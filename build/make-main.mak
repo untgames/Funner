@@ -73,7 +73,7 @@ define batch-compile
   $1.FLAG_FILES := $$($1.FLAG_FILES) $$($2.FLAG_FILE)
   
   $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
-		@cl $$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES)) /nologo /c /Fo"$$($2.TMP_DIR)\\" $$($1.INCLUDE_DIRS:%=/I"%") $$($1.COMPILER_CFLAGS) $$($1.COMPILER_DEFINES:%=/D"%")
+		@cl $$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES:./%=%)) /nologo /c /Fo"$$($2.TMP_DIR)\\" $$($1.INCLUDE_DIRS:%=/I"%") $$($1.COMPILER_CFLAGS) $$($1.COMPILER_DEFINES:%=/D"%")
 		@echo batch-flag-file > $$@
 		
   ifneq (,$$($2.NEW_SOURCE_FILES))
