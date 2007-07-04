@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+
+
+<Uncorrect_tag_property_name>
+
+<Tag 1property = "tara">
+</Tag>
+
+</Uncorrect_tag_property_name>
+
+  <![CDATA[CDATA test asd;fj  sadff h  
+                      @@$21254 CDATA test/]]>
+
+  Identifier
+
+  "string"
+
+  1token
+
+<Uncorrect_tag_property_value>
+
+<Tag property = tara>
+</Tag>
+
+</Uncorrect_tag_property_value>
+
+
+<Uncorrect_tag_name>
+
+<1Tag>
+</1Tag>
+
+</Uncorrect_tag_name>
+
+<Uncorrect_empty_tag>
+
+</br>
+
+</Uncorrect_empty_tag>
+
+
+<MUST BE XXX ERRORS/>
+
+<Unclosed tag>
+
+<No_name_tag>
+
+<>
+</>
+
+</No_name_tag>
