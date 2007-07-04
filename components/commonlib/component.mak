@@ -20,7 +20,7 @@ COMMONLIB_COMPONENTS.COMPILER_DEFINES :=
 #Öåëü ¹3 - CommonLib tests
 COMMONLIB_TESTS.TYPE             := test-suite
 COMMONLIB_TESTS.INCLUDE_DIRS     := include ../xtl/include ../mathlib/include
-COMMONLIB_TESTS.SOURCE_DIRS      := tests/filesys/unit
+COMMONLIB_TESTS.SOURCE_DIRS      := tests/filesys tests/hash
 COMMONLIB_TESTS.LIB_DIRS         :=  
 COMMONLIB_TESTS.LIBS             := commonlib zlib zzip pcre
 COMMONLIB_TESTS.COMPILER_CFLAGS  :=

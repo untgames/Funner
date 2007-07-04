@@ -7,7 +7,7 @@
 
 using namespace common;
 
-const char*  sample_file_name  = "data/sample1.txt";
+const char*  sample_file_name  = "media/tests/hash/sample1.txt";
 const size_t READ_BUFFER_SIZE = 128;
 
 int main ()
