@@ -5,4 +5,4 @@ TARGETS := FUNNER_COMPONENTS #Список целей
 
 #Цель №1 - пакет
 FUNNER_COMPONENTS.TYPE       := package              #Тип цели
-FUNNER_COMPONENTS.COMPONENTS := components/commonlib #Список компонентов и списков опций их сборки
+FUNNER_COMPONENTS.COMPONENTS := components/commonlib components/medialib #Список компонентов и списков опций их сборки
