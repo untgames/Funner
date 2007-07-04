@@ -1,0 +1,213 @@
+/*
+    MySTL limits table
+*/
+
+#ifndef __MYSTL_LIMITS__
+#define __MYSTL_LIMITS__
+
+#include <climits>
+#include <cwchar>
+#include <cfloat>
+
+namespace stl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Константы методов округления (IEEE)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum float_round_style 
+{
+  round_indeterminate       = -1,
+  round_toward_zero         =  0,
+  round_to_nearest          =  1,
+  round_toward_infinity     =  2,
+  round_toward_neg_infinity =  3
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Константы видов ненормальности значения (IEEE)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum float_denorm_style
+{
+  denorm_indeterminate = -1,
+  denorm_absent        =  0,
+  denorm_present       =  1
+};                                
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///База для всех численных лимитов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Number>
+struct numeric_limits_base
+{
+  static const bool is_specialized    = false; //Данный класс специализирован? (относительно numeric_limts<T>)
+  static const bool is_signed         = false; //Имеется ли 'signed' представление?
+  static const bool is_integer        = false; //Целое?
+  static const bool is_exact          = false; //Являются ли вычисления точными? (без ошибок округления)
+  static const bool has_infinity      = false; //Имеется ли положительная бесконечность?
+  static const bool has_quiet_NaN     = false; //Имеется ли значение 'quiet NAN'? (несигнальное значение NAN)
+  static const bool has_signaling_NaN = false; //Доступно ли сигнальное значение NAN?
+  static const bool has_denorm_loss   = false; //Считается ли потеря точности - денормализацией?
+  static const bool is_iec559         = false; //Соответствует ли тип стандарту IEC 559?
+  static const bool is_bounded        = false; //Ограничен ли диапозон значений?
+  static const bool is_modulo         = false; //Есть ли возможность взять значение по модулю?
+  static const bool traps             = false; //Реализованы ли исключения (ловушки) для арифметических операций?
+  static const bool tinyness_before   = false; //Есть ли проверка нормальности числа перед его округлением?
+
+  static const int  digits            = 0;     //Количество разрядов (без потери точности)
+  static const int  digits10          = 0;     //Количество десятичных разрядов (без потери точности)
+  static const int  radix             = 0;     //Основание системы счисления для представления типа
+  static const int  min_exponent      = 0;     //Минимальное отрицательное значение экспоненты (основание radix)
+  static const int  min_exponent10    = 0;     //Минимальное отрицательное значение экспоненты (основание 10)
+  static const int  max_exponent      = 0;     //Максимальное положительное значение экспоненты (основание radix)
+  static const int  max_exponent10    = 0;     //Максимальное положительное значение экспоненты (основание 10)
+
+  static const float_denorm_style has_denorm  = denorm_absent;     //Вид ненормальности значений
+  static const float_round_style  round_style = round_toward_zero; //Метод округления
+
+  static Number min           () throw (); //Минимальное нормальное значени
+  static Number max           () throw (); //Максимальное конечное значение
+  static Number epsilon       () throw (); //Возвращает 1-x, где x - максимальное значение меньшее единицы
+  static Number round_error   () throw (); //Максимальная ошибка округления
+  static Number infinity      () throw (); //Максимальная положительная бесконечность (если has_infinity)
+  static Number quiet_NaN     () throw (); //Несигнальное значение NAN (quiet NAN)
+  static Number signaling_NaN () throw (); //Сигнальное значение NAN (not a number)
+  static Number denorm_min    () throw (); //Наименьшее ненулевое ненормальное значение
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///База для целых типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Int,Int imin,Int imax,int idigits = -1>
+struct integer_limits: public numeric_limits_base<Int> 
+{
+  static const bool is_specialized = true;
+  static const bool is_integer     = true;
+  static const bool is_exact       = true;
+  static const bool is_bounded     = true;
+  static const bool is_modulo      = true;
+  static const bool is_signed      = imin != 0;
+
+  static const int  digits   = (idigits < 0) ? (int)(sizeof (Int) * CHAR_BIT) - (imin == 0 ? 0 : 1) : idigits;
+  static const int  digits10 = (digits * 301) / 1000; // log2 = 0.301029995664...
+  static const int  radix    = 2;
+
+  static Int min () throw () { return imin; }
+  static Int max () throw () { return imax; }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///База для чисел с плавающей точкой
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class             Number,
+          int               Digits,       //Количество двоичных знаков точности представления
+          int               Digits10,     //Количество десятичных знаков точности представления
+          int               MinExp,       //Минимальное значение экспоненты
+          int               MaxExp,       //Максимальное значение экспоненты
+          int               MinExp10,     //Минимальное значение экспоненты (основание 10)
+          int               MaxExp10,     //Максимальное значение экспоненты (основание 10)
+          unsigned int      InfinityWord, //Первое слово +infinity
+          unsigned int      QNaNWord,     //Первое слово quiet NaN
+          unsigned int      SNaNWord,     //Первое слово сигнального NaN
+          bool              IsIEC559,     //Соответствует ли iec559?
+          float_round_style RoundStyle>   //Метод округления
+struct floating_limits: public numeric_limits_base<Number>
+{
+  static const bool is_specialized    = true;
+  static const bool is_bounded        = true;
+  static const bool is_signed         = true;
+  static const bool is_iec559         = IsIEC559;
+  static const bool has_infinity      = true;
+  static const bool has_quiet_NaN     = true;
+  static const bool has_signaling_NaN = true;
+  static const bool has_denorm_loss   = false;
+  static const bool traps             = true;
+  static const bool tinyness_before   = false;
+  static const int  digits            = Digits;
+  static const int  digits10          = Digits10;
+  static const int  radix             = 2;
+  static const int  min_exponent      = MinExp;
+  static const int  max_exponent      = MaxExp;
+  static const int  min_exponent10    = MinExp10;
+  static const int  max_exponent10    = MaxExp10;
+
+  static const float_denorm_style has_denorm = denorm_indeterminate;
+  static const float_round_style  round_style = RoundStyle;
+
+  static Number infinity      () throw ();
+  static Number quiet_NaN     () throw ();
+  static Number signaling_NaN () throw ();
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Таблица лимитов для Number
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Number> 
+struct numeric_limits: public numeric_limits_base<Number> {};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сепциализация для встроенных целых типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <> struct numeric_limits<bool>:           public integer_limits<bool,false,true,0> {};
+template <> struct numeric_limits<char>:           public integer_limits<char,CHAR_MIN,CHAR_MAX> {};
+template <> struct numeric_limits<signed char>:    public integer_limits<signed char,SCHAR_MIN,SCHAR_MAX> {};
+template <> struct numeric_limits<unsigned char>:  public integer_limits<unsigned char,0,UCHAR_MAX> {};
+template <> struct numeric_limits<short>:          public integer_limits<short,SHRT_MIN,SHRT_MAX> {};
+template <> struct numeric_limits<unsigned short>: public integer_limits<unsigned short,0,USHRT_MAX> {};
+template <> struct numeric_limits<int>:            public integer_limits<int,INT_MIN,INT_MAX> {};
+template <> struct numeric_limits<unsigned int>:   public integer_limits<unsigned int,0,UINT_MAX> {};
+template <> struct numeric_limits<long>:           public integer_limits<long,LONG_MIN,LONG_MAX> {};
+template <> struct numeric_limits<unsigned long>:  public integer_limits<unsigned long,0,ULONG_MAX> {};
+
+#ifndef NO_WCHAR
+template <> struct numeric_limits<wchar_t>: public integer_limits<wchar_t,WCHAR_MIN,WCHAR_MAX> {};
+#endif
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Специализация для float
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <> struct numeric_limits<float>
+  : public floating_limits<float,FLT_MANT_DIG,FLT_DIG,FLT_MIN_EXP,FLT_MAX_EXP,FLT_MIN_10_EXP,FLT_MAX_10_EXP,
+           0x7f800000u,0x7f810000u,0x7fc10000u,true,round_to_nearest>
+{
+  static float min         () throw () { return FLT_MIN; }
+  static float denorm_min  () throw () { return FLT_MIN; }
+  static float max     () throw () { return FLT_MAX; }
+  static float epsilon     () throw () { return FLT_EPSILON; }
+  static float round_error () throw () { return 0.5f; }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Специализация для double
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <> struct numeric_limits<double>
+  : public floating_limits<double,DBL_MANT_DIG,DBL_DIG,DBL_MIN_EXP,DBL_MAX_EXP,DBL_MIN_10_EXP,DBL_MAX_10_EXP,
+                           0x7ff00000u,0x7ff10000u,0x7ff90000u,true,round_to_nearest>
+{
+  static double min         () throw () { return DBL_MIN; }
+  static double denorm_min  () throw () { return DBL_MIN; }
+  static double max     () throw () { return DBL_MAX; }
+  static double epsilon     () throw () { return DBL_EPSILON; }
+  static double round_error () throw () { return 0.5; }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Специализация для long double
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <> struct numeric_limits<long double>
+  : public floating_limits<long double,LDBL_MANT_DIG,LDBL_DIG,LDBL_MIN_EXP,LDBL_MAX_EXP,
+         LDBL_MIN_10_EXP,LDBL_MAX_10_EXP,0x7ff00000u,0x7ff10000u,0x7ff90000u,
+         false,round_to_nearest>
+{
+  static long double min         () throw () { return LDBL_MIN; }
+  static long double denorm_min  () throw () { return LDBL_MIN; }
+  static long double max   () throw () { return LDBL_MAX; }
+  static long double epsilon   () throw () { return LDBL_EPSILON; }
+  static long double round_error () throw () { return 4; }
+};
+
+#include <stl/detail/stl/limits.inl>
+
+}
+
+#endif

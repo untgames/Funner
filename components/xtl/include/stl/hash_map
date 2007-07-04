@@ -1,0 +1,254 @@
+/*
+    MySTL hash_map
+*/
+
+#ifndef __MYSTL_HASH_MAP__
+#define __MYSTL_HASH_MAP__
+
+#include <stl/hashtable.h>
+#include <stl/hash_fun.h>
+
+namespace stl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Базовый класс для хэшированного отображения
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,class T,class HashFn,class EqualKey,class Allocator>
+class hash_map_base 
+{
+  protected:  
+    typedef hashtable<pair<const Key,T>,Key,HashFn,select1st<pair<const Key,T> >,EqualKey,Allocator> table_type;
+    
+  public:
+    typedef typename table_type::allocator_type         allocator_type;
+    typedef typename table_type::key_type               key_type;
+    typedef T                                           data_type, mapped_type;
+    typedef typename table_type::value_type             value_type;
+    typedef typename table_type::hasher                 hasher;
+    typedef typename table_type::key_equal              key_equal;
+    typedef typename table_type::size_type              size_type;
+    typedef typename table_type::difference_type        difference_type;
+    typedef typename table_type::pointer                pointer;
+    typedef typename table_type::const_pointer          const_pointer;
+    typedef typename table_type::reference              reference;
+    typedef typename table_type::const_reference        const_reference;    
+    typedef typename table_type::iterator               iterator;
+    typedef typename table_type::const_iterator         const_iterator;    
+    typedef typename table_type::reverse_iterator       reverse_iterator;
+    typedef typename table_type::const_reverse_iterator const_reverse_iterator;
+
+    enum { DEFAULT_TABLE_SIZE = 100 }; //размер хэш-таблицы по умолчанию
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////          
+    explicit hash_map_base (size_type table_size,const hasher& hash,const key_equal& eql,const allocator_type&);
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Аллокатор
+///////////////////////////////////////////////////////////////////////////////////////////////////////////          
+    allocator_type get_allocator () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Функции общего назначения
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                
+    size_type  size      () const;
+    size_type  max_size  () const;
+    bool       empty     () const;
+    hasher     hash_func () const;
+    key_equal  key_eq    () const;
+      
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Итераторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    iterator               begin  ();
+    const_iterator         begin  () const;
+    iterator               end    ();
+    const_iterator         end    () const;
+    reverse_iterator       rbegin ();
+    const_reverse_iterator rbegin () const;
+    reverse_iterator       rend   ();
+    const_reverse_iterator rend   () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Информация о пакетах
+///////////////////////////////////////////////////////////////////////////////////////////////////////////           
+    size_type bucket_count     () const;
+    size_type max_bucket_count () const;
+    size_type elems_in_bucket  (size_type bucket) const;            
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление
+///////////////////////////////////////////////////////////////////////////////////////////////////////////  
+    void      erase (iterator position);
+    size_type erase (const key_type&);
+    void      erase (iterator first,iterator last);
+    void      clear ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    iterator       find  (const key_type&);
+    const_iterator find  (const key_type&) const;
+    size_type      count (const key_type&) const;
+    
+    pair<iterator,iterator>             equal_range (const key_type&);
+    pair<const_iterator,const_iterator> equal_range (const key_type&) const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение размера
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                      
+    void resize (size_type num_elements);          
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Операции сравнения
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    bool operator == (const hash_map_base&) const;
+    bool operator != (const hash_map_base&) const;
+    bool operator <  (const hash_map_base&) const;
+    bool operator >  (const hash_map_base&) const;
+    bool operator <= (const hash_map_base&) const;
+    bool operator >= (const hash_map_base&) const;  
+
+  protected:         
+    table_type ht;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отображение с уникальными ключами
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,
+          class T,
+          class HashFn    = hash_fun<Key>,
+          class EqualKey  = equal_to<Key>,
+          class Allocator = typename default_allocator<pair<const Key,T> >::allocator_type>
+class hash_map: public hash_map_base<Key,T,HashFn,EqualKey,Allocator>
+{
+  protected:
+    typedef hash_map_base<Key,T,HashFn,EqualKey,Allocator> base;
+    typedef typename base::table_type                      table_type;
+
+  public:
+    typedef typename base::allocator_type  allocator_type;
+    typedef typename base::key_type        key_type;
+    typedef typename base::value_type      value_type;
+    typedef typename base::size_type       size_type;
+    typedef typename base::hasher          hasher;
+    typedef typename base::key_equal       key_equal;
+    typedef typename base::iterator        iterator;
+
+    using base::DEFAULT_TABLE_SIZE;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////            
+    explicit hash_map (const allocator_type& = allocator_type::create ());
+    explicit hash_map (size_type              table_size,
+                       const hasher&          hash      = hasher (),
+                       const key_equal&       eql       = key_equal (),
+                       const allocator_type&  allocator = allocator_type::create ());
+ 
+    template <class Iter> 
+    hash_map (Iter                   first,
+              Iter                   last,
+              size_type              table_size = DEFAULT_TABLE_SIZE,
+              const hasher&          hash       = hasher (),
+              const key_equal&       eql        = key_equal (),
+              const allocator_type&  allocator  = allocator_type::create ());
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Операции доступа
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    T& operator [] (const key_type&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка
+///////////////////////////////////////////////////////////////////////////////////////////////////////////        
+    pair<iterator,bool> insert      (const value_type&);
+    pair<iterator,bool> insert_pair (const key_type&,const T&); //non-standart extension
+  
+    template <class Iter> void insert (Iter first,Iter last);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух отображений
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    void swap (hash_map&);
+
+  protected:
+    using base::ht;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отображение с неуникальными ключами
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,
+          class T,
+          class HashFn    = hash_fun<Key>,
+          class EqualKey  = equal_to<Key>,
+          class Allocator = typename default_allocator<pair<Key,T> >::allocator_type>
+class hash_multimap: public hash_map_base<Key,T,HashFn,EqualKey,Allocator>
+{
+  protected:
+    typedef hash_map_base<Key,T,HashFn,EqualKey,Allocator> base;
+    typedef typename base::table_type                      table_type;
+
+  public:
+    typedef typename base::allocator_type  allocator_type;
+    typedef typename base::key_type        key_type;
+    typedef typename base::value_type      value_type;
+    typedef typename base::size_type       size_type;
+    typedef typename base::hasher          hasher;
+    typedef typename base::key_equal       key_equal;
+    typedef typename base::iterator        iterator;
+
+    using base::DEFAULT_TABLE_SIZE;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////          
+    explicit hash_multimap (const allocator_type& = allocator_type::create ());
+    explicit hash_multimap (size_type              table_size,
+                            const hasher&          hash      = hasher (),
+                            const key_equal&       eql       = key_equal (),
+                            const allocator_type&  allocator = allocator_type::create ());
+ 
+    template <class Iter> 
+    hash_multimap (Iter                   first,
+                   Iter                   last,
+                   size_type              table_size = DEFAULT_TABLE_SIZE,
+                   const hasher&          hash       = hasher (),
+                   const key_equal&       eql        = key_equal (),
+                   const allocator_type&  allocator  = allocator_type::create ());
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка
+///////////////////////////////////////////////////////////////////////////////////////////////////////////        
+    iterator insert      (const value_type&);
+    iterator insert_pair (const key_type&,const T&); //non-standart extension
+  
+    template <class Iter> void insert (Iter first,Iter last);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух отображений
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    void swap (hash_multimap&);
+
+  protected:
+    using base::ht;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух отображений
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,class T,class HashFn,class EqualKey,class Allocator>
+void swap (hash_map<Key,T,HashFn,EqualKey,Allocator>&,hash_map<Key,T,HashFn,EqualKey,Allocator>&);
+
+template <class Key,class T,class HashFn,class EqualKey,class Allocator>
+void swap (hash_multimap<Key,T,HashFn,EqualKey,Allocator>&,hash_multimap<Key,T,HashFn,EqualKey,Allocator>&);
+
+#include <stl/detail/stl/hash_map.inl>
+
+}
+
+#endif

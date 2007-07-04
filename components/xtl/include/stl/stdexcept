@@ -1,0 +1,79 @@
+/*
+    MySTL exceptions
+*/
+
+#ifndef __MYSTL_EXCEPTIONS__
+#define __MYSTL_EXCEPTIONS__
+
+#include <exception>
+#include <typeinfo>
+#include <cstdarg>
+#include <cstdio>
+#include <cstring>
+
+#ifdef _MSC_VER 
+  #pragma warning (push)  
+  #pragma warning (disable:4996) //'function' was declared deprecated
+#endif
+
+namespace stl
+{
+
+using std::exception;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Базовый класс именованого исключения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class named_exception: public exception
+{
+  public:
+    enum { BUF_SIZE = 256 };
+
+    named_exception (const char*);
+
+    const char* what () const throw ();
+
+  private:
+    char name [BUF_SIZE];
+};
+
+/*
+    Логические ошибки
+*/
+
+class logic_error:      public named_exception { public: logic_error (const char*); };
+class domain_error:     public logic_error     { public: domain_error (const char*); };
+class invalid_argument: public logic_error     { public: invalid_argument (const char*); };
+class length_error:     public logic_error     { public: length_error (const char*); };
+class out_of_range:     public logic_error     { public: out_of_range (const char*); };
+
+/*
+    Ошибки времени выполнения
+*/
+
+class runtime_error:   public named_exception { public: runtime_error (const char*); };
+class range_error:     public runtime_error   { public: range_error (const char*); };
+class overflow_error:  public runtime_error   { public: overflow_error (const char*); };
+class underflow_error: public runtime_error   { public: underflow_error (const char*); };
+
+/*
+    Возбуждение исключения
+*/
+
+template <class Container> void stl_raise_length_error (const Container&,size_t new_size);
+template <class Container> void stl_raise_out_of_range (const Container&,int position);
+template <class Container> void stl_raise_out_of_range (const Container&,int first,int last);
+template <class Container> void stl_raise_out_of_range (const Container&,typename Container::iterator position);
+template <class Container> void stl_raise_out_of_range (const Container&,
+                                                        typename Container::iterator first,
+                                                        typename Container::iterator last);
+
+#include <stl/detail/stl/stdexcept.inl>
+
+#ifdef _MSC_VER 
+  #pragma warning (pop)
+#endif
+
+}
+
+#endif

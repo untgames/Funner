@@ -1,0 +1,199 @@
+/*
+    MySTL set
+*/
+
+#ifndef __MYSTL_SET__
+#define __MYSTL_SET__
+
+#include <stl/tree.h>
+#include <stl/functional>
+
+namespace stl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Базовый класс для множеств
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,class Compare,class Allocator>
+class set_base
+{
+  protected:
+    typedef rbtree<Key,Key,identity<Key>,Compare,Allocator> tree_type;
+    
+  public:
+    typedef Key                                         key_type, value_type;
+    typedef Compare                                     key_compare, value_compare;        
+    typedef typename tree_type::allocator_type          allocator_type;
+    typedef typename tree_type::size_type               size_type;
+    typedef typename tree_type::difference_type         difference_type;          
+    typedef typename tree_type::const_pointer           pointer, const_pointer;
+    typedef typename tree_type::const_reference         reference, const_reference;
+    typedef typename tree_type::const_iterator          iterator, const_iterator;
+    typedef typename tree_type::const_reverse_iterator  reverse_iterator, const_reverse_iterator;   
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    explicit set_base (const allocator_type&);
+    explicit set_base (const key_compare&,const allocator_type&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Аллокатор
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    allocator_type get_allocator () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Функции общего назначения
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                
+    size_type     size       () const;
+    size_type     max_size   () const;
+    bool          empty      () const;
+    key_compare   key_comp   () const;
+    value_compare value_comp () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Итераторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////        
+    iterator          begin  () const;
+    iterator          end    () const;
+    reverse_iterator  rbegin () const;
+    reverse_iterator  rend   () const;  
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление
+///////////////////////////////////////////////////////////////////////////////////////////////////////////            
+    void      erase (iterator position);
+    size_type erase (const key_type&);
+    void      erase (iterator first,iterator last);
+    void      clear ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск
+///////////////////////////////////////////////////////////////////////////////////////////////////////////              
+    iterator  find        (const key_type&) const;
+    size_type count       (const key_type&) const;
+    iterator  lower_bound (const key_type&) const;
+    iterator  upper_bound (const key_type&) const;
+  
+    pair<iterator,iterator> equal_range (const key_type&) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Операции сравнения
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    bool operator == (const set_base&) const;
+    bool operator != (const set_base&) const;
+    bool operator <  (const set_base&) const;
+    bool operator >  (const set_base&) const;
+    bool operator <= (const set_base&) const;
+    bool operator >= (const set_base&) const;
+    
+  protected:
+    tree_type tree;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Множество c уникальными ключами
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,class Compare=less<Key>,class Allocator=typename default_allocator<Key>::allocator_type>
+class set: public set_base<Key,Compare,Allocator>
+{
+  protected:
+    typedef set_base<Key,Compare,Allocator> base;
+    typedef typename base::tree_type        tree_type;
+
+  public:
+    typedef typename base::allocator_type  allocator_type;
+    typedef typename base::size_type       size_type;
+    typedef typename base::value_type      value_type;
+    typedef typename base::key_compare     key_compare;
+    typedef typename base::iterator        iterator;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    explicit set (const allocator_type& = allocator_type::create ());
+    explicit set (const key_compare&,const allocator_type& = allocator_type::create ());
+ 
+    template <class Iter> set (Iter first,Iter last,const allocator_type& = allocator_type::create ());
+    template <class Iter> set (Iter                   first,
+                               Iter                   last,
+                               const key_compare&     comp,
+                               const allocator_type&  allocator = allocator_type::create ());
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка
+///////////////////////////////////////////////////////////////////////////////////////////////////////////        
+    pair<iterator,bool> insert (const value_type&);
+    iterator            insert (iterator position,const value_type&);
+  
+    template <class Iter> void insert (Iter first,Iter last);    
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содердимого двух множеств
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    void swap (set&);
+
+  protected:
+    using base::tree;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Множество c неуникальными ключами
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,class Compare=less<Key>,class Allocator=typename default_allocator<Key>::allocator_type>
+class multiset: public set_base<Key,Compare,Allocator>
+{
+  protected:
+    typedef set_base<Key,Compare,Allocator> base;    
+    typedef typename base::tree_type        tree_type;
+
+  public:
+    typedef typename base::allocator_type  allocator_type;
+    typedef typename base::size_type       size_type;
+    typedef typename base::value_type      value_type;
+    typedef typename base::key_compare     key_compare;
+    typedef typename base::iterator        iterator;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    explicit multiset (const allocator_type& = allocator_type::create ());
+    explicit multiset (const key_compare&,const allocator_type& = allocator_type::create ());
+
+    template <class Iter> multiset (Iter first,Iter last,const allocator_type& = allocator_type::create ());
+    template <class Iter> multiset (Iter                   first,
+                                    Iter                   last,
+                                    const key_compare&     comp,
+                                    const allocator_type&  allocator = allocator_type::create ());
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка
+///////////////////////////////////////////////////////////////////////////////////////////////////////////        
+    iterator insert (const value_type&);
+    iterator insert (iterator position,const value_type&);
+  
+    template <class Iter> void insert (Iter first,Iter last);    
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содердимого двух множеств
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    void swap (multiset&);    
+
+  protected:
+    using base::tree;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух множеств
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,class Compare,class Allocator>
+void swap (set<Key,Compare,Allocator>&,set<Key,Compare,Allocator>&);
+
+template <class Key,class Compare,class Allocator>
+void swap (multiset<Key,Compare,Allocator>&,multiset<Key,Compare,Allocator>&);
+
+#include <stl/detail/stl/set.inl>
+
+}
+
+#endif

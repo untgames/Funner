@@ -1,0 +1,232 @@
+/*
+    MySTL hash_set
+*/
+
+#ifndef __MYSTL_HASH_SET__
+#define __MYSTL_HASH_SET__
+
+#include <stl/hashtable.h>
+#include <stl/hash_fun.h>
+
+namespace stl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///База для хэшированного множества
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Value,class HashFn,class EqualKey,class Allocator>
+class hash_set_base
+{
+  protected:
+    typedef stl::hashtable<Value,Value,HashFn,identity<Value>,EqualKey,Allocator> table_type;
+
+  public:
+    typedef typename table_type::allocator_type         allocator_type;
+    typedef typename table_type::key_type               key_type;
+    typedef typename table_type::value_type             value_type;
+    typedef typename table_type::hasher                 hasher;
+    typedef typename table_type::key_equal              key_equal;
+    typedef typename table_type::size_type              size_type;
+    typedef typename table_type::difference_type        difference_type;
+    typedef typename table_type::const_pointer          pointer, const_pointer;
+    typedef typename table_type::const_reference        reference, const_reference;
+    typedef typename table_type::const_iterator         iterator, const_iterator;
+    typedef typename table_type::const_reverse_iterator reverse_iterator, const_reverse_iterator;
+    
+    enum { DEFAULT_TABLE_SIZE = 100 }; //размер хэш-таблицы по умолчанию
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    explicit hash_set_base (size_type table_size,const hasher& hash,const key_equal& eql,const allocator_type&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Аллокатор
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    allocator_type get_allocator () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Функции общего назначения
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    size_type size      () const;
+    size_type max_size  () const;
+    bool      empty     () const;
+    hasher    hash_func () const;
+    key_equal key_eq    () const;    
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Итераторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////        
+    iterator          begin  () const;
+    iterator          end    () const;
+    reverse_iterator  rbegin () const;
+    reverse_iterator  rend   () const;      
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Информация о пакетах
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    size_type bucket_count     () const;
+    size_type max_bucket_count () const;
+    size_type elems_in_bucket  (size_type bucket) const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                
+    size_type erase (const key_type&);
+    void      erase (iterator position);
+    void      erase (iterator first,iterator last);
+    void      clear ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                
+    iterator  find  (const key_type&) const;
+    size_type count (const key_type&) const;
+    
+    pair<iterator,iterator> equal_range (const key_type&) const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение размера
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                      
+    void resize (size_type num_elements);      
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Сравнение
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                      
+    bool operator == (const hash_set_base&) const;
+    bool operator != (const hash_set_base&) const;
+    bool operator <  (const hash_set_base&) const;
+    bool operator >  (const hash_set_base&) const;
+    bool operator <= (const hash_set_base&) const;
+    bool operator >= (const hash_set_base&) const;
+    
+  protected:
+    table_type ht;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Хэшированное множество c уникальными ключами
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Value,
+          class HashFn    = hash_fun<Value>,
+          class EqualKey  = equal_to<Value>,
+          class Allocator = typename default_allocator<Value>::allocator_type>
+class hash_set: public hash_set_base<Value,HashFn,EqualKey,Allocator>
+{
+  protected:
+    typedef hash_set_base<Value,HashFn,EqualKey,Allocator> base;
+    typedef typename base::table_type                      table_type;
+
+  public: 
+    typedef typename base::allocator_type  allocator_type;
+    typedef typename base::size_type       size_type;
+    typedef typename base::value_type      value_type;
+    typedef typename base::hasher          hasher;
+    typedef typename base::key_equal       key_equal;
+    typedef typename base::iterator        iterator;
+
+    using base::DEFAULT_TABLE_SIZE;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////          
+    explicit hash_set (const allocator_type& = allocator_type::create ());
+    explicit hash_set (size_type             table_size,
+                       const hasher&         hash      = hasher (),
+                       const key_equal&      eql       = key_equal (),
+                       const allocator_type& allocator = allocator_type::create ());
+             
+    template <class Iter> 
+    hash_set (Iter                  first,
+              Iter                  last,
+              size_type             table_size = DEFAULT_TABLE_SIZE,
+              const hasher&         hash       = hasher (),
+              const key_equal&      eql        = key_equal (),
+              const allocator_type& allocator  = allocator_type::create ());
+                                    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    pair<iterator,bool> insert (const value_type&);
+
+    template <class Iter> void insert (Iter first,Iter last);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух множеств
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void swap (hash_set&);    
+
+  protected:
+    using base::ht;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Хэшированное множество c неуникальными ключами
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Value,
+          class HashFn    = hash_fun<Value>,
+          class EqualKey  = equal_to<Value>,
+          class Allocator = typename default_allocator<Value>::allocator_type>
+class hash_multiset: public hash_set_base<Value,HashFn,EqualKey,Allocator>
+{
+  protected:
+    typedef hash_set_base<Value,HashFn,EqualKey,Allocator> base;
+    typedef typename base::table_type                      table_type;
+
+  public:
+    typedef typename base::allocator_type  allocator_type;
+    typedef typename base::size_type       size_type;
+    typedef typename base::value_type      value_type;
+    typedef typename base::hasher          hasher;
+    typedef typename base::key_equal       key_equal;
+    typedef typename base::iterator        iterator;
+
+    using base::DEFAULT_TABLE_SIZE;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    explicit hash_multiset (const allocator_type& = allocator_type::create ());
+    explicit hash_multiset (size_type              table_size,
+                            const hasher&          hash      = hasher (),
+                            const key_equal&       eql       = key_equal (),
+                            const allocator_type&  allocator = allocator_type::create ());
+             
+    template <class Iter> 
+    hash_multiset (Iter                   first,
+                   Iter                   last,
+                   size_type              table_size = DEFAULT_TABLE_SIZE,
+                   const hasher&          hash       = hasher (),
+                   const key_equal&       eql        = key_equal (),
+                   const allocator_type&  allocator  = allocator_type::create ());
+                                    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    iterator insert (const value_type&);
+
+    template <class Iter> void insert (Iter first,Iter last);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух множеств
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void swap (hash_multiset&);    
+
+  protected:
+    using base::ht;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух множеств
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Value,class HashFn,class EqualKey,class Allocator>
+void swap (hash_set<Value,HashFn,EqualKey,Allocator>&,hash_set<Value,HashFn,EqualKey,Allocator>&);
+
+template <class Value,class HashFn,class EqualKey,class Allocator>
+void swap (hash_multiset<Value,HashFn,EqualKey,Allocator>&,hash_multiset<Value,HashFn,EqualKey,Allocator>&);
+
+#include <stl/detail/stl/hash_set.inl>
+  
+}
+
+#endif

@@ -1,0 +1,252 @@
+/*
+    MySTL deque
+*/
+
+#ifndef __MYSTL_DEQUE__
+#define __MYSTL_DEQUE__
+
+#include <stl/iterator>
+#include <stl/alloc.h>
+#include <stl/stdexcept>
+
+namespace stl
+{
+
+//forward declaration
+template <class T,class Allocator> class deque;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Итератор дека
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Allocator> class deque_iterator_base
+{
+  public:
+    deque_iterator_base ();
+
+    ptrdiff_t operator - (const deque_iterator_base&) const;
+
+    bool operator == (const deque_iterator_base&) const;
+    bool operator != (const deque_iterator_base&) const;
+    bool operator <  (const deque_iterator_base&) const;
+    bool operator >  (const deque_iterator_base&) const;
+    bool operator <= (const deque_iterator_base&) const;
+    bool operator >= (const deque_iterator_base&) const;
+
+  protected:
+    deque_iterator_base (deque<T,Allocator>* owner,size_t offset);
+
+  protected:
+    deque<T,Allocator>* owner;
+    size_t              offset;
+};
+
+template <class T,class Ref,class Ptr,class Allocator>
+class deque_iterator: public deque_iterator_base<T,Allocator>
+{  
+  friend class deque<T,Allocator>;
+  typedef deque_iterator_base<T,Allocator> base;
+  public:
+    typedef T                                             value_type;
+    typedef Ptr                                           pointer;
+    typedef Ref                                           reference;
+    typedef size_t                                        size_type;
+    typedef ptrdiff_t                                     difference_type;
+    typedef deque_iterator<T,T&,T*,Allocator>             iterator;
+    typedef deque_iterator<T,const T&,const T*,Allocator> const_iterator;   
+    typedef random_access_iterator_tag                    iterator_category;
+
+    deque_iterator () {}
+    deque_iterator (const base&);
+
+    reference operator *  () const;
+    pointer   operator -> () const;
+    reference operator [] (difference_type i) const;
+
+    deque_iterator& operator ++ ();
+    deque_iterator& operator -- ();
+    deque_iterator  operator ++ (int);
+    deque_iterator  operator -- (int);
+
+    deque_iterator& operator += (difference_type n);
+    deque_iterator& operator -= (difference_type n);
+   
+    deque_iterator  operator + (difference_type n);
+    deque_iterator  operator - (difference_type n);
+    difference_type operator - (const base&) const;
+
+  private:
+    deque_iterator (deque<T,Allocator>*,size_t offset);
+ 
+    using base::owner;
+    using base::offset;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дек
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Allocator=typename default_allocator<T>::allocator_type>
+class deque
+{
+  friend class deque_iterator<T,T&,T*,Allocator>;
+  friend class deque_iterator<T,const T&,const T*,Allocator>;
+  public: 
+    typedef typename Allocator::template rebind<T>::other allocator_type;
+    typedef size_t                                        size_type;
+    typedef ptrdiff_t                                     difference_type;
+    typedef T                                             value_type;
+    typedef value_type*                                   pointer;
+    typedef const value_type*                             const_pointer;
+    typedef value_type&                                   reference;
+    typedef const value_type&                             const_reference;
+    typedef deque_iterator<T,T&,T*,Allocator>             iterator;
+    typedef deque_iterator<T,const T&,const T*,Allocator> const_iterator;
+    typedef reverse_iterator<const_iterator>              const_reverse_iterator;
+    typedef reverse_iterator<iterator>                    reverse_iterator;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    explicit deque  (const allocator_type& = allocator_type::create ());
+    explicit deque  (size_type count,const value_type& = value_type (),const allocator_type& = allocator_type::create ());
+             deque  (const deque&);
+             ~deque ();
+             
+    template <class Iter> deque (Iter first,Iter last,const allocator_type& = allocator_type::create ());
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Функции общего назначения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    allocator_type get_allocator () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Функции общего назначения
+///////////////////////////////////////////////////////////////////////////////////////////////////           
+    size_type size     () const;
+    size_type max_size () const;
+    bool      empty    () const;    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение итераторов
+///////////////////////////////////////////////////////////////////////////////////////////////////   
+    iterator               begin  ();
+    iterator               end    ();
+    const_iterator         begin  () const;
+    const_iterator         end    () const;
+    reverse_iterator       rbegin ();
+    reverse_iterator       rend   ();
+    const_reverse_iterator rbegin () const;
+    const_reverse_iterator rend   () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Доступ
+///////////////////////////////////////////////////////////////////////////////////////////////////       
+    reference       operator [] (size_type);
+    const_reference operator [] (size_type) const;
+
+    reference       at    (size_type);
+    const_reference at    (size_type) const;      
+    reference       front ();
+    reference       back  ();
+    const_reference front () const;
+    const_reference back  () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////           
+    void assign (size_type count,const value_type& val);
+    
+    template <class Iter> void assign (Iter first,Iter last);
+    
+    deque& operator = (const deque&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух деков
+///////////////////////////////////////////////////////////////////////////////////////////////////               
+    void swap (deque&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление/извлечение элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void push_back  (const value_type&);
+    void push_back  ();
+    void push_front (const value_type&);
+    void push_front ();
+    void pop_back   ();
+    void pop_front  ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////        
+    iterator insert (iterator position,const value_type&);
+    iterator insert (iterator position);
+    void     insert (iterator position,size_type count,const value_type&);    
+
+    template <class Iter> void insert (iterator pos,Iter first,Iter last);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение размера дека
+///////////////////////////////////////////////////////////////////////////////////////////////////            
+    void resize (size_type new_size,const value_type&);
+    void resize (size_type new_size);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////                
+    iterator erase (iterator pos);
+    iterator erase (iterator first,iterator last);
+    void     clear (); 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сравнение
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool operator == (const deque&) const;
+    bool operator != (const deque&) const;
+    bool operator <  (const deque&) const;
+    bool operator >  (const deque&) const;
+    bool operator <= (const deque&) const;
+    bool operator >= (const deque&) const;
+    
+  private:
+    enum {
+      BLOCK_SIZE   = 32, //размер блока
+      MIN_MAP_SIZE = 8   //минимальный размер карты
+    };
+
+    const_reference get (size_type index) const;
+    reference       get (size_type index);
+
+    bool is_valid (iterator) const;
+    bool is_valid (iterator,iterator) const;
+
+    size_type next_size () const;
+    void      grow  ();
+
+    void raise_out_of_range (const char* func_name,iterator pos) const;
+    void raise_out_of_range (const char* func_name,iterator first,iterator last) const;
+
+    template <class Iter> void _insert (iterator pos,Iter first,Iter last,input_iterator_tag);
+    template <class Iter> void _insert (iterator pos,Iter first,Iter last,bidirectional_iterator_tag);
+    template <class Iter> void _insert (iterator pos,Iter first,Iter last,int_iterator_tag);
+    template <class Iter> void _assign (Iter first,Iter last,input_iterator_tag);
+    template <class Iter> void _assign (Iter first,Iter last,int_iterator_tag);
+
+    typedef typename Allocator::template rebind<pointer>::other map_allocator_type;
+
+  private:
+    allocator_type     allocator;
+    map_allocator_type map_allocator;
+    pointer*           map;
+    size_type          map_size, seq_offset, seq_size;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух деков
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Allocator> 
+void swap (deque<T,Allocator>&,deque<T,Allocator>&);
+
+#include <stl/detail/stl/deque.inl>
+
+}
+
+#endif

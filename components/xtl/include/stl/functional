@@ -1,0 +1,580 @@
+/*
+    MySTL functional
+*/
+
+#ifndef __MYSTL_FUNCTIONAL__
+#define __MYSTL_FUNCTIONAL__
+
+#include <stl/adaptors.h>
+
+namespace stl
+{
+
+/*
+    Базовые определения одноместного и двуместного функтора
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Определение одноместного функтора
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg,class Result=Arg>
+struct unary_function 
+{
+  typedef Arg    argument_type;
+  typedef Result result_type;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Определение двуместного функтора
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1> 
+struct binary_function 
+{
+  typedef Arg1   first_argument_type;
+  typedef Arg2   second_argument_type;
+  typedef Result result_type;
+};
+
+/*
+    Арифметико-логические операции 
+    Расширение: assign_* - операции вида *=, +=, etc 
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Сложение
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct plus: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (const Arg1&,const Arg2&) const;
+};
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign_plus: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вычитание
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct minus: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (const Arg1&,const Arg2&) const;
+};
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign_minus: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Умножение
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct multiplies: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (const Arg1&,const Arg2&) const;
+};
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign_multiplies: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Деление
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct divides: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (const Arg1&,const Arg2&) const;
+};
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign_divides: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Остаток от деления
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct modulus: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (const Arg1&,const Arg2&) const;
+};
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign_modulus: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Унарный минус
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg,class Result=Arg>
+struct negate: public unary_function<Arg,Result>
+{
+  Result operator () (const Arg&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отношение равенства (==)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1> 
+struct equal_to: public binary_function<Arg1,Arg2,bool> 
+{
+  bool operator () (const Arg1& a,const Arg2& b) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отношение неравенства (!=)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1> 
+struct not_equal_to: public binary_function<Arg1,Arg2,bool> 
+{
+  bool operator () (const Arg1& a,const Arg2& b) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отношение "меньше" (<)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1> 
+struct less: public binary_function<Arg1,Arg2,bool> 
+{
+  bool operator () (const Arg1& a,const Arg2& b) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отношение "больше" (>)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1> 
+struct greater: public binary_function<Arg1,Arg2,bool> 
+{
+  bool operator () (const Arg1& a,const Arg2& b) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отношение "не больше" (<=)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1> 
+struct less_equal: public binary_function<Arg1,Arg2,bool> 
+{
+  bool operator () (const Arg1& a,const Arg2& b) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отношение "не меньше" (>=)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1> 
+struct greater_equal: public binary_function<Arg1,Arg2,bool> 
+{
+  bool operator () (const Arg1& a,const Arg2& b) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Логическое "И"
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1> 
+struct logical_and: public binary_function<Arg1,Arg2,bool> 
+{
+  bool operator () (const Arg1& a,const Arg2& b) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Логическое "ИЛИ"
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1> 
+struct logical_or: public binary_function<Arg1,Arg2,bool> 
+{
+  bool operator () (const Arg1& a,const Arg2& b) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Логическое "НЕ"
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg> 
+struct logical_not: public unary_function<Arg,bool> 
+{
+  bool operator () (const Arg& a) const;
+};
+
+/*
+    Поразрядные операции (расширение)
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поразрядное "И"
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct radix_and: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (const Arg1&,const Arg2&) const;
+};
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign_radix_and: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поразрядное "ИЛИ"
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct radix_or: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (const Arg1&,const Arg2&) const;
+};
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign_radix_or: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поразрядное "исключающее ИЛИ" (xor)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct radix_xor: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (const Arg1&,const Arg2&) const;
+};
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign_radix_xor: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поразрядное "НЕ"
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg,class Result=Arg>
+struct radix_not: public unary_function<Arg,Result>
+{
+  Result operator () (const Arg&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поразрядный сдвиг влево
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct radix_left_shift: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (const Arg1&,const Arg2&) const;
+};
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign_radix_left_shift: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поразрядный сдвиг вправо
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct radix_right_shift: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (const Arg1&,const Arg2&) const;
+};
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign_radix_right_shift: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/*
+   Присваивание (расширение)
+*/
+
+template <class Arg1,class Arg2=Arg1,class Result=Arg1>
+struct assign: public binary_function<Arg1,Arg2,Result>
+{
+  Result operator () (Arg1&,const Arg2&) const;
+};
+
+/*
+    Логическое отрицание предиката
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отрицание одноместного предиката
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Predicate>
+class unary_negate: public unary_function<typename Predicate::argument_type,bool> 
+{
+  public:
+    typedef typename Predicate::argument_type argument_type;
+
+    unary_negate  (const Predicate&);
+    bool operator () (const argument_type& x) const;
+    
+  protected:
+    Predicate pred;  
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отрицание двуместного предиката
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Predicate> 
+class binary_negate: 
+      public binary_function<typename Predicate::first_argument_type,
+           typename Predicate::second_argument_type,
+           bool>
+{
+  public:
+    typedef typename Predicate::first_argument_type  first_argument_type;
+    typedef typename Predicate::second_argument_type second_argument_type;
+
+    binary_negate (const Predicate&);  
+    bool operator () (const first_argument_type&,const second_argument_type&) const;
+
+  protected:
+    Predicate pred;
+};
+
+/*
+    Подстановки и проекции
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Подстановка значения вместо первого аргумента функции
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Fn> 
+class binder1st: public unary_function<typename Fn::second_argument_type,typename Fn::result_type> 
+{
+  public:
+    typedef typename Fn::second_argument_type argument_type;
+    typedef typename Fn::result_type          result_type;
+
+    binder1st (const Fn&,const typename Fn::first_argument_type&);
+    
+    result_type operator () (const argument_type& x) const;
+  
+  protected:
+    Fn fn;
+    typename Fn::first_argument_type value;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Подстановка значения вместо второго аргумента функции
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Fn> 
+class binder2nd: public unary_function<typename Fn::first_argument_type,typename Fn::result_type> 
+{
+  public:
+    typedef typename Fn::first_argument_type  argument_type;
+    typedef typename Fn::result_type          result_type;
+
+    binder2nd (const Fn&,const typename Fn::second_argument_type&);
+    
+    result_type operator () (const argument_type& x) const;
+  
+  protected:
+    Fn fn;
+    typename Fn::second_argument_type value;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Проекция первого элемента пары
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Pair>
+struct select1st: public unary_function<Pair,typename Pair::first_type> 
+{
+  typedef Pair                       argument_type;
+  typedef typename Pair::first_type  result_type;
+
+  const result_type& operator () (const argument_type& x) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Проекция второго элемента пары
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Pair>
+struct select2nd: public unary_function<Pair,typename Pair::second_type> 
+{
+  typedef Pair                        argument_type;
+  typedef typename Pair::second_type  result_type;
+
+  const result_type& operator () (const argument_type& x) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Проекция первого аргумента двуместной функции
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2>
+struct project1st: public binary_function<Arg1,Arg2,Arg1> 
+{
+  typedef Arg1 first_argument_type;
+  typedef Arg2 second_argument_type;
+  typedef Arg1 result_type;
+
+  result_type operator () (const first_argument_type&,const second_argument_type&);
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Проекция второго аргумента двуместной функции
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2>
+struct project2nd: public binary_function<Arg1,Arg2,Arg2> 
+{
+  typedef Arg1 first_argument_type;
+  typedef Arg2 second_argument_type;
+  typedef Arg2 result_type;
+
+  result_type operator () (const first_argument_type&,const second_argument_type&);
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Проекция аргумента одноместной функции
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T>
+struct identity: public unary_function<T,T> 
+{
+  typedef T argument_type;
+  typedef T result_type;
+
+  const result_type& operator () (const argument_type&) const;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Подстановка константны
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Result>
+class constant_void_fun 
+{
+  public:
+    typedef Result result_type;
+
+    constant_void_fun (const result_type&);
+     
+    const result_type& operator () () const;
+  
+  protected:  
+    result_type val;  
+};  
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Одноместный функтор подстановки константы
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Result,class Arg>
+class constant_unary_fun 
+{
+  public:
+    typedef Arg     argument_type;
+    typedef Result  result_type;
+
+    constant_unary_fun (const result_type&);
+    
+    const result_type& operator () (const Arg&) const;
+
+  protected:          
+    result_type val;  
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Двуместный функтор подстановки константы
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Result,class Arg1,class Arg2>
+class constant_binary_fun 
+{
+  public:
+    typedef Arg1   first_argument_type;
+    typedef Arg2   second_argument_type;
+    typedef Result result_type;    
+
+    constant_binary_fun (const result_type&);
+    
+    const result_type& operator () (const first_argument_type&,const second_argument_type&) const;
+  
+  protected:  
+    result_type val;  
+};
+
+/*
+    Суперпозиция функций
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///fn1 (fn2 (x))
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Fn1,class Fn2>
+class unary_compose: public unary_function<typename Fn2::argument_type,typename Fn1::result_type>
+{
+  public:
+    typedef typename Fn2::argument_type argument_type;
+    typedef typename Fn1::result_type   result_type;
+
+    unary_compose (const Fn1& fn1,const Fn2& fn2);
+    
+    result_type operator () (const argument_type&) const;
+      
+ protected:
+   Fn1 fn1;
+   Fn2 fn2;  
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///fn1 (fn2 (x),fn3 (x))
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Fn1,class Fn2,class Fn3>
+class binary_compose: public unary_function<typename Fn2::argument_type,typename Fn1::result_type> 
+{
+  public:
+    typedef typename Fn2::argument_type argument_type;
+    typedef typename Fn1::result_type   result_type;
+
+    binary_compose (const Fn1& fn1,const Fn2& fn2,const Fn3& fn3);
+    
+    result_type operator () (const argument_type&) const;
+  
+  protected:
+    Fn1 fn1;
+    Fn2 fn2;
+    Fn3 fn3;  
+};
+
+/*
+    "Конструкторы" функторов
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отрицание одноместного / двуместного предикатов
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Predicate> unary_negate<Predicate>  not1 (const Predicate&);
+template <class Predicate> binary_negate<Predicate> not2 (const Predicate&);
+  
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Подстановка val в качестве соответствующего аргумента функции Fn fn
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Fn,class T> binder1st<Fn> bind1st (const Fn& fn,const T& val);  
+template <class Fn,class T> binder2nd<Fn> bind2nd (const Fn& fn,const T& val);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Подстановка константы в в функции с соответствующим числом аргументов
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Ret> constant_void_fun<Ret>           constant0 (const Ret&);
+template <class Ret> constant_unary_fun<Ret,Ret>      constant1 (const Ret&);
+template <class Ret> constant_binary_fun<Ret,Ret,Ret> constant2 (const Ret&);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Суперпозиция функций
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Fn1,class Fn2>           unary_compose<Fn1,Fn2>      compose1 (const Fn1&,const Fn2&);
+template <class Fn1,class Fn2,class Fn3> binary_compose<Fn1,Fn2,Fn3> compose2 (const Fn1&,const Fn2&,const Fn3&); 
+
+#include <stl/detail/stl/functional.inl>
+
+}
+
+#endif

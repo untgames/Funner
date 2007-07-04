@@ -1,0 +1,265 @@
+/*
+    MySTL list
+*/
+
+#ifndef __MYSTL_LIST__
+#define __MYSTL_LIST__
+
+#include <stl/iterator>
+#include <stl/functional>
+#include <stl/alloc.h>
+
+#ifdef _MSC_VER 
+  #pragma warning (push)  
+  #pragma warning (disable:4512) //'class' : assignment operator could not be generated
+#endif
+
+namespace stl
+{
+
+//forward declaration
+template <class T,class Allocator> class list;
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Узел списка
+/////////////////////////////////////////////////////////////////////////////////////////////
+struct list_node_base
+{
+  list_node_base *prev, *next;
+  
+  list_node_base ();
+  
+  static void transfer (list_node_base* position,list_node_base* first,list_node_base* last);
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Итератор списка
+/////////////////////////////////////////////////////////////////////////////////////////////
+template <class T>
+class list_iterator 
+{ 
+  template <class T1,class Allocator> friend class list;
+  public:
+    typedef typename non_const_type<T>::value_type  value_type;
+    typedef size_t                                  size_type;
+    typedef ptrdiff_t                               difference_type;
+    typedef T*                                      pointer;
+    typedef T&                                      reference;
+    typedef list_iterator<value_type>               iterator;
+    typedef list_iterator<const value_type>         const_iterator;
+    typedef bidirectional_iterator_tag              iterator_category;
+
+    list_iterator () {} //????? node = 0??? or private
+    list_iterator (const iterator&);
+    
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+/////////////////////////////////////////////////////////////////////////////////////////////    
+    list_iterator& operator = (const iterator&);
+    
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Селекторы
+/////////////////////////////////////////////////////////////////////////////////////////////
+    reference operator  * () const;
+    pointer   operator -> () const;   
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Инкремент / декремент
+/////////////////////////////////////////////////////////////////////////////////////////////    
+    list_iterator& operator ++ ();
+    list_iterator& operator -- ();  
+    list_iterator  operator ++ (int); //???const
+    list_iterator  operator -- (int);        
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Сравнение
+/////////////////////////////////////////////////////////////////////////////////////////////        
+    bool operator == (const list_iterator&) const;
+    bool operator != (const list_iterator&) const;
+
+  private:          
+    typedef list_node_base Node;
+  
+    list_iterator (Node*);    
+
+  private:  
+    Node* node;  
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Список
+/////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Allocator=typename default_allocator<T>::allocator_type>
+class list
+{
+  friend class list_iterator<T>;
+  struct Node;
+  public:      
+    typedef typename Allocator::template rebind<Node>::other allocator_type;
+    typedef size_t                                           size_type;
+    typedef ptrdiff_t                                        difference_type;
+    typedef T                                                value_type;
+    typedef value_type*                                      pointer;
+    typedef const value_type*                                const_pointer;
+    typedef value_type&                                      reference;
+    typedef const value_type&                                const_reference;
+    typedef list_iterator<T>                                 iterator;
+    typedef list_iterator<const T>                           const_iterator;
+    typedef reverse_iterator<const_iterator>                 const_reverse_iterator;
+    typedef reverse_iterator<iterator>                       reverse_iterator;
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+/////////////////////////////////////////////////////////////////////////////////////////////
+    explicit list  (const allocator_type& = allocator_type::create ());
+    explicit list  (size_type count,const allocator_type& = allocator_type::create ());
+             list  (size_type count,const value_type& value,const allocator_type& = allocator_type::create ());
+             list  (const list&);
+             ~list ();   
+             
+    template <class Iter> list (Iter first,Iter last,const allocator_type& = allocator_type::create ());
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Аллокатор
+/////////////////////////////////////////////////////////////////////////////////////////////            
+    allocator_type get_allocator () const;
+    
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Функции общего назначения
+/////////////////////////////////////////////////////////////////////////////////////////////            
+    bool      empty    () const;
+    size_type size     () const; //линейная сложность!
+    size_type max_size () const;
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Получение итераторов
+/////////////////////////////////////////////////////////////////////////////////////////////    
+    iterator               begin  ();
+    const_iterator         begin  () const;
+    iterator               end    ();
+    const_iterator         end    () const;
+    reverse_iterator       rbegin ();
+    const_reverse_iterator rbegin () const;
+    reverse_iterator       rend   ();
+    const_reverse_iterator rend   () const;
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Операции доступа
+/////////////////////////////////////////////////////////////////////////////////////////////    
+    reference       front  ();
+    const_reference front  () const;
+    reference       back   ();
+    const_reference back   () const;
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+/////////////////////////////////////////////////////////////////////////////////////////////        
+    list& operator = (const list&);            
+    
+    void assign (size_type count,const value_type&);
+        
+    template <class Iter> void assign (Iter first,Iter last);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка
+/////////////////////////////////////////////////////////////////////////////////////////////        
+    iterator insert (iterator position,const value_type&);
+    iterator insert (iterator position);    
+    void     insert (iterator position,size_type count,const value_type&);
+
+    template <class Iter> void insert (iterator position,Iter first,Iter last);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление
+/////////////////////////////////////////////////////////////////////////////////////////////              
+    iterator erase (iterator position);
+    iterator erase (iterator first,iterator last);
+    void     clear ();        
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление / извлечение элемента
+/////////////////////////////////////////////////////////////////////////////////////////////                      
+    void push_front (const value_type&);
+    void push_front ();
+    void push_back  (const value_type&);
+    void push_back  ();    
+    void pop_front  ();
+    void pop_back   ();    
+    
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение размера списка
+/////////////////////////////////////////////////////////////////////////////////////////////                  
+    void resize (size_type new_size,const value_type&);
+    void resize (size_type new_size);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух списков
+/////////////////////////////////////////////////////////////////////////////////////////////                      
+    void swap   (list&);
+    void splice (iterator dst_pos,list& src);
+    void splice (iterator dst_pos,list& src,iterator src_pos);
+    void splice (iterator dst_pos,list& src,iterator src_first,iterator src_last);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Алгоритмы (аналогичны соответствующим алгоритмам из algorithm)
+/////////////////////////////////////////////////////////////////////////////////////////////                              
+    void remove  (const value_type&);
+    void unique  ();
+    void merge   (list&);
+    void reverse ();
+    void sort    ();
+
+    template <class Predicate> void remove_if (Predicate unary_pred);
+    template <class Predicate> void unique    (Predicate binary_pred);
+    template <class Compare>   void merge     (list&,Compare less);
+    template <class Compare>   void sort      (Compare less);
+    
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Сравнение
+/////////////////////////////////////////////////////////////////////////////////////////////                                  
+    bool operator == (const list&) const;
+    bool operator != (const list&) const;
+    bool operator <  (const list&) const;
+    bool operator >  (const list&) const;
+    bool operator <= (const list&) const;
+    bool operator >= (const list&) const;
+
+  private:
+    struct Node: public list_node_base
+    {
+      value_type data;
+      
+      Node (const value_type&); //avoid MSVC warnings (no implementation)
+    };
+     
+    Node* create_node (const value_type&);
+    Node* create_node ();
+    void  delete_node (Node*);
+    
+    void  transfer (iterator position,iterator first,iterator last);
+
+    template <class Iter> void _assign (Iter,Iter,int_iterator_tag);
+    template <class Iter> void _assign (Iter,Iter,input_iterator_tag);
+    template <class Iter> void _insert (iterator,Iter,Iter,int_iterator_tag);
+    template <class Iter> void _insert (iterator,Iter,Iter,input_iterator_tag);
+        
+  private:
+    allocator_type allocator;
+    list_node_base base;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух списков
+/////////////////////////////////////////////////////////////////////////        
+template <class T,class Allocator>
+void swap (list<T,Allocator>&,list<T,Allocator>&);
+
+#include <stl/detail/stl/list.inl>
+
+#ifdef _MSC_VER 
+  #pragma warning (pop)
+#endif
+
+}
+
+#endif

@@ -1,0 +1,372 @@
+/*
+    MySTL string
+*/
+
+#ifndef __MYSTL_STRING__
+#define __MYSTL_STRING__
+
+#include <stl/iterator>
+#include <stl/algorithm>
+#include <stl/char_traits.h>
+#include <stl/alloc.h>
+#include <stl/stdexcept>
+#include <stl/hash_fun.h>
+#include <cctype>
+
+namespace stl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Строка
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Traits=char_traits<T>,class Allocator=typename default_string_allocator<T>::allocator_type>
+class basic_string
+{
+  public:
+    typedef typename Allocator::template rebind<T>::other allocator_type;
+    typedef T                                             value_type;
+    typedef Traits                                        traits_type;
+    typedef value_type*                                   pointer;
+    typedef const value_type*                             const_pointer;
+    typedef value_type&                                   reference;
+    typedef const value_type&                             const_reference;
+    typedef size_t                                        size_type;
+    typedef ptrdiff_t                                     difference_type;
+    typedef const value_type*                             const_iterator;
+    typedef value_type*                                   iterator;
+    typedef reverse_iterator<const_iterator>              const_reverse_iterator;
+    typedef reverse_iterator<iterator>                    reverse_iterator;
+
+    static const size_type npos = (size_type)-1;   
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    explicit basic_string  (const allocator_type& = allocator_type::create ());
+             basic_string  (const basic_string&);
+             basic_string  (const value_type*      c_str,
+                            size_type              c_str_size,
+                            const allocator_type&  allocator = allocator_type::create ());
+             basic_string  (const value_type*      c_str,
+                            const allocator_type&  allocator = allocator_type::create ());
+             basic_string  (size_type              count,
+                            value_type             c,
+                            const allocator_type&  allocator = allocator_type::create ());
+             basic_string  (const basic_string&    s,
+                            size_type              from_pos,
+                            size_type              count = npos,
+                            const allocator_type&  allocator = allocator_type::create ());
+    template <class Iter> 
+             basic_string  (Iter                   first,
+                            Iter                   last,
+                            const allocator_type&  allocator = allocator_type::create ());
+             ~basic_string ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Аллокатор
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    allocator_type get_allocator () const;
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Размер строки / макс. возможный размер / объём / проверка на пустоту
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    size_type size     () const;
+    size_type length   () const { return size (); }
+    size_type max_size () const;
+    size_type capacity () const;
+    bool      empty    () const;  
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Операции доступа
+///////////////////////////////////////////////////////////////////////////////////////////////////////////           
+    const value_type* c_str () const;
+    const value_type* data  () const { return c_str (); }
+
+    reference       operator [] (size_type index);
+    const_reference operator [] (size_type index) const;
+
+    reference       at (size_type); //[] with range check
+    const_reference at (size_type) const; //[] with range check
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение итераторов
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    iterator               begin  ();
+    iterator               end    ();
+    reverse_iterator       rbegin ();
+    reverse_iterator       rend   ();
+    const_iterator         begin  () const;
+    const_iterator         end    () const;    
+    const_reverse_iterator rbegin () const;    
+    const_reverse_iterator rend   () const;     
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение размера
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    void resize  (size_type new_size,value_type c);
+    void resize  (size_type new_size);
+    void reserve (size_type size=0);
+
+    void fast_resize (size_type new_size); //быстрое изменение размера строки (при наличии специализации в char_traits)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение подстроки
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    basic_string substr (size_type pos = 0,size_type n = npos) const;
+ 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    basic_string& assign (const basic_string&);
+    basic_string& assign (const basic_string&,size_type pos,size_type n);
+    basic_string& assign (const value_type*,size_type n);
+    basic_string& assign (const value_type*);
+    basic_string& assign (size_type n,value_type c);
+    basic_string& assign (const value_type* first,const value_type* last);
+
+    template <class Iter> basic_string& assign (Iter first,Iter last);
+  
+    basic_string& operator = (const basic_string&);
+    basic_string& operator = (const value_type*);
+    basic_string& operator = (value_type);  
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    basic_string& insert (size_type pos,const basic_string&);
+    basic_string& insert (size_type pos,const basic_string& s,size_type offs, size_type n);
+    basic_string& insert (size_type pos,const value_type*,size_type n);
+    basic_string& insert (size_type pos,const value_type*);      
+    basic_string& insert (size_type pos,size_type n,value_type c);
+    iterator      insert (iterator  pos,value_type c);
+    void          insert (iterator  pos,size_type n,value_type c);
+
+    template <class Iter> void insert (iterator pos,Iter first,Iter last);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление / удаление элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                                        
+    void push_back (value_type);
+    void pop_back  ();  
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конкатенация  
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    basic_string& append (const basic_string&);
+    basic_string& append (const basic_string&,size_type pos,size_type n);
+    basic_string& append (const value_type*,size_type n); 
+    basic_string& append (const value_type*);
+    basic_string& append (size_type n,value_type c);
+  
+    template <class Iter> basic_string& append (Iter first,Iter last);
+    
+    basic_string& operator += (const basic_string&);
+    basic_string& operator += (const value_type*);
+    basic_string& operator += (value_type);       
+    
+    basic_string operator + (const basic_string&) const;
+    basic_string operator + (const value_type*) const;
+    basic_string operator + (value_type) const;              
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                                              
+    basic_string& erase (size_type pos = 0,size_type n = npos);
+    iterator      erase (iterator pos);
+    iterator      erase (iterator first,iterator last);
+    void          clear ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Замена (erase + insert)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                                                  
+    basic_string& replace (size_type pos,size_type n,const basic_string& s);
+    basic_string& replace (size_type pos1,size_type n1,const basic_string& s,size_type pos2,size_type n2);
+    basic_string& replace (size_type pos,size_type n1,const value_type* s,size_type n2);
+    basic_string& replace (size_type pos,size_type n1,const value_type* s);
+    basic_string& replace (size_type pos,size_type n1,size_type n2,value_type c);
+    basic_string& replace (iterator first,iterator last,const basic_string& s);
+    basic_string& replace (iterator first,iterator last,const value_type* s,size_type n); 
+    basic_string& replace (iterator first,iterator last,const value_type* s);
+    basic_string& replace (iterator first,iterator last,size_type n,value_type c);
+
+    template <class Iter> basic_string& replace (iterator first1,iterator last1,Iter first2,Iter last2);
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен и копирование строки в буфер
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void      swap (basic_string&);
+    size_type copy (value_type* dst,size_type buf_size,size_type pos = 0) const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск (от начала строки)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    size_type find (const basic_string&,size_type from_pos = 0) const; 
+    size_type find (const value_type*,size_type from_pos = 0) const; 
+    size_type find (const value_type*,size_type pos,size_type n) const;
+    size_type find (value_type c,size_type from_pos = 0) const;
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск (от конца строки)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////  
+    size_type rfind (const basic_string&,size_type from_pos = npos) const;
+    size_type rfind (const value_type*,size_type from_pos = npos) const;
+    size_type rfind (const value_type*,size_type pos,size_type n) const;
+    size_type rfind (value_type c,size_type from_pos = npos) const;
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск первого символа присутствующего в подстроке (от начала строки)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    size_type find_first_of (const basic_string&,size_type from_pos = 0) const; 
+    size_type find_first_of (const value_type*,size_type from_pos = 0) const;
+    size_type find_first_of (const value_type*,size_type pos,size_type n) const;
+    size_type find_first_of (value_type c,size_type from_pos = 0) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск первого символа присутствующего в подстроке (от конца строки)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    size_type find_last_of (const basic_string&,size_type from_pos = npos) const;
+    size_type find_last_of (const value_type*,size_type from_pos = npos) const;
+    size_type find_last_of (const value_type*,size_type pos,size_type n) const;
+    size_type find_last_of (value_type c,size_type from_pos = npos) const;
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск первого символа отсутствующего в подстроке (от начала строки)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////  
+    size_type find_first_not_of (const basic_string&,size_type from_pos = 0) const;
+    size_type find_first_not_of (const value_type*,size_type from_pos = 0) const;
+    size_type find_first_not_of (const value_type*,size_type pos,size_type n) const;
+    size_type find_first_not_of (value_type c,size_type from_pos = 0) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск первого символа отсутствующего в подстроке (от конца строки)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    size_type find_last_not_of (const basic_string&,size_type from_pos = npos) const;
+    size_type find_last_not_of (const value_type*,size_type from_pos = npos) const;
+    size_type find_last_not_of (const value_type*,size_type pos,size_type n) const;
+    size_type find_last_not_of (value_type c,size_type from_pos = npos) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Лексикографическое сравнение
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    int compare (const basic_string&) const;
+    int compare (size_type pos,size_type n,const basic_string& s) const;    
+    int compare (size_type pos1,size_type n1,const basic_string& s,size_type pos2,size_type n2) const;
+    int compare (const value_type*) const;
+    int compare (size_type pos,size_type n,const value_type*) const;
+    int compare (size_type pos1,size_type n1,const value_type* s,size_type n2) const;      
+
+    bool operator == (const basic_string&) const;
+    bool operator != (const basic_string&) const;
+    bool operator <= (const basic_string&) const;
+    bool operator >= (const basic_string&) const;
+    bool operator <  (const basic_string&) const;
+    bool operator >  (const basic_string&) const;
+    
+    bool operator == (const value_type*) const;
+    bool operator != (const value_type*) const;
+    bool operator <= (const value_type*) const;
+    bool operator >= (const value_type*) const;
+    bool operator <  (const value_type*) const;
+    bool operator >  (const value_type*) const;
+    
+  private:
+    typedef eq_traits<traits_type> eq_traits;
+
+    struct _reserve {};
+    
+    explicit basic_string  (_reserve,size_type n,const allocator_type& allocator = allocator_type::create ());
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вспомогательные функции
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void construct_null (value_type*);
+    void terminate_string ();
+    
+    template <class Iter> void _copy (Iter,Iter,iterator);
+    void _copy (const value_type*,const value_type*,value_type*);
+
+    size_type next_size        (size_type inc_size) const;
+    bool      is_grow_possible (size_type inc_size) const;
+    bool      is_valid         (iterator) const;
+    bool      is_valid         (iterator,iterator) const;
+    bool      is_valid         (size_type pos) const;
+    bool      is_valid         (size_type pos,size_type count) const;  
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Диспетчеры вызовов (по категориям итераторов)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+                          void _init    (size_type,value_type);
+    template <class Iter> void _init    (Iter,Iter);
+    template <class Iter> void _init    (Iter,Iter,int_iterator_tag);
+    template <class Iter> void _init    (Iter,Iter,input_iterator_tag);
+    template <class Iter> void _init    (Iter,Iter,forward_iterator_tag);
+    template <class Iter> void _assign  (Iter,Iter,int_iterator_tag);
+    template <class Iter> void _assign  (Iter,Iter,input_iterator_tag);
+    template <class Iter> void _append  (Iter,Iter,int_iterator_tag);
+    template <class Iter> void _append  (Iter,Iter,input_iterator_tag);
+    template <class Iter> void _append  (Iter,Iter,forward_iterator_tag);
+    template <class Iter> void _insert  (iterator,Iter,Iter,int_iterator_tag);
+    template <class Iter> void _insert  (iterator,Iter,Iter,input_iterator_tag);
+    template <class Iter> void _insert  (iterator,Iter,Iter,forward_iterator_tag);
+    template <class Iter> void _replace (iterator,iterator,Iter,Iter,int_iterator_tag);
+    template <class Iter> void _replace (iterator,iterator,Iter,Iter,input_iterator_tag);
+    template <class Iter> void _replace (iterator,iterator,Iter,Iter,forward_iterator_tag);
+    
+    static int _compare (const value_type*,const value_type*,const value_type*,const value_type*);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление памятью
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    bool    is_static        () const;
+    void    allocate_block   (size_type);
+    void    deallocate_block ();
+    pointer allocate         (size_type,size_type&);
+    void    deallocate       (pointer,size_type);
+
+    enum { BUF_SIZE = 20/sizeof (value_type)<1?1:20/sizeof (value_type) }; //размер внутреннего буфера
+
+  protected:
+    allocator_type allocator;    
+    pointer        start, finish, end_of_storage;
+    value_type     buffer [BUF_SIZE];
+};
+
+typedef basic_string<char>    string;
+typedef basic_string<wchar_t> wstring;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+///Внешние операторы
+////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Traits,class Allocator> 
+basic_string<T,Traits,Allocator> operator + (const T*,const basic_string<T,Traits,Allocator>&);
+
+template <class T,class Traits,class Allocator> 
+basic_string<T,Traits,Allocator> operator + (T,const basic_string<T,Traits,Allocator>&);
+
+template <class T,class Traits,class Allocator> bool operator == (const T*,const basic_string<T,Traits,Allocator>&);
+template <class T,class Traits,class Allocator> bool operator != (const T*,const basic_string<T,Traits,Allocator>&);
+template <class T,class Traits,class Allocator> bool operator <  (const T*,const basic_string<T,Traits,Allocator>&);
+template <class T,class Traits,class Allocator> bool operator >  (const T*,const basic_string<T,Traits,Allocator>&);
+template <class T,class Traits,class Allocator> bool operator <= (const T*,const basic_string<T,Traits,Allocator>&);
+template <class T,class Traits,class Allocator> bool operator >= (const T*,const basic_string<T,Traits,Allocator>&);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух строк
+////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Traits,class Allocator> 
+void swap (basic_string<T,Traits,Allocator>&,basic_string<T,Traits,Allocator>&);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Функтор хэширования
+//////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Traits,class Allocator>
+struct hash_fun<basic_string<T,Traits,Allocator> >
+{ 
+  size_t operator () (const basic_string<T,Traits,Allocator>& s) const { return hash (s.c_str ()); }
+};
+
+#include <stl/detail/stl/string.inl>
+
+}
+
+#endif

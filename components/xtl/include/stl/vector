@@ -1,0 +1,167 @@
+/*
+    MySTL vector
+*/
+
+#ifndef __MYSTL_VECTOR__
+#define __MYSTL_VECTOR__
+
+#include <stl/iterator>
+#include <stl/alloc.h>
+#include <stl/stdexcept>
+
+namespace stl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Динамический массив
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Allocator=typename default_allocator<T>::allocator_type >
+class vector
+{
+  public:
+    typedef typename Allocator::template rebind<T>::other allocator_type;
+    typedef T                                             value_type;
+    typedef value_type                                    *pointer, *iterator;
+    typedef const value_type                              *const_pointer, *const_iterator;
+    typedef value_type&                                   reference;
+    typedef const value_type&                             const_reference;
+    typedef size_t                                        size_type;
+    typedef ptrdiff_t                                     difference_type;
+    typedef reverse_iterator<const_iterator>              const_reverse_iterator;
+    typedef reverse_iterator<iterator>                    reverse_iterator;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+    explicit vector  (const allocator_type& = allocator_type::create ());
+    explicit vector  (size_type count,const allocator_type& = allocator_type::create ());
+             vector  (size_type count,const value_type& value,const allocator_type& = allocator_type::create ());
+             vector  (const vector&);
+             ~vector ();
+               
+    template <class Iter> vector (Iter first,Iter last,const allocator_type& = allocator_type::create ());
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Аллокатор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    allocator_type get_allocator () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Размер массива / макс. возможный размер / объём / проверка на пустоту
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_type size     () const;
+    size_type max_size () const;
+    size_type capacity () const;
+    bool      empty    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение итераторов
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    iterator               begin  ();
+    iterator               end    ();
+    reverse_iterator       rbegin ();
+    reverse_iterator       rend   ();
+    const_iterator         begin  () const;
+    const_iterator         end    () const;
+    const_reverse_iterator rbegin () const;    
+    const_reverse_iterator rend   () const;
+   
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Операции доступа
+///////////////////////////////////////////////////////////////////////////////////////////////////        
+    reference       operator [] (size_type);
+    const_reference operator [] (size_type) const;
+
+    reference       at    (size_type); //[] with range check
+    const_reference at    (size_type) const; //[] with range check
+    reference       front ();
+    const_reference front () const;
+    reference       back  ();
+    const_reference back  () const;    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    vector& operator = (const vector&);
+        
+    template <class Iter> void assign (Iter first,Iter last);
+                          void assign (size_type count,const value_type&);
+                          
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление / извлечение элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////                                      
+    void push_back (const value_type&);
+    void push_back ();  
+    void pop_back  ();
+       
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////                                          
+    iterator insert (iterator);
+    iterator insert (iterator pos,const value_type& value);
+    void     insert (iterator pos,size_type count,const value_type& value);
+    
+    template <class Iter> void insert (iterator pos,Iter first,Iter last);
+   
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////                                              
+    iterator erase (iterator);
+    iterator erase (iterator first,iterator last);
+    void     clear ();
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение размера массива
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    void resize  (size_type new_size,const value_type& x);
+    void resize  (size_type new_size);
+    void reserve (size_type size);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух массивов
+///////////////////////////////////////////////////////////////////////////////////////////////////        
+    void swap (vector&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Операции сравнения
+///////////////////////////////////////////////////////////////////////////////////////////////////                                                  
+    bool operator == (const vector&) const;
+    bool operator != (const vector&) const;
+    bool operator <  (const vector&) const;
+    bool operator >  (const vector&) const;
+    bool operator <= (const vector&) const;
+    bool operator >= (const vector&) const;
+    
+  private:
+    size_type next_size (size_type inc_size) const;
+    bool      is_grow_possible (size_type inc_size) const;
+    bool      is_valid  (iterator) const;
+    bool      is_valid  (iterator,iterator) const;
+
+                          void _insert       (iterator pos,const value_type&);
+    template <class Iter> void _insert_range (iterator pos,Iter first,Iter last,input_iterator_tag);
+    template <class Iter> void _insert_range (iterator pos,Iter first,Iter last,forward_iterator_tag);
+    template <class Iter> void _insert_range (iterator pos,Iter first,Iter last,int_iterator_tag);    
+    template <class Iter> void _assign       (Iter first,Iter last,int_iterator_tag);
+    template <class Iter> void _assign       (Iter first,Iter last,input_iterator_tag);    
+    template <class Iter> void _assign       (Iter first,Iter last,forward_iterator_tag);
+    template <class Iter> void realloc       (size_type count,Iter first,Iter last);
+    
+  private:
+    allocator_type allocator;
+    pointer        start, finish, end_of_storage;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух массивов
+///////////////////////////////////////////////////////////////////////////////////////////////////        
+template <class T,class Allocator>
+void swap (vector<T,Allocator>&,vector<T,Allocator>&);
+
+#include <stl/detail/stl/vector.inl>
+
+}
+
+#include <stl/bvector.h> //for vector<bool>
+
+#endif

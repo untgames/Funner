@@ -1,0 +1,165 @@
+/*
+    MySTL bitset
+*/
+
+#ifndef __MYSTL_BITSET__
+#define __MYSTL_BITSET__
+
+#include <climits>
+#include <stl/string>
+#include <stl/bitref.h>
+
+#ifdef  _MSC_VER
+  #pragma warning (push)
+  #pragma warning (disable:4127) //conditional expression is constant
+#endif
+
+namespace stl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Битовое множество
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <size_t bits>
+class bitset
+{
+  public:
+    typedef unsigned long            word_type;
+    typedef bit_reference<word_type> reference;
+
+    enum { digits = bits };
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+//////////////////////////////////////////////////////////////////////////////////////////////////
+    bitset ();
+    bitset (unsigned long);
+
+    template <class T,class Traits,class Allocator> 
+    bitset (const basic_string<T,Traits,Allocator>&              s,
+            typename basic_string<T,Traits,Allocator>::size_type pos = 0);
+
+    template <class T,class Traits,class Allocator> 
+    bitset (const basic_string<T,Traits,Allocator>&              s,
+            typename basic_string<T,Traits,Allocator>::size_type pos,
+            typename basic_string<T,Traits,Allocator>::size_type count,
+            T                                                    e0 = (T)'0');
+
+    template <class T> bitset (const T* c_str,size_t pos=0,size_t len=-1,T e0=(T)'0');
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Операции доступа
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool      operator [] (size_t) const;
+    reference operator [] (size_t);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Побитовые операции
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bitset& operator &=  (const bitset&);
+    bitset& operator |=  (const bitset&);
+    bitset& operator ^=  (const bitset&);
+    bitset& operator <<= (size_t shift);
+    bitset& operator >>= (size_t shift);
+
+    bitset  operator &  (const bitset&) const;
+    bitset  operator |  (const bitset&) const;
+    bitset  operator ^  (const bitset&) const;
+    bitset  operator << (size_t pos) const;
+    bitset  operator >> (size_t pos) const;
+
+    bitset  operator ~  () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка / сброс / инверсия бита
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bitset& set   (size_t pos);
+    bitset& set   (size_t pos,bool value);
+    bitset& reset (size_t pos);
+    bitset& flip  (size_t pos);
+    bitset& set   ();
+    bitset& reset ();
+    bitset& flip  ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тестирование бита / подсчёт количества битов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool test (size_t pos) const;
+    bool any  () const;
+    bool none () const;
+
+    size_t count () const;
+    size_t size  () const { return bits; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t find_first () const;
+    size_t find_next  (size_t pos) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Преобразование к двойному слову
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    unsigned long to_ulong () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Преобразование к строке
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class T,class Traits,class Allocator>  
+    basic_string<T,Traits,Allocator> to_string (T e0=(T)'0') const;
+
+    template <class T,class Traits>
+    basic_string<T,Traits> to_string (T e0=(T)'0') const;
+
+    template <class T> 
+    basic_string<T,char_traits<T> > to_string (T e0=(T)'0') const;
+
+    string to_string (char e0='0') const;
+
+    template <class T,class Traits,class Allocator>   
+    basic_string<T,Traits,Allocator>& to_string (basic_string<T,Traits,Allocator>&,T e0=(T)'0') const;
+
+    template <class T> T* to_string (T* buf,T e0=(T)'0') const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сравнение
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool operator == (const bitset&) const;
+    bool operator != (const bitset&) const;
+   
+  private:
+    enum {
+      BITS_PER_WORD = sizeof (word_type) * CHAR_BIT,    //количество битов на слово
+      WORDS         = bits < 1 ? 1 : (bits + BITS_PER_WORD - 1) / BITS_PER_WORD //количество слов
+    };
+
+    static size_t    which_word (size_t pos); 
+    static size_t    which_byte (size_t pos); 
+    static size_t    which_bit  (size_t pos); 
+    static word_type get_mask   (size_t pos);
+
+    void       trim     ();
+    word_type& get_word (size_t pos);
+    word_type  get_word (size_t pos) const;
+    bool unchecked_test (size_t pos) const;
+
+    template <class T> void copy_from_string (const T*,size_t len,T e0);
+
+    void raise_out_of_range     (const char*) const;
+    void raise_length_error     (const char*,size_t) const;
+    void raise_invalid_argument (const char*) const;
+    void raise_overflow_error   (const char*) const;
+
+  private:    
+    word_type word [WORDS];
+};
+
+#include <stl/detail/stl/bitset.inl>
+  
+}
+
+#ifdef  _MSC_VER
+  #pragma warning (pop)
+#endif
+
+#endif

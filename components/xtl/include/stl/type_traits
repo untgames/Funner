@@ -1,0 +1,133 @@
+/*
+    xTL type traits
+*/
+
+#ifndef XTL_TYPE_TRAITS_HEADER
+#define XTL_TYPE_TRAITS_HEADER
+
+#include <stddef.h>
+#include <stl/functional_traits.h>
+
+namespace xtl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вспомогательный шаблонный класс описывающий целочисленную константу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T, T v> struct integral_constant
+{
+  static  const T                 value = v;
+  typedef T                       value_type;
+  typedef integral_constant<T, v> type; 
+};
+
+//вспомогательные классы для наиболее распространённых целочисленных костант
+template <bool value> struct bool_constant:    public integral_constant<bool, value> {};
+template <int value>  struct integer_constant: public integral_constant<int, value> {};
+
+typedef bool_constant<true>  true_type;
+typedef bool_constant<false> false_type;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка принадлежности типа к базовым категориям типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct is_void;                     //T является типом void
+template <class T> struct is_integral;                 //T является целочисленным типом
+template <class T> struct is_floating_point;           //T является вещественным типом
+template <class T> struct is_array;                    //T является массивом
+template <class T> struct is_pointer;                  //T является указателем
+template <class T> struct is_reference;                //T является ссылкой
+template <class T> struct is_member_object_pointer;    //T является указателем на член класса
+template <class T> struct is_member_function_pointer;  //T является указателем на функцию
+template <class T> struct is_enum;                     //T является перечислением
+template <class T> struct is_union;                    //T является объединением
+template <class T> struct is_class;                    //T является классом
+template <class T> struct is_function;                 //T является функцией
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка принадлежности типа к объединённым категориям типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct is_arithmetic;      //T является арифметическим типом 
+template <class T> struct is_fundamental;     //T является фундаментальным типом 
+template <class T> struct is_object;          //T является объектным типом (не ссылка, void или функция)
+template <class T> struct is_scalar;          //T является скалярным типом данных (is_arithmetic, enum, pointer, member_pointer)
+template <class T> struct is_compound;        //T является не фундаментальным типом
+template <class T> struct is_member_pointer;  //T является указателем на функцию или член класса
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка свойств типа
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct is_const;                 //T имеет квалификатор const
+template <class T> struct is_volatile;              //T имеет квалификатор volatile
+template <class T> struct is_pod;                   //T является POD-типом
+template <class T> struct is_empty;                 //T является пустым классом
+template <class T> struct is_polymorphic;           //T является полиморфным типом (содержит виртуальные функции)
+template <class T> struct is_abstract;              //T является абстрактным типом (содержит хотя бы одну чисто виртуальную функцию)
+template <class T> struct has_trivial_constructor;  //T имеет тривиальный конструктор по умолчанию
+template <class T> struct has_trivial_copy;         //T имеет тривиальный конструктор копирования
+template <class T> struct has_trivial_assign;       //T имеет тривиальный оператор присваивания
+template <class T> struct has_trivial_destructor;   //T имеет тривиальный деструктор
+template <class T> struct has_nothrow_constructor;  //T имеет бессбойный конструктор по умолчанию (не выбрасывает исключений)
+template <class T> struct has_nothrow_copy;         //T имеет бессбойный конструктор копирования (не выбрасывает исключений)
+template <class T> struct has_nothrow_assign;       //T имеет бессбойный оператор присваивания (не выбрасывает исключений)
+template <class T> struct has_virtual_destructor;   //T имеет виртуальный деструктор
+template <class T> struct is_signed;                //T является знаковым типом
+template <class T> struct is_unsigned;              //T является беззнаковым типом
+template <class T> struct alignment_of;             //определение выравнивание типа данных
+template <class T> struct rank;                     //определение ранга массива (массив a [4][5][6] имеет ранг 3)
+template <class T, unsigned I = 0> struct extent;   //определение размера I-й размерности массива
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка отношений между типами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T, class U>          struct is_same;        //T и U являются одним и тем же типом
+template <class Base, class Derived> struct is_base_of;     //Base является базовым для Derived
+template <class From, class To>      struct is_convertible; //возможно неявное преобразования из From в To
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Преобразования константности типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct remove_const;    //удаление квалификатора const
+template <class T> struct remove_volatile; //удаление квалификатора volatile
+template <class T> struct remove_cv;       //удаление квалификатора const volatile
+template <class T> struct add_const;       //добавление квалификатора const
+template <class T> struct add_volatile;    //добавление квалификатора volatile
+template <class T> struct add_cv;          //добавление квалификатора const volatile
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Преобразования ссылочных типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct remove_reference; //удаление ссылки
+template <class T> struct add_reference;    //добавление ссылки
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление размерностей массива
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct remove_extent;      //удаление крайней справа размерности массива
+template <class T> struct remove_all_extents; //удаление всех размерностей массива
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Преобразования указателей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct remove_pointer;  //удаление указателя
+template <class T> struct add_pointer;     //добавление указателя
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Хранилище (буфер) для объекта размером Len и выравниванием Align
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <size_t Len, size_t Align> struct aligned_storage;
+
+#include <stl/detail/tr1/type_traits_intrinsics.inl>
+#include <stl/detail/tr1/type_traits_basic.inl>
+
+//#ifndef _MSC_VER
+  #include <stl/detail/tr1/type_traits_hard_properties.inl>
+//#else
+//  #include <tr1/detail/type_traits_hard_properties_msvc.inl>
+//#endif
+
+#include <stl/detail/tr1/type_traits_relations.inl>
+
+}
+
+#endif

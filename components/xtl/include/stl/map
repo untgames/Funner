@@ -1,0 +1,246 @@
+/*
+    MySTL map
+*/
+
+#ifndef __MYSTL_MAP__
+#define __MYSTL_MAP__
+
+#include <stl/tree.h>
+#include <stl/functional>
+
+namespace stl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Базовый класс для отображения
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,class T,class Compare,class Allocator>
+class map_base 
+{
+  protected:  
+    typedef rbtree<Key,pair<const Key,T>,select1st<pair<const Key,T> >,Compare,Allocator> tree_type;
+    
+  public:
+    typedef Key                                         key_type;
+    typedef T                                           data_type, mapped_type;
+    typedef pair<const Key,T>                           value_type;
+    typedef Compare                                     key_compare;
+    typedef typename tree_type::allocator_type          allocator_type;
+    typedef typename tree_type::size_type               size_type;
+    typedef typename tree_type::difference_type         difference_type;
+    typedef typename tree_type::pointer                 pointer;
+    typedef typename tree_type::const_pointer           const_pointer;
+    typedef typename tree_type::reference               reference;
+    typedef typename tree_type::const_reference         const_reference;
+    typedef typename tree_type::iterator                iterator;
+    typedef typename tree_type::const_iterator          const_iterator;
+    typedef typename tree_type::reverse_iterator        reverse_iterator;
+    typedef typename tree_type::const_reverse_iterator  const_reverse_iterator;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Функтор сравнения пар (ключ,значение)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////        
+    class value_compare: public binary_function<value_type,value_type,bool>
+    {
+      friend class map_base;
+      public:
+        bool operator () (const value_type&,const value_type&) const;
+            
+      private:
+        value_compare (Compare);
+        Compare comp;
+    };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////            
+    explicit map_base (const allocator_type&);
+    explicit map_base (const Compare&,const allocator_type&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Аллокатор
+///////////////////////////////////////////////////////////////////////////////////////////////////////////            
+    allocator_type get_allocator () const;
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Функции общего назначения
+///////////////////////////////////////////////////////////////////////////////////////////////////////////                
+    size_type     size       () const;
+    size_type     max_size   () const;
+    bool          empty      () const;
+    key_compare   key_comp   () const;
+    value_compare value_comp () const;
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Итераторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    iterator               begin  ();
+    const_iterator         begin  () const;
+    iterator               end    ();
+    const_iterator         end    () const;
+    reverse_iterator       rbegin ();
+    const_reverse_iterator rbegin () const;
+    reverse_iterator       rend   ();
+    const_reverse_iterator rend   () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление
+///////////////////////////////////////////////////////////////////////////////////////////////////////////  
+    void      erase (iterator position);
+    size_type erase (const key_type&);
+    void      erase (iterator first,iterator last);
+    void      clear ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    iterator       find        (const key_type&);
+    const_iterator find        (const key_type&) const;
+    size_type      count       (const key_type&) const;
+    iterator       lower_bound (const key_type&);
+    const_iterator lower_bound (const key_type&) const;
+    iterator       upper_bound (const key_type&);
+    const_iterator upper_bound (const key_type&) const;
+    
+    pair<iterator,iterator>             equal_range (const key_type&);
+    pair<const_iterator,const_iterator> equal_range (const key_type&) const;
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Операции сравнения
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    bool operator == (const map_base&) const;
+    bool operator != (const map_base&) const;
+    bool operator <  (const map_base&) const;
+    bool operator >  (const map_base&) const;
+    bool operator <= (const map_base&) const;
+    bool operator >= (const map_base&) const;  
+
+  protected:         
+    tree_type tree;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отображение с уникальными ключами
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,
+          class T,
+          class Compare   = less<Key>,
+          class Allocator = typename default_allocator<pair<const Key,T> >::allocator_type>
+class map: public map_base<Key,T,Compare,Allocator>
+{
+  protected:
+    typedef map_base<Key,T,Compare,Allocator>  base;
+    typedef typename base::tree_type           tree_type;
+
+  public:
+    typedef typename base::allocator_type  allocator_type;
+    typedef typename base::size_type       size_type;
+    typedef typename base::key_type        key_type;
+    typedef typename base::value_type      value_type;
+    typedef typename base::key_compare     key_compare;
+    typedef typename base::iterator        iterator;
+
+    using base::key_comp;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    explicit map (const allocator_type& = allocator_type::create ());
+    explicit map (const key_compare&,const allocator_type& = allocator_type::create ());
+ 
+    template <class Iter> map (Iter first,Iter last,const allocator_type& = allocator_type::create ());
+    template <class Iter> map (Iter                   first,
+                               Iter                   last,
+                               const key_compare&     comp,
+                               const allocator_type&  allocator = allocator_type::create ());
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Операции доступа
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    T& operator [] (const key_type&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка
+///////////////////////////////////////////////////////////////////////////////////////////////////////////        
+    pair<iterator,bool> insert      (const value_type&);
+    iterator            insert      (iterator position,const value_type&);
+    pair<iterator,bool> insert_pair (const key_type&,const T&);   //non-standart extension    
+    iterator            insert_pair (iterator position,const key_type&,const T&); //non-standart extension    
+  
+    template <class Iter> void insert (Iter first,Iter last);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    void swap (map&);
+
+  protected:
+    using base::tree;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Отображение с неуникальными ключами
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,
+          class T,
+          class Compare   = less<Key>,
+          class Allocator = typename default_allocator<pair<const Key,T> >::allocator_type>
+class multimap: public map_base<Key,T,Compare,Allocator>
+{
+  protected:
+    typedef map_base<Key,T,Compare,Allocator> base;
+    typedef typename base::tree_type          tree_type;
+
+  public:
+    typedef typename base::allocator_type  allocator_type;
+    typedef typename base::size_type       size_type;
+    typedef typename base::key_type        key_type;
+    typedef typename base::value_type      value_type;
+    typedef typename base::key_compare     key_compare;
+    typedef typename base::iterator        iterator;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    explicit multimap (const allocator_type& = allocator_type::create ());
+    explicit multimap (const key_compare&,const allocator_type& = allocator_type::create ());
+ 
+    template <class Iter> multimap (Iter first,Iter last,const allocator_type& = allocator_type::create ());
+    template <class Iter> multimap (Iter                   first,
+                                    Iter                   last,
+                                    const key_compare&     comp,
+                                    const allocator_type&  allocator = allocator_type::create ());
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Вставка
+///////////////////////////////////////////////////////////////////////////////////////////////////////////        
+    iterator insert      (const value_type&);
+    iterator insert      (iterator position,const value_type&);
+    iterator insert_pair (const key_type&,const T&);   //non-standart extension    
+    iterator insert_pair (iterator position,const key_type&,const T&); //non-standart extension        
+  
+    template <class Iter> void insert (Iter first,Iter last);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    void swap (multimap&);    
+
+  protected:
+    using base::tree;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key,class T,class Compare,class Allocator>
+void swap (map<Key,T,Compare,Allocator>&,map<Key,T,Compare,Allocator>&);
+
+template <class Key,class T,class Compare,class Allocator>
+void swap (multimap<Key,T,Compare,Allocator>&,multimap<Key,T,Compare,Allocator>&);
+
+#include <stl/detail/stl/map.inl>
+
+}
+
+#endif

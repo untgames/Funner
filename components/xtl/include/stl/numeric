@@ -1,0 +1,75 @@
+/*
+    MySTL numeric algorithms
+*/
+
+#ifndef __MYSTL_NUMERIC__
+#define __MYSTL_NUMERIC__
+
+#include <stl/functional>
+#include <stl/iterator>
+#include <stl/math.h>
+
+namespace stl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Статистическая функция (по умолчанию сумма элементов интервала)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class InIter,class T,class BinOperation>
+T accumulate (InIter first,InIter last,T init,BinOperation binary_op);
+
+//сумма элементов интервала
+template <class InIter,class T>
+T accumulate (InIter first,InIter last,T init);
+
+//среднее значение
+template <class InIter,class T>
+T average (InIter first,InIter last,T init);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Скалярное произведение
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class InIter1,class InIter2,class T>
+inline T inner_product (InIter1 first1,InIter1 last1,InIter2 first2,T init);
+
+template <class InIter1,class InIter2,class T,class BinOperation1,class BinOperation2>
+T inner_product (InIter1 first1,InIter1 last1,InIter2 first2,T init,BinOperation1 op1,BinOperation2 op2);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вычисление суммы ряда (result [i] = result [i-1] + first [i])
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class InIter,class OutIter>
+OutIter partial_sum (InIter first,InIter last,OutIter result);
+
+template <class InIter,class OutIter,class BinOperation>
+OutIter partial_sum (InIter first,InIter last,OutIter result,BinOperation op);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вычисление разности смежных элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class InIter,class OutIter>
+OutIter adjacent_difference (InIter first,InIter last,OutIter result);
+
+template <class InIter,class OutIter,class BinOperation>
+OutIter adjacent_difference (InIter first,InIter last,OutIter result,BinOperation op);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Возведение в целую степень (время работы O(logN))
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Integer,class MonoidOperation>
+T power (T x,Integer n,MonoidOperation op);
+
+template <class T,class Integer>
+T power (T x,Integer n);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Генерация числовой последовательности начиная с value
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class FwdIter,class T>
+void iota (FwdIter first,FwdIter last,T value);
+
+#include <stl/detail/stl/numeric.inl>
+
+}
+
+#endif

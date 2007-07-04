@@ -1,0 +1,53 @@
+/*
+    MySTL utility       
+*/
+
+#ifndef __MYSTL_UTILITY__
+#define __MYSTL_UTILITY__
+
+#include <cstdlib>
+#include <cstring>
+#include <stl/iterator>
+#include <stl/pair.h>
+#include <stl/type_traits.h>
+
+#ifdef _MSC_VER 
+  #pragma warning (disable:4100) //unreferenced formal parameter
+#endif
+
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
+namespace stl
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Определение базового типа ("удаление" модификатора const)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct non_const_type          { typedef T value_type; };
+template <class T> struct non_const_type<const T> { typedef T value_type; };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Инициализация / разрушение / копирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T>           void construct (T*);
+template <class T1,class T2> void construct (T1*,const T2& value);
+template <class T>           void destroy   (T*);
+template <class Iter>        void destroy   (Iter first,Iter last);
+template <class T>           T    copy      (const T&);
+
+#include <stl/detail/stl/algobase.inl>
+#include <stl/detail/stl/utility.inl>
+
+#ifdef _MSC_VER 
+  #pragma warning (default:4100) //unreferenced formal parameter
+#endif
+
+}
+
+#endif

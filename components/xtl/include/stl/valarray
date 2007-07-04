@@ -1,0 +1,453 @@
+/*
+    MySTL value array
+*/
+
+#ifndef __MYSTL_VALARRAY__
+#define __MYSTL_VALARRAY__
+
+#include <stl/algorithm>
+#include <stl/numeric>
+#include <stl/math.h>
+#include <stl/limits>
+
+#ifdef _MSC_VER
+  #pragma warning(push)
+  #pragma warning(disable:4512) //assignment operator could not be generated
+#endif
+
+namespace stl
+{
+
+//forward declarations
+class slice;
+class gslice;
+
+template <class T> class valarray;
+template <class T,class Proxy> class proxy_array;
+template <class T> class slice_array;
+template <class T> class gslice_array;
+template <class T> class mask_array;
+template <class T> class indirect_array;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Массив значений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> 
+class valarray
+{
+  template <class T1> friend class valarray;
+  template <class T1,class Proxy> friend class proxy_array;
+  public:
+    typedef T value_type;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Базовые конструкторы / дестркутор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    valarray  ();
+    valarray  (size_t size);
+    valarray  (const value_type& x,size_t size);
+    valarray  (const value_type* p,size_t size);
+    valarray  (const valarray& x);
+    ~valarray ();
+
+    template <class Proxy> valarray (const proxy_array<T,Proxy>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы используемые для оптимизации возвращаемого значения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class T1,class UnaryOperation>
+        valarray (const valarray<T1>& arg,UnaryOperation);
+
+    template <class T1,class T2,class BinaryOperation> 
+        valarray (const valarray<T1>& arg1,const valarray<T2>& arg2,BinaryOperation);
+
+    template <class T1,class T2,class BinaryOperation> 
+        valarray (const valarray<T1>& arg1,const T2& arg2,BinaryOperation);
+
+    template <class T1,class T2,class BinaryOperation> 
+        valarray (const T1& arg1,const valarray<T2>& arg2,BinaryOperation);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Операции общего назначения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t size () const { return array_size; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение размера / очистка (расширение)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void resize (size_t size);
+    void resize (size_t size,value_type);
+    void clear  ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Опрерации доступа
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    value_type        operator [] (size_t i) const;
+    value_type&       operator [] (size_t i);
+    valarray          operator [] (slice) const;
+    slice_array<T>    operator [] (slice);
+    valarray          operator [] (const gslice&) const;
+    gslice_array<T>   operator [] (const gslice&);  
+    valarray          operator [] (const valarray<bool>&) const;
+    mask_array<T>     operator [] (const valarray<bool>&);
+    valarray          operator [] (const valarray<size_t>&) const;
+    indirect_array<T> operator [] (const valarray<size_t>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    valarray& operator = (const valarray&);
+    valarray& operator = (const value_type&);
+
+    template <class Proxy> valarray& operator = (const proxy_array<T,Proxy>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Унарные операции
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    valarray        operator + () const;
+    valarray      operator - () const;  
+    valarray      operator ~ () const;
+    valarray<bool>  operator ! () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Основные бинарные операции между вектором и скаляром
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    valarray& operator *=  (const value_type&);    
+    valarray& operator /=  (const value_type&);
+    valarray& operator %=  (const value_type&);
+    valarray& operator +=  (const value_type&);
+    valarray& operator -=  (const value_type&);
+    valarray& operator ^=  (const value_type&);
+    valarray& operator &=  (const value_type&);
+    valarray& operator |=  (const value_type&);
+    valarray& operator <<= (const value_type&);
+    valarray& operator >>= (const value_type&);
+
+    valarray  operator *   (const value_type&) const;    
+    valarray  operator /   (const value_type&) const;
+    valarray  operator %   (const value_type&) const;
+    valarray  operator +   (const value_type&) const;
+    valarray  operator -   (const value_type&) const;
+    valarray  operator ^   (const value_type&) const;
+    valarray  operator &   (const value_type&) const;
+    valarray  operator |   (const value_type&) const;
+    valarray  operator <<  (const value_type&) const;
+    valarray  operator >>  (const value_type&) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Основные бинарные операции между векторами
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    valarray& operator *=  (const valarray&);    
+    valarray& operator /=  (const valarray&);
+    valarray& operator %=  (const valarray&);
+    valarray& operator +=  (const valarray&);
+    valarray& operator -=  (const valarray&);
+    valarray& operator ^=  (const valarray&);
+    valarray& operator &=  (const valarray&);
+    valarray& operator |=  (const valarray&);
+    valarray& operator <<= (const valarray&);
+    valarray& operator >>= (const valarray&);
+
+    valarray  operator *   (const valarray&) const;
+    valarray  operator /   (const valarray&) const;
+    valarray  operator %   (const valarray&) const;
+    valarray  operator +   (const valarray&) const;
+    valarray  operator -   (const valarray&) const;
+    valarray  operator ^   (const valarray&) const;
+    valarray  operator &   (const valarray&) const;
+    valarray  operator |   (const valarray&) const;
+    valarray  operator <<  (const valarray&) const;
+    valarray  operator >>  (const valarray&) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Логические операции между вектором и скаляром
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    valarray<bool> operator == (const value_type&) const;
+    valarray<bool> operator != (const value_type&) const;
+    valarray<bool> operator <  (const value_type&) const;
+    valarray<bool> operator >  (const value_type&) const;
+    valarray<bool> operator <= (const value_type&) const;
+    valarray<bool> operator >= (const value_type&) const;
+    valarray<bool> operator && (const value_type&) const;
+    valarray<bool> operator || (const value_type&) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Логические операции между двумя векторами
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    valarray<bool> operator == (const valarray&) const;
+    valarray<bool> operator != (const valarray&) const;
+    valarray<bool> operator <  (const valarray&) const;
+    valarray<bool> operator >  (const valarray&) const;
+    valarray<bool> operator <= (const valarray&) const;
+    valarray<bool> operator >= (const valarray&) const;
+    valarray<bool> operator && (const valarray&) const;
+    valarray<bool> operator || (const valarray&) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Статистики
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    value_type sum () const;
+    value_type min () const;
+    value_type max () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сдвиги
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    valarray shift  (int shift) const;
+    valarray cshift (int shift) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Применение функции к каждому элементу массива
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    valarray apply (value_type f (value_type)) const;
+    valarray apply (value_type f (const value_type&)) const;  
+
+  private:
+    template <class BinOperation> valarray& for_each (const valarray&,BinOperation);
+    template <class BinOperation> valarray& for_each (const value_type&,BinOperation);
+    template <class BinOperation> void      for_each (const slice&,const valarray&,BinOperation);
+    template <class BinOperation> void      for_each (const slice&,const value_type&,BinOperation);
+    template <class BinOperation> void      for_each (const gslice&,const valarray&,BinOperation);
+    template <class BinOperation> void      for_each (const gslice&,const value_type&,BinOperation);
+    template <class BinOperation> void      for_each (const valarray<size_t>&,const valarray&,BinOperation);
+    template <class BinOperation> void      for_each (const valarray<size_t>&,const value_type&,BinOperation);
+    template <class BinOperation> void      for_each (const valarray<bool>&,const valarray&,BinOperation);
+    template <class BinOperation> void      for_each (const valarray<bool>&,const value_type&,BinOperation);
+
+    void assign (const slice&,const valarray&);
+    void assign (const gslice&,const valarray&);
+    void assign (const valarray<size_t>&,const valarray&);
+    void assign (const valarray<bool>&,const valarray&);
+
+  private:
+    value_type* first;
+    size_t      array_size, reserved_size;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Внешние операции
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+template <class T> valarray<T>    operator *  (const T&,const valarray<T>&);
+template <class T> valarray<T>    operator /  (const T&,const valarray<T>&);
+template <class T> valarray<T>    operator %  (const T&,const valarray<T>&);
+template <class T> valarray<T>    operator +  (const T&,const valarray<T>&);
+template <class T> valarray<T>    operator -  (const T&,const valarray<T>&);
+template <class T> valarray<T>    operator ^  (const T&,const valarray<T>&);
+template <class T> valarray<T>    operator &  (const T&,const valarray<T>&);
+template <class T> valarray<T>    operator |  (const T&,const valarray<T>&);
+template <class T> valarray<T>    operator << (const T&,const valarray<T>&);
+template <class T> valarray<T>    operator >> (const T&,const valarray<T>&);
+template <class T> valarray<bool> operator == (const T&,const valarray<T>&);
+template <class T> valarray<bool> operator != (const T&,const valarray<T>&);
+template <class T> valarray<bool> operator <  (const T&,const valarray<T>&);
+template <class T> valarray<bool> operator >  (const T&,const valarray<T>&);
+template <class T> valarray<bool> operator <= (const T&,const valarray<T>&);
+template <class T> valarray<bool> operator >= (const T&,const valarray<T>&);
+template <class T> valarray<bool> operator && (const T&,const valarray<T>&);
+template <class T> valarray<bool> operator || (const T&,const valarray<T>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Основные математические функции (трансцидентные функции, sqrt, abs)
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+template <class T> valarray<T> abs   (const valarray<T>&);
+template <class T> valarray<T> acos  (const valarray<T>&);
+template <class T> valarray<T> asin  (const valarray<T>&);
+template <class T> valarray<T> atan  (const valarray<T>&);
+template <class T> valarray<T> atan2 (const valarray<T>&,const valarray<T>&);
+template <class T> valarray<T> atan2 (const valarray<T>&,const T&);
+template <class T> valarray<T> atan2 (const T&,const valarray<T>&);
+template <class T> valarray<T> cos   (const valarray<T>&);
+template <class T> valarray<T> cosh  (const valarray<T>&);
+template <class T> valarray<T> exp   (const valarray<T>&);
+template <class T> valarray<T> log   (const valarray<T>&);
+template <class T> valarray<T> log10 (const valarray<T>&);
+template <class T> valarray<T> pow   (const valarray<T>&,const valarray<T>&);
+template <class T> valarray<T> pow   (const valarray<T>&,const T&);
+template <class T> valarray<T> pow   (const T&,const valarray<T>&);
+template <class T> valarray<T> sin   (const valarray<T>&);
+template <class T> valarray<T> sinh  (const valarray<T>&);
+template <class T> valarray<T> sqrt  (const valarray<T>&);
+template <class T> valarray<T> tan   (const valarray<T>&);
+template <class T> valarray<T> tanh  (const valarray<T>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Посредник для работы с частью valarray
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,class Proxy>
+class proxy_array: public Proxy
+{
+  friend class valarray<T>;
+  public:
+    typedef T         value_type;
+    typedef valarray<value_type>  array_type;
+
+    array_type  operator + () const;
+    array_type  operator - () const;  
+    array_type  operator ~ () const;
+    array_type  operator ! () const;
+  
+    const proxy_array& operator  =  (const array_type&) const;
+    const proxy_array& operator  =  (const value_type&) const;
+    const proxy_array& operator *=  (const array_type&) const;
+    const proxy_array& operator /=  (const array_type&) const;
+    const proxy_array& operator %=  (const array_type&) const;
+    const proxy_array& operator +=  (const array_type&) const;
+    const proxy_array& operator -=  (const array_type&) const;
+    const proxy_array& operator ^=  (const array_type&) const;
+    const proxy_array& operator &=  (const array_type&) const;
+    const proxy_array& operator |=  (const array_type&) const;
+    const proxy_array& operator <<= (const array_type&) const;
+    const proxy_array& operator >>= (const array_type&) const;
+    array_type         operator *   (const value_type&) const;
+    array_type         operator /   (const value_type&) const;
+    array_type         operator %   (const value_type&) const;
+    array_type         operator +   (const value_type&) const;
+    array_type         operator -   (const value_type&) const;
+    array_type         operator ^   (const value_type&) const;
+    array_type         operator &   (const value_type&) const;
+    array_type         operator |   (const value_type&) const;
+    array_type         operator <<  (const value_type&) const;
+    array_type         operator >>  (const value_type&) const;
+    array_type         operator *   (const array_type&) const;
+    array_type         operator /   (const array_type&) const;
+    array_type         operator %   (const array_type&) const;
+    array_type         operator +   (const array_type&) const;
+    array_type         operator -   (const array_type&) const;
+    array_type         operator ^   (const array_type&) const;
+    array_type         operator &   (const array_type&) const;
+    array_type         operator |   (const array_type&) const;
+    array_type         operator <<  (const array_type&) const;
+    array_type         operator >>  (const array_type&) const;
+    valarray<bool>     operator ==  (const value_type&) const;
+    valarray<bool>     operator !=  (const value_type&) const;
+    valarray<bool>     operator <   (const value_type&) const;
+    valarray<bool>     operator >   (const value_type&) const;
+    valarray<bool>     operator <=  (const value_type&) const;
+    valarray<bool>     operator >=  (const value_type&) const;
+    valarray<bool>     operator &&  (const value_type&) const;
+    valarray<bool>     operator ||  (const value_type&) const;
+    valarray<bool>     operator ==  (const array_type&) const;
+    valarray<bool>     operator !=  (const array_type&) const;
+    valarray<bool>     operator <   (const array_type&) const;
+    valarray<bool>     operator >   (const array_type&) const;
+    valarray<bool>     operator <=  (const array_type&) const;
+    valarray<bool>     operator >=  (const array_type&) const;
+    valarray<bool>     operator &&  (const array_type&) const;
+    valarray<bool>     operator ||  (const array_type&) const;
+
+  protected:
+    proxy_array (const Proxy&,array_type&);
+
+  private:
+    proxy_array (); //no implementation
+
+    template <class BinOperation> const proxy_array& for_each (value_type,BinOperation) const;
+    template <class BinOperation> const proxy_array& for_each (const array_type&,BinOperation) const;
+
+    void copy (array_type&) const;
+
+  private:
+    Proxy        proxy;
+    valarray<T>& array;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Внешние операции для proxy_array
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+template <class T,class Proxy> valarray<T>    operator *  (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<T>    operator /  (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<T>    operator %  (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<T>    operator +  (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<T>    operator -  (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<T>    operator ^  (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<T>    operator &  (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<T>    operator |  (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<T>    operator << (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<T>    operator >> (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<bool> operator == (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<bool> operator != (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<bool> operator <  (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<bool> operator >  (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<bool> operator <= (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<bool> operator >= (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<bool> operator && (const T&,const proxy_array<T,Proxy>&);
+template <class T,class Proxy> valarray<bool> operator || (const T&,const proxy_array<T,Proxy>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Срез
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+class slice
+{
+  public:
+    slice ();
+    slice (size_t start,size_t size,size_t stride);
+
+    size_t start    () const;
+    size_t size     () const;
+    size_t stride   () const;
+   
+  private:
+    size_t slice_start, slice_size, slice_stride;
+};
+
+template <class T>
+class slice_array: public proxy_array<T,slice>
+{
+  friend class valarray<T>;
+  private: slice_array (const slice&,valarray<T>&);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Общий случай среза
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+class gslice 
+{
+  public:
+    gslice ();
+    gslice (size_t start,const valarray<size_t>& lengths,const valarray<size_t>& strides);
+
+    size_t            start  () const;
+    const valarray<size_t>& size   () const;
+    const valarray<size_t>& stride () const;
+
+  private:
+    size_t       gslice_start;
+    valarray<size_t> gslice_lengths, gslice_strides;
+};
+
+template <class T>
+class gslice_array: public proxy_array<T,gslice>
+{
+  friend class valarray<T>;
+  private: gslice_array (const gslice&,valarray<T>&);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Срез на основе масок
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+template <class T>
+class mask_array: public proxy_array<T,valarray<bool> >
+{
+  friend class valarray<T>;
+  private: mask_array (const valarray<bool>&,valarray<T>&);    
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Срез на основе ссылок
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+template <class T>
+class indirect_array: public proxy_array<T,valarray<size_t> >
+{
+  friend class valarray<T>;
+  private: indirect_array (const valarray<size_t>& addr,valarray<T>& array);
+};
+
+#include <stl/detail/stl/valarray.inl>
+
+}
+
+#ifdef _MSC_VER
+  #pragma warning(pop)
+#endif
+
+#endif
