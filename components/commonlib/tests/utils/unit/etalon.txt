@@ -1,0 +1,46 @@
+Results of callback_test:
+A::test41 (1,2,3,4)
+A::test42 (1,2,3,4)
+A::test43 (1,2,3,4,DEADBEEF)
+A::test31 (1,2,3)
+A::test32 (1,2,3)
+A::test33 (1,2,3,DEADBEEF)
+A::test21 (1,2)
+A::test22 (1,2)
+A::test23 (1,2,DEADBEEF)
+A::test11 (1)
+A::test12 (1)
+A::test13 (1,DEADBEEF)
+A::test01 ()
+A::test02 ()
+A::test03 (DEADBEEF)
+Results of exception_test:
+exception: Invalid argument <x> at foo<-some_function
+exception: Invalid argument <x>='hello world' at foo<-some_function
+exception: Invalid argument <x>=-1 at foo<-some_function
+exception: Invalid argument <x>=1 at foo<-some_function
+exception: Invalid argument <x>=3.14 at foo<-some_function
+exception: Argument <x> is out of range at foo<-some_function
+exception: Argument <x>=0 is out of range [1;2) at foo<-some_function
+exception: Argument <x>=0 is out of range [-2;-1) at foo<-some_function
+exception: Argument <x>=3.14 is out of range [0;1) at foo<-some_function
+exception: Argument <x>=5 is out of range [0;4) at foo<-some_function
+exception: Null argument <ptr> at foo<-some_function
+exception: Method 'foo' doesn't implemented at some_function
+Results of refcount_test:
+OnLostReferences
+OnLostReferences
+exception: attempt to release reference-count object with no active references
+exception: attempt to restore reference-count object with no active references
+Results of singleton_test:
+Test3::Test3
+Test3::~Test3
+Test3 is initialized: false
+Test1::Test1
+Test2::Test2
+Hello world from singleton
+Exit from main
+Test2::~Test2
+Test3::Test3
+Test3::~Test3
+Test1::~Test1
