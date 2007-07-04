@@ -1,8 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := EXTERN_LIBS #Список целей
+TARGETS := FUNNER_COMPONENTS #Список целей
 
 #Цель №1 - пакет
-EXTERN_LIBS.TYPE       := package                 #Тип цели
-EXTERN_LIBS.COMPONENTS := extern/zlib extern/zzip #Список компонентов и списков опций их сборки
+FUNNER_COMPONENTS.TYPE       := package              #Тип цели
+FUNNER_COMPONENTS.COMPONENTS := components/commonlib #Список компонентов и списков опций их сборки

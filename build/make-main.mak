@@ -93,7 +93,7 @@ define process_source_dir
   
     include $2/sources.mak    
 
-    $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES:%=$2/%))    
+    $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES:%=$2/%))
   else
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES_SUFFIXES:%=$2/*.%))
   endif  
@@ -184,17 +184,17 @@ endef
 #Обработка компонентов пакета (имя пакета, команда make)
 define process_package_components
   $2: PACKAGE_$2.$1
-  
+
   .PHONY: PACKAGE_$2.$1
 
   PACKAGE_$2.$1:
-		@$$(foreach component,$$($1.COMPONENTS),$(MAKE) -C $$(subst :, ,$(ROOT)/$$(component)) $2 && ) true
+		@$$(foreach component,$$($1.COMPONENTS),$(MAKE) -C $$(subst :, ,$(COMPONENT_DIR)/$$(component)) $2 && ) true
 endef
 
 #Обработка цели package (имя цели)
 define process_target.package
   ifneq (,$$($1.COMPONENTS))
-    $$(foreach command,build clean fullyclean test check run,$$(eval $$(call process_package_components,$1,$$(command))))  
+    $$(foreach command,build clean fullyclean test check run,$$(eval $$(call process_package_components,$1,$$(command))))
   else
     $$(warning There is no components in package '$1' component-dir='$(COMPONENT_DIR)')
   endif  
