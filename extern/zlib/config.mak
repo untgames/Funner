@@ -1,0 +1,2 @@
+CUSTOM_INCLUDE_DIRS := h
+EXTERN_BUILD_DIR    := src
