@@ -1,6 +1,0 @@
-Results of md5_1_test:
-hash = d41d8cd98f00b204e9800998ecf8427e
-Results of md5_2_test:
-hash = 57edf4a22be3c955ac49da2e2107b67a
-Results of md5_3_test:
-hash = 57edf4a22be3c955ac49da2e2107b67a
