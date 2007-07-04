@@ -1,0 +1,5 @@
+Results of write_file_test:
+File 'media/tests/filesys/test_copy.txt' info:
+Size:             12
+CRC32 hash value: e47ae66a
+MD5 hash value:   {86,fb,26,9d,19,0d,2c,85,f6,e0,46,8c,ec,a4,2a,20}

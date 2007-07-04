@@ -1,0 +1,7 @@
+Results of search1_test:
+Add search path 'media/tests/filesys':
+Search 'search/*':
+  found: search/subdir
+  found: search/subdir/test1.txt
+  found: search/test.txt
+  found: search/test_zip.txt

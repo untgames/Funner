@@ -1,6 +1,6 @@
 #include "test.h"
 
-const char* RESULTS_FILE_NAME = "data/output_text_stream_results.txt";
+const char* RESULTS_FILE_NAME = "media/tests/filesys/output_text_stream_results.txt";
 
 int main ()
 {

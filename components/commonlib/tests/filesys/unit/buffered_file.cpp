@@ -8,7 +8,7 @@ const size_t READ_BLOCK_SIZE   = 4;
 const char*  MESSAGE1          = "0123456789\n";
 const char*  MESSAGE2          = "9876543210\n";
 const char*  MESSAGE3          = "---ABCDEFGHIJKLMNOPQRSTUVWXYZ---\n";
-const char*  RESULTS_FILE_NAME = "data/buffered_file_results.txt";
+const char*  RESULTS_FILE_NAME = "media/tests/filesys/buffered_file_results.txt";
 
 static char buffer [1024*16];
 

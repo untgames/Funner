@@ -1,6 +1,6 @@
 #include "test.h"
 
-const char* FILE_NAME = "data/test.txt";
+const char* FILE_NAME = "media/tests/filesys/test.txt";
 
 int main ()
 {
