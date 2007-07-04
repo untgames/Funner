@@ -6,8 +6,8 @@ TARGETS := PCRE
 #Цель №1 - PCRE
 PCRE.TYPE             := static-lib                           #Тип цели
 PCRE.NAME             := pcre                                 #Имя выходного файла
-PCRE.INCLUDE_DIRS     := h                                    #Относительные пути к каталогам c заголовочными файлами
-PCRE.SOURCE_DIRS      := src                                  #Относительные пути к каталогам c исходными файлами
+PCRE.INCLUDE_DIRS     := include                              #Относительные пути к каталогам c заголовочными файлами
+PCRE.SOURCE_DIRS      := sources                              #Относительные пути к каталогам c исходными файлами
 PCRE.LIB_DIRS         :=                                      #Относительные пути к каталогам с библиотеками
 PCRE.LIBS             :=                                      #Список используемых при линковке библиотек
 PCRE.COMPILER_DEFINES := _CRT_SECURE_NO_DEPRECATE PCRE_STATIC #Определения сборки
