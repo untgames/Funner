@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <common/exception.h>
+#include <common/file.h>
 #include <media/image.h>
 #include <memory.h>
 
@@ -10,7 +11,7 @@ using namespace common;
 const char* file_name1 = "data/pic1.jpg";
 const char* file_name2 = "data/pic2.tga";
 const char* file_name3 = "data/pic3.bmp";
-
+      
 void print_format (Image* image)
 {
   printf ("image %s format - ", image->Name());
@@ -28,12 +29,13 @@ void print_format (Image* image)
     default:         printf ("Unknown");
   }
   printf ("\n");
-}
+}   
 
-void main ()
+int main ()
 {
   try
   {
+    printf ("Results of multilayer image test:\n");
     ImageSystem::RegisterSaveCodec ("dds", &Image::DefaultSaver);
     ImageSystem::RegisterSaveCodec ("cubemap", &Image::DefaultSaver);
     ImageSystem::RegisterSaveCodec ("skybox", &Image::DefaultSaver);
@@ -60,6 +62,17 @@ void main ()
     img.Resize (1000, 1000, 6);
     printf ("new multilayer image width - %u, height - %u, depth - %u\n", img.Width(), img.Height(), img.Depth());
     
+    FileHash file_hash;
+
+    FileSystem::GetFileHash ("results/multilayer_image.dds",file_hash);
+
+    printf ("File 'results/multilayer_image.dds' hash: {");
+
+    for (size_t i=0;i<15;i++)
+      printf ("%02x,",file_hash.md5 [i]);
+
+    printf ("%02x}\n",file_hash.md5 [15]);
+
     img.Save("results/multilayer_image.tif.skybox", PF_DEFAULT);
 
     img2.Resize (10,10,1);
@@ -67,5 +80,7 @@ void main ()
   catch (std::exception& exception)               
   {                                               
     printf ("exception: %s\n",exception.what ()); 
-  }                                                 
+  }
+  
+  return 0;                                               
 }

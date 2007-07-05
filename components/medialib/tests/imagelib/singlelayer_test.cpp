@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <common/exception.h>
+#include <common/file.h>
 #include <media/image.h>
 #include <memory.h>
 
@@ -30,10 +31,12 @@ void print_format (Image* image)
   printf ("\n");
 }
 
-void main ()
+int main ()
 {
   try
   {
+    printf ("Results of single layer  image test:\n");
+
     Image image1, image2 (file_name2), image3 (image2,PF_RGBA8), image4, image5 (file_name3);
     ImageSystem::RegisterSaveCodec ("tiff", &Image::DefaultSaver);
 
@@ -69,6 +72,17 @@ void main ()
     image1.PutImage (10,10,0,60,60,1,image5.Format(),image5.Bitmap());
     image1.Save("results/image1with5 (PutImage test).bmp", PF_RGB8);
     
+    FileHash file_hash;
+
+    FileSystem::GetFileHash ("results/image1with5 (PutImage test).bmp",file_hash);
+
+    printf ("File 'results/image1with5 (PutImage test).bmp' hash: {");
+
+    for (size_t i=0;i<15;i++)
+      printf ("%02x,",file_hash.md5 [i]);
+
+    printf ("%02x}\n",file_hash.md5 [15]);
+
     Image().Swap(image4);
 
     image4.Save("results/image4-2 (exception test).bmp");
@@ -77,4 +91,5 @@ void main ()
   {                                               
     printf ("exception: %s\n",exception.what ()); 
   }                                               
-}
+  return 0;
+} 

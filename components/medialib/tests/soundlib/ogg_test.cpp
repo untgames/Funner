@@ -10,7 +10,7 @@ using namespace common;
 
 const char* file_name = "data/sound1.ogg";
 
-void main ()
+int main ()
 {
   try
   {
@@ -58,4 +58,6 @@ void main ()
   {
     printf ("unknown exception\n");
   }
+
+  return 0;
 }
