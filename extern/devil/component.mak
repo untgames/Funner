@@ -41,7 +41,7 @@ DEVILDLL.INCLUDE_DIRS     := include include/il components/jpeg/include componen
 DEVILDLL.SOURCE_DIRS      := components/il/sources
 DEVILDLL.LIB_DIRS         :=  
 DEVILDLL.LIBS             := jpeglib tifflib zlib
-DEVILDLL.COMPILER_CFLAGS  :=
+DEVILDLL.COMPILER_CFLAGS  := /wd4142 /wd4005 /wd4018
 DEVILDLL.COMPILER_DEFINES :=
 
 #Öåëü ¹4 - ILUDLL sources
@@ -51,5 +51,5 @@ ILUDLL.INCLUDE_DIRS     := include include/il components/jpeg/include components
 ILUDLL.SOURCE_DIRS      := components/ilu/sources
 ILUDLL.LIB_DIRS         :=  
 ILUDLL.LIBS             := devil
-ILUDLL.COMPILER_CFLAGS  :=
+ILUDLL.COMPILER_CFLAGS  := /wd4090
 ILUDLL.COMPILER_DEFINES :=
