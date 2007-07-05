@@ -6,8 +6,8 @@ TARGETS := DEVIL
 #Öåëü ¹1 - DevIL sources
 DEVIL.TYPE             := static-lib
 DEVIL.NAME             := devil
-DEVIL.INCLUDE_DIRS     := include include/il sources/jpeg/include sources/tiff/include sources/il/include sources/ilu/include ../zlib/include
-DEVIL.SOURCE_DIRS      := sources/jpeg/sources sources/tiff/sources sources/il/sources sources/ilu/sources
+DEVIL.INCLUDE_DIRS     := include include/il components/jpeg/include components/tiff/include components/il/include components/ilu/include ../zlib/include
+DEVIL.SOURCE_DIRS      := components/jpeg/sources components/tiff/sources components/il/sources components/ilu/sources
 DEVIL.LIB_DIRS         :=  
 DEVIL.LIBS             := 
 DEVIL.COMPILER_CFLAGS  :=
