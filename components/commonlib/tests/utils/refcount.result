@@ -1,0 +1,5 @@
+Results of refcount_test:
+OnLostReferences
+OnLostReferences
+exception: attempt to release reference-count object with no active references
+exception: attempt to restore reference-count object with no active references

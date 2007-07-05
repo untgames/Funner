@@ -1,0 +1,12 @@
+Results of singleton_test:
+Test3::Test3
+Test3::~Test3
+Test3 is initialized: false
+Test1::Test1
+Test2::Test2
+Hello world from singleton
+Exit from main
+Test2::~Test2
+Test3::Test3
+Test3::~Test3
+Test1::~Test1
