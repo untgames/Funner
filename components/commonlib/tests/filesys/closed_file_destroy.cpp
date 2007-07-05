@@ -1,6 +1,6 @@
 #include "test.h"
 
-InputFile file ("media/tests/filesys/test.txt");
+InputFile file ("data/test.txt");
 
 int main ()
 {

@@ -1,7 +1,7 @@
 #include "test.h"
 
-const char* SRC_FILE_NAME = "media/tests/filesys/test.txt";
-const char* DST_FILE_NAME = "media/tests/filesys/test_copy.txt";
+const char* SRC_FILE_NAME = "data/test.txt";
+const char* DST_FILE_NAME = "data/test_copy.txt";
 
 int main ()
 {

@@ -32,8 +32,8 @@ root
       X:  ( '0.5' )
     New
 Total nodes count: 31
-media/tests/parser/test1.xml(1): warning: not yet implement. Encoding="windows-1251"
-media/tests/parser/test1.xml(30): error: syntax error. Closing tag 'New2' without opening. Expected 'New1'.
+data/test1.xml(1): warning: not yet implement. Encoding="windows-1251"
+data/test1.xml(30): error: syntax error. Closing tag 'New2' without opening. Expected 'New1'.
 Results of xml1_test:
 Parse successfull
 root
@@ -46,28 +46,28 @@ root
   MUST
     No_name_tag
 Total nodes count: 9
-media/tests/parser/error_test1.xml(1): warning: not yet implement. Encoding="windows-1251"
-media/tests/parser/error_test1.xml(6): error: syntax error. Unexpected token "1property"
-media/tests/parser/error_test1.xml(6): error: syntax error. Unexpected '='
-media/tests/parser/error_test1.xml(6): error: syntax error. Unexpected string "tara"
-media/tests/parser/error_test1.xml(11): error: syntax error. Unexpected CDATA tag. Tag expected
-media/tests/parser/error_test1.xml(13): error: syntax error. Unexpected identifier Identifier. Tag expected
-media/tests/parser/error_test1.xml(15): error: syntax error. Unexpected string "string". Tag expected
-media/tests/parser/error_test1.xml(17): error: syntax error. Unexpected token 1token. Tag expected
-media/tests/parser/error_test1.xml(21): error: syntax error. Attribute value must be a string
-media/tests/parser/error_test1.xml(29): error: syntax error. Element name expected
-media/tests/parser/error_test1.xml(29): error: syntax error. Unexpected '>'
-media/tests/parser/error_test1.xml(30): error: syntax error. Expected identifier
-media/tests/parser/error_test1.xml(30): error: syntax error. Unexpected token "1Tag"
-media/tests/parser/error_test1.xml(30): error: syntax error. Closing tag '1Tag' without opening. Expected 'Uncorrect_tag_name'.
-media/tests/parser/error_test1.xml(36): error: syntax error. Closing tag 'br' without opening. Expected 'Uncorrect_empty_tag'.
-media/tests/parser/error_test1.xml(41): error: syntax error. Expected '=', but found "XXX"
-media/tests/parser/error_test1.xml(41): error: syntax error. Expected '=', but found ""
-media/tests/parser/error_test1.xml(43): error: syntax error. Unexpected new element "Unclosed"
-media/tests/parser/error_test1.xml(43): error: syntax error. Unexpected identifier "Unclosed"
-media/tests/parser/error_test1.xml(43): error: syntax error. Unexpected identifier "tag"
-media/tests/parser/error_test1.xml(47): error: syntax error. Element name expected
-media/tests/parser/error_test1.xml(48): error: syntax error. Expected identifier
-media/tests/parser/error_test1.xml(48): error: syntax error. Unexpected '>'
-media/tests/parser/error_test1.xml(50): error: syntax error. Closing tag 'No_name_tag' without opening. Expected 'MUST'.
-media/tests/parser/error_test1.xml(51): error: unexpected EOF (unclosed tag)
+data/error_test1.xml(1): warning: not yet implement. Encoding="windows-1251"
+data/error_test1.xml(6): error: syntax error. Unexpected token "1property"
+data/error_test1.xml(6): error: syntax error. Unexpected '='
+data/error_test1.xml(6): error: syntax error. Unexpected string "tara"
+data/error_test1.xml(11): error: syntax error. Unexpected CDATA tag. Tag expected
+data/error_test1.xml(13): error: syntax error. Unexpected identifier Identifier. Tag expected
+data/error_test1.xml(15): error: syntax error. Unexpected string "string". Tag expected
+data/error_test1.xml(17): error: syntax error. Unexpected token 1token. Tag expected
+data/error_test1.xml(21): error: syntax error. Attribute value must be a string
+data/error_test1.xml(29): error: syntax error. Element name expected
+data/error_test1.xml(29): error: syntax error. Unexpected '>'
+data/error_test1.xml(30): error: syntax error. Expected identifier
+data/error_test1.xml(30): error: syntax error. Unexpected token "1Tag"
+data/error_test1.xml(30): error: syntax error. Closing tag '1Tag' without opening. Expected 'Uncorrect_tag_name'.
+data/error_test1.xml(36): error: syntax error. Closing tag 'br' without opening. Expected 'Uncorrect_empty_tag'.
+data/error_test1.xml(41): error: syntax error. Expected '=', but found "XXX"
+data/error_test1.xml(41): error: syntax error. Expected '=', but found ""
+data/error_test1.xml(43): error: syntax error. Unexpected new element "Unclosed"
+data/error_test1.xml(43): error: syntax error. Unexpected identifier "Unclosed"
+data/error_test1.xml(43): error: syntax error. Unexpected identifier "tag"
+data/error_test1.xml(47): error: syntax error. Element name expected
+data/error_test1.xml(48): error: syntax error. Expected identifier
+data/error_test1.xml(48): error: syntax error. Unexpected '>'
+data/error_test1.xml(50): error: syntax error. Closing tag 'No_name_tag' without opening. Expected 'MUST'.
+data/error_test1.xml(51): error: unexpected EOF (unclosed tag)

@@ -27,8 +27,8 @@ root
           test:  ( '!!!' )
 Total nodes count: 25
 Parse log:
-media/tests/parser/test1.wxf(3): error: unexpected characters on line
-media/tests/parser/test1.wxf(5): error: User error
-media/tests/parser/test1.wxf(6): warning: User defined warning
-media/tests/parser/test1.wxf(32): error: syntax error. Unexpected value '1'. Line must start from identifier
-media/tests/parser/test1.wxf(54): error: syntax error. Unexpected value '112'. Line must start from identifier
+data/test1.wxf(3): error: unexpected characters on line
+data/test1.wxf(5): error: User error
+data/test1.wxf(6): warning: User defined warning
+data/test1.wxf(32): error: syntax error. Unexpected value '1'. Line must start from identifier
+data/test1.wxf(54): error: syntax error. Unexpected value '112'. Line must start from identifier

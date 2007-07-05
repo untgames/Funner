@@ -7,7 +7,7 @@ using namespace common;
 using namespace stl;
 using namespace math;
 
-const char* SRC_FILE_NAME = "media/tests/parser/test3.wxf";
+const char* SRC_FILE_NAME = "data/test3.wxf";
 const char* DST_FILE_NAME = "/io/stdout";
 
 class Test

@@ -1,5 +1,5 @@
 Results of zip_read_file_test:
-Add search path 'media/tests/filesys':
+Add search path 'data':
 File name: 'search/test_zip.txt'
 File size: 32
 Test #1. Read file content

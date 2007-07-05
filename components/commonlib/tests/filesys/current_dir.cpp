@@ -9,7 +9,7 @@ int main ()
 
   try
   {
-    FileSystem::SetCurrentDir ("media/tests/filesys");
+    FileSystem::SetCurrentDir ("data");
     FileSystem::SetCurrentDir ("search/../search/.././");
     
     printf ("Current dir: '%s'\n",FileSystem::GetCurrentDir ());

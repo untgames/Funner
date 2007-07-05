@@ -1,6 +1,6 @@
 #include "test.h"
 
-const char* SEARCH_PATH = "media/tests/filesys";
+const char* SEARCH_PATH = "data";
 const char* FILE_NAME   = "test.txt";
 
 inline void PrintLog (const char* message)

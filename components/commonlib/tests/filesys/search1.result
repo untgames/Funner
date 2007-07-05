@@ -1,5 +1,5 @@
 Results of search1_test:
-Add search path 'media/tests/filesys':
+Add search path 'data':
 Search 'search/*':
   found: search/subdir
   found: search/subdir/test1.txt

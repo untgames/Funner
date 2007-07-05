@@ -3,7 +3,7 @@
 
 using namespace common;
 
-const char* file_name = "media/tests/parser/test1.wxf";
+const char* file_name = "data/test1.wxf";
 
 size_t EnumNodes (Parser::Iterator p,size_t level=0)
 {

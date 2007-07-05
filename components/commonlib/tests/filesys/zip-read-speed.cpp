@@ -4,7 +4,7 @@
 
 using namespace common;
 
-const char*  SEARCH_PATH = "media/tests/filesys";
+const char*  SEARCH_PATH = "data";
 const char*  FILE_NAME   = "speed-test.txt";
 const size_t BUF_SIZE    = 128;
 const size_t TESTS_COUNT = 10;

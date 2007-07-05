@@ -1,6 +1,6 @@
 Results of file_info_test:
-File info 'media/tests/filesys':
+File info 'data':
 Directory:   true
-File info 'media/tests/filesys/test.txt':
+File info 'data/test.txt':
 Directory:   false
 Size:        12

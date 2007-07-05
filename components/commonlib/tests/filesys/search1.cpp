@@ -1,7 +1,7 @@
 #include "test.h"
 
 const char* SEARCH_MASK = "search/*";
-const char* SEARCH_PATH = "media/tests/filesys";
+const char* SEARCH_PATH = "data";
 
 inline void PrintLog (const char* message)
 {

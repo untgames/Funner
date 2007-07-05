@@ -1,7 +1,7 @@
 #include <string.h>
 #include "test.h"
 
-const char* file_names [] = {"media/tests/filesys","media/tests/filesys/test.txt"};
+const char* file_names [] = {"data","data/test.txt"};
 
 int main ()
 {

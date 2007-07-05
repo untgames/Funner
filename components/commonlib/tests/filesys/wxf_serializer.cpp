@@ -4,7 +4,7 @@
 using namespace stl;
 using namespace math;
 
-const char* RESULTS_FILE_NAME = "media/tests/filesys/wxf_serializer_results.wxf";
+const char* RESULTS_FILE_NAME = "data/wxf_serializer_results.wxf";
 
 typedef set<string> MySet;
 

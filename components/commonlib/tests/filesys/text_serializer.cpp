@@ -5,7 +5,7 @@
 using namespace stl;
 using namespace math;
 
-const char* RESULTS_FILE_NAME = "media/tests/filesys/text_serializer_results.txt";
+const char* RESULTS_FILE_NAME = "data/text_serializer_results.txt";
 
 int main ()
 {

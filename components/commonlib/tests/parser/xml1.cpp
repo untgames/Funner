@@ -3,7 +3,7 @@
 
 using namespace common;
 
-const char* file_name[] = {"media/tests/parser/test1.xml", "media/tests/parser/error_test1.xml"};
+const char* file_name[] = {"data/test1.xml", "data/error_test1.xml"};
 const size_t elements = 2;
 
 size_t EnumNodes (ParseNode* p,size_t level=0)
