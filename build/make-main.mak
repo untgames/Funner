@@ -27,6 +27,8 @@ BUILD_DIR                               := $(ROOT)/$(BUILD_DIR_SHORT_NAME)
 PCH_SHORT_NAME                          := $(strip $(PCH_SHORT_NAME))
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := $(strip $(BATCH_COMPILE_FLAG_FILE_SHORT_NAME))
 DIRS                                     = $(TMP_DIRS) $(DIST_DIR) $(DIST_LIB_DIR) $(DIST_BIN_DIR)
+EMPTY                                   :=
+SPACE                                   := $(EMPTY) $(EMPTY)
 
 ###################################################################################################
 #Если не указан список обрабатываемых файлов - обрабатываем все доступные файлы (для тестирования)
@@ -53,8 +55,8 @@ include $(COMPONENT_CONFIGURATION_FILE)
 ###################################################################################################
 #Специализация пути
 ###################################################################################################
-define specialize_path
-$(wildcard $(foreach dir,$($1),$(COMPONENT_DIR)$(dir)))
+define specialize_paths
+$(foreach dir,$1,$(COMPONENT_DIR)$(dir))
 endef
 
 ###################################################################################################
@@ -85,6 +87,10 @@ endef
 
 #Обработка каталога с исходными файлами (имя цели, путь к каталогу с исходными файлами, список применяемых макросов)
 define process_source_dir
+  ifeq (,$$(wildcard $2))
+    $$(error Source dir '$2' not found at build target '$1' component-dir='$(COMPONENT_DIR)')
+  endif
+
   MODULE_PATH := $$(subst ./,,$$(subst ../,,$2))
   MODULE_NAME := $1.$$(subst /,-,$$(MODULE_PATH))
   
@@ -117,12 +123,14 @@ endef
 
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
 define process_target_with_sources
-  $1.INCLUDE_DIRS := $$(call specialize_path,$1.INCLUDE_DIRS)
-  $1.SOURCE_DIRS  := $$(call specialize_path,$1.SOURCE_DIRS)
-  $1.LIB_DIRS     := $$(call specialize_path,$1.LIB_DIRS) $(DIST_LIB_DIR)
-  $1.DLL_DIRS     := $$(call specialize_path,$1.DLL_DIRS)
-  $1.LIBS         := $$($1.LIBS:%=%.lib)
-  $1.TARGET_DLLS  := $$($1.DLLS:%=$(DIST_BIN_DIR)/%.dll)
+  $1.INCLUDE_DIRS  := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
+  $1.SOURCE_DIRS   := $$(call specialize_paths,$$($1.SOURCE_DIRS))
+  $1.LIB_DIRS      := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
+  $1.DLL_DIRS      := $$(call specialize_paths,$$($1.DLL_DIRS))
+  $1.EXECUTION_DIR := $$(strip $$($1.EXECUTION_DIR))
+  $1.EXECUTION_DIR := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
+  $1.LIBS          := $$($1.LIBS:%=%.lib)
+  $1.TARGET_DLLS   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%.dll)
   
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
@@ -143,7 +151,7 @@ define process_target.static-lib
 
   $1.LIB_FILE  := $(DIST_LIB_DIR)/$$($1.NAME).lib
   TARGET_FILES := $$(TARGET_FILES) $$($1.LIB_FILE)
-
+  
   build: $$($1.LIB_FILE)
 
   $$(eval $$(call process_target_with_sources,$1))  
@@ -164,9 +172,9 @@ define process_target.dynamic-lib
   $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME).dll
   TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE)
 
-  build: $$($1.DLL_FILE)
+  build: $$($1.DLL_FILE)  
 
-  $$(eval $$(call process_target_with_sources,$1))  
+  $$(eval $$(call process_target_with_sources,$1))
 
   $$($1.DLL_FILE): $$($1.FLAG_FILES)
 		@echo Create dynamic library $$(notdir $$@)...
@@ -190,6 +198,8 @@ define process_target.application
   run: RUN.$1
 
   $$(eval $$(call process_target_with_sources,$1))
+  
+  $1.EXECUTION_DIR ?= $(COMPONENT_DIR)$$($1.EXECUTION_DIR)
 
   $$($1.EXE_FILE): $$($1.FLAG_FILES)
 		@echo Linking $$(notdir $$@)...
@@ -197,18 +207,19 @@ define process_target.application
 		
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@cd $(COMPONENT_DIR) && $$(patsubst $(COMPONENT_DIR)%,%,$$<)
+		@export PATH="$(CURDIR)/$(DIST_BIN_DIR):$$(PATH)" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<)
 endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
 define process_tests_source_dir
-  $2.TEST_EXE_FILES    := $$($2.OBJECT_FILES:%.obj=%.exe)
-  $2.TEST_RESULT_FILES := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
+  $2.TEST_EXE_FILES        := $$($2.OBJECT_FILES:%.obj=%.exe)
+  $2.TEST_RESULT_FILES     := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
+  $2.EXECUTION_DIR         := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
 
   build: $$($2.TEST_EXE_FILES)
   test: TEST_MODULE.$2
   check: CHECK_MODULE.$2
-  .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2  
+  .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2
   
 #Правило сборки теста
   $$($2.TMP_DIR)/%.exe: $$($2.TMP_DIR)/%.obj
@@ -218,11 +229,11 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.exe
 		@echo Running $$(notdir $$<)...
-		export PATH=$(DIST_BIN_DIR:COMPONENT_DIR/%=%):$$PATH && cd $(COMPONENT_DIR) && $$(patsubst $(COMPONENT_DIR)%,%,$$<) > $$(patsubst $(COMPONENT_DIR)%,%,$$@)
+		@export PATH="$(CURDIR)/$(DIST_BIN_DIR):$$(PATH)" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@cd $(COMPONENT_DIR) && for file in $$(patsubst $(COMPONENT_DIR)%,%,$$(wildcard $$(files:%=$$($2.TMP_DIR)/%.exe))); do $$$$file; done
+		@export PATH="$(CURDIR)/$(DIST_BIN_DIR):$$(PATH)" && cd $$($2.EXECUTION_DIR) && for file in $$(patsubst %,"$(CURDIR)/%",$$(wildcard $$(files:%=$$($2.TMP_DIR)/%.exe))); do $$$$file; done
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
