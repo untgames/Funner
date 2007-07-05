@@ -35,25 +35,32 @@ size_t EnumNodes (Parser::Iterator p,size_t level=0)
 int main ()
 {
   printf ("Results of wxf1_test:\n");
-
-  Parser::Log log;
-  Parser parser (log,file_name);
-    
-  printf ("Parse successfull\n");
-
-  size_t nodes_count = EnumNodes (parser.Root ());
   
-  printf ("Total nodes count: %u\n",nodes_count);
-  
-  if (log.HasErrors () || log.HasWarnings ()) 
+  try
   {
-    printf ("Parse log:\n");  
+    Parser::Log log;
+    Parser parser (log,file_name);
+      
+    printf ("Parse successfull\n");
 
-    for (size_t i=0;i<log.MessagesCount ();i++)
-      printf ("%s\n",log.Message (i));
+    size_t nodes_count = EnumNodes (parser.Root ());
+    
+    printf ("Total nodes count: %u\n",nodes_count);
+    
+    if (log.HasErrors () || log.HasWarnings ()) 
+    {
+      printf ("Parse log:\n");  
+
+      for (size_t i=0;i<log.MessagesCount ();i++)
+        printf ("%s\n",log.Message (i));
+    }
+    else 
+      printf ("No errors and warnings detected\n");  
   }
-  else 
-    printf ("No errors and warnings detected\n");  
+  catch (std::exception& exception)
+  {
+    printf ("Exception: %s\n", exception.what ());
+  }
   
   return 0;  
 }

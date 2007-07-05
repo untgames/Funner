@@ -1,6 +1,6 @@
 # pragma reserve 1000 10000
 
-# include "data/test2.wxf" 1
+# include "media/tests/parser/test2.wxf" 1
 
 #error "User error"
 #warning "User defined warning"
