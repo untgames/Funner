@@ -1,14 +1,14 @@
 ###################################################################################################
 #Список целей
 ###################################################################################################
-TARGETS := NEWZLIB
+TARGETS := ZLIB
 
-#Цель №1 - NEWZLIB
-NEWZLIB.TYPE             := static-lib #Тип цели
-NEWZLIB.NAME             := zlib       #Имя выходного файла
-NEWZLIB.INCLUDE_DIRS     := include    #Относительные пути к каталогам c заголовочными файлами
-NEWZLIB.SOURCE_DIRS      := sources    #Относительные пути к каталогам c исходными файлами
-NEWZLIB.LIB_DIRS         :=            #Относительные пути к каталогам с библиотеками
-NEWZLIB.LIBS             :=            #Список используемых при линковке библиотек
-NEWZLIB.COMPILER_DEFINES := _CRT_SECURE_NO_DEPRECATE #Определения сборки
-NEWZLIB.COMPILER_CFLAGS  :=            #Флаги сборки (зависят от конфигурации)
+#Цель №1 - ZLIB
+ZLIB.TYPE             := static-lib #Тип цели
+ZLIB.NAME             := zlib       #Имя выходного файла
+ZLIB.INCLUDE_DIRS     := include    #Относительные пути к каталогам c заголовочными файлами
+ZLIB.SOURCE_DIRS      := sources    #Относительные пути к каталогам c исходными файлами
+ZLIB.LIB_DIRS         :=            #Относительные пути к каталогам с библиотеками
+ZLIB.LIBS             :=            #Список используемых при линковке библиотек
+ZLIB.COMPILER_DEFINES := _CRT_SECURE_NO_DEPRECATE #Определения сборки
+ZLIB.COMPILER_CFLAGS  :=            #Флаги сборки (зависят от конфигурации)
