@@ -80,7 +80,7 @@ define batch-compile
     $$($2.FLAG_FILE): force
   endif
   
-  $$(foreach source,$$($2.SOURCE_FILES),$$(eval $$(call create_object_file_dependency,$$(source),$$($2.TMP_DIR),$$(FLAG_FILE))))
+  $$(foreach source,$$($2.SOURCE_FILES),$$(eval $$(call create_object_file_dependency,$$(source),$$($2.TMP_DIR),$$($2.FLAG_FILE))))
 endef
 
 #Обработка каталога с исходными файлами (имя цели, путь к каталогу с исходными файлами, список применяемых макросов)
@@ -149,7 +149,7 @@ endef
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
 define process_tests_source_dir
   $2.TEST_EXE_FILES    := $$($2.OBJECT_FILES:%.obj=%.exe)
-  $2.TEST_RESULT_FILES := $$($2.OBJECT_FILES:%.obj=%.result)
+  $2.TEST_RESULT_FILES := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
 
   build: $$($2.TEST_EXE_FILES)
   test: TEST_MODULE.$2
@@ -157,21 +157,23 @@ define process_tests_source_dir
   .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2  
   
 #Правило сборки теста
-  $$($2.TMP_DIR)/%.exe: $$($2.TMP_DIR)/%.obj $$($1.FLAG_FILES)
-		@echo Linking $(notdir $$@)...
+  $$($2.TMP_DIR)/%.exe: $$($2.TMP_DIR)/%.obj
+		@echo Linking $$(notdir $$@)...
 		@link $$(filter %.obj,$$<) $$($1.LIBS)  /nologo /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
 
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.exe
-		@$$< > $$@
+		@echo Running $$(notdir $$<)...
+		@cd $(COMPONENT_DIR) && $$(patsubst $(COMPONENT_DIR)%,%,$$<) > $$(patsubst $(COMPONENT_DIR)%,%,$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@for file in $$(wildcard $$(files:%=$$($2.TMP_DIR)/%.exe)); do $$$$file; done		
+		@cd $(COMPONENT_DIR) && for file in $$(patsubst $(COMPONENT_DIR)%,%,$$(wildcard $$(files:%=$$($2.TMP_DIR)/%.exe))); do $$$$file; done
 
 #Правило проверки результатов тестирования
-  CHECK_MODULE.$2: $$($2.TEST_EXE_FILES:%.exe=%.result)
-		@for file in $$(notdir $$(wildcard $$(files:%=$$($2.TMP_DIR)/%.result))); do diff --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done		
+  CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
+		@echo Checking results of module '$2'...
+		@for file in $$(notdir $$(wildcard $$(files:%=$$($2.SOURCE_DIR)/%.result))); do diff --strip-trailing-cr --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done
 endef
 
 #Обработка цели test-suite (имя цели)
