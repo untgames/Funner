@@ -1,0 +1,23 @@
+#include <stl/algorithm>
+#include <string.h>
+#include <stdio.h>
+
+using namespace stl;
+
+bool char_str_less (const char* a,const char* b)
+{
+  return strcmp (a,b) < 0 ? 1 : 0;
+}
+
+int main ()
+{
+  printf ("Results of uprbnd2_test:\n");
+
+  char* str [] = {"a","a","b","b","q","w","z"};
+
+  const unsigned strCt = sizeof (str)/sizeof (str[0]);
+
+  printf ("d can be inserted at index: %d\n",upper_bound (str,str+strCt,"d",char_str_less)-str);
+
+  return 0;
+}
