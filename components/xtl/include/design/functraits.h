@@ -5,12 +5,12 @@
 #ifndef DESIGN_FUNCTION_TRAITS_HEADER
 #define DESIGN_FUNCTION_TRAITS_HEADER
 
-#include <design/typelist.h>
+#include <stl/mpl.h>
 
-namespace design
+namespace xtl
 {
 
-namespace type_manip
+namespace mpl
 {
 
 /*
@@ -44,7 +44,7 @@ class signature_arguments_traits
     typedef Ret result_type;
 
     template <size_t number> struct argument {
-      typedef typename type_manip::at<arguments_list,number-1>::result type;
+      typedef typename mpl::at<arguments_list,number-1>::type type;
     };
 };
 
@@ -999,6 +999,11 @@ struct function_traits<Ret (__stdcall T::*const volatile*)(Arg1,Arg2,Arg3,Arg4,A
 
 }
 
+}
+
+namespace design
+{
+  namespace type_manip = xtl::mpl;
 }
 
 #endif //DESIGN_FUNCTION_TRAITS_HEADER
