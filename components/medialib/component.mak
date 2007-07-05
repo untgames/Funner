@@ -16,8 +16,8 @@ MEDIALIB_COMPONENTS.COMPILER_DEFINES := IL_STATIC_LIB
 #Öåëü ¹2 - MediaLib tests
 MEDIALIB_TESTS.TYPE             := test-suite
 MEDIALIB_TESTS.INCLUDE_DIRS     := include ../commonlib/include ../xtl/include
-MEDIALIB_TESTS.SOURCE_DIRS      := tests/soundlib
+MEDIALIB_TESTS.SOURCE_DIRS      := tests/soundlib tests/imagelib
 MEDIALIB_TESTS.LIB_DIRS         :=  
-MEDIALIB_TESTS.LIBS             := commonlib zzip zlib vorbisfile_static vorbis_static ogg medialib
+MEDIALIB_TESTS.LIBS             := commonlib zzip zlib vorbisfile_static vorbis_static ogg medialib devil ilu
 MEDIALIB_TESTS.COMPILER_CFLAGS  :=
 MEDIALIB_TESTS.COMPILER_DEFINES :=
