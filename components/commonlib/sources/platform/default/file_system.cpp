@@ -194,21 +194,7 @@ void StdioFileSystem::FileResize (file_t file,filesize_t new_size)
 
 bool StdioFileSystem::FileEof (file_t file)
 {
-  int result = feof ((FILE*)file);
-  
-  switch (result)
-  {
-    case 0: return false;
-    case 1: return true;
-    default:
-      switch (errno)
-      {
-        case EBADF: RaiseInvalidArgument ("StdioFileSystem::FileEof","file"); break;
-        default:    Raise<FileException> ("StdioFileSystem::FileEof","Unknown error"); break;
-      }
-
-      return false;
-  }  
+  return feof ((FILE*)file) != 0;
 }
 
 void StdioFileSystem::FileFlush (file_t file)
