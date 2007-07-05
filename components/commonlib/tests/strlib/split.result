@@ -1,0 +1,26 @@
+Results of split_test:
+split 'hello world' (delimiters=' ', spaces=' \t') on 2 tokens:
+    'hello'
+    'world'
+split 'hello, world' (delimiters=',', spaces=' \t') on 2 tokens:
+    'hello'
+    'world'
+split 'hello,world' (delimiters=',', spaces=' \t') on 2 tokens:
+    'hello'
+    'world'
+split ',world' (delimiters=',', spaces=' \t') on 2 tokens:
+    ''
+    'world'
+split 'hello,' (delimiters=',', spaces=' \t') on 1 tokens:
+    'hello'
+split ',,hello,world,' (delimiters=',', spaces=' \t') on 4 tokens:
+    ''
+    ''
+    'hello'
+    'world'
+split 'hello world ' (delimiters=' ', spaces=' \t') on 2 tokens:
+    'hello'
+    'world'
+split '' (delimiters='', spaces='') on 0 tokens:
+split 'hello world' (delimiters='', spaces=' \t') on 1 tokens:
+    'hello world'
