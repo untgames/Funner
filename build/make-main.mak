@@ -73,8 +73,8 @@ define batch-compile
   $1.FLAG_FILES := $$($1.FLAG_FILES) $$($2.FLAG_FILE)
   
   $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
-		@cl /EHsc $$($1.COMPILER_CFLAGS) $$($1.COMPILER_DEFINES:%=/D%) /W3 /wd4996 $$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES:./%=%)) /nologo /c /Fo"$$($2.TMP_DIR)\\" $$($1.INCLUDE_DIRS:%=/I"%") /I"$$($2.SOURCE_DIR)"
 		@echo batch-flag-file > $$@
+		@cl /EHsc $$($1.COMPILER_CFLAGS) $$($1.COMPILER_DEFINES:%=/D%) /W3 /wd4996 $$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES:./%=%)) /nologo /c /Fo"$$($2.TMP_DIR)\\" $$($1.INCLUDE_DIRS:%=/I"%") /I"$$($2.SOURCE_DIR)"
 		
   ifneq (,$$($2.NEW_SOURCE_FILES))
     $$($2.FLAG_FILE): force
@@ -172,7 +172,7 @@ define process_target.dynamic-lib
 		@echo Create dynamic library $$(notdir $$@)...
 		@link $$($1.OBJECT_FILES) $$($1.LIBS) /nologo /dll /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
 		@$(RM) $$(basename $$@).exp
-		@mv $$(basename $$@).lib $$(DIST_LIB_DIR)
+		@mv -f $$(basename $$@).lib $$(DIST_LIB_DIR)
 endef
 
 #Обработка цели application (имя цели)
@@ -218,7 +218,7 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.exe
 		@echo Running $$(notdir $$<)...
-		@cd $(COMPONENT_DIR) && $$(patsubst $(COMPONENT_DIR)%,%,$$<) > $$(patsubst $(COMPONENT_DIR)%,%,$$@)
+		export PATH=$(DIST_BIN_DIR:COMPONENT_DIR/%=%):$$PATH && cd $(COMPONENT_DIR) && $$(patsubst $(COMPONENT_DIR)%,%,$$<) > $$(patsubst $(COMPONENT_DIR)%,%,$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
