@@ -135,7 +135,13 @@ endef
 
 #Обработка цели static-lib (имя цели)
 define process_target.static-lib
-  $1.LIB_FILE  := $(DIST_LIB_DIR)/$$(strip $$($1.NAME)).lib
+  $1.NAME := $$(strip $$($1.NAME))
+  
+  ifeq (,$$($1.NAME))
+    $$(error Empty static name at build target '$1' component-dir='$(COMPONENT_DIR)')
+  endif
+
+  $1.LIB_FILE  := $(DIST_LIB_DIR)/$$($1.NAME).lib
   TARGET_FILES := $$(TARGET_FILES) $$($1.LIB_FILE)
 
   build: $$($1.LIB_FILE)
@@ -143,8 +149,55 @@ define process_target.static-lib
   $$(eval $$(call process_target_with_sources,$1))  
 
   $$($1.LIB_FILE): $$($1.FLAG_FILES)
-		@echo Createing library $$(notdir $$@)...
-		@lib /nologo /out:$$@ $$($1.OBJECT_FILES)      
+		@echo Create library $$(notdir $$@)...
+		@lib /nologo /out:$$@ $$($1.OBJECT_FILES)
+endef
+
+#Обработка цели dynamic-lib (имя цели)
+define process_target.dynamic-lib
+  $1.NAME := $$(strip $$($1.NAME))
+  
+  ifeq (,$$($1.NAME))
+    $$(error Empty dynamic library name at build target '$1' component-dir='$(COMPONENT_DIR)')
+  endif
+
+  $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME).dll
+  TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE)
+
+  build: $$($1.DLL_FILE)
+
+  $$(eval $$(call process_target_with_sources,$1))  
+
+  $$($1.DLL_FILE): $$($1.FLAG_FILES)
+		@echo Create dynamic library $$(notdir $$@)...
+		@link $$($1.OBJECT_FILES) $$($1.LIBS) /nologo /dll /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
+		@$(RM) $$(basename $$@).exp
+		@mv $$(basename $$@).lib $$(DIST_LIB_DIR)
+endef
+
+#Обработка цели application (имя цели)
+define process_target.application
+  $1.NAME := $$(strip $$($1.NAME))
+  
+  ifeq (,$$($1.NAME))
+    $$(error Empty application name at build target '$1' component-dir='$(COMPONENT_DIR)')
+  endif
+
+  $1.EXE_FILE  := $(DIST_BIN_DIR)/$$($1.NAME).exe
+  TARGET_FILES := $$(TARGET_FILES) $$($1.EXE_FILE)
+
+  build: $$($1.EXE_FILE)
+  run: RUN.$1
+
+  $$(eval $$(call process_target_with_sources,$1))
+
+  $$($1.EXE_FILE): $$($1.FLAG_FILES)
+		@echo Linking $$(notdir $$@)...
+		@link $$($1.OBJECT_FILES) $$($1.LIBS) /nologo /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
+		
+  RUN.$1: $$($1.EXE_FILE)
+		@echo Running $$(notdir $$<)...
+		@cd $(COMPONENT_DIR) && $$(patsubst $(COMPONENT_DIR)%,%,$$<)
 endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
@@ -199,14 +252,14 @@ define process_target.package
   ifneq (,$$($1.COMPONENTS))
     $$(foreach command,build clean fullyclean test check run,$$(eval $$(call process_package_components,$1,$$(command))))
   else
-    $$(warning There is no components in package '$1' component-dir='$(COMPONENT_DIR)')
+    $$(warning Empty package at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif  
 endef
 
 #Проверка корректности типа цели (тип цели)
 define test_target_type
-  ifeq (,$$(findstring $1,$(VALID_TARGET_TYPES)))
-    $$(error Wrong target type '$1' component-dir='$(COMPONENT_DIR)')
+  ifeq (,$$(findstring $$(strip $$($1.TYPE)),$(VALID_TARGET_TYPES)))
+    $$(error Wrong target type '$$(strip $$($1.TYPE))' at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 endef
 
@@ -214,6 +267,7 @@ endef
 #Правила сборки
 ###################################################################################################
 all: build check
+run: build
 build: create_dirs
 rebuild: clean build
 test: build
@@ -223,7 +277,7 @@ force:
 .PHONY: build rebuild clean fullyclean run test check help create_dirs force
 
 #Обработка целей компонента
-$(foreach target,$(TARGETS),$(eval $(call test_target_type,$(strip $($(target).TYPE)))))
+$(foreach target,$(TARGETS),$(eval $(call test_target_type,$(target))))
 $(foreach target,$(TARGETS),$(eval $(call process_target.$(strip $($(target).TYPE)),$(target))))
 
 #Создание каталогов
