@@ -41,10 +41,10 @@ void main ()
 
     for (size_t j = 0; j < 2; j++)
     {
-      printf ("Hash %u: ", j);
-      for (size_t i = 0; i < 16; i++)
-        printf ("%c", hash[j][i]);
-      printf ("\n");
+      printf ("Hash %u: {", j);
+      for (size_t i = 0; i < 15; i++)
+        printf ("%02x", hash[j][i]);
+      printf ("%02x}\n", hash [j][15]);
     }
   
     delete [] data_buffers [0];
