@@ -170,7 +170,7 @@ define process_target.dynamic-lib
   endif
 
   $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME).dll
-  TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE)
+  TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE))).lib
 
   build: $$($1.DLL_FILE)  
 
@@ -180,7 +180,7 @@ define process_target.dynamic-lib
 		@echo Create dynamic library $$(notdir $$@)...
 		@link $$($1.OBJECT_FILES) $$($1.LIBS) /nologo /dll /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
 		@$(RM) $$(basename $$@).exp
-		@mv -f $$(basename $$@).lib $$(DIST_LIB_DIR)
+		@mv -f $$(basename $$@).lib $(DIST_LIB_DIR)
 endef
 
 #Обработка цели application (имя цели)
