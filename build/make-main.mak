@@ -199,7 +199,7 @@ define process_target.application
 
   $$(eval $$(call process_target_with_sources,$1))
   
-  $1.EXECUTION_DIR ?= $(COMPONENT_DIR)$$($1.EXECUTION_DIR)
+  $1.EXECUTION_DIR ?= $(DIST_BIN_DIR)
 
   $$($1.EXE_FILE): $$($1.FLAG_FILES)
 		@echo Linking $$(notdir $$@)...
