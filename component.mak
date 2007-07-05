@@ -1,8 +1,12 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := FUNNER_COMPONENTS #Список целей
+TARGETS := FUNNER_EXTERN_LIBS FUNNER_COMPONENTS
 
-#Цель №1 - пакет
-FUNNER_COMPONENTS.TYPE       := package              #Тип цели
-FUNNER_COMPONENTS.COMPONENTS := components/commonlib components/medialib #Список компонентов и списков опций их сборки
+#Цель №1 - external libraries
+FUNNER_EXTERN_LIBS.TYPE       := package
+FUNNER_EXTERN_LIBS.COMPONENTS := extern/zlib extern/zzip extern/pcre extern/devil
+
+#Цель №2 - пакет
+FUNNER_COMPONENTS.TYPE       := package
+FUNNER_COMPONENTS.COMPONENTS := components/commonlib components/medialib components/xtl

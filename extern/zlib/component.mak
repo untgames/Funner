@@ -5,7 +5,7 @@ TARGETS := NEWZLIB
 
 #Цель №1 - NEWZLIB
 NEWZLIB.TYPE             := static-lib #Тип цели
-NEWZLIB.NAME             := newzlib    #Имя выходного файла
+NEWZLIB.NAME             := zlib       #Имя выходного файла
 NEWZLIB.INCLUDE_DIRS     := include    #Относительные пути к каталогам c заголовочными файлами
 NEWZLIB.SOURCE_DIRS      := sources    #Относительные пути к каталогам c исходными файлами
 NEWZLIB.LIB_DIRS         :=            #Относительные пути к каталогам с библиотеками

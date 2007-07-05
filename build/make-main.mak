@@ -143,6 +143,7 @@ define process_target.static-lib
   $$(eval $$(call process_target_with_sources,$1))  
 
   $$($1.LIB_FILE): $$($1.FLAG_FILES)
+		@echo Createing library $$(notdir $$@)...
 		@lib /nologo /out:$$@ $$($1.OBJECT_FILES)      
 endef
 
