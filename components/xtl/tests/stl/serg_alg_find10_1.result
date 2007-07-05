@@ -1,0 +1,5 @@
+Results of serg_alg_find10_1:
+A = 0 0 1 1 2 2 4 4 5 5
+lowest position of value 3: 6
+lowest position of value 5: 8
+lowest position of value -1: 0

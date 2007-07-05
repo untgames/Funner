@@ -1,0 +1,8 @@
+Results of mmap1_test:
+count('X') = 0
+count('X') = 1
+count('X') = 2
+X -> 10
+X -> 20
+Y -> 32
+Erased 2 items

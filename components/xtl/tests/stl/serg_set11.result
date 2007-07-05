@@ -1,0 +1,15 @@
+Results of serg_set11_test:
+s1 = 10 20 30
+s2 = 100 200
+s3 = 300
+Result of 's1.swap (s2)':
+s1 = 100 200
+s2 = 10 20 30
+Result of 'swap (s1, s3)':
+s1 = 300
+s3 = 100 200
+Result of 'init_set (s3)':
+s3 = 1 2 3
+Result swap of empty sets':
+s1 =
+s2 =

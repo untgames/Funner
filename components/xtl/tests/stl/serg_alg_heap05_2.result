@@ -1,0 +1,5 @@
+Results of serg_alg_heap05_2:
+A = 1 -4 2 -8 5 -7
+A is not heap!
+A = -8 5 -7 -4 1 2
+A is heap!

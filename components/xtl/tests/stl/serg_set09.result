@@ -1,0 +1,9 @@
+Results of serg_set9_test:
+s1 = 1 2 3 4
+s2 = 1 4 9 16
+s1 == s2 => false
+s1 != s2 => true
+s1 <  s2 => true
+s1 >  s2 => false
+s1 <= s2 => true
+s1 >= s2 => false

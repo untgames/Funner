@@ -1,0 +1,27 @@
+Results of is_polymorphic_test:
+expression is_polymorphic<int>::value=false
+expression is_polymorphic<const int>::value=false
+expression is_polymorphic<volatile int>::value=false
+expression is_polymorphic<int*>::value=false
+expression is_polymorphic<int* const>::value=false
+expression is_polymorphic<int[2]>::value=false
+expression is_polymorphic<int&>::value=false
+expression is_polymorphic<mf4>::value=false
+expression is_polymorphic<f1>::value=false
+expression is_polymorphic<enum_UDT>::value=false
+expression is_polymorphic<UDT>::value=false
+expression is_polymorphic<empty_UDT>::value=false
+expression is_polymorphic<UDT*>::value=false
+expression is_polymorphic<UDT[2]>::value=false
+expression is_polymorphic<UDT&>::value=false
+expression is_polymorphic<void>::value=false
+expression is_polymorphic<VB>::value=true
+expression is_polymorphic<VD>::value=true
+expression is_polymorphic<test_abc1>::value=true
+expression is_polymorphic<test_abc2>::value=true
+expression is_polymorphic<std::exception>::value=true
+expression is_polymorphic<std::bad_alloc>::value=true
+expression is_polymorphic<std::runtime_error>::value=true
+expression is_polymorphic<std::out_of_range>::value=true
+expression is_polymorphic<std::range_error>::value=true
+expression is_polymorphic<poly_bug>::value=true

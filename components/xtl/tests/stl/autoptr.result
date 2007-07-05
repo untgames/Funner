@@ -1,0 +1,5 @@
+Results of autoptr_test:
+A::A (), id=0
+A::A (), id=1
+A::~A (), id=0
+A::~A (), id=1

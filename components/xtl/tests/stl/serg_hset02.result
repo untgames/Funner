@@ -1,0 +1,8 @@
+Results of serg_hset2_test:
+hs1 = 10 20 30 40
+max_size: 357913941
+size: 4
+empty: false
+equal (10, 10) return 'true'
+equal (10, 20) return 'false'
+hash (10) return '10'

@@ -1,0 +1,4 @@
+Results of serg_alg_find16_1:
+A1[] < A1[]: false
+A1[] < A2[]: true
+A3[] < A4[]: true

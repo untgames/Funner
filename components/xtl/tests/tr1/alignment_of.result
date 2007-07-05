@@ -1,0 +1,19 @@
+Results of alignment_of_test:
+expression alignment_of<void>::value=false
+expression alignment_of<char>::value=true
+expression alignment_of<short>::value=true
+expression alignment_of<int>::value=true
+expression alignment_of<long>::value=true
+expression alignment_of<float>::value=true
+expression alignment_of<double>::value=true
+expression alignment_of<long double>::value=true
+expression alignment_of<int[4]>::value=true
+expression alignment_of<int(*)(int)>::value=true
+expression alignment_of<int*>::value=true
+expression alignment_of<VB>::value=true
+expression alignment_of<VD>::value=true
+expression alignment_of<enum_UDT>::value=true
+expression alignment_of<mf2>::value=true
+expression alignment_of<POD_UDT>::value=true
+expression alignment_of<empty_UDT>::value=true
+expression alignment_of<union_UDT>::value=true

@@ -1,0 +1,13 @@
+Resuts of is_signed_test:
+expression is_signed<int>::value=true
+expression is_signed<long>::value=true
+expression is_signed<short>::value=true
+expression is_signed<signed char>::value=true
+expression is_signed<unsigned int>::value=false
+expression is_signed<unsigned long>::value=false
+expression is_signed<unsigned short>::value=false
+expression is_signed<unsigned char>::value=false
+expression is_signed<UDT>::value=false
+expression is_signed<int&>::value=false
+expression is_signed<int*>::value=false
+expression is_signed<int[2]>::value=false

@@ -1,0 +1,5 @@
+Results of serg_set08_test:
+hs1 = 10 20 30 40
+The element 10 already exists: *(pr.first) = 10
+hs1 = 10 20 30 40
+hs2 = 100 20 30

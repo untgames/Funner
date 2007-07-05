@@ -1,0 +1,14 @@
+Results of is_member_pointer_test:
+expression is_member_pointer<f1>::value=false
+expression is_member_pointer<f2>::value=false
+expression is_member_pointer<f3>::value=false
+expression is_member_pointer<void*>::value=false
+expression is_member_pointer<mf1>::value=true
+expression is_member_pointer<mf2>::value=true
+expression is_member_pointer<mf3>::value=true
+expression is_member_pointer<mf4>::value=true
+expression is_member_pointer<cmf>::value=true
+expression is_member_pointer<mp>::value=true
+expression is_member_pointer<void>::value=false
+expression is_member_pointer<test_abc1>::value=false
+expression is_member_pointer<foo0_t>::value=false

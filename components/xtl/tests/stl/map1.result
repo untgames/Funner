@@ -1,0 +1,7 @@
+Results of map1_test:
+m['x'] = 20
+m['x'] = 10
+m['z'] = 0
+m.count('z') = 1
+First insertion successful
+Existing pair c -> 100

@@ -1,0 +1,9 @@
+Results of serg_deque11_test:
+c1 = 10 20 30
+c2 = 30 20 10
+c1 == c2 => false
+c1 != c2 => true
+c1 <  c2 => true
+c1 >  c2 => false
+c1 <= c2 => true
+c1 >= c2 => false

@@ -1,0 +1,14 @@
+Results of is_void_test:
+expression is_void<void>::value=true
+expression is_void<void const>::value=true
+expression is_void<void volatile>::value=true
+expression is_void<void const volatile>::value=true
+expression is_void<void*>::value=false
+expression is_void<int>::value=false
+expression is_void<test_abc1>::value=false
+expression is_void<foo0_t>::value=false
+expression is_void<foo1_t>::value=false
+expression is_void<foo2_t>::value=false
+expression is_void<foo3_t>::value=false
+expression is_void<foo4_t>::value=false
+expression is_void<incomplete_type>::value=false

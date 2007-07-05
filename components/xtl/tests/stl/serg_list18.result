@@ -1,0 +1,9 @@
+Results of serg_list18_test:
+c1 = a b
+c2 = c d
+c1 == c2 => false
+c1 != c2 => true
+c1 <  c2 => true
+c1 >  c2 => false
+c1 <= c2 => true
+c1 >= c2 => false

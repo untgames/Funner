@@ -1,0 +1,19 @@
+Results of is_member_func_test:
+expression is_member_function_pointer<f1>::value=false
+expression is_member_function_pointer<f2>::value=false
+expression is_member_function_pointer<f3>::value=false
+expression is_member_function_pointer<void*>::value=false
+expression is_member_function_pointer<mf1>::value=true
+expression is_member_function_pointer<mf2>::value=true
+expression is_member_function_pointer<mf3>::value=true
+expression is_member_function_pointer<mf4>::value=true
+expression is_member_function_pointer<cmf>::value=true
+expression is_member_function_pointer<mp>::value=false
+expression is_member_function_pointer<void>::value=false
+expression is_member_function_pointer<test_abc1>::value=false
+expression is_member_function_pointer<foo0_t>::value=false
+expression is_member_function_pointer<int&>::value=false
+expression is_member_function_pointer<const int&>::value=false
+expression is_member_function_pointer<const int[2] >::value=false
+expression is_member_function_pointer<const int[] >::value=false
+expression is_member_function_pointer<void>::value=false

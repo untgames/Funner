@@ -1,0 +1,21 @@
+Results of is_array_test:
+expression is_array<int>::value=false
+expression is_array<int*>::value=false
+expression is_array<const int*>::value=false
+expression is_array<const volatile int*>::value=false
+expression is_array<int*const>::value=false
+expression is_array<const int*volatile>::value=false
+expression is_array<const volatile int*const>::value=false
+expression is_array<int[2]>::value=true
+expression is_array<const int[2]>::value=true
+expression is_array<const volatile int[2]>::value=true
+expression is_array<int[2][3]>::value=true
+expression is_array<UDT[2]>::value=true
+expression is_array<int(&)[2]>::value=false
+expression is_array<f1>::value=false
+expression is_array<void>::value=false
+expression is_array<test_abc1>::value=false
+expression is_array<convertible_to_pointer>::value=false
+expression is_array<test_abc1>::value=false
+expression is_array<foo0_t>::value=false
+expression is_array<incomplete_type>::value=false

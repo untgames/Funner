@@ -1,0 +1,2 @@
+Results of equal2_test:
+v2[i] == v1[i] * v1[i]

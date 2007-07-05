@@ -1,0 +1,7 @@
+Result of test str2_test:
+source:     string='Hello world', size=11
+1st resize: string='Hello world!!!', size=14
+2nd resize: string='Hello world!!!', size=34
+downsize:   string='Hello ', size=6
+resize(0):  string='', size=0
+String is empty

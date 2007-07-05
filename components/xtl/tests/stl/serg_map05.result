@@ -1,0 +1,5 @@
+Results of serg_map5_test:
+m1 = (1,1) (2,1)
+The number of elements in m1 with a sort key of 1 is: 1
+The number of elements in m1 with a sort key of 2 is: 1
+The number of elements in m1 with a sort key of 3 is: 0

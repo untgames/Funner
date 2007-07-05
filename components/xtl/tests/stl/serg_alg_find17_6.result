@@ -1,0 +1,4 @@
+Results of serg_alg_find17_6:
+median (-3, 2,-1,abs_less) = 2
+median (-2,-3, 1,abs_less) = -2
+median (-1, 2,-3,abs_less) = 2

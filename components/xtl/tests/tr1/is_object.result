@@ -1,0 +1,8 @@
+Results of is_object_test:
+expression is_object<int>::value=true
+expression is_object<UDT>::value=true
+expression is_object<int&>::value=false
+expression is_object<void>::value=false
+expression is_object<foo4_t>::value=false
+expression is_object<test_abc1>::value=true
+expression is_object<incomplete_type>::value=true

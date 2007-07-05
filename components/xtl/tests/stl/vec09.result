@@ -1,0 +1,34 @@
+Results of vec09_test:
+begin
+...copy construct A1
+...copy construct A1
+...copy construct A2
+...destruct A1
+...copy construct A1
+...copy construct A2
+...copy construct A3
+...destruct A1
+...destruct A2
+insert at begin
+...copy construct A4
+...copy construct A5
+...copy construct A6
+...copy construct A7
+...copy construct A8
+...copy construct A9
+...copy construct A1
+...copy construct A2
+...copy construct A3
+...destruct A1
+...destruct A2
+...destruct A3
+end
+...destruct A4
+...destruct A5
+...destruct A6
+...destruct A7
+...destruct A8
+...destruct A9
+...destruct A1
+...destruct A2
+...destruct A3

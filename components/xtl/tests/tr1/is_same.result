@@ -1,0 +1,11 @@
+Results of is_same_test:
+expression (is_same<int, int>::value)=true
+expression (is_same<int, const int>::value)=false
+expression (is_same<int, int&>::value)=false
+expression (is_same<const int, int&>::value)=false
+expression (is_same<int, const int&>::value)=false
+expression (is_same<int*, const int*>::value)=false
+expression (is_same<int*, int*const>::value)=false
+expression (is_same<int, int[2]>::value)=false
+expression (is_same<int*, int[2]>::value)=false
+expression (is_same<int[4], int[2]>::value)=false

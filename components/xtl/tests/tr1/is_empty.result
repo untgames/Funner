@@ -1,0 +1,13 @@
+Results of is_empty_test:
+expression is_empty<int>::value=false
+expression is_empty<int*>::value=false
+expression is_empty<int&>::value=false
+expression is_empty<void>::value=false
+expression is_empty<int[2]>::value=false
+expression is_empty<f1>::value=false
+expression is_empty<mf1>::value=false
+expression is_empty<UDT>::value=false
+expression is_empty<enum_UDT>::value=false
+expression is_empty<non_empty>::value=false
+expression is_empty<const non_empty&>::value=false
+expression is_empty<foo4_t>::value=false

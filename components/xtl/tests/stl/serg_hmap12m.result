@@ -1,0 +1,14 @@
+Results of serg_hmap12m_test:
+hm1 = (a,10) (b,20) (c,30)
+hm2 = (d,100) (e,200)
+hm3 = (f,300)
+Result of 'hm1.swap (hm2)':
+hm1 = (d,100) (e,200)
+hm2 = (a,10) (b,20) (c,30)
+Result of 'swap (hm1, hm3)':
+hm1 = (f,300)
+hm3 = (d,100) (e,200)
+Result swap of empty maps':
+hm1 =
+hm2 =
+obj count=2

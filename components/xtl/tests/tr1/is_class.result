@@ -1,0 +1,26 @@
+Results of is_class_test:
+expression is_class<int>::value=false
+expression is_class<const int>::value=false
+expression is_class<volatile int>::value=false
+expression is_class<int*>::value=false
+expression is_class<int* const>::value=false
+expression is_class<int[2]>::value=false
+expression is_class<int const[2]>::value=false
+expression is_class<int&>::value=false
+expression is_class<mf4>::value=false
+expression is_class<f1>::value=false
+expression is_class<enum_UDT>::value=false
+expression is_class<union_UDT>::value=false
+expression is_class<POD_union_UDT>::value=false
+expression is_class<empty_union_UDT>::value=false
+expression is_class<empty_POD_union_UDT>::value=false
+expression is_class<UDT>::value=true
+expression is_class<UDT const>::value=true
+expression is_class<UDT volatile>::value=true
+expression is_class<empty_UDT>::value=true
+expression is_class<test_abc1>::value=true
+expression is_class<test_abc1 const>::value=true
+expression is_class<UDT*>::value=false
+expression is_class<UDT[2]>::value=false
+expression is_class<UDT&>::value=false
+expression is_class<void>::value=false

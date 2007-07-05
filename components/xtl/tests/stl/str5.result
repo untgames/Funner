@@ -1,0 +1,8 @@
+Result of test str5_test:
+string <- c-string ('Out There'):         s='Out There'
+string <- c-string ('Out There'[0..2]):   s='Out'
+string <- string   ('Wide World '):       s='Wide World '
+string <- string   ('Wide World '[5..9]): s='World'
+string <- char     ('0'):                 s='0'
+string <- char     ('!'x4):               s='!!!!'
+string <- interval ('Wide World '[5..9]): s='World'

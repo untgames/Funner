@@ -1,0 +1,5 @@
+Result of test str7_test:
+erase interval [3..9] from 'Hello World': 'Held' (first='d')
+erase 5 character from 'Hello World': 'HelloWorld' (first='W')
+erase [6..13] from 'Hello computer': 'Hello '
+clear string 'Hello ': '' (empty)

@@ -1,0 +1,10 @@
+Results of serg_set2_test:
+s1 = 10 20 30 40
+s2 = 40 30 20 10
+max_size: 214748364
+size: 4
+empty: false
+lkc (2, 3) return 'true'
+gkc (2, 3) return 'false'
+lvc (10, 20) return 'true'
+gvc (10, 20) return 'false'

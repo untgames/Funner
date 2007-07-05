@@ -1,0 +1,9 @@
+Results of serg_map9_test:
+m1 = (1,1) (2,2) (3,3) (4,4)
+m2 = (1,1) (2,4) (3,9) (4,16)
+m1 == m2 => false
+m1 != m2 => true
+m1 <  m2 => true
+m1 >  m2 => false
+m1 <= m2 => true
+m1 >= m2 => false

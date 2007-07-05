@@ -1,0 +1,16 @@
+Result of test str3_test:
+s1='SGI STL'
+s2='MS STL'
+s1 == s1: true
+s1 != s2: true
+s1 <= s2: false
+s1 >= s2: true
+s1 <  s2: false
+s1 >  s2: true
+'CAB' == 'CAB'
+'AACAB'[2..4] == 'CAB'
+'AACAB'[0..2] < 'CAB'
+'AACAB'[2..4] == 'DCABD'[1..3]
+'ABC' < 'DEF'
+'AACAB'[2..4] == 'CAB'
+'AACAB'[1..3] == 'ACAB'[0..2]

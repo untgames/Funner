@@ -1,0 +1,8 @@
+Results of rank_test:
+expression rank<int>::value=false
+expression rank<int[]>::value=true
+expression rank<int[][10]>::value=true
+expression rank<int[5][10]>::value=true
+expression rank<int[5][10][40]>::value=true
+expression rank<int (&)[5][10]>::value=false
+expression rank<int (*)[5][10]>::value=false

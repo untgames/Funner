@@ -1,0 +1,15 @@
+Results of serg_map3_test:
+m1 = (1,1) (2,2) (3,3) (4,4)
+m2 = (1,1) (2,4) (3,9) (4,16)
+m3 = (1,0) (2,1) (3,2) (4,3)
+After the 2nd element is deleted, the map m1 is:
+m1 = (1,1) (3,3) (4,4)
+After the middle two elements are deleted, the map m2 is:
+m2 = (1,1) (4,16)
+After the element with a key of 2 is deleted, the map m3 is:
+m3 = (1,0) (3,2) (4,3)
+The number of elements removed from m3 is: 1.
+After the 2nd element is deleted, the map m1 is: 
+m3 = (1,0) (4,3)
+The size of the m3 is 2
+The size of the m3 after clear() is 0

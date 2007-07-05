@@ -1,0 +1,5 @@
+Results of serg_map4_test:
+m1 = (1,10) (2,20) (3,30)
+The element of map m1 with a key of 2 is: 20.
+The map m1 doesn't have an element with a key of 4.
+The element of m1 with a key matching that of the last element is: 30.

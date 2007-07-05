@@ -1,0 +1,6 @@
+Results of is_compound_test:
+expression is_compound<UDT>::value=true
+expression is_compound<void*>::value=true
+expression is_compound<void>::value=false
+expression is_compound<int>::value=false
+expression is_compound<test_abc1>::value=true

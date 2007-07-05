@@ -1,0 +1,7 @@
+Results of mset1_test:
+count(42) = 0
+count(42) = 1
+count(42) = 2
+40 Not found
+Found 42
+Erased 2 instances

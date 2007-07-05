@@ -1,0 +1,13 @@
+Results of serg_str_04:
+The original string str1 is: 'xddd-1234-abcd'
+found str[4] = '-'
+found str[1] = 'd'
+The original string str2 is: 'BBB-1111'
+Elements of the substring 'B1' were not found in str2 after the 6th position.
+found str[3] = '-'
+The original string str3 is: '444-555-GGG'
+found str[3] = '-'
+found str[7] = '-'
+The original string str4 is: '12-ab-12-ab'
+found str[5] = '-'
+found str[2] = '-'

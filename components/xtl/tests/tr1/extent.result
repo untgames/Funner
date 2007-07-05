@@ -1,0 +1,18 @@
+Results of extent_test:
+expression extent<int>::value=false
+expression extent<int[]>::value=false
+expression extent<int[][10]>::value=false
+expression extent<int[5][10]>::value=true
+expression extent<int[5][10][40]>::value=true
+expression extent<int (&)[5][10]>::value=false
+expression extent<int (*)[5][10]>::value=false
+expression (extent<int,1>::value)=false
+expression (extent<int[],1>::value)=false
+expression (extent<int[][10],1>::value)=true
+expression (extent<int[5][10],1>::value)=true
+expression (extent<int[5][10][40],1>::value)=true
+expression (extent<int (&)[5][10],1>::value)=false
+expression (extent<int (*)[5][10],1>::value)=false
+expression (extent<int[5][10],2>::value)=false
+expression (extent<int[5][10][40],2>::value)=true
+expression (extent<int[5][10][40],3>::value)=false

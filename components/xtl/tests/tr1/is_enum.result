@@ -1,0 +1,7 @@
+Results of is_enum_test:
+expression is_enum<int>::value=false
+expression is_enum<enum_UDT>::value=true
+expression is_enum<int_convertible>::value=false
+expression is_enum<int&>::value=false
+expression is_enum<void>::value=false
+expression is_enum<test_abc1>::value=false

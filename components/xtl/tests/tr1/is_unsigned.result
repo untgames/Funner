@@ -1,0 +1,13 @@
+Results of is_unsigned_test:
+expression is_unsigned<int>::value=false
+expression is_unsigned<long>::value=false
+expression is_unsigned<short>::value=false
+expression is_unsigned<signed char>::value=false
+expression is_unsigned<unsigned int>::value=true
+expression is_unsigned<unsigned long>::value=true
+expression is_unsigned<unsigned short>::value=true
+expression is_unsigned<unsigned char>::value=true
+expression is_unsigned<UDT>::value=false
+expression is_unsigned<int&>::value=false
+expression is_unsigned<int*>::value=false
+expression is_unsigned<int[2]>::value=false

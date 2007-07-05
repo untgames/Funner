@@ -1,0 +1,8 @@
+Results of serg_list9_test:
+c1 = 10 20 30
+The size of c1 is 4
+c1 = 10 20 30 40
+The size of c1 is now 5
+c1 = 10 20 30 40 0
+The reduced size of c1 is: 2
+c1 = 10 20

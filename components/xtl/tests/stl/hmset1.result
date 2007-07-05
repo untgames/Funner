@@ -1,0 +1,7 @@
+Results of hmset1_test:
+count(*) = 0
+count(*) = 1
+count(*) = 2
+40 Not found
+Found *
+Erased 2 instances

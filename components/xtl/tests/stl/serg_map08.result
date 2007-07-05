@@ -1,0 +1,7 @@
+Results of serg_map8_test:
+m1 = (1,10) (2,20) (3,30)
+lower_bound (2): 20
+upper_bound (2): 30
+A direct call of lower_bound (2) gives 20
+A direct call of upper_bound (2) gives 30
+Not Found!

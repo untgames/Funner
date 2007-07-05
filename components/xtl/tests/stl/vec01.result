@@ -1,0 +1,6 @@
+Results of vec01_test:
+empty = 1
+size = 0
+max_size = 1073741823
+size = 1
+v1[0] = 42

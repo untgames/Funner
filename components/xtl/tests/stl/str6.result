@@ -1,0 +1,7 @@
+Result of test str6_test:
+c-string:         'Hello ' + 'Out There ' = 'Hello Out There '
+c-string:         'Hello ' + 'Out There '[0..2] = 'Hello Out'
+string:           'Hello ' + 'Wide World '[5..9] = 'Hello World'
+string, c-string: 'Hello ' + 'Wide ' + 'World ' = 'Hello Wide World '
+char:             'Hello ' + '!'x4 = 'Hello !!!!'
+interval:         'Hello ' + 'Wide World '[5..9] = 'Hello World'

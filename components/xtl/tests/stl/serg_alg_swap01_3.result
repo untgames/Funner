@@ -1,0 +1,7 @@
+Results of serg_alg_swap01_3:
+Before swap:
+v1 = 1 2
+v2 = 3 4
+After swap:
+v1 = 3 4
+v2 = 1 2

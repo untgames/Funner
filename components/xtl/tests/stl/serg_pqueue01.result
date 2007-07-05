@@ -1,0 +1,8 @@
+Results of serg_pqueue01_test:
+q1 = ( 200 100 )
+q2 = ( 15 10 5 )
+q3 = ( 1 2 3 )
+q4 = ( 200 100 )
+q5 = ( 5 5 5 )
+q6 = ( 5 5 5 )
+After printing, q6 has 0 elements.

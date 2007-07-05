@@ -1,0 +1,4 @@
+Results of serg_alg_perm02_1:
+Initially              A = 2 3 4 5 6 1
+After prev_permutation A = 2 3 4 5 1 6
+After next_permutation A = 2 3 4 5 6 1

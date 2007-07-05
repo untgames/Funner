@@ -1,0 +1,3 @@
+Result of test str4_test:
+substr 'Heterological paradoxes'[6..12] = 'logical'
+substr 'Heterological paradoxes'[default] = 'Heterological paradoxes'

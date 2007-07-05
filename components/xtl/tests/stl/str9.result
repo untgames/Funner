@@ -1,0 +1,3 @@
+Result of test str9_test:
+copy 11 characters from 'Hello World' to buf: 'Hello World'
+copy 5 characters from 'Hello World'[6] to buf: 'World'

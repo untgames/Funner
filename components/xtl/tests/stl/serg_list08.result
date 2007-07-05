@@ -1,0 +1,5 @@
+Results of serg_list8_test:
+c1 = 1 2 3
+The first element is: 1
+The last element is: 3
+After pop_front the first element is: 2

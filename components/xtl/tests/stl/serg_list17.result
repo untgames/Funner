@@ -1,0 +1,4 @@
+Results of serg_list17_test:
+Before sorting: c1 = d a c b
+After sorting: c1 = a b c d
+After sorting with 'greater than' operation: c1 = d c b a

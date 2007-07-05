@@ -1,0 +1,20 @@
+Results of is_volatile_test:
+expression is_volatile<void>::value=false
+expression is_volatile<volatile void>::value=true
+expression is_volatile<test_abc1>::value=false
+expression is_volatile<volatile test_abc1>::value=true
+expression is_volatile<int>::value=false
+expression is_volatile<volatile int>::value=true
+expression is_volatile<volatile UDT>::value=true
+expression is_volatile<volatile const UDT>::value=true
+expression is_volatile<incomplete_type>::value=false
+expression is_volatile<foo0_t>::value=false
+expression is_volatile<volatile int[2]>::value=true
+expression is_volatile<int[2]>::value=false
+expression is_volatile<const int[2]>::value=false
+expression is_volatile<const volatile int[2]>::value=true
+expression is_volatile<const volatile int[]>::value=true
+expression is_volatile<const int[]>::value=false
+expression is_volatile<volatile int[]>::value=true
+expression is_volatile<int[]>::value=false
+expression is_const<const volatile int[3][4][5]>::value=true

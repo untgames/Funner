@@ -1,0 +1,45 @@
+Results of adaptors_test:
+Class ()
+ptr_fun test:
+int f1 (A&)
+int f1 (A&,B&)
+int int f3 (const A&)
+int f4 (const A&,const B&)
+void f5 (A&)
+void f6 (A&,B&)
+void f7 (A&,B&)
+void f8 (const A&,const B&)
+void f9 (const A&,const B&,const C&)
+void f10 (const A&,const B&,const C&,const D&)
+void f11 (const A&,const B&,const C&,const D&,const E&)
+mem_fun test:
+int  Class::f0  ()
+int  Class::f1  (const A&)
+void Class::f2  ()
+void Class::f3  (const A&)
+void Class::f4  (A&,B&)
+void Class::f5  (A&,B&,C&)
+int  Class::f6  (A&,B&,C&,D&)
+int  Class::f7  () const
+int  Class::f8  (const A&) const
+void Class::f9  () const
+void Class::f10 (const A&) const
+void Class::f11 (A&,B&) const
+void Class::f12 (A&,B&,C&) const
+int  Class::f13 (A&,B&,C&,D&) const
+mem_fun_ref test:
+int  Class::f0  ()
+int  Class::f1  (const A&)
+void Class::f2  ()
+void Class::f3  (const A&)
+void Class::f4  (A&,B&)
+void Class::f5  (A&,B&,C&)
+int  Class::f6  (A&,B&,C&,D&)
+int  Class::f7  () const
+int  Class::f8  (const A&) const
+void Class::f9  () const
+void Class::f10 (const A&) const
+void Class::f11 (A&,B&) const
+void Class::f12 (A&,B&,C&) const
+int  Class::f13 (A&,B&,C&,D&) const
+~Class ()

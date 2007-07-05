@@ -1,0 +1,5 @@
+Results of serg_list6_test:
+c1 = 1 2 3
+The first element is: 1
+The last element is: 3
+After pop_back the last element is: 2
