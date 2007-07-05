@@ -56,6 +56,7 @@ Image::Image (const char* file_name)
     throw;
   }
   load_func->in_use = false;
+  impl->Rename (file_name);
 }
 
 Image::Image (size_t width,size_t height,size_t depth,ImagePixelFormat format,const void* data)
@@ -106,6 +107,7 @@ void Image::Load (const char* file_name)
     throw;
   }
   load_func->in_use = false;
+  impl->Rename (file_name);
 }
 
 void Image::DefaultLoader (const char* file_name, Image& img)

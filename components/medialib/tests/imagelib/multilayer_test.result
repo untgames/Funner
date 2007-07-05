@@ -1,0 +1,9 @@
+Results of multilayer image test:
+multilayer image name - ''
+multilayer image new name - 'new_name'
+image new_name format - BGR8
+image new_name format - RGB8
+multilayer image width - 400, height - 400, depth - 4
+new multilayer image width - 1000, height - 1000, depth - 6
+File 'results/multilayer_image_nx.tif' hash: {c4,0d,4e,37,79,8c,b7,03,92,70,b3,74,ae,37,7a,8b}
+exception: Can't do operations with not initialized image. at NullImageImpl::Width

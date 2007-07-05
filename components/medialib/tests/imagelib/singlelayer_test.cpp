@@ -48,9 +48,9 @@ int main ()
 
     image4.Save("results/image4 (loading test).bmp");
     
-    printf ("image4 name - %s\n", image4.Name());
+    printf ("image4 name - '%s'\n", image4.Name());
     image4.Rename ("new_name");
-    printf ("image4 new name - %s\n", image4.Name());
+    printf ("image4 new name - '%s'\n", image4.Name());
     
     print_format (&image4);
     image4.Convert (PF_RGBA16);

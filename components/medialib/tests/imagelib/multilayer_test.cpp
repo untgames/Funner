@@ -47,9 +47,9 @@ int main ()
     img_builder.CaptureLayer (img2);
     img_builder.Finish (img);
     
-    printf ("multilayer image name - %s\n", img.Name());
+    printf ("multilayer image name - '%s'\n", img.Name());
     img.Rename ("new_name");
-    printf ("multilayer image new name - %s\n", img.Name());
+    printf ("multilayer image new name - '%s'\n", img.Name());
     
     print_format (&img);
     img.Convert (PF_RGB8);
@@ -64,16 +64,16 @@ int main ()
     
     FileHash file_hash;
 
-    FileSystem::GetFileHash ("results/multilayer_image.dds",file_hash);
+    img.Save("results/multilayer_image.tif.skybox", PF_DEFAULT);
 
-    printf ("File 'results/multilayer_image.dds' hash: {");
+    FileSystem::GetFileHash ("results/multilayer_image_nx.tif",file_hash);
+
+    printf ("File 'results/multilayer_image_nx.tif' hash: {");
 
     for (size_t i=0;i<15;i++)
       printf ("%02x,",file_hash.md5 [i]);
 
     printf ("%02x}\n",file_hash.md5 [15]);
-
-    img.Save("results/multilayer_image.tif.skybox", PF_DEFAULT);
 
     img2.Resize (10,10,1);
   }
