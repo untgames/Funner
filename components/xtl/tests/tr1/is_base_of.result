@@ -1,0 +1,20 @@
+Results of is_base_of_test:
+expression (is_base_of<Derived,Base>::value)=false
+expression (is_base_of<Derived,Derived>::value)=true
+expression (is_base_of<Base,Base>::value)=true
+expression (is_base_of<Base,Derived>::value)=true
+expression (is_base_of<Base,MultiBase>::value)=true
+expression (is_base_of<Derived,MultiBase>::value)=true
+expression (is_base_of<Derived2,MultiBase>::value)=true
+expression (is_base_of<Base,PrivateBase>::value)=true
+expression (is_base_of<NonDerived,Base>::value)=false
+expression (is_base_of<Base,void>::value)=false
+expression (is_base_of<Base,const void>::value)=false
+expression (is_base_of<void,Derived>::value)=false
+expression (is_base_of<const void,Derived>::value)=false
+expression (is_base_of<int, int>::value)=true
+expression (is_base_of<const int, int>::value)=false
+expression (is_base_of<VB,VD>::value)=true
+expression (is_base_of<VD,VB>::value)=false
+expression (is_base_of<test_abc1,test_abc3>::value)=true
+expression (is_base_of<test_abc3,test_abc1>::value)=false

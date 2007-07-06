@@ -7,9 +7,6 @@ namespace detail
 
 template <class T> struct is_class_helper
 {
-  typedef char no_type;
-  struct  yes_type { char dummy [2]; };
-
   template <class U> static yes_type is_class_tester (void (U::*)());
   template <class U> static no_type  is_class_tester (...);
   
@@ -98,9 +95,6 @@ namespace detail
 
 template <class T, bool is_a_complete_class=is_class<T>::value && sizeof (T)> struct is_abstract_helper
 {
-  typedef char no_type;
-  struct  yes_type { char dummy [2]; };
-
   template <class U> static no_type  check_sig (U (*)[1]);
   template <class U> static yes_type check_sig (...);
    

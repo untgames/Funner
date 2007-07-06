@@ -77,6 +77,17 @@ struct generate_hierarchy;
 template <class TypeNode,template <class Base,class T> class Unit,class Root=null_type>
 struct generate_linear_hierarchy;
 
+/*
+    ”правл€ющие шаблоны
+*/
+
+//выбор из двух типов condition == true -> TrueType, false -> FalseType
+template <bool condition, class TrueType, class FalseType> struct select;
+
+//compile-time assertion
+template <bool condition> struct compile_time_assert;
+template <>               struct compile_time_assert<true> { enum { value = 1 }; };
+
 #include <stl/detail/ext/typelist.inl> 
 
 }

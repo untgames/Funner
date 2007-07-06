@@ -12,6 +12,12 @@ namespace xtl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Типы позволяющие делать выбор в compile-time по размеру структуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef char                       no_type;
+typedef struct { char dummy [2]; } yes_type;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вспомогательный шаблонный класс описывающий целочисленную константу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T, T v> struct integral_constant
@@ -115,18 +121,19 @@ template <class T> struct add_pointer;     //добавление указателя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Хранилище (буфер) для объекта размером Len и выравниванием Align
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <size_t Len, size_t Align> struct aligned_storage;
+template <size_t Len, size_t Align=-1> struct aligned_storage;
 
 #include <stl/detail/tr1/type_traits_intrinsics.inl>
 #include <stl/detail/tr1/type_traits_basic.inl>
 
-//#ifndef _MSC_VER
+#ifndef _MSC_VER
   #include <stl/detail/tr1/type_traits_hard_properties.inl>
-//#else
-//  #include <tr1/detail/type_traits_hard_properties_msvc.inl>
-//#endif
+#else
+  #include <stl/detail/tr1/type_traits_hard_properties_msvc.inl>
+#endif
 
 #include <stl/detail/tr1/type_traits_relations.inl>
+#include <stl/detail/tr1/type_traits_aligned_storage.inl>
 
 }
 
