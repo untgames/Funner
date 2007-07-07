@@ -124,17 +124,17 @@ template <class T> struct add_pointer;     //добавление указателя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <size_t Len, size_t Align=-1> struct aligned_storage;
 
-#include <tr1/detail/type_traits_intrinsics.inl>
-#include <tr1/detail/type_traits_basic.inl>
+#include <tr1/detail/tt_intrinsics.inl>
+#include <tr1/detail/tt_basic.inl>
 
 #ifndef _MSC_VER
-  #include <tr1/detail/type_traits_hard_properties.inl>
+  #include <tr1/detail/tt_hard_properties.inl>
 #else
-  #include <tr1/detail/type_traits_hard_properties_msvc.inl>
+  #include <tr1/detail/tt_hard_properties_msvc.inl>
 #endif
 
-#include <tr1/detail/type_traits_relations.inl>
-#include <tr1/detail/type_traits_aligned_storage.inl>
+#include <tr1/detail/tt_relations.inl>
+#include <tr1/detail/tt_aligned_storage.inl>
 
 }
 
