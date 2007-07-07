@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <typeinfo>
-#include <stl/type_traits>
+#include <tr1/type_traits>
 
-using namespace xtl;
+using namespace tr1;
 
 //проверка значения выражения
 #define CHECK_INTEGRAL_CONSTANT(EXPRESSION, CORRECT_VALUE)  \

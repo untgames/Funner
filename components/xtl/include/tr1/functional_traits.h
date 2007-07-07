@@ -2,8 +2,8 @@
     Этот код был сгенерирован автоматически. Не исправляйте его вручную
 */
 
-#ifndef XTL_FUNCTIONAL_TRAITS_HEADER
-#define XTL_FUNCTIONAL_TRAITS_HEADER
+#ifndef TR1_FUNCTIONAL_TRAITS_HEADER
+#define TR1_FUNCTIONAL_TRAITS_HEADER
 
 #include <cstddef>
 
@@ -14,9 +14,10 @@ namespace mpl
 template <class Head, class Tail>       struct type_node;
 template <class TypeList, size_t Index> struct at;
                                         struct null_type;
+
 }
 
-namespace xtl
+namespace tr1
 {
 
 namespace detail
@@ -1010,4 +1011,4 @@ using detail::functional_traits;
 
 }
 
-#endif //XTL_FUNCTIONAL_TRAITS_HEADER
+#endif //TR1_FUNCTIONAL_TRAITS_HEADER
