@@ -5,10 +5,19 @@
 #ifndef XTL_FUNCTIONAL_TRAITS_HEADER
 #define XTL_FUNCTIONAL_TRAITS_HEADER
 
-#include <stl/mpl.h>
+#include <cstddef>
 
 namespace xtl
 {
+
+namespace mpl
+{
+
+//forward declarations
+template <class Head, class Tail>       struct type_node;
+template <class TypeList, size_t Index> struct at;
+                                        struct null_type;
+}
 
 namespace detail
 {

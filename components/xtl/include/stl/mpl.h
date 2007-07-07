@@ -2,8 +2,8 @@
     Cписки типов и их обработка (основано на коде билиотеки Loki)
 */
 
-#ifndef XTL_META_PROGRAMMING_LIBRARY_HEADER
-#define XTL_META_PROGRAMMING_LIBRARY_HEADER
+#ifndef XTL_MPL_TYPE_LIST_HEADER
+#define XTL_MPL_TYPE_LIST_HEADER
 
 #include <stddef.h>
 

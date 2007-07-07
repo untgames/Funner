@@ -265,18 +265,3 @@ struct generate_linear_hierarchy_helper
 template <class TypeNode, template <class Base, class T> class Unit, class Root>
 struct generate_linear_hierarchy: 
   public generate_linear_hierarchy_helper<TypeNode, Unit, Root>::generate_linear_hierarchy {};
-
-/*
-    ”правл€ющие шаблоны
-*/
-
-//выбор из двух типов condition == true -> TrueType, false -> FalseType
-template <bool condition, class TrueType, class FalseType> struct select
-{
-  typedef TrueType type;
-};
-
-template <class TrueType, class FalseType> struct select<false, TrueType, FalseType>
-{
-  typedef FalseType type;
-};
