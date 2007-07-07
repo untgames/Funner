@@ -225,7 +225,7 @@ void swap (hash_set<Value,HashFn,EqualKey,Allocator>&,hash_set<Value,HashFn,Equa
 template <class Value,class HashFn,class EqualKey,class Allocator>
 void swap (hash_multiset<Value,HashFn,EqualKey,Allocator>&,hash_multiset<Value,HashFn,EqualKey,Allocator>&);
 
-#include <stl/detail/stl/hash_set.inl>
+#include <stl/detail/hash_set.inl>
   
 }
 

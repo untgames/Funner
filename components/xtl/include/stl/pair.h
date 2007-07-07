@@ -43,7 +43,7 @@ struct pair
 template <class T1,class T2>
 pair<T1,T2> make_pair (const T1& x,const T2& y);
 
-#include <stl/detail/stl/pair.inl>
+#include <stl/detail/pair.inl>
 
 #ifdef _MSC_VER 
   #pragma warning (default:4512) //'class' : assignment operator could not be generated

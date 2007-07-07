@@ -68,7 +68,7 @@ template <class Container> void stl_raise_out_of_range (const Container&,
                                                         typename Container::iterator first,
                                                         typename Container::iterator last);
 
-#include <stl/detail/stl/stdexcept.inl>
+#include <stl/detail/stdexcept.inl>
 
 #ifdef _MSC_VER 
   #pragma warning (pop)

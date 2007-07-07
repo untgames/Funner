@@ -58,7 +58,7 @@ pair<T*,size_t> get_temporary_buffer (size_t len);
 template <class T> 
 void return_temporary_buffer (T* buffer);
 
-#include <stl/detail/stl/tempbuf.inl>
+#include <stl/detail/tempbuf.inl>
 
 }
 

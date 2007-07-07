@@ -168,7 +168,7 @@ class simple_allocator: public allocator<T>
     FreeFn  free;
 };
 
-#include <stl/detail/stl/alloc.inl>
+#include <stl/detail/alloc.inl>
   
 }
 

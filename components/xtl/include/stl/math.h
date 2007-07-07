@@ -52,7 +52,7 @@ template <class T,class T1> T pow (T x,T1 y);
 
 }
 
-#include <stl/detail/stl/math.inl>
+#include <stl/detail/math.inl>
 
 }
 

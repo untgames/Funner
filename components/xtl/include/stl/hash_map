@@ -247,7 +247,7 @@ void swap (hash_map<Key,T,HashFn,EqualKey,Allocator>&,hash_map<Key,T,HashFn,Equa
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
 void swap (hash_multimap<Key,T,HashFn,EqualKey,Allocator>&,hash_multimap<Key,T,HashFn,EqualKey,Allocator>&);
 
-#include <stl/detail/stl/hash_map.inl>
+#include <stl/detail/hash_map.inl>
 
 }
 

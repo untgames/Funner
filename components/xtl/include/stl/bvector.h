@@ -269,7 +269,7 @@ void swap(bit_vector<Allocator>&,bit_vector<Allocator>&);
 template <class Allocator>
 void swap(vector<bool,Allocator>&,vector<bool,Allocator>&);
 
-#include <stl/detail/stl/bvector.inl>
+#include <stl/detail/bvector.inl>
 
 }
 

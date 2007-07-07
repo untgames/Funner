@@ -158,7 +158,7 @@ class vector
 template <class T,class Allocator>
 void swap (vector<T,Allocator>&,vector<T,Allocator>&);
 
-#include <stl/detail/stl/vector.inl>
+#include <stl/detail/vector.inl>
 
 }
 

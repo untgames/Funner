@@ -365,7 +365,7 @@ struct hash_fun<basic_string<T,Traits,Allocator> >
   size_t operator () (const basic_string<T,Traits,Allocator>& s) const { return hash (s.c_str ()); }
 };
 
-#include <stl/detail/stl/string.inl>
+#include <stl/detail/string.inl>
 
 }
 

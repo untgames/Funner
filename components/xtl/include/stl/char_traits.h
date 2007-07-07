@@ -115,7 +115,7 @@ struct lt_traits: public binary_function<typename Traits::char_type,typename Tra
   bool operator () (const char_type& x,const char_type& y) const { return Traits::lt (x,y); }
 };
 
-#include <stl/detail/stl/char_traits.inl>
+#include <stl/detail/char_traits.inl>
 
 }
 

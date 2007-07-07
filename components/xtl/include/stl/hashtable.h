@@ -157,7 +157,7 @@ template <class Value,class Key,class HashFn,class KeyOf,class EqualKey,class Al
 void swap (hashtable<Value,Key,HashFn,KeyOf,EqualKey,Allocator>&,
            hashtable<Value,Key,HashFn,KeyOf,EqualKey,Allocator>&);
 
-#include <stl/detail/stl/hashtable.inl>
+#include <stl/detail/hashtable.inl>
 
 }
 

@@ -68,7 +68,7 @@ T power (T x,Integer n);
 template <class FwdIter,class T>
 void iota (FwdIter first,FwdIter last,T value);
 
-#include <stl/detail/stl/numeric.inl>
+#include <stl/detail/numeric.inl>
 
 }
 

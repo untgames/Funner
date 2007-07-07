@@ -107,7 +107,7 @@ class priority_queue
     Compare  comp;  
 };
 
-#include <stl/detail/stl/queue.inl>
+#include <stl/detail/queue.inl>
 
 }
 

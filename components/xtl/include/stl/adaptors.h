@@ -487,7 +487,7 @@ mem_fun4_ref_t<Ret,T,Arg1,Arg2,Arg3,Arg4> mem_fun_ref (Ret (T::*)(Arg1,Arg2,Arg3
 template <class Ret,class T,class Arg1,class Arg2,class Arg3,class Arg4>
 const_mem_fun4_ref_t<Ret,T,Arg1,Arg2,Arg3,Arg4> mem_fun_ref (Ret (T::*)(Arg1,Arg2,Arg3,Arg4) const);
 
-#include <stl/detail/stl/adaptors.inl>
+#include <stl/detail/adaptors.inl>
 
 }
 

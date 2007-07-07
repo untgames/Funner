@@ -254,7 +254,7 @@ class rbtree
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator> 
 void swap (rbtree<Key,Value,KeyOfValue,Compare,Allocator>&,rbtree<Key,Value,KeyOfValue,Compare,Allocator>&);
 
-#include <stl/detail/stl/tree.inl>
+#include <stl/detail/tree.inl>
 
 #ifdef _MSC_VER 
   #pragma warning (default:4512) //'class' : assignment operator could not be generated

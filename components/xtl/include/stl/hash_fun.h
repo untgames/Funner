@@ -25,7 +25,7 @@ size_t hash (const char*);
 size_t hash (const unsigned char*);
 size_t hash (const wchar_t*);
 
-#include <stl/detail/stl/hash.inl>
+#include <stl/detail/hash.inl>
 
 }
 

@@ -61,7 +61,7 @@ class stack
     Sequence c;
 };
 
-#include <stl/detail/stl/stack.inl>
+#include <stl/detail/stack.inl>
 
 }
 

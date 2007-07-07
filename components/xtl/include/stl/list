@@ -254,7 +254,7 @@ class list
 template <class T,class Allocator>
 void swap (list<T,Allocator>&,list<T,Allocator>&);
 
-#include <stl/detail/stl/list.inl>
+#include <stl/detail/list.inl>
 
 #ifdef _MSC_VER 
   #pragma warning (pop)

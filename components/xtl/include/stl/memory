@@ -117,7 +117,7 @@ class raw_storage_iterator
     ForwardIterator iter;
 };
 
-#include <stl/detail/stl/memory.inl>
+#include <stl/detail/memory.inl>
 
 }
 

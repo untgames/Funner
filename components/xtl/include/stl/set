@@ -192,7 +192,7 @@ void swap (set<Key,Compare,Allocator>&,set<Key,Compare,Allocator>&);
 template <class Key,class Compare,class Allocator>
 void swap (multiset<Key,Compare,Allocator>&,multiset<Key,Compare,Allocator>&);
 
-#include <stl/detail/stl/set.inl>
+#include <stl/detail/set.inl>
 
 }
 

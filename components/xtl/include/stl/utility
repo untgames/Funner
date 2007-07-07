@@ -41,8 +41,8 @@ template <class T>           void destroy   (T*);
 template <class Iter>        void destroy   (Iter first,Iter last);
 template <class T>           T    copy      (const T&);
 
-#include <stl/detail/stl/algobase.inl>
-#include <stl/detail/stl/utility.inl>
+#include <stl/detail/algobase.inl>
+#include <stl/detail/utility.inl>
 
 #ifdef _MSC_VER 
   #pragma warning (default:4100) //unreferenced formal parameter

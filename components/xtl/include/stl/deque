@@ -245,7 +245,7 @@ class deque
 template <class T,class Allocator> 
 void swap (deque<T,Allocator>&,deque<T,Allocator>&);
 
-#include <stl/detail/stl/deque.inl>
+#include <stl/detail/deque.inl>
 
 }
 

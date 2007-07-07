@@ -154,7 +154,7 @@ class bitset
     word_type word [WORDS];
 };
 
-#include <stl/detail/stl/bitset.inl>
+#include <stl/detail/bitset.inl>
   
 }
 

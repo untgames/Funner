@@ -271,7 +271,7 @@ front_insert_iterator<Container> front_inserter (Container&);
 template <class Container,class Iter> 
 insert_iterator<Container> inserter (Container&,Iter pos);
 
-#include <stl/detail/stl/iterator.inl>
+#include <stl/detail/iterator.inl>
 
 }
 

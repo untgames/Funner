@@ -206,7 +206,7 @@ template <> struct numeric_limits<long double>
   static long double round_error () throw () { return 4; }
 };
 
-#include <stl/detail/stl/limits.inl>
+#include <stl/detail/limits.inl>
 
 }
 

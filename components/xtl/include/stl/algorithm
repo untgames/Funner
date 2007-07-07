@@ -566,10 +566,10 @@ OutIter set_symmetric_difference (Iter1 first1,Iter1 last1,Iter2 first2,Iter2 la
 template <class Iter1,class Iter2,class OutIter,class Compare>
 OutIter set_symmetric_difference (Iter1 first1,Iter1 last1,Iter2 first2,Iter2 last2,OutIter result,Compare less);
 
-#include <stl/detail/stl/algorithm.inl>
-#include <stl/detail/stl/heap.inl>
-#include <stl/detail/stl/sort.inl>
-#include <stl/detail/stl/setalgo.inl>
+#include <stl/detail/algorithm.inl>
+#include <stl/detail/heap.inl>
+#include <stl/detail/sort.inl>
+#include <stl/detail/setalgo.inl>
 
 }
 

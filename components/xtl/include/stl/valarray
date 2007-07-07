@@ -442,7 +442,7 @@ class indirect_array: public proxy_array<T,valarray<size_t> >
   private: indirect_array (const valarray<size_t>& addr,valarray<T>& array);
 };
 
-#include <stl/detail/stl/valarray.inl>
+#include <stl/detail/valarray.inl>
 
 }
 

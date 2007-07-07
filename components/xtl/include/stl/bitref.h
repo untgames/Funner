@@ -62,7 +62,7 @@ class bit_reference
 template <class WordT>
 void swap (bit_reference<WordT>&,bit_reference<WordT>&);  
 
-#include <stl/detail/stl/bitref.inl>
+#include <stl/detail/bitref.inl>
 
 }
 
