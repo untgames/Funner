@@ -7,17 +7,17 @@
 
 #include <cstddef>
 
-namespace xtl
-{
-
+//forward declarations
 namespace mpl
 {
 
-//forward declarations
 template <class Head, class Tail>       struct type_node;
 template <class TypeList, size_t Index> struct at;
                                         struct null_type;
 }
+
+namespace xtl
+{
 
 namespace detail
 {
