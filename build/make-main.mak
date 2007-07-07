@@ -60,6 +60,14 @@ $(foreach dir,$1,$(COMPONENT_DIR)$(dir))
 endef
 
 ###################################################################################################
+#Компиляция исходников (список исходников, список подключаемых каталогов, каталог с объектными файлами,
+#список дефайнов, флаги компиляции)
+###################################################################################################
+define tools.msvc.compile
+cl /nologo /c /EHsc /W3 /wd4996 /Fo"$3\\" $(patsubst %,/I"%",$2) $5 $(patsubst %,/D%,$4) $1
+endef
+
+###################################################################################################
 #Обработка цели компонента
 ###################################################################################################
 
@@ -69,15 +77,35 @@ $2/$$(notdir $$(basename $1)).obj: $1 $3
 	@
 endef
 
+#Тестирование времени изменения исходных файлов и соотв. им объектных (список исходных файлов, временный каталог)
+define test_source_and_object_files
+$(foreach src,$1,if [ $(src) -nt $2/$(notdir $(basename $(src))).obj ]; then echo $(src); fi &&) true
+endef
+
 #Правила пакетной компиляции (имя цели, имя модуля)
 define batch-compile
   $2.FLAG_FILE  := $$($2.TMP_DIR)/$$(BATCH_COMPILE_FLAG_FILE_SHORT_NAME)
   $1.FLAG_FILES := $$($1.FLAG_FILES) $$($2.FLAG_FILE)
+
+  ifeq (,$$(wildcard $$($2.FLAG_FILE).incomplete-build))
   
-  $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
-		@echo batch-flag-file > $$@
-		@cl /EHsc $$($1.COMPILER_CFLAGS) $$($1.COMPILER_DEFINES:%=/D%) /W3 /wd4996 $$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES:./%=%)) /nologo /c /Fo"$$($2.TMP_DIR)\\" $$($1.INCLUDE_DIRS:%=/I"%") /I"$$($2.SOURCE_DIR)"
-		
+    $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
+			@echo build-start > $$@.incomplete-build
+			@$$(call tools.msvc.compile,$$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES)),$$($1.INCLUDE_DIRS) $$($2.SOURCE_DIR),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
+			@echo batch-flag-file > $$@
+			@$(RM) $$@.incomplete-build
+
+  else  #В случае если сборка была не завершена
+  
+    $$($2.FLAG_FILE): $2.UPDATED_SOURCE_FILES := $$(shell $$(call test_source_and_object_files,$$($2.SOURCE_FILES),$$($2.TMP_DIR)))
+  
+    $$($2.FLAG_FILE):
+			@$$(call tools.msvc.compile,$$(sort $$($2.UPDATED_SOURCE_FILES) $$($2.NEW_SOURCE_FILES)),$$($1.INCLUDE_DIRS) $$($2.SOURCE_DIR),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
+			@echo batch-flag-file > $$@
+			@$(RM) $$@.incomplete-build
+
+  endif
+
   ifneq (,$$($2.NEW_SOURCE_FILES))
     $$($2.FLAG_FILE): force
   endif
@@ -107,7 +135,7 @@ define process_source_dir
   $$(MODULE_NAME).SOURCE_DIR       := $2
   $$(MODULE_NAME).TMP_DIR          := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$1/$$(MODULE_PATH)
   $$(MODULE_NAME).OBJECT_FILES     := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
-  $$(MODULE_NAME).NEW_SOURCE_FILES := $$(strip $$(foreach file,$$($$(MODULE_NAME).SOURCE_FILES),$$(if $$(wildcard $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$(file))))),,$$(file))))
+  $$(MODULE_NAME).NEW_SOURCE_FILES := $$(patsubst ./%,%,$$(strip $$(foreach file,$$($$(MODULE_NAME).SOURCE_FILES),$$(if $$(wildcard $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$(file))))),,$$(file)))))
   $$(MODULE_NAME).PCH              := $$(wildcard $1/$$(PCH_SHORT_NAME))
   $1.TMP_DIRS                      := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
   $1.OBJECT_FILES                  := $$($1.OBJECT_FILES) $$($$(MODULE_NAME).OBJECT_FILES)
@@ -233,12 +261,12 @@ define process_tests_source_dir
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@export PATH="$(CURDIR)/$(DIST_BIN_DIR):$$(PATH)" && cd $$($2.EXECUTION_DIR) && for file in $$(patsubst %,"$(CURDIR)/%",$$(wildcard $$(files:%=$$($2.TMP_DIR)/%.exe))); do $$$$file; done
+		@export PATH="$(CURDIR)/$(DIST_BIN_DIR):$$(PATH)" && cd $$($2.EXECUTION_DIR) && for file in $$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.exe),$$^)); do $$$$file; done
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
 		@echo Checking results of module '$2'...
-		@for file in $$(notdir $$(wildcard $$(files:%=$$($2.SOURCE_DIR)/%.result))); do diff --strip-trailing-cr --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done
+		@for file in $$(notdir $$(filter $$(files:%=$$($2.SOURCE_DIR)/%.result),$$^)); do diff --strip-trailing-cr --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done
 endef
 
 #Обработка цели test-suite (имя цели)
