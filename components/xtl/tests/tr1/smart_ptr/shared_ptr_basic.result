@@ -1,0 +1,74 @@
+Results of shared_ptr_basic_test:
+expression 'p? true: false' is true
+expression 'p.get() != 0' is true
+expression 'p? true: false' is true
+expression 'p.get() != 0' is true
+expression 'p->id() == 2' is true
+expression '(*p).id() == 2' is true
+expression 'p->id() == 1' is true
+expression '(*p).id() == 1' is true
+expression '!(a == b)' is true
+expression 'a != b' is true
+expression 'a < b || b < a' is true
+expression '!(a < b && b < a)' is true
+expression 'a == b' is true
+expression '!(a != b)' is true
+expression '!(a < b)' is true
+expression '!(b < a)' is true
+expression 'p? true: false' is true
+expression 'p.get() != 0' is true
+expression '!p' is true
+expression 'p.get() == 0' is true
+expression 'p.use_count() == 2' is true
+expression 'p2.use_count() == 1' is true
+expression 'p3.use_count() == 2' is true
+expression 'p->id() == 2' is true
+expression '(*p).id() == 2' is true
+expression 'a == b' is true
+expression '!(a != b)' is true
+expression '!(a == b)' is true
+expression 'a != b' is true
+expression 'p? true: false' is true
+expression 'p.get() != 0' is true
+expression 'a == b' is true
+expression '!(a != b)' is true
+expression '!wp1.expired()' is true
+expression 'wp1.use_count() != 0' is true
+expression '!p' is true
+expression 'p.get() == 0' is true
+expression '!p' is true
+expression 'p.get() == 0' is true
+expression '!p' is true
+expression 'p.get() == 0' is true
+expression '!p' is true
+expression 'p.get() == 0' is true
+expression 'p5.use_count() == 1' is true
+expression 'wp1.expired()' is true
+expression 'wp1.use_count() == 0' is true
+expression '!p' is true
+expression 'p.get() == 0' is true
+expression 'wp2.use_count() == 1' is true
+expression 'q.get() != 0' is true
+expression 'q->id() == 2' is true
+expression 'a < b || b < a' is true
+expression '!(a < b && b < a)' is true
+expression 'p? true: false' is true
+expression 'p.get() != 0' is true
+expression 'wp3.use_count() == 1' is true
+expression '!(a < b)' is true
+expression '!(b < a)' is true
+expression 'wp4.use_count() == 1' is true
+expression '!(a < b)' is true
+expression '!(b < a)' is true
+expression '!p' is true
+expression 'p.get() == 0' is true
+expression 'wp1.use_count() == 1' is true
+expression '!(a < b)' is true
+expression '!(b < a)' is true
+expression 'wp1.use_count() == 0' is true
+expression 'wp2.use_count() == 0' is true
+expression 'wp3.use_count() == 0' is true
+expression 'b1 == (wp1 < wp5)' is true
+expression 'b2 == (wp5 < wp1)' is true
+expression 'p == &cnt' is true
+expression 'cnt == 0' is true

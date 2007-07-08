@@ -1,0 +1,22 @@
+Results of auto_ptr_rv_test:
+expression 'X::instances == 0' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 0' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 0' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 0' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 0' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 0' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 0' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 0' is true
+expression 'X::instances == 1' is true
+expression 'X::instances == 0' is true

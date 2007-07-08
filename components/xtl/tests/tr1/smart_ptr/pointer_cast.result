@@ -1,0 +1,4 @@
+Results of pointer_cast_test:
+expression 'check_dynamic_pointer_cast( ptr )' is true
+expression 'check_static_pointer_cast( ptr )' is true
+expression 'check_const_pointer_cast( ptr )' is true

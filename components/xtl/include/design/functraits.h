@@ -5,7 +5,7 @@
 #ifndef DESIGN_FUNCTION_TRAITS_HEADER
 #define DESIGN_FUNCTION_TRAITS_HEADER
 
-#include <stl/mpl.h>
+#include <mpl/type_list.h>
 
 namespace xtl
 {

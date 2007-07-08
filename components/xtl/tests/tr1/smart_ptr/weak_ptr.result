@@ -1,0 +1,496 @@
+Results of weak_ptr_test:
+expression 'wp.use_count() == 0' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp2.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp.use_count() == 2' is true
+expression '!(sp < sp2 || sp2 < sp)' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp.use_count() == 2' is true
+expression '!(sp < sp2 || sp2 < sp)' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp.use_count() == 2' is true
+expression '!(sp < sp2 || sp2 < sp)' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp.use_count() == 2' is true
+expression '!(sp < sp2 || sp2 < sp)' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp.use_count() == 2' is true
+expression '!(sp < sp2 || sp2 < sp)' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp.use_count() == 2' is true
+expression '!(sp < sp2 || sp2 < sp)' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp2.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp.use_count() == 2' is true
+expression '!(sp < sp2 || sp2 < sp)' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp.use_count() == 2' is true
+expression '!(sp < sp2 || sp2 < sp)' is true
+expression 'wp.use_count() == sp.use_count()' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp.use_count() == 2' is true
+expression '!(sp < sp2 || sp2 < sp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 0' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 0' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 0' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 0' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 0' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 0' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp2.use_count() == wp.use_count()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression 'wp3.use_count() == wp.use_count()' is true
+expression 'wp3.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 1' is true
+expression 'p4.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 1' is true
+expression 'p4.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 1' is true
+expression 'p4.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 1' is true
+expression 'p4.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 1' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 1' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 1' is true
+expression 'p1.use_count() == 0' is true
+expression 'p1.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 1' is true
+expression 'p2.use_count() == 1' is true
+expression 'p3.use_count() == 1' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 1' is true
+expression 'p2.use_count() == 1' is true
+expression 'p3.use_count() == 1' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 1' is true
+expression 'p2.use_count() == 1' is true
+expression 'p3.use_count() == 1' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 1' is true
+expression 'p2.use_count() == 1' is true
+expression 'p3.use_count() == 1' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 1' is true
+expression 'p2.use_count() == 1' is true
+expression 'p3.use_count() == 1' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 1' is true
+expression 'p2.use_count() == 1' is true
+expression 'p3.use_count() == 1' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 1' is true
+expression 'p2.use_count() == 1' is true
+expression 'p3.use_count() == 1' is true
+expression 'p4.use_count() == 1' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'p5.use_count() == 0' is true
+expression 'p6.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'p5.use_count() == 0' is true
+expression 'p6.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'p5.use_count() == 0' is true
+expression 'p6.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'p5.use_count() == 0' is true
+expression 'p6.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'p5.use_count() == 0' is true
+expression 'p6.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'p5.use_count() == 0' is true
+expression 'p6.use_count() == 0' is true
+expression 'sp.unique()' is true
+expression 'p1.use_count() == 0' is true
+expression 'p2.use_count() == 0' is true
+expression 'p3.use_count() == 0' is true
+expression 'p4.use_count() == 0' is true
+expression 'p5.use_count() == 0' is true
+expression 'p6.use_count() == 0' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp.expired()' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp.expired()' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp.expired()' is true
+expression 'wp3.use_count() == 0' is true
+expression 'wp3.expired()' is true
+expression 'wp.use_count() == 1' is true
+expression '!wp.expired()' is true
+expression 'wp.use_count() == 1' is true
+expression '!wp.expired()' is true
+expression 'wp.use_count() == 1' is true
+expression '!wp.expired()' is true
+expression 'wp3.use_count() == 1' is true
+expression '!wp3.expired()' is true
+expression 'wp.use_count() == 2' is true
+expression '!wp.expired()' is true
+expression 'wp2.use_count() == 2' is true
+expression '!wp2.expired()' is true
+expression 'wp3.use_count() == 2' is true
+expression '!wp3.expired()' is true
+expression 'wp.use_count() == 3' is true
+expression '!wp.expired()' is true
+expression 'wp2.use_count() == 3' is true
+expression '!wp2.expired()' is true
+expression 'wp3.use_count() == 3' is true
+expression '!wp3.expired()' is true
+expression 'wp.use_count() == 2' is true
+expression '!wp.expired()' is true
+expression 'wp2.use_count() == 2' is true
+expression '!wp2.expired()' is true
+expression 'wp3.use_count() == 2' is true
+expression '!wp3.expired()' is true
+expression 'wp.use_count() == 1' is true
+expression '!wp.expired()' is true
+expression 'wp2.use_count() == 1' is true
+expression '!wp2.expired()' is true
+expression 'wp3.use_count() == 1' is true
+expression '!wp3.expired()' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp.expired()' is true
+expression 'wp2.use_count() == 0' is true
+expression 'wp2.expired()' is true
+expression 'wp3.use_count() == 0' is true
+expression 'wp3.expired()' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp2.use_count() == 0' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp2.use_count() == 0' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp2.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp2 < wp3 || wp3 < wp2)' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp2.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp2.use_count() == 0' is true
+expression '!(wp2 < wp3 || wp3 < wp2)' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp2 < wp3 || wp3 < wp2)' is true
+expression 'wp.use_count() == 1' is true
+expression 'wp2.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp2.use_count() == 1' is true
+expression '!(wp2 < wp3 || wp3 < wp2)' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp2.use_count() == 0' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression 'wp.use_count() == 0' is true
+expression 'wp2.use_count() == 0' is true
+expression '!(wp2 < wp3 || wp3 < wp2)' is true
+expression '!(wp < wp)' is true
+expression '!(wp < wp2 && wp2 < wp)' is true
+expression '!(wp3 < wp3)' is true
+expression '!(wp < wp3 && wp3 < wp)' is true
+expression '!(wp < wp)' is true
+expression 'wp < wp2 || wp2 < wp' is true
+expression '!(wp < wp2 && wp2 < wp)' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression '!(wp < wp3 && wp3 < wp)' is true
+expression 'wp2 < wp3 || wp3 < wp2' is true
+expression '!(wp2 < wp3 && wp3 < wp2)' is true
+expression 'wp4 < wp3 || wp3 < wp4' is true
+expression '!(wp4 < wp3 && wp3 < wp4)' is true
+expression 'b1 == (wp < wp2)' is true
+expression 'b2 == (wp2 < wp)' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression '!(wp < wp3 && wp3 < wp)' is true
+expression 'wp2 < wp3 || wp3 < wp2' is true
+expression '!(wp2 < wp3 && wp3 < wp2)' is true
+expression 'wp4 < wp3 || wp3 < wp4' is true
+expression '!(wp4 < wp3 && wp3 < wp4)' is true
+expression 'wp < wp2 || wp2 < wp' is true
+expression '!(wp < wp2 && wp2 < wp)' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression '!(wp < wp3 && wp3 < wp)' is true
+expression 'wp2 < wp3 || wp3 < wp2' is true
+expression '!(wp2 < wp3 && wp3 < wp2)' is true
+expression 'wp4 < wp3 || wp3 < wp4' is true
+expression '!(wp4 < wp3 && wp3 < wp4)' is true
+expression 'b1 == (wp < wp2)' is true
+expression 'b2 == (wp2 < wp)' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression '!(wp < wp3 && wp3 < wp)' is true
+expression 'wp2 < wp3 || wp3 < wp2' is true
+expression '!(wp2 < wp3 && wp3 < wp2)' is true
+expression 'wp4 < wp3 || wp3 < wp4' is true
+expression '!(wp4 < wp3 && wp3 < wp4)' is true
+expression 'b1 == (wp < wp2)' is true
+expression 'b2 == (wp2 < wp)' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression '!(wp < wp3 && wp3 < wp)' is true
+expression 'wp2 < wp3 || wp3 < wp2' is true
+expression '!(wp2 < wp3 && wp3 < wp2)' is true
+expression 'wp4 < wp3 || wp3 < wp4' is true
+expression '!(wp4 < wp3 && wp3 < wp4)' is true
+expression '!(wp < wp2 || wp2 < wp)' is true
+expression '!(wp < wp2 && wp2 < wp)' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression '!(wp < wp3 && wp3 < wp)' is true
+expression '!(wp2 < wp3 || wp3 < wp2)' is true
+expression '!(wp2 < wp3 && wp3 < wp2)' is true
+expression '!(wp4 < wp3 || wp3 < wp4)' is true
+expression '!(wp4 < wp3 && wp3 < wp4)' is true
+expression 'b1 == (wp < wp2)' is true
+expression 'b2 == (wp2 < wp)' is true
+expression '!(wp < wp3 || wp3 < wp)' is true
+expression '!(wp < wp3 && wp3 < wp)' is true
+expression '!(wp2 < wp3 || wp3 < wp2)' is true
+expression '!(wp2 < wp3 && wp3 < wp2)' is true
+expression '!(wp4 < wp3 || wp3 < wp4)' is true
+expression '!(wp4 < wp3 && wp3 < wp4)' is true
+expression 'px < py || py < px' is true
+expression 'px < pz || pz < px' is true
+expression 'py < pz || pz < py' is true
+expression '!(px < py && py < px)' is true
+expression '!(px < pz && pz < px)' is true
+expression '!(py < pz && pz < py)' is true
+expression '!(pvx < pvx)' is true
+expression '!(pvy < pvy)' is true
+expression '!(pvz < pvz)' is true
+expression 'pvx < pvy || pvy < pvx' is true
+expression 'pvx < pvz || pvz < pvx' is true
+expression 'pvy < pvz || pvz < pvy' is true
+expression '!(pvx < pvy && pvy < pvx)' is true
+expression '!(pvx < pvz && pvz < pvx)' is true
+expression '!(pvy < pvz && pvz < pvy)' is true
+expression 'px < py || py < px' is true
+expression 'px < pz || pz < px' is true
+expression 'py < pz || pz < py' is true
+expression '!(px < py && py < px)' is true
+expression '!(px < pz && pz < px)' is true
+expression '!(py < pz && pz < py)' is true
+expression '!(pvx < pvx)' is true
+expression '!(pvy < pvy)' is true
+expression '!(pvz < pvz)' is true
+expression 'pvx < pvy || pvy < pvx' is true
+expression 'pvx < pvz || pvz < pvx' is true
+expression 'pvy < pvz || pvz < pvy' is true
+expression '!(pvx < pvy && pvy < pvx)' is true
+expression '!(pvx < pvz && pvz < pvx)' is true
+expression '!(pvy < pvz && pvz < pvy)' is true
+expression '!(px < px)' is true
+expression '!(py < py)' is true
+expression '!(px < py || py < px)' is true
+expression '!(px < pz || pz < px)' is true
+expression '!(py < pz || pz < py)' is true
+expression '!(pvx < pvy || pvy < pvx)' is true
+expression '!(pvx < pvz || pvz < pvx)' is true
+expression '!(pvy < pvz || pvz < pvy)' is true
+expression '!(px < px)' is true
+expression '!(py < py)' is true
+expression '!(px < py || py < px)' is true
+expression '!(px < pz || pz < px)' is true
+expression '!(py < pz || pz < py)' is true
+expression '!(pvx < pvy || pvy < pvx)' is true
+expression '!(pvx < pvz || pvz < pvx)' is true
+expression '!(pvy < pvz || pvz < pvy)' is true
+expression 'i->first.use_count() == i->second' is true
+expression 'i->first.use_count() == i->second' is true
+expression 'i->first.use_count() == i->second' is true
+expression 'i->first.use_count() == i->second' is true
+expression 'i->first.use_count() == i->second' is true
+expression 'i->first.use_count() == i->second' is true

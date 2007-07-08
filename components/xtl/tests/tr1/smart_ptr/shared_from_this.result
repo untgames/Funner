@@ -1,0 +1,13 @@
+Results of shared_from_this_test:
+expression 'py.get() != 0' is true
+expression 'py.use_count() == 1' is true
+expression 'pi.get() == this' is true
+expression 'px.get() != 0' is true
+expression 'py.use_count() == 2' is true
+expression 'py.get() == py2.get()' is true
+expression '!(py < py2 || py2 < py)' is true
+expression 'py.use_count() == 3' is true
+expression 'p == q' is true
+expression '!(p < q) && !(q < p)' is true
+expression 'p == r' is true
+expression '!(p < r) && !(r < p)' is true

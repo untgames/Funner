@@ -1,0 +1,34 @@
+Results of get_deleter_test:
+expression 'get_deleter<void>(p) == 0' is true
+expression 'get_deleter<void const>(p) == 0' is true
+expression 'get_deleter<int>(p) == 0' is true
+expression 'get_deleter<int const>(p) == 0' is true
+expression 'get_deleter<X>(p) == 0' is true
+expression 'get_deleter<X const>(p) == 0' is true
+expression 'get_deleter<deleter>(p) == 0' is true
+expression 'get_deleter<deleter const>(p) == 0' is true
+expression 'get_deleter<deleter2>(p) == 0' is true
+expression 'get_deleter<deleter2 const>(p) == 0' is true
+expression 'get_deleter<void>(p) == 0' is true
+expression 'get_deleter<void const>(p) == 0' is true
+expression 'get_deleter<int>(p) == 0' is true
+expression 'get_deleter<int const>(p) == 0' is true
+expression 'get_deleter<X>(p) == 0' is true
+expression 'get_deleter<X const>(p) == 0' is true
+expression 'get_deleter<deleter>(p) == 0' is true
+expression 'get_deleter<deleter const>(p) == 0' is true
+expression 'get_deleter<deleter2>(p) == 0' is true
+expression 'get_deleter<deleter2 const>(p) == 0' is true
+expression 'get_deleter<void>(p) == 0' is true
+expression 'get_deleter<void const>(p) == 0' is true
+expression 'get_deleter<int>(p) == 0' is true
+expression 'get_deleter<int const>(p) == 0' is true
+expression 'get_deleter<X>(p) == 0' is true
+expression 'get_deleter<X const>(p) == 0' is true
+expression 'get_deleter<deleter2>(p) == 0' is true
+expression 'get_deleter<deleter2 const>(p) == 0' is true
+expression 'q != 0' is true
+expression 'q->data == 0' is true
+expression 'r == q' is true
+expression 'r->data == 17041' is true
+expression 'data == 17041' is true

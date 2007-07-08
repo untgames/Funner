@@ -2,8 +2,8 @@
     Этот код был сгенерирован автоматически. Не исправляйте его вручную
 */
 
-#ifndef TR1_FUNCTIONAL_TRAITS_HEADER
-#define TR1_FUNCTIONAL_TRAITS_HEADER
+#ifndef MYTR1_FUNCTIONAL_TRAITS_HEADER
+#define MYTR1_FUNCTIONAL_TRAITS_HEADER
 
 #include <cstddef>
 
@@ -1011,4 +1011,4 @@ using detail::functional_traits;
 
 }
 
-#endif //TR1_FUNCTIONAL_TRAITS_HEADER
+#endif //MYTR1_FUNCTIONAL_TRAITS_HEADER
