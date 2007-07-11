@@ -33,7 +33,7 @@ SPACE                                   := $(EMPTY) $(EMPTY)
 ###################################################################################################
 #Если не указан список обрабатываемых файлов - обрабатываем все доступные файлы (для тестирования)
 ###################################################################################################
-files ?= *
+files ?= %
 
 ###################################################################################################
 #Цель сборки "по умолчанию"
@@ -130,7 +130,7 @@ define process_source_dir
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES:%=$2/%))
   else
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES_SUFFIXES:%=$2/*.%))
-  endif  
+  endif
 
   $$(MODULE_NAME).SOURCE_DIR       := $2
   $$(MODULE_NAME).TMP_DIR          := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$1/$$(MODULE_PATH)
@@ -266,7 +266,7 @@ define process_tests_source_dir
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
 		@echo Checking results of module '$2'...
-		@for file in $$(notdir $$(filter $$(files:%=$$($2.SOURCE_DIR)/%.result),$$^)); do diff --strip-trailing-cr --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done
+		@for file in $$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)); do diff --strip-trailing-cr --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done
 endef
 
 #Обработка цели test-suite (имя цели)
