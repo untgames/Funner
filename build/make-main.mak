@@ -99,7 +99,7 @@ define batch-compile
   
     $$($2.FLAG_FILE): $2.UPDATED_SOURCE_FILES := $$(shell $$(call test_source_and_object_files,$$($2.SOURCE_FILES),$$($2.TMP_DIR)))
   
-    $$($2.FLAG_FILE):
+    $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
 			@$$(call tools.msvc.compile,$$(sort $$($2.UPDATED_SOURCE_FILES) $$($2.NEW_SOURCE_FILES)),$$($1.INCLUDE_DIRS) $$($2.SOURCE_DIR),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
