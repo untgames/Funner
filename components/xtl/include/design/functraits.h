@@ -7,9 +7,6 @@
 
 #include <mpl/type_list.h>
 
-namespace xtl
-{
-
 namespace mpl
 {
 
@@ -999,11 +996,9 @@ struct function_traits<Ret (__stdcall T::*const volatile*)(Arg1,Arg2,Arg3,Arg4,A
 
 }
 
-}
-
 namespace design
 {
-  namespace type_manip = xtl::mpl;
+  namespace type_manip = mpl;
 }
 
 #endif //DESIGN_FUNCTION_TRAITS_HEADER
