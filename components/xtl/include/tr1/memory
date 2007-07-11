@@ -8,7 +8,7 @@
 #include <exception>
 #include <typeinfo>
 #include <tr1/interlocked.h>
-#include <stl/auto_ptr.h>
+#include <stl/auto_ptr.h> //сделать forward!!!!!
 
 namespace tr1
 {

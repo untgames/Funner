@@ -1,0 +1,248 @@
+/*
+    Кортежи
+*/
+
+#ifndef MYTR1_TUPLE_HEADER
+#define MYTR1_TUPLE_HEADER
+
+#include <stddef.h>
+
+//implementation forwards
+namespace stl { template <class T1, class T2> struct pair; }
+
+namespace tr1
+{
+
+//implementation forwards
+template <class T> class reference_wrapper;
+
+namespace detail
+{
+
+//implementation forwards
+template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+struct tuple_generator;
+
+template <class T> struct access_traits;
+
+template <size_t Index, class Cons> struct tuple_element_selector;
+
+struct null_type {};
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Кортеж
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T0=detail::null_type, class T1=detail::null_type, class T2=detail::null_type, class T3=detail::null_type, class T4=detail::null_type,
+          class T5=detail::null_type, class T6=detail::null_type, class T7=detail::null_type, class T8=detail::null_type, class T9=detail::null_type>
+class tuple: private detail::tuple_generator<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::type
+{
+  template <class A0, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
+  friend class tuple;
+
+  typedef typename detail::tuple_generator<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::type base;
+  typedef typename detail::access_traits<T0>::const_type param0_type;
+  typedef typename detail::access_traits<T1>::const_type param1_type;
+  typedef typename detail::access_traits<T2>::const_type param2_type;
+  typedef typename detail::access_traits<T3>::const_type param3_type;
+  typedef typename detail::access_traits<T4>::const_type param4_type;
+  typedef typename detail::access_traits<T5>::const_type param5_type;
+  typedef typename detail::access_traits<T6>::const_type param6_type;
+  typedef typename detail::access_traits<T7>::const_type param7_type;
+  typedef typename detail::access_traits<T8>::const_type param8_type;
+  typedef typename detail::access_traits<T9>::const_type param9_type;
+  public:
+    enum { size = base::tuple_size }; //длина кортежа
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Класс необходимый для выбора элемента по индексу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <size_t number> struct element
+    {
+      typedef detail::tuple_element_selector<number, base> selector_type;
+      typedef typename selector_type::head_type            type;
+      typedef typename selector_type::const_head_type      const_type;
+      typedef typename selector_type::non_const_head_type  non_const_type;
+    };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+             tuple () {}
+    explicit tuple (param0_type);
+             tuple (param0_type, param1_type);
+             tuple (param0_type, param1_type, param2_type);
+             tuple (param0_type, param1_type, param2_type, param3_type);
+             tuple (param0_type, param1_type, param2_type, param3_type, param4_type);
+             tuple (param0_type, param1_type, param2_type, param3_type, param4_type, param5_type);
+             tuple (param0_type, param1_type, param2_type, param3_type, param4_type, param5_type, param6_type);
+             tuple (param0_type, param1_type, param2_type, param3_type, param4_type, param5_type, param6_type, param7_type);
+             tuple (param0_type, param1_type, param2_type, param3_type, param4_type, param5_type, param6_type, param7_type, param8_type);
+             tuple (param0_type, param1_type, param2_type, param3_type, param4_type, param5_type, param6_type, param7_type, param8_type, param9_type);
+
+    template <class A0, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
+             tuple (const tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8, A9>&);
+
+    template <class A1, class A2>
+             tuple (const stl::pair<A1, A2>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class A0, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
+    tuple& operator = (const tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8, A9>&);
+
+    template <class A1, class A2> tuple& operator = (const stl::pair<A1, A2>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Выбор элемента
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <size_t number> typename element<number>::const_type     get () const;
+    template <size_t number> typename element<number>::non_const_type get ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сравнение кортежей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class A0,class A1,class A2,class A3,class A4,class A5,class A6,class A7,class A8,class A9>
+    bool operator == (const tuple<A0,A1,A2,A3,A4,A5,A6,A7,A8,A9>&) const;
+
+    template <class A0,class A1,class A2,class A3,class A4,class A5,class A6,class A7,class A8,class A9>
+    bool operator != (const tuple<A0,A1,A2,A3,A4,A5,A6,A7,A8,A9>&) const;
+
+    template <class A0,class A1,class A2,class A3,class A4,class A5,class A6,class A7,class A8,class A9>
+    bool operator < (const tuple<A0,A1,A2,A3,A4,A5,A6,A7,A8,A9>&) const;
+
+    template <class A0,class A1,class A2,class A3,class A4,class A5,class A6,class A7,class A8,class A9>
+    bool operator <= (const tuple<A0,A1,A2,A3,A4,A5,A6,A7,A8,A9>&) const;
+
+    template <class A0,class A1,class A2,class A3,class A4,class A5,class A6,class A7,class A8,class A9>
+    bool operator > (const tuple<A0,A1,A2,A3,A4,A5,A6,A7,A8,A9>&) const;
+
+    template <class A0,class A1,class A2,class A3,class A4,class A5,class A6,class A7,class A8,class A9>
+    bool operator >= (const tuple<A0,A1,A2,A3,A4,A5,A6,A7,A8,A9>&) const;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Утилиты получения размера кортежа и получения типа его элемента
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Tuple>               struct tuple_size;    //получение размера кортежа
+template <size_t Index, class Tuple> struct tuple_element; //получение типа I-го элемента
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Селекторы элементов кортежа (пример использования get<0>(t))
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <size_t number, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+typename tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::template element<number>::const_type
+get (const tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>&);
+
+template <size_t number, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+typename tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::template element<number>::non_const_type
+get (tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание кортежей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace detail
+{
+
+//implementation forwards
+template <class T0=detail::null_type, class T1=detail::null_type, class T2=detail::null_type, class T3=detail::null_type, class T4=detail::null_type,
+          class T5=detail::null_type, class T6=detail::null_type, class T7=detail::null_type, class T8=detail::null_type, class T9=detail::null_type>
+struct make_tuple_mapper;
+
+}
+
+tuple<> make_tuple ();
+
+template <class T0>
+typename detail::make_tuple_mapper<T0>::type make_tuple (const T0&);
+
+template <class T0, class T1>
+typename detail::make_tuple_mapper<T0, T1>::type make_tuple (const T0&, const T1&);
+
+template <class T0, class T1, class T2>
+typename detail::make_tuple_mapper<T0, T1, T2>::type make_tuple (const T0&, const T1&, const T2&);
+
+template <class T0, class T1, class T2, class T3>
+typename detail::make_tuple_mapper<T0, T1, T2, T3>::type make_tuple (const T0&, const T1&, const T2&, const T3&);
+
+template <class T0, class T1, class T2, class T3, class T4>
+typename detail::make_tuple_mapper<T0, T1, T2, T3, T4>::type
+make_tuple (const T0&, const T1&, const T2&, const T3&, const T4&);
+
+template <class T0, class T1, class T2, class T3, class T4, class T5>
+typename detail::make_tuple_mapper<T0, T1, T2, T3, T4, T5>::type
+make_tuple (const T0&, const T1&, const T2&, const T3&, const T4&, const T5&);
+
+template <class T0, class T1, class T2, class T3, class T4, class T5, class T6>
+typename detail::make_tuple_mapper<T0, T1, T2, T3, T4, T5, T6>::type
+make_tuple (const T0&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&);
+
+template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+typename detail::make_tuple_mapper<T0, T1, T2, T3, T4, T5, T6, T7>::type
+make_tuple (const T0&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&);
+
+template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+typename detail::make_tuple_mapper<T0, T1, T2, T3, T4, T5, T6, T7, T8>::type
+make_tuple (const T0&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&);
+
+template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+typename detail::make_tuple_mapper<T0, T1, T2, T3, T4, T5, T6, T7, T8>::type
+make_tuple (const T0&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание ссылочных кортежей (все элементы являются ссылками)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace detail
+{
+
+//структура необходимая для игнорирования позиций в кортеже
+struct swallow_assign
+{
+  template <class T> const swallow_assign& operator = (const T&) const { return *this; }
+};
+
+}
+
+const detail::swallow_assign ignore = detail::swallow_assign ();
+
+tuple<> tie ();
+
+template <class T0>
+tuple<T0&> tie (T0&);
+
+template <class T0, class T1>
+tuple<T0&, T1&> tie (T0&, T1&);
+
+template <class T0, class T1, class T2>
+tuple<T0&, T1&, T2&> tie (T0&, T1&, T2&);
+
+template <class T0, class T1, class T2, class T3>
+tuple<T0&, T1&, T2&, T3&> tie (T0&, T1&, T2&, T3&);
+
+template <class T0, class T1, class T2, class T3, class T4>
+tuple<T0&, T1&, T2&, T3&, T4&> tie (T0&, T1&, T2&, T3&, T4&);
+
+template <class T0, class T1, class T2, class T3, class T4, class T5>
+tuple<T0&, T1&, T2&, T3&, T4&, T5&> tie (T0&, T1&, T2&, T3&, T4&, T5&);
+
+template <class T0, class T1, class T2, class T3, class T4, class T5, class T6>
+tuple<T0&, T1&, T2&, T3&, T4&, T5&, T6&> tie (T0&, T1&, T2&, T3&, T4&, T5&, T6&);
+
+template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+tuple<T0&, T1&, T2&, T3&, T4&, T5&, T6&, T7&> tie (T0&, T1&, T2&, T3&, T4&, T5&, T6&, T7&);
+
+template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+tuple<T0&, T1&, T2&, T3&, T4&, T5&, T6&, T7&, T8&> tie (T0&, T1&, T2&, T3&, T4&, T5&, T6&, T7&, T8&);
+
+template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+tuple<T0&, T1&, T2&, T3&, T4&, T5&, T6&, T7&, T8&> tie (T0&, T1&, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&);
+
+#include <tr1/detail/tuple.inl>
+
+}
+
+#endif
