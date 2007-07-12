@@ -12,28 +12,13 @@
 namespace tr1
 {
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Типы позволяющие делать выбор в compile-time по размеру структуры
-///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef char                       no_type;
-typedef struct { char dummy [2]; } yes_type;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вспомогательный шаблонный класс описывающий целочисленную константу
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T, T v> struct integral_constant
-{
-  static  const T                 value = v;
-  typedef T                       value_type;
-  typedef integral_constant<T, v> type; 
-};
-
-//вспомогательные классы для наиболее распространённых целочисленных костант
-template <bool value> struct bool_constant:    public integral_constant<bool, value> {};
-template <int value>  struct integer_constant: public integral_constant<int, value> {};
-
-typedef bool_constant<true>  true_type;
-typedef bool_constant<false> false_type;
+using mpl::yes_type;
+using mpl::no_type;
+using mpl::integral_constant;
+using mpl::bool_constant;
+using mpl::integer_constant;
+using mpl::true_type;
+using mpl::false_type;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка принадлежности типа к базовым категориям типов
@@ -124,17 +109,19 @@ template <class T> struct add_pointer;     //добавление указателя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <size_t Len, size_t Align=-1> struct aligned_storage;
 
-#include <tr1/detail/tt_intrinsics.inl>
-#include <tr1/detail/tt_basic.inl>
+#include <tr1/detail/type_traits/intrinsics.inl>
+#include <tr1/detail/type_traits/basic.inl>
+#include <tr1/detail/type_traits/refptr.inl>
 
 #ifndef _MSC_VER
-  #include <tr1/detail/tt_hard_properties.inl>
+  #include <tr1/detail/type_traits/hard_properties.inl>
 #else
-  #include <tr1/detail/tt_hard_properties_msvc.inl>
+  #include <tr1/detail/type_traits/hard_properties_msvc.inl>
 #endif
 
-#include <tr1/detail/tt_relations.inl>
-#include <tr1/detail/tt_aligned_storage.inl>
+#include <tr1/detail/type_traits/relations.inl>
+#include <tr1/detail/type_traits/alignment_of.inl>
+#include <tr1/detail/type_traits/aligned_storage.inl>
 
 }
 

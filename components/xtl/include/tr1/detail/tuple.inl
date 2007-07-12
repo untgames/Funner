@@ -183,7 +183,6 @@ template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, 
 struct tuple_generator
 {
   typedef cons<T0, typename tuple_generator<T1, T2, T3, T4, T5, T6, T7, T8, T9, null_type>::type> type;
-//  typedef cons<T0, cons<T1, cons<T2, cons<T3, cons<T4, cons<T5, cons<T6, cons<T7, cons<T8, cons<T9, cons<null_type, null_type> > > > > > > > > > > type;
 };
 
 template <> struct tuple_generator<null_type, null_type, null_type, null_type, null_type,

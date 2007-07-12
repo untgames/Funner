@@ -28,11 +28,10 @@ typedef funcall_tag<2> memfun_ref_funcall;  //(arg1.*)(arg2, ..., argN)
 typedef funcall_tag<3> memptr_ptr_funcall;  //(*arg1).*f
 typedef funcall_tag<4> memptr_ref_funcall;  //arg1.*f
 
-template <class Fn, class T=void, bool is_memfunc_ptr=is_member_function_pointer<Fn>::value> struct funcall_selector
+template <class Fn, class T=void, bool is_memfunc_ptr=functional_traits<Fn>::is_memfun> struct funcall_selector
 {
   typedef typename functional_traits<Fn>::object_type object_type;
-  typedef typename remove_reference_wrapper<T>::type argument_type;
-  typedef typename mpl::select<light_is_convertible<argument_type, object_type>::value, memfun_ref_funcall, memfun_ptr_funcall>::type type;
+  typedef typename mpl::select<light_is_convertible<T, object_type>::value, memfun_ref_funcall, memfun_ptr_funcall>::type type;
 };
 
 template <class Fn, class T> struct funcall_selector<Fn, T, false>
@@ -42,118 +41,81 @@ template <class Fn, class T> struct funcall_selector<Fn, T, false>
 
 template <class Ret, class T1, class T2> struct funcall_selector<Ret T1::*, T2, false>
 {
-  typedef typename remove_reference_wrapper<T2>::type argument_type;
-  typedef typename mpl::select<light_is_convertible<argument_type, T1>::value, memptr_ref_funcall, memptr_ptr_funcall>::type type;
+  typedef typename mpl::select<light_is_convertible<T2, T1>::value, memptr_ref_funcall, memptr_ptr_funcall>::type type;
 };
 
 template <class Fn> struct funcall_selector<Fn, void, true>;
-
-/*
-    Снятие reference_wrapper
-*/
-
-template <class T>
-inline T& unwrap (T& r)
-{
-  return r;
-}
-
-template <class T>
-inline const T& unwrap (const T& r)
-{
-  return r;
-}
-
-template <class T> inline T& unwrap (const reference_wrapper<T>& r)
-{
-  return r.get ();
-}
-
-template <class T> inline const T& unwrap (const reference_wrapper<const T>& r)
-{
-  return r.get ();
-}
-
-template <class T> inline T& unwrap (reference_wrapper<T>& r)
-{
-  return r.get ();
-}
-
-template <class T> inline const T& unwrap (reference_wrapper<const T>& r)
-{
-  return r.get ();
-}
 
 /*
     Перегрузки вызовов функциональных объектов
 */
 
 //перегрузка для функционального объекта без аргументов
-template <class Fn, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, default_funcall, ResultTraits)
+template <class Ret, class Fn>
+inline Ret funcall_dispatch (Fn& fn, default_funcall)
 {
   return fn ();
 }
 
 //перегрузка для функционального объекта с 1-м аргументом
-template <class Fn, class T1, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& arg1, default_funcall, ResultTraits)
+template <class Ret, class Fn, class T1>
+inline Ret funcall_dispatch (Fn& fn, T1& arg1, default_funcall)
 {
   return fn (arg1);
 }
 
 //перегрузка для функционального объекта с 2-мя аргументами
-template <class Fn, class T1, class T2, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& arg1, T2& arg2, default_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2>
+inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, default_funcall)
 {
   return fn (arg1, arg2);
 }
 
 //перегрузка для функционального объекта с 3-мя аргументами
-template <class Fn, class T1, class T2, class T3, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& arg1, T2& arg2, T3& arg3, default_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3>
+inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, default_funcall)
 {
   return fn (arg1, arg2, arg3);
 }
 
 //перегрузка для функционального объекта с 4-мя аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, default_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4>
+inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, default_funcall)
 {
   return fn (arg1, arg2, arg3, arg4);
 }
 
 //перегрузка для функционального объекта с 5-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, default_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
+inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, default_funcall)
 {
   return fn (arg1, arg2, arg3, arg4, arg5);
 }
 
 //перегрузка для функционального объекта с 6-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, default_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
+inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, default_funcall)
 {
   return fn (arg1, arg2, arg3, arg4, arg5, arg6);
 }
 
 //перегрузка для функционального объекта с 7-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, default_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, default_funcall)
 {
   return fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 }
 
 //перегрузка для функционального объекта с 8-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, default_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, default_funcall)
 {
   return fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 }
 
 //перегрузка для функционального объекта с 9-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, default_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, default_funcall)
 {
   return fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
 }
@@ -163,118 +125,118 @@ inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& arg1, T2&
 */
 
 //перегрузка для указателя на функцию-член класса с 1-м аргументом
-template <class Fn, class T1, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object, memfun_ref_funcall, ResultTraits)
+template <class Ret, class Fn, class T1>
+inline Ret funcall_dispatch (Fn& fn, T1& object, memfun_ref_funcall)
 {
   return (object.*fn)();
 }
 
-template <class Fn, class T1, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object_ptr, memfun_ptr_funcall, ResultTraits)
+template <class Ret, class Fn, class T1>
+inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, memfun_ptr_funcall)
 {
   return ((*object_ptr).*fn)();
 }
 
 //перегрузка для указателя на функцию-член класса с 2-мя аргументами
-template <class Fn, class T1, class T2, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object, T2& arg2, memfun_ref_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2>
+inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, memfun_ref_funcall)
 {
   return (object.*fn)(arg2);
 }
 
-template <class Fn, class T1, class T2, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object_ptr, T2& arg2, memfun_ptr_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2>
+inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, memfun_ptr_funcall)
 {
   return ((*object_ptr).*fn)(arg2);
 }
 
 //перегрузка для указателя на функцию-член класса с 3-мя аргументами
-template <class Fn, class T1, class T2, class T3, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object, T2& arg2, T3& arg3, memfun_ref_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3>
+inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, memfun_ref_funcall)
 {
   return (object.*fn)(arg2, arg3);
 }
 
-template <class Fn, class T1, class T2, class T3, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, memfun_ptr_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3>
+inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, memfun_ptr_funcall)
 {
   return ((*object_ptr).*fn)(arg2, arg3);
 }
 
 //перегрузка для указателя на функцию-член класса с 4-мя аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, memfun_ref_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4>
+inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, memfun_ref_funcall)
 {
   return (object.*fn)(arg2, arg3, arg4);
 }
 
-template <class Fn, class T1, class T2, class T3, class T4, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, memfun_ptr_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4>
+inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, memfun_ptr_funcall)
 {
   return ((*object_ptr).*fn)(arg2, arg3, arg4);
 }
 
 //перегрузка для указателя на функцию-член класса с 5-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, memfun_ref_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
+inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, memfun_ref_funcall)
 {
   return (object.*fn)(arg2, arg3, arg4, arg5);
 }
 
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, memfun_ptr_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
+inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, memfun_ptr_funcall)
 {
   return ((*object_ptr).*fn)(arg2, arg3, arg4, arg5);
 }
 
 //перегрузка для указателя на функцию-член класса с 6-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, memfun_ref_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
+inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, memfun_ref_funcall)
 {
   return (object.*fn)(arg2, arg3, arg4, arg5, arg6);
 }
 
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, memfun_ptr_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
+inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, memfun_ptr_funcall)
 {
   return ((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6);
 }
 
 //перегрузка для указателя на функцию-член класса с 7-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, memfun_ref_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, memfun_ref_funcall)
 {
   return (object.*fn)(arg2, arg3, arg4, arg5, arg6, arg7);
 }
 
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, memfun_ptr_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, memfun_ptr_funcall)
 {
   return ((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7);
 }
 
 //перегрузка для указателя на функцию-член класса с 8-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, memfun_ref_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, memfun_ref_funcall)
 {
   return (object.*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 }
 
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, memfun_ptr_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, memfun_ptr_funcall)
 {
   return ((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 }
 
 //перегрузка для указателя на функцию-член класса с 9-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, memfun_ref_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, memfun_ref_funcall)
 {
   return (object.*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
 }
 
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, memfun_ptr_funcall, ResultTraits)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, memfun_ptr_funcall)
 {
   return ((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
 }
@@ -284,120 +246,120 @@ inline typename ResultTraits::type funcall_dispatch (const Fn& fn, T1& object_pt
 */
 
 //перегрузка для указателя на объект-член класса с 1-м аргументом
-template <class MemPtr, class T1, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object, memptr_ref_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object, memptr_ref_funcall)
 {
-  return object.*ptr;
+  return const_cast<T&> (object).*ptr;
 }
 
-template <class MemPtr, class T1, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object_ptr, memptr_ptr_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, memptr_ptr_funcall)
 {
-  return (*object_ptr).*ptr;
+  return const_cast<T&> (*object_ptr).*ptr;
 }
 
 //перегрузка для указателя на объект-член класса с 2-мя аргументами
-template <class MemPtr, class T1, class T2, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object, T2&, memptr_ref_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, memptr_ref_funcall)
 {
-  return object.*ptr;
+  return const_cast<T&> (object).*ptr;
 }
 
-template <class MemPtr, class T1, class T2, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object_ptr, T2&, memptr_ptr_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, memptr_ptr_funcall)
 {
-  return (*object_ptr).*ptr;
+  return const_cast<T&> (*object_ptr).*ptr;
 }
 
 //перегрузка для указателя на объект-член класса с 3-мя аргументами
-template <class MemPtr, class T1, class T2, class T3, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object, T2&, T3&, memptr_ref_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, memptr_ref_funcall)
 {
-  return object.*ptr;
+  return const_cast<T&> (object).*ptr;
 }
 
-template <class MemPtr, class T1, class T2, class T3, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object_ptr, T2&, T3&, memptr_ptr_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, memptr_ptr_funcall)
 {
-  return (*object_ptr).*ptr;
+  return const_cast<T&> (*object_ptr).*ptr;
 }
 
 //перегрузка для указателя на объект-член класса с 4-мя аргументами
-template <class MemPtr, class T1, class T2, class T3, class T4, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object, T2&, T3&, T4&, memptr_ref_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, memptr_ref_funcall)
 {
-  return object.*ptr;
+  return const_cast<T&> (object).*ptr;
 }
 
-template <class MemPtr, class T1, class T2, class T3, class T4, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object_ptr, T2&, T3&, T4&, memptr_ptr_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, memptr_ptr_funcall)
 {
-  return (*object_ptr).*ptr;
+  return const_cast<T&> (*object_ptr).*ptr;
 }
 
 //перегрузка для указателя на объект-член класса с 5-ю аргументами
-template <class MemPtr, class T1, class T2, class T3, class T4, class T5, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object, T2&, T3&, T4&, T5&, memptr_ref_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, memptr_ref_funcall)
 {
-  return object.*ptr;
+  return const_cast<T&> (object).*ptr;
 }
 
-template <class MemPtr, class T1, class T2, class T3, class T4, class T5, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, memptr_ptr_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, memptr_ptr_funcall)
 {
-  return (*object_ptr).*ptr;
+  return const_cast<T&> (*object_ptr).*ptr;
 }
 
 //перегрузка для указателя на объект-член класса с 6-ю аргументами
-template <class MemPtr, class T1, class T2, class T3, class T4, class T5, class T6, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, memptr_ref_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, memptr_ref_funcall)
 {
-  return object.*ptr;
+  return const_cast<T&> (object).*ptr;
 }
 
-template <class MemPtr, class T1, class T2, class T3, class T4, class T5, class T6, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, memptr_ptr_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, memptr_ptr_funcall)
 {
-  return (*object_ptr).*ptr;
+  return const_cast<T&> (*object_ptr).*ptr;
 }
 
 //перегрузка для указателя на объект-член класса с 7-ю аргументами
-template <class MemPtr, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, memptr_ref_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, memptr_ref_funcall)
 {
-  return object.*ptr;
+  return const_cast<T&> (object).*ptr;
 }
 
-template <class MemPtr, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, T7&, memptr_ptr_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, T7&, memptr_ptr_funcall)
 {
-  return (*object_ptr).*ptr;
+  return const_cast<T&> (*object_ptr).*ptr;
 }
 
 //перегрузка для указателя на объект-член класса с 8-ю аргументами
-template <class MemPtr, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, T8&, memptr_ref_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, T8&, memptr_ref_funcall)
 {
-  return object.*ptr;
+  return const_cast<T&> (object).*ptr;
 }
 
-template <class MemPtr, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, T7&, T8&, memptr_ptr_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, T7&, T8&, memptr_ptr_funcall)
 {
-  return (*object_ptr).*ptr;
+  return const_cast<T&> (*object_ptr).*ptr;
 }
 
 //перегрузка для указателя на объект-член класса с 9-ю аргументами
-template <class MemPtr, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&, memptr_ref_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&, memptr_ref_funcall)
 {
-  return object.*ptr;
+  return const_cast<T&> (object).*ptr;
 }
 
-template <class MemPtr, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class ResultTraits>
-inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&, memptr_ptr_funcall, ResultTraits)
+template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&, memptr_ptr_funcall)
 {
-  return (*object_ptr).*ptr;
+  return const_cast<T&> (*object_ptr).*ptr;
 }
 
 }
@@ -407,71 +369,71 @@ inline typename ResultTraits::type funcall_dispatch (const MemPtr& ptr, T1& obje
 */
 
 //перегрузка для функционального объекта без аргументов
-template <class Fn>
-inline typename result_of<Fn()>::type funcall (Fn fn)
+template <class Ret, class Fn>
+inline Ret funcall (Fn& fn)
 {
-  return detail::funcall_dispatch (detail::unwrap (fn), typename detail::funcall_selector<Fn>::type (), result_of<Fn()> ());
+  return detail::funcall_dispatch<Ret> (fn, typename detail::funcall_selector<Fn>::type ());
 }
 
 //перегрузка для функционального объекта с 1-м аргументом
-template <class Fn, class T1>
-inline typename result_of<Fn(T1)>::type funcall (Fn fn, T1 arg1)
+template <class Ret, class Fn, class T1>
+inline Ret funcall (Fn& fn, T1& arg1)
 {
-  return detail::funcall_dispatch (detail::unwrap (fn), detail::unwrap (arg1), typename detail::funcall_selector<Fn, T1>::type (), result_of<Fn(T1)> ());
+  return detail::funcall_dispatch<Ret> (fn, arg1, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 2-мя аргументами
-template <class Fn, class T1, class T2>
-inline typename result_of<Fn(T1, T2)>::type funcall (Fn fn, T1 arg1, T2 arg2)
+template <class Ret, class Fn, class T1, class T2>
+inline Ret funcall (Fn& fn, T1& arg1, T2& arg2)
 {
-  return detail::funcall_dispatch (detail::unwrap (fn), detail::unwrap (arg1), detail::unwrap (arg2), typename detail::funcall_selector<Fn, T1>::type (), result_of<Fn(T1, T2)> ());
+  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 3-мя аргументами
-template <class Fn, class T1, class T2, class T3>
-inline typename result_of<Fn(T1, T2, T3)>::type funcall (Fn fn, T1 arg1, T2 arg2, T3 arg3)
+template <class Ret, class Fn, class T1, class T2, class T3>
+inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3)
 {
-  return detail::funcall_dispatch (detail::unwrap (fn), detail::unwrap (arg1), detail::unwrap (arg2), detail::unwrap (arg3), typename detail::funcall_selector<Fn, T1>::type (), result_of<Fn(T1, T2, T3)> ());
+  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 4-мя аргументами
-template <class Fn, class T1, class T2, class T3, class T4>
-inline typename result_of<Fn(T1, T2, T3, T4)>::type funcall (Fn fn, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4>
+inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4)
 {
-  return detail::funcall_dispatch (detail::unwrap (fn), detail::unwrap (arg1), detail::unwrap (arg2), detail::unwrap (arg3), detail::unwrap (arg4), typename detail::funcall_selector<Fn, T1>::type (), result_of<Fn(T1, T2, T3, T4)> ());
+  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 5-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5>
-inline typename result_of<Fn(T1, T2, T3, T4, T5)>::type funcall (Fn fn, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
+inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5)
 {
-  return detail::funcall_dispatch (detail::unwrap (fn), detail::unwrap (arg1), detail::unwrap (arg2), detail::unwrap (arg3), detail::unwrap (arg4), detail::unwrap (arg5), typename detail::funcall_selector<Fn, T1>::type (), result_of<Fn(T1, T2, T3, T4, T5)> ());
+  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, arg5, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 6-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
-inline typename result_of<Fn(T1, T2, T3, T4, T5, T6)>::type funcall (Fn fn, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
+inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6)
 {
-  return detail::funcall_dispatch (detail::unwrap (fn), detail::unwrap (arg1), detail::unwrap (arg2), detail::unwrap (arg3), detail::unwrap (arg4), detail::unwrap (arg5), detail::unwrap (arg6), typename detail::funcall_selector<Fn, T1>::type (), result_of<Fn(T1, T2, T3, T4, T5, T6)> ());
+  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, arg5, arg6, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 7-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-inline typename result_of<Fn(T1, T2, T3, T4, T5, T6, T7)>::type funcall (Fn fn, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7)
 {
-  return detail::funcall_dispatch (detail::unwrap (fn), detail::unwrap (arg1), detail::unwrap (arg2), detail::unwrap (arg3), detail::unwrap (arg4), detail::unwrap (arg5), detail::unwrap (arg6), detail::unwrap (arg7), typename detail::funcall_selector<Fn, T1>::type (), result_of<Fn(T1, T2, T3, T4, T5, T6, T7)> ());
+  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, arg5, arg6, arg7, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 8-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-inline typename result_of<Fn(T1, T2, T3, T4, T5, T6, T7, T8)>::type funcall (Fn fn, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8)
 {
-  return detail::funcall_dispatch (detail::unwrap (fn), detail::unwrap (arg1), detail::unwrap (arg2), detail::unwrap (arg3), detail::unwrap (arg4), detail::unwrap (arg5), detail::unwrap (arg6), detail::unwrap (arg7), detail::unwrap (arg8), typename detail::funcall_selector<Fn, T1>::type (), result_of<Fn(T1, T2, T3, T4, T5, T6, T7, T8)> ());
+  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 9-ю аргументами
-template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-inline typename result_of<Fn(T1, T2, T3, T4, T5, T6, T7, T8, T9)>::type funcall (Fn fn, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9)
 {
-  return detail::funcall_dispatch (detail::unwrap (fn), detail::unwrap (arg1), detail::unwrap (arg2), detail::unwrap (arg3), detail::unwrap (arg4), detail::unwrap (arg5), detail::unwrap (arg6), detail::unwrap (arg7), detail::unwrap (arg8), detail::unwrap (arg9), typename detail::funcall_selector<Fn, T1>::type (), result_of<Fn(T1, T2, T3, T4, T5, T6, T7, T8, T9)> ());
+  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, typename detail::funcall_selector<Fn, T1>::type ());
 }

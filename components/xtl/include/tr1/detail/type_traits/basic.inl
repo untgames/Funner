@@ -59,20 +59,12 @@ template <class T>           struct type_trait_checker<is_array, T const []>:   
 template <class T>           struct type_trait_checker<is_array, T volatile []>:        public true_type {};
 template <class T>           struct type_trait_checker<is_array, T const volatile []>:  public true_type {};
 
-//специализации для проверки является ли T указателем
-template <class T> struct type_trait_checker<is_pointer, T*>: public true_type {};
-
-//специализации для проверки является ли T ссылкой
-template <class T> struct type_trait_checker<is_reference, T&>: public true_type {};
-
 }
 
-template <class T> struct is_void:                    public detail::cv_type_trait_checker<is_void, T> {};
-template <class T> struct is_integral:                public detail::cv_type_trait_checker<is_integral, T> {};
-template <class T> struct is_floating_point:          public detail::cv_type_trait_checker<is_floating_point, T> {};
-template <class T> struct is_array:                   public detail::cv_type_trait_checker<is_array, T> {};
-template <class T> struct is_pointer:                 public detail::cv_type_trait_checker<is_pointer, T> {};
-template <class T> struct is_reference:               public detail::cv_type_trait_checker<is_reference, T> {};
+template <class T> struct is_void:           public detail::cv_type_trait_checker<is_void, T> {};
+template <class T> struct is_integral:       public detail::cv_type_trait_checker<is_integral, T> {};
+template <class T> struct is_floating_point: public detail::cv_type_trait_checker<is_floating_point, T> {};
+template <class T> struct is_array:          public detail::cv_type_trait_checker<is_array, T> {};
 
 /*
     Проверка является ли T объединением
@@ -314,25 +306,3 @@ template <class T> struct add_volatile<T&> { typedef T& type; };
 //добавление квалификатора const volatile
 template <class T> struct add_cv     { typedef T const volatile type; };
 template <class T> struct add_cv<T&> { typedef T& type; };
-
-/*
-    Преобразование указателей и ссылок
-*/
-
-//добавление/удаление ссылки
-template <class T> struct remove_reference                   { typedef T    type; };
-template <class T> struct remove_reference<T&>               { typedef T    type; };
-template <class T> struct add_reference                      { typedef T&   type; };
-template <class T> struct add_reference<T&>                  { typedef T&   type; };
-template <>        struct add_reference<void>                { typedef void type; };
-template <>        struct add_reference<const void>          { typedef void type; };
-template <>        struct add_reference<volatile void>       { typedef void type; };
-template <>        struct add_reference<const volatile void> { typedef void type; };
-
-//добавление/удаление указателя
-template <class T> struct remove_pointer                    { typedef T type; };
-template <class T> struct remove_pointer<T*>                { typedef T type; };
-template <class T> struct remove_pointer<T* const>          { typedef T type; };
-template <class T> struct remove_pointer<T* volatile>       { typedef T type; };
-template <class T> struct remove_pointer<T* const volatile> { typedef T type; };
-template <class T> struct add_pointer                       { typedef typename remove_reference<T>::type* type; };

@@ -13,10 +13,3 @@ template <class T> struct is_polymorphic: public bool_constant<__is_polymorphic 
 
 //определение является ли тип T абстрактным
 template <class T> struct is_abstract: public bool_constant<__is_abstract (T)> {};
-
-//определение выравнивания типа
-template <class T> struct alignment_of:                      public integral_constant<size_t, __alignof (T)> {};
-template <>        struct alignment_of<void>:                public integral_constant<size_t, 0> {};
-template <>        struct alignment_of<const void>:          public integral_constant<size_t, 0> {};
-template <>        struct alignment_of<volatile void>:       public integral_constant<size_t, 0> {};
-template <>        struct alignment_of<const volatile void>: public integral_constant<size_t, 0> {};

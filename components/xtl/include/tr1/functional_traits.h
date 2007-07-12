@@ -174,90 +174,6 @@ template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...)>: public eclipsis_functional_traits<signature_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
 
 /*
-    Специализации для указателей на функцию
-*/
-
-//специализация для указателя на функцию без аргументов
-template <class Ret>
-struct functional_traits<Ret (*)()>: public ptrfun_arguments_traits<Ret>  { };
-
-//специализация для указателя на функцию без аргументов и многоточием
-template <class Ret>
-struct functional_traits<Ret (*)(...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret> > { };
-
-//специализация для указателя на функцию с 1-м аргументом
-template <class Arg1, class Ret>
-struct functional_traits<Ret (*)(Arg1)>: public ptrfun_arguments_traits<Ret, Arg1>  { };
-
-//специализация для указателя на функцию с 1-м аргументом и многоточием
-template <class Arg1, class Ret>
-struct functional_traits<Ret (*)(Arg1, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1> > { };
-
-//специализация для указателя на функцию с 2-мя аргументами
-template <class Arg1, class Arg2, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2>  { };
-
-//специализация для указателя на функцию с 2-мя аргументами и многоточием
-template <class Arg1, class Arg2, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2> > { };
-
-//специализация для указателя на функцию с 3-мя аргументами
-template <class Arg1, class Arg2, class Arg3, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3>  { };
-
-//специализация для указателя на функцию с 3-мя аргументами и многоточием
-template <class Arg1, class Arg2, class Arg3, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3> > { };
-
-//специализация для указателя на функцию с 4-мя аргументами
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4>  { };
-
-//специализация для указателя на функцию с 4-мя аргументами и многоточием
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4> > { };
-
-//специализация для указателя на функцию с 5-ю аргументами
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5>  { };
-
-//специализация для указателя на функцию с 5-ю аргументами и многоточием
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5> > { };
-
-//специализация для указателя на функцию с 6-ю аргументами
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>  { };
-
-//специализация для указателя на функцию с 6-ю аргументами и многоточием
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> > { };
-
-//специализация для указателя на функцию с 7-ю аргументами
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>  { };
-
-//специализация для указателя на функцию с 7-ю аргументами и многоточием
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> > { };
-
-//специализация для указателя на функцию с 8-ю аргументами
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>  { };
-
-//специализация для указателя на функцию с 8-ю аргументами и многоточием
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> > { };
-
-//специализация для указателя на функцию с 9-ю аргументами
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9>  { };
-
-//специализация для указателя на функцию с 9-ю аргументами и многоточием
-template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
-struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
-
-/*
     Специализации для указателей на функцию-член класса
 */
 
@@ -581,11 +497,97 @@ struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Ar
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...) const volatile>: public eclipsis_functional_traits<memfun_arguments_traits<const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
 
+#ifndef _MSC_VER
+
+/*
+    Специализации для указателей на функцию
+*/
+
+//специализация для указателя на функцию без аргументов
+template <class Ret>
+struct functional_traits<Ret (*)()>: public ptrfun_arguments_traits<Ret>  { };
+
+//специализация для указателя на функцию без аргументов и многоточием
+template <class Ret>
+struct functional_traits<Ret (*)(...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret> > { };
+
+//специализация для указателя на функцию с 1-м аргументом
+template <class Arg1, class Ret>
+struct functional_traits<Ret (*)(Arg1)>: public ptrfun_arguments_traits<Ret, Arg1>  { };
+
+//специализация для указателя на функцию с 1-м аргументом и многоточием
+template <class Arg1, class Ret>
+struct functional_traits<Ret (*)(Arg1, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1> > { };
+
+//специализация для указателя на функцию с 2-мя аргументами
+template <class Arg1, class Arg2, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2>  { };
+
+//специализация для указателя на функцию с 2-мя аргументами и многоточием
+template <class Arg1, class Arg2, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2> > { };
+
+//специализация для указателя на функцию с 3-мя аргументами
+template <class Arg1, class Arg2, class Arg3, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3>  { };
+
+//специализация для указателя на функцию с 3-мя аргументами и многоточием
+template <class Arg1, class Arg2, class Arg3, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3> > { };
+
+//специализация для указателя на функцию с 4-мя аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4>  { };
+
+//специализация для указателя на функцию с 4-мя аргументами и многоточием
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4> > { };
+
+//специализация для указателя на функцию с 5-ю аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5>  { };
+
+//специализация для указателя на функцию с 5-ю аргументами и многоточием
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5> > { };
+
+//специализация для указателя на функцию с 6-ю аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>  { };
+
+//специализация для указателя на функцию с 6-ю аргументами и многоточием
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> > { };
+
+//специализация для указателя на функцию с 7-ю аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>  { };
+
+//специализация для указателя на функцию с 7-ю аргументами и многоточием
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> > { };
+
+//специализация для указателя на функцию с 8-ю аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>  { };
+
+//специализация для указателя на функцию с 8-ю аргументами и многоточием
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> > { };
+
+//специализация для указателя на функцию с 9-ю аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9>  { };
+
+//специализация для указателя на функцию с 9-ю аргументами и многоточием
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
+struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...)>: public eclipsis_functional_traits<ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
+
+#else //_MSC_VER
+
 /*
     Специализации для компилятора MSVC
 */
-
-#ifdef _MSC_VER
 
 /*
     Специализации для указателей на функцию с модификатором __fastcall
@@ -1002,6 +1004,214 @@ struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6
 //специализация для указателя на функцию-член класса const volatile T с 9-ю аргументами
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const volatile>: public memfun_arguments_traits<const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
+
+/*
+    Специализации для указателей на функцию с модификатором __cdecl
+*/
+
+//специализация для указателя на функцию без аргументов
+template <class Ret>
+struct functional_traits<Ret (__cdecl*)()>: public ptrfun_arguments_traits<Ret>  { };
+
+//специализация для указателя на функцию с 1-м аргументом
+template <class Arg1, class Ret>
+struct functional_traits<Ret (__cdecl*)(Arg1)>: public ptrfun_arguments_traits<Ret, Arg1>  { };
+
+//специализация для указателя на функцию с 2-мя аргументами
+template <class Arg1, class Arg2, class Ret>
+struct functional_traits<Ret (__cdecl*)(Arg1, Arg2)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2>  { };
+
+//специализация для указателя на функцию с 3-мя аргументами
+template <class Arg1, class Arg2, class Arg3, class Ret>
+struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3>  { };
+
+//специализация для указателя на функцию с 4-мя аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
+struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4>  { };
+
+//специализация для указателя на функцию с 5-ю аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
+struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5>  { };
+
+//специализация для указателя на функцию с 6-ю аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
+struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>  { };
+
+//специализация для указателя на функцию с 7-ю аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
+struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>  { };
+
+//специализация для указателя на функцию с 8-ю аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
+struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>  { };
+
+//специализация для указателя на функцию с 9-ю аргументами
+template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
+struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public ptrfun_arguments_traits<Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9>  { };
+
+/*
+    Специализации для указателей на функцию-член класса с модификатором __cdecl
+*/
+
+//специализация для указателя на функцию-член класса T без аргументов
+template <class T,class Ret>
+struct functional_traits<Ret (__cdecl T::*)()>: public memfun_arguments_traits<T, Ret> { };
+
+//специализация для указателя на функцию-член класса const T без аргументов
+template <class T,class Ret>
+struct functional_traits<Ret (__cdecl T::*)() const>: public memfun_arguments_traits<const T, Ret> { };
+
+//специализация для указателя на функцию-член класса volatile T без аргументов
+template <class T,class Ret>
+struct functional_traits<Ret (__cdecl T::*)() volatile>: public memfun_arguments_traits<volatile T, Ret> { };
+
+//специализация для указателя на функцию-член класса const volatile T без аргументов
+template <class T,class Ret>
+struct functional_traits<Ret (__cdecl T::*)() const volatile>: public memfun_arguments_traits<const volatile T, Ret> { };
+
+//специализация для указателя на функцию-член класса T с 1-м аргументом
+template <class T,class Arg1, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1)>: public memfun_arguments_traits<T, Ret, Arg1> { };
+
+//специализация для указателя на функцию-член класса const T с 1-м аргументом
+template <class T,class Arg1, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1) const>: public memfun_arguments_traits<const T, Ret, Arg1> { };
+
+//специализация для указателя на функцию-член класса volatile T с 1-м аргументом
+template <class T,class Arg1, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1) volatile>: public memfun_arguments_traits<volatile T, Ret, Arg1> { };
+
+//специализация для указателя на функцию-член класса const volatile T с 1-м аргументом
+template <class T,class Arg1, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1) const volatile>: public memfun_arguments_traits<const volatile T, Ret, Arg1> { };
+
+//специализация для указателя на функцию-член класса T с 2-мя аргументами
+template <class T,class Arg1, class Arg2, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2)>: public memfun_arguments_traits<T, Ret, Arg1, Arg2> { };
+
+//специализация для указателя на функцию-член класса const T с 2-мя аргументами
+template <class T,class Arg1, class Arg2, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2) const>: public memfun_arguments_traits<const T, Ret, Arg1, Arg2> { };
+
+//специализация для указателя на функцию-член класса volatile T с 2-мя аргументами
+template <class T,class Arg1, class Arg2, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2) volatile>: public memfun_arguments_traits<volatile T, Ret, Arg1, Arg2> { };
+
+//специализация для указателя на функцию-член класса const volatile T с 2-мя аргументами
+template <class T,class Arg1, class Arg2, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2) const volatile>: public memfun_arguments_traits<const volatile T, Ret, Arg1, Arg2> { };
+
+//специализация для указателя на функцию-член класса T с 3-мя аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3)>: public memfun_arguments_traits<T, Ret, Arg1, Arg2, Arg3> { };
+
+//специализация для указателя на функцию-член класса const T с 3-мя аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3) const>: public memfun_arguments_traits<const T, Ret, Arg1, Arg2, Arg3> { };
+
+//специализация для указателя на функцию-член класса volatile T с 3-мя аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3) volatile>: public memfun_arguments_traits<volatile T, Ret, Arg1, Arg2, Arg3> { };
+
+//специализация для указателя на функцию-член класса const volatile T с 3-мя аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3) const volatile>: public memfun_arguments_traits<const volatile T, Ret, Arg1, Arg2, Arg3> { };
+
+//специализация для указателя на функцию-член класса T с 4-мя аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4)>: public memfun_arguments_traits<T, Ret, Arg1, Arg2, Arg3, Arg4> { };
+
+//специализация для указателя на функцию-член класса const T с 4-мя аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4) const>: public memfun_arguments_traits<const T, Ret, Arg1, Arg2, Arg3, Arg4> { };
+
+//специализация для указателя на функцию-член класса volatile T с 4-мя аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4) volatile>: public memfun_arguments_traits<volatile T, Ret, Arg1, Arg2, Arg3, Arg4> { };
+
+//специализация для указателя на функцию-член класса const volatile T с 4-мя аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4) const volatile>: public memfun_arguments_traits<const volatile T, Ret, Arg1, Arg2, Arg3, Arg4> { };
+
+//специализация для указателя на функцию-член класса T с 5-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public memfun_arguments_traits<T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
+
+//специализация для указателя на функцию-член класса const T с 5-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) const>: public memfun_arguments_traits<const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
+
+//специализация для указателя на функцию-член класса volatile T с 5-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) volatile>: public memfun_arguments_traits<volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
+
+//специализация для указателя на функцию-член класса const volatile T с 5-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) const volatile>: public memfun_arguments_traits<const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
+
+//специализация для указателя на функцию-член класса T с 6-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public memfun_arguments_traits<T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
+
+//специализация для указателя на функцию-член класса const T с 6-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const>: public memfun_arguments_traits<const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
+
+//специализация для указателя на функцию-член класса volatile T с 6-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) volatile>: public memfun_arguments_traits<volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
+
+//специализация для указателя на функцию-член класса const volatile T с 6-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const volatile>: public memfun_arguments_traits<const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
+
+//специализация для указателя на функцию-член класса T с 7-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public memfun_arguments_traits<T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
+
+//специализация для указателя на функцию-член класса const T с 7-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const>: public memfun_arguments_traits<const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
+
+//специализация для указателя на функцию-член класса volatile T с 7-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) volatile>: public memfun_arguments_traits<volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
+
+//специализация для указателя на функцию-член класса const volatile T с 7-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const volatile>: public memfun_arguments_traits<const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
+
+//специализация для указателя на функцию-член класса T с 8-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public memfun_arguments_traits<T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
+
+//специализация для указателя на функцию-член класса const T с 8-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const>: public memfun_arguments_traits<const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
+
+//специализация для указателя на функцию-член класса volatile T с 8-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) volatile>: public memfun_arguments_traits<volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
+
+//специализация для указателя на функцию-член класса const volatile T с 8-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const volatile>: public memfun_arguments_traits<const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
+
+//специализация для указателя на функцию-член класса T с 9-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public memfun_arguments_traits<T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
+
+//специализация для указателя на функцию-член класса const T с 9-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const>: public memfun_arguments_traits<const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
+
+//специализация для указателя на функцию-член класса volatile T с 9-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) volatile>: public memfun_arguments_traits<volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
+
+//специализация для указателя на функцию-член класса const volatile T с 9-ю аргументами
+template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
+struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const volatile>: public memfun_arguments_traits<const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
 #endif //_MSC_VER
 

@@ -58,7 +58,7 @@ template <class Fn, class FnArgs, class Traits> struct signature_result_of<Fn, F
 
 template <class T, class Ret, class FnArgs, class Traits> struct signature_result_of<Ret T::*, FnArgs, Traits, false>
 {
-  typedef Ret type;
+  typedef Ret& type;
 };
 
 //определение типа возвращаемого значения если Fn не сигнатура
@@ -75,7 +75,7 @@ template <class Fn, class Traits> struct non_signature_result_of<Fn, Traits, fal
 
 template <class T, class Ret, class Traits> struct non_signature_result_of<Ret T::*, Traits, false>
 {
-  typedef Ret type;
+  typedef Ret& type;
 };
 
 //комбинация указанных выше случаев
