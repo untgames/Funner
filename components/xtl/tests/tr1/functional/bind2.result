@@ -1,0 +1,44 @@
+Results of bind2_test:
+expression 'bind(f_0)(i) == 17041L' is true
+expression 'bind(f_1, _1)(i) == 1L' is true
+expression 'bind(f_2, _1, 2)(i) == 21L' is true
+expression 'bind(f_3, _1, 2, 3)(i) == 321L' is true
+expression 'bind(f_4, _1, 2, 3, 4)(i) == 4321L' is true
+expression 'bind(f_5, _1, 2, 3, 4, 5)(i) == 54321L' is true
+expression 'bind(f_6, _1, 2, 3, 4, 5, 6)(i) == 654321L' is true
+expression 'bind(f_7, _1, 2, 3, 4, 5, 6, 7)(i) == 7654321L' is true
+expression 'bind(f_8, _1, 2, 3, 4, 5, 6, 7, 8)(i) == 87654321L' is true
+expression 'bind(f_9, _1, 2, 3, 4, 5, 6, 7, 8, 9)(i) == 987654321L' is true
+expression '(bind(fv_0)(i), (global_result == 17041L))' is true
+expression '(bind(fv_1, _1)(i), (global_result == 1L))' is true
+expression '(bind(fv_2, _1, 2)(i), (global_result == 21L))' is true
+expression '(bind(fv_3, _1, 2, 3)(i), (global_result == 321L))' is true
+expression '(bind(fv_4, _1, 2, 3, 4)(i), (global_result == 4321L))' is true
+expression '(bind(fv_5, _1, 2, 3, 4, 5)(i), (global_result == 54321L))' is true
+expression '(bind(fv_6, _1, 2, 3, 4, 5, 6)(i), (global_result == 654321L))' is true
+expression '(bind(fv_7, _1, 2, 3, 4, 5, 6, 7)(i), (global_result == 7654321L))' is true
+expression '(bind(fv_8, _1, 2, 3, 4, 5, 6, 7, 8)(i), (global_result == 87654321L))' is true
+expression '(bind(fv_9, _1, 2, 3, 4, 5, 6, 7, 8, 9)(i), (global_result == 987654321L))' is true
+expression 'bind<short>(Y(), ref(i))() == 7' is true
+expression 'bind<short>(Y(), ref(i))() == 8' is true
+expression 'bind<int>(Y(), i, _1)(k) == 38' is true
+expression 'bind<long>(Y(), i, _1, 9)(k) == 938' is true
+expression 'global_result == 4938' is true
+expression 'bind<short>(Y(), ref(i))() == 7' is true
+expression 'bind<short>(Y(), ref(i))() == 8' is true
+expression 'bind<int>(Y(), i, _1)(k) == 38' is true
+expression 'bind<long>(Y(), i, _1, 9)(k) == 938' is true
+expression 'global_result == 4938' is true
+expression 'bind(Z(), 7, 4)() == 47' is true
+expression 'x.hash == 23558' is true
+expression 'v.hash == 23558' is true
+expression 'bind(f_1, bind(f_1, _1))(x) == 1L' is true
+expression 'bind(f_1, bind(f_2, _1, _2))(x, y) == 21L' is true
+expression 'bind(f_2, bind(f_1, _1), bind(f_1, _1))(x) == 11L' is true
+expression 'bind(f_2, bind(f_1, _1), bind(f_1, _2))(x, y) == 21L' is true
+expression 'bind(f_1, bind(f_0))() == 17041L' is true
+expression '(bind(fv_1, bind(f_1, _1))(x), (global_result == 1L))' is true
+expression '(bind(fv_1, bind(f_2, _1, _2))(x, y), (global_result == 21L))' is true
+expression '(bind(fv_2, bind(f_1, _1), bind(f_1, _1))(x), (global_result == 11L))' is true
+expression '(bind(fv_2, bind(f_1, _1), bind(f_1, _2))(x, y), (global_result == 21L))' is true
+expression '(bind(fv_1, bind(f_0))(), (global_result == 17041L))' is true

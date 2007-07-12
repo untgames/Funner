@@ -1,0 +1,21 @@
+Results of bind_cv_test:
+expression 'cf() == -r' is true
+expression 'f() == r' is true
+expression 'cf() == -r' is true
+expression 'f() == r' is true
+expression 'cf() == -r' is true
+expression 'f() == r' is true
+expression 'cf() == -r' is true
+expression 'f() == r' is true
+expression 'cf() == -r' is true
+expression 'f() == r' is true
+expression 'cf() == -r' is true
+expression 'f() == r' is true
+expression 'cf() == -r' is true
+expression 'f() == r' is true
+expression 'cf() == -r' is true
+expression 'f() == r' is true
+expression 'cf() == -r' is true
+expression 'f() == r' is true
+expression 'cf() == -r' is true
+expression 'f() == r' is true

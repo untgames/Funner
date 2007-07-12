@@ -1,0 +1,12 @@
+Results of bind_dm_test:
+expression 'bind( &X::m, _1 )( x ) == 17041' is true
+expression 'bind( &X::m, _1 )( px ) == 17041' is true
+expression 'bind( &X::m, x )() == 17041' is true
+expression 'bind( &X::m, px )() == 17041' is true
+expression 'bind( &X::m, ref(x) )() == 17041' is true
+expression 'bind( &X::m, _1 )( cx ) == 17041' is true
+expression 'bind( &X::m, _1 )( pcx ) == 17041' is true
+expression 'bind( &X::m, cx )() == 17041' is true
+expression 'bind( &X::m, pcx )() == 17041' is true
+expression 'bind( &X::m, ref(cx) )() == 17041' is true
+expression 'bind( &X::m, bind( f, _1 ) )( v ) == v' is true

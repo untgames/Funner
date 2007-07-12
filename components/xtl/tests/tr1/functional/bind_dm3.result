@@ -1,0 +1,2 @@
+Results of bind_dm3_test:
+expression '&pair.first == &x' is true

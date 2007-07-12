@@ -1,0 +1,31 @@
+Results of bind_rel_test:
+expression '( bind( f, _1 ) == y )( x )' is true
+expression '!( ( bind( f, _1 ) != y )( x ) )' is true
+expression '!( ( bind( f, _1 ) < y )( x ) )' is true
+expression '( bind( f, _1 ) < y + 1 )( x )' is true
+expression '!( ( bind( f, _1 ) > y )( x ) )' is true
+expression '( bind( f, _1 ) > y - 1 )( x )' is true
+expression '!( ( bind( f, _1 ) <= y - 1 )( x ) )' is true
+expression '( bind( f, _1 ) <= y )( x )' is true
+expression '( bind( f, _1 ) <= y + 1 )( x )' is true
+expression '!( ( bind( f, _1 ) >= y + 1 )( x ) )' is true
+expression '( bind( f, _1 ) >= y )( x )' is true
+expression '( bind( f, _1 ) >= y - 1 )( x )' is true
+expression '( bind( f, _1 ) == ref( y ) )( x )' is true
+expression '!( ( bind( f, _1 ) != ref( y ) )( x ) )' is true
+expression '!( ( bind( f, _1 ) < ref( y ) )( x ) )' is true
+expression '!( ( bind( f, _1 ) > ref( y ) )( x ) )' is true
+expression '( bind( f, _1 ) <= ref( y ) )( x )' is true
+expression '( bind( f, _1 ) >= ref( y ) )( x )' is true
+expression '( bind( f, _1 ) == _2 )( x, y )' is true
+expression '!( ( bind( f, _1 ) != _2 )( x, y ) )' is true
+expression '!( ( bind( f, _1 ) < _2 )( x, y ) )' is true
+expression '!( ( bind( f, _1 ) > _2 )( x, y ) )' is true
+expression '( bind( f, _1 ) <= _2 )( x, y )' is true
+expression '( bind( f, _1 ) >= _2 )( x, y )' is true
+expression '( bind( f, _1 ) == bind( g, _1 ) )( x )' is true
+expression '!( ( bind( f, _1 ) != bind( g, _1 ) )( x ) )' is true
+expression '!( ( bind( f, _1 ) < bind( g, _1 ) )( x ) )' is true
+expression '( bind( f, _1 ) <= bind( g, _1 ) )( x )' is true
+expression '!( ( bind( f, _1 ) > bind( g, _1 ) )( x ) )' is true
+expression '( bind( f, _1 ) >= bind( g, _1 ) )( x )' is true

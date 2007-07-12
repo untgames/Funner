@@ -1,0 +1,7 @@
+Results of bind_dm2_test:
+expression 'x.m == 42' is true
+expression 'x.m == 17041' is true
+expression 'bind< long >( &X::m, _1 )( pcx ) == 17041L' is true
+expression 'bind< long >( &X::m, pcx )() == 17041L' is true
+expression 'bind< char const* >( &Y::m, &y )() == v' is true
+expression 'bind< string >( &Y::m, &y )() == v' is true

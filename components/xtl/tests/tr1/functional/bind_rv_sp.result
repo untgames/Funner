@@ -1,0 +1,2 @@
+Results of bind_rv_sp_test:
+expression 'bind( &X::f, bind( &Y::f, &y ) )() == 42' is true

@@ -1,0 +1,6 @@
+Results of bind1_test:
+f(g(x))
+f(h(x, y))
+h(f(x), g(x))
+h(f(x), g(y))
+f(k())

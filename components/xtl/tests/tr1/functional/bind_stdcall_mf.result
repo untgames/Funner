@@ -1,0 +1,2 @@
+Results of bind_stdcall_mf_test:
+expression 'x.hash == 23558' is true

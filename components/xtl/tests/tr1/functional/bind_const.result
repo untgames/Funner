@@ -1,0 +1,21 @@
+Results of bind_const_test:
+expression 'test( bind(f_0), i ) == 17041L' is true
+expression 'test( bind(f_1, _1), i ) == 1L' is true
+expression 'test( bind(f_2, _1, 2), i ) == 21L' is true
+expression 'test( bind(f_3, _1, 2, 3), i ) == 321L' is true
+expression 'test( bind(f_4, _1, 2, 3, 4), i ) == 4321L' is true
+expression 'test( bind(f_5, _1, 2, 3, 4, 5), i ) == 54321L' is true
+expression 'test( bind(f_6, _1, 2, 3, 4, 5, 6), i ) == 654321L' is true
+expression 'test( bind(f_7, _1, 2, 3, 4, 5, 6, 7), i ) == 7654321L' is true
+expression 'test( bind(f_8, _1, 2, 3, 4, 5, 6, 7, 8), i ) == 87654321L' is true
+expression 'test( bind(f_9, _1, 2, 3, 4, 5, 6, 7, 8, 9), i ) == 987654321L' is true
+expression 'testv( bind(fv_0), i ) == 17041L' is true
+expression 'testv( bind(fv_1, _1), i ) == 1L' is true
+expression 'testv( bind(fv_2, _1, 2), i ) == 21L' is true
+expression 'testv( bind(fv_3, _1, 2, 3), i ) == 321L' is true
+expression 'testv( bind(fv_4, _1, 2, 3, 4), i ) == 4321L' is true
+expression 'testv( bind(fv_5, _1, 2, 3, 4, 5), i ) == 54321L' is true
+expression 'testv( bind(fv_6, _1, 2, 3, 4, 5, 6), i ) == 654321L' is true
+expression 'testv( bind(fv_7, _1, 2, 3, 4, 5, 6, 7), i ) == 7654321L' is true
+expression 'testv( bind(fv_8, _1, 2, 3, 4, 5, 6, 7, 8), i ) == 87654321L' is true
+expression 'testv( bind(fv_9, _1, 2, 3, 4, 5, 6, 7, 8, 9), i ) == 987654321L' is true

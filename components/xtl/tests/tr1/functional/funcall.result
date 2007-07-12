@@ -1,8 +1,0 @@
-Results of funcall_test:
-f1: x=1 y='Hello world' z='3
-A::f1: x=1 y='Hello world' z='3
-A::f1: x=1 y='Hello world' z='3
-A::f2 const: x=1 y='Hello world' z='3
-A::f2 const: x=1 y='Hello world' z='3
-Memptr funcall 1
-Memptr funcall 1
