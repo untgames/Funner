@@ -42,6 +42,9 @@ class basic_string
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    struct _reserve {};
+
+    explicit basic_string  (_reserve,size_type n,const allocator_type& allocator = allocator_type::create ());
     explicit basic_string  (const allocator_type& = allocator_type::create ());
              basic_string  (const basic_string&);
              basic_string  (const value_type*      c_str,
@@ -271,10 +274,6 @@ class basic_string
     
   private:
     typedef eq_traits<traits_type> eq_traits;
-
-    struct _reserve {};
-    
-    explicit basic_string  (_reserve,size_type n,const allocator_type& allocator = allocator_type::create ());
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вспомогательные функции

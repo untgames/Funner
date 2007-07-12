@@ -877,7 +877,8 @@ inline basic_string<T,Traits,Alloc> operator +
  (const typename basic_string<T,Traits,Alloc>::value_type* a,
   const basic_string<T,Traits,Alloc>& b)
 {
-  typename basic_string<T,Traits,Alloc>::_reserve __reserve;
+  typename basic_string<T,Traits,Alloc>::_reserve __reserve;    
+
   return basic_string<T,Traits,Alloc> (__reserve,b.size ()+basic_string<T,Traits,Alloc>::traits_type::length (a)).append (a).append (b);
 }
 
