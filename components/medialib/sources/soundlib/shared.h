@@ -6,6 +6,7 @@
 #include <stl/string>
 #include <stl/hash_set>
 #include <stl/hash_map>
+#include <tr1/functional>
 #include <media/sound.h>
 
 namespace medialib
@@ -33,6 +34,9 @@ class SoundSampleImpl
 class SoundSampleSystemImpl
 {
   public:
+    typedef medialib::SoundSampleSystem::CodecLoadFunc CodecLoadFunc;
+    typedef medialib::SoundSampleSystem::DebugLogFunc  DebugLogFunc;
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,25 +53,25 @@ class SoundSampleSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка и вызов пользовательской функции лога дебаг-сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDebugLog (const design::function<void (const char*)>&);
+    void SetDebugLog (const DebugLogFunc&);
     void DebugLog    (const char* debug_message);   
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация и получение пользовательских функций загрузки и чтения звуков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool           RegisterLoadFunc   (const char* extension, const medialib::SoundSampleSystem::CodecLoadFunc& load_codec);
+    bool           RegisterLoadFunc   (const char* extension, const CodecLoadFunc& load_codec);
     void           UnregisterLoadFunc (const char* extension);
     void           UnregisterAllFuncs ();
     medialib::SoundSampleSystem::CodecLoadFunc* GetLoadFunc(const char* extension);
 
   private:
-    typedef stl::hash_set<medialib::SoundSample*>                            OpenSoundSamplesSet;
-    typedef stl::hash_map<stl::string, medialib::SoundSampleSystem::CodecLoadFunc> LoadCodecs;
+    typedef stl::hash_set<medialib::SoundSample*>     OpenSoundSamplesSet;
+    typedef stl::hash_map<stl::string, CodecLoadFunc> LoadCodecs;
 
   private:    
-    design::function<void (const char*)> log_function;         //польовательская функция дебаг-лога
-    OpenSoundSamplesSet                  open_sound_samples;   //список открытых звуков
-    LoadCodecs                           load_codecs;          //список пользовательских функций загрузки
+    DebugLogFunc        log_function;         //польовательская функция дебаг-лога
+    OpenSoundSamplesSet open_sound_samples;   //список открытых звуков
+    LoadCodecs          load_codecs;          //список пользовательских функций загрузки
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

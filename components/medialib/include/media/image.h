@@ -2,7 +2,7 @@
 #define MEDIALIB_IMAGE_HEADER
 
 #include <stl/memory> // в будущем design/pointer.h
-#include <design/function.h>
+#include <tr1/functional_fwd>
 
 namespace medialib
 {
@@ -204,13 +204,15 @@ class ImageSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка пользовательской функции лога дебаг-сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void SetDebugLog (const design::function<void (const char*)>&);
+    typedef tr1::function<void (const char*)> DebugLogFunc;
+
+    static void SetDebugLog (const DebugLogFunc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с пользовательскими функциями загрузки и сохранения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef design::function<void (const char*,       Image&)>                   CodecLoadFunc;
-    typedef design::function<void (const char*, const Image&, ImagePixelFormat)> CodecSaveFunc;
+    typedef tr1::function<void (const char*,       Image&)>                   CodecLoadFunc;
+    typedef tr1::function<void (const char*, const Image&, ImagePixelFormat)> CodecSaveFunc;
 
     static bool RegisterLoadCodec   (const char* extension, const CodecLoadFunc& codec);  //возвращает true при успешной регистрации, и false, 
     static bool RegisterSaveCodec   (const char* extension, const CodecSaveFunc& codec);  //если такое расширение уже зарегестрировано

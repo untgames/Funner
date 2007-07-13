@@ -1,5 +1,5 @@
 #include "shared.h"
-#include <stl/functional>
+//#include <stl/functional>
 
 using namespace medialib;
 
@@ -20,7 +20,8 @@ void DefaultLogFunction (const char* log_message)
 
 ImageSystemImpl::ImageSystemImpl ()
 {
-  log_function = DefaultLogFunction;
+  log_function = &DefaultLogFunction;
+
   RegisterLoadFunc ("jpg", &Image::DefaultLoader);
   RegisterLoadFunc ("bmp", &Image::DefaultLoader);
   RegisterLoadFunc ("tga", &Image::DefaultLoader);
@@ -51,7 +52,7 @@ void ImageSystemImpl::CloseAllImages ()
   for_each (open_images.begin (),open_images.end (), ResetImage);
 }
 
-void ImageSystemImpl::SetDebugLog (const design::function<void (const char*)>& new_log_function)
+void ImageSystemImpl::SetDebugLog (const DebugLogFunc& new_log_function)
 {
   log_function = new_log_function;
 }
@@ -61,13 +62,13 @@ void ImageSystemImpl::DebugLog (const char* debug_message)
   log_function (debug_message);
 }
 
-bool ImageSystemImpl::RegisterLoadFunc (const char* extension, const ImageSystem::CodecLoadFunc& codec)
+bool ImageSystemImpl::RegisterLoadFunc (const char* extension, const CodecLoadFunc& codec)
 {
   CodecLoadFunction codec_function = {codec, false};
   return (load_codecs.insert_pair (extension, codec_function)).second;
 }
 
-bool ImageSystemImpl::RegisterSaveFunc (const char* extension, const ImageSystem::CodecSaveFunc& codec)
+bool ImageSystemImpl::RegisterSaveFunc (const char* extension, const CodecSaveFunc& codec)
 {
   CodecSaveFunction codec_function = {codec, false};
   return (save_codecs.insert_pair (extension, codec_function)).second;
@@ -110,7 +111,7 @@ CodecSaveFunction* ImageSystemImpl::GetSaveFunc (const char* extension)
 namespace medialib
 {
 
-void ImageSystem::SetDebugLog (const design::function<void (const char*)>& log_function)
+void ImageSystem::SetDebugLog (const DebugLogFunc& log_function)
 {
   ImageSystemSingleton::Instance ().SetDebugLog (log_function);
 }

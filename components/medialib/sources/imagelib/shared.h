@@ -6,6 +6,7 @@
 #include <stl/string>
 #include <stl/hash_set>
 #include <stl/hash_map>
+#include <tr1/functional>
 #include <media/image.h>
 
 using medialib::ImagePixelFormat;
@@ -175,6 +176,10 @@ struct CodecSaveFunction
 class ImageSystemImpl
 {
   public:
+    typedef medialib::ImageSystem::DebugLogFunc  DebugLogFunc;
+    typedef medialib::ImageSystem::CodecLoadFunc CodecLoadFunc;
+    typedef medialib::ImageSystem::CodecSaveFunc CodecSaveFunc;
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,14 +196,14 @@ class ImageSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка и вызов пользовательской функции лога дебаг-сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDebugLog (const design::function<void (const char*)>&);
+    void SetDebugLog (const DebugLogFunc&);
     void DebugLog    (const char* debug_message);   
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация и получение пользовательских функций загрузки / сохранения картинок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool               RegisterLoadFunc   (const char* extension, const medialib::ImageSystem::CodecLoadFunc& codec);
-    bool               RegisterSaveFunc   (const char* extension, const medialib::ImageSystem::CodecSaveFunc& codec);
+    bool               RegisterLoadFunc   (const char* extension, const CodecLoadFunc& codec);
+    bool               RegisterSaveFunc   (const char* extension, const CodecSaveFunc& codec);
     void               UnRegisterLoadFunc (const char* extension);
     void               UnRegisterSaveFunc (const char* extension);
     void               UnRegisterAllFuncs ();
@@ -211,10 +216,10 @@ class ImageSystemImpl
     typedef stl::hash_map<stl::string, CodecSaveFunction> SaveCodecs;
 
   private:    
-    design::function<void (const char*)> log_function;   //польовательская функция дебаг-лога
-    OpenImageSet                         open_images;    //список открытых картинок
-    LoadCodecs                           load_codecs;    //список пользовательских функций загрузки
-    SaveCodecs                           save_codecs;    //список пользовательских функций сохранения
+    DebugLogFunc  log_function;   //польовательская функция дебаг-лога
+    OpenImageSet  open_images;    //список открытых картинок
+    LoadCodecs    load_codecs;    //список пользовательских функций загрузки
+    SaveCodecs    save_codecs;    //список пользовательских функций сохранения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

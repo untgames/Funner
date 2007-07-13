@@ -2,7 +2,7 @@
 #define MEDIALIB_SOUND_HEADER
 
 #include <stl/memory> // в будущем design/pointer.h
-#include <design/function.h>
+#include <tr1/functional_fwd>
 #include <common/file.h>
 
 namespace medialib
@@ -121,12 +121,14 @@ class SoundSampleSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка пользовательской функции лога дебаг-сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void SetDebugLog (const design::function<void (const char* message)>&);
+    typedef tr1::function<void (const char* message)> DebugLogFunc;
+
+    static void SetDebugLog (const DebugLogFunc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация пользовательских функций загрузки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef design::function<SoundCodec* (const char* file_name, SoundSampleInfo&)> CodecLoadFunc; //получение информации о файле и инициализация кодека
+    typedef tr1::function<SoundCodec* (const char* file_name, SoundSampleInfo&)> CodecLoadFunc; //получение информации о файле и инициализация кодека
 
     static bool RegisterCodec       (const char* extension, const CodecLoadFunc& loader);  //возвращает true при успешной регистрации, и false, если такое расширение уже зарегестрировано
     static void UnregisterCodec     (const char* extension);

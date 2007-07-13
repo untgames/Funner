@@ -45,7 +45,7 @@ void SoundSampleSystemImpl::CloseAllSoundSamples ()
   for_each (open_sound_samples.begin (),open_sound_samples.end (), ResetSoundSample);
 }
 
-void SoundSampleSystemImpl::SetDebugLog (const design::function<void (const char*)>& new_log_function)
+void SoundSampleSystemImpl::SetDebugLog (const DebugLogFunc& new_log_function)
 {
   log_function = new_log_function;
 }
@@ -55,7 +55,7 @@ void SoundSampleSystemImpl::DebugLog (const char* debug_message)
   log_function (debug_message);
 }
 
-bool SoundSampleSystemImpl::RegisterLoadFunc (const char* extension, const SoundSampleSystem::CodecLoadFunc& load_codec)
+bool SoundSampleSystemImpl::RegisterLoadFunc (const char* extension, const CodecLoadFunc& load_codec)
 {
   return (load_codecs.insert_pair (extension, load_codec)).second;
 }
@@ -72,7 +72,7 @@ void SoundSampleSystemImpl::UnregisterAllFuncs ()
 
 SoundSampleSystem::CodecLoadFunc* SoundSampleSystemImpl::GetLoadFunc (const char* extension)
 {
-  stl::hash_map<stl::string, SoundSampleSystem::CodecLoadFunc>::iterator load_func = load_codecs.find (stl::string (extension));
+  stl::hash_map<stl::string, CodecLoadFunc>::iterator load_func = load_codecs.find (stl::string (extension));
 
   if (load_func == load_codecs.end ())
     return NULL;
@@ -82,7 +82,7 @@ SoundSampleSystem::CodecLoadFunc* SoundSampleSystemImpl::GetLoadFunc (const char
 namespace medialib
 {
 
-void SoundSampleSystem::SetDebugLog (const design::function<void (const char*)>& log_function)
+void SoundSampleSystem::SetDebugLog (const DebugLogFunc& log_function)
 {
   SoundSystemSingleton::Instance ().SetDebugLog (log_function);
 }

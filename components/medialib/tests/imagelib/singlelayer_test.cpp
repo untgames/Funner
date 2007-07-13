@@ -4,6 +4,7 @@
 #include <common/file.h>
 #include <media/image.h>
 #include <memory.h>
+#include <tr1/functional>
 
 using namespace medialib;
 using namespace common;
