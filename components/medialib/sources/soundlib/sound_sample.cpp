@@ -9,14 +9,14 @@ const char* GetExtension (const char* file_name)
   size_t len = strlen(file_name) - 1;
   
   if (file_name == NULL || !len)
-    return NULL;
+    return file_name;
 
   ext = file_name + len;
 
   for (; len && (*ext != '.'); len--, ext--);
 
   if (!len)
-    return NULL;
+    return file_name;
 
   return ext + 1;
 }
@@ -45,8 +45,6 @@ SoundSample::SoundSample (const SoundSample& source)
 SoundSample::SoundSample (const char* file_name)
   : impl (new SoundSampleImpl)
 {
-  SoundSystemSingleton::Instance ().RegisterSoundSample (*this);
-
   SoundSampleSystem::CodecLoadFunc* load_func = SoundSystemSingleton::Instance ().GetLoadFunc(GetExtension (file_name));
 
   if (!load_func)
@@ -54,6 +52,8 @@ SoundSample::SoundSample (const char* file_name)
 
   impl->str_name = file_name;
   impl->codec    = (*load_func) (file_name, impl->info);
+
+  SoundSystemSingleton::Instance ().RegisterSoundSample (*this);
 }
 
 SoundSample::SoundSample (SoundSampleImpl* source)

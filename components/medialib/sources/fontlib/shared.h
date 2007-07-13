@@ -1,0 +1,74 @@
+#ifndef __IMAGELIB_SHARED__
+#define __IMAGELIB_SHARED__
+
+#include <common/singleton.h>
+#include <stl/string>
+#include <stl/hash_set>
+#include <stl/hash_map>
+#include <stl/memory>
+#include <media/font.h>
+
+namespace medialib
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Реализация гарнитуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class FontFaceImpl
+{
+  public:
+    FontFaceImpl () {glyphs_count = 0;}
+    FontFaceImpl (size_t first_char, size_t glyph_table_size, GlyphInfo* glyph, KerningInfo* kerning, const char* font_file_name);
+
+    size_t                     first_char_index;  //char-код первого глифа
+    size_t                     glyphs_count;      //количество глифов
+    stl::auto_ptr<GlyphInfo>   glyphs;            //глифы
+    stl::auto_ptr<KerningInfo> kerning_table;     //таблица межзнаковых интервалов
+    stl::string                file_name;         //имя файла с содержимым гарнитуры
+    stl::string                str_name;          //имя гарнитуры
+};
+
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Реализация системы шрифтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class FontSystemImpl
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FontSystemImpl ();
+    ~FontSystemImpl ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация открытых гарнитур / закрытие всех открытых гарнитур
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RegisterFontFace   (medialib::FontFace&);
+    void UnregisterFontFace (medialib::FontFace&);
+    void CloseAllFontFaces  ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация и получение пользовательских функций загрузки гарнитур
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool               RegisterLoadFunc   (const char* extension, const medialib::FontSystem::CodecLoadFunc& codec);
+    void               UnRegisterLoadFunc (const char* extension);
+    void               UnRegisterAllFuncs ();
+    medialib::FontSystem::CodecLoadFunc* GetLoadFunc (const char* extension);
+
+  private:
+    typedef stl::hash_set<medialib::FontFace*> OpenFontFacesSet;
+    typedef stl::hash_map<stl::string, medialib::FontSystem::CodecLoadFunc> LoadCodecs;
+
+  private:    
+    OpenFontFacesSet open_font_faces;  //список открытых гарнитур
+    LoadCodecs       load_codecs;      //список пользовательских функций загрузки
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Синглтон системы шрифтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef common::Singleton<FontSystemImpl> FontSystemSingleton;
+
+#endif

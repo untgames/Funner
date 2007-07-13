@@ -35,8 +35,6 @@ Image::Image (const Image& source, ImagePixelFormat format)
 
 Image::Image (const char* file_name)
 {
-  ImageSystemSingleton::Instance ().RegisterImage (*this);
-
   Image (new DevILImageImpl ()).Swap (*this);
   CodecLoadFunction* load_func = ImageSystemSingleton::Instance ().GetLoadFunc(GetExtension (file_name));
 
@@ -57,6 +55,8 @@ Image::Image (const char* file_name)
   }
   load_func->in_use = false;
   impl->Rename (file_name);
+
+  ImageSystemSingleton::Instance ().RegisterImage (*this);
 }
 
 Image::Image (size_t width,size_t height,size_t depth,ImagePixelFormat format,const void* data)

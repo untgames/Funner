@@ -1,9 +1,7 @@
 #include <stdio.h>
-#include <time.h>
 #include <common/exception.h>
 #include <common/file.h>
 #include <media/image.h>
-#include <memory.h>
 #include <tr1/functional>
 
 using namespace medialib;
@@ -65,11 +63,11 @@ int main ()
     
     FileHash file_hash;
 
-    img.Save("results/multilayer_image.tif.skybox", PF_DEFAULT);
+    img.Save("results/multilayer_image.bmp.skybox", PF_DEFAULT);
 
-    FileSystem::GetFileHash ("results/multilayer_image_nx.tif",file_hash);
+    FileSystem::GetFileHash ("results/multilayer_image_nx.bmp",file_hash);
 
-    printf ("File 'results/multilayer_image_nx.tif' hash: {");
+    printf ("File 'results/multilayer_image_nx.bmp' hash: {");
 
     for (size_t i=0;i<15;i++)
       printf ("%02x,",file_hash.md5 [i]);

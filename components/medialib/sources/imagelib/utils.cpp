@@ -11,14 +11,14 @@ const char* GetExtension (const char* file_name)
   size_t len = strlen(file_name) - 1;
   
   if (file_name == NULL || !len)
-    return NULL;
+    return file_name;
 
   ext = file_name + len;
 
   for (; len && (*ext != '.'); len--, ext--);
 
   if (!len)
-    return NULL;
+    return file_name;
 
   return ext + 1;
 }

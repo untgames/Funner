@@ -1,9 +1,7 @@
 #include <stdio.h>
-#include <time.h>
 #include <common/exception.h>
 #include <common/file.h>
 #include <media/image.h>
-#include <memory.h>
 #include <tr1/functional>
 
 using namespace medialib;
