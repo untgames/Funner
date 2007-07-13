@@ -161,24 +161,6 @@ inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Снятие reference_wrapper
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> T& unwrap_function (T& r)
-{
-  return r;
-}
-
-template <class T> T& unwrap_function (const reference_wrapper<T>& r)
-{
-  return r.get ();
-}
-
-template <class T> T& unwrap_function (reference_wrapper<T>& r)
-{
-  return r.get ();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Операторы сравнения / логические отрицание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct bind_equals      { template <class T1, class T2> bool operator () (const T1& a, const T2& b) const { return a == b; } };
@@ -208,6 +190,9 @@ template <class Fn> struct bind_result_of<unspecified_result, Fn>
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct binder
 {
+  template <class Ret1, class Fn1, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
+  friend struct binder;
+
   typedef typename detail::make_tuple_mapper<T1, T2, T3, T4, T5, T6, T7, T8, T9>::type binded_arguments_type;
   typedef typename detail::access_traits<T1>::const_type arg1_type;
   typedef typename detail::access_traits<T2>::const_type arg2_type;
@@ -240,12 +225,12 @@ struct binder
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     template <class Args> result_type eval (Args& args)
     {
-      return bind_call<result_type> (unwrap_function (fn), binded_arguments, args, mpl::integer_constant<binded_arguments_type::size> ());
+      return bind_call<result_type> (unwrap (fn), binded_arguments, args, mpl::integer_constant<binded_arguments_type::size> ());
     }
 
     template <class Args> result_type eval (Args& args) const
     {
-      return bind_call<result_type> (unwrap_function (fn), binded_arguments, args, mpl::integer_constant<binded_arguments_type::size> ());
+      return bind_call<result_type> (unwrap (fn), binded_arguments, args, mpl::integer_constant<binded_arguments_type::size> ());
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -368,7 +353,7 @@ struct binder
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вызовы
+///Генерация новых bind-выражений на основе отношения между двумя существующими
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     template <class A> binder<bool, bind_equals, binder, A> operator == (A arg) const
     {
@@ -400,7 +385,16 @@ struct binder
       return binder<bool, bind_not_less, binder, A> (bind_not_less (), *this, arg);
     }
 
-  private:    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка равенства двух bind-выражений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class Ret1, class Fn1, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
+    bool equal (const binder<Ret1, Fn1, A1, A2, A3, A4, A5, A6, A7, A8, A9>& f) const
+    {
+      return fn == f.fn && binded_arguments == f.binded_arguments;
+    }
+
+  private:
     Fn                    fn;
     binded_arguments_type binded_arguments;
 };
@@ -529,6 +523,19 @@ template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5,
 inline detail::binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> bind (Fn fn, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
 {
   return detail::binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> (fn, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+}
+
+/*
+    Проверка равенства bind-выражений
+*/
+
+template <class Ret1, class Fn1, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19,
+          class Ret2, class Fn2, class T21, class T22, class T23, class T24, class T25, class T26, class T27, class T28, class T29>
+inline bool function_equal
+ (const detail::binder<Ret1, Fn1, T11, T12, T13, T14, T15, T16, T17, T18, T19>& f1,
+  const detail::binder<Ret2, Fn2, T21, T22, T23, T24, T25, T26, T27, T28, T29>& f2)
+{
+  return f1.equal (f2);  
 }
 
 /*

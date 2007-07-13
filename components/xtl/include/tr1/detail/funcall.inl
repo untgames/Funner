@@ -54,70 +54,70 @@ template <class Fn> struct funcall_selector<Fn, void, true>;
 template <class Ret, class Fn>
 inline Ret funcall_dispatch (Fn& fn, default_funcall)
 {
-  return fn ();
+  return static_cast<Ret> (fn ());
 }
 
 //перегрузка для функционального объекта с 1-м аргументом
 template <class Ret, class Fn, class T1>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, default_funcall)
 {
-  return fn (arg1);
+  return static_cast<Ret> (fn (arg1));
 }
 
 //перегрузка для функционального объекта с 2-мя аргументами
 template <class Ret, class Fn, class T1, class T2>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, default_funcall)
 {
-  return fn (arg1, arg2);
+  return static_cast<Ret> (fn (arg1, arg2));
 }
 
 //перегрузка для функционального объекта с 3-мя аргументами
 template <class Ret, class Fn, class T1, class T2, class T3>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, default_funcall)
 {
-  return fn (arg1, arg2, arg3);
+  return static_cast<Ret> (fn (arg1, arg2, arg3));
 }
 
 //перегрузка для функционального объекта с 4-мя аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, default_funcall)
 {
-  return fn (arg1, arg2, arg3, arg4);
+  return static_cast<Ret> (fn (arg1, arg2, arg3, arg4));
 }
 
 //перегрузка для функционального объекта с 5-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, default_funcall)
 {
-  return fn (arg1, arg2, arg3, arg4, arg5);
+  return static_cast<Ret> (fn (arg1, arg2, arg3, arg4, arg5));
 }
 
 //перегрузка для функционального объекта с 6-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, default_funcall)
 {
-  return fn (arg1, arg2, arg3, arg4, arg5, arg6);
+  return static_cast<Ret> (fn (arg1, arg2, arg3, arg4, arg5, arg6));
 }
 
 //перегрузка для функционального объекта с 7-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, default_funcall)
 {
-  return fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+  return static_cast<Ret> (fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7));
 }
 
 //перегрузка для функционального объекта с 8-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, default_funcall)
 {
-  return fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+  return static_cast<Ret> (fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
 }
 
 //перегрузка для функционального объекта с 9-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, default_funcall)
 {
-  return fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+  return static_cast<Ret> (fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
 }
 
 /*
@@ -128,117 +128,117 @@ inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5&
 template <class Ret, class Fn, class T1>
 inline Ret funcall_dispatch (Fn& fn, T1& object, memfun_ref_funcall)
 {
-  return (object.*fn)();
+  return static_cast<Ret> ((object.*fn)());
 }
 
 template <class Ret, class Fn, class T1>
 inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, memfun_ptr_funcall)
 {
-  return ((*object_ptr).*fn)();
+  return static_cast<Ret> (((*object_ptr).*fn)());
 }
 
 //перегрузка для указателя на функцию-член класса с 2-мя аргументами
 template <class Ret, class Fn, class T1, class T2>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, memfun_ref_funcall)
 {
-  return (object.*fn)(arg2);
+  return static_cast<Ret> ((object.*fn)(arg2));
 }
 
 template <class Ret, class Fn, class T1, class T2>
 inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, memfun_ptr_funcall)
 {
-  return ((*object_ptr).*fn)(arg2);
+  return static_cast<Ret> (((*object_ptr).*fn)(arg2));
 }
 
 //перегрузка для указателя на функцию-член класса с 3-мя аргументами
 template <class Ret, class Fn, class T1, class T2, class T3>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, memfun_ref_funcall)
 {
-  return (object.*fn)(arg2, arg3);
+  return static_cast<Ret> ((object.*fn)(arg2, arg3));
 }
 
 template <class Ret, class Fn, class T1, class T2, class T3>
 inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, memfun_ptr_funcall)
 {
-  return ((*object_ptr).*fn)(arg2, arg3);
+  return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3));
 }
 
 //перегрузка для указателя на функцию-член класса с 4-мя аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, memfun_ref_funcall)
 {
-  return (object.*fn)(arg2, arg3, arg4);
+  return static_cast<Ret> ((object.*fn)(arg2, arg3, arg4));
 }
 
 template <class Ret, class Fn, class T1, class T2, class T3, class T4>
 inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, memfun_ptr_funcall)
 {
-  return ((*object_ptr).*fn)(arg2, arg3, arg4);
+  return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4));
 }
 
 //перегрузка для указателя на функцию-член класса с 5-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, memfun_ref_funcall)
 {
-  return (object.*fn)(arg2, arg3, arg4, arg5);
+  return static_cast<Ret> ((object.*fn)(arg2, arg3, arg4, arg5));
 }
 
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
 inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, memfun_ptr_funcall)
 {
-  return ((*object_ptr).*fn)(arg2, arg3, arg4, arg5);
+  return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4, arg5));
 }
 
 //перегрузка для указателя на функцию-член класса с 6-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, memfun_ref_funcall)
 {
-  return (object.*fn)(arg2, arg3, arg4, arg5, arg6);
+  return static_cast<Ret> ((object.*fn)(arg2, arg3, arg4, arg5, arg6));
 }
 
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
 inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, memfun_ptr_funcall)
 {
-  return ((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6);
+  return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6));
 }
 
 //перегрузка для указателя на функцию-член класса с 7-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, memfun_ref_funcall)
 {
-  return (object.*fn)(arg2, arg3, arg4, arg5, arg6, arg7);
+  return static_cast<Ret> ((object.*fn)(arg2, arg3, arg4, arg5, arg6, arg7));
 }
 
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, memfun_ptr_funcall)
 {
-  return ((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7);
+  return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7));
 }
 
 //перегрузка для указателя на функцию-член класса с 8-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, memfun_ref_funcall)
 {
-  return (object.*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+  return static_cast<Ret> ((object.*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8));
 }
 
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, memfun_ptr_funcall)
 {
-  return ((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+  return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8));
 }
 
 //перегрузка для указателя на функцию-член класса с 9-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, memfun_ref_funcall)
 {
-  return (object.*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+  return static_cast<Ret> ((object.*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
 }
 
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, memfun_ptr_funcall)
 {
-  return ((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+  return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
 }
 
 /*
@@ -249,117 +249,117 @@ inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg
 template <class Ret, class R, class T, class T1>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, memptr_ref_funcall)
 {
-  return const_cast<T&> (object).*ptr;
+  return static_cast<Ret> (const_cast<T&> (object).*ptr);
 }
 
 template <class Ret, class R, class T, class T1>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, memptr_ptr_funcall)
 {
-  return const_cast<T&> (*object_ptr).*ptr;
+  return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
 //перегрузка для указателя на объект-член класса с 2-мя аргументами
 template <class Ret, class R, class T, class T1, class T2>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, memptr_ref_funcall)
 {
-  return const_cast<T&> (object).*ptr;
+  return static_cast<Ret> (const_cast<T&> (object).*ptr);
 }
 
 template <class Ret, class R, class T, class T1, class T2>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, memptr_ptr_funcall)
 {
-  return const_cast<T&> (*object_ptr).*ptr;
+  return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
 //перегрузка для указателя на объект-член класса с 3-мя аргументами
 template <class Ret, class R, class T, class T1, class T2, class T3>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, memptr_ref_funcall)
 {
-  return const_cast<T&> (object).*ptr;
+  return static_cast<Ret> (const_cast<T&> (object).*ptr);
 }
 
 template <class Ret, class R, class T, class T1, class T2, class T3>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, memptr_ptr_funcall)
 {
-  return const_cast<T&> (*object_ptr).*ptr;
+  return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
 //перегрузка для указателя на объект-член класса с 4-мя аргументами
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, memptr_ref_funcall)
 {
-  return const_cast<T&> (object).*ptr;
+  return static_cast<Ret> (const_cast<T&> (object).*ptr);
 }
 
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, memptr_ptr_funcall)
 {
-  return const_cast<T&> (*object_ptr).*ptr;
+  return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
 //перегрузка для указателя на объект-член класса с 5-ю аргументами
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, memptr_ref_funcall)
 {
-  return const_cast<T&> (object).*ptr;
+  return static_cast<Ret> (const_cast<T&> (object).*ptr);
 }
 
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, memptr_ptr_funcall)
 {
-  return const_cast<T&> (*object_ptr).*ptr;
+  return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
 //перегрузка для указателя на объект-член класса с 6-ю аргументами
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, memptr_ref_funcall)
 {
-  return const_cast<T&> (object).*ptr;
+  return static_cast<Ret> (const_cast<T&> (object).*ptr);
 }
 
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, memptr_ptr_funcall)
 {
-  return const_cast<T&> (*object_ptr).*ptr;
+  return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
 //перегрузка для указателя на объект-член класса с 7-ю аргументами
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, memptr_ref_funcall)
 {
-  return const_cast<T&> (object).*ptr;
+  return static_cast<Ret> (const_cast<T&> (object).*ptr);
 }
 
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, T7&, memptr_ptr_funcall)
 {
-  return const_cast<T&> (*object_ptr).*ptr;
+  return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
 //перегрузка для указателя на объект-член класса с 8-ю аргументами
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, T8&, memptr_ref_funcall)
 {
-  return const_cast<T&> (object).*ptr;
+  return static_cast<Ret> (const_cast<T&> (object).*ptr);
 }
 
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, T7&, T8&, memptr_ptr_funcall)
 {
-  return const_cast<T&> (*object_ptr).*ptr;
+  return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
 //перегрузка для указателя на объект-член класса с 9-ю аргументами
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&, memptr_ref_funcall)
 {
-  return const_cast<T&> (object).*ptr;
+  return static_cast<Ret> (const_cast<T&> (object).*ptr);
 }
 
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&, memptr_ptr_funcall)
 {
-  return const_cast<T&> (*object_ptr).*ptr;
+  return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
 }

@@ -5,8 +5,11 @@
 #ifndef MYTR1_FUNCTIONAL_HEADER
 #define MYTR1_FUNCTIONAL_HEADER
 
+#include <exception>
+#include <new>
 #include <tr1/tuple>
 #include <tr1/funcall.h>
+#include <mpl/type_list.h> //!!реализиовать в function_argument_type
 
 namespace tr1
 {
@@ -20,6 +23,13 @@ template <class Ret, class Fn, class T1=null_type, class T2=null_type, class T3=
 struct binder;
 
 struct unspecified_result;
+
+//implementation forwards
+template <class Ret, class T1=void_argument, class T2=void_argument, class T3=void_argument, class T4=void_argument,
+          class T5=void_argument, class T6=void_argument, class T7=void_argument, class T8=void_argument, class T9=void_argument>
+struct function_invoker;
+
+template <class T> struct function_argument;
 
 }
 
@@ -64,6 +74,140 @@ template <class T> reference_wrapper<const T> cref (reference_wrapper<T>);
 ///Очистка reference_wrapper
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> struct remove_reference_wrapper;
+
+template <class T> T& unwrap (T&);
+template <class T> T& unwrap (const reference_wrapper<T>&);
+template <class T> T& unwrap (reference_wrapper<T>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Исключение, генерируемое при вызове пустой функции обратного вызова
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct bad_function_call: public std::exception
+{
+  const char* what () const throw () { return "bad function call"; }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Функция обратного вызова
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Signature> class function
+{
+  private:
+    struct dummy { void nonnull () {} };    
+    typedef void (dummy::*safe_bool)();
+
+    typedef functional_traits<Signature> traits_type;
+
+    template <size_t I> struct argument
+    {      
+      typedef typename traits_type::template argument<I>::type    base_type;
+      typedef typename detail::function_argument<base_type>::type type;
+    };
+
+    typedef typename argument<1>::type arg1_type;
+    typedef typename argument<2>::type arg2_type;
+    typedef typename argument<3>::type arg3_type;
+    typedef typename argument<4>::type arg4_type;
+    typedef typename argument<5>::type arg5_type;
+    typedef typename argument<6>::type arg6_type;
+    typedef typename argument<7>::type arg7_type;
+    typedef typename argument<8>::type arg8_type;
+    typedef typename argument<9>::type arg9_type;
+    typedef detail::function_invoker<typename traits_type::result_type, arg1_type, arg2_type, arg3_type,
+                                     arg4_type, arg5_type, arg6_type, arg7_type> invoker_type;
+
+  public:
+    typedef typename traits_type::result_type result_type;
+    typedef detail::null_type                 null_type;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+                               function  ();
+                               function  (const function&);
+    template <class Fn>        function  (Fn fn);
+    template <class Signature> function  (const function<Signature>&);
+                               ~function ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+                               function& operator = (const function&);
+    template <class Fn>        function& operator = (Fn);
+    template <class Signature> function& operator = (const function<Signature>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Очистка
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void clear ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Определение типа хранимого функционального объекта и возвращение указателя на него
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const std::type_info& target_type () const;
+
+    template <class T>       T*  target ();
+    template <class T> const T*  target () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка хранит ли функция функциональный объект эквивалентный заданному
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class Fn> bool contains (const Fn&) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка является ли даннаая функция обратного вызова пустой
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool empty () const;
+
+    operator safe_bool () const { return empty () ? 0 : &dummy::nonnull; }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вызов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    result_type operator () () const;
+    result_type operator () (arg1_type) const;
+    result_type operator () (arg1_type, arg2_type) const;
+    result_type operator () (arg1_type, arg2_type, arg3_type) const;
+    result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type) const;
+    result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type, arg5_type) const;
+    result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type, arg5_type, arg6_type) const;
+    result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type, arg5_type, arg6_type, arg7_type) const;
+    result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type, arg5_type, arg6_type, arg7_type, arg8_type) const;
+    result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type, arg5_type, arg6_type, arg7_type, arg8_type, arg9_type) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух функций обратного вызова
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void swap (function&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сравнение
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class Fn> bool operator == (Fn) const;
+    template <class Fn> bool operator != (Fn) const;
+
+    template <class Signature, class Fn> friend bool operator == (Fn, const function<Signature>&);
+    template <class Signature, class Fn> friend bool operator != (Fn, const function<Signature>&);
+
+  private:                        
+    template <class Fn> static invoker_type* create_invoker (Fn&);
+    template <class Fn> static invoker_type* create_invoker (const reference_wrapper<Fn>&);
+    template <class Fn> static invoker_type* create_invoker (Fn&, mpl::true_type);
+    template <class Fn> static invoker_type* create_invoker (Fn&, mpl::false_type);
+                        static invoker_type* create_invoker (null_type);
+
+    template <class Fn> class invoker_impl;
+    class empty_invoker_impl;
+
+  private:
+    invoker_type* invoker;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен содержимого двух функций обратного вызова
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Signature>
+void swap (function<Signature>&, function<Signature>&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подстановщик аргументов функциональных объектов
@@ -159,8 +303,30 @@ detail::binder<detail::unspecified_result, Fn, T1, T2, T3, T4, T5, T6, T7, T8> b
 template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 detail::binder<detail::unspecified_result, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> bind (Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка равенства функциональных объектов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Fn1, class Fn2>
+bool function_equal (const Fn1&, const Fn2&);
+
+template <class Fn1, class Fn2>
+bool function_equal (const reference_wrapper<Fn1>&, const Fn2&);
+
+template <class Fn1, class Fn2>
+bool function_equal (const Fn1&, const reference_wrapper<Fn2>&);
+
+template <class Fn1, class Fn2>
+bool function_equal (const reference_wrapper<Fn1>&, const reference_wrapper<Fn2>&);
+
+template <class Ret1, class Fn1, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19,
+          class Ret2, class Fn2, class T21, class T22, class T23, class T24, class T25, class T26, class T27, class T28, class T29>
+bool function_equal (const detail::binder<Ret1, Fn1, T11, T12, T13, T14, T15, T16, T17, T18, T19>&,
+                     const detail::binder<Ret2, Fn2, T21, T22, T23, T24, T25, T26, T27, T28, T29>&);
+
+
 #include <tr1/detail/fn_utils.inl>
 #include <tr1/detail/bind.inl>
+#include <tr1/detail/function.inl>
 
 }
 

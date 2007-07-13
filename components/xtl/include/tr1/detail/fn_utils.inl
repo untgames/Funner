@@ -155,3 +155,46 @@ template <class T> struct remove_reference_wrapper<reference_wrapper<T> >       
 template <class T> struct remove_reference_wrapper<const reference_wrapper<T> >          { typedef T type; };
 template <class T> struct remove_reference_wrapper<volatile reference_wrapper<T> >       { typedef T type; };
 template <class T> struct remove_reference_wrapper<const volatile reference_wrapper<T> > { typedef T type; };
+
+template <class T> inline T& unwrap (T& r)
+{
+  return r;
+}
+
+template <class T> inline T& unwrap (const reference_wrapper<T>& r)
+{
+  return r.get ();
+}
+
+template <class T> inline T& unwrap (reference_wrapper<T>& r)
+{
+  return r.get ();
+}
+
+/*
+    Проверка равенства функционалов
+*/
+
+template <class Fn1, class Fn2>
+inline bool function_equal (const Fn1& f1, const Fn2& f2)
+{
+  return f1 == f2;
+}
+
+template <class Fn1, class Fn2>
+inline bool function_equal (const reference_wrapper<Fn1>& f1, const Fn2& f2)
+{
+  return function_equal (unwrap (f1), f2);
+}
+
+template <class Fn1, class Fn2>
+inline bool function_equal (const Fn1& f1, const reference_wrapper<Fn2>& f2)
+{
+  return function_equal (f1, unwrap (f2));
+}
+
+template <class Fn1, class Fn2>
+inline bool function_equal (const reference_wrapper<Fn1>& f1, const reference_wrapper<Fn2>& f2)
+{
+  return function_equal (unwrap (f1), unwrap (f2));
+}
