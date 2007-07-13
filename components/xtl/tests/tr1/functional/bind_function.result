@@ -1,0 +1,16 @@
+Results of bind_function_test:
+expression '!fn.contains( bind( f, 1 ) )' is true
+expression '!fn.contains( bind( f, 2 ) )' is true
+expression '!fn.contains( bind( g, 1 ) )' is true
+expression 'fn() == 1' is true
+expression 'fn.contains( bind( f, 1 ) )' is true
+expression '!fn.contains( bind( f, 2 ) )' is true
+expression '!fn.contains( bind( g, 1 ) )' is true
+expression 'fn() == 2' is true
+expression '!fn.contains( bind( f, 1 ) )' is true
+expression 'fn.contains( bind( f, 2 ) )' is true
+expression '!fn.contains( bind( g, 1 ) )' is true
+expression 'fn() == 2' is true
+expression '!fn.contains( bind( f, 1 ) )' is true
+expression '!fn.contains( bind( f, 2 ) )' is true
+expression 'fn.contains( bind( g, 1 ) )' is true

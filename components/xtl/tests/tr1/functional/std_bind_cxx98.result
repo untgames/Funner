@@ -1,0 +1,2 @@
+Results of std_bind_cxx98_test:
+expression 'f (5) == -5' is true

@@ -1,0 +1,124 @@
+Results of function_test:
+expression 'v1.empty()' is true
+expression 'v1 != null' is true
+expression 'global_int == 5' is true
+expression 'v1 == null' is true
+expression '!v1.empty()' is true
+expression 'global_int == 3' is true
+expression 'global_int == 5' is true
+expression 'null == v1' is true
+expression 'null != v1' is true
+expression 'global_int == 5' is true
+expression '!v1.empty()' is true
+expression 'global_int == 3' is true
+expression '!v1.empty()' is true
+expression 'global_int == 5' is true
+expression '!v1.empty()' is true
+expression 'global_int == 3' is true
+expression '!v2? true : false' is true
+expression '!v2.empty()' is true
+expression 'global_int == 3' is true
+expression 'global_int == 5' is true
+expression 'v2.empty()' is true
+expression 'v2? true : false' is true
+expression 'global_int == 5' is true
+expression '!v2.empty()' is true
+expression 'global_int == 3' is true
+expression 'global_int == 5' is true
+expression 'global_int == 3' is true
+expression '!v2.empty()' is true
+expression 'global_int == 5' is true
+expression '!v2.empty()' is true
+expression 'global_int == 3' is true
+expression 'v2.empty()' is true
+expression '!v1.empty()' is true
+expression '!v2.empty()' is true
+expression 'global_int == 3' is true
+expression 'global_int == 3' is true
+expression '!v1.empty()' is true
+expression '!v2.empty()' is true
+expression 'global_int == 5' is true
+expression 'global_int == 5' is true
+expression 'global_int == 5' is true
+expression '!v3? true : false' is true
+expression '!v3.empty()' is true
+expression 'global_int == 3' is true
+expression 'global_int == 5' is true
+expression 'v3.empty()' is true
+expression '!v3.empty()' is true
+expression 'global_int == 5' is true
+expression '!v3.empty()' is true
+expression 'global_int == 3' is true
+expression '!v3.empty()' is true
+expression 'global_int == 5' is true
+expression 'global_int == 5' is true
+expression 'v4.empty()' is true
+expression '!v4.empty()' is true
+expression 'global_int == 3' is true
+expression 'global_int == 5' is true
+expression 'v4.empty()' is true
+expression '!v4.empty()' is true
+expression 'global_int == 5' is true
+expression '!v4.empty()' is true
+expression 'global_int == 3' is true
+expression '!v4.empty()' is true
+expression 'global_int == 5' is true
+expression 'global_int == 5' is true
+expression 'v5.empty()' is true
+expression '!v5.empty()' is true
+expression 'global_int == 3' is true
+expression 'global_int == 5' is true
+expression 'v5.empty()' is true
+expression '!v5.empty()' is true
+expression 'global_int == 5' is true
+expression '!v5.empty()' is true
+expression 'global_int == 3' is true
+expression '!v5.empty()' is true
+expression 'global_int == 5' is true
+expression 'global_int == 5' is true
+expression 'v6.empty()' is true
+expression '!v6.empty()' is true
+expression 'global_int == 3' is true
+expression 'global_int == 5' is true
+expression 'v6.empty()' is true
+expression '!v6.empty()' is true
+expression 'global_int == 5' is true
+expression '!v6.empty()' is true
+expression 'global_int == 3' is true
+expression '!v6.empty()' is true
+expression 'global_int == 5' is true
+expression 'global_int == 2' is true
+expression 'global_int == 2' is true
+expression 'v9 == null' is true
+expression 'null == v9' is true
+expression 'i0() == 5' is true
+expression 'i0() == 3' is true
+expression 'i0() == 5' is true
+expression 'i0() == 3' is true
+expression 'i0? true : false' is true
+expression '!i0? true : false' is true
+expression 'i1() == 5' is true
+expression 'i1() == 3' is true
+expression 'i1() == 5' is true
+expression 'i1() == 3' is true
+expression 'i1? true : false' is true
+expression '!i1? true : false' is true
+expression 'f1(5) == -5' is true
+expression 'id("str") == "str"' is true
+expression 'id2("foo") == "foo"' is true
+expression 'f2(3) == 8' is true
+expression 'cf2(3) == 8' is true
+expression 'cat("str", "ing") == "string"' is true
+expression 'sum(2, 3) == 5' is true
+expression 'f1.empty()' is true
+expression 'f2.empty()' is true
+expression 'f3.empty()' is true
+expression 'f1(&one) == 2' is true
+expression 'f1(&five) == 10' is true
+expression 'f1_2(&one) == 2' is true
+expression 'f1_2(&five) == 10' is true
+expression 'f2(one, 3) == 4' is true
+expression 'f2(five, 4) == 9' is true
+expression 'f(1, 3) == 4' is true
+expression '!f.empty()' is true
+expression '!f.empty()' is true

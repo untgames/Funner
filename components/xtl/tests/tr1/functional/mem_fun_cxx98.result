@@ -1,0 +1,2 @@
+Results of mem_fun_cxx98_test:
+expression 'f(&x, 5) == -5' is true

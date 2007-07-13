@@ -1,0 +1,3 @@
+Results of sum_avg_cxx98_test:
+expression 'avg == 2.5' is true
+expression 'sum == 10' is true
