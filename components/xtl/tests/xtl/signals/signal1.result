@@ -1,0 +1,3 @@
+Results of signal1_test:
+expression 's1(1) == 2' is true
+expression 's1(-1) == 1' is true

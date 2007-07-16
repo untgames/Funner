@@ -7,6 +7,10 @@
 namespace tr1
 {
 
+//implementation forwards
+template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+class tuple;
+
 /*
     Диспетчеризация вызовов функциональных объектов
 */
@@ -51,7 +55,19 @@ typename Ret funcall (Fn&, T1&, T2&, T3&, T4&, T5&, T6&, T7&, T8&);
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 typename Ret funcall (Fn&, T1&, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&);
 
+/*
+    Вызов функтора с аргументами заданными кортежем
+*/
+
+template <class Ret, class Fn, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+Ret apply (Fn&, const tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>&);
+
+template <class Ret, class Fn, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+Ret apply (Fn&, tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>&);
+
+#include <tr1/detail/unwrap.inl>
 #include <tr1/detail/funcall.inl>
+#include <tr1/detail/apply.inl>
 
 }
 

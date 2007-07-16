@@ -6,20 +6,13 @@ namespace detail
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Определение типа аргументов функции
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> struct function_argument                { typedef const T&      type; };
-template <class T> struct function_argument<T&>            { typedef T&            type; };
-template <>        struct function_argument<void_argument> { typedef void_argument type; };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовый класс для функций обратного вызова
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct function_invoker_base
 {
   public:
             function_invoker_base () : ref_count (1) {}
-    virtual ~function_invoker_base () {}  
+    virtual ~function_invoker_base () {}
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -40,82 +33,9 @@ struct function_invoker_base
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const std::type_info& target_type () = 0;
     virtual void*                 target      () = 0;
-  
+
   private:
     size_t ref_count;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Интерфейс обработчиков вызова функторов для разного числа аргументов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//интерфейс обработчика вызова функтора без аргументов
-template <class Ret>
-struct function_invoker<Ret>: public function_invoker_base
-{
-  virtual Ret operator () () = 0;
-};
-
-//интерфейс обработчика вызова функтора с 1-м аргументом
-template <class T, class Ret>
-struct function_invoker<Ret, T>: public function_invoker_base
-{
-  virtual Ret operator () (T) = 0;
-};
-
-//интерфейс обработчика вызова функтора с 2-мя аргументами
-template <class T1, class T2, class Ret>
-struct function_invoker<Ret, T1, T2>: public function_invoker_base
-{
-  virtual Ret operator () (T1, T2) = 0;
-};
-
-//интерфейс обработчика вызова функтора с 3-мя аргументами
-template <class T1, class T2, class T3, class Ret>
-struct function_invoker<Ret, T1, T2, T3>: public function_invoker_base
-{
-  virtual Ret operator () (T1, T2, T3) = 0;
-};
-
-//интерфейс обработчика вызова функтора с 4-мя аргументами
-template <class T1, class T2, class T3, class T4, class Ret>
-struct function_invoker<Ret, T1, T2, T3, T4>: public function_invoker_base
-{
-  virtual Ret operator () (T1, T2, T3, T4) = 0;
-};
-
-//интерфейс обработчика вызова функтора с 5-ю аргументами
-template <class T1, class T2, class T3, class T4, class T5, class Ret>
-struct function_invoker<Ret, T1, T2, T3, T4, T5>: public function_invoker_base
-{
-  virtual Ret operator () (T1, T2, T3, T4, T5) = 0;
-};
-
-//интерфейс обработчика вызова функтора с 6-ю аргументами
-template <class T1, class T2, class T3, class T4, class T5, class T6, class Ret>
-struct function_invoker<Ret, T1, T2, T3, T4, T5, T6>: public function_invoker_base
-{
-  virtual Ret operator () (T1, T2, T3, T4, T5, T6) = 0;
-};
-
-//интерфейс обработчика вызова функтора с 7-ю аргументами
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class Ret>
-struct function_invoker<Ret, T1, T2, T3, T4, T5, T6, T7>: public function_invoker_base
-{
-  virtual Ret operator () (T1, T2, T3, T4, T5, T6, T7) = 0;
-};
-
-//интерфейс обработчика вызова функтора с 8-ю аргументами
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class Ret>
-struct function_invoker<Ret, T1, T2, T3, T4, T5, T6, T7, T8>: public function_invoker_base
-{
-  virtual Ret operator () (T1, T2, T3, T4, T5, T6, T7, T8) = 0;
-};
-
-//интерфейс обработчика вызова функтора с 9-ю аргументами
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class Ret>
-struct function_invoker<Ret, T1, T2, T3, T4, T5, T6, T7, T8, T9>: public function_invoker_base
-{
-  virtual Ret operator () (T1, T2, T3, T4, T5, T6, T7, T8, T9) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -265,77 +185,17 @@ template <class Signature> class function<Signature>::empty_invoker_impl: public
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчик вызовов функтора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Signature> template <class Fn> class function<Signature>::invoker_impl: public invoker_type
+template <class Signature> template <class Fn> class function<Signature>::invoker_impl: public functional_invoker<Fn, invoker_type>
 {
+  typedef functional_invoker<Fn, invoker_type> base;
   public:
-    invoker_impl (Fn& in_fn) : fn (in_fn) { }        
+    invoker_impl (const Fn& fn) : base (fn) {}
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение типа хранимого функционального объекта и указателя на него
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const std::type_info& target_type () { return typeid (fn); }
-    void*                 target      () { return (void*)&fn; }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вызов обработчика для разного набора аргументов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    result_type operator () ()
-    {
-      return funcall<result_type> (unwrap (fn));
-    }
-
-    result_type operator () (arg1_type a1)
-    {
-      return funcall<result_type> (unwrap (fn), a1);
-    }
-
-    result_type operator () (arg1_type a1, arg2_type a2)
-    {
-      return funcall<result_type> (unwrap (fn), a1, a2);
-    }
-
-    result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3)
-    {
-      return funcall<result_type> (unwrap (fn), a1, a2, a3);
-    }
-
-    result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4)
-    {
-      return funcall<result_type> (unwrap (fn), a1, a2, a3, a4);
-    }
-
-    result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5)
-    {
-      return funcall<result_type> (unwrap (fn), a1, a2, a3, a4, a5);
-    }
-
-    result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6)
-    {
-      return funcall<result_type> (unwrap (fn), a1, a2, a3, a4, a5, a6);
-    }
-
-    result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6, arg7_type a7)
-    {
-      return funcall<result_type> (unwrap (fn), a1, a2, a3, a4, a5, a6, a7);
-    }
-
-    result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6, arg7_type a7, arg8_type a8)
-    {
-      return funcall<result_type> (unwrap (fn), a1, a2, a3, a4, a5, a6, a7, a8);
-    }
-
-    result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6, arg7_type a7, arg8_type a8, arg9_type a9)
-    {
-      return funcall<result_type> (unwrap (fn), a1, a2, a3, a4, a5, a6, a7, a8, a9);
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сравнение
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool operator == (Fn& f) const { return fn == f; }
-
-  private:
-    Fn fn;
+    const std::type_info& target_type () { return typeid (Fn); }
+    void*                 target      () { return (void*)&base::function (); }
 };
 
 /*

@@ -372,68 +372,68 @@ inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6
 template <class Ret, class Fn>
 inline Ret funcall (Fn& fn)
 {
-  return detail::funcall_dispatch<Ret> (fn, typename detail::funcall_selector<Fn>::type ());
+  return detail::funcall_dispatch<Ret> (unwrap (fn), typename detail::funcall_selector<Fn>::type ());
 }
 
 //перегрузка для функционального объекта с 1-м аргументом
 template <class Ret, class Fn, class T1>
 inline Ret funcall (Fn& fn, T1& arg1)
 {
-  return detail::funcall_dispatch<Ret> (fn, arg1, typename detail::funcall_selector<Fn, T1>::type ());
+  return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 2-мя аргументами
 template <class Ret, class Fn, class T1, class T2>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2)
 {
-  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, typename detail::funcall_selector<Fn, T1>::type ());
+  return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 3-мя аргументами
 template <class Ret, class Fn, class T1, class T2, class T3>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3)
 {
-  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, typename detail::funcall_selector<Fn, T1>::type ());
+  return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 4-мя аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4)
 {
-  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, typename detail::funcall_selector<Fn, T1>::type ());
+  return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 5-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5)
 {
-  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, arg5, typename detail::funcall_selector<Fn, T1>::type ());
+  return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, arg5, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 6-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6)
 {
-  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, arg5, arg6, typename detail::funcall_selector<Fn, T1>::type ());
+  return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, arg5, arg6, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 7-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7)
 {
-  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, arg5, arg6, arg7, typename detail::funcall_selector<Fn, T1>::type ());
+  return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, arg5, arg6, arg7, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 8-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8)
 {
-  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, typename detail::funcall_selector<Fn, T1>::type ());
+  return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
 //перегрузка для функционального объекта с 9-ю аргументами
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9)
 {
-  return detail::funcall_dispatch<Ret> (fn, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, typename detail::funcall_selector<Fn, T1>::type ());
+  return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, typename detail::funcall_selector<Fn, T1>::type ());
 }

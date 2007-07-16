@@ -1,0 +1,62 @@
+Results of deletion_test:
+Deleting 2
+0 1 2 3 
+expression 'test_output == "0123"' is true
+0 1 3 
+expression 'test_output == "013"' is true
+expression 's0.empty()' is true
+Deleting 3
+0 1 2 3 
+expression 'test_output == "0123"' is true
+0 1 2 
+expression 'test_output == "012"' is true
+expression 's0.num_slots() == 0' is true
+Deleting 0
+0 1 2 3 
+expression 'test_output == "0123"' is true
+1 2 3 
+expression 'test_output == "123"' is true
+Blocking 2
+1 3 
+expression 'test_output == "13"' is true
+Unblocking 2
+1 2 3 
+expression 'test_output == "123"' is true
+expression 's0.empty()' is true
+Mass suicide
+0 1 2 3 
+expression 'test_output == "0123"' is true
+
+expression 'test_output == ""' is true
+1 removes 0
+0 1 2 3 
+expression 'test_output == "0123"' is true
+1 2 3 
+expression 'test_output == "123"' is true
+expression 's0.empty()' is true
+3 removes 2
+0 1 2 3 
+expression 'test_output == "0123"' is true
+0 1 3 
+expression 'test_output == "013"' is true
+0 removes 1
+0 2 3 
+expression 'test_output == "023"' is true
+0 2 3 
+expression 'test_output == "023"' is true
+expression 's0.empty()' is true
+1 removes 3
+0 1 2 
+expression 'test_output == "012"' is true
+0 1 2 
+expression 'test_output == "012"' is true
+0 removes 1, 2 removes 0, 3 removes 2
+0 2 3 
+expression 'test_output == "023"' is true
+3 
+expression 'test_output == "3"' is true
+Deleting 2
+0 1 2 3 
+expression 'test_output == "0123"' is true
+0 1 3 
+expression 'test_output == "013"' is true

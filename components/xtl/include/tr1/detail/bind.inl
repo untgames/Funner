@@ -225,12 +225,12 @@ struct binder
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     template <class Args> result_type eval (Args& args)
     {
-      return bind_call<result_type> (unwrap (fn), binded_arguments, args, mpl::integer_constant<binded_arguments_type::size> ());
+      return bind_call<result_type> (fn, binded_arguments, args, mpl::integer_constant<binded_arguments_type::size> ());
     }
 
     template <class Args> result_type eval (Args& args) const
     {
-      return bind_call<result_type> (unwrap (fn), binded_arguments, args, mpl::integer_constant<binded_arguments_type::size> ());
+      return bind_call<result_type> (fn, binded_arguments, args, mpl::integer_constant<binded_arguments_type::size> ());
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
