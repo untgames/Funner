@@ -2,7 +2,7 @@
 
 using namespace stl;
 using namespace common;
-using namespace design;
+using namespace xtl;
 
 MountPointFileSystem::MountPointFileSystem (MountFileSystem& _owner)
   : owner (_owner)

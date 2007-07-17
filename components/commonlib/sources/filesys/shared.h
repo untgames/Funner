@@ -8,6 +8,7 @@
 #include <stl/hash_set>
 #include <stl/vector>
 #include <stl/list>
+#include <xtl/function.h>
 
 namespace common
 {
@@ -146,12 +147,9 @@ class CustomFileImpl: public FileImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class MemFileImpl: public FileImpl
 {
-  public:
-    typedef CallbackHandler<void*> FreeBufferHandler;
-  
+  public: 
     MemFileImpl  (FileImpl* base_file);
     MemFileImpl  (void* buffer,size_t buffer_size,filemode_t mode);
-    MemFileImpl  (void* buffer,size_t buffer_size,filemode_t mode,const FreeBufferHandler& free_handler);
     ~MemFileImpl ();
 
     size_t      Read   (void* buf,size_t size);
@@ -164,10 +162,10 @@ class MemFileImpl: public FileImpl
     size_t      GetBufferSize () { return finish-start; }
 
   private:
-    FreeBufferHandler free_handler; //функция освобождения файлового буфера
-    char*             start;        //указатель на начало буфера
-    char*             finish;       //указатель на конец буфера
-    char*             pos;          //указатель на текущую позицию внутри буфера
+    bool   is_auto_deleted;  //флаг определяющий нужно ли автоматически удалять буфер при закрытии файла
+    char*  start;        //указатель на начало буфера
+    char*  finish;       //указатель на конец буфера
+    char*  pos;          //указатель на текущую позицию внутри буфера
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -279,9 +277,9 @@ struct SearchPath
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct PackFile
 {
-  size_t                             file_name_hash;   //хэш имени пак-файла
-  size_t                             search_path_hash; //хэш имени пути поиска ассоциированного с пак-файлом
-  design::com_ptr<ICustomFileSystem> file_system;      //интерфейс файловой системы пак-файла
+  size_t                          file_name_hash;   //хэш имени пак-файла
+  size_t                          search_path_hash; //хэш имени пути поиска ассоциированного с пак-файлом
+  xtl::com_ptr<ICustomFileSystem> file_system;      //интерфейс файловой системы пак-файла
   
   PackFile  (size_t file_name_hash,size_t search_path_hash,ICustomFileSystem* file_system);
 };
@@ -325,9 +323,9 @@ struct MountFileSystem
 {
   size_t                          hash;                    //хэш префикса точки монтирования
   stl::string                     prefix;                  //префикс точки монтирования
-  design::com_ptr<ICustomFileSystem> file_system;             //интерфейс файловой системы
-  FileInfo                           mount_point_info;        //информация о точке монтирования
-  MountPointFileSystem               mount_point_file_system; //фиктивная файловая система
+  xtl::com_ptr<ICustomFileSystem> file_system;             //интерфейс файловой системы
+  FileInfo                        mount_point_info;        //информация о точке монтирования
+  MountPointFileSystem            mount_point_file_system; //фиктивная файловая система
 
   MountFileSystem (const char* prefix,size_t hash,ICustomFileSystem* file_system);
   MountFileSystem (const MountFileSystem&);

@@ -3,22 +3,8 @@
 
 using namespace common;
 
-MemFileImpl::MemFileImpl (void* buffer,size_t buffer_size,filemode_t mode,const FreeBufferHandler& _free_handler)
-  : FileImpl (mode|FILE_MODE_SEEK|FILE_MODE_REWIND), free_handler (_free_handler)
-{
-  if (!buffer && buffer_size)
-    RaiseNullArgument ("MemFileImpl::MemFileImpl","buffer");
-
-  if (mode & FILE_MODE_RESIZE)
-    RaiseNotSupported ("MemFileImpl::MemFileImpl","Memory files with FILE_MODE_RESIZE flag not supported");
-
-  start  = (char*)buffer;
-  finish = start + buffer_size;
-  pos    = start;
-}
-
 MemFileImpl::MemFileImpl (void* buffer,size_t buffer_size,filemode_t mode)
-  : FileImpl (mode|FILE_MODE_SEEK|FILE_MODE_REWIND)
+  : FileImpl (mode|FILE_MODE_SEEK|FILE_MODE_REWIND), is_auto_deleted (false)
 {
   if (!buffer && buffer_size)
     RaiseNullArgument ("MemFileImpl::MemFileImpl","buffer");
@@ -32,8 +18,7 @@ MemFileImpl::MemFileImpl (void* buffer,size_t buffer_size,filemode_t mode)
 }
 
 MemFileImpl::MemFileImpl (FileImpl* base_file)
-  : FileImpl (base_file->Mode ()|FILE_MODE_SEEK|FILE_MODE_REWIND),
-    free_handler (::operator delete)
+  : FileImpl (base_file->Mode ()|FILE_MODE_SEEK|FILE_MODE_REWIND), is_auto_deleted (true)    
 {
   if (!base_file)
     RaiseNullArgument ("MemFileImpl::MemFileImpl","base_file");
@@ -66,14 +51,8 @@ MemFileImpl::MemFileImpl (FileImpl* base_file)
 
 MemFileImpl::~MemFileImpl ()
 {
-  try
-  {
-    if (free_handler.valid ())
-      free_handler (start);
-  }
-  catch (...)
-  {
-  }
+  if (is_auto_deleted)
+    ::operator delete (start);
 }
 
 size_t MemFileImpl::Read (void* buf,size_t size)

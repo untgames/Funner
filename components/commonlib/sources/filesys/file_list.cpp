@@ -296,7 +296,7 @@ FileList FileListBuilder::Build (bool need_sort)
     intrusive_ptr<FileListImpl> control
 */
 
-void common::intrusive_ptr_addref (FileListImpl* impl)
+void common::intrusive_ptr_add_ref (FileListImpl* impl)
 {
   impl->AddRef ();
 }

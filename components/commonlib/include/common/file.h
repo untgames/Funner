@@ -2,8 +2,8 @@
 #define __COMMONLIB_FILE_SYSTEM__
 
 #include <time.h>
-#include <design/intrusive_ptr.h>
-#include <common/callback.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/functional_fwd>
 #include <common/exception.h>
 
 namespace common
@@ -16,12 +16,12 @@ class FileListImpl;
 class FileListBuilder;
 
 //intrusive pointers
-typedef design::intrusive_ptr<FileImpl>     FileImplPtr;
-typedef design::intrusive_ptr<FileListImpl> FileListImplPtr;
+typedef xtl::intrusive_ptr<FileImpl>     FileImplPtr;
+typedef xtl::intrusive_ptr<FileListImpl> FileListImplPtr;
 
-void intrusive_ptr_addref  (FileImpl*);
+void intrusive_ptr_add_ref (FileImpl*);
 void intrusive_ptr_release (FileImpl*);
-void intrusive_ptr_addref  (FileListImpl*);
+void intrusive_ptr_add_ref (FileListImpl*);
 void intrusive_ptr_release (FileListImpl*);
 
 /*
@@ -161,7 +161,7 @@ class ICustomFileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск файла (Search возвращает количество найденных файлов)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef CallbackHandler<const char*,const FileInfo&> FileSearchHandler;
+    typedef xtl::function<void (const char* file, const FileInfo& info)> FileSearchHandler;
 
     virtual void Search (const char* wc_mask,const FileSearchHandler& handler) = 0;
 
@@ -417,8 +417,8 @@ class FileList
 class FileSystem
 {
   public:
-    typedef CallbackHandler<const char*>                     LogHandler;
-    typedef CallbackFunction<ICustomFileSystem*,const char*> PackFileCreater;
+    typedef xtl::function<void (const char* message)>            LogHandler;
+    typedef xtl::function<ICustomFileSystem* (const char* path)> PackFileCreater;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего каталога

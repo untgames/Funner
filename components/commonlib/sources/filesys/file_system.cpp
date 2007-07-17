@@ -1,9 +1,11 @@
 #include "shared.h"
 #include <common/hash.h>
 #include <platform/platform.h>
+#include <xtl/bind.h>
 
 using namespace stl;
 using namespace common;
+using namespace xtl;
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' used in base member initializer list
@@ -186,7 +188,7 @@ void FileSystemImpl::RegisterPackFile (const char* extension,const PackFileCreat
   if (!extension)
     RaiseNullArgument ("FileSystem::RegisterPackFile","extension");
 
-  if (!creater.valid ())
+  if (!creater)
     RaiseNullArgument ("FileSystem::RegisterPackFile","creater");
 
   size_t hash = strihash (extension);
@@ -278,7 +280,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
   if (!_path)
     RaiseNullArgument ("FileSystem::AddSearchPath","path");
 
-  if (!log_handler.valid ())
+  if (!log_handler)
     RaiseNullArgument ("FileSystem::AddSearchPath","log_handler");
 
   string path = ConvertFileName (_path), mount_path;
@@ -310,7 +312,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
     for (PackFileTypeList::iterator i=pack_types.begin ();i!=pack_types.end ();++i)
       owner_file_system->Search (format ("%s/*.%s",mount_path.c_str (),i->extension.c_str ()).c_str (),
-                                ICustomFileSystem::FileSearchHandler (list_builder,&FileListBuilder::Insert));
+                                ICustomFileSystem::FileSearchHandler (bind (&FileListBuilder::Insert, list_builder, _1, _2)));
 
     search_paths.push_front (SearchPath (path.c_str (),path_hash));
 

@@ -5,6 +5,7 @@
 #include "shared.h"
 #include <common/exception.h>
 #include <common/strlib.h>
+#include <xtl/function.h>
 
 #ifdef _WIN32
   #include <io.h>

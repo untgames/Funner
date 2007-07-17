@@ -1,9 +1,10 @@
 #include "test.h"
+#include <xtl/function.h>
 
 const char* SEARCH_PATH = "data";
 const char* FILE_NAME   = "test.txt";
 
-inline void PrintLog (const char* message)
+void PrintLog (const char* message)
 {
   printf ("\t%s\n",message);
 }
@@ -16,7 +17,7 @@ int main ()
   
   try
   {
-    FileSystem::AddSearchPath (SEARCH_PATH,PrintLog);
+    FileSystem::AddSearchPath (SEARCH_PATH, &PrintLog);
   
     InputFile file (FILE_NAME);
     

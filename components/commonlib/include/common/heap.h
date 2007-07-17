@@ -2,7 +2,7 @@
 #define __COMMONLIB_HEAP__
 
 #include <new>
-#include <common/callback.h>
+#include <xtl/functional_fwd>
 
 namespace common
 {
@@ -168,18 +168,18 @@ class Heap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка пользовательского обработчика ситуации отстутствия заказываемой памяти
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef CallbackFunction<bool,size_t> FailHandler;
+    typedef xtl::function<bool (size_t need_size)> FailHandler;
 
-    void        SetFailHandler (FailHandler);
-    FailHandler GetFailHandler () const;
+    void               SetFailHandler (const FailHandler&);
+    const FailHandler& GetFailHandler () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка пользовательского отладочного обработчика
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef CallbackHandler<const char*> DebugHandler;
+    typedef xtl::function<void (const char*)> DebugHandler;
 
-    void         SetDebugHandler (DebugHandler);
-    DebugHandler GetDebugHandler () const;
+    void                SetDebugHandler (const DebugHandler&);
+    const DebugHandler& GetDebugHandler () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с контекстами распределения

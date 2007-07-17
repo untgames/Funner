@@ -278,7 +278,7 @@ void FileImpl::Flush ()
     intrusive_ptr<FileImpl> control
 */
 
-void common::intrusive_ptr_addref (FileImpl* impl)
+void common::intrusive_ptr_add_ref (FileImpl* impl)
 {
   impl->AddRef ();
 }

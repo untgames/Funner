@@ -1,3 +1,5 @@
+#include <xtl/function.h>
+
 namespace common
 {
 

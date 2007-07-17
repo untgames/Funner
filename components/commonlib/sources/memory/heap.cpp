@@ -2,6 +2,7 @@
 #include <common/strlib.h>
 #include <platform/platform.h>
 #include <memory.h>
+#include <xtl/function.h>
 
 #include "shared.h"
 
@@ -599,22 +600,22 @@ Heap::~Heap ()
     Установка пользовательских обработчиков событий менеджера памяти
 */
 
-void Heap::SetFailHandler (FailHandler handler)
+void Heap::SetFailHandler (const FailHandler& handler)
 {
   impl->fail_handler = handler;
 }
 
-Heap::FailHandler Heap::GetFailHandler () const
+const Heap::FailHandler& Heap::GetFailHandler () const
 {
   return impl->fail_handler;
 }
 
-void Heap::SetDebugHandler (DebugHandler handler)
+void Heap::SetDebugHandler (const DebugHandler& handler)
 {
   impl->debug_handler = handler;
 }
 
-Heap::DebugHandler Heap::GetDebugHandler () const
+const Heap::DebugHandler& Heap::GetDebugHandler () const
 {
   return impl->debug_handler;
 }
@@ -774,7 +775,7 @@ void* Heap::Allocate (size_t size)
   if (p)
     return p;
     
-  if (!impl->fail_handler.valid ())
+  if (!impl->fail_handler)
     return NULL;
   
   while (!p && impl->fail_handler (size))
@@ -790,7 +791,7 @@ void* Heap::Allocate (size_t size,size_t align,size_t offset)
   if (p)
     return p;
     
-  if (!impl->fail_handler.valid ())
+  if (!impl->fail_handler)
     return NULL;
   
   while (!p && impl->fail_handler (size))

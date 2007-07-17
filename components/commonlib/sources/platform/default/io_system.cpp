@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <common/exception.h>
 #include <common/strlib.h>
+#include <xtl/function.h>
+
 #include "shared.h"
 
 using namespace common;
