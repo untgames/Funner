@@ -1,8 +1,0 @@
-/*
-    TR1 functionals
-*/
-
-#include <tr1/result_of.h>
-#include <tr1/ref.h>
-#include <tr1/function.h>
-#include <tr1/bind.h>

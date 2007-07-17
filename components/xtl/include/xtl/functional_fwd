@@ -1,11 +1,11 @@
 /*
-    TR1 functional fordwards
+    XTL functional fordwards
 */
 
-#ifndef MYTR1_FUNCTIONAL_FWD_HEADER
-#define MYTR1_FUNCTIONAL_FWD_HEADER
+#ifndef XTL_FUNCTIONAL_FWD_HEADER
+#define XTL_FUNCTIONAL_FWD_HEADER
 
-namespace tr1
+namespace xtl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,6 +32,17 @@ template <class Signature> class function;
 ///Сигнал
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Signature, class Accumulator> class signal;
+
+}
+
+namespace tr1
+{
+
+using xtl::result_of;
+using xtl::reference_wrapper;
+using xtl::bad_function_call;
+using xtl::function;
+using xtl::signal;
 
 }
 

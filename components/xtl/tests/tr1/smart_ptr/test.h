@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <tr1/shared_ptr.h>
-#include <tr1/intrusive_ptr.h>
+#include <stl/memory>
+#include <xtl/shared_ptr.h>
+#include <xtl/intrusive_ptr.h>
 
 using namespace tr1;
 

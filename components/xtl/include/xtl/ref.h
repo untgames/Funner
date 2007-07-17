@@ -1,7 +1,7 @@
-#ifndef MYTR1_REFERENCE_WRAPPER_HEADER
-#define MYTR1_REFERENCE_WRAPPER_HEADER
+#ifndef XTL_REFERENCE_WRAPPER_HEADER
+#define XTL_REFERENCE_WRAPPER_HEADER
 
-namespace tr1
+namespace xtl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,8 +45,17 @@ template <class T> T& unwrap (T&);
 template <class T> T& unwrap (const reference_wrapper<T>&);
 template <class T> T& unwrap (reference_wrapper<T>&);
 
-#include <tr1/detail/ref.inl>
-#include <tr1/detail/unwrap.inl>
+#include <xtl/detail/ref.inl>
+#include <xtl/detail/unwrap.inl>
+
+}
+
+namespace tr1
+{
+
+using xtl::reference_wrapper;
+using xtl::ref;
+using xtl::cref;
 
 }
 

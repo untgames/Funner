@@ -22,7 +22,7 @@ template <class T> struct has_nothrow_copy:        public bool_constant<__has_no
 template <class T> struct has_nothrow_assign:      public bool_constant<__has_nothrow_assign (T)> {};
 template <class T> struct has_virtual_destructor:  public bool_constant<__has_virtual_destructor (T)> {};
 
-#define MYTR1_HAS_TYPE_TRAITS_INTRINSICS
+#define XTL_HAS_TYPE_TRAITS_INTRINSICS
 
 #else
 

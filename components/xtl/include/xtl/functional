@@ -1,0 +1,8 @@
+/*
+    XTL functionals
+*/
+
+#include <xtl/result_of.h>
+#include <xtl/ref.h>
+#include <xtl/function.h>
+#include <xtl/bind.h>

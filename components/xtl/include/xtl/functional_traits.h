@@ -2,12 +2,12 @@
     Этот код был сгенерирован автоматически. Не исправляйте его вручную
 */
 
-#ifndef MYTR1_FUNCTIONAL_TRAITS_HEADER
-#define MYTR1_FUNCTIONAL_TRAITS_HEADER
+#ifndef XTL_FUNCTIONAL_TRAITS_HEADER
+#define XTL_FUNCTIONAL_TRAITS_HEADER
 
 #include <cstddef>
 
-namespace tr1
+namespace xtl
 {
 
 //forward declarations
@@ -1221,4 +1221,4 @@ using detail::functional_traits;
 
 }
 
-#endif //MYTR1_FUNCTIONAL_TRAITS_HEADER
+#endif //XTL_FUNCTIONAL_TRAITS_HEADER

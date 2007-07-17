@@ -1,14 +1,14 @@
-#ifndef MYTR1_FUNCTION_HEADER
-#define MYTR1_FUNCTION_HEADER
+#ifndef XTL_FUNCTION_HEADER
+#define XTL_FUNCTION_HEADER
 
 #include <exception>
 #include <new>
 #include <typeinfo>
-#include <tr1/invoker.h>
-#include <tr1/function_equal.h>
-#include <tr1/utility>
+#include <xtl/invoker.h>
+#include <xtl/function_equal.h>
+#include <xtl/utility>
 
-namespace tr1
+namespace xtl
 {
 
 namespace detail
@@ -24,7 +24,7 @@ struct function_invoker_base;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct bad_function_call: public std::exception
 {
-  const char* what () const throw () { return "bad function call"; }
+  const char* what () const throw () { return "xtl::bad_function_call"; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,17 @@ template <class Signature> class function
 template <class Signature>
 void swap (function<Signature>&, function<Signature>&);
 
-#include <tr1/detail/function.inl>
+#include <xtl/detail/function.inl>
+
+}
+
+namespace tr1
+{
+
+using xtl::bad_function_call;
+using xtl::function;
+using xtl::swap;
+using xtl::null;
 
 }
 

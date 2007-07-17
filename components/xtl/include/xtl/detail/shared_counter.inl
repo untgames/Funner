@@ -30,12 +30,12 @@ class shared_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void add_ref_copy ()
     {
-      MYTR1_INTERLOCKED_INCREMENT (&use_counter);
+      XTL_INTERLOCKED_INCREMENT (&use_counter);
     }
     
     void release ()
     {
-      if (MYTR1_INTERLOCKED_DECREMENT (&use_counter) == 0)
+      if (XTL_INTERLOCKED_DECREMENT (&use_counter) == 0)
       {
         dispose      ();
         weak_release ();
@@ -51,7 +51,7 @@ class shared_counter
         if (tmp == 0)
           return false;
 
-        if (MYTR1_INTERLOCKED_COMPARE_EXCHANGE (&use_counter, tmp + 1, tmp) == tmp)
+        if (XTL_INTERLOCKED_COMPARE_EXCHANGE (&use_counter, tmp + 1, tmp) == tmp)
           return true;
       }
     }
@@ -61,12 +61,12 @@ class shared_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     void weak_add_ref ()
     {
-      MYTR1_INTERLOCKED_INCREMENT (&weak_counter);
+      XTL_INTERLOCKED_INCREMENT (&weak_counter);
     }
 
     void weak_release ()
     {
-      if (MYTR1_INTERLOCKED_DECREMENT (&weak_counter) == 0)
+      if (XTL_INTERLOCKED_DECREMENT (&weak_counter) == 0)
         destroy ();
     }
 

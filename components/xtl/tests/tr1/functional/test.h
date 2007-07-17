@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <tr1/memory>
-#include <tr1/functional>
-#include <tr1/type_traits>
+#include <xtl/memory>
+#include <xtl/functional>
+#include <xtl/type_traits>
 
 using namespace tr1;
 

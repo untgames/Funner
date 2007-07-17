@@ -2,12 +2,12 @@
     Cписки типов и их обработка (основано на коде билиотеки Loki)
 */
 
-#ifndef MPL_TYPE_LIST_HEADER
-#define MPL_TYPE_LIST_HEADER
+#ifndef XTL_TYPE_LIST_HEADER
+#define XTL_TYPE_LIST_HEADER
 
 #include <tr1/utility>
 
-namespace tr1
+namespace xtl
 {
 
 namespace mpl
@@ -74,7 +74,7 @@ struct generate_hierarchy;
 template <class TypeNode,template <class Base,class T> class Unit,class Root=null_type>
 struct generate_linear_hierarchy;
 
-#include <mpl/detail/typelist.inl>
+#include <xtl/detail/typelist.inl>
 
 }
 

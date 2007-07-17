@@ -2,10 +2,10 @@
     Утилиты
 */
 
-#ifndef MYTR1_UTILITY_HEADER
-#define MYTR1_UTILITY_HEADER
+#ifndef XTL_UTILITY_HEADER
+#define XTL_UTILITY_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 
 namespace stl
 {
@@ -14,7 +14,7 @@ template <class T1, class T2> struct pair;
 
 }
 
-namespace tr1
+namespace xtl
 {
 
 /*
@@ -38,8 +38,8 @@ template <class T, T v> struct integral_constant
 };
 
 //вспомогательные классы для наиболее распространённых целочисленных костант
-template <bool value> struct bool_constant:    public integral_constant<bool, value> {};
-template <int value>  struct int_constant: public integral_constant<int, value> {};
+template <bool value> struct bool_constant: public integral_constant<bool, value> {};
+template <int value>  struct int_constant:  public integral_constant<int, value> {};
 
 typedef bool_constant<true>  true_type;
 typedef bool_constant<false> false_type;
@@ -79,8 +79,20 @@ typename tuple_element<I, stl::pair<T1, T2> >::type& get (stl::pair<T1, T2>&);
 template <size_t I, class T1, class T2>
 const typename tuple_element<I, stl::pair<T1, T2> >::type& get (const stl::pair<T1, T2>&);
 
-#include <tr1/detail/utility.inl>
-#include <tr1/detail/pair_tuple.inl>
+#include <xtl/detail/utility.inl>
+#include <xtl/detail/pair_tuple.inl>
+
+}
+
+namespace tr1
+{
+
+using xtl::integral_constant;
+using xtl::true_type;
+using xtl::false_type;
+using xtl::tuple_size;
+using xtl::tuple_element;
+using xtl::get;
 
 }
 

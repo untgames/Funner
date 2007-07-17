@@ -1,11 +1,11 @@
-#ifndef MYTR1_BIND_HEADER
-#define MYTR1_BIND_HEADER
+#ifndef XTL_BIND_HEADER
+#define XTL_BIND_HEADER
 
-#include <tr1/tuple>
-#include <tr1/funcall.h>
-#include <tr1/result_of.h>
+#include <xtl/tuple>
+#include <xtl/funcall.h>
+#include <xtl/result_of.h>
 
-namespace tr1
+namespace xtl
 {
 
 namespace detail
@@ -38,11 +38,6 @@ static argument<7> _7;
 static argument<8> _8;
 static argument<9> _9;
 
-}
-
-namespace
-{
-  using namespace placeholders;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +117,30 @@ template <class Ret1, class Fn1, class T11, class T12, class T13, class T14, cla
 bool function_equal (const detail::binder<Ret1, Fn1, T11, T12, T13, T14, T15, T16, T17, T18, T19>&,
                      const detail::binder<Ret2, Fn2, T21, T22, T23, T24, T25, T26, T27, T28, T29>&);
 
-#include <tr1/detail/bind.inl>
+#include <xtl/detail/bind.inl>
+
+}
+
+namespace tr1
+{
+
+using xtl::bind;
+using xtl::is_placeholder;
+using xtl::is_bind_expression;
+
+namespace placeholders
+{
+
+using namespace xtl::placeholders;
+
+}
+
+}
+
+namespace
+{
+
+using namespace xtl::placeholders;
 
 }
 

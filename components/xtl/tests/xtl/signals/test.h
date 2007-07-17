@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <tr1/signal.h>
-#include <tr1/functional>
+#include <xtl/signal.h>
+#include <xtl/functional>
 
-using namespace tr1;
+using namespace xtl;
 
 #define TEST(X) printf ((X)?"expression '%s' is true\n":"failed expression '%s'\n",#X);

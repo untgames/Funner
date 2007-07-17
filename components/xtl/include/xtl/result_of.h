@@ -1,9 +1,9 @@
-#ifndef MYTR1_RESULT_OF_HEADER
-#define MYTR1_RESULT_OF_HEADER
+#ifndef XTL_RESULT_OF_HEADER
+#define XTL_RESULT_OF_HEADER
 
-#include <tr1/functional_traits.h>
+#include <xtl/functional_traits.h>
 
-namespace tr1
+namespace xtl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,7 +11,14 @@ namespace tr1
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class FunctionCallType> struct result_of;
 
-#include <tr1/detail/result_of.inl>
+#include <xtl/detail/result_of.inl>
+
+}
+
+namespace tr1
+{
+
+using xtl::result_of;
 
 }
 

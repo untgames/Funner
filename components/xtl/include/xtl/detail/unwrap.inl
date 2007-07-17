@@ -1,5 +1,5 @@
-#ifndef MYTR1_UNWRAP_HEADER
-#define MYTR1_UNWRAP_HEADER
+#ifndef XTL_UNWRAP_HEADER
+#define XTL_UNWRAP_HEADER
 
 //forward declaration
 template <class T> class reference_wrapper;

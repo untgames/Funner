@@ -1,8 +1,8 @@
-#ifndef MYTR1_SIGNAL_HEADER
-#define MYTR1_SIGNAL_HEADER
+#ifndef XTL_SIGNAL_HEADER
+#define XTL_SIGNAL_HEADER
 
-#include <tr1/tuple>
-#include <tr1/function.h>
+#include <xtl/tuple>
+#include <xtl/function.h>
 
 namespace stl
 {
@@ -11,7 +11,7 @@ struct bidirectional_iterator_tag;
 
 }
 
-namespace tr1
+namespace xtl
 {
 
 namespace detail
@@ -189,7 +189,7 @@ class signal
 template <class Signature, class Accumulator1, class Accumulator2>
 void swap (signal<Signature, Accumulator1>&, signal<Signature, Accumulator2>&);
 
-#include <tr1/detail/signal.inl>
+#include <xtl/detail/signal.inl>
 
 }
 

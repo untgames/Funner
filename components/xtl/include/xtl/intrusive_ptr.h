@@ -1,9 +1,9 @@
-#ifndef MYTR1_INTRUSIVE_POINTER_HEADER
-#define MYTR1_INTRUSIVE_POINTER_HEADER
+#ifndef XTL_INTRUSIVE_POINTER_HEADER
+#define XTL_INTRUSIVE_POINTER_HEADER
 
 #include <cstddef>
 
-namespace tr1
+namespace xtl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ template <class T> class com_ptr: public intrusive_ptr<T, com_intrusive_strategy
 template <class T>
 void swap (com_ptr<T>&, com_ptr<T>&);
 
-#include <tr1/detail/intrusive_ptr.inl>
+#include <xtl/detail/intrusive_ptr.inl>
 
 }
 

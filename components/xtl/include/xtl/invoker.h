@@ -1,9 +1,9 @@
-#ifndef MYTR1_INVOKER_HEADER
-#define MYTR1_INVOKER_HEADER
+#ifndef XTL_INVOKER_HEADER
+#define XTL_INVOKER_HEADER
 
-#include <tr1/funcall.h>
+#include <xtl/funcall.h>
 
-namespace tr1
+namespace xtl
 {
 
 //implementation forwards
@@ -60,7 +60,7 @@ class functional_invoker: public Base
     Fn fn;
 };
 
-#include <tr1/detail/invoker.inl>
+#include <xtl/detail/invoker.inl>
 
 }
 

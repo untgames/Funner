@@ -1,10 +1,10 @@
-#ifndef MYTR1_FUNCALL_HEADER
-#define MYTR1_FUNCALL_HEADER
+#ifndef XTL_FUNCALL_HEADER
+#define XTL_FUNCALL_HEADER
 
-#include <tr1/functional_traits.h>
-#include <tr1/utility>
+#include <xtl/functional_traits.h>
+#include <xtl/utility>
 
-namespace tr1
+namespace xtl
 {
 
 //implementation forwards
@@ -65,9 +65,16 @@ Ret apply (Fn&, const tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>&);
 template <class Ret, class Fn, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 Ret apply (Fn&, tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>&);
 
-#include <tr1/detail/unwrap.inl>
-#include <tr1/detail/funcall.inl>
-#include <tr1/detail/apply.inl>
+#include <xtl/detail/unwrap.inl>
+#include <xtl/detail/funcall.inl>
+#include <xtl/detail/apply.inl>
+
+}
+
+namespace tr1
+{
+
+using xtl::tuple;
 
 }
 

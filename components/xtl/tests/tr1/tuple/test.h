@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <tr1/tuple>
-#include <tr1/type_traits>
-#include <tr1/functional>
+#include <xtl/tuple>
+#include <xtl/type_traits>
+#include <xtl/functional>
 
 using namespace tr1;
 

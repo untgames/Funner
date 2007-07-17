@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <typeinfo>
-#include <tr1/type_traits>
+#include <xtl/type_traits>
 
 using namespace tr1;
 

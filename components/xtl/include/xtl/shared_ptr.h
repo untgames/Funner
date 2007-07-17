@@ -1,13 +1,13 @@
 /*
-    TR1 smart pointers
+    XTL smart pointers
 */
 
-#ifndef MYTR1_MEMORY_HEADER
-#define MYTR1_MEMORY_HEADER
+#ifndef XTL_MEMORY_HEADER
+#define XTL_MEMORY_HEADER
 
 #include <exception>
 #include <typeinfo>
-#include <tr1/interlocked.h>
+#include <xtl/interlocked.h>
 
 namespace stl
 {
@@ -18,7 +18,7 @@ template <class T> class auto_ptr;
 }
 
 
-namespace tr1
+namespace xtl
 {
 
 //implementation forwards
@@ -139,7 +139,7 @@ template <class T> class shared_ptr
 class bad_weak_ptr: public std::exception
 {
   public:
-    const char* what () const throw () { return "tr1::bad_weak_ptr"; }
+    const char* what () const throw () { return "xtl::bad_weak_ptr"; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,9 +248,24 @@ template <class Deleter, class T> Deleter* get_deleter (const shared_ptr<T>&);
 template <class T>                T*       get_pointer (T*);
 template <class T>                T*       get_pointer (const shared_ptr<T>&);
 
-#include <tr1/detail/shared_counter.inl>
-#include <tr1/detail/shared_ptr.inl>
-#include <tr1/detail/weak_ptr.inl>
+#include <xtl/detail/shared_counter.inl>
+#include <xtl/detail/shared_ptr.inl>
+#include <xtl/detail/weak_ptr.inl>
+
+}
+
+namespace tr1
+{
+
+using xtl::shared_ptr;
+using xtl::weak_ptr;
+using xtl::bad_weak_ptr;
+using xtl::enable_shared_from_this;
+using xtl::static_pointer_cast;
+using xtl::dynamic_pointer_cast;
+using xtl::const_pointer_cast;
+using xtl::get_deleter;
+using xtl::swap;
 
 }
 

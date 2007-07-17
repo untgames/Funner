@@ -16,7 +16,7 @@ int main ()
   CHECK_INTEGRAL_CONSTANT (is_class<f1>::value, false);
   CHECK_INTEGRAL_CONSTANT (is_class<enum_UDT>::value, false);
 
-#ifdef MYTR1_HAS_TYPE_TRAITS_INTRINSICS
+#ifdef XTL_HAS_TYPE_TRAITS_INTRINSICS
   CHECK_INTEGRAL_CONSTANT (is_class<union_UDT>::value, false);
   CHECK_INTEGRAL_CONSTANT (is_class<POD_union_UDT>::value, false);
   CHECK_INTEGRAL_CONSTANT (is_class<empty_union_UDT>::value, false);

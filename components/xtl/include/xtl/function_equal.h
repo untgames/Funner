@@ -1,7 +1,7 @@
-#ifndef MYTR1_FUNCTION_EQUAL_HEADER
-#define MYTR1_FUNCTION_EQUAL_HEADER
+#ifndef XTL_FUNCTION_EQUAL_HEADER
+#define XTL_FUNCTION_EQUAL_HEADER
 
-namespace tr1
+namespace xtl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,8 +10,8 @@ namespace tr1
 template <class Fn1, class Fn2>
 bool function_equal (const Fn1&, const Fn2&);
 
-#include <tr1/detail/unwrap.inl>
-#include <tr1/detail/function_equal.inl>
+#include <xtl/detail/unwrap.inl>
+#include <xtl/detail/function_equal.inl>
 
 }
 

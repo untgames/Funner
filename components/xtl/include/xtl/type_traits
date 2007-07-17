@@ -1,15 +1,18 @@
 /*
-    TR1 type traits
+    XTL type traits
 */
 
-#ifndef MYTR1_TYPE_TRAITS_HEADER
-#define MYTR1_TYPE_TRAITS_HEADER
+#ifndef XTL_TYPE_TRAITS_HEADER
+#define XTL_TYPE_TRAITS_HEADER
 
 #include <cstddef>
-#include <tr1/functional_traits.h>
-#include <tr1/utility.h>
+#include <xtl/functional_traits.h>
+#include <xtl/utility>
 
-namespace tr1
+namespace xtl
+{
+
+namespace type_traits
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,19 +104,28 @@ template <class T> struct add_pointer;     //добавление указателя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <size_t Len, size_t Align=-1> struct aligned_storage;
 
-#include <tr1/detail/type_traits/intrinsics.inl>
-#include <tr1/detail/type_traits/basic.inl>
-#include <tr1/detail/type_traits/refptr.inl>
+#include <xtl/detail/type_traits/intrinsics.inl>
+#include <xtl/detail/type_traits/basic.inl>
+#include <xtl/detail/type_traits/refptr.inl>
 
 #ifndef _MSC_VER
-  #include <tr1/detail/type_traits/hard_properties.inl>
+  #include <xtl/detail/type_traits/hard_properties.inl>
 #else
-  #include <tr1/detail/type_traits/hard_properties_msvc.inl>
+  #include <xtl/detail/type_traits/hard_properties_msvc.inl>
 #endif
 
-#include <tr1/detail/type_traits/relations.inl>
-#include <tr1/detail/type_traits/alignment_of.inl>
-#include <tr1/detail/type_traits/aligned_storage.inl>
+#include <xtl/detail/type_traits/relations.inl>
+#include <xtl/detail/type_traits/alignment_of.inl>
+#include <xtl/detail/type_traits/aligned_storage.inl>
+
+}
+
+}
+
+namespace tr1
+{
+
+using namespace xtl::type_traits;
 
 }
 

@@ -1,5 +1,5 @@
-#ifndef MYTR1_TYPE_TRAITS_REFPTR_HEADER
-#define MYTR1_TYPE_TRAITS_REFPTR_HEADER
+#ifndef XTL_TYPE_TRAITS_REFPTR_HEADER
+#define XTL_TYPE_TRAITS_REFPTR_HEADER
 
 /*
     ѕреобразование указателей и ссылок
