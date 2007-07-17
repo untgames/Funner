@@ -2,7 +2,7 @@
 #include <common/exception.h>
 #include <common/file.h>
 #include <media/image.h>
-#include <tr1/functional>
+#include <xtl/functional>
 
 using namespace medialib;
 using namespace common;

@@ -7,6 +7,7 @@
 #include <stl/hash_map>
 #include <stl/memory>
 #include <media/font.h>
+#include <xtl/function.h>
 
 namespace medialib
 {

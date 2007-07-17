@@ -1,12 +1,12 @@
-#ifndef __SOUNDLIB_SHARED__
-#define __SOUNDLIB_SHARED__
+#ifndef SOUNDLIB_SHARED_HEADER
+#define SOUNDLIB_SHARED_HEADER
 
 #include <common/exception.h>
 #include <common/singleton.h>
 #include <stl/string>
 #include <stl/hash_set>
 #include <stl/hash_map>
-#include <tr1/functional>
+#include <xtl/function.h>
 #include <media/sound.h>
 
 namespace medialib

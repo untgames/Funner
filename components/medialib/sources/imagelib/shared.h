@@ -1,12 +1,12 @@
-#ifndef __IMAGELIB_SHARED__
-#define __IMAGELIB_SHARED__
+#ifndef IMAGELIB_SHARED_HEADER
+#define IMAGELIB_SHARED_HEADER
 
 #include <common/exception.h>
 #include <common/singleton.h>
 #include <stl/string>
 #include <stl/hash_set>
 #include <stl/hash_map>
-#include <tr1/functional>
+#include <xtl/function.h>
 #include <media/image.h>
 
 using medialib::ImagePixelFormat;

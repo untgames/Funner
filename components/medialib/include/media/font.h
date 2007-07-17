@@ -1,8 +1,8 @@
 #ifndef MEDIALIB_FONT_HEADER
 #define MEDIALIB_FONT_HEADER
 
-#include <tr1/memory>
-#include <tr1/functional_fwd>
+#include <xtl/shared_ptr.h>
+#include <xtl/functional_fwd>
 
 namespace medialib
 {
@@ -86,7 +86,7 @@ class FontFace
   private:
     FontFace (FontFaceImpl*);
 
-    tr1::shared_ptr<FontFaceImpl> impl;
+    xtl::shared_ptr<FontFaceImpl> impl;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ class FontSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация пользовательских функций загрузки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef tr1::function<FontFace* (const char* file_name)> CodecLoadFunc;
+    typedef xtl::function<FontFace* (const char* file_name)> CodecLoadFunc;
 
     static bool RegisterCodec       (const char* extension, const CodecLoadFunc& loader);  //возвращает true при успешной регистрации, и false, если такое расширение уже зарегестрировано
     static void UnregisterCodec     (const char* extension);
