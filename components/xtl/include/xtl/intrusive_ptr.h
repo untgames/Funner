@@ -20,7 +20,7 @@ template <class T> struct default_intrusive_strategy
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> struct com_intrusive_strategy
 {
-  static T*   clone   (T* ptr) { ptr->Addref (); return ptr; }
+  static T*   clone   (T* ptr) { ptr->AddRef (); return ptr; }
   static void release (T* ptr) { ptr->Release (); }
 };
 
