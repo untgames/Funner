@@ -31,9 +31,10 @@ EMPTY                                   :=
 SPACE                                   := $(EMPTY) $(EMPTY)
 
 ###################################################################################################
-#Если не указан список обрабатываемых файлов - обрабатываем все доступные файлы (для тестирования)
+#Если не указан фильтры - обрабатываем все доступные
 ###################################################################################################
 files ?= %
+targets ?= %
 
 ###################################################################################################
 #Цель сборки "по умолчанию"
@@ -316,8 +317,8 @@ force:
 .PHONY: build rebuild clean fullyclean run test check help create_dirs force
 
 #Обработка целей компонента
-$(foreach target,$(TARGETS),$(eval $(call test_target_type,$(target))))
-$(foreach target,$(TARGETS),$(eval $(call process_target.$(strip $($(target).TYPE)),$(target))))
+$(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call test_target_type,$(target))))
+$(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call process_target.$(strip $($(target).TYPE)),$(target))))
 
 #Создание каталогов
 create_dirs: $(DIRS)
