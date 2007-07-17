@@ -6,8 +6,6 @@
 
 using namespace stl;
 
-detail::null_type null; //!!!!
-
 int global_int;
 
 struct write_five_obj { void operator()() const { global_int = 5; } };

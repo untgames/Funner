@@ -21,7 +21,7 @@ int main()
     }
     else printf ("f has no target, so it is unsafe to call\n");
     
-    f = detail::null_type ();
+    f = null;
     f = &mul_ints;
     
     TEST (f (5, 3) == 15);

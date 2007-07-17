@@ -1,0 +1,142 @@
+Results of intrusive_ptr_test:
+expression 'px.get() == 0' is true
+expression 'px.get() == 0' is true
+expression 'px.get() == 0' is true
+expression 'p->use_count() == 0' is true
+expression 'px.get() == p' is true
+expression 'px->use_count() == 1' is true
+expression 'p->use_count() == 0' is true
+expression 'p->use_count() == 1' is true
+expression 'px.get() == p' is true
+expression 'px->use_count() == 1' is true
+expression 'px2.get() == px.get()' is true
+expression 'px.get() == py.get()' is true
+expression 'px2.get() == px.get()' is true
+expression 'px.get() == py.get()' is true
+expression 'px2.get() == px.get()' is true
+expression 'px.get() == py.get()' is true
+expression 'px2.get() == px.get()' is true
+expression 'px.get() == py.get()' is true
+expression 'px->use_count() == 1' is true
+expression 'px->use_count() == 2' is true
+expression 'px->use_count() == 1' is true
+expression 'px? false: true' is true
+expression '!px' is true
+expression 'get_pointer(px) == px.get()' is true
+expression 'px? false: true' is true
+expression '!px' is true
+expression 'get_pointer(px) == px.get()' is true
+expression 'px? true: false' is true
+expression '!!px' is true
+expression '&*px == px.get()' is true
+expression 'px.operator ->() == px.get()' is true
+expression 'get_pointer(px) == px.get()' is true
+expression 'px.get() == 0' is true
+expression 'px2.get() == 0' is true
+expression 'px.get() == 0' is true
+expression 'px2.get() == 0' is true
+expression 'px.get() == p' is true
+expression 'px->use_count() == 2' is true
+expression 'px2.get() == 0' is true
+expression 'px3.get() == p' is true
+expression 'px3->use_count() == 2' is true
+expression 'px.get() == 0' is true
+expression 'px2.get() == p' is true
+expression 'px2->use_count() == 2' is true
+expression 'px3.get() == p' is true
+expression 'px3->use_count() == 2' is true
+expression 'px.get() == p2' is true
+expression 'px->use_count() == 2' is true
+expression 'px2.get() == p1' is true
+expression 'px2->use_count() == 1' is true
+expression 'px3.get() == p2' is true
+expression 'px3->use_count() == 2' is true
+expression 'px.get() == p1' is true
+expression 'px->use_count() == 1' is true
+expression 'px2.get() == p2' is true
+expression 'px2->use_count() == 2' is true
+expression 'px3.get() == p2' is true
+expression 'px3->use_count() == 2' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '(p == q) == (p.get() == q.get())' is true
+expression '(p.get() == q) == (p.get() == q.get())' is true
+expression '(p == q.get()) == (p.get() == q.get())' is true
+expression '(p != q) == (p.get() != q.get())' is true
+expression '(p.get() != q) == (p.get() != q.get())' is true
+expression '(p != q.get()) == (p.get() != q.get())' is true
+expression '(p < q) == less(p.get(), q.get())' is true
+expression '!p->next->next' is true
+expression '!p->next' is true

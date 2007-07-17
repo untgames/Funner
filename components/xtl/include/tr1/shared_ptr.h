@@ -8,7 +8,15 @@
 #include <exception>
 #include <typeinfo>
 #include <tr1/interlocked.h>
-#include <stl/auto_ptr.h> //сделать forward!!!!!
+
+namespace stl
+{
+
+//implementation forwards
+template <class T> class auto_ptr;
+
+}
+
 
 namespace tr1
 {
