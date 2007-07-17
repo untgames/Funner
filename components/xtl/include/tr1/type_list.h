@@ -5,7 +5,10 @@
 #ifndef MPL_TYPE_LIST_HEADER
 #define MPL_TYPE_LIST_HEADER
 
-#include <stddef.h>
+#include <tr1/utility>
+
+namespace tr1
+{
 
 namespace mpl
 {
@@ -20,9 +23,6 @@ struct type_node
   typedef Tail                 tail_type; //тип хвостового списка
   typedef type_node<Head,Tail> type;      //тип результирующего списка (необходим для однородности обработки)
 };
-
-//терминальный тип, используемый для индикации завершения списка
-struct null_type {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рекурсивное определение списка типов
@@ -75,6 +75,8 @@ template <class TypeNode,template <class Base,class T> class Unit,class Root=nul
 struct generate_linear_hierarchy;
 
 #include <mpl/detail/typelist.inl>
+
+}
 
 }
 

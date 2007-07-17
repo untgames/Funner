@@ -26,8 +26,8 @@ template <class T> class tuple_element_holder
   T value;
   public:
     tuple_element_holder () : value () {}
-    tuple_element_holder (const null_type&) : value () {}
-    tuple_element_holder (null_type&) : value () {}
+    tuple_element_holder (const mpl::null_type&) : value () {}
+    tuple_element_holder (mpl::null_type&) : value () {}
     tuple_element_holder (const tuple_element_holder& h) : value (h.value) {}
 
     template <class T1>
@@ -75,7 +75,7 @@ class cons: private tuple_element_holder<Head>, public Tail
 
     template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
     cons (T0& t0, T1& t1, T2& t2, T3& t3, T4& t4, T5& t5, T6& t6, T7& t7, T8& t8, T9& t9) :
-      holder_type (t0), tail_type (t1, t2, t3, t4, t5, t6, t7, t8, t9, null_type ()) {}
+      holder_type (t0), tail_type (t1, t2, t3, t4, t5, t6, t7, t8, t9, mpl::null_type ()) {}
 
     template <class Head1, class Tail1> cons (const cons<Head1, Tail1>& t) :
       holder_type (t.get_head ()), tail_type (t.get_tail ()) {}
@@ -105,7 +105,7 @@ class cons: private tuple_element_holder<Head>, public Tail
     void assign (T0& t0, T1& t1, T2& t2, T3& t3, T4& t4, T5& t5, T6& t6, T7& t7, T8& t8, T9& t9)
     {
       holder_type::operator = (t0);
-      tail_type::assign (t1, t2, t3, t4, t5, t6, t7, t8, t9, null_type ());
+      tail_type::assign (t1, t2, t3, t4, t5, t6, t7, t8, t9, mpl::null_type ());
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,16 +157,16 @@ class cons: private tuple_element_holder<Head>, public Tail
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Специализация последнего элемента cons-списка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <> struct cons<null_type, null_type>
+template <> struct cons<mpl::null_type, mpl::null_type>
 {
   enum { tuple_size = 0 };
   
   cons () {}
-  cons (const null_type&, const null_type&, const null_type&, const null_type&, const null_type&, 
-                const null_type&, const null_type&, const null_type&, const null_type&, const null_type&) {}                
+  cons (const mpl::null_type&, const mpl::null_type&, const mpl::null_type&, const mpl::null_type&, const mpl::null_type&, 
+        const mpl::null_type&, const mpl::null_type&, const mpl::null_type&, const mpl::null_type&, const mpl::null_type&) {}                
 
-  void assign (const null_type&, const null_type&, const null_type&, const null_type&, const null_type&, 
-               const null_type&, const null_type&, const null_type&, const null_type&, const null_type&) {}
+  void assign (const mpl::null_type&, const mpl::null_type&, const mpl::null_type&, const mpl::null_type&, const mpl::null_type&, 
+               const mpl::null_type&, const mpl::null_type&, const mpl::null_type&, const mpl::null_type&, const mpl::null_type&) {}
 
   bool operator == (const cons&) const { return true;  }
   bool operator != (const cons&) const { return false; }
@@ -182,13 +182,13 @@ template <> struct cons<null_type, null_type>
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct tuple_generator
 {
-  typedef cons<T0, typename tuple_generator<T1, T2, T3, T4, T5, T6, T7, T8, T9, null_type>::type> type;
+  typedef cons<T0, typename tuple_generator<T1, T2, T3, T4, T5, T6, T7, T8, T9, mpl::null_type>::type> type;
 };
 
-template <> struct tuple_generator<null_type, null_type, null_type, null_type, null_type,
-                                   null_type, null_type, null_type, null_type, null_type>
+template <> struct tuple_generator<mpl::null_type, mpl::null_type, mpl::null_type, mpl::null_type, mpl::null_type,
+                                   mpl::null_type, mpl::null_type, mpl::null_type, mpl::null_type, mpl::null_type>
 {
-  typedef cons<null_type, null_type> type;
+  typedef cons<mpl::null_type, mpl::null_type> type;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,24 +221,24 @@ struct tuple_element_selector<0, cons<Head, Tail> >
 
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple (param0_type p0)
-  : base (p0, detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (),
-              detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type ())
+  : base (p0, mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (),
+              mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type ())
   { }
 
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple (param0_type p0, param1_type p1)
-  : base (p0, p1, detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (),
-              detail::null_type (), detail::null_type (), detail::null_type ())
+  : base (p0, p1, mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (),
+                  mpl::null_type (), mpl::null_type (), mpl::null_type ())
   { }
 
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple (param0_type p0, param1_type p1, param2_type p2)
-  : base (p0, p1, p2, detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type ())
+  : base (p0, p1, p2, mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type ())
   { }
 
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple (param0_type p0, param1_type p1, param2_type p2, param3_type p3)
-  : base (p0, p1, p2, p3, detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type ())
+  : base (p0, p1, p2, p3, mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type ())
   { }
   
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -248,7 +248,7 @@ inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple
   param2_type p2, 
   param3_type p3, 
   param4_type p4) 
-    : base (p0, p1, p2, p3, p4, detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type ())
+    : base (p0, p1, p2, p3, p4, mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type ())
   { }
   
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -259,7 +259,7 @@ inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple
   param3_type p3, 
   param4_type p4, 
   param5_type p5)
-    : base (p0, p1, p2, p3, p4, p5, detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type ())
+    : base (p0, p1, p2, p3, p4, p5, mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type ())
   { }
 
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -271,7 +271,7 @@ inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple
   param4_type p4, 
   param5_type p5, 
   param6_type p6)
-    : base (p0, p1, p2, p3, p4, p5, p6, detail::null_type (), detail::null_type (), detail::null_type ())
+    : base (p0, p1, p2, p3, p4, p5, p6, mpl::null_type (), mpl::null_type (), mpl::null_type ())
   { }
   
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -284,7 +284,7 @@ inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple
   param5_type p5, 
   param6_type p6, 
   param7_type p7)
-    : base (p0, p1, p2, p3, p4, p5, p6, p7, detail::null_type (), detail::null_type ())
+    : base (p0, p1, p2, p3, p4, p5, p6, p7, mpl::null_type (), mpl::null_type ())
   { }
   
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -298,7 +298,7 @@ inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple
   param6_type p6, 
   param7_type p7, 
   param8_type p8)
-    : base (p0, p1, p2, p3, p4, p5, p6, p7, p8, detail::null_type ())
+    : base (p0, p1, p2, p3, p4, p5, p6, p7, p8, mpl::null_type ())
   { }
   
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -325,8 +325,8 @@ inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple (const tuple<A0, A1,
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 template <class A1, class A2>
 inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::tuple (const stl::pair<A1, A2>& p)
-  : base (p.first, p.second, detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (),
-          detail::null_type (), detail::null_type (), detail::null_type ())
+  : base (p.first, p.second, mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (),
+          mpl::null_type (), mpl::null_type (), mpl::null_type ())
   { }
 
 /*
@@ -348,7 +348,7 @@ template <class A1, class A2>
 inline tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>& tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::operator =
  (const stl::pair<A1, A2>& t)
 {
-  base::assign (t.first, t.second, detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type (), detail::null_type ());
+  base::assign (t.first, t.second, mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type (), mpl::null_type ());
 
   return *this;
 }

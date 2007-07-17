@@ -22,7 +22,7 @@ template <class T> T* addressof (T& object)
 
 template <class T>
 inline reference_wrapper<T>::reference_wrapper (T& ref)
-  : ptr (addressof (ref))
+  : ptr (detail::addressof (ref))
   { }
 
 template <class T>

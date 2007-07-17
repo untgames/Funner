@@ -74,25 +74,25 @@ inline bool function_not_equals (Fn& a, const function<Signature>& b)
 }
 
 template <class Signature>
-inline bool function_equals (const function<Signature>& f, null_type)
+inline bool function_equals (const function<Signature>& f, null_ptr_type)
 {
   return f.empty ();
 }
 
 template <class Signature>
-inline bool function_equals (null_type, const function<Signature>& f)
+inline bool function_equals (null_ptr_type, const function<Signature>& f)
 {
   return f.empty ();
 }
 
 template <class Signature>
-inline bool function_not_equals (const function<Signature>& f, null_type)
+inline bool function_not_equals (const function<Signature>& f, null_ptr_type)
 {
   return !f.empty ();
 }
 
 template <class Signature>
-inline bool function_not_equals (null_type, const function<Signature>& f)
+inline bool function_not_equals (null_ptr_type, const function<Signature>& f)
 {
   return !f.empty ();
 }
@@ -108,7 +108,7 @@ template <class Signature> class function<Signature>::empty_invoker_impl: public
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение типа хранимого функционального объекта и указателя на него
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const std::type_info& target_type () { return typeid (null_type); }
+    const std::type_info& target_type () { return typeid (null_ptr_type); }
     void*                 target      () { return &null; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,9 +177,6 @@ template <class Signature> class function<Signature>::empty_invoker_impl: public
 
   private:
     empty_invoker_impl () {}
-    
-  private:
-    null_type null;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +205,7 @@ template <class Signature> template <class Fn> class function<Signature>::invoke
 
 template <class Signature>
 inline function<Signature>::function ()
-  : invoker (create_invoker (null_type ()))
+  : invoker (create_invoker (null_ptr_type ()))
   { }
 
 template <class Signature>
@@ -225,7 +222,7 @@ inline function<Signature>::function (Fn f)
 
 template <class Signature> template <class Signature1>
 inline function<Signature>::function (const function<Signature1>& f)
-  : invoker (f ? create_invoker (f) : create_invoker (null_type ()))
+  : invoker (f ? create_invoker (f) : create_invoker (null_ptr_type ()))
   { }
 
 template <class Signature>
@@ -281,7 +278,7 @@ inline typename function<Signature>::invoker_type* function<Signature>::create_i
 {
   typedef functional_traits<Fn> fn_traits_type;
 
-  return create_invoker (f, mpl::bool_constant<fn_traits_type::is_memfun || fn_traits_type::is_ptrfun> ());
+  return create_invoker (f, bool_constant<fn_traits_type::is_memfun || fn_traits_type::is_ptrfun> ());
 }
 
 template <class Signature> template <class Fn>
@@ -289,23 +286,23 @@ inline typename function<Signature>::invoker_type* function<Signature>::create_i
 {
   typedef functional_traits<Fn> fn_traits_type;
 
-  return create_invoker (f, mpl::bool_constant<fn_traits_type::is_memfun || fn_traits_type::is_ptrfun> ());
+  return create_invoker (f, bool_constant<fn_traits_type::is_memfun || fn_traits_type::is_ptrfun> ());
 }
 
 template <class Signature> template <class Fn>
-inline typename function<Signature>::invoker_type* function<Signature>::create_invoker (Fn& f, mpl::true_type)
+inline typename function<Signature>::invoker_type* function<Signature>::create_invoker (Fn& f, true_type)
 {
-  return unwrap (f) != 0 ? create_invoker (f, mpl::false_type ()) : create_invoker (null_type ());
+  return unwrap (f) != 0 ? create_invoker (f, false_type ()) : create_invoker (null_ptr_type ());
 }
 
 template <class Signature> template <class Fn>
-inline typename function<Signature>::invoker_type* function<Signature>::create_invoker (Fn& f, mpl::false_type)
+inline typename function<Signature>::invoker_type* function<Signature>::create_invoker (Fn& f, false_type)
 {
   return new invoker_impl<Fn> (f);
 }
 
 template <class Signature>
-inline typename function<Signature>::invoker_type* function<Signature>::create_invoker (null_type)
+inline typename function<Signature>::invoker_type* function<Signature>::create_invoker (null_ptr_type)
 {
   invoker_type* invoker = empty_invoker_impl::instance_ptr ();
 

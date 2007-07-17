@@ -6,7 +6,7 @@
 #include <typeinfo>
 #include <tr1/invoker.h>
 #include <tr1/function_equal.h>
-#include <tr1/tuple> ///nul_type only!!!!!!!
+#include <tr1/utility>
 
 namespace tr1
 {
@@ -46,7 +46,6 @@ template <class Signature> class function
     typedef typename invoker_type::arg8_type   arg8_type;
     typedef typename invoker_type::arg9_type   arg9_type;
     typedef typename invoker_type::result_type result_type;
-    typedef detail::null_type                  null_type; //!!!!!!!!!
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
@@ -120,9 +119,9 @@ template <class Signature> class function
   private:                        
     template <class Fn> static invoker_type* create_invoker (Fn&);
     template <class Fn> static invoker_type* create_invoker (const reference_wrapper<Fn>&);
-    template <class Fn> static invoker_type* create_invoker (Fn&, mpl::true_type);
-    template <class Fn> static invoker_type* create_invoker (Fn&, mpl::false_type);
-                        static invoker_type* create_invoker (null_type);
+    template <class Fn> static invoker_type* create_invoker (Fn&, true_type);
+    template <class Fn> static invoker_type* create_invoker (Fn&, false_type);
+                        static invoker_type* create_invoker (null_ptr_type);
 
     template <class Fn> class invoker_impl;
     class empty_invoker_impl;

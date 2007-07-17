@@ -7,18 +7,10 @@
 
 #include <cstddef>
 #include <tr1/functional_traits.h>
-#include <mpl/utility.h>
+#include <tr1/utility.h>
 
 namespace tr1
 {
-
-using mpl::yes_type;
-using mpl::no_type;
-using mpl::integral_constant;
-using mpl::bool_constant;
-using mpl::integer_constant;
-using mpl::true_type;
-using mpl::false_type;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка принадлежности типа к базовым категориям типов

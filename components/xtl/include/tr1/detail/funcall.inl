@@ -31,7 +31,7 @@ typedef funcall_tag<4> memptr_ref_funcall;  //arg1.*f
 template <class Fn, class T=void, bool is_memfunc_ptr=functional_traits<Fn>::is_memfun> struct funcall_selector
 {
   typedef typename functional_traits<Fn>::object_type object_type;
-  typedef typename mpl::select<light_is_convertible<T, object_type>::value, memfun_ref_funcall, memfun_ptr_funcall>::type type;
+  typedef typename select<light_is_convertible<T, object_type>::value, memfun_ref_funcall, memfun_ptr_funcall>::type type;
 };
 
 template <class Fn, class T> struct funcall_selector<Fn, T, false>
@@ -41,7 +41,7 @@ template <class Fn, class T> struct funcall_selector<Fn, T, false>
 
 template <class Ret, class T1, class T2> struct funcall_selector<Ret T1::*, T2, false>
 {
-  typedef typename mpl::select<light_is_convertible<T2, T1>::value, memptr_ref_funcall, memptr_ptr_funcall>::type type;
+  typedef typename select<light_is_convertible<T2, T1>::value, memptr_ref_funcall, memptr_ptr_funcall>::type type;
 };
 
 template <class Fn> struct funcall_selector<Fn, void, true>;

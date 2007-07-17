@@ -65,26 +65,26 @@ template <class T> inline const T& wrap_result (const T& r)
 ///Вызовы bind
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Ret, class Fn, class BindedArgs, class Args>
-inline Ret bind_call (Fn& fn, BindedArgs&, Args&, mpl::integer_constant<0>)
+inline Ret bind_call (Fn& fn, BindedArgs&, Args&, int_constant<0>)
 {
   return funcall<Ret> (fn);
 }
 
 template <class Ret, class Fn, class BindedArgs, class Args>
-inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_constant<1>)
+inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, int_constant<1>)
 {
   return funcall<Ret> (fn, wrap_result (eval_argument (get<0> (binded_args), args)));
 }
 
 template <class Ret, class Fn, class BindedArgs, class Args>
-inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_constant<2>)
+inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, int_constant<2>)
 {
   return funcall<Ret> (fn, wrap_result (eval_argument (get<0> (binded_args), args)),
                            wrap_result (eval_argument (get<1> (binded_args), args)));
 }
 
 template <class Ret, class Fn, class BindedArgs, class Args>
-inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_constant<3>)
+inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, int_constant<3>)
 {
   return funcall<Ret> (fn, wrap_result (eval_argument (get<0> (binded_args), args)),
                            wrap_result (eval_argument (get<1> (binded_args), args)),
@@ -92,7 +92,7 @@ inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_
 }
 
 template <class Ret, class Fn, class BindedArgs, class Args>
-inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_constant<4>)
+inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, int_constant<4>)
 {
   return funcall<Ret> (fn, wrap_result (eval_argument (get<0> (binded_args), args)),
                            wrap_result (eval_argument (get<1> (binded_args), args)),
@@ -101,7 +101,7 @@ inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_
 }
 
 template <class Ret, class Fn, class BindedArgs, class Args>
-inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_constant<5>)
+inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, int_constant<5>)
 {
   return funcall<Ret> (fn, wrap_result (eval_argument (get<0> (binded_args), args)),
                            wrap_result (eval_argument (get<1> (binded_args), args)),
@@ -111,7 +111,7 @@ inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_
 }
 
 template <class Ret, class Fn, class BindedArgs, class Args>
-inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_constant<6>)
+inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, int_constant<6>)
 {
   return funcall<Ret> (fn, wrap_result (eval_argument (get<0> (binded_args), args)),
                            wrap_result (eval_argument (get<1> (binded_args), args)),
@@ -122,7 +122,7 @@ inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_
 }
 
 template <class Ret, class Fn, class BindedArgs, class Args>
-inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_constant<7>)
+inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, int_constant<7>)
 {
   return funcall<Ret> (fn, wrap_result (eval_argument (get<0> (binded_args), args)),
                            wrap_result (eval_argument (get<1> (binded_args), args)),
@@ -134,7 +134,7 @@ inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_
 }
 
 template <class Ret, class Fn, class BindedArgs, class Args>
-inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_constant<8>)
+inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, int_constant<8>)
 {
   return funcall<Ret> (fn, wrap_result (eval_argument (get<0> (binded_args), args)),
                            wrap_result (eval_argument (get<1> (binded_args), args)),
@@ -147,7 +147,7 @@ inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_
 }
 
 template <class Ret, class Fn, class BindedArgs, class Args>
-inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, mpl::integer_constant<9>)
+inline Ret bind_call (Fn& fn, BindedArgs& binded_args, Args& args, int_constant<9>)
 {
   return funcall<Ret> (fn, wrap_result (eval_argument (get<0> (binded_args), args)),
                            wrap_result (eval_argument (get<1> (binded_args), args)),
@@ -225,12 +225,12 @@ struct binder
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     template <class Args> result_type eval (Args& args)
     {
-      return bind_call<result_type> (fn, binded_arguments, args, mpl::integer_constant<binded_arguments_type::size> ());
+      return bind_call<result_type> (fn, binded_arguments, args, int_constant<binded_arguments_type::size> ());
     }
 
     template <class Args> result_type eval (Args& args) const
     {
-      return bind_call<result_type> (fn, binded_arguments, args, mpl::integer_constant<binded_arguments_type::size> ());
+      return bind_call<result_type> (fn, binded_arguments, args, int_constant<binded_arguments_type::size> ());
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -543,10 +543,10 @@ inline bool function_equal
 */
 
 //является ли тип подстановщиком аргементов функционального объекта
-template <class T>  struct is_placeholder: public mpl::false_type {};
-template <size_t I> struct is_placeholder<placeholders::argument<I> >: public mpl::true_type {};
+template <class T>  struct is_placeholder: public false_type {};
+template <size_t I> struct is_placeholder<placeholders::argument<I> >: public true_type {};
 
 //является ли тип выражением, полученным после вызова bind
-template <class T> struct is_bind_expression: public mpl::false_type {};
+template <class T> struct is_bind_expression: public false_type {};
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-struct is_bind_expression<detail::binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> >: public mpl::true_type {};
+struct is_bind_expression<detail::binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> >: public true_type {};

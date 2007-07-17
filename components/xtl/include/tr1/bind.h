@@ -12,8 +12,8 @@ namespace detail
 {
 
 //implementation forwards
-template <class Ret, class Fn, class T1=null_type, class T2=null_type, class T3=null_type, class T4=null_type,
-          class T5=null_type, class T6=null_type, class T7=null_type, class T8=null_type, class T9=null_type>
+template <class Ret, class Fn, class T1=mpl::null_type, class T2=mpl::null_type, class T3=mpl::null_type, class T4=mpl::null_type,
+          class T5=mpl::null_type, class T6=mpl::null_type, class T7=mpl::null_type, class T8=mpl::null_type, class T9=mpl::null_type>
 struct binder;
 
 struct unspecified_result;

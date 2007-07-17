@@ -5,7 +5,7 @@
 #ifndef MYTR1_TUPLE_HEADER
 #define MYTR1_TUPLE_HEADER
 
-#include <stddef.h>
+#include <tr1/utility>
 
 //implementation forwards
 namespace stl { template <class T1, class T2> struct pair; }
@@ -27,15 +27,13 @@ template <class T> struct access_traits;
 
 template <size_t Index, class Cons> struct tuple_element_selector;
 
-struct null_type {};
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Кортеж
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T0=detail::null_type, class T1=detail::null_type, class T2=detail::null_type, class T3=detail::null_type, class T4=detail::null_type,
-          class T5=detail::null_type, class T6=detail::null_type, class T7=detail::null_type, class T8=detail::null_type, class T9=detail::null_type>
+template <class T0=mpl::null_type, class T1=mpl::null_type, class T2=mpl::null_type, class T3=mpl::null_type, class T4=mpl::null_type,
+          class T5=mpl::null_type, class T6=mpl::null_type, class T7=mpl::null_type, class T8=mpl::null_type, class T9=mpl::null_type>
 class tuple: private detail::tuple_generator<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::type
 {
   template <class A0, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
@@ -148,8 +146,8 @@ namespace detail
 {
 
 //implementation forwards
-template <class T0=detail::null_type, class T1=detail::null_type, class T2=detail::null_type, class T3=detail::null_type, class T4=detail::null_type,
-          class T5=detail::null_type, class T6=detail::null_type, class T7=detail::null_type, class T8=detail::null_type, class T9=detail::null_type>
+template <class T0=mpl::null_type, class T1=mpl::null_type, class T2=mpl::null_type, class T3=mpl::null_type, class T4=mpl::null_type,
+          class T5=mpl::null_type, class T6=mpl::null_type, class T7=mpl::null_type, class T8=mpl::null_type, class T9=mpl::null_type>
 struct make_tuple_mapper;
 
 }

@@ -7,6 +7,9 @@
 
 #include <cstddef>
 
+namespace tr1
+{
+
 //forward declarations
 namespace mpl
 {
@@ -16,9 +19,6 @@ template <class TypeList, size_t Index> struct at;
                                         struct null_type;
 
 }
-
-namespace tr1
-{
 
 namespace detail
 {

@@ -18,7 +18,7 @@ template <class T> struct struct_aligner
 template <bool found, size_t alignment, class T> struct type_aligner
 {
   enum { value = alignment == alignment_of<T>::value };
-  typedef typename mpl::select<value, T, char>::type type;
+  typedef typename select<value, T, char>::type type;
 };
 
 template <size_t alignment, class T> struct type_aligner<true, alignment, T>
@@ -112,12 +112,12 @@ template <size_t TAlign, size_t Align> struct is_aligned
 template <size_t alignment> class type_with_alignment
 { 
   typedef lower_alignment<alignment> t1;
-  typedef typename mpl::select<is_aligned<alignment_of<t1>::value, alignment>::value, t1, max_align>::type align_t;
+  typedef typename select<is_aligned<alignment_of<t1>::value, alignment>::value, t1, max_align>::type align_t;
   
   enum {
     result_alignment = alignment_of<align_t>::value,
-    ct_check1        = mpl::compile_time_assert<result_alignment >= alignment>::value,
-    ct_check2        = mpl::compile_time_assert<result_alignment % alignment == 0>::value
+    ct_check1        = compile_time_assert<result_alignment >= alignment>::value,
+    ct_check2        = compile_time_assert<result_alignment % alignment == 0>::value
   };
 
   public:

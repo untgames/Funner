@@ -2,7 +2,7 @@
 #define MYTR1_FUNCALL_HEADER
 
 #include <tr1/functional_traits.h>
-#include <mpl/utility.h>
+#include <tr1/utility>
 
 namespace tr1
 {
