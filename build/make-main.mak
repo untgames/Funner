@@ -62,10 +62,10 @@ endef
 
 ###################################################################################################
 #Компиляция исходников (список исходников, список подключаемых каталогов, каталог с объектными файлами,
-#список дефайнов, флаги компиляции)
+#список дефайнов, флаги компиляции, pch файл)
 ###################################################################################################
 define tools.msvc.compile
-cl /nologo /c /EHsc /W3 /wd4996 /Fo"$3\\" $(patsubst %,/I"%",$2) $5 $(patsubst %,/D%,$4) $1
+cl /nologo /c /EHsc /W3 /wd4996 /Fo"$3\\" $(patsubst %,/I"%",$2) $5 $(patsubst %,/D%,$4) $1 $(if $6,/FI"$6" /Yc"$6" /Fp"$3\\")
 endef
 
 ###################################################################################################
@@ -92,7 +92,7 @@ define batch-compile
   
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
 			@echo build-start > $$@.incomplete-build
-			@$$(call tools.msvc.compile,$$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES)),$$($1.INCLUDE_DIRS) $$($2.SOURCE_DIR),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
+			@$$(call tools.msvc.compile,$$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES)),$$($1.INCLUDE_DIRS) $$($2.SOURCE_DIR),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -101,7 +101,7 @@ define batch-compile
     $$($2.FLAG_FILE): $2.UPDATED_SOURCE_FILES := $$(shell $$(call test_source_and_object_files,$$($2.SOURCE_FILES),$$($2.TMP_DIR)))
   
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
-			@$$(call tools.msvc.compile,$$(sort $$($2.UPDATED_SOURCE_FILES) $$($2.NEW_SOURCE_FILES)),$$($1.INCLUDE_DIRS) $$($2.SOURCE_DIR),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
+			@$$(call tools.msvc.compile,$$(sort $$($2.UPDATED_SOURCE_FILES) $$($2.NEW_SOURCE_FILES)),$$($1.INCLUDE_DIRS) $$($2.SOURCE_DIR),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -137,7 +137,7 @@ define process_source_dir
   $$(MODULE_NAME).TMP_DIR          := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$1/$$(MODULE_PATH)
   $$(MODULE_NAME).OBJECT_FILES     := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
   $$(MODULE_NAME).NEW_SOURCE_FILES := $$(patsubst ./%,%,$$(strip $$(foreach file,$$($$(MODULE_NAME).SOURCE_FILES),$$(if $$(wildcard $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$(file))))),,$$(file)))))
-  $$(MODULE_NAME).PCH              := $$(wildcard $1/$$(PCH_SHORT_NAME))
+  $$(MODULE_NAME).PCH              := $$(wildcard $2/$(PCH_SHORT_NAME))
   $1.TMP_DIRS                      := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
   $1.OBJECT_FILES                  := $$($1.OBJECT_FILES) $$($$(MODULE_NAME).OBJECT_FILES)
 
@@ -178,7 +178,7 @@ define process_target.static-lib
     $$(error Empty static name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.LIB_FILE  := $(DIST_LIB_DIR)/$$($1.NAME).lib
+  $1.LIB_FILE  := $(DIST_LIB_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,.lib)
   TARGET_FILES := $$(TARGET_FILES) $$($1.LIB_FILE)
   
   build: $$($1.LIB_FILE)
@@ -198,7 +198,7 @@ define process_target.dynamic-lib
     $$(error Empty dynamic library name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME).dll
+  $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,.dll)
   TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE))).lib
 
   build: $$($1.DLL_FILE)  
@@ -220,7 +220,7 @@ define process_target.application
     $$(error Empty application name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.EXE_FILE  := $(DIST_BIN_DIR)/$$($1.NAME).exe
+  $1.EXE_FILE  := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,.exe)
   TARGET_FILES := $$(TARGET_FILES) $$($1.EXE_FILE)
 
   build: $$($1.EXE_FILE)
