@@ -46,13 +46,13 @@ float ColladaCamera::MagnitudeY  () const
 
 void ColladaImpl::parse_library_cameras (Parser::Iterator p)
 {
-  if(!p->Present("camera"))
+  if(!test (p, "camera"))
   {
     log->Error(p, "Uncorrect 'library_cameras' tag. Must be at least one 'camera' sub-tag");
     return;
   }
-  for (Parser::NamesakeIterator i = p->First("camera"); i; i++)
-    parse_camera (i);
+  
+  for_each_child (p, "camera", bind (&ColladaImpl::parse_camera, this, _1));  
 }
 
 void ColladaImpl::parse_camera (Parser::Iterator p)
@@ -61,13 +61,13 @@ void ColladaImpl::parse_camera (Parser::Iterator p)
 
   if (i)
   {
-    if(!i->Present("technique_common"))
+    if(!test (i, "technique_common"))
     {
       log->Error (i, "Not detected child 'technique_common'.");
       return;
     }
     cameras.resize(cameras.size() + 1);
-    p->Read ("id", cameras.back().id, "No id");
+    read (p, "id", cameras.back().id, "No id");
     cameras.back().line = p->LineNumber();
     parse_technique_common (i->First("technique_common"), &cameras.back());
 
@@ -83,12 +83,12 @@ void ColladaImpl::parse_camera (Parser::Iterator p)
 
 void ColladaImpl::parse_technique_common (Parser::Iterator p, ColladaCameraImpl *destination)
 {
-  if(p->Present("perspective"))
+  if(test (p, "perspective"))
   {
     p = p->First("perspective");
     destination->type = COLLADA_CAMERA_PERSPECTIVE;
   }
-  else if (p->Present("orthographic")) 
+  else if (test (p, "orthographic")) 
   {
     p = p->First("orthographic");
     destination->type = COLLADA_CAMERA_ORTHOGRAPHIC;
@@ -101,19 +101,18 @@ void ColladaImpl::parse_technique_common (Parser::Iterator p, ColladaCameraImpl 
 
   destination->x = destination->y = destination->aspect_ratio = destination->znear = destination->zfar = 0.f;
 
-  if (p->Present("xfov"))  
-    p->First("xfov")->Read ("#text", destination->x, 1.0f);
-  else if (p->Present("xmag"))
-    p->First("xmag")->Read ("#text", destination->x, 1.0f);
-  if (p->Present("yfov"))  
-    p->First("yfov")->Read ("#text", destination->y, 1.0f);
-  else if (p->Present("ymag"))
-    p->First("ymag")->Read ("#text", destination->y, 1.0f);
-  if (p->Present("aspect_ratio"))  
-    p->First("aspect_ratio")->Read ("#text", destination->aspect_ratio, 1.333f);
-  if (p->Present("znear"))  
-    p->First("znear")->Read ("#text", destination->znear, 0.1f);
-  if (p->Present("zfar"))  
-    p->First("zfar")->Read ("#text", destination->zfar, 1000.f);
+  if (test (p, "xfov"))  
+    read (p, "xfov.#text", destination->x, 1.0f);
+  else if (test (p,"xmag"))
+    read (p, "xmag.#text", destination->x, 1.0f);
+  if (test (p, "yfov"))  
+    read (p, "yfov.#text", destination->y, 1.0f);
+  else if (test (p, "ymag"))
+    read (p, "ymag.#text", destination->y, 1.0f);
+  if (test (p, "aspect_ratio"))  
+    read (p, "aspect_ratio.#text", destination->aspect_ratio, 1.333f);
+  if (test (p, "znear"))  
+    read (p, "znear.#text", destination->znear, 0.1f);
+  if (test (p, "zfar"))  
+    read (p, "zfar.#text", destination->zfar, 1000.f);
 }
-

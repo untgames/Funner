@@ -162,7 +162,7 @@ float ColladaEffect::Shininess () const
 
 void ColladaImpl::parse_library_effects (Parser::Iterator p)
 {
-  if (!p->Present("effect"))
+  if (!test (p, "effect"))
   {
     log->Error (p,"Uncorrect 'library_effects' tag. Must be at least one 'effect' sub-tag");
     return;
@@ -174,7 +174,7 @@ void ColladaImpl::parse_library_effects (Parser::Iterator p)
 
 void ColladaImpl::parse_library_images (Parser::Iterator p)
 {
-  if (!p->Present("image"))
+  if (!test (p, "image"))
   {
     log->Error (p,"Uncorrect 'library_images' tag. Must be at least one 'image' sub-tag");
     return;
@@ -195,7 +195,7 @@ void ColladaImpl::parse_effect (Parser::Iterator p)
 
   new_effect->line = p->LineNumber ();
   
-  p->Read ("id",new_effect->id,"No id");
+  read (p, "id",new_effect->id,"No id");
   
   for (Parser::NamesakeIterator i=p->First ("image");i;++i)
   {
@@ -211,7 +211,7 @@ void ColladaImpl::parse_profile_COMMON (Parser::Iterator p, ColladaEffectImpl *d
   if (!p)
     return;
 
-  if (!p->Present ("technique"))
+  if (!test (p, "technique"))
   {
     log->Error (p,"Uncorrect 'profile_COMMON' tag. Must be at least one 'technique' sub-tag");
     return;
@@ -223,7 +223,7 @@ void ColladaImpl::parse_profile_COMMON (Parser::Iterator p, ColladaEffectImpl *d
   
     //чтение "экстра" параметров
 
-  if (technique->Present("extra.technique.bump.texture"))
+  if (test (technique, "extra.technique.bump.texture"))
     parse_texture (technique->First("extra.technique.bump.texture"), &destination->shader.maps[COLLADA_MAP_BUMP].texture);
 
     //чтение картинок, связанных с данной техникой
@@ -253,7 +253,7 @@ void ColladaImpl::parse_profile_COMMON (Parser::Iterator p, ColladaEffectImpl *d
   size_t       type_index       = 0;
 
   for (;type_index<type_names_count;type_index++)
-    if (technique->Present (type_names [type_index].tag))
+    if (test (technique, type_names [type_index].tag))
     {
       destination->shader_type = type_names [type_index].type;
       technique = technique->First (type_names [type_index].tag);
@@ -268,10 +268,10 @@ void ColladaImpl::parse_profile_COMMON (Parser::Iterator p, ColladaEffectImpl *d
   
     //чтение базовых параметров техники
 
-  technique->Read ("shininess.float.#text",destination->shader.shininess);
-  technique->Read ("reflectivity.float.#text",destination->shader.reflectivity);
-  technique->Read ("transparency.float.#text",destination->shader.transparency);
-  technique->Read ("index_of_refraction.float.#text",destination->shader.index_of_refraction);
+  read (technique, "shininess.float.#text",destination->shader.shininess);
+  read (technique, "reflectivity.float.#text",destination->shader.reflectivity);
+  read (technique, "transparency.float.#text",destination->shader.transparency);
+  read (technique, "index_of_refraction.float.#text",destination->shader.index_of_refraction);
   
     //чтение текстурных карт
   
@@ -301,13 +301,13 @@ void ColladaImpl::parse_profile_COMMON (Parser::Iterator p, ColladaEffectImpl *d
       
     ColladaTextureMapImpl& texmap = destination->shader.maps [texmap_names [i].map];
 
-    if (p->Present ("color"))
+    if (test (p, "color"))
     {
-      p->Read ("color.#text",texmap.color);
+      read (p, "color.#text",texmap.color);
       texmap.has_color = true;        
     }
     
-    if (p->Present ("texture"))
+    if (test (p, "texture"))
     {
       if (texmap.has_color)
       {
@@ -322,8 +322,8 @@ void ColladaImpl::parse_profile_COMMON (Parser::Iterator p, ColladaEffectImpl *d
 
 void ColladaImpl::parse_image (Parser::Iterator p, ColladaImageImpl *destination)
 {
-  p->Read ("id",destination->id,"No id");
-  p->Read ("init_from.#text",destination->url);
+  read (p, "id",destination->id,"No id");
+  read (p, "init_from.#text",destination->url);
 
   if (destination->url.empty ())
     log->Warning (p,"Empty 'init_from' tag");
@@ -333,7 +333,7 @@ void ColladaImpl::parse_texture (Parser::Iterator p, ColladaTextureImpl *destina
 {
   destination->line = p->LineNumber();
 
-  p->Read ("texture",destination->texture);
-  p->Read ("texcoord",destination->texcoord);  
-  p->Read ("extra.technique.amount.#text",destination->amount,1.0f);
+  read (p, "texture",destination->texture);
+  read (p, "texcoord",destination->texcoord);  
+  read (p, "extra.technique.amount.#text",destination->amount,1.0f);
 }

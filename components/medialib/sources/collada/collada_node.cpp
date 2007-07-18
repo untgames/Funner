@@ -290,7 +290,7 @@ ColladaInstanceController ColladaNode::Controller (size_t controller_index) cons
   
 void ColladaImpl::parse_library_nodes (Parser::Iterator p)
 {
-  if(!p->Present("node"))
+  if(!test (p, "node"))
   {
     log->Error(p, "Uncorrect 'library_nodes' tag. Must be at least one 'node' sub-tag");
     return;
@@ -308,15 +308,15 @@ void ColladaImpl::parse_node (Parser::Iterator p, ColladaNodeImpl* destination)
   size_t cur_pos = 0;
 
   destination->line = p->LineNumber();
-  p->Read ("id", destination->id, "No id");
-  p->Read ("sid", destination->sid);
-  p->Read ("name", destination->name);
-  if (p->Test("type", "JOINT"))
+  read (p, "id", destination->id, "No id");
+  read (p, "sid", destination->sid);
+  read (p, "name", destination->name);
+  if (test (p, "type", "JOINT"))
     destination->type = JOINT;
   else
     destination->type = NODE;
 
-  p->Read ("layer", layer_buf);
+  read (p, "layer", layer_buf);
   if(!layer_buf.empty())
   {
     for(; (cur_pos != -1) && (cur_pos != layer_buf.size ()) && (layer_buf[cur_pos] != ' '); cur_pos = layer_buf.find (' ', cur_pos) + 1)
@@ -333,55 +333,47 @@ void ColladaImpl::parse_node (Parser::Iterator p, ColladaNodeImpl* destination)
       log->Error (p, "Uncorrect 'layer' subtag. Detected more than one separator in a row or space at the end");
   }
 
-  if(p->Present("lookat"))
-    p->First("lookat")->ReadArray ("#text", &(destination->transform.lookat[0]), 3);
+  if(test (p, "lookat"))
+    read_range (p, "lookat.#text", &(destination->transform.lookat[0]), 3);
   else
     destination->transform.lookat[0] = destination->transform.lookat[1] = destination->transform.lookat[2] = 0;
-  if(p->Present("matrix"))
-    p->First("matrix")->Read ("#text", destination->transform.matrix);
-  else
-    destination->transform.matrix = 1;
-  if(p->Present("rotate"))
-    p->First("rotate")->Read ("#text", destination->transform.rotate);
-  else
-    destination->transform.rotate = 0;
-  if(p->Present("scale"))
-    p->First("scale")->Read ("#text", destination->transform.scale);
-  else
-    destination->transform.scale = 1;
-  if(p->Present("translate"))
-    p->First("translate")->Read ("#text", destination->transform.translate);
-  else
-    destination->transform.translate = 0;
-  if(p->Present("skew"))
+    
+  read (p, "matrix.#text", destination->transform.matrix, mat4f (1.0f));
+  read (p, "rotate.#text", destination->transform.rotate);
+  read (p, "scale.#text", destination->transform.rotate, vec4f (1.0f));
+  read (p, "translate.#text", destination->transform.rotate);  
+
+  if(test (p, "skew"))
   {
-    Parser::AttributeReader attr_reader = p->First("skew")->Reader("#text");
-    attr_reader.Read (destination->transform.skew.angle);
-    attr_reader.Read (destination->transform.skew.rotate_axis);
-    attr_reader.Read (destination->transform.skew.translate_axis);
+    Parser::AttributeIterator attr_reader = make_attribute_iterator (p, "skew.#text");
+    
+    read (attr_reader, destination->transform.skew.angle, 0.0f);
+    read (attr_reader, destination->transform.skew.rotate_axis, vec3f (0.0f));
+    read (attr_reader, destination->transform.skew.translate_axis, vec3f (0.0f));
   }
   else
     destination->transform.skew.rotate_axis = destination->transform.skew.translate_axis = destination->transform.skew.angle = 0;
 
   for(Parser::NamesakeIterator i = p->First("instance_camera"); i; i++)
-    destination->instance_camera.push_back (&(i->ReadString("url")[1]));
+    destination->instance_camera.push_back (&(get<const char*> (i, "url")[1]));
+    
   for(Parser::NamesakeIterator i = p->First("instance_light"); i; i++)
-    destination->instance_light.push_back (&(i->ReadString("url")[1]));
-  if(p->Present("instance_node"))
+    destination->instance_light.push_back (&(get<const char*> (i, "url")[1]));
+  if(test (p, "instance_node"))
 //    destination->instance_node = &(attrs(p->First("instance_node"), "url")[1]);
     log->Warning(p, "instance_node currently unsupported.");
   for(Parser::NamesakeIterator i = p->First("instance_geometry"); i; i++)
   {
     destination->instance_geometry.resize (destination->instance_geometry.size() + 1);
-    destination->instance_geometry.back().url = &(i->ReadString("url")[1]);
-    if(i->Present("bind_material"))
+    destination->instance_geometry.back().url = &(get<const char*> (i, "url")[1]);
+    if(test (i, "bind_material"))
       parse_instance_materials (i->First("bind_material"), &destination->instance_geometry.back().bind.materials, &destination->instance_geometry.back().url);
   }
 
   for(Parser::NamesakeIterator i = p->First("instance_controller"); i; i++)
   {
     destination->instance_controller.resize (destination->instance_controller.size () + 1);
-    destination->instance_controller.back().url = &(i->ReadString("url")[1]);
+    destination->instance_controller.back().url = &(get<const char*> (i, "url")[1]);
 
     if(i->First("bind_material"))
     {
@@ -415,7 +407,7 @@ void ColladaImpl::parse_node (Parser::Iterator p, ColladaNodeImpl* destination)
     }
 
     for(Parser::NamesakeIterator j = i->First("skeleton"); j; j++)
-      destination->instance_controller.back().bind.skeletons.push_back (&(j->ReadString("#text")[1]));
+      destination->instance_controller.back().bind.skeletons.push_back (&(get<const char*> (j, "#text")[1]));
   }
 
   for(Parser::NamesakeIterator i = p->First("node"); i; i++)
@@ -427,17 +419,17 @@ void ColladaImpl::parse_node (Parser::Iterator p, ColladaNodeImpl* destination)
 
 void ColladaImpl::parse_instance_materials (Parser::Iterator p, vector<ColladaInstanceMaterialImpl> *destination, string* mesh_url)
 {
-  if(p->Present("technique_common"))
+  if(test (p, "technique_common"))
     for(Parser::NamesakeIterator i = p->First("technique_common")->First("instance_material"); i; i++)
     {
       destination->resize(destination->size() + 1);
-      destination->back().target = &(i->ReadString("target")[1]);
-      destination->back().symbol = i->ReadString("symbol");
+      destination->back().target = &(get<const char*> (i, "target")[1]);
+      destination->back().symbol = get<const char*> (i, "symbol");
       for(Parser::NamesakeIterator j = i->First("bind"); j; j++)
       {
         destination->back().binds.resize(destination->back().binds.size() + 1);
-        j->Read ("semantic", destination->back().binds.back().semantic);
-        j->Read ("target", destination->back().binds.back().target);
+        test (j, "semantic", destination->back().binds.back().semantic);
+        test (j, "target", destination->back().binds.back().target);
       }
       if (mesh_url)
         for (size_t j = 0; j < meshes.size(); j++)

@@ -138,11 +138,12 @@ float ColladaAnimationChannel::TimeEnd () const
 
 void ColladaImpl::parse_library_animations (Parser::Iterator p)
 {
-  if(!p->Present("animation"))
+  if(!test (p, "animation"))
   {
     log->Error(p, "Uncorrect 'library_animations' tag. Must be at least one 'animation' sub-tag");
     return;
-  }
+  }  
+  
   for (Parser::NamesakeIterator i = p->First("animation"); i; i++)
   {
     animations.resize(animations.size() + 1);
@@ -155,60 +156,61 @@ void ColladaImpl::parse_animation (Parser::Iterator p, ColladaAnimationImpl* des
   const char *sampler;
   
   destination->line = p->LineNumber();
-  p->Read ("id", destination->id, "No id");
+  read (p, "id", destination->id, "No id");  
 
   for(Parser::NamesakeIterator i = p->First("channel"); i; i++)
   {
-    if(!i->Present("target") || !i->Present("source"))
+    if(!test (i, "target") || !test (i, "source"))
     {
       log->Error(i, "One of required sub-tag 'target' or 'source' not detected.");
       continue;
     }
 
     destination->anim_channels.resize(destination->anim_channels.size() + 1);
-    destination->anim_channels.back().target = i->ReadString("target");
+    destination->anim_channels.back().target = get<const char*> (i, "target");
     destination->anim_channels.back().line = i->LineNumber();
-    sampler = &(i->ReadString("source", "##")[1]);
-
+    sampler = &(get<const char*> (i, "source", "##")[1]);
+    
     for(Parser::NamesakeIterator j = p->First("sampler"); j; j++)
-      if(j->Test("id", sampler))
+      if(test (j, "id", sampler))
         for(Parser::NamesakeIterator k = j->First("input"); k; k++)
-        {
-          if(k->Test("semantic", "INPUT"))
-            parse_source(p, &(destination->anim_channels.back().input), &(k->ReadString("source", "##")[1]));
-          if(k->Test("semantic", "INTERPOLATION"))
-            parse_interpolation_source (p, &(k->ReadString("source", "##")[1]));
-          if(k->Test("semantic", "IN_TANGENT"))
-            parse_source(p, &(destination->anim_channels.back().in_tangent), &(k->ReadString("source", "##")[1]));
-          if(k->Test("semantic", "OUT_TANGENT"))
-            parse_source(p, &(destination->anim_channels.back().out_tangent), &(k->ReadString("source", "##")[1]));
-          if(k->Test ("semantic", "OUTPUT"))
-          {
+        {         
+          if(test (k, "semantic", "INPUT"))
+            parse_source(p, &(destination->anim_channels.back().input), &(get<const char*> (k, "source", "##")[1]));
+          if(test (k, "semantic", "INTERPOLATION"))
+            parse_interpolation_source (p, &(get<const char*> (k, "source", "##")[1]));
+          if(test (k, "semantic", "IN_TANGENT"))
+            parse_source(p, &(destination->anim_channels.back().in_tangent), &(get<const char*> (k, "source", "##")[1]));
+          if(test (k, "semantic", "OUT_TANGENT"))
+            parse_source(p, &(destination->anim_channels.back().out_tangent), &(get<const char*> (k, "source", "##")[1]));               
+            
+          if(test (k, "semantic", "OUTPUT"))
+          {           
             bool param_set = false;
 
-            for (Parser::NamesakeIterator m = p->First("source"); m; m++)
-              if(m->Test("id", k->ReadString("source", "##") + 1))
-              {
-                if(m->Present("technique_common"))
-                  if(m->First("technique_common")->Present("accessor"))
-                    if(m->First("technique_common")->First("accessor")->Present("param"))
-                    {
-                      if (m->Test("technique_common.accessor.param.name", "TRANSFORM"))
-                        destination->anim_channels.back().param = COLLADA_ANIMATION_NODE_TRANSFORM;      
-                      else
-                      {
-                        log->Error(m, "Unknown animation param, please call to developers");
-                        destination->anim_channels.back().param = COLLADA_ANIMATION_NODE_TRANSFORM;      
-                      }
-                      param_set = true;
-                    }
+            for (Parser::NamesakeIterator m = p->First("source"); m; m++)            
+              if(test (m, "id", get<const char*> (k, "source", "##") + 1))
+              {               
+                if(test (m, "technique_common.accessor.param"))
+                {
+                  if (test (m, "technique_common.accessor.param.name", "TRANSFORM"))
+                    destination->anim_channels.back().param = COLLADA_ANIMATION_NODE_TRANSFORM;
+                  else
+                  {
+                    log->Error(m, "Unknown animation param, please call to developers");
+                    destination->anim_channels.back().param = COLLADA_ANIMATION_NODE_TRANSFORM;      
+                  }
+                  param_set = true;
+                }               
               }
             if(!param_set)
               log->Error (m, "Can't retreive animation param");
-            parse_source(p, &(destination->anim_channels.back().output), &(k->ReadString("source", "##")[1]));
+            parse_source(p, &(destination->anim_channels.back().output), &(get<const char*> (k, "source", "##")[1]));            
           }
-        }
-  }
+          
+
+        }        
+  }  
 
   for(Parser::NamesakeIterator i = p->First("animation"); i; i++)
   {
@@ -219,7 +221,7 @@ void ColladaImpl::parse_animation (Parser::Iterator p, ColladaAnimationImpl* des
 
 void ColladaImpl::parse_library_animation_clips (Parser::Iterator p)
 {
-  if(!p->Present("animation_clip"))
+  if(!test (p, "animation_clip"))
   {
     log->Error(p, "Uncorrect 'library_animation_clips' tag. Must be at least one 'animation_clip' sub-tag");
     return;
@@ -232,27 +234,27 @@ void ColladaImpl::parse_animation_clip (Parser::Iterator p)
 {
   animation_clips.resize(animation_clips.size() + 1);
 
-  p->Read ("id", animation_clips.back().id, "No id");
-  p->Read ("start", animation_clips.back().start, 0.0f);
-  p->Read ("end",   animation_clips.back().end,   -1.0f);
+  read (p, "id", animation_clips.back().id, "No id");
+  read (p, "start", animation_clips.back().start, 0.0f);
+  read (p, "end",   animation_clips.back().end,   -1.0f);
   animation_clips.back().line = p->LineNumber();
 
   for(Parser::NamesakeIterator i = p->First("instance_animation"); i; i++)
   {
-    if(!i->Present("url"))
+    if(!test (i, "url"))
     {
       log->Error(i, "Required sub-tag 'url' not detected.");
       continue;
     }
     animation_clips.back().instances_anim.resize(animation_clips.back().instances_anim.size() + 1);
-    animation_clips.back().instances_anim.back() = &(i->ReadString("url", "##")[1]);
+    animation_clips.back().instances_anim.back() = &(get<const char*> (i, "url", "##")[1]);
   }
 }
 
 void ColladaImpl::parse_interpolation_source (Parser::Iterator p, const char *source)
 {
   for (Parser::NamesakeIterator i = p->First("source"); i; i++)
-    if (i->Test("id", source))
+    if (test (i, "id", source))
     {
       for (Parser::NamesakeIterator j = i->First("Name_array"); j; j++)
         parse_interpolations (j);
@@ -264,9 +266,9 @@ void ColladaImpl::parse_interpolations (Parser::Iterator n_array)
 {
   size_t count;
 
-  n_array->Read("count", count, (size_t)0);
+  read (n_array, "count", count, (size_t)0);
 
   for (size_t i = 0; i < count; i++)
-    if(!n_array->Test("#text", i, "LINEAR"))
+    if(!test (n_array, "#text", i, "LINEAR"))
       log->Warning (n_array, "Using of non-Linear interpolation type not supported. Use exporter options for forced animation converting");
 }

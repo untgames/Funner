@@ -2,6 +2,7 @@
 #include <common/exception.h>
 #include <common/parser.h>
 #include <stl/vector>
+#include <xtl/bind.h>
 #include "base.h"
 #include "mesh.h"
 #include "visual_scene.h"
@@ -15,6 +16,7 @@
 using namespace common;
 using namespace math;
 using namespace stl;
+using namespace xtl;
 
 class Offsets
 {

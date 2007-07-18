@@ -36,10 +36,10 @@ Collada::Collada (common::Parser::Log* log, const char* file_name)
     return;
   }
 
-  if(!root->Test("version", "1.4.1"))
-    impl->log->Warning(root, "Currently supported Collada version - 1.4.1, document uses other version (%s), some features may be not fully supported or unsupported", root->ReadString("version", ""));
+  if(!test (root, "version", "1.4.1"))
+    impl->log->Warning(root, "Currently supported Collada version - 1.4.1, document uses other version (%s), some features may be not fully supported or unsupported", get<const char*> (root, "version", ""));    
 
-  impl->parse_collada (root);
+  impl->parse_collada (root);  
 
   ColladaEntityImpl::file_name = file_name;
 
@@ -145,19 +145,17 @@ ColladaVisualScene Collada::ActiveScene () const
 
 void ColladaImpl::parse_collada (Parser::Iterator p)
 {
-  if(p->Present("scene"))
-    if(p->First("scene")->Present("instance_visual_scene"))
-    {
-      scene = p->ReadString ("scene.instance_visual_scene.url");
-      if(scene[0] != '#')
-        log->Error(p->First("scene")->First("instance_visual_scene"), "Wrong URL format, no '#' symbol.");
-    }
+  if (test (p, "scene.instance_visual_scene"))
+  {
+    scene = get<const char*> (p, "scene.instance_visual_scene.url");
+    
+    if (scene [0] != '#')
+      log->Error(p->First("scene.instance_visual_scene"), "Wrong URL format, no '#' symbol.");
+  } 
 
-  for (Parser::NamesakeIterator i = p->First("library_materials"); i; i++)
-    parse_library_materials (i);
- 
-  for (Parser::NamesakeIterator i = p->First("library_geometries"); i; i++)
-    parse_library_geometries (i);
+  for_each_child (p, "library_materials", bind (&ColladaImpl::parse_library_materials, this, _1));
+  for_each_child (p, "library_geometries", bind (&ColladaImpl::parse_library_geometries, this, _1));
+
 
   for (size_t i = 0; i < meshes.size(); i++)
     for (size_t j = 0; j < meshes[i].surfaces.size(); j++)
@@ -165,26 +163,17 @@ void ColladaImpl::parse_collada (Parser::Iterator p)
       {
         log->Error(ColladaEntityImpl::file_name.c_str(), meshes[i].line, "Mesh material %s not founded", meshes[i].surfaces[j].material.c_str());
         meshes[i].surfaces.erase(meshes[i].surfaces.begin() + j);
-      }
+      }      
 
-  for (Parser::NamesakeIterator i = p->First("library_effects"); i; i++)
-    parse_library_effects (i);
-  for (Parser::NamesakeIterator i = p->First("library_images"); i; i++)
-    parse_library_images (i);
-  for (Parser::NamesakeIterator i = p->First("library_lights"); i; i++)
-    parse_library_lights (i);
-  for (Parser::NamesakeIterator i = p->First("library_cameras"); i; i++)
-    parse_library_cameras (i);
-  for (Parser::NamesakeIterator i = p->First("library_controllers"); i; i++)
-    parse_library_controllers (i);
-  for (Parser::NamesakeIterator i = p->First("library_nodes"); i; i++)
-    parse_library_nodes (i);
-  for (Parser::NamesakeIterator i = p->First("library_visual_scenes"); i; i++)
-    parse_library_visual_scenes (i);
-  for (Parser::NamesakeIterator i = p->First("library_animations"); i; i++)
-    parse_library_animations (i);
-  for (Parser::NamesakeIterator i = p->First("library_animation_clips"); i; i++)
-    parse_library_animation_clips (i);
+  for_each_child (p, "library_effects", bind (&ColladaImpl::parse_library_effects, this, _1));
+  for_each_child (p, "library_images", bind (&ColladaImpl::parse_library_images, this, _1));
+  for_each_child (p, "library_lights", bind (&ColladaImpl::parse_library_lights, this, _1));  
+  for_each_child (p, "library_cameras", bind (&ColladaImpl::parse_library_cameras, this, _1));
+  for_each_child (p, "library_controllers", bind (&ColladaImpl::parse_library_controllers, this, _1));
+  for_each_child (p, "library_nodes", bind (&ColladaImpl::parse_library_nodes, this, _1));
+  for_each_child (p, "library_visual_scenes", bind (&ColladaImpl::parse_library_visual_scenes, this, _1));
+  for_each_child (p, "library_animations", bind (&ColladaImpl::parse_library_animations, this, _1));
+  for_each_child (p, "library_animation_clips", bind (&ColladaImpl::parse_library_animation_clips, this, _1));  
 
   ColladaEntityImpl::collada_impl = this;
 }

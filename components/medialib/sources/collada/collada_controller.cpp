@@ -141,7 +141,7 @@ ColladaSkin ColladaController::Skin  () const
 
 void ColladaImpl::parse_library_controllers (Parser::Iterator p)
 {
-  if(!p->Present("controller"))
+  if(!test (p,  "controller"))
   {
     log->Error(p, "Uncorrect 'library_controllers' tag. Must be at least one 'controller' sub-tag");
     return;
@@ -149,7 +149,7 @@ void ColladaImpl::parse_library_controllers (Parser::Iterator p)
   for (Parser::NamesakeIterator i = p->First("controller"); i; i++)
   {
     controllers.resize(controllers.size() + 1);
-    i->Read ("id", controllers.back().id, "No id");
+    read (i, "id", controllers.back().id, "No id");
     parse_controller (i, &controllers.back());
   }
 }
@@ -157,12 +157,12 @@ void ColladaImpl::parse_library_controllers (Parser::Iterator p)
 void ColladaImpl::parse_controller (Parser::Iterator p, ColladaControllerImpl* destination)
 {
   destination->line = p->LineNumber();
-  if(p->Present("skin"))
+  if(test (p,  "skin"))
   {
     destination->type = COLLADA_CONTROLLER_SKIN;
     parse_skin (p->First("skin"), &destination->skin);
   }
-  else if (p->Present("morph")) 
+  else if (test (p,  "morph")) 
   {
     destination->type = COLLADA_CONTROLLER_MORPH;
     parse_morph (p->First("morph"), &destination->morph);
@@ -181,18 +181,18 @@ void ColladaImpl::parse_skin (Parser::Iterator p, ColladaSkinImpl* destination)
   stl::vector <float> weights;
 
   destination->line = p->LineNumber ();
-  if(!p->Present("source"))
+  if(!test (p,  "source"))
   {
     log->Error(p, "Uncorrect 'skin' tag, no 'source' attribute");
     return;
   }
 
-  destination->base_mesh = p->ReadString ("source", "##") + 1;
+  destination->base_mesh = get<const char*> (p, "source", "##") + 1;
 
-  if(p->Present("bind_shape_matrix"))
-    p->First("bind_shape_matrix")->Read ("#text", destination->bind_shape_matrix);
+  if(test (p,  "bind_shape_matrix"))
+    read (p, "bind_shape_matrix.#text", destination->bind_shape_matrix);
 
-  if(!p->Present("vertex_weights") || !p->Present("joints"))
+  if(!test (p,  "vertex_weights") || !test (p,  "joints"))
   {
     log->Error(p, "Syntax error. One of required subtag ('vertex_weights' or 'joints') was not detected.");
     return;
@@ -200,42 +200,42 @@ void ColladaImpl::parse_skin (Parser::Iterator p, ColladaSkinImpl* destination)
 
   for(Parser::NamesakeIterator input = p->First("joints")->First("input"); input; input++)
   {
-    if (input->Test("semantic", "JOINT"))
-      parse_source (p, &destination->joints, &(input->ReadString("source", "##")[1]));
-    else if (input->Test("semantic", "INV_BIND_MATRIX"))
-      parse_source (p, &destination->inv_bind_matrices, &(input->ReadString("source", "##")[1]));
+    if (test (input, "semantic", "JOINT"))
+      parse_source (p, &destination->joints, &(get<const char*> (input, "source", "##")[1]));
+    else if (test (input, "semantic", "INV_BIND_MATRIX"))
+      parse_source (p, &destination->inv_bind_matrices, &(get<const char*> (input, "source", "##")[1]));
     else log->Error(input, "Unknown semantic.");
   }
 
-  for(Parser::NamesakeIterator input = p->First("vertex_weights")->First("input"); input; input++)
-    if (input->Test("semantic", "WEIGHT"))
-      parse_source (p, &weights, &(input->ReadString("source", "##")[1]));
+  for(Parser::NamesakeIterator input = p->First("vertex_weights.input"); input; input++)
+    if (test (input, "semantic", "WEIGHT"))
+      parse_source (p, &weights, &(get<const char*> (input, "source", "##")[1]));
 
   p = p->First("vertex_weights");
 
-  destination->vertex_influences.resize (p->ReadInt("count", 0)); 
+  destination->vertex_influences.resize (get<int> (p, "count")); 
 
-  if(p->Present("vcount"))
+  if(test (p,  "vcount"))
   {
-    Parser::AttributeReader v_counts = p->First("vcount")->Reader("#text");
+    Parser::AttributeIterator v_counts = make_attribute_iterator (p, "vcount.#text");
     for(size_t i = 0; i < destination->vertex_influences.size (); i++)
     {
-      v_counts.Read (destination->vertex_influences[i].weights_count);
+      read (v_counts, destination->vertex_influences[i].weights_count);
       destination->vertex_influences[i].first_weight = cur_first_weight;
       cur_first_weight += destination->vertex_influences[i].weights_count;
     }
   }
 
-  if(!p->Present("v"))
+  if(!test (p,  "v"))
     return;
 
   destination->joint_weights.resize (cur_first_weight);
-  Parser::AttributeReader indexes = p->First("v")->Reader("#text");
+  Parser::AttributeIterator indexes = make_attribute_iterator (p, "v.#text");
   for(size_t i = 0; i < cur_first_weight; i++)
   {
-    indexes.Read (index_buf);
+    read (indexes, index_buf);
     destination->joint_weights[i].joint = index_buf + 1;
-    indexes.Read (index_buf);
+    read (indexes, index_buf);
     destination->joint_weights[i].weight = weights[index_buf];
   }
 }
@@ -243,23 +243,23 @@ void ColladaImpl::parse_skin (Parser::Iterator p, ColladaSkinImpl* destination)
 void ColladaImpl::parse_morph (Parser::Iterator p, ColladaMorphImpl* destination)
 {
   destination->line = p->LineNumber ();
-  destination->base_mesh = p->ReadString("source", "##") + 1;
-  if (p->Test("method", "RELATIVE"))
+  destination->base_mesh = get<const char*> (p, "source", "##") + 1;
+  if (test (p, "method", "RELATIVE"))
     destination->method = COLLADA_MORPH_RELATIVE;
   else destination->method = COLLADA_MORPH_NORMALIZED;
        
-  if(!p->Present("targets"))
+  if(!test (p,  "targets"))
   {
     log->Error(p, "Required sub-tag 'targets' was not detected");
     return;
   }
 
-  for(Parser::NamesakeIterator input = p->First("targets")->First("input"); input; input++)
+  for(Parser::NamesakeIterator input = p->First("targets.input"); input; input++)
   {
-    if (input->Test("semantic", "MORPH_TARGET"))
-      parse_source (p, &destination->targets, &(input->ReadString("source", "##")[1]));
-    else if (input->Test("semantic", "MORPH_WEIGHT"))
-      parse_source (p, &destination->weights, &(input->ReadString("source", "##")[1]));
+    if (test (input, "semantic", "MORPH_TARGET"))
+      parse_source (p, &destination->targets, &(get<const char*> (input, "source", "##")[1]));
+    else if (test (input, "semantic", "MORPH_WEIGHT"))
+      parse_source (p, &destination->weights, &(get<const char*> (input, "source", "##")[1]));
     else log->Error(input, "Unknown semantic.");
   } 
 }

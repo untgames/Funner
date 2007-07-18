@@ -18,16 +18,16 @@ FontFace* FontFace::DefaultBFSLoader (const char* file_name)
   GlyphInfo*       glyph_info = NULL;
   KerningInfo*     kerning_info = NULL;
 
-  if (!iter->Present ("FontFile"))
+  if (!test (iter, "FontFile"))
     Raise <Exception> ("FontFace::DefaultBFSLoader", "Incorrect file format, no 'FontFile' property");
-  if (!iter->Present ("FirstCharCode"))
+  if (!test (iter, "FirstCharCode"))
     Raise <Exception> ("FontFace::DefaultBFSLoader", "Incorrect file format, no 'FirstCharCode' property");
-  if (!iter->Present ("Glyphs"))
+  if (!test (iter, "Glyphs"))
     Raise <Exception> ("FontFace::DefaultBFSLoader", "Incorrect file format, no 'Glyphs' tag");
 
-  iter->Read ("Name", temp_name, "");
-  iter->Read ("FontFile", font_file);
-  iter->Read ("FirstCharCode", first_char_code);
+  read (iter, "Name", temp_name, "");
+  read (iter, "FontFile", font_file);
+  read (iter, "FirstCharCode", first_char_code);
 
   for (Parser::Iterator i = iter->First ("Glyphs.Glyph"); i; i++)
     glyph_count++;
@@ -41,20 +41,20 @@ FontFace* FontFace::DefaultBFSLoader (const char* file_name)
   glyph_count = 0;
   for (Parser::NamesakeIterator i = iter->First ("Glyphs.Glyph"); i; i++, glyph_count++)
   {
-    if (!i->Present ("XPos") || !i->Present("YPos") || !i->Present("Width") || !i->Present("Heigth"))
+    if (!test (i, "XPos") || !test (i, "YPos") || !test (i, "Width") || !test (i, "Heigth"))
     {
       log.Error (i, "Incorrect file format, one of tag property missing");
       continue;
     }
 
-    i->Read ("XPos",     glyph_info[glyph_count].x_pos);
-    i->Read ("YPos",     glyph_info[glyph_count].y_pos);
-    i->Read ("Width",    glyph_info[glyph_count].width);
-    i->Read ("Heigth",   glyph_info[glyph_count].heigth);
-    i->Read ("BearingX", glyph_info[glyph_count].bearingX, 0);
-    i->Read ("BearingY", glyph_info[glyph_count].bearingY, (int)glyph_info[glyph_count].heigth);
-    i->Read ("AdvanceX", glyph_info[glyph_count].advanceX, (int)glyph_info[glyph_count].width);
-    i->Read ("AdvanceY", glyph_info[glyph_count].advanceY, 0);
+    read (i, "XPos",     glyph_info[glyph_count].x_pos);
+    read (i, "YPos",     glyph_info[glyph_count].y_pos);
+    read (i, "Width",    glyph_info[glyph_count].width);
+    read (i, "Heigth",   glyph_info[glyph_count].heigth);
+    read (i, "BearingX", glyph_info[glyph_count].bearingX, 0);
+    read (i, "BearingY", glyph_info[glyph_count].bearingY, (int)glyph_info[glyph_count].heigth);
+    read (i, "AdvanceX", glyph_info[glyph_count].advanceX, (int)glyph_info[glyph_count].width);
+    read (i, "AdvanceY", glyph_info[glyph_count].advanceY, 0);
   }
 
   for (size_t i = 0; i < glyph_count; i++)
@@ -66,7 +66,7 @@ FontFace* FontFace::DefaultBFSLoader (const char* file_name)
 
   for (Parser::NamesakeIterator i = iter->First ("Kernings.Kerning"); i; i++)
   {
-    if (!i->Present ("LeftGlyph") || !i->Present("RightGlyph") || !i->Present("XKerning") || !i->Present("YKerning"))
+    if (!test (i, "LeftGlyph") || !test (i, "RightGlyph") || !test (i, "XKerning") || !test (i, "YKerning"))
     {
       log.Error (i, "Incorrect file format, one of tag property missing");
       continue;
@@ -74,10 +74,10 @@ FontFace* FontFace::DefaultBFSLoader (const char* file_name)
 
     size_t left, right;
 
-    i->Read ("LeftGlyph",  left);
-    i->Read ("RightGlyph", right);
-    i->Read ("XKerning",   kerning_info[glyph_count * left + right].x_kerning);
-    i->Read ("YKerning",   kerning_info[glyph_count * left + right].y_kerning);
+    read (i, "LeftGlyph",  left);
+    read (i, "RightGlyph", right);
+    read (i, "XKerning",   kerning_info[glyph_count * left + right].x_kerning);
+    read (i, "YKerning",   kerning_info[glyph_count * left + right].y_kerning);
   }
 
   for (size_t i = 0; i < log.MessagesCount (); i++)

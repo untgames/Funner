@@ -15,7 +15,7 @@ ColladaEffect ColladaMaterial::Effect () const
 
 void ColladaImpl::parse_library_materials (Parser::Iterator p)
 {
-  if(!p->Present("material"))
+  if(!test (p, "material"))
   {
     log->Error(p, "Uncorrect 'library_materials' tag. Must be at least one 'material' sub-tag");
     return;
@@ -31,7 +31,7 @@ void ColladaImpl::parse_material (Parser::Iterator p)
   if (i)
   {
     materials.resize(materials.size() + 1);
-    p->Read ("id", materials.back().id, "No id");
+    read (p, "id", materials.back().id, "No id");
     materials.back().line = p->LineNumber();
     parse_instance_effect (i, &materials.back());
 
@@ -42,9 +42,6 @@ void ColladaImpl::parse_material (Parser::Iterator p)
 
 void ColladaImpl::parse_instance_effect (Parser::Iterator p, ColladaMaterialImpl *destination)
 {
-  if (p->Present("url"))
-    destination->effect = &(p->ReadString("url", "##"))[1];
-  else
-    destination->effect = "No effect";
+  if (test (p, "url"))  destination->effect = &(get<const char*> (p, "url", "##"))[1];
+  else                  destination->effect = "No effect";
 }
-

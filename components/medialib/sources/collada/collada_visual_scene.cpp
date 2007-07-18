@@ -30,7 +30,7 @@ ColladaNode ColladaVisualScene::Node (const char* name)
 
 void ColladaImpl::parse_library_visual_scenes (Parser::Iterator p)
 {
-  if(!p->Present("visual_scene"))
+  if(!test (p, "visual_scene"))
   {
     log->Error(p, "Uncorrect 'library_visual_scenes' tag. Must be at least one 'visual_scene' sub-tag");
     return;
@@ -42,7 +42,7 @@ void ColladaImpl::parse_library_visual_scenes (Parser::Iterator p)
 void ColladaImpl::parse_visual_scene (Parser::Iterator p)
 {
   visual_scenes.resize(visual_scenes.size() + 1);
-  p->Read ("id", visual_scenes.back().id, "No id");
+  read (p, "id", visual_scenes.back().id, "No id");
   visual_scenes.back().line = p->LineNumber();
 
   for(Parser::NamesakeIterator i = p->First("node"); i; i++)

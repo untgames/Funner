@@ -100,7 +100,7 @@ const size_t* ColladaSurface::Indices () const
 
 void ColladaImpl::parse_library_geometries (Parser::Iterator p)
 {
-  if(!p->Present("geometry"))
+  if(!test (p, "geometry"))
   {
     log->Error(p, "Uncorrect 'library_geometries' tag. Must be at least one 'geometry' sub-tag");
     return;
@@ -116,7 +116,7 @@ void ColladaImpl::parse_geometry (Parser::Iterator p)
   if (i)
   {
     meshes.resize(meshes.size() + 1);
-    p->Read ("id", meshes.back().id, "No id");
+    read (p, "id", meshes.back().id, "No id");
     parse_mesh(i, &meshes.back());
     if (++i)
       log->Error(p, "Detected more than one child 'mesh'.");
@@ -126,40 +126,35 @@ void ColladaImpl::parse_geometry (Parser::Iterator p)
 void ColladaImpl::parse_mesh (Parser::Iterator p, ColladaMeshImpl *destination)
 {
   destination->line = p->LineNumber();
-  if(!p->Present("vertices"))
+  if(!test (p, "vertices"))
   {
     log->Warning(p, "No vertices information, empty mesh created");
     return;
   }
-  if(!(p->First("vertices"))->Present("input"))
+  if(!test (p, "vertices.input"))
   {
     log->Warning(p, "Uncorrect vertices information, 'input' URL not detected, empty mesh created");
     return;
   }
-  for (Parser::NamesakeIterator i = p->First("triangles"); i; i++)
-    parse_triangles(i, p, destination);
-  for (Parser::NamesakeIterator i = p->First("linestrips"); i; i++)
-    parse_linestrips(i, p, destination);
-  for (Parser::NamesakeIterator i = p->First("lines"); i; i++)
-    parse_lines(i, p, destination);
-  for (Parser::NamesakeIterator i = p->First("polygons"); i; i++)
-    log->Error(i, "Polygons are not supported.");
-  for (Parser::NamesakeIterator i = p->First("polylist"); i; i++)
-    log->Error(i, "Polygons are not supported.");
-  for (Parser::NamesakeIterator i = p->First("trifans"); i; i++)
-    parse_trifans(i, p, destination);
-  for (Parser::NamesakeIterator i = p->First("tristrips"); i; i++)
-    parse_tristrips(i, p, destination);
+  
+  for (Parser::NamesakeIterator i = p->First("polygons"); i; i++) log->Error(i, "Polygons are not supported.");
+  for (Parser::NamesakeIterator i = p->First("polylist"); i; i++) log->Error(i, "Polygons are not supported.");  
+  
+  for_each_child (p, "triangles", bind (&ColladaImpl::parse_triangles, this, _1, p, destination));
+  for_each_child (p, "linestrips", bind (&ColladaImpl::parse_linestrips, this, _1, p, destination));
+  for_each_child (p, "lines", bind (&ColladaImpl::parse_lines, this, _1, p, destination));
+  for_each_child (p, "trifans", bind (&ColladaImpl::parse_trifans, this, _1, p, destination));
+  for_each_child (p, "tristrips", bind (&ColladaImpl::parse_tristrips, this, _1, p, destination));
 }
 
 int ColladaImpl::parse_common_surface_attr (Parser::Iterator surface, Parser::Iterator mesh, ColladaSurfaceImpl *temp_surface, Offsets *offsets)
 {
-  surface->Read ("material", temp_surface->material);
+  read (surface, "material", temp_surface->material);
 
   if (!parse_inputs (surface, offsets))
     return -1;
 
-  offsets->v_source = mesh->ReadString ("vertices.input.source");
+  offsets->v_source = get<const char*> (mesh, "vertices.input.source");
 
   parse_source (mesh, &(temp_surface->vertices), offsets);
 
@@ -180,8 +175,8 @@ int ColladaImpl::parse_common_surface_attr (Parser::Iterator surface, Parser::It
     parse_source (mesh, &(temp_surface->tex_data[j].tex_vertices), offsets, j);
   }
   
-  if (surface->Present("count"))
-    return surface->ReadInt("count");
+  if (test (surface, "count"))
+    return get<int> (surface, "count");
   else
   {
     log->Error(surface, "'Count' tag not specified.");
@@ -416,49 +411,49 @@ bool ColladaImpl::parse_inputs (Parser::Iterator p, Offsets *offsets)
   
   for(Parser::NamesakeIterator i = p->First("input"); i; i++)
   {
-    if(i->Test("semantic", "VERTEX"))
-      i->Read ("offset", offsets->v_offset);
-    if(i->Test("semantic", "NORMAL"))
+    if(test (i, "semantic", "VERTEX"))
+      read (i, "offset", offsets->v_offset);
+    if(test (i, "semantic", "NORMAL"))
     {
-      i->Read ("offset", offsets->n_offset);
-      i->Read ("source", offsets->n_source);
+      read (i, "offset", offsets->n_offset);
+      read (i, "source", offsets->n_source);
     }
-    if(i->Test("semantic", "COLOR"))
+    if(test (i, "semantic", "COLOR"))
     {
-      i->Read ("offset", offsets->color_offset);
-      i->Read ("source", offsets->color_source);
+      read (i, "offset", offsets->color_offset);
+      read (i, "source", offsets->color_source);
     }
-    if(i->Test("semantic", "TEXCOORD"))
+    if(test (i, "semantic", "TEXCOORD"))
     {
-      offsets->tex_coord_offset.push_back (i->ReadInt("offset"));
-      offsets->tex_coord_source.push_back ((char*)i->ReadString("source"));
-      i->Read ("set", cur_set);
+      offsets->tex_coord_offset.push_back (get<int> (i, "offset"));
+      offsets->tex_coord_source.push_back ((char*)get<const char*> (i, "source"));
+      read (i, "set", cur_set);
       offsets->tex_coord_set.push_back (cur_set);
       offsets->max_offset = max (offsets->max_offset, (short)offsets->tex_coord_offset.back());
     }
-    if(i->Test("semantic", "TEXTANGENT"))
+    if(test (i, "semantic", "TEXTANGENT"))
     {
-      offsets->tex_tangent_offset.push_back (i->ReadInt("offset"));
-      offsets->tex_tangent_source.push_back ((char*)i->ReadString("source"));
-      if(i->Present("set"))
-        offsets->tex_tangent_set.push_back (i->ReadInt("set"));
+      offsets->tex_tangent_offset.push_back (get<int> (i, "offset"));
+      offsets->tex_tangent_source.push_back ((char*)get<const char*> (i, "source"));
+      if(test (i, "set"))
+        offsets->tex_tangent_set.push_back (get<int> (i, "set"));
       else
         offsets->tex_tangent_set.push_back (cur_set);
       offsets->max_offset = max (offsets->max_offset, (short)offsets->tex_tangent_offset.back());
     }
-    if(i->Test("semantic", "TEXBINORMAL"))
+    if(test (i, "semantic", "TEXBINORMAL"))
     {
-      offsets->tex_binormal_offset.push_back (i->ReadInt("offset"));
-      offsets->tex_binormal_source.push_back ((char*)i->ReadString("source"));
-      if(i->Present("set"))
-        offsets->tex_binormal_set.push_back (i->ReadInt("set"));
+      offsets->tex_binormal_offset.push_back (get<int> (i, "offset"));
+      offsets->tex_binormal_source.push_back ((char*)get<const char*> (i, "source"));
+      if(test (i, "set"))
+        offsets->tex_binormal_set.push_back (get<int> (i, "set"));
       else
         offsets->tex_binormal_set.push_back (cur_set);                                
       offsets->max_offset = max (offsets->max_offset, (short)offsets->tex_binormal_offset.back());
     }
     else
     {
-      if (i->ReadInt("offset") > offsets->max_offset) offsets->max_offset = i->ReadInt("offset");
+      if (get<int> (i, "offset") > offsets->max_offset) offsets->max_offset = get<int> (i, "offset");
     }
   }
 
@@ -556,7 +551,7 @@ void ColladaImpl::parse_p (Parser::Iterator p, const Offsets *offsets, vector<Po
   PointInfo        *first_index;
 
   block_size = offsets->max_offset + 1;
-  if (!p->Present("#text"))
+  if (!test (p, "#text"))
   {
     log->Error (p, "'#text' sub-tag not detected");
     return;

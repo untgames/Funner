@@ -41,7 +41,7 @@ float ColladaLight::FalloffExponent () const
 
 void ColladaImpl::parse_library_lights (Parser::Iterator p)
 {
-  if(!p->Present("light"))
+  if(!test (p, "light"))
   {
     log->Error(p, "Uncorrect 'library_lights' tag. Must be at least one 'light' sub-tag");
     return;
@@ -57,7 +57,7 @@ void ColladaImpl::parse_light (Parser::Iterator p)
   if (i)
   {
     lights.resize(lights.size() + 1);
-    p->Read ("id", lights.back().id, "No id");
+    read (p, "id", lights.back().id, "No id");
     lights.back().line = p->LineNumber ();
     parse_technique_common (i, &lights.back());
 
@@ -68,22 +68,22 @@ void ColladaImpl::parse_light (Parser::Iterator p)
 
 void ColladaImpl::parse_technique_common (Parser::Iterator p, ColladaLightImpl *destination)
 {
-  if(p->Present("ambient"))
+  if(test (p, "ambient"))
   {
     p = p->First("ambient");
     destination->type = COLLADA_LIGHT_AMBIENT;
   }
-  else if (p->Present("directional")) 
+  else if (test (p, "directional")) 
   {
     p = p->First("directional");
     destination->type = COLLADA_LIGHT_DIRECT;
   }
-  else if (p->Present("point"))
+  else if (test (p, "point"))
   {
     p = p->First("point");
     destination->type = COLLADA_LIGHT_POINT;
   }              
-  else if (p->Present("spot"))
+  else if (test (p, "spot"))
   {
     p = p->First("spot");
     destination->type = COLLADA_LIGHT_SPOT;
@@ -98,17 +98,10 @@ void ColladaImpl::parse_technique_common (Parser::Iterator p, ColladaLightImpl *
   destination->constant_attenuation = destination->linear_attenuation = destination->quadratic_attenuation = 
                                                                         destination->falloff_angle = destination->falloff_exponent = 0;
 
-  if (p->Present("color"))  
-    p->First("color")->Read ("#text", destination->color);
-  if (p->Present("constant_attenuation"))  
-    p->First("constant_attenuation")->Read ("#text", destination->constant_attenuation);
-  if (p->Present("linear_attenuation"))  
-    p->First("linear_attenuation")->Read ("#text", destination->linear_attenuation);
-  if (p->Present("quadratic_attenuation"))  
-    p->First("quadratic_attenuation")->Read ("#text", destination->quadratic_attenuation);
-  if (p->Present("falloff_angle"))  
-    p->First("falloff_angle")->Read ("#text", destination->falloff_angle);
-  if (p->Present("falloff_exponent"))  
-    p->First("falloff_exponent")->Read ("#text", destination->falloff_exponent);
+  read (p, "color.#text", destination->color);
+  read (p, "constant_attenuation.#text", destination->constant_attenuation);
+  read (p, "linear_attenuation.#text", destination->linear_attenuation);
+  read (p, "quadratic_attenuation.#text", destination->quadratic_attenuation);
+  read (p, "falloff_angle.#text", destination->falloff_angle);
+  read (p, "falloff_exponent.#text", destination->falloff_exponent);
 }
-
