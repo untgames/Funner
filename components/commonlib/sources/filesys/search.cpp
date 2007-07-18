@@ -43,9 +43,9 @@ void FileSearchHelper::Search (ICustomFileSystem* _file_system,const char* dir)
   full_mask   = format ("%s%s",dir,mask);
 
   if (search_flags & FILE_SEARCH_SUBDIRS)
-    file_system->Search (format ("%s*",dir).c_str (),SearchHandler (bind (&FileSearchHelper::InsertRecursive, *this, _1, _2)));
+    file_system->Search (format ("%s*",dir).c_str (),SearchHandler (bind (&FileSearchHelper::InsertRecursive, this, _1, _2)));
   else
-    file_system->Search (full_mask.c_str (),SearchHandler (bind (&FileSearchHelper::Insert, *this, _1, _2)));
+    file_system->Search (full_mask.c_str (),SearchHandler (bind (&FileSearchHelper::Insert, this, _1, _2)));
 }
 
 void FileSearchHelper::InsertRecursive (const char* file_name,const FileInfo& info)
@@ -57,7 +57,7 @@ void FileSearchHelper::InsertRecursive (const char* file_name,const FileInfo& in
     Insert (file_name,info);
 
   if (info.is_dir)
-    file_system->Search (format ("%s/*",file_name).c_str (),SearchHandler (bind (&FileSearchHelper::InsertRecursive, *this, _1, _2)));
+    file_system->Search (format ("%s/*",file_name).c_str (),SearchHandler (bind (&FileSearchHelper::InsertRecursive, this, _1, _2)));
 }
 
 void FileSearchHelper::Insert (const char* file_name,const FileInfo& info)

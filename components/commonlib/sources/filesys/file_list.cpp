@@ -235,7 +235,7 @@ void FileListBuilder::InsertInternal (const char* file_name,size_t file_name_siz
 
   if (items_hash.find (file_name_hash) != items_hash.end ())
     return;
-    
+
   items_hash.insert (file_name_hash);
 
   FileListItem item   = {(const char*)file_names.size (),file_info};
@@ -252,7 +252,7 @@ void FileListBuilder::InsertInternal (const char* file_name,size_t file_name_siz
     file_names.append (file_name+offset,file_name_size-offset);
 
   file_names.push_back (0);
-  items.push_back      (item);
+  items.push_back      (item);  
 }
 
 void FileListBuilder::Insert (const char* file_name,const FileInfo& file_info)

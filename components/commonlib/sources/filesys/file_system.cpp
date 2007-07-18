@@ -312,7 +312,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
     for (PackFileTypeList::iterator i=pack_types.begin ();i!=pack_types.end ();++i)
       owner_file_system->Search (format ("%s/*.%s",mount_path.c_str (),i->extension.c_str ()).c_str (),
-                                ICustomFileSystem::FileSearchHandler (bind (&FileListBuilder::Insert, list_builder, _1, _2)));
+                                ICustomFileSystem::FileSearchHandler (bind (&FileListBuilder::Insert, &list_builder, _1, _2)));
 
     search_paths.push_front (SearchPath (path.c_str (),path_hash));
 

@@ -209,7 +209,7 @@ class BufferedFileImpl: public FileImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Билдер файлового списка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FileListBuilder
+class FileListBuilder: public xtl::noncopyable
 {
   public:
     typedef stl::vector<FileListItem> FileInfoArray;
@@ -235,8 +235,8 @@ class FileListBuilder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     FileList Build (bool sort=false);
     
-  private:
-    void InsertInternal (const char* file_name,size_t file_name_size,const FileInfo& file_info);
+  private:      
+    void InsertInternal (const char* file_name,size_t file_name_size,const FileInfo& file_info);    
         
   private:
     typedef stl::hash_set<size_t> NameHash;
