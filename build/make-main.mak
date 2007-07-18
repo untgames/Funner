@@ -160,7 +160,8 @@ define process_target_with_sources
   $1.EXECUTION_DIR := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
   $1.LIBS          := $$($1.LIBS:%=%.lib)
   $1.TARGET_DLLS   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%.dll)
-  
+  $1.LIB_DEPS      := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(TARGET_FILES))
+
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
   TMP_DIRS := $$($1.TMP_DIRS) $$(TMP_DIRS)
@@ -205,7 +206,7 @@ define process_target.dynamic-lib
 
   $$(eval $$(call process_target_with_sources,$1))
 
-  $$($1.DLL_FILE): $$($1.FLAG_FILES)
+  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Create dynamic library $$(notdir $$@)...
 		@link $$($1.OBJECT_FILES) $$($1.LIBS) /nologo /dll /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
 		@$(RM) $$(basename $$@).exp
@@ -230,7 +231,7 @@ define process_target.application
   
   $1.EXECUTION_DIR ?= $(DIST_BIN_DIR)
 
-  $$($1.EXE_FILE): $$($1.FLAG_FILES)
+  $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
 		@link $$($1.OBJECT_FILES) $$($1.LIBS) /nologo /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
 		
@@ -241,9 +242,9 @@ endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
 define process_tests_source_dir
-  $2.TEST_EXE_FILES        := $$($2.OBJECT_FILES:%.obj=%.exe)
-  $2.TEST_RESULT_FILES     := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
-  $2.EXECUTION_DIR         := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
+  $2.TEST_EXE_FILES    := $$($2.OBJECT_FILES:%.obj=%.exe)
+  $2.TEST_RESULT_FILES := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
+  $2.EXECUTION_DIR     := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
 
   build: $$($2.TEST_EXE_FILES)
   test: TEST_MODULE.$2
@@ -251,9 +252,9 @@ define process_tests_source_dir
   .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2
   
 #Правило сборки теста
-  $$($2.TMP_DIR)/%.exe: $$($2.TMP_DIR)/%.obj
+  $$($2.TMP_DIR)/%.exe: $$($2.TMP_DIR)/%.obj $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
-		@link $$(filter %.obj,$$<) $$($1.LIBS)  /nologo /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
+		@link $$(filter %.obj,$$<) $$($1.LIBS) /nologo /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
 
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.exe
