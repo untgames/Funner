@@ -1,5 +1,5 @@
-#ifndef __IMAGELIB_SHARED__
-#define __IMAGELIB_SHARED__
+#ifndef FONTLIB_SHARED_HEADER
+#define FONTLIB_SHARED_HEADER
 
 #include <common/singleton.h>
 #include <stl/string>
@@ -37,6 +37,8 @@ class FontFaceImpl
 class FontSystemImpl
 {
   public:
+    typedef medialib::FontSystem::CodecLoadFunc CodecLoadFunc;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,14 +55,14 @@ class FontSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация и получение пользовательских функций загрузки гарнитур
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool               RegisterLoadFunc   (const char* extension, const medialib::FontSystem::CodecLoadFunc& codec);
-    void               UnRegisterLoadFunc (const char* extension);
-    void               UnRegisterAllFuncs ();
-    medialib::FontSystem::CodecLoadFunc* GetLoadFunc (const char* extension);
+    bool           RegisterLoadFunc   (const char* extension, const CodecLoadFunc& codec);
+    void           UnRegisterLoadFunc (const char* extension);
+    void           UnRegisterAllFuncs ();
+    CodecLoadFunc* GetLoadFunc        (const char* extension);
 
   private:
-    typedef stl::hash_set<medialib::FontFace*> OpenFontFacesSet;
-    typedef stl::hash_map<stl::string, medialib::FontSystem::CodecLoadFunc> LoadCodecs;
+    typedef stl::hash_set<medialib::FontFace*>        OpenFontFacesSet;
+    typedef stl::hash_map<stl::string, CodecLoadFunc> LoadCodecs;
 
   private:    
     OpenFontFacesSet open_font_faces;  //список открытых гарнитур

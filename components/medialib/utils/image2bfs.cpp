@@ -142,7 +142,8 @@ int main (int argc, char *argv[])
             WriteProperty (&bfs_file, "YPos",   _itoa (i + 1, buffer, 10));
             WriteProperty (&bfs_file, "Width",  _itoa (width - 2, buffer, 10));
             WriteProperty (&bfs_file, "Height", _itoa (height - 2, buffer, 10));
-            bfs_file.Write ("/>\n", 3);    
+            bfs_file.Write ("/>\n", 3);
+            j += width - 1;  
           }
       }
     }

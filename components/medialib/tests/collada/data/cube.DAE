@@ -1,0 +1,861 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Evgeniy</author>
+      <authoring_tool>Feeling ColladaMax v3.03.</authoring_tool>
+      <source_data>file:///J:/Users/Evgeniy/AppData/Local/Temp/_tc/anim-cube1.max</source_data>
+    </contributor>
+    <created>2007-07-18T13:02:49Z</created>
+    <modified>2007-07-18T13:03:03Z</modified>
+    <unit meter="0.0254" name="inch"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_animations>
+    <animation id="repeatU">
+      <source id="repeatU___-_Default-fx_common_repeatU-input">
+        <float_array id="repeatU___-_Default-fx_common_repeatU-input-array" count="2">0 1.13333</float_array>
+        <technique_common>
+          <accessor source="#repeatU___-_Default-fx_common_repeatU-input-array" count="2" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="repeatU___-_Default-fx_common_repeatU-output">
+        <float_array id="repeatU___-_Default-fx_common_repeatU-output-array" count="2">0.099999 1.2</float_array>
+        <technique_common>
+          <accessor source="#repeatU___-_Default-fx_common_repeatU-output-array" count="2" stride="1">
+            <param type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="repeatU___-_Default-fx_common_repeatU-interpolations">
+        <Name_array id="repeatU___-_Default-fx_common_repeatU-interpolations-array" count="2">BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#repeatU___-_Default-fx_common_repeatU-interpolations-array" count="2" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="repeatU___-_Default-fx_common_repeatU-intangents">
+        <float_array id="repeatU___-_Default-fx_common_repeatU-intangents-array" count="4">0.999792 0.099999 0.755593 1.2</float_array>
+        <technique_common>
+          <accessor source="#repeatU___-_Default-fx_common_repeatU-intangents-array" count="2" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="repeatU___-_Default-fx_common_repeatU-outtangents">
+        <float_array id="repeatU___-_Default-fx_common_repeatU-outtangents-array" count="4">0.37774 0.099999 0.133542 1.2</float_array>
+        <technique_common>
+          <accessor source="#repeatU___-_Default-fx_common_repeatU-outtangents-array" count="2" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="repeatU___-_Default-fx_common_repeatU-sampler">
+        <input semantic="INPUT" source="#repeatU___-_Default-fx_common_repeatU-input"/>
+        <input semantic="OUTPUT" source="#repeatU___-_Default-fx_common_repeatU-output"/>
+        <input semantic="INTERPOLATION" source="#repeatU___-_Default-fx_common_repeatU-interpolations"/>
+        <input semantic="IN_TANGENT" source="#repeatU___-_Default-fx_common_repeatU-intangents"/>
+        <input semantic="OUT_TANGENT" source="#repeatU___-_Default-fx_common_repeatU-outtangents"/>
+      </sampler>
+      <channel source="#repeatU___-_Default-fx_common_repeatU-sampler" target="__-_Default-fx/common/repeatU"/>
+    </animation>
+    <animation id="repeatV">
+      <source id="repeatV___-_Default-fx_common_repeatV-input">
+        <float_array id="repeatV___-_Default-fx_common_repeatV-input-array" count="3">0 1.46667 2.33333</float_array>
+        <technique_common>
+          <accessor source="#repeatV___-_Default-fx_common_repeatV-input-array" count="3" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="repeatV___-_Default-fx_common_repeatV-output">
+        <float_array id="repeatV___-_Default-fx_common_repeatV-output-array" count="3">1 1.9 0.7</float_array>
+        <technique_common>
+          <accessor source="#repeatV___-_Default-fx_common_repeatV-output-array" count="3" stride="1">
+            <param type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="repeatV___-_Default-fx_common_repeatV-interpolations">
+        <Name_array id="repeatV___-_Default-fx_common_repeatV-interpolations-array" count="3">BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#repeatV___-_Default-fx_common_repeatV-interpolations-array" count="3" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="repeatV___-_Default-fx_common_repeatV-intangents">
+        <float_array id="repeatV___-_Default-fx_common_repeatV-intangents-array" count="6">0.999792 1 0.977827 1.9 2.04447 0.7</float_array>
+        <technique_common>
+          <accessor source="#repeatV___-_Default-fx_common_repeatV-intangents-array" count="3" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="repeatV___-_Default-fx_common_repeatV-outtangents">
+        <float_array id="repeatV___-_Default-fx_common_repeatV-outtangents-array" count="6">0.48884 1 1.75553 1.9 1.33354 0.7</float_array>
+        <technique_common>
+          <accessor source="#repeatV___-_Default-fx_common_repeatV-outtangents-array" count="3" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="repeatV___-_Default-fx_common_repeatV-sampler">
+        <input semantic="INPUT" source="#repeatV___-_Default-fx_common_repeatV-input"/>
+        <input semantic="OUTPUT" source="#repeatV___-_Default-fx_common_repeatV-output"/>
+        <input semantic="INTERPOLATION" source="#repeatV___-_Default-fx_common_repeatV-interpolations"/>
+        <input semantic="IN_TANGENT" source="#repeatV___-_Default-fx_common_repeatV-intangents"/>
+        <input semantic="OUT_TANGENT" source="#repeatV___-_Default-fx_common_repeatV-outtangents"/>
+      </sampler>
+      <channel source="#repeatV___-_Default-fx_common_repeatV-sampler" target="__-_Default-fx/common/repeatV"/>
+    </animation>
+    <animation id="offsetU">
+      <source id="offsetU___-_Default-fx_common_offsetU-input">
+        <float_array id="offsetU___-_Default-fx_common_offsetU-input-array" count="3">0 1.13333 3.33333</float_array>
+        <technique_common>
+          <accessor source="#offsetU___-_Default-fx_common_offsetU-input-array" count="3" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="offsetU___-_Default-fx_common_offsetU-output">
+        <float_array id="offsetU___-_Default-fx_common_offsetU-output-array" count="3">0.96 0.83 0.63</float_array>
+        <technique_common>
+          <accessor source="#offsetU___-_Default-fx_common_offsetU-output-array" count="3" stride="1">
+            <param type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="offsetU___-_Default-fx_common_offsetU-interpolations">
+        <Name_array id="offsetU___-_Default-fx_common_offsetU-interpolations-array" count="3">BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#offsetU___-_Default-fx_common_offsetU-interpolations-array" count="3" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="offsetU___-_Default-fx_common_offsetU-intangents">
+        <float_array id="offsetU___-_Default-fx_common_offsetU-intangents-array" count="6">0.999792 0.96 0.755593 0.867396 2.60007 0.63</float_array>
+        <technique_common>
+          <accessor source="#offsetU___-_Default-fx_common_offsetU-intangents-array" count="3" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="offsetU___-_Default-fx_common_offsetU-outtangents">
+        <float_array id="offsetU___-_Default-fx_common_offsetU-outtangents-array" count="6">0.37774 0.96 1.86659 0.83 2.33354 0.63</float_array>
+        <technique_common>
+          <accessor source="#offsetU___-_Default-fx_common_offsetU-outtangents-array" count="3" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="offsetU___-_Default-fx_common_offsetU-sampler">
+        <input semantic="INPUT" source="#offsetU___-_Default-fx_common_offsetU-input"/>
+        <input semantic="OUTPUT" source="#offsetU___-_Default-fx_common_offsetU-output"/>
+        <input semantic="INTERPOLATION" source="#offsetU___-_Default-fx_common_offsetU-interpolations"/>
+        <input semantic="IN_TANGENT" source="#offsetU___-_Default-fx_common_offsetU-intangents"/>
+        <input semantic="OUT_TANGENT" source="#offsetU___-_Default-fx_common_offsetU-outtangents"/>
+      </sampler>
+      <channel source="#offsetU___-_Default-fx_common_offsetU-sampler" target="__-_Default-fx/common/offsetU"/>
+    </animation>
+    <animation id="offsetV">
+      <source id="offsetV___-_Default-fx_common_offsetV-input">
+        <float_array id="offsetV___-_Default-fx_common_offsetV-input-array" count="3">0 0.766667 1.46667</float_array>
+        <technique_common>
+          <accessor source="#offsetV___-_Default-fx_common_offsetV-input-array" count="3" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="offsetV___-_Default-fx_common_offsetV-output">
+        <float_array id="offsetV___-_Default-fx_common_offsetV-output-array" count="3">1 1.25 0.96</float_array>
+        <technique_common>
+          <accessor source="#offsetV___-_Default-fx_common_offsetV-output-array" count="3" stride="1">
+            <param type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="offsetV___-_Default-fx_common_offsetV-interpolations">
+        <Name_array id="offsetV___-_Default-fx_common_offsetV-interpolations-array" count="3">BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#offsetV___-_Default-fx_common_offsetV-interpolations-array" count="3" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="offsetV___-_Default-fx_common_offsetV-intangents">
+        <float_array id="offsetV___-_Default-fx_common_offsetV-intangents-array" count="6">0.999792 1 0.511137 1.25 1.23336 0.96</float_array>
+        <technique_common>
+          <accessor source="#offsetV___-_Default-fx_common_offsetV-intangents-array" count="3" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="offsetV___-_Default-fx_common_offsetV-outtangents">
+        <float_array id="offsetV___-_Default-fx_common_offsetV-outtangents-array" count="6">0.25553 1 0.999977 1.25 0.466875 0.96</float_array>
+        <technique_common>
+          <accessor source="#offsetV___-_Default-fx_common_offsetV-outtangents-array" count="3" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="offsetV___-_Default-fx_common_offsetV-sampler">
+        <input semantic="INPUT" source="#offsetV___-_Default-fx_common_offsetV-input"/>
+        <input semantic="OUTPUT" source="#offsetV___-_Default-fx_common_offsetV-output"/>
+        <input semantic="INTERPOLATION" source="#offsetV___-_Default-fx_common_offsetV-interpolations"/>
+        <input semantic="IN_TANGENT" source="#offsetV___-_Default-fx_common_offsetV-intangents"/>
+        <input semantic="OUT_TANGENT" source="#offsetV___-_Default-fx_common_offsetV-outtangents"/>
+      </sampler>
+      <channel source="#offsetV___-_Default-fx_common_offsetV-sampler" target="__-_Default-fx/common/offsetV"/>
+    </animation>
+    <animation id="Box01-node-translation">
+      <source id="Box01-node-translation_Box01-node_translation.X-input">
+        <float_array id="Box01-node-translation_Box01-node_translation.X-input-array" count="1">0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.X-input-array" count="1" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.X-output">
+        <float_array id="Box01-node-translation_Box01-node_translation.X-output-array" count="1">-26.1087</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.X-output-array" count="1" stride="1">
+            <param name="X" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.X-interpolations">
+        <Name_array id="Box01-node-translation_Box01-node_translation.X-interpolations-array" count="1">TCB</Name_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.X-interpolations-array" count="1" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.X-tcbs">
+        <float_array id="Box01-node-translation_Box01-node_translation.X-tcbs-array" count="3">0 0 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.X-tcbs-array" count="1" stride="3">
+            <param type="float"/>
+            <param type="float"/>
+            <param type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.X-eases">
+        <float_array id="Box01-node-translation_Box01-node_translation.X-eases-array" count="2">0 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.X-eases-array" count="1" stride="2">
+            <param type="float"/>
+            <param type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.Y-input">
+        <float_array id="Box01-node-translation_Box01-node_translation.Y-input-array" count="10">0 0.6 0.766667 1.13333 1.4 1.46667 2.03333 2.33333 2.53333 3.33333</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.Y-input-array" count="10" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.Y-output">
+        <float_array id="Box01-node-translation_Box01-node_translation.Y-output-array" count="10">-4.0212 -4.0212 -4.0212 -4.0212 -20.6145 -4.0212 -16.0513 -4.0212 -4.0212 -4.0212</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.Y-output-array" count="10" stride="1">
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.Y-interpolations">
+        <Name_array id="Box01-node-translation_Box01-node_translation.Y-interpolations-array" count="10">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.Y-interpolations-array" count="10" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.Y-intangents">
+        <float_array id="Box01-node-translation_Box01-node_translation.Y-intangents-array" count="20">0.999792 -4.0212 0.40002 -4.0212 0.711117 -4.0212 1.01112 -4.0212 1.31112 -20.6145 1.44445 -4.0212 1.84446 -16.0513 2.23334 -4.0212 2.46667 -4.0212 3.06669 -4.0212</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.Y-intangents-array" count="10" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.Y-outtangents">
+        <float_array id="Box01-node-translation_Box01-node_translation.Y-outtangents-array" count="20">0.19998 -4.0212 0.65555 -4.0212 0.888877 -4.0212 1.22221 -4.0212 1.42222 -20.6145 1.65554 -4.0212 2.13332 -16.0513 2.39999 -4.0212 2.79997 -4.0212 2.33354 -4.0212</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.Y-outtangents-array" count="10" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.Z-input">
+        <float_array id="Box01-node-translation_Box01-node_translation.Z-input-array" count="10">0 0.6 0.866667 1.13333 1.23333 1.46667 2.33333 2.43333 2.53333 3.33333</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.Z-input-array" count="10" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.Z-output">
+        <float_array id="Box01-node-translation_Box01-node_translation.Z-output-array" count="10">0 0 41.0683 0 0 0 0 40.2386 0 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.Z-output-array" count="10" stride="1">
+            <param name="Z" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.Z-interpolations">
+        <Name_array id="Box01-node-translation_Box01-node_translation.Z-interpolations-array" count="10">TCB TCB TCB TCB TCB TCB TCB TCB TCB TCB</Name_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.Z-interpolations-array" count="10" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.Z-tcbs">
+        <float_array id="Box01-node-translation_Box01-node_translation.Z-tcbs-array" count="30">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.Z-tcbs-array" count="10" stride="3">
+            <param type="float"/>
+            <param type="float"/>
+            <param type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-translation_Box01-node_translation.Z-eases">
+        <float_array id="Box01-node-translation_Box01-node_translation.Z-eases-array" count="20">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-translation_Box01-node_translation.Z-eases-array" count="10" stride="2">
+            <param type="float"/>
+            <param type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="Box01-node-translation_Box01-node_translation.X-sampler">
+        <input semantic="INPUT" source="#Box01-node-translation_Box01-node_translation.X-input"/>
+        <input semantic="OUTPUT" source="#Box01-node-translation_Box01-node_translation.X-output"/>
+        <input semantic="INTERPOLATION" source="#Box01-node-translation_Box01-node_translation.X-interpolations"/>
+        <input semantic="TCB" source="#Box01-node-translation_Box01-node_translation.X-tcbs"/>
+        <input semantic="EASE_IN_OUT" source="#Box01-node-translation_Box01-node_translation.X-eases"/>
+      </sampler>
+      <sampler id="Box01-node-translation_Box01-node_translation.Y-sampler">
+        <input semantic="INPUT" source="#Box01-node-translation_Box01-node_translation.Y-input"/>
+        <input semantic="OUTPUT" source="#Box01-node-translation_Box01-node_translation.Y-output"/>
+        <input semantic="INTERPOLATION" source="#Box01-node-translation_Box01-node_translation.Y-interpolations"/>
+        <input semantic="IN_TANGENT" source="#Box01-node-translation_Box01-node_translation.Y-intangents"/>
+        <input semantic="OUT_TANGENT" source="#Box01-node-translation_Box01-node_translation.Y-outtangents"/>
+      </sampler>
+      <sampler id="Box01-node-translation_Box01-node_translation.Z-sampler">
+        <input semantic="INPUT" source="#Box01-node-translation_Box01-node_translation.Z-input"/>
+        <input semantic="OUTPUT" source="#Box01-node-translation_Box01-node_translation.Z-output"/>
+        <input semantic="INTERPOLATION" source="#Box01-node-translation_Box01-node_translation.Z-interpolations"/>
+        <input semantic="TCB" source="#Box01-node-translation_Box01-node_translation.Z-tcbs"/>
+        <input semantic="EASE_IN_OUT" source="#Box01-node-translation_Box01-node_translation.Z-eases"/>
+      </sampler>
+      <channel source="#Box01-node-translation_Box01-node_translation.X-sampler" target="Box01-node/translation.X"/>
+      <channel source="#Box01-node-translation_Box01-node_translation.Y-sampler" target="Box01-node/translation.Y"/>
+      <channel source="#Box01-node-translation_Box01-node_translation.Z-sampler" target="Box01-node/translation.Z"/>
+    </animation>
+    <animation id="Box01-node-rz">
+      <source id="Box01-node-rz_Box01-node_RotZ.ANGLE-input">
+        <float_array id="Box01-node-rz_Box01-node_RotZ.ANGLE-input-array" count="10">0 0.6 0.766667 1.13333 1.23333 1.46667 2.03333 2.33333 2.53333 3.33333</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-rz_Box01-node_RotZ.ANGLE-input-array" count="10" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="Box01-node-rz_Box01-node_RotZ.ANGLE-output">
+        <float_array id="Box01-node-rz_Box01-node_RotZ.ANGLE-output-array" count="10">0 0 0 0 0 0 0 0 0 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-rz_Box01-node_RotZ.ANGLE-output-array" count="10" stride="1">
+            <param name="ANGLE" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-rz_Box01-node_RotZ.ANGLE-interpolations">
+        <Name_array id="Box01-node-rz_Box01-node_RotZ.ANGLE-interpolations-array" count="10">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#Box01-node-rz_Box01-node_RotZ.ANGLE-interpolations-array" count="10" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-rz_Box01-node_RotZ.ANGLE-intangents">
+        <float_array id="Box01-node-rz_Box01-node_RotZ.ANGLE-intangents-array" count="20">0.999792 0 0.40002 0 0.711117 0 1.01112 0 1.2 0 1.3889 0 1.84446 0 2.23334 0 2.46667 0 3.06669 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-rz_Box01-node_RotZ.ANGLE-intangents-array" count="10" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-rz_Box01-node_RotZ.ANGLE-outtangents">
+        <float_array id="Box01-node-rz_Box01-node_RotZ.ANGLE-outtangents-array" count="20">0.19998 0 0.65555 0 0.888877 0 1.16666 0 1.3111 0 1.65554 0 2.13332 0 2.39999 0 2.79997 0 2.33354 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-rz_Box01-node_RotZ.ANGLE-outtangents-array" count="10" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="Box01-node-rz_Box01-node_RotZ.ANGLE-sampler">
+        <input semantic="INPUT" source="#Box01-node-rz_Box01-node_RotZ.ANGLE-input"/>
+        <input semantic="OUTPUT" source="#Box01-node-rz_Box01-node_RotZ.ANGLE-output"/>
+        <input semantic="INTERPOLATION" source="#Box01-node-rz_Box01-node_RotZ.ANGLE-interpolations"/>
+        <input semantic="IN_TANGENT" source="#Box01-node-rz_Box01-node_RotZ.ANGLE-intangents"/>
+        <input semantic="OUT_TANGENT" source="#Box01-node-rz_Box01-node_RotZ.ANGLE-outtangents"/>
+      </sampler>
+      <channel source="#Box01-node-rz_Box01-node_RotZ.ANGLE-sampler" target="Box01-node/RotZ.ANGLE"/>
+    </animation>
+    <animation id="Box01-node-rx">
+      <source id="Box01-node-rx_Box01-node_RotX.ANGLE-input">
+        <float_array id="Box01-node-rx_Box01-node_RotX.ANGLE-input-array" count="10">0 0.6 0.766667 1.13333 1.23333 1.46667 2.03333 2.33333 2.53333 3.33333</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-rx_Box01-node_RotX.ANGLE-input-array" count="10" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="Box01-node-rx_Box01-node_RotX.ANGLE-output">
+        <float_array id="Box01-node-rx_Box01-node_RotX.ANGLE-output-array" count="10">0 0 0 0 0 0 0 0 0 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-rx_Box01-node_RotX.ANGLE-output-array" count="10" stride="1">
+            <param name="ANGLE" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-rx_Box01-node_RotX.ANGLE-interpolations">
+        <Name_array id="Box01-node-rx_Box01-node_RotX.ANGLE-interpolations-array" count="10">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#Box01-node-rx_Box01-node_RotX.ANGLE-interpolations-array" count="10" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-rx_Box01-node_RotX.ANGLE-intangents">
+        <float_array id="Box01-node-rx_Box01-node_RotX.ANGLE-intangents-array" count="20">0.999792 0 0.40002 0 0.711117 0 1.01112 0 1.2 0 1.3889 0 1.84446 0 2.23334 0 2.46667 0 3.06669 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-rx_Box01-node_RotX.ANGLE-intangents-array" count="10" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-rx_Box01-node_RotX.ANGLE-outtangents">
+        <float_array id="Box01-node-rx_Box01-node_RotX.ANGLE-outtangents-array" count="20">0.19998 0 0.65555 0 0.888877 0 1.16666 0 1.3111 0 1.65554 0 2.13332 0 2.39999 0 2.79997 0 2.33354 0</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-rx_Box01-node_RotX.ANGLE-outtangents-array" count="10" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="Box01-node-rx_Box01-node_RotX.ANGLE-sampler">
+        <input semantic="INPUT" source="#Box01-node-rx_Box01-node_RotX.ANGLE-input"/>
+        <input semantic="OUTPUT" source="#Box01-node-rx_Box01-node_RotX.ANGLE-output"/>
+        <input semantic="INTERPOLATION" source="#Box01-node-rx_Box01-node_RotX.ANGLE-interpolations"/>
+        <input semantic="IN_TANGENT" source="#Box01-node-rx_Box01-node_RotX.ANGLE-intangents"/>
+        <input semantic="OUT_TANGENT" source="#Box01-node-rx_Box01-node_RotX.ANGLE-outtangents"/>
+      </sampler>
+      <channel source="#Box01-node-rx_Box01-node_RotX.ANGLE-sampler" target="Box01-node/RotX.ANGLE"/>
+    </animation>
+    <animation id="Box01-node-scale">
+      <source id="Box01-node-scale_Box01-node_scale-input">
+        <float_array id="Box01-node-scale_Box01-node_scale-input-array" count="2">0 3.33333</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-scale_Box01-node_scale-input-array" count="2" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="Box01-node-scale_Box01-node_scale-output">
+        <float_array id="Box01-node-scale_Box01-node_scale-output-array" count="6">1 1 1 1 1 1</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-scale_Box01-node_scale-output-array" count="2" stride="3">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="Z" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-scale_Box01-node_scale-interpolations">
+        <Name_array id="Box01-node-scale_Box01-node_scale-interpolations-array" count="2">BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#Box01-node-scale_Box01-node_scale-interpolations-array" count="2" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-scale_Box01-node_scale-intangents">
+        <float_array id="Box01-node-scale_Box01-node_scale-intangents-array" count="12">0.999792 1 0.999792 1 0.999792 1 2.22233 1 2.22233 1 2.22233 1</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-scale_Box01-node_scale-intangents-array" count="2" stride="6">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Box01-node-scale_Box01-node_scale-outtangents">
+        <float_array id="Box01-node-scale_Box01-node_scale-outtangents-array" count="12">1.111 1 1.111 1 1.111 1 2.33354 1 2.33354 1 2.33354 1</float_array>
+        <technique_common>
+          <accessor source="#Box01-node-scale_Box01-node_scale-outtangents-array" count="2" stride="6">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="Box01-node-scale_Box01-node_scale-sampler">
+        <input semantic="INPUT" source="#Box01-node-scale_Box01-node_scale-input"/>
+        <input semantic="OUTPUT" source="#Box01-node-scale_Box01-node_scale-output"/>
+        <input semantic="INTERPOLATION" source="#Box01-node-scale_Box01-node_scale-interpolations"/>
+        <input semantic="IN_TANGENT" source="#Box01-node-scale_Box01-node_scale-intangents"/>
+        <input semantic="OUT_TANGENT" source="#Box01-node-scale_Box01-node_scale-outtangents"/>
+      </sampler>
+      <channel source="#Box01-node-scale_Box01-node_scale-sampler" target="Box01-node/scale"/>
+    </animation>
+    <animation id="Camera01-camera-xfov">
+      <source id="Camera01-camera-xfov_Camera01-camera_xfov-input">
+        <float_array id="Camera01-camera-xfov_Camera01-camera_xfov-input-array" count="5">0 0.333333 1.13333 2.5 3.33333</float_array>
+        <technique_common>
+          <accessor source="#Camera01-camera-xfov_Camera01-camera_xfov-input-array" count="5" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="Camera01-camera-xfov_Camera01-camera_xfov-output">
+        <float_array id="Camera01-camera-xfov_Camera01-camera_xfov-output-array" count="5">45 66 28 89 32</float_array>
+        <technique_common>
+          <accessor source="#Camera01-camera-xfov_Camera01-camera_xfov-output-array" count="5" stride="1">
+            <param type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Camera01-camera-xfov_Camera01-camera_xfov-interpolations">
+        <Name_array id="Camera01-camera-xfov_Camera01-camera_xfov-interpolations-array" count="5">BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#Camera01-camera-xfov_Camera01-camera_xfov-interpolations-array" count="5" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Camera01-camera-xfov_Camera01-camera_xfov-intangents">
+        <float_array id="Camera01-camera-xfov_Camera01-camera_xfov-intangents-array" count="10">0.999792 45 0.222233 66 0.866693 28 2.04449 89 3.05558 32</float_array>
+        <technique_common>
+          <accessor source="#Camera01-camera-xfov_Camera01-camera_xfov-intangents-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Camera01-camera-xfov_Camera01-camera_xfov-outtangents">
+        <float_array id="Camera01-camera-xfov_Camera01-camera_xfov-outtangents-array" count="10">0.1111 45 0.599973 66 1.58884 28 2.77775 89 2.33354 32</float_array>
+        <technique_common>
+          <accessor source="#Camera01-camera-xfov_Camera01-camera_xfov-outtangents-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="Camera01-camera-xfov_Camera01-camera_xfov-sampler">
+        <input semantic="INPUT" source="#Camera01-camera-xfov_Camera01-camera_xfov-input"/>
+        <input semantic="OUTPUT" source="#Camera01-camera-xfov_Camera01-camera_xfov-output"/>
+        <input semantic="INTERPOLATION" source="#Camera01-camera-xfov_Camera01-camera_xfov-interpolations"/>
+        <input semantic="IN_TANGENT" source="#Camera01-camera-xfov_Camera01-camera_xfov-intangents"/>
+        <input semantic="OUT_TANGENT" source="#Camera01-camera-xfov_Camera01-camera_xfov-outtangents"/>
+      </sampler>
+      <channel source="#Camera01-camera-xfov_Camera01-camera_xfov-sampler" target="Camera01-camera/xfov"/>
+    </animation>
+  </library_animations>
+  <library_cameras>
+    <camera id="Camera01-camera">
+      <optics>
+        <technique_common>
+          <perspective>
+            <xfov sid="xfov">45</xfov>
+            <aspect_ratio>1</aspect_ratio>
+            <znear>1</znear>
+            <zfar>1000</zfar>
+          </perspective>
+        </technique_common>
+      </optics>
+      <extra>
+        <technique profile="FCOLLADA">
+          <target>#Camera01.Target-node</target>
+        </technique>
+      </extra>
+    </camera>
+  </library_cameras>
+  <library_images>
+    <image id="_5.jpg" name="_5.jpg">
+      <init_from>file:///D:/stuff/05.jpg</init_from>
+    </image>
+  </library_images>
+  <library_materials>
+    <material id="__-_Default" name="__-_Default">
+      <instance_effect url="#__-_Default-fx"/>
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="__-_Default-fx" name="__-_Default">
+      <profile_COMMON>
+        <newparam sid="_5.jpg-surface">
+          <surface type="2D">
+            <init_from>_5.jpg</init_from>
+            <format>A8R8G8B8</format>
+          </surface>
+        </newparam>
+        <newparam sid="_5.jpg-sampler">
+          <sampler2D>
+            <source>_5.jpg-surface</source>
+            <minfilter>LINEAR_MIPMAP_LINEAR</minfilter>
+            <magfilter>LINEAR</magfilter>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <blinn>
+            <ambient>
+              <color>0.588235 0.588235 0.588235 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="_5.jpg-sampler" texcoord="CHANNEL1">
+                <extra>
+                  <technique profile="MAYA">
+                    <mirrorU>0</mirrorU>
+                    <mirrorV>0</mirrorV>
+                    <wrapU>1</wrapU>
+                    <wrapV>1</wrapV>
+                    <repeatU sid="repeatU">0.099999</repeatU>
+                    <repeatV sid="repeatV">1</repeatV>
+                    <offsetU sid="offsetU">0.04</offsetU>
+                    <offsetV sid="offsetV">0</offsetV>
+                  </technique>
+                  <technique profile="MAX3D">
+                    <amount>1</amount>
+                  </technique>
+                </extra>
+              </texture>
+            </diffuse>
+            <specular>
+              <color>0.9 0.9 0.9 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <reflectivity>
+              <float>1</float>
+            </reflectivity>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+            <index_of_refraction>
+              <float>1</float>
+            </index_of_refraction>
+          </blinn>
+          <extra>
+            <technique profile="FCOLLADA">
+              <spec_level>
+                <float>0</float>
+              </spec_level>
+              <emission_level>
+                <float>0</float>
+              </emission_level>
+            </technique>
+          </extra>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="MAX3D">
+          <faceted>0</faceted>
+          <double_sided>0</double_sided>
+          <wireframe>0</wireframe>
+          <face_map>0</face_map>
+        </technique>
+      </extra>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry id="Box01-mesh" name="Box01">
+      <mesh>
+        <source id="Box01-mesh-positions">
+          <float_array id="Box01-mesh-positions-array" count="24">-18.9038 -29.8728 0 18.9038 -29.8728 0 -18.9038 29.8728 0 18.9038 29.8728 0 -18.9038 -29.8728 52.3435 18.9038 -29.8728 52.3435 -18.9038 29.8728 52.3435 18.9038 29.8728 52.3435</float_array>
+          <technique_common>
+            <accessor source="#Box01-mesh-positions-array" count="8" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Box01-mesh-normals">
+          <float_array id="Box01-mesh-normals-array" count="72">0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 1 0 0 1 0 0 1 0 0 1 0 -1 0 0 -1 0 0 -1 0 0 -1 0 1 0 0 1 0 0 1 0 0 1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0</float_array>
+          <technique_common>
+            <accessor source="#Box01-mesh-normals-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Box01-mesh-map-channel1">
+          <float_array id="Box01-mesh-map-channel1-array" count="36">0 0 0 1 0 0 0 1 0 1 1 0 0 0 0 1 0 0 0 1 0 1 1 0 0 0 0 1 0 0 0 1 0 1 1 0</float_array>
+          <technique_common>
+            <accessor source="#Box01-mesh-map-channel1-array" count="12" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Box01-mesh-map-channel1-tangents">
+          <float_array id="Box01-mesh-map-channel1-tangents-array" count="12">1 0 0 -1 0 0 0 -1 0 0 1 0</float_array>
+          <technique_common>
+            <accessor source="#Box01-mesh-map-channel1-tangents-array" count="4" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Box01-mesh-map-channel1-binormals">
+          <float_array id="Box01-mesh-map-channel1-binormals-array" count="6">0 -1 0 0 0 -1</float_array>
+          <technique_common>
+            <accessor source="#Box01-mesh-map-channel1-binormals-array" count="2" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Box01-mesh-vertices">
+          <input semantic="POSITION" source="#Box01-mesh-positions"/>
+        </vertices>
+        <triangles material="__-_Default" count="12">
+          <input semantic="VERTEX" source="#Box01-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Box01-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Box01-mesh-map-channel1" offset="2" set="1"/>
+          <input semantic="TEXTANGENT" source="#Box01-mesh-map-channel1-tangents" offset="3" set="1"/>
+          <input semantic="TEXBINORMAL" source="#Box01-mesh-map-channel1-binormals" offset="4" set="1"/>
+          <p>0 0 9 0 0 2 1 11 0 0 3 2 10 0 0 3 2 10 0 0 1 3 8 0 0 0 0 9 0 0 4 4 8 1 0 5 5 9 1 0 7 6 11 1 0 7 6 11 1 0 6 7 10 1 0 4 4 8 1 0 0 8 4 1 1 1 9 5 1 1 5 10 7 1 1 5 10 7 1 1 4 11 6 1 1 0 8 4 1 1 1 12 0 2 1 3 13 1 2 1 7 14 3 2 1 7 14 3 2 1 5 15 2 2 1 1 12 0 2 1 3 16 4 0 1 2 17 5 0 1 6 18 7 0 1 6 18 7 0 1 7 19 6 0 1 3 16 4 0 1 2 20 0 3 1 0 21 1 3 1 4 22 3 3 1 4 22 3 3 1 6 23 2 3 1 2 20 0 3 1</p>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="anim-cube1.max" name="anim-cube1.max">
+      <node id="Box01-node" name="Box01" type="NODE">
+        <translate sid="translation">-26.1087 -4.0212 0</translate>
+        <rotate sid="RotZ">0 0 1 0</rotate>
+        <rotate sid="RotY">0 1 0 0</rotate>
+        <rotate sid="RotX">1 0 0 0</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <instance_geometry url="#Box01-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="__-_Default" target="#__-_Default">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Camera01-node" name="Camera01" type="NODE">
+        <matrix>0.149737 0 -0.988726 -77.6276 -0.988726 0 -0.149737 14.1825 0 1 0 0 0 0 0 1</matrix>
+        <instance_camera url="#Camera01-camera"/>
+      </node>
+      <node id="Camera01.Target-node" name="Camera01.Target" type="NODE">
+        <translate>-28.0856 21.6854 0</translate>
+      </node>
+      <extra>
+        <technique profile="FCOLLADA">
+          <start_time>0</start_time>
+          <end_time>3.33333</end_time>
+        </technique>
+      </extra>
+      <extra>
+        <technique profile="MAX3D">
+          <frame_rate>30</frame_rate>
+        </technique>
+      </extra>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#anim-cube1.max"/>
+  </scene>
+</COLLADA>
