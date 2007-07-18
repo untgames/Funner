@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := FUNNER_EXTERN_LIBS FUNNER_COMPONENTS
+TARGETS := FUNNER_EXTERN_LIBS FUNNER_COMPONENTS FUNNER_UTILS
 
 #Цель №1 - external libraries
 FUNNER_EXTERN_LIBS.TYPE       := package
@@ -10,3 +10,7 @@ FUNNER_EXTERN_LIBS.COMPONENTS := extern/zlib extern/zzip extern/pcre extern/devi
 #Цель №2 - пакет
 FUNNER_COMPONENTS.TYPE       := package
 FUNNER_COMPONENTS.COMPONENTS := components/commonlib components/medialib components/xtl
+
+#Цель №3 - утилиты
+FUNNER_UTILS.TYPE       := package
+FUNNER_UTILS.COMPONENTS := components/utils/max8export
