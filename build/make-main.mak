@@ -92,7 +92,7 @@ define batch-compile
   
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
 			@echo build-start > $$@.incomplete-build
-			@$$(call tools.msvc.compile,$$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES)),$$($1.INCLUDE_DIRS) $$($2.SOURCE_DIR),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
+			@$$(call tools.msvc.compile,$$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -101,7 +101,7 @@ define batch-compile
     $$($2.FLAG_FILE): $2.UPDATED_SOURCE_FILES := $$(shell $$(call test_source_and_object_files,$$($2.SOURCE_FILES),$$($2.TMP_DIR)))
   
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
-			@$$(call tools.msvc.compile,$$(sort $$($2.UPDATED_SOURCE_FILES) $$($2.NEW_SOURCE_FILES)),$$($1.INCLUDE_DIRS) $$($2.SOURCE_DIR),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
+			@$$(call tools.msvc.compile,$$(sort $$($2.UPDATED_SOURCE_FILES) $$($2.NEW_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -137,7 +137,7 @@ define process_source_dir
   $$(MODULE_NAME).TMP_DIR          := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$1/$$(MODULE_PATH)
   $$(MODULE_NAME).OBJECT_FILES     := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
   $$(MODULE_NAME).NEW_SOURCE_FILES := $$(patsubst ./%,%,$$(strip $$(foreach file,$$($$(MODULE_NAME).SOURCE_FILES),$$(if $$(wildcard $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$(file))))),,$$(file)))))
-  $$(MODULE_NAME).PCH              := $$(wildcard $2/$(PCH_SHORT_NAME))
+  $$(MODULE_NAME).PCH              := $$(if $$(wildcard $2/$(PCH_SHORT_NAME)),$(PCH_SHORT_NAME))
   $1.TMP_DIRS                      := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
   $1.OBJECT_FILES                  := $$($1.OBJECT_FILES) $$($$(MODULE_NAME).OBJECT_FILES)
 
