@@ -1,4 +1,5 @@
 #include <common/parser.h>
+#include <stdio.h>
 
 using namespace common;
 

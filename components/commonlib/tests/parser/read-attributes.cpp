@@ -69,7 +69,7 @@ void Test::Translate (const char* type_name,const char* tag,const T& default_val
 {
   T object;
   
-  parser.Root ()->Read (tag,object,default_value);
+  read (parser.Root (),tag,object,default_value);
   
   stream.Printf ("%12s %28s = \"",type_name,format ("<%s>",tag).c_str ());
   serializer.Write (object);
@@ -81,7 +81,7 @@ void Test::TranslateArray (const char* type_name,const char* tag,size_t start,si
 {
   vector<T> v;
 
-  parser.Root ()->ReadArray (tag,back_inserter (v),(size_t)-1,start,step);
+  read_range (parser.Root (),tag,back_inserter (v),(size_t)-1,start,step);
   Print (type_name,tag,v.size (),&v [0]);
 }
 
@@ -90,7 +90,7 @@ void Test::TranslateArray (const char* type_name,const char* tag)
 {
   vector<T> v;
 
-  parser.Root ()->ReadArray (tag,back_inserter (v));  
+  read_range (parser.Root (),tag,back_inserter (v));  
   Print (type_name,tag,v.size (),&v [0]);
 }
 

@@ -1,9 +1,9 @@
-#ifndef __COMMONLIB_PARSER__
-#define __COMMONLIB_PARSER__
+#ifndef COMMONLIB_PARSER_HEADER
+#define COMMONLIB_PARSER_HEADER
 
-#include <math/mathlib.h>
-#include <stl/string>
-#include <stdlib.h>
+#include <xtl/token_iterator.h>
+#include <math/io.h>
+#include <string.h>
 
 namespace common
 {
@@ -20,8 +20,8 @@ template <class NodeType> class ParseNamesakeIterator;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum ParseLogMessageType
 {
-  PARSE_LOG_FATAL_ERROR, //критическая ошибка
-  PARSE_LOG_ERROR,       //ошибка
+  PARSE_LOG_FATAL_ERROR,  //критическая ошибка
+  PARSE_LOG_ERROR,        //ошибка
   PARSE_LOG_WARNING      //предупреждение
 };
 
@@ -46,17 +46,17 @@ class ParseLog
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Протоколирование ошибок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Error    (const char* file_name,size_t line,const char* format,...);
-    void Warning  (const char* file_name,size_t line,const char* format,...);
-    void Error    (ParseNode* node,const char* format,...);
-    void Warning  (ParseNode* node,const char* format,...);
-    void VError   (const char* file_name,size_t line,const char* format,va_list list);
-    void VWarning (const char* file_name,size_t line,const char* format,va_list list);
-    void VError   (ParseNode* node,const char* format,va_list list);
-    void VWarning (ParseNode* node,const char* format,va_list list);
+    void Error    (const char* file_name, size_t line, const char* format, ...);
+    void Warning  (const char* file_name, size_t line, const char* format, ...);
+    void Error    (ParseNode* node, const char* format, ...);
+    void Warning  (ParseNode* node, const char* format, ...);
+    void VError   (const char* file_name, size_t line, const char* format, va_list list);
+    void VWarning (const char* file_name, size_t line, const char* format, va_list list);
+    void VError   (ParseNode* node, const char* format, va_list list);
+    void VWarning (ParseNode* node, const char* format, va_list list);
 
-    void FatalError  (const char* format,...);
-    void VFatalError (const char* format,va_list list);
+    void FatalError  (const char* format, ...);
+    void VFatalError (const char* format, va_list list);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор сообщений
@@ -79,19 +79,18 @@ class ParseLog
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class ParseNode
 {
-  public:
+  public: 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тэг
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* Tag     () const;                 //имя узла
-    bool        TestTag (const char* name) const; //проверяет совпадение имени  
+    const char* Tag () const; //имя узла
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с атрибутами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t       AttributesCount () const;
     const char*  Attribute       (size_t index) const;
-    const char*  Attribute       (size_t index,const char* default_value) const;
+    const char*  Attribute       (size_t index, const char* default_value) const;
     const char** Attributes      () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,11 +106,11 @@ class ParseNode
     ParseNode* Next  (const char* tag) const; //следующий узел на данном уровне иерархии с указанным именем
 
     ParseNode* NextNamesake () const; //следующий "тёзка" на данном уровне иерархии
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о расположении узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* SourceName () const; //имя исходного текста, в котором расположен узел
+    const char* SourceName () const; //имя исходного текста,  в котором расположен узел
     size_t      LineNumber () const; //номер строки
 
   private:
@@ -126,179 +125,28 @@ class ParseNode
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Дерево разбора
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class ParseTree
-{
-  public:
-    typedef ParseNode Node;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ParseTree  (const char* file_name,const char* format="auto");
-    ParseTree  (const char* name,const char* buf,size_t buf_size,const char* format="auto");
-    ParseTree  (ParseLog& log,const char* file_name,const char* format="auto");
-    ParseTree  (ParseLog& log,const char* name,const char* buf,size_t buf_size,const char* format="auto");
-    ~ParseTree ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Корневой узел дерева разбора
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Node* Root () const;
-
-  private:
-    ParseTree (const ParseTree&);
-    void operator = (const ParseTree&);
-
-  private:
-    ParseTreeImpl* impl;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Класс производящий чтение атрибутов и их массивов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class AttributeReaderType>
-class ParseAttributeReader: public AttributeReaderType
-{
-  public:
-    typedef AttributeReaderType BaseAttributeReader;
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ParseAttributeReader (size_t attributes_count,const char** attributes);
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение одиночных атрибутов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> void Read (T& object);
-    template <class T> void Read (T& object,const T& default_value);
-    
-    const char* ReadString (const char* default_value = NULL);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение массива атрибутов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class OutIter> size_t ReadArray (OutIter first);
-    template <class OutIter> size_t ReadArray (OutIter first,size_t count);
-    template <class OutIter> size_t ReadArray (OutIter first,size_t count,size_t step);
-    
-  private:
-    template <class OutIter>   bool ReadIter (OutIter& iter);
-    template <class Container> bool ReadIter (stl::front_insert_iterator<Container>& iter);
-    template <class Container> bool ReadIter (stl::back_insert_iterator<Container>& iter);
-    template <class Container> bool ReadIter (stl::insert_iterator<Container>& iter);
-    template <class T>         bool ReadIter (T*);
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Узлел дерева разбора позволяющий типизированно читать атрибуты
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class AttributeReaderType>
-class ParseReadableNode: public ParseNode
-{
-  public:
-    typedef ParseAttributeReader<AttributeReaderType>     AttributeReader;
-    typedef typename AttributeReader::BaseAttributeReader BaseAttributeReader;
-    typedef ParseReadableNode<AttributeReaderType>        Node;
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перебор вложенных узлов
-///////////////////////////////////////////////////////////////////////////////////////////////////  
-    Node* First () const;
-    Node* Next  () const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перебор узлов по имени
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Node* First (const char* tag) const;
-    Node* Next  (const char* tag) const;
-
-    Node* NextNamesake () const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение парсера атрибутов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    AttributeReader     Reader     () const;
-    AttributeReader     Reader     (const char* tag) const;
-    BaseAttributeReader BaseReader () const;
-    BaseAttributeReader BaseReader (const char* tag) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение атрибутов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> void Read (const char* tag,T& object) const;
-    template <class T> void Read (const char* tag,T& object,const T& default_value) const;
-
-    template <class Traits,class Allocator> 
-    void Read (const char* tag,stl::basic_string<char,Traits,Allocator>& string,const char* default_value) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сокращённые версии чтения атрибутов базовых типов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char*  ReadString (const char* tag,const char* default_value = NULL) const;
-    int          ReadInt    (const char* tag,int default_value = 0) const;
-    unsigned int ReadUInt   (const char* tag,unsigned int default_value = 0) const;
-    float        ReadFloat  (const char* tag,float default_value = 0.0f) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение массива атрибутов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class OutIter>
-    size_t ReadArray (const char* tag,OutIter first) const;
-
-    template <class OutIter>
-    size_t ReadArray (const char* tag,OutIter first,size_t count) const;
-
-    template <class OutIter>
-    size_t ReadArray (const char* tag,OutIter first,size_t count,size_t start) const;
-
-    template <class OutIter>
-    size_t ReadArray (const char* tag,OutIter first,size_t count,size_t start,size_t step) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка значения атрибутов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> bool Test (const char* tag,const T& value) const;
-    template <class T> bool Test (const char* tag,size_t attr_index,const T& value) const;
-                       bool Test (const char* tag,const char* string) const;
-                       bool Test (const char* tag,size_t attr_index,const char* string) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка наличия потомка
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool Present (const char* tag);
-
-  private:
-    ~ParseReadableNode () {}    
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Итератор обхода узлов дерева разбора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class NodeType,class NextFun>
+template <class NextFun>
 class ParseIterator
 {
-  public:
-    typedef NodeType Node;
-  
+  public: 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ParseIterator ();
     ParseIterator (ParseNode*);
     
-    template <class NodeType1,class NextFun1>
-    ParseIterator (const ParseIterator<NodeType1,NextFun1>&);
+    template <class NextFun1>
+    ParseIterator (const ParseIterator<NextFun1>&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     ParseIterator& operator = (ParseNode*);
     
-    template <class NodeType1,class NextFun1> 
-    ParseIterator& operator = (const ParseIterator<NodeType1,NextFun1>&);
+    template <class NextFun1> 
+    ParseIterator& operator = (const ParseIterator<NextFun1>&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переход по уровню иерархии
@@ -309,10 +157,10 @@ class ParseIterator
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение текущего узла дерева разбора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Node* operator -> () const;
-    Node& operator *  () const;
+    ParseNode* operator -> () const;
+    ParseNode& operator *  () const;
 
-    operator Node* () const { return (Node*)node; }
+    operator ParseNode* () const { return node; }
 
   private:
     ParseNode* node;
@@ -321,103 +169,88 @@ class ParseIterator
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Парсер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class AttributeReaderType>
-class BasicParser: public ParseTree
+class Parser
 {
   private:
     struct NextNodeFun         { ParseNode* operator () (ParseNode* node) const; };
     struct NextNamesakeNodeFun { ParseNode* operator () (ParseNode* node) const; };
 
   public:
-    typedef ParseReadableNode<AttributeReaderType>  Node;
-    typedef typename Node::AttributeReader          AttributeReader;
-    typedef typename Node::BaseAttributeReader      BaseAttributeReader;
-    typedef ParseIterator<Node,NextNodeFun>         Iterator;
-    typedef ParseIterator<Node,NextNamesakeNodeFun> NamesakeIterator;
-    typedef ParseLog                                Log;
+    typedef ParseNode                            Node;
+    typedef ParseIterator<NextNodeFun>           Iterator;
+    typedef ParseIterator<NextNamesakeNodeFun>   NamesakeIterator;
+    typedef xtl::io::token_iterator<const char*> AttributeIterator;    
+    typedef ParseLog                             Log;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы
+///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    BasicParser (const char* file_name,const char* format="auto");
-    BasicParser (const char* name,const char* buf,size_t buf_size,const char* format="auto");
-    BasicParser (ParseLog& log,const char* file_name,const char* format="auto");
-    BasicParser (ParseLog& log,const char* name,const char* buf,size_t buf_size,const char* format="auto");
+    Parser  (const char* file_name, const char* format="auto");
+    Parser  (const char* name, const char* buf, size_t buf_size, const char* format="auto");
+    Parser  (ParseLog& log, const char* file_name, const char* format="auto");
+    Parser  (ParseLog& log, const char* name, const char* buf, size_t buf_size, const char* format="auto");
+    ~Parser ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Корень дерева разбора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Node* Root () const;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Базовый класс чтения атрибутов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class BasicAttributeReader
-{
-  public: 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    BasicAttributeReader (size_t attributes_count,const char** attributes);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Указатель на текущий атрибут / список доступных атрибутов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char*  GetAttribute     () const;
-    const char** GetAttributeList () const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество доступных атрибутов / проверка на пустоту
-///////////////////////////////////////////////////////////////////////////////////////////////////        
-    size_t Available () const;
-    bool   IsEmpty   () const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Позиционирование
-///////////////////////////////////////////////////////////////////////////////////////////////////    
-    size_t Tell  () const; //номер текущего атрибута
-    bool   Seek  (size_t position);
-    bool   Skip  (size_t attributes_count);
-    void   Reset ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение базовых типов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool Read (bool&);
-    bool Read (char&);
-    bool Read (unsigned char&);
-    bool Read (short&);
-    bool Read (unsigned short&);
-    bool Read (int&);
-    bool Read (unsigned int&);
-    bool Read (long&);
-    bool Read (unsigned long&);
-    bool Read (float&);
-    bool Read (double&);
-    bool Read (long double&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение строк
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool Read (const char*& string_ptr);
-
-    template <class Traits,class Allocator>
-    bool Read (stl::basic_string<char,Traits,Allocator>& string);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение математических типов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T,size_t size> bool Read (math::vec<T,size>&);
-    template <class T,size_t size> bool Read (math::matrix<T,size>&);
-    template <class T>             bool Read (math::quat<T>&);
+    
+  private:
+    Parser (const Parser&); //no impl
+    Parser& operator = (const Parser&); //no impl
 
   private:
-    const char **start, **pos, **finish;
+    ParseTreeImpl* impl;  
 };
 
-//определение типа для парсера "по умолчанию"
-typedef BasicParser<BasicAttributeReader> Parser;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение итератора атрибутов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+Parser::AttributeIterator make_attribute_iterator (ParseNode*);
+Parser::AttributeIterator make_attribute_iterator (ParseNode*, const char* tag);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Чтение атрибутов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> void read (ParseNode*, const char* tag, T& object);
+template <class T> void read (ParseNode*, const char* tag, T& object, const T& default_value);
+
+template <class Traits, class Allocator> 
+void read (ParseNode*, const char* tag, stl::basic_string<char, Traits, Allocator>& string, const char* default_value);
+
+template <class T> T get (ParseNode*, const char* tag, const T& default_value=T ());
+template <class T> T get (ParseNode*, const char* tag, size_t start, const T& default_value=T ());
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Чтение интервалов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class OutIter>
+size_t read_range (ParseNode*, const char* tag, OutIter first, size_t count=size_t(-1));
+
+template <class OutIter>
+size_t read_range (ParseNode*, const char* tag, OutIter first, size_t count, size_t start, size_t step=0);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка наличия узла / проверка совпадения имени тэга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+bool test     (ParseNode*, const char* tag);
+bool test_tag (ParseNode*, const char* tag);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка значения атрибутов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> bool test (ParseNode*, const char* tag, const T& value);
+template <class T> bool test (ParseNode*, const char* tag, size_t attr_index, const T& value);
+
+bool test (ParseNode*, const char* tag, const char* value);
+bool test (ParseNode*, const char* tag, size_t attr_index, const char* value);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Применение функционала ко всем вложенным узлам
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Fn> void for_each_child (ParseNode*, Fn fn);
+template <class Fn> void for_each_child (ParseNode*, const char* tag, Fn fn);
 
 #include <common/impl/parser.inl>
 

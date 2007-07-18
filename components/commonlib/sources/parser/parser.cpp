@@ -436,11 +436,6 @@ ParseNode* ParseNode::NextNamesake () const
   return NULL;
 }
 
-bool ParseNode::TestTag (const char* tag) const
-{
-  return tag ? strhash (tag) == ((ParseNodeImpl*)data)->hash : false;
-}
-
 size_t ParseNode::AttributesCount () const
 {
   return ((ParseNodeImpl*)data)->argc-1;
@@ -474,10 +469,10 @@ size_t ParseNode::LineNumber () const
 }
 
 /*
-    ParseTree
+    Parser
 */
 
-ParseTree::ParseTree (const char* file_name,const char* format)
+Parser::Parser (const char* file_name,const char* format)
 {
   try
   {
@@ -493,7 +488,7 @@ ParseTree::ParseTree (const char* file_name,const char* format)
   }
 }
 
-ParseTree::ParseTree (const char* name,const char* buf,size_t len,const char* format)
+Parser::Parser (const char* name,const char* buf,size_t len,const char* format)
 {
   try
   {
@@ -509,7 +504,7 @@ ParseTree::ParseTree (const char* name,const char* buf,size_t len,const char* fo
   }
 }
 
-ParseTree::ParseTree (ParseLog& log,const char* file_name,const char* format)
+Parser::Parser (ParseLog& log,const char* file_name,const char* format)
 {
   impl = NULL;
 
@@ -534,7 +529,7 @@ ParseTree::ParseTree (ParseLog& log,const char* file_name,const char* format)
   }
 }
 
-ParseTree::ParseTree (ParseLog& log,const char* name,const char* buf,size_t len,const char* format)
+Parser::Parser (ParseLog& log,const char* name,const char* buf,size_t len,const char* format)
 {
   impl = NULL;
 
@@ -559,8 +554,8 @@ ParseTree::ParseTree (ParseLog& log,const char* name,const char* buf,size_t len,
   }
 }
 
-ParseTree::~ParseTree ()
-{   
+Parser::~Parser ()
+{
   if (!impl)
     return;
 
@@ -576,7 +571,7 @@ ParseTree::~ParseTree ()
   ::operator delete (impl);
 }
 
-ParseTree::Node* ParseTree::Root () const
+Parser::Node* Parser::Root () const
 {
   return (ParseNode*)((char*)impl+sizeof (ParseTreeImpl));
 }

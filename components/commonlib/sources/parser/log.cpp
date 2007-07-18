@@ -1,5 +1,7 @@
 #include <common/parser.h>
 #include <common/strwrap.h>
+#include <new>
+#include <stdio.h>
 
 using namespace common;
 
