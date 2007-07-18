@@ -79,6 +79,22 @@ typename tuple_element<I, stl::pair<T1, T2> >::type& get (stl::pair<T1, T2>&);
 template <size_t I, class T1, class T2>
 const typename tuple_element<I, stl::pair<T1, T2> >::type& get (const stl::pair<T1, T2>&);
 
+namespace noncopyable_namespace  //защита от ADL
+{
+  class noncopyable
+  {
+    protected:
+      noncopyable  () {}
+      ~noncopyable () {}
+
+   private:
+      noncopyable (const noncopyable&); //no impl
+      const noncopyable& operator = (const noncopyable&); //no impl
+  };
+}
+
+typedef noncopyable_namespace::noncopyable noncopyable;
+
 #include <xtl/detail/utility.inl>
 #include <xtl/detail/pair_tuple.inl>
 
