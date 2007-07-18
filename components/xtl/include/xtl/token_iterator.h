@@ -9,9 +9,9 @@ namespace stl
 
 //implementation forwards
 template <class Iter>      struct iterator_traits;
-template <class Container> struct back_insert_iterator;
-template <class Container> struct front_insert_iterator;
-template <class Container> struct insert_iterator;
+template <class Container> class  back_insert_iterator;
+template <class Container> class  front_insert_iterator;
+template <class Container> class  insert_iterator;
                            struct random_access_iterator_tag;
 
 template <class T, class CharT, class Allocator> class basic_string;
@@ -135,6 +135,9 @@ token_iterator<typename iterator_traits<BaseIter>::value_type, BaseIter> make_to
 template <class Ret, class Token, class BaseIter>
 Ret get (token_iterator<Token, BaseIter>&, const Ret& default_value = Ret ());
 
+template <class Token, class BaseIter, class Value>
+void read (token_iterator<Token, BaseIter>&, Value& value, const Value& default_value);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование токена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,6 +147,7 @@ bool read (token_iterator<Token, BaseIter>&, Token& result);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Разбор токенов базовых типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, bool&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, char&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, unsigned char&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, short&);
@@ -155,6 +159,7 @@ template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, uns
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, float&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, double&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, long double&);
+template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, bool&);
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, char&);
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, unsigned char&);
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, short&);
@@ -168,7 +173,7 @@ template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, 
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, long double&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение интервальных значений
+///Чтение интервалов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Token, class BaseIter, class OutIter>
 size_t read_range (token_iterator<Token, BaseIter>&, OutIter first, size_t count = size_t (-1));

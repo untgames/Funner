@@ -212,6 +212,13 @@ inline Ret get (token_iterator<Token, BaseIter>& iter, const Ret& default_value)
   return read (iter, value) ? value : default_value;
 }
 
+template <class Token, class BaseIter, class Value>
+inline void read (token_iterator<Token, BaseIter>& iter, Value& value, const Value& default_value)
+{
+  if (!read (iter, value))
+    value = default_value;
+}
+
 /*
     Чтение интервальных значений
 */
@@ -291,7 +298,7 @@ inline size_t read_range (token_iterator<Token, BaseIter>& iter, OutIter first, 
   size_t                          read_count = 0;
   token_iterator<Token, BaseIter> next       = iter + step;
 
-  for (;count-- && read_iter (iter, first); ++first, iter = next, next += step, ++read_count);
+  for (;count-- && detail::read_iter (iter, first); ++first, iter = next, next += step, ++read_count);
 
   return read_count;
 }
@@ -350,6 +357,19 @@ template <class BaseIter>
 inline bool read (token_iterator<const char*, BaseIter>& iter, unsigned long& value)
 {
   return (iter, *(long*)&value);
+}
+
+template <class BaseIter>
+inline bool read (token_iterator<const char*, BaseIter>& iter, bool& value)
+{
+  long tmp_value;
+
+  if (!detail::read_and_cast<long> (iter, tmp_value))
+    return false;
+    
+  value = tmp_value != 0;
+
+  return true;
 }
 
 template <class BaseIter>
@@ -450,6 +470,19 @@ template <class BaseIter>
 inline bool read (token_iterator<const wchar_t*, BaseIter>& iter, unsigned long& value)
 {
   return (iter, *(long*)&value);
+}
+
+template <class BaseIter>
+inline bool read (token_iterator<const wchar_t*, BaseIter>& iter, bool& value)
+{
+  long tmp_value;
+
+  if (!detail::read_and_cast<long> (iter, tmp_value))
+    return false;
+    
+  value = tmp_value != 0;
+
+  return true;
 }
 
 template <class BaseIter>
