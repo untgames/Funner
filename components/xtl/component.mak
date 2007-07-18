@@ -25,8 +25,8 @@ TR1_TESTS.COMPILER_DEFINES := __MYSTL_STANDALONE__
 
 #Öåëü ¹3 - XTL tests
 XTL_TESTS.TYPE             := test-suite
-XTL_TESTS.INCLUDE_DIRS     := include
-XTL_TESTS.SOURCE_DIRS      := tests/xtl/signals
+XTL_TESTS.INCLUDE_DIRS     := include ../mathlib/include
+XTL_TESTS.SOURCE_DIRS      := tests/xtl/signals tests/xtl/io
 XTL_TESTS.LIB_DIRS         :=  
 XTL_TESTS.EXECTUTION_DIR   :=
 XTL_TESTS.LIBS             :=

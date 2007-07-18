@@ -32,8 +32,7 @@ struct bad_function_call: public std::exception
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Signature> class function
 {
-  struct dummy { void nonnull () {} };
-  typedef void (dummy::*safe_bool)();
+  typedef void (function::*safe_bool)();
   typedef invoker<Signature, detail::function_invoker_base> invoker_type;
   public:
     typedef typename invoker_type::arg1_type   arg1_type;
@@ -86,7 +85,7 @@ template <class Signature> class function
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool empty () const;
 
-    operator safe_bool () const { return empty () ? 0 : &dummy::nonnull; }
+    operator safe_bool () const { return empty () ? 0 : &function::dummy; }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ֲûחמג
@@ -125,6 +124,8 @@ template <class Signature> class function
 
     template <class Fn> class invoker_impl;
     class empty_invoker_impl;
+    
+    void dummy () {}
 
   private:
     invoker_type* invoker;

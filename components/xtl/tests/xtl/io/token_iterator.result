@@ -1,0 +1,9 @@
+Results of token_iterator_test:
+value=1
+failed read next token
+value='hello'
+value=3.14
+failed read next token
+empty: 1
+iter == 0: 1
+available: 0

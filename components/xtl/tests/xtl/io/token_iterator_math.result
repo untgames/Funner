@@ -1,0 +1,8 @@
+Results of token_iterator_math_test:
+value=[ 1 2 3.14 ]
+value=[ [ 4 5 ] [ 6 7 ] ]
+value=[ 9.2 10 11 12 ]
+failed read next token
+empty: 0
+iter == 0: 0
+available: 1
