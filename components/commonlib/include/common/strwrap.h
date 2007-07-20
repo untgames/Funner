@@ -38,6 +38,8 @@ int vsnwprintf (wchar_t* buffer,size_t count,const wchar_t* format,va_list list)
 
 size_t strhash  (const char*,size_t init_hash=0xFFFFFFFF);
 size_t strihash (const char*,size_t init_hash=0xFFFFFFFF);
+size_t strhash  (const wchar_t*,size_t init_hash=0xFFFFFFFF);
+size_t strihash (const wchar_t*,size_t init_hash=0xFFFFFFFF);
 
 }
 

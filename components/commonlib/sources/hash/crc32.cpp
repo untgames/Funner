@@ -65,6 +65,13 @@ inline size_t crc32 (unsigned char data,size_t crc)
   return crc_32_table [(crc^data)&0xff]^(crc>>8); 
 }
 
+inline size_t crc32 (wchar_t data, size_t crc)
+{ 
+  unsigned char* c = (unsigned char*)&data;
+  
+  return crc32 (c [1], crc32 (c [0], crc));
+}
+
 size_t crc32 (const void* data,size_t size,size_t crc)
 {
   for (const unsigned char* p=(const unsigned char*)data;size--;crc=crc32 (*p++,crc));
@@ -78,7 +85,19 @@ size_t strhash (const char* s,size_t init_hash)
 
   size_t hash = init_hash;
     
-  for (;*s;s++) hash = crc32 (*s,hash);
+  for (;*s;s++) hash = crc32 ((unsigned char)*s,hash);
+
+  return hash;
+}
+
+size_t strhash (const wchar_t* s,size_t init_hash)
+{
+  if (!s)
+    return 0;
+
+  size_t hash = init_hash;
+    
+  for (;*s;s++) hash = crc32 (*s, hash);
 
   return hash;
 }
@@ -90,7 +109,19 @@ size_t strihash (const char* s,size_t init_hash)
 
   size_t hash = init_hash;
     
-  for (;*s;s++) hash = crc32 (tolower (*s),hash);
+  for (;*s;s++) hash = crc32 ((unsigned char)tolower (*s),hash);
+
+  return hash;
+}
+
+size_t strihash (const wchar_t* s,size_t init_hash)
+{
+  if (!s)
+    return 0;
+
+  size_t hash = init_hash;
+    
+  for (;*s;s++) hash = crc32 ((wchar_t)towlower (*s),hash);
 
   return hash;
 }
