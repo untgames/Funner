@@ -1,16 +1,19 @@
 #ifndef MEDIALIB_COLLADA_GEOMETRY_HEADER
 #define MEDIALIB_COLLADA_GEOMETRY_HEADER
 
-#include "material.h"
+//#include "material.h"
 #include <math/mathlib.h>
 
 namespace medialib
 {
 
+namespace collada
+{
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовые атрибуты вершины
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct ColladaVertex
+struct Vertex
 {
   math::vec3f coord;    //координаты вершины
   math::vec3f normal;   //нормаль в вершине
@@ -19,7 +22,7 @@ struct ColladaVertex
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Атрибуты текстурирования вершины
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct ColladaTexVertex
+struct TexVertex
 {
   math::vec3f coord;    //текстурные координаты вершины
   math::vec3f tangent;  //касательная в texture space
@@ -27,23 +30,22 @@ struct ColladaTexVertex
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Атрибуты текстурирования вершины
+///Тип примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ColladaPrimitiveType
+enum PrimitiveType
 {
-  COLLADA_PRIMITIVE_LINE_LIST,      //список отрезков
-  COLLADA_PRIMITIVE_LINE_STRIP,     //цепочка отрезков
-  COLLADA_PRIMITIVE_TRIANGLE_LIST,  //список треугольников
-  COLLADA_PRIMITIVE_TRIANGLE_STRIP, //цепочка треугольников
-  COLLADA_PRIMITIVE_TRIANGLE_FAN    //веер треугольников
+  PrimitiveType_LineList,      //список отрезков
+  PrimitiveType_LineStrip,     //цепочка отрезков
+  PrimitiveType_TriangleList,  //список треугольников
+  PrimitiveType_TriangleStrip, //цепочка треугольников
+  PrimitiveType_TriangleFan    //вейер треугольников
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поверхность
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ColladaSurface: public ColladaEntity
+class Surface: public Entity
 {
-  friend class ColladaWrappers;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Материал поверхности
@@ -53,19 +55,23 @@ class ColladaSurface: public ColladaEntity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ColladaPrimitiveType PrimitiveType () const;
+    collada::PrimitiveType PrimitiveType () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с вершинами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                  VerticesCount      () const;
-    const ColladaVertex*    Vertices           () const;    
-    size_t                  TextureChannels    () const;
-    const char*             TextureChannelName (size_t channel) const; 
-    const ColladaTexVertex* TextureVertices    (size_t channel) const;
-    bool                    HasVertexColors    () const;
-    const math::vec4f*            VertexColors       () const;
+    typedef Array<Vertex>      VertexArray;
+    typedef Array<TexVertex>   TexVertexArray;
+    typedef Array<math::vec4f> VertexColorArray;
     
+          VertexArray&      Vertices        ();
+    const VertexArray&      Vertices        () const;
+          TexVertexArray&   TextureVertices (size_t channel);
+    const TexVertexArray&   TextureVertices (size_t channel) const;
+          VertexColorArray& VertexColors    ();
+    const VertexColorArray& VertexColors    () const;
+          bool              HasVertexColors () const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Индексы примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,6 +104,8 @@ class ColladaMesh: public ColladaEntity
   private:
     const ColladaMeshImpl* impl;
 };
+
+}
 
 }
 

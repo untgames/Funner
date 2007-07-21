@@ -1,120 +1,186 @@
 #ifndef MEDIALIB_COLLADA_MATERIAL_HEADER
 #define MEDIALIB_COLLADA_MATERIAL_HEADER
 
-#include "base.h"
+#include <media/collada/utility.h>
+#include <math/mathlib.h>
 
 namespace medialib
 {
 
+namespace collada
+{
+
+//forward declarations
+class Effect;
+class Material;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Библиотеки эффектов и материалов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef ILibrary<Effect>   EffectLibrary;
+typedef ILibrary<Material> MaterialLibrary;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ColladaShaderType
+enum ShaderType
 {
-  COLLADA_SHADER_CONSTANT, //шейдер без интерполяции цвета по поверхности треугольника
-  COLLADA_SHADER_LAMBERT,  //модель освещения Ламберта
-  COLLADA_SHADER_PHONG,    //модель освещения Фонга
-  COLLADA_SHADER_BLINN     //модель освещения Блинна
+  ShaderType_Constant, //шейдер без интерполяции цвета по поверхности треугольника
+  ShaderType_Lambert,  //модель освещения Ламберта
+  ShaderType_Phong,    //модель освещения Фонга
+  ShaderType_Blinn,    //модель освещения Блинна
+
+  ShaderType_Default = ShaderType_Phong,
+
+  ShaderType_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметр эффекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum EffectParam
+{
+  EffectParam_Reflectivity,    //степень отражения
+  EffectParam_Transparency,    //степень прозрачности
+  EffectParam_RefractionIndex, //индекс преломления
+  EffectParam_Shininess,       //степень "металличности"
+  
+  EffectParam_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Индекс доступных текстурных карт
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ColladaTextureMap
+enum TextureMap
 {
-  COLLADA_MAP_DIFFUSE,     //базовая текстура (рассеянное освещение)
-  COLLADA_MAP_AMBIENT,     //текстура поглощения света
-  COLLADA_MAP_SPECULAR,    //текстура степени отражения света
-  COLLADA_MAP_TRANSPARENT, //текстура прозрачности
-  COLLADA_MAP_EMISSION,    //текстура эмиссии (self-illumination)
-  COLLADA_MAP_REFLECTIVE,  //текстура карты отражения (env-map)
-  COLLADA_MAP_BUMP,        //текстура рельефа поверхности
+  TextureMap_Diffuse,     //базовая текстура (рассеянное освещение)
+  TextureMap_Ambient,     //текстура поглощения света
+  TextureMap_Specular,    //текстура степени отражения света
+  TextureMap_Transparent, //текстура прозрачности
+  TextureMap_Emission,    //текстура эмиссии (self-illumination)
+  TextureMap_Reflective,  //текстура карты отражения (env-map)
+  TextureMap_Bump,        //текстура рельефа поверхности
   
-  COLLADA_MAP_NUM
+  TextureMap_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ColladaTexture: public ColladaEntity
+class Texture
 {
-  friend class ColladaWrappers;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя картинки связанной с текстурой
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* Image () const;
+    const char* Image    () const;
+    void        SetImage (const char* image_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Степень влияния текстуры
+///Вес текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    float              Amount () const;
+    float Amount    () const;
+    void  SetAmount (float amount) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица преобразования текстурных координат
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const math::mat4f& Transform () const;
+    const math::mat4f& Transform    () const;
+    void               SetTransform (const math::mat4f&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Имя канала текстурных координат
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetTexcoordChannel (const char* name);
+    const char* TexcoordChannel    () const;
+
+  protected:
+    Texture  ();
+    ~Texture ();
     
   private:
-    ColladaTexture (const ColladaTextureImpl*);
+    Texture (const Texture&); //no impl
+    Texture& operator = (const Texture&); //no impl
   
   private:
-    const ColladaTextureImpl* impl;
+    struct Impl;
+    Impl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Эффект
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ColladaEffect: public ColladaEntity
+class Effect: public Entity
 {
-  friend class ColladaWrappers;
   public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Библиотека
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    EffectLibrary& Library () const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ColladaShaderType ShaderType () const;
+    collada::ShaderType ShaderType    () const;
+    void                SetShaderType (collada::ShaderType type);
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с текстурными картами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool               HasTexture (ColladaTextureMap map) const;
-    ColladaTexture     Texture    (ColladaTextureMap map) const;
-    bool               HasColor   (ColladaTextureMap map) const;
-    const math::vec4f& MapColor   (ColladaTextureMap map) const;
+    bool                    HasTexture    (TextureMap map) const;
+    const collada::Texture& Texture       (TextureMap map) const; //исключение, если текстура отсутствовала
+    collada::Texture&       Texture       (TextureMap map);       //исключение, если текстура отсутствовала
+    collada::Texture&       CreateTexture (TextureMap map);
+    void                    RemoveTexture (TextureMap map);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с цветом карт
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    const math::vec4f& MapColor    (TextureMap map) const;
+    void               SetMapColor (TextureMap map, const math::vec4f& color);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметры эффекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    float Param    (EffectParam param) const;
+    void  SetParam (EffectParam param, float value);
     
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Параметры шейдинга
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    float Reflectivity   () const; //степень отражения
-    float Transparency   () const; //степень прозрачности
-    float RefractonIndex () const; //индекс преломления
-    float Shininess      () const; //степень "металличности"
+  protected:
+    Effect  (EffectLibrary& library, const char* id);
+    ~Effect ();
     
   private:
-    ColladaEffect (const ColladaEffectImpl*);
-    
-  private:
-    const ColladaEffectImpl* impl;
+    struct Impl;
+    Impl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Материал
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ColladaMaterial: public ColladaEntity
+class Material: public Entity
 {
-  friend class ColladaWrappers;
   public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Библиотека
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    MaterialLibrary& Library () const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Эффект связанный с материалом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ColladaEffect Effect () const;
-    
+    const collada::Effect& Effect () const;
+          collada::Effect& Effect ();
+
+  protected:
+    Material  (collada::Effect& effect, MaterialLibrary& library, const char* id);
+    ~Material ();
+
   private:
-    ColladaMaterial (const ColladaMaterialImpl*);
-    
-  private:
-    const ColladaMaterialImpl* impl;
+    struct Impl;
+    Impl* impl;
 };
+
+}
 
 }
 

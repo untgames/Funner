@@ -1,53 +1,52 @@
 #ifndef MEDIALIB_COLLADA_SCENE_HEADER
 #define MEDIALIB_COLLADA_SCENE_HEADER
 
-#include <math/mathlib.h>
-#include "base.h"
-#include "geometry.h"
-#include "controller.h"
-
-//продумать поиск по SubID!!
+#include <media/collada/controller.h>
 
 namespace medialib
+{
+
+namespace collada
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///“ип источника света
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ColladaLightType
+enum LightType
 {
-  COLLADA_LIGHT_AMBIENT, //рассе€нное освещение
-  COLLADA_LIGHT_POINT,   //точечный источник света
-  COLLADA_LIGHT_SPOT,    //направленный конусоидальный источник света
-  COLLADA_LIGHT_DIRECT   //направленный цилиндрический источник света
+  LightType_Ambient, //рассе€нное освещение
+  LightType_Point,   //точечный источник света
+  LightType_Spot,    //направленный конусоидальный источник света
+  LightType_Direct   //направленный цилиндрический источник света
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///“ип камеры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ColladaCameraType
+enum CameraType
 {
-  COLLADA_CAMERA_PERSPECTIVE, //перспективна€ камера
-  COLLADA_CAMERA_ORTHOGRAPHIC //ортографическа€ камера
+  CameraType_Perspective, //перспективна€ камера
+  CameraType_Orthographic //ортографическа€ камера
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///»сточник света
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ColladaLight: public ColladaEntity
+class Light: public Entity
 {
-  friend class ColladaWrappers;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///“ип источника
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ColladaLightType LightType () const;
-    
+    LightType Type    () const;
+    void      SetType (LightType type);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///÷вет источника
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const math::vec3f& Color ();
-    
+    const math::vec3f& Color    () const;
+    void               SetColor (const math::vec3f& color);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕараметры затухани€
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,26 +55,31 @@ class ColladaLight: public ColladaEntity
     float AttenuationQuadratic () const;
     float FalloffAngle         () const;
     float FalloffExponent      () const;
-    
-  private:
-    ColladaLight (const ColladaLightImpl*);
+
+    void SetAttenuation (float constant, float linear, float quadratic);
+    void SetFalloff     (float angle, float exponent);
+
+  protected:
+    Light  (Collada& owner, const char* id);
+    ~Light ();
 
   private:
-    const ColladaLightImpl* impl;
+    struct Impl;
+    Impl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// амера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ColladaCamera: public ColladaEntity
+class Camera: public Entity
 {
-  friend class ColladaWrappers;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///“ип камеры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ColladaCameraType CameraType () const;
-    
+    CameraType Type    () const;
+    void       SetType (CameraType type);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕараметры камеры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,25 +90,28 @@ class ColladaCamera: public ColladaEntity
     float YFov        () const;
     float MagnitudeX  () const;
     float MagnitudeY  () const;
+    
+    void SetFov (float x_fov, float y_fov);
+//    void 
+
+   protected:
+     Camera (Collada& owner, const char* id);
 
    private:
-     ColladaCamera (const ColladaCameraImpl*);
-
-   private:
-     const ColladaCameraImpl* impl;
+     struct Impl;
+     Impl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///»нстанцированный материал
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ColladaInstanceMaterial
+class InstanceMaterial
 {
-  friend class ColladaWrappers;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ћатериал
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ColladaMaterial Material ();
+    collada::Material& Material ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///“екстурные каналы
@@ -112,17 +119,18 @@ class ColladaInstanceMaterial
     const char* TextureChannelName (const char* texture_name) const;
     size_t      TextureChannel     (const char* texture_name) const;
 
-  private:
-    ColladaInstanceMaterial (const ColladaInstanceMaterialImpl*);
+  protected:
+    InstanceMaterial (Collada& owner, const char* id);
 
   private:
-    const ColladaInstanceMaterialImpl* impl;
+    struct Impl;
+    Impl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///»нстанцированный контроллер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ColladaInstanceController
+class InstanceController
 {
   friend class ColladaWrappers;
   public:
@@ -232,6 +240,8 @@ class ColladaVisualScene: public ColladaEntity
   private:
     const ColladaVisualSceneImpl* impl;    
 };
+
+}
 
 }
 
