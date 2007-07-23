@@ -26,7 +26,9 @@ class ScriptEnvImpl
     virtual void        SetVariable (const char* name, const char* value) = 0;
     virtual const char* GetVariable (const char* name) = 0;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void BindFunction (const char* name, ScriptEnv::MegaFunction fn, size_t arg_count) = 0;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 ///Данные
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     stl::string str_name;  //Script environment name
@@ -52,6 +54,8 @@ class LuaEnvImpl : public scriptlib::ScriptEnvImpl
 
     void        SetVariable (const char* name, const char* value);
     const char* GetVariable (const char* name);
+
+    void BindFunction (const char* name, scriptlib::ScriptEnv::MegaFunction fn, size_t arg_count);
 
   private:
     stl::auto_ptr<LuaImpl> impl;

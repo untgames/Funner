@@ -1,0 +1,1 @@
+print (my_c_func("abr"))

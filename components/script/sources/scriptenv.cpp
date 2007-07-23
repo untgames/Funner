@@ -49,15 +49,10 @@ T ScriptEnv::GetVariable (const char* name)
   return impl->GetVariable (name);
 }
 
-template<> const char* ScriptEnv::GetVariable <const char*> (const char* name)
+void ScriptEnv::BindFunction (const char* name, MegaFunction fn)
 {
-  return impl->GetVariable (name);
+  impl->BindFunction (name, fn, 1);
 }
-
-/*const char* ScriptEnv::GetVariable (const char* name)
-{
-  return impl->GetVariable (name);
-} */
 
 void ScriptEnv::Swap (ScriptEnv& script)
 {

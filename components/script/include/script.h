@@ -42,8 +42,10 @@ class ScriptEnv
     void SetVariable (const char* name, T value);
     template <class T>
     T    GetVariable (const char* name);
-template<> const char* ScriptEnv::GetVariable <const char*> (const char* name); 
 
+    typedef void (*MegaFunction) (const char*);  //!!!!!!!!!!!
+  
+    void BindFunction (const char* name, MegaFunction fn);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ξαμεν
