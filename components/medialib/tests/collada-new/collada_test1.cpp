@@ -5,7 +5,7 @@
 using namespace medialib::collada;
 using namespace xtl;
 
-const char* file_name = "data/cube.dae";
+const char* file_name = "data/ape.dae";
 
 //печать строки пробелов (отступ)
 void print_space (int count)

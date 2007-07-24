@@ -397,12 +397,10 @@ void DaeParser::ParseMesh (Parser::Iterator iter, Mesh& mesh)
   
     //чтение источников данных
     
-  MeshSourceMap sources;
-  
-    //чтение поверхностей
+  MeshSourceMap sources;  
     
   for_each_child (iter, "source", bind (&DaeParser::ParseMeshSource, this, _1, ref (sources)));
-  
+
     //чтение поверхностей
 
   for_each_child (iter, "polygons",  bind (&DaeParser::LogError, this, _1, "Polygons are not supported"));
@@ -448,7 +446,8 @@ void DaeParser::ParseMeshSource (Parser::Iterator iter, MeshSourceMap& sources)
   
   if (data_count < count * stride)
   {
-    LogError (accessor_iter, "Wrong count/stride attribute. count * stride > float_array.count = %u", data_count);
+    LogError (accessor_iter, "Wrong count/stride attribute. count * stride > float_array.count. count=%u, stride=%u, "
+              "float_array.count=%u", count, stride, data_count);
     return;
   }
 

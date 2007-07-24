@@ -14,7 +14,7 @@ void DaeParser::ParseLibraryGeometries (Parser::Iterator iter)
   
   LogScope (iter, *this);
 
-  for_each_child (iter, "geometry", bind (&DaeParser::ParseGeometry, this, _1));
+  for_each_child (iter, "geometry", bind (&DaeParser::ParseGeometry, this, _1));  
 }
 
 /*
@@ -25,7 +25,7 @@ void DaeParser::ParseGeometry (Parser::Iterator iter)
 {
   const char* id = get<const char*> (iter, "id");
   
-  LogScope (iter, *this);
+  LogScope scope (iter, *this);
   
   if (!id)
   {
@@ -35,10 +35,13 @@ void DaeParser::ParseGeometry (Parser::Iterator iter)
   
   Parser::Iterator mesh_iter = iter->First ("mesh");
   
+  if (!mesh_iter)
+    return;
+  
   if (mesh_iter->Next ())
     LogWarning (mesh_iter->Next (), "Second mesh will be ignored");    
     
-  Mesh& mesh = model.Meshes ().Create (id);
+  Mesh& mesh = model.Meshes ().Create (id);  
 
   ParseMesh (mesh_iter, mesh);
 }
