@@ -260,6 +260,87 @@ struct SurfaceInfo
   MeshInputBuilder  inputs;
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Класс упрощающий чтение каналов вершинных данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class VertexStreamReader
+{
+  public:
+    VertexStreamReader (DaeParser&        in_parser,
+                        Parser::Node*     in_surface_node,
+                        MeshInputBuilder& in_inputs,
+                        MeshVertexBuffer& in_vertex_buffer)
+       : parser (in_parser), surface_node (in_surface_node), inputs (in_inputs), vertex_buffer (in_vertex_buffer) {}
+
+      //чтение канала данных
+    template <class T, class T1>  
+    bool Read (const char* semantic, const char* set, const char* params, T* buffer, T1 T::* field)
+    {
+      const MeshInput* input = inputs.FindChannel (semantic, set);
+      
+      if (!input)
+      {
+        if (set && *set) parser.LogError (surface_node, "No input channel with semantic='%s' and set='%s'", semantic, set);
+        else             parser.LogError (surface_node, "No input channel with semantic='%s'", semantic);
+
+        return false;
+      }
+      
+      LogScope scope (input->node, parser, semantic);
+
+      if (input->source->params != params)
+      {
+        parser.LogError (input->node, "Wrong params '%s'. Must be '%s'", input->source->params.c_str (), params);
+        return false;
+      }
+
+      const float* source         = &input->source->data [0];
+      size_t       max_count      = input->source->count,
+                   offset         = input->offset,
+                   stride         = input->source->stride,
+                   vertices_count = vertex_buffer.GetVerticesCount ();
+                   
+      if (offset >= inputs.GetChannelsCount ())
+      {
+        parser.LogError (input->node, "Offset %u is greater of inputs count %u", offset, inputs.GetChannelsCount ());
+        return false;
+      }
+      
+      size_t** input_vertex  = vertex_buffer.GetVertices ();
+      T*       output_vertex = buffer;  
+
+      for (size_t i=0; i<vertices_count; i++, input_vertex++, output_vertex++)
+      {
+        size_t index = (*input_vertex) [offset];
+        
+        if (index >= max_count)
+        {
+          parser.LogError (surface_node->First ("p"), "Wrong index %u (max_count=%u)", index, max_count);
+          return false;
+        }
+           
+        SetField (source + index * stride, output_vertex->*field);
+      }
+      
+      return true;      
+    }
+    
+  private:
+      //чтение вектора
+    template <size_t N>
+    void SetField (const float* src, math::vec<float, N>& res)
+    {
+      for (size_t i=0; i<N; i++)
+        res [i] = src [i];
+    }  
+  
+  private:
+    DaeParser&        parser;
+    Parser::Node*     surface_node;
+    MeshInputBuilder& inputs;
+    MeshVertexBuffer& vertex_buffer;
+};
+
 }
 
 }
@@ -512,81 +593,6 @@ void DaeParser::ParseSurfaceInput
   }
 }
 
-namespace
-{
-
-//чтение вектора
-template <size_t N>
-void set_vertex_field (const float* src, math::vec<float, N>& res)
-{
-  for (size_t i=0; i<N; i++)
-    res [i] = src [i];
-}
-
-//чтение канала вершинных данных
-template <class T, class T1>
-bool read_vertex_stream
- (DaeParser&        parser,
-  Parser::Node*     surface_node,
-  MeshInputBuilder& inputs,
-  MeshVertexBuffer& vertex_buffer,
-  const char*       semantic,
-  const char*       set,
-  const char*       params,
-  T*                buffer,
-  T1 T::*           field)
-{
-  const MeshInput* input = inputs.FindChannel (semantic, set);
-  
-  if (!input)
-  {
-    if (set && *set) parser.LogError (surface_node, "No input channel with semantic='%s' and set='%s'", semantic, set);
-    else             parser.LogError (surface_node, "No input channel with semantic='%s'", semantic);
-
-    return false;
-  }
-  
-  LogScope scope (input->node, parser, semantic);
-
-  if (input->source->params != params)
-  {
-    parser.LogError (input->node, "Wrong params '%s'. Must be '%s'", input->source->params.c_str (), params);
-    return false;
-  }
-
-  const float* source         = &input->source->data [0];
-  size_t       max_count      = input->source->count,
-               offset         = input->offset,
-               stride         = input->source->stride,
-               vertices_count = vertex_buffer.GetVerticesCount ();
-               
-  if (offset >= inputs.GetChannelsCount ())
-  {
-    parser.LogError (input->node, "Offset %u is greater of inputs count %u", offset, inputs.GetChannelsCount ());
-    return false;
-  }
-  
-  size_t** input_vertex  = vertex_buffer.GetVertices ();
-  T*       output_vertex = buffer;  
-
-  for (size_t i=0; i<vertices_count; i++, input_vertex++, output_vertex++)
-  {
-    size_t index = (*input_vertex) [offset];
-    
-    if (index >= max_count)
-    {
-      parser.LogError (surface_node->First ("p"), "Wrong index %u (max_count=%u)", index, max_count);
-      return false;
-    }
-       
-    set_vertex_field (source + index * stride, output_vertex->*field);
-  }
-  
-  return true;
-}
-
-}
-
 /*
     Построение буферов поверхности
       Данная функция строит вершинный и индексный буферы поверхности на основе входных каналов данных
@@ -650,12 +656,16 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
     //копирование буфера индексов
 
   stl::copy (output_indices.begin (), output_indices.end (), surface.Indices ());
+
+    //создание объекта, читающего каналы вершинных данных  
+
+  VertexStreamReader stream_reader (*this, surface_iter, surface_info.inputs, vertex_buffer);
  
     //построение результирующего буфера вершин
     
   Vertex* vertices = surface.Vertices ();
 
-  if (!read_vertex_stream (*this, surface_iter, surface_info.inputs, vertex_buffer, "VERTEX", "", "XYZ", vertices, &Vertex::coord))
+  if (!stream_reader.Read ("VERTEX", "", "XYZ", vertices, &Vertex::coord))
   {
     LogError (surface_iter, "Error at read vertices stream");
     
@@ -664,7 +674,7 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
     return;
   }
   
-  if (!read_vertex_stream (*this, surface_iter, surface_info.inputs, vertex_buffer, "NORMAL", "", "XYZ", vertices, &Vertex::normal))
+  if (!stream_reader.Read ("NORMAL", "", "XYZ", vertices, &Vertex::normal))
   {
     LogError (surface_iter, "Error at read normals stream");
 
@@ -672,4 +682,59 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
 
     return;
   }
+  
+    //построение каналов текстурных координат
+    
+  for (size_t i=0; i<surface_info.inputs.GetSetsCount (); i++)
+  {
+    const char* set     = surface_info.inputs.GetSetName (i);
+    size_t      channel = surface.CreateTextureChannel (set);
+    
+    TexVertex* tex_vertices = surface.TextureVertices (channel);
+    
+    if (!stream_reader.Read ("TEXCOORD", set, "STP", tex_vertices, &TexVertex::coord))
+    {
+      LogError (surface_iter, "Error at read TEXCOORD stream from set '%s'", set);
+      
+      surfaces.Remove (surface);
+      
+      return;
+    }
+    
+    if (!stream_reader.Read ("TEXTANGENT", set, "XYZ", tex_vertices, &TexVertex::tangent))
+    {
+      LogError (surface_iter, "Error at read TEXTANGENT stream from set '%s'", set);
+      
+      surfaces.Remove (surface);
+      
+      return;
+    }
+    
+    if (!stream_reader.Read ("TEXBINORMAL", set, "XYZ", tex_vertices, &TexVertex::binormal))
+    {
+      LogError (surface_iter, "Error at read TEXBINORMAL stream from set '%s'", set);
+      
+      surfaces.Remove (surface);
+      
+      return;
+    }    
+  }
+  
+    //построение канала вершинных цветов
+
+/*  const MeshInput* input = inputs.FindChannel ("COLOR");
+  
+  if (input)
+  {
+    surface.CreateVertexColors ();
+    
+    if (!stream_reader.Read ("COLOR", "", "RGBA", surface.VertexColors (), &Vertex::normal))
+    {
+      LogError (surface_iter, "Error at read normals stream");
+
+      surfaces.Remove (surface);
+
+      return;
+    }    
+  }*/
 }

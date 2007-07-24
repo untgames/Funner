@@ -135,12 +135,23 @@ void dump (Material& material, int level)
 }
 
 //печать вершины
-void print (Vertex& v)
+void print (const Vertex& v)
 {
   printf ("coord=");
   print  (v.coord);
   printf (" normal=");
   print  (v.normal);
+}
+
+//печать текстурированной вершины
+void print (const TexVertex& tv)
+{
+  printf ("coord=");
+  print  (tv.coord);
+  printf (" tangent=");
+  print  (tv.tangent);
+  printf (" binormal=");
+  print  (tv.binormal);  
 }
 
 //печать поверхности
@@ -174,6 +185,21 @@ void dump (Surface& surface, int level)
     print       (surface.Vertices () [i]);
     printf      ("\n");
   }
+  
+  for (size_t i=0; i<surface.TextureChannelsCount (); i++)
+  {
+    print_space (level);
+    printf      ("texture_channel '%s'\n", surface.TextureChannelName (i));
+    
+    const TexVertex* tv = surface.TextureVertices (i);
+    
+    for (size_t j=0; j<surface.VerticesCount (); j++, tv++)
+    {
+      print_space (level+1);
+      print       (*tv);
+      printf      ("\n");
+    }
+  }
 
   print_space (level);
   printf      ("indices: ");
@@ -187,13 +213,7 @@ void dump (Surface& surface, int level)
   {
     print_space (level);
     printf      ("has_vertex_colors\n");
-  }
-  
-  for (size_t i=0; i<surface.TextureChannelsCount (); i++)
-  {
-    print_space (level+1);
-    printf      ("texture channel: '%s'\n", surface.TextureChannelName (i));
-  }
+  }  
 }
 
 //печать меша
