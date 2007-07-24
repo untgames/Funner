@@ -14,18 +14,21 @@ namespace
 {
 
 //канал текстурирования вершин
-struct TexVertexChannel
+template <class T> struct Channel
 {
-  TexVertex*  verts; //текстурированные вершины
-  stl::string name;  //имя канала текстурирования
+  T*          verts; //вершины
+  stl::string name;  //имя канала
   
-  TexVertexChannel  (size_t verts_count, const char* in_name) :
-    verts ((TexVertex*)::operator new (sizeof (TexVertex) * verts_count)), name (in_name) {}
+  Channel  (size_t verts_count, const char* in_name) :
+    verts ((T*)::operator new (sizeof (T) * verts_count)), name (in_name) {}
 
-  ~TexVertexChannel () { ::operator delete (verts); }
+  ~Channel () { ::operator delete (verts); }
 };
 
+typedef Channel<TexVertex>             TexVertexChannel;
+typedef Channel<math::vec3f>           ColorChannel;
 typedef stl::vector<TexVertexChannel*> TexVertexChannelArray;
+typedef stl::vector<ColorChannel*>     ColorChannelArray;
 
 }
 
@@ -37,10 +40,13 @@ struct Surface::Impl
   size_t                  indices_count;      //количество индексов
   Vertex*                 vertices;           //вершины
   size_t*                 indices;            //индексы
-  math::vec4f*            colors;             //вершинные цвета
+  ColorChannelArray       color_channels;     //каналы вершинных цветов
   TexVertexChannelArray   texvertex_channels; //каналы текстурирования
   
-  enum { DEFAULT_TEXVERTEX_CHANNELS_RESERVE = 8 }; //резервируемое количество каналов текстурирования
+  enum {
+    DEFAULT_TEXVERTEX_CHANNELS_RESERVE = 8, //резервируемое количество каналов текстурирования
+    DEFAULT_COLOR_CHANNELS_RESERVE     = 4  //резервируемое количество каналов вершинных цветов
+  };
   
   void RemoveAllTextureChannels ()
   {
@@ -50,11 +56,20 @@ struct Surface::Impl
     texvertex_channels.clear ();
   }
   
+  void RemoveAllColorChannels ()
+  {
+    for (ColorChannelArray::iterator i=color_channels.begin (); i!=color_channels.end (); ++i)
+      delete *i;    
+      
+    color_channels.clear ();
+  }  
+  
   Impl (collada::Material& in_material, collada::PrimitiveType in_primitive_type, size_t in_vertices_count, size_t in_indices_count) : 
-    material (in_material), vertices_count (in_vertices_count), indices_count (in_indices_count), colors (0),
+    material (in_material), vertices_count (in_vertices_count), indices_count (in_indices_count),
     primitive_type (in_primitive_type)
   {
     texvertex_channels.reserve (DEFAULT_TEXVERTEX_CHANNELS_RESERVE);
+    color_channels.reserve (DEFAULT_COLOR_CHANNELS_RESERVE);
     
     switch (primitive_type)
     {
@@ -85,12 +100,10 @@ struct Surface::Impl
   ~Impl ()
   {
     RemoveAllTextureChannels ();
+    RemoveAllColorChannels ();
 
     ::operator delete (vertices);
     ::operator delete (indices);
-    
-    if (colors)
-      ::operator delete (colors);
   }
 };
 
@@ -162,45 +175,85 @@ const Vertex* Surface::Vertices () const
     Работа с вершинными цветами
 */
 
-bool Surface::HasVertexColors () const
+size_t Surface::ColorChannelsCount () const
 {
-  return impl->colors != 0;
+  return impl->color_channels.size ();
 }
 
-void Surface::CreateVertexColors ()
+size_t Surface::CreateColorChannel (const char* name)
 {
-  if (impl->colors)
-    return;
+  if (!name)
+    name = "";
     
-  impl->colors = (math::vec4f*)::operator new (sizeof (math::vec4f) * impl->vertices_count);    
-}
-
-void Surface::RemoveVertexColors ()
-{
-  if (!impl->colors)
-    return;
-    
-  ::operator delete (impl->colors);
+  ColorChannel* channel = new ColorChannel (impl->vertices_count, name);
   
-  impl->colors = 0;
+  try
+  {    
+    impl->color_channels.push_back (channel);
+  
+    return impl->color_channels.size () - 1;
+  }
+  catch (...)
+  {
+    delete channel;
+    throw;
+  }
 }
 
-math::vec4f* Surface::VertexColors ()
+void Surface::RemoveColorChannel (size_t channel)
 {
-  if (!impl->colors)
-    RaiseNotSupported ("medialib::collada::Surface::VertexColors", "There is no vertex colors in this surface."
-                       " Use Surface::CreateVertexColors first");
-
-  return impl->colors;
+  if (channel >= impl->color_channels.size ())
+    RaiseOutOfRange ("medialib::collada::Surface::RemoveColorChannel", "channel", channel, impl->color_channels.size ());
+    
+  delete impl->color_channels [channel];
+  
+  impl->color_channels.erase (impl->color_channels.begin () + channel);
 }
 
-const math::vec4f* Surface::VertexColors () const
+void Surface::RemoveAllColorChannels ()
 {
-  if (!impl->colors)
-    RaiseNotSupported ("medialib::collada::Surface::VertexColors", "There is no vertex colors in this surface."
-                       " Use Surface::CreateVertexColors first");
+  impl->RemoveAllColorChannels ();
+}
 
-  return impl->colors;
+const char* Surface::ColorChannelName (size_t channel) const
+{
+  if (channel >= impl->color_channels.size ())
+    RaiseOutOfRange ("medialib::collada::Surface::ColorChannelName", "channel", channel, impl->color_channels.size ());
+    
+  return impl->color_channels [channel]->name.c_str ();
+}
+
+bool Surface::HasColorChannel (size_t channel) const
+{
+  return channel < impl->color_channels.size ();
+}
+
+int Surface::FindColorChannel (const char* name) const
+{
+  if (!name)
+    RaiseNullArgument ("media::collada::Surface::FindColorChannel", "name");
+    
+  for (ColorChannelArray::const_iterator i=impl->color_channels.begin (), end=impl->color_channels.end (); i!=end; ++i)
+    if ((*i)->name == name)
+      return i - impl->color_channels.begin ();
+      
+  return -1;
+}
+
+const math::vec3f* Surface::Colors (size_t channel) const
+{
+  if (channel >= impl->color_channels.size ())
+    RaiseOutOfRange ("medialib::collada::Surface::Colors", "channel", channel, impl->color_channels.size ());
+    
+  return impl->color_channels [channel]->verts;
+}
+
+math::vec3f* Surface::Colors (size_t channel)
+{
+  if (channel >= impl->color_channels.size ())
+    RaiseOutOfRange ("medialib::collada::Surface::Colors", "channel", channel, impl->color_channels.size ());
+    
+  return impl->color_channels [channel]->verts;
 }
 
 /*

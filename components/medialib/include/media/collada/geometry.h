@@ -81,12 +81,16 @@ class Surface
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с вершинными цветами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool HasVertexColors    () const; //проверка: есть ли в поверхности вершинные цвета
-    void CreateVertexColors ();       //создание канала вершинных цветов
-    void RemoveVertexColors ();       //удаление канала вершинных цветов
+    size_t      ColorChannelsCount     () const;                 //количество каналов вершинных цветов
+    size_t      CreateColorChannel     (const char* name = 0);   //создание канала вершинных цветов
+    void        RemoveColorChannel     (size_t channel);         //удаление канала вершинных цветов
+    void        RemoveAllColorChannels ();                       //удаление всех каналов вершинных цветов
+    const char* ColorChannelName       (size_t channel) const;   //имя канала вершинных цветов    
+    bool        HasColorChannel        (size_t channel) const;   //проверка наличия канала вершинных цветов    
+    int         FindColorChannel       (const char* name) const; //возвращает индекс канала вершинных цветов или -1 в случае неудачи
 
-          math::vec4f* VertexColors ();
-    const math::vec4f* VertexColors () const;
+          math::vec3f* Colors (size_t channel);
+    const math::vec3f* Colors (size_t channel) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с текстурированными вершинами

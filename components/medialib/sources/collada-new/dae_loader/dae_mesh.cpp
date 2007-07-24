@@ -272,9 +272,41 @@ class VertexStreamReader
                         MeshVertexBuffer& in_vertex_buffer)
        : parser (in_parser), surface_node (in_surface_node), inputs (in_inputs), vertex_buffer (in_vertex_buffer) {}
 
+      //чтение канала данных в поле, определеяемое указателем на член-класса
+    template <class T, class Field>
+    bool Read (const char* semantic, const char* set, const char* params, T* buffer, Field T::* field)
+    {
+      return ReadCore (semantic, set, params, buffer, field_selector<T, Field> (field));
+    }
+
+      //непосредственное чтение канала данных    
+    template <class T>
+    bool Read (const char* semantic, const char* set, const char* params, T* buffer)
+    {
+      return ReadCore (semantic, set, params, buffer, identity_selector ());
+    }    
+    
+  private:
+      //функтор возвращающий член класса
+    template <class T, class Field> struct field_selector
+    {
+      field_selector (Field T::* in_field) : field (in_field) {}
+      
+      Field& operator () (T& object) const { return object.*field; }
+      
+      Field T::* field;
+    };
+    
+      //функтор возвращающий сам элемент
+    struct identity_selector
+    {
+      template <class T> T& operator () (T& object) const { return object; }
+    };
+    
+  
       //чтение канала данных
-    template <class T, class T1>  
-    bool Read (const char* semantic, const char* set, const char* params, T* buffer, T1 T::* field)
+    template <class T, class Fn>  
+    bool ReadCore (const char* semantic, const char* set, const char* params, T* buffer, Fn fn)
     {
       const MeshInput* input = inputs.FindChannel (semantic, set);
       
@@ -319,11 +351,11 @@ class VertexStreamReader
           return false;
         }
            
-        SetField (source + index * stride, output_vertex->*field);
+        SetField (source + index * stride, fn (*output_vertex));
       }
       
       return true;      
-    }
+    }  
     
   private:
       //чтение вектора
@@ -667,7 +699,7 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
 
   if (!stream_reader.Read ("VERTEX", "", "XYZ", vertices, &Vertex::coord))
   {
-    LogError (surface_iter, "Error at read vertices stream");
+    LogError (surface_iter, "Error at read VERTEX stream");
     
     surfaces.Remove (surface);
     
@@ -676,7 +708,7 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
   
   if (!stream_reader.Read ("NORMAL", "", "XYZ", vertices, &Vertex::normal))
   {
-    LogError (surface_iter, "Error at read normals stream");
+    LogError (surface_iter, "Error at read NORMAL stream");
 
     surfaces.Remove (surface);
 
@@ -688,53 +720,55 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
   for (size_t i=0; i<surface_info.inputs.GetSetsCount (); i++)
   {
     const char* set     = surface_info.inputs.GetSetName (i);
-    size_t      channel = surface.CreateTextureChannel (set);
     
-    TexVertex* tex_vertices = surface.TextureVertices (channel);
+    if (surface_info.inputs.FindChannel ("TEXCOORD", set))
+    {    
+      size_t channel = surface.CreateTextureChannel (set);
     
-    if (!stream_reader.Read ("TEXCOORD", set, "STP", tex_vertices, &TexVertex::coord))
-    {
-      LogError (surface_iter, "Error at read TEXCOORD stream from set '%s'", set);
+      TexVertex* tex_vertices = surface.TextureVertices (channel);      
       
-      surfaces.Remove (surface);
+      if (!stream_reader.Read ("TEXCOORD", set, "STP", tex_vertices, &TexVertex::coord))
+      {
+        LogError (surface_iter, "Error at read TEXCOORD stream from set '%s'", set);
+        
+        surfaces.Remove (surface);
+        
+        return;
+      }
       
-      return;
+      if (!stream_reader.Read ("TEXTANGENT", set, "XYZ", tex_vertices, &TexVertex::tangent))
+      {
+        LogError (surface_iter, "Error at read TEXTANGENT stream from set '%s'", set);
+        
+        surfaces.Remove (surface);
+        
+        return;
+      }
+      
+      if (!stream_reader.Read ("TEXBINORMAL", set, "XYZ", tex_vertices, &TexVertex::binormal))
+      {
+        LogError (surface_iter, "Error at read TEXBINORMAL stream from set '%s'", set);
+        
+        surfaces.Remove (surface);
+        
+        return;
+      }
     }
     
-    if (!stream_reader.Read ("TEXTANGENT", set, "XYZ", tex_vertices, &TexVertex::tangent))
+    if (surface_info.inputs.FindChannel ("COLOR", set))
     {
-      LogError (surface_iter, "Error at read TEXTANGENT stream from set '%s'", set);
+      size_t channel = surface.CreateColorChannel (set);
       
-      surfaces.Remove (surface);
+      math::vec3f* colors = surface.Colors (channel);
       
-      return;
+      if (!stream_reader.Read ("COLOR", set, "RGB", colors))
+      {
+        LogError (surface_iter, "Error at read COLOR stream from set '%s'", set);
+        
+        surfaces.Remove (surface);
+        
+        return;
+      }      
     }
-    
-    if (!stream_reader.Read ("TEXBINORMAL", set, "XYZ", tex_vertices, &TexVertex::binormal))
-    {
-      LogError (surface_iter, "Error at read TEXBINORMAL stream from set '%s'", set);
-      
-      surfaces.Remove (surface);
-      
-      return;
-    }    
-  }
-  
-    //построение канала вершинных цветов
-
-/*  const MeshInput* input = inputs.FindChannel ("COLOR");
-  
-  if (input)
-  {
-    surface.CreateVertexColors ();
-    
-    if (!stream_reader.Read ("COLOR", "", "RGBA", surface.VertexColors (), &Vertex::normal))
-    {
-      LogError (surface_iter, "Error at read normals stream");
-
-      surfaces.Remove (surface);
-
-      return;
-    }    
-  }*/
+  }  
 }

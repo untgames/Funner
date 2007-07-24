@@ -200,6 +200,21 @@ void dump (Surface& surface, int level)
       printf      ("\n");
     }
   }
+  
+  for (size_t i=0; i<surface.ColorChannelsCount (); i++)
+  {
+    print_space (level);
+    printf      ("color_channel '%s'\n", surface.ColorChannelName (i));
+    
+    const math::vec3f* color = surface.Colors (i);
+    
+    for (size_t j=0; j<surface.VerticesCount (); j++, color++)
+    {
+      print_space (level+1);
+      print       (*color);
+      printf      ("\n");
+    }
+  }  
 
   print_space (level);
   printf      ("indices: ");
@@ -209,11 +224,7 @@ void dump (Surface& surface, int level)
 
   printf ("\n");
 
-  if (surface.HasVertexColors ())
-  {
-    print_space (level);
-    printf      ("has_vertex_colors\n");
-  }  
+
 }
 
 //печать меша
