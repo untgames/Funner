@@ -28,8 +28,9 @@ struct ModelImpl
   stl::string       name;      //имя модели
   Library<Effect>   effects;   //библиотека эффектов
   Library<Material> materials; //библиотека материалов
+  Library<Mesh>     meshes;    //библиотека мешей
   
-  ModelImpl () : effects (this), materials (this) {}
+  ModelImpl () : effects (this), materials (this), meshes (this) {}
 };
 
 }
@@ -138,6 +139,16 @@ const EffectLibrary& Model::Effects () const
   return impl->effects;
 }
 
+MeshLibrary& Model::Meshes ()
+{
+  return impl->meshes;
+}
+
+const MeshLibrary& Model::Meshes () const
+{
+  return impl->meshes;
+}
+
 /*
     Обмен
 */
@@ -156,6 +167,25 @@ namespace collada
 void swap (Model& a, Model& b)
 {
   a.Swap (b);
+}
+
+}
+
+}
+
+/*
+    Возвращение имени модели
+*/
+
+namespace medialib
+{
+
+namespace collada
+{
+
+const char* get_model_name (ModelImpl* impl)
+{
+  return impl->name.c_str ();
 }
 
 }

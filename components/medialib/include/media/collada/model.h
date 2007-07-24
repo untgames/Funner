@@ -2,12 +2,7 @@
 #define MEDIALIB_COLLADA_MODEL_HEADER
 
 #include <xtl/functional_fwd>
-#include <media/collada/material.h> //??
-
-//#include "scene.h"
-//#include "animation.h"
-//#include <common/parser.h>
-
+#include <media/collada/geometry.h> //??
 
 namespace medialib
 {
@@ -74,8 +69,10 @@ class Model
 ///////////////////////////////////////////////////////////////////////////////////////////////////
           collada::MaterialLibrary& Materials ();
           collada::EffectLibrary&   Effects   ();
+          collada::MeshLibrary&     Meshes    ();
     const collada::MaterialLibrary& Materials () const;
     const collada::EffectLibrary&   Effects   () const;
+    const collada::MeshLibrary&     Meshes    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ξαμεν

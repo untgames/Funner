@@ -86,10 +86,10 @@ void ModelSystemImpl::Load (const char* file_name, Model& model, const LogFuncti
 
   if (iter == loaders.end ())
     Raise<Exception> ("medialib::collada::ModelSystemImpl::Load", "Can't load model from file '%s'. Unregistered extension '%s'.", file_name, extension); 
+    
+  model.Rename (file_name);    
 
-  iter->second (file_name, model, log);
-  
-  model.Rename (file_name);
+  iter->second (file_name, model, log);  
 }
 
 void ModelSystemImpl::Save (const char* file_name, const Model& model, const LogFunction& log) const

@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_COLLADA_GEOMETRY_HEADER
 #define MEDIALIB_COLLADA_GEOMETRY_HEADER
 
-//#include "material.h"
+#include <media/collada/material.h>
 #include <math/mathlib.h>
 
 namespace medialib
@@ -9,6 +9,14 @@ namespace medialib
 
 namespace collada
 {
+
+//forward declarations
+class Mesh;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Библиотека мешей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef ILibrary<Mesh> MeshLibrary;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовые атрибуты вершины
@@ -44,65 +52,108 @@ enum PrimitiveType
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поверхность
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Surface: public Entity
+class Surface
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Материал поверхности
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* Material () const;
-  
+          collada::Material& Material ();
+    const collada::Material& Material () const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     collada::PrimitiveType PrimitiveType () const;
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Количество вершин и индексов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t VerticesCount () const;
+    size_t IndicesCount  () const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с вершинами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef Array<Vertex>      VertexArray;
-    typedef Array<TexVertex>   TexVertexArray;
-    typedef Array<math::vec4f> VertexColorArray;
-    
-          VertexArray&      Vertices        ();
-    const VertexArray&      Vertices        () const;
-          TexVertexArray&   TextureVertices (size_t channel);
-    const TexVertexArray&   TextureVertices (size_t channel) const;
-          VertexColorArray& VertexColors    ();
-    const VertexColorArray& VertexColors    () const;
-          bool              HasVertexColors () const;
+          Vertex* Vertices ();
+    const Vertex* Vertices () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с вершинными цветами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool HasVertexColors    () const; //проверка: есть ли в поверхности вершинные цвета
+    void CreateVertexColors ();       //создание канала вершинных цветов
+    void RemoveVertexColors ();       //удаление канала вершинных цветов
+
+          math::vec4f* VertexColors ();
+    const math::vec4f* VertexColors () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с текстурированными вершинами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t      TextureChannelsCount     () const;                 //количество каналов текстурирования
+    size_t      CreateTextureChannel     (const char* name = 0);   //создание канала текстурирования
+    void        RemoveTextureChannel     (size_t channel);         //удаление канала текстурирования
+    void        RemoveAllTextureChannels ();                       //удаление всех канало текстурирования
+    const char* TextureChannelName       (size_t channel) const;   //имя текстурированного канала    
+    bool        HasTextureChannel        (size_t channel) const;   //проверка наличия канала текстурирования
+    int         FindTextureChannel       (const char* name) const; //возвращает индекс канала текстурирования или -1 в случае неудачи
+
+      //текстурированные вершины
+    const TexVertex* TextureVertices (size_t channel) const;    
+          TexVertex* TextureVertices (size_t channel);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Индексы примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t        IndicesCount () const;
-    const size_t* Indices      () const;
-    
-  private:
-    ColladaSurface (const ColladaSurfaceImpl*);
+          size_t* Indices ();
+    const size_t* Indices () const;
+
+  protected:
+    Surface  (collada::Material& material, collada::PrimitiveType type, size_t verts_count, size_t indices_count);
+    ~Surface ();
 
   private:
-    const ColladaSurfaceImpl* impl;
+    Surface (const Surface&); //no impl
+    Surface& operator = (const Surface&); //no impl
+
+  private:
+    struct Impl;
+    Impl* impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Коллекция поверхностей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <> class ICollection<Surface>: public IItemCollection<Surface>
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual Surface& Create (Material& material, PrimitiveType type, size_t verts_count, size_t indices_count) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Меш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ColladaMesh: public ColladaEntity
+class Mesh: public Entity
 {
-  friend class ColladaWrappers;
   public:
+    typedef ICollection<Surface> SurfaceList;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с поверхностями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t          SurfacesCount () const;
-    ColladaSurface  Surface       (size_t index) const;
+          SurfaceList& Surfaces ();
+    const SurfaceList& Surfaces () const;
+
+  protected:
+    Mesh (MeshLibrary& library, const char* id);
 
   private:
-    ColladaMesh (const ColladaMeshImpl*);
-
-  private:
-    const ColladaMeshImpl* impl;
+    struct Impl;
+    Impl* impl;
 };
 
 }

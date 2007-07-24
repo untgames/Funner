@@ -8,7 +8,7 @@ void DaeParser::ParseLibraryMaterials (Parser::Iterator iter)
 {
   if (!test (iter, "material"))
   {
-    parse_log.Warning (iter, "Incorrect 'library_materials' tag. Must be at least one 'material' sub-tag");
+    parse_log.Warning (iter, "Incorrect 'library_materials' node. Must be at least one 'material' sub-tag");
     return;
   }
   

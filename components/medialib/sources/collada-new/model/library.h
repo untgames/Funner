@@ -1,7 +1,6 @@
 #include <media/collada/utility.h>
 #include <common/strlib.h>
 #include <stl/hash_map>
-#include <stl/algorithm>
 #include <xtl/functional>
 
 namespace medialib
@@ -17,19 +16,20 @@ template <class Item> const char* get_library_name ();
 
 template <> const char* get_library_name<Effect>   () { return "library_effects"; }
 template <> const char* get_library_name<Material> () { return "library_materials"; }
+template <> const char* get_library_name<Mesh>     () { return "library_meshes"; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Библиотека
+///Базовая библиотека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Item> class Library: public ILibrary<Item>
+template <class Item> class ItemLibrary: public ILibrary<Item>
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Library (ModelImpl* in_owner) : owner (in_owner), gen_id (0) {}
+    ItemLibrary (ModelImpl* in_owner) : owner (in_owner), gen_id (0) {}
 
-    ~Library ()
+    ~ItemLibrary ()
     {
       for (ItemMap::iterator i=items.begin (); i!=items.end (); ++i)
         delete i->second;
@@ -43,7 +43,7 @@ template <class Item> class Library: public ILibrary<Item>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Идентификатор коллекции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* EntityID () const { return get_library_name<Item> (); }
+    const char* EntityId () const { return get_library_name<Item> (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество элементов / проверка на пустоту
@@ -69,7 +69,7 @@ template <class Item> class Library: public ILibrary<Item>
     
     Item& operator [] (const char* id)
     {
-      return const_cast<Item&> (const_cast<const Library&> (*this) [id]);
+      return const_cast<Item&> (const_cast<const ItemLibrary&> (*this) [id]);
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ template <class Item> class Library: public ILibrary<Item>
     
     Item* Find (const char* id)
     {
-      return const_cast<Item*> (const_cast<const Library&> (*this).Find (id));
+      return const_cast<Item*> (const_cast<const ItemLibrary&> (*this).Find (id));
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,52 +106,7 @@ template <class Item> class Library: public ILibrary<Item>
     {
       for (ItemMap::const_iterator i=items.begin (); i!=items.end (); ++i)
         fn (*i->second);
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание элементов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Item& Create (const char* id)
-    {
-      return *CreateCore (id ? id : format ("%s.item%u", get_library_name<Item> (), gen_id++).c_str ());
-    }
-
-    Item& Create (Effect& effect, const char* id)
-    {
-      return *CreateCore (effect, id ? id : format ("%s.item%u", get_library_name<Item> (), gen_id++).c_str ());
-    }
-
-    Item* CreateCore (const char* id)
-    {
-      ContructableItem* item = new ContructableItem (*this, id);
-      
-      try
-      {
-        items [id] = item;
-        return item;
-      }
-      catch (...)
-      {
-        delete item;
-        throw;
-      }
-    }
-    
-    Item* CreateCore (Effect& effect, const char* id)
-    {
-      ContructableItem* item = new ContructableItem (effect, *this, id);
-      
-      try
-      {
-        items [id] = item;
-        return item;
-      }
-      catch (...)
-      {
-        delete item;
-        throw;
-      }
-    }
+    }        
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сброс неиспользуемых элементов
@@ -161,23 +116,87 @@ template <class Item> class Library: public ILibrary<Item>
       RaiseNotImplemented ("medialib::collada::Library::Flush");
     }
 
-  private:
+  protected:
     class ContructableItem: public Item
     {
       public:
-        ContructableItem  (Library& library, const char* id) : Item (library, id) {}
-        ~ContructableItem () {}
-
-        //специализация для материала        
-        ContructableItem  (collada::Effect& effect, Library& library, const char* id) : Item (effect, library, id) {}
+        template <class T1> ContructableItem  (T1& arg1, ItemLibrary& library, const char* id) : Item (arg1, library, id) {}
+                            ContructableItem  (ItemLibrary& library, const char* id) : Item (library, id) {}
+                            ~ContructableItem () {}
     };
-  
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление новых элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Insert (ContructableItem* item)
+    {
+      try
+      {
+        items [item->EntityId ()] = item;
+      }
+      catch (...)
+      {
+        delete item;
+        throw;
+      }
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Item* CreateCore (const char* id)
+    {
+      ContructableItem* item = new ContructableItem (*this, id ? id : format ("%s.item%u", get_library_name<Item> (), gen_id++).c_str ());
+    
+      Insert (item);
+      
+      return item;
+    }
+    
+    template <class T1> Item* CreateCore (T1& arg1, const char* id)
+    {
+      ContructableItem* item = new ContructableItem (arg1, *this, id ? id : format ("%s.item%u", get_library_name<Item> (), gen_id++).c_str ());
+
+      Insert (item);
+
+      return item;
+    }    
+    
+  private:
     typedef stl::hash_map<stl::hash_key<const char*>, ContructableItem*> ItemMap;
   
   private:
     ModelImpl* owner;   //владелец
     ItemMap    items;   //элементы
     size_t     gen_id;  //следующий номер при автогенерации имён
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Библиотека
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Item> class Library: public ItemLibrary<Item>
+{
+  public:
+    Library (ModelImpl* owner) : ItemLibrary<Item> (owner) {}
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Item& Create (const char* id) { return *CreateCore (id); }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Библиотека материалов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <> class Library<Material>: public ItemLibrary<Material>
+{
+  public:
+    Library (ModelImpl* owner) : ItemLibrary<Material> (owner) {}
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Material& Create (Effect& effect, const char* id) { return *CreateCore (effect, id); }
 };
 
 }

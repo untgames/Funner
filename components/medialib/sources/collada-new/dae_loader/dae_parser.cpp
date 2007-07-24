@@ -54,10 +54,10 @@ void DaeParser::LogError (Parser::Node* node, const char* format, ...)
   for (; scope; scope=scope->Prev ())
   {
     Parser::Node* node = scope->Node ();
-    const char* id = get<const char*> (node, "id");
+    const char* id = scope->Id () ? scope->Id () : get<const char*> (node, "id");
 
-    if (id) parse_log.Error (node, "at parse %s '%s'", node->Tag (), id);
-    else    parse_log.Error (node, "at parse %s", node->Tag ());
+    if (id) parse_log.Error (node, "  at parse %s '%s'", node->Tag (), id);
+    else    parse_log.Error (node, "  at parse %s", node->Tag ());
   }
 }
 
@@ -96,6 +96,7 @@ void DaeParser::ParseLibraries (Parser::Iterator iter)
 {
   for_each_child (iter, "library_effects", bind (&DaeParser::ParseLibraryEffects, this, _1));
   for_each_child (iter, "library_materials", bind (&DaeParser::ParseLibraryMaterials, this, _1));
+  for_each_child (iter, "library_geometries", bind (&DaeParser::ParseLibraryGeometries, this, _1));
 }
 
 /*
@@ -111,8 +112,8 @@ void Model::DefaultDaeLoader (const char* file_name, Model& model, const LogFunc
     LogScope
 */
 
-LogScope::LogScope (Parser::Node* in_node, DaeParser& in_parser)
-  : parser (in_parser), node (in_node), prev (parser.current_scope)
+LogScope::LogScope (Parser::Node* in_node, DaeParser& in_parser, const char* in_id)
+  : parser (in_parser), node (in_node), prev (parser.current_scope), id (in_id)
 {
   parser.current_scope = this;
 }

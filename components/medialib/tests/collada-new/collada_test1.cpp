@@ -73,7 +73,7 @@ void dump (Effect& effect, int level)
 {
   print_space (level++);
   
-  printf      ("Effect: '%s'\n", effect.EntityID ());  
+  printf      ("Effect: '%s'\n", effect.EntityId ());  
   print_space (level);
   printf      ("shader type: ");
   
@@ -129,9 +129,81 @@ void dump (Effect& effect, int level)
 void dump (Material& material, int level)
 {
   print_space (level++);
-  printf      ("Material '%s'\n", material.EntityID ());
+  printf      ("Material '%s'\n", material.EntityId ());
   print_space (level);
-  printf      ("effect: '%s'\n", material.Effect ().EntityID ());
+  printf      ("effect: '%s'\n", material.Effect ().EntityId ());
+}
+
+//печать вершины
+void print (Vertex& v)
+{
+  printf ("coord=");
+  print  (v.coord);
+  printf (" normal=");
+  print  (v.normal);
+}
+
+//печать поверхности
+void dump (Surface& surface, int level)
+{
+  print_space (level++);
+  printf      ("Surface:\n");
+  print_space (level);
+  printf      ("primitive_type: ");
+  
+  switch (surface.PrimitiveType ())
+  {
+    case PrimitiveType_LineList:      printf ("line-list\n"); break;
+    case PrimitiveType_LineStrip:     printf ("line-strip\n"); break;
+    case PrimitiveType_TriangleList:  printf ("triangle-list\n"); break;    
+    case PrimitiveType_TriangleStrip: printf ("triangle-strip\n"); break;    
+    case PrimitiveType_TriangleFan:   printf ("triangle-fan\n"); break;
+    default:                          printf ("unknown\n"); break;
+  }
+
+  print_space (level);
+  printf      ("vertices_count: %u\n", surface.VerticesCount ());
+  print_space (level);
+  printf      ("indices_count:  %u\n", surface.IndicesCount ());  
+  print_space (level);
+  printf      ("vertices\n");
+  
+  for (size_t i=0; i<surface.VerticesCount (); i++)
+  {
+    print_space (level+1);
+    print       (surface.Vertices () [i]);
+    printf      ("\n");
+  }
+
+  print_space (level);
+  printf      ("indices: ");
+
+  for (size_t i=0; i<surface.IndicesCount (); i++)
+    printf ("%u ", surface.Indices () [i]);
+
+  printf ("\n");
+
+  if (surface.HasVertexColors ())
+  {
+    print_space (level);
+    printf      ("has_vertex_colors\n");
+  }
+  
+  for (size_t i=0; i<surface.TextureChannelsCount (); i++)
+  {
+    print_space (level+1);
+    printf      ("texture channel: '%s'\n", surface.TextureChannelName (i));
+  }
+}
+
+//печать меша
+void dump (Mesh& mesh, int level)
+{
+  print_space (level++);
+  printf      ("Mesh '%s' (%u surfaces)\n", mesh.EntityId (), mesh.Surfaces ().Size ());
+
+  for (size_t i=0; i<mesh.Surfaces ().Size (); i++)
+    dump (mesh.Surfaces () [i], level);
 }
 
 //печать элемента библиотеки
@@ -144,7 +216,7 @@ template <class Item> void dump_item (Item& item, int level)
 template <class Item> void dump (ILibrary<Item>& library, int level)
 {
   print_space (level++);
-  printf      ("Library '%s' (%u items)\n", library.EntityID (), library.Size ());
+  printf      ("Library '%s' (%u items)\n", library.EntityId (), library.Size ());
 
   library.ForEach (bind (&dump_item<Item>, _1, level));
 }
@@ -167,8 +239,10 @@ int main ()
 
     printf ("---  Collada model dump ---\n");
     printf ("Model '%s'\n", file_name);
-    dump   (model.Effects (), 0);
-    dump   (model.Materials (), 0);
+    
+    dump (model.Effects (), 0);
+    dump (model.Materials (), 0);
+    dump (model.Meshes (), 0);
   }
   catch (std::exception& exception)
   {

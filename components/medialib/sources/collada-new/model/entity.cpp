@@ -41,7 +41,7 @@ ModelImpl* Entity::Owner () const
     Èäåíòèôèêàòîğ îáúåêòà
 */
 
-const char* Entity::EntityID () const
+const char* Entity::EntityId () const
 {
   return impl->id.c_str ();
 }

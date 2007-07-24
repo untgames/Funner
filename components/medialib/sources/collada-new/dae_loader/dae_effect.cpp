@@ -8,7 +8,7 @@ void DaeParser::ParseLibraryEffects (Parser::Iterator iter)
 {
   if (!test (iter, "effect"))
   {
-    LogError (iter, "Incorrect 'library_effects' tag. Must be at least one 'effect' sub-tag");
+    LogError (iter, "Incorrect 'library_effects' node. Must be at least one 'effect' sub-tag");
     return;
   }
   
@@ -50,7 +50,7 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
 
   Parser::Iterator technique_iter = profile_iter->First ("technique");    
   
-  LogScope technique_scope (technique_iter, *this);
+  LogScope technique_scope (technique_iter, *this, "profile_COMMON");
   
     //чтение экстра параметров
     
@@ -151,10 +151,10 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
 
 bool DaeParser::ParseTexture (Parser::Iterator iter, Parser::Iterator profile_iter, Texture& texture)
 {
-  LogScope scope (iter, *this);
-
   const char *sampler_name  = get<const char*> (iter, "texture"),
              *texcoord_name = get<const char*> (iter, "texcoord");
+             
+  LogScope scope (iter, *this, sampler_name);
              
   if (!sampler_name)
   {

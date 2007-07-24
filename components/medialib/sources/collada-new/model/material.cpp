@@ -11,7 +11,11 @@ struct Material::Impl
   MaterialLibrary&           library; //библиотека
   medialib::collada::Effect& effect;  //эффект, связанный с материалом
   
-  Impl (medialib::collada::Effect& in_effect, MaterialLibrary& in_library) : library (in_library), effect (in_effect) {}
+  Impl (medialib::collada::Effect& in_effect, MaterialLibrary& in_library) : library (in_library), effect (in_effect)
+  {
+    if (effect.Owner () != library.Owner ())
+      raise_incompatible ("medialib::collada::Material::Material", effect, library);
+  }
 };
 
 /*
