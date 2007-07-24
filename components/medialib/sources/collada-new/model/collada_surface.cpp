@@ -51,11 +51,12 @@ struct Surface::Impl
   }
   
   Impl (collada::Material& in_material, collada::PrimitiveType in_primitive_type, size_t in_vertices_count, size_t in_indices_count) : 
-    material (in_material), vertices_count (in_vertices_count), indices_count (in_indices_count), colors (0)    
+    material (in_material), vertices_count (in_vertices_count), indices_count (in_indices_count), colors (0),
+    primitive_type (in_primitive_type)
   {
     texvertex_channels.reserve (DEFAULT_TEXVERTEX_CHANNELS_RESERVE);
     
-    switch (in_primitive_type)
+    switch (primitive_type)
     {
       case PrimitiveType_LineList:
       case PrimitiveType_LineStrip:
