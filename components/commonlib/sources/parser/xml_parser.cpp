@@ -291,6 +291,8 @@ void XMLParser::parse_content_text ()
       case XMLLexer::IDENTIFIER:
       case XMLLexer::STRING:
       case XMLLexer::CDATA:
+      case XMLLexer::EQUAL:
+      case XMLLexer::UNDEFINED:
         context.AppendAttr (lex.token ());
         break;
       default:
@@ -304,11 +306,13 @@ void XMLParser::parse_content_elements ()
   for (;;)
   {
     switch (lex.lexem ())
-    {      
+    {
       case XMLLexer::TOKEN:
       case XMLLexer::IDENTIFIER:
       case XMLLexer::STRING:
       case XMLLexer::CDATA:
+      case XMLLexer::EQUAL:
+      case XMLLexer::UNDEFINED:
         parse_content_text();
         continue;
       case XMLLexer::TAG_BEGIN_BRACKET:
