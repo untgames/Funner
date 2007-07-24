@@ -12,7 +12,7 @@ void DaeParser::ParseLibraryMaterials (Parser::Iterator iter)
     return;
   }
   
-  LogScope (iter, *this);
+  LogScope scope (iter, *this);
 
   for_each_child (iter, "material", bind (&DaeParser::ParseMaterial, this, _1));  
 }

@@ -79,6 +79,7 @@ class DaeParser
     void ParseLibraryEffects      (Parser::Iterator);
     void ParseLibraryMaterials    (Parser::Iterator);
     void ParseLibraryGeometries   (Parser::Iterator);
+    void ParseLibraryControllers  (Parser::Iterator);
     void ParseImage               (Parser::Iterator);
     void ParseEffect              (Parser::Iterator);
     void ParseEffectProfileCommon (Parser::Iterator, Effect& effect);
@@ -90,6 +91,8 @@ class DaeParser
     void ParseSurfaceInput        (Parser::Iterator, Parser::Iterator mesh_iter, MeshSourceMap& sources, MeshInputBuilder& inputs);
     void ParseSurface             (Parser::Iterator, Parser::Iterator mesh_iter, Mesh& mesh, PrimitiveType type, MeshSourceMap& sources);
     void ParseSurfaceBuffers      (Parser::Iterator, Parser::Iterator surface_iter, SurfaceInfo& info);
+    void ParseController          (Parser::Iterator);
+    void ParseSkin                (Parser::Iterator, Skin& skin);
 
   private:
     template <class T> bool CheckedRead (Parser::Node* node, const char* tag, T& value)

@@ -2,7 +2,8 @@
 #define MEDIALIB_COLLADA_MODEL_HEADER
 
 #include <xtl/functional_fwd>
-#include <media/collada/geometry.h> //??
+#include <media/collada/geometry.h>
+#include <media/collada/skin.h>
 
 namespace medialib
 {
@@ -12,17 +13,6 @@ namespace collada
 
 //implementation forwards
 struct ModelImpl;
-
-//typedef Library<ColladaMesh>          ColladaMeshLib;
-//typedef Library<ColladaMaterial>      ColladaMaterialLib;
-//typedef Library<ColladaEffect>        ColladaEffectLib;
-//typedef Library<ColladaLight>         ColladaLightLib;
-//typedef Library<ColladaCamera>        ColladaCameraLib;
-//typedef Library<ColladaController>    ColladaControllerLib;
-//typedef Library<ColladaNode>          ColladaNodeLib;
-//typedef Library<ColladaVisualScene>   ColladaVisualSceneLib;
-//typedef Library<ColladaAnimation>     ColladaAnimationLib;
-//typedef Library<ColladaAnimationClip> ColladaAnimationClipLib;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Модель
@@ -70,9 +60,11 @@ class Model
           collada::MaterialLibrary& Materials ();
           collada::EffectLibrary&   Effects   ();
           collada::MeshLibrary&     Meshes    ();
+          collada::SkinLibrary&     Skins     ();
     const collada::MaterialLibrary& Materials () const;
     const collada::EffectLibrary&   Effects   () const;
     const collada::MeshLibrary&     Meshes    () const;
+    const collada::SkinLibrary&     Skins     () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

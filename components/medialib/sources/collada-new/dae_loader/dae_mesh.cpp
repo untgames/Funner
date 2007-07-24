@@ -722,9 +722,9 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
     
     if (surface_info.inputs.FindChannel ("TEXCOORD", set))
     {    
-      size_t channel = surface.CreateTextureChannel (set);
+      size_t channel = surface.TexVertexChannels ().Create (set);
     
-      TexVertex* tex_vertices = surface.TextureVertices (channel);      
+      TexVertex* tex_vertices = surface.TexVertexChannels ().Data (channel);      
       
       if (!stream_reader.Read ("TEXCOORD", set, "STP", tex_vertices, &TexVertex::coord))
       {
@@ -756,9 +756,9 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
     
     if (surface_info.inputs.FindChannel ("COLOR", set))
     {
-      size_t channel = surface.CreateColorChannel (set);
+      size_t channel = surface.ColorChannels ().Create (set);
       
-      math::vec3f* colors = surface.Colors (channel);
+      math::vec3f* colors = surface.ColorChannels ().Data (channel);
       
       if (!stream_reader.Read ("COLOR", set, "RGB", colors))
       {

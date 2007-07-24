@@ -12,7 +12,7 @@ void DaeParser::ParseLibraryGeometries (Parser::Iterator iter)
     return;
   }
   
-  LogScope (iter, *this);
+  LogScope scope (iter, *this);
 
   for_each_child (iter, "geometry", bind (&DaeParser::ParseGeometry, this, _1));  
 }

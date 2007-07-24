@@ -77,8 +77,8 @@ class IBasicCollection
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество элементов / проверка на пустоту
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t Size  () const = 0;
-    virtual bool   Empty () const = 0;
+    virtual size_t Size    () const = 0;
+    virtual bool   IsEmpty () const = 0;
 
   protected:
     virtual ~IBasicCollection () {}

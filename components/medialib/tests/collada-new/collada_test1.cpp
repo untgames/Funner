@@ -186,12 +186,12 @@ void dump (Surface& surface, int level)
     printf      ("\n");
   }
   
-  for (size_t i=0; i<surface.TextureChannelsCount (); i++)
+  for (size_t i=0; i<surface.TexVertexChannels ().Size (); i++)
   {
     print_space (level);
-    printf      ("texture_channel '%s'\n", surface.TextureChannelName (i));
+    printf      ("texture_channel '%s'\n", surface.TexVertexChannels ().Name (i));
     
-    const TexVertex* tv = surface.TextureVertices (i);
+    const TexVertex* tv = surface.TexVertexChannels ().Data (i);
     
     for (size_t j=0; j<surface.VerticesCount (); j++, tv++)
     {
@@ -201,12 +201,12 @@ void dump (Surface& surface, int level)
     }
   }
   
-  for (size_t i=0; i<surface.ColorChannelsCount (); i++)
+  for (size_t i=0; i<surface.ColorChannels ().Size (); i++)
   {
     print_space (level);
-    printf      ("color_channel '%s'\n", surface.ColorChannelName (i));
+    printf      ("color_channel '%s'\n", surface.ColorChannels ().Name (i));
     
-    const math::vec3f* color = surface.Colors (i);
+    const math::vec3f* color = surface.ColorChannels ().Data (i);
     
     for (size_t j=0; j<surface.VerticesCount (); j++, color++)
     {
@@ -223,8 +223,6 @@ void dump (Surface& surface, int level)
     printf ("%u ", surface.Indices () [i]);
 
   printf ("\n");
-
-
 }
 
 //печать меша

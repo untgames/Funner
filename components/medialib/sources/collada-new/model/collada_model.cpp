@@ -29,8 +29,9 @@ struct ModelImpl
   Library<Effect>   effects;   //библиотека эффектов
   Library<Material> materials; //библиотека материалов
   Library<Mesh>     meshes;    //библиотека мешей
+  Library<Skin>     skins;     //библиотека скинов
   
-  ModelImpl () : effects (this), materials (this), meshes (this) {}
+  ModelImpl () : effects (this), materials (this), meshes (this), skins (this) {}
 };
 
 }
@@ -147,6 +148,16 @@ MeshLibrary& Model::Meshes ()
 const MeshLibrary& Model::Meshes () const
 {
   return impl->meshes;
+}
+
+SkinLibrary& Model::Skins ()
+{
+  return impl->skins;
+}
+
+const SkinLibrary& Model::Skins () const
+{
+  return impl->skins;
 }
 
 /*

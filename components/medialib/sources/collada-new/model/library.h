@@ -17,6 +17,7 @@ template <class Item> const char* get_library_name ();
 template <> const char* get_library_name<Effect>   () { return "library_effects"; }
 template <> const char* get_library_name<Material> () { return "library_materials"; }
 template <> const char* get_library_name<Mesh>     () { return "library_meshes"; }
+template <> const char* get_library_name<Skin>     () { return "library_skines"; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовая библиотека
@@ -48,8 +49,8 @@ template <class Item> class ItemLibrary: public ILibrary<Item>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество элементов / проверка на пустоту
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Size  () const { return items.size (); }
-    bool   Empty () const { return items.empty (); }
+    size_t Size    () const { return items.size (); }
+    bool   IsEmpty () const { return items.empty (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Доступ к элементу по имени
