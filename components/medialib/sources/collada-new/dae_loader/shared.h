@@ -15,9 +15,10 @@ namespace collada
 {
 
 //forward declarations
-class DaeParser;
-class MeshSourceMap;
-class MeshInputBuilder;
+class  DaeParser;
+class  MeshSourceMap;
+class  MeshInputBuilder;
+struct SurfaceInfo;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отображение имени в значение
@@ -88,7 +89,7 @@ class DaeParser
     void ParseMeshSource          (Parser::Iterator, MeshSourceMap& sources);
     void ParseSurfaceInput        (Parser::Iterator, Parser::Iterator mesh_iter, MeshSourceMap& sources, MeshInputBuilder& inputs);
     void ParseSurface             (Parser::Iterator, Parser::Iterator mesh_iter, Mesh& mesh, PrimitiveType type, MeshSourceMap& sources);
-    bool ParseSurfaceBuffers      (Parser::Iterator, Mesh& mesh, Material& material, PrimitiveType type, MeshInputBuilder& inputs);
+    void ParseSurfaceBuffers      (Parser::Iterator, Parser::Iterator surface_iter, SurfaceInfo& info);
 
   private:
     template <class T> bool CheckedRead (Parser::Node* node, const char* tag, T& value)

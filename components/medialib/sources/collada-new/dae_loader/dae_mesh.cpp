@@ -249,6 +249,17 @@ class MeshVertexBuffer
     size_t          inputs_count;
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Информация для создания поверхности
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct SurfaceInfo
+{
+  Mesh*             mesh;
+  Material*         material;
+  PrimitiveType     primitive_type;
+  MeshInputBuilder  inputs;
+};
+
 }
 
 }
@@ -278,17 +289,16 @@ void DaeParser::ParseMesh (Parser::Iterator iter, Mesh& mesh)
     //чтение поверхностей
     
   for_each_child (iter, "source", bind (&DaeParser::ParseMeshSource, this, _1, ref (sources)));
+  
+    //чтение поверхностей
 
-//  for_each_child (iter, "polygons",   bind (&DaeParser::LogError, this, _1, "Polygons are not supported"));
-//  for_each_child (iter, "polylist",   bind (&DaeParser::LogError, this, _1, "Polygons are not supported"));
-
+  for_each_child (iter, "polygons",  bind (&DaeParser::LogError, this, _1, "Polygons are not supported"));
+  for_each_child (iter, "polylist",  bind (&DaeParser::LogError, this, _1, "Polygons are not supported"));
   for_each_child (iter, "triangles", bind (&DaeParser::ParseSurface, this, _1, iter, ref (mesh), PrimitiveType_TriangleList, ref (sources)));
-  
-  
-//  for_each_child (iter, "linestrips", bind (&DaeParser::ParseLineStrips, this, _1, ref (mesh)));
-//  for_each_child (iter, "lines",      bind (&DaeParser::ParseLines, this, _1, ref (mesh)));
-//  for_each_child (iter, "trifans",    bind (&DaeParser::ParseTriangleFans, this, _1, ref (mesh)));
-//  for_each_child (iter, "tristrips",  bind (&DaeParser::ParseTriangleStrips, this, _1, ref (mesh)));
+  for_each_child (iter, "tristrips", bind (&DaeParser::ParseSurface, this, _1, iter, ref (mesh), PrimitiveType_TriangleStrip, ref (sources)));
+  for_each_child (iter, "trifans",   bind (&DaeParser::ParseSurface, this, _1, iter, ref (mesh), PrimitiveType_TriangleFan, ref (sources)));
+  for_each_child (iter, "lines",     bind (&DaeParser::ParseSurface, this, _1, iter, ref (mesh), PrimitiveType_LineList, ref (sources)));
+  for_each_child (iter, "linestrip", bind (&DaeParser::ParseSurface, this, _1, iter, ref (mesh), PrimitiveType_LineStrip, ref (sources)));
 }
 
 /*
@@ -362,6 +372,11 @@ void DaeParser::ParseSurface
 {
   LogScope scope (iter, *this);
   
+  SurfaceInfo surface_info;
+  
+  surface_info.mesh           = &mesh;
+  surface_info.primitive_type = primitive_type;
+  
     //получение имени материала
     
   const char* material_name = get<const char*> (iter, "material");
@@ -372,9 +387,9 @@ void DaeParser::ParseSurface
     return;
   }
   
-  Material* material = model.Materials ().Find (material_name);
+  surface_info.material = model.Materials ().Find (material_name);
   
-  if (!material)
+  if (!surface_info.material)
   {
     LogError (iter, "Material '%s' not found", material_name);
     return;
@@ -382,17 +397,11 @@ void DaeParser::ParseSurface
 
     //загрузка каналов данных поверхности
 
-  MeshInputBuilder inputs;
-
-  for_each_child (iter, "input", bind (&DaeParser::ParseSurfaceInput, this, _1, mesh_iter, ref (sources), ref (inputs)));
+  for_each_child (iter, "input", bind (&DaeParser::ParseSurfaceInput, this, _1, mesh_iter, ref (sources), ref (surface_info.inputs)));
   
     //загрузка буферов поверхности
-  
-  if (!ParseSurfaceBuffers (iter, mesh, *material, primitive_type, inputs))
-  {
-    LogError (iter, "Error at build surface buffers");
-    return;
-  }
+
+  for_each_child (iter, "p", bind (&DaeParser::ParseSurfaceBuffers, this, _1, iter, ref (surface_info)));
 }
 
 /*
@@ -583,37 +592,16 @@ bool read_vertex_stream
       Данная функция строит вершинный и индексный буферы поверхности на основе входных каналов данных
 */
 
-bool DaeParser::ParseSurfaceBuffers
- (Parser::Iterator  iter,
-  Mesh&             mesh,
-  Material&         material,
-  PrimitiveType     primitive_type,
-  MeshInputBuilder& inputs)
+void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator surface_iter, SurfaceInfo& surface_info)
 {  
-    //определение итератора буфера индексов
-
-  Parser::Iterator p_iter = iter->First ("p.#text");
-  
-  if (!p_iter)
-  {
-    LogError (iter, "No 'p' sub-tag detected");
-    return false;
-  }
-  
-  if (p_iter->Next ())
-  {
-    LogError (iter, "More than one 'p' sub-tag detected");
-    return false;
-  }
-  
     //получение количества индексов
   
   size_t indices_count = 0;
   
-  if (!CheckedRead (iter, "count", indices_count))
+  if (!CheckedRead (surface_iter, "count", indices_count))
   {
-    LogError (iter, "Error at read 'count' attribute");
-    return false;
+    LogError (surface_iter, "Error at read 'count' attribute");
+    return;
   }  
 
     //чтение исходного буфера индексов
@@ -622,15 +610,15 @@ bool DaeParser::ParseSurfaceBuffers
 
   IndexBuffer input_indices;
 
-  size_t inputs_count        = inputs.GetChannelsCount ();  
+  size_t inputs_count        = surface_info.inputs.GetChannelsCount ();
   size_t input_indices_count = indices_count * inputs_count;
 
   input_indices.resize (input_indices_count);  
 
-  if (read_range (p_iter, 0, &input_indices [0], input_indices_count) != input_indices_count)
+  if (read_range (p_iter, "#text", &input_indices [0], input_indices_count) != input_indices_count)
   {
     LogError (p_iter, "Wrong index buffer");
-    return false;
+    return;
   }
   
     //построение исходного вершинного буфера (каждый элемент - указатель на массив индексов во входных каналах данных)
@@ -654,7 +642,10 @@ bool DaeParser::ParseSurfaceBuffers
   
     //создание поверхности
     
-  Surface& surface = mesh.Surfaces ().Create (material, primitive_type, vertex_buffer.GetVerticesCount (), indices_count);
+  Mesh::SurfaceList& surfaces = surface_info.mesh->Surfaces ();
+    
+  Surface& surface = surfaces.Create (*surface_info.material, surface_info.primitive_type,
+                                      vertex_buffer.GetVerticesCount (), indices_count);
   
     //копирование буфера индексов
 
@@ -664,23 +655,21 @@ bool DaeParser::ParseSurfaceBuffers
     
   Vertex* vertices = surface.Vertices ();
 
-  if (!read_vertex_stream (*this, iter, inputs, vertex_buffer, "VERTEX", "", "XYZ", vertices, &Vertex::coord))
+  if (!read_vertex_stream (*this, surface_iter, surface_info.inputs, vertex_buffer, "VERTEX", "", "XYZ", vertices, &Vertex::coord))
   {
-    LogError (iter, "Error at read vertices stream");
+    LogError (surface_iter, "Error at read vertices stream");
     
-    mesh.Surfaces ().Remove (surface);
+    surfaces.Remove (surface);
     
-    return false;
+    return;
   }
   
-  if (!read_vertex_stream (*this, iter, inputs, vertex_buffer, "NORMAL", "", "XYZ", vertices, &Vertex::normal))
+  if (!read_vertex_stream (*this, surface_iter, surface_info.inputs, vertex_buffer, "NORMAL", "", "XYZ", vertices, &Vertex::normal))
   {
-    LogError (iter, "Error at read normals stream");
+    LogError (surface_iter, "Error at read normals stream");
 
-    mesh.Surfaces ().Remove (surface);    
+    surfaces.Remove (surface);
 
-    return false;
+    return;
   }
-  
-  return true;
 }
