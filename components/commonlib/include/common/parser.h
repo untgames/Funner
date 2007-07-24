@@ -213,7 +213,7 @@ Parser::AttributeIterator make_attribute_iterator (ParseNode*, const char* tag);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение атрибутов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> void read (ParseNode*, const char* tag, T& object);
+template <class T> bool read (ParseNode*, const char* tag, T& object);
 template <class T> void read (ParseNode*, const char* tag, T& object, const T& default_value);
 
 template <class Traits, class Allocator> 
@@ -251,6 +251,12 @@ bool test (ParseNode*, const char* tag, size_t attr_index, const char* value);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Fn> void for_each_child (ParseNode*, Fn fn);
 template <class Fn> void for_each_child (ParseNode*, const char* tag, Fn fn);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вызов функтора, если существует вложенный узел с указанным именем
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Fn>             void parse_if (ParseNode*, const char* tag, Fn then_fn);
+template <class Fn1, class Fn2> void parse_if (ParseNode*, const char* tag, Fn1 then_fn, Fn2 else_fn);
 
 #include <common/impl/parser.inl>
 

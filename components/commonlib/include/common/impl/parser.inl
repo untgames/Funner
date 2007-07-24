@@ -104,13 +104,12 @@ inline Parser::AttributeIterator make_attribute_iterator (ParseNode* node, const
 */
 
 template <class T>
-inline void read (ParseNode* node, const char* tag, T& value)
+inline bool read (ParseNode* node, const char* tag, T& value)
 {
   if (node && tag)
     node = node->First (tag);
   
-  if (!node || !read (make_attribute_iterator (node), value))
-    value = T ();
+  return node && read (make_attribute_iterator (node), value);
 }
 
 template <class T>
@@ -265,4 +264,28 @@ inline void for_each_child (ParseNode* node, const char* tag, Fn fn)
 
   for (ParseNode* i=node->First (tag); i; i=i->NextNamesake ())
     fn (i);
+}
+
+/*
+    Вызов функтора, если существует вложенный узел с указанным именем
+*/
+
+template <class Fn>
+inline void parse_if (ParseNode* node, const char* tag, Fn then_fn)
+{
+  if (tag && node)
+    node = node->First (tag);
+    
+  if (node)   
+    then_fn (node);
+}
+
+template <class Fn1, class Fn2>
+inline void parse_if (ParseNode*, const char* tag, Fn1 then_fn, Fn2 else_fn)
+{
+  if (tag && node)
+    node = node->First (tag);
+    
+  if (node) then_fn (node);
+  else      else_fn (node);
 }
