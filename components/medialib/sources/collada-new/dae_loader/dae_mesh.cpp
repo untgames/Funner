@@ -255,7 +255,7 @@ class MeshVertexBuffer
 struct SurfaceInfo
 {
   Mesh*             mesh;
-  Material*         material;
+  const char*       material_name;
   PrimitiveType     primitive_type;
   MeshInputBuilder  inputs;
 };
@@ -498,14 +498,8 @@ void DaeParser::ParseSurface
     LogError (iter, "No 'material' attribute detected");
     return;
   }
-  
-  surface_info.material = model.Materials ().Find (material_name);
-  
-  if (!surface_info.material)
-  {
-    LogError (iter, "Material '%s' not found", material_name);
-    return;
-  }  
+
+  surface_info.material_name = material_name;
 
     //загрузка каналов данных поверхности
 
@@ -681,8 +675,11 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
     
   Mesh::SurfaceList& surfaces = surface_info.mesh->Surfaces ();
     
-  Surface& surface = surfaces.Create (*surface_info.material, surface_info.primitive_type,
-                                      vertex_buffer.GetVerticesCount (), indices_count);
+  Surface& surface = surfaces.Create (surface_info.primitive_type, vertex_buffer.GetVerticesCount (), indices_count);
+  
+    //установка имени материала
+    
+  surface.SetMaterialName (surface_info.material_name);
   
     //копирование буфера индексов
 

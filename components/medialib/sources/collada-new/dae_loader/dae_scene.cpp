@@ -268,7 +268,8 @@ void DaeParser::ParseBindMaterial (Parser::Iterator iter, MaterialBinds& binds)
   
   for (Parser::NamesakeIterator i=iter->First ("technique_common.instance_material"); i; ++i)
   {
-    const char* target = get<const char*> (i, "target");
+    const char *target = get<const char*> (i, "target"),
+               *symbol = get<const char*> (i, "symbol");
     
     if (!target)
     {
@@ -276,10 +277,30 @@ void DaeParser::ParseBindMaterial (Parser::Iterator iter, MaterialBinds& binds)
       continue;
     }
     
+    if (!symbol)
+    {
+      LogError (i, "No 'symbol' attribute");
+      continue;
+    }    
+    
     target++; //избавляемся от префисного '#'
     
+    Material* material = model.Materials ().Find (target);
+    
+    if (!material)
+    {
+      LogError (i, "No material with id='%s' detected", target);
+      continue;
+    }
+    
+      //добавляем материал в список присоединённых материалов
+
+    binds.SetMaterial (symbol, *material);
+
+      //разбор текстурных каналов
+
     for (Parser::NamesakeIterator j=i->First ("bind_vertex_input"); j; ++j)
-      if (test (j, "input_semantic", "TEXCOORD"))      
+      if (test (j, "input_semantic", "TEXCOORD"))
       {
         const char *semantic = get<const char*> (j, "semantic"),
                    *set      = get<const char*> (j, "input_set");
@@ -295,8 +316,8 @@ void DaeParser::ParseBindMaterial (Parser::Iterator iter, MaterialBinds& binds)
           LogError (j, "No 'input_set' attribute");
           continue;
         }
-        
-        binds.SetSurfaceChannelName (target, semantic, set);
+
+        binds.SetTexcoordChannelName (symbol, semantic, set);
       }
   }
 }

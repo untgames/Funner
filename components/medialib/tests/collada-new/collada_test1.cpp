@@ -34,7 +34,7 @@ void print_space (int count)
 //печать числа с плавающей точкой
 void print (float value)
 {
-  printf ("%g", value);
+  printf ("%+.3f", value);
 }
 
 //печать вектора
@@ -171,7 +171,9 @@ void dump (Surface& surface, int level)
     case PrimitiveType_TriangleFan:   printf ("triangle-fan\n"); break;
     default:                          printf ("unknown\n"); break;
   }
-
+  
+  print_space (level);
+  printf      ("material_name: '%s'\n", surface.MaterialName ());  
   print_space (level);
   printf      ("vertices_count: %u\n", surface.VerticesCount ());
   print_space (level);
@@ -309,17 +311,26 @@ void dump (InstanceMesh& imesh, int level)
 
   for (size_t i=0; i<surfaces.Size (); i++)
   {
-    Material& material = surfaces [i].Material ();
-    Effect&   effect   = material.Effect ();
+    Surface&  surface  = surfaces [i];
+    Material* material = binds.FindMaterial (surface);
+    
+    if (!material)
+    {
+      print_space (level);
+      printf      ("No bind material with name '%s' detected", surface.MaterialName ());
+      continue;
+    }
+    
+    print_space (level);
+    printf      ("surface #%u material: '%s'\n", i, material->EntityId ());
+    
+    Effect& effect = material->Effect ();
     
     for (const TexmapName* texmap = texmaps; texmap->name; texmap++)
       if (effect.HasTexture (texmap->map))
       {
-        const char* channel_name = effect.Texture (texmap->map).TexcoordChannel ();
-        
-        print_space (level);
-        printf      ("material='%s' texture='%s' channel='%s'\n", material.EntityId (), texmap->name,
-                     binds.SurfaceChannelName (material.EntityId (), "TEXCOORD"));
+        print_space (level+1);
+        printf      ("map %s channel #%d\n", texmap->name, binds.FindTexcoordChannel (surface, effect.Texture (texmap->map)));
       }
   }
 }

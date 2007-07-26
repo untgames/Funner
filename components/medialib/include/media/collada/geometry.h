@@ -10,6 +10,9 @@ namespace medialib
 namespace collada
 {
 
+//forward declarations
+class MaterialBinds;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовые атрибуты вершины
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,10 +103,10 @@ class Surface
     typedef IChannelList<VertexInfluence> InfluenceChannelList;   
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Материал поверхности
+///Имя материала поверхности (данное имя должно передаваться в MaterialBinds::FindMaterial)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          collada::Material& Material ();
-    const collada::Material& Material () const;
+    const char* MaterialName    () const;
+    void        SetMaterialName (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип примитивов
@@ -147,7 +150,7 @@ class Surface
     const InfluenceChannelList& InfluenceChannels () const;
 
   protected:
-    Surface  (collada::Material& material, collada::PrimitiveType type, size_t verts_count, size_t indices_count);
+    Surface  (collada::PrimitiveType type, size_t verts_count, size_t indices_count);
     ~Surface ();
 
   private:
@@ -168,7 +171,7 @@ template <> class ICollection<Surface>: public IItemCollection<Surface>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual Surface& Create (Material& material, PrimitiveType type, size_t verts_count, size_t indices_count) = 0;
+    virtual Surface& Create (PrimitiveType type, size_t verts_count, size_t indices_count) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -19,8 +19,8 @@ namespace
 class ConstructableSurface: public Surface
 {
   public:
-    ConstructableSurface (medialib::collada::Material& material, medialib::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
-      : Surface (material, type, verts_count, indices_count) {}
+    ConstructableSurface (medialib::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
+      : Surface (type, verts_count, indices_count) {}
 };
 
 //список поверхностей
@@ -29,9 +29,9 @@ class SurfaceListImpl: public Collection<Surface, ConstructableSurface, true>
   public:
     SurfaceListImpl (Entity& owner) : Collection<Surface, ConstructableSurface, true> (owner) {}
   
-    Surface& Create (Material& material, PrimitiveType type, size_t verts_count, size_t indices_count)
+    Surface& Create (PrimitiveType type, size_t verts_count, size_t indices_count)
     {
-      ConstructableSurface* surface = new ConstructableSurface (material, type, verts_count, indices_count);
+      ConstructableSurface* surface = new ConstructableSurface (type, verts_count, indices_count);
       
       try
       {

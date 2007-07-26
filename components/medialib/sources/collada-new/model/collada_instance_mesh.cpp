@@ -9,7 +9,7 @@ using namespace medialib::collada;
 class ConstructableMaterialBinds: public MaterialBinds
 {
   public:
-    ConstructableMaterialBinds () {}
+    ConstructableMaterialBinds (Entity& entity) : MaterialBinds (entity) {}
     ~ConstructableMaterialBinds () {}
 };
 
@@ -18,7 +18,7 @@ struct InstanceMesh::Impl
   collada::Mesh&             mesh;  //меш
   ConstructableMaterialBinds binds; //присоединённые материалы
   
-  Impl (collada::Mesh& in_mesh) : mesh (in_mesh) {}
+  Impl (collada::Mesh& in_mesh) : mesh (in_mesh), binds (in_mesh) {}
 };
 
 /*

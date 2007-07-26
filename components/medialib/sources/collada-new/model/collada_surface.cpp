@@ -147,7 +147,7 @@ typedef ChannelListImpl<VertexInfluence> InfluenceChannelListImpl;
 
 struct Surface::Impl
 {
-  collada::Material&        material;           //материал
+  stl::string               material_name;      //имя материала
   collada::PrimitiveType    primitive_type;     //тип примитивов
   size_t                    vertices_count;     //количество вершин
   size_t                    indices_count;      //количество индексов
@@ -157,10 +157,9 @@ struct Surface::Impl
   TexVertexChannelListImpl  texvertex_channels; //каналы текстурирования
   InfluenceChannelListImpl  influence_channels; //каналы вершинных весов
   
-  Impl (collada::Material& in_material, collada::PrimitiveType in_primitive_type, size_t in_vertices_count, size_t in_indices_count) : 
-    material (in_material), vertices_count (in_vertices_count), indices_count (in_indices_count),
-    primitive_type (in_primitive_type), color_channels (in_vertices_count), texvertex_channels (in_vertices_count),
-    influence_channels (in_vertices_count)
+  Impl (collada::PrimitiveType in_primitive_type, size_t in_vertices_count, size_t in_indices_count) :
+    vertices_count (in_vertices_count), indices_count (in_indices_count), primitive_type (in_primitive_type),
+    color_channels (in_vertices_count), texvertex_channels (in_vertices_count), influence_channels (in_vertices_count)
   {
     switch (primitive_type)
     {
@@ -199,8 +198,8 @@ struct Surface::Impl
     Конструктор / деструктор
 */
 
-Surface::Surface (medialib::collada::Material& material, medialib::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
-  : impl (new Impl (material, type, verts_count, indices_count))
+Surface::Surface (medialib::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
+  : impl (new Impl (type, verts_count, indices_count))
   {}
 
 Surface::~Surface ()
@@ -209,17 +208,20 @@ Surface::~Surface ()
 }
 
 /*
-    Материал поверхности
+    Имя материала поверхности
 */
 
-Material& Surface::Material ()
+const char* Surface::MaterialName () const
 {
-  return impl->material;
+  return impl->material_name.c_str ();
 }
 
-const Material& Surface::Material () const
+void Surface::SetMaterialName (const char* name)
 {
-  return impl->material;
+  if (!name)
+    RaiseNullArgument ("medialib::collada::Surface::SetMaterialName", "name");
+    
+  impl->material_name = name;
 }
 
 /*
