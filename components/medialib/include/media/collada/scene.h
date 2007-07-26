@@ -252,12 +252,6 @@ class Node: public Entity
           MeshList&   Meshes  ();       //меши
     const MeshList&   Meshes  () const;    
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Слои которым принадлежит узел
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//    size_t      LayersCount () const;
-//    const char* Layer       (size_t layer_index) const;
-
   protected:
     Node  (ModelImpl*, const char* id);
     ~Node ();

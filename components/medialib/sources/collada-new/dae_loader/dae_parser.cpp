@@ -84,8 +84,22 @@ void DaeParser::ParseRoot (Parser::Iterator iter)
   if (!test (iter, "version", "1.4.1"))  
     LogWarning (iter, "Currently supported Collada version - 1.4.1, document uses other version (%s), "
                       "some features may be not fully supported or unsupported", get<const char*> (iter, "version", "UNDEFINED"));
+                      
+    //разбор библиотек
     
   ParseLibraries (iter);
+  
+    //определение имени активной сцены
+    
+  const char* active_scene_name = get<const char*> (iter, "scene.instance_visual_scene.url");
+  
+  if (active_scene_name)
+  {
+    active_scene_name++; //избавляемся от префиксного '#'
+    
+    model.SetActiveSceneName (active_scene_name);
+  }
+  else LogWarning (iter, "No 'scene.instance_visual_scene.url' detected");
 }
 
 /*

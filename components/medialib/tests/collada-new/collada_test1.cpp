@@ -405,14 +405,16 @@ int main ()
 
     printf ("---  Collada model dump ---\n");
     printf ("Model '%s'\n", file_name);
-    
-    dump (model.Effects (), 0);
-    dump (model.Materials (), 0);
-    dump (model.Meshes (), 0);    
-//    dump (model.Skins (), 0);
-    dump (model.Lights (), 0);
-    dump (model.Cameras (), 0);
-    dump (model.Scenes (), 0);
+    print_space (1);
+    printf ("Active scene: '%s'\n", model.ActiveSceneName ());
+
+    dump (model.Effects (), 1);
+    dump (model.Materials (), 1);
+    dump (model.Meshes (), 1);    
+//    dump (model.Skins (), 1);
+    dump (model.Lights (), 1);
+    dump (model.Cameras (), 1);
+    dump (model.Scenes (), 1);
   }
   catch (std::exception& exception)
   {

@@ -25,15 +25,16 @@ namespace collada
 
 struct ModelImpl
 {
-  stl::string       name;      //им€ модели
-  Library<Effect>   effects;   //библиотека эффектов
-  Library<Material> materials; //библиотека материалов
-  Library<Mesh>     meshes;    //библиотека мешей
-  Library<Skin>     skins;     //библиотека скинов
-  Library<Node>     nodes;     //библиотека узлов
-  Library<Scene>    scenes;    //библиотека сцен
-  Library<Light>    lights;    //библиотека источников света
-  Library<Camera>   cameras;   //библиотека камер
+  stl::string       name;         //им€ модели
+  stl::string       active_scene; //им€ активной сцены
+  Library<Effect>   effects;      //библиотека эффектов
+  Library<Material> materials;    //библиотека материалов
+  Library<Mesh>     meshes;       //библиотека мешей
+  Library<Skin>     skins;        //библиотека скинов
+  Library<Node>     nodes;        //библиотека узлов
+  Library<Scene>    scenes;       //библиотека сцен
+  Library<Light>    lights;       //библиотека источников света
+  Library<Camera>   cameras;      //библиотека камер
   
   ModelImpl () : effects (this), materials (this), meshes (this), skins (this), nodes (this), scenes (this), lights (this),
                  cameras (this) {}
@@ -98,27 +99,20 @@ void Model::Rename (const char* new_name)
 }
 
 /*
-    «агрузка / сохранение
+    »м€ активной сцены
 */
 
-void Model::Load (const char* file_name)
+const char* Model::ActiveSceneName () const
 {
-  Model (file_name).Swap (*this);
+  return impl->active_scene.c_str ();
 }
 
-void Model::Load (const char* file_name, const LogFunction& log)
+void Model::SetActiveSceneName (const char* scene_name)
 {
-  Model (file_name, log).Swap (*this);
-}
-
-void Model::Save (const char* file_name)
-{
-  ModelSystemSingleton::Instance ().Save (file_name, *this, &default_collada_log);
-}
-
-void Model::Save (const char* file_name, const LogFunction& log)
-{
-  ModelSystemSingleton::Instance ().Save (file_name, *this, log);
+  if (!scene_name)
+    RaiseNullArgument ("medialib::collada::Model::SetActiveSceneName", "scene_name");
+    
+  impl->active_scene = scene_name;
 }
 
 /*
@@ -227,6 +221,30 @@ void swap (Model& a, Model& b)
 
 }
 
+}
+
+/*
+    «агрузка / сохранение
+*/
+
+void Model::Load (const char* file_name)
+{
+  Model (file_name).Swap (*this);
+}
+
+void Model::Load (const char* file_name, const LogFunction& log)
+{
+  Model (file_name, log).Swap (*this);
+}
+
+void Model::Save (const char* file_name)
+{
+  ModelSystemSingleton::Instance ().Save (file_name, *this, &default_collada_log);
+}
+
+void Model::Save (const char* file_name, const LogFunction& log)
+{
+  ModelSystemSingleton::Instance ().Save (file_name, *this, log);
 }
 
 /*
