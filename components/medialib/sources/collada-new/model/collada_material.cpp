@@ -2,19 +2,22 @@
 
 using namespace medialib::collada;
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 /*
     Реализация библиотеки
 */
 
 struct Material::Impl
 {
-  MaterialLibrary&           library; //библиотека
   medialib::collada::Effect& effect;  //эффект, связанный с материалом
   
-  Impl (medialib::collada::Effect& in_effect, MaterialLibrary& in_library) : library (in_library), effect (in_effect)
+  Impl (Entity& entity, medialib::collada::Effect& in_effect) : effect (in_effect)
   {
-    if (effect.Owner () != library.Owner ())
-      raise_incompatible ("medialib::collada::Material::Material", effect, library);
+    if (effect.Owner () != entity.Owner ())
+      raise_incompatible ("medialib::collada::Material::Material", effect, entity);
   }
 };
 
@@ -22,23 +25,14 @@ struct Material::Impl
     Конструктор / деструктор
 */
 
-Material::Material (medialib::collada::Effect& effect, MaterialLibrary& library, const char* id)
-  : Entity (library.Owner (), id),
-    impl (new Impl (effect, library))
+Material::Material (medialib::collada::Effect& effect, ModelImpl* owner, const char* id)
+  : Entity (owner, id),
+    impl (new Impl (*this, effect))
     {}
 
 Material::~Material ()
 {
   delete impl;
-}
-
-/*
-    Библиотека
-*/
-
-MaterialLibrary& Material::Library () const
-{
-  return impl->library;
 }
 
 /*

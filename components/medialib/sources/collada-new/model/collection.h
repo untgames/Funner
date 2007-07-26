@@ -1,3 +1,6 @@
+#ifndef MEDIALIB_COLLADA_COLLECTION_HEADER
+#define MEDIALIB_COLLADA_COLLECTION_HEADER
+
 #include <media/collada/utility.h>
 #include <common/strlib.h>
 #include <stl/vector>
@@ -9,12 +12,33 @@ namespace medialib
 namespace collada
 {
 
+//forwards
+class Surface;
+class Node;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имена элементов коллекции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Item> const char* get_collection_subname ();
 
-template <> const char* get_collection_subname<Surface> () { return "surfaces"; }
+template <> inline const char* get_collection_subname<Surface>      () { return "surfaces"; }
+template <> inline const char* get_collection_subname<Node>         () { return "nodes"; }
+template <> inline const char* get_collection_subname<Light>        () { return "lights"; }
+template <> inline const char* get_collection_subname<Camera>       () { return "cameras"; }
+template <> inline const char* get_collection_subname<InstanceMesh> () { return "meshes"; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Уничтожение объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <bool NeedDestroy> struct Destroyer
+{
+  template <class T> static void Destroy (T* obj) { delete obj; }
+};
+
+template <> struct Destroyer<false>
+{
+  template <class T> static void Destroy (T* obj) {}
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовая коллекция
@@ -98,7 +122,7 @@ class Collection: public ICollection<Item>
       if (item.Owner () != Owner ())
         raise_incompatible ("medialib::collada::Collection::Insert", item, *this);
 
-      InsertCore (item);
+      return InsertCore (item);
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,8 +133,7 @@ class Collection: public ICollection<Item>
      if (index >= items.size ())
        common::RaiseOutOfRange ("medialib::collada::Collection::Remove", "index", index, items.size ());
 
-     if (NeedDestroy)
-       delete items [index];
+     Destroyer<NeedDestroy>::Destroy (items [index]);
 
      items.erase (items.begin () + index);
    }
@@ -131,7 +154,7 @@ class Collection: public ICollection<Item>
       if (NeedDestroy)
       {
         for (ItemArray::iterator i=items.begin (); i!=items.end (); ++i)
-          delete *i;
+          Destroyer<NeedDestroy>::Destroy (*i);
       }
 
       items.clear ();
@@ -164,3 +187,5 @@ class Collection: public ICollection<Item>
 }
 
 }
+
+#endif

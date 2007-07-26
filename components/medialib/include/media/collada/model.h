@@ -2,7 +2,7 @@
 #define MEDIALIB_COLLADA_MODEL_HEADER
 
 #include <xtl/functional_fwd>
-#include <media/collada/geometry.h>
+#include <media/collada/scene.h>
 #include <media/collada/skin.h>
 
 namespace medialib
@@ -13,6 +13,18 @@ namespace collada
 
 //implementation forwards
 struct ModelImpl;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Библиотеки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef ILibrary<Effect>   EffectLibrary;
+typedef ILibrary<Material> MaterialLibrary;
+typedef ILibrary<Mesh>     MeshLibrary;
+typedef ILibrary<Skin>     SkinLibrary;
+typedef ILibrary<Light>    LightLibrary;
+typedef ILibrary<Camera>   CameraLibrary;
+typedef ILibrary<Node>     NodeLibrary;
+typedef ILibrary<Scene>    SceneLibrary;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Модель
@@ -61,10 +73,18 @@ class Model
           collada::EffectLibrary&   Effects   ();
           collada::MeshLibrary&     Meshes    ();
           collada::SkinLibrary&     Skins     ();
+          collada::LightLibrary&    Lights    ();
+          collada::CameraLibrary&   Cameras   ();
+          collada::NodeLibrary&     Nodes     ();
+          collada::SceneLibrary&    Scenes    ();
     const collada::MaterialLibrary& Materials () const;
     const collada::EffectLibrary&   Effects   () const;
     const collada::MeshLibrary&     Meshes    () const;
     const collada::SkinLibrary&     Skins     () const;
+    const collada::LightLibrary&    Lights    () const;
+    const collada::CameraLibrary&   Cameras   () const;
+    const collada::NodeLibrary&     Nodes     () const;
+    const collada::SceneLibrary&    Scenes    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

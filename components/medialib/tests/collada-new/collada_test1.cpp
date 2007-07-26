@@ -7,6 +7,22 @@ using namespace xtl;
 
 const char* file_name = "data/ape.dae";
 
+struct TexmapName
+{
+  TextureMap  map;
+  const char* name;
+};
+
+static TexmapName texmaps [] = {
+  {TextureMap_Diffuse,     "diffuse"},
+  {TextureMap_Ambient,     "ambient"},
+  {TextureMap_Specular,    "specular"},
+  {TextureMap_Reflective,  "reflective"},
+  {TextureMap_Transparent, "transparent"},
+  {TextureMap_Bump,        "bump"},
+  {(TextureMap)0, 0}
+};
+
 //печать строки пробелов (отступ)
 void print_space (int count)
 {
@@ -93,23 +109,7 @@ void dump (Effect& effect, int level)
   print_space (level);
   printf      ("refraction index: %g\n", effect.Param (EffectParam_RefractionIndex));  
   print_space (level);
-  printf      ("shininess: %g\n", effect.Param (EffectParam_Shininess));
-  
-  struct TexmapName
-  {
-    TextureMap  map;
-    const char* name;
-  };
-  
-  static TexmapName texmaps [] = {
-    {TextureMap_Diffuse,     "diffuse"},
-    {TextureMap_Ambient,     "ambient"},
-    {TextureMap_Specular,    "specular"},
-    {TextureMap_Reflective,  "reflective"},
-    {TextureMap_Transparent, "transparent"},
-    {TextureMap_Bump,        "bump"},
-    {(TextureMap)0, 0}
-  };
+  printf      ("shininess: %g\n", effect.Param (EffectParam_Shininess));  
       
   for (const TexmapName* texmap = texmaps; texmap->name; texmap++)
     if (effect.HasTexture (texmap->map))
@@ -235,6 +235,132 @@ void dump (Mesh& mesh, int level)
     dump (mesh.Surfaces () [i], level);
 }
 
+//вывод источника света
+void dump (Light& light, int level)
+{
+  print_space (level++);
+  printf      ("Light '%s'\n", light.EntityId ());
+  print_space (level);
+  printf      ("type: ");
+  
+  switch (light.Type ())
+  {
+    case LightType_Ambient: printf ("ambient\n"); break;
+    case LightType_Point:   printf ("point\n");   break;
+    case LightType_Spot:    printf ("spot\n");    break;
+    case LightType_Direct:  printf ("direct\n");  break;
+    default:                printf ("unknown\n"); break;
+  }
+  
+  print_space (level);
+  printf      ("color: ");
+  print       (light.Color ());
+  printf      ("\n");
+  print_space (level);
+  printf      ("attenuation_constant: %g\n", light.Param (LightParam_AttenuationConstant));
+  print_space (level);
+  printf      ("attenuation_linear: %g\n", light.Param (LightParam_AttenuationLinear));
+  print_space (level);
+  printf      ("attenuation_quadratic: %g\n", light.Param (LightParam_AttenuationQuadratic));
+  print_space (level);
+  printf      ("falloff_angle: %g\n", light.Param (LightParam_FalloffAngle));
+  print_space (level);
+  printf      ("falloff_exponent: %g\n", light.Param (LightParam_FalloffExponent));
+}
+
+void dump (Camera& camera, int level)
+{
+  print_space (level++);
+  printf      ("Camera '%s'\n", camera.EntityId ());
+  print_space (level);
+  printf      ("type: ");
+  
+  switch (camera.Type ())
+  {
+    case CameraType_Perspective:  printf ("perspective\n"); break;
+    case CameraType_Orthographic: printf ("ortho\n");   break;
+    default:                      printf ("unknown\n"); break;
+  }
+  
+  print_space (level);
+  printf      ("znear: %g\n", camera.Param (CameraParam_ZNear));
+  print_space (level);
+  printf      ("zfar: %g\n", camera.Param (CameraParam_ZFar));
+  print_space (level);
+  printf      ("aspect_ratio: %g\n", camera.Param (CameraParam_AspectRatio));
+  print_space (level);
+  printf      ("xfov: %g\n", camera.Param (CameraParam_XFov));
+  print_space (level);
+  printf      ("yfov: %g\n", camera.Param (CameraParam_YFov));
+  print_space (level);
+  printf      ("xmag: %g\n", camera.Param (CameraParam_XMagnitude));
+  print_space (level);
+  printf      ("ymag: %g\n", camera.Param (CameraParam_YMagnitude));
+}
+
+//вывод инстанцированного меша
+void dump (InstanceMesh& imesh, int level)
+{
+  Mesh::SurfaceList& surfaces = imesh.Mesh ().Surfaces ();
+  MaterialBinds&     binds    = imesh.MaterialBinds ();
+
+  print_space (level++);
+  printf      ("Instance mesh '%s'\n", imesh.Mesh ().EntityId ());  
+
+  for (size_t i=0; i<surfaces.Size (); i++)
+  {
+    Material& material = surfaces [i].Material ();
+    Effect&   effect   = material.Effect ();
+    
+    for (const TexmapName* texmap = texmaps; texmap->name; texmap++)
+      if (effect.HasTexture (texmap->map))
+      {
+        const char* channel_name = effect.Texture (texmap->map).TexcoordChannel ();
+        
+        print_space (level);
+        printf      ("material='%s' texture='%s' channel='%s'\n", material.EntityId (), texmap->name,
+                     binds.SurfaceChannelName (material.EntityId (), "TEXCOORD"));
+      }
+  }
+}
+
+//вывод коллекции
+template <class Item> void dump (ICollection<Item>& collection, int level)
+{
+  print_space (level++);
+  printf      ("Collection '%s' (%u items)\n", collection.EntityId (), collection.Size ());    
+
+  for (size_t i=0; i<collection.Size (); i++)
+  {
+    print_space (level);
+    printf      ("'%s'\n", collection [i].EntityId ());
+  }
+}
+
+//печать узла
+void dump (Node& node, int level)
+{
+  print_space (level++);
+  printf      ("Node '%s'\n", node.EntityId ());
+  print_space (level);
+  printf      ("sid: '%s'\n", node.SubId ());
+  print_space (level);
+  printf      ("name: '%s'\n", node.Name ());
+  print_space (level);
+  printf      ("transform: ");
+  print       (node.Transform ());
+  printf      ("\n");
+  
+  for (size_t i=0; i<node.Meshes ().Size (); i++)
+    dump (node.Meshes () [i], level);
+
+  dump (node.Lights (), level);
+  dump (node.Cameras (), level);
+  
+  for (size_t i=0; i<node.Nodes ().Size (); i++)
+    dump (node.Nodes () [i], level);
+}
+
 //печать элемента библиотеки
 template <class Item> void dump_item (Item& item, int level)
 {
@@ -271,7 +397,11 @@ int main ()
     
     dump (model.Effects (), 0);
     dump (model.Materials (), 0);
-    dump (model.Meshes (), 0);
+    dump (model.Meshes (), 0);    
+//    dump (model.Skins (), 0);
+    dump (model.Lights (), 0);
+    dump (model.Cameras (), 0);
+    dump (model.Scenes (), 0);
   }
   catch (std::exception& exception)
   {

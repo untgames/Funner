@@ -30,12 +30,11 @@ struct Map
 
 struct Effect::Impl
 {
-  EffectLibrary&                 library;                         //библиотека эффектов
   medialib::collada::ShaderType  shader_type;                     //тип шейдера
   Map                            maps [TextureMap_Num];           //карты
   float                          shader_params [EffectParam_Num]; //параметры шейдинга
   
-  Impl (EffectLibrary& in_library) : library (in_library), shader_type (ShaderType_Default)
+  Impl () : shader_type (ShaderType_Default)
   {
     for (size_t i=0; i<EffectParam_Num; i++)
       shader_params [i] = 0.0f;
@@ -52,23 +51,14 @@ struct Effect::Impl
     Конструктор / деструктор
 */
 
-Effect::Effect (EffectLibrary& library, const char* id)
-  : Entity (library.Owner (), id),
-    impl (new Impl (library))
+Effect::Effect (ModelImpl* owner, const char* id)
+  : Entity (owner, id),
+    impl (new Impl)
   {}
 
 Effect::~Effect ()
 {
   delete impl;
-}
-
-/*
-    Библиотека
-*/
-
-EffectLibrary& Effect::Library () const
-{
-  return impl->library;
 }
 
 /*

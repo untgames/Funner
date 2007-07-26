@@ -1,3 +1,6 @@
+#ifndef MEDIALIB_COLLADA_LIBRARY_HEADER
+#define MEDIALIB_COLLADA_LIBRARY_HEADER
+
 #include <media/collada/utility.h>
 #include <common/strlib.h>
 #include <stl/hash_map>
@@ -14,10 +17,14 @@ namespace collada
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Item> const char* get_library_name ();
 
-template <> const char* get_library_name<Effect>   () { return "library_effects"; }
-template <> const char* get_library_name<Material> () { return "library_materials"; }
-template <> const char* get_library_name<Mesh>     () { return "library_meshes"; }
-template <> const char* get_library_name<Skin>     () { return "library_skines"; }
+template <> inline const char* get_library_name<Effect>   () { return "library_effects"; }
+template <> inline const char* get_library_name<Material> () { return "library_materials"; }
+template <> inline const char* get_library_name<Mesh>     () { return "library_meshes"; }
+template <> inline const char* get_library_name<Skin>     () { return "library_skines"; }
+template <> inline const char* get_library_name<Light>    () { return "library_lights"; }
+template <> inline const char* get_library_name<Camera>   () { return "library_cameras"; }
+template <> inline const char* get_library_name<Node>     () { return "library_nodes"; }
+template <> inline const char* get_library_name<Scene>    () { return "library_scenes"; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовая библиотека
@@ -58,12 +65,12 @@ template <class Item> class ItemLibrary: public ILibrary<Item>
     const Item& operator [] (const char* id) const
     {
       if (!id)
-        RaiseNullArgument ("medialib::collada::Library::operator []", "id");
+        common::RaiseNullArgument ("medialib::collada::Library::operator []", "id");
         
       ItemMap::const_iterator iter = items.find (id);
       
       if (iter == items.end ())
-        RaiseInvalidArgument ("medialib::collada::Library::operator []", "id", id, "No item with this name in library");
+        common::RaiseInvalidArgument ("medialib::collada::Library::operator []", "id", id, "No item with this name in library");
         
       return *iter->second;
     }
@@ -79,7 +86,7 @@ template <class Item> class ItemLibrary: public ILibrary<Item>
     const Item* Find (const char* id) const
     {
       if (!id)
-        RaiseNullArgument ("medialib::collada::Library::Find", "id");
+        common::RaiseNullArgument ("medialib::collada::Library::Find", "id");
         
       ItemMap::const_iterator iter = items.find (id);
 
@@ -114,15 +121,15 @@ template <class Item> class ItemLibrary: public ILibrary<Item>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Flush ()
     {
-      RaiseNotImplemented ("medialib::collada::Library::Flush");
+      common::RaiseNotImplemented ("medialib::collada::Library::Flush");
     }
 
   protected:
     class ContructableItem: public Item
     {
       public:
-        template <class T1> ContructableItem  (T1& arg1, ItemLibrary& library, const char* id) : Item (arg1, library, id) {}
-                            ContructableItem  (ItemLibrary& library, const char* id) : Item (library, id) {}
+        template <class T1> ContructableItem  (T1& arg1, ModelImpl* owner, const char* id) : Item (arg1, owner, id) {}
+                            ContructableItem  (ModelImpl* owner, const char* id) : Item (owner, id) {}
                             ~ContructableItem () {}
     };
 
@@ -147,7 +154,7 @@ template <class Item> class ItemLibrary: public ILibrary<Item>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Item* CreateCore (const char* id)
     {
-      ContructableItem* item = new ContructableItem (*this, id ? id : format ("%s.item%u", get_library_name<Item> (), gen_id++).c_str ());
+      ContructableItem* item = new ContructableItem (owner, id ? id : common::format ("%s.item%u", get_library_name<Item> (), gen_id++).c_str ());
     
       Insert (item);
       
@@ -156,7 +163,7 @@ template <class Item> class ItemLibrary: public ILibrary<Item>
     
     template <class T1> Item* CreateCore (T1& arg1, const char* id)
     {
-      ContructableItem* item = new ContructableItem (arg1, *this, id ? id : format ("%s.item%u", get_library_name<Item> (), gen_id++).c_str ());
+      ContructableItem* item = new ContructableItem (arg1, owner, id ? id : common::format ("%s.item%u", get_library_name<Item> (), gen_id++).c_str ());
 
       Insert (item);
 
@@ -203,3 +210,5 @@ template <> class Library<Material>: public ItemLibrary<Material>
 }
 
 }
+
+#endif

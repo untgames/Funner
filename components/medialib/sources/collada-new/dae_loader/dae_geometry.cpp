@@ -1,7 +1,7 @@
 #include "shared.h"
 
 /*
-     §¡®à ¡¨¡«¨®â¥ª¨ £¥®¬¥âà¨¨
+    Ðàçáîð áèáëèîòåêè ãåîìåòðèè
 */
 
 void DaeParser::ParseLibraryGeometries (Parser::Iterator iter)
@@ -18,7 +18,7 @@ void DaeParser::ParseLibraryGeometries (Parser::Iterator iter)
 }
 
 /*
-     §¡®à £¥®¬¥âà¨¨
+    Ðàçáîð ãåîìåòðèè
 */
 
 void DaeParser::ParseGeometry (Parser::Iterator iter)
@@ -38,8 +38,8 @@ void DaeParser::ParseGeometry (Parser::Iterator iter)
   if (!mesh_iter)
     return;
   
-  if (mesh_iter->Next ())
-    LogWarning (mesh_iter->Next (), "Second mesh will be ignored");    
+  if (mesh_iter->NextNamesake ())
+    LogWarning (mesh_iter->NextNamesake (), "Second mesh will be ignored");    
     
   Mesh& mesh = model.Meshes ().Create (id);  
 

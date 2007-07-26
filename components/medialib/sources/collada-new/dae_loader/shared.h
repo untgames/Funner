@@ -1,7 +1,11 @@
+#ifndef MEDIALIB_DAE_SHARED_HEADER
+#define MEDIALIB_DAE_SHARED_HEADER
+
 #include <media/collada/model.h>
 #include <common/parser.h>
 #include <xtl/functional>
 #include <stl/hash_map>
+#include <math/io.h>
 
 using namespace medialib::collada;
 using namespace common;
@@ -80,6 +84,9 @@ class DaeParser
     void ParseLibraryMaterials    (Parser::Iterator);
     void ParseLibraryGeometries   (Parser::Iterator);
     void ParseLibraryControllers  (Parser::Iterator);
+    void ParseLibraryLights       (Parser::Iterator);
+    void ParseLibraryCameras      (Parser::Iterator);
+    void ParseLibraryVisualScenes (Parser::Iterator);
     void ParseImage               (Parser::Iterator);
     void ParseEffect              (Parser::Iterator);
     void ParseEffectProfileCommon (Parser::Iterator, Effect& effect);
@@ -93,6 +100,15 @@ class DaeParser
     void ParseSurfaceBuffers      (Parser::Iterator, Parser::Iterator surface_iter, SurfaceInfo& info);
     void ParseController          (Parser::Iterator);
     void ParseSkin                (Parser::Iterator, Skin& skin);
+    void ParseLight               (Parser::Iterator);
+    void ParseCamera              (Parser::Iterator);
+    void ParseVisualScene         (Parser::Iterator);
+    void ParseNode                (Parser::Iterator, Node& parent);
+    bool ParseTransform           (Parser::Iterator, math::mat4f& tm);
+    void ParseInstanceLight       (Parser::Iterator, Node::LightList& lights);
+    void ParseInstanceCamera      (Parser::Iterator, Node::CameraList& cameras);
+    void ParseInstanceGeometry    (Parser::Iterator, Node::MeshList& meshes);
+    void ParseBindMaterial        (Parser::Iterator iter, MaterialBinds& binds);
 
   private:
     template <class T> bool CheckedRead (Parser::Node* node, const char* tag, T& value)
@@ -114,7 +130,7 @@ class DaeParser
       }
       
       return true;
-    }
+    }   
 
   private:
     Model&    model;         //загружаемая модель
@@ -126,3 +142,5 @@ class DaeParser
 }
 
 }
+
+#endif

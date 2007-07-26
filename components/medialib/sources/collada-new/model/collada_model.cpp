@@ -14,7 +14,7 @@ using namespace common;
 #endif
 
 /*
-    Реализация модели
+    Описание реализации модели
 */
 
 namespace medialib
@@ -30,8 +30,13 @@ struct ModelImpl
   Library<Material> materials; //библиотека материалов
   Library<Mesh>     meshes;    //библиотека мешей
   Library<Skin>     skins;     //библиотека скинов
+  Library<Node>     nodes;     //библиотека узлов
+  Library<Scene>    scenes;    //библиотека сцен
+  Library<Light>    lights;    //библиотека источников света
+  Library<Camera>   cameras;   //библиотека камер
   
-  ModelImpl () : effects (this), materials (this), meshes (this), skins (this) {}
+  ModelImpl () : effects (this), materials (this), meshes (this), skins (this), nodes (this), scenes (this), lights (this),
+                 cameras (this) {}
 };
 
 }
@@ -158,6 +163,46 @@ SkinLibrary& Model::Skins ()
 const SkinLibrary& Model::Skins () const
 {
   return impl->skins;
+}
+
+LightLibrary& Model::Lights ()
+{
+  return impl->lights;
+}
+
+const LightLibrary& Model::Lights () const
+{
+  return impl->lights;
+}
+
+CameraLibrary& Model::Cameras ()
+{
+  return impl->cameras;
+}
+
+const CameraLibrary& Model::Cameras () const
+{
+  return impl->cameras;
+}
+
+NodeLibrary& Model::Nodes ()
+{
+  return impl->nodes;
+}
+
+const NodeLibrary& Model::Nodes () const
+{
+  return impl->nodes;
+}
+
+SceneLibrary& Model::Scenes ()
+{
+  return impl->scenes;
+}
+
+const SceneLibrary& Model::Scenes () const
+{
+  return impl->scenes;
 }
 
 /*

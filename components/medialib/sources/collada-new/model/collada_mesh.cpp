@@ -52,29 +52,19 @@ class SurfaceListImpl: public Collection<Surface, ConstructableSurface, true>
 //реализация Mesh
 struct Mesh::Impl
 {
-  MeshLibrary&    library;  //библиотека мешей
   SurfaceListImpl surfaces; //поверхности меша  
   
-  Impl (MeshLibrary& in_library, Entity& owner) : library (in_library), surfaces (owner) {}
+  Impl (Entity& owner) : surfaces (owner) {}
 };
 
 /*
     Конструктор
 */
 
-Mesh::Mesh (MeshLibrary& library, const char* id)
-  : Entity (library.Owner (), id), impl (new Impl (library, *this))
+Mesh::Mesh (ModelImpl* owner, const char* id)
+  : Entity (owner, id), impl (new Impl (*this))
   {}
-  
-/*
-    Библиотека
-*/
 
-MeshLibrary& Mesh::Library () const
-{
-  return impl->library;
-}
-  
 /*
     Список поверхностей
 */

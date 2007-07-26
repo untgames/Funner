@@ -97,6 +97,10 @@ void DaeParser::ParseLibraries (Parser::Iterator iter)
   for_each_child (iter, "library_effects", bind (&DaeParser::ParseLibraryEffects, this, _1));
   for_each_child (iter, "library_materials", bind (&DaeParser::ParseLibraryMaterials, this, _1));
   for_each_child (iter, "library_geometries", bind (&DaeParser::ParseLibraryGeometries, this, _1));
+  for_each_child (iter, "library_controllers", bind (&DaeParser::ParseLibraryControllers, this, _1));
+  for_each_child (iter, "library_lights", bind (&DaeParser::ParseLibraryLights, this, _1));
+  for_each_child (iter, "library_cameras", bind (&DaeParser::ParseLibraryCameras, this, _1));
+  for_each_child (iter, "library_visual_scenes", bind (&DaeParser::ParseLibraryVisualScenes, this, _1));
 }
 
 /*

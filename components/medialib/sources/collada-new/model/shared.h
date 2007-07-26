@@ -1,3 +1,6 @@
+#ifndef MEDIALIB_COLLADA_SHARED_HEADER
+#define MEDIALIB_COLLADA_SHARED_HEADER
+
 #include <media/collada/model.h>
 #include <common/singleton.h>
 #include <xtl/functional>
@@ -52,10 +55,12 @@ class ModelSystemImpl
 typedef common::Singleton<ModelSystemImpl> ModelSystemSingleton;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Возвращение имени модели
+///Получение имени модели
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const char* get_model_name (ModelImpl*);
 
 }
 
 }
+
+#endif
