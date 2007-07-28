@@ -44,6 +44,7 @@ int main ()
     script.DoFile (file_name2);
     printf ("Lua call result: %d\n", invoke <int, int> (script, "my_lua", 7));
     invoke (script, "my_lua", 12);
+    invoke (script, "my_lua2");
   }
   catch (std::exception& exception)
   {      

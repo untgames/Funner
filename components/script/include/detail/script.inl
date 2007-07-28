@@ -282,15 +282,7 @@ Ret invoke (Environment& env, const char* fn_name, const T1& arg1, const T2& arg
   return ret_value;
 }
 
-template <class T>
-void invoke (Environment& env, const char* fn_name)
-{
-  Stack* stack = env.Stack ();
-
-  stack->PushFunction(fn_name);
-
-  env.Invoke (0, 0);
-}
+void invoke (Environment& env, const char* fn_name);
 
 template <class T1>
 void invoke (Environment& env, const char* fn_name, const T1& arg1)

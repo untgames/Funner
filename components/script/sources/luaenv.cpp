@@ -193,4 +193,12 @@ void script::lua::swap (Environment& env1, Environment& env2)
   env1.Swap (env2);
 }
 
+void script::lua::invoke (Environment& env, const char* fn_name)
+{
+  Stack* stack = env.Stack ();
+
+  stack->PushFunction(fn_name);
+
+  env.Invoke (0, 0);
+}
 

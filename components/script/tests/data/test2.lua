@@ -4,3 +4,6 @@ function my_lua (arg1)
   print (arg1)
   return arg1*arg1
 end
+function my_lua2 ()
+  print ("bla-bla")
+end
