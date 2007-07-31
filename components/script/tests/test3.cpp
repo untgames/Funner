@@ -29,9 +29,7 @@ int main ()
     for (size_t i = 0; i < 10; i++)
       stack->Push (A ());
 
-    stack->Pop (10);
-    
-    printf ("count=%u\n", A::count);
+    stack->Pop (10);    
   }
   catch (std::exception& exception)
   {      
@@ -43,6 +41,8 @@ int main ()
     printf ("unknown exception\n");
     return 1;
   }
+  
+  printf ("count=%u\n", A::count);  
 
   return 0;
 }
