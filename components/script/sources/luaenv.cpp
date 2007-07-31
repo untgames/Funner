@@ -35,6 +35,7 @@ struct Environment::Impl
 {
   public:
     Impl ();
+    ~Impl ();
 
     static int Recaller (lua_State* l_state);
     static int AtPanic  (lua_State* l_state) {Raise <Exception> ("LuaEnvImpl::AtPanic", "Lua at panic."); return 0;}
@@ -44,6 +45,23 @@ struct Environment::Impl
     auto_ptr <lua::Stack>       stack;
     string                      str_name;
     Environment::DebugLogFunc   log_function;
+};
+
+static int DestroyIUserData (lua_State* state)
+{
+  lua::IUserData** ptr = (lua::IUserData**)lua_touserdata (state,-1);
+  
+  if (!ptr) 
+    luaL_typerror (state,1,"user_data");    
+
+  delete (*ptr);
+  
+  return 0;
+}
+
+static const luaL_reg iuser_data_meta_table [] = {
+  {"__gc", DestroyIUserData},
+  {0,0}
 };
 
 Environment::Impl::Impl ()
@@ -60,7 +78,15 @@ Environment::Impl::Impl ()
   lua_pushlightuserdata (l_state, &funcs);
   lua_setglobal         (l_state, HASH_MAP_NAME);
 
+  luaL_newmetatable (l_state,"iuser_data");
+  luaL_openlib      (l_state,0,iuser_data_meta_table,0);
+
   stack = new lua::Stack (l_state);
+}
+
+Environment::Impl::~Impl ()
+{
+  lua_close (l_state);
 }
 
 int Environment::Impl::Recaller (lua_State* l_state)
@@ -82,6 +108,7 @@ Environment::Environment ()
 
 Environment::~Environment ()
 {
+  delete impl;
 }
 
 void Environment::SetDebugLog (const DebugLogFunc& new_log_function)
@@ -119,10 +146,12 @@ void Environment::DoString (const char* expression)
   catch (std::exception& exception)
   {                                               
     impl->log_function (Name (), exception.what ()); 
+    Raise <Exception> ("EnvironmentImpl::DoFile", "Bad script call");
   }
   catch (...)
   {
     impl->log_function (Name (), "Unknown exception have occured."); 
+    Raise <Exception> ("EnvironmentImpl::DoFile", "Bad script call");
   }
 }
 
@@ -131,22 +160,24 @@ void Environment::DoFile (const char* file_name)
   try
   {
     if (luaL_dofile (impl->l_state, file_name))
-      Raise <Exception> ("EnvironmentImpl::DoFile", "Error when loading file %s", file_name);
+      Raise <Exception> ("EnvironmentImpl::DoFile", "Error when loading file '%s'", file_name);
   }
   catch (std::exception& exception)
   {                                               
     impl->log_function (Name (), exception.what ()); 
+    Raise <Exception> ("EnvironmentImpl::DoFile", "Bad script call");
   }
   catch (...)
   {
     impl->log_function (Name (), "Unknown exception have occured."); 
+    Raise <Exception> ("EnvironmentImpl::DoFile", "Bad script call");
   }
 }
 
 void Environment::Invoke (size_t args_count, size_t results_count)
 {
   if (lua_pcall(impl->l_state, args_count, results_count, 0))
-    Raise <Exception> ("invoke", "Error running function: %s", lua_tostring(impl->l_state, -1));
+    Raise <Exception> ("invoke", "Error running function: '%s'", lua_tostring(impl->l_state, -1));
 }
 
 void Environment::RegisterFunction (const char* name, Invoker* invoker)

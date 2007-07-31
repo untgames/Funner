@@ -315,14 +315,74 @@ inline void Environment::BindFunction (const char* name, Fn fn)
   RegisterFunction (name, new detail::InvokerImpl<Signature, Fn> (fn));
 }
 
-template <class T>
-T Stack::Get (int item_number) const
+struct IUserData
 {
-  return static_cast<T> (Get (item_number));
+  virtual ~IUserData () {}
+};
+
+template <class T> struct UserDataImpl: public IUserData
+{
+  UserDataImpl (const T& in_value) : value (in_value) {}
+  
+  T value;
+};
+
+/*template <class T> void Stack::Push (const T& value)
+{
+  if (!CheckAvailable (1))
+    Raise <Exception> ("Stack::Push", "Not enough stack space");
+
+  
+  char* buffer = (char*) Alloc (sizeof (UserDataImpl<T>));
+
+  if (!buffer)
+    Raise <Exception> ("Stack::Push", "Can't alloc memory for pushing object.");
+
+  UserDataImpl<T>* object = new (buffer) UserDataImpl<T> (value);
+}
+
+template <class T> T Stack::Get (int index) const
+{
+  return (StackItem) (Get (index));
 }
 
 template <class T>
 StackItem::operator T () const
 {
-  return (T) (const void*)(*this);
+  UserDataImpl<T> const *object = dynamic_cast<const UserDataImpl<T>*> (reinterpret_cast<const IUserData*> ((const void*)(*this)));
+
+  if (!object)
+    Raise <Exception> ("Stack::Get", "Stack item has other type than asked."); //wrong type
+
+  return object->value;
+} */
+
+template <class T> void Stack::Push (const T& value)
+{
+  if (!CheckAvailable (1))
+    Raise <Exception> ("Stack::Push", "Not enough stack space");
+
+  UserDataImpl<T>** buffer = (UserDataImpl<T>**) Alloc (sizeof (UserDataImpl<T>*));
+
+  if (!buffer)
+    Raise <Exception> ("Stack::Push", "Can't alloc memory for pushing object.");
+
+  *buffer = new UserDataImpl<T> (value);
 }
+
+template <class T> T Stack::Get (int index) const
+{
+  return (StackItem) (Get (index));
+}
+
+template <class T>
+StackItem::operator T () const
+{
+  UserDataImpl<T> const *object = dynamic_cast<const UserDataImpl<T>*> (*reinterpret_cast<const IUserData**> ((const void**)(const void*)(*this)));
+
+  if (!object)
+    Raise <Exception> ("Stack::Get", "Stack item has other type than asked."); //wrong type
+
+  return object->value;
+}
+

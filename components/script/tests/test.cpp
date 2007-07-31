@@ -15,19 +15,13 @@ int my_func (const char* arg)
   return 157;
 }
 
-struct MyStruct
-{
-  int item;
-};
-
-void my_func2 (int arg1, size_t arg2, float arg3, double arg4, const char* arg5, MyStruct* arg6)
+void my_func2 (int arg1, size_t arg2, float arg3, double arg4, const char* arg5)
 {
   printf ("Arg1 = %d\n", arg1);
   printf ("Arg2 = %u\n", arg2);
   printf ("Arg3 = %f\n", arg3);
   printf ("Arg4 = %f\n", arg4);
   printf ("Arg5 = %s\n", arg5);
-  printf ("Arg6 = %p\n", arg6);
 }
 
 int main ()
@@ -35,12 +29,9 @@ int main ()
   try
   {
     Environment script, script2;
-    MyStruct    *my_struct = new MyStruct ();
-
-    my_struct->item = 6734;
 
     script.BindFunction <int (const char*)> ("my_c_func", &my_func);
-    script.BindFunction <void (int, size_t, float, double, const char*, MyStruct*)> ("my_c_func2", &my_func2);
+    script.BindFunction <void (int, size_t, float, double, const char*)> ("my_c_func2", &my_func2);
     script.DoFile (file_name2);
     printf ("Lua call result: %d\n", invoke <int, int> (script, "my_lua", 7));
     invoke (script, "my_lua", 12);
