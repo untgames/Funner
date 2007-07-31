@@ -27,7 +27,7 @@ class Invoker;
 class StackItem
 {
   public:
-    StackItem (lua_State*, size_t);
+    StackItem (lua_State*, size_t); //закрыть от пользователя (либо через friend либо через protected+derived)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 ///Взятие значения аргумента
@@ -52,7 +52,7 @@ class StackItem
 class Stack
 {
   public:
-    Stack (lua_State*);
+    Stack (lua_State*); //закрыть
     
     typedef StackItem Item;
     
@@ -60,12 +60,12 @@ class Stack
 ///Количество элементов в стеке
 //////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Size () const;
-    int    CheckAvailable (size_t count) const;
+    int    CheckAvailable (size_t count) const; //IsAvailable, пояснить работу функции: доступно для чего: взятия или для того, чтобы положить
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение элемента из стека
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    Item Get (int item_number) const;
+    Item Get (int item_number) const; //возможно operator []
     
     template <class T> T Get (int item_number) const;
 
@@ -82,7 +82,7 @@ class Stack
 
     void PushFunction (const char* f_name);
 
-    void* Alloc (size_t size);                       //выделение блока памяти
+    void* Alloc (size_t size);                       //выделение блока памяти //в private
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление элементов стека
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,14 +99,15 @@ class Environment
 {
   public:
     Environment  ();
-    ~Environment ();
+    ~Environment ();    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка пользовательской функции лога дебаг-сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const char* env_name, const char* message)> DebugLogFunc;
+    typedef xtl::function<void (const char* env_name, const char* message)> DebugLogFunc; //первый параметр Environment&
 
     void SetDebugLog (const DebugLogFunc&);
+      //+функция возвращения лога GetDebugLog
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя среды
@@ -117,7 +118,7 @@ class Environment
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получене стека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          lua::Stack* Stack ();
+          lua::Stack* Stack (); //сделать ссылку
     const lua::Stack* Stack () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +129,7 @@ class Environment
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выполнение команды луа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Invoke   (size_t args_count, size_t results_count);
+    void Invoke   (size_t args_count, size_t results_count); //наверное лучше всего скрыть как и Stack. как таковые они не нужны пользователю
     void DoString (const char* expression);
     void DoFile   (const char* file_name);
 
@@ -139,6 +140,10 @@ class Environment
 
   private:
     void RegisterFunction (const char* name, detail::Invoker* invoker);
+    
+  private:
+    Environment (const Environment&); //no impl
+    Environment& operator = (const Environment&); //no impl
 
   private:
     struct Impl;
