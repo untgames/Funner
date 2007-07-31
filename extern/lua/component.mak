@@ -14,10 +14,10 @@ LUALIB.COMPILER_DEFINES :=  								 #Определения сборки
 LUALIB.COMPILER_CFLAGS  :=                   #Флаги сборки (зависят от конфигурации)
 
 #Цель №2 - LUA_UTILS
-LUA_UTILS.TYPE             := test-suite     #Тип цели
-LUA_UTILS.INCLUDE_DIRS     := include			   #Относительные пути к каталогам c заголовочными файлами
-LUA_UTILS.SOURCE_DIRS      := utils          #Относительные пути к каталогам c исходными файлами
-LUA_UTILS.LIB_DIRS         :=                #Относительные пути к каталогам с библиотеками
-LUA_UTILS.LIBS             := lua            #Список используемых при линковке библиотек
-LUA_UTILS.COMPILER_DEFINES :=  							 #Определения сборки
-LUA_UTILS.COMPILER_CFLAGS  :=                #Флаги сборки (зависят от конфигурации)
+LUA_UTILS.TYPE             := test-suite     	 #Тип цели
+LUA_UTILS.INCLUDE_DIRS     := include	sources  #Относительные пути к каталогам c заголовочными файлами
+LUA_UTILS.SOURCE_DIRS      := utils          	 #Относительные пути к каталогам c исходными файлами
+LUA_UTILS.LIB_DIRS         :=                  #Относительные пути к каталогам с библиотеками
+LUA_UTILS.LIBS             := lua              #Список используемых при линковке библиотек
+LUA_UTILS.COMPILER_DEFINES :=  							   #Определения сборки
+LUA_UTILS.COMPILER_CFLAGS  :=                  #Флаги сборки (зависят от конфигурации)
