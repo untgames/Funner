@@ -12,6 +12,7 @@ extern "C"
   #include <lauxlib.h>
 }
 
+//сделать const char*!!
 #define RECALL_NAME "recall"
 #define HASH_MAP_NAME "funcs_hash_map"
 
@@ -25,10 +26,11 @@ void DebugLogFunction (const char* env_name, const char* message)
 
 }
 
+//вверх, сразу после include
 using namespace common;
 using namespace stl;
 using namespace script;
-using lua::Environment;
+using lua::Environment; //????????
 using lua::detail::Invoker;
 
 struct Environment::Impl
@@ -39,10 +41,16 @@ struct Environment::Impl
 
     static int Recaller (lua_State* l_state);
     static int AtPanic  (lua_State* l_state) {Raise <Exception> ("LuaEnvImpl::AtPanic", "Lua at panic."); return 0;}
+
+    /*
+      откомментировать поля, сделать Stack объектом, а не указателем.
+      сделать базовый класс, который будет содержать lua_State* и проверять его на 0
+      инициализацию делать Impl () : Base (), stack (state) {} //state поле в Base
+    */   
     
     lua_State*                  l_state;
     hash_map <string, Invoker*> funcs;
-    auto_ptr <lua::Stack>       stack;
+    auto_ptr <lua::Stack>       stack; //???
     string                      str_name;
     Environment::DebugLogFunc   log_function;
 };
@@ -92,6 +100,8 @@ Environment::Impl::~Impl ()
 int Environment::Impl::Recaller (lua_State* l_state)
 {
   lua_getglobal (l_state, HASH_MAP_NAME);
+    //лучше и проще хранить в луа указатель на Impl либо даже на Environment
+  
   hash_map<string, Invoker*>::iterator func = ((hash_map <string, Invoker*>*)lua_touserdata(l_state, -1))->find (string (lua_tostring (l_state, 1)));
 
   if (func == ((hash_map <string, Invoker*>*)lua_touserdata(l_state, -1))->end ())
@@ -140,6 +150,8 @@ void Environment::DoString (const char* expression)
 {
   try
   {
+     //сделать отдельный тип исключения
+    
     if (luaL_dostring (impl->l_state, expression))
       Raise <Exception> ("EnvironmentImpl::DoString", "Error when executing expression %s", expression);
   }
@@ -159,6 +171,8 @@ void Environment::DoFile (const char* file_name)
 {
   try
   {
+       //не верно. нужно читать через common::File
+    
     if (luaL_dofile (impl->l_state, file_name))
       Raise <Exception> ("EnvironmentImpl::DoFile", "Error when loading file '%s'", file_name);
   }
@@ -186,6 +200,9 @@ void Environment::RegisterFunction (const char* name, Invoker* invoker)
 
   string generated_function ("\nfunction ");
   string args;
+  
+    //общие замечания. проще по-моему сделать это через common::format, либо хотя бы сделать string::reserve. иначе 
+    //будет много доп. выделений/освобождений памяти. в общем продумать
  
   generated_function += name;
   generated_function += " (";
