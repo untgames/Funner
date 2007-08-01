@@ -4,7 +4,7 @@
 #include <stl/string>
 #include <stl/memory>
 #include <stl/hash_map>
-#include <script.h>
+#include <script/script.h>
 #include <xtl/function.h>
 
 extern "C"
@@ -29,7 +29,7 @@ struct Base
     Base ();
     ~Base ();
 
-    lua_State*                  l_state;
+    lua_State* l_state;
 };
 
 struct Environment::Impl : public Base
@@ -41,10 +41,10 @@ struct Environment::Impl : public Base
     static int Recaller (lua_State* l_state);
     static int AtPanic  (lua_State* l_state) {Raise <Exception> ("LuaEnvImpl::AtPanic", "Lua at panic."); return 0;}
 
-    detail::Stack               stack;
-    hash_map <string, Invoker*> funcs;
-    string                      str_name;
-    Environment::DebugLogFunc   log_function;
+    detail::Stack               stack;         //стек Lua-C
+    hash_map <string, Invoker*> funcs;         //зарегестрированные функции
+    string                      str_name;      //строковое имя
+    Environment::DebugLogFunc   log_function;  //функция дебаг-лога
 };
 
 static int DestroyIUserData (lua_State* state)

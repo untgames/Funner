@@ -108,7 +108,7 @@ Ret invoke (Environment&, const char* fn_name, const T1& arg1);
 template <class Ret, class T1, class T2>
 Ret invoke (Environment&, const char* fn_name, const T1& arg1, const T2& arg2);
 
-#include <detail/script.inl>
+#include "detail/script.inl"
 
 }
 

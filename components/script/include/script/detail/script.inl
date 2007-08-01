@@ -46,7 +46,7 @@ class Stack
 ///Количество элементов в стеке
 //////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Size () const;
-    int    CheckAvailable (size_t count) const; //IsAvailable, пояснить работу функции: доступно для чего: взятия или для того, чтобы положить
+    bool   IsAvailable (size_t count) const; //проверяет, возможно ли положить в стек count элементов
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение элемента из стека
@@ -82,6 +82,10 @@ class Stack
     lua_State* state;
 };
 
+/*
+   Работа со стеком
+*/
+
 struct IUserData
 {
   virtual ~IUserData () {}
@@ -96,7 +100,7 @@ template <class T> struct UserDataImpl: public IUserData
 
 template <class T> void Stack::Push (const T& value)
 {
-  if (!CheckAvailable (1))
+  if (!IsAvailable (1))
     Raise <Exception> ("Stack::Push", "Not enough stack space");
 
   void* buffer = Alloc (sizeof (UserDataImpl<T>));
@@ -122,6 +126,10 @@ StackItem::operator T () const
 
   return object->value;
 }
+
+/*
+   Вызов С функций из Invoker
+*/
 
 template <class Signature>
 inline size_t bind_call (Stack& stack);
@@ -278,6 +286,10 @@ inline size_t bind_call (Fn& fn, Stack& stack, selector<void (T1, T2, T3, T4, T5
   return 0;
 }
 
+/*
+   Получение количества аргументов функции
+*/
+
 template <class Fn, class Ret>
 inline size_t arg_count (Fn& fn, selector<Ret ()>)
 {
@@ -354,6 +366,20 @@ template <class Signature, class Fn> class InvokerImpl: public Invoker
 
 }
 
+/*
+   Биндинг С функции к Lua
+*/
+
+template <class Signature, class Fn>
+inline void Environment::BindFunction (const char* name, Fn fn)
+{
+  RegisterFunction (name, new detail::InvokerImpl<Signature, Fn> (fn));
+}
+
+/*
+   Вызов функций Lua
+*/
+
 template <class Ret>
 Ret invoke (Environment& env, const char* fn_name)
 {
@@ -429,10 +455,4 @@ void invoke (Environment& env, const char* fn_name, const T1& arg1, const T2& ar
   stack.Push (arg2);
 
   env.Invoke (2, 0);
-}
-
-template <class Signature, class Fn>
-inline void Environment::BindFunction (const char* name, Fn fn)
-{
-  RegisterFunction (name, new detail::InvokerImpl<Signature, Fn> (fn));
 }

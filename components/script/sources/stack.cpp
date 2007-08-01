@@ -1,4 +1,4 @@
-#include <script.h>
+#include <script/script.h>
 #include <common/exception.h>
 
 extern "C"
@@ -56,9 +56,11 @@ size_t Stack::Size () const
   return lua_gettop (state);
 }
 
-int Stack::CheckAvailable (size_t count) const
+bool Stack::IsAvailable (size_t count) const
 {
-  return lua_checkstack (state, count);
+  if (lua_checkstack (state, count) != 0)
+    return true;
+  return false;
 }
 
 StackItem Stack::Get (int item_number) const
@@ -70,49 +72,49 @@ StackItem Stack::Get (int item_number) const
 
 void Stack::Push (double arg)
 {
-  if (!CheckAvailable (1))
+  if (!IsAvailable (1))
     Raise <Exception> ("Stack::Push", "Not enough stack space");
   lua_pushnumber (state, arg);
 }        
 
 void Stack::Push (float arg)
 {
-  if (!CheckAvailable (1))
+  if (!IsAvailable (1))
     Raise <Exception> ("Stack::Push", "Not enough stack space");
   lua_pushnumber (state, arg);
 }        
 
 void Stack::Push (int arg)
 {
-  if (!CheckAvailable (1))
+  if (!IsAvailable (1))
     Raise <Exception> ("Stack::Push", "Not enough stack space");
   lua_pushinteger (state, arg);
 }
 
 void Stack::Push (size_t arg)
 {
-  if (!CheckAvailable (1))
+  if (!IsAvailable (1))
     Raise <Exception> ("Stack::Push", "Not enough stack space");
   lua_pushinteger (state, arg);
 }
 
 void Stack::Push (const char* arg)
 {
-  if (!CheckAvailable (1))
+  if (!IsAvailable (1))
     Raise <Exception> ("Stack::Push", "Not enough stack space");
   lua_pushstring (state, arg);
 }
 
 void Stack::Push (void* arg)
 {
-  if (!CheckAvailable (1))
+  if (!IsAvailable (1))
     Raise <Exception> ("Stack::Push", "Not enough stack space");
   lua_pushlightuserdata (state, arg);
 }
 
 void Stack::PushFunction (const char* f_name)
 {
-  if (!CheckAvailable (1))
+  if (!IsAvailable (1))
     Raise <Exception> ("Stack::Push", "Not enough stack space");
   lua_getglobal(state, f_name);
 }

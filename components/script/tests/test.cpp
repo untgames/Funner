@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <script.h>
+#include <script/script.h>
 #include <common/exception.h>
 #include <xtl/functional>
 
