@@ -43,7 +43,7 @@ int main ()
     printf ("my_struct2 item value = %d\n", my_struct2->item);
     stack->Pop (1);
 
-    for (size_t j = 0; j < 1000; j++)
+    for (size_t j = 0; j < 50000; j++)
     {
 //      printf ("\n\nPushing\n\n");
       for (size_t i = 0; i < 40; i++)

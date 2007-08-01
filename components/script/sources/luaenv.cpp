@@ -150,9 +150,22 @@ Environment::Impl::~Impl ()
   MemoryManager::GetHeap ().GetStatistics (stat);
   printf ("\n\nFinal stats:\n sys_allocate count = %u\n sys_deallocate count = %u\n sys_allocate size = %u\n sys_deallocate size = %u\n", stat.sys_allocate_count,
             stat.sys_deallocate_count, stat.sys_allocate_size, stat.sys_deallocate_size);
-  printf (" allocate count = %u\n deallocate count = %u\n allocate size = %u\n deallocate size = %u\n\n", stat.allocate_count,
+  printf (" allocate count = %u\n deallocate count = %u\n allocate size = %u\n deallocate size = %u\n", stat.allocate_count,
             stat.deallocate_count, stat.allocate_size, stat.deallocate_size);  
-  printf ("Maximum used memory = %u\n", max_mem_used);
+  printf (" maximum used memory = %u\n", max_mem_used);
+
+  printf ("Range statistics:\n");
+  printf ("\t\t\t\t Blocks\tTotal size\n");
+  printf ("--------------------------------------------------------------------------------\n");
+  for (size_t i=0;i<stat.ranges_count;i++)
+  {
+    const HeapStat::Range& range = stat.ranges [i];
+    
+    printf ("\t[%8u;%8u]: %8u\t%8u\n",range.min_size,range.max_size,range.allocate_count-range.deallocate_count,
+            range.allocate_size-range.deallocate_size);
+  }
+
+  printf ("\n\n");
 }
 
 int Environment::Impl::Recaller (lua_State* l_state)
