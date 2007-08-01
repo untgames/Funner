@@ -76,6 +76,7 @@ static const luaL_reg iuser_data_meta_table [] = {
 #include <common/heap.h>
 
 static size_t allocated_blocks = 0, deallocated_blocks = 0, used_memory = 0, max_mem_used = 0;
+static Heap my_heap;
 
 static void* my_alloc (void *ud, void *ptr, size_t osize, size_t nsize) 
 {
@@ -89,9 +90,9 @@ static void* my_alloc (void *ud, void *ptr, size_t osize, size_t nsize)
     printf ("Deallocating memory at %p (block %u, now used memory = %u)\n", ptr, deallocated_blocks++, used_memory);*/
     
     if (ptr)
-      used_memory -= MemoryManager::GetHeap ().Size (ptr);
+      used_memory -= my_heap.Size (ptr);
 //    printf ("Deallocating memory at %p (block %u, now used memory = %u)\n", ptr, deallocated_blocks++, used_memory);
-    MemoryManager::Deallocate (ptr);//free(ptr);
+    my_heap.Deallocate (ptr);//free(ptr);
     
     return NULL;
   }
@@ -101,15 +102,15 @@ static void* my_alloc (void *ud, void *ptr, size_t osize, size_t nsize)
     used_memory += _msize (ret_value);
     printf ("Allocated %u bytes at %p (block %u, now used memory = %u)\n", nsize, ret_value, allocated_blocks++, used_memory);*/
 
-    void *ret_value = MemoryManager::Allocate (nsize);
+    void *ret_value = my_heap.Allocate (nsize);
     if (ptr)
     {
-      memcpy (ret_value, ptr, min (MemoryManager::GetHeap ().Size (ptr), nsize));
-      used_memory -= MemoryManager::GetHeap ().Size (ptr);
-      MemoryManager::Deallocate (ptr);
+      memcpy (ret_value, ptr, min (my_heap.Size (ptr), nsize));
+      used_memory -= my_heap.Size (ptr);
+      my_heap.Deallocate (ptr);
       deallocated_blocks++;
     }
-    used_memory += MemoryManager::GetHeap ().Size (ret_value);
+    used_memory += my_heap.Size (ret_value);
     if (used_memory > max_mem_used) max_mem_used = used_memory;
 //    printf ("Allocated %u bytes at %p (block %u, now used memory = %u)\n", nsize, ret_value, allocated_blocks++, used_memory);
     return ret_value; 
@@ -147,7 +148,7 @@ Environment::Impl::~Impl ()
 {
   lua_close (l_state);
   HeapStat stat;
-  MemoryManager::GetHeap ().GetStatistics (stat);
+  my_heap.GetStatistics (stat);
   printf ("\n\nFinal stats:\n sys_allocate count = %u\n sys_deallocate count = %u\n sys_allocate size = %u\n sys_deallocate size = %u\n", stat.sys_allocate_count,
             stat.sys_deallocate_count, stat.sys_allocate_size, stat.sys_deallocate_size);
   printf (" allocate count = %u\n deallocate count = %u\n allocate size = %u\n deallocate size = %u\n", stat.allocate_count,
