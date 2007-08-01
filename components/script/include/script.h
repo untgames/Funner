@@ -3,7 +3,6 @@
 
 #include <xtl/functional_fwd>
 #include <common/exception.h>
-#include <new>
 
 //forward declarations
 struct lua_State;
@@ -19,108 +18,44 @@ namespace detail
 {
 
 class Invoker;
+class Stack;
 
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-///Элемент стека
-//////////////////////////////////////////////////////////////////////////////////////////////////
-class StackItem  //в хидере перенести как forward в namespace detail, описание в inl-файле
-{
-  public:
-    StackItem (lua_State*, size_t); //закрыть от пользователя (либо через friend либо через protected+derived)
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-///Взятие значения аргумента
-//////////////////////////////////////////////////////////////////////////////////////////////////
-    operator float       () const;
-    operator double      () const;
-    operator int         () const;
-    operator size_t      () const;
-    operator const char* () const;
-    operator const void* () const;
-
-    template <class T> operator T () const;
-    
-  private:
-    struct lua_State* state;
-    size_t            argument_number;
-};  
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-///Стек аргументов
-//////////////////////////////////////////////////////////////////////////////////////////////////
-class Stack //в хидере перенести как forward в namespace detail, описание в inl-файле
-{
-  public:
-    Stack (lua_State*); //закрыть
-    
-    typedef StackItem Item;
-    
-//////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество элементов в стеке
-//////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Size () const;
-    int    CheckAvailable (size_t count) const; //IsAvailable, пояснить работу функции: доступно для чего: взятия или для того, чтобы положить
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение элемента из стека
-//////////////////////////////////////////////////////////////////////////////////////////////////
-    Item Get (int item_number) const; //возможно operator []
-    
-    template <class T> T Get (int item_number) const;
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-///Помещение данных в стек
-//////////////////////////////////////////////////////////////////////////////////////////////////
-    void Push (double);
-    void Push (int);
-    void Push (const char*);
-    void Push (void*);
-    
-    template <class T>
-    void Push (const T&);
-
-    void PushFunction (const char* f_name);
-
-    void* Alloc (size_t size);                       //выделение блока памяти //в private
-//////////////////////////////////////////////////////////////////////////////////////////////////
-///Удаление элементов стека
-//////////////////////////////////////////////////////////////////////////////////////////////////
-    void Pop (size_t);
-
-  private:
-    lua_State* state;
-};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Скриптовая среда
 //////////////////////////////////////////////////////////////////////////////////////////////////
 class Environment
 {
+  template <class Ret>
+  friend Ret invoke (Environment&, const char* fn_name);
+  template <class Ret, class T1>
+  friend Ret invoke (Environment&, const char* fn_name, const T1& arg1);
+  template <class Ret, class T1, class T2>
+  friend Ret invoke (Environment&, const char* fn_name, const T1& arg1, const T2& arg2);
+  friend void invoke (Environment& env, const char* fn_name);
+  template <class T1>
+  friend void invoke (Environment& env, const char* fn_name, const T1& arg1);
+  template <class T1, class T2>
+  friend void invoke (Environment& env, const char* fn_name, const T1& arg1, const T2& arg2);
+
+  typedef xtl::function<void (const char* env_name, const char* message)> DebugLogFunc;
+
   public:
-    Environment  ();
+    Environment  (const DebugLogFunc&);
     ~Environment ();    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка пользовательской функции лога дебаг-сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const char* env_name, const char* message)> DebugLogFunc; //первый параметр Environment&
-
-    void SetDebugLog (const DebugLogFunc&);
-      //+функция возвращения лога GetDebugLog
+    const DebugLogFunc& GetDebugLog ();
+    void                SetDebugLog (const DebugLogFunc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя среды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* Name   () const;
     void        Rename (const char* new_name);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получене стека
-///////////////////////////////////////////////////////////////////////////////////////////////////
-          lua::Stack* Stack (); //сделать ссылку
-    const lua::Stack* Stack () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Биндинг функций
@@ -130,7 +65,6 @@ class Environment
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выполнение команды луа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Invoke   (size_t args_count, size_t results_count); //наверное лучше всего скрыть как и Stack. как таковые они не нужны пользователю
     void DoString (const char* expression);
     void DoFile   (const char* file_name);
 
@@ -141,6 +75,11 @@ class Environment
 
   private:
     void RegisterFunction (const char* name, detail::Invoker* invoker);
+
+          detail::Stack& Stack ();
+    const detail::Stack& Stack () const;
+
+    void Invoke (size_t args_count, size_t results_count);
     
   private:
     Environment (const Environment&); //no impl

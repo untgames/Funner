@@ -1,4 +1,6 @@
 #include <common/exception.h>
+#include <common/file.h>
+#include <common/strlib.h>
 #include <stl/string>
 #include <stl/memory>
 #include <stl/hash_map>
@@ -12,28 +14,25 @@ extern "C"
   #include <lauxlib.h>
 }
 
-//сделать const char*!!
-#define RECALL_NAME "recall"
-#define HASH_MAP_NAME "funcs_hash_map"
-
-namespace
-{
-
-void DebugLogFunction (const char* env_name, const char* message)
-{
-  printf ("'%s' at environment '%s'\n", message, env_name);
-}
-
-}
-
-//вверх, сразу после include
 using namespace common;
 using namespace stl;
 using namespace script;
-using lua::Environment; //????????
-using lua::detail::Invoker;
+using namespace script::lua;
+using namespace script::lua::detail;
 
-struct Environment::Impl
+const char* RECALL_NAME = "___recall";
+const char* IMPL_NAME = "___impl";
+
+struct Base
+{
+  public:
+    Base ();
+    ~Base ();
+
+    lua_State*                  l_state;
+};
+
+struct Environment::Impl : public Base
 {
   public:
     Impl ();
@@ -42,22 +41,15 @@ struct Environment::Impl
     static int Recaller (lua_State* l_state);
     static int AtPanic  (lua_State* l_state) {Raise <Exception> ("LuaEnvImpl::AtPanic", "Lua at panic."); return 0;}
 
-    /*
-      откомментировать поля, сделать Stack объектом, а не указателем.
-      сделать базовый класс, который будет содержать lua_State* и проверять его на 0
-      инициализацию делать Impl () : Base (), stack (state) {} //state поле в Base
-    */   
-    
-    lua_State*                  l_state;
+    detail::Stack               stack;
     hash_map <string, Invoker*> funcs;
-    auto_ptr <lua::Stack>       stack; //???
     string                      str_name;
     Environment::DebugLogFunc   log_function;
 };
 
 static int DestroyIUserData (lua_State* state)
 {
-  lua::IUserData* ptr = (lua::IUserData*)lua_touserdata (state, -1);
+  IUserData* ptr = (IUserData*)lua_touserdata (state, -1);
   
   if (!ptr) 
     luaL_typerror (state, 1, "user_data");    
@@ -72,135 +64,66 @@ static const luaL_reg iuser_data_meta_table [] = {
   {0,0}
 };
 
-#include <malloc.h>
-#include <common/heap.h>
-
-static size_t allocated_blocks = 0, deallocated_blocks = 0, used_memory = 0, max_mem_used = 0;
-static Heap my_heap;
-
-static void* my_alloc (void *ud, void *ptr, size_t osize, size_t nsize) 
+Base::Base ()
 {
-  (void)ud;
-  (void)osize;  /* not used */
-  
-  if (nsize == 0)
-  {
-/*    if (ptr)
-      used_memory -= _msize (ptr);
-    printf ("Deallocating memory at %p (block %u, now used memory = %u)\n", ptr, deallocated_blocks++, used_memory);*/
-    
-    if (ptr)
-      used_memory -= my_heap.Size (ptr);
-//    printf ("Deallocating memory at %p (block %u, now used memory = %u)\n", ptr, deallocated_blocks++, used_memory);
-    my_heap.Deallocate (ptr);//free(ptr);
-    
-    return NULL;
-  }
-  else
-  {
-/*    void* ret_value = realloc(ptr, nsize);
-    used_memory += _msize (ret_value);
-    printf ("Allocated %u bytes at %p (block %u, now used memory = %u)\n", nsize, ret_value, allocated_blocks++, used_memory);*/
-
-    void *ret_value = my_heap.Allocate (nsize);
-    if (ptr)
-    {
-      memcpy (ret_value, ptr, min (my_heap.Size (ptr), nsize));
-      used_memory -= my_heap.Size (ptr);
-      my_heap.Deallocate (ptr);
-      deallocated_blocks++;
-    }
-    used_memory += my_heap.Size (ret_value);
-    if (used_memory > max_mem_used) max_mem_used = used_memory;
-//    printf ("Allocated %u bytes at %p (block %u, now used memory = %u)\n", nsize, ret_value, allocated_blocks++, used_memory);
-    return ret_value; 
-  }
-}
-
-Environment::Impl::Impl ()
-{
-/*  l_state = lua_open ();
+  l_state = lua_open ();
   if (!l_state)
     Raise <Exception> ("Impl::Impl", "Can't create lua state.");
 
-  lua_setallocf (l_state, &my_alloc, NULL);
-  */
-
-  l_state = lua_newstate (&my_alloc, NULL);
-  if (!l_state)
-    Raise <Exception> ("Impl::Impl", "Can't create lua state.");
-
-  lua_atpanic (l_state, &Impl::AtPanic);
   luaL_openlibs (l_state);
-
-  lua_pushcfunction (l_state, &Impl::Recaller);
-  lua_setglobal     (l_state, RECALL_NAME);
-  lua_pushlightuserdata (l_state, &funcs);
-  lua_setglobal         (l_state, HASH_MAP_NAME);
 
   luaL_newmetatable (l_state,"iuser_data");
   luaL_openlib      (l_state,0,iuser_data_meta_table,0);
-
-  stack = new lua::Stack (l_state);
 }
 
-void dump_memstat (Heap& heap)
+Base::~Base ()
 {
-  HeapStat stat;
-  heap.GetStatistics (stat);
-  printf ("sys_allocate count = %u\n sys_deallocate count = %u\n sys_allocate size = %u\n sys_deallocate size = %u\n", stat.sys_allocate_count,
-            stat.sys_deallocate_count, stat.sys_allocate_size, stat.sys_deallocate_size);
-  printf (" allocate count = %u\n deallocate count = %u\n allocate size = %u\n deallocate size = %u\n", stat.allocate_count,
-            stat.deallocate_count, stat.allocate_size, stat.deallocate_size);  
-  printf (" maximum used memory = %u\n", max_mem_used);
+  lua_close (l_state);
+}
 
-  printf ("Range statistics:\n");
-  printf ("\t\t\t\t Blocks\tTotal size\n");
-  printf ("--------------------------------------------------------------------------------\n");
-  for (size_t i=0;i<stat.ranges_count;i++)
-  {
-    const HeapStat::Range& range = stat.ranges [i];
-    
-    printf ("\t[%8u;%8u]: %8u\t%8u\n",range.min_size,range.max_size,range.allocate_count-range.deallocate_count,
-            range.allocate_size-range.deallocate_size);
-  }
-
-  printf ("\n\n");
+Environment::Impl::Impl ()
+  : Base (), stack (l_state)
+{
+  lua_atpanic           (l_state, &Impl::AtPanic);
+  lua_pushcfunction     (l_state, &Impl::Recaller);
+  lua_setglobal         (l_state, RECALL_NAME);
+  lua_pushlightuserdata (l_state, this);
+  lua_setglobal         (l_state, IMPL_NAME);
 }
 
 Environment::Impl::~Impl ()
 {
-  lua_close (l_state);
-/*
-  printf ("Default heap stat:\n");
-  dump_memstat (MemoryManager::GetHeap ());
-  printf ("Lua heap stat:\n");
-  dump_memstat (my_heap);  
-  printf ("destruct out\n");*/
+  for (hash_map <string, Invoker*>::iterator i = funcs.begin (); i != funcs.end (); i++)
+    delete i->second;
 }
 
 int Environment::Impl::Recaller (lua_State* l_state)
 {
-  lua_getglobal (l_state, HASH_MAP_NAME);
-    //лучше и проще хранить в луа указатель на Impl либо даже на Environment
-  
-  hash_map<string, Invoker*>::iterator func = ((hash_map <string, Invoker*>*)lua_touserdata(l_state, -1))->find (string (lua_tostring (l_state, 1)));
+  lua_getglobal (l_state, IMPL_NAME);
 
-  if (func == ((hash_map <string, Invoker*>*)lua_touserdata(l_state, -1))->end ())
+  Environment::Impl* this_impl = (Environment::Impl*)lua_touserdata(l_state, -1);  
+  hash_map<string, Invoker*>::iterator func = this_impl->funcs.find (string (lua_tostring (l_state, 1)));
+
+  if (func == this_impl->funcs.end ())
     Raise <Exception> ("Impl::Recaller", "Calling unregistered function.");
 
-  return (*(func->second)) (lua::Stack (l_state));
+  return (*(func->second)) (this_impl->stack);
 }
 
-Environment::Environment ()
-  : impl (new Impl)
+Environment::Environment (const DebugLogFunc& debug_log)
+  : impl (new Impl) 
 {
-  SetDebugLog (&DebugLogFunction);
+  SetDebugLog (debug_log);
 }
 
 Environment::~Environment ()
 {
   delete impl;
+}
+
+const Environment::DebugLogFunc& Environment::GetDebugLog ()
+{
+  return impl->log_function;
 }
 
 void Environment::SetDebugLog (const DebugLogFunc& new_log_function)
@@ -218,55 +141,73 @@ void Environment::Rename (const char* new_name)
   impl->str_name = new_name;
 }
 
-lua::Stack* Environment::Stack ()
+detail::Stack& Environment::Stack ()
 {
-  return impl->stack.get();
+  return impl->stack;
 }
 
-const lua::Stack* Environment::Stack () const
+const detail::Stack& Environment::Stack () const
 {
-  return impl->stack.get();
+  return impl->stack;
 }
+
+struct  ScriptExceptionTag;         //ошибка выполнения скрипта
+typedef DerivedException<Exception,ScriptExceptionTag> ScriptException;
+
+void RaiseScriptException (const char* source,const char* format,...)
+{
+  va_list list;
+
+  va_start (list,format);
+
+  VRaise<ScriptException> (source,format,list);
+}
+
 
 void Environment::DoString (const char* expression)
 {
   try
   {
-     //сделать отдельный тип исключения
-    
     if (luaL_dostring (impl->l_state, expression))
-      Raise <Exception> ("EnvironmentImpl::DoString", "Error when executing expression %s", expression);
+      RaiseScriptException ("EnvironmentImpl::DoString", "Lua error executing occured when expression '%s'", expression);
   }
   catch (std::exception& exception)
   {                                               
+    lua_error (impl->l_state);
     impl->log_function (Name (), exception.what ()); 
-    Raise <Exception> ("EnvironmentImpl::DoFile", "Bad script call");
+    RaiseScriptException ("EnvironmentImpl::DoString", "Std exception '%s' occured when executing expression '%s'", exception.what (), expression);
   }
   catch (...)
   {
-    impl->log_function (Name (), "Unknown exception have occured."); 
-    Raise <Exception> ("EnvironmentImpl::DoFile", "Bad script call");
+    lua_error (impl->l_state);
+    impl->log_function (Name (), "Unknown exception occured."); 
+    RaiseScriptException ("EnvironmentImpl::DoString", "Unknown exception occured when executing expression '%s'", expression);
   }
 }
 
 void Environment::DoFile (const char* file_name)
 {
+  InputFile in_file (file_name);
+  char* buffer = new char [in_file.Size ()];
+
+  in_file.Read (buffer, in_file.Size ());
+
   try
   {
-       //не верно. нужно читать через common::File
-    
-    if (luaL_dofile (impl->l_state, file_name))
-      Raise <Exception> ("EnvironmentImpl::DoFile", "Error when loading file '%s'", file_name);
+    if (luaL_dostring (impl->l_state, buffer))
+      RaiseScriptException ("EnvironmentImpl::DoFile", "Lua error occured when executing file '%s'", file_name);
   }
   catch (std::exception& exception)
   {                                               
+    lua_error (impl->l_state);
     impl->log_function (Name (), exception.what ()); 
-    Raise <Exception> ("EnvironmentImpl::DoFile", "Bad script call");
+    RaiseScriptException ("EnvironmentImpl::DoFile", "Std exception '%s' occured when executing file '%s'", exception.what (), file_name);
   }
   catch (...)
   {
+    lua_error (impl->l_state);
     impl->log_function (Name (), "Unknown exception have occured."); 
-    Raise <Exception> ("EnvironmentImpl::DoFile", "Bad script call");
+    RaiseScriptException ("EnvironmentImpl::DoFile", "Unknown exception occured when executing file '%s'", file_name);
   }
 }
 
@@ -278,16 +219,14 @@ void Environment::Invoke (size_t args_count, size_t results_count)
 
 void Environment::RegisterFunction (const char* name, Invoker* invoker)
 {
+  if (!name || !invoker)
+    RaiseNullArgument ("Environment::RegisterFunction", "name or invoker");
+
   impl->funcs.insert_pair (string (name), invoker);
 
-  string generated_function ("\nfunction ");
   string args;
-  
-    //общие замечания. проще по-моему сделать это через common::format, либо хотя бы сделать string::reserve. иначе 
-    //будет много доп. выделений/освобождений памяти. в общем продумать
- 
-  generated_function += name;
-  generated_function += " (";
+  args.reserve (8 * invoker->ArgCount ());
+
   for (size_t i = 0; i < invoker->ArgCount (); i++)
   {
     char arg_buf [8];
@@ -297,6 +236,13 @@ void Environment::RegisterFunction (const char* name, Invoker* invoker)
     if (i < invoker->ArgCount () - 1)
       args += ", ";
   }
+
+  string generated_function ("\nfunction ");
+
+  generated_function.reserve (64 + args.length () * 2 + strlen (name) * 2 + strlen (RECALL_NAME));
+ 
+  generated_function += name;
+  generated_function += " (";
   generated_function += args;
   generated_function += ")\n return ";
   generated_function += RECALL_NAME;
@@ -325,9 +271,7 @@ void script::lua::swap (Environment& env1, Environment& env2)
 
 void script::lua::invoke (Environment& env, const char* fn_name)
 {
-  Stack* stack = env.Stack ();
-
-  stack->PushFunction(fn_name);
+  env.Stack().PushFunction(fn_name);
 
   env.Invoke (0, 0);
 }

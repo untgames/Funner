@@ -8,7 +8,7 @@ extern "C"
   #include <lauxlib.h>
 }
 
-using namespace script::lua;
+using namespace script::lua::detail;
 using namespace common;
 
 StackItem::StackItem (lua_State* in_state, size_t index)
@@ -75,7 +75,21 @@ void Stack::Push (double arg)
   lua_pushnumber (state, arg);
 }        
 
+void Stack::Push (float arg)
+{
+  if (!CheckAvailable (1))
+    Raise <Exception> ("Stack::Push", "Not enough stack space");
+  lua_pushnumber (state, arg);
+}        
+
 void Stack::Push (int arg)
+{
+  if (!CheckAvailable (1))
+    Raise <Exception> ("Stack::Push", "Not enough stack space");
+  lua_pushinteger (state, arg);
+}
+
+void Stack::Push (size_t arg)
 {
   if (!CheckAvailable (1))
     Raise <Exception> ("Stack::Push", "Not enough stack space");

@@ -7,3 +7,4 @@ end
 function my_lua2 ()
   print ("bla-bla")
 end
+print (my_c_func("abr2"))

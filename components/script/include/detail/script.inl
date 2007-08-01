@@ -1,6 +1,127 @@
 namespace detail
 {
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Элемент стека
+//////////////////////////////////////////////////////////////////////////////////////////////////
+class StackItem
+{
+  friend class Stack;
+
+  public:
+/////////////////////////////////////////////////////////////////////////////////////////////////
+///Взятие значения аргумента
+//////////////////////////////////////////////////////////////////////////////////////////////////
+    operator float       () const;
+    operator double      () const;
+    operator int         () const;
+    operator size_t      () const;
+    operator const char* () const;
+    operator const void* () const;
+
+    template <class T> operator T () const;
+
+  private:
+    StackItem (lua_State*, size_t);
+    
+  private:
+    struct lua_State* state;
+    size_t            argument_number;
+};  
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Стек аргументов
+//////////////////////////////////////////////////////////////////////////////////////////////////
+class Stack
+{
+  friend class Environment;
+
+  public:
+    typedef StackItem Item;
+    
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Количество элементов в стеке
+//////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t Size () const;
+    int    CheckAvailable (size_t count) const; //IsAvailable, пояснить работу функции: доступно для чего: взятия или для того, чтобы положить
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение элемента из стека
+//////////////////////////////////////////////////////////////////////////////////////////////////
+    Item Get (int item_number) const; //возможно operator []
+    
+    template <class T> T Get (int item_number) const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Помещение данных в стек
+//////////////////////////////////////////////////////////////////////////////////////////////////
+    void Push (double);
+    void Push (float);
+    void Push (int);
+    void Push (size_t);
+    void Push (const char*);
+    void Push (void*);
+    
+    template <class T>
+    void Push (const T&);
+
+    void PushFunction (const char* f_name);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление элементов стека
+//////////////////////////////////////////////////////////////////////////////////////////////////
+    void Pop (size_t);
+
+  private:
+    Stack (lua_State*);
+    
+    void* Alloc (size_t size);    //выделение блока памяти
+
+  private:
+    lua_State* state;
+};
+
+struct IUserData
+{
+  virtual ~IUserData () {}
+};
+
+template <class T> struct UserDataImpl: public IUserData
+{
+  UserDataImpl (const T& in_value) : value (in_value) {}
+  
+  T value;
+};
+
+template <class T> void Stack::Push (const T& value)
+{
+  if (!CheckAvailable (1))
+    Raise <Exception> ("Stack::Push", "Not enough stack space");
+
+  void* buffer = Alloc (sizeof (UserDataImpl<T>));
+
+  if (!buffer)
+    Raise <Exception> ("Stack::Push", "Can't alloc memory for pushing object.");
+
+  new (buffer) UserDataImpl<T> (value);
+}
+
+template <class T> T Stack::Get (int index) const
+{
+  return (StackItem) (Get (index));
+}
+
+template <class T>
+StackItem::operator T () const
+{
+  UserDataImpl<T> const *object = dynamic_cast<const UserDataImpl<T>*> (reinterpret_cast<const IUserData*> ((const void*)(*this)));
+
+  if (!object)
+    Raise <Exception> ("Stack::Get", "Stack item has other type than asked."); //wrong type
+
+  return object->value;
+}
+
 template <class Signature>
 inline size_t bind_call (Stack& stack);
 
@@ -235,14 +356,14 @@ template <class Signature, class Fn> class InvokerImpl: public Invoker
 template <class Ret>
 Ret invoke (Environment& env, const char* fn_name)
 {
-  Stack* stack = env.Stack ();
+  detail::Stack stack = env.Stack ();
 
-  stack->PushFunction(fn_name);
+  stack.PushFunction(fn_name);
 
   env.Invoke (0, 1);
 
-  Ret ret_value = stack->Get (-1);
-  stack->Pop (1);
+  Ret ret_value = stack.Get (-1);
+  stack.Pop (1);
 
   return ret_value;
 }
@@ -250,16 +371,16 @@ Ret invoke (Environment& env, const char* fn_name)
 template <class Ret, class T1>
 Ret invoke (Environment& env, const char* fn_name, const T1& arg1)
 {
-  Stack* stack = env.Stack ();
+  detail::Stack stack = env.Stack ();
 
-  stack->PushFunction(fn_name);
+  stack.PushFunction(fn_name);
 
-  stack->Push (arg1);
+  stack.Push (arg1);
 
   env.Invoke (1, 1);
 
-  Ret ret_value = stack->Get (-1);
-  stack->Pop (1);
+  Ret ret_value = stack.Get (-1);
+  stack.Pop (1);
 
   return ret_value;
 }
@@ -267,17 +388,17 @@ Ret invoke (Environment& env, const char* fn_name, const T1& arg1)
 template <class Ret, class T1, class T2>
 Ret invoke (Environment& env, const char* fn_name, const T1& arg1, const T2& arg2)
 {
-  Stack* stack = env.Stack ();
+  detail::Stack stack = env.Stack ();
 
-  stack->PushFunction(fn_name);
+  stack.PushFunction(fn_name);
 
-  stack->Push (arg1);
-  stack->Push (arg2);
+  stack.Push (arg1);
+  stack.Push (arg2);
 
   env.Invoke (2, 1);
 
-  Ret ret_value = stack->Get (-1);
-  stack->Pop (1);
+  Ret ret_value = stack.Get (-1);
+  stack.Pop (1);
 
   return ret_value;
 }
@@ -287,11 +408,11 @@ void invoke (Environment& env, const char* fn_name);
 template <class T1>
 void invoke (Environment& env, const char* fn_name, const T1& arg1)
 {
-  Stack* stack = env.Stack ();
+  detail::Stack stack = env.Stack ();
 
-  stack->PushFunction(fn_name);
+  stack.PushFunction(fn_name);
 
-  stack->Push (arg1);
+  stack.Push (arg1);
 
   env.Invoke (1, 0);
 }
@@ -299,12 +420,12 @@ void invoke (Environment& env, const char* fn_name, const T1& arg1)
 template <class T1, class T2>
 void invoke (Environment& env, const char* fn_name, const T1& arg1, const T2& arg2)
 {
-  Stack* stack = env.Stack ();
+  detail::Stack stack = env.Stack ();
 
-  stack->PushFunction(fn_name);
+  stack.PushFunction(fn_name);
 
-  stack->Push (arg1);
-  stack->Push (arg2);
+  stack.Push (arg1);
+  stack.Push (arg2);
 
   env.Invoke (2, 0);
 }
@@ -314,75 +435,3 @@ inline void Environment::BindFunction (const char* name, Fn fn)
 {
   RegisterFunction (name, new detail::InvokerImpl<Signature, Fn> (fn));
 }
-
-struct IUserData
-{
-  virtual ~IUserData () {}
-};
-
-template <class T> struct UserDataImpl: public IUserData
-{
-  UserDataImpl (const T& in_value) : value (in_value) {}
-  
-  T value;
-};
-
-/*template <class T> void Stack::Push (const T& value)
-{
-  if (!CheckAvailable (1))
-    Raise <Exception> ("Stack::Push", "Not enough stack space");
-
-  
-  char* buffer = (char*) Alloc (sizeof (UserDataImpl<T>));
-
-  if (!buffer)
-    Raise <Exception> ("Stack::Push", "Can't alloc memory for pushing object.");
-
-  UserDataImpl<T>* object = new (buffer) UserDataImpl<T> (value);
-}
-
-template <class T> T Stack::Get (int index) const
-{
-  return (StackItem) (Get (index));
-}
-
-template <class T>
-StackItem::operator T () const
-{
-  UserDataImpl<T> const *object = dynamic_cast<const UserDataImpl<T>*> (reinterpret_cast<const IUserData*> ((const void*)(*this)));
-
-  if (!object)
-    Raise <Exception> ("Stack::Get", "Stack item has other type than asked."); //wrong type
-
-  return object->value;
-} */
-
-template <class T> void Stack::Push (const T& value)
-{
-  if (!CheckAvailable (1))
-    Raise <Exception> ("Stack::Push", "Not enough stack space");
-
-  void* buffer = Alloc (sizeof (UserDataImpl<T>));
-
-  if (!buffer)
-    Raise <Exception> ("Stack::Push", "Can't alloc memory for pushing object.");
-
-  new (buffer) UserDataImpl<T> (value);
-}
-
-template <class T> T Stack::Get (int index) const
-{
-  return (StackItem) (Get (index));
-}
-
-template <class T>
-StackItem::operator T () const
-{
-  UserDataImpl<T> const *object = dynamic_cast<const UserDataImpl<T>*> (reinterpret_cast<const IUserData*> ((const void*)(*this)));
-
-  if (!object)
-    Raise <Exception> ("Stack::Get", "Stack item has other type than asked."); //wrong type
-
-  return object->value;
-}
-
