@@ -378,7 +378,7 @@ template <class T> T Stack::Get (int index) const
 template <class T>
 StackItem::operator T () const
 {
-  UserDataImpl<T> const *object = dynamic_cast<const UserDataImpl<T>*> (*reinterpret_cast<const IUserData**> ((const void**)(const void*)(*this)));
+  UserDataImpl<T> const *object = dynamic_cast<const UserDataImpl<T>*> (reinterpret_cast<const IUserData*> ((const void*)(*this)));
 
   if (!object)
     Raise <Exception> ("Stack::Get", "Stack item has other type than asked."); //wrong type

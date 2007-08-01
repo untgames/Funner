@@ -171,12 +171,12 @@ void dump_memstat (Heap& heap)
 Environment::Impl::~Impl ()
 {
   lua_close (l_state);
-
+/*
   printf ("Default heap stat:\n");
   dump_memstat (MemoryManager::GetHeap ());
   printf ("Lua heap stat:\n");
   dump_memstat (my_heap);  
-  printf ("destruct out\n");
+  printf ("destruct out\n");*/
 }
 
 int Environment::Impl::Recaller (lua_State* l_state)
