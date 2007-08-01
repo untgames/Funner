@@ -31,7 +31,7 @@ void my_func2 (int arg1, size_t arg2, float arg3, double arg4, const char* arg5)
 
 float my_func3 (MyStruct* arg)
 {
-  printf ("Arg = %p\n", arg);
+//  printf ("Arg = %p\n", arg);
   return 39.84f;
 }
 
@@ -47,14 +47,19 @@ int main ()
     Environment script (&DebugLogFunction), script2 (&DebugLogFunction);
     MyStruct* my_struct = new MyStruct;
 
+    printf ("Results of lua test:\n\n");
+    printf ("Testing of binding and calling C function from Lua:\n");
     script.BindFunction <int (const char*)> ("my_c_func", &my_func);
     script.BindFunction <void (int, size_t, float, double, const char*)> ("my_c_func2", &my_func2);
     script.BindFunction <float (MyStruct*)> ("my_c_func3", &my_func3);
     script.DoFile (file_name2);
+
+    printf ("\nTesting of calling Lua function from C:\n");
     printf ("Lua call result: %d\n", invoke <int, int> (script, "my_lua", 7));
     invoke (script, "my_lua", 12);
     invoke (script, "my_lua2");
     
+    printf ("\nTesting of calling Lua function which is binded C function from C:\n");
     printf ("Lua call of binded function result: %f\n", invoke <float, MyStruct*> (script, "my_c_func3", my_struct));
 
     delete my_struct;
