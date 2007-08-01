@@ -88,6 +88,9 @@ static void* my_alloc (void *ud, void *ptr, size_t osize, size_t nsize)
       used_memory -= _msize (ptr);
     printf ("Deallocating memory at %p (block %u, now used memory = %u)\n", ptr, deallocated_blocks++, used_memory);*/
     
+    if (ptr)
+      used_memory -= MemoryManager::GetHeap ().Size (ptr);
+    printf ("Deallocating memory at %p (block %u, now used memory = %u)\n", ptr, deallocated_blocks++, used_memory);
     MemoryManager::Deallocate (ptr);//free(ptr);
     
     return NULL;
@@ -101,9 +104,13 @@ static void* my_alloc (void *ud, void *ptr, size_t osize, size_t nsize)
     void *ret_value = MemoryManager::Allocate (nsize);
     if (ptr)
     {
-    memcpy (ret_value, ptr, MemoryManager::GetHeap ().Size (ptr));
-    MemoryManager::Deallocate (ptr);
+      memcpy (ret_value, ptr, min (MemoryManager::GetHeap ().Size (ptr), nsize));
+      used_memory -= MemoryManager::GetHeap ().Size (ptr);
+      MemoryManager::Deallocate (ptr);
+      deallocated_blocks++;
     }
+    used_memory += MemoryManager::GetHeap ().Size (ret_value);
+    printf ("Allocated %u bytes at %p (block %u, now used memory = %u)\n", nsize, ret_value, allocated_blocks++, used_memory);
     return ret_value; 
   }
 }
@@ -138,6 +145,10 @@ Environment::Impl::Impl ()
 Environment::Impl::~Impl ()
 {
   lua_close (l_state);
+  HeapStat stat;
+  MemoryManager::GetHeap ().GetStatistics (stat);
+  printf ("\n\nFinal stats:\n allocate count = %u\n deallocate count = %u\n allocate size = %u\n deallocate size = %u\n\n", stat.sys_allocate_count,
+            stat.sys_deallocate_count, stat.sys_allocate_size, stat.sys_deallocate_size);
 }
 
 int Environment::Impl::Recaller (lua_State* l_state)

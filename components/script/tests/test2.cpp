@@ -43,15 +43,11 @@ int main ()
     printf ("my_struct2 item value = %d\n", my_struct2->item);
     stack->Pop (1);
 
-    for (size_t j = 0; j < 3000; j++)
+    for (size_t j = 0; j < 1000; j++)
     {
 //      printf ("\n\nPushing\n\n");
       for (size_t i = 0; i < 40; i++)
-      {
-        MyStructDerived *tmp = new MyStructDerived ();
-        stack->Push (tmp);
-        delete tmp;
-      }
+        stack->Push (my_struct);
 //      printf ("\n\nPushed, popping\n\n");
       stack->Pop (40);
 //      printf ("\n\nPopped\n\n");
