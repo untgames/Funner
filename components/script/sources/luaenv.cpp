@@ -75,7 +75,7 @@ static const luaL_reg iuser_data_meta_table [] = {
 #include <malloc.h>
 #include <common/heap.h>
 
-static size_t allocated_blocks = 0, deallocated_blocks = 0, used_memory = 0;
+static size_t allocated_blocks = 0, deallocated_blocks = 0, used_memory = 0, max_mem_used = 0;
 
 static void* my_alloc (void *ud, void *ptr, size_t osize, size_t nsize) 
 {
@@ -110,6 +110,7 @@ static void* my_alloc (void *ud, void *ptr, size_t osize, size_t nsize)
       deallocated_blocks++;
     }
     used_memory += MemoryManager::GetHeap ().Size (ret_value);
+    if (used_memory > max_mem_used) max_mem_used = used_memory;
 //    printf ("Allocated %u bytes at %p (block %u, now used memory = %u)\n", nsize, ret_value, allocated_blocks++, used_memory);
     return ret_value; 
   }
@@ -151,6 +152,7 @@ Environment::Impl::~Impl ()
             stat.sys_deallocate_count, stat.sys_allocate_size, stat.sys_deallocate_size);
   printf (" allocate count = %u\n deallocate count = %u\n allocate size = %u\n deallocate size = %u\n\n", stat.allocate_count,
             stat.deallocate_count, stat.allocate_size, stat.deallocate_size);  
+  printf ("Maximum used memory = %u\n", max_mem_used);
 }
 
 int Environment::Impl::Recaller (lua_State* l_state)
