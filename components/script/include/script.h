@@ -3,6 +3,7 @@
 
 #include <xtl/functional_fwd>
 #include <common/exception.h>
+#include <new>
 
 //forward declarations
 struct lua_State;

@@ -57,12 +57,12 @@ struct Environment::Impl
 
 static int DestroyIUserData (lua_State* state)
 {
-  lua::IUserData** ptr = (lua::IUserData**)lua_touserdata (state,-1);
+  lua::IUserData* ptr = (lua::IUserData*)lua_touserdata (state, -1);
   
   if (!ptr) 
-    luaL_typerror (state,1,"user_data");    
+    luaL_typerror (state, 1, "user_data");    
 
-  delete (*ptr);
+  stl::destroy (ptr);
   
   return 0;
 }
@@ -148,7 +148,7 @@ void dump_memstat (Heap& heap)
 {
   HeapStat stat;
   heap.GetStatistics (stat);
-  printf ("\n\nFinal stats:\n sys_allocate count = %u\n sys_deallocate count = %u\n sys_allocate size = %u\n sys_deallocate size = %u\n", stat.sys_allocate_count,
+  printf ("sys_allocate count = %u\n sys_deallocate count = %u\n sys_allocate size = %u\n sys_deallocate size = %u\n", stat.sys_allocate_count,
             stat.sys_deallocate_count, stat.sys_allocate_size, stat.sys_deallocate_size);
   printf (" allocate count = %u\n deallocate count = %u\n allocate size = %u\n deallocate size = %u\n", stat.allocate_count,
             stat.deallocate_count, stat.allocate_size, stat.deallocate_size);  
@@ -176,6 +176,7 @@ Environment::Impl::~Impl ()
   dump_memstat (MemoryManager::GetHeap ());
   printf ("Lua heap stat:\n");
   dump_memstat (my_heap);  
+  printf ("destruct out\n");
 }
 
 int Environment::Impl::Recaller (lua_State* l_state)

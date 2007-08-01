@@ -116,5 +116,5 @@ void Stack::Pop (size_t count)
   if (count > Size ())
     lua_pop (state, (int)Size ());
   else
-    lua_pop (state, (int)count);
+    lua_pop (state, (int)count);    
 }

@@ -362,12 +362,12 @@ template <class T> void Stack::Push (const T& value)
   if (!CheckAvailable (1))
     Raise <Exception> ("Stack::Push", "Not enough stack space");
 
-  UserDataImpl<T>** buffer = (UserDataImpl<T>**) Alloc (sizeof (UserDataImpl<T>*));
+  void* buffer = Alloc (sizeof (UserDataImpl<T>));
 
   if (!buffer)
     Raise <Exception> ("Stack::Push", "Can't alloc memory for pushing object.");
 
-  *buffer = new UserDataImpl<T> (value);
+  new (buffer) UserDataImpl<T> (value);
 }
 
 template <class T> T Stack::Get (int index) const
