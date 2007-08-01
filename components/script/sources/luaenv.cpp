@@ -72,9 +72,52 @@ static const luaL_reg iuser_data_meta_table [] = {
   {0,0}
 };
 
+#include <malloc.h>
+#include <common/heap.h>
+
+static size_t allocated_blocks = 0, deallocated_blocks = 0, used_memory = 0;
+
+static void* my_alloc (void *ud, void *ptr, size_t osize, size_t nsize) 
+{
+  (void)ud;
+  (void)osize;  /* not used */
+  
+  if (nsize == 0)
+  {
+/*    if (ptr)
+      used_memory -= _msize (ptr);
+    printf ("Deallocating memory at %p (block %u, now used memory = %u)\n", ptr, deallocated_blocks++, used_memory);*/
+    
+    MemoryManager::Deallocate (ptr);//free(ptr);
+    
+    return NULL;
+  }
+  else
+  {
+/*    void* ret_value = realloc(ptr, nsize);
+    used_memory += _msize (ret_value);
+    printf ("Allocated %u bytes at %p (block %u, now used memory = %u)\n", nsize, ret_value, allocated_blocks++, used_memory);*/
+
+    void *ret_value = MemoryManager::Allocate (nsize);
+    if (ptr)
+    {
+    memcpy (ret_value, ptr, MemoryManager::GetHeap ().Size (ptr));
+    MemoryManager::Deallocate (ptr);
+    }
+    return ret_value; 
+  }
+}
+
 Environment::Impl::Impl ()
 {
-  l_state = lua_open ();
+/*  l_state = lua_open ();
+  if (!l_state)
+    Raise <Exception> ("Impl::Impl", "Can't create lua state.");
+
+  lua_setallocf (l_state, &my_alloc, NULL);
+  */
+
+  l_state = lua_newstate (&my_alloc, NULL);
   if (!l_state)
     Raise <Exception> ("Impl::Impl", "Can't create lua state.");
 

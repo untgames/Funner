@@ -113,13 +113,8 @@ void* Stack::Alloc (size_t size)
 
 void Stack::Pop (size_t count)
 {
-  printf ("Memory before=%d", lua_gc (state, LUA_GCCOUNT, 0));
   if (count > Size ())
     lua_pop (state, (int)Size ());
   else
     lua_pop (state, (int)count);
-
-  lua_gc (state, LUA_GCCOLLECT, 0);
-    
-  printf (" after=%d\n", lua_gc (state, LUA_GCCOUNT, 0));
 }
