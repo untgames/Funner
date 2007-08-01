@@ -144,11 +144,10 @@ Environment::Impl::Impl ()
   stack = new lua::Stack (l_state);
 }
 
-Environment::Impl::~Impl ()
+void dump_memstat (Heap& heap)
 {
-  lua_close (l_state);
   HeapStat stat;
-  my_heap.GetStatistics (stat);
+  heap.GetStatistics (stat);
   printf ("\n\nFinal stats:\n sys_allocate count = %u\n sys_deallocate count = %u\n sys_allocate size = %u\n sys_deallocate size = %u\n", stat.sys_allocate_count,
             stat.sys_deallocate_count, stat.sys_allocate_size, stat.sys_deallocate_size);
   printf (" allocate count = %u\n deallocate count = %u\n allocate size = %u\n deallocate size = %u\n", stat.allocate_count,
@@ -167,6 +166,16 @@ Environment::Impl::~Impl ()
   }
 
   printf ("\n\n");
+}
+
+Environment::Impl::~Impl ()
+{
+  lua_close (l_state);
+
+  printf ("Default heap stat:\n");
+  dump_memstat (MemoryManager::GetHeap ());
+  printf ("Lua heap stat:\n");
+  dump_memstat (my_heap);  
 }
 
 int Environment::Impl::Recaller (lua_State* l_state)
