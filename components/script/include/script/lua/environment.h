@@ -82,8 +82,8 @@ class Environment
 
     bool DoString (const char* expression);
     bool DoString (const char* expression, const LogFunc& log);
-//    bool DoBuffer (const char* name, const char* buffer, size_t buffer_size);
-//    bool DoBuffer (const char* name, const char* buffer, size_t buffer_size, const LogFunc& log);
+    bool DoBuffer (const char* name, const char* buffer, size_t buffer_size);
+    bool DoBuffer (const char* name, const char* buffer, size_t buffer_size, const LogFunc& log);
     bool DoFile   (const char* file_name);    
     bool DoFile   (const char* file_name, const LogFunc& log);
     
