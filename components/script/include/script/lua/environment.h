@@ -29,12 +29,14 @@ struct EnvironmentImpl;
 ///Исключения
 //////////////////////////////////////////////////////////////////////////////////////////////////
 struct ScriptExceptionTag;                //базовое исключение для lua-исключений
+struct RuntimeExceptionTag;               //исключение, возникающее при выполнении скрипта
 struct StackOverflowExceptionTag;         //стек аргументов переполнен
 struct UndefinedFunctionCallExceptionTag; //попытка вызова незарегистрированной функции
 
 typedef common::DerivedException<common::Exception, ScriptExceptionTag>              ScriptException;
 typedef common::DerivedException<ScriptException, StackOverflowExceptionTag>         StackOverflowException;
 typedef common::DerivedException<ScriptException, UndefinedFunctionCallExceptionTag> UndefinedFunctionCallException;
+typedef common::DerivedException<ScriptException, RuntimeExceptionTag>               RuntimeException;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Селектор типа возвращаемого значения
@@ -47,19 +49,11 @@ template <class T> struct Result {};
 class Environment
 {
   public:
-    typedef xtl::function<void (Environment&, const char* message)> LogFunc;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
     Environment  ();
     ~Environment ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка пользовательской функции лога сообщений
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const LogFunc& GetLogHandler ();
-    void           SetLogHandler (const LogFunc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя среды
@@ -84,8 +78,14 @@ class Environment
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выполнение команды луа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void DoString (const char* expression, const char* name=0);
-    void DoFile   (const char* file_name);
+    typedef xtl::function<void (const char* message)> LogFunc;
+
+    bool DoString (const char* expression);
+    bool DoString (const char* expression, const LogFunc& log);
+//    bool DoBuffer (const char* name, const char* buffer, size_t buffer_size);
+//    bool DoBuffer (const char* name, const char* buffer, size_t buffer_size, const LogFunc& log);
+    bool DoFile   (const char* file_name);    
+    bool DoFile   (const char* file_name, const LogFunc& log);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вызов функции луа

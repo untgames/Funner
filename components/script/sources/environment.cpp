@@ -9,10 +9,6 @@
 using namespace common;
 using namespace script::lua;
 
-#ifdef _MSC_VER
-  #pragma warning (disable : 4355) //'this' : used in base member initializer list
-#endif
-
 namespace
 {
 
@@ -23,7 +19,6 @@ const size_t IMPL_ID               = 0xDEADBEEF;  //идентификатор реализации lua
 }
 
 /*
-    Environment::Impl
     Описание реализации окружения Lua
 */
 
@@ -38,40 +33,14 @@ namespace lua
 
 struct EnvironmentImpl
 {
-  size_t               id;           //идентификатор реализации
-  Environment&         environment;  //ссылка на владельца
-  lua_State*           state;        //состояние Lua
-  InvokerMap           invokers;     //обработчики вызова
-  stl::string          name;         //имя среды
-  Environment::LogFunc log_function; //функция протоколирования
-  
-  EnvironmentImpl (Environment& in_environment) : environment (in_environment) {}
-  
-  void LogError (const char* format, ...);
+  size_t       id;           //идентификатор реализации
+  lua_State*   state;        //состояние Lua
+  InvokerMap   invokers;     //обработчики вызова
+  stl::string  name;         //имя среды    
 };
 
 }
 
-}
-
-/*
-    Вывод сообщения об ошибке
-*/
-
-void EnvironmentImpl::LogError (const char* format, ...)
-{
-  va_list list;
-  
-  va_start (list, format);
-  
-  try
-  {
-    log_function (environment, common::vformat (format, list).c_str ());
-  }
-  catch (...)
-  {
-    //поглощаем все исключения, поскольку данная функция может быть вызвана из C-кода
-  }
 }
 
 /*
@@ -90,71 +59,32 @@ int invoke_dispatch (lua_State* state)
   
     //проверка корректности lua-переменной '__impl'
   
-  if (!this_impl || this_impl->id != IMPL_ID)  
-    return 0; //к сожалению невозможно вывести никаких сообщений, предупрежджающих об ошибке
-    
+  if (!this_impl || this_impl->id != IMPL_ID)
+    Raise<RuntimeException> ("script::lua::invoke_dispatch", "Wrong '__impl' variable");
+
   const char* function_name = lua_tostring (state, 1);
   
     //проверка наличия функции function_name
-  
+
   if (!function_name)
-  {
-    this_impl->LogError ("Null function name at call function '__recall'");
-    return 0;
-  }
+    Raise<RuntimeException> ("script::lua::invoke_dispatch", "Null function name at call function '__recall'");
 
   InvokerMap::iterator iter = this_impl->invokers.find (function_name);
 
   if (iter == this_impl->invokers.end ())
-  {
-    this_impl->LogError ("Attempt to call unregistered function '%s'", function_name);
-    return 0;
-  }
+    Raise<RuntimeException> ("script::lua::invoke_dispatch", "Attempt to call unregistered function '%s'", function_name);
 
     //собственно вызов функции
-    
-  try
-  {    
-    detail::Stack stack (this_impl->state);
-    
-    return (*iter->second) (stack);
-  }
-  catch (std::exception& exception)
-  {
-    this_impl->LogError ("Exception at call function '%s': %s", function_name, exception.what ());
-    lua_error (this_impl->state);
-    //поглощаем все исключения, поскольку данная функция может быть вызвана из C-кода
-  }
-  catch (...)
-  {
-    this_impl->LogError ("Unknown exception at call function '%s'", function_name);
-    lua_error (this_impl->state);
-    //поглощаем все исключения, поскольку данная функция может быть вызвана из C-кода
-  }
-  
-  return 0;
+
+  return (*iter->second) (detail::Stack (state));
 }
 
 //функция обработки ошибок lua
 int error_handler (lua_State* state)
 {
-  lua_getglobal (state, IMPL_NAME);
+  Raise<RuntimeException> ("script::lua::error_handler", "Lua internal error (lua calls 'lua_atpanic' function)");
 
-  EnvironmentImpl* this_impl = reinterpret_cast<EnvironmentImpl*> (lua_touserdata (state, -1));
-  
-    //проверка корректности lua-переменной '__impl'
-  
-  if (!this_impl || this_impl->id != IMPL_ID)  
-    return 0; //к сожалению невозможно вывести никаких сообщений, предупрежджающих об ошибке
-    
-  this_impl->LogError ("Fatal error at parse lua script");
-  
   return 0;
-}
-
-//функция протоколирования по умолчанию
-void default_log_function (Environment&, const char* message)
-{
 }
 
 //функция вызываемая уборщиком мусора при удалении объектов пользовательского типа данных
@@ -174,45 +104,46 @@ int user_data_destroyer (lua_State* state)
 
 
 Environment::Environment ()
-  : impl (new EnvironmentImpl (*this))
+  : impl (new EnvironmentImpl)
 {
-  impl->id = IMPL_ID;
+  try
+  {
+    impl->id = IMPL_ID;
 
-    //инициализация состояния lua
+      //инициализация состояния lua
 
-  impl->state = lua_open ();
+    impl->state = lua_open ();
 
-  if (!impl->state)
+    if (!impl->state)
+      Raise<ScriptException> ("script::lua::Environment::Environment", "Can't create lua state");
+
+      //убрать!!!!!!!
+    
+    luaL_openlibs (impl->state);
+    
+      //регистрация обработчиков удаления пользовательских типов данных    
+      
+    static const luaL_reg user_data_meta_table [] = {{"__gc", &user_data_destroyer}, {0,0}};    
+
+    luaL_newmetatable (impl->state, USER_DATA_TAG);
+    luaL_openlib      (impl->state, 0, user_data_meta_table, 0);
+    
+      //регистрация функции обработки ошибок
+
+    lua_atpanic (impl->state, &error_handler);
+
+      //регистрация диспетчера вызовов
+    
+    lua_pushcfunction     (impl->state, &invoke_dispatch);
+    lua_setglobal         (impl->state, INVOKE_DISPATCH_NAME);
+    lua_pushlightuserdata (impl->state, impl); //сделать через полноценный user data с проверкой типа!!!
+    lua_setglobal         (impl->state, IMPL_NAME);  
+  }
+  catch (...)
   {
     delete impl;
-    Raise<ScriptException> ("script::lua::Environment::Environment", "Can't create lua state");
+    throw;
   }
-
-    //убрать!!!!!!!
-  
-  luaL_openlibs (impl->state);
-  
-    //регистрация обработчиков удаления пользовательских типов данных    
-    
-  static const luaL_reg user_data_meta_table [] = {{"__gc", &user_data_destroyer}, {0,0}};    
-
-  luaL_newmetatable (impl->state, USER_DATA_TAG);
-  luaL_openlib      (impl->state, 0, user_data_meta_table, 0);
-  
-    //регистрация функции обработки ошибок
-
-  lua_atpanic (impl->state, &error_handler);
-
-    //регистрация диспетчера вызовов
-  
-  lua_pushcfunction     (impl->state, &invoke_dispatch);
-  lua_setglobal         (impl->state, INVOKE_DISPATCH_NAME);
-  lua_pushlightuserdata (impl->state, impl); //сделать через полноценный user data с проверкой типа!!!
-  lua_setglobal         (impl->state, IMPL_NAME);
-  
-    //установка функции протоколирования по умолчанию
-
-  SetLogHandler (&default_log_function);
 }
 
 Environment::~Environment ()
@@ -222,20 +153,6 @@ Environment::~Environment ()
   lua_close (impl->state);
 
   delete impl;
-}
-
-/*
-    Работа с функцией протоколирования
-*/
-
-const Environment::LogFunc& Environment::GetLogHandler ()
-{
-  return impl->log_function;
-}
-
-void Environment::SetLogHandler (const LogFunc& new_log_function)
-{
-  impl->log_function = new_log_function; 
 }
 
 /*
@@ -363,23 +280,42 @@ bool Environment::HasFunction (const char* name) const //no throw
     Выполнение выражения
 */
 
-void Environment::DoString (const char* expression, const char* name)
+namespace
+{
+
+//функция протоколирования по умолчанию
+void default_log_handler (const char*)
+{
+}
+
+}
+
+bool Environment::DoString (const char* expression, const LogFunc& log)
 {
   if (!expression)
     RaiseNullArgument ("script::lua::Environment::DoString", "expression");
 
-  if (!name)
-    name = expression;
-  
       //сделать dobuffer
   if (luaL_dostring (impl->state, expression))
-    Raise<ScriptException> ("script::lua::Environment::DoString", "Lua error at parser expression '%s'", name);
+  {
+      //сделать вывод ошибок
+    return false;
+  }
+
+  return true;
 }
 
-void Environment::DoFile (const char* file_name)
+bool Environment::DoString (const char* expression)
+{
+  return DoString (expression, &default_log_handler);
+}
+
+bool Environment::DoFile (const char* file_name, const LogFunc& log)
 {
   if (!file_name)
     RaiseNullArgument ("script::lua::Environment::DoFile", "file_name");
+
+    //доделать вывод!!!
 
   InputFile in_file (file_name);
   size_t    file_size = in_file.Size ();
@@ -391,15 +327,22 @@ void Environment::DoFile (const char* file_name)
 
     buffer [file_size] = '\0';
 
-    DoString (buffer, file_name);
+    bool result = DoString (buffer, log);
 
     ::operator delete (buffer);
+    
+    return result;
   }
   catch (...)
   {
     ::operator delete (buffer);
     throw;
   }
+}
+
+bool Environment::DoFile (const char* file_name)
+{
+  return DoFile (file_name, &default_log_handler);
 }
 
 /*

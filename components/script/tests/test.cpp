@@ -34,9 +34,9 @@ float my_func3 (MyStruct* arg)
   return 39.84f;
 }
 
-void DebugLogFunction (Environment& env, const char* message)
+void DebugLogFunction (const char* message)
 {
-  printf ("%s: %s\n", env.Name (), message);
+  printf ("%s\n", message);
 }
 
 int main ()
@@ -45,11 +45,6 @@ int main ()
   {
     Environment script, script2;
     
-    script.SetLogHandler (&DebugLogFunction);
-    script2.SetLogHandler (&DebugLogFunction);
-    script.Rename ("script");
-    script2.Rename ("script2");    
-    
     MyStruct* my_struct = new MyStruct;
 
     printf ("Results of lua test:\n\n");
@@ -57,7 +52,7 @@ int main ()
     script.RegisterFunction <int (const char*)> ("my_c_func", &my_func);
     script.RegisterFunction <void (int, size_t, float, double, const char*)> ("my_c_func2", &my_func2);
     script.RegisterFunction <float (MyStruct*)> ("my_c_func3", &my_func3);
-    script.DoFile (file_name2);
+    script.DoFile (file_name2, &DebugLogFunction);
 
     printf ("\nTesting of calling Lua function from C:\n");
     printf ("Lua call result: %d\n", script.Invoke ("my_lua", 7, Result<int> ()));
