@@ -11,7 +11,7 @@ LUALIB.SOURCE_DIRS      := sources           #Относительные пути к каталогам c и
 LUALIB.LIB_DIRS         :=                   #Относительные пути к каталогам с библиотеками
 LUALIB.LIBS             :=                   #Список используемых при линковке библиотек
 LUALIB.COMPILER_DEFINES :=  								 #Определения сборки
-LUALIB.COMPILER_CFLAGS  :=                   #Флаги сборки (зависят от конфигурации)
+LUALIB.COMPILER_CFLAGS  := -TP               #Флаги сборки (зависят от конфигурации)
 
 #Цель №2 - LUA_UTILS
 LUA_UTILS.TYPE             := test-suite     	 #Тип цели
@@ -20,4 +20,4 @@ LUA_UTILS.SOURCE_DIRS      := utils          	 #Относительные пути к каталогам c
 LUA_UTILS.LIB_DIRS         :=                  #Относительные пути к каталогам с библиотеками
 LUA_UTILS.LIBS             := lua              #Список используемых при линковке библиотек
 LUA_UTILS.COMPILER_DEFINES :=  							   #Определения сборки
-LUA_UTILS.COMPILER_CFLAGS  :=                  #Флаги сборки (зависят от конфигурации)
+LUA_UTILS.COMPILER_CFLAGS  := -TP              #Флаги сборки (зависят от конфигурации)
