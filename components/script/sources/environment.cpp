@@ -288,6 +288,15 @@ void default_log_handler (const char*)
 {
 }
 
+//временный буфер
+struct Buffer
+{
+  Buffer (size_t size) : data (::operator new (size)) {}
+  ~Buffer () { ::operator delete (data); }
+
+  void* data;
+};
+
 }
 
 bool Environment::DoString (const char* expression, const LogFunc& log)
@@ -295,10 +304,9 @@ bool Environment::DoString (const char* expression, const LogFunc& log)
   if (!expression)
     RaiseNullArgument ("script::lua::Environment::DoString", "expression");
 
-      //сделать dobuffer
   if (luaL_dostring (impl->state, expression))
   {
-      //сделать вывод ошибок
+    log (lua_tostring (impl->state, -1));
     return false;
   }
 
@@ -310,22 +318,26 @@ bool Environment::DoString (const char* expression)
   return DoString (expression, &default_log_handler);
 }
 
-bool Environment::DoBuffer (const char* name, const char* buffer, size_t buffer_size, const LogFunc& log)
+bool Environment::DoBuffer (const char* name, const void* buffer, size_t buffer_size, const LogFunc& log)
 {
-  if (luaL_loadbuffer (impl->state, buffer, buffer_size, name))
+  if (luaL_loadbuffer (impl->state, (const char*)buffer, buffer_size, name))
   {
     log (lua_tostring (impl->state, -1));
-    return 0;
+
+    return false;
   }
-  else if (lua_pcall(impl->state, 0, LUA_MULTRET, 0))
+  
+  if (lua_pcall(impl->state, 0, LUA_MULTRET, 0))
   {
     log (lua_tostring (impl->state, -1));
-    return 0;
+
+    return false;
   }
-  return 1;
+
+  return true;
 }
 
-bool Environment::DoBuffer (const char* name, const char* buffer, size_t buffer_size)
+bool Environment::DoBuffer (const char* name, const void* buffer, size_t buffer_size)
 {
   return DoBuffer (name, buffer, buffer_size, &default_log_handler);
 }
@@ -335,26 +347,25 @@ bool Environment::DoFile (const char* file_name, const LogFunc& log)
   if (!file_name)
     RaiseNullArgument ("script::lua::Environment::DoFile", "file_name");
 
-    //доделать вывод!!!
-
-  InputFile in_file (file_name);
-  size_t    file_size = in_file.Size ();
-  char*     buffer    = (char*)::operator new (file_size);
-
   try
   {
-    in_file.Read (buffer, file_size);
+    InputFile in_file (file_name);
+    size_t    file_size = in_file.Size ();
+    Buffer    buffer (file_size);
 
-    bool result = DoBuffer (file_name, buffer, file_size, log);
+    in_file.Read (buffer.data, file_size);
 
-    ::operator delete (buffer);
-    
-    return result;
+    return DoBuffer (file_name, buffer.data, file_size, log);
+  }
+  catch (std::exception& exception)
+  {
+    log (common::format ("exception: %s", exception.what ()).c_str ());
+    return false;    
   }
   catch (...)
   {
-    ::operator delete (buffer);
-    throw;
+    log ("unknown exception");
+    return false;
   }
 }
 
