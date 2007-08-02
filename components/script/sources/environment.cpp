@@ -310,6 +310,26 @@ bool Environment::DoString (const char* expression)
   return DoString (expression, &default_log_handler);
 }
 
+bool Environment::DoBuffer (const char* name, const char* buffer, size_t buffer_size, const LogFunc& log)
+{
+  if (luaL_loadbuffer (impl->state, buffer, buffer_size, name))
+  {
+    log (lua_tostring (impl->state, -1));
+    return 0;
+  }
+  else if (lua_pcall(impl->state, 0, LUA_MULTRET, 0))
+  {
+    log (lua_tostring (impl->state, -1));
+    return 0;
+  }
+  return 1;
+}
+
+bool Environment::DoBuffer (const char* name, const char* buffer, size_t buffer_size)
+{
+  return DoBuffer (name, buffer, buffer_size, &default_log_handler);
+}
+
 bool Environment::DoFile (const char* file_name, const LogFunc& log)
 {
   if (!file_name)
@@ -319,15 +339,13 @@ bool Environment::DoFile (const char* file_name, const LogFunc& log)
 
   InputFile in_file (file_name);
   size_t    file_size = in_file.Size ();
-  char*     buffer    = (char*)::operator new (file_size + 1);
+  char*     buffer    = (char*)::operator new (file_size);
 
   try
   {
     in_file.Read (buffer, file_size);
 
-    buffer [file_size] = '\0';
-
-    bool result = DoString (buffer, log);
+    bool result = DoBuffer (file_name, buffer, file_size, log);
 
     ::operator delete (buffer);
     
