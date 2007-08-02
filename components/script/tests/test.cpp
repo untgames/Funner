@@ -1,6 +1,5 @@
 #include <stdio.h>
-#include <script/script.h>
-#include <common/exception.h>
+#include <script/lua.h>
 #include <xtl/functional>
 
 using namespace script::lua;
@@ -35,32 +34,38 @@ float my_func3 (MyStruct* arg)
   return 39.84f;
 }
 
-void DebugLogFunction (const char* env_name, const char* message)
+void DebugLogFunction (Environment& env, const char* message)
 {
-  printf ("'%s' at environment '%s'\n", message, env_name);
+  printf ("%s: %s\n", env.Name (), message);
 }
 
 int main ()
 {
   try
   {
-    Environment script (&DebugLogFunction), script2 (&DebugLogFunction);
+    Environment script, script2;
+    
+    script.SetLogHandler (&DebugLogFunction);
+    script2.SetLogHandler (&DebugLogFunction);
+    script.Rename ("script");
+    script2.Rename ("script2");    
+    
     MyStruct* my_struct = new MyStruct;
 
     printf ("Results of lua test:\n\n");
     printf ("Testing of binding and calling C function from Lua:\n");
-    script.BindFunction <int (const char*)> ("my_c_func", &my_func);
-    script.BindFunction <void (int, size_t, float, double, const char*)> ("my_c_func2", &my_func2);
-    script.BindFunction <float (MyStruct*)> ("my_c_func3", &my_func3);
+    script.RegisterFunction <int (const char*)> ("my_c_func", &my_func);
+    script.RegisterFunction <void (int, size_t, float, double, const char*)> ("my_c_func2", &my_func2);
+    script.RegisterFunction <float (MyStruct*)> ("my_c_func3", &my_func3);
     script.DoFile (file_name2);
 
     printf ("\nTesting of calling Lua function from C:\n");
-    printf ("Lua call result: %d\n", invoke <int, int> (script, "my_lua", 7));
-    invoke (script, "my_lua", 12);
-    invoke (script, "my_lua2");
+    printf ("Lua call result: %d\n", script.Invoke ("my_lua", 7, Result<int> ()));
+    script.Invoke ("my_lua", 12);
+    script.Invoke ("my_lua2");
     
     printf ("\nTesting of calling Lua function which is binded C function from C:\n");
-    printf ("Lua call of binded function result: %f\n", invoke <float, MyStruct*> (script, "my_c_func3", my_struct));
+    printf ("Lua call of binded function result: %f\n", script.Invoke<float> ("my_c_func3", my_struct));
 
     delete my_struct;
   }

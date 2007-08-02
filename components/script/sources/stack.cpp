@@ -1,136 +1,156 @@
-#include <script/script.h>
-#include <common/exception.h>
-
-extern "C"
-{
-  #include <lua.h>
-  #include <lualib.h>
-  #include <lauxlib.h>
-}
+#include "shared.h"
 
 using namespace script::lua::detail;
+using namespace script::lua;
 using namespace common;
 
-StackItem::StackItem (lua_State* in_state, size_t index)
-  : state (in_state), argument_number (index)
+namespace script
 {
+
+namespace lua
+{
+
+//тэг пользовательских данных
+const char* USER_DATA_TAG = "user_data";
+
 }
 
-StackItem::operator float () const
-{
-  return (float)lua_tonumber (state, argument_number);
 }
 
-StackItem::operator double () const
-{
-  return lua_tonumber (state, argument_number);
-}
-
-StackItem::operator int () const
-{
-  return lua_tointeger (state, argument_number);
-}
-
-StackItem::operator size_t () const
-{
-  return lua_tointeger (state, argument_number);
-}
-
-StackItem::operator const char* () const
-{
-  return lua_tostring (state, argument_number);
-}
-
-StackItem::operator const void* () const
-{
-  return lua_touserdata (state, argument_number);
-}
+/*
+    Конструктор
+*/
 
 Stack::Stack (lua_State* in_state)
   : state (in_state)
 {
+  if (!state)
+    RaiseNullArgument ("script::lua::Stack::Stack", "state");
+}
+  
+/*
+    Помещение элементов базовых типов в стек
+*/
+
+namespace
+{
+
+//проверка возможности поместить в стек count аргументов 
+void check_stack (lua_State* state, size_t count = 1)
+{
+  if (!lua_checkstack (state, count))
+    Raise<StackOverflowException> ("script::lua::Stack::Push", "Not enough stack space."
+    "Attempt to push %u items in stack with %u items (stack_size=%u)", count, lua_gettop (state), LUAI_MAXCSTACK);
 }
 
-size_t Stack::Size () const
-{
-  return lua_gettop (state);
-}
-
-bool Stack::IsAvailable (size_t count) const
-{
-  if (lua_checkstack (state, count) != 0)
-    return true;
-  return false;
-}
-
-StackItem Stack::Get (int item_number) const
-{
-  if (item_number >= 0)
-    return StackItem (state, item_number + 1);
-  return StackItem (state, lua_gettop (state) + item_number + 1);
 }
 
 void Stack::Push (double arg)
 {
-  if (!IsAvailable (1))
-    Raise <Exception> ("Stack::Push", "Not enough stack space");
-  lua_pushnumber (state, arg);
-}        
-
-void Stack::Push (float arg)
-{
-  if (!IsAvailable (1))
-    Raise <Exception> ("Stack::Push", "Not enough stack space");
+  check_stack    (state);
   lua_pushnumber (state, arg);
 }        
 
 void Stack::Push (int arg)
 {
-  if (!IsAvailable (1))
-    Raise <Exception> ("Stack::Push", "Not enough stack space");
+  check_stack    (state);
   lua_pushinteger (state, arg);
 }
 
-void Stack::Push (size_t arg)
+void Stack::Push (const char* string)
 {
-  if (!IsAvailable (1))
-    Raise <Exception> ("Stack::Push", "Not enough stack space");
-  lua_pushinteger (state, arg);
-}
+  if (!string)
+    RaiseNullArgument ("script::lua::Stack::Push", "string");
 
-void Stack::Push (const char* arg)
-{
-  if (!IsAvailable (1))
-    Raise <Exception> ("Stack::Push", "Not enough stack space");
-  lua_pushstring (state, arg);
+  check_stack    (state);
+  lua_pushstring (state, string);
 }
 
 void Stack::Push (void* arg)
 {
-  if (!IsAvailable (1))
-    Raise <Exception> ("Stack::Push", "Not enough stack space");
+  check_stack           (state);
   lua_pushlightuserdata (state, arg);
 }
 
-void Stack::PushFunction (const char* f_name)
+void Stack::PushFunction (const char* function_name)
 {
-  if (!IsAvailable (1))
-    Raise <Exception> ("Stack::Push", "Not enough stack space");
-  lua_getglobal(state, f_name);
+  if (!function_name)
+    RaiseNullArgument ("script::lua::Stack::PushFunction", "function_name");
+
+  check_stack   (state);    
+  lua_getglobal (state, function_name);
 }
 
-void* Stack::Alloc (size_t size)
+/*
+    Получение из стека элементов базовых типов
+*/
+
+namespace
 {
-  void *ret_value = lua_newuserdata (state, size);
-  luaL_getmetatable(state, "iuser_data");
-  lua_setmetatable(state, -2);
-  return ret_value; 
+
+//проверка наличия элемента в стеке
+int get_item_index (lua_State* state, int index)
+{
+   //??????????
+   //сделать проверку корректности индекса (сверху и снизу)
+   
+  return index >= 0 ? index + 1 : lua_gettop (state) + index + 1;
 }
+
+}
+
+double Stack::GetDouble (int index) const
+{
+  return lua_tonumber (state, get_item_index (state, index));
+}
+
+int Stack::GetInteger (int index) const
+{
+  return lua_tointeger (state, get_item_index (state, index));
+}
+
+void* Stack::GetPointer (int index) const
+{
+  return lua_touserdata (state, get_item_index (state, index));
+}
+
+const char* Stack::GetString (int index) const
+{
+  return lua_tostring (state, get_item_index (state, index));
+}
+
+/*
+    Помещение/извлечение из стека пользовательского типа данных
+*/
+
+void* Stack::NewUserData (size_t size)
+{
+  void* buffer = lua_newuserdata (state, size);
+  
+  if (!buffer)
+    Raise<StackOverflowException> ("script::lua::Stack::NewUserData", "Failt allocation of %u bytes from lua stack", size);
+
+  luaL_getmetatable (state, USER_DATA_TAG);
+  lua_setmetatable  (state, -2);
+
+  return buffer;
+}
+
+IUserData* Stack::GetUserData (int index) const
+{
+  return reinterpret_cast<IUserData*> (luaL_checkudata (state, get_item_index (state, index), USER_DATA_TAG));
+}
+
+/*
+    Удаление из стека count элементов
+*/
 
 void Stack::Pop (size_t count)
 {
-  if (count > Size ())
-    lua_pop (state, (int)Size ());
-  else
-    lua_pop (state, (int)count);    
+  size_t stack_size = static_cast<size_t> (lua_gettop (state));
+
+  if (count > stack_size)
+    count = stack_size;
+
+  lua_pop (state, (int)count);
 }
