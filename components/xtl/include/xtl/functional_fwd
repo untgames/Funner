@@ -33,6 +33,9 @@ template <class Signature> class function;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Signature, class Accumulator> class signal;
 
+//аккумулятор по умолчанию для обработки сигналов
+template <class Result> struct default_signal_accumulator;
+
 }
 
 namespace tr1
