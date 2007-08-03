@@ -1,9 +1,9 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := SG_COMPONENTS
+TARGETS := SG_COMPONENTS SG_TESTS
 
-#Цель №1 - SG_COMPONENTS sources
+#Цель №1 - SG components sources
 SG_COMPONENTS.TYPE             := static-lib
 SG_COMPONENTS.NAME             := sg
 SG_COMPONENTS.INCLUDE_DIRS     := include ../commonlib/include ../xtl/include ../mathlib/include
@@ -12,3 +12,12 @@ SG_COMPONENTS.LIB_DIRS         :=
 SG_COMPONENTS.LIBS             :=
 SG_COMPONENTS.COMPILER_CFLAGS  :=
 SG_COMPONENTS.COMPILER_DEFINES := 
+
+#Цель №2 - SG tests
+SG_TESTS.TYPE             := test-suite
+SG_TESTS.INCLUDE_DIRS     := include ../commonlib/include ../xtl/include ../mathlib/include
+SG_TESTS.SOURCE_DIRS      := tests/core
+SG_TESTS.LIB_DIRS         :=
+SG_TESTS.LIBS             := sg commonlib
+SG_TESTS.COMPILER_CFLAGS  :=
+SG_TESTS.COMPILER_DEFINES := 

@@ -83,6 +83,15 @@ Entity::~Entity ()
 }
 
 /*
+    Создание объекта
+*/
+
+Entity* Entity::Create ()
+{
+  return new Entity;
+}
+
+/*
     Возвращение сцены, которой принадлежит объект
 */
 
@@ -111,6 +120,8 @@ void Entity::Rename (const char* name)
     RaiseNullArgument ("sg::Entity::Rename", "name");
     
   impl->name = name;
+  
+  UpdateNotify ();
 }
 
 /*
@@ -151,6 +162,13 @@ size_t Entity::UseCount () const
 void Entity::SetColor (const vec3f& color)
 {
   impl->color = color;
+  
+  UpdateNotify ();
+}
+
+void Entity::SetColor (float red, float green, float blue)
+{
+  SetColor (vec3f (red, green, blue));
 }
 
 const vec3f& Entity::Color () const
