@@ -1,0 +1,5 @@
+Results of entity_basic_test:
+name: 'entity1'
+color: [1 0 0]
+use count: 1
+entity 'entity1' destroyed
