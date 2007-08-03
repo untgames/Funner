@@ -145,8 +145,8 @@ class Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обход потомков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (Entity&)>       TraverseFunction;
-    typedef xtl::function<void (const Entity&)> ConstTraverseFunction;
+    typedef xtl::function<void (Entity*)>       TraverseFunction;
+    typedef xtl::function<void (const Entity*)> ConstTraverseFunction;
 
     void Traverse (const TraverseFunction&, EntityTraverseMode = EntityTraverseMode_Default);
     void Traverse (const ConstTraverseFunction&, EntityTraverseMode = EntityTraverseMode_Default) const;
@@ -216,7 +216,7 @@ class Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::signal<void (Entity&), xtl::default_signal_accumulator<void> > Signal;
+    typedef xtl::signal<void (Entity*), xtl::default_signal_accumulator<void> > Signal;
 
           Signal& Listeners (EntityEvent);
     const Signal& Listeners (EntityEvent) const;

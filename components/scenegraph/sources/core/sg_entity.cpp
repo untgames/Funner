@@ -398,7 +398,7 @@ void Entity::Traverse (const TraverseFunction& fn, EntityTraverseMode mode)
   switch (mode)
   {
     case EntityTraverseMode_BottomToTop:
-      fn (*this);
+      fn (this);
       break;
     case EntityTraverseMode_TopToBottom:
       break;
@@ -411,7 +411,7 @@ void Entity::Traverse (const TraverseFunction& fn, EntityTraverseMode mode)
     entity->Traverse (fn, mode);
     
   if (mode == EntityTraverseMode_BottomToTop)
-    fn (*this);
+    fn (this);
 }
 
 void Entity::Traverse (const ConstTraverseFunction& fn, EntityTraverseMode mode) const
@@ -419,7 +419,7 @@ void Entity::Traverse (const ConstTraverseFunction& fn, EntityTraverseMode mode)
   switch (mode)
   {
     case EntityTraverseMode_BottomToTop:
-      fn (*this);
+      fn (this);
       break;
     case EntityTraverseMode_TopToBottom:
       break;
@@ -432,7 +432,7 @@ void Entity::Traverse (const ConstTraverseFunction& fn, EntityTraverseMode mode)
     entity->Traverse (fn, mode);
 
   if (mode == EntityTraverseMode_BottomToTop)
-    fn (*this);
+    fn (this);
 }
 
 /*
@@ -799,7 +799,7 @@ void Entity::Notify (EntityEvent event)
 
   try
   {
-    impl->signals [event] (*this);
+    impl->signals [event] (this);
   }
   catch (...)
   {
