@@ -59,30 +59,47 @@ namespace
 //диспетчер вызовов
 int invoke_dispatch (lua_State* state)
 {
-  lua_getglobal (state, IMPL_NAME);
+  try
+  {
+    lua_getglobal (state, IMPL_NAME);
 
-  EnvironmentImpl* this_impl = reinterpret_cast<EnvironmentImpl*> (lua_touserdata (state, -1));
+    EnvironmentImpl* this_impl = reinterpret_cast<EnvironmentImpl*> (lua_touserdata (state, -1));
+    
+      //проверка корректности lua-переменной '__impl'
+    
+    if (!this_impl || this_impl->id != IMPL_ID)
+      Raise<RuntimeException> ("script::lua::invoke_dispatch", "Wrong '__impl' variable");
+
+    const char* function_name = lua_tostring (state, 1);
+    
+      //проверка наличия функции function_name
+
+    if (!function_name)
+      Raise<RuntimeException> ("script::lua::invoke_dispatch", "Null function name at call function '__recall'");
+
+    InvokerMap::iterator iter = this_impl->invokers.find (function_name);
+
+    if (iter == this_impl->invokers.end ())
+      Raise<RuntimeException> ("script::lua::invoke_dispatch", "Attempt to call unregistered function '%s'", function_name);
+
+      //собственно вызов функции
+
+    return (*iter->second.invoker) (detail::Stack (state));
+  }
+  catch (std::exception& exception)
+  {
+    //очищаем стек
+    //кладём текст исключения в стек
+    lua_error (state);
+  }
+  catch (...)
+  {
+    //очищаем стек
+    //кладём текст исключения в стек
+    lua_error (state);
+  }
   
-    //проверка корректности lua-переменной '__impl'
-  
-  if (!this_impl || this_impl->id != IMPL_ID)
-    Raise<RuntimeException> ("script::lua::invoke_dispatch", "Wrong '__impl' variable");
-
-  const char* function_name = lua_tostring (state, 1);
-  
-    //проверка наличия функции function_name
-
-  if (!function_name)
-    Raise<RuntimeException> ("script::lua::invoke_dispatch", "Null function name at call function '__recall'");
-
-  InvokerMap::iterator iter = this_impl->invokers.find (function_name);
-
-  if (iter == this_impl->invokers.end ())
-    Raise<RuntimeException> ("script::lua::invoke_dispatch", "Attempt to call unregistered function '%s'", function_name);
-
-    //собственно вызов функции
-
-  return (*iter->second.invoker) (detail::Stack (state));
+  return 0;
 }
 
 //функция обработки ошибок lua
