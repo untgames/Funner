@@ -1,6 +1,7 @@
 #ifndef SCENE_GRAPH_CAMERA_HEADER
 #define SCENE_GRAPH_CAMERA_HEADER
 
+#include <mathlib.h>
 #include <sg/entity.h>
 
 namespace sg
@@ -92,14 +93,18 @@ class OrthoCamera
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  SetXMag  (float x_mag);
-    void  SetYMag  (float y_mag);
-    void  SetZNear (float z_near);
-    void  SetZFar  (float z_far);
-    float XMag     () const;
-    float YMag     () const;
-    float ZNear    () const;
-    float ZFar     () const;
+    void  SetLeft   (float left);
+    void  SetRight  (float right);
+    void  SetTop    (float top);
+    void  SetBottom (float bottom);
+    void  SetZNear  (float z_near);
+    void  SetZFar   (float z_far);
+    float Left      () const;
+    float Right     () const;
+    float Top       () const;
+    float Bottom    () const;
+    float ZNear     () const;
+    float ZFar      () const;
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
