@@ -88,15 +88,13 @@ int invoke_dispatch (lua_State* state)
   }
   catch (std::exception& exception)
   {
-    //очищаем стек
-    //кладём текст исключения в стек
-    lua_error (state);
+    lua_pop    (state, lua_gettop (state));
+    luaL_error (state, "exception: %s", exception.what ());
   }
   catch (...)
   {
-    //очищаем стек
-    //кладём текст исключения в стек
-    lua_error (state);
+    lua_pop    (state, lua_gettop (state));
+    luaL_error (state, "unknown exception");
   }
   
   return 0;
@@ -105,7 +103,7 @@ int invoke_dispatch (lua_State* state)
 //функция обработки ошибок lua
 int error_handler (lua_State* state)
 {
-  Raise<RuntimeException> ("script::lua::error_handler", "Lua internal error (lua calls 'lua_atpanic' function)");
+  Raise<RuntimeException> ("script::lua::error_handler", "Lua internal error '%s' (lua calls 'lua_atpanic' function)", lua_tostring (state, -1));
 
   return 0;
 }
