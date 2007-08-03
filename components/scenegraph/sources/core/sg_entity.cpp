@@ -1,5 +1,6 @@
 #include <sg/entity.h>
 #include <stl/string>
+#include <xtl/signal.h>
 #include <common/exception.h>
 
 using namespace sg;
@@ -12,20 +13,32 @@ using namespace common;
 
 struct Entity::Impl
 {
-  sg::Scene*  scene;                     //сцена, которой принадлежит объект
-  stl::string name;                      //имя объекта
-  size_t      ref_count;                 //количество ссылок на объект
-  Entity*     parent;                    //родительский узел
-  Entity*     first_child;               //первый потомок
-  Entity*     last_child;                //последний потомок
-  Entity*     prev_child;                //предыдущий потомок
-  Entity*     next_child;                //следующий потомок
-  vec3f       color;                     //цвет объекта
-  Signal      signals [EntityEvent_Num]; //сигналы
-  vec3f       local_position;            //локальное положение в пространстве
-  quatf       local_orientation;         //локальная ориентация объекта
-  vec3f       local_scale;               //локальный масштаб объекта
-  bool        transform_inherit [EntityTransform_Num]; //флаги наследования преобразований  
+  sg::Scene*  scene;                            //сцена, которой принадлежит объект
+  stl::string name;                             //имя объекта
+  size_t      ref_count;                        //количество ссылок на объект
+  Entity*     parent;                           //родительский узел
+  Entity*     first_child;                      //первый потомок
+  Entity*     last_child;                       //последний потомок
+  Entity*     prev_child;                       //предыдущий потомок
+  Entity*     next_child;                       //следующий потомок
+  vec3f       color;                            //цвет объекта
+  Signal      signals [EntityEvent_Num];        //сигналы
+  bool        signal_process [EntityEvent_Num]; //флаги обработки сигналов
+  vec3f       local_position;                   //локальное положение в пространстве
+  quatf       local_orientation;                //локальная ориентация объекта
+  vec3f       local_scale;                      //локальный масштаб объекта
+  mat4f       local_tm;                         //матрица локальных преобразований
+  vec3f       world_position;                   //мировое положение в пространстве
+  quatf       world_orientation;                //мировая ориентация объекта
+  vec3f       world_scale;                      //мировой масштаб объекта
+  mat4f       world_tm;                         //матрица мировых преобразований
+  bool        orientation_inherit;              //флаг наследования родительской ориентации
+  bool        scale_inherit;                    //флаг наследования родительского масштаба
+  bool        need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
+  bool        need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
+  bool        need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
+  size_t      update_lock;                      //счётчик открытых транзакций обновления
+  bool        update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
 };
 
 /*
@@ -35,33 +48,36 @@ struct Entity::Impl
 Entity::Entity ()
   : impl (new Impl)
 {
-  impl->scene       = 0;    //по умолчанию объект не принадлежит ни одной сцене
-  impl->ref_count   = 1;
-  impl->parent      = 0;
-  impl->first_child = 0;
-  impl->last_child  = 0;
-  impl->prev_child  = 0;
-  impl->next_child  = 0;
+  impl->scene         = 0;    //по умолчанию объект не принадлежит ни одной сцене
+  impl->ref_count     = 1;
+  impl->parent        = 0;
+  impl->first_child   = 0;
+  impl->last_child    = 0;
+  impl->prev_child    = 0;
+  impl->next_child    = 0;
+  impl->update_lock   = 0;
+  impl->update_notify = false;
 
     //по умолчанию объект наследует все преобразования родителя
   
-  for (size_t i=0; i<EntityTransform_Num; i++)
-    impl->transform_inherit [i] = true;    
+  impl->orientation_inherit = true;
+  impl->scale_inherit       = true;
+  
+    //преобразования не рассчитаны
+
+  impl->need_world_transform_update = true;
+  impl->need_local_tm_update        = true;
+  impl->need_world_tm_update        = true;  
 }
 
 Entity::~Entity ()
 {
+    //разрываем иерархические связи
+
   UnbindAllChildren ();
   Unbind ();
-
-  try
-  {
-    impl->signals [EntityEvent_Destroyed] (*this);
-  }
-  catch (...)
-  {
-    //блокируем все возможные исключения
-  }
+  
+    //удаляем реализацию объекта
 
   delete impl;
 }
@@ -108,8 +124,19 @@ void Entity::AddRef ()
 
 void Entity::Release ()
 {
+    //защита от повторного удаления в обработчике
+
+  if (impl->signal_process [EntityEvent_Destroyed])
+    return;            
+
   if (!--impl->ref_count)
+  {
+      //оповещаем клиентов об удалении объекта
+
+    Notify (EntityEvent_Destroyed);
+
     delete this;
+  }
 }
 
 size_t Entity::UseCount () const
@@ -201,46 +228,61 @@ void Entity::Unbind (EntityBindMode mode)
 
 void Entity::Bind (AddRefFlag flag, Entity* parent, EntityBindMode mode)
 {
-  if (parent == impl->parent)
+    //защита от вызова Bind в обработчиках соответствующих событий
+
+  if (impl->signal_process [EntityEvent_Binded] || impl->signal_process [EntityEvent_Unbinded])
     return;
+
+  if (parent == impl->parent)
+    return;    
 
   switch (mode)
   {
     case EntityBindMode_SaveLocalTM:
+      break;
     case EntityBindMode_SaveWorldTM:
+      RaiseNotImplemented ("sg::Entity::Bind (mode=EntityBindMode_SaveWorldTM)");
       break;
     default:
-      RaiseInvalidArgument ("sg::Entity::Bind", "mode", "Wrong EntityBindMode %d", mode);
+      RaiseInvalidArgument ("sg::Entity::Bind", "mode", mode);
       break;
   }
   
     //проверка не присоединяется ли объект к своему потомку
     
-  for (Entity* entity=parent; entity; entity=entity->parent)
+  for (Entity* entity=parent; entity; entity=entity->impl->parent)
     if (entity == this)
       RaiseInvalidArgument ("sg::Entity::Bind", "parent", "Attempt to bind object to one of it's child");
+      
+    //оповещаем клиентов об отсоединении объекта от родителя
+      
+  Notify (EntityEvent_Unbinded);
 
     //отсоединям объект от родителя
     
   if (impl->parent)
   {
-    if (impl->prev_child) impl->prev_child->next_child = impl->next_child;
-    else                  impl->parent->first_child    = impl->next_child;
+    if (impl->prev_child) impl->prev_child->impl->next_child = impl->next_child;
+    else                  impl->parent->impl->first_child    = impl->next_child;
     
-    if (impl->next_child) impl->next_child->prev_child = impl->prev_child;
-    else                  impl->parent->last_child     = impl->prev_child;    
-  }  
+    if (impl->next_child) impl->next_child->impl->prev_child = impl->prev_child;
+    else                  impl->parent->impl->last_child     = impl->prev_child;    
+  }
   
+    //родительские преобразования требуют пересчёта
+
+  UpdateWorldTransformNotify ();
+
     //связываем объект с новым родителем
-  
+
   impl->parent = parent;
 
   if (!parent)
   {
     impl->prev_child = impl->next_child = 0;
-
+    
     if (impl->scene)
-      SetScene (0);
+      SetScene (0);      
 
     return;
   }
@@ -251,18 +293,24 @@ void Entity::Bind (AddRefFlag flag, Entity* parent, EntityBindMode mode)
     parent->AddRef ();
 
     //регистрируем объект в списке потомков родителя
+    
+  Impl* parent_impl = parent->impl;
 
-  impl->prev_child   = parent->last_child;
+  impl->prev_child   = parent_impl->last_child;
   impl->next_child   = 0;
-  parent->last_child = this;
+  parent->impl->last_child = this;
 
-  if (impl->prev_child) impl->prev_child->next_child = this;
-  else                  parent->first_child          = this;
+  if (impl->prev_child) impl->prev_child->impl->next_child = this;
+  else                  parent_impl->first_child          = this;
 
     //обновление указателя на сцену в потомках
 
-  if (impl->scene != parent->scene)
-    SetScene (parent->scene);
+  if (impl->scene != parent_impl->scene)
+    SetScene (parent_impl->scene);
+
+      //оповещаем клиентов о присоединении объекта к новому родителю
+
+  Notify (EntityEvent_Binded);
 }
 
 void Entity::UnbindAllChildren ()
@@ -276,6 +324,520 @@ void Entity::SetScene (sg::Scene* scene)
 {
   impl->scene = scene;
   
-  for (Entity* entity=first_child; entity; entity=entity->next_child)
+  for (Entity* entity=impl->first_child; entity; entity=entity->impl->next_child)
     entity->SetScene (scene);
+}
+
+/*
+    Поиск потомка по имени
+*/
+
+Entity* Entity::FindChild (const char* name, EntityFindMode mode) //no throw
+{
+  return const_cast<Entity*> (const_cast<const Entity&> (*this).FindChild (name, mode));
+}
+
+const Entity* Entity::FindChild (const char* name, EntityFindMode mode) const //no throw
+{
+  if (!name)
+    RaiseNullArgument ("sg::Entity::FindChild", "name");
+    
+  switch (mode)
+  {
+    case EntityFindMode_OnNextSublevel:
+      for (Entity* entity=impl->first_child; entity; entity=impl->next_child)
+        if (name == entity->impl->name)
+          return entity;
+
+      break;    
+    case EntityFindMode_OnAllSublevels:
+      for (Entity* entity=impl->first_child; entity; entity=impl->next_child)
+      {
+        if (name == entity->impl->name)
+          return entity;
+        
+        Entity* child = entity->FindChild (name, mode);
+        
+        if (child)
+          return child;
+      }
+
+      break;
+    default:
+      RaiseInvalidArgument ("sg::Entity::FindChild", "mode", mode);
+      break;
+  }
+
+  return 0;  
+}
+
+/*
+    Обход потомков
+*/
+
+void Entity::Traverse (const TraverseFunction& fn, EntityTraverseMode mode)
+{
+  switch (mode)
+  {
+    case EntityTraverseMode_BottomToTop:
+      fn (*this);
+      break;
+    case EntityTraverseMode_TopToBottom:
+      break;
+    default:
+      RaiseInvalidArgument ("sg::Entity::Traverse", "mode", mode);
+      break;
+  }
+  
+  for (Entity* entity=impl->first_child; entity; entity=entity->impl->next_child)
+    entity->Traverse (fn, mode);
+    
+  if (mode == EntityTraverseMode_BottomToTop)
+    fn (*this);
+}
+
+void Entity::Traverse (const ConstTraverseFunction& fn, EntityTraverseMode mode) const
+{
+  switch (mode)
+  {
+    case EntityTraverseMode_BottomToTop:
+      fn (*this);
+      break;
+    case EntityTraverseMode_TopToBottom:
+      break;
+    default:
+      RaiseInvalidArgument ("sg::Entity::Traverse", "mode", mode);
+      break;
+  }
+
+  for (const Entity* entity=impl->first_child; entity; entity=entity->impl->next_child)
+    entity->Traverse (fn, mode);
+
+  if (mode == EntityTraverseMode_BottomToTop)
+    fn (*this);
+}
+
+/*
+    Оповещение о необходимости пересчёта мировых преобразований / пересчёт мировых преобразований
+*/
+
+inline void Entity::UpdateWorldTransformNotify ()
+{
+  if (impl->need_world_transform_update)
+    return;
+
+  impl->need_world_transform_update = true;
+  impl->need_world_tm_update        = true;
+
+  UpdateNotify ();
+  
+    //оповещение всех потомков о необходимости пересчёта мировых преобразований
+  
+  for (Entity* entity=impl->first_child; entity; entity=entity->impl->next_child)
+    entity->UpdateWorldTransformNotify ();
+}
+
+inline void Entity::UpdateLocalTransformNotify ()
+{
+  impl->need_local_tm_update = true;
+  
+  UpdateWorldTransformNotify ();
+}
+
+void Entity::UpdateWorldTransform () const
+{
+  if (impl->parent)
+  {
+    Entity* parent = impl->parent;
+    
+    const quatf& parent_orientation = parent->WorldOrientation ();
+    
+    if (impl->orientation_inherit) impl->world_orientation = parent_orientation * impl->local_orientation;
+    else                           impl->world_orientation = impl->local_orientation;
+
+    const vec3f& parent_scale = parent->WorldScale ();
+
+    if (impl->scale_inherit) impl->world_scale = parent_scale * impl->local_scale;
+    else                     impl->world_scale = impl->local_scale;
+    
+    impl->world_position = parent_orientation * (parent_scale * impl->local_position) + parent->WorldPosition ();
+  }
+  else
+  {
+    impl->world_orientation = impl->local_orientation;
+    impl->world_position    = impl->local_position;
+    impl->world_scale       = impl->local_scale;
+  }
+
+  impl->need_world_transform_update = false;
+}
+
+/*
+    Положение объекта
+*/
+
+void Entity::SetPosition (const vec3f& position)
+{
+  impl->local_position = position;
+
+  UpdateLocalTransformNotify ();
+}
+
+void Entity::SetPosition  (float x, float y, float z)
+{
+  SetPosition (vec3f (x, y, z));
+}
+
+void Entity::ResetPosition ()
+{
+  SetPosition (vec3f (0.0f));
+}
+
+const vec3f& Entity::Position () const
+{
+  return impl->local_position;
+}
+
+const vec3f& Entity::WorldPosition () const
+{
+  if (impl->need_world_transform_update)
+    UpdateWorldTransform ();
+    
+  return impl->world_position;
+}
+
+/*
+    Ориентация объекта
+*/
+
+void Entity::SetOrientation (const quatf& orientation)
+{
+  impl->local_orientation = orientation;
+  
+  UpdateLocalTransformNotify ();
+}
+
+void Entity::SetOrientation (float angle_in_degrees, float axis_x, float axis_y, float axis_z)
+{
+  SetOrientation (fromAxisAnglef (angle_in_degrees, axis_x, axis_y, axis_z));
+}
+
+void Entity::SetOrientation (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees)
+{
+  SetOrientation (fromEulerAnglef (pitch_in_degrees, yaw_in_degrees, roll_in_degrees));
+}
+
+void Entity::ResetOrientation ()
+{
+  SetOrientation (quatf ());
+}
+
+const quatf& Entity::Orientation () const
+{
+  return impl->local_orientation;
+}
+
+const quatf& Entity::WorldOrientation () const
+{
+  if (impl->need_world_transform_update)
+    UpdateWorldTransform ();
+    
+  return impl->world_orientation;
+}
+
+/*
+    Масштаб объекта
+*/
+
+void Entity::SetScale (const vec3f& scale)
+{
+  impl->local_scale = scale;
+  
+  UpdateLocalTransformNotify ();
+}
+
+void Entity::SetScale (float sx, float sy, float sz)
+{
+  SetScale (vec3f (sx, sy, sz));
+}
+
+void Entity::ResetScale ()
+{
+  SetScale (vec3f (1.0f));
+}
+
+const vec3f& Entity::Scale () const
+{
+  return impl->local_scale;
+}
+
+const vec3f& Entity::WorldScale () const
+{
+  if (impl->need_world_transform_update)
+    UpdateWorldTransform ();
+    
+  return impl->world_scale;
+}
+
+/*
+    Управление наследованием преобразований
+*/
+
+//установка флага наследования родительской ориентации
+void Entity::SetOrientationInherit (bool state)
+{
+  impl->orientation_inherit = state;
+}
+
+//наследуется ли родительская ориентация
+bool Entity::IsOrientationInherited () const
+{
+  return impl->orientation_inherit;
+}
+
+//установка флага наследования родительского масштаба
+void Entity::SetScaleInherit (bool state)
+{
+  impl->scale_inherit = state;
+}
+
+//наследуется ли родительский масштаб
+bool Entity::IsScaleInherited () const
+{
+  return impl->scale_inherit;
+}
+
+/*
+    Кумулятивные преобразования
+*/
+
+void Entity::Translate (const math::vec3f& offset, EntityTransformSpace space)
+{
+  switch (space) 
+  {
+    case EntityTransformSpace_Local:
+      impl->local_position += impl->local_orientation * offset;
+      break;
+    case EntityTransformSpace_Parent:
+      impl->local_position += offset;
+      break;
+    case EntityTransformSpace_World:
+      if (impl->parent) impl->local_position += invert (impl->parent->WorldOrientation ()) * offset; 
+      else              impl->local_position += offset;
+
+      break;
+    default:
+      RaiseInvalidArgument ("sg::Entity::Translate", "space", space);
+      break;
+  }
+  
+  UpdateLocalTransformNotify ();
+}
+
+void Entity::Translate (float offset_x, float offset_y, float offset_z, EntityTransformSpace space)
+{
+  Translate (vec3f (offset_x, offset_y, offset_z));
+}
+
+void Entity::Rotate (const math::quatf& q, EntityTransformSpace space)
+{
+  switch (space)
+  {
+    case EntityTransformSpace_Local:
+      impl->local_orientation *= q;
+      break;    
+    case EntityTransformSpace_Parent:
+      impl->local_orientation = q * impl->local_orientation;
+      break;
+    case EntityTransformSpace_World:
+    {
+      const quatf& world_orientation = WorldOrientation ();
+
+      impl->local_orientation = impl->local_orientation * invert (world_orientation) * q * world_orientation;
+      break;
+    }      
+    default:
+      RaiseInvalidArgument ("sg::Entity::Rotate", "space", space);
+      break;
+  }
+
+  UpdateLocalTransformNotify ();
+}
+
+void Entity::Rotate (float angle_in_degrees, float axis_x, float axis_y, float axis_z, EntityTransformSpace space)
+{
+  Rotate (fromAxisAnglef (angle_in_degrees, axis_x, axis_y, axis_z), space);
+}
+
+void Entity::Rotate (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees, EntityTransformSpace space)
+{
+  Rotate (fromEulerAnglef (pitch_in_degrees, yaw_in_degrees, roll_in_degrees), space);
+}
+
+void Entity::Scale (const math::vec3f& scale)
+{
+  impl->local_scale *= scale;  
+  
+  UpdateLocalTransformNotify ();
+}
+
+void Entity::Scale (float sx, float sy, float sz)
+{
+  Scale (vec3f (sx, sy, sz));
+}
+
+/*
+    Получение матриц преобразования объекта
+*/
+
+namespace
+{
+
+//композиция преобразований
+void affine_compose (const vec3f& position, const quatf& orientation, const vec3f& scale, mat4f& tm)
+{
+  tm = math::translate (position) * mat4f (orientation) * math::scale (scale);
+}
+
+}
+
+const mat4f& Entity::TransformationMatrix (EntityTransformSpace space) const
+{
+  static mat4f identity;
+
+  switch (space)
+  {
+    case EntityTransformSpace_Local:
+      if (impl->need_local_tm_update)
+      {
+        affine_compose (impl->local_position, impl->local_orientation, impl->local_scale, impl->local_tm);
+
+        impl->need_local_tm_update = false;
+      }
+
+      return impl->local_tm;
+    case EntityTransformSpace_Parent:
+      return impl->parent ? impl->parent->TransformationMatrix (EntityTransformSpace_World) : identity;
+    case EntityTransformSpace_World:
+      if (impl->need_world_tm_update)
+      {
+        affine_compose (WorldPosition (), WorldOrientation (), WorldScale (), impl->world_tm);
+
+        impl->need_world_tm_update = false;
+      }
+
+      return impl->world_tm;
+    default:
+      RaiseInvalidArgument ("sg::Entity::TransformationMatrix", "space", space);
+      return identity;
+  } 
+}
+
+/*
+    Получение матрицы преобразования объекта object в системе координат данного объекта
+*/
+
+mat4f Entity::ObjectTM (Entity* object) const
+{
+  if (!object)
+    RaiseNullArgument ("sg::Entity::ObjectTM", "object");
+    
+  return invert (WorldTM ()) * object->WorldTM ();
+}
+
+/*
+    Подписка на события Entity
+*/
+
+Entity::Signal& Entity::Listeners (EntityEvent event)
+{
+  return const_cast<Signal&> (const_cast<const Entity&> (*this).Listeners (event));
+}
+
+const Entity::Signal& Entity::Listeners (EntityEvent event) const
+{
+  if (event < 0 || event >= EntityEvent_Num)
+    RaiseInvalidArgument ("sg::Entity::Listeners", "event", event);
+    
+  return impl->signals [event];
+}
+
+/*
+    Оповещение клиентов о наступлении события
+*/
+
+void Entity::Notify (EntityEvent event)
+{
+    //проверяем нет ли рекурсивного вызова
+
+  if (impl->signal_process [event])
+    return;
+    
+    //устанавливаем флаг обработки события
+
+  impl->signal_process [event] = true;
+  
+    //вызываем обработчики событий
+
+  try
+  {
+    impl->signals [event] (*this);
+  }
+  catch (...)
+  {
+    //все исключения клиентских обработчиков событий объекта поглощаются
+  }
+  
+    //снимаем флаг обработки события
+  
+  impl->signal_process [event] = false;
+}
+
+/*
+    Управление транзакциями обновления
+*/
+
+void Entity::BeginUpdate ()
+{
+  impl->update_lock++;
+}
+
+void Entity::EndUpdate ()
+{
+  if (!impl->update_lock)
+    RaiseNotSupported ("sg::Entity::EndUpdate", "Attempt to call EndUpdate without previous BeginUpdate call");  
+    
+  if (!--impl->update_lock)
+  {
+      //если во время транзакции обновления объект изменялся - оповещаем клиентов об изменениях
+    
+    if (impl->update_notify)
+    {
+      Notify (EntityEvent_Updated);
+      
+      impl->update_notify = false;
+    }
+  }
+}
+
+bool Entity::IsInUpdateTransaction () const
+{
+  return impl->update_lock > 0;  
+}
+
+//оповещение об изменении объекта
+void Entity::UpdateNotify ()
+{
+    //если объект не находится в транзакции обновления - оповещаем клиентов об изменениях
+
+  if (!impl->update_lock)
+  {
+    Notify (EntityEvent_Updated);
+    return;
+  }
+
+    //иначе устанавливаем флаг, сигнализирующий о необходимости оповещения клиентов об изменениях по завершении транзакци
+    //обновления
+
+  impl->update_notify = true;    
 }

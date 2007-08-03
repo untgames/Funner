@@ -41,18 +41,6 @@ enum EntityFindMode
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вид преобразований объекта
-///////////////////////////////////////////////////////////////////////////////////////////////////
-enum EntityTransform
-{
-  EntityTransform_Position,    //положение объекта в пространстве
-  EntityTransform_Orientation, //ориентация объекта в пространстве
-  EntityTransform_Scale,       //масштаб объекта
-  
-  EntityTransform_Num
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Пространство преобразований объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum EntityTransformSpace
@@ -71,7 +59,7 @@ enum EntityTraverseMode
   EntityTraverseMode_BottomToTop,      //обход объектов от потомков к родителям
   
   EntityTraverseMode_Default = EntityTraverseMode_TopToBottom
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///События объекта
@@ -157,21 +145,23 @@ class Entity
     void Traverse (const ConstTraverseFunction&, EntityTraverseMode = EntityTraverseMode_Default) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Положение объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void               SetPosition   (const math::vec3f&);
+    void               SetPosition   (float x, float y, float z);
+    void               ResetPosition ();
+    const math::vec3f& Position      () const;
+    const math::vec3f& WorldPosition () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ориентация объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetOrientation   (const math::quatf&);
     void               SetOrientation   (float angle_in_degrees, float axis_x, float axis_y, float axis_z);
     void               SetOrientation   (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees); //углы Эйлера
     void               ResetOrientation ();
-    const math::quatf& Orientation      (EntityTransformSpace = EntityTransformSpace_Local) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Положение объекта
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetPosition   (const math::vec3f&);
-    void               SetPosition   (float x, float y, float z);
-    void               ResetPosition ();
-    const math::vec3f& Position      (EntityTransformSpace = EntityTransformSpace_Local) const;
+    const math::quatf& Orientation      () const;
+    const math::quatf& WorldOrientation () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Масштаб объекта
@@ -179,20 +169,17 @@ class Entity
     void               SetScale   (const math::vec3f&);
     void               SetScale   (float sx, float sy, float sz);
     void               ResetScale ();
-    const math::vec3f& Scale      (EntityTransformSpace = EntityTransformSpace_Local) const;
+    const math::vec3f& Scale      () const;
+    const math::vec3f& WorldScale () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Центр объекта
+///Управление наследованием преобразований
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetPivot (const math::mat4f&);
-    const math::mat4f& Pivot    () const;
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Наследование преобразований
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetTransformInherit  (EntityTransform, bool state);
-    bool IsTransformInherited (EntityTransform) const;
-    
+    void SetOrientationInherit  (bool state); //установка флага наследования родительской ориентации
+    void SetScaleInherit        (bool state); //установка флага наследования родительского масштаба
+    bool IsOrientationInherited () const;     //наследуется ли родительская ориентация
+    bool IsScaleInherited       () const;     //наследуется ли родительский масштаб
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Кумулятивные преобразования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,8 +188,8 @@ class Entity
     void Rotate    (const math::quatf&, EntityTransformSpace = EntityTransformSpace_Parent);
     void Rotate    (float angle_in_degrees, float axis_x, float axis_y, float axis_z, EntityTransformSpace = EntityTransformSpace_Parent);
     void Rotate    (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees, EntityTransformSpace = EntityTransformSpace_Parent);
-    void Scale     (const math::vec3f&, EntityTransformSpace = EntityTransformSpace_Parent);
-    void Scale     (float sx, float sy, float sz, EntityTransformSpace = EntityTransformSpace_Parent);
+    void Scale     (const math::vec3f&);
+    void Scale     (float sx, float sy, float sz);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение матриц преобразования объекта
@@ -215,14 +202,14 @@ class Entity
     const math::mat4f& ParentTM () const { return TransformationMatrix (EntityTransformSpace_Parent); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение матрицы преобразования объекта в системе координат другого объекта
+///Получение матрицы преобразования объекта object в системе координат данного объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    math::mat4f RelativeTM (Entity* parent) const;
+    math::mat4f ObjectTM (Entity* object) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::signal<void (Entity&)> Signal;
+    typedef xtl::signal<void (Entity&), xtl::default_signal_accumulator<void> > Signal;
 
           Signal& Listeners (EntityEvent);
     const Signal& Listeners (EntityEvent) const;
@@ -244,21 +231,16 @@ class Entity
     virtual ~Entity ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Оповещения об обновлениях
+///Оповещение об изменении объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void UpdateNotify ();
     
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сообщение посылаемое при завершении транзакции обновления
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void EndUpdateNotify () {}
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вспомогательные методы
-///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetScene (sg::Scene*);
-    bool IsBindPossible (Entity* parent) const;
+    void UpdateWorldTransformNotify ();
+    void UpdateLocalTransformNotify ();
+    void UpdateWorldTransform () const;
+    void Notify (EntityEvent);
 
   private:
     Entity (const Entity&); //no impl
@@ -275,16 +257,33 @@ class Entity
 class EntityUpdateLock
 {
   public:
-    EntityUpdateLock  ();
-    EntityUpdateLock  (Entity&);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    EntityUpdateLock  (Entity* = 0);
     EntityUpdateLock  (const EntityUpdateLock&);
     ~EntityUpdateLock ();
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
     EntityUpdateLock& operator = (const EntityUpdateLock&);
-  
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Swap (EntityUpdateLock&);
+
   private:
     Entity* entity;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void swap (EntityUpdateLock&, EntityUpdateLock&);
+
+#include <sg/detail/entity.inl>
 
 }
 
