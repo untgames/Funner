@@ -114,10 +114,10 @@ const char* Entity::Name () const
   return impl->name.c_str ();
 }
 
-void Entity::Rename (const char* name)
+void Entity::SetName (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("sg::Entity::Rename", "name");
+    RaiseNullArgument ("sg::Entity::SetName", "name");
     
   impl->name = name;
   
