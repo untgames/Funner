@@ -1,0 +1,7 @@
+Results of entity_orientation test:
+set orientation quatf result: [14.4 17.1 -6.66 34.7]
+set orientation 4 float result: [-0 -0.687951 -0.155131 0.708983]
+set orientation 3 float result: [0.502764 0.100925 0.165962 0.842318]
+world orientation result: [0.502764 0.100925 0.165962 0.842318]
+reset orientation result: [0 0 0 0]
+world orientation result: [0 0 0 0]
