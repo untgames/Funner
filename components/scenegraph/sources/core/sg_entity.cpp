@@ -364,7 +364,7 @@ const Entity* Entity::FindChild (const char* name, EntityFindMode mode) const //
   {
     case EntityFindMode_OnNextSublevel:
       for (Entity* entity=impl->first_child; entity; entity=impl->next_child)
-        if (name == entity->impl->name)
+        if (entity->impl->name == name)
           return entity;
 
       break;    
