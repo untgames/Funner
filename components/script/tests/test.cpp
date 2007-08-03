@@ -62,6 +62,21 @@ int main ()
     printf ("\nTesting of calling Lua function which is binded C function from C:\n");
     printf ("Lua call of binded function result: %f\n", script.Invoke<float> ("my_c_func3", my_struct));
 
+    if (script.HasFunction ("my_c_func"))
+      printf ("my_c_func founded\n");
+    else
+      printf ("my_c_func not founded\n");
+
+    if (script.HasFunction ("my_c_func15"))
+      printf ("my_c_func15 founded\n");
+    else
+      printf ("my_c_func15 not founded\n");
+
+    if (script.HasFunction ("my_lua"))
+      printf ("my_lua founded\n");
+    else
+      printf ("my_lua not founded\n");
+
     delete my_struct;
   }
   catch (std::exception& exception)
@@ -69,6 +84,11 @@ int main ()
     printf ("exception: %s\n",exception.what ());
     return 1;
   }                                               
+  catch (char* exception)
+  {
+    printf ("%s", exception);
+    return 1;
+  }
   catch (...)
   {
     printf ("unknown exception\n");

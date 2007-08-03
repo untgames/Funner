@@ -14,7 +14,7 @@ namespace
 
 const char*  INVOKE_DISPATCH_NAME = "___recall"; //имя функции диспетчеризации в lua
 const char*  IMPL_NAME            = "___impl";   //имя переменной, содержащей указатель на реализацию lua
-const size_t IMPL_ID               = 0xDEADBEEF;  //идентификатор реализации lua
+const size_t IMPL_ID              = 0xDEADBEEF;  //идентификатор реализации lua
 
 }
 
@@ -22,8 +22,14 @@ const size_t IMPL_ID               = 0xDEADBEEF;  //идентификатор реализации lua
     Описание реализации окружения Lua
 */
 
+struct InvokerData
+{
+  detail::Invoker* invoker;
+  stl::string      function;
+};
+
 //карта обработчиков вызова
-typedef stl::hash_map<stl::hash_key<const char*>, detail::Invoker*> InvokerMap;
+typedef stl::hash_map<stl::hash_key<const char*>, InvokerData> InvokerMap;
 
 namespace script
 {
@@ -76,7 +82,7 @@ int invoke_dispatch (lua_State* state)
 
     //собственно вызов функции
 
-  return (*iter->second) (detail::Stack (state));
+  return (*iter->second.invoker) (detail::Stack (state));
 }
 
 //функция обработки ошибок lua
@@ -134,9 +140,10 @@ Environment::Environment ()
 
       //регистрация диспетчера вызовов
     
-    lua_pushcfunction     (impl->state, &invoke_dispatch);
-    lua_setglobal         (impl->state, INVOKE_DISPATCH_NAME);
-    lua_pushlightuserdata (impl->state, impl); //сделать через полноценный user data с проверкой типа!!!
+    lua_pushcfunction (impl->state, &invoke_dispatch);
+    lua_setglobal     (impl->state, INVOKE_DISPATCH_NAME);
+
+    lua_pushlightuserdata (impl->state, impl);
     lua_setglobal         (impl->state, IMPL_NAME);  
   }
   catch (...)
@@ -145,6 +152,48 @@ Environment::Environment ()
     throw;
   }
 }
+
+/*void Environment::Restart ()
+{
+  lua_close (impl->state);
+
+//
+//   Инициализация (!!повтор!!)
+//
+  impl->state = lua_open ();
+
+  if (!impl->state)
+    Raise<ScriptException> ("script::lua::Environment::Environment", "Can't create lua state");
+
+    //убрать!!!!!!!
+  
+  luaL_openlibs (impl->state);
+  
+    //регистрация обработчиков удаления пользовательских типов данных    
+    
+  static const luaL_reg user_data_meta_table [] = {{"__gc", &user_data_destroyer}, {0,0}};    
+
+  luaL_newmetatable (impl->state, USER_DATA_TAG);
+  luaL_openlib      (impl->state, 0, user_data_meta_table, 0);
+  
+    //регистрация функции обработки ошибок
+
+  lua_atpanic (impl->state, &error_handler);
+
+    //регистрация диспетчера вызовов
+  
+  lua_pushcfunction (impl->state, &invoke_dispatch);
+  lua_setglobal     (impl->state, INVOKE_DISPATCH_NAME);
+
+  lua_pushlightuserdata (impl->state, impl);
+  lua_setglobal         (impl->state, IMPL_NAME);  
+
+//
+//   Регистрация функций
+//
+  for (InvokerMap::iterator iter=impl->invokers.begin (); iter!=impl->invokers.end (); ++iter)
+    DoString (iter->second.function.c_str());
+}*/
 
 Environment::~Environment ()
 {
@@ -195,10 +244,6 @@ void Environment::RegisterFunctionCore (const char* name, detail::Invoker* invok
     if (!invoker)
       RaiseNullArgument ("script::lua::Environment::RegisterFunction", "invoker");
       
-      //добавление обработчика в карту обработчиков
-
-    impl->invokers [name] = invoker;
-    
       //генерация функции-оболочки, вызывающей диспетчер обработки вызовов
 
     stl::string args;
@@ -235,6 +280,10 @@ void Environment::RegisterFunctionCore (const char* name, detail::Invoker* invok
     
     generated_function += ")\n end";
 
+      //добавление обработчика в карту обработчиков
+    InvokerData invoker_data = {invoker, generated_function};
+    impl->invokers [name] = invoker_data;
+    
     DoString (generated_function.c_str());
   }
   catch (...)
@@ -254,7 +303,7 @@ void Environment::UnregisterFunction (const char* name) //no throw
   if (iter == impl->invokers.end ())
     return;
 
-  delete iter->second;
+  delete iter->second.invoker;
 
   impl->invokers.erase (iter);
 }
@@ -262,7 +311,7 @@ void Environment::UnregisterFunction (const char* name) //no throw
 void Environment::UnregisterAllFunctions () //no throw
 {
   for (InvokerMap::iterator iter=impl->invokers.begin (); iter!=impl->invokers.end (); ++iter)
-    delete iter->second;
+    delete iter->second.invoker;
 
   impl->invokers.clear ();
 }
@@ -272,7 +321,9 @@ bool Environment::HasFunction (const char* name) const //no throw
   if (!name)
     return false;
 
-  //сделать!!!!!!!проверку наличия функции в контексте луа (включая имена функций, в скриптах)
+  lua_getglobal (impl->state, name);
+  if (lua_isfunction (impl->state, -1))
+    return true;
   return false;
 }
 
