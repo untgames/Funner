@@ -1557,51 +1557,39 @@ inline bool basic_string<T,Traits,Alloc>::operator >= (const value_type* s) cons
 }
 
 template <class T,class Traits,class Alloc>
-inline bool operator == 
- (const typename basic_string<T,Traits,Alloc>::value_type* x,
-  const basic_string<T,Traits,Alloc>&                      y)
+inline bool operator == (const T* x, const basic_string<T,Traits,Alloc>& y)
 {
   size_t count = basic_string<T,Traits,Alloc>::traits_type::length (x);
   return y.size() == count && !basic_string<T,Traits,Alloc>::traits_type::compare (y.data (),x,count);
 }
 
 template <class T,class Traits,class Alloc>
-inline bool operator < 
- (const typename basic_string<T,Traits,Alloc>::value_type* x,
-  const basic_string<T,Traits,Alloc>&                      y)
+inline bool operator < (const T* x, const basic_string<T,Traits,Alloc>& y)
 {
   size_t count = basic_string<T,Traits,Alloc>::traits_type::length (x);
   return basic_string<T,Traits,Alloc>::_compare (y.start,y.finish,x,x+count) < 0;
 }
 
 template <class T,class Traits,class Alloc>
-inline bool operator != 
- (const typename basic_string<T,Traits,Alloc>::value_type* x,
-  const basic_string<T,Traits,Alloc>&                      y)
+inline bool operator != (const T* x, const basic_string<T,Traits,Alloc>& y)
 {
   return !(x == y);
 }
 
 template <class T,class Traits,class Alloc>
-inline bool operator > 
- (const typename basic_string<T,Traits,Alloc>::value_type* x,
-  const basic_string<T,Traits,Alloc>&                      y)
+inline bool operator > (const T* x, const basic_string<T,Traits,Alloc>& y)
 {
   return y < x;
 }
 
 template <class T,class Traits,class Alloc>
-inline bool operator <= 
- (const typename basic_string<T,Traits,Alloc>::value_type* x,
-  const basic_string<T,Traits,Alloc>&                      y)
+inline bool operator <= (const T* x, const basic_string<T,Traits,Alloc>& y)
 {
   return !(y < x);
 }
 
 template <class T,class Traits,class Alloc>
-inline bool operator >= 
- (const typename basic_string<T,Traits,Alloc>::value_type* x,
-  const basic_string<T,Traits,Alloc>&                      y)
+inline bool operator >= (const T* x, const basic_string<T,Traits,Alloc>& y)
 {
   return !(x < y);
 }
