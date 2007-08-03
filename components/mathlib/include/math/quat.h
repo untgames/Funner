@@ -118,6 +118,10 @@ bool equal (const quat<type>&,const quat<type>&,const type& eps);
 template <class type>
 type inner (const quat<type>&,const quat<type>&);
 
+///Обратный кватернион
+template <class type>
+quat<type> invert (const quat<type>&);
+
 }
 
 #endif

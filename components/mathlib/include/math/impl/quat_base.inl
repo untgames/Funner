@@ -160,3 +160,20 @@ void  quat_mul_vec (vec<T,4>& res,const quat<T>& q,const vec<T,4>& v)
 
   vec_div_scalar (res,res,quat_norm (q));
 }
+
+template <class T>
+void quat_invert (quat<T>& res, const quat<T>& src)
+{
+  T norm = quat_norm (src);
+  
+  if (norm > T (0))
+  {
+    T inv_norm = T (1) / norm;
+    
+    res.w =  src.w * inv_norm;
+    res.x = -src.x * inv_norm;
+    res.y = -src.y * inv_norm;
+    res.z = -src.z * inv_norm;
+  }
+  else res.x = res.y = res.z = res.w = T (0);
+}

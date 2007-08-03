@@ -144,6 +144,9 @@ template <class T> T     quat_length    (const quat<T>&);
 template <class T> T     quat_norm      (const quat<T>&);
 template <class T> void  quat_normalize (quat<T>& res,const quat<T>& src);
 
+///ќпределение кватерниона обратного данному
+template <class T> void quat_invert (quat<T>& res,const quat<T>& src);
+
 ///—кал€рное произведение
 template <class T> T quat_inner (const quat<T>& a,const quat<T>& b);
 

@@ -86,7 +86,7 @@ inline T quat<T>::operator ~ () const
 template <class T>
 inline const quat<T> quat<T>::operator - () const
 {
-  return quat (*this,quat_length<T>);
+  return quat (*this,quat_neg<T>);
 }
 
 template <class T>
@@ -220,3 +220,8 @@ inline T inner (const quat<T>& a,const quat<T>& b)
   return quat_inner (a,b);
 }
 
+template <class T>
+inline quat<T> invert (const quat<T>& q)
+{
+  return quat<T> (q,quat_invert<T>);
+}
