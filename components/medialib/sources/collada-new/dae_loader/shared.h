@@ -99,6 +99,7 @@ class DaeParser
     void ParseSurface             (Parser::Iterator, Parser::Iterator mesh_iter, Mesh& mesh, PrimitiveType type, MeshSourceMap& sources);
     void ParseSurfaceBuffers      (Parser::Iterator, Parser::Iterator surface_iter, SurfaceInfo& info);
     void ParseController          (Parser::Iterator);
+    void ParseMorph               (Parser::Iterator, const char* id);
     void ParseSkin                (Parser::Iterator, Skin& skin);
     void ParseLight               (Parser::Iterator);
     void ParseCamera              (Parser::Iterator);

@@ -3,6 +3,7 @@
 
 #include <xtl/functional_fwd>
 #include <media/collada/scene.h>
+#include <media/collada/morph.h>
 #include <media/collada/skin.h>
 
 namespace medialib
@@ -20,6 +21,7 @@ struct ModelImpl;
 typedef ILibrary<Effect>   EffectLibrary;
 typedef ILibrary<Material> MaterialLibrary;
 typedef ILibrary<Mesh>     MeshLibrary;
+typedef ILibrary<Morph>    MorphLibrary;
 typedef ILibrary<Skin>     SkinLibrary;
 typedef ILibrary<Light>    LightLibrary;
 typedef ILibrary<Camera>   CameraLibrary;
@@ -68,7 +70,8 @@ class Model
           collada::MaterialLibrary& Materials ();
           collada::EffectLibrary&   Effects   ();
           collada::MeshLibrary&     Meshes    ();
-          collada::SkinLibrary&     Skins     ();
+          collada::MorphLibrary&    Morphs    ();
+          collada::SkinLibrary&     Skins     ();          
           collada::LightLibrary&    Lights    ();
           collada::CameraLibrary&   Cameras   ();
           collada::NodeLibrary&     Nodes     ();
@@ -76,6 +79,7 @@ class Model
     const collada::MaterialLibrary& Materials () const;
     const collada::EffectLibrary&   Effects   () const;
     const collada::MeshLibrary&     Meshes    () const;
+    const collada::MorphLibrary&    Morphs    () const;
     const collada::SkinLibrary&     Skins     () const;
     const collada::LightLibrary&    Lights    () const;
     const collada::CameraLibrary&   Cameras   () const;

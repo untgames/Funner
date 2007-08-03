@@ -33,15 +33,22 @@ void DaeParser::ParseController (Parser::Iterator iter)
     return;
   }
   
-  Parser::Iterator skin_iter = iter->First ("skin");
+  Parser::Iterator skin_iter  = iter->First ("skin"),
+                   morph_iter = iter->First ("morph");
   
-  if (!skin_iter)
-    return;
-  
-  if (skin_iter->Next ())
-    LogWarning (skin_iter->Next (), "Second skin will be ignored");    
-    
-//  Skin& skin = model.Skins ().Create (id);
+  if (skin_iter)
+  { 
+    if (skin_iter->NextNamesake ())
+      LogWarning (skin_iter->NextNamesake (), "Second skin will be ignored");          
 
-//  ParseSkin (skin_iter, skin);
+//    ParseSkin (skin_iter, skin);
+  }
+
+  if (morph_iter)
+  {
+    if (morph_iter->NextNamesake ())
+      LogWarning (morph_iter->NextNamesake (), "Second morph will be ignored");
+
+//    ParseMorph (morph_iter);
+  }
 }

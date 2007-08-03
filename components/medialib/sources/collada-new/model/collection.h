@@ -26,6 +26,7 @@ template <> inline const char* get_collection_subname<Node>         () { return 
 template <> inline const char* get_collection_subname<Light>        () { return "lights"; }
 template <> inline const char* get_collection_subname<Camera>       () { return "cameras"; }
 template <> inline const char* get_collection_subname<InstanceMesh> () { return "meshes"; }
+template <> inline const char* get_collection_subname<MorphTarget>  () { return "morph_targets"; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Уничтожение объекта

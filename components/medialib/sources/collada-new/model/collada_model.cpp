@@ -30,14 +30,15 @@ struct ModelImpl
   Library<Effect>   effects;      //библиотека эффектов
   Library<Material> materials;    //библиотека материалов
   Library<Mesh>     meshes;       //библиотека мешей
+  Library<Morph>    morphs;       //библиотека морферов
   Library<Skin>     skins;        //библиотека скинов
-  Library<Node>     nodes;        //библиотека узлов
+  Library<Node>     nodes;        //библиотека узлов  
   Library<Scene>    scenes;       //библиотека сцен
   Library<Light>    lights;       //библиотека источников света
   Library<Camera>   cameras;      //библиотека камер
   
-  ModelImpl () : effects (this), materials (this), meshes (this), skins (this), nodes (this), scenes (this), lights (this),
-                 cameras (this) {}
+  ModelImpl () : effects (this), materials (this), meshes (this), skins (this), morphs (this), nodes (this), scenes (this),
+                 lights (this), cameras (this) {}
 };
 
 }
@@ -147,6 +148,16 @@ MeshLibrary& Model::Meshes ()
 const MeshLibrary& Model::Meshes () const
 {
   return impl->meshes;
+}
+
+MorphLibrary& Model::Morphs ()
+{
+  return impl->morphs;
+}
+
+const MorphLibrary& Model::Morphs () const
+{
+  return impl->morphs;
 }
 
 SkinLibrary& Model::Skins ()
