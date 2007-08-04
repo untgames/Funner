@@ -699,7 +699,7 @@ void Entity::Translate (const math::vec3f& offset, EntityTransformSpace space)
       impl->local_position += offset;
       break;
     case EntityTransformSpace_World:
-      if (impl->parent) impl->local_position += invert (impl->parent->WorldOrientation ()) * offset; 
+      if (impl->parent) impl->local_position += invert (impl->parent->WorldOrientation ()) * offset / impl->parent->WorldScale (); 
       else              impl->local_position += offset;
 
       break;
@@ -713,7 +713,7 @@ void Entity::Translate (const math::vec3f& offset, EntityTransformSpace space)
 
 void Entity::Translate (float offset_x, float offset_y, float offset_z, EntityTransformSpace space)
 {
-  Translate (vec3f (offset_x, offset_y, offset_z));
+  Translate (vec3f (offset_x, offset_y, offset_z), space);
 }
 
 void Entity::Rotate (const math::quatf& q, EntityTransformSpace space)
