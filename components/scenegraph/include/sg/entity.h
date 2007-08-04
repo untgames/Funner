@@ -11,23 +11,15 @@ namespace sg
 class Scene;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Режим присоединения объекта к родителю
+///Режим присоединения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum EntityBindMode
 {
-  EntityBindMode_SaveLocalTM, //сохранить локальное положение (относительно родителя)
-  EntityBindMode_SaveWorldTM, //сохранить мировое положение
+  EntityBindMode_AddRef,  //при присоединении количество ссылок на родителя увеличивается на 1
+  EntityBindMode_Capture, //при присоединении количество ссылок на родителя не увеличивается
   
-  EntityBindMode_Default = EntityBindMode_SaveLocalTM
+  EntityBindMode_Default = EntityBindMode_AddRef
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Режим присоединения: нужно ли увеличивать число ссылок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef bool AddRefFlag;
-
-const AddRefFlag NeedAddRef = true;  //нужно увеличивать число ссылок
-const AddRefFlag NoAddRef   = false; //число ссылок увеличивать не нужно
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим поиска потомков
@@ -66,11 +58,11 @@ enum EntityTraverseMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum EntityEvent
 {
-  EntityEvent_Updated,   //объект обновился
-  EntityEvent_Destroyed, //объект удалился
-  EntityEvent_Binded,    //объект присоединиля к родителю
-  EntityEvent_Unbinded,  //объект отсоединился от родителя
-  
+  EntityEvent_AfterUpdate,   //срабатывает после обновления состояния объекта
+  EntityEvent_BeforeDestroy, //срабатывает перед удалением объекта
+  EntityEvent_AfterBind,     //срабатывает после присоединения объекта к родителю
+  EntityEvent_BeforeUnbind,  //срабатывает перед отсоединением объекта от родителя
+
   EntityEvent_Num
 };
 
@@ -84,7 +76,7 @@ class Entity
   public: 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание объекта (как правило это имеет смысл только в случае необходимости объединения других
-///  объектов
+///  объектов)
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
     static Entity* Create ();
   
@@ -129,12 +121,22 @@ class Entity
     const Entity* NextChild  () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Присоединение узла к родителю
+///Настройка иерархических связей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind              (Entity* parent, EntityBindMode mode = EntityBindMode_Default);
-    void Bind              (AddRefFlag flag, Entity* parent, EntityBindMode mode = EntityBindMode_Default);
-    void Unbind            (EntityBindMode mode = EntityBindMode_Default);    
-    void UnbindAllChildren (); //отсоединение всех потомков
+      //установка соединения
+    void BindToParent (Entity&              parent,                                        //родительский узел
+                       EntityBindMode       mode = EntityBindMode_Default,                 //режим присоединения
+                       EntityTransformSpace invariant_space = EntityTransformSpace_Local); //инвариантное пространство преобразований
+
+      //разрыв соединения
+    void Unbind (EntityTransformSpace invariant_space = EntityTransformSpace_Local);
+
+      //отсоединение потомка
+    void UnbindChild (const char* name, EntityTransformSpace invariant_space = EntityTransformSpace_Local);
+    void UnbindChild (const char* name, EntityFindMode find_mode, EntityTransformSpace invariant_space = EntityTransformSpace_Local);
+
+      //отсоединение всех потомков    
+    void UnbindAllChildren ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск потомка по имени
@@ -145,8 +147,8 @@ class Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обход потомков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (Entity*)>       TraverseFunction;
-    typedef xtl::function<void (const Entity*)> ConstTraverseFunction;
+    typedef xtl::function<void (Entity&)>       TraverseFunction;
+    typedef xtl::function<void (const Entity&)> ConstTraverseFunction;
 
     void Traverse (const TraverseFunction&, EntityTraverseMode = EntityTraverseMode_Default);
     void Traverse (const ConstTraverseFunction&, EntityTraverseMode = EntityTraverseMode_Default) const;
@@ -211,12 +213,12 @@ class Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение матрицы преобразования объекта object в системе координат данного объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    math::mat4f ObjectTM (Entity* object) const;
+    math::mat4f ObjectTM (Entity&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::signal<void (Entity*), xtl::default_signal_accumulator<void> > Signal;
+    typedef xtl::signal<void (Entity&), xtl::default_signal_accumulator<void> > Signal;
 
           Signal& Listeners (EntityEvent);
     const Signal& Listeners (EntityEvent) const;
@@ -243,6 +245,7 @@ class Entity
     void UpdateNotify ();
     
   private:
+    void BindToParentImpl (Entity*, EntityBindMode, EntityTransformSpace);
     void SetScene (sg::Scene*);
     void UpdateWorldTransformNotify ();
     void UpdateLocalTransformNotify ();

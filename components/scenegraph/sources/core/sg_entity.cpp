@@ -57,6 +57,10 @@ Entity::Entity ()
   impl->next_child    = 0;
   impl->update_lock   = 0;
   impl->update_notify = false;
+  
+    //масштаб по умолчанию
+    
+  impl->local_scale = 1.0f;
 
     //по умолчанию объект наследует все преобразования родителя
   
@@ -137,14 +141,14 @@ void Entity::Release ()
 {
     //защита от повторного удаления в обработчике
 
-  if (impl->signal_process [EntityEvent_Destroyed])
+  if (impl->signal_process [EntityEvent_BeforeDestroy])
     return;            
 
   if (!--impl->ref_count)
   {
       //оповещаем клиентов об удалении объекта
 
-    Notify (EntityEvent_Destroyed);
+    Notify (EntityEvent_BeforeDestroy);
 
     delete this;
   }
@@ -234,59 +238,82 @@ const Entity* Entity::NextChild () const
     Присоединение узла к родителю
 */
 
-void Entity::Bind (Entity* parent, EntityBindMode mode)
+void Entity::Unbind (EntityTransformSpace invariant_space)
 {
-  Bind (NeedAddRef, parent, mode);
+  BindToParentImpl (0, EntityBindMode_Capture, invariant_space);
 }
 
-void Entity::Unbind (EntityBindMode mode)
+void Entity::BindToParent (Entity& parent, EntityBindMode mode, EntityTransformSpace invariant_space)
 {
-  Bind (0, mode);
+  BindToParentImpl (&parent, mode, invariant_space);
 }
 
-void Entity::Bind (AddRefFlag flag, Entity* parent, EntityBindMode mode)
+void Entity::BindToParentImpl (Entity* parent, EntityBindMode mode, EntityTransformSpace invariant_space)
 {
     //защита от вызова Bind в обработчиках соответствующих событий
 
-  if (impl->signal_process [EntityEvent_Binded] || impl->signal_process [EntityEvent_Unbinded])
+  if (impl->signal_process [EntityEvent_AfterBind] || impl->signal_process [EntityEvent_BeforeUnbind])
     return;
 
-  if (parent == impl->parent)
-    return;    
+    //определяем инвариантное пространство преобразований
 
-  switch (mode)
+  switch (invariant_space)
   {
-    case EntityBindMode_SaveLocalTM:
+    case EntityTransformSpace_Parent:
+    case EntityTransformSpace_Local:
       break;
-    case EntityBindMode_SaveWorldTM:
-      RaiseNotImplemented ("sg::Entity::Bind (mode=EntityBindMode_SaveWorldTM)");
+    case EntityTransformSpace_World:
+      RaiseNotImplemented ("sg::Entity::BindToParent (invariant_space=EntityTransformSpace_World)");
       break;
     default:
-      RaiseInvalidArgument ("sg::Entity::Bind", "mode", mode);
+      RaiseInvalidArgument ("sg::Entity::BindToParent", "invariant_space", invariant_space);
       break;
   }
   
+    //проверяем корректность режима присоединения
+    
+  switch (mode)
+  {
+    case EntityBindMode_AddRef:
+    case EntityBindMode_Capture:
+      break;
+    default:
+      RaiseInvalidArgument ("sg::Entity::BindToParent", "mode", mode);
+      break;
+  }
+  
+    //если родитель не изменяется нет необходимости в присоединии
+
+  if (parent == impl->parent)
+    return;      
+
     //проверка не присоединяется ли объект к своему потомку
     
   for (Entity* entity=parent; entity; entity=entity->impl->parent)
     if (entity == this)
-      RaiseInvalidArgument ("sg::Entity::Bind", "parent", "Attempt to bind object to one of it's child");
+      RaiseInvalidArgument ("sg::Entity::BindToParent", "parent", "Attempt to bind object to one of it's child");
       
     //оповещаем клиентов об отсоединении объекта от родителя
       
-  Notify (EntityEvent_Unbinded);
-
-    //отсоединям объект от родителя
+  Notify (EntityEvent_BeforeUnbind);
+  
+    //если у объект уже есть родитель производитм действия по его отсоединению
     
   if (impl->parent)
   {
+      //отсоединям объект от родителя    
+    
     if (impl->prev_child) impl->prev_child->impl->next_child = impl->next_child;
     else                  impl->parent->impl->first_child    = impl->next_child;
     
     if (impl->next_child) impl->next_child->impl->prev_child = impl->prev_child;
     else                  impl->parent->impl->last_child     = impl->prev_child;    
+    
+      //освобождаем родителя
+
+    impl->parent->Release ();
   }
-  
+
     //родительские преобразования требуют пересчёта
 
   UpdateWorldTransformNotify ();
@@ -300,14 +327,18 @@ void Entity::Bind (AddRefFlag flag, Entity* parent, EntityBindMode mode)
     impl->prev_child = impl->next_child = 0;
     
     if (impl->scene)
-      SetScene (0);      
+      SetScene (0);
+      
+      //оповещаем клиентов о присоединении объекта к новому родителю
+
+    Notify (EntityEvent_AfterBind);
 
     return;
   }
 
-    //проверяем нужно ли увеличивать число ссылок
+    //увеличиваем число ссылок если этого требует режим присоединения
 
-  if (flag)
+  if (mode == EntityBindMode_AddRef)
     parent->AddRef ();
 
     //регистрируем объект в списке потомков родителя
@@ -328,7 +359,25 @@ void Entity::Bind (AddRefFlag flag, Entity* parent, EntityBindMode mode)
 
       //оповещаем клиентов о присоединении объекта к новому родителю
 
-  Notify (EntityEvent_Binded);
+  Notify (EntityEvent_AfterBind);
+}
+
+void Entity::UnbindChild (const char* name, EntityTransformSpace invariant_space)
+{
+  UnbindChild (name, EntityFindMode_OnNextSublevel, invariant_space);
+}
+
+void Entity::UnbindChild (const char* name, EntityFindMode mode, EntityTransformSpace invariant_space)
+{
+  if (!name)
+    RaiseNullArgument ("sg::Entity::UnbindChild", "name");
+
+  Entity* child = FindChild (name, mode);
+  
+  if (!child)
+    return;
+    
+  child->Unbind (invariant_space);
 }
 
 void Entity::UnbindAllChildren ()
@@ -398,7 +447,7 @@ void Entity::Traverse (const TraverseFunction& fn, EntityTraverseMode mode)
   switch (mode)
   {
     case EntityTraverseMode_BottomToTop:
-      fn (this);
+      fn (*this);
       break;
     case EntityTraverseMode_TopToBottom:
       break;
@@ -411,7 +460,7 @@ void Entity::Traverse (const TraverseFunction& fn, EntityTraverseMode mode)
     entity->Traverse (fn, mode);
     
   if (mode == EntityTraverseMode_BottomToTop)
-    fn (this);
+    fn (*this);
 }
 
 void Entity::Traverse (const ConstTraverseFunction& fn, EntityTraverseMode mode) const
@@ -419,7 +468,7 @@ void Entity::Traverse (const ConstTraverseFunction& fn, EntityTraverseMode mode)
   switch (mode)
   {
     case EntityTraverseMode_BottomToTop:
-      fn (this);
+      fn (*this);
       break;
     case EntityTraverseMode_TopToBottom:
       break;
@@ -432,7 +481,7 @@ void Entity::Traverse (const ConstTraverseFunction& fn, EntityTraverseMode mode)
     entity->Traverse (fn, mode);
 
   if (mode == EntityTraverseMode_BottomToTop)
-    fn (this);
+    fn (*this);
 }
 
 /*
@@ -537,12 +586,12 @@ void Entity::SetOrientation (const quatf& orientation)
 
 void Entity::SetOrientation (float angle_in_degrees, float axis_x, float axis_y, float axis_z)
 {
-  SetOrientation (fromAxisAnglef (angle_in_degrees, axis_x, axis_y, axis_z));
+  SetOrientation (fromAxisAnglef (deg2rad (angle_in_degrees), axis_x, axis_y, axis_z));
 }
 
 void Entity::SetOrientation (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees)
 {
-  SetOrientation (fromEulerAnglef (pitch_in_degrees, yaw_in_degrees, roll_in_degrees));
+  SetOrientation (fromEulerAnglef (deg2rad (pitch_in_degrees), deg2rad (yaw_in_degrees), deg2rad (roll_in_degrees)));
 }
 
 void Entity::ResetOrientation ()
@@ -684,12 +733,12 @@ void Entity::Rotate (const math::quatf& q, EntityTransformSpace space)
 
 void Entity::Rotate (float angle_in_degrees, float axis_x, float axis_y, float axis_z, EntityTransformSpace space)
 {
-  Rotate (fromAxisAnglef (angle_in_degrees, axis_x, axis_y, axis_z), space);
+  Rotate (fromAxisAnglef (deg2rad (angle_in_degrees), axis_x, axis_y, axis_z), space);
 }
 
 void Entity::Rotate (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees, EntityTransformSpace space)
 {
-  Rotate (fromEulerAnglef (pitch_in_degrees, yaw_in_degrees, roll_in_degrees), space);
+  Rotate (fromEulerAnglef (deg2rad (pitch_in_degrees), deg2rad (yaw_in_degrees), deg2rad (roll_in_degrees)), space);
 }
 
 void Entity::Scale (const math::vec3f& scale)
@@ -755,12 +804,9 @@ const mat4f& Entity::TransformationMatrix (EntityTransformSpace space) const
     Получение матрицы преобразования объекта object в системе координат данного объекта
 */
 
-mat4f Entity::ObjectTM (Entity* object) const
+mat4f Entity::ObjectTM (Entity& object) const
 {
-  if (!object)
-    RaiseNullArgument ("sg::Entity::ObjectTM", "object");
-    
-  return invert (WorldTM ()) * object->WorldTM ();
+  return invert (WorldTM ()) * object.WorldTM ();
 }
 
 /*
@@ -799,7 +845,7 @@ void Entity::Notify (EntityEvent event)
 
   try
   {
-    impl->signals [event] (this);
+    impl->signals [event] (*this);
   }
   catch (...)
   {
@@ -831,7 +877,7 @@ void Entity::EndUpdate ()
     
     if (impl->update_notify)
     {
-      Notify (EntityEvent_Updated);
+      Notify (EntityEvent_AfterUpdate);
       
       impl->update_notify = false;
     }
@@ -850,7 +896,7 @@ void Entity::UpdateNotify ()
 
   if (!impl->update_lock)
   {
-    Notify (EntityEvent_Updated);
+    Notify (EntityEvent_AfterUpdate);
     return;
   }
 
