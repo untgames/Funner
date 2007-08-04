@@ -15,6 +15,7 @@ struct Entity::Impl
 {
   sg::Scene*  scene;                            //сцена, которой принадлежит объект
   stl::string name;                             //имя объекта
+  size_t      name_hash;                        //хэш имени
   size_t      ref_count;                        //количество ссылок на объект
   Entity*     parent;                           //родительский узел
   Entity*     first_child;                      //первый потомок
@@ -57,7 +58,8 @@ Entity::Entity ()
   impl->next_child    = 0;
   impl->update_lock   = 0;
   impl->update_notify = false;
-  
+  impl->name_hash     = strhash (impl->name.c_str ());
+
     //масштаб по умолчанию
     
   impl->local_scale = 1.0f;
@@ -122,8 +124,9 @@ void Entity::SetName (const char* name)
 {
   if (!name)
     RaiseNullArgument ("sg::Entity::SetName", "name");
-    
-  impl->name = name;
+
+  impl->name      = name;
+  impl->name_hash = strhash (name);
   
   UpdateNotify ();
 }
@@ -364,10 +367,10 @@ void Entity::BindToParentImpl (Entity* parent, EntityBindMode mode, EntityTransf
 
 void Entity::UnbindChild (const char* name, EntityTransformSpace invariant_space)
 {
-  UnbindChild (name, EntityFindMode_OnNextSublevel, invariant_space);
+  UnbindChild (name, EntitySearchMode_OnNextSublevel, invariant_space);
 }
 
-void Entity::UnbindChild (const char* name, EntityFindMode mode, EntityTransformSpace invariant_space)
+void Entity::UnbindChild (const char* name, EntitySearchMode mode, EntityTransformSpace invariant_space)
 {
   if (!name)
     RaiseNullArgument ("sg::Entity::UnbindChild", "name");
@@ -399,32 +402,34 @@ void Entity::SetScene (sg::Scene* scene)
     Поиск потомка по имени
 */
 
-Entity* Entity::FindChild (const char* name, EntityFindMode mode) //no throw
+Entity* Entity::FindChild (const char* name, EntitySearchMode mode) //no throw
 {
   return const_cast<Entity*> (const_cast<const Entity&> (*this).FindChild (name, mode));
 }
 
-const Entity* Entity::FindChild (const char* name, EntityFindMode mode) const //no throw
+const Entity* Entity::FindChild (const char* name, EntitySearchMode mode) const //no throw
 {
   if (!name)
-    RaiseNullArgument ("sg::Entity::FindChild", "name");
+    RaiseNullArgument ("sg::Entity::FindChild", "name");    
+    
+  size_t name_hash = strhash (name);
     
   switch (mode)
   {
-    case EntityFindMode_OnNextSublevel:
+    case EntitySearchMode_OnNextSublevel:
       for (Entity* entity=impl->first_child; entity; entity=impl->next_child)
-        if (entity->impl->name == name)
+        if (entity->impl->name_hash == name_hash && entity->impl->name == name)
           return entity;
 
-      break;    
-    case EntityFindMode_OnAllSublevels:
+      break;
+    case EntitySearchMode_OnAllSublevels:
       for (Entity* entity=impl->first_child; entity; entity=impl->next_child)
       {
-        if (name == entity->impl->name)
+        if (entity->impl->name_hash == name_hash && name == entity->impl->name)
           return entity;
-        
+
         Entity* child = entity->FindChild (name, mode);
-        
+
         if (child)
           return child;
       }

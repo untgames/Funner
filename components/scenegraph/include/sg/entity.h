@@ -24,12 +24,12 @@ enum EntityBindMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим поиска потомков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum EntityFindMode
+enum EntitySearchMode
 {
-  EntityFindMode_OnNextSublevel, //поиск потомка только на следующем подуровне
-  EntityFindMode_OnAllSublevels, //поиск потомка на всех подуровнях
+  EntitySearchMode_OnNextSublevel, //поиск потомка только на следующем подуровне
+  EntitySearchMode_OnAllSublevels, //поиск потомка на всех подуровнях
   
-  EntityFindMode_Default = EntityFindMode_OnAllSublevels
+  EntitySearchMode_Default = EntitySearchMode_OnAllSublevels
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ class Entity
 
       //отсоединение потомка
     void UnbindChild (const char* name, EntityTransformSpace invariant_space = EntityTransformSpace_Local);
-    void UnbindChild (const char* name, EntityFindMode find_mode, EntityTransformSpace invariant_space = EntityTransformSpace_Local);
+    void UnbindChild (const char* name, EntitySearchMode find_mode, EntityTransformSpace invariant_space = EntityTransformSpace_Local);
 
       //отсоединение всех потомков    
     void UnbindAllChildren ();
@@ -141,8 +141,8 @@ class Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск потомка по имени
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          Entity* FindChild (const char* name, EntityFindMode mode = EntityFindMode_Default);
-    const Entity* FindChild (const char* name, EntityFindMode mode = EntityFindMode_Default) const;
+          Entity* FindChild (const char* name, EntitySearchMode mode = EntitySearchMode_Default);
+    const Entity* FindChild (const char* name, EntitySearchMode mode = EntitySearchMode_Default) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обход потомков
