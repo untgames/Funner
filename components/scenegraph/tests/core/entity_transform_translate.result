@@ -1,0 +1,24 @@
+Results of entity_transform_translate_test:
+parent:
+  position: local=[1 2 3] world=[1 2 3]
+  orientation: local=[90 0 0] world=[90 0 0]
+  scale: local=[2 2 2] world=[2 2 2]
+entity:
+  position: local=[1 1 1] world=[3 0 5]
+  orientation: local=[0 0 5.00896e-006] world=[90 5.00896e-006 0]
+  scale: local=[1 1 1] world=[2 2 2]
+translate entity in parent space
+entity:
+  position: local=[2 1 1] world=[5 0 5]
+  orientation: local=[0 0 5.00896e-006] world=[90 5.00896e-006 0]
+  scale: local=[1 1 1] world=[2 2 2]
+translate entity in local space
+entity:
+  position: local=[2 0 1] world=[5 0 3]
+  orientation: local=[0 0 5.00896e-006] world=[90 5.00896e-006 0]
+  scale: local=[1 1 1] world=[2 2 2]
+translate entity in world space
+entity:
+  position: local=[2.5 0.5 0.5] world=[6 1 4]
+  orientation: local=[0 0 5.00896e-006] world=[90 5.00896e-006 0]
+  scale: local=[1 1 1] world=[2 2 2]

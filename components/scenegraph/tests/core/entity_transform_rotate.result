@@ -1,0 +1,13 @@
+Results of entity_transform_rotate_test:
+initial state
+  parent orientation: local=[90 0 0] world=[90 0 0]
+  entity orientation: local=[0 60 0] world=[90 0 60]
+rotate entity in parent space
+  parent orientation: local=[90 0 0] world=[90 0 0]
+  entity orientation: local=[-90 0 60] world=[0 60 0]
+rotate entity in local space
+  parent orientation: local=[90 0 0] world=[90 0 0]
+  entity orientation: local=[-90 0 30] world=[0 30 0]
+rotate entity in world space
+  parent orientation: local=[90 0 0] world=[90 0 0]
+  entity orientation: local=[6.47054e-007 -60 90] world=[-6.83019e-006 30 90]
