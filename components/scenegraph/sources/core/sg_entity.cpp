@@ -653,7 +653,12 @@ const vec3f& Entity::WorldScale () const
 //установка флага наследования родительской ориентации
 void Entity::SetOrientationInherit (bool state)
 {
+  if (state == impl->orientation_inherit)
+    return;
+
   impl->orientation_inherit = state;
+
+  UpdateWorldTransformNotify ();
 }
 
 //наследуется ли родительская ориентация
@@ -665,7 +670,12 @@ bool Entity::IsOrientationInherited () const
 //установка флага наследования родительского масштаба
 void Entity::SetScaleInherit (bool state)
 {
+  if (state == impl->scale_inherit)
+    return;
+
   impl->scale_inherit = state;
+
+  UpdateWorldTransformNotify ();
 }
 
 //наследуется ли родительский масштаб
