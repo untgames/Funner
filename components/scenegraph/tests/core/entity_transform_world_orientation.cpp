@@ -1,7 +1,6 @@
-#include <xtl/intrusive_ptr.h>
 #include "shared.h"
 
-typedef xtl::com_ptr<Entity> EntityPtr;
+typedef com_ptr<Entity> EntityPtr;
 
 int main ()
 {
