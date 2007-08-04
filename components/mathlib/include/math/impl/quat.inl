@@ -1,7 +1,10 @@
 template <class T>
 inline quat<T>::quat ()
 {
-  quat_assign_scalar (*this,T (0));
+  x = T (0);
+  y = T (0);
+  z = T (0);
+  w = T (1);
 }
 
 template <class T> template <class T1>
