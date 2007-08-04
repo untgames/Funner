@@ -2,14 +2,14 @@
 
 typedef xtl::com_ptr<Entity> EntityPtr;
 
-void on_update1 (Entity* entity)
+void on_update1 (Entity& entity)
 {
-  printf ("entity '%s' updated\n", entity->Name ());  
+  printf ("entity '%s' updated\n", entity.Name ());  
 }
 
-void on_update2 (Entity* entity)
+void on_update2 (Entity& entity)
 {
-  entity->SetColor (1, 0, 0);
+  entity.SetColor (1, 0, 0);
 }
 
 int main ()
@@ -19,7 +19,7 @@ int main ()
   EntityPtr entity (Entity::Create (), false);
   
   entity->SetName   ("entity1");
-  entity->Listeners (EntityEvent_Updated).connect (&on_update1);
+  entity->Listeners (EntityEvent_AfterUpdate).connect (&on_update1);
   
   printf ("Update color\n");  
   
@@ -29,7 +29,7 @@ int main ()
   
   entity->SetName ("entity2");
   
-  entity->Listeners (EntityEvent_Updated).connect (&on_update2);
+  entity->Listeners (EntityEvent_AfterUpdate).connect (&on_update2);
   
   printf ("Begin update\n");
   

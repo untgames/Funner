@@ -1,41 +1,27 @@
-#include <mathlib.h>
 #include <xtl/intrusive_ptr.h>
 #include "shared.h"
 
-using namespace math;
-
 typedef xtl::com_ptr<Entity> EntityPtr;
-
-void dump (const vec3f& v)
-{
-  printf ("[%g %g %g]", v.x, v.y, v.z);
-}
 
 int main ()
 {
-  printf ("Results of entity_position test:\n");
+  printf ("Results of entity_position_test:\n");
   
   EntityPtr entity (Entity::Create (), false);
     
+  printf ("set position vec3f result: ");
   entity->SetPosition (vec3f (14.4f, 17.1f, -6.66f));
-  printf ("set position vec3f result: ");  
-  dump   (entity->Position ());
+  dump_position (*entity);
   printf ("\n");
 
+  printf ("set position (x, y, z) result: ");
   entity->SetPosition (0.f, 27.14f, 6.12f);
-  printf ("set position 3 float result: ");  
-  dump   (entity->Position ());
-  printf ("\n");
-  printf ("world position result: ");  
-  dump   (entity->WorldPosition ());
-  printf ("\n");
+  dump_position (*entity);
+  printf ("\n");  
 
+  printf ("reset position result: ");
   entity->ResetPosition ();
-  printf ("reset position result: ");  
-  dump   (entity->Position ());
-  printf ("\n");
-  printf ("world position result: ");  
-  dump   (entity->WorldPosition ());
+  dump_position (*entity);  
   printf ("\n");
 
   return 0;

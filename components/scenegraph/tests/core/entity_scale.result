@@ -1,6 +1,4 @@
-Results of entity_scale test:
-set scale vec3f result: [14.4 17.1 -6.66]
-set scale 3 float result: [0 27.14 6.12]
-world scale result: [0 27.14 6.12]
-reset scale result: [1 1 1]
-world scale result: [1 1 1]
+Results of entity_scale_test:
+set scale vec3f result: local=[14.4 17.1 -6.66] world=[14.4 17.1 -6.66]
+set scale (sx, sy, sz) result: local=[0 27.14 6.12] world=[0 27.14 6.12]
+reset scale result: local=[1 1 1] world=[1 1 1]

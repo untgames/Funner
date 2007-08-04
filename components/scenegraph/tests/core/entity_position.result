@@ -1,6 +1,4 @@
-Results of entity_position test:
-set position vec3f result: [14.4 17.1 -6.66]
-set position 3 float result: [0 27.14 6.12]
-world position result: [0 27.14 6.12]
-reset position result: [0 0 0]
-world position result: [0 0 0]
+Results of entity_position_test:
+set position vec3f result: local=[14.4 17.1 -6.66] world=[14.4 17.1 -6.66]
+set position (x, y, z) result: local=[0 27.14 6.12] world=[0 27.14 6.12]
+reset position result: local=[0 0 0] world=[0 0 0]

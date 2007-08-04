@@ -2,9 +2,9 @@
 
 typedef xtl::com_ptr<Entity> EntityPtr;
 
-void on_destroy (Entity* entity)
+void on_destroy (Entity& entity)
 {
-  printf ("entity '%s' destroyed\n", entity->Name ());
+  printf ("entity '%s' destroyed\n", entity.Name ());
 }
 
 int main ()
@@ -15,7 +15,7 @@ int main ()
   
   entity->SetName   ("entity1");
   entity->SetColor  (1, 0, 0);
-  entity->Listeners (EntityEvent_Destroyed).connect (&on_destroy);
+  entity->Listeners (EntityEvent_BeforeDestroy).connect (&on_destroy);
   
   const vec3f& color = entity->Color ();
 
