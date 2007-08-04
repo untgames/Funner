@@ -1,3 +1,6 @@
+#ifndef SG_TESTS_SHARED
+#define SG_TESTS_SHARED
+
 #include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
 #include <sg/entity.h>
@@ -52,3 +55,5 @@ inline void dump_scale (Entity& entity)
   printf (" world=");
   dump   (entity.WorldScale ());
 }
+
+#endif

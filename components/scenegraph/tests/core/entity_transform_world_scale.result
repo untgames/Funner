@@ -1,0 +1,13 @@
+Results of entity_transform_world_scale_test:
+set scale result: local=[1 2 3] world=[1 2 3]
+translate parent
+parent position: local=[0 2 0] world=[0 2 0]
+entity scale: local=[1 2 3] world=[1 2 3]
+rotate parent
+parent orientation: local=[30 0 0] world=[30 0 0]
+entity scale: local=[1 2 3] world=[1 2 3]
+scale parent
+parent scale: local=[2 3 -1] world=[2 3 -1]
+entity scale: local=[1 2 3] world=[2 6 -3]
+no parent-scale inherit
+entity scale: local=[1 2 3] world=[1 2 3]
