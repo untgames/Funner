@@ -135,9 +135,9 @@ void quat2EulerAngle (const quat<T>& q,T& pitch,T& yaw,T& roll)
     y2 = q.y * q.y,
     z2 = q.z * q.z;
 
-  pitch = rad2deg (atan (T(2) * (q.y*q.z + q.x*q.w)/(-x2 - y2 + z2 + w2)));
-  yaw   = rad2deg (asin (T(-2) * (q.x*q.z - q.y*q.w)));  
-  roll  = rad2deg (atan (T(2) * (q.x*q.y + q.z*q.w)/(x2 - y2 - z2 + w2))); 
+  pitch = atan (T(2) * (q.y*q.z + q.x*q.w)/(-x2 - y2 + z2 + w2));
+  yaw   = asin (T(-2) * (q.x*q.z - q.y*q.w));
+  roll  = atan (T(2) * (q.x*q.y + q.z*q.w)/(x2 - y2 - z2 + w2)); 
 }
 
 template <class T> 
@@ -315,9 +315,9 @@ void AxisAngle2quat  (const T& angle,const vec<T,3>& axis,quat<T>& q)
 template <class T> 
 void EulerAngle2quat (const T& pitch,const T& yaw,const T& roll,quat<T>& q)
 {
-  T ex = deg2rad (pitch) * T (0.5);
-  T ey = deg2rad (yaw ) * T (0.5);
-  T ez = deg2rad (roll) * T (0.5);
+  T ex = pitch * T (0.5);
+  T ey = yaw * T (0.5);
+  T ez = roll * T (0.5);
 
   T cr = cos (ex);
   T cp = cos (ey);
