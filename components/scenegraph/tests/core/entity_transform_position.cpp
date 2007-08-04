@@ -5,7 +5,7 @@ typedef xtl::com_ptr<Entity> EntityPtr;
 
 int main ()
 {
-  printf ("Results of entity_position_test:\n");
+  printf ("Results of entity_transform_position_test:\n");
   
   EntityPtr entity (Entity::Create (), false);
     

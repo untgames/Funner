@@ -1,4 +1,4 @@
-Results of entity_orientation_test:
+Results of entity_transform_orientation_test:
 set orientation from axis angle result: local=[0 0 -30] world=[0 0 -30]
 set orientation euler angle result: local=[10 20 30] world=[10 20 30]
 reset orientation result: local=[0 0 0] world=[0 0 0]

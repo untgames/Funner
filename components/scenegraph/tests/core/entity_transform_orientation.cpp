@@ -8,7 +8,7 @@ typedef xtl::com_ptr<Entity> EntityPtr;
 
 int main ()
 {
-  printf ("Results of entity_orientation_test:\n");
+  printf ("Results of entity_transform_orientation_test:\n");
   
   EntityPtr entity (Entity::Create (), false);
     

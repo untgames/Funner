@@ -5,7 +5,7 @@ typedef xtl::com_ptr<Entity> EntityPtr;
 
 int main ()
 {
-  printf ("Results of entity_scale_test:\n");
+  printf ("Results of entity_transform_scale_test:\n");
   
   EntityPtr entity (Entity::Create (), false);
     
