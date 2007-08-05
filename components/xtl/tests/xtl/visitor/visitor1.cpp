@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <xtl/visitor.h>
 #include <stl/vector>
+#include <xtl/type_list.h>
 
 using namespace xtl;
 using namespace stl;
@@ -22,7 +23,7 @@ struct C : B
   void accept (my_visitor& visitor) { visitor (*this); }
 };
 
-struct my_visitor_impl: public visitor<my_visitor, A, B, C>
+struct my_visitor_impl: public visitor<my_visitor, A, mpl::list<B, C>::type>
 {
   void visit (A&) const { printf ("visit A\n"); }
   void visit (B&) const { printf ("visit B\n"); }
