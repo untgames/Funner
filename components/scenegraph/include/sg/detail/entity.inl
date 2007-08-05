@@ -50,3 +50,28 @@ inline void swap (EntityUpdateLock& a, EntityUpdateLock& b)
 {
   a.Swap (b);
 }
+
+/*
+    Генерация кода посещения родительских классов    
+*/
+
+namespace detail
+{
+
+template <class T> struct AcceptTracker
+{
+  void operator () (T& visited, Entity::Visitor& visitor) const { visitor (visited, AcceptTracker<typename T::BaseClass> ()); }
+};
+
+template <> struct AcceptTracker<Entity>
+{
+  template <class T> void operator () (T& visited, Entity::Visitor& visitor) const { visitor (static_cast<Entity&> (visited)); }
+};
+
+}
+
+template <class T>
+inline void Entity::TrackAccept (T& visited, Visitor& visitor)
+{
+  detail::AcceptTracker<T> ()(visited, visitor);
+}

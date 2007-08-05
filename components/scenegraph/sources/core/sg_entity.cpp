@@ -1,6 +1,7 @@
 #include <sg/entity.h>
 #include <stl/string>
 #include <xtl/signal.h>
+#include <xtl/visitor.h>
 #include <common/exception.h>
 
 using namespace sg;
@@ -444,6 +445,20 @@ const Entity* Entity::FindChild (const char* name, EntitySearchMode mode) const 
 }
 
 /*
+    Посещение объекта с динамической диспетчеризацией по типу (применение паттерна Visitor)
+*/
+
+void Entity::Accept (Visitor& visitor) const
+{
+  const_cast<Entity&> (*this).AcceptCore (visitor);
+}
+
+void Entity::AcceptCore (Visitor& visitor)
+{
+  TrackAccept (*this, visitor);
+}
+
+/*
     Обход потомков
 */
 
@@ -452,15 +467,15 @@ void Entity::Traverse (const TraverseFunction& fn, EntityTraverseMode mode)
   switch (mode)
   {
     case EntityTraverseMode_BottomToTop:
-      fn (*this);
       break;
     case EntityTraverseMode_TopToBottom:
+      fn (*this);
       break;
     default:
       RaiseInvalidArgument ("sg::Entity::Traverse", "mode", mode);
       break;
-  }
-  
+  }  
+
   for (Entity* entity=impl->first_child; entity; entity=entity->impl->next_child)
     entity->Traverse (fn, mode);
     
@@ -473,9 +488,9 @@ void Entity::Traverse (const ConstTraverseFunction& fn, EntityTraverseMode mode)
   switch (mode)
   {
     case EntityTraverseMode_BottomToTop:
-      fn (*this);
       break;
     case EntityTraverseMode_TopToBottom:
+      fn (*this);
       break;
     default:
       RaiseInvalidArgument ("sg::Entity::Traverse", "mode", mode);
@@ -487,6 +502,27 @@ void Entity::Traverse (const ConstTraverseFunction& fn, EntityTraverseMode mode)
 
   if (mode == EntityTraverseMode_BottomToTop)
     fn (*this);
+}
+
+void Entity::TraverseAccept (Visitor& visitor, EntityTraverseMode mode) const
+{
+  switch (mode)
+  {
+    case EntityTraverseMode_BottomToTop:
+      break;
+    case EntityTraverseMode_TopToBottom:
+      const_cast<Entity&> (*this).AcceptCore (visitor);
+      break;
+    default:
+      RaiseInvalidArgument ("sg::Entity::Traverse", "mode", mode);
+      break;
+  }
+
+  for (const Entity* entity=impl->first_child; entity; entity=entity->impl->next_child)
+    entity->TraverseAccept (visitor, mode);
+
+  if (mode == EntityTraverseMode_BottomToTop)
+    const_cast<Entity&> (*this).AcceptCore (visitor);
 }
 
 /*

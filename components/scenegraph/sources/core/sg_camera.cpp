@@ -1,5 +1,6 @@
 #include <common/exception.h>
 #include <sg/camera.h>
+#include <xtl/visitor.h>
 
 using namespace sg;
 using namespace math;
@@ -57,6 +58,15 @@ void Camera::UpdateNotify ()
 }
 
 /*
+    Динамическая диспетчеризация    
+*/
+
+void Camera::AcceptCore (Visitor& visitor)
+{
+  visitor (*this);
+}
+
+/*
     Описание реализации PerspectiveCamera
 */
 
@@ -92,7 +102,7 @@ PerspectiveCamera::~PerspectiveCamera ()
 
 PerspectiveCamera* PerspectiveCamera::Create ()
 {
-  return new PerspectiveCamera ();
+  return new PerspectiveCamera;
 }
 
 /*
@@ -158,6 +168,15 @@ void PerspectiveCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
 }
 
 /*
+    Динамическая диспетчеризация    
+*/
+
+void PerspectiveCamera::AcceptCore (Visitor& visitor)
+{
+  TrackAccept (*this, visitor);
+}
+
+/*
     Описание реализации OrthoCamera
 */
 
@@ -197,7 +216,7 @@ OrthoCamera::~OrthoCamera ()
 
 OrthoCamera* OrthoCamera::Create ()
 {
-  return new OrthoCamera ();
+  return new OrthoCamera;
 }
 
 /*
@@ -277,4 +296,13 @@ void OrthoCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
   proj_matrix [1] = vec4f (0, 2.0f / (impl->top - impl->bottom), 0, - (impl->top + impl->bottom) / (impl->top - impl->bottom));
   proj_matrix [2] = vec4f (0, 0, -2.0f / (impl->z_far - impl->z_near), (impl->z_near + impl->z_far) / (-impl->z_far - impl->z_near));
   proj_matrix [3] = vec4f (0, 0, 0, 1);
+}
+
+/*
+    Динамическая диспетчеризация    
+*/
+
+void OrthoCamera::AcceptCore (Visitor& visitor)
+{
+  TrackAccept (*this, visitor);
 }

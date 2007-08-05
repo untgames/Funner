@@ -1,0 +1,21 @@
+Results of entity_traverse_test:
+entities tree:
+ entity 'entity'
+  entity 'child1'
+   entity 'child2'
+traverse top-to-bottom
+entity 'entity'
+entity 'child1'
+entity 'child2'
+traverse bottom-to-top
+entity 'child2'
+entity 'child1'
+entity 'entity'
+traverse top-to-bottom (const)
+entity 'entity'
+entity 'child1'
+entity 'child2'
+traverse bottom-to-top (const)
+entity 'child2'
+entity 'child1'
+entity 'entity'

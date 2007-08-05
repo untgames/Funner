@@ -1,4 +1,5 @@
 #include <sg/light.h>
+#include <xtl/visitor.h>
 
 using namespace sg;
 using namespace math;
@@ -43,7 +44,7 @@ Light::~Light ()
 
 Light* Light::Create ()
 {
-  return new Light ();
+  return new Light;
 }
 
 /*
@@ -115,6 +116,7 @@ const math::vec3f& Light::Attenuation () const
 /*
     Расстояние действия источника света
 */
+
 void Light::SetRange (float range)
 {
   impl->range = range;
@@ -123,4 +125,13 @@ void Light::SetRange (float range)
 float Light::Range () const
 {
   return impl->range;
+}
+
+/*
+    Динамическая диспетчеризация    
+*/
+
+void Light::AcceptCore (Visitor& visitor)
+{
+  TrackAccept (*this, visitor);
 }
