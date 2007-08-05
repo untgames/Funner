@@ -2,13 +2,19 @@
     Обработка посещений объектов разных типов
 */
 
-template <class Ret, class DefaultVisitorAction> template <class T>
-inline Ret basic_visitor<Ret, DefaultVisitorAction>::operator () (T& visited)
+template <class Ret> template <class T, class Fn>
+inline Ret basic_visitor<Ret>::operator () (T& visited, Fn default_action)
 {
   typedef visitor_node<T, Ret> visitor_impl;
 
   if (visitor_impl* visitor = dynamic_cast<visitor_impl*> (this))
     return visitor->visit (visited);
 
-  return static_cast<DefaultVisitorAction&> (*this)(visited, *this);
+  return default_action (visited, *this);
+}
+
+template <class Ret> template <class T>
+inline Ret basic_visitor<Ret>::operator () (T& visited)
+{
+  return (*this)(visited, default_visitor_action<Ret> ());
 }

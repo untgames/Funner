@@ -23,7 +23,7 @@ struct C : B
   void accept (my_visitor& visitor) { visitor (*this); }
 };
 
-struct my_visitor_impl: public visitor<my_visitor, A, mpl::list<B, C>::type>
+struct my_visitor_impl: public visitor<void, A, mpl::list<B, C>::type>
 {
   void visit (A&) { printf ("visit A\n"); }
   void visit (B&) { printf ("visit B\n"); }

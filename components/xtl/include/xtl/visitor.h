@@ -4,6 +4,9 @@
 namespace xtl
 {
 
+//implementation forwards
+template <class ResultType> class basic_visitor;
+
 namespace mpl
 {
 
@@ -16,16 +19,16 @@ struct null_type;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчик посещений объектов неизвестных типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class ResultType> struct default_visitor_action
+template <class ResultType=void> struct default_visitor_action
 {
-  template <class T, class Visitor> ResultType operator () (T&, Visitor&) const { return ResultType (); }
+  template <class T> ResultType operator () (T&, basic_visitor<ResultType>&) const { return ResultType (); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовый класс паттерна "acyclic visitor"
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class ResultType=void, class DefaultVisitorAction=default_visitor_action<ResultType> >
-class basic_visitor: private DefaultVisitorAction
+template <class ResultType=void>
+class basic_visitor
 {
   public:
     typedef ResultType result_type;
@@ -38,7 +41,8 @@ class basic_visitor: private DefaultVisitorAction
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка посещений объектов разных типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> result_type operator () (T&);
+    template <class T>           result_type operator () (T& visited); //action = default_visitor_action ()
+    template <class T, class Fn> result_type operator () (T& visited, Fn default_action);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,12 +63,11 @@ template <class Ret> class visitor_node<mpl::null_type, Ret> {};
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Visitor для объектов конкретных типов (в качестве каждого из параметров может быть список типов)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class BasicVisitor, class T1=mpl::null_type, class T2=mpl::null_type, class T3=mpl::null_type, class T4=mpl::null_type,
+template <class ResultType, class T1=mpl::null_type, class T2=mpl::null_type, class T3=mpl::null_type, class T4=mpl::null_type,
           class T5=mpl::null_type, class T6=mpl::null_type, class T7=mpl::null_type, class T8=mpl::null_type, class T9=mpl::null_type, class T10=mpl::null_type>
-class visitor: public visitor<BasicVisitor, T2, T3, T4, T5, T6, T7, T8, T9>,
-               public visitor_node<T1, typename BasicVisitor::result_type> {};
+class visitor: public visitor<ResultType, T2, T3, T4, T5, T6, T7, T8, T9>, public visitor_node<T1, ResultType> {};
                
-template <class BasicVisitor> class visitor<BasicVisitor>: public BasicVisitor {};
+template <class ResultType> class visitor<ResultType>: public basic_visitor<ResultType> {};
 
 #include <xtl/detail/visitor.inl>
 
