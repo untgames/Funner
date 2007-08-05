@@ -39,7 +39,6 @@ class basic_visitor: private DefaultVisitorAction
 ///Обработка посещений объектов разных типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     template <class T> result_type operator () (T&);
-    template <class T> result_type operator () (T&) const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,8 +47,7 @@ class basic_visitor: private DefaultVisitorAction
 template <class T, class Ret> class visitor_node
 {
   public:
-    virtual Ret visit (T&) const = 0;
-    virtual Ret visit (T& object) { return const_cast<const visitor_node&> (*this).visit (object); }
+    virtual Ret visit (T& object) = 0;
 };
 
 //специализация для списка типов

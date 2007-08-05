@@ -25,9 +25,9 @@ struct C : B
 
 struct my_visitor_impl: public visitor<my_visitor, A, mpl::list<B, C>::type>
 {
-  void visit (A&) const { printf ("visit A\n"); }
-  void visit (B&) const { printf ("visit B\n"); }
-  void visit (C&) const { printf ("visit C\n"); }
+  void visit (A&) { printf ("visit A\n"); }
+  void visit (B&) { printf ("visit B\n"); }
+  void visit (C&) { printf ("visit C\n"); }
 };
 
 template <class Iter>
