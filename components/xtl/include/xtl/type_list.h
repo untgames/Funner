@@ -5,7 +5,7 @@
 #ifndef XTL_TYPE_LIST_HEADER
 #define XTL_TYPE_LIST_HEADER
 
-#include <tr1/utility>
+#include <xtl/utility>
 
 namespace xtl
 {
