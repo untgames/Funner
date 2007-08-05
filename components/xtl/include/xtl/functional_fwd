@@ -36,6 +36,14 @@ template <class Signature, class Accumulator> class signal;
 //аккумулятор по умолчанию для обработки сигналов
 template <class Result> struct default_signal_accumulator;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Базовый класс паттерна "Acyclic visitor>
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class ResultType, class UnknownVisitorAction> class basic_visitor;
+
+//обработчик посещений объектов неизвестных типов
+template <class ResultType> struct default_visitor_action;
+
 }
 
 namespace tr1
