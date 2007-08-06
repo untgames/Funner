@@ -52,26 +52,29 @@ inline void swap (EntityUpdateLock& a, EntityUpdateLock& b)
 }
 
 /*
-    Генерация кода посещения родительских классов    
+    Попытка посещения объекта
 */
 
 namespace detail
 {
 
-template <class T> struct AcceptTracker
+struct touch_on_default_action
 {
-  void operator () (T& visited, Entity::Visitor& visitor) const { visitor (visited, AcceptTracker<typename T::BaseClass> ()); }
-};
-
-template <> struct AcceptTracker<Entity>
-{
-  template <class T> void operator () (T& visited, Entity::Visitor& visitor) const { visitor (static_cast<Entity&> (visited)); }
+  touch_on_default_action (bool& in_flag) : flag (&in_flag)  {}
+  
+  template <class T> void operator () (T&, Entity::Visitor&) { *flag = true; }
+  
+  bool* flag;
 };
 
 }
 
 template <class T>
-inline void Entity::TrackAccept (T& visited, Visitor& visitor)
+inline bool Entity::TryAccept (T& visited, Visitor& visitor)
 {
-  detail::AcceptTracker<T> ()(visited, visitor);
+  bool is_not_processed = false;
+  
+  visitor (visited, detail::touch_on_default_action (is_not_processed));
+
+  return !is_not_processed;
 }

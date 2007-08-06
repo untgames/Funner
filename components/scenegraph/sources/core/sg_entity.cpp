@@ -455,7 +455,7 @@ void Entity::Accept (Visitor& visitor) const
 
 void Entity::AcceptCore (Visitor& visitor)
 {
-  TrackAccept (*this, visitor);
+  visitor (*this);
 }
 
 /*
