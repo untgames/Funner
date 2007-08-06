@@ -60,5 +60,5 @@ void Camera::UpdateNotify ()
 void Camera::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);
+    Node::AcceptCore (visitor);
 }

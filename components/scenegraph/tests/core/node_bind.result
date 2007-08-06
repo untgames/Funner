@@ -1,0 +1,16 @@
+Results of node_bind_test:
+node 'node1' unbinded from parent '#ROOT'
+node 'node1' binded to parent 'parent1'
+node 'node1' updated
+node 'node1' unbinded from parent 'parent1'
+node 'node1' binded to parent 'parent2'
+node 'node1' updated
+node 'parent1' before destroy
+node 'parent1' destroyed
+node 'node1' before destroy
+node 'node1' unbinded from parent 'parent2'
+node 'parent2' before destroy
+node 'parent2' destroyed
+node 'node1' binded to parent '#ROOT'
+node 'node1' updated
+node 'node1' destroyed

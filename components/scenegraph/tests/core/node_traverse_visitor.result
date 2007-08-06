@@ -1,0 +1,13 @@
+Results of node_traverse_visitor_test:
+entities tree:
+ node 'node'
+  node 'child1'
+   node 'child2'
+visitor traverse top-to-bottom
+node 'node'
+light 'child1'
+camera 'child2'
+visitor traverse bottom-to-top
+camera 'child2'
+light 'child1'
+node 'node'

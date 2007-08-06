@@ -1,0 +1,5 @@
+Results of node_basic_test:
+name: 'node1'
+color: [1 0 0]
+use count: 1
+node 'node1' destroyed

@@ -134,5 +134,5 @@ float Light::Range () const
 void Light::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);
+    Node::AcceptCore (visitor);
 }

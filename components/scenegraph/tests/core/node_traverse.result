@@ -1,0 +1,21 @@
+Results of node_traverse_test:
+entities tree:
+ node 'node'
+  node 'child1'
+   node 'child2'
+traverse top-to-bottom
+node 'node'
+node 'child1'
+node 'child2'
+traverse bottom-to-top
+node 'child2'
+node 'child1'
+node 'node'
+traverse top-to-bottom (const)
+node 'node'
+node 'child1'
+node 'child2'
+traverse bottom-to-top (const)
+node 'child2'
+node 'child1'
+node 'node'

@@ -1,0 +1,11 @@
+Results of node_transform_world_position_test:
+set position vec3f result: local=[1 0 0] world=[1 0 0]
+translate parent
+parent position: local=[0 2 0] world=[0 2 0]
+node position: local=[1 0 0] world=[1 2 0]
+rotate parent
+parent orientation: local=[0 -5.00896e-006 0] world=[0 -5.00896e-006 0]
+node position: local=[1 0 0] world=[-1 2 8.74228e-008]
+scale parent
+parent scale: local=[2 1 1] world=[2 1 1]
+node position: local=[1 0 0] world=[-2 2 1.74846e-007]

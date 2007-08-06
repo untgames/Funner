@@ -1,0 +1,11 @@
+Results of node_find_child_test:
+entities tree:
+ node 'node'
+  node 'child1'
+   node 'child2'
+search on all sublevels:
+  child node 'child1' found
+  child node 'child2' found
+search on next sublevel:
+  child node 'child1' found
+  no child node with name 'child2'

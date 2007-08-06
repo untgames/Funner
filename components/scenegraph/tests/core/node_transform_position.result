@@ -1,0 +1,4 @@
+Results of node_transform_position_test:
+set position vec3f result: local=[14.4 17.1 -6.66] world=[14.4 17.1 -6.66]
+set position (x, y, z) result: local=[0 27.14 6.12] world=[0 27.14 6.12]
+reset position result: local=[0 0 0] world=[0 0 0]

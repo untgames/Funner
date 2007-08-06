@@ -3,7 +3,7 @@
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
-#include <sg/entity.h>
+#include <sg/node.h>
 #include <sg/light.h>
 #include <sg/camera.h>
 #include <stdio.h>
@@ -34,28 +34,28 @@ inline void dump (const quatf& q)
   printf ("[%g %g %g]", pitch, yaw, roll);
 }
 
-inline void dump_position (Entity& entity)
+inline void dump_position (Node& node)
 {
   printf ("local=");
-  dump   (entity.Position ());
+  dump   (node.Position ());
   printf (" world=");
-  dump   (entity.WorldPosition ());
+  dump   (node.WorldPosition ());
 }
 
-inline void dump_orientation (Entity& entity)
+inline void dump_orientation (Node& node)
 {
   printf ("local=");
-  dump   (entity.Orientation ());
+  dump   (node.Orientation ());
   printf (" world=");
-  dump   (entity.WorldOrientation ());
+  dump   (node.WorldOrientation ());
 }
 
-inline void dump_scale (Entity& entity)
+inline void dump_scale (Node& node)
 {
   printf ("local=");
-  dump   (entity.Scale ());
+  dump   (node.Scale ());
   printf (" world=");
-  dump   (entity.WorldScale ());
+  dump   (node.WorldScale ());
 }
 
 #endif

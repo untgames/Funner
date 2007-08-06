@@ -1,0 +1,10 @@
+Results of node_notify_update_test:
+Update color
+node 'node1' updated
+Update name
+node 'node2' updated
+Begin update
+Update color
+Update name
+End update
+node 'node3' updated
