@@ -50,7 +50,7 @@ class MorphTarget
     float Weight    () const;
 
   protected:
-    MorphTarget  (collada::Mesh&);
+    MorphTarget  (collada::Mesh&, float weight);
     ~MorphTarget ();
 
   private:
@@ -68,7 +68,7 @@ class MorphTarget
 template <> class ICollection<MorphTarget>: public IItemCollection<MorphTarget>
 {
   public:
-    virtual MorphTarget& Create (Mesh& mesh) = 0;
+    virtual MorphTarget& Create (Mesh& mesh, float weight) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -237,6 +237,34 @@ void dump (Mesh& mesh, int level)
     dump (mesh.Surfaces () [i], level);
 }
 
+//печать цели морфа
+void dump (MorphTarget& morph_target, int level)
+{
+  print_space (level);
+  printf      ("Mesh '%s', weight = %f\n", morph_target.Mesh ().EntityId (), morph_target.Weight ());
+}
+
+//печать морфа
+void dump (Morph& morph, int level)
+{
+  print_space (level++);
+  printf      ("Morph '%s' (%u targets)\n", morph.EntityId (), morph.Targets ().Size ());
+  print_space (level);
+  printf      ("base mesh: '%s'\n", morph.BaseMesh ().EntityId ());
+  print_space (level);
+  printf      ("method: ");
+  switch (morph.Method ())
+  {
+    case MorphMethod_Normalized: printf ("normalized\n"); break;
+    case MorphMethod_Relative:   printf ("relative\n");   break;
+    default:                     printf ("unknown\n");    break;
+  }
+  print_space (level++);
+  printf      ("targets:\n");
+  for (size_t i=0; i<morph.Targets ().Size (); i++)
+    dump (morph.Targets () [i], level);
+}
+
 //вывод источника света
 void dump (Light& light, int level)
 {
@@ -412,6 +440,7 @@ int main ()
     dump (model.Materials (), 1);
     dump (model.Meshes (), 1);    
 //    dump (model.Skins (), 1);
+    dump (model.Morphs (), 1);
     dump (model.Lights (), 1);
     dump (model.Cameras (), 1);
     dump (model.Scenes (), 1);

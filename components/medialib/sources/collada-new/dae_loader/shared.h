@@ -5,6 +5,8 @@
 #include <common/parser.h>
 #include <xtl/functional>
 #include <stl/hash_map>
+#include <stl/vector>
+#include <stl/string>
 #include <math/io.h>
 
 using namespace medialib::collada;
@@ -110,6 +112,8 @@ class DaeParser
     void ParseInstanceCamera      (Parser::Iterator, Node::CameraList& cameras);
     void ParseInstanceGeometry    (Parser::Iterator, Node::MeshList& meshes);
     void ParseBindMaterial        (Parser::Iterator iter, MaterialBinds& binds);
+    void ParseIdrefArray          (Parser::Iterator iter, stl::vector <stl::string> *source);
+    void ParseFloatArray          (Parser::Iterator iter, stl::vector <float> *source);
 
   private:
     template <class T> bool CheckedRead (Parser::Node* node, const char* tag, T& value)

@@ -36,10 +36,15 @@ void DaeParser::ParseController (Parser::Iterator iter)
   Parser::Iterator skin_iter  = iter->First ("skin"),
                    morph_iter = iter->First ("morph");
   
+  if (skin_iter && morph_iter)
+    LogError (skin_iter->NextNamesake (), "Only one 'skin' or 'morph' sub-tag allowed");          
+  if (!skin_iter && !morph_iter)
+    LogError (skin_iter->NextNamesake (), "Must be at least one 'skin' or 'morph' sub-tag");          
+
   if (skin_iter)
   { 
     if (skin_iter->NextNamesake ())
-      LogWarning (skin_iter->NextNamesake (), "Second skin will be ignored");          
+      LogError (skin_iter->NextNamesake (), "Only one 'skin' sub-tag allowed");          
 
 //    ParseSkin (skin_iter, skin);
   }
@@ -47,8 +52,8 @@ void DaeParser::ParseController (Parser::Iterator iter)
   if (morph_iter)
   {
     if (morph_iter->NextNamesake ())
-      LogWarning (morph_iter->NextNamesake (), "Second morph will be ignored");
+      LogError (morph_iter->NextNamesake (), "Only one 'morph' sub-tag allowed");          
 
-//    ParseMorph (morph_iter);
+    ParseMorph (morph_iter, id);
   }
 }

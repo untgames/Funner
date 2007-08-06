@@ -17,15 +17,15 @@ struct MorphTarget::Impl
   collada::Mesh& mesh;   //меш
   float          weight; //вес
   
-  Impl (collada::Mesh& in_mesh) : mesh (in_mesh), weight (1.0f) {}
+  Impl (collada::Mesh& in_mesh, float in_weight) : mesh (in_mesh), weight (in_weight) {}
 };
 
 /*
      онструктор / деструктор
 */
 
-MorphTarget::MorphTarget (medialib::collada::Mesh& mesh)
-  : impl (new Impl (mesh))
+MorphTarget::MorphTarget (medialib::collada::Mesh& mesh, float weight)
+  : impl (new Impl (mesh, weight))
   {}
 
 MorphTarget::~MorphTarget ()
@@ -65,7 +65,7 @@ float MorphTarget::Weight () const
 class ConstructableMorphTarget: public MorphTarget
 {
   public:
-    ConstructableMorphTarget (medialib::collada::Mesh& mesh) : MorphTarget (mesh) {}
+    ConstructableMorphTarget (medialib::collada::Mesh& mesh, float weight) : MorphTarget (mesh, weight) {}
 };
 
 //список MorphTarget
@@ -74,9 +74,9 @@ class MorphTargetListImpl: public Collection<MorphTarget, ConstructableMorphTarg
   public:
     MorphTargetListImpl (Entity& owner) : Collection<MorphTarget, ConstructableMorphTarget, true> (owner) {}
   
-    MorphTarget& Create (Mesh& mesh)
+    MorphTarget& Create (Mesh& mesh, float weight)
     {
-      ConstructableMorphTarget* target = new ConstructableMorphTarget (mesh);
+      ConstructableMorphTarget* target = new ConstructableMorphTarget (mesh, weight);
 
       try
       {
