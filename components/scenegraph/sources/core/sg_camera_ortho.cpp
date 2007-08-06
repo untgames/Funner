@@ -125,9 +125,10 @@ void OrthoCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
   if (fabs (height) < EPS) Raise<Exception> ("sg::OrthoCamera::ComputeProjectionMatrix", "Zero camera height");
   if (fabs (depth)  < EPS) Raise<Exception> ("sg::OrthoCamera::ComputeProjectionMatrix", "Zero camera depth");
   
-  proj_matrix [0] = vec4f (2.0f / width, 0, 0, - (impl->right + impl->left) / (impl->right - impl->left));
+  //выбрана матрица проецирования, используемая gluOrtho2D
+  proj_matrix [0] = vec4f (2.0f / width, 0, 0, - (impl->right + impl->left) / width);
   proj_matrix [1] = vec4f (0, 2.0f / height, 0, - (impl->top + impl->bottom) / height);
-  proj_matrix [2] = vec4f (0, 0, -2.0f / depth, (impl->z_near + impl->z_far) / (-impl->z_far - impl->z_near));  ///???????????????????почему минус перед zfar????????
+  proj_matrix [2] = vec4f (0, 0, -2.0f / depth, - (impl->z_near + impl->z_far) / depth);
   proj_matrix [3] = vec4f (0, 0, 0, 1);
 }
 

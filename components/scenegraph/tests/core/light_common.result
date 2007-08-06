@@ -1,0 +1,7 @@
+Results of light_common_test:
+Light type: spot light
+Light type: direct light
+Light type: point light
+Light color: [0 0.4 0.17]
+Light attenuation: [0 1.4 -2]
+Light range: 17.600000
