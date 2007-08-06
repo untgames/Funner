@@ -60,6 +60,7 @@ enum EntityEvent
 {
   EntityEvent_AfterUpdate,   //срабатывает после обновления состояния объекта
   EntityEvent_BeforeDestroy, //срабатывает перед удалением объекта
+  EntityEvent_AfterDestroy,  //срабатывает после удаления объекта
   EntityEvent_AfterBind,     //срабатывает после присоединения объекта к родителю
   EntityEvent_BeforeUnbind,  //срабатывает перед отсоединением объекта от родителя
 

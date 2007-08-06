@@ -64,17 +64,18 @@ Entity::Entity ()
     //масштаб по умолчанию
     
   impl->local_scale = 1.0f;
+  impl->world_scale = 1.0f;
 
     //по умолчанию объект наследует все преобразования родителя
   
   impl->orientation_inherit = true;
   impl->scale_inherit       = true;
   
-    //преобразования не рассчитаны
+    //преобразования рассчитаны
 
-  impl->need_world_transform_update = true;
-  impl->need_local_tm_update        = true;
-  impl->need_world_tm_update        = true;  
+  impl->need_world_transform_update = false;
+  impl->need_local_tm_update        = false;
+  impl->need_world_tm_update        = false;  
 }
 
 Entity::~Entity ()
@@ -84,6 +85,10 @@ Entity::~Entity ()
   UnbindAllChildren ();
   Unbind ();
   
+    //оповещение об удалении объекта
+    
+  Notify (EntityEvent_AfterDestroy);
+
     //удаляем реализацию объекта
 
   delete impl;
@@ -318,10 +323,6 @@ void Entity::BindToParentImpl (Entity* parent, EntityBindMode mode, EntityTransf
     impl->parent->Release ();
   }
 
-    //родительские преобразования требуют пересчёта
-
-  UpdateWorldTransformNotify ();
-
     //связываем объект с новым родителем
 
   impl->parent = parent;
@@ -333,9 +334,17 @@ void Entity::BindToParentImpl (Entity* parent, EntityBindMode mode, EntityTransf
     if (impl->scene)
       SetScene (0);
       
+    BeginUpdate ();
+      
+      //родительские преобразования требуют пересчёта
+  
+    UpdateWorldTransformNotify ();
+      
       //оповещаем клиентов о присоединении объекта к новому родителю
 
     Notify (EntityEvent_AfterBind);
+    
+    EndUpdate ();
 
     return;
   }
@@ -360,10 +369,18 @@ void Entity::BindToParentImpl (Entity* parent, EntityBindMode mode, EntityTransf
 
   if (impl->scene != parent_impl->scene)
     SetScene (parent_impl->scene);
+    
+  BeginUpdate ();
+      
+      //родительские преобразования требуют пересчёта
+  
+  UpdateWorldTransformNotify ();    
 
       //оповещаем клиентов о присоединении объекта к новому родителю
 
   Notify (EntityEvent_AfterBind);
+  
+  EndUpdate ();
 }
 
 void Entity::UnbindChild (const char* name, EntityTransformSpace invariant_space)
@@ -531,13 +548,13 @@ void Entity::TraverseAccept (Visitor& visitor, EntityTraverseMode mode) const
 
 inline void Entity::UpdateWorldTransformNotify ()
 {
+  UpdateNotify ();
+
   if (impl->need_world_transform_update)
     return;
 
   impl->need_world_transform_update = true;
   impl->need_world_tm_update        = true;
-
-  UpdateNotify ();
   
     //оповещение всех потомков о необходимости пересчёта мировых преобразований
   
