@@ -1,0 +1,52 @@
+Results of axis_aligned_box_test:
+default constructor
+min=[0 0 0] max=[0 0 0]
+vector constructor
+min=[-10 -20 -30] max=[30 20 10]
+scalar constructor
+min=[1 2 3] max=[4 5 6]
+set_extents
+min=[-1 -2 -3] max=[3 2 1]
+reset
+min=[0 0 0] max=[0 0 0]
+box is empty
+set_minimum
+min=[-2 -4 -6] max=[0 0 0]
+set_maximum
+min=[-2 -4 -6] max=[6 8 10]
+box is not empty
+statistics
+  center: [2 2 2]
+  size: [8 12 16]
+  radius: 10.77
+  volume: 1536
+corners:
+  (Xmin, Ymin, Zmin)=[-2 -4 -6]
+  (Xmax, Ymin, Zmin)=[6 -4 -6]
+  (Xmin, Ymax, Zmin)=[-2 8 -6]
+  (Xmax, Ymax, Zmin)=[6 8 -6]
+  (Xmin, Ymin, Zmax)=[-2 -4 10]
+  (Xmax, Ymin, Zmax)=[6 -4 10]
+  (Xmin, Ymax, Zmax)=[-2 8 10]
+  (Xmax, Ymax, Zmax)=[6 8 10]
+add test point
+min=[-20 -4 -6] max=[6 30 10]
+add box
+min=[-20 -20 -30] max=[30 30 10]
+multiply on quaternion
+min=[-20 -10 -20] max=[30 30 30]
+muliply on matrix
+min=[-10 10 10] max=[40 50 60]
+intersects:
+  box with box1: 1, intersection: min=[-10 10 10] max=[30 20 10]
+  box1 with box: 1, intersection: min=[-10 10 10] max=[30 20 10]
+intersects:
+  box with box2: 0, intersection: min=[0 0 0] max=[0 0 0]
+  box2 with box: 0, intersection: min=[0 0 0] max=[0 0 0]
+contains point: 1
+contains box1: 0
+contains intersection (box, box1): 1
+box == box: 1
+box != box: 0
+box == box1: 0
+box != box1: 1
