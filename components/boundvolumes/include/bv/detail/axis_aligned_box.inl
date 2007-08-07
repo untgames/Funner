@@ -3,8 +3,8 @@
 */
 
 template <class T>
-inline axis_aligned_box<T>::axis_aligned_box (const vec_type& min, const vec_type& max)
-  : min_extent (min), max_extent (max)
+inline axis_aligned_box<T>::axis_aligned_box (const vec_type& vmin, const vec_type& vmax)
+  : min_extent (vmin), max_extent (vmax)
   {}
 
 template <class T>
@@ -33,9 +33,9 @@ inline const typename axis_aligned_box<T>::vec_type& axis_aligned_box<T>::maximu
 */
 
 template <class T>
-inline void axis_aligned_box<T>::set_minimum (const vec_type& min)
+inline void axis_aligned_box<T>::set_minimum (const vec_type& vmin)
 {
-  min_extent = min;
+  min_extent = vmin;
 }
 
 template <class T>
@@ -45,9 +45,9 @@ inline void axis_aligned_box<T>::set_minimum (const element_type& x, const eleme
 }
 
 template <class T>
-inline void axis_aligned_box<T>::set_maximum (const vec_type& max)
+inline void axis_aligned_box<T>::set_maximum (const vec_type& vmax)
 {
-  max_extent = max;
+  max_extent = vmax;
 }
 
 template <class T>
@@ -57,10 +57,10 @@ inline void axis_aligned_box<T>::set_maximum (const element_type& x, const eleme
 }
 
 template <class T>
-inline void axis_aligned_box<T>::set_extents (const vec_type& min, const vec_type& max)
+inline void axis_aligned_box<T>::set_extents (const vec_type& vmin, const vec_type& vmax)
 {
-  set_minimum (min);
-  set_maximum (max);
+  set_minimum (vmin);
+  set_maximum (vmax);
 }
 
 template <class T>
@@ -199,11 +199,11 @@ inline axis_aligned_box<T> axis_aligned_box<T>::operator + (const axis_aligned_b
 template <class T>
 inline axis_aligned_box<T>& axis_aligned_box<T>::operator *= (const math::matrix<T, 4>& tm)
 {
-  vec_type min = min_extent, max = max_extent;
+  vec_type vmin = min_extent, vmax = max_extent;
   
-  min_extent = max_extent = tm * min;
+  min_extent = max_extent = tm * vmin;
   
-  (*this) += tm * max;
+  (*this) += tm * vmax;
   
   return *this;
 }
@@ -211,11 +211,11 @@ inline axis_aligned_box<T>& axis_aligned_box<T>::operator *= (const math::matrix
 template <class T>
 inline axis_aligned_box<T>& axis_aligned_box<T>::operator *= (const math::quat<T>& q)
 {
-  vec_type min = min_extent, max = max_extent;
+  vec_type vmin = min_extent, vmax = max_extent;
   
-  min_extent = max_extent = q * min;
+  min_extent = max_extent = q * vmin;
   
-  (*this) += q * max;
+  (*this) += q * vmax;
   
   return *this;
 }
@@ -231,7 +231,7 @@ inline axis_aligned_box<T> axis_aligned_box<T>::operator * (const math::matrix<T
 {
   axis_aligned_box box;
   
-  box.min_extent = box.max_extent = tm * min_extent.
+  box.min_extent = box.max_extent = tm * min_extent;
 
   box += tm * max_extent;
 
@@ -319,16 +319,16 @@ inline bool axis_aligned_box<T>::operator != (const axis_aligned_box& box) const
 template <class T>
 inline axis_aligned_box<T> intersection (const axis_aligned_box<T>& a, const axis_aligned_box<T>& b)
 {
-  axis_aligned_box<T>::vec_type min = a.minimum (), max = a.maximum ();
+  axis_aligned_box<T>::vec_type vmin = a.minimum (), vmax = a.maximum ();
   
   for (size_t i=0; i<3; i++)
   {
-    if (b.minimum () [i] > min [i]) min [i] = b.minimum () [i];
-    if (b.maximum () [i] < max [i]) max [i] = b.maximum () [i];
+    if (b.minimum () [i] > vmin [i]) vmin [i] = b.minimum () [i];
+    if (b.maximum () [i] < vmax [i]) vmax [i] = b.maximum () [i];
     
-    if (min [i] > max [i])
+    if (vmin [i] > vmax [i])
       return axis_aligned_box<T> ();
   }
   
-  return axis_aligned_box<T> (min, max);
+  return axis_aligned_box<T> (vmin, vmax);
 }

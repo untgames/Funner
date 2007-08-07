@@ -3,14 +3,6 @@
 
 #include <mathlib.h>
 
-#ifdef min
-#undef min
-#endif
-
-#ifdef max
-#undef max
-#endif
-
 namespace bound_volumes
 {
 
@@ -47,7 +39,7 @@ template <class T> struct axis_aligned_box
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     axis_aligned_box () {}
-    axis_aligned_box (const vec_type& min, const vec_type& max);
+    axis_aligned_box (const vec_type& vmin, const vec_type& vmax);
     axis_aligned_box (const element_type& min_x, const element_type& min_y, const element_type& min_z,
                       const element_type& max_x, const element_type& max_y, const element_type& max_z);
 
@@ -64,7 +56,7 @@ template <class T> struct axis_aligned_box
     void set_minimum (const element_type& x, const element_type& y, const element_type& z);
     void set_maximum (const vec_type&);
     void set_maximum (const element_type& x, const element_type& y, const element_type& z);
-    void set_extents (const vec_type& min, const vec_type& max);
+    void set_extents (const vec_type& vmin, const vec_type& vmax);
     void set_extents (const element_type& min_x, const element_type& min_y, const element_type& min_z,
                       const element_type& max_x, const element_type& max_y, const element_type& max_z);
 
