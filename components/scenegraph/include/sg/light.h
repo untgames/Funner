@@ -4,7 +4,7 @@
 #include <mathlib.h>
 #include <sg/entity.h>
 
-namespace sg
+namespace scene_graph
 {
 
 const float DEFAULT_LIGHT_RANGE = 1e9;  //радиус действи€ источника света по умолчанию
@@ -33,8 +33,8 @@ class Light : public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///“ип источника света
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void          SetType (LightType type);
-    sg::LightType Type    () const;
+    void                   SetType (LightType type);
+    scene_graph::LightType Type    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///÷вет источника света

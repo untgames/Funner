@@ -4,7 +4,7 @@
 #include <mathlib.h>
 #include <xtl/functional_fwd>
 
-namespace sg
+namespace scene_graph
 {
 
 //forward declarations
@@ -82,8 +82,8 @@ class Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сцена, которой принадлежит узел (если узел не присоединён к сцене возвращает 0)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    sg::Scene*       Scene ();
-    const sg::Scene* Scene () const;
+    scene_graph::Scene*       Scene ();
+    const scene_graph::Scene* Scene () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя узла
@@ -262,7 +262,7 @@ class Node
 
   private:
     void BindToParentImpl (Node*, NodeBindMode, NodeTransformSpace);
-    void SetScene (sg::Scene*);
+    void SetScene (scene_graph::Scene*);
     void UpdateWorldTransformNotify ();
     void UpdateLocalTransformNotify ();
     void UpdateWorldTransform () const;

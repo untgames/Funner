@@ -1,7 +1,7 @@
 #include <sg/light.h>
 #include <xtl/visitor.h>
 
-using namespace sg;
+using namespace scene_graph;
 using namespace math;
 
 /*

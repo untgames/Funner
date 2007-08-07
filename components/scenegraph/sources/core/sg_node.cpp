@@ -4,7 +4,7 @@
 #include <xtl/visitor.h>
 #include <common/exception.h>
 
-using namespace sg;
+using namespace scene_graph;
 using namespace math;
 using namespace common;
 
@@ -14,32 +14,32 @@ using namespace common;
 
 struct Node::Impl
 {
-  sg::Scene*  scene;                            //сцена, которой принадлежит узел
-  stl::string name;                             //имя узла
-  size_t      name_hash;                        //хэш имени
-  size_t      ref_count;                        //количество ссылок на узел
-  Node*       parent;                           //родительский узел
-  Node*       first_child;                      //первый потомок
-  Node*       last_child;                       //последний потомок
-  Node*       prev_child;                       //предыдущий потомок
-  Node*       next_child;                       //следующий потомок
-  Signal      signals [NodeEvent_Num];          //сигналы
-  bool        signal_process [NodeEvent_Num];   //флаги обработки сигналов
-  vec3f       local_position;                   //локальное положение
-  quatf       local_orientation;                //локальная ориентация
-  vec3f       local_scale;                      //локальный масштаб
-  mat4f       local_tm;                         //матрица локальных преобразований
-  vec3f       world_position;                   //мировое положение
-  quatf       world_orientation;                //мировая ориентация
-  vec3f       world_scale;                      //мировой масштаб
-  mat4f       world_tm;                         //матрица мировых преобразований
-  bool        orientation_inherit;              //флаг наследования родительской ориентации
-  bool        scale_inherit;                    //флаг наследования родительского масштаба
-  bool        need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
-  bool        need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
-  bool        need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
-  size_t      update_lock;                      //счётчик открытых транзакций обновления
-  bool        update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
+  scene_graph::Scene* scene;                            //сцена, которой принадлежит узел
+  stl::string         name;                             //имя узла
+  size_t              name_hash;                        //хэш имени
+  size_t              ref_count;                        //количество ссылок на узел
+  Node*               parent;                           //родительский узел
+  Node*               first_child;                      //первый потомок
+  Node*               last_child;                       //последний потомок
+  Node*               prev_child;                       //предыдущий потомок
+  Node*               next_child;                       //следующий потомок
+  Signal              signals [NodeEvent_Num];          //сигналы
+  bool                signal_process [NodeEvent_Num];   //флаги обработки сигналов
+  vec3f               local_position;                   //локальное положение
+  quatf               local_orientation;                //локальная ориентация
+  vec3f               local_scale;                      //локальный масштаб
+  mat4f               local_tm;                         //матрица локальных преобразований
+  vec3f               world_position;                   //мировое положение
+  quatf               world_orientation;                //мировая ориентация
+  vec3f               world_scale;                      //мировой масштаб
+  mat4f               world_tm;                         //матрица мировых преобразований
+  bool                orientation_inherit;              //флаг наследования родительской ориентации
+  bool                scale_inherit;                    //флаг наследования родительского масштаба
+  bool                need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
+  bool                need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
+  bool                need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
+  size_t              update_lock;                      //счётчик открытых транзакций обновления
+  bool                update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
 };
 
 /*
@@ -128,7 +128,7 @@ const char* Node::Name () const
 void Node::SetName (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("sg::Node::SetName", "name");
+    RaiseNullArgument ("scene_graph::Node::SetName", "name");
 
   impl->name      = name;
   impl->name_hash = strhash (name);
@@ -250,10 +250,10 @@ void Node::BindToParentImpl (Node* parent, NodeBindMode mode, NodeTransformSpace
     case NodeTransformSpace_Local:
       break;
     case NodeTransformSpace_World:
-      RaiseNotImplemented ("sg::Node::BindToParent (invariant_space=NodeTransformSpace_World)");
+      RaiseNotImplemented ("scene_graph::Node::BindToParent (invariant_space=NodeTransformSpace_World)");
       break;
     default:
-      RaiseInvalidArgument ("sg::Node::BindToParent", "invariant_space", invariant_space);
+      RaiseInvalidArgument ("scene_graph::Node::BindToParent", "invariant_space", invariant_space);
       break;
   }
   
@@ -265,7 +265,7 @@ void Node::BindToParentImpl (Node* parent, NodeBindMode mode, NodeTransformSpace
     case NodeBindMode_Capture:
       break;
     default:
-      RaiseInvalidArgument ("sg::Node::BindToParent", "mode", mode);
+      RaiseInvalidArgument ("scene_graph::Node::BindToParent", "mode", mode);
       break;
   }
   
@@ -278,7 +278,7 @@ void Node::BindToParentImpl (Node* parent, NodeBindMode mode, NodeTransformSpace
     
   for (Node* Node=parent; Node; Node=Node->impl->parent)
     if (Node == this)
-      RaiseInvalidArgument ("sg::Node::BindToParent", "parent", "Attempt to bind object to one of it's child");
+      RaiseInvalidArgument ("scene_graph::Node::BindToParent", "parent", "Attempt to bind object to one of it's child");
       
     //оповещаем клиентов об отсоединении узла от родителя
       
@@ -369,7 +369,7 @@ void Node::UnbindChild (const char* name, NodeTransformSpace invariant_space)
 void Node::UnbindChild (const char* name, NodeSearchMode mode, NodeTransformSpace invariant_space)
 {
   if (!name)
-    RaiseNullArgument ("sg::Node::UnbindChild", "name");
+    RaiseNullArgument ("scene_graph::Node::UnbindChild", "name");
 
   Node* child = FindChild (name, mode);
   
@@ -386,7 +386,7 @@ void Node::UnbindAllChildren ()
 }
 
 //установка указателя на сцену для узла и всех его потомков
-void Node::SetScene (sg::Scene* scene)
+void Node::SetScene (scene_graph::Scene* scene)
 {
   impl->scene = scene;
   
@@ -406,7 +406,7 @@ Node* Node::FindChild (const char* name, NodeSearchMode mode) //no throw
 const Node* Node::FindChild (const char* name, NodeSearchMode mode) const //no throw
 {
   if (!name)
-    RaiseNullArgument ("sg::Node::FindChild", "name");    
+    RaiseNullArgument ("scene_graph::Node::FindChild", "name");    
     
   size_t name_hash = strhash (name);
     
@@ -432,7 +432,7 @@ const Node* Node::FindChild (const char* name, NodeSearchMode mode) const //no t
 
       break;
     default:
-      RaiseInvalidArgument ("sg::Node::FindChild", "mode", mode);
+      RaiseInvalidArgument ("scene_graph::Node::FindChild", "mode", mode);
       break;
   }
 
@@ -467,7 +467,7 @@ void Node::Traverse (const TraverseFunction& fn, NodeTraverseMode mode)
       fn (*this);
       break;
     default:
-      RaiseInvalidArgument ("sg::Node::Traverse", "mode", mode);
+      RaiseInvalidArgument ("scene_graph::Node::Traverse", "mode", mode);
       break;
   }  
 
@@ -488,7 +488,7 @@ void Node::Traverse (const ConstTraverseFunction& fn, NodeTraverseMode mode) con
       fn (*this);
       break;
     default:
-      RaiseInvalidArgument ("sg::Node::Traverse", "mode", mode);
+      RaiseInvalidArgument ("scene_graph::Node::Traverse", "mode", mode);
       break;
   }
 
@@ -509,7 +509,7 @@ void Node::TraverseAccept (Visitor& visitor, NodeTraverseMode mode) const
       const_cast<Node&> (*this).AcceptCore (visitor);
       break;
     default:
-      RaiseInvalidArgument ("sg::Node::Traverse", "mode", mode);
+      RaiseInvalidArgument ("scene_graph::Node::Traverse", "mode", mode);
       break;
   }
 
@@ -751,7 +751,7 @@ void Node::Translate (const math::vec3f& offset, NodeTransformSpace space)
 
       break;
     default:
-      RaiseInvalidArgument ("sg::Node::Translate", "space", space);
+      RaiseInvalidArgument ("scene_graph::Node::Translate", "space", space);
       break;
   }
   
@@ -781,7 +781,7 @@ void Node::Rotate (const math::quatf& q, NodeTransformSpace space)
       break;
     }      
     default:
-      RaiseInvalidArgument ("sg::Node::Rotate", "space", space);
+      RaiseInvalidArgument ("scene_graph::Node::Rotate", "space", space);
       break;
   }
 
@@ -852,7 +852,7 @@ const mat4f& Node::TransformationMatrix (NodeTransformSpace space) const
 
       return impl->world_tm;
     default:
-      RaiseInvalidArgument ("sg::Node::TransformationMatrix", "space", space);
+      RaiseInvalidArgument ("scene_graph::Node::TransformationMatrix", "space", space);
       return idNode;
   } 
 }
@@ -878,7 +878,7 @@ Node::Signal& Node::Event (NodeEvent event)
 const Node::Signal& Node::Event (NodeEvent event) const
 {
   if (event < 0 || event >= NodeEvent_Num)
-    RaiseInvalidArgument ("sg::Node::Event", "event", event);
+    RaiseInvalidArgument ("scene_graph::Node::Event", "event", event);
     
   return impl->signals [event];
 }
@@ -926,7 +926,7 @@ void Node::BeginUpdate ()
 void Node::EndUpdate ()
 {
   if (!impl->update_lock)
-    RaiseNotSupported ("sg::Node::EndUpdate", "Attempt to call EndUpdate without previous BeginUpdate call");  
+    RaiseNotSupported ("scene_graph::Node::EndUpdate", "Attempt to call EndUpdate without previous BeginUpdate call");  
     
   if (!--impl->update_lock)
   {

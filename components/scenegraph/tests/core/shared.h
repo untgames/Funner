@@ -8,7 +8,7 @@
 #include <sg/camera.h>
 #include <stdio.h>
 
-using namespace sg;
+using namespace scene_graph;
 using namespace math;
 using namespace xtl;
 using namespace bound_volumes;

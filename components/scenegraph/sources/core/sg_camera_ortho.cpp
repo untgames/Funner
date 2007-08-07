@@ -2,7 +2,7 @@
 #include <xtl/visitor.h>
 #include <common/exception.h>
 
-using namespace sg;
+using namespace scene_graph;
 using namespace math;
 using namespace common;
 
@@ -121,9 +121,9 @@ void OrthoCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
         height = impl->top - impl->bottom,
         depth  = impl->z_far - impl->z_near;
 
-  if (fabs (width)  < EPS) Raise<Exception> ("sg::OrthoCamera::ComputeProjectionMatrix", "Zero camera width");
-  if (fabs (height) < EPS) Raise<Exception> ("sg::OrthoCamera::ComputeProjectionMatrix", "Zero camera height");
-  if (fabs (depth)  < EPS) Raise<Exception> ("sg::OrthoCamera::ComputeProjectionMatrix", "Zero camera depth");
+  if (fabs (width)  < EPS) Raise<Exception> ("scene_graph::OrthoCamera::ComputeProjectionMatrix", "Zero camera width");
+  if (fabs (height) < EPS) Raise<Exception> ("scene_graph::OrthoCamera::ComputeProjectionMatrix", "Zero camera height");
+  if (fabs (depth)  < EPS) Raise<Exception> ("scene_graph::OrthoCamera::ComputeProjectionMatrix", "Zero camera depth");
   
   //выбрана матрица проецирования, используемая gluOrtho2D
   proj_matrix [0] = vec4f (2.0f / width, 0, 0, - (impl->right + impl->left) / width);

@@ -1,7 +1,7 @@
 #include <sg/entity.h>
 #include <xtl/visitor.h>
 
-using namespace sg;
+using namespace scene_graph;
 using namespace math;
 using namespace bound_volumes;
 using namespace xtl;
