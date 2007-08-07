@@ -34,11 +34,11 @@ Camera::~Camera ()
     Матрица проекции
 */
 
-const mat4f& Camera::ProjectionMatrix ()
+const mat4f& Camera::ProjectionMatrix () const
 {
   if (impl->dirty_pm)
   {
-    ComputeProjectionMatrix (impl->proj_matrix);
+    const_cast<Camera&> (*this).ComputeProjectionMatrix (impl->proj_matrix);
     impl->dirty_pm = 0;
   }
   return impl->proj_matrix;
@@ -60,5 +60,5 @@ void Camera::UpdateNotify ()
 void Camera::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Node::AcceptCore (visitor);
+    Entity::AcceptCore (visitor);
 }

@@ -13,14 +13,10 @@ int main ()
   
   NodePtr node (Node::Create (), false);
   
-  node->SetName   ("node1");
-  node->SetColor  (1, 0, 0);
-  node->Listeners (NodeEvent_BeforeDestroy).connect (&on_destroy);
-  
-  const vec3f& color = node->Color ();
+  node->SetName ("node1");
+  node->Event   (NodeEvent_BeforeDestroy).connect (&on_destroy);  
 
   printf ("name: '%s'\n", node->Name ());
-  printf ("color: [%g %g %g]\n", color.x, color.y, color.z);
   printf ("use count: %u\n", node->UseCount ());
 
   return 0;

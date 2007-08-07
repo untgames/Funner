@@ -9,7 +9,7 @@ void on_update1 (Node& node)
 
 void on_update2 (Node& node)
 {
-  node.SetColor (1, 0, 0);
+  node.SetName (node.Name ());
 }
 
 int main ()
@@ -19,17 +19,17 @@ int main ()
   NodePtr node (Node::Create (), false);
   
   node->SetName   ("node1");
-  node->Listeners (NodeEvent_AfterUpdate).connect (&on_update1);
+  node->Event (NodeEvent_AfterUpdate).connect (&on_update1);
   
   printf ("Update color\n");  
   
-  node->SetColor (0, 1, 0);
+  node->SetName (node->Name ());
   
   printf ("Update name\n");
   
   node->SetName ("node2");
   
-  node->Listeners (NodeEvent_AfterUpdate).connect (&on_update2);
+  node->Event (NodeEvent_AfterUpdate).connect (&on_update2);
   
   printf ("Begin update\n");
   
@@ -37,7 +37,7 @@ int main ()
   
   printf ("Update color\n");
   
-  node->SetColor (0, 0, 1);
+  node->SetName (node->Name ());
   
   printf ("Update name\n");
   

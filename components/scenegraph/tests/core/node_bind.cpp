@@ -29,11 +29,11 @@ void on_after_destroy (Node& node)
 
 void register_notifiers (Node& node)
 {
-  node.Listeners (NodeEvent_AfterUpdate).connect (&on_update);
-  node.Listeners (NodeEvent_AfterBind).connect (&on_bind);
-  node.Listeners (NodeEvent_BeforeUnbind).connect (&on_unbind);
-  node.Listeners (NodeEvent_BeforeDestroy).connect (&on_before_destroy);
-  node.Listeners (NodeEvent_AfterDestroy).connect (&on_after_destroy);
+  node.Event (NodeEvent_AfterUpdate).connect (&on_update);
+  node.Event (NodeEvent_AfterBind).connect (&on_bind);
+  node.Event (NodeEvent_BeforeUnbind).connect (&on_unbind);
+  node.Event (NodeEvent_BeforeDestroy).connect (&on_before_destroy);
+  node.Event (NodeEvent_AfterDestroy).connect (&on_after_destroy);
 }
 
 int main ()

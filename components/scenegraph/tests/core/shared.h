@@ -11,6 +11,7 @@
 using namespace sg;
 using namespace math;
 using namespace xtl;
+using namespace bound_volumes;
 
 /*
     Вспомогательные утилиты вывода состояния объекта

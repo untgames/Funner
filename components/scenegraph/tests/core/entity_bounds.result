@@ -1,0 +1,22 @@
+Results of entity_bounds_test:
+default bound box
+entity 'entity' has infinite bounds:
+  local=[[-1e+008 -1e+008 -1e+008] - [1e+008 1e+008 1e+008]]
+  world=[[-1e+008 -1e+008 -1e+008] - [1e+008 1e+008 1e+008]]
+set finite bound box
+entity 'entity' bound:
+  local=[[-10 -10 -10] - [10 10 10]]
+  world=[[-10 -10 -10] - [10 10 10]]
+translate parent
+entity 'entity' bound:
+  local=[[-10 -10 -10] - [10 10 10]]
+  world=[[-9 -8 -7] - [11 12 13]]
+bound statistics:
+  children_bound_box: [[-22 -22 -22] - [10 10 10]]
+  world_children_bound_box: [[-21 -20 -19] - [11 12 13]]
+  full_bound_box: [[-22 -22 -22] - [10 10 10]]
+  world_full_bound_box: [[-21 -20 -19] - [11 12 13]]
+set infinite bounds
+entity 'entity' has infinite bounds:
+  local=[[-1e+008 -1e+008 -1e+008] - [1e+008 1e+008 1e+008]]
+  world=[[-1e+008 -1e+008 -1e+008] - [1e+008 1e+008 1e+008]]

@@ -23,7 +23,6 @@ struct Node::Impl
   Node*       last_child;                       //последний потомок
   Node*       prev_child;                       //предыдущий потомок
   Node*       next_child;                       //следующий потомок
-  vec3f       color;                            //цвет узла
   Signal      signals [NodeEvent_Num];          //сигналы
   bool        signal_process [NodeEvent_Num];   //флаги обработки сигналов
   vec3f       local_position;                   //локальное положение
@@ -166,27 +165,6 @@ void Node::Release ()
 size_t Node::UseCount () const
 {
   return impl->ref_count;
-}
-
-/*
-    Цвет узла
-*/
-
-void Node::SetColor (const vec3f& color)
-{
-  impl->color = color;
-  
-  UpdateNotify ();
-}
-
-void Node::SetColor (float red, float green, float blue)
-{
-  SetColor (vec3f (red, green, blue));
-}
-
-const vec3f& Node::Color () const
-{
-  return impl->color;
 }
 
 /*
@@ -551,11 +529,22 @@ inline void Node::UpdateWorldTransformNotify ()
   UpdateNotify ();
 
   if (impl->need_world_transform_update)
-    return;
+    return;      
 
   impl->need_world_transform_update = true;
   impl->need_world_tm_update        = true;
   
+    //оповещение производных классов об изменении положения объекта
+
+  try
+  {
+    UpdateWorldTransformEvent ();
+  }
+  catch (...)
+  {
+    //поглощаем все исключения
+  }
+
     //оповещение всех потомков о необходимости пересчёта мировых преобразований
   
   for (Node* node=impl->first_child; node; node=node->impl->next_child)
@@ -881,15 +870,15 @@ mat4f Node::ObjectTM (Node& object) const
     Подписка на события Node
 */
 
-Node::Signal& Node::Listeners (NodeEvent event)
+Node::Signal& Node::Event (NodeEvent event)
 {
-  return const_cast<Signal&> (const_cast<const Node&> (*this).Listeners (event));
+  return const_cast<Signal&> (const_cast<const Node&> (*this).Event (event));
 }
 
-const Node::Signal& Node::Listeners (NodeEvent event) const
+const Node::Signal& Node::Event (NodeEvent event) const
 {
   if (event < 0 || event >= NodeEvent_Num)
-    RaiseInvalidArgument ("sg::Node::Listeners", "event", event);
+    RaiseInvalidArgument ("sg::Node::Event", "event", event);
     
   return impl->signals [event];
 }
