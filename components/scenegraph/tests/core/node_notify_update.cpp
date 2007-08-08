@@ -2,12 +2,12 @@
 
 typedef com_ptr<Node> NodePtr;
 
-void on_update1 (Node& node)
+void on_update1 (Node& node, NodeEvent)
 {
   printf ("node '%s' updated\n", node.Name ());  
 }
 
-void on_update2 (Node& node)
+void on_update2 (Node& node, NodeEvent)
 {
   node.SetName (node.Name ());
 }

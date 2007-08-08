@@ -14,32 +14,34 @@ using namespace common;
 
 struct Node::Impl
 {
-  scene_graph::Scene* scene;                            //сцена, которой принадлежит узел
-  stl::string         name;                             //имя узла
-  size_t              name_hash;                        //хэш имени
-  size_t              ref_count;                        //количество ссылок на узел
-  Node*               parent;                           //родительский узел
-  Node*               first_child;                      //первый потомок
-  Node*               last_child;                       //последний потомок
-  Node*               prev_child;                       //предыдущий потомок
-  Node*               next_child;                       //следующий потомок
-  Signal              signals [NodeEvent_Num];          //сигналы
-  bool                signal_process [NodeEvent_Num];   //флаги обработки сигналов
-  vec3f               local_position;                   //локальное положение
-  quatf               local_orientation;                //локальная ориентация
-  vec3f               local_scale;                      //локальный масштаб
-  mat4f               local_tm;                         //матрица локальных преобразований
-  vec3f               world_position;                   //мировое положение
-  quatf               world_orientation;                //мировая ориентация
-  vec3f               world_scale;                      //мировой масштаб
-  mat4f               world_tm;                         //матрица мировых преобразований
-  bool                orientation_inherit;              //флаг наследования родительской ориентации
-  bool                scale_inherit;                    //флаг наследования родительского масштаба
-  bool                need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
-  bool                need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
-  bool                need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
-  size_t              update_lock;                      //счётчик открытых транзакций обновления
-  bool                update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
+  stl::string   name;                             //имя узла
+  size_t        name_hash;                        //хэш имени
+  size_t        ref_count;                        //количество ссылок на узел
+  Node*         parent;                           //родительский узел
+  Node*         first_child;                      //первый потомок
+  Node*         last_child;                       //последний потомок
+  Node*         prev_child;                       //предыдущий потомок
+  Node*         next_child;                       //следующий потомок
+  bool          bind_lock;                        //флаг блокировки на вызов BindToParent
+  Signal        signals [NodeEvent_Num];          //сигналы
+  bool          signal_process [NodeEvent_Num];   //флаги обработки сигналов
+  SubTreeSignal subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
+  bool          subtree_signal_process [NodeSubTreeEvent_Num]; //флаги обработки сигналов, возникающих в узлах потомках
+  vec3f         local_position;                   //локальное положение
+  quatf         local_orientation;                //локальная ориентация
+  vec3f         local_scale;                      //локальный масштаб
+  mat4f         local_tm;                         //матрица локальных преобразований
+  vec3f         world_position;                   //мировое положение
+  quatf         world_orientation;                //мировая ориентация
+  vec3f         world_scale;                      //мировой масштаб
+  mat4f         world_tm;                         //матрица мировых преобразований
+  bool          orientation_inherit;              //флаг наследования родительской ориентации
+  bool          scale_inherit;                    //флаг наследования родительского масштаба
+  bool          need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
+  bool          need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
+  bool          need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
+  size_t        update_lock;                      //счётчик открытых транзакций обновления
+  bool          update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
 };
 
 /*
@@ -49,7 +51,6 @@ struct Node::Impl
 Node::Node ()
   : impl (new Impl)
 {
-  impl->scene         = 0;    //по умолчанию узел не принадлежит ни одной сцене
   impl->ref_count     = 1;
   impl->parent        = 0;
   impl->first_child   = 0;
@@ -61,20 +62,32 @@ Node::Node ()
   impl->name_hash     = strhash (impl->name.c_str ());
 
     //масштаб по умолчанию
-    
+
   impl->local_scale = 1.0f;
   impl->world_scale = 1.0f;
 
     //по умолчанию узел наследует все преобразования родителя
-  
+
   impl->orientation_inherit = true;
   impl->scale_inherit       = true;
-  
+
     //преобразования рассчитаны
 
   impl->need_world_transform_update = false;
   impl->need_local_tm_update        = false;
   impl->need_world_tm_update        = false;  
+  
+    //очистка массива флагов обработки сигналов
+    
+  for (size_t i=0; i<NodeEvent_Num; i++)
+    impl->signal_process [i] = false;
+    
+  for (size_t i=0; i<NodeSubTreeEvent_Num; i++)
+    impl->subtree_signal_process [i] = false;
+    
+    //очистка флага блокировки на вызов BindToParent
+    
+  impl->bind_lock = false;
 }
 
 Node::~Node ()
@@ -100,20 +113,6 @@ Node::~Node ()
 Node* Node::Create ()
 {
   return new Node;
-}
-
-/*
-    Возвращение сцены, которой принадлежит узел
-*/
-
-Scene* Node::Scene ()
-{
-  return impl->scene;
-}
-
-const Scene* Node::Scene () const
-{
-  return impl->scene;
 }
 
 /*
@@ -150,7 +149,7 @@ void Node::Release ()
     //защита от повторного удаления в обработчике
 
   if (impl->signal_process [NodeEvent_BeforeDestroy])
-    return;            
+    return;
 
   if (!--impl->ref_count)
   {
@@ -239,7 +238,7 @@ void Node::BindToParentImpl (Node* parent, NodeBindMode mode, NodeTransformSpace
 {
     //защита от вызова Bind в обработчиках соответствующих событий
 
-  if (impl->signal_process [NodeEvent_AfterBind] || impl->signal_process [NodeEvent_BeforeUnbind])
+  if (impl->bind_lock)
     return;
 
     //определяем инвариантное пространство преобразований
@@ -280,10 +279,14 @@ void Node::BindToParentImpl (Node* parent, NodeBindMode mode, NodeTransformSpace
     if (Node == this)
       RaiseInvalidArgument ("scene_graph::Node::BindToParent", "parent", "Attempt to bind object to one of it's child");
       
-    //оповещаем клиентов об отсоединении узла от родителя
+    //устанавливаем блокировку на вызов BindToParent
+    
+  impl->bind_lock = true;
       
-  Notify (NodeEvent_BeforeUnbind);
-  
+    //оповещаем клиентов об отсоединении узла от родителя
+
+  UnbindNotify ();
+
     //если у узла уже есть родитель производитм действия по его отсоединению
     
   if (impl->parent)
@@ -305,60 +308,33 @@ void Node::BindToParentImpl (Node* parent, NodeBindMode mode, NodeTransformSpace
 
   impl->parent = parent;
 
-  if (!parent)
+  if (parent)
   {
-    impl->prev_child = impl->next_child = 0;
-    
-    if (impl->scene)
-      SetScene (0);
-      
-    BeginUpdate ();
-      
-      //родительские преобразования требуют пересчёта
-  
-    UpdateWorldTransformNotify ();
-      
-      //оповещаем клиентов о присоединении узла к новому родителю
+      //увеличиваем число ссылок если этого требует режим присоединения
 
-    Notify (NodeEvent_AfterBind);
-    
-    EndUpdate ();
+    if (mode == NodeBindMode_AddRef)
+      parent->AddRef ();
 
-    return;
+      //регистрируем узел в списке потомков родителя
+      
+    Impl* parent_impl = parent->impl;
+
+    impl->prev_child   = parent_impl->last_child;
+    impl->next_child   = 0;
+    parent->impl->last_child = this;
+
+    if (impl->prev_child) impl->prev_child->impl->next_child = this;
+    else                  parent_impl->first_child           = this;
   }
+  else impl->prev_child = impl->next_child = 0;    
 
-    //увеличиваем число ссылок если этого требует режим присоединения
-
-  if (mode == NodeBindMode_AddRef)
-    parent->AddRef ();
-
-    //регистрируем узел в списке потомков родителя
-    
-  Impl* parent_impl = parent->impl;
-
-  impl->prev_child   = parent_impl->last_child;
-  impl->next_child   = 0;
-  parent->impl->last_child = this;
-
-  if (impl->prev_child) impl->prev_child->impl->next_child = this;
-  else                  parent_impl->first_child          = this;
-
-    //обновление указателя на сцену в потомках
-
-  if (impl->scene != parent_impl->scene)
-    SetScene (parent_impl->scene);
-    
-  BeginUpdate ();
-      
-      //родительские преобразования требуют пересчёта
+    //оповещение о присоединении узла к родителю
   
-  UpdateWorldTransformNotify ();    
-
-      //оповещаем клиентов о присоединении узла к новому родителю
-
-  Notify (NodeEvent_AfterBind);
+  BindNotify ();
   
-  EndUpdate ();
+    //снятие блокировки на вызов BindToParent
+
+  impl->bind_lock = false;
 }
 
 void Node::UnbindChild (const char* name, NodeTransformSpace invariant_space)
@@ -385,13 +361,54 @@ void Node::UnbindAllChildren ()
     impl->last_child->Unbind ();
 }
 
-//установка указателя на сцену для узла и всех его потомков
-void Node::SetScene (scene_graph::Scene* scene)
+//оповещение о присоединении узла к родителю
+void Node::BindNotify ()
 {
-  impl->scene = scene;
+    //оповещения об изменениях
   
-  for (Node* Node=impl->first_child; Node; Node=Node->impl->next_child)
-    Node->SetScene (scene);
+  BeginUpdate ();
+    
+    //родительские преобразования требуют пересчёта
+
+  UpdateWorldTransformNotify ();
+    
+    //оповещаем клиентов о присоединении узла к новому родителю
+
+  Notify (NodeEvent_AfterBind);
+
+  EndUpdate ();
+  
+    //оповещение родительского узла
+    
+  if (impl->parent)
+    impl->parent->BindChildNotify (*this);
+}
+
+//оповещение об отсоединении узла от родителя
+void Node::UnbindNotify ()
+{
+  Notify (NodeEvent_BeforeUnbind);
+  
+  if (impl->parent)
+    impl->parent->UnbindChildNotify (*this);
+}
+
+//оповещение о присоединении прямого или косвенного потомка
+void Node::BindChildNotify (Node& child)
+{
+  Notify (child, NodeSubTreeEvent_AfterBind);
+  
+  if (impl->parent)
+    impl->parent->BindChildNotify (child);
+}
+
+//оповещени об отсоединении прямого или косвенного потомка
+void Node::UnbindChildNotify (Node& child)
+{
+  Notify (child, NodeSubTreeEvent_BeforeUnbind);
+  
+  if (impl->parent)
+    impl->parent->UnbindChildNotify (child);
 }
 
 /*
@@ -870,17 +887,20 @@ mat4f Node::ObjectTM (Node& object) const
     Подписка на события Node
 */
 
-Node::Signal& Node::Event (NodeEvent event)
-{
-  return const_cast<Signal&> (const_cast<const Node&> (*this).Event (event));
-}
-
-const Node::Signal& Node::Event (NodeEvent event) const
+Node::Signal& Node::Event (NodeEvent event) const
 {
   if (event < 0 || event >= NodeEvent_Num)
-    RaiseInvalidArgument ("scene_graph::Node::Event", "event", event);
-    
+    RaiseInvalidArgument ("scene_graph::Node::Event(NodeEvent)", "event", event);
+
   return impl->signals [event];
+}
+
+Node::SubTreeSignal& Node::Event (NodeSubTreeEvent event) const
+{
+  if (event < 0 || event >= NodeSubTreeEvent_Num)
+    RaiseInvalidArgument ("scene_graph::Node::Event(NodeSubTreeEvent)", "event", event);
+
+  return impl->subtree_signals [event];
 }
 
 /*
@@ -902,7 +922,7 @@ void Node::Notify (NodeEvent event)
 
   try
   {
-    impl->signals [event] (*this);
+    impl->signals [event] (*this, event);
   }
   catch (...)
   {
@@ -912,6 +932,38 @@ void Node::Notify (NodeEvent event)
     //снимаем флаг обработки события
   
   impl->signal_process [event] = false;
+}
+
+void Node::Notify (Node& child, NodeSubTreeEvent event)
+{
+    //проверяем нет ли рекурсивного вызова
+
+  if (impl->subtree_signal_process [event])
+    return;
+    
+    //устанавливаем флаг обработки события
+
+  impl->subtree_signal_process [event] = true;
+  
+    //вызываем обработчики событий
+
+  try
+  {
+    impl->subtree_signals [event] (*this, child, event);
+  }
+  catch (...)
+  {
+    //все исключения клиентских обработчиков событий узла поглощаются
+  }
+  
+    //снимаем флаг обработки события
+  
+  impl->subtree_signal_process [event] = false;
+  
+    //оповещаем о возникновении события относительно всех потомков child
+    
+  for (Node* node=child.impl->first_child; node; node=node->impl->next_child)
+    Notify (*node, event);
 }
 
 /*

@@ -1,4 +1,4 @@
-Results of node_bind_test:
+Results of node_bind1_test:
 node 'node1' unbinded from parent '#ROOT'
 node 'node1' binded to parent 'parent1'
 node 'node1' updated

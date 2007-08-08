@@ -2,7 +2,7 @@
 
 typedef com_ptr<Node> NodePtr;
 
-void on_destroy (Node& node)
+void on_destroy (Node& node, NodeEvent)
 {
   printf ("node '%s' destroyed\n", node.Name ());
 }

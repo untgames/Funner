@@ -68,6 +68,17 @@ enum NodeEvent
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///События узлов-потомков
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum NodeSubTreeEvent
+{
+  NodeSubTreeEvent_AfterBind,    //срабатывает после присоединения к узлу прямого или косвенного потомка
+  NodeSubTreeEvent_BeforeUnbind, //срабатывает перед отсоединением потомка от узла прямого или косвенного потомка
+  
+  NodeSubTreeEvent_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Узел сцены
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   //добавить NodeIterator / NodeConstIterator
@@ -79,12 +90,6 @@ class Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
     static Node* Create ();
   
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сцена, которой принадлежит узел (если узел не присоединён к сцене возвращает 0)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    scene_graph::Scene*       Scene ();
-    const scene_graph::Scene* Scene () const;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,10 +223,11 @@ class Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::signal<void (Node&), xtl::default_signal_accumulator<void> > Signal;
+    typedef xtl::signal<void (Node& sender, NodeEvent event), xtl::default_signal_accumulator<void> > Signal;
+    typedef xtl::signal<void (Node& sender, Node& child, NodeSubTreeEvent event), xtl::default_signal_accumulator<void> > SubTreeSignal;
 
-          Signal& Event (NodeEvent);
-    const Signal& Event (NodeEvent) const;
+    Signal&        Event (NodeEvent) const;
+    SubTreeSignal& Event (NodeSubTreeEvent) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление транзакциями обновления
@@ -261,12 +267,16 @@ class Node
     virtual void UpdateWorldTransformEvent () {} //об изменении положения объекта
 
   private:
-    void BindToParentImpl (Node*, NodeBindMode, NodeTransformSpace);
-    void SetScene (scene_graph::Scene*);
     void UpdateWorldTransformNotify ();
     void UpdateLocalTransformNotify ();
     void UpdateWorldTransform () const;
+    void BindToParentImpl (Node*, NodeBindMode, NodeTransformSpace);
+    void BindNotify ();
+    void UnbindNotify ();
+    void BindChildNotify (Node&);
+    void UnbindChildNotify (Node&);
     void Notify (NodeEvent);
+    void Notify (Node&, NodeSubTreeEvent);
 
   private:
     Node (const Node&); //no impl

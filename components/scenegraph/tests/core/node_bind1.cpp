@@ -2,27 +2,27 @@
 
 typedef com_ptr<Node> NodePtr;
 
-void on_update (Node& node)
+void on_update (Node& node, NodeEvent)
 {
   printf ("node '%s' updated\n", node.Name ());
 }
 
-void on_bind (Node& node)
+void on_bind (Node& node, NodeEvent)
 {
   printf ("node '%s' binded to parent '%s'\n", node.Name (), node.Parent () ? node.Parent ()->Name () : "#ROOT");
 }
 
-void on_unbind (Node& node)
+void on_unbind (Node& node, NodeEvent)
 {
   printf ("node '%s' unbinded from parent '%s'\n", node.Name (), node.Parent () ? node.Parent ()->Name () : "#ROOT");
 }
 
-void on_before_destroy (Node& node)
+void on_before_destroy (Node& node, NodeEvent)
 {
   printf ("node '%s' before destroy\n", node.Name ());
 }
 
-void on_after_destroy (Node& node)
+void on_after_destroy (Node& node, NodeEvent)
 {
   printf ("node '%s' destroyed\n", node.Name ());
 }
@@ -38,7 +38,7 @@ void register_notifiers (Node& node)
 
 int main ()
 {
-  printf ("Results of node_bind_test:\n");
+  printf ("Results of node_bind1_test:\n");
   
   NodePtr node (Node::Create (), false);
   
