@@ -3,7 +3,7 @@
 #include "shared.h"
 
 /*
-    Конструктор
+    Конструктор / деструктор
 */
 
 DaeParser::DaeParser (const char* file_name, Model& in_model, const LogFunction& log)
@@ -20,6 +20,12 @@ DaeParser::DaeParser (const char* file_name, Model& in_model, const LogFunction&
   }
   
   PrintLog (log);  
+}
+
+DaeParser::~DaeParser ()
+{
+  for (VertexIndexMaps::iterator i=vertex_index_maps.begin (); i!=vertex_index_maps.end (); ++i)
+    delete i->second;
 }
 
 /*
@@ -67,6 +73,33 @@ void DaeParser::LogWarning (Parser::Node* node, const char* format, ...)
   
   va_start (list, format);
   parse_log.VWarning (node, format, list);
+}
+
+/*
+    Создание и поиск карт вершинных индексов    
+*/
+
+VertexIndexMap* DaeParser::GetVertexIndexMap (const char* mesh_name)
+{
+  if (!mesh_name)
+    return 0;
+    
+    //попытка поиска карты вершинных индексов
+    
+  VertexIndexMaps::iterator iter = vertex_index_maps.find (mesh_name);
+  
+  if (iter != vertex_index_maps.end ())
+    return iter->second;
+    
+    //создание карты вершинных индексов
+    
+  VertexIndexMap* map = new VertexIndexMap;
+  
+    //регистрация карты вершинных индексов
+    
+  vertex_index_maps [mesh_name] = map;
+  
+  return map;
 }
 
 /*

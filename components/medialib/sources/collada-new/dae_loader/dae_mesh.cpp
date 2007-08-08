@@ -286,6 +286,48 @@ class VertexStreamReader
       return ReadCore (semantic, set, params, buffer, identity_selector ());
     }    
     
+      //чтение массива индексов вершин
+    bool ReadVertexIndices (size_t* buffer)
+    {
+      const MeshInput* input = inputs.FindChannel ("VERTEX", "");
+      
+      if (!input)
+      {
+        parser.LogError (surface_node, "No input channel with semantic='VERTEX'");
+        return false;
+      }
+
+      LogScope scope (input->node, parser);
+
+      size_t offset         = input->offset,
+             max_count      = input->source->count,
+             vertices_count = vertex_buffer.GetVerticesCount ();
+
+      if (offset >= inputs.GetChannelsCount ())
+      {
+        parser.LogError (input->node, "Offset %u is greater of inputs count %u", offset, inputs.GetChannelsCount ());
+        return false;
+      }
+
+      size_t** input_vertex = vertex_buffer.GetVertices ();
+      size_t*  output_index = buffer;
+
+      for (size_t i=0; i<vertices_count; i++, input_vertex++, output_index++)
+      {
+        size_t index = (*input_vertex) [offset];
+        
+        if (index >= max_count)
+        {
+          parser.LogError (surface_node->First ("p"), "Wrong index %u (max_count=%u)", index, max_count);
+          return false;
+        }
+           
+        *output_index = index;
+      }
+
+      return true;      
+    }
+    
   private:
       //функтор возвращающий член класса
     template <class T, class Field> struct field_selector
@@ -302,7 +344,6 @@ class VertexStreamReader
     {
       template <class T> T& operator () (T& object) const { return object; }
     };
-    
   
       //чтение канала данных
     template <class T, class Fn>  
@@ -354,7 +395,7 @@ class VertexStreamReader
         SetField (source + index * stride, fn (*output_vertex));
       }
       
-      return true;      
+      return true;
     }  
     
   private:
@@ -364,7 +405,7 @@ class VertexStreamReader
     {
       for (size_t i=0; i<N; i++)
         res [i] = src [i];
-    }  
+    }    
   
   private:
     DaeParser&        parser;
@@ -766,5 +807,20 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
         return;
       }      
     }
-  }  
+  }
+  
+    //построение массива вершинных индексов
+    
+  VertexIndexMap* vertex_index_map = GetVertexIndexMap (surface_info.mesh->EntityId ());
+  
+  vertex_index_map->Resize (surface.VerticesCount ());
+
+  if (!stream_reader.ReadVertexIndices (vertex_index_map->Indices ()))
+  {
+    LogError (surface_iter, "Error at read VERTEX stream");
+
+    surfaces.Remove (surface);
+
+    return;
+  }    
 }
