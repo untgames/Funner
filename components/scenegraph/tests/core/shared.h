@@ -7,6 +7,7 @@
 #include <sg/node.h>
 #include <sg/light.h>
 #include <sg/camera.h>
+#include <sg/visual_model.h>
 #include <sg/scene.h>
 #include <stdio.h>
 

@@ -128,7 +128,7 @@ float Light::Range () const
 }
 
 /*
-    Динамическая диспетчеризация    
+    Метод, вызываемый при посещении объекта
 */
 
 void Light::AcceptCore (Visitor& visitor)
