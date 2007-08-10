@@ -1,7 +1,8 @@
 Results of node_bind2_test:
 node 'parent2' binded to 'parent1' sub-tree
-node 'child1' binded to 'parent1' sub-tree
 node 'child2' binded to 'parent1' sub-tree
 node 'child2' unbinded from 'parent1' sub-tree
+node 'child1' binded to 'parent1' sub-tree
+exit
 node 'child1' unbinded from 'parent1' sub-tree
 node 'parent2' unbinded from 'parent1' sub-tree

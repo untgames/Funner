@@ -40,10 +40,10 @@ int main ()
   dump (*node);  
   
   printf ("visitor traverse top-to-bottom\n");
-  node->TraverseAccept (MyVisitor (), NodeTraverseMode_TopToBottom);
+  node->VisitEach (MyVisitor (), NodeTraverseMode_TopToBottom);
   
   printf ("visitor traverse bottom-to-top\n");
-  node->TraverseAccept (MyVisitor (), NodeTraverseMode_BottomToTop);
+  node->VisitEach (MyVisitor (), NodeTraverseMode_BottomToTop);
 
   return 0;
 }

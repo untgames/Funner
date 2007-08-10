@@ -1,24 +1,32 @@
-#include <sg/entity.h>
+#include <sg/scene.h>
 #include <xtl/visitor.h>
+
+#include "scene_object.h"
+
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
 
 using namespace scene_graph;
 using namespace math;
 using namespace bound_volumes;
 using namespace xtl;
 
-const float INFINITE_BOUND_VALUE = 1e8f;
+const float INFINITE_BOUND_VALUE = 1e8f; //значение бесконечности дл€ ограничивающих объЄмов
 
 /*
     ќписание реализации Entity
 */
 
-struct Entity::Impl
+struct Entity::Impl: public SceneObject
 {
   vec3f  color;                    //цвет объекта
   aaboxf local_bound_box;          //ограничивающий параллелипиппед в локальной системе координат
   aaboxf world_bound_box;          //ограничивающий параллелипиппед в мировой системе координат
   bool   need_world_bounds_update; //мировые ограничивающие объЄмы требуют пересчЄта
   bool   infinite_bounds;          //€вл€ютс€ ли ограничивающие объЄмы узла бесконечными
+  
+  Impl (scene_graph::Entity& entity) : SceneObject (entity) {}
 };
 
 /*
@@ -26,7 +34,7 @@ struct Entity::Impl
 */
 
 Entity::Entity ()
-  : impl (new Impl)
+  : impl (new Impl (*this))
 {
   impl->need_world_bounds_update = false;
   impl->infinite_bounds          = true;
@@ -66,6 +74,9 @@ const vec3f& Entity::Color () const
 //оповещение об обновлении мировых ограничивающих объЄмов
 void Entity::UpdateWorldBoundsNotify ()
 {
+  if (!impl->need_world_bounds_update)
+    impl->UpdateBoundsNotify ();
+
   impl->need_world_bounds_update = true;
 }
 
@@ -85,7 +96,7 @@ void Entity::SetBoundBox (const bound_volumes::aaboxf& box)
   impl->local_bound_box = box;
   
   UpdateWorldBoundsNotify ();
-  UpdateNotify ();  
+  UpdateNotify ();
 }
 
 //ограничивающий объЄм узла в локальной системе координат
@@ -106,6 +117,9 @@ const aaboxf& Entity::WorldBoundBox () const
 //установка бесконечных ограничивающий объЄмов
 void Entity::SetInfiniteBounds ()
 {
+  if (impl->infinite_bounds) //игнорируем повторную установку бесконечных ограничивающих объЄмов
+    return;
+
   impl->infinite_bounds = true;
   impl->local_bound_box = aaboxf (vec3f (-INFINITE_BOUND_VALUE), vec3f (INFINITE_BOUND_VALUE));
   
@@ -158,7 +172,7 @@ aaboxf Entity::WorldChildrenBoundBox () const
 
   EntityVisitor visitor;
 
-  TraverseAccept (visitor);
+  VisitEach (visitor);
   
   return visitor.box;
 }
@@ -173,9 +187,23 @@ aaboxf Entity::WorldFullBoundBox () const
     ќбработка оповещени€ об изменении мирового положени€ узла
 */
 
-void Entity::UpdateWorldTransformEvent ()
+void Entity::AfterUpdateWorldTransformEvent ()
 {
   UpdateWorldBoundsNotify ();
+}
+
+/*
+    ќбработка оповещений об присоединении/отсоединении объекта к сцене
+*/
+
+void Entity::AfterSceneAttachEvent ()
+{
+  Scene ()->Attach (*impl);
+}
+
+void Entity::BeforeSceneDetachEvent ()
+{
+  impl->BindToSpace (0);
 }
 
 /*

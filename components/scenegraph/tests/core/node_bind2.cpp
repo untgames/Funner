@@ -17,7 +17,7 @@ void on_unbind_child (Node& node, Node& child, NodeSubTreeEvent)
   
     //проверка корректности обработки сутации вызова Bind в обработчике (вызов должен быть проигнорирован)
   
-  child.BindToParent (node);
+//  child.BindToParent (node);
 }
 
 int main ()
@@ -38,6 +38,8 @@ int main ()
   parent2->BindToParent (*parent1);
   child->BindToParent (*node);
   node->BindToParent (*parent2);
+  
+  printf ("exit\n");
 
   return 0;
 }

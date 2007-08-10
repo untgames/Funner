@@ -6,6 +6,7 @@
 #include <sg/node.h>
 #include <sg/light.h>
 #include <sg/camera.h>
+#include <sg/scene.h>
 #include <stdio.h>
 
 using namespace scene_graph;

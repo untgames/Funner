@@ -58,11 +58,13 @@ enum NodeTraverseMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum NodeEvent
 {
-  NodeEvent_AfterUpdate,   //срабатывает после обновления состояния узла
-  NodeEvent_BeforeDestroy, //срабатывает перед удалением узла
-  NodeEvent_AfterDestroy,  //срабатывает после удаления узла
-  NodeEvent_AfterBind,     //срабатывает после присоединения узла к родителю
-  NodeEvent_BeforeUnbind,  //срабатывает перед отсоединением узла от родителя
+  NodeEvent_AfterUpdate,       //срабатывает после обновления состояния узла
+  NodeEvent_BeforeDestroy,     //срабатывает перед удалением узла
+  NodeEvent_AfterDestroy,      //срабатывает после удаления узла
+  NodeEvent_AfterBind,         //срабатывает после присоединения узла к родителю
+  NodeEvent_BeforeUnbind,      //срабатывает перед отсоединением узла от родителя
+  NodeEvent_AfterSceneAttach,  //срабатывает после присоединения объекта к сцене
+  NodeEvent_BeforeSceneDetach, //срабатывает перед отсоединением объекта от сцены
 
   NodeEvent_Num
 };
@@ -82,6 +84,7 @@ enum NodeSubTreeEvent
 ///Узел сцены
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   //добавить NodeIterator / NodeConstIterator
+  //добавить блокировку на удаление объектов при оповещениях (скорее всего в Notify)!!!
 class Node
 {
   public: 
@@ -89,6 +92,13 @@ class Node
 ///Создание узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
     static Node* Create ();
+    static Node* Create (scene_graph::Scene&); //неверно!!!!!!
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сцена, которой принадлежит объект
+///////////////////////////////////////////////////////////////////////////////////////////////////
+          scene_graph::Scene* Scene ();
+    const scene_graph::Scene* Scene () const;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя узла
@@ -121,9 +131,14 @@ class Node
 ///Настройка иерархических связей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
       //установка соединения
-    void BindToParent (Node&              parent,                                        //родительский узел
+    void BindToParent (Node&              parent,                                      //родительский узел
                        NodeBindMode       mode = NodeBindMode_Default,                 //режим присоединения
                        NodeTransformSpace invariant_space = NodeTransformSpace_Local); //инвариантное пространство преобразований
+
+      //присоединение к сцене
+    void BindToScene (scene_graph::Scene& scene,                                       //сцена
+                      NodeBindMode        mode = NodeBindMode_Default,                 //режим присоединения
+                      NodeTransformSpace  invariant_space = NodeTransformSpace_Local); //инвариантное пространство преобразований
 
       //разрыв соединения
     void Unbind (NodeTransformSpace invariant_space = NodeTransformSpace_Local);
@@ -154,9 +169,9 @@ class Node
     typedef xtl::function<void (Node&)>       TraverseFunction;
     typedef xtl::function<void (const Node&)> ConstTraverseFunction;
 
-    void Traverse (const TraverseFunction&, NodeTraverseMode = NodeTraverseMode_Default);
-    void Traverse (const ConstTraverseFunction&, NodeTraverseMode = NodeTraverseMode_Default) const;
-    void TraverseAccept (Visitor&, NodeTraverseMode = NodeTraverseMode_Default) const;
+    void Traverse  (const TraverseFunction&, NodeTraverseMode = NodeTraverseMode_Default);
+    void Traverse  (const ConstTraverseFunction&, NodeTraverseMode = NodeTraverseMode_Default) const;
+    void VisitEach (Visitor&, NodeTraverseMode = NodeTraverseMode_Default) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Положение узла
@@ -242,7 +257,7 @@ class Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-            Node  ();
+            Node  (scene_graph::Scene* = 0);
     virtual ~Node ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -264,7 +279,9 @@ class Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///События
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void UpdateWorldTransformEvent () {} //об изменении положения объекта
+    virtual void AfterUpdateWorldTransformEvent () {} //после изменения положения объекта
+    virtual void AfterSceneAttachEvent () {}          //после присоединения объекта к сцене
+    virtual void BeforeSceneDetachEvent () {}         //перед отсоединением объекта от сцены
 
   private:
     void UpdateWorldTransformNotify ();
@@ -275,6 +292,7 @@ class Node
     void UnbindNotify ();
     void BindChildNotify (Node&);
     void UnbindChildNotify (Node&);
+    void SetScene (scene_graph::Scene*);
     void Notify (NodeEvent);
     void Notify (Node&, NodeSubTreeEvent);
 
