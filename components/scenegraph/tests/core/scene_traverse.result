@@ -1,0 +1,11 @@
+Results of scene_traverse_test:
+traverse
+  entity 'entity1'
+  entity 'entity2'
+visit_each
+  test_entity 'entity2'
+  test_entity 'entity3'
+const traverse
+  entity 'entity1'
+  entity 'entity2'
+  entity 'entity3'

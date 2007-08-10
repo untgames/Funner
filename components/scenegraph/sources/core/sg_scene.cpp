@@ -6,20 +6,41 @@
 #include "scene_object.h"
 
 using namespace scene_graph;
+using namespace bound_volumes;
 using namespace stl;
 using namespace common;
+using namespace xtl;
 
 /*
     Описание реализации сцены
 */
 
 //typedef xtl::com_ptr<ISceneManager> SceneManagerPtr;
+typedef com_ptr<Node> NodePtr;
 
 struct Scene::Impl: public SceneSpace
 {
 //  SceneManagerPtr scene_manager; //менеджер сцены
-  string name; //имя сцены  
-  Node*  root; //корень сцены
+  string  name; //имя сцены  
+  NodePtr root; //корень сцены
+  
+  template <class Fn>
+  void ForEach (Fn& fn)
+  {
+    SceneObject* object = FirstObject ();
+
+    for (size_t count=ObjectsCount (); count--; object=object->NextObject ())
+      fn (object->Entity ());
+  }
+  
+  template <class Fn>
+  void ForEach (Fn& fn) const
+  {
+    const SceneObject* object = FirstObject ();
+
+    for (size_t count=ObjectsCount (); count--; object=object->NextObject ())
+      fn (object->Entity ());
+  }  
 };
 
 /*
@@ -31,7 +52,19 @@ Scene::Scene ()
 {
     //создание корневого узла сцены
     
-  impl->root = Node::Create (*this);
+  try
+  {
+    impl->root = Node::Create ();
+    
+      //установка указателя на данную сцену
+
+    impl->root->SetScene (this);        
+  }
+  catch (...)
+  {
+    delete impl;
+    throw;
+  }   
 }
 
 Scene::~Scene ()
@@ -39,7 +72,6 @@ Scene::~Scene ()
     //освобождение корня сцены
 
   impl->root->UnbindAllChildren ();
-  impl->root->Release ();
 
     //удаление реализации
   
@@ -96,39 +128,87 @@ void Scene::Attach (SceneObject& object)
 }
 
 /*
+    Функторы для обхода объектов сцены
+*/
+
+namespace
+{
+
+//враппер над вызовами посетителя
+struct VisitorWrapper
+{
+  VisitorWrapper (Scene::Visitor& in_visitor) : visitor (in_visitor) {}
+
+  void operator () (Entity& entity) const
+  {
+    entity.Accept (visitor);
+  }
+
+  Scene::Visitor& visitor;
+};
+
+//враппер над вызовами функторов с проверкой попадания обьъекта в ограничивающий объём
+template <class Fn>
+struct BoundsCheckFunction
+{
+  BoundsCheckFunction (const aaboxf& in_box, Fn& in_fn) : box (in_box), fn (in_fn) {}
+  
+  template <class Entity> void operator () (Entity& entity) const
+  {
+      //если объект имеет бесконечные ограничивающие объёмы - обрабатываем его
+
+    if (entity.IsInfiniteBounds ())
+    {
+      fn (entity);
+      return;
+    }
+
+      //если объект имеет конечные ограничивающие объёмы - проверяем его попадание в заданный объём
+
+    if (entity.WorldBoundBox ().intersects (box))
+      fn (entity);
+  }
+
+  const aaboxf& box;
+  Fn&           fn;
+};
+
+}
+
+/*
     Обход объектов, принадлежащих сцене
 */
 
 void Scene::Traverse (const TraverseFunction& fn)
 {
-  SceneObject* object = impl->FirstObject ();
-
-  for (size_t i=0, count=impl->ObjectsCount (); i<count; i++, object=object->NextObject ())
-    fn (object->Entity ());
+  impl->ForEach (fn);
 }
 
 void Scene::Traverse (const ConstTraverseFunction& fn) const
 {
-  const SceneObject* object = impl->FirstObject ();
-
-  for (size_t i=0, count=impl->ObjectsCount (); i<count; i++, object=object->NextObject ())
-    fn (object->Entity ());
+  impl->ForEach (fn);
 }
 
 void Scene::VisitEach (Visitor& visitor) const
 {
-  SceneObject* object = const_cast<SceneObject*> (impl->FirstObject ());
-
-  for (size_t i=0, count=impl->ObjectsCount (); i<count; i++, object=object->NextObject ())
-    object->Entity ().Accept (visitor);
+  const_cast<Impl*> (impl)->ForEach (VisitorWrapper (visitor));
 }
 
 /*
-    Node
-    Биндинг узлов к сцене
+    Обход объектов, принадлежащих сцене и входящих в ограничивающий объём
 */
 
-void Node::BindToScene (scene_graph::Scene& scene, NodeBindMode mode, NodeTransformSpace invariant_space)
+void Scene::Traverse (const aaboxf& box, const TraverseFunction& fn)
+{  
+  impl->ForEach (BoundsCheckFunction<const TraverseFunction> (box, fn));
+}
+
+void Scene::Traverse (const aaboxf& box, const ConstTraverseFunction& fn) const
 {
-  BindToParent (scene.Root (), mode, invariant_space);
+  impl->ForEach (BoundsCheckFunction<const ConstTraverseFunction> (box, fn));
+}
+
+void Scene::VisitEach (const aaboxf& box, Visitor& visitor) const
+{
+  const_cast<Impl*> (impl)->ForEach (BoundsCheckFunction<VisitorWrapper> (box, VisitorWrapper (visitor)));
 }

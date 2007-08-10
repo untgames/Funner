@@ -3,6 +3,7 @@
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
+#include <xtl/visitor.h>
 #include <sg/node.h>
 #include <sg/light.h>
 #include <sg/camera.h>
@@ -13,6 +14,26 @@ using namespace scene_graph;
 using namespace math;
 using namespace xtl;
 using namespace bound_volumes;
+
+/*
+    Тестовый объект
+*/
+
+class TestEntity: public Entity
+{
+  public:
+    using Entity::SetBoundBox;
+    using Entity::SetInfiniteBounds;
+    
+    static TestEntity* Create () { return new TestEntity; }
+    
+  protected:
+    void AcceptCore (Visitor& visitor)
+    {
+      if (!TryAccept (*this, visitor))
+        Entity::AcceptCore (visitor);
+    }
+};
 
 /*
     Вспомогательные утилиты вывода состояния объекта

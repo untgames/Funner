@@ -1,4 +1,4 @@
-#include <sg/node.h>
+#include <sg/scene.h>
 #include <stl/string>
 #include <xtl/signal.h>
 #include <xtl/visitor.h>
@@ -49,11 +49,11 @@ struct Node::Impl
      онструктор / деструктор
 */
 
-Node::Node (scene_graph::Scene* in_scene)
+Node::Node ()
   : impl (new Impl)
 {
   impl->ref_count     = 1;
-  impl->scene         = in_scene;
+  impl->scene         = 0;
   impl->parent        = 0;
   impl->first_child   = 0;
   impl->last_child    = 0;
@@ -115,11 +115,6 @@ Node::~Node ()
 Node* Node::Create ()
 {
   return new Node;
-}
-
-Node* Node::Create (scene_graph::Scene& scene)
-{
-  return new Node (&scene);
 }
 
 /*
@@ -308,7 +303,10 @@ void Node::BindToParent (Node& parent, NodeBindMode mode, NodeTransformSpace inv
   BindToParentImpl (&parent, mode, invariant_space);
 }
 
-//BindToScene реализован в sg_scene.cpp
+void Node::BindToScene (scene_graph::Scene& scene, NodeBindMode mode, NodeTransformSpace invariant_space)
+{
+  BindToParent (scene.Root (), mode, invariant_space);
+}
 
 void Node::BindToParentImpl (Node* parent, NodeBindMode mode, NodeTransformSpace invariant_space)
 {
@@ -347,7 +345,12 @@ void Node::BindToParentImpl (Node* parent, NodeBindMode mode, NodeTransformSpace
     //если родитель не измен€етс€ нет необходимости в присоединии
 
   if (parent == impl->parent)
-    return;      
+    return;
+    
+    //проверка попытки отсоединени€ корневого узла от сцены
+
+  if (!impl->parent && impl->scene)
+    RaiseNotSupported ("scene_graph::Node::BindToParent", "Attempt to bind scene '%s' root to parent not supproted", impl->scene->Name ());
 
     //проверка не присоедин€етс€ ли узел к своему потомку
     

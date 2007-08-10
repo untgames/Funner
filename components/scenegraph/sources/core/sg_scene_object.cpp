@@ -60,19 +60,3 @@ void SceneObject::BindToSpace (SceneSpace* new_space)
   
   space->objects_count++;
 }
-
-/*
-    Оповещение об изменении ограничивающих объёмов
-*/
-
-void SceneObject::UpdateBoundsNotify ()
-{
-}
-
-/*
-    Обновление ограничивающих объёмов
-*/
-
-void SceneObject::UpdateBounds ()
-{
-}

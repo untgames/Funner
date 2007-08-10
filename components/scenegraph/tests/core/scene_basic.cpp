@@ -1,4 +1,3 @@
-#include <xtl/visitor.h>
 #include "shared.h"
 
 void on_destroy (Node& node, NodeEvent)
@@ -21,10 +20,10 @@ void traverse_fn (Entity& entity)
   printf ("  entity '%s'\n", entity.Name ());
 }
 
-class MyVisitor: public xtl::visitor<void, Light>
+class MyVisitor: public xtl::visitor<void, TestEntity>
 {
   public:
-    void visit (Light& object)  { printf ("  light '%s'\n", object.Name ()); }
+    void visit (TestEntity& object)  { printf ("  test_entity '%s'\n", object.Name ()); }
 };
 
 
@@ -44,7 +43,7 @@ int main ()
     
     _snprintf (name, sizeof (name), "entity%u", i);
     
-    Entity* entity = Light::Create ();
+    Entity* entity = TestEntity::Create ();
     
     entity->SetName (name);
     
@@ -54,6 +53,8 @@ int main ()
     
     entity->BindToScene (scene, NodeBindMode_Capture);
   }
+  
+  printf ("%u entities in scene\n", scene.EntitiesCount ());
   
   printf ("traverse\n");
 

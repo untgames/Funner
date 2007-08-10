@@ -1,0 +1,2 @@
+Results of scene_root_unbind_test:
+exception: Attempt to bind scene 'scene1' root to parent not supproted at scene_graph::Node::BindToParent

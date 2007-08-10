@@ -6,7 +6,7 @@ int main ()
 {
   printf ("Results of entity_basic_test:\n");
   
-  EntityPtr entity (Light::Create (), false);
+  EntityPtr entity (TestEntity::Create (), false);
   
   entity->SetName ("entity1");
   entity->SetColor (1.0f, 0.5f, 0.7f);

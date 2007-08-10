@@ -74,9 +74,6 @@ const vec3f& Entity::Color () const
 //оповещение об обновлении мировых ограничивающих объёмов
 void Entity::UpdateWorldBoundsNotify ()
 {
-  if (!impl->need_world_bounds_update)
-    impl->UpdateBoundsNotify ();
-
   impl->need_world_bounds_update = true;
 }
 

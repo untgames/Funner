@@ -1,5 +1,4 @@
 #include "shared.h"
-#include <xtl/visitor.h>
 
 typedef com_ptr<Node> NodePtr;
 
