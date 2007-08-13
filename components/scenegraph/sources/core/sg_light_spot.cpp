@@ -81,8 +81,7 @@ void SpotLight::ComputeBV ()
   {
     float half_width  = tan (deg2rad (impl->angle / 2)) * Range (); 
   
-    axis_aligned_box <float> bbox (-half_width, -half_width, 0, half_width, half_width, Range ());
-    SetBoundBox (bbox);
+    SetBoundBox (axis_aligned_box <float> (-half_width, -half_width, 0, half_width, half_width, Range ()));
   }
 }
 

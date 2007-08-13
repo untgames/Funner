@@ -37,11 +37,8 @@ void PointLight::ComputeBV ()
 {
   if (Range () >= INFINITY)
     SetInfiniteBounds ();
-  else
-  {
-//    sphere <float> bsphere (vec3f (0), Range ());
-//    SetBoundBox (bsphere);
-  }
+  else;
+//    SetBoundBox (sphere <float> (vec3f (0), Range ()));
 }
 
 /*

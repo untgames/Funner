@@ -65,10 +65,7 @@ void DirectLight::ComputeBV ()
   if (Range () >= INFINITY || impl->radius >= INFINITY)
     SetInfiniteBounds ();
   else
-  {
-    axis_aligned_box <float> bbox (-impl->radius, -impl->radius, 0, impl->radius, impl->radius, Range ());
-    SetBoundBox (bbox);
-  }
+    SetBoundBox (axis_aligned_box <float> (-impl->radius, -impl->radius, 0, impl->radius, impl->radius, Range ()));
 }
 
 /*
