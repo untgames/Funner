@@ -265,6 +265,27 @@ void dump (Morph& morph, int level)
     dump (morph.Targets () [i], level);
 }
 
+//печать скина
+void dump (Skin& skin, int level)
+{
+  print_space (level++);
+  printf      ("Skin '%s'\n", skin.EntityId ());
+  print_space (level);
+  printf      ("bind shape matrix: ");
+  print       (skin.BindShapeMatrix ());
+  printf      ("\n");
+  print_space (level);
+  printf      ("joints count: '%u'\n", skin.JointsCount ());
+  print_space (level++);
+  printf      ("joints' inv matrixes:\n");
+  for (size_t i=0; i<skin.JointsCount (); i++)
+  {
+    print_space (level);
+    print (skin.JointInvMatrix (i));
+    printf      ("\n");
+  }
+}
+
 //вывод источника света
 void dump (Light& light, int level)
 {
@@ -439,7 +460,7 @@ int main ()
     dump (model.Effects (), 1);
     dump (model.Materials (), 1);
     dump (model.Meshes (), 1);    
-//    dump (model.Skins (), 1);
+    dump (model.Skins (), 1);
     dump (model.Morphs (), 1);
     dump (model.Lights (), 1);
     dump (model.Cameras (), 1);

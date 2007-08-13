@@ -18,7 +18,6 @@ struct Joint
   math::mat4f inv_matrix; //обратная матрица соединения
 };
 
-typedef stl::vector<JointWeight>     WeightArray;
 typedef stl::vector<Joint*>          JointArray;
 
 }
@@ -26,7 +25,6 @@ typedef stl::vector<Joint*>          JointArray;
 struct Skin::Impl
 {
   math::mat4f  bind_shape_matrix; //матрица фигуры
-  WeightArray  weights;           //веса
   JointArray   joints;            //соединения
   
   enum { DEFAULT_JOINTS_RESERVE = 32 };
@@ -141,28 +139,4 @@ int Skin::FindJoint (const char* name) const
       return i - impl->joints.begin ();
       
   return -1;
-}
-
-/*
-    Работа с весами
-*/
-
-size_t Skin::WeightsCount () const
-{
-  return impl->weights.size ();
-}
-
-const JointWeight* Skin::Weights () const
-{
-  return &impl->weights [0];
-}
-
-JointWeight* Skin::Weights ()
-{
-  return &impl->weights [0];
-}
-
-void Skin::ResizeWeights (size_t new_weights_count)
-{
-  impl->weights.resize (new_weights_count);
 }

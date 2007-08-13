@@ -46,7 +46,9 @@ void DaeParser::ParseController (Parser::Iterator iter)
     if (skin_iter->NextNamesake ())
       LogError (skin_iter->NextNamesake (), "Only one 'skin' sub-tag allowed");          
 
-//    ParseSkin (skin_iter, skin);
+    Skin& skin = model.Skins().Create(id);
+  
+    ParseSkin (skin_iter, skin);
   }
 
   if (morph_iter)

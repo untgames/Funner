@@ -65,7 +65,7 @@ void DaeParser::ParseIdrefArray (Parser::Iterator iter, vector <string> *source)
 }
 
 /*
-    Разбор источника света
+    Разбор морфа
 */
 
 void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
@@ -141,10 +141,7 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
         }
 
       if (targets.empty ())
-      {
-        LogError (iter, "No targets");
-        return;
-      }
+        LogWarning (iter, "No targets");
     }
     else if (!::strcmp (semantic, "MORPH_WEIGHT"))
     {
@@ -162,10 +159,7 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
         }
 
       if (weights.empty ())
-      {
-        LogError (iter, "No weights");
-        return;
-      }
+        LogWarning (iter, "No weights");
     }
   }
 

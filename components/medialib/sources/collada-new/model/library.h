@@ -21,7 +21,7 @@ template <> inline const char* get_library_name<Effect>   () { return "library_e
 template <> inline const char* get_library_name<Material> () { return "library_materials"; }
 template <> inline const char* get_library_name<Mesh>     () { return "library_meshes"; }
 template <> inline const char* get_library_name<Morph>    () { return "library_morphs"; }
-template <> inline const char* get_library_name<Skin>     () { return "library_skines"; }
+template <> inline const char* get_library_name<Skin>     () { return "library_skins"; }
 template <> inline const char* get_library_name<Light>    () { return "library_lights"; }
 template <> inline const char* get_library_name<Camera>   () { return "library_cameras"; }
 template <> inline const char* get_library_name<Node>     () { return "library_nodes"; }

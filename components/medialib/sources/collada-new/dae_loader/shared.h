@@ -143,7 +143,9 @@ class DaeParser
     void ParseInstanceGeometry    (Parser::Iterator, Node::MeshList& meshes);
     void ParseBindMaterial        (Parser::Iterator iter, MaterialBinds& binds);
     void ParseIdrefArray          (Parser::Iterator iter, stl::vector <stl::string> *source);
+    void ParseNameArray           (Parser::Iterator iter, stl::vector <stl::string> *source);
     void ParseFloatArray          (Parser::Iterator iter, stl::vector <float> *source);
+    void ParseFloatArray          (Parser::Iterator iter, stl::vector <math::mat4f> *source);
 
   private:
     template <class T> bool CheckedRead (Parser::Node* node, const char* tag, T& value)
