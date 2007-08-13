@@ -1,20 +1,18 @@
 #include "shared.h"
 
-typedef com_ptr<Light> LightPtr;
+typedef com_ptr<SpotLight> SpotLightPtr;
 
 int main ()
 {
   printf ("Results of light_spot_test:\n");
   
-  LightPtr light (Light::Create (), false);
+  SpotLightPtr light (SpotLight::Create (), false);
 
-  light->SetType (LightType_Spot);
+  light->SetAngle (30.4f);
+  printf ("Spot angle: %f\n", light->Angle ());
 
-  light->SetSpotAngle (30.4f);
-  printf ("Spot angle: %f\n", light->SpotAngle ());
-
-  light->SetSpotExponent (0.19f);
-  printf ("Spot exponent: %f\n", light->SpotExponent ());
+  light->SetExponent (0.19f);
+  printf ("Spot exponent: %f\n", light->Exponent ());
 
   return 0;
 }

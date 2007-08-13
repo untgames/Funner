@@ -10,12 +10,9 @@ using namespace math;
 
 struct Light::Impl
 {
-  LightType type;          //тип источника света
-  vec3f     color;         //цвет света
-  float     spot_angle;    //угол (для Spot)
-  float     spot_exponent; //экспонента затухания по углу (для Spot)
-  vec3f     attenuation;   //коэффициенты затухания (x - constant, y - linear, z - quadratic)
-  float     range;         //расстояние действия света
+  vec3f color;         //цвет света
+  vec3f attenuation;   //коэффициенты затухания (x - constant, y - linear, z - quadratic)
+  float range;         //расстояние действия света
 };
 
 /*
@@ -25,40 +22,14 @@ struct Light::Impl
 Light::Light ()
   : impl (new Impl)
 {
-  impl->type          = LightType_Point;
-  impl->color         = 0;
-  impl->spot_angle    = 0;
-  impl->spot_exponent = 0;
-  impl->attenuation   = 0;
-  impl->range         = DEFAULT_LIGHT_RANGE;
+  impl->color       = 0;
+  impl->attenuation = 0;
+  impl->range       = DEFAULT_LIGHT_RANGE;
 }
 
 Light::~Light ()
 {
   delete impl;
-}
-
-/*
-    Создание источника света
-*/
-
-Light* Light::Create ()
-{
-  return new Light;
-}
-
-/*
-    Тип источника света
-*/
-
-void Light::SetType (LightType type)
-{
-  impl->type = type;
-}
-
-LightType Light::Type () const
-{
-  return impl->type;
 }
 
 /*
@@ -73,30 +44,6 @@ void Light::SetLightColor (const math::vec3f& color)
 const math::vec3f& Light::LightColor () const
 {
   return impl->color;
-}
-
-/*
-    Параметры источника света
-*/
-
-void Light::SetSpotAngle (float angle)
-{
-  impl->spot_angle = angle;
-}
-
-float Light::SpotAngle () const
-{
-  return impl->spot_angle;
-}
-
-void Light::SetSpotExponent (float exponent)
-{
-  impl->spot_exponent = exponent;
-}
-
-float Light::SpotExponent () const
-{
-  return impl->spot_exponent;
 }
 
 /*
@@ -120,6 +67,7 @@ const math::vec3f& Light::Attenuation () const
 void Light::SetRange (float range)
 {
   impl->range = range;
+  ComputeBV ();
 }
 
 float Light::Range () const

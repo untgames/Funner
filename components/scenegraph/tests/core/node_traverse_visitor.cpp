@@ -25,7 +25,7 @@ int main ()
 {
   printf ("Results of node_traverse_visitor_test:\n");
   
-  NodePtr node (Node::Create (), false), child1 (Light::Create (), false), child2 (PerspectiveCamera::Create (), false);
+  NodePtr node (Node::Create (), false), child1 (SpotLight::Create (), false), child2 (PerspectiveCamera::Create (), false);
   
   node->SetName ("node");
   child1->SetName ("child1");
