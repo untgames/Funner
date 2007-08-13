@@ -61,7 +61,6 @@ float SpotLight::Angle () const
 void SpotLight::SetExponent (float exponent)
 {
   impl->exponent = exponent;
-  ComputeBV ();
 }
 
 float SpotLight::Exponent () const
