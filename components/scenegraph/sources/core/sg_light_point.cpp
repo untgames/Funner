@@ -33,7 +33,7 @@ PointLight* PointLight::Create ()
    Рассчёт ограничивающего объёма
 */
 
-void PointLight::ComputeBV ()
+void PointLight::UpdateBoundsCore ()
 {
   if (Range () >= INFINITY)
     SetInfiniteBounds ();

@@ -48,7 +48,7 @@ DirectLight* DirectLight::Create ()
 void DirectLight::SetRadius (float radius)
 {
   impl->radius = radius;
-  ComputeBV ();
+  UpdateBoundsNotify ();
 }
 
 float DirectLight::Radius () const
@@ -60,7 +60,7 @@ float DirectLight::Radius () const
    Рассчёт ограничивающего объёма
 */
 
-void DirectLight::ComputeBV ()
+void DirectLight::UpdateBoundsCore ()
 {
   if (Range () >= INFINITY || impl->radius >= INFINITY)
     SetInfiniteBounds ();

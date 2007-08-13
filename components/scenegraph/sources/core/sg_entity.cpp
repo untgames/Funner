@@ -23,6 +23,7 @@ struct Entity::Impl: public SceneObject
   vec3f  color;                    //цвет объекта
   aaboxf local_bound_box;          //ограничивающий параллелипиппед в локальной системе координат
   aaboxf world_bound_box;          //ограничивающий параллелипиппед в мировой системе координат
+  bool   need_local_bounds_update; //локальные ограничивающие объЄмы требуют пересчЄта
   bool   need_world_bounds_update; //мировые ограничивающие объЄмы требуют пересчЄта
   bool   infinite_bounds;          //€вл€ютс€ ли ограничивающие объЄмы узла бесконечными
   
@@ -36,6 +37,7 @@ struct Entity::Impl: public SceneObject
 Entity::Entity ()
   : impl (new Impl (*this))
 {
+  impl->need_local_bounds_update = false;
   impl->need_world_bounds_update = false;
   impl->infinite_bounds          = true;
   impl->local_bound_box          = impl->world_bound_box = aaboxf (vec3f (-INFINITE_BOUND_VALUE), vec3f (INFINITE_BOUND_VALUE));
@@ -71,6 +73,12 @@ const vec3f& Entity::Color () const
     –абота с ограничивающими объЄмами
 */
 
+//оповещение об обновлении локальных ограничивающих объЄмов
+void Entity::UpdateBoundsNotify ()
+{
+  impl->need_local_bounds_update = true;
+}
+
 //оповещение об обновлении мировых ограничивающих объЄмов
 void Entity::UpdateWorldBoundsNotify ()
 {
@@ -99,6 +107,12 @@ void Entity::SetBoundBox (const bound_volumes::aaboxf& box)
 //ограничивающий объЄм узла в локальной системе координат
 const aaboxf& Entity::BoundBox () const
 {
+  if (impl->need_local_bounds_update)
+  {
+    const_cast <Entity&> (*this).UpdateBoundsCore ();
+    impl->need_local_bounds_update = false;
+  }
+
   return impl->local_bound_box;
 }
 
@@ -122,6 +136,11 @@ void Entity::SetInfiniteBounds ()
   
   UpdateWorldBoundsNotify ();
   UpdateNotify ();
+}
+
+//ќбновление локального ограничивающего объЄма
+void Entity::UpdateBoundsCore ()
+{
 }
 
 //€вл€ютс€ ли ограничивающие объЄмы узла бесконечными

@@ -1,10 +1,12 @@
 #include <sg/camera.h>
 #include <xtl/visitor.h>
 #include <common/exception.h>
+#include <bv/axis_aligned_box.h>
 
 using namespace scene_graph;
 using namespace math;
 using namespace common;
+using namespace bound_volumes;
 
 const float EPS = 1e-6f;
 
@@ -54,6 +56,7 @@ PerspectiveCamera* PerspectiveCamera::Create ()
 void PerspectiveCamera::SetFovX (float fov_x)
 {
   impl->fov_x = fov_x;
+  UpdateBoundsNotify ();
 }
 
 float PerspectiveCamera::FovX () const
@@ -64,6 +67,7 @@ float PerspectiveCamera::FovX () const
 void PerspectiveCamera::SetFovY (float fov_y)
 {
   impl->fov_y = fov_y;
+  UpdateBoundsNotify ();
 }
 
 float PerspectiveCamera::FovY () const
@@ -74,6 +78,7 @@ float PerspectiveCamera::FovY () const
 void PerspectiveCamera::SetZNear (float z_near)
 {
   impl->z_near = z_near;
+  UpdateBoundsNotify ();
 }
 
 float PerspectiveCamera::ZNear () const
@@ -84,6 +89,7 @@ float PerspectiveCamera::ZNear () const
 void PerspectiveCamera::SetZFar  (float z_far)
 {
   impl->z_far = z_far;
+  UpdateBoundsNotify ();
 }
 
 float PerspectiveCamera::ZFar () const
@@ -105,6 +111,19 @@ void PerspectiveCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
   proj_matrix [1] = vec4f (0, 2.0f * impl->z_near / height, 0, 0);
   proj_matrix [2] = vec4f (0, 0, -(impl->z_far + impl->z_near) / depth, -2.0f * impl->z_near * impl->z_far / depth);
   proj_matrix [3] = vec4f (0, 0, -1, 0);
+}
+
+/*
+   Рассчёт ограничивающего объёма
+*/
+
+void PerspectiveCamera::UpdateBoundsCore ()
+{
+  float half_width  = tan (deg2rad (impl->fov_x / 2)) * stl::max (fabs (impl->z_near), fabs (impl->z_far)), 
+        half_height = tan (deg2rad (impl->fov_y / 2)) * stl::max (fabs (impl->z_near), fabs (impl->z_far));
+
+  SetBoundBox (axis_aligned_box <float> (-half_width, -half_height, -impl->z_far,
+                                          half_width,  half_height, -impl->z_near));
 }
 
 /*

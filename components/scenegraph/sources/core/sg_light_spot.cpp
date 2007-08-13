@@ -50,7 +50,7 @@ SpotLight* SpotLight::Create ()
 void SpotLight::SetAngle (float angle)
 {
   impl->angle = angle;
-  ComputeBV ();
+  UpdateBoundsNotify ();
 }
 
 float SpotLight::Angle () const
@@ -72,7 +72,7 @@ float SpotLight::Exponent () const
    Рассчёт ограничивающего объёма
 */
 
-void SpotLight::ComputeBV ()
+void SpotLight::UpdateBoundsCore ()
 {
   if (Range () >= INFINITY)
     SetInfiniteBounds ();

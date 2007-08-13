@@ -67,7 +67,7 @@ const math::vec3f& Light::Attenuation () const
 void Light::SetRange (float range)
 {
   impl->range = range;
-  ComputeBV ();
+  UpdateBoundsNotify ();
 }
 
 float Light::Range () const

@@ -1,10 +1,12 @@
 #include <sg/camera.h>
 #include <xtl/visitor.h>
 #include <common/exception.h>
+#include <bv/axis_aligned_box.h>
 
 using namespace scene_graph;
 using namespace math;
 using namespace common;
+using namespace bound_volumes;
 
 const float EPS = 1e-6f;
 
@@ -58,6 +60,7 @@ OrthoCamera* OrthoCamera::Create ()
 void OrthoCamera::SetLeft (float left)
 {
   impl->left = left;
+  UpdateBoundsNotify ();
 }
 
 float OrthoCamera::Left () const
@@ -68,6 +71,7 @@ float OrthoCamera::Left () const
 void OrthoCamera::SetRight (float right)
 {
   impl->right = right;
+  UpdateBoundsNotify ();
 }
 
 float OrthoCamera::Right () const
@@ -78,6 +82,7 @@ float OrthoCamera::Right () const
 void OrthoCamera::SetTop (float top)
 {
   impl->top = top;
+  UpdateBoundsNotify ();
 }
 
 float OrthoCamera::Top () const
@@ -88,6 +93,7 @@ float OrthoCamera::Top () const
 void OrthoCamera::SetBottom (float bottom)
 {
   impl->bottom = bottom;
+  UpdateBoundsNotify ();
 }
 
 float OrthoCamera::Bottom () const
@@ -98,6 +104,7 @@ float OrthoCamera::Bottom () const
 void OrthoCamera::SetZNear (float z_near)
 {
   impl->z_near = z_near;
+  UpdateBoundsNotify ();
 }
 
 float OrthoCamera::ZNear () const
@@ -108,6 +115,7 @@ float OrthoCamera::ZNear () const
 void OrthoCamera::SetZFar  (float z_far)
 {
   impl->z_far = z_far;
+  UpdateBoundsNotify ();
 }
 
 float OrthoCamera::ZFar () const
@@ -130,6 +138,16 @@ void OrthoCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
   proj_matrix [1] = vec4f (0, 2.0f / height, 0, - (impl->top + impl->bottom) / height);
   proj_matrix [2] = vec4f (0, 0, -2.0f / depth, - (impl->z_near + impl->z_far) / depth);
   proj_matrix [3] = vec4f (0, 0, 0, 1);
+}
+
+/*
+   Рассчёт ограничивающего объёма
+*/
+
+void OrthoCamera::UpdateBoundsCore ()
+{
+  SetBoundBox (axis_aligned_box <float> (stl::min (impl->left, impl->right), stl::min (impl->bottom, impl->top), -impl->z_far,
+                                         stl::max (impl->left, impl->right), stl::max (impl->bottom, impl->top), -impl->z_near));
 }
 
 /*
