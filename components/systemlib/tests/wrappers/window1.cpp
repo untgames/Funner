@@ -22,7 +22,7 @@ void destroy (Window& window, WindowEvent, const WindowEventContext&)
 
   Application::Exit (0);
 
-  throw std::bad_alloc (); //тестирования распространения исключений в обработчиках событий
+  throw std::bad_alloc (); //тестирование распространения исключений в обработчиках событий
 }
 
 void app_exit ()
@@ -37,7 +37,7 @@ void print (const char* message)
 
 int main ()
 {
-  printf ("Results of window_test:\n");
+  printf ("Results of window1_test:\n");
   
   try
   {

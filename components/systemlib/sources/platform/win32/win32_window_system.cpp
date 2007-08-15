@@ -366,7 +366,7 @@ void Win32Platform::CloseWindow (window_t handle)
 {
   HWND wnd = (HWND)handle;
   
-  ::CloseWindow (wnd);
+  PostMessage (wnd, WM_CLOSE, 0, 0);
   CheckErrors ("syslib::Win32Platform::CloseWindow");
 }
 
@@ -480,7 +480,7 @@ void Win32Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
       else       ShowWindow (wnd, SW_MINIMIZE);
 
       break;
-    case WindowFlag_Focus: //фоку ввода
+    case WindowFlag_Focus: //фокус ввода
       SetFocus (state ? wnd : HWND_TOP);
       break;
     default:

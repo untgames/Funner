@@ -1,0 +1,8 @@
+Results of window1_test:
+title: 'Test window'
+is_active: 1
+position: x=0 y=0
+width: 400
+height: 300
+after deactivate
+is_active: 0
