@@ -154,6 +154,12 @@ void print (const TexVertex& tv)
   print  (tv.binormal);  
 }
 
+//печать вершинного веса
+void print (const VertexInfluence& influence)
+{
+  printf ("first=%u count=%u", influence.first_weight, influence.weights_count);
+}
+
 //печать поверхности
 void dump (Surface& surface, int level)
 {
@@ -174,11 +180,7 @@ void dump (Surface& surface, int level)
   
   print_space (level);
   printf      ("material_name: '%s'\n", surface.MaterialName ());  
-  for (size_t i = 0; i < surface.InfluenceChannels ().Size (); i++)
-  {
-    print_space (level);
-    printf ("skin: '%s'\n", surface.InfluenceChannels ().Name (i));
-  }
+
   print_space (level);
   printf      ("vertices_count: %u\n", surface.VerticesCount ());
   print_space (level);
@@ -219,6 +221,21 @@ void dump (Surface& surface, int level)
     {
       print_space (level+1);
       print       (*color);
+      printf      ("\n");
+    }
+  }  
+  
+  for (size_t i = 0; i < surface.InfluenceChannels ().Size (); i++)
+  {
+    print_space (level);
+    printf ("influence_channel: '%s'\n", surface.InfluenceChannels ().Name (i));
+    
+    const VertexInfluence* influence = surface.InfluenceChannels ().Data (i);
+    
+    for (size_t j=0; j < surface.VerticesCount (); j++, influence++)
+    {
+      print_space (level+1);
+      print       (*influence);
       printf      ("\n");
     }
   }  
