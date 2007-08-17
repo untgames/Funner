@@ -94,7 +94,7 @@ bool template <class T> class sphere::contains (const vec_type& point)
 }
 bool template <class T> class sphere::contains (const sphere& sphere)
 {
-   return sphere_center.length(sphere.center())<sphere_radius-2*sphere.radius()?true:false;
+   return sphere_center.length(sphere.center())<sphere_radius-2*sphere.radius()?true:false;   //вроде умножение не нужно
 }
 //bool template <class T> class sphere::contains (const axis_aligned_box<T>& box) const;
 
@@ -112,10 +112,10 @@ bool template <class T> class sphere::equal (const sphere& sp, const element_typ
 
 bool template <class T> class sphere::operator == (const sphere& sp)
 {
-   return ((abs(sphere_radius-sp.radius())<eps)&&(center==sp.center()))?true:false
+   return ((abs(sphere_radius-sp.radius())<eps)&&(center==sp.center()))?true:false  //повторяющийся код, лучше через equal
 }
 
 bool template <class T> class sphere::operator != (const sphere& sp)
 {
-   return ((abs(sphere_radius-sp.radius())<eps)&&(center==sp.center()))?false:true
+   return ((abs(sphere_radius-sp.radius())<eps)&&(center==sp.center()))?false:true  //повторяющийся код, лучше через оператор ==
 }
