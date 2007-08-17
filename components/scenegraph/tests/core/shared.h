@@ -6,6 +6,7 @@
 #include <xtl/visitor.h>
 #include <sg/node.h>
 #include <sg/light.h>
+#include <sg/listener.h>
 #include <sg/camera.h>
 #include <sg/visual_model.h>
 #include <sg/scene.h>

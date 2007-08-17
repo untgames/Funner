@@ -174,6 +174,11 @@ void dump (Surface& surface, int level)
   
   print_space (level);
   printf      ("material_name: '%s'\n", surface.MaterialName ());  
+  for (size_t i = 0; i < surface.InfluenceChannels ().Size (); i++)
+  {
+    print_space (level);
+    printf ("skin: '%s'\n", surface.InfluenceChannels ().Name (i));
+  }
   print_space (level);
   printf      ("vertices_count: %u\n", surface.VerticesCount ());
   print_space (level);
@@ -271,6 +276,11 @@ void dump (Skin& skin, int level)
   print_space (level++);
   printf      ("Skin '%s'\n", skin.EntityId ());
   print_space (level);
+  if (skin.BaseMorph ())
+    printf ("base morph '%s'\n", skin.BaseMorph ()->EntityId ());
+  else
+    printf ("no base morph\n");
+  print_space (level);
   printf      ("bind shape matrix: ");
   print       (skin.BindShapeMatrix ());
   printf      ("\n");
@@ -281,8 +291,16 @@ void dump (Skin& skin, int level)
   for (size_t i=0; i<skin.JointsCount (); i++)
   {
     print_space (level);
+    printf      ("joint '%s' inv_matrix: ", skin.JointName (i));
     print (skin.JointInvMatrix (i));
     printf      ("\n");
+  }
+  print_space ((--level)++);
+  printf      ("joint weights:\n");
+  for (size_t i = 0; i < skin.WeightsCount (); i++)
+  {
+    print_space (level);
+    printf ("joint %d weight %f\n", skin.Weights ()[i].joint, skin.Weights ()[i].weight);
   }
 }
 

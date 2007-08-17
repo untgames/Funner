@@ -1,5 +1,4 @@
 #include <media/collada/skin.h>
-#include <stl/hash_map>
 #include <stl/vector>
 #include <stl/string>
 
@@ -18,15 +17,17 @@ struct Joint
   math::mat4f inv_matrix; //обратна€ матрица соединени€
 };
 
-typedef stl::vector<Joint*>          JointArray;
+typedef stl::vector<Joint*> JointArray;
 
 }
 
 struct Skin::Impl
 {
-  math::mat4f  bind_shape_matrix; //матрица фигуры
-  JointArray   joints;            //соединени€
-  
+  math::mat4f        bind_shape_matrix;      //матрица фигуры
+  JointArray         joints;                 //соединени€
+  stl::vector<VertexJointWeight> weights;    //веса джойнтов
+  Morph*             base_morph;             //базовый морф (если есть)
+
   enum { DEFAULT_JOINTS_RESERVE = 32 };
   
   Impl ()
@@ -39,7 +40,7 @@ struct Skin::Impl
      онструктор / деструктор
 */
 
-Skin::Skin (ModelImpl* owner, const char* id) 
+Skin::Skin (ModelImpl* owner, const char* id)
   : Entity (owner, id), impl (new Impl)
   {}
 
@@ -139,4 +140,47 @@ int Skin::FindJoint (const char* name) const
       return i - impl->joints.begin ();
       
   return -1;
+}
+
+const char* Skin::JointName (size_t joint)
+{
+  if (joint >= impl->joints.size ())
+    common::RaiseOutOfRange ("medialib::collada::JointName", "joint", joint, impl->joints.size ());
+    
+  return impl->joints[joint]->name.c_str ();
+}
+
+void Skin::SetBaseMorph (Morph* base_morph)
+{
+  impl->base_morph = base_morph;
+}
+
+Morph* Skin::BaseMorph ()
+{
+  return impl->base_morph;
+}
+
+const Morph* Skin::BaseMorph () const
+{
+  return impl->base_morph;
+}
+
+size_t Skin::WeightsCount () const
+{
+  return impl->weights.size ();
+}
+
+void Skin::WeightsResize (size_t new_size)
+{
+  impl->weights.resize (new_size);
+}
+
+VertexJointWeight* Skin::Weights ()
+{
+  return impl->weights.begin ();
+}
+
+const VertexJointWeight* Skin::Weights () const
+{
+  return impl->weights.begin ();
 }

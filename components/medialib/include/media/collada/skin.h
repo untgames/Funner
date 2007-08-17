@@ -10,6 +10,12 @@ namespace medialib
 namespace collada
 {
 
+struct VertexJointWeight
+{
+  int   joint;
+  float weight;
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Скин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,6 +38,24 @@ class Skin: public Entity
     void               SetJointInvMatrix (size_t joint, const math::mat4f& invTM); //установка обратной матрицы соединения
     const math::mat4f& JointInvMatrix    (size_t joint) const;                //получение обратной матрицы соединения
     int                FindJoint         (const char* name) const;            //возвращает номер соединения по имени или -1 в случае неудачи
+    const char*        JointName         (size_t joint);                      //имя соединения
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Базовый морф
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetBaseMorph (Morph* base_morph);
+
+          Morph* BaseMorph ();
+    const Morph* BaseMorph () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Веса джойнтов в вершинах
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t WeightsCount  () const;
+    void   WeightsResize (size_t new_size);
+
+          VertexJointWeight* Weights ();          
+    const VertexJointWeight* Weights () const;
 
   protected:
     Skin  (ModelImpl*, const char* id);

@@ -1,3 +1,4 @@
+#include <stl/vector>
 #include "shared.h"
 
 /*
@@ -46,9 +47,74 @@ void DaeParser::ParseController (Parser::Iterator iter)
     if (skin_iter->NextNamesake ())
       LogError (skin_iter->NextNamesake (), "Only one 'skin' sub-tag allowed");          
 
-    Skin& skin = model.Skins().Create(id);
+    if (!test (skin_iter, "vertex_weights"))
+    {
+      LogError (skin_iter, "No 'vertex_weights' sub-tag");
+      return;
+    }
+
+    const char* base_mesh = get<const char*> (skin_iter, "source");
+
+    if (!base_mesh)
+    {
+      LogError (skin_iter, "No base mesh ('source' property)");
+      return;
+    }
+
+    base_mesh++; //убираем префиксный '#'
+
+    Mesh* mesh = model.Meshes ().Find (base_mesh);
+    Morph* morph = model.Morphs ().Find (base_mesh);
+    
+    if (!mesh)
+    {
+      if (!morph)
+      {
+        LogError (skin_iter, "Incorrect url '%s'. No mesh or morph in library", base_mesh);
+        return;
+      }
+
+      mesh = &(morph->BaseMesh ());
+    }
   
-    ParseSkin (skin_iter, skin);
+    size_t influence_channel_index = mesh->Surfaces()[0].InfluenceChannels ().Create (id);
+    VertexInfluence* vertex_influences = mesh->Surfaces()[0].InfluenceChannels ().Data (influence_channel_index);
+
+    size_t vertex_joint_weights_count = 0, vertex_count;
+
+    if (!CheckedRead (skin_iter, "vertex_weights.count", vertex_count))
+    {
+      LogError (skin_iter, "Error at read 'vertex_weights.count'");
+      return;
+    }
+
+    stl::vector <size_t> per_vertex_count (vertex_count), vertex_start_weight (vertex_count);
+
+    if (read_range (skin_iter, "vertex_weights.vcount.#text", per_vertex_count.begin (), vertex_count) != vertex_count)
+    {
+      LogError (skin_iter, "Error at read 'vertex_weights.vcount' items");
+      return;
+    }
+
+    for (size_t i = 0; i < vertex_count; i++)
+    {
+      vertex_start_weight[i] = vertex_joint_weights_count;
+      vertex_joint_weights_count += per_vertex_count[i];
+    }
+
+    size_t* vertex_indices = vertex_index_maps[mesh->EntityId ()]->Indices ();
+
+    for (size_t i = 0; i < vertex_index_maps[mesh->EntityId ()]->Size (); i++)
+    {
+      vertex_influences[i].first_weight  = vertex_start_weight[vertex_indices[i]];
+      vertex_influences[i].weights_count = per_vertex_count[vertex_indices[i]];
+    }
+
+    Skin& skin = model.Skins().Create(id);
+    skin.WeightsResize (vertex_joint_weights_count);
+    skin.SetBaseMorph  (morph);
+
+    ParseSkin (skin_iter, skin, per_vertex_count);
   }
 
   if (morph_iter)
