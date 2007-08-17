@@ -132,7 +132,7 @@ class DaeParser
     void ParseSurfaceBuffers      (Parser::Iterator, Parser::Iterator surface_iter, SurfaceInfo& info);
     void ParseController          (Parser::Iterator);
     void ParseMorph               (Parser::Iterator, const char* id);
-    void ParseSkin                (Parser::Iterator, Skin& skin, stl::vector <size_t>& per_vertex_count);
+    void ParseSkin                (Parser::Iterator, const char* id);
     void ParseLight               (Parser::Iterator);
     void ParseCamera              (Parser::Iterator);
     void ParseVisualScene         (Parser::Iterator);

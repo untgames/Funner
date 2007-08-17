@@ -69,7 +69,7 @@ void DaeParser::ParseNameArray (Parser::Iterator iter, vector <string> *source)
     Разбор скина
 */
 
-void DaeParser::ParseSkin (Parser::Iterator iter, Skin& skin, stl::vector <size_t>& per_vertex_count)
+void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
 {
   vector <string> joints;
   vector <mat4f>  inv_matrixes;
@@ -77,12 +77,104 @@ void DaeParser::ParseSkin (Parser::Iterator iter, Skin& skin, stl::vector <size_
 
   LogScope scope (iter, *this);
 
+  if (!test (iter, "vertex_weights"))
+  {
+    LogError (iter, "No 'vertex_weights' sub-tag");
+    return;
+  }
+
+  const char* base_mesh = get<const char*> (iter, "source");
+
+  if (!base_mesh)
+  {
+    LogError (iter, "No base mesh ('source' property)");
+    return;
+  }
+
+  base_mesh++; //убираем префиксный '#'
+
+  Mesh* mesh = model.Meshes ().Find (base_mesh);
+  Morph* morph = model.Morphs ().Find (base_mesh);
+  
+  if (!mesh)
+  {
+    if (!morph)
+    {
+      LogError (iter, "Incorrect url '%s'. No mesh or morph in library", base_mesh);
+      return;
+    }
+
+    mesh = &morph->BaseMesh ();
+  }  
+  
   if (test (iter, "bind_shape_matrix"))
     if (!CheckedRead (iter, "bind_shape_matrix.#text", bind_shape_matrix))
     {
       LogError (iter, "Uncorrect 'bind_shape_matrix' tag");
       return;
     }
+
+  size_t influence_count = 0;
+
+  if (!CheckedRead (iter, "vertex_weights.count", influence_count))
+  {
+    LogError (iter, "Error at read 'vertex_weights.count'");
+    return;
+  }
+
+  stl::vector <size_t> per_vertex_count (influence_count), vertex_first_weight (influence_count);
+
+  if (read_range (iter, "vertex_weights.vcount.#text", per_vertex_count.begin (), influence_count) != influence_count)
+  {
+    LogError (iter, "Error at read 'vertex_weights.vcount' items");
+    return;
+  }
+  
+  size_t vertex_joint_weights_count = 0;
+
+  for (size_t i=0; i<influence_count; i++)
+  {
+    vertex_first_weight [i]     = vertex_joint_weights_count;
+    vertex_joint_weights_count += per_vertex_count [i];
+  }
+  
+  for (size_t i=0; i<mesh->Surfaces ().Size (); i++)
+  {
+    Surface&        surface            = mesh->Surfaces ()[i];
+    VertexIndexMap* vertex_indices_map = GetVertexIndicesMap (&surface);
+    
+      //не выполнение этого условия теоретически невозможно
+
+    if (vertex_indices_map->Size () != surface.VerticesCount ())
+      continue;
+
+    size_t           channel   = surface.InfluenceChannels ().Create (id);
+    VertexInfluence* influence = surface.InfluenceChannels ().Data (channel);
+
+    size_t* index         = vertex_indices_map->Indices (),
+            indices_count = vertex_indices_map->Size ();
+
+    for (size_t i=0; i<indices_count; i++, index++, influence++)
+    {
+      if (*index >= influence_count)
+      {
+        LogError (iter->First ("vertex_weights.vcount"), "Vertex index %u is greater than influence_count=%u", *index, influence_count);
+        surface.InfluenceChannels ().Remove (channel);
+
+        break;
+      }
+
+      influence->first_weight  = vertex_first_weight [*index];
+      influence->weights_count = per_vertex_count [*index];
+    }
+  }
+  
+    //создание скина
+
+  Skin& skin = model.Skins().Create(id);
+  
+  skin.WeightsResize (vertex_joint_weights_count);
+  skin.SetBaseMorph  (morph);
   skin.SetBindShapeMatrix (bind_shape_matrix);
 
   for (Parser::NamesakeIterator joints_iter=iter->First ("joints")->First ("input"); joints_iter; ++joints_iter)
