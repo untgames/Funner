@@ -79,14 +79,14 @@ void DaeParser::LogWarning (Parser::Node* node, const char* format, ...)
     Создание и поиск карт вершинных индексов    
 */
 
-VertexIndexMap* DaeParser::GetVertexIndexMap (const char* mesh_name)
+VertexIndexMap* DaeParser::GetVertexIndicesMap (const Surface* surface)
 {
-  if (!mesh_name)
+  if (!surface)
     return 0;
     
     //попытка поиска карты вершинных индексов
     
-  VertexIndexMaps::iterator iter = vertex_index_maps.find (mesh_name);
+  VertexIndexMaps::iterator iter = vertex_index_maps.find (surface);
   
   if (iter != vertex_index_maps.end ())
     return iter->second;
@@ -97,7 +97,7 @@ VertexIndexMap* DaeParser::GetVertexIndexMap (const char* mesh_name)
   
     //регистрация карты вершинных индексов
     
-  vertex_index_maps [mesh_name] = map;
+  vertex_index_maps [surface] = map;
   
   return map;
 }

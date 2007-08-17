@@ -105,7 +105,7 @@ class DaeParser
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание или поиск карт вершинных индексов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    VertexIndexMap* GetVertexIndexMap (const char* mesh_name);
+    VertexIndexMap* GetVertexIndicesMap  (const Surface*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Разбор отдельных элементов
@@ -170,7 +170,7 @@ class DaeParser
     }
     
   private:
-    typedef stl::hash_map<stl::hash_key<const char*>, VertexIndexMap*> VertexIndexMaps;
+    typedef stl::hash_map<const Surface*, VertexIndexMap*> VertexIndexMaps;
 
   private:
     Model&          model;             //загружаемая модель

@@ -74,43 +74,68 @@ void DaeParser::ParseController (Parser::Iterator iter)
         return;
       }
 
-      mesh = &(morph->BaseMesh ());
-    }
-  
-    size_t influence_channel_index = mesh->Surfaces()[0].InfluenceChannels ().Create (id);
-    VertexInfluence* vertex_influences = mesh->Surfaces()[0].InfluenceChannels ().Data (influence_channel_index);
+      mesh = &morph->BaseMesh ();
+    }  
+    
+    size_t influence_count = 0;
 
-    size_t vertex_joint_weights_count = 0, vertex_count;
-
-    if (!CheckedRead (skin_iter, "vertex_weights.count", vertex_count))
+    if (!CheckedRead (skin_iter, "vertex_weights.count", influence_count))
     {
       LogError (skin_iter, "Error at read 'vertex_weights.count'");
       return;
     }
 
-    stl::vector <size_t> per_vertex_count (vertex_count), vertex_start_weight (vertex_count);
+    stl::vector <size_t> per_vertex_count (influence_count), vertex_first_weight (influence_count);
 
-    if (read_range (skin_iter, "vertex_weights.vcount.#text", per_vertex_count.begin (), vertex_count) != vertex_count)
+    if (read_range (skin_iter, "vertex_weights.vcount.#text", per_vertex_count.begin (), influence_count) != influence_count)
     {
       LogError (skin_iter, "Error at read 'vertex_weights.vcount' items");
       return;
     }
+    
+    size_t vertex_joint_weights_count = 0;
 
-    for (size_t i = 0; i < vertex_count; i++)
+    for (size_t i=0; i<influence_count; i++)
     {
-      vertex_start_weight[i] = vertex_joint_weights_count;
-      vertex_joint_weights_count += per_vertex_count[i];
+      vertex_first_weight [i]     = vertex_joint_weights_count;
+      vertex_joint_weights_count += per_vertex_count [i];
     }
-
-    size_t* vertex_indices = vertex_index_maps[mesh->EntityId ()]->Indices ();
-
-    for (size_t i = 0; i < vertex_index_maps[mesh->EntityId ()]->Size (); i++)
+    
+    for (size_t i=0; i<mesh->Surfaces ().Size (); i++)
     {
-      vertex_influences[i].first_weight  = vertex_start_weight[vertex_indices[i]];
-      vertex_influences[i].weights_count = per_vertex_count[vertex_indices[i]];
+      Surface&        surface            = mesh->Surfaces ()[i];
+      VertexIndexMap* vertex_indices_map = GetVertexIndicesMap (&surface);
+      
+        //не выполнение этого условия теоретически невозможно
+
+      if (vertex_indices_map->Size () != surface.VerticesCount ())
+        continue;
+
+      size_t           channel   = surface.InfluenceChannels ().Create (id);
+      VertexInfluence* influence = surface.InfluenceChannels ().Data (channel);
+
+      size_t* index         = vertex_indices_map->Indices (),
+              indices_count = vertex_indices_map->Size ();
+
+      for (size_t i=0; i<indices_count; i++, index++, influence++)
+      {
+        if (*index >= influence_count)
+        {
+          LogError (skin_iter->First ("vertex_weights.vcount"), "Vertex index %u is greater than influence_count=%u", *index, influence_count);
+          surface.InfluenceChannels ().Remove (channel);
+
+          break;
+        }
+
+        influence->first_weight  = vertex_first_weight [*index];
+        influence->weights_count = per_vertex_count [*index];
+      }
     }
+    
+      //создание скина
 
     Skin& skin = model.Skins().Create(id);
+    
     skin.WeightsResize (vertex_joint_weights_count);
     skin.SetBaseMorph  (morph);
 

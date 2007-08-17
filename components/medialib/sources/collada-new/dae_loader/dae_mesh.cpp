@@ -811,7 +811,7 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
   
     //построение массива вершинных индексов
     
-  VertexIndexMap* vertex_index_map = GetVertexIndexMap (surface_info.mesh->EntityId ());
+  VertexIndexMap* vertex_index_map = GetVertexIndicesMap (&surface);
   
   vertex_index_map->Resize (surface.VerticesCount ());
 
