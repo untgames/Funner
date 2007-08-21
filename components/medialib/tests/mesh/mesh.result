@@ -1,0 +1,22 @@
+dump mesh
+Mesh 'mesh1' (5 vertices, 0 weights, 12 indices, 0 primitives)
+add primitives
+Mesh 'mesh1' (5 vertices, 0 weights, 12 indices, 2 primitives)
+  primitive #0: type='triangle_list' first=12 count=5 material='my_material'
+  primitive #1: type='triangle_strip' first=14 count=8 material='my_material1'
+resize vertex stream
+Mesh 'mesh1' (10 vertices, 0 weights, 12 indices, 2 primitives)
+  primitive #0: type='triangle_list' first=12 count=5 material='my_material'
+  primitive #1: type='triangle_strip' first=14 count=8 material='my_material1'
+copy mesh
+Mesh 'mesh2' (10 vertices, 0 weights, 12 indices, 2 primitives)
+  primitive #0: type='triangle_list' first=12 count=5 material='my_material'
+  primitive #1: type='triangle_strip' first=14 count=8 material='my_material1'
+clear mesh
+Mesh 'mesh1' (0 vertices, 0 weights, 0 indices, 0 primitives)
+detach mesh buffers
+Mesh 'mesh2' (0 vertices, 0 weights, 0 indices, 2 primitives)
+  primitive #0: type='triangle_list' first=12 count=5 material='my_material'
+  primitive #1: type='triangle_strip' first=14 count=8 material='my_material1'
+remove primitives
+Mesh 'mesh2' (0 vertices, 0 weights, 0 indices, 0 primitives)

@@ -1,0 +1,47 @@
+Results of index_buffer_test:
+Dump ib1
+Index buffer (12 indices):
+  0
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+  10
+  11
+Dump ib2
+Index buffer (0 indices):
+ib2 capacity: 14
+ib2 = ib1
+Index buffer (12 indices):
+  0
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+  10
+  11
+clear ib2
+Index buffer (0 indices):
+instance ib2
+Index buffer (5 indices):
+  0
+  1
+  2
+  3
+  4
+instance ib1 (default clone mode)
+Index buffer (4 indices):
+  0
+  1
+  2
+  3
