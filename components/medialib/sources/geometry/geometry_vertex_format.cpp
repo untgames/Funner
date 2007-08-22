@@ -77,7 +77,7 @@ const VertexAttribute* VertexFormat::Attributes () const
 const VertexAttribute& VertexFormat::operator [] (size_t index) const
 {
   if (index >= impl->attributes_count)
-    RaiseOutOfRange ("medialib::VertexFormat::operator []", "index", index, impl->attributes_count);
+    RaiseOutOfRange ("medialib::geometry::VertexFormat::operator []", "index", index, impl->attributes_count);
     
   return impl->attributes [index];
 }
@@ -114,7 +114,7 @@ namespace
 
 void raise_incompatible (VertexAttributeSemantic semantic, VertexAttributeType type)
 {
-  RaiseNotSupported ("medialib::VertexFormat::AddAttribute", "Semantic '%s' is not compatible with type '%s'",
+  RaiseNotSupported ("medialib::geometry::VertexFormat::AddAttribute", "Semantic '%s' is not compatible with type '%s'",
                      get_semantic_name (semantic), get_type_name (type));
 }
 
@@ -195,10 +195,10 @@ void check_attribute_type (VertexAttributeSemantic semantic, VertexAttributeType
 size_t VertexFormat::AddAttribute (VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset)
 {
   if (semantic < 0 || semantic >= VertexAttributeSemantic_Num)
-    RaiseInvalidArgument ("medialib::VertexFormat::AddAttribute", "semantic", semantic);
+    RaiseInvalidArgument ("medialib::geometry::VertexFormat::AddAttribute", "semantic", semantic);
     
   if (type < 0 || type >= VertexAttributeType_Num)
-    RaiseInvalidArgument ("medialib::VertexFormat::AddAttribute", "type", type);
+    RaiseInvalidArgument ("medialib::geometry::VertexFormat::AddAttribute", "type", type);
     
     //проверка совместимости типа атрибута с его семантикой
     
@@ -207,7 +207,7 @@ size_t VertexFormat::AddAttribute (VertexAttributeSemantic semantic, VertexAttri
     //проверка наличия атрибута в формате
 
   if (FindAttribute (semantic))
-    RaiseInvalidArgument ("medialib::VertexFormat::AddAttribute", "semantic", semantic, "Attribute has been already inserted");
+    RaiseInvalidArgument ("medialib::geometry::VertexFormat::AddAttribute", "semantic", semantic, "Attribute has been already inserted");
     
     //добавление атрибута
      
@@ -409,7 +409,7 @@ const char* get_semantic_name (VertexAttributeSemantic semantic)
     case VertexAttributeSemantic_TexCoord6: return "texcoord6";
     case VertexAttributeSemantic_TexCoord7: return "texcoord7";
     case VertexAttributeSemantic_Influence: return "influence";
-    default:                                RaiseInvalidArgument ("medialib::get_semantic_name(VertexAttributeSemantic)", "semantic", semantic);
+    default:                                RaiseInvalidArgument ("medialib::geometry::get_semantic_name(VertexAttributeSemantic)", "semantic", semantic);
   }
 
   return "";
@@ -428,7 +428,7 @@ const char* get_type_name (VertexAttributeType type)
     case VertexAttributeType_Short4:    return "short4";
     case VertexAttributeType_UByte4:    return "ubyte4";
     case VertexAttributeType_Influence: return "influence";
-    default:                            RaiseInvalidArgument ("medialib::get_type_name(VertexAttributeType)", "type", type);
+    default:                            RaiseInvalidArgument ("medialib::geometry::get_type_name(VertexAttributeType)", "type", type);
   }
 
   return "";

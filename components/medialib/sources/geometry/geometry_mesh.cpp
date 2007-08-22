@@ -96,7 +96,7 @@ const char* Mesh::Name () const
 void Mesh::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("medialib::Mesh::Rename", "name");
+    RaiseNullArgument ("medialib::geometry::Mesh::Rename", "name");
     
   impl->name = name;
 }
@@ -187,7 +187,7 @@ size_t Mesh::PrimitivesCount () const
 const Primitive& Mesh::Primitive (size_t index) const
 {
   if (index >= impl->primitives.size ())
-    RaiseOutOfRange ("medialib::Mesh::Primitive", "index", index, impl->primitives.size ());
+    RaiseOutOfRange ("medialib::geometry::Mesh::Primitive", "index", index, impl->primitives.size ());
     
   if (impl->need_material_names_update)
   {
@@ -209,7 +209,7 @@ const Primitive& Mesh::Primitive (size_t index) const
 size_t Mesh::AddPrimitive (PrimitiveType type, size_t first, size_t count, const char* material)
 {
   if (type < 0 || type >= PrimitiveType_Num)
-    RaiseInvalidArgument ("medialib::Mesh::AddPrimitive", "type", type);
+    RaiseInvalidArgument ("medialib::geometry::Mesh::AddPrimitive", "type", type);
     
   if (!material)
     material = "";
@@ -303,7 +303,7 @@ const char* get_type_name (PrimitiveType type)
     case PrimitiveType_TriangleList:  return "triangle_list";
     case PrimitiveType_TriangleStrip: return "triangle_strip";
     case PrimitiveType_TriangleFan:   return "triangle_fan";
-    default:                          RaiseInvalidArgument ("medialib::get_type_name (PrimitiveType)", "type", type);
+    default:                          RaiseInvalidArgument ("medialib::geometry::get_type_name (PrimitiveType)", "type", type);
   }
   
   return "";

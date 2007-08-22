@@ -4,33 +4,33 @@
 using namespace medialib::geometry;
 
 /*
-    MeshBuffer
+    Buffer
 */
 
-MeshBuffer::MeshBuffer ()
+Buffer::Buffer ()
   : start (0), finish (0), end_of_storage (0)
   {}
   
-MeshBuffer::MeshBuffer (size_t size)
+Buffer::Buffer (size_t size)
   : start (0), finish (0), end_of_storage (0)
 {
   Resize (size);
 }
 
-MeshBuffer::MeshBuffer (const MeshBuffer& MeshBuffer)
+Buffer::Buffer (const Buffer& Buffer)
 {
-  Resize (MeshBuffer.Size ());
+  Resize (Buffer.Size ());
   
-  memcpy (start, MeshBuffer.start, finish - start);
+  memcpy (start, Buffer.start, finish - start);
 }
 
-MeshBuffer::~MeshBuffer ()
+Buffer::~Buffer ()
 {
   if (start)
     ::operator delete (start);
 }
 
-void MeshBuffer::Resize (size_t new_size)
+void Buffer::Resize (size_t new_size)
 {
   size_t size = finish - start;
   
@@ -43,7 +43,7 @@ void MeshBuffer::Resize (size_t new_size)
   finish = start + new_size;
 }
 
-void MeshBuffer::Reserve (size_t new_size)
+void Buffer::Reserve (size_t new_size)
 {
   size_t size = end_of_storage - start;
 

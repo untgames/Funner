@@ -11,7 +11,7 @@ struct VertexStream::Impl: public InstanceResource
 {
   VertexFormat format;         //формат вершин
   size_t       vertex_size;    //размер вершины
-  MeshBuffer   data_buffer;    //буфер с данными
+  Buffer       data_buffer;    //буфер с данными
   size_t       vertices_count; //количество вершин
   
   Impl (const VertexFormat&);
@@ -66,7 +66,7 @@ VertexStream::VertexStream (size_t vertices_count, const VertexFormat& format, s
 }
 
 VertexStream::VertexStream (const VertexStream& vs, BufferCloneMode mode)
-  : impl (clone_resource (vs.impl, mode, "medialib::VertexStream::VertexStream"))
+  : impl (clone_resource (vs.impl, mode, "medialib::geometry::VertexStream::VertexStream"))
   {}
 
 VertexStream::~VertexStream ()

@@ -67,7 +67,7 @@ VertexBuffer::VertexBuffer ()
   {}
 
 VertexBuffer::VertexBuffer (const VertexBuffer& vb, BufferCloneMode mode)
-  : impl (clone_resource (vb.impl, mode, "medialib::VertexBuffer::VertexBuffer"))
+  : impl (clone_resource (vb.impl, mode, "medialib::geometry::VertexBuffer::VertexBuffer"))
   {}
 
 VertexBuffer::~VertexBuffer ()
@@ -107,7 +107,7 @@ size_t VertexBuffer::StreamsCount () const
 const VertexStream& VertexBuffer::Stream (size_t index) const
 {
   if (index >= impl->streams.size ())
-    RaiseOutOfRange ("medialib::VertexBuffer::Stream", "index", index, impl->streams.size ());
+    RaiseOutOfRange ("medialib::geometry::VertexBuffer::Stream", "index", index, impl->streams.size ());
     
   return impl->streams [index];
 }
@@ -143,7 +143,7 @@ size_t VertexBuffer::Attach (VertexStream& vs, BufferCloneMode mode)
     case BufferCloneMode_Instance:
       break;
     default:
-      RaiseInvalidArgument ("medialib::VertexBuffer::Attach", "mode", mode);
+      RaiseInvalidArgument ("medialib::geometry::VertexBuffer::Attach", "mode", mode);
       break;
   }
 

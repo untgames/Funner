@@ -11,15 +11,15 @@ namespace geometry
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Буфер меша
+///Буфер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class MeshBuffer
+class Buffer
 {
   public:
-    MeshBuffer  ();
-    MeshBuffer  (size_t size);
-    MeshBuffer  (const MeshBuffer&);
-    ~MeshBuffer ();
+    Buffer  ();
+    Buffer  (size_t size);
+    Buffer  (const Buffer&);
+    ~Buffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размер буфера / объём буфера (количество доступной памяти)
@@ -39,7 +39,7 @@ class MeshBuffer
     void Reserve (size_t new_size);
     
   private:
-    MeshBuffer& operator = (const MeshBuffer&); //no impl
+    Buffer& operator = (const Buffer&); //no impl
   
   private:      
     char *start, *finish, *end_of_storage;

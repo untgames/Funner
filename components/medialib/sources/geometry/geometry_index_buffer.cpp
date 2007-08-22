@@ -9,7 +9,7 @@ using namespace common;
 
 struct IndexBuffer::Impl: public InstanceResource
 {
-  MeshBuffer indices;   //массив индексов
+  Buffer indices; //массив индексов
 };
 
 /*
@@ -27,7 +27,7 @@ IndexBuffer::IndexBuffer (size_t indices_count)
 }
   
 IndexBuffer::IndexBuffer (const IndexBuffer& ib, BufferCloneMode mode)
-  : impl (clone_resource (ib.impl, mode, "medialib::IndexBuffer::IndexBuffer"))
+  : impl (clone_resource (ib.impl, mode, "medialib::geometry::IndexBuffer::IndexBuffer"))
   {}
 
 IndexBuffer::~IndexBuffer ()

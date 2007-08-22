@@ -9,7 +9,7 @@ using namespace common;
 
 struct VertexWeightStream::Impl: public InstanceResource
 {
-  MeshBuffer data_buffer; //буфер данных
+  Buffer data_buffer; //буфер данных
 };
 
 /*
@@ -27,7 +27,7 @@ VertexWeightStream::VertexWeightStream (size_t weights_count)
 }
   
 VertexWeightStream::VertexWeightStream (const VertexWeightStream& vws, BufferCloneMode mode)
-  : impl (clone_resource (vws.impl, mode, "medialib::VertexWeightStream::VertexWeightStream"))
+  : impl (clone_resource (vws.impl, mode, "medialib::geometry::VertexWeightStream::VertexWeightStream"))
   {}
 
 VertexWeightStream::~VertexWeightStream ()
