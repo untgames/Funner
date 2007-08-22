@@ -1,15 +1,14 @@
-#ifndef MEDIALIB_MESH_TESTS_HEADER
-#define MEDIALIB_MESH_TESTS_HEADER
+#ifndef MEDIALIB_GEOMETRY_TESTS_HEADER
+#define MEDIALIB_GEOMETRY_TESTS_HEADER
 
 #include <stdio.h>
 #include <exception>
-#include <media/mesh/mesh.h>
-#include <media/mesh/vertex.h>
+#include <media/mesh.h>
 
-using namespace medialib;
+using namespace medialib::geometry;
 using namespace math;
 
-typedef vertex::Vertex<vertex::Position3f, vertex::Normalf, vertex::Color4ub, vertex::TexChannel<0>::Coord2f> CustomVertex;
+typedef Vertex<Position3f, Normalf, Color4ub, TexChannel<0>::Coord2f> CustomVertex;
 
 //вывод вершинного атрибута
 void dump (const VertexAttribute& attribute)

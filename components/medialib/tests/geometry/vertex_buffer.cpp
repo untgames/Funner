@@ -16,7 +16,7 @@ int main ()
 {
   printf ("Results of vertex_buffer_test:\n");
   
-  VertexStream vs1 (12, get_vertex_format<CustomVertex> ()), vs2 (10, get_vertex_format<vertex::Vertex<vertex::Position2f> > ());
+  VertexStream vs1 (12, get_vertex_format<CustomVertex> ()), vs2 (10, get_vertex_format<Vertex<Position2f> > ());
   VertexWeightStream weights (12);  
   VertexBuffer vb1, vb2;
 

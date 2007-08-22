@@ -1,10 +1,13 @@
-#ifndef MEDIALIB_MESH_SHARED_HEADER
-#define MEDIALIB_MESH_SHARED_HEADER
+#ifndef MEDIALIB_GEOMETRY_SHARED_HEADER
+#define MEDIALIB_GEOMETRY_SHARED_HEADER
 
 #include <common/exception.h>
-#include <media/mesh/mesh.h>
+#include <media/geometry/mesh.h>
 
 namespace medialib
+{
+
+namespace geometry
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,6 +100,8 @@ template <class T> void release_resource (T* resource)
 {
   if (!--resource->ref_count)
     delete resource;
+}
+
 }
 
 }

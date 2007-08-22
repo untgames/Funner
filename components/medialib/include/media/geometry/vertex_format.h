@@ -1,10 +1,13 @@
-#ifndef MEDIALIB_VERTEX_FORMAT_HEADER
-#define MEDIALIB_VERTEX_FORMAT_HEADER
+#ifndef MEDIALIB_GEOMETRY_VERTEX_FORMAT_HEADER
+#define MEDIALIB_GEOMETRY_VERTEX_FORMAT_HEADER
 
 #include <stddef.h>
 #include <common/singleton.h>
 
 namespace medialib
+{
+
+namespace geometry
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,7 +160,9 @@ const char* get_type_name      (VertexAttributeType);     //имя типа
 template <class Vertex>
 const VertexFormat& get_vertex_format ();
 
-#include <media/mesh/detail/vertex_format.inl>
+#include <media/geometry/detail/vertex_format.inl>
+
+}
 
 }
 

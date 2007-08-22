@@ -1,9 +1,9 @@
-#include <media/mesh/mesh.h>
+#include <media/geometry/mesh.h>
 #include <common/exception.h>
 #include <stl/vector>
 #include <stl/string>
 
-using namespace medialib;
+using namespace medialib::geometry;
 using namespace stl;
 using namespace common;
 
@@ -27,8 +27,8 @@ typedef stl::vector<PrimitiveImpl> PrimitiveArray;
 struct Mesh::Impl
 {
   string                 name;                       //имя меша
-  medialib::VertexBuffer vertex_buffer;              //вершинный буфер
-  medialib::IndexBuffer  index_buffer;               //индексный буфер
+  geometry::VertexBuffer vertex_buffer;              //вершинный буфер
+  geometry::IndexBuffer  index_buffer;               //индексный буфер
   PrimitiveArray         primitives;                 //примитивы
   string                 material_names;             //имена материалов
   bool                   need_material_names_update; //необходимо обновить имена материалов
@@ -105,22 +105,22 @@ void Mesh::Rename (const char* name)
     Буферы
 */
 
-const medialib::VertexBuffer& Mesh::VertexBuffer () const
+const medialib::geometry::VertexBuffer& Mesh::VertexBuffer () const
 {
   return impl->vertex_buffer;
 }
 
-medialib::VertexBuffer& Mesh::VertexBuffer ()
+medialib::geometry::VertexBuffer& Mesh::VertexBuffer ()
 {
   return impl->vertex_buffer;
 }
 
-const medialib::IndexBuffer& Mesh::IndexBuffer () const
+const medialib::geometry::IndexBuffer& Mesh::IndexBuffer () const
 {
   return impl->index_buffer;
 }
 
-medialib::IndexBuffer& Mesh::IndexBuffer ()
+medialib::geometry::IndexBuffer& Mesh::IndexBuffer ()
 {
   return impl->index_buffer;
 }
@@ -149,24 +149,24 @@ size_t Mesh::WeightsCount () const
     Присоединение/отсоединение буферов
 */
 
-void Mesh::Attach (medialib::VertexBuffer& vb, BufferCloneMode mode)
+void Mesh::Attach (medialib::geometry::VertexBuffer& vb, BufferCloneMode mode)
 {
   impl->vertex_buffer.Assign (vb, mode);
 }
 
-void Mesh::Attach (medialib::IndexBuffer& ib, BufferCloneMode mode)
+void Mesh::Attach (medialib::geometry::IndexBuffer& ib, BufferCloneMode mode)
 {
   impl->index_buffer.Assign (ib, mode);
 }
     
 void Mesh::DetachVertexBuffer ()
 {
-  medialib::VertexBuffer ().Swap (impl->vertex_buffer);
+  medialib::geometry::VertexBuffer ().Swap (impl->vertex_buffer);
 }
 
 void Mesh::DetachIndexBuffer ()
 {
-  medialib::IndexBuffer ().Swap (impl->index_buffer);
+  medialib::geometry::IndexBuffer ().Swap (impl->index_buffer);
 }
 
 void Mesh::DetachAllBuffers ()
@@ -278,6 +278,9 @@ void Mesh::Swap (Mesh& mesh)
 namespace medialib
 {
 
+namespace geometry
+{
+
 /*
     Обмен
 */
@@ -304,6 +307,8 @@ const char* get_type_name (PrimitiveType type)
   }
   
   return "";
+}
+
 }
 
 }

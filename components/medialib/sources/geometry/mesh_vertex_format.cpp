@@ -1,9 +1,9 @@
-#include <media/mesh/mesh.h>
+#include <media/geometry/mesh.h>
 #include <common/exception.h>
 #include <common/hash.h>
 #include <memory.h>
 
-using namespace medialib;
+using namespace medialib::geometry;
 using namespace common;
 
 /*
@@ -301,9 +301,14 @@ void VertexFormat::Swap (VertexFormat& vf)
 namespace medialib
 {
 
+namespace geometry
+{
+
 void swap (VertexFormat& vf1, VertexFormat& vf2)
 {
   vf1.Swap (vf2);
+}
+
 }
 
 }
@@ -342,6 +347,9 @@ bool VertexFormat::operator != (const VertexFormat& vf) const
 */
 
 namespace medialib
+{
+
+namespace geometry
 {
 
 //размер типа атрибута вершин в байтах
@@ -424,6 +432,8 @@ const char* get_type_name (VertexAttributeType type)
   }
 
   return "";
+}
+
 }
 
 }

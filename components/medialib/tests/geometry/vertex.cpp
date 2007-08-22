@@ -1,7 +1,5 @@
 #include "shared.h"
 
-using namespace medialib::vertex;
-
 template <class Vertex> void dump_format ()
 {
   VertexFormat format;

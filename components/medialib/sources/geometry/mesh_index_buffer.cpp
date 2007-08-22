@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib;
+using namespace medialib::geometry;
 using namespace common;
 
 /*
@@ -115,10 +115,15 @@ void IndexBuffer::Swap (IndexBuffer& ib)
 
 namespace medialib
 {
+
+namespace geometry
+{
     
 void swap (IndexBuffer& ib1, IndexBuffer& ib2)
 {
   ib1.Swap (ib2);
+}
+
 }
 
 }

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib;
+using namespace medialib::geometry;
 using namespace common;
 
 /*
@@ -116,9 +116,14 @@ void VertexWeightStream::Swap (VertexWeightStream& vws)
 namespace medialib
 {
 
+namespace geometry
+{
+
 void swap (VertexWeightStream& vws1, VertexWeightStream& vws2)
 {
   vws1.Swap (vws2);
+}
+
 }
 
 }

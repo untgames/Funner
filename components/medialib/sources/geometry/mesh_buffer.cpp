@@ -1,7 +1,7 @@
 #include <memory.h>
 #include "shared.h"
 
-using namespace medialib;
+using namespace medialib::geometry;
 
 /*
     MeshBuffer

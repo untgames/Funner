@@ -1,7 +1,7 @@
 #include <stl/vector>
 #include "shared.h"
 
-using namespace medialib;
+using namespace medialib::geometry;
 using namespace common;
 
 const size_t DEFAULT_VERTEX_ARRAY_RESERVE = 4; //резервируемый размер вершинного массива
@@ -224,9 +224,14 @@ void VertexBuffer::Swap (VertexBuffer& vb)
 namespace medialib
 {
 
+namespace geometry
+{
+
 void swap (VertexBuffer& vb1, VertexBuffer& vb2)
 {
   vb1.Swap (vb2);
+}
+
 }
 
 }
