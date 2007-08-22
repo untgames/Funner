@@ -23,7 +23,15 @@ VertexWeightStream::VertexWeightStream ()
 VertexWeightStream::VertexWeightStream (size_t weights_count)
   : impl (new Impl)
 {
-  Resize (weights_count);
+  try
+  {
+    Resize (weights_count);
+  }
+  catch (...)
+  {
+    delete impl;
+    throw;
+  }
 }
   
 VertexWeightStream::VertexWeightStream (const VertexWeightStream& vws, BufferCloneMode mode)

@@ -74,17 +74,17 @@ const VertexAttribute* VertexFormat::Attributes () const
     Получение атрибута
 */
 
-const VertexAttribute& VertexFormat::operator [] (size_t index) const
+const VertexAttribute& VertexFormat::Attribute (size_t index) const
 {
   if (index >= impl->attributes_count)
-    RaiseOutOfRange ("medialib::geometry::VertexFormat::operator []", "index", index, impl->attributes_count);
+    RaiseOutOfRange ("medialib::geometry::VertexFormat::Attribute", "index", index, impl->attributes_count);
     
   return impl->attributes [index];
 }
 
-VertexAttribute& VertexFormat::operator [] (size_t index)
+VertexAttribute& VertexFormat::Attribute (size_t index)
 {
-  return const_cast<VertexAttribute&> (const_cast<const VertexFormat&> (*this) [index]);
+  return const_cast<VertexAttribute&> (const_cast<const VertexFormat&> (*this).Attribute (index));
 }
 
 /*
@@ -225,6 +225,23 @@ size_t VertexFormat::AddAttribute (VertexAttributeSemantic semantic, VertexAttri
   return impl->attributes_count - 1;
 }
 
+size_t VertexFormat::AddAttributes (const VertexFormat& format)
+{
+  for (size_t i=0, count=format.impl->attributes_count; i<count; i++)
+    if (FindAttribute (format.impl->attributes [i].semantic))
+      RaiseInvalidArgument ("medialib::geometry::VertexFormat::AddAttributes", "semantic",
+                            format.impl->attributes [i].semantic, "Attribute has been already inserted");
+                            
+  for (size_t i=0, count=format.impl->attributes_count; i<count; i++)
+  {
+    const VertexAttribute& attribute = format.impl->attributes [i];
+    
+    AddAttribute (attribute.semantic, attribute.type, attribute.offset);
+  }
+
+  return impl->attributes_count - 1;
+}
+
 /*
     Удаление атрибутов
 */
@@ -252,9 +269,41 @@ void VertexFormat::RemoveAttribute (VertexAttributeSemantic semantic)
   RemoveAttribute (attribute - impl->attributes);
 }
 
+void VertexFormat::RemoveAttributes (const VertexFormat& format)
+{
+  for (size_t i=0, count=format.impl->attributes_count; i<count; i++)
+    RemoveAttribute (format.impl->attributes [i].semantic);
+}
+
 void VertexFormat::Clear ()
 {
   impl->attributes_count = 0;
+}
+
+/*
+    Перегрузка операторов
+*/
+
+VertexFormat& VertexFormat::operator += (const VertexFormat& format)
+{
+  AddAttributes (format);
+  return *this;
+}
+
+VertexFormat& VertexFormat::operator -= (const VertexFormat& format)
+{
+  RemoveAttributes (format);
+  return *this;
+}
+
+VertexFormat VertexFormat::operator + (const VertexFormat& format) const
+{
+  return VertexFormat (*this) += format;
+}
+
+VertexFormat VertexFormat::operator - (const VertexFormat& format) const
+{
+  return VertexFormat (*this) -= format;
 }
 
 /*
@@ -272,7 +321,7 @@ size_t VertexFormat::GetMinimalVertexSize () const
     
     for (VertexAttribute* attribute=impl->attributes, *end=attribute+impl->attributes_count; attribute != end; attribute++)
     {
-      size_t offset = attribute->offset + get_size (attribute->type);
+      size_t offset = attribute->offset + get_type_size (attribute->type);
 
       if (offset > max_offset)
         max_offset = offset;
@@ -353,7 +402,7 @@ namespace geometry
 {
 
 //размер типа атрибута вершин в байтах
-size_t get_size (VertexAttributeType type)
+size_t get_type_size (VertexAttributeType type)
 {
   switch (type)
   {
@@ -365,7 +414,7 @@ size_t get_size (VertexAttributeType type)
     case VertexAttributeType_Short4:    return sizeof (short) * 4;
     case VertexAttributeType_UByte4:    return sizeof (unsigned char) * 4;
     case VertexAttributeType_Influence: return sizeof (VertexInfluence);
-    default:                            RaiseInvalidArgument ("media::get_size", "type", type);
+    default:                            RaiseInvalidArgument ("media::get_type_size", "type", type);
   }
   
   return 0;

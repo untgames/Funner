@@ -1,26 +1,11 @@
 #include "shared.h"
 
-void dump (const CustomVertex& v)
-{
-  printf ("  xyz=[%g %g %g] normal=[%g %g %g] rgba=[%u %u %u %u] st=[%g %g]\n", v.position.x, v.position.y, v.position.z,
-          v.normal.x, v.normal.y, v.normal.z, v.color.x, v.color.y, v.color.z, v.color.w, v.texcoord0.x, v.texcoord0.y);
-}
-
-void dump (const VertexStream& s)
-{
-  printf ("vertex stream (%u vertices):\n", s.Size ());
-
-  const CustomVertex* verts = s.Data<CustomVertex> ();
-
-  for (size_t i=0; i<s.Size (); i++)
-    dump (verts [i]);
-}
-
 int main ()
 {
   printf ("Results of vertex_stream_test:\n");
 
-  VertexStream vs1 (5, get_vertex_format<CustomVertex> (), sizeof (CustomVertex)), vs2 (get_vertex_format<CustomVertex> ());
+  VertexStream vs1 (5, make_vertex_declaration<CustomVertex> ()),
+               vs2 (make_vertex_declaration<CustomVertex> ());
   
   CustomVertex* verts = vs1.Data<CustomVertex> ();
   

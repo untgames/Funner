@@ -23,7 +23,15 @@ IndexBuffer::IndexBuffer ()
 IndexBuffer::IndexBuffer (size_t indices_count)
   : impl (new Impl)
 {
-  Resize (indices_count);
+  try
+  {
+    Resize (indices_count);
+  }
+  catch (...)
+  {
+    delete impl;
+    throw;
+  }
 }
   
 IndexBuffer::IndexBuffer (const IndexBuffer& ib, BufferCloneMode mode)

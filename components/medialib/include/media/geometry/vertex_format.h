@@ -99,20 +99,31 @@ class VertexFormat
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение атрибута
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const VertexAttribute& operator [] (size_t index) const;
-          VertexAttribute& operator [] (size_t index);
+    const VertexAttribute& Attribute (size_t index) const;
+          VertexAttribute& Attribute (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление атрибутов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t AddAttribute (VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset); //return: индекс вершинного атрибута
+    size_t AddAttribute  (VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset); //return: индекс вершинного атрибута
+    size_t AddAttributes (const VertexFormat&); //return: инедкс последнего добавленного атрибута
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление атрибутов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RemoveAttribute (size_t position); //nothrow
-    void RemoveAttribute (VertexAttributeSemantic); //nothrow
-    void Clear (); //удаление всех атрибутов, nothrow
+    void RemoveAttribute  (size_t position); //nothrow
+    void RemoveAttribute  (VertexAttributeSemantic); //nothrow
+    void RemoveAttributes (const VertexFormat&);
+    void Clear            (); //удаление всех атрибутов, nothrow
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перегрузка операторов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    VertexFormat& operator += (const VertexFormat&);
+    VertexFormat& operator -= (const VertexFormat&);
+    
+    VertexFormat operator + (const VertexFormat&) const;
+    VertexFormat operator - (const VertexFormat&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск атрибута по семантике
@@ -149,10 +160,10 @@ void swap (VertexFormat&, VertexFormat&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение характеристик
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-size_t      get_size           (VertexAttributeType);     //размер типа атрибута вершин в байтах
-size_t      get_components_num (VertexAttributeType);     //количество компонентов
 const char* get_semantic_name  (VertexAttributeSemantic); //имя семантики
 const char* get_type_name      (VertexAttributeType);     //имя типа
+size_t      get_type_size      (VertexAttributeType);     //размер типа атрибута вершин в байтах
+size_t      get_components_num (VertexAttributeType);     //количество компонентов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение формата вершины

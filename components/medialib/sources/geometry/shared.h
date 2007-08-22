@@ -102,6 +102,12 @@ template <class T> void release_resource (T* resource)
     delete resource;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Копирование массивов атрибутов с преобразованием формата
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void copy (size_t vertices_count, const void* source, VertexAttributeType source_type, size_t source_stride,
+           void* destination, VertexAttributeType destination_type, size_t destination_stride);
+
 }
 
 }

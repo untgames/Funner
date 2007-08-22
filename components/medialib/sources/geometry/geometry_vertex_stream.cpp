@@ -14,28 +14,21 @@ struct VertexStream::Impl: public InstanceResource
   Buffer       data_buffer;    //буфер с данными
   size_t       vertices_count; //количество вершин
   
-  Impl (const VertexFormat&);
-  Impl (const VertexFormat&, size_t vertex_size);
+  Impl ();
+  Impl (const VertexDeclaration&);
 };
 
 /*
     VertexStream::Impl
 */
 
-VertexStream::Impl::Impl (const VertexFormat& in_format)
-  : format (in_format), vertices_count (0)
-{
-  vertex_size = format.GetMinimalVertexSize ();
-}
-
-VertexStream::Impl::Impl (const VertexFormat& in_format, size_t in_vertex_size)
-  : format (in_format), vertex_size (in_vertex_size), vertices_count (0)
-{
-  size_t min_vertex_size = format.GetMinimalVertexSize ();
-
-  if (vertex_size < min_vertex_size)
-    vertex_size = min_vertex_size;
-}
+VertexStream::Impl::Impl (const VertexDeclaration& declaration)
+  : format (declaration.Format ()), vertex_size (declaration.VertexSize ()), vertices_count (0)
+  {}
+  
+VertexStream::Impl::Impl ()
+  : vertex_size (0), vertices_count (0)
+  {}
 
 /*
     VertexStream
@@ -45,24 +38,86 @@ VertexStream::Impl::Impl (const VertexFormat& in_format, size_t in_vertex_size)
     Конструкторы / деструктор
 */
   
-VertexStream::VertexStream (const VertexFormat& format)
-  : impl (new Impl (format))
+VertexStream::VertexStream (const VertexDeclaration& declaration)
+  : impl (new Impl (declaration))
   {}
 
-VertexStream::VertexStream (const VertexFormat& format, size_t vertex_size)
-  : impl (new Impl (format, vertex_size))
-  {}
-
-VertexStream::VertexStream (size_t vertices_count, const VertexFormat& format)
-  : impl (new Impl (format))
+VertexStream::VertexStream (size_t vertices_count, const VertexDeclaration& declaration)
+  : impl (new Impl (declaration))
 {
-  Resize (vertices_count);
+  try
+  {
+    Resize (vertices_count);
+  }
+  catch (...)
+  {
+    delete impl;
+    throw;
+  }
 }
 
-VertexStream::VertexStream (size_t vertices_count, const VertexFormat& format, size_t vertex_size)
-  : impl (new Impl (format, vertex_size))
+VertexStream::VertexStream (const VertexStream& source, const VertexDeclaration& declaration)
+  : impl (new Impl (declaration))
 {
-  Resize (vertices_count);
+  try
+  {
+    Convert (source);
+  }
+  catch (...)
+  {
+    delete impl;
+    throw;
+  }
+}
+
+VertexStream::VertexStream (const VertexBuffer& src_vb, const VertexDeclaration& declaration)
+  : impl (new Impl (declaration))
+{
+  try
+  {
+    Convert (src_vb);
+  }
+  catch (...)
+  {
+    delete impl;
+    throw;
+  }
+}
+
+VertexStream::VertexStream (const VertexBuffer& src_vb)
+  : impl (new Impl)
+{
+  try
+  {
+    VertexFormat& dst_format = impl->format;
+    size_t       offset = 0;
+
+    for (size_t i=0, count=src_vb.StreamsCount (); i<count; i++)
+    {
+      const VertexFormat& src_format = src_vb.Stream (i).Format ();
+      
+      for (size_t j=0, count=src_format.AttributesCount (); j<count; j++)
+      {
+        const VertexAttribute& attribute = src_format.Attribute (j);
+        
+        if (!dst_format.FindAttribute (attribute.semantic))
+        {
+          dst_format.AddAttribute (attribute.semantic, attribute.type, offset);
+          
+          offset += get_type_size (attribute.type);
+        }
+      }
+    }
+
+    impl->vertex_size = offset;
+
+    Convert (src_vb);
+  }
+  catch (...)
+  {
+    delete impl;
+    throw;
+  }
 }
 
 VertexStream::VertexStream (const VertexStream& vs, BufferCloneMode mode)
@@ -83,9 +138,25 @@ void VertexStream::Assign (const VertexStream& vs, BufferCloneMode mode)
   VertexStream (vs, mode).Swap (*this);
 }
 
+void VertexStream::Assign (const VertexBuffer& vb, const VertexDeclaration& declaration)
+{
+  VertexStream (vb, declaration).Swap (*this);
+}
+
+void VertexStream::Assign (const VertexBuffer& vb)
+{
+  VertexStream (vb).Swap (*this);
+}
+
 VertexStream& VertexStream::operator = (const VertexStream& vs)
 {
   Assign (vs);
+  return *this;
+}
+
+VertexStream& VertexStream::operator = (const VertexBuffer& vb)
+{
+  Assign (vb);
   return *this;
 }
 
@@ -184,4 +255,95 @@ void swap (VertexStream& vs1, VertexStream& vs2)
 
 }
     
+}
+
+/*
+    Преобразование вершинных массивов
+*/
+
+void VertexStream::Convert (const VertexStream& src_stream)
+{
+  if (!impl->format.AttributesCount ())
+  {
+    Clear ();
+    return;
+  }
+  
+    //определение количества вершин
+    
+  size_t vertices_count = src_stream.Size ();
+  
+    //имезенение размера массива вершин
+  
+  Resize (vertices_count);
+  
+    //очистка массива
+    
+  memset (impl->data_buffer.Data (), 0, impl->data_buffer.Size ());
+  
+    //копирование данных из вершинного буфера
+  
+  for (size_t i=0, count=impl->format.AttributesCount (); i<count; i++)
+  {
+    const VertexAttribute&    dst_attribute = impl->format.Attribute (i);
+          void*               dst_ptr       = static_cast<char*> (impl->data_buffer.Data ()) + dst_attribute.offset;
+    const VertexAttributeType dst_type      = dst_attribute.type;
+    const size_t              dst_stride    = impl->vertex_size;
+    const VertexAttribute*    src_attribute = src_stream.Format ().FindAttribute (dst_attribute.semantic);
+      
+    if (!src_attribute)
+      continue;
+        
+    const void*               src_ptr    = static_cast<const char*> (src_stream.Data ()) + src_attribute->offset;
+    const size_t              src_stride = src_stream.VertexSize ();
+    const VertexAttributeType src_type   = src_attribute->type;
+    
+    copy (vertices_count, src_ptr, src_type, src_stride, dst_ptr, dst_type, dst_stride);
+  }
+}
+
+void VertexStream::Convert (const VertexBuffer& vb)
+{
+  if (!impl->format.AttributesCount ())
+  {
+    Clear ();
+    return;
+  }
+  
+    //определение количества вершин
+    
+  size_t vertices_count = vb.VerticesCount ();
+  
+    //имезенение размера массива вершин
+  
+  Resize (vertices_count);
+  
+    //очистка массива
+    
+  memset (impl->data_buffer.Data (), 0, impl->data_buffer.Size ());
+  
+    //копирование данных из вершинного буфера
+  
+  for (size_t i=0, count=impl->format.AttributesCount (); i<count; i++)
+  {
+    const VertexAttribute&    dst_attribute = impl->format.Attribute (i);
+          void*               dst_ptr       = static_cast<char*> (impl->data_buffer.Data ()) + dst_attribute.offset;
+    const VertexAttributeType dst_type      = dst_attribute.type;
+    const size_t              dst_stride    = impl->vertex_size;
+
+    for (size_t j=0, count=vb.StreamsCount (); j<count; j++)
+    {
+      const VertexStream&    src_stream    = vb.Stream (j);
+      const VertexAttribute* src_attribute = src_stream.Format ().FindAttribute (dst_attribute.semantic);
+      
+      if (!src_attribute)
+        continue;
+        
+      const void*               src_ptr    = static_cast<const char*> (src_stream.Data ()) + src_attribute->offset;
+      const size_t              src_stride = src_stream.VertexSize ();
+      const VertexAttributeType src_type   = src_attribute->type;
+      
+      copy (vertices_count, src_ptr, src_type, src_stride, dst_ptr, dst_type, dst_stride);
+    }
+  }
 }

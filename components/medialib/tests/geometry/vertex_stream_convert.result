@@ -1,0 +1,32 @@
+Results of vertex_stream_convert_test:
+vertex stream (10 vertices):
+  xyz=[0 0 0] normal=[0 1 0] rgba=[0 0 0 0] st=[0 -0]
+  xyz=[1 2 3] normal=[0 1 0] rgba=[0 0 0 0] st=[1 -1]
+  xyz=[2 4 6] normal=[0 1 0] rgba=[0 0 0 0] st=[2 -2]
+  xyz=[3 6 9] normal=[0 1 0] rgba=[0 0 0 0] st=[3 -3]
+  xyz=[4 8 12] normal=[0 1 0] rgba=[0 0 0 0] st=[4 -4]
+  xyz=[5 10 15] normal=[0 1 0] rgba=[0 0 0 0] st=[5 -5]
+  xyz=[6 12 18] normal=[0 1 0] rgba=[0 0 0 0] st=[6 -6]
+  xyz=[7 14 21] normal=[0 1 0] rgba=[0 0 0 0] st=[7 -7]
+  xyz=[8 16 24] normal=[0 1 0] rgba=[0 0 0 0] st=[8 -8]
+  xyz=[9 18 27] normal=[0 1 0] rgba=[0 0 0 0] st=[9 -9]
+vertex format (3 attributes, min_vertex_size=36):
+  attribute: semantic='position' type='float4' offset=0
+  attribute: semantic='normal' type='float3' offset=16
+  attribute: semantic='texcoord0' type='float2' offset=28
+try convert
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute
+Semantic 'position' is not compatible with type 'influence' at medialib::geometry::VertexFormat::AddAttribute

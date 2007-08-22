@@ -31,7 +31,31 @@ void dump (const VertexFormat& format, size_t vertex_size=size_t (-1))
   }
   
   for (size_t i=0; i<format.AttributesCount (); i++)
-    dump (format [i]);
+    dump (format.Attribute (i));
+}
+
+//вывод вершины
+void dump (const CustomVertex& v)
+{
+  printf ("  xyz=[%g %g %g] normal=[%g %g %g] rgba=[%u %u %u %u] st=[%g %g]\n", v.position.x, v.position.y, v.position.z,
+          v.normal.x, v.normal.y, v.normal.z, v.color.x, v.color.y, v.color.z, v.color.w, v.texcoord0.x, v.texcoord0.y);
+}
+
+//вывод потока вершин
+void dump (const VertexStream& s)
+{
+  printf ("vertex stream (%u vertices):\n", s.Size ());
+
+  const CustomVertex* verts = s.Data<CustomVertex> ();
+  
+  if (!verts)
+  {
+    printf ("  wrong format!\n");
+    return;
+  }
+
+  for (size_t i=0; i<s.Size (); i++)
+    dump (verts [i]);
 }
 
 #endif

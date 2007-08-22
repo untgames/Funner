@@ -118,7 +118,7 @@ template <size_t Index> struct TexChannel
 ///Получение формата вершины
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-void get_format (const Vertex<T0, T1, T2, T3, T4, T5, T6, T7>*, VertexFormat&);
+void get_vertex_format (const Vertex<T0, T1, T2, T3, T4, T5, T6, T7>*, VertexFormat&);
 
 #include <media/geometry/detail/vertex.inl>
 

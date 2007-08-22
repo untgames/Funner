@@ -4,7 +4,7 @@ template <class Vertex> void dump_format ()
 {
   VertexFormat format;
 
-  get_format ((Vertex*)0, format);
+  get_vertex_format ((Vertex*)0, format);
 
   dump (format, sizeof (Vertex));
 }

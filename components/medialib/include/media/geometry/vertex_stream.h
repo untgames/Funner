@@ -10,6 +10,34 @@ namespace medialib
 namespace geometry
 {
 
+//forward declarations
+class VertexBuffer;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Объявление вершины
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class VertexDeclaration
+{
+  public:
+    VertexDeclaration (const VertexFormat&);
+    VertexDeclaration (const VertexFormat&, size_t vertex_size);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение параметров
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const VertexFormat& Format     () const;
+    size_t              VertexSize () const;
+
+  private:
+    const VertexFormat* format;
+    size_t              vertex_size;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание объявления вершины
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Vertex> VertexDeclaration make_vertex_declaration ();
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Массив вершинных атрибутов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,18 +47,25 @@ class VertexStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    VertexStream  (const VertexFormat& format);
-    VertexStream  (const VertexFormat& format, size_t vertex_size);
-    VertexStream  (size_t vertices_count, const VertexFormat& format);
-    VertexStream  (size_t vertices_count, const VertexFormat& format, size_t vertex_size);
+    VertexStream  (const VertexDeclaration& declaration);
+    VertexStream  (size_t vertices_count, const VertexDeclaration& declaration);
+    VertexStream  (const VertexBuffer& source);
+    VertexStream  (const VertexStream& source, const VertexDeclaration& declaration);
+    VertexStream  (const VertexBuffer& source, const VertexDeclaration& declaration);
     VertexStream  (const VertexStream&, BufferCloneMode mode = BufferCloneMode_Default);
     ~VertexStream ();
+    
+    template <class Vertex> VertexStream (size_t);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexStream& operator = (const VertexStream&);
-    void          Assign     (const VertexStream&, BufferCloneMode mode = BufferCloneMode_Default);
+    VertexStream& operator = (const VertexBuffer&);
+    void          Assign     (const VertexStream&, BufferCloneMode mode = BufferCloneMode_Default);    
+    void          Assign     (const VertexBuffer&);
+    void          Assign     (const VertexStream&, const VertexDeclaration& declaration);
+    void          Assign     (const VertexBuffer&, const VertexDeclaration& declaration);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Формат
@@ -72,6 +107,10 @@ class VertexStream
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (VertexStream&);
+
+  private:
+    void Convert (const VertexStream&);
+    void Convert (const VertexBuffer&);
 
   private:
     struct Impl;
