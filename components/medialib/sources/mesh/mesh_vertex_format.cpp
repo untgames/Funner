@@ -1,4 +1,4 @@
-#include <media/mesh.h>
+#include <media/mesh/mesh.h>
 #include <common/exception.h>
 #include <common/hash.h>
 #include <memory.h>

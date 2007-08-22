@@ -2,7 +2,7 @@
 #define MEDIALIB_VERTEX_HEADER
 
 #include <math/mathlib.h>
-#include <media/vertex_format.h>
+#include <media/mesh/vertex_format.h>
 
 namespace xtl
 {
@@ -120,7 +120,7 @@ template <size_t Index> struct TexChannel
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 void get_format (const Vertex<T0, T1, T2, T3, T4, T5, T6, T7>*, VertexFormat&);
 
-#include <media/detail/vertex.inl>
+#include <media/mesh/detail/vertex.inl>
 
 }
 

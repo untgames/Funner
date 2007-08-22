@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 #include <exception>
-#include <media/mesh.h>
-#include <media/vertex.h>
+#include <media/mesh/mesh.h>
+#include <media/mesh/vertex.h>
 
 using namespace medialib;
 using namespace math;

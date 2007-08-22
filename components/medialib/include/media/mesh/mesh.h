@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_MESH_HEADER
 #define MEDIALIB_MESH_HEADER
 
-#include <media/vertex_format.h>
+#include <media/mesh/vertex_format.h>
 
 namespace medialib
 {
@@ -402,7 +402,7 @@ void swap (Mesh&, Mesh&);
 
 //добавить функцию проверки корректности меша
 
-#include <media/detail/mesh.inl>
+#include <media/mesh/detail/mesh.inl>
 
 }
 

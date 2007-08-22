@@ -1,4 +1,4 @@
-#include <media/mesh.h>
+#include <media/mesh/mesh.h>
 #include <common/exception.h>
 #include <stl/vector>
 #include <stl/string>

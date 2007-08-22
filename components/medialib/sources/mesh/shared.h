@@ -2,7 +2,7 @@
 #define MEDIALIB_MESH_SHARED_HEADER
 
 #include <common/exception.h>
-#include <media/mesh.h>
+#include <media/mesh/mesh.h>
 
 namespace medialib
 {

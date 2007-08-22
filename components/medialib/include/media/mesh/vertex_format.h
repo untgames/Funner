@@ -157,7 +157,7 @@ const char* get_type_name      (VertexAttributeType);     //имя типа
 template <class Vertex>
 const VertexFormat& get_vertex_format ();
 
-#include <media/detail/vertex_format.inl>
+#include <media/mesh/detail/vertex_format.inl>
 
 }
 
