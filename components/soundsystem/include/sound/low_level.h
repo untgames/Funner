@@ -4,7 +4,7 @@
 #include <mathlib.h>
 #include <xtl/functional_fwd>
 
-namespace soundsystem
+namespace sound
 {
 
 namespace low_level
@@ -15,15 +15,20 @@ namespace low_level
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Source
 {
-  math::vec3f& position;            //позиция
-  math::vec3f& direction;           //направление
-  math::vec3f& velocity;            //скорость
-  float        minimum_gain;        //минимальная громкость
-  float        maximum_gain;        //максимальная громкость
-  float        inner_angle;         //угол внутреннего конуса излучения
-  float        outer_angle;         //угол внешнего конуса излучения
-  float        outer_gain;          //громкость внутри внешнего конуса
-  float        reference_distance;  //расстояние, с которого громкость равна gain
+  math::vec3f position;            //позиция
+  math::vec3f direction;           //направление
+  math::vec3f velocity;            //скорость
+  float       gain;                //громкость
+  float       minimum_gain;        //минимальная громкость
+  float       maximum_gain;        //максимальная громкость
+  float       inner_angle;         //угол внутреннего конуса излучения
+  float       outer_angle;         //угол внешнего конуса излучения
+  float       outer_gain;          //громкость внутри внешнего конуса
+  float       reference_distance;  //расстояние, с которого громкость равна volume
+//Настройки эффектов звука
+//  float        air_absorption;      //поглощение воздухом
+//  float        outer_gain_hf;       //параметр фильтра высокой частоты для внешнего конуса
+//  float        room_rolloff_factor; //количество поглощения на выходе к фильтру
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,10 +36,10 @@ struct Source
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Listener 
 {
-  math::vec3f& position;    //позиция
-  math::vec3f& direction;   //направление
-  math::vec3f& up;          //направление вверх
-  math::vec3f& velocity;    //скорость
+  math::vec3f position;    //позиция
+  math::vec3f direction;   //направление
+  math::vec3f up;          //направление вверх
+  math::vec3f velocity;    //скорость
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,9 +48,9 @@ struct Listener
 struct SystemInfo
 {
   size_t channels_count;          //количество поддерживаемых каналов
-  size_t hardware_channels_count; //количество аппаратно поддерживаемых каналов
   size_t eax_major_version;       //старшая часть версии EAX
   size_t eax_minor_version;       //младшая часть версии EAX
+//  size_t max_aux_sends;           //максимальное количество подключённых к источнику фильтров
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +67,7 @@ struct ICustomSoundSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение информации об устройстве
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void GetInfo (DeviceInfo&) = 0;
+    virtual void GetInfo (SystemInfo&) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество микшируемых каналов
@@ -76,17 +81,10 @@ struct ICustomSoundSystem
     virtual const char* GetSample (size_t channel) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка цикличности проигрывания канала
+///Проверка цикличности проигрывания канала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetLooping (size_t channel, bool looping) = 0;
-    virtual bool GetLooping (size_t channel) = 0;
+    virtual bool IsLooped (size_t channel) = 0;
     
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка уровня громкости для канала
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void  SetVolume (size_t channel, float volume_in_db) = 0;
-    virtual float GetVolume (size_t channel) = 0;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров источника
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,23 +94,24 @@ struct ICustomSoundSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление проигрыванием
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void   Play  (size_t channel) = 0;
-    virtual void   Pause (size_t channel) = 0;
-    virtual void   Stop  (size_t channel) = 0;
-    virtual void   Seek  (size_t channel, float time_in_seconds) = 0;
-    virtual float  Tell  (size_t channel) = 0;
+    virtual void  Play  (size_t channel, bool looping = false) = 0;
+    virtual void  Pause (size_t channel) = 0;
+    virtual void  Stop  (size_t channel) = 0;
+    virtual void  Seek  (size_t channel, float time_in_seconds) = 0;
+    virtual float Tell  (size_t channel) = 0;
+    virtual bool  IsPlaying (size_t channel) = 0;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка уровня громкости для устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void  SetVolume (float volume_in_db) = 0;
+    virtual void  SetVolume (float gain) = 0;
     virtual float GetVolume () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Блокировка проигрывания звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void SetMute (bool state) = 0;
-    virtual bool IsMute  () = 0;//??имя
+    virtual bool IsMuted () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров слушателя
@@ -126,7 +125,7 @@ struct ICustomSoundSystem
     typedef xtl::function<void (const char* message)> LogHandler;
 
     virtual void              SetDebugLog (const LogHandler&) = 0;
-    virtual const LogHandler& GetDebugLog ();
+    virtual const LogHandler& GetDebugLog () = 0;
 
   protected:    
     virtual ~ICustomSoundSystem () {}    
