@@ -309,6 +309,25 @@ const char* get_type_name (PrimitiveType type)
   return "";
 }
 
+/*
+    Получение количества точек
+*/
+
+size_t get_points_count (PrimitiveType type, size_t primitives_count)
+{
+  switch (type)
+  {
+    case PrimitiveType_LineList:      return primitives_count * 2;
+    case PrimitiveType_LineStrip:     return primitives_count + 1;
+    case PrimitiveType_TriangleList:  return primitives_count * 3;
+    case PrimitiveType_TriangleStrip: return primitives_count + 2;
+    case PrimitiveType_TriangleFan:   return primitives_count + 2;
+    default:                          RaiseInvalidArgument ("medialib::geometry::get_points_count", "type", type);
+  }
+  
+  return 0;
+}
+
 }
 
 }

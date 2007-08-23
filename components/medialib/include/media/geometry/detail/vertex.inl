@@ -134,7 +134,7 @@ template <class Vertex> struct vertex_format<Vertex, VertexInfluence>
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_Influence, VertexAttributeType_Influence, offsetof (Vertex, first_joint));
+    format.AddAttribute (VertexAttributeSemantic_Influence, VertexAttributeType_Influence, offsetof (Vertex, first_weight));
   }
 };
 

@@ -20,3 +20,11 @@ inline const VertexFormat& get_vertex_format ()
 {
   return common::Singleton<detail::VertexFormatHolder<Vertex> >::Instance ().format;
 }
+
+/*
+    VertexInfluence
+*/
+
+inline VertexInfluence::VertexInfluence ()
+  : first_weight (0), weights_count (0)
+  {}

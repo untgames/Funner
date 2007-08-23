@@ -106,89 +106,6 @@ VertexAttribute* VertexFormat::FindAttribute (VertexAttributeSemantic semantic)
 }
 
 /*
-    ѕроверка совместимости типа атрибута с его семантикой
-*/
-
-namespace
-{
-
-void raise_incompatible (VertexAttributeSemantic semantic, VertexAttributeType type)
-{
-  RaiseNotSupported ("medialib::geometry::VertexFormat::AddAttribute", "Semantic '%s' is not compatible with type '%s'",
-                     get_semantic_name (semantic), get_type_name (type));
-}
-
-void check_attribute_type (VertexAttributeSemantic semantic, VertexAttributeType type)
-{
-  switch (semantic)
-  {
-    case VertexAttributeSemantic_Position:
-    case VertexAttributeSemantic_TexCoord0:
-    case VertexAttributeSemantic_TexCoord1:
-    case VertexAttributeSemantic_TexCoord2:
-    case VertexAttributeSemantic_TexCoord3:
-    case VertexAttributeSemantic_TexCoord4:
-    case VertexAttributeSemantic_TexCoord5:
-    case VertexAttributeSemantic_TexCoord6:
-    case VertexAttributeSemantic_TexCoord7:
-      switch (type)
-      {
-        case VertexAttributeType_Float2:
-        case VertexAttributeType_Float3:
-        case VertexAttributeType_Float4:
-        case VertexAttributeType_Short2:
-        case VertexAttributeType_Short3:
-        case VertexAttributeType_Short4:
-        case VertexAttributeType_UByte4:
-          break;
-        default:
-          raise_incompatible (semantic, type);
-          break;
-      }
-      break;
-    case VertexAttributeSemantic_Normal:
-    case VertexAttributeSemantic_Tangent:
-    case VertexAttributeSemantic_Binormal:
-      switch (type)
-      {
-        case VertexAttributeType_Float3:
-        case VertexAttributeType_Short3:
-          break;
-        default:
-          raise_incompatible (semantic, type);
-          break;
-      }
-      break;
-    case VertexAttributeSemantic_Color:
-      switch (type)
-      {
-        case VertexAttributeType_Float3:
-        case VertexAttributeType_Float4:
-        case VertexAttributeType_Short3:
-        case VertexAttributeType_Short4:
-        case VertexAttributeType_UByte4:
-          break;
-        default:
-          raise_incompatible (semantic, type);
-          break;
-      }
-      break;
-    case VertexAttributeSemantic_Influence:
-      switch (type)
-      {
-        case VertexAttributeType_Influence:
-          break;
-        default:
-          raise_incompatible (semantic, type);
-          break;
-      }
-      break;
-  }
-}
-
-}
-
-/*
     ƒобавление атрибутов
 */
 
@@ -202,12 +119,15 @@ size_t VertexFormat::AddAttribute (VertexAttributeSemantic semantic, VertexAttri
     
     //проверка совместимости типа атрибута с его семантикой
     
-  check_attribute_type (semantic, type);
+  if (!is_compatible (semantic, type))
+    RaiseNotSupported ("medialib::geometry::VertexFormat::AddAttribute", "Semantic '%s' is not compatible with type '%s'",
+                       get_semantic_name (semantic), get_type_name (type));  
   
     //проверка наличи€ атрибута в формате
 
   if (FindAttribute (semantic))
-    RaiseInvalidArgument ("medialib::geometry::VertexFormat::AddAttribute", "semantic", semantic, "Attribute has been already inserted");
+    RaiseNotSupported ("medialib::geometry::VertexFormat::AddAttribute", "Attribute with semantic '%s' has been already inserted",
+                       get_semantic_name (semantic));
     
     //добавление атрибута
      
@@ -421,7 +341,7 @@ size_t get_type_size (VertexAttributeType type)
 }
 
 //количество компонентов
-size_t get_components_num (VertexAttributeType type)
+size_t get_components_count (VertexAttributeType type)
 {
   switch (type)
   {
@@ -433,7 +353,7 @@ size_t get_components_num (VertexAttributeType type)
     case VertexAttributeType_UByte4:
     case VertexAttributeType_Float4:    return 4;
     case VertexAttributeType_Influence: return 1;
-    default:                            RaiseInvalidArgument ("media::get_components_num", "type", type);
+    default:                            RaiseInvalidArgument ("media::get_components_count", "type", type);
   }
 
   return 0;
@@ -481,6 +401,62 @@ const char* get_type_name (VertexAttributeType type)
   }
 
   return "";
+}
+
+
+//проверка совместимости
+bool is_compatible (VertexAttributeSemantic semantic, VertexAttributeType type)
+{
+  switch (semantic)
+  {
+    case VertexAttributeSemantic_Position:
+    case VertexAttributeSemantic_TexCoord0:
+    case VertexAttributeSemantic_TexCoord1:
+    case VertexAttributeSemantic_TexCoord2:
+    case VertexAttributeSemantic_TexCoord3:
+    case VertexAttributeSemantic_TexCoord4:
+    case VertexAttributeSemantic_TexCoord5:
+    case VertexAttributeSemantic_TexCoord6:
+    case VertexAttributeSemantic_TexCoord7:
+      switch (type)
+      {
+        case VertexAttributeType_Float2:
+        case VertexAttributeType_Float3:
+        case VertexAttributeType_Float4:
+        case VertexAttributeType_Short2:
+        case VertexAttributeType_Short3:
+        case VertexAttributeType_Short4:
+        case VertexAttributeType_UByte4: return true;
+        default:                         return false;
+      }
+    case VertexAttributeSemantic_Normal:
+    case VertexAttributeSemantic_Tangent:
+    case VertexAttributeSemantic_Binormal:
+      switch (type)
+      {
+        case VertexAttributeType_Float3:
+        case VertexAttributeType_Short3: return true;
+        default:                         return false;
+      }
+    case VertexAttributeSemantic_Color:
+      switch (type)
+      {
+        case VertexAttributeType_Float3:
+        case VertexAttributeType_Float4:
+        case VertexAttributeType_Short3:
+        case VertexAttributeType_Short4:
+        case VertexAttributeType_UByte4: return true;
+        default:                         return false;
+      }
+    case VertexAttributeSemantic_Influence:
+      switch (type)
+      {
+        case VertexAttributeType_Influence: return true;
+        default:                            return false;
+      }
+  }
+  
+  return false;
 }
 
 }

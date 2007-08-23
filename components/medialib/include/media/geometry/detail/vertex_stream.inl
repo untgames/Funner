@@ -47,3 +47,11 @@ inline Vertex* VertexStream::Data ()
 {
   return const_cast<Vertex*> (const_cast<const VertexStream&> (*this).Data<Vertex> ());
 }
+
+/*
+    VertexWeight
+*/
+
+inline VertexWeight::VertexWeight ()
+  : joint_index (0), joint_weight (0.0f)
+  {}

@@ -15,7 +15,9 @@ namespace geometry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct VertexInfluence
 {
-  size_t first_joint, joints_count;
+  size_t first_weight, weights_count;
+  
+  VertexInfluence ();
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,10 +162,11 @@ void swap (VertexFormat&, VertexFormat&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение характеристик
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const char* get_semantic_name  (VertexAttributeSemantic); //имя семантики
-const char* get_type_name      (VertexAttributeType);     //имя типа
-size_t      get_type_size      (VertexAttributeType);     //размер типа атрибута вершин в байтах
-size_t      get_components_num (VertexAttributeType);     //количество компонентов
+const char* get_semantic_name    (VertexAttributeSemantic); //имя семантики
+const char* get_type_name        (VertexAttributeType);     //имя типа
+size_t      get_type_size        (VertexAttributeType);     //размер типа атрибута вершин в байтах
+size_t      get_components_count (VertexAttributeType);     //количество компонентов
+bool        is_compatible        (VertexAttributeSemantic, VertexAttributeType); //проверка совместимости
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение формата вершины
