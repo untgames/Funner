@@ -57,19 +57,19 @@ template <class T> class sphere
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     sphere& operator += (const vec_type&);
     sphere& operator += (const sphere&);
-    sphere& operator += (const axis_aligned_box<T>&); //???
+//    sphere& operator += (const axis_aligned_box<T>&); //???
     sphere  operator +  (const vec_type&) const;
     sphere  operator +  (const sphere&) const;
-    sphere  operator +  (const axis_aligned_box&) const; //???
+//    sphere  operator +  (const axis_aligned_box&) const; //???
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Преобразования ограничивающей сферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    sphere& operator *= (const math::matrix<T, 4>&);
+/*    sphere& operator *= (const math::matrix<T, 4>&);
     sphere& operator *= (const math::quat<T>&);
     sphere  operator *  (const math::matrix<T, 4>&) const;
     sphere  operator *  (const math::quat<T>&) const;
-
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка пересечения ограничивающей сферы с различными примитивами
 ///////////////////////////////////////////////////////////////////////////////////////////////////

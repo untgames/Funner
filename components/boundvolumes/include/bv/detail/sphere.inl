@@ -66,15 +66,47 @@ bool template <class T> class sphere::empty (const element_type& eps = default_e
 ///Добавление примитивов в ограничивающий объём
 ///  Если текущий радиус < 0 - сбрасываем положение сферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-sphere& template <class T> class sphere::operator += (const vec_type&)
+sphere& template <class T> class sphere::operator += (const vec_type& point) const
 {
+   vec_type vec;
+   if(sphere_radius==0)
+   {
+      sphere_center=vec;
+      return *this;
+   }
+   if(contains(point))
+      return *this;
+   vec=(sphere_center+point)/2;
+   sphere_center=vec+normalize(vec)*(sphere_radius/2);
+   return *this;
 }
-sphere& template <class T> class sphere::operator += (const sphere&);
-sphere& template <class T> class sphere::operator += (const axis_aligned_box<T>&); //???
-sphere  template <class T> class sphere::operator +  (const vec_type&) const;
-sphere  template <class T> class sphere::operator +  (const sphere&) const;
-sphere  template <class T> class sphere::operator +  (const axis_aligned_box&) const; //???
 
+sphere& template <class T> class sphere::operator += (const sphere& sph) const
+{
+   vec_type vec;
+   if(sphere_radius==0)
+   {
+      sphere_radius=sph.radius();
+      sphere_center=sph.centre();
+      return *this;
+   }
+   if(contains(sph))
+      return *this;
+   vec=(sphere_center+sph.center())/2;
+   sphere_center=vec+normalize(vec)*((sphere_radius+sph.radius)/2);
+   return *this;
+}
+
+//sphere& template <class T> class sphere::operator += (const axis_aligned_box<T>&); //???
+sphere  template <class T> class sphere::operator +  (const vec_type& vec) const
+{
+   return shere(*this)+=vec;
+}
+sphere  template <class T> class sphere::operator +  (const sphere& sph) const
+{
+   return shere(*this)+=sph;
+}
+//sphere  template <class T> class sphere::operator +  (const axis_aligned_box&) const; //???
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка пересечения ограничивающей сферы с различными примитивами
