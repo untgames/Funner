@@ -84,8 +84,8 @@ class Mesh
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение/отсоединение буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Attach (geometry::VertexBuffer&, BufferCloneMode mode = BufferCloneMode_Instance);
-    void Attach (geometry::IndexBuffer&, BufferCloneMode mode = BufferCloneMode_Instance);
+    void Attach (geometry::VertexBuffer&, CloneMode mode = CloneMode_Instance);
+    void Attach (geometry::IndexBuffer&, CloneMode mode = CloneMode_Instance);
 
     void DetachVertexBuffer ();
     void DetachIndexBuffer  ();

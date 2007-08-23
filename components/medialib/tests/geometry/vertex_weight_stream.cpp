@@ -19,12 +19,8 @@ int main ()
     VertexWeightStream s1 (12), s2;  
     
     for (size_t i=0; i<s1.Size (); i++)
-    {
-      VertexWeight w = {i, 0.5f};
-      
-      s1.Data ()[i] = w;
-    }
-    
+      s1.Data ()[i] = VertexWeight (i, 0.5f);
+ 
     printf ("Dump s1\n");
     dump (s1);
     
@@ -48,7 +44,7 @@ int main ()
     
     printf ("instance s2\n");
     
-    s2.Assign (s1, BufferCloneMode_Instance);
+    s2.Assign (s1, CloneMode_Instance);
     
     s1.Resize (5);
 

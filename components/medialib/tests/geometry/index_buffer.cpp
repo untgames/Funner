@@ -42,7 +42,7 @@ int main ()
     
     printf ("instance ib2\n");
     
-    ib2.Assign (ib1, BufferCloneMode_Instance);
+    ib2.Assign (ib1, CloneMode_Instance);
     
     ib1.Resize (5);
 

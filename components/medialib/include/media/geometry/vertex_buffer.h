@@ -19,13 +19,13 @@ class VertexBuffer
 /// онструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexBuffer  ();
-    VertexBuffer  (const VertexBuffer&, BufferCloneMode mode = BufferCloneMode_Default);
+    VertexBuffer  (const VertexBuffer&, CloneMode mode = CloneMode_Default);
     ~VertexBuffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕрисваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void          Assign     (const VertexBuffer&, BufferCloneMode mode = BufferCloneMode_Default);
+    void          Assign     (const VertexBuffer&, CloneMode mode = CloneMode_Default);
     VertexBuffer& operator = (const VertexBuffer&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,9 +48,9 @@ class VertexBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕрисоединение/отсоединение массивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Attach        (VertexStream&, BufferCloneMode mode = BufferCloneMode_Instance); //return: индекс массива
+    size_t Attach        (VertexStream&, CloneMode mode = CloneMode_Instance); //return: индекс массива
     void   Detach        (size_t index); //nothrow
-    void   AttachWeights (VertexWeightStream&, BufferCloneMode mode = BufferCloneMode_Instance);
+    void   AttachWeights (VertexWeightStream&, CloneMode mode = CloneMode_Instance);
     void   DetachWeights ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

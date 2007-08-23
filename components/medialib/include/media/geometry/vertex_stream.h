@@ -52,7 +52,7 @@ class VertexStream
     VertexStream  (const VertexBuffer& source);
     VertexStream  (const VertexStream& source, const VertexDeclaration& declaration);
     VertexStream  (const VertexBuffer& source, const VertexDeclaration& declaration);
-    VertexStream  (const VertexStream&, BufferCloneMode mode = BufferCloneMode_Default);
+    VertexStream  (const VertexStream&, CloneMode mode = CloneMode_Default);
     ~VertexStream ();
     
     template <class Vertex> VertexStream (size_t);
@@ -62,7 +62,7 @@ class VertexStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexStream& operator = (const VertexStream&);
     VertexStream& operator = (const VertexBuffer&);
-    void          Assign     (const VertexStream&, BufferCloneMode mode = BufferCloneMode_Default);    
+    void          Assign     (const VertexStream&, CloneMode mode = CloneMode_Default);    
     void          Assign     (const VertexBuffer&);
     void          Assign     (const VertexStream&, const VertexDeclaration& declaration);
     void          Assign     (const VertexBuffer&, const VertexDeclaration& declaration);
@@ -123,17 +123,6 @@ class VertexStream
 void swap (VertexStream&, VertexStream&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вершинный вес
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct VertexWeight
-{
-  size_t joint_index;  //индекс соединения
-  float  joint_weight; //вес соединения
-  
-  VertexWeight ();
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Массив вершинных весов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class VertexWeightStream
@@ -144,14 +133,14 @@ class VertexWeightStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexWeightStream  ();
     VertexWeightStream  (size_t weights_count);
-    VertexWeightStream  (const VertexWeightStream&, BufferCloneMode mode = BufferCloneMode_Default);
+    VertexWeightStream  (const VertexWeightStream&, CloneMode mode = CloneMode_Default);
     ~VertexWeightStream ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexWeightStream& operator = (const VertexWeightStream&);
-    void                Assign     (const VertexWeightStream&, BufferCloneMode mode = BufferCloneMode_Default);
+    void                Assign     (const VertexWeightStream&, CloneMode mode = CloneMode_Default);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных

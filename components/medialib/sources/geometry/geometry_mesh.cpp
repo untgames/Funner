@@ -49,8 +49,8 @@ Mesh::Impl::Impl ()
 
 Mesh::Impl::Impl (const Impl& impl)
   : name (impl.name),
-    vertex_buffer (impl.vertex_buffer),
-    index_buffer (impl.index_buffer),
+    vertex_buffer (impl.vertex_buffer, CloneMode_Source),
+    index_buffer (impl.index_buffer, CloneMode_Source),
     primitives (impl.primitives),
     material_names (impl.material_names),
     need_material_names_update (true)
@@ -149,12 +149,12 @@ size_t Mesh::WeightsCount () const
     Присоединение/отсоединение буферов
 */
 
-void Mesh::Attach (medialib::geometry::VertexBuffer& vb, BufferCloneMode mode)
+void Mesh::Attach (medialib::geometry::VertexBuffer& vb, CloneMode mode)
 {
   impl->vertex_buffer.Assign (vb, mode);
 }
 
-void Mesh::Attach (medialib::geometry::IndexBuffer& ib, BufferCloneMode mode)
+void Mesh::Attach (medialib::geometry::IndexBuffer& ib, CloneMode mode)
 {
   impl->index_buffer.Assign (ib, mode);
 }

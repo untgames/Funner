@@ -47,7 +47,7 @@ int main ()
   
   printf ("instance vs2\n");
 
-  vs2.Assign (vs1, BufferCloneMode_Instance);
+  vs2.Assign (vs1, CloneMode_Instance);
   
   dump (vs2);
 

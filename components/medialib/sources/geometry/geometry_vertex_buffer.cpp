@@ -13,16 +13,16 @@ const size_t DEFAULT_VERTEX_ARRAY_RESERVE = 4; //резервируемый размер вершинного
 class VertexStreamWrapper: public VertexStream
 {
   public:
-    VertexStreamWrapper (const VertexStreamWrapper& vs) : VertexStream (vs, BufferCloneMode_Instance), clone_mode (vs.clone_mode) {}
-    VertexStreamWrapper (const VertexStream& vs, BufferCloneMode mode) : VertexStream (vs, mode), clone_mode (mode) {}
+    VertexStreamWrapper (const VertexStreamWrapper& vs) : VertexStream (vs, CloneMode_Instance), clone_mode (vs.clone_mode) {}
+    VertexStreamWrapper (const VertexStream& vs, CloneMode mode) : VertexStream (vs, mode), clone_mode (mode) {}
 
     VertexStreamWrapper& operator = (const VertexStream& vs)
     {
-      Assign (vs, BufferCloneMode_Instance);
+      Assign (vs, CloneMode_Instance);
       return *this;
     }
 
-    BufferCloneMode clone_mode; //режим копирования
+    CloneMode clone_mode; //режим копирования
 };
 
 /*
@@ -66,7 +66,7 @@ VertexBuffer::VertexBuffer ()
   : impl (new Impl)
   {}
 
-VertexBuffer::VertexBuffer (const VertexBuffer& vb, BufferCloneMode mode)
+VertexBuffer::VertexBuffer (const VertexBuffer& vb, CloneMode mode)
   : impl (clone_resource (vb.impl, mode, "medialib::geometry::VertexBuffer::VertexBuffer"))
   {}
 
@@ -79,7 +79,7 @@ VertexBuffer::~VertexBuffer ()
     Присваивание
 */
 
-void VertexBuffer::Assign (const VertexBuffer& vb, BufferCloneMode mode)
+void VertexBuffer::Assign (const VertexBuffer& vb, CloneMode mode)
 {
   VertexBuffer (vb, mode).Swap (*this);
 }
@@ -135,12 +135,13 @@ VertexWeightStream& VertexBuffer::Weights ()
     Присоединение/отсоединение массивов
 */
 
-size_t VertexBuffer::Attach (VertexStream& vs, BufferCloneMode mode)
+size_t VertexBuffer::Attach (VertexStream& vs, CloneMode mode)
 {
   switch (mode)
   {
-    case BufferCloneMode_Copy:
-    case BufferCloneMode_Instance:
+    case CloneMode_Copy:
+    case CloneMode_Instance:
+    case CloneMode_Source:
       break;
     default:
       RaiseInvalidArgument ("medialib::geometry::VertexBuffer::Attach", "mode", mode);
@@ -160,7 +161,7 @@ void VertexBuffer::Detach (size_t index)
   impl->streams.erase (impl->streams.begin () + index);
 }
 
-void VertexBuffer::AttachWeights (VertexWeightStream& vws, BufferCloneMode mode)
+void VertexBuffer::AttachWeights (VertexWeightStream& vws, CloneMode mode)
 {
   impl->weights.Assign (vws, mode);
 }

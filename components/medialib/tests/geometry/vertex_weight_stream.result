@@ -40,8 +40,9 @@ Vertex weight stream (5 weights):
   joint=3 weight=0.5
   joint=4 weight=0.5
 instance s1 (default clone mode)
-Vertex weight stream (4 weights):
+Vertex weight stream (5 weights):
   joint=0 weight=0.5
   joint=1 weight=0.5
   joint=2 weight=0.5
   joint=3 weight=0.5
+  joint=4 weight=0.5

@@ -51,9 +51,9 @@ class Buffer
 struct InstanceResource
 {
   size_t          ref_count;          //счЄтчик ссылок
-  BufferCloneMode default_clone_mode; //режим инстанцировани€ по умолчанию
+  CloneMode default_clone_mode; //режим инстанцировани€ по умолчанию
   
-  InstanceResource () : ref_count (1), default_clone_mode (BufferCloneMode_Copy) {}
+  InstanceResource () : ref_count (1), default_clone_mode (CloneMode_Copy) {}
   InstanceResource (const InstanceResource& resource) : ref_count (1), default_clone_mode (resource.default_clone_mode) {}
 
   private: InstanceResource& operator = (const InstanceResource&); //no impl
@@ -62,20 +62,20 @@ struct InstanceResource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// опирование ресурса
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> T* clone_resource (T* resource, BufferCloneMode mode, const char* source)
+template <class T> T* clone_resource (T* resource, CloneMode mode, const char* source)
 {
   T* new_resource = 0;
 
   switch (mode)
   {
-    case BufferCloneMode_Copy:
+    case CloneMode_Copy:
       new_resource = new T (*resource);
       break;
-    case BufferCloneMode_Instance:
+    case CloneMode_Instance:
       new_resource = resource;
       resource->ref_count++;
       break;
-    case BufferCloneMode_Default:
+    case CloneMode_Source:
       new_resource = clone_resource (resource, resource->default_clone_mode, source);
       break;
     default:

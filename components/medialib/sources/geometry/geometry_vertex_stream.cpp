@@ -120,7 +120,7 @@ VertexStream::VertexStream (const VertexBuffer& src_vb)
   }
 }
 
-VertexStream::VertexStream (const VertexStream& vs, BufferCloneMode mode)
+VertexStream::VertexStream (const VertexStream& vs, CloneMode mode)
   : impl (clone_resource (vs.impl, mode, "medialib::geometry::VertexStream::VertexStream"))
   {}
 
@@ -133,7 +133,7 @@ VertexStream::~VertexStream ()
     Присваивание
 */
 
-void VertexStream::Assign (const VertexStream& vs, BufferCloneMode mode)
+void VertexStream::Assign (const VertexStream& vs, CloneMode mode)
 {
   VertexStream (vs, mode).Swap (*this);
 }

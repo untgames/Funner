@@ -34,7 +34,7 @@ VertexWeightStream::VertexWeightStream (size_t weights_count)
   }
 }
   
-VertexWeightStream::VertexWeightStream (const VertexWeightStream& vws, BufferCloneMode mode)
+VertexWeightStream::VertexWeightStream (const VertexWeightStream& vws, CloneMode mode)
   : impl (clone_resource (vws.impl, mode, "medialib::geometry::VertexWeightStream::VertexWeightStream"))
   {}
 
@@ -47,7 +47,7 @@ VertexWeightStream::~VertexWeightStream ()
     Присваивание
 */
 
-void VertexWeightStream::Assign (const VertexWeightStream& vws, BufferCloneMode mode)
+void VertexWeightStream::Assign (const VertexWeightStream& vws, CloneMode mode)
 {
   VertexWeightStream (vws, mode).Swap (*this);
 }
