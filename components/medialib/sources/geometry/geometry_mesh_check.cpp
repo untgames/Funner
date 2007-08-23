@@ -1,8 +1,4 @@
-#include <float.h>
-#include <media/geometry/mesh.h>
-#include <xtl/function.h>
-#include <common/strlib.h>
-#include <mathlib.h>
+#include "shared.h"
 
 using namespace medialib::geometry;
 using namespace common;

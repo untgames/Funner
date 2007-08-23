@@ -1,4 +1,3 @@
-#include <memory.h>
 #include "shared.h"
 
 using namespace medialib::geometry;

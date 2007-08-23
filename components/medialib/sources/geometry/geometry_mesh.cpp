@@ -1,7 +1,4 @@
-#include <media/geometry/mesh.h>
-#include <common/exception.h>
-#include <stl/vector>
-#include <stl/string>
+#include "shared.h"
 
 using namespace medialib::geometry;
 using namespace stl;
@@ -24,7 +21,7 @@ struct PrimitiveImpl: public Primitive
 
 typedef stl::vector<PrimitiveImpl> PrimitiveArray;
 
-struct Mesh::Impl
+struct Mesh::Impl: public InstanceResource
 {
   string                 name;                       //имя меша
   geometry::VertexBuffer vertex_buffer;              //вершинный буфер
@@ -64,22 +61,27 @@ Mesh::Mesh ()
   : impl (new Impl)
   {}
 
-Mesh::Mesh (const Mesh& mesh)
-  : impl (new Impl (*mesh.impl))
+Mesh::Mesh (const Mesh& mesh, CloneMode mode)
+  : impl (clone_resource (mesh.impl, mode, "medialib::geometry::Mesh::Mesh"))
   {}
 
 Mesh::~Mesh ()
 {
-  delete impl;
+  release_resource (impl);
 }
 
 /*
     Присваивание
 */
 
+void Mesh::Assign (const Mesh& mesh, CloneMode mode)
+{
+  Mesh (mesh, mode).Swap (*this);
+}
+
 Mesh& Mesh::operator = (const Mesh& mesh)
 {
-  Mesh (mesh).Swap (*this);
+  Assign (mesh);
 
   return *this;
 }

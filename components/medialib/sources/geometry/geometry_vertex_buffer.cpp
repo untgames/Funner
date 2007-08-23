@@ -1,4 +1,3 @@
-#include <stl/vector>
 #include "shared.h"
 
 using namespace medialib::geometry;
@@ -16,9 +15,10 @@ class VertexStreamWrapper: public VertexStream
     VertexStreamWrapper (const VertexStreamWrapper& vs) : VertexStream (vs, CloneMode_Instance), clone_mode (vs.clone_mode) {}
     VertexStreamWrapper (const VertexStream& vs, CloneMode mode) : VertexStream (vs, mode), clone_mode (mode) {}
 
-    VertexStreamWrapper& operator = (const VertexStream& vs)
+    VertexStreamWrapper& operator = (const VertexStreamWrapper& vs)
     {
       Assign (vs, CloneMode_Instance);
+      clone_mode = vs.clone_mode;
       return *this;
     }
 

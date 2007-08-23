@@ -1,5 +1,4 @@
 #include "shared.h"
-#include <mathlib.h>
 
 using namespace medialib::geometry;
 using namespace common;

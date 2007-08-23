@@ -1,7 +1,4 @@
-#include <media/geometry/mesh.h>
-#include <common/exception.h>
-#include <common/hash.h>
-#include <memory.h>
+#include "shared.h"
 
 using namespace medialib::geometry;
 using namespace common;

@@ -20,21 +20,33 @@ ModelSystemImpl::ModelSystemImpl ()
 
 bool ModelSystemImpl::RegisterLoader (const char* extension, const LoadFunction& loader)
 {
+  if (!extension)
+    RaiseNullArgument ("medialib::collada::ModelSystemImpl::RegisterLoader", "extension");
+
   return loaders.insert_pair (extension, loader).second;
 }
 
 bool ModelSystemImpl::RegisterSaver (const char* extension, const SaveFunction& saver)
 {
+  if (!extension)
+    RaiseNullArgument ("medialib::collada::ModelSystemImpl::RegisterSaver", "extension");
+
   return savers.insert_pair (extension, saver).second;
 }
 
 void ModelSystemImpl::UnregisterLoader (const char* extension)
 {
+  if (!extension)
+    return;
+
   loaders.erase (extension);
 }
 
 void ModelSystemImpl::UnregisterSaver (const char* extension)
 {
+  if (!extension)
+    return;
+
   savers.erase (extension);
 }
 
