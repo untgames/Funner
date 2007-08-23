@@ -146,6 +146,12 @@ void Entity::UpdateBoundsCore ()
 //€вл€ютс€ ли ограничивающие объЄмы узла бесконечными
 bool Entity::IsInfiniteBounds () const
 {
+  if (impl->need_local_bounds_update)
+  {
+    const_cast <Entity&> (*this).UpdateBoundsCore ();
+    impl->need_local_bounds_update = false;
+  }
+
   return impl->infinite_bounds;
 }
 

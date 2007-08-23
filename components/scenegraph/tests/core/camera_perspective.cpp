@@ -35,6 +35,26 @@ void dump_matrix (const math::matrix<T, N>& v)
   printf (" ]");
 }
 
+void dump (const aaboxf& box)
+{
+  printf ("[");
+  dump (box.minimum ());
+  printf (" - ");
+  dump (box.maximum ());  
+  printf ("]");
+}
+
+void dump_bounds (Camera& camera)
+{
+  if (camera.IsInfiniteBounds ()) printf ("camera has infinite bounds:\n  local=", camera.Name ());
+  else                            printf ("camera bound:\n  local=", camera.Name ());
+
+  dump (camera.BoundBox ());
+  printf ("\n  world=");
+  dump (camera.WorldBoundBox ());
+  printf ("\n");
+}
+
 int main ()
 {
   printf ("Results of camera_perspective_test:\n");
@@ -51,6 +71,8 @@ int main ()
   printf ("Projection matrix:\n");
   dump_matrix (camera->ProjectionMatrix ());
   printf ("\n");
+
+  dump_bounds (*camera);
 
   return 0;
 }

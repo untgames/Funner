@@ -2,3 +2,6 @@ Results of light_common_test:
 Light color: [0 0.4 0.17]
 Light attenuation: [0 1.4 -2]
 Light range: 17.600000
+light bound:
+  local=[[-17.6 -17.6 -17.6] - [17.6 17.6 17.6]]
+  world=[[-17.6 -17.6 -17.6] - [17.6 17.6 17.6]]

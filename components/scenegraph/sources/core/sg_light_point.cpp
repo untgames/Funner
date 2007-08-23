@@ -1,5 +1,6 @@
 #include <sg/light.h>
 #include <xtl/visitor.h>
+#include <bv/axis_aligned_box.h>
 //#include <bv/sphere.h>
 
 using namespace scene_graph;
@@ -38,6 +39,7 @@ void PointLight::UpdateBoundsCore ()
   if (Range () >= INFINITY)
     SetInfiniteBounds ();
   else;
+    SetBoundBox (axis_aligned_box <float> (-Range (), -Range (), -Range (), Range (), Range (), Range ()));
 //    SetBoundBox (sphere <float> (vec3f (0), Range ()));
 }
 

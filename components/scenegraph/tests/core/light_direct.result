@@ -1,2 +1,5 @@
 Results of light_direct_test:
 Light radius: 48.500000
+light bound:
+  local=[[-48.5 -48.5 0] - [48.5 48.5 10]]
+  world=[[-48.5 -48.5 0] - [48.5 48.5 10]]
