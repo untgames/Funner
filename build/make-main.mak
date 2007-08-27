@@ -10,6 +10,7 @@ DIST_DIR_SHORT_NAME                     := dist          #Базовое имя каталога с
 PCH_SHORT_NAME                          := pch.h         #Базовое имя PCH файла
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
 VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package #Допустимые типы целей
+PACKAGE_COMMANDS                        := build clean test check run #Команды, делегируемые компонентам пакета
 
 ###################################################################################################
 #Производные пути и переменные
@@ -26,6 +27,7 @@ DIST_BIN_DIR                            := $(DIST_DIR)/bin
 BUILD_DIR                               := $(ROOT)/$(BUILD_DIR_SHORT_NAME)
 PCH_SHORT_NAME                          := $(strip $(PCH_SHORT_NAME))
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := $(strip $(BATCH_COMPILE_FLAG_FILE_SHORT_NAME))
+TMP_DIRS                                := $(ROOT)/$(TMP_DIR_SHORT_NAME)
 DIRS                                     = $(TMP_DIRS) $(DIST_DIR) $(DIST_LIB_DIR) $(DIST_BIN_DIR)
 EMPTY                                   :=
 SPACE                                   := $(EMPTY) $(EMPTY)
@@ -134,7 +136,7 @@ define process_source_dir
   endif
 
   $$(MODULE_NAME).SOURCE_DIR       := $2
-  $$(MODULE_NAME).TMP_DIR          := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$1/$$(MODULE_PATH)
+  $$(MODULE_NAME).TMP_DIR          := $$($1.TMP_DIR)/$$(MODULE_PATH)
   $$(MODULE_NAME).OBJECT_FILES     := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
   $$(MODULE_NAME).NEW_SOURCE_FILES := $$(patsubst ./%,%,$$(strip $$(foreach file,$$($$(MODULE_NAME).SOURCE_FILES),$$(if $$(wildcard $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$(file))))),,$$(file)))))
   $$(MODULE_NAME).PCH              := $$(if $$(wildcard $2/$(PCH_SHORT_NAME)),$(PCH_SHORT_NAME))
@@ -148,6 +150,7 @@ endef
 define create_extern_file_dependency
   $1: $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $1),$2)) $$(notdir $1))
 		@cp -fv $$< $$@
+		@chmod ug+rwx $$@
 endef
 
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
@@ -161,14 +164,16 @@ define process_target_with_sources
   $1.LIBS          := $$($1.LIBS:%=%.lib)
   $1.TARGET_DLLS   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%.dll)
   $1.LIB_DEPS      := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(TARGET_FILES))
+  $1.TMP_DIR       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$1
+  $1.TMP_DIRS      := $$($1.TMP_DIR)
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
   TMP_DIRS := $$($1.TMP_DIRS) $$(TMP_DIRS)
 
   build: $$($1.TARGET_DLLS)
-  
-  $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))  
+
+  $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
 endef
 
 #Обработка цели static-lib (имя цели)
@@ -291,7 +296,7 @@ endef
 #Обработка цели package (имя цели)
 define process_target.package
   ifneq (,$$($1.COMPONENTS))
-    $$(foreach command,build clean fullyclean test check run,$$(eval $$(call process_package_components,$1,$$(command))))
+    $$(foreach command,$(PACKAGE_COMMANDS),$$(eval $$(call process_package_components,$1,$$(command))))
   else
     $$(warning Empty package at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif  
@@ -326,14 +331,11 @@ create_dirs: $(DIRS)
 
 $(DIRS):
 	@mkdir -p $@
+	@chmod ug+rw $@
 
 #Очистка
-clean: single_component_clean
-fullyclean: single_component_fullyclean
-.PHONY: single_component_fullyclean single_component_clean
+clean:
+	@$(if $(TMP_DIRS),$(RM) -r $(TMP_DIRS))
 
-single_component_clean:
-	@$(if $(TMP_DIRS),$(RM) -r $(addsuffix /*,$(TMP_DIRS)))
-	
-single_component_fullyclean: single_component_clean
-	@$(if $(TARGET_FILES),$(RM) $(TARGET_FILES))
+fullyclean: clean
+	@$(RM) -r $(DIRS)
