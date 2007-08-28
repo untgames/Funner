@@ -8,7 +8,7 @@
 #include <xtl/function.h>
 #include <common/exception.h>
 #include <common/strlib.h>
-#include <sound/openal_device.h>
+#include <openaldevice/openal_device.h>
 #include <media/sound.h>
 
 #define MAX_CHANNELS_COUNT 1024
@@ -53,6 +53,44 @@ const char* StrALCError (ALCenum error)
     case ALC_OUT_OF_MEMORY:   return "Out of memory.";
     default:                  return "Unknown error.";
   }
+}
+
+void CheckALChannelPropertyError (ICustomSoundSystem::LogHandler log_handler, size_t channel, ALenum property)
+{
+  ALenum error_code;
+
+  error_code = alGetError ();
+  if (error_code != AL_NO_ERROR)
+    switch (property)
+    {
+      case AL_POSITION:  log_handler (format ("Can't set channel %u position property. '%s'", channel, StrALError (error_code)).c_str ());  break;
+      case AL_DIRECTION: log_handler (format ("Can't set channel %u direction property. '%s'", channel, StrALError (error_code)).c_str ()); break;
+      case AL_VELOCITY:  log_handler (format ("Can't set channel %u velocity property. '%s'", channel, StrALError (error_code)).c_str ());  break;
+      case AL_GAIN:      log_handler (format ("Can't set channel %u gain property. '%s'", channel, StrALError (error_code)).c_str ());      break;
+      case AL_MIN_GAIN:  log_handler (format ("Can't set channel %u minimum gain property. '%s'", channel, StrALError (error_code)).c_str ()); break;
+      case AL_MAX_GAIN:  log_handler (format ("Can't set channel %u maximum gain property. '%s'", channel, StrALError (error_code)).c_str ()); break;
+      case AL_CONE_INNER_ANGLE:   log_handler (format ("Can't set channel %u inner angle property. '%s'", channel, StrALError (error_code)).c_str ()); break;
+      case AL_CONE_OUTER_ANGLE:   log_handler (format ("Can't set channel %u outer angle property. '%s'", channel, StrALError (error_code)).c_str ()); break;
+      case AL_CONE_OUTER_GAIN:    log_handler (format ("Can't set channel %u outer gain property. '%s'", channel, StrALError (error_code)).c_str ());  break;
+      case AL_REFERENCE_DISTANCE: log_handler (format ("Can't set channel %u reference distance property. '%s'", channel, StrALError (error_code)).c_str ()); break;
+      default:                    log_handler (format ("Error '%s' while setting unknown property channel %u", StrALError (error_code), channel).c_str ());
+    }
+}
+
+void CheckALListenerPropertyError (ICustomSoundSystem::LogHandler log_handler, ALenum property)
+{
+  ALenum error_code;
+
+  error_code = alGetError ();
+  if (error_code != AL_NO_ERROR)
+    switch (property)
+    {
+      case AL_POSITION:    log_handler (format ("Can't set listener position property. '%s'",    StrALError (error_code)).c_str ()); break;
+      case AL_ORIENTATION: log_handler (format ("Can't set listener orientation property. '%s'", StrALError (error_code)).c_str ()); break;
+      case AL_VELOCITY:    log_handler (format ("Can't set listener velocity property. '%s'",    StrALError (error_code)).c_str ()); break;
+      case AL_GAIN:        log_handler (format ("Can't set channel %u gain property. '%s'",      StrALError (error_code)).c_str ()); break;
+      default:             log_handler (format ("Error '%s' while setting unknown listener property", StrALError (error_code)).c_str ());
+    }
 }
 
 struct OpenALSource
@@ -190,14 +228,14 @@ OpenALSoundSystem::Impl::~Impl ()
     Конструктор / деструктор
 */
 
-OpenALSoundSystem::OpenALSoundSystem ()
+OpenALSoundSystem::OpenALSoundSystem (const char* device_name)
 {
   ALCdevice  *device;
   ALCcontext *context;
 
-  device = alcOpenDevice (NULL);
+  device = alcOpenDevice (device_name);
   if (!device) 
-    Raise <Exception> ("OpenALSoundSystem::OpenALSoundSystem", "Can't open default device");
+    Raise <Exception> ("OpenALSoundSystem::OpenALSoundSystem", "Can't open device '%s'.", device_name);
 
   context = alcCreateContext (device, NULL);
   if (!context)
@@ -220,6 +258,15 @@ OpenALSoundSystem::~OpenALSoundSystem ()
 const char* OpenALSoundSystem::Name ()
 {
   return alcGetString (impl->device, ALC_DEVICE_SPECIFIER);
+}
+
+const char* OpenALSoundSystem::Devices ()
+{
+  if (alcIsExtensionPresent (NULL, "ALC_ENUMERATE_ALL_EXT"))
+    return alcGetString (NULL, ALC_ALL_DEVICES_SPECIFIER);
+  if (alcIsExtensionPresent (NULL, "ALC_ENUMERATION_EXT"))
+    return alcGetString (NULL, ALC_DEVICE_SPECIFIER);
+  return NULL;
 }
 
 /*
@@ -336,58 +383,27 @@ void OpenALSoundSystem::SetSource (size_t channel, const Source& source_source)
     RaiseOutOfRange ("OpenALSoundSystem::SetSource", "channel", channel, impl->info.channels_count);
     
   impl->sources[channel]->source = source_source;
-  ALenum error_code;
 
   alSourcefv (impl->sources[channel]->name, AL_POSITION, source_source.position);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u position property. '%s'", channel, StrALError (error_code)).c_str ());
-
+  CheckALChannelPropertyError (impl->log_handler, channel, AL_POSITION);
   alSourcefv (impl->sources[channel]->name, AL_DIRECTION, source_source.direction);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u direction property. '%s'", channel, StrALError (error_code)).c_str ());
-
+  CheckALChannelPropertyError (impl->log_handler, channel, AL_DIRECTION);
   alSourcefv (impl->sources[channel]->name, AL_VELOCITY, source_source.velocity);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u velocity property. '%s'", channel, StrALError (error_code)).c_str ());
-
+  CheckALChannelPropertyError (impl->log_handler, channel, AL_VELOCITY);
   alSourcef (impl->sources[channel]->name, AL_GAIN, source_source.gain);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u gain property. '%s'", channel, StrALError (error_code)).c_str ());
-
+  CheckALChannelPropertyError (impl->log_handler, channel, AL_GAIN);
   alSourcef (impl->sources[channel]->name, AL_MIN_GAIN, source_source.minimum_gain);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u minimum gain property. '%s'", channel, StrALError (error_code)).c_str ());
-
+  CheckALChannelPropertyError (impl->log_handler, channel, AL_MIN_GAIN);
   alSourcef (impl->sources[channel]->name, AL_MAX_GAIN, source_source.maximum_gain);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u maximum gain property. '%s'", channel, StrALError (error_code)).c_str ());
-
+  CheckALChannelPropertyError (impl->log_handler, channel, AL_MAX_GAIN);
   alSourcef (impl->sources[channel]->name, AL_CONE_INNER_ANGLE, source_source.inner_angle);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u inner angle property. '%s'", channel, StrALError (error_code)).c_str ());
-
+  CheckALChannelPropertyError (impl->log_handler, channel, AL_CONE_INNER_ANGLE);
   alSourcef (impl->sources[channel]->name, AL_CONE_OUTER_ANGLE, source_source.outer_angle);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u outer angle property. '%s'", channel, StrALError (error_code)).c_str ());
-
+  CheckALChannelPropertyError (impl->log_handler, channel, AL_CONE_OUTER_ANGLE);
   alSourcef (impl->sources[channel]->name, AL_CONE_OUTER_GAIN, source_source.outer_gain);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u outer gain property. '%s'", channel, StrALError (error_code)).c_str ());
-
+  CheckALChannelPropertyError (impl->log_handler, channel, AL_CONE_OUTER_GAIN);
   alSourcef (impl->sources[channel]->name, AL_REFERENCE_DISTANCE, source_source.reference_distance);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u reference distance property. '%s'", channel, StrALError (error_code)).c_str ());
-
+  CheckALChannelPropertyError (impl->log_handler, channel, AL_REFERENCE_DISTANCE);
 }
 
 void OpenALSoundSystem::GetSource (size_t channel, Source& target_source)
@@ -511,12 +527,8 @@ void  OpenALSoundSystem::SetVolume (float gain)
 
   impl->gain = gain;
 
-  ALenum error_code;
-
   alListenerf (AL_GAIN, gain);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set volume. '%s'", StrALError (error_code)).c_str ());
+  CheckALListenerPropertyError (impl->log_handler, AL_GAIN);
 }
 
 float OpenALSoundSystem::GetVolume ()
@@ -555,24 +567,15 @@ bool OpenALSoundSystem::IsMuted ()
 void OpenALSoundSystem::SetListener (const Listener& source_listener)
 {
   impl->listener = source_listener;
-  ALenum error_code;
   float  orientation [6] = {source_listener.direction.x, source_listener.direction.y, source_listener.direction.z, 
                             source_listener.up.x,        source_listener.up.y,        source_listener.up.z};
 
   alListenerfv (AL_POSITION, source_listener.position);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set listener position property. '%s'", StrALError (error_code)).c_str ());
-
+  CheckALListenerPropertyError (impl->log_handler, AL_POSITION);
   alListenerfv (AL_VELOCITY, source_listener.velocity);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set listener velocity property. '%s'", StrALError (error_code)).c_str ());
-
+  CheckALListenerPropertyError (impl->log_handler, AL_VELOCITY);
   alListenerfv (AL_ORIENTATION, orientation);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set listener direction and up property. '%s'", StrALError (error_code)).c_str ());
+  CheckALListenerPropertyError (impl->log_handler, AL_ORIENTATION);
 }
 
 void OpenALSoundSystem::GetListener (Listener& target_listener)

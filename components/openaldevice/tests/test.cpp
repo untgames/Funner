@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <mathlib.h>
 #include <common/exception.h>
-#include <sound/openal_device.h>
+#include <openaldevice/openal_device.h>
 
 using namespace math;
 using namespace sound;
@@ -58,12 +58,17 @@ int main ()
 {
   try
   {
-    ICustomSoundSystem *sound_system = new OpenALSoundSystem;
+    ICustomSoundSystem *sound_system = new OpenALSoundSystem ();
     SystemInfo info;
     Listener   listener;
     Source     source;
 
     sound_system->GetInfo (info);
+
+    printf ("Available OpenAL devices:\n");
+    for (const char* device = ((OpenALSoundSystem*)sound_system)->Devices (); strlen (device); device += strlen (device) + 1)
+      printf ("  '%s'\n", device);
+
     printf ("Using device %s.\n", sound_system->Name ());
     printf ("Total channels available: %u\n", info.channels_count);
     printf ("Supported EAX %u.%u.\n", info.eax_major_version, info.eax_minor_version);
