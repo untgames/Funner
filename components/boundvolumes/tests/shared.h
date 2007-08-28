@@ -6,7 +6,7 @@
 #define max
 
 #include <bv/axis_aligned_box.h>
-#include <bv/sphere.h>
+//#include <bv/sphere.h>
 #include <stdio.h>
 
 using namespace bound_volumes;

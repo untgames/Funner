@@ -10,5 +10,5 @@ FUNNER_EXTERN_LIBS.COMPONENTS := extern/zlib extern/zzip extern/pcre extern/devi
 
 #Цель №2 - пакет
 FUNNER_COMPONENTS.TYPE       := package
-FUNNER_COMPONENTS.COMPONENTS := components/commonlib components/medialib components/xtl components/boundvolumes components/script \
-                                components/scenegraph components/openaldevice
+FUNNER_COMPONENTS.COMPONENTS := components/commonlib components/systemlib components/medialib components/xtl \
+                                components/boundvolumes components/script components/scenegraph components/openaldevice
