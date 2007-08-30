@@ -1,13 +1,22 @@
 #include <stdio.h>
 #include <mathlib.h>
 #include <common/exception.h>
+#include <xtl/signal.h>
+#include <syslib/application.h>
+#include <syslib/timer.h>
 #include <openaldevice/openal_device.h>
 
 using namespace math;
+using namespace syslib;
 using namespace sound;
 using namespace sound::openal_device;
 
-const char* file_name = "data/sound2.ogg";
+const char* file_name = "data/sound1.ogg";
+const char* file_name2 = "data/sound2.ogg";
+
+ICustomSoundSystem *sound_system;
+float              source_angle = 0;
+Source             source;
 
 //печать числа с плавающей точкой
 void print (float value)
@@ -54,14 +63,23 @@ void dump (Source& source)
             source.gain, source.minimum_gain, source.maximum_gain, source.inner_angle, source.outer_angle, source.outer_gain, source.reference_distance);
 }
 
+void TimerHandler (Timer& timer)
+{
+  ((OpenALSoundSystem*)sound_system)->UpdateBuffers ();
+  printf ("Buffers update\n");
+  printf ("position = %f\n", sound_system->Tell (0));
+  source.position = vec3f (sin (deg2rad (source_angle)), 0, cos (deg2rad (source_angle)));
+  source_angle++;
+  sound_system->SetSource (1, source);
+}
+
 int main ()
 {
   try
   {
-    ICustomSoundSystem *sound_system = new OpenALSoundSystem ();
+    sound_system = new OpenALSoundSystem ();
     SystemInfo info;
     Listener   listener;
-    Source     source;
 
     sound_system->GetInfo (info);
 
@@ -88,7 +106,7 @@ int main ()
     sound_system->GetSource (0, source);
     dump (source);
     printf ("\n");
-    source.position     = vec3f(-1,1,1);
+    source.position     = vec3f(0,0,1);
     source.direction    = vec3f(0,0,0);
     source.velocity     = vec3f(0,0,0);
     source.gain         = 1.f;
@@ -103,8 +121,17 @@ int main ()
     dump (source);
     printf ("\n");
 
+    source.gain         = 0.3f;
+    sound_system->SetSource (1, source);
+    sound_system->SetSample (1, file_name2);
+
     sound_system->SetSample (0, file_name);
+    sound_system->Seek (0, 1.f);
     sound_system->Play (0, true);
+    sound_system->Play (1, true);
+
+    Timer timer (&TimerHandler, (size_t)BUFFER_UPDATE_TIME * 1000);
+    Application::Run ();
 
     for(;;);
 

@@ -110,7 +110,7 @@ size_t SoundSample::BytesToSamples (size_t byte_count) const
 
 double SoundSample::SamplesToSeconds (size_t sample_count) const
 {
-  return impl->info.frequency / sample_count;
+  return (double)sample_count / (double)impl->info.frequency;
 }
 
 size_t SoundSample::SecondsToSamples (double second_count) const

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 #include <al.h>
 #include <alc.h>
 #include <stl/vector>
@@ -100,33 +101,153 @@ struct OpenALSource
 
   SoundSample sound_sample;    //звук
   Source      source;          //общий источник звука
+  bool        looping;         //зацикленность
+  bool        play_from_start; //нужно ли делать rewind при вызове play
   size_t      name;            //имя источника в OpenAL
-  size_t      buffer_name;     //OpenAL буффер
-  char*       buffer;          //буффер декодированного звука
+  size_t      buffer_name[2];  //OpenAL буффер
+  size_t      buffer_samples;  //количество сэмплов в буффере
+  size_t      buffer_size;     //размер в байтах
+  size_t      last_sample;     //номер последнего прочитанного сэмпла
+  size_t      start_sample;    //номер начального сэмпла проигрывания
+  clock_t     play_start_time; //время последнего seek
+  size_t      first_buffer;    //номер первого в очереди буффера    
+  char*       buffer[2];       //буффер декодированного звука
 };
 
 OpenALSource::OpenALSource ()
-  : buffer (NULL)
+  : play_from_start (true)
 {
+  buffer[0] = NULL;
+  buffer[1] = NULL;
   alGenSources (1, &name);
   if (alGetError () != AL_NO_ERROR)
     Raise <Exception> ("OpenALSource::OpenALSource", "Can't create source");
-  alGenBuffers(1, &buffer_name);
+  alGenBuffers(2, buffer_name);
   if (alGetError () != AL_NO_ERROR)
     Raise <Exception> ("OpenALSource::OpenALSource", "Can't create buffer");
 }
 
 OpenALSource::~OpenALSource ()
 {
-  if (buffer)
-    delete [] buffer;
+  if (buffer[0])
+    delete [] buffer[0];
+  if (buffer[1])
+    delete [] buffer[1];
   if (buffer_name)
-    alDeleteBuffers (1, &buffer_name);
+    alDeleteBuffers (1, buffer_name);
   if (alGetError () != AL_NO_ERROR)
     Raise <Exception> ("OpenALSource::~OpenALSource", "Can't delete buffer");
   alDeleteSources (1, &name);
   if (alGetError () != AL_NO_ERROR)
     Raise <Exception> ("OpenALSource::~OpenALSource", "Can't delete source");
+}
+
+bool FillSourceBuffer (OpenALSource* source, size_t buffer_index, ICustomSoundSystem::LogHandler log_handler)
+{
+  size_t sample_size = source->sound_sample.SamplesToBytes (1);
+  size_t readed_samples;
+  ALenum error_code;
+
+  if (source->looping)
+  {
+    for (size_t total_readed_samples = 0; total_readed_samples < source->buffer_samples; total_readed_samples += readed_samples)
+    {
+      if (source->last_sample == source->sound_sample.SamplesCount ())
+        source->last_sample = 0;
+      source->last_sample += readed_samples = source->sound_sample.Read (source->last_sample, source->buffer_samples - total_readed_samples, source->buffer[buffer_index] + source->sound_sample.SamplesToBytes (total_readed_samples));
+    
+      if (!readed_samples)
+      {
+        log_handler (format ("Can't read data from sample '%s'", source->sound_sample.Name ()).c_str ());
+        return false;
+      }
+    }
+    readed_samples = total_readed_samples;
+  }
+  else
+  {
+    source->last_sample += readed_samples = source->sound_sample.Read (source->last_sample, source->buffer_samples, source->buffer[buffer_index]);
+    if (!readed_samples)
+      return false;
+  }
+
+  if (source->sound_sample.Channels () == 1)
+    alBufferData (source->buffer_name[buffer_index], AL_FORMAT_MONO16, source->buffer[buffer_index], readed_samples * sample_size, source->sound_sample.Frequency ());
+  else
+    alBufferData (source->buffer_name[buffer_index], AL_FORMAT_STEREO16, source->buffer[buffer_index], readed_samples * sample_size, source->sound_sample.Frequency ());
+
+  error_code = alGetError ();
+  
+  if (error_code != AL_NO_ERROR)
+  {
+    log_handler (format ("Can't set buffer data. '%s'", StrALError (error_code)).c_str ());
+    return false;
+  }
+
+  return true;
+}
+
+void UpdateSourceBuffer (OpenALSource* source, ICustomSoundSystem::LogHandler log_handler)
+{
+  if (!source->buffer[0])
+    return;
+
+  ALenum error_code;
+  int    processed_buffers = 0;
+  
+  alGetSourcei (source->name, AL_BUFFERS_QUEUED, &processed_buffers);
+  error_code = alGetError ();  
+  if (error_code != AL_NO_ERROR)
+    log_handler (format ("Can't get channel queued buffers count. '%s'", StrALError (error_code)).c_str ());
+
+  if (!processed_buffers)
+  {
+    if (FillSourceBuffer (source, 0, log_handler))
+    {
+      if (FillSourceBuffer (source, 1, log_handler))
+        alSourceQueueBuffers (source->name, 2, source->buffer_name);
+      else
+        alSourceQueueBuffers (source->name, 1, &source->buffer_name[0]);
+    }
+    else
+    {
+      log_handler (format ("No buffers was queued from source '%s'", source->sound_sample.Name ()).c_str ());
+      return;
+    }
+
+    error_code = alGetError ();    
+    if (error_code != AL_NO_ERROR)
+      log_handler (format ("Can't queue buffers. '%s'", StrALError (error_code)).c_str ());
+
+    return;
+  }
+
+  for (;;)
+  {
+    alGetSourcei (source->name, AL_BUFFERS_PROCESSED, &processed_buffers);
+    error_code = alGetError ();    
+    if (error_code != AL_NO_ERROR)
+      log_handler (format ("Can't get channel processed buffers count. '%s'", StrALError (error_code)).c_str ());
+
+    if (!processed_buffers)
+      return;
+
+    alSourceUnqueueBuffers (source->name, 1, &source->buffer_name[source->first_buffer]);
+    error_code = alGetError ();    
+    if (error_code != AL_NO_ERROR)
+      log_handler (format ("Can't unqueue buffers. '%s'", StrALError (error_code)).c_str ());
+    
+    if (!FillSourceBuffer (source, source->first_buffer, log_handler))
+      return;
+
+    alSourceQueueBuffers (source->name, 1, &source->buffer_name[source->first_buffer]);
+    error_code = alGetError ();    
+    if (error_code != AL_NO_ERROR)
+      log_handler (format ("Can't queue buffers. '%s'", StrALError (error_code)).c_str ());
+
+    source->first_buffer++;
+    source->first_buffer %= 2;
+  }
 }
 
 }
@@ -189,18 +310,21 @@ OpenALSoundSystem::Impl::Impl (ALCdevice* in_device, ALCcontext* in_context)
 
   size_t temp_sources[MAX_CHANNELS_COUNT];
   info.channels_count = 0;
-  for (size_t i = 0; i < MAX_CHANNELS_COUNT; i++)
+  size_t cur_channel = 0;
+  for (; cur_channel < MAX_CHANNELS_COUNT; cur_channel++)
   {
-    alGenSources (1, &temp_sources[i]);
+    alGenSources (1, &temp_sources[cur_channel]);
     if (alGetError () != AL_NO_ERROR)
     {
-      info.channels_count = i;
-      alDeleteSources (i, temp_sources);
+      info.channels_count = cur_channel;
+      alDeleteSources (cur_channel, temp_sources);
       if (alGetError () != AL_NO_ERROR)
         Raise <Exception> ("OpenALSoundSystem::OpenALSoundSystem", "Can't delete sources generated during initialization");
       break;
     }
   }
+  if (!cur_channel)
+    Raise <Exception> ("OpenALSoundSystem::OpenALSoundSystem", "Can't create no one channel");
   if (!info.channels_count)
   {
     alDeleteSources (MAX_CHANNELS_COUNT, temp_sources);
@@ -298,30 +422,41 @@ void OpenALSoundSystem::SetSample (size_t channel, const char* sample_name)
     
   if (!sample_name)
     RaiseNullArgument ("OpenALSoundSystem::SetSample", "sample_name");
-
-  ALenum error_code;
+    
+  Stop (channel);
 
   try
   {
     impl->sources[channel]->sound_sample.Load (sample_name);
+    
     if (impl->sources[channel]->sound_sample.BitsPerSample () != 16)
       RaiseNotSupported ("OpenALSoundSystem::SetSample", "Supported only 16 bit audio depth, sample depth - %u.", impl->sources[channel]->sound_sample.BitsPerSample ());
-    if (impl->sources[channel]->sound_sample. Channels () > 2 || !impl->sources[channel]->sound_sample. Channels ())
-      RaiseNotSupported ("OpenALSoundSystem::SetSample", "Supported only mono and stereo sources, sample has %u channels.", impl->sources[channel]->sound_sample. Channels ());
-    size_t buffer_size = impl->sources[channel]->sound_sample.SizeInBytes ();
-    impl->sources[channel]->buffer = new char [buffer_size];  
-    impl->sources[channel]->sound_sample.Read (0, impl->sources[channel]->sound_sample.SizeInBytes (), impl->sources[channel]->buffer);
+    if (impl->sources[channel]->sound_sample.Channels () > 2 || !impl->sources[channel]->sound_sample.Channels ())
+      RaiseNotSupported ("OpenALSoundSystem::SetSample", "Supported only mono and stereo sources, sample has %u channels.", impl->sources[channel]->sound_sample.Channels ());
 
-    if (impl->sources[channel]->sound_sample.Channels () == 1)
-      alBufferData (impl->sources[channel]->buffer_name, AL_FORMAT_MONO16, impl->sources[channel]->buffer, buffer_size, impl->sources[channel]->sound_sample.Frequency ());
-    else
-      alBufferData (impl->sources[channel]->buffer_name, AL_FORMAT_STEREO16, impl->sources[channel]->buffer, buffer_size, impl->sources[channel]->sound_sample.Frequency ());
-    error_code = alGetError ();
-    if (error_code != AL_NO_ERROR)
+    impl->sources[channel]->buffer_samples = (size_t)(BUFFER_UPDATE_TIME * impl->sources[channel]->sound_sample.Frequency ());
+
+    if (impl->sources[channel]->buffer_size)
     {
-      impl->log_handler (format ("Can't attach data to buffer. '%s'", StrALError (error_code)).c_str ());
-      delete [] impl->sources[channel]->buffer;
-      return;
+      size_t new_buffer_size = (size_t)(impl->sources[channel]->sound_sample.BitsPerSample () / 8 * impl->sources[channel]->buffer_samples * impl->sources[channel]->sound_sample.Channels ());
+      
+      if (impl->sources[channel]->buffer_size != new_buffer_size)
+      {
+        if (impl->sources[channel]->buffer[0])
+          delete [] impl->sources[channel]->buffer[0];
+        if (impl->sources[channel]->buffer[1])
+          delete [] impl->sources[channel]->buffer[1];
+
+        impl->sources[channel]->buffer_size = new_buffer_size;
+        impl->sources[channel]->buffer[0] = new char [impl->sources[channel]->buffer_size];  
+        impl->sources[channel]->buffer[1] = new char [impl->sources[channel]->buffer_size];  
+      }
+    }
+    else
+    {
+      impl->sources[channel]->buffer_size = (size_t)(impl->sources[channel]->sound_sample.BitsPerSample () / 8 * impl->sources[channel]->buffer_samples * impl->sources[channel]->sound_sample.Channels ());
+      impl->sources[channel]->buffer[0] = new char [impl->sources[channel]->buffer_size];  
+      impl->sources[channel]->buffer[1] = new char [impl->sources[channel]->buffer_size];  
     }
   }
   catch (std::exception& exception)
@@ -331,15 +466,6 @@ void OpenALSoundSystem::SetSample (size_t channel, const char* sample_name)
   catch (...)
   {
     impl->log_handler (format ("Can't load file '%s'. Unknown exception.", sample_name).c_str());
-  }
-
-  alSourcei(impl->sources[channel]->name, AL_BUFFER, impl->sources[channel]->buffer_name);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-  {
-    impl->log_handler (format ("Can't attach buffer to channel %u. '%s'", channel, StrALError (error_code)).c_str ());
-    delete [] impl->sources[channel]->buffer;
-    return;
   }
 }
 
@@ -360,17 +486,7 @@ bool OpenALSoundSystem::IsLooped (size_t channel)
   if (channel >= impl->info.channels_count)
     RaiseOutOfRange ("OpenALSoundSystem::IsLooped", "channel", channel, impl->info.channels_count);
     
-  ALenum error_code;
-  int    status;
-
-  alGetSourcei (impl->sources[channel]->name, AL_LOOPING, &status);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-  {
-    impl->log_handler (format ("Can't get channel %u looping property. '%s'", channel, StrALError (error_code)).c_str ());
-    return false;
-  }
-  return status != 0;
+  return impl->sources[channel]->looping; 
 }
     
 /*
@@ -423,17 +539,19 @@ void OpenALSoundSystem::Play (size_t channel, bool looping)
   if (channel >= impl->info.channels_count)
     RaiseOutOfRange ("OpenALSoundSystem::Play", "channel", channel, impl->info.channels_count);
     
+  impl->sources[channel]->looping = looping;
+
   ALenum error_code;
 
+  if (impl->sources[channel]->play_from_start)
+    Seek (channel, 0);
+
+  impl->sources[channel]->play_from_start = true;
+  impl->sources[channel]->play_start_time = clock ();
   alSourcePlay (impl->sources[channel]->name);
   error_code = alGetError ();
   if (error_code != AL_NO_ERROR)
     impl->log_handler (format ("Can't perform play operation on channel %u. '%s'", channel, StrALError (error_code)).c_str ());
-
-  alSourcei (impl->sources[channel]->name, AL_LOOPING, looping);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't set channel %u looping property. '%s'", channel, StrALError (error_code)).c_str ());
 }
 
 void OpenALSoundSystem::Pause (size_t channel)
@@ -454,6 +572,8 @@ void OpenALSoundSystem::Stop (size_t channel)
   if (channel >= impl->info.channels_count)
     RaiseOutOfRange ("OpenALSoundSystem::Stop", "channel", channel, impl->info.channels_count);
     
+  impl->sources[channel]->play_from_start = true;
+
   ALenum error_code;
 
   alSourceStop (impl->sources[channel]->name);
@@ -463,16 +583,36 @@ void OpenALSoundSystem::Stop (size_t channel)
 }
 
 void OpenALSoundSystem::Seek (size_t channel, float time_in_seconds)
-{   //!!!!! нужно учитывать разбитие на буфера
+{
   if (channel >= impl->info.channels_count)
     RaiseOutOfRange ("OpenALSoundSystem::Seek", "channel", channel, impl->info.channels_count);
-    
-  ALenum error_code;
 
-  alSourcef (impl->sources[channel]->name, AL_SEC_OFFSET, time_in_seconds);
+  if (time_in_seconds >= impl->sources[channel]->sound_sample.SamplesToSeconds (impl->sources[channel]->sound_sample.SamplesCount ()))
+  {
+    impl->log_handler ("Attempting to seek more than sample range. Seeking to begin.");
+    time_in_seconds = 0;
+  }
+
+  impl->sources[channel]->last_sample = impl->sources[channel]->start_sample = impl->sources[channel]->sound_sample.SecondsToSamples (time_in_seconds);
+
+  ALenum error_code;
+  int    queued_buffers;
+  
+  alGetSourcei (impl->sources[channel]->name, AL_BUFFERS_QUEUED, &queued_buffers);
   error_code = alGetError ();
+  
   if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't perform seek operation on channel %u. '%s'", channel, StrALError (error_code)).c_str ());
+    impl->log_handler (format ("Can't get channel queued buffers count. '%s'", StrALError (error_code)).c_str ());
+
+  alSourceUnqueueBuffers (impl->sources[channel]->name, queued_buffers, impl->sources[channel]->buffer_name);
+  error_code = alGetError ();    
+  if (error_code != AL_NO_ERROR)
+    impl->log_handler (format ("Can't unqueue buffers. '%s'", StrALError (error_code)).c_str ());
+
+  UpdateSourceBuffer (impl->sources[channel], impl->log_handler);
+
+  impl->sources[channel]->play_start_time = clock ();
+  impl->sources[channel]->play_from_start = false;
 }
 
 float OpenALSoundSystem::Tell (size_t channel)
@@ -481,15 +621,9 @@ float OpenALSoundSystem::Tell (size_t channel)
     RaiseOutOfRange ("OpenALSoundSystem::Tell", "channel", channel, impl->info.channels_count);
     
   float  offset;
-  ALenum error_code;
 
-  alGetSourcef (impl->sources[channel]->name, AL_SEC_OFFSET, &offset);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-  {
-    impl->log_handler (format ("Can't retreive channel %u offset. '%s'", channel, StrALError (error_code)).c_str ());
-    return 0.f;
-  }
+  offset = ((float)(clock () - impl->sources[channel]->play_start_time)) / CLOCKS_PER_SEC + (float)impl->sources[channel]->sound_sample.SamplesToSeconds (impl->sources[channel]->start_sample);
+  offset = fmod (offset, (float)impl->sources[channel]->sound_sample.SamplesToSeconds (impl->sources[channel]->sound_sample.SamplesCount ()));
 
   return offset;
 }
@@ -595,4 +729,10 @@ void OpenALSoundSystem::SetDebugLog (const LogHandler& log_handler)
 const OpenALSoundSystem::LogHandler& OpenALSoundSystem::GetDebugLog ()
 {
   return impl->log_handler;
+}
+
+void OpenALSoundSystem::UpdateBuffers ()
+{
+  for (vector <OpenALSource*>::iterator i = impl->sources.begin (); i != impl->sources.end (); ++i)
+    UpdateSourceBuffer (*i, impl->log_handler);
 }
