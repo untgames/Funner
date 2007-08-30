@@ -65,9 +65,6 @@ void dump (Source& source)
 
 void TimerHandler (Timer& timer)
 {
-  ((OpenALSoundSystem*)sound_system)->UpdateBuffers ();
-  printf ("Buffers update\n");
-  printf ("position = %f\n", sound_system->Tell (0));
   source.position = vec3f (sin (deg2rad (source_angle)), 0, cos (deg2rad (source_angle)));
   source_angle++;
   sound_system->SetSource (1, source);
@@ -132,8 +129,6 @@ int main ()
 
     Timer timer (&TimerHandler, (size_t)BUFFER_UPDATE_TIME * 1000);
     Application::Run ();
-
-    for(;;);
 
     delete (OpenALSoundSystem*)sound_system;
   }

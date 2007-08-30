@@ -5,13 +5,13 @@
 #include <xtl/functional_fwd>
 #include <sound/low_level.h>
 
-using namespace sound::low_level;
-
 namespace sound
 {
 
 namespace openal_device
 {
+
+using namespace sound::low_level;
 
 const float BUFFER_UPDATE_TIME = 0.5;
 
@@ -94,7 +94,11 @@ struct OpenALSoundSystem : public sound::low_level::ICustomSoundSystem
     void              SetDebugLog (const LogHandler&);
     const LogHandler& GetDebugLog ();
 
-    void UpdateBuffers (); //!!!!!!! Временно
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление буфферов звука
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void UpdateBuffers ();
 
   private:
     struct Impl;

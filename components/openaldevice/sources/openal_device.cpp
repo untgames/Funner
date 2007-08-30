@@ -7,6 +7,8 @@
 #include <alc.h>
 #include <stl/vector>
 #include <xtl/function.h>
+#include <xtl/bind.h>
+#include <syslib/timer.h>
 #include <common/exception.h>
 #include <common/strlib.h>
 #include <openaldevice/openal_device.h>
@@ -19,6 +21,10 @@ using namespace stl;
 using namespace medialib;
 using namespace sound;
 using namespace sound::openal_device;
+
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
 
 namespace
 {
@@ -258,6 +264,7 @@ void UpdateSourceBuffer (OpenALSource* source, ICustomSoundSystem::LogHandler lo
 
 struct OpenALSoundSystem::Impl
 {
+  syslib::Timer          timer;         //таймер обновления буффера
   ALCdevice              *device;       //устройство OpenAL
   ALCcontext             *context;      //контекст OpenAL
   float                  gain;          //gain
@@ -268,12 +275,13 @@ struct OpenALSoundSystem::Impl
   Listener               listener;      //слушатель
   vector <OpenALSource*> sources;       //источники звука
 
-  Impl (ALCdevice* in_device, ALCcontext* in_context);
+  Impl (ALCdevice* in_device, ALCcontext* in_context, OpenALSoundSystem* sound_system);
   ~Impl ();
 };
 
-OpenALSoundSystem::Impl::Impl (ALCdevice* in_device, ALCcontext* in_context)
- : device (in_device), context (in_context), log_handler (DefaultLogHandler), is_muted (false), gain (1.f), last_gain (1.f)
+OpenALSoundSystem::Impl::Impl (ALCdevice* in_device, ALCcontext* in_context, OpenALSoundSystem* sound_system)
+ : device (in_device), context (in_context), log_handler (DefaultLogHandler), is_muted (false), gain (1.f), last_gain (1.f),
+   timer (xtl::bind (&OpenALSoundSystem::UpdateBuffers, sound_system), (size_t)(BUFFER_UPDATE_TIME * 1000))
 {
   char *extensions = (char*)alGetString (AL_EXTENSIONS);
   int  compare_value;
@@ -367,7 +375,7 @@ OpenALSoundSystem::OpenALSoundSystem (const char* device_name)
   if (!alcMakeContextCurrent (context))
     Raise <Exception> ("OpenALSoundSystem::OpenALSoundSystem", "Can't make context current. '%s'", StrALCError (alcGetError (impl->device)));
 
-  impl = new Impl (device, context); 
+  impl = new Impl (device, context, this); 
 }
 
 OpenALSoundSystem::~OpenALSoundSystem ()
