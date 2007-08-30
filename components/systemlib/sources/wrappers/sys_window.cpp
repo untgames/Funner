@@ -188,7 +188,7 @@ void Window::Init (WindowStyle style, size_t width, size_t height)
 
 void Window::Close ()
 {
-  Platform::CloseWindow (CheckedHandle ());
+  Platform::CloseWindow ((Platform::window_t)CheckedHandle ());
 }
 
 void Window::ForceClose ()
@@ -198,7 +198,7 @@ void Window::ForceClose ()
     
   Notify (WindowEvent_OnClose);
 
-  Platform::DestroyWindow (impl->handle);
+  Platform::DestroyWindow ((Platform::window_t)impl->handle);
 }
 
 //может быть вызван одним из обработчиков события WindowEvent_OnClose
@@ -269,7 +269,7 @@ void Window::SetStyle (WindowStyle style)
 
 const char* Window::Title () const
 {
-  Platform::GetWindowTitle (CheckedHandle (), MAX_TITLE_LENGTH, impl->title);
+  Platform::GetWindowTitle ((Platform::window_t)CheckedHandle (), MAX_TITLE_LENGTH, impl->title);
 
   return impl->title;
 }
@@ -279,7 +279,7 @@ void Window::SetTitle (const char* title)
   if (!title)
     RaiseNullArgument ("syslib::Window::SetTitle", "title");
 
-  Platform::SetWindowTitle (CheckedHandle (), title);
+  Platform::SetWindowTitle ((Platform::window_t)CheckedHandle (), title);
 }
 
 /*
@@ -290,7 +290,7 @@ Rect Window::WindowRect () const
 {
   Rect rect;
 
-  Platform::GetWindowRect (CheckedHandle (), rect);
+  Platform::GetWindowRect ((Platform::window_t)CheckedHandle (), rect);
 
   return rect;
 }
@@ -299,7 +299,7 @@ Rect Window::ClientRect () const
 {
   Rect rect;
 
-  Platform::GetClientRect (CheckedHandle (), rect);
+  Platform::GetClientRect ((Platform::window_t)CheckedHandle (), rect);
 
   return rect;
 }
@@ -312,7 +312,7 @@ size_t Window::Width () const
 {
   Rect rect;
 
-  Platform::GetWindowRect (CheckedHandle (), rect);
+  Platform::GetWindowRect ((Platform::window_t)CheckedHandle (), rect);
 
   return rect.right - rect.left;
 }
@@ -321,7 +321,7 @@ size_t Window::Height () const
 {
   Rect rect;
 
-  Platform::GetWindowRect (CheckedHandle (), rect);
+  Platform::GetWindowRect ((Platform::window_t)CheckedHandle (), rect);
 
   return rect.bottom - rect.top;
 }
@@ -340,12 +340,12 @@ void Window::SetSize (size_t width, size_t height)
 {
   Rect rect;
 
-  Platform::GetWindowRect (CheckedHandle (), rect);
+  Platform::GetWindowRect ((Platform::window_t)CheckedHandle (), rect);
   
   rect.right  = rect.left + width;
   rect.bottom = rect.top + height;
 
-  Platform::SetWindowRect (CheckedHandle (), rect);
+  Platform::SetWindowRect ((Platform::window_t)CheckedHandle (), rect);
 }
 
 /*
@@ -356,7 +356,7 @@ Point Window::Position () const
 {
   Rect rect;
 
-  Platform::GetWindowRect (CheckedHandle (), rect);
+  Platform::GetWindowRect ((Platform::window_t)CheckedHandle (), rect);
 
   return Point (rect.left, rect.top);
 }
@@ -365,7 +365,7 @@ void Window::SetPosition (const Point& position)
 {
   Rect rect;
 
-  Platform::GetWindowRect (CheckedHandle (), rect);
+  Platform::GetWindowRect ((Platform::window_t)CheckedHandle (), rect);
   
   size_t width  = rect.right - rect.left,
          height = rect.bottom - rect.top;
@@ -375,7 +375,7 @@ void Window::SetPosition (const Point& position)
   rect.right  = position.x + width;
   rect.bottom = position.y + height;
 
-  Platform::SetWindowRect (CheckedHandle (), rect);
+  Platform::SetWindowRect ((Platform::window_t)CheckedHandle (), rect);
 }
 
 void Window::SetPosition (size_t x, size_t y)
@@ -391,8 +391,8 @@ Point Window::CursorPosition () const
 {
   Rect window_rect, client_rect;
   
-  Platform::GetWindowRect (CheckedHandle (), window_rect);
-  Platform::GetClientRect (CheckedHandle (), client_rect);
+  Platform::GetWindowRect ((Platform::window_t)CheckedHandle (), window_rect);
+  Platform::GetClientRect ((Platform::window_t)CheckedHandle (), client_rect);
 
   Point position = Platform::GetCursorPosition ();
 
@@ -406,8 +406,8 @@ void Window::SetCursorPosition (const Point& position)
 {
   Rect window_rect, client_rect;
   
-  Platform::GetWindowRect (CheckedHandle (), window_rect);
-  Platform::GetClientRect (CheckedHandle (), client_rect);
+  Platform::GetWindowRect ((Platform::window_t)CheckedHandle (), window_rect);
+  Platform::GetClientRect ((Platform::window_t)CheckedHandle (), client_rect);
 
   Platform::SetCursorPosition (Point (position.x + client_rect.left + window_rect.left,
                                       position.y + client_rect.top + window_rect.top));
@@ -424,12 +424,12 @@ void Window::SetCursorPosition (size_t x, size_t y)
 
 bool Window::IsActive () const
 {
-  return Platform::GetWindowFlag (CheckedHandle (), WindowFlag_Active);
+  return Platform::GetWindowFlag ((Platform::window_t)CheckedHandle (), WindowFlag_Active);
 }
 
 void Window::SetActive (bool state)
 {
-  Platform::SetWindowFlag (CheckedHandle (), WindowFlag_Active, state);
+  Platform::SetWindowFlag ((Platform::window_t)CheckedHandle (), WindowFlag_Active, state);
 }
 
 /*
@@ -438,12 +438,12 @@ void Window::SetActive (bool state)
 
 bool Window::IsVisible () const
 {
-  return Platform::GetWindowFlag (CheckedHandle (), WindowFlag_Visible);
+  return Platform::GetWindowFlag ((Platform::window_t)CheckedHandle (), WindowFlag_Visible);
 }
 
 void Window::SetVisible (bool state)
 {
-  Platform::SetWindowFlag (CheckedHandle (), WindowFlag_Visible, state);
+  Platform::SetWindowFlag ((Platform::window_t)CheckedHandle (), WindowFlag_Visible, state);
 }
 
 /*
@@ -452,12 +452,12 @@ void Window::SetVisible (bool state)
 
 bool Window::HasFocus () const
 {
-  return Platform::GetWindowFlag (CheckedHandle (), WindowFlag_Focus);
+  return Platform::GetWindowFlag ((Platform::window_t)CheckedHandle (), WindowFlag_Focus);
 }
 
 void Window::SetFocus (bool state)
 {
-  Platform::SetWindowFlag (CheckedHandle (), WindowFlag_Focus, state);
+  Platform::SetWindowFlag ((Platform::window_t)CheckedHandle (), WindowFlag_Focus, state);
 }
 
 /*

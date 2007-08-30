@@ -17,9 +17,9 @@ const char* WINDOW_CLASS_NAME = "Default window class";
 struct WindowImpl
 {
   void*                               user_data;       //указатель на пользовательские данные
-  Win32Platform::WindowMessageHandler message_handler; //функция обработки сообщений окна
+  Platform::WindowMessageHandler message_handler; //функция обработки сообщений окна
   
-  WindowImpl (Win32Platform::WindowMessageHandler handler, void* in_user_data) : 
+  WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data) : 
       user_data (in_user_data), message_handler (handler) {}
   
   void Notify (WindowEvent event, const WindowEventContext& context)
@@ -303,7 +303,7 @@ void RegisterWindowClass ()
 
 #undef CreateWindow
 
-Win32Platform::window_t Win32Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, void* user_data)
 {
     //определене стиля окна
     
@@ -353,7 +353,7 @@ Win32Platform::window_t Win32Platform::CreateWindow (WindowStyle style, WindowMe
     UpdateWindow (wnd);
     CheckErrors  ("syslib::Win32Platform::CreateWindow");    
 
-    return wnd;
+    return (window_t)wnd;
   }
   catch (...)
   {
@@ -362,7 +362,7 @@ Win32Platform::window_t Win32Platform::CreateWindow (WindowStyle style, WindowMe
   }  
 }
 
-void Win32Platform::CloseWindow (window_t handle)
+void Platform::CloseWindow (window_t handle)
 {
   HWND wnd = (HWND)handle;
   
@@ -370,7 +370,7 @@ void Win32Platform::CloseWindow (window_t handle)
   CheckErrors ("syslib::Win32Platform::CloseWindow");
 }
 
-void Win32Platform::DestroyWindow (window_t handle)
+void Platform::DestroyWindow (window_t handle)
 {
   HWND wnd = (HWND)handle;
 
@@ -382,7 +382,7 @@ void Win32Platform::DestroyWindow (window_t handle)
     Заголовок окна
 */
 
-void Win32Platform::SetWindowTitle (window_t handle, const char* title)
+void Platform::SetWindowTitle (window_t handle, const char* title)
 {
   HWND wnd = (HWND)handle;  
   
@@ -390,7 +390,7 @@ void Win32Platform::SetWindowTitle (window_t handle, const char* title)
   CheckErrors ("syslib::Win32Platform::SetWindowTitle");
 }
 
-void Win32Platform::GetWindowTitle (window_t handle, size_t buffer_size, char* buffer)
+void Platform::GetWindowTitle (window_t handle, size_t buffer_size, char* buffer)
 {
   HWND wnd = (HWND)handle;
   
@@ -402,7 +402,7 @@ void Win32Platform::GetWindowTitle (window_t handle, size_t buffer_size, char* b
     Область окна / клиентская область
 */
 
-void Win32Platform::SetWindowRect (window_t handle, const Rect& rect)
+void Platform::SetWindowRect (window_t handle, const Rect& rect)
 {
   HWND wnd = (HWND)handle;
   
@@ -432,7 +432,7 @@ void Win32Platform::SetWindowRect (window_t handle, const Rect& rect)
   CheckErrors  ("syslib::Win32Platform::SetWindowRect");
 }
 
-void Win32Platform::GetWindowRect (window_t handle, Rect& rect)
+void Platform::GetWindowRect (window_t handle, Rect& rect)
 {
   HWND wnd = (HWND)handle;
   
@@ -447,7 +447,7 @@ void Win32Platform::GetWindowRect (window_t handle, Rect& rect)
   rect.bottom = window_rect.bottom;
 }
 
-void Win32Platform::GetClientRect (window_t handle, Rect& rect)
+void Platform::GetClientRect (window_t handle, Rect& rect)
 {
   HWND wnd = (HWND)handle;
   
@@ -466,7 +466,7 @@ void Win32Platform::GetClientRect (window_t handle, Rect& rect)
     Установка флагов окна
 */
 
-void Win32Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
+void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 {
   HWND wnd = (HWND)handle;
   
@@ -490,7 +490,7 @@ void Win32Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
   CheckErrors ("syslib::Win32Platform::SetWindowFlag");
 }
 
-bool Win32Platform::GetWindowFlag (window_t handle, WindowFlag flag)
+bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
 {
   HWND wnd    = (HWND)handle;
   bool result = false;
@@ -520,13 +520,13 @@ bool Win32Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     Положение курсора
 */
 
-void Win32Platform::SetCursorPosition (const Point& position)
+void Platform::SetCursorPosition (const Point& position)
 {
   SetCursorPos (position.x, position.y);
   CheckErrors  ("syslib::Win32Platform::SetCursorPosition");
 }
 
-Point Win32Platform::GetCursorPosition ()
+Point Platform::GetCursorPosition ()
 {
   POINT position;
   

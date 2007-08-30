@@ -21,19 +21,19 @@ void Raise (const char* method_name)
     Создание/закрытие/уничтожение окна
 */
 
-DefaultPlatform::window_t DefaultPlatform::CreateWindow (WindowStyle, WindowMessageHandler, void*)
+Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler, void*)
 {
   Raise ("syslib::DefaultPlatform::CreateWindow");
   
   return 0;
 }
 
-void DefaultPlatform::CloseWindow (window_t)
+void Platform::CloseWindow (window_t)
 {
   Raise ("syslib::DefaultPlatform::CloseWindow");
 }
 
-void DefaultPlatform::DestroyWindow (window_t)
+void Platform::DestroyWindow (window_t)
 {
   Raise ("syslib::DefaultPlatform::DestroyWindow");
 }
@@ -42,12 +42,12 @@ void DefaultPlatform::DestroyWindow (window_t)
     Заголовок окна
 */
 
-void DefaultPlatform::SetWindowTitle (window_t, const char*)
+void Platform::SetWindowTitle (window_t, const char*)
 {
   Raise ("syslib::DefaultPlatform::SetWindowTitle");
 }
 
-void DefaultPlatform::GetWindowTitle (window_t, size_t, char*)
+void Platform::GetWindowTitle (window_t, size_t, char*)
 {
   Raise ("syslib::DefaultPlatform::GetWindowTitle");
 }
@@ -56,17 +56,17 @@ void DefaultPlatform::GetWindowTitle (window_t, size_t, char*)
     Область окна / клиентская область
 */
 
-void DefaultPlatform::SetWindowRect (window_t, const Rect&)
+void Platform::SetWindowRect (window_t, const Rect&)
 {
   Raise ("syslib::DefaultPlatform::SetWindowRect");
 }
 
-void DefaultPlatform::GetWindowRect (window_t, Rect&)
+void Platform::GetWindowRect (window_t, Rect&)
 {
   Raise ("syslib::DefaultPlatform::GetWindowRect");  
 }
 
-void DefaultPlatform::GetClientRect (window_t, Rect&)
+void Platform::GetClientRect (window_t, Rect&)
 {
   Raise ("syslib::DefaultPlatform::GetClientRect");
 }
@@ -75,12 +75,12 @@ void DefaultPlatform::GetClientRect (window_t, Rect&)
     Установка флагов окна
 */
 
-void DefaultPlatform::SetWindowFlag (window_t, WindowFlag, bool)
+void Platform::SetWindowFlag (window_t, WindowFlag, bool)
 {
   Raise ("syslib::DefaultPlatform::SetWindowFlag");
 }
 
-bool DefaultPlatform::GetWindowFlag (window_t, WindowFlag)
+bool Platform::GetWindowFlag (window_t, WindowFlag)
 {
   Raise ("syslib::DefaultPlatform::GetWindowFlag");
   
@@ -91,12 +91,12 @@ bool DefaultPlatform::GetWindowFlag (window_t, WindowFlag)
     Положение курсора
 */
 
-void DefaultPlatform::SetCursorPosition (const Point&)
+void Platform::SetCursorPosition (const Point&)
 {
   Raise ("syslib::DefaultPlatform::SetCursorPosition");
 }
 
-Point DefaultPlatform::GetCursorPosition ()
+Point Platform::GetCursorPosition ()
 {
   Raise ("syslib::DefaultPlatform::GetCursorPosition");
   
