@@ -629,7 +629,92 @@ void OpenALContext::alDeleteBuffers (ALsizei n, const ALuint* buffers)
   Dispatch ("alDeleteBuffers", &::alDeleteBuffers, tie (n, make_wrapper (n, buffers)));
 }
 
+ALboolean OpenALContext::alIsBuffer (ALuint bid)
+{
+  return Dispatch<ALboolean> ("alIsBuffer", &::alIsBuffer, tie (bid));
+}
+
 void OpenALContext::alBufferData (ALuint buffer, ALenum format, const ALvoid *data, ALsizei size, ALsizei freq)
 {
   Dispatch ("alBufferData", &::alBufferData, tie (buffer, make_wrapper (format), data, size, freq));
+}
+
+void OpenALContext::alBufferf (ALuint bid, ALenum param, ALfloat value)
+{
+  Dispatch ("alBufferf", &::alBufferf, tie (bid, make_wrapper (param), value));
+}
+
+void OpenALContext::alBuffer3f (ALuint bid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3)
+{
+  Dispatch ("alBuffer3f", &::alBuffer3f, tie (bid, make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alBufferfv (ALuint bid, ALenum param, const ALfloat* values)
+{
+  Dispatch ("alBufferfv", &::alBufferfv, tie (bid, param, values));
+}
+
+void OpenALContext::alBufferi (ALuint bid, ALenum param, ALint value)
+{
+  Dispatch ("alBufferi", &::alBufferi, tie (bid, make_wrapper (param), value));
+}
+
+void OpenALContext::alBuffer3i (ALuint bid, ALenum param, ALint value1, ALint value2, ALint value3)
+{
+  Dispatch ("alBuffer3i", &::alBuffer3i, tie (bid, make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alBufferiv (ALuint bid, ALenum param, const ALint* values)
+{
+  Dispatch ("alBufferiv", &::alBufferiv, tie (bid, make_wrapper (param), values));
+}
+
+void OpenALContext::alGetBufferf (ALuint bid, ALenum param, ALfloat* value)
+{
+  Dispatch ("alGetBufferf", &::alGetBufferf, tie (bid, make_wrapper (param), value));
+}
+
+void OpenALContext::alGetBuffer3f (ALuint bid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3)
+{
+  Dispatch ("alGetBuffer3f", &::alGetBuffer3f, tie (bid, make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alGetBufferfv (ALuint bid, ALenum param, ALfloat* values)
+{
+  Dispatch ("alGetBufferfv", &::alGetBufferfv, tie (bid, make_wrapper (param), values));
+}
+
+void OpenALContext::alGetBufferi (ALuint bid, ALenum param, ALint* value)
+{
+  Dispatch ("alGetBufferi", &::alGetBufferi, tie (bid, make_wrapper (param), value));
+}
+
+void OpenALContext::alGetBuffer3i (ALuint bid, ALenum param, ALint* value1, ALint* value2, ALint* value3)
+{
+  Dispatch ("alGetBuffer3i", &::alGetBuffer3i, tie (bid, make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alGetBufferiv (ALuint bid, ALenum param, ALint* values)
+{
+  Dispatch ("alGetBufferiv", &::alGetBufferiv, tie (bid, make_wrapper (param), values));
+}
+
+void OpenALContext::alDopplerFactor (ALfloat value)
+{
+  Dispatch ("alDopplerFactor", &::alDopplerFactor, tie (value));
+}
+
+void OpenALContext::alDopplerVelocity (ALfloat value)
+{
+  Dispatch ("alDopplerVelocity", &::alDopplerVelocity, tie (value));
+}
+
+void OpenALContext::alSpeedOfSound (ALfloat value)
+{
+  Dispatch ("alSpeedOfSound", &::alSpeedOfSound, tie (value));
+}
+
+void OpenALContext::alDistanceModel (ALenum distanceModel)
+{
+  Dispatch ("alDistanceModel", &::alDistanceModel, tie (make_wrapper (distanceModel)));
 }

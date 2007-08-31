@@ -203,7 +203,7 @@ class OpenALContext
     void alDopplerFactor( ALfloat value );
     void alDopplerVelocity( ALfloat value );
     void alSpeedOfSound( ALfloat value );
-    void alDistanceModel( ALenum distanceModel );    
+    void alDistanceModel( ALenum distanceModel );
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
