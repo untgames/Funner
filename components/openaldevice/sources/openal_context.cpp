@@ -111,6 +111,19 @@ const char* get_al_constant_name (ALenum value)
   }
 }
 
+//размерность массива аргументов
+size_t get_array_size (ALenum param)
+{
+  switch (param)
+  {
+    case AL_POSITION:
+    case AL_DIRECTION:
+    case AL_ORIENTATION:
+    case AL_VELOCITY:    return 3;
+    default:             return 0;
+  }
+}
+
 /*
     Обёртки для информативности вывода
 */
@@ -234,7 +247,7 @@ inline void dump_argument (float value, string& result)
 
 inline void dump_argument (const void* ptr, string& result)
 {
-  result += format ("%p", ptr);
+  result += ptr ? "pointer" : "null";
 }
 
 inline void dump_argument (const EnumWrapper& arg, string& result)
@@ -526,7 +539,7 @@ void OpenALContext::alSource3f (ALuint sid, ALenum param, ALfloat value1, ALfloa
 
 void OpenALContext::alSourcefv (ALuint sid, ALenum param, const ALfloat* values)
 {
-  Dispatch ("alSourcefv", &::alSourcefv, tie (sid, make_wrapper (param), values));
+  Dispatch ("alSourcefv", &::alSourcefv, tie (sid, make_wrapper (param), make_wrapper (get_array_size (param), values)));
 }
 
 void OpenALContext::alSourcei (ALuint sid, ALenum param, ALint value)
@@ -541,7 +554,7 @@ void OpenALContext::alSource3i (ALuint sid, ALenum param, ALint value1, ALint va
 
 void OpenALContext::alSourceiv (ALuint sid, ALenum param, const ALint* values)
 {
-  Dispatch ("alSourceiv", &::alSourceiv, tie (sid, make_wrapper (param), values));
+  Dispatch ("alSourceiv", &::alSourceiv, tie (sid, make_wrapper (param), make_wrapper (get_array_size (param), values)));
 }
 
 void OpenALContext::alSourcePlayv (ALsizei ns, const ALuint *sids)
@@ -606,7 +619,7 @@ void OpenALContext::alListener3f (ALenum param, ALfloat value1, ALfloat value2, 
 
 void OpenALContext::alListenerfv (ALenum param, const ALfloat* values)
 {
-  Dispatch ("alListenerfv", &::alListenerfv, tie (make_wrapper (param), values));
+  Dispatch ("alListenerfv", &::alListenerfv, tie (make_wrapper (param), make_wrapper (get_array_size (param), values)));
 }
 
 void OpenALContext::alListeneri (ALenum param, ALint value)
@@ -621,7 +634,7 @@ void OpenALContext::alListener3i (ALenum param, ALint value1, ALint value2, ALin
 
 void OpenALContext::alListeneriv (ALenum param, const ALint* values)
 {
-  Dispatch ("alListeneriv", &::alListeneriv, tie (make_wrapper (param), values));
+  Dispatch ("alListeneriv", &::alListeneriv, tie (make_wrapper (param), make_wrapper (get_array_size (param), values)));
 }
 
 void OpenALContext::alGetListenerf (ALenum param, ALfloat* value)
@@ -686,7 +699,7 @@ void OpenALContext::alBuffer3f (ALuint bid, ALenum param, ALfloat value1, ALfloa
 
 void OpenALContext::alBufferfv (ALuint bid, ALenum param, const ALfloat* values)
 {
-  Dispatch ("alBufferfv", &::alBufferfv, tie (bid, param, values));
+  Dispatch ("alBufferfv", &::alBufferfv, tie (bid, param, make_wrapper (get_array_size (param), values)));
 }
 
 void OpenALContext::alBufferi (ALuint bid, ALenum param, ALint value)
@@ -701,7 +714,7 @@ void OpenALContext::alBuffer3i (ALuint bid, ALenum param, ALint value1, ALint va
 
 void OpenALContext::alBufferiv (ALuint bid, ALenum param, const ALint* values)
 {
-  Dispatch ("alBufferiv", &::alBufferiv, tie (bid, make_wrapper (param), values));
+  Dispatch ("alBufferiv", &::alBufferiv, tie (bid, make_wrapper (param), make_wrapper (get_array_size (param), values)));
 }
 
 void OpenALContext::alGetBufferf (ALuint bid, ALenum param, ALfloat* value)
