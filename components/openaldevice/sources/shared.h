@@ -141,14 +141,19 @@ class OpenALContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обёртки над вызовами OpenAL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-     void alGenSources( ALsizei n, ALuint* sources );     
-     void alDeleteSources( ALsizei n, const ALuint* sources );
-     void alGetSourcef( ALuint sid, ALenum param, ALfloat* value );
-     void alGetSource3f( ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
-     void alGetSourcefv( ALuint sid, ALenum param, ALfloat* values );
-     void alGetSourcei( ALuint sid,  ALenum param, ALint* value );
-     void alGetSource3i( ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
-     void alGetSourceiv( ALuint sid,  ALenum param, ALint* values );
+    void alGenSources( ALsizei n, ALuint* sources );     
+    void alDeleteSources( ALsizei n, const ALuint* sources );
+    void alGetSourcef( ALuint sid, ALenum param, ALfloat* value );
+    void alGetSource3f( ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
+    void alGetSourcefv( ALuint sid, ALenum param, ALfloat* values );
+    void alGetSourcei( ALuint sid,  ALenum param, ALint* value );
+    void alGetSource3i( ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
+    void alGetSourceiv( ALuint sid,  ALenum param, ALint* values );
+    void alSourceQueueBuffers( ALuint sid, ALsizei n, ALuint* buffers );
+    void alSourceUnqueueBuffers( ALuint sid, ALsizei n, ALuint* buffers );
+    void alGenBuffers( ALsizei n, ALuint* buffers );
+    void alDeleteBuffers( ALsizei n, ALuint* buffers );
+    void alBufferData( ALuint buffer, ALenum format, const ALvoid *data, ALsizei size, ALsizei freq );
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

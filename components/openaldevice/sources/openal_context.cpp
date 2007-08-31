@@ -443,3 +443,28 @@ void OpenALContext::alGetSourceiv (ALuint sid, ALenum param, ALint* values)
 {
   Dispatch ("alGetSourceiv", &::alGetSourceiv, tie (sid, make_wrapper (param), values));
 }
+
+void OpenALContext::alSourceQueueBuffers (ALuint sid, ALsizei n, ALuint* buffers)
+{
+  Dispatch ("alSourceQueueBuffers", &::alSourceQueueBuffers, tie (sid, n, buffers));
+}
+
+void OpenALContext::alSourceUnqueueBuffers (ALuint sid, ALsizei n, ALuint* buffers)
+{
+  Dispatch ("alSourceUnqueueBuffers", &::alSourceUnqueueBuffers, tie (sid, n, buffers));
+}
+
+void OpenALContext::alGenBuffers (ALsizei n, ALuint* buffers)
+{
+  Dispatch ("alGenBuffers", &::alGenBuffers, tie (n, buffers));
+}
+
+void OpenALContext::alDeleteBuffers (ALsizei n, ALuint* buffers)
+{
+  Dispatch ("alDeleteBuffers", &::alDeleteBuffers, tie (n, buffers));
+}
+
+void OpenALContext::alBufferData (ALuint buffer, ALenum format, const ALvoid *data, ALsizei size, ALsizei freq)
+{
+  Dispatch ("alBufferData", &::alBufferData, tie (buffer, make_wrapper (format), data, size, freq));
+}
