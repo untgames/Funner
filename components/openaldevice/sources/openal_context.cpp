@@ -1,0 +1,445 @@
+#include "shared.h"
+
+using namespace sound::low_level;
+using namespace common;
+using namespace stl;
+using namespace xtl;
+
+namespace
+{
+
+//получение текстового описания ошибки контекста OpenAL
+const char* get_alc_error_message (ALCenum error)
+{
+  switch (error)
+  {
+    case AL_NO_ERROR:         return "No error";
+    case ALC_INVALID_DEVICE:  return "Invalid device";
+    case ALC_INVALID_CONTEXT: return "Invalid context";
+    case ALC_INVALID_ENUM:    return "Invalid enum";
+    case ALC_INVALID_VALUE:   return "Invalid value";
+    case ALC_OUT_OF_MEMORY:   return "Out of memory";
+    default:                  return "Unknown error";
+  }
+}
+
+//получение текстового описания ошибки OpenAL
+const char* get_al_error_message (ALenum error)
+{
+  switch (error)
+  {
+    case AL_NO_ERROR:          return "No error";
+    case AL_INVALID_NAME:      return "Invalid Name paramater passed to AL call";
+    case AL_INVALID_ENUM:      return "Invalid enum parameter passed to AL call";
+    case AL_INVALID_VALUE:     return "Invalid enum parameter value";
+    case AL_INVALID_OPERATION: return "Invalid operation";
+    case AL_OUT_OF_MEMORY:     return "Out of memory";
+    default:                   return "Unknown error";
+  }
+}
+
+//получение текстового имени константы OpenAL
+const char* get_al_constant_name (ALenum value)
+{
+  switch (value)
+  {
+    case AL_SOURCE_RELATIVE                        : return "AL_SOURCE_RELATIVE";
+    case AL_CONE_INNER_ANGLE                       : return "AL_CONE_INNER_ANGLE";
+    case AL_CONE_OUTER_ANGLE                       : return "AL_CONE_OUTER_ANGLE";
+    case AL_PITCH                                  : return "AL_PITCH";
+    case AL_POSITION                               : return "AL_POSITION";
+    case AL_DIRECTION                              : return "AL_DIRECTION";
+    case AL_VELOCITY                               : return "AL_VELOCITY";
+    case AL_LOOPING                                : return "AL_LOOPING";
+    case AL_BUFFER                                 : return "AL_BUFFER";
+    case AL_GAIN                                   : return "AL_GAIN";
+    case AL_MIN_GAIN                               : return "AL_MIN_GAIN";
+    case AL_MAX_GAIN                               : return "AL_MAX_GAIN";
+    case AL_ORIENTATION                            : return "AL_ORIENTATION";
+    case AL_CHANNEL_MASK                           : return "AL_CHANNEL_MASK";
+    case AL_SOURCE_STATE                           : return "AL_SOURCE_STATE";
+    case AL_INITIAL                                : return "AL_INITIAL";
+    case AL_PLAYING                                : return "AL_PLAYING";
+    case AL_PAUSED                                 : return "AL_PAUSED";
+    case AL_STOPPED                                : return "AL_STOPPED";
+    case AL_BUFFERS_QUEUED                         : return "AL_BUFFERS_QUEUED";
+    case AL_BUFFERS_PROCESSED                      : return "AL_BUFFERS_PROCESSED";
+    case AL_SEC_OFFSET                             : return "AL_SEC_OFFSET";
+    case AL_SAMPLE_OFFSET                          : return "AL_SAMPLE_OFFSET";
+    case AL_BYTE_OFFSET                            : return "AL_BYTE_OFFSET";
+    case AL_SOURCE_TYPE                            : return "AL_SOURCE_TYPE";
+    case AL_STATIC                                 : return "AL_STATIC";
+    case AL_STREAMING                              : return "AL_STREAMING";
+    case AL_UNDETERMINED                           : return "AL_UNDETERMINED";
+    case AL_FORMAT_MONO8                           : return "AL_FORMAT_MONO8";
+    case AL_FORMAT_MONO16                          : return "AL_FORMAT_MONO16";
+    case AL_FORMAT_STEREO8                         : return "AL_FORMAT_STEREO8";
+    case AL_FORMAT_STEREO16                        : return "AL_FORMAT_STEREO16";
+    case AL_REFERENCE_DISTANCE                     : return "AL_REFERENCE_DISTANCE";
+    case AL_ROLLOFF_FACTOR                         : return "AL_ROLLOFF_FACTOR";
+    case AL_CONE_OUTER_GAIN                        : return "AL_CONE_OUTER_GAIN";
+    case AL_MAX_DISTANCE                           : return "AL_MAX_DISTANCE";
+    case AL_FREQUENCY                              : return "AL_FREQUENCY";
+    case AL_BITS                                   : return "AL_BITS";
+    case AL_CHANNELS                               : return "AL_CHANNELS";
+    case AL_SIZE                                   : return "AL_SIZE";
+    case AL_UNUSED                                 : return "AL_UNUSED";
+    case AL_PENDING                                : return "AL_PENDING";
+    case AL_PROCESSED                              : return "AL_PROCESSED";
+    case AL_INVALID_NAME                           : return "AL_INVALID_NAME";
+//    case AL_ILLEGAL_ENUM                           : return "AL_ILLEGAL_ENUM";
+    case AL_INVALID_ENUM                           : return "AL_INVALID_ENUM";
+    case AL_INVALID_VALUE                          : return "AL_INVALID_VALUE";
+//    case AL_ILLEGAL_COMMAND                        : return "AL_ILLEGAL_COMMAND";
+    case AL_INVALID_OPERATION                      : return "AL_INVALID_OPERATION";
+    case AL_OUT_OF_MEMORY                          : return "AL_OUT_OF_MEMORY";
+    case AL_VENDOR                                 : return "AL_VENDOR";
+    case AL_VERSION                                : return "AL_VERSION";
+    case AL_RENDERER                               : return "AL_RENDERER";
+    case AL_EXTENSIONS                             : return "AL_EXTENSIONS";
+    case AL_DOPPLER_FACTOR                         : return "AL_DOPPLER_FACTOR";
+    case AL_DOPPLER_VELOCITY                       : return "AL_DOPPLER_VELOCITY";
+    case AL_SPEED_OF_SOUND                         : return "AL_SPEED_OF_SOUND";
+    case AL_DISTANCE_MODEL                         : return "AL_DISTANCE_MODEL";
+    case AL_INVERSE_DISTANCE                       : return "AL_INVERSE_DISTANCE";
+    case AL_INVERSE_DISTANCE_CLAMPED               : return "AL_INVERSE_DISTANCE_CLAMPED";
+    case AL_LINEAR_DISTANCE                        : return "AL_LINEAR_DISTANCE";
+    case AL_LINEAR_DISTANCE_CLAMPED                : return "AL_LINEAR_DISTANCE_CLAMPED";
+    case AL_EXPONENT_DISTANCE                      : return "AL_EXPONENT_DISTANCE";
+    case AL_EXPONENT_DISTANCE_CLAMPED              : return "AL_EXPONENT_DISTANCE_CLAMPED";
+    default                                        : return 0;
+  }
+}
+
+/*
+    Обёртки для информативности вывода
+*/
+
+//обёртка для вывода названий констант OpenAL
+struct EnumWrapper
+{
+  EnumWrapper (ALenum in_value) : value (in_value) {}
+  
+  operator ALenum () const { return value; }
+  
+  ALenum value;
+};
+
+inline EnumWrapper make_wrapper (ALenum value)
+{
+  return EnumWrapper (value);
+}
+
+//обёртка для печати массивов
+template <class T> struct ArrayWrapper
+{
+  ArrayWrapper (size_t in_size, T* in_array) : size (in_size), array (in_array) {}
+  
+  operator T* () const { return array; }
+
+  size_t size;
+  T*     array;
+};
+
+template <class T>
+inline ArrayWrapper<T> make_wrapper (size_t size, T* array)
+{
+  return ArrayWrapper<T> (size, array);
+}
+
+/*
+    Печать аргументов
+*/
+
+template <size_t Size> struct ArgumentsCount {};
+
+template <class Tuple>
+inline void dump_arguments (const Tuple& args, string& result)
+{
+  dump_arguments (args, result, ArgumentsCount<tuple_size<Tuple>::value> ());
+}
+
+template <class Tuple>
+inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<0>)
+{
+}
+
+template <class Tuple>
+inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<1>)
+{
+  dump_argument (get<0> (args), result);
+}
+
+template <class Tuple>
+inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<2>)
+{
+  dump_argument       (get<0> (args), result);
+  dump_comma_argument (get<1> (args), result);
+}
+
+template <class Tuple>
+inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<3>)
+{
+  dump_argument       (get<0> (args), result);
+  dump_comma_argument (get<1> (args), result);
+  dump_comma_argument (get<2> (args), result);
+}
+
+template <class Tuple>
+inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<4>)
+{
+  dump_argument       (get<0> (args), result);
+  dump_comma_argument (get<1> (args), result);
+  dump_comma_argument (get<2> (args), result);
+  dump_comma_argument (get<3> (args), result);
+}
+
+template <class Tuple>
+inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<5>)
+{
+  dump_argument       (get<0> (args), result);
+  dump_comma_argument (get<1> (args), result);
+  dump_comma_argument (get<2> (args), result);
+  dump_comma_argument (get<3> (args), result);
+  dump_comma_argument (get<4> (args), result);
+}
+
+template <class T>
+inline void dump_comma_argument (const T& value, string& result)
+{
+  result += ',';
+
+  dump_argument (value, result);
+}
+
+inline void dump_argument (int value, string& result)
+{
+  result += format ("%d", value);  
+}
+
+inline void dump_argument (size_t value, string& result)
+{
+  result += format ("%u", value);  
+}
+
+inline void dump_argument (double value, string& result)
+{
+  result += format ("%.3f", value);
+}
+
+inline void dump_argument (float value, string& result)
+{
+  result += format ("%.3f", value);
+}
+
+inline void dump_argument (const void* ptr, string& result)
+{
+  result += format ("%p", ptr);
+}
+
+inline void dump_argument (const EnumWrapper& arg, string& result)
+{
+  const char* name = get_al_constant_name (arg.value);
+  
+  if (!name) result += format ("ALenum (%d)", arg.value);
+  else       result += name;
+}
+
+template <class T>
+inline void dump_argument (const ArrayWrapper<T>& arg, string& result)
+{
+  result += '{';
+
+  if (arg.size)
+  {
+    dump_argument (arg.array [0], result);
+    
+    for (size_t i=1; i<arg.size; i++)
+    {
+      result += ',';
+      
+      dump_argument (arg.array [i], result);
+    }
+  }
+
+  result += '}';
+}
+
+}
+
+/*
+    Конструктор / деструктор
+*/
+
+OpenALContext::OpenALContext  (const char* device_name, const LogHandler& in_log_handler)
+  : log_handler (in_log_handler)
+{
+  if (!device_name)
+    RaiseNullArgument ("sound::low_level::OpenALContext::OpenALContext", "device_name");
+    
+  device = alcOpenDevice (device_name);
+  
+  if (!device) 
+    Raise<OpenALException> ("sound::low_level::OpenALContext::OpenALContext", "Can't open device '%s'", device_name);
+
+  context = alcCreateContext (device, 0);
+
+  if (!context)
+  {
+    alcCloseDevice (device);
+    Raise<OpenALException> ("OpenALDevice::OpenALDevice", "Can't create context. %s", get_alc_error_message (alcGetError (device)));
+  }
+}
+
+OpenALContext::~OpenALContext ()
+{
+  if (IsCurrent ())
+    alcMakeContextCurrent (0);
+
+  alcDestroyContext (context);
+
+  ALCenum error = alcGetError (device);
+
+  if (error != AL_NO_ERROR)
+    LogError ("Error at alcDestroyContext(%p). %s", context, get_alc_error_message (error));
+
+  if (!alcCloseDevice (device))
+    LogError ("Error at alcCloseDevice(%p). %s", device, get_alc_error_message (alcGetError (device)));
+}
+
+/*
+    Управление текущими контекстами
+*/
+
+bool OpenALContext::IsCurrent () const
+{
+  return alcGetCurrentContext () == context;
+}
+
+bool OpenALContext::MakeCurrent ()
+{
+  if (IsCurrent ())
+    return true;
+
+  if (!alcMakeContextCurrent (context))
+  {
+    LogError ("Error at alcMakeContextCurrent(%p). %s", context, get_alc_error_message (alcGetError (device)));
+    return false;
+  }
+  
+  return true;
+}
+
+/*
+    Протоколирование ошибок
+*/
+
+void OpenALContext::LogError (const char* message, ...)
+{
+  if (!log_handler)
+    return;
+
+  try
+  {
+    va_list list;
+
+    va_start (list, message);
+    
+    log_handler (vformat (message, list).c_str ());
+  }
+  catch (...)
+  {
+    //подавляем все исключения
+  }
+}
+
+/*
+    Проверка ошибок после вызова функции
+*/
+
+template <class Tuple>
+void OpenALContext::CheckErrors (const char* function_name, const Tuple& args)
+{
+  ALenum error = alGetError ();
+  
+  try
+  {  
+    if (error != AL_NO_ERROR)
+    {
+      string args_string;
+      
+      dump_arguments (args, args_string);
+      
+      LogError ("Error at call %s(%s). %s", function_name, args_string.c_str (), get_al_error_message (error));
+    }
+  }
+  catch (...)
+  {
+    LogError ("Error at call %s(...). %s", function_name, get_al_error_message (error));
+  }
+}
+
+/*
+    Диспетчеры обращений к OpenAL
+*/
+
+template <class Fn, class Tuple>
+void OpenALContext::Dispatch (const char* function_name, Fn fn, const Tuple& args)
+{
+  apply<void> (fn, args);
+  CheckErrors (function_name, args);
+}
+
+template <class Ret, class Fn, class Tuple>
+Ret OpenALContext::Dispatch (const char* function_name, Fn fn, const Tuple& args)
+{
+  Ret result = apply<Ret> (fn, args);
+
+  CheckErrors (function_name, args);
+
+  return result;
+}
+
+/*
+    Обёртки над вызовами OpenAL
+*/
+
+void OpenALContext::alGenSources (ALsizei n, ALuint* sources)
+{
+  Dispatch ("alGenSources", &::alGenSources, tie (n, make_wrapper (n, sources)));
+}
+
+void OpenALContext::alDeleteSources (ALsizei n, const ALuint* sources)
+{
+  Dispatch ("alDeleteSources", &::alDeleteSources, tie (n, make_wrapper (n, sources)));
+}
+
+void OpenALContext::alGetSourcef (ALuint sid, ALenum param, ALfloat* value)
+{
+  Dispatch ("alGetSourcef", &::alGetSourcef, tie (sid, make_wrapper (param), value));
+}
+
+void OpenALContext::alGetSource3f (ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3)
+{
+  Dispatch ("alGetSource3f", &::alGetSource3f, tie (sid, make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alGetSourcefv (ALuint sid, ALenum param, ALfloat* values)
+{
+  Dispatch ("alGetSourcefv", &::alGetSourcefv, tie (sid, make_wrapper (param), values));
+}
+
+void OpenALContext::alGetSourcei (ALuint sid, ALenum param, ALint* value)
+{
+  Dispatch ("alGetSourcei", &::alGetSourcei, tie (sid, make_wrapper (param), value));
+}
+
+void OpenALContext::alGetSource3i (ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3)
+{
+  Dispatch ("alGetSource3i", &::alGetSource3i, tie (sid, make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alGetSourceiv (ALuint sid, ALenum param, ALint* values)
+{
+  Dispatch ("alGetSourceiv", &::alGetSourceiv, tie (sid, make_wrapper (param), values));
+}

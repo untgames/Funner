@@ -3,13 +3,10 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
-#include <al.h>
-#include <alc.h>
 #include <stl/vector>
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <syslib/timer.h>
-#include <common/exception.h>
 #include <common/strlib.h>
 #include <media/sound.h>
 
@@ -263,8 +260,7 @@ void UpdateSourceBuffer (OpenALSource* source, ISoundDevice::LogHandler log_hand
 struct OpenALDevice::Impl
 {
   syslib::Timer          timer;         //таймер обновления буффера
-  ALCdevice              *device;       //устройство OpenAL
-  ALCcontext             *context;      //контекст OpenAL
+  OpenALContext          context;       //контекст
   float                  gain;          //gain
   float                  last_gain;     //предыдущий gain
   bool                   is_muted;      //состояние блокировки проигрывания
@@ -274,14 +270,18 @@ struct OpenALDevice::Impl
   vector <OpenALSource*> sources;       //источники звука
   size_t                 ref_count;     //количество ссылок
 
-  Impl (ALCdevice* in_device, ALCcontext* in_context, OpenALDevice* sound_system);
+  Impl (const char* device_name, OpenALDevice* sound_system);
   ~Impl ();
 };
 
-OpenALDevice::Impl::Impl (ALCdevice* in_device, ALCcontext* in_context, OpenALDevice* sound_system)
- : device (in_device), context (in_context), log_handler (DefaultLogHandler), is_muted (false), gain (1.f), last_gain (1.f),
+OpenALDevice::Impl::Impl (const char* device_name, OpenALDevice* sound_system)
+ : context (device_name, &DefaultLogHandler), log_handler (DefaultLogHandler), is_muted (false), gain (1.f), last_gain (1.f),
    timer (xtl::bind (&OpenALDevice::UpdateBuffers, sound_system), (size_t)(BUFFER_UPDATE_TIME * 1000)), ref_count (1)
 {
+    //временный код!!!
+
+  context.MakeCurrent ();
+
   char *extensions = (char*)alGetString (AL_EXTENSIONS);
   int  compare_value;
 
@@ -347,12 +347,6 @@ OpenALDevice::Impl::~Impl ()
 {
   for (size_t i = 0; i < info.channels_count; i++)
     delete sources[i];
-  alcMakeContextCurrent (NULL);
-  alcDestroyContext (context);
-  if (alcGetError (device) == ALC_INVALID_CONTEXT)
-    log_handler ("Can't destroy context. Invalid context");
-  if (!alcCloseDevice (device))
-    log_handler (format("Can't close device. '%s'", StrALCError (alcGetError (device))).c_str ());
 }
 
 /*
@@ -360,30 +354,8 @@ OpenALDevice::Impl::~Impl ()
 */
 
 OpenALDevice::OpenALDevice (const char* device_name)
-{
-  ALCdevice  *device;
-  ALCcontext *context;
-  
-  {
-     //временный код - убрать!!!
-  
-  if (device_name && !common::strcmp (device_name, "default"))
-    device_name = 0;
-    
-  }
-
-  device = alcOpenDevice (device_name);
-  if (!device) 
-    Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't open device '%s'.", device_name);
-
-  context = alcCreateContext (device, NULL);
-  if (!context)
-    Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't create additional context. '%s'", StrALCError (alcGetError (impl->device)));
-  if (!alcMakeContextCurrent (context))
-    Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't make context current. '%s'", StrALCError (alcGetError (impl->device)));
-
-  impl = new Impl (device, context, this); 
-}
+  : impl (new Impl (device_name, this))
+  {}
 
 OpenALDevice::~OpenALDevice ()
 {
@@ -396,7 +368,8 @@ OpenALDevice::~OpenALDevice ()
 
 const char* OpenALDevice::Name ()
 {
-  return alcGetString (impl->device, ALC_DEVICE_SPECIFIER);
+  return "openal"; //в будущем более подробно!!!
+//  return alcGetString (impl->device, ALC_DEVICE_SPECIFIER);
 }
 
 /*
