@@ -364,14 +364,19 @@ void OpenALContext::CheckErrors (const char* function_name, const Tuple& args)
   
   try
   {  
+    string args_string;
+      
+    dump_arguments (args, args_string);    
+    
     if (error != AL_NO_ERROR)
     {
-      string args_string;
+//      string args_string;
       
-      dump_arguments (args, args_string);
+//      dump_arguments (args, args_string);
       
       LogError ("Error at call %s(%s). %s", function_name, args_string.c_str (), get_al_error_message (error));
     }
+    else LogError ("%s(%s)", function_name, args_string.c_str ());
   }
   catch (...)
   {
