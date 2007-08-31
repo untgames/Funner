@@ -204,3 +204,8 @@ connection Application::RegisterEventHandler (ApplicationEvent event, const Even
 {
   return ApplicationSingleton::Instance ().RegisterEventHandler (event, handler);
 }
+
+void Application::Sleep (size_t milliseconds)
+{
+  Platform::Sleep (milliseconds);
+}
