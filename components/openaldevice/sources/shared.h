@@ -162,6 +162,12 @@ class OpenALContext
     void alGetSourcei( ALuint sid,  ALenum param, ALint* value );
     void alGetSource3i( ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
     void alGetSourceiv( ALuint sid,  ALenum param, ALint* values );
+    void alSourcef( ALuint sid, ALenum param, ALfloat value ); 
+    void alSource3f( ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
+    void alSourcefv( ALuint sid, ALenum param, const ALfloat* values ); 
+    void alSourcei( ALuint sid, ALenum param, ALint value ); 
+    void alSource3i( ALuint sid, ALenum param, ALint value1, ALint value2, ALint value3 );
+    void alSourceiv( ALuint sid, ALenum param, const ALint* values );
     void alSourcePlayv( ALsizei ns, const ALuint *sids );
     void alSourceStopv( ALsizei ns, const ALuint *sids );
     void alSourceRewindv( ALsizei ns, const ALuint *sids );

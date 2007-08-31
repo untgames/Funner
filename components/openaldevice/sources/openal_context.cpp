@@ -509,6 +509,36 @@ void OpenALContext::alGetSourceiv (ALuint sid, ALenum param, ALint* values)
   Dispatch ("alGetSourceiv", &::alGetSourceiv, tie (sid, make_wrapper (param), values));
 }
 
+void OpenALContext::alSourcef (ALuint sid, ALenum param, ALfloat value)
+{
+  Dispatch ("alSourcef", &::alSourcef, tie (sid, make_wrapper (param), value));
+}
+
+void OpenALContext::alSource3f (ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3)
+{
+  Dispatch ("alSource3f", &::alSource3f, tie (sid, make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alSourcefv (ALuint sid, ALenum param, const ALfloat* values)
+{
+  Dispatch ("alSourcefv", &::alSourcefv, tie (sid, make_wrapper (param), values));
+}
+
+void OpenALContext::alSourcei (ALuint sid, ALenum param, ALint value)
+{
+  Dispatch ("alSourcei", &::alSourcei, tie (sid, make_wrapper (param), value));
+}
+
+void OpenALContext::alSource3i (ALuint sid, ALenum param, ALint value1, ALint value2, ALint value3)
+{
+  Dispatch ("alSource3i", &::alSource3i, tie (sid, make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alSourceiv (ALuint sid, ALenum param, const ALint* values)
+{
+  Dispatch ("alSourceiv", &::alSourceiv, tie (sid, make_wrapper (param), values));
+}
+
 void OpenALContext::alSourcePlayv (ALsizei ns, const ALuint *sids)
 {
   Dispatch ("alSourcePlayv", &::alSourcePlayv, tie (ns, make_wrapper (ns, sids)));

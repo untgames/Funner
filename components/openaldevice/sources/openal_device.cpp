@@ -45,58 +45,6 @@ const char* StrALError (ALenum error)
   }
 }
 
-const char* StrALCError (ALCenum error)
-{
-  switch (error)
-  {
-    case AL_NO_ERROR:         return "No error.";
-    case ALC_INVALID_DEVICE:  return "Invalid device.";
-    case ALC_INVALID_CONTEXT: return "Invalid context.";
-    case ALC_INVALID_ENUM:    return "Invalid enum.";
-    case ALC_INVALID_VALUE:   return "Invalid value.";
-    case ALC_OUT_OF_MEMORY:   return "Out of memory.";
-    default:                  return "Unknown error.";
-  }
-}
-
-void CheckALChannelPropertyError (ISoundDevice::LogHandler log_handler, size_t channel, ALenum property)
-{
-  ALenum error_code;
-
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    switch (property)
-    {
-      case AL_POSITION:  log_handler (format ("Can't set channel %u position property. '%s'", channel, StrALError (error_code)).c_str ());  break;
-      case AL_DIRECTION: log_handler (format ("Can't set channel %u direction property. '%s'", channel, StrALError (error_code)).c_str ()); break;
-      case AL_VELOCITY:  log_handler (format ("Can't set channel %u velocity property. '%s'", channel, StrALError (error_code)).c_str ());  break;
-      case AL_GAIN:      log_handler (format ("Can't set channel %u gain property. '%s'", channel, StrALError (error_code)).c_str ());      break;
-      case AL_MIN_GAIN:  log_handler (format ("Can't set channel %u minimum gain property. '%s'", channel, StrALError (error_code)).c_str ()); break;
-      case AL_MAX_GAIN:  log_handler (format ("Can't set channel %u maximum gain property. '%s'", channel, StrALError (error_code)).c_str ()); break;
-      case AL_CONE_INNER_ANGLE:   log_handler (format ("Can't set channel %u inner angle property. '%s'", channel, StrALError (error_code)).c_str ()); break;
-      case AL_CONE_OUTER_ANGLE:   log_handler (format ("Can't set channel %u outer angle property. '%s'", channel, StrALError (error_code)).c_str ()); break;
-      case AL_CONE_OUTER_GAIN:    log_handler (format ("Can't set channel %u outer gain property. '%s'", channel, StrALError (error_code)).c_str ());  break;
-      case AL_REFERENCE_DISTANCE: log_handler (format ("Can't set channel %u reference distance property. '%s'", channel, StrALError (error_code)).c_str ()); break;
-      default:                    log_handler (format ("Error '%s' while setting unknown property channel %u", StrALError (error_code), channel).c_str ());
-    }
-}
-
-void CheckALListenerPropertyError (ISoundDevice::LogHandler log_handler, ALenum property)
-{
-  ALenum error_code;
-
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    switch (property)
-    {
-      case AL_POSITION:    log_handler (format ("Can't set listener position property. '%s'",    StrALError (error_code)).c_str ()); break;
-      case AL_ORIENTATION: log_handler (format ("Can't set listener orientation property. '%s'", StrALError (error_code)).c_str ()); break;
-      case AL_VELOCITY:    log_handler (format ("Can't set listener velocity property. '%s'",    StrALError (error_code)).c_str ()); break;
-      case AL_GAIN:        log_handler (format ("Can't set channel %u gain property. '%s'",      StrALError (error_code)).c_str ()); break;
-      default:             log_handler (format ("Error '%s' while setting unknown listener property", StrALError (error_code)).c_str ());
-    }
-}
-
 struct OpenALSource
 {
   OpenALSource  ();
@@ -188,27 +136,23 @@ bool FillSourceBuffer (OpenALSource* source, size_t buffer_index, ISoundDevice::
   return true;
 }
 
-void UpdateSourceBuffer (OpenALSource* source, ISoundDevice::LogHandler log_handler)
+void UpdateSourceBuffer (OpenALSource* source, ISoundDevice::LogHandler log_handler, OpenALContext* context)
 {
   if (!source->buffer[0])
     return;
 
-  ALenum error_code;
   int    processed_buffers = 0;
   
-  alGetSourcei (source->name, AL_BUFFERS_QUEUED, &processed_buffers);
-  error_code = alGetError ();  
-  if (error_code != AL_NO_ERROR)
-    log_handler (format ("Can't get channel queued buffers count. '%s'", StrALError (error_code)).c_str ());
+  context->alGetSourcei (source->name, AL_BUFFERS_QUEUED, &processed_buffers);
 
   if (!processed_buffers)
   {
     if (FillSourceBuffer (source, 0, log_handler))
     {
       if (FillSourceBuffer (source, 1, log_handler))
-        alSourceQueueBuffers (source->name, 2, source->buffer_name);
+        context->alSourceQueueBuffers (source->name, 2, source->buffer_name);
       else
-        alSourceQueueBuffers (source->name, 1, &source->buffer_name[0]);
+        context->alSourceQueueBuffers (source->name, 1, &source->buffer_name[0]);
     }
     else
     {
@@ -216,35 +160,22 @@ void UpdateSourceBuffer (OpenALSource* source, ISoundDevice::LogHandler log_hand
       return;
     }
 
-    error_code = alGetError ();    
-    if (error_code != AL_NO_ERROR)
-      log_handler (format ("Can't queue buffers. '%s'", StrALError (error_code)).c_str ());
-
     return;
   }
 
   for (;;)
   {
-    alGetSourcei (source->name, AL_BUFFERS_PROCESSED, &processed_buffers);
-    error_code = alGetError ();    
-    if (error_code != AL_NO_ERROR)
-      log_handler (format ("Can't get channel processed buffers count. '%s'", StrALError (error_code)).c_str ());
+    context->alGetSourcei (source->name, AL_BUFFERS_PROCESSED, &processed_buffers);
 
     if (!processed_buffers)
       return;
 
-    alSourceUnqueueBuffers (source->name, 1, &source->buffer_name[source->first_buffer]);
-    error_code = alGetError ();    
-    if (error_code != AL_NO_ERROR)
-      log_handler (format ("Can't unqueue buffers. '%s'", StrALError (error_code)).c_str ());
+    context->alSourceUnqueueBuffers (source->name, 1, &source->buffer_name[source->first_buffer]);
     
     if (!FillSourceBuffer (source, source->first_buffer, log_handler))
       return;
 
-    alSourceQueueBuffers (source->name, 1, &source->buffer_name[source->first_buffer]);
-    error_code = alGetError ();    
-    if (error_code != AL_NO_ERROR)
-      log_handler (format ("Can't queue buffers. '%s'", StrALError (error_code)).c_str ());
+    context->alSourceQueueBuffers (source->name, 1, &source->buffer_name[source->first_buffer]);
 
     source->first_buffer++;
     source->first_buffer %= 2;
@@ -282,7 +213,7 @@ OpenALDevice::Impl::Impl (const char* device_name, OpenALDevice* sound_system)
 
   context.MakeCurrent ();
 
-  char *extensions = (char*)alGetString (AL_EXTENSIONS);
+  char *extensions = (char*)context.alGetString (AL_EXTENSIONS);
   int  compare_value;
 
   info.eax_major_version = 0;
@@ -324,9 +255,7 @@ OpenALDevice::Impl::Impl (const char* device_name, OpenALDevice* sound_system)
     if (alGetError () != AL_NO_ERROR)
     {
       info.channels_count = cur_channel;
-      alDeleteSources (cur_channel, temp_sources);
-      if (alGetError () != AL_NO_ERROR)
-        Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't delete sources generated during initialization");
+      context.alDeleteSources (cur_channel, temp_sources);
       break;
     }
   }
@@ -334,7 +263,7 @@ OpenALDevice::Impl::Impl (const char* device_name, OpenALDevice* sound_system)
     Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't create no one channel");
   if (!info.channels_count)
   {
-    alDeleteSources (MAX_CHANNELS_COUNT, temp_sources);
+    context.alDeleteSources (MAX_CHANNELS_COUNT, temp_sources);
     info.channels_count = MAX_CHANNELS_COUNT;
   }
 
@@ -479,26 +408,16 @@ void OpenALDevice::SetSource (size_t channel, const Source& source_source)
     
   impl->sources[channel]->source = source_source;
 
-  alSourcefv (impl->sources[channel]->name, AL_POSITION, source_source.position);
-  CheckALChannelPropertyError (impl->log_handler, channel, AL_POSITION);
-  alSourcefv (impl->sources[channel]->name, AL_DIRECTION, source_source.direction);
-  CheckALChannelPropertyError (impl->log_handler, channel, AL_DIRECTION);
-  alSourcefv (impl->sources[channel]->name, AL_VELOCITY, source_source.velocity);
-  CheckALChannelPropertyError (impl->log_handler, channel, AL_VELOCITY);
-  alSourcef (impl->sources[channel]->name, AL_GAIN, source_source.gain);
-  CheckALChannelPropertyError (impl->log_handler, channel, AL_GAIN);
-  alSourcef (impl->sources[channel]->name, AL_MIN_GAIN, source_source.minimum_gain);
-  CheckALChannelPropertyError (impl->log_handler, channel, AL_MIN_GAIN);
-  alSourcef (impl->sources[channel]->name, AL_MAX_GAIN, source_source.maximum_gain);
-  CheckALChannelPropertyError (impl->log_handler, channel, AL_MAX_GAIN);
-  alSourcef (impl->sources[channel]->name, AL_CONE_INNER_ANGLE, source_source.inner_angle);
-  CheckALChannelPropertyError (impl->log_handler, channel, AL_CONE_INNER_ANGLE);
-  alSourcef (impl->sources[channel]->name, AL_CONE_OUTER_ANGLE, source_source.outer_angle);
-  CheckALChannelPropertyError (impl->log_handler, channel, AL_CONE_OUTER_ANGLE);
-  alSourcef (impl->sources[channel]->name, AL_CONE_OUTER_GAIN, source_source.outer_gain);
-  CheckALChannelPropertyError (impl->log_handler, channel, AL_CONE_OUTER_GAIN);
-  alSourcef (impl->sources[channel]->name, AL_REFERENCE_DISTANCE, source_source.reference_distance);
-  CheckALChannelPropertyError (impl->log_handler, channel, AL_REFERENCE_DISTANCE);
+  impl->context.alSourcefv (impl->sources[channel]->name, AL_POSITION, source_source.position);
+  impl->context.alSourcefv (impl->sources[channel]->name, AL_DIRECTION, source_source.direction);
+  impl->context.alSourcefv (impl->sources[channel]->name, AL_VELOCITY, source_source.velocity);
+  impl->context.alSourcef  (impl->sources[channel]->name, AL_GAIN, source_source.gain);
+  impl->context.alSourcef  (impl->sources[channel]->name, AL_MIN_GAIN, source_source.minimum_gain);
+  impl->context.alSourcef  (impl->sources[channel]->name, AL_MAX_GAIN, source_source.maximum_gain);
+  impl->context.alSourcef  (impl->sources[channel]->name, AL_CONE_INNER_ANGLE, source_source.inner_angle);
+  impl->context.alSourcef  (impl->sources[channel]->name, AL_CONE_OUTER_ANGLE, source_source.outer_angle);
+  impl->context.alSourcef  (impl->sources[channel]->name, AL_CONE_OUTER_GAIN, source_source.outer_gain);
+  impl->context.alSourcef  (impl->sources[channel]->name, AL_REFERENCE_DISTANCE, source_source.reference_distance);
 }
 
 void OpenALDevice::GetSource (size_t channel, Source& target_source)
@@ -520,17 +439,12 @@ void OpenALDevice::Play (size_t channel, bool looping)
     
   impl->sources[channel]->looping = looping;
 
-  ALenum error_code;
-
   if (impl->sources[channel]->play_from_start)
     Seek (channel, 0);
 
   impl->sources[channel]->play_from_start = true;
   impl->sources[channel]->play_start_time = clock ();
-  alSourcePlay (impl->sources[channel]->name);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't perform play operation on channel %u. '%s'", channel, StrALError (error_code)).c_str ());
+  impl->context.alSourcePlay (impl->sources[channel]->name);
 }
 
 void OpenALDevice::Pause (size_t channel)
@@ -538,12 +452,7 @@ void OpenALDevice::Pause (size_t channel)
   if (channel >= impl->info.channels_count)
     RaiseOutOfRange ("OpenALDevice::Pause", "channel", channel, impl->info.channels_count);
     
-  ALenum error_code;
-
-  alSourcePause (impl->sources[channel]->name);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't perform pause operation on channel %u. '%s'", channel, StrALError (error_code)).c_str ());
+  impl->context.alSourcePause (impl->sources[channel]->name);
 }
 
 void OpenALDevice::Stop (size_t channel)
@@ -553,12 +462,7 @@ void OpenALDevice::Stop (size_t channel)
     
   impl->sources[channel]->play_from_start = true;
 
-  ALenum error_code;
-
-  alSourceStop (impl->sources[channel]->name);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't perform stop operation on channel %u. '%s'", channel, StrALError (error_code)).c_str ());
+  impl->context.alSourceStop (impl->sources[channel]->name);
 }
 
 void OpenALDevice::Seek (size_t channel, float time_in_seconds)
@@ -574,21 +478,13 @@ void OpenALDevice::Seek (size_t channel, float time_in_seconds)
 
   impl->sources[channel]->last_sample = impl->sources[channel]->start_sample = impl->sources[channel]->sound_sample.SecondsToSamples (time_in_seconds);
 
-  ALenum error_code;
   int    queued_buffers;
   
-  alGetSourcei (impl->sources[channel]->name, AL_BUFFERS_QUEUED, &queued_buffers);
-  error_code = alGetError ();
-  
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't get channel queued buffers count. '%s'", StrALError (error_code)).c_str ());
+  impl->context.alGetSourcei (impl->sources[channel]->name, AL_BUFFERS_QUEUED, &queued_buffers);
 
-  alSourceUnqueueBuffers (impl->sources[channel]->name, queued_buffers, impl->sources[channel]->buffer_name);
-  error_code = alGetError ();    
-  if (error_code != AL_NO_ERROR)
-    impl->log_handler (format ("Can't unqueue buffers. '%s'", StrALError (error_code)).c_str ());
+  impl->context.alSourceUnqueueBuffers (impl->sources[channel]->name, queued_buffers, impl->sources[channel]->buffer_name);
 
-  UpdateSourceBuffer (impl->sources[channel], impl->log_handler);
+  UpdateSourceBuffer (impl->sources[channel], impl->log_handler, &impl->context);
 
   impl->sources[channel]->play_start_time = clock ();
   impl->sources[channel]->play_from_start = false;
@@ -612,16 +508,9 @@ bool OpenALDevice::IsPlaying (size_t channel)
   if (channel >= impl->info.channels_count)
     RaiseOutOfRange ("OpenALDevice::IsPlaying", "channel", channel, impl->info.channels_count);
     
-  int    status;
-  ALenum error_code;
+  int    status = AL_STOPPED;
 
-  alGetSourcei (impl->sources[channel]->name, AL_SOURCE_STATE, &status);
-  error_code = alGetError ();
-  if (error_code != AL_NO_ERROR)
-  {
-    impl->log_handler (format ("Can't retreive channel %u status. '%s'", channel, StrALError (error_code)).c_str ());
-    return false;
-  }
+  impl->context.alGetSourcei (impl->sources[channel]->name, AL_SOURCE_STATE, &status);
 
   return (status == AL_PLAYING);
 }
@@ -640,8 +529,7 @@ void  OpenALDevice::SetVolume (float gain)
 
   impl->gain = gain;
 
-  alListenerf (AL_GAIN, gain);
-  CheckALListenerPropertyError (impl->log_handler, AL_GAIN);
+  impl->context.alListenerf (AL_GAIN, gain);
 }
 
 float OpenALDevice::GetVolume ()
@@ -683,12 +571,9 @@ void OpenALDevice::SetListener (const Listener& source_listener)
   float  orientation [6] = {source_listener.direction.x, source_listener.direction.y, source_listener.direction.z, 
                             source_listener.up.x,        source_listener.up.y,        source_listener.up.z};
 
-  alListenerfv (AL_POSITION, source_listener.position);
-  CheckALListenerPropertyError (impl->log_handler, AL_POSITION);
-  alListenerfv (AL_VELOCITY, source_listener.velocity);
-  CheckALListenerPropertyError (impl->log_handler, AL_VELOCITY);
-  alListenerfv (AL_ORIENTATION, orientation);
-  CheckALListenerPropertyError (impl->log_handler, AL_ORIENTATION);
+  impl->context.alListenerfv (AL_POSITION, source_listener.position);
+  impl->context.alListenerfv (AL_VELOCITY, source_listener.velocity);
+  impl->context.alListenerfv (AL_ORIENTATION, orientation);
 }
 
 void OpenALDevice::GetListener (Listener& target_listener)
@@ -713,7 +598,7 @@ const OpenALDevice::LogHandler& OpenALDevice::GetDebugLog ()
 void OpenALDevice::UpdateBuffers ()
 {
   for (vector <OpenALSource*>::iterator i = impl->sources.begin (); i != impl->sources.end (); ++i)
-    UpdateSourceBuffer (*i, impl->log_handler);
+    UpdateSourceBuffer (*i, impl->log_handler, &impl->context);
 }
 
 void OpenALDevice::AddRef ()
