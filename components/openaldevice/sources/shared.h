@@ -141,19 +141,69 @@ class OpenALContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обёртки над вызовами OpenAL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    void alEnable( ALenum capability );
+    void alDisable( ALenum capability ); 
+    ALboolean alIsEnabled( ALenum capability );
+    const ALchar* alGetString( ALenum param );
+    void alGetBooleanv( ALenum param, ALboolean* data );
+    void alGetIntegerv( ALenum param, ALint* data );
+    void alGetFloatv( ALenum param, ALfloat* data );
+    void alGetDoublev( ALenum param, ALdouble* data );
+    ALboolean alGetBoolean( ALenum param );
+    ALint alGetInteger( ALenum param );
+    ALfloat alGetFloat( ALenum param );
+    ALdouble alGetDouble( ALenum param );
     void alGenSources( ALsizei n, ALuint* sources );     
     void alDeleteSources( ALsizei n, const ALuint* sources );
+    ALboolean alIsSource( ALuint sid );      
     void alGetSourcef( ALuint sid, ALenum param, ALfloat* value );
     void alGetSource3f( ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
     void alGetSourcefv( ALuint sid, ALenum param, ALfloat* values );
     void alGetSourcei( ALuint sid,  ALenum param, ALint* value );
     void alGetSource3i( ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
     void alGetSourceiv( ALuint sid,  ALenum param, ALint* values );
-    void alSourceQueueBuffers( ALuint sid, ALsizei n, ALuint* buffers );
-    void alSourceUnqueueBuffers( ALuint sid, ALsizei n, ALuint* buffers );
+    void alSourcePlayv( ALsizei ns, const ALuint *sids );
+    void alSourceStopv( ALsizei ns, const ALuint *sids );
+    void alSourceRewindv( ALsizei ns, const ALuint *sids );
+    void alSourcePausev( ALsizei ns, const ALuint *sids );
+    void alSourcePlay( ALuint sid );
+    void alSourceStop( ALuint sid );
+    void alSourceRewind( ALuint sid );
+    void alSourcePause( ALuint sid );
+    void alSourceQueueBuffers( ALuint sid, ALsizei numEntries, const ALuint *bids );
+    void alSourceUnqueueBuffers( ALuint sid, ALsizei numEntries, ALuint *bids );     
+    void alListenerf( ALenum param, ALfloat value );
+    void alListener3f( ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
+    void alListenerfv( ALenum param, const ALfloat* values ); 
+    void alListeneri( ALenum param, ALint value );
+    void alListener3i( ALenum param, ALint value1, ALint value2, ALint value3 );
+    void alListeneriv( ALenum param, const ALint* values );
+    void alGetListenerf( ALenum param, ALfloat* value );
+    void alGetListener3f( ALenum param, ALfloat *value1, ALfloat *value2, ALfloat *value3 );
+    void alGetListenerfv( ALenum param, ALfloat* values );
+    void alGetListeneri( ALenum param, ALint* value );
+    void alGetListener3i( ALenum param, ALint *value1, ALint *value2, ALint *value3 );
+    void alGetListeneriv( ALenum param, ALint* values );
     void alGenBuffers( ALsizei n, ALuint* buffers );
-    void alDeleteBuffers( ALsizei n, ALuint* buffers );
-    void alBufferData( ALuint buffer, ALenum format, const ALvoid *data, ALsizei size, ALsizei freq );
+    void alDeleteBuffers( ALsizei n, const ALuint* buffers );
+    ALboolean alIsBuffer( ALuint bid );
+    void alBufferData( ALuint bid, ALenum format, const ALvoid* data, ALsizei size, ALsizei freq );
+    void alBufferf( ALuint bid, ALenum param, ALfloat value );
+    void alBuffer3f( ALuint bid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
+    void alBufferfv( ALuint bid, ALenum param, const ALfloat* values );
+    void alBufferi( ALuint bid, ALenum param, ALint value );
+    void alBuffer3i( ALuint bid, ALenum param, ALint value1, ALint value2, ALint value3 );
+    void alBufferiv( ALuint bid, ALenum param, const ALint* values );
+    void alGetBufferf( ALuint bid, ALenum param, ALfloat* value );
+    void alGetBuffer3f( ALuint bid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
+    void alGetBufferfv( ALuint bid, ALenum param, ALfloat* values );
+    void alGetBufferi( ALuint bid, ALenum param, ALint* value );
+    void alGetBuffer3i( ALuint bid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
+    void alGetBufferiv( ALuint bid, ALenum param, ALint* values );
+    void alDopplerFactor( ALfloat value );
+    void alDopplerVelocity( ALfloat value );
+    void alSpeedOfSound( ALfloat value );
+    void alDistanceModel( ALenum distanceModel );    
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

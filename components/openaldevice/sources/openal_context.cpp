@@ -404,6 +404,66 @@ Ret OpenALContext::Dispatch (const char* function_name, Fn fn, const Tuple& args
     Обёртки над вызовами OpenAL
 */
 
+void OpenALContext::alEnable (ALenum capability)
+{
+  Dispatch ("alEnable", &::alEnable, tie (make_wrapper (capability)));
+}
+
+void OpenALContext::alDisable (ALenum capability)
+{
+  Dispatch ("alDisable", &::alDisable, tie (make_wrapper (capability)));
+}
+
+ALboolean OpenALContext::alIsEnabled (ALenum capability)
+{
+  return Dispatch<ALboolean> ("alIsEnabled", &::alIsEnabled, tie (make_wrapper (capability)));
+}
+
+const ALchar* OpenALContext::alGetString (ALenum param)
+{
+  return Dispatch<const ALchar*> ("alGetString", &::alGetString, tie (make_wrapper (param)));
+}
+
+void OpenALContext::alGetBooleanv (ALenum param, ALboolean* data)
+{
+  Dispatch ("alGetBooleanv", &::alGetBooleanv, tie (make_wrapper (param), data));
+}
+
+void OpenALContext::alGetIntegerv (ALenum param, ALint* data)
+{
+  Dispatch ("alGetIntegerv", &::alGetIntegerv, tie (make_wrapper (param), data));
+}
+
+void OpenALContext::alGetFloatv (ALenum param, ALfloat* data)
+{
+  Dispatch ("alGetFloatv", &::alGetFloatv, tie (make_wrapper (param), data));
+}
+
+void OpenALContext::alGetDoublev (ALenum param, ALdouble* data)
+{
+  Dispatch ("alGetDoublev", &::alGetDoublev, tie (make_wrapper (param), data));
+}
+
+ALboolean OpenALContext::alGetBoolean (ALenum param)
+{
+  return Dispatch<ALboolean> ("alGetBoolean", &::alGetBoolean, tie (make_wrapper (param)));
+}
+
+ALint OpenALContext::alGetInteger (ALenum param)
+{
+  return Dispatch<ALint> ("alGetInteger", &::alGetInteger, tie (make_wrapper (param)));
+}
+
+ALfloat OpenALContext::alGetFloat (ALenum param)
+{
+  return Dispatch<ALfloat> ("alGetFloat", &::alGetFloat, tie (make_wrapper (param)));
+}
+
+ALdouble OpenALContext::alGetDouble (ALenum param)
+{
+  return Dispatch<ALdouble> ("alGetDouble", &::alGetDouble, tie (make_wrapper (param)));
+}
+
 void OpenALContext::alGenSources (ALsizei n, ALuint* sources)
 {
   Dispatch ("alGenSources", &::alGenSources, tie (n, make_wrapper (n, sources)));
@@ -412,6 +472,11 @@ void OpenALContext::alGenSources (ALsizei n, ALuint* sources)
 void OpenALContext::alDeleteSources (ALsizei n, const ALuint* sources)
 {
   Dispatch ("alDeleteSources", &::alDeleteSources, tie (n, make_wrapper (n, sources)));
+}
+
+ALboolean OpenALContext::alIsSource (ALuint sid)
+{
+  return Dispatch<ALboolean> ("alIsSource", &::alIsSource, tie (sid));
 }
 
 void OpenALContext::alGetSourcef (ALuint sid, ALenum param, ALfloat* value)
@@ -444,7 +509,7 @@ void OpenALContext::alGetSourceiv (ALuint sid, ALenum param, ALint* values)
   Dispatch ("alGetSourceiv", &::alGetSourceiv, tie (sid, make_wrapper (param), values));
 }
 
-void OpenALContext::alSourceQueueBuffers (ALuint sid, ALsizei n, ALuint* buffers)
+void OpenALContext::alSourceQueueBuffers (ALuint sid, ALsizei n, const ALuint* buffers)
 {
   Dispatch ("alSourceQueueBuffers", &::alSourceQueueBuffers, tie (sid, n, buffers));
 }
@@ -459,7 +524,7 @@ void OpenALContext::alGenBuffers (ALsizei n, ALuint* buffers)
   Dispatch ("alGenBuffers", &::alGenBuffers, tie (n, buffers));
 }
 
-void OpenALContext::alDeleteBuffers (ALsizei n, ALuint* buffers)
+void OpenALContext::alDeleteBuffers (ALsizei n, const ALuint* buffers)
 {
   Dispatch ("alDeleteBuffers", &::alDeleteBuffers, tie (n, buffers));
 }
