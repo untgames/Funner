@@ -559,6 +559,66 @@ void OpenALContext::alSourceUnqueueBuffers (ALuint sid, ALsizei n, ALuint* buffe
   Dispatch ("alSourceUnqueueBuffers", &::alSourceUnqueueBuffers, tie (sid, n, buffers));
 }
 
+void OpenALContext::alListenerf (ALenum param, ALfloat value)
+{
+  Dispatch ("alListenerf", &::alListenerf, tie (make_wrapper (param), value));
+}
+
+void OpenALContext::alListener3f (ALenum param, ALfloat value1, ALfloat value2, ALfloat value3)
+{
+  Dispatch ("alListener3f", &::alListener3f, tie (make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alListenerfv (ALenum param, const ALfloat* values)
+{
+  Dispatch ("alListenerfv", &::alListenerfv, tie (make_wrapper (param), values));
+}
+
+void OpenALContext::alListeneri (ALenum param, ALint value)
+{
+  Dispatch ("alListeneri", &::alListeneri, tie (make_wrapper (param), value));
+}
+
+void OpenALContext::alListener3i (ALenum param, ALint value1, ALint value2, ALint value3)
+{
+  Dispatch ("alListener3i", &::alListener3i, tie (make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alListeneriv (ALenum param, const ALint* values)
+{
+  Dispatch ("alListeneriv", &::alListeneriv, tie (make_wrapper (param), values));
+}
+
+void OpenALContext::alGetListenerf (ALenum param, ALfloat* value)
+{
+  Dispatch ("alGetListenerf", &::alGetListenerf, tie (make_wrapper (param), value));
+}
+
+void OpenALContext::alGetListener3f (ALenum param, ALfloat *value1, ALfloat *value2, ALfloat *value3)
+{
+  Dispatch ("alGetListener3f", &::alGetListener3f, tie (make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alGetListenerfv (ALenum param, ALfloat* values)
+{
+  Dispatch ("alGetListenerfv", &::alGetListenerfv, tie (make_wrapper (param), values));
+}
+
+void OpenALContext::alGetListeneri (ALenum param, ALint* value)
+{
+  Dispatch ("alGetListeneri", &::alGetListeneri, tie (make_wrapper (param), value));
+}
+
+void OpenALContext::alGetListener3i (ALenum param, ALint *value1, ALint *value2, ALint *value3)
+{
+  Dispatch ("alGetListener3i", &::alGetListener3i, tie (make_wrapper (param), value1, value2, value3));
+}
+
+void OpenALContext::alGetListeneriv (ALenum param, ALint* values)
+{
+  Dispatch ("alGetListeneriv", &::alGetListeneriv, tie (make_wrapper (param), values));
+}
+
 void OpenALContext::alGenBuffers (ALsizei n, ALuint* buffers)
 {
   Dispatch ("alGenBuffers", &::alGenBuffers, tie (n, buffers));
