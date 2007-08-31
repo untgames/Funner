@@ -399,15 +399,6 @@ const char* OpenALDevice::Name ()
   return alcGetString (impl->device, ALC_DEVICE_SPECIFIER);
 }
 
-const char* OpenALDevice::Devices ()
-{
-  if (alcIsExtensionPresent (NULL, "ALC_ENUMERATE_ALL_EXT"))
-    return alcGetString (NULL, ALC_ALL_DEVICES_SPECIFIER);
-  if (alcIsExtensionPresent (NULL, "ALC_ENUMERATION_EXT"))
-    return alcGetString (NULL, ALC_DEVICE_SPECIFIER);
-  return NULL;
-}
-
 /*
    Получение информации об устройстве
 */

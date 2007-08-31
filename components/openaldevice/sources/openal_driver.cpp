@@ -1,3 +1,5 @@
+#include <al.h>
+#include <alc.h>
 #include "shared.h"
 
 using namespace sound::low_level;
@@ -29,13 +31,23 @@ void register_openal_driver (const char* name)
 
   try
   {
-     //здесь будут регистрироваться конфигурации
-     
-     SoundSystem::RegisterConfiguration (name, "default");
+     const char* devices;
+
+     if (alcIsExtensionPresent (NULL, "ALC_ENUMERATE_ALL_EXT"))
+       devices = alcGetString (NULL, ALC_ALL_DEVICES_SPECIFIER);
+     else if (alcIsExtensionPresent (NULL, "ALC_ENUMERATION_EXT"))
+       devices = alcGetString (NULL, ALC_DEVICE_SPECIFIER);
+     else
+     {
+       SoundSystem::RegisterConfiguration (name, "default");
+       return;
+     }
+
+     for (; strlen (devices); devices += strlen (devices) + 1)
+       SoundSystem::RegisterConfiguration (name, devices);
   }
   catch (...)
   {
-    SoundSystem::UnregisterAllConfigurations (name, "*");
     SoundSystem::UnregisterDriver (name);
     throw;
   }
