@@ -14,9 +14,9 @@ using namespace sound::openal_device;
 const char* file_name = "data/sound1.ogg";
 const char* file_name2 = "data/sound2.ogg";
 
-ICustomSoundSystem *sound_system;
-float              source_angle = 0;
-Source             source;
+ISoundDevice *sound_system;
+float        source_angle = 0;
+Source       source;
 
 //печать числа с плавающей точкой
 void print (float value)
@@ -68,6 +68,13 @@ void TimerHandler (Timer& timer)
   source.position = vec3f (sin (deg2rad (source_angle)), 0, cos (deg2rad (source_angle)));
   source_angle++;
   sound_system->SetSource (1, source);
+
+  if (source_angle == 360)
+  {
+    delete (OpenALSoundSystem*)sound_system;
+
+    Application::Exit (0);
+  }
 }
 
 int main ()
@@ -75,10 +82,10 @@ int main ()
   try
   {
     sound_system = new OpenALSoundSystem ();
-    SystemInfo info;
-    Listener   listener;
+    Capabilities   info;
+    Listener       listener;
 
-    sound_system->GetInfo (info);
+    sound_system->GetCapabilities (info);
 
     printf ("Available OpenAL devices:\n");
     for (const char* device = ((OpenALSoundSystem*)sound_system)->Devices (); strlen (device); device += strlen (device) + 1)
@@ -128,9 +135,8 @@ int main ()
     sound_system->Play (1, true);
 
     Timer timer (&TimerHandler, (size_t)BUFFER_UPDATE_TIME * 1000);
-    Application::Run ();
 
-    delete (OpenALSoundSystem*)sound_system;
+    Application::Run ();
   }
   catch (std::exception& exception)
   {                                               

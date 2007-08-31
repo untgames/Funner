@@ -62,7 +62,7 @@ const char* StrALCError (ALCenum error)
   }
 }
 
-void CheckALChannelPropertyError (ICustomSoundSystem::LogHandler log_handler, size_t channel, ALenum property)
+void CheckALChannelPropertyError (ISoundDevice::LogHandler log_handler, size_t channel, ALenum property)
 {
   ALenum error_code;
 
@@ -84,7 +84,7 @@ void CheckALChannelPropertyError (ICustomSoundSystem::LogHandler log_handler, si
     }
 }
 
-void CheckALListenerPropertyError (ICustomSoundSystem::LogHandler log_handler, ALenum property)
+void CheckALListenerPropertyError (ISoundDevice::LogHandler log_handler, ALenum property)
 {
   ALenum error_code;
 
@@ -135,20 +135,18 @@ OpenALSource::OpenALSource ()
 
 OpenALSource::~OpenALSource ()
 {
+  alSourceStop (name);
+
   if (buffer[0])
     delete [] buffer[0];
   if (buffer[1])
     delete [] buffer[1];
   if (buffer_name)
-    alDeleteBuffers (1, buffer_name);
-  if (alGetError () != AL_NO_ERROR)
-    Raise <Exception> ("OpenALSource::~OpenALSource", "Can't delete buffer");
+    alDeleteBuffers (2, buffer_name);
   alDeleteSources (1, &name);
-  if (alGetError () != AL_NO_ERROR)
-    Raise <Exception> ("OpenALSource::~OpenALSource", "Can't delete source");
 }
 
-bool FillSourceBuffer (OpenALSource* source, size_t buffer_index, ICustomSoundSystem::LogHandler log_handler)
+bool FillSourceBuffer (OpenALSource* source, size_t buffer_index, ISoundDevice::LogHandler log_handler)
 {
   size_t sample_size = source->sound_sample.SamplesToBytes (1);
   size_t readed_samples;
@@ -193,7 +191,7 @@ bool FillSourceBuffer (OpenALSource* source, size_t buffer_index, ICustomSoundSy
   return true;
 }
 
-void UpdateSourceBuffer (OpenALSource* source, ICustomSoundSystem::LogHandler log_handler)
+void UpdateSourceBuffer (OpenALSource* source, ISoundDevice::LogHandler log_handler)
 {
   if (!source->buffer[0])
     return;
@@ -270,10 +268,11 @@ struct OpenALSoundSystem::Impl
   float                  gain;          //gain
   float                  last_gain;     //предыдущий gain
   bool                   is_muted;      //состояние блокировки проигрывания
-  SystemInfo             info;          //информация о устройстве
+  Capabilities           info;          //информация о устройстве
   LogHandler             log_handler;   //функция лога
   Listener               listener;      //слушатель
   vector <OpenALSource*> sources;       //источники звука
+  size_t                 ref_count;     //количество ссылок
 
   Impl (ALCdevice* in_device, ALCcontext* in_context, OpenALSoundSystem* sound_system);
   ~Impl ();
@@ -281,7 +280,7 @@ struct OpenALSoundSystem::Impl
 
 OpenALSoundSystem::Impl::Impl (ALCdevice* in_device, ALCcontext* in_context, OpenALSoundSystem* sound_system)
  : device (in_device), context (in_context), log_handler (DefaultLogHandler), is_muted (false), gain (1.f), last_gain (1.f),
-   timer (xtl::bind (&OpenALSoundSystem::UpdateBuffers, sound_system), (size_t)(BUFFER_UPDATE_TIME * 1000))
+   timer (xtl::bind (&OpenALSoundSystem::UpdateBuffers, sound_system), (size_t)(BUFFER_UPDATE_TIME * 1000)), ref_count (1)
 {
   char *extensions = (char*)alGetString (AL_EXTENSIONS);
   int  compare_value;
@@ -351,9 +350,9 @@ OpenALSoundSystem::Impl::~Impl ()
   alcMakeContextCurrent (NULL);
   alcDestroyContext (context);
   if (alcGetError (device) == ALC_INVALID_CONTEXT)
-    Raise <Exception> ("OpenALSoundSystem::~Impl", "Can't destroy context. Invalid context");
+    log_handler ("Can't destroy context. Invalid context");
   if (!alcCloseDevice (device))
-    Raise <Exception> ("OpenALSoundSystem::~Impl", "Can't close device. '%s'", StrALCError (alcGetError (device)));
+    log_handler (format("Can't close device. '%s'", StrALCError (alcGetError (device))).c_str ());
 }
 
 /*
@@ -405,7 +404,7 @@ const char* OpenALSoundSystem::Devices ()
    Получение информации об устройстве
 */
 
-void OpenALSoundSystem::GetInfo (SystemInfo& target_info)
+void OpenALSoundSystem::GetCapabilities (Capabilities& target_info)
 {
   target_info = impl->info;
 }
@@ -743,4 +742,15 @@ void OpenALSoundSystem::UpdateBuffers ()
 {
   for (vector <OpenALSource*>::iterator i = impl->sources.begin (); i != impl->sources.end (); ++i)
     UpdateSourceBuffer (*i, impl->log_handler);
+}
+
+void OpenALSoundSystem::AddRef ()
+{
+  impl->ref_count++;
+}
+
+void OpenALSoundSystem::Release ()
+{
+  if (!--impl->ref_count)
+    delete this;
 }
