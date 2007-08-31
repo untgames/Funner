@@ -91,15 +91,19 @@ OpenALDevice::Impl::Impl (const char* device_name, OpenALDevice* sound_system)
     info.channels_count = MAX_CHANNELS_COUNT;
   }
 
+  buffer = new char [((size_t)(2.f * (float)MAX_SOUND_CHANNELS * (float)MAX_SOUND_FREQUENCY * BUFFER_TIME) + 1023)&~1023];
+
   sources.resize (info.channels_count);
   for (size_t i = 0; i < info.channels_count; i++)
-    sources[i] = new OpenALSource (&context);
+    sources[i] = new OpenALSource (&context, buffer);
 }
 
 OpenALDevice::Impl::~Impl ()
 {
   for (size_t i = 0; i < info.channels_count; i++)
     delete sources[i];
+
+  delete [] buffer;
 }
 
 /*

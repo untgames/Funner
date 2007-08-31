@@ -24,8 +24,10 @@ struct OpenALExceptionTag;
 
 typedef common::DerivedException<common::Exception, OpenALExceptionTag> OpenALException;
 
-//const float BUFFER_UPDATE_TIME = 0.5;
-const float BUFFER_UPDATE_TIME = 0.05;
+const float  BUFFER_UPDATE_TIME = 0.3f;
+const float  BUFFER_TIME = 0.5f;
+const size_t MAX_SOUND_FREQUENCY = 48000;
+const size_t MAX_SOUND_CHANNELS  = 2;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Cистема воспроизведения звука, реализованная через OpenAL
@@ -251,23 +253,23 @@ class OpenALContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct OpenALSource
 {
-  OpenALSource  (OpenALContext* in_context);
+  OpenALSource  (OpenALContext* in_context, char* in_buffer);
   ~OpenALSource ();
 
   medialib::SoundSample sound_sample;    //звук
   Source      source;          //общий источник звука
   bool        looping;         //зацикленность
+  bool        playing;         //источник играет
   bool        play_from_start; //нужно ли делать rewind при вызове play
   size_t      name;            //имя источника в OpenAL
   size_t      buffer_name[2];  //OpenAL буффер
   size_t      buffer_samples;  //количество сэмплов в буффере
-  size_t      buffer_size;     //размер в байтах
   size_t      last_sample;     //номер последнего прочитанного сэмпла
   size_t      start_sample;    //номер начального сэмпла проигрывания
   clock_t     play_start_time; //время последнего seek
   size_t      first_buffer;    //номер первого в очереди буффера    
-  char*       buffer[2];       //буффер декодированного звука
-  OpenALContext *context;       //контекст
+  char*       buffer;          //указатель на общий буффер декодированного звука
+  OpenALContext *context;      //контекст
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -284,6 +286,7 @@ struct OpenALDevice::Impl
   LogHandler             log_handler;   //функция лога
   Listener               listener;      //слушатель
   size_t                 ref_count;     //количество ссылок
+  char*                  buffer;        //буффер декодированного звука
   stl::vector <OpenALSource*> sources;  //источники звука
 
   Impl (const char* device_name, OpenALDevice* sound_system);

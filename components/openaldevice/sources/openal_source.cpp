@@ -34,7 +34,7 @@ bool FillSourceBuffer (OpenALSource* source, size_t buffer_index, ISoundDevice::
     {
       if (source->last_sample == source->sound_sample.SamplesCount ())
         source->last_sample = 0;
-      source->last_sample += readed_samples = source->sound_sample.Read (source->last_sample, source->buffer_samples - total_readed_samples, source->buffer[buffer_index] + source->sound_sample.SamplesToBytes (total_readed_samples));
+      source->last_sample += readed_samples = source->sound_sample.Read (source->last_sample, source->buffer_samples - total_readed_samples, source->buffer + source->sound_sample.SamplesToBytes (total_readed_samples));
     
       if (!readed_samples)
       {
@@ -46,15 +46,15 @@ bool FillSourceBuffer (OpenALSource* source, size_t buffer_index, ISoundDevice::
   }
   else
   {
-    source->last_sample += readed_samples = source->sound_sample.Read (source->last_sample, source->buffer_samples, source->buffer[buffer_index]);
+    source->last_sample += readed_samples = source->sound_sample.Read (source->last_sample, source->buffer_samples, source->buffer);
     if (!readed_samples)
       return false;
   }
 
   if (source->sound_sample.Channels () == 1)
-    alBufferData (source->buffer_name[buffer_index], AL_FORMAT_MONO16, source->buffer[buffer_index], readed_samples * sample_size, source->sound_sample.Frequency ());
+    alBufferData (source->buffer_name[buffer_index], AL_FORMAT_MONO16, source->buffer, readed_samples * sample_size, source->sound_sample.Frequency ());
   else
-    alBufferData (source->buffer_name[buffer_index], AL_FORMAT_STEREO16, source->buffer[buffer_index], readed_samples * sample_size, source->sound_sample.Frequency ());
+    alBufferData (source->buffer_name[buffer_index], AL_FORMAT_STEREO16, source->buffer, readed_samples * sample_size, source->sound_sample.Frequency ());
 
   error_code = alGetError ();
   
@@ -69,9 +69,6 @@ bool FillSourceBuffer (OpenALSource* source, size_t buffer_index, ISoundDevice::
 
 void UpdateSourceBuffer (OpenALSource* source, ISoundDevice::LogHandler log_handler, OpenALContext* context)
 {
-  if (!source->buffer[0])
-    return;
-
   int    processed_buffers = 0;
   
   context->alGetSourcei (source->name, AL_BUFFERS_QUEUED, &processed_buffers);
@@ -80,10 +77,9 @@ void UpdateSourceBuffer (OpenALSource* source, ISoundDevice::LogHandler log_hand
   {
     if (FillSourceBuffer (source, 0, log_handler))
     {
+      context->alSourceQueueBuffers (source->name, 1, &source->buffer_name[0]);
       if (FillSourceBuffer (source, 1, log_handler))
-        context->alSourceQueueBuffers (source->name, 2, source->buffer_name);
-      else
-        context->alSourceQueueBuffers (source->name, 1, &source->buffer_name[0]);
+        context->alSourceQueueBuffers (source->name, 1, &source->buffer_name[1]);
     }
     else
     {
@@ -115,11 +111,9 @@ void UpdateSourceBuffer (OpenALSource* source, ISoundDevice::LogHandler log_hand
 
 }
 
-OpenALSource::OpenALSource (OpenALContext* in_context)
-  : play_from_start (true), context (in_context)
+OpenALSource::OpenALSource (OpenALContext* in_context, char* in_buffer)
+  : play_from_start (true), context (in_context), buffer (in_buffer), playing (false), looping (false)
 {
-  buffer[0] = NULL;
-  buffer[1] = NULL;
   alGenSources (1, &name);
   if (alGetError () != AL_NO_ERROR)
     Raise <Exception> ("OpenALSource::OpenALSource", "Can't create source");
@@ -138,10 +132,6 @@ OpenALSource::~OpenALSource ()
   if (queued_buffers)
     context->alSourceUnqueueBuffers (name, queued_buffers, buffer_name);
 
-  if (buffer[0])
-    delete [] buffer[0];
-  if (buffer[1])
-    delete [] buffer[1];
   if (buffer_name)
     context->alDeleteBuffers (2, buffer_name);
   context->alDeleteSources (1, &name);
@@ -159,6 +149,8 @@ void OpenALDevice::SetSample (size_t channel, const char* sample_name)
   if (!sample_name)
     RaiseNullArgument ("OpenALDevice::SetSample", "sample_name");
     
+  bool played = IsPlaying (channel), looped = IsLooped (channel);
+
   Stop (channel);
 
   try
@@ -170,39 +162,21 @@ void OpenALDevice::SetSample (size_t channel, const char* sample_name)
     if (impl->sources[channel]->sound_sample.Channels () > 2 || !impl->sources[channel]->sound_sample.Channels ())
       RaiseNotSupported ("OpenALDevice::SetSample", "Supported only mono and stereo sources, sample has %u channels.", impl->sources[channel]->sound_sample.Channels ());
 
-    impl->sources[channel]->buffer_samples = (size_t)(BUFFER_UPDATE_TIME * impl->sources[channel]->sound_sample.Frequency ());
-
-    if (impl->sources[channel]->buffer_size)
-    {
-      size_t new_buffer_size = (size_t)(impl->sources[channel]->sound_sample.BitsPerSample () / 8 * impl->sources[channel]->buffer_samples * impl->sources[channel]->sound_sample.Channels ());
-      
-      if (impl->sources[channel]->buffer_size != new_buffer_size)
-      {
-        if (impl->sources[channel]->buffer[0])
-          delete [] impl->sources[channel]->buffer[0];
-        if (impl->sources[channel]->buffer[1])
-          delete [] impl->sources[channel]->buffer[1];
-
-        impl->sources[channel]->buffer_size = new_buffer_size;
-        impl->sources[channel]->buffer[0] = new char [impl->sources[channel]->buffer_size];  
-        impl->sources[channel]->buffer[1] = new char [impl->sources[channel]->buffer_size];  
-      }
-    }
-    else
-    {
-      impl->sources[channel]->buffer_size = (size_t)(impl->sources[channel]->sound_sample.BitsPerSample () / 8 * impl->sources[channel]->buffer_samples * impl->sources[channel]->sound_sample.Channels ());
-      impl->sources[channel]->buffer[0] = new char [impl->sources[channel]->buffer_size];  
-      impl->sources[channel]->buffer[1] = new char [impl->sources[channel]->buffer_size];  
-    }
+    impl->sources[channel]->buffer_samples = (size_t)(BUFFER_TIME * impl->sources[channel]->sound_sample.Frequency ());
   }
   catch (std::exception& exception)
   {                                               
     impl->log_handler (format ("Can't load file '%s'. Exception: '%s'.", sample_name, exception.what ()).c_str());
+    return;
   }                                               
   catch (...)
   {
     impl->log_handler (format ("Can't load file '%s'. Unknown exception.", sample_name).c_str());
+    return;
   }
+
+  if (played)
+    Play (channel, looped);
 }
 
 const char* OpenALDevice::GetSample (size_t channel)
@@ -266,6 +240,7 @@ void OpenALDevice::Play (size_t channel, bool looping)
     RaiseOutOfRange ("OpenALDevice::Play", "channel", channel, impl->info.channels_count);
     
   impl->sources[channel]->looping = looping;
+  impl->sources[channel]->playing = true;
 
   if (impl->sources[channel]->play_from_start)
     Seek (channel, 0);
@@ -280,6 +255,8 @@ void OpenALDevice::Pause (size_t channel)
   if (channel >= impl->info.channels_count)
     RaiseOutOfRange ("OpenALDevice::Pause", "channel", channel, impl->info.channels_count);
     
+  impl->sources[channel]->playing = false;
+
   impl->context.alSourcePause (impl->sources[channel]->name);
 }
 
@@ -289,6 +266,8 @@ void OpenALDevice::Stop (size_t channel)
     RaiseOutOfRange ("OpenALDevice::Stop", "channel", channel, impl->info.channels_count);
     
   impl->sources[channel]->play_from_start = true;
+  impl->sources[channel]->playing = false;
+  impl->sources[channel]->looping = false;
 
   impl->context.alSourceStop (impl->sources[channel]->name);
 }
@@ -336,16 +315,38 @@ bool OpenALDevice::IsPlaying (size_t channel)
   if (channel >= impl->info.channels_count)
     RaiseOutOfRange ("OpenALDevice::IsPlaying", "channel", channel, impl->info.channels_count);
     
-  int    status = AL_STOPPED;
+  if (impl->sources[channel]->playing)
+  {
+    int status = AL_STOPPED;
 
-  impl->context.alGetSourcei (impl->sources[channel]->name, AL_SOURCE_STATE, &status);
+    impl->context.alGetSourcei (impl->sources[channel]->name, AL_SOURCE_STATE, &status);
 
-  return (status == AL_PLAYING);
+    if (status == AL_PLAYING)
+      return true;
+    else if (Tell (channel) > impl->sources[channel]->sound_sample.SamplesToSeconds (impl->sources[channel]->sound_sample.SamplesCount ()))
+    {
+      impl->sources[channel]->playing = false;
+      return false;
+    }
+    else
+    {
+      impl->sources[channel]->play_from_start = false;
+      Play (channel, impl->sources[channel]->looping);
+      return true;
+    }
+  }
+  else 
+    return false;
 }
 
 void OpenALDevice::UpdateBuffers ()
 {
-  for (stl::vector <OpenALSource*>::iterator i = impl->sources.begin (); i != impl->sources.end (); ++i)
-    UpdateSourceBuffer (*i, impl->log_handler, &impl->context);
+  for (size_t i = 0; i < impl->sources.size (); i++)
+  {
+    if (impl->sources[i]->playing)
+    {
+      UpdateSourceBuffer (impl->sources[i], impl->log_handler, &impl->context);
+      IsPlaying (i);
+    }
+  }
 }
-
