@@ -1,31 +1,28 @@
-#ifndef SOUND_SYSTEM_OPENAL_DEVICE_HEADER
-#define SOUND_SYSTEM_OPENAL_DEVICE_HEADER
+#ifndef SOUND_SYSTEM_OPENAL_DEVICE_SHARED_HEADER
+#define SOUND_SYSTEM_OPENAL_DEVICE_SHARED_HEADER
 
-#include <mathlib.h>
-#include <xtl/functional_fwd>
-#include <sound/device.h>
+#include <sound/openal_device.h>
+#include <xtl/function.h>
 
 namespace sound
 {
 
-namespace openal_device
+namespace low_level
 {
-
-using namespace sound::low_level;
 
 const float BUFFER_UPDATE_TIME = 0.5;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Cистема воспроизведения звука, реализованная через OpenAL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct OpenALSoundSystem : public sound::low_level::ISoundDevice
+struct OpenALDevice : public sound::low_level::ISoundDevice
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OpenALSoundSystem  (const char* device_name = NULL);
-    ~OpenALSoundSystem ();
+    OpenALDevice  (const char* device_name = NULL);
+    ~OpenALDevice ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя устройства

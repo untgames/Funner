@@ -11,16 +11,16 @@
 #include <syslib/timer.h>
 #include <common/exception.h>
 #include <common/strlib.h>
-#include <openaldevice/openal_device.h>
 #include <media/sound.h>
+
+#include "shared.h"
 
 #define MAX_CHANNELS_COUNT 1024
 
 using namespace common;
 using namespace stl;
 using namespace medialib;
-using namespace sound;
-using namespace sound::openal_device;
+using namespace sound::low_level;
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
@@ -257,10 +257,10 @@ void UpdateSourceBuffer (OpenALSource* source, ISoundDevice::LogHandler log_hand
 }
 
 /*
-    Описание реализации OpenALSoundSystem
+    Описание реализации OpenALDevice
 */
 
-struct OpenALSoundSystem::Impl
+struct OpenALDevice::Impl
 {
   syslib::Timer          timer;         //таймер обновления буффера
   ALCdevice              *device;       //устройство OpenAL
@@ -274,13 +274,13 @@ struct OpenALSoundSystem::Impl
   vector <OpenALSource*> sources;       //источники звука
   size_t                 ref_count;     //количество ссылок
 
-  Impl (ALCdevice* in_device, ALCcontext* in_context, OpenALSoundSystem* sound_system);
+  Impl (ALCdevice* in_device, ALCcontext* in_context, OpenALDevice* sound_system);
   ~Impl ();
 };
 
-OpenALSoundSystem::Impl::Impl (ALCdevice* in_device, ALCcontext* in_context, OpenALSoundSystem* sound_system)
+OpenALDevice::Impl::Impl (ALCdevice* in_device, ALCcontext* in_context, OpenALDevice* sound_system)
  : device (in_device), context (in_context), log_handler (DefaultLogHandler), is_muted (false), gain (1.f), last_gain (1.f),
-   timer (xtl::bind (&OpenALSoundSystem::UpdateBuffers, sound_system), (size_t)(BUFFER_UPDATE_TIME * 1000)), ref_count (1)
+   timer (xtl::bind (&OpenALDevice::UpdateBuffers, sound_system), (size_t)(BUFFER_UPDATE_TIME * 1000)), ref_count (1)
 {
   char *extensions = (char*)alGetString (AL_EXTENSIONS);
   int  compare_value;
@@ -326,12 +326,12 @@ OpenALSoundSystem::Impl::Impl (ALCdevice* in_device, ALCcontext* in_context, Ope
       info.channels_count = cur_channel;
       alDeleteSources (cur_channel, temp_sources);
       if (alGetError () != AL_NO_ERROR)
-        Raise <Exception> ("OpenALSoundSystem::OpenALSoundSystem", "Can't delete sources generated during initialization");
+        Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't delete sources generated during initialization");
       break;
     }
   }
   if (!cur_channel)
-    Raise <Exception> ("OpenALSoundSystem::OpenALSoundSystem", "Can't create no one channel");
+    Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't create no one channel");
   if (!info.channels_count)
   {
     alDeleteSources (MAX_CHANNELS_COUNT, temp_sources);
@@ -343,7 +343,7 @@ OpenALSoundSystem::Impl::Impl (ALCdevice* in_device, ALCcontext* in_context, Ope
     sources[i] = new OpenALSource;
 }
 
-OpenALSoundSystem::Impl::~Impl ()
+OpenALDevice::Impl::~Impl ()
 {
   for (size_t i = 0; i < info.channels_count; i++)
     delete sources[i];
@@ -359,25 +359,33 @@ OpenALSoundSystem::Impl::~Impl ()
     Конструктор / деструктор
 */
 
-OpenALSoundSystem::OpenALSoundSystem (const char* device_name)
+OpenALDevice::OpenALDevice (const char* device_name)
 {
   ALCdevice  *device;
   ALCcontext *context;
+  
+  {
+     //временный код - убрать!!!
+  
+  if (device_name && !common::strcmp (device_name, "default"))
+    device_name = 0;
+    
+  }
 
   device = alcOpenDevice (device_name);
   if (!device) 
-    Raise <Exception> ("OpenALSoundSystem::OpenALSoundSystem", "Can't open device '%s'.", device_name);
+    Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't open device '%s'.", device_name);
 
   context = alcCreateContext (device, NULL);
   if (!context)
-    Raise <Exception> ("OpenALSoundSystem::OpenALSoundSystem", "Can't create additional context. '%s'", StrALCError (alcGetError (impl->device)));
+    Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't create additional context. '%s'", StrALCError (alcGetError (impl->device)));
   if (!alcMakeContextCurrent (context))
-    Raise <Exception> ("OpenALSoundSystem::OpenALSoundSystem", "Can't make context current. '%s'", StrALCError (alcGetError (impl->device)));
+    Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't make context current. '%s'", StrALCError (alcGetError (impl->device)));
 
   impl = new Impl (device, context, this); 
 }
 
-OpenALSoundSystem::~OpenALSoundSystem ()
+OpenALDevice::~OpenALDevice ()
 {
   delete impl;
 }
@@ -386,12 +394,12 @@ OpenALSoundSystem::~OpenALSoundSystem ()
    Имя устройства
 */
 
-const char* OpenALSoundSystem::Name ()
+const char* OpenALDevice::Name ()
 {
   return alcGetString (impl->device, ALC_DEVICE_SPECIFIER);
 }
 
-const char* OpenALSoundSystem::Devices ()
+const char* OpenALDevice::Devices ()
 {
   if (alcIsExtensionPresent (NULL, "ALC_ENUMERATE_ALL_EXT"))
     return alcGetString (NULL, ALC_ALL_DEVICES_SPECIFIER);
@@ -404,7 +412,7 @@ const char* OpenALSoundSystem::Devices ()
    Получение информации об устройстве
 */
 
-void OpenALSoundSystem::GetCapabilities (Capabilities& target_info)
+void OpenALDevice::GetCapabilities (Capabilities& target_info)
 {
   target_info = impl->info;
 }
@@ -413,7 +421,7 @@ void OpenALSoundSystem::GetCapabilities (Capabilities& target_info)
    Количество микшируемых каналов
 */
 
-size_t OpenALSoundSystem::ChannelsCount ()
+size_t OpenALDevice::ChannelsCount ()
 {
   return impl->info.channels_count;
 }
@@ -422,13 +430,13 @@ size_t OpenALSoundSystem::ChannelsCount ()
    Установка текущего проигрываемого звука
 */
 
-void OpenALSoundSystem::SetSample (size_t channel, const char* sample_name)
+void OpenALDevice::SetSample (size_t channel, const char* sample_name)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::SetSample", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::SetSample", "channel", channel, impl->info.channels_count);
     
   if (!sample_name)
-    RaiseNullArgument ("OpenALSoundSystem::SetSample", "sample_name");
+    RaiseNullArgument ("OpenALDevice::SetSample", "sample_name");
     
   Stop (channel);
 
@@ -437,9 +445,9 @@ void OpenALSoundSystem::SetSample (size_t channel, const char* sample_name)
     impl->sources[channel]->sound_sample.Load (sample_name);
     
     if (impl->sources[channel]->sound_sample.BitsPerSample () != 16)
-      RaiseNotSupported ("OpenALSoundSystem::SetSample", "Supported only 16 bit audio depth, sample depth - %u.", impl->sources[channel]->sound_sample.BitsPerSample ());
+      RaiseNotSupported ("OpenALDevice::SetSample", "Supported only 16 bit audio depth, sample depth - %u.", impl->sources[channel]->sound_sample.BitsPerSample ());
     if (impl->sources[channel]->sound_sample.Channels () > 2 || !impl->sources[channel]->sound_sample.Channels ())
-      RaiseNotSupported ("OpenALSoundSystem::SetSample", "Supported only mono and stereo sources, sample has %u channels.", impl->sources[channel]->sound_sample.Channels ());
+      RaiseNotSupported ("OpenALDevice::SetSample", "Supported only mono and stereo sources, sample has %u channels.", impl->sources[channel]->sound_sample.Channels ());
 
     impl->sources[channel]->buffer_samples = (size_t)(BUFFER_UPDATE_TIME * impl->sources[channel]->sound_sample.Frequency ());
 
@@ -476,10 +484,10 @@ void OpenALSoundSystem::SetSample (size_t channel, const char* sample_name)
   }
 }
 
-const char* OpenALSoundSystem::GetSample (size_t channel)
+const char* OpenALDevice::GetSample (size_t channel)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::GetSample", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::GetSample", "channel", channel, impl->info.channels_count);
     
   return impl->sources[channel]->sound_sample.Name ();
 }
@@ -488,10 +496,10 @@ const char* OpenALSoundSystem::GetSample (size_t channel)
    Проверка цикличности проигрывания канала
 */
 
-bool OpenALSoundSystem::IsLooped (size_t channel)
+bool OpenALDevice::IsLooped (size_t channel)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::IsLooped", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::IsLooped", "channel", channel, impl->info.channels_count);
     
   return impl->sources[channel]->looping; 
 }
@@ -500,10 +508,10 @@ bool OpenALSoundSystem::IsLooped (size_t channel)
    Установка параметров источника
 */
 
-void OpenALSoundSystem::SetSource (size_t channel, const Source& source_source)
+void OpenALDevice::SetSource (size_t channel, const Source& source_source)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::SetSource", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::SetSource", "channel", channel, impl->info.channels_count);
     
   impl->sources[channel]->source = source_source;
 
@@ -529,10 +537,10 @@ void OpenALSoundSystem::SetSource (size_t channel, const Source& source_source)
   CheckALChannelPropertyError (impl->log_handler, channel, AL_REFERENCE_DISTANCE);
 }
 
-void OpenALSoundSystem::GetSource (size_t channel, Source& target_source)
+void OpenALDevice::GetSource (size_t channel, Source& target_source)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::GetSource", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::GetSource", "channel", channel, impl->info.channels_count);
     
   target_source = impl->sources[channel]->source;
 }
@@ -541,10 +549,10 @@ void OpenALSoundSystem::GetSource (size_t channel, Source& target_source)
    Управление проигрыванием
 */
 
-void OpenALSoundSystem::Play (size_t channel, bool looping)
+void OpenALDevice::Play (size_t channel, bool looping)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::Play", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::Play", "channel", channel, impl->info.channels_count);
     
   impl->sources[channel]->looping = looping;
 
@@ -561,10 +569,10 @@ void OpenALSoundSystem::Play (size_t channel, bool looping)
     impl->log_handler (format ("Can't perform play operation on channel %u. '%s'", channel, StrALError (error_code)).c_str ());
 }
 
-void OpenALSoundSystem::Pause (size_t channel)
+void OpenALDevice::Pause (size_t channel)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::Pause", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::Pause", "channel", channel, impl->info.channels_count);
     
   ALenum error_code;
 
@@ -574,10 +582,10 @@ void OpenALSoundSystem::Pause (size_t channel)
     impl->log_handler (format ("Can't perform pause operation on channel %u. '%s'", channel, StrALError (error_code)).c_str ());
 }
 
-void OpenALSoundSystem::Stop (size_t channel)
+void OpenALDevice::Stop (size_t channel)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::Stop", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::Stop", "channel", channel, impl->info.channels_count);
     
   impl->sources[channel]->play_from_start = true;
 
@@ -589,10 +597,10 @@ void OpenALSoundSystem::Stop (size_t channel)
     impl->log_handler (format ("Can't perform stop operation on channel %u. '%s'", channel, StrALError (error_code)).c_str ());
 }
 
-void OpenALSoundSystem::Seek (size_t channel, float time_in_seconds)
+void OpenALDevice::Seek (size_t channel, float time_in_seconds)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::Seek", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::Seek", "channel", channel, impl->info.channels_count);
 
   if (time_in_seconds >= impl->sources[channel]->sound_sample.SamplesToSeconds (impl->sources[channel]->sound_sample.SamplesCount ()))
   {
@@ -622,10 +630,10 @@ void OpenALSoundSystem::Seek (size_t channel, float time_in_seconds)
   impl->sources[channel]->play_from_start = false;
 }
 
-float OpenALSoundSystem::Tell (size_t channel)
+float OpenALDevice::Tell (size_t channel)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::Tell", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::Tell", "channel", channel, impl->info.channels_count);
     
   float  offset;
 
@@ -635,10 +643,10 @@ float OpenALSoundSystem::Tell (size_t channel)
   return offset;
 }
 
-bool OpenALSoundSystem::IsPlaying (size_t channel)
+bool OpenALDevice::IsPlaying (size_t channel)
 {
   if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALSoundSystem::IsPlaying", "channel", channel, impl->info.channels_count);
+    RaiseOutOfRange ("OpenALDevice::IsPlaying", "channel", channel, impl->info.channels_count);
     
   int    status;
   ALenum error_code;
@@ -658,7 +666,7 @@ bool OpenALSoundSystem::IsPlaying (size_t channel)
    Установка уровня громкости для устройства
 */
 
-void  OpenALSoundSystem::SetVolume (float gain)
+void  OpenALDevice::SetVolume (float gain)
 {
   if (gain < 0.f || gain > 1.f)
   {
@@ -672,7 +680,7 @@ void  OpenALSoundSystem::SetVolume (float gain)
   CheckALListenerPropertyError (impl->log_handler, AL_GAIN);
 }
 
-float OpenALSoundSystem::GetVolume ()
+float OpenALDevice::GetVolume ()
 {
   return impl->gain;
 }
@@ -681,7 +689,7 @@ float OpenALSoundSystem::GetVolume ()
    Блокировка проигрывания звука
 */
 
-void OpenALSoundSystem::SetMute (bool state)
+void OpenALDevice::SetMute (bool state)
 {
   if (impl->is_muted != state)
   {
@@ -696,7 +704,7 @@ void OpenALSoundSystem::SetMute (bool state)
   impl->is_muted = state;
 }
 
-bool OpenALSoundSystem::IsMuted ()
+bool OpenALDevice::IsMuted ()
 {
   return impl->is_muted;
 }
@@ -705,7 +713,7 @@ bool OpenALSoundSystem::IsMuted ()
    Установка параметров слушателя
 */
 
-void OpenALSoundSystem::SetListener (const Listener& source_listener)
+void OpenALDevice::SetListener (const Listener& source_listener)
 {
   impl->listener = source_listener;
   float  orientation [6] = {source_listener.direction.x, source_listener.direction.y, source_listener.direction.z, 
@@ -719,7 +727,7 @@ void OpenALSoundSystem::SetListener (const Listener& source_listener)
   CheckALListenerPropertyError (impl->log_handler, AL_ORIENTATION);
 }
 
-void OpenALSoundSystem::GetListener (Listener& target_listener)
+void OpenALDevice::GetListener (Listener& target_listener)
 {
   target_listener = impl->listener;
 }
@@ -728,28 +736,28 @@ void OpenALSoundSystem::GetListener (Listener& target_listener)
    Установка функции отладочного протоколирования
 */
 
-void OpenALSoundSystem::SetDebugLog (const LogHandler& log_handler)
+void OpenALDevice::SetDebugLog (const LogHandler& log_handler)
 {
   impl->log_handler = log_handler;
 }
 
-const OpenALSoundSystem::LogHandler& OpenALSoundSystem::GetDebugLog ()
+const OpenALDevice::LogHandler& OpenALDevice::GetDebugLog ()
 {
   return impl->log_handler;
 }
 
-void OpenALSoundSystem::UpdateBuffers ()
+void OpenALDevice::UpdateBuffers ()
 {
   for (vector <OpenALSource*>::iterator i = impl->sources.begin (); i != impl->sources.end (); ++i)
     UpdateSourceBuffer (*i, impl->log_handler);
 }
 
-void OpenALSoundSystem::AddRef ()
+void OpenALDevice::AddRef ()
 {
   impl->ref_count++;
 }
 
-void OpenALSoundSystem::Release ()
+void OpenALDevice::Release ()
 {
   if (!--impl->ref_count)
     delete this;

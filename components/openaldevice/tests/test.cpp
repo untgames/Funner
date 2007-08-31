@@ -4,27 +4,31 @@
 #include <xtl/signal.h>
 #include <syslib/application.h>
 #include <syslib/timer.h>
-#include <openaldevice/openal_device.h>
+#include <sound/openal_device.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/bind.h>
 
 using namespace math;
 using namespace syslib;
-using namespace sound;
-using namespace sound::openal_device;
+using namespace sound::low_level;
+using namespace xtl;
 
 const char* file_name = "data/sound1.ogg";
 const char* file_name2 = "data/sound2.ogg";
 
-ISoundDevice *sound_system;
+const size_t SOURCE_UPDATE_TIME = 100;   //период обновления параметров источника звука (в милисекундах)
+const size_t TEST_WORK_TIME     = 4000;  //время работы теста (в милисекундах)
+
 float        source_angle = 0;
 Source       source;
 
-//ЇҐз вм зЁб«  б Ї« ў ойҐ© в®зЄ®©
+//печать числа с плавающей точкой
 void print (float value)
 {
   printf ("%+.3f", value);
 }
 
-//ЇҐз вм ўҐЄв®а 
+//печать вектора
 template <class T, size_t N>
 void print (const math::vec<T, N>& v)
 {
@@ -63,33 +67,29 @@ void dump (Source& source)
             source.gain, source.minimum_gain, source.maximum_gain, source.inner_angle, source.outer_angle, source.outer_gain, source.reference_distance);
 }
 
-void TimerHandler (Timer& timer)
+void TimerHandler (ISoundDevice* sound_system, Timer&)
 {
   source.position = vec3f (sin (deg2rad (source_angle)), 0, cos (deg2rad (source_angle)));
   source_angle++;
   sound_system->SetSource (1, source);
-
-  if (source_angle == 360)
-  {
-    delete (OpenALSoundSystem*)sound_system;
-
-    Application::Exit (0);
-  }
 }
 
 int main ()
 {
   try
   {
-    sound_system = new OpenALSoundSystem ();
+    register_openal_driver ();
+    
+    xtl::com_ptr<ISoundDevice> sound_system (SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("openal", "*"), 0), false);
+
     Capabilities   info;
     Listener       listener;
 
     sound_system->GetCapabilities (info);
 
-    printf ("Available OpenAL devices:\n");
-    for (const char* device = ((OpenALSoundSystem*)sound_system)->Devices (); strlen (device); device += strlen (device) + 1)
-      printf ("  '%s'\n", device);
+//    printf ("Available OpenAL devices:\n");
+//    for (const char* device = ((OpenALSoundSystem*)sound_system)->Devices (); strlen (device); device += strlen (device) + 1)
+//      printf ("  '%s'\n", device);
 
     printf ("Using device %s.\n", sound_system->Name ());
     printf ("Total channels available: %u\n", info.channels_count);
@@ -134,7 +134,8 @@ int main ()
     sound_system->Play (0, true);
     sound_system->Play (1, true);
 
-    Timer timer (&TimerHandler, (size_t)BUFFER_UPDATE_TIME * 1000);
+    Timer timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),
+          timer2 (bind (&Application::Exit, 0), TEST_WORK_TIME);
 
     Application::Run ();
   }
@@ -146,6 +147,8 @@ int main ()
   {
     printf ("unknown exception\n");
   }
+  
+  printf ("exit\n");
 
-  return 0;
+  return Application::GetExitCode ();
 }
