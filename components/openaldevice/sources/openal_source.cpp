@@ -132,6 +132,12 @@ OpenALSource::~OpenALSource ()
 {
   context->alSourceStop (name);
 
+  int queued_buffers = 0;
+  
+  context->alGetSourcei (name, AL_BUFFERS_QUEUED, &queued_buffers);
+  if (queued_buffers)
+    context->alSourceUnqueueBuffers (name, queued_buffers, buffer_name);
+
   if (buffer[0])
     delete [] buffer[0];
   if (buffer[1])
