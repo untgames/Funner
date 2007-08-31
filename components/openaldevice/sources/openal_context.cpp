@@ -466,7 +466,7 @@ ALdouble OpenALContext::alGetDouble (ALenum param)
 
 void OpenALContext::alGenSources (ALsizei n, ALuint* sources)
 {
-  Dispatch ("alGenSources", &::alGenSources, tie (n, make_wrapper (n, sources)));
+  Dispatch ("alGenSources", &::alGenSources, tie (n, sources));
 }
 
 void OpenALContext::alDeleteSources (ALsizei n, const ALuint* sources)
@@ -509,6 +509,46 @@ void OpenALContext::alGetSourceiv (ALuint sid, ALenum param, ALint* values)
   Dispatch ("alGetSourceiv", &::alGetSourceiv, tie (sid, make_wrapper (param), values));
 }
 
+void OpenALContext::alSourcePlayv (ALsizei ns, const ALuint *sids)
+{
+  Dispatch ("alSourcePlayv", &::alSourcePlayv, tie (ns, make_wrapper (ns, sids)));
+}
+
+void OpenALContext::alSourceStopv (ALsizei ns, const ALuint *sids)
+{
+  Dispatch ("alSourceStopv", &::alSourceStopv, tie (ns, make_wrapper (ns, sids)));
+}
+
+void OpenALContext::alSourceRewindv (ALsizei ns, const ALuint *sids)
+{
+  Dispatch ("alSourceRewindv", &::alSourceRewindv, tie (ns, make_wrapper (ns, sids)));
+}
+
+void OpenALContext::alSourcePausev (ALsizei ns, const ALuint *sids)
+{
+  Dispatch ("alSourcePausev", &::alSourcePausev, tie (ns, make_wrapper (ns, sids)));
+}
+
+void OpenALContext::alSourcePlay (ALuint sid)
+{
+  Dispatch ("alSourcePlay", &::alSourcePlay, tie (sid));
+}
+
+void OpenALContext::alSourceStop (ALuint sid)
+{
+  Dispatch ("alSourceStop", &::alSourceStop, tie (sid));
+}
+
+void OpenALContext::alSourceRewind (ALuint sid)
+{
+  Dispatch ("alSourceRewind", &::alSourceRewind, tie (sid));
+}
+
+void OpenALContext::alSourcePause (ALuint sid)
+{
+  Dispatch ("alSourcePause", &::alSourcePause, tie (sid));
+}
+
 void OpenALContext::alSourceQueueBuffers (ALuint sid, ALsizei n, const ALuint* buffers)
 {
   Dispatch ("alSourceQueueBuffers", &::alSourceQueueBuffers, tie (sid, n, buffers));
@@ -526,7 +566,7 @@ void OpenALContext::alGenBuffers (ALsizei n, ALuint* buffers)
 
 void OpenALContext::alDeleteBuffers (ALsizei n, const ALuint* buffers)
 {
-  Dispatch ("alDeleteBuffers", &::alDeleteBuffers, tie (n, buffers));
+  Dispatch ("alDeleteBuffers", &::alDeleteBuffers, tie (n, make_wrapper (n, buffers)));
 }
 
 void OpenALContext::alBufferData (ALuint buffer, ALenum format, const ALvoid *data, ALsizei size, ALsizei freq)
