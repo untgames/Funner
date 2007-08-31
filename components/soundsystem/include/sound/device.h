@@ -146,7 +146,10 @@ class SoundSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация драйверов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<ISoundDevice* (const char* driver_name, const char* device_name, const char* init_string)> CreateDeviceHandler;
+    typedef xtl::function<ISoundDevice* (const char* driver_name,
+                                         const char* device_name,
+                                         const void* window_handle,
+                                         const char* init_string)> CreateDeviceHandler;
 
     static void RegisterDriver       (const char* driver_name, const CreateDeviceHandler& creater);
     static void UnregisterDriver     (const char* driver_name);
@@ -175,8 +178,8 @@ class SoundSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства воспроизведения звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static ISoundDevice* CreateDevice (const char* driver_name, const char* device_name, const char* init_string);
-    static ISoundDevice* CreateDevice (const char* configuration_name, const char* init_string = "");
+    static ISoundDevice* CreateDevice (const char* driver_name, const char* device_name, const void* window_handle, const char* init_string);
+    static ISoundDevice* CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string = "");
 };
 
 }

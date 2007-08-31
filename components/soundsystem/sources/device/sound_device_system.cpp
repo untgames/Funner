@@ -57,8 +57,8 @@ class SoundSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—оздание устройства воспроизведени€ звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISoundDevice* CreateDevice (const char* driver_name, const char* device_name, const char* init_string);
-    ISoundDevice* CreateDevice (const char* configuration_name, const char* init_string = "");
+    ISoundDevice* CreateDevice (const char* driver_name, const char* device_name, const void* window_handle, const char* init_string);
+    ISoundDevice* CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string = "");
     
   private:
     static string GetConfigurationName (const char* driver_name, const char* device_name);
@@ -264,7 +264,7 @@ const char* SoundSystemImpl::GetConfiguration (size_t index) const
     —оздание устройства воспроизведени€ звука
 */
 
-ISoundDevice* SoundSystemImpl::CreateDevice (const char* configuration_name, const char* init_string)
+ISoundDevice* SoundSystemImpl::CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string)
 {
   if (!configuration_name)
     RaiseNullArgument ("sound::low_level::SoundSystem::CreateDevice", "configuration_name");
@@ -280,10 +280,10 @@ ISoundDevice* SoundSystemImpl::CreateDevice (const char* configuration_name, con
                           
   Configuration& cfg = cfg_iter->second;
 
-  return cfg.driver_iter->second (cfg.driver_name.c_str (), cfg.device_name.c_str (), init_string);  
+  return cfg.driver_iter->second (cfg.driver_name.c_str (), cfg.device_name.c_str (), window_handle, init_string);  
 }
     
-ISoundDevice* SoundSystemImpl::CreateDevice (const char* driver_name, const char* device_name, const char* init_string)
+ISoundDevice* SoundSystemImpl::CreateDevice (const char* driver_name, const char* device_name, const void* window_handle, const char* init_string)
 {
   if (!driver_name)
     RaiseNullArgument ("sound::low_level::SoundSystemImpl::CreateDevice", "driver_name");
@@ -291,7 +291,7 @@ ISoundDevice* SoundSystemImpl::CreateDevice (const char* driver_name, const char
   if (!device_name)
     RaiseNullArgument ("sound::low_level::SoundSystemImpl::CreateDevice", "device_name");
 
-  return CreateDevice (GetConfigurationName (driver_name, device_name).c_str (), init_string);
+  return CreateDevice (GetConfigurationName (driver_name, device_name).c_str (), window_handle, init_string);
 }
 
 /*
@@ -372,12 +372,12 @@ const char* SoundSystem::FindConfiguration (const char* driver_mask, const char*
   return SoundSystemSingleton::Instance ().FindConfiguration (driver_mask, device_mask);
 }
 
-ISoundDevice* SoundSystem::CreateDevice (const char* driver_name, const char* device_name, const char* init_string)
+ISoundDevice* SoundSystem::CreateDevice (const char* driver_name, const char* device_name, const void* window_handle, const char* init_string)
 {
-  return SoundSystemSingleton::Instance ().CreateDevice (driver_name, device_name, init_string);
+  return SoundSystemSingleton::Instance ().CreateDevice (driver_name, device_name, window_handle, init_string);
 }
 
-ISoundDevice* SoundSystem::CreateDevice (const char* configuration_name, const char* init_string)
+ISoundDevice* SoundSystem::CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string)
 {
-  return SoundSystemSingleton::Instance ().CreateDevice (configuration_name, init_string);
+  return SoundSystemSingleton::Instance ().CreateDevice (configuration_name, window_handle, init_string);
 }
