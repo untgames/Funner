@@ -24,7 +24,8 @@ struct OpenALExceptionTag;
 
 typedef common::DerivedException<common::Exception, OpenALExceptionTag> OpenALException;
 
-const float BUFFER_UPDATE_TIME = 0.5;
+//const float BUFFER_UPDATE_TIME = 0.5;
+const float BUFFER_UPDATE_TIME = 0.05;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Cистема воспроизведения звука, реализованная через OpenAL

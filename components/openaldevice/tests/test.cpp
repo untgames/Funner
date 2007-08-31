@@ -7,6 +7,7 @@
 #include <sound/openal_device.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/bind.h>
+#include <xtl/connection.h>
 
 using namespace math;
 using namespace syslib;
@@ -74,6 +75,11 @@ void TimerHandler (ISoundDevice* sound_system, Timer&)
   sound_system->SetSource (1, source);
 }
 
+void idle ()
+{
+//  Application::Sleep (100);
+}
+
 int main ()
 {
   try
@@ -132,6 +138,8 @@ int main ()
 
     Timer timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),
           timer2 (bind (&Application::Exit, 0), TEST_WORK_TIME);
+          
+//    xtl::auto_connection c = Application::RegisterEventHandler (ApplicationEvent_OnIdle, &idle);
 
     Application::Run ();
   }
