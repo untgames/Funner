@@ -1,42 +1,20 @@
 #include "shared.h"
 
 using namespace medialib::geometry;
+using namespace medialib;
 using namespace stl;
 using namespace common;
 
 const size_t DEFAULT_MESH_ARRAY_RESERVE = 32;
 
 /*
-    Обёртка над мешем
-*/
-
-namespace
-{
-
-struct MeshWrapper: public Mesh
-{
-  MeshWrapper (const Mesh& mesh, CloneMode in_clone_mode) : Mesh (mesh, in_clone_mode), clone_mode (in_clone_mode) {}
-  MeshWrapper (const MeshWrapper& wrapper) : Mesh (wrapper, CloneMode_Instance), clone_mode (wrapper.clone_mode) {}
-
-  MeshWrapper& operator = (const MeshWrapper& wrapper)
-  {
-    Assign (wrapper, CloneMode_Instance);
-    clone_mode = wrapper.clone_mode;
-    return *this;
-  }
-
-  CloneMode clone_mode;
-};
-
-}
-
-/*
     Описание реализации меш-модели
 */
 
-typedef vector<MeshWrapper> MeshArray;
+typedef SharedResourceHolder<Mesh> MeshHolder;
+typedef vector<MeshHolder>         MeshArray;
 
-struct MeshModel::Impl: public InstanceResource
+struct MeshModel::Impl: public SharedResource
 {
   string    name;   //имя модели
   MeshArray meshes; //массив мешей
@@ -60,7 +38,7 @@ MeshModel::Impl::Impl (const Impl& impl)
   meshes.reserve (impl.meshes.size ());
   
   for (MeshArray::const_iterator i=impl.meshes.begin (), end=impl.meshes.end (); i!=end; ++i)
-    meshes.push_back (MeshWrapper (*i, i->clone_mode));
+    meshes.push_back (MeshHolder (*i, ForceClone));
 }
 
 /*
@@ -135,7 +113,7 @@ const Mesh& MeshModel::Mesh (size_t index) const
   if (index >= impl->meshes.size ())
     RaiseOutOfRange ("medialib::geometry::MeshModel::Mesh", "index", index, impl->meshes.size ());
     
-  return impl->meshes [index];
+  return impl->meshes [index].Resource ();
 }
 
 Mesh& MeshModel::Mesh (size_t index)
@@ -149,18 +127,7 @@ Mesh& MeshModel::Mesh (size_t index)
 
 size_t MeshModel::Attach (medialib::geometry::Mesh& mesh, CloneMode mode)
 {
-  switch (mode)
-  {
-    case CloneMode_Instance:
-    case CloneMode_Copy:
-    case CloneMode_Source:
-      break;
-    default:
-      RaiseInvalidArgument ("medialib::geometry::Mesh::Attach", "mode", mode);
-      break;
-  }
-
-  impl->meshes.push_back (MeshWrapper (mesh, mode));
+  impl->meshes.push_back (MeshHolder (mesh, mode));
 
   return impl->meshes.size () - 1;
 }

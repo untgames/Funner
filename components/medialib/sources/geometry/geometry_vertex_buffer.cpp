@@ -1,41 +1,24 @@
 #include "shared.h"
 
 using namespace medialib::geometry;
+using namespace medialib;
 using namespace common;
 
 const size_t DEFAULT_VERTEX_ARRAY_RESERVE = 4; //резервируемый размер вершинного массива
 
 /*
-    ќбЄртка дл€ хранени€ вершинных массивов
-*/
-
-class VertexStreamWrapper: public VertexStream
-{
-  public:
-    VertexStreamWrapper (const VertexStreamWrapper& vs) : VertexStream (vs, CloneMode_Instance), clone_mode (vs.clone_mode) {}
-    VertexStreamWrapper (const VertexStream& vs, CloneMode mode) : VertexStream (vs, mode), clone_mode (mode) {}
-
-    VertexStreamWrapper& operator = (const VertexStreamWrapper& vs)
-    {
-      Assign (vs, CloneMode_Instance);
-      clone_mode = vs.clone_mode;
-      return *this;
-    }
-
-    CloneMode clone_mode; //режим копировани€
-};
-
-/*
     ќписание реализации VertexBuffer
 */
 
-typedef stl::vector<VertexStreamWrapper> VertexStreamArray;
+typedef SharedResourceHolder<VertexStream>       VertexStreamHolder;
+typedef SharedResourceHolder<VertexWeightStream> VertexWeightStreamHolder;
+typedef stl::vector<VertexStreamHolder>          VertexStreamArray;
 
-struct VertexBuffer::Impl: public InstanceResource
+struct VertexBuffer::Impl: public SharedResource
 {
-  VertexStreamArray  streams;   //вершинные массивы
-  VertexWeightStream weights;   //массив весов
-  
+  VertexStreamArray        streams;   //вершинные массивы
+  VertexWeightStreamHolder weights;   //массив весов
+
   Impl ();
   Impl (const Impl&);
 };
@@ -50,12 +33,12 @@ VertexBuffer::Impl::Impl ()
 }
   
 VertexBuffer::Impl::Impl (const Impl& impl)
-  : weights (impl.weights)
+  : weights (impl.weights, ForceClone)
 {
   streams.reserve (impl.streams.size ());
 
   for (VertexStreamArray::const_iterator i=impl.streams.begin (), end=impl.streams.end (); i!=end; ++i)
-    streams.push_back (VertexStreamWrapper (*i, i->clone_mode));
+    streams.push_back (VertexStreamHolder (*i, ForceClone));
 }
 
 /*
@@ -109,7 +92,7 @@ const VertexStream& VertexBuffer::Stream (size_t index) const
   if (index >= impl->streams.size ())
     RaiseOutOfRange ("medialib::geometry::VertexBuffer::Stream", "index", index, impl->streams.size ());
     
-  return impl->streams [index];
+  return impl->streams [index].Resource ();
 }
 
 VertexStream& VertexBuffer::Stream (size_t index)
@@ -123,12 +106,12 @@ VertexStream& VertexBuffer::Stream (size_t index)
 
 const VertexWeightStream& VertexBuffer::Weights () const
 {
-  return impl->weights;
+  return impl->weights.Resource ();
 }
 
 VertexWeightStream& VertexBuffer::Weights ()
 {
-  return impl->weights;
+  return impl->weights.Resource ();
 }
 
 /*
@@ -141,14 +124,13 @@ size_t VertexBuffer::Attach (VertexStream& vs, CloneMode mode)
   {
     case CloneMode_Copy:
     case CloneMode_Instance:
-    case CloneMode_Source:
       break;
     default:
       RaiseInvalidArgument ("medialib::geometry::VertexBuffer::Attach", "mode", mode);
       break;
   }
 
-  impl->streams.push_back (VertexStreamWrapper (vs, mode));
+  impl->streams.push_back (VertexStreamHolder (vs, mode));
 
   return impl->streams.size () - 1;
 }
@@ -168,7 +150,7 @@ void VertexBuffer::AttachWeights (VertexWeightStream& vws, CloneMode mode)
 
 void VertexBuffer::DetachWeights ()
 {
-  VertexWeightStream ().Swap (impl->weights);
+  impl->weights.Assign (VertexWeightStream (), CloneMode_Instance);
 }
 
 void VertexBuffer::Clear ()
@@ -190,7 +172,7 @@ size_t VertexBuffer::VerticesCount () const
   
   for (VertexStreamArray::iterator i=impl->streams.begin (), end=impl->streams.end (); i!=end; ++i)
   {
-    size_t size = i->Size ();
+    size_t size = i->Resource ().Size ();
     
     if (size < vertices_count)
       vertices_count = size;
@@ -208,7 +190,7 @@ size_t VertexBuffer::VertexSize () const
   size_t vertex_size = 0;
 
   for (VertexStreamArray::iterator i=impl->streams.begin (), end=impl->streams.end (); i!=end; ++i)
-    vertex_size += i->VertexSize ();
+    vertex_size += i->Resource ().VertexSize ();
     
   return vertex_size;
 }

@@ -1,13 +1,14 @@
 #include "shared.h"
 
 using namespace medialib::geometry;
+using namespace medialib;
 using namespace common;
 
 /*
     Описание реализации вершинного массива
 */
 
-struct VertexStream::Impl: public InstanceResource
+struct VertexStream::Impl: public SharedResource
 {
   VertexFormat format;         //формат вершин
   size_t       vertex_size;    //размер вершины

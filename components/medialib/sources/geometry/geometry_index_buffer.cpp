@@ -1,13 +1,14 @@
 #include "shared.h"
 
 using namespace medialib::geometry;
+using namespace medialib;
 using namespace common;
 
 /*
     Описание реализации индексного буфера
 */
 
-struct IndexBuffer::Impl: public InstanceResource
+struct IndexBuffer::Impl: public SharedResource
 {
   Buffer indices; //массив индексов
 };

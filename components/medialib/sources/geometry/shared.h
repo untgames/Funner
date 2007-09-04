@@ -15,6 +15,7 @@
 #include <common/exception.h>
 
 #include <media/geometry/mesh_model.h>
+#include <shared/shared_resource.h>
 
 namespace medialib
 {
@@ -56,63 +57,6 @@ class Buffer
   private:      
     char *start, *finish, *end_of_storage;
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Инстанцированный ресурс
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct InstanceResource //заменить на SharedResource!!!!!
-{
-  size_t          ref_count;          //счётчик ссылок
-  CloneMode default_clone_mode; //режим инстанцирования по умолчанию
-  
-  InstanceResource () : ref_count (1), default_clone_mode (CloneMode_Copy) {}
-  InstanceResource (const InstanceResource& resource) : ref_count (1), default_clone_mode (resource.default_clone_mode) {}
-
-  private: InstanceResource& operator = (const InstanceResource&); //no impl
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Копирование ресурса
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> T* clone_resource (T* resource, CloneMode mode, const char* source)
-{
-  T* new_resource = 0;
-
-  switch (mode)
-  {
-    case CloneMode_Copy:
-      new_resource = new T (*resource);
-      break;
-    case CloneMode_Instance:
-      new_resource = resource;
-      resource->ref_count++;
-      break;
-    case CloneMode_Source:
-      new_resource = clone_resource (resource, resource->default_clone_mode, source);
-      break;
-    default:
-      common::RaiseInvalidArgument (source, "mode", mode);
-      break;
-  }
-
-  new_resource->default_clone_mode = mode;
-  
-  return new_resource;
-}
-
-template <class T> T* clone_resource (T* resource, const char* source)
-{
-  return clone_resource (source, resource, resource->default_clone_mode);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Освобождение ресурса
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> void release_resource (T* resource)
-{
-  if (!--resource->ref_count)
-    delete resource;
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование массивов атрибутов с преобразованием формата

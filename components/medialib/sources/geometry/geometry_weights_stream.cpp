@@ -1,13 +1,14 @@
 #include "shared.h"
 
 using namespace medialib::geometry;
+using namespace medialib;
 using namespace common;
 
 /*
     Описание реализации массива весов
 */
 
-struct VertexWeightStream::Impl: public InstanceResource
+struct VertexWeightStream::Impl: public SharedResource
 {
   Buffer data_buffer; //буфер данных
 };

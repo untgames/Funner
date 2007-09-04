@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace medialib::geometry;
+using namespace medialib;
 using namespace stl;
 using namespace common;
 
@@ -19,16 +20,18 @@ struct PrimitiveImpl: public Primitive
     Описание реализации Mesh
 */
 
-typedef stl::vector<PrimitiveImpl> PrimitiveArray;
+typedef stl::vector<PrimitiveImpl>         PrimitiveArray;
+typedef SharedResourceHolder<VertexBuffer> VertexBufferHolder;
+typedef SharedResourceHolder<IndexBuffer>  IndexBufferHolder;
 
-struct Mesh::Impl: public InstanceResource
+struct Mesh::Impl: public SharedResource
 {
-  string                 name;                       //имя меша
-  geometry::VertexBuffer vertex_buffer;              //вершинный буфер
-  geometry::IndexBuffer  index_buffer;               //индексный буфер
-  PrimitiveArray         primitives;                 //примитивы
-  string                 material_names;             //имена материалов
-  bool                   need_material_names_update; //необходимо обновить имена материалов
+  string             name;                       //имя меша
+  VertexBufferHolder vertex_buffer;              //вершинный буфер
+  IndexBufferHolder  index_buffer;               //индексный буфер
+  PrimitiveArray     primitives;                 //примитивы
+  string             material_names;             //имена материалов
+  bool               need_material_names_update; //необходимо обновить имена материалов
   
   Impl (); 
   Impl (const Impl&);
@@ -46,8 +49,8 @@ Mesh::Impl::Impl ()
 
 Mesh::Impl::Impl (const Impl& impl)
   : name (impl.name),
-    vertex_buffer (impl.vertex_buffer, CloneMode_Source),
-    index_buffer (impl.index_buffer, CloneMode_Source),
+    vertex_buffer (impl.vertex_buffer, ForceClone),
+    index_buffer (impl.index_buffer, ForceClone),
     primitives (impl.primitives),
     material_names (impl.material_names),
     need_material_names_update (true)
@@ -109,22 +112,22 @@ void Mesh::Rename (const char* name)
 
 const medialib::geometry::VertexBuffer& Mesh::VertexBuffer () const
 {
-  return impl->vertex_buffer;
+  return impl->vertex_buffer.Resource ();
 }
 
 medialib::geometry::VertexBuffer& Mesh::VertexBuffer ()
 {
-  return impl->vertex_buffer;
+  return impl->vertex_buffer.Resource ();
 }
 
 const medialib::geometry::IndexBuffer& Mesh::IndexBuffer () const
 {
-  return impl->index_buffer;
+  return impl->index_buffer.Resource ();
 }
 
 medialib::geometry::IndexBuffer& Mesh::IndexBuffer ()
 {
-  return impl->index_buffer;
+  return impl->index_buffer.Resource ();
 }
 
 /*
@@ -133,17 +136,17 @@ medialib::geometry::IndexBuffer& Mesh::IndexBuffer ()
 
 size_t Mesh::VerticesCount () const
 {
-  return impl->vertex_buffer.VerticesCount ();
+  return impl->vertex_buffer.Resource ().VerticesCount ();
 }
 
 size_t Mesh::IndicesCount () const
 {
-  return impl->index_buffer.Size ();
+  return impl->index_buffer.Resource ().Size ();
 }
 
 size_t Mesh::WeightsCount () const
 {
-  return impl->vertex_buffer.Weights ().Size ();
+  return impl->vertex_buffer.Resource ().Weights ().Size ();
 }
 
 
@@ -163,12 +166,12 @@ void Mesh::Attach (medialib::geometry::IndexBuffer& ib, CloneMode mode)
     
 void Mesh::DetachVertexBuffer ()
 {
-  medialib::geometry::VertexBuffer ().Swap (impl->vertex_buffer);
+  impl->vertex_buffer.Assign (medialib::geometry::VertexBuffer (), CloneMode_Instance);
 }
 
 void Mesh::DetachIndexBuffer ()
 {
-  medialib::geometry::IndexBuffer ().Swap (impl->index_buffer);
+  impl->index_buffer.Assign (medialib::geometry::IndexBuffer (), CloneMode_Instance);
 }
 
 void Mesh::DetachAllBuffers ()
