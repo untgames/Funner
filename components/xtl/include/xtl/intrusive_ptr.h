@@ -149,6 +149,18 @@ template <class T> class com_ptr: public intrusive_ptr<T, com_intrusive_strategy
 template <class T>
 void swap (com_ptr<T>&, com_ptr<T>&);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Приведение типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T1, class T2>
+com_ptr<T1> static_pointer_cast (const com_ptr<T2>&);
+
+template <class T1, class T2>
+com_ptr<T1> const_pointer_cast (const com_ptr<T2>&);
+
+template <class T1, class T2>
+com_ptr<T1> dynamic_pointer_cast (const com_ptr<T2>&);
+
 #include <xtl/detail/intrusive_ptr.inl>
 
 }

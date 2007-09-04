@@ -299,3 +299,25 @@ inline void swap (com_ptr<T>& p1, com_ptr<T>& p2)
 {
   p1.swap (p2);  
 }  
+
+/*
+    Приведение типов
+*/
+
+template <class T1, class T2>
+inline com_ptr<T1> static_pointer_cast (const com_ptr<T2>& p)
+{
+  return static_cast<T1*> (p.get ());
+}
+
+template <class T1, class T2>
+inline com_ptr<T1> const_pointer_cast (const com_ptr<T2>& p)
+{
+  return const_cast<T1*> (p.get ());
+}
+
+template <class T1, class T2>
+inline com_ptr<T1> dynamic_pointer_cast (const com_ptr<T2>& p)
+{
+  return dynamic_cast<T1*> (p.get ());
+}
