@@ -1,0 +1,145 @@
+#include "shared.h"
+
+using namespace medialib::rfx;
+using namespace medialib;
+using namespace stl;
+using namespace common;
+
+/*
+    Описание реализации Shader
+*/
+
+typedef bitset<ShaderPin_Num> PinSet;
+
+struct Shader::Impl
+{
+  size_t ref_count; //счётчик ссылок
+  string name;      //имя
+  size_t name_hash; //хэш имени
+  PinSet pins;      //пины
+  
+  Impl ();
+  Impl (const Impl&);
+};
+
+/*
+    Impl::Impl
+*/
+
+Shader::Impl::Impl ()
+  : ref_count (1), name_hash (strhash (""))
+  {}
+
+Shader::Impl::Impl (const Impl& impl)
+  : ref_count (1), name (impl.name), name_hash (impl.name_hash), pins (impl.pins)
+  {}
+
+/*
+    Конструкторы / деструктор
+*/
+
+Shader::Shader ()
+  : impl (new Impl)
+  {}
+
+Shader::Shader (const Shader& shader)
+  : impl (new Impl (*shader.impl))
+  {}
+
+Shader::~Shader ()
+{
+  delete impl;
+}
+
+/*
+    Имя
+*/
+
+const char* Shader::Name () const
+{
+  return impl->name.c_str ();
+}
+
+size_t Shader::NameHash () const
+{
+  return impl->name_hash;
+}
+
+void Shader::Rename (const char* name)
+{
+  if (!name)
+    RaiseNullArgument ("medialib::rfx::Shader::Rename", "name");
+    
+  impl->name      = name;
+  impl->name_hash = strhash (name);
+}
+
+/*
+    Подсчёт ссылок
+*/
+
+void Shader::AddRef () const
+{
+  impl->ref_count++;
+}
+
+void Shader::Release () const
+{
+  if (!--impl->ref_count)
+    delete impl;
+}
+
+/*
+    Копирование
+*/
+
+Shader::Pointer Shader::Clone (CloneMode mode)
+{
+  switch (mode)
+  {
+    case CloneMode_Instance: return this;
+    case CloneMode_Copy:     return Pointer (CloneCore (), false);
+    default:                 RaiseInvalidArgument ("medialib::rfx::Shader::Clone", "mode", mode);
+  }
+  
+  return 0;
+}
+
+Shader* Shader::CloneCore () const
+{
+  return new Shader (*this);
+}
+
+/*
+    Работа с логическими свойствами
+*/
+
+bool Shader::IsEnabled (ShaderPin pin) const
+{
+  if (pin < 0 || pin >= ShaderPin_Num)
+    RaiseInvalidArgument ("medialib::rfx::Shader::IsEnabled", "pin", pin);
+    
+  return impl->pins.test (pin);
+}
+
+void Shader::SetPin (ShaderPin pin, bool state)
+{
+  if (pin < 0 || pin >= ShaderPin_Num)
+    RaiseInvalidArgument ("medialib::rfx::Shader::SetPin", "pin", pin); 
+    
+  impl->pins.set (pin, state);
+}
+
+/*
+    Динамическая диспетчеризация
+*/
+
+void Shader::Accept (Visitor& visitor)
+{
+  AcceptCore (visitor);
+}
+
+void Shader::AcceptCore (Visitor& visitor)
+{
+  visitor (*this);
+}
