@@ -174,7 +174,7 @@ inline bool bitset<bits>::operator [] (size_t pos) const
 template <size_t bits>
 inline typename bitset<bits>::reference bitset<bits>::operator [] (size_t pos)
 {
-  return reference (word+get_word (pos),get_mask (which_bit (pos)));
+  return reference (&get_word (pos),get_mask (which_bit (pos)));
 }
 
 /*
