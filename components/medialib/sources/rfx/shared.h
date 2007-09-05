@@ -8,9 +8,11 @@
 #include <xtl/visitor.h>
 #include <common/exception.h>
 #include <common/strwrap.h>
+#include <common/singleton.h>
 #include <media/rfx/common_shader.h>
 #include <media/rfx/material_library.h>
 #include <shared/shared_resource.h>
+#include <shared/resource_manager.h>
 
 namespace medialib
 {
@@ -18,7 +20,23 @@ namespace medialib
 namespace rfx
 {
 
-//®вбҐзҐ­ЁҐ Ї® Ја ­ЁжҐ
+/*
+    Система управления материалами
+*/
+
+class MaterialSystemImpl: public ResourceManager<MaterialSystem::LoadHandler, MaterialSystem::SaveHandler>
+{
+  public:
+    MaterialSystemImpl ();
+};
+
+typedef common::Singleton<MaterialSystemImpl> MaterialSystemSingleton;
+
+/*
+    Утилиты    
+*/
+
+//отсечение по границе
 inline float clamp (float value, float min_value, float max_value)
 {
   if (value < min_value) return min_value;

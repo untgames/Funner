@@ -56,7 +56,19 @@ MaterialLibrary::MaterialLibrary ()
 MaterialLibrary::MaterialLibrary (const char* file_name)
   : impl (new Impl)
 {
-//  MaterialLibrarySystemSingleton::Instance ().Load (file_name, *this);
+  if (!file_name)
+    RaiseNullArgument ("medialib::MaterialLibrary::MaterialLibrary", "file_name");
+    
+  try
+  {
+    MaterialSystemSingleton::Instance ().Load (file_name, *this);
+    
+    Rename (file_name);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Raise ("medialib::MaterialLibrary::MaterialLibrary");
+  }
 }
 
 MaterialLibrary::MaterialLibrary (const MaterialLibrary& library)
@@ -156,7 +168,17 @@ void MaterialLibrary::Load (const char* file_name)
 
 void MaterialLibrary::Save (const char* file_name)
 {
-//  MaterialLibrarySystemSingleton::Instance ().Save (file_name, *this);
+  if (!file_name)
+    RaiseNullArgument ("medialib::MaterialLibrary::Save", "file_name");
+    
+  try
+  {
+    MaterialSystemSingleton::Instance ().Save (file_name, *this);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Raise ("medialib::MaterialLibrary::Save");
+  }
 }
 
 /*
