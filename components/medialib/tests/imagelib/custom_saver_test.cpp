@@ -9,7 +9,7 @@ using namespace common;
 
 const char* file_name = "data/pic1.jpg";
 
-void MyPngSaver (const char* file_name, const Image& img, ImagePixelFormat pf)
+void MyPngSaver (const char* file_name, const Image& img)
 {
   FILE* save_file;
 
@@ -27,7 +27,7 @@ void main ()
   {
     printf ("Results of custom saver test:\n");
 
-    ImageSystem::RegisterSaveCodec ("png", &MyPngSaver);
+    ImageSystem::RegisterSaver ("png", &MyPngSaver);
 
     Image image(file_name);
 

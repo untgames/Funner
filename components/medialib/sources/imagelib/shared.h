@@ -1,15 +1,19 @@
 #ifndef IMAGELIB_SHARED_HEADER
 #define IMAGELIB_SHARED_HEADER
 
-#include <common/exception.h>
-#include <common/singleton.h>
+#include <stdarg.h>
+#include <il/il.h>
+#include <il/ilu.h>
 #include <stl/string>
-#include <stl/hash_set>
+#include <stl/vector>
 #include <stl/hash_map>
 #include <xtl/function.h>
+#include <common/exception.h>
+#include <common/singleton.h>
+#include <common/heap.h>
+#include <common/file.h>
 #include <media/image.h>
-
-using medialib::ImagePixelFormat;
+#include <shared/resource_manager.h>
 
 namespace medialib
 {
@@ -30,216 +34,82 @@ class ImageImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const char* Name   () const;
-    virtual void        Rename (const char* new_name);
+    const char* Name   ();
+    void        Rename (const char* new_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Формат данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual ImagePixelFormat Format () const = 0;
+    virtual PixelFormat Format () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Преобразование формата
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void Convert (ImagePixelFormat new_format) = 0;
+    virtual void Convert (PixelFormat new_format) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t Width  () const = 0;
-    virtual size_t Height () const = 0;
-    virtual size_t Depth  () const = 0;
+    virtual size_t Width  () = 0;
+    virtual size_t Height () = 0;
+    virtual size_t Depth  () = 0;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение размера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void Resize (size_t width,size_t height,size_t depth) = 0;
+    virtual void Resize (size_t width, size_t height, size_t depth) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с образом картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void* Bitmap   (size_t z) = 0;
+    virtual void* Bitmap (size_t z) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование образа с автоматическим преобразованием формата
-///////////////////////////////////////////////////////////////////////////////////////////////////          
-    virtual void PutImage (size_t x,size_t y,size_t z,size_t width,size_t height,size_t depth,ImagePixelFormat format,const void* data) = 0;
-    virtual void GetImage (size_t x,size_t y,size_t z,size_t width,size_t height,size_t depth,ImagePixelFormat format,void* data) = 0;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data) = 0;
+    virtual void GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сохранение картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void Save (const char* file_name,ImagePixelFormat recommended_format) = 0;
+    virtual void Save (const char* file_name) = 0;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Данные
-///////////////////////////////////////////////////////////////////////////////////////////////////
-  private:
-    stl::string str_name;  //Image name
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Непроинициализированная картинка
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class NullImageImpl : public ImageImpl
-{
-  public:
-    NullImageImpl ();
-    ~NullImageImpl ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Переопределение основных функций
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    ImageImpl* Clone ();
-
-    const char* Name   () const;
-    void        Rename (const char* new_name);
-
-    ImagePixelFormat Format () const;
-    
-    void Convert (ImagePixelFormat new_format);
-    
-    size_t Width  () const;
-    size_t Height () const;
-    size_t Depth  () const;
-    
-    void Resize (size_t width,size_t height,size_t depth);
-
-    void* Bitmap   (size_t z);
-
-    void PutImage (size_t x,size_t y,size_t z,size_t width,size_t height,size_t depth,ImagePixelFormat format,const void* data);
-    void GetImage (size_t x,size_t y,size_t z,size_t width,size_t height,size_t depth,ImagePixelFormat format,void* data);
-  
-    void Save (const char* file_name,ImagePixelFormat recommended_format);
-
-  private:
-    void Raise (const char* source) const;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///DevIL картинка
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class DevILImageImpl : public ImageImpl
-{
-  public:
-    DevILImageImpl ();
-    DevILImageImpl (const DevILImageImpl* source);
-    DevILImageImpl (const char* file_name);
-    DevILImageImpl (size_t width,size_t height,size_t depth,ImagePixelFormat format,const void* data);
-    ~DevILImageImpl ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Переопределение основных функций
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    ImageImpl* Clone ();
-
-    ImagePixelFormat Format () const;
-    
-    void Convert (ImagePixelFormat new_format);
-    
-    size_t Width  () const;
-    size_t Height () const;
-    size_t Depth  () const;
-    
-    void Resize (size_t width,size_t height,size_t depth);
-    
-    void* Bitmap   (size_t z);
-      
-    void PutImage (size_t x,size_t y,size_t z,size_t width,size_t height,size_t depth,ImagePixelFormat format,const void* data);
-    void GetImage (size_t x,size_t y,size_t z,size_t width,size_t height,size_t depth,ImagePixelFormat format,void* data);
-      
-    void Save (const char* file_name,ImagePixelFormat recommended_format);
+  protected:
+    ImageImpl  ();
+    ImageImpl  (const ImageImpl&);
     
   private:
-    size_t name;      //IL image name
-};
+    ImageImpl& operator = (const ImageImpl&); //no impl
 
-};
-
-struct CodecLoadFunction
-{
-  medialib::ImageSystem::CodecLoadFunc function;
-  bool in_use;
-};
-
-struct CodecSaveFunction
-{
-  medialib::ImageSystem::CodecSaveFunc function;
-  bool in_use;
+  private:
+    stl::string name; //имя картинки
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация системы картинок
+///Создание реализаций картинок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ImageSystemImpl
+ImageImpl* create_bitmap_image ();
+ImageImpl* create_bitmap_image (size_t width, size_t height, size_t depth, PixelFormat format, const void* data);
+ImageImpl* create_bitmap_image (const char* file_name);
+ImageImpl* create_multilayer_image (size_t count, Image* images, LayersCloneMode clone_mode);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер картинок
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class ImageSystemImpl: public ResourceManager<ImageSystem::LoadHandler, ImageSystem::SaveHandler>
 {
   public:
-    typedef medialib::ImageSystem::DebugLogFunc  DebugLogFunc;
-    typedef medialib::ImageSystem::CodecLoadFunc CodecLoadFunc;
-    typedef medialib::ImageSystem::CodecSaveFunc CodecSaveFunc;
-  
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
     ImageSystemImpl ();
-    ~ImageSystemImpl ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация открытых картинок / закрытие всех открытых картинок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterImage   (medialib::Image&);
-    void UnregisterImage (medialib::Image&);
-    void CloseAllImages  ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка и вызов пользовательской функции лога дебаг-сообщений
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDebugLog (const DebugLogFunc&);
-    void DebugLog    (const char* debug_message);   
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация и получение пользовательских функций загрузки / сохранения картинок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool               RegisterLoadFunc   (const char* extension, const CodecLoadFunc& codec);
-    bool               RegisterSaveFunc   (const char* extension, const CodecSaveFunc& codec);
-    void               UnRegisterLoadFunc (const char* extension);
-    void               UnRegisterSaveFunc (const char* extension);
-    void               UnRegisterAllFuncs ();
-    CodecLoadFunction* GetLoadFunc        (const char* extension);
-    CodecSaveFunction* GetSaveFunc        (const char* extension);
-
-  private:
-    typedef stl::hash_set<medialib::Image*> OpenImageSet;
-    typedef stl::hash_map<stl::string, CodecLoadFunction> LoadCodecs;
-    typedef stl::hash_map<stl::string, CodecSaveFunction> SaveCodecs;
-
-  private:    
-    DebugLogFunc  log_function;   //польовательская функция дебаг-лога
-    OpenImageSet  open_images;    //список открытых картинок
-    LoadCodecs    load_codecs;    //список пользовательских функций загрузки
-    SaveCodecs    save_codecs;    //список пользовательских функций сохранения
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Исключения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void RaiseException (const char* source, const char* description);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск расширения в имени файла
-///////////////////////////////////////////////////////////////////////////////////////////////////
-const char* GetExtension (const char* file_name);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск индекса последнего вхождения '/'
-///////////////////////////////////////////////////////////////////////////////////////////////////
-size_t GetFolder (const char* file_name);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Синглтон файловой системы
-///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef common::Singleton<ImageSystemImpl> ImageSystemSingleton;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обеспечение инициализации DevIL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void devil_init ();
+
+}
 
 #endif

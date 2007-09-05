@@ -8,19 +8,19 @@ using namespace medialib;
 using namespace common;
 using stl::string;
 
-size_t GetBpp (ImagePixelFormat pf)
+size_t GetBpp (PixelFormat pf)
 {
   switch (pf)
   {
-    case PF_RGB8:   return 3;
-    case PF_RGB16:  return 4;
-    case PF_BGR8:   return 3;
-    case PF_RGBA8:  return 4;
-    case PF_RGBA16: return 8;
-    case PF_BGRA8:  return 4;
-    case PF_L8:     return 1;
-    case PF_A8:     return 1;
-    case PF_LA8:    return 2;
+    case PixelFormat_RGB8:   return 3;
+    case PixelFormat_RGB16:  return 4;
+    case PixelFormat_BGR8:   return 3;
+    case PixelFormat_RGBA8:  return 4;
+    case PixelFormat_RGBA16: return 8;
+    case PixelFormat_BGRA8:  return 4;
+    case PixelFormat_L8:     return 1;
+    case PixelFormat_A8:     return 1;
+    case PixelFormat_LA8:    return 2;
     default: printf ("Unknown pixel format\n"); return 0;  
   }
 }
