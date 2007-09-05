@@ -148,7 +148,7 @@ filepos_t File::Seek (filepos_t pos,FileSeekMode seek_mode)
   {
     case FILE_SEEK_SET: position = pos; break;
     case FILE_SEEK_CUR: position = impl->Tell () + pos; break;
-    case FILE_SEEK_END: position = impl->Size () - pos; break;
+    case FILE_SEEK_END: position = impl->Size () + pos; break;
     default:            RaiseInvalidArgument ("File::Seek","seek_mode",seek_mode);
   }
 
