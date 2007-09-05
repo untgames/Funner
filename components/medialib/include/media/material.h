@@ -1,2 +1,2 @@
-#include <media/rfx/material.h>
+#include <media/rfx/material_library.h>
 #include <media/rfx/common_shader.h>

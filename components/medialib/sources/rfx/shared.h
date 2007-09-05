@@ -8,9 +8,8 @@
 #include <xtl/visitor.h>
 #include <common/exception.h>
 #include <common/strwrap.h>
-#include <media/material.h>
 #include <media/rfx/common_shader.h>
-#include <media/rfx/texmap.h>
+#include <media/rfx/material_library.h>
 #include <shared/shared_resource.h>
 
 namespace medialib
