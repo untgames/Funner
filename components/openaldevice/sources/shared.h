@@ -21,6 +21,7 @@ namespace low_level
 {
 
 struct OpenALExceptionTag;
+class  OpenALContext;
 
 typedef common::DerivedException<common::Exception, OpenALExceptionTag> OpenALException;
 
@@ -28,6 +29,30 @@ const float  BUFFER_UPDATE_TIME = 0.3f;
 const float  BUFFER_TIME = 0.5f;
 const size_t MAX_SOUND_FREQUENCY = 48000;
 const size_t MAX_SOUND_CHANNELS  = 2;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Источник звука OpenAL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct OpenALSource
+{
+  OpenALSource  (OpenALContext* in_context, char* in_buffer);
+  ~OpenALSource ();
+
+  medialib::SoundSample sound_sample;    //звук
+  Source      source;          //общий источник звука
+  bool        looping;         //зацикленность
+  bool        playing;         //источник играет
+  bool        play_from_start; //нужно ли делать rewind при вызове play
+  size_t      name;            //имя источника в OpenAL
+  size_t      buffer_name[2];  //OpenAL буффер
+  size_t      buffer_samples;  //количество сэмплов в буффере
+  size_t      last_sample;     //номер последнего прочитанного сэмпла
+  size_t      start_sample;    //номер начального сэмпла проигрывания
+  clock_t     play_start_time; //время последнего seek
+  size_t      first_buffer;    //номер первого в очереди буффера    
+  char*       buffer;          //указатель на общий буффер декодированного звука
+  OpenALContext *context;      //контекст
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Cистема воспроизведения звука, реализованная через OpenAL
@@ -120,8 +145,17 @@ struct OpenALDevice : public sound::low_level::ISoundDevice
     void UpdateBuffers ();
 
   private:
-    struct Impl;
-    Impl* impl;
+    syslib::Timer          timer;         //таймер обновления буффера
+    OpenALContext*         context;       //контекст
+    float                  gain;          //gain
+    float                  last_gain;     //предыдущий gain
+    bool                   is_muted;      //состояние блокировки проигрывания
+    Capabilities           info;          //информация о устройстве
+    LogHandler             log_handler;   //функция лога
+    Listener               listener;      //слушатель
+    size_t                 ref_count;     //количество ссылок
+    char*                  buffer;        //буффер декодированного звука
+    stl::vector <OpenALSource*> sources;  //источники звука
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,51 +280,6 @@ class OpenALContext
     ALCdevice*  device;       //устройство OpenAL
     ALCcontext* context;      //контекст OpenAL
     LogHandler  log_handler;  //функтор протоколирования
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Источник звука OpenAL
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct OpenALSource
-{
-  OpenALSource  (OpenALContext* in_context, char* in_buffer);
-  ~OpenALSource ();
-
-  medialib::SoundSample sound_sample;    //звук
-  Source      source;          //общий источник звука
-  bool        looping;         //зацикленность
-  bool        playing;         //источник играет
-  bool        play_from_start; //нужно ли делать rewind при вызове play
-  size_t      name;            //имя источника в OpenAL
-  size_t      buffer_name[2];  //OpenAL буффер
-  size_t      buffer_samples;  //количество сэмплов в буффере
-  size_t      last_sample;     //номер последнего прочитанного сэмпла
-  size_t      start_sample;    //номер начального сэмпла проигрывания
-  clock_t     play_start_time; //время последнего seek
-  size_t      first_buffer;    //номер первого в очереди буффера    
-  char*       buffer;          //указатель на общий буффер декодированного звука
-  OpenALContext *context;      //контекст
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание реализации OpenALDevice
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct OpenALDevice::Impl
-{
-  syslib::Timer          timer;         //таймер обновления буффера
-  OpenALContext          context;       //контекст
-  float                  gain;          //gain
-  float                  last_gain;     //предыдущий gain
-  bool                   is_muted;      //состояние блокировки проигрывания
-  Capabilities           info;          //информация о устройстве
-  LogHandler             log_handler;   //функция лога
-  Listener               listener;      //слушатель
-  size_t                 ref_count;     //количество ссылок
-  char*                  buffer;        //буффер декодированного звука
-  stl::vector <OpenALSource*> sources;  //источники звука
-
-  Impl (const char* device_name, OpenALDevice* sound_system);
-  ~Impl ();
 };
 
 }

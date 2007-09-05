@@ -29,15 +29,20 @@ void DefaultLogHandler (const char* log_message)
 
 }
 
-OpenALDevice::Impl::Impl (const char* device_name, OpenALDevice* sound_system)
- : context (device_name, &DefaultLogHandler), log_handler (DefaultLogHandler), is_muted (false), gain (1.f), last_gain (1.f),
-   timer (xtl::bind (&OpenALDevice::UpdateBuffers, sound_system), (size_t)(BUFFER_UPDATE_TIME * 1000)), ref_count (1)
+/*
+    Конструктор / деструктор
+*/
+
+OpenALDevice::OpenALDevice (const char* device_name)
+ : context (new OpenALContext (device_name, &DefaultLogHandler)), log_handler (DefaultLogHandler), is_muted (false), 
+   gain (1.f), last_gain (1.f), timer (xtl::bind (&OpenALDevice::UpdateBuffers, this), (size_t)(BUFFER_UPDATE_TIME * 1000)), 
+   ref_count (1)
 {
     //временный код!!!
 
-  context.MakeCurrent ();
+  context->MakeCurrent ();
 
-  char *extensions = (char*)context.alGetString (AL_EXTENSIONS);
+  char *extensions = (char*)context->alGetString (AL_EXTENSIONS);
   int  compare_value;
 
   info.eax_major_version = 0;
@@ -79,15 +84,18 @@ OpenALDevice::Impl::Impl (const char* device_name, OpenALDevice* sound_system)
     if (alGetError () != AL_NO_ERROR)
     {
       info.channels_count = cur_channel;
-      context.alDeleteSources (cur_channel, temp_sources);
+      context->alDeleteSources (cur_channel, temp_sources);
       break;
     }
   }
   if (!cur_channel)
+  {
+    delete context;
     Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't create no one channel");
+  }
   if (!info.channels_count)
   {
-    context.alDeleteSources (MAX_CHANNELS_COUNT, temp_sources);
+    context->alDeleteSources (MAX_CHANNELS_COUNT, temp_sources);
     info.channels_count = MAX_CHANNELS_COUNT;
   }
 
@@ -95,28 +103,16 @@ OpenALDevice::Impl::Impl (const char* device_name, OpenALDevice* sound_system)
 
   sources.resize (info.channels_count);
   for (size_t i = 0; i < info.channels_count; i++)
-    sources[i] = new OpenALSource (&context, buffer);
+    sources[i] = new OpenALSource (context, buffer);
 }
 
-OpenALDevice::Impl::~Impl ()
+OpenALDevice::~OpenALDevice ()
 {
   for (size_t i = 0; i < info.channels_count; i++)
     delete sources[i];
 
   delete [] buffer;
-}
-
-/*
-    Конструктор / деструктор
-*/
-
-OpenALDevice::OpenALDevice (const char* device_name)
-  : impl (new Impl (device_name, this))
-  {}
-
-OpenALDevice::~OpenALDevice ()
-{
-  delete impl;
+  delete context;
 }
 
 /*
@@ -135,7 +131,7 @@ const char* OpenALDevice::Name ()
 
 void OpenALDevice::GetCapabilities (Capabilities& target_info)
 {
-  target_info = impl->info;
+  target_info = info;
 }
 
 /*
@@ -144,29 +140,29 @@ void OpenALDevice::GetCapabilities (Capabilities& target_info)
 
 size_t OpenALDevice::ChannelsCount ()
 {
-  return impl->info.channels_count;
+  return info.channels_count;
 }
     
 /*
    Установка уровня громкости для устройства
 */
 
-void  OpenALDevice::SetVolume (float gain)
+void  OpenALDevice::SetVolume (float in_gain)
 {
-  if (gain < 0.f || gain > 1.f)
+  if (in_gain < 0.f || in_gain > 1.f)
   {
-    impl->log_handler (format ("Incorrect gain value received (%f). Gain not changed", gain).c_str ());
+    log_handler (format ("Incorrect gain value received (%f). Gain not changed", in_gain).c_str ());
     return;
   }
 
-  impl->gain = gain;
+  gain = in_gain;
 
-  impl->context.alListenerf (AL_GAIN, gain);
+  context->alListenerf (AL_GAIN, in_gain);
 }
 
 float OpenALDevice::GetVolume ()
 {
-  return impl->gain;
+  return gain;
 }
 
 /*
@@ -175,22 +171,22 @@ float OpenALDevice::GetVolume ()
 
 void OpenALDevice::SetMute (bool state)
 {
-  if (impl->is_muted != state)
+  if (is_muted != state)
   {
-    if (impl->is_muted)
-      SetVolume (impl->last_gain);
+    if (is_muted)
+      SetVolume (last_gain);
     else
     {
-      impl->last_gain = impl->gain;
+      last_gain = gain;
       SetVolume (0.f);
     }
   }
-  impl->is_muted = state;
+  is_muted = state;
 }
 
 bool OpenALDevice::IsMuted ()
 {
-  return impl->is_muted;
+  return is_muted;
 }
 
 /*
@@ -199,41 +195,41 @@ bool OpenALDevice::IsMuted ()
 
 void OpenALDevice::SetListener (const Listener& source_listener)
 {
-  impl->listener = source_listener;
+  listener = source_listener;
   float  orientation [6] = {source_listener.direction.x, source_listener.direction.y, source_listener.direction.z, 
                             source_listener.up.x,        source_listener.up.y,        source_listener.up.z};
 
-  impl->context.alListenerfv (AL_POSITION, source_listener.position);
-  impl->context.alListenerfv (AL_VELOCITY, source_listener.velocity);
-  impl->context.alListenerfv (AL_ORIENTATION, orientation);
+  context->alListenerfv (AL_POSITION,    source_listener.position);
+  context->alListenerfv (AL_VELOCITY,    source_listener.velocity);
+  context->alListenerfv (AL_ORIENTATION, orientation);
 }
 
 void OpenALDevice::GetListener (Listener& target_listener)
 {
-  target_listener = impl->listener;
+  target_listener = listener;
 }
 
 /*
    Установка функции отладочного протоколирования
 */
 
-void OpenALDevice::SetDebugLog (const LogHandler& log_handler)
+void OpenALDevice::SetDebugLog (const LogHandler& in_log_handler)
 {
-  impl->log_handler = log_handler;
+  log_handler = in_log_handler;
 }
 
 const OpenALDevice::LogHandler& OpenALDevice::GetDebugLog ()
 {
-  return impl->log_handler;
+  return log_handler;
 }
 
 void OpenALDevice::AddRef ()
 {
-  impl->ref_count++;
+  ref_count++;
 }
 
 void OpenALDevice::Release ()
 {
-  if (!--impl->ref_count)
+  if (!--ref_count)
     delete this;
 }

@@ -143,8 +143,8 @@ OpenALSource::~OpenALSource ()
 
 void OpenALDevice::SetSample (size_t channel, const char* sample_name)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::SetSample", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::SetSample", "channel", channel, info.channels_count);
     
   if (!sample_name)
     RaiseNullArgument ("OpenALDevice::SetSample", "sample_name");
@@ -155,23 +155,23 @@ void OpenALDevice::SetSample (size_t channel, const char* sample_name)
 
   try
   {
-    impl->sources[channel]->sound_sample.Load (sample_name);
+    sources[channel]->sound_sample.Load (sample_name);
     
-    if (impl->sources[channel]->sound_sample.BitsPerSample () != 16)
-      RaiseNotSupported ("OpenALDevice::SetSample", "Supported only 16 bit audio depth, sample depth - %u.", impl->sources[channel]->sound_sample.BitsPerSample ());
-    if (impl->sources[channel]->sound_sample.Channels () > 2 || !impl->sources[channel]->sound_sample.Channels ())
-      RaiseNotSupported ("OpenALDevice::SetSample", "Supported only mono and stereo sources, sample has %u channels.", impl->sources[channel]->sound_sample.Channels ());
+    if (sources[channel]->sound_sample.BitsPerSample () != 16)
+      RaiseNotSupported ("OpenALDevice::SetSample", "Supported only 16 bit audio depth, sample depth - %u.", sources[channel]->sound_sample.BitsPerSample ());
+    if (sources[channel]->sound_sample.Channels () > 2 || !sources[channel]->sound_sample.Channels ())
+      RaiseNotSupported ("OpenALDevice::SetSample", "Supported only mono and stereo sources, sample has %u channels.", sources[channel]->sound_sample.Channels ());
 
-    impl->sources[channel]->buffer_samples = (size_t)(BUFFER_TIME * impl->sources[channel]->sound_sample.Frequency ());
+    sources[channel]->buffer_samples = (size_t)(BUFFER_TIME * sources[channel]->sound_sample.Frequency ());
   }
   catch (std::exception& exception)
   {                                               
-    impl->log_handler (format ("Can't load file '%s'. Exception: '%s'.", sample_name, exception.what ()).c_str());
+    log_handler (format ("Can't load file '%s'. Exception: '%s'.", sample_name, exception.what ()).c_str());
     return;
   }                                               
   catch (...)
   {
-    impl->log_handler (format ("Can't load file '%s'. Unknown exception.", sample_name).c_str());
+    log_handler (format ("Can't load file '%s'. Unknown exception.", sample_name).c_str());
     return;
   }
 
@@ -181,10 +181,10 @@ void OpenALDevice::SetSample (size_t channel, const char* sample_name)
 
 const char* OpenALDevice::GetSample (size_t channel)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::GetSample", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::GetSample", "channel", channel, info.channels_count);
     
-  return impl->sources[channel]->sound_sample.Name ();
+  return sources[channel]->sound_sample.Name ();
 }
 
 /*
@@ -193,10 +193,10 @@ const char* OpenALDevice::GetSample (size_t channel)
 
 bool OpenALDevice::IsLooped (size_t channel)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::IsLooped", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::IsLooped", "channel", channel, info.channels_count);
     
-  return impl->sources[channel]->looping; 
+  return sources[channel]->looping; 
 }
     
 /*
@@ -205,29 +205,29 @@ bool OpenALDevice::IsLooped (size_t channel)
 
 void OpenALDevice::SetSource (size_t channel, const Source& source_source)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::SetSource", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::SetSource", "channel", channel, info.channels_count);
     
-  impl->sources[channel]->source = source_source;
+  sources[channel]->source = source_source;
 
-  impl->context.alSourcefv (impl->sources[channel]->name, AL_POSITION, source_source.position);
-  impl->context.alSourcefv (impl->sources[channel]->name, AL_DIRECTION, source_source.direction);
-  impl->context.alSourcefv (impl->sources[channel]->name, AL_VELOCITY, source_source.velocity);
-  impl->context.alSourcef  (impl->sources[channel]->name, AL_GAIN, source_source.gain);
-  impl->context.alSourcef  (impl->sources[channel]->name, AL_MIN_GAIN, source_source.minimum_gain);
-  impl->context.alSourcef  (impl->sources[channel]->name, AL_MAX_GAIN, source_source.maximum_gain);
-  impl->context.alSourcef  (impl->sources[channel]->name, AL_CONE_INNER_ANGLE, source_source.inner_angle);
-  impl->context.alSourcef  (impl->sources[channel]->name, AL_CONE_OUTER_ANGLE, source_source.outer_angle);
-  impl->context.alSourcef  (impl->sources[channel]->name, AL_CONE_OUTER_GAIN, source_source.outer_gain);
-  impl->context.alSourcef  (impl->sources[channel]->name, AL_REFERENCE_DISTANCE, source_source.reference_distance);
+  context->alSourcefv (sources[channel]->name, AL_POSITION, source_source.position);
+  context->alSourcefv (sources[channel]->name, AL_DIRECTION, source_source.direction);
+  context->alSourcefv (sources[channel]->name, AL_VELOCITY, source_source.velocity);
+  context->alSourcef  (sources[channel]->name, AL_GAIN, source_source.gain);
+  context->alSourcef  (sources[channel]->name, AL_MIN_GAIN, source_source.minimum_gain);
+  context->alSourcef  (sources[channel]->name, AL_MAX_GAIN, source_source.maximum_gain);
+  context->alSourcef  (sources[channel]->name, AL_CONE_INNER_ANGLE, source_source.inner_angle);
+  context->alSourcef  (sources[channel]->name, AL_CONE_OUTER_ANGLE, source_source.outer_angle);
+  context->alSourcef  (sources[channel]->name, AL_CONE_OUTER_GAIN, source_source.outer_gain);
+  context->alSourcef  (sources[channel]->name, AL_REFERENCE_DISTANCE, source_source.reference_distance);
 }
 
 void OpenALDevice::GetSource (size_t channel, Source& target_source)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::GetSource", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::GetSource", "channel", channel, info.channels_count);
     
-  target_source = impl->sources[channel]->source;
+  target_source = sources[channel]->source;
 }
 
 /*
@@ -236,102 +236,102 @@ void OpenALDevice::GetSource (size_t channel, Source& target_source)
 
 void OpenALDevice::Play (size_t channel, bool looping)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::Play", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::Play", "channel", channel, info.channels_count);
     
-  impl->sources[channel]->looping = looping;
-  impl->sources[channel]->playing = true;
+  sources[channel]->looping = looping;
+  sources[channel]->playing = true;
 
-  if (impl->sources[channel]->play_from_start)
+  if (sources[channel]->play_from_start)
     Seek (channel, 0);
 
-  impl->sources[channel]->play_from_start = true;
-  impl->sources[channel]->play_start_time = clock ();
-  impl->context.alSourcePlay (impl->sources[channel]->name);
+  sources[channel]->play_from_start = true;
+  sources[channel]->play_start_time = clock ();
+  context->alSourcePlay (sources[channel]->name);
 }
 
 void OpenALDevice::Pause (size_t channel)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::Pause", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::Pause", "channel", channel, info.channels_count);
     
-  impl->sources[channel]->playing = false;
+  sources[channel]->playing = false;
 
-  impl->context.alSourcePause (impl->sources[channel]->name);
+  context->alSourcePause (sources[channel]->name);
 }
 
 void OpenALDevice::Stop (size_t channel)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::Stop", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::Stop", "channel", channel, info.channels_count);
     
-  impl->sources[channel]->play_from_start = true;
-  impl->sources[channel]->playing = false;
-  impl->sources[channel]->looping = false;
+  sources[channel]->play_from_start = true;
+  sources[channel]->playing = false;
+  sources[channel]->looping = false;
 
-  impl->context.alSourceStop (impl->sources[channel]->name);
+  context->alSourceStop (sources[channel]->name);
 }
 
 void OpenALDevice::Seek (size_t channel, float time_in_seconds)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::Seek", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::Seek", "channel", channel, info.channels_count);
 
-  if (time_in_seconds >= impl->sources[channel]->sound_sample.SamplesToSeconds (impl->sources[channel]->sound_sample.SamplesCount ()))
+  if (time_in_seconds >= sources[channel]->sound_sample.SamplesToSeconds (sources[channel]->sound_sample.SamplesCount ()))
   {
-    impl->log_handler ("Attempting to seek more than sample range. Seeking to begin.");
+    log_handler ("Attempting to seek more than sample range. Seeking to begin.");
     time_in_seconds = 0;
   }
 
-  impl->sources[channel]->last_sample = impl->sources[channel]->start_sample = impl->sources[channel]->sound_sample.SecondsToSamples (time_in_seconds);
+  sources[channel]->last_sample = sources[channel]->start_sample = sources[channel]->sound_sample.SecondsToSamples (time_in_seconds);
 
   int    queued_buffers;
   
-  impl->context.alGetSourcei (impl->sources[channel]->name, AL_BUFFERS_QUEUED, &queued_buffers);
+  context->alGetSourcei (sources[channel]->name, AL_BUFFERS_QUEUED, &queued_buffers);
 
-  impl->context.alSourceUnqueueBuffers (impl->sources[channel]->name, queued_buffers, impl->sources[channel]->buffer_name);
+  context->alSourceUnqueueBuffers (sources[channel]->name, queued_buffers, sources[channel]->buffer_name);
 
-  UpdateSourceBuffer (impl->sources[channel], impl->log_handler, &impl->context);
+  UpdateSourceBuffer (sources[channel], log_handler, context);
 
-  impl->sources[channel]->play_start_time = clock ();
-  impl->sources[channel]->play_from_start = false;
+  sources[channel]->play_start_time = clock ();
+  sources[channel]->play_from_start = false;
 }
 
 float OpenALDevice::Tell (size_t channel)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::Tell", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::Tell", "channel", channel, info.channels_count);
     
   float  offset;
 
-  offset = ((float)(clock () - impl->sources[channel]->play_start_time)) / CLOCKS_PER_SEC + (float)impl->sources[channel]->sound_sample.SamplesToSeconds (impl->sources[channel]->start_sample);
-  offset = fmod (offset, (float)impl->sources[channel]->sound_sample.SamplesToSeconds (impl->sources[channel]->sound_sample.SamplesCount ()));
+  offset = ((float)(clock () - sources[channel]->play_start_time)) / CLOCKS_PER_SEC + (float)sources[channel]->sound_sample.SamplesToSeconds (sources[channel]->start_sample);
+  offset = fmod (offset, (float)sources[channel]->sound_sample.SamplesToSeconds (sources[channel]->sound_sample.SamplesCount ()));
 
   return offset;
 }
 
 bool OpenALDevice::IsPlaying (size_t channel)
 {
-  if (channel >= impl->info.channels_count)
-    RaiseOutOfRange ("OpenALDevice::IsPlaying", "channel", channel, impl->info.channels_count);
+  if (channel >= info.channels_count)
+    RaiseOutOfRange ("OpenALDevice::IsPlaying", "channel", channel, info.channels_count);
     
-  if (impl->sources[channel]->playing)
+  if (sources[channel]->playing)
   {
     int status = AL_STOPPED;
 
-    impl->context.alGetSourcei (impl->sources[channel]->name, AL_SOURCE_STATE, &status);
+    context->alGetSourcei (sources[channel]->name, AL_SOURCE_STATE, &status);
 
     if (status == AL_PLAYING)
       return true;
-    else if (Tell (channel) > impl->sources[channel]->sound_sample.SamplesToSeconds (impl->sources[channel]->sound_sample.SamplesCount ()))
+    else if (Tell (channel) > sources[channel]->sound_sample.SamplesToSeconds (sources[channel]->sound_sample.SamplesCount ()))
     {
-      impl->sources[channel]->playing = false;
+      sources[channel]->playing = false;
       return false;
     }
     else
     {
-      impl->sources[channel]->play_from_start = false;
-      Play (channel, impl->sources[channel]->looping);
+      sources[channel]->play_from_start = false;
+      Play (channel, sources[channel]->looping);
       return true;
     }
   }
@@ -341,11 +341,11 @@ bool OpenALDevice::IsPlaying (size_t channel)
 
 void OpenALDevice::UpdateBuffers ()
 {
-  for (size_t i = 0; i < impl->sources.size (); i++)
+  for (size_t i = 0; i < sources.size (); i++)
   {
-    if (impl->sources[i]->playing)
+    if (sources[i]->playing)
     {
-      UpdateSourceBuffer (impl->sources[i], impl->log_handler, &impl->context);
+      UpdateSourceBuffer (sources[i], log_handler, context);
       IsPlaying (i);
     }
   }
