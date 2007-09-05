@@ -80,21 +80,19 @@ class MeshModel
 void swap (MeshModel&, MeshModel&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Система управления меш-моделями
+///Система управления мешами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class MeshModelSystem
+class MeshSystem
 {
   public:
-    typedef xtl::function<void (const char*,       MeshModel&)> LoadFunction;
-    typedef xtl::function<void (const char*, const MeshModel&)> SaveFunction;
+    typedef xtl::function<void (const char*,       MeshModel&)> LoadHandler;
+    typedef xtl::function<void (const char*, const MeshModel&)> SaveHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с пользовательскими функциями загрузки и сохранения
-///  Register* возвращает true при успешной регистрации, и false,  если такое расширение уже
-///  зарегестрировано
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static bool RegisterLoader   (const char* extension, const LoadFunction& loader);
-    static bool RegisterSaver    (const char* extension, const SaveFunction& saver);
+    static void RegisterLoader   (const char* extension, const LoadHandler& loader);
+    static void RegisterSaver    (const char* extension, const SaveHandler& saver);
     static void UnregisterLoader (const char* extension);
     static void UnregisterSaver  (const char* extension);
     static void UnregisterAll    ();  

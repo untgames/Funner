@@ -56,7 +56,19 @@ MeshModel::MeshModel ()
 MeshModel::MeshModel (const char* file_name)
   : impl (new Impl)
 {
-  MeshModelSystemSingleton::Instance ().Load (file_name, *this);
+  if (!file_name)
+    RaiseNullArgument ("medialib::MeshModel::MeshModel", "file_name");
+
+  try
+  {
+    MeshSystemSingleton::Instance ().Load (file_name, *this);
+    
+    Rename (file_name);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Raise ("medialib::MeshModel::MeshModel");
+  }
 }
 
 MeshModel::MeshModel (const MeshModel& model)
@@ -156,7 +168,14 @@ void MeshModel::Load (const char* file_name)
 
 void MeshModel::Save (const char* file_name)
 {
-  MeshModelSystemSingleton::Instance ().Save (file_name, *this);
+  try
+  {
+    MeshSystemSingleton::Instance ().Save (file_name, *this);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Raise ("medialib::MeshModel::Save");
+  }
 }
 
 /*

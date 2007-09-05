@@ -16,6 +16,7 @@
 
 #include <media/geometry/mesh_model.h>
 #include <shared/shared_resource.h>
+#include <shared/resource_manager.h>
 
 namespace medialib
 {
@@ -67,43 +68,13 @@ void copy (size_t vertices_count, const void* source, VertexAttributeType source
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Система управления меш-моделями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class MeshModelSystemImpl
+class MeshSystemImpl: public ResourceManager<MeshSystem::LoadHandler, MeshSystem::SaveHandler>
 {
   public:
-    typedef MeshModelSystem::LoadFunction LoadFunction;
-    typedef MeshModelSystem::SaveFunction SaveFunction;
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    MeshModelSystemImpl ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация пользовательских функций загрузки / сохранения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool RegisterLoader       (const char* extension, const LoadFunction& loader);
-    bool RegisterSaver        (const char* extension, const SaveFunction& saver);
-    void UnregisterLoader     (const char* extension);
-    void UnregisterSaver      (const char* extension);
-    void UnregisterAllLoaders ();
-    void UnregisterAllSavers  ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Загрузка / сохранение моделей
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Load (const char* file_name, MeshModel& model) const;
-    void Save (const char* file_name, const MeshModel& model) const;
-
-  private:
-    typedef stl::hash_map<stl::hash_key<const char*>, LoadFunction> LoadFunctions;
-    typedef stl::hash_map<stl::hash_key<const char*>, SaveFunction> SaveFunctions;
-    
-  private:
-    LoadFunctions loaders;
-    SaveFunctions savers;
+    MeshSystemImpl ();
 };
 
-typedef common::Singleton<MeshModelSystemImpl> MeshModelSystemSingleton;
+typedef common::Singleton<MeshSystemImpl> MeshSystemSingleton;
 
 }
 
