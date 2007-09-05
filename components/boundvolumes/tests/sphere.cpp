@@ -32,7 +32,7 @@ void main()
    printf("sphere created by vector and radius constructor\n");
    dump(sph2);
    
-   printf("empty=%d\n",sph1.empty(0.01));
+   printf("empty=%d\n",sph1.empty(0.01f));
    sph1.set_radius(5);
    sph1.set_center(vec3f(10,10,30));
    printf("set sphere properties\n");
@@ -47,11 +47,11 @@ void main()
 
    printf("intersects=%d\n",sph1.intersects(sph2));
    
-   box=sph1*translatef (10, 20, 30);
+/*   box=sph1*translatef (10, 20, 30);
    printf ("muliply on matrix\n");
    dump (box);
 
    box=sph1*fromAxisAnglef (deg2rad (90.0f), 1, 0, 0);
    printf ("\nmultiply on quaternion\n");
-   dump (box);
+   dump (box);*/
 }
