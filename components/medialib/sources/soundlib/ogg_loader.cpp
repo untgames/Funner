@@ -46,13 +46,19 @@ size_t OggReadFunc (void* data, size_t size, size_t count, void* file_ptr)
 
 int OggSeekFunc (void* file_ptr, ogg_int64_t offset, int origin)
 {
-  int ret_value = 1;
   FileSeekMode seek_mode[3] = {FILE_SEEK_SET, FILE_SEEK_CUR, FILE_SEEK_END};
 
   try
   {
-     int cur_pos = ((File*)file_ptr)->Tell ();
-     cur_pos == ((File*)file_ptr)->Seek ((filepos_t)offset, seek_mode[origin]) ? ret_value = 0 : ret_value = 1;
+     filepos_t seek_pos;
+
+     switch (seek_mode[origin])
+     {
+       case FILE_SEEK_SET: seek_pos = (filepos_t)offset; break;
+       case FILE_SEEK_CUR: seek_pos = ((StdFile*)file_ptr)->Tell () + (filepos_t)offset; break;
+       case FILE_SEEK_END: seek_pos = ((StdFile*)file_ptr)->Size () + (filepos_t)offset; break;
+     } 
+     return seek_pos != ((StdFile*)file_ptr)->Seek ((filepos_t)offset, seek_mode[origin]);  
   }
   catch (std::exception& exception)
   {
@@ -62,8 +68,7 @@ int OggSeekFunc (void* file_ptr, ogg_int64_t offset, int origin)
   {
     SoundSystemSingleton::Instance ().DebugLog ("Unknown exception at OggSeekFunc.");
   }
-
-  return ret_value;
+  return 1;
 }
 
 int OggCloseFunc (void* file_ptr)
