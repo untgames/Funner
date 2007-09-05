@@ -2,13 +2,13 @@
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-template <class T> class sphere::sphere
+template <class T> sphere<T>::sphere()
 {
    sphere_center=vec_type(0,0,0);
    sphere_radius=0;
 }
 
-template <class T> class sphere::sphere (const vec_type& center, const element_type& radius)
+template <class T> sphere<T>::sphere (const vec_type& center, const element_type& radius)
 {
    sphere_center=center;
    sphere_radius=radius;
@@ -17,31 +17,43 @@ template <class T> class sphere::sphere (const vec_type& center, const element_t
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const vec_type& template <class T> class sphere::center () const
+template <class T>
+const typename sphere<T>::vec_type &sphere<T>::center () const
+{
+   return sphere_center;
+}
+/*template <class T>
+const typename sphere<T>::vec_type& sphere<T>::center () const
 {
    return center;
-}
-element_type    template <class T> class sphere::radius () const;
+} */
+
+template <class T>
+typename sphere<T>::element_type sphere<T>::radius () const
 {
-   return radius;
+   return sphere_radius;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void template <class T> class sphere::set_radius  (const element_type& r)
+template <class T>
+void typename sphere<T>::set_radius  (const element_type& r)
 {
-   radius=r;
+   sphere_radius=r;
 }
-void template <class T> class sphere::set_center  (const vec_type& c)
+
+template <class T>
+void typename sphere<T>::set_center  (const vec_type& c)
 {
-   centre=c;
+   sphere_center=c;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сброс объёма
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void template <class T> class sphere::reset (const vec_type& center = vec_type (0), const element_type& radius = element_type (0))
+template <class T>
+void typename sphere<T>::reset (const vec_type& center = vec_type (0), const element_type& radius = element_type (0))
 {
    sphere_center=center;
    sphere_radius=radius;
@@ -50,23 +62,27 @@ void template <class T> class sphere::reset (const vec_type& center = vec_type (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение статистик ограничивающей сферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-element_type template <class T> class sphere::volume () const //геометрический объём сферы
+template <class T>
+typename sphere<T>::element_type typename sphere<T>::volume () const //геометрический объём сферы
 {
-   return 4*3.14*sphere_radius*sphere_radius*sphere_radius/3; //както не красиво
+   return 4*M_PI*sphere_radius*sphere_radius*sphere_radius/3; //както не красиво
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка на пустоту
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool template <class T> class sphere::empty (const element_type& eps = default_epsilon) //проверка: r < eps
+template <class T>
+bool sphere<T>::empty (const element_type& eps) const
+//bool typename sphere<T>::empty (const typename sphere::element_type& eps = default_epsilon) //проверка: r < eps
 {
-   return sphere_radius<eps?true:false;
+   return sphere_radius<eps;//true:false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление примитивов в ограничивающий объём
 ///  Если текущий радиус < 0 - сбрасываем положение сферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-sphere& template <class T> class sphere::operator += (const vec_type& point) const
+template <class T>
+sphere<T>& sphere<T>::operator += (const vec_type& point)
 {
    vec_type vec;
    if(sphere_radius==0)
@@ -81,7 +97,8 @@ sphere& template <class T> class sphere::operator += (const vec_type& point) con
    return *this;
 }
 
-sphere& template <class T> class sphere::operator += (const sphere& sph) const
+template <class T>
+sphere<T>& sphere<T>::operator += (const sphere<T>& sph)
 {
    vec_type vec;
    if(sphere_radius==0)
@@ -98,11 +115,14 @@ sphere& template <class T> class sphere::operator += (const sphere& sph) const
 }
 
 //sphere& template <class T> class sphere::operator += (const axis_aligned_box<T>&); //???
-sphere  template <class T> class sphere::operator +  (const vec_type& vec) const
+template <class T>
+sphere<T> sphere<T>::operator +  (const vec_type& vec) const
 {
    return shere(*this)+=vec;
 }
-sphere  template <class T> class sphere::operator +  (const sphere& sph) const
+
+template <class T>
+sphere<T> sphere<T>::operator +  (const sphere<T>& sph) const
 {
    return shere(*this)+=sph;
 }
@@ -111,22 +131,26 @@ sphere  template <class T> class sphere::operator +  (const sphere& sph) const
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка пересечения ограничивающей сферы с различными примитивами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool template <class T> class sphere::intersects (const sphere&)
+template <class T>
+bool sphere<T>::intersects (const sphere<T>& sphere) const
 {
-   return sphere_center.length(sphere.center())<sphere_radius+sphere.radius()?true:false;
+   return length(sphere_center-sphere.center())<sphere_radius+sphere.radius()?true:false;
 }
 //bool template <class T> class sphere::intersects (const axis_aligned_box<T>&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка: содержит ли ограничивающая сфера различные примитивы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool template <class T> class sphere::contains (const vec_type& point)
+template <class T>
+bool typename sphere<T>::contains (const vec_type& point) const
 {
-   return point.length(sphere_center)<sphere_radius?true:false;
+   return length(point-sphere_center)<sphere_radius?true:false;
 }
-bool template <class T> class sphere::contains (const sphere& sphere)
+
+template <class T>
+bool typename sphere<T>::contains (const sphere& sphere) const
 {
-   return sphere_center.length(sphere.center())<sphere_radius-2*sphere.radius()?true:false;   //вроде умножение не нужно
+   return length(sphere_center-sphere.center())<(sphere_radius-2*sphere.radius())?true:false;   //вроде умножение не нужно
 }
 //bool template <class T> class sphere::contains (const axis_aligned_box<T>& box) const;
 
@@ -137,17 +161,20 @@ bool template <class T> class sphere::contains (const sphere& sphere)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сравнение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool template <class T> class sphere::equal (const sphere& sp, const element_type& eps = default_epsilon)
+template <class T>
+bool sphere<T>::equal (const sphere& sp, const element_type& eps = default_epsilon) const
 {
-   return ((abs(sphere_radius-sp.radius())<eps)&&(center==sp.center()))?true:false
+   return ((abs(sphere_radius-sp.radius())<eps)&&(sphere_center==sp.center()))?true:false;
 }
 
-bool template <class T> class sphere::operator == (const sphere& sp)
+template <class T>
+bool typename sphere<T>::operator == (const sphere<T>& sp) const
 {
-   return ((abs(sphere_radius-sp.radius())<eps)&&(center==sp.center()))?true:false  //повторяющийся код, лучше через equal
+   return equal(sp);
 }
 
-bool template <class T> class sphere::operator != (const sphere& sp)
+template <class T>
+bool typename sphere<T>::operator != (const sphere& sp) const
 {
-   return ((abs(sphere_radius-sp.radius())<eps)&&(center==sp.center()))?false:true  //повторяющийся код, лучше через оператор ==
+   return !equal(sp);
 }
