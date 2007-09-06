@@ -280,6 +280,9 @@ void OpenALSource::FillBuffers ()
     for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
       FillBuffer (al_buffers [i]);
       
+  context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
+  context.alGetSourcei (al_source, AL_BUFFERS_PROCESSED, &processed_buffers_count);      
+      
     printf ("!queued=%u processed=%u\n", queued_buffers_count, processed_buffers_count);        
   }
   else if (processed_buffers_count)
