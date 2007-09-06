@@ -3,13 +3,16 @@
 using namespace sound::low_level;
 using namespace common;
 
+//период обновлени€ буферов источника в тиках
+const size_t SOURCE_BUFFERS_UPDATE_TICKS = size_t (SOURCE_BUFFERS_UPDATE_PERIOD * CLOCKS_PER_SEC);
+
 /*
      онструктор / деструктор
 */
 
 OpenALSource::OpenALSource (OpenALDevice& in_device)
   : device (in_device), source_need_update (true), sample_need_update (false), is_looped (false), is_playing (false),
-    play_time_offset (0)
+    play_time_offset (0), last_buffers_fill_time (clock () - SOURCE_BUFFERS_UPDATE_TICKS)
 {
   alGetError   ();
   alGenSources (1, &al_source);  
@@ -226,9 +229,11 @@ void OpenALSource::FillBuffer (size_t al_buffer)
     while (available_samples_count)
     {    
       if (play_sample_position == sound_sample.SamplesCount ())
-        play_sample_position = 0;        
+        play_sample_position = 0;
 
       size_t samples_count = sound_sample.Read (play_sample_position, available_samples_count, buffer);
+      
+//      printf ("read (%u, %u) = %u, total = %u\n", play_sample_position, available_samples_count, samples_count, sound_sample.SamplesCount ());
       
       if (!samples_count)
         break;
@@ -240,21 +245,28 @@ void OpenALSource::FillBuffer (size_t al_buffer)
   }
   else
   {
-    available_samples_count -= sound_sample.Read (play_sample_position, available_samples_count, buffer);
+    size_t samples_count     = sound_sample.Read (play_sample_position, available_samples_count, buffer);    
+    available_samples_count -= samples_count;
+    play_sample_position    += samples_count;
   }      
   
   size_t readed_samples_count = max_samples_count - available_samples_count;
   ALenum format               = sound_sample.Channels () == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
   
   OpenALContext& context = device.Context ();
+  
+  printf ("fill (%u, %u)\n", sound_sample.SamplesToBytes (readed_samples_count), sound_sample.Frequency ());
 
   context.alBufferData (al_buffer, format, device.GetSampleBuffer (), sound_sample.SamplesToBytes (readed_samples_count),
                         sound_sample.Frequency ());
-  context.alSourceQueueBuffers (al_source, 1, &al_buffer);  
+  context.alSourceQueueBuffers (al_source, 1, &al_buffer);
 }
 
 void OpenALSource::FillBuffers ()
 {
+  if (size_t (clock () - last_buffers_fill_time) < SOURCE_BUFFERS_UPDATE_TICKS)
+    return;
+
   ALint          queued_buffers_count = 0, processed_buffers_count = 0;
   OpenALContext& context              = device.Context ();
 
@@ -262,22 +274,25 @@ void OpenALSource::FillBuffers ()
   context.alGetSourcei (al_source, AL_BUFFERS_PROCESSED, &processed_buffers_count);
 
   if (!queued_buffers_count)
-  {
+  {  
       //первоначальное заполнение буферов      
 
     for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
       FillBuffer (al_buffers [i]);
-    
   }
   else if (processed_buffers_count)
   {
-    ALuint buffers [SOURCE_BUFFERS_COUNT];
+    ALuint buffers [SOURCE_BUFFERS_COUNT];   
 
     context.alSourceUnqueueBuffers (al_source, processed_buffers_count, buffers);
+    
+    printf ("%u: process=%u, source=%p\n", clock (), processed_buffers_count, al_source);
 
     for (int i=0; i<processed_buffers_count; i++)
       FillBuffer (buffers [i]);
-  }  
+  }
+
+  last_buffers_fill_time = clock ();    
 }
 
 /*
@@ -298,7 +313,7 @@ void OpenALSource::Update ()
     if (source_need_update)
     {
       source_need_update = false;
-      
+
       context.alSourcefv (al_source, AL_POSITION, source.position);
       context.alSourcefv (al_source, AL_DIRECTION, source.direction);
       context.alSourcefv (al_source, AL_VELOCITY, source.velocity);
@@ -330,6 +345,8 @@ void OpenALSource::Update ()
 
     if (sample_need_update)
     {
+      printf ("update sample\n");
+      
       sample_need_update = false;      
       
         //останавливаем проигрывание
@@ -346,9 +363,7 @@ void OpenALSource::Update ()
       if (queued_buffers_count)
         context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers);
 
-      play_sample_position = sound_sample.SecondsToSamples (Tell ());
-      
-      printf ("heye!\n");
+      play_sample_position = sound_sample.SecondsToSamples (Tell ());      
 
       if (playing)
       {

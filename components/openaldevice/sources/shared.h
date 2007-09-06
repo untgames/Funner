@@ -28,9 +28,10 @@ class OpenALContext;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Константы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t SOURCE_BUFFERS_COUNT       = 3;    //количество буферов проигрывания на источник
-const size_t MAX_DEVICE_CHANNELS_COUNT  = 1024; //максимальное количество каналов проигрывания
-const size_t DEFAULT_SAMPLE_BUFFER_SIZE = 4096; //размер буфера сэмплирования по умолчанию
+const size_t SOURCE_BUFFERS_COUNT         = 40;     //количество буферов проигрывания на источник
+const size_t MAX_DEVICE_CHANNELS_COUNT    = 1024;  //максимальное количество каналов проигрывания
+const size_t DEFAULT_SAMPLE_BUFFER_SIZE   = 16384; //размер буфера сэмплирования по умолчанию
+const float  SOURCE_BUFFERS_UPDATE_PERIOD = 0.1f;  //период обновления буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключения OpenAL
@@ -39,11 +40,6 @@ struct OpenALExceptionTag;
 struct OpenALGenSourceException {};
 
 typedef common::DerivedException<common::Exception, OpenALExceptionTag> OpenALException;
-
-const float  BUFFER_UPDATE_TIME = 0.3f;
-const float  BUFFER_TIME = 0.5f;
-const size_t MAX_SOUND_FREQUENCY = 48000;
-const size_t MAX_SOUND_CHANNELS  = 2;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Контекст OpenAL
@@ -365,7 +361,8 @@ class OpenALSource
     bool           is_playing;                        //проигрывается ли звук
     clock_t        play_time_start;                   //время начала проигрывания
     clock_t        play_time_offset;                  //смещение при проигрывании
-    size_t         play_sample_position;              //позиция проигрывания
+    clock_t        last_buffers_fill_time;            //время последнего обновления буферов
+    size_t         play_sample_position;              //позиция проигрывания    
     ALuint         al_source;                         //имя источника в OpenAL
     ALuint         al_buffers [SOURCE_BUFFERS_COUNT]; //OpenAL буферы    
 };

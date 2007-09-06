@@ -8,6 +8,9 @@ using namespace sound::low_level;
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
 
+//время обновления буферов источника в миллисекундах
+const size_t SOURCE_BUFFERS_UPDATE_MILLISECONDS = size_t (SOURCE_BUFFERS_UPDATE_PERIOD * 1000);
+
 namespace
 {
 
@@ -23,7 +26,7 @@ void DefaultLogHandler (const char* log_message)
 
 OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
  : context (device_name, &DefaultLogHandler),
-   timer (xtl::bind (&OpenALDevice::Update, this)),
+   timer (xtl::bind (&OpenALDevice::Update, this), SOURCE_BUFFERS_UPDATE_MILLISECONDS),
    log_handler (&DefaultLogHandler),
    listener_need_update (false),
    sample_buffer (DEFAULT_SAMPLE_BUFFER_SIZE),

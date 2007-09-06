@@ -18,7 +18,7 @@ const char* file_name = "data/sound1.ogg";
 const char* file_name2 = "data/sound2.ogg";
 
 const size_t SOURCE_UPDATE_TIME = 100;   //период обновления параметров источника звука (в милисекундах)
-const size_t TEST_WORK_TIME     = 4000;  //время работы теста (в милисекундах)
+const size_t TEST_WORK_TIME     = 8000;  //время работы теста (в милисекундах)
 
 float        source_angle = 0;
 Source       source;
@@ -135,8 +135,10 @@ int main ()
 
     sound_system->SetSample (0, file_name);
     sound_system->Seek (0, 1.f);
-    sound_system->Play (0, true);
+//    sound_system->Play (0, true);
     sound_system->Play (1, true);
+//    sound_system->Play (0, false);
+//    sound_system->Play (1, false);
 
     Timer timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),
           timer2 (bind (&Application::Exit, 0), TEST_WORK_TIME);
