@@ -105,11 +105,17 @@ size_t SoundSample::SamplesToBytes (size_t sample_count) const
 
 size_t SoundSample::BytesToSamples (size_t byte_count) const
 {
+  if (!impl->info.bits_per_sample || !impl->info.channels)
+    return 0;
+
   return byte_count / (impl->info.bits_per_sample / 8 * impl->info.channels);
 }
 
 double SoundSample::SamplesToSeconds (size_t sample_count) const
 {
+  if (!impl->info.frequency)
+    return 0;
+
   return (double)sample_count / (double)impl->info.frequency;
 }
 
@@ -147,6 +153,7 @@ size_t SoundSample::Read (size_t first_sample, size_t samples_count, void* data)
 {
   if (first_sample >= impl->info.samples_count)
     return 0;
+
   return impl->codec->Read (first_sample, samples_count, data);
 }
 
