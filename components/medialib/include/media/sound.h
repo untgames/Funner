@@ -84,7 +84,7 @@ class SoundSample
     size_t Frequency     () const; //количество сэмплов в секунду (частота)
     size_t Channels      () const; //количество каналов
     size_t BitsPerSample () const; //количество битов на сэмпл
-    float  Duration      () const {return (float)SamplesToSeconds (SamplesCount ());} //продолжительность
+    double Duration      () const { return SamplesToSeconds (SamplesCount ()); } //продолжительность
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
