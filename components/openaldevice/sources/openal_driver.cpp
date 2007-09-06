@@ -1,5 +1,3 @@
-#include <al.h>
-#include <alc.h>
 #include "shared.h"
 
 using namespace sound::low_level;
@@ -8,9 +6,9 @@ namespace
 {
 
 //функция создания OpenAL устройства
-ISoundDevice* create_device (const char*, const char* device_name, const void*, const char*)
+ISoundDevice* create_device (const char* driver_name, const char* device_name, const void*, const char*)
 {
-  return new OpenALDevice (device_name);
+  return new OpenALDevice (driver_name, device_name);  
 }
 
 }

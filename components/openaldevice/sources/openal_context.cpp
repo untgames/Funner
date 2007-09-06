@@ -290,6 +290,9 @@ OpenALContext::OpenALContext  (const char* device_name, const LogHandler& in_log
   if (!device_name)
     RaiseNullArgument ("sound::low_level::OpenALContext::OpenALContext", "device_name");
     
+  if (!::strcmp (device_name, "default"))
+    device_name = 0;
+    
   device = alcOpenDevice (device_name);
   
   if (!device) 

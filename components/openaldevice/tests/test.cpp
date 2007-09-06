@@ -46,26 +46,32 @@ void print (const math::vec<T, N>& v)
 
 void dump (Listener& listener)
 {
-  printf ("position = ");
+  printf ("listener:\n");
+  printf ("  position = ");
   print  (listener.position);
-  printf (" direction = ");
+  printf ("\n  direction = ");
   print  (listener.direction);
-  printf (" up = ");
+  printf ("\n  up = ");
   print  (listener.up);
-  printf (" velocity = ");
+  printf ("\n  velocity = ");
   print  (listener.velocity);
+  printf ("\n");
 }
 
 void dump (Source& source)
 {
-  printf ("position = ");
+  printf ("source:\n");
+  printf ("  position = ");
   print  (source.position);
-  printf (" direction = ");
+  printf ("\n  direction = ");
   print  (source.direction);
-  printf (" velocity = ");
+  printf ("\n  velocity = ");
   print  (source.velocity);
-  printf (" gain = %.3f min_gain = %.3f max_gain = %.3f inner_angle = %.3f outer_angle = %.3f outer_gain = %.3f reference_distance = %.3f",
-            source.gain, source.minimum_gain, source.maximum_gain, source.inner_angle, source.outer_angle, source.outer_gain, source.reference_distance);
+  printf ("\n  gain = %.3f\n  min_gain = %.3f\n  max_gain = %.3f\n  inner_angle = %.3f\n"
+          "  outer_angle = %.3f\n  outer_gain = %.3f\n  reference_distance = %.3f",
+          source.gain, source.minimum_gain, source.maximum_gain, source.inner_angle,
+          source.outer_angle, source.outer_gain, source.reference_distance);
+  printf ("\n");
 }
 
 void TimerHandler (ISoundDevice* sound_system, Timer&)
@@ -77,7 +83,7 @@ void TimerHandler (ISoundDevice* sound_system, Timer&)
 
 void idle ()
 {
-//  Application::Sleep (100);
+  Application::Sleep (100);
 }
 
 int main ()
@@ -99,7 +105,6 @@ int main ()
 
     sound_system->GetListener (listener);
     dump (listener);
-    printf ("\n");
     listener.position  = vec3f(0,0,0);
     listener.direction = vec3f(0,0,-1);
     listener.up        = vec3f(0,1,0);
@@ -107,11 +112,9 @@ int main ()
     sound_system->SetListener (listener);
     sound_system->GetListener (listener);
     dump (listener);
-    printf ("\n");
   
     sound_system->GetSource (0, source);
     dump (source);
-    printf ("\n");
     source.position     = vec3f(0,0,1);
     source.direction    = vec3f(0,0,0);
     source.velocity     = vec3f(0,0,0);
@@ -125,7 +128,6 @@ int main ()
     sound_system->SetSource (0, source);
     sound_system->GetSource (0, source);
     dump (source);
-    printf ("\n");
 
     source.gain         = 0.3f;
     sound_system->SetSource (1, source);

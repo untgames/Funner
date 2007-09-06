@@ -1,15 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <time.h>
-#include <xtl/function.h>
-#include <xtl/bind.h>
-#include <common/strlib.h>
-
 #include "shared.h"
-
-#define MAX_CHANNELS_COUNT 1024
 
 using namespace common;
 using namespace stl;
@@ -24,7 +13,6 @@ namespace
 
 void DefaultLogHandler (const char* log_message)
 {
-  printf ("%s\n", log_message);
 }
 
 }
@@ -33,16 +21,22 @@ void DefaultLogHandler (const char* log_message)
     Конструктор / деструктор
 */
 
-OpenALDevice::OpenALDevice (const char* device_name)
- : context (new OpenALContext (device_name, &DefaultLogHandler)), log_handler (DefaultLogHandler), is_muted (false), 
-   gain (1.f), last_gain (1.f), timer (xtl::bind (&OpenALDevice::UpdateBuffers, this), (size_t)(BUFFER_UPDATE_TIME * 1000)), 
-   ref_count (1)
+OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
+ : context (device_name, &DefaultLogHandler),
+   timer (xtl::bind (&OpenALDevice::Update, this)),
+   log_handler (&DefaultLogHandler),
+   listener_need_update (false),
+   sample_buffer (DEFAULT_SAMPLE_BUFFER_SIZE),
+   ref_count (1),
+   is_muted (false), 
+   gain (1.0f),
+   channels_count (0)  
 {
     //временный код!!!
 
-  context->MakeCurrent ();
+  context.MakeCurrent ();
 
-  char *extensions = (char*)context->alGetString (AL_EXTENSIONS);
+  char *extensions = (char*)context.alGetString (AL_EXTENSIONS);
   int  compare_value;
 
   info.eax_major_version = 0;
@@ -74,45 +68,49 @@ OpenALDevice::OpenALDevice (const char* device_name)
       }
     }
   } while (extensions);
+  
+    //формирование имени устройства
+    
+  name = format ("%s:::%s", driver_name ? driver_name : "", device_name ? device_name : "");
+    
+    //создание каналов проигрывания
 
-  size_t temp_sources[MAX_CHANNELS_COUNT];
-  info.channels_count = 0;
-  size_t cur_channel = 0;
-  for (; cur_channel < MAX_CHANNELS_COUNT; cur_channel++)
-  {
-    alGenSources (1, &temp_sources[cur_channel]);
-    if (alGetError () != AL_NO_ERROR)
+  for (size_t i=0; i<MAX_DEVICE_CHANNELS_COUNT; i++)
+  {    
+    try
     {
-      info.channels_count = cur_channel;
-      context->alDeleteSources (cur_channel, temp_sources);
+      channels [i] = new OpenALSource (*this);
+    }
+    catch (...)
+    {
       break;
     }
-  }
-  if (!cur_channel)
-  {
-    delete context;
-    Raise <Exception> ("OpenALDevice::OpenALDevice", "Can't create no one channel");
-  }
-  if (!info.channels_count)
-  {
-    context->alDeleteSources (MAX_CHANNELS_COUNT, temp_sources);
-    info.channels_count = MAX_CHANNELS_COUNT;
+
+    channels_count++;
   }
 
-  buffer = new char [((size_t)(2.f * (float)MAX_SOUND_CHANNELS * (float)MAX_SOUND_FREQUENCY * BUFFER_TIME) + 1023)&~1023];
-
-  sources.resize (info.channels_count);
-  for (size_t i = 0; i < info.channels_count; i++)
-    sources[i] = new OpenALSource (context, buffer);
+  info.channels_count = channels_count;  
 }
 
 OpenALDevice::~OpenALDevice ()
 {
-  for (size_t i = 0; i < info.channels_count; i++)
-    delete sources[i];
+  for (size_t i=0; i<channels_count; i++)
+    delete channels [i];
+}
 
-  delete [] buffer;
-  delete context;
+/*
+    Подсчёт ссылок
+*/
+
+void OpenALDevice::AddRef ()
+{
+  ref_count++;
+}
+
+void OpenALDevice::Release ()
+{
+  if (!--ref_count)
+    delete this;
 }
 
 /*
@@ -121,8 +119,7 @@ OpenALDevice::~OpenALDevice ()
 
 const char* OpenALDevice::Name ()
 {
-  return "openal"; //в будущем более подробно!!!
-//  return alcGetString (impl->device, ALC_DEVICE_SPECIFIER);
+  return name.c_str ();
 }
 
 /*
@@ -135,29 +132,29 @@ void OpenALDevice::GetCapabilities (Capabilities& target_info)
 }
 
 /*
-   Количество микшируемых каналов
+    Оповещение о необходимости обновления слушателя
 */
 
-size_t OpenALDevice::ChannelsCount ()
+void OpenALDevice::UpdateListenerNotify ()
 {
-  return info.channels_count;
+  listener_need_update = true;
+  
+  Update ();
 }
     
 /*
    Установка уровня громкости для устройства
 */
 
-void  OpenALDevice::SetVolume (float in_gain)
+void OpenALDevice::SetVolume (float in_gain)
 {
-  if (in_gain < 0.f || in_gain > 1.f)
-  {
-    log_handler (format ("Incorrect gain value received (%f). Gain not changed", in_gain).c_str ());
-    return;
-  }
+  if (in_gain < 0.0f) in_gain = 0.0f;
+  if (in_gain > 1.0f) in_gain = 1.0f;
 
-  gain = in_gain;
-
-  context->alListenerf (AL_GAIN, in_gain);
+  gain     = in_gain;
+  is_muted = false;
+  
+  UpdateListenerNotify ();
 }
 
 float OpenALDevice::GetVolume ()
@@ -171,17 +168,9 @@ float OpenALDevice::GetVolume ()
 
 void OpenALDevice::SetMute (bool state)
 {
-  if (is_muted != state)
-  {
-    if (is_muted)
-      SetVolume (last_gain);
-    else
-    {
-      last_gain = gain;
-      SetVolume (0.f);
-    }
-  }
   is_muted = state;
+
+  UpdateListenerNotify ();
 }
 
 bool OpenALDevice::IsMuted ()
@@ -190,18 +179,14 @@ bool OpenALDevice::IsMuted ()
 }
 
 /*
-   Установка параметров слушателя
+    Установка параметров слушателя
 */
 
-void OpenALDevice::SetListener (const Listener& source_listener)
+void OpenALDevice::SetListener (const Listener& in_listener)
 {
-  listener = source_listener;
-  float  orientation [6] = {source_listener.direction.x, source_listener.direction.y, source_listener.direction.z, 
-                            source_listener.up.x,        source_listener.up.y,        source_listener.up.z};
+  listener = in_listener;
 
-  context->alListenerfv (AL_POSITION,    source_listener.position);
-  context->alListenerfv (AL_VELOCITY,    source_listener.velocity);
-  context->alListenerfv (AL_ORIENTATION, orientation);
+  UpdateListenerNotify ();
 }
 
 void OpenALDevice::GetListener (Listener& target_listener)
@@ -210,12 +195,12 @@ void OpenALDevice::GetListener (Listener& target_listener)
 }
 
 /*
-   Установка функции отладочного протоколирования
+    Отладочное протоколирование
 */
 
 void OpenALDevice::SetDebugLog (const LogHandler& in_log_handler)
 {
-  log_handler = in_log_handler;
+  log_handler = in_log_handler ? in_log_handler : &DefaultLogHandler;
 }
 
 const OpenALDevice::LogHandler& OpenALDevice::GetDebugLog ()
@@ -223,13 +208,152 @@ const OpenALDevice::LogHandler& OpenALDevice::GetDebugLog ()
   return log_handler;
 }
 
-void OpenALDevice::AddRef ()
+void OpenALDevice::DebugPrintf (const char* format, ...)
 {
-  ref_count++;
+  va_list list;
+  
+  va_start (list, format);
+  DebugVPrintf (format, list);
 }
 
-void OpenALDevice::Release ()
+void OpenALDevice::DebugVPrintf (const char* format, va_list list)
 {
-  if (!--ref_count)
-    delete this;
+  try
+  {
+    log_handler (vformat (format, list).c_str ());
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
+}
+
+/*
+    Установка текущего проигрываемого звука
+*/
+
+void OpenALDevice::SetSample (size_t channel, const char* sample_name)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::SetSample", "channel", channel, channels_count);
+    
+  if (!sample_name)
+    RaiseNullArgument ("sound::low_level::OpenALDevice::SetSample", "sample_name");
+    
+  channels [channel]->SetSample (sample_name);
+}
+
+const char* OpenALDevice::GetSample (size_t channel)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::GetSample", "channel", channel, channels_count);
+    
+  return channels [channel]->GetSample ();
+}
+
+/*
+    Проверка цикличности проигрывания канала
+*/
+
+bool OpenALDevice::IsLooped (size_t channel)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::IsLooped", "channel", channel, channels_count);
+    
+  return channels [channel]->IsLooped ();
+}
+    
+/*
+    Установка параметров источника
+*/
+
+void OpenALDevice::SetSource (size_t channel, const Source& source)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::SetSource", "channel", channel, channels_count);
+    
+  channels [channel]->SetSource (source);
+}
+
+void OpenALDevice::GetSource (size_t channel, Source& source)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::GetSource", "channel", channel, channels_count);
+
+  source = channels [channel]->GetSource ();
+}
+
+/*
+    Управление проигрыванием
+*/
+
+void OpenALDevice::Play (size_t channel, bool looping)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::Play", "channel", channel, channels_count);
+    
+  channels [channel]->Play (looping);
+}
+
+void OpenALDevice::Pause (size_t channel)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::Pause", "channel", channel, channels_count);
+    
+  channels [channel]->Pause ();
+}
+
+void OpenALDevice::Stop (size_t channel)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::Stop", "channel", channel, channels_count);
+    
+  channels [channel]->Stop ();
+}
+
+void OpenALDevice::Seek (size_t channel, float time_in_seconds)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::Seek", "channel", channel, channels_count);
+
+  channels [channel]->Seek (time_in_seconds);
+}
+
+float OpenALDevice::Tell (size_t channel)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::Tell", "channel", channel, channels_count);
+    
+  return channels [channel]->Tell (); 
+}
+
+bool OpenALDevice::IsPlaying (size_t channel)
+{
+  if (channel >= channels_count)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::IsPlaying", "channel", channel, channels_count);
+    
+  return channels [channel]->IsPlaying ();
+}
+
+/*
+    Обновление
+*/
+
+void OpenALDevice::Update ()
+{
+  if (listener_need_update)
+  {
+    listener_need_update = false;
+    
+    float orientation [6] = {listener.direction.x, listener.direction.y, listener.direction.z, 
+                             listener.up.x,        listener.up.y,        listener.up.z};
+
+    context.alListenerfv (AL_POSITION,    listener.position);
+    context.alListenerfv (AL_VELOCITY,    listener.velocity);
+    context.alListenerfv (AL_ORIENTATION, orientation);
+    context.alListenerf  (AL_GAIN,        is_muted ? 0.0f : gain);
+  }
+
+  for (size_t i=0; i<channels_count; i++)
+    channels [i]->Update ();
 }
