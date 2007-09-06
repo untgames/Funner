@@ -23,6 +23,11 @@ const size_t TEST_WORK_TIME     = 8000;  //время работы теста (в милисекундах)
 float        source_angle = 0;
 Source       source;
 
+void log_print (const char* message)
+{
+  printf ("DeviceLog: %s\n", message);
+}
+
 //печать числа с плавающей точкой
 void print (float value)
 {
@@ -97,6 +102,7 @@ int main ()
     Capabilities   info;
     Listener       listener;
 
+    sound_system->SetDebugLog (&log_print);
     sound_system->GetCapabilities (info);
 
     printf ("Using device %s.\n", sound_system->Name ());
@@ -135,10 +141,8 @@ int main ()
 
     sound_system->SetSample (0, file_name);
     sound_system->Seek (0, 1.f);
-//    sound_system->Play (0, true);
+    sound_system->Play (0, true);
     sound_system->Play (1, true);
-//    sound_system->Play (0, false);
-//    sound_system->Play (1, false);
 
     Timer timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),
           timer2 (bind (&Application::Exit, 0), TEST_WORK_TIME);
