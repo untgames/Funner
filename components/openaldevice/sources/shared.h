@@ -32,6 +32,7 @@ const size_t SOURCE_BUFFERS_COUNT         = 4;    //количество буферов проигрыва
 const size_t MAX_DEVICE_CHANNELS_COUNT    = 1024; //максимальное количество каналов проигрывания
 const size_t DEFAULT_SAMPLE_BUFFER_SIZE   = 4096; //размер буфера сэмплирования по умолчанию
 const float  SOURCE_BUFFERS_UPDATE_PERIOD = 0.1f; //период обновления буферов
+const size_t DEVICE_BUFFERS_POOL_SIZE     = 32;   //размер пула буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключения OpenAL
@@ -328,6 +329,8 @@ class OpenALDevice : public sound::low_level::ISoundDevice
     float          source_properties_update_period;      //частота обновления свойств источника
     float          listener_properties_update_period;    //частота обновления свойств слушателя
     OpenALSource*  first_active_source;  //первый активный источник
+    ALuint         al_buffers_pool [DEVICE_BUFFERS_POOL_SIZE]; //пул буферов
+    size_t         al_buffers_pool_size;                       //размер пула буферов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

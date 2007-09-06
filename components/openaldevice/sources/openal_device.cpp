@@ -41,7 +41,8 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
    is_muted (false), 
    gain (1.0f),
    channels_count (0),
-   first_active_source (0)
+   first_active_source (0),
+   al_buffers_pool_size (0)
 {
     //временный код!!!
 
@@ -105,8 +106,14 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
 
 OpenALDevice::~OpenALDevice ()
 {
+    //удаление каналов
+
   for (size_t i=0; i<channels_count; i++)
     delete channels [i];
+    
+    //очистка пула буферов
+    
+  context.alDeleteBuffers (al_buffers_pool_size, al_buffers_pool);
 }
 
 /*
@@ -434,6 +441,9 @@ float OpenALDevice::GetHint (SoundDeviceHint hint)
 
 ALuint OpenALDevice::AllocateSourceBuffer ()
 {
+  if (al_buffers_pool_size)
+    return al_buffers_pool [--al_buffers_pool_size];
+
   const ALuint WRONG_BUFFER_ID = 0;
 
   ALuint buffer = WRONG_BUFFER_ID;
@@ -448,5 +458,14 @@ ALuint OpenALDevice::AllocateSourceBuffer ()
 
 void OpenALDevice::DeallocateSourceBuffer (ALuint buffer)
 {
-  alDeleteBuffers (1, &buffer);
+  if (al_buffers_pool_size == DEVICE_BUFFERS_POOL_SIZE)
+  {
+    size_t flush_size = DEVICE_BUFFERS_POOL_SIZE / 2 + 1;
+    
+    context.alDeleteBuffers (flush_size, al_buffers_pool);
+    
+    al_buffers_pool_size -= flush_size;
+  }
+
+  al_buffers_pool [al_buffers_pool_size++] = buffer;
 }
