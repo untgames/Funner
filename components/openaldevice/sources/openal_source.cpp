@@ -255,7 +255,7 @@ void OpenALSource::FillBuffer (size_t al_buffer)
   
   OpenALContext& context = device.Context ();
   
-  printf ("fill (%u, %u)\n", sound_sample.SamplesToBytes (readed_samples_count), sound_sample.Frequency ());
+  printf ("fill (%p, %u, %u)\n", al_buffer, sound_sample.SamplesToBytes (readed_samples_count), sound_sample.Frequency ());
 
   context.alBufferData (al_buffer, format, device.GetSampleBuffer (), sound_sample.SamplesToBytes (readed_samples_count),
                         sound_sample.Frequency ());
