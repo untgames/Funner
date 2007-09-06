@@ -2,6 +2,7 @@
 #define MEDIALIB_COLLADA_MODEL_HEADER
 
 #include <xtl/functional_fwd>
+#include <stl/auto_ptr.h>
 #include <media/collada/scene.h>
 #include <media/collada/morph.h>
 #include <media/collada/skin.h>
@@ -101,7 +102,7 @@ class Model
     Model& operator = (const Model&); //no impl
 
   private:
-    ModelImpl* impl;
+    stl::auto_ptr<ModelImpl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -77,7 +77,6 @@ MeshModel::MeshModel (const MeshModel& model)
 
 MeshModel::~MeshModel ()
 {
-  delete impl;
 }
 
 /*

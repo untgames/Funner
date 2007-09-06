@@ -3,6 +3,7 @@
 
 #include <media/geometry/mesh.h>
 #include <xtl/functional_fwd>
+#include <stl/auto_ptr.h>
 
 namespace medialib
 {
@@ -71,7 +72,7 @@ class MeshModel
 
   private:
     struct Impl;
-    Impl* impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

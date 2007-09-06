@@ -79,7 +79,6 @@ Model::Model (const char* file_name, const LogFunction& log)
   
 Model::~Model ()
 {
-  delete impl;
 }
 
 /*
