@@ -36,7 +36,7 @@ MEDIALIB_TESTS.COMPILER_DEFINES :=
 MEDIALIB_COLLADA.TYPE             := static-lib
 MEDIALIB_COLLADA.NAME             := collada
 MEDIALIB_COLLADA.INCLUDE_DIRS     := include ../commonlib/include ../mathlib/include ../xtl/include
-MEDIALIB_COLLADA.SOURCE_DIRS      := sources/collada-new/model sources/collada-new/dae_loader
+MEDIALIB_COLLADA.SOURCE_DIRS      := sources/collada/model sources/collada/dae_loader
 MEDIALIB_COLLADA.LIB_DIRS         :=  
 MEDIALIB_COLLADA.LIBS             := 
 MEDIALIB_COLLADA.COMPILER_CFLAGS  :=
@@ -45,7 +45,7 @@ MEDIALIB_COLLADA.COMPILER_DEFINES :=
 #Öåëü ¹5 - MediaLib COLLADA tests
 MEDIALIB_COLLADA_TESTS.TYPE             := test-suite
 MEDIALIB_COLLADA_TESTS.INCLUDE_DIRS     := include ../mathlib/include ../xtl/include ../commonlib/include
-MEDIALIB_COLLADA_TESTS.SOURCE_DIRS      := tests/collada-new
+MEDIALIB_COLLADA_TESTS.SOURCE_DIRS      := tests/collada
 MEDIALIB_COLLADA_TESTS.LIB_DIRS         :=
 MEDIALIB_COLLADA_TESTS.LIBS             := commonlib zzip zlib collada
 MEDIALIB_COLLADA_TESTS.COMPILER_CFLAGS  :=
