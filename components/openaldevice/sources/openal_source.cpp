@@ -22,7 +22,7 @@ OpenALSource::OpenALSource (OpenALDevice& in_device)
 
   try
   {
-    device.Context ().alGenBuffers (2, al_buffers);
+    device.Context ().alGenBuffers (SOURCE_BUFFERS_COUNT, al_buffers);
   }
   catch (...)
   {
@@ -44,7 +44,7 @@ OpenALSource::~OpenALSource ()
   
   try
   {
-    device.Context ().alDeleteBuffers (2, al_buffers);
+    device.Context ().alDeleteBuffers (SOURCE_BUFFERS_COUNT, al_buffers);
   }
   catch (...)
   {
@@ -232,9 +232,7 @@ void OpenALSource::FillBuffer (size_t al_buffer)
         play_sample_position = 0;
 
       size_t samples_count = sound_sample.Read (play_sample_position, available_samples_count, buffer);
-      
-//      printf ("read (%u, %u) = %u, total = %u\n", play_sample_position, available_samples_count, samples_count, sound_sample.SamplesCount ());
-      
+
       if (!samples_count)
         break;
       
@@ -253,9 +251,7 @@ void OpenALSource::FillBuffer (size_t al_buffer)
   size_t readed_samples_count = max_samples_count - available_samples_count;
   ALenum format               = sound_sample.Channels () == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
   
-  OpenALContext& context = device.Context ();
-  
-  printf ("fill (%p, %u, %u)\n", al_buffer, sound_sample.SamplesToBytes (readed_samples_count), sound_sample.Frequency ());
+  OpenALContext& context = device.Context ();  
 
   context.alBufferData (al_buffer, format, device.GetSampleBuffer (), sound_sample.SamplesToBytes (readed_samples_count),
                         sound_sample.Frequency ());
@@ -272,6 +268,8 @@ void OpenALSource::FillBuffers ()
 
   context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
   context.alGetSourcei (al_source, AL_BUFFERS_PROCESSED, &processed_buffers_count);
+  
+    printf ("queued=%u processed=%u\n", queued_buffers_count, processed_buffers_count);  
 
   if (!queued_buffers_count)
   {  
@@ -284,9 +282,7 @@ void OpenALSource::FillBuffers ()
   {
     ALuint buffers [SOURCE_BUFFERS_COUNT];   
 
-    context.alSourceUnqueueBuffers (al_source, processed_buffers_count, buffers);
-    
-    printf ("%u: process=%u, source=%p\n", clock (), processed_buffers_count, al_source);
+    context.alSourceUnqueueBuffers (al_source, processed_buffers_count, buffers);    
 
     for (int i=0; i<processed_buffers_count; i++)
       FillBuffer (buffers [i]);
@@ -344,9 +340,7 @@ void OpenALSource::Update ()
       //обновление буферов      
 
     if (sample_need_update)
-    {
-      printf ("update sample\n");
-      
+    {     
       sample_need_update = false;      
       
         //останавливаем проигрывание
