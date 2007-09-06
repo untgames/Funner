@@ -106,14 +106,14 @@ void OpenALSource::UpdateSourceNotify ()
 {
   source_need_update = true;
 
-  Update ();
+  PropertiesUpdate ();
 }
 
 void OpenALSource::UpdateSampleNotify ()
 {
   sample_need_update = true;
 
-  Update ();
+  BufferUpdate ();
 }
 
 /*
@@ -339,7 +339,7 @@ void OpenALSource::FillBuffers ()
     Обновление источника
 */
 
-void OpenALSource::Update ()
+void OpenALSource::BufferUpdate ()
 {
   if (!is_active && !sample_need_update)
     return;    
@@ -368,24 +368,6 @@ void OpenALSource::Update ()
     {
       if (is_playing) Activate   ();
       else            Deactivate ();
-    }
-    
-      //обновление параметров источника
-    
-    if (source_need_update)
-    {
-      source_need_update = false;
-
-      context.alSourcefv (al_source, AL_POSITION, source.position);
-      context.alSourcefv (al_source, AL_DIRECTION, source.direction);
-      context.alSourcefv (al_source, AL_VELOCITY, source.velocity);
-      context.alSourcef  (al_source, AL_GAIN, source.gain);
-      context.alSourcef  (al_source, AL_MIN_GAIN, source.minimum_gain);
-      context.alSourcef  (al_source, AL_MAX_GAIN, source.maximum_gain);
-      context.alSourcef  (al_source, AL_CONE_INNER_ANGLE, source.inner_angle);
-      context.alSourcef  (al_source, AL_CONE_OUTER_ANGLE, source.outer_angle);
-      context.alSourcef  (al_source, AL_CONE_OUTER_GAIN, source.outer_gain);
-      context.alSourcef  (al_source, AL_REFERENCE_DISTANCE, source.reference_distance);
     }
 
       //обновление буферов      
@@ -422,6 +404,42 @@ void OpenALSource::Update ()
   catch (std::exception& exception)
   {
     device.DebugPrintf ("Exception at update source: %s", exception.what ());
+  }
+  catch (...)
+  {
+  }
+}
+
+void OpenALSource::PropertiesUpdate ()
+{
+  if (!is_active && !sample_need_update)
+    return;    
+
+  try
+  {
+    OpenALContext& context = device.Context ();
+    
+      //обновление параметров источника
+    
+    if (source_need_update)
+    {
+      source_need_update = false;
+
+      context.alSourcefv (al_source, AL_POSITION, source.position);
+      context.alSourcefv (al_source, AL_DIRECTION, source.direction);
+      context.alSourcefv (al_source, AL_VELOCITY, source.velocity);
+      context.alSourcef  (al_source, AL_GAIN, source.gain);
+      context.alSourcef  (al_source, AL_MIN_GAIN, source.minimum_gain);
+      context.alSourcef  (al_source, AL_MAX_GAIN, source.maximum_gain);
+      context.alSourcef  (al_source, AL_CONE_INNER_ANGLE, source.inner_angle);
+      context.alSourcef  (al_source, AL_CONE_OUTER_ANGLE, source.outer_angle);
+      context.alSourcef  (al_source, AL_CONE_OUTER_GAIN, source.outer_gain);
+      context.alSourcef  (al_source, AL_REFERENCE_DISTANCE, source.reference_distance);
+    }
+  }
+  catch (std::exception& exception)
+  {
+    device.DebugPrintf ("Exception at update source properties: %s", exception.what ());
   }
   catch (...)
   {

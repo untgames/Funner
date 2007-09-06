@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <mathlib.h>
 #include <common/exception.h>
-#include <xtl/signal.h>
+#include <xtl/function.h>
 #include <syslib/application.h>
 #include <syslib/timer.h>
 #include <sound/openal_device.h>

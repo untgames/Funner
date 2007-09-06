@@ -279,6 +279,12 @@ class OpenALDevice : public sound::low_level::ISoundDevice
     void Release ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка параметров устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void  SetHint (SoundDeviceHint hint, float value);
+    float GetHint (SoundDeviceHint hint);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции отладочного протоколирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void              SetDebugLog (const LogHandler&);
@@ -291,7 +297,9 @@ class OpenALDevice : public sound::low_level::ISoundDevice
     void DebugVPrintf (const char* format, va_list);
 
   private:
-    void Update ();   
+    void BufferUpdate ();   
+    void ListenerUpdate ();
+    void SourceUpdate ();
     void UpdateListenerNotify ();
 
     OpenALDevice (const OpenALDevice&);
@@ -303,7 +311,9 @@ class OpenALDevice : public sound::low_level::ISoundDevice
   private:
     stl::string    name;                 //имя устройства
     OpenALContext  context;              //контекст    
-    syslib::Timer  timer;                //таймер обновления буфера
+    syslib::Timer  buffer_timer;         //таймер обновления буфера
+    syslib::Timer  listener_timer;       //таймер обновления слушателя
+    syslib::Timer  source_timer;         //таймер обновления источников
     LogHandler     log_handler;          //функция лога
     Capabilities   info;                 //информация о устройстве
     Listener       listener;             //слушатель
@@ -314,6 +324,9 @@ class OpenALDevice : public sound::low_level::ISoundDevice
     bool           is_muted;             //флг блокировки проигрывания
     size_t         channels_count;       //количество каналов
     OpenALSource*  channels [MAX_DEVICE_CHANNELS_COUNT]; //каналы проигрывания
+    float          buffer_update_period;                 //частота обновления буффера
+    float          source_properties_update_period;      //частота обновления свойств источника
+    float          listener_properties_update_period;    //частота обновления свойств слушателя
     OpenALSource*  first_active_source;  //первый активный источник
 };
 
@@ -359,7 +372,8 @@ class OpenALSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление (синхронизация с OpenAL)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Update ();
+    void BufferUpdate ();
+    void PropertiesUpdate ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со списком активных источников

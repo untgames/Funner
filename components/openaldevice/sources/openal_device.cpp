@@ -10,6 +10,8 @@ using namespace sound::low_level;
 
 //время обновления буферов источника в миллисекундах
 const size_t SOURCE_BUFFERS_UPDATE_MILLISECONDS = size_t (SOURCE_BUFFERS_UPDATE_PERIOD * 1000);
+const float DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD = 0.03f;
+const float DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD = 0.03f;
 
 namespace
 {
@@ -26,7 +28,12 @@ void DefaultLogHandler (const char* log_message)
 
 OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
  : context (device_name, &DefaultLogHandler),
-   timer (xtl::bind (&OpenALDevice::Update, this), SOURCE_BUFFERS_UPDATE_MILLISECONDS),
+   buffer_update_period (SOURCE_BUFFERS_UPDATE_PERIOD),
+   source_properties_update_period (DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD),
+   listener_properties_update_period (DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD),
+   buffer_timer   (xtl::bind (&OpenALDevice::BufferUpdate, this), SOURCE_BUFFERS_UPDATE_MILLISECONDS),
+   listener_timer (xtl::bind (&OpenALDevice::ListenerUpdate, this), (size_t)(DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD * 1000)),
+   source_timer   (xtl::bind (&OpenALDevice::SourceUpdate, this), (size_t)(DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD * 1000)),
    log_handler (&DefaultLogHandler),
    listener_need_update (false),
    sample_buffer (DEFAULT_SAMPLE_BUFFER_SIZE),
@@ -143,7 +150,7 @@ void OpenALDevice::UpdateListenerNotify ()
 {
   listener_need_update = true;
   
-  Update ();
+  ListenerUpdate ();
 }
     
 /*
@@ -343,7 +350,33 @@ bool OpenALDevice::IsPlaying (size_t channel)
     Обновление
 */
 
-void OpenALDevice::Update ()
+void OpenALDevice::BufferUpdate ()
+{
+    //если нет активных источников нет необходимости что-либо обновлять
+
+  if (!first_active_source)
+    return;
+    
+    //обновление источников
+
+  for (OpenALSource* source=first_active_source; source; source=source->NextActive ())
+    source->BufferUpdate ();
+}
+
+void OpenALDevice::SourceUpdate ()
+{
+    //если нет активных источников нет необходимости что-либо обновлять
+
+  if (!first_active_source)
+    return;
+    
+    //обновление источников
+
+  for (OpenALSource* source=first_active_source; source; source=source->NextActive ())
+    source->PropertiesUpdate ();
+}
+
+void OpenALDevice::ListenerUpdate ()
 {
     //если нет активных источников нет необходимости что-либо обновлять
 
@@ -364,11 +397,35 @@ void OpenALDevice::Update ()
     context.alListenerfv (AL_ORIENTATION, orientation);
     context.alListenerf  (AL_GAIN,        is_muted ? 0.0f : gain);
   }
-  
-    //обновление источников
+}
 
-  for (OpenALSource* source=first_active_source; source; source=source->NextActive ())
-    source->Update ();
+/*
+   Установка параметров устройства
+*/
+
+void OpenALDevice::SetHint (SoundDeviceHint hint, float value)
+{
+  if (value < 0.001)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::SetHint", "value", value, 0.001f, 60.f);
+
+  switch (hint)
+  {
+    case SoundDeviceHint_BufferUpdatePeriod: buffer_update_period = value; buffer_timer.SetPeriod ((size_t)(value * 1000)); break;
+    case SoundDeviceHint_SourcePropertiesUpdatePeriod: source_properties_update_period = value; source_timer.SetPeriod ((size_t)(value * 1000)); break;
+    case SoundDeviceHint_ListenerPropertiesUpdatePeriod: listener_properties_update_period = value; listener_timer.SetPeriod ((size_t)(value * 1000)); break;
+  }
+}
+
+float OpenALDevice::GetHint (SoundDeviceHint hint)
+{
+  switch (hint)
+  {
+    case SoundDeviceHint_BufferUpdatePeriod:             return buffer_update_period;
+    case SoundDeviceHint_SourcePropertiesUpdatePeriod:   return source_properties_update_period;
+    case SoundDeviceHint_ListenerPropertiesUpdatePeriod: return listener_properties_update_period;
+  }
+
+  return 0;
 }
 
 /*
