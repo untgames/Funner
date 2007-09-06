@@ -83,7 +83,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
   
     //формирование имени устройства
     
-  name = format ("%s:::%s", driver_name ? driver_name : "", device_name ? device_name : "");
+  name = format ("%s::%s", driver_name ? driver_name : "", device_name ? device_name : "");
     
     //создание каналов проигрывания
 
@@ -412,14 +412,28 @@ void OpenALDevice::ListenerUpdate ()
 
 void OpenALDevice::SetHint (SoundDeviceHint hint, size_t frequency)
 {
-  if (frequency < 1)
-    RaiseOutOfRange ("sound::low_level::OpenALDevice::SetHint", "value", frequency, 1u, 1000u);
+    //заменить на дефолтные значения!!!
+
+  if (!frequency)
+    RaiseInvalidArgument ("sound::low_level::OpenALDevice::SetHint", "value", frequency);
 
   switch (hint)
   {
-    case SoundDeviceHint_BufferUpdateFrequency: buffer_update_frequency = frequency; buffer_timer.SetPeriod ((size_t)(1000 / frequency)); break;
-    case SoundDeviceHint_SourcePropertiesUpdateFrequency: source_properties_update_frequency = frequency; source_timer.SetPeriod ((size_t)(1000 / frequency)); break;
-    case SoundDeviceHint_ListenerPropertiesUpdateFrequency: listener_properties_update_frequency = frequency; listener_timer.SetPeriod ((size_t)(1000 / frequency)); break;
+    case SoundDeviceHint_BufferUpdateFrequency:
+      buffer_update_frequency = frequency;
+      buffer_timer.SetPeriod ((size_t)(1000.0f / frequency));
+      break;
+    case SoundDeviceHint_SourcePropertiesUpdateFrequency:
+      source_properties_update_frequency = frequency;
+      source_timer.SetPeriod ((size_t)(1000.0f / frequency));
+      break;
+    case SoundDeviceHint_ListenerPropertiesUpdateFrequency:
+      listener_properties_update_frequency = frequency;
+      listener_timer.SetPeriod ((size_t)(1000.0f / frequency));
+      break;
+    default: 
+      RaiseInvalidArgument ("sound::low_level::OpenALDevice::SetHint", "hint", hint);
+      break;
   }
 }
 
@@ -430,6 +444,7 @@ size_t OpenALDevice::GetHint (SoundDeviceHint hint)
     case SoundDeviceHint_BufferUpdateFrequency:             return buffer_update_frequency;
     case SoundDeviceHint_SourcePropertiesUpdateFrequency:   return source_properties_update_frequency;
     case SoundDeviceHint_ListenerPropertiesUpdateFrequency: return listener_properties_update_frequency;
+    default:                                                RaiseInvalidArgument ("sound::low_level::OpenALDevice::GetHint", "hint", hint);    
   }
 
   return 0;

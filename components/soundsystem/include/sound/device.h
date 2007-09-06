@@ -138,7 +138,7 @@ struct ISoundDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void   SetHint (SoundDeviceHint hint, size_t frequency) = 0;
+    virtual void   SetHint (SoundDeviceHint hint, size_t мфдгу) = 0;
     virtual size_t GetHint (SoundDeviceHint hint) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,7 +200,7 @@ class SoundSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства воспроизведения звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static ISoundDevice* CreateDevice (const char* driver_name, const char* device_name, const void* window_handle, const char* init_string);
+    static ISoundDevice* CreateDevice (const char* driver_name, const char* device_name, const void* window_handlezz, const char* init_string);
     static ISoundDevice* CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string = "");
 };
 
