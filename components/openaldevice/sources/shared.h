@@ -282,8 +282,8 @@ class OpenALDevice : public sound::low_level::ISoundDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  SetHint (SoundDeviceHint hint, float value);
-    float GetHint (SoundDeviceHint hint);
+    void   SetHint (SoundDeviceHint hint, size_t frequency);
+    size_t GetHint (SoundDeviceHint hint);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции отладочного протоколирования
@@ -325,9 +325,9 @@ class OpenALDevice : public sound::low_level::ISoundDevice
     bool           is_muted;             //флг блокировки проигрывания
     size_t         channels_count;       //количество каналов
     OpenALSource*  channels [MAX_DEVICE_CHANNELS_COUNT]; //каналы проигрывания
-    float          buffer_update_period;                 //частота обновления буффера
-    float          source_properties_update_period;      //частота обновления свойств источника
-    float          listener_properties_update_period;    //частота обновления свойств слушателя
+    size_t         buffer_update_frequency;              //частота обновления буффера
+    size_t         source_properties_update_frequency;   //частота обновления свойств источника
+    size_t         listener_properties_update_frequency; //частота обновления свойств слушателя
     OpenALSource*  first_active_source;  //первый активный источник
     ALuint         al_buffers_pool [DEVICE_BUFFERS_POOL_SIZE]; //пул буферов
     size_t         al_buffers_pool_size;                       //размер пула буферов

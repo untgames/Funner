@@ -28,9 +28,9 @@ void DefaultLogHandler (const char* log_message)
 
 OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
  : context (device_name, &DefaultLogHandler),
-   buffer_update_period (SOURCE_BUFFERS_UPDATE_PERIOD),
-   source_properties_update_period (DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD),
-   listener_properties_update_period (DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD),
+   buffer_update_frequency ((size_t) (1.f / SOURCE_BUFFERS_UPDATE_PERIOD)),
+   source_properties_update_frequency ((size_t)(1.f / DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD)),
+   listener_properties_update_frequency ((size_t)(1.f / DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD)),
    buffer_timer   (xtl::bind (&OpenALDevice::BufferUpdate, this), SOURCE_BUFFERS_UPDATE_MILLISECONDS),
    listener_timer (xtl::bind (&OpenALDevice::ListenerUpdate, this), (size_t)(DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD * 1000)),
    source_timer   (xtl::bind (&OpenALDevice::SourceUpdate, this), (size_t)(DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD * 1000)),
@@ -410,26 +410,26 @@ void OpenALDevice::ListenerUpdate ()
    Установка параметров устройства
 */
 
-void OpenALDevice::SetHint (SoundDeviceHint hint, float value)
+void OpenALDevice::SetHint (SoundDeviceHint hint, size_t frequency)
 {
-  if (value < 0.001)
-    RaiseOutOfRange ("sound::low_level::OpenALDevice::SetHint", "value", value, 0.001f, 60.f);
+  if (frequency < 1)
+    RaiseOutOfRange ("sound::low_level::OpenALDevice::SetHint", "value", frequency, 1u, 1000u);
 
   switch (hint)
   {
-    case SoundDeviceHint_BufferUpdatePeriod: buffer_update_period = value; buffer_timer.SetPeriod ((size_t)(value * 1000)); break;
-    case SoundDeviceHint_SourcePropertiesUpdatePeriod: source_properties_update_period = value; source_timer.SetPeriod ((size_t)(value * 1000)); break;
-    case SoundDeviceHint_ListenerPropertiesUpdatePeriod: listener_properties_update_period = value; listener_timer.SetPeriod ((size_t)(value * 1000)); break;
+    case SoundDeviceHint_BufferUpdateFrequency: buffer_update_frequency = frequency; buffer_timer.SetPeriod ((size_t)(1000 / frequency)); break;
+    case SoundDeviceHint_SourcePropertiesUpdateFrequency: source_properties_update_frequency = frequency; source_timer.SetPeriod ((size_t)(1000 / frequency)); break;
+    case SoundDeviceHint_ListenerPropertiesUpdateFrequency: listener_properties_update_frequency = frequency; listener_timer.SetPeriod ((size_t)(1000 / frequency)); break;
   }
 }
 
-float OpenALDevice::GetHint (SoundDeviceHint hint)
+size_t OpenALDevice::GetHint (SoundDeviceHint hint)
 {
   switch (hint)
   {
-    case SoundDeviceHint_BufferUpdatePeriod:             return buffer_update_period;
-    case SoundDeviceHint_SourcePropertiesUpdatePeriod:   return source_properties_update_period;
-    case SoundDeviceHint_ListenerPropertiesUpdatePeriod: return listener_properties_update_period;
+    case SoundDeviceHint_BufferUpdateFrequency:             return buffer_update_frequency;
+    case SoundDeviceHint_SourcePropertiesUpdateFrequency:   return source_properties_update_frequency;
+    case SoundDeviceHint_ListenerPropertiesUpdateFrequency: return listener_properties_update_frequency;
   }
 
   return 0;

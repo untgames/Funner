@@ -64,9 +64,9 @@ struct Capabilities
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum SoundDeviceHint
 {
-  SoundDeviceHint_BufferUpdatePeriod,
-  SoundDeviceHint_SourcePropertiesUpdatePeriod,
-  SoundDeviceHint_ListenerPropertiesUpdatePeriod
+  SoundDeviceHint_BufferUpdateFrequency,
+  SoundDeviceHint_SourcePropertiesUpdateFrequency,
+  SoundDeviceHint_ListenerPropertiesUpdateFrequency
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,8 +138,8 @@ struct ISoundDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void  SetHint (SoundDeviceHint hint, float value) = 0;
-    virtual float GetHint (SoundDeviceHint hint) = 0;
+    virtual void   SetHint (SoundDeviceHint hint, size_t frequency) = 0;
+    virtual size_t GetHint (SoundDeviceHint hint) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции отладочного протоколирования
