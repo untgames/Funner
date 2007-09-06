@@ -37,7 +37,18 @@ const float  SOURCE_BUFFERS_UPDATE_PERIOD = 0.1f; //период обновления буферов
 ///Исключения OpenAL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct OpenALExceptionTag;
-struct OpenALGenSourceException {};
+
+//исключение, возникающее при невозможности создания источника
+struct OpenALGenSourceException: public std::exception
+{
+  const char* what () const throw () { return "OpenALGenSourceException"; }
+};
+
+//исключение, возникающее при невозможности создания буфера
+struct OpenALGenBufferException: public std::exception
+{
+  const char* what () const throw () { return "OpenALGenBufferException"; }
+};
 
 typedef common::DerivedException<common::Exception, OpenALExceptionTag> OpenALException;
 
@@ -254,6 +265,12 @@ class OpenALDevice : public sound::low_level::ISoundDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void*  GetSampleBuffer     () const { return sample_buffer.data (); }
     size_t GetSampleBufferSize () const { return sample_buffer.size (); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление распределением буферов проигрывания
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ALuint AllocateSourceBuffer   ();
+    void   DeallocateSourceBuffer (ALuint);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление подсчётом ссылок

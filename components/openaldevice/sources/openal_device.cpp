@@ -370,3 +370,26 @@ void OpenALDevice::Update ()
   for (OpenALSource* source=first_active_source; source; source=source->NextActive ())
     source->Update ();
 }
+
+/*
+    ”правление распределением буферов проигрывани€
+*/
+
+ALuint OpenALDevice::AllocateSourceBuffer ()
+{
+  const ALuint WRONG_BUFFER_ID = 0;
+
+  ALuint buffer = WRONG_BUFFER_ID;
+  
+  context.alGenBuffers (1, &buffer);
+  
+  if (buffer == WRONG_BUFFER_ID)
+    throw OpenALGenBufferException ();
+
+  return buffer;
+}
+
+void OpenALDevice::DeallocateSourceBuffer (ALuint buffer)
+{
+  alDeleteBuffers (1, &buffer);
+}

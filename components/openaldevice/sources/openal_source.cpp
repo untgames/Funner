@@ -31,16 +31,6 @@ OpenALSource::OpenALSource (OpenALDevice& in_device)
   
   if (alGetError () != AL_NO_ERROR)
     throw OpenALGenSourceException ();
-
-  try
-  {
-    device.Context ().alGenBuffers (SOURCE_BUFFERS_COUNT, al_buffers);
-  }
-  catch (...)
-  {
-    device.Context ().alDeleteSources (1, &al_source);
-    throw;
-  }
 }
 
 OpenALSource::~OpenALSource ()
@@ -55,15 +45,6 @@ OpenALSource::~OpenALSource ()
   {
     //подаваляем все исключения
   }
-  
-  try
-  {
-    device.Context ().alDeleteBuffers (SOURCE_BUFFERS_COUNT, al_buffers);
-  }
-  catch (...)
-  {
-    //подавляем все исключения
-  }
 }
 
 /*
@@ -75,13 +56,28 @@ void OpenALSource::Activate ()
   if (is_active)
     return;
     
+  for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
+  {
+    try
+    {
+      al_buffers [i] = device.AllocateSourceBuffer ();
+    }
+    catch (...)
+    {
+      for (size_t j=0; j<i; j++)
+        device.DeallocateSourceBuffer (al_buffers [j]);
+        
+      throw;
+    }
+  }
+    
   OpenALSource* first = device.GetFirstActiveSource ();
   
   next_active = first;
   
   if (next_active) next_active->prev_active = this;
 
-  device.SetFirstActiveSource (this);
+  device.SetFirstActiveSource (this);    
 
   is_active = true;
 }
@@ -90,6 +86,9 @@ void OpenALSource::Deactivate ()
 {
   if (!is_active)
     return;
+    
+  for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
+    device.DeallocateSourceBuffer (al_buffers [i]);
     
   if (next_active) next_active->prev_active = prev_active;
   if (prev_active) prev_active->next_active = next_active;
@@ -321,7 +320,7 @@ void OpenALSource::FillBuffers ()
       //первоначальное заполнение буферов      
 
     for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
-      FillBuffer (al_buffers [i]);      
+      FillBuffer (al_buffers [i]);
   }
   else if (processed_buffers_count)
   {
@@ -349,6 +348,28 @@ void OpenALSource::Update ()
   {
     OpenALContext& context = device.Context ();
     
+      //определение состояния проигрывания
+
+    int status = AL_STOPPED;
+
+    context.alGetSourcei (al_source, AL_SOURCE_STATE, &status);
+
+      //возобновление прекращенного проигрывания / установка флага, сигнализирующего о конце проигрывания
+      
+    if (status != AL_PLAYING)
+    {
+      if (IsPlaying ()) sample_need_update = true;
+      else              is_playing         = false;
+    }
+    
+      //добавление / удаление источника в список активных, заказ буферов
+
+    if (is_playing != is_active)
+    {
+      if (is_playing) Activate   ();
+      else            Deactivate ();
+    }
+    
       //обновление параметров источника
     
     if (source_need_update)
@@ -365,20 +386,6 @@ void OpenALSource::Update ()
       context.alSourcef  (al_source, AL_CONE_OUTER_ANGLE, source.outer_angle);
       context.alSourcef  (al_source, AL_CONE_OUTER_GAIN, source.outer_gain);
       context.alSourcef  (al_source, AL_REFERENCE_DISTANCE, source.reference_distance);
-    }
-
-      //определение состояния проигрывания
-
-    int status = AL_STOPPED;
-
-    context.alGetSourcei (al_source, AL_SOURCE_STATE, &status);
-
-      //возобновление прекращенного проигрывания / установка флага, сигнализирующего о конце проигрывания
-      
-    if (status != AL_PLAYING)
-    {
-      if (IsPlaying ()) sample_need_update = true;
-      else              is_playing         = false;
     }
 
       //обновление буферов      
@@ -410,15 +417,7 @@ void OpenALSource::Update ()
       }
       else alSourceStop (al_source);
     }
-    else FillBuffers ();
-    
-      //добавление / удаление источника в список активных
-      
-    if (is_playing != is_active)
-    {
-      if (is_playing) Activate   ();
-      else            Deactivate ();
-    }
+    else FillBuffers ();    
   }
   catch (std::exception& exception)
   {
