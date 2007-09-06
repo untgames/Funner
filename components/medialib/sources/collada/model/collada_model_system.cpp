@@ -18,125 +18,14 @@ ModelSystemImpl::ModelSystemImpl ()
     Регистрация пользовательских функций загрузки / сохранения
 */
 
-bool ModelSystemImpl::RegisterLoader (const char* extension, const LoadFunction& loader)
+void ModelSystem::RegisterLoader (const char* extension, const LoadHandler& loader)
 {
-  if (!extension)
-    RaiseNullArgument ("medialib::collada::ModelSystemImpl::RegisterLoader", "extension");
-
-  return loaders.insert_pair (extension, loader).second;
+  ModelSystemSingleton::Instance ().RegisterLoader (extension, loader);
 }
 
-bool ModelSystemImpl::RegisterSaver (const char* extension, const SaveFunction& saver)
+void ModelSystem::RegisterSaver (const char* extension, const SaveHandler& saver)
 {
-  if (!extension)
-    RaiseNullArgument ("medialib::collada::ModelSystemImpl::RegisterSaver", "extension");
-
-  return savers.insert_pair (extension, saver).second;
-}
-
-void ModelSystemImpl::UnregisterLoader (const char* extension)
-{
-  if (!extension)
-    return;
-
-  loaders.erase (extension);
-}
-
-void ModelSystemImpl::UnregisterSaver (const char* extension)
-{
-  if (!extension)
-    return;
-
-  savers.erase (extension);
-}
-
-void ModelSystemImpl::UnregisterAllLoaders ()
-{
-  loaders.clear ();
-}
-
-void ModelSystemImpl::UnregisterAllSavers ()
-{
-  savers.clear ();
-}
-
-/*
-    Загрузка / сохранение
-*/
-
-namespace
-{
-
-const char* GetExtension (const char* file_name)
-{
-  const char*  ext;
-  size_t len = strlen(file_name) - 1;
-  
-  if (file_name == NULL || !len)
-    return file_name;
-
-  ext = file_name + len;
-
-  for (; len && (*ext != '.'); len--, ext--);
-
-  if (!len)
-    return file_name;
-
-  return ext + 1;
-}
-
-}
-
-void ModelSystemImpl::Load (const char* file_name, Model& model, const LogFunction& log) const
-{
-  if (!file_name)
-    RaiseNullArgument ("medialib::collada::ModelSystemImpl::Load", "file_name");
-
-  const char* extension = GetExtension (file_name);
-
-  LoadFunctions::const_iterator iter = loaders.find (extension);
-
-  if (iter == loaders.end ())
-    Raise<Exception> ("medialib::collada::ModelSystemImpl::Load", "Can't load model from file '%s'. Unregistered extension '%s'.", file_name, extension); 
-    
-  model.Rename (file_name);    
-
-  iter->second (file_name, model, log);  
-}
-
-void ModelSystemImpl::Save (const char* file_name, const Model& model, const LogFunction& log) const
-{
-  if (!file_name)
-    RaiseNullArgument ("medialib::collada::ModelSystemImpl::Save", "file_name");
-
-  const char* extension = GetExtension (file_name);
-
-  SaveFunctions::const_iterator iter = savers.find (extension);
-
-  if (iter == savers.end ())
-    Raise<Exception> ("medialib::collada::ModelSystemImpl::Save", "Can't save model to file '%s'. Unregistered extension '%s'.", file_name, extension);
-
-  iter->second (file_name, model, log);
-}
-
-/*
-    Врапперы вызовов ModelSystemImpl    
-*/
-
-namespace medialib
-{
-
-namespace collada
-{
-
-bool ModelSystem::RegisterLoader (const char* extension, const LoadFunction& loader)
-{
-  return ModelSystemSingleton::Instance ().RegisterLoader (extension, loader);
-}
-
-bool ModelSystem::RegisterSaver (const char* extension, const SaveFunction& saver)
-{
-  return ModelSystemSingleton::Instance ().RegisterSaver (extension, saver);
+  ModelSystemSingleton::Instance ().RegisterSaver (extension, saver);
 }
 
 void ModelSystem::UnregisterLoader (const char* extension)
@@ -151,10 +40,5 @@ void ModelSystem::UnregisterSaver (const char* extension)
 
 void ModelSystem::UnregisterAll ()
 {
-  ModelSystemSingleton::Instance ().UnregisterAllLoaders ();
-  ModelSystemSingleton::Instance ().UnregisterAllSavers ();
-}
-
-}
-
+  ModelSystemSingleton::Instance ().UnregisterAll ();
 }

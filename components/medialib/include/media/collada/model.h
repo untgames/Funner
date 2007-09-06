@@ -116,16 +116,14 @@ void swap (Model&, Model&);
 class ModelSystem
 {
   public:
-    typedef xtl::function<void (const char*,       Model&, const Model::LogFunction& log)> LoadFunction;
-    typedef xtl::function<void (const char*, const Model&, const Model::LogFunction& log)> SaveFunction;
+    typedef xtl::function<void (const char*,       Model&, const Model::LogFunction& log)> LoadHandler;
+    typedef xtl::function<void (const char*, const Model&, const Model::LogFunction& log)> SaveHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абота с пользовательскими функци€ми загрузки и сохранени€
-///  Register* возвращает true при успешной регистрации, и false,  если такое расширение уже
-///  зарегестрировано
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static bool RegisterLoader   (const char* extension, const LoadFunction& loader);
-    static bool RegisterSaver    (const char* extension, const SaveFunction& saver);
+    static void RegisterLoader   (const char* extension, const LoadHandler& loader);
+    static void RegisterSaver    (const char* extension, const SaveHandler& saver);
     static void UnregisterLoader (const char* extension);
     static void UnregisterSaver  (const char* extension);
     static void UnregisterAll    ();

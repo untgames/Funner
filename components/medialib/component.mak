@@ -35,7 +35,7 @@ MEDIALIB_TESTS.COMPILER_DEFINES :=
 #Öåëü ¹4 - MediaLib COLLADA
 MEDIALIB_COLLADA.TYPE             := static-lib
 MEDIALIB_COLLADA.NAME             := collada
-MEDIALIB_COLLADA.INCLUDE_DIRS     := include ../commonlib/include ../mathlib/include ../xtl/include
+MEDIALIB_COLLADA.INCLUDE_DIRS     := include sources ../commonlib/include ../mathlib/include ../xtl/include
 MEDIALIB_COLLADA.SOURCE_DIRS      := sources/collada/model sources/collada/dae_loader
 MEDIALIB_COLLADA.LIB_DIRS         :=  
 MEDIALIB_COLLADA.LIBS             := 
