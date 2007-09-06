@@ -228,15 +228,14 @@ void OpenALSource::FillBuffer (size_t al_buffer)
       if (play_sample_position == sound_sample.SamplesCount ())
         play_sample_position = 0;        
 
-      size_t size = sound_sample.Read (play_sample_position, available_samples_count, buffer);
+      size_t samples_count = sound_sample.Read (play_sample_position, available_samples_count, buffer);
       
-      if (!size)
+      if (!samples_count)
         break;
       
-      available_samples_count -= size;
-      buffer                  += sound_sample.SamplesToBytes (size);
-
-      play_sample_position += size;
+      available_samples_count -= samples_count;
+      buffer                  += sound_sample.SamplesToBytes (samples_count);
+      play_sample_position    += samples_count;
     }    
   }
   else
@@ -348,6 +347,8 @@ void OpenALSource::Update ()
         context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers);
 
       play_sample_position = sound_sample.SecondsToSamples (Tell ());
+      
+      printf ("heye!\n");
 
       if (playing)
       {
