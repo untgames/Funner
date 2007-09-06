@@ -32,10 +32,10 @@ int main ()
     printf ("  Bits per sample - %u\n", sample.BitsPerSample ());
 
     printf ("Calculated sample properties:\n");
-    printf ("  Bytes   - %u\n", sample.SamplesToBytes (sample.SamplesCount ()));
-    printf ("  Samples - %u\n", sample.BytesToSamples (sample.SizeInBytes ()));
-    printf ("  Seconds - %f\n", sample.SamplesToSeconds (sample.SamplesCount ()));
-    printf ("  Samples - %u\n", sample.SecondsToSamples (sample.SamplesToSeconds (sample.SamplesCount ())));
+    printf ("  Bytes    - %u\n", sample.SamplesToBytes (sample.SamplesCount ()));
+    printf ("  Samples  - %u\n", sample.BytesToSamples (sample.SizeInBytes ()));
+    printf ("  Duration - %f\n", sample.Duration ());
+    printf ("  Samples  - %u\n", sample.SecondsToSamples (sample.SamplesToSeconds (sample.SamplesCount ())));
   }
   catch (std::exception& exception)
   {                                               

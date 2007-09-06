@@ -8,7 +8,7 @@ Sample properties:
   Channels  - 2
   Bits per sample - 16
 Calculated sample properties:
-  Bytes   - 220668
-  Samples - 55167
-  Seconds - 2.501905
-  Samples - 55167
+  Bytes    - 220668
+  Samples  - 55167
+  Duration - 2.501905
+  Samples  - 55167
