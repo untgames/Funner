@@ -28,10 +28,10 @@ class OpenALContext;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Константы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t SOURCE_BUFFERS_COUNT         = 4;     //количество буферов проигрывания на источник
-const size_t MAX_DEVICE_CHANNELS_COUNT    = 1024;  //максимальное количество каналов проигрывания
-const size_t DEFAULT_SAMPLE_BUFFER_SIZE   = 4096;  //размер буфера сэмплирования по умолчанию
-const float  SOURCE_BUFFERS_UPDATE_PERIOD = 0.25f; //период обновления буферов
+const size_t SOURCE_BUFFERS_COUNT         = 4;    //количество буферов проигрывания на источник
+const size_t MAX_DEVICE_CHANNELS_COUNT    = 1024; //максимальное количество каналов проигрывания
+const size_t DEFAULT_SAMPLE_BUFFER_SIZE   = 4096; //размер буфера сэмплирования по умолчанию
+const float  SOURCE_BUFFERS_UPDATE_PERIOD = 0.1f; //период обновления буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключения OpenAL
@@ -238,10 +238,10 @@ class OpenALDevice : public sound::low_level::ISoundDevice
     void GetListener (Listener&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка функции отладочного протоколирования
+///Работа со списком активных источников
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void              SetDebugLog (const LogHandler&);
-    const LogHandler& GetDebugLog ();
+    void          SetFirstActiveSource (OpenALSource* source) { first_active_source = source; }
+    OpenALSource* GetFirstActiveSource () const { return first_active_source; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///OpenAL контекст
@@ -260,6 +260,12 @@ class OpenALDevice : public sound::low_level::ISoundDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddRef  ();
     void Release ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка функции отладочного протоколирования
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void              SetDebugLog (const LogHandler&);
+    const LogHandler& GetDebugLog ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Печать отладочных сообщений
@@ -291,6 +297,7 @@ class OpenALDevice : public sound::low_level::ISoundDevice
     bool           is_muted;             //флг блокировки проигрывания
     size_t         channels_count;       //количество каналов
     OpenALSource*  channels [MAX_DEVICE_CHANNELS_COUNT]; //каналы проигрывания
+    OpenALSource*  first_active_source;  //первый активный источник
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -336,13 +343,21 @@ class OpenALSource
 ///Обновление (синхронизация с OpenAL)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Update ();
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа со списком активных источников
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    OpenALSource* PrevActive () const { return prev_active; }
+    OpenALSource* NextActive () const { return next_active; }
+
   private:
     void   FillBuffer (size_t al_buffer);
     void   FillBuffers ();
     void   UpdateSourceNotify ();
     void   UpdateSampleNotify ();
     size_t TellInTicks () const;
+    void   Activate ();
+    void   Deactivate ();
     
   private:
     OpenALSource (const OpenALSource&); //no impl
@@ -359,12 +374,14 @@ class OpenALSource
     bool           sample_need_update;                //необходимо обновить позицию проигрывания
     bool           is_looped;                         //цикличность проигрывания
     bool           is_playing;                        //проигрывается ли звук
+    bool           is_active;                         //является ли источник активным
     clock_t        play_time_start;                   //время начала проигрывания
     clock_t        play_time_offset;                  //смещение при проигрывании
     clock_t        last_buffers_fill_time;            //время последнего обновления буферов
     size_t         play_sample_position;              //позиция проигрывания    
     ALuint         al_source;                         //имя источника в OpenAL
-    ALuint         al_buffers [SOURCE_BUFFERS_COUNT]; //OpenAL буферы    
+    ALuint         al_buffers [SOURCE_BUFFERS_COUNT]; //OpenAL буферы
+    OpenALSource   *prev_active, *next_active;        //список активных источников (проигрываемых)
 };
 
 }

@@ -33,7 +33,8 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
    ref_count (1),
    is_muted (false), 
    gain (1.0f),
-   channels_count (0)  
+   channels_count (0),
+   first_active_source (0)
 {
     //временный код!!!
 
@@ -344,6 +345,13 @@ bool OpenALDevice::IsPlaying (size_t channel)
 
 void OpenALDevice::Update ()
 {
+    //если нет активных источников нет необходимости что-либо обновлять
+
+  if (!first_active_source)
+    return;
+    
+    //обновление слушателя
+
   if (listener_need_update)
   {
     listener_need_update = false;
@@ -356,7 +364,9 @@ void OpenALDevice::Update ()
     context.alListenerfv (AL_ORIENTATION, orientation);
     context.alListenerf  (AL_GAIN,        is_muted ? 0.0f : gain);
   }
+  
+    //обновление источников
 
-  for (size_t i=0; i<channels_count; i++)
-    channels [i]->Update ();
+  for (OpenALSource* source=first_active_source; source; source=source->NextActive ())
+    source->Update ();
 }

@@ -3,6 +3,10 @@
 using namespace sound::low_level;
 using namespace common;
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 //период обновления буферов источника в тиках
 const size_t SOURCE_BUFFERS_UPDATE_TICKS = size_t (SOURCE_BUFFERS_UPDATE_PERIOD * CLOCKS_PER_SEC);
 
@@ -11,8 +15,16 @@ const size_t SOURCE_BUFFERS_UPDATE_TICKS = size_t (SOURCE_BUFFERS_UPDATE_PERIOD 
 */
 
 OpenALSource::OpenALSource (OpenALDevice& in_device)
-  : device (in_device), source_need_update (true), sample_need_update (false), is_looped (false), is_playing (false),
-    play_time_offset (0), last_buffers_fill_time (clock () - SOURCE_BUFFERS_UPDATE_TICKS)
+  : device (in_device),
+    source_need_update (true),
+    sample_need_update (false),
+    is_looped (false),
+    is_playing (false),
+    is_active (false),
+    play_time_offset (0),
+    last_buffers_fill_time (clock () - SOURCE_BUFFERS_UPDATE_TICKS),
+    prev_active (0),
+    next_active (0)
 {
   alGetError   ();
   alGenSources (1, &al_source);  
@@ -33,6 +45,8 @@ OpenALSource::OpenALSource (OpenALDevice& in_device)
 
 OpenALSource::~OpenALSource ()
 { 
+  Deactivate ();
+
   try
   {
     device.Context ().alDeleteSources (1, &al_source);
@@ -50,6 +64,39 @@ OpenALSource::~OpenALSource ()
   {
     //подавляем все исключения
   }
+}
+
+/*
+    Работа со списком активных источников
+*/
+
+void OpenALSource::Activate ()
+{  
+  if (is_active)
+    return;
+    
+  OpenALSource* first = device.GetFirstActiveSource ();
+  
+  next_active = first;
+  
+  if (next_active) next_active->prev_active = this;
+
+  device.SetFirstActiveSource (this);
+
+  is_active = true;
+}
+
+void OpenALSource::Deactivate ()
+{
+  if (!is_active)
+    return;
+    
+  if (next_active) next_active->prev_active = prev_active;
+  if (prev_active) prev_active->next_active = next_active;
+  else             device.SetFirstActiveSource (next_active);
+
+  prev_active = next_active = 0;
+  is_active   = false;
 }
 
 /*
@@ -250,10 +297,8 @@ void OpenALSource::FillBuffer (size_t al_buffer)
   
   size_t readed_samples_count = max_samples_count - available_samples_count;
   ALenum format               = sound_sample.Channels () == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
-  
+
   OpenALContext& context = device.Context ();  
-  
-//  printf ("fill (%p, %u)\n", al_buffer, sound_sample.SamplesToBytes (readed_samples_count));
 
   context.alBufferData (al_buffer, format, device.GetSampleBuffer (), sound_sample.SamplesToBytes (readed_samples_count),
                         sound_sample.Frequency ());
@@ -270,20 +315,13 @@ void OpenALSource::FillBuffers ()
 
   context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
   context.alGetSourcei (al_source, AL_BUFFERS_PROCESSED, &processed_buffers_count);
-  
-    printf ("queued=%u processed=%u\n", queued_buffers_count, processed_buffers_count);  
 
   if (!queued_buffers_count)
   {  
       //первоначальное заполнение буферов      
 
     for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
-      FillBuffer (al_buffers [i]);
-      
-  context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
-  context.alGetSourcei (al_source, AL_BUFFERS_PROCESSED, &processed_buffers_count);      
-      
-    printf ("!queued=%u processed=%u\n", queued_buffers_count, processed_buffers_count);        
+      FillBuffer (al_buffers [i]);      
   }
   else if (processed_buffers_count)
   {
@@ -304,7 +342,7 @@ void OpenALSource::FillBuffers ()
 
 void OpenALSource::Update ()
 {
-  if (!is_playing && !sample_need_update)
+  if (!is_active && !sample_need_update)
     return;    
 
   try
@@ -331,17 +369,16 @@ void OpenALSource::Update ()
 
       //определение состояния проигрывания
 
-    bool playing = IsPlaying ();
-    int  status  = AL_STOPPED;
+    int status = AL_STOPPED;
 
     context.alGetSourcei (al_source, AL_SOURCE_STATE, &status);
 
-      //возобновление прекращенного проигрывания
+      //возобновление прекращенного проигрывания / установка флага, сигнализирующего о конце проигрывания
       
     if (status != AL_PLAYING)
     {
-      if (playing) sample_need_update = true;
-      else         is_playing         = false;
+      if (IsPlaying ()) sample_need_update = true;
+      else              is_playing         = false;
     }
 
       //обновление буферов      
@@ -366,14 +403,22 @@ void OpenALSource::Update ()
 
       play_sample_position = sound_sample.SecondsToSamples (Tell ());      
 
-      if (playing)
+      if (is_playing)
       {
         FillBuffers  ();
         alSourcePlay (al_source);
       }
-      else alSourceStop (al_source);      
+      else alSourceStop (al_source);
     }
     else FillBuffers ();
+    
+      //добавление / удаление источника в список активных
+      
+    if (is_playing != is_active)
+    {
+      if (is_playing) Activate   ();
+      else            Deactivate ();
+    }
   }
   catch (std::exception& exception)
   {
