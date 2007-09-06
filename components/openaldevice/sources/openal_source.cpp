@@ -234,7 +234,9 @@ void OpenALSource::FillBuffer (size_t al_buffer)
         break;
       
       available_samples_count -= size;
-      buffer                  += size;
+      buffer                  += sound_sample.SamplesToBytes (size);
+
+      play_sample_position += size;
     }    
   }
   else
@@ -250,8 +252,6 @@ void OpenALSource::FillBuffer (size_t al_buffer)
   context.alBufferData (al_buffer, format, device.GetSampleBuffer (), sound_sample.SamplesToBytes (readed_samples_count),
                         sound_sample.Frequency ());
   context.alSourceQueueBuffers (al_source, 1, &al_buffer);  
-
-  play_sample_position += readed_samples_count;
 }
 
 void OpenALSource::FillBuffers ()
