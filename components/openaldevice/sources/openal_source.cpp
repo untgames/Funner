@@ -252,6 +252,8 @@ void OpenALSource::FillBuffer (size_t al_buffer)
   ALenum format               = sound_sample.Channels () == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
   
   OpenALContext& context = device.Context ();  
+  
+//  printf ("fill (%p, %u)\n", al_buffer, sound_sample.SamplesToBytes (readed_samples_count));
 
   context.alBufferData (al_buffer, format, device.GetSampleBuffer (), sound_sample.SamplesToBytes (readed_samples_count),
                         sound_sample.Frequency ());
