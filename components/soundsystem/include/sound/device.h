@@ -204,7 +204,7 @@ class SoundSystem
     static ISoundDevice* CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string = "");
 };
 
-#include <sound/impl/device.inl>
+#include <sound/detail/device.inl>
 
 }
 
