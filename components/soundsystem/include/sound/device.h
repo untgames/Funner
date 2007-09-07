@@ -28,6 +28,7 @@ struct Source
   float       outer_angle;         //угол внешнего конуса излучения
   float       outer_gain;          //громкость внутри внешнего конуса
   float       reference_distance;  //расстояние, с которого громкость равна volume
+  float       maximum_distance;    //расстояние незатухания громкости
 //Настройки эффектов звука
 //  float        air_absorption;      //поглощение воздухом
 //  float        outer_gain_hf;       //параметр фильтра высокой частоты для внешнего конуса

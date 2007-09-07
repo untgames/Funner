@@ -435,6 +435,7 @@ void OpenALSource::PropertiesUpdate ()
       context.alSourcef  (al_source, AL_CONE_OUTER_ANGLE, source.outer_angle);
       context.alSourcef  (al_source, AL_CONE_OUTER_GAIN, source.outer_gain);
       context.alSourcef  (al_source, AL_REFERENCE_DISTANCE, source.reference_distance);
+      context.alSourcef  (al_source, AL_MAX_DISTANCE, source.maximum_distance);
     }
   }
   catch (std::exception& exception)
