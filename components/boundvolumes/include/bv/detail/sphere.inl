@@ -81,27 +81,23 @@ inline bool sphere<T>::empty (const element_type& eps) const
 /*
     Добавление примитивов в ограничивающий объём
 */
-///
-///  Если текущий радиус < 0 - сбрасываем положение сферы
-///////////////////////////////////////////////////////////////////////////////////////////////////
+
+//если текущий радиус < 0 - сбрасываем положение сферы
 template <class T>
 sphere<T>& sphere<T>::operator += (const vec_type& point)
 {
-    //???????????
-
-  vec_type vec;
-  if(sphere_radius<0)
+  if (sphere_radius < element_type (0))
   {
-     sphere_radius=0;
-     sphere_center=vec;
-     return *this;
-  }
-  if(contains(point))
-     return *this;
+    sphere_radius = element_type (0);
+    sphere_center = point;
 
-  vec=(sphere_center+point)/2;
+    return *this;
+  }
   
-  sphere_center=vec+normalize(vec)*(sphere_radius/2);
+  element_type distance = length (sphere_center - point);
+  
+  if (distance > sphere_radius)
+    sphere_radius = distance;
 
   return *this;
 }
