@@ -873,9 +873,7 @@ inline basic_string<T,Traits,Alloc> basic_string<T,Traits,Alloc>::operator + (co
 }
 
 template <class T,class Traits,class Alloc>
-inline basic_string<T,Traits,Alloc> operator + 
- (const typename basic_string<T,Traits,Alloc>::value_type* a,
-  const basic_string<T,Traits,Alloc>& b)
+inline basic_string<T,Traits,Alloc> operator + (const T* a, const basic_string<T,Traits,Alloc>& b)
 {
   typename basic_string<T,Traits,Alloc>::_reserve __reserve;    
 
@@ -883,9 +881,7 @@ inline basic_string<T,Traits,Alloc> operator +
 }
 
 template <class T,class Traits,class Alloc>
-inline basic_string<T,Traits,Alloc> operator + 
- (const typename basic_string<T,Traits,Alloc>::value_type a,
-  const basic_string<T,Traits,Alloc>& b)
+inline basic_string<T,Traits,Alloc> operator + (const T a, const basic_string<T,Traits,Alloc>& b)
 {
   typename basic_string<T,Traits,Alloc>::_reserve __reserve;
   basic_string<T,Traits,Alloc> res (__reserve,b.size ()+1);
