@@ -4,7 +4,7 @@
 
 template <class T>
 inline sphere<T>::sphere ()
-  : sphere_radius (0)
+  : sphere_radius (-1)
   {}
 
 template <class T>
@@ -75,7 +75,7 @@ inline typename sphere<T>::element_type sphere<T>::volume () const
 template <class T>
 inline bool sphere<T>::empty (const element_type& eps) const
 {
-  return sphere_radius < eps;
+  return sphere_radius < 0;
 }
 
 /*
@@ -90,8 +90,9 @@ sphere<T>& sphere<T>::operator += (const vec_type& point)
     //???????????
 
   vec_type vec;
-  if(sphere_radius==0)
+  if(sphere_radius<0)
   {
+     sphere_radius=0;
      sphere_center=vec;
      return *this;
   }
@@ -111,7 +112,7 @@ sphere<T>& sphere<T>::operator += (const sphere<T>& sph)
     //????????
 
   vec_type vec;
-  if(sphere_radius==0)
+  if(sphere_radius<0)
   {
      sphere_radius=sph.radius();
      sphere_center=sph.centre();
