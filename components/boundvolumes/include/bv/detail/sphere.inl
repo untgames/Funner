@@ -1,3 +1,15 @@
+namespace detail
+{
+
+//возведение в квадрат
+template <class T>
+inline T sqr (const T& x)
+{
+  return x * x;
+}
+
+}
+
 /*
     Конструкторы
 */
@@ -44,6 +56,12 @@ inline void sphere<T>::set_center (const vec_type& c)
   sphere_center = c;
 }
 
+template <class T>
+inline void sphere<T>::set_center (const element_type& x, const element_type& y, const element_type& z)
+{
+  set_center (vec_type (x, y, z));
+}
+
 /*
     Сброс объёма
 */
@@ -56,26 +74,13 @@ inline void sphere<T>::reset (const vec_type& center, const element_type& radius
 }
 
 /*
-    Получение статистик ограничивающей сферы
-*/
-
-//геометрический объём сферы
-template <class T>
-inline typename sphere<T>::element_type sphere<T>::volume () const
-{
-  static const element_type pi = (element_type)3.1415926;
-
-  return element_type (4) * pi * sphere_radius * sphere_radius * sphere_radius / element_type (3);
-}
-
-/*
     Проверка на пустоту
 */
 
 template <class T>
-inline bool sphere<T>::empty (const element_type& eps) const
+inline bool sphere<T>::empty () const
 {
-  return sphere_radius < 0;
+  return sphere_radius < element_type (0);
 }
 
 /*
@@ -150,7 +155,7 @@ inline sphere<T> sphere<T>::operator + (const axis_aligned_box<T>& box) const
 template <class T>
 inline sphere<T>& sphere<T>::operator *= (const math::quat<T>& q)
 {
-  sphere_center *= q;
+  sphere_center = q * sphere_center;
 
   return *this;
 }
@@ -170,7 +175,7 @@ inline sphere<T> operator * (const math::quat<T>& q, const sphere<T>& s)
 template <class T>
 inline axis_aligned_box<T> sphere<T>::operator * (const math::matrix<T, 4>& m) const
 {
-  return axis_aligned_box (sphere_center - vec_type (sphere_center), sphere_center + vec_type (sphere_center)) *= m;
+  return axis_aligned_box<T> (*this) *= m;
 }
 
 template <class T>
@@ -180,52 +185,8 @@ inline axis_aligned_box<T> operator * (const math::matrix<T, 4>& m, const sphere
 }
 
 /*
-    Проверка пересечения ограничивающей сферы с различными примитивами
-*/
-
-template <class T>
-inline bool sphere<T>::intersects (const sphere<T>& s) const
-{
-  float distance = sphere_radius + s.sphere_radius;
-
-  return qlen (sphere_center - sphere_center) < distance * distance;
-}
-
-//bool template <class T> class sphere::intersects (const axis_aligned_box<T>&) const;
-
-/*
-    Проверка: содержит ли ограничивающая сфера различные примитивы
-*/
-
-template <class T>
-inline bool typename sphere<T>::contains (const vec_type& point) const
-{
-  return qlen (point - sphere_center) < sphere_radius * sphere_radius;
-}
-
-template <class T>
-inline bool typename sphere<T>::contains (const sphere& s) const
-{
-  return s.sphere_radius + length (sphere_center - s.sphere_center) < sphere_radius;
-}
-
-//bool template <class T> class sphere::contains (const axis_aligned_box<T>& box) const;
-
-/*
     Сравнение
 */
-
-//специализировать для float/double/int
-template <class T>
-inline bool sphere<T>::equal (const sphere& s, const element_type& eps) const
-{
-  element_type difference = sphere_radius - s.sphere_radius;
-
-  if (difference < element_type (0))
-    difference = -difference;
-
-  return math::equal (sphere_center, s.sphere_center, eps) && difference < eps;
-}
 
 template <class T>
 inline bool sphere<T>::operator == (const sphere<T>& s) const
@@ -237,4 +198,92 @@ template <class T>
 inline bool typename sphere<T>::operator != (const sphere& s) const
 {
   return !(*this == s);
+}
+
+/*
+    Проверка пересечения ограничивающей сферы с различными примитивами
+*/
+
+template <class T>
+inline bool intersects (const sphere<T>& s1, const sphere<T>& s2)
+{
+  if (s1.empty () || s2.empty ())
+    return false;
+
+  return qlen (s1.center () - s2.center ()) < detail::sqr (s1.radius () + s2.radius ());
+}
+
+//a Simple Method for Box-Sphere Intersection Testing by Jim Arvo from "Graphics Gems", Academic Press, 1990
+template <class T>
+inline bool intersects (const sphere<T>& s, const axis_aligned_box<T>& box)
+{
+  if (s.empty () || box.empty ())
+    return false;
+
+  T min_distance = T (0);
+
+  for (size_t i=0; i<3; i++)
+  {
+    T d1 = s.center ()[i] - box.minimum ()[i], d2 = s.center ()[i] - box.maximum ()[i];
+                 
+    if      (d1 < T (0)) min_distance += detail::sqr (d1);
+    else if (d2 > T (0)) min_distance += detail::sqr (d2);  
+  }
+
+  return min_distance < detail::sqr (s.radius ());
+}
+
+/*
+    Проверка: содержит ли ограничивающая сфера различные примитивы
+*/
+
+template <class T>
+inline bool contains (const sphere<T>& s, const math::vec<T, 3>& point)
+{
+  return qlen (point - s.center ()) < detail::sqr (s.radius ());
+}
+
+template <class T>
+inline bool contains (const sphere<T>& s1, const sphere<T>& s2)
+{
+  if (s1.empty () || s2.empty ())
+    return false;
+
+  return s2.radius () + length (s1.center () - s2.center ()) < s1.radius ();
+}
+
+template <class T>
+inline bool contains (const sphere<T>& s, const axis_aligned_box<T>& box)
+{
+  if (s.empty () || box.empty ())
+    return false;
+
+  return contains (s, box.minimum ()) && contains (s, box.maximum ());
+}
+
+/*
+    Расчёт объёма сферы
+*/
+
+template <class T>
+inline T volume (const sphere<T>& s)
+{
+  static const T pi = T (3.1415926);
+
+  return T (4) * pi * detail::sqr (s.radius ()) * s.radius () / T (3);
+}
+
+/*
+    Проверка на эквивалентность
+*/
+
+template <class T>
+inline bool equal (const sphere<T>& s1, const sphere<T>& s2, const T& eps)
+{
+  T difference = s1.radius () - s2.radius ();
+
+  if (difference < T (0))
+    difference = -difference;
+
+  return math::equal (s1.center (), s2.center (), eps) && difference < eps;
 }

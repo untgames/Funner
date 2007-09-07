@@ -11,6 +11,11 @@ template <class T>
 inline axis_aligned_box<T>::axis_aligned_box (const T& min_x, const T& min_y, const T& min_z, const T& max_x, const T& max_y, const T& max_z)
   : min_extent (min_x, min_y, min_z), max_extent (max_x, max_y, max_z)
   {}
+  
+template <class T>
+inline axis_aligned_box<T>::axis_aligned_box (const sphere<T>& s)
+  : min_extent (s.center () - vec_type (s.radius ())), max_extent (s.center () + vec_type (s.radius ()))
+  {}
 
 /*
     Получение экстент
@@ -101,24 +106,18 @@ inline T axis_aligned_box<T>::radius () const
   return length (size ()) / T (2);
 }
 
-template <class T>
-inline T axis_aligned_box<T>::volume () const
-{
-  vec_type size = this->size ();
-
-  return size.x * size.y * size.z;
-}
-
 /*
     Проверка на пустоту
 */
 
 template <class T>
-inline bool axis_aligned_box<T>::empty (const element_type& eps) const
+inline bool axis_aligned_box<T>::empty () const
 {
-  vec_type size = abs (this->size ());
+  for (size_t i=0; i<3; i++)
+    if (min_extent [i] >= max_extent [i])
+      return true;
 
-  return size.x < eps || size.y < eps || size.z < eps;
+  return false;
 }
 
 /*
@@ -190,7 +189,19 @@ template <class T>
 inline axis_aligned_box<T> axis_aligned_box<T>::operator + (const axis_aligned_box& box) const  
 {
   return axis_aligned_box (*this) += box;
-}    
+}
+
+template <class T>
+inline axis_aligned_box<T>& axis_aligned_box<T>::operator += (const sphere<T>& s)
+{
+  return (*this) += axis_aligned_box (s);
+}
+
+template <class T>
+inline axis_aligned_box<T> axis_aligned_box<T>::operator + (const sphere<T>& s) const
+{
+  return axis_aligned_box (*this) += axis_aligned_box (s);
+}
 
 /*
     Преобразования ограничивающего параллелипиппеда
@@ -255,19 +266,54 @@ inline axis_aligned_box<T> operator * (const math::quat<T>& tm, const axis_align
 {
   return box * tm;
 }
+
+/*
+    Сравнение
+*/
+
+template <class T>
+inline bool axis_aligned_box<T>::operator == (const axis_aligned_box& box) const
+{
+  return min_extent == box.min_extent && max_extent == box.max_extent;
+}
+
+template <class T>
+inline bool axis_aligned_box<T>::operator != (const axis_aligned_box& box) const
+{
+  return !(*this == box);
+}
+
+/*
+    Проверка эквивалентности
+*/
+
+template <class T>
+inline bool equal (const axis_aligned_box<T>& box1, const axis_aligned_box<T>& box2, const T& eps)
+{
+  return math::equal (box1.minimum (), box2.minimum (), eps) && math::equal (box1.maximum (), box2.maximum (), eps);
+}
     
 /*
     Проверка пересечения ограничивающего параллелипиппеда с различными примитивами
 */
 
 template <class T>
-inline bool axis_aligned_box<T>::intersects (const axis_aligned_box& box) const
+inline bool intersects (const axis_aligned_box<T>& box1, const axis_aligned_box<T>& box2)
 {
+  if (box1.empty () || box2.empty ())
+    return false;
+
   for (size_t i=0; i<3; i++)
-    if (max_extent [i] < box.min_extent [i] || min_extent [i] > box.max_extent [i])
+    if (box1.maximum ()[i] < box2.minimum ()[i] || box1.minimum ()[i] > box2.maximum ()[i])
       return false;
 
   return true;  
+}
+
+template <class T>
+inline bool intersects (const axis_aligned_box<T>& box, const sphere<T>& sphere)
+{
+  return intersects (sphere, box);
 }
 
 /*
@@ -275,41 +321,37 @@ inline bool axis_aligned_box<T>::intersects (const axis_aligned_box& box) const
 */
 
 template <class T>
-inline bool axis_aligned_box<T>::contains (const vec_type& p) const
+inline bool contains (const axis_aligned_box<T>& box, const math::vec<T, 3>& p)
 {
+  if (box.empty ())
+    return false;
+
   for (size_t i=0; i<3; i++)
-    if (p [i] < min_extent [i] || p [i] > max_extent [i])
+    if (p [i] < box.minimum ()[i] || p [i] > box.maximum ()[i])
       return false;
       
   return true;
 }
 
 template <class T>
-inline bool axis_aligned_box<T>::contains (const axis_aligned_box& box) const
+inline bool contains (const axis_aligned_box<T>& box1, const axis_aligned_box<T>& box2)
 {
-  return contains (box.min_extent) && contains (box.max_extent);
-}
+  if (box1.empty () || box2.empty ())
+    return false;
 
-/*
-    Сравнение
-*/
-
-template <class T>
-inline bool axis_aligned_box<T>::equal (const axis_aligned_box& box, const element_type& eps) const
-{
-  return math::equal (min_extent, box.min_extent, eps) && math::equal (max_extent, box.max_extent, eps);
+  return contains (box1, box2.minimum ()) && contains (box1, box2.maximum ());
 }
 
 template <class T>
-inline bool axis_aligned_box<T>::operator == (const axis_aligned_box& box) const
+inline bool contains (const axis_aligned_box<T>& box, const sphere<T>& s)
 {
-  return equal (box);
-}
+  if (box.empty () || s.empty ())
+    return false;
 
-template <class T>
-inline bool axis_aligned_box<T>::operator != (const axis_aligned_box& box) const
-{
-  return !(*this == box);
+  if (!contains (box, s.center ()))
+    return false;
+
+  return contains (box, normalize (s.center () - box.center () * s.radius () + s.center ()));
 }
 
 /*
@@ -331,4 +373,16 @@ inline axis_aligned_box<T> intersection (const axis_aligned_box<T>& a, const axi
   }
   
   return axis_aligned_box<T> (vmin, vmax);
+}
+
+/*
+    Получение объёма
+*/
+
+template <class T>
+inline T volume (const axis_aligned_box<T>& box)
+{
+  typename axis_aligned_box<T>::vec_type size = box.size ();
+
+  return size.x * size.y * size.z;
 }

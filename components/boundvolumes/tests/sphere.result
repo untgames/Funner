@@ -1,0 +1,44 @@
+Results of sphere_test:
+sphere created by default constructor
+center=[0 0 0] radius=-1
+sphere created by vector and radius constructor
+center=[10 20 30] radius=40
+volume: 268082.56
+set_radius
+center=[10 20 30] radius=5
+set_center
+center=[-10 -20 -30] radius=5
+reset
+center=[0 0 0] radius=-1
+empty: true
+add first point
+center=[-1 -2 0] radius=0
+add second point
+center=[-1 -2 0] radius=2
+copy
+center=[-1 -2 0] radius=2
+rotate
+center=[0 -2 1] radius=2
+add sphere
+center=[-1 -2 0] radius=4
+scale
+min=[-10 -12 -8] max=[6 4 8]
+add box
+center=[-1 -2 0] radius=15.6525
+intersects with sphere1: true
+intersects with sphere2: false
+intersects with empty sphere: false
+intersects with box1: true
+intersects with box2: false
+intersects with empty box: false
+contains sphere1: true
+contains sphere2: false
+contains empty sphere: false
+contains box1: true
+contains box2: false
+contains empty box: false
+s1 equal s3: true
+s1 == s2: false
+s1 != s2: true
+s1 == s1: true
+s1 != s1: false

@@ -1,18 +1,5 @@
 #include "shared.h"
 
-void dump (const vec3f& v)
-{
-  printf ("[%g %g %g]", v.x, v.y, v.z);
-}
-
-void dump (const aaboxf& box)
-{
-  printf ("min=");
-  dump (box.minimum ());
-  printf (" max=");
-  dump (box.maximum ());
-}
-
 int main ()
 {
   printf ("Results of axis_aligned_box_test:\n");  
@@ -57,7 +44,7 @@ int main ()
   printf ("\n  size: ");
   dump (box.size ());
   printf ("\n  radius: %.2f\n", box.radius ());
-  printf ("  volume: %g\n", box.volume ());
+  printf ("  volume: %g\n", volume (box));
   
   printf ("corners:\n");
   
@@ -122,24 +109,24 @@ int main ()
   printf ("\n");  
   
   printf ("intersects:\n");
-  printf ("  box with box1: %d, intersection: ", box.intersects (box1));
+  printf ("  box with box1: %d, intersection: ", intersects (box, box1));
   dump   (intersection (box, box1));
   printf ("\n");
-  printf ("  box1 with box: %d, intersection: ", box1.intersects (box));
+  printf ("  box1 with box: %d, intersection: ", intersects (box1, box));
   dump   (intersection (box1, box));
   printf ("\n");
 
   printf ("intersects:\n");
-  printf ("  box with box2: %d, intersection: ", box.intersects (box2));
+  printf ("  box with box2: %d, intersection: ", intersects (box, box2));
   dump   (intersection (box, box2));
   printf ("\n");
-  printf ("  box2 with box: %d, intersection: ", box2.intersects (box));
+  printf ("  box2 with box: %d, intersection: ", intersects (box2, box));
   dump   (intersection (box2, box));
   printf ("\n");
   
-  printf ("contains point: %d\n", box.contains (vec3f (10.0f)));
-  printf ("contains box1: %d\n", box.contains (box1));
-  printf ("contains intersection (box, box1): %d\n", box.contains (intersection (box, box1)));
+  printf ("contains point: %d\n", contains (box, vec3f (10.0f)));
+  printf ("contains box1: %d\n", contains (box, box1));
+  printf ("contains intersection (box, box1): %d\n", contains (box, intersection (box, box1)));
   
   printf ("box == box: %d\n", box == box);
   printf ("box != box: %d\n", box != box);  

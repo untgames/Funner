@@ -1,7 +1,7 @@
 #ifndef BOUND_VOLUMES_TESTS_SHARED
 #define BOUND_VOLUMES_TESTS_SHARED
 
-//вҐбвЁа®ў ­ЁҐ Є®¬ЇЁ«пжЁЁ Є®¤  б ¬ Єа®б ¬Ё min/max
+//тестирование компиляции кода с макросами min/max
 #define min
 #define max
 
@@ -11,5 +11,29 @@
 
 using namespace bound_volumes;
 using namespace math;
+
+/*
+    Вывод приимтивов
+*/
+
+void dump (const vec3f& v)
+{
+  printf ("[%.2g %.2g %.2g]", v.x, v.y, v.z);
+}
+
+void dump (const aaboxf& box)
+{
+  printf ("min=");
+  dump (box.minimum ());
+  printf (" max=");
+  dump (box.maximum ());
+}
+
+void dump (const spheref& s)
+{
+  printf ("center=");
+  dump (s.center());
+  printf (" radius=%g",s.radius());
+}
 
 #endif
