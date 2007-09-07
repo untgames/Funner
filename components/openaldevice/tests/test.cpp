@@ -104,6 +104,8 @@ int main ()
 
     sound_system->SetDebugLog (&log_print);
     sound_system->GetCapabilities (info);
+    
+//    sound_system->SetIntegerParam ("al_debug_log", 1);
 
     printf ("Using device %s.\n", sound_system->Name ());
     printf ("Total channels available: %u\n", info.channels_count);

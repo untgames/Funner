@@ -3,6 +3,7 @@
 
 #include <mathlib.h>
 #include <xtl/functional_fwd>
+#include <exception>
 
 namespace sound
 {
@@ -60,13 +61,11 @@ struct Capabilities
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Изменяемые характеристики устройства
+///Исключение: устройство перешло в некорректное состояние
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum SoundDeviceHint
+struct LostDeviceException: public std::exception
 {
-  SoundDeviceHint_BufferUpdateFrequency,
-  SoundDeviceHint_SourcePropertiesUpdateFrequency,
-  SoundDeviceHint_ListenerPropertiesUpdateFrequency
+  const char* what () const throw () { return "LostDeviceException"; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,8 +137,13 @@ struct ISoundDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void   SetHint (SoundDeviceHint hint, size_t мфдгу) = 0;
-    virtual size_t GetHint (SoundDeviceHint hint) = 0;
+    virtual const char* GetParamsNames  () = 0; //возвращение строку имён параметров устройства, разделитель - пробел
+    virtual bool        IsIntegerParam  (const char* name) = 0;
+    virtual bool        IsStringParam   (const char* name) = 0;
+    virtual void        SetIntegerParam (const char* name, int value) = 0;
+    virtual int         GetIntegerParam (const char* name) = 0;
+    virtual void        SetStringParam  (const char* name, const char* value) = 0;
+    virtual const char* GetStringParam  (const char* name) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции отладочного протоколирования

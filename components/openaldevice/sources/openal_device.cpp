@@ -10,8 +10,10 @@ using namespace sound::low_level;
 
 //время обновления буферов источника в миллисекундах
 const size_t SOURCE_BUFFERS_UPDATE_MILLISECONDS = size_t (SOURCE_BUFFERS_UPDATE_PERIOD * 1000);
-const float DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD = 0.03f;
-const float DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD = 0.03f;
+const float  DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD = 0.03f;
+const float  DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD = 0.03f;
+const char*  DEVICE_PARAMS_NAMES = "buffer_update_frequency source_update_frequency listener_update_frequency al_debug_log";
+const char*  DEVICE_INT_PARAMS_NAMES = DEVICE_PARAMS_NAMES;
 
 namespace
 {
@@ -27,14 +29,13 @@ void DefaultLogHandler (const char* log_message)
 */
 
 OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
- : context (device_name, &DefaultLogHandler),
+ : context (device_name),
    buffer_update_frequency ((size_t) (1.f / SOURCE_BUFFERS_UPDATE_PERIOD)),
    source_properties_update_frequency ((size_t)(1.f / DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD)),
    listener_properties_update_frequency ((size_t)(1.f / DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD)),
    buffer_timer   (xtl::bind (&OpenALDevice::BufferUpdate, this), SOURCE_BUFFERS_UPDATE_MILLISECONDS),
    listener_timer (xtl::bind (&OpenALDevice::ListenerUpdate, this), (size_t)(DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD * 1000)),
    source_timer   (xtl::bind (&OpenALDevice::SourceUpdate, this), (size_t)(DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD * 1000)),
-   log_handler (&DefaultLogHandler),
    listener_need_update (false),
    sample_buffer (DEFAULT_SAMPLE_BUFFER_SIZE),
    ref_count (1),
@@ -219,6 +220,8 @@ void OpenALDevice::GetListener (Listener& target_listener)
 void OpenALDevice::SetDebugLog (const LogHandler& in_log_handler)
 {
   log_handler = in_log_handler ? in_log_handler : &DefaultLogHandler;
+  
+  context.SetDebugLog (log_handler);
 }
 
 const OpenALDevice::LogHandler& OpenALDevice::GetDebugLog ()
@@ -407,47 +410,96 @@ void OpenALDevice::ListenerUpdate ()
 }
 
 /*
-   Установка параметров устройства
+    Установка параметров устройства
 */
 
-void OpenALDevice::SetHint (SoundDeviceHint hint, size_t frequency)
+const char* OpenALDevice::GetParamsNames ()
 {
-    //заменить на дефолтные значения!!!
+  return DEVICE_PARAMS_NAMES;
+}
 
-  if (!frequency)
-    RaiseInvalidArgument ("sound::low_level::OpenALDevice::SetHint", "value", frequency);
+bool OpenALDevice::IsIntegerParam  (const char* name)
+{
+  if (!name)
+    return false;
+    
+  return strstr (DEVICE_INT_PARAMS_NAMES, name) != 0;
+}
 
-  switch (hint)
+bool OpenALDevice::IsStringParam (const char*)
+{
+  return false;
+}
+
+void OpenALDevice::SetIntegerParam (const char* name, int value)
+{
+  if (!name)
+    RaiseNullArgument ("sound::low_level::OpenALDevice::SetIntegerParam", "name");    
+    
+    //заменить на дефолтные значения!!!    
+    
+  if (!value)
+    RaiseNullArgument ("sound::low_level::OpenALDevice::SetIntegerParam", "value");
+
+  if (!::strcmp (name, "buffer_update_frequency"))
   {
-    case SoundDeviceHint_BufferUpdateFrequency:
-      buffer_update_frequency = frequency;
-      buffer_timer.SetPeriod ((size_t)(1000.0f / frequency));
-      break;
-    case SoundDeviceHint_SourcePropertiesUpdateFrequency:
-      source_properties_update_frequency = frequency;
-      source_timer.SetPeriod ((size_t)(1000.0f / frequency));
-      break;
-    case SoundDeviceHint_ListenerPropertiesUpdateFrequency:
-      listener_properties_update_frequency = frequency;
-      listener_timer.SetPeriod ((size_t)(1000.0f / frequency));
-      break;
-    default: 
-      RaiseInvalidArgument ("sound::low_level::OpenALDevice::SetHint", "hint", hint);
-      break;
+    buffer_update_frequency = (size_t)value;
+    buffer_timer.SetPeriod ((size_t)(1000.0f / value));
+  }
+  else if (!::strcmp (name, "source_update_frequency"))
+  {
+    source_properties_update_frequency = (size_t)value;
+    source_timer.SetPeriod ((size_t)(1000.0f / value));    
+  }
+  else if (!::strcmp (name, "listener_update_frequency"))
+  {
+    listener_properties_update_frequency = (size_t)value;
+    listener_timer.SetPeriod ((size_t)(1000.0f / value));    
+  }
+  else if (!::strcmp (name, "al_debug_log"))
+  {
+    context.SetDebugLogState (value != 0);
+  }
+  else
+  {
+    RaiseInvalidArgument ("sound::low_level::OpenALDevice::SetIntegerParam", "name", name);
   }
 }
 
-size_t OpenALDevice::GetHint (SoundDeviceHint hint)
+int OpenALDevice::GetIntegerParam (const char* name)
 {
-  switch (hint)
+  if (!name)
+    RaiseNullArgument ("sound::low_level::OpenALDevice::GetIntegerParam", "name");
+    
+  if      (!::strcmp (name, "buffer_update_frequency"))   return static_cast<int> (buffer_update_frequency);
+  else if (!::strcmp (name, "source_update_frequency"))   return static_cast<int> (source_properties_update_frequency);
+  else if (!::strcmp (name, "listener_update_frequency")) return static_cast<int> (listener_properties_update_frequency);
+  else if (!::strcmp (name, "al_debug_log"))              return context.GetDebugLogState ();
+  else
   {
-    case SoundDeviceHint_BufferUpdateFrequency:             return buffer_update_frequency;
-    case SoundDeviceHint_SourcePropertiesUpdateFrequency:   return source_properties_update_frequency;
-    case SoundDeviceHint_ListenerPropertiesUpdateFrequency: return listener_properties_update_frequency;
-    default:                                                RaiseInvalidArgument ("sound::low_level::OpenALDevice::GetHint", "hint", hint);    
+    RaiseInvalidArgument ("sound::low_level::OpenALDevice::GetIntegerParam", "name", name);
   }
 
   return 0;
+}
+
+void OpenALDevice::SetStringParam (const char* name, const char*)
+{
+  if (!name)
+    RaiseNullArgument ("sound::low_level::OpenALDevice::SetStringParam", "name");
+
+
+  RaiseInvalidArgument ("sound::low_level::OpenALDevice::SetStringParam", "name", name);
+}
+
+const char* OpenALDevice::GetStringParam (const char* name)
+{
+  if (!name)
+    RaiseNullArgument ("sound::low_level::OpenALDevice::GetStringParam", "name");
+
+  RaiseInvalidArgument ("sound::low_level::OpenALDevice::GetStringParam", "name", name);
+
+  return "";
 }
 
 /*

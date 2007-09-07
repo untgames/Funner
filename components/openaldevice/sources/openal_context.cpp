@@ -284,8 +284,8 @@ inline void dump_argument (const ArrayWrapper<T>& arg, string& result)
     Конструктор / деструктор
 */
 
-OpenALContext::OpenALContext  (const char* device_name, const LogHandler& in_log_handler)
-  : log_handler (in_log_handler)
+OpenALContext::OpenALContext  (const char* device_name)
+  : debug_log_state (false)
 {
   if (!device_name)
     RaiseNullArgument ("sound::low_level::OpenALContext::OpenALContext", "device_name");
@@ -317,10 +317,10 @@ OpenALContext::~OpenALContext ()
   ALCenum error = alcGetError (device);
 
   if (error != AL_NO_ERROR)
-    LogError ("Error at alcDestroyContext(%p). %s", context, get_alc_error_message (error));
+    LogPrintf ("Error at alcDestroyContext(%p). %s", context, get_alc_error_message (error));
 
   if (!alcCloseDevice (device))
-    LogError ("Error at alcCloseDevice(%p). %s", device, get_alc_error_message (alcGetError (device)));
+    LogPrintf ("Error at alcCloseDevice(%p). %s", device, get_alc_error_message (alcGetError (device)));
 }
 
 /*
@@ -339,7 +339,7 @@ bool OpenALContext::MakeCurrent ()
 
   if (!alcMakeContextCurrent (context))
   {
-    LogError ("Error at alcMakeContextCurrent(%p). %s", context, get_alc_error_message (alcGetError (device)));
+    LogPrintf ("Error at alcMakeContextCurrent(%p). %s", context, get_alc_error_message (alcGetError (device)));
     return false;
   }
   
@@ -350,7 +350,12 @@ bool OpenALContext::MakeCurrent ()
     Протоколирование ошибок
 */
 
-void OpenALContext::LogError (const char* message, ...)
+void OpenALContext::SetDebugLog (const LogHandler& in_log_handler)
+{
+  log_handler = in_log_handler;
+}
+
+void OpenALContext::LogPrintf (const char* message, ...)
 {
   if (!log_handler)
     return;
@@ -379,24 +384,27 @@ void OpenALContext::CheckErrors (const char* function_name, const Tuple& args)
   ALenum error = alGetError ();
   
   try
-  {  
-//    string args_string;
-      
-//    dump_arguments (args, args_string);    
-    
+  {
     if (error != AL_NO_ERROR)
     {
       string args_string;
       
       dump_arguments (args, args_string);
       
-      LogError ("Error at call %s(%s). %s", function_name, args_string.c_str (), get_al_error_message (error));
+      LogPrintf ("Error at call %s(%s). %s", function_name, args_string.c_str (), get_al_error_message (error));
     }
-//    else LogError ("%s(%s)", function_name, args_string.c_str ());
+    else if (debug_log_state)
+    {
+      string args_string;          
+
+      dump_arguments (args, args_string);
+
+      LogPrintf ("%s(%s)", function_name, args_string.c_str ());
+    }
   }
   catch (...)
   {
-    LogError ("Error at call %s(...). %s", function_name, get_al_error_message (error));
+    LogPrintf ("Error at call %s(...). %s", function_name, get_al_error_message (error));
   }
 }
 
