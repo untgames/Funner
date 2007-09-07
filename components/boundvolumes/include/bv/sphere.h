@@ -57,16 +57,18 @@ template <class T> class sphere
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     sphere& operator += (const vec_type&);
     sphere& operator += (const sphere&);
-//    sphere& operator += (const axis_aligned_box<T>&); //???
+    sphere& operator += (const axis_aligned_box<T>&);
     sphere  operator +  (const vec_type&) const;
     sphere  operator +  (const sphere&) const;
-//    sphere  operator +  (const axis_aligned_box&) const; //???
+    sphere  operator +  (const axis_aligned_box<T>&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Преобразования ограничивающей сферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    axis_aligned_box<T>  operator *  (const math::matrix<T, 4>&) const;
-    axis_aligned_box<T>  operator *  (const math::quat<T>&) const;
+    sphere& operator *= (const math::quat<T>&);
+    sphere  operator *  (const math::quat<T>&) const;
+
+    axis_aligned_box<T> operator * (const math::matrix<T, 4>&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка пересечения ограничивающей сферы с различными примитивами
@@ -104,8 +106,8 @@ typedef sphere<double> sphered;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Преобразования ограничивающей сферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> sphere<T> operator * (const math::matrix<T, 4>&, const sphere<T>&);
-template <class T> sphere<T> operator * (const math::quat<T>&, const sphere<T>&);
+template <class T> axis_aligned_box<T> operator * (const math::matrix<T, 4>&, const sphere<T>&);
+template <class T> sphere<T>           operator * (const math::quat<T>&, const sphere<T>&);
 
 #include <bv/detail/sphere.inl>
 
