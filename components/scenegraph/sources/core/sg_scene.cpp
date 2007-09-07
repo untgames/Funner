@@ -165,7 +165,7 @@ struct BoundsCheckFunction
 
       //если объект имеет конечные ограничивающие объёмы - проверяем его попадание в заданный объём
 
-    if (entity.WorldBoundBox ().intersects (box))
+    if (intersects (entity.WorldBoundBox (), box))
       fn (entity);
   }
 
