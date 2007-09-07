@@ -108,7 +108,12 @@ inline sphere<T>& sphere<T>::operator += (const sphere<T>& s)
   if (sphere_radius < element_type (0))
     return *this = s;
     
-  return *this += s.sphere_center + normalize (s.sphere_radius - sphere_radius) * s.sphere_radius
+  element_type distance = length (s.sphere_center - sphere_center) + s.sphere_radius;
+
+  if (distance > sphere_radius)
+    sphere_radius = distance;
+    
+  return *this;
 }
 
 template <class T>
@@ -199,10 +204,9 @@ inline bool typename sphere<T>::contains (const vec_type& point) const
 }
 
 template <class T>
-inline bool typename sphere<T>::contains (const sphere& sphere) const
+inline bool typename sphere<T>::contains (const sphere& s) const
 {
-    //????
-  return length(sphere_center-sphere.center())<(sphere_radius-2*sphere.radius());   //вроде умножение не нужно
+  return s.sphere_radius + length (sphere_center - s.sphere_center) < sphere_radius;
 }
 
 //bool template <class T> class sphere::contains (const axis_aligned_box<T>& box) const;
