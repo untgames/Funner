@@ -1,7 +1,7 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
-using namespace medialib;
+using namespace media::geometry;
+using namespace media;
 using namespace common;
 
 const size_t DEFAULT_VERTEX_ARRAY_RESERVE = 4; //резервируемый размер вершинного массива
@@ -50,7 +50,7 @@ VertexBuffer::VertexBuffer ()
   {}
 
 VertexBuffer::VertexBuffer (const VertexBuffer& vb, CloneMode mode)
-  : impl (clone_resource (vb.impl, mode, "medialib::geometry::VertexBuffer::VertexBuffer"))
+  : impl (clone_resource (vb.impl, mode, "media::geometry::VertexBuffer::VertexBuffer"))
   {}
 
 VertexBuffer::~VertexBuffer ()
@@ -90,7 +90,7 @@ size_t VertexBuffer::StreamsCount () const
 const VertexStream& VertexBuffer::Stream (size_t index) const
 {
   if (index >= impl->streams.size ())
-    RaiseOutOfRange ("medialib::geometry::VertexBuffer::Stream", "index", index, impl->streams.size ());
+    RaiseOutOfRange ("media::geometry::VertexBuffer::Stream", "index", index, impl->streams.size ());
     
   return impl->streams [index].Resource ();
 }
@@ -126,7 +126,7 @@ size_t VertexBuffer::Attach (VertexStream& vs, CloneMode mode)
     case CloneMode_Instance:
       break;
     default:
-      RaiseInvalidArgument ("medialib::geometry::VertexBuffer::Attach", "mode", mode);
+      RaiseInvalidArgument ("media::geometry::VertexBuffer::Attach", "mode", mode);
       break;
   }
 
@@ -204,7 +204,7 @@ void VertexBuffer::Swap (VertexBuffer& vb)
   stl::swap (vb.impl, impl);
 }
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

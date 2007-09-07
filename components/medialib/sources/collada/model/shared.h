@@ -7,7 +7,7 @@
 #include <stl/hash_map>
 #include <shared/resource_manager.h>
 
-namespace medialib
+namespace media
 {
 
 namespace collada

@@ -2,7 +2,7 @@
 #include <stl/string>
 #include <common/exception.h>
 
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace common;
 
 /*
@@ -44,7 +44,7 @@ const char* Texture::Image () const
 void Texture::SetImage (const char* image_name)
 {
   if (!image_name)
-    RaiseNullArgument ("medialib::collada::Texture::SetImage", "image_name");
+    RaiseNullArgument ("media::collada::Texture::SetImage", "image_name");
     
   impl->image_name = image_name;
 }
@@ -61,7 +61,7 @@ const char* Texture::TexcoordChannel () const
 void Texture::SetTexcoordChannel (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("medialib::collada::Texture::SetTexcoordChannel", "name");
+    RaiseNullArgument ("media::collada::Texture::SetTexcoordChannel", "name");
     
   impl->texcoord = name;
 }

@@ -4,7 +4,7 @@
 #include <stl/memory>
 #include <xtl/functional_fwd>
 
-namespace medialib
+namespace media
 {
 
 //implementation forwards

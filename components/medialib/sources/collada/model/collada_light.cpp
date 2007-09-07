@@ -1,6 +1,6 @@
 #include <media/collada/scene.h>
 
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace common;
 using namespace math;
 
@@ -53,7 +53,7 @@ void Light::SetType (LightType type)
     case LightType_Direct:
       break;
     default:
-      RaiseInvalidArgument ("medialib::collada::Light::SetType", "type", type);
+      RaiseInvalidArgument ("media::collada::Light::SetType", "type", type);
       break;
   }
   
@@ -81,7 +81,7 @@ void Light::SetColor (const vec3f& color)
 void Light::SetParam (LightParam param, float value)
 {
   if (param < 0 || param >= LightParam_Num)
-    RaiseInvalidArgument ("medialib::collada::Light::SetParam", "param", param);
+    RaiseInvalidArgument ("media::collada::Light::SetParam", "param", param);
     
   impl->params [param] = value;
 }
@@ -89,7 +89,7 @@ void Light::SetParam (LightParam param, float value)
 float Light::Param (LightParam param) const
 {
   if (param < 0 || param >= LightParam_Num)
-    RaiseInvalidArgument ("medialib::collada::Light::Param", "param", param);
+    RaiseInvalidArgument ("media::collada::Light::Param", "param", param);
     
   return impl->params [param];
 }

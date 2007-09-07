@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
+using namespace media::geometry;
 
 /*
     Buffer

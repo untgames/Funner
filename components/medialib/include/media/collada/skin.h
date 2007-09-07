@@ -4,7 +4,7 @@
 #include <media/collada/utility.h>
 #include <math/mathlib.h>
 
-namespace medialib
+namespace media
 {
 
 namespace collada

@@ -1,7 +1,7 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
-using namespace medialib;
+using namespace media::geometry;
+using namespace media;
 using namespace common;
 
 /*
@@ -36,7 +36,7 @@ VertexWeightStream::VertexWeightStream (size_t weights_count)
 }
   
 VertexWeightStream::VertexWeightStream (const VertexWeightStream& vws, CloneMode mode)
-  : impl (clone_resource (vws.impl, mode, "medialib::geometry::VertexWeightStream::VertexWeightStream"))
+  : impl (clone_resource (vws.impl, mode, "media::geometry::VertexWeightStream::VertexWeightStream"))
   {}
 
 VertexWeightStream::~VertexWeightStream ()
@@ -122,7 +122,7 @@ void VertexWeightStream::Swap (VertexWeightStream& vws)
   vws.impl  = tmp;
 }
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

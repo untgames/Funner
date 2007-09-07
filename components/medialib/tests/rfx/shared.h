@@ -5,8 +5,8 @@
 #include <media/material.h>
 #include <xtl/visitor.h>
 
-using namespace medialib;
-using namespace medialib::rfx;
+using namespace media;
+using namespace media::rfx;
 using namespace math;
 
 //тестовый шейдер

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib;
+using namespace media;
 using namespace common;
 using namespace stl;
 
@@ -86,10 +86,10 @@ class MultilayerImageImpl: public ImageImpl
 MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersCloneMode clone_mode)
 {
   if (!count)
-    RaiseNullArgument ("medialib::MultilayerImageImpl::MultilayerImageImpl", "count");
+    RaiseNullArgument ("media::MultilayerImageImpl::MultilayerImageImpl", "count");
     
   if (!images)
-    RaiseNullArgument ("medialib::MultilayerImageImpl::MultilayerImageImpl", "images");
+    RaiseNullArgument ("media::MultilayerImageImpl::MultilayerImageImpl", "images");
 
   layers_width  = images [0].Width ();
   layers_height = images [0].Height ();
@@ -107,7 +107,7 @@ MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersClo
         images [i].Swap (layers [i]);
       break;
     default:
-      RaiseInvalidArgument ("medialib::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
+      RaiseInvalidArgument ("media::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
       break;
   }
 
@@ -204,7 +204,7 @@ void MultilayerImageImpl::Convert (PixelFormat new_format)
 void MultilayerImageImpl::SaveSixLayersImage (const char* file_name, const char* suffixes [6])
 {
   if (layers.size () < 6)
-    RaiseNotSupported ("medialib::MultilayerImageImpl::SaveSixLayerImage", "Can't save image '%s', depth=%d<6.", Name (), layers.size ());
+    RaiseNotSupported ("media::MultilayerImageImpl::SaveSixLayerImage", "Can't save image '%s', depth=%d<6.", Name (), layers.size ());
     
   string basename1 = common::basename (file_name),
          basename2 = common::basename (basename1),
@@ -247,12 +247,12 @@ void MultilayerImageImpl::Save (const char* file_name)
   else if (!::strcmp (DDS_SUFFIX,     suffix.c_str ())) SaveDDS     (file_name);
   else
   {
-    RaiseNotSupported ("medialib::MultilayerImageImpl::Save", "Can't save image '%s' in file '%s. Unknown extension '%s'",
+    RaiseNotSupported ("media::MultilayerImageImpl::Save", "Can't save image '%s' in file '%s. Unknown extension '%s'",
                        Name (), file_name, suffix.c_str ());
   }
 }
 
-namespace medialib
+namespace media
 {
 
 /*

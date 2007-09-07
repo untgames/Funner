@@ -2,7 +2,7 @@
 
 #include "collection.h"
 
-using namespace medialib::collada;
+using namespace media::collada;
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
@@ -19,7 +19,7 @@ namespace
 class ConstructableSurface: public Surface
 {
   public:
-    ConstructableSurface (medialib::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
+    ConstructableSurface (media::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
       : Surface (type, verts_count, indices_count) {}
 };
 

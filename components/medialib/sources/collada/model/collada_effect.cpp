@@ -1,7 +1,7 @@
 #include <media/collada/material.h>
 #include <common/exception.h>
 
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace common;
 
 /*
@@ -30,7 +30,7 @@ struct Map
 
 struct Effect::Impl
 {
-  medialib::collada::ShaderType  shader_type;                     //тип шейдера
+  media::collada::ShaderType  shader_type;                     //тип шейдера
   Map                            maps [TextureMap_Num];           //карты
   float                          shader_params [EffectParam_Num]; //параметры шейдинга
   
@@ -70,7 +70,7 @@ ShaderType Effect::ShaderType () const
   return impl->shader_type;
 }
 
-void Effect::SetShaderType (medialib::collada::ShaderType type)
+void Effect::SetShaderType (media::collada::ShaderType type)
 {
   switch (type)
   {
@@ -81,7 +81,7 @@ void Effect::SetShaderType (medialib::collada::ShaderType type)
       impl->shader_type = type;
       break;
     default:
-      RaiseInvalidArgument ("medialib::collada::Effect::SetShaderType", "type", type);
+      RaiseInvalidArgument ("media::collada::Effect::SetShaderType", "type", type);
       break;
   }
 }
@@ -93,7 +93,7 @@ void Effect::SetShaderType (medialib::collada::ShaderType type)
 bool Effect::HasTexture (TextureMap map) const
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("medialib::collada::Effect::HasTexture", "map", map);
+    RaiseInvalidArgument ("media::collada::Effect::HasTexture", "map", map);
     
   return impl->maps [map].texture != 0;
 }
@@ -101,27 +101,27 @@ bool Effect::HasTexture (TextureMap map) const
 const Texture& Effect::Texture (TextureMap map) const
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("medialib::collada::Effect::Texture", "map", map);
+    RaiseInvalidArgument ("media::collada::Effect::Texture", "map", map);
     
-  medialib::collada::Texture* texture = impl->maps [map].texture;
+  media::collada::Texture* texture = impl->maps [map].texture;
   
   if (!texture)
-    RaiseInvalidArgument ("medialib::collada::Effect::Texture", "map", map, "There is no texture attached to this map");
+    RaiseInvalidArgument ("media::collada::Effect::Texture", "map", map, "There is no texture attached to this map");
 
   return *texture;
 }
 
 Texture& Effect::Texture (TextureMap map)
 {
-  return const_cast<medialib::collada::Texture&> (const_cast<const Effect&> (*this).Texture (map));
+  return const_cast<media::collada::Texture&> (const_cast<const Effect&> (*this).Texture (map));
 }
 
 Texture& Effect::CreateTexture (TextureMap map)
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("medialib::collada::Effect::CreateTexture", "map", map);
+    RaiseInvalidArgument ("media::collada::Effect::CreateTexture", "map", map);
     
-  medialib::collada::Texture* texture = impl->maps [map].texture;
+  media::collada::Texture* texture = impl->maps [map].texture;
   
   if (!texture)
     texture = impl->maps [map].texture = new TextureImpl;
@@ -132,7 +132,7 @@ Texture& Effect::CreateTexture (TextureMap map)
 void Effect::RemoveTexture (TextureMap map)
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("medialib::collada::Effect::CreateTexture", "map", map);
+    RaiseInvalidArgument ("media::collada::Effect::CreateTexture", "map", map);
     
   TextureImpl* texture = impl->maps [map].texture;
   
@@ -151,7 +151,7 @@ void Effect::RemoveTexture (TextureMap map)
 const math::vec4f& Effect::MapColor (TextureMap map) const
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("medialib::collada::Effect::MapColor", "map", map);
+    RaiseInvalidArgument ("media::collada::Effect::MapColor", "map", map);
     
   return impl->maps [map].color;
 }
@@ -171,7 +171,7 @@ void Effect::SetMapColor (TextureMap map, const math::vec4f& color)
 float Effect::Param (EffectParam param) const
 {
   if (param < 0 || param >= EffectParam_Num)
-    RaiseInvalidArgument ("medialib::collada::Effect::Param", "param", param);
+    RaiseInvalidArgument ("media::collada::Effect::Param", "param", param);
     
   return impl->shader_params [param];
 }
@@ -179,7 +179,7 @@ float Effect::Param (EffectParam param) const
 void Effect::SetParam (EffectParam param, float value)
 {
   if (param < 0 || param >= EffectParam_Num)
-    RaiseInvalidArgument ("medialib::collada::Effect::SetParam", "param", param);
+    RaiseInvalidArgument ("media::collada::Effect::SetParam", "param", param);
     
   impl->shader_params [param] = value;
 }

@@ -413,7 +413,7 @@ class OpenALSource
     OpenALSource& operator = (const OpenALSource&); //no impl
     
   private:
-    typedef medialib::SoundSample SoundSample;
+    typedef media::SoundSample SoundSample;
 
   private:
     OpenALDevice&  device;                            //устройство проигрывания

@@ -11,12 +11,12 @@ namespace
 
 void log_exception (const char* source, std::exception& exception)
 {
-  medialib::ImageSystemSingleton::Instance ().Printf ("Exception at %s: %s", source, exception.what ());
+  media::ImageSystemSingleton::Instance ().Printf ("Exception at %s: %s", source, exception.what ());
 }
 
 void log_exception (const char* source)
 {
-  medialib::ImageSystemSingleton::Instance ().Printf ("Unknown exception at %s", source);
+  media::ImageSystemSingleton::Instance ().Printf ("Unknown exception at %s", source);
 }
 
 /*
@@ -31,11 +31,11 @@ ILvoid* ILAPIENTRY devil_allocate (ILuint size)
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_allocate", exception);
+    log_exception ("media::devil_allocate", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_allocate");
+    log_exception ("media::devil_allocate");
   }
   
   return 0;
@@ -49,11 +49,11 @@ ILvoid ILAPIENTRY devil_deallocate (ILvoid* ptr)
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_deallocate", exception);
+    log_exception ("media::devil_deallocate", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_deallocate");
+    log_exception ("media::devil_deallocate");
   }  
 }
 
@@ -65,11 +65,11 @@ ILHANDLE ILAPIENTRY devil_file_open_read_only (const ILstring file_name)
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_file_open_read_only", exception);
+    log_exception ("media::devil_file_open_read_only", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_file_open_read_only");
+    log_exception ("media::devil_file_open_read_only");
   }
   
   return 0;
@@ -83,11 +83,11 @@ ILHANDLE ILAPIENTRY devil_file_open_write_only (const ILstring file_name)
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_file_open_write_only", exception);
+    log_exception ("media::devil_file_open_write_only", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_file_open_write_only");
+    log_exception ("media::devil_file_open_write_only");
   }
   
   return 0;
@@ -101,11 +101,11 @@ ILvoid ILAPIENTRY devil_file_close (ILHANDLE file_ptr)
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_file_close", exception);
+    log_exception ("media::devil_file_close", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_file_close");
+    log_exception ("media::devil_file_close");
   }
 }
 
@@ -117,11 +117,11 @@ ILboolean ILAPIENTRY devil_file_eof (ILHANDLE file_ptr)
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_file_eof", exception);
+    log_exception ("media::devil_file_eof", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_file_eof");
+    log_exception ("media::devil_file_eof");
   }
   
   return 0;
@@ -137,11 +137,11 @@ ILint ILAPIENTRY devil_file_getc (ILHANDLE file_ptr)
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_getc", exception);
+    log_exception ("media::devil_getc", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_getc");
+    log_exception ("media::devil_getc");
   }
   
   return 0;
@@ -158,11 +158,11 @@ ILint ILAPIENTRY devil_file_read (void* data, ILuint size, ILuint count, ILHANDL
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_file_read", exception);
+    log_exception ("media::devil_file_read", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_file_read");
+    log_exception ("media::devil_file_read");
   }
   
   return 0;
@@ -187,11 +187,11 @@ ILint ILAPIENTRY devil_file_seek (ILHANDLE file_ptr, ILint offset, ILint origin)
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_file_seek", exception);
+    log_exception ("media::devil_file_seek", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_file_seek");
+    log_exception ("media::devil_file_seek");
   }
 
   return 1;
@@ -205,11 +205,11 @@ ILint ILAPIENTRY devil_file_tell (ILHANDLE file_ptr)
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_file_tell", exception);
+    log_exception ("media::devil_file_tell", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_file_tell");
+    log_exception ("media::devil_file_tell");
   }
 
   return 0;
@@ -223,11 +223,11 @@ ILint ILAPIENTRY devil_file_putc (ILubyte buffer, ILHANDLE file_ptr)
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_file_putc", exception);
+    log_exception ("media::devil_file_putc", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_file_putc");
+    log_exception ("media::devil_file_putc");
   }
 
   return EOF;
@@ -244,11 +244,11 @@ ILint ILAPIENTRY devil_file_write (const void* buffer, ILuint size, ILuint count
   }
   catch (std::exception& exception)
   {
-    log_exception ("medialib::devil_file_write", exception);
+    log_exception ("media::devil_file_write", exception);
   }
   catch (...)
   {
-    log_exception ("medialib::devil_file_write");
+    log_exception ("media::devil_file_write");
   }
 
   return 0;
@@ -286,7 +286,7 @@ typedef common::Singleton<DevILSystemImpl> DevILSystemSingleton;
 
 }
 
-namespace medialib
+namespace media
 {
 
 void devil_init ()

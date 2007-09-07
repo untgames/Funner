@@ -18,7 +18,7 @@ struct null_type;
 
 }
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <common/singleton.h>
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

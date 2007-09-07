@@ -5,7 +5,7 @@
 #include <xtl/functional_fwd>
 #include <common/file.h>
 
-namespace medialib
+namespace media
 {
 
 //implementation forwards

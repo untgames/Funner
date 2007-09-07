@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
+using namespace media::geometry;
 using namespace common;
 
 /*
@@ -74,7 +74,7 @@ const VertexAttribute* VertexFormat::Attributes () const
 const VertexAttribute& VertexFormat::Attribute (size_t index) const
 {
   if (index >= impl->attributes_count)
-    RaiseOutOfRange ("medialib::geometry::VertexFormat::Attribute", "index", index, impl->attributes_count);
+    RaiseOutOfRange ("media::geometry::VertexFormat::Attribute", "index", index, impl->attributes_count);
     
   return impl->attributes [index];
 }
@@ -109,21 +109,21 @@ VertexAttribute* VertexFormat::FindAttribute (VertexAttributeSemantic semantic)
 size_t VertexFormat::AddAttribute (VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset)
 {
   if (semantic < 0 || semantic >= VertexAttributeSemantic_Num)
-    RaiseInvalidArgument ("medialib::geometry::VertexFormat::AddAttribute", "semantic", semantic);
+    RaiseInvalidArgument ("media::geometry::VertexFormat::AddAttribute", "semantic", semantic);
     
   if (type < 0 || type >= VertexAttributeType_Num)
-    RaiseInvalidArgument ("medialib::geometry::VertexFormat::AddAttribute", "type", type);
+    RaiseInvalidArgument ("media::geometry::VertexFormat::AddAttribute", "type", type);
     
     //проверка совместимости типа атрибута с его семантикой
     
   if (!is_compatible (semantic, type))
-    RaiseNotSupported ("medialib::geometry::VertexFormat::AddAttribute", "Semantic '%s' is not compatible with type '%s'",
+    RaiseNotSupported ("media::geometry::VertexFormat::AddAttribute", "Semantic '%s' is not compatible with type '%s'",
                        get_semantic_name (semantic), get_type_name (type));  
   
     //проверка наличия атрибута в формате
 
   if (FindAttribute (semantic))
-    RaiseNotSupported ("medialib::geometry::VertexFormat::AddAttribute", "Attribute with semantic '%s' has been already inserted",
+    RaiseNotSupported ("media::geometry::VertexFormat::AddAttribute", "Attribute with semantic '%s' has been already inserted",
                        get_semantic_name (semantic));
     
     //добавление атрибута
@@ -146,7 +146,7 @@ size_t VertexFormat::AddAttributes (const VertexFormat& format)
 {
   for (size_t i=0, count=format.impl->attributes_count; i<count; i++)
     if (FindAttribute (format.impl->attributes [i].semantic))
-      RaiseInvalidArgument ("medialib::geometry::VertexFormat::AddAttributes", "semantic",
+      RaiseInvalidArgument ("media::geometry::VertexFormat::AddAttributes", "semantic",
                             format.impl->attributes [i].semantic, "Attribute has been already inserted");
                             
   for (size_t i=0, count=format.impl->attributes_count; i<count; i++)
@@ -264,7 +264,7 @@ void VertexFormat::Swap (VertexFormat& vf)
   vf.impl   = tmp;
 }
 
-namespace medialib
+namespace media
 {
 
 namespace geometry
@@ -312,7 +312,7 @@ bool VertexFormat::operator != (const VertexFormat& vf) const
     Получение характеристик
 */
 
-namespace medialib
+namespace media
 {
 
 namespace geometry
@@ -375,7 +375,7 @@ const char* get_semantic_name (VertexAttributeSemantic semantic)
     case VertexAttributeSemantic_TexCoord6: return "texcoord6";
     case VertexAttributeSemantic_TexCoord7: return "texcoord7";
     case VertexAttributeSemantic_Influence: return "influence";
-    default:                                RaiseInvalidArgument ("medialib::geometry::get_semantic_name(VertexAttributeSemantic)", "semantic", semantic);
+    default:                                RaiseInvalidArgument ("media::geometry::get_semantic_name(VertexAttributeSemantic)", "semantic", semantic);
   }
 
   return "";
@@ -394,7 +394,7 @@ const char* get_type_name (VertexAttributeType type)
     case VertexAttributeType_Short4:    return "short4";
     case VertexAttributeType_UByte4:    return "ubyte4";
     case VertexAttributeType_Influence: return "influence";
-    default:                            RaiseInvalidArgument ("medialib::geometry::get_type_name(VertexAttributeType)", "type", type);
+    default:                            RaiseInvalidArgument ("media::geometry::get_type_name(VertexAttributeType)", "type", type);
   }
 
   return "";

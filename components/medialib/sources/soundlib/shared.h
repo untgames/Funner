@@ -9,7 +9,7 @@
 #include <xtl/function.h>
 #include <media/sound.h>
 
-namespace medialib
+namespace media
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,8 +34,8 @@ class SoundSampleImpl
 class SoundSampleSystemImpl
 {
   public:
-    typedef medialib::SoundSampleSystem::CodecLoadFunc CodecLoadFunc;
-    typedef medialib::SoundSampleSystem::DebugLogFunc  DebugLogFunc;
+    typedef media::SoundSampleSystem::CodecLoadFunc CodecLoadFunc;
+    typedef media::SoundSampleSystem::DebugLogFunc  DebugLogFunc;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструктор / деструктор
@@ -46,8 +46,8 @@ class SoundSampleSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–егистраци€ открытых звуков / закрытие всех открытых звуков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterSoundSample   (medialib::SoundSample&);
-    void UnregisterSoundSample (medialib::SoundSample&);
+    void RegisterSoundSample   (media::SoundSample&);
+    void UnregisterSoundSample (media::SoundSample&);
     void CloseAllSoundSamples  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,10 +62,10 @@ class SoundSampleSystemImpl
     bool           RegisterLoadFunc   (const char* extension, const CodecLoadFunc& load_codec);
     void           UnregisterLoadFunc (const char* extension);
     void           UnregisterAllFuncs ();
-    medialib::SoundSampleSystem::CodecLoadFunc* GetLoadFunc(const char* extension);
+    media::SoundSampleSystem::CodecLoadFunc* GetLoadFunc(const char* extension);
 
   private:
-    typedef stl::hash_set<medialib::SoundSample*>     OpenSoundSamplesSet;
+    typedef stl::hash_set<media::SoundSample*>        OpenSoundSamplesSet;
     typedef stl::hash_map<stl::string, CodecLoadFunc> LoadCodecs;
 
   private:    

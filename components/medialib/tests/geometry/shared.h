@@ -6,8 +6,8 @@
 #include <media/mesh.h>
 #include <xtl/function.h>
 
-using namespace medialib::geometry;
-using namespace medialib;
+using namespace media::geometry;
+using namespace media;
 using namespace math;
 
 typedef Vertex<Position3f, Normalf, Color4ub, TexChannel<0>::Coord2f> CustomVertex;

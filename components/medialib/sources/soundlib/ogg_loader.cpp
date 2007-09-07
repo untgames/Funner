@@ -1,16 +1,16 @@
 #include <vorbis/vorbisfile.h>
 #include "shared.h"
 
-using namespace medialib;
+using namespace media;
 using namespace common;
 
 namespace
 {
 
-class OggCodec : public medialib::SoundCodec
+class OggCodec : public media::SoundCodec
 {
   public:
-    OggCodec  (const char* file_name, medialib::SoundSampleInfo& sound_sample_info);
+    OggCodec  (const char* file_name, media::SoundSampleInfo& sound_sample_info);
     ~OggCodec () {ov_clear (&vf);}
 
     size_t Read (size_t first_sample, size_t samples_count, void* data);
@@ -185,7 +185,7 @@ OggCodec* OggCodec::Clone ()
   return ret_value;
 }
 
-namespace medialib
+namespace media
 {
 
 SoundCodec* SoundSample::DefaultOggLoader (const char* file_name, SoundSampleInfo& sound_sample_info)

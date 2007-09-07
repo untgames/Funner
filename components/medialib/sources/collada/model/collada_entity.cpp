@@ -1,7 +1,7 @@
 #include <media/collada/utility.h>
 #include <stl/string>
 
-using namespace medialib::collada;
+using namespace media::collada;
 
 /*
     Реализация Entity

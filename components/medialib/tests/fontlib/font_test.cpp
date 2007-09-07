@@ -2,7 +2,7 @@
 #include <common/exception.h>
 #include <media/font.h>
 
-using namespace medialib;
+using namespace media;
 using namespace common;
 
 const char* file_name = "data/my_font.bfs";

@@ -5,7 +5,7 @@
 #include <xtl/functional_fwd>
 #include <stl/auto_ptr.h>
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

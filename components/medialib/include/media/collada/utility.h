@@ -5,7 +5,7 @@
 #include <xtl/functional_fwd>
 #include <common/exception.h>
 
-namespace medialib
+namespace media
 {
 
 namespace collada

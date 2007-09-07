@@ -6,7 +6,7 @@
 #include <stl/hash_map>
 #include <xtl/functional>
 
-namespace medialib
+namespace media
 {
 
 namespace collada
@@ -66,12 +66,12 @@ template <class Item> class ItemLibrary: public ILibrary<Item>
     const Item& operator [] (const char* id) const
     {
       if (!id)
-        common::RaiseNullArgument ("medialib::collada::Library::operator []", "id");
+        common::RaiseNullArgument ("media::collada::Library::operator []", "id");
         
       ItemMap::const_iterator iter = items.find (id);
       
       if (iter == items.end ())
-        common::RaiseInvalidArgument ("medialib::collada::Library::operator []", "id", id, "No item with this name in library");
+        common::RaiseInvalidArgument ("media::collada::Library::operator []", "id", id, "No item with this name in library");
         
       return *iter->second;
     }
@@ -87,7 +87,7 @@ template <class Item> class ItemLibrary: public ILibrary<Item>
     const Item* Find (const char* id) const
     {
       if (!id)
-        common::RaiseNullArgument ("medialib::collada::Library::Find", "id");
+        common::RaiseNullArgument ("media::collada::Library::Find", "id");
         
       ItemMap::const_iterator iter = items.find (id);
 
@@ -122,7 +122,7 @@ template <class Item> class ItemLibrary: public ILibrary<Item>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Flush ()
     {
-      common::RaiseNotImplemented ("medialib::collada::Library::Flush");
+      common::RaiseNotImplemented ("media::collada::Library::Flush");
     }
 
   protected:

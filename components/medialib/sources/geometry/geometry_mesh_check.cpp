@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
+using namespace media::geometry;
 using namespace common;
 using namespace math;
 
@@ -212,7 +212,7 @@ void check_stream (Log& log, CheckContext& context)
     Проверка корректности меша
 */
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

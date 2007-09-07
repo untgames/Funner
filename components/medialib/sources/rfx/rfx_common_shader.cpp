@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib::rfx;
+using namespace media::rfx;
 using namespace math;
 using namespace common;
 
@@ -102,7 +102,7 @@ CommonShaderType CommonShader::Type () const
 void CommonShader::SetType (CommonShaderType type)
 {
   if (type < 0 || type >= CommonShaderType_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::SetShaderType", "type", type);
+    RaiseInvalidArgument ("media::rfx::CommonShader::SetShaderType", "type", type);
     
   impl->shader_type = type;
 }
@@ -114,7 +114,7 @@ void CommonShader::SetType (CommonShaderType type)
 const vec3f& CommonShader::Color (CommonShaderColor color_id) const
 {
   if (color_id < 0 || color_id >= CommonShaderColor_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::Color", "color_id", color_id);
+    RaiseInvalidArgument ("media::rfx::CommonShader::Color", "color_id", color_id);
     
   return impl->colors [color_id];
 }
@@ -122,7 +122,7 @@ const vec3f& CommonShader::Color (CommonShaderColor color_id) const
 void CommonShader::SetColor (CommonShaderColor color_id, const vec3f& color)
 {
   if (color_id < 0 || color_id >= CommonShaderColor_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::SetColor", "color_id", color_id);
+    RaiseInvalidArgument ("media::rfx::CommonShader::SetColor", "color_id", color_id);
     
   impl->colors [color_id] = clamp (color, vec3f (0.0f), vec3f (1.0f));
 }
@@ -172,13 +172,13 @@ const BlendFunction& CommonShader::Blend () const
 void CommonShader::SetBlend (const BlendFunction& blend)
 {
   if (blend.equation < 0 || blend.equation >= BlendEquation_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::SetBlend", "blend.equation", blend.equation);
+    RaiseInvalidArgument ("media::rfx::CommonShader::SetBlend", "blend.equation", blend.equation);
 
   if (blend.argument [0] < 0 || blend.argument [0] >= BlendArgument_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::SetBlend", "blend.argument[0]", blend.argument [0]);
+    RaiseInvalidArgument ("media::rfx::CommonShader::SetBlend", "blend.argument[0]", blend.argument [0]);
 
   if (blend.argument [1] < 0 || blend.argument [1] >= BlendArgument_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::SetBlend", "blend.argument[1]", blend.argument [1]);
+    RaiseInvalidArgument ("media::rfx::CommonShader::SetBlend", "blend.argument[1]", blend.argument [1]);
 
   impl->blend_function = blend;
 }
@@ -205,7 +205,7 @@ float CommonShader::AlphaTestReference () const
 void CommonShader::SetAlphaTestMode (CompareMode mode)
 {
   if (mode < 0 || mode >= CompareMode_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::SetAlphaTestMode", "mode", mode);
+    RaiseInvalidArgument ("media::rfx::CommonShader::SetAlphaTestMode", "mode", mode);
     
   impl->alpha_test_mode = mode;
 }
@@ -228,7 +228,7 @@ void CommonShader::SetAlphaTest (CompareMode mode, float alpha_reference)
 const Texmap& CommonShader::Map (CommonShaderMap map) const
 {
   if (map < 0 || map >= CommonShaderMap_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::Map", "map", map);
+    RaiseInvalidArgument ("media::rfx::CommonShader::Map", "map", map);
     
   return impl->maps [map].texmap;
 }
@@ -245,7 +245,7 @@ Texmap& CommonShader::Map (CommonShaderMap map)
 float CommonShader::MapWeight (CommonShaderMap map) const
 {
   if (map < 0 || map >= CommonShaderMap_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::MapWeight", "map", map);
+    RaiseInvalidArgument ("media::rfx::CommonShader::MapWeight", "map", map);
     
   return impl->maps [map].weight;
 }
@@ -253,7 +253,7 @@ float CommonShader::MapWeight (CommonShaderMap map) const
 void CommonShader::SetMapWeight (CommonShaderMap map, float weight)
 {
   if (map < 0 || map >= CommonShaderMap_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::SetMapWeight", "map", map);
+    RaiseInvalidArgument ("media::rfx::CommonShader::SetMapWeight", "map", map);
 
   impl->maps [map].weight = clamp (weight, 0.0f, 1.0f);
 }
@@ -262,18 +262,18 @@ void CommonShader::SetMapWeight (CommonShaderMap map, float weight)
     –азрешение / запрещение текстурных карт
 */
 
-medialib::rfx::MapState CommonShader::MapState (CommonShaderMap map) const
+media::rfx::MapState CommonShader::MapState (CommonShaderMap map) const
 {
   if (map < 0 || map >= CommonShaderMap_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::MapState", "map", map);
+    RaiseInvalidArgument ("media::rfx::CommonShader::MapState", "map", map);
     
   return impl->maps [map].state;
 }
 
-void CommonShader::SetMapState (CommonShaderMap map, medialib::rfx::MapState state)
+void CommonShader::SetMapState (CommonShaderMap map, media::rfx::MapState state)
 {
   if (map < 0 || map >= CommonShaderMap_Num)
-    RaiseInvalidArgument ("medialib::rfx::CommonShader::SetMapState", "map", map);
+    RaiseInvalidArgument ("media::rfx::CommonShader::SetMapState", "map", map);
     
   switch (state)
   {
@@ -281,7 +281,7 @@ void CommonShader::SetMapState (CommonShaderMap map, medialib::rfx::MapState sta
     case MapState_Disabled:
       break;
     default:
-      RaiseInvalidArgument ("medialib::rfx::CommonShader::SetMapState", "state", state);
+      RaiseInvalidArgument ("media::rfx::CommonShader::SetMapState", "state", state);
       break;
   }
 

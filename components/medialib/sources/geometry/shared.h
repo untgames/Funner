@@ -18,7 +18,7 @@
 #include <shared/shared_resource.h>
 #include <shared/resource_manager.h>
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

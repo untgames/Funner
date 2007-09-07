@@ -1,6 +1,6 @@
 #include <media/collada/material.h>
 
-using namespace medialib::collada;
+using namespace media::collada;
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
@@ -12,12 +12,12 @@ using namespace medialib::collada;
 
 struct Material::Impl
 {
-  medialib::collada::Effect& effect;  //эффект, связанный с материалом
+  media::collada::Effect& effect;  //эффект, связанный с материалом
   
-  Impl (Entity& entity, medialib::collada::Effect& in_effect) : effect (in_effect)
+  Impl (Entity& entity, media::collada::Effect& in_effect) : effect (in_effect)
   {
     if (effect.Owner () != entity.Owner ())
-      raise_incompatible ("medialib::collada::Material::Material", effect, entity);
+      raise_incompatible ("media::collada::Material::Material", effect, entity);
   }
 };
 
@@ -25,7 +25,7 @@ struct Material::Impl
     Конструктор / деструктор
 */
 
-Material::Material (medialib::collada::Effect& effect, ModelImpl* owner, const char* id)
+Material::Material (media::collada::Effect& effect, ModelImpl* owner, const char* id)
   : Entity (owner, id),
     impl (new Impl (*this, effect))
     {}
@@ -39,12 +39,12 @@ Material::~Material ()
     Эффект связанный с материалом
 */
 
-const medialib::collada::Effect& Material::Effect () const
+const media::collada::Effect& Material::Effect () const
 {
   return impl->effect;
 }
 
-medialib::collada::Effect& Material::Effect ()
+media::collada::Effect& Material::Effect ()
 {
   return impl->effect;
 }

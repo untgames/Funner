@@ -4,7 +4,7 @@
 #include <media/clone_mode.h>
 #include <common/exception.h>
 
-namespace medialib
+namespace media
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ template <class T> class SharedResourceHolder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим копирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    medialib::CloneMode CloneMode () const;
+    media::CloneMode CloneMode () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Хранимый ресурс
@@ -73,11 +73,11 @@ template <class T> class SharedResourceHolder
           ResourceType& Resource ();
           
   private:
-    static void CheckMode (medialib::CloneMode mode, const char* source);
+    static void CheckMode (media::CloneMode mode, const char* source);
 
   private:
-    T                   resource;
-    medialib::CloneMode clone_mode;
+    T                resource;
+    media::CloneMode clone_mode;
 };
 
 #include <shared/detail/shared_resource.inl>

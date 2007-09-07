@@ -25,7 +25,7 @@ const char* GetExtension (const char* file_name)
 }
 
 using namespace common;
-using namespace medialib;
+using namespace media;
 
 FontFace::FontFace ()
   : impl (new FontFaceImpl)
@@ -147,7 +147,7 @@ void FontFace::Swap (FontFace& font)
   swap (impl, font.impl);
 }
 
-namespace medialib
+namespace media
 {
 
 void swap (FontFace& font1,FontFace& font2)

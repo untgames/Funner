@@ -1,8 +1,8 @@
 #include "shared.h"
 
 using namespace common;
-using namespace medialib::rfx;
-using namespace medialib;
+using namespace media::rfx;
+using namespace media;
 using namespace math;
 
 /*
@@ -77,7 +77,7 @@ const char* Texmap::Image () const
 void Texmap::SetImage (const char* image_name)
 {
   if (!image_name)
-    RaiseNullArgument ("medialib::Texmap::SetImage", "image_name");
+    RaiseNullArgument ("media::Texmap::SetImage", "image_name");
     
   impl->image = image_name;
 }
@@ -103,7 +103,7 @@ void Texmap::SetTransform (const math::mat4f& tm)
 int Texmap::Source (Texcoord coord) const
 {
   if (coord < 0 || coord >= Texcoord_Num)
-    RaiseInvalidArgument ("medialib::Texmap::Source", "coord", coord);
+    RaiseInvalidArgument ("media::Texmap::Source", "coord", coord);
     
   return impl->texcoord_params [coord].source;
 }
@@ -111,7 +111,7 @@ int Texmap::Source (Texcoord coord) const
 void Texmap::SetSource (Texcoord coord, int source)
 {
   if (coord < 0 || coord >= Texcoord_Num)
-    RaiseInvalidArgument ("medialib::Texmap::SetSource", "coord", coord);
+    RaiseInvalidArgument ("media::Texmap::SetSource", "coord", coord);
     
   impl->texcoord_params [coord].source = source;
 }
@@ -123,7 +123,7 @@ void Texmap::SetSource (Texcoord coord, int source)
 TexcoordWrap Texmap::Wrap (Texcoord coord) const
 {
   if (coord < 0 || coord >= Texcoord_Num)
-    RaiseInvalidArgument ("medialib::Texmap::Wrap", "coord", coord);
+    RaiseInvalidArgument ("media::Texmap::Wrap", "coord", coord);
     
   return impl->texcoord_params [coord].wrap;
 }
@@ -131,7 +131,7 @@ TexcoordWrap Texmap::Wrap (Texcoord coord) const
 void Texmap::SetWrap (Texcoord coord, TexcoordWrap wrap)
 {
   if (coord < 0 || coord >= Texcoord_Num)
-    RaiseInvalidArgument ("medialib::Texmap::SetWrap", "coord", coord);
+    RaiseInvalidArgument ("media::Texmap::SetWrap", "coord", coord);
     
   impl->texcoord_params [coord].wrap = wrap;
 }
@@ -143,7 +143,7 @@ void Texmap::SetWrap (Texcoord coord, TexcoordWrap wrap)
 TexmapFilterType Texmap::FilterType (TexmapFilter filter) const
 {
   if (filter < 0 || filter >= TexmapFilter_Num)
-    RaiseInvalidArgument ("medialib::Texmap::FilterType", "filter", filter);
+    RaiseInvalidArgument ("media::Texmap::FilterType", "filter", filter);
     
   return impl->filters [filter];
 }
@@ -151,7 +151,7 @@ TexmapFilterType Texmap::FilterType (TexmapFilter filter) const
 void Texmap::SetFilterType (TexmapFilter filter, TexmapFilterType type)
 {
   if (filter < 0 || filter >= TexmapFilter_Num)
-    RaiseInvalidArgument ("medialib::Texmap::SetFilterType", "filter", filter);
+    RaiseInvalidArgument ("media::Texmap::SetFilterType", "filter", filter);
     
   switch (type)
   {
@@ -162,7 +162,7 @@ void Texmap::SetFilterType (TexmapFilter filter, TexmapFilterType type)
     case TexmapFilterType_Anisotropic:
       break;
     default:
-      RaiseInvalidArgument ("medialib::Texmap::SetFilterType", "type", type);
+      RaiseInvalidArgument ("media::Texmap::SetFilterType", "type", type);
       break;
   }
   
@@ -178,7 +178,7 @@ void Texmap::Swap (Texmap& texmap)
   stl::swap (impl, texmap.impl);
 }
 
-namespace medialib
+namespace media
 {
 
 namespace rfx

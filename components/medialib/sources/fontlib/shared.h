@@ -9,7 +9,7 @@
 #include <media/font.h>
 #include <xtl/function.h>
 
-namespace medialib
+namespace media
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ class FontFaceImpl
 class FontSystemImpl
 {
   public:
-    typedef medialib::FontSystem::CodecLoadFunc CodecLoadFunc;
+    typedef media::FontSystem::CodecLoadFunc CodecLoadFunc;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструктор / деструктор
@@ -48,8 +48,8 @@ class FontSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–егистраци€ открытых гарнитур / закрытие всех открытых гарнитур
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterFontFace   (medialib::FontFace&);
-    void UnregisterFontFace (medialib::FontFace&);
+    void RegisterFontFace   (media::FontFace&);
+    void UnregisterFontFace (media::FontFace&);
     void CloseAllFontFaces  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ class FontSystemImpl
     CodecLoadFunc* GetLoadFunc        (const char* extension);
 
   private:
-    typedef stl::hash_set<medialib::FontFace*>        OpenFontFacesSet;
+    typedef stl::hash_set<media::FontFace*>           OpenFontFacesSet;
     typedef stl::hash_map<stl::string, CodecLoadFunc> LoadCodecs;
 
   private:    

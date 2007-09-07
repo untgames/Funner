@@ -1,6 +1,6 @@
 #include "shared.h"
 
-namespace medialib
+namespace media
 {
 
 namespace collada

@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <media/clone_mode.h>
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

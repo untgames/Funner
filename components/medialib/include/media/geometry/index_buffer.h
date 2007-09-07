@@ -3,7 +3,7 @@
 
 #include <media/geometry/defs.h>
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

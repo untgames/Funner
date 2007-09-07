@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib;
+using namespace media;
 
 /*
     ImageSystemImpl

@@ -4,7 +4,7 @@
 #include <stl/string>
 #include <media/image.h>
 
-using namespace medialib;
+using namespace media;
 using namespace common;
 using stl::string;
 

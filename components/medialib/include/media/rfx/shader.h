@@ -5,7 +5,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <media/clone_mode.h>
 
-namespace medialib
+namespace media
 {
 
 namespace rfx

@@ -1,7 +1,7 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
-using namespace medialib;
+using namespace media::geometry;
+using namespace media;
 using namespace common;
 
 /*
@@ -122,7 +122,7 @@ VertexStream::VertexStream (const VertexBuffer& src_vb)
 }
 
 VertexStream::VertexStream (const VertexStream& vs, CloneMode mode)
-  : impl (clone_resource (vs.impl, mode, "medialib::geometry::VertexStream::VertexStream"))
+  : impl (clone_resource (vs.impl, mode, "media::geometry::VertexStream::VertexStream"))
   {}
 
 VertexStream::~VertexStream ()
@@ -243,7 +243,7 @@ void VertexStream::Swap (VertexStream& vs)
   impl       = tmp;
 }
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

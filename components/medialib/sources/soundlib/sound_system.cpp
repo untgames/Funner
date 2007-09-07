@@ -1,7 +1,7 @@
 #include "shared.h"
 #include <common/file.h>
 
-using namespace medialib;
+using namespace media;
 
 namespace
 {
@@ -79,7 +79,7 @@ SoundSampleSystem::CodecLoadFunc* SoundSampleSystemImpl::GetLoadFunc (const char
   return &load_func->second;
 }
 
-namespace medialib
+namespace media
 {
 
 void SoundSampleSystem::SetDebugLog (const DebugLogFunc& log_function)

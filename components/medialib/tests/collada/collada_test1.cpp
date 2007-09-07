@@ -2,7 +2,7 @@
 #include <xtl/functional>
 #include <stdio.h>
 
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace xtl;
 
 const char* file_name = "data/ape.dae";

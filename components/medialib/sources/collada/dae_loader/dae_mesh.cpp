@@ -5,13 +5,13 @@
 
 #include "shared.h"
 
-using namespace medialib::collada;
+using namespace media::collada;
 
 /*
     Вспомогательные структуры данных
 */
 
-namespace medialib
+namespace media
 {
 
 namespace collada

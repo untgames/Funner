@@ -2,10 +2,10 @@
 #include <common/exception.h>
 #include "shared.h"
 
-using namespace medialib;
+using namespace media;
 using namespace common;
 
-namespace medialib
+namespace media
 {
 
 FontFace* FontFace::DefaultBFSLoader (const char* file_name)

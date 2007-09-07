@@ -1,6 +1,6 @@
 #include <media/collada/scene.h>
 
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace common;
 using namespace math;
 
@@ -50,7 +50,7 @@ void Camera::SetType (CameraType type)
     case CameraType_Orthographic:
       break;
     default:
-      RaiseInvalidArgument ("medialib::collada::Camera::SetType", "type", type);
+      RaiseInvalidArgument ("media::collada::Camera::SetType", "type", type);
       break;
   }
   
@@ -64,7 +64,7 @@ void Camera::SetType (CameraType type)
 void Camera::SetParam (CameraParam param, float value)
 {
   if (param < 0 || param >= CameraParam_Num)
-    RaiseInvalidArgument ("medialib::collada::Camera::SetParam", "param", param);
+    RaiseInvalidArgument ("media::collada::Camera::SetParam", "param", param);
     
   impl->params [param] = value;
 }
@@ -72,7 +72,7 @@ void Camera::SetParam (CameraParam param, float value)
 float Camera::Param (CameraParam param) const
 {
   if (param < 0 || param >= CameraParam_Num)
-    RaiseInvalidArgument ("medialib::collada::Camera::Param", "param", param);
+    RaiseInvalidArgument ("media::collada::Camera::Param", "param", param);
     
   return impl->params [param];
 }

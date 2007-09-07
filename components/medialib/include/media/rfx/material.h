@@ -3,7 +3,7 @@
 
 #include <media/rfx/shader.h>
 
-namespace medialib
+namespace media
 {
 
 namespace rfx
@@ -24,8 +24,8 @@ enum PassState
 class Material
 {  
   public:
-    typedef medialib::rfx::Shader::Pointer      ShaderPointer;
-    typedef medialib::rfx::Shader::ConstPointer ConstShaderPointer;
+    typedef media::rfx::Shader::Pointer      ShaderPointer;
+    typedef media::rfx::Shader::ConstPointer ConstShaderPointer;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор

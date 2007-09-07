@@ -3,7 +3,7 @@
 
 #include <media/geometry/vertex_stream.h>
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

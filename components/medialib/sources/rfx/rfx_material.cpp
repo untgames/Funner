@@ -1,7 +1,7 @@
 #include "shared.h"
 
-using namespace medialib::rfx;
-using namespace medialib;
+using namespace media::rfx;
+using namespace media;
 using namespace common;
 using namespace stl;
 
@@ -70,7 +70,7 @@ Material::Material ()
   {}
 
 Material::Material (const Material& material, CloneMode mode)
-  : impl (clone_resource (material.impl, mode, "medialib::Material::Material"))
+  : impl (clone_resource (material.impl, mode, "media::Material::Material"))
   {}
 
 Material::~Material ()
@@ -106,7 +106,7 @@ const char* Material::Name () const
 void Material::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("medialib::rfx::Material::Rename", "name");
+    RaiseNullArgument ("media::rfx::Material::Rename", "name");
     
   impl->name = name;
 }
@@ -124,15 +124,15 @@ size_t Material::PassesCount () const
     Получение шейдеров
 */
 
-const medialib::rfx::Shader& Material::Shader (size_t index) const
+const media::rfx::Shader& Material::Shader (size_t index) const
 {
   if (index >= impl->passes.size ())
-    RaiseOutOfRange ("medialib::rfx::Material::Shader", "index", index, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::Material::Shader", "index", index, impl->passes.size ());
     
   return *impl->passes [index].shader;
 }
 
-medialib::rfx::Shader& Material::Shader (size_t index)
+media::rfx::Shader& Material::Shader (size_t index)
 {
   return const_cast<rfx::Shader&> (const_cast<const Material&> (*this).Shader (index));
 }
@@ -144,10 +144,10 @@ medialib::rfx::Shader& Material::Shader (size_t index)
 void Material::InsertPass (size_t index, const ShaderPointer& shader_ptr, CloneMode mode)
 {
   if (index > impl->passes.size ())
-    RaiseOutOfRange ("medialib::rfx::Material::InsertPass", "index", index, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::Material::InsertPass", "index", index, impl->passes.size ());
 
   if (!shader_ptr)
-    RaiseNullArgument ("medialib::rfx::Material::InsertPass", "shader_ptr");
+    RaiseNullArgument ("media::rfx::Material::InsertPass", "shader_ptr");
 
   impl->passes.insert (impl->passes.begin () + index, Pass (shader_ptr->Clone (mode), mode));
 }
@@ -179,10 +179,10 @@ void Material::RemoveAllPasses ()
 void Material::SetShader (size_t index, const ShaderPointer& shader_ptr, CloneMode mode)
 {
   if (index >= impl->passes.size ())
-    RaiseOutOfRange ("medialib::rfx::Material::SetShader", "index", index, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::Material::SetShader", "index", index, impl->passes.size ());
 
   if (!shader_ptr)
-    RaiseNullArgument ("medialib::rfx::Material::SetShader", "shader_ptr");
+    RaiseNullArgument ("media::rfx::Material::SetShader", "shader_ptr");
 
   impl->passes [index] = Pass (shader_ptr->Clone (mode), mode);
 }
@@ -194,10 +194,10 @@ void Material::SetShader (size_t index, const ShaderPointer& shader_ptr, CloneMo
 void Material::MovePass (size_t source_index, size_t destination_index)
 {
   if (source_index >= impl->passes.size ())
-    RaiseOutOfRange ("medialib::rfx::Material::MovePass", "source_index", source_index, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::Material::MovePass", "source_index", source_index, impl->passes.size ());
 
   if (destination_index >= impl->passes.size ())
-    RaiseOutOfRange ("medialib::rfx::Material::MovePass", "destination_index", destination_index, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::Material::MovePass", "destination_index", destination_index, impl->passes.size ());
     
   Pass slot = impl->passes [source_index];
     
@@ -208,10 +208,10 @@ void Material::MovePass (size_t source_index, size_t destination_index)
 void Material::SwapPasses (size_t index1, size_t index2)
 {
   if (index1 >= impl->passes.size ())
-    RaiseOutOfRange ("medialib::rfx::Material::SwapPasses", "index1", index1, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::Material::SwapPasses", "index1", index1, impl->passes.size ());
 
   if (index2 >= impl->passes.size ())
-    RaiseOutOfRange ("medialib::rfx::Material::SwapPasses", "index2", index2, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::Material::SwapPasses", "index2", index2, impl->passes.size ());
     
   stl::swap (impl->passes [index1], impl->passes [index2]);
 }
@@ -223,7 +223,7 @@ void Material::SwapPasses (size_t index1, size_t index2)
 int Material::FindPass (const char* name) const
 {
   if (!name)
-    RaiseNullArgument ("medialib::rfx::Material::FindPass", "name");
+    RaiseNullArgument ("media::rfx::Material::FindPass", "name");
     
   size_t hash = strhash (name);
   
@@ -250,25 +250,25 @@ Material::ConstShaderPointer Material::FindShader (const char* name) const
 
 Material::ShaderPointer Material::FindShader (const char* name)
 {
-  return xtl::const_pointer_cast<medialib::rfx::Shader> (const_cast<const Material&> (*this).FindShader (name));
+  return xtl::const_pointer_cast<media::rfx::Shader> (const_cast<const Material&> (*this).FindShader (name));
 }
 
 /*
     Разрешение / запрещение проходов
 */
 
-medialib::rfx::PassState Material::PassState (size_t index) const
+media::rfx::PassState Material::PassState (size_t index) const
 {
   if (index >= impl->passes.size ())
-    RaiseOutOfRange ("medialib::rfx::Material::PassState", "index", index, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::Material::PassState", "index", index, impl->passes.size ());
     
   return impl->passes [index].state;
 }
 
-void Material::SetPassState (size_t index, medialib::rfx::PassState state)
+void Material::SetPassState (size_t index, media::rfx::PassState state)
 {
   if (index >= impl->passes.size ())
-    RaiseOutOfRange ("medialib::rfx::Material::SetPassState", "index", index, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::Material::SetPassState", "index", index, impl->passes.size ());
 
   switch (state)
   {
@@ -276,7 +276,7 @@ void Material::SetPassState (size_t index, medialib::rfx::PassState state)
     case PassState_Disabled:
       break;
     default:
-      RaiseInvalidArgument ("medialib::rfx::Material::SetPassState", "state", state);
+      RaiseInvalidArgument ("media::rfx::Material::SetPassState", "state", state);
       break;
   }
 
@@ -302,7 +302,7 @@ void Material::VisitEachPass (Visitor& visitor)
 bool Material::IsEnabled (ShaderPin pin) const
 {
   if (pin < 0 || pin >= ShaderPin_Num)
-    RaiseInvalidArgument ("medialib::rfx::Material::IsEnabled", "pin", pin);
+    RaiseInvalidArgument ("media::rfx::Material::IsEnabled", "pin", pin);
 
   for (PassArray::const_iterator i=impl->passes.begin (), end=impl->passes.end (); i!=end; ++i)
     if (i->shader->IsEnabled (pin))
@@ -344,7 +344,7 @@ void Material::Swap (Material& material)
   stl::swap (impl, material.impl);  
 }
 
-namespace medialib
+namespace media
 {
 
 namespace rfx

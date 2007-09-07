@@ -1,7 +1,7 @@
 #include "shared.h"
 
-using namespace medialib::rfx;
-using namespace medialib;
+using namespace media::rfx;
+using namespace media;
 using namespace stl;
 using namespace common;
 
@@ -57,7 +57,7 @@ MaterialLibrary::MaterialLibrary (const char* file_name)
   : impl (new Impl)
 {
   if (!file_name)
-    RaiseNullArgument ("medialib::MaterialLibrary::MaterialLibrary", "file_name");
+    RaiseNullArgument ("media::MaterialLibrary::MaterialLibrary", "file_name");
     
   try
   {
@@ -67,7 +67,7 @@ MaterialLibrary::MaterialLibrary (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("medialib::MaterialLibrary::MaterialLibrary");
+    exception.Raise ("media::MaterialLibrary::MaterialLibrary");
   }
 }
 
@@ -102,7 +102,7 @@ const char* MaterialLibrary::Name () const
 void MaterialLibrary::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("medialib::rfx::MaterialLibrary::Rename", name);
+    RaiseNullArgument ("media::rfx::MaterialLibrary::Rename", name);
     
   impl->name = name;
 }
@@ -123,21 +123,21 @@ size_t MaterialLibrary::MaterialsCount () const
 const Material& MaterialLibrary::Material (size_t index) const
 {
   if (index >= impl->materials.size ())
-    RaiseOutOfRange ("medialib::rfx::MaterialLibrary::Material", "index", index, impl->materials.size ());
+    RaiseOutOfRange ("media::rfx::MaterialLibrary::Material", "index", index, impl->materials.size ());
     
   return impl->materials [index].Resource ();
 }
 
 Material& MaterialLibrary::Material (size_t index)
 {
-  return const_cast<medialib::rfx::Material&> (const_cast<const MaterialLibrary&> (*this).Material (index));
+  return const_cast<media::rfx::Material&> (const_cast<const MaterialLibrary&> (*this).Material (index));
 }
 
 /*
     Присоединение мешей
 */
 
-size_t MaterialLibrary::Attach (medialib::rfx::Material& Material, CloneMode mode)
+size_t MaterialLibrary::Attach (media::rfx::Material& Material, CloneMode mode)
 {
   impl->materials.push_back (MaterialHolder (Material, mode));
 
@@ -169,7 +169,7 @@ void MaterialLibrary::Load (const char* file_name)
 void MaterialLibrary::Save (const char* file_name)
 {
   if (!file_name)
-    RaiseNullArgument ("medialib::MaterialLibrary::Save", "file_name");
+    RaiseNullArgument ("media::MaterialLibrary::Save", "file_name");
     
   try
   {
@@ -177,7 +177,7 @@ void MaterialLibrary::Save (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("medialib::MaterialLibrary::Save");
+    exception.Raise ("media::MaterialLibrary::Save");
   }
 }
 
@@ -190,7 +190,7 @@ void MaterialLibrary::Swap (MaterialLibrary& library)
   stl::swap (library.impl, impl);
 }
 
-namespace medialib
+namespace media
 {
 
 namespace rfx

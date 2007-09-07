@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib;
+using namespace media;
 using namespace common;
 
 namespace
@@ -100,8 +100,8 @@ DevILPixelFormat get_devil_format (PixelFormat format)
     case PixelFormat_BGRA8:  return DevILPixelFormat (IL_BGRA, IL_UNSIGNED_BYTE, 4);
     case PixelFormat_L8:     return DevILPixelFormat (IL_LUMINANCE, IL_UNSIGNED_BYTE, 1);
     case PixelFormat_LA8:    return DevILPixelFormat (IL_LUMINANCE_ALPHA, IL_UNSIGNED_BYTE, 2);
-    case PixelFormat_A8:     RaiseNotImplemented ("medialib::get_devil_format(PixelFormat_A8)"); break;
-    default:                 RaiseInvalidArgument ("medialib::get_devil_format", "format", format); break;
+    case PixelFormat_A8:     RaiseNotImplemented ("media::get_devil_format(PixelFormat_A8)"); break;
+    default:                 RaiseInvalidArgument ("media::get_devil_format", "format", format); break;
   }
   
   return DevILPixelFormat (0, 0, 0); //для обхода предупреждений компилятора, данная точка недостижима
@@ -128,7 +128,7 @@ const char* get_devil_format_name (ILenum format)
     case IL_BGRA:             return "IL_BGRA";
     case IL_LUMINANCE:        return "IL_LUMINANCE";
     case IL_LUMINANCE_ALPHA:  return "IL_LUMINANCE_ALPHA";
-    default:                  RaiseInvalidArgument ("medialib::get_devil_format_name", "format", format);
+    default:                  RaiseInvalidArgument ("media::get_devil_format_name", "format", format);
   }
   
   return "";
@@ -146,7 +146,7 @@ const char* get_devil_type_name (ILenum type)
     case IL_UNSIGNED_INT:   return "IL_UNSIGNED_INT";
     case IL_FLOAT:          return "IL_FLOAT";
     case IL_DOUBLE:         return "IL_DOUBLE";
-    default:                RaiseInvalidArgument ("medialib::get_devil_type_name", "type", type);
+    default:                RaiseInvalidArgument ("media::get_devil_type_name", "type", type);
   }
 
   return "";
@@ -164,25 +164,25 @@ DevILImageImpl::DevILImageImpl ()
   : width (0), height (0), depth (0), format (PixelFormat_Default)
 {
   ilGenImages        (1, &il_image);
-  check_devil_errors ("medialib::DevILImageImpl::DevILImageImpl()", "ilGenImages");
+  check_devil_errors ("media::DevILImageImpl::DevILImageImpl()", "ilGenImages");
 }
 
 DevILImageImpl::DevILImageImpl (DevILImageImpl& source)
   : ImageImpl (source), width (source.width), height (source.height), depth (source.depth), format (source.format)
 {
   ilGenImages        (1, &il_image);
-  check_devil_errors ("medialib::DevILImageImpl::DevILImageImpl(const DevILImageImpl&)", "ilGenImages");
+  check_devil_errors ("media::DevILImageImpl::DevILImageImpl(const DevILImageImpl&)", "ilGenImages");
 
   try
   {
     ilBindImage        (il_image);
-    check_devil_errors ("medialib::DevILImageImpl::DevILImageImpl(const DevILImageImpl&)", "ilBindImage");
+    check_devil_errors ("media::DevILImageImpl::DevILImageImpl(const DevILImageImpl&)", "ilBindImage");
     ilCopyImage        (source.il_image);
 
     ILenum error = ilGetError ();
 
     if (error != IL_NO_ERROR)
-      raise_devil_exception ("medialib::DevILImageImpl::DevILImageImpl(const DevILImageImpl&)", "Can't copy image '%s'. %s.",
+      raise_devil_exception ("media::DevILImageImpl::DevILImageImpl(const DevILImageImpl&)", "Can't copy image '%s'. %s.",
                              source.Name (), iluErrorString (error));
   }
   catch (...)
@@ -196,12 +196,12 @@ DevILImageImpl::DevILImageImpl (const char* file_name)
   : width (0), height (0), depth (0), format (PixelFormat_Default)
 {
   ilGenImages        (1, &il_image);
-  check_devil_errors ("medialib::DevILImageImpl::DevILImageImpl(const char*)", "ilGenImages");
+  check_devil_errors ("media::DevILImageImpl::DevILImageImpl(const char*)", "ilGenImages");
   
   try
   {
     ilBindImage        (il_image);
-    check_devil_errors ("medialib::DevILImageImpl::DevILImageImpl(const char*)", "ilBindImage");    
+    check_devil_errors ("media::DevILImageImpl::DevILImageImpl(const char*)", "ilBindImage");    
     ilLoadImage        (const_cast<ILstring> (file_name));
 
     ILenum error = ilGetError();
@@ -258,7 +258,7 @@ DevILImageImpl::DevILImageImpl (const char* file_name)
     }
     
     if (format == PixelFormat_Default)
-      raise_devil_exception ("medialib::DevILImageImpl::DevILImageImpl(const char*)", "Image '%s' has unsupported format (%s, %s)",
+      raise_devil_exception ("media::DevILImageImpl::DevILImageImpl(const char*)", "Image '%s' has unsupported format (%s, %s)",
                              file_name, get_devil_format_name (devil_format), get_devil_type_name (devil_type));
 
     width  = ilGetInteger (IL_IMAGE_WIDTH);
@@ -276,12 +276,12 @@ DevILImageImpl::DevILImageImpl (size_t in_width, size_t in_height, size_t in_dep
   : width (in_width), height (in_height), depth (in_depth), format (in_format)
 {
   ilGenImages        (1, &il_image);
-  check_devil_errors ("medialib::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)", "ilGenImages");
+  check_devil_errors ("media::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)", "ilGenImages");
 
   try
   {
     ilBindImage        (il_image);
-    check_devil_errors ("medialib::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)", "ilBindImage");
+    check_devil_errors ("media::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)", "ilBindImage");
 
     DevILPixelFormat devil_format = get_devil_format (format);
 
@@ -290,7 +290,7 @@ DevILImageImpl::DevILImageImpl (size_t in_width, size_t in_height, size_t in_dep
     ILenum error = ilGetError();
 
     if (error != IL_NO_ERROR)
-      raise_devil_exception ("medialib::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)",
+      raise_devil_exception ("media::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)",
                              "Can't create image %dx%dx%d with format=%s. %s", width, height, depth, get_format_name (format),
                              iluErrorString (error));
   }
@@ -322,7 +322,7 @@ ImageImpl* DevILImageImpl::Clone ()
 void DevILImageImpl::Convert (PixelFormat new_format)
 {
   ilBindImage        (il_image);
-  check_devil_errors ("medialib::DevILImageImpl::Convert", "ilBindImage");
+  check_devil_errors ("media::DevILImageImpl::Convert", "ilBindImage");
   
   DevILPixelFormat devil_format = get_devil_format (new_format);
   
@@ -331,7 +331,7 @@ void DevILImageImpl::Convert (PixelFormat new_format)
   ILenum error = ilGetError();
 
   if (error != IL_NO_ERROR)
-    raise_devil_exception ("medialib::DevILImageImpl::Convert", "Can't convert image '%s' to format=%s. %s", Name (),
+    raise_devil_exception ("media::DevILImageImpl::Convert", "Can't convert image '%s' to format=%s. %s", Name (),
                            get_format_name (new_format), iluErrorString (error));
                            
   format = new_format;
@@ -344,13 +344,13 @@ void DevILImageImpl::Convert (PixelFormat new_format)
 void DevILImageImpl::Resize (size_t in_width, size_t in_height, size_t in_depth)
 {
   ilBindImage        (il_image);
-  check_devil_errors ("medialib::DevILImageImpl::Resize", "ilBindImage");
+  check_devil_errors ("media::DevILImageImpl::Resize", "ilBindImage");
   iluScale           (in_width, in_height, in_depth);
 
   ILenum error = ilGetError();
 
   if (error != IL_NO_ERROR)
-    raise_devil_exception ("medialib::DevILImageImpl::Resize", "Can't resize image '%s' to %ux%ux%u. %s.",
+    raise_devil_exception ("media::DevILImageImpl::Resize", "Can't resize image '%s' to %ux%ux%u. %s.",
                            Name (), in_width, in_height, in_depth, iluErrorString (error));
 
   width  = in_width;
@@ -365,12 +365,12 @@ void DevILImageImpl::Resize (size_t in_width, size_t in_height, size_t in_depth)
 void* DevILImageImpl::Bitmap (size_t z)
 {
   ilBindImage        (il_image);
-  check_devil_errors ("medialib::DevILImageImpl::Bitmap", "ilBindImage");
+  check_devil_errors ("media::DevILImageImpl::Bitmap", "ilBindImage");
   
   size_t offset = get_bytes_per_pixel (format) * width * height * z;
   void*  data   = ilGetData () + offset;
 
-  check_devil_errors ("medialib::DevILImageImpl::Bitmap", "ilGetData");
+  check_devil_errors ("media::DevILImageImpl::Bitmap", "ilGetData");
 
   return data;
 }
@@ -381,12 +381,12 @@ void DevILImageImpl::PutImage (size_t x, size_t y, size_t z, size_t width, size_
     format = this->format;
 
   ilBindImage (il_image);
-  check_devil_errors ("medialib::DevILImageImpl::PutImage", "ilBindImage");
+  check_devil_errors ("media::DevILImageImpl::PutImage", "ilBindImage");
 
   DevILPixelFormat devil_format = get_devil_format (format);
   
   ilSetPixels (x, y, z, width, height, depth, devil_format.format, devil_format.type, const_cast<ILvoid*> (data));
-  check_devil_errors ("medialib::DevILImageImpl::PutImage", "ilSetPixels");
+  check_devil_errors ("media::DevILImageImpl::PutImage", "ilSetPixels");
 }
 
 void DevILImageImpl::GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data)
@@ -395,12 +395,12 @@ void DevILImageImpl::GetImage (size_t x, size_t y, size_t z, size_t width, size_
     format = this->format;
 
   ilBindImage (il_image);
-  check_devil_errors ("medialib::DevILImageImpl::GetImage", "ilBindImage");
+  check_devil_errors ("media::DevILImageImpl::GetImage", "ilBindImage");
   
   DevILPixelFormat devil_format = get_devil_format (format);  
   
   ilCopyPixels (x, y, z, width, height, depth, devil_format.format, devil_format.type, data);
-  check_devil_errors ("medialib::DevILImageImpl::GetImage", "ilCopyPixels");
+  check_devil_errors ("media::DevILImageImpl::GetImage", "ilCopyPixels");
 }
 
 /*
@@ -410,19 +410,19 @@ void DevILImageImpl::GetImage (size_t x, size_t y, size_t z, size_t width, size_
 void DevILImageImpl::Save (const char* file_name)
 {
   ilBindImage        (il_image);
-  check_devil_errors ("medialib::DevILImageImpl::Save", "ilBindImage");    
+  check_devil_errors ("media::DevILImageImpl::Save", "ilBindImage");    
   ilSaveImage        (const_cast<ILstring> (file_name));
 
   ILenum error = ilGetError ();
 
   if (error != IL_NO_ERROR)
-    raise_devil_exception ("medialib::DevILImageImpl::Save", "Can't save image '%s' to file '%s'. %s",
+    raise_devil_exception ("media::DevILImageImpl::Save", "Can't save image '%s' to file '%s'. %s",
                            Name (), file_name, iluErrorString (error));
 }
 
 }
 
-namespace medialib
+namespace media
 {
 
 /*

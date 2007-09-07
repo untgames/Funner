@@ -7,7 +7,7 @@
 #include <media/collada/morph.h>
 #include <media/collada/skin.h>
 
-namespace medialib
+namespace media
 {
 
 namespace collada

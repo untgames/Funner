@@ -3,7 +3,7 @@
 
 #include "collection.h"
 
-using namespace medialib::collada;
+using namespace media::collada;
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
@@ -19,7 +19,7 @@ namespace
 class ConstructableInstanceMesh: public InstanceMesh
 {
   public:
-    ConstructableInstanceMesh (medialib::collada::Mesh& mesh) : InstanceMesh (mesh) {}
+    ConstructableInstanceMesh (media::collada::Mesh& mesh) : InstanceMesh (mesh) {}
     ~ConstructableInstanceMesh () {}  
 };
 
@@ -94,7 +94,7 @@ const char* Node::SubId () const
 void Node::SetSubId (const char* sid)
 {
   if (!sid)
-    common::RaiseNullArgument ("medialib::collada::Node::SetSubId", "sid");
+    common::RaiseNullArgument ("media::collada::Node::SetSubId", "sid");
     
   impl->sid = sid;
 }
@@ -111,7 +111,7 @@ const char* Node::Name () const
 void Node::SetName (const char* name)
 {
   if (!name)
-    common::RaiseNullArgument ("medialib::collada::Node::SetName", "name");
+    common::RaiseNullArgument ("media::collada::Node::SetName", "name");
     
   impl->name = name;
 }

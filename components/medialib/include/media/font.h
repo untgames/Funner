@@ -4,7 +4,7 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/functional_fwd>
 
-namespace medialib
+namespace media
 {
 
 //implementation forwards

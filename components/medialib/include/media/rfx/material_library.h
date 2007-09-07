@@ -3,7 +3,7 @@
 
 #include <media/rfx/material.h>
 
-namespace medialib
+namespace media
 {
 
 namespace rfx

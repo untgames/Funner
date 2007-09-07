@@ -1,7 +1,7 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
-using namespace medialib;
+using namespace media::geometry;
+using namespace media;
 using namespace stl;
 using namespace common;
 
@@ -57,7 +57,7 @@ MeshModel::MeshModel (const char* file_name)
   : impl (new Impl)
 {
   if (!file_name)
-    RaiseNullArgument ("medialib::MeshModel::MeshModel", "file_name");
+    RaiseNullArgument ("media::MeshModel::MeshModel", "file_name");
 
   try
   {
@@ -67,7 +67,7 @@ MeshModel::MeshModel (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("medialib::MeshModel::MeshModel");
+    exception.Raise ("media::MeshModel::MeshModel");
   }
 }
 
@@ -101,7 +101,7 @@ const char* MeshModel::Name () const
 void MeshModel::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("medialib::geometry::MeshModel::Rename", name);
+    RaiseNullArgument ("media::geometry::MeshModel::Rename", name);
     
   impl->name = name;
 }
@@ -122,21 +122,21 @@ size_t MeshModel::MeshesCount () const
 const Mesh& MeshModel::Mesh (size_t index) const
 {
   if (index >= impl->meshes.size ())
-    RaiseOutOfRange ("medialib::geometry::MeshModel::Mesh", "index", index, impl->meshes.size ());
+    RaiseOutOfRange ("media::geometry::MeshModel::Mesh", "index", index, impl->meshes.size ());
     
   return impl->meshes [index].Resource ();
 }
 
 Mesh& MeshModel::Mesh (size_t index)
 {
-  return const_cast<medialib::geometry::Mesh&> (const_cast<const MeshModel&> (*this).Mesh (index));
+  return const_cast<media::geometry::Mesh&> (const_cast<const MeshModel&> (*this).Mesh (index));
 }
 
 /*
     Присоединение мешей
 */
 
-size_t MeshModel::Attach (medialib::geometry::Mesh& mesh, CloneMode mode)
+size_t MeshModel::Attach (media::geometry::Mesh& mesh, CloneMode mode)
 {
   impl->meshes.push_back (MeshHolder (mesh, mode));
 
@@ -173,7 +173,7 @@ void MeshModel::Save (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("medialib::MeshModel::Save");
+    exception.Raise ("media::MeshModel::Save");
   }
 }
 
@@ -186,7 +186,7 @@ void MeshModel::Swap (MeshModel& model)
   stl::swap (model.impl, impl);
 }
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

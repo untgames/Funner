@@ -5,7 +5,7 @@
 #include <media/rfx/texmap.h>
 #include <mathlib.h>
 
-namespace medialib
+namespace media
 {
 
 namespace rfx

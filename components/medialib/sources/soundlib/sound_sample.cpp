@@ -24,7 +24,7 @@ const char* GetExtension (const char* file_name)
 }
 
 using namespace common;
-using namespace medialib;
+using namespace media;
 
 SoundSample::SoundSample ()
   : impl (new SoundSampleImpl)
@@ -162,7 +162,7 @@ void SoundSample::Swap (SoundSample& sound)
   swap (impl, sound.impl);
 }
 
-namespace medialib
+namespace media
 {
 
 void swap (SoundSample& sound1,SoundSample& sound2)

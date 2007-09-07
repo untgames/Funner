@@ -9,12 +9,12 @@
 #include <stl/string>
 #include <math/io.h>
 
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace common;
 using namespace xtl;
 using namespace math;
 
-namespace medialib
+namespace media
 {
 
 namespace collada

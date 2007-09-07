@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib::collada;
+using namespace media::collada;
 
 /*
     Разбор библиотеки камер

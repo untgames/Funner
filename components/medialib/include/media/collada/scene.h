@@ -3,7 +3,7 @@
 
 #include <media/collada/geometry.h>
 
-namespace medialib
+namespace media
 {
 
 namespace collada

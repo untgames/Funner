@@ -1,7 +1,7 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
-using namespace medialib;
+using namespace media::geometry;
+using namespace media;
 using namespace stl;
 using namespace common;
 
@@ -65,7 +65,7 @@ Mesh::Mesh ()
   {}
 
 Mesh::Mesh (const Mesh& mesh, CloneMode mode)
-  : impl (clone_resource (mesh.impl, mode, "medialib::geometry::Mesh::Mesh"))
+  : impl (clone_resource (mesh.impl, mode, "media::geometry::Mesh::Mesh"))
   {}
 
 Mesh::~Mesh ()
@@ -101,7 +101,7 @@ const char* Mesh::Name () const
 void Mesh::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("medialib::geometry::Mesh::Rename", "name");
+    RaiseNullArgument ("media::geometry::Mesh::Rename", "name");
     
   impl->name = name;
 }
@@ -110,22 +110,22 @@ void Mesh::Rename (const char* name)
     Буферы
 */
 
-const medialib::geometry::VertexBuffer& Mesh::VertexBuffer () const
+const media::geometry::VertexBuffer& Mesh::VertexBuffer () const
 {
   return impl->vertex_buffer.Resource ();
 }
 
-medialib::geometry::VertexBuffer& Mesh::VertexBuffer ()
+media::geometry::VertexBuffer& Mesh::VertexBuffer ()
 {
   return impl->vertex_buffer.Resource ();
 }
 
-const medialib::geometry::IndexBuffer& Mesh::IndexBuffer () const
+const media::geometry::IndexBuffer& Mesh::IndexBuffer () const
 {
   return impl->index_buffer.Resource ();
 }
 
-medialib::geometry::IndexBuffer& Mesh::IndexBuffer ()
+media::geometry::IndexBuffer& Mesh::IndexBuffer ()
 {
   return impl->index_buffer.Resource ();
 }
@@ -154,24 +154,24 @@ size_t Mesh::WeightsCount () const
     Присоединение/отсоединение буферов
 */
 
-void Mesh::Attach (medialib::geometry::VertexBuffer& vb, CloneMode mode)
+void Mesh::Attach (media::geometry::VertexBuffer& vb, CloneMode mode)
 {
   impl->vertex_buffer.Assign (vb, mode);
 }
 
-void Mesh::Attach (medialib::geometry::IndexBuffer& ib, CloneMode mode)
+void Mesh::Attach (media::geometry::IndexBuffer& ib, CloneMode mode)
 {
   impl->index_buffer.Assign (ib, mode);
 }
     
 void Mesh::DetachVertexBuffer ()
 {
-  impl->vertex_buffer.Assign (medialib::geometry::VertexBuffer (), CloneMode_Instance);
+  impl->vertex_buffer.Assign (media::geometry::VertexBuffer (), CloneMode_Instance);
 }
 
 void Mesh::DetachIndexBuffer ()
 {
-  impl->index_buffer.Assign (medialib::geometry::IndexBuffer (), CloneMode_Instance);
+  impl->index_buffer.Assign (media::geometry::IndexBuffer (), CloneMode_Instance);
 }
 
 void Mesh::DetachAllBuffers ()
@@ -192,7 +192,7 @@ size_t Mesh::PrimitivesCount () const
 const Primitive& Mesh::Primitive (size_t index) const
 {
   if (index >= impl->primitives.size ())
-    RaiseOutOfRange ("medialib::geometry::Mesh::Primitive", "index", index, impl->primitives.size ());
+    RaiseOutOfRange ("media::geometry::Mesh::Primitive", "index", index, impl->primitives.size ());
     
   if (impl->need_material_names_update)
   {
@@ -214,7 +214,7 @@ const Primitive& Mesh::Primitive (size_t index) const
 size_t Mesh::AddPrimitive (PrimitiveType type, size_t first, size_t count, const char* material)
 {
   if (type < 0 || type >= PrimitiveType_Num)
-    RaiseInvalidArgument ("medialib::geometry::Mesh::AddPrimitive", "type", type);
+    RaiseInvalidArgument ("media::geometry::Mesh::AddPrimitive", "type", type);
     
   if (!material)
     material = "";
@@ -280,7 +280,7 @@ void Mesh::Swap (Mesh& mesh)
   stl::swap (mesh.impl, impl);
 }
 
-namespace medialib
+namespace media
 {
 
 namespace geometry
@@ -308,7 +308,7 @@ const char* get_type_name (PrimitiveType type)
     case PrimitiveType_TriangleList:  return "triangle_list";
     case PrimitiveType_TriangleStrip: return "triangle_strip";
     case PrimitiveType_TriangleFan:   return "triangle_fan";
-    default:                          RaiseInvalidArgument ("medialib::geometry::get_type_name (PrimitiveType)", "type", type);
+    default:                          RaiseInvalidArgument ("media::geometry::get_type_name (PrimitiveType)", "type", type);
   }
   
   return "";
@@ -327,7 +327,7 @@ size_t get_points_count (PrimitiveType type, size_t primitives_count)
     case PrimitiveType_TriangleList:  return primitives_count * 3;
     case PrimitiveType_TriangleStrip: return primitives_count + 2;
     case PrimitiveType_TriangleFan:   return primitives_count + 2;
-    default:                          RaiseInvalidArgument ("medialib::geometry::get_points_count", "type", type);
+    default:                          RaiseInvalidArgument ("media::geometry::get_points_count", "type", type);
   }
   
   return 0;

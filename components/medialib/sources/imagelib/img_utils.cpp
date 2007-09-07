@@ -6,7 +6,7 @@ using namespace common;
     ѕолучение характеристик формата
 */
 
-namespace medialib
+namespace media
 {
 
 //им€ формата
@@ -23,7 +23,7 @@ const char* get_format_name (PixelFormat format)
     case PixelFormat_L8:     return "l8";
     case PixelFormat_A8:     return "a8";
     case PixelFormat_LA8:    return "la8";
-    default:                 RaiseInvalidArgument ("medialib::get_format_name(PixelFormat)", "format", format);
+    default:                 RaiseInvalidArgument ("media::get_format_name(PixelFormat)", "format", format);
   }
 
   return "";
@@ -43,7 +43,7 @@ size_t get_bits_per_pixel (PixelFormat format)
     case PixelFormat_L8:     return 8;
     case PixelFormat_A8:     return 8;
     case PixelFormat_LA8:    return 16;
-    default:                 RaiseInvalidArgument ("medialib::get_bits_per_pixel(PixelFormat)", "format", format);
+    default:                 RaiseInvalidArgument ("media::get_bits_per_pixel(PixelFormat)", "format", format);
   }
 
   return 0; 

@@ -1,6 +1,6 @@
 #include <media/collada/scene.h>
 
-using namespace medialib::collada;
+using namespace media::collada;
 
 /*
     Описание реализации InstanceMesh
@@ -25,7 +25,7 @@ struct InstanceMesh::Impl
     Конструктор / деструктор
 */
 
-InstanceMesh::InstanceMesh (medialib::collada::Mesh& mesh)
+InstanceMesh::InstanceMesh (media::collada::Mesh& mesh)
   : impl (new Impl (mesh))
   {}
   
@@ -38,12 +38,12 @@ InstanceMesh::~InstanceMesh ()
     Меш
 */
 
-medialib::collada::Mesh& InstanceMesh::Mesh ()
+media::collada::Mesh& InstanceMesh::Mesh ()
 {
   return impl->mesh;
 }
 
-const medialib::collada::Mesh& InstanceMesh::Mesh () const
+const media::collada::Mesh& InstanceMesh::Mesh () const
 {
   return impl->mesh;
 }
@@ -52,12 +52,12 @@ const medialib::collada::Mesh& InstanceMesh::Mesh () const
     Присоединённые материалы
 */
 
-medialib::collada::MaterialBinds& InstanceMesh::MaterialBinds ()
+media::collada::MaterialBinds& InstanceMesh::MaterialBinds ()
 {
   return impl->binds;
 }
 
-const medialib::collada::MaterialBinds& InstanceMesh::MaterialBinds () const
+const media::collada::MaterialBinds& InstanceMesh::MaterialBinds () const
 {
   return impl->binds;
 }

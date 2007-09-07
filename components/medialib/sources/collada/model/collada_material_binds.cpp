@@ -2,7 +2,7 @@
 #include <stl/hash_map>
 #include <stl/string>
 
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace common;
 
 /*
@@ -68,10 +68,10 @@ Material* MaterialBinds::FindMaterial (const Surface& surface)
 void MaterialBinds::SetMaterial (const char* symbol, Material& material)
 {
   if (!symbol)
-    RaiseNullArgument ("medialib::collada::MaterialBinds::SetMaterial", "symbol");
+    RaiseNullArgument ("media::collada::MaterialBinds::SetMaterial", "symbol");
     
   if (material.Owner () != impl->owner.Owner ())
-    raise_incompatible ("medialib::collada::MaterialBinds::SetMaterial", material, impl->owner);
+    raise_incompatible ("media::collada::MaterialBinds::SetMaterial", material, impl->owner);
     
   impl->materials [symbol] = &material;
 }
@@ -79,7 +79,7 @@ void MaterialBinds::SetMaterial (const char* symbol, Material& material)
 void MaterialBinds::RemoveMaterial (const char* symbol)
 {
   if (!symbol)
-    RaiseNullArgument ("medialib::collada::MaterialBinds::RemoveMaterial", "symbol");
+    RaiseNullArgument ("media::collada::MaterialBinds::RemoveMaterial", "symbol");
     
   impl->materials.erase (symbol);
 }
@@ -111,13 +111,13 @@ const char* MaterialBinds::TexcoordChannelName (const char* material, const char
 void MaterialBinds::SetTexcoordChannelName (const char* material, const char* texture_channel, const char* surface_channel)
 {
   if (!material)
-    RaiseNullArgument ("medialib::collada::MaterialBinds::SetTexcoordChannelName", "material");
+    RaiseNullArgument ("media::collada::MaterialBinds::SetTexcoordChannelName", "material");
 
   if (!texture_channel)
-    RaiseNullArgument ("medialib::collada::MaterialBinds::SetTexcoordChannelName", "texture_channel");
+    RaiseNullArgument ("media::collada::MaterialBinds::SetTexcoordChannelName", "texture_channel");
 
   if (!surface_channel)
-    RaiseNullArgument ("medialib::collada::MaterialBinds::SetTexcoordChannelName", "surface_channel");
+    RaiseNullArgument ("media::collada::MaterialBinds::SetTexcoordChannelName", "surface_channel");
     
   size_t hash = get_hash (material, texture_channel);
     
@@ -134,10 +134,10 @@ void MaterialBinds::SetTexcoordChannelName (const char* material, const char* te
 void MaterialBinds::RemoveTexcoordChannelName (const char* material, const char* texture_channel)
 {
   if (!material)
-    RaiseNullArgument ("medialib::collada::MaterialBinds::RemoveTexcoordChannelName", "material");
+    RaiseNullArgument ("media::collada::MaterialBinds::RemoveTexcoordChannelName", "material");
 
   if (!texture_channel)
-    RaiseNullArgument ("medialib::collada::MaterialBinds::RemoveSurfaceChannelName", "texture_channel");
+    RaiseNullArgument ("media::collada::MaterialBinds::RemoveSurfaceChannelName", "texture_channel");
     
   size_t hash = get_hash (material, texture_channel);
   

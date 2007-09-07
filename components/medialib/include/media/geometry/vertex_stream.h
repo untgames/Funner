@@ -4,7 +4,7 @@
 #include <media/geometry/defs.h>
 #include <media/geometry/vertex_format.h>
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

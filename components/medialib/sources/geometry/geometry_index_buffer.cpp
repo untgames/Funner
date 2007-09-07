@@ -1,7 +1,7 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
-using namespace medialib;
+using namespace media::geometry;
+using namespace media;
 using namespace common;
 
 /*
@@ -36,7 +36,7 @@ IndexBuffer::IndexBuffer (size_t indices_count)
 }
   
 IndexBuffer::IndexBuffer (const IndexBuffer& ib, CloneMode mode)
-  : impl (clone_resource (ib.impl, mode, "medialib::geometry::IndexBuffer::IndexBuffer"))
+  : impl (clone_resource (ib.impl, mode, "media::geometry::IndexBuffer::IndexBuffer"))
   {}
 
 IndexBuffer::~IndexBuffer ()
@@ -122,7 +122,7 @@ void IndexBuffer::Swap (IndexBuffer& ib)
   impl      = tmp;
 }
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

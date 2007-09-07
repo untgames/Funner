@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
+using namespace media::geometry;
 
 /*
     MeshSystemImpl
@@ -14,7 +14,7 @@ MeshSystemImpl::MeshSystemImpl ()
     Врапперы вызовов MeshSystemImpl    
 */
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

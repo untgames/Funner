@@ -6,7 +6,7 @@
 #include "shared.h"
 #include "library.h"
 
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace common;
 
 #ifdef _MSC_VER
@@ -17,7 +17,7 @@ using namespace common;
     Описание реализации модели
 */
 
-namespace medialib
+namespace media
 {
 
 namespace collada
@@ -93,7 +93,7 @@ const char* Model::Name () const
 void Model::Rename (const char* new_name)
 {
   if (!new_name)
-    RaiseNullArgument ("medialib::collada::Model::Rename", "new_name");
+    RaiseNullArgument ("media::collada::Model::Rename", "new_name");
     
   impl->name = new_name;
 }
@@ -110,7 +110,7 @@ const char* Model::ActiveSceneName () const
 void Model::SetActiveSceneName (const char* scene_name)
 {
   if (!scene_name)
-    RaiseNullArgument ("medialib::collada::Model::SetActiveSceneName", "scene_name");
+    RaiseNullArgument ("media::collada::Model::SetActiveSceneName", "scene_name");
     
   impl->active_scene = scene_name;
 }
@@ -218,7 +218,7 @@ void Model::Swap (Model& model)
   stl::swap (model.impl, impl);
 }
 
-namespace medialib
+namespace media
 {
 
 namespace collada
@@ -261,7 +261,7 @@ void Model::Save (const char* file_name, const LogFunction& log)
     Возвращение имени модели
 */
 
-namespace medialib
+namespace media
 {
 
 namespace collada

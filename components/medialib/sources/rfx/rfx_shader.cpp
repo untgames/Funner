@@ -1,7 +1,7 @@
 #include "shared.h"
 
-using namespace medialib::rfx;
-using namespace medialib;
+using namespace media::rfx;
+using namespace media;
 using namespace stl;
 using namespace common;
 
@@ -68,7 +68,7 @@ size_t Shader::NameHash () const
 void Shader::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("medialib::rfx::Shader::Rename", "name");
+    RaiseNullArgument ("media::rfx::Shader::Rename", "name");
     
   impl->name      = name;
   impl->name_hash = strhash (name);
@@ -99,7 +99,7 @@ Shader::Pointer Shader::Clone (CloneMode mode)
   {
     case CloneMode_Instance: return this;
     case CloneMode_Copy:     return Pointer (CloneCore (), false);
-    default:                 RaiseInvalidArgument ("medialib::rfx::Shader::Clone", "mode", mode);
+    default:                 RaiseInvalidArgument ("media::rfx::Shader::Clone", "mode", mode);
   }
   
   return 0;
@@ -117,7 +117,7 @@ Shader* Shader::CloneCore () const
 bool Shader::IsEnabled (ShaderPin pin) const
 {
   if (pin < 0 || pin >= ShaderPin_Num)
-    RaiseInvalidArgument ("medialib::rfx::Shader::IsEnabled", "pin", pin);
+    RaiseInvalidArgument ("media::rfx::Shader::IsEnabled", "pin", pin);
     
   return impl->pins.test (pin);
 }
@@ -125,7 +125,7 @@ bool Shader::IsEnabled (ShaderPin pin) const
 void Shader::SetPin (ShaderPin pin, bool state)
 {
   if (pin < 0 || pin >= ShaderPin_Num)
-    RaiseInvalidArgument ("medialib::rfx::Shader::SetPin", "pin", pin); 
+    RaiseInvalidArgument ("media::rfx::Shader::SetPin", "pin", pin); 
     
   impl->pins.set (pin, state);
 }

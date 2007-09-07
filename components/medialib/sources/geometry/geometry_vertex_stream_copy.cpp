@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib::geometry;
+using namespace media::geometry;
 using namespace common;
 using namespace math;
 
@@ -13,7 +13,7 @@ namespace
 
 void raise_incompatible (VertexAttributeType src_type, VertexAttributeType dst_type)
 {
-  RaiseNotSupported ("medialib::geometry::copy", "Convertion from vertex type '%s' to vertex type '%s' not supported",
+  RaiseNotSupported ("media::geometry::copy", "Convertion from vertex type '%s' to vertex type '%s' not supported",
                      get_type_name (src_type), get_type_name (dst_type));
 }
 
@@ -93,7 +93,7 @@ void copy_internal
     Копирование массивов атрибутов с преобразованием формата
 */
 
-namespace medialib
+namespace media
 {
 
 namespace geometry
@@ -109,10 +109,10 @@ void copy
   size_t              destination_stride)
 {
   if (!source && vertices_count)
-    RaiseNullArgument ("medialib::geometry::copy", "source");
+    RaiseNullArgument ("media::geometry::copy", "source");
     
   if (!destination && vertices_count)
-    RaiseNullArgument ("medialib::geometry::copy", "destination");
+    RaiseNullArgument ("media::geometry::copy", "destination");
     
   switch (source_type)
   {

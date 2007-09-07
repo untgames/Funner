@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib;
+using namespace media;
 
 namespace
 {
@@ -61,7 +61,7 @@ FontSystem::CodecLoadFunc* FontSystemImpl::GetLoadFunc (const char* extension)
   return &load_func->second;
 }
 
-namespace medialib
+namespace media
 {
 
 bool FontSystem::RegisterCodec (const char* extension, const CodecLoadFunc& load_codec)

@@ -6,7 +6,7 @@
 #include <stl/vector>
 #include <xtl/functional>
 
-namespace medialib
+namespace media
 {
 
 namespace collada
@@ -86,7 +86,7 @@ class Collection: public ICollection<Item>
     const Item& operator [] (size_t index) const
     {
       if (index >= items.size ())
-        common::RaiseOutOfRange ("medialib::collada::Collection::operator []", "index", index, items.size ());
+        common::RaiseOutOfRange ("media::collada::Collection::operator []", "index", index, items.size ());
 
       return *items [index];
     }
@@ -121,7 +121,7 @@ class Collection: public ICollection<Item>
     size_t Insert (Item& item)
     {
       if (item.Owner () != Owner ())
-        raise_incompatible ("medialib::collada::Collection::Insert", item, *this);
+        raise_incompatible ("media::collada::Collection::Insert", item, *this);
 
       return InsertCore (item);
     }
@@ -132,7 +132,7 @@ class Collection: public ICollection<Item>
    void Remove (size_t index)
    {
      if (index >= items.size ())
-       common::RaiseOutOfRange ("medialib::collada::Collection::Remove", "index", index, items.size ());
+       common::RaiseOutOfRange ("media::collada::Collection::Remove", "index", index, items.size ());
 
      Destroyer<NeedDestroy>::Destroy (items [index]);
 

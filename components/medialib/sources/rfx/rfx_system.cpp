@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace medialib::rfx;
+using namespace media::rfx;
 
 /*
     MaterialSystemImpl

@@ -56,18 +56,18 @@ inline void release_resource (T* resource)
 */
 
 template <class T>
-inline SharedResourceHolder<T>::SharedResourceHolder (medialib::CloneMode in_clone_mode)
+inline SharedResourceHolder<T>::SharedResourceHolder (media::CloneMode in_clone_mode)
   : clone_mode (in_clone_mode)
 {
-  CheckMode (clone_mode, "medialib::SharedResourceHolder::SharedResourceHolder");
+  CheckMode (clone_mode, "media::SharedResourceHolder::SharedResourceHolder");
 }
 
 template <class T>
-inline SharedResourceHolder<T>::SharedResourceHolder (const T& in_resource, medialib::CloneMode in_clone_mode)
+inline SharedResourceHolder<T>::SharedResourceHolder (const T& in_resource, media::CloneMode in_clone_mode)
   : resource (in_resource, in_clone_mode),
     clone_mode (in_clone_mode)
 {
-  CheckMode (clone_mode, "medialib::SharedResourceHolder::SharedResourceHolder");
+  CheckMode (clone_mode, "media::SharedResourceHolder::SharedResourceHolder");
 }
 
 template <class T>
@@ -97,9 +97,9 @@ inline SharedResourceHolder<T>& SharedResourceHolder<T>::operator = (const Share
 }
 
 template <class T>
-inline void SharedResourceHolder<T>::Assign (const T& in_resource, medialib::CloneMode in_clone_mode)
+inline void SharedResourceHolder<T>::Assign (const T& in_resource, media::CloneMode in_clone_mode)
 {
-  CheckMode (in_clone_mode, "medialib::SharedResourceHolder::SharedResourceHolder");
+  CheckMode (in_clone_mode, "media::SharedResourceHolder::SharedResourceHolder");
 
   resource.Assign (in_resource, in_clone_mode);
 
@@ -111,7 +111,7 @@ inline void SharedResourceHolder<T>::Assign (const T& in_resource, medialib::Clo
 */
 
 template <class T>
-inline void SharedResourceHolder<T>::CheckMode (medialib::CloneMode mode, const char* source)
+inline void SharedResourceHolder<T>::CheckMode (media::CloneMode mode, const char* source)
 {
   switch (mode)
   {
@@ -129,7 +129,7 @@ inline void SharedResourceHolder<T>::CheckMode (medialib::CloneMode mode, const 
 */
 
 template <class T>
-inline medialib::CloneMode SharedResourceHolder<T>::CloneMode () const
+inline media::CloneMode SharedResourceHolder<T>::CloneMode () const
 {
   return clone_mode;
 }

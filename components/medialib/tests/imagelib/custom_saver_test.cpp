@@ -4,7 +4,7 @@
 #include <media/image.h>
 #include <xtl/functional>
 
-using namespace medialib;
+using namespace media;
 using namespace common;
 
 const char* file_name = "data/pic1.jpg";

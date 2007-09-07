@@ -3,7 +3,7 @@
 #include <stl/string>
 #include <stl/vector>
 
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace common;
 
 namespace
@@ -38,7 +38,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     size_t Create (const char* name)
     {
       if (!name)
-        RaiseNullArgument ("medialib::collada::Surface::IChannelList::Create", "name");
+        RaiseNullArgument ("media::collada::Surface::IChannelList::Create", "name");
         
       Channel* channel = new Channel (vertices_count, name);
       
@@ -58,7 +58,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     void Remove (size_t channel)
     {
       if (channel >= channels.size ())
-        RaiseOutOfRange ("medialib::collada::Surface::IChannelList::Remove", "channel", channel, channels.size ());
+        RaiseOutOfRange ("media::collada::Surface::IChannelList::Remove", "channel", channel, channels.size ());
         
       delete channels [channel];
       
@@ -79,7 +79,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     const char* Name (size_t channel) const
     {
       if (channel >= channels.size ())
-        RaiseOutOfRange ("medialib::collada::Surface::IChannelList::Name", "channel", channel, channels.size ());
+        RaiseOutOfRange ("media::collada::Surface::IChannelList::Name", "channel", channel, channels.size ());
         
       return channels [channel]->name.c_str ();
     }
@@ -105,7 +105,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     const T* Data (size_t channel) const
     {
       if (channel >= channels.size ())
-        RaiseOutOfRange ("medialib::collada::Surface::IChannelList::Data", "channel", channel, channels.size ());
+        RaiseOutOfRange ("media::collada::Surface::IChannelList::Data", "channel", channel, channels.size ());
         
       return channels [channel]->data;
     }
@@ -170,7 +170,7 @@ struct Surface::Impl
       case PrimitiveType_TriangleFan:
         break;
       default:
-        RaiseInvalidArgument ("medialib::collada::Surface::Surface", "primitive_type", in_primitive_type);
+        RaiseInvalidArgument ("media::collada::Surface::Surface", "primitive_type", in_primitive_type);
         break;
     }
     
@@ -198,7 +198,7 @@ struct Surface::Impl
     Конструктор / деструктор
 */
 
-Surface::Surface (medialib::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
+Surface::Surface (media::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
   : impl (new Impl (type, verts_count, indices_count))
   {}
 
@@ -219,7 +219,7 @@ const char* Surface::MaterialName () const
 void Surface::SetMaterialName (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("medialib::collada::Surface::SetMaterialName", "name");
+    RaiseNullArgument ("media::collada::Surface::SetMaterialName", "name");
     
   impl->material_name = name;
 }

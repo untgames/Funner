@@ -5,7 +5,7 @@
 #include <media/sound.h>
 #include <memory.h>
 
-using namespace medialib;
+using namespace media;
 using namespace common;
 
 const char* file_name = "data/sound1.ogg";

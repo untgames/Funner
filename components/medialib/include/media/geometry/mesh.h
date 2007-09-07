@@ -5,7 +5,7 @@
 #include <media/geometry/index_buffer.h>
 #include <xtl/functional_fwd>
 
-namespace medialib
+namespace media
 {
 
 namespace geometry

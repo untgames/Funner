@@ -2,7 +2,7 @@
 #include <stl/vector>
 #include <stl/string>
 
-using namespace medialib::collada;
+using namespace media::collada;
 
 /*
     Описание реализации скина
@@ -77,7 +77,7 @@ size_t Skin::JointsCount () const
 size_t Skin::CreateJoint (const char* name)
 {
   if (!name)
-    common::RaiseNullArgument ("medialib::collada::Skin::CreateJoint", "name");
+    common::RaiseNullArgument ("media::collada::Skin::CreateJoint", "name");
 
   Joint* joint = new Joint;
   
@@ -99,7 +99,7 @@ size_t Skin::CreateJoint (const char* name)
 void Skin::RemoveJoint (size_t joint)
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("medialib::collada::RemoveJoint", "joint", joint, impl->joints.size ());
+    common::RaiseOutOfRange ("media::collada::RemoveJoint", "joint", joint, impl->joints.size ());
     
   delete impl->joints [joint];
   
@@ -117,7 +117,7 @@ void Skin::RemoveAllJoints ()
 void Skin::SetJointInvMatrix (size_t joint, const math::mat4f& inv_matrix)
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("medialib::collada::SetJointInvMatrix", "joint", joint, impl->joints.size ());
+    common::RaiseOutOfRange ("media::collada::SetJointInvMatrix", "joint", joint, impl->joints.size ());
     
   impl->joints [joint]->inv_matrix = inv_matrix;
 }
@@ -125,7 +125,7 @@ void Skin::SetJointInvMatrix (size_t joint, const math::mat4f& inv_matrix)
 const math::mat4f& Skin::JointInvMatrix (size_t joint) const
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("medialib::collada::GetJointInvMatrix", "joint", joint, impl->joints.size ());
+    common::RaiseOutOfRange ("media::collada::GetJointInvMatrix", "joint", joint, impl->joints.size ());
     
   return impl->joints [joint]->inv_matrix;
 }
@@ -133,7 +133,7 @@ const math::mat4f& Skin::JointInvMatrix (size_t joint) const
 int Skin::FindJoint (const char* name) const
 {
   if (!name)
-    common::RaiseNullArgument ("medialib::collada::Skin::FindJoint", "name");
+    common::RaiseNullArgument ("media::collada::Skin::FindJoint", "name");
 
   for (JointArray::iterator i=impl->joints.begin (), end=impl->joints.end (); i!=end; ++i)
     if ((*i)->name == name)
@@ -145,7 +145,7 @@ int Skin::FindJoint (const char* name) const
 const char* Skin::JointName (size_t joint)
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("medialib::collada::JointName", "joint", joint, impl->joints.size ());
+    common::RaiseOutOfRange ("media::collada::JointName", "joint", joint, impl->joints.size ());
     
   return impl->joints[joint]->name.c_str ();
 }

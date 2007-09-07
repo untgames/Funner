@@ -1,15 +1,15 @@
 #include "shared.h"
 
 using namespace common;
-using namespace medialib;
+using namespace media;
 
 namespace
 {
 
-class WavCodec : public medialib::SoundCodec 
+class WavCodec : public media::SoundCodec 
 {
   public:
-    WavCodec (const char* file_name, medialib::SoundSampleInfo& sound_sample_info);
+    WavCodec (const char* file_name, media::SoundSampleInfo& sound_sample_info);
     ~WavCodec () {file->Close ();}
 
     size_t Read (size_t first_sample, size_t samples_count, void* data);
@@ -100,7 +100,7 @@ WavCodec* WavCodec::Clone ()
   return ret_value;
 }
 
-namespace medialib
+namespace media
 {
 
 SoundCodec* SoundSample::DefaultWavLoader (const char* file_name, SoundSampleInfo& sound_sample_info)

@@ -6,12 +6,12 @@ template <class T>
 inline void ResourceHandlerRegistry<T>::Register (const char* extension, const Handler& handler)
 {
   if (!extension)
-    common::RaiseNullArgument ("medialib::ResourceHandlerRegistry::Register", "extension");
+    common::RaiseNullArgument ("media::ResourceHandlerRegistry::Register", "extension");
 
   HandlerMap::iterator iter = handlers.find (extension);
   
   if (iter != handlers.end ())
-    common::RaiseInvalidArgument ("medialib::ResourcehandlerRegistry::Register", "extension", extension, "Handler already registered");
+    common::RaiseInvalidArgument ("media::ResourcehandlerRegistry::Register", "extension", extension, "Handler already registered");
 
   handlers.insert_pair (extension, handler);
 }
@@ -35,12 +35,12 @@ template <class T>
 inline const T& ResourceHandlerRegistry<T>::FindHandlerByExtension (const char* extension) const
 {
   if (!extension)
-    common::RaiseNullArgument ("medialib::ResourceHandlerRegistry", "extension");
+    common::RaiseNullArgument ("media::ResourceHandlerRegistry", "extension");
     
   HandlerMap::const_iterator iter = handlers.find (extension);
 
   if (iter == handlers.end ())
-    common::RaiseNotSupported ("medialib::ResourceHandlerRegistry::FindHandlerByExtension", "Extension '%s' not registered", extension);
+    common::RaiseNotSupported ("media::ResourceHandlerRegistry::FindHandlerByExtension", "Extension '%s' not registered", extension);
 
   return iter->second;
 }
@@ -63,7 +63,7 @@ template <class T>
 inline const T& ResourceHandlerRegistry<T>::FindHandlerByFileName (const char* file_name) const
 {
   if (!file_name)
-    common::RaiseNullArgument ("medialib::ResourceHandlerRegistry::FindHandlerByFileName", "file_name");
+    common::RaiseNullArgument ("media::ResourceHandlerRegistry::FindHandlerByFileName", "file_name");
 
   return FindHandlerByExtension (detail::get_extension<true> (file_name));
 }

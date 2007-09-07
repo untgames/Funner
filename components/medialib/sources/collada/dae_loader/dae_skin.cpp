@@ -1,7 +1,7 @@
 #include "shared.h"
 
 using namespace stl;
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace math;
 
 /*

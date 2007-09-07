@@ -1,7 +1,7 @@
 #include <media/collada/morph.h>
 #include "collection.h"
 
-using namespace medialib::collada;
+using namespace media::collada;
 using namespace common;
 
 #ifdef _MSC_VER
@@ -24,7 +24,7 @@ struct MorphTarget::Impl
     Конструктор / деструктор
 */
 
-MorphTarget::MorphTarget (medialib::collada::Mesh& mesh, float weight)
+MorphTarget::MorphTarget (media::collada::Mesh& mesh, float weight)
   : impl (new Impl (mesh, weight))
   {}
 
@@ -33,12 +33,12 @@ MorphTarget::~MorphTarget ()
   delete impl;
 }
 
-medialib::collada::Mesh& MorphTarget::Mesh ()
+media::collada::Mesh& MorphTarget::Mesh ()
 {
   return impl->mesh;
 }
 
-const medialib::collada::Mesh& MorphTarget::Mesh () const
+const media::collada::Mesh& MorphTarget::Mesh () const
 {
   return impl->mesh;
 }
@@ -65,7 +65,7 @@ float MorphTarget::Weight () const
 class ConstructableMorphTarget: public MorphTarget
 {
   public:
-    ConstructableMorphTarget (medialib::collada::Mesh& mesh, float weight) : MorphTarget (mesh, weight) {}
+    ConstructableMorphTarget (media::collada::Mesh& mesh, float weight) : MorphTarget (mesh, weight) {}
 };
 
 //список MorphTarget
@@ -132,7 +132,7 @@ void Morph::SetMethod (MorphMethod method)
     case MorphMethod_Relative:
       break;
     default:
-      RaiseInvalidArgument ("medialib::collada::Morph::SetMethod", "method", method);
+      RaiseInvalidArgument ("media::collada::Morph::SetMethod", "method", method);
       break;
   }
   

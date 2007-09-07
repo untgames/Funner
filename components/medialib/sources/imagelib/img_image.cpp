@@ -1,7 +1,7 @@
 #include "shared.h"
 
 using namespace common;
-using namespace medialib;
+using namespace media;
 
 /*
     Конструкторы / деструктор
@@ -21,7 +21,7 @@ Image::Image (const Image& source, PixelFormat format)
 Image::Image (const char* file_name, PixelFormat format)
 {  
   if (!file_name)
-    RaiseNullArgument ("medialib::Image::Image", "file_name");
+    RaiseNullArgument ("media::Image::Image", "file_name");
 
   try
   {
@@ -32,17 +32,17 @@ Image::Image (const char* file_name, PixelFormat format)
   }
   catch (Exception& exception)
   {
-    exception.Raise ("medialib::Image::Image");
+    exception.Raise ("media::Image::Image");
   }
 }
 
 Image::Image (size_t layers_count, Image* layers, LayersCloneMode clone_mode)
 {
   if (!layers_count)
-    RaiseNullArgument ("medialib::Image::Image", "layers_count");
+    RaiseNullArgument ("media::Image::Image", "layers_count");
     
   if (!layers)
-    RaiseNullArgument ("medialib::Image::Image", "layers");
+    RaiseNullArgument ("media::Image::Image", "layers");
     
   switch (clone_mode)
   {
@@ -50,7 +50,7 @@ Image::Image (size_t layers_count, Image* layers, LayersCloneMode clone_mode)
     case LayersCloneMode_Capture:
       break;
     default:
-      RaiseInvalidArgument ("medialib::Image::Image", "clone_mode", clone_mode);
+      RaiseInvalidArgument ("media::Image::Image", "clone_mode", clone_mode);
       break;
   }
 
@@ -90,7 +90,7 @@ const char* Image::Name () const
 void Image::Rename (const char* new_name)
 {
   if (!new_name)
-    RaiseNullArgument ("medialib::Image::Rename", "new_name");
+    RaiseNullArgument ("media::Image::Rename", "new_name");
 
   impl->Rename (new_name);
 }
@@ -110,7 +110,7 @@ void Image::Convert (PixelFormat new_format)
     return;
 
   if (new_format < 0 || new_format >= PixelFormat_Num)
-    RaiseInvalidArgument ("medialib::Image::Convert", "new_format", new_format);
+    RaiseInvalidArgument ("media::Image::Convert", "new_format", new_format);
 
   impl->Convert (new_format);
 }
@@ -135,9 +135,9 @@ void Image::Resize (size_t width, size_t height, size_t depth)
   if (width == impl->Width () && height == impl->Height () && depth == impl->Depth ())
     return;
 
-  if (!width)  RaiseInvalidArgument ("medialib::Image::Resize", "width", width);
-  if (!height) RaiseInvalidArgument ("medialib::Image::Resize", "height", height);
-  if (!depth)  RaiseInvalidArgument ("medialib::Image::Resize", "depth", depth);
+  if (!width)  RaiseInvalidArgument ("media::Image::Resize", "width", width);
+  if (!height) RaiseInvalidArgument ("media::Image::Resize", "height", height);
+  if (!depth)  RaiseInvalidArgument ("media::Image::Resize", "depth", depth);
 
   impl->Resize (width, height, depth);
 }
@@ -149,7 +149,7 @@ void Image::Resize (size_t width, size_t height, size_t depth)
 const void* Image::Bitmap (size_t z) const
 {
   if (z >= impl->Depth ())
-    RaiseOutOfRange ("medialib::Image::Bitmap", "z", z, impl->Depth ());
+    RaiseOutOfRange ("media::Image::Bitmap", "z", z, impl->Depth ());
 
   return impl->Bitmap (z);
 }
@@ -162,7 +162,7 @@ void* Image::Bitmap (size_t z)
 void Image::PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data)
 {
   if (!data)
-    RaiseNullArgument ("medialib::Image::PutImage", "data");
+    RaiseNullArgument ("media::Image::PutImage", "data");
 
   impl->PutImage (x, y, z, width, height, depth, format, data);
 }
@@ -170,7 +170,7 @@ void Image::PutImage (size_t x, size_t y, size_t z, size_t width, size_t height,
 void Image::GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data) const
 {
   if (!data)
-    RaiseNullArgument ("medialib::Image::GetImage", "data");
+    RaiseNullArgument ("media::Image::GetImage", "data");
 
   impl->GetImage (x, y, z, width, height, depth, format, data);
 }
@@ -187,10 +187,10 @@ void Image::Load (const char* file_name)
 void Image::Save (const char* file_name, PixelFormat recommended_format)
 {
   if (!file_name)
-    RaiseNullArgument ("medialib::Image::Save", "file_name");
+    RaiseNullArgument ("media::Image::Save", "file_name");
     
   if (recommended_format < 0 || recommended_format >= PixelFormat_Num)
-    RaiseInvalidArgument ("medialib::Image::Save", "recommended_format", recommended_format);
+    RaiseInvalidArgument ("media::Image::Save", "recommended_format", recommended_format);
 
   try
   {
@@ -205,7 +205,7 @@ void Image::Save (const char* file_name, PixelFormat recommended_format)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("medialib::Image::Save");
+    exception.Raise ("media::Image::Save");
   }
 }
 
@@ -228,7 +228,7 @@ void Image::Swap (Image& image)
   swap (impl, image.impl);
 }
 
-namespace medialib
+namespace media
 {
 
 void swap (Image& image1,Image& image2)
