@@ -84,7 +84,7 @@ inline bool sphere<T>::empty (const element_type& eps) const
 
 //если текущий радиус < 0 - сбрасываем положение сферы
 template <class T>
-sphere<T>& sphere<T>::operator += (const vec_type& point)
+inline sphere<T>& sphere<T>::operator += (const vec_type& point)
 {
   if (sphere_radius < element_type (0))
   {
@@ -95,7 +95,7 @@ sphere<T>& sphere<T>::operator += (const vec_type& point)
   }
   
   element_type distance = length (sphere_center - point);
-  
+
   if (distance > sphere_radius)
     sphere_radius = distance;
 
@@ -103,22 +103,12 @@ sphere<T>& sphere<T>::operator += (const vec_type& point)
 }
 
 template <class T>
-sphere<T>& sphere<T>::operator += (const sphere<T>& sph)
+inline sphere<T>& sphere<T>::operator += (const sphere<T>& s)
 {
-    //????????
-
-  vec_type vec;
-  if(sphere_radius<0)
-  {
-     sphere_radius=sph.radius();
-     sphere_center=sph.centre();
-     return *this;
-  }
-  if(contains(sph))
-     return *this;
-  vec=(sphere_center+sph.center())/2;
-  sphere_center=vec+normalize(vec)*((sphere_radius+sph.radius)/2);
-  return *this;
+  if (sphere_radius < element_type (0))
+    return *this = s;
+    
+  return *this += s.sphere_center + normalize (s.sphere_radius - sphere_radius) * s.sphere_radius
 }
 
 template <class T>
