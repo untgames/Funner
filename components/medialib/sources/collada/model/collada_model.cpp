@@ -68,10 +68,10 @@ Model::Model  ()
 Model::Model (const char* file_name)
   : impl (new ModelImpl)
 {
-  ModelSystemSingleton::Instance ().Load (file_name, *this, default_collada_log);
+  ModelSystemSingleton::Instance ().Load (file_name, *this, LogHandler (&default_collada_log));
 }
 
-Model::Model (const char* file_name, const LogFunction& log)
+Model::Model (const char* file_name, const LogHandler& log)
   : impl (new ModelImpl)
 {
   ModelSystemSingleton::Instance ().Load (file_name, *this, log);
@@ -242,17 +242,17 @@ void Model::Load (const char* file_name)
   Model (file_name).Swap (*this);
 }
 
-void Model::Load (const char* file_name, const LogFunction& log)
+void Model::Load (const char* file_name, const LogHandler& log)
 {
   Model (file_name, log).Swap (*this);
 }
 
 void Model::Save (const char* file_name)
 {
-  ModelSystemSingleton::Instance ().Save (file_name, *this, default_collada_log);
+  ModelSystemSingleton::Instance ().Save (file_name, *this, LogHandler (&default_collada_log));
 }
 
-void Model::Save (const char* file_name, const LogFunction& log)
+void Model::Save (const char* file_name, const LogHandler& log)
 {
   ModelSystemSingleton::Instance ().Save (file_name, *this, log);
 }

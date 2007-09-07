@@ -6,7 +6,7 @@
     Конструктор / деструктор
 */
 
-DaeParser::DaeParser (const char* file_name, Model& in_model, const LogFunction& log)
+DaeParser::DaeParser (const char* file_name, Model& in_model, const LogHandler& log)
   : model (in_model), parser (parse_log, file_name), current_scope (0)
 {
   try
@@ -32,7 +32,7 @@ DaeParser::~DaeParser ()
     Печать ошибок
 */
 
-void DaeParser::PrintLog (const LogFunction& log)
+void DaeParser::PrintLog (const LogHandler& log)
 {
   for (size_t i=0; i<parse_log.MessagesCount (); ++i)
     log (parse_log.Message (i));    
@@ -154,7 +154,7 @@ void DaeParser::ParseLibraries (Parser::Iterator iter)
     Функция загрузки модели
 */
 
-void Model::DefaultDaeLoader (const char* file_name, Model& model, const LogFunction& log)
+void Model::DefaultDaeLoader (const char* file_name, Model& model, const LogHandler& log)
 {
   DaeParser (file_name, model, log);
 }

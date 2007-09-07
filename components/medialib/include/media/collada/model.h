@@ -35,14 +35,14 @@ typedef ILibrary<Scene>    SceneLibrary;
 class Model
 {
   public:
-    typedef xtl::function<void (const char*)> LogFunction;
+    typedef xtl::function<void (const char*)> LogHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Model  ();
     Model  (const char* file_name);
-    Model  (const char* file_name, const LogFunction& log_func);
+    Model  (const char* file_name, const LogHandler& log_func);
     ~Model ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,9 +55,9 @@ class Model
 ///Загрузка / сохранение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Load (const char* file_name);
-    void Load (const char* file_name, const LogFunction& log);
+    void Load (const char* file_name, const LogHandler& log);
     void Save (const char* file_name);
-    void Save (const char* file_name, const LogFunction& log);
+    void Save (const char* file_name, const LogHandler& log);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя активной сцены
@@ -95,7 +95,7 @@ class Model
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчики загрузки/сохранения по умолчанию
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void DefaultDaeLoader (const char* file_name, Model&, const LogFunction& log);
+    static void DefaultDaeLoader (const char* file_name, Model&, const LogHandler& log);
 
   private:
     Model  (const Model&); //no impl
@@ -116,8 +116,8 @@ void swap (Model&, Model&);
 class ModelSystem
 {
   public:
-    typedef xtl::function<void (const char*,       Model&, const Model::LogFunction& log)> LoadHandler;
-    typedef xtl::function<void (const char*, const Model&, const Model::LogFunction& log)> SaveHandler;
+    typedef xtl::function<void (const char*,       Model&, const Model::LogHandler& log)> LoadHandler;
+    typedef xtl::function<void (const char*, const Model&, const Model::LogHandler& log)> SaveHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с пользовательскими функциями загрузки и сохранения
