@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_HEAP__
-#define __COMMONLIB_HEAP__
+#ifndef COMMONLIB_HEAP_HEADER
+#define COMMONLIB_HEAP_HEADER
 
 #include <new>
 #include <xtl/functional_fwd>
@@ -241,7 +241,7 @@ class MemoryManager
 ///ѕереопределение операторов распределени€ пам€ти
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __COMMONLIB_NO_NEWDELETE_REDIRECT__
+#ifndef COMMONLIB_NO_NEWDELETE_REDIRECT
   #include <common/detail/heap.inl>
 #endif
 

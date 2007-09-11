@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_EXCEPTION__
-#define __COMMONLIB_EXCEPTION__
+#ifndef COMMONLIB_EXCEPTION_HEADER
+#define COMMONLIB_EXCEPTION_HEADER
 
 #include <exception>
 #include <stddef.h>

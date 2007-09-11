@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_STREAMS__
-#define __COMMONLIB_STREAMS__
+#ifndef COMMONLIB_STREAMS_HEADER
+#define COMMONLIB_STREAMS_HEADER
 
 #include <common/file.h>
 #include <common/strlib.h>

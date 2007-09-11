@@ -1,5 +1,5 @@
-#ifndef __COMMON_REFERENCE_COUNT__
-#define __COMMON_REFERENCE_COUNT__
+#ifndef COMMON_REFERENCE_COUNT_HEADER
+#define COMMON_REFERENCE_COUNT_HEADER
 
 #include <stl/stdexcept>
 

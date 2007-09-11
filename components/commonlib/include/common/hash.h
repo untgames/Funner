@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_HASH__
-#define __COMMONLIB_HASH__
+#ifndef COMMONLIB_HASH_HEADER
+#define COMMONLIB_HASH_HEADER
 
 #include <stddef.h>
 

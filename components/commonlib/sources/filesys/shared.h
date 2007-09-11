@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_FILE_SYSTEM_SHARED__
-#define __COMMONLIB_FILE_SYSTEM_SHARED__
+#ifndef COMMONLIB_FILE_SYSTEM_SHARED_HEADER
+#define COMMONLIB_FILE_SYSTEM_SHARED_HEADER
 
 #include <common/file.h>
 #include <common/refcount.h>

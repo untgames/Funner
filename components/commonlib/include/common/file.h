@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_FILE_SYSTEM__
-#define __COMMONLIB_FILE_SYSTEM__
+#ifndef COMMONLIB_FILE_SYSTEM_HEADER
+#define COMMONLIB_FILE_SYSTEM_HEADER
 
 #include <time.h>
 #include <xtl/intrusive_ptr.h>

@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_SINGLEON__
-#define __COMMONLIB_SINGLEON__
+#ifndef COMMONLIB_SINGLEON_HEADER
+#define COMMONLIB_SINGLEON_HEADER
 
 #include <new>
 #include <stl/stdexcept>

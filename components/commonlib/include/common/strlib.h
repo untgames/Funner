@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_STRING__
-#define __COMMONLIB_STRING__
+#ifndef COMMONLIB_STRING_LIBRARY_HEADER
+#define COMMONLIB_STRING_LIBRARY_HEADER
 
 #include <common/strwrap.h>
 #include <stl/string>

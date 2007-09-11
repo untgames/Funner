@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_PLATFORM__
-#define __COMMONLIB_PLATFORM__
+#ifndef COMMONLIB_PLATFORM_HEADER
+#define COMMONLIB_PLATFORM_HEADER
 
 namespace common
 {

@@ -1,5 +1,5 @@
-#ifndef __COMMLIB_DEFAULT_PLATFORM__
-#define __COMMLIB_DEFAULT_PLATFORM__
+#ifndef COMMLIB_DEFAULT_PLATFORM_HEADER
+#define COMMLIB_DEFAULT_PLATFORM_HEADER
 
 #include <platform/platform.h>
 #include <common/heap.h>
@@ -107,4 +107,3 @@ class StdioIOSystem: public StdioFileSystem
 }
 
 #endif
-

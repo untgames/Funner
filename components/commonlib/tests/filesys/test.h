@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_FILE_SYSTEM_TEST__
-#define __COMMONLIB_FILE_SYSTEM_TEST__
+#ifndef COMMONLIB_FILE_SYSTEM_TEST_HEADER
+#define COMMONLIB_FILE_SYSTEM_TEST_HEADER
 
 #include <stdio.h>
 #include <common/file.h>

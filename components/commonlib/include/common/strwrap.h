@@ -1,5 +1,5 @@
-#ifndef __COMMONLIB_STRING_WRAPPERS__
-#define __COMMONLIB_STRING_WRAPPERS__
+#ifndef COMMONLIB_STRING_WRAPPERS_HEADER
+#define COMMONLIB_STRING_WRAPPERS_HEADER
 
 #include <stddef.h>
 #include <stdarg.h>
