@@ -105,7 +105,7 @@ void RaiseNotSupported    (const char* source);
 void RaiseNotSupported    (const char* source,const char* format,...);
 void VRaiseNotSupported   (const char* source,const char* format,va_list list);
 
-#include <common/impl/exception.inl>
+#include <common/detail/exception.inl>
 
 }
 

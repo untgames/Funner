@@ -102,7 +102,7 @@ T* Singleton<T,CreateaionPolicy>::instance = 0;
 template <class T,template <class> class CreateaionPolicy>
 SingletonListNode Singleton<T,CreateaionPolicy>::node;
 
-#include <common/impl/singleton.inl>
+#include <common/detail/singleton.inl>
 
 }
 

@@ -242,7 +242,7 @@ class MemoryManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __COMMONLIB_NO_NEWDELETE_REDIRECT__
-  #include <common/impl/heap.inl>
+  #include <common/detail/heap.inl>
 #endif
 
 #endif

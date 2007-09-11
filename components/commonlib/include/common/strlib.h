@@ -73,7 +73,7 @@ bool wcimatch (const char* string,const char* wildcard);
 size_t strhash  (const stl::string&,size_t init_hash=0xFFFFFFFF);
 size_t strihash (const stl::string&,size_t init_hash=0xFFFFFFFF);
 
-#include <common/impl/strlib.inl>
+#include <common/detail/strlib.inl>
 
 }
 

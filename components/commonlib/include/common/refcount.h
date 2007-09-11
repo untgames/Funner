@@ -44,7 +44,7 @@ class ReferenceCounter
     size_t ref_count;
 };
 
-#include <common/impl/refcount.inl>
+#include <common/detail/refcount.inl>
 
 }
 

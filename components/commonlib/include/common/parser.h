@@ -258,7 +258,7 @@ template <class Fn> void for_each_child (ParseNode*, const char* tag, Fn fn);
 template <class Fn>             void parse_if (ParseNode*, const char* tag, Fn then_fn);
 template <class Fn1, class Fn2> void parse_if (ParseNode*, const char* tag, Fn1 then_fn, Fn2 else_fn);
 
-#include <common/impl/parser.inl>
+#include <common/detail/parser.inl>
 
 }
 

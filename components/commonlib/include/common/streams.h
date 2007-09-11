@@ -278,7 +278,7 @@ class BasicWxfSerializer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef BasicWxfSerializer<TextSerializer> WxfSerializer;
 
-#include <common/impl/streams.inl>
+#include <common/detail/streams.inl>
 
 }
 
