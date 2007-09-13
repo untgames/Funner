@@ -21,7 +21,7 @@ void MyPngSaver (const char* file_name, const Image& img)
   fclose (save_file);
 }
 
-void main ()
+int main ()
 {
   try
   {
@@ -48,4 +48,10 @@ void main ()
   {                                               
     printf ("exception: %s\n",exception.what ()); 
   }                                               
+  catch (...)
+  {
+    printf ("unknown exception\n");
+  }
+  
+  return 0;
 }
