@@ -113,3 +113,17 @@ inline auto_ptr<T>::operator auto_ptr<T1> () throw ()
 {
   return release ();
 }
+
+template <class T>
+inline void auto_ptr<T>::swap (auto_ptr<T>& p)
+{
+  T* tmp = p.ptr;
+  p.ptr  = ptr;
+  ptr    = tmp;
+}
+
+template <class T>
+inline void swap (auto_ptr<T>& p1, auto_ptr<T>& p2)
+{
+  p1.swap (p2);
+}
