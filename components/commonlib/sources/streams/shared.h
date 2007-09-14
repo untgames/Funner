@@ -3,7 +3,9 @@
 
 #include <common/streams.h>
 #include <common/exception.h>
+#include <common/strwrap.h>
 #include <xtl/function.h>
+#include <string.h>
 
 namespace common
 {

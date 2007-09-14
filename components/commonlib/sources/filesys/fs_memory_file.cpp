@@ -1,5 +1,4 @@
 #include "shared.h"
-#include <memory.h>
 
 using namespace common;
 

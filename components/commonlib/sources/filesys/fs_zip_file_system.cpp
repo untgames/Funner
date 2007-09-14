@@ -1,7 +1,4 @@
 #include "shared.h"
-#include <stl/hash_map>
-#include <stl/vector>
-#include <zzip/zzip.h>
 
 using namespace common;
 using namespace stl;

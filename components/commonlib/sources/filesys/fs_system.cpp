@@ -1,7 +1,4 @@
 #include "shared.h"
-#include <common/hash.h>
-#include <platform/platform.h>
-#include <xtl/bind.h>
 
 using namespace stl;
 using namespace common;
@@ -133,11 +130,11 @@ const char* FileSystemImpl::CompressPath (const char* path)
       switch (size)
       {
         case 2:
-          if (!common::strncmp (src+1,".",1))
+          if (!strncmp (src+1,".",1))
             continue;
           break;            
         case 3:            
-          if (!common::strncmp (src+1,"..",2))
+          if (!strncmp (src+1,"..",2))
           {
             del_count++;
             continue;
@@ -383,7 +380,7 @@ void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystem* file_sys
   prefix += '/';
 
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
-    if (!common::strncmp (i->prefix.c_str (),prefix.c_str (),i->prefix.size ()))
+    if (!strncmp (i->prefix.c_str (),prefix.c_str (),i->prefix.size ()))
       Raise<FileMountException> ("FileSystem::Mount","Can not mount file system '%s' "
                                  "because it intersects with already mounted file system '%s'",
                                  prefix.c_str (),i->prefix.c_str ());
@@ -400,7 +397,7 @@ void FileSystemImpl::Unmount (const char* _path_prefix)
   size_t hash   = strhash (prefix);
 
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
-    if (i->hash == hash && !common::strncmp (prefix.c_str (),i->prefix.c_str (),i->prefix.size ()-1))
+    if (i->hash == hash && !strncmp (prefix.c_str (),i->prefix.c_str (),i->prefix.size ()-1))
     {
       mounts.erase (i);
       return;
@@ -440,7 +437,7 @@ bool FileSystemImpl::IsPathMount (const char* path) const
   size_t hash   = strhash (prefix);
 
   for (MountList::const_iterator i=mounts.begin ();i!=mounts.end ();++i)
-    if (i->hash == hash && !common::strncmp (prefix.c_str (),i->prefix.c_str (),i->prefix.size ()-1))
+    if (i->hash == hash && !strncmp (prefix.c_str (),i->prefix.c_str (),i->prefix.size ()-1))
       return true;
 
   return false;
@@ -454,7 +451,7 @@ ICustomFileSystem* FileSystemImpl::FindMountFileSystem (const char* file_name,st
 {
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
   {
-    if (!common::strnicmp (i->prefix.c_str (),file_name,i->prefix.size ()-1))
+    if (!string_wrappers::strnicmp (i->prefix.c_str (),file_name,i->prefix.size ()-1))
     {
       switch (file_name [i->prefix.size ()-1])
       {

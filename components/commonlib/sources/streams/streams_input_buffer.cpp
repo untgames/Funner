@@ -141,8 +141,8 @@ size_t InputStreamBuffer::DefaultReader (void*, size_t)
 */
 
 void InputStreamBuffer::Swap (InputStreamBuffer& isb)
-{
-  stl::swap (impl, isb.impl);
+{  
+  swap (impl, isb.impl);
 }
 
 namespace common

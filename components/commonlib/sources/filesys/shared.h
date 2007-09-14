@@ -5,10 +5,17 @@
 #include <common/refcount.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+#include <common/hash.h>
+#include <platform/platform.h>
+#include <zzip/zzip.h>
 #include <stl/hash_set>
+#include <stl/hash_map>
 #include <stl/vector>
 #include <stl/list>
+#include <stl/algorithm>
 #include <xtl/function.h>
+#include <xtl/bind.h>
+#include <memory.h>
 
 namespace common
 {

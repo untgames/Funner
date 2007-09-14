@@ -1,6 +1,7 @@
 #include <common/parser.h>
-#include <common/streams.h>
+#include <common/strlib.h>
 #include <stl/vector>
+#include <mathlib.h>
 #include <stdio.h>
 
 using namespace common;
@@ -8,29 +9,35 @@ using namespace stl;
 using namespace math;
 
 const char* SRC_FILE_NAME = "data/test3.wxf";
-const char* DST_FILE_NAME = "/io/stdout";
 
 class Test
 {
   public:
-    Test (const char* in_file_name,const char* out_file_name);
+    Test (const char* in_file_name);
     
     template <class T> void Translate      (const char* type_name,const char* tag,const T& default_value = T ());
     template <class T> void TranslateArray (const char* type_name,const char* tag);
     template <class T> void TranslateArray (const char* type_name,const char* tag,size_t start,size_t step=0);
     
   private:
-    template <class T> void Print (const char* type_name,const char* tag,size_t count,const T* array);
+    template <class T> void Print (const char* type_name,const char* tag,size_t count,const T* array);    
+        
+    void Write (int value)            { printf ("%d", value); }
+    void Write (short value)          { printf ("%d", value); }
+    void Write (const char* s)        { printf ("%s", s); }    
+    void Write (float value)          { printf ("%g", value); }
+    void Write (const stl::string& s) { Write (s.c_str ()); }
+    void Write (char value)           { printf ("%c", value); }
+    void Write (const math::vec3f& v) { printf ("%g, %g, %g", v [0], v [1], v [2]); }
+    void Write (const math::mat3f& m) { Write (m [0]); printf (", "); Write (m [1]); printf (", "); Write (m [2]); }
   
   private:
-    Parser::Log      log;    
-    Parser           parser;
-    OutputTextStream stream;
-    TextSerializer   serializer;
+    Parser::Log log;    
+    Parser      parser;    
 };
 
-Test::Test (const char* in_file_name,const char* out_file_name)
-  : parser (log,in_file_name), stream (out_file_name), serializer (stream,", ")
+Test::Test (const char* in_file_name)
+  : parser (log,in_file_name)
 { 
   if (log.HasErrors () || log.HasWarnings ())
   {
@@ -44,24 +51,23 @@ Test::Test (const char* in_file_name,const char* out_file_name)
 template <class T> 
 void Test::Print (const char* type_name,const char* tag,size_t count,const T* array)
 {
-  stream.Printf ("%12s %28s = {",type_name,format ("<%s>[%u]",tag,count).c_str ());
+  printf ("%12s %28s = {",type_name,format ("<%s>[%u]",tag,count).c_str ());
 
   if (count)
   {    
     for (size_t i=0;i<count-1;i++)
     {
-      stream.Print ("\"");
-      serializer.Write (array [i]);
-      stream.Print ("\"");
-      serializer.WriteSeparator ();
+      printf ("\"");
+      Write  (array [i]);
+      printf ("\", ");
     }
-
-    stream.Print ("\"");
-    serializer.Write (array [count-1]);
-    stream.Print ("\"");
+    
+    printf ("\"");
+    Write  (array [count-1]);
+    printf ("\"");
   }
 
-  stream.Print ("}\n");
+  printf ("}\n");
 }
 
 template <class T>
@@ -71,9 +77,9 @@ void Test::Translate (const char* type_name,const char* tag,const T& default_val
   
   read (parser.Root (),tag,object,default_value);
   
-  stream.Printf ("%12s %28s = \"",type_name,format ("<%s>",tag).c_str ());
-  serializer.Write (object);
-  stream.Print ("\"\n");
+  printf ("%12s %28s = \"",type_name,format ("<%s>",tag).c_str ());
+  Write  (object);
+  printf ("\"\n");
 }
 
 template <class T> 
@@ -100,7 +106,7 @@ int main ()
 
   try
   {
-    Test test (SRC_FILE_NAME,DST_FILE_NAME);
+    Test test (SRC_FILE_NAME);
     
     printf ("Dump:\n");
 
