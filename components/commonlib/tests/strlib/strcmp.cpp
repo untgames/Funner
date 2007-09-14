@@ -1,7 +1,6 @@
 #include <common/strlib.h>
 #include <stdio.h>
 
-using namespace common;
 using namespace stl;
 
 struct CompareTest
@@ -35,8 +34,8 @@ int main ()
   {    
     CompareTest& test = compare_tests [i];
     
-    if (test.len == -1) printf ("strcmp('%s','%s')=%d\n",test.s1,test.s2,common::strcmp (test.s1,test.s2));
-    else                printf ("strncmp('%s','%s',%d)=%d\n",test.s1,test.s2,test.len,common::strncmp (test.s1,test.s2,(size_t)test.len));
+    if (test.len == -1) printf ("strcmp('%s','%s')=%d\n",test.s1,test.s2,common::string_wrappers::strcmp (test.s1,test.s2));
+    else                printf ("strncmp('%s','%s',%d)=%d\n",test.s1,test.s2,test.len,common::string_wrappers::strncmp (test.s1,test.s2,(size_t)test.len));
   }
   
   printf ("Case compare tests:\n");  
@@ -53,8 +52,8 @@ int main ()
   {    
     CompareTest& test = compare_tests [i];
     
-    if (test.len == -1) printf ("stricmp('%s','%s')=%d\n",test.s1,test.s2,common::stricmp (test.s1,test.s2));
-    else                printf ("strnicmp('%s','%s',%d)=%d\n",test.s1,test.s2,test.len,common::strnicmp (test.s1,test.s2,(size_t)test.len));
+    if (test.len == -1) printf ("stricmp('%s','%s')=%d\n",test.s1,test.s2,common::string_wrappers::stricmp (test.s1,test.s2));
+    else                printf ("strnicmp('%s','%s',%d)=%d\n",test.s1,test.s2,test.len,common::string_wrappers::strnicmp (test.s1,test.s2,(size_t)test.len));
   }
 
   return 0;

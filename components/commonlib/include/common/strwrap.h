@@ -11,6 +11,9 @@
 namespace common
 {
 
+namespace string_wrappers
+{
+
 /*
     Сравнение строк
 */
@@ -31,6 +34,8 @@ int snprintf   (char* buffer,size_t count,const char* format,...);
 int vsnprintf  (char* buffer,size_t count,const char* format,va_list list);
 int snwprintf  (wchar_t* buffer,size_t count,const wchar_t* format,...);
 int vsnwprintf (wchar_t* buffer,size_t count,const wchar_t* format,va_list list);
+
+}
 
 /*
     Хэширование
