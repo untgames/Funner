@@ -5,47 +5,47 @@
 
 using namespace common;
 
-const size_t START_LOG_BUF_SIZE   = 1024;    //стартовый размер протокола
-const size_t MAX_LOG_BUF_SIZE     = 16*1024; //максимальный размер протокола
-const size_t INTERNAL_BUFFER_SIZE = 128;     //размер внутреннего буфера протокола
+const size_t START_LOG_BUF_SIZE   = 1024;    //ёЄрЁЄют√щ ЁрчьхЁ яЁюЄюъюыр
+const size_t MAX_LOG_BUF_SIZE     = 16*1024; //ьръёшьры№э√щ ЁрчьхЁ яЁюЄюъюыр
+const size_t INTERNAL_BUFFER_SIZE = 128;     //ЁрчьхЁ тэєЄЁхээхую сєЇхЁр яЁюЄюъюыр
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Информация о сообщении
+///╚эЇюЁьрЎш  ю ёююс∙хэшш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct ParseLogMessage
 {
-  ParseLogMessageType type;           //тип сообщения  
-  size_t              message_offset; //смещение до строки с сообщением
+  ParseLogMessageType type;           //Єшя ёююс∙хэш   
+  size_t              message_offset; //ёьх∙хэшх фю ёЄЁюъш ё ёююс∙хэшхь
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание реализации протокола парсера
+///╬яшёрэшх ЁхрышчрЎшш яЁюЄюъюыр ярЁёхЁр
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct ParseLog::Impl 
 {
-  size_t           buffer_size;     //размер буфера
-  size_t           available;       //доступный размер буфера
-  char*            buffer;          //буфер протокола
-  ParseLogMessage* message_pos;     //позиция для записи следующего заголовка сообщения
-  char*            string_pos;      //позиция для записи следующей строки
-  bool             has_errors;      //есть ошибки разбора
-  bool             has_warnings;    //есть предупреждения разбора
-  size_t           messages_count;  //количество сообщений
-  char             internal_buffer [INTERNAL_BUFFER_SIZE]; //внутренний буфер на случай фатальных ошибок
+  size_t           buffer_size;     //ЁрчьхЁ сєЇхЁр
+  size_t           available;       //фюёЄєяэ√щ ЁрчьхЁ сєЇхЁр
+  char*            buffer;          //сєЇхЁ яЁюЄюъюыр
+  ParseLogMessage* message_pos;     //яючшЎш  фы  чряшёш ёыхфє■∙хую чруюыютър ёююс∙хэш 
+  char*            string_pos;      //яючшЎш  фы  чряшёш ёыхфє■∙хщ ёЄЁюъш
+  bool             has_errors;      //хёЄ№ ю°шсъш ЁрчсюЁр
+  bool             has_warnings;    //хёЄ№ яЁхфєяЁхцфхэш  ЁрчсюЁр
+  size_t           messages_count;  //ъюышўхёЄтю ёююс∙хэшщ
+  char             internal_buffer [INTERNAL_BUFFER_SIZE]; //тэєЄЁхээшщ сєЇхЁ эр ёыєўрщ ЇрЄры№э√ї ю°шсюъ
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///╩юэёЄЁєъЄюЁ / фхёЄЁєъЄюЁ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   Impl  ();
   ~Impl ();
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Резервирование места под сообщение
+///╨хчхЁтшЁютрэшх ьхёЄр яюф ёююс∙хэшх
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   char* AllocMessage (size_t message_size,ParseLogMessageType type);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление сообщения
+///─юсртыхэшх ёююс∙хэш 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void InsertMessage (const char*         file_name,
                       size_t              line,
@@ -147,7 +147,7 @@ void ParseLog::Impl::InsertMessage
     
   if (type != PARSE_LOG_FATAL_ERROR)
   {
-    size_t size = vsnprintf (NULL,0,format,list) + snprintf (NULL,0,"%s(%u): %s: ",file_name,line,message_type_string);
+    size_t size = string_wrappers::vsnprintf (NULL,0,format,list) + string_wrappers::snprintf (NULL,0,"%s(%u): %s: ",file_name,line,message_type_string);
     
     if (size == (size_t)-1)
       return;
@@ -163,7 +163,7 @@ void ParseLog::Impl::InsertMessage
   }
   else
   {    
-    size_t size = vsnprintf (NULL,0,format,list) + snprintf (NULL,0,"%s: ",message_type_string);
+    size_t size = string_wrappers::vsnprintf (NULL,0,format,list) + string_wrappers::snprintf (NULL,0,"%s: ",message_type_string);
     
     if (size == (size_t)-1)
       return;

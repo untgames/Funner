@@ -266,7 +266,7 @@ void ParseContext::Resize (size_t size)
   {
     char buf [128];
     
-    snprintf (buf,sizeof (buf),"Buffer can not be enlarged by %u bytes (cur_size=%u, max_size=%u)",
+    string_wrappers::snprintf (buf,sizeof (buf),"Buffer can not be enlarged by %u bytes (cur_size=%u, max_size=%u)",
                size,cur_size,MAX_ATTR_BUF_SIZE);
     
     throw ParseBufferTooLargeException (buf);

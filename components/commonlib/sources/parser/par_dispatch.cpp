@@ -29,9 +29,9 @@ static ParseFormat DetectFileFormat (const char* file_name)
 {
   string type = suffix (file_name);
   
-  if      (!common::stricmp (type.c_str (),".wxf")) return PARSE_FORMAT_WXF;
-  else if (!common::stricmp (type.c_str (),".xml")) return PARSE_FORMAT_XML;
-  else                                              return PARSE_FORMAT_AUTODETECT;
+  if      (!string_wrappers::stricmp (type.c_str (),".wxf")) return PARSE_FORMAT_WXF;
+  else if (!string_wrappers::stricmp (type.c_str (),".xml")) return PARSE_FORMAT_XML;
+  else                                                       return PARSE_FORMAT_AUTODETECT;
 }
 
 ParseFormat GetParseFormat (const char* format_name)
@@ -39,10 +39,10 @@ ParseFormat GetParseFormat (const char* format_name)
   if (!format_name || !*format_name)
     return PARSE_FORMAT_AUTODETECT;
     
-  if      (!common::stricmp (format_name,"wxf"))  return PARSE_FORMAT_WXF;
-  else if (!common::stricmp (format_name,"xml"))  return PARSE_FORMAT_XML; 
-  else if (!common::stricmp (format_name,"auto")) return PARSE_FORMAT_AUTODETECT;
-  else                                            return PARSE_FORMAT_UNKNOWN;
+  if      (!string_wrappers::stricmp (format_name,"wxf"))  return PARSE_FORMAT_WXF;
+  else if (!string_wrappers::stricmp (format_name,"xml"))  return PARSE_FORMAT_XML; 
+  else if (!string_wrappers::stricmp (format_name,"auto")) return PARSE_FORMAT_AUTODETECT;
+  else                                                     return PARSE_FORMAT_UNKNOWN;
 }
 
 /*

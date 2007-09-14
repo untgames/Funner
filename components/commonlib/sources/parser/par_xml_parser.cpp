@@ -174,7 +174,7 @@ inline XMLParser::Instruction XMLParser::instruction (const char* name)
     return INSTRUCTION_UNDEFINED;
 
   for (String2Instruction* i=instruction_map;i->name;i++)
-    if (!common::stricmp (i->name,name))
+    if (!string_wrappers::stricmp (i->name,name))
       return i->instruction;
       
   return INSTRUCTION_UNDEFINED;
@@ -209,8 +209,8 @@ void XMLParser::process_instruction (const char* name,const char* value,size_t l
     {
       int result = -1;
       
-      if      (!common::stricmp (value,"yes")) result = 1;
-      else if (!common::stricmp (value,"no"))  result = 0;
+      if      (!string_wrappers::stricmp (value,"yes")) result = 1;
+      else if (!string_wrappers::stricmp (value,"no"))  result = 0;
       
       if (result == -1)
       {
@@ -263,7 +263,7 @@ void XMLParser::parse_PI ()
     return;
   }  
   
-  if (common::strnicmp ("xml",lex.token (),3))
+  if (string_wrappers::strnicmp ("xml",lex.token (),3))
   {
     error ("processing directive must start from 'xml' prefix");
     return;
@@ -332,7 +332,7 @@ void XMLParser::parse_content_elements ()
             return;
         }
 
-        if (common::strcmp(context.GetCurrentNodeName(), lex.token ()))
+        if (strcmp(context.GetCurrentNodeName(), lex.token ()))
         {
           error ("syntax error. Closing tag '%s' without opening. Expected '%s'.", lex.token (), context.GetCurrentNodeName());
           if (lex.next () != XMLLexer::TAG_END_BRACKET)

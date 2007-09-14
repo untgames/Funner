@@ -120,7 +120,7 @@ void WXFParser::parse_pragma ()
     return;
   }
 
-  if (!common::strcmp (lex.token (),"reserve"))
+  if (!strcmp (lex.token (),"reserve"))
   {
     size_t size [2];
     
@@ -142,7 +142,7 @@ void WXFParser::parse_pragma ()
     if (!context.Reserve (size [0],size [1]))
       warning ("Can not reserve %u nodes and %u attributes",size [0],size [1]);
   }
-  else if (!common::strcmp (lex.token (),"profile"))
+  else if (!strcmp (lex.token (),"profile"))
   {
     lex.next ();
     
@@ -152,9 +152,9 @@ void WXFParser::parse_pragma ()
       return;
     }
     
-    if      (!common::strcmp (lex.token (),"small"))  context.SetGrow (GROW_SMALL);
-    else if (!common::strcmp (lex.token (),"medium")) context.SetGrow (GROW_MEDIUM);
-    else if (!common::strcmp (lex.token (),"large"))  context.SetGrow (GROW_LARGE);
+    if      (!strcmp (lex.token (),"small"))  context.SetGrow (GROW_SMALL);
+    else if (!strcmp (lex.token (),"medium")) context.SetGrow (GROW_MEDIUM);
+    else if (!strcmp (lex.token (),"large"))  context.SetGrow (GROW_LARGE);
     else
     {
       error ("unknown profile \"%s\"",lex.token ());
@@ -212,10 +212,10 @@ void WXFParser::parse_directive ()
   if (!*directive)
     return;
     
-  if      (!common::strcmp ("pragma",directive))  parse_pragma ();
-  else if (!common::strcmp ("include",directive)) parse_include ();
-  else if (!common::strcmp ("error",directive))   parse_error ();
-  else if (!common::strcmp ("warning",directive)) parse_warning ();    
+  if      (!strcmp ("pragma",directive))  parse_pragma ();
+  else if (!strcmp ("include",directive)) parse_include ();
+  else if (!strcmp ("error",directive))   parse_error ();
+  else if (!strcmp ("warning",directive)) parse_warning ();    
   else    
   {
     error ("unknown directive '%s'",directive);
