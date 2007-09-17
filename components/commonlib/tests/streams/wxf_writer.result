@@ -1,0 +1,65 @@
+Results of wxf_writer_test:
+/*
+  This file is auto generated
+  Do not modify it by hand
+*/
+
+test1
+{
+  //Scalar types serialization
+
+  scalar
+  {
+    int     -1
+    size_t  4294967295
+    float   3.14159
+    double  3.14159
+    long_double 3.14159
+    string  "Hello world"
+    char    x
+  }
+
+  //Mathlib types serialization
+
+  mathlib
+  {
+    vec3f   1.1 2.2 3.3
+    mat4f   1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+    quatd   3.14159 3.14159 3.14159 3.14159
+  }
+
+  //Intervals serialization
+
+  intervals
+  {
+    int_array
+    (
+      1
+      2
+      3
+      4
+      5
+      6
+      7
+      8
+      9
+      10
+    )
+    stl_set
+    (
+      hello
+      sunny
+      world
+    )
+  }
+}
+test2 1 1 1 1
+{
+  /*
+    This frame need to test block-comments in subframes
+    Don't worry about it:)
+  */
+
+  bool_flag
+}
+exception: Wrong wxf-format tag 'wrong tag' at common::WxfWriter::Write

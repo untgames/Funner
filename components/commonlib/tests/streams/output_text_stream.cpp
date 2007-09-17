@@ -1,16 +1,4 @@
-#include "shared.h"
-
-size_t writer (const void* buffer, size_t size)
-{
-  size_t result = size;
-
-  const char* s = (const char*)buffer;
-
-  for (;size--; s++)
-    printf ("%c", *s);
-
-  return result;
-}
+#include "shared.h" 
 
 int main ()
 {
@@ -18,7 +6,7 @@ int main ()
   
   try
   {
-    OutputTextStream stream (&writer);
+    OutputTextStream stream (&dump);
 
     write (stream, "Hello world\n");
     write (stream, 12, "-###");

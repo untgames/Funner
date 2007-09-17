@@ -2,8 +2,10 @@
 #define STREAMS_SHARED_HEADER
 
 #include <common/streams.h>
+#include <common/wxf_writer.h>
 #include <common/exception.h>
 #include <common/strwrap.h>
+#include <common/file.h>
 #include <xtl/function.h>
 #include <string.h>
 
