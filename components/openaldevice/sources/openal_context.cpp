@@ -415,11 +415,6 @@ void OpenALContext::CheckErrors (const char* function_name, const Tuple& args)
 template <class Fn, class Tuple>
 void OpenALContext::Dispatch (const char* function_name, Fn fn, const Tuple& args)
 {
-  ALenum error = alGetError ();
-  
-  if (error != AL_NO_ERROR)
-    LogPrintf ("Error before call %s!!!\n", function_name);
-
   apply<void> (fn, args);
   CheckErrors (function_name, args);
 }
@@ -427,11 +422,6 @@ void OpenALContext::Dispatch (const char* function_name, Fn fn, const Tuple& arg
 template <class Ret, class Fn, class Tuple>
 Ret OpenALContext::Dispatch (const char* function_name, Fn fn, const Tuple& args)
 {
-  ALenum error = alGetError ();
-  
-  if (error != AL_NO_ERROR)
-    LogPrintf ("Error before call %s!!!\n", function_name);
-
   Ret result = apply<Ret> (fn, args);
 
   CheckErrors (function_name, args);
