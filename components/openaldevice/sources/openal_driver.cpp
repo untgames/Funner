@@ -35,14 +35,17 @@ void register_openal_driver (const char* name)
        devices = alcGetString (NULL, ALC_ALL_DEVICES_SPECIFIER);
      else if (alcIsExtensionPresent (NULL, "ALC_ENUMERATION_EXT"))
        devices = alcGetString (NULL, ALC_DEVICE_SPECIFIER);
-     else
-     {
-       SoundSystem::RegisterConfiguration (name, "default");
-       return;
-     }
 
-     for (; strlen (devices); devices += strlen (devices) + 1)
-       SoundSystem::RegisterConfiguration (name, devices);
+     if (devices)
+     {
+       if (!strlen(devices))
+         SoundSystem::RegisterConfiguration (name, "default");
+
+       for (; strlen (devices); devices += strlen (devices) + 1)
+         SoundSystem::RegisterConfiguration (name, devices);
+     }
+     else
+       SoundSystem::RegisterConfiguration (name, "default");
   }
   catch (...)
   {
