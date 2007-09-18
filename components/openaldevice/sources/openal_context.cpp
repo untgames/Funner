@@ -610,12 +610,12 @@ void OpenALContext::alSourcePause (ALuint sid)
 
 void OpenALContext::alSourceQueueBuffers (ALuint sid, ALsizei n, const ALuint* buffers)
 {
-  Dispatch ("alSourceQueueBuffers", &::alSourceQueueBuffers, tie (sid, n, buffers));
+  Dispatch ("alSourceQueueBuffers", &::alSourceQueueBuffers, tie (sid, n, make_wrapper (n, buffers)));
 }
 
 void OpenALContext::alSourceUnqueueBuffers (ALuint sid, ALsizei n, ALuint* buffers)
 {
-  Dispatch ("alSourceUnqueueBuffers", &::alSourceUnqueueBuffers, tie (sid, n, buffers));
+  Dispatch ("alSourceUnqueueBuffers", &::alSourceUnqueueBuffers, tie (sid, n, make_wrapper (n, buffers)));
 }
 
 void OpenALContext::alListenerf (ALenum param, ALfloat value)
