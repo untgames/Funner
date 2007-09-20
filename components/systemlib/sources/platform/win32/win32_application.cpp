@@ -12,10 +12,9 @@ bool Platform::IsMessageQueueEmpty ()
   
   bool result = PeekMessage (&msg, 0, 0, 0, PM_NOREMOVE) == 0;
   
-  if (!msg.hwnd) //для обработки WM_TIMER
-    SetLastError (0);
-
-  CheckErrors ("syslib::Win32Platform::IsMessageQueueEmpty");
+    //сбрасываем все ошибки
+  
+  SetLastError (0);
   
   return result;
 }
