@@ -107,7 +107,7 @@ int main ()
     
 //    sound_system->SetIntegerParam ("al_debug_log", 1);
 
-    printf ("Using device %s.\n", sound_system->Name ());
+/*    printf ("Using device %s.\n", sound_system->Name ());
     printf ("Total channels available: %u\n", info.channels_count);
     printf ("Supported EAX %u.%u.\n", info.eax_major_version, info.eax_minor_version);
 
@@ -148,9 +148,9 @@ int main ()
 
     Timer timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),
           timer2 (bind (&Application::Exit, 0), TEST_WORK_TIME);
-          
+  */        
 //    xtl::auto_connection c = Application::RegisterEventHandler (ApplicationEvent_OnIdle, &idle);
-
+  
     Application::Run ();
   }
   catch (std::exception& exception)
