@@ -6,6 +6,8 @@
 namespace common
 {
 
+//переименовать фреймы в узлы
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение: неверный wxf-тэг
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +72,7 @@ class WxfWriter
     template <class InIter> void WriteRange (const char* tag, InIter first, InIter last, const char* format);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вставка коментария
+///Вставка комvентария
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void WriteComment (const char* comment);
     void WriteComment (const wchar_t* comment);
@@ -107,7 +109,7 @@ void wxf_write (OutputTextStream&, unsigned char symbol);
 void wxf_write (OutputTextStream&, const char* string);
 void wxf_write (OutputTextStream&, const wchar_t* string);
 
-template <class Traits, class Allocator> void wfx_write (OutputTextStream&, const stl::basic_string<char, Traits, Allocator>& string);
+template <class Traits, class Allocator> void wxf_write (OutputTextStream&, const stl::basic_string<char, Traits, Allocator>& string);
 template <class Traits, class Allocator> void wxf_write (OutputTextStream&, const stl::basic_string<wchar_t, Traits, Allocator>& string);
 
 #include <common/detail/wxf_writer.inl>

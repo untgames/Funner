@@ -208,9 +208,9 @@ void write (OutputTextStream&, const stl::basic_string<wchar_t, Traits, Allocato
 ///Вывод символов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void write (OutputTextStream&, char symbol);
-void write (OutputTextStream&, signed char symbol);
-void write (OutputTextStream&, unsigned char symbol);
 void write (OutputTextStream&, wchar_t symbol);
+void write (OutputTextStream&, size_t count, char symbol);
+void write (OutputTextStream&, size_t count, wchar_t symbol);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вывод целых чисел
@@ -254,6 +254,10 @@ void write_range (OutputTextStream&, InIter first, InIter last, const char* form
 
 template <class InIter>
 void write_range (OutputTextStream&, InIter first, InIter last, const char* format, const wchar_t* separator);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Бинарный поток вывода с учётом порядка следования байтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <common/detail/streams.inl>
 

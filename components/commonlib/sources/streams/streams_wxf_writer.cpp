@@ -2,35 +2,6 @@
 
 using namespace common;
 
-namespace
-{
-  
-/*
-    Дамп в файл
-*/
-
-struct FileWriter
-{
-  FileWriter (const char* file_name) : file (file_name) {}
-
-  size_t operator () (const void* buffer, size_t size)
-  {
-    size_t result = file.Write (buffer, size);
-
-    file.Flush ();
-
-    return result;
-  }
-
-  OutputFile file;
-};
-  
-}
-
-/*
-    WxfWriter
-*/
-
 /*
     Описание реализации
 */
@@ -143,7 +114,7 @@ void WxfWriter::Write (const char* tag)
 }
 
 /*
-    Вставка коментария
+    Вставка комментария
 */
 
 void WxfWriter::WriteComment (const char* comment)
@@ -220,14 +191,8 @@ void WxfWriter::WriteIndent ()
 
 void WxfWriter::WriteIndent (size_t indent)
 {
-  static char  buf [] = "                                ";
-  const size_t BUF_SIZE = sizeof (buf) - 1;
+  write (impl->stream, indent, ' ');
 
-  for (size_t i=0; i<indent/BUF_SIZE; i++)
-    impl->stream.Write (buf, BUF_SIZE);
-
-  impl->stream.Write (buf, indent % BUF_SIZE);
-  
   impl->begin_frame_flag = false;
 }
 

@@ -108,19 +108,42 @@ void write (OutputTextStream& stream, char symbol)
   stream.Write (&symbol, 1);
 }
 
-void write (OutputTextStream& stream, signed char symbol)
-{
-  stream.Write (reinterpret_cast<const char*> (&symbol), 1);
-}
-
-void write (OutputTextStream& stream, unsigned char symbol)
-{
-  stream.Write (reinterpret_cast<const char*> (&symbol), 1);
-}
-
 void write (OutputTextStream& stream, wchar_t symbol)
 {
   stream.Write (&symbol, 1);
+}
+
+void write (OutputTextStream& stream, size_t count, char symbol)
+{
+  if (!count)
+    return;
+
+  char buf [128];
+  const size_t BUF_SIZE = sizeof (buf);
+  
+  memset (buf, symbol, BUF_SIZE < count ? BUF_SIZE : count);
+
+  for (size_t i=0, passes_count=count/BUF_SIZE; i<passes_count; i++)
+    stream.Write (buf, BUF_SIZE);
+
+  stream.Write (buf, count % BUF_SIZE);
+}
+
+void write (OutputTextStream& stream, size_t count, wchar_t symbol)
+{
+  if (!count)
+    return;
+
+  const size_t BUF_SIZE = 128;
+  wchar_t buf [BUF_SIZE];
+  
+  for (size_t i=0, fill_size=count<BUF_SIZE?count:BUF_SIZE; i<fill_size; i++)
+    buf [i] = symbol;
+
+  for (size_t i=0, passes_count=count/BUF_SIZE; i<passes_count; i++)
+    stream.Write (buf, BUF_SIZE);
+
+  stream.Write (buf, count % BUF_SIZE);
 }
 
 /*

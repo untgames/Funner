@@ -3,6 +3,7 @@
 
 #include <common/streams.h>
 #include <common/wxf_writer.h>
+#include <common/xml_writer.h>
 #include <xtl/function.h>
 #include <stl/string>
 #include <stl/set>
