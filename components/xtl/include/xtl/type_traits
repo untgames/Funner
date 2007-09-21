@@ -106,6 +106,7 @@ template <size_t Len, size_t Align=-1> struct aligned_storage;
 
 #include <xtl/detail/type_traits/intrinsics.inl>
 #include <xtl/detail/type_traits/basic.inl>
+#include <xtl/detail/type_traits/cv.inl>
 #include <xtl/detail/type_traits/refptr.inl>
 
 #ifndef _MSC_VER
