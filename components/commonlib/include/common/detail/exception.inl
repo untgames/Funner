@@ -137,3 +137,17 @@ inline void VRaiseNotSupported (const char* source,const char* format,va_list li
 {  
   VRaise<NotSupportedException> (source,format,list);
 }
+
+inline void RaiseInvalidOperation (const char* source,const char* format,...)
+{
+  va_list list;
+
+  va_start (list,format);
+
+  VRaise<OperationException> (source,format,list);
+}
+
+inline void VRaiseInvalidOperation (const char* source,const char* format,va_list list)
+{  
+  VRaise<OperationException> (source,format,list);
+}
