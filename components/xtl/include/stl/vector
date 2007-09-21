@@ -5,7 +5,7 @@
 #ifndef __MYSTL_VECTOR__
 #define __MYSTL_VECTOR__
 
-#include <stl/iterator>
+#include <stl/reverse_iterator.h>
 #include <stl/alloc.h>
 #include <stl/stdexcept>
 

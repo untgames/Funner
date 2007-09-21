@@ -6,7 +6,7 @@
 #define __MYSTL_NUMERIC__
 
 #include <stl/functional>
-#include <stl/iterator>
+#include <stl/iterator_traits.h>
 #include <stl/math.h>
 
 namespace stl

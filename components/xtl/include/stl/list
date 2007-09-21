@@ -5,7 +5,7 @@
 #ifndef __MYSTL_LIST__
 #define __MYSTL_LIST__
 
-#include <stl/iterator>
+#include <stl/reverse_iterator.h>
 #include <stl/functional>
 #include <stl/alloc.h>
 

@@ -1,5 +1,6 @@
 #include <stl/deque>
 #include <stl/algorithm>
+#include <stl/iterator>
 #include <stdio.h>
 
 using namespace stl;

@@ -5,7 +5,7 @@
 #ifndef __MYSTL_ALGORITHM__
 #define __MYSTL_ALGORITHM__
 
-#include <stl/iterator>
+#include <stl/iterator_traits.h>
 #include <stl/functional>
 #include <stl/utility>
 #include <stl/tempbuf.h>

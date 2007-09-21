@@ -7,7 +7,7 @@
 
 #include <stl/alloc.h>
 #include <stl/tempbuf.h>
-#include <stl/iterator>
+#include <stl/iterator_traits.h>
 #include <stl/auto_ptr.h>
 
 namespace stl

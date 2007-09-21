@@ -1,5 +1,6 @@
 #include <stl/vector>
 #include <stl/algorithm>
+#include <stl/iterator>
 #include <stdio.h>
 
 using namespace stl;

@@ -5,7 +5,7 @@
 #ifndef __MYSTL_DEQUE__
 #define __MYSTL_DEQUE__
 
-#include <stl/iterator>
+#include <stl/reverse_iterator.h>
 #include <stl/alloc.h>
 #include <stl/stdexcept>
 

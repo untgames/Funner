@@ -5,7 +5,7 @@
 #ifndef __MYSTL_STRING__
 #define __MYSTL_STRING__
 
-#include <stl/iterator>
+#include <stl/reverse_iterator.h>
 #include <stl/algorithm>
 #include <stl/char_traits.h>
 #include <stl/alloc.h>
