@@ -32,6 +32,8 @@ int main ()
 
     window.Close ();
 
+    Timer timer (xtl::bind (&Window::Close, &window), 1000);
+
     Application::Run ();        
 
     return Application::GetExitCode ();    
