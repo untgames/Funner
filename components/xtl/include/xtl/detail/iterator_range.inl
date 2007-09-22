@@ -371,6 +371,12 @@ inline iterator_range<typename range_const_iterator<Range>::type> make_iterator_
   return detail::make_range_impl (range, advance_begin, advance_end);
 }
 
+template <class T>
+inline iterator_range<T*> make_iterator_range (size_t count, T* array)
+{
+  return iterator_range<T*> (array, array + count);
+}
+
 /*
     —оздание последовательности из интервала
 */

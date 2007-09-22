@@ -115,6 +115,8 @@ make_iterator_range (Range&, typename range_difference<Range>::type advance_begi
 template <class Range> iterator_range<typename range_const_iterator<Range>::type>
 make_iterator_range (const Range&, typename range_difference<Range>::type advance_begin, typename range_difference<Range>::type advance_end);
 
+template <class T> iterator_range<T*> make_iterator_range (size_t count, T* array);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—оздание последовательности из интервала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
