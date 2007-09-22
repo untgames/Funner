@@ -1,6 +1,7 @@
 #include <common/parser.h>
 #include <common/strlib.h>
 #include <stl/vector>
+#include <stl/insert_iterators.h>
 #include <mathlib.h>
 #include <stdio.h>
 
