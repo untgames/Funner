@@ -93,8 +93,6 @@ inline T& intrusive_ptr<T, Strategy>::operator * () const
 template <class T, template <class> class Strategy>
 inline intrusive_ptr<T, Strategy>::operator unspecified_bool_type () const
 {
-  static int dummy = 0;
-
   return ptr ? &intrusive_ptr::get : 0;
 }
 
