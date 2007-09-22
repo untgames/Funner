@@ -39,8 +39,8 @@ int main ()
     writer.EndFrame     ();
     writer.WriteComment ("Intervals serialization");
     writer.BeginFrame   ("intervals");
-    writer.WriteRange   ("int_array", sizeof (array)/sizeof (*array), array);
-    writer.WriteRange   ("stl_set", set.begin (), set.end ());
+    writer.Write        ("int_array", xtl::make_iterator_range (sizeof (array)/sizeof (*array), array));
+    writer.Write        ("stl_set", xtl::make_iterator_range (set));
     writer.EndFrame     ();
     writer.EndFrame     ();
     writer.BeginFrame   ("test2", vec4f (1.0f));

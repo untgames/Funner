@@ -66,10 +66,8 @@ class WxfWriter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сериализация диапазонов атрибутов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T>      void WriteRange (const char* tag, size_t count, const T* array);
-    template <class InIter> void WriteRange (const char* tag, InIter first, InIter last);
-    template <class T>      void WriteRange (const char* tag, size_t count, const T* array, const char* format);
-    template <class InIter> void WriteRange (const char* tag, InIter first, InIter last, const char* format);
+    template <class FwdIter> void Write (const char* tag, const xtl::iterator_range<FwdIter>& range);
+    template <class FwdIter> void Write (const char* tag, const xtl::iterator_range<FwdIter>& range, const char* format);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вставка комvентария

@@ -68,35 +68,25 @@ inline void WxfWriter::Write (const char* tag, const T& value, const char* forma
     Сериализация диапазонов атрибутов
 */
 
-template <class T>
-inline void WxfWriter::WriteRange (const char* tag, size_t count, const T* array)
+template <class FwdIter>
+inline void WxfWriter::Write (const char* tag, const xtl::iterator_range<FwdIter>& range)
 {
-  WriteRange (tag, array, array + count);
-}
+  typedef typename xtl::iterator_range<FwdIter>::const_iterator const_iterator;
 
-template <class T>
-inline void WxfWriter::WriteRange (const char* tag, size_t count, const T* array, const char* format)
-{
-  WriteRange (tag, array, array + count, format);
-}
-
-template <class InIter>
-inline void WxfWriter::WriteRange (const char* tag, InIter first, InIter last)
-{
   OutputTextStream& stream = Stream ();
 
-  CheckTag    (tag, "common::WxfWriter::WriteRange");
+  CheckTag    (tag, "common::WxfWriter::Write(range)");
   WriteIndent ();
   write       (stream, tag);
   write       (stream, "\n");
   WriteIndent ();
   write       (stream, "(\n");
 
-  for (;first != last; ++first)
+  for (const_iterator i=range.begin (), end=range.end () ;i != end; ++i)
   {
     WriteIndent ();
     WriteIndent (FrameIndent ());
-    wxf_write   (stream, *first);
+    wxf_write   (stream, *i);
     write       (stream, "\n");
   }
 
@@ -104,22 +94,25 @@ inline void WxfWriter::WriteRange (const char* tag, InIter first, InIter last)
   write       (stream, ")\n");
 }
 
-template <class InIter>
-inline void WxfWriter::WriteRange (const char* tag, InIter first, InIter last, const char* format)
+template <class FwdIter>
+inline void WxfWriter::Write (const char* tag, const xtl::iterator_range<FwdIter>& range, const char* format)
 {
+  typedef typename xtl::iterator_range<FwdIter>::const_iterator const_iterator;
+
   OutputTextStream& stream = Stream ();
 
-  CheckTag    (tag, "common::WxfWriter::WriteRange");
+  CheckTag    (tag, "common::WxfWriter::Write(range)");
   WriteIndent ();
   write       (stream, tag);
+  write       (stream, "\n");  
   WriteIndent ();
   write       (stream, "(\n");
 
-  for (;first != last; ++first)
+  for (const_iterator i=range.begin (), end=range.end () ;i != end; ++i)
   {
     WriteIndent ();
     WriteIndent (FrameIndent ());
-    wxf_write   (stream, *first, format);
+    wxf_write   (stream, *i, format);
     write       (stream, "\n");
   }
 
