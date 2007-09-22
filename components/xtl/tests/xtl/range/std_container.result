@@ -1,0 +1,21 @@
+Results of std_container_test:
+expression '( is_same< range_value<vec_t>::type, vec_t::value_type >::value )' is true
+expression '( is_same< range_iterator<vec_t>::type, vec_t::iterator >::value )' is true
+expression '( is_same< range_const_iterator<vec_t>::type, vec_t::const_iterator >::value )' is true
+expression '( is_same< range_difference<vec_t>::type, vec_t::difference_type >::value )' is true
+expression '( is_same< range_size<vec_t>::type, vec_t::size_type >::value )' is true
+expression '( is_same< range_result_iterator<vec_t>::type, vec_t::iterator >::value )' is true
+expression '( is_same< range_result_iterator<const vec_t>::type, vec_t::const_iterator >::value )' is true
+expression '( is_same< range_value<const vec_t>::type, vec_t::value_type >::value )' is true
+expression '( is_same< range_iterator<const vec_t>::type, vec_t::iterator >::value )' is true
+expression '( is_same< range_const_iterator<const vec_t>::type, vec_t::const_iterator >::value )' is true
+expression '( is_same< range_difference<const vec_t>::type, vec_t::difference_type >::value )' is true
+expression '( is_same< range_size<const vec_t>::type, vec_t::size_type >::value )' is true
+expression 'begin( vec ) == vec.begin()' is true
+expression 'end( vec ) == vec.end()' is true
+expression 'empty( vec ) == vec.empty()' is true
+expression 'size( vec ) == vec.size()' is true
+expression 'begin( cvec ) == cvec.begin()' is true
+expression 'end( cvec ) == cvec.end()' is true
+expression 'empty( cvec ) == cvec.empty()' is true
+expression 'size( cvec ) == cvec.size()' is true

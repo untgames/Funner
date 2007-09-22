@@ -1,0 +1,36 @@
+Results of sub_range_test:
+expression 'r == r' is true
+expression 's == r' is true
+expression 'r2 == r2' is true
+expression 's2 != r2' is true
+expression '!(s != s)' is true
+expression 'r.begin() == s.begin()' is true
+expression 'r2.begin()== s2.begin()' is true
+expression 'r.end() == s.end()' is true
+expression 'r2.end() == s2.end()' is true
+expression 'r.size() == s.size()' is true
+expression 'r2.size() == s2.size()' is true
+hello world hello world hello world hello world
+expression 'equal( res.begin(), res.end(), r.begin() )' is true
+expression 'singular_irange.empty()' is true
+expression 'singular_irange.size() == 0' is true
+expression 'singular_srange.empty()' is true
+expression 'singular_srange.size() == 0' is true
+expression 'empty( singular_irange )' is true
+expression 'empty( singular_srange )' is true
+expression 'rr.equal( r )' is true
+expression 'rr == string ("hello")' is true
+expression 'rr != string ("hell")' is true
+expression 'rr < string ("hello dude")' is true
+expression 'string ("hello") == rr' is true
+expression 'string ("hell") != rr' is true
+expression '! (string ("hello dude") < rr )' is true
+expression 'rrr == rr' is true
+expression '!( rrr != rr )' is true
+expression '!( rrr < rr )' is true
+expression 'cr.front() == 'h'' is true
+expression 'cr.back() == 'd'' is true
+expression 'cr[1] == 'e'' is true
+expression 'rrr == string ("ello worl")' is true
+expression 'rrr == str' is true
+expression 'rrr == string ("HEllo worlD")' is true

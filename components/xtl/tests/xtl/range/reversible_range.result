@@ -1,0 +1,24 @@
+Results of reversible_range_test:
+expression 'rbegin( vec ) == range_reverse_iterator<vec_t>::type( vec.end() )' is true
+expression 'rend( vec ) == range_reverse_iterator<vec_t>::type( vec.begin() )' is true
+expression 'distance( rbegin( vec ), rend( vec ) ) == distance( begin( vec ), end( vec ) )' is true
+expression 'rbegin( p ) == begin( rp )' is true
+expression 'rend( p ) == end( rp )' is true
+expression 'distance( rbegin( p ), rend( p ) ) == distance( begin( rp ), end( rp ) )' is true
+expression 'distance( begin( p ), end( p ) ) == distance( rbegin( rp ), rend( rp ) )' is true
+expression '&*begin( str ) == &*( rend( str ) - 1 )' is true
+expression '&*( end( str ) - 1 ) == &*rbegin( str )' is true
+expression '&*begin( cstr ) == &*( rend( cstr ) - 1 )' is true
+expression '&*( end( cstr ) - 1 ) == &*rbegin( cstr )' is true
+expression '&*begin( a ) == &*( rend( a ) - 1 )' is true
+expression '&*( end( a ) - 1 ) == &*rbegin( a )' is true
+expression '&*begin( ca ) == &*( rend( ca ) - 1 )' is true
+expression '&*( end( ca ) - 1 ) == &*rbegin( ca )' is true
+expression '&*begin( wstr ) == &*( rend( wstr ) - 1 )' is true
+expression '&*( end( wstr ) - 1 ) == &*rbegin( wstr )' is true
+expression '&*begin( cwstr ) == &*( rend( cwstr ) - 1 )' is true
+expression '&*( end( cwstr ) - 1 ) == &*rbegin( cwstr )' is true
+expression '&*begin( wa ) == &*( rend( wa ) - 1 )' is true
+expression '&*( end( wa ) - 1 ) == &*rbegin( wa )' is true
+expression '&*begin( cwa ) == &*( rend( cwa ) - 1 )' is true
+expression '&*( end( cwa ) - 1 ) == &*rbegin( cwa )' is true

@@ -1,0 +1,9 @@
+Results of const_ranges:
+expression 'const_begin( foo ) == begin( as_const( foo ) )' is true
+expression 'const_end( foo ) == end( as_const( foo ) )' is true
+expression 'const_rbegin( foo ) == rbegin( as_const( foo ) )' is true
+expression 'const_rend( foo ) == rend( as_const( foo ) )' is true
+expression 'const_begin( bar ) == begin( as_const( bar ) )' is true
+expression 'const_end( bar ) == end( as_const( bar ) )' is true
+expression 'const_rbegin( bar ) == rbegin( as_const( bar ) )' is true
+expression 'const_rend( bar ) == rend( as_const( bar ) )' is true

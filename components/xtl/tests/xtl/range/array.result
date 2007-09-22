@@ -1,0 +1,7 @@
+Results of array_test:
+expression 'begin( my_array ) == my_array' is true
+expression 'end( my_array ) == my_array + size( my_array )' is true
+expression 'empty( my_array ) == false' is true
+expression 'begin( ca ) == ca' is true
+expression 'end( ca ) == ca + size( ca )' is true
+expression 'empty( ca ) == false' is true

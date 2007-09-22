@@ -1,0 +1,23 @@
+Results of iterator_range_test:
+expression '!r.empty()' is true
+expression '!r2.empty()' is true
+expression 'r.size() == size( r )' is true
+expression 'r2.size() == size( r2 )' is true
+expression 'distance( r.begin(), r.end() ) == distance( begin( r2 ), end( r2 ) )' is true
+hello world hello world
+expression 'equal( res.begin(), res.end(), r.begin() )' is true
+expression 'rr.equal( r )' is true
+expression 'rr == string ("hello")' is true
+expression 'rr != string ("hell")' is true
+expression 'rr < string ("hello dude")' is true
+expression 'string ("hello") == rr' is true
+expression 'string ("hell") != rr' is true
+expression '! (string ("hello dude") < rr )' is true
+expression 'rrr == rr' is true
+expression '!( rrr != rr )' is true
+expression '!( rrr < rr )' is true
+expression 'cr.front() == 'h'' is true
+expression 'cr.back() == 'd'' is true
+expression 'cr[1] == 'e'' is true
+expression 'rrr == string ("ello worl")' is true
+expression 'rrr == str' is true

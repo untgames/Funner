@@ -1,0 +1,27 @@
+Results of iterator_pair_test:
+expression '( is_same< range_value<pair_t>::type, iterator_traits<pair_t::first_type>::value_type>::value )' is true
+expression '( is_same< range_iterator<pair_t>::type, pair_t::first_type >::value )' is true
+expression '( is_same< range_const_iterator<pair_t>::type, pair_t::first_type >::value )' is true
+expression '( is_same< range_difference<pair_t>::type, iterator_traits<pair_t::first_type>::difference_type >::value )' is true
+expression '( is_same< range_size<pair_t>::type, size_t >::value )' is true
+expression '( is_same< range_result_iterator<pair_t>::type, pair_t::first_type >::value )' is true
+expression '( is_same< range_result_iterator<const_pair_t>::type, const_pair_t::first_type >::value )' is true
+expression '( is_same< range_value<const_pair_tt>::type, iterator_traits<const_pair_t::first_type>::value_type>::value )' is true
+expression '( is_same< range_iterator<const_pair_tt>::type, const_pair_tt::first_type >::value )' is true
+expression '( is_same< range_const_iterator<const_pair_tt>::type, const_pair_tt::first_type >::value )' is true
+expression '( is_same< range_difference<const_pair_tt>::type, iterator_traits<const_pair_tt::first_type>::difference_type >::value )' is true
+expression '( is_same< range_size<const_pair_tt>::type, size_t >::value )' is true
+expression '( is_same< range_result_iterator<const_pair_tt>::type, const_pair_tt::first_type >::value )' is true
+expression '( is_same< range_result_iterator<const_pair_tt>::type, const_pair_tt::first_type >::value )' is true
+expression 'begin( pair ) == pair.first' is true
+expression 'end( pair ) == pair.second' is true
+expression 'empty( pair ) == (pair.first == pair.second)' is true
+expression 'size( pair ) == size_t( distance( pair.first, pair.second ) )' is true
+expression 'begin( const_pair ) == const_pair.first' is true
+expression 'end( const_pair ) == const_pair.second' is true
+expression 'empty( const_pair ) == (const_pair.first == const_pair.second)' is true
+expression 'size( const_pair ) == size_t( distance( const_pair.first, const_pair.second ) )' is true
+expression 'begin( constness_pair ) == constness_pair.first' is true
+expression 'end( constness_pair ) == constness_pair.second' is true
+expression 'empty( constness_pair ) == (constness_pair.first == const_pair.second)' is true
+expression 'size( constness_pair ) == size_t( distance( constness_pair.first, constness_pair.second ) )' is true

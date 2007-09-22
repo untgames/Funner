@@ -1,0 +1,13 @@
+Results of adl_conformance_test:
+expression 'boost::begin( r ) != xtl_namespace' is true
+expression 'boost::begin( r2 ) != xtl_namespace' is true
+expression 'boost::begin( r3 ) != xtl_namespace' is true
+expression 'boost::begin( r4 ) != xtl_namespace' is true
+expression 'boost::begin( r5 ) != xtl_namespace' is true
+expression 'boost::begin( r6 ) != xtl_namespace' is true
+expression 'boost::begin( r ) == templated_namespace' is true
+expression 'boost::begin( r2 ) == templated_namespace' is true
+expression 'boost::begin( r3 ) == non_templated_namespace' is true
+expression 'boost::begin( r4 ) == non_templated_namespace' is true
+expression 'boost::begin( r5 ) == global_namespace' is true
+expression 'boost::begin( r6 ) == global_namespace' is true

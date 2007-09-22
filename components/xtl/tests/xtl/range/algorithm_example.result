@@ -1,0 +1,4 @@
+Results of algorithm_example_test:
+expression 'my_generic_replace( my_vector, 4, 2 ) == 3u' is true
+expression 'my_generic_replace( my_view, 4, 2 ) == N' is true
+expression 'my_generic_replace( str, 'a', 'b' ) == 0u' is true
