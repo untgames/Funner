@@ -46,8 +46,8 @@ int main ()
     writer.EndNode         ();
     writer.WriteComment    ("Intervals serialization");
     writer.BeginNode       ("intervals");
-//    writer.WriteNode       ("int_array", sizeof (array)/sizeof (*array), array);
-//    writer.WriteNode       ("stl_set", set.begin (), set.end ());
+    writer.WriteNode       ("int_array", xtl::make_iterator_range (sizeof (array)/sizeof (*array), array));
+    writer.WriteNode       ("stl_set", xtl::make_iterator_range (set));
     writer.EndNode         ();
     writer.EndNode         ();
     writer.WriteNode       ("bool_flag");

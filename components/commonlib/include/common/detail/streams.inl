@@ -22,33 +22,64 @@ inline void write (OutputTextStream& stream, const stl::basic_string<wchar_t, Tr
     Вывод интервалов
 */
 
-namespace detail
+template <class InIter>
+inline void write_range (OutputTextStream& stream, InIter first, InIter last)
 {
+  for (;;)
+  {
+    write (stream, *first);
 
-template <class InIter, class Separator>
-inline void write_range (OutputTextStream& stream, InIter first, InIter last, const char* format, const Separator& separator)
+    ++first;
+
+    if (first != last) stream.Write (" ");
+    else               break;
+  }  
+}
+
+template <class InIter>
+inline void write_range (OutputTextStream& stream, InIter first, InIter last, const char* format)
 {
+  if (!format)
+    RaiseNullArgument ("common::write_range", "format");
+    
+  static char default_separator = ' ';
+    
+  const char *separator_start = &default_separator, *separator_end = separator_start + 1;
+    
+  if (*format == '[')
+  {
+    for (const char* s=format+1; *s; s++)
+      if (*s == ']')
+      {
+        separator_start = format + 1;
+        separator_end   = s;
+        format          = s + 1;
+
+        break;
+      }
+  }
+  
+  size_t separator_size = separator_end - separator_start;
+
   for (;;)
   {
     write (stream, *first, format);
 
     ++first;
 
-    if (first != last) write (stream, separator);
+    if (first != last) stream.Write (separator_start, separator_size);
     else               break;
-  }
+  }  
 }
 
-}
-
-template <class InIter>
-inline void write_range (OutputTextStream& stream, InIter first, InIter last, const char* format, const char* separator)
+template <class FwdIter>
+inline void write (OutputTextStream& stream, const xtl::iterator_range<FwdIter>& range, const char* format)
 {
-  detail::write_range (stream, first, last, format, separator);
+  write_range (stream, range.begin (), range.end (), format);
 }
 
-template <class InIter>
-inline void write_range (OutputTextStream& stream, InIter first, InIter last, const char* format, const wchar_t* separator)
+template <class FwdIter>
+inline void write (OutputTextStream& stream, const xtl::iterator_range<FwdIter>& range)
 {
-  detail::write_range (stream, first, last, format, separator);
+  write_range (stream, range.begin (), range.end ());
 }

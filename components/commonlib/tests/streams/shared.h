@@ -5,6 +5,7 @@
 #include <common/wxf_writer.h>
 #include <common/xml_writer.h>
 #include <xtl/function.h>
+#include <xtl/iterator_range.h>
 #include <stl/string>
 #include <stl/set>
 #include <mathlib.h>

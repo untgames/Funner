@@ -298,7 +298,7 @@ void XmlWriter::Flush ()
 
 void XmlWriter::WriteHeader ()
 {
-  impl->stream.Write ("<?xml version=\"1.0\" encoding = \"windows-1251\"?>\n");
+  impl->stream.Write ("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 }
 
 /*

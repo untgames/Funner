@@ -40,8 +40,8 @@ int main ()
     
     int array [] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     
-    write_range (stream, array, array + 10, "hex:00", ", ");
-    write       (stream, "\n");
+    write (stream, xtl::make_iterator_range (10, array), "[, ]hex:00");
+    write (stream, "\n");
   }
   catch (std::exception& exception)
   {

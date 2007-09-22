@@ -8,8 +8,16 @@
 namespace stl
 {
 
-//forward declarations
+//forward declaration
 template <class Char, class Traits, class Allocator> class basic_string;
+
+}
+
+namespace xtl
+{
+
+//forward declaration
+template <class FwdIter> class iterator_range;
 
 }
 
@@ -250,10 +258,16 @@ void write (OutputTextStream&, bool value, const char* format);
 ///Вывод интервалов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class InIter>
-void write_range (OutputTextStream&, InIter first, InIter last, const char* format="", const char* separator=" ");
+void write_range (OutputTextStream&, InIter first, InIter last);
 
 template <class InIter>
-void write_range (OutputTextStream&, InIter first, InIter last, const char* format, const wchar_t* separator);
+void write_range (OutputTextStream&, InIter first, InIter last, const char* format);
+
+template <class FwdIter>
+void write (OutputTextStream&, const xtl::iterator_range<FwdIter>&);
+
+template <class FwdIter>
+void write (OutputTextStream&, const xtl::iterator_range<FwdIter>&, const char* format);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Бинарный поток вывода с учётом порядка следования байтов
