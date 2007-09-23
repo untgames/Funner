@@ -12,39 +12,52 @@ using namespace common;
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ЋЇЁб ­ЁҐ Ї®в®Є®ў®Ј® д ©«  бв ­¤ ав­®© ЎЁЎ«Ё®вҐЄЁ
+///Описание потокового файла стандартной библиотеки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct StdioFile
 {
-  const char* name;   //Ё¬п ў StdioIOSystem
-  FILE*       stream; //Ї®в®Є
-  filemode_t  mode;   //аҐ¦Ё¬ а Ў®вл
+  const char* name;     //имя в StdioIOSystem
+  const char* dir_name; //имя каталога
+  FILE*       stream;   //поток
+  filemode_t  mode;     //режим работы
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Џ®в®Є®ўлҐ д ©«л бв ­¤ ав­®© ЎЁЎ«Ё®вҐЄЁ
+///Потоковые файлы стандартной библиотеки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static StdioFile stdio_files [] = {
-  {"stdout",stdout,FILE_MODE_WRITE},
-  {"stderr",stderr,FILE_MODE_WRITE},
-  {"stdin",stdin,FILE_MODE_READ}
+  {"stdout","stdout/",stdout,FILE_MODE_WRITE},
+  {"stderr","stderr/",stderr,FILE_MODE_WRITE},
+  {"stdin","stdin/",stdin,FILE_MODE_READ}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Љ®«ЁзҐбвў® Ї®в®Є®ўле д ©«®ў бв ­¤ ав­®© ЎЁЎ«Ё®вҐЄЁ
-///////////////////////////////////////////////////////////////////////////////////////////////////
+///Количество потоковых файлов стандартной библиотеки
+//////////////////////////////////////////////,/////////////////////////////////////////////////////
 const size_t STDIO_FILES_NUM = sizeof (stdio_files)/sizeof (StdioFile);
 
 /*
     StdioIOSystem
 */
 
+namespace
+{
+
+//проверка существования файла в домене
+bool is_file_exist (const char* file_name,StdioFile& file)
+{
+  return !stricmp (file.name,file_name) || !strnicmp (file.dir_name,file_name,strlen (file.dir_name));
+}
+
+}
+  
+
 StdioIOSystem::file_t StdioIOSystem::FileOpen (const char* file_name,filemode_t mode,size_t)
 {
   StdioFile* stdio_file = stdio_files;
   
   for (size_t i=0;i<STDIO_FILES_NUM;i++,stdio_file++)
-    if (!stricmp (file_name,stdio_file->name))
+    if (is_file_exist (file_name,*stdio_file))
     {
       if (stdio_file->mode & ~mode)
       {
@@ -65,7 +78,7 @@ bool StdioIOSystem::IsFileExist (const char* file_name)
   StdioFile* stdio_file = stdio_files;
   
   for (size_t i=0;i<STDIO_FILES_NUM;i++,stdio_file++)
-    if (!(stricmp (stdio_file->name,file_name)))
+    if (is_file_exist (file_name,*stdio_file))
       return true;
 
   return false;
@@ -89,7 +102,7 @@ bool StdioIOSystem::GetFileInfo (const char* file_name,FileInfo& info)
   StdioFile* stdio_file = stdio_files;
 
   for (size_t i=0;i<STDIO_FILES_NUM;i++,stdio_file++)
-    if (!(stricmp (stdio_file->name,file_name)))
+    if (is_file_exist (file_name,*stdio_file))
     {
       memset (&info,0,sizeof (info));
       return true;
