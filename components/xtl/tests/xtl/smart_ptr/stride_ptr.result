@@ -1,0 +1,32 @@
+Results of stride_ptr_test:
+0 2 4 6 8 
+expression '!p' is true
+expression 'p2' is true
+expression 'p1 == p2' is true
+expression 'p0 != p2' is true
+expression 'p0 < p2' is true
+expression 'p2 > p0' is true
+expression 'p0 <= p2' is true
+expression 'p2 >= p0' is true
+expression 'p1 <= p2' is true
+expression 'p1 >= p2' is true
+expression 'p1.get () == p2' is true
+expression 'p0.get () != p2' is true
+expression 'p0.get () < p2' is true
+expression 'p2.get () > p0' is true
+expression 'p0.get () <= p2' is true
+expression 'p2.get () >= p0' is true
+expression 'p1.get () <= p2' is true
+expression 'p1.get () >= p2' is true
+expression 'p1 == p2.get ()' is true
+expression 'p0 != p2.get ()' is true
+expression 'p0 < p2.get ()' is true
+expression 'p2 > p0.get ()' is true
+expression 'p0 <= p2.get ()' is true
+expression 'p2 >= p0.get ()' is true
+expression 'p1 <= p2.get ()' is true
+expression 'p1 >= p2.get ()' is true
+expression 'p1 - 5 == p0' is true
+expression 'p0 + 5 == p2' is true
+expression 'p0 [3] == 6' is true
+expression '(p1 = p0) == p0' is true
