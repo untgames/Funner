@@ -75,6 +75,15 @@ VertexBuffer& VertexBuffer::operator = (const VertexBuffer& vb)
 }
 
 /*
+    Идентификатор буфера
+*/
+
+size_t VertexBuffer::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
+/*
     Количество массивов вершинных атрибутов
 */
 

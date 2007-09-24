@@ -61,6 +61,15 @@ IndexBuffer& IndexBuffer::operator = (const IndexBuffer& ib)
 }
 
 /*
+    Идентификатор буфера
+*/
+
+size_t IndexBuffer::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
+/*
     Данные
 */
 

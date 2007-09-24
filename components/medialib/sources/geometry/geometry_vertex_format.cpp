@@ -381,6 +381,47 @@ const char* get_semantic_name (VertexAttributeSemantic semantic)
   return "";
 }
 
+//получение семантики по имени
+VertexAttributeSemantic get_vertex_attribute_semantic (const char* name, VertexAttributeSemantic default_semantic)
+{
+  if (!name)
+    return default_semantic;
+    
+  struct Map
+  {
+    stl::hash_key<const char*> name_hash;
+    VertexAttributeSemantic    semantic;
+  };
+  
+  static Map map [] = {
+    {"position",  VertexAttributeSemantic_Position},
+    {"normal",    VertexAttributeSemantic_Normal},
+    {"color",     VertexAttributeSemantic_Color},
+    {"tangent",   VertexAttributeSemantic_Tangent},
+    {"binormal",  VertexAttributeSemantic_Binormal},
+    {"texcoord0", VertexAttributeSemantic_TexCoord0},
+    {"texcoord1", VertexAttributeSemantic_TexCoord1},
+    {"texcoord2", VertexAttributeSemantic_TexCoord2},
+    {"texcoord3", VertexAttributeSemantic_TexCoord3},
+    {"texcoord4", VertexAttributeSemantic_TexCoord4},
+    {"texcoord5", VertexAttributeSemantic_TexCoord5},
+    {"texcoord6", VertexAttributeSemantic_TexCoord6},
+    {"texcoord7", VertexAttributeSemantic_TexCoord7},
+    {"influence", VertexAttributeSemantic_Influence}
+  };
+  
+  static const size_t map_size = sizeof (map) / sizeof (*map);
+  
+  const Map* map_iter = map;
+  size_t     hash     = strhash (name);
+  
+  for (size_t i=0; i<map_size; i++, map_iter++)
+    if (map_iter->name_hash.get_hash () == hash)
+      return map_iter->semantic;
+  
+  return default_semantic;
+}
+
 //имя типа
 const char* get_type_name (VertexAttributeType type)
 {
@@ -400,6 +441,40 @@ const char* get_type_name (VertexAttributeType type)
   return "";
 }
 
+//получение типа по имени
+VertexAttributeType get_vertex_attribute_type (const char* name, VertexAttributeType default_type)
+{
+  if (!name)
+    return default_type;
+
+  struct Map
+  {
+    stl::hash_key<const char*> name_hash;
+    VertexAttributeType        type;
+  };
+
+  static Map map [] = {
+    {"float2",    VertexAttributeType_Float2},
+    {"float3",    VertexAttributeType_Float3},
+    {"float4",    VertexAttributeType_Float4},
+    {"short2",    VertexAttributeType_Short2},
+    {"short3",    VertexAttributeType_Short3},
+    {"short4",    VertexAttributeType_Short4},
+    {"ubyte4",    VertexAttributeType_UByte4},
+    {"influence", VertexAttributeType_Influence}
+  };
+
+  static const size_t map_size = sizeof (map) / sizeof (*map);
+
+  const Map* map_iter = map;
+  size_t     hash     = strhash (name);
+
+  for (size_t i=0; i<map_size; i++, map_iter++)
+    if (map_iter->name_hash.get_hash () == hash)
+      return map_iter->type;
+
+  return default_type;
+}
 
 //проверка совместимости
 bool is_compatible (VertexAttributeSemantic semantic, VertexAttributeType type)

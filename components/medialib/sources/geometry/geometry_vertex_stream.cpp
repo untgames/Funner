@@ -162,6 +162,15 @@ VertexStream& VertexStream::operator = (const VertexBuffer& vb)
 }
 
 /*
+    Идентификатор потока
+*/
+
+size_t VertexStream::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
+/*
     Формат
 */
 

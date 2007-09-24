@@ -8,6 +8,8 @@ using namespace media::geometry;
 
 MeshSystemImpl::MeshSystemImpl ()
 {
+  RegisterSaver  ("xmesh", &xmesh_save_model);
+  RegisterLoader ("xmesh", &xmesh_load_model);
 }
 
 /*

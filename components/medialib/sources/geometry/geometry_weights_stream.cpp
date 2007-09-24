@@ -61,6 +61,15 @@ VertexWeightStream& VertexWeightStream::operator = (const VertexWeightStream& vs
 }
 
 /*
+    Идентификатор потока
+*/
+
+size_t VertexWeightStream::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
+/*
     Получение данных
 */
 

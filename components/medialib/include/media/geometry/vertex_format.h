@@ -158,6 +158,12 @@ size_t      get_type_size        (VertexAttributeType);     //размер типа атрибу
 size_t      get_components_count (VertexAttributeType);     //количество компонентов
 bool        is_compatible        (VertexAttributeSemantic, VertexAttributeType); //проверка совместимости
 
+//получение семантики по имени
+VertexAttributeSemantic get_vertex_attribute_semantic (const char* name, VertexAttributeSemantic default_semantic=VertexAttributeSemantic_Num);
+
+//получение типа по имени
+VertexAttributeType get_vertex_attribute_type (const char* name, VertexAttributeType default_type=VertexAttributeType_Num);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение формата вершины
 ///////////////////////////////////////////////////////////////////////////////////////////////////

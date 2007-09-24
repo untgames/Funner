@@ -7,12 +7,20 @@
 #include <stl/string>
 #include <stl/vector>
 #include <stl/hash_map>
+
 #include <xtl/function.h>
+#include <xtl/iterator_range.h>
+#include <xtl/stride_ptr.h>
+#include <xtl/bind.h>
+#include <xtl/ref.h>
 
 #include <mathlib.h>
+
 #include <common/strlib.h>
 #include <common/hash.h>
 #include <common/exception.h>
+#include <common/xml_writer.h>
+#include <common/parser.h>
 
 #include <media/geometry/mesh_model.h>
 #include <shared/shared_resource.h>
@@ -64,6 +72,12 @@ class Buffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void copy (size_t vertices_count, const void* source, VertexAttributeType source_type, size_t source_stride,
            void* destination, VertexAttributeType destination_type, size_t destination_stride);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сохранение / загрузка мешей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void xmesh_save_model (const char* file_name, const MeshModel& model);
+void xmesh_load_model (const char* file_name, MeshModel& model);
            
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Система управления меш-моделями

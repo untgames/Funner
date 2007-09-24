@@ -90,6 +90,15 @@ Mesh& Mesh::operator = (const Mesh& mesh)
 }
 
 /*
+    Идентификатор меша
+*/
+
+size_t Mesh::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
+/*
     Имя меша
 */
 
@@ -312,6 +321,41 @@ const char* get_type_name (PrimitiveType type)
   }
   
   return "";
+}
+
+/*
+    Получение типа примитива по имени
+*/
+
+PrimitiveType get_primitive_type (const char* name, PrimitiveType default_type)
+{
+  if (!name)
+    return default_type;
+
+  struct Map
+  {
+    stl::hash_key<const char*> name_hash;
+    PrimitiveType              type;
+  };
+
+  static Map map [] = {
+    {"line_list",       PrimitiveType_LineList},
+    {"line_strip",      PrimitiveType_LineStrip},
+    {"triangle_list",   PrimitiveType_TriangleList},
+    {"triangle_strip",  PrimitiveType_TriangleStrip},
+    {"triangle_fan",    PrimitiveType_TriangleFan},
+  };
+
+  static const size_t map_size = sizeof (map) / sizeof (*map);
+
+  const Map* map_iter = map;
+  size_t     hash     = strhash (name);
+
+  for (size_t i=0; i<map_size; i++, map_iter++)
+    if (map_iter->name_hash.get_hash () == hash)
+      return map_iter->type;
+
+  return default_type;
 }
 
 /*
