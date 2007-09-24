@@ -201,3 +201,18 @@ inline void XmlWriter::WriteNodeCData (const char* name, const T& value, const c
     throw;
   }  
 }
+
+/*
+    Блок сериализации узлов Xml
+*/
+
+inline XmlNodeScope::XmlNodeScope (XmlWriter& in_writer, const char* frame_tag)
+  : writer (in_writer)
+{
+  writer.BeginNode (frame_tag);  
+}
+
+inline XmlNodeScope::~XmlNodeScope ()
+{
+  writer.EndNode ();
+}

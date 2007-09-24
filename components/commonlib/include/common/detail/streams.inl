@@ -25,6 +25,9 @@ inline void write (OutputTextStream& stream, const stl::basic_string<wchar_t, Tr
 template <class InIter>
 inline void write_range (OutputTextStream& stream, InIter first, InIter last)
 {
+  if (first == last)
+    return;
+
   for (;;)
   {
     write (stream, *first);
@@ -41,6 +44,9 @@ inline void write_range (OutputTextStream& stream, InIter first, InIter last, co
 {
   if (!format)
     RaiseNullArgument ("common::write_range", "format");
+
+  if (first == last)
+    return;
     
   static char default_separator = ' ';
     
