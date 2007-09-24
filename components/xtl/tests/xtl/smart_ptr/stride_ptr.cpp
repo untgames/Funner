@@ -45,6 +45,7 @@ int main ()
   TEST (p0 + 5 == p2);
   TEST (p0 [3] == 6);
   TEST ((p1 = p0) == p0);
+  TEST (p1.equal (p0));
 
   return 0;
 }

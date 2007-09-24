@@ -9,7 +9,7 @@ inline stride_ptr<T>::stride_ptr ()
 
 template <class T>
 inline stride_ptr<T>::stride_ptr (const pointer in_ptr, difference_type in_stride)
-  : ptr (reinterpret_cast<char*> (in_ptr)), stride (in_stride)
+  : ptr ((char*)in_ptr), stride (in_stride)
   {}
 
 template <class T>
@@ -144,6 +144,16 @@ template <class T>
 inline stride_ptr<T> stride_ptr<T>::operator - (difference_type offset) const
 {
   return stride_ptr<T> (*this) -= offset;
+}
+
+/*
+    Проверка на эквивалентность
+*/
+
+template <class T>
+inline bool stride_ptr<T>::equal (const stride_ptr& p) const
+{
+  return ptr == p.ptr && stride == p.stride;
 }
 
 /*

@@ -30,3 +30,4 @@ expression 'p1 - 5 == p0' is true
 expression 'p0 + 5 == p2' is true
 expression 'p0 [3] == 6' is true
 expression '(p1 = p0) == p0' is true
+expression 'p1.equal (p0)' is true
