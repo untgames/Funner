@@ -14,11 +14,11 @@ int main ()
     Mesh mesh;
     
     mesh.Rename ("mesh1");
-   
+
     VertexStream vs (2, make_vertex_declaration<MyVertex> ());
 
     MyVertex* verts = vs.Data<MyVertex> ();
-    
+
     if (verts)
     { 
       float z = 0.0f;
@@ -36,11 +36,11 @@ int main ()
       verts [1].first_weight  = 2;
       verts [1].weights_count = 3;
     }
-    
+
     VertexWeightStream vws (4);
-    
+
     VertexWeight* weights = vws.Data ();
-    
+
     weights [0].joint_index  = 0;
     weights [0].joint_weight = -0.4f;
     weights [1].joint_index  = 1;
@@ -49,20 +49,20 @@ int main ()
     weights [2].joint_weight = 0.3f;
     weights [3].joint_index  = 2;
     weights [3].joint_weight = 0.0f;
-    
+
     IndexBuffer ib (5);
-    
+
     size_t* indices = ib.Data ();
-    
+
     for (size_t i=0; i<ib.Size (); i++)
       indices [i] = i % 3;
 
     mesh.VertexBuffer ().Attach (vs);
     mesh.Attach (ib);
     mesh.VertexBuffer ().AttachWeights (vws);
-    
+
     mesh.AddPrimitive (PrimitiveType_LineList, 6, 3, 0);
-    mesh.AddPrimitive (PrimitiveType_TriangleList, 0, 2, "");
+    mesh.AddPrimitive (PrimitiveType_TriangleList, 0, 2, "");    
 
     check (mesh, 5, &print);
   }
