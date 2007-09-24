@@ -143,17 +143,6 @@ inline T get (ParseNode* node, const char* tag, const T& default_value)
   return node && read (make_attribute_iterator (node), value) ? value : default_value;
 }
 
-template <class T>
-inline T get (ParseNode* node, const char* tag, size_t start, const T& default_value)
-{
-  if (node && tag)
-    node = node->First (tag);
-
-  T value;
-
-  return node && read (make_attribute_iterator (node) += start, value) ? value : default_value;
-}
-
 /*
     Чтение интервалов
 */
@@ -214,30 +203,9 @@ inline bool test (ParseNode* node, const char* tag, const T& value)
   return tmp == value;
 }
 
-template <class T> 
-inline bool test (ParseNode* node, const char* tag, size_t start, const T& value)
-{
-  T tmp;
-  
-  if (node && tag)
-    node = node->First (tag);  
-  
-  if (!node || !read (make_attribute_iterator (node) += start, tmp))
-    return false;
-
-  return tmp == value;
-}
-
 inline bool test (ParseNode* node, const char* tag, const char* value)
 {
   const char* s = get<const char*> (node, tag); 
-
-  return s && strcmp (s, value) == 0;
-}
-
-inline bool test (ParseNode* node, const char* tag, size_t start, const char* value)
-{
-  const char* s = get<const char*> (node, tag, start);
 
   return s && strcmp (s, value) == 0;
 }

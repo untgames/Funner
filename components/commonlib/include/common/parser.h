@@ -220,7 +220,6 @@ template <class Traits, class Allocator>
 void read (ParseNode*, const char* tag, stl::basic_string<char, Traits, Allocator>& string, const char* default_value);
 
 template <class T> T get (ParseNode*, const char* tag, const T& default_value=T ());
-template <class T> T get (ParseNode*, const char* tag, size_t start, const T& default_value=T ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение интервалов
@@ -241,10 +240,8 @@ bool test_tag (ParseNode*, const char* tag);
 ///Проверка значения атрибутов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> bool test (ParseNode*, const char* tag, const T& value);
-template <class T> bool test (ParseNode*, const char* tag, size_t attr_index, const T& value);
 
 bool test (ParseNode*, const char* tag, const char* value);
-bool test (ParseNode*, const char* tag, size_t attr_index, const char* value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Применение функционала ко всем вложенным узлам
