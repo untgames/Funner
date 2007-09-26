@@ -2,15 +2,18 @@
 #include <sound/manager.h>
 #include <sound/device.h>
 #include <stl/hash_map>
+#include <stl/algorithm>
 #include <stl/deque>
 #include <xtl/intrusive_ptr.h>
-#include <xtl/function.h>
 #include <xtl/signal.h>
+#include <xtl/bind.h>
 #include <syslib/window.h>
 
 using namespace sound;
 using namespace sound::low_level;
 using namespace syslib;
+using namespace stl;
+using namespace xtl;
 
 /*
     Описание реализации SoundManager
@@ -43,8 +46,8 @@ struct SoundManager::Impl
   EmitterSet                  emitters;             //излучатели звука
   ChannelsSet                 free_channels;        //номера свободных каналов
   Capabilities                capabilities;         //возможности устройства
-//????  xtl::auto_connection        minimize_connection;  //соединения события потери фокуса
-//????  xtl::auto_connection        maximize_connection;  //соединения события получения фокуса
+  auto_connection             minimize_connection;  //соединения события потери фокуса
+  auto_connection             maximize_connection;  //соединения события получения фокуса
 
   Impl (Window& target_window);
 
@@ -73,9 +76,10 @@ SoundManagerEmitter::SoundManagerEmitter (float normalized_offset)
   {}
 
 SoundManager::Impl::Impl (Window& target_window)
-  : window (target_window), minimize_action (WindowMinimizeAction_Ignore), volume (1.f)//????, 
-//?????    minimize_connection (window.RegisterEventHandler (WindowEvent_OnLostFocus, &SoundManager::Impl::OnMinimize)),
-//?????    maximize_connection (window.RegisterEventHandler (WindowEvent_OnSetFocus,  &SoundManager::Impl::OnMaximize))
+  : window (target_window), minimize_action (WindowMinimizeAction_Ignore),
+    volume (1.f),
+    minimize_connection (window.RegisterEventHandler (WindowEvent_OnLostFocus, bind (&SoundManager::Impl::OnMinimize, this, _1, _2, _3))),
+    maximize_connection (window.RegisterEventHandler (WindowEvent_OnSetFocus,  bind (&SoundManager::Impl::OnMaximize, this, _1, _2, _3)))
   {}
 
 /*
@@ -106,8 +110,12 @@ void SoundManager::Impl::OnMaximize (Window& window, WindowEvent event, const Wi
 {
   switch (minimize_action)
   {
-    case WindowMinimizeAction_Mute:  SetMute (was_muted); break;
-    case WindowMinimizeAction_Pause: /*????for_each (emitters.begin (), emitters.end (), &SoundManager::Impl::PlaySound);*/ break;
+    case WindowMinimizeAction_Mute:
+      SetMute (was_muted);
+      break;
+    case WindowMinimizeAction_Pause:
+//      for_each (emitters.begin (), emitters.end (), bind (&SoundManager::Impl::PlaySound, this, _1));
+      break;
   }
 }
 
@@ -274,12 +282,13 @@ float SoundManager::GetNormalizedOffset (Emitter& emitter) const
 
 void SoundManager::ForEachEmitter (const EmitterHandler& emitter_handler)
 {
-//????????  for_each (impl->emitters.begin (), impl->emitters.end (), emitter_handler);
+  //так не получится: emiiters - карта с эелементом pair<Emitter*, SoundManagerEmitter>
+//  for_each (impl->emitters.begin (), impl->emitters.end (), emitter_handler);
 }
 
 void SoundManager::ForEachEmitter (const ConstEmitterHandler& emitter_handler) const
 {
-//????????  for_each (impl->emitters.begin (), impl->emitters.end (), emitter_handler);
+//  for_each (impl->emitters.begin (), impl->emitters.end (), emitter_handler);
 }
 
 /*
