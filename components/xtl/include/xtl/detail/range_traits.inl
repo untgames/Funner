@@ -107,7 +107,7 @@ inline typename range_const_iterator<T>::type begin (const T& c)
 }
 
 template <class T>
-inline typename range_iterator<typename remove_const<T>::type>::type begin (T& c)
+inline typename range_iterator<T>::type begin (T& c)
 {
   return c.begin ();
 }
@@ -150,7 +150,7 @@ inline typename range_const_iterator<T>::type end (const T& c)
 }
 
 template <class T>
-inline typename range_iterator<typename remove_const<T>::type>::type end (T& c)
+inline typename range_iterator<T>::type end (T& c)
 {
   return c.end ();
 }
