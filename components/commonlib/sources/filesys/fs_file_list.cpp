@@ -6,7 +6,7 @@ using namespace common;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание реализации списка файлов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class common::FileListImpl: public ReferenceCounter
+class common::FileListImpl: public xtl::reference_counter
 {
   friend class FileListBuilder;
   public:  
@@ -76,10 +76,26 @@ FileListIterator::FileListIterator (const FileList& list)
   : list_impl (list.impl), pos (0)
   { }
 
+FileListIterator::FileListIterator (const FileListIterator& iter)
+  : list_impl (iter.list_impl), pos (iter.pos)
+  {}
+  
+FileListIterator::~FileListIterator ()
+{
+}
+
 FileListIterator& FileListIterator::operator = (const FileList& list)
 {
   list_impl = list.impl;  
   pos       = 0;
+
+  return *this;
+}
+
+FileListIterator& FileListIterator::operator = (const FileListIterator& iter)
+{
+  list_impl = iter.list_impl;
+  pos       = iter.pos;
 
   return *this;
 }
@@ -170,6 +186,20 @@ FileList::FileList ()
 FileList::FileList (FileListImpl* _impl)
   : impl (_impl,false)
   { }
+  
+FileList::FileList (const FileList& list)
+  : impl (list.impl)
+  {}
+  
+FileList::~FileList ()
+{
+}
+  
+FileList& FileList::operator = (const FileList& list)
+{
+  impl = list.impl;
+  return *this;
+}
 
 size_t FileList::Size () const
 {
@@ -288,18 +318,4 @@ FileList FileListBuilder::Build (bool need_sort)
   items_hash.clear ();
 
   return list;
-}
-
-/*
-    intrusive_ptr<FileListImpl> control
-*/
-
-void common::intrusive_ptr_add_ref (FileListImpl* impl)
-{
-  impl->AddRef ();
-}
-
-void common::intrusive_ptr_release (FileListImpl* impl)
-{
-  impl->Release ();
 }

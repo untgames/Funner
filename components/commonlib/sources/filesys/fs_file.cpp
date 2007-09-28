@@ -8,7 +8,7 @@ using namespace stl;
 */
 
 /*
-     онструкторы и присваивание
+     онструкторы, деструктор и присваивание
 */
 
 File::File ()
@@ -17,8 +17,8 @@ File::File ()
   FileSystemSingleton::Instance ().RegisterFile (*this);
 }
 
-File::File (FileImpl* _impl)
-  : impl (_impl,false)
+File::File (FileImplPtr _impl)
+  : impl (_impl)
 {
   FileSystemSingleton::Instance ().RegisterFile (*this);
 }
@@ -33,6 +33,13 @@ File::~File ()
 {
   if (FileSystemSingleton::IsInitialized ()) //если менеджера файловой системы уже уничтожен регистраци€ не нужна
     FileSystemSingleton::Instance ().UnregisterFile (*this);
+}
+
+File& File::operator = (const File& file)
+{
+  impl = file.impl;
+  
+  return *this;
 }
 
 /*
@@ -272,18 +279,4 @@ bool FileImpl::Eof ()
     
 void FileImpl::Flush ()
 {
-}
-
-/*
-    intrusive_ptr<FileImpl> control
-*/
-
-void common::intrusive_ptr_add_ref (FileImpl* impl)
-{
-  impl->AddRef ();
-}
-
-void common::intrusive_ptr_release (FileImpl* impl)
-{
-  impl->Release ();
 }

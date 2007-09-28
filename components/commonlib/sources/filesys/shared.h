@@ -2,19 +2,23 @@
 #define COMMONLIB_FILE_SYSTEM_SHARED_HEADER
 
 #include <common/file.h>
-#include <common/refcount.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 #include <common/hash.h>
+
 #include <platform/platform.h>
 #include <zzip/zzip.h>
+
 #include <stl/hash_set>
 #include <stl/hash_map>
 #include <stl/vector>
 #include <stl/list>
 #include <stl/algorithm>
+
 #include <xtl/function.h>
 #include <xtl/bind.h>
+#include <xtl/reference_counter.h>
+
 #include <memory.h>
 
 namespace common
@@ -30,9 +34,12 @@ const size_t DEFAULT_FILE_BUF_SIZE = 8192; //размер буфера файла по умолчанию
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание реализации файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FileImpl: public ReferenceCounter
+class FileImpl: public xtl::reference_counter
 {
   public:
+            FileImpl (filemode_t mode);
+    virtual ~FileImpl () {}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим работы файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,10 +80,6 @@ class FileImpl: public ReferenceCounter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual bool IsClosedFileType () { return false; }
 
-  protected:
-            FileImpl (filemode_t mode);
-    virtual ~FileImpl () {}
-
   private:
     filemode_t mode; //режим работы файла
 };
@@ -113,9 +116,6 @@ class ClosedFileImpl: public FileImpl
     static FileImpl* Instance ();
     
   private:
-    void OnLostReferences () {}
-
-  private:
     void Raise (const char* source);
 };
 
@@ -128,8 +128,8 @@ class CustomFileImpl: public FileImpl
     typedef ICustomFileSystem::file_t file_t;
 
   public:
-    CustomFileImpl  (ICustomFileSystem* file_system,const char* file_name,filemode_t mode_flags);
-    CustomFileImpl  (ICustomFileSystem* file_system,file_t handle,filemode_t mode_flags,bool auto_close);
+    CustomFileImpl  (ICustomFileSystemPtr file_system,const char* file_name,filemode_t mode_flags);
+    CustomFileImpl  (ICustomFileSystemPtr file_system,file_t handle,filemode_t mode_flags,bool auto_close);
     ~CustomFileImpl ();
 
     size_t      Read   (void* buf,size_t size);
@@ -144,9 +144,9 @@ class CustomFileImpl: public FileImpl
     size_t      GetBufferSize ();
 
   private:
-    ICustomFileSystem* file_system; //файловая система
-    file_t             file_handle; //хандлер файла в файловой системе
-    bool               auto_close;  //необходимо ли закрывать файл при уничтожении объекта
+    ICustomFileSystemPtr file_system; //файловая система
+    file_t              file_handle; //хандлер файла в файловой системе
+    bool                auto_close;  //необходимо ли закрывать файл при уничтожении объекта
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ class CustomFileImpl: public FileImpl
 class MemFileImpl: public FileImpl
 {
   public: 
-    MemFileImpl  (FileImpl* base_file);
+    MemFileImpl  (FileImplPtr base_file);
     MemFileImpl  (void* buffer,size_t buffer_size,filemode_t mode);
     ~MemFileImpl ();
 
@@ -181,7 +181,7 @@ class MemFileImpl: public FileImpl
 class BufferedFileImpl: public FileImpl
 {
   public:
-    BufferedFileImpl  (FileImpl* base_file,size_t buffer_size);
+    BufferedFileImpl  (FileImplPtr base_file,size_t buffer_size);
     ~BufferedFileImpl ();
 
     size_t      Read   (void* buf,size_t size);
@@ -202,15 +202,15 @@ class BufferedFileImpl: public FileImpl
     void   FlushBuffer ();
 
   private:
-    FileImpl*  base_file;    //базовый файл
-    filepos_t  file_pos;     //файловая позиция
-    filesize_t file_size;    //размер файла
-    char*      buffer;       //буфер файла
-    size_t     buffer_size;  //размер буфера файла
-    filepos_t  cache_start;  //файловая позиция начала буферизированного участка
-    filepos_t  cache_finish; //файловая позиция конца буферизированного участка
-    size_t     dirty_start;  //файловая позиция начала обновлённого участка
-    size_t     dirty_finish; //файловая позиция конца обновлённого участка
+    FileImplPtr base_file;   //базовый файл
+    filepos_t   file_pos;     //файловая позиция
+    filesize_t  file_size;    //размер файла
+    char*       buffer;       //буфер файла
+    size_t      buffer_size;  //размер буфера файла
+    filepos_t   cache_start;  //файловая позиция начала буферизированного участка
+    filepos_t   cache_finish; //файловая позиция конца буферизированного участка
+    size_t      dirty_start;  //файловая позиция начала обновлённого участка
+    size_t      dirty_finish; //файловая позиция конца обновлённого участка
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -284,11 +284,11 @@ struct SearchPath
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct PackFile
 {
-  size_t                          file_name_hash;   //хэш имени пак-файла
-  size_t                          search_path_hash; //хэш имени пути поиска ассоциированного с пак-файлом
-  xtl::com_ptr<ICustomFileSystem> file_system;      //интерфейс файловой системы пак-файла
+  size_t              file_name_hash;   //хэш имени пак-файла
+  size_t              search_path_hash; //хэш имени пути поиска ассоциированного с пак-файлом
+  ICustomFileSystemPtr file_system;      //интерфейс файловой системы пак-файла
   
-  PackFile  (size_t file_name_hash,size_t search_path_hash,ICustomFileSystem* file_system);
+  PackFile  (size_t file_name_hash,size_t search_path_hash,ICustomFileSystemPtr file_system);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -328,13 +328,13 @@ class MountPointFileSystem: public ICustomFileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct MountFileSystem
 {
-  size_t                          hash;                    //хэш префикса точки монтирования
-  stl::string                     prefix;                  //префикс точки монтирования
-  xtl::com_ptr<ICustomFileSystem> file_system;             //интерфейс файловой системы
-  FileInfo                        mount_point_info;        //информация о точке монтирования
-  MountPointFileSystem            mount_point_file_system; //фиктивная файловая система
+  size_t                hash;                    //хэш префикса точки монтирования
+  stl::string           prefix;                  //префикс точки монтирования
+  ICustomFileSystemPtr   file_system;             //интерфейс файловой системы
+  FileInfo              mount_point_info;        //информация о точке монтирования
+  MountPointFileSystem  mount_point_file_system; //фиктивная файловая система
 
-  MountFileSystem (const char* prefix,size_t hash,ICustomFileSystem* file_system);
+  MountFileSystem (const char* prefix,size_t hash,ICustomFileSystemPtr file_system);
   MountFileSystem (const MountFileSystem&);
 };
 
@@ -375,17 +375,17 @@ class FileSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление пользоватльских типов пак-файлов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Mount       (const char* path_prefix,ICustomFileSystem* file_system);
+    void Mount       (const char* path_prefix,ICustomFileSystemPtr file_system);
     void Unmount     (const char* path_prefix);
-    void Unmount     (ICustomFileSystem* file_system);
+    void Unmount     (ICustomFileSystemPtr file_system);
     void UnmountAll  ();
     bool IsPathMount (const char* path) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Открытие файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
-    FileImpl* OpenFile (const char* src_file_name,filemode_t mode_flags);
-    FileImpl* OpenFile (const char* src_file_name,filemode_t mode_flags,size_t buffer_size);
+    FileImplPtr OpenFile (const char* src_file_name,filemode_t mode_flags);
+    FileImplPtr OpenFile (const char* src_file_name,filemode_t mode_flags,size_t buffer_size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка размера буфера файла по умолчанию
@@ -428,8 +428,8 @@ class FileSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Определение файловой системы ассоциированной с указанным путём
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ICustomFileSystem* FindMountFileSystem (const char* path,stl::string& result_file_name);
-    ICustomFileSystem* FindFileSystem      (const char* path,stl::string& result_file_name);
+    ICustomFileSystemPtr FindMountFileSystem (const char* path,stl::string& result_file_name);
+    ICustomFileSystemPtr FindFileSystem      (const char* path,stl::string& result_file_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление пак-файла

@@ -16,7 +16,7 @@ MemFileImpl::MemFileImpl (void* buffer,size_t buffer_size,filemode_t mode)
   pos    = start;
 }
 
-MemFileImpl::MemFileImpl (FileImpl* base_file)
+MemFileImpl::MemFileImpl (FileImplPtr base_file)
   : FileImpl (base_file->Mode ()|FILE_MODE_SEEK|FILE_MODE_REWIND), is_auto_deleted (true)    
 {
   if (!base_file)

@@ -3,7 +3,7 @@
 using namespace common;
 using namespace stl;
 
-BufferedFileImpl::BufferedFileImpl (FileImpl* _base_file,size_t buf_size)
+BufferedFileImpl::BufferedFileImpl (FileImplPtr _base_file,size_t buf_size)
   : FileImpl (_base_file->Mode ()), base_file (_base_file)
 {
   buffer       = (char*)::operator new (buf_size);
@@ -14,8 +14,6 @@ BufferedFileImpl::BufferedFileImpl (FileImpl* _base_file,size_t buf_size)
   cache_finish = 0;
   file_pos     = base_file->Tell ();
   file_size    = base_file->Size ();
-
-  base_file->AddRef ();  
 }
 
 BufferedFileImpl::~BufferedFileImpl ()
@@ -23,14 +21,6 @@ BufferedFileImpl::~BufferedFileImpl ()
   try
   {
     Flush ();
-  }
-  catch (...)
-  {
-  }
-
-  try
-  {
-    base_file->Release ();
   }
   catch (...)
   {

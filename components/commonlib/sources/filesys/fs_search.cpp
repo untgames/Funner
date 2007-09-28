@@ -12,7 +12,7 @@ class FileSearchHelper
   public:
     FileSearchHelper (FileListBuilder& builder,const char* mask,size_t search_flags);
 
-    void Search (ICustomFileSystem*,const char* dir);
+    void Search (ICustomFileSystemPtr,const char* dir);
 
   private:  
     void Insert          (const char* file_name,const FileInfo&);
@@ -21,11 +21,11 @@ class FileSearchHelper
   private:  
     typedef ICustomFileSystem::FileSearchHandler SearchHandler;
   
-    FileListBuilder&   builder;
-    size_t             search_flags;
-    ICustomFileSystem* file_system;  
-    const char*        mask;
-    string             full_mask;
+    FileListBuilder&     builder;
+    size_t               search_flags;
+    ICustomFileSystemPtr file_system;  
+    const char*          mask;
+    string               full_mask;
 };
 
 /*
@@ -36,7 +36,7 @@ inline FileSearchHelper::FileSearchHelper (FileListBuilder& _builder,const char*
   : builder (_builder), search_flags (_search_flags), file_system (0), mask (_mask)
   { }
 
-void FileSearchHelper::Search (ICustomFileSystem* _file_system,const char* dir)
+void FileSearchHelper::Search (ICustomFileSystemPtr _file_system,const char* dir)
 {
   file_system = _file_system;
   full_mask   = format ("%s%s",dir,mask);
@@ -86,7 +86,7 @@ void FileSystemImpl::MountSearch (FileListBuilder& builder,const char* wc_mask,c
     if (!string_wrappers::strnicmp (i->prefix.c_str (),prefix,i->prefix.size ()))  
     {
       builder.SetPrefix    (i->prefix.c_str ());
-      search_helper.Search (get_pointer (i->file_system),prefix+i->prefix.size ());
+      search_helper.Search (i->file_system,prefix+i->prefix.size ());
     }
     else if (!string_wrappers::strnicmp (i->prefix.c_str (),prefix,prefix_size))
     {
@@ -99,7 +99,7 @@ void FileSystemImpl::MountSearch (FileListBuilder& builder,const char* wc_mask,c
       if (flags & FILE_SEARCH_SUBDIRS)
       {       
         builder.SetPrefix    (i->prefix.c_str ());
-        search_helper.Search (get_pointer (i->file_system),"");
+        search_helper.Search (i->file_system,"");
       }
     }
   }
@@ -168,7 +168,7 @@ FileList FileSystemImpl::Search (const char* src_mask,size_t flags)
       builder.SetPrefix ("");
 
       for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
-        search_helper.Search (get_pointer (i->file_system),src_prefix.c_str ());
+        search_helper.Search (i->file_system,src_prefix.c_str ());
     }
   }
 

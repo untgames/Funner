@@ -2,7 +2,7 @@
 
 using namespace common;
 
-CustomFileImpl::CustomFileImpl (ICustomFileSystem* _file_system,const char* _file_name,filemode_t mode_flags)
+CustomFileImpl::CustomFileImpl (ICustomFileSystemPtr _file_system,const char* _file_name,filemode_t mode_flags)
   : FileImpl (mode_flags), auto_close (true)
 {
   if (!_file_system)
@@ -13,20 +13,13 @@ CustomFileImpl::CustomFileImpl (ICustomFileSystem* _file_system,const char* _fil
 
   file_system = _file_system;
   file_handle = file_system->FileOpen (_file_name,mode_flags,0);
-
-  file_system->AddRef ();
 }
 
-CustomFileImpl::CustomFileImpl (ICustomFileSystem* _file_system,file_t _handle,filemode_t mode_flags,bool _auto_close)
-  : FileImpl (mode_flags), auto_close (_auto_close)
+CustomFileImpl::CustomFileImpl (ICustomFileSystemPtr _file_system,file_t _handle,filemode_t mode_flags,bool _auto_close)
+  : FileImpl (mode_flags), auto_close (_auto_close), file_system (_file_system), file_handle (_handle)
 {
   if (!_file_system)
     RaiseNullArgument ("CustomFileImpl::CustomFileImpl","file_system");
-
-  file_system = _file_system;
-  file_handle = _handle;
-
-  file_system->AddRef ();  
 }
 
 CustomFileImpl::~CustomFileImpl ()
@@ -35,14 +28,6 @@ CustomFileImpl::~CustomFileImpl ()
   {
     if (auto_close)
       file_system->FileClose (file_handle);
-  }
-  catch (...)
-  {
-  }
-
-  try
-  {
-    file_system->Release ();
   }
   catch (...)
   {

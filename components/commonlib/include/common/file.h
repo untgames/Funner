@@ -14,15 +14,12 @@ class FileImpl;
 class FileList;
 class FileListImpl;
 class FileListBuilder;
+class ICustomFileSystem;
 
 //intrusive pointers
 typedef xtl::intrusive_ptr<FileImpl>     FileImplPtr;
 typedef xtl::intrusive_ptr<FileListImpl> FileListImplPtr;
-
-void intrusive_ptr_add_ref (FileImpl*);
-void intrusive_ptr_release (FileImpl*);
-void intrusive_ptr_add_ref (FileListImpl*);
-void intrusive_ptr_release (FileListImpl*);
+typedef xtl::com_ptr<ICustomFileSystem>  ICustomFileSystemPtr;
 
 /*
     Файловые исключения
@@ -183,9 +180,17 @@ class File
 {
   friend class FileSystem;
   public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктры / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
     File  ();
     File  (const File&);
     ~File ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    File& operator = (const File&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим работы файла
@@ -238,7 +243,7 @@ class File
     bool operator != (const File&) const;
 
   protected:
-    File (FileImpl*);
+    File (FileImplPtr);
 
   private:
     FileImplPtr impl;
@@ -299,8 +304,8 @@ class MemFile: public File
 class CustomFile: public File
 {
   public:
-    CustomFile (ICustomFileSystem* file_system,const char* file_name,filemode_t mode);
-    CustomFile (ICustomFileSystem*        file_system,
+    CustomFile (ICustomFileSystemPtr file_system,const char* file_name,filemode_t mode);
+    CustomFile (ICustomFileSystemPtr      file_system,
                 ICustomFileSystem::file_t handle,
                 filemode_t                mode,
                 bool                      auto_close = false);
@@ -326,11 +331,17 @@ class FileListIterator
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы и присваивание
+///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FileListIterator ();
-    FileListIterator (const FileList&);
+    FileListIterator  ();
+    FileListIterator  (const FileList&);
+    FileListIterator  (const FileListIterator&);
+    ~FileListIterator ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FileListIterator& operator = (const FileListIterator&);
     FileListIterator& operator = (const FileList&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -379,9 +390,16 @@ class FileList
     typedef FileListItem     ItemType;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///Конструктры / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FileList ();
+    FileList  ();
+    FileList  (const FileList&);
+    ~FileList ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FileList& operator = (const FileList&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество файлов / информация об i-м файле
@@ -443,9 +461,9 @@ class FileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Монтирование пользовательской файловой системы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void Mount       (const char* path_prefix,ICustomFileSystem* file_system);
+    static void Mount       (const char* path_prefix,ICustomFileSystemPtr file_system);
     static void Unmount     (const char* path_prefix);
-    static void Unmount     (ICustomFileSystem* file_system);
+    static void Unmount     (ICustomFileSystemPtr file_system);
     static void UnmountAll  ();
     static bool IsPathMount (const char* path); //проверка: смонтирован ли путь
 

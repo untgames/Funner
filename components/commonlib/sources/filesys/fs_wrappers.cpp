@@ -42,10 +42,10 @@ MemFile::MemFile (void* buf,size_t size,filemode_t mode)
   : File (new MemFileImpl (buf,size,mode))
   { }
   
-CustomFile::CustomFile (ICustomFileSystem* file_system,const char* name,filemode_t mode)
+CustomFile::CustomFile (ICustomFileSystemPtr file_system,const char* name,filemode_t mode)
  : File (new CustomFileImpl (file_system,name,mode))
  { }
 
-CustomFile::CustomFile (ICustomFileSystem* file_system,ICustomFileSystem::file_t handle,filemode_t mode,bool auto_close)
+CustomFile::CustomFile (ICustomFileSystemPtr file_system,ICustomFileSystem::file_t handle,filemode_t mode,bool auto_close)
  : File (new CustomFileImpl (file_system,handle,mode,auto_close))
  { }

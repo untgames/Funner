@@ -20,11 +20,11 @@ inline SearchPath::SearchPath (const char* _path,size_t _hash)
   : hash (_hash), path (_path)
   { }
   
-inline PackFile::PackFile (size_t _file_name_hash,size_t _search_path_hash,ICustomFileSystem* _file_system) 
+inline PackFile::PackFile (size_t _file_name_hash,size_t _search_path_hash,ICustomFileSystemPtr _file_system) 
   : file_name_hash (_file_name_hash), search_path_hash (_search_path_hash), file_system (_file_system)
   { }
     
-inline MountFileSystem::MountFileSystem (const char* _prefix,size_t _hash,ICustomFileSystem* _file_system)
+inline MountFileSystem::MountFileSystem (const char* _prefix,size_t _hash,ICustomFileSystemPtr _file_system)
   : hash (_hash), prefix (_prefix), file_system (_file_system), mount_point_file_system (*this)
 {
   mount_point_info.time_create = 0;
@@ -242,18 +242,11 @@ void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,cons
     {
       try
       {        
-        ICustomFileSystem* pack_file_system = i->creater (path.c_str ());
+        ICustomFileSystemPtr pack_file_system (i->creater (path.c_str ()),false);
 
-        try
-        {
-          pack_files.push_front (PackFile (strihash (path),search_path_hash,pack_file_system));
-          return;
-        }
-        catch (...)
-        {
-          pack_file_system->Release ();
-          throw;
-        }
+        pack_files.push_front (PackFile (strihash (path),search_path_hash,pack_file_system));
+
+        return;
       }
       catch (FileException& exception)
       {
@@ -269,7 +262,7 @@ void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,cons
       }
     }
 
-  log_handler (format ("Fail to open pack-file '%s'. Undefined extension",_path).c_str ());
+  log_handler (format ("Fail to open pack-file '%s'. Undefined extension '%s'",_path,type.c_str ()).c_str ());
 }
 
 void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_handler)
@@ -285,7 +278,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
   if (path [0] != '/')
     path = format ("%s/%s",default_path.c_str (),path.c_str ());
 
-  ICustomFileSystem* owner_file_system = FindMountFileSystem (path.c_str (),mount_path);
+  ICustomFileSystemPtr owner_file_system = FindMountFileSystem (path.c_str (),mount_path);
   FileInfo           file_info;
 
   if (!owner_file_system || !owner_file_system->GetFileInfo (mount_path.c_str (),file_info))
@@ -363,7 +356,7 @@ void FileSystemImpl::RemoveAllSearchPaths ()
     Работа со смонтированными файловыми системами
 */
 
-void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystem* file_system)
+void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystemPtr file_system)
 {
   if (!_path_prefix)
     RaiseNullArgument ("FileSystem::Mount","path_prefix");
@@ -404,7 +397,7 @@ void FileSystemImpl::Unmount (const char* _path_prefix)
     }
 }
 
-void FileSystemImpl::Unmount (ICustomFileSystem* file_system)
+void FileSystemImpl::Unmount (ICustomFileSystemPtr file_system)
 {
   if (!file_system)
     return;
@@ -447,7 +440,7 @@ bool FileSystemImpl::IsPathMount (const char* path) const
     Определение принадлежности файла к файловой системе
 */
 
-ICustomFileSystem* FileSystemImpl::FindMountFileSystem (const char* file_name,string& result_file_name)
+ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,string& result_file_name)
 {
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
   {
@@ -460,7 +453,7 @@ ICustomFileSystem* FileSystemImpl::FindMountFileSystem (const char* file_name,st
           return &i->mount_point_file_system;
         case '/': //запрос к смонтированной файловой системе
           result_file_name = file_name + i->prefix.size ();
-          return get_pointer (i->file_system);
+          return i->file_system;
         default:
           break;
       }
@@ -470,7 +463,7 @@ ICustomFileSystem* FileSystemImpl::FindMountFileSystem (const char* file_name,st
   return NULL;
 }
 
-ICustomFileSystem* FileSystemImpl::FindFileSystem (const char* src_file_name,string& result_file_name)
+ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,string& result_file_name)
 {
   string file_name = ConvertFileName (src_file_name);
   
@@ -482,7 +475,7 @@ ICustomFileSystem* FileSystemImpl::FindFileSystem (const char* src_file_name,str
     //пытаемся найти файл по дефолтному пути поиска
  
   string             full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ()), mount_name;
-  ICustomFileSystem* owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
+  ICustomFileSystemPtr owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
 
   if (owner_file_system && owner_file_system->IsFileExist (mount_name.c_str ()))
   {
@@ -491,7 +484,7 @@ ICustomFileSystem* FileSystemImpl::FindFileSystem (const char* src_file_name,str
   }
 
   string             default_mount_name  = mount_name;
-  ICustomFileSystem* default_file_system = owner_file_system;
+  ICustomFileSystemPtr default_file_system = owner_file_system;
 
     //пытаемся найти файл в списке путей поиска
 
@@ -513,7 +506,7 @@ ICustomFileSystem* FileSystemImpl::FindFileSystem (const char* src_file_name,str
     if (i->file_system->IsFileExist (file_name.c_str ()))
     {
       swap (result_file_name,file_name);
-      return get_pointer (i->file_system);
+      return i->file_system;
     }
     
     //возвращаем ссылку на файловую систему включающую путь по умолчанию      
@@ -530,14 +523,14 @@ ICustomFileSystem* FileSystemImpl::FindFileSystem (const char* src_file_name,str
     Открытие файла
 */
 
-FileImpl* FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_flags,size_t buffer_size)
+FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_flags,size_t buffer_size)
 {
   if (!src_file_name)
     RaiseNullArgument ("FileSystemImpl::OpenFile","file_name");
 
   string file_name;
 
-  ICustomFileSystem* file_system = FindFileSystem (src_file_name,file_name);
+  ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
 
   try
   {    
@@ -550,12 +543,12 @@ FileImpl* FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_fl
       size_t self_buffer_size = base_file->GetBufferSize ();
       
       if (!buffer_size || self_buffer_size >= buffer_size)
-        return base_file->AddRef (), get_pointer (base_file);
+        return base_file;
 
       if (base_file->Size () < default_file_buffer_size && !(mode_flags & (FILE_MODE_RESIZE|FILE_MODE_WRITE)))
-        return new MemFileImpl (get_pointer (base_file));
+        return FileImplPtr (new MemFileImpl (base_file), false);
 
-      return new BufferedFileImpl (get_pointer (base_file),buffer_size);
+      return FileImplPtr (new BufferedFileImpl (base_file,buffer_size), false);
     }
     catch (...)
     {
@@ -579,7 +572,7 @@ FileImpl* FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_fl
   return NULL;
 }
 
-FileImpl* FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_flags)
+FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_flags)
 {
   return OpenFile (src_file_name,mode_flags,default_file_buffer_size);
 }
@@ -607,7 +600,7 @@ void FileSystemImpl::Remove (const char* src_file_name)
   
   try
   {
-    ICustomFileSystem* file_system = FindFileSystem (src_file_name,file_name);
+    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
     
     file_system->Remove (file_name.c_str ());
   }
@@ -629,7 +622,7 @@ void FileSystemImpl::Rename (const char* src_file_name,const char* new_name)
   
   try
   {
-    ICustomFileSystem* file_system = FindFileSystem (src_file_name,file_name);
+    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
     
     file_system->Rename (file_name.c_str (),new_name);
   }
@@ -648,7 +641,7 @@ void FileSystemImpl::Mkdir (const char* src_dir_name)
 
   try
   {
-    ICustomFileSystem* file_system = FindFileSystem (src_dir_name,dir_name);
+    ICustomFileSystemPtr file_system = FindFileSystem (src_dir_name,dir_name);
     
     file_system->Mkdir (dir_name.c_str ());
   }
@@ -684,7 +677,7 @@ bool FileSystemImpl::GetFileInfo (const char* src_file_name,FileInfo& info)
   {
     string file_name;
 
-    ICustomFileSystem* file_system = FindFileSystem (src_file_name,file_name);    
+    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);    
 
     return file_system->GetFileInfo (file_name.c_str (),info);
   }
@@ -736,7 +729,7 @@ void FileSystem::UnregisterPackFile (const char* extension)
   FileSystemSingleton::Instance ().UnregisterPackFile (extension);
 }
 
-void FileSystem::Mount (const char* path_prefix,ICustomFileSystem* file_system)
+void FileSystem::Mount (const char* path_prefix,ICustomFileSystemPtr file_system)
 {
   FileSystemSingleton::Instance ().Mount (path_prefix,file_system);
 }
@@ -746,7 +739,7 @@ void FileSystem::Unmount (const char* path_prefix)
   FileSystemSingleton::Instance ().Unmount (path_prefix);
 }
 
-void FileSystem::Unmount (ICustomFileSystem* file_system)
+void FileSystem::Unmount (ICustomFileSystemPtr file_system)
 {
   FileSystemSingleton::Instance ().Unmount (file_system);
 }
