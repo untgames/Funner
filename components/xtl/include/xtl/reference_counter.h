@@ -7,7 +7,7 @@
 namespace xtl
 {
 
-namespace reference_counter_namespace
+namespace reference_counter_namespace //для защиты от ADL
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,6 +57,12 @@ template <class Fn> void release (reference_counter&, Fn fn);
                     void addref  (reference_counter*);
 template <class Fn> void release (reference_counter*, Fn fn);
 template <class T>  void release (T*); //удаление объекта в случае потери ссылок
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Взаимодействие с intrusive_ptr
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> void intrusive_ptr_add_ref (T*);
+template <class T> void intrusive_ptr_release (T*);
 
 #include <xtl/detail/reference_counter.inl>
 

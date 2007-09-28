@@ -105,3 +105,19 @@ inline void release (T* ptr)
   if (!--*ptr)
     checked_delete (ptr);
 }
+
+/*
+    Взаимодействие с intrusive_ptr
+*/
+
+template <class T>
+inline void intrusive_ptr_add_ref (T* ptr)
+{
+  addref (ptr);
+}
+
+template <class T>
+inline void intrusive_ptr_release (T* ptr)
+{
+  release (ptr);
+}
