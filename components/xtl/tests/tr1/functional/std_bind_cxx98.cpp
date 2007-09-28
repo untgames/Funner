@@ -1,7 +1,5 @@
 #include "test.h"
 
-#include <stl/functional>
-
 using namespace stl;
 
 struct X

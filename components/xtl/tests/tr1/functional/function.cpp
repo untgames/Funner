@@ -1,9 +1,5 @@
 #include "test.h"
 
-#include <stl/functional>
-#include <stl/string>
-#include <stl/utility>
-
 using namespace stl;
 
 int global_int;

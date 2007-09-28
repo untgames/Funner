@@ -1,5 +1,4 @@
 #include "test.h"
-#include <stl/utility>
 
 using namespace stl;
 

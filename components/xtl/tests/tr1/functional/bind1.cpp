@@ -1,7 +1,5 @@
 #include "test.h"
 
-#include <stl/string>
-
 using namespace stl;
 
 string f (const string& x)

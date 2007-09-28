@@ -1,3 +1,6 @@
+#ifndef XTL_TYPE_TRAITS_TEST_HEADER
+#define XTL_TYPE_TRAITS_TEST_HEADER
+
 #include <stdio.h>
 #include <typeinfo>
 #include <xtl/type_traits>
@@ -301,3 +304,5 @@ struct wrap
    T t;
    int j;
 };
+
+#endif
