@@ -2,16 +2,23 @@
 #define MEDIALIB_RFX_SHARED_HEADER
 
 #include <memory.h>
+
 #include <stl/string>
 #include <stl/vector>
 #include <stl/bitset>
+
 #include <xtl/visitor.h>
+#include <xtl/reference_counter.h>
+
 #include <common/exception.h>
 #include <common/strwrap.h>
 #include <common/singleton.h>
+
 #include <media/rfx/common_shader.h>
 #include <media/rfx/material_library.h>
-#include <shared/shared_resource.h>
+
+#include <shared/resource_holder.h>
+#include <shared/clone.h>
 #include <shared/resource_manager.h>
 
 namespace media

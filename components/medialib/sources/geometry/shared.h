@@ -13,6 +13,7 @@
 #include <xtl/stride_ptr.h>
 #include <xtl/bind.h>
 #include <xtl/ref.h>
+#include <xtl/reference_counter.h>
 
 #include <mathlib.h>
 
@@ -23,7 +24,9 @@
 #include <common/parser.h>
 
 #include <media/geometry/mesh_model.h>
-#include <shared/shared_resource.h>
+
+#include <shared/resource_holder.h>
+#include <shared/clone.h>
 #include <shared/resource_manager.h>
 
 namespace media

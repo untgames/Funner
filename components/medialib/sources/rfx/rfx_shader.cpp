@@ -11,15 +11,13 @@ using namespace common;
 
 typedef bitset<ShaderPin_Num> PinSet;
 
-struct Shader::Impl
+struct Shader::Impl: public xtl::reference_counter
 {
-  size_t ref_count; //счётчик ссылок
   string name;      //имя
   size_t name_hash; //хэш имени
   PinSet pins;      //пины
   
   Impl ();
-  Impl (const Impl&);
 };
 
 /*
@@ -27,11 +25,7 @@ struct Shader::Impl
 */
 
 Shader::Impl::Impl ()
-  : ref_count (1), name_hash (strhash (""))
-  {}
-
-Shader::Impl::Impl (const Impl& impl)
-  : ref_count (1), name (impl.name), name_hash (impl.name_hash), pins (impl.pins)
+  : name_hash (strhash (""))
   {}
 
 /*
@@ -48,7 +42,6 @@ Shader::Shader (const Shader& shader)
 
 Shader::~Shader ()
 {
-  delete impl;
 }
 
 /*
@@ -80,13 +73,12 @@ void Shader::Rename (const char* name)
 
 void Shader::AddRef () const
 {
-  impl->ref_count++;
+  addref (*impl);
 }
 
 void Shader::Release () const
 {
-  if (!--impl->ref_count)
-    delete impl;
+  release (impl.get ());
 }
 
 /*

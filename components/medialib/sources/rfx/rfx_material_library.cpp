@@ -11,10 +11,10 @@ const size_t DEFAULT_MATERIAL_ARRAY_RESERVE = 32;
     Описание реализации библиотеки материалов
 */
 
-typedef SharedResourceHolder<Material> MaterialHolder;
-typedef vector<MaterialHolder>         MaterialArray;
+typedef ResourceHolder<Material> MaterialHolder;
+typedef vector<MaterialHolder>   MaterialArray;
 
-struct MaterialLibrary::Impl: public SharedResource
+struct MaterialLibrary::Impl
 {
   string        name;      //имя модели
   MaterialArray materials; //массив материалов

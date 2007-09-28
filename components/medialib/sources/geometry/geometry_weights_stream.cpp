@@ -8,7 +8,7 @@ using namespace common;
     Описание реализации массива весов
 */
 
-struct VertexWeightStream::Impl: public SharedResource
+struct VertexWeightStream::Impl: public xtl::reference_counter
 {
   Buffer data_buffer; //буфер данных
 };
@@ -18,44 +18,30 @@ struct VertexWeightStream::Impl: public SharedResource
 */
 
 VertexWeightStream::VertexWeightStream ()
-  : impl (new Impl)
+  : impl (new Impl, false)
   {}
 
 VertexWeightStream::VertexWeightStream (size_t weights_count)
-  : impl (new Impl)
+  : impl (new Impl, false)
 {
-  try
-  {
-    Resize (weights_count);
-  }
-  catch (...)
-  {
-    delete impl;
-    throw;
-  }
+  Resize (weights_count);
 }
   
 VertexWeightStream::VertexWeightStream (const VertexWeightStream& vws, CloneMode mode)
-  : impl (clone_resource (vws.impl, mode, "media::geometry::VertexWeightStream::VertexWeightStream"))
+  : impl (clone (vws.impl, mode, "media::geometry::VertexWeightStream::VertexWeightStream"))
   {}
 
 VertexWeightStream::~VertexWeightStream ()
 {
-  release_resource (impl);
 }
 
 /*
     Присваивание
 */
 
-void VertexWeightStream::Assign (const VertexWeightStream& vws, CloneMode mode)
+VertexWeightStream& VertexWeightStream::operator = (const VertexWeightStream& vws)
 {
-  VertexWeightStream (vws, mode).Swap (*this);
-}
-
-VertexWeightStream& VertexWeightStream::operator = (const VertexWeightStream& vsw)
-{
-  Assign (vsw);
+  impl = vws.impl;
 
   return *this;
 }
@@ -66,7 +52,7 @@ VertexWeightStream& VertexWeightStream::operator = (const VertexWeightStream& vs
 
 size_t VertexWeightStream::Id () const
 {
-  return reinterpret_cast<size_t> (impl);
+  return reinterpret_cast<size_t> (get_pointer (impl));
 }
 
 /*
@@ -126,9 +112,7 @@ void VertexWeightStream::Reserve (size_t weights_count)
 
 void VertexWeightStream::Swap (VertexWeightStream& vws)
 {
-  Impl* tmp = impl;
-  impl      = vws.impl;
-  vws.impl  = tmp;
+  swap (impl, vws.impl);
 }
 
 namespace media

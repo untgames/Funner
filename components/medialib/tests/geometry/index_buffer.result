@@ -39,7 +39,7 @@ Index buffer (5 indices):
   2
   3
   4
-instance ib1 (default clone mode)
+copy ib2
 Index buffer (5 indices):
   0
   1

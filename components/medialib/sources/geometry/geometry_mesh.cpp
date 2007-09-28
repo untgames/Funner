@@ -20,11 +20,11 @@ struct PrimitiveImpl: public Primitive
     Описание реализации Mesh
 */
 
-typedef stl::vector<PrimitiveImpl>         PrimitiveArray;
-typedef SharedResourceHolder<VertexBuffer> VertexBufferHolder;
-typedef SharedResourceHolder<IndexBuffer>  IndexBufferHolder;
+typedef stl::vector<PrimitiveImpl>   PrimitiveArray;
+typedef ResourceHolder<VertexBuffer> VertexBufferHolder;
+typedef ResourceHolder<IndexBuffer>  IndexBufferHolder;
 
-struct Mesh::Impl: public SharedResource
+struct Mesh::Impl: public xtl::reference_counter
 {
   string             name;                       //имя меша
   VertexBufferHolder vertex_buffer;              //вершинный буфер
@@ -65,26 +65,20 @@ Mesh::Mesh ()
   {}
 
 Mesh::Mesh (const Mesh& mesh, CloneMode mode)
-  : impl (clone_resource (mesh.impl, mode, "media::geometry::Mesh::Mesh"))
+  : impl (clone (mesh.impl, mode, "media::geometry::Mesh::Mesh"))
   {}
 
 Mesh::~Mesh ()
 {
-  release_resource (impl);
 }
 
 /*
     Присваивание
 */
 
-void Mesh::Assign (const Mesh& mesh, CloneMode mode)
-{
-  Mesh (mesh, mode).Swap (*this);
-}
-
 Mesh& Mesh::operator = (const Mesh& mesh)
 {
-  Assign (mesh);
+  impl = mesh.impl;
 
   return *this;
 }
@@ -95,7 +89,7 @@ Mesh& Mesh::operator = (const Mesh& mesh)
 
 size_t Mesh::Id () const
 {
-  return reinterpret_cast<size_t> (impl);
+  return reinterpret_cast<size_t> (get_pointer (impl));
 }
 
 /*
@@ -165,22 +159,22 @@ size_t Mesh::WeightsCount () const
 
 void Mesh::Attach (media::geometry::VertexBuffer& vb, CloneMode mode)
 {
-  impl->vertex_buffer.Assign (vb, mode);
+  impl->vertex_buffer.Attach (vb, mode);
 }
 
 void Mesh::Attach (media::geometry::IndexBuffer& ib, CloneMode mode)
 {
-  impl->index_buffer.Assign (ib, mode);
+  impl->index_buffer.Attach (ib, mode);
 }
     
 void Mesh::DetachVertexBuffer ()
 {
-  impl->vertex_buffer.Assign (media::geometry::VertexBuffer (), CloneMode_Instance);
+  impl->vertex_buffer.Attach (media::geometry::VertexBuffer (), CloneMode_Instance);
 }
 
 void Mesh::DetachIndexBuffer ()
 {
-  impl->index_buffer.Assign (media::geometry::IndexBuffer (), CloneMode_Instance);
+  impl->index_buffer.Attach (media::geometry::IndexBuffer (), CloneMode_Instance);
 }
 
 void Mesh::DetachAllBuffers ()
@@ -286,7 +280,7 @@ void Mesh::Clear ()
 
 void Mesh::Swap (Mesh& mesh)
 {
-  stl::swap (mesh.impl, impl);
+  swap (mesh.impl, impl);
 }
 
 namespace media
@@ -372,6 +366,25 @@ size_t get_points_count (PrimitiveType type, size_t primitives_count)
     case PrimitiveType_TriangleStrip: return primitives_count + 2;
     case PrimitiveType_TriangleFan:   return primitives_count + 2;
     default:                          RaiseInvalidArgument ("media::geometry::get_points_count", "type", type);
+  }
+  
+  return 0;
+}
+
+/*
+    Определение количества примитивов
+*/
+
+size_t get_primitives_count (PrimitiveType type, size_t points_count)
+{
+  switch (type)
+  {
+    case PrimitiveType_LineList:      return points_count / 2;
+    case PrimitiveType_LineStrip:     return points_count ? points_count - 1 : 0;
+    case PrimitiveType_TriangleList:  return points_count / 3;
+    case PrimitiveType_TriangleStrip: return points_count >= 2 ? points_count - 2 : 0;
+    case PrimitiveType_TriangleFan:   return points_count >= 2 ? points_count - 2 : 0;
+    default:                          RaiseInvalidArgument ("media::geometry::get_primitives_count", "type", type);
   }
   
   return 0;

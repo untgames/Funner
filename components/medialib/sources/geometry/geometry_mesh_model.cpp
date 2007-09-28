@@ -11,10 +11,10 @@ const size_t DEFAULT_MESH_ARRAY_RESERVE = 32;
     Описание реализации меш-модели
 */
 
-typedef SharedResourceHolder<Mesh> MeshHolder;
-typedef vector<MeshHolder>         MeshArray;
+typedef ResourceHolder<Mesh> MeshHolder;
+typedef vector<MeshHolder>   MeshArray;
 
-struct MeshModel::Impl: public SharedResource
+struct MeshModel::Impl
 {
   string    name;   //имя модели
   MeshArray meshes; //массив мешей

@@ -2,6 +2,8 @@
 #define MEDIALIB_GEOMETRY_INDEX_BUFFER_HEADER
 
 #include <media/geometry/defs.h>
+#include <xtl/intrusive_ptr.h>
+#include <media/clone.h>
 
 namespace media
 {
@@ -20,13 +22,12 @@ class IndexBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IndexBuffer  ();
     IndexBuffer  (size_t indices_count);
-    IndexBuffer  (const IndexBuffer&, CloneMode mode = CloneMode_Default);
+    IndexBuffer  (const IndexBuffer&, CloneMode = CloneMode_Instance);
     ~IndexBuffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void         Assign     (const IndexBuffer&, CloneMode mode = CloneMode_Default);
     IndexBuffer& operator = (const IndexBuffer&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +65,7 @@ class IndexBuffer
 
   private:
     struct Impl;
-    Impl* impl;
+    xtl::intrusive_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

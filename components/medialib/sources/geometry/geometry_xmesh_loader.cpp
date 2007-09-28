@@ -171,7 +171,7 @@ class XmlMeshModelLoader
 
         //регистрация потока
 
-      vertex_streams.insert_pair (id, SharedResourceHolder<VertexStream> (vs, CloneMode_Instance));
+      vertex_streams.insert_pair (id, vs);
     }
     
       //разбор потока вершинных весов
@@ -200,7 +200,7 @@ class XmlMeshModelLoader
         
         //регистрация потока
         
-      vertex_weights.insert_pair (id, SharedResourceHolder<VertexWeightStream> (vws, CloneMode_Instance));
+      vertex_weights.insert_pair (id, vws);
     }
 
       //разбор вершинного буфера
@@ -228,7 +228,7 @@ class XmlMeshModelLoader
         if (weights_iter == vertex_weights.end ())
           return;
           
-        vb.AttachWeights (weights_iter->second.Resource ());
+        vb.AttachWeights (weights_iter->second);
       }
 
          //разбор вершинных потоков
@@ -245,12 +245,12 @@ class XmlMeshModelLoader
         if (stream_iter == vertex_streams.end ())
           continue;
 
-        vb.Attach (stream_iter->second.Resource ());
+        vb.Attach (stream_iter->second);
       }
 
          //регистрация вершинного буфера
 
-      vertex_buffers.insert_pair (id, SharedResourceHolder<VertexBuffer> (vb, CloneMode_Instance));
+      vertex_buffers.insert_pair (id, vb);
     }
     
       //разбор индексного буфера
@@ -279,7 +279,7 @@ class XmlMeshModelLoader
         
         //регистрация потока
         
-      index_buffers.insert_pair (id, SharedResourceHolder<IndexBuffer> (ib, CloneMode_Instance));
+      index_buffers.insert_pair (id, ib);
     }
     
       //разбор примитива
@@ -318,7 +318,7 @@ class XmlMeshModelLoader
       if (vb_iter == vertex_buffers.end ())
         return;        
         
-      vb = &vb_iter->second.Resource ();
+      vb = &vb_iter->second;
       
       if (ib_id)
       {
@@ -327,7 +327,7 @@ class XmlMeshModelLoader
         if (ib_iter == index_buffers.end ())
           return;
           
-        ib = &ib_iter->second.Resource ();
+        ib = &ib_iter->second;
       }
       
         //создание меша
@@ -367,10 +367,10 @@ class XmlMeshModelLoader
     }
     
   private:
-    typedef stl::hash_map<stl::hash_key<const char*>, SharedResourceHolder<VertexStream> >       VertexStreamMap;
-    typedef stl::hash_map<stl::hash_key<const char*>, SharedResourceHolder<VertexWeightStream> > VertexWeightStreamMap;
-    typedef stl::hash_map<stl::hash_key<const char*>, SharedResourceHolder<VertexBuffer> >       VertexBufferMap;
-    typedef stl::hash_map<stl::hash_key<const char*>, SharedResourceHolder<IndexBuffer> >        IndexBufferMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, VertexStream>       VertexStreamMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, VertexWeightStream> VertexWeightStreamMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, VertexBuffer>       VertexBufferMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, IndexBuffer>        IndexBufferMap;
 
   private:
     Parser                parser;         //парсер

@@ -10,11 +10,11 @@ const size_t DEFAULT_VERTEX_ARRAY_RESERVE = 4; //резервируемый размер вершинного
     ќписание реализации VertexBuffer
 */
 
-typedef SharedResourceHolder<VertexStream>       VertexStreamHolder;
-typedef SharedResourceHolder<VertexWeightStream> VertexWeightStreamHolder;
-typedef stl::vector<VertexStreamHolder>          VertexStreamArray;
+typedef ResourceHolder<VertexStream>       VertexStreamHolder;
+typedef ResourceHolder<VertexWeightStream> VertexWeightStreamHolder;
+typedef stl::vector<VertexStreamHolder>    VertexStreamArray;
 
-struct VertexBuffer::Impl: public SharedResource
+struct VertexBuffer::Impl: public xtl::reference_counter
 {
   VertexStreamArray        streams;   //вершинные массивы
   VertexWeightStreamHolder weights;   //массив весов
@@ -50,26 +50,20 @@ VertexBuffer::VertexBuffer ()
   {}
 
 VertexBuffer::VertexBuffer (const VertexBuffer& vb, CloneMode mode)
-  : impl (clone_resource (vb.impl, mode, "media::geometry::VertexBuffer::VertexBuffer"))
+  : impl (clone (vb.impl, mode, "media::geometry::VertexBuffer::VertexBuffer"))
   {}
 
 VertexBuffer::~VertexBuffer ()
 {
-  release_resource (impl);
 }
 
 /*
     ѕрисваивание
 */
 
-void VertexBuffer::Assign (const VertexBuffer& vb, CloneMode mode)
-{
-  VertexBuffer (vb, mode).Swap (*this);
-}
-
 VertexBuffer& VertexBuffer::operator = (const VertexBuffer& vb)
 {
-  Assign (vb);
+  impl = vb.impl;
 
   return *this;
 }
@@ -80,7 +74,7 @@ VertexBuffer& VertexBuffer::operator = (const VertexBuffer& vb)
 
 size_t VertexBuffer::Id () const
 {
-  return reinterpret_cast<size_t> (impl);
+  return reinterpret_cast<size_t> (get_pointer (impl));
 }
 
 /*
@@ -129,16 +123,6 @@ VertexWeightStream& VertexBuffer::Weights ()
 
 size_t VertexBuffer::Attach (VertexStream& vs, CloneMode mode)
 {
-  switch (mode)
-  {
-    case CloneMode_Copy:
-    case CloneMode_Instance:
-      break;
-    default:
-      RaiseInvalidArgument ("media::geometry::VertexBuffer::Attach", "mode", mode);
-      break;
-  }
-
   impl->streams.push_back (VertexStreamHolder (vs, mode));
 
   return impl->streams.size () - 1;
@@ -154,12 +138,12 @@ void VertexBuffer::Detach (size_t index)
 
 void VertexBuffer::AttachWeights (VertexWeightStream& vws, CloneMode mode)
 {
-  impl->weights.Assign (vws, mode);
+  impl->weights.Attach (vws, mode);
 }
 
 void VertexBuffer::DetachWeights ()
 {
-  impl->weights.Assign (VertexWeightStream (), CloneMode_Instance);
+  impl->weights.Attach (VertexWeightStream (), CloneMode_Instance);
 }
 
 void VertexBuffer::Clear ()
@@ -210,7 +194,7 @@ size_t VertexBuffer::VertexSize () const
 
 void VertexBuffer::Swap (VertexBuffer& vb)
 {
-  stl::swap (vb.impl, impl);
+  swap (vb.impl, impl);
 }
 
 namespace media

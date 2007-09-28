@@ -2,7 +2,9 @@
 #define MEDIALIB_SOUND_SOURCE_HEADER
 
 #include <xtl/functional_fwd>
-#include <media/clone_mode.h>
+#include <xtl/intrusive_ptr.h>
+#include <stl/auto_ptr.h>
+#include <media/clone.h>
 
 namespace media
 {
@@ -30,14 +32,13 @@ class SoundSource
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     SoundSource  ();
-    SoundSource  (const SoundSource&, CloneMode = CloneMode_Default);
+    SoundSource  (const SoundSource&, CloneMode = CloneMode_Instance);
     ~SoundSource ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     SoundSource& operator = (const SoundSource&);
-    void         Assign     (const SoundSource&, CloneMode = CloneMode_Default);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип звука
@@ -73,7 +74,7 @@ class SoundSource
 
   private:
     struct Impl;
-    Impl* impl;
+    xtl::intrusive_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +143,7 @@ class SoundSourceLibrary
   
   private:
     struct Impl;
-    Impl* impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

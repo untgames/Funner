@@ -16,7 +16,7 @@ Vertex weight stream (12 weights):
 Dump s2
 Vertex weight stream (0 weights):
 s2 capacity: 14
-s2 = s1
+copy s1 to s2
 Vertex weight stream (12 weights):
   joint=0 weight=0.5
   joint=1 weight=0.5
@@ -33,13 +33,6 @@ Vertex weight stream (12 weights):
 clear s2
 Vertex weight stream (0 weights):
 instance s2
-Vertex weight stream (5 weights):
-  joint=0 weight=0.5
-  joint=1 weight=0.5
-  joint=2 weight=0.5
-  joint=3 weight=0.5
-  joint=4 weight=0.5
-instance s1 (default clone mode)
 Vertex weight stream (5 weights):
   joint=0 weight=0.5
   joint=1 weight=0.5

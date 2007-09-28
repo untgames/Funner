@@ -8,7 +8,7 @@ using namespace common;
     Описание реализации индексного буфера
 */
 
-struct IndexBuffer::Impl: public SharedResource
+struct IndexBuffer::Impl: public xtl::reference_counter
 {
   Buffer indices; //массив индексов
 };
@@ -18,44 +18,30 @@ struct IndexBuffer::Impl: public SharedResource
 */
 
 IndexBuffer::IndexBuffer ()
-  : impl (new Impl)
+  : impl (new Impl, false)
   {}
 
 IndexBuffer::IndexBuffer (size_t indices_count)
-  : impl (new Impl)
+  : impl (new Impl, false)
 {
-  try
-  {
-    Resize (indices_count);
-  }
-  catch (...)
-  {
-    delete impl;
-    throw;
-  }
+  Resize (indices_count);
 }
   
 IndexBuffer::IndexBuffer (const IndexBuffer& ib, CloneMode mode)
-  : impl (clone_resource (ib.impl, mode, "media::geometry::IndexBuffer::IndexBuffer"))
+  : impl (media::clone (ib.impl, mode, "media::geometry::IndexBuffer::IndexBuffer"))
   {}
 
 IndexBuffer::~IndexBuffer ()
 {
-  release_resource (impl);
 }
 
 /*
     Присваивание
 */
 
-void IndexBuffer::Assign (const IndexBuffer& ib, CloneMode mode)
-{
-  IndexBuffer (ib, mode).Swap (*this);
-}
-
 IndexBuffer& IndexBuffer::operator = (const IndexBuffer& ib)
 {
-  Assign (ib);
+  impl = ib.impl;
 
   return *this;
 }
@@ -66,7 +52,7 @@ IndexBuffer& IndexBuffer::operator = (const IndexBuffer& ib)
 
 size_t IndexBuffer::Id () const
 {
-  return reinterpret_cast<size_t> (impl);
+  return reinterpret_cast<size_t> (get_pointer (impl));
 }
 
 /*
@@ -126,9 +112,7 @@ void IndexBuffer::Reserve (size_t indices_count)
 
 void IndexBuffer::Swap (IndexBuffer& ib)
 {
-  Impl* tmp = ib.impl;
-  ib.impl   = impl;
-  impl      = tmp;
+  impl.swap (ib.impl);
 }
 
 namespace media

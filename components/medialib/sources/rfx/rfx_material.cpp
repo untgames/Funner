@@ -32,7 +32,7 @@ typedef vector<Pass> PassArray;
     Описание реализации Material
 */
 
-struct Material::Impl: public SharedResource
+struct Material::Impl: public xtl::reference_counter
 {
   string    name;       //имя материала
   PassArray passes;     //проходы
@@ -66,16 +66,15 @@ Material::Impl::Impl (const Impl& impl)
 */
 
 Material::Material ()
-  : impl (new Impl)
+  : impl (new Impl, false)
   {}
 
 Material::Material (const Material& material, CloneMode mode)
-  : impl (clone_resource (material.impl, mode, "media::Material::Material"))
+  : impl (clone (material.impl, mode, "media::Material::Material"))
   {}
 
 Material::~Material ()
 {
-  release_resource (impl);
 }
 
 /*
@@ -84,14 +83,9 @@ Material::~Material ()
 
 Material& Material::operator = (const Material& material)
 {
-  Assign (material);
+  impl = material.impl;
 
   return *this;
-}
-
-void Material::Assign (const Material& material, CloneMode mode)
-{
-  Material (material, mode).Swap (*this);
 }
 
 /*
@@ -341,7 +335,7 @@ void Material::Clear ()
 
 void Material::Swap (Material& material)
 {
-  stl::swap (impl, material.impl);  
+  swap (impl, material.impl);  
 }
 
 namespace media

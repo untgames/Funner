@@ -8,7 +8,7 @@ using namespace common;
     Описание реализации вершинного массива
 */
 
-struct VertexStream::Impl: public SharedResource
+struct VertexStream::Impl: public xtl::reference_counter
 {
   VertexFormat format;         //формат вершин
   size_t       vertex_size;    //размер вершины
@@ -40,124 +40,70 @@ VertexStream::Impl::Impl ()
 */
   
 VertexStream::VertexStream (const VertexDeclaration& declaration)
-  : impl (new Impl (declaration))
+  : impl (new Impl (declaration), false)
   {}
 
 VertexStream::VertexStream (size_t vertices_count, const VertexDeclaration& declaration)
-  : impl (new Impl (declaration))
+  : impl (new Impl (declaration), false)
 {
-  try
-  {
-    Resize (vertices_count);
-  }
-  catch (...)
-  {
-    delete impl;
-    throw;
-  }
+  Resize (vertices_count);
 }
 
 VertexStream::VertexStream (const VertexStream& source, const VertexDeclaration& declaration)
-  : impl (new Impl (declaration))
+  : impl (new Impl (declaration), false)
 {
-  try
-  {
-    Convert (source);
-  }
-  catch (...)
-  {
-    delete impl;
-    throw;
-  }
+  Convert (source);
 }
 
 VertexStream::VertexStream (const VertexBuffer& src_vb, const VertexDeclaration& declaration)
-  : impl (new Impl (declaration))
+  : impl (new Impl (declaration), false)
 {
-  try
-  {
-    Convert (src_vb);
-  }
-  catch (...)
-  {
-    delete impl;
-    throw;
-  }
+  Convert (src_vb);
 }
 
 VertexStream::VertexStream (const VertexBuffer& src_vb)
-  : impl (new Impl)
+  : impl (new Impl, false)
 {
-  try
-  {
-    VertexFormat& dst_format = impl->format;
-    size_t       offset = 0;
+  VertexFormat& dst_format = impl->format;
+  size_t       offset = 0;
 
-    for (size_t i=0, count=src_vb.StreamsCount (); i<count; i++)
+  for (size_t i=0, count=src_vb.StreamsCount (); i<count; i++)
+  {
+    const VertexFormat& src_format = src_vb.Stream (i).Format ();
+    
+    for (size_t j=0, count=src_format.AttributesCount (); j<count; j++)
     {
-      const VertexFormat& src_format = src_vb.Stream (i).Format ();
+      const VertexAttribute& attribute = src_format.Attribute (j);
       
-      for (size_t j=0, count=src_format.AttributesCount (); j<count; j++)
+      if (!dst_format.FindAttribute (attribute.semantic))
       {
-        const VertexAttribute& attribute = src_format.Attribute (j);
+        dst_format.AddAttribute (attribute.semantic, attribute.type, offset);
         
-        if (!dst_format.FindAttribute (attribute.semantic))
-        {
-          dst_format.AddAttribute (attribute.semantic, attribute.type, offset);
-          
-          offset += get_type_size (attribute.type);
-        }
+        offset += get_type_size (attribute.type);
       }
     }
-
-    impl->vertex_size = offset;
-
-    Convert (src_vb);
   }
-  catch (...)
-  {
-    delete impl;
-    throw;
-  }
+
+  impl->vertex_size = offset;
+
+  Convert (src_vb);
 }
 
 VertexStream::VertexStream (const VertexStream& vs, CloneMode mode)
-  : impl (clone_resource (vs.impl, mode, "media::geometry::VertexStream::VertexStream"))
+  : impl (clone (vs.impl, mode, "media::geometry::VertexStream::VertexStream"))
   {}
 
 VertexStream::~VertexStream ()
 {
-  release_resource (impl);
 }
 
 /*
     Присваивание
 */
 
-void VertexStream::Assign (const VertexStream& vs, CloneMode mode)
-{
-  VertexStream (vs, mode).Swap (*this);
-}
-
-void VertexStream::Assign (const VertexBuffer& vb, const VertexDeclaration& declaration)
-{
-  VertexStream (vb, declaration).Swap (*this);
-}
-
-void VertexStream::Assign (const VertexBuffer& vb)
-{
-  VertexStream (vb).Swap (*this);
-}
-
 VertexStream& VertexStream::operator = (const VertexStream& vs)
 {
-  Assign (vs);
-  return *this;
-}
-
-VertexStream& VertexStream::operator = (const VertexBuffer& vb)
-{
-  Assign (vb);
+  impl = vs.impl;
   return *this;
 }
 
@@ -167,7 +113,7 @@ VertexStream& VertexStream::operator = (const VertexBuffer& vb)
 
 size_t VertexStream::Id () const
 {
-  return reinterpret_cast<size_t> (impl);
+  return reinterpret_cast<size_t> (get_pointer (impl));
 }
 
 /*
@@ -247,9 +193,7 @@ void VertexStream::Reserve (size_t vertices_count)
 
 void VertexStream::Swap (VertexStream& vs)
 {
-  Impl* tmp  = vs.impl;
-  vs.impl    = impl;
-  impl       = tmp;
+  swap (impl, vs.impl);
 }
 
 namespace media

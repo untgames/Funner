@@ -10,10 +10,10 @@ const size_t DEFAULT_SOUND_SOURCE_ARRAY_RESERVE = 32;
     Описание реализации библиотеки звуков
 */
 
-typedef SharedResourceHolder<SoundSource> SoundSourceHolder;
-typedef vector<SoundSourceHolder>         SoundSourceArray;
+typedef ResourceHolder<SoundSource> SoundSourceHolder;
+typedef vector<SoundSourceHolder>   SoundSourceArray;
 
-struct SoundSourceLibrary::Impl: public SharedResource
+struct SoundSourceLibrary::Impl
 {
   string           name;          //имя модели
   SoundSourceArray sound_sources; //массив материалов
@@ -76,7 +76,6 @@ SoundSourceLibrary::SoundSourceLibrary (const SoundSourceLibrary& library)
 
 SoundSourceLibrary::~SoundSourceLibrary ()
 {
-  delete impl;
 }
 
 /*

@@ -1,5 +1,3 @@
-#include <stl/string>
-#include <shared/shared_resource.h>
 #include "shared.h"
 
 using namespace media;
@@ -10,7 +8,7 @@ using namespace common;
     Описание реализации SoundSource
 */
 
-struct SoundSource::Impl: public SharedResource
+struct SoundSource::Impl: public xtl::reference_counter
 {
   string          type;                //тип звука
   bool            looping;             //цикличность
@@ -41,16 +39,15 @@ SoundSource::Impl::Impl ()
 */
 
 SoundSource::SoundSource ()
-  : impl (new Impl)
+  : impl (new Impl, false)
   {}
 
 SoundSource::SoundSource (const SoundSource& sound_source, CloneMode mode)
-  : impl (clone_resource (sound_source.impl, mode, "media::SoundSource::SoundSource"))
+  : impl (clone (sound_source.impl, mode, "media::SoundSource::SoundSource"))
   {}
 
 SoundSource::~SoundSource ()
 {
-  release_resource (impl);
 }
 
 /*
@@ -59,14 +56,9 @@ SoundSource::~SoundSource ()
 
 SoundSource& SoundSource::operator = (const SoundSource& sound_source)
 {
-  Assign (sound_source);
+  impl = sound_source.impl;
 
   return *this;
-}
-
-void SoundSource::Assign (const SoundSource& sound_source, CloneMode mode)
-{
-  SoundSource (sound_source, mode).Swap (*this);
 }
 
 /*
@@ -178,7 +170,7 @@ float SoundSource::Param (SoundSourceParam param) const
 
 void SoundSource::Swap (SoundSource& sound_source)
 {
-  stl::swap (impl, sound_source.impl);  
+  swap (impl, sound_source.impl);  
 }
 
 namespace media

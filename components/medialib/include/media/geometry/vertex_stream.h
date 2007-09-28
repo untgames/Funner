@@ -3,6 +3,8 @@
 
 #include <media/geometry/defs.h>
 #include <media/geometry/vertex_format.h>
+#include <xtl/intrusive_ptr.h>
+#include <media/clone.h>
 
 namespace media
 {
@@ -52,7 +54,7 @@ class VertexStream
     VertexStream  (const VertexBuffer& source);
     VertexStream  (const VertexStream& source, const VertexDeclaration& declaration);
     VertexStream  (const VertexBuffer& source, const VertexDeclaration& declaration);
-    VertexStream  (const VertexStream&, CloneMode mode = CloneMode_Default);
+    VertexStream  (const VertexStream&, CloneMode mode = CloneMode_Instance);
     ~VertexStream ();
     
     template <class Vertex> VertexStream (size_t);
@@ -61,12 +63,7 @@ class VertexStream
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexStream& operator = (const VertexStream&);
-    VertexStream& operator = (const VertexBuffer&);
-    void          Assign     (const VertexStream&, CloneMode mode = CloneMode_Default);    
-    void          Assign     (const VertexBuffer&);
-    void          Assign     (const VertexStream&, const VertexDeclaration& declaration);
-    void          Assign     (const VertexBuffer&, const VertexDeclaration& declaration);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Идентификатор потока (уникальный)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +116,7 @@ class VertexStream
 
   private:
     struct Impl;
-    Impl* impl;
+    xtl::intrusive_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,14 +135,13 @@ class VertexWeightStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexWeightStream  ();
     VertexWeightStream  (size_t weights_count);
-    VertexWeightStream  (const VertexWeightStream&, CloneMode mode = CloneMode_Default);
+    VertexWeightStream  (const VertexWeightStream&, CloneMode mode = CloneMode_Instance);
     ~VertexWeightStream ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexWeightStream& operator = (const VertexWeightStream&);
-    void                Assign     (const VertexWeightStream&, CloneMode mode = CloneMode_Default);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Идентификатор потока (уникальный)
@@ -182,7 +178,7 @@ class VertexWeightStream
 
   private:
     struct Impl;
-    Impl* impl;
+    xtl::intrusive_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

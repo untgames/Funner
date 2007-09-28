@@ -31,9 +31,9 @@ int main ()
     
     printf ("s2 capacity: %u\n", s2.Capacity ());
     
-    s2 = s1;
+    s2 = clone (s1, CloneMode_Copy);
     
-    printf ("s2 = s1\n");
+    printf ("copy s1 to s2\n");
     dump (s2);
     
     printf ("clear s2\n");
@@ -44,19 +44,11 @@ int main ()
     
     printf ("instance s2\n");
     
-    s2.Assign (s1, CloneMode_Instance);
+    s2 = s1;
     
     s1.Resize (5);
 
-    dump (s2);
-    
-    printf ("instance s1 (default clone mode)\n");
-    
-    s1 = s2;    
-    
-    s2.Resize (4);
-    
-    dump (s1);
+    dump (s2);    
   }
   catch (std::exception& exception)
   {

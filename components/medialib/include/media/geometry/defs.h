@@ -2,7 +2,6 @@
 #define MEDIALIB_GEOMETRY_DEFINES_HEADER
 
 #include <stddef.h>
-#include <media/clone_mode.h>
 
 namespace media
 {

@@ -1,9 +1,4 @@
-#include <media/collada.h>
-#include <xtl/functional>
-#include <stdio.h>
-
-using namespace media::collada;
-using namespace xtl;
+#include "shared.h"
 
 const char* file_name = "data/ape.dae";
 

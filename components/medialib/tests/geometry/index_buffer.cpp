@@ -42,18 +42,18 @@ int main ()
     
     printf ("instance ib2\n");
     
-    ib2.Assign (ib1, CloneMode_Instance);
+    ib2 = ib1;
     
     ib1.Resize (5);
 
     dump (ib2);
     
-    printf ("instance ib1 (default clone mode)\n");
+    printf ("copy ib2\n");
     
-    ib1 = ib2;    
-    
+    ib1 = clone (ib2);
+
     ib2.Resize (4);
-    
+
     dump (ib1);
   }
   catch (std::exception& exception)

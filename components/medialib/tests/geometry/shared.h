@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <exception>
 #include <media/mesh.h>
+#include <media/collada.h>
 #include <xtl/function.h>
 
 using namespace media::geometry;

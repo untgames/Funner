@@ -21,9 +21,9 @@ int main ()
 
   dump (vs1);
   
-  printf ("vs2 = vs1\n");    
+  printf ("copy vs1 to vs2\n");    
   
-  vs2 = vs1;
+  vs2 = clone (vs1, CloneMode_Copy);
   
   dump (vs2);
   
@@ -47,7 +47,7 @@ int main ()
   
   printf ("instance vs2\n");
 
-  vs2.Assign (vs1, CloneMode_Instance);
+  vs2 = vs1;
   
   dump (vs2);
 

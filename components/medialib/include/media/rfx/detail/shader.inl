@@ -1,5 +1,5 @@
 /*
-    ®¯ëâª  ¯®á¥é¥­¨ï ®¡ê¥ªâ 
+    Ïîïûòêà ïîñåùåíèÿ îáúåêòà
 */
 
 namespace detail
@@ -24,4 +24,13 @@ inline bool Shader::TryAccept (T& visited, Visitor& visitor)
   visitor (visited, detail::touch_on_default_action (is_not_processed));
 
   return !is_not_processed;
+}
+
+/*
+    Êîïèðîâàíèå
+*/
+
+inline Shader::Pointer clone (Shader::Pointer ptr, CloneMode mode)
+{
+  return ptr ? ptr->Clone (mode) : 0;
 }
