@@ -1,5 +1,5 @@
-#ifndef SOUND_SHARED_HEADER
-#define SOUND_SHARED_HEADER
+#ifndef SOUND_LISTENER_HEADER
+#define SOUND_LISTENER_HEADER
 
 #include <mathlib.h>
 

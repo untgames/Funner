@@ -4,7 +4,7 @@
 #include <mathlib.h>
 #include <xtl/functional_fwd>
 #include <exception>
-#include "shared.h"
+#include <sound/listener.h>
 
 namespace sound
 {

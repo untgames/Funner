@@ -4,7 +4,7 @@
 #include <xtl/functional_fwd>
 #include <stl/auto_ptr.h>
 #include <mathlib.h>
-#include "shared.h"
+#include <sound/listener.h>
 
 namespace syslib
 {
