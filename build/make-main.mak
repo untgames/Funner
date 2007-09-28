@@ -27,7 +27,8 @@ DIST_BIN_DIR                            := $(DIST_DIR)/bin
 BUILD_DIR                               := $(ROOT)/$(BUILD_DIR_SHORT_NAME)
 PCH_SHORT_NAME                          := $(strip $(PCH_SHORT_NAME))
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := $(strip $(BATCH_COMPILE_FLAG_FILE_SHORT_NAME))
-TMP_DIRS                                := $(ROOT)/$(TMP_DIR_SHORT_NAME)
+ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)
+TMP_DIRS                                := $(ROOT_TMP_DIR)
 DIRS                                     = $(TMP_DIRS) $(DIST_DIR) $(DIST_LIB_DIR) $(DIST_BIN_DIR)
 EMPTY                                   :=
 SPACE                                   := $(EMPTY) $(EMPTY)
@@ -335,7 +336,7 @@ $(DIRS):
 
 #Очистка
 clean:
-	@$(if $(TMP_DIRS),$(RM) -r $(TMP_DIRS))
+	@$(if $(TMP_DIRS),$(RM) -r $(filter-out $(ROOT_TMP_DIR),$(TMP_DIRS)))
 
 fullyclean: clean
 	@$(RM) -r $(DIRS)
