@@ -12,6 +12,7 @@
 using namespace math;
 using namespace syslib;
 using namespace sound::low_level;
+using namespace sound;
 using namespace xtl;
 
 const char* file_name = "data/sound1.ogg";

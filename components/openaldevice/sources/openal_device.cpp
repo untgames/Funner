@@ -2,6 +2,7 @@
 
 using namespace common;
 using namespace stl;
+using namespace sound;
 using namespace sound::low_level;
 
 #ifdef _MSC_VER
