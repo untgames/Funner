@@ -1,0 +1,14 @@
+Results of iterator_test:
+expression '!i1' is true
+expression 'i2' is true
+expression 'i3' is true
+expression 'i4' is true
+dump range [iterator;iterator): 1 2 3 4 5 
+dump [iterator;empty) range: 1 2 3 4 5 
+reverse-dump [iterator;iterator) range: 5 4 3 2 1 
+expression 'i2 != i1' is true
+expression '--my_iter (i2) == i1' is true
+expression 'i3 == i1' is true
+expression 'i1 == i3' is true
+expression 'i4 == i2' is true
+exception: xtl::bad_iterator_dereference
