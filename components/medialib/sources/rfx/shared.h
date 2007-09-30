@@ -20,6 +20,7 @@
 #include <shared/resource_holder.h>
 #include <shared/clone.h>
 #include <shared/resource_manager.h>
+#include <shared/resource_library.h>
 
 namespace media
 {
@@ -28,16 +29,16 @@ namespace rfx
 {
 
 /*
-    Система управления материалами
+    Менеджер библиотек материалов
 */
 
-class MaterialSystemImpl: public ResourceManager<MaterialSystem::LoadHandler, MaterialSystem::SaveHandler>
+class MaterialLibraryManagerImpl: public ResourceManager<MaterialLibraryManager::LoadHandler, MaterialLibraryManager::SaveHandler>
 {
   public:
-    MaterialSystemImpl ();
+    MaterialLibraryManagerImpl ();
 };
 
-typedef common::Singleton<MaterialSystemImpl> MaterialSystemSingleton;
+typedef common::Singleton<MaterialLibraryManagerImpl> MaterialLibraryManagerSingleton;
 
 /*
     Утилиты    

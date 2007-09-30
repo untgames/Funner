@@ -5,45 +5,17 @@ using namespace media;
 using namespace stl;
 using namespace common;
 
-const size_t DEFAULT_MATERIAL_ARRAY_RESERVE = 32;
-
 /*
     Описание реализации библиотеки материалов
 */
 
-typedef ResourceHolder<Material> MaterialHolder;
-typedef vector<MaterialHolder>   MaterialArray;
+typedef ResourceLibrary<Material> MaterialLibraryHolder;
 
 struct MaterialLibrary::Impl
 {
-  string        name;      //имя модели
-  MaterialArray materials; //массив материалов
-
-  Impl ();
-  Impl (const Impl&);
+  string                name;      //имя модели
+  MaterialLibraryHolder materials; //библиотека материалов
 };
-
-/*
-    MaterialModel::Impl::Impl
-*/
-
-MaterialLibrary::Impl::Impl ()
-{
-  materials.reserve (DEFAULT_MATERIAL_ARRAY_RESERVE);
-}
-
-MaterialLibrary::Impl::Impl (const Impl& impl)
-  : name (impl.name)
-{
-  materials.reserve (impl.materials.size ());
-  
-  for (MaterialArray::const_iterator i=impl.materials.begin (), end=impl.materials.end (); i!=end; ++i)
-    materials.push_back (MaterialHolder (*i, ForceClone));
-}
-
-/*
-    MaterialLibrary
-*/
 
 /*
     Конструкторы / деструктор
@@ -56,19 +28,8 @@ MaterialLibrary::MaterialLibrary ()
 MaterialLibrary::MaterialLibrary (const char* file_name)
   : impl (new Impl)
 {
-  if (!file_name)
-    RaiseNullArgument ("media::MaterialLibrary::MaterialLibrary", "file_name");
-    
-  try
-  {
-    MaterialSystemSingleton::Instance ().Load (file_name, *this);
-    
-    Rename (file_name);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Raise ("media::MaterialLibrary::MaterialLibrary");
-  }
+  Load (file_name);
+  Rename (file_name);
 }
 
 MaterialLibrary::MaterialLibrary (const MaterialLibrary& library)
@@ -77,7 +38,6 @@ MaterialLibrary::MaterialLibrary (const MaterialLibrary& library)
 
 MaterialLibrary::~MaterialLibrary ()
 {
-  delete impl;
 }
 
 /*
@@ -108,53 +68,75 @@ void MaterialLibrary::Rename (const char* name)
 }
 
 /*
-    Количество мешей
+    Количество мешей / проверка на пустоту
 */
 
-size_t MaterialLibrary::MaterialsCount () const
+size_t MaterialLibrary::Size () const
 {
-  return impl->materials.size ();
+  return impl->materials.Size ();
+}
+
+bool MaterialLibrary::IsEmpty () const
+{
+  return impl->materials.IsEmpty ();
 }
 
 /*
-    Получение мешей
+    Получение итератора
 */
 
-const Material& MaterialLibrary::Material (size_t index) const
+MaterialLibrary::Iterator MaterialLibrary::CreateIterator ()
 {
-  if (index >= impl->materials.size ())
-    RaiseOutOfRange ("media::rfx::MaterialLibrary::Material", "index", index, impl->materials.size ());
-    
-  return impl->materials [index].Resource ();
+  return impl->materials.CreateIterator ();
 }
 
-Material& MaterialLibrary::Material (size_t index)
+MaterialLibrary::ConstIterator MaterialLibrary::CreateIterator () const
 {
-  return const_cast<media::rfx::Material&> (const_cast<const MaterialLibrary&> (*this).Material (index));
+  return impl->materials.CreateIterator ();
+}
+
+/*
+    Поиск
+*/
+
+Material* MaterialLibrary::Find (const char* name)
+{
+  return impl->materials.Find (name);
+}
+
+const Material* MaterialLibrary::Find (const char* name) const
+{
+  return impl->materials.Find (name);
 }
 
 /*
     Присоединение мешей
 */
 
-size_t MaterialLibrary::Attach (media::rfx::Material& Material, CloneMode mode)
+void MaterialLibrary::Attach (const char* name, Material& material, CloneMode mode)
 {
-  impl->materials.push_back (MaterialHolder (Material, mode));
-
-  return impl->materials.size () - 1;
+  impl->materials.Insert (name, material, mode);
 }
 
-void MaterialLibrary::Detach (size_t index)
+void MaterialLibrary::Detach (const char* name)
 {
-  if (index >= impl->materials.size ())
-    return;
-    
-  impl->materials.erase (impl->materials.begin () + index);
+  impl->materials.Remove (name);
 }
 
 void MaterialLibrary::DetachAll ()
 {
-  impl->materials.clear ();
+  impl->materials.Clear ();
+}
+
+/*
+    Очистка
+*/
+
+void MaterialLibrary::Clear ()
+{
+  DetachAll ();
+  
+  impl->name.clear ();
 }
 
 /*
@@ -163,7 +145,17 @@ void MaterialLibrary::DetachAll ()
 
 void MaterialLibrary::Load (const char* file_name)
 {
-  MaterialLibrary (file_name).Swap (*this);
+  if (!file_name)
+    RaiseNullArgument ("media::MaterialLibrary::Load", "file_name");
+    
+  try
+  {
+    MaterialLibraryManagerSingleton::Instance ().Load (file_name, *this);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Raise ("media::MaterialLibrary::Load");
+  }
 }
 
 void MaterialLibrary::Save (const char* file_name)
@@ -173,7 +165,7 @@ void MaterialLibrary::Save (const char* file_name)
     
   try
   {
-    MaterialSystemSingleton::Instance ().Save (file_name, *this);
+    MaterialLibraryManagerSingleton::Instance ().Save (file_name, *this);
   }
   catch (common::Exception& exception)
   {
@@ -187,7 +179,7 @@ void MaterialLibrary::Save (const char* file_name)
 
 void MaterialLibrary::Swap (MaterialLibrary& library)
 {
-  stl::swap (library.impl, impl);
+  swap (library.impl, impl);
 }
 
 namespace media
