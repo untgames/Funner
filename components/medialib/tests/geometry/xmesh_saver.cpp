@@ -75,14 +75,14 @@ int main ()
     mesh2.AddPrimitive (PrimitiveType_LineList, 0, 12, "material1");
     mesh2.AddPrimitive (PrimitiveType_LineStrip, 1, 14, "material2");    
 
-    MeshModel mesh_model;
+    MeshLibrary mesh_library;
 
-    mesh_model.Rename ("my_mesh_model");
+    mesh_library.Rename ("my_mesh_library");
     
-    mesh_model.Attach (mesh1);
-    mesh_model.Attach (mesh2);
+    mesh_library.Attach ("mesh1", mesh1);
+    mesh_library.Attach ("mesh2", mesh2);
 
-    mesh_model.Save (DST_FILE_NAME);
+    mesh_library.Save (DST_FILE_NAME);
   }
   catch (std::exception& exception)
   {

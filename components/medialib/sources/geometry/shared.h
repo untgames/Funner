@@ -14,6 +14,7 @@
 #include <xtl/bind.h>
 #include <xtl/ref.h>
 #include <xtl/reference_counter.h>
+#include <xtl/iterator.h>
 
 #include <mathlib.h>
 
@@ -23,11 +24,12 @@
 #include <common/xml_writer.h>
 #include <common/parser.h>
 
-#include <media/geometry/mesh_model.h>
+#include <media/geometry/mesh_library.h>
 
 #include <shared/resource_holder.h>
 #include <shared/clone.h>
 #include <shared/resource_manager.h>
+#include <shared/resource_library.h>
 
 namespace media
 {
@@ -79,19 +81,19 @@ void copy (size_t vertices_count, const void* source, VertexAttributeType source
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сохранение / загрузка мешей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void xmesh_save_model (const char* file_name, const MeshModel& model);
-void xmesh_load_model (const char* file_name, MeshModel& model);
+void xmesh_save_library (const char* file_name, const MeshLibrary& library);
+void xmesh_load_library (const char* file_name, MeshLibrary& library);
            
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Система управления меш-моделями
+///Менеджер библиотек мешей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class MeshSystemImpl: public ResourceManager<MeshSystem::LoadHandler, MeshSystem::SaveHandler>
+class MeshLibraryManagerImpl: public ResourceManager<MeshLibraryManager::LoadHandler, MeshLibraryManager::SaveHandler>
 {
   public:
-    MeshSystemImpl ();
+    MeshLibraryManagerImpl ();
 };
 
-typedef common::Singleton<MeshSystemImpl> MeshSystemSingleton;
+typedef common::Singleton<MeshLibraryManagerImpl> MeshLibraryManagerSingleton;
 
 }
 

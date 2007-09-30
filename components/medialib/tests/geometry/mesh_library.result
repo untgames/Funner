@@ -1,14 +1,14 @@
-Results of mesh_model_test:
+Results of mesh_library_test:
 attach meshes
-model 'model1' (4 meshes)
+library 'library1' (4 meshes)
   mesh 'mesh1'
   mesh 'mesh2'
   mesh 'mesh3'
   mesh 'mesh4'
 detach mesh
-model 'model1' (3 meshes)
+library 'library1' (3 meshes)
   mesh 'mesh1'
   mesh 'mesh2'
   mesh 'mesh4'
-clear model
-model 'model1' (0 meshes)
+clear library
+library '' (0 meshes)

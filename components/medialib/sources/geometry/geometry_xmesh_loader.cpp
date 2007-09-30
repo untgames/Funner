@@ -59,7 +59,7 @@ namespace
     Загрузчик меш-моделей в формате Xml
 */
 
-class XmlMeshModelLoader
+class XmlMeshLibraryLoader
 {
   private:
       //разбор вершинного формата
@@ -103,7 +103,7 @@ class XmlMeshModelLoader
 
         //разбор вершинного формата
       
-      for_each_child (vs_iter, "channel", xtl::bind (&XmlMeshModelLoader::ParseVertexFormatChannel, this, _1, xtl::ref (vertex_format)));
+      for_each_child (vs_iter, "channel", xtl::bind (&XmlMeshLibraryLoader::ParseVertexFormatChannel, this, _1, xtl::ref (vertex_format)));
       
         //создание вершинного потока        
       
@@ -343,27 +343,27 @@ class XmlMeshModelLoader
         
         //чтение примитивов
 
-      for_each_child (mesh_iter, "primitive", xtl::bind (&XmlMeshModelLoader::ParsePrimitive, this, _1, xtl::ref (mesh)));      
+      for_each_child (mesh_iter, "primitive", xtl::bind (&XmlMeshLibraryLoader::ParsePrimitive, this, _1, xtl::ref (mesh)));      
 
         //присоединение меша к модели
 
-      model.Attach (mesh);            
+      library.Attach (name, mesh);
     }
   
-      //разбор модели
-    void ParseModel (Parser::Iterator model_iter)
+      //разбор библиотеки
+    void ParseLibrary (Parser::Iterator library_iter)
     {     
-      for_each_child (model_iter, "vertex_streams.vertex_stream", xtl::bind (&XmlMeshModelLoader::ParseVertexStream, this, _1));
-      for_each_child (model_iter, "vertex_streams.vertex_weight_stream", xtl::bind (&XmlMeshModelLoader::ParseVertexWeightStream, this, _1));
-      for_each_child (model_iter, "vertex_buffers.vertex_buffer", xtl::bind (&XmlMeshModelLoader::ParseVertexBuffer, this, _1));
-      for_each_child (model_iter, "index_buffers.index_buffer", xtl::bind (&XmlMeshModelLoader::ParseIndexBuffer, this, _1));      
-      for_each_child (model_iter, "meshes.mesh", xtl::bind (&XmlMeshModelLoader::ParseMesh, this, _1));
+      for_each_child (library_iter, "vertex_streams.vertex_stream", xtl::bind (&XmlMeshLibraryLoader::ParseVertexStream, this, _1));
+      for_each_child (library_iter, "vertex_streams.vertex_weight_stream", xtl::bind (&XmlMeshLibraryLoader::ParseVertexWeightStream, this, _1));
+      for_each_child (library_iter, "vertex_buffers.vertex_buffer", xtl::bind (&XmlMeshLibraryLoader::ParseVertexBuffer, this, _1));
+      for_each_child (library_iter, "index_buffers.index_buffer", xtl::bind (&XmlMeshLibraryLoader::ParseIndexBuffer, this, _1));      
+      for_each_child (library_iter, "meshes.mesh", xtl::bind (&XmlMeshLibraryLoader::ParseMesh, this, _1));
     }
 
   public:
-    XmlMeshModelLoader (const char* file_name, MeshModel& in_model) : parser (file_name, "xml"), model (in_model)
+    XmlMeshLibraryLoader (const char* file_name, MeshLibrary& in_library) : parser (file_name, "xml"), library (in_library)
     {
-      ParseModel (parser.Root ()->First ("model"));
+      ParseLibrary (parser.Root ()->First ("mesh_library"));
     }
     
   private:
@@ -374,7 +374,7 @@ class XmlMeshModelLoader
 
   private:
     Parser                parser;         //парсер
-    MeshModel&            model;          //модель
+    MeshLibrary&          library;        //библиотека
     VertexStreamMap       vertex_streams; //загруженные вершинные потоки
     VertexWeightStreamMap vertex_weights; //загруженные потоки вершинных весов
     VertexBufferMap       vertex_buffers; //загруженные вершинные буферы
@@ -393,9 +393,9 @@ namespace geometry
     Загрузка меш-модели
 */
 
-void xmesh_load_model (const char* file_name, MeshModel& model)
+void xmesh_load_library (const char* file_name, MeshLibrary& library)
 {
-  XmlMeshModelLoader (file_name, model);
+  XmlMeshLibraryLoader (file_name, library);
 }
 
 }

@@ -38,7 +38,7 @@ namespace
      ласс, сохран€ющий меш-модели в Xml-формате
 */
 
-class XmlMeshModelSaver
+class XmlMeshLibrarySaver
 {
   private:
     typedef stl::hash_map<size_t, size_t> ResourceMap;
@@ -238,9 +238,9 @@ class XmlMeshModelSaver
     {
       XmlWriter::Scope scope (writer, "vertex_streams");
       
-      for (size_t i=0; i<model.MeshesCount (); i++)
+      for (MeshLibrary::ConstIterator i=library.CreateIterator (); i; ++i)
       {
-        const Mesh&         mesh = model.Mesh (i);
+        const Mesh&         mesh = *i;
         const VertexBuffer& vb   = mesh.VertexBuffer ();
 
         for (size_t j=0; j<vb.StreamsCount (); j++)
@@ -255,8 +255,8 @@ class XmlMeshModelSaver
     {
       XmlWriter::Scope scope (writer, "vertex_buffers");            
       
-      for (size_t i=0; i<model.MeshesCount (); i++)       
-        SaveVertexBuffer (model.Mesh (i).VertexBuffer ());
+      for (MeshLibrary::ConstIterator i=library.CreateIterator (); i; ++i)       
+        SaveVertexBuffer (i->VertexBuffer ());
     }
     
       //сохранение индексных буферов
@@ -264,8 +264,8 @@ class XmlMeshModelSaver
     {
       XmlWriter::Scope scope (writer, "index_buffers");            
       
-      for (size_t i=0; i<model.MeshesCount (); i++)
-        SaveIndexBuffer (model.Mesh (i).IndexBuffer ());
+      for (MeshLibrary::ConstIterator i=library.CreateIterator (); i; ++i)
+        SaveIndexBuffer (i->IndexBuffer ());
     }
     
       //сохранение мешей
@@ -273,14 +273,14 @@ class XmlMeshModelSaver
     {
       XmlWriter::Scope scope (writer, "meshes");      
       
-      for (size_t i=0; i<model.MeshesCount (); i++)
-        SaveMesh (model.Mesh (i));
+      for (MeshLibrary::ConstIterator i=library.CreateIterator (); i; ++i)
+        SaveMesh (*i);
     }
     
-      //сохранение модели
-    void SaveModel ()
+      //сохранение библиотеки
+    void SaveLibrary ()
     {
-      XmlWriter::Scope scope (writer, "model");
+      XmlWriter::Scope scope (writer, "mesh_library");
 
       SaveVertexStreams ();          
       SaveVertexBuffers ();
@@ -290,18 +290,18 @@ class XmlMeshModelSaver
     
   public:
       //конструктор
-    XmlMeshModelSaver (const char* file_name, const MeshModel& in_model) : writer (file_name), model (in_model)
+    XmlMeshLibrarySaver (const char* file_name, const MeshLibrary& in_library) : writer (file_name), library (in_library)
     {
-      SaveModel ();
+      SaveLibrary ();
     }
 
   private:
-    XmlWriter        writer;          //сериализатор Xml
-    const MeshModel& model;           //сохран€ема€ модель
-    ResourceMap      vertex_streams;  //сохранЄнные вершинные потоки
-    ResourceMap      vertex_buffers;  //сохранЄнные вершинные буферы
-    ResourceMap      vertex_weights;  //сохранЄнные потоки вершинных весов
-    ResourceMap      index_buffers;   //сохранЄнные индексные буферы
+    XmlWriter          writer;          //сериализатор Xml
+    const MeshLibrary& library;         //сохран€ема€ библиотека
+    ResourceMap        vertex_streams;  //сохранЄнные вершинные потоки
+    ResourceMap        vertex_buffers;  //сохранЄнные вершинные буферы
+    ResourceMap        vertex_weights;  //сохранЄнные потоки вершинных весов
+    ResourceMap        index_buffers;   //сохранЄнные индексные буферы
 };
 
 }
@@ -313,12 +313,12 @@ namespace geometry
 {
 
 /*
-    —охранение меш-модели
+    —охранение библиотеки мешей
 */
 
-void xmesh_save_model (const char* file_name, const MeshModel& model)
+void xmesh_save_library (const char* file_name, const MeshLibrary& library)
 {
-  XmlMeshModelSaver (file_name, model);
+  XmlMeshLibrarySaver (file_name, library);
 }
 
 }

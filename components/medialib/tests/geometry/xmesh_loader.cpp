@@ -9,7 +9,7 @@ int main ()
   {
     printf ("Results of xmesh_loader_test:\n");
     
-    MeshModel (SRC_MODEL_FILE_NAME).Save (DST_MODEL_FILE_NAME);
+    MeshLibrary (SRC_MODEL_FILE_NAME).Save (DST_MODEL_FILE_NAME);
   }
   catch (std::exception& exception)
   {

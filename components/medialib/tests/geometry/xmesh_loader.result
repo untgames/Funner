@@ -1,6 +1,6 @@
 Results of xmesh_loader_test:
 <?xml version="1.0" encoding="utf-8"?>
-<model>
+<mesh_library>
   <vertex_streams>
     <vertex_stream id="vs#1" vertices_count="4" vertex_size="36">
       <channel semantic="position" type="float3" offset="0">
@@ -56,4 +56,4 @@ Results of xmesh_loader_test:
       <primitive type="line_strip" material="material2" first="1" count="14"/>
     </mesh>
   </meshes>
-</model>
+</mesh_library>

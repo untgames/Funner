@@ -1,2 +1,2 @@
-#include <media/geometry/mesh_model.h>
+#include <media/geometry/mesh_library.h>
 #include <media/geometry/vertex.h>
