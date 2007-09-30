@@ -1,9 +1,9 @@
-Results of sound_source_test:
-Modified sound source:
-SoundSource type: 'Type1'
+Results of sound_declaration_test:
+Modified sound declaration:
+SoundDeclaration type: 'Type1'
 Looping: 'looped'
-Sounds count: 2
-Sounds:
+Samples count: 2
+Samples:
   'sound1.ogg'
   'sound2.ogg'
 Gain: 0.700000
@@ -15,24 +15,24 @@ Outer gain: 0.400000
 Reference distance: 25.000000
 Maximum distance: 90.000000
 Cull distance: 95.000000
-Initial sound source:
-SoundSource type: ''
+Initial sound declaration:
+SoundDeclaration type: ''
 Looping: 'not looped'
-Sounds count: 0
+Samples count: 0
 Gain: 1.000000
 Minimum gain: 0.000000
 Maximum gain: 1.000000
 Inner angle: 360.000000
 Outer angle: 360.000000
 Outer gain: 1.000000
-Reference distance: 0.000000
-Maximum distance: 0.000000
-Cull distance: 0.000000
+Reference distance: 1000000.000000
+Maximum distance: 1000000.000000
+Cull distance: 1000000.000000
 Deleting one sound:
-SoundSource type: 'Type1'
+SoundDeclaration type: 'Type1'
 Looping: 'looped'
-Sounds count: 1
-Sounds:
+Samples count: 1
+Samples:
   'sound2.ogg'
 Gain: 0.700000
 Minimum gain: 0.100000
