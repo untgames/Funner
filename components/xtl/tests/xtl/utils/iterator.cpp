@@ -1,5 +1,6 @@
 #include <stl/vector>
 #include <stl/list>
+#include <stl/map>
 #include <stl/algorithm>
 #include <xtl/iterator.h>
 
@@ -23,9 +24,15 @@ int main ()
     static int array [] = {1, 2, 3, 4, 5};
     
     vector<int> vec (array, array + 5);
-    list<int>   list (vec.begin (), vec.end ());  
+    map<int, int> m;
     
-    my_iter i1, i2 = make_iterator (list, 0), i3 = vec.begin (), i4 = vec.end ();
+    m [0] = 1;
+    m [1] = 2;
+    m [2] = 3;
+    m [3] = 4;
+    m [4] = 5;
+    
+    my_iter i1, i2 = make_iterator<int> (m.begin (), m.begin (), m.end ()), i3 = vec.begin (), i4 = vec.end ();
     
     TEST (!i1);  
     TEST (i2);
@@ -58,6 +65,10 @@ int main ()
     TEST (i3 == i1);
     TEST (i1 == i3);
     TEST (i4 == i2);
+
+    i2++; //проверка "ленивого" копирования
+
+    TEST (i4 != i2);
 
     *i1;    
   }

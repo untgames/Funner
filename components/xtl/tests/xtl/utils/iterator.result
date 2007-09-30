@@ -11,4 +11,5 @@ expression '--my_iter (i2) == i1' is true
 expression 'i3 == i1' is true
 expression 'i1 == i3' is true
 expression 'i4 == i2' is true
+expression 'i4 != i2' is true
 exception: xtl::bad_iterator_dereference

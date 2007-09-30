@@ -7,17 +7,17 @@ namespace detail
 
 template <class T> struct iterator_interface
 {
-  typedef T value_type;
-
   virtual ~iterator_interface () {}
 
-  virtual T&                  get     () = 0;
-  virtual bool                empty   () = 0;
-  virtual void                next    () = 0;
-  virtual void                prev    () = 0;
-  virtual bool                equal   (const iterator_interface&) = 0;
-  virtual iterator_interface* clone   () = 0;
-  virtual void                release () { delete this; }
+  virtual T&                  get       () = 0;
+  virtual bool                empty     () = 0;
+  virtual void                next      () = 0;
+  virtual void                prev      () = 0;
+  virtual bool                equal     (const iterator_interface&) = 0;
+  virtual iterator_interface* clone     () = 0;
+  virtual size_t              use_count () = 0;
+  virtual void                addref    () = 0;
+  virtual void                release   () = 0;
 };
 
 /*
@@ -48,68 +48,84 @@ template <class Iter> void iterator_prev (Iter& iter, stl::bidirectional_iterato
     Хранителище для итератора
 */
 
-template <class Iter> class iterator_base: public iterator_interface<typename stl::iterator_traits<Iter>::value_type>
+template <class T, class Iter, class Fn> class iterator_base: public iterator_interface<T>
 {
   public:
-    iterator_base (const Iter& in_iter) : iter (in_iter) {}
+    iterator_base (const Iter& in_iter, const Fn& in_selector) : iter (in_iter), selector (in_selector), ref_count (1) {}
+    iterator_base (const iterator_base& i) : iter (i.iter), selector (i.selector), ref_count (1) {}
     
     bool equal (const iterator_interface& i)
     {
       const iterator_base* impl = dynamic_cast<const iterator_base*> (&i);
 
       return impl && iter == impl->iter;
-    }    
+    }
+    
+    T& get () { return selector (*iter); }
+    
+    size_t use_count () { return ref_count; }
+    
+    void addref  () { ++ref_count; }
+    void release ()
+    {
+      if (!--ref_count)
+        delete this;
+    }
+  
+  private:
+    iterator_base& operator = (const iterator_base&); //no impl
 
   protected:
-    Iter iter;
+    Iter   iter;
+    size_t ref_count;
+    Fn     selector;
 };
 
 /*
     Реализация обычного итератора
 */
 
-template <class Iter> class iterator_impl: public iterator_base<Iter>
+template <class T, class Iter, class Fn> class iterator_impl: public iterator_base<T, Iter, Fn>
 {
   public:
-    typedef iterator_base<Iter>                                    base;  
+    typedef iterator_base<T, Iter, Fn>                             base;  
     typedef typename stl::iterator_traits<Iter>::iterator_category iterator_category;
-    typedef typename base::value_type                              value_type;
   
-    iterator_impl (const Iter& in_iter) : base (in_iter) {}
+    iterator_impl (const Iter& in_iter, const Fn& in_selector) : base (in_iter, in_selector) {}
     
     bool                empty () { return !iter; }
     void                next  () { detail::iterator_next (iter, iterator_category ()); }
     void                prev  () { detail::iterator_prev (iter, iterator_category ()); }
     iterator_interface* clone () { return new iterator_impl (*this); }
 
-    value_type& get ()
+    T& get ()
     {
       if (!iter)
         throw xtl::bad_iterator_dereference ();
 
-      return *iter;
-    }
+      return base::get ();
+    }    
 };
 
 /*
     Реализация интервального итератора
 */
 
-template <class Iter> class range_iterator_impl: public iterator_base<Iter>
+template <class T, class Iter, class Fn> class range_iterator_impl: public iterator_base<T, Iter, Fn>
 {
   public:
-    typedef iterator_base<Iter>                                    base;
+    typedef iterator_base<T, Iter, Fn>                             base;
     typedef typename stl::iterator_traits<Iter>::iterator_category iterator_category;
-    typedef typename base::value_type                              value_type;
   
-    range_iterator_impl (const Iter& in_iter, const Iter& in_first, const Iter& in_last) : base (in_iter), first (in_first), last (in_last) {}
+    range_iterator_impl (const Iter& in_iter, const Iter& in_first, const Iter& in_last, const Fn& in_selector) 
+      : base (in_iter, in_selector), first (in_first), last (in_last) {}
     
-    value_type& get ()
+    T& get ()
     {
       if (iter == last)
         throw xtl::bad_iterator_dereference ();
 
-      return *iter;
+      return base::get ();
     }
     
     bool empty () { return iter == last; }
@@ -138,12 +154,14 @@ template <class Iter> class range_iterator_impl: public iterator_base<Iter>
 
 template <class T> struct empty_iterator_impl: public iterator_interface<T>
 {
-  T&                  get     () { throw xtl::bad_iterator_dereference (); }
-  bool                empty   () { return true; }
-  void                next    () {}
-  void                prev    () {}
-  iterator_interface* clone   () { return this; }
-  void                release () {}
+  T&                  get       () { throw xtl::bad_iterator_dereference (); }
+  bool                empty     () { return true; }
+  void                next      () {}
+  void                prev      () {}
+  iterator_interface* clone     () { return this; }
+  size_t              use_count () { return 1; }
+  void                addref    () {}
+  void                release   () {}
 
   bool equal (const iterator_interface& iter)
   {
@@ -157,6 +175,17 @@ template <class T> struct empty_iterator_impl: public iterator_interface<T>
 
     return iter;
   }
+};
+
+/*
+    Селектор по умолчанию
+*/
+
+template <class T>
+struct default_iterator_selector
+{
+                      T& operator () (T& value) const                { return value; }
+  template <class T1> T& operator () (stl::pair<T1, T>& value) const { return value.second; }
 };
 
 }
@@ -176,23 +205,30 @@ inline iterator<T>::iterator ()
 
 template <class T>
 inline iterator<T>::iterator (const iterator& i)
-  : impl (i.impl->clone ())
-  {}
-  
-template <class T> template <class T1>
-inline iterator<T>::iterator (const iterator<T1>& i)
-  : impl (i.impl->clone ())
-  {}
+  : impl (i.impl)
+{
+  impl->addref ();
+}
 
 template <class T> template <class Iter>
 inline iterator<T>::iterator (Iter iter)
-  : impl (new detail::iterator_impl<Iter> (iter))
+  : impl (new detail::iterator_impl<T, Iter, detail::default_iterator_selector<T> > (iter, detail::default_iterator_selector<T> ()))
   {}
+
+template <class T> template <class Iter, class Fn>
+inline iterator<T>::iterator (Iter iter, Fn selector)
+  : impl (new detail::iterator_impl<T, Iter, Fn> (iter, selector)), shared (false)
+  {}  
 
 template <class T> template <class Iter>
 inline iterator<T>::iterator (Iter iter, Iter first, Iter last)
-  : impl (new detail::range_iterator_impl<Iter> (iter, first, last))
+  : impl (new detail::range_iterator_impl<T, Iter, detail::default_iterator_selector<T> > (iter, first, last, detail::default_iterator_selector<T> ()))
   {}
+
+template <class T> template <class Iter, class Fn>
+inline iterator<T>::iterator (Iter iter, Iter first, Iter last, Fn selector)
+  : impl (new detail::range_iterator_impl<T, Iter, Fn> (iter, first, last, selector))
+  {}  
 
 template <class T>
 inline iterator<T>::~iterator ()
@@ -206,13 +242,6 @@ inline iterator<T>::~iterator ()
 
 template <class T>
 inline iterator<T>& iterator<T>::operator = (const iterator& i)
-{
-  iterator (i).swap (*this);
-  return *this;
-}
-
-template <class T> template <class T1>
-inline iterator<T>& iterator<T>::operator = (const iterator<T1>& i)
 {
   iterator (i).swap (*this);
   return *this;
@@ -274,14 +303,22 @@ inline typename iterator<T>::pointer iterator<T>::operator -> () const
 template <class T>
 inline iterator<T>& iterator<T>::operator ++ ()
 {
+  if (impl->use_count () > 1)
+    impl = impl->clone ();
+
   impl->next ();
+
   return *this;
 }
 
 template <class T>
 inline iterator<T>& iterator<T>::operator -- ()
 {
+  if (impl->use_count () > 1)
+    impl = impl->clone ();
+
   impl->prev ();
+
   return *this;
 }
 
@@ -339,10 +376,38 @@ inline void swap (iterator<T>& i1, iterator<T>& i2)
   i1.swap (i2);
 }
 
+/*
+    Создание итератора
+*/
+
+template <class T, class Iter>
+inline iterator<T> make_iterator (Iter i)
+{
+  return iterator<T> (i);
+}
+
 template <class Iter>
 inline iterator<typename stl::iterator_traits<Iter>::value_type> make_iterator (Iter i)
 {
   return iterator<typename stl::iterator_traits<Iter>::value_type> (i);
+}
+
+template <class T, class Iter, class Fn>
+inline iterator<T> make_iterator (Iter i, Fn selector)
+{
+  return iterator<T> (i, selector);
+}
+
+template <class Iter, class Fn>
+inline iterator<typename stl::iterator_traits<Iter>::value_type> make_iterator (Iter i, Fn selector)
+{
+  return iterator<typename stl::iterator_traits<Iter>::value_type> (i, selector);
+}
+
+template <class T, class Iter>
+inline iterator<T> make_iterator (Iter iter, Iter first, Iter last)
+{
+  return iterator<T> (iter, first, last);
 }
 
 template <class Iter>
@@ -351,22 +416,14 @@ inline iterator<typename stl::iterator_traits<Iter>::value_type> make_iterator (
   return iterator<typename stl::iterator_traits<Iter>::value_type> (iter, first, last);
 }
 
-template <class Container>
-inline iterator<typename Container::value_type> make_iterator (Container& c, size_t offset)
+template <class T, class Iter, class Fn>
+inline iterator<T> make_iterator (Iter iter, Iter first, Iter last, Fn selector)
 {
-  typename Container::iterator iter = c.begin ();
-  
-  stl::advance (iter, offset);
-  
-  return make_iterator (iter, c.begin (), c.end ());
+  return iterator<T> (iter, first, last, selector);
 }
 
-template <class Container>
-inline iterator<const typename Container::value_type> make_iterator (const Container& c, size_t offset)
+template <class Iter, class Fn>
+inline iterator<typename stl::iterator_traits<Iter>::value_type> make_iterator (Iter iter, Iter first, Iter last, Fn selector)
 {
-  typename Container::const_iterator iter = c.begin ();
-  
-  stl::advance (iter, offset);
-  
-  return make_iterator (iter, c.begin (), c.end ());
+  return iterator<typename stl::iterator_traits<Iter>::value_type> (iter, first, last, selector);
 }

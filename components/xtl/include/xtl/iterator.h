@@ -3,6 +3,14 @@
 
 #include <stl/iterator_traits.h>
 
+namespace stl
+{
+
+//forward declaration
+template <class T1, class T2> struct pair;
+
+}
+
 namespace xtl
 {
 
@@ -60,16 +68,16 @@ class iterator
     iterator  (const iterator&);
     ~iterator ();
     
-    template <class Iter> iterator (Iter);
-    template <class Iter> iterator (Iter iter, Iter first, Iter last);
-    template <class T1>   iterator (const iterator<T1>&);
+    template <class Iter>           iterator (Iter iter);
+    template <class Iter, class Fn> iterator (Iter iter, Fn selector);
+    template <class Iter>           iterator (Iter iter, Iter first, Iter last);
+    template <class Iter, class Fn> iterator (Iter iter, Iter first, Iter last, Fn selector);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     iterator& operator = (const iterator&);
 
-    template <class T1>   iterator& operator = (const iterator<T1>&);
     template <class Iter> iterator& operator = (Iter);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,16 +131,26 @@ template <class T> void swap (iterator<T>&, iterator<T>&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание итератора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Iter> iterator<typename stl::iterator_traits<Iter>::value_type> make_iterator (Iter);
+template <class Iter>          iterator<typename stl::iterator_traits<Iter>::value_type> make_iterator (Iter iter);
+template <class T, class Iter> iterator<T>                                               make_iterator (Iter iter);
+
+template <class Iter, class Fn>
+iterator<typename stl::iterator_traits<Iter>::value_type> make_iterator (Iter iter, Fn selector);
+
+template <class T, class Iter, class Fn>
+iterator<T> make_iterator (Iter iter, Fn selector);
 
 template <class Iter>
 iterator<typename stl::iterator_traits<Iter>::value_type> make_iterator (Iter iter, Iter first, Iter last);
 
-template <class Container>
-iterator<typename Container::value_type> make_iterator (Container& c, size_t offset);
+template <class T, class Iter>
+iterator<T> make_iterator (Iter iter, Iter first, Iter last);
 
-template <class Container>
-iterator<const typename Container::value_type> make_iterator (const Container& c, size_t offset);
+template <class Iter, class Fn>
+iterator<typename stl::iterator_traits<Iter>::value_type> make_iterator (Iter iter, Iter first, Iter last, Fn selector);
+
+template <class T, class Iter, class Fn>
+iterator<T> make_iterator (Iter iter, Iter first, Iter last, Fn selector);
 
 #include <xtl/detail/iterator.inl>
 
