@@ -31,11 +31,17 @@ void DaeParser::ParseEffect (Parser::Iterator iter)
   
     //создание эффекта
     
-  Effect& effect = model.Effects ().Create (id);  
+  Effect effect;
+  
+  effect.SetId (id);
 
     //разбор профилей эффекта
 
   parse_if (iter, "profile_COMMON", xtl::bind (&DaeParser::ParseEffectProfileCommon, this, _1, ref (effect)));
+  
+    //добавление эффекта в библиотеку
+    
+  model.Effects ().Insert (effect);
 }
 
 void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect& effect)
@@ -55,8 +61,12 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
     //чтение экстра параметров
     
   if (Parser::Iterator bump_texture_iter = technique_iter->First ("extra.technique.bump.texture"))
-    if (!ParseTexture (bump_texture_iter, profile_iter, effect.CreateTexture (TextureMap_Bump)))
-      effect.RemoveTexture (TextureMap_Bump);
+  {
+    Texture texture;
+
+    if (ParseTexture (bump_texture_iter, profile_iter, texture))
+      effect.SetTexture (TextureMap_Bump, texture);
+  }
 
     //чтение типа шейдера
 
@@ -143,8 +153,10 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
         continue;
       }
       
-      if (!ParseTexture (texture_iter, profile_iter, effect.CreateTexture (texmaps [i].value)))
-        effect.RemoveTexture (texmaps [i].value);
+      Texture texture;
+      
+      if (ParseTexture (texture_iter, profile_iter, texture))
+        effect.SetTexture (texmaps [i].value, texture);      
     }      
   }
 }

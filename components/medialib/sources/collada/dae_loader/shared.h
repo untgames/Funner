@@ -1,12 +1,19 @@
 #ifndef MEDIALIB_DAE_SHARED_HEADER
 #define MEDIALIB_DAE_SHARED_HEADER
 
-#include <media/collada/model.h>
-#include <common/parser.h>
-#include <xtl/functional>
+#include <stdarg.h>
+
 #include <stl/hash_map>
 #include <stl/vector>
 #include <stl/string>
+
+#include <media/collada.h>
+
+#include <common/parser.h>
+#include <common/hash.h>
+
+#include <xtl/functional>
+
 #include <math/io.h>
 
 using namespace media::collada;

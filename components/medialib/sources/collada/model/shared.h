@@ -1,11 +1,25 @@
 #ifndef MEDIALIB_COLLADA_SHARED_HEADER
 #define MEDIALIB_COLLADA_SHARED_HEADER
 
-#include <media/collada/model.h>
-#include <common/singleton.h>
-#include <xtl/functional>
+#include <stl/string>
+#include <stl/vector>
 #include <stl/hash_map>
+
+#include <xtl/reference_counter.h>
+#include <xtl/functional>
+
+#include <common/exception.h>
+#include <common/singleton.h>
+
+#include <media/collada.h>
+
+#include <shared/clone.h>
+#include <shared/resource_holder.h>
 #include <shared/resource_manager.h>
+#include <shared/resource_library.h>
+
+#include "library.h"
+#include "collection.h"
 
 namespace media
 {
@@ -14,20 +28,15 @@ namespace collada
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Система управления моделями
+///Реализация менеджера моделей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ModelSystemImpl : public ResourceManager<ModelSystem::LoadHandler, ModelSystem::SaveHandler>
+class ModelManagerImpl : public ResourceManager<ModelManager::LoadHandler, ModelManager::SaveHandler>
 {
   public:
-    ModelSystemImpl ();
+    ModelManagerImpl ();
 };
 
-typedef common::Singleton<ModelSystemImpl> ModelSystemSingleton;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение имени модели
-///////////////////////////////////////////////////////////////////////////////////////////////////
-const char* get_model_name (ModelImpl*);
+typedef common::Singleton<ModelManagerImpl> ModelManagerSingleton;
 
 }
 

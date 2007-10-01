@@ -1,85 +1,66 @@
-#include <media/collada/scene.h>
-#include <stl/string>
-
-#include "collection.h"
+#include "shared.h"
 
 using namespace media::collada;
-
-#ifdef _MSC_VER
-  #pragma warning (disable : 4355) //'this' : used in base member initializer list
-#endif
-
-/*
-    Коллекция мешей
-*/
-
-namespace
-{
-
-class ConstructableInstanceMesh: public InstanceMesh
-{
-  public:
-    ConstructableInstanceMesh (media::collada::Mesh& mesh) : InstanceMesh (mesh) {}
-    ~ConstructableInstanceMesh () {}  
-};
-
-}
-
-class InstanceMeshCollection: public Collection<InstanceMesh, ConstructableInstanceMesh, true>
-{
-  public:
-    InstanceMeshCollection (Entity& owner) : Collection<InstanceMesh, ConstructableInstanceMesh, true> (owner) {}
-  
-    InstanceMesh& Create (Mesh& mesh)
-    {
-      ConstructableInstanceMesh* instance_mesh = new ConstructableInstanceMesh (mesh);
-      
-      try
-      {
-        InsertCore (*instance_mesh);
-
-        return *instance_mesh;
-      }
-      catch (...)
-      {
-        delete instance_mesh;
-        throw;
-      }    
-    }
-};
 
 /*
     Описание реализации узла
 */
 
-typedef Collection<Node>       NodeListImpl;
-typedef Collection<Light>      LightListImpl;
-typedef Collection<Camera>     CameraListImpl;
+typedef CollectionImpl<Node>         NodeListImpl;
+typedef CollectionImpl<Light>        LightListImpl;
+typedef CollectionImpl<Camera>       CameraListImpl;
+typedef CollectionImpl<InstanceMesh> InstanceMeshListImpl;
 
-struct Node::Impl
+struct Node::Impl: public xtl::reference_counter
 {
-  stl::string            sid;     //идентификатор узла в пределах родителя
-  stl::string            name;    //имя узла
-  math::mat4f            tm;      //матрица преобразований узла
-  NodeListImpl           nodes;   //вложенные узлы
-  LightListImpl          lights;  //источники света
-  CameraListImpl         cameras; //камеры
-  InstanceMeshCollection meshes;  //меши
-
-  Impl (Entity& entity) : nodes (entity), lights (entity), cameras (entity), meshes (entity) {}
+  stl::string          id;      //идентификатор узла
+  stl::string          sid;     //идентификатор узла в пределах родителя
+  stl::string          name;    //имя узла
+  math::mat4f          tm;      //матрица преобразований узла
+  NodeListImpl         nodes;   //вложенные узлы
+  LightListImpl        lights;  //источники света
+  CameraListImpl       cameras; //камеры
+  InstanceMeshListImpl meshes;  //меши
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
-Node::Node (ModelImpl* owner, const char* id)
-  : Entity (owner, id), impl (new Impl (*this))
+Node::Node ()
+  : impl (new Impl, false)
+  {}
+  
+Node::Node (const Node& node, media::CloneMode mode)
+  : impl (media::clone (node.impl, mode, "media::collada::Node::Node"))
   {}
 
 Node::~Node ()
 {
-  delete impl;
+}
+
+Node& Node::operator = (const Node& node)
+{
+  impl = node.impl;
+
+  return *this;
+}
+
+/*
+    Идентификатор узла
+*/
+
+const char* Node::Id () const
+{
+  return impl->id.c_str ();
+}
+
+void Node::SetId (const char* id)
+{
+  if (!id)
+    common::RaiseNullArgument ("media::collada::Node::SetId", "id");
+    
+  impl->id = id;
 }
 
 /*

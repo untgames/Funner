@@ -1,69 +1,59 @@
-#include <media/collada/geometry.h>
-
-#include "collection.h"
+#include "shared.h"
 
 using namespace media::collada;
-
-#ifdef _MSC_VER
-  #pragma warning (disable : 4355) //'this' : used in base member initializer list
-#endif
+using namespace common;
 
 /*
     Реализация Mesh
 */
 
-namespace
+typedef CollectionImpl<Surface> SurfaceCollection;
+
+struct Mesh::Impl: public xtl::reference_counter
 {
-
-//конструируемый Surface
-class ConstructableSurface: public Surface
-{
-  public:
-    ConstructableSurface (media::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
-      : Surface (type, verts_count, indices_count) {}
-};
-
-//список поверхностей
-class SurfaceListImpl: public Collection<Surface, ConstructableSurface, true>
-{
-  public:
-    SurfaceListImpl (Entity& owner) : Collection<Surface, ConstructableSurface, true> (owner) {}
-  
-    Surface& Create (PrimitiveType type, size_t verts_count, size_t indices_count)
-    {
-      ConstructableSurface* surface = new ConstructableSurface (type, verts_count, indices_count);
-      
-      try
-      {
-        InsertCore (*surface);
-
-        return *surface;
-      }
-      catch (...)
-      {
-        delete surface;
-        throw;
-      }
-    }
-};
-
-}
-
-//реализация Mesh
-struct Mesh::Impl
-{
-  SurfaceListImpl surfaces; //поверхности меша  
-  
-  Impl (Entity& owner) : surfaces (owner) {}
+  SurfaceCollection surfaces; //поверхности меша
+  stl::string       id;       //идентификатор меша  
 };
 
 /*
     Конструктор
 */
 
-Mesh::Mesh (ModelImpl* owner, const char* id)
-  : Entity (owner, id), impl (new Impl (*this))
+Mesh::Mesh ()
+  : impl (new Impl, false)
   {}
+  
+Mesh::Mesh (const Mesh& mesh, media::CloneMode mode)
+  : impl (media::clone (mesh.impl, mode, "media::collada::Mesh::Mesh"))
+  {}
+  
+Mesh::~Mesh ()
+{
+}
+
+Mesh& Mesh::operator = (const Mesh& mesh)
+{
+  impl = mesh.impl;
+  
+  return *this;
+}
+
+/*
+    Идентификатор меша
+*/
+
+const char* Mesh::Id () const
+{
+  return impl->id.c_str ();
+}
+
+void Mesh::SetId (const char* id)
+{
+  if (!id)
+    RaiseNullArgument ("media::collada::Mesh::SetId", "id");
+    
+  impl->id = id;
+}
 
 /*
     Список поверхностей

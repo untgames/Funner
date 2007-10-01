@@ -1,64 +1,76 @@
-#include <media/collada/material.h>
-#include <common/exception.h>
+#include "shared.h"
 
 using namespace media::collada;
+using namespace media;
 using namespace common;
 
 /*
     Реализация эффекта
 */
 
-namespace
-{
-
-class TextureImpl: public Texture
-{
-  public:
-    TextureImpl () {}
-    ~TextureImpl () {}
-};
-
-}
+typedef ResourceHolder<Texture> TextureHolder;
 
 struct Map
 {
-  TextureImpl* texture; //текстура
-  math::vec4f  color;   //цвет карты  
+  TextureHolder texture; //текстура
+  math::vec4f   color;   //цвет карты
   
-  Map () : texture (0) {}
+  Map () {}
+  Map (const Map& map) : texture (map.texture, ForceClone), color (map.color) {}
 };
 
-struct Effect::Impl
+struct Effect::Impl: public xtl::reference_counter
 {
   media::collada::ShaderType  shader_type;                     //тип шейдера
-  Map                            maps [TextureMap_Num];           //карты
-  float                          shader_params [EffectParam_Num]; //параметры шейдинга
+  Map                         maps [TextureMap_Num];           //карты
+  float                       shader_params [EffectParam_Num]; //параметры шейдинга
+  stl::string                 id;                              //идентификатор эффекта
   
   Impl () : shader_type (ShaderType_Default)
   {
     for (size_t i=0; i<EffectParam_Num; i++)
       shader_params [i] = 0.0f;
-  }
-  
-  ~Impl ()
-  {
-    for (size_t i=0; i<TextureMap_Num; i++)
-      delete maps [i].texture;
-  }
+  }  
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
-Effect::Effect (ModelImpl* owner, const char* id)
-  : Entity (owner, id),
-    impl (new Impl)
+Effect::Effect ()
+  : impl (new Impl, false)
+  {}
+  
+Effect::Effect (const Effect& effect, media::CloneMode mode)
+  : impl (media::clone (effect.impl, mode, "media::collada::Effect::Effect"))
   {}
 
 Effect::~Effect ()
 {
-  delete impl;
+}
+
+Effect& Effect::operator = (const Effect& effect)
+{
+  impl = effect.impl;
+  
+  return *this;
+}
+
+/*
+    Идентификатор эффекта
+*/
+
+const char* Effect::Id () const
+{
+  return impl->id.c_str ();
+}
+
+void Effect::SetId (const char* id)
+{
+  if (!id)
+    RaiseNullArgument ("media::collada::Effect::SetId", "id");
+    
+  impl->id = id;
 }
 
 /*
@@ -90,25 +102,12 @@ void Effect::SetShaderType (media::collada::ShaderType type)
     Работа с текстурными картами
 */
 
-bool Effect::HasTexture (TextureMap map) const
-{
-  if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("media::collada::Effect::HasTexture", "map", map);
-    
-  return impl->maps [map].texture != 0;
-}
-
 const Texture& Effect::Texture (TextureMap map) const
 {
   if (map < 0 || map >= TextureMap_Num)
     RaiseInvalidArgument ("media::collada::Effect::Texture", "map", map);
     
-  media::collada::Texture* texture = impl->maps [map].texture;
-  
-  if (!texture)
-    RaiseInvalidArgument ("media::collada::Effect::Texture", "map", map, "There is no texture attached to this map");
-
-  return *texture;
+  return impl->maps [map].texture.Resource ();
 }
 
 Texture& Effect::Texture (TextureMap map)
@@ -116,32 +115,20 @@ Texture& Effect::Texture (TextureMap map)
   return const_cast<media::collada::Texture&> (const_cast<const Effect&> (*this).Texture (map));
 }
 
-Texture& Effect::CreateTexture (TextureMap map)
+void Effect::SetTexture (TextureMap map, media::collada::Texture& texture, media::CloneMode mode)
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("media::collada::Effect::CreateTexture", "map", map);
+    RaiseInvalidArgument ("media::collada::Effect::SetTexture", "map", map);
     
-  media::collada::Texture* texture = impl->maps [map].texture;
-  
-  if (!texture)
-    texture = impl->maps [map].texture = new TextureImpl;
-
-  return *texture;
+  impl->maps [map].texture.Attach (texture, mode);
 }
 
-void Effect::RemoveTexture (TextureMap map)
+bool Effect::HasTexture (TextureMap map) const
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("media::collada::Effect::CreateTexture", "map", map);
+    return false;
     
-  TextureImpl* texture = impl->maps [map].texture;
-  
-  if (!texture)
-    return;
-
-  delete texture;
-
-  impl->maps [map].texture = 0;
+  return *impl->maps [map].texture.Resource ().Image () != '\0';
 }
 
 /*

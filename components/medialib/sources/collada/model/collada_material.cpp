@@ -1,50 +1,72 @@
-#include <media/collada/material.h>
+#include "shared.h"
 
 using namespace media::collada;
-
-#ifdef _MSC_VER
-  #pragma warning (disable : 4355) //'this' : used in base member initializer list
-#endif
+using namespace media;
+using namespace common;
 
 /*
     Реализация библиотеки
 */
 
-struct Material::Impl
+struct Material::Impl: public xtl::reference_counter
 {
-  media::collada::Effect& effect;  //эффект, связанный с материалом
-  
-  Impl (Entity& entity, media::collada::Effect& in_effect) : effect (in_effect)
-  {
-    if (effect.Owner () != entity.Owner ())
-      raise_incompatible ("media::collada::Material::Material", effect, entity);
-  }
+  stl::string effect; //эффект, связанный с материалом
+  stl::string id;     //идентификатор материала  
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
-Material::Material (media::collada::Effect& effect, ModelImpl* owner, const char* id)
-  : Entity (owner, id),
-    impl (new Impl (*this, effect))
+Material::Material ()
+  : impl (new Impl, false)
     {}
+    
+Material::Material (const Material& mtl, media::CloneMode mode)
+  : impl (media::clone (mtl.impl, mode, "media::collada::Material::Material"))
+  {}
 
 Material::~Material ()
 {
-  delete impl;
+}
+
+Material& Material::operator = (const Material& mtl)
+{
+  impl = mtl.impl;
+  
+  return *this;
+}
+
+/*
+    Идентификатор материала
+*/
+
+const char* Material::Id () const
+{
+  return impl->id.c_str ();
+}
+
+void Material::SetId (const char* id)
+{
+  if (!id)
+    RaiseNullArgument ("media::collada::Material::SetId", "id");
+    
+  impl->id = id;
 }
 
 /*
     Эффект связанный с материалом
 */
 
-const media::collada::Effect& Material::Effect () const
+const char* Material::Effect () const
 {
-  return impl->effect;
+  return impl->effect.c_str ();
 }
 
-media::collada::Effect& Material::Effect ()
+void Material::SetEffect (const char* effect_id)
 {
-  return impl->effect;
+  if (!effect_id)
+    RaiseNullArgument ("media::collada::Material::SetEffect", "effect_id");
+
+  impl->effect = effect_id;
 }

@@ -60,6 +60,15 @@ void DaeParser::ParseMaterial (Parser::Iterator iter)
     LogError (iter, "More than one child 'instance_effect' detected");
     return;
   }  
-
-  model.Materials ().Create (*effect, id);
+  
+    //создание нового материала
+    
+  Material material;
+  
+  material.SetId    (id);
+  material.SetEffect (effect_id);
+    
+    //добавление материала в библиотеку
+    
+  model.Materials ().Insert (material);
 }

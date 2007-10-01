@@ -1,46 +1,58 @@
-#include <media/collada/morph.h>
-#include "collection.h"
+#include "shared.h"
 
 using namespace media::collada;
 using namespace common;
-
-#ifdef _MSC_VER
-  #pragma warning (disable : 4355) //'this' : used in base member initializer list
-#endif
 
 /*
     Цель морфинга
 */
 
-struct MorphTarget::Impl
+struct MorphTarget::Impl: public xtl::reference_counter
 {
-  collada::Mesh& mesh;   //меш
-  float          weight; //вес
+  stl::string mesh;   //меш
+  float       weight; //вес
   
-  Impl (collada::Mesh& in_mesh, float in_weight) : mesh (in_mesh), weight (in_weight) {}
+  Impl () : weight (0.0f) {}
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
-MorphTarget::MorphTarget (media::collada::Mesh& mesh, float weight)
-  : impl (new Impl (mesh, weight))
+MorphTarget::MorphTarget ()
+  : impl (new Impl, false)
+  {}
+  
+MorphTarget::MorphTarget (const MorphTarget& target, media::CloneMode mode)
+  : impl (media::clone (target.impl, mode, "media::collada::MorphTarget::MorphTarget"))
   {}
 
 MorphTarget::~MorphTarget ()
 {
-  delete impl;
 }
 
-media::collada::Mesh& MorphTarget::Mesh ()
+MorphTarget& MorphTarget::operator = (const MorphTarget& target)
 {
-  return impl->mesh;
+  impl = target.impl;
+  
+  return *this;
 }
 
-const media::collada::Mesh& MorphTarget::Mesh () const
+/*
+    Меш
+*/
+
+const char* MorphTarget::Mesh () const
 {
-  return impl->mesh;
+  return impl->mesh.c_str ();
+}
+
+void MorphTarget::SetMesh (const char* mesh)
+{
+  if (!mesh)
+    RaiseNullArgument ("media::collada::MorphTarget::SetMesh", "mesh");
+    
+  impl->mesh = mesh;
 }
 
 /*
@@ -61,58 +73,56 @@ float MorphTarget::Weight () const
     Морфер    
 */
 
-//конструируемый MorphTarget
-class ConstructableMorphTarget: public MorphTarget
-{
-  public:
-    ConstructableMorphTarget (media::collada::Mesh& mesh, float weight) : MorphTarget (mesh, weight) {}
-};
+typedef CollectionImpl<MorphTarget> MorphTargetListImpl;
 
-//список MorphTarget
-class MorphTargetListImpl: public Collection<MorphTarget, ConstructableMorphTarget, true>
-{
-  public:
-    MorphTargetListImpl (Entity& owner) : Collection<MorphTarget, ConstructableMorphTarget, true> (owner) {}
-  
-    MorphTarget& Create (Mesh& mesh, float weight)
-    {
-      ConstructableMorphTarget* target = new ConstructableMorphTarget (mesh, weight);
-
-      try
-      {
-        InsertCore (*target);
-
-        return *target;
-      }
-      catch (...)
-      {
-        delete target;
-        throw;
-      }
-    }
-};
-
-struct Morph::Impl
+struct Morph::Impl: public xtl::reference_counter
 {
   MorphMethod         method;    //метод морфинга
-  Mesh&               base_mesh; //базовый меш
-  MorphTargetListImpl targets;   //цели морфинга  
+  MorphTargetListImpl targets;   //цели морфинга
+  stl::string         base_mesh; //базовый меш  
+  stl::string         id;        //идентификатор морфера
   
-  Impl (Entity& owner, Mesh& in_base_mesh) : method (MorphMethod_Normalized), base_mesh (in_base_mesh), targets (owner) {}
+  Impl () : method (MorphMethod_Normalized) {}
 };
 
 /*
     Конструктор / деструктор
 */
 
-Morph::Morph (Mesh& base_mesh, ModelImpl* model, const char* id)
-  : Entity (model, id),
-    impl (new Impl (*this, base_mesh))
-    {}
+Morph::Morph ()
+  : impl (new Impl, false)
+  {}
+  
+Morph::Morph (const Morph& morph, media::CloneMode mode)
+  : impl (media::clone (morph.impl, mode, "media::collada::Morph::Morph"))
+  {}
 
 Morph::~Morph ()
 {
-  delete impl;
+}
+
+Morph& Morph::operator = (const Morph& morph)
+{
+  impl = morph.impl;
+  
+  return *this;
+}
+
+/*
+    Идентификатор морфера
+*/
+
+const char* Morph::Id () const
+{
+   return impl->id.c_str ();
+}
+
+void Morph::SetId (const char* id)
+{
+  if (!id)
+    RaiseNullArgument ("media::collada::Morph::SetId", "id");
+    
+  impl->id = id;
 }
 
 /*
@@ -143,14 +153,17 @@ void Morph::SetMethod (MorphMethod method)
     Базовый меш
 */
 
-Mesh& Morph::BaseMesh ()
+const char* Morph::BaseMesh () const
 {
-  return impl->base_mesh;
+  return impl->base_mesh.c_str ();
 }
 
-const Mesh& Morph::BaseMesh () const
+void Morph::SetBaseMesh (const char* mesh)
 {
-  return impl->base_mesh;
+  if (!mesh)
+    RaiseNullArgument ("media::collada::Morph::SetBaseMesh", "mesh");
+    
+  impl->base_mesh = mesh;
 }
 
 /*

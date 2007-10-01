@@ -1,7 +1,4 @@
-#include <media/collada/geometry.h>
-
-#include <stl/string>
-#include <stl/vector>
+#include "shared.h"
 
 using namespace media::collada;
 using namespace common;
@@ -19,6 +16,26 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     ChannelListImpl (size_t in_vertices_count) : vertices_count (in_vertices_count)
     {
       channels.reserve (DEFAULT_CHANNELS_RESERVE);
+    }
+    
+    ChannelListImpl (const ChannelListImpl& impl) : vertices_count (impl.vertices_count)
+    {
+      channels.reserve (impl.channels.size ());
+      
+      for (ChannelArray::const_iterator i=impl.channels.begin (), end=impl.channels.end (); i!=end; ++i)
+      {
+        Channel* channel = new Channel (**i);
+        
+        try
+        {
+          channels.push_back (channel);
+        }
+        catch (...)
+        {
+          delete channel;
+          throw;
+        }
+      }
     }
     
     ~ChannelListImpl ()
@@ -107,7 +124,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
       if (channel >= channels.size ())
         RaiseOutOfRange ("media::collada::Surface::IChannelList::Data", "channel", channel, channels.size ());
         
-      return channels [channel]->data;
+      return &channels [channel]->data [0];
     }
 
     T* Data (size_t channel)
@@ -118,18 +135,17 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
   private:
     struct Channel
     {
-      T*          data;
-      stl::string name;
+      typedef stl::vector<T> Array;
       
-      Channel  (size_t verts_count, const char* in_name) :
-        data ((T*)::operator new (sizeof (T) * verts_count)), name (in_name) {}
+      Array       data;
+      stl::string name;
 
-      ~Channel () { ::operator delete (data); }
+      Channel  (size_t verts_count, const char* in_name) : data (verts_count), name (in_name) {}
     };
     
     typedef stl::vector<Channel*> ChannelArray;
     
-   private:
+   private:     
      ChannelArray channels;
      size_t       vertices_count;
 };
@@ -144,21 +160,21 @@ typedef ChannelListImpl<VertexInfluence> InfluenceChannelListImpl;
     Реализация surface
 */
 
+typedef stl::vector<Vertex> VertexArray;
+typedef stl::vector<size_t> IndexArray;
 
-struct Surface::Impl
+struct Surface::Impl: public xtl::reference_counter
 {
   stl::string               material_name;      //имя материала
   collada::PrimitiveType    primitive_type;     //тип примитивов
-  size_t                    vertices_count;     //количество вершин
-  size_t                    indices_count;      //количество индексов
-  Vertex*                   vertices;           //вершины
-  size_t*                   indices;            //индексы
+  VertexArray               vertices;           //вершины
+  IndexArray                indices;            //индексы
   ColorChannelListImpl      color_channels;     //каналы вершинных цветов
   TexVertexChannelListImpl  texvertex_channels; //каналы текстурирования
   InfluenceChannelListImpl  influence_channels; //каналы вершинных весов
   
   Impl (collada::PrimitiveType in_primitive_type, size_t in_vertices_count, size_t in_indices_count) :
-    vertices_count (in_vertices_count), indices_count (in_indices_count), primitive_type (in_primitive_type),
+    vertices (in_vertices_count), indices (in_indices_count), primitive_type (in_primitive_type),
     color_channels (in_vertices_count), texvertex_channels (in_vertices_count), influence_channels (in_vertices_count)
   {
     switch (primitive_type)
@@ -172,25 +188,7 @@ struct Surface::Impl
       default:
         RaiseInvalidArgument ("media::collada::Surface::Surface", "primitive_type", in_primitive_type);
         break;
-    }
-    
-    vertices = (Vertex*)::operator new (vertices_count * sizeof (Vertex));
-    
-    try
-    {
-      indices  = (size_t*)::operator new (indices_count * sizeof (size_t));
-    }
-    catch (...)
-    {
-      ::operator delete (vertices);
-      throw;
-    }
-  }
-  
-  ~Impl ()
-  {
-    ::operator delete (vertices);
-    ::operator delete (indices);
+    }    
   }
 };
 
@@ -199,27 +197,37 @@ struct Surface::Impl
 */
 
 Surface::Surface (media::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
-  : impl (new Impl (type, verts_count, indices_count))
+  : impl (new Impl (type, verts_count, indices_count), false)
+  {}
+  
+Surface::Surface (const Surface& srf, media::CloneMode mode)
+  : impl (media::clone (srf.impl, mode, "media::collada::Surface::Surface"))
   {}
 
 Surface::~Surface ()
 {
-  delete impl;
+}
+
+Surface& Surface::operator = (const Surface& srf)
+{
+  impl = srf.impl;
+
+  return *this;
 }
 
 /*
     Имя материала поверхности
 */
 
-const char* Surface::MaterialName () const
+const char* Surface::Material () const
 {
   return impl->material_name.c_str ();
 }
 
-void Surface::SetMaterialName (const char* name)
+void Surface::SetMaterial (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("media::collada::Surface::SetMaterialName", "name");
+    RaiseNullArgument ("media::collada::Surface::SetMaterial", "name");
     
   impl->material_name = name;
 }
@@ -239,12 +247,12 @@ PrimitiveType Surface::PrimitiveType () const
 
 size_t Surface::VerticesCount () const
 {
-  return impl->vertices_count;
+  return impl->vertices.size ();
 }
 
 size_t Surface::IndicesCount () const
 {
-  return impl->indices_count;
+  return impl->indices.size ();
 }
 
 /*
@@ -253,12 +261,12 @@ size_t Surface::IndicesCount () const
 
 Vertex* Surface::Vertices ()
 {
-  return impl->vertices;
+  return &impl->vertices [0];
 }
 
 const Vertex* Surface::Vertices () const
 {
-  return impl->vertices;
+  return &impl->vertices [0];
 }
 
 /*
@@ -267,12 +275,12 @@ const Vertex* Surface::Vertices () const
 
 size_t* Surface::Indices ()
 {
-  return impl->indices;
+  return &impl->indices [0];
 }
 
 const size_t* Surface::Indices () const
 {
-  return impl->indices;
+  return &impl->indices [0];
 }
 
 /*

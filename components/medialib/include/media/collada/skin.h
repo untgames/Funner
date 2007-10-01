@@ -1,8 +1,9 @@
 #ifndef MEDIALIB_COLLADA_SKIN_HEADER
 #define MEDIALIB_COLLADA_SKIN_HEADER
 
-#include <media/collada/utility.h>
 #include <math/mathlib.h>
+#include <media/clone.h>
+#include <xtl/intrusive_ptr.h>
 
 namespace media
 {
@@ -19,9 +20,24 @@ struct VertexJointWeight
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Скин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Skin: public Entity
+class Skin
 {
   public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы / деструктор / присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Skin  ();
+    Skin  (const Skin&, media::CloneMode mode = media::CloneMode_Instance);
+    ~Skin ();
+    
+    Skin& operator = (const Skin&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Идентификатор скина
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* Id    () const;
+    void        SetId (const char* id);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица фигуры 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,18 +54,16 @@ class Skin: public Entity
     void               SetJointInvMatrix (size_t joint, const math::mat4f& invTM); //установка обратной матрицы соединения
     const math::mat4f& JointInvMatrix    (size_t joint) const;                //получение обратной матрицы соединения
     int                FindJoint         (const char* name) const;            //возвращает номер соединения по имени или -1 в случае неудачи
-    const char*        JointName         (size_t joint);                      //имя соединения
+    const char*        JointName         (size_t joint) const;                //имя соединения
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Базовый морф
+///Базовый меш / морф
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetBaseMorph (Morph* base_morph);
-
-          Morph* BaseMorph ();
-    const Morph* BaseMorph () const;
+    const char* BaseMesh    () const;
+    void        SetBaseMesh (const char* mesh);    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Веса джойнтов в вершинах
+///Веса соединений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t WeightsCount  () const;
     void   WeightsResize (size_t new_size);
@@ -57,13 +71,9 @@ class Skin: public Entity
           VertexJointWeight* Weights ();          
     const VertexJointWeight* Weights () const;
 
-  protected:
-    Skin  (ModelImpl*, const char* id);
-    ~Skin ();
-
   private:
     struct Impl;
-    Impl* impl;
+    xtl::intrusive_ptr<Impl> impl;
 };
 
 }

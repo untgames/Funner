@@ -96,9 +96,16 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
     LogError (iter, "Incorrect url '%s'. No mesh in library", base_mesh);
     return;
   }
-
-  Morph& morph = model.Morphs().Create(*mesh, id);
   
+    //создание морфера
+
+  Morph morph;
+  
+  morph.SetId (id);
+  morph.SetBaseMesh (base_mesh);
+  
+    //разбор параметров морфера
+   
   LogScope scope (iter, *this);
 
   if (test (iter, "method", "RELATIVE"))
@@ -171,14 +178,27 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
 
   for (size_t i = 0; i < targets.size (); i++)
   {
-    Mesh* mesh = model.Meshes ().Find (targets[i].c_str ());
+    Mesh* mesh = model.Meshes ().Find (targets [i].c_str ());
     
     if (!mesh)
     {
-      LogError (iter, "Incorrect url '%s'. No mesh in library", targets[i].c_str ());
+      LogError (iter, "Incorrect url '%s'. No mesh in library", targets [i].c_str ());
       return;
     }
+     
+      //создание цели
+    
+    MorphTarget target;
+    
+    target.SetMesh   (targets [i].c_str ());
+    target.SetWeight (weights [i]);
 
-    morph.Targets ().Create (*mesh, weights[i]);
+      //добавление цели в морфер
+      
+    morph.Targets ().Insert (target);
   }
+  
+    //добавление морфера в библиотеку    
+    
+  model.Morphs ().Insert (morph);
 }

@@ -35,13 +35,21 @@ void DaeParser::ParseVisualScene (Parser::Iterator iter)
     LogError (iter, "No id");
     return;
   }
+  
+    //создане сцены
 
-  Scene& scene = model.Scenes ().Create (id); 
+  Node scene;
+  
+  scene.SetId (id);  
   
   if (name)
     scene.SetName (name);
   
   for_each_child (iter, "node", bind (&DaeParser::ParseNode, this, _1, ref (scene)));
+  
+    //добавление сцены в библиотеку
+    
+  model.Scenes ().Insert (scene);
 }
 
 /*
@@ -72,7 +80,11 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
     return;
   }
   
-  Node& node = model.Nodes ().Create (id);
+    //создание узла
+  
+  Node node;
+  
+  node.SetId (id);
   
     //биндинг к родительскому узлу
     
@@ -91,6 +103,10 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
     //установка преобразований узла
  
   node.SetTransform (tm);
+  
+    //добавление узла в библиотеку
+    
+  model.Nodes ().Insert (node);  
   
     //разбор инстанцированной геометрии
     
@@ -191,6 +207,8 @@ void DaeParser::ParseInstanceLight (Parser::Iterator iter, Node::LightList& ligh
     LogError (iter, "No light with id='%s' detected", url);
     return;
   }
+  
+    //добавление источнкиа света в коллекцию узла
 
   lights.Insert (*light);
 }
@@ -218,6 +236,8 @@ void DaeParser::ParseInstanceCamera (Parser::Iterator iter, Node::CameraList& ca
     LogError (iter, "No camera with id='%s' detected", url);
     return;
   }
+  
+    //добавление камеры в коллекцию узла
 
   cameras.Insert (*camera);
 }
@@ -247,11 +267,17 @@ void DaeParser::ParseInstanceGeometry (Parser::Iterator iter, Node::MeshList& me
     return;
   }
 
-  InstanceMesh& imesh = meshes.Create (*mesh);
-  
+  InstanceMesh imesh;
+
+  imesh.SetMesh (url);
+
     //разбор прикреплённых материалов
   
   for_each_child (iter, "bind_material", bind (&DaeParser::ParseBindMaterial, this, _1, ref (imesh.MaterialBinds ())));
+  
+    //добавление меша в коллекцию узла
+    
+  meshes.Insert (imesh);
 }
 
 /*
@@ -295,7 +321,7 @@ void DaeParser::ParseBindMaterial (Parser::Iterator iter, MaterialBinds& binds)
     
       //добавляем материал в список присоединённых материалов
 
-    binds.SetMaterial (symbol, *material);
+    binds.SetMaterial (symbol, target);
 
       //разбор текстурных каналов
 

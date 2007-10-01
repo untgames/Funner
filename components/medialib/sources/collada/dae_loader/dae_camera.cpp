@@ -68,7 +68,9 @@ void DaeParser::ParseCamera (Parser::Iterator iter)
   
     //создание камеры
     
-  Camera& camera = model.Cameras ().Create (id);
+  Camera camera;
+  
+  camera.SetId (id);
   
     //установка типа камеры
     
@@ -96,4 +98,8 @@ void DaeParser::ParseCamera (Parser::Iterator iter)
       if (CheckedRead (iter, params [i].string, value))
         camera.SetParam (params [i].value, value);
     }
+    
+    //добавление камеры в библиотеку
+    
+  model.Cameras ().Insert (camera);
 }

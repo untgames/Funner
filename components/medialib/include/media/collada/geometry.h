@@ -1,17 +1,16 @@
 #ifndef MEDIALIB_COLLADA_GEOMETRY_HEADER
 #define MEDIALIB_COLLADA_GEOMETRY_HEADER
 
-#include <media/collada/material.h>
+#include <media/collada/collection.h>
+#include <media/clone.h>
 #include <math/mathlib.h>
+#include <xtl/intrusive_ptr.h>
 
 namespace media
 {
 
 namespace collada
 {
-
-//forward declarations
-class MaterialBinds;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовые атрибуты вершины
@@ -96,17 +95,26 @@ class Surface
 
       protected:
         virtual ~IChannelList () {}
-    };  
+    };
     
     typedef IChannelList<TexVertex>       TexVertexChannelList;
     typedef IChannelList<math::vec3f>     ColorChannelList;
     typedef IChannelList<VertexInfluence> InfluenceChannelList;   
-  
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы / деструктор / присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Surface  (collada::PrimitiveType type, size_t verts_count, size_t indices_count);
+    Surface  (const Surface&, media::CloneMode mode = media::CloneMode_Instance);
+    ~Surface ();
+
+    Surface& operator = (const Surface&);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя материала поверхности (данное имя должно передаваться в MaterialBinds::FindMaterial)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* MaterialName    () const;
-    void        SetMaterialName (const char* name);
+    const char* Material    () const;
+    void        SetMaterial (const char* id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип примитивов
@@ -149,51 +157,43 @@ class Surface
           InfluenceChannelList& InfluenceChannels ();
     const InfluenceChannelList& InfluenceChannels () const;
 
-  protected:
-    Surface  (collada::PrimitiveType type, size_t verts_count, size_t indices_count);
-    ~Surface ();
-
-  private:
-    Surface (const Surface&); //no impl
-    Surface& operator = (const Surface&); //no impl
-
   private:
     struct Impl;
-    Impl* impl;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Коллекция поверхностей
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <> class ICollection<Surface>: public IItemCollection<Surface>
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual Surface& Create (PrimitiveType type, size_t verts_count, size_t indices_count) = 0;
+    xtl::intrusive_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Меш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Mesh: public Entity
+class Mesh
 {
   public:
     typedef ICollection<Surface> SurfaceList;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы / деструктор / присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Mesh  ();
+    Mesh  (const Mesh&, media::CloneMode mode = CloneMode_Instance);
+    ~Mesh ();
+
+    Mesh& operator = (const Mesh&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с поверхностями
+///Идентификатор меша
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* Id    () const;
+    void        SetId (const char* id);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Список поверхностей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
           SurfaceList& Surfaces ();
     const SurfaceList& Surfaces () const;
 
-  protected:
-    Mesh (ModelImpl*, const char* id);
-
   private:
     struct Impl;
-    Impl* impl;
+    xtl::intrusive_ptr<Impl> impl;
 };
 
 }

@@ -1,49 +1,26 @@
-#include <media/collada/model.h>
-
-#include <common/exception.h>
-#include <stl/string>
-
 #include "shared.h"
-#include "library.h"
 
 using namespace media::collada;
 using namespace common;
-
-#ifdef _MSC_VER
-  #pragma warning (disable : 4355) //'this' : used in base member initializer list
-#endif
 
 /*
     Описание реализации модели
 */
 
-namespace media
+struct Model::Impl
 {
-
-namespace collada
-{
-
-struct ModelImpl
-{
-  stl::string       name;         //имя модели
-  stl::string       active_scene; //имя активной сцены
-  Library<Effect>   effects;      //библиотека эффектов
-  Library<Material> materials;    //библиотека материалов
-  Library<Mesh>     meshes;       //библиотека мешей
-  Library<Morph>    morphs;       //библиотека морферов
-  Library<Skin>     skins;        //библиотека скинов
-  Library<Node>     nodes;        //библиотека узлов  
-  Library<Scene>    scenes;       //библиотека сцен
-  Library<Light>    lights;       //библиотека источников света
-  Library<Camera>   cameras;      //библиотека камер
-  
-  ModelImpl () : effects (this), materials (this), meshes (this), skins (this), morphs (this), nodes (this), scenes (this),
-                 lights (this), cameras (this) {}
+  stl::string           name;         //имя модели
+  stl::string           active_scene; //имя активной сцены
+  LibraryImpl<Effect>   effects;      //библиотека эффектов
+  LibraryImpl<Material> materials;    //библиотека материалов
+  LibraryImpl<Mesh>     meshes;       //библиотека мешей
+  LibraryImpl<Morph>    morphs;       //библиотека морферов
+  LibraryImpl<Skin>     skins;        //библиотека скинов
+  LibraryImpl<Node>     nodes;        //библиотека узлов  
+  LibraryImpl<Node>     scenes;       //библиотека сцен
+  LibraryImpl<Light>    lights;       //библиотека источников света
+  LibraryImpl<Camera>   cameras;      //библиотека камер
 };
-
-}
-
-}
 
 /*
     Утилиты
@@ -59,26 +36,37 @@ void default_collada_log (const char*)
 }
 
 /*
-    Конструкторы / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
 Model::Model  ()
-  : impl (new ModelImpl) {}
+  : impl (new Impl) {}
 
 Model::Model (const char* file_name)
-  : impl (new ModelImpl)
+  : impl (new Impl)
 {
-  ModelSystemSingleton::Instance ().Load (file_name, *this, LogHandler (&default_collada_log));
+  ModelManagerSingleton::Instance ().Load (file_name, *this, LogHandler (&default_collada_log));
 }
 
 Model::Model (const char* file_name, const LogHandler& log)
-  : impl (new ModelImpl)
+  : impl (new Impl)
 {
-  ModelSystemSingleton::Instance ().Load (file_name, *this, log);
+  ModelManagerSingleton::Instance ().Load (file_name, *this, log);
 }
-  
+
+Model::Model (const Model& model)
+  : impl (new Impl (*model.impl))
+  {}
+
 Model::~Model ()
 {
+}
+
+Model& Model::operator = (const Model& model)
+{
+  Model (model).Swap (*this);
+  
+  return *this;
 }
 
 /*
@@ -199,12 +187,12 @@ const NodeLibrary& Model::Nodes () const
   return impl->nodes;
 }
 
-SceneLibrary& Model::Scenes ()
+NodeLibrary& Model::Scenes ()
 {
   return impl->scenes;
 }
 
-const SceneLibrary& Model::Scenes () const
+const NodeLibrary& Model::Scenes () const
 {
   return impl->scenes;
 }
@@ -215,7 +203,7 @@ const SceneLibrary& Model::Scenes () const
 
 void Model::Swap (Model& model)
 {
-  stl::swap (model.impl, impl);
+  swap (model.impl, impl);
 }
 
 namespace media
@@ -249,29 +237,10 @@ void Model::Load (const char* file_name, const LogHandler& log)
 
 void Model::Save (const char* file_name)
 {
-  ModelSystemSingleton::Instance ().Save (file_name, *this, LogHandler (&default_collada_log));
+  ModelManagerSingleton::Instance ().Save (file_name, *this, LogHandler (&default_collada_log));
 }
 
 void Model::Save (const char* file_name, const LogHandler& log)
 {
-  ModelSystemSingleton::Instance ().Save (file_name, *this, log);
-}
-
-/*
-    Возвращение имени модели
-*/
-
-namespace media
-{
-
-namespace collada
-{
-
-const char* get_model_name (ModelImpl* impl)
-{
-  return impl->name.c_str ();
-}
-
-}
-
+  ModelManagerSingleton::Instance ().Save (file_name, *this, log);
 }

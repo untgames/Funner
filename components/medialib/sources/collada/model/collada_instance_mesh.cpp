@@ -1,4 +1,4 @@
-#include <media/collada/scene.h>
+#include "shared.h"
 
 using namespace media::collada;
 
@@ -6,46 +6,50 @@ using namespace media::collada;
     Описание реализации InstanceMesh
 */
 
-class ConstructableMaterialBinds: public MaterialBinds
+struct InstanceMesh::Impl: public xtl::reference_counter
 {
-  public:
-    ConstructableMaterialBinds (Entity& entity) : MaterialBinds (entity) {}
-    ~ConstructableMaterialBinds () {}
-};
-
-struct InstanceMesh::Impl
-{
-  collada::Mesh&             mesh;  //меш
-  ConstructableMaterialBinds binds; //присоединённые материалы
-  
-  Impl (collada::Mesh& in_mesh) : mesh (in_mesh), binds (in_mesh) {}
+  stl::string            mesh;  //меш
+  collada::MaterialBinds binds; //присоединённые материалы  
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
-InstanceMesh::InstanceMesh (media::collada::Mesh& mesh)
-  : impl (new Impl (mesh))
+InstanceMesh::InstanceMesh ()
+  : impl (new Impl, false)
   {}
   
+InstanceMesh::InstanceMesh (const InstanceMesh& imesh, media::CloneMode mode)
+  : impl (media::clone (imesh.impl, mode, "media::collada::InstanceMesh::InstanceMesh"))
+  {}  
+
 InstanceMesh::~InstanceMesh ()
 {
-  delete impl;
+}
+
+InstanceMesh& InstanceMesh::operator = (const InstanceMesh& imesh)
+{
+  impl = imesh.impl;
+  
+  return *this;
 }
 
 /*
     Меш
 */
 
-media::collada::Mesh& InstanceMesh::Mesh ()
+const char* InstanceMesh::Mesh () const
 {
-  return impl->mesh;
+  return impl->mesh.c_str ();
 }
 
-const media::collada::Mesh& InstanceMesh::Mesh () const
+void InstanceMesh::SetMesh (const char* mesh_id)
 {
-  return impl->mesh;
+  if (!mesh_id)
+    common::RaiseNullArgument ("media::collada::InstanceMesh::SetMesh", "mesh_id");
+    
+  impl->mesh = mesh_id;
 }
 
 /*

@@ -63,7 +63,7 @@ void print (const math::matrix<T, N>& v)
 }
 
 //печать текстуры
-void dump (const char* name, Texture& texture, int level)
+void dump (const char* name, Texture& texture, int level, Model& model)
 {
   print_space (level++);  
   printf      ("Texture '%s'\n", name);
@@ -80,11 +80,11 @@ void dump (const char* name, Texture& texture, int level)
 }
 
 //печать эффекта
-void dump (Effect& effect, int level)
+void dump (Effect& effect, int level, Model& model)
 {
   print_space (level++);
   
-  printf      ("Effect: '%s'\n", effect.EntityId ());  
+  printf      ("Effect: '%s'\n", effect.Id ());  
   print_space (level);
   printf      ("shader type: ");
   
@@ -107,9 +107,9 @@ void dump (Effect& effect, int level)
   printf      ("shininess: %g\n", effect.Param (EffectParam_Shininess));  
       
   for (const TexmapName* texmap = texmaps; texmap->name; texmap++)
-    if (effect.HasTexture (texmap->map))
+    if (*effect.Texture (texmap->map).Image ())
     {
-      dump (texmap->name, effect.Texture (texmap->map), level);
+      dump (texmap->name, effect.Texture (texmap->map), level, model);
     }
     else
     {
@@ -121,12 +121,12 @@ void dump (Effect& effect, int level)
 }
 
 //печать материала
-void dump (Material& material, int level)
+void dump (Material& material, int level, Model& model)
 {
   print_space (level++);
-  printf      ("Material '%s'\n", material.EntityId ());
+  printf      ("Material '%s'\n", material.Id ());
   print_space (level);
-  printf      ("effect: '%s'\n", material.Effect ().EntityId ());
+  printf      ("effect: '%s'\n", material.Effect ());
 }
 
 //печать вершины
@@ -156,7 +156,7 @@ void print (const VertexInfluence& influence)
 }
 
 //печать поверхности
-void dump (Surface& surface, int level)
+void dump (Surface& surface, int level, Model& model)
 {
   print_space (level++);
   printf      ("Surface:\n");
@@ -174,7 +174,7 @@ void dump (Surface& surface, int level)
   }
   
   print_space (level);
-  printf      ("material_name: '%s'\n", surface.MaterialName ());  
+  printf      ("material_name: '%s'\n", surface.Material ());  
 
   print_space (level);
   printf      ("vertices_count: %u\n", surface.VerticesCount ());
@@ -245,29 +245,29 @@ void dump (Surface& surface, int level)
 }
 
 //печать меша
-void dump (Mesh& mesh, int level)
+void dump (Mesh& mesh, int level, Model& model)
 {
   print_space (level++);
-  printf      ("Mesh '%s' (%u surfaces)\n", mesh.EntityId (), mesh.Surfaces ().Size ());
+  printf      ("Mesh '%s' (%u surfaces)\n", mesh.Id (), mesh.Surfaces ().Size ());
 
   for (size_t i=0; i<mesh.Surfaces ().Size (); i++)
-    dump (mesh.Surfaces () [i], level);
+    dump (mesh.Surfaces () [i], level, model);
 }
 
 //печать цели морфа
 void dump (MorphTarget& morph_target, int level)
 {
   print_space (level);
-  printf      ("Mesh '%s', weight = %f\n", morph_target.Mesh ().EntityId (), morph_target.Weight ());
+  printf      ("Mesh '%s', weight = %f\n", morph_target.Mesh (), morph_target.Weight ());
 }
 
 //печать морфа
-void dump (Morph& morph, int level)
+void dump (Morph& morph, int level, Model& model)
 {
   print_space (level++);
-  printf      ("Morph '%s' (%u targets)\n", morph.EntityId (), morph.Targets ().Size ());
+  printf      ("Morph '%s' (%u targets)\n", morph.Id (), morph.Targets ().Size ());
   print_space (level);
-  printf      ("base mesh: '%s'\n", morph.BaseMesh ().EntityId ());
+  printf      ("base mesh: '%s'\n", morph.BaseMesh ());
   print_space (level);
   printf      ("method: ");
   switch (morph.Method ())
@@ -283,15 +283,12 @@ void dump (Morph& morph, int level)
 }
 
 //печать скина
-void dump (Skin& skin, int level)
+void dump (Skin& skin, int level, Model& model)
 {
   print_space (level++);
-  printf      ("Skin '%s'\n", skin.EntityId ());
+  printf      ("Skin '%s'\n", skin.Id ());
   print_space (level);
-  if (skin.BaseMorph ())
-    printf ("base morph '%s'\n", skin.BaseMorph ()->EntityId ());
-  else
-    printf ("no base morph\n");
+  printf      ("base mesh '%s'\n", skin.BaseMesh ());
   print_space (level);
   printf      ("bind shape matrix: ");
   print       (skin.BindShapeMatrix ());
@@ -317,10 +314,10 @@ void dump (Skin& skin, int level)
 }
 
 //вывод источника света
-void dump (Light& light, int level)
+void dump (Light& light, int level, Model& model)
 {
   print_space (level++);
-  printf      ("Light '%s'\n", light.EntityId ());
+  printf      ("Light '%s'\n", light.Id ());
   print_space (level);
   printf      ("type: ");
   
@@ -349,10 +346,10 @@ void dump (Light& light, int level)
   printf      ("falloff_exponent: %g\n", light.Param (LightParam_FalloffExponent));
 }
 
-void dump (Camera& camera, int level)
+void dump (Camera& camera, int level, Model& model)
 {
   print_space (level++);
-  printf      ("Camera '%s'\n", camera.EntityId ());
+  printf      ("Camera '%s'\n", camera.Id ());
   print_space (level);
   printf      ("type: ");
   
@@ -380,58 +377,70 @@ void dump (Camera& camera, int level)
 }
 
 //вывод инстанцированного меша
-void dump (InstanceMesh& imesh, int level)
+void dump (InstanceMesh& imesh, int level, Model& model)
 {
-  Mesh::SurfaceList& surfaces = imesh.Mesh ().Surfaces ();
+  Mesh* mesh = model.Meshes ().Find (imesh.Mesh ());
+
+  if (!mesh)
+    return;
+           
+  Mesh::SurfaceList& surfaces = mesh->Surfaces ();
   MaterialBinds&     binds    = imesh.MaterialBinds ();
 
   print_space (level++);
-  printf      ("Instance mesh '%s'\n", imesh.Mesh ().EntityId ());  
+  printf      ("Instance mesh '%s'\n", imesh.Mesh ());
 
   for (size_t i=0; i<surfaces.Size (); i++)
   {
     Surface&  surface  = surfaces [i];
-    Material* material = binds.FindMaterial (surface);
+    Material* material = model.Materials ().Find (binds.FindMaterial (surface));
     
     if (!material)
     {
       print_space (level);
-      printf      ("No bind material with name '%s' detected", surface.MaterialName ());
+      printf      ("No bind material with name '%s' detected\n", surface.Material ());
       continue;
     }
     
     print_space (level);
-    printf      ("surface #%u material: '%s'\n", i, material->EntityId ());
+    printf      ("surface #%u material: '%s'\n", i, material->Id ());
     
-    Effect& effect = material->Effect ();
+    Effect* effect = model.Effects ().Find (material->Effect ());
+    
+    if (!effect)
+    {
+      print_space (level);
+      printf      ("No effect with name '%s' detected\n", material->Effect ());
+      continue;
+    }
     
     for (const TexmapName* texmap = texmaps; texmap->name; texmap++)
-      if (effect.HasTexture (texmap->map))
+      if (effect->HasTexture (texmap->map))
       {
         print_space (level+1);
-        printf      ("map %s channel #%d\n", texmap->name, binds.FindTexcoordChannel (surface, effect.Texture (texmap->map)));
+        printf      ("map %s channel #%d\n", texmap->name, binds.FindTexcoordChannel (surface, effect->Texture (texmap->map)));
       }
   }
 }
 
 //вывод коллекции
-template <class Item> void dump (ICollection<Item>& collection, int level)
+template <class Item> void dump (const char* name, ICollection<Item>& collection, int level)
 {
   print_space (level++);
-  printf      ("Collection '%s' (%u items)\n", collection.EntityId (), collection.Size ());    
+  printf      ("Collection '%s' (%u items)\n", name, collection.Size ());    
 
   for (size_t i=0; i<collection.Size (); i++)
   {
     print_space (level);
-    printf      ("'%s'\n", collection [i].EntityId ());
+    printf      ("'%s'\n", collection [i].Id ());
   }
 }
 
 //печать узла
-void dump (Node& node, int level)
+void dump (Node& node, int level, Model& model)
 {
   print_space (level++);
-  printf      ("Node '%s'\n", node.EntityId ());
+  printf      ("Node '%s'\n", node.Id ());
   print_space (level);
   printf      ("sid: '%s'\n", node.SubId ());
   print_space (level);
@@ -442,28 +451,29 @@ void dump (Node& node, int level)
   printf      ("\n");
   
   for (size_t i=0; i<node.Meshes ().Size (); i++)
-    dump (node.Meshes () [i], level);
+    dump (node.Meshes () [i], level, model);
 
-  dump (node.Lights (), level);
-  dump (node.Cameras (), level);
+  dump ("lights", node.Lights (), level);
+  dump ("cameras", node.Cameras (), level);
   
   for (size_t i=0; i<node.Nodes ().Size (); i++)
-    dump (node.Nodes () [i], level);
+    dump (node.Nodes () [i], level, model);
 }
 
 //печать элемента библиотеки
-template <class Item> void dump_item (Item& item, int level)
+template <class Item> void dump_item (Item& item, int level, Model& model)
 {
-  dump (item, level);
+  dump (item, level, model);
 }
 
 //печать библиотеки
-template <class Item> void dump (ILibrary<Item>& library, int level)
+template <class Item> void dump (const char* library_name, ILibrary<Item>& library, int level, Model& model)
 {
   print_space (level++);
-  printf      ("Library '%s' (%u items)\n", library.EntityId (), library.Size ());
-
-  library.ForEach (bind (&dump_item<Item>, _1, level));
+  printf      ("Library '%s' (%u items)\n", library_name, library.Size ());
+  
+  for (ILibrary<Item>::Iterator i=library.CreateIterator (); i; ++i)
+    dump (*i, level, model);
 }
 
 //функция протоколирования ошибок разбора модели
@@ -487,14 +497,14 @@ int main ()
     print_space (1);
     printf ("Active scene: '%s'\n", model.ActiveSceneName ());
 
-    dump (model.Effects (), 1);
-    dump (model.Materials (), 1);
-    dump (model.Meshes (), 1);    
-    dump (model.Skins (), 1);
-    dump (model.Morphs (), 1);
-    dump (model.Lights (), 1);
-    dump (model.Cameras (), 1);
-    dump (model.Scenes (), 1);
+    dump ("library_effects", model.Effects (), 1, model);
+    dump ("library_materials", model.Materials (), 1, model);
+    dump ("library_meshes", model.Meshes (), 1, model);
+    dump ("library_skins", model.Skins (), 1, model);
+    dump ("library_morphs", model.Morphs (), 1, model);
+    dump ("library_lights", model.Lights (), 1, model);
+    dump ("library_cameras", model.Cameras (), 1, model);
+    dump ("library_scenes", model.Scenes (), 1, model);
   }
   catch (std::exception& exception)
   {

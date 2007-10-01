@@ -1,8 +1,3 @@
-#include <stl/vector>
-#include <stl/hash_map>
-#include <stl/string>
-#include <common/hash.h>
-
 #include "shared.h"
 
 using namespace media::collada;
@@ -712,15 +707,13 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
     *index = vertex_buffer.AddVertex (&*index_iter);
   }  
   
-    //создание поверхности
+    //создание поверхности    
     
-  Mesh::SurfaceList& surfaces = surface_info.mesh->Surfaces ();
-    
-  Surface& surface = surfaces.Create (surface_info.primitive_type, vertex_buffer.GetVerticesCount (), indices_count);
+  Surface surface (surface_info.primitive_type, vertex_buffer.GetVerticesCount (), indices_count);
   
     //установка имени материала
     
-  surface.SetMaterialName (surface_info.material_name);
+  surface.SetMaterial (surface_info.material_name);
   
     //копирование буфера индексов
 
@@ -736,9 +729,7 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
 
   if (!stream_reader.Read ("VERTEX", "", "XYZ", vertices, &Vertex::coord))
   {
-    LogError (surface_iter, "Error at read VERTEX stream");
-    
-    surfaces.Remove (surface);
+    LogError (surface_iter, "Error at read VERTEX stream");    
     
     return;
   }
@@ -746,8 +737,6 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
   if (!stream_reader.Read ("NORMAL", "", "XYZ", vertices, &Vertex::normal))
   {
     LogError (surface_iter, "Error at read NORMAL stream");
-
-    surfaces.Remove (surface);
 
     return;
   }
@@ -767,9 +756,7 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
       if (!stream_reader.Read ("TEXCOORD", set, "STP", tex_vertices, &TexVertex::coord))
       {
         LogError (surface_iter, "Error at read TEXCOORD stream from set '%s'", set);
-        
-        surfaces.Remove (surface);
-        
+      
         return;
       }
       
@@ -777,16 +764,12 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
       {
         LogError (surface_iter, "Error at read TEXTANGENT stream from set '%s'", set);
         
-        surfaces.Remove (surface);
-        
         return;
       }
       
       if (!stream_reader.Read ("TEXBINORMAL", set, "XYZ", tex_vertices, &TexVertex::binormal))
       {
         LogError (surface_iter, "Error at read TEXBINORMAL stream from set '%s'", set);
-        
-        surfaces.Remove (surface);
         
         return;
       }
@@ -801,8 +784,6 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
       if (!stream_reader.Read ("COLOR", set, "RGB", colors))
       {
         LogError (surface_iter, "Error at read COLOR stream from set '%s'", set);
-        
-        surfaces.Remove (surface);
         
         return;
       }      
@@ -819,8 +800,10 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
   {
     LogError (surface_iter, "Error at read VERTEX stream");
 
-    surfaces.Remove (surface);
-
     return;
-  }    
+  }
+  
+    //присоединение поверхности к мешу
+  
+  surface_info.mesh->Surfaces ().Insert (surface);
 }

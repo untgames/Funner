@@ -1,6 +1,4 @@
-#include <media/collada/scene.h>
-#include <stl/hash_map>
-#include <stl/string>
+#include "shared.h"
 
 using namespace media::collada;
 using namespace common;
@@ -9,77 +7,74 @@ using namespace common;
     Описание реализации присоединенного материала
 */
 
-typedef stl::hash_map<size_t, stl::string>                   ChannelMap;
-typedef stl::hash_map<stl::hash_key<const char*>, Material*> MaterialMap;
+typedef stl::hash_map<size_t, stl::string>                     ChannelMap;
+typedef stl::hash_map<stl::hash_key<const char*>, stl::string> MaterialMap;
 
-struct MaterialBinds::Impl
+struct MaterialBinds::Impl: public xtl::reference_counter
 {
-  Entity&     owner;     //владелец
   ChannelMap  channels;  //карта каналов    
-  MaterialMap materials; //карта материалов
-  
-  Impl (Entity& in_owner) : owner (in_owner) {}
+  MaterialMap materials; //карта материалов  
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
-MaterialBinds::MaterialBinds (Entity& owner)
-  : impl (new Impl (owner))
+MaterialBinds::MaterialBinds ()
+  : impl (new Impl, false)
+  {}
+  
+MaterialBinds::MaterialBinds (const MaterialBinds& binds, media::CloneMode mode)
+  : impl (media::clone (binds.impl, mode, "media::collada::MaterialBinds::MaterialBinds"))
   {}
 
 MaterialBinds::~MaterialBinds ()
 {
-  delete impl;
+}
+
+MaterialBinds& MaterialBinds::operator = (const MaterialBinds& binds)
+{
+  impl = binds.impl;
+  
+  return *this;
 }
 
 /*
     Связывание материалов
 */
 
-const Material* MaterialBinds::FindMaterial (const char* symbol) const //nothrow
+const char* MaterialBinds::FindMaterial (const char* symbol) const //nothrow
 {
   if (!symbol)
     return 0;
     
   MaterialMap::const_iterator iter = impl->materials.find (symbol);
   
-  return iter != impl->materials.end () ? iter->second : 0;
+  return iter != impl->materials.end () ? iter->second.c_str () : 0;
 }
 
-Material* MaterialBinds::FindMaterial (const char* symbol)
-{
-  return const_cast<collada::Material*> (const_cast<const MaterialBinds&> (*this).FindMaterial (symbol));
-}
-
-const Material* MaterialBinds::FindMaterial (const Surface& surface) const //nothrow
+const char* MaterialBinds::FindMaterial (const Surface& surface) const //nothrow
 {
     //здесь должна быть проверка совместимости с поверхностью, но пока что это невозможно из-за отсутствия метода Surface::Owner
 
-  return FindMaterial (surface.MaterialName ());
+  return FindMaterial (surface.Material ());
 }
 
-Material* MaterialBinds::FindMaterial (const Surface& surface)
-{
-  return const_cast<Material*> (const_cast<const MaterialBinds&> (*this).FindMaterial (surface));
-}
-
-void MaterialBinds::SetMaterial (const char* symbol, Material& material)
+void MaterialBinds::SetMaterial (const char* symbol, const char* material)
 {
   if (!symbol)
-    RaiseNullArgument ("media::collada::MaterialBinds::SetMaterial", "symbol");
-    
-  if (material.Owner () != impl->owner.Owner ())
-    raise_incompatible ("media::collada::MaterialBinds::SetMaterial", material, impl->owner);
-    
-  impl->materials [symbol] = &material;
+    RaiseNullArgument ("media::collada::MaterialBinds::SetMaterial", "symbol");    
+
+  if (!material)
+    RaiseNullArgument ("media::collada::MaterialBinds::SetMaterial", "material");
+
+  impl->materials [symbol] = material;
 }
 
 void MaterialBinds::RemoveMaterial (const char* symbol)
 {
   if (!symbol)
-    RaiseNullArgument ("media::collada::MaterialBinds::RemoveMaterial", "symbol");
+    return;
     
   impl->materials.erase (symbol);
 }
@@ -148,7 +143,7 @@ int MaterialBinds::FindTexcoordChannel (const Surface& surface, const Texture& t
 {
     //здесь должна быть проверка совместимости с поверхностью, но пока что это невозможно из-за отсутствия метода Surface::Owner
 
-  const char* surface_channel_name = TexcoordChannelName (surface.MaterialName (), texture.TexcoordChannel ());
+  const char* surface_channel_name = TexcoordChannelName (surface.Material (), texture.TexcoordChannel ());
 
   if (!*surface_channel_name)
     return -1;

@@ -104,8 +104,8 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
       return;
     }
 
-    mesh = &morph->BaseMesh ();
-  }  
+    mesh = model.Meshes ().Find (morph->BaseMesh ());
+  }
   
   if (test (iter, "bind_shape_matrix"))
     if (!CheckedRead (iter, "bind_shape_matrix.#text", bind_shape_matrix))
@@ -143,7 +143,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     Surface&        surface            = mesh->Surfaces ()[i];
     VertexIndexMap* vertex_indices_map = GetVertexIndicesMap (&surface);
     
-      //не выполнение этого условия теоретически невозможно
+      //невыполнение этого условия теоретически невозможно
 
     if (vertex_indices_map->Size () != surface.VerticesCount ())
       continue;
@@ -171,13 +171,14 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
   
     //создание скина
 
-  Skin& skin = model.Skins().Create(id);
+  Skin skin;  
   
+  skin.SetId (id);  
   skin.WeightsResize (vertex_joint_weights_count);
-  skin.SetBaseMorph  (morph);
-  skin.SetBindShapeMatrix (bind_shape_matrix);
+  skin.SetBaseMesh   (base_mesh);
+  skin.SetBindShapeMatrix (bind_shape_matrix);  
 
-  for (Parser::NamesakeIterator joints_iter=iter->First ("joints")->First ("input"); joints_iter; ++joints_iter)
+  for (Parser::NamesakeIterator joints_iter=iter->First ("joints.input"); joints_iter; ++joints_iter)
   {
     const char *semantic    = get<const char*> (joints_iter, "semantic"),
                *source_name = get<const char*> (joints_iter, "source");
@@ -198,7 +199,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
 
     if (!::strcmp (semantic, "JOINT"))
     {
-      for (Parser::NamesakeIterator i = iter->First("source"); i; ++i)
+      for (Parser::NamesakeIterator i = iter->First ("source"); i; ++i)
         if (test (i, "id", source_name))
         {
           ParseNameArray (i, &joints);
@@ -236,7 +237,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
   
   vector <float> weights;
 
-  for (Parser::NamesakeIterator weights_iter=iter->First ("vertex_weights")->First ("input"); weights_iter; ++weights_iter)
+  for (Parser::NamesakeIterator weights_iter=iter->First ("vertex_weights.input"); weights_iter; ++weights_iter)
   {
     const char *semantic    = get<const char*> (weights_iter, "semantic"),
                *source_name = get<const char*> (weights_iter, "source");
@@ -301,4 +302,8 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
 
     cur_index += per_vertex_count[i];
   }
+  
+    //добавление скина в библиотеку
+    
+  model.Skins ().Insert (skin);
 }

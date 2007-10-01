@@ -1,6 +1,4 @@
-#include <media/collada/skin.h>
-#include <stl/vector>
-#include <stl/string>
+#include "shared.h"
 
 using namespace media::collada;
 
@@ -15,40 +13,81 @@ struct Joint
 {
   stl::string name;       //имя соединения
   math::mat4f inv_matrix; //обратная матрица соединения
+  
+  Joint (const char* in_name) : name (in_name) {}
 };
 
 typedef stl::vector<Joint*> JointArray;
 
 }
 
-struct Skin::Impl
+struct Skin::Impl: public xtl::reference_counter
 {
-  math::mat4f        bind_shape_matrix;      //матрица фигуры
-  JointArray         joints;                 //соединения
-  stl::vector<VertexJointWeight> weights;    //веса джойнтов
-  Morph*             base_morph;             //базовый морф (если есть)
+  math::mat4f                    bind_shape_matrix; //матрица фигуры
+  JointArray                     joints;            //соединения
+  stl::vector<VertexJointWeight> weights;           //веса соединений
+  stl::string                    base_mesh;         //базовый меш / морф
+  stl::string                    id;                //идентификатор скина
 
   enum { DEFAULT_JOINTS_RESERVE = 32 };
+  
+  void RemoveAllJoints ()
+  {
+    for (JointArray::iterator i=joints.begin (), end=joints.end (); i!=end; ++i)
+      delete *i;
+
+    joints.clear ();
+  }
   
   Impl ()
   {
     joints.reserve (DEFAULT_JOINTS_RESERVE);
   }
+
+  ~Impl ()
+  {
+    RemoveAllJoints ();
+  }
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
-Skin::Skin (ModelImpl* owner, const char* id)
-  : Entity (owner, id), impl (new Impl)
+Skin::Skin ()
+  : impl (new Impl, false)
+  {}
+  
+Skin::Skin (const Skin& skin, media::CloneMode mode)
+  : impl (media::clone (skin.impl, mode, "media::collada::Skin::Skin"))
   {}
 
 Skin::~Skin ()
 {
-  RemoveAllJoints ();
+}
 
-  delete impl;
+Skin& Skin::operator = (const Skin& skin)
+{
+  impl = skin.impl;
+  
+  return *this;
+}
+
+/*
+    Идентификатор скина
+*/
+
+const char* Skin::Id () const
+{
+  return impl->id.c_str ();
+}
+
+void Skin::SetId (const char* id)
+{
+  if (!id)
+    common::RaiseNullArgument ("media::collada::Skin::SetId", "id");
+    
+  impl->id = id;
 }
 
 /*
@@ -71,7 +110,7 @@ void Skin::SetBindShapeMatrix (const math::mat4f& tm)
 
 size_t Skin::JointsCount () const
 {
- return impl->joints.size ();
+  return impl->joints.size ();
 }
 
 size_t Skin::CreateJoint (const char* name)
@@ -79,12 +118,10 @@ size_t Skin::CreateJoint (const char* name)
   if (!name)
     common::RaiseNullArgument ("media::collada::Skin::CreateJoint", "name");
 
-  Joint* joint = new Joint;
+  Joint* joint = new Joint (name);
   
   try
   {
-    joint->name = name;
-    
     impl->joints.push_back (joint);
     
     return impl->joints.size () - 1;
@@ -99,7 +136,7 @@ size_t Skin::CreateJoint (const char* name)
 void Skin::RemoveJoint (size_t joint)
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("media::collada::RemoveJoint", "joint", joint, impl->joints.size ());
+    return;
     
   delete impl->joints [joint];
   
@@ -108,16 +145,13 @@ void Skin::RemoveJoint (size_t joint)
 
 void Skin::RemoveAllJoints ()
 {
-  for (JointArray::iterator i=impl->joints.begin (), end=impl->joints.end (); i!=end; ++i)
-    delete *i;
-    
-  impl->joints.clear ();
+  impl->RemoveAllJoints ();    
 }
 
 void Skin::SetJointInvMatrix (size_t joint, const math::mat4f& inv_matrix)
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("media::collada::SetJointInvMatrix", "joint", joint, impl->joints.size ());
+    common::RaiseOutOfRange ("media::collada::Skin::SetJointInvMatrix", "joint", joint, impl->joints.size ());
     
   impl->joints [joint]->inv_matrix = inv_matrix;
 }
@@ -125,7 +159,7 @@ void Skin::SetJointInvMatrix (size_t joint, const math::mat4f& inv_matrix)
 const math::mat4f& Skin::JointInvMatrix (size_t joint) const
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("media::collada::GetJointInvMatrix", "joint", joint, impl->joints.size ());
+    common::RaiseOutOfRange ("media::collada::Skin::GetJointInvMatrix", "joint", joint, impl->joints.size ());
     
   return impl->joints [joint]->inv_matrix;
 }
@@ -133,7 +167,7 @@ const math::mat4f& Skin::JointInvMatrix (size_t joint) const
 int Skin::FindJoint (const char* name) const
 {
   if (!name)
-    common::RaiseNullArgument ("media::collada::Skin::FindJoint", "name");
+    return -1;
 
   for (JointArray::iterator i=impl->joints.begin (), end=impl->joints.end (); i!=end; ++i)
     if ((*i)->name == name)
@@ -142,28 +176,34 @@ int Skin::FindJoint (const char* name) const
   return -1;
 }
 
-const char* Skin::JointName (size_t joint)
+const char* Skin::JointName (size_t joint) const
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("media::collada::JointName", "joint", joint, impl->joints.size ());
+    common::RaiseOutOfRange ("media::collada::Skin::JointName", "joint", joint, impl->joints.size ());
     
-  return impl->joints[joint]->name.c_str ();
+  return impl->joints [joint]->name.c_str ();
 }
 
-void Skin::SetBaseMorph (Morph* base_morph)
+/*
+    Базовый меш / морф
+*/
+
+void Skin::SetBaseMesh (const char* mesh)
 {
-  impl->base_morph = base_morph;
+  if (!mesh)
+    common::RaiseNullArgument ("media::collada::Skin::SetBaseMesh", "mesh");
+    
+  impl->base_mesh = mesh;
 }
 
-Morph* Skin::BaseMorph ()
+const char* Skin::BaseMesh () const
 {
-  return impl->base_morph;
+  return impl->base_mesh.c_str ();
 }
 
-const Morph* Skin::BaseMorph () const
-{
-  return impl->base_morph;
-}
+/*
+    Веса соединений
+*/
 
 size_t Skin::WeightsCount () const
 {

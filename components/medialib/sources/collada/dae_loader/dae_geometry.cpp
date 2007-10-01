@@ -41,7 +41,15 @@ void DaeParser::ParseGeometry (Parser::Iterator iter)
   if (mesh_iter->NextNamesake ())
     LogWarning (mesh_iter->NextNamesake (), "Second mesh will be ignored");    
     
-  Mesh& mesh = model.Meshes ().Create (id);  
+    //разбор меша
+    
+  Mesh mesh;
+      
+  mesh.SetId (id);
 
   ParseMesh (mesh_iter, mesh);
+  
+    //добавление меша в библиотеку
+    
+  model.Meshes ().Insert (mesh);
 }

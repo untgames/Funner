@@ -1,6 +1,4 @@
-#include <media/collada/material.h>
-#include <stl/string>
-#include <common/exception.h>
+#include "shared.h"
 
 using namespace media::collada;
 using namespace common;
@@ -9,7 +7,7 @@ using namespace common;
     Реализация текстуры
 */
 
-struct Texture::Impl
+struct Texture::Impl: public xtl::reference_counter
 {
   float       amount;     //вес текстуры
   stl::string image_name; //имя картинки
@@ -18,18 +16,28 @@ struct Texture::Impl
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
-Texture::Texture  ()
-  : impl (new Impl)
+Texture::Texture ()
+  : impl (new Impl, false)
 {
   impl->amount = 1.0f;
 }
 
+Texture::Texture (const Texture& texture, media::CloneMode mode)
+  : impl (media::clone (texture.impl, mode, "media::collada::Texture::Texture"))
+  {}
+
 Texture::~Texture ()
 {
-  delete impl;
+}
+
+Texture& Texture::operator = (const Texture& texture)
+{
+  impl = texture.impl;
+
+  return *this;
 }
 
 /*

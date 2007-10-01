@@ -73,7 +73,9 @@ void DaeParser::ParseLight (Parser::Iterator iter)
   
     //создание источника света
     
-  Light& light = model.Lights ().Create (id);  
+  Light light;
+  
+  light.SetId (id);
   
     //установка типа источника
     
@@ -106,4 +108,8 @@ void DaeParser::ParseLight (Parser::Iterator iter)
       if (CheckedRead (iter, light_params [i].string, value))
         light.SetParam (light_params [i].value, value);
     }
+    
+    //добавление источника в библиотеку
+  
+  model.Lights ().Insert (light);
 }

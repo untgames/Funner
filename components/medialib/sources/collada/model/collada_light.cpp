@@ -1,4 +1,4 @@
-#include <media/collada/scene.h>
+#include "shared.h"
 
 using namespace media::collada;
 using namespace common;
@@ -8,11 +8,12 @@ using namespace math;
     Описание реализации источника света
 */
 
-struct Light::Impl
+struct Light::Impl: public xtl::reference_counter
 {
-  LightType type;                    //тип источника света
-  float     params [LightParam_Num]; //параметры источника света
-  vec3f     color;                   //цвет источника
+  LightType   type;                    //тип источника света
+  float       params [LightParam_Num]; //параметры источника света
+  vec3f       color;                   //цвет источника
+  stl::string id;                      //идентификатор источника
   
   Impl () : type (LightType_Point)
   {
@@ -22,16 +23,43 @@ struct Light::Impl
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
-Light::Light (ModelImpl* owner, const char* id)
-  : Entity (owner, id), impl (new Impl)
+Light::Light ()
+  : impl (new Impl, false)
+  {}
+  
+Light::Light (const Light& light, media::CloneMode mode)
+  : impl (media::clone (light.impl, mode, "media::collada::Light::Light"))
   {}
 
 Light::~Light ()
 {
-  delete impl;
+}
+
+Light& Light::operator = (const Light& light)
+{
+  impl = light.impl;
+
+  return *this;
+}
+
+/*
+    Идентификатор источника
+*/
+
+const char* Light::Id () const
+{
+  return impl->id.c_str ();
+}
+
+void Light::SetId (const char* id)
+{
+  if (!id)
+    RaiseNullArgument ("media::collada::Light::SetId", "id");
+    
+  impl->id = id;
 }
   
 /*

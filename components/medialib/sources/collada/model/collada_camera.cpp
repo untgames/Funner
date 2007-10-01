@@ -1,4 +1,4 @@
-#include <media/collada/scene.h>
+#include "shared.h"
 
 using namespace media::collada;
 using namespace common;
@@ -8,10 +8,11 @@ using namespace math;
     Описание реализации камеры
 */
 
-struct Camera::Impl
+struct Camera::Impl: public xtl::reference_counter
 {
-  CameraType type;                     //тип камеры
-  float      params [CameraParam_Num]; //параметры камеры
+  CameraType  type;                     //тип камеры
+  float       params [CameraParam_Num]; //параметры камеры
+  stl::string id;                       //идентификатор камеры
   
   Impl () : type (CameraType_Perspective)
   {
@@ -21,16 +22,43 @@ struct Camera::Impl
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор / присваивание
 */
 
-Camera::Camera (ModelImpl* owner, const char* id)
-  : Entity (owner, id), impl (new Impl)
+Camera::Camera ()
+  : impl (new Impl, false)
+  {}
+  
+Camera::Camera (const Camera& camera, media::CloneMode mode)
+  : impl (media::clone (camera.impl, mode, "media::collada::Camera::Camera"))
   {}
 
 Camera::~Camera ()
 {
-  delete impl;
+}
+
+Camera& Camera::operator = (const Camera& camera)
+{
+  impl = camera.impl;
+
+  return *this;
+}
+
+/*
+    Идентификатор камеры
+*/
+
+const char* Camera::Id () const
+{
+  return impl->id.c_str ();
+}
+
+void Camera::SetId (const char* id)
+{
+  if (!id)
+    RaiseNullArgument ("media::collada::Camera::SetId", "id");
+
+  impl->id = id;
 }
   
 /*

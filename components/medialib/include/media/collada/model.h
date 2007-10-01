@@ -3,9 +3,7 @@
 
 #include <xtl/functional_fwd>
 #include <stl/auto_ptr.h>
-#include <media/collada/scene.h>
-#include <media/collada/morph.h>
-#include <media/collada/skin.h>
+#include <media/collada/library.h>
 
 namespace media
 {
@@ -13,8 +11,15 @@ namespace media
 namespace collada
 {
 
-//implementation forwards
-struct ModelImpl;
+//forward declarations
+class Effect;
+class Material;
+class Mesh;
+class Morph;
+class Skin;
+class Light;
+class Camera;
+class Node;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Библиотеки
@@ -27,7 +32,6 @@ typedef ILibrary<Skin>     SkinLibrary;
 typedef ILibrary<Light>    LightLibrary;
 typedef ILibrary<Camera>   CameraLibrary;
 typedef ILibrary<Node>     NodeLibrary;
-typedef ILibrary<Scene>    SceneLibrary;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Модель
@@ -38,12 +42,15 @@ class Model
     typedef xtl::function<void (const char*)> LogHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы / деструктор
+///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Model  ();
     Model  (const char* file_name);
     Model  (const char* file_name, const LogHandler& log_func);
+    Model  (const Model&);
     ~Model ();
+    
+    Model& operator = (const Model&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя модели
@@ -76,7 +83,7 @@ class Model
           collada::LightLibrary&    Lights    ();
           collada::CameraLibrary&   Cameras   ();
           collada::NodeLibrary&     Nodes     ();
-          collada::SceneLibrary&    Scenes    ();
+          collada::NodeLibrary&     Scenes    ();
     const collada::MaterialLibrary& Materials () const;
     const collada::EffectLibrary&   Effects   () const;
     const collada::MeshLibrary&     Meshes    () const;
@@ -85,7 +92,7 @@ class Model
     const collada::LightLibrary&    Lights    () const;
     const collada::CameraLibrary&   Cameras   () const;
     const collada::NodeLibrary&     Nodes     () const;
-    const collada::SceneLibrary&    Scenes    () const;
+    const collada::NodeLibrary&     Scenes    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -98,11 +105,8 @@ class Model
     static void DefaultDaeLoader (const char* file_name, Model&, const LogHandler& log);
 
   private:
-    Model  (const Model&); //no impl
-    Model& operator = (const Model&); //no impl
-
-  private:
-    stl::auto_ptr<ModelImpl> impl;
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,9 +115,9 @@ class Model
 void swap (Model&, Model&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Система управления моделями
+///Менеджер моделей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ModelSystem
+class ModelManager
 {
   public:
     typedef xtl::function<void (const char*,       Model&, const Model::LogHandler& log)> LoadHandler;

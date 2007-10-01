@@ -1,4 +1,3 @@
-#include <stl/vector>
 #include "shared.h"
 
 /*
@@ -32,8 +31,8 @@ void DaeParser::ParseController (Parser::Iterator iter)
   {
     LogError (iter, "No id");
     return;
-  }
-  
+  }  
+
   Parser::Iterator skin_iter  = iter->First ("skin"),
                    morph_iter = iter->First ("morph");
   

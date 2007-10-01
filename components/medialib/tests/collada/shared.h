@@ -1,4 +1,5 @@
 #include <xtl/functional>
+#include <xtl/iterator.h>
 #include <media/collada.h>
 #include <media/mesh.h>
 #include <stdio.h>
