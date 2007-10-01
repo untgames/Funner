@@ -1,9 +1,9 @@
 ###################################################################################################
-#Оѓа•§•Ђ•≠®п ® ™Ѓ≠бв†≠вл
+#ќпределени€ и константы
 ###################################################################################################
 TARGETS := SG_COMPONENTS SG_TESTS
 
-#Ц•Ђм ь1 - SG components sources
+#÷ель є1 - SG components sources
 SG_COMPONENTS.TYPE             := static-lib
 SG_COMPONENTS.NAME             := sg
 SG_COMPONENTS.INCLUDE_DIRS     := include ../commonlib/include ../xtl/include ../mathlib/include ../boundvolumes/include
@@ -13,7 +13,7 @@ SG_COMPONENTS.LIBS             :=
 SG_COMPONENTS.COMPILER_CFLAGS  :=
 SG_COMPONENTS.COMPILER_DEFINES := 
 
-#Ц•Ђм ь2 - SG tests
+#÷ель є2 - SG tests
 SG_TESTS.TYPE             := test-suite
 SG_TESTS.INCLUDE_DIRS     := include ../commonlib/include ../xtl/include ../mathlib/include ../boundvolumes/include
 SG_TESTS.SOURCE_DIRS      := tests/core
