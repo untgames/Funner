@@ -65,12 +65,14 @@ int main ()
     TEST (i3 == i1);
     TEST (i1 == i3);
     TEST (i4 == i2);
+    TEST (i2 == m.begin ());
+    TEST (m.begin () == i2);
 
     i2++; //проверка "ленивого" копирования
 
     TEST (i4 != i2);
 
-    *i1;    
+    *i1;
   }
   catch (std::exception& exception)
   {

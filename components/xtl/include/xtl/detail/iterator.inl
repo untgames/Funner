@@ -9,15 +9,17 @@ template <class T> struct iterator_interface
 {
   virtual ~iterator_interface () {}
 
-  virtual T&                  get       () = 0;
-  virtual bool                empty     () = 0;
-  virtual void                next      () = 0;
-  virtual void                prev      () = 0;
-  virtual bool                equal     (const iterator_interface&) = 0;
-  virtual iterator_interface* clone     () = 0;
-  virtual size_t              use_count () = 0;
-  virtual void                addref    () = 0;
-  virtual void                release   () = 0;
+  virtual const std::type_info&  target_type () = 0;
+  virtual void*                  target      () = 0;
+  virtual T&                     get         () = 0;
+  virtual bool                   empty       () = 0;
+  virtual void                   next        () = 0;
+  virtual void                   prev        () = 0;
+  virtual bool                   equal       (const iterator_interface&) = 0;
+  virtual iterator_interface*    clone       () = 0;
+  virtual size_t                 use_count   () = 0;
+  virtual void                   addref      () = 0;
+  virtual void                   release     () = 0;
 };
 
 /*
@@ -71,7 +73,10 @@ template <class T, class Iter, class Fn> class iterator_base: public iterator_in
       if (!--ref_count)
         delete this;
     }
-  
+
+    const std::type_info& target_type () { return typeid (Iter); }
+    void*                 target      () { return &iter; }
+
   private:
     iterator_base& operator = (const iterator_base&); //no impl
 
@@ -154,14 +159,16 @@ template <class T, class Iter, class Fn> class range_iterator_impl: public itera
 
 template <class T> struct empty_iterator_impl: public iterator_interface<T>
 {
-  T&                  get       () { throw xtl::bad_iterator_dereference (); }
-  bool                empty     () { return true; }
-  void                next      () {}
-  void                prev      () {}
-  iterator_interface* clone     () { return this; }
-  size_t              use_count () { return 1; }
-  void                addref    () {}
-  void                release   () {}
+  const std::type_info& target_type () { return typeid (empty_iterator_impl); }
+  void*                 target      () { return this; }
+  T&                    get         () { throw xtl::bad_iterator_dereference (); }
+  bool                  empty       () { return true; }
+  void                  next        () {}
+  void                  prev        () {}
+  iterator_interface*   clone       () { return this; }
+  size_t                use_count   () { return 1; }
+  void                  addref      () {}
+  void                  release     () {}
 
   bool equal (const iterator_interface& iter)
   {
@@ -343,6 +350,46 @@ inline iterator<T> iterator<T>::operator -- (int)
 }
 
 /*
+    Определение типа хранимого итератора и возвращение указателя на него
+*/
+
+template <class T>
+inline const std::type_info& iterator<T>::target_type () const
+{
+  return impl->target_type ();
+}
+
+template <class T> template <class Iter>
+inline Iter* iterator<T>::target ()
+{
+  return &typeid (Iter) == &impl->target_type () ? static_cast<Iter*> (impl->target ()) : 0;
+}
+
+template <class T> template <class Iter>
+inline const Iter* iterator<T>::target () const
+{
+  return &typeid (Iter) == &impl->target_type () ? static_cast<const Iter*> (impl->target ()) : 0;
+}
+
+/*
+    Проверка хранится ли итератор эквивалентный заданному
+*/
+
+template <class T> template <class Iter>
+inline bool iterator<T>::contains (const Iter& i) const
+{
+  if (const Iter* this_iter = target<Iter> ())
+  {
+    return *this_iter == i;
+  }
+  else if (const Iter* this_iter = target<const Iter> ())
+  {
+    return *this_iter == i;
+  }
+  else return false;
+}
+
+/*
     Сравнение
 */
 
@@ -356,6 +403,30 @@ template <class T>
 inline bool iterator<T>::operator != (const iterator& i) const
 {
   return !impl->equal (*i.impl) && (*this || i);
+}
+
+template <class T> template <class Iter>
+inline bool iterator<T>::operator == (const Iter& i) const
+{
+  return contains (i);
+}
+
+template <class T> template <class Iter>
+inline bool iterator<T>::operator != (const Iter& i) const
+{
+  return !contains (i);
+}
+
+template <class Iter, class T>
+inline bool operator == (const Iter& i1, const iterator<T>& i2)
+{
+  return i2.contains (i1);
+}
+
+template <class Iter, class T>
+inline bool operator != (const Iter& i1, const iterator<T>& i2)
+{
+  return !i2.contains (i1);
 }
 
 /*
