@@ -37,7 +37,8 @@ SoundSample::SoundSample (const SoundSample& source)
 {                  
   impl->str_name = source.impl->str_name;
   impl->info     = source.impl->info;
-  impl->codec    = source.impl->codec->Clone ();
+  if (source.impl->codec.get ())
+    impl->codec  = source.impl->codec->Clone ();
 
   SoundSystemSingleton::Instance ().RegisterSoundSample (*this);
 }

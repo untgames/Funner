@@ -8,12 +8,21 @@
 #include <xtl/signal.h>
 #include <xtl/bind.h>
 #include <syslib/window.h>
+#include <common/exception.h>
+#include <media/sound.h>
+#include <media/sound_declaration.h>
 
 using namespace sound;
 using namespace sound::low_level;
 using namespace syslib;
 using namespace stl;
 using namespace xtl;
+using namespace common;
+using namespace media;
+
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
 
 /*
     Описание реализации SoundManager
@@ -21,13 +30,17 @@ using namespace xtl;
 
 struct SoundManagerEmitter
 {
-  int      channel_number;   //номер канала проигрывания (-1 - отсечён или не проигрывается)
-  float    start_position;   //позиция начала проигрывания
-  float    cur_position;     //текущая позиция проигрывания
-  clock_t  play_start_time;  //время начала проигрывания
-  bool     is_playing;       //статус проигрывания
+  int               channel_number;     //номер канала проигрывания (-1 - отсечён или не проигрывается)
+  float             start_offset;       //нормализованный сдвиг начала проигрывания
+  float             start_position;     //позиция начала проигрывания
+  float             cur_position;       //текущая позиция проигрывания
+  clock_t           play_start_time;    //время начала проигрывания
+  bool              is_playing;         //статус проигрывания
+  SoundDeclaration* sound_declaration;  //описание звука
+  SoundSample       sound_sample;       //звуковой сэмпл (используется для определения длительности звука)
+  size_t            sample_number;      //номер проигрываемого сэмпла
 
-  SoundManagerEmitter (float normalized_offset);
+  SoundManagerEmitter  (float normalized_offset);
 };
 
 typedef stl::hash_map<Emitter*, SoundManagerEmitter> EmitterSet;
@@ -48,6 +61,7 @@ struct SoundManager::Impl
   Capabilities                capabilities;         //возможности устройства
   auto_connection             minimize_connection;  //соединения события потери фокуса
   auto_connection             maximize_connection;  //соединения события получения фокуса
+  SoundDeclarationLibrary     sound_decl_library;   //библиотека описаний звуков
 
   Impl (Window& target_window);
 
@@ -69,10 +83,12 @@ struct SoundManager::Impl
   void PauseSound   (Emitter& emitter);
   void StopSound    (Emitter& emitter);
   void StopPlaying  (EmitterSet::iterator emitter_iter);
+
+  float GetNormalizedOffset (Emitter& emitter);
 };
 
 SoundManagerEmitter::SoundManagerEmitter (float normalized_offset)
-  : channel_number (-1), is_playing (false)
+  : channel_number (-1), is_playing (false), start_offset (normalized_offset)
   {}
 
 SoundManager::Impl::Impl (Window& target_window)
@@ -102,7 +118,10 @@ void SoundManager::Impl::OnMinimize (Window& window, WindowEvent event, const Wi
   switch (minimize_action)
   {
     case WindowMinimizeAction_Mute:  SetMute (true); break;
-    case WindowMinimizeAction_Pause: /*????for_each (emitters.begin (), emitters.end (), &SoundManager::Impl::PauseSound);*/ break;
+    case WindowMinimizeAction_Pause: 
+      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+        PauseSound (*(i->first));
+      break;
   }
 }
 
@@ -114,7 +133,8 @@ void SoundManager::Impl::OnMaximize (Window& window, WindowEvent event, const Wi
       SetMute (was_muted);
       break;
     case WindowMinimizeAction_Pause:
-//      for_each (emitters.begin (), emitters.end (), bind (&SoundManager::Impl::PlaySound, this, _1));
+      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+        PlaySound (*(i->first));
       break;
   }
 }
@@ -127,15 +147,31 @@ void SoundManager::Impl::PlaySound (Emitter& emitter)
 {
   EmitterSet::iterator emitter_iter = emitters.find (&emitter);
 
+  if (emitter_iter == emitters.end ())
+    return;
+
+  emitter_iter->second.sound_declaration = sound_decl_library.Find (emitter.Source ());
+  if (!emitter_iter->second.sound_declaration)
+    return;
+
+  if (emitter_iter->second.cur_position == emitter_iter->second.start_position)
+  {
+    emitter_iter->second.sample_number = rand () % emitter_iter->second.sound_declaration->SamplesCount ();
+    emitter_iter->second.sound_sample.Load (emitter_iter->second.sound_declaration->Sample (emitter_iter->second.sample_number));
+    emitter_iter->second.start_position = (float)emitter_iter->second.sound_sample.Duration () * emitter_iter->second.start_offset;
+    emitter_iter->second.cur_position = emitter_iter->second.start_position;
+  }
+  emitter_iter->second.is_playing      = true;
+  emitter_iter->second.play_start_time = clock ();
+
   if (!free_channels.empty ())
   {
     size_t channel_to_use = free_channels.back ();
     free_channels.pop_back ();
 
     emitter_iter->second.channel_number = channel_to_use;
-//    device->SetSample (channel_to_use, emitter.sound_source.Sound (emitter.sample_number));
-    emitter_iter->second.play_start_time = clock ();
-    emitter_iter->second.is_playing = true;
+    device->SetSample (channel_to_use, emitter_iter->second.sound_declaration->Sample (emitter_iter->second.sample_number));
+    device->Seek (channel_to_use, emitter_iter->second.cur_position);
     device->Play (channel_to_use, true);
   }
 }
@@ -143,6 +179,9 @@ void SoundManager::Impl::PlaySound (Emitter& emitter)
 void SoundManager::Impl::PauseSound (Emitter& emitter)
 {
   EmitterSet::iterator emitter_iter = emitters.find (&emitter);
+
+  if (emitter_iter == emitters.end ())
+    return;
 
   if (emitter_iter->second.is_playing)
   {
@@ -155,20 +194,35 @@ void SoundManager::Impl::StopSound (Emitter& emitter)
 {
   EmitterSet::iterator emitter_iter = emitters.find (&emitter);
 
-  emitter_iter->second.cur_position = emitter_iter->second.start_position;
+  if (emitter_iter == emitters.end ())
+    return;
 
   if (emitter_iter->second.is_playing)
     StopPlaying (emitter_iter);
+
+  emitters.erase (emitter_iter);
 }
 
 void SoundManager::Impl::StopPlaying (EmitterSet::iterator emitter_iter)
 {
+  emitter_iter->second.is_playing = false;
+
   if (emitter_iter->second.channel_number != -1)
   {
     device->Stop (emitter_iter->second.channel_number);
     free_channels.push_back (emitter_iter->second.channel_number);
     emitter_iter->second.channel_number = -1;
   }
+}
+
+float SoundManager::Impl::GetNormalizedOffset (Emitter& emitter)
+{
+  EmitterSet::iterator emitter_iter = emitters.find (&emitter);
+
+  if (emitter_iter == emitters.end ())
+    return 0.f;
+
+  return 0.f;
 }
 
 /*
@@ -264,16 +318,18 @@ void SoundManager::PlaySound (Emitter& emitter, float normalized_offset)
 
   impl->emitters.insert_pair (&emitter, manager_emitter);
   impl->PlaySound (emitter);
+  emitter.Activate ();
 }
 
 void SoundManager::StopSound (Emitter& emitter)
 {
   impl->StopSound (emitter);
+  emitter.Deactivate ();
 }
 
 float SoundManager::GetNormalizedOffset (Emitter& emitter) const
 {
-  return 0.f;
+  return impl->GetNormalizedOffset (emitter);
 }
 
 /*
@@ -282,26 +338,38 @@ float SoundManager::GetNormalizedOffset (Emitter& emitter) const
 
 void SoundManager::ForEachEmitter (const EmitterHandler& emitter_handler)
 {
-  //так не получится: emiiters - карта с эелементом pair<Emitter*, SoundManagerEmitter>
-//  for_each (impl->emitters.begin (), impl->emitters.end (), emitter_handler);
+  for (EmitterSet::iterator i = impl->emitters.begin (); i != impl->emitters.end (); ++i)
+    emitter_handler (*(i->first));
 }
 
 void SoundManager::ForEachEmitter (const ConstEmitterHandler& emitter_handler) const
 {
-//  for_each (impl->emitters.begin (), impl->emitters.end (), emitter_handler);
+  for (EmitterSet::iterator i = impl->emitters.begin (); i != impl->emitters.end (); ++i)
+    emitter_handler (*(i->first));
 }
 
 /*
    Применение операции ко всем слушателям c заданным типом
 */
 
-void SoundManager::ForEachEmitter (const char* type, const EmitterHandler&)
+void SoundManager::ForEachEmitter (const char* type, const EmitterHandler& emitter_handler)
 {
+  if (!type)
+    RaiseNullArgument ("sound::SoundManager::ForEachEmitter", "type");
 
+  for (EmitterSet::iterator i = impl->emitters.begin (); i != impl->emitters.end (); ++i)
+   if (!strcmp (type, i->second.sound_declaration->Type ()))
+     emitter_handler (*(i->first));
 }
 
-void SoundManager::ForEachEmitter (const char* type, const ConstEmitterHandler&) const
+void SoundManager::ForEachEmitter (const char* type, const ConstEmitterHandler& emitter_handler) const
 {
+  if (!type)
+    RaiseNullArgument ("sound::SoundManager::ForEachEmitter", "type");
+
+  for (EmitterSet::iterator i = impl->emitters.begin (); i != impl->emitters.end (); ++i)
+   if (!strcmp (type, i->second.sound_declaration->Type ()))
+     emitter_handler (*(i->first));
 }
 
 /*

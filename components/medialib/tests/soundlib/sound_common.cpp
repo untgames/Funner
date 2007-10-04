@@ -14,7 +14,9 @@ int main ()
 {
   try
   {
-    SoundSample sample;
+    SoundSample sample, sample2;
+
+    sample = sample2;
 
     printf ("Results of sound_common_test:\n");
 
