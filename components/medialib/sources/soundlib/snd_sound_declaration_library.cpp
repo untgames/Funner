@@ -138,7 +138,7 @@ void SoundDeclarationLibrary::Load (const char* file_name)
     
   try
   {
-//    SoundDeclarationSystemSingleton::Instance ().Load (file_name, *this);    
+    SoundDeclarationLibraryManagerSingleton::Instance ().Load (file_name, *this);    
   }
   catch (common::Exception& exception)
   {
@@ -154,7 +154,7 @@ void SoundDeclarationLibrary::Save (const char* file_name)
     
   try
   {
-//    SoundDeclarationSystemSingleton::Instance ().Save (file_name, *this);
+    SoundDeclarationLibraryManagerSingleton::Instance ().Save (file_name, *this);
   }
   catch (common::Exception& exception)
   {
