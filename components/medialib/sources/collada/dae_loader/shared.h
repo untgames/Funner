@@ -11,6 +11,7 @@
 
 #include <common/parser.h>
 #include <common/hash.h>
+#include <common/strlib.h>
 
 #include <xtl/functional>
 
@@ -112,7 +113,7 @@ class DaeParser
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание или поиск карт вершинных индексов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    VertexIndexMap* GetVertexIndicesMap  (const Surface*);
+    VertexIndexMap* GetVertexIndicesMap  (const char* mesh_id, size_t surface_index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Разбор отдельных элементов
@@ -148,6 +149,7 @@ class DaeParser
     void ParseInstanceLight       (Parser::Iterator, Node::LightList& lights);
     void ParseInstanceCamera      (Parser::Iterator, Node::CameraList& cameras);
     void ParseInstanceGeometry    (Parser::Iterator, Node::MeshList& meshes);
+    void ParseInstanceController  (Parser::Iterator, Node::ControllerList& controllers);
     void ParseBindMaterial        (Parser::Iterator iter, MaterialBinds& binds);
     void ParseIdrefArray          (Parser::Iterator iter, stl::vector <stl::string> *source);
     void ParseNameArray           (Parser::Iterator iter, stl::vector <stl::string> *source);
@@ -177,7 +179,7 @@ class DaeParser
     }
     
   private:
-    typedef stl::hash_map<const Surface*, VertexIndexMap*> VertexIndexMaps;
+    typedef stl::hash_map<stl::hash_key<const char*>, VertexIndexMap*> VertexIndexMaps;
 
   private:
     Model&          model;             //загружаемая модель

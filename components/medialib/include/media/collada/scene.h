@@ -15,6 +15,7 @@ namespace collada
 //forward declaration
 class Surface;
 class Texture;
+class Model;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип источника света
@@ -232,15 +233,62 @@ class InstanceMesh
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Инстанцированный контроллер
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class InstanceController
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы / деструктор / присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    InstanceController  ();
+    InstanceController  (const InstanceController&, media::CloneMode mode = media::CloneMode_Instance);
+    ~InstanceController ();    
+
+    InstanceController& operator = (const InstanceController&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Контроллер
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* Controller    () const;
+    void        SetController (const char* controller_id);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Определение имени базового меша
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* FindBaseMesh (Model&) const; //0 в случае неудачи
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присоединённые материалы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+          collada::MaterialBinds& MaterialBinds ();
+    const collada::MaterialBinds& MaterialBinds () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ссылки на корни поиска узлов для скининга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t      JointSearchRootsCount     () const;
+    const char* JointSearchRoot           (size_t root_index) const;
+    size_t      InsertJointSearchRoot     (const char* node_id); //ret: joint_root index
+    void        RemoveJointSearchRoot     (size_t root_index);
+    void        RemoveAllJointSearchRoots ();
+
+  private:
+    struct Impl;
+    xtl::intrusive_ptr<Impl> impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Узел сцены
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Node
 {
   public:
-    typedef ICollection<Node>         NodeList;
-    typedef ICollection<Camera>       CameraList;
-    typedef ICollection<Light>        LightList;
-    typedef ICollection<InstanceMesh> MeshList;
+    typedef ICollection<Node>               NodeList;
+    typedef ICollection<Camera>             CameraList;
+    typedef ICollection<Light>              LightList;
+    typedef ICollection<InstanceMesh>       MeshList;
+    typedef ICollection<InstanceController> ControllerList;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
@@ -278,14 +326,22 @@ class Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Коллекции узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          NodeList&   Nodes   ();       //узлы-потомки
-    const NodeList&   Nodes   () const;
-          LightList&  Lights  ();       //источники света
-    const LightList&  Lights  () const;
-          CameraList& Cameras ();       //камеры
-    const CameraList& Cameras () const;
-          MeshList&   Meshes  ();       //меши
-    const MeshList&   Meshes  () const;
+          NodeList&       Nodes       ();       //узлы-потомки
+    const NodeList&       Nodes       () const;
+          LightList&      Lights      ();       //источники света
+    const LightList&      Lights      () const;
+          CameraList&     Cameras     ();       //камеры
+    const CameraList&     Cameras     () const;
+          MeshList&       Meshes      ();       //меши
+    const MeshList&       Meshes      () const;
+          ControllerList& Controllers ();       //контроллеры
+    const ControllerList& Controllers () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск потомка по Sub-ID
+///////////////////////////////////////////////////////////////////////////////////////////////////
+          Node* FindChild (const char* sub_id);
+    const Node* FindChild (const char* sub_id) const;
 
   private:
     struct Impl;

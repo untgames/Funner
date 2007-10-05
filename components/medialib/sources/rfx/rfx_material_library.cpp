@@ -154,7 +154,8 @@ void MaterialLibrary::Load (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("media::MaterialLibrary::Load");
+    exception.Touch ("media::MaterialLibrary::Load");
+    throw;
   }
 }
 
@@ -169,7 +170,8 @@ void MaterialLibrary::Save (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("media::MaterialLibrary::Save");
+    exception.Touch ("media::MaterialLibrary::Save");
+    throw;
   }
 }
 

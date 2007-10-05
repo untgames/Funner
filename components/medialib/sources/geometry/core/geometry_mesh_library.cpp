@@ -153,7 +153,8 @@ void MeshLibrary::Load (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("media::MeshLibrary::Load");
+    exception.Touch ("media::MeshLibrary::Load");
+    throw;
   }
 }
 
@@ -165,7 +166,8 @@ void MeshLibrary::Save (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("media::MeshLibrary::Save");
+    exception.Touch ("media::MeshLibrary::Save");
+    throw;
   }
 }
 

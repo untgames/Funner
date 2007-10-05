@@ -423,6 +423,62 @@ void dump (InstanceMesh& imesh, int level, Model& model)
   }
 }
 
+//вывод инстанцированного контроллера
+void dump (InstanceController& icontroller, int level, Model& model)
+{  
+  Mesh* mesh = model.Meshes ().Find (icontroller.FindBaseMesh (model));
+  
+  if (!mesh)
+    return;
+
+  Mesh::SurfaceList& surfaces = mesh->Surfaces ();
+  MaterialBinds&     binds    = icontroller.MaterialBinds ();
+
+  print_space (level++);
+  printf      ("Instance controller '%s'\n", icontroller.Controller ());
+
+  for (size_t i=0; i<surfaces.Size (); i++)
+  {
+    Surface&  surface  = surfaces [i];
+    Material* material = model.Materials ().Find (binds.FindMaterial (surface));
+    
+    if (!material)
+    {
+      print_space (level);
+      printf      ("No bind material with name '%s' detected\n", surface.Material ());
+      continue;
+    }
+    
+    print_space (level);
+    printf      ("surface #%u material: '%s'\n", i, material->Id ());
+    
+    Effect* effect = model.Effects ().Find (material->Effect ());
+    
+    if (!effect)
+    {
+      print_space (level);
+      printf      ("No effect with name '%s' detected\n", material->Effect ());
+      continue;
+    }
+    
+    for (const TexmapName* texmap = texmaps; texmap->name; texmap++)
+      if (effect->HasTexture (texmap->map))
+      {
+        print_space (level+1);
+        printf      ("map %s channel #%d\n", texmap->name, binds.FindTexcoordChannel (surface, effect->Texture (texmap->map)));
+      }
+  }
+  
+  print_space (level++);
+  printf      ("search roots:\n");
+  
+  for (size_t i=0; i<icontroller.JointSearchRootsCount (); i++)
+  {
+    print_space (level);
+    printf      ("node '%s'\n", icontroller.JointSearchRoot (i));
+  }
+}
+
 //вывод коллекции
 template <class Item> void dump (const char* name, ICollection<Item>& collection, int level)
 {
@@ -450,8 +506,17 @@ void dump (Node& node, int level, Model& model)
   print       (node.Transform ());
   printf      ("\n");
   
+  print_space (level);
+  printf      ("Collection 'instance_meshes' (%u items)\n", node.Meshes ().Size ());    
+   
   for (size_t i=0; i<node.Meshes ().Size (); i++)
-    dump (node.Meshes () [i], level, model);
+    dump (node.Meshes () [i], level + 1, model);
+    
+  print_space (level);
+  printf      ("Collection 'instance_controllers' (%u items)\n", node.Controllers ().Size ());        
+    
+  for (size_t i=0; i<node.Controllers ().Size (); i++)
+    dump (node.Controllers () [i], level + 1, model);
 
   dump ("lights", node.Lights (), level);
   dump ("cameras", node.Cameras (), level);

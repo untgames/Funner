@@ -142,7 +142,8 @@ void SoundDeclarationLibrary::Load (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("media::SoundDeclarationLibrary::Load");
+    exception.Touch ("media::SoundDeclarationLibrary::Load");
+    throw;
   }
 }
 
@@ -157,7 +158,8 @@ void SoundDeclarationLibrary::Save (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("media::SoundDeclarationLibrary::Save");
+    exception.Touch ("media::SoundDeclarationLibrary::Save");
+    throw;
   }
 }
 

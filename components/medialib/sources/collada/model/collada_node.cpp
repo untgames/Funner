@@ -6,21 +6,23 @@ using namespace media::collada;
     ќписание реализации узла
 */
 
-typedef CollectionImpl<Node>         NodeListImpl;
-typedef CollectionImpl<Light>        LightListImpl;
-typedef CollectionImpl<Camera>       CameraListImpl;
-typedef CollectionImpl<InstanceMesh> InstanceMeshListImpl;
+typedef CollectionImpl<Node>               NodeListImpl;
+typedef CollectionImpl<Light>              LightListImpl;
+typedef CollectionImpl<Camera>             CameraListImpl;
+typedef CollectionImpl<InstanceMesh>       InstanceMeshListImpl;
+typedef CollectionImpl<InstanceController> InstanceControllerListImpl;
 
 struct Node::Impl: public xtl::reference_counter
 {
-  stl::string          id;      //идентификатор узла
-  stl::string          sid;     //идентификатор узла в пределах родител€
-  stl::string          name;    //им€ узла
-  math::mat4f          tm;      //матрица преобразований узла
-  NodeListImpl         nodes;   //вложенные узлы
-  LightListImpl        lights;  //источники света
-  CameraListImpl       cameras; //камеры
-  InstanceMeshListImpl meshes;  //меши
+  stl::string                id;          //идентификатор узла
+  stl::string                sid;         //идентификатор узла в пределах родител€
+  stl::string                name;        //им€ узла
+  math::mat4f                tm;          //матрица преобразований узла
+  NodeListImpl               nodes;       //вложенные узлы
+  LightListImpl              lights;      //источники света
+  CameraListImpl             cameras;     //камеры
+  InstanceMeshListImpl       meshes;      //меши
+  InstanceControllerListImpl controllers; //контроллеры
 };
 
 /*
@@ -153,4 +155,44 @@ Node::MeshList& Node::Meshes ()
 const Node::MeshList& Node::Meshes () const
 {
   return impl->meshes;
+}
+
+Node::ControllerList& Node::Controllers ()
+{
+  return impl->controllers;
+}
+
+const Node::ControllerList& Node::Controllers () const
+{
+  return impl->controllers;
+}
+
+/*
+    ѕоиск потомка по Sub-ID
+*/
+
+const Node* Node::FindChild (const char* sub_id) const
+{
+  if (!sub_id)
+    return 0;
+    
+  for (size_t i=0, count=impl->nodes.Size (); i<count; i++)
+  {
+    const Node& child = impl->nodes [i];
+    
+    if (!::strcmp (child.Id (), sub_id))
+      return &child;
+      
+    const Node* result = child.FindChild (sub_id);
+    
+    if (result)
+      return result;
+  }
+  
+  return 0;
+}
+
+Node* Node::FindChild (const char* sub_id)
+{
+  return const_cast<Node*> (const_cast<const Node&> (*this).FindChild (sub_id));
 }

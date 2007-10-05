@@ -112,6 +112,10 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
     
   for_each_child (iter, "instance_geometry", bind (&DaeParser::ParseInstanceGeometry, this, _1, ref (node.Meshes ())));
   
+    //разбор инстанцированных контроллеров
+    
+  for_each_child (iter, "instance_controller", bind (&DaeParser::ParseInstanceController, this, _1, ref (node.Controllers ())));
+  
     //разбор инстанцированных источников света
     
   for_each_child (iter, "instance_light", bind (&DaeParser::ParseInstanceLight, this, _1, ref (node.Lights ())));
@@ -252,7 +256,7 @@ void DaeParser::ParseInstanceGeometry (Parser::Iterator iter, Node::MeshList& me
   
   if (!url)
   {
-    LogError (iter, "No url. Error at parser 'instance_geometry'");
+    LogError (iter, "No url. Error at parse 'instance_geometry'");
     return;
   }
   
@@ -278,6 +282,59 @@ void DaeParser::ParseInstanceGeometry (Parser::Iterator iter, Node::MeshList& me
     //добавление меша в коллекцию узла
     
   meshes.Insert (imesh);
+}
+
+/*
+    Разбор инстанцированного контроллера
+*/
+
+void DaeParser::ParseInstanceController (Parser::Iterator iter, Node::ControllerList& controllers)
+{
+  const char* url = get<const char*> (iter, "url");
+  
+  if (!url)
+  {
+    LogError (iter, "No url. Error at parse 'instance_controller'");
+    return;
+  }
+  
+  url++; //избавляемся от префисного '#'
+
+  Skin*  skin  = model.Skins ().Find (url);
+  Morph* morph = model.Morphs ().Find (url);
+
+  if (!skin && !morph)
+  {
+    LogError (iter, "No controller with id='%s' detected", url);
+    return;
+  }
+  
+  InstanceController icontroller;
+  
+  icontroller.SetController (url);
+  
+    //разбор прикреплённых материалов
+    
+  for_each_child (iter, "bind_material", bind (&DaeParser::ParseBindMaterial, this, _1, ref (icontroller.MaterialBinds ())));
+  
+    //разбор корней поиска соединений
+    
+  for (Parser::NamesakeIterator skeleton_iter=iter->First ("skeleton"); skeleton_iter; ++skeleton_iter)
+  {
+    const char* root_id = get<const char*> (skeleton_iter, "#text");
+
+    if (!root_id)
+    {
+      LogError (skeleton_iter, "Error at read 'skeleton' data");
+      return;
+    }
+
+    icontroller.InsertJointSearchRoot (root_id);
+  }  
+
+    //добавление контроллера в коллекцию узла
+
+  controllers.Insert (icontroller);
 }
 
 /*

@@ -32,7 +32,8 @@ Image::Image (const char* file_name, PixelFormat format)
   }
   catch (Exception& exception)
   {
-    exception.Raise ("media::Image::Image");
+    exception.Touch ("media::Image::Image");
+    throw;
   }
 }
 
@@ -205,7 +206,8 @@ void Image::Save (const char* file_name, PixelFormat recommended_format)
   }
   catch (common::Exception& exception)
   {
-    exception.Raise ("media::Image::Save");
+    exception.Touch ("media::Image::Save");
+    throw;
   }
 }
 

@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIALIB_COMPONENTS MEDIALIB_UTILS MEDIALIB_COLLADA MEDIALIB_TESTS MEDIALIB_COLLADA_TESTS
+TARGETS := MEDIALIB_COMPONENTS MEDIALIB_UTILS MEDIALIB_COLLADA MEDIALIB_TESTS MEDIALIB_COLLADA_TESTS MEDIALIB_COLLADA_CONVERT_TESTS
 
 #Цель №1 - MediaLib sources
 MEDIALIB_COMPONENTS.TYPE             := static-lib
@@ -50,3 +50,12 @@ MEDIALIB_COLLADA_TESTS.LIB_DIRS         :=
 MEDIALIB_COLLADA_TESTS.LIBS             := commonlib zzip zlib collada
 MEDIALIB_COLLADA_TESTS.COMPILER_CFLAGS  :=
 MEDIALIB_COLLADA_TESTS.COMPILER_DEFINES :=
+
+#Цель №6 - MediaLib COLLADA convert tests
+MEDIALIB_COLLADA_CONVERT_TESTS.TYPE             := test-suite
+MEDIALIB_COLLADA_CONVERT_TESTS.INCLUDE_DIRS     := include ../mathlib/include ../xtl/include ../commonlib/include
+MEDIALIB_COLLADA_CONVERT_TESTS.SOURCE_DIRS      := tests/collada-convert
+MEDIALIB_COLLADA_CONVERT_TESTS.LIB_DIRS         :=
+MEDIALIB_COLLADA_CONVERT_TESTS.LIBS             := commonlib zzip zlib collada medialib
+MEDIALIB_COLLADA_CONVERT_TESTS.COMPILER_CFLAGS  :=
+MEDIALIB_COLLADA_CONVERT_TESTS.COMPILER_DEFINES :=

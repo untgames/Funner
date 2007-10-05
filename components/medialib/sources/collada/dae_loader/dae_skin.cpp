@@ -104,7 +104,8 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
       return;
     }
 
-    mesh = model.Meshes ().Find (morph->BaseMesh ());
+    mesh      = model.Meshes ().Find (morph->BaseMesh ());
+    base_mesh = morph->BaseMesh ();
   }
   
   if (test (iter, "bind_shape_matrix"))
@@ -137,14 +138,14 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     vertex_first_weight [i]     = vertex_joint_weights_count;
     vertex_joint_weights_count += per_vertex_count [i];
   }
-  
+ 
   for (size_t i=0; i<mesh->Surfaces ().Size (); i++)
   {
     Surface&        surface            = mesh->Surfaces ()[i];
-    VertexIndexMap* vertex_indices_map = GetVertexIndicesMap (&surface);
+    VertexIndexMap* vertex_indices_map = GetVertexIndicesMap (base_mesh, i);
     
       //невыполнение этого условия теоретически невозможно
-
+      
     if (vertex_indices_map->Size () != surface.VerticesCount ())
       continue;
 

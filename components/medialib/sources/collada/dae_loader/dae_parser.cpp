@@ -77,14 +77,16 @@ void DaeParser::LogWarning (Parser::Node* node, const char* format, ...)
     Создание и поиск карт вершинных индексов    
 */
 
-VertexIndexMap* DaeParser::GetVertexIndicesMap (const Surface* surface)
+VertexIndexMap* DaeParser::GetVertexIndicesMap (const char* mesh_id, size_t surface_index)
 {
-  if (!surface)
+  if (!mesh_id)
     return 0;
+    
+  stl::string surface_name = common::format ("%s#%u", mesh_id, surface_index);
     
     //попытка поиска карты вершинных индексов
     
-  VertexIndexMaps::iterator iter = vertex_index_maps.find (surface);
+  VertexIndexMaps::iterator iter = vertex_index_maps.find (surface_name.c_str ());
   
   if (iter != vertex_index_maps.end ())
     return iter->second;
@@ -95,7 +97,7 @@ VertexIndexMap* DaeParser::GetVertexIndicesMap (const Surface* surface)
   
     //регистрация карты вершинных индексов
     
-  vertex_index_maps [surface] = map;
+  vertex_index_maps [surface_name.c_str ()] = map;
   
   return map;
 }
@@ -108,7 +110,7 @@ void DaeParser::ParseRoot (Parser::Iterator iter)
 {
   if (!iter)
   {
-    LogError (iter, "Wrong file format. No 'COLLADA' tag\n");
+    LogError (parser.Root (), "Wrong file format. No 'COLLADA' tag\n");
     return;
   }
   
