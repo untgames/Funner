@@ -101,5 +101,5 @@ void DaeParser::ParseCamera (Parser::Iterator iter)
     
     //добавление камеры в библиотеку
     
-  model.Cameras ().Insert (camera);
+  model.Cameras ().Insert (id, camera);
 }

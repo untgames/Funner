@@ -70,5 +70,5 @@ void DaeParser::ParseMaterial (Parser::Iterator iter)
     
     //добавление материала в библиотеку
     
-  model.Materials ().Insert (material);
+  model.Materials ().Insert (id, material);
 }

@@ -41,7 +41,7 @@ void DaeParser::ParseEffect (Parser::Iterator iter)
   
     //добавление эффекта в библиотеку
     
-  model.Effects ().Insert (effect);
+  model.Effects ().Insert (id, effect);
 }
 
 void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect& effect)

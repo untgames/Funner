@@ -200,5 +200,5 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
   
     //добавление морфера в библиотеку    
     
-  model.Morphs ().Insert (morph);
+  model.Morphs ().Insert (id, morph);
 }

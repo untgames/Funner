@@ -141,8 +141,6 @@ void MaterialBinds::RemoveTexcoordChannelName (const char* material, const char*
 
 int MaterialBinds::FindTexcoordChannel (const Surface& surface, const Texture& texture) const //nothrow
 {
-    //здесь должна быть проверка совместимости с поверхностью, но пока что это невозможно из-за отсутствия метода Surface::Owner
-
   const char* surface_channel_name = TexcoordChannelName (surface.Material (), texture.TexcoordChannel ());
 
   if (!*surface_channel_name)

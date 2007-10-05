@@ -49,7 +49,7 @@ void DaeParser::ParseVisualScene (Parser::Iterator iter)
   
     //добавление сцены в библиотеку
     
-  model.Scenes ().Insert (scene);
+  model.Scenes ().Insert (id, scene);
 }
 
 /*
@@ -106,7 +106,7 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
   
     //добавление узла в библиотеку
     
-  model.Nodes ().Insert (node);  
+  model.Nodes ().Insert (id, node);  
   
     //разбор инстанцированной геометрии
     

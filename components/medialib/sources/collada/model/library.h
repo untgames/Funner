@@ -57,11 +57,17 @@ template <class Item> class LibraryImpl: public ILibrary<Item>
     ConstIterator CreateIterator () const { return impl.CreateIterator (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение имени хранимого ресурса
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* ItemId (const Iterator& i)            { return ResourceLibrary<Item>::Name (i); }
+    const char* ItemId (const ConstIterator& i) const { return ResourceLibrary<Item>::Name (i); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление элементов в библиотеку / очистка библиотеки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Insert (Item& item, media::CloneMode mode) { impl.Insert (item.Id (), item, mode); }
-    void Remove (const char* item_id)               { impl.Remove (item_id); }
-    void Clear  ()                                  { impl.Clear (); }
+    void Insert (const char* id, Item& item, media::CloneMode mode) { impl.Insert (id, item, mode); }
+    void Remove (const char* id)                                    { impl.Remove (id); }
+    void Clear  ()                                                  { impl.Clear (); }
 
   private:
     typedef ResourceLibrary<Item> Impl;

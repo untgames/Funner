@@ -111,5 +111,5 @@ void DaeParser::ParseLight (Parser::Iterator iter)
     
     //добавление источника в библиотеку
   
-  model.Lights ().Insert (light);
+  model.Lights ().Insert (id, light);
 }

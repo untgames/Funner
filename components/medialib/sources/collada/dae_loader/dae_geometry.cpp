@@ -51,5 +51,5 @@ void DaeParser::ParseGeometry (Parser::Iterator iter)
   
     //добавление меша в библиотеку
     
-  model.Meshes ().Insert (mesh);
+  model.Meshes ().Insert (id, mesh);
 }

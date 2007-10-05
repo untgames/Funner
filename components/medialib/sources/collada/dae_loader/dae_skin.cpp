@@ -305,5 +305,5 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
   
     //добавление скина в библиотеку
     
-  model.Skins ().Insert (skin);
+  model.Skins ().Insert (id, skin);
 }
