@@ -36,7 +36,7 @@ void BufferedFileImpl::ResetBuffer (filepos_t new_cache_start)
   if (Mode () & FILE_MODE_READ)
   {
     if (base_file->Tell () != new_cache_start && base_file->Seek (new_cache_start) != new_cache_start)
-      BufferedFileException ("Can not seek base file").Raise ("BufferedFileImpl::ResetBuffer");
+      throw BufferedFileException ("BufferedFileImpl::ResetBuffer", "Can not seek base file");
 
     cache_finish = new_cache_start + base_file->Read (buffer,buffer_size);
   }
@@ -119,7 +119,7 @@ size_t BufferedFileImpl::Read (void* buf,size_t size)
   if (block_start + size > buffer_size) //чтение в обход кэша
   {
     if (base_file->Tell () != file_pos && base_file->Seek (file_pos) != file_pos)
-      BufferedFileException ("Can not seek base file").Raise ("BufferedFileImpl::Read");
+      throw BufferedFileException ("BufferedFileImpl::Read", "Can not seek base file");
 
     size      = base_file->Read (read_buffer,size);
     file_pos += size + tail_size;
@@ -175,7 +175,7 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
     else //если блок накрывает кэш
     {
       if (base_file->Tell () != file_pos && base_file->Seek (file_pos) != file_pos)
-        BufferedFileException ("Can not seek base file").Raise ("BufferedFileImpl::Write");
+        throw BufferedFileException ("BufferedFileImpl::Write", "Can not seek base file");
 
       write_size  = base_file->Write (write_buffer,size);
       file_pos   += write_size;
@@ -204,7 +204,7 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
   if (block_start + size > buffer_size) //запись в обход кэша
   {
     if (base_file->Tell () != file_pos && base_file->Seek (file_pos) != file_pos)
-      BufferedFileException ("Can not seek base file").Raise ("BufferedFileImpl::Write");
+      throw  BufferedFileException ("BufferedFileImpl::Write", "Can not seek base file");
 
     size      = base_file->Write (write_buffer,size);
     file_pos += size + tail_size;
@@ -263,10 +263,10 @@ void BufferedFileImpl::FlushBuffer ()
   size_t    size     = dirty_finish - dirty_start;
 
   if (base_file->Tell () != position && base_file->Seek (position) != position)
-    BufferedFileException ("Can not seek base file").Raise ("BufferedFileImpl::FlushBuffer");
+    throw BufferedFileException ("BufferedFileImpl::FlushBuffer", "Can not seek base file");
 
   if (base_file->Write (buffer+dirty_start,size) != size)
-    BufferedFileException ("Can not flush file buffer").Raise ("BufferedFileImpl::FlushBuffer");
+    throw BufferedFileException ("BufferedFileImpl::FlushBuffer", "Can not flush file buffer");
 
   dirty_start = dirty_finish = 0;
 }

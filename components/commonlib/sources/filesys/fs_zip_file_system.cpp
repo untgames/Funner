@@ -151,7 +151,8 @@ ZipFileSystem::ZipFileSystem (const char* path)
   }
   catch (Exception& exception)
   {
-    exception.Raise ("ZipFileSystem::ZipFileSystem");
+    exception.Touch ("ZipFileSystem::ZipFileSystem");
+    throw;
   }
   catch (...)
   {

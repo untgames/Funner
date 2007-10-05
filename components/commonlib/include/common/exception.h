@@ -26,6 +26,7 @@ class Exception: public std::exception
 {
   public:
     Exception  (const char* message);
+    Exception  (const char* source, const char* message);
     Exception  (const Exception&);
     ~Exception () throw ();
     
@@ -40,10 +41,9 @@ class Exception: public std::exception
     const char* Message () const throw ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Выброс исключения
+///Добавление информации о контексте выброса
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Raise ();
-    void Raise (const char* source);
+    void Touch (const char* source);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,6 +64,7 @@ class DerivedException: public BaseException
 {
   public:
     DerivedException (const char* message);
+    DerivedException (const char* source, const char* message);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

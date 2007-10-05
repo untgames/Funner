@@ -35,7 +35,8 @@ MemFileImpl::MemFileImpl (FileImplPtr base_file)
   catch (Exception& exception)
   {
     ::operator delete (buffer);
-    exception.Raise ("MemFileImpl::MemFileImpl");
+    exception.Touch ("MemFileImpl::MemFileImpl");
+    throw;
   }
   catch (...)
   {

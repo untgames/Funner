@@ -606,7 +606,8 @@ void FileSystemImpl::Remove (const char* src_file_name)
   }
   catch (Exception& exception)
   {
-    exception.Raise ("FileSystem::Remove");
+    exception.Touch ("FileSystem::Remove");
+    throw;
   }
 }
 
@@ -628,7 +629,8 @@ void FileSystemImpl::Rename (const char* src_file_name,const char* new_name)
   }
   catch (Exception& exception)
   {
-    exception.Raise ("FileSystem::Rename");
+    exception.Touch ("FileSystem::Rename");
+    throw;
   }
 }
 
@@ -647,7 +649,8 @@ void FileSystemImpl::Mkdir (const char* src_dir_name)
   }
   catch (Exception& exception)
   {
-    exception.Raise ("FileSystem::Mkdir");
+    exception.Touch ("FileSystem::Mkdir");
+    throw;
   }
 }
 
@@ -891,6 +894,7 @@ void FileSystem::GetFileHash (const char* file_name,FileHash& hash)
   }
   catch (FileException& exception)
   {
-    exception.Raise ("FileSystem::GetFileHash");
+    exception.Touch ("FileSystem::GetFileHash");
+    throw;
   }
 }

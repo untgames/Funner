@@ -34,6 +34,23 @@ Exception::Exception (const char* _message)
   }
 }
 
+Exception::Exception (const char* source, const char* _message)
+{
+  impl = new Impl;
+  
+  try
+  {      
+    impl->message = _message;
+    
+    Touch (source);
+  }
+  catch (...)
+  {
+    delete impl;
+    throw;
+  }
+}
+
 Exception::Exception (const Exception& exception)
 {
   impl = new Impl;
@@ -74,26 +91,19 @@ const char* Exception::what () const throw ()
   return impl->message.c_str ();
 }
 
-void Exception::Raise ()
+void Exception::Touch (const char* source)
 {
-  throw *this;
-}
+  if (!source)
+    return;
 
-void Exception::Raise (const char* source)
-{
-  if (source)
+  if (!impl->stack_print)
   {
-    if (!impl->stack_print)
-    {
-      impl->message     += " at ";
-      impl->stack_print  = true;
-    }
-    else impl->message += "<-";
-
-    impl->message += source;
+    impl->message     += " at ";
+    impl->stack_print  = true;
   }
+  else impl->message += "<-";
 
-  throw *this;
+  impl->message += source;
 }
 
 /*

@@ -260,7 +260,7 @@ filepos_t FileImpl::Seek (filepos_t)
 void FileImpl::Rewind ()
 {
   if (Seek (0))
-    FileException ("Internal seek error").Raise ("FileImpl::Rewind");
+    throw FileException ("FileImpl::Rewind", "Internal seek error");
 }
 
 filesize_t FileImpl::Size ()

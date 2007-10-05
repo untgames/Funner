@@ -573,5 +573,5 @@ Parser::~Parser ()
 
 Parser::Node* Parser::Root () const
 {
-  return (ParseNode*)((char*)impl+sizeof (ParseTreeImpl));
+  return impl ? (ParseNode*)((char*)impl+sizeof (ParseTreeImpl)) : 0;
 }

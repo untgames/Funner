@@ -87,7 +87,8 @@ void MountPointFileSystem::Rename (const char* file_name,const char* new_name)
   catch (FileMountException& exception)
   {
     FileSystemSingleton::Instance ().Mount (file_name,file_system);
-    exception.Raise ("MountPointFileSystem::Rename");
+    exception.Touch ("MountPointFileSystem::Rename");
+    throw;
   }
 }
 

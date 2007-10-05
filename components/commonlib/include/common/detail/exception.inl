@@ -7,6 +7,11 @@ inline DerivedException<BaseException,Tag>::DerivedException (const char* messag
   : BaseException (message)
   { }
   
+template <class BaseException,class Tag>
+inline DerivedException<BaseException,Tag>::DerivedException (const char* source, const char* message)
+  : BaseException (source, message)
+  { }  
+  
 /*
     Raise
 */
@@ -21,7 +26,11 @@ extern void VRaise
 template <class Exception>
 void __RaiseException (const char* source,const char* message)
 {
-  Exception (message).Raise (source);    
+  Exception exception (message);
+
+  exception.Touch (source);
+
+  throw exception;
 }
 
 template <class Exception>

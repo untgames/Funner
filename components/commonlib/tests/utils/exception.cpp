@@ -12,7 +12,8 @@ using namespace common;
     }                                             \
     catch (Exception& exception)                  \
     {                                             \
-      exception.Raise ("some_function");          \
+      exception.Touch ("some_function");          \
+      throw;                                      \
     }                                             \
   }                                               \
   catch (std::exception& exception)               \
