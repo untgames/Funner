@@ -346,7 +346,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
                               0, 0, GetApplicationInstance (), window_impl);
                                 
     if (!wnd)
-      WinAPIException ("Error at create window").Raise ("syslib::Win32Platform::CreateWindow");
+      throw WinAPIException ("syslib::Win32Platform::CreateWindow", "Error at create window");
 
     CheckErrors  ("syslib::Win32Platform::CreateWindow");    
     ShowWindow   (wnd, SW_SHOW);

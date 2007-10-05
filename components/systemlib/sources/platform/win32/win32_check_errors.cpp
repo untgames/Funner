@@ -13,7 +13,7 @@ class Win32ErrorMessage
                      0, error_code, 0, (LPTSTR)&buffer, 0, 0);
 
       if (!buffer)
-        WinAPIException ("Internal error at FormatMessage").Raise ("system::Win32ErrorMessage::Win32ErrorMessage");
+        throw WinAPIException ("system::Win32ErrorMessage::Win32ErrorMessage", "Internal error at FormatMessage");
     }
 
     ~Win32ErrorMessage ()
@@ -34,7 +34,7 @@ void CheckErrors (const char* source)
   DWORD error_code = GetLastError ();
   
   if (error_code)
-    WinAPIException (Win32ErrorMessage (GetLastError ()).Message ()).Raise (source);
+    throw WinAPIException (source, Win32ErrorMessage (GetLastError ()).Message ());
 }
 
 }
