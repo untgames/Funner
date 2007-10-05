@@ -204,33 +204,53 @@ class XmlMeshLibrarySaver
     {
       XmlWriter::Scope scope (writer, "primitive");
       
-      writer.WriteAttribute ("type", get_type_name (primitive.type));
+      writer.WriteAttribute ("type", get_type_name (primitive.type));      
       writer.WriteAttribute ("material", primitive.material);
+      writer.WriteAttribute ("vertex_buffer", primitive.vertex_buffer);
       writer.WriteAttribute ("first", primitive.first);
       writer.WriteAttribute ("count", primitive.count);
+    }
+    
+      //сохранение вершинных буферов меша
+    void SaveMeshVertexBuffers (const Mesh& mesh)
+    {
+      XmlWriter::Scope scope (writer, "vertex_buffers");
+      
+      for (size_t i=0, count=mesh.VertexBuffersCount (); i<count; i++)
+      {
+        ResourceMap::const_iterator vb_iter = vertex_buffers.find (mesh.VertexBuffer (i).Id ());
+
+        if (vb_iter != vertex_buffers.end ())
+          writer.WriteData (format ("vb#%u", vb_iter->second));
+      }
+    }
+    
+      //сохранение примитивов
+    void SaveMeshPrimitives (const Mesh& mesh)
+    {
+      XmlWriter::Scope scope (writer, "primitives");
+      
+      for (size_t i=0; i<mesh.PrimitivesCount (); i++)
+        SavePrimitive (mesh.Primitive (i));      
     }
     
       //сохранение меша
     void SaveMesh (const Mesh& mesh)
     {
-      if (!mesh.VertexBuffer ().VerticesCount () || !mesh.PrimitivesCount ())
+      if (!mesh.VertexBuffersCount () || !mesh.PrimitivesCount ())
         return;
       
       XmlWriter::Scope scope (writer, "mesh");
       
       writer.WriteAttribute ("name", mesh.Name ());
       
-      ResourceMap::const_iterator vb_iter = vertex_buffers.find (mesh.VertexBuffer ().Id ()),
-                                  ib_iter = index_buffers.find (mesh.IndexBuffer ().Id ());
+      ResourceMap::const_iterator ib_iter = index_buffers.find (mesh.IndexBuffer ().Id ());
       
-      if (vb_iter != vertex_buffers.end ())
-        writer.WriteAttribute ("vertex_buffer", format ("vb#%u", vb_iter->second));
-
       if (ib_iter != index_buffers.end ())
-        writer.WriteAttribute ("index_buffer", format ("ib#%u", ib_iter->second));        
+        writer.WriteAttribute ("index_buffer", format ("ib#%u", ib_iter->second));
         
-      for (size_t i=0; i<mesh.PrimitivesCount (); i++)
-        SavePrimitive (mesh.Primitive (i));
+      SaveMeshVertexBuffers (mesh);
+      SaveMeshPrimitives (mesh);        
     }
     
       //сохранение вершинных потоков
@@ -240,13 +260,17 @@ class XmlMeshLibrarySaver
       
       for (MeshLibrary::ConstIterator i=library.CreateIterator (); i; ++i)
       {
-        const Mesh&         mesh = *i;
-        const VertexBuffer& vb   = mesh.VertexBuffer ();
+        const Mesh& mesh = *i;
+        
+        for (size_t k=0, count=mesh.VertexBuffersCount (); k<count; k++)
+        {
+          const VertexBuffer& vb = mesh.VertexBuffer (k);
 
-        for (size_t j=0; j<vb.StreamsCount (); j++)
-          SaveVertexStream (vb.Stream (j));
+          for (size_t j=0; j<vb.StreamsCount (); j++)
+            SaveVertexStream (vb.Stream (j));
 
-        SaveVertexWeightStream (vb.Weights ());
+          SaveVertexWeightStream (vb.Weights ());          
+        }
       }
     }
     
@@ -255,8 +279,13 @@ class XmlMeshLibrarySaver
     {
       XmlWriter::Scope scope (writer, "vertex_buffers");            
       
-      for (MeshLibrary::ConstIterator i=library.CreateIterator (); i; ++i)       
-        SaveVertexBuffer (i->VertexBuffer ());
+      for (MeshLibrary::ConstIterator i=library.CreateIterator (); i; ++i)
+      {
+        const Mesh& mesh = *i;
+        
+        for (size_t j=0, count=mesh.VertexBuffersCount (); j<count; j++)        
+          SaveVertexBuffer (mesh.VertexBuffer (j));
+      }
     }
     
       //сохранение индексных буферов

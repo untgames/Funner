@@ -123,6 +123,14 @@ VertexWeightStream& VertexBuffer::Weights ()
 
 size_t VertexBuffer::Attach (VertexStream& vs, CloneMode mode)
 {
+    //проверка зарегистрирован ли канал
+    
+  size_t id = vs.Id ();
+    
+  for (VertexStreamArray::iterator i=impl->streams.begin (), end=impl->streams.end (); i!=end; ++i)
+    if (i->Resource ().Id () == id)
+      return i - impl->streams.begin ();
+
   impl->streams.push_back (VertexStreamHolder (vs, mode));
 
   return impl->streams.size () - 1;

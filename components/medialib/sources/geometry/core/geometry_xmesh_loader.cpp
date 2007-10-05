@@ -287,38 +287,48 @@ class XmlMeshLibraryLoader
     {
       PrimitiveType type     = get_primitive_type (get<const char*> (primitive_iter, "type", ""));
       const char*   material = get<const char*> (primitive_iter, "material", "");
-      size_t        first    = get<size_t> (primitive_iter, "first", (size_t)-1),
-                    count    = get<size_t> (primitive_iter, "count", (size_t)-1);
-                    
-      if (type == PrimitiveType_Num || first == (size_t)-1 || count == (size_t)-1)
-        return;
+      size_t        vertex_buffer = get<size_t> (primitive_iter, "vertex_buffer", (size_t)-1),
+                    first         = get<size_t> (primitive_iter, "first", (size_t)-1),
+                    count         = get<size_t> (primitive_iter, "count", (size_t)-1);
 
-      mesh.AddPrimitive (type, first, count, material);
+      if (type == PrimitiveType_Num || first == (size_t)-1 || count == (size_t)-1 || vertex_buffer == (size_t)-1)
+        return;
+        
+      if (vertex_buffer >= mesh.VertexBuffersCount ())
+        return; //вершинный буфер не найден
+
+      mesh.AddPrimitive (type, vertex_buffer, first, count, material);
     }
     
-      //разбор мешей
+      //разбор меша
     void ParseMesh (Parser::Iterator mesh_iter)
     {
-        //чтение имён: меша, вершинного буфера, индексного буфера (если есть)
+        //чтение имён: меша, индексного буфера (если есть)
       
       const char *name  = get<const char*> (mesh_iter, "name", ""),
-                 *vb_id = get<const char*> (mesh_iter, "vertex_buffer"),
                  *ib_id = get<const char*> (mesh_iter, "index_buffer");
                  
-        //поиск вершинного и индексного буфера
+        //создание меша
         
-      VertexBuffer* vb = 0;
-      IndexBuffer*  ib = 0;
-
-      if (!vb_id)
-        return;
-        
-      VertexBufferMap::iterator vb_iter = vertex_buffers.find (vb_id);
+      Mesh mesh;
       
-      if (vb_iter == vertex_buffers.end ())
-        return;        
+      mesh.Rename (name);                 
+                 
+        //поиск вершинных буферов        
+
+      for (Parser::AttributeIterator vb_iter=make_attribute_iterator (mesh_iter, "vertex_buffers.#text"); vb_iter; ++vb_iter)
+      {
+        VertexBufferMap::iterator iter = vertex_buffers.find (*vb_iter);
+      
+        if (iter == vertex_buffers.end ())
+          return;
+
+        mesh.Attach (iter->second);
+      }
+
+        //поиск индексного буфера
         
-      vb = &vb_iter->second;
+      IndexBuffer* ib = 0;
       
       if (ib_id)
       {
@@ -328,22 +338,14 @@ class XmlMeshLibraryLoader
           return;
           
         ib = &ib_iter->second;
-      }
-      
-        //создание меша
-        
-      Mesh mesh;
-      
-      mesh.Rename (name);
-
-      mesh.Attach (*vb);
+      }      
 
       if (ib)
         mesh.Attach (*ib);              
         
         //чтение примитивов
 
-      for_each_child (mesh_iter, "primitive", xtl::bind (&XmlMeshLibraryLoader::ParsePrimitive, this, _1, xtl::ref (mesh)));      
+      for_each_child (mesh_iter, "primitives.primitive", xtl::bind (&XmlMeshLibraryLoader::ParsePrimitive, this, _1, xtl::ref (mesh)));
 
         //присоединение меша к модели
 

@@ -40,10 +40,11 @@ PrimitiveType get_primitive_type (const char* name, PrimitiveType default_type =
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Primitive
 {
-  PrimitiveType type;     //тип примитива
-  size_t        first;    //индекс первой вершины/индекса
-  size_t        count;    //количество примитивов
-  const char*   material; //имя материала
+  PrimitiveType type;          //тип примитива
+  size_t        vertex_buffer; //индекс вершинного буфера
+  size_t        first;         //индекс первой вершины/индекса
+  size_t        count;         //количество примитивов
+  const char*   material;      //имя материала
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,29 +77,29 @@ class Mesh
     void        Rename (const char*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Буферы
+///Вершинные буферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const geometry::VertexBuffer& VertexBuffer () const;
-          geometry::VertexBuffer& VertexBuffer ();
-    const geometry::IndexBuffer&  IndexBuffer  () const;
-          geometry::IndexBuffer&  IndexBuffer  ();
+    const geometry::VertexBuffer& VertexBuffer (size_t index) const;
+          geometry::VertexBuffer& VertexBuffer (size_t index);
+          
+    size_t VertexBuffersCount () const; //количество вершинных буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Статистика: количество вершин/индексов/весов
+///Индексный буфер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t VerticesCount () const;
-    size_t IndicesCount  () const;
-    size_t WeightsCount  () const;
+    const geometry::IndexBuffer& IndexBuffer () const;
+          geometry::IndexBuffer& IndexBuffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение/отсоединение буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Attach (geometry::VertexBuffer&, CloneMode mode = CloneMode_Instance);
-    void Attach (geometry::IndexBuffer&, CloneMode mode = CloneMode_Instance);
+    size_t Attach (geometry::VertexBuffer&, CloneMode mode = CloneMode_Instance);
+    void   Attach (geometry::IndexBuffer&, CloneMode mode = CloneMode_Instance);
 
-    void DetachVertexBuffer ();
-    void DetachIndexBuffer  ();
-    void DetachAllBuffers   (); //отсоединение всех буферов
+    void DetachVertexBuffer     (size_t index);
+    void DetachIndexBuffer      ();
+    void DetachAllVertexBuffers ();
+    void DetachAllBuffers       (); //отсоединение всех буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество примитивов / доступ к примитивам
@@ -109,7 +110,7 @@ class Mesh
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление примитивов примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t AddPrimitive        (PrimitiveType type, size_t first, size_t count, const char* material); //return: индекс примитива
+    size_t AddPrimitive        (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, const char* material); //return: индекс примитива
     void   RemovePrimitive     (size_t primitive_index);
     void   RemoveAllPrimitives ();
 

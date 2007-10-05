@@ -56,13 +56,19 @@ int main ()
 
     for (size_t i=0; i<ib.Size (); i++)
       indices [i] = i % 3;
+      
+    VertexBuffer vb;
 
-    mesh.VertexBuffer ().Attach (vs);
+    vb.Attach (vs);
+    vb.AttachWeights (vws);
+
+    mesh.Attach (vb);
     mesh.Attach (ib);
-    mesh.VertexBuffer ().AttachWeights (vws);
 
-    mesh.AddPrimitive (PrimitiveType_LineList, 6, 3, 0);
-    mesh.AddPrimitive (PrimitiveType_TriangleList, 0, 2, "");    
+    mesh.AddPrimitive (PrimitiveType_LineList, 0, 6, 3, 0);
+    mesh.AddPrimitive (PrimitiveType_TriangleList, 0, 0, 2, "");
+    mesh.AddPrimitive (PrimitiveType_TriangleStrip, 0, 0, 3, "");
+    mesh.AddPrimitive (PrimitiveType_TriangleList, 1, 0, 2, "");
 
     check (mesh, 5, &print);
   }

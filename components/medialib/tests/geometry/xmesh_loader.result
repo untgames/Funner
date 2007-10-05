@@ -47,13 +47,23 @@ Results of xmesh_loader_test:
     </index_buffer>
   </index_buffers>
   <meshes>
-    <mesh name="mesh1" vertex_buffer="vb#1" index_buffer="ib#1">
-      <primitive type="triangle_list" material="material1" first="0" count="12"/>
-      <primitive type="triangle_strip" material="material2" first="1" count="14"/>
+    <mesh name="mesh1" index_buffer="ib#1">
+      <vertex_buffers>
+        vb#1
+      </vertex_buffers>
+      <primitives>
+        <primitive type="triangle_list" material="material1" vertex_buffer="0" first="0" count="12"/>
+        <primitive type="triangle_strip" material="material2" vertex_buffer="0" first="1" count="14"/>
+      </primitives>
     </mesh>
-    <mesh name="mesh2" vertex_buffer="vb#2">
-      <primitive type="line_list" material="material1" first="0" count="12"/>
-      <primitive type="line_strip" material="material2" first="1" count="14"/>
+    <mesh name="mesh2">
+      <vertex_buffers>
+        vb#2
+      </vertex_buffers>
+      <primitives>
+        <primitive type="line_list" material="material1" vertex_buffer="0" first="0" count="12"/>
+        <primitive type="line_strip" material="material2" vertex_buffer="0" first="1" count="14"/>
+      </primitives>
     </mesh>
   </meshes>
 </mesh_library>

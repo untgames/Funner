@@ -46,14 +46,15 @@ class Log
 struct CheckContext
 {
   const VertexStream&        stream;        //вершинный массив
-  const VertexWeightStream&  weights;
+  const VertexWeightStream&  weights;       //веса
+  size_t                     vertex_buffer_index; //номер вершинного буфера
   size_t                     stream_index;  //номер вершинного массива
   size_t                     weights_count; //количество весов
   size_t                     vertex_index;  //номер вершины
   const VertexAttribute*     attribute;
   
-  CheckContext (const VertexBuffer& vb, size_t in_stream_index) :
-    stream (vb.Stream (in_stream_index)), weights (vb.Weights ()), stream_index (in_stream_index),
+  CheckContext (const VertexBuffer& vb, size_t in_vertex_buffer_index, size_t in_stream_index) :
+    stream (vb.Stream (in_stream_index)), weights (vb.Weights ()), vertex_buffer_index (in_vertex_buffer_index), stream_index (in_stream_index),
     weights_count (weights.Size ()), vertex_index (0), attribute (0) {}
 };
 
@@ -64,16 +65,16 @@ inline void check_attribute (Log& log, CheckContext& context, const VertexInflue
 
   if (influence.first_weight >= context.weights_count)
   {
-    log.Error ("vertex_stream[%u].vertex[%u].first_weight=%u > weights_count=%u",
-               context.stream_index, context.vertex_index, influence.first_weight, context.weights_count);
+    log.Error ("vertex_buffer[%u].stream[%u].vertex[%u].first_weight=%u > weights_count=%u",
+               context.vertex_buffer_index, context.stream_index, context.vertex_index, influence.first_weight, context.weights_count);
                
     return;
   }
   
   if (context.weights_count - influence.first_weight < influence.weights_count)  
   {
-    log.Error ("vertex_stream[%u].vertex[%u].last_weight=%u > weights_count=%u (last_weight=first_weight+weights_count)",
-               context.stream_index, context.vertex_index, influence.first_weight + influence.weights_count, context.weights_count);
+    log.Error ("vertex_buffer[%u].stream[%u].vertex[%u].last_weight=%u > weights_count=%u (last_weight=first_weight+weights_count)",
+               context.vertex_buffer_index, context.stream_index, context.vertex_index, influence.first_weight + influence.weights_count, context.weights_count);
                
     return;    
   }
@@ -85,8 +86,8 @@ inline void check_attribute (Log& log, CheckContext& context, const VertexInflue
     weights_sum += weight->joint_weight;
     
   if (fabs (weights_sum - 1.0f) > EPS)
-    log.Error ("vertex_stream[%u].vertex[%u] not normalized (weights_sum=%.3f)", context.stream_index, context.vertex_index,
-               weights_sum);
+    log.Error ("vertex_buffer[%u].stream[%u].vertex[%u] not normalized (weights_sum=%.3f)",
+               context.vertex_buffer_index, context.stream_index, context.vertex_index, weights_sum);
 }
 
 template <size_t Size>
@@ -96,8 +97,8 @@ inline void check_attribute (Log& log, CheckContext& context, const vec<float, S
 
   for (size_t i=0; i<Size; i++)
     if (!_finite (attribute [i]))
-      log.Error ("inifinite value vertex_stream[%u].vertex[%u].%s.%s=%g (attribute_type='%s')",
-                 context.stream_index, context.vertex_index, get_semantic_name (context.attribute->semantic), component_name [i],
+      log.Error ("inifinite value vertex_buffer[%u].stream[%u].vertex[%u].%s.%s=%g (attribute_type='%s')",
+                 context.vertex_buffer_index, context.stream_index, context.vertex_index, get_semantic_name (context.attribute->semantic), component_name [i],
                  attribute [i], get_type_name (context.attribute->type));
 }
 
@@ -141,8 +142,8 @@ void check_stream (Log& log, CheckContext& context)
       case VertexAttributeSemantic_Influence:
         break;
       default:
-        log.Error ("vertex_stream[%u].format.attribute[%u] has unknown semantic=%d", context.stream_index,
-                   i, attribute.semantic);
+        log.Error ("vertex_buffer[%u].stream[%u].format.attribute[%u] has unknown semantic=%d",
+                   context.vertex_buffer_index, context.stream_index, i, attribute.semantic);
         continue;
     }
     
@@ -158,15 +159,15 @@ void check_stream (Log& log, CheckContext& context)
       case VertexAttributeType_UByte4:
         break;
       default:
-        log.Error ("vertex_stream[%u].format.attribute[%u] has unknown type=%d", context.stream_index,
-                   i, attribute.type);
+        log.Error ("vertex_buffer[%u].stream[%u].format.attribute[%u] has unknown type=%d",
+                   context.vertex_buffer_index, context.stream_index, i, attribute.type);
         continue;
     }
     
     if (!is_compatible (attribute.semantic, attribute.type))
     {
-      log.Error ("vertex_stream[%u].format.attribute[%u] has semantic '%s' incompatible with type '%s'", context.stream_index,
-                 i, get_semantic_name (attribute.semantic), get_type_name (attribute.type));
+      log.Error ("vertex_buffer[%u].stream[%u].format.attribute[%u] has semantic '%s' incompatible with type '%s'",
+                 context.vertex_buffer_index, context.stream_index, i, get_semantic_name (attribute.semantic), get_type_name (attribute.type));
 
       continue;
     }
@@ -176,8 +177,8 @@ void check_stream (Log& log, CheckContext& context)
     
     if (attribute.offset > vertex_size || vertex_size - attribute.offset < type_size)
     {
-       log.Error ("bad offset vertex_stream[%u].format.attribute[%u].offset=%u (type_size=%u, vertex_size=%u)",
-                  context.stream_index, i, attribute.offset, type_size, vertex_size);
+       log.Error ("bad offset vertex_buffer[%u].stream[%u].format.attribute[%u].offset=%u (type_size=%u, vertex_size=%u)",
+                  context.vertex_buffer_index, context.stream_index, i, attribute.offset, type_size, vertex_size);
                   
        continue;
     }
@@ -224,19 +225,26 @@ bool check (const Mesh& mesh, size_t joints_count, const xtl::function<void (con
   
   try
   {
-    const VertexBuffer& vertex_buffer = mesh.VertexBuffer ();
-    const IndexBuffer&  index_buffer  = mesh.IndexBuffer ();
+    const IndexBuffer& index_buffer = mesh.IndexBuffer ();
     
       //проверка примитивов
     
-    bool   has_indices = mesh.IndexBuffer ().Size () != 0;
-    size_t max_index   = has_indices ? index_buffer.Size () : vertex_buffer.VerticesCount ();
-    
-    const char* max_index_name = has_indices ? "indices_count" : "vertices_count";
+    bool has_indices = mesh.IndexBuffer ().Size () != 0;
 
     for (size_t i=0, count=mesh.PrimitivesCount (); i<count; i++)
-    {      
+    {                  
       const Primitive& primitive = mesh.Primitive (i);
+      
+      if (primitive.vertex_buffer >= mesh.VertexBuffersCount ())
+      {
+        log.Error ("primitive[%u].vertex_buffer=%u >= vertex_buffers_count=%u", i, primitive.vertex_buffer, mesh.VertexBuffersCount ());
+        continue;
+      }
+
+      const VertexBuffer& vertex_buffer = mesh.VertexBuffer (primitive.vertex_buffer);
+
+      size_t      max_index      = has_indices ? index_buffer.Size () : vertex_buffer.VerticesCount ();    
+      const char* max_index_name = has_indices ? "indices_count" : "vertices_count";      
       
       switch (primitive.type)
       {
@@ -268,30 +276,37 @@ bool check (const Mesh& mesh, size_t joints_count, const xtl::function<void (con
                    
         continue;
       }
+      
+        //проверка корректности индексов
+      
+      const size_t* index       = index_buffer.Data ();
+      size_t        verts_count = vertex_buffer.VerticesCount ();
+      
+      for (size_t j=0, count=index_buffer.Size (); j<count; j++, index++)
+        if (*index >= verts_count)
+          log.Error ("index[%u]=%u >= vertices_count=%u (at primitive #%u)", j, *index, verts_count, i);
     }
-  
-      //проверка индексного буфера
-    
-    const size_t* index       = index_buffer.Data ();
-    size_t        verts_count = vertex_buffer.VerticesCount ();
-    
-    for (size_t i=0, count=index_buffer.Size (); i<count; i++, index++)
-      if (*index >= verts_count)
-        log.Error ("bad index[%u]=%u (vertices_count=%u)", i, *index, verts_count);
-
-      //проверка вершинных массивов
         
-    for (size_t i=0, count=vertex_buffer.StreamsCount (); i<count; i++)     
-      check_stream (log, CheckContext (mesh.VertexBuffer (), i));
-    
-      //проверка массива весов
+      //проверка вершинных буферов
       
-    const VertexWeight* weight = vertex_buffer.Weights ().Data ();
-      
-    for (size_t i=0, count=mesh.WeightsCount (); i<count; i++, weight++)
+    for (size_t i=0, count=mesh.VertexBuffersCount (); i<count; i++)
     {
-      if (weight->joint_index >= joints_count)
-        log.Error ("weight [%u].joint_index=%u > joints_count=%u", i, weight->joint_index, joints_count);
+        //проверка вершинных массивов
+
+      const VertexBuffer& vertex_buffer = mesh.VertexBuffer (i);
+
+      for (size_t j=0, count=vertex_buffer.StreamsCount (); j<count; j++)
+        check_stream (log, CheckContext (vertex_buffer, i, j));
+
+        //проверка массива весов
+        
+      const VertexWeight* weight = vertex_buffer.Weights ().Data ();
+        
+      for (size_t j=0, count=vertex_buffer.Weights ().Size (); j<count; j++, weight++)
+      {
+        if (weight->joint_index >= joints_count)
+          log.Error ("vertex_buffer[%u].weight[%u].joint_index=%u >= joints_count=%u", i, j, weight->joint_index, joints_count);
+      }        
     }
   }
   catch (std::exception& exception)

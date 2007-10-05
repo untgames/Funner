@@ -57,23 +57,31 @@ int main ()
     Mesh mesh1;
 
     mesh1.Rename ("mesh1");
+    
+    VertexBuffer vb1;
+    
+    vb1.Attach (vs1);
 
-    mesh1.VertexBuffer ().Attach (vs1);
+    mesh1.Attach (vb1);
     mesh1.Attach (ib);
     
-    mesh1.AddPrimitive (PrimitiveType_TriangleList, 0, 12, "material1");
-    mesh1.AddPrimitive (PrimitiveType_TriangleStrip, 1, 14, "material2");
+    mesh1.AddPrimitive (PrimitiveType_TriangleList, 0, 0, 12, "material1");
+    mesh1.AddPrimitive (PrimitiveType_TriangleStrip, 0, 1, 14, "material2");
 
     Mesh mesh2;
     
     mesh2.Rename ("mesh2");
     
-    mesh2.VertexBuffer ().Attach (vs1);
-    mesh2.VertexBuffer ().Attach (vs2);
-    mesh2.VertexBuffer ().AttachWeights (vws);
+    VertexBuffer vb2;
     
-    mesh2.AddPrimitive (PrimitiveType_LineList, 0, 12, "material1");
-    mesh2.AddPrimitive (PrimitiveType_LineStrip, 1, 14, "material2");    
+    vb2.Attach (vs1);
+    vb2.Attach (vs2);
+    vb2.AttachWeights (vws);
+    
+    mesh2.Attach (vb2);
+    
+    mesh2.AddPrimitive (PrimitiveType_LineList, 0, 0, 12, "material1");
+    mesh2.AddPrimitive (PrimitiveType_LineStrip, 0, 1, 14, "material2");    
 
     MeshLibrary mesh_library;
 

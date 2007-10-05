@@ -6,6 +6,7 @@ using namespace stl;
 using namespace common;
 
 const size_t DEFAULT_PRIMITIVES_ARRAY_RESERVE = 8; //количество резервируемых примитивов
+const size_t DEFAULT_VB_ARRAY_RESERVE         = 4; //количество резервируемых вершинных буферов
 
 /*
     Реализация примитива
@@ -20,14 +21,15 @@ struct PrimitiveImpl: public Primitive
     Описание реализации Mesh
 */
 
-typedef stl::vector<PrimitiveImpl>   PrimitiveArray;
-typedef ResourceHolder<VertexBuffer> VertexBufferHolder;
-typedef ResourceHolder<IndexBuffer>  IndexBufferHolder;
+typedef ResourceHolder<VertexBuffer>    VertexBufferHolder;
+typedef ResourceHolder<IndexBuffer>     IndexBufferHolder;
+typedef stl::vector<PrimitiveImpl>      PrimitiveArray;
+typedef stl::vector<VertexBufferHolder> VertexBufferArray;
 
 struct Mesh::Impl: public xtl::reference_counter
 {
   string             name;                       //имя меша
-  VertexBufferHolder vertex_buffer;              //вершинный буфер
+  VertexBufferArray  vertex_buffers;             //вершинные буферы
   IndexBufferHolder  index_buffer;               //индексный буфер
   PrimitiveArray     primitives;                 //примитивы
   string             material_names;             //имена материалов
@@ -44,17 +46,23 @@ struct Mesh::Impl: public xtl::reference_counter
 Mesh::Impl::Impl ()
 {
   primitives.reserve (DEFAULT_PRIMITIVES_ARRAY_RESERVE);
+  vertex_buffers.reserve (DEFAULT_VB_ARRAY_RESERVE);
+  
   need_material_names_update = true;
 }
 
 Mesh::Impl::Impl (const Impl& impl)
   : name (impl.name),
-    vertex_buffer (impl.vertex_buffer, ForceClone),
     index_buffer (impl.index_buffer, ForceClone),
     primitives (impl.primitives),
     material_names (impl.material_names),
     need_material_names_update (true)
-  {}
+{
+  vertex_buffers.reserve (impl.vertex_buffers.size ());
+
+  for (VertexBufferArray::const_iterator i=impl.vertex_buffers.begin (), end=impl.vertex_buffers.end (); i!=end; ++i)
+    vertex_buffers.push_back (VertexBufferHolder (*i, ForceClone));
+}
 
 /*
     Конструкторы / деструктор
@@ -113,14 +121,23 @@ void Mesh::Rename (const char* name)
     Буферы
 */
 
-const media::geometry::VertexBuffer& Mesh::VertexBuffer () const
+//количество вершинных буферов
+size_t Mesh::VertexBuffersCount () const
 {
-  return impl->vertex_buffer.Resource ();
+  return impl->vertex_buffers.size ();
 }
 
-media::geometry::VertexBuffer& Mesh::VertexBuffer ()
+const media::geometry::VertexBuffer& Mesh::VertexBuffer (size_t index) const
 {
-  return impl->vertex_buffer.Resource ();
+  if (index >= impl->vertex_buffers.size ())
+    RaiseOutOfRange ("media::geometry::Mesh::VertexBuffer", "index", index, impl->vertex_buffers.size ());
+
+  return impl->vertex_buffers [index].Resource ();
+}
+
+media::geometry::VertexBuffer& Mesh::VertexBuffer (size_t index)
+{
+  return const_cast<media::geometry::VertexBuffer&> (const_cast<const Mesh&> (*this).VertexBuffer (index));
 }
 
 const media::geometry::IndexBuffer& Mesh::IndexBuffer () const
@@ -133,33 +150,16 @@ media::geometry::IndexBuffer& Mesh::IndexBuffer ()
   return impl->index_buffer.Resource ();
 }
 
-/*
-    Статистика: количество вершин/индексов/весов
-*/
-
-size_t Mesh::VerticesCount () const
-{
-  return impl->vertex_buffer.Resource ().VerticesCount ();
-}
-
-size_t Mesh::IndicesCount () const
-{
-  return impl->index_buffer.Resource ().Size ();
-}
-
-size_t Mesh::WeightsCount () const
-{
-  return impl->vertex_buffer.Resource ().Weights ().Size ();
-}
-
 
 /*
     Присоединение/отсоединение буферов
 */
 
-void Mesh::Attach (media::geometry::VertexBuffer& vb, CloneMode mode)
+size_t Mesh::Attach (media::geometry::VertexBuffer& vb, CloneMode mode)
 {
-  impl->vertex_buffer.Attach (vb, mode);
+  impl->vertex_buffers.push_back (VertexBufferHolder (vb, mode));
+
+  return impl->vertex_buffers.size () - 1;
 }
 
 void Mesh::Attach (media::geometry::IndexBuffer& ib, CloneMode mode)
@@ -167,9 +167,12 @@ void Mesh::Attach (media::geometry::IndexBuffer& ib, CloneMode mode)
   impl->index_buffer.Attach (ib, mode);
 }
     
-void Mesh::DetachVertexBuffer ()
+void Mesh::DetachVertexBuffer (size_t index)
 {
-  impl->vertex_buffer.Attach (media::geometry::VertexBuffer (), CloneMode_Instance);
+  if (index >= impl->vertex_buffers.size ())
+    return;
+
+  impl->vertex_buffers.erase (impl->vertex_buffers.begin () + index);
 }
 
 void Mesh::DetachIndexBuffer ()
@@ -177,9 +180,14 @@ void Mesh::DetachIndexBuffer ()
   impl->index_buffer.Attach (media::geometry::IndexBuffer (), CloneMode_Instance);
 }
 
+void Mesh::DetachAllVertexBuffers ()
+{
+  impl->vertex_buffers.clear ();
+}
+
 void Mesh::DetachAllBuffers ()
 {
-  DetachVertexBuffer ();
+  DetachAllVertexBuffers ();
   DetachIndexBuffer ();
 }
 
@@ -214,7 +222,7 @@ const Primitive& Mesh::Primitive (size_t index) const
     Добавление/удаление примитивов примитивов
 */
 
-size_t Mesh::AddPrimitive (PrimitiveType type, size_t first, size_t count, const char* material)
+size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, const char* material)
 {
   if (type < 0 || type >= PrimitiveType_Num)
     RaiseInvalidArgument ("media::geometry::Mesh::AddPrimitive", "type", type);
@@ -225,6 +233,7 @@ size_t Mesh::AddPrimitive (PrimitiveType type, size_t first, size_t count, const
   PrimitiveImpl primitive;
   
   primitive.type                 = type;
+  primitive.vertex_buffer        = vertex_buffer;
   primitive.first                = first;
   primitive.count                = count;
   primitive.material             = 0;
