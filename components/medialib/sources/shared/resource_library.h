@@ -4,6 +4,7 @@
 #include <xtl/function.h>
 #include <xtl/iterator.h>
 #include <stl/hash_map>
+#include <stl/string>
 #include <media/clone.h>
 #include <shared/resource_holder.h>
 #include <common/exception.h>
@@ -43,6 +44,12 @@ template <class T> class ResourceLibrary
     ConstIterator CreateIterator () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение имени ресурса по итератору
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static const char* Name (const Iterator&);
+    static const char* Name (const ConstIterator&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск элемента в библиотеке
 ///////////////////////////////////////////////////////////////////////////////////////////////////
           Item* Find (const char* name);
@@ -66,7 +73,7 @@ template <class T> class ResourceLibrary
     void Swap (ResourceLibrary&);
 
   private:
-    typedef stl::hash_map<stl::hash_key<const char*>, ResourceHolder<Item> > ItemMap;
+    typedef stl::hash_map<stl::string, ResourceHolder<Item> > ItemMap;
    
   private:
     ItemMap items; //элементы данной библиотеки

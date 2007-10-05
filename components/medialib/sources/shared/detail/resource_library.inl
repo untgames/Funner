@@ -75,6 +75,32 @@ inline typename ResourceLibrary<T>::ConstIterator ResourceLibrary<T>::CreateIter
 }
 
 /*
+    Получение имени ресурса по итератору
+*/
+
+template <class T>
+inline const char* ResourceLibrary<T>::Name (const Iterator& i)
+{
+  const ItemMap::iterator* iter = i.target<ItemMap::iterator> ();
+  
+  if (!iter)
+    common::RaiseInvalidArgument ("media::ResourceLibrary::Name", "iterator", "wrong-type");
+
+  return (*iter)->first.c_str ();
+}
+
+template <class T>
+inline const char* ResourceLibrary<T>::Name (const ConstIterator& i)
+{
+  const ItemMap::const_iterator* iter = i.target<ItemMap::const_iterator> ();
+
+  if (!iter)
+    common::RaiseInvalidArgument ("media::ResourceLibrary::Name", "iterator", "wrong-type");
+
+  return (*iter)->first.c_str ();
+}
+
+/*
     Поиск элемента в библиотеке
 */
 
