@@ -54,13 +54,13 @@ template <class Item> class LibraryImpl: public ILibrary<Item>
 ///Получение итератора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Iterator      CreateIterator ()       { return impl.CreateIterator (); }
-    ConstIterator CreateIterator () const { return impl.CreateIterator (); }
+    ConstIterator CreateIterator () const { return impl.CreateConstIterator (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени хранимого ресурса
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* ItemId (const Iterator& i)            { return ResourceLibrary<Item>::Name (i); }
-    const char* ItemId (const ConstIterator& i) const { return ResourceLibrary<Item>::Name (i); }
+    const char* ItemId (const Iterator& i)            { return ResourceLibrary<Item>::ItemId (i); }
+    const char* ItemId (const ConstIterator& i) const { return ResourceLibrary<Item>::ItemId (i); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление элементов в библиотеку / очистка библиотеки

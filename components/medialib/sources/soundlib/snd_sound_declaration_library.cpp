@@ -91,7 +91,21 @@ SoundDeclarationLibrary::Iterator SoundDeclarationLibrary::CreateIterator ()
 
 SoundDeclarationLibrary::ConstIterator SoundDeclarationLibrary::CreateIterator () const
 {
-  return impl->declarations.CreateIterator ();
+  return impl->declarations.CreateConstIterator ();
+}
+
+/*
+    Имя декларации по итератору
+*/
+
+const char* SoundDeclarationLibrary::ItemId (const Iterator& i)
+{
+  return impl->declarations.ItemId (i);
+}
+
+const char* SoundDeclarationLibrary::ItemId (const ConstIterator& i) const
+{
+  return impl->declarations.ItemId (i);
 }
 
 /*

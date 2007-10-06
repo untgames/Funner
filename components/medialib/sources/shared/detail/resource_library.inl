@@ -69,7 +69,7 @@ inline typename ResourceLibrary<T>::Iterator ResourceLibrary<T>::CreateIterator 
 }
 
 template <class T>
-inline typename ResourceLibrary<T>::ConstIterator ResourceLibrary<T>::CreateIterator () const
+inline typename ResourceLibrary<T>::ConstIterator ResourceLibrary<T>::CreateConstIterator () const
 {
   return ConstIterator (items.begin (), items.begin (), items.end (), detail::resource_selector<const T> ());
 }
@@ -79,23 +79,23 @@ inline typename ResourceLibrary<T>::ConstIterator ResourceLibrary<T>::CreateIter
 */
 
 template <class T>
-inline const char* ResourceLibrary<T>::Name (const Iterator& i)
+inline const char* ResourceLibrary<T>::ItemId (const Iterator& i)
 {
   const ItemMap::iterator* iter = i.target<ItemMap::iterator> ();
   
   if (!iter)
-    common::RaiseInvalidArgument ("media::ResourceLibrary::Name", "iterator", "wrong-type");
+    common::RaiseInvalidArgument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
 
   return (*iter)->first.c_str ();
 }
 
 template <class T>
-inline const char* ResourceLibrary<T>::Name (const ConstIterator& i)
+inline const char* ResourceLibrary<T>::ItemId (const ConstIterator& i)
 {
   const ItemMap::const_iterator* iter = i.target<ItemMap::const_iterator> ();
 
   if (!iter)
-    common::RaiseInvalidArgument ("media::ResourceLibrary::Name", "iterator", "wrong-type");
+    common::RaiseInvalidArgument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
 
   return (*iter)->first.c_str ();
 }

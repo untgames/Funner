@@ -6,6 +6,7 @@
 #include <common/exception.h>
 #include <common/singleton.h>
 #include <common/file.h>
+#include <common/xml_writer.h>
 
 #include <stl/vector>
 #include <stl/string>
@@ -100,6 +101,11 @@ class SoundDeclarationLibraryManagerImpl: public ResourceManager<SoundDeclaratio
 };
 
 typedef common::Singleton<SoundDeclarationLibraryManagerImpl> SoundDeclarationLibraryManagerSingleton;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сохранение и загрузка SoundDeclarationLibrary
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void snddecl_save_library (const char* file_name, const SoundDeclarationLibrary& library);
 
 }
 
