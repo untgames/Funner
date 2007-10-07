@@ -7,6 +7,7 @@
 using namespace media;
 using namespace common;
 
+const char* results_dir = "results";
 const char* file_name1 = "data/pic1.jpg";
 const char* file_name2 = "data/pic2.tga";
 const char* file_name3 = "data/pic3.bmp";
@@ -38,6 +39,9 @@ int main ()
 
     Image image1, image2 (file_name2), image3 (image2,PixelFormat_RGBA8), image4, image5 (file_name3);
     ImageSystem::RegisterSaver ("tiff", &Image::DefaultSaver);
+
+    if (!FileSystem::IsDir (results_dir))
+      FileSystem::Mkdir (results_dir);
 
     image1 = image2;
     print_format (&image5);

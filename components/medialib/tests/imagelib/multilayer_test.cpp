@@ -7,6 +7,7 @@
 using namespace media;
 using namespace common;
 
+const char* results_dir = "results";
 const char* file_name1 = "data/pic1.jpg";
 const char* file_name2 = "data/pic2.tga";
 const char* file_name3 = "data/pic3.bmp";
@@ -39,6 +40,9 @@ int main ()
     Image layers [2] = {Image (file_name2), Image (file_name3)};
     Image img (2, layers);
     
+    if (!FileSystem::IsDir (results_dir))
+      FileSystem::Mkdir (results_dir);
+
     printf ("multilayer image name - '%s'\n", img.Name());
     img.Rename ("new_name");
     printf ("multilayer image new name - '%s'\n", img.Name());
@@ -58,9 +62,9 @@ int main ()
 
     img.Save("results/multilayer_image.bmp.skybox");
 
-    FileSystem::GetFileHash ("results/multilayer_image_nx.bmp",file_hash);
+    FileSystem::GetFileHash ("results/multilayer_image_down.bmp",file_hash);
 
-    printf ("File 'results/multilayer_image_nx.bmp' hash: {");
+    printf ("File 'results/multilayer_image_down.bmp' hash: {");
 
     for (size_t i=0;i<15;i++)
       printf ("%02x,",file_hash.md5 [i]);

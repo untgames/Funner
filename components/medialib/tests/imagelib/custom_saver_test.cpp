@@ -7,6 +7,7 @@
 using namespace media;
 using namespace common;
 
+const char* results_dir = "results";
 const char* file_name = "data/pic1.jpg";
 
 void MyPngSaver (const char* file_name, const Image& img)
@@ -30,6 +31,9 @@ int main ()
     ImageSystem::RegisterSaver ("png", &MyPngSaver);
 
     Image image(file_name);
+
+    if (!FileSystem::IsDir (results_dir))
+      FileSystem::Mkdir (results_dir);
 
     image.Save("results/custom_saver.png");
 
