@@ -36,7 +36,7 @@ TIFFLIB.COMPILER_DEFINES :=
 
 #Öåëü ¹3 - DevILDLL sources
 DEVILDLL.TYPE             := dynamic-lib
-DEVILDLL.NAME             := funner-devil
+DEVILDLL.NAME             := devil
 DEVILDLL.INCLUDE_DIRS     := include include/il components/jpeg/include components/tiff/include components/il/include ../zlib/include
 DEVILDLL.SOURCE_DIRS      := components/il/sources
 DEVILDLL.LIB_DIRS         :=  
@@ -46,7 +46,7 @@ DEVILDLL.COMPILER_DEFINES :=
 
 #Öåëü ¹4 - ILUDLL sources
 ILUDLL.TYPE             := dynamic-lib
-ILUDLL.NAME             := funner-ilu
+ILUDLL.NAME             := ilu
 ILUDLL.INCLUDE_DIRS     := include include/il components/jpeg/include components/tiff/include components/il/include components/ilu/include ../zlib/include
 ILUDLL.SOURCE_DIRS      := components/ilu/sources
 ILUDLL.LIB_DIRS         :=  
