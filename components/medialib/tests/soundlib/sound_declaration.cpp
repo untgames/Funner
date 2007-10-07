@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include <media/sound_declaration.h>
+#include <common/file.h>
 
 using namespace media;
+using namespace common;
+
+const char* results_dir      = "results";
+const char* result_file_name = "results/result_sound_decl.sdf";
 
 void dump (SoundDeclaration& sound_decl)
 {
@@ -31,31 +36,49 @@ int main ()
 {
   printf ("Results of sound_declaration_test:\n");
 
-  SoundDeclaration sound_decl, sound_decl2;
+  try
+  {
+    SoundDeclarationLibrary sdecl_lib;
+    SoundDeclaration        sound_decl, sound_decl2;
 
-  sound_decl.SetType    ("Type1");
-  sound_decl.SetLooping (true);
-  sound_decl.AddSample  ("sound1.ogg");
-  sound_decl.AddSample  ("sound2.ogg");
-  sound_decl.SetParam   (SoundParam_Gain, 0.7f);
-  sound_decl.SetParam   (SoundParam_MinimumGain, 0.1f);
-  sound_decl.SetParam   (SoundParam_MaximumGain, 0.95f);
-  sound_decl.SetParam   (SoundParam_InnerAngle, 20.f);
-  sound_decl.SetParam   (SoundParam_OuterAngle, 60.f);
-  sound_decl.SetParam   (SoundParam_OuterGain, 0.4f);
-  sound_decl.SetParam   (SoundParam_ReferenceDistance, 25.f);
-  sound_decl.SetParam   (SoundParam_MaximumDistance, 90.f);
-  sound_decl.SetParam   (SoundParam_CullDistance, 95.f);
-  printf ("Modified sound declaration:\n");
-  dump   (sound_decl);
+    sound_decl.SetType    ("Type1");
+    sound_decl.SetLooping (true);
+    sound_decl.AddSample  ("sound1.ogg");
+    sound_decl.AddSample  ("sound2.ogg");
+    sound_decl.SetParam   (SoundParam_Gain, 0.7f);
+    sound_decl.SetParam   (SoundParam_MinimumGain, 0.1f);
+    sound_decl.SetParam   (SoundParam_MaximumGain, 0.95f);
+    sound_decl.SetParam   (SoundParam_InnerAngle, 20.f);
+    sound_decl.SetParam   (SoundParam_OuterAngle, 60.f);
+    sound_decl.SetParam   (SoundParam_OuterGain, 0.4f);
+    sound_decl.SetParam   (SoundParam_ReferenceDistance, 25.f);
+    sound_decl.SetParam   (SoundParam_MaximumDistance, 90.f);
+    sound_decl.SetParam   (SoundParam_CullDistance, 95.f);
+    printf ("Modified sound declaration:\n");
+    dump   (sound_decl);
 
-  sound_decl.Swap (sound_decl2);
-  printf ("Initial sound declaration:\n");
-  dump   (sound_decl);
-  
-  sound_decl2.RemoveSample (0);
-  printf ("Deleting one sound:\n");
-  dump   (sound_decl2);
+    sound_decl.Swap (sound_decl2);
+    printf ("Initial sound declaration:\n");
+    dump   (sound_decl);
+    
+    sound_decl2.RemoveSample (0);
+    printf ("Deleting one sound:\n");
+    dump   (sound_decl2);
+
+    if (!FileSystem::IsDir (results_dir))
+      FileSystem::Mkdir (results_dir);
+
+    sdecl_lib.Attach ("sound_decl2", sound_decl2);
+    sdecl_lib.Save (result_file_name);
+  }
+  catch (std::exception& exception)
+  {                                               
+    printf ("exception: %s\n",exception.what ()); 
+  }                                               
+  catch (...)
+  {
+    printf ("unknown exception\n");
+  }
 
   return 0;
 }
