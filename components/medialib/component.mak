@@ -19,7 +19,7 @@ MEDIALIB_UTILS.NAME             := image2bfs
 MEDIALIB_UTILS.INCLUDE_DIRS     := include ../commonlib/include ../xtl/include
 MEDIALIB_UTILS.SOURCE_DIRS      := utils
 MEDIALIB_UTILS.LIB_DIRS         :=  
-MEDIALIB_UTILS.LIBS             := medialib funner-devil funner-ilu commonlib zzip zlib
+MEDIALIB_UTILS.LIBS             := medialib devil ilu commonlib zzip zlib
 MEDIALIB_UTILS.COMPILER_CFLAGS  :=
 MEDIALIB_UTILS.COMPILER_DEFINES :=
 
@@ -28,7 +28,7 @@ MEDIALIB_TESTS.TYPE             := test-suite
 MEDIALIB_TESTS.INCLUDE_DIRS     := include ../commonlib/include ../xtl/include ../mathlib/include
 MEDIALIB_TESTS.SOURCE_DIRS      := tests/imagelib tests/soundlib tests/fontlib tests/geometry tests/rfx
 MEDIALIB_TESTS.LIB_DIRS         :=  
-MEDIALIB_TESTS.LIBS             := commonlib zzip zlib vorbisfile_static vorbis_static ogg medialib funner-devil funner-ilu
+MEDIALIB_TESTS.LIBS             := commonlib zzip zlib vorbisfile_static vorbis_static ogg medialib devil ilu
 MEDIALIB_TESTS.COMPILER_CFLAGS  :=
 MEDIALIB_TESTS.COMPILER_DEFINES :=
 
