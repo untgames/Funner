@@ -248,7 +248,7 @@ endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
 define process_tests_source_dir
-  $2.TEST_EXE_FILES    := $$($2.OBJECT_FILES:%.obj=%.exe)
+  $2.TEST_EXE_FILES    := $$(filter $$(files:%=$$($2.TMP_DIR)/%.exe),$$($2.OBJECT_FILES:%.obj=%.exe))
   $2.TEST_RESULT_FILES := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
   $2.EXECUTION_DIR     := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
 
@@ -260,7 +260,7 @@ define process_tests_source_dir
 #Правило сборки теста
   $$($2.TMP_DIR)/%.exe: $$($2.TMP_DIR)/%.obj $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
-		@link $$(filter %.obj,$$<) $$($1.LIBS) /nologo /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
+		@link $$(filter %.obj,$$<) $$($1.LIBS) /nologo /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS) /incremental
 
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.exe
