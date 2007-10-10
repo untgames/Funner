@@ -8,7 +8,8 @@ using namespace media;
 
 SoundDeclarationLibraryManagerImpl::SoundDeclarationLibraryManagerImpl ()
 {
-  RegisterSaver ("snddecl", &snddecl_save_library);
+  RegisterSaver  ("snddecl", &snddecl_save_library);
+  RegisterLoader ("snddecl", &snddecl_load_library);
 }
 
 /*

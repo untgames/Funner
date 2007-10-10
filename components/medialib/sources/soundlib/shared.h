@@ -106,6 +106,7 @@ typedef common::Singleton<SoundDeclarationLibraryManagerImpl> SoundDeclarationLi
 ///Сохранение и загрузка SoundDeclarationLibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void snddecl_save_library (const char* file_name, const SoundDeclarationLibrary& library);
+void snddecl_load_library (const char* file_name, SoundDeclarationLibrary& library);
 
 }
 

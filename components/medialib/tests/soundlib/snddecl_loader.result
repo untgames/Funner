@@ -1,4 +1,4 @@
-Results of snddecl_saver_test:
+Results of snddecl_loader_test:
 <?xml version="1.0" encoding="utf-8"?>
 <sound_declaration_library>
   <declaration id="declaration1" name="" type="Type1" looping="1">

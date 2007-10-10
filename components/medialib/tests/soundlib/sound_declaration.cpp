@@ -64,12 +64,6 @@ int main ()
     sound_decl2.RemoveSample (0);
     printf ("Deleting one sound:\n");
     dump   (sound_decl2);
-
-    if (!FileSystem::IsDir (results_dir))
-      FileSystem::Mkdir (results_dir);
-
-    sdecl_lib.Attach ("sound_decl2", sound_decl2);
-    sdecl_lib.Save (result_file_name);
   }
   catch (std::exception& exception)
   {                                               

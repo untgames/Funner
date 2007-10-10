@@ -53,7 +53,8 @@ class SoundDeclarationLibrarySaver
       
         //сохранение базовых атрибутов
 
-      writer.WriteAttribute ("name", name);
+      writer.WriteAttribute ("id", name);
+      writer.WriteAttribute ("name", declaration.Name ());
       writer.WriteAttribute ("type", declaration.Type ());
       writer.WriteAttribute ("looping", declaration.Looping ());
       
