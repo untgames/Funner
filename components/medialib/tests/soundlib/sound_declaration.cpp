@@ -6,7 +6,7 @@ using namespace media;
 using namespace common;
 
 const char* results_dir      = "results";
-const char* result_file_name = "results/result_sound_decl.sdf";
+const char* result_file_name = "results/result_sound_decl.snddecl";
 
 void dump (SoundDeclaration& sound_decl)
 {
