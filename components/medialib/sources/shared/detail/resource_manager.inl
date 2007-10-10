@@ -72,19 +72,14 @@ inline const T& ResourceHandlerRegistry<T>::FindHandlerByFileName (const char* f
     DebugManager
 */
 
-namespace detail
+inline DebugManager::DebugManager ()
+  : debug_log (&DefaultLogHandler)
 {
-
-template <bool dummy>
-inline void default_debug_log (const char*)
-{
-}
-
 }
 
 inline void DebugManager::SetDebugLog (const LogHandler& in_debug_log)
 {
-  debug_log = in_debug_log ? in_debug_log : &detail::default_debug_log<true>;
+  debug_log = in_debug_log ? in_debug_log : &DefaultLogHandler;
 }
 
 inline const DebugManager::LogHandler& DebugManager::GetDebugLog () const

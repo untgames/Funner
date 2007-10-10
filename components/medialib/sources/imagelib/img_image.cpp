@@ -26,6 +26,9 @@ Image::Image (const char* file_name, PixelFormat format)
   try
   {
     ImageSystemSingleton::Instance ().Load (file_name, *this);    
+    
+    if (!impl.get ())
+      RaiseInvalidOperation ("media::Image::Image", "Error at load image '%s' (format=%s)", file_name, get_format_name (format));
 
     Rename  (file_name);
     Convert (format);
@@ -218,7 +221,8 @@ void Image::DefaultLoader (const char* file_name, Image& image)
 
 void Image::CubemapLoader (const char* file_name, Image& image)
 {
-  ImageSystemSingleton::Instance ().Printf ("filename: %s", file_name);
+  printf ("!!\n");
+//  ImageSystemSingleton::Instance ().Printf ("filename: %s", file_name);
 }
 
 void Image::SkyboxLoader (const char* file_name, Image& image)

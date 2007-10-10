@@ -14,16 +14,17 @@ const char* get_format_name (PixelFormat format)
 {
   switch (format)
   {
-    case PixelFormat_RGB8:   return "rgb8";
-    case PixelFormat_RGB16:  return "rgb16";
-    case PixelFormat_BGR8:   return "bgr8";
-    case PixelFormat_RGBA8:  return "rgba8";
-    case PixelFormat_RGBA16: return "rgba16";
-    case PixelFormat_BGRA8:  return "bgra8";
-    case PixelFormat_L8:     return "l8";
-    case PixelFormat_A8:     return "a8";
-    case PixelFormat_LA8:    return "la8";
-    default:                 RaiseInvalidArgument ("media::get_format_name(PixelFormat)", "format", format);
+    case PixelFormat_Default: return "default";
+    case PixelFormat_RGB8:    return "rgb8";
+    case PixelFormat_RGB16:   return "rgb16";
+    case PixelFormat_BGR8:    return "bgr8";
+    case PixelFormat_RGBA8:   return "rgba8";
+    case PixelFormat_RGBA16:  return "rgba16";
+    case PixelFormat_BGRA8:   return "bgra8";
+    case PixelFormat_L8:      return "l8";
+    case PixelFormat_A8:      return "a8";
+    case PixelFormat_LA8:     return "la8";
+    default:                  RaiseInvalidArgument ("media::get_format_name(PixelFormat)", "format", format);
   }
 
   return "";
