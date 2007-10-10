@@ -91,6 +91,8 @@ class Image
 ///Обработчики загрузки/сохранения по умолчанию
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void DefaultLoader (const char* file_name, Image& image);
+    static void CubemapLoader (const char* file_name, Image& image);
+    static void SkyboxLoader  (const char* file_name, Image& image);
     static void DefaultSaver  (const char* file_name, const Image& image);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

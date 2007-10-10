@@ -216,6 +216,16 @@ void Image::DefaultLoader (const char* file_name, Image& image)
   image.impl = create_bitmap_image (file_name);
 }
 
+void Image::CubemapLoader (const char* file_name, Image& image)
+{
+  ImageSystem::ImageSystemSingleton::Printf ("filename: %s", file_name);
+}
+
+void Image::SkyboxLoader (const char* file_name, Image& image)
+{
+
+}
+
 void Image::DefaultSaver (const char* file_name, const Image& image)
 {
   image.impl->Save (file_name);
