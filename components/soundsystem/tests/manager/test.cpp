@@ -16,7 +16,9 @@ using namespace sound::low_level;
 using namespace xtl;
 using namespace math;
 
+const size_t ACTION_TIME    = 1000;
 const size_t TEST_WORK_TIME = 2000;  //время работы теста (в милисекундах)
+const char* library_file = "data/test.snddecl";
 
 //печать числа с плавающей точкой
 void print (float value)
@@ -119,7 +121,7 @@ int main ()
    Testing basic emitter properties
 */
 
-    Emitter emitter ("sound1");
+    Emitter emitter ("declaration1");
 
     printf ("Emitter source - %s\n", emitter.Source ());
     printf ("Initial emitter volume = %f,", emitter.Volume ());
@@ -139,7 +141,9 @@ int main ()
 /*
    Testing manager work
 */
-    manager.PlaySound (emitter);
+    manager.PlaySound (emitter, 0.3f);
+
+    printf ("Current offset = %f\n", manager.GetNormalizedOffset (emitter));
 
     Application::Run ();
   }
