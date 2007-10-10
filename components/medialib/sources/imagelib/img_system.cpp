@@ -14,7 +14,7 @@ ImageSystemImpl::ImageSystemImpl ()
   RegisterLoader ("tif",     &Image::DefaultLoader);
   RegisterLoader ("dds",     &Image::DefaultLoader);    
   RegisterLoader ("cubemap", &Image::CubemapLoader);
-  RegisterLoader ("skybox",  &Image::SkyboxLoader);
+  RegisterLoader ("skybox",  &Image::SkyBoxLoader);
 
   RegisterSaver  ("jpg",     &Image::DefaultSaver);
   RegisterSaver  ("bmp",     &Image::DefaultSaver);

@@ -1,5 +1,6 @@
 #include "shared.h"
 
+using namespace stl;
 using namespace common;
 using namespace media;
 
@@ -219,15 +220,46 @@ void Image::DefaultLoader (const char* file_name, Image& image)
   image.impl = create_bitmap_image (file_name);
 }
 
-void Image::CubemapLoader (const char* file_name, Image& image)
+void Image::SixLayerImageLoader (const char* file_name, Image& image, const char* suffixes [6])
 {
-  printf ("!!\n");
-//  ImageSystemSingleton::Instance ().Printf ("filename: %s", file_name);
+  static const int LAYERS_COUNT = 6;
+
+  vector<Image> layers;
+
+  string basename1 = common::basename (file_name),
+         basename2 = common::basename (basename1),
+         suffix    = common::suffix   (basename1);
+
+  layers.reserve (LAYERS_COUNT);
+
+  try {
+
+    for (size_t i=0; i<LAYERS_COUNT; i++)
+      layers [i].Load ((basename2 + suffixes [i] + suffix).c_str ());
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("media::Image::SixLayerImageLoader");
+    throw;
+  }
+
+  Image cubemap_image (LAYERS_COUNT, &layers[0], LayersCloneMode_Capture);
+
+  swap (image, cubemap_image);
 }
 
-void Image::SkyboxLoader (const char* file_name, Image& image)
+void Image::CubemapLoader (const char* file_name, Image& image)
 {
+  static const char* suffixes [6] = {"_px", "_nx", "_py", "_ny", "_pz", "_nz"};  
 
+  SixLayerImageLoader (file_name, image, suffixes);
+}
+
+void Image::SkyBoxLoader (const char* file_name, Image& image)
+{
+  static const char* suffixes [6] = {"_up", "_down", "_left", "_right", "_front", "_back"};
+
+  SixLayerImageLoader (file_name, image, suffixes);
 }
 
 void Image::DefaultSaver (const char* file_name, const Image& image)
