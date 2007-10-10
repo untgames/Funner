@@ -90,9 +90,11 @@ class Image
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчики загрузки/сохранения по умолчанию
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void DefaultLoader (const char* file_name, Image& image);
-    static void CubemapLoader (const char* file_name, Image& image);
-    static void SkyboxLoader  (const char* file_name, Image& image);
+    static void DefaultLoader       (const char* file_name, Image& image);
+    static void CubemapLoader       (const char* file_name, Image& image);
+    static void SkyBoxLoader        (const char* file_name, Image& image);
+    static void SixLayerImageLoader (const char* file_name, Image& image, const char* suffixes [6]);
+
     static void DefaultSaver  (const char* file_name, const Image& image);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
