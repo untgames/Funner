@@ -218,7 +218,7 @@ void Image::DefaultLoader (const char* file_name, Image& image)
 
 void Image::CubemapLoader (const char* file_name, Image& image)
 {
-  ImageSystem::ImageSystemSingleton::Printf ("filename: %s", file_name);
+  ImageSystemSingleton::Instance ().Printf ("filename: %s", file_name);
 }
 
 void Image::SkyboxLoader (const char* file_name, Image& image)
