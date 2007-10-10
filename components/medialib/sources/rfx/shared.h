@@ -6,6 +6,7 @@
 #include <stl/string>
 #include <stl/vector>
 #include <stl/bitset>
+#include <stl/hash_map>
 
 #include <xtl/visitor.h>
 #include <xtl/reference_counter.h>
@@ -13,8 +14,11 @@
 #include <common/exception.h>
 #include <common/strwrap.h>
 #include <common/singleton.h>
+#include <common/xml_writer.h>
+#include <common/parser.h>
 
-#include <media/rfx/common_shader.h>
+#include <media/rfx/common_material.h>
+#include <media/rfx/multipass_material.h>
 #include <media/rfx/material_library.h>
 
 #include <shared/resource_holder.h>
@@ -66,6 +70,13 @@ inline math::vec<T, Size> clamp
 
   return result;    
 }
+
+/*
+    Сохранение и загрузка материалов
+*/
+
+void mtl_save_library (const char* file_name, const MaterialLibrary&);
+void mtl_load_library (const char* file_name, MaterialLibrary&);
 
 }
 

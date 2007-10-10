@@ -1,5 +1,5 @@
-Results of shader_test:
-Shader 'shader1'
+Results of material2_test:
+Material 'Material1'
   pin 'two_sided' enabled
   pin 'wireframe' enabled
   pin 'lighting' disabled

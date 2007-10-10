@@ -9,12 +9,12 @@ using namespace common;
     Описание реализации библиотеки материалов
 */
 
-typedef ResourceLibrary<Material> MaterialLibraryHolder;
+typedef hash_map<string, Material::Pointer> MaterialMap;
 
 struct MaterialLibrary::Impl
 {
-  string                name;      //имя модели
-  MaterialLibraryHolder materials; //библиотека материалов
+  string      name;      //имя модели
+  MaterialMap materials; //библиотека материалов
 };
 
 /*
@@ -51,7 +51,7 @@ MaterialLibrary& MaterialLibrary::operator = (const MaterialLibrary& library)
 }
 
 /*
-    Имя модели
+    Имя библиотеки
 */
 
 const char* MaterialLibrary::Name () const
@@ -73,59 +73,101 @@ void MaterialLibrary::Rename (const char* name)
 
 size_t MaterialLibrary::Size () const
 {
-  return impl->materials.Size ();
+  return impl->materials.size ();
 }
 
 bool MaterialLibrary::IsEmpty () const
 {
-  return impl->materials.IsEmpty ();
+  return impl->materials.empty ();
 }
 
 /*
     Получение итератора
 */
 
-MaterialLibrary::Iterator MaterialLibrary::CreateIterator ()
+namespace
 {
-  return impl->materials.CreateIterator ();
+
+//селектор материала
+template <class T>
+struct material_selector
+{
+  template <class T1> T& operator () (T1& value) const { return value.second; }
+};
+
 }
 
-MaterialLibrary::ConstIterator MaterialLibrary::CreateIterator () const
+MaterialLibrary::Iterator MaterialLibrary::CreateIterator ()
 {
-  return impl->materials.CreateIterator ();
+  return const_cast<const MaterialLibrary&> (*this).CreateIterator ();
+}
+
+MaterialLibrary::Iterator MaterialLibrary::CreateIterator () const
+{
+  return ConstIterator (impl->materials.begin (), impl->materials.begin (), impl->materials.end (), material_selector<Material::Pointer> ());
+}
+
+/*
+    Получение идентификатора материала
+*/
+
+const char* MaterialLibrary::ItemId (const Iterator& i)
+{
+  return const_cast<const MaterialLibrary&> (*this).ItemId (i);
+}
+
+const char* MaterialLibrary::ItemId (const ConstIterator& i) const
+{
+  const MaterialMap::iterator* iter = i.target<MaterialMap::iterator> ();
+
+  if (!iter)
+    common::RaiseInvalidArgument ("media::rfx::MaterialLibrary::ItemId", "iterator", "wrong-type");
+
+  return (*iter)->first.c_str ();
 }
 
 /*
     Поиск
 */
 
-Material* MaterialLibrary::Find (const char* name)
+Material::Pointer MaterialLibrary::Find (const char* name)
 {
-  return impl->materials.Find (name);
+  return xtl::const_pointer_cast<Material> (const_cast<const MaterialLibrary&> (*this).Find (name));
 }
 
-const Material* MaterialLibrary::Find (const char* name) const
+Material::ConstPointer MaterialLibrary::Find (const char* name) const
 {
-  return impl->materials.Find (name);
+  if (!name)
+    return 0;
+    
+  MaterialMap::const_iterator iter = impl->materials.find (name);
+  
+  return iter != impl->materials.end () ? iter->second : 0;
 }
 
 /*
-    Присоединение мешей
+    Присоединение материалов
 */
 
-void MaterialLibrary::Attach (const char* name, Material& material, CloneMode mode)
+void MaterialLibrary::Attach (const char* id, const Material::Pointer& material)
 {
-  impl->materials.Insert (name, material, mode);
+  if (!id)
+    common::RaiseNullArgument ("media::rfx::MaterialLibrary::Insert", "id");
+    
+  impl->materials.insert_pair (id, material);
 }
 
-void MaterialLibrary::Detach (const char* name)
+void MaterialLibrary::Detach (const char* id)
 {
-  impl->materials.Remove (name);
+  if (!id)
+    return;
+    
+  impl->materials.erase (id);
 }
 
 void MaterialLibrary::DetachAll ()
 {
-  impl->materials.Clear ();
+  impl->materials.clear ();
 }
 
 /*
@@ -146,7 +188,7 @@ void MaterialLibrary::Clear ()
 void MaterialLibrary::Load (const char* file_name)
 {
   if (!file_name)
-    RaiseNullArgument ("media::MaterialLibrary::Load", "file_name");
+    RaiseNullArgument ("media::rfx::MaterialLibrary::Load", "file_name");
     
   try
   {
@@ -154,7 +196,7 @@ void MaterialLibrary::Load (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("media::MaterialLibrary::Load");
+    exception.Touch ("media::rfx::MaterialLibrary::Load");
     throw;
   }
 }
@@ -162,7 +204,7 @@ void MaterialLibrary::Load (const char* file_name)
 void MaterialLibrary::Save (const char* file_name)
 {
   if (!file_name)
-    RaiseNullArgument ("media::MaterialLibrary::Save", "file_name");
+    RaiseNullArgument ("media::rfx::MaterialLibrary::Save", "file_name");
     
   try
   {
@@ -170,7 +212,7 @@ void MaterialLibrary::Save (const char* file_name)
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("media::MaterialLibrary::Save");
+    exception.Touch ("media::rfx::MaterialLibrary::Save");
     throw;
   }
 }

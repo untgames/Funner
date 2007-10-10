@@ -1,5 +1,5 @@
-Results of common_shader_test:
-Common shader 'shader1'
+Results of common_material_test:
+Common material 'shader1'
   type: gourand
   color 'ambient': [ 0 0 0 ]
   color 'diffuse': [ 0 0 0 ]

@@ -1,5 +1,5 @@
 /*
-    ╧юя√Єър яюёх∙хэш  юс·хъЄр
+    Попытка посещения объекта
 */
 
 namespace detail
@@ -9,7 +9,7 @@ struct touch_on_default_action
 {
   touch_on_default_action (bool& in_flag) : flag (&in_flag)  {}
   
-  template <class T> void operator () (T&, Shader::Visitor&) { *flag = true; }
+  template <class T> void operator () (T&, Material::Visitor&) { *flag = true; }
   
   bool* flag;
 };
@@ -17,7 +17,7 @@ struct touch_on_default_action
 }
 
 template <class T>
-inline bool Shader::TryAccept (T& visited, Visitor& visitor)
+inline bool Material::TryAccept (T& visited, Visitor& visitor)
 {
   bool is_not_processed = false;
   
@@ -27,10 +27,10 @@ inline bool Shader::TryAccept (T& visited, Visitor& visitor)
 }
 
 /*
-    ╩юяшЁютрэшх
+    Копирование
 */
 
-inline Shader::Pointer clone (Shader::Pointer ptr, CloneMode mode)
+inline Material::Pointer clone (Material::Pointer ptr, CloneMode mode)
 {
   return ptr ? ptr->Clone (mode) : 0;
 }

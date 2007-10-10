@@ -2,7 +2,6 @@
 #define MEDIALIB_RFX_MATERIAL_LIBRARY_HEADER
 
 #include <media/rfx/material.h>
-#include <stl/auto_ptr.h>
 
 namespace xtl
 {
@@ -24,8 +23,8 @@ namespace rfx
 class MaterialLibrary
 {
   public:
-    typedef xtl::iterator<Material>       Iterator;
-    typedef xtl::iterator<const Material> ConstIterator;
+    typedef xtl::iterator<Material::Pointer>      Iterator, ConstIterator; //исправить после доработки итератора
+//    typedef xtl::iterator<Material::ConstPointer> ConstIterator;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
@@ -59,16 +58,22 @@ class MaterialLibrary
     ConstIterator CreateIterator () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение идентификатора материала
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* ItemId (const Iterator&);
+    const char* ItemId (const ConstIterator&) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          Material* Find (const char* name);
-    const Material* Find (const char* name) const;
+    Material::Pointer      Find (const char* name);
+    Material::ConstPointer Find (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение материалов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Attach    (const char* name, Material& material, CloneMode mode = CloneMode_Instance);
-    void Detach    (const char* name); //no throw
+    void Attach    (const char* id, const Material::Pointer& material_ptr);
+    void Detach    (const char* id); //no throw
     void DetachAll ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

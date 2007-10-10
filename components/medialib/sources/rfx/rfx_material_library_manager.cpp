@@ -8,6 +8,8 @@ using namespace media::rfx;
 
 MaterialLibraryManagerImpl::MaterialLibraryManagerImpl ()
 {
+//  RegisterSaver  ("mtl", &mtl_save_library);
+//  RegisterLoader ("mtl", &mtl_load_library);
 }
 
 /*

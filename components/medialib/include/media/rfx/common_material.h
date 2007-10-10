@@ -1,7 +1,7 @@
-#ifndef MEDIALIB_RFX_COMMON_SHADER_HEADER
-#define MEDIALIB_RFX_COMMON_SHADER_HEADER
+#ifndef MEDIALIB_RFX_COMMON_MATERIAL_HEADER
+#define MEDIALIB_RFX_COMMON_MATERIAL_HEADER
 
-#include <media/rfx/shader.h>
+#include <media/rfx/material.h>
 #include <media/rfx/texmap.h>
 #include <mathlib.h>
 
@@ -79,44 +79,44 @@ enum CompareMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum CommonShaderType
+enum CommonMaterialShaderType
 {
-  CommonShaderType_Flat,    //сплошная заливка
-  CommonShaderType_Gourand, //заливка по Гуро
-  CommonShaderType_Phong,   //заливка по Фонгу
+  CommonMaterialShaderType_Flat,    //сплошная заливка
+  CommonMaterialShaderType_Gourand, //заливка по Гуро
+  CommonMaterialShaderType_Phong,   //заливка по Фонгу
   
-  CommonShaderType_Default = CommonShaderType_Gourand,
+  CommonMaterialShaderType_Default = CommonMaterialShaderType_Gourand,
   
-  CommonShaderType_Num
+  CommonMaterialShaderType_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Цвета слоя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum CommonShaderColor
+enum CommonMaterialColor
 {
-  CommonShaderColor_Ambient,   //цвет поглощения
-  CommonShaderColor_Diffuse,   //цвет рассеивания
-  CommonShaderColor_Specular,  //цвет отражения
-  CommonShaderColor_Emission,  //цвет излучения 
+  CommonMaterialColor_Ambient,   //цвет поглощения
+  CommonMaterialColor_Diffuse,   //цвет рассеивания
+  CommonMaterialColor_Specular,  //цвет отражения
+  CommonMaterialColor_Emission,  //цвет излучения 
   
-  CommonShaderColor_Num
+  CommonMaterialColor_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текстурные карты, используемые шейдером
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum CommonShaderMap
+enum CommonMaterialMap
 {
-  CommonShaderMap_Diffuse,     //базовая текстура (рассеянное освещение)
-  CommonShaderMap_Ambient,     //текстура поглощения света
-  CommonShaderMap_Specular,    //текстура степени отражения света
-  CommonShaderMap_Transparent, //текстура прозрачности
-  CommonShaderMap_Emission,    //текстура эмиссии (self-illumination)
-  CommonShaderMap_Reflective,  //текстура карты отражения (env-map)
-  CommonShaderMap_Bump,        //текстура рельефа поверхности
+  CommonMaterialMap_Diffuse,     //базовая текстура (рассеянное освещение)
+  CommonMaterialMap_Ambient,     //текстура поглощения света
+  CommonMaterialMap_Specular,    //текстура степени отражения света
+  CommonMaterialMap_Transparent, //текстура прозрачности
+  CommonMaterialMap_Emission,    //текстура эмиссии (self-illumination)
+  CommonMaterialMap_Reflective,  //текстура карты отражения (env-map)
+  CommonMaterialMap_Bump,        //текстура рельефа поверхности
 
-  CommonShaderMap_Num
+  CommonMaterialMap_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,13 +129,23 @@ enum MapState
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение имени
+///////////////////////////////////////////////////////////////////////////////////////////////////
+const char* get_name (BlendEquation);
+const char* get_name (BlendArgument);
+const char* get_name (CompareMode);
+const char* get_name (CommonMaterialShaderType);
+const char* get_name (CommonMaterialColor);
+const char* get_name (CommonMaterialMap);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проход по умолчанию
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class CommonShader: public Shader
+class CommonMaterial: public Material
 {
   public:
-    typedef xtl::com_ptr<CommonShader>       Pointer;
-    typedef xtl::com_ptr<const CommonShader> ConstPointer;
+    typedef xtl::com_ptr<CommonMaterial>       Pointer;
+    typedef xtl::com_ptr<const CommonMaterial> ConstPointer;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание
@@ -145,15 +155,15 @@ class CommonShader: public Shader
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    CommonShaderType Type    () const;
-    void             SetType (CommonShaderType);
+    CommonMaterialShaderType ShaderType    () const;
+    void                     SetShaderType (CommonMaterialShaderType);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Цвета
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const math::vec3f& Color    (CommonShaderColor color_id) const;
-    void               SetColor (CommonShaderColor color_id, const math::vec3f& color);
-    void               SetColor (CommonShaderColor color_id, float red, float green, float blue);
+    const math::vec3f& Color    (CommonMaterialColor color_id) const;
+    void               SetColor (CommonMaterialColor color_id, const math::vec3f& color);
+    void               SetColor (CommonMaterialColor color_id, float red, float green, float blue);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///"Металличность"
@@ -186,32 +196,32 @@ class CommonShader: public Shader
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текстурные карты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const Texmap& Map (CommonShaderMap map) const;
-          Texmap& Map (CommonShaderMap map);
+    const Texmap& Map (CommonMaterialMap map) const;
+          Texmap& Map (CommonMaterialMap map);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Веса текстурных карт
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    float MapWeight    (CommonShaderMap map) const;
-    void  SetMapWeight (CommonShaderMap map, float weight);
+    float MapWeight    (CommonMaterialMap map) const;
+    void  SetMapWeight (CommonMaterialMap map, float weight);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Разрешение / запрещение текстурных карт
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    rfx::MapState MapState    (CommonShaderMap map) const;
-    void          SetMapState (CommonShaderMap map, rfx::MapState state);
+    rfx::MapState MapState    (CommonMaterialMap map) const;
+    void          SetMapState (CommonMaterialMap map, rfx::MapState state);
 
-    bool IsMapEnabled (CommonShaderMap map) const { return MapState (map)  == MapState_Enabled; }
-    void EnableMap    (CommonShaderMap map)       { SetMapState (map, MapState_Enabled);        }
-    void DisableMap   (CommonShaderMap map)       { SetMapState (map, MapState_Disabled);       }
+    bool IsMapEnabled (CommonMaterialMap map) const { return MapState (map)  == MapState_Enabled; }
+    void EnableMap    (CommonMaterialMap map)       { SetMapState (map, MapState_Enabled);        }
+    void DisableMap   (CommonMaterialMap map)       { SetMapState (map, MapState_Disabled);       }
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    CommonShader  ();
-    CommonShader  (const CommonShader&);
-    ~CommonShader ();
+    CommonMaterial  ();
+    CommonMaterial  (const CommonMaterial&);
+    ~CommonMaterial ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Динамическая диспетчеризация
@@ -222,11 +232,11 @@ class CommonShader: public Shader
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация копирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Shader* CloneCore () const;
+    Material* CloneCore () const;
 
   private:
     struct Impl;
-    Impl* impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 #include <media/rfx/detail/blend.inl>

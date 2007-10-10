@@ -57,16 +57,16 @@ void dump (const Texmap& texmap)
   }
 }
 
-void dump (const CommonShader& shader)
+void dump (const CommonMaterial& shader)
 {
-  printf ("Common shader '%s'\n", shader.Name ());
+  printf ("Common material '%s'\n", shader.Name ());
   printf ("  type: ");
 
-  switch (shader.Type ())
+  switch (shader.ShaderType ())
   {
-    case CommonShaderType_Flat:    printf ("flat"); break;
-    case CommonShaderType_Gourand: printf ("gourand"); break;
-    case CommonShaderType_Phong:   printf ("phong"); break;
+    case CommonMaterialShaderType_Flat:    printf ("flat"); break;
+    case CommonMaterialShaderType_Gourand: printf ("gourand"); break;
+    case CommonMaterialShaderType_Phong:   printf ("phong"); break;
     default:                       printf ("unknown"); break;
   }
   
@@ -74,10 +74,10 @@ void dump (const CommonShader& shader)
   
   static const char* color_name [] = {"ambient", "diffuse", "specular", "emission"};
   
-  for (size_t i=0; i<CommonShaderColor_Num; i++)
+  for (size_t i=0; i<CommonMaterialColor_Num; i++)
   {
     printf ("  color '%s': ", color_name [i]);
-    dump   (shader.Color ((CommonShaderColor)i));
+    dump   (shader.Color ((CommonMaterialColor)i));
     printf ("\n");
   }
   
@@ -110,32 +110,32 @@ void dump (const CommonShader& shader)
 
   static const char* map_name [] = {"diffuse", "ambient", "specular", "transparent", "emission", "reflective", "bump"};
   
-  for (size_t i=0; i<CommonShaderMap_Num; i++)
+  for (size_t i=0; i<CommonMaterialMap_Num; i++)
   {        
     printf ("  texmap '%s'\n", map_name [i]);    
-    printf ("    state: %s\n", shader.IsMapEnabled ((CommonShaderMap)i) ? "enabled" : "disabled");
-    printf ("    weight: %g\n", shader.MapWeight ((CommonShaderMap)i));
-    dump   (shader.Map ((CommonShaderMap)i));
+    printf ("    state: %s\n", shader.IsMapEnabled ((CommonMaterialMap)i) ? "enabled" : "disabled");
+    printf ("    weight: %g\n", shader.MapWeight ((CommonMaterialMap)i));
+    dump   (shader.Map ((CommonMaterialMap)i));
   }  
 }
 
 int main ()
 {
-  printf ("Results of common_shader_test:\n");
+  printf ("Results of common_material_test:\n");
   
-  CommonShader::Pointer shader = CommonShader::Create ();
+  CommonMaterial::Pointer shader = CommonMaterial::Create ();
   
   shader->Rename ("shader1");
-  shader->SetColor (CommonShaderColor_Emission, 0.2f, 1.2f, -2.0f);
+  shader->SetColor (CommonMaterialColor_Emission, 0.2f, 1.2f, -2.0f);
   shader->SetShininess (320);
   shader->SetTransparency (0.4f);
   shader->SetBlend (make_blend_filter ()); 
   shader->SetAlphaTest (CompareMode_LessEqual, 1.3f);
   
-  shader->EnableMap (CommonShaderMap_Transparent);
-  shader->SetMapWeight (CommonShaderMap_Transparent, -0.5f);
+  shader->EnableMap (CommonMaterialMap_Transparent);
+  shader->SetMapWeight (CommonMaterialMap_Transparent, -0.5f);
 
-  Texmap& texmap = shader->Map (CommonShaderMap_Transparent);
+  Texmap& texmap = shader->Map (CommonMaterialMap_Transparent);
 
   texmap.SetTransform  (translatef (1.0f, 0.5f, 0.0f));
   texmap.SetImage      ("image1");

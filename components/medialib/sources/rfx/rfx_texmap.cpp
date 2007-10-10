@@ -51,7 +51,6 @@ Texmap::Texmap (const Texmap& texmap)
 
 Texmap::~Texmap ()
 {
-  delete impl;
 }
 
 /*
@@ -187,6 +186,75 @@ namespace rfx
 void swap (Texmap& texmap1, Texmap& texmap2)
 {
   texmap1.Swap (texmap2);  
+}
+
+/*
+    Получение имени
+*/
+
+const char* get_name (Texcoord id)
+{
+  switch (id)
+  {
+    case Texcoord_S: return "s";
+    case Texcoord_T: return "t";
+    case Texcoord_Q: return "q";
+    default:         RaiseInvalidArgument ("media::rfx::get_name(Texcoord)", "id", id);
+  }
+  
+  return "";
+}
+
+const char* get_name (TexcoordSource id)
+{
+  switch (id)
+  {
+    case TexcoordSource_SphereMap:     return "sphere_map";
+    case TexcoordSource_ReflectionMap: return "reflection_map";
+    default:                           return "explicit";
+  }
+}
+
+const char* get_name (TexcoordWrap id)
+{
+  switch (id)
+  {
+    case TexcoordWrap_Repeat:        return "repeat";
+    case TexcoordWrap_Mirror:        return "mirror";
+    case TexcoordWrap_Clamp:         return "clamp";
+    case TexcoordWrap_ClampToBorder: return "clamp_to_border";
+    default:                         RaiseInvalidArgument ("media::rfx::get_name(TexcoordWrap)", "id", id);
+  }
+  
+  return "";
+}
+
+const char* get_name (TexmapFilter id)
+{
+  switch (id)
+  {
+    case TexmapFilter_Min: return "min";
+    case TexmapFilter_Mag: return "mag";
+    case TexmapFilter_Mip: return "mip";
+    default:               RaiseInvalidArgument ("media::rfx::get_name(TexmapFilter)", "id", id);
+  }
+  
+  return "";
+}
+
+const char* get_name (TexmapFilterType id)
+{
+  switch (id)
+  {
+    case TexmapFilterType_Default:     return "default";
+    case TexmapFilterType_Point:       return "point";
+    case TexmapFilterType_Bilinear:    return "bilinear";
+    case TexmapFilterType_Trilinear:   return "trilinear";
+    case TexmapFilterType_Anisotropic: return "anisotropic";
+    default:                           RaiseInvalidArgument ("media::rfx::get_name(TexmapFilterType)", "id", id);
+  }
+
+  return "";  
 }
 
 }
