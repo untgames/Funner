@@ -1,5 +1,4 @@
 Results of axis_aligned_box_plus_test:
-
 operator +=
 min=[-10 -20 -30] max=[30 35 45]
 operator +

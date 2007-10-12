@@ -7,7 +7,7 @@ int main ()
   aaboxf box,box1 (vec3f (-10, -20, -30), vec3f (30, 20, 10)), box2 (1, 2, 3, 4, 5, 6);  
   spheref s(vec3f (20, 30, 40), 5);
   
-  printf ("\noperator +=\n");
+  printf ("operator +=\n");
   box1+=s;
   dump (box1);
   printf ("\noperator +\n");
