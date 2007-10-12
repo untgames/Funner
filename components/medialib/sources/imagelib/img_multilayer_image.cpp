@@ -61,12 +61,15 @@ class MultilayerImageImpl: public ImageImpl
 ///Сохранение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
    void Save (const char*);
-   
+
   private:
     void SaveSixLayersImage (const char* file_name, const char* suffixes [6]);
     void SaveCubemap        (const char* file_name);
     void SaveSkyBox         (const char* file_name);
     void SaveDDS            (const char* file_name);
+
+    void LoadCubemap (const char* file_name);
+    void LoadSkyBox (const char* file_name);
 
   private:
     typedef stl::vector<Image> ImageArray;
@@ -252,8 +255,23 @@ void MultilayerImageImpl::Save (const char* file_name)
   }
 }
 
+/*
+    Загрузка
+*/
+
+void MultilayerImageImpl::LoadCubemap (const char* file_name)
+{
+//  Image (file_name).Swap (*this);
+}
+
+void MultilayerImageImpl::LoadSkyBox (const char* file_name)
+{
+//  Image (file_name).Swap (*this);
+}
+
 namespace media
 {
+typedef stl::vector<Image> ImageArray;
 
 /*
     Создание реализации
@@ -262,6 +280,57 @@ namespace media
 ImageImpl* create_multilayer_image (size_t count, Image* images, LayersCloneMode clone_mode)
 {
   return new MultilayerImageImpl (count, images, clone_mode);
+}
+
+ImageArray* load_image_array (const char* file_name, size_t count, const char** suffixes)
+{
+  if (!file_name)
+    RaiseNullArgument ("media::load_image_array", "file_name");
+
+  if (!count)
+    RaiseNullArgument ("media::load_image_array", "count");
+
+  int suffixes_count = sizeof (suffixes) / sizeof (suffixes [0]);
+
+  if (count != suffixes_count)
+    RaiseNullArgument ("media::load_image_array", "suffixes");
+
+  string basename1 = common::basename (file_name),
+         basename2 = common::basename (basename1),
+         suffix    = common::suffix   (basename1);
+
+  ImageArray* images = new ImageArray (count);
+
+  try
+  {
+    for (size_t i=0; i<count; i++)
+      (*images) [i].Load ((basename2 + suffixes [i] + suffix).c_str ());
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("media::load_image_array");
+    throw;
+  }
+
+  return images;
+}
+
+ImageImpl* create_cubemap_image (const char* file_name)
+{
+  static const char* suffixes [] = {"_px", "_nx", "_py", "_ny", "_pz", "_nz"};  
+
+  ImageArray* images = load_image_array (file_name, 6, suffixes);
+
+  return new MultilayerImageImpl (6, images->begin (), LayersCloneMode_Capture);
+}
+
+ImageImpl* create_skybox_image (const char* file_name)
+{
+  static const char* suffixes [] = {"_up", "_down", "_left", "_right", "_front", "_back"};
+
+  ImageArray* images = load_image_array (file_name, 6, suffixes);
+
+  return new MultilayerImageImpl (6, images->begin (), LayersCloneMode_Capture);
 }
 
 }

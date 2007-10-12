@@ -92,7 +92,10 @@ class ImageImpl
 ImageImpl* create_bitmap_image ();
 ImageImpl* create_bitmap_image (size_t width, size_t height, size_t depth, PixelFormat format, const void* data);
 ImageImpl* create_bitmap_image (const char* file_name);
-ImageImpl* create_multilayer_image (size_t count, Image* images, LayersCloneMode clone_mode);
+
+ImageImpl*  create_multilayer_image (size_t count, Image* images, LayersCloneMode clone_mode);
+ImageImpl*  create_cubemap_image    (const char* file_name);
+ImageImpl*  create_skybox_image     (const char* file_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер картинок
