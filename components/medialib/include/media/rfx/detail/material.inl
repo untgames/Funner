@@ -25,12 +25,3 @@ inline bool Material::TryAccept (T& visited, Visitor& visitor)
 
   return !is_not_processed;
 }
-
-/*
-    Копирование
-*/
-
-inline Material::Pointer clone (Material::Pointer ptr, CloneMode mode)
-{
-  return ptr ? ptr->Clone (mode) : 0;
-}

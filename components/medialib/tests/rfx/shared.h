@@ -5,6 +5,7 @@
 #include <exception>
 #include <media/material.h>
 #include <xtl/visitor.h>
+#include <xtl/function.h>
 
 using namespace media;
 using namespace media::rfx;

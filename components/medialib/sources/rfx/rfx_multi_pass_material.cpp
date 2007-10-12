@@ -46,7 +46,7 @@ MultiPassMaterial::MultiPassMaterial ()
   {}
 
 MultiPassMaterial::MultiPassMaterial (const MultiPassMaterial& mtl)
-  : Material (mtl), impl (new Impl (*mtl.impl))
+  : media::rfx::Material (mtl), impl (new Impl (*mtl.impl))
   {}
 
 MultiPassMaterial::~MultiPassMaterial ()
@@ -69,14 +69,14 @@ MultiPassMaterial::Pointer MultiPassMaterial::Create ()
 void MultiPassMaterial::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Material::AcceptCore (visitor);
+    media::rfx::Material::AcceptCore (visitor);
 }
 
 /*
     Реализация копирования
 */
 
-Material* MultiPassMaterial::CloneCore () const
+media::rfx::Material* MultiPassMaterial::CloneCore () const
 {
   return new MultiPassMaterial (*this);
 }
@@ -94,17 +94,17 @@ size_t MultiPassMaterial::PassesCount () const
     Получение материалов
 */
 
-media::rfx::Material::ConstPointer MultiPassMaterial::Pass (size_t index) const
+media::rfx::Material::ConstPointer MultiPassMaterial::Material (size_t index) const
 {
   if (index >= impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::Pass", "index", index, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::MultiPassMaterial::Material", "index", index, impl->passes.size ());
     
   return impl->passes [index].material;
 }
 
-media::rfx::Material::Pointer MultiPassMaterial::Pass (size_t index)
+media::rfx::Material::Pointer MultiPassMaterial::Material (size_t index)
 {
-  return xtl::const_pointer_cast<media::rfx::Material> (const_cast<const MultiPassMaterial&> (*this).Pass (index));
+  return xtl::const_pointer_cast<media::rfx::Material> (const_cast<const MultiPassMaterial&> (*this).Material (index));
 }
 
 /*
@@ -146,13 +146,13 @@ void MultiPassMaterial::RemoveAllPasses ()
     Установка шейдера
 */
 
-void MultiPassMaterial::SetPass (size_t index, const Material::Pointer& material_ptr)
+void MultiPassMaterial::SetMaterial (size_t index, const Material::Pointer& material_ptr)
 {
   if (index >= impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::SetPass", "index", index, impl->passes.size ());
+    RaiseOutOfRange ("media::rfx::MultiPassMaterial::SetMaterial", "index", index, impl->passes.size ());
 
   if (!material_ptr)
-    RaiseNullArgument ("media::rfx::MultiPassMaterial::SetPass", "material_ptr");
+    RaiseNullArgument ("media::rfx::MultiPassMaterial::SetMaterial", "material_ptr");
 
   impl->passes [index].material = material_ptr;
 }

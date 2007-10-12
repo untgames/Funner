@@ -110,6 +110,13 @@ class MaterialLibraryManager
   public:
     typedef xtl::function<void (const char*,       MaterialLibrary&)> LoadHandler;
     typedef xtl::function<void (const char*, const MaterialLibrary&)> SaveHandler;
+    typedef xtl::function<void (const char*)>                         LogHandler;    
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка пользовательской функции протоколирования отладочных сообщений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void              SetDebugLog (const LogHandler&);
+    static const LogHandler& GetDebugLog ();
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с пользовательскими функциями загрузки и сохранения

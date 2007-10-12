@@ -8,13 +8,23 @@ using namespace media::rfx;
 
 MaterialLibraryManagerImpl::MaterialLibraryManagerImpl ()
 {
-//  RegisterSaver  ("mtl", &mtl_save_library);
-//  RegisterLoader ("mtl", &mtl_load_library);
+  RegisterSaver  ("mtl", &mtl_save_library);
+  RegisterLoader ("mtl", &mtl_load_library);
 }
 
 /*
     MaterialLibraryManager
 */
+
+void MaterialLibraryManager::SetDebugLog (const LogHandler& handler)
+{
+  MaterialLibraryManagerSingleton::Instance ().SetDebugLog (handler);
+}
+
+const MaterialLibraryManager::LogHandler& MaterialLibraryManager::GetDebugLog ()
+{
+  return MaterialLibraryManagerSingleton::Instance ().GetDebugLog ();
+}
 
 void MaterialLibraryManager::RegisterLoader (const char* extension, const LoadHandler& handler)
 {

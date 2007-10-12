@@ -10,7 +10,7 @@ class MyVisitor: public xtl::visitor<void, TestMaterial, CommonMaterial, MultiPa
       printf ("MultiPassMaterial '%s' (%u passes, sort_group=%d)\n", material.Name (), material.PassesCount (), material.SortGroup ());
       
       for (size_t i=0; i<material.PassesCount (); i++)
-        printf ("  [%c] pass #%u: shader='%s'\n", material.IsPassEnabled (i) ? 'X' : ' ', i, material.Pass (i)->Name ());
+        printf ("  [%c] pass #%u: shader='%s'\n", material.IsPassEnabled (i) ? 'X' : ' ', i, material.Material (i)->Name ());
         
       printf ("  visit passes:\n");
 

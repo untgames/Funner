@@ -7,9 +7,12 @@
 #include <stl/vector>
 #include <stl/bitset>
 #include <stl/hash_map>
+#include <stl/hash_set>
 
 #include <xtl/visitor.h>
 #include <xtl/reference_counter.h>
+#include <xtl/ref.h>
+#include <xtl/bind.h>
 
 #include <common/exception.h>
 #include <common/strwrap.h>
