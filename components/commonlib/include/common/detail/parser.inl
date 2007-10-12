@@ -115,32 +115,77 @@ inline bool read (ParseNode* node, const char* tag, T& value)
 template <class T>
 inline void read (ParseNode* node, const char* tag, T& value, const T& default_value)
 {
-  if (node && tag)
-    node = node->First (tag);
-  
-  if (!node || !read (make_attribute_iterator (node), value))
+  if (!read (node, tag, value))
     value = default_value;
 }
 
 template <class Traits,class Allocator>
 inline void read (ParseNode* node, const char* tag, stl::basic_string<char, Traits, Allocator>& string, const char* default_value)
 {
-  if (node && tag)
-    node = node->First (tag);
-
-  if (!node || !read (make_attribute_iterator (node), string))
+  if (!read (node, tag, string))
     string = default_value ? default_value : "";
 }
 
 template <class T>
 inline T get (ParseNode* node, const char* tag, const T& default_value)
 {
-  if (node && tag)
-    node = node->First (tag);
-
   T value;
+  
+  return read (node, tag, value) ? value : default_value;
+}
 
-  return node && read (make_attribute_iterator (node), value) ? value : default_value;
+/*
+    Чтение атрибутов с протоколированием ошибок
+*/
+
+template <class T>
+inline bool read (ParseLog& log, ParseNode* node, const char* tag, T& value)
+{
+  if (!node)
+    return false;
+
+  if (tag)
+  {
+    ParseNode* child = node->First (tag);
+    
+    if (!child)
+    {
+      log.Error (node, "Node '%s' not found", tag);
+      return false;
+    }
+      
+    node = child;
+  }    
+  
+  if (!read (make_attribute_iterator (node), value))
+  {
+    log.Error (node, "Error at read value");
+    return false;
+  }
+
+  return true;
+}
+
+template <class T>
+inline void read (ParseLog& log, ParseNode* node, const char* tag, T& value, const T& default_value)
+{
+  if (!read (log, node, tag, value))
+    value = default_value;
+}
+
+template <class Traits, class Allocator> 
+void read (ParseLog& log, ParseNode* node, const char* tag, stl::basic_string<char, Traits, Allocator>& string, const char* default_value)
+{
+  if (!read (log, node, tag, string))
+    string = default_value ? default_value : "";  
+}
+
+template <class T>
+inline T get (ParseLog& log, ParseNode* node, const char* tag, const T& default_value)
+{
+  T value;
+  
+  return read (log, node, tag, value) ? value : default_value;
 }
 
 /*
@@ -173,6 +218,74 @@ inline size_t read_range (ParseNode* node, const char* tag, OutIter first, size_
     return 0;
 
   return read_range (iter, first, count, step);
+}
+
+/*
+    Чтение интервалов с протоколированием ошибок
+*/
+
+template <class OutIter>
+inline size_t read_range (ParseLog& log, ParseNode* node, const char* tag, OutIter first, size_t count)
+{
+  if (!node)
+    return;
+
+  if (tag)
+  {
+    ParseNode* child = node->First (tag);
+    
+    if (!child)
+    {
+      log.Error (node, "Node '%s' not found", tag);
+      return 0;
+    }
+
+    node = child;
+  }
+  
+  size_t result = read_range (make_attribute_iterator (node), first, count);
+  
+  if (result != count)
+    log.Warning (node, "Range not fully read (request_count=%u, result_count=%u)", count, result);
+    
+  return result;
+}
+
+template <class OutIter>
+inline size_t read_range (ParseLog& log, ParseNode* node, const char* tag, OutIter first, size_t count, size_t start, size_t step)
+{
+  if (!node)
+    return 0;
+
+  if (tag)
+  {
+    ParseNode* child = node->First (tag);
+    
+    if (!child)
+    {
+      log.Error (node, "Node '%s' not found", tag);
+      return 0;
+    }
+
+    node = child;
+  }
+    
+  Parser::AttributeIterator iter = make_attribute_iterator (node);
+
+  iter += start;
+
+  if (!iter)
+  {
+    log.Error (node, "Wrong <start>=%u (attributes_count=%u)", start, node->AttributesCount ());
+    return 0;
+  }
+
+  size_t result = read_range (iter, first, count, step);
+ 
+  if (result != count)
+    log.Warning (node, "Range not fully read (request_count=%u, result_count=%u)", count, result);
+
+  return result;
 }
 
 /*

@@ -222,6 +222,17 @@ void read (ParseNode*, const char* tag, stl::basic_string<char, Traits, Allocato
 template <class T> T get (ParseNode*, const char* tag, const T& default_value=T ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Чтение атрибутов с протоколированием ошибок
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> bool read (ParseLog&, ParseNode*, const char* tag, T& object);
+template <class T> void read (ParseLog&, ParseNode*, const char* tag, T& object, const T& default_value);
+
+template <class Traits, class Allocator> 
+void read (ParseLog&, ParseNode*, const char* tag, stl::basic_string<char, Traits, Allocator>& string, const char* default_value);
+
+template <class T> T get (ParseLog&, ParseNode*, const char* tag, const T& default_value=T ());
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение интервалов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class OutIter>
@@ -229,6 +240,15 @@ size_t read_range (ParseNode*, const char* tag, OutIter first, size_t count=size
 
 template <class OutIter>
 size_t read_range (ParseNode*, const char* tag, OutIter first, size_t count, size_t start, size_t step=0);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Чтение интервалов с протоколированием ошибок
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class OutIter>
+size_t read_range (ParseLog&, ParseNode*, const char* tag, OutIter first, size_t count=size_t(-1));
+
+template <class OutIter>
+size_t read_range (ParseLog&, ParseNode*, const char* tag, OutIter first, size_t count, size_t start, size_t step=0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка наличия узла / проверка совпадения имени тэга
