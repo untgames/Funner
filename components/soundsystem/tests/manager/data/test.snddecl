@@ -4,6 +4,7 @@
     <params gain="0.7" min_gain="0.1" max_gain="0.95" inner_angle="20" outer_angle="60" outer_gain="0.4" reference_distance="25" maximum_distance="90" cull_distance="95"/>
     <samples count="2">
       data/sound1.ogg
+      data/sound2.ogg
       data/sound2.wav
     </samples>
   </declaration>

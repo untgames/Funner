@@ -1,4 +1,6 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <mathlib.h>
 #include <common/exception.h>
 #include <syslib/window.h>
@@ -16,9 +18,11 @@ using namespace sound::low_level;
 using namespace xtl;
 using namespace math;
 
-const size_t ACTION_TIME    = 1000;
-const size_t TEST_WORK_TIME = 2000;  //время работы теста (в милисекундах)
+const size_t ACTION_TIME = 100;
+const size_t TEST_WORK_TIME = 5000;  //время работы теста (в милисекундах)
 const char* library_file = "data/test.snddecl";
+
+Emitter emitter ("declaration1");
 
 //печать числа с плавающей точкой
 void print (float value)
@@ -74,6 +78,11 @@ void print (bool arg)
     printf ("false\n");
 }
 
+void TimerHandler (Timer&)
+{
+  emitter.SetPosition (emitter.Position () + vec3f (5.f, 0.f, 0.f));
+}
+
 int main ()
 {
   printf ("Results of test 'test':\n");
@@ -83,6 +92,8 @@ int main ()
     register_openal_driver ();
 
     Timer timer (bind (&Application::Exit, 0), TEST_WORK_TIME);
+
+    srand ((unsigned int)time (NULL));
 
     Window       window;
     SoundManager manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
@@ -117,11 +128,10 @@ int main ()
     manager.SetListener (listener);
     printf ("New listener status: "); print (manager.Listener ());
 
+    manager.LoadSoundLibrary (library_file);
 /*
    Testing basic emitter properties
 */
-
-    Emitter emitter ("declaration1");
 
     printf ("Emitter source - %s\n", emitter.Source ());
     printf ("Initial emitter volume = %f,", emitter.Volume ());
@@ -131,7 +141,7 @@ int main ()
     printf ("Initial position: ");  print (emitter.Position ());
     printf ("\nInitial direction: "); print (emitter.Direction ());
     printf ("\nInitial velocity: ");  print (emitter.Velocity ());
-    emitter.SetPosition  (vec3f (2.f, 2.f, 4.f));
+    emitter.SetPosition  (vec3f (-50.f, 2.f, 4.f));
     emitter.SetDirection (vec3f (-2.f, -2.f, -4.f));
     emitter.SetVelocity  (vec3f (0.f, 0.f, 0.1f));
     printf ("\nNew position: ");  print (emitter.Position ());
@@ -144,6 +154,8 @@ int main ()
     manager.PlaySound (emitter, 0.3f);
 
     printf ("Current offset = %f\n", manager.GetNormalizedOffset (emitter));
+
+    Timer timer2 (&TimerHandler, ACTION_TIME);
 
     Application::Run ();
   }

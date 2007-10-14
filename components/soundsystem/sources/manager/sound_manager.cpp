@@ -3,11 +3,13 @@
 #include <sound/device.h>
 #include <stl/hash_map>
 #include <stl/algorithm>
-#include <stl/deque>
+#include <stl/stack>
+#include <stl/string>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/bind.h>
 #include <syslib/window.h>
+#include <syslib/timer.h>
 #include <common/exception.h>
 #include <media/sound.h>
 #include <media/sound_declaration.h>
@@ -23,6 +25,8 @@ using namespace media;
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
+
+const float DEFAULT_EMITTER_PROPERTIES_UPDATE_PERIOD = 0.03f;
 
 /*
     Описание реализации SoundManager
@@ -40,31 +44,41 @@ struct SoundManagerEmitter
   SoundSample       sound_sample;       //звуковой сэмпл (используется для определения длительности звука)
   size_t            sample_number;      //номер проигрываемого сэмпла
   bool              sample_chosen;      //эммитер ещё не проигрывался
+  Source            source;             //излучатель звука
 
   SoundManagerEmitter  (float normalized_offset);
 };
 
 typedef stl::hash_map<Emitter*, SoundManagerEmitter> EmitterSet;
 typedef xtl::com_ptr<low_level::ISoundDevice>        DevicePtr;
-typedef stl::deque<size_t>                           ChannelsSet;
+typedef stl::stack<size_t>                           ChannelsSet;
 
 struct SoundManager::Impl
 {
-  Window&                     window;               //окно
-  DevicePtr                   device;               //устройство воспроизведения
-  sound::WindowMinimizeAction minimize_action;      //поведение при сворачивании окна
-  float                       volume;               //добавочная громкость
-  bool                        is_muted;             //флаг блокировки проигрывания звука
-  bool                        was_muted;            //предыдущее состояние флага блокировки проигрывания звука
-  sound::Listener             listener;             //параметры слушателя
-  EmitterSet                  emitters;             //излучатели звука
-  ChannelsSet                 free_channels;        //номера свободных каналов
-  Capabilities                capabilities;         //возможности устройства
-  auto_connection             minimize_connection;  //соединения события потери фокуса
-  auto_connection             maximize_connection;  //соединения события получения фокуса
-  SoundDeclarationLibrary     sound_decl_library;   //библиотека описаний звуков
+  Window&                     window;                   //окно
+  DevicePtr                   device;                   //устройство воспроизведения
+  sound::WindowMinimizeAction minimize_action;          //поведение при сворачивании окна
+  float                       volume;                   //добавочная громкость
+  bool                        is_muted;                 //флаг блокировки проигрывания звука
+  bool                        was_muted;                //предыдущее состояние флага блокировки проигрывания звука
+  sound::Listener             listener;                 //параметры слушателя
+  EmitterSet                  emitters;                 //излучатели звука
+  ChannelsSet                 free_channels;            //номера свободных каналов
+  Capabilities                capabilities;             //возможности устройства
+  auto_connection             minimize_connection;      //соединения события потери фокуса
+  auto_connection             maximize_connection;      //соединения события получения фокуса
+  auto_connection             change_handle_connection; //соединение собятия изменения хэндла
+  SoundDeclarationLibrary     sound_decl_library;       //библиотека описаний звуков
+  string                      target_configuration;     //конфигурация устройства вывода
+  string                      init_string;              //строка инициализации
+  Timer                       emitter_timer;            //таймер обновления эмиттеров
 
-  Impl (Window& target_window);
+  Impl (Window& target_window, const char* in_target_configuration, const char* in_init_string);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Инициализация устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+  void Init ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Блокировка проигрывания звука
@@ -76,6 +90,16 @@ struct SoundManager::Impl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void OnMinimize (Window& window, WindowEvent event, const WindowEventContext& context);
   void OnMaximize (Window& window, WindowEvent event, const WindowEventContext& context);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+////Функция, вызываемая при изменении хэндла
+///////////////////////////////////////////////////////////////////////////////////////////////////
+  void OnChangeHandle (Window& in_window, WindowEvent event, const WindowEventContext& context);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление свойств эмиттеров
+///////////////////////////////////////////////////////////////////////////////////////////////////
+  void EmitterUpdate ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проигрывание звуков
@@ -92,12 +116,51 @@ SoundManagerEmitter::SoundManagerEmitter (float normalized_offset)
   : channel_number (-1), is_playing (false), start_offset (normalized_offset), sample_chosen (false)
   {}
 
-SoundManager::Impl::Impl (Window& target_window)
+SoundManager::Impl::Impl (Window& target_window, const char* in_target_configuration, const char* in_init_string)
   : window (target_window), minimize_action (WindowMinimizeAction_Ignore),
     volume (1.f),
+    target_configuration (in_target_configuration),
+    init_string (in_init_string),
     minimize_connection (window.RegisterEventHandler (WindowEvent_OnLostFocus, bind (&SoundManager::Impl::OnMinimize, this, _1, _2, _3))),
-    maximize_connection (window.RegisterEventHandler (WindowEvent_OnSetFocus,  bind (&SoundManager::Impl::OnMaximize, this, _1, _2, _3)))
-  {}
+    maximize_connection (window.RegisterEventHandler (WindowEvent_OnSetFocus,  bind (&SoundManager::Impl::OnMaximize, this, _1, _2, _3))),
+    change_handle_connection (window.RegisterEventHandler (WindowEvent_OnChangeHandle, bind (&SoundManager::Impl::OnChangeHandle, this, _1, _2, _3))),
+    emitter_timer (xtl::bind (&SoundManager::Impl::EmitterUpdate, this), (size_t)(DEFAULT_EMITTER_PROPERTIES_UPDATE_PERIOD * 1000))
+{
+  Init ();
+}
+
+/*
+   Инициализация устройства
+*/
+
+void SoundManager::Impl::Init ()
+{
+  try
+  {
+    device = SoundSystem::CreateDevice (target_configuration.c_str (), &window, init_string.c_str ());
+
+    if (device)
+    {
+      device->GetCapabilities (capabilities);
+      
+      for (size_t i = free_channels.size (); i; i--)
+        free_channels.pop ();
+
+      for (size_t i = 0; i < capabilities.channels_count; i++)
+        free_channels.push (i);
+
+      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+        if (i->second.is_playing)
+        {
+          PauseSound (*(i->first));
+          PlaySound  (*(i->first));
+        }
+    }
+  }
+  catch (...)
+  {
+  }
+}
 
 /*
    Блокировка проигрывания звука
@@ -141,6 +204,35 @@ void SoundManager::Impl::OnMaximize (Window& window, WindowEvent event, const Wi
 }
 
 /*
+   Функция, вызываемая при изменении хэндла
+*/
+
+void SoundManager::Impl::OnChangeHandle (Window& window, WindowEvent event, const WindowEventContext& context)
+{
+  Init ();
+}
+
+/*
+   Обновление свойств эмиттеров
+*/
+
+void SoundManager::Impl::EmitterUpdate ()
+{
+  printf ("Updating emitter\n");
+  for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+  {
+    i->second.source.position  = i->first->Position  ();
+    i->second.source.direction = i->first->Direction ();
+    i->second.source.velocity  = i->first->Velocity  ();
+
+    printf ("Position = %f %f %f\n", i->second.source.position.x, i->second.source.position.y, i->second.source.position.z);
+
+    if (i->second.channel_number != -1)
+      device->SetSource (i->second.channel_number, i->second.source);
+  }
+}
+
+/*
    Проигрывание звуков
 */
 
@@ -151,24 +243,35 @@ void SoundManager::Impl::PlaySound (Emitter& emitter)
   if (emitter_iter == emitters.end ())
     return;
 
-  emitter_iter->second.sound_declaration = sound_decl_library.Find (emitter.Source ());
-  if (!emitter_iter->second.sound_declaration)
-    return;
-
   if (!emitter_iter->second.sample_chosen)
   {
+    emitter_iter->second.sound_declaration = sound_decl_library.Find (emitter.Source ());
+    if (!emitter_iter->second.sound_declaration)
+      return;
+
     emitter_iter->second.sample_number = rand () % emitter_iter->second.sound_declaration->SamplesCount ();
     emitter_iter->second.sound_sample.Load (emitter_iter->second.sound_declaration->Sample (emitter_iter->second.sample_number));
     emitter_iter->second.start_position = (float)emitter_iter->second.sound_sample.Duration () * emitter_iter->second.start_offset;
     emitter_iter->second.cur_position = emitter_iter->second.start_position;
+    emitter_iter->second.sample_chosen = true;
+
+    emitter_iter->second.source.gain               = emitter_iter->second.sound_declaration->Param (SoundParam_Gain);
+    emitter_iter->second.source.minimum_gain       = emitter_iter->second.sound_declaration->Param (SoundParam_MinimumGain);
+    emitter_iter->second.source.maximum_gain       = emitter_iter->second.sound_declaration->Param (SoundParam_MaximumGain);
+    emitter_iter->second.source.inner_angle        = emitter_iter->second.sound_declaration->Param (SoundParam_InnerAngle);
+    emitter_iter->second.source.outer_angle        = emitter_iter->second.sound_declaration->Param (SoundParam_OuterAngle);
+    emitter_iter->second.source.outer_gain         = emitter_iter->second.sound_declaration->Param (SoundParam_OuterGain);
+    emitter_iter->second.source.reference_distance = emitter_iter->second.sound_declaration->Param (SoundParam_ReferenceDistance);
+    emitter_iter->second.source.maximum_distance   = emitter_iter->second.sound_declaration->Param (SoundParam_MaximumDistance);
+
   }
   emitter_iter->second.is_playing      = true;
   emitter_iter->second.play_start_time = clock ();
 
   if (!free_channels.empty ())
   {
-    size_t channel_to_use = free_channels.back ();
-    free_channels.pop_back ();
+    size_t channel_to_use = free_channels.top ();
+    free_channels.pop ();
 
     emitter_iter->second.channel_number = channel_to_use;
     device->SetSample (channel_to_use, emitter_iter->second.sound_declaration->Sample (emitter_iter->second.sample_number));
@@ -217,7 +320,7 @@ void SoundManager::Impl::StopPlaying (EmitterSet::iterator emitter_iter)
   if (emitter_iter->second.channel_number != -1)
   {
     device->Stop (emitter_iter->second.channel_number);
-    free_channels.push_back (emitter_iter->second.channel_number);
+    free_channels.push (emitter_iter->second.channel_number);
     emitter_iter->second.channel_number = -1;
   }
 }
@@ -247,24 +350,8 @@ float SoundManager::Impl::GetNormalizedOffset (Emitter& emitter)
 */
 
 SoundManager::SoundManager (Window& target_window, const char* target_configuration, const char* init_string)
-  : impl (new Impl (target_window))
+  : impl (new Impl (target_window, target_configuration, init_string))
 {
-  try
-  {
-    impl->device = SoundSystem::CreateDevice (target_configuration, &impl->window, init_string);
-
-    if (impl->device)
-    {
-      impl->device->GetCapabilities (impl->capabilities);
-      
-      for (size_t i = 0; i < impl->capabilities.channels_count; i++)
-        impl->free_channels.push_back (i);
-    }
-    impl->sound_decl_library.Load ("data/test.snddecl"); //!!!!!!!!!!!!!!!!
-  }
-  catch (...)
-  {
-  }
 }
 
 SoundManager::~SoundManager ()
@@ -403,4 +490,13 @@ void SoundManager::SetListener (const sound::Listener& listener)
 const sound::Listener& SoundManager::Listener () const
 {
   return impl->listener;
+}
+
+/*
+   Загрузка библиотеки звуков
+*/
+
+void SoundManager::LoadSoundLibrary (const char* file_name)
+{
+  impl->sound_decl_library.Load (file_name);
 }
