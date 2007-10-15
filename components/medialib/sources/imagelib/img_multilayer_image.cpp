@@ -68,9 +68,6 @@ class MultilayerImageImpl: public ImageImpl
     void SaveSkyBox         (const char* file_name);
     void SaveDDS            (const char* file_name);
 
-    void LoadCubemap (const char* file_name);
-    void LoadSkyBox (const char* file_name);
-
   private:
     typedef stl::vector<Image> ImageArray;
 
@@ -258,16 +255,6 @@ void MultilayerImageImpl::Save (const char* file_name)
 /*
     Загрузка
 */
-
-void MultilayerImageImpl::LoadCubemap (const char* file_name)
-{
-//  Image (file_name).Swap (*this);
-}
-
-void MultilayerImageImpl::LoadSkyBox (const char* file_name)
-{
-//  Image (file_name).Swap (*this);
-}
 
 namespace media
 {
