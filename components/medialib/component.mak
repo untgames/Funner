@@ -10,7 +10,7 @@ MEDIALIB_COMPONENTS.INCLUDE_DIRS     := include sources ../../extern/devil/inclu
 MEDIALIB_COMPONENTS.SOURCE_DIRS      := sources/imagelib sources/soundlib sources/fontlib sources/geometry/core sources/geometry/optimize sources/rfx
 MEDIALIB_COMPONENTS.LIB_DIRS         :=  
 MEDIALIB_COMPONENTS.LIBS             := 
-MEDIALIB_COMPONENTS.COMPILER_CFLAGS  :=
+MEDIALIB_COMPONENTS.COMPILER_CFLAGS  := /wd4244
 MEDIALIB_COMPONENTS.COMPILER_DEFINES := IL_STATIC_LIB
 
 #Öåëü ¹2 - MediaLib utils
