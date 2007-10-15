@@ -258,7 +258,6 @@ void MultilayerImageImpl::Save (const char* file_name)
 
 namespace media
 {
-typedef stl::vector<Image> ImageArray;
 
 /*
     Создание реализации
@@ -269,47 +268,47 @@ ImageImpl* create_multilayer_image (size_t count, Image* images, LayersCloneMode
   return new MultilayerImageImpl (count, images, clone_mode);
 }
 
-ImageArray* load_six_image_array (const char* file_name, const char* suffixes [6])
+void load_image_array (const char* file_name, size_t count, const char** suffixes, Image* images)
 {
   if (!file_name)
     RaiseNullArgument ("media::load_image_array", "file_name");
 
   string basename1 = common::basename (file_name),
          basename2 = common::basename (basename1),
-         suffix    = common::suffix   (basename1);
-
-  ImageArray* images = new ImageArray (6);
+         suffix    = common::suffix   (basename1);         
 
   try
   {
     for (size_t i=0; i<6; i++)
-      (*images) [i].Load ((basename2 + suffixes [i] + suffix).c_str ());
+      images [i].Load ((basename2 + suffixes [i] + suffix).c_str ());      
   }
   catch (common::Exception& exception)
   {
     exception.Touch ("media::load_image_array");
     throw;
   }
-
-  return images;
 }
 
 ImageImpl* create_cubemap_image (const char* file_name)
 {
   static const char* suffixes [6] = {"_px", "_nx", "_py", "_ny", "_pz", "_nz"};
 
-  ImageArray* images = load_six_image_array (file_name, suffixes);
+  Image images [6];
+  
+  load_image_array (file_name, 6, suffixes, images);
 
-  return new MultilayerImageImpl (6, images->begin (), LayersCloneMode_Capture);
+  return new MultilayerImageImpl (6, images, LayersCloneMode_Capture);
 }
 
 ImageImpl* create_skybox_image (const char* file_name)
 {
   static const char* suffixes [6] = {"_up", "_down", "_left", "_right", "_front", "_back"};
 
-  ImageArray* images = load_six_image_array (file_name, suffixes);
+  Image images [6];
+  
+  load_image_array (file_name, 6, suffixes, images);
 
-  return new MultilayerImageImpl (6, images->begin (), LayersCloneMode_Capture);
+  return new MultilayerImageImpl (6, images, LayersCloneMode_Capture);
 }
 
 }

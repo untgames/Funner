@@ -88,12 +88,11 @@ class Image
     void Save (const char* file_name, PixelFormat format = PixelFormat_Default);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработчики загрузки/сохранения по умолчанию
+///Обработчики загрузки/сохранения по умолчанию (в будущем убрать вообще!!!)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void DefaultLoader       (const char* file_name, Image& image);
-    static void CubemapLoader       (const char* file_name, Image& image);
-    static void SkyBoxLoader        (const char* file_name, Image& image);
-
+    static void DefaultLoader (const char* file_name, Image& image);
+    static void CubemapLoader (const char* file_name, Image& image);
+    static void SkyBoxLoader  (const char* file_name, Image& image);
     static void DefaultSaver  (const char* file_name, const Image& image);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
