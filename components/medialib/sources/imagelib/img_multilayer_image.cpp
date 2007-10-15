@@ -258,7 +258,7 @@ void MultilayerImageImpl::Save (const char* file_name)
 
 namespace media
 {
-typedef stl::vector<Image> ImageArray;
+typedef stl::vector<Image>       ImageArray;
 
 /*
     Создание реализации
@@ -269,28 +269,20 @@ ImageImpl* create_multilayer_image (size_t count, Image* images, LayersCloneMode
   return new MultilayerImageImpl (count, images, clone_mode);
 }
 
-ImageArray* load_image_array (const char* file_name, size_t count, const char** suffixes)
+ImageArray* load_six_image_array (const char* file_name, const char* suffixes [6])
 {
   if (!file_name)
     RaiseNullArgument ("media::load_image_array", "file_name");
-
-  if (!count)
-    RaiseNullArgument ("media::load_image_array", "count");
-
-  int suffixes_count = sizeof (suffixes) / sizeof (suffixes [0]);
-
-  if (count != suffixes_count)
-    RaiseNullArgument ("media::load_image_array", "suffixes");
 
   string basename1 = common::basename (file_name),
          basename2 = common::basename (basename1),
          suffix    = common::suffix   (basename1);
 
-  ImageArray* images = new ImageArray (count);
+  ImageArray* images = new ImageArray (6);
 
   try
   {
-    for (size_t i=0; i<count; i++)
+    for (size_t i=0; i<6; i++)
       (*images) [i].Load ((basename2 + suffixes [i] + suffix).c_str ());
   }
   catch (common::Exception& exception)
@@ -304,18 +296,18 @@ ImageArray* load_image_array (const char* file_name, size_t count, const char** 
 
 ImageImpl* create_cubemap_image (const char* file_name)
 {
-  static const char* suffixes [] = {"_px", "_nx", "_py", "_ny", "_pz", "_nz"};  
+  static const char* suffixes [6] = {"_px", "_nx", "_py", "_ny", "_pz", "_nz"};
 
-  ImageArray* images = load_image_array (file_name, 6, suffixes);
+  ImageArray* images = load_six_image_array (file_name, suffixes);
 
   return new MultilayerImageImpl (6, images->begin (), LayersCloneMode_Capture);
 }
 
 ImageImpl* create_skybox_image (const char* file_name)
 {
-  static const char* suffixes [] = {"_up", "_down", "_left", "_right", "_front", "_back"};
+  static const char* suffixes [6] = {"_up", "_down", "_left", "_right", "_front", "_back"};
 
-  ImageArray* images = load_image_array (file_name, 6, suffixes);
+  ImageArray* images = load_six_image_array (file_name, suffixes);
 
   return new MultilayerImageImpl (6, images->begin (), LayersCloneMode_Capture);
 }
