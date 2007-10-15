@@ -1,0 +1,10 @@
+Results of any_test:
+default construction
+single argument construction
+copy construction
+copy assignment operator
+converting assignment operator
+failed custom keyword cast
+exception: xtl::bad_any_cast
+swap member function
+copying operations on a null
