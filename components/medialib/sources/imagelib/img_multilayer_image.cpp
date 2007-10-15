@@ -258,7 +258,7 @@ void MultilayerImageImpl::Save (const char* file_name)
 
 namespace media
 {
-typedef stl::vector<Image>       ImageArray;
+typedef stl::vector<Image> ImageArray;
 
 /*
     Создание реализации
