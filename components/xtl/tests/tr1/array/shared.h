@@ -4,5 +4,4 @@
 #include <stl/string>
 #include <stdio.h>
 
-using namespace xtl; //tr1!!!
-
+using namespace tr1;
