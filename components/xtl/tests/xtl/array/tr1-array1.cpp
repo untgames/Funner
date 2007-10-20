@@ -2,7 +2,7 @@
 
 int main()
 {
-    printf ("Results of array1_test:\n");
+    printf ("Results of tr1_array1_test:\n");
 
     // define special type name
     typedef array<float,6> Array;
