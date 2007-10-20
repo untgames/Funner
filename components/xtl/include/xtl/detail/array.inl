@@ -390,7 +390,7 @@ template <class T>
 inline typename array<T,0>::reference array<T,0>::failed_rangecheck ()
 {
   stl::range_error e ("attempt to access element of an empty array");
-  throw_exception (e);
+  throw e;
   //
   // We need to return something here to keep
   // some compilers happy: however we will never
