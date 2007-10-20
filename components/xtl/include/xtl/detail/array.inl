@@ -5,22 +5,25 @@
 /*
     Поддержка итераторов
 */
-array::iterator array::begin ()
+template <class T, size_t N>
+inline typename array<T,N>::iterator array<T,N>::begin ()
 {
   return elems;
 }
 
-array::const_iterator array::begin () const 
+template <class T, size_t N>
+inline typename array<T,N>::const_iterator array<T,N>::begin () const 
 {
   return elems;
 }
 
-array::iterator array::end ()
+template <class T, size_t N>
+inline typename array<T,N>::iterator array<T,N>::end ()
 {
   return elems+N;
 }
-
-array::const_iterator array::end () const
+template <class T, size_t N>
+inline typename array<T,N>::const_iterator array<T,N>::end () const
 {
   return elems+N;
 }
@@ -28,22 +31,26 @@ array::const_iterator array::end () const
 /*
     Поддержка реверсных итераторов
 */
-array::reverse_iterator array::rbegin ()
+template <class T, size_t N>
+inline typename array<T,N>::reverse_iterator array<T,N>::rbegin ()
 {
   return reverse_iterator (end ());
 }
 
-array::const_reverse_iterator array::rbegin() const
+template <class T, size_t N>
+inline typename array<T,N>::const_reverse_iterator array<T,N>::rbegin() const
 {
   return const_reverse_iterator (end ());
 }
 
-array::reverse_iterator array::rend ()
+template <class T, size_t N>
+inline typename array<T,N>::reverse_iterator array<T,N>::rend ()
 {
   return reverse_iterator (begin ());
 }
 
-array::const_reverse_iterator array::rend () const
+template <class T, size_t N>
+inline typename array<T,N>::const_reverse_iterator array<T,N>::rend () const
 {
   return const_reverse_iterator (begin ());
 }
@@ -51,12 +58,14 @@ array::const_reverse_iterator array::rend () const
 /*
     Доступ к элементу (operator[])
 */
-array::reference array::operator[] (size_type i) 
+template <class T, size_t N>
+inline typename array<T,N>::reference array<T,N>::operator[] (size_type i) 
 { 
   return elems [i];
 }
 
-array::const_reference array::operator[](size_type i) const 
+template <class T, size_t N>
+inline typename array<T,N>::const_reference array<T,N>::operator[](size_type i) const 
 {     
   return elems [i]; 
 }
@@ -64,13 +73,15 @@ array::const_reference array::operator[](size_type i) const
 /*
     Доступ к элементу с проверкой диапазона (at())
 */
-array::reference array::at (size_type i)
+template <class T, size_t N>
+inline typename array<T,N>::reference array<T,N>::at (size_type i)
 {
   rangecheck (i);
   return elems [i];
 }
 
-array::const_reference array::at (size_type i) const
+template <class T, size_t N>
+inline typename array<T,N>::const_reference array<T,N>::at (size_type i) const
 {
   rangecheck (i);
   return elems [i];
@@ -79,22 +90,26 @@ array::const_reference array::at (size_type i) const
 /*
     Доступ к первому (front) и последнему (back) элементам
 */
-array::reference array::front () 
+template <class T, size_t N>
+inline typename array<T,N>::reference array<T,N>::front () 
 { 
   return elems [0]; 
 }
 
-array::const_reference array::front () const 
+template <class T, size_t N>
+inline typename array<T,N>::const_reference array<T,N>::front () const 
 {
   return elems [0];
 }
 
-array::reference array::back () 
+template <class T, size_t N>
+inline typename array<T,N>::reference array<T,N>::back () 
 { 
   return elems [N-1]; 
 }
 
-array::const_reference array::back () const 
+template <class T, size_t N>
+inline typename array<T,N>::const_reference array<T,N>::back () const 
 { 
   return elems [N-1]; 
 }
@@ -102,17 +117,20 @@ array::const_reference array::back () const
 /*
     Информация о размере
 */
-static array::size_type array::size ()
+template <class T, size_t N>
+inline typename array<T,N>::size_type array<T,N>::size ()
 {
   return N;
 }
 
-static bool array::empty ()
+template <class T, size_t N>
+inline typename bool array<T,N>::empty ()
 {
   return false;
 }
 
-static array::size_type array::max_size ()
+template <class T, size_t N>
+inline typename array<T,N>::size_type array<T,N>::max_size ()
 {
   return N;
 }
@@ -120,7 +138,8 @@ static array::size_type array::max_size ()
 /*
    Обмен (за линейное время)
 */
-void array::swap (array::array<T,N>& y)
+template <class T, size_t N>
+void array<T,N>::swap (array<T,N>& y)
 {
   stl::swap_ranges (begin (), end (), y.begin ());
 }
@@ -128,12 +147,14 @@ void array::swap (array::array<T,N>& y)
 /*
     Прямой доступ к данным (только чтение)
 */
-const T* array::data () const
+template <class T, size_t N>
+const T* array<T,N>::data () const
 {
   return elems;
 }
 
-T* array::data ()
+template <class T, size_t N>
+T* array<T,N>::data ()
 { 
   return elems;
 }
@@ -141,7 +162,8 @@ T* array::data ()
 /*
     Использование как С массива (чтение/запись)
 */
-T* array::c_array ()
+template <class T, size_t N>
+T* array<T,N>::c_array ()
 { 
   return elems;
 }
@@ -149,8 +171,9 @@ T* array::c_array ()
 /*
     Присваивание c преобразованием типа
 */
+template <class T, size_t N>
 template <typename T2>
-array<T,N>& array::operator= (const array<T2,N>& rhs)
+array<T,N>& array<T,N>::operator= (const array<T2,N>& rhs)
 {
     stl::copy (rhs.begin (),rhs.end (), begin ());
     return *this;
@@ -159,7 +182,8 @@ array<T,N>& array::operator= (const array<T2,N>& rhs)
 /*
     Присваивание одного значения для всех элементов
 */
-void array::assign (const T& value)
+template <class T, size_t N>
+void array<T,N>::assign (const T& value)
 {
     stl::fill_n (begin (), size (), value);
 }
@@ -167,7 +191,8 @@ void array::assign (const T& value)
 /*
     Проверка диапазона
 */
-static void array::rangecheck (array::size_type i)
+template <class T, size_t N>
+void array<T,N>::rangecheck (typename array<T,N>::size_type i)
 {
   if (i >= size ())
   {

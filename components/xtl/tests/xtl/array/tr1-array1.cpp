@@ -5,7 +5,7 @@ int main()
     printf ("Results of array1_test:\n");
 
     // define special type name
-    typedef boost::array<float,6> Array;
+    typedef array<float,6> Array;
 
     // create and initialize an array
     Array a = { { 42 } };
