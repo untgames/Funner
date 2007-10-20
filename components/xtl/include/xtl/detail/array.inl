@@ -387,7 +387,7 @@ void array<T,0>::assign (const T& value)
     Проверка диапазона
 */
 template <class T>
-inline typename array<T,0>::reference failed_rangecheck ()
+inline typename array<T,0>::reference array<T,0>::failed_rangecheck ()
 {
   stl::range_error e ("attempt to access element of an empty array");
   throw_exception (e);
