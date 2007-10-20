@@ -1,0 +1,8 @@
+Results of tr1_array1_test:
+size:     6
+empty:    false
+max_size: 6
+front:    42
+back:     47
+elems:    42 43 44 45 46 47 
+copy construction and copy assignment are OK
