@@ -8,6 +8,7 @@
 #include <sg/light.h>
 #include <sg/listener.h>
 #include <sg/camera.h>
+#include <sg/sound_emitter.h>
 #include <sg/visual_model.h>
 #include <sg/scene.h>
 #include <stdio.h>
