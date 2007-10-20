@@ -90,6 +90,8 @@ void RunTests ()
 
 int main()
 {
+    printf ("Results of tr1_array0_test:\n");
+
     RunTests< bool >();
     RunTests< void * >();
     RunTests< long double >();
