@@ -1,0 +1,11 @@
+Results of tr1_array5_test:
+static_size: 6
+size:        6
+empty:       false
+max_size:    6
+front:       42.419998
+back:        0.000000
+[0]:         42.419998
+elems:       42.419998 0.000000 0.000000 0.000000 0.000000 0.000000 
+42 0 0 0 0 0 
+copy construction and copy assignment are OK
