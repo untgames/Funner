@@ -701,6 +701,11 @@ struct tuple_size<const tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >
   enum { value = tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::size };
 };
 
+#ifdef _MSC_VER
+  #pragma warning (push)
+  #pragma warning (disable : 4181)
+#endif
+
 template <size_t Index, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct tuple_element<Index, tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >
 {
@@ -712,3 +717,7 @@ struct tuple_element<Index, const tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> 
 {
   typedef const typename tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::template element<Index>::type type;
 };
+
+#ifdef _MSC_VER
+  #pragma warning (pop)
+#endif

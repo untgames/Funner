@@ -117,7 +117,7 @@ inline Ret apply (Fn& fn, tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>& args)
 {
   enum { arguments_count = tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::size };
 
-  return apply<Ret, arguments_count> (fn, args, detail::tuple_argument_evalutor ());
+  return detail::apply_dispatch<Ret> (unwrap (fn), args, detail::tuple_argument_evalutor (), detail::apply_selector<arguments_count> ());  
 }
 
 template <class Ret, class Fn, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -125,5 +125,5 @@ inline Ret apply (Fn& fn, const tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>& a
 {
   enum { arguments_count = tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::size };
 
-  return apply<Ret, arguments_count> (fn, args, detail::tuple_argument_evalutor ());
+  return detail::apply_dispatch<Ret> (unwrap (fn), args, detail::tuple_argument_evalutor (), detail::apply_selector<arguments_count> ());
 }
