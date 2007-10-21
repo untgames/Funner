@@ -183,7 +183,7 @@ inline const T* any::content () const
     Преобразователь
 */
 
-inline basic_any_caster& any::get_caster () const
+inline const basic_any_caster& any::get_caster () const
 {
   return content_ptr ? content_ptr->get_caster () : detail::default_caster_factory::get_caster<void> ();
 }
