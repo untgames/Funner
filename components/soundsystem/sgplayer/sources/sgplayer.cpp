@@ -71,8 +71,8 @@ struct SGPlayer::Impl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка добавления/удаления нодов в сцене
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void ProcessAttachNode (Node& node, NodeEvent event);
-  void ProcessDetachNode (Node& node, NodeEvent event);
+  void ProcessAttachNode (Node& sender, Node& node, NodeSubTreeEvent event);
+  void ProcessDetachNode (Node& sender, Node& node, NodeSubTreeEvent event);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проигрывание эмиттеров
@@ -94,8 +94,8 @@ SGPlayer::Impl::Impl (scene_graph::Listener& in_listener, sound::SoundManager& i
 
   scene->Traverse (xtl::bind (&SGPlayer::Impl::CheckNode, this, _1));
 
-  scene->Root ().Event (NodeEvent_AfterSceneAttach).connect  (bind (&SGPlayer::Impl::ProcessAttachNode, this, _1, _2));
-  scene->Root ().Event (NodeEvent_BeforeSceneDetach).connect (bind (&SGPlayer::Impl::ProcessDetachNode, this, _1, _2));
+  scene->Root ().Event (NodeSubTreeEvent_AfterBind).connect  (bind (&SGPlayer::Impl::ProcessAttachNode, this, _1, _2, _3));
+  scene->Root ().Event (NodeSubTreeEvent_BeforeUnbind).connect (bind (&SGPlayer::Impl::ProcessDetachNode, this, _1, _2, _3));
 }
 
 /*
@@ -144,12 +144,12 @@ void SGPlayer::Impl::CheckNode (scene_graph::Node& node)
    Обработка добавления/удаления нодов в сцене
 */
 
-void SGPlayer::Impl::ProcessAttachNode (Node& node, NodeEvent event)
+void SGPlayer::Impl::ProcessAttachNode (Node& sender, Node& node, NodeSubTreeEvent event)
 {
   CheckNode (node);
 }
 
-void SGPlayer::Impl::ProcessDetachNode (Node& node, NodeEvent event)
+void SGPlayer::Impl::ProcessDetachNode (Node& sender, Node& node, NodeSubTreeEvent event)
 {
   EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&node));
 

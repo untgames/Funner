@@ -23,7 +23,7 @@ using namespace scene_graph;
 using namespace math;
 
 const size_t TEST_WORK_TIME = 8000;  //время работы теста (в милисекундах)
-const size_t ACTION_TIME    = 7000;
+const size_t ACTION_TIME    = 5000;
 const size_t ACTION2_TIME   = 100;
 const char* library_file    = "data/test.snddecl";
 
