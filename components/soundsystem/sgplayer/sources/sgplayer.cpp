@@ -49,13 +49,13 @@ typedef stl::hash_map<scene_graph::SoundEmitter*, SGPlayerEmitter> EmitterSet;
 
 struct SGPlayer::Impl
 {
-  scene_graph::Listener& listener;           //слушатель
+  scene_graph::Listener* listener;           //слушатель
   sound::SoundManager&   sound_manager;      //менеджер
   EmitterSet             emitters;           //эмиттеры
   Timer                  listener_timer;     //таймер обновления слушателя
   Timer                  emitter_timer;      //таймер обновления эмиттеров
 
-  Impl (scene_graph::Listener& in_listener, sound::SoundManager& in_sound_manager);
+  Impl (sound::SoundManager& in_sound_manager);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление свойств слушателя/эмиттеров
@@ -81,22 +81,11 @@ struct SGPlayer::Impl
   void StopEmitter (SoundEmitter& emitter, SoundEmitterEvent event);
 };
 
-SGPlayer::Impl::Impl (scene_graph::Listener& in_listener, sound::SoundManager& in_sound_manager) 
-  : listener (in_listener), 
-    sound_manager (in_sound_manager), 
+SGPlayer::Impl::Impl (sound::SoundManager& in_sound_manager) 
+  : sound_manager (in_sound_manager), 
     listener_timer (xtl::bind (&SGPlayer::Impl::ListenerUpdate, this), (size_t)(DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD * 1000)),
     emitter_timer (xtl::bind (&SGPlayer::Impl::EmitterUpdate, this), (size_t)(DEFAULT_EMITTER_PROPERTIES_UPDATE_PERIOD * 1000))
-{
-  scene_graph::Scene* scene = listener.Scene ();
-
-  if (!scene)
-    Raise <Exception> ("sound::SGPlayer::Impl::Impl", "Listener is not binded to any scene.");
-
-  scene->Traverse (xtl::bind (&SGPlayer::Impl::CheckNode, this, _1));
-
-  scene->Root ().Event (NodeSubTreeEvent_AfterBind).connect  (bind (&SGPlayer::Impl::ProcessAttachNode, this, _1, _2, _3));
-  scene->Root ().Event (NodeSubTreeEvent_BeforeUnbind).connect (bind (&SGPlayer::Impl::ProcessDetachNode, this, _1, _2, _3));
-}
+  {}
 
 /*
    Обновление свойств слушателя/эмиттеров
@@ -104,11 +93,14 @@ SGPlayer::Impl::Impl (scene_graph::Listener& in_listener, sound::SoundManager& i
 
 void SGPlayer::Impl::ListenerUpdate ()
 {
+  if (!listener)
+    return;
+
   sound::Listener snd_listener;
     
-  snd_listener.position  = listener.WorldPosition ();                              //!!!!!!!!добавить скорость
-  snd_listener.direction = listener.WorldOrientation () * vec3f(0.f,0.f,1.f);
-  snd_listener.up        = listener.WorldOrientation () * vec3f(0.f,1.f,0.f);
+  snd_listener.position  = listener->WorldPosition ();                              //!!!!!!!!добавить скорость
+  snd_listener.direction = listener->WorldOrientation () * vec3f(0.f,0.f,1.f);
+  snd_listener.up        = listener->WorldOrientation () * vec3f(0.f,1.f,0.f);
 
   sound_manager.SetListener (snd_listener);
 }
@@ -187,12 +179,39 @@ void SGPlayer::Impl::StopEmitter (SoundEmitter& emitter, SoundEmitterEvent event
    Конструктор / деструктор
 */
 
-SGPlayer::SGPlayer (scene_graph::Listener& listener, sound::SoundManager& sound_manager)
-  : impl (new Impl (listener, sound_manager))
+SGPlayer::SGPlayer (sound::SoundManager& sound_manager)
+  : impl (new Impl (sound_manager))
   {}
 
 SGPlayer::~SGPlayer ()
 {
 }
 
+/*
+   Установка слушателя
+*/
 
+void SGPlayer::SetListener (scene_graph::Listener& listener)
+{
+  scene_graph::Scene* scene = listener.Scene ();
+
+  if (!scene)
+    Raise <Exception> ("sound::SGPlayer::Impl::Impl", "Listener is not binded to any scene.");
+
+  if (impl->listener)
+    if (impl->listener->Scene () == scene)
+    {
+      impl->listener = &listener;
+      return;
+    }
+
+  for (EmitterSet::iterator i = impl->emitters.begin (); i != impl->emitters.end (); ++i)
+    impl->sound_manager.StopSound (i->second.emitter);
+
+  impl->emitters.erase (impl->emitters.begin (), impl->emitters.end ());
+
+  scene->Traverse (xtl::bind (&SGPlayer::Impl::CheckNode, impl.get (), _1));
+
+  scene->Root ().Event (NodeSubTreeEvent_AfterBind).connect  (bind (&SGPlayer::Impl::ProcessAttachNode, impl.get (), _1, _2, _3));
+  scene->Root ().Event (NodeSubTreeEvent_BeforeUnbind).connect (bind (&SGPlayer::Impl::ProcessDetachNode, impl.get (), _1, _2, _3));
+}

@@ -63,7 +63,9 @@ int main ()
 
     manager.LoadSoundLibrary (library_file);
 
-    SGPlayer sgplayer (*(listener.get ()), manager);
+    SGPlayer sgplayer (manager);
+
+    sgplayer.SetListener (*(listener.get ()));
 
     sound_emitter2->BindToParent (scene.Root ());
 
