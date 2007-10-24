@@ -5,4 +5,4 @@ TARGETS := SOUNDSYSTEM_COMPONENTS
 
 #Цель №1 - пакет
 SOUNDSYSTEM_COMPONENTS.TYPE       := package
-SOUNDSYSTEM_COMPONENTS.COMPONENTS := manager openaldevice
+SOUNDSYSTEM_COMPONENTS.COMPONENTS := manager openaldevice sgplayer

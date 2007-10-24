@@ -218,14 +218,11 @@ void SoundManager::Impl::OnChangeHandle (Window& window, WindowEvent event, cons
 
 void SoundManager::Impl::EmitterUpdate ()
 {
-  printf ("Updating emitter\n");
   for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
   {
     i->second.source.position  = i->first->Position  ();
     i->second.source.direction = i->first->Direction ();
     i->second.source.velocity  = i->first->Velocity  ();
-
-    printf ("Position = %f %f %f\n", i->second.source.position.x, i->second.source.position.y, i->second.source.position.z);
 
     if (i->second.channel_number != -1)
       device->SetSource (i->second.channel_number, i->second.source);
