@@ -1,8 +1,6 @@
-#ifndef COMMONLIB_UTF_CONVERTER_HEADER
-#define COMMONLIB_UTF_CONVERTER_HEADER
-
 #include <wchar.h>
 #include <common/utf_converter.h>
+
 namespace common
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +50,7 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
          else
          {
             if ( srcSize < bytes )
-	    {
+      {
                // ERROR: Not enough encoded bytes available
                err = 4;
             }
@@ -113,5 +111,3 @@ EncodingResult convert_to_utf16 (const char* source_buffer,            //буфер-и
 }
 
 }
-
-#endif 
