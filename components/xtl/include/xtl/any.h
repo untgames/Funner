@@ -3,26 +3,18 @@
 
 #include <exception>
 #include <typeinfo>
-#include <xtl/utility>
+#include <xtl/dynamic_cast_root.h>
+#include <xtl/lexical_cast.h>
+#include <xtl/default_cast_type.h>
+#include <xtl/type_traits> //for is_polymorphic, remove_reference
 
 namespace xtl
 {
-
-namespace mpl
-{
-
-//implementation forwards
-template <class Head, class Tail> struct type_node;
-struct null_type;
-
-}
 
 namespace detail
 {
 
 //implementation forwards
-template <class SrcT, class DstT> struct static_caster;
-template <class SrcT, class DstT> struct dynamic_caster;
 struct any_holder;
 
 }
@@ -31,53 +23,14 @@ struct any_holder;
 class any;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Базовый класс преобразователя типов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class basic_any_caster
-{
-  public:
-    template <class T>       T cast (any&) const;
-    template <class T> const T cast (const any&) const;
-
-  protected:
-            basic_any_caster  () {}
-    virtual ~basic_any_caster () {}
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Фабрика преобразователей типов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <template <class SrcT, class DstT> class Caster, class T1=mpl::null_type, class T2=mpl::null_type,
-          class T3=mpl::null_type, class T4=mpl::null_type, class T5=mpl::null_type, class T6=mpl::null_type,
-          class T7=mpl::null_type, class T8=mpl::null_type, class T9=mpl::null_type, class T10=mpl::null_type>
-struct caster_factory
-{
-  template <class SrcT> static basic_any_caster& get_caster ();
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Фабрика преобразователей типов, использующая static_cast
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T1=mpl::null_type, class T2=mpl::null_type, class T3=mpl::null_type, class T4=mpl::null_type,
-          class T5=mpl::null_type, class T6=mpl::null_type, class T7=mpl::null_type, class T8=mpl::null_type,
-          class T9=mpl::null_type, class T10=mpl::null_type>
-struct static_caster_factory: caster_factory<detail::static_caster, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> {};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Фабрика преобразователей типов, использующая dynamic_cast
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T1=mpl::null_type, class T2=mpl::null_type, class T3=mpl::null_type, class T4=mpl::null_type,
-          class T5=mpl::null_type, class T6=mpl::null_type, class T7=mpl::null_type, class T8=mpl::null_type,
-          class T9=mpl::null_type, class T10=mpl::null_type>
-struct dynamic_caster_factory: caster_factory<detail::dynamic_caster, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> {};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение: ошибка приведения any-типа данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class bad_any_cast: public std::bad_cast
 {
   public:
     virtual const char* what () const throw () { return "xtl::bad_any_cast"; }
+    
+      //+target_type, source_type
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,8 +46,7 @@ class any
     any  (const any&);
     ~any ();
                        
-    template <class T>                      any (const T& value, bool ref_counted=false);
-    template <class T, class CasterFactory> any (const T& value, const CasterFactory& caster_factory, bool ref_counted=false);
+    template <class T> any (const T& value, bool ref_counted=false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
@@ -117,9 +69,9 @@ class any
     template <class T> const T* content () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразователь
+///Приведение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const basic_any_caster& get_caster () const;
+    template <class T> const T cast () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -127,8 +79,8 @@ class any
     any& swap (any&);
     
   private:
-    template <class T, class CasterFactory>
-    static detail::any_holder* create_holder (const T&, const CasterFactory&, bool ref_counted);
+    template <class T>
+    static detail::any_holder* create_holder (const T&, bool ref_counted);
                        
   private: 
     detail::any_holder* content_ptr;
@@ -142,8 +94,7 @@ void swap (any&, any&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание any с подсчётом ссылок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T>                      any make_ref_any (const T&);
-template <class T, class CasterFactory> any make_ref_any (const T&, const CasterFactory&);
+template <class T> any make_ref_any (const T&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Приведение типов
@@ -154,12 +105,14 @@ template <class T>       T  any_cast (any&);
 template <class T> const T  any_cast (const any&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Полиморфное приведение типов
+///Многоуровневое приведение типов:
+///   - попытка приведений квалификаторов (const, volataile, const volataile)
+///   - попытка dynamic_cast приведений (для типов приводимых к dynamic_cast_root)
+///   - попытка лексикографических приведений (lexical_cast)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> T       polymorphic_any_cast (any&);
-template <class T> const T polymorphic_any_cast (const any&);
+template <class T> const T any_multicast (const any&);
 
-#include <xtl/detail/type_traits/refptr.inl>
+//#include <xtl/detail/type_traits/refptr.inl>
 #include <xtl/detail/any.inl>
 
 }

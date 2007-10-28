@@ -3,7 +3,7 @@
 
 using namespace xtl;
 
-struct A
+struct A: public dynamic_cast_root
 {
   virtual const char* name () const { return "class A"; }
 };
@@ -45,7 +45,7 @@ void test (const char* name, const any& a)
 
   try
   {
-    print (polymorphic_any_cast<T> (a));
+    print (any_multicast<T> (a));
   }
   catch (std::exception& exception)
   {
@@ -61,11 +61,7 @@ int main ()
   
   try
   {
-    typedef static_caster_factory<float, double, long double> my_factory1;
-    typedef static_caster_factory<A*> my_factory2;
-    typedef dynamic_caster_factory<A*, B*, C*> my_factory3;
-    
-    any a1 (1, my_factory1 ());
+    any a1 (1);
     
     test<float>  ("float", a1);
     test<double> ("double", a1);
@@ -74,16 +70,16 @@ int main ()
     B b;
     C c;
     
-    any a2 (&b, my_factory2 ());
+    any a2 (&b);
 
     test<A*> ("class A", a2);
     test<B*> ("class B", a2);
     test<C*> ("class C", a2);
     
-    const any a3 (static_cast<A*> (&c), my_factory3 ());
+    const any a3 (static_cast<A*> (&c));
     
     test<A*> ("class A", a3);
-    test<B*> ("class B", a3);
+    test<B*> ("class B", a3);    
     test<C*> ("class C", a3);
   }
   catch (std::exception& exception)

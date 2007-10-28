@@ -61,6 +61,21 @@ inline void to_string (stl::string& buffer, const char* value)
   buffer = value ? value : "(null)";
 }
 
+/*inline void to_string (stl::string& buffer, const wchar_t* value)
+{
+  if (!value)
+    value = L"";      
+
+  buffer.resize (wcslen (value));
+
+  _snprintf (&buffer [0], buffer.size () + 1, "%S", value);
+}
+
+inline void to_string (stl::string& buffer, const stl::wstring& value)
+{
+  to_string (buffer, value.c_str ());
+}*/
+
 inline void to_string (stl::string& buffer, const signed char* value)
 {
   to_string (buffer, reinterpret_cast<const char*> (value));
@@ -167,7 +182,7 @@ inline void to_string (stl::string& buffer, const T* pointer)
 {
   buffer.resize (8);
   
-  _snprintf (buffer, buffer.size () + 1, "%p", pointer);
+  _snprintf (&buffer [0], buffer.size () + 1, "%p", pointer);
 }
 
 template <class T>
@@ -286,14 +301,13 @@ inline void to_value (const stl::string& buffer, long double& value)
   value = static_cast<long double> (tmp);  
 }
 
-template <class T>
-inline void to_value (const stl::string& buffer, T*& pointer)
+inline void to_value (const stl::string& buffer, void*& pointer)
 {
   long tmp;
   
   detail::string_to_integer (buffer, tmp);
   
-  pointer = reinterpret_cast<T*> (tmp);
+  pointer = reinterpret_cast<void*> (tmp);
 }
 
 template <class T>
