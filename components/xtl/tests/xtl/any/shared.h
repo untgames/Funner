@@ -1,4 +1,8 @@
 #include <stdio.h>
+#include <xtl/any.h>
+#include <stl/string>
+#include <stl/utility>
+#include <stl/memory>
 
 #define TEST(X) printf ((X)?"expression '%s' is true\n":"failed expression '%s'\n",#X);
 

@@ -5,10 +5,7 @@
 #include "shared.h"
 
 #define EPS 1e-06
-
-#define TEST_THROW(X,Y) try { (X); printf ("executed '%s'\n", #X); } catch (Y&) { printf ("exception '%s' accepted\n", #Y); } \
-  catch (...) { printf ("wrong exception. must be '%s'\n", #Y); }
-  
+ 
 #define TEST_CLOSE(X,Y) printf ((fabs((X)-(Y))<EPS)?"expression '%s==%s' is true\n":"failed expression '%s==%s'\n",#X,#Y)
 
 void test_conversion_to_char()
@@ -128,11 +125,11 @@ void test_conversion_to_string()
 
 void test_conversion_to_pointer()
 {
-    TEST_THROW (lexical_cast<char *>("Test"), bad_lexical_cast);
-    TEST_THROW (lexical_cast<wchar_t *>("Test"), bad_lexical_cast);
+    TEST_THROW (lexical_cast<void*>("Test"), bad_lexical_cast);
+    TEST_THROW (lexical_cast<void*>("Test"), bad_lexical_cast);
 }
 
-/*void test_conversion_from_to_wchar_t_alias()
+void test_conversion_from_to_wchar_t_alias()
 {
     TEST (123u == lexical_cast<unsigned short>("123"));
     TEST (123u == lexical_cast<unsigned int>("123"));
@@ -155,7 +152,7 @@ void test_conversion_from_wchar_t()
     TEST (1.0 == lexical_cast<double>(L'1'));
     TEST_THROW (lexical_cast<double>(L'A'), bad_lexical_cast);
 
-    TEST (1.23 == lexical_cast<double>(L"1.23"));
+    TEST_CLOSE (1.23, lexical_cast<double>(L"1.23"));
     TEST_THROW (lexical_cast<double>(L""), bad_lexical_cast);
     TEST_THROW (lexical_cast<double>(L"Test"), bad_lexical_cast);
 
@@ -225,7 +222,7 @@ void test_conversion_to_wstring()
     TEST (L"Test" == lexical_cast<stl::wstring>(stl::wstring(L"Test")));
     TEST (L" " == lexical_cast<stl::wstring>(stl::wstring(L" ")));
     TEST (L"" == lexical_cast<stl::wstring>(stl::wstring(L"")));
-} */
+}
 
 void test_bad_lexical_cast()
 {
@@ -266,8 +263,8 @@ int main ()
     printf ("conversion to bool:\n");
     test_conversion_to_bool ();
     
-  //  printf ("conversion from to wchar_t:\n");
-  //  test_conversion_from_to_wchar_t_alias ();
+    printf ("conversion from to wchar_t_alias:\n");
+    test_conversion_from_to_wchar_t_alias ();
     
     printf ("conversion to pointer:\n");
     test_conversion_to_pointer ();
@@ -275,17 +272,17 @@ int main ()
     printf ("conversion to string:\n");
     test_conversion_to_string ();
 
-  //  printf ("conversion from wchar_t:\n");  
-  //  test_conversion_from_wchar_t ();
+    printf ("conversion from wchar_t:\n");  
+    test_conversion_from_wchar_t ();
     
-  //  printf("conversion to wchar_t:\n");
-  //  test_conversion_to_wchar_t ();
+    printf("conversion to wchar_t:\n");
+    test_conversion_to_wchar_t ();
     
-  //  printf ("conversion from wstring:\n");
-  //  test_conversion_from_wstring ();
+    printf ("conversion from wstring:\n");
+    test_conversion_from_wstring ();
     
-  //  printf ("conversion to wstring:\n");
-  //  test_conversion_to_wstring ();
+    printf ("conversion to wstring:\n");
+    test_conversion_to_wstring ();
 
     printf ("bad_lexical_cast test:\n");
     test_bad_lexical_cast ();

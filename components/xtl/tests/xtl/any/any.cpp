@@ -1,8 +1,3 @@
-#include <stl/string>
-#include <stl/utility>
-
-#include <xtl/any.h>
-
 #include "shared.h"
 
 template<typename string_type, typename function_type>

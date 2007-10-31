@@ -61,20 +61,25 @@ inline void to_string (stl::string& buffer, const char* value)
   buffer = value ? value : "(null)";
 }
 
-/*inline void to_string (stl::string& buffer, const wchar_t* value)
+inline void to_string (stl::string& buffer, const wchar_t* value)
 {
   if (!value)
     value = L"";      
 
-  buffer.resize (wcslen (value));
-
-  _snprintf (&buffer [0], buffer.size () + 1, "%S", value);
+  buffer.resize ((wcslen (value) + 1)* 2);
+  
+  size_t len = _snprintf (&buffer [0], buffer.size () + 1, "%S", value);
+  
+  if (len > buffer.size ())
+    len = buffer.size ();
+    
+  buffer.resize (len);
 }
 
 inline void to_string (stl::string& buffer, const stl::wstring& value)
 {
   to_string (buffer, value.c_str ());
-}*/
+}
 
 inline void to_string (stl::string& buffer, const signed char* value)
 {
@@ -115,6 +120,13 @@ inline void to_string (stl::string& buffer, signed char value)
 inline void to_string (stl::string& buffer, unsigned char value)
 {
   buffer = value;
+}
+
+inline void to_string (stl::string& buffer, wchar_t value)
+{
+  wchar_t tmp_buffer [2] = {value, L'\0'};
+
+  to_string (buffer, tmp_buffer);
 }
 
 inline void to_string (stl::string& buffer, short value)
@@ -202,6 +214,27 @@ inline stl::string to_string (const T& value)
 inline void to_value (const stl::string& buffer, stl::string& value)
 {
   value = buffer;
+}
+
+inline void to_value (const stl::string& buffer, stl::wstring& value)
+{
+  if (buffer.empty ())
+    throw bad_lexical_cast (typeid (stl::string), typeid (stl::wstring));
+
+  value.resize (buffer.size ());
+  
+  size_t length = _snwprintf (&value [0], value.size (), L"%S", buffer.c_str ());
+  
+  if (length > value.size ())
+    length = value.size ();
+    
+  value.resize (length);
+}
+
+inline void to_value (const stl::string& buffer, wchar_t& value)
+{
+  if (buffer.empty () || !_snscanf (buffer.c_str (), buffer.size (), "%C", &value))
+    throw bad_lexical_cast (typeid (stl::string), typeid (wchar_t));
 }
 
 inline void to_value (const stl::string& buffer, long& value)
@@ -304,9 +337,9 @@ inline void to_value (const stl::string& buffer, long double& value)
 inline void to_value (const stl::string& buffer, void*& pointer)
 {
   long tmp;
-  
+
   detail::string_to_integer (buffer, tmp);
-  
+
   pointer = reinterpret_cast<void*> (tmp);
 }
 

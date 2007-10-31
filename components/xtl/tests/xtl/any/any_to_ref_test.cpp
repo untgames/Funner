@@ -1,7 +1,4 @@
-#include <xtl/any.h>
 #include "shared.h"
-
-using namespace xtl;
 
 void test_cast_to_reference()
 {

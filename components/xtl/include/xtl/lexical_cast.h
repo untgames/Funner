@@ -16,7 +16,7 @@ namespace xtl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение: неверное лексикографическое преобразование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class bad_lexical_cast: public std::exception
+class bad_lexical_cast: public std::bad_cast
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,6 @@ void to_value (const stl::string& buffer, bool& value);
 void to_value (const stl::string& buffer, float& value);
 void to_value (const stl::string& buffer, double& value);
 void to_value (const stl::string& buffer, long double& value);
-
 void to_value (const stl::string& buffer, void*& pointer);
 
 template <class T> T to_value (const stl::string&);

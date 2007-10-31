@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <xtl/any.h>
-
-using namespace xtl;
+#include "shared.h"
 
 struct A
 {
