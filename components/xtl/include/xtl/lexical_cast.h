@@ -63,9 +63,7 @@ void to_string (stl::string& buffer, bool value);
 void to_string (stl::string& buffer, float value);
 void to_string (stl::string& buffer, const double& value);
 void to_string (stl::string& buffer, const long double& value);
-
-template <class T>
-void to_string (stl::string& buffer, const T* pointer);
+void to_string (stl::string& buffer, const void* pointer);
 
 template <class T> stl::string to_string (const T& value);
 

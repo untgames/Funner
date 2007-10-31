@@ -9,6 +9,14 @@
 #include <xtl/type.h>
 #include <xtl/type_traits> //for is_polymorphic, remove_reference
 
+namespace stl
+{
+
+//forward declarations
+template <class T> class auto_ptr;
+
+}
+
 namespace xtl
 {
 
@@ -21,7 +29,10 @@ struct any_holder;
 }
 
 //forward declaration
-class any;
+template <class T>                  class shared_ptr;
+template <class T, class Strategy>  class intrusive_ptr;
+template <class T>                  class com_ptr;
+template <class T>                  class reference_wrapper;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение: ошибка приведения any-типа данных
@@ -91,6 +102,12 @@ class any
     template <class T> const T cast () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Лексикографическое приведение
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void to_string   (stl::string& buffer) const;
+    void set_content (const stl::string& buffer);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     any& swap (any&);
@@ -128,6 +145,23 @@ template <class T> const T  any_cast (const any&);
 ///   - попытка лексикографических приведений (lexical_cast)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> const T any_multicast (const any&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение приводимого значения. Используется как базовое при работе any_multicast
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> T& get_castable_value (T&);
+
+template <class T>                 T* get_castable_value (stl::auto_ptr<T>&);
+template <class T>                 T* get_castable_value (shared_ptr<T>&);
+template <class T, class Strategy> T* get_castable_value (intrusive_ptr<T, Strategy>&);
+template <class T>                 T* get_castable_value (com_ptr<T>&);
+template <class T>                 T& get_castable_value (reference_wrapper<T>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Лексикографическое приведение типов any (без изменения типа any)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void to_string (stl::string& buffer, const volatile any& value);
+void to_value  (const stl::string& buffer, volatile any& value);
 
 #include <xtl/detail/any.inl>
 

@@ -37,14 +37,14 @@ struct Y : X
   Y(int value) : X (value) {}
 };
 
-void to_string (stl::string& buffer, const X& value)
+int& get_castable_value (Y& x)
 {
-  xtl::to_string (buffer, value.value);
+  return x.value;
 }
 
-void to_value (const stl::string& buffer, X& value)
+void to_value (const stl::string& buffer, X& x)
 {
-  xtl::to_value (buffer, value.value);
+  xtl::to_value (buffer, x.value);
 }
 
 }
@@ -175,7 +175,7 @@ int main ()
     test<const volatile B*> ("const volatile class B", a5);
     test<const volatile C*> ("const volatile class C", a5);    
     
-    printf ("check complex-lexical_cast\n");    
+    printf ("check complex-lexical_cast\n");
     
     Y y (123);
     any a6 (y);
@@ -184,7 +184,15 @@ int main ()
     test<Y> ("class Y", a6);
     test<const Y> ("const class Y", a6);
     test<X> ("class X", a6);
-    test<X&> ("class X&", a6);    
+    test<X&> ("class X&", a6);
+    
+    printf ("check set_content\n");
+    
+    a6 = ref (y);
+    
+    to_value ("321", a6);
+    
+    printf ("y.value=%d\n", y.value);
   }
   catch (std::exception& exception)
   {

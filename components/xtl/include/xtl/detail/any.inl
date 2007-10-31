@@ -1,3 +1,41 @@
+/*
+===================================================================================================
+    bad_any_cast
+===================================================================================================    
+*/
+
+/*
+    Конструкторы
+*/
+
+inline bad_any_cast::bad_any_cast ()
+  : source (&typeid (void)), target (&typeid (void))
+  {}
+
+inline bad_any_cast::bad_any_cast (const std::type_info& in_source_type, const std::type_info& in_target_type)
+  : source (&in_source_type), target (&in_target_type)
+  {}
+
+/*
+    Исходный и целевой типы
+*/
+
+inline const std::type_info& bad_any_cast::source_type () const
+{
+  return *source;
+}
+
+inline const std::type_info& bad_any_cast::target_type () const
+{
+  return *target;
+}
+
+/*
+===================================================================================================
+    Описание реализации any
+===================================================================================================    
+*/
+ 
 namespace detail
 {
 
@@ -5,11 +43,12 @@ namespace adl_defaults
 {
 
 /*
-    Свободные функции по умолчанию, для игнрирования отсутствия соответствующих псевдонимов при ADL
+    Свободные функции по умолчанию, для игнорирования отсутствия соответствующих псевдонимов при ADL
 */
 
 using xtl::to_string;
 using xtl::to_value;
+using xtl::get_root;
 
 //по умолчанию типы не преобразуются к строкам
 inline void to_string (stl::string&, default_cast_type)
@@ -21,6 +60,12 @@ inline void to_string (stl::string&, default_cast_type)
 inline void to_value (const stl::string& buffer, default_cast_type)
 {
   throw bad_any_cast ();
+}
+
+//по умолчанию, тип не является потомком dynamic_cast_root
+inline dynamic_cast_root* get_root (default_cast_type)
+{
+  return 0;
 }
 
 }
@@ -75,12 +120,13 @@ struct any_holder
 {
   virtual ~any_holder () {}
 
-  virtual size_t                qualifier_mask () = 0;
-  virtual const std::type_info& type           () = 0;
-  virtual const std::type_info& stored_type    () = 0;
-  virtual any_holder*           clone          () = 0;
-  virtual void                  release        () = 0;
-  virtual void                  dump           (stl::string&) = 0;
+  virtual size_t                qualifier_mask        () = 0;
+  virtual const std::type_info& type                  () = 0;
+  virtual const std::type_info& stored_type           () = 0;
+  virtual any_holder*           clone                 () = 0;
+  virtual void                  release               () = 0;
+  virtual void                  dump                  (stl::string&) = 0;
+  virtual void                  set_content           (const stl::string&) = 0;
   virtual dynamic_cast_root*    get_dynamic_cast_root () = 0;
 };
 
@@ -100,14 +146,23 @@ template <class T> struct any_content: public any_holder
 
   dynamic_cast_root* get_dynamic_cast_root ()
   {
-    return const_cast<dynamic_cast_root*> (get_root (value));
+    using adl_defaults::get_root;
+  
+    return const_cast<dynamic_cast_root*> (get_root (get_castable_value (value)));
   }
   
   void dump (stl::string& buffer)
   {
     using adl_defaults::to_string;
+
+    to_string (buffer, get_castable_value (value));
+  }
   
-    to_string (buffer, value);
+  void set_content (const stl::string& buffer)
+  {
+    using adl_defaults::to_value;
+    
+    to_value (buffer, get_castable_value (value));
   }
 
   base_type value;
@@ -130,13 +185,13 @@ template <class T> class referenced_any_impl: public any_content<T>
   public:
     referenced_any_impl (const T& in_value) : any_content<T> (in_value), ref_count (1) {}
 
-  any_holder* clone () { return ref_count++, this; }
+    any_holder* clone () { return ref_count++, this; }
   
-  void release ()
-  {
-    if (!--ref_count)
-      delete this;
-  }
+    void release ()
+    {
+      if (!--ref_count)
+        delete this;
+    }
 
   private:
     size_t ref_count;
@@ -145,7 +200,9 @@ template <class T> class referenced_any_impl: public any_content<T>
 }
 
 /*
+===================================================================================================
     any
+===================================================================================================    
 */
 
 /*
@@ -334,6 +391,39 @@ inline const T any::cast () const
 }
 
 /*
+    Лексикографическое приведение
+*/
+
+inline void any::to_string (stl::string& buffer) const
+{
+  if (!content_ptr)
+  {
+    buffer.clear ();
+    return;
+  }
+  
+  content_ptr->dump (buffer);
+}
+
+inline void any::set_content (const stl::string& buffer)
+{
+  if (!content_ptr)
+    return;
+    
+  content_ptr->set_content (buffer);
+}
+
+inline void to_string (stl::string& buffer, const volatile any& value)
+{
+  const_cast<const any&> (value).to_string (buffer);
+}
+
+inline void to_value  (const stl::string& buffer, volatile any& value)
+{
+  const_cast<any&> (value).set_content (buffer);
+}
+
+/*
     Обмен
 */
 
@@ -345,11 +435,17 @@ inline any& any::swap (any& in_any)
   
   return *this;
 }
-                       
+
 inline void swap (any& a1, any& a2)
 {
   a1.swap (a2);
 }
+
+/*
+===================================================================================================
+    Утилиты
+===================================================================================================    
+*/
 
 /*
     Создание any с подсчётом ссылок
@@ -414,31 +510,41 @@ inline const T any_multicast (const any& a)
 }
 
 /*
-    bad_any_cast
+    Получение приводимого значения. Используется как базовое при работе any_multicast
 */
 
-/*
-    Конструкторы
-*/
-
-inline bad_any_cast::bad_any_cast ()
-  : source (&typeid (void)), target (&typeid (void))
-  {}
-
-inline bad_any_cast::bad_any_cast (const std::type_info& in_source_type, const std::type_info& in_target_type)
-  : source (&in_source_type), target (&in_target_type)
-  {}
-
-/*
-    Исходный и целевой типы
-*/
-
-inline const std::type_info& bad_any_cast::source_type () const
+template <class T>
+inline T& get_castable_value (T& value)
 {
-  return *source;
+  return value;
 }
 
-inline const std::type_info& bad_any_cast::target_type () const
+template <class T>
+inline T* get_castable_value (stl::auto_ptr<T>& ptr)
 {
-  return *target;
+  return get_pointer (ptr);
+}
+
+template <class T>
+inline T* get_castable_value (shared_ptr<T>& ptr)
+{
+  return get_pointer (ptr);
+}
+
+template <class T, class Strategy>
+inline T* get_castable_value (intrusive_ptr<T, Strategy>& ptr)
+{
+  return get_pointer (ptr);
+}
+
+template <class T>
+inline T* get_castable_value (com_ptr<T>& ptr)
+{
+  return get_pointer (ptr);
+}
+
+template <class T>
+inline T& get_castable_value (reference_wrapper<T>& ref)
+{
+  return ref.get ();
 }

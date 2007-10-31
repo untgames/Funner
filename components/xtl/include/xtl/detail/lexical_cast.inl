@@ -189,8 +189,7 @@ inline void to_string (stl::string& buffer, const long double& value)
   to_string (buffer, static_cast<double> (value));
 }
 
-template <class T>
-inline void to_string (stl::string& buffer, const T* pointer)
+inline void to_string (stl::string& buffer, const void* pointer)
 {
   buffer.resize (8);
   
