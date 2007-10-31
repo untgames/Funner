@@ -1,0 +1,9 @@
+Results of any_to_ref_test:
+expression '&ra1 == &ra2 && &ra2 == &ra3' is true
+expression '&rb1 == &rb2 && &rb2 == &rb3' is true
+expression '&rc1 == &rc2' is true
+expression '&ra1 != &rb1 && &rb1 != &rc1 && &rc1 != &ra1' is true
+expression '&ra1 != &i && &rb1 != &i && &rc1 != &i' is true
+expression 'v == i + 1' is true
+expression 'v2 == i - 1' is true
+exception 'bad_any_cast' accepted
