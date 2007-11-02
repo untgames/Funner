@@ -1,6 +1,6 @@
 /*
 ===================================================================================================
-    bad_any_cast
+    Исключения
 ===================================================================================================    
 */
 
@@ -14,6 +14,18 @@ inline bad_any_cast::bad_any_cast ()
 
 inline bad_any_cast::bad_any_cast (const std::type_info& in_source_type, const std::type_info& in_target_type)
   : source (&in_source_type), target (&in_target_type)
+  {}
+
+inline bad_any_const_cast::bad_any_const_cast (const std::type_info& source_type, const std::type_info& target_type)
+  : bad_any_cast (source_type, target_type)
+  {}
+
+inline bad_any_dynamic_cast::bad_any_dynamic_cast (const std::type_info& source_type, const std::type_info& target_type)
+  : bad_any_cast (source_type, target_type)
+  {}
+
+inline bad_any_lexical_cast::bad_any_lexical_cast (const std::type_info& source_type, const std::type_info& target_type)
+  : bad_any_cast (source_type, target_type)
   {}
 
 /*
@@ -39,6 +51,15 @@ inline const std::type_info& bad_any_cast::target_type () const
 namespace detail
 {
 
+/*
+    Внутреннее исключение, возникающее при невозможности приведения
+*/
+
+struct bad_any_cast_internal: public std::bad_cast
+{
+  const char* what () const throw () { return "xtl::detail::bad_any_cast_internal"; }
+};
+
 namespace adl_defaults
 {
 
@@ -53,13 +74,13 @@ using xtl::get_root;
 //по умолчанию типы не преобразуются к строкам
 inline void to_string (stl::string&, default_cast_type)
 {
-  throw bad_any_cast ();
+  throw bad_any_cast_internal ();
 }
 
 //по умолчанию типы не приводимы из строки
 inline void to_value (const stl::string& buffer, default_cast_type)
 {
-  throw bad_any_cast ();
+  throw bad_any_cast_internal ();
 }
 
 //по умолчанию, тип не является потомком dynamic_cast_root
@@ -69,15 +90,6 @@ inline dynamic_cast_root* get_root (default_cast_type)
 }
 
 }
-
-/*
-    Внутреннее исключение, возникающее при невозможности приведения
-*/
-
-struct bad_any_cast_internal: public std::bad_cast
-{
-  const char* what () const throw () { return "xtl::detail::bad_any_cast_internal"; }
-};
 
 /*
     Определение маски квалификаторов типа
@@ -95,9 +107,9 @@ template <class T> struct any_qualifier_mask<const T>           { enum { value =
 template <class T> struct any_qualifier_mask<volatile T>        { enum { value = any_qualifier_volatile_bit | any_qualifier_mask<T>::value }; };
 template <class T> struct any_qualifier_mask<const volatile T>  { enum { value = any_qualifier_volatile_bit | any_qualifier_const_bit | any_qualifier_mask<T>::value }; };
 template <class T> struct any_qualifier_mask<T*>                { enum { value = any_qualifier_mask<T>::value }; };
-template <class T> struct any_qualifier_mask<const T*>          { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_const_bit }; };
-template <class T> struct any_qualifier_mask<volatile T*>       { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_volatile_bit }; };
-template <class T> struct any_qualifier_mask<const volatile T*> { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_volatile_bit | any_qualifier_ptr_const_bit }; };
+template <class T> struct any_qualifier_mask<T* const>          { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_const_bit }; };
+template <class T> struct any_qualifier_mask<T* volatile>       { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_volatile_bit }; };
+template <class T> struct any_qualifier_mask<T* const volatile> { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_volatile_bit | any_qualifier_ptr_const_bit }; };
 
 template <class T> struct any_qualifier_mask<reference_wrapper<T> >          { enum { value = any_qualifier_mask<T>::value }; };
 template <class T> struct any_qualifier_mask<const reference_wrapper<T> >    { enum { value = any_qualifier_mask<T>::value | any_qualifier_mask_const_bit }; };
@@ -427,13 +439,13 @@ inline const T any::cast () const
   
     //проверка возможности const_cast приведения
   
-  static const size_t target_qualifier_mask = detail::any_qualifier_mask<nonref>::value;
+  static const size_t target_qualifier_mask = detail::any_qualifier_mask<nonref>::value;  
 
   if (content_ptr->qualifier_mask () & ~target_qualifier_mask)
-    throw bad_any_cast (type (), typeid (T)); //преобразование невозможно, из-за понижения уровня квалификаторов const и volatile
-    
+    throw bad_any_const_cast (type (), typeid (T)); //преобразование невозможно, из-за понижения уровня квалификаторов const и volatile
+
      //попытка прямого преобразования    
-     
+
   const std::type_info* content_type = &content_ptr->stored_type ();
     
   if (&typeid (stored_type) == content_type)
@@ -444,15 +456,22 @@ inline const T any::cast () const
   if (&typeid (reference_wrapper<stored_type>) == content_type)
     return static_cast<detail::any_content<reference_wrapper<stored_type> >*> (content_ptr)->value.get ();
     
+    //попытка приведения через dynamic_cast_root    
+    
   try
   {
-      //попытка приведения через dynamic_cast_root
-
     if (dynamic_cast_root* dc_root = content_ptr->get_dynamic_cast_root ())
-      return detail::dynamic_caster<nonref>::cast (dc_root);
+      return detail::dynamic_caster<nonref>::cast (dc_root);      
+  }
+  catch (detail::bad_any_cast_internal&)
+  {
+    throw bad_any_dynamic_cast (type (), typeid (T));
+  }
 
-      //попытка лексикографического приведения
-
+    //попытка лексикографического приведения
+      
+  try
+  {
     stl::string buffer;
 
     content_ptr->dump (buffer);
@@ -461,7 +480,7 @@ inline const T any::cast () const
   }
   catch (detail::bad_any_cast_internal&)
   {
-    throw bad_any_cast (type (), typeid (T));
+    throw bad_any_lexical_cast (type (), typeid (T));
   }
 }
 
@@ -477,7 +496,14 @@ inline void any::to_string (stl::string& buffer) const
     return;
   }
 
-  content_ptr->dump (buffer);
+  try
+  {
+    content_ptr->dump (buffer);
+  }
+  catch (detail::bad_any_cast_internal&)
+  {
+    throw bad_any_lexical_cast (type (), typeid (stl::string));
+  }
 }
 
 inline void any::set_content (const stl::string& buffer)
@@ -488,7 +514,7 @@ inline void any::set_content (const stl::string& buffer)
     //проверка возможности const_cast приведения
 
   if (content_ptr->qualifier_mask () & (detail::any_qualifier_const_bit | detail::any_qualifier_ptr_const_bit))
-    throw bad_any_cast (typeid (const stl::string), type ()); //преобразование невозможно, из-за понижения уровня квалификаторов const и volatile
+    throw bad_any_const_cast (typeid (const stl::string), type ()); //преобразование невозможно, из-за понижения уровня квалификаторов const и volatile
     
   try
   {
@@ -496,7 +522,7 @@ inline void any::set_content (const stl::string& buffer)
   }
   catch (detail::bad_any_cast_internal&)
   {
-    throw bad_any_cast (typeid (const stl::string), type ());
+    throw bad_any_lexical_cast (typeid (const stl::string), type ());
   }
 }
 
@@ -604,6 +630,22 @@ template <class T>
 inline T& get_castable_value (T& value)
 {
   return value;
+}
+
+template <class T>
+inline T& get_castable_value (T* ptr)
+{
+  return *ptr;
+}
+
+inline char* get_castable_value (char* ptr)
+{
+  return ptr;
+}
+
+inline wchar_t* get_castable_value (wchar_t* ptr)
+{
+  return ptr;
 }
 
 template <class T>

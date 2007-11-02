@@ -38,6 +38,14 @@ template <class Fn> struct functional_traits
 };
 
 /*
+    Специализации для различных видов квалификаторов
+*/
+
+template <class Fn> struct functional_traits<const Fn>:          public functional_traits<Fn> {};
+template <class Fn> struct functional_traits<volatile Fn>:       public functional_traits<Fn> {};
+template <class Fn> struct functional_traits<const volatile Fn>: public functional_traits<Fn> {};
+
+/*
     Таблицы конфигурации аргументов функции и типа возвращаемого значения
 */
 

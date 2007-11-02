@@ -6,47 +6,47 @@ cast to 'long double': 1
 check dynamic any_multicast (source type - class B)
 cast to 'class A': static-type='class A' dynamic-type='class B'
 cast to 'class B': static-type='class B' dynamic-type='class B'
-cast to 'class C': fail: xtl::bad_any_cast
+cast to 'class C': fail: xtl::bad_any_dynamic_cast
 check dynamic any_multicast (source type - class C, casted to A)
 cast to 'class A': static-type='class A' dynamic-type='class C'
-cast to 'class B': fail: xtl::bad_any_cast
+cast to 'class B': fail: xtl::bad_any_dynamic_cast
 cast to 'class C': static-type='class C' dynamic-type='class C'
 cast to 'const class A&': static-type='class A' dynamic-type='class C'
-cast to 'const class B&': fail: xtl::bad_any_cast
+cast to 'const class B&': fail: xtl::bad_any_dynamic_cast
 cast to 'const class C&': static-type='class C' dynamic-type='class C'
-cast to 'class X*': fail: xtl::bad_any_cast
+cast to 'class X*': fail: xtl::bad_any_dynamic_cast
 check dynamic any_multicast (source type - class C, casted to const A)
-cast to 'class A': fail: xtl::bad_any_cast
-cast to 'class B': fail: xtl::bad_any_cast
-cast to 'class C': fail: xtl::bad_any_cast
+cast to 'class A': fail: xtl::bad_any_const_cast
+cast to 'class B': fail: xtl::bad_any_const_cast
+cast to 'class C': fail: xtl::bad_any_const_cast
 cast to 'const class A': static-type='class A' dynamic-type='class C'
-cast to 'const class B': fail: xtl::bad_any_cast
+cast to 'const class B': fail: xtl::bad_any_dynamic_cast
 cast to 'const class C': static-type='class C' dynamic-type='class C'
-cast to 'volatile class A': fail: xtl::bad_any_cast
-cast to 'volatile class B': fail: xtl::bad_any_cast
-cast to 'volatile class C': fail: xtl::bad_any_cast
+cast to 'volatile class A': fail: xtl::bad_any_const_cast
+cast to 'volatile class B': fail: xtl::bad_any_const_cast
+cast to 'volatile class C': fail: xtl::bad_any_const_cast
 cast to 'const volatile class A': static-type='class A' dynamic-type='class C'
-cast to 'const volatile class B': fail: xtl::bad_any_cast
+cast to 'const volatile class B': fail: xtl::bad_any_dynamic_cast
 cast to 'const volatile class C': static-type='class C' dynamic-type='class C'
 check dynamic any_multicast (source type - stl::auto_ptr<const class C>)
 cast to 'class A': static-type='class A' dynamic-type='class C'
-cast to 'class B': fail: xtl::bad_any_cast
+cast to 'class B': fail: xtl::bad_any_dynamic_cast
 cast to 'class C': static-type='class C' dynamic-type='class C'
 cast to 'const class A': static-type='class A' dynamic-type='class C'
-cast to 'const class B': fail: xtl::bad_any_cast
+cast to 'const class B': fail: xtl::bad_any_dynamic_cast
 cast to 'const class C': static-type='class C' dynamic-type='class C'
 cast to 'volatile class A': static-type='class A' dynamic-type='class C'
-cast to 'volatile class B': fail: xtl::bad_any_cast
+cast to 'volatile class B': fail: xtl::bad_any_dynamic_cast
 cast to 'volatile class C': static-type='class C' dynamic-type='class C'
 cast to 'const volatile class A': static-type='class A' dynamic-type='class C'
-cast to 'const volatile class B': fail: xtl::bad_any_cast
+cast to 'const volatile class B': fail: xtl::bad_any_dynamic_cast
 cast to 'const volatile class C': static-type='class C' dynamic-type='class C'
 check complex-lexical_cast
 cast to 'class Y&': static-type='class Y' value=123
 cast to 'class Y': static-type='class Y' value=123
 cast to 'const class Y': static-type='class Y' value=123
 cast to 'class X': static-type='class X' value=123
-cast to 'class X&': fail: xtl::bad_any_cast
+cast to 'class X&': fail: xtl::bad_any_lexical_cast
 check set_content
 y.value=321
-exception: xtl::bad_any_cast
+exception: xtl::bad_any_const_cast
