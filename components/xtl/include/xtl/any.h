@@ -151,10 +151,10 @@ template <class T> const T any_multicast (const any&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> T& get_castable_value (T&);
 
-template <class T>                 T* get_castable_value (stl::auto_ptr<T>&);
-template <class T>                 T* get_castable_value (shared_ptr<T>&);
-template <class T, class Strategy> T* get_castable_value (intrusive_ptr<T, Strategy>&);
-template <class T>                 T* get_castable_value (com_ptr<T>&);
+template <class T>                 T& get_castable_value (stl::auto_ptr<T>&);
+template <class T>                 T& get_castable_value (shared_ptr<T>&);
+template <class T, class Strategy> T& get_castable_value (intrusive_ptr<T, Strategy>&);
+template <class T>                 T& get_castable_value (com_ptr<T>&);
 template <class T>                 T& get_castable_value (reference_wrapper<T>&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -37,14 +37,14 @@ struct Y : X
   Y(int value) : X (value) {}
 };
 
-int& get_castable_value (Y& x)
-{
-  return x.value;
-}
-
 void to_value (const stl::string& buffer, X& x)
 {
   xtl::to_value (buffer, x.value);
+}
+
+void to_string (stl::string& buffer, X& x)
+{
+  xtl::to_string (buffer, x.value);
 }
 
 }
@@ -60,14 +60,14 @@ void print (const volatile A& a)
   printf ("static-type='class A' dynamic-type='%s'", const_cast<const A&> (a).name ());
 }
 
-void print (const volatile B& a)
+void print (const volatile B& b)
 {
-  printf ("static-type='class B' dynamic-type='%s'", const_cast<const B&> (a).name ());
+  printf ("static-type='class B' dynamic-type='%s'", const_cast<const B&> (b).name ());
 }
 
-void print (const volatile C& a)
+void print (const volatile C& c)
 {
-  printf ("static-type='class C' dynamic-type='%s'", const_cast<const C&> (a).name ());
+  printf ("static-type='class C' dynamic-type='%s'", const_cast<const C&> (c).name ());
 }
 
 void print (const volatile test_namespace::X& x)
@@ -119,7 +119,7 @@ int main ()
     test<long double> ("long double", a1);
     
     B b;
-    C c;
+    C c;    
     
     printf ("check dynamic any_multicast (source type - class B)\n");
     
@@ -178,7 +178,7 @@ int main ()
     printf ("check complex-lexical_cast\n");
     
     Y y (123);
-    any a6 (y);
+    any a6 (xtl::ref (y));
     
     test<Y&> ("class Y&", a6);
     test<Y> ("class Y", a6);
@@ -186,13 +186,17 @@ int main ()
     test<X> ("class X", a6);
     test<X&> ("class X&", a6);
     
-    printf ("check set_content\n");
-    
-    a6 = ref (y);
-    
+    printf ("check set_content\n");    
+
     to_value ("321", a6);
     
     printf ("y.value=%d\n", y.value);
+    
+    a6 = xtl::cref (y);
+    
+    to_value ("4321", a6);
+    
+    printf ("y.value=%d\n", y.value); //must be unreachable
   }
   catch (std::exception& exception)
   {

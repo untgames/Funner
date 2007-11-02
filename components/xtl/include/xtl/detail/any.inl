@@ -91,13 +91,18 @@ enum {
 };
 
 template <class T> struct any_qualifier_mask                    { enum { value = 0 }; };
-template <class T> struct any_qualifier_mask<const T>           { enum { value = any_qualifier_const_bit }; };
-template <class T> struct any_qualifier_mask<volatile T>        { enum { value = any_qualifier_volatile_bit }; };
-template <class T> struct any_qualifier_mask<const volatile T>  { enum { value = any_qualifier_volatile_bit | any_qualifier_const_bit }; };
+template <class T> struct any_qualifier_mask<const T>           { enum { value = any_qualifier_const_bit | any_qualifier_mask<T>::value }; };
+template <class T> struct any_qualifier_mask<volatile T>        { enum { value = any_qualifier_volatile_bit | any_qualifier_mask<T>::value }; };
+template <class T> struct any_qualifier_mask<const volatile T>  { enum { value = any_qualifier_volatile_bit | any_qualifier_const_bit | any_qualifier_mask<T>::value }; };
 template <class T> struct any_qualifier_mask<T*>                { enum { value = any_qualifier_mask<T>::value }; };
 template <class T> struct any_qualifier_mask<const T*>          { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_const_bit }; };
 template <class T> struct any_qualifier_mask<volatile T*>       { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_volatile_bit }; };
 template <class T> struct any_qualifier_mask<const volatile T*> { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_volatile_bit | any_qualifier_ptr_const_bit }; };
+
+template <class T> struct any_qualifier_mask<reference_wrapper<T> >          { enum { value = any_qualifier_mask<T>::value }; };
+template <class T> struct any_qualifier_mask<const reference_wrapper<T> >    { enum { value = any_qualifier_mask<T>::value | any_qualifier_mask_const_bit }; };
+template <class T> struct any_qualifier_mask<volatile reference_wrapper<T> > { enum { value = any_qualifier_mask<T>::value | any_qualifier_mask_volatile_bit }; };
+template <class T> struct any_qualifier_mask<const volatile reference_wrapper<T> > { enum { value = any_qualifier_mask<T>::value | any_qualifier_mask_volatile_bit | any_qualifier_mask_const_bit }; };
 
 /*
     Определение хранимого типа
@@ -111,6 +116,67 @@ template <class T> struct any_stored_type<T*>                { typedef typename 
 template <class T> struct any_stored_type<T* const>          { typedef typename any_stored_type<T>::type* type; };
 template <class T> struct any_stored_type<T* volatile>       { typedef typename any_stored_type<T>::type* type; };
 template <class T> struct any_stored_type<T* const volatile> { typedef typename any_stored_type<T>::type* type; };
+
+template <class T> struct any_stored_type<reference_wrapper<T> >
+{
+  typedef reference_wrapper<typename any_stored_type<T>::type> type;
+};
+
+template <class T> struct any_stored_type<const reference_wrapper<T> >:          public any_stored_type<reference_wrapper<T> > {};
+template <class T> struct any_stored_type<volatile reference_wrapper<T> >:       public any_stored_type<reference_wrapper<T> > {};
+template <class T> struct any_stored_type<const volatile reference_wrapper<T> >: public any_stored_type<reference_wrapper<T> > {};
+
+/*
+    Снятие константности
+*/
+
+template <class T>
+inline typename any_stored_type<T>::type& get_unqualified_value (T& value)
+{
+  return const_cast<typename any_stored_type<T>::type&> (value);
+}
+
+template <class T>
+inline typename any_stored_type<T>::type& get_unqualified_value (const T& value)
+{
+  return const_cast<typename any_stored_type<T>::type&> (value);  
+}
+
+template <class T>
+inline typename any_stored_type<T>::type& get_unqualified_value (volatile T& value)
+{
+  return const_cast<typename any_stored_type<T>::type&> (value);  
+}
+
+template <class T>
+inline typename any_stored_type<T>::type& get_unqualified_value (const volatile T& value)
+{
+  return const_cast<typename any_stored_type<T>::type&> (value);    
+}
+
+template <class T>
+inline typename any_stored_type<T>::type& get_unqualified_value (reference_wrapper<T>& value)
+{
+  return get_unqualified_value (value.get ());
+}
+
+template <class T>
+inline typename any_stored_type<T>::type& get_unqualified_value (const reference_wrapper<T>& value)
+{
+  return get_unqualified_value (value.get ());
+}
+
+template <class T>
+inline typename any_stored_type<T>::type& get_unqualified_value (volatile reference_wrapper<T>& value)
+{
+  return get_unqualified_value (value.get ());
+}
+
+template <class T>
+inline typename any_stored_type<T>::type& get_unqualified_value (const volatile reference_wrapper<T>& value)
+{
+  return get_unqualified_value (value.get ());
+}
 
 /*
     Интерфейс хранилища вариантных данных 
@@ -138,7 +204,7 @@ template <class T> struct any_content: public any_holder
 {
   typedef typename any_stored_type<T>::type base_type;
 
-  any_content (const T& in_value) : value (*const_cast<base_type*> (&in_value)) {}
+  any_content (const T& in_value) : value (get_unqualified_value (in_value)) {}
 
   const std::type_info& type           () { return typeid (T); }
   const std::type_info& stored_type    () { return typeid (base_type); }
@@ -148,7 +214,7 @@ template <class T> struct any_content: public any_holder
   {
     using adl_defaults::get_root;
   
-    return const_cast<dynamic_cast_root*> (get_root (get_castable_value (value)));
+    return get_unqualified_value (get_root (get_castable_value (value)));
   }
   
   void dump (stl::string& buffer)
@@ -359,15 +425,24 @@ inline const T any::cast () const
   typedef typename type_traits::remove_reference<T>::type nonref;    
   typedef typename detail::any_stored_type<nonref>::type  stored_type;  
   
-     //попытка прямого преобразования
-    
+    //проверка возможности const_cast приведения
+  
   static const size_t target_qualifier_mask = detail::any_qualifier_mask<nonref>::value;
 
   if (content_ptr->qualifier_mask () & ~target_qualifier_mask)
     throw bad_any_cast (type (), typeid (T)); //преобразование невозможно, из-за понижения уровня квалификаторов const и volatile
     
-  if (&typeid (stored_type) == &content_ptr->stored_type ())
+     //попытка прямого преобразования    
+     
+  const std::type_info* content_type = &content_ptr->stored_type ();
+    
+  if (&typeid (stored_type) == content_type)
     return static_cast<detail::any_content<stored_type>*> (content_ptr)->value;
+    
+    //попытка приведения из reference_wrapper
+    
+  if (&typeid (reference_wrapper<stored_type>) == content_type)
+    return static_cast<detail::any_content<reference_wrapper<stored_type> >*> (content_ptr)->value.get ();
     
   try
   {
@@ -401,7 +476,7 @@ inline void any::to_string (stl::string& buffer) const
     buffer.clear ();
     return;
   }
-  
+
   content_ptr->dump (buffer);
 }
 
@@ -409,8 +484,20 @@ inline void any::set_content (const stl::string& buffer)
 {
   if (!content_ptr)
     return;
+
+    //проверка возможности const_cast приведения
+
+  if (content_ptr->qualifier_mask () & (detail::any_qualifier_const_bit | detail::any_qualifier_ptr_const_bit))
+    throw bad_any_cast (typeid (const stl::string), type ()); //преобразование невозможно, из-за понижения уровня квалификаторов const и volatile
     
-  content_ptr->set_content (buffer);
+  try
+  {
+    content_ptr->set_content (buffer);
+  }
+  catch (detail::bad_any_cast_internal&)
+  {
+    throw bad_any_cast (typeid (const stl::string), type ());
+  }
 }
 
 inline void to_string (stl::string& buffer, const volatile any& value)
@@ -520,27 +607,27 @@ inline T& get_castable_value (T& value)
 }
 
 template <class T>
-inline T* get_castable_value (stl::auto_ptr<T>& ptr)
+inline T& get_castable_value (stl::auto_ptr<T>& ptr)
 {
-  return get_pointer (ptr);
+  return *ptr;
 }
 
 template <class T>
-inline T* get_castable_value (shared_ptr<T>& ptr)
+inline T& get_castable_value (shared_ptr<T>& ptr)
 {
-  return get_pointer (ptr);
+  return *ptr;
 }
 
 template <class T, class Strategy>
-inline T* get_castable_value (intrusive_ptr<T, Strategy>& ptr)
+inline T& get_castable_value (intrusive_ptr<T, Strategy>& ptr)
 {
-  return get_pointer (ptr);
+  return *ptr;
 }
 
 template <class T>
-inline T* get_castable_value (com_ptr<T>& ptr)
+inline T& get_castable_value (com_ptr<T>& ptr)
 {
-  return get_pointer (ptr);
+  return *ptr;
 }
 
 template <class T>

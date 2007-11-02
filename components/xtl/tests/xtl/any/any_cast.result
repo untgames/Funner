@@ -49,3 +49,4 @@ cast to 'class X': static-type='class X' value=123
 cast to 'class X&': fail: xtl::bad_any_cast
 check set_content
 y.value=321
+exception: xtl::bad_any_cast
