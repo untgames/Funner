@@ -1,0 +1,6 @@
+Results of invoker1_test:
+f(3,Hello world)
+stack (size=3):
+  item[0]: '3'
+  item[1]: 'Hello world'
+  item[2]: 'all ok'

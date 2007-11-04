@@ -2,11 +2,17 @@
 #define SCRIPTLIB_CORE_TESTS_SHARED_HEADER
 
 #include <stdio.h>
+
 #include <stl/vector>
 #include <stl/memory>
+
 #include <xtl/shared_ptr.h>
 #include <xtl/ref.h>
+#include <xtl/iterator.h>
+#include <xtl/connection.h>
+
 #include <common/strlib.h>
+
 #include <script/bind.h>
 
 using namespace script;

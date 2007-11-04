@@ -1,0 +1,20 @@
+Results of invoker_registry:
+Register invokers:
+  register 'f1'
+  register 'f2'
+  register 'f3'
+Unregister invokers:
+  unregister 'f2'
+Traverse invokers:
+  invoker 'f1': arguments_count=2, results_count=1
+  invoker 'f3': arguments_count=2, results_count=1
+Search 'f1', 'f2':
+  invoker 'f1' found
+  invoker 'f2' not found
+Copy registry:
+Unregister invoker 'f1' from registry1:
+  registry1:  unregister 'f1'
+Exit
+  registry1:  unregister 'f3'
+  unregister 'f1'
+  unregister 'f3'

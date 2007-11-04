@@ -2,9 +2,16 @@
 #define SCRIPTLIB_INVOKER_HEADER
 
 #include <xtl/functional_fwd>
-#include <xtl/iterator.h>
 #include <stl/auto_ptr.h>
 #include <script/stack.h>
+
+namespace xtl
+{
+
+//forward declarations
+template <class T> class iterator;
+
+}
 
 namespace script
 {
@@ -46,6 +53,8 @@ enum InvokerRegistryEvent
 {
   InvokerRegistryEvent_OnRegisterInvoker,    //срабатывает при добавлении шлюза
   InvokerRegistryEvent_OnUnregisterInvoker,  //срабатывает при удалении шлюза
+  
+  InvokerRegistryEvent_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +98,7 @@ class InvokerRegistry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация/удаление шлюзов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Register   (const char* name, const Invoker& fn);
+    void Register   (const char* name, const Invoker& invoker);
     void Unregister (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +109,7 @@ class InvokerRegistry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация обработчиков событий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (InvokerRegistryEvent, const Invoker&)> EventHandler;
+    typedef xtl::function<void (InvokerRegistryEvent, const char* invoker_name)> EventHandler;
 
     xtl::connection RegisterHandler (InvokerRegistryEvent event_id, const EventHandler& handler) const;
 
