@@ -5,6 +5,6 @@ copy construction
 copy assignment operator
 converting assignment operator
 failed custom keyword cast
-exception: xtl::bad_any_cast
+exception: xtl::bad_any_cast; reason: types aren't equal
 swap member function
 copying operations on a null
