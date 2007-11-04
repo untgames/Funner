@@ -26,11 +26,11 @@ class IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение аргумента из стека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual float       GetFloat   (int index) = 0;
-    virtual int         GetInteger (int index) = 0;
-    virtual void*       GetPointer (int index) = 0;
-    virtual const char* GetString  (int index) = 0;
-    virtual xtl::any&   GetVariant (int index) = 0;
+    virtual float       GetFloat   (size_t index) = 0;
+    virtual int         GetInteger (size_t index) = 0;
+    virtual void*       GetPointer (size_t index) = 0;
+    virtual const char* GetString  (size_t index) = 0;
+    virtual xtl::any&   GetVariant (size_t index) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Помещение аргументов в стек
@@ -45,7 +45,7 @@ class IStack
 ///Помещение/извлечение из стека специальных символов интерпретации (например имён функций)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void        PushSymbol (const char* symbol) = 0;
-    virtual const char* GetSymbol  (int index) = 0;
+    virtual const char* GetSymbol  (size_t index) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление аргументов из стека

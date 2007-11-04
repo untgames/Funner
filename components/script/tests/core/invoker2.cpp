@@ -1,60 +1,5 @@
 #include "shared.h"
 
-struct X: public xtl::dynamic_cast_root
-{
-  virtual const char* name () const { return "struct X"; }
-
-  virtual const char* test () const { return "X::test"; }
-};
-
-struct Y: X
-{
-  const char* name () const { return "struct Y"; }
-
-  const char* test () const { return "Y::test"; }
-};
-
-struct A
-{
-  A (const char* in_name) : name (in_name) {}
-
-  xtl::shared_ptr<X> f (float& x, const char* y)
-  {
-    printf ("%s: f(%g,%s)\n", name.c_str (), x, y);
-    
-    x += 2.0f;
-    name += '!';
-
-    return xtl::shared_ptr<X> (new Y);
-  }
-
-  stl::string name;
-};
-
-void to_string (stl::string& buffer, const X& value)
-{
-  buffer = value.name ();
-}
-
-void to_string (stl::string& buffer, const A& value)
-{
-  buffer = common::format ("A('%s')", value.name.c_str ());
-}
-
-void dump (IStack& stack)
-{
-  printf ("stack (size=%u):\n", stack.Size ());
-
-  stl::string buffer;
-
-  for (size_t i=0; i<stack.Size (); i++)
-  {
-    to_string (buffer, stack.GetVariant (i));
-
-    printf ("  item[%u]: '%s'\n", i, buffer.c_str ());
-  }
-}
-
 void invoke (const char* name, const Invoker& f, IStack& stack)
 {
   printf ("invoke '%s':\n", name);
@@ -90,7 +35,7 @@ int main ()
 
     invoke ("f1", f1, stack);
     
-    dump (stack);
+    stack.Dump ();
 
     printf ("a.name='%s'\n", a.name.c_str ());
     
@@ -99,14 +44,14 @@ int main ()
     
     invoke ("f2", f2, stack);    
 
-    dump (stack);
+    stack.Dump ();
     
     stack.Pop  (stack.Size ());
     stack.Push (xtl::shared_ptr<const X> (new Y));
 
     invoke ("f2", f2, stack);
-
-    dump (stack);
+    
+    stack.Dump ();
   }
   catch (xtl::bad_any_cast& exception)
   {

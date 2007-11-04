@@ -3,6 +3,7 @@
 
 #include <xtl/functional_fwd>
 #include <xtl/intrusive_ptr.h>
+#include <common/exception.h>
 #include <script/stack.h>
 
 namespace script
@@ -10,6 +11,19 @@ namespace script
 
 //forward declaration
 class InvokerRegistry;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Исключения
+//////////////////////////////////////////////////////////////////////////////////////////////////
+struct InterpreterExceptionTag;           //базовое скриптовое исключение
+struct RuntimeExceptionTag;               //исключение, возникающее при выполнении скрипта
+struct StackExceptionTag;                 //исключение, возникающее при переполнении/"недополнении" стека
+struct UndefinedFunctionCallExceptionTag; //попытка вызова незарегистрированной функции
+
+typedef common::DerivedException<common::Exception, InterpreterExceptionTag>              InterpreterException;
+typedef common::DerivedException<InterpreterException, StackExceptionTag>                 StackException;
+typedef common::DerivedException<InterpreterException, UndefinedFunctionCallExceptionTag> UndefinedFunctionCallException;
+typedef common::DerivedException<InterpreterException, RuntimeExceptionTag>               RuntimeException;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерпретатор
@@ -35,7 +49,7 @@ class IInterpreter
     virtual void DoCommands (const char*        buffer_name,  //имя буфера команд
                              const void*        buffer,       //буфер с командами
                              size_t             buffer_size,  //размер буфера
-                             const LogFunction& log);         //функция протоколирования ошибок интерпретации
+                             const LogFunction& log) = 0;     //функция протоколирования ошибок интерпретации
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка наличия функции в контексте интерпретации
