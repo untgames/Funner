@@ -701,7 +701,7 @@ inline T& get_castable_value (shared_ptr<T>& ptr)
   return *ptr;
 }
 
-template <class T, class Strategy>
+template <class T, template <class > class Strategy>
 inline T& get_castable_value (intrusive_ptr<T, Strategy>& ptr)
 {
   return *ptr;

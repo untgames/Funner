@@ -29,10 +29,11 @@ struct any_holder;
 }
 
 //forward declaration
-template <class T>                  class shared_ptr;
-template <class T, class Strategy>  class intrusive_ptr;
-template <class T>                  class com_ptr;
-template <class T>                  class reference_wrapper;
+template <class T> class shared_ptr;
+template <class T> class com_ptr;
+template <class T> class reference_wrapper;
+
+template <class T, template <class > class Strategy>  class intrusive_ptr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение: ошибка приведения any-типа данных
@@ -170,13 +171,14 @@ template <class T> const T any_multicast (const any&);
 ///Получение приводимого значения. Используется как базовое при работе any_multicast
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> T& get_castable_value (T&);
+template <class T> T& get_castable_value (T*);
+template <class T> T& get_castable_value (stl::auto_ptr<T>&);
+template <class T> T& get_castable_value (shared_ptr<T>&);
+template <class T> T& get_castable_value (com_ptr<T>&);
+template <class T> T& get_castable_value (reference_wrapper<T>&);
 
-template <class T>                 T& get_castable_value (T*);
-template <class T>                 T& get_castable_value (stl::auto_ptr<T>&);
-template <class T>                 T& get_castable_value (shared_ptr<T>&);
-template <class T, class Strategy> T& get_castable_value (intrusive_ptr<T, Strategy>&);
-template <class T>                 T& get_castable_value (com_ptr<T>&);
-template <class T>                 T& get_castable_value (reference_wrapper<T>&);
+template <class T, template <class > class Strategy>
+T& get_castable_value (intrusive_ptr<T, Strategy>&);
 
 char*    get_castable_value (char*);
 wchar_t* get_castable_value (wchar_t*);
