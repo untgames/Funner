@@ -2,7 +2,9 @@
     Создание аргумента функции-шлюза
 */
 
-//в detail!!!????
+namespace detail
+{ 
+
 template <class T>
 inline xtl::any make_invoker_argument (T& value)
 { 
@@ -23,9 +25,6 @@ inline const double&      make_invoker_argument (const double& value)      { ret
 inline const long double& make_invoker_argument (const long double& value) { return value; }
 inline const char*        make_invoker_argument (const char* string)       { return string; }
 inline const char*        make_invoker_argument (char* string)             { return string; }
-
-namespace detail
-{ 
 
 /*
     Извлечение аргументов из стека

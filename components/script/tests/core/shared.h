@@ -20,6 +20,7 @@ class MyStack: public IStack
     int         GetInteger (int index) { return xtl::any_multicast<int> (array.at (index)); }
     void*       GetPointer (int index) { return xtl::any_multicast<void*> (array.at (index)); }
     const char* GetString  (int index) { return xtl::any_multicast<const char*> (array.at (index)); }
+    const char* GetSymbol  (int index) { return MyStack::GetString (index); }
     xtl::any&   GetVariant (int index) { return array.at (index); }
 
     void Push (float value)        { array.push_back (xtl::make_ref_any (value)); }
@@ -27,6 +28,8 @@ class MyStack: public IStack
     void Push (void* pointer)      { array.push_back (xtl::make_ref_any (pointer)); }
     void Push (const char* string) { array.push_back (xtl::make_ref_any (string)); }
     void Push (const xtl::any& a)  { array.push_back (a); }
+
+    void PushSymbol (const char* string) { MyStack::Push (string); }
 
     void Pop (size_t arguments_count)
     {
