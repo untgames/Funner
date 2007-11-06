@@ -229,7 +229,7 @@ inline iterator<T>::iterator (Iter iter, Fn selector)
 
 template <class T> template <class Iter>
 inline iterator<T>::iterator (Iter iter, Iter first, Iter last)
-  : impl (new detail::range_iterator_impl<value_type, Iter, detail::default_iterator_selector<value_type> > (iter, first, last, detail::default_iterator_selector<value_type> ()))
+  : impl (new detail::range_iterator_impl<value_type, Iter, detail::default_iterator_selector<T> > (iter, first, last, detail::default_iterator_selector<T> ()))
   {}
 
 template <class T> template <class Iter, class Fn>
@@ -252,7 +252,7 @@ inline typename iterator<T>::iterator_interface* iterator<T>::create_dispatch (c
 {
   using namespace detail;
 
-  return new iterator_impl<value_type, Iter, default_iterator_selector<value_type> > (i, default_iterator_selector<value_type> ());
+  return new iterator_impl<value_type, Iter, default_iterator_selector<T> > (i, default_iterator_selector<T> ());
 }
 
 template <class T>
