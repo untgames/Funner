@@ -138,8 +138,8 @@ class iterator
   private:
     typedef detail::iterator_interface<value_type> iterator_interface;
     
-    template <class Iter> static iterator_interface* create_dispatch (const Iter&, Iter*);
-                          static iterator_interface* create_dispatch (const iterator<value_type>&, iterator<value_type>*);
+    template <class Iter> static iterator_interface* create_dispatch (const Iter&, const Iter*);
+                          static iterator_interface* create_dispatch (const iterator<value_type>&, const iterator<value_type>*);
 
   private:
     iterator_interface* impl;

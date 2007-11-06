@@ -219,7 +219,7 @@ inline iterator<T>::iterator (const iterator& i)
 
 template <class T> template <class Iter>
 inline iterator<T>::iterator (Iter iter)
-  : impl (create_dispatch (iter, static_cast<Iter*> (0)))
+  : impl (create_dispatch (iter, static_cast<const Iter*> (0)))
   {}
 
 template <class T> template <class Iter, class Fn>
@@ -248,7 +248,7 @@ inline iterator<T>::~iterator ()
 */
 
 template <class T> template <class Iter>
-inline typename iterator<T>::iterator_interface* iterator<T>::create_dispatch (const Iter& i, Iter*)
+inline typename iterator<T>::iterator_interface* iterator<T>::create_dispatch (const Iter& i, const Iter*)
 {
   using namespace detail;
 
@@ -256,7 +256,7 @@ inline typename iterator<T>::iterator_interface* iterator<T>::create_dispatch (c
 }
 
 template <class T>
-inline typename iterator<T>::iterator_interface* iterator<T>::create_dispatch (const iterator<value_type>& i, iterator<value_type>*)
+inline typename iterator<T>::iterator_interface* iterator<T>::create_dispatch (const iterator<value_type>& i, const iterator<value_type>*)
 {
   i.impl->addref ();
   
