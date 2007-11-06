@@ -75,7 +75,6 @@ class IInterpreter
 ///Создание интерпретатора lua
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 xtl::com_ptr<IInterpreter> create_lua_interpreter (const InvokerRegistry& registry);
-xtl::com_ptr<IInterpreter> create_lua_interpreter (const char* name, const InvokerRegistry& registry);
 
 }
 

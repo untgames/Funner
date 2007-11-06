@@ -21,9 +21,18 @@ const char* USER_DATA_TAG = "user_data";
     Конструкторы
 */
 
-LuaStack::LuaStack (lua_State* in_state)
-  : state (in_state)
+LuaStack::LuaStack ()
+  : state (0)
   {}
+  
+/*
+    Состояние машины Lua
+*/
+
+void LuaStack::SetState (lua_State* in_state)
+{
+  state = in_state;
+}
 
 /*
     Количество аргументов в стеке
