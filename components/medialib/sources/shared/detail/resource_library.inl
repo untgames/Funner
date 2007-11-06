@@ -79,23 +79,19 @@ inline typename ResourceLibrary<T>::ConstIterator ResourceLibrary<T>::CreateCons
 */
 
 template <class T>
-inline const char* ResourceLibrary<T>::ItemId (const Iterator& i)
-{
-  const ItemMap::iterator* iter = i.target<ItemMap::iterator> ();
-  
-  if (!iter)
-    common::RaiseInvalidArgument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
-
-  return (*iter)->first.c_str ();
-}
-
-template <class T>
 inline const char* ResourceLibrary<T>::ItemId (const ConstIterator& i)
 {
-  const ItemMap::const_iterator* iter = i.target<ItemMap::const_iterator> ();
-
+  const ItemMap::const_iterator* iter = i.target<ItemMap::const_iterator> ();    
+  
   if (!iter)
-    common::RaiseInvalidArgument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
+  {
+    const ItemMap::iterator* iter = i.target<ItemMap::iterator> ();
+
+    if (!iter)
+      common::RaiseInvalidArgument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
+
+    return (*iter)->first.c_str ();
+  }
 
   return (*iter)->first.c_str ();
 }

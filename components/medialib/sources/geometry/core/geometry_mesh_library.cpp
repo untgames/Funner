@@ -95,6 +95,15 @@ MeshLibrary::ConstIterator MeshLibrary::CreateIterator () const
 }
 
 /*
+    Идентификатор меша в библиотеке
+*/
+
+const char* MeshLibrary::ItemId (const ConstIterator& i) const
+{
+  return impl->meshes.ItemId (i);
+}
+
+/*
     Поиск
 */
 

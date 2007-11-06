@@ -111,11 +111,6 @@ MaterialLibrary::Iterator MaterialLibrary::CreateIterator () const
     Получение идентификатора материала
 */
 
-const char* MaterialLibrary::ItemId (const Iterator& i)
-{
-  return const_cast<const MaterialLibrary&> (*this).ItemId (i);
-}
-
 const char* MaterialLibrary::ItemId (const ConstIterator& i) const
 {
   const MaterialMap::iterator* iter = i.target<MaterialMap::iterator> ();

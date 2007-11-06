@@ -98,11 +98,6 @@ SoundDeclarationLibrary::ConstIterator SoundDeclarationLibrary::CreateIterator (
     Имя декларации по итератору
 */
 
-const char* SoundDeclarationLibrary::ItemId (const Iterator& i)
-{
-  return impl->declarations.ItemId (i);
-}
-
 const char* SoundDeclarationLibrary::ItemId (const ConstIterator& i) const
 {
   return impl->declarations.ItemId (i);
