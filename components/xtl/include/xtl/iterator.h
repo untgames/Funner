@@ -24,28 +24,31 @@ template <class T> struct iterator_interface;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Базовый класс исключений итераторов
+///Исключения:
+///  iterator_exception - базовый класс исключений итератора
+///  bad_iterator_operation - неверная операция (категория инстанцированного итератора не позволяет выполнить указанную операцию)
+///  bad_iterator_dereference - попытка взятия значения в пустом итераторе
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct iterator_exception: public std::exception
 {
   const char* what () const throw () { return "xtl::iterator_exception"; }
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Исключение: неверная операция (категория инстанцированного итератора не позволяет выполнить указанную операцию)
-///////////////////////////////////////////////////////////////////////////////////////////////////
 struct bad_iterator_operation: public iterator_exception
 {
   const char* what () const throw () { return "xtl::bad_iterator_operation"; }
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Исключение: попытка взятия значения в пустом итераторе
-///////////////////////////////////////////////////////////////////////////////////////////////////
 struct bad_iterator_dereference: public bad_iterator_operation
 {
   const char* what () const throw () { return "xtl::bad_iterator_dereference"; }
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тип значений итератора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct iterator_value_type          { typedef T type; };
+template <class T> struct iterator_value_type<const T> { typedef T type; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Полиморфный итератор
@@ -53,14 +56,15 @@ struct bad_iterator_dereference: public bad_iterator_operation
 template <class T>
 class iterator
 {
+  template <class T> friend class iterator;
   typedef bool (iterator::*safe_bool)() const;
   public:
-    typedef T                               value_type;
-    typedef size_t                          size_type;
-    typedef ptrdiff_t                       difference_type;
-    typedef T*                              pointer;
-    typedef T&                              reference;
-    typedef stl::bidirectional_iterator_tag iterator_category;
+    typedef typename iterator_value_type<T>::type value_type;
+    typedef size_t                                size_type;
+    typedef ptrdiff_t                             difference_type;
+    typedef T*                                    pointer;
+    typedef T&                                    reference;
+    typedef stl::bidirectional_iterator_tag       iterator_category;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
@@ -124,27 +128,34 @@ class iterator
 ///Сравнение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool operator == (const iterator&) const;
-    bool operator != (const iterator&) const;
-    
-    template <class Iter> bool operator == (const Iter&) const;
-    template <class Iter> bool operator != (const Iter&) const;
+    bool operator != (const iterator&) const;    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void swap (iterator&);
+    
+  private:
+    typedef detail::iterator_interface<value_type> iterator_interface;
+    
+    template <class Iter> static iterator_interface* create_dispatch (const Iter&, Iter*);
+                          static iterator_interface* create_dispatch (const iterator<value_type>&, iterator<value_type>*);
 
   private:
-    typedef detail::iterator_interface<T> iterator_interface;
-
     iterator_interface* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сравнение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Iter, class T> bool operator == (const iterator<T>&, const Iter&);
+template <class Iter, class T> bool operator != (const iterator<T>&, const Iter&);
 template <class Iter, class T> bool operator == (const Iter&, const iterator<T>&);
 template <class Iter, class T> bool operator != (const Iter&, const iterator<T>&);
+template <class T>             bool operator == (const iterator<T>&, const iterator<const T>&);
+template <class T>             bool operator == (const iterator<const T>&, const iterator<T>&);
+template <class T>             bool operator != (const iterator<T>&, const iterator<const T>&);
+template <class T>             bool operator != (const iterator<const T>&, const iterator<T>&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

@@ -8,7 +8,7 @@
 
 using namespace stl;
 
-typedef xtl::iterator<int> my_iter;
+typedef xtl::iterator<const int> my_iter;
 
 void print (int x)
 {
@@ -52,8 +52,10 @@ int main ()
     printf ("\n");
     
     printf ("reverse-dump [iterator;iterator) range: ");
+       
+    reverse_iterator<my_iter> ri2_begin (--my_iter (i2)), ri2_end (i2);
     
-    for_each (reverse_iterator<my_iter> (--my_iter (i2)), reverse_iterator<my_iter> (i2), &print);
+    for_each (ri2_begin, ri2_end, &print);
     
     printf ("\n");
     

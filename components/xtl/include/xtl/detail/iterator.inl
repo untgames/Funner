@@ -63,7 +63,7 @@ template <class T, class Iter, class Fn> class iterator_base: public iterator_in
       return impl && iter == impl->iter;
     }
     
-    T& get () { return selector (*iter); }
+    T& get () { return static_cast<T&> (selector (*iter)); }
     
     size_t use_count () { return ref_count; }
     
@@ -207,7 +207,7 @@ struct default_iterator_selector
 
 template <class T>
 inline iterator<T>::iterator ()
-  : impl (detail::empty_iterator_impl<T>::instace_ptr ())
+  : impl (detail::empty_iterator_impl<value_type>::instace_ptr ())
   {}
 
 template <class T>
@@ -219,22 +219,22 @@ inline iterator<T>::iterator (const iterator& i)
 
 template <class T> template <class Iter>
 inline iterator<T>::iterator (Iter iter)
-  : impl (new detail::iterator_impl<T, Iter, detail::default_iterator_selector<T> > (iter, detail::default_iterator_selector<T> ()))
+  : impl (create_dispatch (iter, static_cast<Iter*> (0)))
   {}
 
 template <class T> template <class Iter, class Fn>
 inline iterator<T>::iterator (Iter iter, Fn selector)
-  : impl (new detail::iterator_impl<T, Iter, Fn> (iter, selector)), shared (false)
+  : impl (new detail::iterator_impl<value_type, Iter, Fn> (iter, selector))
   {}  
 
 template <class T> template <class Iter>
 inline iterator<T>::iterator (Iter iter, Iter first, Iter last)
-  : impl (new detail::range_iterator_impl<T, Iter, detail::default_iterator_selector<T> > (iter, first, last, detail::default_iterator_selector<T> ()))
+  : impl (new detail::range_iterator_impl<value_type, Iter, detail::default_iterator_selector<value_type> > (iter, first, last, detail::default_iterator_selector<value_type> ()))
   {}
 
 template <class T> template <class Iter, class Fn>
 inline iterator<T>::iterator (Iter iter, Iter first, Iter last, Fn selector)
-  : impl (new detail::range_iterator_impl<T, Iter, Fn> (iter, first, last, selector))
+  : impl (new detail::range_iterator_impl<value_type, Iter, Fn> (iter, first, last, selector))
   {}  
 
 template <class T>
@@ -242,6 +242,26 @@ inline iterator<T>::~iterator ()
 {
   impl->release ();
 }  
+
+/*
+    Диспетчер создания итератора    
+*/
+
+template <class T> template <class Iter>
+inline typename iterator<T>::iterator_interface* iterator<T>::create_dispatch (const Iter& i, Iter*)
+{
+  using namespace detail;
+
+  return new iterator_impl<value_type, Iter, default_iterator_selector<value_type> > (i, default_iterator_selector<value_type> ());
+}
+
+template <class T>
+inline typename iterator<T>::iterator_interface* iterator<T>::create_dispatch (const iterator<value_type>& i, iterator<value_type>*)
+{
+  i.impl->addref ();
+  
+  return i.impl;
+}
 
 /*
     Присваивание
@@ -402,19 +422,19 @@ inline bool iterator<T>::operator == (const iterator& i) const
 template <class T>
 inline bool iterator<T>::operator != (const iterator& i) const
 {
-  return !impl->equal (*i.impl) && (*this || i);
+  return !(*this == i);
 }
 
-template <class T> template <class Iter>
-inline bool iterator<T>::operator == (const Iter& i) const
+template <class Iter, class T>
+inline bool operator == (const iterator<T>& i1, const Iter& i2)
 {
-  return contains (i);
+  return i1.contains (i2);
 }
 
-template <class T> template <class Iter>
-inline bool iterator<T>::operator != (const Iter& i) const
+template <class Iter, class T>
+inline bool operator != (const iterator<T>& i1, const Iter& i2)
 {
-  return !contains (i);
+  return !(i1 == i2);
 }
 
 template <class Iter, class T>
@@ -426,7 +446,31 @@ inline bool operator == (const Iter& i1, const iterator<T>& i2)
 template <class Iter, class T>
 inline bool operator != (const Iter& i1, const iterator<T>& i2)
 {
-  return !i2.contains (i1);
+  return !(i1 == i2);
+}
+
+template <class T>
+inline bool operator == (const iterator<T>& i1, const iterator<const T>& i2)
+{
+  return i1 == iterator<T> (i2);
+}
+
+template <class T>
+inline bool operator == (const iterator<const T>& i1, const iterator<T>& i2)
+{
+  return iterator<T> (i1) == i2;
+}
+
+template <class T>
+inline bool operator != (const iterator<T>& i1, const iterator<const T>& i2)
+{
+  return !(i1 == i2);
+}
+
+template <class T>
+inline bool operator != (const iterator<const T>& i1, const iterator<T>& i2)
+{
+  return !(i1 == i2);
 }
 
 /*
