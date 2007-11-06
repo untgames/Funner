@@ -1,4 +1,11 @@
-#include <script/lua/environment.h>
+#ifndef SCRIPTLIB_LUA_SHARED_HEADER
+#define SCRIPTLIB_LUA_SHARED_HEADER
+
+#include <script/interpreter.h>
+#include <script/invoker.h>
+
+#include <xtl/any.h>
+
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -63,3 +70,4 @@ extern const char* USER_DATA_TAG;
 
 }
 
+#endif
