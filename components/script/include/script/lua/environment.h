@@ -154,6 +154,10 @@ class Environment
     void Invoke (const char* name, const T1&, const T2&, const T3&, const T4&,
                  const T5&, const T6&, const T7&, const T8&, const T9&, Result<void> = Result<void> ()) const;
 
+    lua_State* State ();
+
+    void InvokeCore           (size_t args_count, size_t results_count) const;
+
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Возвращение стека
@@ -164,7 +168,6 @@ class Environment
 ///Внутренние функции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterFunctionCore (const char* name, detail::Invoker* invoker, size_t arguments_count);
-    void InvokeCore           (size_t args_count, size_t results_count) const;
     
     template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
     Ret InvokeDispatch (const char* name, size_t args_count, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&, Result<Ret>) const;

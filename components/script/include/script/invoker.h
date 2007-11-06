@@ -2,6 +2,7 @@
 #define SCRIPTLIB_INVOKER_HEADER
 
 #include <xtl/functional_fwd>
+#include <xtl/function.h>
 #include <stl/auto_ptr.h>
 #include <script/stack.h>
 

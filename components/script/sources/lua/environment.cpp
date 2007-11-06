@@ -449,3 +449,8 @@ void Environment::InvokeCore (size_t args_count, size_t results_count) const
   if (lua_pcall (impl->state, args_count, results_count, 0))
     Raise <Exception> ("script::lua::Environment::Invoke", "Error running function: '%s'", lua_tostring (impl->state, -1));
 }
+
+lua_State* Environment::State ()
+{
+  return impl->state;
+}
