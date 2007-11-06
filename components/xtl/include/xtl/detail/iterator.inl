@@ -63,7 +63,7 @@ template <class T, class Iter, class Fn> class iterator_base: public iterator_in
       return impl && iter == impl->iter;
     }
     
-    T& get () { return *const_cast<T*> (static_cast<const T*> (&selector (*iter))); }
+    T& get () { return (T&)selector (*iter); }
     
     size_t use_count () { return ref_count; }
     
