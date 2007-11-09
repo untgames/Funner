@@ -8,7 +8,7 @@ namespace detail
 template <class T>
 inline xtl::any make_invoker_argument (T& value)
 { 
-  return make_ref_any (value);
+  return xtl::make_ref_any (value);
 }
 
 inline char               make_invoker_argument (char value)               { return value; }
