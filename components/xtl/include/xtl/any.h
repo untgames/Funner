@@ -8,6 +8,7 @@
 #include <xtl/default_cast_type.h>
 #include <xtl/type.h>
 #include <xtl/type_traits> //for is_polymorphic, remove_reference
+#include <xtl/ref.h>
 
 namespace stl
 {
@@ -31,7 +32,6 @@ struct any_holder;
 //forward declaration
 template <class T> class shared_ptr;
 template <class T> class com_ptr;
-template <class T> class reference_wrapper;
 
 template <class T, template <class > class Strategy>  class intrusive_ptr;
 
