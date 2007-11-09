@@ -6,6 +6,14 @@
 #include <common/exception.h>
 #include <script/stack.h>
 
+namespace xtl
+{
+
+//forward declaration
+template <class T> class shared_ptr;
+
+}
+
 namespace script
 {
 
@@ -74,7 +82,7 @@ class IInterpreter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание интерпретатора lua
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-xtl::com_ptr<IInterpreter> create_lua_interpreter (const InvokerRegistry& registry);
+xtl::com_ptr<IInterpreter> create_lua_interpreter (const xtl::shared_ptr<InvokerRegistry>& registry);
 
 }
 

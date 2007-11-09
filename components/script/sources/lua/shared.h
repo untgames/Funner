@@ -6,6 +6,7 @@
 
 #include <xtl/any.h>
 #include <xtl/connection.h>
+#include <xtl/shared_ptr.h>
 
 #include <lua.h>
 #include <lualib.h>
@@ -77,7 +78,7 @@ class LuaInterpreter: public IInterpreter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    LuaInterpreter  (const InvokerRegistry&);
+    LuaInterpreter  (const xtl::shared_ptr<InvokerRegistry>&);
     ~LuaInterpreter ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,23 +115,22 @@ class LuaInterpreter: public IInterpreter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                  Id       () {return id;}
-    const  InvokerRegistry& Registry () {return registry;}
+    size_t                  Id       () { return id; }
+    const  InvokerRegistry& Registry () { return *registry; }
 
+  private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация функций
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterFunction   (const char* function_name);
-    
-    void OnRegisterInvoker  (InvokerRegistryEvent, const char* invoker_name);
+    void RegisterFunction   (const char* function_name);    
 
   private:
-    const InvokerRegistry& registry;                         //реестр шлюзов C++ используемых луа
-    lua_State*             state;                            //состояние машины Lua
-    LuaStack               stack;                            //стек аргументов
-    size_t                 ref_count;                        //счётчик активных ссылок
-    size_t                 id;                               //идентификатор реализации
-    xtl::auto_connection   on_register_invoker_connection;   //соединение регистрации функции
+    xtl::shared_ptr<InvokerRegistry> registry;                         //реестр шлюзов C++ используемых луа
+    lua_State*                       state;                            //состояние машины Lua
+    LuaStack                         stack;                            //стек аргументов
+    size_t                           ref_count;                        //счётчик активных ссылок
+    size_t                           id;                               //идентификатор реализации
+    xtl::auto_connection             on_register_invoker_connection;   //соединение регистрации функции
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

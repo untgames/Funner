@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <xtl/iterator.h>
+#include <xtl/shared_ptr.h>
 #include <script/bind.h>
 
 using namespace script;
@@ -22,12 +23,10 @@ int main ()
   {
     printf ("Results of lua_interpreter test:\n");
     
-    InvokerRegistry invoker_registry;
-    Invoker         invoker  = make_invoker (hello_func);
+    xtl::shared_ptr<InvokerRegistry> invoker_registry (new InvokerRegistry);
+    Invoker invoker  = make_invoker (hello_func);
 
-    InvokerRegistry::Iterator i = invoker_registry.CreateIterator ();
-
-    invoker_registry.Register ("f1", invoker);
+    invoker_registry->Register ("f1", invoker);
 
     xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (invoker_registry));
 

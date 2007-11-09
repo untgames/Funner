@@ -3,6 +3,9 @@
 using namespace script;
 using namespace math;
 
+namespace script
+{
+
 /*
     Регистрация математической библиотеки
 */
@@ -20,4 +23,6 @@ void bind_math_library (InvokerRegistry& registry)
   registry.Register ("vecAbs",       make_invoker<vec3f (vec3f)> (&math::abs<float, 3>));
   registry.Register ("vecMin",       make_invoker<vec3f (vec3f, vec3f)> (&math::min<float, 3>));
   registry.Register ("vecMax",       make_invoker<vec3f (vec3f, vec3f)> (&math::max<float, 3>));
+}
+
 }

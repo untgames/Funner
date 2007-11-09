@@ -90,11 +90,12 @@ void log_function (const char*)
     Конструктор / деструктор
 */
 
-LuaInterpreter::LuaInterpreter (const InvokerRegistry& in_registry)
+LuaInterpreter::LuaInterpreter (const xtl::shared_ptr<InvokerRegistry>& in_registry)
   : registry (in_registry), 
     ref_count (1), 
     id (IMPL_ID),
-    on_register_invoker_connection (registry.RegisterHandler (InvokerRegistryEvent_OnRegisterInvoker, bind (&LuaInterpreter::OnRegisterInvoker, this, _1, _2)))
+    on_register_invoker_connection (registry->RegisterHandler (InvokerRegistryEvent_OnRegisterInvoker,
+      bind (&LuaInterpreter::RegisterFunction, this, _2)))
 {
     //инициализация состояния lua
 
@@ -102,32 +103,40 @@ LuaInterpreter::LuaInterpreter (const InvokerRegistry& in_registry)
 
   if (!state)
     Raise <InterpreterException> ("LuaInterpreter::LuaInterpreter", "Can't create lua state");
-
-  luaL_openlibs (state);
-  
-    //регистрация обработчиков удаления пользовательских типов данных    
     
-  static const luaL_reg user_data_meta_table [] = {{"__gc", &user_data_destroyer}, {0,0}};    
+  try
+  {
+    luaL_openlibs (state);
+    
+      //регистрация обработчиков удаления пользовательских типов данных    
+      
+    static const luaL_reg user_data_meta_table [] = {{"__gc", &user_data_destroyer}, {0,0}};    
 
-  luaL_newmetatable (state, USER_DATA_TAG);
-  luaL_openlib      (state, 0, user_data_meta_table, 0);
-  
-    //регистрация функции обработки ошибок
+    luaL_newmetatable (state, USER_DATA_TAG);
+    luaL_openlib      (state, 0, user_data_meta_table, 0);
+    
+      //регистрация функции обработки ошибок
 
-  lua_atpanic (state, &error_handler);
+    lua_atpanic (state, &error_handler);
 
-    //регистрация диспетчера вызовов
-  
-  lua_pushcfunction (state, &invoke_dispatch);
-  lua_setglobal     (state, INVOKE_DISPATCH_NAME);
+      //регистрация диспетчера вызовов
+    
+    lua_pushcfunction (state, &invoke_dispatch);
+    lua_setglobal     (state, INVOKE_DISPATCH_NAME);
 
-  lua_pushlightuserdata (state, this);
-  lua_setglobal         (state, IMPL_NAME);  
+    lua_pushlightuserdata (state, this);
+    lua_setglobal         (state, IMPL_NAME);  
 
-  stack.SetState (state);
-  
-  for (InvokerRegistry::Iterator i = ((InvokerRegistry)registry).CreateIterator (); i; ++i)
-    RegisterFunction (registry.InvokerId (i));
+    stack.SetState (state);
+    
+    for (InvokerRegistry::Iterator i = registry->CreateIterator (); i; ++i)
+      RegisterFunction (registry->InvokerId (i));
+  }
+  catch (...)
+  {
+    lua_close (state);
+    throw;
+  }
 }
 
 LuaInterpreter::~LuaInterpreter ()
@@ -163,9 +172,8 @@ bool LuaInterpreter::HasFunction (const char* name)
     return false;
 
   lua_getglobal (state, name);
-  if (lua_isfunction (state, -1))
-    return true;
-  return false;
+
+  return lua_isfunction (state, -1) != 0;
 }
 
 /*
@@ -235,11 +243,6 @@ void LuaInterpreter::RegisterFunction (const char* function_name)
   DoCommands (function_name, generated_function.c_str(), generated_function.length (), &log_function);
 }
 
-void LuaInterpreter::OnRegisterInvoker (InvokerRegistryEvent, const char* invoker_name)
-{
-  RegisterFunction (invoker_name);
-}
-
 namespace script
 {
 
@@ -247,8 +250,11 @@ namespace script
     Создание интерпретатора lua
 */
 
-xtl::com_ptr<IInterpreter> create_lua_interpreter (const InvokerRegistry& registry)
+xtl::com_ptr<IInterpreter> create_lua_interpreter (const xtl::shared_ptr<InvokerRegistry>& registry)
 {
+  if (!registry)
+    common::RaiseNullArgument ("script::create_lua_interpreter", "registry");
+
   return xtl::com_ptr<IInterpreter> (new LuaInterpreter (registry), false);
 }
 
