@@ -42,12 +42,6 @@ int invoke_dispatch (lua_State* state)
 
       //גûחמג רכ‏חא
     
-    luaL_where (state, 0);
-    
-    printf ("TETE: %s\n", lua_tostring (state, -1));
-    
-    lua_pop (state, 1);
-
     (*invoker)(LuaStack (state));
 
     return invoker->ResultsCount ();    
