@@ -31,11 +31,17 @@ int main ()
 
     xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (invoker_registry));
 
+    printf ("Interpreter name - %s\n", interpreter->Name ());
+
     printf ("Interpreter has function 'f1': %d\n", interpreter->HasFunction ("f1"));
 
     interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
 
     printf ("Interpreter has function 'f': %d\n", interpreter->HasFunction ("f"));
+
+    interpreter->Stack ().Push ("f");
+
+    interpreter->Invoke (0, 0);
   }
   catch (std::exception& exception)
   {      

@@ -5,6 +5,7 @@
 #include <script/invoker.h>
 
 #include <xtl/any.h>
+#include <xtl/connection.h>
 
 #include <lua.h>
 #include <lualib.h>
@@ -110,11 +111,26 @@ class LuaInterpreter: public IInterpreter
     void AddRef  ();
     void Release ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t                  Id       () {return id;}
+    const  InvokerRegistry& Registry () {return registry;}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация функций
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RegisterFunction   (const char* function_name);
+    
+    void OnRegisterInvoker  (InvokerRegistryEvent, const char* invoker_name);
+
   private:
-    const InvokerRegistry& registry;  //реестр шлюзов C++ используемых луа
-    lua_State*             state;     //состояние машины Lua
-    LuaStack               stack;     //стек аргументов
-    size_t                 ref_count; //счётчик активных ссылок
+    const InvokerRegistry& registry;                         //реестр шлюзов C++ используемых луа
+    lua_State*             state;                            //состояние машины Lua
+    LuaStack               stack;                            //стек аргументов
+    size_t                 ref_count;                        //счётчик активных ссылок
+    size_t                 id;                               //идентификатор реализации
+    xtl::auto_connection   on_register_invoker_connection;   //соединение регистрации функции
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
