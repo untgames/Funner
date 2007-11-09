@@ -1,6 +1,8 @@
 #ifndef __MATHLIB_VECTOR__
 #define __MATHLIB_VECTOR__
 
+#include <stddef.h>
+
 #pragma pack (push,1)
 
 #undef min
@@ -14,32 +16,32 @@ namespace math
 ////////////////////////////////////////////////////////////////////////////////////////////
 template <class type,size_t size> struct vec_base
 {
-  operator type*       ()       { return x; }
-  operator const type* () const { return x; }
+  type&       operator [] (size_t index)       { return x [index]; }
+  const type& operator [] (size_t index) const { return x [index]; }
  
   type x [size];
 };
 
 template <class type> struct vec_base<type,2>
 {
-  operator type*       ()       { return &x; }
-  operator const type* () const { return &x; }
+  type&       operator [] (size_t index)       { return (&x) [index]; }
+  const type& operator [] (size_t index) const { return (&x) [index]; }
  
   type x,y;
 };
 
 template <class type> struct vec_base<type,3>
 {
-  operator type*       ()       { return &x; }
-  operator const type* () const { return &x; }
+  type&       operator [] (size_t index)       { return (&x) [index]; }
+  const type& operator [] (size_t index) const { return (&x) [index]; }
  
   type x,y,z;
 };
 
 template <class type> struct vec_base<type,4>
 {
-  operator type*       ()       { return &x; }
-  operator const type* () const { return &x; }
+  type&       operator [] (size_t index)       { return (&x) [index]; }
+  const type& operator [] (size_t index) const { return (&x) [index]; }
  
   type x,y,z,w;
 };

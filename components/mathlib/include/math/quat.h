@@ -10,8 +10,8 @@ template <class type> struct quat_base
 {
   type x,y,z,w;
 
-  operator type*       ()       { return &x; } 
-  operator const type* () const { return &x; }
+  type&       operator [] (size_t index)       { return (&x) [index]; }
+  const type& operator [] (size_t index) const { return (&x) [index]; }
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////

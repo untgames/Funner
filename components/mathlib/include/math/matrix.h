@@ -41,8 +41,8 @@ class matrix
     const vector& row     (size_t i) const;
     const vector  column  (size_t i) const; //копи€!
 
-    operator vector*       ()       { return x; }
-    operator const vector* () const { return x; }
+          vector& operator [] (size_t index)       { return x [index]; }
+    const vector& operator [] (size_t index) const { return x [index]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///”нарные операции
