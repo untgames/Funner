@@ -32,8 +32,15 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
    int srcBytes;
    bool r;
 
+   printf("---source_buffer=%p\n",source_buffer);
+   printf("---source_buffer_size=%d\n",source_buffer_size);
+   printf("---bsrc=%p\n",bsrc);
+
    while((unsigned char*)source_buffer+source_buffer_size>bsrc)
    {
+      printf("source_buffer=%p\n",source_buffer);
+      printf("source_buffer_size=%d\n",source_buffer_size);
+      printf("bsrc=%p\n",bsrc);
       srcSize=source_buffer_size-res.source_buffer_processed_size;
       switch (source_buffer_encoding)
       {
@@ -56,6 +63,10 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
             r=decode_UTF32(bsrc,srcSize,&srcBytes,dst,false);
             break;
       }
+      printf("srcBytes=%d\n",srcBytes);
+      printf("dst=%p\n",dst);
+      printf("dst=%p\n",*dst);
+      dst++;
       res.destination_buffer_processed_size+=srcBytes;
       bsrc+=srcBytes;
       printf("%s\n",dst);
