@@ -1,6 +1,3 @@
-#include <common/exception.h>
-#include <xtl/iterator.h>
-#include <xtl/bind.h>
 #include "shared.h"
 
 using namespace script;
@@ -98,7 +95,9 @@ LuaInterpreter::LuaInterpreter (const xtl::shared_ptr<InvokerRegistry>& in_regis
   : registry (in_registry),
     ref_count (1), 
     on_register_invoker_connection (registry->RegisterHandler (InvokerRegistryEvent_OnRegisterInvoker,
-      bind (&LuaInterpreter::RegisterInvoker, this, _2, _3)))
+      bind (&LuaInterpreter::RegisterInvoker, this, _2, _3))),
+    on_unregister_invoker_connection (registry->RegisterHandler (InvokerRegistryEvent_OnUnregisterInvoker,
+      bind (&LuaInterpreter::UnregisterInvoker, this, _2)))
 {
     //инициализация состояния lua
 
@@ -265,7 +264,7 @@ void LuaInterpreter::Release ()
 }
 
 /*
-   Регистрация шлюзов
+   Регистрация / удаление шлюзов
 */
 
 void LuaInterpreter::RegisterInvoker (const char* invoker_name, Invoker& invoker)
@@ -279,6 +278,15 @@ void LuaInterpreter::RegisterInvoker (const char* invoker_name, Invoker& invoker
   lua_pushstring        (state, invoker_name);
   lua_pushcclosure      (state, &invoke_dispatch, 2);
   lua_setglobal         (state, invoker_name);
+}
+
+void LuaInterpreter::UnregisterInvoker (const char* invoker_name)
+{
+  if (!invoker_name)
+    return;
+
+  lua_pushnil    (state);
+  lua_setglobal  (state, invoker_name);
 }
 
 namespace script

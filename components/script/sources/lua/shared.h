@@ -7,6 +7,8 @@
 #include <xtl/any.h>
 #include <xtl/connection.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/iterator.h>
+#include <xtl/bind.h>
 
 #include <lua.h>
 #include <lualib.h>
@@ -115,16 +117,18 @@ class LuaInterpreter: public IInterpreter
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация шлюза
+///Регистрация/удаление шлюза
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterInvoker (const char* invoker_name, Invoker& invoker);
+    void RegisterInvoker   (const char* invoker_name, Invoker& invoker);
+    void UnregisterInvoker (const char* invoker_name);
 
   private:
     xtl::shared_ptr<InvokerRegistry> registry;                         //реестр шлюзов C++ используемых луа
     lua_State*                       state;                            //состояние машины Lua
     LuaStack                         stack;                            //стек аргументов
     size_t                           ref_count;                        //счётчик активных ссылок
-    xtl::auto_connection             on_register_invoker_connection;   //соединение регистрации функции
+    xtl::auto_connection             on_register_invoker_connection;   //соединение регистрации шлюза
+    xtl::auto_connection             on_unregister_invoker_connection; //соединение удаления шлюза
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

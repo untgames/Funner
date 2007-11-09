@@ -5,7 +5,7 @@
 
 using namespace script;
 
-const char* lua_f = "function f (arg1)  print (arg1)  return arg1*arg1 end";
+const char* lua_f = "function f (arg1) return arg1*arg1 end";
 
 void hello_func ()
 {
@@ -31,6 +31,10 @@ int main ()
     xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (invoker_registry));
 
     printf ("Interpreter name - %s\n", interpreter->Name ());
+    printf ("Interpreter has function 'f1': %d\n", interpreter->HasFunction ("f1"));    
+    printf ("Unregister 'f1'\n");
+
+    invoker_registry->Unregister ("f1");
 
     printf ("Interpreter has function 'f1': %d\n", interpreter->HasFunction ("f1"));
 
@@ -38,19 +42,15 @@ int main ()
 
     printf ("Interpreter has function 'f': %d\n", interpreter->HasFunction ("f"));
 
-    interpreter->Stack ().Push ("f");
-
-    interpreter->Invoke (0, 0);
+    printf ("invoke result: %g\n", invoke<float> (*interpreter, "f", 3.0f));
   }
   catch (std::exception& exception)
   {      
     printf ("exception: %s\n",exception.what ());
-    return 1;
   }                                               
   catch (...)
   {
     printf ("unknown exception\n");
-    return 1;
   }
 
   return 0;
