@@ -1,6 +1,7 @@
 #include "shared.h"
 
 const char* test_buffer =  
+"function test_identity (v1)\nreturn v1\nend\n"
 "function test_length (v1)\nreturn vecLength (v1)\nend\n"
 "function test_qlength (v1)\nreturn vecQLength (v1)\nend\n"
 "function test_dot (v1,v2)\nreturn vecDot (v1,v2)\nend\n"
@@ -23,8 +24,9 @@ int main ()
     
     script->DoCommands ("test_buffer", test_buffer, strlen (test_buffer), &log_print);
     
-    print (invoke<vec3f> (*script, "test_length", vec3f (0, 0, 2)));
-    print (invoke<vec3f> (*script, "test_qlength", vec3f (1, 2, 3)));
+    print ("test_identity", invoke<vec3f> (*script, "test_identity", vec3f (1, 2, 3)));
+    print ("test_length",   invoke<float> (*script, "test_length", vec3f (0, 0, 2)));
+    print ("test_qlength",  invoke<float> (*script, "test_qlength", vec3f (1, 2, 3)));
   }
   catch (xtl::bad_any_cast& exception)
   {

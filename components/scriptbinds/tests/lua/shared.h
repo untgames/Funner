@@ -20,9 +20,22 @@ inline void log_print (const char* message)
   printf ("%s\n", message);
 }
 
+inline void print (float x)
+{
+  printf ("%g", x);
+}
+
 inline void print (const vec3f& v)
 {
-  printf ("[%g %g %g]\n", v.x, v.y, v.z);
+  printf ("[%g %g %g]", v.x, v.y, v.z);
+}
+
+template <class T>
+inline void print (const char* tag, const T& value)
+{
+  printf ("%s: ", tag);
+  print  (value);
+  printf ("\n");
 }
 
 inline void bind_io (InvokerRegistry& registry)

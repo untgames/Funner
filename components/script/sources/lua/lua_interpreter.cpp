@@ -15,47 +15,49 @@ using namespace xtl;
 namespace
 {
 
-const char*  INVOKE_DISPATCH_NAME = "___recall"; //имя функции диспетчеризации в lua
-const char*  IMPL_NAME            = "___impl";   //имя переменной, содержащей указатель на реализацию lua
-const size_t IMPL_ID              = 0xDEADBEEF;  //идентификатор реализации lua
-
 //диспетчер вызовов
 int invoke_dispatch (lua_State* state)
 {
+  const char* invoker_name = "invoker_dispatch";
+
   try
-  {
-    lua_getglobal (state, IMPL_NAME);
+  {     
+      //получение указателя на шлюз      
 
-    LuaInterpreter* this_impl = reinterpret_cast<LuaInterpreter*> (lua_touserdata (state, -1));
-    
-      //проверка корректности lua-переменной '__impl'
-    
-    if (!this_impl || this_impl->Id () != IMPL_ID)
-      Raise<RuntimeException> ("script::lua::invoke_dispatch", "Wrong '__impl' variable");
+    const Invoker* invoker = reinterpret_cast<const Invoker*> (lua_touserdata (state, lua_upvalueindex (1)));
 
-    const char* function_name = lua_tostring (state, 1);
-    
-      //проверка наличия функции function_name
+    invoker_name = lua_tostring (state, lua_upvalueindex (2));
 
-    if (!function_name)
-      Raise<UndefinedFunctionCallException> ("script::lua::invoke_dispatch", "Null function name at call function '__recall'");
-
-    const Invoker* invoker = this_impl->Registry ().Find (function_name);
+    if (!invoker_name)
+      invoker_name = "invoker_dispatch";
 
     if (!invoker)
-      Raise<UndefinedFunctionCallException> ("script::lua::invoke_dispatch", "Invoker not found for function %s.", function_name);
+      Raise<RuntimeException> ("script::lua::invoke_dispatch", "No upvalue associated with invoker");
 
-    (*invoker) (this_impl->Stack ());
+      //проверка количества переданных аргументов
+
+    if (invoker->ArgumentsCount () != lua_gettop (state))
+      Raise<StackException> ("script::lua::invoke_dispatch", "Arguments count mismatch (expected %u, got %u)", 
+                             invoker->ArgumentsCount (), lua_gettop (state));
+
+      //вызов шлюза
+
+    (*invoker)(LuaStack (state));
+
+    return invoker->ResultsCount ();    
+  }
+  catch (xtl::bad_any_cast& exception)
+  {
+    luaL_error (state, "%s: %s -> %s (at invoke '%s')", exception.what (), exception.source_type ().name (), exception.target_type ().name (),
+                invoker_name);
   }
   catch (std::exception& exception)
   {
-    lua_pop    (state, lua_gettop (state));
-    luaL_error (state, "exception: %s", exception.what ());
+    luaL_error (state, "exception: %s (at invoke '%s')", exception.what (), invoker_name);
   }
   catch (...)
   {
-    lua_pop    (state, lua_gettop (state));
-    luaL_error (state, "unknown exception");
+    luaL_error (state, "%s (at invoke '%s')", lua_gettop (state) ? lua_tostring (state, -1) : "internal error", invoker_name);
   }
   
   return 0;
@@ -64,7 +66,7 @@ int invoke_dispatch (lua_State* state)
 //функция обработки ошибок lua
 int error_handler (lua_State* state)
 {
-  Raise<RuntimeException> ("script::lua::error_handler", "Lua internal error '%s' (lua calls 'lua_atpanic' function)", lua_tostring (state, -1));
+  Raise<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
 
   return 0;
 }
@@ -72,10 +74,12 @@ int error_handler (lua_State* state)
 //функция вызываемая уборщиком мусора при удалении объектов пользовательского типа данных
 int user_data_destroyer (lua_State* state)
 {
-  if (!luaL_checkudata (state, -1, USER_DATA_TAG))
-    return 0;
+  xtl::any* variant = reinterpret_cast<xtl::any*> (luaL_checkudata (state, -1, USER_DATA_TAG));
+  
+  if (!variant)
+    return 0;    
 
-  stl::destroy (lua_touserdata (state, -1));
+  stl::destroy (variant);  
 
   return 0;
 }
@@ -91,46 +95,45 @@ void log_function (const char*)
 */
 
 LuaInterpreter::LuaInterpreter (const xtl::shared_ptr<InvokerRegistry>& in_registry)
-  : registry (in_registry), 
+  : registry (in_registry),
     ref_count (1), 
-    id (IMPL_ID),
     on_register_invoker_connection (registry->RegisterHandler (InvokerRegistryEvent_OnRegisterInvoker,
-      bind (&LuaInterpreter::RegisterFunction, this, _2)))
+      bind (&LuaInterpreter::RegisterInvoker, this, _2, _3)))
 {
     //инициализация состояния lua
 
   state = lua_open ();
 
   if (!state)
-    Raise <InterpreterException> ("LuaInterpreter::LuaInterpreter", "Can't create lua state");
+    Raise <InterpreterException> ("script::lua::LuaInterpreter::LuaInterpreter", "Can't create lua state");
     
   try
   {
     luaL_openlibs (state);
-    
+
       //регистрация обработчиков удаления пользовательских типов данных    
-      
-    static const luaL_reg user_data_meta_table [] = {{"__gc", &user_data_destroyer}, {0,0}};    
+
+    static const luaL_reg user_data_meta_table [] = {{"__gc", &user_data_destroyer}, {0,0}};
 
     luaL_newmetatable (state, USER_DATA_TAG);
-    luaL_openlib      (state, 0, user_data_meta_table, 0);
-    
+    luaL_register     (state, 0, user_data_meta_table);
+
       //регистрация функции обработки ошибок
 
     lua_atpanic (state, &error_handler);
 
-      //регистрация диспетчера вызовов
-    
-    lua_pushcfunction (state, &invoke_dispatch);
-    lua_setglobal     (state, INVOKE_DISPATCH_NAME);
-
-    lua_pushlightuserdata (state, this);
-    lua_setglobal         (state, IMPL_NAME);  
+      //инициализация стека
 
     stack.SetState (state);
-    
-    for (InvokerRegistry::Iterator i = registry->CreateIterator (); i; ++i)
-      RegisterFunction (registry->InvokerId (i));
+
+      //регистрация обработчиков
+
+    for (InvokerRegistry::Iterator i=registry->CreateIterator (); i; ++i)
+      RegisterInvoker (registry->InvokerId (i), *i);
+      
+      //очистка стека
+      
+    lua_settop (state, 0);
   }
   catch (...)
   {
@@ -170,10 +173,14 @@ bool LuaInterpreter::HasFunction (const char* name)
 {
   if (!name)
     return false;
-
+      
   lua_getglobal (state, name);
 
-  return lua_isfunction (state, -1) != 0;
+  bool is_function = lua_isfunction (state, -1) != 0;
+
+  lua_pop (state, 1);
+
+  return is_function;
 }
 
 /*
@@ -182,15 +189,41 @@ bool LuaInterpreter::HasFunction (const char* name)
 
 void LuaInterpreter::DoCommands (const char* buffer_name, const void* buffer, size_t buffer_size, const LogFunction& log)
 {
+    //загружаем буфер команд в контекст луа
+
   if (luaL_loadbuffer (state, (const char*)buffer, buffer_size, buffer_name))
   {
-    log (lua_tostring (state, -1));
+    try
+    {
+      log (lua_tostring (state, -1));        
+    }
+    catch (...)
+    {
+      //подавляем все исключения
+    }
+
+      //выталкиваем сообщение об ошибке из стека 
+
+    lua_pop (state, 1);
 
     return;
   }
+
+  if (lua_pcall (state, 0, LUA_MULTRET, 0))
+  {
+    try
+    {
+      log (lua_tostring (state, -1));
+    }
+    catch (...)
+    {
+      //подавляем все исключения
+    }
     
-  if (lua_pcall(state, 0, LUA_MULTRET, 0))
-    log (lua_tostring (state, -1));
+      //выталкиваем из стека сообщение об ошибке
+      
+    lua_pop (state, 1);
+  }
 }
 
 /*
@@ -200,7 +233,20 @@ void LuaInterpreter::DoCommands (const char* buffer_name, const void* buffer, si
 void LuaInterpreter::Invoke (size_t arguments_count, size_t results_count)
 {
   if (lua_pcall (state, arguments_count, results_count, 0))
-    Raise <RuntimeException> ("LuaInterpreter::Invoke", "Error running function: '%s'", lua_tostring (state, -1));
+  {
+      //формируем сообщение об ошибке
+    
+    const char* reason    = lua_tostring (state, -1);
+    stl::string error_msg = reason ? reason : "internal error";
+    
+      //выталкиваем из стека сообщение об ошибке
+
+    lua_pop (state, 1);
+    
+      //возбуждаем исключение
+
+    Raise<RuntimeException> ("script::lua::LuaInterpreter::Invoke", "%s", error_msg.c_str ());    
+  }
 }
 
 /*
@@ -219,28 +265,20 @@ void LuaInterpreter::Release ()
 }
 
 /*
-   Регистрация функций
+   Регистрация шлюзов
 */
 
-void LuaInterpreter::RegisterFunction (const char* function_name)
+void LuaInterpreter::RegisterInvoker (const char* invoker_name, Invoker& invoker)
 {
-  if (!function_name)
-    RaiseNullArgument ("script::lua::LuaInterpreter::RegisterFunction", "function_name");
-
-    //генерация функции-оболочки, вызывающей диспетчер обработки вызовов
-
-  stl::string generated_function ("\nfunction ");
-
-  generated_function.reserve (64 + strlen (function_name) * 2 + strlen (INVOKE_DISPATCH_NAME));
- 
-  generated_function += function_name;
-  generated_function += " ()\n return ";
-  generated_function += INVOKE_DISPATCH_NAME;
-  generated_function += " (\"";
-  generated_function += function_name;
-  generated_function += "\")\n end";
-
-  DoCommands (function_name, generated_function.c_str(), generated_function.length (), &log_function);
+  if (!invoker_name)
+    RaiseNullArgument ("script::lua::LuaInterpreter::RegisterInvoker", "invoker_name");
+    
+    //регистрация С-closure
+    
+  lua_pushlightuserdata (state, &invoker);
+  lua_pushstring        (state, invoker_name);
+  lua_pushcclosure      (state, &invoke_dispatch, 2);
+  lua_setglobal         (state, invoker_name);
 }
 
 namespace script

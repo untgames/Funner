@@ -28,6 +28,7 @@ class LuaStack: public IStack
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     LuaStack ();
+    LuaStack (lua_State*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Состояние машины Lua
@@ -112,24 +113,17 @@ class LuaInterpreter: public IInterpreter
     void AddRef  ();
     void Release ();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение данных
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                  Id       () { return id; }
-    const  InvokerRegistry& Registry () { return *registry; }
-
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация функций
+///Регистрация шлюза
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterFunction   (const char* function_name);    
+    void RegisterInvoker (const char* invoker_name, Invoker& invoker);
 
   private:
     xtl::shared_ptr<InvokerRegistry> registry;                         //реестр шлюзов C++ используемых луа
     lua_State*                       state;                            //состояние машины Lua
     LuaStack                         stack;                            //стек аргументов
     size_t                           ref_count;                        //счётчик активных ссылок
-    size_t                           id;                               //идентификатор реализации
     xtl::auto_connection             on_register_invoker_connection;   //соединение регистрации функции
 };
 

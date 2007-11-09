@@ -31,8 +31,8 @@ struct NamedInvoker
     Описание реализации реестра шлюзов
 */
 
-typedef stl::hash_map<stl::hash_key<const char*>, NamedInvoker> InvokerMap;
-typedef xtl::signal<void (InvokerRegistryEvent, const char*)>   RegistrySignal;
+typedef stl::hash_map<stl::hash_key<const char*>, NamedInvoker>         InvokerMap;
+typedef xtl::signal<void (InvokerRegistryEvent, const char*, Invoker&)> RegistrySignal;
 
 struct InvokerRegistry::Impl
 {
@@ -42,14 +42,14 @@ struct InvokerRegistry::Impl
   Impl () {}
   Impl (const Impl& impl) : invokers (impl.invokers) {}
   
-  void Notify (InvokerRegistryEvent event_id, const char* invoker_name)
+  void Notify (InvokerRegistryEvent event_id, const char* invoker_name, Invoker& invoker)
   {
     if (!handlers [event_id])
       return;
       
     try
     {      
-      handlers [event_id] (event_id, invoker_name);
+      handlers [event_id] (event_id, invoker_name, invoker);
     }
     catch (...)
     {
@@ -129,24 +129,21 @@ InvokerRegistry::ConstIterator InvokerRegistry::CreateIterator () const
     Получение идентификатора шлюза
 */
 
-const char* InvokerRegistry::InvokerId (const Iterator& i)
-{
-  const InvokerMap::iterator* iter = i.target<InvokerMap::iterator> ();
-
-  if (!iter)
-    common::RaiseInvalidArgument ("script::InvokerRegistry::InvokerId", "iterator", "wrong-type");
-
-  return (*iter)->second.name.c_str ();
-}
-
 const char* InvokerRegistry::InvokerId (const ConstIterator& i) const
 {
-  const InvokerMap::const_iterator* iter = i.target<InvokerMap::const_iterator> ();
+  const InvokerMap::const_iterator* citer = i.target<InvokerMap::const_iterator> ();
 
-  if (!iter)
-    common::RaiseInvalidArgument ("script::InvokerRegistry::InvokerId", "iterator", "wrong-type");
-
-  return (*iter)->second.name.c_str ();
+  if (citer)
+    return (*citer)->second.name.c_str ();  
+    
+  const InvokerMap::iterator* iter = i.target<InvokerMap::iterator> ();
+  
+  if (iter)
+    return (*iter)->second.name.c_str ();
+    
+  common::RaiseInvalidArgument ("script::InvokerRegistry::InvokerId", "iterator", "wrong-type");
+  
+  return ""; //never called
 }
 
 /*
@@ -160,9 +157,9 @@ void InvokerRegistry::Register (const char* name, const Invoker& invoker)
     
   Unregister (name);
 
-  impl->invokers.insert_pair (name, NamedInvoker (name, invoker));
-
-  impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name);
+  stl::pair<InvokerMap::iterator, bool> insert_result = impl->invokers.insert_pair (name, NamedInvoker (name, invoker));
+  
+  impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name, insert_result.first->second.invoker);
 }
 
 void InvokerRegistry::Unregister (const char* name)
@@ -175,7 +172,7 @@ void InvokerRegistry::Unregister (const char* name)
   if (iter == impl->invokers.end ())
     return;
 
-  impl->Notify (InvokerRegistryEvent_OnUnregisterInvoker, name);
+  impl->Notify (InvokerRegistryEvent_OnUnregisterInvoker, name, iter->second.invoker);
 
   impl->invokers.erase (iter);
 }
@@ -189,7 +186,7 @@ void InvokerRegistry::Clear ()
     //оповещение об удалении шлюзов
     
   for (InvokerMap::iterator iter = impl->invokers.begin (), end = impl->invokers.end (); iter != end; ++iter)
-    impl->Notify (InvokerRegistryEvent_OnUnregisterInvoker, iter->second.name.c_str ());
+    impl->Notify (InvokerRegistryEvent_OnUnregisterInvoker, iter->second.name.c_str (), iter->second.invoker);
     
     //удаление шлюзов
     

@@ -91,7 +91,7 @@ const char* Exception::what () const throw ()
   return impl->message.c_str ();
 }
 
-void Exception::Touch (const char* source)
+void Exception::TouchImpl (const char* source)
 {
   if (!source)
     return;
@@ -105,6 +105,22 @@ void Exception::Touch (const char* source)
 
   impl->message += source;
 }
+
+void Exception::VTouch (const char* format, va_list args)
+{
+  if (!format)
+    return;
+
+  TouchImpl (vformat (format, args).c_str ());
+}
+    
+void Exception::Touch (const char* format, ...)
+{
+  va_list list;
+  
+  va_start (list, format);  
+  VTouch   (format, list);
+}    
 
 /*
     VRaise

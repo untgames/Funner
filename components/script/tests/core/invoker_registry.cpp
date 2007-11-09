@@ -1,20 +1,24 @@
 #include "shared.h"
 
-void registry_handler (InvokerRegistryEvent event_id, const char* name)
+void registry_handler (InvokerRegistryEvent event_id, const char* name, Invoker& invoker)
 {
   switch (event_id)
   {
-    case InvokerRegistryEvent_OnRegisterInvoker:   printf ("  register '%s'\n", name); break;
-    case InvokerRegistryEvent_OnUnregisterInvoker: printf ("  unregister '%s'\n", name); break;
+    case InvokerRegistryEvent_OnRegisterInvoker:
+      printf ("  register '%s' (arguments_count=%u, results_count=%u)\n", name, invoker.ArgumentsCount (), invoker.ResultsCount ());
+      break;
+    case InvokerRegistryEvent_OnUnregisterInvoker:
+      printf ("  unregister '%s' (arguments_count=%u, results_count=%u)\n", name, invoker.ArgumentsCount (), invoker.ResultsCount ());
+      break;    
     default: break;
   }
 }
 
-void registry1_handler (InvokerRegistryEvent event_id, const char* name)
+void registry1_handler (InvokerRegistryEvent event_id, const char* name, Invoker& invoker)
 {
   printf ("  registry1:");
   
-  registry_handler (event_id, name);
+  registry_handler (event_id, name, invoker);
 }
 
 int main (int, char** argv)

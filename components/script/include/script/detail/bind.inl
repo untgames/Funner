@@ -116,7 +116,7 @@ struct functional_argument_traits
 {
   typedef typename FunctionalTraits::template argument<I+1>::type argument_type;
   
-  enum { argument_index = I };
+  enum { argument_index = I + 1 };
 };
 
 template <class FunctionalTraits, size_t I>
@@ -124,7 +124,7 @@ struct functional_argument_traits<FunctionalTraits, I, true>
 {
   typedef typename FunctionalTraits::template argument<I>::type argument_type;
   
-  enum { argument_index = I };
+  enum { argument_index = I + 1 };
 };
 
 template <class FunctionalTraits>
@@ -132,7 +132,7 @@ struct functional_argument_traits<FunctionalTraits, 0, true>
 {
   typedef typename FunctionalTraits::object_type& argument_type;
   
-  enum { argument_index = 0 };
+  enum { argument_index = 1 };
 };
 
 template <class FunctionalTraits>
@@ -190,8 +190,26 @@ struct invoker_impl<FnTraits, Fn, void>
     Функция-диспетчер вызова шлюза
 */
 
+template <class Ret>
+Ret get_result (IStack& stack)
+{
+  try
+  {
+    Ret result = get_argument<Ret> (stack, stack.Size () - 1);
+
+    stack.Pop (1);
+
+    return result;
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("script::get_result");
+    throw;
+  }
+}
+
 template <size_t ArgsCount, class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
-inline Ret invoke_dispatch
+Ret invoke_dispatch
  (IInterpreter& interpreter,
   const char*   name,
   const T1&     arg1,
@@ -206,31 +224,35 @@ inline Ret invoke_dispatch
   const T10&    arg10,
   xtl::type<Ret>)
 {
-  IStack& stack = interpreter.Stack ();
+  try
+  {
+    IStack& stack = interpreter.Stack ();
 
-  stack.PushSymbol (name);
-  push_argument    (stack, arg1);
-  push_argument    (stack, arg2);
-  push_argument    (stack, arg3);
-  push_argument    (stack, arg4);
-  push_argument    (stack, arg5);
-  push_argument    (stack, arg6);
-  push_argument    (stack, arg7);
-  push_argument    (stack, arg8);
-  push_argument    (stack, arg9);
-  push_argument    (stack, arg10);
+    stack.PushSymbol (name);
+    push_argument    (stack, arg1);
+    push_argument    (stack, arg2);
+    push_argument    (stack, arg3);
+    push_argument    (stack, arg4);
+    push_argument    (stack, arg5);
+    push_argument    (stack, arg6);
+    push_argument    (stack, arg7);
+    push_argument    (stack, arg8);
+    push_argument    (stack, arg9);
+    push_argument    (stack, arg10);
 
-  interpreter.Invoke (ArgsCount, 1);
+    interpreter.Invoke (ArgsCount, 1);
 
-  Ret result = get_argument<Ret> (stack, stack.Size () - 1);
-
-  stack.Pop (1);
-
-  return result;
+    return get_result<Ret> (stack);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("script::invoke(%s,%s,...)", interpreter.Name (), name);
+    throw;
+  }
 }
 
 template <size_t ArgsCount, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
-inline void invoke_dispatch
+void invoke_dispatch
  (IInterpreter& interpreter,
   const char*   name,
   const T1&     arg1,
@@ -245,21 +267,29 @@ inline void invoke_dispatch
   const T10&    arg10,
   xtl::type<void>)
 {
-  IStack& stack = interpreter.Stack ();
+  try
+  {
+    IStack& stack = interpreter.Stack ();
 
-  stack.PushSymbol (name);
-  push_argument    (stack, arg1);
-  push_argument    (stack, arg2);
-  push_argument    (stack, arg3);
-  push_argument    (stack, arg4);
-  push_argument    (stack, arg5);
-  push_argument    (stack, arg6);
-  push_argument    (stack, arg7);
-  push_argument    (stack, arg8);
-  push_argument    (stack, arg9);
-  push_argument    (stack, arg10);
+    stack.PushSymbol (name);
+    push_argument    (stack, arg1);
+    push_argument    (stack, arg2);
+    push_argument    (stack, arg3);
+    push_argument    (stack, arg4);
+    push_argument    (stack, arg5);
+    push_argument    (stack, arg6);
+    push_argument    (stack, arg7);
+    push_argument    (stack, arg8);
+    push_argument    (stack, arg9);
+    push_argument    (stack, arg10);
 
-  interpreter.Invoke (ArgsCount, 0);
+    interpreter.Invoke (ArgsCount, 0);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("script::invoke(%s,%s,...)", interpreter.Name (), name);
+    throw;
+  }
 }
 
 }

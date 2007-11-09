@@ -24,6 +24,10 @@ const char* USER_DATA_TAG = "user_data";
 LuaStack::LuaStack ()
   : state (0)
   {}
+
+LuaStack::LuaStack (lua_State* in_state)
+  : state (in_state)
+  {}  
   
 /*
     Состояние машины Lua
@@ -40,7 +44,7 @@ void LuaStack::SetState (lua_State* in_state)
 
 size_t LuaStack::Size ()
 {
-  return lua_gettop (state);
+  return lua_gettop (state) + 1;
 }
 
 /*
@@ -51,36 +55,38 @@ namespace
 {
 
 //проверка наличия элемента в стеке
-int get_item_index (lua_State* state, size_t index, const char* function_name)
+void check_item_index (lua_State* state, size_t index, const char* function_name)
 {
-  size_t stack_size = lua_gettop (state);
+  size_t stack_size = lua_gettop (state) + 1; 
 
   if (index >= stack_size)
-    Raise<StackException> (function_name, "Attempt to get argument %u from stack with %u items", index, stack_size);
-
-  return index + 1;
+    Raise<StackException> (function_name, "Attempt to get item #%u from stack with %u items", index, stack_size);
 }
 
 }
 
 float LuaStack::GetFloat (size_t index)
 {
-  return (float)lua_tonumber (state, get_item_index (state, index, "script::lua::LuaStack::GetFloat"));
+  check_item_index (state, index, "script::lua::LuaStack::GetFloat");
+  return (float)lua_tonumber (state, index);
 }
 
 int LuaStack::GetInteger (size_t index)
 {
-  return lua_tointeger (state, get_item_index (state, index, "script::lua::LuaStack::GetInteger"));
+  check_item_index (state, index, "script::lua::LuaStack::GetInteger");
+  return lua_tointeger (state, index);
 }
 
 void* LuaStack::GetPointer (size_t index)
 {
-  return lua_touserdata (state, get_item_index (state, index, "script::lua::LuaStack::GetPointer"));
+  check_item_index (state, index, "script::lua::LuaStack::GetPointer");
+  return lua_touserdata (state, index);
 }
 
 const char* LuaStack::GetString (size_t index)
 {
-  return lua_tostring (state, get_item_index (state, index, "script::lua::LuaStack::GetString"));
+  check_item_index (state, index, "script::lua::LuaStack::GetString");
+  return lua_tostring (state, index);
 }
 
 const char* LuaStack::GetSymbol (size_t index)
@@ -92,7 +98,39 @@ const char* LuaStack::GetSymbol (size_t index)
 
 xtl::any& LuaStack::GetVariant (size_t index)
 {
-  return *reinterpret_cast<xtl::any*> (luaL_checkudata (state, get_item_index (state, index, "script::lua::LuaStack::GetVariant"), USER_DATA_TAG));
+    //проверка индекса
+    
+  check_item_index (state, index, "script::lua::LuaStack::GetVariant");
+
+    //получение аргумента
+
+  xtl::any* variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, index));
+
+    //получение мета-таблицы
+
+  if (variant && lua_getmetatable (state, index))
+  {
+    lua_getfield (state, LUA_REGISTRYINDEX, USER_DATA_TAG); //кэшировать!!!!!
+    
+      //проверка совпадения типов
+    
+    if (lua_rawequal (state, -1, -2))
+    {
+      lua_pop (state, 2);
+
+      return *variant;
+    }
+  }
+
+    //если типы не совпали
+
+  luaL_typerror (state, index, USER_DATA_TAG);
+
+    //генерация исключения
+
+  Raise<RuntimeException> ("script::LuaStack::GetVariant", "Item %u has wrong type (non user-data)", index);
+  
+  return *variant;
 }
 
 /*
@@ -155,7 +193,7 @@ void LuaStack::Push (const xtl::any& object)
   void* buffer = lua_newuserdata (state, BUFFER_SIZE);
   
   if (!buffer)
-    Raise<StackException> ("script::lua::LuStack::Push(const xtl::any&)", "Fail to allocate %u bytes from lua stack", BUFFER_SIZE);
+    Raise<StackException> ("script::lua::LuaStack::Push(const xtl::any&)", "Fail to allocate %u bytes from lua stack", BUFFER_SIZE);
 
   luaL_getmetatable (state, USER_DATA_TAG);
   lua_setmetatable  (state, -2);

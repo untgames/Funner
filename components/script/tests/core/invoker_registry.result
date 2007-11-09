@@ -1,10 +1,10 @@
 Results of invoker_registry:
 Register invokers:
-  register 'f1'
-  register 'f2'
-  register 'f3'
+  register 'f1' (arguments_count=2, results_count=1)
+  register 'f2' (arguments_count=2, results_count=1)
+  register 'f3' (arguments_count=2, results_count=1)
 Unregister invokers:
-  unregister 'f2'
+  unregister 'f2' (arguments_count=2, results_count=1)
 Traverse invokers:
   invoker 'f1': arguments_count=2, results_count=1
   invoker 'f3': arguments_count=2, results_count=1
@@ -13,8 +13,8 @@ Search 'f1', 'f2':
   invoker 'f2' not found
 Copy registry:
 Unregister invoker 'f1' from registry1:
-  registry1:  unregister 'f1'
+  registry1:  unregister 'f1' (arguments_count=2, results_count=1)
 Exit
-  registry1:  unregister 'f3'
-  unregister 'f1'
-  unregister 'f3'
+  registry1:  unregister 'f3' (arguments_count=2, results_count=1)
+  unregister 'f1' (arguments_count=2, results_count=1)
+  unregister 'f3' (arguments_count=2, results_count=1)
