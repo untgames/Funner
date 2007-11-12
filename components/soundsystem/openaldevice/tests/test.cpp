@@ -96,9 +96,9 @@ int main ()
 {
   try
   {
-    register_openal_driver ();
+//    register_openal_driver ();
     
-    xtl::com_ptr<ISoundDevice> sound_system (create_openal_device (find_openal_device_name ("*"), 0, ""), false);
+    xtl::com_ptr<ISoundDevice> sound_system (create_openal_device ("", 0, ""), false);
 
     Capabilities   info;
     Listener       listener;
