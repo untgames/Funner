@@ -201,8 +201,6 @@ void Stack::Push (const xtl::any& value)
 //  luaL_getmetatable (state, USER_DATA_TAG);
   luaL_getmetatable (state, object->type ().name ()); //for tests only!!!
   lua_setmetatable  (state, -2);
-  
-  printf ("push '%s'\n", object->type ().name ());
 
 /*  try
   {

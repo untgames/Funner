@@ -21,7 +21,7 @@ Metatable::Metatable (lua_State* in_state, const char* name, InvokerRegistry& in
   static const luaL_reg common_meta_table [] = {
     {"__gc", &destroy_object},
     {0, 0}
-  };  
+  };
 
   luaI_openlib (state, 0, common_meta_table, 0);    
       
@@ -78,14 +78,10 @@ void Metatable::RegisterInvoker (const char* invoker_name, Invoker& invoker)
   lua_pushcclosure      (state, &invoke_dispatch, 2);
   lua_setfield          (state, -2, invoker_name);
   lua_pop               (state, 1);
-  
-  printf ("register invoker '%s'::'%s' %d\n", table_name.c_str (), invoker_name, lua_gettop (state));
 }
 
 void Metatable::UnregisterInvoker (const char* invoker_name)
 {
-  printf ("unregister '%s'\n", invoker_name);
-
   luaL_getmetatable (state, table_name.c_str ()); //optimize!!
   lua_pushnil       (state);
   lua_setfield      (state, -2, invoker_name);

@@ -12,8 +12,8 @@
 #include <xtl/iterator.h>
 #include <xtl/bind.h>
 
-#include <common/strlib.h> //???????????????
 #include <common/heap.h>
+#include <common/strlib.h>
 
 #include <lua.h>
 #include <lualib.h>
