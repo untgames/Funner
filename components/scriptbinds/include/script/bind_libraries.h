@@ -5,13 +5,13 @@ namespace script
 {
 
 //forward declarations
-class InvokerRegistry;
+class Environment;
 
 /*
     Регистрация библиотек
 */
 
-void bind_math_library (InvokerRegistry&);
+void bind_math_library (Environment&);
 
 }
 

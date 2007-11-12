@@ -2,6 +2,7 @@
 #define SCRIPTBINDS_SHARED_HEADER
 
 #include <script/bind.h>
+#include <script/environment.h>
 #include <script/bind_libraries.h>
 
 #include <mathlib.h>

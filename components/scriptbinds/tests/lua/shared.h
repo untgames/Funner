@@ -3,12 +3,16 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include <xtl/shared_ptr.h>
 #include <xtl/function.h>
 
 #include <script/bind_libraries.h>
+#include <script/environment.h>
 #include <script/bind.h>
+
+#include <common/heap.h>
 
 #include <mathlib.h>
 
@@ -36,11 +40,6 @@ inline void print (const char* tag, const T& value)
   printf ("%s: ", tag);
   print  (value);
   printf ("\n");
-}
-
-inline void bind_io (InvokerRegistry& registry)
-{
-  registry.Register ("ioPrint", make_invoker (&log_print));
 }
 
 #endif

@@ -7,7 +7,8 @@ const char* test_buffer =
 "function test_dot (v1,v2)\nreturn vecDot (v1,v2)\nend\n"
 "function test_abs (v1)\nreturn vecAbs (v1)\nend\n"
 "function test_min (v1,v2)\nreturn vecMin (v1,v2)\nend\n"
-"function test_max (v1,v2)\nreturn vecMax (v1,v2)\nend\n";
+"function test_max (v1,v2)\nreturn vecMax (v1,v2)\nend\n"
+"function test_add (v1,v2)\nreturn v1 + v2\nend\n";
 
 int main ()
 {
@@ -15,18 +16,18 @@ int main ()
   
   try
   {
-    xtl::shared_ptr<InvokerRegistry> registry (new InvokerRegistry);
+    xtl::shared_ptr<Environment> env (new Environment);
+    xtl::com_ptr<IInterpreter>  script = create_lua_interpreter (env);
   
-    bind_io           (*registry);
-    bind_math_library (*registry);
-    
-    xtl::com_ptr<IInterpreter> script = create_lua_interpreter (registry);    
+    bind_math_library (*env);
     
     script->DoCommands ("test_buffer", test_buffer, strlen (test_buffer), &log_print);
     
     print ("test_identity", invoke<vec3f> (*script, "test_identity", vec3f (1, 2, 3)));
     print ("test_length",   invoke<float> (*script, "test_length", vec3f (0, 0, 2)));
     print ("test_qlength",  invoke<float> (*script, "test_qlength", vec3f (1, 2, 3)));
+    
+    invoke<void>  (*script, "test_add", vec3f (1, 2, 3), vec3f (4, 5, 6));
   }
   catch (xtl::bad_any_cast& exception)
   {
