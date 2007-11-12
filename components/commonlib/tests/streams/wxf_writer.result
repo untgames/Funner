@@ -62,4 +62,5 @@ test2 1 1 1 1
 
   bool_flag
 }
-exception: Wrong wxf-format tag 'wrong tag' at common::WxfWriter::Write
+exception: Wrong wxf-format tag 'wrong tag'
+    at common::WxfWriter::Write

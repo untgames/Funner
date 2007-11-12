@@ -96,13 +96,18 @@ void Exception::TouchImpl (const char* source)
   if (!source)
     return;
 
-  if (!impl->stack_print)
+/*  if (!impl->stack_print)
   {
     impl->message     += " at ";
     impl->stack_print  = true;
   }
-  else impl->message += "<-";
-
+  else
+  {
+//    impl->message += "<-";
+    impl->message += '\n';
+  }*/
+  
+  impl->message += "\n    at ";
   impl->message += source;
 }
 
