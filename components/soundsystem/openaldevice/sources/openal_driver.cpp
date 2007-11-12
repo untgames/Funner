@@ -54,20 +54,6 @@ void register_openal_driver (const char* name)
   }
 }
 
-/*
-   —оздание устройства воспроизведени€ звука
-*/
-
-ISoundDevice* create_openal_device (const char* configuration, const void* window_handle, const char* init_string)
-{
-  return new OpenALDevice ("", "");
-}
-
-const char* find_openal_device_name (const char* device_mask)
-{
-  return SoundSystem::FindConfiguration ("OpenAL", device_mask);
-}
-
 }
 
 }
