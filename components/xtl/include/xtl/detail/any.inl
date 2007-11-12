@@ -606,7 +606,7 @@ inline void swap (any& a1, any& a2)
 */
 
 template <class T>
-inline any make_ref_any (const T& value)
+inline any make_ref_any (T& value)
 {
   return any (value, true);
 }
