@@ -425,9 +425,9 @@ void OpenALSource::PropertiesUpdate ()
     {
       source_need_update = false;
 
-      context.alSourcefv (al_source, AL_POSITION, source.position);
-      context.alSourcefv (al_source, AL_DIRECTION, source.direction);
-      context.alSourcefv (al_source, AL_VELOCITY, source.velocity);
+      context.alSourcefv (al_source, AL_POSITION, &source.position [0]);
+      context.alSourcefv (al_source, AL_DIRECTION, &source.direction [0]);
+      context.alSourcefv (al_source, AL_VELOCITY, &source.velocity [0]);
       context.alSourcef  (al_source, AL_GAIN, source.gain);
       context.alSourcef  (al_source, AL_MIN_GAIN, source.minimum_gain);
       context.alSourcef  (al_source, AL_MAX_GAIN, source.maximum_gain);

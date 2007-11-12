@@ -403,9 +403,9 @@ void OpenALDevice::ListenerUpdate ()
     float orientation [6] = {listener.direction.x, listener.direction.y, listener.direction.z, 
                              listener.up.x,        listener.up.y,        listener.up.z};
 
-    context.alListenerfv (AL_POSITION,    listener.position);
-    context.alListenerfv (AL_VELOCITY,    listener.velocity);
-    context.alListenerfv (AL_ORIENTATION, orientation);
+    context.alListenerfv (AL_POSITION,    &listener.position [0]);
+    context.alListenerfv (AL_VELOCITY,    &listener.velocity [0]);
+    context.alListenerfv (AL_ORIENTATION, &orientation [0]);
     context.alListenerf  (AL_GAIN,        is_muted ? 0.0f : gain);
   }
 }
