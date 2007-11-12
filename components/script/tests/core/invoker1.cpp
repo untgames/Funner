@@ -16,6 +16,7 @@ int main ()
     Invoker f1 = make_invoker (&f);
     MyStack stack;
 
+    stack.PushSymbol ("dummy");
     stack.Push (3.0f);
     stack.Push ("Hello world");
 

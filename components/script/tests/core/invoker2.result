@@ -1,17 +1,20 @@
 Results of invoker2_test:
 invoke 'f1':
 A1: f(3,Hello world)
-stack (size=4):
-  item[0]: 'A('A1!')'
-  item[1]: '5'
-  item[2]: 'Hello world'
-  item[3]: 'struct Y'
+stack (size=5):
+  item[0]: 'dummy'
+  item[1]: 'A('A1!')'
+  item[2]: '5'
+  item[3]: 'Hello world'
+  item[4]: 'struct Y'
 a.name='A1!'
 invoke 'f2':
-stack (size=2):
-  item[0]: 'struct Y'
-  item[1]: 'Y::test'
+stack (size=3):
+  item[0]: 'dummy'
+  item[1]: 'struct Y'
+  item[2]: 'Y::test'
 invoke 'f2':
-stack (size=2):
-  item[0]: 'struct Y'
-  item[1]: 'Y::test'
+stack (size=3):
+  item[0]: 'dummy'
+  item[1]: 'struct Y'
+  item[2]: 'Y::test'

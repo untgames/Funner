@@ -12,52 +12,9 @@ using namespace xtl;
 namespace
 {
 
-//диспетчер вызовов
-int invoke_dispatch (lua_State* state)
+//функция протоколирования по умолчанию
+void log_function (const char*)
 {
-  const char* invoker_name = "invoker_dispatch";
-
-  try
-  {     
-      //получение указателя на шлюз      
-
-    const Invoker* invoker = reinterpret_cast<const Invoker*> (lua_touserdata (state, lua_upvalueindex (1)));
-
-    invoker_name = lua_tostring (state, lua_upvalueindex (2));
-
-    if (!invoker_name)
-      invoker_name = "invoker_dispatch";
-
-    if (!invoker)
-      Raise<RuntimeException> ("script::lua::invoke_dispatch", "No upvalue associated with invoker");
-
-      //проверка количества переданных аргументов
-
-    if (invoker->ArgumentsCount () != lua_gettop (state))
-      Raise<StackException> ("script::lua::invoke_dispatch", "Arguments count mismatch (expected %u, got %u)", 
-                             invoker->ArgumentsCount (), lua_gettop (state));
-
-      //вызов шлюза
-    
-    (*invoker)(LuaStack (state));
-
-    return invoker->ResultsCount ();    
-  }
-  catch (xtl::bad_any_cast& exception)
-  {
-    luaL_error (state, "%s: %s -> %s (at invoke '%s')", exception.what (), exception.source_type ().name (), exception.target_type ().name (),
-                invoker_name);
-  }
-  catch (std::exception& exception)
-  {
-    luaL_error (state, "exception: %s (at invoke '%s')", exception.what (), invoker_name);
-  }
-  catch (...)
-  {
-    luaL_error (state, "%s (at invoke '%s')", lua_gettop (state) ? lua_tostring (state, -1) : "internal error", invoker_name);
-  }
-  
-  return 0;
 }
 
 //функция обработки ошибок lua
@@ -68,21 +25,38 @@ int error_handler (lua_State* state)
   return 0;
 }
 
-//функция вызываемая уборщиком мусора при удалении объектов пользовательского типа данных
-int user_data_destroyer (lua_State* state)
+//функция заказа памяти
+void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
 {
-  xtl::any* variant = reinterpret_cast<xtl::any*> (luaL_checkudata (state, -1, USER_DATA_TAG));
-  
-  if (!variant)
-    return 0;    
+  try
+  {
+    common::Heap& heap = *reinterpret_cast<common::Heap*> (user_data);
 
-  stl::destroy (variant);  
+    if (!new_size)
+    {
+      heap.Deallocate (ptr);
+      return 0;    
+    }
 
-  return 0;
-}
+    void* new_buffer = heap.Allocate (new_size);
 
-void log_function (const char*)
-{
+    if (!new_buffer)
+      return 0;    
+
+    if (ptr)
+    {
+      memcpy (new_buffer, ptr, old_size < new_size ? old_size : new_size);
+
+      heap.Deallocate (ptr);
+    }
+
+    return new_buffer;
+  }
+  catch (...)
+  {
+    //подавляем все исключения
+    return 0;
+  }
 }
 
 }
@@ -91,31 +65,30 @@ void log_function (const char*)
     Конструктор / деструктор
 */
 
-LuaInterpreter::LuaInterpreter (const xtl::shared_ptr<InvokerRegistry>& in_registry)
-  : registry (in_registry),
-    ref_count (1), 
-    on_register_invoker_connection (registry->RegisterHandler (InvokerRegistryEvent_OnRegisterInvoker,
-      bind (&LuaInterpreter::RegisterInvoker, this, _2, _3))),
-    on_unregister_invoker_connection (registry->RegisterHandler (InvokerRegistryEvent_OnUnregisterInvoker,
-      bind (&LuaInterpreter::UnregisterInvoker, this, _2)))
+Interpreter::Interpreter (const EnvironmentPointer& in_environment)
+  : environment (in_environment),
+    ref_count (1)
 {
     //инициализация состояния lua
 
-  state = lua_open ();
+  state = lua_newstate (&reallocate, &MemoryManager::GetHeap ());
 
   if (!state)
-    Raise <InterpreterException> ("script::lua::LuaInterpreter::LuaInterpreter", "Can't create lua state");
-    
+    Raise <InterpreterException> ("script::lua::Interpreter::Interpreter", "Can't create lua state");
+
   try
   {
     luaL_openlibs (state);
 
       //регистрация обработчиков удаления пользовательских типов данных    
 
-    static const luaL_reg user_data_meta_table [] = {{"__gc", &user_data_destroyer}, {0,0}};
-
+    static const luaL_reg user_data_meta_table [] = {
+      {"__gc", &destroy_object},
+      {0,0}
+    };
+    
     luaL_newmetatable (state, USER_DATA_TAG);
-    luaL_register     (state, 0, user_data_meta_table);
+    luaI_openlib      (state, 0, user_data_meta_table, 0); //must be 1
 
       //регистрация функции обработки ошибок
 
@@ -124,14 +97,22 @@ LuaInterpreter::LuaInterpreter (const xtl::shared_ptr<InvokerRegistry>& in_regis
       //инициализация стека
 
     stack.SetState (state);
-
-      //регистрация обработчиков
-
-    for (InvokerRegistry::Iterator i=registry->CreateIterator (); i; ++i)
-      RegisterInvoker (registry->InvokerId (i), *i);
+    
+      //регистрация обработчиков событий создания/удаления реестров
       
+    on_create_registry_connection = environment->RegisterEventHandler (EnvironmentEvent_OnCreateRegistry,
+      xtl::bind (&Interpreter::RegisterInvokerRegistry, this, _2, _3));
+      
+    on_remove_registry_connection = environment->RegisterEventHandler (EnvironmentEvent_OnRemoveRegistry,
+      xtl::bind (&Interpreter::UnregisterInvokerRegistry, this, _2));
+      
+      //регистрация обработчиков событий появления новых реестров
+
+    for (Environment::Iterator i=environment->CreateIterator (); i; ++i)
+      RegisterInvokerRegistry (environment->RegistryId (i), *i);
+
       //очистка стека
-      
+
     lua_settop (state, 0);
   }
   catch (...)
@@ -141,8 +122,17 @@ LuaInterpreter::LuaInterpreter (const xtl::shared_ptr<InvokerRegistry>& in_regis
   }
 }
 
-LuaInterpreter::~LuaInterpreter ()
+Interpreter::~Interpreter ()
 {
+    //удаление метатаблиц
+    
+  for (MetatableMap::iterator i=metatables.begin (), end=metatables.end (); i!=end; ++i)
+    delete i->second;
+    
+  metatables.clear ();
+    
+    //закрытие lua
+
   lua_close (state);
 }
 
@@ -150,7 +140,7 @@ LuaInterpreter::~LuaInterpreter ()
     Имя интерпретатора
 */
 
-const char* LuaInterpreter::Name ()
+const char* Interpreter::Name ()
 {
   return LUA_RELEASE;
 }
@@ -159,7 +149,7 @@ const char* LuaInterpreter::Name ()
     Стек аргументов
 */
 
-IStack& LuaInterpreter::Stack ()
+IStack& Interpreter::Stack ()
 {
   return stack;
 }
@@ -168,7 +158,7 @@ IStack& LuaInterpreter::Stack ()
     Проверка наличия функции
 */
 
-bool LuaInterpreter::HasFunction (const char* name)
+bool Interpreter::HasFunction (const char* name)
 {
   if (!name)
     return false;
@@ -186,7 +176,7 @@ bool LuaInterpreter::HasFunction (const char* name)
     Выполнение буфера интерпретации луа
 */
 
-void LuaInterpreter::DoCommands (const char* buffer_name, const void* buffer, size_t buffer_size, const LogFunction& log)
+void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_t buffer_size, const LogFunction& log)
 {
     //загружаем буфер команд в контекст луа
 
@@ -229,7 +219,7 @@ void LuaInterpreter::DoCommands (const char* buffer_name, const void* buffer, si
     Вызов функции луа
 */
 
-void LuaInterpreter::Invoke (size_t arguments_count, size_t results_count)
+void Interpreter::Invoke (size_t arguments_count, size_t results_count)
 {
   if (lua_pcall (state, arguments_count, results_count, 0))
   {
@@ -237,14 +227,14 @@ void LuaInterpreter::Invoke (size_t arguments_count, size_t results_count)
     
     const char* reason    = lua_tostring (state, -1);
     stl::string error_msg = reason ? reason : "internal error";
-    
+
       //выталкиваем из стека сообщение об ошибке
 
     lua_pop (state, 1);
-    
+
       //возбуждаем исключение
 
-    Raise<RuntimeException> ("script::lua::LuaInterpreter::Invoke", "%s", error_msg.c_str ());    
+    Raise<RuntimeException> ("script::lua::Interpreter::Invoke", "%s", error_msg.c_str ());    
   }
 }
 
@@ -252,12 +242,12 @@ void LuaInterpreter::Invoke (size_t arguments_count, size_t results_count)
     Подсчёт ссылок
 */
 
-void LuaInterpreter::AddRef ()
+void Interpreter::AddRef ()
 {
   ref_count++;
 }
 
-void LuaInterpreter::Release ()
+void Interpreter::Release ()
 {
   if (!--ref_count)
     delete this;
@@ -267,26 +257,117 @@ void LuaInterpreter::Release ()
    Регистрация / удаление шлюзов
 */
 
-void LuaInterpreter::RegisterInvoker (const char* invoker_name, Invoker& invoker)
+void Interpreter::RegisterInvoker (const char* invoker_name, Invoker& invoker)
 {
   if (!invoker_name)
-    RaiseNullArgument ("script::lua::LuaInterpreter::RegisterInvoker", "invoker_name");
+    RaiseNullArgument ("script::lua::Interpreter::RegisterInvoker", "invoker_name");
     
     //регистрация С-closure
     
   lua_pushlightuserdata (state, &invoker);
-  lua_pushstring        (state, invoker_name);
+  lua_pushstring        (state, invoker_name);  //??????
   lua_pushcclosure      (state, &invoke_dispatch, 2);
   lua_setglobal         (state, invoker_name);
 }
 
-void LuaInterpreter::UnregisterInvoker (const char* invoker_name)
+void Interpreter::UnregisterInvoker (const char* invoker_name)
 {
   if (!invoker_name)
     return;
 
   lua_pushnil    (state);
   lua_setglobal  (state, invoker_name);
+}
+    
+/*
+    Регистрация / удаление реестров
+*/
+
+void Interpreter::RegisterInvokerRegistry (const char* registry_name, InvokerRegistry& registry)
+{
+  if (!registry_name)
+    RaiseNullArgument ("script::lua::RegisterInvokerRegistry", "registry_name");     
+    
+    //проверка: является ли регистрируемый реестр глобальным
+
+  if (!strcmp ("global", registry_name))
+  {
+    RegisterGlobalRegistry (registry);
+  }
+  else
+  {    
+      //регистрация мета-таблицы
+      
+    Metatable* metatable = new Metatable (state, registry_name, registry);
+    
+    try
+    {
+      metatables.insert_pair (registry_name, metatable);
+    }
+    catch (...)
+    {
+      delete metatable;
+      throw;
+    }
+  }
+}
+
+void Interpreter::UnregisterInvokerRegistry (const char* registry_name)
+{
+  if (!registry_name)
+    return;
+       
+  if (!strcmp ("global", registry_name))
+  {
+    on_register_invoker_connection.disconnect ();
+    on_unregister_invoker_connection.disconnect ();
+  }
+  else
+  {
+      //удаление метатаблицы      
+
+    MetatableMap::iterator iter = metatables.find (registry_name);
+
+    if (iter == metatables.end ())
+      return;
+
+    delete iter->second;
+
+    metatables.erase (iter);
+  }
+}
+
+void Interpreter::RegisterGlobalRegistry (InvokerRegistry& registry)
+{
+    //регистрация обработчиков событий
+
+  on_register_invoker_connection = registry.RegisterEventHandler (InvokerRegistryEvent_OnRegisterInvoker,
+      bind (&Interpreter::RegisterInvoker, this, _2, _3));
+
+  on_unregister_invoker_connection = registry.RegisterEventHandler (InvokerRegistryEvent_OnUnregisterInvoker,
+      bind (&Interpreter::UnregisterInvoker, this, _2));
+      
+    //регистрация шлюзов
+    
+  for (InvokerRegistry::Iterator i=registry.CreateIterator (); i; ++i)
+    RegisterInvoker (registry.InvokerId (i), *i);
+}
+
+/*
+    Поиск метатаблицы
+*/
+
+Metatable* Interpreter::FindMetatable (const char* name) const
+{
+  if (!name)
+    return 0;
+    
+  MetatableMap::const_iterator iter = metatables.find (name);
+  
+  if (iter == metatables.end ())
+    return 0;
+    
+  return iter->second;
 }
 
 namespace script
@@ -296,12 +377,12 @@ namespace script
     Создание интерпретатора lua
 */
 
-xtl::com_ptr<IInterpreter> create_lua_interpreter (const xtl::shared_ptr<InvokerRegistry>& registry)
+xtl::com_ptr<IInterpreter> create_lua_interpreter (const xtl::shared_ptr<Environment>& environment)
 {
-  if (!registry)
-    common::RaiseNullArgument ("script::create_lua_interpreter", "registry");
+  if (!environment)
+    common::RaiseNullArgument ("script::create_lua_interpreter", "environment");
 
-  return xtl::com_ptr<IInterpreter> (new LuaInterpreter (registry), false);
+  return xtl::com_ptr<IInterpreter> (new Interpreter (environment), false);
 }
 
 }

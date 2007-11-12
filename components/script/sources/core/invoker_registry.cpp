@@ -1,12 +1,4 @@
-#include <stl/hash_map>
-#include <stl/string>
-
-#include <xtl/iterator.h>
-#include <xtl/signal.h>
-
-#include <common/exception.h>
-
-#include <script/invoker.h>
+#include "shared.h"
 
 using namespace script;
 
@@ -108,7 +100,7 @@ const Invoker* InvokerRegistry::Find (const char* name) const
 namespace
 {
 
-struct InvokerNameSelector
+struct InvokerSelector
 {
   template <class T> Invoker& operator () (T& value) const { return value.second.invoker; }
 };
@@ -117,12 +109,12 @@ struct InvokerNameSelector
 
 InvokerRegistry::Iterator InvokerRegistry::CreateIterator ()
 {
-  return Iterator (impl->invokers.begin (), impl->invokers.begin (), impl->invokers.end (), InvokerNameSelector ());
+  return Iterator (impl->invokers.begin (), impl->invokers.begin (), impl->invokers.end (), InvokerSelector ());
 }
 
 InvokerRegistry::ConstIterator InvokerRegistry::CreateIterator () const
 {
-  return ConstIterator (impl->invokers.begin (), impl->invokers.begin (), impl->invokers.end (), InvokerNameSelector ());
+  return ConstIterator (impl->invokers.begin (), impl->invokers.begin (), impl->invokers.end (), InvokerSelector ());
 }
 
 /*
@@ -131,19 +123,12 @@ InvokerRegistry::ConstIterator InvokerRegistry::CreateIterator () const
 
 const char* InvokerRegistry::InvokerId (const ConstIterator& i) const
 {
-  const InvokerMap::const_iterator* citer = i.target<InvokerMap::const_iterator> ();
-
-  if (citer)
-    return (*citer)->second.name.c_str ();  
-    
   const InvokerMap::iterator* iter = i.target<InvokerMap::iterator> ();
-  
-  if (iter)
-    return (*iter)->second.name.c_str ();
-    
-  common::RaiseInvalidArgument ("script::InvokerRegistry::InvokerId", "iterator", "wrong-type");
-  
-  return ""; //never called
+
+  if (!iter)
+    common::RaiseInvalidArgument ("script::InvokerRegistry::InvokerId", "iterator", "wrong-type");
+
+  return (*iter)->second.name.c_str ();
 }
 
 /*
@@ -160,6 +145,12 @@ void InvokerRegistry::Register (const char* name, const Invoker& invoker)
   stl::pair<InvokerMap::iterator, bool> insert_result = impl->invokers.insert_pair (name, NamedInvoker (name, invoker));
   
   impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name, insert_result.first->second.invoker);
+}
+
+void InvokerRegistry::Register (const InvokerRegistry& registry)
+{
+  for (InvokerMap::const_iterator i=registry.impl->invokers.begin (), end=registry.impl->invokers.end (); i!=end; ++i)
+    Register (i->second.name.c_str (), i->second.invoker);
 }
 
 void InvokerRegistry::Unregister (const char* name)
@@ -197,10 +188,10 @@ void InvokerRegistry::Clear ()
     Регистрация обработчиков событий
 */
 
-xtl::connection InvokerRegistry::RegisterHandler (InvokerRegistryEvent event_id, const EventHandler& handler) const
+xtl::connection InvokerRegistry::RegisterEventHandler (InvokerRegistryEvent event_id, const EventHandler& handler) const
 {
   if (event_id < 0 || event_id >= InvokerRegistryEvent_Num)
-    common::RaiseInvalidArgument ("script::InvokerRegistry::RegisterHandler", "event_id", event_id);
+    common::RaiseInvalidArgument ("script::InvokerRegistry::RegisterEventHandler", "event_id", event_id);
 
   return impl->handlers [event_id].connect (handler);
 }

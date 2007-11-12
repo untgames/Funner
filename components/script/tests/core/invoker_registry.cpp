@@ -30,10 +30,10 @@ int main (int, char** argv)
     InvokerRegistry registry, registry1;
     Invoker         invoker = make_invoker (&main);
     
-    registry.RegisterHandler  (InvokerRegistryEvent_OnRegisterInvoker, &registry_handler);
-    registry.RegisterHandler  (InvokerRegistryEvent_OnUnregisterInvoker, &registry_handler);
-    registry1.RegisterHandler (InvokerRegistryEvent_OnRegisterInvoker, &registry1_handler);
-    registry1.RegisterHandler (InvokerRegistryEvent_OnUnregisterInvoker, &registry1_handler);
+    registry.RegisterEventHandler  (InvokerRegistryEvent_OnRegisterInvoker, &registry_handler);
+    registry.RegisterEventHandler  (InvokerRegistryEvent_OnUnregisterInvoker, &registry_handler);
+    registry1.RegisterEventHandler (InvokerRegistryEvent_OnRegisterInvoker, &registry1_handler);
+    registry1.RegisterEventHandler (InvokerRegistryEvent_OnUnregisterInvoker, &registry1_handler);
     
     printf ("Register invokers:\n");
     

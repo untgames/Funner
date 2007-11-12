@@ -2,6 +2,7 @@
 #include <xtl/iterator.h>
 #include <xtl/shared_ptr.h>
 #include <script/bind.h>
+#include <script/environment.h>
 
 using namespace script;
 
@@ -23,18 +24,21 @@ int main ()
   {
     printf ("Results of lua_interpreter test:\n");
     
-    xtl::shared_ptr<InvokerRegistry> invoker_registry (new InvokerRegistry);
-    Invoker invoker  = make_invoker (hello_func);
+    xtl::shared_ptr<Environment> env (new Environment);
+    
+    Invoker invoker = make_invoker (hello_func);
+    
+    InvokerRegistry& registry = env->CreateRegistry ("global");
 
-    invoker_registry->Register ("f1", invoker);
+    registry.Register ("f1", invoker);
 
-    xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (invoker_registry));
+    xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (env));
 
     printf ("Interpreter name - %s\n", interpreter->Name ());
-    printf ("Interpreter has function 'f1': %d\n", interpreter->HasFunction ("f1"));    
+    printf ("Interpreter has function 'f1': %d\n", interpreter->HasFunction ("f1"));
     printf ("Unregister 'f1'\n");
 
-    invoker_registry->Unregister ("f1");
+    registry.Unregister ("f1");
 
     printf ("Interpreter has function 'f1': %d\n", interpreter->HasFunction ("f1"));
 

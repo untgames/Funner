@@ -39,7 +39,7 @@ class IStack
     virtual void Push (int value) = 0;
     virtual void Push (void* pointer) = 0;
     virtual void Push (const char* string) = 0;
-    virtual void Push (const xtl::any&) = 0;
+    virtual void Push (const xtl::any& variant) = 0;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Помещение/извлечение из стека специальных символов интерпретации (например имён функций)

@@ -28,7 +28,8 @@ int main ()
     MyStack stack;
     
     A a ("A1");
-    
+
+    stack.PushSymbol ("dummy");
     stack.Push (xtl::ref (a));
     stack.Push (3.0f);
     stack.Push ("Hello world");
@@ -40,6 +41,7 @@ int main ()
     printf ("a.name='%s'\n", a.name.c_str ());
     
     stack.Pop  (stack.Size ());
+    stack.PushSymbol ("dummy");    
     stack.Push (xtl::shared_ptr<X> (new Y));
     
     invoke ("f2", f2, stack);    
@@ -47,6 +49,7 @@ int main ()
     stack.Dump ();
     
     stack.Pop  (stack.Size ());
+    stack.PushSymbol ("dummy");    
     stack.Push (xtl::shared_ptr<const X> (new Y));
 
     invoke ("f2", f2, stack);

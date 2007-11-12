@@ -99,6 +99,7 @@ class InvokerRegistry
 ///Регистрация/удаление шлюзов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Register   (const char* name, const Invoker& invoker);
+    void Register   (const InvokerRegistry& registry); //регистрация копий шлюзов registry
     void Unregister (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +112,7 @@ class InvokerRegistry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (InvokerRegistryEvent, const char* invoker_name, Invoker& invoker)> EventHandler;
 
-    xtl::connection RegisterHandler (InvokerRegistryEvent event_id, const EventHandler& handler) const;
+    xtl::connection RegisterEventHandler (InvokerRegistryEvent event_id, const EventHandler& handler) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

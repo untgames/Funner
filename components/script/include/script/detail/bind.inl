@@ -11,6 +11,7 @@ inline xtl::any make_invoker_argument (T& value)
   return xtl::make_ref_any (value);
 }
 
+inline xtl::any           make_invoker_argument (const xtl::any& value)    { return value; }
 inline char               make_invoker_argument (char value)               { return value; }
 inline signed char        make_invoker_argument (signed char value)        { return value; }
 inline unsigned char      make_invoker_argument (unsigned char value)      { return value; }
