@@ -6,7 +6,7 @@
 
 using namespace script;
 
-const char* lua_f = "function test (object) return object:f(2) end";
+const char* lua_f = "function test (object) return object:f(2) + object:f(3) end";
 
 struct A
 {
@@ -15,10 +15,15 @@ struct A
   int id;
 };
 
-float f (const A& object, int x)
+A f (const A& object, int x)
 {
   printf ("f(A(%d),%d)\n", object.id, x);
-  return 3.0f;
+  return A (object.id + x);
+}
+
+int my_add (const A& object1, const A& object2)
+{
+  return object1.id + object2.id;
 }
 
 void log_function (const char* s)
@@ -34,13 +39,12 @@ int main ()
     
     xtl::shared_ptr<Environment> env (new Environment);
     
-    Invoker invoker = make_invoker (&f);
-    
     InvokerRegistry&           registry (env->CreateRegistry (typeid(A).name ()));
     xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (env));    
 
-    registry.Register ("f", invoker);
-
+    registry.Register ("f", make_invoker (&f));
+    registry.Register ("__add", make_invoker (&my_add));
+    
     interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
 
     printf ("invoke result: %g\n", invoke<float> (*interpreter, "test", A (4)));
