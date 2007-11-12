@@ -12,12 +12,10 @@ Metatable::Metatable (lua_State* in_state, const char* name, InvokerRegistry& in
   : registry (in_registry), state (in_state), table_name (name)
 {
     //создание новой метатаблицы
-
-  if (!luaL_newmetatable (state, name))
-    Raise<RuntimeException> ("script::lua::Metatable::Metatable", "Error at create metatable");
     
-  printf ("test: %d\n", lua_tointeger (state, -1));
-
+  if (!luaL_newmetatable (state, name))
+    Raise<RuntimeException> ("script::lua::Metatable::Metatable", "Error at create metatable");    
+    
     //регистрация обработчиков удаления пользовательских типов данных
 
   static const luaL_reg common_meta_table [] = {
@@ -74,7 +72,7 @@ void Metatable::Destroy ()
 
 void Metatable::RegisterInvoker (const char* invoker_name, Invoker& invoker)
 {
-  luaL_getmetatable     (state, table_name.c_str ()); //optimize!!
+  luaL_getmetatable     (state, table_name.c_str ());
   lua_pushlightuserdata (state, &invoker);
   lua_pushstring        (state, invoker_name);
   lua_pushcclosure      (state, &invoke_dispatch, 2);
@@ -84,7 +82,7 @@ void Metatable::RegisterInvoker (const char* invoker_name, Invoker& invoker)
 
 void Metatable::UnregisterInvoker (const char* invoker_name)
 {
-  luaL_getmetatable (state, table_name.c_str ()); //optimize!!
+  luaL_getmetatable (state, table_name.c_str ());
   lua_pushnil       (state);
   lua_setfield      (state, -2, invoker_name);
 }

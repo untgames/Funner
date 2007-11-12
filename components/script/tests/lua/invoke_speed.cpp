@@ -1,8 +1,11 @@
 #include <stdio.h>
+#include <time.h>
 #include <xtl/iterator.h>
 #include <xtl/shared_ptr.h>
 #include <script/bind.h>
 #include <script/environment.h>
+
+const size_t TOTAL = 100000;
 
 using namespace script;
 
@@ -17,7 +20,6 @@ struct A
 
 A f (const A& object, int x)
 {
-  printf ("f(A(%d),%d)\n", object.id, x);
   return A (object.id + x);
 }
 
@@ -35,7 +37,7 @@ int main ()
 {
   try
   {
-    printf ("Results of lua_interpreter2_test:\n");
+    printf ("Results of invoke_speed_test:\n");
     
     xtl::shared_ptr<Environment> env (new Environment);
     
@@ -46,8 +48,17 @@ int main ()
     registry.Register ("__add", make_invoker (&my_add));
     
     interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
-
-    printf ("invoke result: %g\n", invoke<float> (*interpreter, "test", A (4)));
+    
+    A value (4);
+    
+    clock_t start = clock ();
+    
+    for (size_t i=0; i<TOTAL; i++)
+      invoke<float> (*interpreter, "test", value);
+      
+    clock_t end = clock ();
+    
+    printf ("Operations per second: %.2fk\n", float (TOTAL)/float (end-start)*float (CLK_TCK)/1000.0f);
   }
   catch (std::exception& exception)
   {      

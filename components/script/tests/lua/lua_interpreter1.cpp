@@ -22,7 +22,7 @@ int main ()
 {
   try
   {
-    printf ("Results of lua_interpreter test:\n");
+    printf ("Results of lua_interpreter1_test:\n");
     
     xtl::shared_ptr<Environment> env (new Environment);
     

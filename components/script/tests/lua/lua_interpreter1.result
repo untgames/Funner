@@ -1,4 +1,4 @@
-Results of lua_interpreter test:
+Results of lua_interpreter1_test:
 Interpreter name - Lua 5.1.2
 Interpreter has function 'f1': 1
 Unregister 'f1'
