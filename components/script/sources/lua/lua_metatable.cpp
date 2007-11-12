@@ -15,6 +15,8 @@ Metatable::Metatable (lua_State* in_state, const char* name, InvokerRegistry& in
 
   if (!luaL_newmetatable (state, name))
     Raise<RuntimeException> ("script::lua::Metatable::Metatable", "Error at create metatable");
+    
+  printf ("test: %d\n", lua_tointeger (state, -1));
 
     //регистрация обработчиков удаления пользовательских типов данных
 
