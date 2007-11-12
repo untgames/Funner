@@ -80,7 +80,8 @@ void swap (connection&, connection&);
 class auto_connection: public connection
 {
   public:
-    auto_connection  (const connection&);
+    auto_connection  () {}
+    auto_connection  (const connection&);    
     ~auto_connection ();
     
     auto_connection& operator = (const connection&);
