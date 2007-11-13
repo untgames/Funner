@@ -41,11 +41,12 @@ int main ()
     
     xtl::shared_ptr<Environment> env (new Environment);
     
-    InvokerRegistry&           registry (env->CreateLibrary (typeid(A).name ()));
+    InvokerRegistry&           registry = env->CreateLibrary ("my_library");
     xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (env));    
 
     registry.Register ("f", make_invoker (&f));
     registry.Register ("__add", make_invoker (&my_add));
+    env->RegisterType (typeid (A), "my_library");
     
     interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
     
