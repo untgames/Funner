@@ -15,30 +15,27 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
     table_name (name),
     is_global (table_name == "global")
 {
-    //создание новой библиотеки
+    //регистрация обработчиков удаления пользовательских типов данных
 
-  if (!luaL_newmetatable (state, name))
-    Raise<RuntimeException> ("script::lua::Library::Library", "Error at create Library");
+  static const luaL_reg common_meta_table [] = {
+    {"__gc", &destroy_object},
+    {"__tostring", &dump_to_string},
+    {0, 0}
+  };
 
+  luaL_register (state, name, common_meta_table);
+  lua_pushvalue (state, -1);
+  lua_setfield  (state, LUA_REGISTRYINDEX, name); //регистрация метатаблицы
+
+    //установка индексной таблицы (фактически поле __index метатаблицы указывает на саму метатаблицу)
+
+  lua_pushstring (state, "__index");
+  lua_pushvalue  (state, -2);
+  lua_settable   (state, -3);
+  lua_pop        (state, 1);    
+    
   try
-  {
-      //регистрация обработчиков удаления пользовательских типов данных
-
-    static const luaL_reg common_meta_table [] = {
-      {"__gc", &destroy_object},
-      {"__tostring", &dump_to_string},
-      {0, 0}
-    };
-
-    luaI_openlib (state, 0, common_meta_table, 0);
-
-      //установка индексной таблицы (фактически поле __index метатаблицы указывает на саму метатаблицу)
-
-    lua_pushstring (state, "__index");
-    lua_pushvalue  (state, -2);
-    lua_settable   (state, -3);
-    lua_pop        (state, 1);    
-
+  {    
       //регистрация шлюзов
 
     for (InvokerRegistry::Iterator i=registry.CreateIterator (); i; ++i)
@@ -68,9 +65,11 @@ Library::~Library ()
 void Library::Destroy ()
 {
      //unregister all invokers
- 
-  lua_pushnil  (state);
-  lua_setfield (state, LUA_REGISTRYINDEX, table_name.c_str ());
+
+  lua_pushnil   (state);
+  lua_pushvalue (state, -1);
+  lua_setfield  (state, LUA_REGISTRYINDEX, table_name.c_str ());
+  lua_setfield  (state, LUA_GLOBALSINDEX, table_name.c_str ());
 }
 
 /*

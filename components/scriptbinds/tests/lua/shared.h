@@ -6,18 +6,37 @@
 #include <time.h>
 
 #include <xtl/shared_ptr.h>
-#include <xtl/function.h>
+#include <xtl/bind.h>
 
 #include <script/bind_libraries.h>
 #include <script/environment.h>
 #include <script/bind.h>
 
-#include <common/heap.h>
+#include <common/file.h>
+#include <common/strlib.h>
 
 #include <mathlib.h>
 
 using namespace script;
 using namespace math;
+
+/*
+    Сериализация математических типов в строку
+*/
+
+namespace math
+{
+
+void to_string (stl::string& buffer, const math::vec3f& v)
+{
+  buffer = common::format ("[%g %g %g]", v.x, v.y, v.z);
+}
+
+}
+
+/*
+    Отладочное протоколирование
+*/
 
 inline void log_print (const char* message)
 {
@@ -40,6 +59,37 @@ inline void print (const char* tag, const T& value)
   printf ("%s: ", tag);
   print  (value);
   printf ("\n");
+}
+
+/*
+    Выполнение скрипта    
+*/
+
+void load_script (IInterpreter& interpreter, const char* file_name)
+{
+  common::InputFile file (file_name);
+
+  stl::string buffer (file.Size (), ' ');
+
+  file.Read (&buffer [0], buffer.size ());        
+
+  interpreter.DoCommands (file_name, buffer.c_str (), buffer.size (), &log_print);    
+}
+
+template <class Ret, class T>
+Ret do_script (IInterpreter& interpreter, const char* file_name, const T& arg)
+{
+  load_script (interpreter, file_name);
+
+  return invoke<Ret> (interpreter, "test", arg);
+}
+
+template <class Ret, class T1, class T2>
+Ret do_script (IInterpreter& interpreter, const char* file_name, const T1& arg1, const T2& arg2)
+{
+  load_script (interpreter, file_name);
+
+  return invoke<Ret> (interpreter, "test", arg1, arg2);
 }
 
 #endif

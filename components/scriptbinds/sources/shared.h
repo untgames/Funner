@@ -5,6 +5,10 @@
 #include <script/environment.h>
 #include <script/bind_libraries.h>
 
+#include <stl/functional>
+
+#include <common/strlib.h>
+
 #include <mathlib.h>
 
 #endif
