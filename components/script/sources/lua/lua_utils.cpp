@@ -79,8 +79,6 @@ int unsafe_invoke_dispatch (lua_State* state)
 //функция, вызываемая сборщиком мусора при удалении объектов пользовательского типа данных
 int unsafe_destroy_object (lua_State* state)
 {
-    //получение аргумента
-
   xtl::any* variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, -1));
   
   if (variant && lua_getmetatable (state, -1))
@@ -90,6 +88,26 @@ int unsafe_destroy_object (lua_State* state)
     lua_pop (state, 1);
 
     delete variant;
+  }
+
+  return 0;
+}
+
+//печать в строку состояния объекта пользовательского типа данных
+int unsafe_dump_to_string (lua_State* state)
+{
+  xtl::any* variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, -1));
+  
+  if (variant && lua_getmetatable (state, -1))
+  {
+    lua_pop (state, 1);
+    
+    stl::string buffer;
+
+    to_string      (buffer, *variant);
+    lua_pushstring (state, buffer.c_str ());
+
+    return 1;
   }
 
   return 0;
@@ -118,6 +136,12 @@ int error_handler (lua_State* state)
   Raise<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
 
   return 0;
+}
+
+//печать в строку состояния объекта пользовательского типа данных
+int dump_to_string (lua_State* state)
+{
+  return safe_call (state, &unsafe_dump_to_string);
 }
 
 //функция заказа памяти

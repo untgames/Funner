@@ -39,10 +39,11 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
 
   lua_atpanic (state, &error_handler);
   
-    //регистрация обработчика удаления пользовательского типа данных
+    //регистрация обработчиков пользовательского типа данных
 
   static const luaL_reg user_data_meta_table [] = {
     {"__gc", &destroy_object},
+    {"__tostring", &dump_to_string},
     {0,0}
   };
   

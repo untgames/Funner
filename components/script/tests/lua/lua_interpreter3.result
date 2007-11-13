@@ -1,0 +1,3 @@
+Results of lua_interpreter3_test:
+f(A(4),2)
+to_string: A(6)

@@ -214,6 +214,7 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
 int invoke_dispatch (lua_State*); //вызов шлюза
 int destroy_object  (lua_State*); //удаление объекта
 int error_handler   (lua_State*); //обработчик ошибок
+int dump_to_string  (lua_State*); //печать в строку состояния объекта пользовательского типа данных
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выделение памяти

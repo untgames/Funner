@@ -26,6 +26,7 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
 
     static const luaL_reg common_meta_table [] = {
       {"__gc", &destroy_object},
+      {"__tostring", &dump_to_string},
       {0, 0}
     };
 
