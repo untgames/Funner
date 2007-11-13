@@ -111,6 +111,27 @@ const char* get_al_constant_name (ALenum value)
   }
 }
 
+//получение текстового имени константы OpenALContext
+const char* get_alc_constant_name (ALCenum value)
+{
+  switch (value)
+  {
+    case ALC_ATTRIBUTES_SIZE                       : return "ALC_ATTRIBUTES_SIZE";
+    case ALC_ALL_ATTRIBUTES                        : return "ALC_ALL_ATTRIBUTES";
+    case ALC_MAJOR_VERSION                         : return "ALC_MAJOR_VERSION";
+    case ALC_MINOR_VERSION                         : return "ALC_MINOR_VERSION";
+    case ALC_CAPTURE_SAMPLES                       : return "ALC_CAPTURE_SAMPLES";
+    case ALC_DEFAULT_DEVICE_SPECIFIER              : return "ALC_DEFAULT_DEVICE_SPECIFIER";
+    case ALC_DEVICE_SPECIFIER                      : return "ALC_DEVICE_SPECIFIER";
+    case ALC_EXTENSIONS                            : return "ALC_EXTENSIONS";
+    case ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER      : return "ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER";
+    case ALC_CAPTURE_DEVICE_SPECIFIER              : return "ALC_CAPTURE_DEVICE_SPECIFIER";
+    case ALC_EFX_MAJOR_VERSION                     : return "ALC_EFX_MAJOR_VERSION";
+    case ALC_EFX_MINOR_VERSION                     : return "ALC_EFX_MINOR_VERSION";
+    case ALC_MAX_AUXILIARY_SENDS                   : return "ALC_MAX_AUXILIARY_SENDS";
+    default                                        : return 0;
+  }
+}
 //размерность массива аргументов
 size_t get_array_size (ALenum param)
 {
@@ -141,6 +162,21 @@ struct EnumWrapper
 inline EnumWrapper make_wrapper (ALenum value)
 {
   return EnumWrapper (value);
+}
+
+//обёртка для вывода названий констант OpenALContext
+struct ContextEnumWrapper
+{
+  ContextEnumWrapper (ALCenum in_value) : value (in_value) {}
+  
+  operator ALCenum () const { return value; }
+  
+  ALCenum value;
+};
+
+inline ContextEnumWrapper make_alc_wrapper (ALCenum value)
+{
+  return ContextEnumWrapper (value);
 }
 
 //обёртка для печати массивов
@@ -258,6 +294,14 @@ inline void dump_argument (const EnumWrapper& arg, string& result)
   else       result += name;
 }
 
+inline void dump_argument (const ContextEnumWrapper& arg, string& result)
+{
+  const char* name = get_alc_constant_name (arg.value);
+  
+  if (!name) result += format ("ALCenum (%d)", arg.value);
+  else       result += name;
+}
+
 template <class T>
 inline void dump_argument (const ArrayWrapper<T>& arg, string& result)
 {
@@ -287,6 +331,8 @@ inline void dump_argument (const ArrayWrapper<T>& arg, string& result)
 OpenALContext::OpenALContext  (const char* device_name)
   : debug_log_state (false)
 {
+  ALint attribs[4] = {0};
+
   if (!device_name)
     RaiseNullArgument ("sound::low_level::OpenALContext::OpenALContext", "device_name");
     
@@ -298,7 +344,15 @@ OpenALContext::OpenALContext  (const char* device_name)
   if (!device) 
     Raise<OpenALException> ("sound::low_level::OpenALContext::OpenALContext", "Can't open device '%s'", device_name);
 
-  context = alcCreateContext (device, 0);
+  efx_present = alcIsExtensionPresent ("ALC_EXT_EFX") == ALC_TRUE;
+
+  if (efx_present)
+  {
+    attribs[0] = ALC_MAX_AUXILIARY_SENDS;
+    attribs[1] = MaxTryAuxSends;    
+  }
+  
+  context = alcCreateContext (device, attribs);
 
   if (!context)
   {
@@ -408,6 +462,36 @@ void OpenALContext::CheckErrors (const char* function_name, const Tuple& args)
   }
 }
 
+template <class Tuple>
+void OpenALContext::ContextCheckErrors (const char* function_name, const Tuple& args)
+{
+  ALCenum error = alcGetError (device);
+  
+  try
+  {
+    if (error != ALC_NO_ERROR)
+    {
+      string args_string;
+      
+      dump_arguments (args, args_string);
+      
+      LogPrintf ("Error at call %s(%s). %s", function_name, args_string.c_str (), get_al_error_message (error));
+    }
+    else if (debug_log_state)
+    {
+      string args_string;          
+
+      dump_arguments (args, args_string);
+
+      LogPrintf ("%s(%s)", function_name, args_string.c_str ());
+    }
+  }
+  catch (...)
+  {
+    LogPrintf ("Error at call %s(...). %s", function_name, get_al_error_message (error));
+  }
+}
+
 /*
     Диспетчеры обращений к OpenAL
 */
@@ -425,6 +509,23 @@ Ret OpenALContext::Dispatch (const char* function_name, Fn fn, const Tuple& args
   Ret result = apply<Ret> (fn, args);
 
   CheckErrors (function_name, args);
+
+  return result;
+}
+
+template <class Fn, class Tuple>
+void OpenALContext::ContextDispatch (const char* function_name, Fn fn, const Tuple& args)
+{
+  apply<void> (fn, args);
+  ContextCheckErrors (function_name, args);
+}
+
+template <class Ret, class Fn, class Tuple>
+Ret OpenALContext::ContextDispatch (const char* function_name, Fn fn, const Tuple& args)
+{
+  Ret result = apply<Ret> (fn, args);
+
+  ContextCheckErrors (function_name, args);
 
   return result;
 }
@@ -776,4 +877,18 @@ void OpenALContext::alSpeedOfSound (ALfloat value)
 void OpenALContext::alDistanceModel (ALenum distanceModel)
 {
   Dispatch ("alDistanceModel", &::alDistanceModel, tie (make_wrapper (distanceModel)));
+}
+
+/*
+   Обёртки над вызовами OpenALContext
+*/
+
+ALCboolean OpenALContext::alcIsExtensionPresent (const ALCchar *extname)
+{
+  return ContextDispatch<ALCboolean> ("alcIsExtensionPresent", &::alcIsExtensionPresent, tie (device, extname));
+}
+
+void OpenALContext::alcGetIntegerv (ALCenum param, ALCsizei size, ALCint *data)
+{
+  ContextDispatch ("alcGetIntegerv", &::alcGetIntegerv, tie (device, make_alc_wrapper (param), size, data));
 }

@@ -109,8 +109,10 @@ int main ()
 //    sound_system->SetIntegerParam ("al_debug_log", 1);
 
     printf ("Using device %s.\n", sound_system->Name ());
-    printf ("Total channels available: %u\n", info.channels_count);
+    printf ("Total channels available: %u.\n", info.channels_count);
     printf ("Supported EAX %u.%u.\n", info.eax_major_version, info.eax_minor_version);
+    printf ("Supported EFX %u.%u.\n", info.efx_major_version, info.efx_minor_version);
+    printf ("Maximum auxilary sends %u.\n", info.max_aux_sends);
 
     sound_system->GetListener (listener);
     dump (listener);

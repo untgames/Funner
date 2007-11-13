@@ -5,6 +5,7 @@
 #include <time.h>
 #include <al.h>
 #include <alc.h>
+#include <efx.h>
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/uninitialized_storage.h>
@@ -155,6 +156,12 @@ class OpenALContext
     void alSpeedOfSound( ALfloat value );
     void alDistanceModel( ALenum distanceModel );
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обёртки над вызовами OpenALContext
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ALCboolean alcIsExtensionPresent( const ALCchar *extname );
+    void       alcGetIntegerv( ALCenum param, ALCsizei size, ALCint *data );
+
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Функция протоколирования
@@ -170,11 +177,20 @@ class OpenALContext
     template <class Ret, class Fn, class Tuple>
     Ret Dispatch (const char* function_name, Fn fn, const Tuple& args);
 
+    template <class Fn, class Tuple>
+    void ContextDispatch (const char* function_name, Fn fn, const Tuple& args);
+
+    template <class Ret, class Fn, class Tuple>
+    Ret ContextDispatch (const char* function_name, Fn fn, const Tuple& args);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка ошибок после вызова функции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     template <class Tuple>
     void CheckErrors (const char* function_name, const Tuple& args);
+
+    template <class Tuple>
+    void ContextCheckErrors (const char* function_name, const Tuple& args);
 
   private:
     OpenALContext (const OpenALContext&); //no impl
@@ -184,6 +200,7 @@ class OpenALContext
     ALCdevice*  device;          //устройство OpenAL
     ALCcontext* context;         //контекст OpenAL
     LogHandler  log_handler;     //функтор протоколирования
+    bool        efx_present;     //наличие EFX
     bool        debug_log_state; //нужно ли отладочное протоколирование вызовов OpenAL
 };
 

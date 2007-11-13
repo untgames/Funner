@@ -104,6 +104,15 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
   }
 
   info.channels_count = channels_count;  
+
+  ALCint temp_veriable;
+
+  context.alcGetIntegerv (ALC_EFX_MAJOR_VERSION, 1, &temp_veriable);
+  info.efx_major_version = temp_veriable;
+  context.alcGetIntegerv (ALC_EFX_MINOR_VERSION, 1, &temp_veriable);
+  info.efx_minor_version = temp_veriable;
+  context.alcGetIntegerv (ALC_MAX_AUXILIARY_SENDS, 1, &temp_veriable);
+  info.max_aux_sends = temp_veriable;
 }
 
 OpenALDevice::~OpenALDevice ()
