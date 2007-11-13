@@ -58,6 +58,20 @@ template <size_t I, size_t J, size_t K> vec3f get_vec3f_tuple (vec3f v)
 }
 
 /*
+    Утилиты
+*/
+
+vec3f normalize_vec3f (const vec3f& v)
+{
+  return normalize (v);
+}
+
+vec3f cross_vec3f (const vec3f& v1, const vec3f& v2)
+{
+  return cross (v1, v2);
+}
+
+/*
     Создание шлюзов на бинарные операции
 */
 
@@ -151,27 +165,21 @@ void bind_math_library (Environment& environment)
   math_lib.Register ("vec2", make_invoker (&create_vec2));
   math_lib.Register ("vec1", make_invoker (&create_vec1));
   math_lib.Register ("vec",  make_invoker (&create_vec));
+  
+    //регистрация функций унарных функций над вектором
+    
+  math_lib.Register ("length",    make_invoker<float (vec3f)> (&math::length<float, 3>));
+  math_lib.Register ("qlength",   make_invoker<float (vec3f)> (&math::qlen<float, 3>));
+  math_lib.Register ("normalize", make_invoker<vec3f (vec3f)> (&normalize_vec3f));
+  math_lib.Register ("dot",       make_invoker<float (vec3f, vec3f)> (&math::dot<float, 3>));
+  math_lib.Register ("cross",     make_invoker<vec3f (vec3f, vec3f)> (&cross_vec3f));
+  math_lib.Register ("abs",       make_invoker<vec3f (vec3f)> (&math::abs<float, 3>));
+  math_lib.Register ("min",       make_invoker<vec3f (vec3f, vec3f)> (&math::min<float, 3>));
+  math_lib.Register ("max",       make_invoker<vec3f (vec3f, vec3f)> (&math::max<float, 3>));
 
     //регистрация типов данных
 
   environment.RegisterType (typeid (vec3f), MATHLIB_VEC3F_LIBRARY);
-  
-  
-    
-/*  InvokerRegistry* registry = environment.FindRegistry ("global");
-  
-  if (!registry)
-    return;
-    
-  registry->Register ("vecLength",    make_invoker<float (vec3f)> (&math::length<float, 3>));
-  registry->Register ("vecQLength",   make_invoker<float (vec3f)> (&math::qlen<float, 3>));
-////  registry.Register ("vecNormalize", make_invoker<vec3f (vec3f)> (&math::normalize<float, 3>)); //сделать адаптер вызова
-  registry->Register ("vecDot",       make_invoker<float (vec3f, vec3f)> (&math::dot<float, 3>));
-////  registry.Register ("vecCross",     make_invoker<vec3f (vec3f, vec3f)> (&math::cross<float, 3>));//сделать адаптер вызова
-////  registry.Register ("vecAngle",     make_invoker<float (vec3f)> (&math::angle<float, 3>));
-  registry->Register ("vecAbs",       make_invoker<vec3f (vec3f)> (&math::abs<float, 3>));
-  registry->Register ("vecMin",       make_invoker<vec3f (vec3f, vec3f)> (&math::min<float, 3>));
-  registry->Register ("vecMax",       make_invoker<vec3f (vec3f, vec3f)> (&math::max<float, 3>));*/
 }
 
 }
