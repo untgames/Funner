@@ -41,7 +41,7 @@ int main ()
     
     xtl::shared_ptr<Environment> env (new Environment);
     
-    InvokerRegistry&           registry (env->CreateRegistry (typeid(A).name ()));
+    InvokerRegistry&           registry (env->CreateLibrary (typeid(A).name ()));
     xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (env));    
 
     registry.Register ("f", make_invoker (&f));
@@ -58,7 +58,7 @@ int main ()
       
     clock_t end = clock ();
     
-    printf ("Operations per second: %.2fk\n", float (TOTAL)/float (end-start)*float (CLK_TCK)/1000.0f);
+    printf ("Invokations per second: %.2fk\n", float (TOTAL)/float (end-start)*float (CLK_TCK)/1000.0f);
   }
   catch (std::exception& exception)
   {      

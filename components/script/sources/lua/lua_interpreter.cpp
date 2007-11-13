@@ -5,58 +5,18 @@ using namespace script::lua;
 using namespace common;
 using namespace xtl;
 
-#ifdef _MSC_VER
-  #pragma warning (disable : 4355) //'this' : used in base member initializer list
-#endif
+/*
+    Имя вариантного типа данных по умолчанию
+*/
 
-namespace
+namespace script
 {
 
-//функция протоколирования по умолчанию
-void log_function (const char*)
+namespace lua
 {
-}
 
-//функция обработки ошибок lua
-int error_handler (lua_State* state)
-{
-  Raise<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
+const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";
 
-  return 0;
-}
-
-//функция заказа памяти
-void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
-{
-  try
-  {
-    common::Heap& heap = *reinterpret_cast<common::Heap*> (user_data);
-
-    if (!new_size)
-    {
-      heap.Deallocate (ptr);
-      return 0;    
-    }
-
-    void* new_buffer = heap.Allocate (new_size);
-
-    if (!new_buffer)
-      return 0;    
-
-    if (ptr)
-    {
-      memcpy (new_buffer, ptr, old_size < new_size ? old_size : new_size);
-
-      heap.Deallocate (ptr);
-    }
-
-    return new_buffer;
-  }
-  catch (...)
-  {
-    //подавляем все исключения
-    return 0;
-  }
 }
 
 }
@@ -67,73 +27,48 @@ void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
 
 Interpreter::Interpreter (const EnvironmentPointer& in_environment)
   : environment (in_environment),
-    ref_count (1)
+    stack (state, *environment)
 {
-    //инициализация состояния lua
+    //инициализация стандартных библиотек
 
-  state = lua_newstate (&reallocate, &MemoryManager::GetHeap ());
+  luaopen_base   (state);
+  luaopen_string (state);
+  luaopen_table  (state);    
 
-  if (!state)
-    Raise <InterpreterException> ("script::lua::Interpreter::Interpreter", "Can't create lua state");
+    //регистрация функции обработки ошибок
 
-  try
-  {
-    luaL_openlibs (state);
+  lua_atpanic (state, &error_handler);
+  
+    //регистрация обработчика удаления пользовательского типа данных
 
-      //регистрация обработчиков удаления пользовательских типов данных    
+  static const luaL_reg user_data_meta_table [] = {
+    {"__gc", &destroy_object},
+    {0,0}
+  };
+  
+  luaL_newmetatable (state, VARIANT_DEFAULT_TYPE_NAME);
+  luaI_openlib      (state, 0, user_data_meta_table, 0);
 
-    static const luaL_reg user_data_meta_table [] = {
-      {"__gc", &destroy_object},
-      {0,0}
-    };
-    
-    luaL_newmetatable (state, USER_DATA_TAG);
-    luaI_openlib      (state, 0, user_data_meta_table, 0); //must be 1
+    //регистрация обработчиков событий создания/удаления библиотек
 
-      //регистрация функции обработки ошибок
+  on_create_library_connection = environment->RegisterEventHandler (EnvironmentLibraryEvent_OnCreate,
+    xtl::bind (&Interpreter::RegisterLibrary, this, _2, _3));
 
-    lua_atpanic (state, &error_handler);
+  on_remove_library_connection = environment->RegisterEventHandler (EnvironmentLibraryEvent_OnRemove,
+    xtl::bind (&Interpreter::UnregisterLibrary, this, _2));
 
-      //инициализация стека
+    //регистрация библиотек
 
-    stack.SetState (state);
-    
-      //регистрация обработчиков событий создания/удаления реестров
-      
-    on_create_registry_connection = environment->RegisterEventHandler (EnvironmentEvent_OnCreateRegistry,
-      xtl::bind (&Interpreter::RegisterInvokerRegistry, this, _2, _3));
-      
-    on_remove_registry_connection = environment->RegisterEventHandler (EnvironmentEvent_OnRemoveRegistry,
-      xtl::bind (&Interpreter::UnregisterInvokerRegistry, this, _2));
-      
-      //регистрация обработчиков событий появления новых реестров
+  for (Environment::Iterator i=environment->CreateIterator (); i; ++i)
+    RegisterLibrary (environment->LibraryId (i), *i);
 
-    for (Environment::Iterator i=environment->CreateIterator (); i; ++i)
-      RegisterInvokerRegistry (environment->RegistryId (i), *i);
+    //очистка стека
 
-      //очистка стека
-
-    lua_settop (state, 0);
-  }
-  catch (...)
-  {
-    lua_close (state);
-    throw;
-  }
+  lua_settop (state, 0);
 }
 
 Interpreter::~Interpreter ()
 {
-    //удаление метатаблиц
-    
-  for (MetatableMap::iterator i=metatables.begin (), end=metatables.end (); i!=end; ++i)
-    delete i->second;
-    
-  metatables.clear ();
-    
-    //закрытие lua
-
-  lua_close (state);
 }
 
 /*
@@ -175,6 +110,16 @@ bool Interpreter::HasFunction (const char* name)
 /*
     Выполнение буфера интерпретации луа
 */
+
+namespace
+{
+
+//функция протоколирования по умолчанию
+void log_function (const char*)
+{
+}
+
+}
 
 void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_t buffer_size, const LogFunction& log)
 {
@@ -244,130 +189,32 @@ void Interpreter::Invoke (size_t arguments_count, size_t results_count)
 
 void Interpreter::AddRef ()
 {
-  ref_count++;
+  addref (this);
 }
 
 void Interpreter::Release ()
 {
-  if (!--ref_count)
-    delete this;
+  release (this);
 }
-
+   
 /*
-   Регистрация / удаление шлюзов
+    Регистрация / удаление библиотек
 */
 
-void Interpreter::RegisterInvoker (const char* invoker_name, Invoker& invoker)
-{
-  if (!invoker_name)
-    RaiseNullArgument ("script::lua::Interpreter::RegisterInvoker", "invoker_name");
-    
-    //регистрация С-closure
-    
-  lua_pushlightuserdata (state, &invoker);
-  lua_pushstring        (state, invoker_name);  //??????
-  lua_pushcclosure      (state, &invoke_dispatch, 2);
-  lua_setglobal         (state, invoker_name);
-}
-
-void Interpreter::UnregisterInvoker (const char* invoker_name)
-{
-  if (!invoker_name)
-    return;
-
-  lua_pushnil    (state);
-  lua_setglobal  (state, invoker_name);
-}
-    
-/*
-    Регистрация / удаление реестров
-*/
-
-void Interpreter::RegisterInvokerRegistry (const char* registry_name, InvokerRegistry& registry)
-{
-  if (!registry_name)
-    RaiseNullArgument ("script::lua::RegisterInvokerRegistry", "registry_name");     
-    
-    //проверка: является ли регистрируемый реестр глобальным
-
-  if (!strcmp ("global", registry_name))
-  {
-    RegisterGlobalRegistry (registry);
-  }
-  else
-  {    
-      //регистрация мета-таблицы
-      
-    Metatable* metatable = new Metatable (state, registry_name, registry);
-    
-    try
-    {
-      metatables.insert_pair (registry_name, metatable);
-    }
-    catch (...)
-    {
-      delete metatable;
-      throw;
-    }
-  }
-}
-
-void Interpreter::UnregisterInvokerRegistry (const char* registry_name)
-{
-  if (!registry_name)
-    return;
-       
-  if (!strcmp ("global", registry_name))
-  {
-    on_register_invoker_connection.disconnect ();
-    on_unregister_invoker_connection.disconnect ();
-  }
-  else
-  {
-      //удаление метатаблицы      
-
-    MetatableMap::iterator iter = metatables.find (registry_name);
-
-    if (iter == metatables.end ())
-      return;
-
-    delete iter->second;
-
-    metatables.erase (iter);
-  }
-}
-
-void Interpreter::RegisterGlobalRegistry (InvokerRegistry& registry)
-{
-    //регистрация обработчиков событий
-
-  on_register_invoker_connection = registry.RegisterEventHandler (InvokerRegistryEvent_OnRegisterInvoker,
-      bind (&Interpreter::RegisterInvoker, this, _2, _3));
-
-  on_unregister_invoker_connection = registry.RegisterEventHandler (InvokerRegistryEvent_OnUnregisterInvoker,
-      bind (&Interpreter::UnregisterInvoker, this, _2));
-      
-    //регистрация шлюзов
-    
-  for (InvokerRegistry::Iterator i=registry.CreateIterator (); i; ++i)
-    RegisterInvoker (registry.InvokerId (i), *i);
-}
-
-/*
-    Поиск метатаблицы
-*/
-
-Metatable* Interpreter::FindMetatable (const char* name) const
+void Interpreter::RegisterLibrary (const char* name, InvokerRegistry& registry)
 {
   if (!name)
-    return 0;
+    RaiseNullArgument ("script::lua::RegisterLibrary", "name");
+
+  libraries.insert_pair (name, LibraryPtr (new Library (*this, name, registry), false));
+}
+
+void Interpreter::UnregisterLibrary (const char* name)
+{
+  if (!name)
+    return;
     
-  MetatableMap::const_iterator iter = metatables.find (name);
-  
-  if (iter == metatables.end ())
-    return 0;
-    
-  return iter->second;
+  libraries.erase (name);
 }
 
 namespace script

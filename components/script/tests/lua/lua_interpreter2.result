@@ -1,0 +1,4 @@
+Results of lua_interpreter2_test:
+f(A(4),2)
+f(A(4),3)
+invoke result: 13

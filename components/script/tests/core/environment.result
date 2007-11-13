@@ -1,0 +1,18 @@
+Results of environment:
+Create libraries:
+  create 'library1'
+  create 'library2'
+Register types:
+Unregister libraries:
+  remove 'library2'
+Check types:
+  'float' type not found
+  'int' type found
+  'double' type not found
+Traverse libraries:
+  library 'library1'
+Search 'f1', 'f2':
+  library 'library1' found
+  library 'library2' not found
+Exit
+  remove 'library1'

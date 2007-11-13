@@ -10,41 +10,59 @@ using namespace common;
 namespace
 {
 
-struct NamedRegistry
+struct LibraryImpl
 {
-  stl::string     name;     //им€ реестра
+  stl::string     id;       //идентификатор библиотеки
   InvokerRegistry registry; //реестр
 
-  NamedRegistry (const char* in_name) : name (in_name) {}    
+  LibraryImpl (const char* in_id) : id (in_id) {}    
 };
+
+typedef stl::hash_map<stl::hash_key<const char*>, LibraryImpl*>                    LibraryMap;
+typedef stl::hash_map<const std::type_info*, LibraryImpl*>                         LinkMap;
+typedef xtl::signal<void (EnvironmentLibraryEvent, const char*, InvokerRegistry&)> EnvironmentSignal;
 
 }
 
-typedef stl::hash_map<stl::hash_key<const char*>, NamedRegistry*>           RegistryMap;
-typedef xtl::signal<void (EnvironmentEvent, const char*, InvokerRegistry&)> EnvironmentSignal;
-
 struct Environment::Impl
 {
-  RegistryMap       registries;                       //реестры
-  EnvironmentSignal handlers [EnvironmentEvent_Num];  //сигналы
-  
+  LibraryMap        libraries;                               //библиотеки
+  LinkMap           links;                                   //ссылки
+  EnvironmentSignal handlers [EnvironmentLibraryEvent_Num];  //сигналы
+
   Impl () {}
-  Impl (const Impl& impl) : registries (impl.registries) {}
-  
-  void Notify (EnvironmentEvent event_id, const char* name, InvokerRegistry& registry)
+  Impl (const Impl& impl) : libraries (impl.libraries), links (impl.links) {}
+
+  void Notify (EnvironmentLibraryEvent event_id, const char* id, InvokerRegistry& registry)
   {
     if (!handlers [event_id])
       return;
       
     try
     {      
-      handlers [event_id] (event_id, name, registry);
+      handlers [event_id] (event_id, id, registry);
     }
     catch (...)
     {
       //подавл€ем все исключени€
     }
-  }  
+  }
+  
+  void RemoveLinks (LibraryImpl* library)
+  {
+    for (LinkMap::iterator i=links.begin (), end=links.end (); i!=end;)
+      if (i->second == library)
+      {
+        LinkMap::iterator tmp = i;
+
+        ++tmp;
+
+        links.erase (i);
+
+        i = tmp;
+      }
+      else ++i;
+  }
 };
 
 /*
@@ -76,64 +94,137 @@ Environment& Environment::operator = (const Environment& environment)
 }
 
 /*
-    —оздание / удаление / поиск реестров
+    —оздание / удаление / поиск библиотек
 */
 
-InvokerRegistry& Environment::CreateRegistry (const char* id)
+InvokerRegistry& Environment::CreateLibrary (const char* id)
 {
   if (!id)
-    RaiseNullArgument ("script::Environment::CreateRegistry", "id");
+    RaiseNullArgument ("script::Environment::CreateLibrary", "id");
 
-  RegistryMap::const_iterator iter = impl->registries.find (id);
+  LibraryMap::const_iterator iter = impl->libraries.find (id);
 
-  if (iter != impl->registries.end ())
-    RaiseInvalidArgument ("script::Environment::CreateRegistry", "id", id, "Registry with this name already registered");
+  if (iter != impl->libraries.end ())
+    RaiseInvalidArgument ("script::Environment::CreateLibrary", "id", id, "Library with this id already registered");
 
-  NamedRegistry* named_registry = new NamedRegistry (id);
+  LibraryImpl* library = new LibraryImpl (id);
 
   try
   {
-    impl->registries.insert_pair (id, named_registry);
+    impl->libraries.insert_pair (id, library);
   }
   catch (...)
   {
-    delete named_registry;
+    delete library;
     throw;
   }
 
-  impl->Notify (EnvironmentEvent_OnCreateRegistry, id, named_registry->registry);
+  impl->Notify (EnvironmentLibraryEvent_OnCreate, id, library->registry);
 
-  return named_registry->registry;
+  return library->registry;
 }
 
-void Environment::RemoveRegistry (const char* id)
+void Environment::RemoveLibrary (const char* id)
 {
   if (!id)
     return;
     
-  RegistryMap::iterator iter = impl->registries.find (id);
+  LibraryMap::iterator iter = impl->libraries.find (id);
   
-  if (iter == impl->registries.end ())
+  if (iter == impl->libraries.end ())
     return;
 
-  impl->Notify (EnvironmentEvent_OnRemoveRegistry, id, iter->second->registry);
+  impl->Notify (EnvironmentLibraryEvent_OnRemove, id, iter->second->registry);  
+  impl->RemoveLinks (iter->second);
 
-  delete iter->second;
+  delete iter->second;  
 
-  impl->registries.erase (iter);
+  impl->libraries.erase (iter);
 }
 
-InvokerRegistry* Environment::FindRegistry (const char* id) const
+void Environment::RemoveAllLibraries ()
+{
+    //оповещение об удалении библиотек
+    
+  for (LibraryMap::iterator iter = impl->libraries.begin (), end = impl->libraries.end (); iter != end; ++iter)
+    impl->Notify (EnvironmentLibraryEvent_OnRemove, iter->second->id.c_str (), iter->second->registry);
+
+    //удаление библиотек
+    
+  for (LibraryMap::iterator iter = impl->libraries.begin (), end = impl->libraries.end (); iter != end; ++iter)   
+    delete iter->second;
+
+  impl->libraries.clear ();
+  impl->links.clear ();
+}
+
+/*
+    –егистраци€ ассоциаций
+*/
+
+void Environment::RegisterType (const std::type_info& type, const char* library_id)
+{
+  if (!library_id)
+    RaiseNullArgument ("script::Environment::RegisterType", "library_id");
+    
+  LibraryMap::iterator iter = impl->libraries.find (library_id);
+  
+  if (iter == impl->libraries.end ())
+    RaiseInvalidArgument ("script::Environment::RegisterType", "library_id", library_id, "No library with this id");
+
+  impl->links [&type] = iter->second;
+}
+
+void Environment::UnregisterType (const std::type_info& type)
+{   
+  impl->links.erase (&type);
+}
+
+void Environment::UnregisterAllTypes ()
+{
+  impl->links.clear ();
+}
+
+/*
+    ѕоиск библиотеки
+*/
+
+InvokerRegistry* Environment::FindLibrary (const char* id) const
 {
   if (!id)
     return 0;
     
-  RegistryMap::iterator iter = impl->registries.find (id);
+  LibraryMap::iterator iter = impl->libraries.find (id);
   
-  if (iter == impl->registries.end ())
+  if (iter == impl->libraries.end ())
     return 0;
 
   return &iter->second->registry;
+}
+
+InvokerRegistry& Environment::Library (const char* id)
+{
+  InvokerRegistry* registry = FindLibrary (id);
+  
+  if (registry)
+    return *registry;
+
+  return CreateLibrary (id);
+}
+
+const char* Environment::FindLibraryId (const std::type_info& type) const
+{
+  LinkMap::const_iterator iter = impl->links.find (&type);
+  
+  if (iter == impl->links.end ())
+    return 0;
+    
+  return iter->second->id.c_str ();
+}
+
+InvokerRegistry* Environment::FindLibrary (const std::type_info& type) const
+{
+  return FindLibrary (FindLibraryId (type));
 }
 
 /*
@@ -142,17 +233,8 @@ InvokerRegistry* Environment::FindRegistry (const char* id) const
 
 void Environment::Clear ()
 {
-    //оповещение об удалении реестров
-    
-  for (RegistryMap::iterator iter = impl->registries.begin (), end = impl->registries.end (); iter != end; ++iter)
-    impl->Notify (EnvironmentEvent_OnRemoveRegistry, iter->second->name.c_str (), iter->second->registry);
-
-    //удаление шлюзов
-    
-  for (RegistryMap::iterator iter = impl->registries.begin (), end = impl->registries.end (); iter != end; ++iter)
-    delete iter->second;
-
-  impl->registries.clear ();  
+  RemoveAllLibraries ();
+  UnregisterAllTypes (); 
 }
     
 /*
@@ -171,35 +253,35 @@ struct RegistrySelector
 
 Environment::Iterator Environment::CreateIterator ()
 {
-  return Iterator (impl->registries.begin (), impl->registries.begin (), impl->registries.end (), RegistrySelector ());
+  return Iterator (impl->libraries.begin (), impl->libraries.begin (), impl->libraries.end (), RegistrySelector ());
 }
 
 Environment::ConstIterator Environment::CreateIterator () const
 {
-  return ConstIterator (impl->registries.begin (), impl->registries.begin (), impl->registries.end (), RegistrySelector ());
+  return ConstIterator (impl->libraries.begin (), impl->libraries.begin (), impl->libraries.end (), RegistrySelector ());
 }
 
 /*
-    ѕолучение имени реестра по итератору
+    ѕолучение имени библиотеки по итератору
 */
 
-const char* Environment::RegistryId (const ConstIterator& i) const
+const char* Environment::LibraryId (const ConstIterator& i) const
 {
-  const RegistryMap::iterator* iter = i.target<RegistryMap::iterator> ();
+  const LibraryMap::iterator* iter = i.target<LibraryMap::iterator> ();
 
   if (!iter)
-    common::RaiseInvalidArgument ("script::Environment::RegistryId", "iterator", "wrong-type");
+    common::RaiseInvalidArgument ("script::Environment::LibraryId", "iterator", "wrong-type");
 
-  return (*iter)->second->name.c_str ();
+  return (*iter)->second->id.c_str ();
 }
 
 /*
     –егистраци€ обработчиков событий
 */
 
-xtl::connection Environment::RegisterEventHandler (EnvironmentEvent event_id, const EventHandler& handler)
+xtl::connection Environment::RegisterEventHandler (EnvironmentLibraryEvent event_id, const EventHandler& handler)
 {
-  if (event_id < 0 || event_id >= EnvironmentEvent_Num)
+  if (event_id < 0 || event_id >= EnvironmentLibraryEvent_Num)
     common::RaiseInvalidArgument ("script::Environment::RegisterEventHandler", "event_id", event_id);
 
   return impl->handlers [event_id].connect (handler);

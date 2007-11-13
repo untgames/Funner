@@ -14,6 +14,7 @@
 #include <common/strlib.h>
 
 #include <script/bind.h>
+#include <script/environment.h>
 
 using namespace script;
 

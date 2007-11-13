@@ -57,24 +57,21 @@ int unsafe_invoke_dispatch (lua_State* state)
 {
     //получение указателя на шлюз      
 
-  const Invoker* invoker      = reinterpret_cast<const Invoker*> (lua_touserdata (state, lua_upvalueindex (1)));
-  const char*    invoker_name = lua_tostring (state, lua_upvalueindex (2));
+  const Invoker* invoker   = reinterpret_cast<const Invoker*> (lua_touserdata (state, lua_upvalueindex (1)));
+  Interpreter* interpreter = reinterpret_cast<Interpreter*> (lua_touserdata (state, lua_upvalueindex (2)));
 
-  if (!invoker_name)
-    Raise<UndefinedFunctionCallException> ("script::lua::InvokerDispatch::operator ()", "Undefined function call (no up-values found)");
-
-  if (!invoker)
-    Raise<RuntimeException> ("script::lua::InvokerDispatch::operator ()", "Null invoker call (no up-values found)");
+  if (!invoker || !interpreter)
+    Raise<RuntimeException> ("script::lua::invoke_dispatch", "Bad invoker call (no up-values found)");
 
     //проверка количества переданных аргументов
 
-  if (invoker->ArgumentsCount () != lua_gettop (state))
-    Raise<StackException> ("script::lua::InvokerDispatch::operator ()", "Arguments count mismatch (expected %u, got %u)", 
+  if ((int)invoker->ArgumentsCount () > lua_gettop (state))
+    Raise<StackException> ("script::lua::invoke_dispatch", "Arguments count mismatch (expected %u, got %u)", 
                            invoker->ArgumentsCount (), lua_gettop (state));
 
     //вызов шлюза
-  
-  (*invoker)(Stack (state));
+
+  (*invoker)(interpreter->Interpreter::Stack ());
 
   return invoker->ResultsCount ();
 }
@@ -82,13 +79,18 @@ int unsafe_invoke_dispatch (lua_State* state)
 //функция, вызываемая сборщиком мусора при удалении объектов пользовательского типа данных
 int unsafe_destroy_object (lua_State* state)
 {
-  xtl::any* variant = reinterpret_cast<xtl::any*> (luaL_checkudata (state, -1, USER_DATA_TAG));
-  
-  if (!variant)
-    return 0;    
+    //получение аргумента
 
-  delete variant; //!!!!
-//    stl::destroy (variant);  
+  xtl::any* variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, -1));
+  
+  if (variant && lua_getmetatable (state, -1))
+  {
+      //все пользовательские типы данных, хранимые в стеке, приводятся к xtl::any*. проверка совпадения метатаблиц не требуется
+    
+    lua_pop (state, 1);
+
+    delete variant;
+  }
 
   return 0;
 }
@@ -98,14 +100,58 @@ int unsafe_destroy_object (lua_State* state)
 namespace lua
 {
 
+//вызов шлюза
 int invoke_dispatch (lua_State* state)
 {
   return safe_call (state, &unsafe_invoke_dispatch);
 }
 
+//удаление объекта
 int destroy_object (lua_State* state)
 {
   return safe_call (state, &unsafe_destroy_object);
+}
+
+//функция обработки ошибок lua
+int error_handler (lua_State* state)
+{
+  Raise<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
+
+  return 0;
+}
+
+//функция заказа памяти
+void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
+{
+  try
+  {
+    common::Heap& heap = *reinterpret_cast<common::Heap*> (user_data);
+
+    if (!new_size)
+    {
+      heap.Deallocate (ptr);
+      return 0;    
+    }
+
+    void* new_buffer = heap.Allocate (new_size);
+
+    if (!new_buffer)
+      return 0;    
+
+    if (ptr)
+    {
+      memcpy (new_buffer, ptr, old_size < new_size ? old_size : new_size);
+
+      heap.Deallocate (ptr);
+    }
+
+    return new_buffer;
+  }
+  catch (...)
+  {
+    //подавляем все исключения
+    return 0;
+  }
 }
 
 }

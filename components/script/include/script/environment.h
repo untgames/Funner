@@ -1,6 +1,7 @@
 #ifndef SCRIPTLIB_ENVIRONMENT_HEADER
 #define SCRIPTLIB_ENVIRONMENT_HEADER
 
+#include <typeinfo>
 #include <xtl/functional_fwd>
 #include <stl/auto_ptr.h>
 #include <script/invoker.h>
@@ -11,12 +12,12 @@ namespace script
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///События окружения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum EnvironmentEvent
+enum EnvironmentLibraryEvent
 {
-  EnvironmentEvent_OnCreateRegistry, //генерируется после создания нового реестра
-  EnvironmentEvent_OnRemoveRegistry, //генерируется перед удалением реестра
+  EnvironmentLibraryEvent_OnCreate, //генерируется после создания новой библиотеки
+  EnvironmentLibraryEvent_OnRemove, //генерируется перед удалением библиотеки
   
-  EnvironmentEvent_Num
+  EnvironmentLibraryEvent_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +26,7 @@ enum EnvironmentEvent
 class Environment
 {
   public:
-    typedef xtl::function<void (EnvironmentEvent event, const char* registry_id, InvokerRegistry& registry)> EventHandler;
+    typedef xtl::function<void (EnvironmentLibraryEvent event, const char* library_id, InvokerRegistry& registry)> EventHandler;
     typedef xtl::iterator<InvokerRegistry>        Iterator;
     typedef xtl::iterator<const InvokerRegistry>  ConstIterator;
   
@@ -48,17 +49,36 @@ class Environment
     ConstIterator CreateIterator () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение имени реестра по итератору
+///Получение имени библиотеки по итератору
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* RegistryId (const ConstIterator&) const;    
+    const char* LibraryId (const ConstIterator&) const;    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание / удаление / поиск реестров
+///Создание / удаление библиотеки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    InvokerRegistry& CreateRegistry (const char* id);
-    void             RemoveRegistry (const char* id);   
-    InvokerRegistry* FindRegistry   (const char* id) const;
-    
+    InvokerRegistry& CreateLibrary (const char* id);
+    void             RemoveLibrary (const char* id);
+    void             RemoveAllLibraries ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация ассоциаций между C++ RTTI и библиотеками
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RegisterType       (const std::type_info& type, const char* library_id);
+    void UnregisterType     (const std::type_info& type);
+    void UnregisterAllTypes ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск библиотеки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    InvokerRegistry* FindLibrary   (const char* id) const;
+    InvokerRegistry* FindLibrary   (const std::type_info& type) const;
+    const char*      FindLibraryId (const std::type_info& type) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск библиотеки по имени и создание её в случае отстуствия
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    InvokerRegistry& Library (const char* id);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,7 +87,7 @@ class Environment
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация обработчиков событий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    xtl::connection RegisterEventHandler (EnvironmentEvent event, const EventHandler& handler);
+    xtl::connection RegisterEventHandler (EnvironmentLibraryEvent event, const EventHandler& handler);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

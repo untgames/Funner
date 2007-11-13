@@ -4,39 +4,14 @@ using namespace script;
 using namespace script::lua;
 using namespace common;
 
-namespace script
-{
-
-namespace lua
-{
-
-//тэг пользовательских данных
-const char* USER_DATA_TAG = "user_data";
-
-}
-
-}
-
 /*
     Конструкторы
 */
 
-Stack::Stack ()
-  : state (0)
+Stack::Stack (lua_State* in_state, Environment& in_environment)
+  : state (in_state),
+    environment (in_environment)
   {}
-
-Stack::Stack (lua_State* in_state)
-  : state (in_state)
-  {}  
-  
-/*
-    Состояние машины Lua
-*/
-
-void Stack::SetState (lua_State* in_state)
-{
-  state = in_state;
-}
 
 /*
     Количество аргументов в стеке
@@ -106,33 +81,23 @@ xtl::any& Stack::GetVariant (size_t index)
 
   xtl::any* variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, index));
   
-  return *variant; //for tests only!!!
-
-    //получение мета-таблицы
-
-/*  if (variant && lua_getmetatable (state, index))
+  if (variant && lua_getmetatable (state, index))
   {
-    lua_getfield (state, LUA_REGISTRYINDEX, USER_DATA_TAG); //кэшировать!!!!!
+      //все пользовательские типы данных, хранимые в стеке, приводятся к xtl::any*. проверка совпадения метатаблиц не требуется
     
-      //проверка совпадения типов
-    
-    if (lua_rawequal (state, -1, -2))
-    {
-      lua_pop (state, 2);
-
-      return *variant;
-    }
+    lua_pop (state, 1);
+    return *variant;
   }
 
     //если типы не совпали
 
-  luaL_typerror (state, index, USER_DATA_TAG);
+  luaL_typerror (state, index, "xtl::any");
 
     //генерация исключения
 
   Raise<RuntimeException> ("script::Stack::GetVariant", "Item %u has wrong type (non user-data)", index);
   
-  return *variant;*/
+  return *variant;
 }
 
 /*
@@ -190,27 +155,16 @@ void Stack::PushSymbol (const char* symbol)
 
 void Stack::Push (const xtl::any& value)
 {
-//  static const size_t BUFFER_SIZE = sizeof (xtl::any);  
-//  void* buffer = lua_newuserdata (state, BUFFER_SIZE);
+  const char* library_id = environment.FindLibraryId (value.type ());
+  
+  if (!library_id)
+    library_id = VARIANT_DEFAULT_TYPE_NAME;
+
   xtl::any* object = new xtl::any (value);
 
-//  if (!buffer)
-//    Raise<StackException> ("script::lua::Stack::Push(const xtl::any&)", "Fail to allocate %u bytes from lua stack", BUFFER_SIZE);
-
   lua_pushlightuserdata (state, object);
-//  luaL_getmetatable (state, USER_DATA_TAG);
-  luaL_getmetatable (state, object->type ().name ()); //for tests only!!!
-  lua_setmetatable  (state, -2);
-
-/*  try
-  {
-    new (buffer) xtl::any (object);
-  }
-  catch (...)
-  {
-    Stack::Pop (1);
-    throw;
-  }*/
+  luaL_getmetatable     (state, library_id);
+  lua_setmetatable      (state, -2);
 }
 
 /*

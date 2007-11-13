@@ -9,8 +9,10 @@
 #include <xtl/any.h>
 #include <xtl/connection.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
 #include <xtl/bind.h>
+#include <xtl/reference_counter.h>
 
 #include <common/heap.h>
 #include <common/strlib.h>
@@ -25,8 +27,41 @@ namespace script
 namespace lua
 {
 
+//forward declaration
+class Interpreter;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Стек Lua
+///Имя вариантного типа данных "по умолчанию"
+///////////////////////////////////////////////////////////////////////////////////////////////////
+extern const char* VARIANT_DEFAULT_TYPE_NAME;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Состояние машины lua
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class StateHolder
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    StateHolder  ();
+    ~StateHolder ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение состояния
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    lua_State* State () const { return state; }
+
+  private:
+    StateHolder (const StateHolder&); //no impl
+    StateHolder& operator = (const StateHolder&); //no impl
+
+  protected:
+    lua_State* state;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Стек
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Stack: public IStack
 {
@@ -34,14 +69,7 @@ class Stack: public IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Stack ();
-    Stack (lua_State*);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Состояние машины Lua
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void       SetState (lua_State*);
-    lua_State* State    () const { return state; }    
+    Stack (lua_State* state, Environment& environment);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество аргументов в стеке
@@ -50,7 +78,7 @@ class Stack: public IStack
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение аргументов из стека
-///////////////////////////////////////////////////////////////////////////////////////////////////    
+///////////////////////////////////////////////////////////////////////////////////////////////////
     float       GetFloat   (size_t index);
     int         GetInteger (size_t index);
     void*       GetPointer (size_t index);
@@ -72,27 +100,23 @@ class Stack: public IStack
 ///Удаление аргументов из стека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Pop (size_t arguments_count);
-    
+
   private:
-    lua_State* state;    
+    lua_State*   state;
+    Environment& environment;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Метатаблица Lua
+///Библиотека Lua
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Metatable
+class Library: public xtl::reference_counter
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Metatable  (lua_State* state, const char* name, InvokerRegistry& registry);
-    ~Metatable ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Номер таблицы
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//    int Index () const { return table_index; }
+    Library  (Interpreter& interpreter, const char* name, InvokerRegistry& registry);
+    ~Library ();
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,21 +131,23 @@ class Metatable
     void Destroy ();
 
   private:
-    Metatable (const Metatable&); //no impl
-    Metatable& operator = (const Metatable&); //no impl
+    Library (const Library&); //no impl
+    Library& operator = (const Library&); //no impl
 
-  private:  
+  private:
+    lua_State*           state;                            //состояние Lua
+    Interpreter&         interpreter;                      //интерпретатор
     InvokerRegistry&     registry;                         //реестр шлюзов
-    lua_State*           state;                            //состояние lua
     stl::string          table_name;                       //имя таблицы
+    bool                 is_global;                        //является ли библиотека глобальной
     xtl::auto_connection on_register_invoker_connection;   //соединение регистрации шлюза
-    xtl::auto_connection on_unregister_invoker_connection; //соединение удаления шлюза    
+    xtl::auto_connection on_unregister_invoker_connection; //соединение удаления шлюза
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерпретатор Lua
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Interpreter: public IInterpreter
+class Interpreter: public IInterpreter, public StateHolder, public xtl::reference_counter
 {
   public:
     typedef xtl::shared_ptr<Environment> EnvironmentPointer;
@@ -165,48 +191,34 @@ class Interpreter: public IInterpreter
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация/удаление шлюзов
+///Регистрация/удаление библиотек
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterInvoker   (const char* invoker_name, Invoker& invoker);
-    void UnregisterInvoker (const char* invoker_name);
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация/удаление реестров
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterInvokerRegistry   (const char* registry_name, InvokerRegistry& registry);
-    void RegisterGlobalRegistry    (InvokerRegistry&);
-    void UnregisterInvokerRegistry (const char* invoker_registry);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск метатаблицы
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Metatable* FindMetatable (const char* name) const;
+    void RegisterLibrary   (const char* name, InvokerRegistry& registry);
+    void UnregisterLibrary (const char* name);
 
   private:
-    typedef stl::hash_map<stl::hash_key<const char*>, Metatable*> MetatableMap;
+    typedef xtl::intrusive_ptr<Library>                           LibraryPtr;
+    typedef stl::hash_map<stl::hash_key<const char*>, LibraryPtr> LibraryMap;
 
   private:
-    lua_State*            state;                            //состояние машины Lua    
-    lua::Stack            stack;                            //стек аргументов    
-    size_t                ref_count;                        //счётчик активных ссылок    
-    xtl::auto_connection  on_register_invoker_connection;   //соединение на событие регистрации шлюза
-    xtl::auto_connection  on_unregister_invoker_connection; //соединение на событие удаления шлюза
-    xtl::auto_connection  on_create_registry_connection;    //соединение на событие создания реестра
-    xtl::auto_connection  on_remove_registry_connection;    //соединение на событие удаления реестра    
-    EnvironmentPointer    environment;                      //скриптовое окружение
-    MetatableMap          metatables;                       //карта метатаблиц
+    EnvironmentPointer    environment;                  //скриптовое окружение
+    lua::Stack            stack;                        //стек аргументов
+    LibraryMap            libraries;                    //карта библиотек
+    xtl::auto_connection  on_create_library_connection; //соединение на событие создания библиотеки
+    xtl::auto_connection  on_remove_library_connection; //соединение на событие удаления библиотеки
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вызов шлюза / удаление объекта
+///Утилиты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-int invoke_dispatch (lua_State*);
-int destroy_object  (lua_State*);
+int invoke_dispatch (lua_State*); //вызов шлюза
+int destroy_object  (lua_State*); //удаление объекта
+int error_handler   (lua_State*); //обработчик ошибок
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Тэг пользовательских данных
+///Выделение памяти
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-extern const char* USER_DATA_TAG;
+void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size);
 
 }
 

@@ -6,6 +6,7 @@
 
 #include <xtl/iterator.h>
 #include <xtl/signal.h>
+#include <xtl/shared_ptr.h>
 
 #include <common/exception.h>
 

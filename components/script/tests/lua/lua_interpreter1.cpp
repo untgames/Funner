@@ -28,7 +28,7 @@ int main ()
     
     Invoker invoker = make_invoker (hello_func);
     
-    InvokerRegistry& registry = env->CreateRegistry ("global");
+    InvokerRegistry& registry = env->CreateLibrary ("global");
 
     registry.Register ("f1", invoker);
 
