@@ -13,6 +13,7 @@ int main ()
   
     bind_math_library (*env);
     do_script<void>   (*script, SCRIPT_FILE_NAME, vec3f (1, 2, 3));
+    invoke<void> (*script, "test_matrix", mat4f (1));
   }
   catch (xtl::bad_any_cast& exception)
   {

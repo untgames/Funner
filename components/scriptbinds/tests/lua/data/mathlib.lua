@@ -36,3 +36,25 @@ function test (v)
   print ("v3 = funner.math.cross (v1, v2): " .. tostring (v3))
   print ("funner.math.qlength (v3): " .. funner.math.qlength (v3))
 end
+
+function test_matrix (m)
+  print ("Input:   " .. tostring (m:row (0)))
+--  print ("         " .. tostring (m:row (1)))
+--  print ("         " .. tostring (m:row (2)))
+--  print ("row2:    " .. tostring (m:row (2)))
+--  print ("column1: " .. tostring (m:column (1)))
+
+  m1 = funner.math.mat4 (2)
+  m2 = funner.math.mat4 (3)
+  m3 = m1 * m2
+  print ("         " .. tostring (m3:row (0)))
+ 
+  v1 = funner.math.vec (7)
+  v2 = funner.math.multiply_mat_vec (m1, v1)
+  print ("         " .. tostring (v2))
+  m5 = funner.math.mat4 (2)
+  print ("minor m 1 1 = " .. m5:minor (1, 1))
+  print ("det m = " .. m5:det ())
+  m = m:set_element (0, 1, 15.4)
+  print ("         " .. tostring (m:row (0)))
+end

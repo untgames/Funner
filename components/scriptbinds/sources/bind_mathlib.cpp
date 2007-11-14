@@ -13,6 +13,7 @@ namespace
 
 const char* MATHLIB_LIBRARY       = "funner.math";
 const char* MATHLIB_VEC3F_LIBRARY = "funner.math.vec3f";
+const char* MATHLIB_MAT4F_LIBRARY = "funner.math.mat4f";
 
 /*
     Создание вектора
@@ -79,6 +80,78 @@ template <class Ret, class Arg1, class Arg2, template <class, class, class> clas
 inline Invoker make_binary_invoker ()
 {
   return make_invoker<Ret (Arg1, Arg2)> (Operation<Arg1, Arg2, Ret> ());
+}
+
+/*
+    Создание матрицы
+*/
+
+mat4f create_mat4a (float a)
+{
+  return mat4f (a);
+}
+
+mat4f create_mat4m (mat4f m)
+{
+  return mat4f (m);
+}
+
+/*
+    Селекторы компонент матрицы
+*/
+
+vec3f get_mat4f_row (mat4f m, size_t i)
+{
+  return vec3f(m.row (i));
+}
+
+vec3f get_mat4f_column (mat4f m, size_t i)
+{
+  return m.column (i);
+}
+
+float get_mat4f_element (mat4f m, size_t i, size_t j)
+{
+  return m[i][j];
+}
+
+/*
+   Операции над матрицами
+*/
+
+void transpose (mat4f m)
+{
+  m.transpose ();
+}
+
+void invert (mat4f m)
+{
+  m.invert ();
+}
+
+/*void normalize (mat4f m)
+{
+  m.normalize ();
+} */
+
+mat4f set_row (mat4f m, size_t i, vec3f v)
+{
+  m[i] = v;
+  return m;
+}
+
+mat4f set_column (mat4f m, size_t i, vec3f v)
+{
+  m[0][i] = v.x;
+  m[1][i] = v.y;
+  m[2][i] = v.z;
+  return m;
+}
+
+mat4f set_element (mat4f m, size_t i, size_t j, float value)
+{
+  m[i][j] = value;
+  return m;
 }
 
 }
@@ -180,6 +253,62 @@ void bind_math_library (Environment& environment)
     //регистрация типов данных
 
   environment.RegisterType (typeid (vec3f), MATHLIB_VEC3F_LIBRARY);
+  
+    //создание математической библиотеки
+    
+  InvokerRegistry& mat4f_lib = environment.CreateLibrary (MATHLIB_MAT4F_LIBRARY);
+  
+       //уменьшить количество инстансов!!!
+  
+    //регистрация селекторов
+    
+  mat4f_lib.Register ("row",    make_invoker (&get_mat4f_row));
+  mat4f_lib.Register ("column", make_invoker (&get_mat4f_column));
+  mat4f_lib.Register ("get",    make_invoker (&get_mat4f_element));
+
+  mat4f_lib.Register ("set_row",     make_invoker (&set_row));
+  mat4f_lib.Register ("set_column",  make_invoker (&set_column));
+  mat4f_lib.Register ("set_element", make_invoker (&set_element));
+  
+    //регистрация функций над матрицами
+    
+  mat4f_lib.Register ("transpose", make_invoker (&transpose));
+  mat4f_lib.Register ("invert",    make_invoker (&invert));
+//  mat4f_lib.Register ("normalize", make_invoker (&normalize));
+  mat4f_lib.Register ("det",       make_invoker (&math::det<float, 4>));
+  mat4f_lib.Register ("minor",     make_invoker (&math::minor<float, 4>));
+  
+  math_lib.Register ("multiply_mat_vec", make_binary_invoker<vec3f, mat4f, vec3f, multiplies> ());  
+
+    //регистрация операций над векторами
+
+  mat4f_lib.Register ("__add", make_binary_invoker<mat4f, mat4f, mat4f, plus> ());
+  mat4f_lib.Register ("__sub", make_binary_invoker<mat4f, mat4f, mat4f, minus> ());
+  mat4f_lib.Register ("__mul", make_binary_invoker<mat4f, mat4f, mat4f, multiplies> ());
+  mat4f_lib.Register ("__div", make_binary_invoker<mat4f, mat4f, float, divides> ());
+
+    //регистрация функций создания матрицы
+    
+  math_lib.Register ("mat4", make_invoker (&create_mat4a));
+
+    //регистрация типов данных
+
+  environment.RegisterType (typeid (mat4f), MATHLIB_MAT4F_LIBRARY);
+    
+/*  InvokerRegistry* registry = environment.FindRegistry ("global");
+  
+  if (!registry)
+    return;
+    
+  registry->Register ("vecLength",    make_invoker<float (vec3f)> (&math::length<float, 3>));
+  registry->Register ("vecQLength",   make_invoker<float (vec3f)> (&math::qlen<float, 3>));
+////  registry.Register ("vecNormalize", make_invoker<vec3f (vec3f)> (&math::normalize<float, 3>)); //сделать адаптер вызова
+  registry->Register ("vecDot",       make_invoker<float (vec3f, vec3f)> (&math::dot<float, 3>));
+////  registry.Register ("vecCross",     make_invoker<vec3f (vec3f, vec3f)> (&math::cross<float, 3>));//сделать адаптер вызова
+////  registry.Register ("vecAngle",     make_invoker<float (vec3f)> (&math::angle<float, 3>));
+  registry->Register ("vecAbs",       make_invoker<vec3f (vec3f)> (&math::abs<float, 3>));
+  registry->Register ("vecMin",       make_invoker<vec3f (vec3f, vec3f)> (&math::min<float, 3>));
+  registry->Register ("vecMax",       make_invoker<vec3f (vec3f, vec3f)> (&math::max<float, 3>));*/
 }
 
 }
