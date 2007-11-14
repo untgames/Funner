@@ -43,8 +43,7 @@ int main ()
     
     InvokerRegistry& registry = env->CreateLibrary ("my_library");
 
-    env->RegisterType (typeid (A), "my_library");
-    env->RegisterType (typeid (const A), "my_library");
+    env->RegisterType<A> ("my_library");
 
     xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (env));
 

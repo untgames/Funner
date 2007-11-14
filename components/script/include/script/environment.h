@@ -66,6 +66,9 @@ class Environment
     void RegisterType       (const std::type_info& type, const char* library_id);
     void UnregisterType     (const std::type_info& type);
     void UnregisterAllTypes ();
+    
+    template <class T> void RegisterType   (const char* library_id);
+    template <class T> void UnregisterType ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск библиотеки
@@ -104,6 +107,8 @@ class Environment
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Environment&, Environment&);
+
+#include <script/detail/environment.inl>
 
 }
 
