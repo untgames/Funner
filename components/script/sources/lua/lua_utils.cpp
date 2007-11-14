@@ -40,7 +40,7 @@ int unsafe_variant_destroy (lua_State* state)
     
     lua_pop (state, 1);
     
-    delete variant;
+    stl::destroy (variant);
   }
 
   return 0;
