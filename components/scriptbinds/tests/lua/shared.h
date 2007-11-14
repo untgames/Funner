@@ -21,20 +21,6 @@ using namespace script;
 using namespace math;
 
 /*
-    —ериализаци€ математических типов в строку
-*/
-
-namespace math
-{
-
-void to_string (stl::string& buffer, const math::vec3f& v)
-{
-  buffer = common::format ("[%g %g %g]", v.x, v.y, v.z);
-}
-
-}
-
-/*
     ќтладочное протоколирование
 */
 
@@ -59,6 +45,11 @@ inline void print (const char* tag, const T& value)
   printf ("%s: ", tag);
   print  (value);
   printf ("\n");
+}
+
+inline const char* get_typename (const xtl::any& variant)
+{
+  return variant.type ().name ();
 }
 
 /*

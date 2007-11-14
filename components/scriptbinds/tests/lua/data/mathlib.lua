@@ -1,60 +1,80 @@
 function test (v)
   print ("Input:     " .. tostring (v))
-  print ("Get v.x:   " .. tostring (v:x ()))
-  print ("Get v.y:   " .. v:y ())
-  print ("Get v.z:   " .. v:z ())
-  print ("Get v.xzy: " .. tostring (v:xzy ()))
+  print ("Get v.x:   " .. tostring (v.x))
+  print ("Get v.y:   " .. v.y)
+  print ("Get v.z:   " .. v.z)
 
-  tmp = v:xyz () + v:yzx ()
+  print ("Get v.xzy: " .. tostring (v.xzy))
 
-  print ("tmp = v:xyz + v:yzx: " .. tostring (tmp))
+  tmp = v.xyz + v.yzx
 
-  tmp = tmp - v * v:zxy ()
+  print ("tmp = v.xyz + v.yzx: " .. tostring (tmp))
 
-  print ("tmp = tmp - v * v:zxy (): " .. tostring (tmp))
-  print ("funner.math.vec3(4,5,6): " .. tostring (funner.math.vec3 (4, 5, 6)))
+  tmp = tmp - v * v.zxy
 
-  v1 = funner.math.vec (7)
+  print ("tmp = tmp - v * v.zxy: " .. tostring (tmp))
 
-  print ("v1 = funner.math.vec(7): " .. tostring (v1))
-  print ("funner.math.normalize(v1): " .. tostring (funner.math.normalize(v1)))
+  print ("vec3(4,5,6): " .. tostring (vec3 (4, 5, 6)))
 
-  v1 = funner.math.abs (funner.math.vec3 (-1, 2, -3))
+  v1 = scalar3 (7)
 
-  print ("v1 = funner.math.abs (funner.math.vec3 (-1, 2, -3)): " .. tostring (v1))
+  print ("v1 = scalar3(7): " .. tostring (v1))
+  print ("v1:normalize(): " .. tostring (v1:normalize()))
 
-  v2 = funner.math.min (v1, tmp)
+  v1 = vec3 (-1, 2, -3):abs ()
 
-  print ("v2 = funner.math.min (v1, tmp): " .. tostring (v2))
+  print ("v1 = vec3 (-1, 2, -3):abs (): " .. tostring (v1))
 
-  v2 = funner.math.max (v1, tmp)
+  v2 = v1:min (tmp)
 
-  print ("v2 = funner.math.max (v1, tmp): " .. tostring (v2))
+  print ("v2 = v1:min (tmp): " .. tostring (v2))
 
-  v3 = funner.math.cross (v1, v2)
+  v2 = v1:max (tmp)
 
-  print ("v3 = funner.math.cross (v1, v2): " .. tostring (v3))
-  print ("funner.math.qlength (v3): " .. funner.math.qlength (v3))
+  print ("v2 = v1:max (tmp): " .. tostring (v2))
+
+  v3 = v1:cross (v2)
+
+  print ("v3 = v1:cross (v2): " .. tostring (v3))
+  print ("v3.qlength: " .. v3.qlength)
+
+  v1 = v.xyz -- явное копирование, а не создание ссылки на объект
+
+  v1 [0] = 4
+  v1 [1] = 5
+  v1.z   = 6
+
+  print ("After set values: " .. tostring (v1))
+
 end
 
 function test_matrix (m)
-  print ("Input:   " .. tostring (m:row (0)))
---  print ("         " .. tostring (m:row (1)))
---  print ("         " .. tostring (m:row (2)))
---  print ("row2:    " .. tostring (m:row (2)))
---  print ("column1: " .. tostring (m:column (1)))
+  print ("Input:   ");
 
-  m1 = funner.math.mat4 (2)
-  m2 = funner.math.mat4 (3)
-  m3 = m1 * m2
-  print ("         " .. tostring (m3:row (0)))
- 
-  v1 = funner.math.vec (7)
-  v2 = funner.math.multiply_mat_vec (m1, v1)
-  print ("         " .. tostring (v2))
-  m5 = funner.math.mat4 (2)
-  print ("minor m 1 1 = " .. m5:minor (1, 1))
-  print ("det m = " .. m5:det ())
-  m = m:set_element (0, 1, 15.4)
-  print ("         " .. tostring (m:row (0)))
+  print (m [0])
+  print (m [1])
+  print (m [2])
+  print (m [3])
+
+  m [0].zxy = vec3 (1, 2, 3)
+
+  print ("After m[0].zxy=vec3(1,2,3): " .. tostring (m [0]))
+
+  local m1 = mat4 (2)
+  local m2 = mat4 (3)
+  local m3 = m1 * m2
+
+  print ("Result of matrix multiplies: " .. tostring (m3))
+
+  m3:set (1, 1, 123)
+
+  print ("After m3:set(1,1,123): " .. tostring (m3))
+
+  m3 [2][2] = 456
+
+  print ("After m3 [2][2]=456: " .. tostring (m3))
+
+  local m5 = mat4 (2)
+
+  print ("mat4(2):det (): " .. m5:det ()) 
 end

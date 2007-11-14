@@ -10,6 +10,8 @@ int main ()
   {
     xtl::shared_ptr<Environment> env    (new Environment);
     xtl::com_ptr<IInterpreter>   script (create_lua_interpreter (env));
+    
+    env->Library ("global").Register ("typename", make_invoker (&get_typename));
   
     bind_math_library (*env);
     load_script       (*script, SCRIPT_FILE_NAME);
