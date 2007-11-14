@@ -250,18 +250,12 @@ void bind_math_library (Environment& environment)
   math_lib.Register ("min",       make_invoker<vec3f (vec3f, vec3f)> (&math::min<float, 3>));
   math_lib.Register ("max",       make_invoker<vec3f (vec3f, vec3f)> (&math::max<float, 3>));
 
-    //регистрация типов данных
-
-  environment.RegisterType (typeid (vec3f), MATHLIB_VEC3F_LIBRARY);
-  
     //создание математической библиотеки
-    
+
   InvokerRegistry& mat4f_lib = environment.CreateLibrary (MATHLIB_MAT4F_LIBRARY);
-  
-       //уменьшить количество инстансов!!!
-  
+
     //регистрация селекторов
-    
+
   mat4f_lib.Register ("row",    make_invoker (&get_mat4f_row));
   mat4f_lib.Register ("column", make_invoker (&get_mat4f_column));
   mat4f_lib.Register ("get",    make_invoker (&get_mat4f_element));
@@ -269,9 +263,9 @@ void bind_math_library (Environment& environment)
   mat4f_lib.Register ("set_row",     make_invoker (&set_row));
   mat4f_lib.Register ("set_column",  make_invoker (&set_column));
   mat4f_lib.Register ("set_element", make_invoker (&set_element));
-  
+
     //регистрация функций над матрицами
-    
+
   mat4f_lib.Register ("transpose", make_invoker (&transpose));
   mat4f_lib.Register ("invert",    make_invoker (&invert));
 //  mat4f_lib.Register ("normalize", make_invoker (&normalize));
@@ -294,21 +288,7 @@ void bind_math_library (Environment& environment)
     //регистрация типов данных
 
   environment.RegisterType (typeid (mat4f), MATHLIB_MAT4F_LIBRARY);
-    
-/*  InvokerRegistry* registry = environment.FindRegistry ("global");
-  
-  if (!registry)
-    return;
-    
-  registry->Register ("vecLength",    make_invoker<float (vec3f)> (&math::length<float, 3>));
-  registry->Register ("vecQLength",   make_invoker<float (vec3f)> (&math::qlen<float, 3>));
-////  registry.Register ("vecNormalize", make_invoker<vec3f (vec3f)> (&math::normalize<float, 3>)); //сделать адаптер вызова
-  registry->Register ("vecDot",       make_invoker<float (vec3f, vec3f)> (&math::dot<float, 3>));
-////  registry.Register ("vecCross",     make_invoker<vec3f (vec3f, vec3f)> (&math::cross<float, 3>));//сделать адаптер вызова
-////  registry.Register ("vecAngle",     make_invoker<float (vec3f)> (&math::angle<float, 3>));
-  registry->Register ("vecAbs",       make_invoker<vec3f (vec3f)> (&math::abs<float, 3>));
-  registry->Register ("vecMin",       make_invoker<vec3f (vec3f, vec3f)> (&math::min<float, 3>));
-  registry->Register ("vecMax",       make_invoker<vec3f (vec3f, vec3f)> (&math::max<float, 3>));*/
+  environment.RegisterType (typeid (vec3f), MATHLIB_VEC3F_LIBRARY);
 }
 
 }

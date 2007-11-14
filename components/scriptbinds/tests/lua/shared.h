@@ -76,20 +76,4 @@ void load_script (IInterpreter& interpreter, const char* file_name)
   interpreter.DoCommands (file_name, buffer.c_str (), buffer.size (), &log_print);    
 }
 
-template <class Ret, class T>
-Ret do_script (IInterpreter& interpreter, const char* file_name, const T& arg)
-{
-  load_script (interpreter, file_name);
-
-  return invoke<Ret> (interpreter, "test", arg);
-}
-
-template <class Ret, class T1, class T2>
-Ret do_script (IInterpreter& interpreter, const char* file_name, const T1& arg1, const T2& arg2)
-{
-  load_script (interpreter, file_name);
-
-  return invoke<Ret> (interpreter, "test", arg1, arg2);
-}
-
 #endif
