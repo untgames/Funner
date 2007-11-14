@@ -14,25 +14,45 @@ namespace
 //диспетчер вызовов
 int unsafe_invoke_dispatch (lua_State* state)
 {
-    //получение указателя на шлюз      
+    //получение указателя на шлюз
 
-  const Invoker* invoker   = reinterpret_cast<const Invoker*> (lua_touserdata (state, lua_upvalueindex (1)));
-  Interpreter* interpreter = reinterpret_cast<Interpreter*> (lua_touserdata (state, lua_upvalueindex (2)));
+  const Invoker* invoker      = reinterpret_cast<const Invoker*> (lua_touserdata (state, lua_upvalueindex (1)));
+  Interpreter*   interpreter  = reinterpret_cast<Interpreter*> (lua_touserdata (state, lua_upvalueindex (2)));
+  const char*    invoker_name = lua_tostring (state, lua_upvalueindex (3));
 
-  if (!invoker || !interpreter)
+  if (!invoker || !interpreter || !invoker_name)
     Raise<RuntimeException> ("script::lua::invoke_dispatch", "Bad invoker call (no up-values found)");
 
     //проверка количества переданных аргументов
 
   if ((int)invoker->ArgumentsCount () > lua_gettop (state))
-    Raise<StackException> ("script::lua::invoke_dispatch", "Arguments count mismatch (expected %u, got %u)", 
-                           invoker->ArgumentsCount (), lua_gettop (state));
+    Raise<StackException> ("script::lua::invoke_dispatch(%s)", "Arguments count mismatch (expected %u, got %u)", 
+                           invoker_name, invoker->ArgumentsCount (), lua_gettop (state));
 
     //вызов шлюза
 
-  (*invoker)(interpreter->Interpreter::Stack ());
+  try
+  {
+    (*invoker)(interpreter->Interpreter::Stack ());
+    
+    return invoker->ResultsCount ();    
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("script::lua::invoke_dispatch(\"%s\")", invoker_name);
+    throw;
+  }
+  catch (xtl::bad_any_cast& exception)
+  {
+    Raise<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\")", invoker_name).c_str (),
+                             "%s: %s->%s", exception.what (), exception.source_type ().name (), exception.target_type ().name ());
+  }
+  catch (std::exception& exception)
+  {
+    Raise<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\")", invoker_name).c_str (), "%s", exception.what ());
+  }
 
-  return invoker->ResultsCount ();
+  return 0;
 }
 
 int invoke_dispatch (lua_State* state)
@@ -139,12 +159,18 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
     {"__index",    &variant_get_field},
     {"__newindex", &variant_set_field},
     {0, 0}
-  };
+  };  
 
   luaL_register (state, name, common_meta_table);
   lua_pushvalue (state, -1);
   lua_setfield  (state, LUA_REGISTRYINDEX, name); //регистрация метатаблицы
+  
+    //помещение имени библиотеки в таблицу (отладочная информация)
     
+  lua_pushstring (state, "__library_name");
+  lua_pushstring (state, name);
+  lua_rawset     (state, -3);
+
   try
   {    
       //регистрация шлюзов
@@ -189,13 +215,14 @@ void Library::Destroy ()
 
 void Library::RegisterInvoker (const char* invoker_name, Invoker& invoker)
 {
-  if (!strcmp (invoker_name, "__index") || !strcmp (invoker_name, "__gc"))
+  if (!strcmp (invoker_name, "__index") || !strcmp (invoker_name, "__newindex") || !strcmp (invoker_name, "__gc"))
     return; //регистрация шлюзов с указанными имена запрещена
 
   luaL_getmetatable     (state, table_name.c_str ());
   lua_pushlightuserdata (state, &invoker);
   lua_pushlightuserdata (state, &interpreter);
-  lua_pushcclosure      (state, &invoke_dispatch, 2);
+  lua_pushfstring       (state, "%s.%s", table_name.c_str (), invoker_name);
+  lua_pushcclosure      (state, &invoke_dispatch, 3);
   
   if (is_global)
   {

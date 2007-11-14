@@ -64,24 +64,38 @@ struct string_argument_selector
   static const char* get (IStack& stack, size_t index) { return stack.GetString (index); }
 };
 
+//извлечение вариантных типов данных
+struct any_argument_selector
+{
+  static xtl::any& get (IStack& stack, size_t index) { return stack.GetVariant (index); }
+};
+
 //специализации взятия аргумента для различных типов данных
-template <> struct argument_selector<char>:                 public int_argument_selector<char> {};
-template <> struct argument_selector<signed char>:          public int_argument_selector<signed char> {};
-template <> struct argument_selector<unsigned char>:        public int_argument_selector<unsigned char> {};
-template <> struct argument_selector<short>:                public int_argument_selector<short> {};
-template <> struct argument_selector<unsigned short>:       public int_argument_selector<unsigned short> {};
-template <> struct argument_selector<int>:                  public int_argument_selector<int> {};
-template <> struct argument_selector<unsigned int>:         public int_argument_selector<unsigned int> {};
-template <> struct argument_selector<long>:                 public int_argument_selector<long> {};
-template <> struct argument_selector<unsigned long>:        public int_argument_selector<unsigned long> {};
-template <> struct argument_selector<float>:                public float_argument_selector<float> {};
-template <> struct argument_selector<double>:               public float_argument_selector<double> {};
-template <> struct argument_selector<long double>:          public float_argument_selector<long double> {};
-template <> struct argument_selector<void*>:                public raw_pointer_argument_selector {};
-template <> struct argument_selector<const void*>:          public raw_pointer_argument_selector {};
-template <> struct argument_selector<const volatile void*>: public raw_pointer_argument_selector {};
-template <> struct argument_selector<const char*>:          public string_argument_selector {};
-template <> struct argument_selector<const volatile char*>: public string_argument_selector {};
+template <> struct argument_selector<xtl::any>:                 public any_argument_selector {};
+template <> struct argument_selector<const xtl::any>:           public any_argument_selector {};
+template <> struct argument_selector<volatile xtl::any>:        public any_argument_selector {};
+template <> struct argument_selector<const volatile xtl::any>:  public any_argument_selector {};
+template <> struct argument_selector<xtl::any&>:                public any_argument_selector {};
+template <> struct argument_selector<const xtl::any&>:          public any_argument_selector {};
+template <> struct argument_selector<volatile xtl::any&>:       public any_argument_selector {};
+template <> struct argument_selector<const volatile xtl::any&>: public any_argument_selector {};
+template <> struct argument_selector<char>:                     public int_argument_selector<char> {};
+template <> struct argument_selector<signed char>:              public int_argument_selector<signed char> {};
+template <> struct argument_selector<unsigned char>:            public int_argument_selector<unsigned char> {};
+template <> struct argument_selector<short>:                    public int_argument_selector<short> {};
+template <> struct argument_selector<unsigned short>:           public int_argument_selector<unsigned short> {};
+template <> struct argument_selector<int>:                      public int_argument_selector<int> {};
+template <> struct argument_selector<unsigned int>:             public int_argument_selector<unsigned int> {};
+template <> struct argument_selector<long>:                     public int_argument_selector<long> {};
+template <> struct argument_selector<unsigned long>:            public int_argument_selector<unsigned long> {};
+template <> struct argument_selector<float>:                    public float_argument_selector<float> {};
+template <> struct argument_selector<double>:                   public float_argument_selector<double> {};
+template <> struct argument_selector<long double>:              public float_argument_selector<long double> {};
+template <> struct argument_selector<void*>:                    public raw_pointer_argument_selector {};
+template <> struct argument_selector<const void*>:              public raw_pointer_argument_selector {};
+template <> struct argument_selector<const volatile void*>:     public raw_pointer_argument_selector {};
+template <> struct argument_selector<const char*>:              public string_argument_selector {};
+template <> struct argument_selector<const volatile char*>:     public string_argument_selector {};
 
 template <class Traits, class Allocator>
 struct argument_selector<stl::basic_string<char, Traits, Allocator> >: public string_argument_selector {};
@@ -209,6 +223,13 @@ Ret get_result (IStack& stack)
   }
 }
 
+template <> inline void get_result (IStack&)
+{
+}
+
+template <class Ret> struct results_count       { enum { value = 1 }; };
+template <>          struct results_count<void> { enum { value = 0 }; };
+
 template <size_t ArgsCount, class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
 Ret invoke_dispatch
  (IInterpreter& interpreter,
@@ -241,54 +262,13 @@ Ret invoke_dispatch
     push_argument    (stack, arg9);
     push_argument    (stack, arg10);
 
-    interpreter.Invoke (ArgsCount, 1);
+    interpreter.Invoke (ArgsCount, results_count<Ret>::value);
 
     return get_result<Ret> (stack);
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("script::invoke(%s,%s,...)", interpreter.Name (), name);
-    throw;
-  }
-}
-
-template <size_t ArgsCount, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
-void invoke_dispatch
- (IInterpreter& interpreter,
-  const char*   name,
-  const T1&     arg1,
-  const T2&     arg2,
-  const T3&     arg3,
-  const T4&     arg4,
-  const T5&     arg5,
-  const T6&     arg6,
-  const T7&     arg7,
-  const T8&     arg8,
-  const T9&     arg9,
-  const T10&    arg10,
-  xtl::type<void>)
-{
-  try
-  {
-    IStack& stack = interpreter.Stack ();
-
-    stack.PushSymbol (name);
-    push_argument    (stack, arg1);
-    push_argument    (stack, arg2);
-    push_argument    (stack, arg3);
-    push_argument    (stack, arg4);
-    push_argument    (stack, arg5);
-    push_argument    (stack, arg6);
-    push_argument    (stack, arg7);
-    push_argument    (stack, arg8);
-    push_argument    (stack, arg9);
-    push_argument    (stack, arg10);
-
-    interpreter.Invoke (ArgsCount, 0);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("script::invoke(%s,%s,...)", interpreter.Name (), name);
+    exception.Touch ("script::invoke(\"%s\",\"%s\",...)", interpreter.Name (), name);
     throw;
   }
 }

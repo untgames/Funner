@@ -22,7 +22,7 @@ stl::string get_lua_position (lua_State* state)
     if (debug.currentline == -1)
       continue;
     
-    if (debug.name) buffer += common::format ("\n    at lua-call %s(%d): function='%s'", debug.short_src, debug.currentline, debug.name);
+    if (debug.name) buffer += common::format ("\n    at lua-call %s(%d): function=\"%s\"", debug.short_src, debug.currentline, debug.name);
     else            buffer += common::format ("\n    at lua-call %s(%d)", debug.short_src, debug.currentline);
   }
 
@@ -33,13 +33,13 @@ stl::string get_lua_position (lua_State* state)
 int unsafe_variant_destroy (lua_State* state)
 {
   xtl::any* variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, -1));
-  
+
   if (variant && lua_getmetatable (state, -1))
   {
       //все пользовательские типы данных, хранимые в стеке, приводятся к xtl::any*. проверка совпадения метатаблиц не требуется
     
     lua_pop (state, 1);
-
+    
     delete variant;
   }
 

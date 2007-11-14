@@ -147,6 +147,24 @@ void InvokerRegistry::Register (const char* name, const Invoker& invoker)
   impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name, insert_result.first->second.invoker);
 }
 
+void InvokerRegistry::Register (const char* name, const InvokerRegistry& source_registry, const char* source_name)
+{
+  if (!source_name)
+    common::RaiseNullArgument ("script::InvokerRegistry::Register", "source_name");
+    
+  const Invoker* invoker = source_registry.Find (source_name);
+    
+  if (!invoker)
+    common::RaiseInvalidArgument ("script::InvokerRegistry::Register", "source_name", source_name, "No invoker found");
+    
+  Register (name, *invoker);
+}
+
+void InvokerRegistry::Register (const char* name, const char* source_name)
+{
+  Register (name, *this, source_name);
+}
+
 void InvokerRegistry::Register (const InvokerRegistry& registry)
 {
   for (InvokerMap::const_iterator i=registry.impl->invokers.begin (), end=registry.impl->invokers.end (); i!=end; ++i)

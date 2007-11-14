@@ -153,18 +153,46 @@ void Stack::PushSymbol (const char* symbol)
   lua_getglobal (state, symbol);
 }
 
+void check(lua_State* state,const char* prefix, int index)
+{
+    if (lua_getmetatable (state, index))
+    {
+      lua_getfield (state, -1, "__library_name");
+      
+      printf ("%s: '%s'\n", prefix, lua_tostring (state, -1));
+      
+      lua_pop (state, 2);
+    }
+}
+
 void Stack::Push (const xtl::any& value)
 {
+ check_stack (state);
+
+  static const size_t BUFFER_SIZE = sizeof (xtl::any); 
+
+  void* buffer = lua_newuserdata (state, BUFFER_SIZE); 
+
+  if (!buffer) 
+    Raise<StackException> ("script::lua::Stack::Push(const xtl::any&)", "Fail to allocate %u bytes from stack", BUFFER_SIZE);
+    
   const char* library_id = environment.FindLibraryId (value.castable_type ());
   
   if (!library_id)
-    library_id = VARIANT_DEFAULT_TYPE_NAME;
+    library_id = VARIANT_DEFAULT_TYPE_NAME;    
 
-  xtl::any* object = new xtl::any (value);
+  luaL_getmetatable (state, library_id);
+  lua_setmetatable  (state, -2);
 
-  lua_pushlightuserdata (state, object);
-  luaL_getmetatable     (state, library_id);
-  lua_setmetatable      (state, -2);
+  try
+  {
+    new (buffer) xtl::any (value);
+  }
+  catch (...)
+  {
+    lua_pop (state, 1);
+    throw; 
+  }
 }
 
 /*

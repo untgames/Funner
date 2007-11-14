@@ -3,7 +3,8 @@ invoke result: 8
 after invoke: A(2)
 exception: Invalid argument <id>=0
     at set_id(A)
+    at script::lua::invoke_dispatch("my_library.set_id")
     at lua-call [string "lua_f"](5)
     at lua-call [string "lua_f"](5)
     at script::lua::Interpreter::Invoke
-    at script::invoke(Lua 5.1.2,test2,...)
+    at script::invoke("Lua 5.1.2","test2",...)
