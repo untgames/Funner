@@ -78,3 +78,48 @@ inline void write (common::OutputTextStream& stream, const quat<T>& value, const
 {
   write_range (stream, &value [0], &value [4], format);
 }
+
+/*
+    Приведение к строке
+*/
+
+namespace detail
+{
+
+template <size_t size, class String, class T>
+inline void to_string_helper (String& buffer, const T* values)
+{
+  buffer.clear ();
+  
+  String item_buffer;
+
+  for (size_t i=0; i<size; i++)
+  {
+    xtl::to_string (item_buffer, values [i]);
+
+    buffer += item_buffer;
+
+    if (i != size-1)
+      buffer += ' ';
+  }
+}
+
+}
+
+template <class String, class T, size_t size>
+inline void to_string (String& buffer, const vec<T, size>& value)
+{
+  detail::to_string_helper<size> (buffer, &value [0]);
+}
+
+template <class String, class T, size_t size>
+inline void to_string (String& buffer, const matrix<T, size>& value)
+{
+  detail::to_string_helper<size * size> (buffer, &value [0][0]);
+}
+
+template <class String, class T>
+inline void to_string (String& buffer, const quat<T>& value)
+{
+  detail::to_string_helper<4> (buffer, &value [0]);
+}

@@ -53,6 +53,18 @@ void write (common::OutputTextStream&, const matrix<T, size>& value, const char*
 template <class T>
 void write (common::OutputTextStream&, const quat<T>& value, const char* format="");
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Приведение к строке
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class String, class T, size_t size>
+void to_string (String& buffer, const vec<T, size>& value);
+
+template <class String, class T, size_t size>
+void to_string (String& buffer, const matrix<T, size>& value);
+
+template <class String, class T>
+void to_string (String& buffer, const quat<T>& value);
+
 #include <math/impl/io.inl>
 
 }
