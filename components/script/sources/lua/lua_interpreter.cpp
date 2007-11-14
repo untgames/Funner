@@ -21,6 +21,19 @@ const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";
 
 }
 
+namespace
+{
+
+//функция обработки ошибок lua
+int error_handler (lua_State* state)
+{
+  Raise<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
+
+  return 0;
+}
+
+}
+
 /*
     Конструктор / деструктор
 */
@@ -42,8 +55,8 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
     //регистрация обработчиков пользовательского типа данных
 
   static const luaL_reg user_data_meta_table [] = {
-    {"__gc", &destroy_object},
-    {"__tostring", &dump_to_string},
+    {"__gc",       &variant_destroy},
+    {"__tostring", &variant_tostring},
     {0,0}
   };
   

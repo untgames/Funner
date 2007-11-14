@@ -5,6 +5,45 @@ using namespace script::lua;
 using namespace common;
 
 /*
+    Функции передаваемые lua
+*/
+
+namespace
+{
+
+//диспетчер вызовов
+int unsafe_invoke_dispatch (lua_State* state)
+{
+    //получение указателя на шлюз      
+
+  const Invoker* invoker   = reinterpret_cast<const Invoker*> (lua_touserdata (state, lua_upvalueindex (1)));
+  Interpreter* interpreter = reinterpret_cast<Interpreter*> (lua_touserdata (state, lua_upvalueindex (2)));
+
+  if (!invoker || !interpreter)
+    Raise<RuntimeException> ("script::lua::invoke_dispatch", "Bad invoker call (no up-values found)");
+
+    //проверка количества переданных аргументов
+
+  if ((int)invoker->ArgumentsCount () > lua_gettop (state))
+    Raise<StackException> ("script::lua::invoke_dispatch", "Arguments count mismatch (expected %u, got %u)", 
+                           invoker->ArgumentsCount (), lua_gettop (state));
+
+    //вызов шлюза
+
+  (*invoker)(interpreter->Interpreter::Stack ());
+
+  return invoker->ResultsCount ();
+}
+
+//вызов шлюза
+int invoke_dispatch (lua_State* state)
+{
+  return safe_call (state, &unsafe_invoke_dispatch);
+}
+
+}
+
+/*
     Конструкторы / деструктор
 */
 
@@ -18,8 +57,8 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
     //регистрация обработчиков удаления пользовательских типов данных
 
   static const luaL_reg common_meta_table [] = {
-    {"__gc", &destroy_object},
-    {"__tostring", &dump_to_string},
+    {"__gc",       &variant_destroy},
+    {"__tostring", &variant_tostring},
     {0, 0}
   };
 
@@ -32,7 +71,7 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
   lua_pushstring (state, "__index");
   lua_pushvalue  (state, -2);
   lua_settable   (state, -3);
-  lua_pop        (state, 1);    
+  lua_pop        (state, 1);
     
   try
   {    
