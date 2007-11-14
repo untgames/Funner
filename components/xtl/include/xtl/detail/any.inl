@@ -218,6 +218,7 @@ struct any_holder
   virtual size_t                qualifier_mask        () = 0;
   virtual const std::type_info& type                  () = 0;
   virtual const std::type_info& stored_type           () = 0;
+  virtual const std::type_info& castable_type         () = 0;
   virtual any_holder*           clone                 () = 0;
   virtual void                  release               () = 0;
   virtual void                  dump                  (stl::string&) = 0;
@@ -237,6 +238,7 @@ template <class T> struct any_content: public any_holder
 
   const std::type_info& type           () { return typeid (T); }
   const std::type_info& stored_type    () { return typeid (base_type); }
+  const std::type_info& castable_type  () { return typeid (get_castable_value (value)); }
   size_t                qualifier_mask () { return any_qualifier_mask<T>::value; }
 
   dynamic_cast_root* get_dynamic_cast_root ()
@@ -367,6 +369,11 @@ inline bool any::empty () const
 inline const std::type_info& any::type () const
 {
   return content_ptr ? content_ptr->type () : typeid (void);
+}
+
+inline const std::type_info& any::castable_type () const
+{
+  return content_ptr ? content_ptr->castable_type () : typeid (void);
 }
 
 template <class T>

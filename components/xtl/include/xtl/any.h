@@ -113,6 +113,7 @@ class any
 ///“ип и данные
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const std::type_info& type () const;
+    const std::type_info& castable_type () const;
 
     template <class T>       T* content ();
     template <class T> const T* content () const;
