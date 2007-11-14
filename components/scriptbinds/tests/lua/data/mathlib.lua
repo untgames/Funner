@@ -1,4 +1,4 @@
-function test (v)
+function test_vector (v)
   print ("Input:     " .. tostring (v))
   print ("Get v.x:   " .. tostring (v.x))
   print ("Get v.y:   " .. v.y)

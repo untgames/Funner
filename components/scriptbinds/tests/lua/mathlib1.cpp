@@ -18,7 +18,7 @@ int main ()
     
     printf ("Test vec3f library:\n");
 
-    invoke<void> (*script, "test", vec3f (1, 2, 3));
+    invoke<void> (*script, "test_vector", vec3f (1, 2, 3));
     
     printf ("Test mat4f library:\n");
     
