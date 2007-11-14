@@ -180,6 +180,8 @@ void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_
 
 void Interpreter::Invoke (size_t arguments_count, size_t results_count)
 {
+    //возможно проще использовать call???
+
   if (lua_pcall (state, arguments_count, results_count, 0))
   {
       //формируем сообщение об ошибке

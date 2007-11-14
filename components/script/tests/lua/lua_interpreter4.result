@@ -1,0 +1,9 @@
+Results of lua_interpreter4_test:
+invoke result: 8
+after invoke: A(2)
+exception: Invalid argument <id>=0
+    at set_id(A)
+    at lua-call [string "lua_f"](5)
+    at lua-call [string "lua_f"](5)
+    at script::lua::Interpreter::Invoke
+    at script::invoke(Lua 5.1.2,test2,...)

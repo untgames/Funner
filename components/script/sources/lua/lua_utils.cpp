@@ -18,8 +18,12 @@ stl::string get_lua_position (lua_State* state)
       break;
       
     lua_getinfo (state, "Sln", &debug);
-   
-    buffer += common::format ("\n    at lua-call %s(%d): function='%s'", debug.short_src, debug.currentline, debug.namewhat);
+    
+    if (debug.currentline == -1)
+      continue;
+    
+    if (debug.name) buffer += common::format ("\n    at lua-call %s(%d): function='%s'", debug.short_src, debug.currentline, debug.name);
+    else            buffer += common::format ("\n    at lua-call %s(%d)", debug.short_src, debug.currentline);
   }
 
   return buffer;
@@ -84,7 +88,7 @@ int safe_call (lua_State* state, int (*f)(lua_State*))
   }
   catch (std::exception& exception)
   {
-    luaL_error (state, "exception: %s%s", exception.what (), get_lua_position (state).c_str ());
+    luaL_error (state, "%s%s", exception.what (), get_lua_position (state).c_str ());
   }
   catch (...)
   {

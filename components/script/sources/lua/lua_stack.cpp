@@ -155,7 +155,7 @@ void Stack::PushSymbol (const char* symbol)
 
 void Stack::Push (const xtl::any& value)
 {
-  const char* library_id = environment.FindLibraryId (value.type ());
+  const char* library_id = environment.FindLibraryId (value.castable_type ());
   
   if (!library_id)
     library_id = VARIANT_DEFAULT_TYPE_NAME;
