@@ -140,16 +140,16 @@ class IDevice: virtual public IDeviceObject
     virtual const Rect&       RSGetScissor  () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///”правление выходным уровнем (output-merger)
+///”правление выходным уровнем (output-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void                OMSetBlendState        (IBlendState* state) = 0;
-    virtual void                OMSetDepthStencil      (IDepthStencilState* state) = 0;
-    virtual void                OMSetStencilReference  (size_t reference) = 0;    
-    virtual void                OMSetFrameBuffer       (IFrameBuffer* frame_buffer) = 0;
-    virtual IBlendState*        OMGetBlendState        () = 0;
-    virtual IDepthStencilState* OMGetDepthStencilState () = 0;
-    virtual size_t              OMGetStencilReference  () = 0;
-    virtual IFrameBuffer*       OMGetFrameBuffer       () = 0;
+    virtual void                OSSetBlendState        (IBlendState* state) = 0;
+    virtual void                OSSetDepthStencil      (IDepthStencilState* state) = 0;
+    virtual void                OSSetStencilReference  (size_t reference) = 0;    
+    virtual void                OSSetFrameBuffer       (IFrameBuffer* frame_buffer) = 0;
+    virtual IBlendState*        OSGetBlendState        () = 0;
+    virtual IDepthStencilState* OSGetDepthStencilState () = 0;
+    virtual size_t              OSGetStencilReference  () = 0;
+    virtual IFrameBuffer*       OSGetFrameBuffer       () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќчистка
