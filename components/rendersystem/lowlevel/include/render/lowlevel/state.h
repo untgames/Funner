@@ -447,13 +447,13 @@ enum BlendArgument
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Флаги маски записи цветов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ColorWriteMask
+enum ColorWriteFlag
 {
-  ColorWriteMask_RedBit   = 1, //необходимо ли записывать красную компоненту цвета
-  ColorWriteMask_GreenBit = 2, //необходимо ли записывать зелёную компоненту цвета
-  ColorWriteMask_BlueBit  = 4, //необходимо ли записывать синюю компоненту цвета
-  ColorWriteMask_AlphaBit = 8, //необходимо ли записывать альфа компоненту цвета
-  ColorWriteMask_All      = ColorWriteMask_RedBit | ColorWriteMask_GreenBit | ColorWriteMask_BlueBit | ColorWriteMask_AlphaBit
+  ColorWriteFlag_Red   = 1, //необходимо ли записывать красную компоненту цвета
+  ColorWriteFlag_Green = 2, //необходимо ли записывать зелёную компоненту цвета
+  ColorWriteFlag_Blue  = 4, //необходимо ли записывать синюю компоненту цвета
+  ColorWriteFlag_Alpha = 8, //необходимо ли записывать альфа компоненту цвета
+  ColorWriteFlag_All   = ColorWriteFlag_Red | ColorWriteFlag_Green | ColorWriteFlag_Blue | ColorWriteFlag_Alpha
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

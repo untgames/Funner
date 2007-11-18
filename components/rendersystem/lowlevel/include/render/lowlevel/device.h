@@ -1,6 +1,7 @@
 #ifndef RENDER_LOW_LEVEL_DEVICE_HEADER
 #define RENDER_LOW_LEVEL_DEVICE_HEADER
 
+#include <exception>
 #include <render/lowlevel/state.h>
 #include <render/lowlevel/texture.h>
 #include <render/lowlevel/query.h>
@@ -38,11 +39,11 @@ enum ShaderMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Флаги очистки буфера кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ClearFlags
+enum ClearFlag
 {
-  ClearFlags_Color   = 1, //очищать буфер цвета (render-target)
-  ClearFlags_Depth   = 2, //очищать буфер глубины
-  ClearFlags_Stencil = 4  //очищать буфер трафарета
+  ClearFlag_Color   = 1, //очищать буфер цвета (render-target)
+  ClearFlag_Depth   = 2, //очищать буфер глубины
+  ClearFlag_Stencil = 4  //очищать буфер трафарета
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,6 +59,14 @@ enum PrimitiveType
   PrimitiveType_TriangleFan,   //вейер треугольников
 
   PrimitiveType_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Исключение: устройство перешло в некорректное состояние
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct LostDeviceException: public std::exception
+{
+  const char* what () const throw () { return "render::low_level::LostDeviceException"; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
