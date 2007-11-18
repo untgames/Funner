@@ -6,19 +6,22 @@
 #include <render/lowlevel/query.h>
 #include <render/lowlevel/frame_buffer.h>
 
+//???добавить интеллектуальные указатели
+
 namespace render
 {
 
 namespace low_level
 {
 
+//forward declarations
+class ISwapChain;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Константы устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const size_t DEVICE_VERTEX_BUFFER_SLOTS_COUNT = 8; //количество слотов для размещения вершинных буферов
 const size_t DEVICE_SAMPLER_SLOTS_COUNT       = 8; //количество слотов для размещения сэмплеров
-
-//информация об устройстве????
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режимы шейдинга
@@ -43,32 +46,55 @@ enum ClearFlags
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тип примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum PrimitiveType
+{
+  PrimitiveType_PointList,     //список точек
+  PrimitiveType_LineList,      //список отрезков
+  PrimitiveType_LineStrip,     //цепочка отрезков
+  PrimitiveType_TriangleList,  //список треугольников
+  PrimitiveType_TriangleStrip, //цепочка треугольников
+  PrimitiveType_TriangleFan,   //вейер треугольников
+
+  PrimitiveType_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class IDevice: virtual public IDeviceObject
 {
   public:  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Имя устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual const char* GetName () = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Цепочка обмена
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual ISwapChain* GetSwapChain () = 0;
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IInputLayoutState*  CreateInputLayoutState  (const InputLayoutDesc&) = 0;    
-    virtual IPredicate*         CreatePredicate         () = 0;
-    virtual IStatisticsQuery*   CreateStatisticsQuery   () = 0;
-        //при создании устройств нужно ли передавать Desc или пользоваться парой Set/GetDesc???
-    
-    virtual ILightingState*     CreateLightingState     (const LightingDesc&) = 0;
-    virtual IViewerState*       CreateViewerState       (const ViewerDesc&) = 0;
-    virtual ITransformState*    CreateTransformState    (const TransformDesc&) = 0;
-    virtual IMaterialState*     CreateMaterialState     (const MaterialDesc&) = 0;
-    virtual IRasterizerState*   CreateRasterizerState   (const RasterizerDesc&) = 0;
-    virtual IBlendState*        CreateBlendState        (const BlendDesc&) = 0;
-    virtual IDepthStencilState* CreateDepthStencilState (const DepthStencilDesc&) = 0;
-    virtual ISamplerState*      CreateSamplerState      (const SamplerDesc&) = 0;
+    virtual IInputLayoutState*  CreateInputLayoutState  () = 0;
+    virtual ILightingState*     CreateLightingState     () = 0;
+    virtual IViewerState*       CreateViewerState       () = 0;
+    virtual ITransformState*    CreateTransformState    () = 0;
+    virtual IMaterialState*     CreateMaterialState     () = 0;
+    virtual IRasterizerState*   CreateRasterizerState   () = 0;
+    virtual IBlendState*        CreateBlendState        () = 0;
+    virtual IDepthStencilState* CreateDepthStencilState () = 0;
+    virtual ISamplerState*      CreateSamplerState      () = 0;
     virtual IVertexBuffer*      CreateVertexBuffer      (const BufferDesc&) = 0;
     virtual IIndexBuffer*       CreateIndexBuffer       (const BufferDesc&) = 0;
     virtual ITexture*           CreateTexture           (const TextureDesc&) = 0;
     virtual IFrameBuffer*       CreateFrameBuffer       (const FrameBufferDesc&) = 0;
-      //создание буфера кадра и привязка к нему текстуры в качестве рендер-таржета???
+    virtual IFrameBuffer*       CreateFrameBuffer       (ITexture* render_target) = 0;
+    virtual IPredicate*         CreatePredicate         () = 0;
+    virtual IStatisticsQuery*   CreateStatisticsQuery   () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление входным уровнем (input-stage)
@@ -81,31 +107,22 @@ class IDevice: virtual public IDeviceObject
     virtual IIndexBuffer*      ISGetIndexBuffer  () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление предикатами отрисовки -- убрать с InputStage!!!
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void        ISSetPredication    (IPredicate* predicate, bool predicate_value) = 0;
-    virtual IPredicate* ISGetPredicate      () = 0;
-    virtual bool        ISGetPredicateValue () = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление шейдерными уровнями (shader-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void             SSSetMode           (ShaderMode mode) = 0;
-    virtual void             SSSetViewer         (IViewerState* state) = 0;
-    virtual void             SSSetTransform      (ITransformState* state) = 0;
-    virtual void             SSSetTransformBase  (size_t first_matrix_index) = 0;
-    virtual void             SSSetLighting       (ILightingState* state) = 0;
-    virtual void             SSSetSampler        (size_t sampler_slot, ISamplerState* state) = 0;
-    virtual void             SSSetTexture        (size_t sampler_slot, ITexture* texture) = 0;
-    virtual void             SSSetMaterial       (IMaterialState* state) = 0;
-    virtual ShaderMode       SSGetMode           () = 0;
-    virtual IViewerState*    SSGetViewer         () = 0;
-    virtual ITransformState* SSGetTransform      () = 0;
-    virtual size_t           SSGetTransformBase  () = 0;
-    virtual ILightingState*  SSGetLighting       () = 0;
-    virtual ISamplerState*   SSGetSampler        (size_t sampler_slot) = 0;
-    virtual ITexture*        SSGetTexture        (size_t sampler_slot) = 0;
-    virtual IMaterialState*  SSGetMaterial       () = 0;
+    virtual void             SSSetMode       (ShaderMode mode) = 0;
+    virtual void             SSSetViewer     (IViewerState* state) = 0;
+    virtual void             SSSetTransform  (ITransformState* state) = 0;
+    virtual void             SSSetLighting   (ILightingState* state) = 0;
+    virtual void             SSSetSampler    (size_t sampler_slot, ISamplerState* state) = 0;
+    virtual void             SSSetTexture    (size_t sampler_slot, ITexture* texture) = 0;
+    virtual void             SSSetMaterial   (IMaterialState* state) = 0;
+    virtual ShaderMode       SSGetMode       () = 0;
+    virtual IViewerState*    SSGetViewer     () = 0;
+    virtual ITransformState* SSGetTransform  () = 0;
+    virtual ILightingState*  SSGetLighting   () = 0;
+    virtual ISamplerState*   SSGetSampler    (size_t sampler_slot) = 0;
+    virtual ITexture*        SSGetTexture    (size_t sampler_slot) = 0;
+    virtual IMaterialState*  SSGetMaterial   () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение информации о доступных режимах шейдинга устройства
@@ -141,6 +158,13 @@ class IDevice: virtual public IDeviceObject
     virtual void ClearDepthSurface        (IDepthStencilSurface* surface, float depth) = 0;
     virtual void ClearStencilSurface      (IDepthStencilSurface* surface, unsigned char value) = 0;
     virtual void Clear                    (IFrameBuffer* buffer, size_t clear_flags, const Colo4f& color, float depth, unsigned char stencil) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление предикатами отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void        SetPredication    (IPredicate* predicate, bool predicate_value) = 0;
+    virtual IPredicate* GetPredicate      () = 0;
+    virtual bool        GetPredicateValue () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование примитивов
