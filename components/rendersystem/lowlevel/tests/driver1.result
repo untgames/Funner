@@ -1,0 +1,2 @@
+Results of driver1_test:
+exception: Method 'TestDriver::CreateSwapChain' doesn't implemented

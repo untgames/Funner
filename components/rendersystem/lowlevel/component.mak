@@ -5,7 +5,7 @@ TARGETS := RENDER_LOW_LEVEL_SOURCES RENDER_LOW_LEVEL_TESTS
 
 #Öåëü ¹1 - RENDER system sources
 RENDER_LOW_LEVEL_SOURCES.TYPE             := static-lib
-RENDER_LOW_LEVEL_SOURCES.NAME             := render-ll
+RENDER_LOW_LEVEL_SOURCES.NAME             := render_ll
 RENDER_LOW_LEVEL_SOURCES.INCLUDE_DIRS     := include ../../commonlib/include ../../xtl/include
 RENDER_LOW_LEVEL_SOURCES.SOURCE_DIRS      := sources
 RENDER_LOW_LEVEL_SOURCES.LIB_DIRS         :=  
