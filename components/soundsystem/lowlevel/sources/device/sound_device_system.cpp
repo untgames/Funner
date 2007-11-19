@@ -110,7 +110,7 @@ void SoundSystemImpl::RegisterDriver (const char* driver_name, const CreateDevic
 void SoundSystemImpl::UnregisterDriver (const char* driver_name)
 {
   if (!driver_name)
-    RaiseNullArgument ("sound::low_level::SoundSystem::UnregisterDriver", "driver_name");
+    return;
 
   drivers.erase (driver_name);
 
@@ -189,7 +189,7 @@ const char* SoundSystemImpl::RegisterConfiguration (const char* driver_name, con
 void SoundSystemImpl::UnregisterConfiguration (const char* configuration_name)
 {
   if (!configuration_name)
-    RaiseNullArgument ("sound::low_level::SoundSystemImpl::UnregisterConfiguration", "configuration_name");
+    return;
     
   ConfigurationMap::iterator cfg_iter = configurations.find (configuration_name);
 
