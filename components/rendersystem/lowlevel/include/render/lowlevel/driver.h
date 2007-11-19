@@ -19,7 +19,7 @@ struct OutputModeDesc
   size_t width;        //ширина фрейм-буфера
   size_t height;       //высота фрейм-буфера
   size_t color_bits;   //количество бит на цвет
-  size_t refresh_rate; //частота обновления монитора (0-default)  
+  size_t refresh_rate; //частота обновления монитора (0-default)
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,9 +119,9 @@ class IDriver: virtual public IObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Имя драйвера
+///Описание драйвера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const char* GetName () = 0;
+    virtual const char* GetDescription () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перечисление доступных устройств вывода
@@ -144,8 +144,8 @@ class IDriver: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (const char*)> LogFunction;
     
-    void               SetDebugLog (const LogFunction&) = 0;
-    const LogFunction& GetDebugLog () = 0;
+    virtual void               SetDebugLog (const LogFunction&) = 0;
+    virtual const LogFunction& GetDebugLog () = 0;
 };
 
 }

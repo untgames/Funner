@@ -7,8 +7,6 @@
 #include <render/lowlevel/query.h>
 #include <render/lowlevel/frame_buffer.h>
 
-//???добавить интеллектуальные указатели
-
 namespace render
 {
 
@@ -167,7 +165,8 @@ class IDevice: virtual public IDeviceObject
     virtual void ClearRenderTargetSurface (IRenderTargetSurface* surface, const Color4f& color) = 0;
     virtual void ClearDepthSurface        (IDepthStencilSurface* surface, float depth) = 0;
     virtual void ClearStencilSurface      (IDepthStencilSurface* surface, unsigned char value) = 0;
-    virtual void Clear                    (IFrameBuffer* buffer, size_t clear_flags, const Colo4f& color, float depth, unsigned char stencil) = 0;
+    virtual void Clear                    (IFrameBuffer* buffer, size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
+    virtual void Clear                    (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление предикатами отрисовки

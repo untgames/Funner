@@ -18,21 +18,21 @@ class RenderSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация драйверов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterDriver   (const char* name, IDriver* driver);
-    void UnregisterDriver (const char* name);
+    static void RegisterDriver   (const char* name, IDriver* driver);
+    static void UnregisterDriver (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск драйвера по имени
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IDriver* FindDriver (const char* name);
+    static IDriver* FindDriver (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IDevice* CreateDevice (const char*          driver_mask,       //маска имени драйвера
-                           const char*          output_mask,       //маска имени устройства вывода
-                           const SwapChainDesc& swap_chain,        //дескриптор цепочки обмена
-                           const char*          init_string = ""); //строка инициализации
+    static IDevice* CreateDevice (const char*          driver_mask,       //маска имени драйвера
+                                  const char*          output_mask,       //маска имени устройства вывода
+                                  const SwapChainDesc& swap_chain,        //дескриптор цепочки обмена
+                                  const char*          init_string = ""); //строка инициализации
 };
 
 }

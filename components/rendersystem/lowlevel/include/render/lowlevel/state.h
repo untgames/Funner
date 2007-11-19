@@ -175,7 +175,7 @@ struct LightDesc
   Color3f   specular_color; //веса отражённой составляющей света
   float     inner_angle;    //внутренний угол излучения
   float     outer_angle;    //внешний угол излучения
-  float     attenuation [CommonShaderLightAttenuation_Num]; //коэффициенты затухания
+  float     attenuation [LightAttenuation_Num]; //коэффициенты затухания
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -295,14 +295,14 @@ enum MaterialMap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct MaterialDesc
 {
-  Color4f         emission;                //цвет излучения
-  Color4f         ambient;                 //цвет поглощения
-  Color4f         diffuse;                 //цвет рассеивания
-  Color4f         specular;                //цвет отражения
-  float           shininess;               //металличность
-  CompareMode     alpha_compare_mode;      //режим альфа теста
-  float           alpha_reference;         //константа альфа теста
-  MaterialMapDesc maps [MaterialMap_Num];  //текстурные карты
+  Color4f      emission;                //цвет излучения
+  Color4f      ambient;                 //цвет поглощения
+  Color4f      diffuse;                 //цвет рассеивания
+  Color4f      specular;                //цвет отражения
+  float        shininess;               //металличность
+  CompareMode  alpha_compare_mode;      //режим альфа теста
+  float        alpha_reference;         //константа альфа теста
+  TexmapDesc   maps [MaterialMap_Num];  //текстурные карты
 };
 
 /*
@@ -399,7 +399,7 @@ struct DepthStencilDesc
   bool          depth_test_enable;      //включён ли тест глубины
   bool          depth_write_enable;     //включена ли запись в буфер глубины
   bool          stencil_test_enable;    //включён ли тест трафарета
-  CompareDesc   depth_compare_mode;     //режим сравнения в тесте глубины
+  CompareMode   depth_compare_mode;     //режим сравнения в тесте глубины
   unsigned char stencil_read_mask;      //маска, накладываемая на значения буфера трафарета при чтении
   unsigned char stencil_write_mask;     //маска, накладываемая на значения буфера трафарета при записи
   StencilDesc   stencil_desc [FaceMode_Num]; //дескрипторы буфера трафарета для различных видов граней
