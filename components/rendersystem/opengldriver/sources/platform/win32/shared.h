@@ -49,8 +49,8 @@ class Output: public IOutput, virtual public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего видео-режима
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetCurrentMode (const OutputModeDesc&);
-    void GetCurrentMode (OutputModeDesc&);
+    void   SetCurrentMode (const OutputModeDesc&);
+    void   GetCurrentMode (OutputModeDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление гамма-коррекцией
@@ -62,10 +62,15 @@ class Output: public IOutput, virtual public Object
 ///Список свойств устройства вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IPropertyList* GetProperties ();
+    
+  private:
+    typedef stl::vector<OutputModeDesc> OutputModeArray;
 
   private:
-    stl::string  name;        //имя устройства
-    PropertyList properties;  //свойства устройства
+    stl::string     name;        //имя устройства
+    stl::string     win_name;    //имя устройства в Windows
+    PropertyList    properties;  //свойства устройства
+    OutputModeArray modes;       //режимы работы устройства
 };
 
 }
