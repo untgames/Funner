@@ -2,10 +2,10 @@
 #define RENDER_LOW_LEVEL_DEVICE_HEADER
 
 #include <exception>
-#include <render/lowlevel/state.h>
-#include <render/lowlevel/texture.h>
-#include <render/lowlevel/query.h>
-#include <render/lowlevel/frame_buffer.h>
+#include <render/low_level/state.h>
+#include <render/low_level/texture.h>
+#include <render/low_level/query.h>
+#include <render/low_level/frame_buffer.h>
 
 namespace render
 {

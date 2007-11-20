@@ -1,7 +1,7 @@
 #ifndef RENDER_LOW_LEVEL_FRAME_BUFFER
 #define RENDER_LOW_LEVEL_FRAME_BUFFER
 
-#include <render/lowlevel/buffer.h>
+#include <render/low_level/buffer.h>
 
 namespace render
 {

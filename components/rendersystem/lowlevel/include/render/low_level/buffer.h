@@ -1,7 +1,7 @@
 #ifndef RENDER_LOW_LEVEL_BUFFER_HEADER
 #define RENDER_LOW_LEVEL_BUFFER_HEADER
 
-#include <render/lowlevel/object.h>
+#include <render/low_level/object.h>
 
 namespace render
 {
@@ -96,7 +96,7 @@ class IBuffer: virtual public IDeviceObject
 class IIndexBuffer:  virtual public IBuffer {};
 class IVertexBuffer: virtual public IBuffer {};
 
-#include <render/lowlevel/detail/buffer.inl>
+#include <render/low_level/detail/buffer.inl>
 
 }
 

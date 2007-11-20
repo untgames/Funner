@@ -1,7 +1,7 @@
 #ifndef RENDER_LOW_LEVEL_TEXTURE_HEADER
 #define RENDER_LOW_LEVEL_TEXTURE_HEADER
 
-#include <render/lowlevel/buffer.h>
+#include <render/low_level/buffer.h>
 
 namespace render
 {

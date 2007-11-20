@@ -1,7 +1,7 @@
 #ifndef RENDER_LOW_LEVEL_UTILITIES_HEADER
 #define RENDER_LOW_LEVEL_UTILITIES_HEADER
 
-#include <render/lowlevel/device.h>
+#include <render/low_level/device.h>
 
 namespace render
 {

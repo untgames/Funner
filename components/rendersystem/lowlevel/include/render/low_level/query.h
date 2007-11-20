@@ -1,7 +1,7 @@
 #ifndef RENDER_LOW_LEVEL_QUERY_HEADER
 #define RENDER_LOW_LEVEL_QUERY_HEADER
 
-#include <render/lowlevel/object.h>
+#include <render/low_level/object.h>
 
 namespace render
 {

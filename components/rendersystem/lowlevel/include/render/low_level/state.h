@@ -1,8 +1,8 @@
 #ifndef RENDER_LOW_LEVEL_STATE_HEADER
 #define RENDER_LOW_LEVEL_STATE_HEADER
 
-#include <render/lowlevel/object.h>
-#include <render/lowlevel/common.h>
+#include <render/low_level/object.h>
+#include <render/low_level/common.h>
 
 namespace render
 {

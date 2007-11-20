@@ -9,8 +9,8 @@
 
 #include <common/exception.h>
 
-#include <render/lowlevel/system.h>
-#include <render/lowlevel/device.h>
+#include <render/low_level/system.h>
+#include <render/low_level/device.h>
 
 using namespace render::low_level;
 using namespace common;

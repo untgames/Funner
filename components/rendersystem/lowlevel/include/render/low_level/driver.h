@@ -2,7 +2,8 @@
 #define RENDER_LOW_LEVEL_DRIVER_HEADER
 
 #include <xtl/functional_fwd>
-#include <render/lowlevel/common.h>
+#include <render/low_level/common.h>
+#include <render/low_level/frame_buffer.h>
 
 namespace render
 {

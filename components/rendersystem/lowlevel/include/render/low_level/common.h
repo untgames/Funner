@@ -1,6 +1,8 @@
 #ifndef RENDER_LOW_LEVEL_COMMON_HEADER
 #define RENDER_LOW_LEVEL_COMMON_HEADER
 
+#include <stddef.h>
+
 namespace render
 {
 
