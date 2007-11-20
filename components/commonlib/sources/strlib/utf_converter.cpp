@@ -4,11 +4,17 @@
 namespace common
 {
 
+#define Char unsigned __int16
+
 bool decode_ASCII7(const unsigned char* src, int srcSize, int* srcBytes, wint_t* buffer);
 bool decode_UTF8(const unsigned char* src, int srcSize, int* srcBytes, wint_t* buffer);
 bool decode_UTF16(const unsigned char* src, int srcSize, int* srcBytes, wint_t* buffer,bool bigEndian);
 bool decode_UTF32(const unsigned char* src, int srcSize, int* srcBytes, wint_t* buffer,bool bigEndian);
 
+bool encode_ASCII7(unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp);
+bool encode_UTF8(unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp);
+bool encode_UTF16(unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp, bool bigEndian);
+bool encode_UTF32(unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp, bool bigEndian);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение: неверная кодировка Unicode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +89,53 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
                            size_t      destination_buffer_size,      //размер буфера-приёмника в байтах
                            Encoding    destination_buffer_encoding) //кодировка буфера-приёмника
 {
-   EncodingResult res;
+   EncodingResult res={0,0};
+   wint_t *bsrc=(wint_t*)source_buffer;
+   wint_t *dst=(wint_t*)destination_buffer;
+   int srcSize;
+   int srcBytes;
+   bool r;
+
+   printf("---source_buffer=%p\n",source_buffer);
+   printf("---source_buffer_size=%d\n",source_buffer_size);
+   printf("---bsrc=%p\n",bsrc);
+
+   while((wint_t*)source_buffer+source_buffer_size>bsrc)
+   {
+      printf("source_buffer=%p\n",source_buffer);
+      printf("source_buffer_size=%d\n",source_buffer_size);
+      printf("bsrc=%p\n",bsrc);
+      srcSize=source_buffer_size-res.source_buffer_processed_size;
+      switch (destination_buffer_encoding)
+      {
+         case Encoding_Ascii7:
+//bool encode_ASCII7(unsigned char* dst,int dstSize,int* dstBytes,unsigned int cp);
+            r=encode_ASCII7((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc);
+            break;
+         case Encoding_Utf8:
+            r=encode_UTF8((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc);
+            break;
+         case Encoding_Utf16BE:	
+            r=encode_UTF16((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc,true);
+            break;
+         case Encoding_Utf16LE:	
+            r=encode_UTF16((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc,false);
+            break;
+         case Encoding_Utf32BE:
+            r=encode_UTF32((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc,true);
+            break;
+         case Encoding_Utf32LE:
+            r=encode_UTF32((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc,false);
+            break;
+      }
+      printf("srcBytes=%d\n",srcBytes);
+      printf("dst=%p\n",dst);
+      printf("dst=%p\n",*dst);
+      dst+=srcBytes;
+      res.destination_buffer_processed_size+=srcBytes;
+      bsrc++;
+      printf("%s\n",dst);
+   }
    return res;
 }
 
@@ -327,6 +379,184 @@ bool decode_UTF32( const unsigned char* src, int srcSize, int* srcBytes, wint_t*
    if ( !err )
       *buffer = cp;
    *srcBytes = src-src0;
+   return !err;
+}
+
+
+bool encode_ASCII7( unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp)
+{
+   const unsigned char *dst0=dst;
+   int err=0;
+
+   if ( dstSize >= 1 )
+   {
+      if(cp>=128)
+      {
+         // ERROR: Out-of-range ASCII-7 code
+         err = 1;
+      }
+      else
+      {
+         *dst++=(unsigned char)cp;
+      }
+   }
+   else
+   {
+      // ERROR: Not enough buffer space
+      err = 5;
+      cp = unsigned int(-1);
+   }
+
+   *dstBytes = dst-dst0;
+   return !err;
+}
+
+bool encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, unsigned int cp)
+{
+   const unsigned char *dst0=dst;
+   int err=0;
+
+   if(cp<0x80) 
+   {
+      if ( dstSize < 1 )
+      {
+         // ERROR: Not enough buffer space.
+         err = 5;
+      }
+      else
+      {
+         *dst++ = (unsigned char)cp;
+      }
+   }
+   else if (cp < 0x800) 
+   {
+      if ( dstSize < 2 )
+      {
+         // ERROR: Not enough buffer space.
+         err = 5;
+      }
+      else
+      {
+         *dst++ = (unsigned char)( 0xC0 | (cp>>6) );
+         *dst++ = (unsigned char)( 0x80 | (cp&0x3F) );
+      }
+   }
+   else if (cp < 0x10000) 
+   {
+      if ( dstSize < 3 )
+      {
+         // ERROR: Not enough buffer space.
+         err = 5;
+      }
+      else
+      {
+         *dst++ = (unsigned char)( 0xE0 | (cp>>12) );
+         *dst++ = (unsigned char)( 0x80 | ( (cp>>6) &0x3F) );
+         *dst++ = (unsigned char)( 0x80 | (cp&0x3F) );
+      }
+   }
+   else if (cp < 0x200000) 
+   {
+      if ( dstSize < 4 )
+      {
+         // ERROR: Not enough buffer space.
+         err = 5;
+      }
+      else
+      {
+         *dst++ = (unsigned char)( 0xF0 | (cp>>18) );
+         *dst++ = (unsigned char)( 0x80 | ( (cp>>12) &0x3F) );
+         *dst++ = (unsigned char)( 0x80 | ( (cp>>6) &0x3F) );
+         *dst++ = (unsigned char)( 0x80 | (cp&0x3F) );
+      }
+   }
+   else
+   {
+      // ERROR: Invalid Unicode scalar value
+      err = 2;
+   }
+   *dstBytes = dst-dst0;
+   return !err;
+}
+
+bool encode_UTF16( unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp, bool bigEndian)
+{
+   const unsigned char*dst0= dst;
+   int err= 0;
+
+   // encode
+   Char codes[2];
+   int codeCount = 0;
+   if ( cp >= 0x10000 )
+   {
+      codes[codeCount++] = Char( ((cp-0x10000)>>10) + 0xD800 );
+      codes[codeCount++] = Char( ((cp-0x10000)&1023) + 0xDC00 );
+   }
+   else
+   {
+      codes[codeCount++] = Char( cp );
+   }
+   // write
+   int codeSize = unsigned(codeCount) * 2U;
+   if ( dstSize < codeSize )
+   {
+      // Error: Not enough buffer space
+      err = 5;
+   }
+   else
+   {
+      for ( int i = 0 ; i < codeCount ; ++i )
+      {
+         Char code = codes[i];
+         if ( bigEndian )
+         {
+            *dst++ = unsigned char(code >> 8);
+            *dst++ = unsigned char(code);
+         }
+         else
+         {
+            *dst++ = unsigned char(code);
+            *dst++ = unsigned char(code >> 8);
+         }
+      }
+   }
+
+   *dstBytes = dst-dst0;
+   return !err;
+}
+
+bool encode_UTF32( unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp, bool bigEndian )
+{
+   const unsigned char *dst0= dst;
+   int err=0;
+
+   // write
+   int codeCount = 1;
+   int codeSize = unsigned(codeCount) * 4U;
+   if ( dstSize < codeSize )
+   {
+      // Error: Not enough buffer space
+      err = 5;
+   }
+   else
+   {
+      unsigned int code = cp;
+      if ( bigEndian )
+      {
+         *dst++ = unsigned char(code>>24);
+         *dst++ = unsigned char(code>>16);
+         *dst++ = unsigned char(code>>8);
+         *dst++ = unsigned char(code);
+      }
+      else
+      {
+         *dst++ = unsigned char(code);
+         *dst++ = unsigned char(code>>8);
+         *dst++ = unsigned char(code>>16);
+         *dst++ = unsigned char(code>>24);
+      }
+   }
+   *dstBytes = dst-dst0;
    return !err;
 }
 
