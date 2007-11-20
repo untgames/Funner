@@ -5,6 +5,7 @@
 
 #include <shared/object.h>
 #include <shared/output_manager.h>
+#include <shared/context_manager.h>
 
 #include <common/exception.h>
 #include <common/singleton.h>
@@ -60,8 +61,9 @@ class Driver: virtual public IDriver, public Object
     const LogFunction& GetDebugLog ();
     
   private:
-    OutputManager output_manager; //менеджер устройств вывода
-    LogFunction   log_fn;         //функция отладочного протоколирования
+    OutputManager  output_manager;  //менеджер устройств вывода
+    ContextManager context_manager; //менеджер контекстов
+    LogFunction    log_fn;          //функция отладочного протоколирования
 };
 
 }

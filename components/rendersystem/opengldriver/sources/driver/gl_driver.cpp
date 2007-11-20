@@ -47,8 +47,7 @@ IOutput* Driver::GetOutput (size_t index)
 
 ISwapChain* Driver::CreateSwapChain (IOutput* target_output, const SwapChainDesc& desc)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Driver::CreateSwapChain");
-  return 0;
+  return context_manager.CreateSwapChain (target_output, desc);
 }
 
 /*

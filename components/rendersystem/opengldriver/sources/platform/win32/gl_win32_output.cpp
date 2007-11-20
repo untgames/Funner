@@ -152,9 +152,18 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   LONG result = ChangeDisplaySettings (&dev_mode_desc, CDS_FULLSCREEN);
 
   if (result != DISP_CHANGE_SUCCESSFUL)
-    RaiseInvalidOperation ("render::low_level::opengl::Output::SetCurrentMode",
-    "ChangeDisplaySettings fail: name='%s', win-name='%s', mode='%ux%ux%u (%uHz)'",
-    name.c_str (), win_name.c_str (), mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);      
+  {
+    try
+    {
+      raise_error ("render::low_level::opengl::Output::SetCurrentMode");
+    }
+    catch (common::Exception& exception)
+    {
+      exception.Touch ("ChangeDisplaySettings(device-name='%s', mode='%ux%ux%u @ %uHz')",
+        name.c_str (), win_name.c_str (), mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);
+      throw;
+    }
+  }
 }
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
@@ -178,7 +187,7 @@ void Output::SetGammaRamp (const Color3f table [256])
   }
 
   if (!SetDeviceGammaRamp (GetDC (), gamma_ramp_table))
-    Raise <Exception> ("render::low_level::opengl::Output::SetGammaRamp", "Can't set gamma ramp (SetDeviceGammaRamp error).");
+    raise_error (format ("render::low_level::opengl::Output::SetGammaRamp(device-name='%s')", name.c_str ()).c_str ());
 }
 
 void Output::GetGammaRamp (Color3f table [256])
@@ -186,7 +195,7 @@ void Output::GetGammaRamp (Color3f table [256])
   WORD gamma_ramp_table[256][3];
 
   if (!GetDeviceGammaRamp (GetDC (), gamma_ramp_table))
-    Raise <Exception> ("render::low_level::opengl::Output::GetGammaRamp", "Can't get gamma ramp (GetDeviceGammaRamp error).");
+    raise_error (format ("render::low_level::opengl::Output::GetGammaRamp(device-name='%s')", name.c_str ()).c_str ());
 
   for (size_t i = 0; i < 256; i++)
   {
@@ -202,13 +211,14 @@ void Output::GetGammaRamp (Color3f table [256])
 
 HDC Output::GetDC ()
 {
-  if (!hDC)
-  {
-    hDC = CreateDC (win_name.c_str (), NULL, NULL, NULL);
+  if (hDC)
+    return hDC;
+    
+  hDC = CreateDC (win_name.c_str (), NULL, NULL, NULL);
 
-    if (!hDC)
-      Raise <Exception> ("render::low_level::opengl::Output::GetDC", "Can't create context for device '%s' (win name - '%s').", name.c_str (), win_name.c_str ());
-  }
+  if (!hDC)
+    raise_error (common::format ("render::low_level::opengl::Output::GetDC(device-name='%s')", name.c_str ()).c_str ());
+
   return hDC;
 }
 
