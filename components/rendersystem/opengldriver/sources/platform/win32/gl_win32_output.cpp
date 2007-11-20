@@ -39,6 +39,7 @@ bool get_mode_desc (const char* device_name, int mode_index, OutputModeDesc& mod
 */
 
 Output::Output (const DISPLAY_DEVICE& device_info)
+  : hDC (NULL)
 {
     //получение имени устройства
 
@@ -101,6 +102,8 @@ Output::Output (const DISPLAY_DEVICE& device_info)
 
 Output::~Output ()
 {
+  if (hDC)
+    DeleteDC (hDC);
 }
 
 /*
@@ -165,11 +168,6 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 
 void Output::SetGammaRamp (const Color3f table [256])
 {
-  HDC hDC = CreateDC (win_name.c_str (), NULL, NULL, NULL);
-
-  if (!hDC)
-    Raise <Exception> ("render::low_level::opengl::Output::GetGammaRamp", "Can't create device context.");
-
   WORD gamma_ramp_table[256][3];
 
   for (size_t i = 0; i < 256; i++)
@@ -179,31 +177,16 @@ void Output::SetGammaRamp (const Color3f table [256])
     gamma_ramp_table[i][2] = (WORD)(table[i].blue * 65535.f);
   }
 
-  if (!SetDeviceGammaRamp (hDC, gamma_ramp_table))
-  {
-    DeleteDC (hDC);
+  if (!SetDeviceGammaRamp (GetDC (), gamma_ramp_table))
     Raise <Exception> ("render::low_level::opengl::Output::SetGammaRamp", "Can't set gamma ramp (SetDeviceGammaRamp error).");
-  }
-  DeleteDC (hDC);
 }
 
 void Output::GetGammaRamp (Color3f table [256])
 {
-  HDC hDC = CreateDC (win_name.c_str (), NULL, NULL, NULL);
-
-  if (!hDC)
-    Raise <Exception> ("render::low_level::opengl::Output::GetGammaRamp", "Can't create device context.");
-
-  printf ("HDC = %p\n", hDC);
-
   WORD gamma_ramp_table[256][3];
 
-  if (!GetDeviceGammaRamp (hDC, gamma_ramp_table))
-  {
-    DeleteDC (hDC);
+  if (!GetDeviceGammaRamp (GetDC (), gamma_ramp_table))
     Raise <Exception> ("render::low_level::opengl::Output::GetGammaRamp", "Can't get gamma ramp (GetDeviceGammaRamp error).");
-  }
-  DeleteDC (hDC);
 
   for (size_t i = 0; i < 256; i++)
   {
@@ -211,6 +194,22 @@ void Output::GetGammaRamp (Color3f table [256])
     table[i].green = (float)gamma_ramp_table[i][1] / 65535.f;
     table[i].blue  = (float)gamma_ramp_table[i][2] / 65535.f;
   }
+}
+
+/*
+   Получение хэндла контекста устройства
+*/
+
+HDC Output::GetDC ()
+{
+  if (!hDC)
+  {
+    hDC = CreateDC (win_name.c_str (), NULL, NULL, NULL);
+
+    if (!hDC)
+      Raise <Exception> ("render::low_level::opengl::Output::GetDC", "Can't create context for device '%s' (win name - '%s').", name.c_str (), win_name.c_str ());
+  }
+  return hDC;
 }
 
 /*
