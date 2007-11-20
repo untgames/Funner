@@ -80,11 +80,6 @@ class IDevice: virtual public IDeviceObject
     virtual const char* GetDescription () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Цепочка обмена
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual ISwapChain* GetSwapChain () = 0;
-  
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual IInputLayoutState*  CreateInputLayoutState  () = 0;
@@ -100,6 +95,7 @@ class IDevice: virtual public IDeviceObject
     virtual IIndexBuffer*       CreateIndexBuffer       (const BufferDesc&) = 0;
     virtual ITexture*           CreateTexture           (const TextureDesc&) = 0;
     virtual IFrameBuffer*       CreateFrameBuffer       (const FrameBufferDesc&) = 0;
+    virtual IFrameBuffer*       CreateFrameBuffer       (ISwapChain*) = 0;
     virtual IFrameBuffer*       CreateFrameBuffer       (ITexture* render_target) = 0;
     virtual IPredicate*         CreatePredicate         () = 0;
     virtual IStatisticsQuery*   CreateStatisticsQuery   () = 0;
