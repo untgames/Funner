@@ -165,12 +165,52 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 
 void Output::SetGammaRamp (const Color3f table [256])
 {
-  RaiseNotImplemented ("render::low_level::opengl::Output::SetGammaRamp");
+  HDC hDC = CreateDC (win_name.c_str (), NULL, NULL, NULL);
+
+  if (!hDC)
+    Raise <Exception> ("render::low_level::opengl::Output::GetGammaRamp", "Can't create device context.");
+
+  WORD gamma_ramp_table[256][3];
+
+  for (size_t i = 0; i < 256; i++)
+  {
+    gamma_ramp_table[i][0] = (WORD)(table[i].red * 65535.f);
+    gamma_ramp_table[i][1] = (WORD)(table[i].green * 65535.f);
+    gamma_ramp_table[i][2] = (WORD)(table[i].blue * 65535.f);
+  }
+
+  if (!SetDeviceGammaRamp (hDC, gamma_ramp_table))
+  {
+    DeleteDC (hDC);
+    Raise <Exception> ("render::low_level::opengl::Output::SetGammaRamp", "Can't set gamma ramp (SetDeviceGammaRamp error).");
+  }
+  DeleteDC (hDC);
 }
 
 void Output::GetGammaRamp (Color3f table [256])
 {
-  RaiseNotImplemented ("render::low_level::opengl::Output::GetGammaRamp");
+  HDC hDC = CreateDC (win_name.c_str (), NULL, NULL, NULL);
+
+  if (!hDC)
+    Raise <Exception> ("render::low_level::opengl::Output::GetGammaRamp", "Can't create device context.");
+
+  printf ("HDC = %p\n", hDC);
+
+  WORD gamma_ramp_table[256][3];
+
+  if (!GetDeviceGammaRamp (hDC, gamma_ramp_table))
+  {
+    DeleteDC (hDC);
+    Raise <Exception> ("render::low_level::opengl::Output::GetGammaRamp", "Can't get gamma ramp (GetDeviceGammaRamp error).");
+  }
+  DeleteDC (hDC);
+
+  for (size_t i = 0; i < 256; i++)
+  {
+    table[i].red   = (float)gamma_ramp_table[i][0] / 65535.f;
+    table[i].green = (float)gamma_ramp_table[i][1] / 65535.f;
+    table[i].blue  = (float)gamma_ramp_table[i][2] / 65535.f;
+  }
 }
 
 /*

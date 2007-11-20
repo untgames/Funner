@@ -18,6 +18,6 @@ OPENGLDRIVER_TESTS.TYPE             := test-suite
 OPENGLDRIVER_TESTS.INCLUDE_DIRS     := include ../lowlevel/include ../../commonlib/include ../../xtl/include
 OPENGLDRIVER_TESTS.SOURCE_DIRS      := tests/driver
 OPENGLDRIVER_TESTS.LIB_DIRS         :=
-OPENGLDRIVER_TESTS.LIBS             := commonlib zzip zlib glew_static render_ll opengl_driver user32
+OPENGLDRIVER_TESTS.LIBS             := commonlib zzip zlib glew_static render_ll opengl_driver user32 gdi32
 OPENGLDRIVER_TESTS.COMPILER_CFLAGS  :=
 OPENGLDRIVER_TESTS.COMPILER_DEFINES := 
