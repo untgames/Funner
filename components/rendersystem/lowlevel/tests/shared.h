@@ -23,7 +23,7 @@ using namespace common;
 class ObjectImpl: virtual public IObject, public xtl::reference_counter
 {
   public:
-    bool IsCompatible (IObject*) { return true; }
+    IPropertyList* GetProperties () { return 0; }
   
     void AddRef () { addref (this); }  
     void Release () { release (this); }
