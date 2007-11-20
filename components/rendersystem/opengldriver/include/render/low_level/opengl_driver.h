@@ -1,7 +1,7 @@
 #ifndef RENDER_LOW_LEVEL_OPENGL_DRIVER_HEADER
 #define RENDER_LOW_LEVEL_OPENGL_DRIVER_HEADER
 
-#include <render/lowlevel/driver.h>
+#include <render/low_level/driver.h>
 
 namespace render
 {

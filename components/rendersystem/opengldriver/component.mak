@@ -1,14 +1,23 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := OPENGLDRIVER_SOURCES
+TARGETS := OPENGLDRIVER_SOURCES OPENGLDRIVER_TESTS
 
-#Цель №1 - RENDER system sources
+#Цель №1 - OpenGL render system sources
 OPENGLDRIVER_SOURCES.TYPE             := static-lib
 OPENGLDRIVER_SOURCES.NAME             := opengl_driver
-OPENGLDRIVER_SOURCES.INCLUDE_DIRS     := include sources/shared ../lowlevel/include ../../commonlib/include ../../xtl/include ../../../extern/glew/include
-OPENGLDRIVER_SOURCES.SOURCE_DIRS      := sources/driver sources/platform/win32
+OPENGLDRIVER_SOURCES.INCLUDE_DIRS     := include sources ../lowlevel/include ../../commonlib/include ../../xtl/include ../../../extern/glew/include
+OPENGLDRIVER_SOURCES.SOURCE_DIRS      := sources/core sources/driver sources/platform/win32
 OPENGLDRIVER_SOURCES.LIB_DIRS         :=  
 OPENGLDRIVER_SOURCES.LIBS             := 
 OPENGLDRIVER_SOURCES.COMPILER_CFLAGS  :=
-OPENGLDRIVER_SOURCES.COMPILER_DEFINES := 
+OPENGLDRIVER_SOURCES.COMPILER_DEFINES := GLEW_STATIC 
+
+#Цель №2 - OpenGLrender system tests
+OPENGLDRIVER_TESTS.TYPE             := test-suite
+OPENGLDRIVER_TESTS.INCLUDE_DIRS     := include ../lowlevel/include ../../commonlib/include ../../xtl/include
+OPENGLDRIVER_TESTS.SOURCE_DIRS      := tests/driver
+OPENGLDRIVER_TESTS.LIB_DIRS         :=
+OPENGLDRIVER_TESTS.LIBS             := commonlib zzip zlib glew_static render_ll opengl_driver user32
+OPENGLDRIVER_TESTS.COMPILER_CFLAGS  :=
+OPENGLDRIVER_TESTS.COMPILER_DEFINES := 
