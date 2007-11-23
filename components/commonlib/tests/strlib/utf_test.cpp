@@ -9,6 +9,8 @@ int main()
   FILE *f=fopen("zzz.txt","w+");
   memset(out,0,sizeof(out));
   common::utf_decode(in,16,common::Encoding::Encoding_Utf16LE,(char*)out,128);
+  wprintf(L"%‘\n",out);
+  printf("---------------utf_encode-----------------\n");
   common::utf_encode(out,32,(char*)in,128,common::Encoding::Encoding_Utf8);
   for(int i=0;i<32;i++)
      putc(in[i],f);
