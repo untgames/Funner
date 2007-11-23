@@ -92,6 +92,8 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
    EncodingResult res={0,0};
    wint_t *bsrc=(wint_t*)source_buffer;
    wint_t *dst=(wint_t*)destination_buffer;
+   wint_t *old_bsrc=(wint_t*)source_buffer;
+   wint_t *old_dst=(wint_t*)destination_buffer;
    int srcSize;
    int srcBytes;
    bool r;
@@ -102,9 +104,10 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
 
    while((wint_t*)source_buffer+source_buffer_size>bsrc)
    {
-      printf("source_buffer=%p\n",source_buffer);
-      printf("source_buffer_size=%d\n",source_buffer_size);
-      printf("bsrc=%p\n",bsrc);
+printf("start ------------------\n");
+//      printf("source_buffer=%p\n",source_buffer);
+//      printf("source_buffer_size=%d\n",source_buffer_size);
+//      printf("bsrc=%p\n",bsrc);
       srcSize=source_buffer_size-res.source_buffer_processed_size;
       switch (destination_buffer_encoding)
       {
@@ -128,13 +131,22 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
             r=encode_UTF32((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc,false);
             break;
       }
-      printf("srcBytes=%d\n",srcBytes);
-      printf("dst=%p\n",dst);
-      printf("dst=%p\n",*dst);
-      dst+=srcBytes;
+//      printf("srcBytes=%d\n",srcBytes);
+//      printf("dst=%p\n",dst);
+    printf("r=%s\n",r==true?"true":"false");
+    printf("srcBytes=%d\n",srcBytes);
+//      printf("bsrc=%p\n",bsrc);
+//(unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc
+      dst=(wint_t*)((char*)dst+srcBytes);
       res.destination_buffer_processed_size+=srcBytes;
-      bsrc++;
-      printf("%s\n",dst);
+      (char*)bsrc++;
+//      printf("---\nbsrc=%p\n",bsrc);
+//      printf("dst=%p\n",dst);
+      printf("bsrc-old=%p\n",(char*)bsrc-(char*)old_bsrc);
+      printf("dst-old=%p\n",(char*)dst-(char*)old_dst);
+old_bsrc=bsrc;
+old_dst=dst;
+printf("end --------------------\n");
    }
    return res;
 }
