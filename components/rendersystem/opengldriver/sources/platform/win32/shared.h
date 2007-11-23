@@ -1,12 +1,17 @@
 #ifndef RENDER_GL_DRIVER_WIN32_SHARED_HEADER
 #define RENDER_GL_DRIVER_WIN32_SHARED_HEADER
 
+#define _WIN32_WINNT 0x0501 //for ChangeDisplaySettings
+
 #include <windows.h>
+#include <gl/glew.h>
+#include <gl/wglew.h>
 
 #include <shared/output_manager.h>
 #include <shared/context_manager.h>
 #include <shared/object.h>
 #include <shared/property_list.h>
+#include <shared/context.h>
 
 #include <xtl/intrusive_ptr.h>
 
@@ -51,8 +56,8 @@ class Output: virtual public IOutput, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”становка текущего видео-режима
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetCurrentMode (const OutputModeDesc&);
-    void   GetCurrentMode (OutputModeDesc&);
+    void SetCurrentMode (const OutputModeDesc&);
+    void GetCurrentMode (OutputModeDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление гамма-коррекцией
@@ -90,7 +95,7 @@ class SwapChain: virtual public ISwapChain, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SwapChain  ();
+    SwapChain  (OutputManager&, const SwapChainDesc& desc);
     ~SwapChain ();
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,11 +118,16 @@ class SwapChain: virtual public ISwapChain, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetFullscreenState (bool state);
     bool GetFullscreenState ();
+    
+  private:
+    typedef xtl::com_ptr<Output> OutputPtr;
 
   private:
-    Output*       output;  //указатель на устройство вывода
-    HDC           hDC;     //контекст устройства вывода
-    SwapChainDesc desc;    //дескриптор цепочки обмена
+    OutputPtr     output;                //указатель на устройство вывода
+    HWND          output_window;         //окно вывода
+    HDC           output_device_context; //контекст устройства вывода
+    WGLEWContext  wglew_context;         //контекст WGLEW
+    SwapChainDesc desc;                  //дескриптор цепочки обмена
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,6 +135,23 @@ class SwapChain: virtual public ISwapChain, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void check_errors (const char* source);
 void raise_error  (const char* source);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ƒополнительные функции инициализации Windows OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+HWND  create_dummy_window        (HWND parent);        //создание вспомогательного окна
+HDC   get_device_context         (HWND window);        //получение контекста окна
+HGLRC create_opengl_context      (HDC device_context); //создание контекста OpenGL
+void  init_wglew_context         (const SwapChainDesc& swap_chain_desc, WGLEWContext* wglew_context); //инициализаци€ контекста wglew
+void  set_current_opengl_context (HDC device_context, HGLRC gl_context);                              //установка текущего контекста OpenGL
+void  set_current_glew_context   (const GLEWContext*, const WGLEWContext* context);                   //установка текущего контекста GLEW/WGLEW
+void  set_pixel_format           (HDC device_context, const SwapChainDesc& swap_chain_desc);          //установка формата пикселей
+void  get_pixel_format           (HDC device_context, SwapChainDesc& swap_chain_desc);                //получение формата пикселей
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕолучение контекста WGLEW (им€ функции выбрано исход€ из требований WGLEW)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+const WGLEWContext* wglewGetContext ();
 
 }
 

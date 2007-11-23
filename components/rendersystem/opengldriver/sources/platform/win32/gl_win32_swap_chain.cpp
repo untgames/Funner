@@ -8,12 +8,64 @@ using namespace common;
     Конструктор / деструктор
 */
 
-SwapChain::SwapChain ()
+SwapChain::SwapChain (OutputManager&, const SwapChainDesc& in_desc)
+  : output (0), output_window ((HWND)in_desc.window_handle)
 {
+  if (!output_window)
+    RaiseNullArgument ("render::low_level::opengl::SwapChain::SwapChain", "swap_chain_desc.window_handle");
+
+    //получение контекста устройства вывода
+    
+  output_device_context = get_device_context (output_window);
+  
+  try
+  {
+      //инициализация и установка контекста WGLEW
+
+    try
+    {
+      init_wglew_context       (in_desc, &wglew_context);
+      set_current_glew_context (0, &wglew_context);
+    }
+    catch (std::exception& exception)
+    {
+          //заменить printf на вывод в лог-поток!!!!!
+      printf ("SwapChain::SwapChain: Error at initialize WGLEWContext. %s\n", exception.what ());      
+    }
+    catch (...)
+    {
+      printf ("SwapChain::SwapChain: Unknown exception at initialize WGLEWContext\n");
+    }    
+
+      //установка формата пикселей
+
+    set_pixel_format (output_device_context, in_desc);
+    
+      //получение установленного формата пикселей
+      
+    get_pixel_format (output_device_context, desc);
+    
+      //перенесение дублируемых полей
+    
+    desc.vsync         = in_desc.vsync;
+    desc.window_handle = in_desc.window_handle;
+
+      //добавить установку/взятие состояния FullScreen-mode!!!       
+
+      //отмена текущего контекста WGLEW
+
+    set_current_glew_context (0, 0);
+  }
+  catch (...)
+  {
+    ReleaseDC (output_window, output_device_context);
+    throw;
+  }
 }
 
 SwapChain::~SwapChain ()
 {
+  ReleaseDC (output_window, output_device_context);
 }
 
 /*
@@ -31,7 +83,8 @@ void SwapChain::GetDesc (SwapChainDesc& out_desc)
 
 IOutput* SwapChain::GetOutput ()
 {
-  return output;
+  RaiseNotImplemented ("render::low_level::opengl::SwapChain::GetOutput");
+  return get_pointer (output);
 }
 
 /*
@@ -40,7 +93,7 @@ IOutput* SwapChain::GetOutput ()
 
 void SwapChain::Present ()
 {
-  if (!SwapBuffers (hDC))
+  if (!SwapBuffers (output_device_context))
     raise_error (format ("render::low_level::opengl::SwapChain::Present(device-name='%s')", output->GetName ()).c_str ());
 }
 

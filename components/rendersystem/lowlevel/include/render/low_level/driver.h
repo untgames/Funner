@@ -60,7 +60,7 @@ enum SwapMethod
   SwapMethod_Discard, //состояние заднего буфера после обмена не определено
   SwapMethod_Flip,    //обмен местами заднего и переднего буфера
   SwapMethod_Copy,    //копирование заднего буфера в передний
-  
+
   SwapMethod_Num
 };
 
@@ -74,7 +74,8 @@ struct SwapChainDesc
   size_t          buffers_count; //количество буферов в цепочке обмена (0=default 2 buffers)
   SwapMethod      swap_method;   //метод обмена заднего и переднего буферов  
   bool            vsync;         //необходимо ли использовать VSync
-  void*           window_handle; //дескриптор окна отрисовки
+  bool            fullscreen;    //необходимо ли переводить устройство в FullScreen mode
+  const void*     window_handle; //дескриптор окна отрисовки
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +126,7 @@ class IDriver: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual ISwapChain* CreateSwapChain (IOutput* target_output, const SwapChainDesc& desc) = 0;
+    virtual ISwapChain* CreateSwapChain (const SwapChainDesc& desc) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства отрисовки

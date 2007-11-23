@@ -97,7 +97,7 @@ class TestDriver: public IDriver, public ObjectImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISwapChain* CreateSwapChain (IOutput*, const SwapChainDesc&)
+    ISwapChain* CreateSwapChain (const SwapChainDesc&)
     {
       RaiseNotImplemented ("TestDriver::CreateSwapChain");
       return 0;

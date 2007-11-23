@@ -45,9 +45,9 @@ IOutput* Driver::GetOutput (size_t index)
     Создание цепочки обмена
 */
 
-ISwapChain* Driver::CreateSwapChain (IOutput* target_output, const SwapChainDesc& desc)
+ISwapChain* Driver::CreateSwapChain (const SwapChainDesc& desc)
 {
-  return context_manager.CreateSwapChain (target_output, desc);
+  return context_manager.CreateSwapChain (output_manager, desc);
 }
 
 /*

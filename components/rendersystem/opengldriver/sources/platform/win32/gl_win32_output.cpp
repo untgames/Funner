@@ -155,12 +155,28 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   {
     try
     {
-      raise_error ("render::low_level::opengl::Output::SetCurrentMode");
+      const char* msg = "";
+      
+      switch (result)
+      {
+        case DISP_CHANGE_BADDUALVIEW: msg = "System is DualView capable"; break;
+        case DISP_CHANGE_BADFLAGS:    msg = "Invalid set of flags"; break;
+        case DISP_CHANGE_BADMODE:     msg = "The graphics mode is not supported"; break;
+        case DISP_CHANGE_BADPARAM:    msg = "Invalid parameter"; break;
+        case DISP_CHANGE_FAILED:      msg = "The display driver failed the specified graphics mode"; break;
+        case DISP_CHANGE_NOTUPDATED:  msg = "Unable to write settings to the registry"; break;
+        case DISP_CHANGE_RESTART:     msg = "The computer must be restarted in order for the graphics mode to work"; break;
+        default:
+          raise_error ("render::low_level::opengl::Output::SetCurrentMode");
+          break;
+      }
+      
+      RaiseInvalidOperation ("render::low_level::opengl::Output::SetCurrentMode", msg);
     }
     catch (common::Exception& exception)
     {
       exception.Touch ("ChangeDisplaySettings(device-name='%s', mode='%ux%ux%u @ %uHz')",
-        name.c_str (), win_name.c_str (), mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);
+        name.c_str (), mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);
       throw;
     }
   }

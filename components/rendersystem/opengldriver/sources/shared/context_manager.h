@@ -1,6 +1,8 @@
 #ifndef RENDER_GL_DRIVER_CONTEXT_MANAGER_HEADER
 #define RENDER_GL_DRIVER_CONTEXT_MANAGER_HEADER
 
+#include <shared/output_manager.h>
+
 namespace render
 {
 
@@ -25,7 +27,7 @@ class ContextManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISwapChain* CreateSwapChain (IOutput* target_output, const SwapChainDesc& swap_chain_desc);
+    ISwapChain* CreateSwapChain (OutputManager& output_manager, const SwapChainDesc& swap_chain_desc);
     
   private:
     ContextManager (const ContextManager&); //no impl

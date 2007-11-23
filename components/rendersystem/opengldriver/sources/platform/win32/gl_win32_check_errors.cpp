@@ -11,6 +11,7 @@ class Win32ErrorMessage
     {
       FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                      0, error_code, 0, (LPTSTR)&buffer, 0, 0);
+//MAKELANGID (LANG_NEUTRAL,SUBLANG_DEFAULT)                     
 
       if (!buffer)
         common::RaiseInvalidOperation ("render::low_level::opengl::Win32ErrorMessage::Win32ErrorMessage", "Internal error at FormatMessage");

@@ -40,7 +40,6 @@ class RenderSystemImpl
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDevice* CreateDevice (const char*          driver_mask,       //маска имени драйвера
-                           const char*          output_mask,       //маска имени устройства вывода
                            const SwapChainDesc& swap_chain,        //дескриптор цепочки обмена
                            const char*          init_string = ""); //строка инициализации
 
@@ -105,11 +104,10 @@ IDriver* RenderSystemImpl::FindDriver (const char* name)
 
 IDevice* RenderSystemImpl::CreateDevice
  (const char*          driver_mask,      //маска имени драйвера
-  const char*          output_mask,      //маска имени устройства вывода
   const SwapChainDesc& swap_chain_desc,  //дескриптор цепочки обмена
   const char*          init_string)      //строка инициализации
 {
-  if (!driver_mask || !output_mask)
+  if (!driver_mask)
     return 0;
     
   if (!init_string)
@@ -121,22 +119,12 @@ IDevice* RenderSystemImpl::CreateDevice
     if (wcimatch (iter->first.c_str (), driver_mask))
     {
       DriverPtr driver = iter->second;
-      
-        //поиск устройства вывода
-        
-      for (size_t i=0, count=driver->GetOutputsCount (); i<count; i++)
-      {
-        IOutput* output = driver->GetOutput (i);
-        
-        if (wcimatch (output->GetName (), output_mask))
-        {
-            //создание SwapChain и устройства отрисовки
 
-          xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (output, swap_chain_desc), false);
+        //создание SwapChain и устройства отрисовки
 
-          return driver->CreateDevice (get_pointer (swap_chain), init_string);
-        }
-      }
+      xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (swap_chain_desc), false);
+
+      return driver->CreateDevice (get_pointer (swap_chain), init_string);
     }
 
   return 0;
@@ -163,7 +151,7 @@ IDriver* RenderSystem::FindDriver (const char* name)
   return RenderSystemSingleton::Instance ().FindDriver (name);
 }
 
-IDevice* RenderSystem::CreateDevice (const char* driver_mask, const char* output_mask, const SwapChainDesc& swap_chain, const char* init_string)
+IDevice* RenderSystem::CreateDevice (const char* driver_mask, const SwapChainDesc& swap_chain, const char* init_string)
 {
-  return RenderSystemSingleton::Instance ().CreateDevice (driver_mask, output_mask, swap_chain, init_string);
+  return RenderSystemSingleton::Instance ().CreateDevice (driver_mask, swap_chain, init_string);
 }

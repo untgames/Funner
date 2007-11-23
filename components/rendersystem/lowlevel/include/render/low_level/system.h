@@ -30,7 +30,6 @@ class RenderSystem
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static IDevice* CreateDevice (const char*          driver_mask,       //маска имени драйвера
-                                  const char*          output_mask,       //маска имени устройства вывода
                                   const SwapChainDesc& swap_chain,        //дескриптор цепочки обмена
                                   const char*          init_string = ""); //строка инициализации
 };

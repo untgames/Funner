@@ -12,7 +12,7 @@ int main ()
     
     SwapChainDesc swap_chain_desc; //не инициализируется, поскольку не будет использован в дальнейшем    
     
-    xtl::com_ptr<IDevice> device (RenderSystem::CreateDevice ("*_drv", "Testoutput", swap_chain_desc), false);
+    xtl::com_ptr<IDevice> device (RenderSystem::CreateDevice ("*_drv", swap_chain_desc), false);
   }
   catch (std::exception& exception)
   {
