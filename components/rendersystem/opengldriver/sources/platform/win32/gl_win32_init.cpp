@@ -60,15 +60,6 @@ void set_current_opengl_context (HDC device_context, HGLRC gl_context)
     raise_error ("wglMakeCurrent");
 }
 
-//получение текущего контекста WGLEW
-const WGLEWContext* wglewGetContext ()
-{
-  if (!current_wglew_context)
-    RaiseInvalidOperation ("render::low_level::opengl::wglewGetContext", "No current context has bound");
-
-  return current_wglew_context;
-}
-
 //инициализация контекста WGLEW
 void init_wglew_context (const SwapChainDesc& swap_chain_desc, WGLEWContext* wglew_context)
 {
@@ -123,6 +114,9 @@ void init_wglew_context (const SwapChainDesc& swap_chain_desc, WGLEWContext* wgl
 //установка текущего контекста GLEW/WGLEW
 void set_current_glew_context (const GLEWContext* glew_context, const WGLEWContext* wglew_context)
 {
+  if ((current_glew_context || current_wglew_context) && (glew_context || wglew_context))
+    RaiseInvalidOperation ("render::low_level::opengl::set_current_context", "Context is locked");
+
   current_glew_context  = glew_context;
   current_wglew_context = wglew_context;
 }
@@ -134,6 +128,15 @@ const GLEWContext* glewGetContext ()
     RaiseInvalidOperation ("render::low_level::opengl::glewGetContext", "No current context has bound");
 
   return current_glew_context;
+}
+
+//получение текущего контекста WGLEW
+const WGLEWContext* wglewGetContext ()
+{
+  if (!current_wglew_context)
+    RaiseInvalidOperation ("render::low_level::opengl::wglewGetContext", "No current context has bound");
+
+  return current_wglew_context;
 }
 
 namespace
