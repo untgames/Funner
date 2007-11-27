@@ -260,7 +260,7 @@ define process_tests_source_dir
 #Правило сборки теста
   $$($2.TMP_DIR)/%.exe: $$($2.TMP_DIR)/%.obj $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
-		@link $$(filter %.obj,$$<) $$($1.LIBS) /nologo /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS) /incremental
+		@link $$(filter %.obj,$$<) $$($1.LIBS) /nologo /out:"$$@" $$($1.LIB_DIRS:%=/libpath:"%") $$($1.LINK_FLAGS)
 
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.exe
