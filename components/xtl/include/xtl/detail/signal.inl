@@ -1,80 +1,6 @@
 namespace detail
 {
 
-#ifdef _MSC_VER
-  #pragma warning(push)
-  #pragma warning(disable : 4355) //'this' : used in base member initializer list
-#endif
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Слот в обработке сигнала
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Signature> class slot: public connection_impl
-{
-  public:  
-    typedef function<Signature>                 function_type;
-    typedef typename function_type::result_type result_type;
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы / деструктор
-/////////////////////////////////////////////////////////////////////////////////////////////////// 
-    slot () : connection_impl (false), prev_slot (this), next_slot (this) {}
-    
-    template <class Fn> slot (Fn& in_fn, slot* in_next) : fn (in_fn), next_slot (in_next), prev_slot (in_next->prev_slot)
-    {
-      next_slot->prev_slot = prev_slot->next_slot = this;
-    }
-
-    ~slot ()
-    {
-      prev_slot->next_slot = next_slot;
-      next_slot->prev_slot = prev_slot;
-    }
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение следующего и предыдущего слотов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    slot* prev () const { return prev_slot; }
-    slot* next () const { return next_slot; }
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вызов обработчика
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class Args> result_type invoke (Args& args) const
-    {
-      return apply<result_type> (fn, args);
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка равенства функций
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class Fn> bool equal (Fn& in_fn) const
-    {
-      return fn == in_fn;
-    }
-
-  private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Разрыв соединения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void do_disconnect ()
-    {
-      prev_slot->next_slot  = next_slot;
-      next_slot->prev_slot  = prev_slot;
-      next_slot = prev_slot = this;
-  
-      release ();
-    }
-
-  private:
-    function_type fn;
-    slot          *prev_slot, *next_slot;
-};
-
-#ifdef _MSC_VER
-  #pragma warning(pop)
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Итератор слотов для аккумулирования результата распространения сигнала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,13 +8,14 @@ template <class Slot, class Args> class signal_invoke_iterator
 {  
   typedef Slot slot_type;
   public:
-    typedef typename slot_type::result_type value_type;
-    typedef stl::bidirectional_iterator_tag iterator_category;
+    typedef typename slot_type::function_type   function_type;
+    typedef typename function_type::result_type value_type;
+    typedef stl::bidirectional_iterator_tag     iterator_category;
     
-    signal_invoke_iterator (Args& in_args, Slot* first_slot) : slot (first_slot), args (&in_args)
-    {   
-      while (slot->blocked ()) slot = slot->next ();
-      
+    signal_invoke_iterator (Args& in_args, Slot* first_slot, Slot* in_end) : slot (first_slot), end (in_end), args (&in_args)
+    {
+      while (slot->slot_type::blocked () && slot != end) slot = slot->next ();
+
       slot->lock ();
     }
     
@@ -104,16 +31,17 @@ template <class Slot, class Args> class signal_invoke_iterator
     
     signal_invoke_iterator& operator = (const signal_invoke_iterator& i)
     {
-      if (this != &i)
-      {
-        slot_type* old_slot = slot;
-        
-        slot = i.slot;
-        args = i.args;
-        
-        slot->lock ();
-        old_slot->unlock ();
-      }
+      if (this == &i)
+        return *this;
+
+      slot_type* old_slot = slot;
+      
+      slot = i.slot;
+      end  = i.end;
+      args = i.args;
+      
+      slot->lock ();
+      old_slot->unlock ();
 
       return *this;
     }
@@ -122,7 +50,7 @@ template <class Slot, class Args> class signal_invoke_iterator
     {
       slot_type* old_slot = slot;
     
-      do slot = slot->next (); while (slot->blocked ());    
+      do slot = slot->next (); while (slot->slot_type::blocked () && slot != end);
       
       slot->lock ();
       old_slot->unlock ();
@@ -143,7 +71,7 @@ template <class Slot, class Args> class signal_invoke_iterator
     {
       slot_type* old_slot = slot;    
 
-      do slot = slot->prev (); while (slot->blocked ());
+      do slot = slot->prev (); while (slot->slot_type::blocked () && slot != end);
 
       slot->lock ();
       old_slot->unlock ();
@@ -159,14 +87,15 @@ template <class Slot, class Args> class signal_invoke_iterator
     
       return tmp;
     }    
-    
+ 
     bool operator == (const signal_invoke_iterator& s) const { return slot == s.slot; }
     bool operator != (const signal_invoke_iterator& s) const { return slot != s.slot; }
 
-    value_type operator * () const { return slot->invoke (*args); }
+    value_type operator * () const { return apply<value_type> (slot->function (), *args); }
 
   private:
     Slot* slot;    
+    Slot* end;
     Args* args;
 };
 
@@ -216,11 +145,14 @@ template <> struct default_signal_accumulator<void>
 
 template <class Signature, class Accumulator>
 inline signal<Signature, Accumulator>::signal ()
-  { }
+{
+  first.lock ();
+}
 
 template <class Signature, class Accumulator>
 inline signal<Signature, Accumulator>::~signal ()
 {
+  first.unlock ();
   disconnect_all ();
 }
 
@@ -228,19 +160,28 @@ inline signal<Signature, Accumulator>::~signal ()
     Установка / разрыв соединения
 */
 
-template <class Signature, class Accumulator> template <class Fn>
-inline connection signal<Signature, Accumulator>::connect (Fn fn)
+template <class Signature, class Accumulator>
+inline connection signal<Signature, Accumulator>::connect (slot_type& s)
 {
-  return new slot (fn, &first);
+  s.impl->connect (&first);
+  return s.connection ();
+}
+
+template <class Signature, class Accumulator>
+inline connection signal<Signature, Accumulator>::connect (const function_type& fn)
+{
+  slot_type s (fn, &first);  
+
+  return s.connection ();
 }
 
 template <class Signature, class Accumulator> template <class Fn>
 inline void signal<Signature, Accumulator>::disconnect (Fn fn)
 {
-  for (slot* i=first.next (); i!=&first;)
-    if (i->equal (fn))
+  for (slot_impl* i=first.next (); i!=&first;)
+    if (i->function () == fn)
     {
-      slot* tmp = i;
+      slot_impl* tmp = i;
       
       tmp = tmp->next ();
       
@@ -256,11 +197,11 @@ void signal<Signature, Accumulator>::disconnect_all ()
 {
     //данная функция предполагает возможность очистки списка обработчиков во время распространения сигнала
 
-  for (slot* i=first.prev (), *end=&first; i!=&first;)
+  for (slot_impl* i=first.previos (), *end=&first; i!=&first;)
   {
-    slot* tmp = i;
+    slot_impl* tmp = i;
     
-    tmp = tmp->prev ();
+    tmp = tmp->previos ();
     
     i->disconnect ();
     
@@ -275,7 +216,7 @@ void signal<Signature, Accumulator>::disconnect_all ()
 template <class Signature, class Accumulator>
 inline bool signal<Signature, Accumulator>::empty () const
 {
-  return first.next () == &first;
+  return !first.connected ();
 }
 
 /*
@@ -287,26 +228,10 @@ inline size_t signal<Signature, Accumulator>::num_slots () const
 {
   size_t count = 0;
 
-  for (const slot* i=first.next (); i!=&first; i=i->next ())
+  for (slot_impl* i=first.next (); i!=&first; i=i->next ())
     count++;
     
   return count;
-}
-
-/*
-    Обмен
-*/
-
-template <class Signature, class Accumulator> template <class Accumulator1>
-inline void signal<Signature, Accumulator>::swap (signal<Signature, Accumulator1>& s)
-{
-  first.swap (s.first);
-}
-
-template <class Signature, class Accumulator1, class Accumulator2>
-inline void swap (signal<Signature, Accumulator1>& s1, signal<Signature, Accumulator2>& s2)
-{
-  s1.swap (s2);
 }
 
 /*
@@ -316,9 +241,9 @@ inline void swap (signal<Signature, Accumulator1>& s1, signal<Signature, Accumul
 template <class Signature, class Accumulator> template <class Tuple>
 inline typename signal<Signature, Accumulator>::result_type signal<Signature, Accumulator>::invoke (Tuple& args) const
 {
-  typedef detail::signal_invoke_iterator<slot, Tuple> iterator;
+  typedef detail::signal_invoke_iterator<slot_impl, Tuple> iterator;
 
-  return Accumulator () (iterator (args, first.next ()), iterator (args, &first));
+  return Accumulator () (iterator (args, first.next (), &first), iterator (args, &first, &first));
 }
 
 template <class Signature, class Accumulator>
