@@ -6,6 +6,7 @@
 
 #include <shared/object.h>
 #include <shared/property_list.h>
+#include <shared/event.h>
 
 #include <stl/string>
 #include <stl/vector>
