@@ -170,7 +170,7 @@ inline connection signal<Signature, Accumulator>::connect (slot_type& s)
 template <class Signature, class Accumulator>
 inline connection signal<Signature, Accumulator>::connect (const function_type& fn)
 {
-  slot_type s (fn, &first);  
+  slot_type s (fn, &first);
 
   return s.connection ();
 }

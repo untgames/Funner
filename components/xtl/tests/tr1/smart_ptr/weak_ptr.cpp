@@ -5,6 +5,9 @@
 
 using namespace stl;
 
+namespace test
+{
+
 namespace n_element_type
 {
 
@@ -1306,9 +1309,13 @@ void test()
 
 } // namespace n_map
 
+} //namespace test
+
 int main()
 {
     printf ("Results of weak_ptr_test:\n");
+
+    using namespace test;
 
     n_element_type::test();
     n_constructors::test();
@@ -1324,6 +1331,10 @@ int main()
     return 0;
 }
 
+namespace test
+{
+
+
 class incomplete
 {
 };
@@ -1332,4 +1343,6 @@ shared_ptr<incomplete> create_incomplete()
 {
     shared_ptr<incomplete> px(new incomplete);
     return px;
+}
+
 }

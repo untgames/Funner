@@ -19,6 +19,10 @@ template <class T> struct checked_array_deleter
   void operator () (T* p) const { delete [] p; }
 };
 
+namespace test
+{
+
+
 namespace n_element_type
 {
 
@@ -3115,9 +3119,13 @@ void test()
 
 } // namespace n_spt_wrap
 
+} //namespace test
+
 int main()
 {
     printf ("Results of shared_ptr_test:\n");
+
+    using namespace test;
 
     n_element_type::test();
     n_constructors::test();
@@ -3150,6 +3158,10 @@ int main()
 
     return 0;
 }
+
+namespace test
+{
+
 
 namespace n_spt_incomplete
 {
@@ -3278,3 +3290,5 @@ shared_ptr<X> createX()
 }
 
 } // namespace n_spt_abstract
+
+} // namespace test

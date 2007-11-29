@@ -1,5 +1,8 @@
 #include "test.h"
 
+namespace test
+{
+
 enum adl_types
 {
     unused,
@@ -119,11 +122,15 @@ inline range::iterator begin( range& r )
 inline range::iterator begin( const range& r )
 {
     return global_namespace;
-}   
+}
+
+}
 
 int main ()
 {
     printf ("Results of adl_conformance_test:\n");
+
+    using namespace test;
 
     find_templated::range<int>       r;
     const find_templated::range<int> r2;

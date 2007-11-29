@@ -13,6 +13,9 @@ using xtl::intrusive_ptr;
 
 //
 
+namespace test
+{
+
 namespace N
 {
 
@@ -520,9 +523,13 @@ void test()
 
 } // namespace n_report_1
 
+} //namespace test
+
 int main()
 {
     printf ("Results of intrusive_ptr_test:\n");
+
+    using namespace test;
 
     n_element_type::test();
     n_constructors::test();
