@@ -1,7 +1,7 @@
-#ifndef RENDER_GL_DRIVER_CONTEXT_MANAGER_HEADER
-#define RENDER_GL_DRIVER_CONTEXT_MANAGER_HEADER
+#ifndef RENDER_GL_DRIVER_TRACKABLE_HEADER
+#define RENDER_GL_DRIVER_TRACKABLE_HEADER
 
-#include <shared/output_manager.h>
+#include <xtl/signal.h>
 
 namespace render
 {
@@ -13,29 +13,26 @@ namespace opengl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Менеджер контекстов OpenGL
+///Объект, оповещающий клиентов при удалении
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ContextManager
+class Trackable
 {
   public:
+    typedef xtl::slot<void ()> HandlerSlot;
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///Объект, оповещающий клиентов при удалении
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ContextManager  ();
-    ~ContextManager ();
+    Trackable  ();
+    ~Trackable ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание цепочки обмена
+///Регистрация обработчика события удаления объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISwapChain* CreateSwapChain (OutputManager& output_manager, const SwapChainDesc& swap_chain_desc);
-    
-  private:
-    ContextManager (const ContextManager&); //no impl
-    ContextManager& operator = (const ContextManager&); //no impl
+    xtl::connection RegisterDestroyHandler (HandlerSlot&);
 
   private:
-    struct Impl;
-    stl::auto_ptr<Impl> impl;
+    xtl::signal<void ()> destroy_signal;
 };
 
 }

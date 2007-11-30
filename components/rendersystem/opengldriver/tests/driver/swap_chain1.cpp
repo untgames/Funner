@@ -56,7 +56,7 @@ int main ()
     desc.fullscreen                = true;
     desc.window_handle             = window.Handle ();
 
-    SwapChainPtr swap_chain (driver->CreateSwapChain (desc));
+    SwapChainPtr swap_chain (driver->CreateSwapChain (desc), false);
     
     swap_chain->GetDesc (desc);
     
@@ -67,7 +67,7 @@ int main ()
       desc.samples_count = 0;
       desc.buffers_count = 1;
 
-      SwapChainPtr (driver->CreateSwapChain (desc)).swap (swap_chain);
+      SwapChainPtr (driver->CreateSwapChain (desc), false).swap (swap_chain);
     
       swap_chain->GetDesc (desc);
 

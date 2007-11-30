@@ -16,10 +16,15 @@ SwapChain::SwapChain (OutputManager&, const SwapChainDesc& in_desc)
 
     //получение контекста устройства вывода
     
-  output_device_context = get_device_context (output_window);
+  output_device_context = ::GetDC (output_window);
   
+  if (!output_device_context)
+    raise_error ("GetDC");
+
   try
   {
+    ThreadLock lock;
+    
       //инициализация и установка контекста WGLEW
 
     try
@@ -58,6 +63,7 @@ SwapChain::SwapChain (OutputManager&, const SwapChainDesc& in_desc)
   }
   catch (...)
   {
+    set_current_glew_context (0, 0);
     ReleaseDC (output_window, output_device_context);
     throw;
   }
@@ -110,4 +116,28 @@ bool SwapChain::GetFullscreenState ()
 {
   RaiseNotImplemented ("render::low_level::opengl::SwapChain::SetFullscreenState");
   return false;
+}
+
+/*
+    Создание цепочки обмена
+*/
+
+namespace render
+{
+
+namespace low_level
+{
+
+namespace opengl
+{
+
+ISwapChain* create_swap_chain (OutputManager& output_manager, const SwapChainDesc& swap_chain_desc)
+{
+  return new SwapChain (output_manager, swap_chain_desc);
+}
+
+}
+
+}
+
 }

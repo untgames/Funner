@@ -19,6 +19,9 @@ namespace low_level
 namespace opengl
 {
 
+namespace
+{
+
 //создание вспомогательного окна для инициализации расширений WGL
 HWND create_dummy_window (HWND parent)
 {
@@ -31,33 +34,6 @@ HWND create_dummy_window (HWND parent)
   return window;
 }
 
-//получение контекста окна
-HDC get_device_context (HWND window)
-{
-  HDC dc = GetDC (window);
-  
-  if (!dc)
-    raise_error ("GetDC");
-    
-  return dc;
-}
-
-//создание контекста OpenGL
-HGLRC create_opengl_context (HDC dc)
-{
-  HGLRC context = wglCreateContext (dc);
-
-  if (!context)
-    raise_error ("wglCreateContext");
-
-  return context;
-}
-
-//установка текущего контекста OpenGL
-void set_current_opengl_context (HDC device_context, HGLRC gl_context)
-{
-  if (!wglMakeCurrent (device_context, gl_context))
-    raise_error ("wglMakeCurrent");
 }
 
 //инициализация контекста WGLEW
@@ -77,16 +53,23 @@ void init_wglew_context (const SwapChainDesc& swap_chain_desc, WGLEWContext* wgl
   try
   {
     dummy_window = create_dummy_window (window);
-    dummy_dc     = get_device_context (dummy_window);    
+    dummy_dc     = GetDC (dummy_window);
+    
+    if (!dummy_dc)
+      raise_error ("GetDC");
     
     set_pixel_format (dummy_dc, swap_chain_desc); //установка формата пикселей без использования расширений
     
-    dummy_context = create_opengl_context (dummy_dc);        
+    dummy_context = wglCreateContext (dummy_dc);
 
-    set_current_opengl_context (dummy_dc, dummy_context);
-    
+    if (!dummy_context)
+      raise_error ("wglCreateContext");
+
+    if (!wglMakeCurrent (dummy_dc, dummy_context))
+      raise_error ("wglMakeCurrent");
+
       //инициализация расширений WGL
-      
+
     GLenum status = wglewContextInit (wglew_context);
 
     if (status != GLEW_OK)
@@ -115,7 +98,7 @@ void init_wglew_context (const SwapChainDesc& swap_chain_desc, WGLEWContext* wgl
 void set_current_glew_context (const GLEWContext* glew_context, const WGLEWContext* wglew_context)
 {
   if ((current_glew_context || current_wglew_context) && (glew_context || wglew_context))
-    RaiseInvalidOperation ("render::low_level::opengl::set_current_context", "Context is locked");
+    RaiseInvalidOperation ("render::low_level::opengl::set_current_glew_context", "Context is locked");
 
   current_glew_context  = glew_context;
   current_wglew_context = wglew_context;

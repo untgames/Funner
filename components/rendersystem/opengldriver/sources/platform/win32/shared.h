@@ -7,13 +7,15 @@
 #include <gl/glew.h>
 #include <gl/wglew.h>
 
-#include <shared/output_manager.h>
-#include <shared/context_manager.h>
+#include <shared/platform/output_manager.h>
+#include <shared/platform/swap_chain.h>
+#include <shared/platform/context.h>
 #include <shared/object.h>
 #include <shared/property_list.h>
-#include <shared/context.h>
+#include <shared/trackable.h>
 
 #include <xtl/intrusive_ptr.h>
+#include <xtl/bind.h>
 
 #include <stl/vector>
 #include <stl/string>
@@ -89,7 +91,7 @@ class Output: virtual public IOutput, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///÷епочка обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SwapChain: virtual public ISwapChain, public Object
+class SwapChain: virtual public ISwapChain, public Object, public Trackable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +124,7 @@ class SwapChain: virtual public ISwapChain, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онтекст устройства вывода / WGLEW контекст
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    HDC                 GetDC           () const { return device_context; }
+    HDC                 GetDC           () const { return output_device_context; }
     const WGLEWContext* GetWGLEWContext () const { return &wglew_context; }
 
   private:
@@ -145,18 +147,33 @@ void raise_error  (const char* source);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ƒополнительные функции инициализации Windows OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-HWND  create_dummy_window        (HWND parent);        //создание вспомогательного окна
-HDC   get_device_context         (HWND window);        //получение контекста окна
-HGLRC create_opengl_context      (HDC device_context); //создание контекста OpenGL
-void  init_wglew_context         (const SwapChainDesc& swap_chain_desc, WGLEWContext* wglew_context); //инициализаци€ контекста wglew
-void  set_current_opengl_context (HDC device_context, HGLRC gl_context);                              //установка текущего контекста OpenGL
-void  set_current_glew_context   (const GLEWContext*, const WGLEWContext* context);                   //установка текущего контекста GLEW/WGLEW
-void  set_pixel_format           (HDC device_context, const SwapChainDesc& swap_chain_desc);          //установка формата пикселей
-void  get_pixel_format           (HDC device_context, SwapChainDesc& swap_chain_desc);                //получение формата пикселей
+void init_wglew_context       (const SwapChainDesc& swap_chain_desc, WGLEWContext* wglew_context); //инициализаци€ контекста wglew
+void set_current_glew_context (const GLEWContext*, const WGLEWContext* context);                   //установка текущего контекста GLEW/WGLEW
+void set_pixel_format         (HDC device_context, const SwapChainDesc& swap_chain_desc);          //установка формата пикселей
+void get_pixel_format         (HDC device_context, SwapChainDesc& swap_chain_desc);                //получение формата пикселей
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ѕолучение контекста WGLEW (им€ функции выбрано исход€ из требований WGLEW)
+///«ахват нитью контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+class ThreadLock
+{
+  public:
+    ThreadLock  ();
+    ~ThreadLock ();
+
+    static void Lock     ();
+    static void Unlock   ();
+    static bool IsLocked ();
+
+  private:
+    ThreadLock (const ThreadLock&); //no impl
+    ThreadLock& operator = (const ThreadLock&); //no impl
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕолучение контекста GLEW/WGLEW (им€ функции выбрано исход€ из требований GLEW)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+const GLEWContext*  glewGetContext  ();
 const WGLEWContext* wglewGetContext ();
 
 }
