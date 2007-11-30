@@ -34,7 +34,7 @@ Device::Device (ISwapChain* swap_chain, const char*)
   properties.AddProperty ("gl_extensions", extension_string.c_str ());
 
     //проверка состояния контекста OpenGL
-  
+
   current_state.Check ("render::low_level::opengl::Device::Device");
 }
 

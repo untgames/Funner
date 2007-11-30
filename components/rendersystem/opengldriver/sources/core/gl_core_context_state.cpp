@@ -81,6 +81,11 @@ void ContextState::SetObject (ContextSlot slot, ContextObject* object)
   current_object = object;
 }
 
+void ContextState::SetObject (ContextSlot slot, IObject* object)
+{
+  SetObject (slot, cast_object<ContextObject*> (object));
+}
+
 ContextObject* ContextState::GetObject (ContextSlot slot) const
 {
   if (slot < 0 || slot >= ContextSlot_Num)
