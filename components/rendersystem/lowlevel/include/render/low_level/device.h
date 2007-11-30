@@ -147,7 +147,7 @@ class IDevice: virtual public IDeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void                OSSetBlendState        (IBlendState* state) = 0;
     virtual void                OSSetDepthStencil      (IDepthStencilState* state) = 0;
-    virtual void                OSSetStencilReference  (size_t reference) = 0;    
+    virtual void                OSSetStencilReference  (size_t reference) = 0;
     virtual void                OSSetFrameBuffer       (IFrameBuffer* frame_buffer) = 0;
     virtual IBlendState*        OSGetBlendState        () = 0;
     virtual IDepthStencilState* OSGetDepthStencilState () = 0;

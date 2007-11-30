@@ -39,9 +39,11 @@ class RenderSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IDevice* CreateDevice (const char*          driver_mask,       //маска имени драйвера
-                           const SwapChainDesc& swap_chain,        //дескриптор цепочки обмена
-                           const char*          init_string = ""); //строка инициализации
+    bool CreateSwapChainAndDevice (const char*          driver_mask,     //маска имени драйвера
+                                   const SwapChainDesc& swap_chain_desc, //дескриптор цепочки обмена
+                                   const char*          init_string,     //строка инициализации
+                                   ISwapChain*&         out_swap_chain,  //результирующая цепочка обмена
+                                   IDevice*&            out_device);     //результирующее устройство отрисовки
 
   private:
     typedef xtl::com_ptr<IDriver>      DriverPtr;
@@ -102,10 +104,12 @@ IDriver* RenderSystemImpl::FindDriver (const char* name)
     Создание устройства отрисовки
 */
 
-IDevice* RenderSystemImpl::CreateDevice
+bool RenderSystemImpl::CreateSwapChainAndDevice
  (const char*          driver_mask,      //маска имени драйвера
   const SwapChainDesc& swap_chain_desc,  //дескриптор цепочки обмена
-  const char*          init_string)      //строка инициализации
+  const char*          init_string,      //строка инициализации
+  ISwapChain*&         out_swap_chain,   //результирующая цепочка обмена
+  IDevice*&            out_device)       //результирующее устройство отрисовки
 {
   if (!driver_mask)
     return 0;
@@ -123,11 +127,21 @@ IDevice* RenderSystemImpl::CreateDevice
         //создание SwapChain и устройства отрисовки
 
       xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (swap_chain_desc), false);
+      
+      IDevice* device = driver->CreateDevice (get_pointer (swap_chain), init_string);
+      
+      swap_chain->AddRef ();
 
-      return driver->CreateDevice (get_pointer (swap_chain), init_string);
+      out_swap_chain = get_pointer (swap_chain);
+      out_device     = device;
+
+      return true;
     }
+    
+  out_swap_chain = 0;
+  out_device     = 0;
 
-  return 0;
+  return false;
 }
 
 /*
@@ -151,7 +165,12 @@ IDriver* RenderSystem::FindDriver (const char* name)
   return RenderSystemSingleton::Instance ().FindDriver (name);
 }
 
-IDevice* RenderSystem::CreateDevice (const char* driver_mask, const SwapChainDesc& swap_chain, const char* init_string)
+bool RenderSystem::CreateSwapChainAndDevice
+ (const char*          driver_mask,
+  const SwapChainDesc& swap_chain_desc,
+  const char*          init_string,
+  ISwapChain*&         out_swap_chain,
+  IDevice*&            out_device)
 {
-  return RenderSystemSingleton::Instance ().CreateDevice (driver_mask, swap_chain, init_string);
+  return RenderSystemSingleton::Instance ().CreateSwapChainAndDevice (driver_mask, swap_chain_desc, init_string, out_swap_chain, out_device);
 }

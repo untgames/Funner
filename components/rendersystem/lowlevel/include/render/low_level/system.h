@@ -29,9 +29,11 @@ class RenderSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static IDevice* CreateDevice (const char*          driver_mask,       //маска имени драйвера
-                                  const SwapChainDesc& swap_chain,        //дескриптор цепочки обмена
-                                  const char*          init_string = ""); //строка инициализации
+    static bool CreateSwapChainAndDevice (const char*          driver_mask,     //маска имени драйвера
+                                          const SwapChainDesc& swap_chain_desc, //дескриптор цепочки обмена
+                                          const char*          init_string,     //строка инициализации
+                                          ISwapChain*&         out_swap_chain,  //результирующая цепочка обмена
+                                          IDevice*&            out_device);     //результирующее устройство отрисовки
 };
 
 }
