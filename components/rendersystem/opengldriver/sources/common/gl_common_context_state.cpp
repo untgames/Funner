@@ -83,7 +83,7 @@ void ContextState::SetObject (ContextSlot slot, ContextObject* object)
 
 void ContextState::SetObject (ContextSlot slot, IObject* object)
 {
-  SetObject (slot, cast_object<ContextObject*> (object));
+  SetObject (slot, cast_object<ContextObject> (object, "render::low_level::ContextState::SetObject", "object"));
 }
 
 ContextObject* ContextState::GetObject (ContextSlot slot) const
