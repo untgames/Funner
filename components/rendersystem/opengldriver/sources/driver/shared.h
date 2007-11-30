@@ -9,6 +9,7 @@
 #include <shared/object.h>
 #include <shared/context_state.h>
 #include <shared/property_list.h>
+#include <shared/output_stage.h>
 
 #include <common/exception.h>
 #include <common/singleton.h>
@@ -203,6 +204,7 @@ class Device: virtual public IDevice, public Object
   private:
     ContextState current_state; //текущее состояние контекста OpenGL
     PropertyList properties;    //свойства устройства
+    OutputStage  output_stage;  //выходной уровень
 };
 
 }

@@ -9,10 +9,10 @@ using namespace common;
 */
 
 Device::Device (ISwapChain* swap_chain, const char*)
-  : current_state (swap_chain)
+  : current_state (swap_chain), output_stage (current_state)
 {  
   ContextLock lock (current_state);
-  
+
     //получение информации об устройстве отрисовки
     
   properties.AddProperty ("vendor",     reinterpret_cast<const char*> (glGetString (GL_VENDOR)));
@@ -91,18 +91,6 @@ IRasterizerState* Device::CreateRasterizerState ()
   return 0;
 }
 
-IBlendState* Device::CreateBlendState ()
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateBlendState");
-  return 0;
-}
-
-IDepthStencilState* Device::CreateDepthStencilState ()
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateDepthStencilState");
-  return 0;
-}
-
 ISamplerState* Device::CreateSamplerState ()
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreateSamplerState");
@@ -124,24 +112,6 @@ IIndexBuffer* Device::CreateIndexBuffer (const BufferDesc&)
 ITexture* Device::CreateTexture (const TextureDesc&)
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreateTexture");
-  return 0;
-}
-
-IFrameBuffer* Device::CreateFrameBuffer (const FrameBufferDesc&)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateFrameBuffer(const FrameBufferDesc&)");
-  return 0;
-}
-
-IFrameBuffer* Device::CreateFrameBuffer (ISwapChain*)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateFrameBuffer(ISwapChain*)");
-  return 0;
-}
-
-IFrameBuffer* Device::CreateFrameBuffer (ITexture* render_target)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateFrameBuffer(ITexture*)");
   return 0;
 }
 
@@ -333,48 +303,69 @@ const Rect& Device::RSGetScissor ()
     ”правление выходным уровнем (output-stage)
 */
 
+IBlendState* Device::CreateBlendState ()
+{
+  return output_stage.CreateBlendState ();
+}
+
+IDepthStencilState* Device::CreateDepthStencilState ()
+{
+  return output_stage.CreateDepthStencilState ();
+}
+
+IFrameBuffer* Device::CreateFrameBuffer (const FrameBufferDesc& frame_buffer_desc)
+{
+  return output_stage.CreateFrameBuffer (frame_buffer_desc);
+}
+
+IFrameBuffer* Device::CreateFrameBuffer (ISwapChain* swap_chain)
+{
+  return output_stage.CreateFrameBuffer (swap_chain);
+}
+
+IFrameBuffer* Device::CreateFrameBuffer (ITexture* render_target)
+{
+  return output_stage.CreateFrameBuffer (render_target);
+}
+
 void Device::OSSetBlendState (IBlendState* state)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::OSSetBlendState");
+  output_stage.SetBlendState (state);
 }
 
 void Device::OSSetDepthStencil (IDepthStencilState* state)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::OSSetDepthStencil");
+  output_stage.SetDepthStencil (state);
 }
 
 void Device::OSSetStencilReference (size_t reference)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::OSSetStencilReference");
+  output_stage.SetStencilReference (reference);
 }
 
 void Device::OSSetFrameBuffer (IFrameBuffer* frame_buffer)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::OSSetFrameBuffer");
+  output_stage.SetFrameBuffer (frame_buffer);
 }
 
 IBlendState* Device::OSGetBlendState ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::OSGetBlendState");
-  return 0;
+  return output_stage.GetBlendState ();
 }
 
 IDepthStencilState* Device::OSGetDepthStencilState ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::OSGetDepthStencilState");
-  return 0;
+  return output_stage.GetDepthStencilState ();
 }
 
 size_t Device::OSGetStencilReference ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::OSGetStencilReference");
-  return 0;
+  return output_stage.GetStencilReference ();
 }
 
 IFrameBuffer* Device::OSGetFrameBuffer ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::OSGetFrameBuffer");
-  return 0;
+  return output_stage.GetFrameBuffer ();
 }
 
 /*

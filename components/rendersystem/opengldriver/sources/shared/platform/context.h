@@ -1,6 +1,7 @@
 #ifndef RENDER_GL_DRIVER_CONTEXT_HEADER
 #define RENDER_GL_DRIVER_CONTEXT_HEADER
 
+#include <render/low_level/driver.h>
 #include <gl/glew.h>
 #include <stl/auto_ptr.h>
 

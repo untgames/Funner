@@ -12,19 +12,29 @@ struct OpenGLExceptionTag;
 
 typedef DerivedException<Exception, OpenGLExceptionTag> OpenGLException;
 
+namespace
+{
+
+struct ContextSlotImpl
+{
+  ContextObject*         object;
+  Trackable::HandlerSlot destroy_handler;
+  
+  ContextSlotImpl () : object (0) {}
+};
+
+}
+
 /*
     Описание реализации состояния контекста
 */
 
 struct ContextState::Impl: public xtl::reference_counter
 {
-  Context        context;                            //контекст OpenGL
-  ContextObject* selected_objects [ContextSlot_Num]; //выбранные объекты
+  Context         context;                 //контекст OpenGL
+  ContextSlotImpl slots [ContextSlot_Num]; //выбранные объекты
 
-  Impl (ISwapChain* swap_chain) : context (swap_chain)
-  {
-    memset (selected_objects, 0, sizeof (selected_objects));
-  }
+  Impl (ISwapChain* swap_chain) : context (swap_chain) {}
 };
 
 /*
@@ -34,6 +44,10 @@ struct ContextState::Impl: public xtl::reference_counter
 ContextState::ContextState (ISwapChain* swap_chain)
   : impl (new Impl (swap_chain))
 {
+    //инициализация обработчиков удаления выбранных объектов
+    
+  for (size_t i=0; i<ContextSlot_Num; i++)
+    impl->slots [i].destroy_handler = xtl::bind (&ContextState::ResetSlot, this, (ContextSlot)i);
 }
 
 ContextState::ContextState (const ContextState& state)
@@ -58,27 +72,31 @@ ContextState& ContextState::operator = (const ContextState& state)
     Выбор объекта в контекст
 */
 
-void ContextState::SetObject (ContextSlot slot, ContextObject* object)
+void ContextState::SetObject (ContextSlot slot, ContextObject* new_object)
 {
   if (slot < 0 || slot >= ContextSlot_Num)
     RaiseInvalidArgument ("render::low_level::opengl::ContextState::SetObject", "slot", slot);
     
-  ContextObject*& current_object = impl->selected_objects [slot];
+  ContextSlotImpl& slot_impl = impl->slots [slot];
     
-  if (current_object == object)
+  if (slot_impl.object == new_object)
     return;
 
   ContextLock lock (*this);
 
-  if (current_object)
-    current_object->Unbind (*this);
+  slot_impl.object = 0;
 
-  current_object = 0;
+  if (new_object)
+  {
+    new_object->Bind (*this);
+    new_object->RegisterDestroyHandler (slot_impl.destroy_handler);
+  }
+  else
+  {
+      //обработка сброса состояния слота
+  }
 
-  if (object)
-    object->Bind (*this);
-
-  current_object = object;
+  slot_impl.object = new_object;
 }
 
 void ContextState::SetObject (ContextSlot slot, IObject* object)
@@ -86,12 +104,17 @@ void ContextState::SetObject (ContextSlot slot, IObject* object)
   SetObject (slot, cast_object<ContextObject> (object, "render::low_level::ContextState::SetObject", "object"));
 }
 
+void ContextState::ResetSlot (ContextSlot slot)
+{
+  SetObject (slot, (ContextObject*)0);
+}
+
 ContextObject* ContextState::GetObject (ContextSlot slot) const
 {
   if (slot < 0 || slot >= ContextSlot_Num)
     RaiseInvalidArgument ("render::low_level::opengl::ContextState::GetObject", "slot", slot);
 
-  return impl->selected_objects [slot];
+  return impl->slots [slot].object;
 }
 
 /*
