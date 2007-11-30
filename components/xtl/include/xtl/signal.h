@@ -43,7 +43,6 @@ class slot
     slot  ();
     slot  (const slot&);
     slot  (const function_type& fn);
-    slot  (const function_type& fn, slot& next_slot);
     ~slot ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +88,7 @@ class slot
   private:
     typedef detail::slot_impl<Signature> slot_impl;
   
-    slot (const function_type&, slot_impl*);
+    slot (const function_type&, slot_impl*);    
 
   private:
     slot_impl* impl;

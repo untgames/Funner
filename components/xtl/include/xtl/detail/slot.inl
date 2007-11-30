@@ -165,12 +165,6 @@ inline slot<Signature>::slot (const function_type& fn)
 }
 
 template <class Signature>
-inline slot<Signature>::slot (const function_type& fn, slot& next)
-  : impl (new slot_impl (fn, next.impl))
-{
-}
-
-template <class Signature>
 inline slot<Signature>::slot (const slot& s)
   : impl (s.impl)
 {
