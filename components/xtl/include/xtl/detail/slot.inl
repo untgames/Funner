@@ -261,9 +261,9 @@ inline bool slot<Signature>::connected () const
 template <class Signature>
 inline void slot<Signature>::swap (slot& s)
 {
-  detail::slot_impl* tmp = s.impl;
-  s.impl                 = impl;
-  impl                   = tmp;
+  slot_impl* tmp = s.impl;
+  s.impl         = impl;
+  impl           = tmp;
 }
 
 template <class Signature>
