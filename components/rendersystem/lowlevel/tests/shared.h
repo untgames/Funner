@@ -103,6 +103,12 @@ class TestDriver: public IDriver, public ObjectImpl
       return 0;
     }
 
+    ISwapChain* CreateSwapChain (IOutput*, const SwapChainDesc&)
+    {
+      RaiseNotImplemented ("TestDriver::CreateSwapChain");
+      return 0;
+    }    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
