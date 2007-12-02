@@ -38,6 +38,7 @@ int main ()
     Window window (WindowStyle_Overlapped, 400, 200);
     
     window.SetTitle ("OpenGL driver test window");
+//    window.SetPosition (1280 - 400 / 2-1, 200);    
     
     IDriver* driver = get_opengl_driver ();    
     
@@ -57,6 +58,8 @@ int main ()
     desc.window_handle             = window.Handle ();
 
     SwapChainPtr swap_chain (driver->CreateSwapChain (desc), false);
+    
+//    printf ("Swap chain containing output: '%s'\n", swap_chain->GetContainingOutput ()->GetName ());
     
     swap_chain->GetDesc (desc);
     

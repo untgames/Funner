@@ -58,19 +58,6 @@ ISwapChain* Driver::CreateSwapChain (const SwapChainDesc& desc)
   }
 }
 
-ISwapChain* Driver::CreateSwapChain (IOutput* output, const SwapChainDesc& desc)
-{
-  try
-  {
-    return create_swap_chain (output, desc);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::Driver::CreateSwapChain(IOutput*,const SwapChainDesc&)");
-    throw;
-  }
-}
-
 /*
     Создание устройства отрисовки
 */

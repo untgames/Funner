@@ -17,7 +17,6 @@ namespace opengl
 ///Создание цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ISwapChain* create_swap_chain (OutputManager& output_manager, const SwapChainDesc& swap_chain_desc);
-ISwapChain* create_swap_chain (IOutput* output, const SwapChainDesc& swap_chain_desc);
 
 }
 

@@ -8,11 +8,23 @@ using namespace common;
     Конструктор / деструктор
 */
 
-SwapChain::SwapChain (const DeviceContextPtr& in_device_context, IOutput* in_output, const SwapChainDesc& in_desc)
-  : device_context (in_device_context), output (in_output)
+SwapChain::SwapChain (IOutput* in_output, const SwapChainDesc& in_desc)
+  : output (in_output)
 {
   try
   {
+      //получение окна вывода
+      
+    output_window = (HWND)in_desc.window_handle;
+    
+    if (!output_window)
+      RaiseNullArgument ("render::low_level::opengl::SwapChain::SwapChain", "swap_chain_desc.window_handle");  
+      
+    output_context = ::GetDC (output_window);
+    
+    if (!output_context)
+      raise_error ("GetDC");
+    
     ThreadLock lock;
     
       //инициализация и установка контекста WGLEW
@@ -34,7 +46,7 @@ SwapChain::SwapChain (const DeviceContextPtr& in_device_context, IOutput* in_out
 
       //установка формата пикселей
 
-    set_pixel_format (GetDC (), in_desc); //???
+    set_pixel_format (GetDC (), in_desc);
     
       //получение установленного формата пикселей
       
@@ -60,6 +72,7 @@ SwapChain::SwapChain (const DeviceContextPtr& in_device_context, IOutput* in_out
 
 SwapChain::~SwapChain ()
 {
+  ReleaseDC (output_window, output_context);
 }
 
 /*
@@ -86,7 +99,7 @@ IOutput* SwapChain::GetContainingOutput ()
 
 void SwapChain::Present ()
 {
-  if (!SwapBuffers (device_context->GetDC ()))
+  if (!SwapBuffers (GetDC ()))
     raise_error (format ("render::low_level::opengl::SwapChain::Present(device-name='%s')", output->GetName ()).c_str ());
 }
 
@@ -136,12 +149,7 @@ ISwapChain* create_swap_chain (OutputManager& output_manager, const SwapChainDes
     RaiseInvalidOperation ("render::low_level::opengl::create_swap_chain", "Can not find containing output for window '%s'", title);
   }
 
-  return new SwapChain (DeviceContextPtr (new WindowDeviceContext (window)), output, swap_chain_desc);
-}
-
-ISwapChain* create_swap_chain (IOutput* output, const SwapChainDesc& swap_chain_desc)
-{
-  return new SwapChain (DeviceContextPtr (new OutputDeviceContext (output)), output, swap_chain_desc);
+  return new SwapChain (output, swap_chain_desc);
 }
 
 }
