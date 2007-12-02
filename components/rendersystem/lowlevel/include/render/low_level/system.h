@@ -27,6 +27,12 @@ class RenderSystem
     static IDriver* FindDriver (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание цепочки обмена
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static ISwapChain* CreateSwapChain (const char* driver_mask, const SwapChainDesc& swap_chain_desc);
+    static ISwapChain* CreateSwapChain (const char* driver_mask, const char* output_mask, const SwapChainDesc& swap_chain_desc);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static bool CreateSwapChainAndDevice (const char*          driver_mask,     //маска имени драйвера
@@ -34,6 +40,12 @@ class RenderSystem
                                           const char*          init_string,     //строка инициализации
                                           ISwapChain*&         out_swap_chain,  //результирующая цепочка обмена
                                           IDevice*&            out_device);     //результирующее устройство отрисовки
+    static bool CreateSwapChainAndDevice (const char*          driver_mask,     //маска имени драйвера
+                                          const char*          output_mask,     //маска имени устройства вывода
+                                          const SwapChainDesc& swap_chain_desc, //дескриптор цепочки обмена
+                                          const char*          init_string,     //строка инициализации
+                                          ISwapChain*&         out_swap_chain,  //результирующая цепочка обмена
+                                          IDevice*&            out_device);     //результирующее устройство отрисовки                                          
 };
 
 }
