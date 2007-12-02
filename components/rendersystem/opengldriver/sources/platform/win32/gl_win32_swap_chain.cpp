@@ -11,21 +11,30 @@ using namespace common;
 SwapChain::SwapChain (IOutput* in_output, const SwapChainDesc& in_desc)
   : output (in_output)
 {
+    //получение окна вывода
+    
+  output_window = (HWND)in_desc.window_handle;
+  
+  if (!output_window)
+    RaiseNullArgument ("render::low_level::opengl::SwapChain::SwapChain", "swap_chain_desc.window_handle");  
+    
+  output_context = ::GetDC (output_window);
+  
+  if (!output_context)
+    raise_error ("GetDC");
+    
+    //предварительная установка SwapChainDesc
+    
+  desc = in_desc;
+    
+    //установка состояния FullScreen
+
+  if (in_desc.fullscreen)
+    SetFullscreenState (true);
+
   try
   {
-      //получение окна вывода
-      
-    output_window = (HWND)in_desc.window_handle;
-    
-    if (!output_window)
-      RaiseNullArgument ("render::low_level::opengl::SwapChain::SwapChain", "swap_chain_desc.window_handle");  
-      
-    output_context = ::GetDC (output_window);
-    
-    if (!output_context)
-      raise_error ("GetDC");
-    
-    ThreadLock lock;
+    ThreadLock lock;    
     
       //инициализация и установка контекста WGLEW
 
@@ -42,22 +51,21 @@ SwapChain::SwapChain (IOutput* in_output, const SwapChainDesc& in_desc)
     catch (...)
     {
       printf ("SwapChain::SwapChain: Unknown exception at initialize WGLEWContext\n");
-    }    
-
+    }
+    
       //установка формата пикселей
 
-    set_pixel_format (GetDC (), in_desc);
-    
+    set_pixel_format (GetDC (), in_desc);        
+      
       //получение установленного формата пикселей
       
-    get_pixel_format (GetDC (), desc);
-    
+    get_pixel_format (GetDC (), desc);      
+      
       //перенесение дублируемых полей
     
     desc.vsync         = in_desc.vsync;
     desc.window_handle = in_desc.window_handle;
-
-      //добавить установку/взятие состояния FullScreen-mode!!!       
+    desc.fullscreen    = GetFullscreenState ();      
 
       //отмена текущего контекста WGLEW
 
@@ -72,7 +80,17 @@ SwapChain::SwapChain (IOutput* in_output, const SwapChainDesc& in_desc)
 
 SwapChain::~SwapChain ()
 {
-  ReleaseDC (output_window, output_context);
+  ReleaseDC (output_window, output_context);    
+  
+  try
+  {
+    if (GetFullscreenState () == desc.fullscreen)
+      SetFullscreenState (false);
+  }
+  catch (...)  
+  {
+    //подавляем все исключения
+  }
 }
 
 /*
@@ -109,13 +127,48 @@ void SwapChain::Present ()
 
 void SwapChain::SetFullscreenState (bool state)
 {
-  RaiseNotImplemented ("render::low_level::opengl::SwapChain::SetFullscreenState");
+  if (GetFullscreenState () == state)
+    return;
+    
+  if (state)
+  {
+    if (!SetWindowPos (output_window, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE))
+      raise_error ("SetWindowPos");
+
+    OutputModeDesc mode_desc;
+
+    RECT window_rect;
+
+    if (!GetWindowRect (output_window, &window_rect))
+      raise_error ("GetWindowRect");
+
+    mode_desc.width        = window_rect.right - window_rect.left;
+    mode_desc.height       = window_rect.bottom - window_rect.top;
+    mode_desc.color_bits   = desc.frame_buffer.color_bits;
+    mode_desc.refresh_rate = 0;
+
+    output->SetCurrentMode (mode_desc);
+  }
+  else
+  {
+    if (ChangeDisplaySettings (0, 0) != DISP_CHANGE_SUCCESSFUL)
+      raise_error ("ChangeDisplaySettings(0,0)");
+  }
 }
 
 bool SwapChain::GetFullscreenState ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::SwapChain::SetFullscreenState");
-  return false;
+  OutputModeDesc mode_desc;
+  
+  output->GetCurrentMode (mode_desc);
+
+  RECT window_rect;
+
+  if (!GetWindowRect (output_window, &window_rect))
+    raise_error ("GetWindowRect");
+    
+  return window_rect.left == 0 && window_rect.top == 0 && window_rect.right - window_rect.left == mode_desc.width &&
+         window_rect.bottom - window_rect.top == mode_desc.height && desc.frame_buffer.color_bits >= mode_desc.color_bits;
 }
 
 /*

@@ -4,8 +4,6 @@ using namespace syslib;
 
 typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
 
-const bool FAIL_TEST = false;
-
 void dump (const SwapChainDesc& desc)
 {
   printf ("Swap chain description:\n");
@@ -31,7 +29,7 @@ void dump (const SwapChainDesc& desc)
 
 int main ()
 {
-  printf ("Results of swap_chain1_test:\n");
+  printf ("Results of swap_chain1_fs_test:\n");
   
   try
   {
@@ -54,28 +52,16 @@ int main ()
     desc.samples_count             = 4;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = true;
-    desc.fullscreen                = false;
+    desc.fullscreen                = true;
     desc.window_handle             = window.Handle ();
 
     SwapChainPtr swap_chain (driver->CreateSwapChain (desc), false);
     
-//    printf ("Swap chain containing output: '%s'\n", swap_chain->GetContainingOutput ()->GetName ());
+    printf ("Swap chain containing output: '%s'\n", swap_chain->GetContainingOutput ()->GetName ());
     
     swap_chain->GetDesc (desc);
     
     dump (desc);
-
-    if (FAIL_TEST)
-    {
-      desc.samples_count = 0;
-      desc.buffers_count = 1;
-
-      SwapChainPtr (driver->CreateSwapChain (desc), false).swap (swap_chain);
-    
-      swap_chain->GetDesc (desc);
-
-      dump (desc);
-    }
   }
   catch (std::exception& exception)
   {
