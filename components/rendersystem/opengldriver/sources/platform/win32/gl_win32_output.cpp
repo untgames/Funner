@@ -13,7 +13,7 @@ namespace
     Получение информации об видео-режиме
 */
 
-bool get_mode_desc (const char* device_name, int mode_index, OutputModeDesc& mode_desc)
+bool get_mode_desc (const char* device_name, int mode_index, OutputModeDesc& mode_desc, Rect* screen_rect=0)
 {
   DEVMODE dev_mode_desc;
   
@@ -28,6 +28,14 @@ bool get_mode_desc (const char* device_name, int mode_index, OutputModeDesc& mod
   mode_desc.height       = dev_mode_desc.dmPelsHeight;
   mode_desc.color_bits   = dev_mode_desc.dmBitsPerPel;
   mode_desc.refresh_rate = dev_mode_desc.dmDisplayFrequency;
+  
+  if (screen_rect)  
+  {
+    screen_rect->x      = dev_mode_desc.dmPosition.x;
+    screen_rect->y      = dev_mode_desc.dmPosition.y;
+    screen_rect->width  = dev_mode_desc.dmPelsWidth;
+    screen_rect->height = dev_mode_desc.dmPelsHeight;
+  }
   
   return true;
 }
@@ -184,7 +192,7 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 {
-  get_mode_desc (win_name.c_str (), ENUM_CURRENT_SETTINGS, mode_desc);    
+  get_mode_desc (win_name.c_str (), ENUM_CURRENT_SETTINGS, mode_desc);
 }
 
 /*
@@ -236,6 +244,17 @@ HDC Output::GetDC ()
     raise_error (common::format ("render::low_level::opengl::Output::GetDC(device-name='%s')", name.c_str ()).c_str ());
 
   return hDC;
+}
+
+/*
+    Получение экранных координат и размеров устройства вывода
+*/
+
+void Output::GetScreenRect (Rect& rect)
+{
+  OutputModeDesc mode_desc;
+
+  get_mode_desc (win_name.c_str (), ENUM_CURRENT_SETTINGS, mode_desc, &rect);
 }
 
 /*

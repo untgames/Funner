@@ -8,19 +8,9 @@ using namespace common;
     Конструктор / деструктор
 */
 
-SwapChain::SwapChain (OutputManager&, const SwapChainDesc& in_desc)
-  : output (0), output_window ((HWND)in_desc.window_handle)
+SwapChain::SwapChain (const DeviceContextPtr& in_device_context, IOutput* in_output, const SwapChainDesc& in_desc)
+  : device_context (in_device_context), output (in_output)
 {
-  if (!output_window)
-    RaiseNullArgument ("render::low_level::opengl::SwapChain::SwapChain", "swap_chain_desc.window_handle");
-
-    //получение контекста устройства вывода
-    
-  output_device_context = ::GetDC (output_window);
-  
-  if (!output_device_context)
-    raise_error ("GetDC");
-
   try
   {
     ThreadLock lock;
@@ -44,11 +34,11 @@ SwapChain::SwapChain (OutputManager&, const SwapChainDesc& in_desc)
 
       //установка формата пикселей
 
-    set_pixel_format (output_device_context, in_desc);
+    set_pixel_format (GetDC (), in_desc); //???
     
       //получение установленного формата пикселей
       
-    get_pixel_format (output_device_context, desc);
+    get_pixel_format (GetDC (), desc);
     
       //перенесение дублируемых полей
     
@@ -64,14 +54,12 @@ SwapChain::SwapChain (OutputManager&, const SwapChainDesc& in_desc)
   catch (...)
   {
     set_current_glew_context (0, 0);
-    ReleaseDC (output_window, output_device_context);
     throw;
   }
 }
 
 SwapChain::~SwapChain ()
 {
-  ReleaseDC (output_window, output_device_context);
 }
 
 /*
@@ -84,12 +72,11 @@ void SwapChain::GetDesc (SwapChainDesc& out_desc)
 }
 
 /*
-    Получение устройства вывода
+    Получение устройства вывода с максимальным размером области перекрытия
 */
 
-IOutput* SwapChain::GetOutput ()
+IOutput* SwapChain::GetContainingOutput ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::SwapChain::GetOutput");
   return get_pointer (output);
 }
 
@@ -99,7 +86,7 @@ IOutput* SwapChain::GetOutput ()
 
 void SwapChain::Present ()
 {
-  if (!SwapBuffers (output_device_context))
+  if (!SwapBuffers (device_context->GetDC ()))
     raise_error (format ("render::low_level::opengl::SwapChain::Present(device-name='%s')", output->GetName ()).c_str ());
 }
 
@@ -133,7 +120,28 @@ namespace opengl
 
 ISwapChain* create_swap_chain (OutputManager& output_manager, const SwapChainDesc& swap_chain_desc)
 {
-  return new SwapChain (output_manager, swap_chain_desc);
+  HWND window = (HWND)swap_chain_desc.window_handle;
+  
+  if (!window)
+    RaiseNullArgument ("render::low_level::opengl::create_swap_chain", "swap_chain_desc.window_handle");
+
+  IOutput* output = output_manager.FindContainingOutput ((void*)window);
+
+  if (!output)
+  {
+    char title [128];
+
+    GetWindowText (window, title, sizeof (title));
+
+    RaiseInvalidOperation ("render::low_level::opengl::create_swap_chain", "Can not find containing output for window '%s'", title);
+  }
+
+  return new SwapChain (DeviceContextPtr (new WindowDeviceContext (window)), output, swap_chain_desc);
+}
+
+ISwapChain* create_swap_chain (IOutput* output, const SwapChainDesc& swap_chain_desc)
+{
+  return new SwapChain (DeviceContextPtr (new OutputDeviceContext (output)), output, swap_chain_desc);
 }
 
 }

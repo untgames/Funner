@@ -53,7 +53,20 @@ ISwapChain* Driver::CreateSwapChain (const SwapChainDesc& desc)
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Driver::CreateSwapChain");
+    exception.Touch ("render::low_level::opengl::Driver::CreateSwapChain(const SwapChainDesc&)");
+    throw;
+  }
+}
+
+ISwapChain* Driver::CreateSwapChain (IOutput* output, const SwapChainDesc& desc)
+{
+  try
+  {
+    return create_swap_chain (output, desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Driver::CreateSwapChain(IOutput*,const SwapChainDesc&)");
     throw;
   }
 }
