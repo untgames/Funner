@@ -92,6 +92,12 @@ void test_utf_converter (const char* file_name, Encoding source_encoding)
 int main()
 {
   printf ("Results of utf_converter_test:\n");
+  
+  if (!setlocale (LC_ALL, ".1251"))
+  {
+    printf ("Error at set locale\n");
+    return 0;
+  }
 
   const char* source_file_name [4] = {"data\\ansi.txt", "data\\utf8.txt", "data\\utf16le.txt", "data\\utf16be.txt"};
   Encoding    source_encoding [4]  = {Encoding_Ascii7, Encoding_Utf8, Encoding_Utf16LE, Encoding_Utf16BE};
