@@ -201,13 +201,13 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 
 void Output::SetGammaRamp (const Color3f table [256])
 {
-  WORD gamma_ramp_table[256][3];
+  WORD gamma_ramp_table[3][256];
 
   for (size_t i = 0; i < 256; i++)
   {
-    gamma_ramp_table[i][0] = (WORD)(table[i].red * 65535.f);
-    gamma_ramp_table[i][1] = (WORD)(table[i].green * 65535.f);
-    gamma_ramp_table[i][2] = (WORD)(table[i].blue * 65535.f);
+    gamma_ramp_table[0][i] = (WORD)(table[i].red * 65535.f);
+    gamma_ramp_table[1][i] = (WORD)(table[i].green * 65535.f);
+    gamma_ramp_table[2][i] = (WORD)(table[i].blue * 65535.f);
   }
 
   if (!SetDeviceGammaRamp (GetDC (), gamma_ramp_table))
@@ -216,16 +216,16 @@ void Output::SetGammaRamp (const Color3f table [256])
 
 void Output::GetGammaRamp (Color3f table [256])
 {
-  WORD gamma_ramp_table[256][3];
+  WORD gamma_ramp_table[3][256];
 
   if (!GetDeviceGammaRamp (GetDC (), gamma_ramp_table))
     raise_error (format ("render::low_level::opengl::Output::GetGammaRamp(device-name='%s')", name.c_str ()).c_str ());
 
   for (size_t i = 0; i < 256; i++)
   {
-    table[i].red   = (float)gamma_ramp_table[i][0] / 65535.f;
-    table[i].green = (float)gamma_ramp_table[i][1] / 65535.f;
-    table[i].blue  = (float)gamma_ramp_table[i][2] / 65535.f;
+    table[i].red   = (float)gamma_ramp_table[0][i] / 65535.f;
+    table[i].green = (float)gamma_ramp_table[1][i] / 65535.f;
+    table[i].blue  = (float)gamma_ramp_table[2][i] / 65535.f;
   }
 }
 
