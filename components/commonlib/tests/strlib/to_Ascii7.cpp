@@ -39,13 +39,9 @@ int main()
      file->Read(in,127);
      memset(out,0,sizeof(out));
      utf_decode(in,64,en[i],(char*)out,120);
-     for(int j=0;j<4;j++)
-     {
-        memset(in,0,sizeof(in));
-        utf_encode(out,64,(char*)in,120,en[j]);
-        printf("%s\n",in);
-        wprintf(L"%s\n",(char*)in);
-     }
+     memset(in,0,sizeof(in));
+     utf_encode(out,64,(char*)in,120,Encoding_Ascii7);
+     printf("%s\n",in);
      delete file;
   }
   return 0;
