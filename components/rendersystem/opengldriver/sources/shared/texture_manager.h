@@ -13,8 +13,17 @@ namespace low_level
 namespace opengl
 {
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Способности менеджера текстур
+///////////////////////////////////////////////////////////////////////////////////////////////////
 enum TextureManagerCapability
 {
+  TextureManagerCapability_Texture3D,       //создание трёхмерных текстур
+  TextureManagerCapability_TextureCubeMap,  //создание кубических карт
+  TextureManagerCapability_GenerateMipmaps, //генерация мип-уровней
+  TextureManagerCapability_Compression,     //сжатие текстур
+  
+  TextureManagerCapability_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +51,8 @@ class TextureManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройки работы с расширениями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetCapability (TextureManagerCapability cap, bool state);
+    void SetCapability (TextureManagerCapability capability, bool state);
+    bool GetCapability (TextureManagerCapability capability) const;
 
   private:
     TextureManager (const TextureManager&);             //no impl
