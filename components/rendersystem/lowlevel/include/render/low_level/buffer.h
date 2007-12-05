@@ -93,8 +93,8 @@ class IBuffer: virtual public IObject
 ///Основные виды используемых буферов
 ///  Потомки введены только для статического контроля типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class IIndexBuffer:  virtual public IBuffer {};
-class IVertexBuffer: virtual public IBuffer {};
+class IVertexBuffer:  virtual public IBuffer {};
+class IIndexBuffer:   virtual public IBuffer {};
 
 #include <render/low_level/detail/buffer.inl>
 
