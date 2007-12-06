@@ -10,6 +10,16 @@
 
 using namespace common;
 
+void dump32(void *ptr,int l)
+{
+   FILE *file=fopen("dump.txt","a");
+   char *str=(char*)ptr;
+   for(int i=0;i<l;i++)
+      fputc(str[i],file);
+//       fprintf(file,"%p|",str[i]);
+   fclose(file);
+}
+
 void dump (const void* buffer, size_t length, Encoding encoding)
 {
   switch (encoding)
@@ -81,6 +91,7 @@ void test_utf_converter (const char* file_name, Encoding source_encoding)
     size_t source_length = file.Read (buffer [0], sizeof (buffer [0]));
      
     EncodingResult decode_result = utf_decode (buffer [0], source_length, source_encoding, buffer [1], sizeof (buffer [1]));
+    dump32(buffer[1],128);
     EncodingResult encode_result = utf_encode (buffer [1], decode_result.destination_buffer_processed_size, buffer [0], sizeof (buffer [0]), encoding [i]);
 
     dump (buffer [0], encode_result.destination_buffer_processed_size, encoding [i]);
