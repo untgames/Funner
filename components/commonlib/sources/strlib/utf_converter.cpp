@@ -11,10 +11,10 @@ bool decode_UTF8(const unsigned char* src, int srcSize, int* srcBytes, char32* b
 bool decode_UTF16(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer,bool bigEndian);
 bool decode_UTF32(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer,bool bigEndian);
 
-bool encode_ASCII7(unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp);
-bool encode_UTF8(unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp);
-bool encode_UTF16(unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp, bool bigEndian);
-bool encode_UTF32(unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp, bool bigEndian);
+bool encode_ASCII7(unsigned char* dst, int dstSize, int* dstBytes, char32 cp);
+bool encode_UTF8(unsigned char* dst, int dstSize, int* dstBytes, char32 cp);
+bool encode_UTF16(unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool bigEndian);
+bool encode_UTF32(unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool bigEndian);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение: неверная кодировка Unicode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -225,9 +225,12 @@ bool decode_ASCII7( const unsigned char* src, int srcSize, int* srcBytes, char32
 {
    const unsigned char* src0=src;
    int err=0;
-   char32 cp=char32(-1);
+   if (*src0>=(unsigned char)128)
+      *buffer=0x3F;    //Заменить на '?'
+   else
+      *buffer = *src;
 
-   if ( srcSize >= 1 )
+/*   if ( srcSize >= 1 )
    {
       cp = *src++;
       //if ( cp >= (unsigned char)128 )
@@ -238,9 +241,9 @@ bool decode_ASCII7( const unsigned char* src, int srcSize, int* srcBytes, char32
       // ERROR: Not enough encoded bytes available
       err = 4;
    }
-
-   if ( !err )
-      *buffer = cp;
+*/
+//   if ( !err )
+   *src++;
    *srcBytes = src-src0;
    return !err;
 }
@@ -395,35 +398,21 @@ bool decode_UTF32( const unsigned char* src, int srcSize, int* srcBytes, char32*
 }
 
 
-bool encode_ASCII7( unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp)
+bool encode_ASCII7( unsigned char* dst, int dstSize, int* dstBytes, char32 cp)
 {
    const unsigned char *dst0=dst;
    int err=0;
 
-   if ( dstSize >= 1 )
-   {
-      if(cp>=128)
-      {
-         // ERROR: Out-of-range ASCII-7 code
-         err = 1;
-      }
-      else
-      {
-         *dst++=(unsigned char)cp;
-      }
-   }
+   if(cp>=128)
+      *dst++='?';  //Заменить на '?'
    else
-   {
-      // ERROR: Not enough buffer space
-      err = 5;
-      cp = unsigned int(-1);
-   }
+      *dst++=(unsigned char)cp;
 
    *dstBytes = dst-dst0;
    return !err;
 }
 
-bool encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, unsigned int cp)
+bool encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, char32 cp)
 {
    const unsigned char *dst0=dst;
    int err=0;
@@ -491,7 +480,7 @@ bool encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, unsigned int cp)
    return !err;
 }
 
-bool encode_UTF16( unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp, bool bigEndian)
+bool encode_UTF16( unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool bigEndian)
 {
    const unsigned char*dst0= dst;
    int err= 0;
@@ -537,7 +526,7 @@ bool encode_UTF16( unsigned char* dst, int dstSize, int* dstBytes, unsigned int 
    return !err;
 }
 
-bool encode_UTF32( unsigned char* dst, int dstSize, int* dstBytes, unsigned int cp, bool bigEndian )
+bool encode_UTF32( unsigned char* dst, int dstSize, int* dstBytes,char32 cp, bool bigEndian )
 {
    const unsigned char *dst0= dst;
    int err=0;
