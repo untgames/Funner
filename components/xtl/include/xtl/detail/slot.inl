@@ -180,6 +180,7 @@ inline slot<Signature>::slot (const function_type& fn, slot_impl* next_slot)
 template <class Signature>
 inline slot<Signature>::~slot ()
 {
+  impl->disconnect ();
   impl->release ();
 }
 
