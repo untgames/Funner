@@ -5,9 +5,9 @@
 #include <render/low_level/opengl_driver.h>
 
 #include <shared/platform/output_manager.h>
-#include <shared/platform/swap_chain.h>
+#include <shared/platform/swap_chain_manager.h>
 #include <shared/object.h>
-#include <shared/context_state.h>
+#include <shared/context_manager.h>
 #include <shared/property_list.h>
 #include <shared/output_stage.h>
 
@@ -17,6 +17,8 @@
 #include <stl/string>
 
 #include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/bind.h>
 
 namespace render
 {
@@ -65,6 +67,11 @@ class Driver: virtual public IDriver, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetDebugLog (const LogFunction&);
     const LogFunction& GetDebugLog ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Протоколирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LogMessage (const char* message) const;
 
   private:
     OutputManager output_manager; //менеджер устройств вывода
@@ -80,7 +87,7 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Device  (ISwapChain* swap_chain, const char* init_string);
+    Device  (Driver* driver, ISwapChain* swap_chain, const char* init_string);
     ~Device ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,9 +209,13 @@ class Device: virtual public IDevice, public Object
     IPropertyList* GetProperties ();
     
   private:
-    ContextState current_state; //текущее состояние контекста OpenGL
-    PropertyList properties;    //свойства устройства
-    OutputStage  output_stage;  //выходной уровень
+    typedef xtl::com_ptr<Driver> DriverPtr;
+    
+  private:
+    DriverPtr      driver;          //драйвер OpenGL
+    ContextManager context_manager; //менеджер контекстов OpenGL
+    PropertyList   properties;      //свойства устройства
+    OutputStage    output_stage;    //выходной уровень
 };
 
 }

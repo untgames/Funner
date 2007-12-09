@@ -10,17 +10,17 @@ using namespace common;
 
 struct OutputStage::Impl
 {
-  ContextState state; //текущее состо€ние контекста    
+  ContextManager context_manager; //менеджер контекстов
   
-  Impl (ContextState& in_state) : state (in_state) {}
+  Impl (ContextManager& in_context_manager) : context_manager (in_context_manager) {}
 };
 
 /*
      онструктор / деструктор
 */
 
-OutputStage::OutputStage (ContextState& state)
-  : impl (new Impl (state))
+OutputStage::OutputStage (ContextManager& context_manager)
+  : impl (new Impl (context_manager))
 {
 }
 

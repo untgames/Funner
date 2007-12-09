@@ -2,6 +2,28 @@
 
 using namespace render::low_level::opengl;
 using namespace render::low_level;
+using namespace common;
+
+namespace
+{
+
+int current_object_id = 1;
+
+}
+
+/*
+    Конструктор
+*/
+
+Object::Object ()
+  : id (current_object_id++)
+{
+  if (!id)
+  {
+    --current_object_id;
+    RaiseNotSupported ("render::low_level::opengl::Object::Object", "Too many object created. No enough identifiers");
+  }
+}
 
 /*
     Подсчёт ссылок

@@ -62,19 +62,13 @@ namespace low_level
 namespace opengl
 {
 
-//проверка ошибок использования WinAPI и генерация исключения в случае их наличия
-void check_errors (const char* source)
-{ 
+//генерация исключения
+void raise_error (const char* source)
+{
   DWORD error_code = GetLastError ();
   
   if (error_code)
     common::RaiseInvalidOperation (source, Win32ErrorMessage (GetLastError ()).Message ());
-}
-
-//генерация исключения
-void raise_error (const char* source)
-{
-  check_errors (source);
   
   common::RaiseInvalidOperation (source, "Operation failed");
 }

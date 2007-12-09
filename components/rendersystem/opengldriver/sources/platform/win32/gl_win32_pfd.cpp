@@ -2,14 +2,6 @@
 
 using namespace common;
 
-namespace
-{
-
-const GLEWContext*  current_glew_context  = 0; //текущий контекст GLEW
-const WGLEWContext* current_wglew_context = 0; //текущий контекст WGLEW
-
-}
-
 namespace render
 {
 
@@ -18,109 +10,6 @@ namespace low_level
 
 namespace opengl
 {
-
-namespace
-{
-
-//создание вспомогательного окна для инициализации расширений WGL
-HWND create_dummy_window (HWND parent)
-{
-  HWND window = CreateWindow ("static", "", WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-    parent, 0, GetModuleHandle (0), 0);
-
-  if (!window)
-    raise_error ("CreateWindow");
-    
-  return window;
-}
-
-}
-
-//инициализация контекста WGLEW
-void init_wglew_context (const SwapChainDesc& swap_chain_desc, WGLEWContext* wglew_context)
-{
-    //создание вспомогательного контекста OpenGL
-
-  HWND  window        = (HWND)swap_chain_desc.window_handle,
-        dummy_window  = 0;
-  HDC   dummy_dc      = 0;
-  HGLRC dummy_context = 0;
-
-    //отмена текущего WGLEW контекста
-    
-  set_current_glew_context (0, 0);
-  
-  try
-  {
-    dummy_window = create_dummy_window (window);
-    dummy_dc     = GetDC (dummy_window);
-    
-    if (!dummy_dc)
-      raise_error ("GetDC");
-    
-    set_pixel_format (dummy_dc, swap_chain_desc); //установка формата пикселей без использования расширений
-    
-    dummy_context = wglCreateContext (dummy_dc);
-
-    if (!dummy_context)
-      raise_error ("wglCreateContext");
-
-    if (!wglMakeCurrent (dummy_dc, dummy_context))
-      raise_error ("wglMakeCurrent");
-
-      //инициализация расширений WGL
-
-    GLenum status = wglewContextInit (wglew_context);
-
-    if (status != GLEW_OK)
-      RaiseInvalidOperation ("wglewContextInit", "%s", glewGetString (status));
-
-      //освобождение ресурсов
-
-    wglMakeCurrent   (0, 0);
-    wglDeleteContext (dummy_context);
-    ReleaseDC        (dummy_window, dummy_dc);
-    DestroyWindow    (dummy_window);    
-  }
-  catch (...)
-  {
-    wglMakeCurrent (0, 0);
-
-    if (dummy_context) wglDeleteContext (dummy_context);
-    if (dummy_dc)      ReleaseDC        (dummy_window, dummy_dc);
-    if (dummy_window)  DestroyWindow    (dummy_window);
-
-    throw;
-  }  
-}
-
-//установка текущего контекста GLEW/WGLEW
-void set_current_glew_context (const GLEWContext* glew_context, const WGLEWContext* wglew_context)
-{
-  if ((current_glew_context || current_wglew_context) && (glew_context || wglew_context))
-    RaiseInvalidOperation ("render::low_level::opengl::set_current_glew_context", "Context is locked");
-
-  current_glew_context  = glew_context;
-  current_wglew_context = wglew_context;
-}
-
-//получение текущего контекста GLEW
-const GLEWContext* glewGetContext ()
-{
-  if (!current_glew_context)
-    RaiseInvalidOperation ("render::low_level::opengl::glewGetContext", "No current context has bound");
-
-  return current_glew_context;
-}
-
-//получение текущего контекста WGLEW
-const WGLEWContext* wglewGetContext ()
-{
-  if (!current_wglew_context)
-    RaiseInvalidOperation ("render::low_level::opengl::wglewGetContext", "No current context has bound");
-
-  return current_wglew_context;
-}
 
 namespace
 {
@@ -135,14 +24,14 @@ inline void set_attribute (int*& iter, int name, int value)
 
 }
 
-//установка формата пикселей
-void set_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_desc)
+//выбор формата пикселей
+int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_desc)
 {
   try
   {
     int pixel_format = 0;
     
-      //заполнение стандартной структуры описателя формата пикселей
+      //заполнение стандартной структуры дескриптора формата пикселей
     
     PIXELFORMATDESCRIPTOR pfd;
 
@@ -159,9 +48,9 @@ void set_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_desc)
     pfd.cAlphaBits   = swap_chain_desc.frame_buffer.alpha_bits;
     pfd.iLayerType   = PFD_MAIN_PLANE;    
 
-    if (current_wglew_context && wglChoosePixelFormatARB)
+    if (wglewGetContext () && wglChoosePixelFormatARB)
     {
-        //заполнение таблицы формата пикселей    
+        //заполнение таблицы формата пикселей
         
       const size_t INTEGER_ATTRIBUTES_TABLE_SIZE = 64;      
 
@@ -175,7 +64,6 @@ void set_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_desc)
       set_attribute (iter, WGL_ALPHA_BITS_ARB,      swap_chain_desc.frame_buffer.alpha_bits);
       set_attribute (iter, WGL_DEPTH_BITS_ARB,      swap_chain_desc.frame_buffer.depth_bits);
       set_attribute (iter, WGL_STENCIL_BITS_ARB,    swap_chain_desc.frame_buffer.stencil_bits);
-      set_attribute (iter, WGL_ACCUM_BITS_ARB,      0);
       set_attribute (iter, WGL_ACCELERATION_ARB,    WGL_FULL_ACCELERATION_ARB);
       
       switch (swap_chain_desc.swap_method)
@@ -221,10 +109,7 @@ void set_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_desc)
         raise_error ("ChoosePixelFormat");
     }
     
-      //установка текущего формата пикселей для окна
-    
-    if (!SetPixelFormat (device_context, pixel_format, &pfd))
-      raise_error ("SetPixelFormat");
+    return pixel_format;
   }
   catch (common::Exception& exception)
   {
@@ -237,7 +122,7 @@ void set_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_desc)
       case SwapMethod_Copy:    swap_method_name = "copy"; break;
     }
 
-    exception.Touch ("render::low_level::opengl::set_pixel_format(color=%u, alpha=%u, depth=%u, stencil=%u, "
+    exception.Touch ("render::low_level::opengl::choose_pixel_format(color=%u, alpha=%u, depth=%u, stencil=%u, "
       "samples=%u, buffers=%u, swap=%s%s%s)", swap_chain_desc.frame_buffer.color_bits, swap_chain_desc.frame_buffer.alpha_bits,
       swap_chain_desc.frame_buffer.depth_bits, swap_chain_desc.frame_buffer.stencil_bits, swap_chain_desc.samples_count,
       swap_chain_desc.buffers_count, swap_method_name, swap_chain_desc.fullscreen ? ", fullscreen" : "",
@@ -248,7 +133,7 @@ void set_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_desc)
 }
 
 //получение формата пикселей
-void get_pixel_format (HDC device_context, SwapChainDesc& swap_chain_desc)
+void get_pixel_format (HDC device_context, int pixel_format, SwapChainDesc& swap_chain_desc)
 {
     //очистка структуры swap_chain_desc
 
@@ -256,12 +141,7 @@ void get_pixel_format (HDC device_context, SwapChainDesc& swap_chain_desc)
 
     //получение номера формата пикселей
 
-  int pixel_format = GetPixelFormat (device_context);
-
-  if (!pixel_format)
-    raise_error ("GetPixelFormat");
-
-  if (current_wglew_context && wglGetPixelFormatAttribivARB) //WGLEW already init
+  if (wglewGetContext () && wglGetPixelFormatAttribivARB) //WGLEW already init
   {
       //получение формата пикселей с использованием расширений
 

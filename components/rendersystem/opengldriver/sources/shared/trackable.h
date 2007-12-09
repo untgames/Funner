@@ -18,7 +18,7 @@ namespace opengl
 class Trackable
 {
   public:
-    typedef xtl::slot<void ()> HandlerSlot;
+    typedef xtl::slot<void ()> DestroyHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Объект, оповещающий клиентов при удалении
@@ -29,7 +29,7 @@ class Trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация обработчика события удаления объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    xtl::connection RegisterDestroyHandler (HandlerSlot&);
+    xtl::connection RegisterDestroyHandler (DestroyHandler&);
 
   private:
     xtl::signal<void ()> destroy_signal;

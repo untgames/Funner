@@ -49,7 +49,7 @@ ISwapChain* Driver::CreateSwapChain (const SwapChainDesc& desc)
 {
   try
   {
-    return create_swap_chain (output_manager, desc);
+    return SwapChainManager::CreateSwapChain (output_manager, desc);
   }
   catch (common::Exception& exception)
   {
@@ -72,7 +72,7 @@ IDevice* Driver::CreateDevice (ISwapChain* swap_chain, const char* init_string)
   
   try
   {
-    return new Device (swap_chain, init_string);
+    return new Device (this, swap_chain, init_string);
   }
   catch (common::Exception& exception)
   {
@@ -93,6 +93,25 @@ void Driver::SetDebugLog (const LogFunction& in_log_fn)
 const Driver::LogFunction& Driver::GetDebugLog ()
 {
   return log_fn;
+}
+
+/*
+    Протоколирование
+*/
+
+void Driver::LogMessage (const char* message) const
+{
+  if (!message)
+    return;
+    
+  try
+  {
+    log_fn (message);
+  }
+  catch (...)
+  {
+    //подавляем все исключения
+  }
 }
 
 /*

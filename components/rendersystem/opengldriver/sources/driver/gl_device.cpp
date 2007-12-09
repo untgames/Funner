@@ -8,10 +8,16 @@ using namespace common;
     Конструктор / деструктор
 */
 
-Device::Device (ISwapChain* swap_chain, const char*)
-  : current_state (swap_chain), output_stage (current_state)
+Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char*)
+  : driver (in_driver),
+    context_manager (xtl::bind (&Driver::LogMessage, in_driver, _1)),
+    output_stage (context_manager)
 {  
-  ContextLock lock (current_state);
+    //выбор активной цепочки обмена и установка текущего контекста
+    
+  context_manager.SetSwapChains (swap_chain, swap_chain);
+
+  context_manager.MakeContextCurrent ();
 
     //получение информации об устройстве отрисовки
     
@@ -21,7 +27,7 @@ Device::Device (ISwapChain* swap_chain, const char*)
   
     //получение списка расширений
     
-  const char* swap_chain_extension_string = current_state.GetContext ().GetSwapChainExtensionString ();
+  const char* swap_chain_extension_string = context_manager.GetSwapChainsExtensionString ();
   
   stl::string extension_string = reinterpret_cast<const char*> (glGetString (GL_EXTENSIONS));
   
@@ -35,7 +41,7 @@ Device::Device (ISwapChain* swap_chain, const char*)
 
     //проверка состояния контекста OpenGL
 
-  current_state.Check ("render::low_level::opengl::Device::Device");
+  context_manager.CheckErrors ("render::low_level::opengl::Device::Device");
 }
 
 Device::~Device ()
