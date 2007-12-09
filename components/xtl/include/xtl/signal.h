@@ -101,6 +101,22 @@ template <class Signature>
 void swap (slot<Signature>&, slot<Signature>&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Слот автоматически разрывающий после входа из блока
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Signature>
+class auto_slot: public slot<Signature>
+{
+  typedef slot<Signature> base;
+  public:
+    auto_slot  () {}
+    auto_slot  (const slot<Signature>&);
+    auto_slot  (const function_type& fn);
+    ~auto_slot ();
+
+    auto_slot& operator = (const slot<Signature>&);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сигнал
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Signature, class Accumulator = default_signal_accumulator<typename function<Signature>::result_type> >

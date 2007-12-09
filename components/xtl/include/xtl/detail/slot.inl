@@ -180,7 +180,6 @@ inline slot<Signature>::slot (const function_type& fn, slot_impl* next_slot)
 template <class Signature>
 inline slot<Signature>::~slot ()
 {
-  impl->disconnect ();
   impl->release ();
 }
 
@@ -271,4 +270,32 @@ template <class Signature>
 inline void swap (slot<Signature>& s1, slot<Signature>& s2)
 {
   s1.swap (s2);
+}
+
+/*
+    auto_slot
+*/
+
+template <class Signature>
+inline auto_slot<Signature>::auto_slot (const slot<Signature>& s)
+  : base (s)
+  {}
+
+template <class Signature>
+inline auto_slot<Signature>::auto_slot (const function_type& fn)
+  : base (fn)
+  {}
+
+template <class Signature>
+inline auto_slot<Signature>::~auto_slot ()
+{
+  disconnect ();
+}
+
+template <class Signature>
+inline auto_slot<Signature>& auto_slot<Signature>::operator = (const slot<Signature>& s)
+{
+  base::operator = (s);
+
+  return *this;
 }
