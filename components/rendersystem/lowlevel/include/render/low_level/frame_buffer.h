@@ -14,6 +14,8 @@ namespace low_level
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct FrameBufferDesc
 {
+  size_t width;        //ширина буферов
+  size_t height;       //высота буферов
   size_t color_bits;   //количество бит на цвет
   size_t alpha_bits;   //количество бит на альфу
   size_t depth_bits;   //количество бит на глубину

@@ -56,9 +56,11 @@ PrimarySwapChain::PrimarySwapChain (IOutput* in_output, const SwapChainDesc& in_
 
     //перенесение дублируемых полей
   
-  desc.vsync         = in_desc.vsync;
-  desc.window_handle = in_desc.window_handle;
-  desc.fullscreen    = GetFullscreenState ();
+  desc.vsync               = in_desc.vsync;
+  desc.window_handle       = in_desc.window_handle;
+  desc.frame_buffer.width  = GetDeviceCaps (output_context, HORZRES);
+  desc.frame_buffer.height = GetDeviceCaps (output_context, VERTRES);
+  desc.fullscreen          = GetFullscreenState ();
 }
 
 PrimarySwapChain::~PrimarySwapChain ()

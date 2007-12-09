@@ -33,7 +33,7 @@ ISwapChain* SwapChainManager::CreateSwapChain (OutputManager& output_manager, co
     Создание PBuffer'а
 */
 
-IPBuffer* SwapChainManager::CreatePBuffer (ISwapChain* primary_swap_chain, const PBufferDesc& pbuffer_desc)
+ISwapChain* SwapChainManager::CreatePBuffer (ISwapChain* primary_swap_chain, const SwapChainDesc& pbuffer_desc)
 {
   try
   {
@@ -43,7 +43,7 @@ IPBuffer* SwapChainManager::CreatePBuffer (ISwapChain* primary_swap_chain, const
   catch (common::Exception& exception)
   {
     exception.Touch ("render::low_level::opengl::SwapChainManager::CreatePBuffer", "Could not create pbuffer %ux%ux%u",
-      pbuffer_desc.width, pbuffer_desc.height, pbuffer_desc.frame_buffer.color_bits);
+      pbuffer_desc.frame_buffer.width, pbuffer_desc.frame_buffer.height, pbuffer_desc.frame_buffer.color_bits);
 
     throw;
   }

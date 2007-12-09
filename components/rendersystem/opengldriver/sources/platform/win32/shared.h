@@ -170,20 +170,19 @@ class PrimarySwapChain: public SwapChain
 ///PBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   //сделать слежение за потерей PBuffer!!!
-class PBuffer: virtual public IPBuffer, public SwapChain
+class PBuffer: public SwapChain
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    PBuffer  (PrimarySwapChain* primary_swap_chain, const PBufferDesc& desc);
+    PBuffer  (PrimarySwapChain* primary_swap_chain, const SwapChainDesc& desc);
     ~PBuffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void GetDesc (SwapChainDesc&);
-    void GetDesc (PBufferDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение устройства вывода с максимальным размером области перекрытия
@@ -217,10 +216,10 @@ class PBuffer: virtual public IPBuffer, public SwapChain
     void Destroy ();
     
   private:
-    SwapChainPtr primary_swap_chain; //основная цепочка обмена
-    PBufferDesc  desc;               //дескриптор буфера
-    HPBUFFERARB  pbuffer;            //дескриптор PBuffer'а
-    HDC          output_context;     //контекст устройства вывода
+    SwapChainPtr  primary_swap_chain; //основная цепочка обмена
+    SwapChainDesc desc;               //дескриптор буфера
+    HPBUFFERARB   pbuffer;            //дескриптор PBuffer'а
+    HDC           output_context;     //контекст устройства вывода
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

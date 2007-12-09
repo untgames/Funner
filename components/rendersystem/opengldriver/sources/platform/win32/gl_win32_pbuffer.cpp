@@ -8,7 +8,7 @@ using namespace common;
     Конструктор / деструктор
 */
 
-PBuffer::PBuffer (PrimarySwapChain* in_primary_swap_chain, const PBufferDesc& in_desc)
+PBuffer::PBuffer (PrimarySwapChain* in_primary_swap_chain, const SwapChainDesc& in_desc)
   : primary_swap_chain (in_primary_swap_chain), desc (in_desc), pbuffer (0), output_context (0)
 {
   Create ();
@@ -41,10 +41,10 @@ void PBuffer::Create ()
     int pixel_format = choose_pixel_format (primary_device_context, desc);
     
       //создание PBuffer
-      
+
     int pbuffer_attributes [2] = {0, 0};
-      
-    pbuffer = wglCreatePbufferARB (primary_device_context, pixel_format, desc.width, desc.height, pbuffer_attributes);
+
+    pbuffer = wglCreatePbufferARB (primary_device_context, pixel_format, desc.frame_buffer.width, desc.frame_buffer.height, pbuffer_attributes);
     
     if (!pbuffer)
       raise_error ("wglCreatePbufferARB");
@@ -67,8 +67,8 @@ void PBuffer::Create ()
     if (!wglQueryPbufferARB (pbuffer, WGL_PBUFFER_WIDTH_ARB, &width) || !wglQueryPbufferARB (pbuffer, WGL_PBUFFER_HEIGHT_ARB, &height))
       raise_error ("wglQueryPBufferARB");
 
-    desc.width  = (size_t)width;
-    desc.height = (size_t)height;
+    desc.frame_buffer.width  = (size_t)width;
+    desc.frame_buffer.height = (size_t)height;
 
       //перенесение дублируемых полей
 
@@ -112,11 +112,6 @@ void PBuffer::Destroy ()
 */
 
 void PBuffer::GetDesc (SwapChainDesc& out_desc)
-{
-  out_desc = desc;
-}
-
-void PBuffer::GetDesc (PBufferDesc& out_desc)
 {
   out_desc = desc;
 }
