@@ -171,6 +171,29 @@ struct ContextManager::Impl: public xtl::reference_counter
 
     if (swap_chain == read_swap_chain)
       read_swap_chain = 0;
+      
+      //восстановление контекста
+      
+    if (!selected_context)
+    {
+      if (contexts.empty ())
+        return; //восстановление невозможно
+      
+      selected_context = contexts.front ();
+    }
+
+    if (!draw_swap_chain)
+    {
+      for (ContextMap::iterator iter=context_map.begin (), end=context_map.end (); iter!=end; ++iter)
+        if (iter->second.context_impl == selected_context)
+        {
+          draw_swap_chain = iter->first;
+          break;
+        }
+    }
+
+    if (!read_swap_chain)
+      read_swap_chain = draw_swap_chain;
   }
 };
 
@@ -411,4 +434,14 @@ void ContextManager::CheckErrors (const char* source) const
       Raise<OpenGLException> (source, "OpenGL error: code=%d", error);
       break;
   }
+}
+
+void ContextManager::RaiseError (const char* source) const
+{
+  if (!source)
+    return;
+    
+  CheckErrors (source);
+  
+  RaiseInvalidOperation (source, "Invalid operation");
 }

@@ -11,7 +11,7 @@ using namespace common;
 Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char*)
   : driver (in_driver),
     context_manager (xtl::bind (&Driver::LogMessage, in_driver, _1)),
-    output_stage (context_manager)
+    output_stage (context_manager, swap_chain)
 {  
     //выбор активной цепочки обмена и установка текущего контекста
     
@@ -309,14 +309,14 @@ const Rect& Device::RSGetScissor ()
     ”правление выходным уровнем (output-stage)
 */
 
-IBlendState* Device::CreateBlendState ()
+IBlendState* Device::CreateBlendState (const BlendDesc& desc)
 {
-  return output_stage.CreateBlendState ();
+  return output_stage.CreateBlendState (desc);
 }
 
-IDepthStencilState* Device::CreateDepthStencilState ()
+IDepthStencilState* Device::CreateDepthStencilState (const DepthStencilDesc& desc)
 {
-  return output_stage.CreateDepthStencilState ();
+  return output_stage.CreateDepthStencilState (desc);
 }
 
 IFrameBuffer* Device::CreateFrameBuffer (const FrameBufferDesc& frame_buffer_desc)

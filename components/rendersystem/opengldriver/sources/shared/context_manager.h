@@ -94,6 +94,7 @@ class ContextManager
 ///Проверка ошибок OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     void CheckErrors (const char* source) const;
+    void RaiseError  (const char* source) const;
 
   private:
     struct Impl;

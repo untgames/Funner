@@ -42,7 +42,7 @@ ISwapChain* SwapChainManager::CreatePBuffer (ISwapChain* primary_swap_chain, con
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainManager::CreatePBuffer", "Could not create pbuffer %ux%ux%u",
+    exception.Touch ("render::low_level::opengl::SwapChainManager::CreatePBuffer(%ux%ux%u)",
       pbuffer_desc.frame_buffer.width, pbuffer_desc.frame_buffer.height, pbuffer_desc.frame_buffer.color_bits);
 
     throw;

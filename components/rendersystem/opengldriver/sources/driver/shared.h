@@ -109,8 +109,8 @@ class Device: virtual public IDevice, public Object
     ITransformState*    CreateTransformState    ();
     IMaterialState*     CreateMaterialState     ();
     IRasterizerState*   CreateRasterizerState   ();
-    IBlendState*        CreateBlendState        ();
-    IDepthStencilState* CreateDepthStencilState ();
+    IBlendState*        CreateBlendState        (const BlendDesc&);
+    IDepthStencilState* CreateDepthStencilState (const DepthStencilDesc&);
     ISamplerState*      CreateSamplerState      ();
     IVertexBuffer*      CreateVertexBuffer      (const BufferDesc&);
     IIndexBuffer*       CreateIndexBuffer       (const BufferDesc&);

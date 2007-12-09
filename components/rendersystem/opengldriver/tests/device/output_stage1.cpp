@@ -8,7 +8,9 @@ int main ()
   {
     Test test ("OpenGL device test window (output_stage1)");
 
-    IFrameBuffer* buffer = test.device->CreateFrameBuffer (&*test.swap_chain);        
+    IFrameBuffer* buffer = test.device->OSGetFrameBuffer ();
+    
+    dump_desc (*buffer);    
   }
   catch (std::exception& exception)
   {
