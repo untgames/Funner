@@ -2,7 +2,6 @@
 #define RENDER_GL_DRIVER_OUTPUT_STAGE_HEADER
 
 #include <stl/auto_ptr.h>
-#include <render/low_level/device.h>
 #include <shared/context_manager.h>
 
 namespace render
