@@ -461,11 +461,14 @@ enum ColorWriteFlag
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct BlendDesc
 {
-  bool           blend_enable;               //включено ли смешивание цветов
-  BlendOperation blend_operation;            //вид операции смешивания цветов
-  BlendArgument  blend_source_argument;      //аргумент функции смешивания цветов, выбранный из источника цвета
-  BlendArgument  blend_destination_argument; //аргумент функции смешивания цветов, выбранный из приёмника цвета
-  unsigned char  color_write_mask;           //маска записи цветов
+  bool           blend_enable;                     //включено ли смешивание цветов
+  BlendOperation blend_color_operation;            //вид операции смешивания цветов
+  BlendArgument  blend_color_source_argument;      //аргумент функции смешивания цветов, выбранный из источника цвета
+  BlendArgument  blend_color_destination_argument; //аргумент функции смешивания цветов, выбранный из приёмника цвета
+  BlendOperation blend_alpha_operation;            //вид операции смешивания альфа компонент
+  BlendArgument  blend_alpha_source_argument;      //аргумент функции смешивания альфа компонент, выбранный из источника цвета
+  BlendArgument  blend_alpha_destination_argument; //аргумент функции смешивания альфа компонент, выбранный из приёмника цвета
+  unsigned char  color_write_mask;                 //маска записи цветов
 };
 
 /*

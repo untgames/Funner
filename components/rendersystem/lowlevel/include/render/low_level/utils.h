@@ -2,6 +2,7 @@
 #define RENDER_LOW_LEVEL_UTILITIES_HEADER
 
 #include <render/low_level/device.h>
+#include <render/low_level/driver.h>
 
 namespace render
 {

@@ -87,8 +87,8 @@ class IDevice: virtual public IObject
     virtual ITransformState*    CreateTransformState    () = 0;
     virtual IMaterialState*     CreateMaterialState     () = 0;
     virtual IRasterizerState*   CreateRasterizerState   () = 0;
-    virtual IBlendState*        CreateBlendState        () = 0;
-    virtual IDepthStencilState* CreateDepthStencilState () = 0;
+    virtual IBlendState*        CreateBlendState        (const BlendDesc&) = 0;
+    virtual IDepthStencilState* CreateDepthStencilState (const DepthStencilDesc&) = 0;
     virtual ISamplerState*      CreateSamplerState      () = 0;
     virtual IVertexBuffer*      CreateVertexBuffer      (const BufferDesc&) = 0;
     virtual IIndexBuffer*       CreateIndexBuffer       (const BufferDesc&) = 0;
