@@ -81,7 +81,7 @@ class IDevice: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IInputLayoutState*  CreateInputLayoutState  () = 0;
+    virtual IInputLayoutState*  CreateInputLayoutState  (const InputLayoutDesc&) = 0;
     virtual ILightingState*     CreateLightingState     () = 0;
     virtual IViewerState*       CreateViewerState       () = 0;
     virtual ITransformState*    CreateTransformState    () = 0;
