@@ -112,8 +112,8 @@ int main()
     return 0;
   }
 
-  const char* source_file_name [4] = {"data\\utf16be.txt","data\\ansi.txt", "data\\utf8.txt", "data\\utf16le.txt"};
-  Encoding    source_encoding [4]  = {Encoding_Utf16BE,Encoding_Ascii7, Encoding_Utf8, Encoding_Utf16LE};
+  const char* source_file_name [4] = {"data\\ansi.txt", "data\\utf8.txt", "data\\utf16le.txt","data\\utf16be.txt"};
+  Encoding    source_encoding [4]  = {Encoding_Ascii7, Encoding_Utf8, Encoding_Utf16LE,Encoding_Utf16BE};
 
   for (size_t i=0; i<4; i++)
     test_utf_converter (source_file_name [i], source_encoding [i]);

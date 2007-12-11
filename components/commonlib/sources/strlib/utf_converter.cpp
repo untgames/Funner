@@ -69,6 +69,7 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
             r=decode_UTF32(bsrc,srcSize,&srcBytes,dst,false);
             break;
       }
+//      printf("error=%d\n",r);
 //      printf("srcBytes=%d\n",srcBytes);
 //      printf("dst=%p\n",dst);
 //      printf("dst=%p\n",*dst);
@@ -352,6 +353,8 @@ bool decode_UTF16( const unsigned char* src, int srcSize, int* srcBytes, char32*
 
    if ( !err )
       *buffer = cp;
+   else
+      *buffer = 0x3F;
    *srcBytes = src-src0;
    return !err;
 }
