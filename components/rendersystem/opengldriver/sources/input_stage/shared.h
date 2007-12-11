@@ -1,20 +1,23 @@
-#ifndef RENDER_GL_DRIVER_INPUT_STAGE_VERTEX_BUFFER
-#define RENDER_GL_DRIVER_INPUT_STAGE_VERTEX_BUFFER
+#ifndef RENDER_GL_DRIVER_INPUT_STAGE_SHARED_HEADER
+#define RENDER_GL_DRIVER_INPUT_STAGE_SHARED_HEADER
 
-#include <render/lowlevel/buffer.h>
+#include <shared/buffer.h>
+#include <shared/input_stage.h>
+#include <common/exception.h>
 
 namespace render
 {
 
-namespace lowlevel
+namespace low_level
 {
 
 namespace opengl
 {
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вершинный буфер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class VertexBuffer: virtual public IVertexBuffer
+class VertexBuffer: virtual public IVertexBuffer, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

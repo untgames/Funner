@@ -1,115 +1,95 @@
-#include <common/exception.h>
-#include <shared/input_stage.h>
+#include "shared.h"
 
-namespace render
+using namespace render::low_level;
+using namespace render::low_level::opengl;
+using namespace common;
+
+/*
+    Описание реализации входного уровня конвейера OpenGL
+*/
+
+struct InputStage::Impl: public ContextObject
 {
-
-namespace low_level
-{
-
-namespace opengl
-{
-
-/// struct InputStage::Impl
-
-struct InputStage::Impl
-{
-  Impl();
-  Impl(const Impl&);
-  ~Impl();
+    //конструктор
+  Impl (const ContextManager& context_manager) : ContextObject (context_manager) {}
 };
 
-InputStage::Impl::Impl()
-{
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::Impl::Impl()");
-}
+/*
+    Конструкторы
+*/
 
-InputStage::Impl::Impl(const Impl&)
+InputStage::InputStage (ContextManager& context_manager)
+  : impl (new Impl (context_manager))
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::Impl::Impl(const Impl&)");
-}
-
-InputStage::Impl::~Impl()
-{
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::Impl::~Impl()");
-}
-
-/// class InputStage
-
-InputStage::InputStage(ContextManager&)
-{
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::InputStage(ContextManager&)");
 }
 
 InputStage::~InputStage()
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::~InputStage()");
 }
+
+/*
+    Создание ресурсов
+*/
 
 IInputLayoutState* InputStage::CreateInputLayoutState (const InputLayoutDesc& desc)
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::CreateInputLayoutState(const InputLayoutDesc&)");
-  return NULL;
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::CreateInputLayoutState");
+  return 0;
 }
 
 IVertexBuffer* InputStage::CreateVertexBuffer (const BufferDesc& desc)
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::CreateVertexBuffer(const BufferDesc&)");
-  return NULL;
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::CreateVertexBuffer");
+  return 0;
 }
 
 IIndexBuffer* InputStage::CreateIndexBuffer (const BufferDesc& desc)
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::CreateIndexBuffer(const BufferDesc&)");
-  return NULL;
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::CreateIndexBuffer");
+  return 0;
 }
+
+/*
+    Управление конфигурацией входных данных    
+*/
 
 void InputStage::SetInputLayout (IInputLayoutState* state)
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::SetInputLayout(IInputLayoutState*)");
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::SetInputLayout");
 }
 
 IInputLayoutState* InputStage::GetInputLayout () const
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::GetInputLayout()");
-  return NULL;
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::GetInputLayout");
+  return 0;
 }
+
+/*
+    Управление вершинными буферами
+*/
 
 void InputStage::SetVertexBuffer (size_t vertex_buffer_slot, IVertexBuffer* buffer)
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::SetVertexBuffer(size_t, IVertexBuffer*)");
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::SetVertexBuffer");
 }
 
 IVertexBuffer* InputStage::GetVertexBuffer (size_t vertex_buffer_slot) const
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::GetVertexBuffer(size_t)");
-  return NULL;
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::GetVertexBuffer");
+  return 0;
 }
 
-void SetIndexBuffer (IIndexBuffer* buffer)
+/*
+    Управление индексным буфером
+*/
+
+void InputStage::SetIndexBuffer (IIndexBuffer* buffer)
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::SetIndexBuffer(IIndexBuffer*)");
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::SetIndexBuffer");
 }
 
-IIndexBuffer* GetIndexBuffer () const
+IIndexBuffer* InputStage::GetIndexBuffer () const
 {
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::GetIndexBuffer()");
-  return NULL;
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::GetIndexBuffer");
+  return 0;
 }
-
-InputStage::InputStage (const InputStage&)
-{
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::InputStage(const InputStage&)");  
-}
-
-InputStage::InputStage& operator = (const InputStage&)
-{
-  common::RaiseNotImplemented("render::low_level::opengl::InputStage::operator = (const InputStage&)");
-  return *this;
-}
-
-} ///opengl namespace
-
-} ///low_level namespace
-
-} ///render namespace
