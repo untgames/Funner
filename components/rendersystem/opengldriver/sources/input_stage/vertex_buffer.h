@@ -1,5 +1,5 @@
-#ifndef _H_VERTEX_BUFFER_H_
-#define _H_VERTEX_BUFFER_H_
+#ifndef RENDER_GL_DRIVER_INPUT_STAGE_VERTEX_BUFFER
+#define RENDER_GL_DRIVER_INPUT_STAGE_VERTEX_BUFFER
 
 #include <render/lowlevel/buffer.h>
 
@@ -9,10 +9,12 @@ namespace render
 namespace lowlevel
 {
 
+namespace opengl
+{
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вершинный буфер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class VertexBuffer: public IVertexBuffer
+class VertexBuffer: virtual public IVertexBuffer
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,4 +51,6 @@ class VertexBuffer: public IVertexBuffer
 
 }
 
-#endif  _H_VERTEX_BUFFER_H_
+}
+
+#endif
