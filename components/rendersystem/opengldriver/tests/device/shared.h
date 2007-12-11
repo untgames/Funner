@@ -37,16 +37,17 @@ struct Test
 
     memset (&desc, 0, sizeof (desc));
 
-    desc.frame_buffer.color_bits   = 24;
-    desc.frame_buffer.alpha_bits   = 8;
-    desc.frame_buffer.depth_bits   = 16;
-    desc.frame_buffer.stencil_bits = 8;
-    desc.buffers_count             = 2;
-    desc.samples_count             = 4;
-    desc.swap_method               = SwapMethod_Discard;
-    desc.vsync                     = false;
-    desc.fullscreen                = false;
-    desc.window_handle             = window.Handle ();
+    desc.frame_buffer.color_bits          = 24;
+    desc.frame_buffer.alpha_bits          = 8;
+    desc.frame_buffer.depth_bits          = 16;
+    desc.frame_buffer.stencil_bits        = 8;
+    desc.frame_buffer.color_buffers_count = 4;
+    desc.buffers_count                    = 2;
+    desc.samples_count                    = 4;
+    desc.swap_method                      = SwapMethod_Discard;
+    desc.vsync                            = false;
+    desc.fullscreen                       = false;
+    desc.window_handle                    = window.Handle ();
     
     swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);
     device     = DevicePtr (driver->CreateDevice (&*swap_chain), false);
@@ -61,12 +62,13 @@ inline void dump_desc (IFrameBuffer& buffer)
   buffer.GetDesc (desc);
   
   printf ("Frame buffer:\n");
-  printf ("  width:        %u\n", desc.width);
-  printf ("  height:       %u\n", desc.height);
-  printf ("  color_bits:   %u\n", desc.color_bits);
-  printf ("  alpha_bits:   %u\n", desc.alpha_bits);
-  printf ("  depth_bits:   %u\n", desc.depth_bits);
-  printf ("  stencil_bits: %u\n", desc.stencil_bits);
+  printf ("  width:         %u\n", desc.width);
+  printf ("  height:        %u\n", desc.height);
+  printf ("  color_bits:    %u\n", desc.color_bits);
+  printf ("  alpha_bits:    %u\n", desc.alpha_bits);
+  printf ("  depth_bits:    %u\n", desc.depth_bits);
+  printf ("  stencil_bits:  %u\n", desc.stencil_bits);
+  printf ("  color_buffers: %u\n", desc.color_buffers_count);
 }
 
 //печать дескриптора blend-state

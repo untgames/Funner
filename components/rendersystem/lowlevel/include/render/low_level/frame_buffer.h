@@ -14,19 +14,20 @@ namespace low_level
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct FrameBufferDesc
 {
-  size_t width;        //ширина буферов
-  size_t height;       //высота буферов
-  size_t color_bits;   //количество бит на цвет
-  size_t alpha_bits;   //количество бит на альфу
-  size_t depth_bits;   //количество бит на глубину
-  size_t stencil_bits; //количество бит на шаблон  
+  size_t width;               //ширина буферов
+  size_t height;              //высота буферов
+  size_t color_bits;          //количество бит на цвет
+  size_t alpha_bits;          //количество бит на альфу
+  size_t depth_bits;          //количество бит на глубину
+  size_t stencil_bits;        //количество бит на шаблон
+  size_t color_buffers_count; //количество буферов цвета 
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поверхности отрисовки: color, depth-stencil
+///Буферы отрисовки: color, depth-stencil
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class IRenderTargetSurface: virtual public IBuffer {};
-class IDepthStencilSurface: virtual public IBuffer {};
+class IColorBuffer:        virtual public IBuffer {};
+class IDepthStencilBuffer: virtual public IBuffer {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буфер кадра
@@ -40,10 +41,10 @@ class IFrameBuffer: virtual public IObject
     virtual void GetDesc (FrameBufferDesc&) = 0;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение поверхностей отрисовки
+///Получение буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IRenderTargetSurface* GetRenderTarget () = 0;
-    virtual IDepthStencilSurface* GetDepthStencil () = 0;
+    virtual IColorBuffer*        GetColorBuffer        (size_t buffer_index = 0) = 0;
+    virtual IDepthStencilBuffer* GetDepthStencilBuffer () = 0;
 };
 
 }

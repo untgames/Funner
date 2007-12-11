@@ -45,17 +45,17 @@ class SwapChainFrameBuffer: public FrameBuffer
       out_desc = swap_chain_desc.frame_buffer;
     }
     
-      //получение цветовой поверхности
-    IRenderTargetSurface* GetRenderTarget ()
+      //получение буфера цвета
+    IColorBuffer* GetColorBuffer (size_t)
     {
-      RaiseNotImplemented ("render::low_level::opengl::SwapChainFrameBuffer::GetRenderTarget");
+      RaiseNotImplemented ("render::low_level::opengl::SwapChainFrameBuffer::GetColorBuffer");
       return 0;
     }
     
-      //получение depth-stencil поверхности
-    IDepthStencilSurface* GetDepthStencil ()
+      //получение depth-stencil буфера
+    IDepthStencilBuffer* GetDepthStencilBuffer ()
     {
-      RaiseNotImplemented ("render::low_level::opengl::SwapChainFrameBuffer::GetDepthStencil");
+      RaiseNotImplemented ("render::low_level::opengl::SwapChainFrameBuffer::GetDepthStencilBuffer");
       return 0;
     }
 

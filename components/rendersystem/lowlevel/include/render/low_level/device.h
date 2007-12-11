@@ -157,11 +157,11 @@ class IDevice: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void ClearRenderTargetSurface (IRenderTargetSurface* surface, const Color4f& color) = 0;
-    virtual void ClearDepthSurface        (IDepthStencilSurface* surface, float depth) = 0;
-    virtual void ClearStencilSurface      (IDepthStencilSurface* surface, unsigned char value) = 0;
-    virtual void Clear                    (IFrameBuffer* buffer, size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
-    virtual void Clear                    (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
+    virtual void ClearColorBuffer   (IColorBuffer* buffer, const Color4f& color) = 0;
+    virtual void ClearDepthBuffer   (IDepthStencilBuffer* buffer, float depth) = 0;
+    virtual void ClearStencilBuffer (IDepthStencilBuffer* buffer, unsigned char value) = 0;
+    virtual void Clear              (IFrameBuffer* buffer, size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
+    virtual void Clear              (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление предикатами отрисовки

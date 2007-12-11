@@ -30,7 +30,7 @@ enum BufferType
   BufferType_VertexBuffer, //вершинный буфер
   BufferType_IndexBuffer,  //индексный буфер
   BufferType_Texture,      //текстура
-  BufferType_RenderTarget, //целевой буфер отрисовки
+  BufferType_ColorBuffer,  //буфер цвета
   BufferType_DepthStencil, //буфер глубина/трафарет
 
   BufferType_Num

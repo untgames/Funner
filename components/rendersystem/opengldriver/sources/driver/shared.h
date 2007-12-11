@@ -180,11 +180,11 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ClearRenderTargetSurface (IRenderTargetSurface* surface, const Color4f& color);
-    void ClearDepthSurface        (IDepthStencilSurface* surface, float depth);
-    void ClearStencilSurface      (IDepthStencilSurface* surface, unsigned char value);
-    void Clear                    (IFrameBuffer* buffer, size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
-    void Clear                    (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
+    void ClearColorBuffer   (IColorBuffer* buffer, const Color4f& color);
+    void ClearDepthBuffer   (IDepthStencilBuffer* buffer, float depth);
+    void ClearStencilBuffer (IDepthStencilBuffer* buffer, unsigned char value);
+    void Clear              (IFrameBuffer* buffer, size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
+    void Clear              (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление предикатами отрисовки

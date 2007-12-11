@@ -373,19 +373,19 @@ IFrameBuffer* Device::OSGetFrameBuffer ()
     Очистка
 */
 
-void Device::ClearRenderTargetSurface (IRenderTargetSurface* surface, const Color4f& color)
+void Device::ClearColorBuffer (IColorBuffer* buffer, const Color4f& color)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ClearRenderTargetSurface");
+  RaiseNotImplemented ("render::low_level::opengl::Device::ClearColorBuffer");
 }
 
-void Device::ClearDepthSurface (IDepthStencilSurface* surface, float depth)
+void Device::ClearDepthBuffer (IDepthStencilBuffer* buffer, float depth)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ClearDepthSurface");
+  RaiseNotImplemented ("render::low_level::opengl::Device::ClearDepthBuffer");
 }
 
-void Device::ClearStencilSurface (IDepthStencilSurface* surface, unsigned char value)
+void Device::ClearStencilBuffer (IDepthStencilBuffer* buffer, unsigned char value)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ClearStencilSurface");
+  RaiseNotImplemented ("render::low_level::opengl::Device::ClearStencilBuffer");
 }
 
 void Device::Clear (IFrameBuffer* buffer, size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)

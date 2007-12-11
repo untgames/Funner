@@ -31,6 +31,10 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
   {
     int pixel_format = 0;
     
+      //определение числа дополнительных буферов цвета
+    
+    size_t aux_buffers_count = swap_chain_desc.frame_buffer.color_buffers_count ? swap_chain_desc.frame_buffer.color_buffers_count - 1 : 0;
+    
       //заполнение стандартной структуры дескриптора формата пикселей
     
     PIXELFORMATDESCRIPTOR pfd;
@@ -44,7 +48,7 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
     pfd.cColorBits   = swap_chain_desc.frame_buffer.color_bits;
     pfd.cDepthBits   = swap_chain_desc.frame_buffer.depth_bits;
     pfd.cStencilBits = swap_chain_desc.frame_buffer.stencil_bits;
-    pfd.cAccumBits   = 0;
+    pfd.cAuxBuffers  = aux_buffers_count;
     pfd.cAlphaBits   = swap_chain_desc.frame_buffer.alpha_bits;
     pfd.iLayerType   = PFD_MAIN_PLANE;    
 
@@ -63,6 +67,7 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
       set_attribute (iter, WGL_COLOR_BITS_ARB,      swap_chain_desc.frame_buffer.color_bits);
       set_attribute (iter, WGL_ALPHA_BITS_ARB,      swap_chain_desc.frame_buffer.alpha_bits);
       set_attribute (iter, WGL_DEPTH_BITS_ARB,      swap_chain_desc.frame_buffer.depth_bits);
+      set_attribute (iter, WGL_AUX_BUFFERS_ARB,     aux_buffers_count);
       set_attribute (iter, WGL_STENCIL_BITS_ARB,    swap_chain_desc.frame_buffer.stencil_bits);
       set_attribute (iter, WGL_ACCELERATION_ARB,    WGL_FULL_ACCELERATION_ARB);
       
@@ -122,10 +127,10 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
       case SwapMethod_Copy:    swap_method_name = "copy"; break;
     }
 
-    exception.Touch ("render::low_level::opengl::choose_pixel_format(color=%u, alpha=%u, depth=%u, stencil=%u, "
-      "samples=%u, buffers=%u, swap=%s%s%s)", swap_chain_desc.frame_buffer.color_bits, swap_chain_desc.frame_buffer.alpha_bits,
-      swap_chain_desc.frame_buffer.depth_bits, swap_chain_desc.frame_buffer.stencil_bits, swap_chain_desc.samples_count,
-      swap_chain_desc.buffers_count, swap_method_name, swap_chain_desc.fullscreen ? ", fullscreen" : "",
+    exception.Touch ("render::low_level::opengl::choose_pixel_format(color=%u, alpha=%u, depth=%u, stencil=%u, color_buffers=%u, "
+      "samples=%u, swap_buffers=%u, swap=%s%s%s)", swap_chain_desc.frame_buffer.color_bits, swap_chain_desc.frame_buffer.alpha_bits,
+      swap_chain_desc.frame_buffer.depth_bits, swap_chain_desc.frame_buffer.stencil_bits, swap_chain_desc.frame_buffer.color_buffers_count,
+      swap_chain_desc.samples_count, swap_chain_desc.buffers_count, swap_method_name, swap_chain_desc.fullscreen ? ", fullscreen" : "",
       swap_chain_desc.vsync ? ", vsync" : "");
 
     throw;
@@ -150,6 +155,7 @@ void get_pixel_format (HDC device_context, int pixel_format, SwapChainDesc& swap
       WGL_ALPHA_BITS_ARB,
       WGL_DEPTH_BITS_ARB,
       WGL_STENCIL_BITS_ARB,
+      WGL_AUX_BUFFERS_ARB,
       WGL_DOUBLE_BUFFER_ARB,
       WGL_SWAP_METHOD_ARB
     };
@@ -161,11 +167,12 @@ void get_pixel_format (HDC device_context, int pixel_format, SwapChainDesc& swap
     if (!wglGetPixelFormatAttribivARB (device_context, pixel_format, 0, BASIC_NAMES_COUNT, basic_names, value_buffer))
       raise_error ("wglGetPixelFormatAttribivARB");
 
-    swap_chain_desc.frame_buffer.color_bits   = *iter++;
-    swap_chain_desc.frame_buffer.alpha_bits   = *iter++;
-    swap_chain_desc.frame_buffer.depth_bits   = *iter++;
-    swap_chain_desc.frame_buffer.stencil_bits = *iter++;
-    swap_chain_desc.buffers_count             = *iter++ ? 2 : 1;
+    swap_chain_desc.frame_buffer.color_bits          = *iter++;
+    swap_chain_desc.frame_buffer.alpha_bits          = *iter++;
+    swap_chain_desc.frame_buffer.depth_bits          = *iter++;
+    swap_chain_desc.frame_buffer.stencil_bits        = *iter++;
+    swap_chain_desc.frame_buffer.color_buffers_count = *iter++ + 1;
+    swap_chain_desc.buffers_count                    = *iter++ ? 2 : 1;
     
     switch (*iter++)
     {
@@ -196,12 +203,13 @@ void get_pixel_format (HDC device_context, int pixel_format, SwapChainDesc& swap
     if (!DescribePixelFormat (device_context, pixel_format, sizeof (pfd), &pfd))
       raise_error ("DescribePixelFormat");
 
-    swap_chain_desc.frame_buffer.color_bits   = pfd.cColorBits;
-    swap_chain_desc.frame_buffer.alpha_bits   = pfd.cAlphaBits;
-    swap_chain_desc.frame_buffer.depth_bits   = pfd.cDepthBits;
-    swap_chain_desc.frame_buffer.stencil_bits = pfd.cStencilBits;
-    swap_chain_desc.buffers_count             = pfd.dwFlags & PFD_DOUBLEBUFFER ? 2 : 1;
-    swap_chain_desc.swap_method               = SwapMethod_Discard;
+    swap_chain_desc.frame_buffer.color_bits          = pfd.cColorBits;
+    swap_chain_desc.frame_buffer.alpha_bits          = pfd.cAlphaBits;
+    swap_chain_desc.frame_buffer.depth_bits          = pfd.cDepthBits;
+    swap_chain_desc.frame_buffer.stencil_bits        = pfd.cStencilBits;
+    swap_chain_desc.frame_buffer.color_buffers_count = pfd.cAuxBuffers + 1;
+    swap_chain_desc.buffers_count                    = pfd.dwFlags & PFD_DOUBLEBUFFER ? 2 : 1;
+    swap_chain_desc.swap_method                      = SwapMethod_Discard;
   }
 }
 
