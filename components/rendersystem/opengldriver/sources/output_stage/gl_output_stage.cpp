@@ -86,14 +86,17 @@ struct OutputStage::Impl
     
     memset (&blend_desc, 0, sizeof (blend_desc));
     
-    blend_desc.blend_enable               = false;
-    blend_desc.blend_operation            = BlendOperation_Add;
-    blend_desc.blend_source_argument      = BlendArgument_One;
-    blend_desc.blend_destination_argument = BlendArgument_Zero;
-    blend_desc.color_write_mask           = ColorWriteFlag_All;
+    blend_desc.blend_enable                     = false;
+    blend_desc.blend_color_operation            = BlendOperation_Add;
+    blend_desc.blend_color_source_argument      = BlendArgument_One;
+    blend_desc.blend_color_destination_argument = BlendArgument_Zero;
+    blend_desc.blend_alpha_operation            = BlendOperation_Add;
+    blend_desc.blend_alpha_source_argument      = BlendArgument_One;
+    blend_desc.blend_alpha_destination_argument = BlendArgument_Zero;
+    blend_desc.color_write_mask                 = ColorWriteFlag_All;
 
     default_blend_state = xtl::com_ptr<IBlendState> (new BlendState (context_manager, blend_desc), false);
-    
+
       //установка состояния "по умолчанию"
 
     SetFrameBuffer (&*default_frame_buffer);

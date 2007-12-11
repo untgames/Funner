@@ -3,6 +3,8 @@
 
 #include <memory.h>
 
+#include <render/low_level/utils.h>
+
 #include <shared/output_stage.h>
 #include <shared/object.h>
 #include <shared/trackable.h>
