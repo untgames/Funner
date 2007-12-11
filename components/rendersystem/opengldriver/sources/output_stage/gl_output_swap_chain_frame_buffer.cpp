@@ -15,25 +15,24 @@ class SwapChainFrameBuffer: public FrameBuffer
 {
   public:
       //конструктор
-    SwapChainFrameBuffer (const ContextManager& in_context_manager, ISwapChain* in_swap_chain) :
-      swap_chain (in_swap_chain), context_manager (in_context_manager)
+    SwapChainFrameBuffer (const ContextManager& context_manager, ISwapChain* in_swap_chain) :
+      FrameBuffer (context_manager),
+      swap_chain (in_swap_chain)
     {
       if (!in_swap_chain)
         RaiseNullArgument ("render::low_level::opengl::SwapChainFrameBuffer::SwapChainFrameBuffer", "swap_chain");
-        
+
         //для проверки совместимости с контекстом
-       
+
       Bind ();
     }
-    
-      //получение менеджера контекстов
-    ContextManager& GetContextManager () { return context_manager; }
 
       //присоединение буфера к контексту OpenGL
     void Bind ()
     {
-      context_manager.SetSwapChains (&*swap_chain, &*swap_chain);
-      context_manager.MakeContextCurrent ();
+      GetContextManager ().SetSwapChains (&*swap_chain, &*swap_chain);
+
+      MakeContextCurrent ();
     }
     
       //получение дескриптора
@@ -64,8 +63,7 @@ class SwapChainFrameBuffer: public FrameBuffer
     typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
 
   private:
-    ContextManager  context_manager; //менеджер контекстов
-    SwapChainPtr    swap_chain;      //цепочка обмена
+    SwapChainPtr swap_chain;      //цепочка обмена
 };
 
 }
@@ -78,4 +76,3 @@ FrameBuffer* FrameBuffer::Create (const ContextManager& context_manager, ISwapCh
 {
   return new SwapChainFrameBuffer (context_manager, swap_chain);
 }
-

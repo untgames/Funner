@@ -11,7 +11,8 @@ using namespace common;
 Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char*)
   : driver (in_driver),
     context_manager (xtl::bind (&Driver::LogMessage, in_driver, _1)),
-    output_stage (context_manager, swap_chain)
+    output_stage (context_manager, swap_chain),
+    input_stage (context_manager)
 {  
     //выбор активной цепочки обмена и установка текущего контекста
     
@@ -61,12 +62,6 @@ const char* Device::GetName ()
     —оздание ресурсов
 */
 
-IInputLayoutState* Device::CreateInputLayoutState ()
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateInputLayoutState");
-  return 0;
-}
-
 ILightingState* Device::CreateLightingState ()
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreateLightingState");
@@ -103,18 +98,6 @@ ISamplerState* Device::CreateSamplerState ()
   return 0;
 }
 
-IVertexBuffer* Device::CreateVertexBuffer (const BufferDesc&)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateVertexBuffer");
-  return 0;
-}
-
-IIndexBuffer* Device::CreateIndexBuffer (const BufferDesc&)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateIndexBuffer");
-  return 0;
-}
-
 ITexture* Device::CreateTexture (const TextureDesc&)
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreateTexture");
@@ -137,37 +120,49 @@ IStatisticsQuery* Device::CreateStatisticsQuery ()
     ”правление входным уровнем (input-stage)
 */
 
+IInputLayoutState* Device::CreateInputLayoutState (const InputLayoutDesc& desc)
+{
+  return input_stage.CreateInputLayoutState (desc);
+}
+
+IVertexBuffer* Device::CreateVertexBuffer (const BufferDesc& desc)
+{
+  return input_stage.CreateVertexBuffer (desc);
+}
+
+IIndexBuffer* Device::CreateIndexBuffer (const BufferDesc& desc)
+{
+  return input_stage.CreateIndexBuffer (desc);
+}
+
 void Device::ISSetInputLayout (IInputLayoutState* state)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ISSetInputLayout");  
+  input_stage.SetInputLayout (state);
 }
 
 void Device::ISSetVertexBuffer (size_t vertex_buffer_slot, IVertexBuffer* buffer)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ISSetVertexBuffer");
+  input_stage.SetVertexBuffer (vertex_buffer_slot, buffer);
 }
 
 void Device::ISSetIndexBuffer (IIndexBuffer* buffer)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ISSetIndexBuffer");
+  input_stage.SetIndexBuffer (buffer);
 }
 
 IInputLayoutState* Device::ISGetInputLayout ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ISGetInputLayout");
-  return 0;
+  return input_stage.GetInputLayout ();
 }
 
 IVertexBuffer* Device::ISGetVertexBuffer (size_t vertex_buffer_slot)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ISGetVertexBuffer");
-  return 0;
+  return input_stage.GetVertexBuffer (vertex_buffer_slot);
 }
 
 IIndexBuffer* Device::ISGetIndexBuffer ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ISGetIndexBuffer");
-  return 0;
+  return input_stage.GetIndexBuffer ();
 }
 
 /*

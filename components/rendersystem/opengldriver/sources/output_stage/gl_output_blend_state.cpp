@@ -8,8 +8,9 @@ using namespace common;
     Конструктор / деструктор
 */
 
-BlendState::BlendState (const ContextManager& in_context_manager, const BlendDesc& in_desc)
-  : context_manager (in_context_manager), display_list (0)
+BlendState::BlendState (const ContextManager& context_manager, const BlendDesc& in_desc)
+  : ContextObject (context_manager),
+    display_list (0)
 {
   SetDesc (in_desc);
 }
@@ -20,14 +21,14 @@ BlendState::~BlendState ()
   {
     if (display_list)
     {
-      context_manager.MakeContextCurrent ();
+      MakeContextCurrent ();
 
       glDeleteLists (display_list, 1);
     }
   }
   catch (std::exception& exception)
   {
-    context_manager.LogPrintf ("%s\n", exception.what ());
+    LogPrintf ("%s\n", exception.what ());
   }
   catch (...)
   {
@@ -96,7 +97,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   
     //выбор контекста
 
-  context_manager.MakeContextCurrent ();
+  MakeContextCurrent ();
   
     //определение поддержки расширений OpenGL
     
@@ -222,7 +223,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     display_list = glGenLists (1);      
     
     if (!display_list)
-      context_manager.RaiseError ("render::low_level::opengl::BlendState::SetDesc");
+      RaiseError ("render::low_level::opengl::BlendState::SetDesc");
   }
 
   glNewList (display_list, GL_COMPILE);
@@ -248,7 +249,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   
     //проверка ошибок
   
-  context_manager.CheckErrors ("render::low_level::opengl::BlendState::SetDesc");
+  CheckErrors ("render::low_level::opengl::BlendState::SetDesc");
 }
 
 void BlendState::GetDesc (BlendDesc& out_desc)
@@ -265,7 +266,7 @@ void BlendState::Bind ()
   if (!display_list)
     RaiseInvalidOperation ("render::low_level::opengl::BlendState::Bind", "Empty state (null display list)");
 
-  context_manager.MakeContextCurrent ();
+  MakeContextCurrent ();
 
   glCallList (display_list);
 }

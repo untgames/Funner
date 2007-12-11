@@ -9,6 +9,7 @@
 #include <shared/object.h>
 #include <shared/context_manager.h>
 #include <shared/property_list.h>
+#include <shared/input_stage.h>
 #include <shared/output_stage.h>
 
 #include <common/exception.h>
@@ -103,7 +104,7 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IInputLayoutState*  CreateInputLayoutState  ();
+    IInputLayoutState*  CreateInputLayoutState  (const InputLayoutDesc&);
     ILightingState*     CreateLightingState     ();
     IViewerState*       CreateViewerState       ();
     ITransformState*    CreateTransformState    ();
@@ -216,6 +217,7 @@ class Device: virtual public IDevice, public Object
     ContextManager context_manager; //менеджер контекстов OpenGL
     PropertyList   properties;      //свойства устройства
     OutputStage    output_stage;    //выходной уровень
+    InputStage     input_stage;     //входной уровень
 };
 
 }

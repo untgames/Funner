@@ -8,9 +8,8 @@
 #include <render/low_level/debug.h>
 
 #include <shared/property_list.h>
-#include <shared/context_manager.h>
+#include <shared/context_object.h>
 #include <shared/buffer.h>
-#include <shared/trackable.h>
 #include <shared/platform/context.h>
 
 #include <stl/string>

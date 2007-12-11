@@ -69,18 +69,17 @@ class OutputStageState
     Описание реализации выходного уровня конвейера OpenGL
 */
 
-struct OutputStage::Impl
+struct OutputStage::Impl: public ContextObject
 {
-  ContextManager            context_manager;      //менеджер контекстов
   OutputStageState          state;                //состояние уровня
   xtl::com_ptr<ISwapChain>  default_swap_chain;   //цепочка обмена по умолчанию
   xtl::com_ptr<FrameBuffer> default_frame_buffer; //буфер кадра "по умолчанию"
   xtl::com_ptr<IBlendState> default_blend_state;  //состояние подуровня смешивания цветов "по умолчанию"
   
   Impl (ContextManager& in_context_manager, ISwapChain* swap_chain) :
-    context_manager (in_context_manager),
+    ContextObject (in_context_manager),
     default_swap_chain (swap_chain),
-    default_frame_buffer (FrameBuffer::Create (context_manager, swap_chain), false)
+    default_frame_buffer (FrameBuffer::Create (GetContextManager (), swap_chain), false)
   {
     BlendDesc blend_desc;
     
@@ -95,7 +94,7 @@ struct OutputStage::Impl
     blend_desc.blend_alpha_destination_argument = BlendArgument_Zero;
     blend_desc.color_write_mask                 = ColorWriteFlag_All;
 
-    default_blend_state = xtl::com_ptr<IBlendState> (new BlendState (context_manager, blend_desc), false);
+    default_blend_state = xtl::com_ptr<IBlendState> (new BlendState (GetContextManager (), blend_desc), false);
 
       //установка состояния "по умолчанию"
 
@@ -109,11 +108,7 @@ struct OutputStage::Impl
     if (!in_frame_buffer)
       RaiseNullArgument ("render::low_level::opengl::OutputStage::SetFrameBuffer", "frame_buffer");
       
-    FrameBuffer* frame_buffer = cast_object<FrameBuffer> (in_frame_buffer, "render::low_level::opengl::OutputStage::SetFrameBuffer", "frame_buffer");
-    
-    if (!frame_buffer->GetContextManager ().IsCompatible (context_manager))
-      RaiseInvalidArgument ("render::low_level::opengl::OutputStage::SetFrameBuffer", "frame_buffer", "IFrameBuffer instance",
-        "IFrameBuffer incompatible with IDevice");
+    FrameBuffer* frame_buffer = cast_object<FrameBuffer> (*this, in_frame_buffer, "render::low_level::opengl::OutputStage::SetFrameBuffer", "frame_buffer");
 
     state.SetFrameBuffer (frame_buffer);
   }
@@ -127,12 +122,8 @@ struct OutputStage::Impl
     if (!in_blend_state)
       RaiseNullArgument ("render::low_level::opengl::OutputStage::SetBlendState", "blend_state");
       
-    BlendState* blend_state = cast_object<BlendState> (in_blend_state, "render::low_level::opengl::OutputStage::SetBlendState", "blend_state");
+    BlendState* blend_state = cast_object<BlendState> (*this, in_blend_state, "render::low_level::opengl::OutputStage::SetBlendState", "blend_state");
     
-    if (!blend_state->GetContextManager ().IsCompatible (context_manager))
-      RaiseInvalidArgument ("render::low_level::opengl::OutputStage::SetBlendState", "blend_state", "IBlendState instance",
-        "IBlendState incompatible with IDevice");
-
     state.SetBlendState (blend_state);
   }
     
@@ -169,7 +160,7 @@ IFrameBuffer* OutputStage::CreateFrameBuffer (const FrameBufferDesc& desc)
 
     xtl::com_ptr<ISwapChain> swap_chain (SwapChainManager::CreatePBuffer (&*impl->default_swap_chain, swap_chain_desc), false);
 
-    return FrameBuffer::Create (impl->context_manager, &*swap_chain);
+    return FrameBuffer::Create (impl->GetContextManager (), &*swap_chain);
   }
   catch (common::Exception& exception)
   {
@@ -185,7 +176,7 @@ IFrameBuffer* OutputStage::CreateFrameBuffer (ISwapChain* swap_chain)
 
   try
   {
-    return FrameBuffer::Create (impl->context_manager, swap_chain);
+    return FrameBuffer::Create (impl->GetContextManager (), swap_chain);
   }
   catch (common::Exception& exception)
   {
@@ -208,7 +199,7 @@ IBlendState* OutputStage::CreateBlendState (const BlendDesc& desc)
 {
   try
   {
-    return new BlendState (impl->context_manager, desc);
+    return new BlendState (impl->GetContextManager (), desc);
   }
   catch (common::Exception& exception)
   {
