@@ -45,4 +45,3 @@ void Buffer::CopyToImpl (size_t source_offset, size_t size, IBuffer& destination
   GetData             (source_offset, size, temp_storage.data ());
   destination.SetData (destination_offset, size, temp_storage.data ());
 }
-
