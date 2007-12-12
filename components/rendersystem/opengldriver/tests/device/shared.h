@@ -81,14 +81,14 @@ inline void dump_desc (IBlendState& state)
   state.GetDesc (desc);
   
   printf ("Blend state:\n");
-  printf ("  blend_enable:                     %s\n", desc.blend_enable ? "true" : "false");
+  printf ("  blend_enable:                     %s\n", desc.blend_enable [0] ? "true" : "false");
   printf ("  blend_color_operation:            %s\n", get_name (desc.blend_color_operation));
   printf ("  blend_color_source_argument:      %s\n", get_name (desc.blend_color_source_argument));
   printf ("  blend_color_destination_argument: %s\n", get_name (desc.blend_color_destination_argument));
   printf ("  blend_alpha_operation:            %s\n", get_name (desc.blend_alpha_operation));  
   printf ("  blend_alpha_source_argument:      %s\n", get_name (desc.blend_alpha_source_argument));
   printf ("  blend_alpha_destination_argument: %s\n", get_name (desc.blend_alpha_destination_argument));  
-  printf ("  color_write_mask:                 %s\n", get_name ((ColorWriteFlag)desc.color_write_mask));
+  printf ("  color_write_mask:                 %s\n", get_name ((ColorWriteFlag)desc.color_write_mask [0]));
 }
 
 #endif

@@ -84,15 +84,19 @@ struct OutputStage::Impl: public ContextObject
     BlendDesc blend_desc;
     
     memset (&blend_desc, 0, sizeof (blend_desc));
-    
-    blend_desc.blend_enable                     = false;
+        
     blend_desc.blend_color_operation            = BlendOperation_Add;
     blend_desc.blend_color_source_argument      = BlendArgument_One;
     blend_desc.blend_color_destination_argument = BlendArgument_Zero;
     blend_desc.blend_alpha_operation            = BlendOperation_Add;
     blend_desc.blend_alpha_source_argument      = BlendArgument_One;
     blend_desc.blend_alpha_destination_argument = BlendArgument_Zero;
-    blend_desc.color_write_mask                 = ColorWriteFlag_All;
+
+    for (size_t i=0; i<MAX_COLOR_BUFFERS_COUNT; i++)
+    {    
+      blend_desc.blend_enable     [i] = false;    
+      blend_desc.color_write_mask [i] = ColorWriteFlag_All;
+    }
 
     default_blend_state = xtl::com_ptr<IBlendState> (new BlendState (GetContextManager (), blend_desc), false);
 
