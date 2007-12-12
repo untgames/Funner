@@ -7,7 +7,7 @@ TARGETS := OPENGLDRIVER_SOURCES OPENGLDRIVER_TESTS
 OPENGLDRIVER_SOURCES.TYPE             := static-lib
 OPENGLDRIVER_SOURCES.NAME             := opengl_driver
 OPENGLDRIVER_SOURCES.INCLUDE_DIRS     := include sources ../lowlevel/include ../../commonlib/include ../../xtl/include ../../../extern/glew/include
-OPENGLDRIVER_SOURCES.SOURCE_DIRS      := sources/common sources/platform/win32 sources/driver sources/input_stage sources/output_stage
+OPENGLDRIVER_SOURCES.SOURCE_DIRS      := sources/common sources/platform/win32 sources/driver sources/input_stage sources/output_stage sources/texturemanager
 OPENGLDRIVER_SOURCES.LIB_DIRS         :=  
 OPENGLDRIVER_SOURCES.LIBS             := 
 OPENGLDRIVER_SOURCES.COMPILER_CFLAGS  :=
@@ -15,7 +15,7 @@ OPENGLDRIVER_SOURCES.COMPILER_DEFINES := GLEW_STATIC GLEW_MX
 
 #Öåëü ¹2 - OpenGLrender system tests
 OPENGLDRIVER_TESTS.TYPE             := test-suite
-OPENGLDRIVER_TESTS.INCLUDE_DIRS     := include ../lowlevel/include ../../commonlib/include ../../xtl/include ../../systemlib/include
+OPENGLDRIVER_TESTS.INCLUDE_DIRS     := include sources ../lowlevel/include ../../commonlib/include ../../xtl/include ../../systemlib/include
 OPENGLDRIVER_TESTS.SOURCE_DIRS      := tests/driver tests/device
 OPENGLDRIVER_TESTS.LIB_DIRS         :=
 OPENGLDRIVER_TESTS.LIBS             := commonlib zzip zlib system glew_static render_ll opengl_driver user32 gdi32 opengl32
