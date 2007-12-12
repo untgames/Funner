@@ -9,7 +9,6 @@
 
 #include <shared/property_list.h>
 #include <shared/context_object.h>
-#include <shared/buffer.h>
 #include <shared/platform/context.h>
 
 #include <stl/string>

@@ -37,13 +37,13 @@ IInputLayoutState* InputStage::CreateInputLayoutState (const InputLayoutDesc& de
   return 0;
 }
 
-IVertexBuffer* InputStage::CreateVertexBuffer (const BufferDesc& desc)
+IBuffer* InputStage::CreateVertexBuffer (const BufferDesc& desc)
 {
   RaiseNotImplemented ("render::low_level::opengl::InputStage::CreateVertexBuffer");
   return 0;
 }
 
-IIndexBuffer* InputStage::CreateIndexBuffer (const BufferDesc& desc)
+IBuffer* InputStage::CreateIndexBuffer (const BufferDesc& desc)
 {
   RaiseNotImplemented ("render::low_level::opengl::InputStage::CreateIndexBuffer");
   return 0;
@@ -68,12 +68,12 @@ IInputLayoutState* InputStage::GetInputLayout () const
     ”правление вершинными буферами
 */
 
-void InputStage::SetVertexBuffer (size_t vertex_buffer_slot, IVertexBuffer* buffer)
+void InputStage::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)
 {
   RaiseNotImplemented ("render::low_level::opengl::InputStage::SetVertexBuffer");
 }
 
-IVertexBuffer* InputStage::GetVertexBuffer (size_t vertex_buffer_slot) const
+IBuffer* InputStage::GetVertexBuffer (size_t vertex_buffer_slot) const
 {
   RaiseNotImplemented ("render::low_level::opengl::InputStage::GetVertexBuffer");
   return 0;
@@ -83,12 +83,12 @@ IVertexBuffer* InputStage::GetVertexBuffer (size_t vertex_buffer_slot) const
     ”правление индексным буфером
 */
 
-void InputStage::SetIndexBuffer (IIndexBuffer* buffer)
+void InputStage::SetIndexBuffer (IBuffer* buffer)
 {
   RaiseNotImplemented ("render::low_level::opengl::InputStage::SetIndexBuffer");
 }
 
-IIndexBuffer* InputStage::GetIndexBuffer () const
+IBuffer* InputStage::GetIndexBuffer () const
 {
   RaiseNotImplemented ("render::low_level::opengl::InputStage::GetIndexBuffer");
   return 0;

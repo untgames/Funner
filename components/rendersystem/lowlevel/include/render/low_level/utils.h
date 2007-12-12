@@ -15,7 +15,7 @@ namespace low_level
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const char* get_name (CompareMode);
 const char* get_name (BufferUsageMode);
-const char* get_name (BufferType);
+const char* get_name (BufferBindFlag);
 const char* get_name (BufferAccessFlag);
 const char* get_name (PixelFormat);
 const char* get_name (TextureDimension);

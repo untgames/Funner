@@ -1,10 +1,8 @@
 #ifndef RENDER_GL_DRIVER_INPUT_STAGE_HEADER
 #define RENDER_GL_DRIVER_INPUT_STAGE_HEADER
 
-#include <render/low_level/buffer.h>
-#include <shared/context_manager.h>
-#include <render/low_level/state.h>
 #include <stl/auto_ptr.h>
+#include <render/low_level/device.h>
 #include <shared/context_object.h>
 
 namespace render
@@ -32,8 +30,8 @@ class InputStage
 ///—оздание ресурсов уровн€
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IInputLayoutState* CreateInputLayoutState (const InputLayoutDesc& desc);
-    IVertexBuffer*     CreateVertexBuffer     (const BufferDesc& desc);
-    IIndexBuffer*      CreateIndexBuffer      (const BufferDesc& desc);
+    IBuffer*           CreateVertexBuffer     (const BufferDesc& desc);
+    IBuffer*           CreateIndexBuffer      (const BufferDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление конфигурацией входных данных
@@ -44,14 +42,14 @@ class InputStage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление вершинными буферами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void           SetVertexBuffer (size_t vertex_buffer_slot, IVertexBuffer* buffer);
-    IVertexBuffer* GetVertexBuffer (size_t vertex_buffer_slot) const;
+    void     SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer);
+    IBuffer* GetVertexBuffer (size_t vertex_buffer_slot) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление индексным буфером
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void          SetIndexBuffer (IIndexBuffer* buffer);
-    IIndexBuffer* GetIndexBuffer () const;
+    void     SetIndexBuffer (IBuffer* buffer);
+    IBuffer* GetIndexBuffer () const;
 
   private:
     InputStage (const InputStage&); //no impl

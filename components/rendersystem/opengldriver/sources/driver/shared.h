@@ -113,8 +113,8 @@ class Device: virtual public IDevice, public Object
     IBlendState*        CreateBlendState        (const BlendDesc&);
     IDepthStencilState* CreateDepthStencilState (const DepthStencilDesc&);
     ISamplerState*      CreateSamplerState      (const SamplerDesc&);
-    IVertexBuffer*      CreateVertexBuffer      (const BufferDesc&);
-    IIndexBuffer*       CreateIndexBuffer       (const BufferDesc&);
+    IBuffer*            CreateVertexBuffer      (const BufferDesc&);
+    IBuffer*            CreateIndexBuffer       (const BufferDesc&);
     ITexture*           CreateTexture           (const TextureDesc&);
     IFrameBuffer*       CreateFrameBuffer       (const FrameBufferDesc&);
     IFrameBuffer*       CreateFrameBuffer       (ISwapChain*);
@@ -126,11 +126,11 @@ class Device: virtual public IDevice, public Object
 ///Управление входным уровнем (input-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               ISSetInputLayout  (IInputLayoutState* state);
-    void               ISSetVertexBuffer (size_t vertex_buffer_slot,  IVertexBuffer* buffer);
-    void               ISSetIndexBuffer  (IIndexBuffer* buffer);
+    void               ISSetVertexBuffer (size_t vertex_buffer_slot,  IBuffer* buffer);
+    void               ISSetIndexBuffer  (IBuffer* buffer);
     IInputLayoutState* ISGetInputLayout  ();
-    IVertexBuffer*     ISGetVertexBuffer (size_t vertex_buffer_slot);
-    IIndexBuffer*      ISGetIndexBuffer  ();
+    IBuffer*           ISGetVertexBuffer (size_t vertex_buffer_slot);
+    IBuffer*           ISGetIndexBuffer  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление шейдерными уровнями (shader-stage)

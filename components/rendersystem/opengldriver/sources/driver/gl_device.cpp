@@ -125,12 +125,12 @@ IInputLayoutState* Device::CreateInputLayoutState (const InputLayoutDesc& desc)
   return input_stage.CreateInputLayoutState (desc);
 }
 
-IVertexBuffer* Device::CreateVertexBuffer (const BufferDesc& desc)
+IBuffer* Device::CreateVertexBuffer (const BufferDesc& desc)
 {
   return input_stage.CreateVertexBuffer (desc);
 }
 
-IIndexBuffer* Device::CreateIndexBuffer (const BufferDesc& desc)
+IBuffer* Device::CreateIndexBuffer (const BufferDesc& desc)
 {
   return input_stage.CreateIndexBuffer (desc);
 }
@@ -140,12 +140,12 @@ void Device::ISSetInputLayout (IInputLayoutState* state)
   input_stage.SetInputLayout (state);
 }
 
-void Device::ISSetVertexBuffer (size_t vertex_buffer_slot, IVertexBuffer* buffer)
+void Device::ISSetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)
 {
   input_stage.SetVertexBuffer (vertex_buffer_slot, buffer);
 }
 
-void Device::ISSetIndexBuffer (IIndexBuffer* buffer)
+void Device::ISSetIndexBuffer (IBuffer* buffer)
 {
   input_stage.SetIndexBuffer (buffer);
 }
@@ -155,12 +155,12 @@ IInputLayoutState* Device::ISGetInputLayout ()
   return input_stage.GetInputLayout ();
 }
 
-IVertexBuffer* Device::ISGetVertexBuffer (size_t vertex_buffer_slot)
+IBuffer* Device::ISGetVertexBuffer (size_t vertex_buffer_slot)
 {
   return input_stage.GetVertexBuffer (vertex_buffer_slot);
 }
 
-IIndexBuffer* Device::ISGetIndexBuffer ()
+IBuffer* Device::ISGetIndexBuffer ()
 {
   return input_stage.GetIndexBuffer ();
 }
