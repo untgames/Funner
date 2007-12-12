@@ -4,6 +4,7 @@
 #include <stl/auto_ptr.h>
 #include <render/low_level/device.h>
 #include <shared/context_object.h>
+#include <common/exception.h>
 
 namespace render
 {
