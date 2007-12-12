@@ -38,9 +38,9 @@ int main ()
 
     output->SetCurrentMode (mode_desc);        
 
-    mode_desc.refresh_rate = 13;
+//    mode_desc.refresh_rate = 13;
     
-    output->SetCurrentMode (mode_desc);
+//    output->SetCurrentMode (mode_desc);
   }
   catch (std::exception& exception)
   {

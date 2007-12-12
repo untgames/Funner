@@ -112,7 +112,6 @@ Output::~Output ()
 {
   try
   {
-    printf ("!!!!\n");
     RestoreDefaultMode ();
   }
   catch (...)
