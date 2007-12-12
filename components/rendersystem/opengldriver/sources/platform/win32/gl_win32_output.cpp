@@ -110,7 +110,15 @@ Output::Output (const DISPLAY_DEVICE& device_info)
 
 Output::~Output ()
 {
-  RestoreDefaultMode ();
+  try
+  {
+    printf ("!!!!\n");
+    RestoreDefaultMode ();
+  }
+  catch (...)
+  {
+    //подавляем все исключения
+  }
 
   if (hDC)
     DeleteDC (hDC);
