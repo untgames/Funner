@@ -31,26 +31,16 @@ int main ()
     OutputModeDesc mode_desc;
     
     output->GetCurrentMode (mode_desc);
-    output->SetCurrentMode (mode_desc);
+    output->SetCurrentMode (mode_desc);    
+
+    mode_desc.width  = 1024;
+    mode_desc.height = 768;
+
+    output->SetCurrentMode (mode_desc);        
+
+    mode_desc.refresh_rate = 13;
     
-    OutputModeDesc old_mode_desc = mode_desc;
-
-    try
-    {
-      mode_desc.width  = 1024;
-      mode_desc.height = 768;
-
-      output->SetCurrentMode (mode_desc);        
-
-      mode_desc.refresh_rate = 13;
-      
-      output->SetCurrentMode (mode_desc);
-    }
-    catch (...)
-    {
-      output->SetCurrentMode (old_mode_desc);
-      throw;
-    }
+    output->SetCurrentMode (mode_desc);
   }
   catch (std::exception& exception)
   {
