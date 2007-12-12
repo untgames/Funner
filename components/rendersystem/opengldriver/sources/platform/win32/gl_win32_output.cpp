@@ -157,7 +157,7 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   dev_mode_desc.dmDisplayFrequency = mode_desc.refresh_rate;
   dev_mode_desc.dmFields           = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | (mode_desc.refresh_rate ? DM_DISPLAYFREQUENCY : 0);
 
-  LONG result = ChangeDisplaySettings (&dev_mode_desc, CDS_FULLSCREEN);
+  LONG result = ChangeDisplaySettingsEx (win_name.c_str (), &dev_mode_desc, 0, 0, 0);
 
   if (result != DISP_CHANGE_SUCCESSFUL)
   {
@@ -183,7 +183,7 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
     }
     catch (common::Exception& exception)
     {
-      exception.Touch ("ChangeDisplaySettings(device-name='%s', mode='%ux%ux%u @ %uHz')",
+      exception.Touch ("ChangeDisplaySettingsEx(device-name='%s', mode='%ux%ux%u @ %uHz')",
         name.c_str (), mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);
       throw;
     }
