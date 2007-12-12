@@ -28,19 +28,29 @@ int main ()
     
     IOutput* output = driver->GetOutput (0);
     
-    OutputModeDesc mode_desc;        
+    OutputModeDesc mode_desc;
     
     output->GetCurrentMode (mode_desc);
     output->SetCurrentMode (mode_desc);
     
-    mode_desc.width  = 1024;
-    mode_desc.height = 768;
+    OutputModeDesc old_mode_desc = mode_desc;
 
-    output->SetCurrentMode (mode_desc);        
+    try
+    {
+      mode_desc.width  = 1024;
+      mode_desc.height = 768;
 
-    mode_desc.refresh_rate = 13;
-    
-    output->SetCurrentMode (mode_desc);
+      output->SetCurrentMode (mode_desc);        
+
+      mode_desc.refresh_rate = 13;
+      
+      output->SetCurrentMode (mode_desc);
+    }
+    catch (...)
+    {
+      output->SetCurrentMode (old_mode_desc);
+      throw;
+    }
   }
   catch (std::exception& exception)
   {
