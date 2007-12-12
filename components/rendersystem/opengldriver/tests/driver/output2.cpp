@@ -31,7 +31,7 @@ int main ()
     OutputModeDesc mode_desc;
     
     output->GetCurrentMode (mode_desc);
-    output->SetCurrentMode (mode_desc);    
+//    output->SetCurrentMode (mode_desc);
 
     mode_desc.width  = 1024;
     mode_desc.height = 768;
