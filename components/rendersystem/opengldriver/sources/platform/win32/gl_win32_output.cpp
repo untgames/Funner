@@ -110,14 +110,14 @@ Output::Output (const DISPLAY_DEVICE& device_info)
 
 Output::~Output ()
 {
-  try
+/*  try
   {
     RestoreDefaultMode ();
   }
   catch (...)
   {
     //подавляем все исключения
-  }
+  }*/
 
   if (hDC)
     DeleteDC (hDC);
@@ -158,7 +158,7 @@ namespace
 
 void set_mode_desc (const char* device_name, DEVMODE* mode)
 {
-  LONG result = ChangeDisplaySettingsEx (device_name, mode, 0, 0, 0);
+  LONG result = ChangeDisplaySettingsEx (device_name, mode, 0, CDS_FULLSCREEN, 0);
 
   if (result == DISP_CHANGE_SUCCESSFUL)
     return;
