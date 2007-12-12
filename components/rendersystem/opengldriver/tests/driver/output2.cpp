@@ -51,7 +51,6 @@ int main ()
       output->SetCurrentMode (old_mode_desc);
       throw;
     }
-    output->SetCurrentMode (old_mode_desc);
   }
   catch (std::exception& exception)
   {

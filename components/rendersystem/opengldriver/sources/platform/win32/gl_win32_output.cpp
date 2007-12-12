@@ -110,6 +110,8 @@ Output::Output (const DISPLAY_DEVICE& device_info)
 
 Output::~Output ()
 {
+  RestoreDefaultMode ();
+
   if (hDC)
     DeleteDC (hDC);
 }
