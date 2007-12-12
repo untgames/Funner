@@ -3,7 +3,7 @@
 
 #include <stl/auto_ptr.h>
 #include <render/low_level/device.h>
-#include <shared/context_object.h>
+#include <shared/context_manager.h>
 
 namespace render
 {
