@@ -144,6 +144,37 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
     Установка текущего видео-режима
 */
 
+namespace
+{
+
+void set_mode_desc (const char* device_name, DEVMODE* mode)
+{
+  LONG result = ChangeDisplaySettingsEx (device_name, mode, 0, 0, 0);
+
+  if (result == DISP_CHANGE_SUCCESSFUL)
+    return;
+
+  const char* msg = "";
+  
+  switch (result)
+  {
+    case DISP_CHANGE_BADDUALVIEW: msg = "System is DualView capable"; break;
+    case DISP_CHANGE_BADFLAGS:    msg = "Invalid set of flags"; break;
+    case DISP_CHANGE_BADMODE:     msg = "The graphics mode is not supported"; break;
+    case DISP_CHANGE_BADPARAM:    msg = "Invalid parameter"; break;
+    case DISP_CHANGE_FAILED:      msg = "The display driver failed the specified graphics mode"; break;
+    case DISP_CHANGE_NOTUPDATED:  msg = "Unable to write settings to the registry"; break;
+    case DISP_CHANGE_RESTART:     msg = "The computer must be restarted in order for the graphics mode to work"; break;
+    default:
+      raise_error ("ChangeDisplaySettingsEx");
+      break;
+  }
+
+  RaiseInvalidOperation ("ChangeDisplaySettingsEx", msg);
+}
+
+}
+
 void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
 {
   DEVMODE dev_mode_desc;
@@ -157,36 +188,28 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   dev_mode_desc.dmDisplayFrequency = mode_desc.refresh_rate;
   dev_mode_desc.dmFields           = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | (mode_desc.refresh_rate ? DM_DISPLAYFREQUENCY : 0);
 
-  LONG result = ChangeDisplaySettingsEx (win_name.c_str (), &dev_mode_desc, 0, 0, 0);
-
-  if (result != DISP_CHANGE_SUCCESSFUL)
+  try
   {
-    try
-    {
-      const char* msg = "";
-      
-      switch (result)
-      {
-        case DISP_CHANGE_BADDUALVIEW: msg = "System is DualView capable"; break;
-        case DISP_CHANGE_BADFLAGS:    msg = "Invalid set of flags"; break;
-        case DISP_CHANGE_BADMODE:     msg = "The graphics mode is not supported"; break;
-        case DISP_CHANGE_BADPARAM:    msg = "Invalid parameter"; break;
-        case DISP_CHANGE_FAILED:      msg = "The display driver failed the specified graphics mode"; break;
-        case DISP_CHANGE_NOTUPDATED:  msg = "Unable to write settings to the registry"; break;
-        case DISP_CHANGE_RESTART:     msg = "The computer must be restarted in order for the graphics mode to work"; break;
-        default:
-          raise_error ("render::low_level::opengl::Output::SetCurrentMode");
-          break;
-      }
-      
-      RaiseInvalidOperation ("render::low_level::opengl::Output::SetCurrentMode", msg);
-    }
-    catch (common::Exception& exception)
-    {
-      exception.Touch ("ChangeDisplaySettingsEx(device-name='%s', mode='%ux%ux%u @ %uHz')",
-        name.c_str (), mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);
-      throw;
-    }
+    set_mode_desc (win_name.c_str (), &dev_mode_desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Output::SetCurrentMode(device-name='%s', mode='%ux%ux%u @ %uHz')",
+      name.c_str (), mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);
+    throw;
+  }
+}
+
+void Output::RestoreDefaultMode ()
+{
+  try
+  {
+    set_mode_desc (win_name.c_str (), 0);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Output::RestoreDefaultMode(device-name='%s')", name.c_str ());
+    throw;
   }
 }
 

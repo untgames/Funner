@@ -136,8 +136,12 @@ void PrimarySwapChain::SetFullscreenState (bool state)
   }
   else
   {
-    if (ChangeDisplaySettings (0, 0) != DISP_CHANGE_SUCCESSFUL)
-      raise_error ("ChangeDisplaySettings(0,0)");
+    Output* win_output = dynamic_cast<Output*> (&*output);
+
+    if (!win_output)
+      return;
+
+    win_output->RestoreDefaultMode ();
   }
 }
 

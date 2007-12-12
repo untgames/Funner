@@ -1,7 +1,7 @@
 #ifndef RENDER_GL_DRIVER_WIN32_SHARED_HEADER
 #define RENDER_GL_DRIVER_WIN32_SHARED_HEADER
 
-#define _WIN32_WINNT 0x0501 //for ChangeDisplaySettings
+#define _WIN32_WINNT 0x0501 //for ChangeDisplaySettingsEx
 
 #include <windows.h>
 #include <gl/glew.h>
@@ -62,6 +62,7 @@ class Output: virtual public IOutput, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetCurrentMode (const OutputModeDesc&);
     void GetCurrentMode (OutputModeDesc&);
+    void RestoreDefaultMode ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление гамма-коррекцией
