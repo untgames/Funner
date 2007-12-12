@@ -2,6 +2,7 @@
 #define RENDER_GL_DRIVER_INPUT_STAGE_HEADER
 
 #include <render/low_level/buffer.h>
+#include <shared/context_manager.h>
 #include <render/low_level/state.h>
 #include <stl/auto_ptr.h>
 #include <shared/context_object.h>
