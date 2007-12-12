@@ -92,7 +92,7 @@ IRasterizerState* Device::CreateRasterizerState ()
   return 0;
 }
 
-ISamplerState* Device::CreateSamplerState ()
+ISamplerState* Device::CreateSamplerState (const SamplerDesc&)
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreateSamplerState");
   return 0;
