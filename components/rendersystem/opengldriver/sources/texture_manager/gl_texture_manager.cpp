@@ -1,4 +1,3 @@
-#include <common/exception.h>
 #include "shared.h"
 
 using namespace common;
@@ -9,8 +8,10 @@ using namespace render::low_level::opengl;
     Описание реализации SoundDeclarationLibrary
 */
 
-struct TextureManager::Impl
+struct TextureManager::Impl: public ContextObject
 {
+    //конструктор
+  Impl (const ContextManager& context_manager) : ContextObject (context_manager) {}
 };
 
 
@@ -18,8 +19,8 @@ struct TextureManager::Impl
    Конструктор / деструктор
 */
 
-TextureManager::TextureManager ()
-  : impl (new Impl)
+TextureManager::TextureManager (const ContextManager& context_manager)
+  : impl (new Impl (context_manager))
 {
 }
 
@@ -33,14 +34,14 @@ TextureManager::~TextureManager ()
 
 ITexture* TextureManager::CreateTexture (const TextureDesc&)
 {
-  RaiseNotSupported ("render::low_level::opengl::TextureManager::CreateTexture");
-  return NULL;
+  RaiseNotImplemented ("render::low_level::opengl::TextureManager::CreateTexture");
+  return 0;
 }
 
 ISamplerState* TextureManager::CreateSamplerState (const SamplerDesc&)
 {
-  RaiseNotSupported ("render::low_level::opengl::TextureManager::CreateSamplerState");
-  return NULL;
+  RaiseNotImplemented ("render::low_level::opengl::TextureManager::CreateSamplerState");
+  return 0;
 }
 
 /*
@@ -49,22 +50,22 @@ ISamplerState* TextureManager::CreateSamplerState (const SamplerDesc&)
 
 void TextureManager::SetTexture (size_t sampler_slot, ITexture* texture)
 {
-  RaiseNotSupported ("render::low_level::opengl::TextureManager::SetTexture");
+  RaiseNotImplemented ("render::low_level::opengl::TextureManager::SetTexture");
 }
 
 void TextureManager::SetSampler (size_t sampler_slot, ISamplerState* state)
 {
-  RaiseNotSupported ("render::low_level::opengl::TextureManager::SetSampler");
+  RaiseNotImplemented ("render::low_level::opengl::TextureManager::SetSampler");
 }
 
 ITexture* TextureManager::GetTexture (size_t sampler_slot) const
 {
-  RaiseNotSupported ("render::low_level::opengl::TextureManager::GetTexture");
-  return NULL;
+  RaiseNotImplemented ("render::low_level::opengl::TextureManager::GetTexture");
+  return 0;
 }
 
 ISamplerState* TextureManager::GetSampler (size_t sampler_slot) const
 {
-  RaiseNotSupported ("render::low_level::opengl::TextureManager::GetSampler");
-  return NULL;
+  RaiseNotImplemented ("render::low_level::opengl::TextureManager::GetSampler");
+  return 0;
 }

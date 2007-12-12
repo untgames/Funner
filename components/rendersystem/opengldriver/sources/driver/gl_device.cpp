@@ -12,7 +12,8 @@ Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char*)
   : driver (in_driver),
     context_manager (xtl::bind (&Driver::LogMessage, in_driver, _1)),
     output_stage (context_manager, swap_chain),
-    input_stage (context_manager)
+    input_stage (context_manager),
+    texture_manager (context_manager)
 {  
     //выбор активной цепочки обмена и установка текущего контекста
     
@@ -92,18 +93,6 @@ IRasterizerState* Device::CreateRasterizerState ()
   return 0;
 }
 
-ISamplerState* Device::CreateSamplerState (const SamplerDesc&)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateSamplerState");
-  return 0;
-}
-
-ITexture* Device::CreateTexture (const TextureDesc&)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateTexture");
-  return 0;
-}
-
 IPredicate* Device::CreatePredicate ()
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreatePredicate");
@@ -166,6 +155,40 @@ IBuffer* Device::ISGetIndexBuffer ()
 }
 
 /*
+    ”правление текстурами
+*/
+
+ISamplerState* Device::CreateSamplerState (const SamplerDesc& desc)
+{
+  return texture_manager.CreateSamplerState (desc);
+}
+
+ITexture* Device::CreateTexture (const TextureDesc& desc)
+{
+  return texture_manager.CreateTexture (desc);
+}
+
+void Device::SSSetSampler (size_t sampler_slot, ISamplerState* state)
+{
+  texture_manager.SetSampler (sampler_slot, state);
+}
+
+void Device::SSSetTexture (size_t sampler_slot, ITexture* texture)
+{
+  texture_manager.SetTexture (sampler_slot, texture);
+}
+
+ISamplerState* Device::SSGetSampler (size_t sampler_slot)
+{
+  return texture_manager.GetSampler (sampler_slot);
+}
+
+ITexture* Device::SSGetTexture (size_t sampler_slot)
+{
+  return texture_manager.GetTexture (sampler_slot);
+}
+
+/*
     ”правление шейдерными уровн€ми (shader-stage)
 */
 
@@ -187,16 +210,6 @@ void Device::SSSetTransform (ITransformState* state)
 void Device::SSSetLighting (ILightingState* state)
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::SSSetLighting");
-}
-
-void Device::SSSetSampler (size_t sampler_slot, ISamplerState* state)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetSampler");
-}
-
-void Device::SSSetTexture (size_t sampler_slot, ITexture* texture)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetTexture");
 }
 
 void Device::SSSetMaterial (IMaterialState* state)
@@ -225,18 +238,6 @@ ITransformState* Device::SSGetTransform ()
 ILightingState* Device::SSGetLighting ()
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::SSGetLighting");
-  return 0;
-}
-
-ISamplerState* Device::SSGetSampler (size_t sampler_slot)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetSampler");
-  return 0;
-}
-
-ITexture* Device::SSGetTexture (size_t sampler_slot)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetTexture");
   return 0;
 }
 

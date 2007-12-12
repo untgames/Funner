@@ -10,6 +10,7 @@
 #include <shared/context_manager.h>
 #include <shared/property_list.h>
 #include <shared/input_stage.h>
+#include <shared/texture_manager.h>
 #include <shared/output_stage.h>
 
 #include <common/exception.h>
@@ -218,6 +219,7 @@ class Device: virtual public IDevice, public Object
     PropertyList   properties;      //свойства устройства
     OutputStage    output_stage;    //выходной уровень
     InputStage     input_stage;     //входной уровень
+    TextureManager texture_manager; //менеджер текстур
 };
 
 }

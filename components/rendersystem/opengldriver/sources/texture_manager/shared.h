@@ -1,8 +1,10 @@
 #ifndef RENDER_GL_DRIVER_TEXTURE_SHARED_HEADER
 #define RENDER_GL_DRIVER_TEXTURE_SHARED_HEADER
 
+#include <common/exception.h>
 #include <render/low_level/texture.h>
 #include <shared/texture_manager.h>
+#include <shared/context_object.h>
 
 /*
 class Texture : virtual public ITexture, public Buffer

@@ -223,7 +223,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     display_list = glGenLists (1);      
     
     if (!display_list)
-      RaiseError ("render::low_level::opengl::BlendState::SetDesc");
+      RaiseError (METHOD_NAME);
   }
 
   glNewList (display_list, GL_COMPILE);
@@ -249,7 +249,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   
     //проверка ошибок
   
-  CheckErrors ("render::low_level::opengl::BlendState::SetDesc");
+  CheckErrors (METHOD_NAME);
 }
 
 void BlendState::GetDesc (BlendDesc& out_desc)
