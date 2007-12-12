@@ -6,7 +6,6 @@
 #include <shared/texture_manager.h>
 #include <shared/context_object.h>
 
-/*
 class Texture : virtual public ITexture, public Buffer
 {
   public:
@@ -64,5 +63,5 @@ class TextureCubemap : public Texture
     CubemapTexture (const TextureDesc& texture_desc) : Texture (texture_desc) {}
     ~CubemapTexture () {}
 };
-*/
+
 #endif

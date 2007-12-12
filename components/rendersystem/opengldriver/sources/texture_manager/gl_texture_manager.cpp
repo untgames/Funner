@@ -5,7 +5,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-    Описание реализации SoundDeclarationLibrary
+    Описание реализации TextureManager
 */
 
 struct TextureManager::Impl: public ContextObject
