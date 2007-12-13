@@ -137,8 +137,10 @@ class Window
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Заголовок окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* Title    () const;
-    void        SetTitle (const char*);
+    const char*    Title        () const;
+    const wchar_t* TitleUnicode () const;
+    void           SetTitle     (const char*);
+    void           SetTitle     (const wchar_t*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Стиль окна
@@ -219,10 +221,10 @@ class Window
     const LogHandler& DebugLog    () const;
 
   private:
-    const void* CheckedHandle () const;
-    void        SetHandle     (const void* handle);
-    void        Notify        (WindowEvent, const WindowEventContext&);
-    void        Notify        (WindowEvent);
+    const void* CheckedHandle  () const;
+    void        SetHandle      (const void* handle);
+    void        Notify         (WindowEvent, const WindowEventContext&);
+    void        Notify         (WindowEvent);
     static void MessageHandler (WindowEvent, const WindowEventContext&, void*);
 
   private:

@@ -16,7 +16,7 @@ const char* WINDOW_CLASS_NAME = "Default window class";
 
 struct WindowImpl
 {
-  void*                               user_data;       //указатель на пользовательские данные
+  void*                          user_data;       //указатель на пользовательские данные
   Platform::WindowMessageHandler message_handler; //функци€ обработки сообщений окна
   
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data) : 
@@ -289,10 +289,10 @@ void RegisterWindowClass ()
   wc.hIcon         = LoadIcon (GetApplicationInstance (), IDI_APPLICATION);  
   wc.hCursor       = LoadCursor (GetApplicationInstance (), IDC_ARROW);
   wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-  wc.lpszClassName = WINDOW_CLASS_NAME;  
+  wc.lpszClassName = WINDOW_CLASS_NAME;
 
   if (!RegisterClass (&wc))
-    CheckErrors ("syslib::RegisterWindowClass");
+    raise_error ("::RegisterClass");
 }
 
 }
@@ -321,61 +321,87 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       RaiseInvalidArgument ("syslib::Win32Platform::CreateWindow", "style", style);
       return 0;
   }
-
-  static bool is_window_class_registered = false;  
   
-    //регистраци€ оконного класса
-  
-  if (!is_window_class_registered)
-  {
-      //корректна€ реализаци€ требует также вызова UnregisterClass при выходе из приложени€, но данный вызов
-      //осуществл€етс€ автоматически поэтому не производитс€ в ручную
-
-    RegisterWindowClass ();
-
-    is_window_class_registered = true;
-  }  
-  
-    //создание окна
- 
-  WindowImpl* window_impl = new WindowImpl (handler, user_data);
-
   try
-  {    
-    HWND wnd = CreateWindowA (WINDOW_CLASS_NAME, "", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                              0, 0, GetApplicationInstance (), window_impl);
-                                
-    if (!wnd)
-      throw WinAPIException ("syslib::Win32Platform::CreateWindow", "Error at create window");
-
-    CheckErrors  ("syslib::Win32Platform::CreateWindow");    
-    ShowWindow   (wnd, SW_SHOW);
-    UpdateWindow (wnd);
-    CheckErrors  ("syslib::Win32Platform::CreateWindow");    
-
-    return (window_t)wnd;
-  }
-  catch (...)
   {
-    delete window_impl;
+    static bool is_window_class_registered = false;  
+    
+      //регистраци€ оконного класса
+    
+    if (!is_window_class_registered)
+    {
+        //корректна€ реализаци€ требует также вызова UnregisterClass при выходе из приложени€, но данный вызов
+        //осуществл€етс€ автоматически поэтому не производитс€ в ручную
+
+      RegisterWindowClass ();
+
+      is_window_class_registered = true;
+    }  
+    
+      //создание окна
+   
+    WindowImpl* window_impl = new WindowImpl (handler, user_data);
+
+    try
+    {    
+      HWND wnd = CreateWindowA (WINDOW_CLASS_NAME, "", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                                0, 0, GetApplicationInstance (), window_impl);
+                                  
+      if (!wnd)
+        raise_error ("::CreateWindow");
+
+      ShowWindow   (wnd, SW_SHOW);
+      check_errors ("::ShowWindow");
+
+      if (!UpdateWindow (wnd))
+        raise_error ("::UpdateWindow");
+
+      return (window_t)wnd;
+    }
+    catch (...)
+    {
+      delete window_impl;
+      throw;
+    }
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::CreateWindow");
+    
     throw;
   }  
 }
 
 void Platform::CloseWindow (window_t handle)
 {
-  HWND wnd = (HWND)handle;
+  try
+  {
+    HWND wnd = (HWND)handle;
   
-  PostMessage (wnd, WM_CLOSE, 0, 0);
-  CheckErrors ("syslib::Win32Platform::CloseWindow");
+    if (!PostMessage (wnd, WM_CLOSE, 0, 0))
+      raise_error ("::PostMessage(window, WM_CLOSE,0, 0)");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::CloseWindow");
+    throw;
+  }
 }
 
 void Platform::DestroyWindow (window_t handle)
 {
-  HWND wnd = (HWND)handle;
+  try
+  {
+    HWND wnd = (HWND)handle;
 
-  ::DestroyWindow (wnd);
-  CheckErrors ("syslib::Win32Platform::DestroyWindow");
+   if (!::DestroyWindow (wnd))
+      raise_error ("::DestroyWindow");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::DestroyWindow");
+    throw;
+  }
 }
     
 /*
@@ -384,18 +410,66 @@ void Platform::DestroyWindow (window_t handle)
 
 void Platform::SetWindowTitle (window_t handle, const char* title)
 {
-  HWND wnd = (HWND)handle;  
+  try
+  {
+    HWND wnd = (HWND)handle;  
   
-  SetWindowText (wnd, title);
-  CheckErrors ("syslib::Win32Platform::SetWindowTitle");
+    if (!SetWindowTextA (wnd, title))
+      raise_error ("::SetWindowTextA");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::SetWindowTitle(const char*)");
+    throw;
+  }
+}
+
+void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
+{
+  try
+  {
+    HWND wnd = (HWND)handle;  
+
+    if (!SetWindowTextW (wnd, title))
+      raise_error ("::SetWindowTextW");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::SetWindowTitle(const wchar_t*)");
+    throw;
+  }
 }
 
 void Platform::GetWindowTitle (window_t handle, size_t buffer_size, char* buffer)
 {
-  HWND wnd = (HWND)handle;
+  try
+  {
+    HWND wnd = (HWND)handle;
   
-  GetWindowText (wnd, buffer, buffer_size);
-  CheckErrors ("syslib::Win32Platform::GetWindowTitle");
+    if (!GetWindowTextA (wnd, buffer, buffer_size))
+      raise_error ("::GetWindowTextA");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::GetWindowTitle(char*)");
+    throw;
+  }
+}
+
+void Platform::GetWindowTitle (window_t handle, size_t buffer_size, wchar_t* buffer)
+{
+  try
+  {
+    HWND wnd = (HWND)handle;
+  
+    if (!GetWindowTextW (wnd, buffer, buffer_size))
+      raise_error ("::GetWindowText(wchar_t*)");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::GetWindowTitle(wchar_t*)");
+    throw;
+  }
 }
 
 /*
@@ -404,62 +478,86 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size, char* buffer
 
 void Platform::SetWindowRect (window_t handle, const Rect& rect)
 {
-  HWND wnd = (HWND)handle;
-  
-  RECT window_rect;
-  
-  ::GetWindowRect (wnd, &window_rect);  
-  CheckErrors     ("syslib::Win32Platform::SetWindowRect");
-  
-  UINT flags = SWP_NOACTIVATE;
-  
-  if (window_rect.right - window_rect.left == rect.right - rect.left &&
-      window_rect.bottom - window_rect.top == rect.bottom - rect.top)
+  try
   {
-      //измен€ть размеры окна не нужно
+    HWND wnd = (HWND)handle;
+    
+    RECT window_rect;
+    
+    if (!::GetWindowRect (wnd, &window_rect))
+      raise_error ("::GetWindowRect");
+    
+    UINT flags = SWP_NOACTIVATE;
+    
+    if (window_rect.right - window_rect.left == rect.right - rect.left &&
+        window_rect.bottom - window_rect.top == rect.bottom - rect.top)
+    {
+        //измен€ть размеры окна не нужно
 
-    flags |= SWP_NOSIZE;
+      flags |= SWP_NOSIZE;
+    }
+    
+    if (window_rect.left == rect.left && window_rect.top == rect.top)
+    {
+        //измен€ть положение окна не нужно
+
+      flags |= SWP_NOMOVE;
+    }
+
+    if (!SetWindowPos (wnd, HWND_TOP, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, flags))
+      raise_error ("::SetWindowPos");
   }
-  
-  if (window_rect.left == rect.left && window_rect.top == rect.top)
+  catch (common::Exception& exception)
   {
-      //измен€ть положение окна не нужно
-
-    flags |= SWP_NOMOVE;
+    exception.Touch ("syslib::Win32Platform::SetWindowRect");
+    throw;
   }
-
-  SetWindowPos (wnd, HWND_TOP, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, flags);
-  CheckErrors  ("syslib::Win32Platform::SetWindowRect");
 }
 
 void Platform::GetWindowRect (window_t handle, Rect& rect)
 {
-  HWND wnd = (HWND)handle;
-  
-  RECT window_rect;
-  
-  ::GetWindowRect (wnd, &window_rect);  
-  CheckErrors     ("syslib::Win32Platform::GetWindowRect");
-  
-  rect.left   = window_rect.left;
-  rect.right  = window_rect.right;
-  rect.top    = window_rect.top;
-  rect.bottom = window_rect.bottom;
+  try
+  {
+    HWND wnd = (HWND)handle;
+    
+    RECT window_rect;
+    
+    if (!::GetWindowRect (wnd, &window_rect))
+      raise_error ("::GetWindowRect");
+
+    rect.left   = window_rect.left;
+    rect.right  = window_rect.right;
+    rect.top    = window_rect.top;
+    rect.bottom = window_rect.bottom;
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::GetWindowRect");
+    throw;
+  }
 }
 
 void Platform::GetClientRect (window_t handle, Rect& rect)
 {
-  HWND wnd = (HWND)handle;
-  
-  RECT window_rect;
-  
-  ::GetClientRect (wnd, &window_rect);  
-  CheckErrors     ("syslib::Win32Platform::GetClientRect");
-  
-  rect.left   = window_rect.left;
-  rect.right  = window_rect.right;
-  rect.top    = window_rect.top;
-  rect.bottom = window_rect.bottom;
+  try
+  {
+    HWND wnd = (HWND)handle;
+    
+    RECT window_rect;
+    
+    if (!::GetClientRect (wnd, &window_rect))
+      raise_error ("::GetClientRect");
+    
+    rect.left   = window_rect.left;
+    rect.right  = window_rect.right;
+    rect.top    = window_rect.top;
+    rect.bottom = window_rect.bottom;
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::GetClientRect");
+    throw;
+  }
 }
 
 /*
@@ -469,51 +567,88 @@ void Platform::GetClientRect (window_t handle, Rect& rect)
 void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 {
   HWND wnd = (HWND)handle;
-  
-  switch (flag)
+
+  try
   {
-    case WindowFlag_Visible: //видимость окна
-      ShowWindow (wnd, state ? SW_SHOW : SW_HIDE);
-      break;
-    case WindowFlag_Active: //активность окна
-      if (state) SetActiveWindow (wnd);
-      else       ShowWindow (wnd, SW_MINIMIZE);
+    switch (flag)
+    {      
+      case WindowFlag_Visible: //видимость окна
+        ShowWindow (wnd, state ? SW_SHOW : SW_HIDE);
+        check_errors ("::ShowWindow");
+        break;
+      case WindowFlag_Active: //активность окна
+        if (state)
+        {
+          if (!SetActiveWindow (wnd))
+            raise_error ("::SetActiveWindow");
+        }
+        else
+        {
+          ShowWindow (wnd, SW_MINIMIZE);
+          check_errors ("::ShowWindow");
+        }
 
-      break;
-    case WindowFlag_Focus: //фокус ввода
-      SetFocus (state ? wnd : HWND_TOP);
-      break;
-    default:
-      RaiseInvalidArgument ("syslib::Win32Platform::SetWindowFlag", "flag", flag);
+        break;
+      case WindowFlag_Focus: //фокус ввода
+        if (!SetFocus (state ? wnd : HWND_TOP))
+          raise_error ("::SetFocus");
+        break;
+      default:
+        RaiseInvalidArgument ("syslib::Win32Platform::SetWindowFlag", "flag", flag);
+        break;
+    }
   }
-
-  CheckErrors ("syslib::Win32Platform::SetWindowFlag");
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::SetWindowFlag");
+    throw;
+  }
 }
 
 bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
 {
-  HWND wnd    = (HWND)handle;
-  bool result = false;
+  HWND wnd = (HWND)handle;
   
-  switch (flag)
+  try
   {
-    case WindowFlag_Visible:
-      result = ShowWindow (wnd, SW_SHOWNA) == TRUE;
-      break;
-    case WindowFlag_Active:
-      result = GetActiveWindow () == wnd;
-      break;
-    case WindowFlag_Focus:
-      result = GetFocus () == wnd;
-      break;
-    default:
-      RaiseInvalidArgument ("syslib::Win32Platform::GetWindowFlag", "flag", flag);
-      break;
-  }
-  
-  CheckErrors ("syslib::Win32Platform::GetWindowFlag");
-  
-  return result;
+    switch (flag)
+    {
+      case WindowFlag_Visible:
+      {
+        bool result = ShowWindow (wnd, SW_SHOWNA) == TRUE;
+        
+        check_errors ("::ShowWindow");
+
+        return result;
+      }
+      case WindowFlag_Active:
+      {
+        HWND active_wnd = GetActiveWindow ();
+
+        check_errors ("::GetActiveWindow");
+
+        return active_wnd == wnd;
+      }
+      case WindowFlag_Focus:
+      {
+        HWND focus_wnd = GetFocus ();
+        
+        check_errors ("::GetFocus");
+        
+        return focus_wnd == wnd;
+      }
+      default:
+        RaiseInvalidArgument ("", "flag", flag);
+        break;
+    }
+  }  
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::GetWindowFlag");
+    throw;
+  }  
+
+  return false;
 }
 
 /*
@@ -522,16 +657,32 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
 
 void Platform::SetCursorPosition (const Point& position)
 {
-  SetCursorPos (position.x, position.y);
-  CheckErrors  ("syslib::Win32Platform::SetCursorPosition");
+  try
+  {
+    if (!SetCursorPos (position.x, position.y))
+      raise_error  ("::SetCursorPos");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::SetCursorPosition");
+    throw;
+  }
 }
 
 Point Platform::GetCursorPosition ()
 {
-  POINT position;
-  
-  GetCursorPos (&position);
-  CheckErrors  ("syslib::Win32Platform::GetCursorPosition");
-  
-  return Point (position.x, position.y);
+  try
+  {
+    POINT position;
+
+    if (!GetCursorPos (&position))
+      raise_error ("::GetCursorPos");
+
+    return Point (position.x, position.y);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::GetCursorPosition");
+    throw;
+  }
 }

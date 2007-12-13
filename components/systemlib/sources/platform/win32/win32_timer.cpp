@@ -42,23 +42,29 @@ class Win32Timer
 Win32Timer::Win32Timer (size_t period_in_milliseconds, const TimerHandler& in_handler, void* in_user_data)
   : handler (in_handler), user_data (in_user_data)
 {
-  SetLastError (0);
-  
-  timer = SetTimer (0, 0, period_in_milliseconds, &TimerProc);
-
-  CheckErrors ("syslib::Win32Timer::Win32Timer");
-
-  if (!timer)
-    Raise<WinAPIException> ("syslib::Win32Timer::Win32Timer", "Error at create SetTimer with period=%u", period_in_milliseconds);
-    
   try
   {
-    TimerMapSingleton::Instance () [timer] = this;
-  }
-  catch (...)
-  {
-    KillTimer (0, timer);
     SetLastError (0);
+
+    timer = SetTimer (0, 0, period_in_milliseconds, &TimerProc);
+
+    if (!timer)
+      raise_error ("::SetTimer");
+
+    try
+    {
+      TimerMapSingleton::Instance () [timer] = this;
+    }
+    catch (...)
+    {
+      KillTimer (0, timer);
+      SetLastError (0);
+      throw;
+    }
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Timer::Win32Timer");
     throw;
   }
 }
@@ -107,7 +113,6 @@ void Platform::Sleep (size_t miliseconds)
 {
   SetLastError (0);
   ::Sleep (miliseconds);
-  CheckErrors ("syslib::Win32Platform::Sleep");
 }
 
 /*

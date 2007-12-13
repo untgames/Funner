@@ -21,19 +21,35 @@ bool Platform::IsMessageQueueEmpty ()
 
 void Platform::DoNextEvent ()
 {
-  MSG msg;
-  
-  bool is_quit = GetMessage (&msg, 0, 0, 0) == 0;
+  try
+  {
+    MSG msg;
+    
+    bool is_quit = GetMessage (&msg, 0, 0, 0) == 0;
 
-  CheckErrors ("syslib::Win32Platform::DoNextEvent");
+    check_errors ("::GetMessage");
 
-  TranslateMessage (&msg);
-  DispatchMessage  (&msg);
-  SetLastError     (0);
+    TranslateMessage (&msg);
+    DispatchMessage  (&msg);
+    SetLastError     (0);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::DoNextEvent");
+    throw;
+  }
 }
 
 void Platform::WaitMessage ()
 {
-  ::WaitMessage ();
-  CheckErrors   ("syslib::Win32Platform::WaitMessage");
+  try
+  {
+    if (!::WaitMessage ())
+      raise_error ("::WaitMessage");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::WaitMessage");
+    throw;
+  }
 }

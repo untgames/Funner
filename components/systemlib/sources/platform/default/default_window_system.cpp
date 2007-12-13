@@ -47,7 +47,17 @@ void Platform::SetWindowTitle (window_t, const char*)
   Raise ("syslib::DefaultPlatform::SetWindowTitle");
 }
 
+void Platform::SetWindowTitle (window_t, const wchar_t*)
+{
+  Raise ("syslib::DefaultPlatform::SetWindowTitle");
+}
+
 void Platform::GetWindowTitle (window_t, size_t, char*)
+{
+  Raise ("syslib::DefaultPlatform::GetWindowTitle");
+}
+
+void Platform::GetWindowTitle (window_t, size_t, wchar_t*)
 {
   Raise ("syslib::DefaultPlatform::GetWindowTitle");
 }

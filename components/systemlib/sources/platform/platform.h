@@ -39,7 +39,9 @@ class Platform
 ///Заголовок окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void SetWindowTitle (window_t, const char* title);
+    static void SetWindowTitle (window_t, const wchar_t* title);
     static void GetWindowTitle (window_t, size_t buffer_size, char* buffer);
+    static void GetWindowTitle (window_t, size_t buffer_size, wchar_t* buffer);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Область окна / клиентская область

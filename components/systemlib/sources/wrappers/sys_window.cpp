@@ -24,11 +24,13 @@ struct Window::Impl
   WindowSignal signals [WindowEvent_Num]; //сигналы окна
   bool         close_cancel_flag;         //флаг отмены закрытия окна
   char         title [MAX_TITLE_LENGTH];  //заголовок окна
+  wchar_t      title_unicode [MAX_TITLE_LENGTH]; //заголовок окна в Unicode
   LogHandler   debug_log;                 //функция отладочного протоколирования
   
   Impl () : handle (0), style (WindowStyle_Default)
   {
     *title = 0;
+    *title_unicode = 0;
   }  
 };
 
@@ -274,10 +276,25 @@ const char* Window::Title () const
   return impl->title;
 }
 
+const wchar_t* Window::TitleUnicode () const
+{
+  Platform::GetWindowTitle ((Platform::window_t)CheckedHandle (), MAX_TITLE_LENGTH, impl->title_unicode);
+
+  return impl->title_unicode;
+}
+
 void Window::SetTitle (const char* title)
 {
   if (!title)
-    RaiseNullArgument ("syslib::Window::SetTitle", "title");
+    RaiseNullArgument ("syslib::Window::SetTitle(const char*)", "title");
+
+  Platform::SetWindowTitle ((Platform::window_t)CheckedHandle (), title);
+}
+
+void Window::SetTitle (const wchar_t* title)
+{
+  if (!title)
+    RaiseNullArgument ("syslib::Window::SetTitle(const wchar_t*)", "title");
 
   Platform::SetWindowTitle ((Platform::window_t)CheckedHandle (), title);
 }
