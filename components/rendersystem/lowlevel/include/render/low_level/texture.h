@@ -1,7 +1,7 @@
 #ifndef RENDER_LOW_LEVEL_TEXTURE_HEADER
 #define RENDER_LOW_LEVEL_TEXTURE_HEADER
 
-#include <render/low_level/buffer.h>
+#include <render/low_level/common.h>
 
 namespace render
 {
@@ -55,18 +55,27 @@ struct TextureDesc
   size_t           layers;                //количество слоёв (для кубических текстур), глубина (для трёхмерных текстур)
   PixelFormat      format;                //формат пикселей
   bool             generate_mips_enable;  //разрешена ли генерация mip-уровней
+  size_t           access_flags;          //флаги доступа к буферу
+  size_t           bind_flags;            //флаги биндинга буфера
+  UsageMode        usage_mode;            //режим использования буфера
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текстура
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ITexture: virtual public IBuffer
+class ITexture : virtual public IObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void GetDesc (TextureDesc&) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с данными
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void SetData (size_t layer, size_t mip_level, size_t offset, size_t size, const void* buffer) = 0;
+    virtual void GetData (size_t layer, size_t mip_level, size_t offset, size_t size, void* buffer) = 0;
 };
 
 }

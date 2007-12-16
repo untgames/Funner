@@ -20,6 +20,12 @@ int main ()
     desc.generate_mips_enable = false;
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
+
+    desc.dimension            = TextureDimension_2D;
+    desc.width                = 8096;
+    desc.height               = 512;
+  
+    xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
   }
   catch (std::exception& exception)
   {
