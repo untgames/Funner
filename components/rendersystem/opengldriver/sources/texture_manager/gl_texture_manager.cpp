@@ -78,7 +78,7 @@ ITexture* TextureManager::CreateTexture (const TextureDesc& tex_desc)
       break;
     }
     case TextureDimension_Cubemap: RaiseNotImplemented ("render::low_level::opengl::TextureManager::CreateTexture"); break;
-    default: RaiseInvalidArgument ("render::low_level::opengl::TextureManager::CreateTexture", "tex_desc.dimension");
+    default: RaiseInvalidArgument ("render::low_level::opengl::TextureManager::CreateTexture", "tex_desc.dimension", tex_desc.dimension);
   }
 
   return 0;
