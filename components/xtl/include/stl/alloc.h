@@ -3,6 +3,7 @@
 
 #include <new>
 #include <stl/utility>
+#include <stl/config.h>
 
 #ifndef __MYSTL_STANDALONE__
   #include <common/heap.h>
@@ -14,19 +15,6 @@ namespace stl
 //forward declarations
 template <class T>                            class allocator;
 template <class T,class AllocFn,class FreeFn> class simple_allocator;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///јллокатор по умолчанию (может быть специализирован пользователем)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> struct default_allocator
-{
-  typedef allocator<T> allocator_type;
-};
-
-template <class T> struct default_string_allocator
-{
-  typedef allocator<T> allocator_type;
-};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ѕазовый аллокатор

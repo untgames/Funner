@@ -1,0 +1,24 @@
+/*
+    MySTL string forward declarations
+*/
+
+#ifndef __MYSTL_STRING_FORWARD_DECLARATIONS__
+#define __MYSTL_STRING_FORWARD_DECLARATIONS__
+
+#include <wchar.h>
+#include <stl/config.h>
+
+namespace stl
+{
+
+template <class Char> struct char_traits;
+
+template <class T,class Traits=char_traits<T>,class Allocator=typename default_string_allocator<T>::allocator_type>
+class basic_string;
+
+typedef basic_string<char>    string;
+typedef basic_string<wchar_t> wstring;
+
+}
+
+#endif
