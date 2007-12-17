@@ -2,10 +2,13 @@
 #define COMMONLIB_UTF_CONVERTER_HEADER
 
 #include <wchar.h>
+#include <stl/string_fwd>
 
 namespace common
 {
+
 typedef unsigned int char32;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Unicode-кодировки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,20 +57,14 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
                            Encoding    destination_buffer_encoding); //кодировка буфера-приёмника
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перекодировка wchar_t -> utf8
+///Перекодировка char <-> wchar_t
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-EncodingResult convert_to_utf8 (const wchar_t* source_buffer,            //буфер-источник
-                                size_t         source_buffer_size,       //размера буфера-источника
-                                char*          destination_buffer,       //буфер-приёмник
-                                size_t         destination_buffer_size); //размер буфера-приёмника
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перекодировка utf8 -> wchar_t
-///////////////////////////////////////////////////////////////////////////////////////////////////
-EncodingResult convert_to_utf16 (const char* source_buffer,            //буфер-источник
-                                 size_t      source_buffer_size,       //размера буфера-источника
-                                 wchar_t*    destination_buffer,       //буфер-приёмник
-                                 size_t      destination_buffer_size); //размер буфера-приёмника
+stl::string  tostring  (const wchar_t* string, int length);
+stl::string  tostring  (const wchar_t* string);
+stl::string  tostring  (const stl::wstring&);
+stl::wstring towstring (const char* string, int length);
+stl::wstring towstring (const char* string);
+stl::wstring towstring (const stl::string&);
 
 };
 

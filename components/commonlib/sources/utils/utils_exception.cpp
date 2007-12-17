@@ -93,7 +93,7 @@ const char* Exception::what () const throw ()
 
 void Exception::TouchImpl (const char* source)
 {
-  if (!source)
+  if (!source || !*source)
     return;
 
 /*  if (!impl->stack_print)
