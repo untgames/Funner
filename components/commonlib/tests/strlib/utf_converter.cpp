@@ -91,14 +91,18 @@ void test_utf_converter (const char* file_name, Encoding source_encoding)
     memset(buffer [0],0,sizeof(buffer [0]));
     
     size_t source_length = file.Read (buffer [0], sizeof (buffer [0]));
-     
+//    printf("source_length = %d\n",source_length);
     EncodingResult decode_result = utf_decode (buffer [0], source_length, source_encoding, buffer [1], sizeof (buffer [1]));
-    dump32(buffer[1],128);
+//    printf ("decode = %d\n",decode_result.destination_buffer_processed_size);
+//    dump32(buffer[1],128);
+    memset(buffer [0],0,sizeof(0));
     EncodingResult encode_result = utf_encode (buffer [1], decode_result.destination_buffer_processed_size, buffer [0], sizeof (buffer [0]), encoding [i]);
+//    printf ("encode = %d\n",encode_result.destination_buffer_processed_size);
 
     dump (buffer [0], encode_result.destination_buffer_processed_size, encoding [i]);
 
     printf ("'\n");
+//    swap();
   }
 }
 

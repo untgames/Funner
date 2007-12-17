@@ -1,6 +1,16 @@
 #include <wchar.h>
 #include <common/utf_converter.h>
 
+/*void dump32(void *ptr,int l)
+{
+   FILE *file=fopen("dump.txt","a");
+   char *str=(char*)ptr;
+   for(int i=0;i<l;i++)
+      fputc(str[i],file);
+//       fprintf(file,"%p|",str[i]);
+   fclose(file);
+} */
+
 namespace common
 {
 
@@ -37,12 +47,17 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
    int srcSize;
    int srcBytes;
    bool r;
+   int i;
 
 //   printf("---source_buffer=%p\n",source_buffer);
 //   printf("---source_buffer_size=%d\n",source_buffer_size);
 //   printf("---bsrc=%p\n",bsrc);
 
-   while((unsigned char*)source_buffer+source_buffer_size>bsrc)
+//   while((unsigned char*)source_buffer+source_buffer_size>bsrc)
+//   for(i=0;i<source_buffer_size;i++)
+   i=0;
+   res.destination_buffer_processed_size=0;
+   while(i<source_buffer_size)
    {
 //      printf("source_buffer=%p\n",source_buffer);
 //      printf("source_buffer_size=%d\n",source_buffer_size);
@@ -70,14 +85,19 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
             break;
       }
 //      printf("error=%d\n",r);
-//      printf("srcBytes=%d\n",srcBytes);
+      i+=srcBytes;
+//      printf("srcBytes=%d, i=%d\n",srcBytes,i);
+
 //      printf("dst=%p\n",dst);
 //      printf("dst=%p\n",*dst);
       dst++;
-      res.destination_buffer_processed_size+=srcBytes;
+      res.source_buffer_processed_size=i;
+      res.destination_buffer_processed_size++;
       bsrc+=srcBytes;
+//dump32(dst,128);
 //      printf("%s\n",dst);
    }
+   res.destination_buffer_processed_size*=sizeof(char32);
    return res;
 }
 
@@ -103,7 +123,7 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
 //   printf("---source_buffer_size=%d\n",source_buffer_size);
 //   printf("---bsrc=%p\n",bsrc);
 
-   while((char32*)source_buffer+source_buffer_size>bsrc)
+   while((char32*)source_buffer+source_buffer_size/sizeof(char32)>bsrc)
    {
 //printf("start ------------------\n");
 //      printf("source_buffer=%p\n",source_buffer);
@@ -149,18 +169,6 @@ old_bsrc=bsrc;
 old_dst=dst;
 //printf("end --------------------\n");
    }
-   return res;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перекодировка wchar_t -> utf8
-///////////////////////////////////////////////////////////////////////////////////////////////////
-EncodingResult convert_to_utf8 (const wchar_t* source_buffer,            //буфер-источник
-                                size_t         source_buffer_size,       //размера буфера-источника
-                                char*          destination_buffer,       //буфер-приёмник
-                                size_t         destination_buffer_size) //размер буфера-приёмника
-{
-   EncodingResult res;
    return res;
 }
 
