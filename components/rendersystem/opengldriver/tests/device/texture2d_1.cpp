@@ -21,9 +21,8 @@ int main ()
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
 
-    desc.dimension            = TextureDimension_2D;
-    desc.width                = 8096;
-    desc.height               = 512;
+    desc.dimension            = TextureDimension_1D;
+    desc.width                = 4096;
   
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
   }

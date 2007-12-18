@@ -1,5 +1,4 @@
 #include "shared.h"
-#include <common/exception.h>
 
 using namespace render::low_level;
 using namespace render::low_level::opengl;
@@ -9,7 +8,7 @@ using namespace render::low_level::opengl;
 */
 
 Texture::Texture  (const ContextManager& manager, const TextureDesc& tex_desc, GLenum in_target)
-  : ContextObject (manager), target (in_target), desc (tex_desc), initialized (false)
+  : ContextObject (manager), target (in_target), desc (tex_desc), mips_count (0)
 {
   MakeContextCurrent ();
   glGenTextures(1, &texture_id);
@@ -58,9 +57,18 @@ void Texture::Bind ()
    Получение параметров текстуры
 */
 
-size_t Texture::TexelSize ()
+namespace render
 {
-  switch (desc.format)
+
+namespace low_level
+{
+
+namespace opengl
+{
+  
+size_t TexelSize (PixelFormat format)
+{
+  switch (format)
   {
     case PixelFormat_L8:
     case PixelFormat_A8:
@@ -78,9 +86,9 @@ size_t Texture::TexelSize ()
   }
 }
 
-GLint Texture::GLInternalFormat ()
+GLint GLInternalFormat (PixelFormat format)
 {
-  switch (desc.format)
+  switch (format)
   {
     case PixelFormat_L8:    return GL_LUMINANCE8;
     case PixelFormat_A8:    return GL_ALPHA8;
@@ -98,9 +106,9 @@ GLint Texture::GLInternalFormat ()
   }
 }
 
-GLenum Texture::GLFormat ()
+GLenum GLFormat (PixelFormat format)
 {
-  switch (desc.format)
+  switch (format)
   {
     case PixelFormat_L8:    return GL_LUMINANCE;
     case PixelFormat_A8:    return GL_ALPHA;
@@ -116,4 +124,10 @@ GLenum Texture::GLFormat ()
     case PixelFormat_D32:
     default: common::RaiseNotImplemented ("render::low_level::opengl::Texture::GLFormat"); return GL_ALPHA;
   }
+}
+
+}
+
+}
+
 }

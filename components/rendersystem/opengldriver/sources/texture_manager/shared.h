@@ -1,6 +1,7 @@
 #ifndef RENDER_GL_DRIVER_TEXTURE_SHARED_HEADER
 #define RENDER_GL_DRIVER_TEXTURE_SHARED_HEADER
 
+#include <math.h>
 #include <common/exception.h>
 #include <shared/texture_manager.h>
 #include <shared/context_object.h>
@@ -42,18 +43,11 @@ class Texture : virtual public ITexture, public ContextObject
     GLenum GetTarget    () const { return target; }
     GLuint GetTextureId () const { return texture_id; }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение параметров текстуры
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t TexelSize ();
-    GLint  GLInternalFormat ();
-    GLenum GLFormat ();
-
   public:
     GLenum      target;      //целевой тип текстуры
     GLuint      texture_id;  //идентификатор текстуры
     TextureDesc desc;        //дескриптор текстуры
-    bool        initialized; //текстура инициализированна
+    size_t      mips_count;  //количество мип-уровней
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,8 +64,8 @@ class Texture1D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t offset, size_t size, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t offset, size_t size, void* buffer);
+    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, const void* buffer);
+    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,8 +82,8 @@ class Texture2D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t offset, size_t size, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t offset, size_t size, void* buffer);
+    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, const void* buffer);
+    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,8 +100,8 @@ class Texture3D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t offset, size_t size, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t offset, size_t size, void* buffer);
+    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, const void* buffer);
+    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,9 +118,16 @@ class TextureCubemap : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t offset, size_t size, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t offset, size_t size, void* buffer);
+    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, const void* buffer);
+    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer);
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение параметров текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+size_t TexelSize (PixelFormat format);
+GLint  GLInternalFormat (PixelFormat format);
+GLenum GLFormat (PixelFormat format);
 
 }
 
