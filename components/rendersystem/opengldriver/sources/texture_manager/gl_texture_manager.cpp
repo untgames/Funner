@@ -45,9 +45,9 @@ TextureManager::Impl::Impl (const ContextManager& context_manager) : ContextObje
 ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
 {
   if ((int)tex_desc.width > max_texture_size)
-    RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_texture_size);
+    RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 2, max_texture_size);
   else if ((int)tex_desc.height > max_texture_size)
-    RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 1, max_texture_size);
+    RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 2, max_texture_size);
   
   MakeContextCurrent ();
 
@@ -55,6 +55,8 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
   {
     case TextureDimension_1D: 
     {
+      if ((tex_desc.width < 2))
+        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 2, max_texture_size);
       if ((tex_desc.width - 1) & tex_desc.width) 
         RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width");
 
@@ -70,6 +72,10 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
     }
     case TextureDimension_2D:
     {
+      if ((tex_desc.width < 2))
+        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 2, max_texture_size);
+      if ((tex_desc.height < 2))
+        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 2, max_texture_size);
       if ((tex_desc.width - 1) & tex_desc.width) 
         RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width");
       if ((tex_desc.height - 1) & tex_desc.height) 

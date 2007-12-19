@@ -128,6 +128,7 @@ class TextureCubemap : public Texture
 size_t TexelSize (PixelFormat format);
 GLint  GLInternalFormat (PixelFormat format);
 GLenum GLFormat (PixelFormat format);
+void ScaleImage2XDown (PixelFormat format, size_t width, size_t height, const void* src, void* dest);
 
 }
 
