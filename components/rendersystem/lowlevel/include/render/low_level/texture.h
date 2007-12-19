@@ -24,8 +24,8 @@ enum PixelFormat
   PixelFormat_DXT3,  //red, green, blue, alpha - compressed  
   PixelFormat_DXT5,  //red, green, blue, alpha - compressed
   PixelFormat_D16,   //depth:16
-  PixelFormat_D24,   //depth:24
-  PixelFormat_D32,   //depth:32
+  PixelFormat_D24X8, //depth:24, x:8
+  PixelFormat_D24S8, //depth:24, stencil:8
   PixelFormat_S8,    //stencil:8
 
   PixelFormat_Num

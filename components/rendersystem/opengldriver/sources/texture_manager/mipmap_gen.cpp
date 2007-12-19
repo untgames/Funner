@@ -2,16 +2,10 @@
 #define RENDER_GL_DRIVER_SCALE
 
 #include "shared.h"
-#include <memory.h>
 
 typedef unsigned char  uchar;
 typedef unsigned short uint16;
-typedef unsigned int   uint32;
-
-struct data24bit_t
-{
-  uchar data[3];
-};
+typedef unsigned int   r24g8_t;
 
 struct two_color8_t
 {
@@ -52,23 +46,11 @@ void ScalePixel (uint16& dest, uint16 s1, uint16 s2, uint16 s3, uint16 s4)
   dest = (size_t)(s1 + s2 + s3 + s4) >> 2;
 }
 
-void ScalePixel (data24bit_t& dest, const data24bit_t& s1, const data24bit_t& s2, const data24bit_t& s3, const data24bit_t& s4)
+void ScalePixel (r24g8_t& dest, const r24g8_t& s1, const r24g8_t& s2, const r24g8_t& s3, const r24g8_t& s4)
 {
-  size_t data[4];
-
-  memcpy (&data[0], &s1, 3);
-  memcpy (&data[1], &s2, 3);
-  memcpy (&data[2], &s3, 3);
-  memcpy (&data[3], &s4, 3);
-
-  data [0] = (data[0] + data[1] + data[2] + data[3]) >> 2;
-
-  memcpy (&dest, &data[0], 3);
-}
-
-void ScalePixel (uint32& dest, const uint32& s1, const uint32& s2, const uint32& s3, const uint32& s4)
-{
-  dest = (size_t)(s1 + s2 + s3 + s4) >> 2;
+  //Непереносимо!!!
+  dest = ((s1 & 0xffffff) + (s2 & 0xffffff) + (s3 & 0xffffff) + (s4 & 0xffffff)) >> 2;
+  dest |= ((((s1 & 0xff000000) >> 24) + ((s2 & 0xff000000) >> 24) + ((s3 & 0xff000000) >> 24) + ((s4 & 0xff000000) >> 24)) >> 2) << 22;
 }
 
 void  ScalePixel (two_color8_t& dest, two_color8_t s1, two_color8_t s2, two_color8_t s3, two_color8_t s4)
@@ -133,11 +115,11 @@ void render::low_level::opengl::ScaleImage2XDown (PixelFormat format, size_t wid
     case PixelFormat_A8:
     case PixelFormat_S8:    ScaleImage2XDownImpl <uchar>        (width, height, (uchar*)       src, (uchar*)       dest); break;
     case PixelFormat_LA8:   ScaleImage2XDownImpl <two_color8_t> (width, height, (two_color8_t*)src, (two_color8_t*)dest); break;
-    case PixelFormat_D16:   ScaleImage2XDownImpl <uint16>       (width, height, (data16bit_t*) src, (data16bit_t*) dest); break;
+    case PixelFormat_D16:   ScaleImage2XDownImpl <uint16>       (width, height, (uint16*)      src, (uint16*)      dest); break;
     case PixelFormat_RGB8:  ScaleImage2XDownImpl <rgb8_t>       (width, height, (rgb8_t*)      src, (rgb8_t*)      dest); break;
-    case PixelFormat_D24:   ScaleImage2XDownImpl <data24bit_t>  (width, height, (data24bit_t*) src, (data24bit_t*) dest); break;
     case PixelFormat_RGBA8: ScaleImage2XDownImpl <rgba8_t>      (width, height, (rgba8_t*)     src, (rgba8_t*)     dest); break;
-    case PixelFormat_D32:   ScaleImage2XDownImpl <uint32>       (width, height, (data32bit_t*) src, (data32bit_t*) dest); break;
+    case PixelFormat_D24S8:
+    case PixelFormat_D24X8: ScaleImage2XDownImpl <r24g8_t>      (width, height, (r24g8_t*)     src, (r24g8_t*)     dest); break;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:

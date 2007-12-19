@@ -1,5 +1,4 @@
 #include "shared.h"
-#include <stdio.h> //!!!!!!!!!!!!
 
 using namespace common;
 using namespace render::low_level;
@@ -79,22 +78,6 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
     {
       ScaleImage2XDown (desc.format, width, height, source_buffer, mip_buffer);
-/*      switch (desc.format)
-      {
-        case PixelFormat_L8:
-        case PixelFormat_A8:
-        case PixelFormat_S8:    ScaleImage2XDown <uchar>        (width, height, (uchar*)       source_buffer, (uchar*)       mip_buffer); break;
-        case PixelFormat_LA8:   ScaleImage2XDown <two_color8_t> (width, height, (two_color8_t*)source_buffer, (two_color8_t*)mip_buffer); break;
-        case PixelFormat_D16:   ScaleImage2XDown <data16bit_t>  (width, height, (data16bit_t*) source_buffer, (data16bit_t*) mip_buffer); break;
-        case PixelFormat_RGB8:  ScaleImage2XDown <rgb8_t>       (width, height, (rgb8_t*)      source_buffer, (rgb8_t*)      mip_buffer); break;
-        case PixelFormat_D24:   ScaleImage2XDown <data24bit_t>  (width, height, (data24bit_t*) source_buffer, (data24bit_t*) mip_buffer); break;
-        case PixelFormat_RGBA8: ScaleImage2XDown <rgba8_t>      (width, height, (rgba8_t*)     source_buffer, (rgba8_t*)     mip_buffer); break;
-        case PixelFormat_D32:   ScaleImage2XDown <data32bit_t>  (width, height, (data32bit_t*) source_buffer, (data32bit_t*) mip_buffer); break;
-        case PixelFormat_DXT1:
-        case PixelFormat_DXT3:
-        case PixelFormat_DXT5:
-        default: delete [] mip_buffer; return;
-      }*/
 
       glTexSubImage2D (GL_TEXTURE_2D, i, x, y, width, height, GLFormat (desc.format), GL_UNSIGNED_BYTE, mip_buffer);
 
