@@ -7,8 +7,7 @@ using namespace common;
 ///Конструктор / деструктор
 VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, const BufferDesc& desc)
   : Buffer (desc), ContextObject (context_manager), target (in_target)
-{
-  
+{ 
 }
 
 VboBuffer::~VboBuffer ()

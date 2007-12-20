@@ -9,9 +9,11 @@ using namespace common;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SystemMemoryBuffer::SystemMemoryBuffer (const BufferDesc& desc)
+  : Buffer(desc)
 {
-  bufferdesc = desc;
-  buffer = new void[bufferdesc.size];
+  BufferDesc d;
+  GetDesc(d);
+  buffer = (void*)new char[d.size];
 }
 
 SystemMemoryBuffer::~SystemMemoryBuffer ()
@@ -22,22 +24,30 @@ SystemMemoryBuffer::~SystemMemoryBuffer ()
 ///Работа с данными буфера
 void SystemMemoryBuffer::SetData (size_t offset, size_t size, const void* data)
 {
-  if (offset < 0 || offset >= bufferdesc.size)
+  /*
+  BufferDesc bd;
+  GetDesc(bd);
+  
+  if (offset < 0 || offset >= bd.size)
     return;
     
   void* begin = buffer + offset;
-  void* end   = bufferdesc.size > offset + size ? begin + size : buffer + bufferdesc.size;
+  void* end   = bd.size > offset + size ? begin + size : buffer + bd.size;
   void* ptr   = data;
   
   for (; begin < end; begin++, ptr++)
     *begin = *ptr;
+  */
     
-  //common::RaiseNotImplemented("render::low_level::opengl::SystemMemoryBuffer::SetData");
 }
 
 void SystemMemoryBuffer::GetData (size_t offset, size_t size, void* data)
 {
-  if (offset < 0 || offset >= bufferdesc.size)
+  /*
+  BufferDesc bd;
+  GetDesc(bd);
+
+  if (offset < 0 || offset >= bd.size)
     return;
 
   void* begin = buffer + offset;
@@ -45,7 +55,7 @@ void SystemMemoryBuffer::GetData (size_t offset, size_t size, void* data)
   void* ptr   = data;
   for (; begin < end; begin ++, ptr++)
     *ptr = *begin;
-  //common::RaiseNotImplemented("render::low_level::opengl::SystemMemoryBuffer::GetData");
+  */
 }
 
 ///Установка буфера в контекст OpenGL
@@ -57,6 +67,5 @@ void SystemMemoryBuffer::Bind ()
 ///Указатель на данные буфера
 void* SystemMemoryBuffer::GetDataPointer ()
 {
-  //common::RaiseNotImplemented("render::low_level::opengl::SystemMemoryBuffer::GetDataPointer");
   return buffer;
 }
