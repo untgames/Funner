@@ -1,5 +1,14 @@
 #include "shared.h"
 
+/*
+    Замечания
+      1) перед каждым блоком команд GL нужно делать MakeContextCurrent ()
+         в деструкторе тоже нужно, но страховать этот вызов в try { MakeContextCurrent (); gl-commands; } catch (...) { nothing }
+      2) лучше дескриптор сделать в базовом классе const и proteced
+      3) упрощение enum-ов: BufferAccessFlag -> AccessFlag, BufferUsageMode -> UsageMode - они общие в буферах и текстурах
+      4) не понял зачем Map/Unmap. там есть методы Set/Get. хотя это нужно посмотреть детальнее
+*/
+
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
@@ -19,58 +28,58 @@ VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, c
   
   switch (bd.usage_mode)                  // что поделаешь, под каждую пару доступ-режим - отдельный флаг
   {
-    case BufferUsageMode_Default:         // по дефолту делаем динамик, это перестраховка, а вообще 
+    case UsageMode_Default:         // по дефолту делаем динамик, это перестраховка, а вообще 
       switch (bd.access_flags)            // надо дефолт нафик убрать! потому как в реализации его нет
       {
-        case BufferAccessFlag_Read:
+        case AccessFlag_Read:
           buffermode = GL_DYNAMIC_READ;
           break;
-        case BufferAccessFlag_Write:
+        case AccessFlag_Write:
           buffermode = GL_DYNAMIC_DRAW;
           break;
-        case BufferAccessFlag_RW:
+        case AccessFlag_Read | AccessFlag_Write:
           buffermode = GL_DYNAMIC_COPY;
           break;
       }
       break;
-    case BufferUsageMode_Static:          // статический буфер
+    case UsageMode_Static:          // статический буфер
       switch (bd.access_flags)
       {
-        case BufferAccessFlag_Read:
+        case AccessFlag_Read:
           buffermode = GL_STATIC_READ;
           break;
-        case BufferAccessFlag_Write:
+        case AccessFlag_Write:
           buffermode = GL_STATIC_DRAW;
           break;
-        case BufferAccessFlag_RW:
+        case AccessFlag_Read | AccessFlag_Write:
           buffermode = GL_STATIC_COPY;
           break;
       }
       break;
-    case BufferUsageMode_Dynamic:         // динамический буфер
+    case UsageMode_Dynamic:         // динамический буфер
       switch (bd.access_flags)
       {
-        case BufferAccessFlag_Read:
+        case AccessFlag_Read:
           buffermode = GL_DYNAMIC_READ;
           break;
-        case BufferAccessFlag_Write:
+        case AccessFlag_Write:
           buffermode = GL_DYNAMIC_DRAW;
           break;
-        case BufferAccessFlag_RW:
+        case AccessFlag_Read | AccessFlag_Write:
           buffermode = GL_DYNAMIC_COPY;
           break;
       }
       break;
-    case BufferUsageMode_Stream:          // поточный буфер
+    case UsageMode_Stream:          // поточный буфер
       switch (bd.access_flags)
       {
-        case BufferAccessFlag_Read:
+        case AccessFlag_Read:
           buffermode = GL_STREAM_READ;
           break;
-        case BufferAccessFlag_Write:
+        case AccessFlag_Write:
           buffermode = GL_STREAM_DRAW;
           break;
-        case BufferAccessFlag_RW:
+        case AccessFlag_Read | AccessFlag_Write:
           buffermode = GL_STREAM_COPY;
           break;
       }
