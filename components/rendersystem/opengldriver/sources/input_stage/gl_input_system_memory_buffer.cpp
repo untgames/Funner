@@ -1,5 +1,11 @@
 #include "shared.h"
 
+/*
+    Замечания:
+      1) неверно удаляется память. выделение было как [] нужно также удалять. но лучше использовать xtl::uninitialized_storage
+      2) для копирования вызывай memcpy
+*/
+
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
