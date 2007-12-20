@@ -43,6 +43,8 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
       }
     }
   }
+
+  CheckErrors ("render::low_level::opengl::Texture2D::Texture2D");
 }
 
 /*
@@ -65,6 +67,7 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 
   bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
 
+  MakeContextCurrent ();
   Bind ();
 
   if (mip_level && has_SGIS_generate_mipmap)
@@ -97,6 +100,8 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 
     delete [] mip_buffer;
   }
+
+  CheckErrors ("render::low_level::opengl::Texture2D::SetData");
 }
 
 void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer)
@@ -114,5 +119,7 @@ void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   if (height != desc.height)
     RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "height", desc.height, desc.height);
 
+  MakeContextCurrent ();
   glGetTexImage (GL_TEXTURE_2D, mip_level, GLFormat (desc.format), GLType (desc.format), buffer);
+  CheckErrors ("render::low_level::opengl::Texture2D::GetData");
 }

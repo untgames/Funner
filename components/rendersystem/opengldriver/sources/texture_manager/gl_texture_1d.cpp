@@ -32,6 +32,8 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
         glTexImage1D (GL_TEXTURE_1D, i, GLInternalFormat (tex_desc.format), tex_desc.width >> i, 0, GLFormat (tex_desc.format), GLType (tex_desc.format), NULL);
     }
   }
+
+  CheckErrors ("render::low_level::opengl::Texture1D::Texture1D");
 }
 
 /*
@@ -51,6 +53,8 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     return;
 
   bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
+
+  MakeContextCurrent ();
 
   Bind ();
 
@@ -73,6 +77,8 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 
     delete [] mip_buffer;
   }
+
+  CheckErrors ("render::low_level::opengl::Texture1D::SetData");
 }
 
 void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer)
@@ -86,5 +92,7 @@ void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   if (width != desc.width)
     RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "width", desc.width, desc.width);
 
+  MakeContextCurrent ();
   glGetTexImage (GL_TEXTURE_1D, mip_level, GLFormat (desc.format), GLType (desc.format), buffer);
+  CheckErrors ("render::low_level::opengl::Texture1D::GetData");
 }
