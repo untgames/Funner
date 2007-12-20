@@ -24,38 +24,33 @@ SystemMemoryBuffer::~SystemMemoryBuffer ()
 ///Работа с данными буфера
 void SystemMemoryBuffer::SetData (size_t offset, size_t size, const void* data)
 {
-  /*
   BufferDesc bd;
   GetDesc(bd);
   
   if (offset < 0 || offset >= bd.size)
     return;
     
-  void* begin = buffer + offset;
-  void* end   = bd.size > offset + size ? begin + size : buffer + bd.size;
-  void* ptr   = data;
+  char* begin = (char*)buffer + offset;
+  char* end   = bd.size > offset + size ? (char*)begin + size : (char*)buffer + bd.size;
+  char* ptr   = (char*)data;
   
   for (; begin < end; begin++, ptr++)
     *begin = *ptr;
-  */
-    
 }
 
 void SystemMemoryBuffer::GetData (size_t offset, size_t size, void* data)
 {
-  /*
   BufferDesc bd;
   GetDesc(bd);
 
   if (offset < 0 || offset >= bd.size)
     return;
 
-  void* begin = buffer + offset;
-  void* end   = buffer + offset + size;
-  void* ptr   = data;
+  char* begin = (char*)buffer + offset;
+  char* end   = (char*)buffer + offset + size;
+  char* ptr   = (char*)data;
   for (; begin < end; begin ++, ptr++)
     *ptr = *begin;
-  */
 }
 
 ///Установка буфера в контекст OpenGL
