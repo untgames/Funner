@@ -106,7 +106,7 @@ class VboBuffer: public Buffer, public ContextObject
 
   private:
     GLenum target;    //целевой тип аппаратного буфера (GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER)
-    GLint  buffer_id; //номер буфера в контексте OpenGL
+    GLuint  buffer_id; //номер буфера в контексте OpenGL
 };
 
 }
