@@ -126,6 +126,26 @@ GLenum GLFormat (PixelFormat format)
   }
 }
 
+GLenum GLType (PixelFormat format)
+{
+  switch (format)
+  {
+    case PixelFormat_L8:    
+    case PixelFormat_A8:    
+    case PixelFormat_S8:
+    case PixelFormat_LA8:   
+    case PixelFormat_RGB8:  
+    case PixelFormat_RGBA8: return GL_UNSIGNED_BYTE;
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8:   
+    default: common::RaiseNotImplemented ("render::low_level::opengl::Texture::GLFormat"); return GL_ALPHA;
+  }
+}
+
 }
 
 }

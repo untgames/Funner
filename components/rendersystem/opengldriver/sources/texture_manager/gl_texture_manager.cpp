@@ -62,7 +62,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
 
       GLint width;
 
-      glTexImage1D (GL_PROXY_TEXTURE_1D, 0, GLInternalFormat (tex_desc.format), tex_desc.width, 0, GLFormat (tex_desc.format), GL_UNSIGNED_BYTE, NULL);
+      glTexImage1D (GL_PROXY_TEXTURE_1D, 0, GLInternalFormat (tex_desc.format), tex_desc.width, 0, GLFormat (tex_desc.format), GLType (tex_desc.format), NULL);
       glGetTexLevelParameteriv (GL_PROXY_TEXTURE_1D, 0, GL_TEXTURE_WIDTH, &width);
       if (!width)
         Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
@@ -84,7 +84,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       GLint width;
 
       glTexImage2D (GL_PROXY_TEXTURE_2D, 0, GLInternalFormat (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                    GLFormat (tex_desc.format), GL_UNSIGNED_BYTE, NULL);
+                    GLFormat (tex_desc.format), GLType (tex_desc.format), NULL);
       glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
       if (!width)
         Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 

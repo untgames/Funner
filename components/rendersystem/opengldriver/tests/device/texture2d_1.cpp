@@ -9,9 +9,9 @@ int main ()
     Test test ("OpenGL device test window (texture2d_1_test)");
 
     TextureDesc desc;
-    char image_data[8*256*256];
-
     memset (&desc, 0, sizeof (desc));
+
+    char* image_data = new char [512 * 512 * 8];
     
     desc.dimension            = TextureDimension_2D;
     desc.width                = 512;
@@ -22,6 +22,9 @@ int main ()
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
     texture->SetData (0, 0, 256, 256, 256, 256, image_data);
+    texture->GetData (0, 0, 0, 0, 512, 512, image_data);
+
+    delete [] image_data;
 
     desc.dimension            = TextureDimension_1D;
     desc.width                = 4096;
