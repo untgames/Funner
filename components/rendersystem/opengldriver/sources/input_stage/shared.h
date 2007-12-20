@@ -41,7 +41,7 @@ class Buffer: virtual public IBuffer
     virtual void* GetDataPointer () = 0;
     
   private:
-    BufferDesc desc; //дескриптор буфера
+    BufferDesc bufferdesc; //дескриптор буфера
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

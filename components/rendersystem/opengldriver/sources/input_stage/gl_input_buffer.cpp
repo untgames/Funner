@@ -5,12 +5,13 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 ///Конструктор / деструктор
-Buffer::Buffer (const BufferDesc&)
+Buffer::Buffer (const BufferDesc& desc)
 {
+  bufferdesc = desc;
 }
 
 ///Получение дескриптора
-void Buffer::GetDesc (BufferDesc&)
+void Buffer::GetDesc (BufferDesc& desc)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Buffer::GetDesc");
+  desc = bufferdesc;
 }
