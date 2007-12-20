@@ -1,10 +1,5 @@
 #include "shared.h"
-
-/*
-    Замечания:
-      1) неверно удаляется память. выделение было как [] нужно также удалять. но лучше использовать xtl::uninitialized_storage
-      2) для копирования вызывай memcpy
-*/
+#include <memory.h>
 
 using namespace render::low_level;
 using namespace render::low_level::opengl;
@@ -15,51 +10,37 @@ using namespace common;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SystemMemoryBuffer::SystemMemoryBuffer (const BufferDesc& desc)
-  : Buffer(desc)
+  : bufferdesc(desc)
 {
-  BufferDesc d;                     // путь смы и проинитили дескриптор,
-  GetDesc(d);                       // вытаскивать его приходится вот так извратно
-  buffer = (void*)new char[d.size]; // резервируем память
+  buffer = (void*)new char[bufferdesc.size]; // резервируем память
 }
 
 SystemMemoryBuffer::~SystemMemoryBuffer ()
 {
-  delete buffer;                    // буффер уж не нужен
+  delete[] buffer;                          // буффер уж не нужен
 }
-
+  
 ///Работа с данными буфера
 void SystemMemoryBuffer::SetData (size_t offset, size_t size, const void* data)
 {
-  BufferDesc bd;                        // опять тащить дескриптор
-  GetDesc(bd);
-  
-  if (offset < 0 || offset >= bd.size)  // проверяем смещение
+  if (offset < 0 || offset >= bufferdesc.size)      // проверяем смещение
     return;
   
-  // комплект указателей для копирования данных
-  char* begin = (char*)buffer + offset; 
-  char* end   = bd.size > offset + size ? (char*)begin + size : (char*)buffer + bd.size;
-  char* ptr   = (char*)data;
+  char* begin = (char*)buffer + offset;             // начало массива
+  size        = offset + size > bufferdesc.size ?   // размер массива
+                  bufferdesc.size - offset : size;
   // само копирование
-  for (; begin < end; begin++, ptr++)
-    *begin = *ptr;
+  memcpy((void*) begin, data, size);
 }
 
 void SystemMemoryBuffer::GetData (size_t offset, size_t size, void* data)
 {
-  BufferDesc bd;                        // и снова дескриптор
-  GetDesc(bd);
-
-  if (offset < 0 || offset >= bd.size)  // смещение
+  if (offset < 0 || offset >= bufferdesc.size)      // проверяем смещение
     return;
 
-  // указатели
   char* begin = (char*)buffer + offset;
-  char* end   = (char*)buffer + offset + size;
-  char* ptr   = (char*)data;
   // копирование
-  for (; begin < end; begin ++, ptr++)
-    *ptr = *begin;
+  memcpy(data, (void*) begin, size);
 }
 
 ///Установка буфера в контекст OpenGL
