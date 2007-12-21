@@ -15,9 +15,7 @@ Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char*)
     input_stage (context_manager),
     texture_manager (context_manager)
 {  
-    //выбор активной цепочки обмена и установка текущего контекста
-    
-  context_manager.SetSwapChains (swap_chain, swap_chain);
+    //установка текущего контекста
 
   context_manager.MakeContextCurrent ();
 
@@ -63,31 +61,31 @@ const char* Device::GetName ()
     Создание ресурсов
 */
 
-ILightingState* Device::CreateLightingState ()
+ILightingState* Device::CreateLightingState (const LightingDesc&)
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreateLightingState");
   return 0;
 }
 
-IViewerState* Device::CreateViewerState ()
+IViewerState* Device::CreateViewerState (const ViewerDesc&)
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreateViewerState");
   return 0;
 }
 
-ITransformState* Device::CreateTransformState ()
+ITransformState* Device::CreateTransformState (const TransformDesc&)
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreateTransformState");
   return 0;
 }
 
-IMaterialState* Device::CreateMaterialState ()
+IMaterialState* Device::CreateMaterialState (const MaterialDesc&)
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreateMaterialState");
   return 0;
 }
 
-IRasterizerState* Device::CreateRasterizerState ()
+IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc&)
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreateRasterizerState");
   return 0;
@@ -305,6 +303,11 @@ const Rect& Device::RSGetScissor ()
     Управление выходным уровнем (output-stage)
 */
 
+ITexture* Device::GetBuffer (ISwapChain* swap_chain, size_t buffer_id)
+{
+  return output_stage.GetBuffer (swap_chain, buffer_id);
+}
+
 IBlendState* Device::CreateBlendState (const BlendDesc& desc)
 {
   return output_stage.CreateBlendState (desc);
@@ -315,19 +318,9 @@ IDepthStencilState* Device::CreateDepthStencilState (const DepthStencilDesc& des
   return output_stage.CreateDepthStencilState (desc);
 }
 
-IFrameBuffer* Device::CreateFrameBuffer (const FrameBufferDesc& frame_buffer_desc)
+IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
 {
-  return output_stage.CreateFrameBuffer (frame_buffer_desc);
-}
-
-IFrameBuffer* Device::CreateFrameBuffer (ISwapChain* swap_chain)
-{
-  return output_stage.CreateFrameBuffer (swap_chain);
-}
-
-IFrameBuffer* Device::CreateFrameBuffer (ITexture* render_target)
-{
-  return output_stage.CreateFrameBuffer (render_target);
+  return output_stage.CreateView (texture, desc);
 }
 
 void Device::OSSetBlendState (IBlendState* state)
@@ -345,9 +338,9 @@ void Device::OSSetStencilReference (size_t reference)
   output_stage.SetStencilReference (reference);
 }
 
-void Device::OSSetFrameBuffer (IFrameBuffer* frame_buffer)
+void Device::OSSetRenderTargets (IView* render_target_view, IView* depth_stencil_view)
 {
-  output_stage.SetFrameBuffer (frame_buffer);
+  output_stage.SetRenderTargets (render_target_view, depth_stencil_view);
 }
 
 IBlendState* Device::OSGetBlendState ()
@@ -365,38 +358,33 @@ size_t Device::OSGetStencilReference ()
   return output_stage.GetStencilReference ();
 }
 
-IFrameBuffer* Device::OSGetFrameBuffer ()
+IView* Device::OSGetRenderTargetView ()
 {
-  return output_stage.GetFrameBuffer ();
+  return output_stage.GetRenderTargetView ();
+}
+
+IView* Device::OSGetDepthStencilView ()
+{
+  return output_stage.GetDepthStencilView ();
 }
 
 /*
     Очистка
 */
 
-void Device::ClearColorBuffer (IColorBuffer* buffer, const Color4f& color)
+void Device::ClearRenderTargetView (const Color4f& color)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ClearColorBuffer");
+  output_stage.ClearRenderTargetView (color);
 }
 
-void Device::ClearDepthBuffer (IDepthStencilBuffer* buffer, float depth)
+void Device::ClearDepthStencilView (float depth, unsigned char stencil)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ClearDepthBuffer");
+  output_stage.ClearDepthStencilView (depth, stencil);
 }
 
-void Device::ClearStencilBuffer (IDepthStencilBuffer* buffer, unsigned char value)
+void Device::ClearViews (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::ClearStencilBuffer");
-}
-
-void Device::Clear (IFrameBuffer* buffer, size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::Clear");
-}
-
-void Device::Clear (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::Clear");
+  output_stage.ClearViews (clear_flags, color, depth, stencil);
 }
 
 /*

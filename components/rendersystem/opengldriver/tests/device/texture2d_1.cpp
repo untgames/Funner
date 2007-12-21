@@ -6,7 +6,7 @@ int main ()
   
   try
   {
-    Test test ("OpenGL device test window (texture2d_1_test)");
+    Test test (L"OpenGL device test window (texture2d_1_test)");
 
     TextureDesc desc;
     memset (&desc, 0, sizeof (desc));

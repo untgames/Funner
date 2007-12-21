@@ -50,7 +50,7 @@ struct Context::Impl
       
       if (!wglMakeCurrent (swap_chain_dc, gl_context))
         raise_error ("wglMakeCurrent");
-
+        
       GLenum status = glewContextInit (&glew_context);
 
       if (status != GLEW_OK)
@@ -60,6 +60,7 @@ struct Context::Impl
     }
     catch (...)
     {
+      wglMakeCurrent (0, 0);
       wglDeleteContext (gl_context);
       throw;
     }

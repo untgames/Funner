@@ -10,21 +10,9 @@ namespace low_level
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Режим сравнения
+///Матрица
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum CompareMode
-{
-  CompareMode_AlwaysFail,   //результат сравнения всегда ложь
-  CompareMode_AlwaysPass,   //результат сравнения всегда истина
-  CompareMode_Equal,        //new_value == reference_value
-  CompareMode_NotEqual,     //new_value != reference_value
-  CompareMode_Less,         //new_value <  reference_value
-  CompareMode_LessEqual,    //new_value <= reference_value
-  CompareMode_Greater,      //new_value >  reference_value
-  CompareMode_GreaterEqual, //new_value >= reference_value
-
-  CompareMode_Num
-};
+typedef float Matrix4f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Цвета
@@ -57,6 +45,23 @@ struct Viewport: public Rect
 {
   float  min_depth; //минимальная глубина [0;1]
   float  max_depth; //максимальная глубина [0;1]
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Режим сравнения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum CompareMode
+{
+  CompareMode_AlwaysFail,   //результат сравнения всегда ложь
+  CompareMode_AlwaysPass,   //результат сравнения всегда истина
+  CompareMode_Equal,        //new_value == reference_value
+  CompareMode_NotEqual,     //new_value != reference_value
+  CompareMode_Less,         //new_value <  reference_value
+  CompareMode_LessEqual,    //new_value <= reference_value
+  CompareMode_Greater,      //new_value >  reference_value
+  CompareMode_GreaterEqual, //new_value >= reference_value
+
+  CompareMode_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,11 +98,6 @@ enum AccessFlag
   AccessFlag_Read  = 1, //доступ на чтение
   AccessFlag_Write = 2 //доступ на запись
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Матрица
-///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef float Matrix4f;
 
 }
 

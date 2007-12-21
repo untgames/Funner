@@ -8,14 +8,14 @@ int main ()
   {
     xtl::com_ptr<IDriver> driver (new TestDriver, false);
     
-    RenderSystem::RegisterDriver ("test_drv", get_pointer (driver));
+    DriverManager::RegisterDriver ("test_drv", get_pointer (driver));
     
     SwapChainDesc swap_chain_desc; //не инициализируется, поскольку не будет использован в дальнейшем    
     
     IDevice*    device     = 0;
     ISwapChain* swap_chain = 0;
     
-    RenderSystem::CreateSwapChainAndDevice ("*_drv", swap_chain_desc, "", swap_chain, device);
+    DriverManager::CreateSwapChainAndDevice ("*_drv", swap_chain_desc, "", swap_chain, device);
   }
   catch (std::exception& exception)
   {

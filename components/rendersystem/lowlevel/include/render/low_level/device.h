@@ -2,10 +2,10 @@
 #define RENDER_LOW_LEVEL_DEVICE_HEADER
 
 #include <exception>
+#include <render/low_level/buffer.h>
 #include <render/low_level/state.h>
-#include <render/low_level/texture.h>
+#include <render/low_level/view.h>
 #include <render/low_level/query.h>
-#include <render/low_level/frame_buffer.h>
 
 namespace render
 {
@@ -39,9 +39,8 @@ enum ShaderMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum ClearFlag
 {
-  ClearFlag_Color   = 1, //очищать буфер цвета (render-target)
-  ClearFlag_Depth   = 2, //очищать буфер глубины
-  ClearFlag_Stencil = 4  //очищать буфер трафарета
+  ClearFlag_RenderTargetView = 1, //очищать буферы цвета (render-target)
+  ClearFlag_DepthStencilView = 2, //очищать буфер глубины и трафарета
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,14 +59,6 @@ enum PrimitiveType
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Исключение: устройство перешло в некорректное состояние
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct LostDeviceException: public std::exception
-{
-  const char* what () const throw () { return "render::low_level::LostDeviceException"; }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class IDevice: virtual public IObject
@@ -82,22 +73,25 @@ class IDevice: virtual public IObject
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual IInputLayoutState*  CreateInputLayoutState  (const InputLayoutDesc&) = 0;
-    virtual ILightingState*     CreateLightingState     () = 0;
-    virtual IViewerState*       CreateViewerState       () = 0;
-    virtual ITransformState*    CreateTransformState    () = 0;
-    virtual IMaterialState*     CreateMaterialState     () = 0;
-    virtual IRasterizerState*   CreateRasterizerState   () = 0;
+    virtual ILightingState*     CreateLightingState     (const LightingDesc&) = 0;
+    virtual IViewerState*       CreateViewerState       (const ViewerDesc&) = 0;
+    virtual ITransformState*    CreateTransformState    (const TransformDesc&) = 0;
+    virtual IMaterialState*     CreateMaterialState     (const MaterialDesc&) = 0;
+    virtual IRasterizerState*   CreateRasterizerState   (const RasterizerDesc&) = 0;
     virtual IBlendState*        CreateBlendState        (const BlendDesc&) = 0;
     virtual IDepthStencilState* CreateDepthStencilState (const DepthStencilDesc&) = 0;
     virtual ISamplerState*      CreateSamplerState      (const SamplerDesc&) = 0;
     virtual IBuffer*            CreateVertexBuffer      (const BufferDesc&) = 0;
     virtual IBuffer*            CreateIndexBuffer       (const BufferDesc&) = 0;
     virtual ITexture*           CreateTexture           (const TextureDesc&) = 0;
-    virtual IFrameBuffer*       CreateFrameBuffer       (const FrameBufferDesc&) = 0;
-    virtual IFrameBuffer*       CreateFrameBuffer       (ISwapChain*) = 0;
-    virtual IFrameBuffer*       CreateFrameBuffer       (ITexture* render_target) = 0;
+    virtual IView*              CreateView              (ITexture* texture, const ViewDesc& desc) = 0;
     virtual IPredicate*         CreatePredicate         () = 0;
     virtual IStatisticsQuery*   CreateStatisticsQuery   () = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение отображение буфера цепочки обмена на текстуру
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual ITexture* GetBuffer (ISwapChain* swap_chain, size_t buffer_id) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление входным уровнем (input-stage)
@@ -148,20 +142,19 @@ class IDevice: virtual public IObject
     virtual void                OSSetBlendState        (IBlendState* state) = 0;
     virtual void                OSSetDepthStencil      (IDepthStencilState* state) = 0;
     virtual void                OSSetStencilReference  (size_t reference) = 0;
-    virtual void                OSSetFrameBuffer       (IFrameBuffer* frame_buffer) = 0;
+    virtual void                OSSetRenderTargets     (IView* render_target_view, IView* depth_stencil_view) = 0;
     virtual IBlendState*        OSGetBlendState        () = 0;
     virtual IDepthStencilState* OSGetDepthStencilState () = 0;
     virtual size_t              OSGetStencilReference  () = 0;
-    virtual IFrameBuffer*       OSGetFrameBuffer       () = 0;
+    virtual IView*              OSGetRenderTargetView  () = 0;
+    virtual IView*              OSGetDepthStencilView  () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очистка
+///Очистка буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void ClearColorBuffer   (IColorBuffer* buffer, const Color4f& color) = 0;
-    virtual void ClearDepthBuffer   (IDepthStencilBuffer* buffer, float depth) = 0;
-    virtual void ClearStencilBuffer (IDepthStencilBuffer* buffer, unsigned char value) = 0;
-    virtual void Clear              (IFrameBuffer* buffer, size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
-    virtual void Clear              (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
+    virtual void ClearRenderTargetView (const Color4f& color) = 0;
+    virtual void ClearDepthStencilView (float depth, unsigned char stencil) = 0;
+    virtual void ClearViews            (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление предикатами отрисовки

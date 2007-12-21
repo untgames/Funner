@@ -19,37 +19,78 @@ typedef DerivedException<Exception, OpenGLExceptionTag> OpenGLException;
     Описание реализации контекста OpenGL
 */
 
-typedef size_t ContextData [ContextDataTable_Num][CONTEXT_DATA_TABLE_SIZE];
+struct ContextImpl;
+
+typedef size_t                                ContextData [ContextDataTable_Num][CONTEXT_DATA_TABLE_SIZE];
+typedef xtl::com_ptr<ISwapChain>              SwapChainPtr;   //указатель на цепочку обмена
+typedef xtl::intrusive_ptr<ContextImpl>       ContextImplPtr; //указатель на реализацию контекста
+typedef stl::hash_map<size_t, ContextImplPtr> ContextMap;     //карта соответствия контекста OpenGL и цепочки обмена
 
 struct ContextImpl: public xtl::reference_counter
 {
-  Context     context; //контекст OpenGL
-  ContextData data;    //локальные данные контекста 
+  Context      context;           //контекст OpenGL
+  SwapChainPtr master_swap_chain; //главная цепочка обмена, связанная с контекстом
+  ContextData  data;              //локальные данные контекста 
 
-  ContextImpl (ISwapChain* swap_chain) : context (swap_chain)
+  ContextImpl (ISwapChain* swap_chain) : context (swap_chain), master_swap_chain (swap_chain)
+  {
+    Init ();
+  }
+
+  ContextImpl (ISwapChain* swap_chain, const Context& shared_context) : context (swap_chain, shared_context), master_swap_chain (swap_chain)
+  {
+    Init ();
+  }
+  
+    //инициализация
+  void Init ()
   {
     memset (data, 0, sizeof (data));
   }
+  
+    //установка локальных данных
+  void SetContextData (ContextDataTable table_id, size_t element_id, size_t value)
+  {
+    static const char* METHOD_NAME = "render::low_level::opengl::ContextImpl::SetContextData";
+    
+    if (table_id < 0 || table_id >= ContextDataTable_Num)
+      RaiseInvalidArgument (METHOD_NAME, "table_id", table_id);
+      
+    if (element_id >= CONTEXT_DATA_TABLE_SIZE)
+      RaiseOutOfRange (METHOD_NAME, "element_id", element_id, CONTEXT_DATA_TABLE_SIZE);
+      
+    data [table_id][element_id] = value;
+  }
 
-  ContextImpl (ISwapChain* swap_chain, const Context& shared_context) : context (swap_chain, shared_context)
+    //чтение локальных данных
+  size_t GetContextData (ContextDataTable table_id, size_t element_id)
+  {
+    static const char* METHOD_NAME = "render::low_level::opengl::ContextImpl::GetContextData";
+
+    if (table_id < 0 || table_id >= ContextDataTable_Num)
+      RaiseInvalidArgument (METHOD_NAME, "table_id", table_id);
+
+    if (element_id >= CONTEXT_DATA_TABLE_SIZE)
+      RaiseOutOfRange (METHOD_NAME, "element_id", element_id, CONTEXT_DATA_TABLE_SIZE);
+
+    return data [table_id][element_id];
+  }
+  
+    //очистка таблицы локальных данных
+  void ClearContextData (ContextDataTable table_id)
+  {
+    if (table_id < 0 || table_id >= ContextDataTable_Num)
+      RaiseInvalidArgument ("render::low_level::opengl::ContextManager::ClearContextData", "table_id", table_id);
+
+    memset (data [table_id], 0, sizeof (data [table_id]));
+  }
+  
+    //очистка всех таблиц локальных данных
+  void ClearContextData ()
   {
     memset (data, 0, sizeof (data));
-  }  
+  }
 };
-
-typedef xtl::intrusive_ptr<ContextImpl> ContextImplPtr;  //указатель на реализацию контекста
-
-struct ContextBind
-{
-  ContextImplPtr          context_impl;          //указатель на реализацию контекста
-  xtl::auto_slot<void ()> on_destroy_swap_chain; //слот обработчика события удаления соединения
-  
-  ContextBind (const ContextImplPtr& in_context_impl, xtl::slot<void ()>& destroy_handler) :
-    context_impl (in_context_impl), on_destroy_swap_chain (destroy_handler) {}
-};
-
-typedef stl::hash_map<ISwapChain*, ContextBind> ContextMap;   //карта соответствия контекста OpenGL и цепочки обмена
-typedef stl::vector<ContextImpl*>               ContextArray; //массив контекстов
 
 }
 
@@ -59,141 +100,159 @@ typedef stl::vector<ContextImpl*>               ContextArray; //массив контексто
 
 struct ContextManager::Impl: public xtl::reference_counter
 {
-  LogHandler   log_handler;      //обработчик протоколирования
-  ContextArray contexts;         //контексты
-  ContextMap   context_map;      //карта отображения цепочки обмена на контекст
-  ContextImpl* selected_context; //выбранный контекст
-  ISwapChain*  draw_swap_chain;  //цепочка обмена для рисования
-  ISwapChain*  read_swap_chain;  //цепочка обмена для чтения
+  LogHandler                log_handler;                //обработчик протоколирования
+  ContextMap                context_map;                //карта отображения цепочки обмена на контекст
+  ContextImpl*              current_context;            //текущий контекст
+  ISwapChain*               current_draw_swap_chain;    //цепочка обмена для рисования
+  ISwapChain*               current_read_swap_chain;    //цепочка обмена для чтения
+  size_t                    current_context_id;         //идентификатор текущего контекста (0 - отсутствует)
+  size_t                    next_context_id;            //номер следующего создаваемого контекста
+  Trackable::DestroyHandler on_destroy_draw_swap_chain; //обработчик удаления цепочки обмена для рисования 
+  Trackable::DestroyHandler on_destroy_read_swap_chain; //обработчик удаления цепочки обмена для чтения
   
-  Impl (const LogHandler& in_log_handler) : log_handler (in_log_handler), selected_context (0), draw_swap_chain (0), read_swap_chain (0) {}
-  
-  ContextImpl* GetContext (ISwapChain* swap_chain, bool create_new_context=true)
+  Impl (const LogHandler& in_log_handler) :
+    log_handler (in_log_handler),
+    current_context (0),
+    current_draw_swap_chain (0),
+    current_read_swap_chain (0),
+    current_context_id (0),
+    next_context_id (1),
+    on_destroy_draw_swap_chain (xtl::bind (&Impl::RestoreContext, this)),
+    on_destroy_read_swap_chain (xtl::bind (&Impl::RestoreContext, this))
+  {}
+ 
+    //создание контекста
+  size_t CreateContext (ISwapChain* swap_chain)
   {
-    ContextMap::iterator iter = context_map.find (swap_chain);
-    
-      //проверка: есть ли контекст соответствующий данной цепочке обмена
-    
-    if (iter != context_map.end ())
-      return &*iter->second.context_impl;
+    if (!swap_chain)
+      RaiseNullArgument ("render::low_level::opengl::ContextManager::CreateContext", "swap_chain");
 
-    Trackable* trackable = cast_object<Trackable> (swap_chain, "render::low_level::opengl::ContextManager::Impl", "swap_chain");
-
-    Trackable::DestroyHandler destroy_handler (xtl::bind (&Impl::OnDestroySwapChain, this, swap_chain));    
-
-      //попытка найти контекст для данной цепочки обмена
-
-    for (ContextArray::iterator i=contexts.begin (), end=contexts.end (); i!=end; ++i)
-      if ((*i)->context.IsCompatible (swap_chain))
-      {
-        context_map.insert_pair (swap_chain, ContextBind (*i, destroy_handler));
-        
-        trackable->RegisterDestroyHandler (destroy_handler);
-
-        return *i;
-      }
-      
-    if (!create_new_context)
-      return 0;
-      
-      //создание нового контекста
-      
     ContextImplPtr new_context;
+
+    if (context_map.empty ()) new_context = ContextImplPtr (new ContextImpl (swap_chain), false);
+    else                      new_context = ContextImplPtr (new ContextImpl (swap_chain, context_map.begin ()->second->context), false);
+
+    size_t new_context_id = next_context_id;
+
+    context_map.insert_pair (new_context_id, new_context);
+
+    next_context_id++;
+
+    return new_context_id;
+  }
+  
+    //удаление контекста
+  void DeleteContext (size_t context_id)
+  {
+    context_map.erase (context_id);
+
+    if (context_id == current_context_id)
+      RestoreContext ();
+  }
+  
+    //установка текущего контекста
+  void SetContext (size_t context_id, ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain)
+  {
+    static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::SetContext";
     
-    if (contexts.empty ())
+    if (context_id == current_context_id && draw_swap_chain == current_draw_swap_chain && read_swap_chain == current_read_swap_chain)
+      return;      
+
+      //поиск контекста
+      
+    ContextMap::iterator iter = context_map.find (context_id);
+    
+    if (iter == context_map.end ())
+      RaiseInvalidArgument (METHOD_NAME, "context_id", context_id);
+
+    ContextImplPtr context = iter->second;
+
+      //проверка совместимости контекста с цепочками обмена
+
+    if (!context->context.IsCompatible (draw_swap_chain))
+      RaiseInvalidArgument (METHOD_NAME, "draw_swap_chain", "ISwapChain instance", "Swap chain incompatible with context");
+
+    if (draw_swap_chain != read_swap_chain && !context->context.IsCompatible (read_swap_chain))
+      RaiseInvalidArgument (METHOD_NAME, "read_swap_chain", "ISwapChain instance", "Swap chain incompatible with context");
+
+      //регистрация обработчиков удаления цепочек обмена
+
+    Trackable *draw_swap_chain_trackable = cast_object<Trackable> (draw_swap_chain, METHOD_NAME, "draw_swap_chain"),
+              *read_swap_chain_trackable = cast_object<Trackable> (read_swap_chain, METHOD_NAME, "read_swap_chain");
+
+    draw_swap_chain_trackable->RegisterDestroyHandler (on_destroy_draw_swap_chain);
+    read_swap_chain_trackable->RegisterDestroyHandler (on_destroy_read_swap_chain);
+
+      //обновление данных
+
+    current_context         = &*iter->second;
+    current_draw_swap_chain = draw_swap_chain;
+    current_read_swap_chain = read_swap_chain;
+    current_context_id      = context_id;
+  }
+
+    //восставление контекста (после удаления контекста или цепочки обмена)
+  void RestoreContext ()
+  {
+      //если текущий контекст не удалён - устанавливаем в качестве текущих цепочек обмена основную цепочку обмена контекста
+    
+    ContextMap::iterator iter = context_map.find (current_context_id);
+
+    if (iter != context_map.end ())
     {
-      new_context = ContextImplPtr (new ContextImpl (swap_chain), false);
+      current_draw_swap_chain = current_read_swap_chain = &*current_context->master_swap_chain;
+
+      return;
     }
-    else
+    
+      //если был удалён текущий контекст
+      
+    if (context_map.empty ())
     {
-      new_context = ContextImplPtr (new ContextImpl (swap_chain, contexts.front ()->context), false);
+        //если удалены все контексты - восставление не возможно
+
+      current_draw_swap_chain = 0;
+      current_read_swap_chain = 0;
+      current_context         = 0;
+      current_context_id      = 0;
+
+      return;
     }
 
-    contexts.push_back (get_pointer (new_context));
-    
+      //выбираем в качестве текущего первый контекст из списка созданных вместе с его основной цепочкой обмена
+
+    ContextImplPtr context = context_map.begin ()->second;
+
+    current_context         = &*context;
+    current_read_swap_chain = &*context->master_swap_chain;
+    current_draw_swap_chain = current_read_swap_chain;
+    current_context_id      = context_map.begin ()->first;
+  }
+  
+    //активация текущего контекста
+  void MakeContextCurrent ()
+  {
+    static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::MakeContextCurrent";
+
+    if (!current_context)
+      RaiseInvalidOperation (METHOD_NAME, "Null active context");
+
     try
     {
-      context_map.insert_pair (swap_chain, ContextBind (new_context, destroy_handler));
-
-      trackable->RegisterDestroyHandler (destroy_handler);
+      current_context->context.MakeCurrent (current_draw_swap_chain, current_read_swap_chain);
     }
-    catch (...)
+    catch (common::Exception& exception)
     {
-      contexts.pop_back ();
+      exception.Touch (METHOD_NAME);
+
       throw;
-    }    
-
-    return get_pointer (new_context);
+    }
   }
   
-  ContextImpl* GetContext (ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain)
+    //проверка является ли текущий контекст активным
+  bool IsContextCurrent ()
   {
-    ContextImpl *draw_context = GetContext (draw_swap_chain),
-                *read_context = GetContext (read_swap_chain, false);
-
-    if (draw_context != read_context)
-      RaiseInvalidOperation ("render::low_level::opengl::ContextManager::Impl::GetContext", "Swap chains are incompatible");
-
-    return draw_context;
-  }
-  
-  void OnDestroySwapChain (ISwapChain* swap_chain)
-  {
-    ContextMap::iterator iter = context_map.find (swap_chain);
-
-    if (iter == context_map.end ())
-      return;
-
-    ContextImpl* context = &*iter->second.context_impl;
-    bool         need_context_delete = false;
-    
-    if (context->use_count () == 1)
-      need_context_delete = true;
-    
-      //удаление ассоциации цепочки обмена и контекста
-    
-    context_map.erase (iter);    
-    
-      //удаление последней ссылки на контекст - удаление контекста
-
-    if (need_context_delete)
-    {
-      contexts.erase (stl::remove (contexts.begin (), contexts.end (), context), contexts.end ());
-
-      if (selected_context == context)
-        selected_context = 0;
-    }
-
-      //очистка ссылок
-
-    if (swap_chain == draw_swap_chain)
-      draw_swap_chain = 0;
-
-    if (swap_chain == read_swap_chain)
-      read_swap_chain = 0;
-      
-      //восстановление контекста
-      
-    if (!selected_context)
-    {
-      if (contexts.empty ())
-        return; //восстановление невозможно
-      
-      selected_context = contexts.front ();
-    }
-
-    if (!draw_swap_chain)
-    {
-      for (ContextMap::iterator iter=context_map.begin (), end=context_map.end (); iter!=end; ++iter)
-        if (iter->second.context_impl == selected_context)
-        {
-          draw_swap_chain = iter->first;
-          break;
-        }
-    }
-
-    if (!read_swap_chain)
-      read_swap_chain = draw_swap_chain;
+    return current_context && current_context->context.IsCurrent (current_draw_swap_chain, current_read_swap_chain);
   }
 };
 
@@ -228,44 +287,41 @@ ContextManager& ContextManager::operator = (const ContextManager& manager)
 }
 
 /*
-    Выбор активных цепочек обмена
+    Создание / удаление контекста
 */
 
-void ContextManager::SetSwapChains (ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain)
+size_t ContextManager::CreateContext (ISwapChain* swap_chain)
 {
-  if (draw_swap_chain == impl->draw_swap_chain && read_swap_chain == impl->read_swap_chain)
-    return;
+  return impl->CreateContext (swap_chain);
+}
 
-  if (!draw_swap_chain)
-    RaiseNullArgument ("render::low_level::opengl::ContextManager::SetSwapChains", "draw_swap_chain");
+void ContextManager::DeleteContext (size_t context_id)
+{
+  impl->DeleteContext (context_id);
+}
 
-  if (!read_swap_chain)
-    RaiseNullArgument ("render::low_level::opengl::ContextManager::SetSwapChains", "read_swap_chain");
-    
-  try
-  {
-    ContextImpl* context = impl->GetContext (draw_swap_chain, read_swap_chain);
-  
-    impl->draw_swap_chain  = draw_swap_chain;
-    impl->read_swap_chain  = read_swap_chain;
-    impl->selected_context = context;
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::ContextManager::SetSwapChains");
-    
-    throw;
-  }
+/*
+    Выбор текущего контекста
+*/
+
+void ContextManager::SetContext (size_t context_id, ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain)
+{
+  impl->SetContext (context_id, draw_swap_chain, read_swap_chain);
 }
 
 ISwapChain* ContextManager::GetDrawSwapChain () const
 {
-  return impl->draw_swap_chain;
+  return impl->current_draw_swap_chain;
 }
 
 ISwapChain* ContextManager::GetReadSwapChain () const
 {
-  return impl->read_swap_chain;
+  return impl->current_read_swap_chain;
+}
+
+size_t ContextManager::GetContextId () const
+{
+  return impl->current_context_id;
 }
 
 /*
@@ -274,27 +330,12 @@ ISwapChain* ContextManager::GetReadSwapChain () const
 
 void ContextManager::MakeContextCurrent () const
 {
-  if (!impl->selected_context)
-    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::MakeContextCurrent", "Null active context");
-
-  try
-  {
-    impl->selected_context->context.MakeCurrent (impl->draw_swap_chain, impl->read_swap_chain);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::ContextManager::MakeContextCurrent");
-    
-    throw;
-  }
+  impl->MakeContextCurrent ();
 }
 
 bool ContextManager::IsContextCurrent () const
 {
-  if (!impl->selected_context)
-    return false;
-
-  return impl->selected_context->context.IsCurrent (impl->draw_swap_chain, impl->read_swap_chain);
+  return impl->IsContextCurrent ();
 }
 
 /*
@@ -303,49 +344,34 @@ bool ContextManager::IsContextCurrent () const
 
 void ContextManager::SetContextData (ContextDataTable table_id, size_t element_id, size_t value)
 {
-  if (!impl->selected_context)
+  if (!impl->current_context)
     RaiseInvalidOperation ("render::low_level::opengl::ContextManager::SetContextData", "Null active context");
-    
-  if (table_id < 0 || table_id >= ContextDataTable_Num)
-    RaiseInvalidArgument ("render::low_level::opengl::ContextManager::SetContextData", "table_id", table_id);
-    
-  if (element_id >= CONTEXT_DATA_TABLE_SIZE)
-    RaiseOutOfRange ("render::low_level::opengl::ContextManager::SetContextData", "element_id", element_id, CONTEXT_DATA_TABLE_SIZE);
-    
-  impl->selected_context->data [table_id][element_id] = value;
+
+  impl->current_context->SetContextData (table_id, element_id, value);
 }
 
 size_t ContextManager::GetContextData (ContextDataTable table_id, size_t element_id) const
 {
-  if (!impl->selected_context)
+  if (!impl->current_context)
     RaiseInvalidOperation ("render::low_level::opengl::ContextManager::GetContextData", "Null active context");
-    
-  if (table_id < 0 || table_id >= ContextDataTable_Num)
-    RaiseInvalidArgument ("render::low_level::opengl::ContextManager::GetContextData", "table_id", table_id);
-    
-  if (element_id >= CONTEXT_DATA_TABLE_SIZE)
-    RaiseOutOfRange ("render::low_level::opengl::ContextManager::GetContextData", "element_id", element_id, CONTEXT_DATA_TABLE_SIZE);
-    
-  return impl->selected_context->data [table_id][element_id];
+
+  return impl->current_context->GetContextData (table_id, element_id);
 }
 
 void ContextManager::ClearContextData (ContextDataTable table_id)
 {
-  if (!impl->selected_context)
+  if (!impl->current_context)
     RaiseInvalidOperation ("render::low_level::opengl::ContextManager::ClearContextData", "Null active context");
     
-  if (table_id < 0 || table_id >= ContextDataTable_Num)
-    RaiseInvalidArgument ("render::low_level::opengl::ContextManager::ClearContextData", "table_id", table_id);
-    
-  memset (impl->selected_context->data [table_id], 0, sizeof (impl->selected_context->data [table_id]));
+  impl->current_context->ClearContextData (table_id);
 }
 
 void ContextManager::ClearContextData ()
 {
-  if (!impl->selected_context)
+  if (!impl->current_context)
     RaiseInvalidOperation ("render::low_level::opengl::ContextManager::ClearContextData", "Null active context");
 
-  memset (impl->selected_context->data, 0, sizeof (impl->selected_context->data));
+  impl->current_context->ClearContextData ();
 }
 
 /*

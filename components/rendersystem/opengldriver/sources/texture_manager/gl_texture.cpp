@@ -34,8 +34,8 @@ void Texture::GetDesc (TextureDesc& target_desc)
   target_desc.layers       = desc.layers;
   target_desc.format       = desc.format;
   target_desc.generate_mips_enable = desc.generate_mips_enable;
-  target_desc.bind_flags   = BufferBindFlag_Texture;
-  target_desc.access_flags = BufferAccessFlag_Read | BufferAccessFlag_Write;
+  target_desc.bind_flags   = BindFlag_Texture;
+  target_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
 
   if ((target_desc.usage_mode != UsageMode_Default) && (target_desc.usage_mode != UsageMode_Static) && 
       (target_desc.usage_mode != UsageMode_Dynamic) && (target_desc.usage_mode != UsageMode_Stream))

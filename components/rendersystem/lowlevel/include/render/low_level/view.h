@@ -1,8 +1,7 @@
-#ifndef RENDER_LOW_LEVEL_BUFFER_HEADER
-#define RENDER_LOW_LEVEL_BUFFER_HEADER
+#ifndef RENDER_LOW_LEVEL_VIEW_HEADER
+#define RENDER_LOW_LEVEL_VIEW_HEADER
 
-#include <render/low_level/object.h>
-#include <render/low_level/common.h>
+#include <render/low_level/texture.h>
 
 namespace render
 {
@@ -11,32 +10,29 @@ namespace low_level
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Дескриптор буфера
+///Дескриптор отображения текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct BufferDesc
+struct ViewDesc
 {
-  size_t    size;         //размер буфера
-  UsageMode usage_mode;   //режим использования буфера
-  size_t    bind_flags;   //флаги биндинга буфера
-  size_t    access_flags; //флаги доступа к буферу
+  size_t layer;     //слой текстуры, на который делается отображение
+  size_t mip_level; //mip-уровень текстуры, на который делается отображение
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Буфер
+///Отображение текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class IBuffer: virtual public IObject
+class IView: virtual public IObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение дескриптора буфера
+///Текстура, на которую строится отображение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void GetDesc (BufferDesc&) = 0;
+    virtual ITexture* GetTexture () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение / запись из буфера
+///Получение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetData (size_t offset, size_t size, const void* data) = 0;
-    virtual void GetData (size_t offset, size_t size, void* data) = 0;
+    virtual void GetDesc (ViewDesc&) = 0;
 };
 
 }

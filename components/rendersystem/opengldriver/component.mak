@@ -10,7 +10,7 @@ OPENGLDRIVER_SOURCES.INCLUDE_DIRS     := include sources ../lowlevel/include ../
 OPENGLDRIVER_SOURCES.SOURCE_DIRS      := sources/common sources/platform/win32 sources/driver sources/input_stage sources/output_stage sources/texture_manager
 OPENGLDRIVER_SOURCES.LIB_DIRS         :=  
 OPENGLDRIVER_SOURCES.LIBS             := 
-OPENGLDRIVER_SOURCES.COMPILER_CFLAGS  :=
+OPENGLDRIVER_SOURCES.COMPILER_CFLAGS  := /wd4355
 OPENGLDRIVER_SOURCES.COMPILER_DEFINES := GLEW_STATIC GLEW_MX
 
 #Öåëü ¹2 - OpenGLrender system tests

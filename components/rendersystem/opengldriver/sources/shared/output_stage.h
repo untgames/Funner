@@ -26,11 +26,14 @@ class OutputStage
     ~OutputStage ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание буферов кадра
+///Получение отображение буфера цепочки обмена на текстуру
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IFrameBuffer* CreateFrameBuffer (const FrameBufferDesc&);
-    IFrameBuffer* CreateFrameBuffer (ISwapChain*);
-    IFrameBuffer* CreateFrameBuffer (ITexture* render_target);
+    ITexture* GetBuffer (ISwapChain* swap_chain, size_t buffer_id);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание отображений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IView* CreateView (ITexture* texture, const ViewDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание состояний выходного уровня
@@ -39,10 +42,11 @@ class OutputStage
     IDepthStencilState* CreateDepthStencilState (const DepthStencilDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с буфером кадра
+///Выбор целевых отображений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void          SetFrameBuffer (IFrameBuffer*);
-    IFrameBuffer* GetFrameBuffer () const;
+    void    SetRenderTargets    (IView* render_target_view, IView* depth_stencil_view);
+    IView*  GetRenderTargetView () const;
+    IView*  GetDepthStencilView () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка подуровня смешивания цветов
@@ -57,6 +61,13 @@ class OutputStage
     void                SetStencilReference  (size_t reference);
     IDepthStencilState* GetDepthStencilState () const;
     size_t              GetStencilReference  () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Очистка буферов отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ClearRenderTargetView (const Color4f& color);
+    void ClearDepthStencilView (float depth, unsigned char stencil);
+    void ClearViews            (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
 
   private:
     OutputStage (const OutputStage&); //no impl

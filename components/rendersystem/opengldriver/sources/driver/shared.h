@@ -106,22 +106,25 @@ class Device: virtual public IDevice, public Object
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IInputLayoutState*  CreateInputLayoutState  (const InputLayoutDesc&);
-    ILightingState*     CreateLightingState     ();
-    IViewerState*       CreateViewerState       ();
-    ITransformState*    CreateTransformState    ();
-    IMaterialState*     CreateMaterialState     ();
-    IRasterizerState*   CreateRasterizerState   ();
+    ILightingState*     CreateLightingState     (const LightingDesc&);
+    IViewerState*       CreateViewerState       (const ViewerDesc&);
+    ITransformState*    CreateTransformState    (const TransformDesc&);
+    IMaterialState*     CreateMaterialState     (const MaterialDesc&);
+    IRasterizerState*   CreateRasterizerState   (const RasterizerDesc&);
     IBlendState*        CreateBlendState        (const BlendDesc&);
     IDepthStencilState* CreateDepthStencilState (const DepthStencilDesc&);
     ISamplerState*      CreateSamplerState      (const SamplerDesc&);
     IBuffer*            CreateVertexBuffer      (const BufferDesc&);
     IBuffer*            CreateIndexBuffer       (const BufferDesc&);
     ITexture*           CreateTexture           (const TextureDesc&);
-    IFrameBuffer*       CreateFrameBuffer       (const FrameBufferDesc&);
-    IFrameBuffer*       CreateFrameBuffer       (ISwapChain*);
-    IFrameBuffer*       CreateFrameBuffer       (ITexture* render_target);
+    IView*              CreateView              (ITexture* texture, const ViewDesc&);
     IPredicate*         CreatePredicate         ();
     IStatisticsQuery*   CreateStatisticsQuery   ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение отображение буфера цепочки обмена на текстуру
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ITexture* GetBuffer (ISwapChain* swap_chain, size_t buffer_id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление входным уровнем (input-stage)
@@ -172,20 +175,19 @@ class Device: virtual public IDevice, public Object
     void                OSSetBlendState        (IBlendState* state);
     void                OSSetDepthStencil      (IDepthStencilState* state);
     void                OSSetStencilReference  (size_t reference);    
-    void                OSSetFrameBuffer       (IFrameBuffer* frame_buffer);
+    void                OSSetRenderTargets     (IView* render_target_view, IView* depth_stencil_view);
     IBlendState*        OSGetBlendState        ();
     IDepthStencilState* OSGetDepthStencilState ();
     size_t              OSGetStencilReference  ();
-    IFrameBuffer*       OSGetFrameBuffer       ();
+    IView*              OSGetRenderTargetView  ();
+    IView*              OSGetDepthStencilView  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очистка
+///Очистка буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ClearColorBuffer   (IColorBuffer* buffer, const Color4f& color);
-    void ClearDepthBuffer   (IDepthStencilBuffer* buffer, float depth);
-    void ClearStencilBuffer (IDepthStencilBuffer* buffer, unsigned char value);
-    void Clear              (IFrameBuffer* buffer, size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
-    void Clear              (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
+    void ClearRenderTargetView (const Color4f& color);
+    void ClearDepthStencilView (float depth, unsigned char stencil);
+    void ClearViews            (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление предикатами отрисовки

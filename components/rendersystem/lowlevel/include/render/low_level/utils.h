@@ -14,9 +14,9 @@ namespace low_level
 ///Получение строковых описаний элементов перечислений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const char* get_name (CompareMode);
-const char* get_name (BufferUsageMode);
-const char* get_name (BufferBindFlag);
-const char* get_name (BufferAccessFlag);
+const char* get_name (UsageMode);
+const char* get_name (BindFlag);
+const char* get_name (AccessFlag);
 const char* get_name (PixelFormat);
 const char* get_name (TextureDimension);
 const char* get_name (VertexAttributeSemantic);

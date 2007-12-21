@@ -1,4 +1,4 @@
-#include <render/low_level/system.h>
+#include <render/low_level/driver.h>
 
 #include <common/singleton.h>
 #include <common/strlib.h>
@@ -22,7 +22,7 @@ namespace low_level
     Описание реализации системы управления низкоуровневыми драйверами отрисовки
 */
 
-class RenderSystemImpl
+class DriverManagerImpl
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,24 +66,24 @@ class RenderSystemImpl
     Регистрация драйверов
 */
 
-void RenderSystemImpl::RegisterDriver (const char* name, IDriver* driver)
+void DriverManagerImpl::RegisterDriver (const char* name, IDriver* driver)
 {
   if (!name)
-    RaiseNullArgument ("render::low_level::RenderSystem::RegisterDriver", "name");
+    RaiseNullArgument ("render::low_level::DriverManager::RegisterDriver", "name");
 
   if (!driver)
-    RaiseNullArgument ("render::low_level::RenderSystem::RegisterDriver", "driver");
+    RaiseNullArgument ("render::low_level::DriverManager::RegisterDriver", "driver");
 
   DriverMap::iterator iter = drivers.find (name);
 
   if (iter != drivers.end ())
-    RaiseInvalidArgument ("render::low_level::RenderSystem::RegisterDriver", "name", name,
+    RaiseInvalidArgument ("render::low_level::DriverManager::RegisterDriver", "name", name,
                           "Driver with this name has been already registered");
 
   drivers.insert_pair (name, driver);
 }
 
-void RenderSystemImpl::UnregisterDriver (const char* name)
+void DriverManagerImpl::UnregisterDriver (const char* name)
 {
   if (!name)
     return;
@@ -95,7 +95,7 @@ void RenderSystemImpl::UnregisterDriver (const char* name)
     Поиск драйвера по имени
 */
 
-IDriver* RenderSystemImpl::FindDriver (const char* name)
+IDriver* DriverManagerImpl::FindDriver (const char* name)
 {
   if (!name)
     return 0;
@@ -108,7 +108,8 @@ IDriver* RenderSystemImpl::FindDriver (const char* name)
 /*
     Создание цепочки обмена
 */
-ISwapChain* RenderSystemImpl::CreateSwapChain (const char* driver_mask, const SwapChainDesc& swap_chain_desc)
+
+ISwapChain* DriverManagerImpl::CreateSwapChain (const char* driver_mask, const SwapChainDesc& swap_chain_desc)
 {
   if (!driver_mask)
     driver_mask = "*";
@@ -126,7 +127,7 @@ ISwapChain* RenderSystemImpl::CreateSwapChain (const char* driver_mask, const Sw
     Создание устройства отрисовки
 */
 
-bool RenderSystemImpl::CreateSwapChainAndDevice
+bool DriverManagerImpl::CreateSwapChainAndDevice
  (const char*          driver_mask,      //маска имени драйвера
   const SwapChainDesc& swap_chain_desc,  //дескриптор цепочки обмена
   const char*          init_string,      //строка инициализации
@@ -170,34 +171,34 @@ bool RenderSystemImpl::CreateSwapChainAndDevice
     Обёртки над обращениями к системе управления низкоуровневыми драйверами отрисовки
 */
 
-typedef Singleton<RenderSystemImpl> RenderSystemSingleton;
+typedef Singleton<DriverManagerImpl> DriverManagerSingleton;
 
-void RenderSystem::RegisterDriver (const char* name, IDriver* driver)
+void DriverManager::RegisterDriver (const char* name, IDriver* driver)
 {
-  RenderSystemSingleton::Instance ().RegisterDriver (name, driver);
+  DriverManagerSingleton::Instance ().RegisterDriver (name, driver);
 }
 
-void RenderSystem::UnregisterDriver (const char* name)
+void DriverManager::UnregisterDriver (const char* name)
 {
-  RenderSystemSingleton::Instance ().UnregisterDriver (name);
+  DriverManagerSingleton::Instance ().UnregisterDriver (name);
 }
 
-IDriver* RenderSystem::FindDriver (const char* name)
+IDriver* DriverManager::FindDriver (const char* name)
 {
-  return RenderSystemSingleton::Instance ().FindDriver (name);
+  return DriverManagerSingleton::Instance ().FindDriver (name);
 }
 
-ISwapChain* RenderSystem::CreateSwapChain (const char* driver_mask, const SwapChainDesc& swap_chain_desc)
+ISwapChain* DriverManager::CreateSwapChain (const char* driver_mask, const SwapChainDesc& swap_chain_desc)
 {
-  return RenderSystemSingleton::Instance ().CreateSwapChain (driver_mask, swap_chain_desc);
+  return DriverManagerSingleton::Instance ().CreateSwapChain (driver_mask, swap_chain_desc);
 }
 
-bool RenderSystem::CreateSwapChainAndDevice
+bool DriverManager::CreateSwapChainAndDevice
  (const char*          driver_mask,
   const SwapChainDesc& swap_chain_desc,
   const char*          init_string,
   ISwapChain*&         out_swap_chain,
   IDevice*&            out_device)
 {
-  return RenderSystemSingleton::Instance ().CreateSwapChainAndDevice (driver_mask, swap_chain_desc, init_string, out_swap_chain, out_device);
+  return DriverManagerSingleton::Instance ().CreateSwapChainAndDevice (driver_mask, swap_chain_desc, init_string, out_swap_chain, out_device);
 }
