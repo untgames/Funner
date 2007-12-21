@@ -1,4 +1,5 @@
 #include <wchar.h>
+#include <string.h>
 #include <common/utf_converter.h>
 
 /*void dump32(void *ptr,int l)
@@ -47,7 +48,7 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
    int srcSize;
    int srcBytes;
    bool r;
-   int i;
+   unsigned int i;
 
 //   printf("---source_buffer=%p\n",source_buffer);
 //   printf("---source_buffer_size=%d\n",source_buffer_size);
@@ -572,4 +573,61 @@ bool encode_UTF32( unsigned char* dst, int dstSize, int* dstBytes,char32 cp, boo
    return !err;
 }
 
+stl::wstring towstring (const char* string, int length)
+{
+   wchar_t wchar;
+   stl::wstring str;
+   for(int i=0;i<length;i++)
+   {
+      mbtowc(&wchar,&string[i],1);
+      str[i]=wchar;
+   }
+   return str;
+}
+
+stl::wstring towstring (const char* string)
+{
+   return towstring(string,strlen(string));
+}
+
+stl::wstring towstring (const stl::string& string)
+{
+   wchar_t wchar;
+   stl::wstring str;
+   for(unsigned int i=0;i<string.length();i++)
+   {
+      mbtowc(&wchar,&string[i],1);
+      str[i]=wchar;
+   }
+   return str;
+}
+
+stl::string  tostring  (const wchar_t* string, int length)
+{
+   char c;
+   stl::string str;
+   for(int i=0;i<length;i++)
+   {
+      wctomb(&c,string[i]);
+      str[i]=c;
+   }
+   return str;
+}
+
+stl::string  tostring  (const wchar_t* string)
+{
+   return tostring(string,wcslen(string));
+}
+
+stl::string  tostring  (const stl::wstring& string)
+{
+   char c;
+   stl::string str;
+   for(unsigned int i=0;i<string.length();i++)
+   {
+      wctomb(&c,string[i]);
+      str[i]=c;
+   }
+   return str;
+}
 }

@@ -122,5 +122,12 @@ int main()
   for (size_t i=0; i<4; i++)
     test_utf_converter (source_file_name [i], source_encoding [i]);
 
+  wchar_t *wc=L"Hello World!!! Привет Мир";
+  char     *c="Hello World!!! Привет Мир";
+  stl::string str=tostring(wc);
+  stl::wstring wstr=towstring(c);
+  printf("wchar->char %s\n",str);
+  wprintf(L"wchar->char %s\n",wstr);
+
   return 0;
 }
