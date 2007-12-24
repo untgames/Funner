@@ -15,3 +15,5 @@ test encoding chain: utf16be->utf32le->ascii7: 'Hello World!!! ?????? ???!!'
 test encoding chain: utf16be->utf32le->utf8: 'Hello World!!! РџСЂРёРІРµС‚ РњРё'
 test encoding chain: utf16be->utf32le->utf16le: 'Hello World!!! Привет Мир!!'
 test encoding chain: utf16be->utf32le->utf16be: 'Hello World!!! Привет Мир!!'
+wchar->char Hello World!!! Привет Мир
+wchar->char Hello World!!! Привет Мир

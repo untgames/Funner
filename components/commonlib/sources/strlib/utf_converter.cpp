@@ -140,10 +140,10 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
          case Encoding_Utf8:
             r=encode_UTF8((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc);
             break;
-         case Encoding_Utf16BE:	
+         case Encoding_Utf16BE: 
             r=encode_UTF16((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc,true);
             break;
-         case Encoding_Utf16LE:	
+         case Encoding_Utf16LE: 
             r=encode_UTF16((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc,false);
             break;
          case Encoding_Utf32BE:
@@ -244,7 +244,7 @@ bool decode_ASCII7( const unsigned char* src, int srcSize, int* srcBytes, char32
    {
       cp = *src++;
       //if ( cp >= (unsigned char)128 )
-      //err = 1;				// ERROR: Out-of-range ASCII-7 code
+      //err = 1;        // ERROR: Out-of-range ASCII-7 code
    }
    else
    {
@@ -575,60 +575,78 @@ bool encode_UTF32( unsigned char* dst, int dstSize, int* dstBytes,char32 cp, boo
 
 stl::wstring towstring (const char* string, int length)
 {
-   wchar_t wchar;
-   stl::wstring str;
-   for(int i=0;i<length;i++)
-   {
-      mbtowc(&wchar,&string[i],1);
-      str[i]=wchar;
-   }
-   return str;
+  if (!string)
+    return L"";
+
+  if (length == -1)
+    length = strlen (string);
+
+  stl::wstring result;
+  
+  int result_size = (int)mbstowcs (0, string, length);
+
+  if (result_size == -1)
+    return L"(common::towstring error)";
+
+  if (!result_size)
+    return L"";
+
+  result.fast_resize (result_size);
+  
+  mbstowcs (&result [0], string, length);
+
+  return result;
 }
 
 stl::wstring towstring (const char* string)
 {
-   return towstring(string,strlen(string));
+  return towstring (string, -1);
 }
 
 stl::wstring towstring (const stl::string& string)
 {
-   wchar_t wchar;
-   stl::wstring str;
-   for(unsigned int i=0;i<string.length();i++)
-   {
-      mbtowc(&wchar,&string[i],1);
-      str[i]=wchar;
-   }
-   return str;
+  if (string.empty ())
+    return L"";
+
+  return towstring (&string [0], string.size ());
 }
 
-stl::string  tostring  (const wchar_t* string, int length)
+stl::string tostring (const wchar_t* string, int length)
 {
-   char c;
-   stl::string str;
-   for(int i=0;i<length-1;i++)
-   {
-      wctomb(&c,string[i]);
-      str[i]=c;
-   }
-printf("sdfsdf\n");
-   return str;
+  if (!string)
+    return "";
+
+  if (length == -1)
+    length = wcslen (string);
+
+  stl::string result;
+  
+  int result_size = (int)wcstombs (0, string, length);
+  
+  if (result_size == -1)
+    return "(common::tostring error)";
+    
+  if (!result_size)
+    return "";
+  
+  result.fast_resize (result_size);
+  
+  wcstombs (&result [0], string, length);
+  
+  return result;
 }
 
-stl::string  tostring  (const wchar_t* string)
+stl::string tostring (const wchar_t* string)
 {
-   return tostring(string,wcslen(string));
+  return tostring (string, -1);
 }
 
-stl::string  tostring  (const stl::wstring& string)
+stl::string tostring (const stl::wstring& string)
 {
-   char c;
-   stl::string str;
-   for(unsigned int i=0;i<string.length();i++)
-   {
-      wctomb(&c,string[i]);
-      str[i]=c;
-   }
-   return str;
+  if (string.empty ())
+    return "";
+
+  return tostring (&string [0], string.size ());
 }
+
 }
