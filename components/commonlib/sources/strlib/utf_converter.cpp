@@ -606,11 +606,12 @@ stl::string  tostring  (const wchar_t* string, int length)
 {
    char c;
    stl::string str;
-   for(int i=0;i<length;i++)
+   for(int i=0;i<length-1;i++)
    {
       wctomb(&c,string[i]);
       str[i]=c;
    }
+printf("sdfsdf\n");
    return str;
 }
 

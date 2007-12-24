@@ -125,9 +125,10 @@ int main()
   wchar_t *wc=L"Hello World!!! Привет Мир";
   char     *c="Hello World!!! Привет Мир";
   stl::string str=tostring(wc);
+printf("====\n");
+  printf("wchar->char %s\n",str.c_str());
   stl::wstring wstr=towstring(c);
-  printf("wchar->char %s\n",str);
-  wprintf(L"wchar->char %s\n",wstr);
+  wprintf(L"wchar->char %s\n",wstr.c_str ());
 
   return 0;
 }
