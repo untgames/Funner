@@ -2,6 +2,7 @@
 #define RENDER_GL_DRIVER_DRIVER_SHARED_HEADER
 
 #include <render/low_level/device.h>
+#include <render/low_level/utils.h>
 #include <render/low_level/opengl_driver.h>
 
 #include <shared/platform/output_manager.h>
@@ -105,26 +106,23 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IInputLayoutState*  CreateInputLayoutState  (const InputLayoutDesc&);
-    ILightingState*     CreateLightingState     (const LightingDesc&);
-    IViewerState*       CreateViewerState       (const ViewerDesc&);
-    ITransformState*    CreateTransformState    (const TransformDesc&);
-    IMaterialState*     CreateMaterialState     (const MaterialDesc&);
-    IRasterizerState*   CreateRasterizerState   (const RasterizerDesc&);
-    IBlendState*        CreateBlendState        (const BlendDesc&);
-    IDepthStencilState* CreateDepthStencilState (const DepthStencilDesc&);
-    ISamplerState*      CreateSamplerState      (const SamplerDesc&);
-    IBuffer*            CreateVertexBuffer      (const BufferDesc&);
-    IBuffer*            CreateIndexBuffer       (const BufferDesc&);
-    ITexture*           CreateTexture           (const TextureDesc&);
-    IView*              CreateView              (ITexture* texture, const ViewDesc&);
-    IPredicate*         CreatePredicate         ();
-    IStatisticsQuery*   CreateStatisticsQuery   ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение отображение буфера цепочки обмена на текстуру
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ITexture* GetBuffer (ISwapChain* swap_chain, size_t buffer_id);
+    IInputLayoutState*  CreateInputLayoutState    (const InputLayoutDesc&);
+    ILightingState*     CreateLightingState       (const LightingDesc&);
+    IViewerState*       CreateViewerState         (const ViewerDesc&);
+    ITransformState*    CreateTransformState      (const TransformDesc&);
+    IMaterialState*     CreateMaterialState       (const MaterialDesc&);
+    IRasterizerState*   CreateRasterizerState     (const RasterizerDesc&);
+    IBlendState*        CreateBlendState          (const BlendDesc&);
+    IDepthStencilState* CreateDepthStencilState   (const DepthStencilDesc&);
+    ISamplerState*      CreateSamplerState        (const SamplerDesc&);
+    IBuffer*            CreateVertexBuffer        (const BufferDesc&);
+    IBuffer*            CreateIndexBuffer         (const BufferDesc&);
+    ITexture*           CreateTexture             (const TextureDesc&);
+    ITexture*           CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index);
+    ITexture*           CreateDepthStencilTexture (ISwapChain* swap_chain);
+    IView*              CreateView                (ITexture* texture, const ViewDesc&);
+    IPredicate*         CreatePredicate           ();
+    IStatisticsQuery*   CreateStatisticsQuery     ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление входным уровнем (input-stage)
@@ -173,7 +171,7 @@ class Device: virtual public IDevice, public Object
 ///Управление выходным уровнем (output-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                OSSetBlendState        (IBlendState* state);
-    void                OSSetDepthStencil      (IDepthStencilState* state);
+    void                OSSetDepthStencilState (IDepthStencilState* state);
     void                OSSetStencilReference  (size_t reference);    
     void                OSSetRenderTargets     (IView* render_target_view, IView* depth_stencil_view);
     IBlendState*        OSGetBlendState        ();

@@ -42,6 +42,12 @@ void Texture::GetDesc (TextureDesc& target_desc)
     target_desc.usage_mode = UsageMode_Default;
 }
 
+void Texture::GetDesc (BindableTextureDesc& desc)
+{
+  desc.id     = texture_id;
+  desc.target = target;
+}
+
 /*
    Выбор текстуры в контекст OpenGL
 */

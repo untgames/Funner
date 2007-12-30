@@ -13,7 +13,7 @@ OPENGLDRIVER_SOURCES.LIBS             :=
 OPENGLDRIVER_SOURCES.COMPILER_CFLAGS  := /wd4355
 OPENGLDRIVER_SOURCES.COMPILER_DEFINES := GLEW_STATIC GLEW_MX
 
-#Цель №2 - OpenGLrender system tests
+#Цель №2 - OpenGL render system tests
 OPENGLDRIVER_TESTS.TYPE             := test-suite
 OPENGLDRIVER_TESTS.INCLUDE_DIRS     := include sources ../lowlevel/include ../../commonlib/include ../../xtl/include ../../systemlib/include
 OPENGLDRIVER_TESTS.SOURCE_DIRS      := tests/driver tests/device

@@ -1,5 +1,8 @@
 #include "shared.h"
 
+//добавить GL_NV_blend_squaring (gl 1.4)
+//добавить blend-constant-color (gl 1.4)
+
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;

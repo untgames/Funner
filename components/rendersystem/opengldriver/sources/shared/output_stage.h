@@ -26,9 +26,11 @@ class OutputStage
     ~OutputStage ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение отображение буфера цепочки обмена на текстуру
+///Создание текстур
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ITexture* GetBuffer (ISwapChain* swap_chain, size_t buffer_id);
+    ITexture* CreateTexture             (const TextureDesc&);    
+    ITexture* CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index);
+    ITexture* CreateDepthStencilTexture (ISwapChain* swap_chain);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание отображений
@@ -57,7 +59,7 @@ class OutputStage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка подуровня попиксельного отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////          
-    void                SetDepthStencil      (IDepthStencilState* state);
+    void                SetDepthStencilState (IDepthStencilState* state);
     void                SetStencilReference  (size_t reference);
     IDepthStencilState* GetDepthStencilState () const;
     size_t              GetStencilReference  () const;

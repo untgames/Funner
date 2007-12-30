@@ -163,7 +163,21 @@ ISamplerState* Device::CreateSamplerState (const SamplerDesc& desc)
 
 ITexture* Device::CreateTexture (const TextureDesc& desc)
 {
-  return texture_manager.CreateTexture (desc);
+  if (desc.bind_flags & BindFlag_Texture)
+  {
+    return texture_manager.CreateTexture (desc);
+  }
+  else if (desc.bind_flags & (BindFlag_RenderTarget | BindFlag_DepthStencil))
+  {
+    return output_stage.CreateTexture (desc);
+  }
+  else
+  {
+    RaiseNotSupported ("render::low_level::opengl::Device::CreateTexture", "Unsupported bindbale flags desc.bind_flags=%s",
+      get_name ((BindFlag)desc.bind_flags));
+
+    return 0;
+  }
 }
 
 void Device::SSSetSampler (size_t sampler_slot, ISamplerState* state)
@@ -303,9 +317,14 @@ const Rect& Device::RSGetScissor ()
     ”правление выходным уровнем (output-stage)
 */
 
-ITexture* Device::GetBuffer (ISwapChain* swap_chain, size_t buffer_id)
+ITexture* Device::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
 {
-  return output_stage.GetBuffer (swap_chain, buffer_id);
+  return output_stage.CreateRenderTargetTexture (swap_chain, buffer_index);
+}
+
+ITexture* Device::CreateDepthStencilTexture (ISwapChain* swap_chain)
+{
+  return output_stage.CreateDepthStencilTexture (swap_chain);
 }
 
 IBlendState* Device::CreateBlendState (const BlendDesc& desc)
@@ -328,9 +347,9 @@ void Device::OSSetBlendState (IBlendState* state)
   output_stage.SetBlendState (state);
 }
 
-void Device::OSSetDepthStencil (IDepthStencilState* state)
+void Device::OSSetDepthStencilState (IDepthStencilState* state)
 {
-  output_stage.SetDepthStencil (state);
+  output_stage.SetDepthStencilState (state);
 }
 
 void Device::OSSetStencilReference (size_t reference)
