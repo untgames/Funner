@@ -72,26 +72,23 @@ class IDevice: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IInputLayoutState*  CreateInputLayoutState  (const InputLayoutDesc&) = 0;
-    virtual ILightingState*     CreateLightingState     (const LightingDesc&) = 0;
-    virtual IViewerState*       CreateViewerState       (const ViewerDesc&) = 0;
-    virtual ITransformState*    CreateTransformState    (const TransformDesc&) = 0;
-    virtual IMaterialState*     CreateMaterialState     (const MaterialDesc&) = 0;
-    virtual IRasterizerState*   CreateRasterizerState   (const RasterizerDesc&) = 0;
-    virtual IBlendState*        CreateBlendState        (const BlendDesc&) = 0;
-    virtual IDepthStencilState* CreateDepthStencilState (const DepthStencilDesc&) = 0;
-    virtual ISamplerState*      CreateSamplerState      (const SamplerDesc&) = 0;
-    virtual IBuffer*            CreateVertexBuffer      (const BufferDesc&) = 0;
-    virtual IBuffer*            CreateIndexBuffer       (const BufferDesc&) = 0;
-    virtual ITexture*           CreateTexture           (const TextureDesc&) = 0;
-    virtual IView*              CreateView              (ITexture* texture, const ViewDesc& desc) = 0;
-    virtual IPredicate*         CreatePredicate         () = 0;
-    virtual IStatisticsQuery*   CreateStatisticsQuery   () = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение отображение буфера цепочки обмена на текстуру
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual ITexture* GetBuffer (ISwapChain* swap_chain, size_t buffer_id) = 0;
+    virtual IInputLayoutState*  CreateInputLayoutState    (const InputLayoutDesc&) = 0;
+    virtual ILightingState*     CreateLightingState       (const LightingDesc&) = 0;
+    virtual IViewerState*       CreateViewerState         (const ViewerDesc&) = 0;
+    virtual ITransformState*    CreateTransformState      (const TransformDesc&) = 0;
+    virtual IMaterialState*     CreateMaterialState       (const MaterialDesc&) = 0;
+    virtual IRasterizerState*   CreateRasterizerState     (const RasterizerDesc&) = 0;
+    virtual IBlendState*        CreateBlendState          (const BlendDesc&) = 0;
+    virtual IDepthStencilState* CreateDepthStencilState   (const DepthStencilDesc&) = 0;
+    virtual ISamplerState*      CreateSamplerState        (const SamplerDesc&) = 0;
+    virtual IBuffer*            CreateVertexBuffer        (const BufferDesc&) = 0;
+    virtual IBuffer*            CreateIndexBuffer         (const BufferDesc&) = 0;
+    virtual ITexture*           CreateTexture             (const TextureDesc&) = 0;
+    virtual ITexture*           CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index) = 0;
+    virtual ITexture*           CreateDepthStencilTexture (ISwapChain* swap_chain) = 0;
+    virtual IView*              CreateView                (ITexture* texture, const ViewDesc& desc) = 0;
+    virtual IPredicate*         CreatePredicate           () = 0;
+    virtual IStatisticsQuery*   CreateStatisticsQuery     () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление входным уровнем (input-stage)
@@ -140,7 +137,7 @@ class IDevice: virtual public IObject
 ///Управление выходным уровнем (output-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void                OSSetBlendState        (IBlendState* state) = 0;
-    virtual void                OSSetDepthStencil      (IDepthStencilState* state) = 0;
+    virtual void                OSSetDepthStencilState (IDepthStencilState* state) = 0;
     virtual void                OSSetStencilReference  (size_t reference) = 0;
     virtual void                OSSetRenderTargets     (IView* render_target_view, IView* depth_stencil_view) = 0;
     virtual IBlendState*        OSGetBlendState        () = 0;

@@ -41,6 +41,12 @@ const char* get_name (UsageMode param)
   }
 }
 
+const char* get_name (BindFlag param)
+{
+  RaiseNotImplemented ("render::low_level::get_name(BindFlag)");
+  return "";  
+}
+
 /*const char* get_name (BufferBindFlag param)
 {
   switch (param)
