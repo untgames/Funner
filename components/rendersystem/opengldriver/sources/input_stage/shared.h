@@ -65,7 +65,7 @@ class SystemMemoryBuffer: public Buffer
     void* GetDataPointer ();
 
   private:
-    BufferDesc  bufferdesc; // дескриптор буфера
+    BufferDesc  buffer_desc; // дескриптор буфера
     void*       buffer;     // указатель на буфер в системной памяти
 };
 
@@ -103,7 +103,7 @@ class VboBuffer: public Buffer, public ContextObject
     void* GetDataPointer ();
 
   private:
-    BufferDesc  bufferdesc; // дескриптор буфера
+    BufferDesc  buffer_desc; // дескриптор буфера
     GLenum      target;     //целевой тип аппаратного буфера (GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER)
     GLuint      buffer_id;  //номер буфера в контексте OpenGL
 };

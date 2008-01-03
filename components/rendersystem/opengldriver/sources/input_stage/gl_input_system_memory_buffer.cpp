@@ -10,35 +10,42 @@ using namespace common;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SystemMemoryBuffer::SystemMemoryBuffer (const BufferDesc& desc)
-  : bufferdesc(desc)
+  : buffer_desc(desc)
 {
-  buffer = (void*)new char[bufferdesc.size]; // резервируем пам€ть
+  buffer = (void*)new char[buffer_desc.size]; // резервируем пам€ть
 }
 
 SystemMemoryBuffer::~SystemMemoryBuffer ()
 {
-  delete[] buffer;                          // буффер уж не нужен
+  delete[] buffer;                          // буффер уже не нужен
+}
+
+void SystemMemoryBuffer::GetDesc(BufferDesc& desc)
+{
+  desc = buffer_desc;
 }
   
 ///–абота с данными буфера
 void SystemMemoryBuffer::SetData (size_t offset, size_t size, const void* data)
 {
-  if (offset < 0 || offset >= bufferdesc.size)      // провер€ем смещение
+  if (offset >= buffer_desc.size)      // провер€ем смещение
     return;
   
   char* begin = (char*)buffer + offset;             // начало массива
-  size        = offset + size > bufferdesc.size ?   // размер массива
-                  bufferdesc.size - offset : size;
+  size        = offset + size > buffer_desc.size ?   // размер массива
+                  buffer_desc.size - offset : size;
   // само копирование
   memcpy((void*) begin, data, size);
 }
 
 void SystemMemoryBuffer::GetData (size_t offset, size_t size, void* data)
 {
-  if (offset < 0 || offset >= bufferdesc.size)      // провер€ем смещение
+  if (offset >= buffer_desc.size)      // провер€ем смещение
     return;
 
   char* begin = (char*)buffer + offset;
+  size        = offset + size > buffer_desc.size ?   // размер массива
+                  buffer_desc.size - offset : size;
   // копирование
   memcpy(data, (void*) begin, size);
 }
