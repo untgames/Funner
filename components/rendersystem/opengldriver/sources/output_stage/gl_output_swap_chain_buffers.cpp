@@ -30,6 +30,12 @@ SwapChainColorBuffer::SwapChainColorBuffer (const ContextManager& manager, ISwap
 
   if (buffer_index >= desc.buffers_count)
     RaiseOutOfRange (METHOD_NAME, "buffer_index", buffer_index, desc.buffers_count);
+    
+  switch (buffer_index)
+  {
+    case 0:  buffer_type = GL_FRONT; break;
+    default: buffer_type = GL_BACK;  break;
+  }
 }
 
 /*

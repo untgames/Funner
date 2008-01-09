@@ -28,6 +28,7 @@ class SwapChainManager
 ///Создание PBuffer'а
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static ISwapChain* CreatePBuffer (ISwapChain* source_chain, const SwapChainDesc& pbuffer_desc);
+    static ISwapChain* CreatePBuffer (ISwapChain* source_chain);
 };
 
 }

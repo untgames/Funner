@@ -178,6 +178,7 @@ class PBuffer: public SwapChain
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     PBuffer  (PrimarySwapChain* primary_swap_chain, const SwapChainDesc& desc);
+    PBuffer  (PrimarySwapChain* swap_chain);
     ~PBuffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,10 +218,11 @@ class PBuffer: public SwapChain
     void Destroy ();
     
   private:
-    SwapChainPtr  primary_swap_chain; //основная цепочка обмена
-    SwapChainDesc desc;               //дескриптор буфера
-    HPBUFFERARB   pbuffer;            //дескриптор PBuffer'а
-    HDC           output_context;     //контекст устройства вывода
+    SwapChainPtr  primary_swap_chain;  //основная цепочка обмена
+    SwapChainDesc desc;                //дескриптор буфера
+    HPBUFFERARB   pbuffer;             //дескриптор PBuffer'а
+    HDC           output_context;      //контекст устройства вывода
+    bool          create_largest_flag; //флаг, сигнализирующий о необходимости создания максимально возможного pbuffer'а
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

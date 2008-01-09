@@ -48,3 +48,17 @@ ISwapChain* SwapChainManager::CreatePBuffer (ISwapChain* primary_swap_chain, con
     throw;
   }
 }
+
+ISwapChain* SwapChainManager::CreatePBuffer (ISwapChain* swap_chain)
+{
+  try
+  {
+    return new PBuffer (cast_object<PrimarySwapChain> (swap_chain, "render::low_level::SwapChainManager::CreatePBuffer", "swap_chain"));
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::SwapChainManager::CreatePBuffer");
+
+    throw;
+  }
+}

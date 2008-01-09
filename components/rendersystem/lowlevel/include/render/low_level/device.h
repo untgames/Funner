@@ -39,8 +39,12 @@ enum ShaderMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum ClearFlag
 {
-  ClearFlag_RenderTargetView = 1, //очищать буферы цвета (render-target)
-  ClearFlag_DepthStencilView = 2, //очищать буфер глубины и трафарета
+  ClearFlag_RenderTarget = 1, //очищать буферы цвета (render-target)
+  ClearFlag_Depth        = 2, //очищать буфер глубины
+  ClearFlag_Stencil      = 4, //очищать буфер трафарета
+
+  ClearFlag_DepthStencil = ClearFlag_Depth | ClearFlag_Stencil,
+  ClearFlag_All          = ClearFlag_RenderTarget | ClearFlag_DepthStencil
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +154,7 @@ class IDevice: virtual public IObject
 ///Очистка буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void ClearRenderTargetView (const Color4f& color) = 0;
-    virtual void ClearDepthStencilView (float depth, unsigned char stencil) = 0;
+    virtual void ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil) = 0;
     virtual void ClearViews            (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

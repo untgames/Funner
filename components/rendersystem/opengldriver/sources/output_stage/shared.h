@@ -9,6 +9,7 @@
 #include <shared/context_object.h>
 #include <shared/object.h>
 #include <shared/trackable.h>
+//#include <shared/trackable_ptr.h>
 #include <shared/texture_manager.h>
 #include <shared/platform/swap_chain_manager.h>
 
@@ -121,7 +122,7 @@ class SwapChainColorBuffer: public ColorBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ISwapChain* GetSwapChain   () const { return swap_chain.get (); }
     size_t      GetBufferIndex () const { return buffer_index; }
-    GLenum      GetBufferType  () const;
+    GLenum      GetBufferType  () const { return buffer_type; }
 
   private:
     void Bind ();
@@ -133,6 +134,7 @@ class SwapChainColorBuffer: public ColorBuffer
   private:
     SwapChainPtr swap_chain;   //цепочка обмена
     size_t       buffer_index; //индекс буфера обмена в цепочке обмена
+    GLenum       buffer_type;  //тип буфера
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

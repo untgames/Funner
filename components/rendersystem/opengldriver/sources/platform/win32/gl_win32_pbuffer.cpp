@@ -8,9 +8,21 @@ using namespace common;
     Конструктор / деструктор
 */
 
-PBuffer::PBuffer (PrimarySwapChain* in_primary_swap_chain, const SwapChainDesc& in_desc)
-  : primary_swap_chain (in_primary_swap_chain), desc (in_desc), pbuffer (0), output_context (0)
+PBuffer::PBuffer (PrimarySwapChain* swap_chain, const SwapChainDesc& in_desc)
+  : primary_swap_chain (swap_chain), desc (in_desc), pbuffer (0), output_context (0), create_largest_flag (false)
 {
+  Create ();
+}
+
+PBuffer::PBuffer (PrimarySwapChain* swap_chain)
+  : primary_swap_chain (swap_chain), pbuffer (0), output_context (0), create_largest_flag (true)
+{
+    //заполнение дескриптора
+
+  swap_chain->GetDesc (desc);
+
+    //создание буфера
+
   Create ();
 }
 
@@ -42,10 +54,12 @@ void PBuffer::Create ()
     
       //создание PBuffer
 
-    int pbuffer_attributes [2] = {0, 0};
+    int  pbuffer_attributes []  = {0, 0, WGL_PBUFFER_LARGEST_ARB, 1, 0, 0};
+    int* pbuffer_attributes_ptr = create_largest_flag ? pbuffer_attributes + 2 : pbuffer_attributes;
 
-    pbuffer = wglCreatePbufferARB (primary_device_context, pixel_format, desc.frame_buffer.width, desc.frame_buffer.height, pbuffer_attributes);
-    
+    pbuffer = wglCreatePbufferARB (primary_device_context, pixel_format, desc.frame_buffer.width, desc.frame_buffer.height,
+                                   pbuffer_attributes_ptr);
+
     if (!pbuffer)
       raise_error ("wglCreatePbufferARB");
       

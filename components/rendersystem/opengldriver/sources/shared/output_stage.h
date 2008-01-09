@@ -68,8 +68,13 @@ class OutputStage
 ///Очистка буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ClearRenderTargetView (const Color4f& color);
-    void ClearDepthStencilView (float depth, unsigned char stencil);
+    void ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil);
     void ClearViews            (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка состояния уровня в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Bind ();
 
   private:
     OutputStage (const OutputStage&); //no impl

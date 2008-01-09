@@ -25,7 +25,7 @@ int main ()
     
     swap_chain_desc.window_handle = window.Handle ();
 
-    SwapChainPtr swap_chain (test.driver->CreateSwapChain (swap_chain_desc), false);
+    SwapChainPtr swap_chain (test.driver->CreateSwapChain (swap_chain_desc), false);    
     
     TexturePtr texture [4] = {
       TexturePtr (test.device->CreateRenderTargetTexture (test.swap_chain.get (), 1), false),
@@ -45,7 +45,22 @@ int main ()
     for (int i=0; i<4; i++)
       view [i] = ViewPtr (test.device->CreateView (texture [i].get (), view_desc), false);
 
-    test.device->OSSetRenderTargets (view [Window1_RenderTarget].get (), view [Window2_DepthStencil].get ());
+    test.device->OSSetRenderTargets (view [Window2_RenderTarget].get (), view [Window2_DepthStencil].get ());
+    
+    Color4f clear_color;
+    
+    clear_color.red   = 0;
+    clear_color.green = 0.7f;
+    clear_color.blue  = 0.7f;
+    clear_color.alpha = 0;
+
+    test.device->ClearViews (ClearFlag_All, clear_color, 0.5f, 12);
+    test.device->Draw (PrimitiveType_PointList, 0, 0);
+    
+    test.swap_chain->Present ();
+    swap_chain->Present ();
+    
+    syslib::Application::Run ();
   }
   catch (std::exception& exception)
   {

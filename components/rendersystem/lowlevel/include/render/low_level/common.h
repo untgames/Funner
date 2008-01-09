@@ -19,7 +19,7 @@ typedef float Matrix4f;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Color3f
 {
-  float red, green, blue;
+  float red, green, blue;  
 };
 
 struct Color4f: public Color3f

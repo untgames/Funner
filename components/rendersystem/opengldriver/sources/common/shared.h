@@ -10,6 +10,7 @@
 #include <shared/property_list.h>
 #include <shared/context_object.h>
 #include <shared/platform/context.h>
+#include <shared/platform/swap_chain_manager.h>
 
 #include <stl/string>
 #include <stl/vector>

@@ -396,9 +396,9 @@ void Device::ClearRenderTargetView (const Color4f& color)
   output_stage.ClearRenderTargetView (color);
 }
 
-void Device::ClearDepthStencilView (float depth, unsigned char stencil)
+void Device::ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil)
 {
-  output_stage.ClearDepthStencilView (depth, stencil);
+  output_stage.ClearDepthStencilView (clear_flags, depth, stencil);
 }
 
 void Device::ClearViews (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)
@@ -428,17 +428,100 @@ bool Device::GetPredicateValue ()
 }
 
 /*
+    Установка состояния устройства в контекст OpenGL
+*/
+
+void Device::Bind (size_t base_vertex, size_t base_index)
+{
+  output_stage.Bind ();
+  input_stage.Bind (base_vertex, base_index);
+}
+
+/*
     Рисование примитивов
 */
 
+namespace
+{
+
+//получение режима рисования примитивов OpenGL
+GLenum get_mode (PrimitiveType type, const char* source)
+{
+  switch (type)
+  {
+    case PrimitiveType_PointList:     return GL_POINTS;
+    case PrimitiveType_LineList:      return GL_LINES;
+    case PrimitiveType_LineStrip:     return GL_LINE_STRIP;
+    case PrimitiveType_TriangleList:  return GL_TRIANGLES;
+    case PrimitiveType_TriangleStrip: return GL_TRIANGLE_STRIP;
+    case PrimitiveType_TriangleFan:   return GL_TRIANGLE_FAN;
+    default:
+      RaiseInvalidArgument (source, "primitive_type", type);
+      return 0;
+  }
+}
+
+}
+
 void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::Draw");
+  static const char* METHOD_NAME = "render::low_level::opengl::Device::Draw";
+
+    //TODO: сделать проверку корректности индексов!!!
+    
+  GLenum mode = get_mode (primitive_type, METHOD_NAME);
+  
+  try
+  {
+      //установка состояния устройства в контекст OpenGL
+
+    Bind (0, 0);
+
+      //рисование
+
+    glDrawArrays (mode, first_vertex, vertices_count);
+
+      //проверка ошибок
+
+    context_manager.CheckErrors ("glDrawArrays");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch (METHOD_NAME);
+    
+    throw;
+  }
 }
 
 void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::DrawIndexed");
+  static const char* METHOD_NAME = "render::low_level::opengl::Device::DrawIndexed";
+
+    //TODO: сделать проверку корректности индексов!!!
+    
+  GLenum mode       = get_mode (primitive_type, METHOD_NAME),
+         index_type = input_stage.GetIndexType ();
+
+  try
+  {
+      //установка состояния устройства в контекст OpenGL
+
+    Bind (base_vertex, first_index);
+
+      //рисование
+
+    glDrawElements (mode, indices_count, index_type, input_stage.GetIndices ());
+
+      //проверка ошибок
+
+    context_manager.CheckErrors ("glDrawElements");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch (METHOD_NAME);
+
+    throw;
+  }
 }
 
 /*
@@ -447,7 +530,8 @@ void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size
 
 void Device::Flush ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::Flush");
+  context_manager.MakeContextCurrent ();
+  glFinish ();
 }
 
 /*

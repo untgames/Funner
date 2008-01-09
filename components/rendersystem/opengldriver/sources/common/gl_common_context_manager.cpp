@@ -254,6 +254,38 @@ struct ContextManager::Impl: public xtl::reference_counter
   {
     return current_context && current_context->context.IsCurrent (current_draw_swap_chain, current_read_swap_chain);
   }
+  
+    //создание цепочки обмена совместимой с контекстом
+  ISwapChain* CreateCompatibleSwapChain (size_t context_id)
+  {
+    static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::CreateCompatibleSwapChain";
+
+      //поиск контекста
+
+    ContextMap::iterator iter = context_map.find (context_id);
+
+    if (iter == context_map.end ())
+      RaiseInvalidArgument (METHOD_NAME, "context_id", context_id);
+
+    ContextImplPtr context = iter->second;
+    
+      //создание цепочки обмена
+      
+    return SwapChainManager::CreatePBuffer (context->master_swap_chain.get ());
+  }
+  
+    //проверка совместимости контекста и цепочки обмена
+  bool IsCompatible (size_t context_id, ISwapChain* swap_chain)
+  {
+      //поиск контекста
+
+    ContextMap::iterator iter = context_map.find (context_id);
+
+    if (iter == context_map.end ())
+      return false;
+
+    return iter->second->context.IsCompatible (swap_chain);
+  }
 };
 
 /*
@@ -298,6 +330,15 @@ size_t ContextManager::CreateContext (ISwapChain* swap_chain)
 void ContextManager::DeleteContext (size_t context_id)
 {
   impl->DeleteContext (context_id);
+}
+
+/*
+    Создание цепочки обмена совместимой с контекстом
+*/
+
+ISwapChain* ContextManager::CreateCompatibleSwapChain (size_t context_id)
+{
+  return impl->CreateCompatibleSwapChain (context_id);
 }
 
 /*
@@ -383,6 +424,15 @@ const char* ContextManager::GetSwapChainsExtensionString () const
   MakeContextCurrent ();
 
   return Context::GetSwapChainExtensionString ();
+}
+
+/*
+    Проверка совместимости контекста и цепочки обмена
+*/
+
+bool ContextManager::IsCompatible (size_t context_id, ISwapChain* swap_chain) const
+{
+  return impl->IsCompatible (context_id, swap_chain);
 }
 
 /*

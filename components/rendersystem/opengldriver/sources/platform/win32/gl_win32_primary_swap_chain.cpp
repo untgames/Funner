@@ -102,6 +102,13 @@ IOutput* PrimarySwapChain::GetContainingOutput ()
 
 void PrimarySwapChain::Present ()
 {
+    //сброс буфера команд OpenGL
+
+  if (wglGetCurrentDC () == output_context)
+    glFlush ();
+
+    //обмен переднего и заднего буфера отрисовки
+
   if (!SwapBuffers (output_context))
     raise_error (format ("render::low_level::opengl::PrimarySwapChain::Present(device-name='%s')", output->GetName ()).c_str ());
 }

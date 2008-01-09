@@ -38,8 +38,8 @@ class SwapChainFrameBuffer: public FrameBuffer, public ContextObject
     typedef xtl::com_ptr<SwapChainDepthStencilBuffer> DepthStencilBufferPtr;
 
   private:
-    ColorBufferPtr        color_buffer;         //буфер цвета
-    DepthStencilBufferPtr depth_stencil_buffer; //буфер глубина-трафарет
+    ColorBufferPtr        color_buffer;
+    DepthStencilBufferPtr depth_stencil_buffer;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,17 +73,46 @@ class DefaultOutputStageResourceFactory: public OutputStageResourceFactory, publ
     FrameBuffer* CreateFrameBuffer (IBindableTexture*, NullView);
     FrameBuffer* CreateFrameBuffer (IBindableTexture*, SwapChainDepthStencilBuffer*);
     FrameBuffer* CreateFrameBuffer (IBindableTexture*, IBindableTexture*);
+    
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск совместимых теневых буферов вывода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    SwapChainColorBuffer*        FindShadowBuffer (SwapChainDepthStencilBuffer*);
+    SwapChainDepthStencilBuffer* FindShadowBuffer (SwapChainColorBuffer*);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработчики удаления теневых буферов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RemoveColorBuffer        (SwapChainColorBuffer*);
+    void RemoveDepthStencilBuffer (SwapChainDepthStencilBuffer*);
+    
+  private:
+/*    struct ColorBufferHolder
+    {
+      SwapChainColorBuffer*     buffer;
+      Trackable::DestroyHandler on_destroy;
+      
+      ColorBufferHolder (SwapChainColorBuffer* in_buffer, xtl::slot<void ()>& destroy_handler)
+        : buffer (in_buffer), on_destroy (destroy_handler)
+      {
+        on_destroy
+      }
+    };*/
+  
+    typedef stl::list<SwapChainColorBuffer*>        ColorBufferList;
+    typedef stl::list<SwapChainDepthStencilBuffer*> DepthStencilBufferList;
+
+  private:
+    ColorBufferList           shadow_color_buffers;
+    DepthStencilBufferList    shadow_depth_stencil_buffers;
+    Trackable::DestroyHandler on_destroy_color_buffer;
+    Trackable::DestroyHandler on_destroy_depth_stencil_buffer;
 };
 
 /*
 ===================================================================================================
     SwapChainFrameBuffer
-===================================================================================================
-*/
-
-/*
-===================================================================================================
-    DefaultOutputStageResourceFactory
 ===================================================================================================
 */
 
@@ -107,7 +136,26 @@ SwapChainFrameBuffer::SwapChainFrameBuffer
 
 void SwapChainFrameBuffer::Bind ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::SwapChainDepthStencilBuffer::Bind");
+  size_t      context_id  = depth_stencil_buffer ? depth_stencil_buffer->GetContextId () : 0;
+  ISwapChain* swap_chain  = color_buffer ? color_buffer->GetSwapChain () : 0;
+  GLenum      buffer_type = color_buffer ? color_buffer->GetBufferType () : GL_BACK;
+  
+    //установка активного контекста
+
+  GetContextManager ().SetContext (context_id, swap_chain, swap_chain);
+  
+    //установка текущего контекста OpenGL
+
+  MakeContextCurrent ();
+  
+    //установка текущего буфера чтения и отрисовки
+
+  glReadBuffer (buffer_type);
+  glDrawBuffer (buffer_type);
+  
+    //проверка ошибок
+
+  CheckErrors ("render::low_level::opengl::SwapChainFrameBuffer::Bind");
 }
 
 /*
@@ -118,6 +166,12 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
 {
   RaiseNotImplemented ("render::low_level::opengl::SwapChainDepthStencilBuffer::UpdateRenderTargets");
 }
+
+/*
+===================================================================================================
+    DefaultOutputStageResourceFactory
+===================================================================================================
+*/
 
 /*
     Конструктор / деструктор
@@ -131,6 +185,18 @@ DefaultOutputStageResourceFactory::DefaultOutputStageResourceFactory (const Cont
 DefaultOutputStageResourceFactory::~DefaultOutputStageResourceFactory ()
 {
 }
+
+/*
+    Поиск совместимых теневых буферов вывода
+*/
+
+/*SwapChainColorBuffer* DefaultOutputStageResourceFactory::FindShadowBuffer (SwapChainDepthStencilBuffer*)
+{
+}
+
+SwapChainDepthStencilBuffer* DefaultOutputStageResourceFactory::FindShadowBuffer (SwapChainColorBuffer*)
+{
+} */
 
 /*
     Создание целевого буфера вывода    

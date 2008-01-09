@@ -93,3 +93,27 @@ IBuffer* InputStage::GetIndexBuffer () const
   RaiseNotImplemented ("render::low_level::opengl::InputStage::GetIndexBuffer");
   return 0;
 }
+
+/*
+    ѕолучение адреса начала массива индексов и типа индексов
+*/
+
+const void* InputStage::GetIndices () const
+{
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::GetIndices");
+  return 0;
+}
+
+GLenum InputStage::GetIndexType () const
+{
+  RaiseNotImplemented ("render::low_level::opengl::InputStage::GetIndexType");
+  return 0;
+}
+
+/*
+    ”становка состо€ни€ уровн€ в контекст OpenGL
+*/
+
+void InputStage::Bind (size_t base_vertex, size_t base_index)
+{
+}
