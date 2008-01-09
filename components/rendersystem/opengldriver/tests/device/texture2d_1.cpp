@@ -18,6 +18,7 @@ int main ()
     desc.height               = 512;
     desc.layers               = 0;
     desc.format               = PixelFormat_RGB8;
+    desc.bind_flags           = BindFlag_Texture;
     desc.generate_mips_enable = true;
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);

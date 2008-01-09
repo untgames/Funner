@@ -45,9 +45,9 @@ TextureManager::Impl::Impl (const ContextManager& context_manager) : ContextObje
 ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
 {
   if ((int)tex_desc.width > max_texture_size)
-    RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 2, max_texture_size);
+    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Max texture width is %u", max_texture_size);
   else if ((int)tex_desc.height > max_texture_size)
-    RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 2, max_texture_size);
+    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Max texture height is %u", max_texture_size);
   
   MakeContextCurrent ();
 
