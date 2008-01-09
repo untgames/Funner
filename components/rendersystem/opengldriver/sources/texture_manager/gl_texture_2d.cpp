@@ -14,8 +14,8 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
   bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
 
   Bind ();
-  glTexImage2D (GL_TEXTURE_2D, 0, GLInternalFormat (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                GLFormat (tex_desc.format), GLType (tex_desc.format), NULL);
+  glTexImage2D (GL_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -34,8 +34,8 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
 
       for (size_t i = 1; i < mips_count; i++)
       {
-        glTexImage2D (GL_TEXTURE_2D, i, GLInternalFormat (tex_desc.format), width, height, 0, 
-                      GLFormat (tex_desc.format), GLType (tex_desc.format), NULL);
+        glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format (tex_desc.format), width, height, 0, 
+                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
         if (width > 1) 
           width = width >> i;
         if (height > 1)
@@ -72,7 +72,7 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 
   if (mip_level && has_SGIS_generate_mipmap)
     glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, false); 
-  glTexSubImage2D (GL_TEXTURE_2D, mip_level, x, y, width, height, GLFormat (desc.format), GLType (desc.format), buffer);
+  glTexSubImage2D (GL_TEXTURE_2D, mip_level, x, y, width, height, gl_format (desc.format), gl_type (desc.format), buffer);
   if (mip_level && has_SGIS_generate_mipmap)
     glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, true);
 
@@ -84,13 +84,13 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
       height = height >> 1;
 
     char* source_buffer = (char*)buffer;
-    char* mip_buffer = new char [width * height * TexelSize (desc.format)];
+    char* mip_buffer = new char [width * height * texel_size (desc.format)];
 
     for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
     {
-      ScaleImage2XDown (desc.format, width, height, source_buffer, mip_buffer);
+      scale_image_2x_down (desc.format, width, height, source_buffer, mip_buffer);
 
-      glTexSubImage2D (GL_TEXTURE_2D, i, x, y, width, height, GLFormat (desc.format), GLType (desc.format), mip_buffer);
+      glTexSubImage2D (GL_TEXTURE_2D, i, x, y, width, height, gl_format (desc.format), gl_type (desc.format), mip_buffer);
 
       if (width > 1)
         width = width >> 1;
@@ -120,6 +120,6 @@ void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "height", desc.height, desc.height);
 
   MakeContextCurrent ();
-  glGetTexImage (GL_TEXTURE_2D, mip_level, GLFormat (desc.format), GLType (desc.format), buffer);
+  glGetTexImage (GL_TEXTURE_2D, mip_level, gl_format (desc.format), gl_type (desc.format), buffer);
   CheckErrors ("render::low_level::opengl::Texture2D::GetData");
 }

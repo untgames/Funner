@@ -44,6 +44,10 @@ class Texture : virtual public IBindableTexture, public ContextObject
     GLenum GetTarget    () const { return target; }
     GLuint GetTextureId () const { return texture_id; }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение параметров текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
   public:
     GLenum      target;      //целевой тип текстуры
     GLuint      texture_id;  //идентификатор текстуры
@@ -126,12 +130,11 @@ class TextureCubemap : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение параметров текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  ///ВНИМАНИЕ!!! имена не соотв. CppCS (https://unt.game-host.org/twiki/bin/view.cgi/Main/CppCodingStandarts#MyIIIdot2dot2dot1)
-size_t TexelSize        (PixelFormat format);
-GLint  GLInternalFormat (PixelFormat format);
-GLenum GLFormat         (PixelFormat format);
-GLenum GLType           (PixelFormat format);
-void ScaleImage2XDown   (PixelFormat format, size_t width, size_t height, const void* src, void* dest);
+size_t texel_size          (PixelFormat format);
+GLint  gl_internal_format  (PixelFormat format);
+GLenum gl_format           (PixelFormat format);
+GLenum gl_type             (PixelFormat format);
+void   scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest);
 
 }
 

@@ -72,7 +72,7 @@ namespace low_level
 namespace opengl
 {
   
-size_t TexelSize (PixelFormat format)
+size_t texel_size (PixelFormat format)
 {
   switch (format)
   {
@@ -92,7 +92,7 @@ size_t TexelSize (PixelFormat format)
   }
 }
 
-GLint GLInternalFormat (PixelFormat format)
+GLint gl_internal_format (PixelFormat format)
 {
   switch (format)
   {
@@ -101,9 +101,9 @@ GLint GLInternalFormat (PixelFormat format)
     case PixelFormat_LA8:   return GL_LUMINANCE8_ALPHA8;
     case PixelFormat_RGB8:  return GL_RGB8;
     case PixelFormat_RGBA8: return GL_RGBA8;
-    case PixelFormat_DXT1:
-    case PixelFormat_DXT3:
-    case PixelFormat_DXT5:
+    case PixelFormat_DXT1:  return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+    case PixelFormat_DXT3:  return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+    case PixelFormat_DXT5:  return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     case PixelFormat_S8:
     case PixelFormat_D16:
     case PixelFormat_D24X8:
@@ -112,18 +112,18 @@ GLint GLInternalFormat (PixelFormat format)
   }
 }
 
-GLenum GLFormat (PixelFormat format)
+GLenum gl_format (PixelFormat format)
 {
   switch (format)
   {
     case PixelFormat_L8:    return GL_LUMINANCE;
     case PixelFormat_A8:    return GL_ALPHA;
     case PixelFormat_LA8:   return GL_LUMINANCE_ALPHA;
-    case PixelFormat_RGB8:  return GL_RGB;
-    case PixelFormat_RGBA8: return GL_RGBA;
     case PixelFormat_DXT1:
+    case PixelFormat_RGB8:  return GL_RGB;
+    case PixelFormat_RGBA8: 
     case PixelFormat_DXT3:
-    case PixelFormat_DXT5:
+    case PixelFormat_DXT5:  return GL_RGBA;
     case PixelFormat_S8:
     case PixelFormat_D16:
     case PixelFormat_D24X8:
@@ -132,7 +132,7 @@ GLenum GLFormat (PixelFormat format)
   }
 }
 
-GLenum GLType (PixelFormat format)
+GLenum gl_type (PixelFormat format)
 {
   switch (format)
   {
@@ -141,10 +141,10 @@ GLenum GLType (PixelFormat format)
     case PixelFormat_S8:
     case PixelFormat_LA8:   
     case PixelFormat_RGB8:  
-    case PixelFormat_RGBA8: return GL_UNSIGNED_BYTE;
+    case PixelFormat_RGBA8: 
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
-    case PixelFormat_DXT5:
+    case PixelFormat_DXT5:  return GL_UNSIGNED_BYTE;
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:   

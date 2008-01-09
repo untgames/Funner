@@ -14,14 +14,14 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
   bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
 
   Bind ();
-  glTexImage1D (GL_TEXTURE_1D, 0, GLInternalFormat (tex_desc.format), tex_desc.width, 0, GLFormat (tex_desc.format), GLType (tex_desc.format), NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexImage1D (GL_TEXTURE_1D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   if (tex_desc.generate_mips_enable)
   {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     mips_count = (size_t)(log ((float)tex_desc.width) / log (2.f));
 
     if (has_SGIS_generate_mipmap)
@@ -29,7 +29,7 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
     else
     {
       for (size_t i = 1; i < mips_count; i++)
-        glTexImage1D (GL_TEXTURE_1D, i, GLInternalFormat (tex_desc.format), tex_desc.width >> i, 0, GLFormat (tex_desc.format), GLType (tex_desc.format), NULL);
+        glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format (tex_desc.format), tex_desc.width >> i, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
     }
   }
 
@@ -60,19 +60,19 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 
   if (mip_level && has_SGIS_generate_mipmap)
     glTexParameteri (GL_TEXTURE_1D, GL_GENERATE_MIPMAP_SGIS, false); 
-  glTexSubImage1D (GL_TEXTURE_1D, mip_level, x, width, GLFormat (desc.format), GLType (desc.format), buffer);
+  glTexSubImage1D (GL_TEXTURE_1D, mip_level, x, width, gl_format (desc.format), gl_type (desc.format), buffer);
   if (mip_level && has_SGIS_generate_mipmap)
     glTexParameteri (GL_TEXTURE_1D, GL_GENERATE_MIPMAP_SGIS, true);
   
   if (desc.generate_mips_enable && !mip_level && !has_SGIS_generate_mipmap)
   {
     char* source_buffer = (char*)buffer;
-    char* mip_buffer = new char [width >> 1 * TexelSize (desc.format)];
+    char* mip_buffer = new char [width >> 1 * texel_size (desc.format)];
 
     for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
     {
-      ScaleImage2XDown (desc.format, width >> i, 1, source_buffer, mip_buffer);
-      glTexSubImage1D (GL_TEXTURE_1D, i, x >> i, width >> i, GLFormat (desc.format), GLType (desc.format), mip_buffer);
+      scale_image_2x_down (desc.format, width >> i, 1, source_buffer, mip_buffer);
+      glTexSubImage1D (GL_TEXTURE_1D, i, x >> i, width >> i, gl_format (desc.format), gl_type (desc.format), mip_buffer);
     }
 
     delete [] mip_buffer;
@@ -93,6 +93,6 @@ void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "width", desc.width, desc.width);
 
   MakeContextCurrent ();
-  glGetTexImage (GL_TEXTURE_1D, mip_level, GLFormat (desc.format), GLType (desc.format), buffer);
+  glGetTexImage (GL_TEXTURE_1D, mip_level, gl_format (desc.format), gl_type (desc.format), buffer);
   CheckErrors ("render::low_level::opengl::Texture1D::GetData");
 }
