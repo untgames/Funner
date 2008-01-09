@@ -14,7 +14,7 @@ SystemMemoryBuffer::SystemMemoryBuffer (const BufferDesc& desc)
 {
   try
   {
-    buffer = (void*)new char[buffer_desc.size]; // резервируем память
+    buffer = new char [buffer_desc.size]; // резервируем память
   }
   catch (common::Exception& exception)        // давим все исключения
   {
@@ -27,15 +27,12 @@ SystemMemoryBuffer::~SystemMemoryBuffer ()
 {
   try
   {
-    delete[] buffer;                          // буффер уже не нужен
-  }
-  catch (common::Exception& exception)        // давим все исключения
-  {
-    exception.Touch("render::low_level::opengl::SystemMemoryBuffer::~SystemMemoryBuffer ()");
-    throw;
+    delete [] buffer;
   }
   catch (...)
-  { }
+  {
+    //подавление всех исключений
+  }
 }
 
 void SystemMemoryBuffer::GetDesc(BufferDesc& desc)
@@ -51,9 +48,9 @@ void SystemMemoryBuffer::SetData (size_t offset, size_t size, const void* data)
   
   char* begin = (char*)buffer + offset;             // начало массива
   size        = offset + size > buffer_desc.size ?   // размер массива
-                  buffer_desc.size - offset : size;
+                buffer_desc.size - offset : size;
   // само копирование
-  memcpy((void*) begin, data, size);
+  memcpy (begin, data, size);
 }
 
 void SystemMemoryBuffer::GetData (size_t offset, size_t size, void* data)
@@ -63,9 +60,9 @@ void SystemMemoryBuffer::GetData (size_t offset, size_t size, void* data)
 
   char* begin = (char*)buffer + offset;
   size        = offset + size > buffer_desc.size ?   // размер массива
-                  buffer_desc.size - offset : size;
+                buffer_desc.size - offset : size;
   // копирование
-  memcpy(data, (void*) begin, size);
+  memcpy (data, begin, size);
 }
 
 ///Установка буфера в контекст OpenGL
