@@ -173,7 +173,7 @@ ITexture* Device::CreateTexture (const TextureDesc& desc)
   }
   else
   {
-    RaiseNotSupported ("render::low_level::opengl::Device::CreateTexture", "Unsupported bindbale flags desc.bind_flags=%s",
+    RaiseNotSupported ("render::low_level::opengl::Device::CreateTexture", "Unsupported bindable flags desc.bind_flags=%s",
       get_name ((BindFlag)desc.bind_flags));
 
     return 0;
