@@ -73,6 +73,9 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
   if (mip_level)
     RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, 1);
     
+  if (source_format != PixelFormat_D24S8)
+    RaiseNotSupported (METHOD_NAME, "source_format != PixelFormat_D24S8");
+    
     //разделение данных буфера на компоненты глубины и трафарета
     
   xtl::uninitialized_storage<float>         depth_buffer (width * height);
@@ -120,6 +123,9 @@ void DepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size
     
   if (mip_level)
     RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, 1);    
+
+  if (target_format != PixelFormat_D24S8)
+    RaiseNotSupported (METHOD_NAME, "target_format != PixelFormat_D24S8");
     
     //создание буферов для хранения разделенных данных глубины и трафарета
 

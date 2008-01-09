@@ -49,6 +49,9 @@ void ColorBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
     
   if (mip_level)
     RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, 1);
+    
+  if (source_format != PixelFormat_RGBA8)
+    RaiseNotSupported (METHOD_NAME, "source_format != PixelFormat_RGBA8");
 
     //установка буфера в контекст OpenGL
 
@@ -81,6 +84,9 @@ void ColorBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, s
     
   if (mip_level)
     RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, 1);    
+    
+  if (target_format != PixelFormat_RGBA8)
+    RaiseNotSupported (METHOD_NAME, "target_format != PixelFormat_RGBA8");
 
     //установка буфера в контекст OpenGL
 
