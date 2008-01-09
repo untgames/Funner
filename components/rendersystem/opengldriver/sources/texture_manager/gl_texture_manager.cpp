@@ -44,16 +44,16 @@ TextureManager::Impl::Impl (const ContextManager& context_manager) : ContextObje
   
 ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
 {
-  if ((int)tex_desc.width > max_texture_size)
-    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Max texture width is %u", max_texture_size);
-  else if ((int)tex_desc.height > max_texture_size)
-    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Max texture height is %u", max_texture_size);
+  if (((int)tex_desc.width > max_texture_size) || ((int)tex_desc.height > max_texture_size))
+    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                       "Can't create texture %u*%u. Reason: maximum texture size is %u*%u", 
+                        tex_desc.width, tex_desc.height, max_texture_size, max_texture_size);
   
   MakeContextCurrent ();
 
   bool has_EXT_texture_compression_s3tc = (GLEW_ARB_texture_compression || GLEW_VERSION_1_3) && GLEW_EXT_texture_compression_s3tc;
 
-  if (!has_EXT_texture_compression_s3tc && ((tex_desc.format == PixelFormat_DXT1) || (tex_desc.format == PixelFormat_DXT3) || (tex_desc.format == PixelFormat_DXT5)))
+  if (!has_EXT_texture_compression_s3tc && is_compressed_format (tex_desc.format))
     RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "DXT texture comression not supported!");
 
   switch (tex_desc.dimension)
@@ -63,11 +63,15 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       if ((tex_desc.width < 2))
         RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 2, max_texture_size);
       if ((tex_desc.width - 1) & tex_desc.width) 
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width");
+        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width, 
+                              "Texture width must be power of 2");
+      if (is_compressed_format (tex_desc.format))
+        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.format");
 
       GLint width;
 
       glTexImage1D (GL_PROXY_TEXTURE_1D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+      
       glGetTexLevelParameteriv (GL_PROXY_TEXTURE_1D, 0, GL_TEXTURE_WIDTH, &width);
       if (!width)
         Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
@@ -82,14 +86,27 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       if ((tex_desc.height < 2))
         RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 2, max_texture_size);
       if ((tex_desc.width - 1) & tex_desc.width) 
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width");
+        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width,
+                              "Texture width must be power of 2");
       if ((tex_desc.height - 1) & tex_desc.height) 
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height");
+        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
+                              "Texture height must be power of 2");
+      if ((tex_desc.width & 3) && is_compressed_format (tex_desc.format))
+        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width,
+                              "Texture width for compressed image must be a multiple 4");
+      if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
+        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
+                              "Texture height for compressed image must be a multiple 4");
 
       GLint width;
 
-      glTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                    gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+      if (is_compressed_format (tex_desc.format))
+        glCompressedTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                                ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+      else
+        glTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+      
       glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
       if (!width)
         Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 

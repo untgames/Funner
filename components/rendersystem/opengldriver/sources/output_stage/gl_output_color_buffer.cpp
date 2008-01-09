@@ -37,7 +37,7 @@ void ColorBuffer::GetDesc (TextureDesc& out_desc)
     Работа с данными
 */
 
-void ColorBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, const void* buffer)
+void ColorBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::ColorBuffer::SetData";
 
@@ -69,7 +69,7 @@ void ColorBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
   CheckErrors (METHOD_NAME);
 }
 
-void ColorBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer)
+void ColorBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::ColorBuffer::GetData";
 

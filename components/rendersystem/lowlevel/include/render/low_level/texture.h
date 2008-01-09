@@ -74,8 +74,8 @@ class ITexture : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, const void* buffer) = 0;
-    virtual void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer) = 0;
+    virtual void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer) = 0;
+    virtual void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer) = 0;
 };
 
 }

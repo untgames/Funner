@@ -14,11 +14,14 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
   bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
 
   Bind ();
+
   glTexImage1D (GL_TEXTURE_1D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+
   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
   if (tex_desc.generate_mips_enable)
   {
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -40,7 +43,7 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
    Работа с данными
 */
 
-void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, const void* buffer)
+void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
   if (!buffer)
     RaiseNullArgument ("render::low_level::opengl::Texture1D::SetData", "buffer");
@@ -57,22 +60,22 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   MakeContextCurrent ();
 
   Bind ();
-
+  
   if (mip_level && has_SGIS_generate_mipmap)
     glTexParameteri (GL_TEXTURE_1D, GL_GENERATE_MIPMAP_SGIS, false); 
-  glTexSubImage1D (GL_TEXTURE_1D, mip_level, x, width, gl_format (desc.format), gl_type (desc.format), buffer);
+  glTexSubImage1D (GL_TEXTURE_1D, mip_level, x, width, gl_format (source_format), gl_type (source_format), buffer);
   if (mip_level && has_SGIS_generate_mipmap)
     glTexParameteri (GL_TEXTURE_1D, GL_GENERATE_MIPMAP_SGIS, true);
   
   if (desc.generate_mips_enable && !mip_level && !has_SGIS_generate_mipmap)
   {
     char* source_buffer = (char*)buffer;
-    char* mip_buffer = new char [width >> 1 * texel_size (desc.format)];
+    char* mip_buffer = new char [width >> 1 * texel_size (source_format)];
 
     for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
     {
-      scale_image_2x_down (desc.format, width >> i, 1, source_buffer, mip_buffer);
-      glTexSubImage1D (GL_TEXTURE_1D, i, x >> i, width >> i, gl_format (desc.format), gl_type (desc.format), mip_buffer);
+      scale_image_2x_down (source_format, width >> i, 1, source_buffer, mip_buffer);
+      glTexSubImage1D (GL_TEXTURE_1D, i, x >> i, width >> i, gl_format (source_format), gl_type (source_format), mip_buffer);
     }
 
     delete [] mip_buffer;
@@ -81,7 +84,7 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   CheckErrors ("render::low_level::opengl::Texture1D::SetData");
 }
 
-void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer)
+void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   if (!buffer)
     RaiseNullArgument ("render::low_level::opengl::Texture1D::SetData", "buffer");
@@ -93,6 +96,8 @@ void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "width", desc.width, desc.width);
 
   MakeContextCurrent ();
-  glGetTexImage (GL_TEXTURE_1D, mip_level, gl_format (desc.format), gl_type (desc.format), buffer);
+
+  glGetTexImage (GL_TEXTURE_1D, mip_level, gl_format (target_format), gl_type (target_format), buffer);
+  
   CheckErrors ("render::low_level::opengl::Texture1D::GetData");
 }

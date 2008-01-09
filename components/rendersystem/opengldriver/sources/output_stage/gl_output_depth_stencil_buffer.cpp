@@ -60,7 +60,7 @@ inline size_t get_depth_stencil_pixel (float depth, unsigned char stencil)
 
 }
 
-void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, const void* buffer)
+void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::DepthStencilBuffer::SetData";
 
@@ -108,7 +108,7 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
   CheckErrors (METHOD_NAME);
 }
 
-void DepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer)
+void DepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::DepthStencilBuffer::GetData";
 

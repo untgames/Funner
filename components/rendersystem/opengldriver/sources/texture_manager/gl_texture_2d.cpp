@@ -14,12 +14,19 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
   bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
 
   Bind ();
-  glTexImage2D (GL_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+
+  if (is_compressed_format (tex_desc.format))   
+    glCompressedTexImage2D (GL_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 
+                            tex_desc.height, 0, ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+  else
+    glTexImage2D (GL_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                  gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  
   if (tex_desc.generate_mips_enable)
   {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -34,8 +41,12 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
 
       for (size_t i = 1; i < mips_count; i++)
       {
-        glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format (tex_desc.format), width, height, 0, 
-                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+        if (is_compressed_format (tex_desc.format))   
+          glCompressedTexImage2D (GL_TEXTURE_2D, i, gl_internal_format (tex_desc.format), width, 
+                                  height, 0, ((width * height) >> 4) / compressed_quad_size (tex_desc.format), NULL);
+        else
+          glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format (tex_desc.format), width, height, 0, 
+                        gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
         if (width > 1) 
           width = width >> i;
         if (height > 1)
@@ -51,60 +62,81 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
    Работа с данными
 */
 
-void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, const void* buffer)
+void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
   if (!buffer)
     RaiseNullArgument ("render::low_level::opengl::Texture2D::SetData", "buffer");
 
   if (mip_level > mips_count)
-    RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "mip_level", 0, mips_count);
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "mip_level", 0, mips_count);
   if (x + width > desc.width)
     RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "x + width", 0, desc.width);
   if (y + height > desc.height)
     RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "y + height", 0, desc.height);
   if (!width || !height)
     return;
+  if (is_compressed_format (desc.format))
+  {
+    if (source_format != desc.format)
+      RaiseInvalidArgument ("render::low_level::opengl::Texture2D::SetData", "source_format");
+    if (desc.generate_mips_enable)
+      RaiseInvalidOperation ("render::low_level::opengl::Texture2D::SetData", "Generate mipmaps not compatible with compressed textures.");
+    if (x & 3)
+      RaiseInvalidArgument ("render::low_level::opengl::Texture2D::SetData", "x", x, "x must be a multiple of 4.");
+    if (y & 3)
+      RaiseInvalidArgument ("render::low_level::opengl::Texture2D::SetData", "y", y, "y must be a multiple of 4.");
+    if (width & 3)
+      RaiseInvalidArgument ("render::low_level::opengl::Texture2D::SetData", "width", width, "width must be a multiple of 4.");
+    if (height & 3)
+      RaiseInvalidArgument ("render::low_level::opengl::Texture2D::SetData", "height", height, "height must be a multiple of 4.");
+  }
 
   bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
 
   MakeContextCurrent ();
   Bind ();
 
-  if (mip_level && has_SGIS_generate_mipmap)
-    glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, false); 
-  glTexSubImage2D (GL_TEXTURE_2D, mip_level, x, y, width, height, gl_format (desc.format), gl_type (desc.format), buffer);
-  if (mip_level && has_SGIS_generate_mipmap)
-    glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, true);
+  if (is_compressed_format (source_format))
+    glCompressedTexSubImage2D (GL_TEXTURE_2D, mip_level, x, y, width, height, gl_format (source_format), 
+                               ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
+  else
+  {
+    if (mip_level && has_SGIS_generate_mipmap)
+      glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, false); 
+    glTexSubImage2D (GL_TEXTURE_2D, mip_level, x, y, width, height, gl_format (source_format), gl_type (source_format), buffer);
+    if (mip_level && has_SGIS_generate_mipmap)
+      glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, true);
 
-  if (desc.generate_mips_enable && !mip_level && !has_SGIS_generate_mipmap)
-  {    
-    if (width > 1)
-      width = width >> 1;
-    if (height > 1)
-      height = height >> 1;
-
-    char* source_buffer = (char*)buffer;
-    char* mip_buffer = new char [width * height * texel_size (desc.format)];
-
-    for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
-    {
-      scale_image_2x_down (desc.format, width, height, source_buffer, mip_buffer);
-
-      glTexSubImage2D (GL_TEXTURE_2D, i, x, y, width, height, gl_format (desc.format), gl_type (desc.format), mip_buffer);
-
+    if (desc.generate_mips_enable && !mip_level && !has_SGIS_generate_mipmap)
+    {    
       if (width > 1)
         width = width >> 1;
       if (height > 1)
         height = height >> 1;
-    }
 
-    delete [] mip_buffer;
+      char* source_buffer = (char*)buffer;
+      char* mip_buffer = new char [width * height * texel_size (source_format)];
+
+      for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
+      {
+        scale_image_2x_down (source_format, width, height, source_buffer, mip_buffer);
+
+        glTexSubImage2D (GL_TEXTURE_2D, i, x, y, width, height, gl_format (source_format), gl_type (source_format), mip_buffer);
+
+        if (width > 1)
+          width = width >> 1;
+        if (height > 1)
+          height = height >> 1;
+      }
+
+      delete [] mip_buffer;
+    }
   }
 
   CheckErrors ("render::low_level::opengl::Texture2D::SetData");
 }
 
-void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, void* buffer)
+void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   if (!buffer)
     RaiseNullArgument ("render::low_level::opengl::Texture2D::SetData", "buffer");
@@ -118,8 +150,16 @@ void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "width", desc.width, desc.width);
   if (height != desc.height)
     RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "height", desc.height, desc.height);
+  if (is_compressed_format (target_format))
+    if (target_format != desc.format)
+      RaiseInvalidArgument ("render::low_level::opengl::Texture2D::GetData", "target_format");
 
   MakeContextCurrent ();
-  glGetTexImage (GL_TEXTURE_2D, mip_level, gl_format (desc.format), gl_type (desc.format), buffer);
+
+  if (is_compressed_format (target_format))
+    glGetCompressedTexImage (GL_TEXTURE_2D, mip_level, buffer);
+  else
+    glGetTexImage (GL_TEXTURE_2D, mip_level, gl_format (target_format), gl_type (target_format), buffer);
+  
   CheckErrors ("render::low_level::opengl::Texture2D::GetData");
 }
