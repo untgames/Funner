@@ -132,6 +132,15 @@ struct InputStage::Impl: public ContextObject
     return 0;
   }
   
+  //////////////////////////////////////////
+  /// Заглушка для контекста
+  //////////////////////////////////////////  
+  
+  void MakeContextCurrent()
+  {
+    ContextObject::MakeContextCurrent();
+  }
+  
 private:
   IInputLayoutState*  input_state;
   IBuffer*            vertex_buffer_slots[Max_Vertex_Buffer_Slots];
@@ -178,6 +187,8 @@ IBuffer* InputStage::CreateVertexBuffer (const BufferDesc& desc)
 {
   try
   {
+    impl->MakeContextCurrent();
+    
     if (!(desc.bind_flags & BindFlag_VertexBuffer))
       RaiseInvalidArgument("render::low_level::opengl::InputStage::CreateVertexBuffer (const BufferDesc& desc)",
                            "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
@@ -201,6 +212,8 @@ IBuffer* InputStage::CreateIndexBuffer (const BufferDesc& desc)
 {
   try
   {
+    impl->MakeContextCurrent();
+
     if (!(desc.bind_flags & BindFlag_IndexBuffer))
       RaiseInvalidArgument("render::low_level::opengl::InputStage::CreateVertexBuffer (const BufferDesc& desc)",
                            "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
