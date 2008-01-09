@@ -12,12 +12,30 @@ using namespace common;
 SystemMemoryBuffer::SystemMemoryBuffer (const BufferDesc& desc)
   : buffer_desc(desc)
 {
-  buffer = (void*)new char[buffer_desc.size]; // резервируем память
+  try
+  {
+    buffer = (void*)new char[buffer_desc.size]; // резервируем память
+  }
+  catch (common::Exception& exception)        // давим все исключения
+  {
+    exception.Touch("render::low_level::opengl::SystemMemoryBuffer::SystemMemoryBuffer ()");
+    throw;
+  }
 }
 
 SystemMemoryBuffer::~SystemMemoryBuffer ()
 {
-  delete[] buffer;                          // буффер уже не нужен
+  try
+  {
+    delete[] buffer;                          // буффер уже не нужен
+  }
+  catch (common::Exception& exception)        // давим все исключения
+  {
+    exception.Touch("render::low_level::opengl::SystemMemoryBuffer::~SystemMemoryBuffer ()");
+    throw;
+  }
+  catch (...)
+  { }
 }
 
 void SystemMemoryBuffer::GetDesc(BufferDesc& desc)
