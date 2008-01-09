@@ -69,18 +69,21 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
       set_attribute (iter, WGL_STENCIL_BITS_ARB,    swap_chain_desc.frame_buffer.stencil_bits);
       set_attribute (iter, WGL_ACCELERATION_ARB,    WGL_FULL_ACCELERATION_ARB);
       
-      switch (swap_chain_desc.swap_method)
+      if (swap_chain_desc.buffers_count > 1)
       {
-        case SwapMethod_Copy:
-          set_attribute (iter, WGL_SWAP_METHOD_ARB, WGL_SWAP_COPY_ARB);
-          break;
-        case SwapMethod_Flip:
-          set_attribute (iter, WGL_SWAP_METHOD_ARB, WGL_SWAP_EXCHANGE_ARB);
-          break;
-        default:
-        case SwapMethod_Discard:
-          set_attribute (iter, WGL_SWAP_METHOD_ARB, WGL_SWAP_UNDEFINED_ARB);
-          break;
+        switch (swap_chain_desc.swap_method)
+        {
+          case SwapMethod_Copy:
+            set_attribute (iter, WGL_SWAP_METHOD_ARB, WGL_SWAP_COPY_ARB);
+            break;
+          case SwapMethod_Flip:
+            set_attribute (iter, WGL_SWAP_METHOD_ARB, WGL_SWAP_EXCHANGE_ARB);
+            break;
+          default:
+          case SwapMethod_Discard:
+            set_attribute (iter, WGL_SWAP_METHOD_ARB, WGL_SWAP_UNDEFINED_ARB);
+            break;
+        }
       }
 
       if (WGLEW_ARB_pbuffer)
@@ -98,8 +101,7 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
 
       float float_attributes [] = {0, 0};
 
-      if (!wglChoosePixelFormatARB (device_context, integer_attributes, float_attributes, 1, &pixel_format, &formats_count))
-        raise_error ("wglChoosePixelFormatARB");
+      wglChoosePixelFormatARB (device_context, integer_attributes, float_attributes, 1, &pixel_format, &formats_count);
     }
     
     if (!pixel_format)
