@@ -164,6 +164,7 @@ template <class Signature, class Accumulator>
 inline connection signal<Signature, Accumulator>::connect (slot_type& s)
 {
   s.impl->connect (&first);
+
   return s.connection ();
 }
 
@@ -195,7 +196,7 @@ void signal<Signature, Accumulator>::disconnect_all ()
 {
     //данная функция предполагает возможность очистки списка обработчиков во время распространения сигнала
 
-  for (slot_impl* i=first.previos (), *end=&first; i!=&first;)
+  for (slot_impl* i=first.previos (); i!=&first;)
   {
     slot_impl* tmp = i;
     

@@ -23,10 +23,9 @@ template <class Signature> class slot_impl: public connection_impl
     }
     
     slot_impl (const function_type& in_fn, slot_impl* in_next_slot) :
-               fn (in_fn), next_slot (in_next_slot), prev_slot (in_next_slot->prev_slot), lock_count (0), wait_next_slot (0), is_blocked (false)
+      fn (in_fn), next_slot (in_next_slot), prev_slot (in_next_slot->prev_slot), lock_count (0), wait_next_slot (0), is_blocked (false)
     {
       prev_slot->next_slot = next_slot->prev_slot = this;
-      addref (); //добавление узла в цепочку сопровождается увеличением числа ссылок
     }
 
     ~slot_impl ()
@@ -133,6 +132,21 @@ template <class Signature> class slot_impl: public connection_impl
     
       //проверка блокировки соединения
     bool blocked () { return is_blocked; }
+    
+      //увеличение числа ссылок слотов
+    void slot_addref ()
+    {
+      addref ();
+    }
+    
+      //уменьшение числа ссылок слотов
+    void slot_release ()
+    {
+      if (use_count () == 2 && prev_slot != this)
+        disconnect ();
+
+      release ();
+    }
 
   private:
     slot_impl (const slot_impl&); //no impl
@@ -168,7 +182,7 @@ template <class Signature>
 inline slot<Signature>::slot (const slot& s)
   : impl (s.impl)
 {
-  impl->addref ();
+  impl->slot_addref ();
 }
 
 template <class Signature>
@@ -180,7 +194,7 @@ inline slot<Signature>::slot (const function_type& fn, slot_impl* next_slot)
 template <class Signature>
 inline slot<Signature>::~slot ()
 {
-  impl->release ();
+  impl->slot_release ();
 }
 
 /*

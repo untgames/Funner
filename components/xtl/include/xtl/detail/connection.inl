@@ -17,6 +17,8 @@ class connection_impl
       if (!--ref_count)
         delete this;
     }
+    
+    size_t use_count () const { return ref_count; }
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка факта наличя соединения

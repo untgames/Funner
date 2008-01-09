@@ -1,0 +1,12 @@
+Results of slot_deletion_test:
+Fn(1)
+Fn(2)
+Fn(3)
+1 2 3 
+end of slot s2
+~Fn(3)
+1 2 
+end of signal
+~Fn(2)
+end of slot s1
+~Fn(1)
