@@ -9,13 +9,13 @@
 #include <shared/context_object.h>
 #include <shared/object.h>
 #include <shared/trackable.h>
-//#include <shared/trackable_ptr.h>
 #include <shared/texture_manager.h>
 #include <shared/platform/swap_chain_manager.h>
 
 #include <stl/list>
 
 #include <xtl/intrusive_ptr.h>
+#include <xtl/trackable_ptr.h>
 #include <xtl/bind.h>
 #include <xtl/uninitialized_storage.h>
 

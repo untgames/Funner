@@ -164,7 +164,7 @@ void SwapChainFrameBuffer::Bind ()
 
 void SwapChainFrameBuffer::UpdateRenderTargets ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::SwapChainDepthStencilBuffer::UpdateRenderTargets");
+//  RaiseNotImplemented ("render::low_level::opengl::SwapChainDepthStencilBuffer::UpdateRenderTargets");
 }
 
 /*

@@ -368,5 +368,5 @@ GLenum InputStage::GetIndexType () const
 
 void InputStage::Bind (size_t base_vertex, size_t base_index)
 {
-  RaiseNotImplemented ("render::low_level::opengl::InputStage::Bind (size_t base_vertex, size_t base_index)");
+//  RaiseNotImplemented ("render::low_level::opengl::InputStage::Bind (size_t base_vertex, size_t base_index)");
 }

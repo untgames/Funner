@@ -26,7 +26,17 @@ inline xtl::connection Trackable::RegisterDestroyHandler (SlotType& handler)
   return xtl::trackable::connect_tracker (handler);
 }
 
-inline xtl::connection Trackable::RegisterDestroyHandler (FunctionType& handler)
+inline xtl::connection Trackable::RegisterDestroyHandler (const FunctionType& handler)
 {
   return xtl::trackable::connect_tracker (handler);
+}
+
+inline xtl::connection Trackable::RegisterDestroyHandler (const FunctionType& handler, Trackable& trackable)
+{
+  return xtl::trackable::connect_tracker (handler, trackable);
+}
+
+inline xtl::connection Trackable::RegisterDestroyHandler (const FunctionType& handler, xtl::trackable& trackable)
+{
+  return xtl::trackable::connect_tracker (handler, trackable);
 }

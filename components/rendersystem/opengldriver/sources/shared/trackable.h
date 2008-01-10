@@ -31,7 +31,9 @@ class Trackable: private xtl::trackable
 ///Регистрация обработчика события удаления объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterDestroyHandler (SlotType& handler);
-    xtl::connection RegisterDestroyHandler (FunctionType& handler);
+    xtl::connection RegisterDestroyHandler (const FunctionType& handler);
+    xtl::connection RegisterDestroyHandler (const FunctionType& handler, Trackable& trackable);
+    xtl::connection RegisterDestroyHandler (const FunctionType& handler, xtl::trackable& trackable);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

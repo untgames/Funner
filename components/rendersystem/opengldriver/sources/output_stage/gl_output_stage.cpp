@@ -74,22 +74,6 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
 };
 
 /*
-    Хранилище для отображения
-*/
-
-struct ViewHolder: public xtl::reference_counter
-{
-  xtl::com_ptr<View>      view;            //отображение
-  xtl::auto_slot<void ()> on_destroy_view; //соединение события удаления отображения с соответствующим сигналом
-  
-  ViewHolder (const xtl::com_ptr<View>& in_view, xtl::slot<void ()>& destroy_handler) :
-    view (in_view), on_destroy_view (destroy_handler)
-  {
-    view->RegisterDestroyHandler (destroy_handler);
-  }
-};
-
-/*
     Описание состояния выходного уровня конвейера OpenGL
 */
 
@@ -97,36 +81,19 @@ class OutputStageState
 {
   public:  
       //конструктор
-    OutputStageState () :
-      blend_state (0),
-      frame_buffer_holder (0),
-      on_destroy_blend_state (xtl::bind (&OutputStageState::SetBlendState, this, (BlendState*)0)),
-      on_destroy_frame_buffer_holder (xtl::bind (&OutputStageState::SetFrameBufferHolder, this, (FrameBufferHolder*)0))
-       {}
-    
-      //присваивание
-    OutputStageState& operator = (const OutputStageState& state)
-    {
-      SetBlendState (state.GetBlendState ());
-      SetFrameBufferHolder (state.GetFrameBufferHolder ());
-
-      return *this;
-    }
+    OutputStageState () {}
 
       //установка текущего состояния подуровня смешивания цветов
     void SetBlendState (BlendState* state)
     {
       if (state == blend_state)
         return;
-      
+
       blend_state = state;
-      
-      if (state)
-        state->RegisterDestroyHandler (on_destroy_blend_state);
     }
 
       //получение текущего состояния подуровня смешивания цветов
-    BlendState* GetBlendState () const { return blend_state; }
+    BlendState* GetBlendState () const { return blend_state.get (); }
     
       //установка текущего хранилища буфера кадра
     void SetFrameBufferHolder (FrameBufferHolder* in_frame_buffer_holder)
@@ -135,13 +102,10 @@ class OutputStageState
         return;        
 
       frame_buffer_holder = in_frame_buffer_holder;
-
-      if (frame_buffer_holder)
-        frame_buffer_holder->RegisterDestroyHandler (on_destroy_frame_buffer_holder);
     }
     
       //получение текущего хранилища буфера кадра
-    FrameBufferHolder* GetFrameBufferHolder () const { return frame_buffer_holder; }
+    FrameBufferHolder* GetFrameBufferHolder () const { return frame_buffer_holder.get (); }
     
       //получение текущего буфера кадра
     FrameBuffer* GetFrameBuffer () const { return frame_buffer_holder ? frame_buffer_holder->frame_buffer : 0; }
@@ -155,11 +119,13 @@ class OutputStageState
   private:
     OutputStageState (const OutputStageState&); //no impl
 
-  private:  
-    BlendState*             blend_state;                    //текущее состояние подуровня смешивания цветов
-    FrameBufferHolder*      frame_buffer_holder;            //текущее хранилище буфера кадра
-    xtl::auto_slot<void ()> on_destroy_blend_state;         //обработчик события удаления состояния подуровня смешивания цветов
-    xtl::auto_slot<void ()> on_destroy_frame_buffer_holder; //обработчик события удаления хранилища буфера кадра
+  private:    
+    typedef xtl::trackable_ptr<BlendState>        BlendStatePtr;
+    typedef xtl::trackable_ptr<FrameBufferHolder> FrameBufferHolderPtr;
+
+  private:
+    BlendStatePtr        blend_state;         //текущее состояние подуровня смешивания цветов
+    FrameBufferHolderPtr frame_buffer_holder; //текущее хранилище буфера кадра
 };
 
 }
@@ -168,11 +134,10 @@ class OutputStageState
     Описание реализации выходного уровня конвейера OpenGL
 */
 
-typedef xtl::intrusive_ptr<ViewHolder>        ViewHolderPtr;
+//typedef xtl::intrusive_ptr<ViewHolder>        ViewHolderPtr;
 typedef xtl::intrusive_ptr<FrameBufferHolder> FrameBufferHolderPtr;
 typedef xtl::com_ptr<View>                    ViewPtr;
 typedef stl::list<FrameBufferHolderPtr>       FrameBufferHolderList;
-typedef stl::list<ViewHolderPtr>              ViewHolderList;
 
 struct OutputStage::Impl: public ContextObject
 {
@@ -180,7 +145,6 @@ struct OutputStage::Impl: public ContextObject
   stl::auto_ptr<OutputStageResourceFactory>  default_resource_factory;   //фабрика ресурсов по умолчанию
   OutputStageResourceFactory*                resource_factory;           //выбранная фабрика ресурсов
   FrameBufferHolderList                      frame_buffers;              //буферы кадра
-  ViewHolderList                             views;                      //отображения
   ViewPtr                                    default_render_target_view; //отображение буфера цвета по умолчанию
   ViewPtr                                    default_depth_stencil_view; //отображение буфера глубина-трафарет по умолчанию         
   xtl::com_ptr<ISwapChain>                   default_swap_chain;         //цепочка обмена по умолчанию
@@ -259,34 +223,15 @@ struct OutputStage::Impl: public ContextObject
     return &*frame_buffers.front ();
   }
   
-    //добавление соединения
+    //добавление отображения
   void AddView (const xtl::com_ptr<View>& view)
   {
-    xtl::slot<void ()> destroy_handler = xtl::bind (&Impl::RemoveView, this, view.get ());
-    
-    views.push_back (ViewHolderPtr (new ViewHolder (view, destroy_handler), false));
+    RegisterDestroyHandler (xtl::bind (&Impl::RemoveView, this, view.get ()), *this);
   }
-  
-    //удаления отображений
+
+    //удаления отображения
   void RemoveView (View* view)
   {
-      //удаление отображения из списка отображений
-      
-    for (ViewHolderList::iterator iter=views.begin (), end=views.end (); iter!=end;)
-    {
-      if ((*iter)->view == view)
-      {
-        ViewHolderList::iterator tmp = iter;
-        
-        ++tmp;
-
-        views.erase (iter);
-
-        iter = tmp;
-      }
-      else ++iter;
-    }
-    
       //удаление всех буферов кадра, в которых присутствует указанное отображение
     
     for (FrameBufferHolderList::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end;)
