@@ -23,7 +23,8 @@ struct TextureManager::Impl: public ContextObject
     ISamplerState* CreateSamplerState (const SamplerDesc&);
 
   public:
-    GLint max_texture_size;
+    GLint max_texture_size;            //максимальный размер текстуры для устройства
+    GLint max_rectangle_texture_size;  //максимальный размер текстуры со сторонами не степени 2 для устройства
 };
 
 /*
@@ -33,8 +34,14 @@ struct TextureManager::Impl: public ContextObject
 TextureManager::Impl::Impl (const ContextManager& context_manager) : ContextObject (context_manager) 
 {
   MakeContextCurrent ();
+
+  bool has_EXT_texture_rectangle = (GLEW_EXT_texture_rectangle || GLEW_NV_texture_rectangle);
+
   glEnable (GL_TEXTURE_2D);
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_texture_size);
+  if (has_EXT_texture_rectangle)
+    glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, &max_rectangle_texture_size);
+  
   CheckErrors ("render::low_level::opengl::TextureManager::Impl::Impl");
 }
 
@@ -52,24 +59,44 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
   MakeContextCurrent ();
 
   bool has_EXT_texture_compression_s3tc = (GLEW_ARB_texture_compression || GLEW_VERSION_1_3) && GLEW_EXT_texture_compression_s3tc;
+  bool has_EXT_texture_rectangle        = (GLEW_EXT_texture_rectangle || GLEW_NV_texture_rectangle);
+  bool has_ARB_texture_non_power_of_two = (GLEW_ARB_texture_non_power_of_two || GLEW_VERSION_2_0);
 
-  if (!has_EXT_texture_compression_s3tc && is_compressed_format (tex_desc.format))
-    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "DXT texture comression not supported!");
+  GLint width;
+  TextureDesc temp_desc = tex_desc;            
 
   switch (tex_desc.dimension)
   {
     case TextureDimension_1D: 
     {
-      if ((tex_desc.width < 2))
-        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 2, max_texture_size);
-      if ((tex_desc.width - 1) & tex_desc.width) 
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width, 
-                              "Texture width must be power of 2");
+      temp_desc.height = 1;
+      temp_desc.layers = 1;
+      if ((tex_desc.width < 1))
+        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_texture_size);
       if (is_compressed_format (tex_desc.format))
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.format", tex_desc.format, 
-                              "1D texture can't be compressed.");
+        RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "1D texture can't be compressed.");
+      if (!has_ARB_texture_non_power_of_two)
+        if ((tex_desc.width - 1) & tex_desc.width) 
+          if (has_EXT_texture_rectangle)
+          {
+            if (tex_desc.generate_mips_enable)
+              RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Mip maps for non power of two textures not supported.");
 
-      GLint width;
+            glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, 1, 0, 
+                          gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+            
+            glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, GL_TEXTURE_WIDTH, &width);
+            if (!width)
+              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                                 "Not enough space to create texture with width = %u", tex_desc.width);
+
+            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+
+            return new TextureNPOT (GetContextManager (), temp_desc);
+          }
+          else
+            RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width, 
+                                  "Texture width must be power of 2");
 
       glTexImage1D (GL_PROXY_TEXTURE_1D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
       
@@ -78,28 +105,47 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
         Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
                            "Not enough space to create texture with width = %u", tex_desc.width);
 
-      return new Texture1D (GetContextManager (), tex_desc);
+      CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+      return new Texture1D (GetContextManager (), temp_desc);
     }
     case TextureDimension_2D:
     {
-      if ((tex_desc.width < 2))
-        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 2, max_texture_size);
-      if ((tex_desc.height < 2))
-        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 2, max_texture_size);
-      if ((tex_desc.width - 1) & tex_desc.width) 
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width,
-                              "Texture width must be power of 2");
-      if ((tex_desc.height - 1) & tex_desc.height) 
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
-                              "Texture height must be power of 2");
+      temp_desc.layers = 1;
+      if ((tex_desc.width < 1))
+        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_texture_size);
+      if ((tex_desc.height < 1))
+        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 1, max_texture_size);
       if ((tex_desc.width & 3) && is_compressed_format (tex_desc.format))
         RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width,
                               "Texture width for compressed image must be a multiple 4");
       if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
         RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
                               "Texture height for compressed image must be a multiple 4");
+      if (!has_ARB_texture_non_power_of_two)
+      {
+        if (((tex_desc.width - 1) & tex_desc.width) || ((tex_desc.height - 1) & tex_desc.height))
+          if (has_EXT_texture_rectangle)
+          {
+            if (is_compressed_format (tex_desc.format))
+              RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Non power of two texture can't be compressed.");
+            if (tex_desc.generate_mips_enable)
+              RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Mip maps for non power of two textures not supported.");
 
-      GLint width;
+            glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                          gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+            
+            glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, GL_TEXTURE_WIDTH, &width);
+            if (!width)
+              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                                 "Not enough space to create texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
+
+            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+            return new TextureNPOT (GetContextManager (), temp_desc);
+          }
+          else
+            RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width, tex_desc.height", tex_desc.width,
+                                  "Texture width and height must be power of 2");
+      }
 
       if (is_compressed_format (tex_desc.format))
         glCompressedTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
@@ -113,7 +159,8 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
         Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
                            "Not enough space to create texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
 
-      return new Texture2D (GetContextManager (), tex_desc);
+      CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+      return new Texture2D (GetContextManager (), temp_desc);
     }
     case TextureDimension_3D: 
     {
@@ -123,8 +170,6 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
     case TextureDimension_Cubemap: RaiseNotImplemented ("render::low_level::opengl::TextureManager::Impl::CreateTexture"); break;
     default: RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.dimension", tex_desc.dimension);
   }
-
-  CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
 
   return 0;
 }

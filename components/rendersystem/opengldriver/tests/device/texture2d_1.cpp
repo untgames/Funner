@@ -14,18 +14,20 @@ int main ()
     char* image_data = new char [512 * 512 * 3];
     
     desc.dimension            = TextureDimension_2D;
-    desc.width                = 512;
-    desc.height               = 512;
+    desc.width                = 508;
+    desc.height               = 508;
     desc.layers               = 0;
     desc.format               = PixelFormat_RGB8;
     desc.bind_flags           = BindFlag_Texture;
     desc.generate_mips_enable = true;
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
-    texture->SetData (0, 0, 256, 256, 256, 256, PixelFormat_RGB8, image_data);
-    texture->GetData (0, 0, 0, 0, 512, 512, PixelFormat_RGB8, image_data);
+    texture->SetData (0, 0, 254, 254, 254, 254, PixelFormat_RGB8, image_data);
+    texture->GetData (0, 0, 0, 0, 508, 508, PixelFormat_RGB8, image_data);
 
     desc.generate_mips_enable = false;
+    desc.width                = 512;
+    desc.height               = 512;
     desc.format               = PixelFormat_DXT5;
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);

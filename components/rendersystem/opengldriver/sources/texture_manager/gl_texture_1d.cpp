@@ -50,8 +50,8 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 
   if (mip_level > mips_count)
     RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "mip_level", 0, mips_count);
-  if (x + width > desc.width)
-    RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "x + width", 0, desc.width);
+  if ((x + width) > (desc.width) >> mip_level)
+    RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "x + width", 0, desc.width >> mip_level);
   if (!width)
     return;
   if (is_compressed_format (source_format))

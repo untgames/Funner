@@ -69,10 +69,10 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 
   if (mip_level > mips_count)
     RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "mip_level", 0, mips_count);
-  if (x + width > desc.width)
-    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "x + width", 0, desc.width);
-  if (y + height > desc.height)
-    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "y + height", 0, desc.height);
+  if (((x + width) > (desc.width >> mip_level)) && ((x + width) != 1))
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "x + width", 0, desc.width >> mip_level);
+  if (((y + height) > (desc.height >> mip_level)) && ((y + height) != 1))
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "y + height", 0, desc.height >> mip_level);
   if (!width || !height)
     return;
   if (is_compressed_format (desc.format))
