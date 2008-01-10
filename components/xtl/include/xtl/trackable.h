@@ -27,11 +27,12 @@ class trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление обработчиков удаления объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    connection connect_tracker (const function_type&);
-    connection connect_tracker (slot_type&);
+    connection connect_tracker (const function_type& handler);
+    connection connect_tracker (slot_type& handler);
+    connection connect_tracker (const function_type& handler, trackable& owner);
 
     template <class Fn> void disconnect_tracker (Fn);
-    
+
     void disconnect_all_trackers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

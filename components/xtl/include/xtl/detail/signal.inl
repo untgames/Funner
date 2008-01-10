@@ -171,7 +171,7 @@ inline connection signal<Signature, Accumulator>::connect (slot_type& s)
 template <class Signature, class Accumulator>
 inline connection signal<Signature, Accumulator>::connect (const function_type& fn)
 {
-  return new detail::slot_impl<Signature> (fn, &first);
+  return detail::slot_connection (new detail::slot_impl<Signature> (fn, &first));
 }
 
 template <class Signature, class Accumulator> template <class Fn>

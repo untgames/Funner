@@ -160,6 +160,16 @@ template <class Signature> class slot_impl: public connection_impl
     bool          is_blocked;
 };
 
+/*
+    Соединение
+*/
+
+class slot_connection: public connection
+{
+  public:
+    slot_connection (connection_impl* impl) : connection (impl) {}
+};
+
 }
 
 /*
@@ -232,7 +242,7 @@ inline const typename slot<Signature>::function_type& slot<Signature>::function 
 template <class Signature>
 inline xtl::connection slot<Signature>::connection () const
 {
-  return impl;
+  return detail::slot_connection (impl);
 }
 
 /*

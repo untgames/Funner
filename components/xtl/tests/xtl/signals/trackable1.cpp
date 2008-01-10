@@ -7,7 +7,7 @@ void handler ()
 
 int main ()
 {
-  printf ("Results of trackable:\n");  
+  printf ("Results of trackable1_test:\n");  
 
   trackable t;
 
