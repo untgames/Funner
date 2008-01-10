@@ -23,7 +23,10 @@ int main ()
     t1.connect_tracker (&handler<12>, t2);
     
     connection c2 = t2.connect_tracker (&handler<0>,  t1),
-               c3 = t2.connect_tracker (&handler<-1>,  t1);
+               c3 = t2.connect_tracker (&handler<-1>, t1),
+               c4 = t2.connect_tracker (&handler<-2>, t1);
+               
+    c4.block ();
                
     c1 = c3;
     
