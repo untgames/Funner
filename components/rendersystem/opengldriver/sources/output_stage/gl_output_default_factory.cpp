@@ -106,8 +106,8 @@ class DefaultOutputStageResourceFactory: public OutputStageResourceFactory, publ
   private:
     ColorBufferList           shadow_color_buffers;
     DepthStencilBufferList    shadow_depth_stencil_buffers;
-    Trackable::DestroyHandler on_destroy_color_buffer;
-    Trackable::DestroyHandler on_destroy_depth_stencil_buffer;
+    Trackable::SlotType on_destroy_color_buffer;
+    Trackable::SlotType on_destroy_depth_stencil_buffer;
 };
 
 /*

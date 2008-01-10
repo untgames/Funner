@@ -100,15 +100,15 @@ struct ContextImpl: public xtl::reference_counter
 
 struct ContextManager::Impl: public xtl::reference_counter
 {
-  LogHandler                log_handler;                //обработчик протоколирования
-  ContextMap                context_map;                //карта отображения цепочки обмена на контекст
-  ContextImpl*              current_context;            //текущий контекст
-  ISwapChain*               current_draw_swap_chain;    //цепочка обмена для рисования
-  ISwapChain*               current_read_swap_chain;    //цепочка обмена для чтения
-  size_t                    current_context_id;         //идентификатор текущего контекста (0 - отсутствует)
-  size_t                    next_context_id;            //номер следующего создаваемого контекста
-  Trackable::DestroyHandler on_destroy_draw_swap_chain; //обработчик удаления цепочки обмена для рисования 
-  Trackable::DestroyHandler on_destroy_read_swap_chain; //обработчик удаления цепочки обмена для чтения
+  LogHandler          log_handler;                //обработчик протоколирования
+  ContextMap          context_map;                //карта отображения цепочки обмена на контекст
+  ContextImpl*        current_context;            //текущий контекст
+  ISwapChain*         current_draw_swap_chain;    //цепочка обмена для рисования
+  ISwapChain*         current_read_swap_chain;    //цепочка обмена для чтения
+  size_t              current_context_id;         //идентификатор текущего контекста (0 - отсутствует)
+  size_t              next_context_id;            //номер следующего создаваемого контекста
+  Trackable::SlotType on_destroy_draw_swap_chain; //обработчик удаления цепочки обмена для рисования 
+  Trackable::SlotType on_destroy_read_swap_chain; //обработчик удаления цепочки обмена для чтения
   
   Impl (const LogHandler& in_log_handler) :
     log_handler (in_log_handler),
