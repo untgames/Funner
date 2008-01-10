@@ -65,6 +65,21 @@ inline trackable_ptr<T>::trackable_ptr (const trackable_ptr<T1>& p)
 #endif
 
 /*
+    Получение trackable-объекта
+*/
+
+inline trackable& get_trackable (trackable& t)
+{
+  return t;
+}
+
+inline int& get_trackable (const default_cast_type&)
+{
+  static int dummy = 0;
+  return dummy;
+}
+
+/*
     Регистрация обработчика удаления хранимого объекта
 */
 
@@ -73,10 +88,7 @@ namespace detail
 
 inline void register_handler (trackable::slot_type& slot, trackable* ptr)
 {
-  slot.disconnect ();
-
-  if (ptr)
-    ptr->connect_tracker (slot);
+  ptr->connect_tracker (slot);
 }
 
 inline void register_handler (trackable::slot_type&, ...)
@@ -88,7 +100,10 @@ inline void register_handler (trackable::slot_type&, ...)
 template <class T>
 void trackable_ptr<T>::update ()
 {
-  detail::register_handler (on_destroy, ptr);
+  on_destroy.disconnect ();
+
+  if (ptr)
+    detail::register_handler (on_destroy, &get_trackable (*ptr));
 
   try
   {
