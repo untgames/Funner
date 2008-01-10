@@ -26,7 +26,10 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
   
   private:
     template <class T>
-    static FrameBuffer* CreateFrameBufferImpl (const T& render_target, View* depth_stencil_view, OutputStageResourceFactory* resource_factory)
+    static FrameBuffer* CreateFrameBufferImpl
+      (const T&                    render_target,
+       View*                       depth_stencil_view,
+       OutputStageResourceFactory* resource_factory)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferHolder::CreateFrameBuffer";
 
@@ -42,7 +45,47 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
         case ViewType_SwapChainDepthStencilBuffer:
           return resource_factory->CreateFrameBuffer (render_target, depth_stencil_view->GetSwapChainDepthStencilBuffer ());
         case ViewType_Texture:
-          return resource_factory->CreateFrameBuffer (render_target, depth_stencil_view->GetBindableTexture ());
+        {
+          ViewDesc desc;
+          
+          depth_stencil_view->GetDesc (desc);
+          
+          return resource_factory->CreateFrameBuffer (render_target, depth_stencil_view->GetBindableTexture (), desc);
+        }
+        default:
+          RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type '%s'", typeid (depth_stencil_view->GetTexture ()).name ());
+          return 0;
+      }
+    }  
+  
+    template <class T>
+    static FrameBuffer* CreateFrameBufferImpl
+      (const T&                    render_target,
+       const ViewDesc&             render_target_desc,
+       View*                       depth_stencil_view,
+       OutputStageResourceFactory* resource_factory)
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferHolder::CreateFrameBuffer";
+
+      ViewType depth_stencil_type = depth_stencil_view ? depth_stencil_view->GetType () : ViewType_Null;
+
+      switch (depth_stencil_type)
+      {
+        case ViewType_Null:
+          return resource_factory->CreateFrameBuffer (render_target, render_target_desc, NullView ());
+        case ViewType_SwapChainColorBuffer:
+          RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'");
+          return 0;
+        case ViewType_SwapChainDepthStencilBuffer:
+          return resource_factory->CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetSwapChainDepthStencilBuffer ());
+        case ViewType_Texture:
+        {
+          ViewDesc desc;
+          
+          depth_stencil_view->GetDesc (desc);
+          
+          return resource_factory->CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetBindableTexture (), desc);
+        }
         default:
           RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type '%s'", typeid (depth_stencil_view->GetTexture ()).name ());
           return 0;
@@ -65,7 +108,13 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
           RaiseNotSupported (METHOD_NAME, "Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'");
           return 0;
         case ViewType_Texture:
-          return CreateFrameBufferImpl (render_target_view->GetBindableTexture (), depth_stencil_view, resource_factory);
+        {
+          ViewDesc render_target_desc;
+          
+          render_target_view->GetDesc (render_target_desc);
+          
+          return CreateFrameBufferImpl (render_target_view->GetBindableTexture (), render_target_desc, depth_stencil_view, resource_factory);
+        }
         default:
           RaiseNotSupported (METHOD_NAME, "Unsupported render-target view type '%s'", typeid (render_target_view->GetTexture ()).name ());
           return 0;
@@ -134,10 +183,11 @@ class OutputStageState
     Описание реализации выходного уровня конвейера OpenGL
 */
 
-//typedef xtl::intrusive_ptr<ViewHolder>        ViewHolderPtr;
 typedef xtl::intrusive_ptr<FrameBufferHolder> FrameBufferHolderPtr;
 typedef xtl::com_ptr<View>                    ViewPtr;
 typedef stl::list<FrameBufferHolderPtr>       FrameBufferHolderList;
+typedef xtl::com_ptr<ISwapChain>              SwapChainPtr;
+typedef xtl::com_ptr<BlendState>              BlendStatePtr;
 
 struct OutputStage::Impl: public ContextObject
 {
@@ -147,8 +197,9 @@ struct OutputStage::Impl: public ContextObject
   FrameBufferHolderList                      frame_buffers;              //буферы кадра
   ViewPtr                                    default_render_target_view; //отображение буфера цвета по умолчанию
   ViewPtr                                    default_depth_stencil_view; //отображение буфера глубина-трафарет по умолчанию         
-  xtl::com_ptr<ISwapChain>                   default_swap_chain;         //цепочка обмена по умолчанию
-  xtl::com_ptr<IBlendState>                  default_blend_state;        //состояние подуровня смешивания цветов по умолчанию
+  SwapChainPtr                               default_swap_chain;         //цепочка обмена по умолчанию
+  BlendStatePtr                              default_blend_state;        //состояние подуровня смешивания цветов по умолчанию
+  BlendStatePtr                              null_blend_state;           //состояние подуровня смешивания цветов соотв. отключению подуровня
 
   Impl (ContextManager& context_manager, ISwapChain* swap_chain) :
     ContextObject (context_manager),
@@ -158,7 +209,7 @@ struct OutputStage::Impl: public ContextObject
   {
       //инициализация отображений
       
-    xtl::com_ptr<ITexture> color_texture (resource_factory->CreateRenderTargetTexture (swap_chain, 0), false),
+    xtl::com_ptr<ITexture> color_texture (resource_factory->CreateRenderTargetTexture (swap_chain, 1), false),
                            depth_stencil_texture (resource_factory->CreateDepthStencilTexture (swap_chain), false);
 
     ViewDesc view_desc;
@@ -170,31 +221,33 @@ struct OutputStage::Impl: public ContextObject
 
     SetRenderTargets (default_render_target_view.get (), default_depth_stencil_view.get ());
     
-      //установка текущего контекста
+      //установка текущего контекста      
       
     if (state.GetFrameBuffer ())
-      state.GetFrameBuffer ()->Bind ();
+    {
+      bool buffer_state [2];
       
-      //инициализация BlendState      
+      state.GetFrameBuffer ()->Bind (buffer_state [0], buffer_state [1]);
+    }
+      
+      //инициализация BlendState по умолчанию
         
     BlendDesc blend_desc;
     
     memset (&blend_desc, 0, sizeof (blend_desc));
 
-    blend_desc.blend_enable                     = false;
-    blend_desc.blend_color_operation            = BlendOperation_Add;
-    blend_desc.blend_color_source_argument      = BlendArgument_One;
-    blend_desc.blend_color_destination_argument = BlendArgument_Zero;
-    blend_desc.blend_alpha_operation            = BlendOperation_Add;
-    blend_desc.blend_alpha_source_argument      = BlendArgument_One;
-    blend_desc.blend_alpha_destination_argument = BlendArgument_Zero;
-    blend_desc.color_write_mask                 = ColorWriteFlag_All;
+    blend_desc.blend_enable     = false;
+    blend_desc.color_write_mask = ColorWriteFlag_All;
 
-    default_blend_state = xtl::com_ptr<IBlendState> (new BlendState (GetContextManager (), blend_desc), false);
+    default_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);
+    
+    blend_desc.color_write_mask = 0;
+    
+    null_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);
     
       //установка состояния по умолчанию
 
-    SetBlendState (&*default_blend_state);        
+    SetBlendState (&*default_blend_state);
   }    
   
     //получение буфера кадра по отображениям
@@ -205,7 +258,7 @@ struct OutputStage::Impl: public ContextObject
     for (FrameBufferHolderList::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)
       if ((*iter)->render_target_view == render_target_view && (*iter)->depth_stencil_view == depth_stencil_view)
       {
-          //оптимизация: перемещение найденного узла в начало списка для ускорения повтороного поиска
+          //оптимизация: перемещение найденного узла в начало списка для ускорения повторного поиска
 
         frame_buffers.splice (frame_buffers.begin (), frame_buffers, iter);
 
@@ -279,7 +332,25 @@ struct OutputStage::Impl: public ContextObject
       //обновление целевых буферов отрисовки
       
     if (state.GetFrameBuffer ())
-      state.GetFrameBuffer ()->UpdateRenderTargets ();
+    {
+      try
+      {
+        state.GetFrameBuffer ()->UpdateRenderTargets ();
+      }
+      catch (common::Exception& exception)
+      {
+        exception.Touch (METHOD_NAME);
+        LogPrintf ("Exception: %s", exception.Message ());
+      }
+      catch (std::exception& exception)
+      {
+        LogPrintf ("Exception '%s'", exception.what ());
+      }
+      catch (...)
+      {
+        LogPrintf ("Unknown exception at %s", METHOD_NAME);
+      }
+    }
 
       //установка текущего хранилища буфера кадра
 
@@ -394,29 +465,31 @@ struct OutputStage::Impl: public ContextObject
     }
   }
   
-      //установка состояния уровня в контекст OpenGL
-    void Bind ()
-    {
-      static const char* METHOD_NAME = "render::low_level::opengl::OutputStage::Bind";
+    //установка состояния уровня в контекст OpenGL
+  void Bind ()
+  {
+    static const char* METHOD_NAME = "render::low_level::opengl::OutputStage::Bind";
+    
+    FrameBuffer* frame_buffer = state.GetFrameBuffer ();
+    BlendState*  blend_state  = state.GetBlendState ();
+    
+    if (!frame_buffer)
+      RaiseInvalidOperation (METHOD_NAME, "No frame-buffer selected (use IDevice::OSSetRenderTargets)");
       
-      FrameBuffer* frame_buffer = state.GetFrameBuffer ();
-      BlendState*  blend_state  = state.GetBlendState ();
-      
-      if (!frame_buffer)
-        RaiseInvalidOperation (METHOD_NAME, "No frame-buffer selected (use IDevice::OSSetRenderTargets)");
+    bool color_buffer_state         = true,
+         depth_stencil_buffer_state = true;
 
-      frame_buffer->Bind ();
-      
-      if (blend_state)
-      {
-        blend_state->Bind ();
-      }
-      else
-      {
-        //????
-        RaiseNotSupported (METHOD_NAME, "No blend-state selected");
-      }
-    }  
+    frame_buffer->Bind (color_buffer_state, depth_stencil_buffer_state);
+    
+    if (blend_state && color_buffer_state)
+    {
+      blend_state->Bind ();      
+    }
+    else
+    {
+      null_blend_state->Bind ();
+    }
+  }
 };
 
 /*

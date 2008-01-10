@@ -230,23 +230,32 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   }
 
   glNewList (display_list, GL_COMPILE);
-
-  if (desc.blend_enable) glEnable  (GL_BLEND);
-  else                   glDisable (GL_BLEND);
-
-  if      (glBlendEquationSeparate)    glBlendEquationSeparate    (color_blend_equation, alpha_blend_equation);
-  else if (glBlendEquationSeparateEXT) glBlendEquationSeparateEXT (color_blend_equation, alpha_blend_equation);      
-  else if (glBlendEquation)            glBlendEquation            (color_blend_equation);
-  else if (glBlendEquationEXT)         glBlendEquationEXT         (color_blend_equation);
-
-  if      (glBlendFuncSeparate)    glBlendFuncSeparate    (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
-  else if (glBlendFuncSeparateEXT) glBlendFuncSeparateEXT (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
-  else                             glBlendFunc            (src_color_arg, dst_color_arg);
-
+  
   size_t mask = in_desc.color_write_mask;
 
   glColorMask ((mask & ColorWriteFlag_Red) != 0, (mask & ColorWriteFlag_Green) != 0,
                (mask & ColorWriteFlag_Blue) != 0, (mask & ColorWriteFlag_Alpha) != 0);
+               
+  if (mask & ColorWriteFlag_All)
+  {
+    if (desc.blend_enable)
+    {
+      glEnable (GL_BLEND);
+
+      if      (glBlendEquationSeparate)    glBlendEquationSeparate    (color_blend_equation, alpha_blend_equation);
+      else if (glBlendEquationSeparateEXT) glBlendEquationSeparateEXT (color_blend_equation, alpha_blend_equation);      
+      else if (glBlendEquation)            glBlendEquation            (color_blend_equation);
+      else if (glBlendEquationEXT)         glBlendEquationEXT         (color_blend_equation);
+
+      if      (glBlendFuncSeparate)    glBlendFuncSeparate    (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
+      else if (glBlendFuncSeparateEXT) glBlendFuncSeparateEXT (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
+      else                             glBlendFunc            (src_color_arg, dst_color_arg);      
+    }
+    else
+    {
+      glDisable (GL_BLEND);
+    }
+  }
 
   glEndList ();  
   

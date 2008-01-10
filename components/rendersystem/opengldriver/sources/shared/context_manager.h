@@ -63,6 +63,8 @@ class ContextManager
 ///Создание совместимой цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ISwapChain* CreateCompatibleSwapChain (size_t context_id);
+    ISwapChain* CreateCompatibleSwapChain (ISwapChain*);
+    ISwapChain* CreateCompatibleSwapChain (ISwapChain*, const SwapChainDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выбор текущего контекста

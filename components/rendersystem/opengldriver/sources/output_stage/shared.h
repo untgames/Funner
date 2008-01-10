@@ -118,11 +118,15 @@ class SwapChainColorBuffer: public ColorBuffer
     SwapChainColorBuffer (const ContextManager& manager, ISwapChain* swap_chain, size_t buffer_index);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Цепочка обмена и gl-имя буфера
+///Цепочка обмена и номер буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ISwapChain* GetSwapChain   () const { return swap_chain.get (); }
     size_t      GetBufferIndex () const { return buffer_index; }
-    GLenum      GetBufferType  () const { return buffer_type; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тип буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    GLenum GetBufferType () const { return buffer_type; }
 
   private:
     void Bind ();
@@ -134,7 +138,7 @@ class SwapChainColorBuffer: public ColorBuffer
   private:
     SwapChainPtr swap_chain;   //цепочка обмена
     size_t       buffer_index; //индекс буфера обмена в цепочке обмена
-    GLenum       buffer_type;  //тип буфера
+    GLenum       buffer_type; //тип буфера    
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +167,7 @@ class SwapChainDepthStencilBuffer: public DepthStencilBuffer
 
   private:
     SwapChainPtr swap_chain; //цепочка обмена
-    size_t       context_id; //индентификатор контекста
+    size_t       context_id; //идентификатор контекста
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,7 +246,7 @@ class FrameBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка буфера в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void Bind () = 0;
+    virtual void Bind (bool& color_buffer_state, bool& depth_stencil_buffer_state) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление целевых буферов отрисовки
@@ -273,13 +277,13 @@ class OutputStageResourceFactory
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual FrameBuffer* CreateFrameBuffer (NullView, NullView) = 0;
     virtual FrameBuffer* CreateFrameBuffer (NullView, SwapChainDepthStencilBuffer*) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (NullView, IBindableTexture*) = 0;
+    virtual FrameBuffer* CreateFrameBuffer (NullView, IBindableTexture*, const ViewDesc&) = 0;
     virtual FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, NullView) = 0;
     virtual FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, SwapChainDepthStencilBuffer*) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, IBindableTexture*) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (IBindableTexture*, NullView) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (IBindableTexture*, SwapChainDepthStencilBuffer*) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (IBindableTexture*, IBindableTexture*) = 0;
+    virtual FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, IBindableTexture*, const ViewDesc&) = 0;
+    virtual FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, NullView) = 0;
+    virtual FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, SwapChainDepthStencilBuffer*) = 0;
+    virtual FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, IBindableTexture*, const ViewDesc&) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание фабрик

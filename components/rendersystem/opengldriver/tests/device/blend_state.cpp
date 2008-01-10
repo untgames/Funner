@@ -21,7 +21,7 @@ int main ()
     desc.blend_alpha_operation            = BlendOperation_Min;
     desc.blend_alpha_source_argument      = BlendArgument_One;
     desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;    
-    desc.color_write_mask                  = ColorWriteFlag_Red | ColorWriteFlag_Blue;
+    desc.color_write_mask                 = ColorWriteFlag_Red | ColorWriteFlag_Blue;
 
     IBlendState* state = test.device->CreateBlendState (desc);
     

@@ -10,17 +10,17 @@ enum Target
 
 int main ()
 {
-  printf ("Results of render_targets_test:\n");
+  printf ("Results of render_targets1_test:\n");
   
   try
   {
     ViewPtr view [4];
     
     {    
-      Test           test (L"OpenGL device test first window (render_targets)");    
+      Test           test (L"OpenGL device test first window (render_targets1)");
       syslib::Window window (syslib::WindowStyle_Overlapped, 400, 200);
       
-      window.SetTitle (L"OpenGL device test second window (render_targets)");
+      window.SetTitle (L"OpenGL device test second window (render_targets1)");
       
       SwapChainDesc swap_chain_desc;
       
@@ -47,7 +47,7 @@ int main ()
       for (int i=0; i<4; i++)
         view [i] = ViewPtr (test.device->CreateView (texture [i].get (), view_desc), false);
 
-      test.device->OSSetRenderTargets (view [Window2_RenderTarget].get (), view [Window2_DepthStencil].get ());
+      test.device->OSSetRenderTargets (view [Window1_RenderTarget].get (), view [Window2_DepthStencil].get ());
       
       Color4f clear_color;
       

@@ -5,7 +5,7 @@ Swap chain description:
     Depth bits:    24
     Stencil bits:  8
     Buffers count: 2
-    Samples count: 4
+    Samples count: 2
     Swap method:   discard
     VSync:         enable
     FullScreen:    disable

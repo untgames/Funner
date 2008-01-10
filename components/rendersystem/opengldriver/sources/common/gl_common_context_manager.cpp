@@ -258,7 +258,7 @@ struct ContextManager::Impl: public xtl::reference_counter
     //создание цепочки обмена совместимой с контекстом
   ISwapChain* CreateCompatibleSwapChain (size_t context_id)
   {
-    static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::CreateCompatibleSwapChain";
+    static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(size_t)";
 
       //поиск контекста
 
@@ -273,6 +273,24 @@ struct ContextManager::Impl: public xtl::reference_counter
       
     return SwapChainManager::CreatePBuffer (context->master_swap_chain.get ());
   }
+  
+    //создание совместимой цепочки обмена
+  ISwapChain* CreateCompatibleSwapChain (ISwapChain* swap_chain)
+  {
+    if (!swap_chain)
+      RaiseNullArgument ("render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(ISwapChain*)", "swap_chain");
+    
+    return SwapChainManager::CreatePBuffer (swap_chain);
+  }
+  
+    //создание совместимой цепочки обмена
+  ISwapChain* CreateCompatibleSwapChain (ISwapChain* swap_chain, const SwapChainDesc& desc)
+  {
+    if (!swap_chain)
+      RaiseNullArgument ("render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(ISwapChain*,const SwapChainDesc&)", "swap_chain");
+    
+    return SwapChainManager::CreatePBuffer (swap_chain, desc);
+  }  
   
     //проверка совместимости контекста и цепочки обмена
   bool IsCompatible (size_t context_id, ISwapChain* swap_chain)
@@ -339,6 +357,16 @@ void ContextManager::DeleteContext (size_t context_id)
 ISwapChain* ContextManager::CreateCompatibleSwapChain (size_t context_id)
 {
   return impl->CreateCompatibleSwapChain (context_id);
+}
+
+ISwapChain* ContextManager::CreateCompatibleSwapChain (ISwapChain* swap_chain)
+{
+  return impl->CreateCompatibleSwapChain (swap_chain);
+}
+
+ISwapChain* ContextManager::CreateCompatibleSwapChain (ISwapChain* swap_chain, const SwapChainDesc& desc)
+{
+  return impl->CreateCompatibleSwapChain (swap_chain, desc);
 }
 
 /*

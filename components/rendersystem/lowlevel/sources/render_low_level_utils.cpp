@@ -129,6 +129,42 @@ const char* get_name (AccessFlag param)
   }
 }
 
+const char* get_name (PixelFormat param)
+{
+  switch (param)
+  {
+    case PixelFormat_RGB8:  return "PixelFormat_RGB8";
+    case PixelFormat_RGBA8: return "PixelFormat_RGBA8";
+    case PixelFormat_L8:    return "PixelFormat_L8";
+    case PixelFormat_A8:    return "PixelFormat_A8";
+    case PixelFormat_LA8:   return "PixelFormat_LA8";
+    case PixelFormat_DXT1:  return "PixelFormat_DXT1";
+    case PixelFormat_DXT3:  return "PixelFormat_DXT3";
+    case PixelFormat_DXT5:  return "PixelFormat_DXT5";
+    case PixelFormat_D16:   return "PixelFormat_D16";
+    case PixelFormat_D24X8: return "PixelFormat_D24X8";
+    case PixelFormat_D24S8: return "PixelFormat_D24S8";
+    case PixelFormat_S8:    return "PixelFormat_S8";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(PixelFormat)", "param", param);
+      return "";
+  }
+}
+
+const char* get_name (TextureDimension param)
+{
+  switch (param)
+  {
+    case TextureDimension_1D:      return "TextureDimension_1D";
+    case TextureDimension_2D:      return "TextureDimension_2D";
+    case TextureDimension_3D:      return "TextureDimension_3D";
+    case TextureDimension_Cubemap: return "TextureDimension_Cubemap";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(TextureDimension)", "param", param);
+      return "";
+  }
+}
+
 const char* get_name (BlendOperation param)
 {
   switch (param)

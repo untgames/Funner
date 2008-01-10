@@ -2,10 +2,10 @@ Results of blend_state_test:
 Blend state:
   blend_enable:                     false
   blend_color_operation:            BlendOperation_Add
-  blend_color_source_argument:      BlendArgument_One
+  blend_color_source_argument:      BlendArgument_Zero
   blend_color_destination_argument: BlendArgument_Zero
   blend_alpha_operation:            BlendOperation_Add
-  blend_alpha_source_argument:      BlendArgument_One
+  blend_alpha_source_argument:      BlendArgument_Zero
   blend_alpha_destination_argument: BlendArgument_Zero
   color_write_mask:                 red | green | blue | alpha
 Blend state:
