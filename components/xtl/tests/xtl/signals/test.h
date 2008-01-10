@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <xtl/signal.h>
 #include <xtl/functional>
+#include <xtl/trackable_ptr.h>
 
 using namespace xtl;
 

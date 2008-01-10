@@ -1,0 +1,18 @@
+Results of trackable_ptr1_test:
+p3:  not null
+!p3: false
+delete p3, p4
+p3 changed
+p4 changed
+p4:  null
+!p4: true
+new p4
+p4 changed
+p3:  null
+!p3: true
+p4:  not null
+!p4: false
+p3 changed
+delete p4, p3
+p4 changed
+p3 changed
