@@ -66,7 +66,8 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
         RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width, 
                               "Texture width must be power of 2");
       if (is_compressed_format (tex_desc.format))
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.format");
+        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.format", tex_desc.format, 
+                              "1D texture can't be compressed.");
 
       GLint width;
 

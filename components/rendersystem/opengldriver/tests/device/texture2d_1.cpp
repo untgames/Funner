@@ -30,8 +30,10 @@ int main ()
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
 
+    texture2->SetData (0, 0, 256, 256, 256, 256, PixelFormat_RGB8, image_data);
     texture2->SetData (0, 0, 256, 256, 256, 256, PixelFormat_DXT5, image_data);
     texture2->GetData (0, 0, 0, 0, 512, 512, PixelFormat_DXT5, image_data);
+    texture2->GetData (0, 0, 0, 0, 512, 512, PixelFormat_RGB8, image_data);
   
     delete [] image_data;
 

@@ -77,8 +77,6 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     return;
   if (is_compressed_format (desc.format))
   {
-    if (source_format != desc.format)
-      RaiseInvalidArgument ("render::low_level::opengl::Texture2D::SetData", "source_format");
     if (desc.generate_mips_enable)
       RaiseInvalidOperation ("render::low_level::opengl::Texture2D::SetData", "Generate mipmaps not compatible with compressed textures.");
     if (x & 3)
@@ -90,6 +88,9 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     if (height & 3)
       RaiseInvalidArgument ("render::low_level::opengl::Texture2D::SetData", "height", height, "height must be a multiple of 4.");
   }
+  if (is_compressed_format (source_format))
+    if (source_format != desc.format)
+      RaiseInvalidArgument ("render::low_level::opengl::Texture2D::SetData", "source_format");
 
   bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
 
@@ -152,7 +153,7 @@ void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "height", desc.height, desc.height);
   if (is_compressed_format (target_format))
     if (target_format != desc.format)
-      RaiseInvalidArgument ("render::low_level::opengl::Texture2D::GetData", "target_format");
+      RaiseInvalidArgument ("render::low_level::opengl::Texture2D::GetData", "target_format", target_format, "Can't get compressed texture data, format is different.");
 
   MakeContextCurrent ();
 
