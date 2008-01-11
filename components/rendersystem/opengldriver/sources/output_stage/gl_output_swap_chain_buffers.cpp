@@ -71,16 +71,47 @@ void SwapChainColorBuffer::Bind ()
     Конструктор / деструктор
 */
 
-SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const ContextManager& manager, ISwapChain* in_swap_chain)
-  : DepthStencilBuffer (manager),
-    swap_chain (in_swap_chain)
+SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const ContextManager& manager, ISwapChain* swap_chain)
+  : DepthStencilBuffer (manager)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer";
 
   if (!swap_chain)
     RaiseNullArgument (METHOD_NAME, "swap_chain");
+  
+  SwapChainDesc swap_chain_desc;
 
-  context_id = GetContextManager ().CreateContext (swap_chain.get ());
+  swap_chain->GetDesc (swap_chain_desc);
+
+  width  = swap_chain_desc.frame_buffer.width;
+  height = swap_chain_desc.frame_buffer.height;
+
+  context_id = GetContextManager ().CreateContext (swap_chain);  
+}
+
+SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const ContextManager& manager, ISwapChain* swap_chain, size_t in_width, size_t in_height)
+  : DepthStencilBuffer (manager),
+    width (in_width),
+    height (in_height)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer";
+
+  if (!swap_chain)
+    RaiseNullArgument (METHOD_NAME, "swap_chain");
+    
+  SwapChainDesc swap_chain_desc;
+
+  swap_chain->GetDesc (swap_chain_desc);
+  
+  if (width > swap_chain_desc.frame_buffer.width)
+    RaiseNotSupported (METHOD_NAME, "Depth-stencil buffer width=%u is greater than swap-chain width=%u", width,
+      swap_chain_desc.frame_buffer.width);
+
+  if (height > swap_chain_desc.frame_buffer.height)
+    RaiseNotSupported (METHOD_NAME, "Depth-stencil buffer height=%u is greater than swap-chain height=%u", height,
+      swap_chain_desc.frame_buffer.height);
+
+  context_id = GetContextManager ().CreateContext (swap_chain);  
 }
 
 SwapChainDepthStencilBuffer::~SwapChainDepthStencilBuffer ()
@@ -92,14 +123,10 @@ SwapChainDepthStencilBuffer::~SwapChainDepthStencilBuffer ()
     Получение размеров буфера
 */
 
-void SwapChainDepthStencilBuffer::GetSize (size_t& width, size_t& height)
+void SwapChainDepthStencilBuffer::GetSize (size_t& out_width, size_t& out_height)
 {
-  SwapChainDesc desc;
-
-  swap_chain->GetDesc (desc);
-  
-  width  = desc.frame_buffer.width;
-  height = desc.frame_buffer.height;
+  out_width  = width;
+  out_height = height;
 }
     
 /*

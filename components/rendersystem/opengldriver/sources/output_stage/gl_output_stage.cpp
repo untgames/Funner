@@ -17,7 +17,7 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
   View*        depth_stencil_view; //целевое отображение буфера глубина-трафарет
   FrameBuffer* frame_buffer;       //буфер кадра
 
-  FrameBufferHolder (View* in_render_target_view, View* in_depth_stencil_view, OutputStageResourceFactory* resource_factory) :
+  FrameBufferHolder (View* in_render_target_view, View* in_depth_stencil_view, FrameBufferFactory* resource_factory) :
     render_target_view (in_render_target_view),
     depth_stencil_view (in_depth_stencil_view),
     frame_buffer       (CreateFrameBuffer (in_render_target_view, in_depth_stencil_view, resource_factory))
@@ -29,7 +29,7 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
     static FrameBuffer* CreateFrameBufferImpl
       (const T&                    render_target,
        View*                       depth_stencil_view,
-       OutputStageResourceFactory* resource_factory)
+       FrameBufferFactory* resource_factory)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferHolder::CreateFrameBuffer";
 
@@ -63,7 +63,7 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
       (const T&                    render_target,
        const ViewDesc&             render_target_desc,
        View*                       depth_stencil_view,
-       OutputStageResourceFactory* resource_factory)
+       FrameBufferFactory* resource_factory)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferHolder::CreateFrameBuffer";
 
@@ -92,7 +92,7 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
       }
     }
   
-    static FrameBuffer* CreateFrameBuffer (View* render_target_view, View* depth_stencil_view, OutputStageResourceFactory* resource_factory)
+    static FrameBuffer* CreateFrameBuffer (View* render_target_view, View* depth_stencil_view, FrameBufferFactory* resource_factory)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferHolder::CreateFrameBuffer";
       
@@ -192,8 +192,8 @@ typedef xtl::com_ptr<BlendState>              BlendStatePtr;
 struct OutputStage::Impl: public ContextObject
 {
   OutputStageState                           state;                      //состояние уровня
-  stl::auto_ptr<OutputStageResourceFactory>  default_resource_factory;   //фабрика ресурсов по умолчанию
-  OutputStageResourceFactory*                resource_factory;           //выбранная фабрика ресурсов
+  stl::auto_ptr<FrameBufferFactory>  default_resource_factory;   //фабрика ресурсов по умолчанию
+  FrameBufferFactory*                resource_factory;           //выбранная фабрика ресурсов
   FrameBufferHolderList                      frame_buffers;              //буферы кадра
   ViewPtr                                    default_render_target_view; //отображение буфера цвета по умолчанию
   ViewPtr                                    default_depth_stencil_view; //отображение буфера глубина-трафарет по умолчанию         
@@ -203,7 +203,7 @@ struct OutputStage::Impl: public ContextObject
 
   Impl (ContextManager& context_manager, ISwapChain* swap_chain) :
     ContextObject (context_manager),
-    default_resource_factory (OutputStageResourceFactory::CreateDefaultFactory (context_manager)),
+    default_resource_factory (FrameBufferFactory::CreateDefaultFactory (context_manager, swap_chain)),
     resource_factory (default_resource_factory.get ()),
     default_swap_chain (swap_chain)
   {

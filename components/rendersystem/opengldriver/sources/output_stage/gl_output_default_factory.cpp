@@ -64,14 +64,19 @@ class SwapChainFrameBuffer: public FrameBuffer, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация фабрики ресурсов выходного подуровня OpenGL по умолчанию
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class DefaultOutputStageResourceFactory: public OutputStageResourceFactory, public ContextObject
+class DefaultFrameBufferFactory: public FrameBufferFactory, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    DefaultOutputStageResourceFactory  (const ContextManager& manager);
-    ~DefaultOutputStageResourceFactory ();
+    DefaultFrameBufferFactory  (const ContextManager& manager, ISwapChain* default_swap_chain);
+    ~DefaultFrameBufferFactory ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение цепочки обмена по умолчанию
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ISwapChain* GetDefaultSwapChain () const { return default_swap_chain.get (); }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание целевых буферов вывода
@@ -94,26 +99,27 @@ class DefaultOutputStageResourceFactory: public OutputStageResourceFactory, publ
     FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
     
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение цепочки обмена по умолчанию
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISwapChain* GetDefaultSwapChain ();
-  
+    typedef xtl::com_ptr<SwapChainColorBuffer>        ColorBufferPtr;
+    typedef xtl::com_ptr<SwapChainDepthStencilBuffer> DepthStencilBufferPtr;
+    
+  private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с теневыми буферами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SwapChainColorBuffer*        GetShadowBuffer          (SwapChainDepthStencilBuffer*);
-    SwapChainDepthStencilBuffer* GetShadowBuffer          (SwapChainColorBuffer*);
-    void                         GetShadowBuffers         (SwapChainColorBuffer*&, SwapChainDepthStencilBuffer*&);
-    SwapChainColorBuffer*        CreateColorBuffer        (SwapChainDepthStencilBuffer*);
-    SwapChainDepthStencilBuffer* CreateDepthStencilBuffer (SwapChainColorBuffer*);
-    SwapChainFrameBuffer*        CreateShadowFrameBuffer  ();
+    ColorBufferPtr        GetShadowBuffer          (SwapChainDepthStencilBuffer*);
+    DepthStencilBufferPtr GetShadowBuffer          (SwapChainColorBuffer*);
+    void                  GetShadowBuffers         (ColorBufferPtr&, DepthStencilBufferPtr&);
+    ColorBufferPtr        CreateColorBuffer        (SwapChainDepthStencilBuffer*);
+    DepthStencilBufferPtr CreateDepthStencilBuffer (SwapChainColorBuffer*);
+    SwapChainFrameBuffer* CreateShadowFrameBuffer  ();
 
   private:
     typedef stl::list<SwapChainColorBuffer*>        ColorBufferList;
     typedef stl::list<SwapChainDepthStencilBuffer*> DepthStencilBufferList;
+    typedef xtl::com_ptr<ISwapChain>                SwapChainPtr;
 
   private:
+    SwapChainPtr           default_swap_chain;
     ColorBufferList        shadow_color_buffers;
     DepthStencilBufferList shadow_depth_stencil_buffers;
 };
@@ -345,7 +351,7 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
 
 /*
 ===================================================================================================
-    DefaultOutputStageResourceFactory
+    DefaultFrameBufferFactory
 ===================================================================================================
 */
 
@@ -353,44 +359,29 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
     Конструктор / деструктор
 */
 
-DefaultOutputStageResourceFactory::DefaultOutputStageResourceFactory (const ContextManager& manager)
-  : ContextObject (manager)
+DefaultFrameBufferFactory::DefaultFrameBufferFactory (const ContextManager& manager, ISwapChain* in_default_swap_chain)
+  : ContextObject (manager), default_swap_chain (in_default_swap_chain)
 {
 }
 
-DefaultOutputStageResourceFactory::~DefaultOutputStageResourceFactory ()
+DefaultFrameBufferFactory::~DefaultFrameBufferFactory ()
 {
-}
-
-/*
-    Получение цепочки обмена по умолчанию
-*/
-
-ISwapChain* DefaultOutputStageResourceFactory::GetDefaultSwapChain ()
-{
-  ISwapChain* swap_chain = GetContextManager ().GetDrawSwapChain ();
-  
-  if (!swap_chain)
-    RaiseInvalidOperation ("render::low_level::opengl::DefaultOutputStageResourceFactory::GetDefaultSwapChain",
-                           "Null default swap chain");
-
-  return swap_chain;
 }
 
 /*
     Работа с теневыми буферами
 */
 
-SwapChainColorBuffer* DefaultOutputStageResourceFactory::CreateColorBuffer (SwapChainDepthStencilBuffer* depth_stencil_buffer)
+DefaultFrameBufferFactory::ColorBufferPtr DefaultFrameBufferFactory::CreateColorBuffer (SwapChainDepthStencilBuffer* depth_stencil_buffer)
 {
   xtl::com_ptr<ISwapChain> swap_chain (GetContextManager ().CreateCompatibleSwapChain (depth_stencil_buffer->GetContextId ()), false);
 
-  return new SwapChainColorBuffer (GetContextManager (), swap_chain.get (), 1);
+  return ColorBufferPtr (new SwapChainColorBuffer (GetContextManager (), swap_chain.get (), 1), false);
 }
 
-SwapChainDepthStencilBuffer* DefaultOutputStageResourceFactory::CreateDepthStencilBuffer (SwapChainColorBuffer* color_buffer)
+DefaultFrameBufferFactory::DepthStencilBufferPtr DefaultFrameBufferFactory::CreateDepthStencilBuffer (SwapChainColorBuffer* color_buffer)
 {
-  return new SwapChainDepthStencilBuffer (GetContextManager (), color_buffer->GetSwapChain ());
+  return DepthStencilBufferPtr (new SwapChainDepthStencilBuffer (GetContextManager (), color_buffer->GetSwapChain ()), false);
 }
 
 namespace
@@ -412,7 +403,7 @@ template <class List> class list_remover
 
 }
 
-SwapChainColorBuffer* DefaultOutputStageResourceFactory::GetShadowBuffer (SwapChainDepthStencilBuffer* depth_stencil_buffer)
+DefaultFrameBufferFactory::ColorBufferPtr DefaultFrameBufferFactory::GetShadowBuffer (SwapChainDepthStencilBuffer* depth_stencil_buffer)
 {
   ContextManager& manager    = GetContextManager ();
   size_t          context_id = depth_stencil_buffer->GetContextId ();
@@ -431,7 +422,7 @@ SwapChainColorBuffer* DefaultOutputStageResourceFactory::GetShadowBuffer (SwapCh
 
     //создание нового буфера цвета
 
-  xtl::com_ptr<SwapChainColorBuffer> color_buffer (CreateColorBuffer (depth_stencil_buffer), false);
+  ColorBufferPtr color_buffer = CreateColorBuffer (depth_stencil_buffer);
   
   shadow_color_buffers.push_front (color_buffer.get ());
 
@@ -445,17 +436,15 @@ SwapChainColorBuffer* DefaultOutputStageResourceFactory::GetShadowBuffer (SwapCh
     throw;
   }
 
-  color_buffer->AddRef ();
-
-  return color_buffer.get ();
+  return color_buffer;
 }
 
-SwapChainDepthStencilBuffer* DefaultOutputStageResourceFactory::GetShadowBuffer (SwapChainColorBuffer* color_buffer)
+DefaultFrameBufferFactory::DepthStencilBufferPtr DefaultFrameBufferFactory::GetShadowBuffer (SwapChainColorBuffer* color_buffer)
 {
   ContextManager& manager    = GetContextManager ();
   ISwapChain*     swap_chain = color_buffer->GetSwapChain ();
-  
-    //попытка найти совместимый по формату буфер глубина-трафарет
+
+    //попытка найти совместимый по формату буфер глубина-трафарет        
     
   for (DepthStencilBufferList::iterator iter=shadow_depth_stencil_buffers.begin (), end=shadow_depth_stencil_buffers.end (); iter!=end; ++iter)
     if (manager.IsCompatible ((*iter)->GetContextId (), swap_chain))
@@ -469,7 +458,7 @@ SwapChainDepthStencilBuffer* DefaultOutputStageResourceFactory::GetShadowBuffer 
     
     //создание нового буфера глубина-трафарет
     
-  xtl::com_ptr<SwapChainDepthStencilBuffer> depth_stencil_buffer (CreateDepthStencilBuffer (color_buffer), false);
+  DepthStencilBufferPtr depth_stencil_buffer = CreateDepthStencilBuffer (color_buffer);
   
   shadow_depth_stencil_buffers.push_front (depth_stencil_buffer.get ());
 
@@ -484,12 +473,10 @@ SwapChainDepthStencilBuffer* DefaultOutputStageResourceFactory::GetShadowBuffer 
     throw;
   }
 
-  depth_stencil_buffer->AddRef ();
-
-  return depth_stencil_buffer.get ();
+  return depth_stencil_buffer;
 }
 
-void DefaultOutputStageResourceFactory::GetShadowBuffers (SwapChainColorBuffer*& color_buffer, SwapChainDepthStencilBuffer*& depth_stencil_buffer)
+void DefaultFrameBufferFactory::GetShadowBuffers (ColorBufferPtr& color_buffer, DepthStencilBufferPtr& depth_stencil_buffer)
 {
   ContextManager& manager = GetContextManager ();
 
@@ -518,7 +505,7 @@ void DefaultOutputStageResourceFactory::GetShadowBuffers (SwapChainColorBuffer*&
   if (!shadow_color_buffers.empty ())
   {
     color_buffer         = shadow_color_buffers.front ();
-    depth_stencil_buffer = GetShadowBuffer (color_buffer);
+    depth_stencil_buffer = GetShadowBuffer (color_buffer.get ());
     
     return;
   }
@@ -526,36 +513,47 @@ void DefaultOutputStageResourceFactory::GetShadowBuffers (SwapChainColorBuffer*&
   if (!shadow_depth_stencil_buffers.empty ())
   {
     depth_stencil_buffer = shadow_depth_stencil_buffers.front ();
-    color_buffer         = GetShadowBuffer (depth_stencil_buffer);
+    color_buffer         = GetShadowBuffer (depth_stencil_buffer.get ());
     
     return;
   }
 
     //создание новой пары буферов
 
-  xtl::com_ptr<ISwapChain>           swap_chain (manager.CreateCompatibleSwapChain (GetDefaultSwapChain ()), false);
-  xtl::com_ptr<SwapChainColorBuffer> new_color_buffer (new SwapChainColorBuffer (manager, swap_chain.get (), 1), false);
+  SwapChainPtr          swap_chain (GetContextManager ().CreateCompatibleSwapChain (GetDefaultSwapChain ()), false);
+  ColorBufferPtr        new_color_buffer (new SwapChainColorBuffer (manager, swap_chain.get (), 1), false);  
+  DepthStencilBufferPtr new_depth_stencil_buffer = GetShadowBuffer (new_color_buffer.get ());
 
-  color_buffer         = new_color_buffer.get ();
-  depth_stencil_buffer = GetShadowBuffer (color_buffer);
+  shadow_color_buffers.push_front (new_color_buffer.get ());
 
-  new_color_buffer->AddRef ();
+  try
+  {
+    new_color_buffer->RegisterDestroyHandler (list_remover<ColorBufferList> (shadow_color_buffers, shadow_color_buffers.begin ()), *this);
+  }
+  catch (...)
+  {
+    shadow_color_buffers.pop_front ();
+    throw;
+  }
+
+  color_buffer         = new_color_buffer;
+  depth_stencil_buffer = new_depth_stencil_buffer;
 }
 
-SwapChainFrameBuffer* DefaultOutputStageResourceFactory::CreateShadowFrameBuffer ()
+SwapChainFrameBuffer* DefaultFrameBufferFactory::CreateShadowFrameBuffer ()
 {
   try
   {
-    SwapChainColorBuffer*        color_buffer = 0;
-    SwapChainDepthStencilBuffer* depth_stencil_buffer = 0;
+    ColorBufferPtr        color_buffer;
+    DepthStencilBufferPtr depth_stencil_buffer;
     
     GetShadowBuffers (color_buffer, depth_stencil_buffer);
     
-    return new SwapChainFrameBuffer (GetContextManager (), color_buffer, depth_stencil_buffer);
+    return new SwapChainFrameBuffer (GetContextManager (), color_buffer.get (), depth_stencil_buffer.get ());
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateShadowFrameBuffer");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateShadowFrameBuffer");
     
     throw;
   }
@@ -565,9 +563,9 @@ SwapChainFrameBuffer* DefaultOutputStageResourceFactory::CreateShadowFrameBuffer
     Создание целевого буфера вывода    
 */
 
-ITexture* DefaultOutputStageResourceFactory::CreateTexture (const TextureDesc& desc)
+ITexture* DefaultFrameBufferFactory::CreateTexture (const TextureDesc& desc)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::DefaultOutputStageResourceFactory::CreateTexture";
+  static const char* METHOD_NAME = "render::low_level::opengl::DefaultFrameBufferFactory::CreateTexture";
   
   switch (desc.dimension)
   {
@@ -591,26 +589,45 @@ ITexture* DefaultOutputStageResourceFactory::CreateTexture (const TextureDesc& d
     case PixelFormat_RGB8:
     case PixelFormat_RGBA8:
     {
-      SwapChainDesc swap_chain_desc;
-      ISwapChain*   default_swap_chain = GetDefaultSwapChain ();
-      
-      default_swap_chain->GetDesc (swap_chain_desc);      
-      
-      swap_chain_desc.frame_buffer.width  = desc.width;
-      swap_chain_desc.frame_buffer.height = desc.height;
+      try
+      {
+        SwapChainDesc swap_chain_desc;
+        ISwapChain*   default_swap_chain = GetDefaultSwapChain ();
+        
+        default_swap_chain->GetDesc (swap_chain_desc);
+        
+        swap_chain_desc.frame_buffer.width  = desc.width;
+        swap_chain_desc.frame_buffer.height = desc.height;
 
-      xtl::com_ptr<ISwapChain> swap_chain (GetContextManager ().CreateCompatibleSwapChain (default_swap_chain, swap_chain_desc), false);
+        SwapChainPtr swap_chain (GetContextManager ().CreateCompatibleSwapChain (default_swap_chain, swap_chain_desc), false);
 
-      return new SwapChainColorBuffer (GetContextManager (), swap_chain.get (), 1);
+        return new SwapChainColorBuffer (GetContextManager (), swap_chain.get (), 1);
+      }
+      catch (common::Exception& exception)
+      {
+        exception.Touch (METHOD_NAME);
+        
+        throw;
+      }
     }
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
-    case PixelFormat_S8:
     {
-      RaiseNotImplemented ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateTexture");
-      return 0;
+      try
+      {
+        ISwapChain* default_swap_chain = GetDefaultSwapChain ();
+
+        return new SwapChainDepthStencilBuffer (GetContextManager (), default_swap_chain, desc.width, desc.height);
+      }
+      catch (common::Exception& exception)
+      {
+        exception.Touch (METHOD_NAME);
+        
+        throw;
+      }
     }
+    case PixelFormat_S8:
     case PixelFormat_L8:
     case PixelFormat_A8:
     case PixelFormat_LA8:
@@ -625,7 +642,7 @@ ITexture* DefaultOutputStageResourceFactory::CreateTexture (const TextureDesc& d
   }
 }
 
-ITexture* DefaultOutputStageResourceFactory::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
+ITexture* DefaultFrameBufferFactory::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
 {
   try
   {
@@ -633,13 +650,13 @@ ITexture* DefaultOutputStageResourceFactory::CreateRenderTargetTexture (ISwapCha
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateRenderTargetTexture");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateRenderTargetTexture");
 
     throw;
   }
 }
 
-ITexture* DefaultOutputStageResourceFactory::CreateDepthStencilTexture (ISwapChain* swap_chain)
+ITexture* DefaultFrameBufferFactory::CreateDepthStencilTexture (ISwapChain* swap_chain)
 {
   try
   {
@@ -647,7 +664,7 @@ ITexture* DefaultOutputStageResourceFactory::CreateDepthStencilTexture (ISwapCha
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateDepthStencilTexture");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateDepthStencilTexture");
 
     throw;
   }
@@ -657,7 +674,7 @@ ITexture* DefaultOutputStageResourceFactory::CreateDepthStencilTexture (ISwapCha
     Создание фрейм буферов
 */
 
-FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer (NullView, NullView)
+FrameBuffer* DefaultFrameBufferFactory::CreateFrameBuffer (NullView, NullView)
 {
   try
   {
@@ -669,17 +686,17 @@ FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer (NullView, Nul
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateFrameBuffer(NullView,NullView)");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateFrameBuffer(NullView,NullView)");
     
     throw;
   }
 }
 
-FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer (NullView, SwapChainDepthStencilBuffer* depth_stencil_buffer)
+FrameBuffer* DefaultFrameBufferFactory::CreateFrameBuffer (NullView, SwapChainDepthStencilBuffer* depth_stencil_buffer)
 {
   try
   {
-    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), GetShadowBuffer (depth_stencil_buffer),
+    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), GetShadowBuffer (depth_stencil_buffer).get (),
                                                                    depth_stencil_buffer);
 
     frame_buffer->SetBuffersState (false, true);
@@ -688,13 +705,13 @@ FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer (NullView, Swa
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateFrameBuffer(NullView,SwapChainDepthStencilBuffer*)");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateFrameBuffer(NullView,SwapChainDepthStencilBuffer*)");
     
     throw;
   }
 }
 
-FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer (NullView, IBindableTexture* texture, const ViewDesc& desc)
+FrameBuffer* DefaultFrameBufferFactory::CreateFrameBuffer (NullView, IBindableTexture* texture, const ViewDesc& desc)
 {
   try
   {
@@ -707,17 +724,18 @@ FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer (NullView, IBi
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateFrameBuffer(NullView,IBindableTexture*)");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateFrameBuffer(NullView,IBindableTexture*)");
 
     throw;
   }
 }
 
-FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer (SwapChainColorBuffer* color_buffer, NullView)
+FrameBuffer* DefaultFrameBufferFactory::CreateFrameBuffer (SwapChainColorBuffer* color_buffer, NullView)
 {
   try
   {
-    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), color_buffer, GetShadowBuffer (color_buffer));
+    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), color_buffer,
+                                                                   GetShadowBuffer (color_buffer).get ());
     
     frame_buffer->SetBuffersState (true, false);
     
@@ -725,13 +743,13 @@ FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer (SwapChainColo
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateFrameBuffer(SwapChainColorBuffer*,NullView)");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateFrameBuffer(SwapChainColorBuffer*,NullView)");
 
     throw;
   }
 }
 
-FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer
+FrameBuffer* DefaultFrameBufferFactory::CreateFrameBuffer
  (SwapChainColorBuffer*        color_buffer,
   SwapChainDepthStencilBuffer* depth_stencil_buffer)
 {
@@ -741,20 +759,21 @@ FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateFrameBuffer(SwapChainColorBuffer*,SwapChainDepthStencilBuffer*)");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateFrameBuffer(SwapChainColorBuffer*,SwapChainDepthStencilBuffer*)");
 
     throw;
   }
 }
 
-FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer
+FrameBuffer* DefaultFrameBufferFactory::CreateFrameBuffer
  (SwapChainColorBuffer* color_buffer,
   IBindableTexture*     texture,
   const ViewDesc&       desc)
 {
   try
   {
-    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), color_buffer, GetShadowBuffer (color_buffer));
+    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), color_buffer,
+                                                                   GetShadowBuffer (color_buffer).get ());
 
     frame_buffer->SetRenderTargets (0, 0, texture, &desc);
 
@@ -762,13 +781,13 @@ FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateFrameBuffer(SwapChainColorBuffer*,IBindableTexture*)");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateFrameBuffer(SwapChainColorBuffer*,IBindableTexture*)");
 
     throw;
   }
 }
 
-FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer (IBindableTexture* texture, const ViewDesc& desc, NullView)
+FrameBuffer* DefaultFrameBufferFactory::CreateFrameBuffer (IBindableTexture* texture, const ViewDesc& desc, NullView)
 {
   try
   {
@@ -781,20 +800,20 @@ FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer (IBindableText
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateFrameBuffer(IBindableTexture*,NullView)");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateFrameBuffer(IBindableTexture*,NullView)");
     
     throw;
   }
 }
 
-FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer
+FrameBuffer* DefaultFrameBufferFactory::CreateFrameBuffer
  (IBindableTexture*            texture,
   const ViewDesc&              desc,
   SwapChainDepthStencilBuffer* depth_stencil_buffer)
 {
   try
   {
-    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), GetShadowBuffer (depth_stencil_buffer),
+    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), GetShadowBuffer (depth_stencil_buffer).get (),
                                                                    depth_stencil_buffer);
 
     frame_buffer->SetRenderTargets (texture, &desc, 0, 0);
@@ -803,13 +822,13 @@ FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateFrameBuffer(IBindableTexture*,SwapChainDepthStencilBuffer*)");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateFrameBuffer(IBindableTexture*,SwapChainDepthStencilBuffer*)");
 
     throw;
   }
 }
 
-FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer
+FrameBuffer* DefaultFrameBufferFactory::CreateFrameBuffer
  (IBindableTexture* render_target_texture,
   const ViewDesc&   render_target_desc,
   IBindableTexture* depth_stencil_texture,
@@ -825,7 +844,7 @@ FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DefaultOutputStageResourceFactory::CreateFrameBuffer(IBindableTexture*,IBindableTexture*)");
+    exception.Touch ("render::low_level::opengl::DefaultFrameBufferFactory::CreateFrameBuffer(IBindableTexture*,IBindableTexture*)");
 
     throw;
   }
@@ -835,7 +854,7 @@ FrameBuffer* DefaultOutputStageResourceFactory::CreateFrameBuffer
     Создание фабрики ресурсов выходного уровня по умолчанию
 */
 
-OutputStageResourceFactory* OutputStageResourceFactory::CreateDefaultFactory (const ContextManager& manager)
+FrameBufferFactory* FrameBufferFactory::CreateDefaultFactory (const ContextManager& manager, ISwapChain* default_swap_chain)
 {
-  return new DefaultOutputStageResourceFactory (manager);
+  return new DefaultFrameBufferFactory (manager, default_swap_chain);
 }

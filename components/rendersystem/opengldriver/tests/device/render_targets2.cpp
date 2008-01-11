@@ -47,7 +47,12 @@ int main ()
     
     TexturePtr color_texture (test.device->CreateTexture (bindable_texture_desc), false);
     
-    static const int VIEWS_COUNT = 5;
+    bindable_texture_desc.bind_flags = BindFlag_DepthStencil;
+    bindable_texture_desc.format     = PixelFormat_D24X8;
+    
+    TexturePtr depth_texture (test.device->CreateTexture (bindable_texture_desc), false);
+    
+    static const int VIEWS_COUNT = 6;
     
     ViewPtr  view [VIEWS_COUNT];  
     ViewDesc view_desc;
@@ -58,8 +63,13 @@ int main ()
     view [1] = ViewPtr (test.device->CreateView (back_buffer_texture.get (), view_desc), false);
     view [2] = ViewPtr (test.device->CreateView (depth_stencil_buffer_texture.get (), view_desc), false);        
     view [3] = ViewPtr (test.device->CreateView (color_texture.get (), view_desc), false);
-    view [4] = 0;
-//    view [2] = ViewPtr (test.device->CreateView (bindable_depth_texture.get (), view_desc), false);    
+    view [4] = ViewPtr (test.device->CreateView (depth_texture.get (), view_desc), false);
+    view [5] = 0;
+//    view [2] = ViewPtr (test.device->CreateView (bindable_depth_texture.get (), view_desc), false);
+
+    bool status [VIEWS_COUNT][VIEWS_COUNT];
+    
+    memset (&status [0][0], 0, sizeof (status));
     
     for (int i=0; i<VIEWS_COUNT; i++)
       for (int j=0; j<VIEWS_COUNT; j++)
@@ -74,6 +84,9 @@ int main ()
         {
           test.device->OSSetRenderTargets (view [i].get (), view [j].get ());
           test.device->Draw (PrimitiveType_PointList, 0, 0);
+          
+          status [i][j] = true;
+          
           printf ("Ok\n");
         }
         catch (std::exception& exception)
@@ -81,6 +94,26 @@ int main ()
           printf ("\n%s\n", exception.what ());
         }
       }
+      
+    printf ("Status info:\n");
+    printf ("  1) RGBA texture\n");
+    printf ("  2) Swap chain color buffer\n");
+    printf ("  3) Swap chain depth-stencil buffer\n");
+    printf ("  4) Auxilary color buffer\n");
+    printf ("  5) Auxilary depth-stencil buffer\n");
+    printf ("  6) Null view\n");
+    printf ("Status table (rows - render-target view, columns - depth-stencil view):\n");
+    printf ("  123456\n");
+          
+    for (int i=0; i<VIEWS_COUNT; i++)
+    {
+      printf ("%d|", i+1);
+      
+      for (int j=0; j<VIEWS_COUNT; j++)
+        printf (status [i][j] ? "+" : "-");
+        
+      printf ("\n");
+    }
   }
   catch (std::exception& exception)
   {
