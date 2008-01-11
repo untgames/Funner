@@ -25,7 +25,13 @@ int main ()
 
     BlendStatePtr state (test.device->CreateBlendState (desc), false);
     
-    dump_desc (*state);
+    test.device->OSSetBlendState (state.get ());
+    
+    dump_desc (*test.device->OSGetBlendState ());
+
+    state = 0;
+
+    dump_desc (*test.device->OSGetBlendState ());
   }
   catch (std::exception& exception)
   {

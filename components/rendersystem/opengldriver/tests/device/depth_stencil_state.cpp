@@ -34,7 +34,13 @@ int main ()
     
     DepthStencilStatePtr state (test.device->CreateDepthStencilState (desc), false);
     
-    dump_desc (*state);
+    test.device->OSSetDepthStencilState (state.get ());
+    
+    dump_desc (*test.device->OSGetDepthStencilState ());
+    
+    state = 0;
+    
+    dump_desc (*test.device->OSGetDepthStencilState ());    
   }
   catch (std::exception& exception)
   {

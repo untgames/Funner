@@ -77,6 +77,13 @@ struct Test
 //печать дескриптора blend-state
 inline void dump_desc (IBlendState& state)
 {
+  if (!&state)
+  {
+    printf ("Null blend state\n");
+    
+    return;
+  }
+
   using render::low_level::get_name;
 
   BlendDesc desc;
@@ -106,6 +113,13 @@ inline void dump_desc (const StencilDesc& desc)
 //печать дескриптора depth-stencil-state
 inline void dump_desc (IDepthStencilState& state)
 {
+  if (!&state)
+  {
+    printf ("Null depth-stencil state\n");
+  
+    return;
+  }
+
   using render::low_level::get_name;
   
   DepthStencilDesc desc;

@@ -17,3 +17,4 @@ Blend state:
   blend_alpha_source_argument:      BlendArgument_One
   blend_alpha_destination_argument: BlendArgument_InverseSourceAlpha
   color_write_mask:                 red | blue
+Null blend state

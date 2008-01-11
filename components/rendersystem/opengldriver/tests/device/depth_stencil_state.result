@@ -33,3 +33,4 @@ Depth-stencil state:
     stencil_fail_operation: StencilOperation_Zero
     depth_fail_operation:   StencilOperation_Replace
     stencil_pass_operation: StencilOperation_Keep
+Null depth-stencil state

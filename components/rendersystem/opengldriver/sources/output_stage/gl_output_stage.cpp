@@ -126,9 +126,6 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
     Описание состояния выходного уровня конвейера OpenGL
 */
 
-typedef xtl::com_ptr<BlendState>        BlendStatePtr;
-typedef xtl::com_ptr<DepthStencilState> DepthStencilStatePtr;
-
 class OutputStageState
 {
   public:  
@@ -153,7 +150,7 @@ class OutputStageState
       if (state == depth_stencil_state)
         return;
         
-      depth_stencil_state = state;
+      depth_stencil_state = state;            
     }
 
       //получение текущего состояния подуровня попиксельного отсечения
@@ -190,10 +187,12 @@ class OutputStageState
     View* GetDepthStencilView () const { return frame_buffer_holder ? frame_buffer_holder->depth_stencil_view : 0; }        
 
   private:
-    OutputStageState (const OutputStageState&); //no impl
+    OutputStageState (const OutputStageState&); //no impl        
 
   private:    
     typedef xtl::trackable_ptr<FrameBufferHolder> FrameBufferHolderPtr;
+    typedef xtl::trackable_ptr<BlendState>        BlendStatePtr;
+    typedef xtl::trackable_ptr<DepthStencilState> DepthStencilStatePtr;
 
   private:
     BlendStatePtr        blend_state;         //текущее состояние подуровня смешивания цветов
@@ -212,6 +211,8 @@ typedef xtl::intrusive_ptr<FrameBufferHolder> FrameBufferHolderPtr;
 typedef xtl::com_ptr<View>                    ViewPtr;
 typedef stl::list<FrameBufferHolderPtr>       FrameBufferHolderList;
 typedef xtl::com_ptr<ISwapChain>              SwapChainPtr;
+typedef xtl::com_ptr<BlendState>              BlendStatePtr;
+typedef xtl::com_ptr<DepthStencilState>       DepthStencilStatePtr;
 
 struct OutputStage::Impl: public ContextObject
 {
