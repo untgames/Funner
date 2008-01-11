@@ -101,11 +101,11 @@ GLint gl_internal_format (PixelFormat format)
     case PixelFormat_DXT1:  return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     case PixelFormat_DXT3:  return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
     case PixelFormat_DXT5:  return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    case PixelFormat_S8:
-    case PixelFormat_D16:
-    case PixelFormat_D24X8:
-    case PixelFormat_D24S8:   
-    default: common::RaiseNotImplemented ("render::low_level::opengl::Texture::gl_internal_format"); return GL_ALPHA;
+    case PixelFormat_D16:   return GL_DEPTH_COMPONENT16_ARB;
+    case PixelFormat_D24X8: return GL_DEPTH_COMPONENT24_ARB;
+    case PixelFormat_D24S8: return GL_DEPTH24_STENCIL8_EXT;  
+    case PixelFormat_S8:    common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", "Stencil textures not supported.");
+    default: common::RaiseInvalidArgument ("render::low_level::opengl::Texture::gl_internal_format", "format"); return GL_ALPHA;
   }
 }
 
@@ -121,11 +121,21 @@ GLenum gl_format (PixelFormat format)
     case PixelFormat_LA8:   return GL_LUMINANCE_ALPHA;
     case PixelFormat_RGB8:  return GL_RGB;
     case PixelFormat_RGBA8: return GL_RGBA;
-    case PixelFormat_S8:
-    case PixelFormat_D16:
-    case PixelFormat_D24X8:
-    case PixelFormat_D24S8:   
-    default: common::RaiseNotImplemented ("render::low_level::opengl::Texture::gl_format"); return GL_ALPHA;
+    case PixelFormat_D16:   
+    case PixelFormat_D24X8: 
+    {
+      if (GLEW_ARB_depth_texture || GLEW_VERSION_1_4)
+        return GL_DEPTH_COMPONENT;
+      else common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", "Depth textures not supported.");
+    }
+    case PixelFormat_D24S8:
+    {
+      if ((GLEW_ARB_depth_texture || GLEW_VERSION_1_4) && GLEW_EXT_packed_depth_stencil)
+        return GL_DEPTH_STENCIL_EXT;  
+      else common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", "Depth-stencil textures not supported.");
+    }
+    case PixelFormat_S8:    common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", "Stencil textures not supported.");
+    default: common::RaiseInvalidArgument ("render::low_level::opengl::Texture::gl_format", "format"); return GL_ALPHA;
   }
 }
 
@@ -142,10 +152,10 @@ GLenum gl_type (PixelFormat format)
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:  return GL_UNSIGNED_BYTE;
-    case PixelFormat_D16:
-    case PixelFormat_D24X8:
-    case PixelFormat_D24S8:   
-    default: common::RaiseNotImplemented ("render::low_level::opengl::Texture::gl_type"); return GL_ALPHA;
+    case PixelFormat_D16:   return GL_UNSIGNED_SHORT;
+    case PixelFormat_D24X8: return GL_UNSIGNED_INT;
+    case PixelFormat_D24S8: return GL_UNSIGNED_INT_24_8_EXT;
+    default: common::RaiseInvalidArgument ("render::low_level::opengl::Texture::gl_type", "format"); return GL_UNSIGNED_BYTE;
   }
 }
 

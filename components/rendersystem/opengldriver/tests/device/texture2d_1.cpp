@@ -11,7 +11,7 @@ int main ()
     TextureDesc desc;
     memset (&desc, 0, sizeof (desc));
 
-    char* image_data = new char [512 * 512 * 3];
+    char* image_data = new char [512 * 512 * 4];
     
     desc.dimension            = TextureDimension_2D;
     desc.width                = 508;
@@ -37,6 +37,15 @@ int main ()
     texture2->GetData (0, 0, 0, 0, 512, 512, PixelFormat_DXT5, image_data);
     texture2->GetData (0, 0, 0, 0, 512, 512, PixelFormat_RGB8, image_data);
   
+    desc.format               = PixelFormat_D24S8;
+    desc.width                = 512;
+    desc.height               = 512;
+
+    xtl::com_ptr<ITexture> texture3 (test.device->CreateTexture (desc), false);
+
+    texture3->SetData (0, 0, 256, 256, 256, 256, PixelFormat_D24S8, image_data);
+    texture3->GetData (0, 0, 0, 0, 512, 512, PixelFormat_D24S8, image_data);
+
     delete [] image_data;
 
     desc.dimension            = TextureDimension_1D;
