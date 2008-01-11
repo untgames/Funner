@@ -126,11 +126,14 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
     Описание состояния выходного уровня конвейера OpenGL
 */
 
+typedef xtl::com_ptr<BlendState>        BlendStatePtr;
+typedef xtl::com_ptr<DepthStencilState> DepthStencilStatePtr;
+
 class OutputStageState
 {
   public:  
       //конструктор
-    OutputStageState () {}
+    OutputStageState () : stencil_reference (0) {}
 
       //установка текущего состояния подуровня смешивания цветов
     void SetBlendState (BlendState* state)
@@ -144,6 +147,27 @@ class OutputStageState
       //получение текущего состояния подуровня смешивания цветов
     BlendState* GetBlendState () const { return blend_state.get (); }
     
+      //установка текущего состояния подуровня попиксельного отсечения
+    void SetDepthStencilState (DepthStencilState* state)
+    {
+      if (state == depth_stencil_state)
+        return;
+        
+      depth_stencil_state = state;
+    }
+
+      //получение текущего состояния подуровня попиксельного отсечения
+    DepthStencilState* GetDepthStencilState () const { return depth_stencil_state.get (); }
+    
+      //установка значения ссылки трафарета
+    void SetStencilReference (size_t reference)
+    {
+      stencil_reference = reference;
+    }
+
+      //получение значения ссылки трафарета
+    size_t GetStencilReference () const { return stencil_reference; }
+
       //установка текущего хранилища буфера кадра
     void SetFrameBufferHolder (FrameBufferHolder* in_frame_buffer_holder)
     {
@@ -169,11 +193,12 @@ class OutputStageState
     OutputStageState (const OutputStageState&); //no impl
 
   private:    
-    typedef xtl::trackable_ptr<BlendState>        BlendStatePtr;
     typedef xtl::trackable_ptr<FrameBufferHolder> FrameBufferHolderPtr;
 
   private:
     BlendStatePtr        blend_state;         //текущее состояние подуровня смешивания цветов
+    DepthStencilStatePtr depth_stencil_state; //текущее состояние подуровня попиксельного отсечения
+    size_t               stencil_reference;   //текущее значение трафарета
     FrameBufferHolderPtr frame_buffer_holder; //текущее хранилище буфера кадра
 };
 
@@ -187,19 +212,20 @@ typedef xtl::intrusive_ptr<FrameBufferHolder> FrameBufferHolderPtr;
 typedef xtl::com_ptr<View>                    ViewPtr;
 typedef stl::list<FrameBufferHolderPtr>       FrameBufferHolderList;
 typedef xtl::com_ptr<ISwapChain>              SwapChainPtr;
-typedef xtl::com_ptr<BlendState>              BlendStatePtr;
 
 struct OutputStage::Impl: public ContextObject
 {
-  OutputStageState                           state;                      //состояние уровня
-  stl::auto_ptr<FrameBufferFactory>  default_resource_factory;   //фабрика ресурсов по умолчанию
-  FrameBufferFactory*                resource_factory;           //выбранная фабрика ресурсов
-  FrameBufferHolderList                      frame_buffers;              //буферы кадра
-  ViewPtr                                    default_render_target_view; //отображение буфера цвета по умолчанию
-  ViewPtr                                    default_depth_stencil_view; //отображение буфера глубина-трафарет по умолчанию         
-  SwapChainPtr                               default_swap_chain;         //цепочка обмена по умолчанию
-  BlendStatePtr                              default_blend_state;        //состояние подуровня смешивания цветов по умолчанию
-  BlendStatePtr                              null_blend_state;           //состояние подуровня смешивания цветов соотв. отключению подуровня
+  OutputStageState                   state;                       //состояние уровня
+  stl::auto_ptr<FrameBufferFactory>  default_resource_factory;    //фабрика ресурсов по умолчанию
+  FrameBufferFactory*                resource_factory;            //выбранная фабрика ресурсов
+  FrameBufferHolderList              frame_buffers;               //буферы кадра
+  ViewPtr                            default_render_target_view;  //отображение буфера цвета по умолчанию
+  ViewPtr                            default_depth_stencil_view;  //отображение буфера глубина-трафарет по умолчанию
+  SwapChainPtr                       default_swap_chain;          //цепочка обмена по умолчанию
+  BlendStatePtr                      default_blend_state;         //состояние подуровня смешивания цветов по умолчанию
+  BlendStatePtr                      null_blend_state;            //состояние подуровня смешивания цветов соотв. отключению подуровня
+  DepthStencilStatePtr               default_depth_stencil_state; //состояние подуровня попиксельного отсечения по умолчанию
+  DepthStencilStatePtr               null_depth_stencil_state;    //состояние подуровня попиксельного отсечения соотв. отключению подуровня
 
   Impl (ContextManager& context_manager, ISwapChain* swap_chain) :
     ContextObject (context_manager),
@@ -230,7 +256,7 @@ struct OutputStage::Impl: public ContextObject
       state.GetFrameBuffer ()->Bind (buffer_state [0], buffer_state [1]);
     }
       
-      //инициализация BlendState по умолчанию
+      //инициализация BlendState
         
     BlendDesc blend_desc;
     
@@ -245,9 +271,28 @@ struct OutputStage::Impl: public ContextObject
     
     null_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);
     
+      //инициализация DepthStencilState
+      
+    DepthStencilDesc depth_stencil_desc;
+    
+    memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
+    
+    depth_stencil_desc.depth_test_enable  = true;
+    depth_stencil_desc.depth_write_enable = true;
+    depth_stencil_desc.depth_compare_mode = CompareMode_Less;
+    
+    default_depth_stencil_state = DepthStencilStatePtr (new DepthStencilState (GetContextManager (), depth_stencil_desc), false);
+    
+    depth_stencil_desc.depth_test_enable  = false;
+    depth_stencil_desc.depth_write_enable = false;
+    depth_stencil_desc.depth_compare_mode = CompareMode_AlwaysPass;
+    
+    null_depth_stencil_state = DepthStencilStatePtr (new DepthStencilState (GetContextManager (), depth_stencil_desc), false);
+    
       //установка состояния по умолчанию
 
     SetBlendState (&*default_blend_state);
+    SetDepthStencilState (&*default_depth_stencil_state);
   }    
   
     //получение буфера кадра по отображениям
@@ -360,9 +405,6 @@ struct OutputStage::Impl: public ContextObject
     //установка текущего состояния подуровня смешивания цветов
   void SetBlendState (IBlendState* in_blend_state)
   {
-    if (!in_blend_state)
-      RaiseNullArgument ("render::low_level::opengl::OutputStage::SetBlendState", "blend_state");
-      
     BlendState* blend_state = cast_object<BlendState> (*this, in_blend_state, "render::low_level::opengl::OutputStage::SetBlendState", "blend_state");
     
     state.SetBlendState (blend_state);
@@ -370,6 +412,18 @@ struct OutputStage::Impl: public ContextObject
     
     //получение текущего состояния подуровня смешивания цветов
   IBlendState* GetBlendState () { return state.GetBlendState (); }  
+  
+    //установка текущего состояния подуровня попиксельного отсечения
+  void SetDepthStencilState (IDepthStencilState* in_depth_stencil_state)
+  {
+    DepthStencilState* depth_stencil_state = cast_object<DepthStencilState> (*this, in_depth_stencil_state,
+      "render::low_level::opengl::OutputStage::SetDepthStencilState", "depth_stencil_state");
+
+    state.SetDepthStencilState (depth_stencil_state);
+  }
+  
+    //получение текущего состояния подуровня попиксельного отсечения
+  IDepthStencilState* GetDepthStencilState () { return state.GetDepthStencilState (); }
   
     //очистка текущего буфера цвета
   void ClearRenderTargetView (const Color4f& color)
@@ -470,8 +524,9 @@ struct OutputStage::Impl: public ContextObject
   {
     static const char* METHOD_NAME = "render::low_level::opengl::OutputStage::Bind";
     
-    FrameBuffer* frame_buffer = state.GetFrameBuffer ();
-    BlendState*  blend_state  = state.GetBlendState ();
+    FrameBuffer*       frame_buffer        = state.GetFrameBuffer ();
+    BlendState*        blend_state         = state.GetBlendState ();
+    DepthStencilState* depth_stencil_state = state.GetDepthStencilState ();
     
     if (!frame_buffer)
       RaiseInvalidOperation (METHOD_NAME, "No frame-buffer selected (use IDevice::OSSetRenderTargets)");
@@ -488,6 +543,15 @@ struct OutputStage::Impl: public ContextObject
     else
     {
       null_blend_state->Bind ();
+    }
+    
+    if (depth_stencil_state && depth_stencil_buffer_state)
+    {
+      depth_stencil_state->Bind (state.GetStencilReference ());
+    }
+    else
+    {
+      null_depth_stencil_state->Bind (state.GetStencilReference ());
     }
   }
 };
@@ -587,10 +651,18 @@ IBlendState* OutputStage::CreateBlendState (const BlendDesc& desc)
   }
 }
 
-IDepthStencilState* OutputStage::CreateDepthStencilState (const DepthStencilDesc&)
+IDepthStencilState* OutputStage::CreateDepthStencilState (const DepthStencilDesc& desc)
 {
-  RaiseNotImplemented ("render::low_level::opengl::OutputStage::CreateDepthStencilState");
-  return 0;
+  try
+  {
+    return new DepthStencilState (impl->GetContextManager (), desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::OutputStage::CreateDepthStencilState");
+    
+    throw;
+  }
 }
 
 /*
@@ -641,24 +713,22 @@ IBlendState* OutputStage::GetBlendState () const
 
 void OutputStage::SetDepthStencilState (IDepthStencilState* state)
 {
-  RaiseNotImplemented ("render::low_level::opengl::OutputStage::SetDepthStencilState");
+  impl->SetDepthStencilState (state);
 }
 
 void OutputStage::SetStencilReference (size_t reference)
 {
-  RaiseNotImplemented ("render::low_level::opengl::OutputStage::SetStencilReference");
+  impl->state.SetStencilReference (reference);
 }
 
 IDepthStencilState* OutputStage::GetDepthStencilState () const
 {
-  RaiseNotImplemented ("render::low_level::opengl::OutputStage::GetDepthStencilState");
-  return 0;
+  return impl->GetDepthStencilState ();
 }
 
 size_t OutputStage::GetStencilReference () const
 {
-  RaiseNotImplemented ("render::low_level::opengl::OutputStage::GetDepthStencilReference");
-  return 0;
+  return impl->state.GetStencilReference ();
 }
 
 /*

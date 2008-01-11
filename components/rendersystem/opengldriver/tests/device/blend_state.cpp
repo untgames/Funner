@@ -23,7 +23,7 @@ int main ()
     desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;    
     desc.color_write_mask                 = ColorWriteFlag_Red | ColorWriteFlag_Blue;
 
-    IBlendState* state = test.device->CreateBlendState (desc);
+    BlendStatePtr state (test.device->CreateBlendState (desc), false);
     
     dump_desc (*state);
   }

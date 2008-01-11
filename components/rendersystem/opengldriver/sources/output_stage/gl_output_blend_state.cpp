@@ -29,6 +29,12 @@ BlendState::~BlendState ()
       glDeleteLists (display_list, 1);
     }
   }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::BlendState::~BlendState");
+    
+    LogPrintf ("%s\n", exception.Message ());
+  }  
   catch (std::exception& exception)
   {
     LogPrintf ("%s\n", exception.what ());
@@ -196,24 +202,27 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   }  
   
     //проверка поддержки расширений
-  
-  if (color_blend_equation != alpha_blend_equation && !ext.has_ext_blend_equation_separate)
-    RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_operation=%s mismatch desc.blend_alpha_operation=%s"
-      " (GL_EXT_blend_equation_separate not supported)", get_name (in_desc.blend_color_operation), get_name (in_desc.blend_alpha_operation));
-  
-  if (!ext.has_ext_blend_func_separate)
-  {
-    if (src_color_arg != src_alpha_arg)
-      RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_source_argument=%s mismatch desc.blend_alpha_source_argument=%s"
-      " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_source_argument), get_name (in_desc.blend_alpha_source_argument));
+    
+  if (in_desc.blend_enable && (in_desc.color_write_mask & ColorWriteFlag_All))
+  {  
+    if (color_blend_equation != alpha_blend_equation && !ext.has_ext_blend_equation_separate)
+      RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_operation=%s mismatch desc.blend_alpha_operation=%s"
+        " (GL_EXT_blend_equation_separate not supported)", get_name (in_desc.blend_color_operation), get_name (in_desc.blend_alpha_operation));
+    
+    if (!ext.has_ext_blend_func_separate)
+    {
+      if (src_color_arg != src_alpha_arg)
+        RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_source_argument=%s mismatch desc.blend_alpha_source_argument=%s"
+        " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_source_argument), get_name (in_desc.blend_alpha_source_argument));
 
-    if (dst_color_arg != dst_alpha_arg)
-      RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_destination_argument=%s mismatch desc.blend_alpha_destination_argument=%s"
-      " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_destination_argument), get_name (in_desc.blend_alpha_destination_argument));
+      if (dst_color_arg != dst_alpha_arg)
+        RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_destination_argument=%s mismatch desc.blend_alpha_destination_argument=%s"
+        " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_destination_argument), get_name (in_desc.blend_alpha_destination_argument));
+    }
+
+    check_blend_operation (in_desc.blend_color_operation, ext, METHOD_NAME, "desc.blend_color_operation");
+    check_blend_operation (in_desc.blend_alpha_operation, ext, METHOD_NAME, "desc.blend_alpha_operation");
   }
-
-  check_blend_operation (in_desc.blend_color_operation, ext, METHOD_NAME, "desc.blend_color_operation");
-  check_blend_operation (in_desc.blend_alpha_operation, ext, METHOD_NAME, "desc.blend_alpha_operation");
 
     //сохранение дескриптора
 
@@ -236,25 +245,22 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   glColorMask ((mask & ColorWriteFlag_Red) != 0, (mask & ColorWriteFlag_Green) != 0,
                (mask & ColorWriteFlag_Blue) != 0, (mask & ColorWriteFlag_Alpha) != 0);
                
-  if (mask & ColorWriteFlag_All)
+  if (desc.blend_enable && (mask & ColorWriteFlag_All))
   {
-    if (desc.blend_enable)
-    {
-      glEnable (GL_BLEND);
+    glEnable (GL_BLEND);
 
-      if      (glBlendEquationSeparate)    glBlendEquationSeparate    (color_blend_equation, alpha_blend_equation);
-      else if (glBlendEquationSeparateEXT) glBlendEquationSeparateEXT (color_blend_equation, alpha_blend_equation);      
-      else if (glBlendEquation)            glBlendEquation            (color_blend_equation);
-      else if (glBlendEquationEXT)         glBlendEquationEXT         (color_blend_equation);
+    if      (glBlendEquationSeparate)    glBlendEquationSeparate    (color_blend_equation, alpha_blend_equation);
+    else if (glBlendEquationSeparateEXT) glBlendEquationSeparateEXT (color_blend_equation, alpha_blend_equation);      
+    else if (glBlendEquation)            glBlendEquation            (color_blend_equation);
+    else if (glBlendEquationEXT)         glBlendEquationEXT         (color_blend_equation);
 
-      if      (glBlendFuncSeparate)    glBlendFuncSeparate    (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
-      else if (glBlendFuncSeparateEXT) glBlendFuncSeparateEXT (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
-      else                             glBlendFunc            (src_color_arg, dst_color_arg);      
-    }
-    else
-    {
-      glDisable (GL_BLEND);
-    }
+    if      (glBlendFuncSeparate)    glBlendFuncSeparate    (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
+    else if (glBlendFuncSeparateEXT) glBlendFuncSeparateEXT (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
+    else                             glBlendFunc            (src_color_arg, dst_color_arg);      
+  }
+  else
+  {
+    glDisable (GL_BLEND);
   }
 
   glEndList ();  
@@ -275,10 +281,14 @@ void BlendState::GetDesc (BlendDesc& out_desc)
 
 void BlendState::Bind ()
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::BlendState::Bind";
+
   if (!display_list)
-    RaiseInvalidOperation ("render::low_level::opengl::BlendState::Bind", "Empty state (null display list)");
+    RaiseInvalidOperation (METHOD_NAME, "Empty state (null display list)");
 
   MakeContextCurrent ();
 
   glCallList (display_list);
+  
+  CheckErrors (METHOD_NAME);
 }

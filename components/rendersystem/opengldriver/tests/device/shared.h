@@ -18,11 +18,13 @@
 
 using namespace render::low_level;
 
-typedef xtl::com_ptr<IDriver>    DriverPtr;
-typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
-typedef xtl::com_ptr<IDevice>    DevicePtr;
-typedef xtl::com_ptr<ITexture>   TexturePtr;
-typedef xtl::com_ptr<IView>      ViewPtr;
+typedef xtl::com_ptr<IDriver>            DriverPtr;
+typedef xtl::com_ptr<ISwapChain>         SwapChainPtr;
+typedef xtl::com_ptr<IDevice>            DevicePtr;
+typedef xtl::com_ptr<ITexture>           TexturePtr;
+typedef xtl::com_ptr<IView>              ViewPtr;
+typedef xtl::com_ptr<IBlendState>        BlendStatePtr; 
+typedef xtl::com_ptr<IDepthStencilState> DepthStencilStatePtr; 
 
 //тестовое приложение
 struct Test
@@ -90,6 +92,37 @@ inline void dump_desc (IBlendState& state)
   printf ("  blend_alpha_source_argument:      %s\n", get_name (desc.blend_alpha_source_argument));
   printf ("  blend_alpha_destination_argument: %s\n", get_name (desc.blend_alpha_destination_argument));  
   printf ("  color_write_mask:                 %s\n", get_name ((ColorWriteFlag)desc.color_write_mask));
+}
+
+//печать дескриптора stencil
+inline void dump_desc (const StencilDesc& desc)
+{
+  printf ("    stencil_compare_mode:   %s\n", get_name (desc.stencil_compare_mode));
+  printf ("    stencil_fail_operation: %s\n", get_name (desc.stencil_fail_operation));
+  printf ("    depth_fail_operation:   %s\n", get_name (desc.depth_fail_operation));
+  printf ("    stencil_pass_operation: %s\n", get_name (desc.stencil_pass_operation));
+}
+
+//печать дескриптора depth-stencil-state
+inline void dump_desc (IDepthStencilState& state)
+{
+  using render::low_level::get_name;
+  
+  DepthStencilDesc desc;
+  
+  state.GetDesc (desc);
+  
+  printf ("Depth-stencil state:\n");
+  printf ("  depth_test_enable:   %s\n", desc.depth_test_enable ? "true" : "false");
+  printf ("  depth_write_enable:  %s\n", desc.depth_write_enable ? "true" : "false");
+  printf ("  stencil_test_enable: %s\n", desc.stencil_test_enable ? "true" : "false");
+  printf ("  depth_compare_mode:  %s\n", get_name (desc.depth_compare_mode));
+  printf ("  stencil_read_mask:   %02x\n", desc.stencil_read_mask);
+  printf ("  stencil_write_mask:  %02x\n", desc.stencil_write_mask);
+  printf ("  stencil_desc [FaceMode_Front]:\n");
+  dump_desc (desc.stencil_desc [FaceMode_Front]);
+  printf ("  stencil_desc [FaceMode_Back]:\n");
+  dump_desc (desc.stencil_desc [FaceMode_Back]);  
 }
 
 #endif
