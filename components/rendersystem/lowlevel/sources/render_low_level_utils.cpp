@@ -165,6 +165,22 @@ const char* get_name (TextureDimension param)
   }
 }
 
+const char* get_name (StencilOperation param)
+{
+  switch (param)
+  {
+    case StencilOperation_Keep:       return "StencilOperation_Keep";
+    case StencilOperation_Zero:       return "StencilOperation_Zero";
+    case StencilOperation_Replace:    return "StencilOperation_Replace";
+    case StencilOperation_Increment:  return "StencilOperation_Increment";
+    case StencilOperation_Decrement:  return "StencilOperation_Decrement";
+    case StencilOperation_Invert:     return "StencilOperation_Invert";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(StencilOperation)", "param", param);
+      return "";
+  }
+}
+
 const char* get_name (BlendOperation param)
 {
   switch (param)
