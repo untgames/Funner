@@ -29,9 +29,7 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
 {
   try
   {
-    int pixel_format = 0;
-    
-//    size_t aux_buffers_count = swap_chain_desc.frame_buffer.color_buffers_count ? swap_chain_desc.frame_buffer.color_buffers_count - 1 : 0;
+    int pixel_format = 0;    
     
       //заполнение стандартной структуры дескриптора формата пикселей
     
@@ -46,7 +44,6 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
     pfd.cColorBits   = swap_chain_desc.frame_buffer.color_bits;
     pfd.cDepthBits   = swap_chain_desc.frame_buffer.depth_bits;
     pfd.cStencilBits = swap_chain_desc.frame_buffer.stencil_bits;
-//    pfd.cAuxBuffers  = aux_buffers_count;
     pfd.cAlphaBits   = swap_chain_desc.frame_buffer.alpha_bits;
     pfd.iLayerType   = PFD_MAIN_PLANE;    
 
@@ -65,9 +62,20 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
       set_attribute (iter, WGL_COLOR_BITS_ARB,      swap_chain_desc.frame_buffer.color_bits);
       set_attribute (iter, WGL_ALPHA_BITS_ARB,      swap_chain_desc.frame_buffer.alpha_bits);
       set_attribute (iter, WGL_DEPTH_BITS_ARB,      swap_chain_desc.frame_buffer.depth_bits);
-//      set_attribute (iter, WGL_AUX_BUFFERS_ARB,     aux_buffers_count);
       set_attribute (iter, WGL_STENCIL_BITS_ARB,    swap_chain_desc.frame_buffer.stencil_bits);
-      set_attribute (iter, WGL_ACCELERATION_ARB,    WGL_FULL_ACCELERATION_ARB);
+
+      int* extended_properties_pos = iter;
+
+      set_attribute (iter, WGL_ACCELERATION_ARB,    WGL_FULL_ACCELERATION_ARB);      
+      
+      if (WGLEW_ARB_pbuffer)
+        set_attribute (iter, WGL_DRAW_TO_PBUFFER_ARB, true);              
+      
+      if (WGLEW_ARB_multisample && swap_chain_desc.samples_count)
+      {
+        set_attribute (iter, WGL_SAMPLE_BUFFERS_ARB, true);
+        set_attribute (iter, WGL_SAMPLES_ARB,        swap_chain_desc.samples_count);
+      }      
       
       if (swap_chain_desc.buffers_count > 1)
       {
@@ -86,22 +94,22 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
         }
       }
 
-      if (WGLEW_ARB_pbuffer)
-        set_attribute (iter, WGL_DRAW_TO_PBUFFER_ARB, true);
-
-      if (WGLEW_ARB_multisample && swap_chain_desc.samples_count)
-      {
-        set_attribute (iter, WGL_SAMPLE_BUFFERS_ARB, true);
-        set_attribute (iter, WGL_SAMPLES_ARB,        swap_chain_desc.samples_count);
-      }
-
       set_attribute (iter, 0, 0); //end of attribute list
 
       size_t formats_count = 0;
 
       float float_attributes [] = {0, 0};
-
-      wglChoosePixelFormatARB (device_context, integer_attributes, float_attributes, 1, &pixel_format, &formats_count);
+      
+      /*
+          Данный цикл необходим для обхода проблем с некоторыми реализациями драйверов ATI, в которых установка таких свойств
+          как WGL_SWAP_METHOD_ARB приводит к невозможности работы wglChoosePixelFormatARB
+      */
+      
+      for (;!wglChoosePixelFormatARB (device_context, integer_attributes, float_attributes, 1, &pixel_format, &formats_count) &&
+            iter != extended_properties_pos; iter -= 4)
+      {
+        set_attribute (iter, 0, 0);
+      }
     }
     
     if (!pixel_format)
@@ -155,7 +163,6 @@ void get_pixel_format (HDC device_context, int pixel_format, SwapChainDesc& swap
       WGL_ALPHA_BITS_ARB,
       WGL_DEPTH_BITS_ARB,
       WGL_STENCIL_BITS_ARB,
-//      WGL_AUX_BUFFERS_ARB,
       WGL_DOUBLE_BUFFER_ARB,
       WGL_SWAP_METHOD_ARB
     };
@@ -171,7 +178,6 @@ void get_pixel_format (HDC device_context, int pixel_format, SwapChainDesc& swap
     swap_chain_desc.frame_buffer.alpha_bits          = *iter++;
     swap_chain_desc.frame_buffer.depth_bits          = *iter++;
     swap_chain_desc.frame_buffer.stencil_bits        = *iter++;
-//    swap_chain_desc.frame_buffer.color_buffers_count = *iter++ + 1;
     swap_chain_desc.buffers_count                    = *iter++ ? 2 : 1;
     
     switch (*iter++)
@@ -203,13 +209,12 @@ void get_pixel_format (HDC device_context, int pixel_format, SwapChainDesc& swap
     if (!DescribePixelFormat (device_context, pixel_format, sizeof (pfd), &pfd))
       raise_error ("DescribePixelFormat");
 
-    swap_chain_desc.frame_buffer.color_bits          = pfd.cColorBits;
-    swap_chain_desc.frame_buffer.alpha_bits          = pfd.cAlphaBits;
-    swap_chain_desc.frame_buffer.depth_bits          = pfd.cDepthBits;
-    swap_chain_desc.frame_buffer.stencil_bits        = pfd.cStencilBits;
-//    swap_chain_desc.frame_buffer.color_buffers_count = pfd.cAuxBuffers + 1;
-    swap_chain_desc.buffers_count                    = pfd.dwFlags & PFD_DOUBLEBUFFER ? 2 : 1;
-    swap_chain_desc.swap_method                      = SwapMethod_Discard;
+    swap_chain_desc.frame_buffer.color_bits   = pfd.cColorBits;
+    swap_chain_desc.frame_buffer.alpha_bits   = pfd.cAlphaBits;
+    swap_chain_desc.frame_buffer.depth_bits   = pfd.cDepthBits;
+    swap_chain_desc.frame_buffer.stencil_bits = pfd.cStencilBits;
+    swap_chain_desc.buffers_count             = pfd.dwFlags & PFD_DOUBLEBUFFER ? 2 : 1;
+    swap_chain_desc.swap_method               = SwapMethod_Discard;
   }
 }
 
