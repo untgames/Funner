@@ -1,4 +1,9 @@
 #include "shared.h"
+#include <common/hash.h>
+
+using namespace common;
+
+const size_t image_data_size = 512 * 512 * 4;
 
 int main ()
 {
@@ -11,7 +16,8 @@ int main ()
     TextureDesc desc;
     memset (&desc, 0, sizeof (desc));
 
-    char* image_data = new char [512 * 512 * 4];
+    char* image_data = new char [image_data_size];
+    unsigned char hash[2][16];
     
     desc.dimension            = TextureDimension_2D;
     desc.width                = 508;
@@ -22,8 +28,16 @@ int main ()
     desc.generate_mips_enable = true;
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
-    texture->SetData (0, 0, 254, 254, 254, 254, PixelFormat_RGB8, image_data);
+    memset (image_data, 17, image_data_size);
+    texture->SetData (0, 0, 0, 0, 508, 508, PixelFormat_RGB8, image_data);
+    md5 (hash[0], image_data, image_data_size);
     texture->GetData (0, 0, 0, 0, 508, 508, PixelFormat_RGB8, image_data);
+    md5 (hash[1], image_data, image_data_size);
+
+    if (memcmp (hash[0], hash[1], 16))
+      printf ("RGB texture data operations works incorrect!\n");
+    else
+      printf ("RGB texture data operations works correct!\n");
 
     desc.generate_mips_enable = false;
     desc.width                = 512;
@@ -32,26 +46,36 @@ int main ()
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
 
-    texture2->SetData (0, 0, 256, 256, 256, 256, PixelFormat_RGB8, image_data);
+    texture2->SetData (0, 0, 0, 0, 512, 512, PixelFormat_RGB8, image_data);
+    md5 (hash[0], image_data, image_data_size);
+    texture2->GetData (0, 0, 0, 0, 512, 512, PixelFormat_RGB8, image_data);
+    md5 (hash[1], image_data, image_data_size);
+
+    if (memcmp (hash[0], hash[1], 16))
+      printf ("DXT texture data operations works incorrect!\n");
+    else
+      printf ("DXT texture data operations works correct!\n");
+
     texture2->SetData (0, 0, 256, 256, 256, 256, PixelFormat_DXT5, image_data);
     texture2->GetData (0, 0, 0, 0, 512, 512, PixelFormat_DXT5, image_data);
-    texture2->GetData (0, 0, 0, 0, 512, 512, PixelFormat_RGB8, image_data);
   
-    desc.format               = PixelFormat_D24S8;
+    desc.format               = PixelFormat_D16;
     desc.width                = 512;
     desc.height               = 512;
 
     xtl::com_ptr<ITexture> texture3 (test.device->CreateTexture (desc), false);
 
-    texture3->SetData (0, 0, 256, 256, 256, 256, PixelFormat_D24S8, image_data);
-    texture3->GetData (0, 0, 0, 0, 512, 512, PixelFormat_D24S8, image_data);
+    texture3->SetData (0, 0, 0, 0, 512, 512, PixelFormat_D16, image_data);
+    md5 (hash[0], image_data, image_data_size);
+    texture3->GetData (0, 0, 0, 0, 512, 512, PixelFormat_D16, image_data);
+    md5 (hash[1], image_data, image_data_size);
+
+    if (memcmp (hash[0], hash[1], 16))
+      printf ("Depth texture data operations works incorrect!\n");
+    else
+      printf ("Depth texture data operations works correct!\n");
 
     delete [] image_data;
-
-    desc.dimension            = TextureDimension_1D;
-    desc.width                = 4096;
-  
-    xtl::com_ptr<ITexture> error_texture (test.device->CreateTexture (desc), false);
   }
   catch (std::exception& exception)
   {
