@@ -1,6 +1,7 @@
 #include <wchar.h>
 #include <string.h>
 #include <common/utf_converter.h>
+#include <common/exception.h>
 
 /*void dump32(void *ptr,int l)
 {
@@ -17,15 +18,17 @@ namespace common
 
 #define Char unsigned __int16
 
-bool decode_ASCII7(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer);
-bool decode_UTF8(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer);
-bool decode_UTF16(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer,bool bigEndian);
-bool decode_UTF32(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer,bool bigEndian);
+void ReturnExeption(int ex,char *func,int i);
 
-bool encode_ASCII7(unsigned char* dst, int dstSize, int* dstBytes, char32 cp);
-bool encode_UTF8(unsigned char* dst, int dstSize, int* dstBytes, char32 cp);
-bool encode_UTF16(unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool bigEndian);
-bool encode_UTF32(unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool bigEndian);
+int decode_ASCII7(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer);
+int decode_UTF8(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer);
+int decode_UTF16(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer,bool bigEndian);
+int decode_UTF32(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer,bool bigEndian);
+
+int encode_ASCII7(unsigned char* dst, int dstSize, int* dstBytes, char32 cp);
+int encode_UTF8(unsigned char* dst, int dstSize, int* dstBytes, char32 cp);
+int encode_UTF16(unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool bigEndian);
+int encode_UTF32(unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool bigEndian);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение: неверная кодировка Unicode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,26 +46,24 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
                            size_t      destination_buffer_size)  //размер буфера-приёмника в байтах
 {
    EncodingResult res={0,0};
+   if(source_buffer_size==0||destination_buffer_size==0)
+      return res;
+   if(source_buffer==NULL)
+      throw ArgumentNullException("utf_decode","source_buffer is null");
+   if(destination_buffer==NULL)
+      throw ArgumentNullException("utf_decode","destination_buffer is null");
    unsigned char *bsrc=(unsigned char*)source_buffer;
    char32 *dst=(char32*)destination_buffer;
    int srcSize;
    int srcBytes;
-   bool r;
+   int r;
    unsigned int i;
 
-//   printf("---source_buffer=%p\n",source_buffer);
-//   printf("---source_buffer_size=%d\n",source_buffer_size);
-//   printf("---bsrc=%p\n",bsrc);
-
-//   while((unsigned char*)source_buffer+source_buffer_size>bsrc)
-//   for(i=0;i<source_buffer_size;i++)
    i=0;
    res.destination_buffer_processed_size=0;
-   while(i<source_buffer_size)
+   while(i<source_buffer_size&&
+         res.destination_buffer_processed_size<destination_buffer_size)
    {
-//      printf("source_buffer=%p\n",source_buffer);
-//      printf("source_buffer_size=%d\n",source_buffer_size);
-//      printf("bsrc=%p\n",bsrc);
       srcSize=source_buffer_size-res.source_buffer_processed_size;
       switch (source_buffer_encoding)
       {
@@ -85,20 +86,14 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
             r=decode_UTF32(bsrc,srcSize,&srcBytes,dst,false);
             break;
       }
-//      printf("error=%d\n",r);
+      if(r!=0)
+         ReturnExeption(r,"utf_decode",i);
       i+=srcBytes;
-//      printf("srcBytes=%d, i=%d\n",srcBytes,i);
-
-//      printf("dst=%p\n",dst);
-//      printf("dst=%p\n",*dst);
       dst++;
       res.source_buffer_processed_size=i;
-      res.destination_buffer_processed_size++;
+      res.destination_buffer_processed_size+=sizeof(char32);
       bsrc+=srcBytes;
-//dump32(dst,128);
-//      printf("%s\n",dst);
    }
-   res.destination_buffer_processed_size*=sizeof(char32);
    return res;
 }
 
@@ -112,29 +107,27 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
                            Encoding    destination_buffer_encoding) //кодировка буфера-приёмника
 {
    EncodingResult res={0,0};
+   if(source_buffer_size==0||destination_buffer_size==0)
+      return res;
+   if(source_buffer==NULL)
+      throw ArgumentNullException("utf_encode","source_buffer is null");
+   if(destination_buffer==NULL)
+      throw ArgumentNullException("utf_encode","destination_buffer is null");
    char32 *bsrc=(char32*)source_buffer;
    char32 *dst=(char32*)destination_buffer;
    char32 *old_bsrc=(char32*)source_buffer;
    char32 *old_dst=(char32*)destination_buffer;
    int srcSize;
    int srcBytes;
-   bool r;
+   int r;
 
-//   printf("---source_buffer=%p\n",source_buffer);
-//   printf("---source_buffer_size=%d\n",source_buffer_size);
-//   printf("---bsrc=%p\n",bsrc);
-
-   while((char32*)source_buffer+source_buffer_size/sizeof(char32)>bsrc)
+   while((char32*)source_buffer+source_buffer_size/sizeof(char32)>bsrc&&
+          res.destination_buffer_processed_size<destination_buffer_size)
    {
-//printf("start ------------------\n");
-//      printf("source_buffer=%p\n",source_buffer);
-//      printf("source_buffer_size=%d\n",source_buffer_size);
-//      printf("bsrc=%p\n",bsrc);
       srcSize=source_buffer_size-res.source_buffer_processed_size;
       switch (destination_buffer_encoding)
       {
          case Encoding_Ascii7:
-//bool encode_ASCII7(unsigned char* dst,int dstSize,int* dstBytes,unsigned int cp);
             r=encode_ASCII7((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc);
             break;
          case Encoding_Utf8:
@@ -153,22 +146,13 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
             r=encode_UTF32((unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc,false);
             break;
       }
-//      printf("srcBytes=%d\n",srcBytes);
-//      printf("dst=%p\n",dst);
-//    printf("r=%s\n",r==true?"true":"false");
-//    printf("srcBytes=%d\n",srcBytes);
-//      printf("bsrc=%p\n",bsrc);
-//(unsigned char *)dst,destination_buffer_size,&srcBytes,*bsrc
+      if(r!=0)
+         ReturnExeption(r,"utf_encode",res.destination_buffer_processed_size);
       dst=(char32*)((char*)dst+srcBytes);
       res.destination_buffer_processed_size+=srcBytes;
       (char*)bsrc++;
-//      printf("---\nbsrc=%p\n",bsrc);
-//      printf("dst=%p\n",dst);
-//      printf("bsrc-old=%p\n",(char*)bsrc-(char*)old_bsrc);
-//      printf("dst-old=%p\n",(char*)dst-(char*)old_dst);
-old_bsrc=bsrc;
-old_dst=dst;
-//printf("end --------------------\n");
+      old_bsrc=bsrc;
+      old_dst=dst;
    }
    return res;
 }
@@ -231,7 +215,7 @@ EncodingResult convert_to_utf16 (const char* source_buffer,            //буфер-и
    return res;
 }
 
-bool decode_ASCII7( const unsigned char* src, int srcSize, int* srcBytes, char32* buffer )
+int decode_ASCII7( const unsigned char* src, int srcSize, int* srcBytes, char32* buffer )
 {
    const unsigned char* src0=src;
    int err=0;
@@ -255,10 +239,10 @@ bool decode_ASCII7( const unsigned char* src, int srcSize, int* srcBytes, char32
 //   if ( !err )
    *src++;
    *srcBytes = src-src0;
-   return !err;
+   return err;
 }
 
-bool decode_UTF8( const unsigned char* src, int srcSize, int* srcBytes, char32* buffer )
+int decode_UTF8( const unsigned char* src, int srcSize, int* srcBytes, char32* buffer )
 {
    const unsigned char*src0=src;
    int err=0;
@@ -319,10 +303,10 @@ bool decode_UTF8( const unsigned char* src, int srcSize, int* srcBytes, char32* 
    if ( !err )
       *buffer = cp;
    *srcBytes = src-src0;
-   return !err;
+   return err;
 }
 
-bool decode_UTF16( const unsigned char* src, int srcSize, int* srcBytes, char32* buffer, bool bigEndian )
+int decode_UTF16( const unsigned char* src, int srcSize, int* srcBytes, char32* buffer, bool bigEndian )
 {
    const unsigned char* src0=src;
    int err=0;
@@ -365,10 +349,10 @@ bool decode_UTF16( const unsigned char* src, int srcSize, int* srcBytes, char32*
    else
       *buffer = 0x3F;
    *srcBytes = src-src0;
-   return !err;
+   return err;
 }
 
-bool decode_UTF32( const unsigned char* src, int srcSize, int* srcBytes, char32* buffer, bool bigEndian )
+int decode_UTF32( const unsigned char* src, int srcSize, int* srcBytes, char32* buffer, bool bigEndian )
 {
    const unsigned char* src0=src;
    int err=0;
@@ -406,11 +390,11 @@ bool decode_UTF32( const unsigned char* src, int srcSize, int* srcBytes, char32*
    if ( !err )
       *buffer = cp;
    *srcBytes = src-src0;
-   return !err;
+   return err;
 }
 
 
-bool encode_ASCII7( unsigned char* dst, int dstSize, int* dstBytes, char32 cp)
+int encode_ASCII7( unsigned char* dst, int dstSize, int* dstBytes, char32 cp)
 {
    const unsigned char *dst0=dst;
    int err=0;
@@ -421,10 +405,10 @@ bool encode_ASCII7( unsigned char* dst, int dstSize, int* dstBytes, char32 cp)
       *dst++=(unsigned char)cp;
 
    *dstBytes = dst-dst0;
-   return !err;
+   return err;
 }
 
-bool encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, char32 cp)
+int encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, char32 cp)
 {
    const unsigned char *dst0=dst;
    int err=0;
@@ -489,10 +473,10 @@ bool encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, char32 cp)
       err = 2;
    }
    *dstBytes = dst-dst0;
-   return !err;
+   return err;
 }
 
-bool encode_UTF16( unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool bigEndian)
+int encode_UTF16( unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool bigEndian)
 {
    const unsigned char*dst0= dst;
    int err= 0;
@@ -535,10 +519,10 @@ bool encode_UTF16( unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bo
    }
 
    *dstBytes = dst-dst0;
-   return !err;
+   return err;
 }
 
-bool encode_UTF32( unsigned char* dst, int dstSize, int* dstBytes,char32 cp, bool bigEndian )
+int encode_UTF32( unsigned char* dst, int dstSize, int* dstBytes,char32 cp, bool bigEndian )
 {
    const unsigned char *dst0= dst;
    int err=0;
@@ -570,11 +554,13 @@ bool encode_UTF32( unsigned char* dst, int dstSize, int* dstBytes,char32 cp, boo
       }
    }
    *dstBytes = dst-dst0;
-   return !err;
+   return err;
 }
 
 stl::wstring towstring (const char* string, int length)
 {
+   if(string==NULL)
+      throw ArgumentNullException("towstring","string is null");
   if (!string)
     return L"";
 
@@ -600,6 +586,8 @@ stl::wstring towstring (const char* string, int length)
 
 stl::wstring towstring (const char* string)
 {
+   if(string==NULL)
+      throw ArgumentNullException("towstring","string is null");
   return towstring (string, -1);
 }
 
@@ -613,6 +601,8 @@ stl::wstring towstring (const stl::string& string)
 
 stl::string tostring (const wchar_t* string, int length)
 {
+   if(string==NULL)
+      throw ArgumentNullException("tostring","string is null");
   if (!string)
     return "";
 
@@ -638,6 +628,8 @@ stl::string tostring (const wchar_t* string, int length)
 
 stl::string tostring (const wchar_t* string)
 {
+   if(string==NULL)
+      throw ArgumentNullException("tostring","string is null");
   return tostring (string, -1);
 }
 
@@ -649,4 +641,27 @@ stl::string tostring (const stl::wstring& string)
   return tostring (&string [0], string.size ());
 }
 
+void ReturnExeption(int ex,char *func,int i)
+{
+   char ErrorBuf[128];
+   switch(ex)
+   {
+      case 1:
+         sprintf(ErrorBuf,"Out-of-range ASCII-7 code (%d)",i);
+         throw ArgumentException(func,ErrorBuf);
+         break;
+      case 2:
+         sprintf(ErrorBuf,"Invalid Unicode scalar value (%d)",i);
+         throw ArgumentException(func,ErrorBuf);
+         break;
+      case 4:
+         sprintf(ErrorBuf,"Not enough encoded bytes available (%d)",i);
+         throw ArgumentException(func,ErrorBuf);
+         break;
+      case 5:
+         sprintf(ErrorBuf,"Not enough buffer space (%d)",i);
+         throw ArgumentException(func,ErrorBuf);
+         break;
+   }
+}
 }
