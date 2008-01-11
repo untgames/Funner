@@ -2,11 +2,11 @@
 
 int main ()
 {
-  printf ("Results of depth_stencil_state_test:\n");
+  printf ("Results of depth_stencil_state_test1:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (depth_stencil_state)");
+    Test test (L"OpenGL device test window (depth_stencil_state1)");
     
     dump_desc (*test.device->OSGetDepthStencilState ());    
     

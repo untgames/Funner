@@ -263,37 +263,40 @@ void DepthStencilState::Bind (size_t reference)
 
   glCallList (display_list);
   
-  if (need_two_side_stencil)
+  if (desc.stencil_test_enable)
   {
-      //получение информации о доступных расширениях
-    
-    bool has_ext_stencil_two_side = GLEW_EXT_stencil_two_side != 0,
-         has_ati_separate_stencil = GLEW_ATI_separate_stencil || GLEW_VERSION_2_0;
-    
-    if (has_ati_separate_stencil)
+    if (need_two_side_stencil)
     {
-      if (glStencilFuncSeparate)
+        //получение информации о доступных расширениях
+      
+      bool has_ext_stencil_two_side = GLEW_EXT_stencil_two_side != 0,
+           has_ati_separate_stencil = GLEW_ATI_separate_stencil || GLEW_VERSION_2_0;
+      
+      if (has_ati_separate_stencil)
       {
-        glStencilFuncSeparate (GL_FRONT, gl_stencil_func [0], reference, desc.stencil_read_mask);
-        glStencilFuncSeparate (GL_BACK, gl_stencil_func [1], reference, desc.stencil_read_mask);
+        if (glStencilFuncSeparate)
+        {
+          glStencilFuncSeparate (GL_FRONT, gl_stencil_func [0], reference, desc.stencil_read_mask);
+          glStencilFuncSeparate (GL_BACK, gl_stencil_func [1], reference, desc.stencil_read_mask);
+        }
+        else if (glStencilFuncSeparateATI)
+        {
+          glStencilFuncSeparateATI (GL_FRONT, gl_stencil_func [0], reference, desc.stencil_read_mask);
+          glStencilFuncSeparateATI (GL_BACK, gl_stencil_func [1], reference, desc.stencil_read_mask);
+        }
       }
-      else if (glStencilFuncSeparateATI)
+      else if (has_ext_stencil_two_side)
       {
-        glStencilFuncSeparateATI (GL_FRONT, gl_stencil_func [0], reference, desc.stencil_read_mask);
-        glStencilFuncSeparateATI (GL_BACK, gl_stencil_func [1], reference, desc.stencil_read_mask);
+        glActiveStencilFaceEXT (GL_FRONT);
+        glStencilFunc          (gl_stencil_func [0], reference, desc.stencil_read_mask);
+        glActiveStencilFaceEXT (GL_BACK);
+        glStencilFunc          (gl_stencil_func [1], reference, desc.stencil_read_mask);
       }
     }
-    else if (has_ext_stencil_two_side)
+    else
     {
-      glActiveStencilFaceEXT (GL_FRONT);
-      glStencilFunc          (gl_stencil_func [0], reference, desc.stencil_read_mask);
-      glActiveStencilFaceEXT (GL_BACK);
-      glStencilFunc          (gl_stencil_func [1], reference, desc.stencil_read_mask);
+      glStencilFunc (gl_stencil_func [0], reference, desc.stencil_read_mask);
     }
-  }
-  else
-  {
-    glStencilFunc (gl_stencil_func [0], reference, desc.stencil_read_mask);
   }
 
   CheckErrors (METHOD_NAME);
