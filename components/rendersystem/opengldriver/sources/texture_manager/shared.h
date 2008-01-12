@@ -83,12 +83,12 @@ class Texture2D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+    virtual void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
+    virtual void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Текстура со сторонами не степени 2, работающие через расширение GL_EXT_texture_rectangle
+///Текстура со сторонами не степени 2, работающая через расширение GL_EXT_texture_rectangle
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class TextureNPOT : public Texture
 {
@@ -103,6 +103,28 @@ class TextureNPOT : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
     void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Текстура со сторонами не степени 2, растянутая (используетсяч при остутствии GL_EXT_texture_rectangle)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class TextureEmulatedNPOT : public Texture2D
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    TextureEmulatedNPOT (const ContextManager&, const TextureDesc& texture_desc, float in_horisontal_scale, float in_vertical_scale);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с данными
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
+    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+
+  private:
+    float horisontal_scale; //коэффициент растягивания по горизонтали
+    float vertical_scale;   //коэффициент растягивания по вертикали
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,7 +173,9 @@ GLenum gl_type              (PixelFormat format);  //тип OpenGL
 bool   is_compressed_format (PixelFormat format);  //является ли формат сжатым
 size_t compressed_quad_size (PixelFormat format);  //размер блока сжатых пикселей 4*4 в байтах
 
-void   scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest);
+void scale_image_2x_down (PixelFormat format, size_t width,     size_t height,     const void* src, void* dest);
+void scale_image         (PixelFormat format, size_t width,     size_t height, 
+                                              size_t new_width, size_t new_height, const void* src, void* dest);
 
 }
 

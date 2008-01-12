@@ -17,14 +17,8 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
 
   glTexImage1D (GL_TEXTURE_1D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
 
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
   if (tex_desc.generate_mips_enable)
   {
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     mips_count = (size_t)(log ((float)tex_desc.width) / log (2.f));
 
     if (has_SGIS_generate_mipmap)
@@ -49,9 +43,9 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     RaiseNullArgument ("render::low_level::opengl::Texture1D::SetData", "buffer");
 
   if (mip_level > mips_count)
-    RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "mip_level", 0, mips_count);
+    RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "mip_level", mip_level, (size_t)0, mips_count);
   if ((x + width) > (desc.width) >> mip_level)
-    RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "x + width", 0, desc.width >> mip_level);
+    RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "x + width", x + width, (size_t)0, desc.width >> mip_level);
   if (!width)
     return;
   if (is_compressed_format (source_format))
@@ -91,11 +85,11 @@ void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   if (!buffer)
     RaiseNullArgument ("render::low_level::opengl::Texture1D::SetData", "buffer");
   if (mip_level > mips_count)
-    RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "mip_level", 0, mips_count);
+    RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "mip_level", mip_level, (size_t)0, mips_count);
   if (x)
-    RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "x", 0, 0);
+    RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "x", x, (size_t)0, (size_t)0);
   if (width != desc.width)
-    RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "width", desc.width, desc.width);
+    RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "width", width, desc.width, desc.width);
   if (is_compressed_format (target_format))
     RaiseInvalidArgument ("render::low_level::opengl::Texture2D::GetData", "target_format", target_format, "Can't get compressed data from 1d texture.");
 

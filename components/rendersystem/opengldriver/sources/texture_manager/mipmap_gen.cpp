@@ -6,6 +6,7 @@
 typedef unsigned char  uchar;
 typedef unsigned short uint16;
 typedef unsigned int   r24g8_t;
+typedef int            fixed;
 
 struct two_color8_t
 {
@@ -107,6 +108,61 @@ void scale_image_2x_down_impl (size_t width, size_t height, const T* src,T* dest
   }
 }
 
+fixed int2fixed (int data)
+{
+  return data << 16;
+}
+
+int fixed2int (fixed data)
+{
+  return data >> 16;
+}
+
+fixed float2fixed (float data)
+{
+  return (fixed)(data * 65536.f);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+///Полное мастштабирование (не более чем в два раза)
+////////////////////////////////////////////////////////////////////////////////////////////
+template <class T>
+void scale_image_impl (size_t width, size_t height, const T* src, size_t newWidth, size_t newHeight, T* res)
+{
+  fixed    sw  = int2fixed (width),
+           sh  = int2fixed (height),
+           rw  = int2fixed (newWidth),
+           rh  = int2fixed (newHeight);
+  fixed    dkx = float2fixed ((float)width / (float)newWidth), 
+           dky = float2fixed ((float)height / (float)newHeight);
+  fixed    sx  = 0, 
+           sy  = 0;
+  const T* line = src;
+
+  for (size_t ry = 0; ry < newHeight; ry++, sy += dky)
+  {
+    if (fixed2int (sy) > 0)
+    {
+      line += fixed2int (sy) * width;
+      sy   &= 0xFFFF;
+    }
+
+    sx         = 0;
+    const T* s = line;
+
+    for (size_t rx = 0; rx < newWidth; rx++, sx += dkx, res++)
+    {
+      if (fixed2int (sx) > 0)
+      {
+        s   += fixed2int (sx);
+        sx  &= 0xFFFF;
+      }  
+
+      *res = *s;   
+    }
+  }    
+}
+
 void render::low_level::opengl::scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest)
 {
   switch (format)
@@ -123,9 +179,29 @@ void render::low_level::opengl::scale_image_2x_down (PixelFormat format, size_t 
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-    default: return;
+    default: common::RaiseNotSupported ("render::low_level::opengl::scale_image", "DXT image scaling not supported.");;
   }
 }
 
+void render::low_level::opengl::scale_image (PixelFormat format, size_t width, size_t height, 
+                                             size_t new_width, size_t new_height, const void* src, void* dest)
+{
+  switch (format)
+  {
+    case PixelFormat_L8:
+    case PixelFormat_A8:
+    case PixelFormat_S8:    scale_image_impl <uchar>        (width, height, (uchar*)       src, new_width, new_height, (uchar*)       dest); break;
+    case PixelFormat_LA8:   scale_image_impl <two_color8_t> (width, height, (two_color8_t*)src, new_width, new_height, (two_color8_t*)dest); break;
+    case PixelFormat_D16:   scale_image_impl <uint16>       (width, height, (uint16*)      src, new_width, new_height, (uint16*)      dest); break;
+    case PixelFormat_RGB8:  scale_image_impl <rgb8_t>       (width, height, (rgb8_t*)      src, new_width, new_height, (rgb8_t*)      dest); break;
+    case PixelFormat_RGBA8: scale_image_impl <rgba8_t>      (width, height, (rgba8_t*)     src, new_width, new_height, (rgba8_t*)     dest); break;
+    case PixelFormat_D24S8:
+    case PixelFormat_D24X8: scale_image_impl <r24g8_t>      (width, height, (r24g8_t*)     src, new_width, new_height, (r24g8_t*)     dest); break;
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+    default: common::RaiseNotSupported ("render::low_level::opengl::scale_image", "DXT image scaling not supported.");
+  }
+}
 
 #endif

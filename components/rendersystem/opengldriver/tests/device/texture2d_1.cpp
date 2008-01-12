@@ -35,9 +35,9 @@ int main ()
     md5 (hash[1], image_data, image_data_size);
 
     if (memcmp (hash[0], hash[1], 16))
-      printf ("RGB texture data operations works incorrect!\n");
+      printf ("RGB non power of two texture data operations works incorrect!\n");
     else
-      printf ("RGB texture data operations works correct!\n");
+      printf ("RGB non power of two texture data operations works correct!\n");
 
     desc.generate_mips_enable = false;
     desc.width                = 512;

@@ -4,6 +4,15 @@ using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
+template <class T>
+T next_higher_power_of_two (T k) 
+{
+  k--;
+  for (int i=1; i < sizeof(T) * 8; i = i * 2)
+          k = k | k >> i;
+  return k + 1;
+}
+
 /*
     Описание реализации TextureManager
 */
@@ -41,7 +50,8 @@ TextureManager::Impl::Impl (const ContextManager& context_manager) : ContextObje
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_texture_size);
   if (has_EXT_texture_rectangle)
     glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, &max_rectangle_texture_size);
-  
+  else
+    max_rectangle_texture_size = max_texture_size;
   CheckErrors ("render::low_level::opengl::TextureManager::Impl::Impl");
 }
 
@@ -95,8 +105,21 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
             return new TextureNPOT (GetContextManager (), temp_desc);
           }
           else
-            RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width, 
-                                  "Texture width must be power of 2");
+          {
+            temp_desc.width = next_higher_power_of_two (tex_desc.width);
+
+            glTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                          gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+            
+            glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+            if (!width)
+              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                                 "Not enough space to create texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
+
+            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+            LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");
+            return new TextureEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width, 1);
+          }
 
       glTexImage1D (GL_PROXY_TEXTURE_1D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
       
@@ -143,8 +166,22 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
             return new TextureNPOT (GetContextManager (), temp_desc);
           }
           else
-            RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width, tex_desc.height", tex_desc.width,
-                                  "Texture width and height must be power of 2");
+          {
+            temp_desc.width  = next_higher_power_of_two (tex_desc.width);
+            temp_desc.height = next_higher_power_of_two (tex_desc.height);
+
+            glTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                          gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+            
+            glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+            if (!width)
+              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                                 "Not enough space to create texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
+
+            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+            LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");
+            return new TextureEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width, (float)temp_desc.height / (float)tex_desc.height);
+          }
       }
 
       if (is_compressed_format (tex_desc.format))

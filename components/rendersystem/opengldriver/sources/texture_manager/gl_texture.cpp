@@ -126,13 +126,15 @@ GLenum gl_format (PixelFormat format)
     {
       if (GLEW_ARB_depth_texture || GLEW_VERSION_1_4)
         return GL_DEPTH_COMPONENT;
-      else common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", "Depth textures not supported.");
+      else common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", 
+                                      "Depth textures not supported. ARB_depth_texture extension not detected.");
     }
     case PixelFormat_D24S8:
     {
       if ((GLEW_ARB_depth_texture || GLEW_VERSION_1_4) && GLEW_EXT_packed_depth_stencil)
         return GL_DEPTH_STENCIL_EXT;  
-      else common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", "Depth-stencil textures not supported.");
+      else common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", 
+                                      "Depth-stencil textures not supported. EXT_packed_depth_stencil extension not detected.");
     }
     case PixelFormat_S8:    common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", "Stencil textures not supported.");
     default: common::RaiseInvalidArgument ("render::low_level::opengl::Texture::gl_format", "format"); return GL_ALPHA;

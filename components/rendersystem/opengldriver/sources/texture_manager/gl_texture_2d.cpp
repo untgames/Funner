@@ -22,14 +22,8 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     glTexImage2D (GL_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
                   gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  
   if (tex_desc.generate_mips_enable)
   {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     tex_desc.width > tex_desc.height ? mips_count = (size_t)(log ((float)tex_desc.width) / log (2.f)) : 
                                        mips_count = (size_t)(log ((float)tex_desc.height) / log (2.f));
 
@@ -68,11 +62,11 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     RaiseNullArgument ("render::low_level::opengl::Texture2D::SetData", "buffer");
 
   if (mip_level > mips_count)
-    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "mip_level", 0, mips_count);
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "mip_level", mip_level, (size_t)0, mips_count);
   if (((x + width) > (desc.width >> mip_level)) && ((x + width) != 1))
-    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "x + width", 0, desc.width >> mip_level);
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "x + width", x + width, (size_t)0, desc.width >> mip_level);
   if (((y + height) > (desc.height >> mip_level)) && ((y + height) != 1))
-    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "y + height", 0, desc.height >> mip_level);
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::SetData", "y + height", y + height, (size_t)0, desc.height >> mip_level);
   if (!width || !height)
     return;
   if (is_compressed_format (desc.format))
@@ -142,15 +136,15 @@ void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   if (!buffer)
     RaiseNullArgument ("render::low_level::opengl::Texture2D::SetData", "buffer");
   if (mip_level > mips_count)
-    RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "mip_level", 0, mips_count);
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "mip_level", mip_level, (size_t)0, mips_count);
   if (x)
-    RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "x", 0, 0);
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "x", x, (size_t)0, (size_t)0);
   if (y)
-    RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "y", 0, 0);
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "y", y, (size_t)0, (size_t)0);
   if (width != desc.width)
-    RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "width", desc.width, desc.width);
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "width", width, desc.width, desc.width);
   if (height != desc.height)
-    RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "height", desc.height, desc.height);
+    RaiseOutOfRange ("render::low_level::opengl::Texture2D::GetData", "height", height, desc.height, desc.height);
   if (is_compressed_format (target_format))
     if (target_format != desc.format)
       RaiseInvalidArgument ("render::low_level::opengl::Texture2D::GetData", "target_format", target_format, "Can't get compressed texture data, format is different.");
