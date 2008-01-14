@@ -1,0 +1,11 @@
+Results of regexp2_test:
+Found 9 matches:
+    'X=Y'
+    'X'
+    'Y'
+    'A=E'
+    'A'
+    'E'
+    'CC=D'
+    'CC'
+    'D'

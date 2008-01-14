@@ -4,6 +4,7 @@
 #include <common/strwrap.h>
 #include <stl/string>
 #include <stl/vector>
+#include <xtl/functional_fwd>
 
 namespace common
 {
@@ -56,13 +57,19 @@ stl::vector<stl::string> split (const char* str,const char* delimiters=" ",const
 stl::vector<stl::string> split (const stl::string& str,const char* delimiters=" ",const char* spaces=" \t");
 
 /*
+    Разбор строк инициализации (property1=value property2='string value')
+*/
+
+void parse_init_string (const char* init_string, const xtl::function<void (const char* property, const char* value)>& fn);
+
+/*
     Работа с регулярными выражениями
 */
 
-stl::vector<stl::string> parse   (const char* string,const char* re_pattern);
-stl::string              replace (const char* string,const char* re_pattern,const char* replacement);
+stl::vector<stl::string> parse   (const char* string,const char* re_pattern, const char* flags="");
+stl::string              replace (const char* string,const char* re_pattern,const char* replacement, const char* flags="");
 
-bool rematch  (const char* string,const char* re_pattern);
+bool rematch  (const char* string,const char* re_pattern, const char* flags="");
 bool wcmatch  (const char* string,const char* wildcard);
 bool wcimatch (const char* string,const char* wildcard);
 

@@ -7,7 +7,7 @@ using namespace common;
 
 int main ()
 {
-  printf ("Results of regexp_test:\n");  
+  printf ("Results of regexp1_test:\n");
 
   const char* pattern = "(hello) ([[:lower:]]+)";
   const char* str     = "hello world";  

@@ -1,4 +1,0 @@
-Results of regexp_test:
-parse 'hello world' (pattern='(hello) ([[:lower:]]+)', locale='C') on 2 tokens:
-    'hello'
-    'world'
