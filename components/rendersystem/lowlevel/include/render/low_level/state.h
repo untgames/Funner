@@ -3,6 +3,7 @@
 
 #include <render/low_level/object.h>
 #include <render/low_level/common.h>
+#include <stl/vector>
 
 namespace render
 {
@@ -92,15 +93,18 @@ struct VertexWeight
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Дескриптор входного потока
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+const size_t Max_Vertex_Attributes_Count = 8;
+
 struct InputLayoutDesc
 {
-  size_t                 vertex_attributes_count; //количество вершинных атрибутов
-  const VertexAttribute* vertex_attributes;       //вершинные атрибуты
-  size_t                 vertex_weights_count;    //количество вершинных весов
-  const VertexWeight*    vertex_weights;          //вершинные веса  
-  InputDataType          index_type;              //тип индексов в вершинном буфере
-  size_t                 index_buffer_offset;     //смещение в индексном буфере
-  size_t                 first_matrix;            //смещение в массиве матриц
+
+  size_t                vertex_attributes_count;                        //количество вершинных атрибутов
+  VertexAttribute       vertex_attributes[Max_Vertex_Attributes_Count]; //вершинные атрибуты
+  //size_t                vertex_weights_count;                           //количество вершинных весов
+  //const VertexWeight*   vertex_weights;                                 //вершинные веса  
+  InputDataType         index_type;                                     //тип индексов в вершинном буфере
+  size_t                index_buffer_offset;                            //смещение в индексном буфере
+  size_t                first_matrix;                                   //смещение в массиве матриц
 };
 
 /*

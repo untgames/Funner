@@ -51,6 +51,69 @@ struct InputStage::Impl: public ContextObject
   }
   
   //////////////////////////////////////////
+  /// создание ресурсов
+  //////////////////////////////////////////
+
+  IInputLayoutState* CreateInputLayoutState(const InputLayoutDesc& desc)
+  {
+    try
+    {
+      return new InputLayoutState(desc);
+    }
+    catch (common::Exception& exception)
+    {
+      exception.Touch("render::low_level::opengl::InputStage::Impl::CreateInputLayoutState (const InputLayoutDesc& desc)");
+      throw;
+    }
+  }
+
+  IBuffer* CreateVertexBuffer (const BufferDesc& desc)
+  {
+    try
+    {
+      MakeContextCurrent();
+     
+      if (!(desc.bind_flags & BindFlag_VertexBuffer))
+        RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::CreateVertexBuffer (const BufferDesc& desc)",
+                             "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
+                             "Buffer descriptor must include VertexBuffer binding support");
+    
+      if (GLEW_ARB_vertex_buffer_object)
+        return new VboBuffer(GetContextManager(), GL_ARRAY_BUFFER, desc);
+      else
+        return new SystemMemoryBuffer(desc);
+    }
+    catch (common::Exception& exception)
+    {
+      exception.Touch("render::low_level::opengl::InputStage::Impl::CreateVertexBuffer (const BufferDesc& desc)");
+      throw;
+    }
+  }
+
+  IBuffer* CreateIndexBuffer (const BufferDesc& desc)
+  {
+    try
+    {
+      MakeContextCurrent();
+
+      if (!(desc.bind_flags & BindFlag_IndexBuffer))
+        RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::CreateIndexBuffer (const BufferDesc& desc)",
+                             "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
+                             "Buffer descriptor must include IndexBuffer binding support");
+
+      if (GLEW_ARB_vertex_buffer_object)
+        return new VboBuffer(GetContextManager(), GL_ELEMENT_ARRAY_BUFFER, desc);
+      else
+        return new SystemMemoryBuffer(desc);
+    }
+    catch (common::Exception& exception)
+    {
+      exception.Touch("render::low_level::opengl::InputStage::Impl::CreateIndexBuffer (const BufferDesc& desc)");
+      throw;
+    } 
+  }
+
+  //////////////////////////////////////////
   /// операции над InputLayoutState
   //////////////////////////////////////////
   
@@ -172,7 +235,7 @@ IInputLayoutState* InputStage::CreateInputLayoutState (const InputLayoutDesc& de
 {
   try
   {
-    return new InputLayoutState(desc);
+    return impl->CreateInputLayoutState(desc);
   }
   catch (common::Exception& exception)
   {
@@ -187,17 +250,7 @@ IBuffer* InputStage::CreateVertexBuffer (const BufferDesc& desc)
 {
   try
   {
-    impl->MakeContextCurrent();
-    
-    if (!(desc.bind_flags & BindFlag_VertexBuffer))
-      RaiseInvalidArgument("render::low_level::opengl::InputStage::CreateVertexBuffer (const BufferDesc& desc)",
-                           "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
-                           "Buffer descriptor must include VertexBuffer binding support");
-    
-    if (GLEW_ARB_vertex_buffer_object)
-      return new VboBuffer(impl->GetContextManager(), GL_ARRAY_BUFFER, desc);
-    else
-      return new SystemMemoryBuffer(desc);
+    impl->CreateVertexBuffer(desc);
   }
   catch (common::Exception& exception)
   {
@@ -212,17 +265,7 @@ IBuffer* InputStage::CreateIndexBuffer (const BufferDesc& desc)
 {
   try
   {
-    impl->MakeContextCurrent();
-
-    if (!(desc.bind_flags & BindFlag_IndexBuffer))
-      RaiseInvalidArgument("render::low_level::opengl::InputStage::CreateVertexBuffer (const BufferDesc& desc)",
-                           "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
-                           "Buffer descriptor must include IndexBuffer binding support");
-
-    if (GLEW_ARB_vertex_buffer_object)
-      return new VboBuffer(impl->GetContextManager(), GL_ELEMENT_ARRAY_BUFFER, desc);
-    else
-      return new SystemMemoryBuffer(desc);
+    impl->CreateIndexBuffer(desc);
   }
   catch (common::Exception& exception)
   {
