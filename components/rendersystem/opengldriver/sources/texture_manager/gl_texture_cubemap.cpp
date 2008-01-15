@@ -160,6 +160,7 @@ void TextureCubemap::GetData (size_t layer, size_t mip_level, size_t x, size_t y
       RaiseInvalidArgument ("render::low_level::opengl::TextureCubemap::GetData", "target_format", target_format, "Can't get compressed texture data, format is different.");
 
   MakeContextCurrent ();
+  Bind ();
 
   if (is_compressed_format (target_format))
     glGetCompressedTexImage (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, buffer);

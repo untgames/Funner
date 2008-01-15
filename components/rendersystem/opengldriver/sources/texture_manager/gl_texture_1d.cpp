@@ -94,6 +94,7 @@ void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     RaiseInvalidArgument ("render::low_level::opengl::Texture2D::GetData", "target_format", target_format, "Can't get compressed data from 1d texture.");
 
   MakeContextCurrent ();
+  Bind ();
 
   glGetTexImage (GL_TEXTURE_1D, mip_level, gl_format (target_format), gl_type (target_format), buffer);
   

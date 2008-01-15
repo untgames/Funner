@@ -66,6 +66,7 @@ void TextureNPOT::GetData (size_t layer, size_t mip_level, size_t x, size_t y, s
     RaiseInvalidArgument ("render::low_level::opengl::TextureNPOT::GetData", "target_format", target_format, "Can't get compressed texture data, format is different.");
 
   MakeContextCurrent ();
+  Bind ();
 
   glGetTexImage (GL_TEXTURE_RECTANGLE_EXT, 0, gl_format (target_format), gl_type (target_format), buffer);
   
