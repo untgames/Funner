@@ -22,7 +22,7 @@ int main ()
     desc.dimension            = TextureDimension_2D;
     desc.width                = 508;
     desc.height               = 508;
-    desc.layers               = 0;
+    desc.layers               = 1;
     desc.format               = PixelFormat_RGB8;
     desc.bind_flags           = BindFlag_Texture;
     desc.generate_mips_enable = true;
@@ -40,9 +40,9 @@ int main ()
       printf ("RGB non power of two texture data operations works correct!\n");
 
     desc.generate_mips_enable = false;
+    desc.format               = PixelFormat_DXT5;
     desc.width                = 512;
     desc.height               = 512;
-    desc.format               = PixelFormat_DXT5;
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
 
@@ -60,8 +60,6 @@ int main ()
     texture2->GetData (0, 0, 0, 0, 512, 512, PixelFormat_DXT5, image_data);
   
     desc.format               = PixelFormat_D16;
-    desc.width                = 512;
-    desc.height               = 512;
 
     xtl::com_ptr<ITexture> texture3 (test.device->CreateTexture (desc), false);
 
@@ -74,6 +72,25 @@ int main ()
       printf ("Depth texture data operations works incorrect!\n");
     else
       printf ("Depth texture data operations works correct!\n");
+
+    desc.format    = PixelFormat_RGB8;
+    desc.dimension = TextureDimension_Cubemap;
+    desc.width     = 508;
+    desc.height    = 508;
+    desc.layers    = 6;
+
+    xtl::com_ptr<ITexture> texture4 (test.device->CreateTexture (desc), false);
+
+    texture4->SetData (4, 0, 0, 0, 508, 508, PixelFormat_RGB8, image_data);
+    md5 (hash[0], image_data, image_data_size);
+    texture4->GetData (4, 0, 0, 0, 508, 508, PixelFormat_RGB8, image_data);
+    md5 (hash[1], image_data, image_data_size);
+
+    if (memcmp (hash[0], hash[1], 16))
+      printf ("Cubemap texture data operations works incorrect!\n");
+    else
+      printf ("Cubemap texture data operations works correct!\n");
+
 
     delete [] image_data;
   }

@@ -179,7 +179,7 @@ void render::low_level::opengl::scale_image_2x_down (PixelFormat format, size_t 
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-    default: common::RaiseNotSupported ("render::low_level::opengl::scale_image", "DXT image scaling not supported.");;
+    default: common::RaiseNotSupported ("render::low_level::opengl::scale_image_2x_down", "DXT image scaling not supported.");;
   }
 }
 

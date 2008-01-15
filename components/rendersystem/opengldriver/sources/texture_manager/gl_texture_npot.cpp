@@ -51,7 +51,7 @@ void TextureNPOT::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
 void TextureNPOT::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   if (!buffer)
-    RaiseNullArgument ("render::low_level::opengl::TextureNPOT::SetData", "buffer");
+    RaiseNullArgument ("render::low_level::opengl::TextureNPOT::GetData", "buffer");
   if (mip_level)
     RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::GetData", "mip_level", mip_level, (size_t)0, (size_t)0);
   if (x)

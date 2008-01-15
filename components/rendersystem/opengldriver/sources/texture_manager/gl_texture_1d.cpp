@@ -49,7 +49,7 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   if (!width)
     return;
   if (is_compressed_format (source_format))
-    RaiseInvalidArgument ("render::low_level::opengl::Texture2D::SetData", "source_format", source_format, "Can't set compressed data for 1d texture.");
+    RaiseInvalidArgument ("render::low_level::opengl::Texture1D::SetData", "source_format", source_format, "Can't set compressed data for 1d texture.");
 
   bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
 
@@ -83,13 +83,13 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   if (!buffer)
-    RaiseNullArgument ("render::low_level::opengl::Texture1D::SetData", "buffer");
+    RaiseNullArgument ("render::low_level::opengl::Texture1D::GetData", "buffer");
   if (mip_level > mips_count)
     RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "mip_level", mip_level, (size_t)0, mips_count);
   if (x)
     RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "x", x, (size_t)0, (size_t)0);
-  if (width != desc.width)
-    RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "width", width, desc.width, desc.width);
+  if (width != (desc.width >> mip_level))
+    RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "width", width, desc.width >> mip_level, desc.width >> mip_level);
   if (is_compressed_format (target_format))
     RaiseInvalidArgument ("render::low_level::opengl::Texture2D::GetData", "target_format", target_format, "Can't get compressed data from 1d texture.");
 
