@@ -126,4 +126,44 @@ size_t strihash (const wchar_t* s,size_t init_hash)
   return hash;
 }
 
+size_t strnhash (const char* s,size_t length,size_t init_hash)
+{
+  if (!s)
+    return 0;
+
+  return crc32 (s,length,init_hash);
+}
+
+size_t strnhash (const wchar_t* s,size_t length,size_t init_hash)
+{
+  if (!s)
+    return 0;
+
+  return crc32 (s,length*sizeof (wchar_t),init_hash);
+}
+
+size_t strnihash (const char* s,size_t size,size_t init_hash)
+{
+  if (!s)
+    return 0;
+
+  size_t hash = init_hash;
+  
+  for (const unsigned char* p=(const unsigned char*)s;size--;hash=crc32 ((unsigned char)tolower (*p++),hash));
+
+  return hash;
+}
+
+size_t strnihash (const wchar_t* s,size_t size,size_t init_hash)
+{
+  if (!s)
+    return 0;
+
+  size_t hash = init_hash;
+  
+  for (;size--;hash=crc32 ((wchar_t)towlower (*s++),hash));
+
+  return hash;
+}
+
 }
