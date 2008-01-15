@@ -58,7 +58,17 @@ void SwapChainColorBuffer::GetSize (size_t& width, size_t& height)
 
 void SwapChainColorBuffer::Bind ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::SwapChainColorBuffer::Bind");
+  try
+  {
+    GetContextManager ().SetContext (0, swap_chain.get (), swap_chain.get ());
+    MakeContextCurrent ();
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::SwapChainColorBuffer::Bind");
+    
+    throw;
+  }
 }
 
 /*
@@ -135,5 +145,15 @@ void SwapChainDepthStencilBuffer::GetSize (size_t& out_width, size_t& out_height
 
 void SwapChainDepthStencilBuffer::Bind ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::SwapChainDepthStencilBuffer::Bind");
+  try
+  {
+    GetContextManager ().SetContext (context_id, 0, 0);
+    MakeContextCurrent ();
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::SwapChainDepthStencilBuffer::Bind");
+    
+    throw;
+  }  
 }

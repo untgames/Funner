@@ -7,7 +7,6 @@
 #include <exception>
 
 #include <syslib/window.h>
-#include <syslib/application.h> //out!!!
 
 #include <render/low_level/opengl_driver.h>
 #include <render/low_level/device.h>
@@ -15,6 +14,7 @@
 #include <render/low_level/utils.h>
 
 #include <xtl/intrusive_ptr.h>
+#include <xtl/uninitialized_storage.h>
 
 using namespace render::low_level;
 

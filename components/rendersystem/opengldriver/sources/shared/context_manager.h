@@ -73,13 +73,12 @@ class ContextManager
     void        SetContext       (size_t context_id, ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain);
     ISwapChain* GetDrawSwapChain () const;
     ISwapChain* GetReadSwapChain () const;
-    size_t      GetContextId     () const;
+    size_t      GetContextId     () const;    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///јктиваци€ текущего контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void MakeContextCurrent () const;
-    bool IsContextCurrent   () const; //убрать
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абота с таблицей локальных данных текущего контекста

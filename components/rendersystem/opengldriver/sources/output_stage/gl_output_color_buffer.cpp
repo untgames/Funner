@@ -91,22 +91,28 @@ void ColorBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
   Bind ();
 
     //проверка наличия расширения GL_ARB_window_pos либо версии OpenGL не ниже 1.4
-
-  if (glWindowPos2iARB)
-  {
-    glWindowPos2iARB (x, y);
-  }
-  else if (glWindowPos2i)
-  {
-    glWindowPos2i (x, y);
-  }
-  else
-  {
+    
+  static Extension ARB_window_pos = "GL_ARB_window_pos",
+                   Version_1_4    = "GL_VERSION_1_4";
+  
+  if (!IsSupported (ARB_window_pos) && !IsSupported (Version_1_4))
     RaiseNotSupported (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
-  }
+
+  if      (glWindowPos2iARB) glWindowPos2iARB (x, y);
+  else if (glWindowPos2i)    glWindowPos2i    (x, y);
+  else                       return;
 
     //копирование
-
+    
+/*   glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+   glPixelStorei(GL_PACK_ALIGNMENT, 1);
+   glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+   glPixelStorei(GL_PACK_SKIP_PIXELS, 0);    
+         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+         glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+         glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);   */
+    
   glDrawPixels (width, height, format, GL_UNSIGNED_BYTE, buffer);
 
     //проверка состояния OpenGL
@@ -122,10 +128,7 @@ void ColorBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, s
     RaiseOutOfRange (METHOD_NAME, "layer", layer, 1);
     
   if (mip_level)
-    RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, 1);    
-    
-  if (target_format != PixelFormat_RGBA8)
-    RaiseNotSupported (METHOD_NAME, "target_format != PixelFormat_RGBA8");
+    RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, 1);        
 
   if (!width || !height)
     return;

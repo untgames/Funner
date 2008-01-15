@@ -257,9 +257,29 @@ struct ContextManager::Impl: public xtl::reference_counter
       static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::SetContext";
       
       if (context_id == current_context_id && draw_swap_chain == current_draw_swap_chain && read_swap_chain == current_read_swap_chain)
-        return;      
+        return;
+        
+      if (!read_swap_chain)
+        read_swap_chain = draw_swap_chain;
+        
+      if (!context_id && !draw_swap_chain)
+        RaiseNullArgument (METHOD_NAME, "draw_swap_chain && context_id");
+        
+      if (!context_id) //поиск совместимого контекста
+      {
+        try
+        {
+          context_id = GetCompatibleContextId (draw_swap_chain);
+        }
+        catch (common::Exception& exception)
+        {
+          exception.Touch (METHOD_NAME);
+          
+          throw;
+        }
+      }
 
-        //поиск контекста
+        //поиск контекста по его идентификатору
         
       ContextMap::iterator iter = context_map.find (context_id);
       
@@ -267,6 +287,9 @@ struct ContextManager::Impl: public xtl::reference_counter
         RaiseInvalidArgument (METHOD_NAME, "context_id", context_id);
 
       ContextImplPtr context = iter->second;
+      
+      if (!draw_swap_chain) //использование первичной цепочки обмена
+        draw_swap_chain = context->GetMasterSwapChain ();
 
         //проверка совместимости контекста с цепочками обмена
 
@@ -310,13 +333,7 @@ struct ContextManager::Impl: public xtl::reference_counter
 
         throw;
       }
-    }
-    
-      //проверка является ли текущий контекст активным
-    bool IsContextCurrent ()
-    {
-      return current_context && current_context->GetContext ().IsCurrent (current_draw_swap_chain, current_read_swap_chain);
-    }
+    }    
     
       //получение текущего контекста и цепочек обмена
     ISwapChain*  GetDrawSwapChain () const { return current_draw_swap_chain; }
@@ -359,7 +376,7 @@ struct ContextManager::Impl: public xtl::reference_counter
         RaiseNullArgument ("render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(ISwapChain*,const SwapChainDesc&)", "swap_chain");
       
       return SwapChainManager::CreatePBuffer (swap_chain, desc);
-    }  
+    }    
     
       //проверка совместимости контекста и цепочки обмена
     bool IsCompatible (size_t context_id, ISwapChain* swap_chain)
@@ -453,6 +470,28 @@ struct ContextManager::Impl: public xtl::reference_counter
         max_version = value;
       }
     }  
+    
+      //поиск контекста, совместимого с указанной цепочкой обмена
+    size_t GetCompatibleContextId (ISwapChain* swap_chain)
+    {
+        //наиболее выгодным является выбор текущего контекста, если это возможно
+      
+      if (current_context && current_context->GetContext ().IsCompatible (swap_chain))
+        return current_context_id;
+        
+        //поиск контекста среди существующих
+        
+      for (ContextMap::iterator iter=context_map.begin (), end=context_map.end (); iter != end; ++iter)
+        if (iter->second->GetContext ().IsCompatible (swap_chain))
+          return iter->first;
+          
+        //совместимый контекст не найден
+        
+      RaiseNotSupported ("render::low_level::opengl::ContextManager::Impl::GetCompatibleContextId",
+        "No context compatible with swap_chain");
+
+      return 0;
+    }
     
       //восставление контекста (после удаления контекста или цепочки обмена)
     void RestoreContext ()
@@ -606,11 +645,6 @@ size_t ContextManager::GetContextId () const
 void ContextManager::MakeContextCurrent () const
 {
   impl->MakeContextCurrent ();
-}
-
-bool ContextManager::IsContextCurrent () const
-{
-  return impl->IsContextCurrent ();
 }
 
 /*

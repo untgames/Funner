@@ -81,10 +81,16 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
   Bind ();
 
     //проверка наличия расширения GL_ARB_window_pos либо версии OpenGL не ниже 1.4
+    
+  static Extension ARB_window_pos = "GL_ARB_window_pos",
+                   Version_1_4    = "GL_VERSION_1_4";
+  
+  if (!IsSupported (ARB_window_pos) && !IsSupported (Version_1_4))
+    RaiseNotSupported (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
 
-  if      (glWindowPos2iARB) glWindowPos2iARB  (x, y);
-  else if (glWindowPos2i)    glWindowPos2i     (x, y);
-  else                       RaiseNotSupported ("render::low_level::opengl::DepthStencilBuffer::SetData", "Extension GL_ARB_window_pos not supported");    
+  if      (glWindowPos2iARB) glWindowPos2iARB (x, y);
+  else if (glWindowPos2i)    glWindowPos2i    (x, y);
+  else                       return;
   
     //копирование
     
