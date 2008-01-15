@@ -34,7 +34,8 @@ struct Test
   SwapChainPtr   swap_chain;
   DevicePtr      device;
   
-  Test (const wchar_t* title) : window (syslib::WindowStyle_Overlapped, 400, 200), driver (get_opengl_driver ())
+  Test (const wchar_t* title, const char* init_string="") :
+    window (syslib::WindowStyle_Overlapped, 400, 200), driver (get_opengl_driver ())
   {
     window.SetTitle (title);
 
@@ -52,27 +53,11 @@ struct Test
     desc.vsync                     = false;
     desc.fullscreen                = false;
     desc.window_handle             = window.Handle ();
-    
+
     swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);
-    device     = DevicePtr (driver->CreateDevice (&*swap_chain), false);
+    device     = DevicePtr (driver->CreateDevice (&*swap_chain, init_string), false);
   }
 };
-
-//печать дескриптора FrameBuffer
-/*inline void dump_desc (IFrameBuffer& buffer)
-{
-  FrameBufferDesc desc;
-  
-  buffer.GetDesc (desc);
-  
-  printf ("Frame buffer:\n");
-  printf ("  width:         %u\n", desc.width);
-  printf ("  height:        %u\n", desc.height);
-  printf ("  color_bits:    %u\n", desc.color_bits);
-  printf ("  alpha_bits:    %u\n", desc.alpha_bits);
-  printf ("  depth_bits:    %u\n", desc.depth_bits);
-  printf ("  stencil_bits:  %u\n", desc.stencil_bits);
-} */
 
 //печать дескриптора blend-state
 inline void dump_desc (IBlendState& state)

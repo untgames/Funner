@@ -99,8 +99,8 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
   
     //получение информации о доступных расширениях
   
-  bool has_ext_stencil_two_side = GLEW_EXT_stencil_two_side != 0,
-       has_ati_separate_stencil = GLEW_ATI_separate_stencil || GLEW_VERSION_2_0,
+  bool has_ext_stencil_two_side = IsSupported (GlExtension_EXT_stencil_two_side),
+       has_ati_separate_stencil = IsSupported (GlExtension_ATI_separate_stencil) || IsSupported (GlExtension_Version_2_0),
        has_two_side_stencil     = has_ext_stencil_two_side || has_ati_separate_stencil;
   
     //преобразование данных дескриптора
@@ -269,9 +269,11 @@ void DepthStencilState::Bind (size_t reference)
     {
         //получение информации о доступных расширениях
       
-      bool has_ext_stencil_two_side = GLEW_EXT_stencil_two_side != 0,
-           has_ati_separate_stencil = GLEW_ATI_separate_stencil || GLEW_VERSION_2_0;
-      
+      bool has_ext_stencil_two_side = IsSupported (GlExtension_EXT_stencil_two_side),
+           has_ati_separate_stencil = IsSupported (GlExtension_ATI_separate_stencil) || IsSupported (GlExtension_Version_2_0);
+
+        //настройка функции трафарета
+
       if (has_ati_separate_stencil)
       {
         if (glStencilFuncSeparate)

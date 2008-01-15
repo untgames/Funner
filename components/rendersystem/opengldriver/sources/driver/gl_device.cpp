@@ -8,9 +8,9 @@ using namespace common;
      онструктор / деструктор
 */
 
-Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char*)
+Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char* init_string)
   : driver (in_driver),
-    context_manager (xtl::bind (&Driver::LogMessage, in_driver, _1)),
+    context_manager (xtl::bind (&Driver::LogMessage, in_driver, _1), init_string),
     output_stage (context_manager, swap_chain),
     input_stage (context_manager),
     texture_manager (context_manager)
@@ -21,9 +21,10 @@ Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char*)
 
     //получение информации об устройстве отрисовки
     
-  properties.AddProperty ("vendor",     reinterpret_cast<const char*> (glGetString (GL_VENDOR)));
-  properties.AddProperty ("renderer",   reinterpret_cast<const char*> (glGetString (GL_RENDERER)));
-  properties.AddProperty ("gl_version", reinterpret_cast<const char*> (glGetString (GL_VERSION)));
+  properties.AddProperty ("init_string", init_string);
+  properties.AddProperty ("vendor",      reinterpret_cast<const char*> (glGetString (GL_VENDOR)));
+  properties.AddProperty ("renderer",    reinterpret_cast<const char*> (glGetString (GL_RENDERER)));
+  properties.AddProperty ("gl_version",  reinterpret_cast<const char*> (glGetString (GL_VERSION)));
   
     //получение списка расширений
     

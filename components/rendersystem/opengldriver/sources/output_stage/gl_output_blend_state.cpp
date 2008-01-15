@@ -112,10 +112,10 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     
   BlendExtensions ext;
     
-  ext.has_ext_blend_func_separate     = GLEW_EXT_blend_func_separate || GLEW_VERSION_1_4;
-  ext.has_ext_blend_equation_separate = GLEW_EXT_blend_equation_separate || GLEW_VERSION_2_0;
-  ext.has_ext_blend_minmax            = GLEW_EXT_blend_minmax || GLEW_VERSION_1_2;
-  ext.has_ext_blend_subtract          = GLEW_EXT_blend_subtract || GLEW_VERSION_1_2;  
+  ext.has_ext_blend_func_separate     = IsSupported (GlExtension_EXT_blend_func_separate) || IsSupported (GlExtension_Version_1_4);
+  ext.has_ext_blend_equation_separate = IsSupported (GlExtension_EXT_blend_equation_separate) || IsSupported (GlExtension_Version_2_0);
+  ext.has_ext_blend_minmax            = IsSupported (GlExtension_EXT_blend_minmax) || IsSupported (GlExtension_Version_1_2);
+  ext.has_ext_blend_subtract          = IsSupported (GlExtension_EXT_blend_subtract) || IsSupported (GlExtension_Version_1_2);
 
     //преобразование данных дескриптора
     

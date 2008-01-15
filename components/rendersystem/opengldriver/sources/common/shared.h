@@ -15,6 +15,7 @@
 #include <stl/string>
 #include <stl/vector>
 #include <stl/hash_map>
+#include <stl/bitset>
 
 #include <xtl/reference_counter.h>
 #include <xtl/bind.h>
@@ -24,5 +25,6 @@
 #include <common/exception.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+#include <common/singleton.h>
 
 #endif

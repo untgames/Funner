@@ -64,33 +64,18 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
 {
   static const char* METHOD_NAME = "render::low_level::opengl::DepthStencilBuffer::SetData";
 
-  if (!buffer)
-    RaiseNullArgument (METHOD_NAME, "buffer");
-    
   if (layer)
     RaiseOutOfRange (METHOD_NAME, "layer", layer, 1);
     
   if (mip_level)
     RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, 1);
-    
-  if (source_format != PixelFormat_D24S8)
-    RaiseNotSupported (METHOD_NAME, "source_format != PixelFormat_D24S8");
-    
-    //разделение данных буфера на компоненты глубины и трафарета
-    
-  xtl::uninitialized_storage<float>         depth_buffer (width * height);
-  xtl::uninitialized_storage<unsigned char> stencil_buffer (width * height);    
-  
-  const size_t*  src_pixel         = static_cast<const size_t*> (buffer);
-  float*         dst_depth_pixel   = depth_buffer.data ();
-  unsigned char* dst_stencil_pixel = stencil_buffer.data ();
-  
-  for (size_t count=width*height; count--; src_pixel++, dst_depth_pixel++, dst_stencil_pixel++)
-  {
-    *dst_depth_pixel   = get_depth_component (*src_pixel);
-    *dst_stencil_pixel = get_stencil_index (*src_pixel);
-  }
 
+  if (!width || !height)
+    return;
+    
+  if (!buffer)
+    RaiseNullArgument (METHOD_NAME, "buffer");
+    
     //установка буфера в контекст OpenGL
 
   Bind ();
@@ -99,12 +84,80 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
 
   if      (glWindowPos2iARB) glWindowPos2iARB  (x, y);
   else if (glWindowPos2i)    glWindowPos2i     (x, y);
-  else                       RaiseNotSupported ("render::low_level::opengl::DepthStencilBuffer::SetData", "Extension GL_ARB_window_pos not supported");
+  else                       RaiseNotSupported ("render::low_level::opengl::DepthStencilBuffer::SetData", "Extension GL_ARB_window_pos not supported");    
+  
+    //копирование
+    
+  switch (source_format)
+  {
+    case PixelFormat_D16:
+      glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, buffer);
+      break;
+    case PixelFormat_D24X8:
+    {
+      xtl::uninitialized_storage<size_t> depth_buffer (width * height);
+      
+      size_t*       dst_pixel = depth_buffer.data ();
+      const size_t* src_pixel = static_cast<const size_t*> (buffer);
+      
+      for (size_t count=width*height; count--; src_pixel++, dst_pixel++)
+        *dst_pixel = *src_pixel << 8;
+      
+      glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, depth_buffer.data ());
 
-    //копирование    
+      break;
+    }
+    case PixelFormat_D24S8:
+    {
+        //копирование может быть произведено двумя способами: при помощи расширения EXT_packed_depth_stencil,
+        //либо посредством разделения переданного буфера на 2: буфер глубины и буфер трафарета
 
-  glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_FLOAT, depth_buffer.data ());
-  glDrawPixels (width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_buffer.data ());
+      if (GLEW_EXT_packed_depth_stencil)
+      {
+        glDrawPixels (width, height, GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT_24_8_EXT, buffer);
+      }
+      else
+      {
+          //разделение данных буфера на компоненты глубины и трафарета
+
+        xtl::uninitialized_storage<float>         depth_buffer (width * height);
+        xtl::uninitialized_storage<unsigned char> stencil_buffer (width * height);    
+        
+        const size_t*  src_pixel         = static_cast<const size_t*> (buffer);
+        float*         dst_depth_pixel   = depth_buffer.data ();
+        unsigned char* dst_stencil_pixel = stencil_buffer.data ();
+        
+        for (size_t count=width*height; count--; src_pixel++, dst_depth_pixel++, dst_stencil_pixel++)
+        {
+          *dst_depth_pixel   = get_depth_component (*src_pixel);
+          *dst_stencil_pixel = get_stencil_index (*src_pixel);
+        }
+
+          //копирование    
+
+        glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_FLOAT, depth_buffer.data ());
+        glDrawPixels (width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_buffer.data ());
+      }
+
+      break;
+    }
+    case PixelFormat_S8:
+      glDrawPixels (width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, buffer);
+      break;
+    case PixelFormat_RGB8:
+    case PixelFormat_RGBA8:
+    case PixelFormat_L8:
+    case PixelFormat_A8:
+    case PixelFormat_LA8:
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+      RaiseNotSupported (METHOD_NAME, "Unsupported %s=%s", "source_format", get_name (source_format));
+      return;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "source_format", source_format);
+      return;
+  }    
 
     //проверка состояния OpenGL
 
@@ -115,42 +168,92 @@ void DepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size
 {
   static const char* METHOD_NAME = "render::low_level::opengl::DepthStencilBuffer::GetData";
 
-  if (!buffer)
-    RaiseNullArgument (METHOD_NAME, "buffer");
-    
   if (layer)
     RaiseOutOfRange (METHOD_NAME, "layer", layer, 1);
     
   if (mip_level)
     RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, 1);    
 
-  if (target_format != PixelFormat_D24S8)
-    RaiseNotSupported (METHOD_NAME, "target_format != PixelFormat_D24S8");
+  if (!width || !height)
+    return;
     
-    //создание буферов для хранения разделенных данных глубины и трафарета
-
-  xtl::uninitialized_storage<float>         depth_buffer (width * height);
-  xtl::uninitialized_storage<unsigned char> stencil_buffer (width * height);
-
+  if (!buffer)
+    RaiseNullArgument (METHOD_NAME, "buffer");
+    
     //установка буфера в контекст OpenGL
 
   Bind ();
-
+  
     //копирование
+    
+  switch (target_format)
+  {
+    case PixelFormat_D16:
+      glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, buffer);
+      break;
+    case PixelFormat_D24X8:
+    {
+      glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, buffer);
+      
+      size_t* pixel = static_cast<size_t*> (buffer);
 
-  glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, depth_buffer.data ());
-  glReadPixels (x, y, width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_buffer.data ());
+      for (size_t count=width*height; count--; pixel++)
+        *pixel >>= 8;
 
+      break;
+    }
+    case PixelFormat_D24S8:
+    {
+        //копирование может быть произведено двумя способами: при помощи расширения EXT_packed_depth_stencil,
+        //либо посредством разделения переданного буфера на 2: буфер глубины и буфер трафарета
+
+      if (GLEW_EXT_packed_depth_stencil)
+      {
+        glReadPixels (x, y, width, height, GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT_24_8_EXT, buffer);
+      }
+      else
+      {
+          //создание буферов для хранения разделенных данных глубины и трафарета
+
+        xtl::uninitialized_storage<float>         depth_buffer (width * height);
+        xtl::uninitialized_storage<unsigned char> stencil_buffer (width * height);
+
+          //копирование
+
+        glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, depth_buffer.data ());
+        glReadPixels (x, y, width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_buffer.data ());
+
+          //упаковка прочитанных данных
+
+        size_t*              dst_pixel         = static_cast<size_t*> (buffer);
+        const float*         src_depth_pixel   = depth_buffer.data ();
+        const unsigned char* src_stencil_pixel = stencil_buffer.data ();
+
+        for (size_t count=width*height; count--; dst_pixel++, src_depth_pixel++, src_stencil_pixel++)
+          *dst_pixel = get_depth_stencil_pixel (*src_depth_pixel, *src_stencil_pixel);
+      }
+
+      break;
+    }
+    case PixelFormat_S8:
+      glDrawPixels (width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, buffer);
+      break;
+    case PixelFormat_RGB8:
+    case PixelFormat_RGBA8:
+    case PixelFormat_L8:
+    case PixelFormat_A8:
+    case PixelFormat_LA8:
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+      RaiseNotSupported (METHOD_NAME, "Unsupported %s=%s", "target_format", get_name (target_format));
+      return;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "target_format", target_format);
+      return;
+  }
+    
     //проверка состояния OpenGL
 
   CheckErrors (METHOD_NAME);  
-
-    //упаковка прочитанных данных
-
-  size_t*              dst_pixel         = static_cast<size_t*> (buffer);
-  const float*         src_depth_pixel   = depth_buffer.data ();
-  const unsigned char* src_stencil_pixel = stencil_buffer.data ();
-
-  for (size_t count=width*height; count--; dst_pixel++, src_depth_pixel++, src_stencil_pixel++)
-    *dst_pixel = get_depth_stencil_pixel (*src_depth_pixel, *src_stencil_pixel);
 }

@@ -37,21 +37,54 @@ void ColorBuffer::GetDesc (TextureDesc& out_desc)
     Работа с данными
 */
 
+namespace
+{
+
+GLenum get_glformat (PixelFormat format, const char* source, const char* param)
+{
+  switch (format)
+  {
+    case PixelFormat_RGB8:  return GL_RGB;
+    case PixelFormat_RGBA8: return GL_RGBA;
+    case PixelFormat_L8:    return GL_LUMINANCE;
+    case PixelFormat_A8:    return GL_ALPHA;
+    case PixelFormat_LA8:   return GL_LUMINANCE_ALPHA;
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:    
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8:
+    case PixelFormat_S8:
+      RaiseNotSupported (source, "Unsupported %s=%s", param, get_name (format));
+      return 0;
+    default:
+      RaiseInvalidArgument (source, param, format);
+      return 0;
+  }
+}
+
+}
+
 void ColorBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::ColorBuffer::SetData";
-
-  if (!buffer)
-    RaiseNullArgument (METHOD_NAME, "buffer");
-    
+  
   if (layer)
     RaiseOutOfRange (METHOD_NAME, "layer", layer, 1);
-    
+
   if (mip_level)
     RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, 1);
+
+  if (!width || !height)
+    return;
     
-  if (source_format != PixelFormat_RGBA8)
-    RaiseNotSupported (METHOD_NAME, "source_format != PixelFormat_RGBA8");
+  if (!buffer)
+    RaiseNullArgument (METHOD_NAME, "buffer");
+
+    //преобразование формата пикселей
+
+  GLenum format = get_glformat (source_format, METHOD_NAME, "source_format");
 
     //установка буфера в контекст OpenGL
 
@@ -59,13 +92,22 @@ void ColorBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
 
     //проверка наличия расширения GL_ARB_window_pos либо версии OpenGL не ниже 1.4
 
-  if      (glWindowPos2iARB) glWindowPos2iARB  (x, y);
-  else if (glWindowPos2i)    glWindowPos2i     (x, y);
-  else                       RaiseNotSupported ("render::low_level::opengl::ColorBuffer::SetData", "Extension GL_ARB_window_pos not supported");
+  if (glWindowPos2iARB)
+  {
+    glWindowPos2iARB (x, y);
+  }
+  else if (glWindowPos2i)
+  {
+    glWindowPos2i (x, y);
+  }
+  else
+  {
+    RaiseNotSupported (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
+  }
 
     //копирование
 
-  glDrawPixels (width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+  glDrawPixels (width, height, format, GL_UNSIGNED_BYTE, buffer);
 
     //проверка состояния OpenGL
 
@@ -76,9 +118,6 @@ void ColorBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, s
 {
   static const char* METHOD_NAME = "render::low_level::opengl::ColorBuffer::GetData";
 
-  if (!buffer)
-    RaiseNullArgument (METHOD_NAME, "buffer");
-    
   if (layer)
     RaiseOutOfRange (METHOD_NAME, "layer", layer, 1);
     
@@ -88,13 +127,23 @@ void ColorBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, s
   if (target_format != PixelFormat_RGBA8)
     RaiseNotSupported (METHOD_NAME, "target_format != PixelFormat_RGBA8");
 
+  if (!width || !height)
+    return;
+
+  if (!buffer)
+    RaiseNullArgument (METHOD_NAME, "buffer");    
+    
+    //преобразование формата пикселей
+
+  GLenum format = get_glformat (target_format, METHOD_NAME, "target_format");
+
     //установка буфера в контекст OpenGL
 
   Bind ();
 
     //копирование
 
-  glReadPixels (x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+  glReadPixels (x, y, width, height, format, GL_UNSIGNED_BYTE, buffer);
 
     //проверка состояния OpenGL
 

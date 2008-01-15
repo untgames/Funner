@@ -64,6 +64,20 @@ void ContextObject::ClearContextData ()
 }
 
 /*
+    Определение поддержки расширения контекстом
+*/
+
+bool ContextObject::IsSupported (size_t context_id, GlExtension extension_id) const
+{
+  return context_manager.IsSupported (context_id, extension_id);
+}
+
+bool ContextObject::IsSupported (GlExtension extension_id) const
+{
+  return context_manager.IsSupported (extension_id);
+}
+
+/*
     Протоколирование
 */
 

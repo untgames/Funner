@@ -6,7 +6,8 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (blend_state)");    
+//    Test test (L"OpenGL device test window (blend_state)", "disable='GL_EXT_blend_*' max_version=1.2");
+    Test test (L"OpenGL device test window (blend_state)");
     
     dump_desc (*test.device->OSGetBlendState ());
     
