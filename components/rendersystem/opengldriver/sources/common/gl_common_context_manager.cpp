@@ -16,61 +16,6 @@ namespace
 struct OpenGLExceptionTag;
 
 typedef DerivedException<Exception, OpenGLExceptionTag> OpenGLException; //исключение: внутренняя ошибка OpenGL
-typedef stl::bitset<GlExtension_Num>                    ExtensionsFlags; //флаги поддержки исключений
-
-//заполнение таблицы флагов поддерживаемых расширений
-void set_extensions_flags (const char* extensions, ExtensionsFlags& flags, bool value)
-{
-  stl::string mask;
-
-  for (const char* pos=extensions; *pos;)
-  {
-    for (;*pos && *pos==' '; ++pos);
-    
-    const char* first    = pos;
-    bool        wildcard = false;
-    
-    for (bool loop=true; loop; ++pos)
-      switch (*pos)
-      {
-        case '\0':
-        case ' ':
-          loop = false;
-          break;
-        case '?':
-        case '*':
-          wildcard = true;
-        default:
-          break;
-      }
-      
-    if (!wildcard)
-    {
-      GlExtension extension_id = get_extension_id (first, size_t (pos-first-1));
-      
-      if (extension_id == GlExtension_Unknown)
-        continue;
-
-      flags [extension_id] = true;            
-    }
-    else
-    {            
-      mask.assign (first, size_t (pos - first - 1));
-
-      if (!strcmp (mask.c_str (), "*")) //обработка специального случая очистки / установки всех флагов
-      {
-        if (value) flags.set ();    
-        else       flags.reset ();        
-      }
-      else
-      {      
-        for (int id=0; id<GlExtension_Num; id++)
-          if (wcimatch (get_extension_name ((GlExtension)id), mask.c_str ()))
-            flags.set (id, value);
-      }
-    }    
-  }
-}
 
 /*
 ===================================================================================================
@@ -97,8 +42,8 @@ class ContextImpl: public xtl::reference_counter
     ISwapChain*     GetMasterSwapChain () const { return master_swap_chain.get (); }
     
       //получение флагов поддержки исключений
-          ExtensionsFlags& GetExtensions ()       { return extensions; }      
-    const ExtensionsFlags& GetExtensions () const { return extensions; }
+          ExtensionSet& GetExtensions ()       { return extensions; }      
+    const ExtensionSet& GetExtensions () const { return extensions; }
     
       //получение версии OpenGL
     const char* GetVersion () const { return version.c_str (); }
@@ -151,31 +96,44 @@ class ContextImpl: public xtl::reference_counter
       //инициализация
     void Init ()        
     {
-        //очистка таблицы локальных данных контекста
-      
-      memset (data, 0, sizeof (data));
-      
-        //выбор активного контекста
-      
-      context.MakeCurrent (master_swap_chain.get ());
-      
-        //определение поддержки расширений        
-
-      const char* supported_extensions = reinterpret_cast<const char*> (glGetString (GL_EXTENSIONS));
-
-      set_extensions_flags (supported_extensions, extensions, true);
-      
-        //определение поддержки версий
+      try
+      {
+          //очистка таблицы локальных данных контекста
         
-      extensions [GlExtension_Version_1_1] = GLEW_VERSION_1_1 != 0;
-      extensions [GlExtension_Version_1_2] = GLEW_VERSION_1_2 != 0;
-      extensions [GlExtension_Version_1_3] = GLEW_VERSION_1_3 != 0;
-      extensions [GlExtension_Version_1_4] = GLEW_VERSION_1_4 != 0;
-      extensions [GlExtension_Version_1_5] = GLEW_VERSION_1_5 != 0;
-      extensions [GlExtension_Version_2_0] = GLEW_VERSION_2_0 != 0;
-      extensions [GlExtension_Version_2_1] = GLEW_VERSION_2_1 != 0;
-      
-      version = reinterpret_cast<const char*> (glGetString (GL_VERSION));
+        memset (data, 0, sizeof (data));
+        
+          //выбор активного контекста
+        
+        context.MakeCurrent (master_swap_chain.get ());
+        
+          //определение поддержки расширений        
+
+        const char* supported_extensions = reinterpret_cast<const char*> (glGetString (GL_EXTENSIONS));
+
+        extensions.SetGroup (supported_extensions, true);
+
+          //определение поддержки версий
+          
+        static Extension Version_1_1 ("GL_VERSION_1_1"), Version_1_2 ("GL_VERSION_1_2"), Version_1_3 ("GL_VERSION_1_3"),
+                         Version_1_4 ("GL_VERSION_1_4"), Version_1_5 ("GL_VERSION_1_5"), Version_2_0 ("GL_VERSION_2_0"),
+                         Version_2_1 ("GL_VERSION_2_1");
+
+        extensions.Set (Version_1_1, GLEW_VERSION_1_1 != 0);
+        extensions.Set (Version_1_2, GLEW_VERSION_1_2 != 0);
+        extensions.Set (Version_1_3, GLEW_VERSION_1_3 != 0);
+        extensions.Set (Version_1_4, GLEW_VERSION_1_4 != 0);
+        extensions.Set (Version_1_5, GLEW_VERSION_1_5 != 0);
+        extensions.Set (Version_2_0, GLEW_VERSION_2_0 != 0);
+        extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);
+        
+        version = reinterpret_cast<const char*> (glGetString (GL_VERSION));
+      }
+      catch (common::Exception& exception)
+      {
+        exception.Touch ("render::low_level::opengl::ContextImpl::Init");
+        
+        throw;        
+      }
     }
 
   private:
@@ -183,11 +141,11 @@ class ContextImpl: public xtl::reference_counter
     typedef xtl::com_ptr<ISwapChain> SwapChainPtr;   //указатель на цепочку обмена  
     
   private:
-    Context         context;           //контекст OpenGL
-    SwapChainPtr    master_swap_chain; //главная цепочка обмена, связанная с контекстом
-    ExtensionsFlags extensions;        //флаги поддерживаемых исключений
-    stl::string     version;           //получение версии OpenGL
-    ContextData     data;              //локальные данные контекста 
+    Context       context;           //контекст OpenGL
+    SwapChainPtr  master_swap_chain; //главная цепочка обмена, связанная с контекстом
+    ExtensionSet  extensions;        //флаги поддерживаемых исключений
+    stl::string   version;           //получение версии OpenGL
+    ContextData   data;              //локальные данные контекста 
 };
 
 }
@@ -214,7 +172,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       if (!init_string)
         RaiseNullArgument ("render::low_level::opengl::ContextManager::ContextManager", "init_string");          
         
-      enabled_extensions.set ();
+      enabled_extensions.Set (true);
       
       common::parse_init_string (init_string, xtl::bind (&Impl::AddInitProperty, this, _1, _2));
     }    
@@ -234,15 +192,15 @@ struct ContextManager::Impl: public xtl::reference_counter
       
         //проверка поддержки требуемых расширений и версий
       
-      ExtensionsFlags& context_extensions = new_context->GetExtensions ();
+      ExtensionSet& context_extensions = new_context->GetExtensions ();
 
       context_extensions &= enabled_extensions;
       
-      for (int i=0; i<GlExtension_Num; i++)
-        if (required_extensions [i] && !context_extensions [i])
+      for (size_t id=0, count=ExtensionSet::Size (); id<count; id++)
+        if (required_extensions.Get (id) && !context_extensions.Get (id))
         {
           RaiseNotSupported (METHOD_NAME, "Could not create new context. Reason: required extension '%s' not supported",
-            get_extension_name ((GlExtension)i));
+            get_extension_name (id));
         }
         
       if (!min_version.empty () && strcmp (new_context->GetVersion (), min_version.c_str ()) < 0)
@@ -253,15 +211,23 @@ struct ContextManager::Impl: public xtl::reference_counter
 
       if (!max_version.empty ())
       {
-        static const char*  versions []    = {"1.1", "1.2", "1.3", "1.4", "1.5", "2.0", "2.1"};
-        static const size_t versions_count = sizeof (versions) / sizeof (*versions);
+        static const char*  version_string [] = {"1.1", "1.2", "1.3", "1.4", "1.5", "2.0", "2.1"};        
+        static const size_t versions_count    = sizeof (version_string) / sizeof (*version_string);
+
+        static Extension extension [] = {
+          Extension ("GL_VERSION_1_1"),
+          Extension ("GL_VERSION_1_2"),
+          Extension ("GL_VERSION_1_3"),
+          Extension ("GL_VERSION_1_4"),
+          Extension ("GL_VERSION_1_5"),
+          Extension ("GL_VERSION_2_0"),
+          Extension ("GL_VERSION_2_1"),
+        };
 
         for (size_t i=0; i<versions_count; i++)
         {
-          GlExtension id = (GlExtension)(GlExtension_Version_1_1 + i);
-
-          if (context_extensions [id] && strcmp (max_version.c_str (), versions [i]) < 0)
-            context_extensions [id] = false;
+          if (strcmp (max_version.c_str (), version_string [i]) < 0)
+            context_extensions.Set (extension [i], false);
         }
       }
 
@@ -409,11 +375,8 @@ struct ContextManager::Impl: public xtl::reference_counter
     }
     
       //определение поддержки расширения контекстом
-    bool IsSupported (size_t context_id, GlExtension extension_id) const
+    bool IsSupported (size_t context_id, const Extension& extension) const
     {
-      if (extension_id < 0 || extension_id >= GlExtension_Num)
-        return false;
-      
         //поиск контекста
 
       ContextMap::const_iterator iter = context_map.find (context_id);
@@ -421,15 +384,15 @@ struct ContextManager::Impl: public xtl::reference_counter
       if (iter == context_map.end ())
         return false;
         
-      return iter->second->GetExtensions ()[extension_id];
+      return iter->second->GetExtensions ().Get (extension);
     }
       
-    bool IsSupported (GlExtension extension_id) const
+    bool IsSupported (const Extension& extension) const
     {
-      if (!current_context || extension_id < 0 || extension_id >= GlExtension_Num)
+      if (!current_context)
         return false;
         
-      return current_context->GetExtensions ()[extension_id];
+      return current_context->GetExtensions ().Get (extension);
     }
     
       //протоколирование
@@ -451,21 +414,35 @@ struct ContextManager::Impl: public xtl::reference_counter
     {
       if (!common::string_wrappers::stricmp (name, "require"))
       {
-        set_extensions_flags (value, required_extensions, true);
+        required_extensions.SetGroup (value, true);
       }
       else if (!common::string_wrappers::stricmp (name, "disable"))
       {     
-        set_extensions_flags (value, enabled_extensions, false);
+        enabled_extensions.SetGroup (value, false);
       }
       else if (!common::string_wrappers::stricmp (name, "enable"))
-      {     
-        set_extensions_flags (value, enabled_extensions, true);
+      {
+        enabled_extensions.SetGroup (value, true);
       }
       else if (!common::string_wrappers::strnicmp (name, "gl_", 3))
       {
-        bool flag = atoi (value) != 0;
-
-        set_extensions_flags (name, flag ? required_extensions : enabled_extensions, flag);
+        if (!strcmp (value, "0"))
+        {
+          enabled_extensions.Set (name, false);
+        }
+        else if (!strcmp (value, "1"))
+        {
+          enabled_extensions.Set (name, true);
+        }
+        else if (!strcmp (value, "!"))
+        {
+          required_extensions.Set (name, true);
+        }
+        else if (!strcmp (value, "1!"))
+        {
+          enabled_extensions.Set (name, true);
+          required_extensions.Set (name, true);
+        }
       }
       else if (!common::string_wrappers::stricmp (name, "min_version"))
       {
@@ -521,8 +498,8 @@ struct ContextManager::Impl: public xtl::reference_counter
   
   private:
     LogHandler          log_handler;                //обработчик протоколирования
-    ExtensionsFlags     required_extensions;        //расширения, затребованные в строке иициализации
-    ExtensionsFlags     enabled_extensions;         //расширения, разрешенные к использованию в строке инициализаии
+    ExtensionSet        required_extensions;        //расширения, затребованные в строке иициализации
+    ExtensionSet        enabled_extensions;         //расширения, разрешенные к использованию в строке инициализаии
     stl::string         min_version;                //минимальная требуемой версии OpenGL
     stl::string         max_version;                //максимальная необходимая версия OpenGL
     ContextMap          context_map;                //карта отображения цепочки обмена на контекст
@@ -705,14 +682,14 @@ bool ContextManager::IsCompatible (const ContextManager& manager) const
     Определение поддержки расширения контекстом
 */
 
-bool ContextManager::IsSupported (size_t context_id, GlExtension extension_id) const
+bool ContextManager::IsSupported (size_t context_id, const Extension& extension) const
 {
-  return impl->IsSupported (context_id, extension_id);
+  return impl->IsSupported (context_id, extension);
 }
 
-bool ContextManager::IsSupported (GlExtension extension_id) const
+bool ContextManager::IsSupported (const Extension& extension) const
 {
-  return impl->IsSupported (extension_id);
+  return impl->IsSupported (extension);
 }
 
 /*

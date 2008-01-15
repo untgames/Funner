@@ -58,6 +58,22 @@ struct BlendExtensions
   bool has_ext_blend_equation_separate; //GL_EXT_blend_equation_separate
   bool has_ext_blend_minmax;            //GL_EXT_blend_minmax
   bool has_ext_blend_subtract;          //GL_EXT_blend_subtract
+  
+  BlendExtensions (const ContextManager& manager)
+  {
+    static Extension EXT_blend_func_separate     = "GL_EXT_blend_func_separate",
+                     EXT_blend_equation_separate = "GL_EXT_blend_equation_separate",
+                     EXT_blend_minmax            = "GL_EXT_blend_minmax",
+                     EXT_blend_subtract          = "GL_EXT_blend_subtract",
+                     Version_1_2                 = "GL_VERSION_1_2",
+                     Version_1_4                 = "GL_VERSION_1_4",
+                     Version_2_0                 = "GL_VERSION_2_0";
+      
+    has_ext_blend_func_separate     = manager.IsSupported (EXT_blend_func_separate) || manager.IsSupported (Version_1_4);
+    has_ext_blend_equation_separate = manager.IsSupported (EXT_blend_equation_separate) || manager.IsSupported (Version_2_0);
+    has_ext_blend_minmax            = manager.IsSupported (EXT_blend_minmax) || manager.IsSupported (Version_1_2);
+    has_ext_blend_subtract          = manager.IsSupported (EXT_blend_subtract) || manager.IsSupported (Version_1_2);
+  }
 };
 
 void check_blend_operation (BlendOperation operation, const BlendExtensions& ext, const char* method, const char* param)
@@ -110,12 +126,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   
     //определение поддержки расширений OpenGL
     
-  BlendExtensions ext;
-    
-  ext.has_ext_blend_func_separate     = IsSupported (GlExtension_EXT_blend_func_separate) || IsSupported (GlExtension_Version_1_4);
-  ext.has_ext_blend_equation_separate = IsSupported (GlExtension_EXT_blend_equation_separate) || IsSupported (GlExtension_Version_2_0);
-  ext.has_ext_blend_minmax            = IsSupported (GlExtension_EXT_blend_minmax) || IsSupported (GlExtension_Version_1_2);
-  ext.has_ext_blend_subtract          = IsSupported (GlExtension_EXT_blend_subtract) || IsSupported (GlExtension_Version_1_2);
+  BlendExtensions ext (GetContextManager ());
 
     //преобразование данных дескриптора
     
