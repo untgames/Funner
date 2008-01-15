@@ -18,6 +18,9 @@ TextureCubemapEmulatedNPOT::TextureCubemapEmulatedNPOT  (const ContextManager& m
 
 void TextureCubemapEmulatedNPOT::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
+  if (is_compressed_format (source_format))
+    Raise <Exception> ("render::low_level::opengl::TextureCubemapEmulatedNPOT::SetData", "Compression in emulated npot textures not implemented yet.");
+
   size_t scaled_width   = (size_t)ceil ((float)width * scale_factor);
   size_t scaled_height  = (size_t)ceil ((float)height * scale_factor);
   char*  scaled_buffer  = new char [scaled_width * scaled_height * texel_size (source_format)];
@@ -40,6 +43,9 @@ void TextureCubemapEmulatedNPOT::SetData (size_t layer, size_t mip_level, size_t
 
 void TextureCubemapEmulatedNPOT::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
+  if (is_compressed_format (target_format))
+    Raise <Exception> ("render::low_level::opengl::TextureCubemapEmulatedNPOT::GetData", "Compression in emulated npot textures not implemented yet.");
+
   size_t scaled_width   = (size_t)ceil ((float)width * scale_factor);
   size_t scaled_height  = (size_t)ceil ((float)height * scale_factor);
   char*  scaled_buffer  = new char [scaled_width * scaled_height * texel_size (target_format)];

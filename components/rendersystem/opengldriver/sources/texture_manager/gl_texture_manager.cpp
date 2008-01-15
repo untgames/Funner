@@ -112,6 +112,10 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
           }
           else
           {
+            if (is_compressed_format (tex_desc.format))
+              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                                 "Compression in emulated npot textures not implemented yet.");
+
             temp_desc.width = next_higher_power_of_two (tex_desc.width);
 
             glTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
@@ -173,6 +177,10 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
           }
           else
           {
+            if (is_compressed_format (tex_desc.format))
+              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                                 "Compression in emulated npot textures not implemented yet.");
+
             temp_desc.width  = next_higher_power_of_two (tex_desc.width);
             temp_desc.height = next_higher_power_of_two (tex_desc.height);
 
@@ -231,6 +239,10 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       {
         if (((tex_desc.width - 1) & tex_desc.width) || ((tex_desc.height - 1) & tex_desc.height))
         {
+          if (is_compressed_format (tex_desc.format))
+            Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                               "Compression in emulated npot textures not implemented yet.");
+
           temp_desc.width = temp_desc.height = next_higher_power_of_two (tex_desc.width);
 
           glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
