@@ -5,6 +5,48 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
+    Временное хранилище изменяемых параметров OpenGL
+*/
+
+namespace
+{
+
+class DepthStencilTempState
+{
+  public:
+    DepthStencilTempState ()
+    {
+      scissor_test = glIsEnabled (GL_SCISSOR_TEST);
+      
+      glGetIntegerv (GL_STENCIL_WRITEMASK, &stencil_write_mask);
+      glGetIntegerv (GL_DEPTH_WRITEMASK, &depth_write_mask);
+      
+      glDisable     (GL_SCISSOR_TEST);
+//      glEnable      (GL_STENCIL_TEST);
+      glDepthMask   (GL_TRUE);
+      glStencilMask (~0);
+      
+//      glStencilFunc (GL_ALWAYS, 0, ~0);
+    }
+  
+    ~DepthStencilTempState ()
+    {
+      if (scissor_test) glEnable  (GL_SCISSOR_TEST);
+      else              glDisable (GL_SCISSOR_TEST);
+      
+      glDepthMask   (depth_write_mask);
+      glStencilMask (stencil_write_mask);
+    }
+    
+  private:
+    int scissor_test;
+    int stencil_write_mask;
+    int depth_write_mask;
+};
+
+}
+
+/*
     Конструктор
 */
 
@@ -81,7 +123,7 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
     //установка буфера в контекст OpenGL
 
   Bind ();
-
+  
     //проверка наличия расширения GL_ARB_window_pos либо версии OpenGL не ниже 1.4
     
   static Extension ARB_window_pos = "GL_ARB_window_pos",
@@ -99,10 +141,17 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
   switch (source_format)
   {
     case PixelFormat_D16:
+    {
+      DepthStencilTempState temp_state;
+
       glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, buffer);
+
       break;
+    }
     case PixelFormat_D24X8:
     {
+      DepthStencilTempState temp_state;
+      
       xtl::uninitialized_storage<size_t> depth_buffer (width * height);
       
       size_t*       dst_pixel = depth_buffer.data ();
@@ -110,13 +159,15 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
       
       for (size_t count=width*height; count--; src_pixel++, dst_pixel++)
         *dst_pixel = *src_pixel << 8;
-      
+
       glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, depth_buffer.data ());
 
       break;
     }
     case PixelFormat_D24S8:
     {
+      DepthStencilTempState temp_state;      
+
         //копирование может быть произведено двумя способами: при помощи расширения EXT_packed_depth_stencil,
         //либо посредством разделения переданного буфера на 2: буфер глубины и буфер трафарета
         
@@ -143,7 +194,7 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
           *dst_stencil_pixel = get_stencil_index (*src_pixel);
         }
 
-          //копирование    
+          //копирование
 
         glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_FLOAT, depth_buffer.data ());
         glDrawPixels (width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_buffer.data ());
@@ -152,8 +203,13 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
       break;
     }
     case PixelFormat_S8:
+    {
+      DepthStencilTempState temp_state;
+      
       glDrawPixels (width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, buffer);
+
       break;
+    }
     case PixelFormat_RGB8:
     case PixelFormat_RGBA8:
     case PixelFormat_L8:
@@ -248,7 +304,10 @@ void DepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size
       break;
     }
     case PixelFormat_S8:
-      glDrawPixels (width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, buffer);
+//      glEnable (GL_STENCIL_TEST);
+//      glClearStencil (0xe);
+//      glClear (GL_STENCIL_BUFFER_BIT);
+      glReadPixels (x, y, width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, buffer);
       break;
     case PixelFormat_RGB8:
     case PixelFormat_RGBA8:

@@ -142,7 +142,7 @@ void test_buffer (ITexture& render_buffer, size_t x, size_t y, size_t width, siz
     
     init_buffer (width, height, pixel_size, pixel_used_size, src_buffer.data ());
     
-    render_buffer.SetData (0, 0, x, y, width, height, format, src_buffer.data ());  
+    render_buffer.SetData (0, 0, x, y, width, height, format, src_buffer.data ());
     render_buffer.GetData (0, 0, x, y, width, height, format, dst_buffer.data ());
     
     if (!memcmp (src_buffer.data (), dst_buffer.data (), src_buffer.size ()))
@@ -163,7 +163,7 @@ void test_buffer (ITexture& render_buffer, size_t x, size_t y, size_t width, siz
 
 void test_buffer (ITexture& render_buffer)
 {
-  static const size_t width = 5, height = 5, x = 200, y = 100;
+  static const size_t width = 7, height = 7, x = 20, y = 10;
 
   for (int i=0; i<PixelFormat_Num; i++)
   {
@@ -180,6 +180,15 @@ int main ()
     printf ("Results of render_buffers_test:\n");
     
     Test test (L"OpenGL device test window (render_buffers)", "GL_EXT_packed_depth_stencil=0");
+    
+    Color4f clear_color;
+    
+    clear_color.red   = 0;
+    clear_color.green = 0;
+    clear_color.blue  = 0;
+    clear_color.alpha = 0;
+    
+//    test.device->ClearViews (ClearFlag_All, clear_color, 0, 0); 
     
     printf ("Color buffer test:\n");
 

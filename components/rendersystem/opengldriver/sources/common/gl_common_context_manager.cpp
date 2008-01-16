@@ -322,7 +322,7 @@ struct ContextManager::Impl: public xtl::reference_counter
     }
     
       //активация текущего контекста
-    void MakeContextCurrent ()
+    void MakeContextCurrent (bool clear_errors)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::MakeContextCurrent";
 
@@ -335,7 +335,8 @@ struct ContextManager::Impl: public xtl::reference_counter
         
           //очистка текущей ошибки
           
-        while (glGetError () != GL_NO_ERROR);
+        if (clear_errors)
+          while (glGetError () != GL_NO_ERROR);
       }
       catch (common::Exception& exception)
       {
@@ -654,7 +655,7 @@ size_t ContextManager::GetContextId () const
 
 void ContextManager::MakeContextCurrent () const
 {
-  impl->MakeContextCurrent ();
+  impl->MakeContextCurrent (true);
 }
 
 /*
@@ -699,7 +700,7 @@ void ContextManager::ClearContextData ()
 
 const char* ContextManager::GetSwapChainsExtensionString () const
 {
-  MakeContextCurrent ();
+  impl->MakeContextCurrent (false);
 
   return Context::GetSwapChainExtensionString ();
 }
@@ -765,7 +766,7 @@ void ContextManager::CheckErrors (const char* source) const
   if (!source)
     source = "render::low_level::ContextManager::CheckErrors";
     
-  MakeContextCurrent ();
+  impl->MakeContextCurrent (false);
   
   GLenum error = glGetError ();
   
