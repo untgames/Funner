@@ -10,10 +10,16 @@ using namespace common;
 class InputLayoutState: public IInputLayoutState, public Object
 {
   public:
-    InputLayoutState(const InputLayoutDesc& desc): input_desc(desc)
+    InputLayoutState(const InputLayoutDesc& desc)
     {
-      if (desc.index_type >= InputDataType_Num)
-        RaiseInvalidArgument("render::low_level::opengl::InputLayoutState::", "desc.index_type", desc.index_type);
+      try
+      {
+        SetDesc(desc);
+      }
+      catch (common::Exception& exception)
+      {
+        exception.Touch("render::low_level::opengl::InputLayoutState::InputLayoutState(const InputLayoutDesc& desc)");
+      }
     }
     
     void GetDesc (InputLayoutDesc& desc)
@@ -23,6 +29,9 @@ class InputLayoutState: public IInputLayoutState, public Object
     
     void SetDesc (const InputLayoutDesc& desc)
     {
+      if (desc.index_type >= InputDataType_Num)
+        RaiseInvalidArgument("render::low_level::opengl::InputLayoutState::SetDesc (const InputLayoutDesc& desc)", "desc.index_type", desc.index_type);
+
       input_desc = desc;
     }
     

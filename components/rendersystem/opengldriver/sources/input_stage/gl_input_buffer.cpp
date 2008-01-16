@@ -5,27 +5,13 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 Buffer::Buffer(const ContextManager& context_manager, const BufferDesc& desc)
-  : ContextObject(context_manager)
+  : ContextObject(context_manager), buffer_desc(desc)
 {
-  try
-  {
-    SetDesc(desc);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch("render::low_level::opengl::Buffer::Buffer(const ContextManager& context_manager, const BufferDesc& desc)");
-  }
+  if (desc.usage_mode >= UsageMode_Num)
+    RaiseInvalidArgument("render::low_level::opengl::Buffer::Buffer(const ContextManager& context_manager, const BufferDesc& desc)", "desc.usage_mode", desc.usage_mode);
 }
 
 void Buffer::GetDesc(BufferDesc& desc)
 {
   desc = buffer_desc;
-}
-  
-void Buffer::SetDesc(const BufferDesc& desc)
-{
-  if (desc.usage_mode >= UsageMode_Num)
-    RaiseInvalidArgument("render::low_level::opengl::Buffer::SetDesc (const BufferDesc& desc)", "desc.usage_mode", desc.usage_mode);      
-
-  buffer_desc = desc;
 }
