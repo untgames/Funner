@@ -200,7 +200,9 @@ int main ()
 
     TexturePtr depth_stencil_buffer = test.device->OSGetDepthStencilView ()->GetTexture ();
     
-    test_buffer (*depth_stencil_buffer);
+//    test_buffer (*depth_stencil_buffer);
+
+    test_buffer (*depth_stencil_buffer, 0, 0, 2, 2, PixelFormat_S8);
   }
   catch (std::exception& exception)
   {
