@@ -16,6 +16,7 @@
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/trackable_ptr.h>
 #include <xtl/bind.h>
 
 #include <stl/vector>
@@ -126,7 +127,7 @@ class PrimarySwapChain: public SwapChain
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    PrimarySwapChain  (IOutput* output, const SwapChainDesc& desc);
+    PrimarySwapChain  (const SwapChainDesc& desc, OutputManager* output_manager);
     ~PrimarySwapChain ();
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,16 +156,16 @@ class PrimarySwapChain: public SwapChain
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     HDC                 GetDC           () { return output_context; }
     const WGLEWContext* GetWGLEWContext () { return &wglew_context; }
-
+    
   private:
-    typedef xtl::com_ptr<IOutput> OutputPtr;
+    typedef xtl::trackable_ptr<OutputManager> OutputManagerPtr;
 
   private:
     WGLEWContext     wglew_context;  //контекст WGLEW
     HWND             output_window;  //окно вывода
     HDC              output_context; //контекст вывода
-    OutputPtr        output;         //указатель на устройство вывода    
     SwapChainDesc    desc;           //дескриптор цепочки обмена    
+    OutputManagerPtr output_manager; //менеджер устройств вывода
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

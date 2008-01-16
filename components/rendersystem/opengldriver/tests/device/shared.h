@@ -38,6 +38,7 @@ struct Test
     window (syslib::WindowStyle_Overlapped, 400, 200), driver (get_opengl_driver ())
   {
     window.SetTitle (title);
+    window.Hide ();
 
     SwapChainDesc desc;
 
@@ -45,10 +46,9 @@ struct Test
 
     desc.frame_buffer.color_bits   = 24;
     desc.frame_buffer.alpha_bits   = 8;
-    desc.frame_buffer.depth_bits   = 24;
+    desc.frame_buffer.depth_bits   = 16;
     desc.frame_buffer.stencil_bits = 8;
     desc.buffers_count             = 2;
-//    desc.samples_count             = 4;
     desc.samples_count             = 0;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = false;

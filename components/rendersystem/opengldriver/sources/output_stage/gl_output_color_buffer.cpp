@@ -64,6 +64,61 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
   }
 }
 
+/*
+    Временное хранилище изменяемых параметров OpenGL
+*/
+
+const GLenum MODE_NAMES [] = {GL_BLEND, GL_DEPTH_TEST, GL_STENCIL_TEST, GL_SCISSOR_TEST, GL_FOG, GL_TEXTURE_1D, GL_TEXTURE_2D,
+                              GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP, GL_TEXTURE_RECTANGLE_EXT};
+const size_t MODE_NAMES_COUNT = sizeof (MODE_NAMES) / sizeof (*MODE_NAMES);
+
+struct ColorBufferTempState
+{
+  public:
+    ColorBufferTempState ()
+    {
+        //сохранение состояния параметров пофрагментных операций          
+      
+      for (size_t i=0; i<MODE_NAMES_COUNT; i++)
+        mode_states [i] = glIsEnabled (MODE_NAMES [i]) != 0;                
+
+      glGetIntegerv (GL_COLOR_WRITEMASK, color_write_mask);
+
+        //отключение пофрагментных операций      
+
+      for (size_t i=0; i<MODE_NAMES_COUNT; i++)
+        glDisable (MODE_NAMES [i]);
+
+      glColorMask (1, 1, 1, 1);
+      
+      ClearErrors ();      
+    }
+    
+    ~ColorBufferTempState ()
+    {
+        //восстановление состояния параметров пофрагментных операций
+        
+      for (size_t i=0; i<MODE_NAMES_COUNT; i++)
+        if (mode_states [i]) glEnable (MODE_NAMES [i]);
+        else                 glDisable (MODE_NAMES [i]);
+
+      glColorMask (color_write_mask [0], color_write_mask [1], color_write_mask [2], color_write_mask [3]);
+
+      ClearErrors ();      
+    }
+    
+  private:
+      //очистка ошибки, связанной с использованием неподдерживаемых расширений  
+    void ClearErrors ()
+    {
+      while (glGetError () != GL_NO_ERROR);      
+    }
+    
+  private:
+    bool mode_states [MODE_NAMES_COUNT];
+    int  color_write_mask [4];
+};
+
 }
 
 void ColorBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
@@ -89,24 +144,24 @@ void ColorBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
     //установка буфера в контекст OpenGL
 
   Bind ();
+  
+  ColorBufferTempState temp_state;
 
     //проверка наличия расширения GL_ARB_window_pos либо версии OpenGL не ниже 1.4
-    
+
   static Extension ARB_window_pos = "GL_ARB_window_pos",
                    Version_1_4    = "GL_VERSION_1_4";
-  
+
   if (!IsSupported (ARB_window_pos) && !IsSupported (Version_1_4))
     RaiseNotSupported (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
 
   if      (glWindowPos2iARB) glWindowPos2iARB (x, y);
   else if (glWindowPos2i)    glWindowPos2i    (x, y);
-  else                       return;
-  
-    //TODO: отключение пофрагментных операций
+  else                       return;  
 
     //копирование    
-    
-  glDrawPixels (width, height, format, GL_UNSIGNED_BYTE, buffer);
+
+  glDrawPixels (width, height, format, GL_UNSIGNED_BYTE, buffer);  
 
     //проверка состояния OpenGL
 

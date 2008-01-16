@@ -58,14 +58,21 @@ void SwapChainColorBuffer::GetSize (size_t& width, size_t& height)
 
 void SwapChainColorBuffer::Bind ()
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::SwapChainColorBuffer::Bind";
+
   try
   {
     GetContextManager ().SetContext (0, swap_chain.get (), swap_chain.get ());
     MakeContextCurrent ();
+
+    glReadBuffer (buffer_type);
+    glDrawBuffer (buffer_type);
+
+    CheckErrors (METHOD_NAME);
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainColorBuffer::Bind");
+    exception.Touch (METHOD_NAME);
     
     throw;
   }

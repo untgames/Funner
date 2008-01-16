@@ -10,23 +10,16 @@ using namespace common;
 
 ISwapChain* SwapChainManager::CreateSwapChain (OutputManager& output_manager, const SwapChainDesc& swap_chain_desc)
 {
-  HWND window = (HWND)swap_chain_desc.window_handle;
-  
-  if (!window)
-    RaiseNullArgument ("render::low_level::opengl::SwapChainManager::CreateSwapChain", "swap_chain_desc.window_handle");
-
-  IOutput* output = output_manager.FindContainingOutput ((void*)window);
-
-  if (!output)
+  try
   {
-    char title [128];
-
-    GetWindowText (window, title, sizeof (title));
-
-    RaiseInvalidOperation ("render::low_level::opengl::SwapChainManager::CreateSwapChain", "Can not find containing output for window '%s'", title);
+    return new PrimarySwapChain (swap_chain_desc, &output_manager);
   }
-  
-  return new PrimarySwapChain (output, swap_chain_desc);
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::SwapChainManager::CreateSwapChain");
+
+    throw;
+  }
 }
 
 /*

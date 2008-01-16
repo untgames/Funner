@@ -22,11 +22,8 @@ class DepthStencilTempState
       glGetIntegerv (GL_DEPTH_WRITEMASK, &depth_write_mask);
       
       glDisable     (GL_SCISSOR_TEST);
-//      glEnable      (GL_STENCIL_TEST);
       glDepthMask   (GL_TRUE);
       glStencilMask (~0);
-      
-//      glStencilFunc (GL_ALWAYS, 0, ~0);
     }
   
     ~DepthStencilTempState ()
@@ -82,25 +79,17 @@ void DepthStencilBuffer::GetDesc (TextureDesc& out_desc)
 namespace
 {
 
-//////сделать через битовые поля!!!!
-
-//выделение компоненты глубины
-inline float get_depth_component (size_t pixel)
+struct Depth24Stencil8
 {
-  return float (pixel & 0xFFFFFF) / float (0xFFFFFF);
-}
-
-//выделение компоненты трафарета
-inline unsigned char get_stencil_index (size_t pixel)
-{
-  return unsigned char (pixel >> 24);
-}
-
-//получение упакованного пикселя по компонентам глубины и трафарета
-inline size_t get_depth_stencil_pixel (float depth, unsigned char stencil)
-{
-  return (size_t (depth * 0xFFFFFF) & 0xFFFFFF) + (size_t (stencil) << 24);
-}
+  size_t depth_component : 24;
+  size_t stencil_index : 8;
+  
+  void Set (size_t in_depth_component, unsigned char in_stencil_index)
+  {
+    depth_component = in_depth_component >> 8;
+    stencil_index   = in_stencil_index;
+  }
+};
 
 }
 
@@ -142,9 +131,17 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
   {
     case PixelFormat_D16:
     {
-      DepthStencilTempState temp_state;
+      DepthStencilTempState temp_state;      
 
-      glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, buffer);
+      xtl::uninitialized_storage<size_t> depth_buffer (width * height);
+
+      size_t*               dst_pixel = depth_buffer.data ();
+      const unsigned short* src_pixel = static_cast<const unsigned short*> (buffer);
+
+      for (size_t count=width*height; count--; src_pixel++, dst_pixel++)
+        *dst_pixel = size_t (*src_pixel) << 16;
+
+      glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, depth_buffer.data ());
 
       break;
     }
@@ -156,7 +153,7 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
       
       size_t*       dst_pixel = depth_buffer.data ();
       const size_t* src_pixel = static_cast<const size_t*> (buffer);
-      
+
       for (size_t count=width*height; count--; src_pixel++, dst_pixel++)
         *dst_pixel = *src_pixel << 8;
 
@@ -181,22 +178,22 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
       {
           //разделение данных буфера на компоненты глубины и трафарета
 
-        xtl::uninitialized_storage<float>         depth_buffer (width * height);
+        xtl::uninitialized_storage<size_t>        depth_buffer (width * height);
         xtl::uninitialized_storage<unsigned char> stencil_buffer (width * height);    
         
-        const size_t*  src_pixel         = static_cast<const size_t*> (buffer);
-        float*         dst_depth_pixel   = depth_buffer.data ();
-        unsigned char* dst_stencil_pixel = stencil_buffer.data ();
-        
+        const Depth24Stencil8* src_pixel         = static_cast<const Depth24Stencil8*> (buffer);
+        size_t*                dst_depth_pixel   = depth_buffer.data ();
+        unsigned char*         dst_stencil_pixel = stencil_buffer.data ();
+  
         for (size_t count=width*height; count--; src_pixel++, dst_depth_pixel++, dst_stencil_pixel++)
         {
-          *dst_depth_pixel   = get_depth_component (*src_pixel);
-          *dst_stencil_pixel = get_stencil_index (*src_pixel);
+          *dst_depth_pixel   = (size_t)(src_pixel->depth_component) << 8;
+          *dst_stencil_pixel = src_pixel->stencil_index;
         }
 
           //копирование
 
-        glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_FLOAT, depth_buffer.data ());
+        glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, depth_buffer.data ());
         glDrawPixels (width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_buffer.data ());
       }
 
@@ -260,7 +257,7 @@ void DepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size
     case PixelFormat_D24X8:
     {
       glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, buffer);
-      
+
       size_t* pixel = static_cast<size_t*> (buffer);
 
       for (size_t count=width*height; count--; pixel++)
@@ -283,30 +280,27 @@ void DepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size
       {
           //создание буферов для хранения разделенных данных глубины и трафарета
 
-        xtl::uninitialized_storage<float>         depth_buffer (width * height);
+        xtl::uninitialized_storage<size_t>        depth_buffer (width * height);
         xtl::uninitialized_storage<unsigned char> stencil_buffer (width * height);
 
           //копирование
 
-        glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, depth_buffer.data ());
+        glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, depth_buffer.data ());
         glReadPixels (x, y, width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_buffer.data ());
 
           //упаковка прочитанных данных
 
-        size_t*              dst_pixel         = static_cast<size_t*> (buffer);
-        const float*         src_depth_pixel   = depth_buffer.data ();
+        Depth24Stencil8*     dst_pixel         = static_cast<Depth24Stencil8*> (buffer);
+        const size_t*        src_depth_pixel   = depth_buffer.data ();
         const unsigned char* src_stencil_pixel = stencil_buffer.data ();
 
         for (size_t count=width*height; count--; dst_pixel++, src_depth_pixel++, src_stencil_pixel++)
-          *dst_pixel = get_depth_stencil_pixel (*src_depth_pixel, *src_stencil_pixel);
+          dst_pixel->Set (*src_depth_pixel, *src_stencil_pixel);
       }
 
       break;
     }
     case PixelFormat_S8:
-//      glEnable (GL_STENCIL_TEST);
-//      glClearStencil (0xe);
-//      glClear (GL_STENCIL_BUFFER_BIT);
       glReadPixels (x, y, width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, buffer);
       break;
     case PixelFormat_RGB8:

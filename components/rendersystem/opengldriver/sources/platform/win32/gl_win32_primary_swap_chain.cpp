@@ -8,8 +8,8 @@ using namespace common;
     Конструктор / деструктор
 */
 
-PrimarySwapChain::PrimarySwapChain (IOutput* in_output, const SwapChainDesc& in_desc)
-  : output (in_output)
+PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& in_desc, OutputManager* in_output_manager)
+  : output_manager (in_output_manager)
 {
     //получение окна вывода
     
@@ -93,7 +93,7 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
 {
-  return get_pointer (output);
+  return output_manager ? output_manager->FindContainingOutput (output_window) : 0;
 }
 
 /*
@@ -102,15 +102,24 @@ IOutput* PrimarySwapChain::GetContainingOutput ()
 
 void PrimarySwapChain::Present ()
 {
-    //сброс буфера команд OpenGL
+  try
+  {
+      //сброс буфера команд OpenGL
 
-  if (wglGetCurrentDC () == output_context)
-    glFlush ();
+    if (wglGetCurrentDC () == output_context)
+      glFlush ();
 
-    //обмен переднего и заднего буфера отрисовки
+      //обмен переднего и заднего буфера отрисовки
 
-  if (!SwapBuffers (output_context))
-    raise_error (format ("render::low_level::opengl::PrimarySwapChain::Present(device-name='%s')", output->GetName ()).c_str ());
+    if (!SwapBuffers (output_context))
+      raise_error ("SwapBuffers");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::PrimarySwapChain::Present");
+
+    throw;
+  }
 }
 
 /*
@@ -121,7 +130,12 @@ void PrimarySwapChain::SetFullscreenState (bool state)
 {
   if (GetFullscreenState () == state)
     return;
-    
+
+  IOutput* output = PrimarySwapChain::GetContainingOutput ();
+  
+  if (!output)
+    return;
+
   if (state)
   {
     if (!SetWindowPos (output_window, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE))
@@ -137,7 +151,7 @@ void PrimarySwapChain::SetFullscreenState (bool state)
     mode_desc.width        = window_rect.right - window_rect.left;
     mode_desc.height       = window_rect.bottom - window_rect.top;
     mode_desc.color_bits   = desc.frame_buffer.color_bits;
-    mode_desc.refresh_rate = 0;
+    mode_desc.refresh_rate = 0;    
 
     output->SetCurrentMode (mode_desc);
   }
@@ -154,6 +168,11 @@ void PrimarySwapChain::SetFullscreenState (bool state)
 
 bool PrimarySwapChain::GetFullscreenState ()
 {
+  IOutput* output = PrimarySwapChain::GetContainingOutput ();
+  
+  if (!output)
+    return false;
+
   OutputModeDesc mode_desc;
   
   output->GetCurrentMode (mode_desc);

@@ -49,7 +49,7 @@ void init_line (size_t width, size_t pixel_size, size_t pixel_used_size, unsigne
   {
     size_t j;
     
-    for (j=0; j<pixel_used_size; j++) pixel [j] = i; //myrand ();
+    for (j=0; j<pixel_used_size; j++) pixel [j] = myrand () & 63;
     for (;j<pixel_size; j++)          pixel [j] = 0;
   }    
 }
@@ -163,7 +163,7 @@ void test_buffer (ITexture& render_buffer, size_t x, size_t y, size_t width, siz
 
 void test_buffer (ITexture& render_buffer)
 {
-  static const size_t width = 7, height = 7, x = 20, y = 10;
+  static const size_t width = 4, height = 4, x = 20, y = 10;
 
   for (int i=0; i<PixelFormat_Num; i++)
   {
@@ -183,26 +183,30 @@ int main ()
     
     Color4f clear_color;
     
-    clear_color.red   = 0;
-    clear_color.green = 0;
-    clear_color.blue  = 0;
-    clear_color.alpha = 0;
-    
-//    test.device->ClearViews (ClearFlag_All, clear_color, 0, 0); 
-    
-    printf ("Color buffer test:\n");
+    clear_color.red   = 1.0f / 255.0f;
+    clear_color.green = 2.0f / 255.0f;
+    clear_color.blue  = 3.0f / 255.0f;
+    clear_color.alpha = 4.0f / 255.0f;
 
-    TexturePtr color_buffer = test.device->OSGetRenderTargetView ()->GetTexture ();
+    test.device->ClearViews (ClearFlag_All, clear_color, 0, 0);
+
+    printf ("Color back-buffer test:\n");
+
+    TexturePtr back_color_buffer = test.device->OSGetRenderTargetView ()->GetTexture ();
     
-    test_buffer (*color_buffer);
+    test_buffer (*back_color_buffer);
+    
+    printf ("Color front-buffer test:\n");
+
+    TexturePtr front_color_buffer (test.device->CreateRenderTargetTexture (test.swap_chain.get (), 0), false);
+    
+    test_buffer (*front_color_buffer);    
     
     printf ("Depth-stencil buffer test:\n");
 
     TexturePtr depth_stencil_buffer = test.device->OSGetDepthStencilView ()->GetTexture ();
     
-//    test_buffer (*depth_stencil_buffer);
-
-    test_buffer (*depth_stencil_buffer, 0, 0, 2, 2, PixelFormat_S8);
+    test_buffer (*depth_stencil_buffer);    
   }
   catch (std::exception& exception)
   {
