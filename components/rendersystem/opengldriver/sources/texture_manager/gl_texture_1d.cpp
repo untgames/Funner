@@ -11,7 +11,10 @@ using namespace render::low_level::opengl;
 Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_desc)
   : Texture (manager, tex_desc, GL_TEXTURE_1D)
 {
-  bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
+  static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
+                   Version_1_4          = "GL_VERSION_1_4";
+
+  bool has_SGIS_generate_mipmap = GetContextManager().IsSupported (SGIS_generate_mipmap) || GetContextManager().IsSupported (Version_1_4);
 
   Bind ();
 
@@ -51,7 +54,10 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   if (is_compressed_format (source_format))
     RaiseInvalidArgument ("render::low_level::opengl::Texture1D::SetData", "source_format", source_format, "Can't set compressed data for 1d texture.");
 
-  bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
+  static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
+                   Version_1_4          = "GL_VERSION_1_4";
+
+  bool has_SGIS_generate_mipmap = GetContextManager().IsSupported (SGIS_generate_mipmap) || GetContextManager().IsSupported (Version_1_4);
 
   MakeContextCurrent ();
 

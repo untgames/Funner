@@ -4,6 +4,9 @@ using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
+namespace
+{
+
 template <class T>
 T next_higher_power_of_two (T k) 
 {
@@ -11,6 +14,40 @@ T next_higher_power_of_two (T k)
   for (int i=1; i < sizeof(T) * 8; i = i * 2)
           k = k | k >> i;
   return k + 1;
+}
+
+struct TextureExtensions
+{
+  bool has_ext_texture_rectangle;        //GL_EXT_texture_rectangle
+  bool has_ext_texture3D;                //GL_EXT_texture3D
+  bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
+  bool has_arb_texture_cube_map;         //GL_ARB_texture_cubemap
+  bool has_arb_texture_non_power_of_two; //GL_ARB_texture_non_power_of_two
+  
+  TextureExtensions (const ContextManager& manager)
+  {
+    static Extension EXT_texture_rectangle        = "GL_EXT_texture_rectangle",
+                     EXT_texture3D                = "GL_EXT_texture3D",
+                     EXT_texture_compression_s3tc = "GL_EXT_texture_compression_s3tc",
+                     EXT_texture_cube_map         = "GL_EXT_texture_cube_map",
+                     NV_texture_rectangle         = "GL_NV_texture_rectangle",
+                     ARB_texture_cube_map         = "GL_ARB_texture_cube_map",
+                     ARB_texture_compression      = "GL_ARB_texture_compression",
+                     ARB_texture_non_power_of_two = "GL_ARB_texture_non_power_of_two",
+                     Version_1_2                  = "GL_VERSION_1_2",
+                     Version_1_3                  = "GL_VERSION_1_3",
+                     Version_2_0                  = "GL_VERSION_2_0";
+      
+    has_ext_texture_rectangle        = manager.IsSupported (EXT_texture_rectangle) || manager.IsSupported (NV_texture_rectangle);
+    has_ext_texture3D                = manager.IsSupported (EXT_texture3D) || manager.IsSupported (Version_1_2);
+    has_ext_texture_compression_s3tc = (manager.IsSupported (ARB_texture_compression) || manager.IsSupported (Version_1_3)) && 
+                                       manager.IsSupported (EXT_texture_compression_s3tc);
+    has_arb_texture_cube_map         = manager.IsSupported (ARB_texture_cube_map) || manager.IsSupported (EXT_texture_cube_map) ||
+                                       manager.IsSupported (Version_1_3);
+    has_arb_texture_non_power_of_two = manager.IsSupported (ARB_texture_non_power_of_two) || manager.IsSupported (Version_2_0);
+  }
+};
+
 }
 
 /*
@@ -35,8 +72,9 @@ struct TextureManager::Impl: public ContextObject
     GLint max_texture_size;            //максимальный размер текстуры для устройства
     GLint max_rectangle_texture_size;  //максимальный размер текстуры со сторонами не степени 2 для устройства
     GLint max_cube_map_texture_size;   //максимальный размер cubemap текстуры
-    GLint  max_3d_texture_size;         //максимальный размер 3d текстуры
+    GLint max_3d_texture_size;         //максимальный размер 3d текстуры
 };
+
 
 /*
    Конструктор
@@ -47,19 +85,17 @@ TextureManager::Impl::Impl (const ContextManager& context_manager)
 {
   MakeContextCurrent ();
 
-  bool has_EXT_texture_rectangle = (GLEW_EXT_texture_rectangle || GLEW_NV_texture_rectangle);
-  bool has_ARB_texture_cubemap   = (GLEW_ARB_texture_cube_map || GLEW_EXT_texture_cube_map || GLEW_VERSION_1_3);
-  bool has_EXT_texture3D         = (GLEW_EXT_texture3D || GLEW_VERSION_1_2);
+  TextureExtensions ext (context_manager);
 
   glEnable (GL_TEXTURE_2D);
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_texture_size);
-  if (has_EXT_texture_rectangle)
+  if (ext.has_ext_texture_rectangle)
     glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, &max_rectangle_texture_size);
   else
     max_rectangle_texture_size = max_texture_size;
-  if (has_ARB_texture_cubemap)
+  if (ext.has_arb_texture_cube_map)
     glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, &max_cube_map_texture_size);
-  if (has_EXT_texture3D)
+  if (ext.has_ext_texture3D)
     glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, &max_3d_texture_size);
   CheckErrors ("render::low_level::opengl::TextureManager::Impl::Impl");
 }
@@ -77,11 +113,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
   
   MakeContextCurrent ();
 
-  bool has_EXT_texture_compression_s3tc = (GLEW_ARB_texture_compression || GLEW_VERSION_1_3) && GLEW_EXT_texture_compression_s3tc;
-  bool has_EXT_texture_rectangle        = (GLEW_EXT_texture_rectangle || GLEW_NV_texture_rectangle);
-  bool has_ARB_texture_non_power_of_two = (GLEW_ARB_texture_non_power_of_two || GLEW_VERSION_2_0);
-  bool has_ARB_texture_cubemap          = (GLEW_ARB_texture_cube_map || GLEW_EXT_texture_cube_map || GLEW_VERSION_1_3);
-  bool has_EXT_texture3D                = (GLEW_EXT_texture3D || GLEW_VERSION_1_2);
+  TextureExtensions ext (GetContextManager ());
 
   GLint width;
   TextureDesc temp_desc = tex_desc;            
@@ -96,9 +128,9 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
         RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_texture_size);
       if (is_compressed_format (tex_desc.format))
         RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "1D texture can't be compressed.");
-      if (!has_ARB_texture_non_power_of_two)
+      if (!ext.has_arb_texture_non_power_of_two)
         if ((tex_desc.width - 1) & tex_desc.width) 
-          if (has_EXT_texture_rectangle)
+          if (ext.has_ext_texture_rectangle)
           {
             if (tex_desc.generate_mips_enable)
               RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Mip maps for non power of two textures not supported.");
@@ -159,10 +191,10 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
         RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
                               "Texture height for compressed image must be a multiple 4");
-      if (!has_ARB_texture_non_power_of_two)
+      if (!ext.has_arb_texture_non_power_of_two)
       {
         if (((tex_desc.width - 1) & tex_desc.width) || ((tex_desc.height - 1) & tex_desc.height))
-          if (has_EXT_texture_rectangle)
+          if (ext.has_ext_texture_rectangle)
           {
             if (is_compressed_format (tex_desc.format))
               RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Non power of two texture can't be compressed.");
@@ -220,7 +252,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
     }
     case TextureDimension_3D: 
     {
-      if (has_EXT_texture3D)
+      if (ext.has_ext_texture3D)
       {
         if (tex_desc.width < 1)
           RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_3d_texture_size);
@@ -234,7 +266,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
         if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
           RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
                                 "Texture height for compressed image must be a multiple 4");
-        if (!has_ARB_texture_non_power_of_two)
+        if (!ext.has_arb_texture_non_power_of_two)
         {
           if (((tex_desc.width - 1) & tex_desc.width) || ((tex_desc.height - 1) & tex_desc.height))
           {
@@ -281,59 +313,64 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
     }
     case TextureDimension_Cubemap:
     {
-      if (tex_desc.layers != 6)
-        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.layers", (int)tex_desc.layers, 6, 6);
-      if (tex_desc.width != tex_desc.height)
-        Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Cubemap texture width and height must be equal.");
-      if (tex_desc.width < 1)
-        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_cube_map_texture_size);
-      if (tex_desc.height < 1)
-        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 1, max_cube_map_texture_size);
-      if ((tex_desc.width & 3) && is_compressed_format (tex_desc.format))
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width,
-                              "Texture width for compressed image must be a multiple 4");
-      if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
-                              "Texture height for compressed image must be a multiple 4");
-
-      if (!has_ARB_texture_non_power_of_two)
+      if (ext.has_arb_texture_cube_map)
       {
-        if (((tex_desc.width - 1) & tex_desc.width) || ((tex_desc.height - 1) & tex_desc.height))
+        if (tex_desc.layers != 6)
+          RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.layers", (int)tex_desc.layers, 6, 6);
+        if (tex_desc.width != tex_desc.height)
+          Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Cubemap texture width and height must be equal.");
+        if (tex_desc.width < 1)
+          RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_cube_map_texture_size);
+        if (tex_desc.height < 1)
+          RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 1, max_cube_map_texture_size);
+        if ((tex_desc.width & 3) && is_compressed_format (tex_desc.format))
+          RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width,
+                                "Texture width for compressed image must be a multiple 4");
+        if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
+          RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
+                                "Texture height for compressed image must be a multiple 4");
+
+        if (!ext.has_arb_texture_non_power_of_two)
         {
-          if (is_compressed_format (tex_desc.format))
-            Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                               "Compression in emulated npot textures not implemented yet.");
+          if (((tex_desc.width - 1) & tex_desc.width) || ((tex_desc.height - 1) & tex_desc.height))
+          {
+            if (is_compressed_format (tex_desc.format))
+              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                                 "Compression in emulated npot textures not implemented yet.");
 
-          temp_desc.width = temp_desc.height = next_higher_power_of_two (tex_desc.width);
+            temp_desc.width = temp_desc.height = next_higher_power_of_two (tex_desc.width);
 
-          glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
-                        gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-          
-          glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, GL_TEXTURE_WIDTH, &width);
-          if (!width)
-            Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                               "Not enough space to create cubemap texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
+            glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
+                          gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+            
+            glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, GL_TEXTURE_WIDTH, &width);
+            if (!width)
+              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                                 "Not enough space to create cubemap texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
 
-          CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
-          LogPrintf ("Non power of two textures not supported by hardware. Scaled  cubemap texture created.\n");
-          return new TextureCubemapEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width);
+            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+            LogPrintf ("Non power of two textures not supported by hardware. Scaled  cubemap texture created.\n");
+            return new TextureCubemapEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width);
+          }
         }
+
+        if (is_compressed_format (tex_desc.format))
+          glCompressedTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                                  ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);          //???? Image size may be must multiplied by depth
+        else
+          glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                        gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+        
+        glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, GL_TEXTURE_WIDTH, &width);
+        if (!width)
+          Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                             "Not enough space to create cubemap texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
+
+        CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+        return new TextureCubemap (GetContextManager (), temp_desc);
       }
-
-      if (is_compressed_format (tex_desc.format))
-        glCompressedTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                                ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);          //???? Image size may be must multiplied by depth
       else
-        glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-      
-      glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, GL_TEXTURE_WIDTH, &width);
-      if (!width)
-        Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                           "Not enough space to create cubemap texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
-
-      CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
-      return new TextureCubemap (GetContextManager (), temp_desc);
+        RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension."); 
     }
     default: RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.dimension", tex_desc.dimension);
   }

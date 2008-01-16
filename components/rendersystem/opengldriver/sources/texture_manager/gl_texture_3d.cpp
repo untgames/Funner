@@ -11,7 +11,10 @@ using namespace render::low_level::opengl;
 Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_desc)
   : Texture (manager, tex_desc, GL_TEXTURE_3D_EXT)
 {
-  bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
+  static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
+                   Version_1_4          = "GL_VERSION_1_4";
+
+  bool has_SGIS_generate_mipmap = GetContextManager().IsSupported (SGIS_generate_mipmap) || GetContextManager().IsSupported (Version_1_4);
 
   Bind ();
 
@@ -88,7 +91,10 @@ void Texture3D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     if (source_format != desc.format)
       RaiseInvalidArgument ("render::low_level::opengl::Texture3D::SetData", "source_format");
 
-  bool has_SGIS_generate_mipmap = GLEW_SGIS_generate_mipmap || GLEW_VERSION_1_4;
+  static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
+                   Version_1_4          = "GL_VERSION_1_4";
+
+  bool has_SGIS_generate_mipmap = GetContextManager().IsSupported (SGIS_generate_mipmap) || GetContextManager().IsSupported (Version_1_4);
 
   MakeContextCurrent ();
   Bind ();
