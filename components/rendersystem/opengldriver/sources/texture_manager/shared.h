@@ -142,7 +142,7 @@ class Texture3D : public Texture
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);   //идёт получение не слоя, а всей текстуры. Необходимо достаточное количество памяти.
+    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -81,7 +81,7 @@ size_t texel_size (PixelFormat format)
     case PixelFormat_S8:    return 1;
     case PixelFormat_LA8:
     case PixelFormat_D16:   return 2;
-    case PixelFormat_RGB8:  return 3;
+    case PixelFormat_RGB8:
     case PixelFormat_RGBA8:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8: return 4;  
@@ -122,20 +122,8 @@ GLenum gl_format (PixelFormat format)
     case PixelFormat_RGB8:  return GL_RGB;
     case PixelFormat_RGBA8: return GL_RGBA;
     case PixelFormat_D16:   
-    case PixelFormat_D24X8: 
-    {
-      if (GLEW_ARB_depth_texture || GLEW_VERSION_1_4)
-        return GL_DEPTH_COMPONENT;
-      else common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", 
-                                      "Depth textures not supported. ARB_depth_texture extension not detected.");
-    }
-    case PixelFormat_D24S8:
-    {
-      if ((GLEW_ARB_depth_texture || GLEW_VERSION_1_4) && GLEW_EXT_packed_depth_stencil)
-        return GL_DEPTH_STENCIL_EXT;  
-      else common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", 
-                                      "Depth-stencil textures not supported. EXT_packed_depth_stencil extension not detected.");
-    }
+    case PixelFormat_D24X8: return GL_DEPTH_COMPONENT;
+    case PixelFormat_D24S8: return GL_DEPTH_STENCIL_EXT;  
     case PixelFormat_S8:    common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", "Stencil textures not supported.");
     default: common::RaiseInvalidArgument ("render::low_level::opengl::Texture::gl_format", "format"); return GL_ALPHA;
   }

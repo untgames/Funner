@@ -87,7 +87,6 @@ TextureManager::Impl::Impl (const ContextManager& context_manager)
 
   TextureExtensions ext (context_manager);
 
-  glEnable (GL_TEXTURE_2D);
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_texture_size);
   if (ext.has_ext_texture_rectangle)
     glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, &max_rectangle_texture_size);

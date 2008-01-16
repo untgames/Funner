@@ -160,10 +160,24 @@ void Texture3D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   MakeContextCurrent ();
   Bind ();
 
-  if (is_compressed_format (target_format))
-    glGetCompressedTexImage (GL_TEXTURE_3D_EXT, mip_level, buffer);
-  else
-    glGetTexImage (GL_TEXTURE_3D_EXT, mip_level, gl_format (target_format), gl_type (target_format), buffer);
+  char* temp_buffer;
   
+  if (is_compressed_format (target_format))
+    temp_buffer = new char [((width * height) >> 4) * desc.layers * compressed_quad_size (target_format)];
+  else
+    temp_buffer = new char [width * height * desc.layers * texel_size (target_format)];
+
+  if (is_compressed_format (target_format))
+    glGetCompressedTexImage (GL_TEXTURE_3D_EXT, mip_level, temp_buffer);
+  else
+    glGetTexImage (GL_TEXTURE_3D_EXT, mip_level, gl_format (target_format), gl_type (target_format), temp_buffer);
+
+  if (is_compressed_format (target_format))
+    memcpy (buffer, temp_buffer + ((width * height) >> 4) * layer * compressed_quad_size (target_format), ((width * height) >> 4) * compressed_quad_size (target_format));
+  else
+    memcpy (buffer, temp_buffer + width * height * layer * texel_size (target_format), width * height * texel_size (target_format));
+  
+  delete [] temp_buffer;  
+
   CheckErrors ("render::low_level::opengl::Texture3D::GetData");
 }
