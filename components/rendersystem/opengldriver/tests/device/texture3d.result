@@ -1,0 +1,3 @@
+Results of texture3d_test:
+RGB non power of two 3d texture data operations works correct!
+RGBA 3d texture data operations works correct!

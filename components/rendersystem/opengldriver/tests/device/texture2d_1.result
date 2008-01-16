@@ -1,5 +1,3 @@
-Results of texture2d_1_test:
-RGB non power of two texture data operations works correct!
-DXT texture data operations works correct!
-Depth texture data operations works correct!
-Cubemap texture data operations works correct!
+RGB non power of two 2d texture data operations works correct!
+DXT 2d texture data operations works correct!
+Depth 2d texture data operations works correct!
