@@ -10,7 +10,11 @@ using namespace common;
 class InputLayoutState: public IInputLayoutState, public Object
 {
   public:
-    InputLayoutState(const InputLayoutDesc& desc): input_desc(desc) { }
+    InputLayoutState(const InputLayoutDesc& desc): input_desc(desc)
+    {
+      if (desc.index_type >= InputDataType_Num)
+        RaiseInvalidArgument("render::low_level::opengl::InputLayoutState::", "desc.index_type", desc.index_type);
+    }
     
     void GetDesc (InputLayoutDesc& desc)
     {
@@ -33,7 +37,7 @@ class InputLayoutState: public IInputLayoutState, public Object
 ================================================================================
 */
 
-const size_t Max_Vertex_Buffer_Slots = 8;
+const size_t MAX_VERTEX_BUFFER_SLOTS = 8;
 
 struct InputStage::Impl: public ContextObject
 {
@@ -43,7 +47,7 @@ struct InputStage::Impl: public ContextObject
 
   Impl (const ContextManager& context_manager) : ContextObject (context_manager)
   {
-    for (int i = 0; i < Max_Vertex_Buffer_Slots; i++)
+    for (int i = 0; i < MAX_VERTEX_BUFFER_SLOTS; i++)
       vertex_buffer_slots[i] = NULL;
     
     input_state   = NULL;
@@ -81,7 +85,7 @@ struct InputStage::Impl: public ContextObject
       if (GLEW_ARB_vertex_buffer_object)
         return new VboBuffer(GetContextManager(), GL_ARRAY_BUFFER, desc);
       else
-        return new SystemMemoryBuffer(desc);
+        return new SystemMemoryBuffer(GetContextManager(), desc);
     }
     catch (common::Exception& exception)
     {
@@ -104,7 +108,7 @@ struct InputStage::Impl: public ContextObject
       if (GLEW_ARB_vertex_buffer_object)
         return new VboBuffer(GetContextManager(), GL_ELEMENT_ARRAY_BUFFER, desc);
       else
-        return new SystemMemoryBuffer(desc);
+        return new SystemMemoryBuffer(GetContextManager(), desc);
     }
     catch (common::Exception& exception)
     {
@@ -136,9 +140,9 @@ struct InputStage::Impl: public ContextObject
   
   IBuffer* GetVertexBuffer(size_t vertex_buffer_slot)
   {
-    if (vertex_buffer_slot >= Max_Vertex_Buffer_Slots)
+    if (vertex_buffer_slot >= MAX_VERTEX_BUFFER_SLOTS)
       RaiseOutOfRange("render::low_level::opengl::InputStage::Impl::GetVertexBuffer (size_t vertex_buffer_slot)",
-                      "vertex_buffer_slot", vertex_buffer_slot, Max_Vertex_Buffer_Slots);
+                      "vertex_buffer_slot", vertex_buffer_slot, MAX_VERTEX_BUFFER_SLOTS);
   
     return vertex_buffer_slots[vertex_buffer_slot];
   }
@@ -149,9 +153,16 @@ struct InputStage::Impl: public ContextObject
       RaiseNullArgument("render::low_level::opengl::InputStage::Impl::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)",
                         "buffer");
     
-    if (vertex_buffer_slot >= Max_Vertex_Buffer_Slots)
+    BufferDesc desc;
+    buffer->GetDesc(desc);
+    if (!(desc.bind_flags & BindFlag_VertexBuffer))
+      RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::CreateVertexBuffer (const BufferDesc& desc)",
+                           "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
+                           "Buffer descriptor must include VertexBuffer binding support");
+
+    if (vertex_buffer_slot >= MAX_VERTEX_BUFFER_SLOTS)
       RaiseOutOfRange("render::low_level::opengl::InputStage::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)",
-                      "vertex_buffer_slot", vertex_buffer_slot, Max_Vertex_Buffer_Slots);
+                      "vertex_buffer_slot", vertex_buffer_slot, MAX_VERTEX_BUFFER_SLOTS);
   
     vertex_buffer_slots[vertex_buffer_slot] = buffer;
   }
@@ -164,6 +175,13 @@ struct InputStage::Impl: public ContextObject
   {
     if (!buffer)
       RaiseNullArgument("render::low_level::opengl::InputStage::Impl::SetIndexBuffer (IBuffer* buffer)", "buffer");
+      
+    BufferDesc desc;
+    buffer->GetDesc(desc);
+    if (!(desc.bind_flags & BindFlag_IndexBuffer))
+      RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::CreateIndexBuffer (const BufferDesc& desc)",
+                           "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
+                           "Buffer descriptor must include IndexBuffer binding support");
     
     index_buffer = buffer;
   }
@@ -179,34 +197,35 @@ struct InputStage::Impl: public ContextObject
   
   const void* GetIndices()
   {
-    /*
     if (!index_buffer)
       RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::GetIndices()", "Index buffer is not set, use SetIndexBuffer(size_t, IBuffer*) first!");
-      
-    return index_buffer->
-    */
-    RaiseNotImplemented ("render::low_level::opengl::InputStage::Impl::GetIndices()");
-    return 0;
+    
+    Buffer* buffer = cast_object<Buffer> (GetContextManager(), index_buffer, "render::low_level::opengl::InputStage::Impl::GetIndices()", "index_buffer");
+    return buffer->GetDataPointer();
+    //RaiseNotImplemented ("render::low_level::opengl::InputStage::Impl::GetIndices()");
+    //return 0;
   }
 
   GLenum GetIndexType()
   {
-    RaiseNotImplemented ("render::low_level::opengl::InputStage::Impl::GetIndexType()");
-    return 0;
+    if (!input_state)
+      RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::GetIndexType()", "InputLayoutState is not set, use SetInputLayoutState (IInputLayoutState* state) first!");
+    
+    InputLayoutDesc idesc;
+    input_state->GetDesc(idesc);
+    return idesc.index_type;
+      
+    //RaiseNotImplemented ("render::low_level::opengl::InputStage::Impl::GetIndexType()");
+    //return 0;
   }
   
-  //////////////////////////////////////////
-  /// Заглушка для контекста
-  //////////////////////////////////////////  
-  
-  void MakeContextCurrent()
+  void Bind(size_t base_vertex, size_t base_index)
   {
-    ContextObject::MakeContextCurrent();
   }
-  
+    
 private:
   IInputLayoutState*  input_state;
-  IBuffer*            vertex_buffer_slots[Max_Vertex_Buffer_Slots];
+  IBuffer*            vertex_buffer_slots[MAX_VERTEX_BUFFER_SLOTS];
   IBuffer*            index_buffer;
 };
 
@@ -250,7 +269,7 @@ IBuffer* InputStage::CreateVertexBuffer (const BufferDesc& desc)
 {
   try
   {
-    impl->CreateVertexBuffer(desc);
+    return impl->CreateVertexBuffer(desc);
   }
   catch (common::Exception& exception)
   {
@@ -265,7 +284,7 @@ IBuffer* InputStage::CreateIndexBuffer (const BufferDesc& desc)
 {
   try
   {
-    impl->CreateIndexBuffer(desc);
+    return impl->CreateIndexBuffer(desc);
   }
   catch (common::Exception& exception)
   {

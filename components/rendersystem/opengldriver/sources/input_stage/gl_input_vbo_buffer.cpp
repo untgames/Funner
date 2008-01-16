@@ -6,7 +6,7 @@ using namespace common;
 
 ///Конструктор / деструктор
 VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, const BufferDesc& desc)
-  : buffer_desc (desc), ContextObject (context_manager), target (in_target)
+  : Buffer(context_manager, desc), target (in_target)
 {
   MakeContextCurrent();
 
@@ -90,11 +90,6 @@ VboBuffer::~VboBuffer ()
   glDeleteBuffers(1, &buffer_id);     // уничтожаем буфер
 
   CheckErrors("render::low_level::opengl::VboBuffer::~VboBuffer ()");
-}
-
-void VboBuffer::GetDesc(BufferDesc& desc)
-{
-  desc = buffer_desc;
 }
 
 ///Работа с данными буфера

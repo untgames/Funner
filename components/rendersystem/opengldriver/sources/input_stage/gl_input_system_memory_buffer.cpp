@@ -9,8 +9,8 @@ using namespace common;
 ///Реализация - SystemMemoryBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SystemMemoryBuffer::SystemMemoryBuffer (const BufferDesc& desc)
-  : buffer_desc(desc)
+SystemMemoryBuffer::SystemMemoryBuffer (const ContextManager& context_manager, const BufferDesc& desc)
+  : Buffer(context_manager, desc) 
 {
   try
   {
@@ -35,11 +35,6 @@ SystemMemoryBuffer::~SystemMemoryBuffer ()
   }
 }
 
-void SystemMemoryBuffer::GetDesc(BufferDesc& desc)
-{
-  desc = buffer_desc;
-}
-  
 ///Работа с данными буфера
 void SystemMemoryBuffer::SetData (size_t offset, size_t size, const void* data)
 {
