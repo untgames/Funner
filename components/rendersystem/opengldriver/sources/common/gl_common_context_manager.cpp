@@ -332,6 +332,10 @@ struct ContextManager::Impl: public xtl::reference_counter
       try
       {
         current_context->GetContext ().MakeCurrent (current_draw_swap_chain, current_read_swap_chain);
+        
+          //очистка текущей ошибки
+          
+        while (glGetError () != GL_NO_ERROR);
       }
       catch (common::Exception& exception)
       {

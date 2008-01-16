@@ -179,7 +179,7 @@ int main ()
   {
     printf ("Results of render_buffers_test:\n");
     
-    Test test (L"OpenGL device test window (render_buffers)");    
+    Test test (L"OpenGL device test window (render_buffers)", "GL_EXT_packed_depth_stencil=0");
     
     printf ("Color buffer test:\n");
 

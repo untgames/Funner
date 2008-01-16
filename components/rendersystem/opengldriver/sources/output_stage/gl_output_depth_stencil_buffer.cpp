@@ -119,8 +119,10 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
     {
         //копирование может быть произведено двумя способами: при помощи расширения EXT_packed_depth_stencil,
         //либо посредством разделения переданного буфера на 2: буфер глубины и буфер трафарета
+        
+      static Extension EXT_packed_depth_stencil = "GL_EXT_packed_depth_stencil";        
 
-      if (GLEW_EXT_packed_depth_stencil)
+      if (IsSupported (EXT_packed_depth_stencil))
       {
         glDrawPixels (width, height, GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT_24_8_EXT, buffer);
       }
@@ -160,7 +162,7 @@ void DepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-      RaiseNotSupported (METHOD_NAME, "Unsupported %s=%s", "source_format", get_name (source_format));
+      RaiseNotSupported (METHOD_NAME, "Unsupported source_format=%s", get_name (source_format));
       return;
     default:
       RaiseInvalidArgument (METHOD_NAME, "source_format", source_format);
@@ -214,8 +216,10 @@ void DepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size
     {
         //копирование может быть произведено двумя способами: при помощи расширения EXT_packed_depth_stencil,
         //либо посредством разделения переданного буфера на 2: буфер глубины и буфер трафарета
+        
+      static Extension EXT_packed_depth_stencil = "GL_EXT_packed_depth_stencil";
 
-      if (GLEW_EXT_packed_depth_stencil)
+      if (IsSupported (EXT_packed_depth_stencil))
       {
         glReadPixels (x, y, width, height, GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT_24_8_EXT, buffer);
       }
@@ -254,7 +258,7 @@ void DepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-      RaiseNotSupported (METHOD_NAME, "Unsupported %s=%s", "target_format", get_name (target_format));
+      RaiseNotSupported (METHOD_NAME, "Unsupported target_format=%s", get_name (target_format));
       return;
     default:
       RaiseInvalidArgument (METHOD_NAME, "target_format", target_format);
