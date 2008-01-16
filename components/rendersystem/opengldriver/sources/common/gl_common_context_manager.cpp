@@ -127,6 +127,10 @@ class ContextImpl: public xtl::reference_counter
         extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);
         
         version = reinterpret_cast<const char*> (glGetString (GL_VERSION));
+        
+          //инициализация состояния OpenGL
+          
+         init_opengl_state ();
       }
       catch (common::Exception& exception)
       {
@@ -259,9 +263,6 @@ struct ContextManager::Impl: public xtl::reference_counter
       if (context_id == current_context_id && draw_swap_chain == current_draw_swap_chain && read_swap_chain == current_read_swap_chain)
         return;
         
-      if (!read_swap_chain)
-        read_swap_chain = draw_swap_chain;
-        
       if (!context_id && !draw_swap_chain)
         RaiseNullArgument (METHOD_NAME, "draw_swap_chain && context_id");
         
@@ -290,6 +291,11 @@ struct ContextManager::Impl: public xtl::reference_counter
       
       if (!draw_swap_chain) //использование первичной цепочки обмена
         draw_swap_chain = context->GetMasterSwapChain ();
+        
+        //если цепочка чтения не указана
+        
+      if (!read_swap_chain)
+        read_swap_chain = draw_swap_chain;        
 
         //проверка совместимости контекста с цепочками обмена
 

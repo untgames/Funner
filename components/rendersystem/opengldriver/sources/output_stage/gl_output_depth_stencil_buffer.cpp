@@ -40,6 +40,8 @@ void DepthStencilBuffer::GetDesc (TextureDesc& out_desc)
 namespace
 {
 
+//////сделать через битовые поля!!!!
+
 //выделение компоненты глубины
 inline float get_depth_component (size_t pixel)
 {

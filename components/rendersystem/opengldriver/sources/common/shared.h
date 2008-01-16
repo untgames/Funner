@@ -27,4 +27,25 @@
 #include <common/strlib.h>
 #include <common/singleton.h>
 
+namespace render
+{
+
+namespace low_level
+{
+
+namespace opengl
+{
+
+/*
+    Инициализация состояния OpenGL
+*/
+
+void init_opengl_state ();
+
+}
+
+}
+
+}
+
 #endif

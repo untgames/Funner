@@ -101,17 +101,10 @@ void ColorBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
   if      (glWindowPos2iARB) glWindowPos2iARB (x, y);
   else if (glWindowPos2i)    glWindowPos2i    (x, y);
   else                       return;
+  
+    //TODO: отключение пофрагментных операций
 
-    //копирование
-    
-/*   glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-   glPixelStorei(GL_PACK_ALIGNMENT, 1);
-   glPixelStorei(GL_PACK_SKIP_ROWS, 0);
-   glPixelStorei(GL_PACK_SKIP_PIXELS, 0);    
-         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-         glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
-         glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);   */
+    //копирование    
     
   glDrawPixels (width, height, format, GL_UNSIGNED_BYTE, buffer);
 
