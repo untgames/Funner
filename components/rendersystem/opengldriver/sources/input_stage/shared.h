@@ -43,6 +43,8 @@ class Buffer: virtual public IBuffer, public ContextObject
  
   protected:
     BufferDesc  buffer_desc; // дескриптор буфера
+    
+    void SetDesc (const BufferDesc&);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
