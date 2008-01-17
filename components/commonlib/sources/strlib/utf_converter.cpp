@@ -18,7 +18,7 @@ namespace common
 
 #define Char unsigned __int16
 
-void ReturnExeption(int ex,char *func,int i);
+void ReturnException(int ex,char *func,int i);
 
 int decode_ASCII7(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer);
 int decode_UTF8(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer);
@@ -49,9 +49,9 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
    if(source_buffer_size==0||destination_buffer_size==0)
       return res;
    if(source_buffer==NULL)
-      throw ArgumentNullException("utf_decode","source_buffer is null");
+      throw ArgumentNullException("common::utf_decode","source_buffer is null");
    if(destination_buffer==NULL)
-      throw ArgumentNullException("utf_decode","destination_buffer is null");
+      throw ArgumentNullException("common::utf_decode","destination_buffer is null");
    unsigned char *bsrc=(unsigned char*)source_buffer;
    char32 *dst=(char32*)destination_buffer;
    int srcSize;
@@ -87,7 +87,7 @@ EncodingResult utf_decode (const void* source_buffer,            //буфер-источни
             break;
       }
       if(r!=0)
-         ReturnExeption(r,"utf_decode",i);
+         ReturnException(r,"common::utf_decode",i);
       i+=srcBytes;
       dst++;
       res.source_buffer_processed_size=i;
@@ -110,9 +110,9 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
    if(source_buffer_size==0||destination_buffer_size==0)
       return res;
    if(source_buffer==NULL)
-      throw ArgumentNullException("utf_encode","source_buffer is null");
+      throw ArgumentNullException("common::utf_encode","source_buffer is null");
    if(destination_buffer==NULL)
-      throw ArgumentNullException("utf_encode","destination_buffer is null");
+      throw ArgumentNullException("common::utf_encode","destination_buffer is null");
    char32 *bsrc=(char32*)source_buffer;
    char32 *dst=(char32*)destination_buffer;
    char32 *old_bsrc=(char32*)source_buffer;
@@ -147,7 +147,7 @@ EncodingResult utf_encode (const void* source_buffer,                //буфер-ист
             break;
       }
       if(r!=0)
-         ReturnExeption(r,"utf_encode",res.destination_buffer_processed_size);
+         ReturnException(r,"common::utf_encode",res.destination_buffer_processed_size);
       dst=(char32*)((char*)dst+srcBytes);
       res.destination_buffer_processed_size+=srcBytes;
       (char*)bsrc++;
@@ -641,26 +641,37 @@ stl::string tostring (const stl::wstring& string)
   return tostring (&string [0], string.size ());
 }
 
-void ReturnExeption(int ex,char *func,int i)
+enum
+{
+   UtfError_OutOfRange=1,
+   UtfError_InvalidScalarValue=2,
+   UtfError_NotEnoughEncoded=4,
+   UtfError_NotEnoughBufferSpace=5
+};
+
+void ReturnException(int ex,char *func,int i)
 {
    char ErrorBuf[128];
    switch(ex)
    {
-      case 1:
-         sprintf(ErrorBuf,"Out-of-range ASCII-7 code (%d)",i);
-         throw ArgumentException(func,ErrorBuf);
+      case UtfError_OutOfRange:
+         Raise<ArgumentException>(ErrorBuf,"Out-of-range ASCII-7 code (%d)",i);
+//         throw ArgumentException(func,ErrorBuf);
          break;
-      case 2:
-         sprintf(ErrorBuf,"Invalid Unicode scalar value (%d)",i);
-         throw ArgumentException(func,ErrorBuf);
+      case UtfError_InvalidScalarValue:
+         Raise<ArgumentException>(ErrorBuf,"Invalid Unicode scalar value (%d)",i);
+//         throw ArgumentException(func,ErrorBuf);
          break;
-      case 4:
-         sprintf(ErrorBuf,"Not enough encoded bytes available (%d)",i);
-         throw ArgumentException(func,ErrorBuf);
+      case UtfError_NotEnoughEncoded:
+         Raise<ArgumentException>(ErrorBuf,"Not enough encoded bytes available (%d)",i);
+//         throw ArgumentException(func,ErrorBuf);
          break;
-      case 5:
-         sprintf(ErrorBuf,"Not enough buffer space (%d)",i);
-         throw ArgumentException(func,ErrorBuf);
+      case UtfError_NotEnoughBufferSpace:
+         Raise<ArgumentException>(ErrorBuf,"Not enough buffer space (%d)",i);
+//         throw ArgumentException(func,ErrorBuf);
+         break;
+      default:
+         throw ArgumentException(func,"Unknown error");
          break;
    }
 }
