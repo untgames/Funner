@@ -1,5 +1,5 @@
 Results of init_string_test:
 Could not create new context. Reason: required extension 'GL_ARB_texture_non_power_of_two' not supported
     at render::low_level::opengl::ContextManager::CreateContext
-    at render::low_level::opengl::DefaultFrameBufferFactory::CreateDepthStencilTexture
+    at render::low_level::opengl::FrameBufferManager::CreateDepthStencilTexture
     at render::low_level::opengl::Driver::CreateDevice

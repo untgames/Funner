@@ -17,109 +17,10 @@ struct FrameBufferHolder: public Trackable, public xtl::reference_counter
   View*        depth_stencil_view; //целевое отображение буфера глубина-трафарет
   FrameBuffer* frame_buffer;       //буфер кадра
 
-  FrameBufferHolder (View* in_render_target_view, View* in_depth_stencil_view, FrameBufferFactory* resource_factory) :
+  FrameBufferHolder (View* in_render_target_view, View* in_depth_stencil_view, FrameBufferManager& manager) :
     render_target_view (in_render_target_view),
     depth_stencil_view (in_depth_stencil_view),
-    frame_buffer       (CreateFrameBuffer (in_render_target_view, in_depth_stencil_view, resource_factory))
-  {
-  }
-  
-  private:
-    template <class T>
-    static FrameBuffer* CreateFrameBufferImpl
-      (const T&                    render_target,
-       View*                       depth_stencil_view,
-       FrameBufferFactory* resource_factory)
-    {
-      static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferHolder::CreateFrameBuffer";
-
-      ViewType depth_stencil_type = depth_stencil_view ? depth_stencil_view->GetType () : ViewType_Null;
-
-      switch (depth_stencil_type)
-      {
-        case ViewType_Null:
-          return resource_factory->CreateFrameBuffer (render_target, NullView ());
-        case ViewType_SwapChainColorBuffer:
-          RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'");
-          return 0;
-        case ViewType_SwapChainDepthStencilBuffer:
-          return resource_factory->CreateFrameBuffer (render_target, depth_stencil_view->GetSwapChainDepthStencilBuffer ());
-        case ViewType_Texture:
-        {
-          ViewDesc desc;
-          
-          depth_stencil_view->GetDesc (desc);
-          
-          return resource_factory->CreateFrameBuffer (render_target, depth_stencil_view->GetBindableTexture (), desc);
-        }
-        default:
-          RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type '%s'", typeid (depth_stencil_view->GetTexture ()).name ());
-          return 0;
-      }
-    }  
-  
-    template <class T>
-    static FrameBuffer* CreateFrameBufferImpl
-      (const T&                    render_target,
-       const ViewDesc&             render_target_desc,
-       View*                       depth_stencil_view,
-       FrameBufferFactory* resource_factory)
-    {
-      static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferHolder::CreateFrameBuffer";
-
-      ViewType depth_stencil_type = depth_stencil_view ? depth_stencil_view->GetType () : ViewType_Null;
-
-      switch (depth_stencil_type)
-      {
-        case ViewType_Null:
-          return resource_factory->CreateFrameBuffer (render_target, render_target_desc, NullView ());
-        case ViewType_SwapChainColorBuffer:
-          RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'");
-          return 0;
-        case ViewType_SwapChainDepthStencilBuffer:
-          return resource_factory->CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetSwapChainDepthStencilBuffer ());
-        case ViewType_Texture:
-        {
-          ViewDesc desc;
-          
-          depth_stencil_view->GetDesc (desc);
-          
-          return resource_factory->CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetBindableTexture (), desc);
-        }
-        default:
-          RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type '%s'", typeid (depth_stencil_view->GetTexture ()).name ());
-          return 0;
-      }
-    }
-  
-    static FrameBuffer* CreateFrameBuffer (View* render_target_view, View* depth_stencil_view, FrameBufferFactory* resource_factory)
-    {
-      static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferHolder::CreateFrameBuffer";
-      
-      ViewType render_target_type = render_target_view ? render_target_view->GetType () : ViewType_Null;
-
-      switch (render_target_type)
-      {
-        case ViewType_Null:
-          return CreateFrameBufferImpl (NullView (), depth_stencil_view, resource_factory);
-        case ViewType_SwapChainColorBuffer:
-          return CreateFrameBufferImpl (render_target_view->GetSwapChainColorBuffer (), depth_stencil_view, resource_factory);
-        case ViewType_SwapChainDepthStencilBuffer:
-          RaiseNotSupported (METHOD_NAME, "Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'");
-          return 0;
-        case ViewType_Texture:
-        {
-          ViewDesc render_target_desc;
-          
-          render_target_view->GetDesc (render_target_desc);
-          
-          return CreateFrameBufferImpl (render_target_view->GetBindableTexture (), render_target_desc, depth_stencil_view, resource_factory);
-        }
-        default:
-          RaiseNotSupported (METHOD_NAME, "Unsupported render-target view type '%s'", typeid (render_target_view->GetTexture ()).name ());
-          return 0;
-      }
-    }
+    frame_buffer       (manager.CreateFrameBuffer (in_render_target_view, in_depth_stencil_view)) { }  
 };
 
 /*
@@ -216,28 +117,24 @@ typedef xtl::com_ptr<DepthStencilState>       DepthStencilStatePtr;
 
 struct OutputStage::Impl: public ContextObject
 {
-  OutputStageState                   state;                       //состояние уровня
-  stl::auto_ptr<FrameBufferFactory>  default_resource_factory;    //фабрика ресурсов по умолчанию
-  FrameBufferFactory*                resource_factory;            //выбранная фабрика ресурсов
-  FrameBufferHolderList              frame_buffers;               //буферы кадра
-  ViewPtr                            default_render_target_view;  //отображение буфера цвета по умолчанию
-  ViewPtr                            default_depth_stencil_view;  //отображение буфера глубина-трафарет по умолчанию
-  SwapChainPtr                       default_swap_chain;          //цепочка обмена по умолчанию
-  BlendStatePtr                      default_blend_state;         //состояние подуровня смешивания цветов по умолчанию
-  BlendStatePtr                      null_blend_state;            //состояние подуровня смешивания цветов соотв. отключению подуровня
-  DepthStencilStatePtr               default_depth_stencil_state; //состояние подуровня попиксельного отсечения по умолчанию
-  DepthStencilStatePtr               null_depth_stencil_state;    //состояние подуровня попиксельного отсечения соотв. отключению подуровня
+  OutputStageState      state;                       //состояние уровня
+  FrameBufferManager    frame_buffer_manager;        //менеджер буферов кадра
+  FrameBufferHolderList frame_buffers;               //буферы кадра
+  ViewPtr               default_render_target_view;  //отображение буфера цвета по умолчанию
+  ViewPtr               default_depth_stencil_view;  //отображение буфера глубина-трафарет по умолчанию
+  BlendStatePtr         default_blend_state;         //состояние подуровня смешивания цветов по умолчанию
+  BlendStatePtr         null_blend_state;            //состояние подуровня смешивания цветов соотв. отключению подуровня
+  DepthStencilStatePtr  default_depth_stencil_state; //состояние подуровня попиксельного отсечения по умолчанию
+  DepthStencilStatePtr  null_depth_stencil_state;    //состояние подуровня попиксельного отсечения соотв. отключению подуровня
 
   Impl (ContextManager& context_manager, ISwapChain* swap_chain) :
     ContextObject (context_manager),
-    default_resource_factory (FrameBufferFactory::CreateDefaultFactory (context_manager, swap_chain)),
-    resource_factory (default_resource_factory.get ()),
-    default_swap_chain (swap_chain)
+    frame_buffer_manager (context_manager, swap_chain)
   {
       //инициализация отображений
       
-    xtl::com_ptr<ITexture> color_texture (resource_factory->CreateRenderTargetTexture (swap_chain, 1), false),
-                           depth_stencil_texture (resource_factory->CreateDepthStencilTexture (swap_chain), false);
+    xtl::com_ptr<ITexture> color_texture (frame_buffer_manager.CreateRenderTargetTexture (swap_chain, 1), false),
+                           depth_stencil_texture (frame_buffer_manager.CreateDepthStencilTexture (swap_chain), false);
 
     ViewDesc view_desc;
 
@@ -313,7 +210,7 @@ struct OutputStage::Impl: public ContextObject
       
       //создание нового буфера кадра
       
-    FrameBufferHolderPtr frame_buffer_holder (new FrameBufferHolder (render_target_view, depth_stencil_view, resource_factory), false);  
+    FrameBufferHolderPtr frame_buffer_holder (new FrameBufferHolder (render_target_view, depth_stencil_view, frame_buffer_manager), false);  
 
       //добавление нового буфера кадра в список созданных
 
@@ -578,7 +475,7 @@ ITexture* OutputStage::CreateTexture (const TextureDesc& desc)
 {
   try
   {
-    return impl->resource_factory->CreateTexture (desc);
+    return impl->frame_buffer_manager.CreateTexture (desc);
   }
   catch (common::Exception& exception)
   {
@@ -592,7 +489,7 @@ ITexture* OutputStage::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t
 {
   try
   {
-    return impl->resource_factory->CreateRenderTargetTexture (swap_chain, buffer_index);
+    return impl->frame_buffer_manager.CreateRenderTargetTexture (swap_chain, buffer_index);
   }
   catch (common::Exception& exception)
   {
@@ -606,7 +503,7 @@ ITexture* OutputStage::CreateDepthStencilTexture (ISwapChain* swap_chain)
 {
   try
   {
-    return impl->resource_factory->CreateDepthStencilTexture (swap_chain);
+    return impl->frame_buffer_manager.CreateDepthStencilTexture (swap_chain);
   }
   catch (common::Exception& exception)
   {

@@ -253,41 +253,128 @@ class FrameBuffer
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Абстрактаня фабрика ресурсов выходного подуровня OpenGL
+///Реализация буфера кадра для цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FrameBufferFactory
+class SwapChainFrameBuffer: public FrameBuffer, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Деструктор
+///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual ~FrameBufferFactory () {}
+    SwapChainFrameBuffer (const ContextManager&        manager,
+                          SwapChainColorBuffer*        color_buffer,
+                          SwapChainDepthStencilBuffer* depth_stencil_buffer);
+                          
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Разрешение / запрещение буферов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetBuffersState            (bool color_buffer_state, bool depth_stencil_buffer_state);
+    bool GetColorBufferState        () const { return color_buffer_state; }
+    bool GetDepthStencilBufferState () const { return depth_stencil_buffer_state; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка буфера в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Bind (bool&, bool&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с текстурами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void              SetRenderTargets       (IBindableTexture*, const ViewDesc*, IBindableTexture*, const ViewDesc*);
+    IBindableTexture* GetRenderTargetTexture () const { return render_target_texture.get (); }
+    IBindableTexture* GetDepthStencilTexture () const { return depth_stencil_texture.get (); }
+    const ViewDesc&   GetRenderTargetDesc    () const { return render_target_desc; }
+    const ViewDesc&   GetDepthStencilDesc    () const { return depth_stencil_desc; }
+    void              UpdateRenderTargets    ();
+
+  private:
+    typedef xtl::com_ptr<SwapChainColorBuffer>        ColorBufferPtr;
+    typedef xtl::com_ptr<SwapChainDepthStencilBuffer> DepthStencilBufferPtr;
+    typedef xtl::com_ptr<IBindableTexture>            TexturePtr;
+
+  private:
+    ColorBufferPtr        color_buffer;
+    DepthStencilBufferPtr depth_stencil_buffer;
+    TexturePtr            render_target_texture;
+    TexturePtr            depth_stencil_texture;
+    ViewDesc              render_target_desc;
+    ViewDesc              depth_stencil_desc;    
+    bool                  color_buffer_state;
+    bool                  depth_stencil_buffer_state;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер буферов кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class FrameBufferManager: public ContextObject
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FrameBufferManager  (const ContextManager& manager, ISwapChain* default_swap_chain);
+    ~FrameBufferManager ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение цепочки обмена по умолчанию
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ISwapChain* GetDefaultSwapChain () const { return default_swap_chain.get (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание целевых буферов вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual ITexture* CreateTexture             (const TextureDesc&) = 0;
-    virtual ITexture* CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index) = 0;
-    virtual ITexture* CreateDepthStencilTexture (ISwapChain* swap_chain) = 0;
+    ITexture* CreateTexture             (const TextureDesc&);
+    ITexture* CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index);
+    ITexture* CreateDepthStencilTexture (ISwapChain* swap_chain);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание фрейм буферов
+///Диспетчер создания буферов кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual FrameBuffer* CreateFrameBuffer (NullView, NullView) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (NullView, SwapChainDepthStencilBuffer*) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (NullView, IBindableTexture*, const ViewDesc&) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, NullView) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, SwapChainDepthStencilBuffer*) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, IBindableTexture*, const ViewDesc&) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, NullView) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, SwapChainDepthStencilBuffer*) = 0;
-    virtual FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, IBindableTexture*, const ViewDesc&) = 0;
+    FrameBuffer* CreateFrameBuffer (View* render_target_view, View* depth_stencil_view);
 
+  private:
+    typedef xtl::com_ptr<SwapChainColorBuffer>        ColorBufferPtr;
+    typedef xtl::com_ptr<SwapChainDepthStencilBuffer> DepthStencilBufferPtr;
+
+  private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание фабрик
+///Промежуточные диспетчеры создания буферов кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static FrameBufferFactory* CreateDefaultFactory (const ContextManager&, ISwapChain* default_swap_chain);
-    static FrameBufferFactory* CreateFboFactory     (const ContextManager&, FrameBufferFactory* default_factory);
+    template <class T>
+    FrameBuffer* CreateFrameBufferImpl (const T& render_target, const ViewDesc& render_target_desc, View* depth_stencil_view);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание буферов кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, NullView, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, NullView, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, NullView, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с теневыми буферами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ColorBufferPtr        GetShadowBuffer          (SwapChainDepthStencilBuffer*);
+    DepthStencilBufferPtr GetShadowBuffer          (SwapChainColorBuffer*);
+    void                  GetShadowBuffers         (ColorBufferPtr&, DepthStencilBufferPtr&);
+    ColorBufferPtr        CreateColorBuffer        (SwapChainDepthStencilBuffer*);
+    DepthStencilBufferPtr CreateDepthStencilBuffer (SwapChainColorBuffer*);
+    SwapChainFrameBuffer* CreateShadowFrameBuffer  ();
+
+  private:
+    typedef stl::list<SwapChainColorBuffer*>        ColorBufferList;
+    typedef stl::list<SwapChainDepthStencilBuffer*> DepthStencilBufferList;
+    typedef xtl::com_ptr<ISwapChain>                SwapChainPtr;
+
+  private:
+    SwapChainPtr           default_swap_chain;
+    ColorBufferList        shadow_color_buffers;
+    DepthStencilBufferList shadow_depth_stencil_buffers;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
