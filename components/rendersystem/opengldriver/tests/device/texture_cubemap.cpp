@@ -29,9 +29,9 @@ int main ()
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
     memset (image_data, 17, image_data_size);
-    texture->SetData (3, 0, 0, 0, 508, 508, PixelFormat_DXT5, image_data);
+    texture->SetData (3, 0, 0, 0, 508, 508, PixelFormat_DXT5, image_data + desc.width * desc.height * 3);
     md5 (hash[0], image_data, image_data_size);
-    texture->GetData (3, 0, 0, 0, 508, 508, PixelFormat_DXT5, image_data);
+    texture->GetData (3, 0, 0, 0, 508, 508, PixelFormat_DXT5, image_data + desc.width * desc.height * 3);
     md5 (hash[1], image_data, image_data_size);
 
     if (memcmp (hash[0], hash[1], 16))
@@ -46,9 +46,9 @@ int main ()
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
 
-    texture2->SetData (2, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data);
+    texture2->SetData (2, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data + desc.width * desc.height * 2);
     md5 (hash[0], image_data, image_data_size);
-    texture2->GetData (2, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data);
+    texture2->GetData (2, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data + desc.width * desc.height * 2);
     md5 (hash[1], image_data, image_data_size);
 
     if (memcmp (hash[0], hash[1], 16))

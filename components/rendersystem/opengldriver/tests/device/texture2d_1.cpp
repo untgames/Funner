@@ -11,7 +11,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (texture2d_1_test)");
+    Test test (L"OpenGL device test window (texture2d_1_test)");//, "disable='GL_ARB_texture_non_power_of_two GL_EXT_texture_compression_s3tc GL_EXT_texture_rectangle' max_version=1.1");
 
     TextureDesc desc;
     memset (&desc, 0, sizeof (desc));
@@ -42,13 +42,13 @@ int main ()
     desc.generate_mips_enable = false;
     desc.format               = PixelFormat_DXT5;
     desc.width                = 512;
-    desc.height               = 512;
+    desc.height               = 508;
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
 
-    texture2->SetData (0, 0, 0, 0, 512, 512, PixelFormat_RGB8, image_data);
+    texture2->SetData (0, 0, 0, 0, 512, 508, PixelFormat_RGB8, image_data);
     md5 (hash[0], image_data, image_data_size);
-    texture2->GetData (0, 0, 0, 0, 512, 512, PixelFormat_RGB8, image_data);
+    texture2->GetData (0, 0, 0, 0, 512, 508, PixelFormat_RGB8, image_data);
     md5 (hash[1], image_data, image_data_size);
 
     if (memcmp (hash[0], hash[1], 16))
@@ -56,10 +56,12 @@ int main ()
     else
       printf ("DXT 2d texture data operations works correct!\n");
 
-    texture2->SetData (0, 0, 0, 0, 512, 512, PixelFormat_DXT5, image_data);
-    texture2->GetData (0, 0, 0, 0, 512, 512, PixelFormat_DXT5, image_data);
+    texture2->SetData (0, 0, 0, 0, 512, 508, PixelFormat_DXT5, image_data);
+    texture2->GetData (0, 0, 0, 0, 512, 508, PixelFormat_DXT5, image_data);
   
     desc.format  = PixelFormat_D16;
+    desc.width   = 512;
+    desc.height  = 512;
 
     xtl::com_ptr<ITexture> texture3 (test.device->CreateTexture (desc), false);
 

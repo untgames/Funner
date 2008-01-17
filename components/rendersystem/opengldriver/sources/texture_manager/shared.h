@@ -216,9 +216,22 @@ GLenum gl_type              (PixelFormat format);  //тип OpenGL
 bool   is_compressed_format (PixelFormat format);  //€вл€етс€ ли формат сжатым
 size_t compressed_quad_size (PixelFormat format);  //размер блока сжатых пикселей 4*4 в байтах
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ћасштабирование текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
 void scale_image_2x_down (PixelFormat format, size_t width,     size_t height,     const void* src, void* dest);
 void scale_image         (PixelFormat format, size_t width,     size_t height, 
                                               size_t new_width, size_t new_height, const void* src, void* dest);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–абота с DXT форматом при остутствии аппаратной поддержки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void   unpack_dxt (PixelFormat format, size_t width, size_t height, const void* dxt_data,      void* unpacked_data); //распаковка dxt
+void   pack_dxt   (PixelFormat format, size_t width, size_t height, const void* unpacked_data, void* dxt_data);      //упаковка dxt
+GLint  unpack_internal_format (PixelFormat format);                                                                  //распакованный внутренний формат OpenGL
+GLenum unpack_type            (PixelFormat format);                                                                  //распакованный тип OpenGL
+size_t unpack_texel_size      (PixelFormat format);                                                                  //размер распакованного тексел€ в байтах
+GLenum unpack_format          (PixelFormat format);                                                                  //распакованный формат OpenGL
+PixelFormat unpack_pf         (PixelFormat format);                                                                  //распакованный формат
 
 }
 

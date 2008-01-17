@@ -81,7 +81,7 @@ size_t texel_size (PixelFormat format)
     case PixelFormat_S8:    return 1;
     case PixelFormat_LA8:
     case PixelFormat_D16:   return 2;
-    case PixelFormat_RGB8:
+    case PixelFormat_RGB8:  return 3;
     case PixelFormat_RGBA8:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8: return 4;  

@@ -4,6 +4,30 @@ using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
+namespace
+{
+
+struct TextureExtensions
+{
+  bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
+  bool has_sgis_generate_mipmap;         //GL_SGIS_generate_mipmap
+  
+  TextureExtensions (const ContextManager& manager)
+  {
+    static Extension SGIS_generate_mipmap         = "GL_SGIS_generate_mipmap",
+                     EXT_texture_compression_s3tc = "GL_EXT_texture_compression_s3tc",
+                     ARB_texture_compression      = "GL_ARB_texture_compression",
+                     Version_1_3                  = "GL_VERSION_1_3",
+                     Version_1_4                  = "GL_VERSION_1_4";
+      
+    has_ext_texture_compression_s3tc = (manager.IsSupported (ARB_texture_compression) || manager.IsSupported (Version_1_3)) && 
+                                       manager.IsSupported (EXT_texture_compression_s3tc);
+    has_sgis_generate_mipmap         = (manager.IsSupported (SGIS_generate_mipmap) || manager.IsSupported (Version_1_4));
+  }
+};
+
+}
+
 /*
    Конструктор / деструктор
 */
@@ -11,18 +35,21 @@ using namespace render::low_level::opengl;
 TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDesc& tex_desc)
   : Texture (manager, tex_desc, GL_TEXTURE_CUBE_MAP_ARB)
 {
-  static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
-                   Version_1_4          = "GL_VERSION_1_4";
-
-  bool has_SGIS_generate_mipmap = GetContextManager().IsSupported (SGIS_generate_mipmap) || GetContextManager().IsSupported (Version_1_4);
+  TextureExtensions ext (GetContextManager ());
 
   Bind ();
 
   for (size_t i = 0; i < 6; i++)
   {
     if (is_compressed_format (tex_desc.format))   
-      glCompressedTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, gl_internal_format (tex_desc.format), tex_desc.width, 
-                              tex_desc.height, 0, ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+    {
+      if (ext.has_ext_texture_compression_s3tc)   
+        glCompressedTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, gl_internal_format (tex_desc.format), tex_desc.width, 
+                                tex_desc.height, 0, ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+      else
+        glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                      unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+    }
     else
       glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
                     gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
@@ -33,7 +60,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     tex_desc.width > tex_desc.height ? mips_count = (size_t)(log ((float)tex_desc.width) / log (2.f)) : 
                                        mips_count = (size_t)(log ((float)tex_desc.height) / log (2.f));
 
-    if (has_SGIS_generate_mipmap)
+    if (ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, true);
     else
     {
@@ -44,8 +71,14 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
         for (size_t j = 0; j < 6; j++)
         {
           if (is_compressed_format (tex_desc.format))   
-            glCompressedTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format), width, 
-                                    height, 0, ((width * height) >> 4) / compressed_quad_size (tex_desc.format), NULL);
+          {
+            if (ext.has_ext_texture_compression_s3tc)   
+              glCompressedTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format), width, 
+                                      height, 0, ((width * height) >> 4) / compressed_quad_size (tex_desc.format), NULL);
+            else
+              glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, unpack_internal_format (tex_desc.format), width, height, 0, 
+                            unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+          }
           else
             glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format), width, height, 0, 
                           gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
@@ -97,26 +130,35 @@ void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y
     if (source_format != desc.format)
       RaiseInvalidArgument ("render::low_level::opengl::TextureCubemap::SetData", "source_format");
 
-  static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
-                   Version_1_4          = "GL_VERSION_1_4";
-
-  bool has_SGIS_generate_mipmap = GetContextManager().IsSupported (SGIS_generate_mipmap) || GetContextManager().IsSupported (Version_1_4);
+  TextureExtensions ext (GetContextManager ());
 
   MakeContextCurrent ();
   Bind ();
 
   if (is_compressed_format (source_format))
-    glCompressedTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, gl_format (source_format), 
-                               ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
+  {
+    if (ext.has_ext_texture_compression_s3tc)
+      glCompressedTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, gl_format (source_format), 
+                                 ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
+    else
+    {
+      char* unpacked_buffer = new char [width * height * unpack_texel_size (source_format)];
+
+      unpack_dxt (source_format, width, height, buffer, unpacked_buffer);
+      glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, unpack_format (source_format), unpack_type (source_format), unpacked_buffer);
+
+      delete [] unpacked_buffer;
+    }
+  }
   else
   {
-    if (mip_level && has_SGIS_generate_mipmap)
+    if (mip_level && ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, false); 
     glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, gl_format (source_format), gl_type (source_format), buffer);
-    if (mip_level && has_SGIS_generate_mipmap)
+    if (mip_level && ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, true);
 
-    if (desc.generate_mips_enable && !mip_level && !has_SGIS_generate_mipmap)
+    if (desc.generate_mips_enable && !mip_level && !ext.has_sgis_generate_mipmap)
     {    
       if (width > 1)
         width = width >> 1;
@@ -168,8 +210,22 @@ void TextureCubemap::GetData (size_t layer, size_t mip_level, size_t x, size_t y
   MakeContextCurrent ();
   Bind ();
 
+  TextureExtensions ext (GetContextManager ());
+
   if (is_compressed_format (target_format))
-    glGetCompressedTexImage (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, buffer);
+  {
+    if (ext.has_ext_texture_compression_s3tc)
+      glGetCompressedTexImage (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, buffer);
+    else
+    {
+      char* unpacked_buffer = new char [width * height * unpack_texel_size (target_format)];
+
+      glGetTexImage (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, unpack_format (target_format), unpack_type (target_format), unpacked_buffer);
+      pack_dxt      (target_format, width, height, unpacked_buffer, buffer);
+
+      delete [] unpacked_buffer;
+    }
+  }
   else
     glGetTexImage (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, gl_format (target_format), gl_type (target_format), buffer);
   

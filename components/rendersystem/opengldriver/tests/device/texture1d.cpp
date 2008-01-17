@@ -3,7 +3,7 @@
 
 using namespace common;
 
-const size_t image_data_size = 512 * 4;
+const size_t image_data_size = 512 * 3;
 
 int main ()
 {

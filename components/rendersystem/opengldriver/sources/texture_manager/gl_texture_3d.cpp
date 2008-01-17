@@ -4,6 +4,30 @@ using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
+namespace
+{
+
+struct TextureExtensions
+{
+  bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
+  bool has_sgis_generate_mipmap;         //GL_SGIS_generate_mipmap
+  
+  TextureExtensions (const ContextManager& manager)
+  {
+    static Extension SGIS_generate_mipmap         = "GL_SGIS_generate_mipmap",
+                     EXT_texture_compression_s3tc = "GL_EXT_texture_compression_s3tc",
+                     ARB_texture_compression      = "GL_ARB_texture_compression",
+                     Version_1_3                  = "GL_VERSION_1_3",
+                     Version_1_4                  = "GL_VERSION_1_4";
+      
+    has_ext_texture_compression_s3tc = (manager.IsSupported (ARB_texture_compression) || manager.IsSupported (Version_1_3)) && 
+                                       manager.IsSupported (EXT_texture_compression_s3tc);
+    has_sgis_generate_mipmap         = (manager.IsSupported (SGIS_generate_mipmap) || manager.IsSupported (Version_1_4));
+  }
+};
+
+}
+
 /*
    Конструктор / деструктор
 */
@@ -11,16 +35,19 @@ using namespace render::low_level::opengl;
 Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_desc)
   : Texture (manager, tex_desc, GL_TEXTURE_3D_EXT)
 {
-  static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
-                   Version_1_4          = "GL_VERSION_1_4";
-
-  bool has_SGIS_generate_mipmap = GetContextManager().IsSupported (SGIS_generate_mipmap) || GetContextManager().IsSupported (Version_1_4);
+  TextureExtensions ext (GetContextManager ());
 
   Bind ();
 
   if (is_compressed_format (tex_desc.format))   
-    glCompressedTexImage3D (GL_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers,
-                            0, ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+  {   
+    if (ext.has_ext_texture_compression_s3tc)
+      glCompressedTexImage3D (GL_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers,
+                              0, ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+    else
+      glTexImage3DEXT (GL_TEXTURE_3D_EXT, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
+                       unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+  }
   else
     glTexImage3DEXT (GL_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
@@ -30,7 +57,7 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     tex_desc.width > tex_desc.height ? mips_count = (size_t)(log ((float)tex_desc.width) / log (2.f)) : 
                                        mips_count = (size_t)(log ((float)tex_desc.height) / log (2.f));
 
-    if (has_SGIS_generate_mipmap)
+    if (ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_3D_EXT, GL_GENERATE_MIPMAP_SGIS, true);
     else
     {
@@ -39,8 +66,14 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
       for (size_t i = 1; i < mips_count; i++)
       {
         if (is_compressed_format (tex_desc.format))   
-          glCompressedTexImage3D (GL_TEXTURE_3D_EXT, i, gl_internal_format (tex_desc.format), width, height, tex_desc.layers,
-                                  0, ((width * height) >> 4) / compressed_quad_size (tex_desc.format), NULL);
+        {
+          if (ext.has_ext_texture_compression_s3tc)
+            glCompressedTexImage3D (GL_TEXTURE_3D_EXT, i, gl_internal_format (tex_desc.format), width, height, tex_desc.layers,
+                                    0, ((width * height) >> 4) / compressed_quad_size (tex_desc.format), NULL);
+          else
+            glTexImage3DEXT (GL_TEXTURE_3D_EXT, i, unpack_internal_format (tex_desc.format), width, height, tex_desc.layers, 0, 
+                             unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+        }
         else
           glTexImage3DEXT (GL_TEXTURE_3D_EXT, i, gl_internal_format (tex_desc.format), width, height, tex_desc.layers, 0, 
                            gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
@@ -91,26 +124,35 @@ void Texture3D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     if (source_format != desc.format)
       RaiseInvalidArgument ("render::low_level::opengl::Texture3D::SetData", "source_format");
 
-  static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
-                   Version_1_4          = "GL_VERSION_1_4";
-
-  bool has_SGIS_generate_mipmap = GetContextManager().IsSupported (SGIS_generate_mipmap) || GetContextManager().IsSupported (Version_1_4);
+  TextureExtensions ext (GetContextManager ());
 
   MakeContextCurrent ();
   Bind ();
 
   if (is_compressed_format (source_format))
-    glCompressedTexSubImage3D (GL_TEXTURE_3D_EXT, mip_level, x, y, layer, width, height, 1, gl_format (source_format), 
-                               ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
+  {
+    if (ext.has_ext_texture_compression_s3tc)
+      glCompressedTexSubImage3D (GL_TEXTURE_3D_EXT, mip_level, x, y, layer, width, height, 1, gl_format (source_format), 
+                                 ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
+    else
+    {
+      char* unpacked_buffer = new char [width * height * unpack_texel_size (source_format)];
+
+      unpack_dxt (source_format, width, height, buffer, unpacked_buffer);
+      glTexSubImage3D (GL_TEXTURE_3D_EXT, mip_level, x, y, layer, width, height, 1, unpack_format (source_format), unpack_type (source_format), unpacked_buffer);
+
+      delete [] unpacked_buffer;
+    }
+  }
   else
   {
-    if (mip_level && has_SGIS_generate_mipmap)
+    if (mip_level && ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_3D_EXT, GL_GENERATE_MIPMAP_SGIS, false); 
     glTexSubImage3D (GL_TEXTURE_3D_EXT, mip_level, x, y, layer, width, height, 1, gl_format (source_format), gl_type (source_format), buffer);
-    if (mip_level && has_SGIS_generate_mipmap)
+    if (mip_level && ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_3D_EXT, GL_GENERATE_MIPMAP_SGIS, true);
 
-    if (desc.generate_mips_enable && !mip_level && !has_SGIS_generate_mipmap)
+    if (desc.generate_mips_enable && !mip_level && !ext.has_sgis_generate_mipmap)
     {    
       if (width > 1)
         width = width >> 1;
@@ -160,22 +202,36 @@ void Texture3D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   MakeContextCurrent ();
   Bind ();
 
-  char* temp_buffer;
+  TextureExtensions ext (GetContextManager ());
+
+  char*  temp_buffer;
+  size_t layer_size;
   
-  if (is_compressed_format (target_format))
-    temp_buffer = new char [((width * height) >> 4) * desc.layers * compressed_quad_size (target_format)];
+  if (is_compressed_format (target_format) && ext.has_ext_texture_compression_s3tc)
+    layer_size = ((width * height) >> 4) * compressed_quad_size (target_format);
   else
-    temp_buffer = new char [width * height * desc.layers * texel_size (target_format)];
+  {
+    if (texel_size (target_format) == 3)
+      layer_size = width * height * 4;
+    else
+      layer_size = width * height * texel_size (target_format);
+  }
+  temp_buffer = new char [layer_size * desc.layers];
 
   if (is_compressed_format (target_format))
-    glGetCompressedTexImage (GL_TEXTURE_3D_EXT, mip_level, temp_buffer);
+  {
+    if (ext.has_ext_texture_compression_s3tc)
+      glGetCompressedTexImage (GL_TEXTURE_3D_EXT, mip_level, temp_buffer);
+    else
+      glGetTexImage (GL_TEXTURE_3D_EXT, mip_level, unpack_format (target_format), unpack_type (target_format), temp_buffer);
+  }
   else
     glGetTexImage (GL_TEXTURE_3D_EXT, mip_level, gl_format (target_format), gl_type (target_format), temp_buffer);
-
-  if (is_compressed_format (target_format))
-    memcpy (buffer, temp_buffer + ((width * height) >> 4) * layer * compressed_quad_size (target_format), ((width * height) >> 4) * compressed_quad_size (target_format));
+  
+  if (is_compressed_format (target_format) && !ext.has_ext_texture_compression_s3tc)
+    pack_dxt (target_format, width, height, temp_buffer + layer_size * layer, buffer);
   else
-    memcpy (buffer, temp_buffer + width * height * layer * texel_size (target_format), width * height * texel_size (target_format));
+    memcpy (buffer, temp_buffer + layer_size * layer, layer_size);
   
   delete [] temp_buffer;  
 
