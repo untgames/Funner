@@ -16,13 +16,13 @@ Color back-buffer test:
     1702 3928 132c 090b     1706 3978 1384 0921     0004 0050 0058 0016 
     1e12 3433 0c1e 1534     1e36 3499 0c5a 159c     0024 0066 003c 0068 
   test format PixelFormat_D16: EXCEPTION: Unsupported source_format=PixelFormat_D16
-    at render::low_level::opengl::ColorBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_D24X8: EXCEPTION: Unsupported source_format=PixelFormat_D24X8
-    at render::low_level::opengl::ColorBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_D24S8: EXCEPTION: Unsupported source_format=PixelFormat_D24S8
-    at render::low_level::opengl::ColorBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_S8: EXCEPTION: Unsupported source_format=PixelFormat_S8
-    at render::low_level::opengl::ColorBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
 Color front-buffer test:
   test format PixelFormat_RGB8: Ok!
   test format PixelFormat_RGBA8: Ok!
@@ -40,24 +40,24 @@ Color front-buffer test:
     0d19 0d13 0430 343a     0d4b 0d39 0490 34ae     0032 0026 0060 0074 
     2626 3313 0b0b 1021     2672 3339 0b21 1063     004c 0026 0016 0042 
   test format PixelFormat_D16: EXCEPTION: Unsupported source_format=PixelFormat_D16
-    at render::low_level::opengl::ColorBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_D24X8: EXCEPTION: Unsupported source_format=PixelFormat_D24X8
-    at render::low_level::opengl::ColorBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_D24S8: EXCEPTION: Unsupported source_format=PixelFormat_D24S8
-    at render::low_level::opengl::ColorBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_S8: EXCEPTION: Unsupported source_format=PixelFormat_S8
-    at render::low_level::opengl::ColorBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
 Depth-stencil buffer test:
   test format PixelFormat_RGB8: EXCEPTION: Unsupported source_format=PixelFormat_RGB8
-    at render::low_level::opengl::DepthStencilBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_RGBA8: EXCEPTION: Unsupported source_format=PixelFormat_RGBA8
-    at render::low_level::opengl::DepthStencilBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_L8: EXCEPTION: Unsupported source_format=PixelFormat_L8
-    at render::low_level::opengl::DepthStencilBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_A8: EXCEPTION: Unsupported source_format=PixelFormat_A8
-    at render::low_level::opengl::DepthStencilBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_LA8: EXCEPTION: Unsupported source_format=PixelFormat_LA8
-    at render::low_level::opengl::DepthStencilBuffer::SetData
+    at render::low_level::opengl::RenderBuffer::SetData
   test format PixelFormat_D16: Ok!
   test format PixelFormat_D24X8: Ok!
   test format PixelFormat_D24S8: Ok!

@@ -15,7 +15,7 @@ using namespace common;
 */
 
 SwapChainColorBuffer::SwapChainColorBuffer (const ContextManager& manager, ISwapChain* in_swap_chain, size_t in_buffer_index)
-  : ColorBuffer (manager),
+  : RenderBuffer (manager, RenderBufferType_Color),
     swap_chain (in_swap_chain),
     buffer_index (in_buffer_index)
 {
@@ -89,7 +89,7 @@ void SwapChainColorBuffer::Bind ()
 */
 
 SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const ContextManager& manager, ISwapChain* swap_chain)
-  : DepthStencilBuffer (manager)
+  : RenderBuffer (manager, RenderBufferType_DepthStencil)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer";
 
@@ -107,7 +107,7 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const ContextManager& 
 }
 
 SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const ContextManager& manager, ISwapChain* swap_chain, size_t in_width, size_t in_height)
-  : DepthStencilBuffer (manager),
+  : RenderBuffer (manager, RenderBufferType_DepthStencil),
     width (in_width),
     height (in_height)
 {
