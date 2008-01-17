@@ -18,6 +18,14 @@ namespace common
 
 #define Char unsigned __int16
 
+enum
+{
+   UtfError_OutOfRange=1,
+   UtfError_InvalidScalarValue=2,
+   UtfError_NotEnoughEncoded=4,
+   UtfError_NotEnoughBufferSpace=5
+};
+
 void ReturnException(int ex,char *func,int i);
 
 int decode_ASCII7(const unsigned char* src, int srcSize, int* srcBytes, char32* buffer);
@@ -273,14 +281,14 @@ int decode_UTF8( const unsigned char* src, int srcSize, int* srcBytes, char32* b
           if ( bytes < 2 || bytes > 4 )
           {
              // ERROR: Invalid number of following bytes
-             err = 1;
+             err = UtfError_OutOfRange;
           }
           else
           {
              if ( srcSize < bytes )
              {
                 // ERROR: Not enough encoded bytes available
-                err = 4;
+                err = UtfError_NotEnoughEncoded;
              }
              else
              {
@@ -298,7 +306,7 @@ int decode_UTF8( const unsigned char* src, int srcSize, int* srcBytes, char32* b
    else
    {
       // ERROR: Not enough encoded bytes available
-      err = 4;
+      err = UtfError_NotEnoughEncoded;
    }
    if ( !err )
       *buffer = cp;
@@ -334,14 +342,14 @@ int decode_UTF16( const unsigned char* src, int srcSize, int* srcBytes, char32* 
          else
          {
             // ERROR: Not enough encoded bytes available
-            err = 4;
+            err = UtfError_NotEnoughEncoded;
          }
       }
    }
    else
    {
       // ERROR: Not enough encoded bytes available
-      err = 4;
+      err = UtfError_NotEnoughEncoded;
    }
 
    if ( !err )
@@ -384,7 +392,7 @@ int decode_UTF32( const unsigned char* src, int srcSize, int* srcBytes, char32* 
    else
    {
       // ERROR: Not enough encoded bytes available
-      err = 4;
+      err = UtfError_NotEnoughEncoded;
    }
 
    if ( !err )
@@ -418,7 +426,7 @@ int encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, char32 cp)
       if ( dstSize < 1 )
       {
          // ERROR: Not enough buffer space.
-         err = 5;
+         err = UtfError_NotEnoughBufferSpace;
       }
       else
       {
@@ -430,7 +438,7 @@ int encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, char32 cp)
       if ( dstSize < 2 )
       {
          // ERROR: Not enough buffer space.
-         err = 5;
+         err = UtfError_NotEnoughBufferSpace;
       }
       else
       {
@@ -443,7 +451,7 @@ int encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, char32 cp)
       if ( dstSize < 3 )
       {
          // ERROR: Not enough buffer space.
-         err = 5;
+         err = UtfError_NotEnoughBufferSpace;
       }
       else
       {
@@ -457,7 +465,7 @@ int encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, char32 cp)
       if ( dstSize < 4 )
       {
          // ERROR: Not enough buffer space.
-         err = 5;
+         err = UtfError_NotEnoughBufferSpace;
       }
       else
       {
@@ -470,7 +478,7 @@ int encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, char32 cp)
    else
    {
       // ERROR: Invalid Unicode scalar value
-      err = 2;
+      err = UtfError_InvalidScalarValue;
    }
    *dstBytes = dst-dst0;
    return err;
@@ -479,7 +487,7 @@ int encode_UTF8(unsigned char* dst,int dstSize, int* dstBytes, char32 cp)
 int encode_UTF16( unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool bigEndian)
 {
    const unsigned char*dst0= dst;
-   int err= 0;
+   int err=0;
 
    // encode
    Char codes[2];
@@ -498,7 +506,7 @@ int encode_UTF16( unsigned char* dst, int dstSize, int* dstBytes, char32 cp, boo
    if ( dstSize < codeSize )
    {
       // Error: Not enough buffer space
-      err = 5;
+      err = UtfError_NotEnoughBufferSpace;
    }
    else
    {
@@ -533,7 +541,7 @@ int encode_UTF32( unsigned char* dst, int dstSize, int* dstBytes,char32 cp, bool
    if ( dstSize < codeSize )
    {
       // Error: Not enough buffer space
-      err = 5;
+      err = UtfError_NotEnoughBufferSpace;
    }
    else
    {
@@ -641,33 +649,24 @@ stl::string tostring (const stl::wstring& string)
   return tostring (&string [0], string.size ());
 }
 
-enum
-{
-   UtfError_OutOfRange=1,
-   UtfError_InvalidScalarValue=2,
-   UtfError_NotEnoughEncoded=4,
-   UtfError_NotEnoughBufferSpace=5
-};
-
 void ReturnException(int ex,char *func,int i)
 {
-   char ErrorBuf[128];
    switch(ex)
    {
       case UtfError_OutOfRange:
-         Raise<ArgumentException>(ErrorBuf,"Out-of-range ASCII-7 code (%d)",i);
+         Raise<ArgumentException>(func,"Out-of-range ASCII-7 code (%d)",i);
 //         throw ArgumentException(func,ErrorBuf);
          break;
       case UtfError_InvalidScalarValue:
-         Raise<ArgumentException>(ErrorBuf,"Invalid Unicode scalar value (%d)",i);
+         Raise<ArgumentException>(func,"Invalid Unicode scalar value (%d)",i);
 //         throw ArgumentException(func,ErrorBuf);
          break;
       case UtfError_NotEnoughEncoded:
-         Raise<ArgumentException>(ErrorBuf,"Not enough encoded bytes available (%d)",i);
+         Raise<ArgumentException>(func,"Not enough encoded bytes available (%d)",i);
 //         throw ArgumentException(func,ErrorBuf);
          break;
       case UtfError_NotEnoughBufferSpace:
-         Raise<ArgumentException>(ErrorBuf,"Not enough buffer space (%d)",i);
+         Raise<ArgumentException>(func,"Not enough buffer space (%d)",i);
 //         throw ArgumentException(func,ErrorBuf);
          break;
       default:
