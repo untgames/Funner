@@ -93,13 +93,12 @@ struct VertexWeight
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ƒескриптор входного потока
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t Max_Vertex_Attributes_Count = 8;
+const size_t MAX_VERTEX_ATTRIBUTES_COUNT = 8;
 
 struct InputLayoutDesc
 {
-
   size_t                vertex_attributes_count;                        //количество вершинных атрибутов
-  VertexAttribute       vertex_attributes[Max_Vertex_Attributes_Count]; //вершинные атрибуты
+  VertexAttribute       vertex_attributes[MAX_VERTEX_ATTRIBUTES_COUNT]; //вершинные атрибуты
   //size_t                vertex_weights_count;                           //количество вершинных весов
   //const VertexWeight*   vertex_weights;                                 //вершинные веса  
   InputDataType         index_type;                                     //тип индексов в вершинном буфере

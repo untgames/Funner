@@ -242,6 +242,23 @@ const char* get_name (ColorWriteFlag param)
   }
 }
 
+const char* get_name (InputDataType param)
+{
+  switch (param)
+  {
+    case InputDataType_Byte:    return "InputDataType_Byte";
+    case InputDataType_UByte:   return "InputDataType_UByte";
+    case InputDataType_Short:   return "InputDataType_Short";
+    case InputDataType_UShort:  return "InputDataType_UShort";
+    case InputDataType_Int:     return "InputDataType_Int";
+    case InputDataType_UInt:    return "InputDataType_UInt";
+    case InputDataType_Float:   return "InputDataType_Float";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(InputDataType)", "param", param);
+      return "";    
+  }
+}
+
 }
 
 }

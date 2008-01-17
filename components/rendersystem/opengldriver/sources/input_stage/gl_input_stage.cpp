@@ -207,10 +207,37 @@ struct InputStage::Impl: public ContextObject
   const void* GetIndices()
   {
     if (!index_buffer)
-      RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::GetIndices()", "Index buffer is not set, use SetIndexBuffer(size_t, IBuffer*) first!");
+      RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::GetIndices()", "IndexBuffer is not set, use SetIndexBuffer(size_t, IBuffer*) first!");
+
+    if (!input_state)
+      RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::GetIndices()", "InputLayoutState is not set, use SetInputLayoutState (IInputLayoutState* state) first!");
     
+    InputLayoutDesc desc;
+    input_state->GetDesc(desc);
+    
+    size_t index_size;
+    switch (desc.index_type)
+    {
+      case InputDataType_UByte:
+        index_size = sizeof (unsigned char);
+        break;
+      case InputDataType_UShort:
+        index_size = sizeof (unsigned short);
+        break;
+      case InputDataType_UInt:
+        index_size = sizeof (unsigned int);
+        break;
+      default:
+        RaiseInvalidArgument( "render::low_level::opengl::InputStage::Impl::GetIndices()",
+                              "InputLayoutDesc::index_type",
+                              get_name((InputDataType)desc.index_type),
+                              "Index Data type must be a 1, 2 or 4 byte unsigned number");
+        break;
+    }
+        
     Buffer* buffer = cast_object<Buffer> (GetContextManager(), index_buffer, "render::low_level::opengl::InputStage::Impl::GetIndices()", "index_buffer");
-    return buffer->GetDataPointer();
+
+    return ((char*)buffer->GetDataPointer()) + index_size * desc.index_buffer_offset;
     //RaiseNotImplemented ("render::low_level::opengl::InputStage::Impl::GetIndices()");
     //return 0;
   }
@@ -230,6 +257,19 @@ struct InputStage::Impl: public ContextObject
   
   void Bind(size_t base_vertex, size_t base_index)
   {
+    if (!input_state)
+      RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::Bind()", "InputLayoutState is not set, use SetInputLayoutState (IInputLayoutState* state) first!");
+    
+    InputLayoutDesc desc;
+    input_state->GetDesc(desc);
+    
+    if (!index_buffer)
+      RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::Bind()", "IndexBuffer is not set, use SetIndexBuffer (IBuffer* buffer) first!");
+    
+    desc.index_buffer_offset = base_index;
+    input_state->SetDesc(desc);
+    
+    //MakeContextCurrent();
   }
     
 private:

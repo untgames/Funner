@@ -4,17 +4,23 @@ int main ()
 {
   printf ("Results of stride_ptr_test:\n");
   
-  typedef stride_ptr<int> my_ptr;
+  typedef stride_ptr<int>     my_ptr;
   
   int x [10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
   
   my_ptr p, p0 (x, sizeof (int) * 2), p1 = p0, p2 = p1 + 5;
+  my_ptr p3 = x, p4 = p3 + 10;
   
   for (;p1<p2; ++p1)
     printf ("%d ", *p1);
     
   printf ("\n");
   
+  for (;p3<p4; ++p3)
+    printf ("%d ", *p3);
+    
+  printf ("\n");
+
   TEST (!p);
   TEST (p2);
   TEST (p1 == p2);

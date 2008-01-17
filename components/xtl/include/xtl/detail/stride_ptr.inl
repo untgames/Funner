@@ -4,7 +4,7 @@
 
 template <class T>
 inline stride_ptr<T>::stride_ptr ()
-  : ptr (0), stride (0)
+  : ptr (0), stride (sizeof(T))
   {}
 
 template <class T>
