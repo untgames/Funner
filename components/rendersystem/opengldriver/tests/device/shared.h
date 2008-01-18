@@ -38,7 +38,7 @@ struct Test
     window (syslib::WindowStyle_Overlapped, 400, 200), driver (get_opengl_driver ())
   {
     window.SetTitle (title);
-    window.Hide ();
+//    window.Hide ();
 
     SwapChainDesc desc;
 

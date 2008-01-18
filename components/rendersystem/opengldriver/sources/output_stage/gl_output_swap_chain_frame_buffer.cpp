@@ -40,6 +40,13 @@ void SwapChainFrameBuffer::Bind (bool& out_color_buffer_state, bool& out_depth_s
 
   MakeContextCurrent ();
   
+    //установка буфера кадра по умолчанию
+    
+  static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
+  
+  if (IsSupported (EXT_framebuffer_object))
+    glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+  
     //установка текущего буфера чтения и отрисовки    
 
   glReadBuffer (buffer_type);
@@ -98,7 +105,7 @@ void SwapChainFrameBuffer::SetRenderTargets
       case PixelFormat_D24X8:
       case PixelFormat_D24S8:
       case PixelFormat_S8:
-        RaiseNotSupported (METHOD_NAME, "Can not bind texture with format %s as render-target", get_name (desc.format));
+        RaiseNotSupported (METHOD_NAME, "Unsupported render-target texture format=%s", get_name (desc.format));
         break;
       default:
         RaiseInvalidArgument (METHOD_NAME, "desc.format", desc.format);
@@ -122,7 +129,7 @@ void SwapChainFrameBuffer::SetRenderTargets
       case PixelFormat_DXT1:
       case PixelFormat_DXT3:
       case PixelFormat_DXT5:
-        RaiseNotSupported (METHOD_NAME, "Can not bind texture with format %s as depth-stencil", get_name (desc.format));
+        RaiseNotSupported (METHOD_NAME, "Unsopported depth-stencil texture format=%s", get_name (desc.format));
         break;
       case PixelFormat_D16:
       case PixelFormat_D24X8:
@@ -133,7 +140,7 @@ void SwapChainFrameBuffer::SetRenderTargets
         RaiseInvalidArgument (METHOD_NAME, "desc.format", desc.format);
         break;
     }
-  }  
+  }
 
   render_target_texture = in_render_target_texture;
   depth_stencil_texture = in_depth_stencil_texture;    
@@ -157,10 +164,11 @@ void SwapChainFrameBuffer::SetRenderTargets
   }
 }
 
-namespace
-{
+/*
+    Копирование изображения в текстуру
+*/
 
-void copy_image (size_t width, size_t height, const BindableTextureDesc& texture_desc, const ViewDesc& view_desc)
+void SwapChainFrameBuffer::CopyImage (size_t width, size_t height, const BindableTextureDesc& texture_desc, const ViewDesc& view_desc)
 {
   glBindTexture (texture_desc.target, texture_desc.id);  
   
@@ -170,18 +178,31 @@ void copy_image (size_t width, size_t height, const BindableTextureDesc& texture
       glCopyTexSubImage1D (GL_TEXTURE_1D, view_desc.mip_level, 0, 0, 0, width);
       break;
     case GL_TEXTURE_2D:
-      glCopyTexSubImage2D (GL_TEXTURE_2D, view_desc.mip_level, 0, 0, 0, 0, width, height);
+    case GL_TEXTURE_RECTANGLE_ARB:
+    case GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB:
+    case GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB:
+    case GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB:
+    case GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB:
+    case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB:
+    case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB:
+      glCopyTexSubImage2D (texture_desc.target, view_desc.mip_level, 0, 0, 0, 0, width, height);
+      break;
+    case GL_TEXTURE_3D:
+      glCopyTexSubImage3D (texture_desc.target, view_desc.mip_level, 0, 0, view_desc.layer, 0, 0, width, height);
       break;
     default:
+      RaiseNotSupported ("render::low_level::opengl::SwapChainFrameBuffer::CopyImage", "Unsupported textarget=0x%04x", texture_desc.target);
       break;
   }
 }
 
-}
-
 void SwapChainFrameBuffer::UpdateRenderTargets ()
 {
-    //данный метод вызывается в установленном контексте, потому не требует вызова MakeConextCurrent
+    //установка активного буфера кадра
+
+  bool states [2];
+
+  Bind (states [0], states [1]);
     
     //получение информации о цепочке обмена
     
@@ -202,8 +223,8 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
     render_target_texture->GetDesc (bindable_desc);
     render_target_texture->GetDesc (texture_desc);
 
-    copy_image (width < texture_desc.width ? width : texture_desc.width,
-                height < texture_desc.height ? height : texture_desc.height, bindable_desc, render_target_desc);
+    CopyImage (width < texture_desc.width ? width : texture_desc.width,
+               height < texture_desc.height ? height : texture_desc.height, bindable_desc, render_target_desc);
   }
   
     //копирование текстуры из буфера глубины
@@ -216,7 +237,7 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
     depth_stencil_texture->GetDesc (bindable_desc);
     depth_stencil_texture->GetDesc (texture_desc);
 
-    copy_image (width < texture_desc.width ? width : texture_desc.width,
+    CopyImage (width < texture_desc.width ? width : texture_desc.width,
                 height < texture_desc.height ? height : texture_desc.height, bindable_desc, depth_stencil_desc);
   }
   

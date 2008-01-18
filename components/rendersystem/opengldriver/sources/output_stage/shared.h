@@ -30,15 +30,18 @@ namespace low_level
 namespace opengl
 {
 
+//добавить NullFrameBuffer!!!!!
+//отключать fbo для swap-chain
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Тип буфера рендеринга
+///Тип цели рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum RenderBufferType
+enum RenderTargetType
 {
-  RenderBufferType_Color,        //буфер цвета
-  RenderBufferType_DepthStencil, //буфера глубина-трафарет
+  RenderTargetType_Color,        //буфер цвета
+  RenderTargetType_DepthStencil, //буфер глубина-трафарет
   
-  RenderBufferType_Num
+  RenderTargetType_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,14 +51,9 @@ class RenderBuffer: virtual public ITexture, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение типа буфера
+///Получение типа цели рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderBufferType GetTarget () const { return target; }
-  
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение дескриптора текстуры
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void GetDesc (TextureDesc&);
+    RenderTargetType GetTargetType () const { return target_type; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
@@ -67,7 +65,7 @@ class RenderBuffer: virtual public ITexture, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderBuffer (const ContextManager&, RenderBufferType target);
+    RenderBuffer (const ContextManager&, RenderTargetType target_typ);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,20 +73,41 @@ class RenderBuffer: virtual public ITexture, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void Bind () = 0;
 
+  private:
+    RenderTargetType target_type;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Буфер рендеринг цепочки обмена
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class SwapChainRenderBuffer: public RenderBuffer
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение дескриптора текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void GetDesc (TextureDesc&);
+
+  protected:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    SwapChainRenderBuffer (const ContextManager&, RenderTargetType target);
+    
+  private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение размеров буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void GetSize (size_t& width, size_t& height) = 0;
-
+    virtual void GetSize (size_t& width, size_t& height) = 0;  
+  
   private:
-    TextureDesc      desc;   //дескриптор текстуры
-    RenderBufferType target; //тип целевого буфера
+    TextureDesc desc;   //дескриптор текстуры  
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буфер цвета цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SwapChainColorBuffer: public RenderBuffer
+class SwapChainColorBuffer: public SwapChainRenderBuffer
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,7 +142,7 @@ class SwapChainColorBuffer: public RenderBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буфер глубины-трафарета цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SwapChainDepthStencilBuffer: public RenderBuffer
+class SwapChainDepthStencilBuffer: public SwapChainRenderBuffer
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,9 +167,43 @@ class SwapChainDepthStencilBuffer: public RenderBuffer
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Буфер отрисовки
+///Буфер отрисовки, создаваемый посредством расширения EXT_framebuffer_object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-//class RenderBuffer: public 
+class FboRenderBuffer: public RenderBuffer
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FboRenderBuffer  (const ContextManager& manager, PixelFormat format, size_t width, size_t height);
+    ~FboRenderBuffer ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Внутренний OpenGL идентификатор буфера рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    int GetRenderBufferId () const { return render_buffer_id; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение дескриптора текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void GetDesc (TextureDesc&);
+    
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка буфера в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Bind (); 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение OpenGL идентификатора буфера кадра для возможности ручной записи / чтения данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t GetFrameBufferId ();
+
+  private:
+    size_t      render_buffer_id; //идентификатор буфера рендеринга
+    size_t      frame_buffer_id;  //идентификатор буфера кадра, используемого для установки/чтения данных
+    TextureDesc desc;             //дескриптор буфера
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип, используемый для указания отсутствия отображения при создания буферов кадра
@@ -166,7 +219,7 @@ enum ViewType
   ViewType_SwapChainColorBuffer,        //отображение на буфер цвета цепочки обмена
   ViewType_SwapChainDepthStencilBuffer, //отображение на буфер глубина-трафарет цепочки обмена
   ViewType_Texture,                     //отображение на текстуру
-//  ViewType_RenderBuffer  //отображение построено на буфер отрисовки или буфер кадра
+  ViewType_FboRenderBuffer              //отображение на frame_buffer_object render-buffer
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -192,7 +245,7 @@ class View: virtual public IView, public Object, public Trackable
     IBindableTexture*            GetBindableTexture             () { return bindable_texture.get (); }
     SwapChainColorBuffer*        GetSwapChainColorBuffer        () { return color_buffer.get (); }
     SwapChainDepthStencilBuffer* GetSwapChainDepthStencilBuffer () { return depth_stencil_buffer.get (); }
-//    RenderBuffer*      GetRenderBuffer    () { return render_buffer.get (); }
+    FboRenderBuffer*             GetFboRenderBuffer             () { return fbo_render_buffer.get (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
@@ -204,6 +257,7 @@ class View: virtual public IView, public Object, public Trackable
     typedef xtl::com_ptr<IBindableTexture>            BindableTexturePtr;
     typedef xtl::com_ptr<SwapChainColorBuffer>        ColorBufferPtr;
     typedef xtl::com_ptr<SwapChainDepthStencilBuffer> DepthStencilBufferPtr;
+    typedef xtl::com_ptr<FboRenderBuffer>             FboRenderBufferPtr;
 
   private:
     ViewType              type;                 //тип отображения
@@ -211,6 +265,7 @@ class View: virtual public IView, public Object, public Trackable
     BindableTexturePtr    bindable_texture;     //текстура
     ColorBufferPtr        color_buffer;         //буфера цвета цепочки обмена
     DepthStencilBufferPtr depth_stencil_buffer; //буфер глубина-трафарет цепочки обмена
+    FboRenderBufferPtr    fbo_render_buffer;    //буфер рендеринга
     ViewDesc              desc;                 //дескриптор отображения
 };
 
@@ -272,6 +327,12 @@ class SwapChainFrameBuffer: public FrameBuffer, public ContextObject
     void              UpdateRenderTargets    ();
 
   private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Копирование изображения в текстуру
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void CopyImage (size_t width, size_t height, const BindableTextureDesc& texture_desc, const ViewDesc& view_desc);
+
+  private:
     typedef xtl::com_ptr<SwapChainColorBuffer>        ColorBufferPtr;
     typedef xtl::com_ptr<SwapChainDepthStencilBuffer> DepthStencilBufferPtr;
     typedef xtl::com_ptr<IBindableTexture>            TexturePtr;
@@ -285,6 +346,76 @@ class SwapChainFrameBuffer: public FrameBuffer, public ContextObject
     ViewDesc              depth_stencil_desc;    
     bool                  color_buffer_state;
     bool                  depth_stencil_buffer_state;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Базовый класс буфера кадра на основе расширения EXT_framebuffer_object
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class FboFrameBufferBase: public FrameBuffer, public ContextObject
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    ~FboFrameBufferBase ();  
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение OpenGL идентификатора буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t GetFrameBufferId () const { return id; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка буфера в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Bind (bool& color_buffer_state, bool& depth_stencil_buffer_state);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление целевых буферов отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void UpdateRenderTargets () {}
+
+  protected:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FboFrameBufferBase (const ContextManager&, bool color_buffer_state, bool depth_stencil_buffer_state);
+
+  private:
+    size_t id;
+    bool   color_buffer_state;
+    bool   depth_stencil_buffer_state;    
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Буфер кадра на основе расширения EXT_framebuffer_object
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class FboFrameBuffer: public FboFrameBufferBase
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FboFrameBuffer (const ContextManager&, NullView, FboRenderBuffer*);
+    FboFrameBuffer (const ContextManager&, NullView, IBindableTexture*, const ViewDesc&);
+    FboFrameBuffer (const ContextManager&, FboRenderBuffer*, NullView);
+    FboFrameBuffer (const ContextManager&, FboRenderBuffer*, FboRenderBuffer*);
+    FboFrameBuffer (const ContextManager&, FboRenderBuffer*, IBindableTexture*, const ViewDesc&);
+    FboFrameBuffer (const ContextManager&, IBindableTexture*, const ViewDesc&, NullView);
+    FboFrameBuffer (const ContextManager&, IBindableTexture*, const ViewDesc&, FboRenderBuffer*);
+    FboFrameBuffer (const ContextManager&, IBindableTexture*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присоединение буфера рендеринга к текущему буферу кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetAttachment (RenderTargetType target_type, IBindableTexture* texture, const ViewDesc& desc);
+    void SetAttachment (RenderTargetType target_type, FboRenderBuffer* render_buffer);
+    void SetAttachment (GLenum textarget, GLenum attachment, size_t texture_id, const ViewDesc& view_desc);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Завершение инициализации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void FinishInitialization ();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -307,7 +438,7 @@ class FrameBufferManager: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание целевых буферов вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ITexture* CreateTexture             (const TextureDesc&);
+    ITexture* CreateRenderBuffer        (const TextureDesc&);
     ITexture* CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index);
     ITexture* CreateDepthStencilTexture (ISwapChain* swap_chain);
 
@@ -333,12 +464,19 @@ class FrameBufferManager: public ContextObject
     FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, NullView, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, FboRenderBuffer*, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, NullView, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, FboRenderBuffer*, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, NullView, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, FboRenderBuffer*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, NullView, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, FboRenderBuffer*, const ViewDesc&);
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с теневыми буферами
@@ -349,6 +487,12 @@ class FrameBufferManager: public ContextObject
     ColorBufferPtr        CreateColorBuffer        (SwapChainDepthStencilBuffer*);
     DepthStencilBufferPtr CreateDepthStencilBuffer (SwapChainColorBuffer*);
     SwapChainFrameBuffer* CreateShadowFrameBuffer  ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание буферов рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ITexture* CreateSwapChainRenderBuffer (const TextureDesc&);
+    ITexture* CreateFboRenderBuffer       (const TextureDesc&);    
 
   private:
     typedef stl::list<SwapChainColorBuffer*>        ColorBufferList;

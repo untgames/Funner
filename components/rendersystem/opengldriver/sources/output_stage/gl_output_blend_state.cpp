@@ -27,6 +27,8 @@ BlendState::~BlendState ()
       MakeContextCurrent ();
 
       glDeleteLists (display_list, 1);
+      
+      CheckErrors ("");      
     }
   }
   catch (common::Exception& exception)

@@ -92,47 +92,18 @@ struct Depth24Stencil8
      онструктор
 */
 
-RenderBuffer::RenderBuffer (const ContextManager& manager, RenderBufferType in_target)
-  : ContextObject (manager), target (in_target)
+RenderBuffer::RenderBuffer (const ContextManager& manager, RenderTargetType in_target_type)
+  : ContextObject (manager), target_type (in_target_type)
 {
-  PixelFormat format;
-  size_t      bind_flags;
-
-  switch (target)
+  switch (target_type)
   {
-    case RenderBufferType_Color:
-      format     = PixelFormat_RGBA8;
-      bind_flags = BindFlag_RenderTarget;
-      break;
-    case RenderBufferType_DepthStencil:
-      format     = PixelFormat_D24S8;
-      bind_flags = BindFlag_DepthStencil;
+    case RenderTargetType_Color:
+    case RenderTargetType_DepthStencil:
       break;
     default:
-      RaiseInvalidArgument ("render::low_level::opengl::RenderBuffer::RenderBuffer", "target", target);
+      RaiseInvalidArgument ("render::low_level::opengl::RenderBuffer::RenderBuffer", "target_type", target_type);
       break;
   }
-
-  desc.dimension            = TextureDimension_2D;
-  desc.width                = 0;
-  desc.height               = 0;
-  desc.layers               = 1;
-  desc.format               = format;
-  desc.generate_mips_enable = false;
-  desc.access_flags         = AccessFlag_Read | AccessFlag_Write;  
-  desc.bind_flags           = bind_flags;
-  desc.usage_mode           = UsageMode_Static;
-}
-
-/*
-    ѕолучение дескриптора
-*/
-
-void RenderBuffer::GetDesc (TextureDesc& out_desc)
-{
-  out_desc = desc;
-  
-  GetSize (out_desc.width, out_desc.height);
 }
 
 /*
@@ -202,9 +173,9 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
   else if (glWindowPos2i)    glWindowPos2i    (x, y);
   else                       return;  
   
-  switch (target)
+  switch (target_type)
   {
-    case RenderBufferType_Color:
+    case RenderTargetType_Color:
     {
         //преобразование формата пикселей
 
@@ -216,7 +187,7 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
       
       break;
     }
-    case RenderBufferType_DepthStencil:
+    case RenderTargetType_DepthStencil:
     {
       switch (source_format)
       {
@@ -332,9 +303,9 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
   Bind ();
   
-  switch (target)
+  switch (target_type)
   {
-    case RenderBufferType_Color:
+    case RenderTargetType_Color:
     {
         //преобразование формата пикселей
 
@@ -346,7 +317,7 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
       
       break;
     }
-    case RenderBufferType_DepthStencil:
+    case RenderTargetType_DepthStencil:
     {
       switch (target_format)
       {

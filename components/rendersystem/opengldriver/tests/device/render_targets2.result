@@ -1,128 +1,222 @@
 Results of render_targets2_test:
-set render targets color-buffer={bind_flags=Texture, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=Texture, format=PixelFormat_RGBA8}: 
-Can not bind texture with format PixelFormat_RGBA8 as depth-stencil
-    at render::low_level::opengl::SwapChainFrameBuffer::SetRenderTargets
-    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IBindableTexture*,IBindableTexture*)
-    at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=Texture, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'
+set render targets color-buffer=RGBA texture, depth-stencil-buffer=RGBA texture: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=Texture, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: Ok
-set render targets color-buffer={bind_flags=Texture, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'
+set render targets color-buffer=RGBA texture, depth-stencil-buffer=D24X8 texture: Ok
+set render targets color-buffer=RGBA texture, depth-stencil-buffer=D24S8 texture: Ok
+set render targets color-buffer=RGBA texture, depth-stencil-buffer=Swap chain color buffer: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=Texture, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: Ok
-set render targets color-buffer={bind_flags=Texture, format=PixelFormat_RGBA8}, depth-stencil={null}: Ok
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=Texture, format=PixelFormat_RGBA8}: 
-Can not bind texture with format PixelFormat_RGBA8 as depth-stencil
-    at render::low_level::opengl::SwapChainFrameBuffer::SetRenderTargets
-    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(SwapChainColorBuffer*,IBindableTexture*)
-    at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'
+set render targets color-buffer=RGBA texture, depth-stencil-buffer=Swap chain depth-stencil buffer: Ok
+set render targets color-buffer=RGBA texture, depth-stencil-buffer=Auxilary color buffer: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: Ok
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'
+set render targets color-buffer=RGBA texture, depth-stencil-buffer=Auxilary depth-stencil buffer: Ok
+set render targets color-buffer=RGBA texture, depth-stencil-buffer=Null view: Ok
+set render targets color-buffer=D24X8 texture, depth-stencil-buffer=RGBA texture: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: Ok
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={null}: Ok
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={bind_flags=Texture, format=PixelFormat_RGBA8}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24X8 texture, depth-stencil-buffer=D24X8 texture: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24X8 texture, depth-stencil-buffer=D24S8 texture: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24X8 texture, depth-stencil-buffer=Swap chain color buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24X8 texture, depth-stencil-buffer=Swap chain depth-stencil buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24X8 texture, depth-stencil-buffer=Auxilary color buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={null}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24X8 texture, depth-stencil-buffer=Auxilary depth-stencil buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=Texture, format=PixelFormat_RGBA8}: 
-Can not bind texture with format PixelFormat_RGBA8 as depth-stencil
-    at render::low_level::opengl::SwapChainFrameBuffer::SetRenderTargets
-    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(SwapChainColorBuffer*,IBindableTexture*)
-    at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'
+set render targets color-buffer=D24X8 texture, depth-stencil-buffer=Null view: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: Ok
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'
+set render targets color-buffer=D24S8 texture, depth-stencil-buffer=RGBA texture: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: Ok
-set render targets color-buffer={bind_flags=RenderTarget, format=PixelFormat_RGBA8}, depth-stencil={null}: Ok
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={bind_flags=Texture, format=PixelFormat_RGBA8}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24S8 texture, depth-stencil-buffer=D24X8 texture: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24S8 texture, depth-stencil-buffer=D24S8 texture: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24S8 texture, depth-stencil-buffer=Swap chain color buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24S8 texture, depth-stencil-buffer=Swap chain depth-stencil buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24S8 texture, depth-stencil-buffer=Auxilary color buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={bind_flags=DepthStencil, format=PixelFormat_D24S8}, depth-stencil={null}: 
-Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'
+set render targets color-buffer=D24S8 texture, depth-stencil-buffer=Auxilary depth-stencil buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={null}, depth-stencil={bind_flags=Texture, format=PixelFormat_RGBA8}: 
-Can not bind texture with format PixelFormat_RGBA8 as depth-stencil
-    at render::low_level::opengl::SwapChainFrameBuffer::SetRenderTargets
-    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(NullView,IBindableTexture*)
-    at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={null}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'
+set render targets color-buffer=D24S8 texture, depth-stencil-buffer=Null view: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={null}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: Ok
-set render targets color-buffer={null}, depth-stencil={bind_flags=RenderTarget, format=PixelFormat_RGBA8}: 
-Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'
+set render targets color-buffer=Swap chain color buffer, depth-stencil-buffer=RGBA texture: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
     at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
     at render::low_level::opengl::OutputStage::SetRenderTargets
-set render targets color-buffer={null}, depth-stencil={bind_flags=DepthStencil, format=PixelFormat_D24S8}: Ok
-set render targets color-buffer={null}, depth-stencil={null}: Ok
+set render targets color-buffer=Swap chain color buffer, depth-stencil-buffer=D24X8 texture: Ok
+set render targets color-buffer=Swap chain color buffer, depth-stencil-buffer=D24S8 texture: Ok
+set render targets color-buffer=Swap chain color buffer, depth-stencil-buffer=Swap chain color buffer: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Swap chain color buffer, depth-stencil-buffer=Swap chain depth-stencil buffer: Ok
+set render targets color-buffer=Swap chain color buffer, depth-stencil-buffer=Auxilary color buffer: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Swap chain color buffer, depth-stencil-buffer=Auxilary depth-stencil buffer: Fail!
+Incompatible configuration SwapChainColorBuffer with FboRenderBuffer
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(SwapChainColorBuffer*,FboRenderBuffer*)
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Swap chain color buffer, depth-stencil-buffer=Null view: Ok
+set render targets color-buffer=Swap chain depth-stencil buffer, depth-stencil-buffer=RGBA texture: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Swap chain depth-stencil buffer, depth-stencil-buffer=D24X8 texture: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Swap chain depth-stencil buffer, depth-stencil-buffer=D24S8 texture: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Swap chain depth-stencil buffer, depth-stencil-buffer=Swap chain color buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Swap chain depth-stencil buffer, depth-stencil-buffer=Swap chain depth-stencil buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Swap chain depth-stencil buffer, depth-stencil-buffer=Auxilary color buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Swap chain depth-stencil buffer, depth-stencil-buffer=Auxilary depth-stencil buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Swap chain depth-stencil buffer, depth-stencil-buffer=Null view: Fail!
+Unsupported render-target view format=PixelFormat_D24S8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary color buffer, depth-stencil-buffer=RGBA texture: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary color buffer, depth-stencil-buffer=D24X8 texture: Ok
+set render targets color-buffer=Auxilary color buffer, depth-stencil-buffer=D24S8 texture: Ok
+set render targets color-buffer=Auxilary color buffer, depth-stencil-buffer=Swap chain color buffer: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary color buffer, depth-stencil-buffer=Swap chain depth-stencil buffer: Fail!
+Incompatible configuration FboRenderBuffer with SwapChainDepthStencilBuffer
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,SwapChainDepthStencilBuffer*)
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary color buffer, depth-stencil-buffer=Auxilary color buffer: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary color buffer, depth-stencil-buffer=Auxilary depth-stencil buffer: Ok
+set render targets color-buffer=Auxilary color buffer, depth-stencil-buffer=Null view: Ok
+set render targets color-buffer=Auxilary depth-stencil buffer, depth-stencil-buffer=RGBA texture: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary depth-stencil buffer, depth-stencil-buffer=D24X8 texture: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary depth-stencil buffer, depth-stencil-buffer=D24S8 texture: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary depth-stencil buffer, depth-stencil-buffer=Swap chain color buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary depth-stencil buffer, depth-stencil-buffer=Swap chain depth-stencil buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary depth-stencil buffer, depth-stencil-buffer=Auxilary color buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary depth-stencil buffer, depth-stencil-buffer=Auxilary depth-stencil buffer: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Auxilary depth-stencil buffer, depth-stencil-buffer=Null view: Fail!
+Unsupported render-target view format=PixelFormat_D24X8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Null view, depth-stencil-buffer=RGBA texture: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Null view, depth-stencil-buffer=D24X8 texture: Ok
+set render targets color-buffer=Null view, depth-stencil-buffer=D24S8 texture: Ok
+set render targets color-buffer=Null view, depth-stencil-buffer=Swap chain color buffer: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Null view, depth-stencil-buffer=Swap chain depth-stencil buffer: Ok
+set render targets color-buffer=Null view, depth-stencil-buffer=Auxilary color buffer: Fail!
+Unsupported depth-stencil view format=PixelFormat_RGBA8
+    at render::low_level::opengl::FrameBufferManager::CreateFrameBuffer
+    at render::low_level::opengl::OutputStage::SetRenderTargets
+set render targets color-buffer=Null view, depth-stencil-buffer=Auxilary depth-stencil buffer: Ok
+set render targets color-buffer=Null view, depth-stencil-buffer=Null view: Ok
 Status info:
   1) RGBA texture
-  2) Swap chain color buffer
-  3) Swap chain depth-stencil buffer
-  4) Auxilary color buffer
-  5) Auxilary depth-stencil buffer
-  6) Null view
+  2) D24X8 texture
+  3) D24S8 texture
+  4) Swap chain color buffer
+  5) Swap chain depth-stencil buffer
+  6) Auxilary color buffer
+  7) Auxilary depth-stencil buffer
+  8) Null view
 Status table (rows - render-target view, columns - depth-stencil view):
-  123456
-1|--+-++
-2|--+-++
-3|------
-4|--+-++
-5|------
-6|--+-++
+  12345678
+1|-++-+-++
+2|--------
+3|--------
+4|-++-+--+
+5|--------
+6|-++---++
+7|--------
+8|-++-+-++

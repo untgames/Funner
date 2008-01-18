@@ -792,8 +792,11 @@ void ContextManager::CheckErrors (const char* source) const
     case GL_OUT_OF_MEMORY:
       Raise<OpenGLException> (source, "OpenGL error: out of memory");
       break;
+    case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
+      Raise<OpenGLException> (source, "OpenGL error: invalid framebuffer operation");
+      break;
     default:
-      Raise<OpenGLException> (source, "OpenGL error: code=%d", error);
+      Raise<OpenGLException> (source, "OpenGL error: code=0x%04x", error);
       break;
   }
 }

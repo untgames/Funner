@@ -209,29 +209,12 @@ SwapChainFrameBuffer* FrameBufferManager::CreateShadowFrameBuffer ()
 }
 
 /*
-    Создание целевого буфера вывода    
+    Создание буфера рендеринга
 */
 
-ITexture* FrameBufferManager::CreateTexture (const TextureDesc& desc)
+ITexture* FrameBufferManager::CreateSwapChainRenderBuffer (const TextureDesc& desc)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::CreateTexture";
-  
-  switch (desc.dimension)
-  {
-    case TextureDimension_2D:
-      break;
-    case TextureDimension_1D:
-    case TextureDimension_3D:
-    case TextureDimension_Cubemap:
-      RaiseNotSupported (METHOD_NAME, "Can not create output-stage texture with dimension %s", get_name (desc.dimension));
-      return 0;
-    default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.dimension", desc.dimension);
-      return 0;
-  }
-
-  if (desc.generate_mips_enable)
-    RaiseNotSupported (METHOD_NAME, "Can not create output-stage texture with automatic mipmap generation");
+  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::CreateSwapChainRenderBuffer";
 
   switch (desc.format)
   {
@@ -291,6 +274,61 @@ ITexture* FrameBufferManager::CreateTexture (const TextureDesc& desc)
   }
 }
 
+ITexture* FrameBufferManager::CreateFboRenderBuffer (const TextureDesc& desc)
+{
+  try
+  {
+    return new FboRenderBuffer (GetContextManager (), desc.format, desc.width, desc.height);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFboRenderBuffer");
+
+    throw;
+  }
+}
+
+ITexture* FrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::CreateRenderBuffer";
+  
+  switch (desc.dimension)
+  {
+    case TextureDimension_2D:
+      break;
+    case TextureDimension_1D:
+    case TextureDimension_3D:
+    case TextureDimension_Cubemap:
+      RaiseNotSupported (METHOD_NAME, "Can not create output-stage texture with dimension %s", get_name (desc.dimension));
+      return 0;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.dimension", desc.dimension);
+      return 0;
+  }
+  
+  if (desc.layers > 1)
+    RaiseNotSupported (METHOD_NAME, "Could not create output-stage texture with desc.layers=%u", desc.layers);
+
+  if (desc.generate_mips_enable)
+    RaiseNotSupported (METHOD_NAME, "Could not create output-stage texture with automatic mipmap generation");
+
+  try
+  {
+      //выбор текущего контекста
+
+    static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
+
+    if (IsSupported (EXT_framebuffer_object)) return CreateFboRenderBuffer (desc);
+    else                                      return CreateSwapChainRenderBuffer (desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch (METHOD_NAME);
+
+    throw;
+  }
+}
+
 ITexture* FrameBufferManager::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
 {
   try
@@ -332,6 +370,35 @@ FrameBuffer* FrameBufferManager::CreateFrameBufferImpl
   static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::CreateFrameBuffer";
 
   ViewType depth_stencil_type = depth_stencil_view ? depth_stencil_view->GetType () : ViewType_Null;
+  
+  ViewDesc depth_stencil_desc;
+  
+  if (depth_stencil_view)
+  {
+      //получение дескриптора отображения
+    
+    depth_stencil_view->GetDesc (depth_stencil_desc);
+    
+      //получение дескриптора текстуры
+
+    TextureDesc texture_desc;
+    
+    depth_stencil_view->GetTexture ()->GetDesc (texture_desc);
+    
+      //проверка формата
+      
+    switch (texture_desc.format)
+    {
+      case PixelFormat_D16:
+      case PixelFormat_D24X8:
+      case PixelFormat_D24S8:
+      case PixelFormat_S8:
+        break;      
+      default:
+        RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view format=%s", get_name (texture_desc.format));
+        break;
+    }    
+  }
 
   switch (depth_stencil_type)
   {
@@ -347,22 +414,12 @@ FrameBuffer* FrameBufferManager::CreateFrameBufferImpl
       RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'");
       return 0;
     case ViewType_SwapChainDepthStencilBuffer:
-    {
-      ViewDesc depth_stencil_desc;
-
-      depth_stencil_view->GetDesc (depth_stencil_desc);      
-
       return CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetSwapChainDepthStencilBuffer (),
                                 depth_stencil_desc);
-    }
     case ViewType_Texture:
-    {
-      ViewDesc depth_stencil_desc;
-      
-      depth_stencil_view->GetDesc (depth_stencil_desc);
-      
       return CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetBindableTexture (), depth_stencil_desc);
-    }
+    case ViewType_FboRenderBuffer:
+      return CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetFboRenderBuffer (), depth_stencil_desc);
     default:
       RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type '%s'", typeid (depth_stencil_view->GetTexture ()).name ());
       return 0;
@@ -375,6 +432,36 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (View* render_target_view, Vi
 
   ViewType render_target_type = render_target_view ? render_target_view->GetType () : ViewType_Null;
 
+  ViewDesc render_target_desc;
+
+  if (render_target_view)
+  {
+      //получение дескриптора отображения
+
+    render_target_view->GetDesc (render_target_desc);    
+    
+      //получение дескриптора текстуры
+
+    TextureDesc texture_desc;
+    
+    render_target_view->GetTexture ()->GetDesc (texture_desc);        
+    
+      //проверка формата
+      
+    switch (texture_desc.format)
+    {
+      case PixelFormat_RGB8:
+      case PixelFormat_RGBA8:
+      case PixelFormat_L8:
+      case PixelFormat_A8:
+      case PixelFormat_LA8:
+        break;      
+      default:
+        RaiseNotSupported (METHOD_NAME, "Unsupported render-target view format=%s", get_name (texture_desc.format));
+        break;
+    }
+  }
+
   switch (render_target_type)
   {
     case ViewType_Null:
@@ -386,24 +473,14 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (View* render_target_view, Vi
       return CreateFrameBufferImpl (NullView (), null_view_desc, depth_stencil_view);
     }
     case ViewType_SwapChainColorBuffer:
-    {
-      ViewDesc render_target_desc;
-      
-      render_target_view->GetDesc (render_target_desc);      
-      
       return CreateFrameBufferImpl (render_target_view->GetSwapChainColorBuffer (), render_target_desc, depth_stencil_view);
-    }
     case ViewType_SwapChainDepthStencilBuffer:
       RaiseNotSupported (METHOD_NAME, "Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'");
       return 0;
     case ViewType_Texture:
-    {
-      ViewDesc render_target_desc;
-      
-      render_target_view->GetDesc (render_target_desc);
-      
       return CreateFrameBufferImpl (render_target_view->GetBindableTexture (), render_target_desc, depth_stencil_view);
-    }
+    case ViewType_FboRenderBuffer:
+      return CreateFrameBufferImpl (render_target_view->GetFboRenderBuffer (), render_target_desc, depth_stencil_view);
     default:
       RaiseNotSupported (METHOD_NAME, "Unsupported render-target view type '%s'", typeid (render_target_view->GetTexture ()).name ());
       return 0;
@@ -470,6 +547,20 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, I
   }
 }
 
+FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, FboRenderBuffer* render_buffer, const ViewDesc&)
+{
+  try
+  {
+    return new FboFrameBuffer (GetContextManager (), NullView (), render_buffer);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(NullView,FboRenderBuffer*)");
+    
+    throw;
+  }
+}
+
 FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer* color_buffer, const ViewDesc&, NullView, const ViewDesc&)
 {
   try
@@ -520,6 +611,14 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer* color_
 
     throw;
   }
+}
+
+FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, FboRenderBuffer*, const ViewDesc&)
+{
+  RaiseNotSupported ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(SwapChainColorBuffer*,FboRenderBuffer*)",
+                     "Incompatible configuration SwapChainColorBuffer with FboRenderBuffer");
+
+  return 0;
 }
 
 FrameBuffer* FrameBufferManager::CreateFrameBuffer (IBindableTexture* texture, const ViewDesc& desc, NullView, const ViewDesc&)
@@ -578,6 +677,82 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer
   {
     exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IBindableTexture*,IBindableTexture*)");
 
+    throw;
+  }
+}
+
+FrameBuffer* FrameBufferManager::CreateFrameBuffer
+ (IBindableTexture* render_target_texture,
+  const ViewDesc&   render_target_desc,
+  FboRenderBuffer*  depth_stencil_buffer,
+  const ViewDesc&)
+{
+  try
+  {
+    return new FboFrameBuffer (GetContextManager (), render_target_texture, render_target_desc, depth_stencil_buffer);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IBindableTexture*,FboRenderBuffer*)");
+    
+    throw;
+  }
+}
+
+FrameBuffer* FrameBufferManager::CreateFrameBuffer (FboRenderBuffer* color_buffer, const ViewDesc&, NullView, const ViewDesc&)
+{
+  try
+  {
+    return new FboFrameBuffer (GetContextManager (), color_buffer, NullView ());
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,NullView)");
+    
+    throw;
+  }
+}
+
+FrameBuffer* FrameBufferManager::CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&)
+{
+  RaiseNotSupported ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,SwapChainDepthStencilBuffer*)",
+                     "Incompatible configuration FboRenderBuffer with SwapChainDepthStencilBuffer");
+
+  return 0;
+}
+
+FrameBuffer* FrameBufferManager::CreateFrameBuffer
+ (FboRenderBuffer*  color_buffer,
+  const ViewDesc&,
+  IBindableTexture* depth_stencil_texture,
+  const ViewDesc&   depth_stencil_desc)
+{
+  try
+  {
+    return new FboFrameBuffer (GetContextManager (), color_buffer, depth_stencil_texture, depth_stencil_desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,IBindableTexture*)");
+
+    throw;
+  }
+}
+
+FrameBuffer* FrameBufferManager::CreateFrameBuffer
+ (FboRenderBuffer* color_buffer,
+  const ViewDesc&,
+  FboRenderBuffer* depth_stencil_buffer,
+  const ViewDesc&)
+{
+  try
+  {
+    return new FboFrameBuffer (GetContextManager (), color_buffer, depth_stencil_buffer);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,FboRenderBuffer*)");
+    
     throw;
   }
 }

@@ -62,3 +62,42 @@ Depth-stencil buffer test:
   test format PixelFormat_D24X8: Ok!
   test format PixelFormat_D24S8: Ok!
   test format PixelFormat_S8: Ok!
+Application-created color buffer test:
+  test format PixelFormat_RGB8: Ok!
+  test format PixelFormat_RGBA8: Ok!
+  test format PixelFormat_L8: FAIL!
+  Mismatch map (source buffer | destination buffer | difference):
+    0e 2a 0a 02     2a 7e 1e 06     1c 54 14 04 
+    04 31 3e 0f     0c 93 ba 2d     08 62 7c 1e 
+    23 03 01 1b     69 09 03 51     46 06 02 36 
+    3f 30 32 1a     bd 90 96 4e     7e 60 64 34 
+  test format PixelFormat_A8: Ok!
+  test format PixelFormat_LA8: FAIL!
+  Mismatch map (source buffer | destination buffer | difference):
+    3e21 1429 043a 2d27     3e63 147b 04ae 2d75     0042 0052 0074 004e 
+    093f 1419 3f11 3238     09bd 144b 3f33 32a8     007e 0032 0022 0070 
+    2808 2d11 0500 022c     2818 2d33 0500 0284     0010 0022 0000 0058 
+    1214 142c 3029 0336     123c 1484 307b 03a2     0028 0058 0052 006c 
+  test format PixelFormat_D16: EXCEPTION: Unsupported source_format=PixelFormat_D16
+    at render::low_level::opengl::RenderBuffer::SetData
+  test format PixelFormat_D24X8: EXCEPTION: Unsupported source_format=PixelFormat_D24X8
+    at render::low_level::opengl::RenderBuffer::SetData
+  test format PixelFormat_D24S8: EXCEPTION: Unsupported source_format=PixelFormat_D24S8
+    at render::low_level::opengl::RenderBuffer::SetData
+  test format PixelFormat_S8: EXCEPTION: Unsupported source_format=PixelFormat_S8
+    at render::low_level::opengl::RenderBuffer::SetData
+Application-created depth-stencil buffer test:
+  test format PixelFormat_RGB8: EXCEPTION: Unsupported source_format=PixelFormat_RGB8
+    at render::low_level::opengl::RenderBuffer::SetData
+  test format PixelFormat_RGBA8: EXCEPTION: Unsupported source_format=PixelFormat_RGBA8
+    at render::low_level::opengl::RenderBuffer::SetData
+  test format PixelFormat_L8: EXCEPTION: Unsupported source_format=PixelFormat_L8
+    at render::low_level::opengl::RenderBuffer::SetData
+  test format PixelFormat_A8: EXCEPTION: Unsupported source_format=PixelFormat_A8
+    at render::low_level::opengl::RenderBuffer::SetData
+  test format PixelFormat_LA8: EXCEPTION: Unsupported source_format=PixelFormat_LA8
+    at render::low_level::opengl::RenderBuffer::SetData
+  test format PixelFormat_D16: Ok!
+  test format PixelFormat_D24X8: Ok!
+  test format PixelFormat_D24S8: Ok!
+  test format PixelFormat_S8: Ok!

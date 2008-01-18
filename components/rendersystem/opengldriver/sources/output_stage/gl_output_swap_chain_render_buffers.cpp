@@ -6,6 +6,61 @@ using namespace common;
 
 /*
 ===================================================================================================
+    SwapChainRenderBuffer
+===================================================================================================
+*/
+
+/*
+     онструктор
+*/
+
+SwapChainRenderBuffer::SwapChainRenderBuffer (const ContextManager& manager, RenderTargetType target_type)
+  : RenderBuffer (manager, target_type)
+{
+  PixelFormat format;
+  size_t      bind_flags;
+
+  switch (target_type)
+  {
+    case RenderTargetType_Color:
+      format     = PixelFormat_RGBA8;
+      bind_flags = BindFlag_RenderTarget;
+      break;
+    case RenderTargetType_DepthStencil:
+      format     = PixelFormat_D24S8;
+      bind_flags = BindFlag_DepthStencil;
+      break;
+    default:
+      RaiseInvalidArgument ("render::low_level::opengl::SwapChainRenderBuffer::SwapChainRenderBuffer", "target_type", target_type);
+      break;
+  }
+  
+  memset (&desc, 0, sizeof (desc));  
+
+  desc.dimension            = TextureDimension_2D;
+  desc.width                = 0;
+  desc.height               = 0;
+  desc.layers               = 1;
+  desc.format               = format;
+  desc.generate_mips_enable = false;
+  desc.access_flags         = AccessFlag_Read | AccessFlag_Write;  
+  desc.bind_flags           = bind_flags;
+  desc.usage_mode           = UsageMode_Static;
+}
+
+/*
+    ѕолучение дескриптора
+*/
+
+void SwapChainRenderBuffer::GetDesc (TextureDesc& out_desc)
+{
+  out_desc = desc;
+  
+  GetSize (out_desc.width, out_desc.height);
+}
+
+/*
+===================================================================================================
     SwapChainColorBuffer
 ===================================================================================================
 */
@@ -15,7 +70,7 @@ using namespace common;
 */
 
 SwapChainColorBuffer::SwapChainColorBuffer (const ContextManager& manager, ISwapChain* in_swap_chain, size_t in_buffer_index)
-  : RenderBuffer (manager, RenderBufferType_Color),
+  : SwapChainRenderBuffer (manager, RenderTargetType_Color),
     swap_chain (in_swap_chain),
     buffer_index (in_buffer_index)
 {
@@ -60,15 +115,28 @@ void SwapChainColorBuffer::Bind ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainColorBuffer::Bind";
 
-  try
+  try    
   {
+      //выбор текущего контекста
+    
     GetContextManager ().SetContext (0, swap_chain.get (), swap_chain.get ());
     MakeContextCurrent ();
+    
+      //установка буфера кадра по умолчанию
+      
+    static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
+    
+    if (IsSupported (EXT_framebuffer_object))
+      glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+
+      //настройка буферов отрисовки и чтени€
 
     glReadBuffer (buffer_type);
     glDrawBuffer (buffer_type);
 
-    CheckErrors (METHOD_NAME);
+      //проверка ошибок
+
+    CheckErrors ("");
   }
   catch (common::Exception& exception)
   {
@@ -89,7 +157,7 @@ void SwapChainColorBuffer::Bind ()
 */
 
 SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const ContextManager& manager, ISwapChain* swap_chain)
-  : RenderBuffer (manager, RenderBufferType_DepthStencil)
+  : SwapChainRenderBuffer (manager, RenderTargetType_DepthStencil)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer";
 
@@ -107,7 +175,7 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const ContextManager& 
 }
 
 SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const ContextManager& manager, ISwapChain* swap_chain, size_t in_width, size_t in_height)
-  : RenderBuffer (manager, RenderBufferType_DepthStencil),
+  : SwapChainRenderBuffer (manager, RenderTargetType_DepthStencil),
     width (in_width),
     height (in_height)
 {
@@ -154,8 +222,21 @@ void SwapChainDepthStencilBuffer::Bind ()
 {
   try
   {
+      //выбор текущего контекста
+    
     GetContextManager ().SetContext (context_id, 0, 0);
     MakeContextCurrent ();
+    
+      //установка буфера кадра по умолчанию
+      
+    static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
+    
+    if (IsSupported (EXT_framebuffer_object))
+      glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+
+      //проверка ошибок
+      
+    CheckErrors ("");
   }
   catch (common::Exception& exception)
   {

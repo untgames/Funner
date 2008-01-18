@@ -46,6 +46,8 @@ DepthStencilState::~DepthStencilState ()
       MakeContextCurrent ();
 
       glDeleteLists (display_list, 1);
+
+      CheckErrors ("");
     }
   }
   catch (common::Exception& exception)

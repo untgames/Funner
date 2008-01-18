@@ -179,7 +179,7 @@ int main ()
   {
     printf ("Results of render_buffers_test:\n");
     
-    Test test (L"OpenGL device test window (render_buffers)", "GL_EXT_packed_depth_stencil=0");
+    Test test (L"OpenGL device test window (render_buffers)");
     
     Color4f clear_color;
     
@@ -193,20 +193,46 @@ int main ()
     printf ("Color back-buffer test:\n");
 
     TexturePtr back_color_buffer = test.device->OSGetRenderTargetView ()->GetTexture ();
-    
+
     test_buffer (*back_color_buffer);
-    
+
     printf ("Color front-buffer test:\n");
 
     TexturePtr front_color_buffer (test.device->CreateRenderTargetTexture (test.swap_chain.get (), 0), false);
-    
+
     test_buffer (*front_color_buffer);    
-    
+
     printf ("Depth-stencil buffer test:\n");
 
     TexturePtr depth_stencil_buffer = test.device->OSGetDepthStencilView ()->GetTexture ();
-    
+
     test_buffer (*depth_stencil_buffer);    
+    
+    printf ("Application-created color buffer test:\n");
+    
+    TextureDesc desc;
+    
+    memset (&desc, 0, sizeof (desc));
+    
+    desc.dimension  = TextureDimension_2D;
+    desc.width      = 512;
+    desc.height     = 512;
+    desc.layers     = 1;
+    desc.format     = PixelFormat_RGBA8;
+    desc.bind_flags = BindFlag_RenderTarget;
+    
+    TexturePtr color_render_buffer = test.device->CreateTexture (desc);
+
+    test_buffer (*color_render_buffer);
+    
+    printf ("Application-created depth-stencil buffer test:\n");
+
+    desc.format     = PixelFormat_D24S8;
+    desc.bind_flags = BindFlag_DepthStencil;
+
+    TexturePtr depth_stencil_render_buffer = test.device->CreateTexture (desc);
+
+    test_buffer (*depth_stencil_render_buffer);    
   }
   catch (std::exception& exception)
   {

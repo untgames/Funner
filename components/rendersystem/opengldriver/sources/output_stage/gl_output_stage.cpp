@@ -475,7 +475,7 @@ ITexture* OutputStage::CreateTexture (const TextureDesc& desc)
 {
   try
   {
-    return impl->frame_buffer_manager.CreateTexture (desc);
+    return impl->frame_buffer_manager.CreateRenderBuffer (desc);
   }
   catch (common::Exception& exception)
   {

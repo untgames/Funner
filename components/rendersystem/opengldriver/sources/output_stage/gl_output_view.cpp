@@ -41,6 +41,10 @@ View::View (ITexture* in_texture, const ViewDesc& in_desc)
   {
     type = ViewType_SwapChainDepthStencilBuffer;
   }
+  else if (fbo_render_buffer = dynamic_cast<FboRenderBuffer*> (in_texture))
+  {
+    type = ViewType_FboRenderBuffer;
+  }
   else
   {
     RaiseInvalidArgument (METHOD_NAME, "texture", typeid (in_texture).name (), "Unsupported texture type");
