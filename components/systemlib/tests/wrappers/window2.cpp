@@ -25,6 +25,12 @@ int main ()
     printf ("width: %d\n", window.Width ());
     printf ("height: %d\n", window.Height ());
     
+    window.Show ();
+    
+    printf ("after show\n");    
+    
+    printf ("is_active: %d\n", window.IsActive ());
+    
     window.Deactivate ();
     
     printf ("after deactivate\n");

@@ -350,8 +350,8 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       if (!wnd)
         raise_error ("::CreateWindow");
 
-      ShowWindow   (wnd, SW_SHOW);
-      check_errors ("::ShowWindow");
+//      ShowWindow   (wnd, SW_SHOW);
+//      check_errors ("::ShowWindow");
 
       if (!UpdateWindow (wnd))
         raise_error ("::UpdateWindow");
