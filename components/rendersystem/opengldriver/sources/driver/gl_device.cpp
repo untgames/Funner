@@ -164,20 +164,33 @@ ISamplerState* Device::CreateSamplerState (const SamplerDesc& desc)
 
 ITexture* Device::CreateTexture (const TextureDesc& desc)
 {
-  if (desc.bind_flags & BindFlag_Texture)
+  static const char* METHOD_NAME = "render::low_level::opengl::Device::CreateTexture";
+
+  if (!(desc.bind_flags & (BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil)))
   {
-    return texture_manager.CreateTexture (desc);
-  }
-  else if (desc.bind_flags & (BindFlag_RenderTarget | BindFlag_DepthStencil))
-  {
-    return output_stage.CreateTexture (desc);
-  }
-  else
-  {
-    RaiseNotSupported ("render::low_level::opengl::Device::CreateTexture", "Unsupported bindable flags desc.bind_flags=%s",
+    RaiseNotSupported (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s",
       get_name ((BindFlag)desc.bind_flags));
 
     return 0;
+  }
+  
+  try
+  {
+    if (desc.bind_flags & BindFlag_Texture)
+    {    
+      return texture_manager.CreateTexture (desc);
+    }
+    else if (desc.bind_flags & (BindFlag_RenderTarget | BindFlag_DepthStencil))
+    {
+      return output_stage.CreateTexture (desc);
+    }
+    else return 0;
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch (METHOD_NAME);
+    
+    throw;
   }
 }
 
