@@ -259,6 +259,44 @@ const char* get_name (InputDataType param)
   }
 }
 
+const char* get_name (InputDataFormat param)
+{
+  switch (param)
+  {
+    case InputDataFormat_Vector1: return "InputDataFormat_Vector1";
+    case InputDataFormat_Vector2: return "InputDataFormat_Vector2";
+    case InputDataFormat_Vector3: return "InputDataFormat_Vector3";
+    case InputDataFormat_Vector4: return "InputDataFormat_Vector4";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(InputDataFormat)", "param", param);
+      return "";    
+  }
+}
+
+const char* get_name (VertexAttributeSemantic param)
+{
+  switch (param)
+  {
+    case VertexAttributeSemantic_Position:  return "VertexAttributeSemantic_Position";
+    case VertexAttributeSemantic_Normal:    return "VertexAttributeSemantic_Normal";
+    case VertexAttributeSemantic_Color:     return "VertexAttributeSemantic_Color";
+    case VertexAttributeSemantic_Tangent:   return "VertexAttributeSemantic_Tangent";
+    case VertexAttributeSemantic_Binormal:  return "VertexAttributeSemantic_Binormal";
+    case VertexAttributeSemantic_TexCoord0: return "VertexAttributeSemantic_TexCoord0";
+    case VertexAttributeSemantic_TexCoord1: return "VertexAttributeSemantic_TexCoord1";
+    case VertexAttributeSemantic_TexCoord2: return "VertexAttributeSemantic_TexCoord2";
+    case VertexAttributeSemantic_TexCoord3: return "VertexAttributeSemantic_TexCoord3";
+    case VertexAttributeSemantic_TexCoord4: return "VertexAttributeSemantic_TexCoord4";
+    case VertexAttributeSemantic_TexCoord5: return "VertexAttributeSemantic_TexCoord5";
+    case VertexAttributeSemantic_TexCoord6: return "VertexAttributeSemantic_TexCoord6";
+    case VertexAttributeSemantic_TexCoord7: return "VertexAttributeSemantic_TexCoord7";
+    case VertexAttributeSemantic_Influence: return "VertexAttributeSemantic_Influence";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(VertexAttributeSemantic)", "param", param);
+      return "";    
+  }
+}
+
 }
 
 }
