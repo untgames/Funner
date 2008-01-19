@@ -6,6 +6,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
+const size_t MAX_VERTEX_BUFFER_SLOTS = 8;
 
 class InputLayoutState: public IInputLayoutState, public Object
 {
@@ -36,7 +37,7 @@ class InputLayoutState: public IInputLayoutState, public Object
     }
     
   private:
-    InputLayoutDesc input_desc;
+    InputLayoutDesc   input_desc;
 };
 
 
@@ -45,8 +46,6 @@ class InputLayoutState: public IInputLayoutState, public Object
     Описание реализации входного уровня конвейера OpenGL
 ================================================================================
 */
-
-const size_t MAX_VERTEX_BUFFER_SLOTS = 8;
 
 struct InputStage::Impl: public ContextObject
 {
@@ -138,7 +137,11 @@ struct InputStage::Impl: public ContextObject
   void SetInputLayoutState (IInputLayoutState* state)
   {
     if (!state)
-      RaiseNullArgument("render::low_level::opengl::InputStage::Impl::SetInputLayoutState (IInputLayoutState* state)", "state");
+    {
+      input_state = NULL;
+      return;
+      //RaiseNullArgument("render::low_level::opengl::InputStage::Impl::SetInputLayoutState (IInputLayoutState* state)", "state");
+    }
     
     input_state = state;
   }
@@ -158,9 +161,17 @@ struct InputStage::Impl: public ContextObject
   
   void SetVertexBuffer(size_t vertex_buffer_slot, IBuffer* buffer)
   {
+    if (vertex_buffer_slot >= MAX_VERTEX_BUFFER_SLOTS)
+      RaiseOutOfRange("render::low_level::opengl::InputStage::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)",
+                      "vertex_buffer_slot", vertex_buffer_slot, MAX_VERTEX_BUFFER_SLOTS);
+                      
     if (!buffer)
-      RaiseNullArgument("render::low_level::opengl::InputStage::Impl::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)",
-                        "buffer");
+    {
+      vertex_buffer_slots[vertex_buffer_slot] = NULL;
+      return;
+    //  RaiseNullArgument("render::low_level::opengl::InputStage::Impl::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)",
+    //                    "buffer");
+    }
     
     BufferDesc desc;
     buffer->GetDesc(desc);
@@ -169,9 +180,6 @@ struct InputStage::Impl: public ContextObject
                            "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
                            "Buffer descriptor must include VertexBuffer binding support");
 
-    if (vertex_buffer_slot >= MAX_VERTEX_BUFFER_SLOTS)
-      RaiseOutOfRange("render::low_level::opengl::InputStage::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)",
-                      "vertex_buffer_slot", vertex_buffer_slot, MAX_VERTEX_BUFFER_SLOTS);
   
     vertex_buffer_slots[vertex_buffer_slot] = buffer;
   }
@@ -183,7 +191,11 @@ struct InputStage::Impl: public ContextObject
   void SetIndexBuffer(IBuffer* buffer)
   {
     if (!buffer)
-      RaiseNullArgument("render::low_level::opengl::InputStage::Impl::SetIndexBuffer (IBuffer* buffer)", "buffer");
+    {
+      index_buffer = NULL;
+      return;
+      //RaiseNullArgument("render::low_level::opengl::InputStage::Impl::SetIndexBuffer (IBuffer* buffer)", "buffer");
+    }
       
     BufferDesc desc;
     buffer->GetDesc(desc);
@@ -254,9 +266,12 @@ struct InputStage::Impl: public ContextObject
     //RaiseNotImplemented ("render::low_level::opengl::InputStage::Impl::GetIndexType()");
     //return 0;
   }
-  
+    
   void Bind(size_t base_vertex, size_t base_index)
   {
+    ///////////////////////////////////////////
+    /// Биндинг индексного буфера
+    ///////////////////////////////////////////
     if (!input_state)
       RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::Bind()", "InputLayoutState is not set, use SetInputLayoutState (IInputLayoutState* state) first!");
     
@@ -269,13 +284,205 @@ struct InputStage::Impl: public ContextObject
     desc.index_buffer_offset = base_index;
     input_state->SetDesc(desc);
     
+    ///////////////////////////////////////////
+    /// Биндинг вершинных буферов
+    ///////////////////////////////////////////
+
     //MakeContextCurrent();
+    
+    VertexAttribute*  attrib_to_semantics_table[VertexAttributeSemantic_Num];
+    
+    for (VertexAttribute **ptr = attrib_to_semantics_table, **end = ptr + VertexAttributeSemantic_Num; ptr < end; ptr++)
+      *ptr = NULL;
+    
+    for (int i = 0; i < desc.vertex_attributes_count; i++)
+      attrib_to_semantics_table[ desc.vertex_attributes[i].semantic ] = &desc.vertex_attributes[i];
+    
+    for (int i = VertexAttributeSemantic_Num - 1; i >=0; i--)
+    {
+      if (attrib_to_semantics_table[i])
+      {
+        if (vertex_buffer_slots[ attrib_to_semantics_table[i]->slot ])
+          RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::Bind()",
+                                "VertexBuffer in slot %d is not set! Check slot index in VertexAttributes list or set buffer with SetVertexBuffer(...)!",
+                                attrib_to_semantics_table[i]->slot);
+        
+        Buffer* current_buffer = cast_object<Buffer> (GetContextManager(), vertex_buffer_slots[ attrib_to_semantics_table[i]->slot ],
+                                                      "render::low_level::opengl::InputStage::Impl::Bind(size_t base_vertex, size_t base_index)",
+                                                      "vertex_buffer_slots[ attrib_to_semantics_table[i]->slot ]");
+        
+        current_buffer->Bind();
+        BindBufferBySemantics(*(attrib_to_semantics_table[i]), base_vertex, current_buffer->GetDataPointer());
+      }
+    }
   }
     
 private:
   IInputLayoutState*  input_state;
   IBuffer*            vertex_buffer_slots[MAX_VERTEX_BUFFER_SLOTS];
   IBuffer*            index_buffer;
+
+  void BindBufferBySemantics (VertexAttribute attribute,
+                              size_t base_vertex,
+                              const void* base_data)
+  {
+    GLint size;
+    GLenum type;
+    
+    size_t type_size;
+    
+    switch (attribute.format)
+    {
+      case InputDataFormat_Vector1:
+        size = 1;
+        type_size = 1;
+        break;
+      case InputDataFormat_Vector2:
+        size = 2;
+        type_size = 2;
+        break;
+      case InputDataFormat_Vector3:
+        size = 3;
+        type_size = 3;
+        break;
+      case InputDataFormat_Vector4:
+        size = 4;
+        type_size = 4;
+        break;
+      default:
+        RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                             "attribute.format", attribute.format, "Unknown InputDataFormat value supplied!"); 
+    }
+
+    switch (attribute.type)
+    {
+      case InputDataType_Byte:
+        type = GL_BYTE;
+        type_size *= sizeof(char);
+        break;
+      case InputDataType_UByte:
+        type = GL_UNSIGNED_BYTE;
+        type_size *= sizeof(char);
+        break;
+      case InputDataType_Short:
+        type = GL_SHORT;
+        type_size *= sizeof(short);
+        break;
+      case InputDataType_UShort:
+        type = GL_UNSIGNED_SHORT;
+        type_size *= sizeof(short);
+        break;
+      case InputDataType_Int:
+        type = GL_INT;
+        type_size *= sizeof(int);
+        break;
+      case InputDataType_UInt:
+        type = GL_UNSIGNED_INT;
+        type_size *= sizeof(int);
+        break;
+      case InputDataType_Float:
+        type = GL_FLOAT;
+        type_size *= sizeof(float);
+        break;
+      default:
+        RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                             "attribute.type", attribute.type, "Unknown InputDataType value supplied!");         
+    }
+    
+    const void* data = ( (const char*)base_data ) + attribute.offset + base_vertex * (type_size + attribute.stride);
+
+    switch (attribute.semantic)
+    {
+      case VertexAttributeSemantic_Position:
+        switch (attribute.format)
+        {
+          case InputDataFormat_Vector1:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.format", get_name(attribute.format),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_Position semantic!");
+        }
+        
+        switch (attribute.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_UShort:
+          case InputDataType_UInt:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.type", get_name(attribute.type),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_Position semantic!");
+        }
+
+        glVertexPointer(size, type, attribute.stride, data);
+        break;
+
+      case VertexAttributeSemantic_Normal:
+        switch (attribute.type)
+        {
+          case InputDataType_UByte:
+          case InputDataType_UShort:
+          case InputDataType_UInt:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.type", get_name(attribute.type),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_Normal semantic!");
+        }
+
+        glNormalPointer(type, attribute.stride, data);
+        break;
+      case VertexAttributeSemantic_Color:
+        switch (attribute.format)
+        {
+          case InputDataFormat_Vector1:
+          case InputDataFormat_Vector2:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.format", get_name(attribute.format),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_Color semantic!");
+        }
+        
+        glColorPointer(size, type, attribute.stride, data);
+        break;
+      case VertexAttributeSemantic_Tangent:
+        //break;
+      case VertexAttributeSemantic_Binormal:
+        RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                          "The semantic %s support is not implemented yet", get_name(attribute.semantic));
+        break;
+      case VertexAttributeSemantic_TexCoord0:
+        switch (attribute.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_UShort:
+          case InputDataType_UInt:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.type", get_name(attribute.type),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
+        }
+        glTexCoordPointer(size, type, attribute.stride, data);
+        break;
+      case VertexAttributeSemantic_TexCoord1:
+        //break;
+      case VertexAttributeSemantic_TexCoord2:
+        //break;
+      case VertexAttributeSemantic_TexCoord3:
+        //break;
+      case VertexAttributeSemantic_TexCoord4:
+        //break;
+      case VertexAttributeSemantic_TexCoord5:
+        //break;
+      case VertexAttributeSemantic_TexCoord6:
+        //break;
+      case VertexAttributeSemantic_TexCoord7:
+        //break;
+      case VertexAttributeSemantic_Influence:
+        RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                          "The semantic %s support is not implemented yet", get_name(attribute.semantic));
+        break;
+      default:
+        RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                             "attribute.semantic", attribute.semantic, "Unknown VertexAttributeSemantic supplied!"); 
+    }
+  }
 };
 
 /*
