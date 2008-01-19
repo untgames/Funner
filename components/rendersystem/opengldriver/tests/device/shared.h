@@ -13,8 +13,12 @@
 #include <render/low_level/debug.h>
 #include <render/low_level/utils.h>
 
+#include <stl/list>
+
 #include <xtl/intrusive_ptr.h>
 #include <xtl/uninitialized_storage.h>
+
+#include <common/exception.h>
 
 using namespace render::low_level;
 

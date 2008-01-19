@@ -9,7 +9,9 @@ using namespace common;
 */
 
 FrameBufferManager::FrameBufferManager (const ContextManager& manager, ISwapChain* in_default_swap_chain)
-  : ContextObject (manager), default_swap_chain (in_default_swap_chain)
+  : ContextObject (manager),
+    default_swap_chain (in_default_swap_chain),
+    EXT_framebuffer_object ("GL_EXT_framebuffer_object")
 {
 }
 
@@ -316,8 +318,6 @@ ITexture* FrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
   {
       //выбор текущего контекста
 
-    static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
-
     if (IsSupported (EXT_framebuffer_object)) return CreateFboRenderBuffer (desc);
     else                                      return CreateSwapChainRenderBuffer (desc);
   }
@@ -455,6 +455,9 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (View* render_target_view, Vi
       case PixelFormat_L8:
       case PixelFormat_A8:
       case PixelFormat_LA8:
+      case PixelFormat_DXT1:
+      case PixelFormat_DXT3:
+      case PixelFormat_DXT5:
         break;      
       default:
         RaiseNotSupported (METHOD_NAME, "Unsupported render-target view format=%s", get_name (texture_desc.format));
@@ -495,11 +498,7 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, N
 {
   try
   {
-    SwapChainFrameBuffer* frame_buffer = CreateShadowFrameBuffer ();
-    
-    frame_buffer->SetBuffersState (false, false);
-    
-    return frame_buffer;
+    return new NullFrameBuffer (GetContextManager ());
   }
   catch (common::Exception& exception)
   {
@@ -532,12 +531,19 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, I
 {
   try
   {
-    SwapChainFrameBuffer* frame_buffer = CreateShadowFrameBuffer ();
+    if (IsSupported (EXT_framebuffer_object))
+    {
+      return new FboFrameBuffer (GetContextManager (), NullView (), texture, desc);
+    }
+    else
+    {
+      SwapChainFrameBuffer* frame_buffer = CreateShadowFrameBuffer ();
 
-    frame_buffer->SetBuffersState  (false, true);
-    frame_buffer->SetRenderTargets (0, 0, texture, &desc);
+      frame_buffer->SetBuffersState  (false, true);
+      frame_buffer->SetRenderTargets (0, 0, texture, &desc);
 
-    return frame_buffer;    
+      return frame_buffer;
+    }
   }
   catch (common::Exception& exception)
   {
@@ -551,6 +557,9 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, F
 {
   try
   {
+    if (!IsSupported (EXT_framebuffer_object))
+      RaiseNotSupported ("", "GL_EXT_framebuffer_object not supported");
+    
     return new FboFrameBuffer (GetContextManager (), NullView (), render_buffer);
   }
   catch (common::Exception& exception)
@@ -625,12 +634,19 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (IBindableTexture* texture, c
 {
   try
   {
-    SwapChainFrameBuffer* frame_buffer = CreateShadowFrameBuffer ();
+    if (IsSupported (EXT_framebuffer_object))
+    {
+      return new FboFrameBuffer (GetContextManager (), texture, desc, NullView ());
+    }
+    else
+    {
+      SwapChainFrameBuffer* frame_buffer = CreateShadowFrameBuffer ();
 
-    frame_buffer->SetBuffersState  (true, false);
-    frame_buffer->SetRenderTargets (texture, &desc, 0, 0);
+      frame_buffer->SetBuffersState  (true, false);
+      frame_buffer->SetRenderTargets (texture, &desc, 0, 0);
 
-    return frame_buffer;    
+      return frame_buffer;
+    }
   }
   catch (common::Exception& exception)
   {
@@ -667,11 +683,19 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer
 {
   try
   {
-    SwapChainFrameBuffer* frame_buffer = CreateShadowFrameBuffer ();
-    
-    frame_buffer->SetRenderTargets (render_target_texture, &render_target_desc, depth_stencil_texture, &depth_stencil_desc);
-    
-    return frame_buffer;
+    if (IsSupported (EXT_framebuffer_object))
+    {
+      return new FboFrameBuffer (GetContextManager (), render_target_texture, render_target_desc, depth_stencil_texture,
+                                 depth_stencil_desc);
+    }
+    else
+    {
+      SwapChainFrameBuffer* frame_buffer = CreateShadowFrameBuffer ();
+      
+      frame_buffer->SetRenderTargets (render_target_texture, &render_target_desc, depth_stencil_texture, &depth_stencil_desc);
+      
+      return frame_buffer;
+    }
   }
   catch (common::Exception& exception)
   {
@@ -689,6 +713,9 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer
 {
   try
   {
+    if (!IsSupported (EXT_framebuffer_object))
+      RaiseNotSupported ("", "GL_EXT_framebuffer_object not supported");    
+    
     return new FboFrameBuffer (GetContextManager (), render_target_texture, render_target_desc, depth_stencil_buffer);
   }
   catch (common::Exception& exception)
@@ -703,6 +730,9 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (FboRenderBuffer* color_buffe
 {
   try
   {
+    if (!IsSupported (EXT_framebuffer_object))
+      RaiseNotSupported ("", "GL_EXT_framebuffer_object not supported");    
+    
     return new FboFrameBuffer (GetContextManager (), color_buffer, NullView ());
   }
   catch (common::Exception& exception)
@@ -729,6 +759,9 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer
 {
   try
   {
+    if (!IsSupported (EXT_framebuffer_object))
+      RaiseNotSupported ("", "GL_EXT_framebuffer_object not supported");    
+    
     return new FboFrameBuffer (GetContextManager (), color_buffer, depth_stencil_texture, depth_stencil_desc);
   }
   catch (common::Exception& exception)
@@ -747,6 +780,9 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer
 {
   try
   {
+    if (!IsSupported (EXT_framebuffer_object))
+      RaiseNotSupported ("", "GL_EXT_framebuffer_object not supported");    
+    
     return new FboFrameBuffer (GetContextManager (), color_buffer, depth_stencil_buffer);
   }
   catch (common::Exception& exception)

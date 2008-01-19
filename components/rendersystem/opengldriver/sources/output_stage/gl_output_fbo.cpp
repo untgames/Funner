@@ -527,6 +527,7 @@ void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t 
     case GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB:
     case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB:
     case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB:
+      printf ("attach %d\n", texture_id);
       glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, attachment, textarget, texture_id, view_desc.mip_level);
       break;
     case GL_TEXTURE_3D_EXT:
@@ -540,6 +541,9 @@ void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t 
 
 void FboFrameBuffer::SetAttachment (RenderTargetType target_type, IBindableTexture* texture, const ViewDesc& view_desc)
 {
+  if (view_desc.mip_level)
+    RaiseNotSupported ("render::low_level::opengl::FboFrameBuffer::SetAttachment", "Unsupported mip_level=0 (incompatible with GL_EXT_framebuffer_object)");
+
   TextureDesc         desc;
   BindableTextureDesc bind_desc;
 
@@ -598,11 +602,11 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, FboRenderBuffe
 
 void FboFrameBuffer::FinishInitialization ()
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FboFrameBuffer::FboFrameBuffer";
+  static const char* METHOD_NAME = "render::low_level::opengl::FboFrameBuffer::FinishInitialization";
 
     //проверка состояния буфера кадра
   
-  GLenum status = (GLenum)glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);    
+  GLenum status = (GLenum)glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 
   check_frame_buffer_status (METHOD_NAME, status);
 
