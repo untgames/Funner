@@ -75,7 +75,7 @@ int main ()
     
     textures.reserve (ARRAYS_RESERVE_SIZE);    
     
-    static size_t tex_sizes [2] = {34, 32};
+    static size_t tex_sizes [2] = {36, 32};
     
     for (int i=0; i<2; i++)
     {    
@@ -122,7 +122,8 @@ int main ()
           
           try
           {
-            printf ("Create texture dimension=%s format=%s: ", get_name (texture_desc.dimension), get_name (texture_desc.format));
+            printf ("Create texture dimension=%s format=%s %ux%ux%u: ", get_name (texture_desc.dimension),
+                    get_name (texture_desc.format), texture_desc.width, texture_desc.height, texture_desc.layers);
 
             TexturePtr texture (test.device->CreateTexture (texture_desc), false);
 
