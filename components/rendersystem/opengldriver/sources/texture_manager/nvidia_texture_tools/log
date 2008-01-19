@@ -1,0 +1,2 @@
+blockdxt.cpp  color.h	      colorblock.h	   fastcompressdxt.h  makefile
+blockdxt.h    colorblock.cpp  fastcompressdxt.cpp  log		      squish
