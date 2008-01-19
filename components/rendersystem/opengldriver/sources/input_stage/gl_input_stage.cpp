@@ -84,13 +84,19 @@ struct InputStage::Impl: public ContextObject
     try
     {
       MakeContextCurrent();
+
+      static Extension  ARB_vertex_buffer_object  = "GL_ARB_vertex_buffer_object",
+                        GL_version_1_5            = "GL_VERSION_1_5";
+    
+      bool has_ARB_vertex_buffer_object =    GetContextManager().IsSupported(ARB_vertex_buffer_object)
+                                          || GetContextManager().IsSupported(GL_version_1_5);
      
       if (!(desc.bind_flags & BindFlag_VertexBuffer))
         RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::CreateVertexBuffer (const BufferDesc& desc)",
                              "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
                              "Buffer descriptor must include VertexBuffer binding support");
     
-      if (GLEW_ARB_vertex_buffer_object)
+      if (has_ARB_vertex_buffer_object)
         return new VboBuffer(GetContextManager(), GL_ARRAY_BUFFER, desc);
       else
         return new SystemMemoryBuffer(GetContextManager(), desc);
@@ -108,12 +114,17 @@ struct InputStage::Impl: public ContextObject
     {
       MakeContextCurrent();
 
+      static Extension  ARB_vertex_buffer_object  = "GL_ARB_vertex_buffer_object",
+                        GL_version_1_5            = "GL_VERSION_1_5";
+    
+      bool has_ARB_vertex_buffer_object =    GetContextManager().IsSupported(ARB_vertex_buffer_object)
+                                          || GetContextManager().IsSupported(GL_version_1_5);
       if (!(desc.bind_flags & BindFlag_IndexBuffer))
         RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::CreateIndexBuffer (const BufferDesc& desc)",
                              "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
                              "Buffer descriptor must include IndexBuffer binding support");
 
-      if (GLEW_ARB_vertex_buffer_object)
+      if (has_ARB_vertex_buffer_object)
         return new VboBuffer(GetContextManager(), GL_ELEMENT_ARRAY_BUFFER, desc);
       else
         return new SystemMemoryBuffer(GetContextManager(), desc);
@@ -288,7 +299,7 @@ struct InputStage::Impl: public ContextObject
     /// Биндинг вершинных буферов
     ///////////////////////////////////////////
 
-    //MakeContextCurrent();
+    MakeContextCurrent();
     
     VertexAttribute*  attrib_to_semantics_table[VertexAttributeSemantic_Num];
     
@@ -328,6 +339,18 @@ private:
   {
     GLint size;
     GLenum type;
+    
+    static Extension  ARB_multitexture = "GL_ARB_multitexture",
+                      GL_version_1_3   = "GL_VERSION_1_3";
+    size_t            texunits_num = 1;
+    
+    bool has_ARB_multitexture =    GetContextManager().IsSupported(ARB_multitexture)
+                                || GetContextManager().IsSupported(GL_version_1_3);
+    
+    if (has_ARB_multitexture)
+    {
+      glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, (GLint*)&texunits_num);
+    }    
     
     size_t type_size;
     
@@ -448,6 +471,9 @@ private:
                           "The semantic %s support is not implemented yet", get_name(attribute.semantic));
         break;
       case VertexAttributeSemantic_TexCoord0:
+        if (has_ARB_multitexture)
+          glActiveTexture(GL_TEXTURE0);
+
         switch (attribute.type)
         {
           case InputDataType_Byte:
@@ -458,22 +484,177 @@ private:
                                  "attribute.type", get_name(attribute.type),
                                  "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
         }
+        
         glTexCoordPointer(size, type, attribute.stride, data);
         break;
       case VertexAttributeSemantic_TexCoord1:
-        //break;
+        if (!has_ARB_multitexture)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing is not supported");
+
+        if (texunits_num < 2)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 2);
+          
+        glActiveTexture(GL_TEXTURE1);
+        
+        switch (attribute.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_UShort:
+          case InputDataType_UInt:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.type", get_name(attribute.type),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
+        }
+        
+        glTexCoordPointer(size, type, attribute.stride, data);
+        break;
       case VertexAttributeSemantic_TexCoord2:
-        //break;
+        if (!has_ARB_multitexture)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing is not supported");
+
+        if (texunits_num < 3)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 3);
+          
+        glActiveTexture(GL_TEXTURE2);
+        
+        switch (attribute.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_UShort:
+          case InputDataType_UInt:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.type", get_name(attribute.type),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
+        }
+        
+        glTexCoordPointer(size, type, attribute.stride, data);
+        break;
       case VertexAttributeSemantic_TexCoord3:
-        //break;
+        if (!has_ARB_multitexture)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing is not supported");
+
+        if (texunits_num < 4)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 4);
+          
+        glActiveTexture(GL_TEXTURE3);
+        
+        switch (attribute.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_UShort:
+          case InputDataType_UInt:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.type", get_name(attribute.type),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
+        }
+        
+        glTexCoordPointer(size, type, attribute.stride, data);
+        break;
       case VertexAttributeSemantic_TexCoord4:
-        //break;
+        if (!has_ARB_multitexture)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing is not supported");
+
+        if (texunits_num < 5)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 5);
+          
+        glActiveTexture(GL_TEXTURE4);
+        
+        switch (attribute.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_UShort:
+          case InputDataType_UInt:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.type", get_name(attribute.type),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
+        }
+        
+        glTexCoordPointer(size, type, attribute.stride, data);
+        break;
       case VertexAttributeSemantic_TexCoord5:
-        //break;
+        if (!has_ARB_multitexture)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing is not supported");
+
+        if (texunits_num < 6)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 6);
+          
+        glActiveTexture(GL_TEXTURE5);
+        
+        switch (attribute.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_UShort:
+          case InputDataType_UInt:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.type", get_name(attribute.type),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
+        }
+        
+        glTexCoordPointer(size, type, attribute.stride, data);
+        break;
       case VertexAttributeSemantic_TexCoord6:
-        //break;
+        if (!has_ARB_multitexture)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing is not supported");
+
+        if (texunits_num < 7)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 7);
+          
+        glActiveTexture(GL_TEXTURE6);
+        
+        switch (attribute.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_UShort:
+          case InputDataType_UInt:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.type", get_name(attribute.type),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
+        }
+        
+        glTexCoordPointer(size, type, attribute.stride, data);
+        break;
       case VertexAttributeSemantic_TexCoord7:
-        //break;
+        if (!has_ARB_multitexture)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing is not supported");
+
+        if (texunits_num < 8)
+          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 8);
+          
+        glActiveTexture(GL_TEXTURE7);
+        
+        switch (attribute.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_UShort:
+          case InputDataType_UInt:
+            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                                 "attribute.type", get_name(attribute.type),
+                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
+        }
+        
+        glTexCoordPointer(size, type, attribute.stride, data);
+        break;
       case VertexAttributeSemantic_Influence:
         RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
                           "The semantic %s support is not implemented yet", get_name(attribute.semantic));
