@@ -97,8 +97,8 @@ int main ()
           break;
         case TextureDimension_Cubemap:
           texture_desc.width  = 512;
-          texture_desc.height = 1;
-          texture_desc.layers = 1;
+          texture_desc.height = 512;
+          texture_desc.layers = 6;
           break;          
         case TextureDimension_3D:
           texture_desc.width  = 512;

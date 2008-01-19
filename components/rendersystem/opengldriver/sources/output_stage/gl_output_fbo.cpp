@@ -512,6 +512,27 @@ FboFrameBuffer::FboFrameBuffer
     Присоединение буфера рендеринга к текущему буферу кадра
 */
 
+namespace
+{
+
+GLenum get_cubemap_target (size_t layer)
+{
+  switch (layer)
+  {
+    case 0: return GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB;
+    case 1: return GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB;
+    case 2: return GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB;
+    case 3: return GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB;
+    case 4: return GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB;
+    case 5: return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB;
+    default:
+      RaiseOutOfRange ("render::low_level::opengl::get_cubemap_target", "layer", layer, 0u, 6u);
+      return 0;
+  }
+}
+
+}
+
 void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t texture_id, const ViewDesc& view_desc)
 {
   switch (textarget)
@@ -527,9 +548,13 @@ void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t 
     case GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB:
     case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB:
     case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB:
-      printf ("attach %d\n", texture_id);
       glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, attachment, textarget, texture_id, view_desc.mip_level);
       break;
+    case GL_TEXTURE_CUBE_MAP_ARB:
+    {
+      glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, attachment, get_cubemap_target (view_desc.layer), texture_id, view_desc.mip_level);
+      break;
+    }
     case GL_TEXTURE_3D_EXT:
       glFramebufferTexture3DEXT (GL_FRAMEBUFFER_EXT, attachment, textarget, texture_id, view_desc.mip_level, view_desc.layer);
       break;
