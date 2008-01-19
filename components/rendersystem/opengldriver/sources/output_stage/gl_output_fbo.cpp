@@ -479,7 +479,7 @@ FboFrameBuffer::FboFrameBuffer
   NullView)
     : FboFrameBufferBase (manager, true, false)
 {
-  SetAttachment (RenderTargetType_Color, render_target_texture, render_target_desc);
+  SetAttachment (RenderTargetType_Color, render_target_texture, render_target_desc);  
   FinishInitialization ();
 }
 

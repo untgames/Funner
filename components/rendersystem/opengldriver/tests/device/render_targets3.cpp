@@ -66,7 +66,7 @@ int main ()
     
     typedef stl::vector<TexturePtr> TextureList;        
     
-      //б®§¤ ­ЁҐ вҐЄбвга
+      //создание текстур
       
     printf ("Create textures:\n");
     
@@ -130,7 +130,7 @@ int main ()
       }
     }
     
-      //б®§¤ ­ЁҐ ®в®Ўа ¦Ґ­Ё©
+      //создание отображений
       
     printf ("Create views:\n");
     
@@ -140,7 +140,7 @@ int main ()
     
     views.reserve (ARRAYS_RESERVE_SIZE);
     
-    views.push_back (ViewPtr ()); //¤®Ў ў«Ґ­ЁҐ Їгбв®Ј® ®в®Ўа ¦Ґ­Ёп
+    views.push_back (ViewPtr ()); //добавление пустого отображения
     
     for (TextureList::iterator iter=textures.begin (); iter!=textures.end (); ++iter)
     {
@@ -178,7 +178,7 @@ int main ()
       }
     }
     
-      //вҐбвЁа®ў ­ЁҐ а §«Ёз­ле Є®­дЁЈга жЁ© ®в®Ўа ¦Ґ­Ё©
+      //тестирование различных конфигураций отображений
       
     printf ("Set render targets:\n");
       
@@ -212,11 +212,12 @@ int main ()
         catch (std::exception& exception)
         {
           printf ("Fail!\n%s\n", exception.what ());
+//          printf ("Bad!\n");
         }
       }
     }
 
-      //ўлў®¤ бв вгб         
+      //вывод статуса        
 
     printf ("Status info:\n");
 
