@@ -313,7 +313,7 @@ struct InputStage::Impl: public ContextObject
     {
       if (attrib_to_semantics_table[i])
       {
-        if (vertex_buffer_slots[ attrib_to_semantics_table[i]->slot ])
+        if (!(vertex_buffer_slots[ attrib_to_semantics_table[i]->slot ]))
           RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::Bind()",
                                 "VertexBuffer in slot %d is not set! Check slot index in VertexAttributes list or set buffer with SetVertexBuffer(...)!",
                                 attrib_to_semantics_table[i]->slot);
