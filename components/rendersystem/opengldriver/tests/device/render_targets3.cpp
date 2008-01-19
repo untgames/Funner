@@ -19,7 +19,8 @@ void dump (IView* view)
     view->GetDesc (view_desc);
     view->GetTexture ()->GetDesc (tex_desc);
     
-    printf ("{%s, %s, %u}", get_name (tex_desc.dimension), get_name (tex_desc.format), view_desc.layer);
+    printf ("{%s, %s, %ux%ux%u, %u}", get_name (tex_desc.dimension), get_name (tex_desc.format),
+           tex_desc.width, tex_desc.height, tex_desc.layers, view_desc.layer);
   }
   else printf ("null");
 }
@@ -62,7 +63,7 @@ int main ()
   {
     printf ("Results of render_targets3_test:\n");
     
-    Test test (L"OpenGL device test window (render_targets3)");    
+    Test test (L"OpenGL device test window (render_targets3)");
     
     typedef stl::vector<TexturePtr> TextureList;        
     
@@ -74,58 +75,65 @@ int main ()
     
     textures.reserve (ARRAYS_RESERVE_SIZE);    
     
-    for (int dim=0; dim<TextureDimension_Num; dim++)
-    {
-      TextureDesc texture_desc;    
-
-      memset (&texture_desc, 0, sizeof (texture_desc));
-
-      texture_desc.dimension  = (TextureDimension)dim;
-      texture_desc.bind_flags = BindFlag_Texture;
-
-      switch (dim)
-      {
-        case TextureDimension_1D:
-          texture_desc.width  = 512;
-          texture_desc.height = 1;
-          texture_desc.layers = 1;
-          break;
-        case TextureDimension_2D:
-          texture_desc.width  = 512;
-          texture_desc.height = 512;
-          texture_desc.layers = 1;
-          break;
-        case TextureDimension_Cubemap:
-          texture_desc.width  = 512;
-          texture_desc.height = 512;
-          texture_desc.layers = 6;
-          break;          
-        case TextureDimension_3D:
-          texture_desc.width  = 512;
-          texture_desc.height = 512;
-          texture_desc.layers = 2;
-          break;
-        default:
-          continue;
-      }
+    static size_t tex_sizes [2] = {34, 32};
+    
+    for (int i=0; i<2; i++)
+    {    
+      size_t tex_size = tex_sizes [i];
       
-      for (int format=0; format<PixelFormat_Num; format++)
+      for (int dim=0; dim<TextureDimension_Num; dim++)
       {
-        texture_desc.format = (PixelFormat)format;                
-        
-        try
+        TextureDesc texture_desc;    
+
+        memset (&texture_desc, 0, sizeof (texture_desc));
+
+        texture_desc.dimension  = (TextureDimension)dim;
+        texture_desc.bind_flags = BindFlag_Texture;        
+
+        switch (dim)
         {
-          printf ("Create texture dimension=%s format=%s: ", get_name (texture_desc.dimension), get_name (texture_desc.format));
-
-          TexturePtr texture (test.device->CreateTexture (texture_desc), false);
-
-          textures.push_back (texture);                    
-
-          printf ("Ok!\n");
+          case TextureDimension_1D:
+            texture_desc.width  = tex_size;
+            texture_desc.height = 1;
+            texture_desc.layers = 1;
+            break;
+          case TextureDimension_2D:
+            texture_desc.width  = tex_size;
+            texture_desc.height = tex_size;
+            texture_desc.layers = 1;
+            break;
+          case TextureDimension_Cubemap:
+            texture_desc.width  = tex_size;
+            texture_desc.height = tex_size;
+            texture_desc.layers = 6;
+            break;          
+          case TextureDimension_3D:
+            texture_desc.width  = tex_size;
+            texture_desc.height = tex_size;
+            texture_desc.layers = 2;
+            break;
+          default:
+            continue;
         }
-        catch (std::exception& exception)
+        
+        for (int format=0; format<PixelFormat_Num; format++)
         {
-          printf ("Fail!\n%s\n", exception.what ());
+          texture_desc.format = (PixelFormat)format;                
+          
+          try
+          {
+            printf ("Create texture dimension=%s format=%s: ", get_name (texture_desc.dimension), get_name (texture_desc.format));
+
+            TexturePtr texture (test.device->CreateTexture (texture_desc), false);
+
+            textures.push_back (texture);                    
+
+            printf ("Ok!\n");
+          }
+          catch (std::exception& exception)
+          {
+            printf ("Fail!\n%s\n", exception.what ());
+          }
         }
       }
     }
@@ -223,7 +231,7 @@ int main ()
 
     for (size_t i=0; i<views.size (); i++)
     {
-      printf ("%02u) ", i+1);
+      printf ("%03u) ", i+1);
       dump   (views [i].get ());
       printf ("\n");
     }
@@ -236,7 +244,7 @@ int main ()
       {
         case RenderTargetType_Null:
         case RenderTargetType_DepthStencil:
-          printf ("%02u ", i+1);
+          printf ("%03u ", i+1);
           break;
         default:
           break;
@@ -250,7 +258,7 @@ int main ()
       {
         case RenderTargetType_Null:
         case RenderTargetType_Color:
-          printf ("%02u| ", i+1);
+          printf ("%03u| ", i+1);
           break;
         default:
           continue;
@@ -267,8 +275,8 @@ int main ()
             continue;
         }
         
-        if (status [i*views.size () + j]) printf ("+  ");
-        else                              printf ("-  ");
+        if (status [i*views.size () + j]) printf ("+   ");
+        else                              printf ("-   ");
       }
 
       printf ("\n");
