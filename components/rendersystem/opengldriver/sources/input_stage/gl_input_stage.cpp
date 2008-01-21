@@ -1,12 +1,11 @@
 #include "shared.h"
 #include <shared/object.h>
 #include <render/low_level/utils.h>
+#include <stl/vector>
 
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
-
-const size_t MAX_VERTEX_BUFFER_SLOTS = 8;
 
 class InputLayoutState: public IInputLayoutState, public Object
 {
@@ -55,11 +54,60 @@ struct InputStage::Impl: public ContextObject
 
   Impl (const ContextManager& context_manager) : ContextObject (context_manager)
   {
-    for (int i = 0; i < MAX_VERTEX_BUFFER_SLOTS; i++)
+    for (int i = 0; i < DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
       vertex_buffer_slots[i] = NULL;
     
     input_state   = NULL;
     index_buffer  = NULL;
+    
+    MakeContextCurrent();
+
+    if (has_ARB_multitexture())
+    {
+      glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, (GLint*)&max_texture_units_count);
+    }    
+
+    ///////////////////////////////////////////
+    /// Константы для проверки поддержки типов и форматов данных
+    ///////////////////////////////////////////
+    
+    position_types_supported.push_back(InputDataType_Short);
+    position_types_supported.push_back(InputDataType_Int);
+    position_types_supported.push_back(InputDataType_Float);
+    
+    position_formats_supported.push_back(InputDataFormat_Vector2);
+    position_formats_supported.push_back(InputDataFormat_Vector3);
+    position_formats_supported.push_back(InputDataFormat_Vector4);
+    
+    normal_types_supported.push_back(InputDataType_Byte);
+    normal_types_supported.push_back(InputDataType_Short);
+    normal_types_supported.push_back(InputDataType_Int);
+    normal_types_supported.push_back(InputDataType_Float);
+    
+    normal_formats_supported.push_back(InputDataFormat_Vector1);
+    normal_formats_supported.push_back(InputDataFormat_Vector2);
+    normal_formats_supported.push_back(InputDataFormat_Vector3);
+    normal_formats_supported.push_back(InputDataFormat_Vector4);
+
+    color_types_supported.push_back(InputDataType_Byte);
+    color_types_supported.push_back(InputDataType_UByte);
+    color_types_supported.push_back(InputDataType_Short);
+    color_types_supported.push_back(InputDataType_UShort);
+    color_types_supported.push_back(InputDataType_Int);
+    color_types_supported.push_back(InputDataType_UInt);
+    color_types_supported.push_back(InputDataType_Float);
+
+    color_formats_supported.push_back(InputDataFormat_Vector3);
+    color_formats_supported.push_back(InputDataFormat_Vector4);
+
+    texcoord_types_supported.push_back(InputDataType_Short);
+    texcoord_types_supported.push_back(InputDataType_Int);
+    texcoord_types_supported.push_back(InputDataType_Float);
+    
+    texcoord_formats_supported.push_back(InputDataFormat_Vector1);
+    texcoord_formats_supported.push_back(InputDataFormat_Vector2);
+    texcoord_formats_supported.push_back(InputDataFormat_Vector3);
+    texcoord_formats_supported.push_back(InputDataFormat_Vector4);
   }
   
   //////////////////////////////////////////
@@ -163,18 +211,18 @@ struct InputStage::Impl: public ContextObject
   
   IBuffer* GetVertexBuffer(size_t vertex_buffer_slot)
   {
-    if (vertex_buffer_slot >= MAX_VERTEX_BUFFER_SLOTS)
+    if (vertex_buffer_slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
       RaiseOutOfRange("render::low_level::opengl::InputStage::Impl::GetVertexBuffer (size_t vertex_buffer_slot)",
-                      "vertex_buffer_slot", vertex_buffer_slot, MAX_VERTEX_BUFFER_SLOTS);
+                      "vertex_buffer_slot", vertex_buffer_slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
   
     return vertex_buffer_slots[vertex_buffer_slot];
   }
   
   void SetVertexBuffer(size_t vertex_buffer_slot, IBuffer* buffer)
   {
-    if (vertex_buffer_slot >= MAX_VERTEX_BUFFER_SLOTS)
+    if (vertex_buffer_slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
       RaiseOutOfRange("render::low_level::opengl::InputStage::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)",
-                      "vertex_buffer_slot", vertex_buffer_slot, MAX_VERTEX_BUFFER_SLOTS);
+                      "vertex_buffer_slot", vertex_buffer_slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
                       
     if (!buffer)
     {
@@ -192,7 +240,9 @@ struct InputStage::Impl: public ContextObject
                            "Buffer descriptor must include VertexBuffer binding support");
 
   
-    vertex_buffer_slots[vertex_buffer_slot] = buffer;
+    vertex_buffer_slots[vertex_buffer_slot] = cast_object<Buffer>(GetContextManager(), buffer,
+                                                                  "render::low_level::opengl::InputStage::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)",
+                                                                  "buffer");
   }
   
   //////////////////////////////////////////
@@ -215,7 +265,9 @@ struct InputStage::Impl: public ContextObject
                            "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
                            "Buffer descriptor must include IndexBuffer binding support");
     
-    index_buffer = buffer;
+    index_buffer = cast_object<Buffer>(GetContextManager(), buffer,
+                                       "render::low_level::opengl::InputStage::SetIndexBuffer (IBuffer* buffer)",
+                                       "buffer");
   }
   
   IBuffer* GetIndexBuffer()
@@ -258,9 +310,7 @@ struct InputStage::Impl: public ContextObject
         break;
     }
         
-    Buffer* buffer = cast_object<Buffer> (GetContextManager(), index_buffer, "render::low_level::opengl::InputStage::Impl::GetIndices()", "index_buffer");
-
-    return ((char*)buffer->GetDataPointer()) + index_size * desc.index_buffer_offset;
+    return ((char*)index_buffer->GetDataPointer()) + index_size * desc.index_buffer_offset;
     //RaiseNotImplemented ("render::low_level::opengl::InputStage::Impl::GetIndices()");
     //return 0;
   }
@@ -306,7 +356,7 @@ struct InputStage::Impl: public ContextObject
     for (VertexAttribute **ptr = attrib_to_semantics_table, **end = ptr + VertexAttributeSemantic_Num; ptr < end; ptr++)
       *ptr = NULL;
     
-    for (int i = 0; i < desc.vertex_attributes_count; i++)
+    for (size_t i = 0; i < desc.vertex_attributes_count; i++)
       attrib_to_semantics_table[ desc.vertex_attributes[i].semantic ] = &desc.vertex_attributes[i];
     
     for (int i = VertexAttributeSemantic_Num - 1; i >=0; i--)
@@ -318,9 +368,7 @@ struct InputStage::Impl: public ContextObject
                                 "VertexBuffer in slot %d is not set! Check slot index in VertexAttributes list or set buffer with SetVertexBuffer(...)!",
                                 attrib_to_semantics_table[i]->slot);
         
-        Buffer* current_buffer = cast_object<Buffer> (GetContextManager(), vertex_buffer_slots[ attrib_to_semantics_table[i]->slot ],
-                                                      "render::low_level::opengl::InputStage::Impl::Bind(size_t base_vertex, size_t base_index)",
-                                                      "vertex_buffer_slots[ attrib_to_semantics_table[i]->slot ]");
+        Buffer* current_buffer = vertex_buffer_slots[ attrib_to_semantics_table[i]->slot ];
         
         current_buffer->Bind();
         BindBufferBySemantics(*(attrib_to_semantics_table[i]), base_vertex, current_buffer->GetDataPointer());
@@ -330,30 +378,32 @@ struct InputStage::Impl: public ContextObject
     
 private:
   IInputLayoutState*  input_state;
-  IBuffer*            vertex_buffer_slots[MAX_VERTEX_BUFFER_SLOTS];
-  IBuffer*            index_buffer;
+  Buffer*             vertex_buffer_slots[DEVICE_VERTEX_BUFFER_SLOTS_COUNT];
+  Buffer*             index_buffer;
+  size_t              max_texture_units_count;
+
+  stl::vector<InputDataType>   position_types_supported,
+                               normal_types_supported,
+                               color_types_supported,
+                               texcoord_types_supported;
+  stl::vector<InputDataFormat> position_formats_supported,
+                               normal_formats_supported,
+                               color_formats_supported,
+                               texcoord_formats_supported;
 
   void BindBufferBySemantics (VertexAttribute attribute,
                               size_t base_vertex,
                               const void* base_data)
-  {
+  {    
     GLint size;
     GLenum type;
     
-    static Extension  ARB_multitexture = "GL_ARB_multitexture",
-                      GL_version_1_3   = "GL_VERSION_1_3";
-    size_t            texunits_num = 1;
-    
-    bool has_ARB_multitexture =    GetContextManager().IsSupported(ARB_multitexture)
-                                || GetContextManager().IsSupported(GL_version_1_3);
-    
-    if (has_ARB_multitexture)
-    {
-      glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, (GLint*)&texunits_num);
-    }    
-    
     size_t type_size;
+    size_t texunit = 0;
     
+    ///////////////////////////////////////////
+    /// Преобразование формата буфера
+    ///////////////////////////////////////////
     switch (attribute.format)
     {
       case InputDataFormat_Vector1:
@@ -376,7 +426,9 @@ private:
         RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
                              "attribute.format", attribute.format, "Unknown InputDataFormat value supplied!"); 
     }
-
+    ///////////////////////////////////////////
+    /// Преобразование типа данных буфера
+    ///////////////////////////////////////////
     switch (attribute.type)
     {
       case InputDataType_Byte:
@@ -411,250 +463,136 @@ private:
         RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
                              "attribute.type", attribute.type, "Unknown InputDataType value supplied!");         
     }
-    
+    ///////////////////////////////////////////
+    /// Расчёт начального адреса данных
+    ///////////////////////////////////////////
     const void* data = ( (const char*)base_data ) + attribute.offset + base_vertex * (type_size + attribute.stride);
-
+    ///////////////////////////////////////////
+    /// Перебор семантик
+    ///////////////////////////////////////////
     switch (attribute.semantic)
     {
+      ///////////////////////////////////////////
+      /// Координаты
+      ///////////////////////////////////////////
       case VertexAttributeSemantic_Position:
-        switch (attribute.format)
-        {
-          case InputDataFormat_Vector1:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.format", get_name(attribute.format),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_Position semantic!");
-        }
+        if (!IsParamSupported(attribute.format, position_formats_supported))
+          RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                               "attribute.format", get_name(attribute.format),
+                               "This InputDataType is not supported by the VertexAttributeSemantic_Position semantic!");
         
-        switch (attribute.type)
-        {
-          case InputDataType_Byte:
-          case InputDataType_UByte:
-          case InputDataType_UShort:
-          case InputDataType_UInt:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.type", get_name(attribute.type),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_Position semantic!");
-        }
+        if (!IsParamSupported(attribute.type, position_types_supported))
+          RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                               "attribute.type", get_name(attribute.type),
+                               "This InputDataType is not supported by the VertexAttributeSemantic_Position semantic!");
 
         glVertexPointer(size, type, attribute.stride, data);
         break;
-
+      ///////////////////////////////////////////
+      /// Нормали
+      ///////////////////////////////////////////
       case VertexAttributeSemantic_Normal:
-        switch (attribute.type)
-        {
-          case InputDataType_UByte:
-          case InputDataType_UShort:
-          case InputDataType_UInt:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.type", get_name(attribute.type),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_Normal semantic!");
-        }
+        if (!IsParamSupported(attribute.format, normal_formats_supported))
+          RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                               "attribute.format", get_name(attribute.format),
+                               "This InputDataType is not supported by the VertexAttributeSemantic_Normal semantic!");
+        
+        if (!IsParamSupported(attribute.type, normal_types_supported))
+          RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                               "attribute.type", get_name(attribute.type),
+                               "This InputDataType is not supported by the VertexAttributeSemantic_Normal semantic!");
 
         glNormalPointer(type, attribute.stride, data);
         break;
+      ///////////////////////////////////////////
+      /// Цвета
+      ///////////////////////////////////////////
       case VertexAttributeSemantic_Color:
-        switch (attribute.format)
-        {
-          case InputDataFormat_Vector1:
-          case InputDataFormat_Vector2:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.format", get_name(attribute.format),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_Color semantic!");
-        }
+        if (!IsParamSupported(attribute.format, color_formats_supported))
+          RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                               "attribute.format", get_name(attribute.format),
+                               "This InputDataType is not supported by the VertexAttributeSemantic_Color semantic!");
+        
+        if (!IsParamSupported(attribute.type, color_types_supported))
+          RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                               "attribute.type", get_name(attribute.type),
+                               "This InputDataType is not supported by the VertexAttributeSemantic_Color semantic!");
         
         glColorPointer(size, type, attribute.stride, data);
         break;
+      ///////////////////////////////////////////
+      /// Касательные
+      ///////////////////////////////////////////
       case VertexAttributeSemantic_Tangent:
         //break;
+      ///////////////////////////////////////////
+      /// Бинормали
+      ///////////////////////////////////////////
       case VertexAttributeSemantic_Binormal:
         RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
                           "The semantic %s support is not implemented yet", get_name(attribute.semantic));
         break;
+      ///////////////////////////////////////////
+      /// Основной буфер текстурных координат
+      ///////////////////////////////////////////
       case VertexAttributeSemantic_TexCoord0:
-        if (has_ARB_multitexture)
+        if (!IsParamSupported(attribute.format, texcoord_formats_supported))
+          RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                               "attribute.format", get_name(attribute.format),
+                               "This InputDataFormat is not supported by the VertexAttributeSemantic_TexCoord semantics!");
+                               
+        if (!IsParamSupported(attribute.type, texcoord_types_supported))
+          RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                               "attribute.type", get_name(attribute.type),
+                               "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord semantics!");
+        
+        if (has_ARB_multitexture())
           glActiveTexture(GL_TEXTURE0);
 
-        switch (attribute.type)
-        {
-          case InputDataType_Byte:
-          case InputDataType_UByte:
-          case InputDataType_UShort:
-          case InputDataType_UInt:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.type", get_name(attribute.type),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
-        }
-        
         glTexCoordPointer(size, type, attribute.stride, data);
         break;
+      ///////////////////////////////////////////
+      /// Дополнительные буферы текстурных координат
+      ///////////////////////////////////////////
       case VertexAttributeSemantic_TexCoord1:
-        if (!has_ARB_multitexture)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing is not supported");
-
-        if (texunits_num < 2)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 2);
-          
-        glActiveTexture(GL_TEXTURE1);
-        
-        switch (attribute.type)
-        {
-          case InputDataType_Byte:
-          case InputDataType_UByte:
-          case InputDataType_UShort:
-          case InputDataType_UInt:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.type", get_name(attribute.type),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
-        }
-        
-        glTexCoordPointer(size, type, attribute.stride, data);
-        break;
+        //break;
       case VertexAttributeSemantic_TexCoord2:
-        if (!has_ARB_multitexture)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing is not supported");
-
-        if (texunits_num < 3)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 3);
-          
-        glActiveTexture(GL_TEXTURE2);
-        
-        switch (attribute.type)
-        {
-          case InputDataType_Byte:
-          case InputDataType_UByte:
-          case InputDataType_UShort:
-          case InputDataType_UInt:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.type", get_name(attribute.type),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
-        }
-        
-        glTexCoordPointer(size, type, attribute.stride, data);
-        break;
+        //break;
       case VertexAttributeSemantic_TexCoord3:
-        if (!has_ARB_multitexture)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing is not supported");
-
-        if (texunits_num < 4)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 4);
-          
-        glActiveTexture(GL_TEXTURE3);
-        
-        switch (attribute.type)
-        {
-          case InputDataType_Byte:
-          case InputDataType_UByte:
-          case InputDataType_UShort:
-          case InputDataType_UInt:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.type", get_name(attribute.type),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
-        }
-        
-        glTexCoordPointer(size, type, attribute.stride, data);
-        break;
+        //break;
       case VertexAttributeSemantic_TexCoord4:
-        if (!has_ARB_multitexture)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing is not supported");
-
-        if (texunits_num < 5)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 5);
-          
-        glActiveTexture(GL_TEXTURE4);
-        
-        switch (attribute.type)
-        {
-          case InputDataType_Byte:
-          case InputDataType_UByte:
-          case InputDataType_UShort:
-          case InputDataType_UInt:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.type", get_name(attribute.type),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
-        }
-        
-        glTexCoordPointer(size, type, attribute.stride, data);
-        break;
+        //break;
       case VertexAttributeSemantic_TexCoord5:
-        if (!has_ARB_multitexture)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing is not supported");
-
-        if (texunits_num < 6)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 6);
-          
-        glActiveTexture(GL_TEXTURE5);
-        
-        switch (attribute.type)
-        {
-          case InputDataType_Byte:
-          case InputDataType_UByte:
-          case InputDataType_UShort:
-          case InputDataType_UInt:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.type", get_name(attribute.type),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
-        }
-        
-        glTexCoordPointer(size, type, attribute.stride, data);
-        break;
+        //break;
       case VertexAttributeSemantic_TexCoord6:
-        if (!has_ARB_multitexture)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing is not supported");
-
-        if (texunits_num < 7)
-          RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 7);
-          
-        glActiveTexture(GL_TEXTURE6);
-        
-        switch (attribute.type)
-        {
-          case InputDataType_Byte:
-          case InputDataType_UByte:
-          case InputDataType_UShort:
-          case InputDataType_UInt:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.type", get_name(attribute.type),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
-        }
-        
-        glTexCoordPointer(size, type, attribute.stride, data);
-        break;
+        //break;
       case VertexAttributeSemantic_TexCoord7:
-        if (!has_ARB_multitexture)
+        if (!has_ARB_multitexture())
           RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
                             "Multitexturing is not supported");
 
-        if (texunits_num < 8)
+        texunit = attribute.semantic - VertexAttributeSemantic_TexCoord0;
+        if (texunit > max_texture_units_count)
           RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                            "Multitexturing supports only %d texture units instead of %d requested", texunits_num, 8);
+                            "Multitexturing supports only %d texture units instead of %d requested",
+                            max_texture_units_count, texunit);
           
-        glActiveTexture(GL_TEXTURE7);
+        if (!IsParamSupported(attribute.format, texcoord_formats_supported))
+          RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                               "attribute.format", get_name(attribute.format),
+                               "This InputDataFormat is not supported by the VertexAttributeSemantic_TexCoord semantics!");
+                               
+        if (!IsParamSupported(attribute.type, texcoord_types_supported))
+          RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
+                               "attribute.type", get_name(attribute.type),
+                               "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord semantics!");
         
-        switch (attribute.type)
-        {
-          case InputDataType_Byte:
-          case InputDataType_UByte:
-          case InputDataType_UShort:
-          case InputDataType_UInt:
-            RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                                 "attribute.type", get_name(attribute.type),
-                                 "This InputDataType is not supported by the VertexAttributeSemantic_TexCoord0 semantic!");
-        }
-        
+        glActiveTexture(GL_TEXTURE0 + texunit);
         glTexCoordPointer(size, type, attribute.stride, data);
         break;
+      ///////////////////////////////////////////
+      /// Какой-то инфлюэнс...
+      ///////////////////////////////////////////
       case VertexAttributeSemantic_Influence:
         RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
                           "The semantic %s support is not implemented yet", get_name(attribute.semantic));
@@ -664,6 +602,30 @@ private:
                              "attribute.semantic", attribute.semantic, "Unknown VertexAttributeSemantic supplied!"); 
     }
   }
+
+  ///////////////////////////////////////////
+  /// Проверка поддержки мультитекстурирования
+  ///////////////////////////////////////////
+  bool has_ARB_multitexture()
+  {
+    static Extension  ARB_multitexture = "GL_ARB_multitexture",
+                      GL_version_1_3   = "GL_VERSION_1_3";
+    
+    return GetContextManager().IsSupported(ARB_multitexture) || GetContextManager().IsSupported(GL_version_1_3);    
+  }
+  
+  ///////////////////////////////////////////
+  /// Проверка поддержки типа данных по списку
+  ///////////////////////////////////////////
+  template <typename T>
+  bool IsParamSupported(T param, const stl::vector<T> &pack)
+  {
+    for (stl::vector<T>::const_iterator i = pack.begin(); i != pack.end(); i++)
+      if (*i == param)
+        return true;
+    
+    return false;
+  }  
 };
 
 /*
