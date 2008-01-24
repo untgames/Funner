@@ -203,6 +203,20 @@ struct InputStage::Impl: public ContextObject
     }
     
     input_state = state;
+    
+    InputLayoutDesc desc;
+    input_state->GetDesc(desc);
+    
+    for (int i = 0; i < VertexAttributeSemantic_Num; i++)
+      attribute_table[i] = NULL;
+    
+    for (size_t i = 0; i < desc.vertex_attributes_count; i++)
+      attribute_table[desc.vertex_attributes[i].semantic] = &desc.vertex_attributes[i];
+    
+    MakeContextCurrent();
+
+    for (int i = 0; i < VertexAttributeSemantic_Num; i++)
+      SetSemanticClientState(static_cast<VertexAttributeSemantic>(i), attribute_table[i]!=NULL?true:false);
   }
   
   //////////////////////////////////////////
@@ -238,7 +252,6 @@ struct InputStage::Impl: public ContextObject
       RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::CreateVertexBuffer (const BufferDesc& desc)",
                            "desc.bind_flags", get_name((BindFlag)desc.bind_flags),
                            "Buffer descriptor must include VertexBuffer binding support");
-
   
     vertex_buffer_slots[vertex_buffer_slot] = cast_object<Buffer>(GetContextManager(), buffer,
                                                                   "render::low_level::opengl::InputStage::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)",
@@ -284,33 +297,7 @@ struct InputStage::Impl: public ContextObject
     if (!index_buffer)
       RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::GetIndices()", "IndexBuffer is not set, use SetIndexBuffer(size_t, IBuffer*) first!");
 
-    if (!input_state)
-      RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::GetIndices()", "InputLayoutState is not set, use SetInputLayoutState (IInputLayoutState* state) first!");
-    
-    InputLayoutDesc desc;
-    input_state->GetDesc(desc);
-    
-    size_t index_size;
-    switch (desc.index_type)
-    {
-      case InputDataType_UByte:
-        index_size = sizeof (unsigned char);
-        break;
-      case InputDataType_UShort:
-        index_size = sizeof (unsigned short);
-        break;
-      case InputDataType_UInt:
-        index_size = sizeof (unsigned int);
-        break;
-      default:
-        RaiseInvalidArgument( "render::low_level::opengl::InputStage::Impl::GetIndices()",
-                              "InputLayoutDesc::index_type",
-                              get_name((InputDataType)desc.index_type),
-                              "Index Data type must be a 1, 2 or 4 byte unsigned number");
-        break;
-    }
-        
-    return ((char*)index_buffer->GetDataPointer()) + index_size * desc.index_buffer_offset;
+    return static_cast<char*>(index_buffer->GetDataPointer()) + full_index_offset;
     //RaiseNotImplemented ("render::low_level::opengl::InputStage::Impl::GetIndices()");
     //return 0;
   }
@@ -330,48 +317,56 @@ struct InputStage::Impl: public ContextObject
     
   void Bind(size_t base_vertex, size_t base_index)
   {
-    ///////////////////////////////////////////
-    /// Биндинг индексного буфера
-    ///////////////////////////////////////////
     if (!input_state)
       RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::Bind()", "InputLayoutState is not set, use SetInputLayoutState (IInputLayoutState* state) first!");
     
+    ///////////////////////////////////////////
+    /// Биндинг индексного буфера, по сути настройка
+    /// смещения для GetIndices()
+    ///////////////////////////////////////////
     InputLayoutDesc desc;
     input_state->GetDesc(desc);
     
-    if (!index_buffer)
-      RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::Bind()", "IndexBuffer is not set, use SetIndexBuffer (IBuffer* buffer) first!");
+    size_t index_size;
+    switch (desc.index_type)
+    {
+      case InputDataType_UByte:
+        index_size = sizeof (unsigned char);
+        break;
+      case InputDataType_UShort:
+        index_size = sizeof (unsigned short);
+        break;
+      case InputDataType_UInt:
+        index_size = sizeof (unsigned int);
+        break;
+      default:
+        RaiseInvalidArgument( "render::low_level::opengl::InputStage::Impl::Bind()",
+                              "InputLayoutDesc::index_type",
+                              get_name((InputDataType)desc.index_type),
+                              "Index Data type must be a 1, 2 or 4 byte unsigned number");
+    }
     
-    desc.index_buffer_offset = base_index;
-    input_state->SetDesc(desc);
-    
+    full_index_offset = desc.index_buffer_offset + base_index*index_size;
+
     ///////////////////////////////////////////
     /// Биндинг вершинных буферов
     ///////////////////////////////////////////
 
     MakeContextCurrent();
     
-    VertexAttribute*  attrib_to_semantics_table[VertexAttributeSemantic_Num];
-    
-    for (VertexAttribute **ptr = attrib_to_semantics_table, **end = ptr + VertexAttributeSemantic_Num; ptr < end; ptr++)
-      *ptr = NULL;
-    
-    for (size_t i = 0; i < desc.vertex_attributes_count; i++)
-      attrib_to_semantics_table[ desc.vertex_attributes[i].semantic ] = &desc.vertex_attributes[i];
-    
     for (int i = VertexAttributeSemantic_Num - 1; i >=0; i--)
     {
-      if (attrib_to_semantics_table[i])
+      if (attribute_table[i])
       {
-        if (!(vertex_buffer_slots[ attrib_to_semantics_table[i]->slot ]))
+        if (!(vertex_buffer_slots[ attribute_table[i]->slot ]))
           RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::Bind()",
                                 "VertexBuffer in slot %d is not set! Check slot index in VertexAttributes list or set buffer with SetVertexBuffer(...)!",
-                                attrib_to_semantics_table[i]->slot);
+                                attribute_table[i]->slot);
         
-        Buffer* current_buffer = vertex_buffer_slots[ attrib_to_semantics_table[i]->slot ];
+        Buffer* current_buffer = vertex_buffer_slots[ attribute_table[i]->slot ];
         
         current_buffer->Bind();
-        BindBufferBySemantics(*(attrib_to_semantics_table[i]), base_vertex, current_buffer->GetDataPointer());
+        BindBufferBySemantics(*(attribute_table[i]), base_vertex, current_buffer->GetDataPointer());
       }
     }
   }
@@ -381,6 +376,9 @@ private:
   Buffer*             vertex_buffer_slots[DEVICE_VERTEX_BUFFER_SLOTS_COUNT];
   Buffer*             index_buffer;
   size_t              max_texture_units_count;
+  size_t              full_index_offset;
+  
+  VertexAttribute*    attribute_table[VertexAttributeSemantic_Num];
 
   stl::vector<InputDataType>   position_types_supported,
                                normal_types_supported,
@@ -626,6 +624,55 @@ private:
     
     return false;
   }  
+  
+  ///////////////////////////////////////////
+  /// Включение/выключение клиентстэйта
+  ///////////////////////////////////////////
+  void SetClientState(GLenum state, bool enable)
+  {
+    if (enable)
+      glEnableClientState(state);
+    else
+      glDisableClientState(state);    
+  }
+  
+  void SetSemanticClientState(VertexAttributeSemantic semantic, bool enable)
+  {
+    switch (semantic)
+    {
+      case VertexAttributeSemantic_Position:
+        SetClientState(GL_VERTEX_ARRAY, enable);
+        break;
+      case VertexAttributeSemantic_Normal:
+        SetClientState(GL_NORMAL_ARRAY, enable);
+        break;
+      case VertexAttributeSemantic_Color:
+        SetClientState(GL_COLOR_ARRAY, enable);
+        break;
+      case VertexAttributeSemantic_Tangent:
+        //SetClientState(, enable);
+        break;
+      case VertexAttributeSemantic_Binormal:
+        //SetClientState(, enable);
+        break;
+      case VertexAttributeSemantic_TexCoord0:
+      case VertexAttributeSemantic_TexCoord1:
+      case VertexAttributeSemantic_TexCoord2:
+      case VertexAttributeSemantic_TexCoord3:
+      case VertexAttributeSemantic_TexCoord4:
+      case VertexAttributeSemantic_TexCoord5:
+      case VertexAttributeSemantic_TexCoord6:
+      case VertexAttributeSemantic_TexCoord7:
+        SetClientState(GL_TEXTURE_COORD_ARRAY, enable);
+        break;
+      case VertexAttributeSemantic_Influence:
+        //SetClientState(, enable);
+        break;
+      default:
+        RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::SetSemanticClientState (VertexAttributeSemantic semantic, bool enable)",
+                             "semantic", semantic, "Unknown VertexAttributeSemantic supplied!"); 
+    }
+  }
 };
 
 /*
