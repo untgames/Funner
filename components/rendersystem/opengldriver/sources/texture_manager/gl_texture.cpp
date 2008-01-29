@@ -155,7 +155,7 @@ void Texture::GetData
     //получение информации о текстуре
     
   GLenum layer_target  = GetLayerTarget (layer);
-  bool   is_full_image = width == level_width && height == level_height && desc.layers == 1;
+  bool   is_full_image = width == level_width && height == level_height && desc.layers == 1 && !x && !y;
          
   if (is_compressed_format (target_format))
   {
@@ -164,13 +164,55 @@ void Texture::GetData
     if (!ext.has_ext_texture_compression_s3tc)
       common::RaiseNotSupported (METHOD_NAME, "Texture packing not supported (GL_EXT_texture_compression_s3tc not supported)");
       
+    if (target_format != desc.format)
+      common::RaiseNotSupported (METHOD_NAME, "Can't get compressed texture data, target format %s mismatch with texture format %s", 
+                         get_name (target_format), get_name (desc.format));
+ 
     if (is_full_image)
     {
       glGetCompressedTexImage (layer_target, mip_level, buffer);      
     }
     else
     {
-      common::RaiseNotImplemented ("Texture::GetData(compressed)");
+      static const size_t DXT_EDGE_SIZE  = 4,
+                          DXT_BLOCK_SIZE = DXT_EDGE_SIZE * DXT_EDGE_SIZE;
+
+      if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))          common::RaiseNotSupported (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
+      if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) common::RaiseNotSupported (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);
+
+        //Переход к размерности блока в DXT
+
+      x      /= DXT_EDGE_SIZE;
+      y      /= DXT_EDGE_SIZE;
+      width  /= DXT_EDGE_SIZE;
+      height /= DXT_EDGE_SIZE;
+
+        //Копирование полного образа во временный буфер
+
+
+      size_t quad_size  = compressed_quad_size (target_format),
+             layer_size = level_width * level_height / DXT_BLOCK_SIZE * quad_size;
+      
+      xtl::uninitialized_storage<char> temp_buffer (layer_size * desc.layers);
+
+      glGetCompressedTexImage (layer_target, mip_level, temp_buffer.data ());      
+
+        //копирование части образа в пользовательсий буфер
+               
+      size_t quad_line_size = level_width / DXT_EDGE_SIZE * quad_size,
+             start_offset   = layer * layer_size + y * quad_line_size + x * quad_size,
+             block_size     = width * quad_size;
+      
+      const char* src = temp_buffer.data () + start_offset;
+      char*       dst = reinterpret_cast<char*> (buffer);
+      
+      for (size_t i = 0; i < height; i++)
+      {
+        memcpy (dst, src, block_size);
+
+        src += quad_line_size;
+        dst += block_size;
+      }
     }
   }
   else
@@ -180,6 +222,8 @@ void Texture::GetData
     GLenum gl_tex_format = gl_format (target_format),
            gl_tex_type   = gl_type (target_format);
       
+    //!!! Учесть случай RGB 3D текстур
+
     if (is_full_image)
     {
       glGetTexImage (layer_target, mip_level, gl_tex_format, gl_tex_type, buffer);

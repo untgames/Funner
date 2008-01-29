@@ -7,7 +7,7 @@ using namespace render::low_level::opengl;
 namespace
 {
 
-struct TextureExtensions
+struct TextureManagerExtensions
 {
   bool has_ext_texture_rectangle;        //GL_EXT_texture_rectangle
   bool has_ext_texture3D;                //GL_EXT_texture3D
@@ -17,7 +17,7 @@ struct TextureExtensions
   bool has_arb_texture_non_power_of_two; //GL_ARB_texture_non_power_of_two
   bool has_arb_depth_texture;            //GL_ARB_depth_texture
   
-  TextureExtensions (const ContextManager& manager)
+  TextureManagerExtensions (const ContextManager& manager)
   {
     static Extension EXT_texture_rectangle        = "GL_EXT_texture_rectangle",
                      EXT_texture3D                = "GL_EXT_texture3D",
@@ -84,7 +84,7 @@ TextureManager::Impl::Impl (const ContextManager& context_manager)
 {
   MakeContextCurrent ();
 
-  TextureExtensions ext (context_manager);
+  TextureManagerExtensions ext (context_manager);
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_texture_size);
   if (ext.has_ext_texture_rectangle)
@@ -111,7 +111,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
   
   MakeContextCurrent ();
 
-  TextureExtensions ext (GetContextManager ());
+  TextureManagerExtensions ext (GetContextManager ());
 
   GLint width;
   TextureDesc temp_desc = tex_desc;            
