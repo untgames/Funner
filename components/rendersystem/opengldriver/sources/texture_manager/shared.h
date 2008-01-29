@@ -2,7 +2,11 @@
 #define RENDER_GL_DRIVER_TEXTURE_SHARED_HEADER
 
 #include <math.h>
+
 #include <common/exception.h>
+
+#include <xtl/uninitialized_storage.h>
+
 #include <shared/texture_manager.h>
 #include <shared/context_object.h>
 
@@ -232,13 +236,12 @@ void scale_image         (PixelFormat format, size_t width,     size_t height,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с DXT форматом при остутствии аппаратной поддержки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void   unpack_dxt (PixelFormat format, size_t width, size_t height, const void* dxt_data,      void* unpacked_data); //распаковка dxt
-void   pack_dxt   (PixelFormat format, size_t width, size_t height, const void* unpacked_data, void* dxt_data);      //упаковка dxt
-GLint  unpack_internal_format (PixelFormat format);                                                                  //распакованный внутренний формат OpenGL
-GLenum unpack_type            (PixelFormat format);                                                                  //распакованный тип OpenGL
-size_t unpack_texel_size      (PixelFormat format);                                                                  //размер распакованного текселя в байтах
-GLenum unpack_format          (PixelFormat format);                                                                  //распакованный формат OpenGL
-PixelFormat unpack_pf         (PixelFormat format);                                                                  //распакованный формат
+void   unpack_dxt (PixelFormat format, size_t width, size_t height, const void* dxt_data, void* unpacked_data); //распаковка dxt
+GLint  unpack_internal_format (PixelFormat format);                                                             //распакованный внутренний формат OpenGL
+GLenum unpack_type            (PixelFormat format);                                                             //распакованный тип OpenGL
+size_t unpack_texel_size      (PixelFormat format);                                                             //размер распакованного текселя в байтах
+GLenum unpack_format          (PixelFormat format);                                                             //распакованный формат OpenGL
+PixelFormat unpack_pf         (PixelFormat format);                                                             //распакованный формат
 
 }
 

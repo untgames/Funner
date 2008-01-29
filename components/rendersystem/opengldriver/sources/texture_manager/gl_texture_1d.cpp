@@ -70,16 +70,14 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   
   if (desc.generate_mips_enable && !mip_level && !has_SGIS_generate_mipmap)
   {
-    char* source_buffer = (char*)buffer;
-    char* mip_buffer = new char [width >> 1 * texel_size (source_format)];
+    const char* source_buffer = (char*)buffer;   //!!!!!!!!!!!
+    xtl::uninitialized_storage <char> mip_buffer (width / 2 * texel_size (source_format));
 
     for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
     {
-      scale_image_2x_down (source_format, width >> i, 1, source_buffer, mip_buffer);
-      glTexSubImage1D (GL_TEXTURE_1D, i, x >> i, width >> i, gl_format (source_format), gl_type (source_format), mip_buffer);
+      scale_image_2x_down (source_format, width >> i, 1, source_buffer, mip_buffer.data ());
+      glTexSubImage1D (GL_TEXTURE_1D, i, x >> i, width >> i, gl_format (source_format), gl_type (source_format), mip_buffer.data ());
     }
-
-    delete [] mip_buffer;
   }
 
   CheckErrors ("render::low_level::opengl::Texture1D::SetData");

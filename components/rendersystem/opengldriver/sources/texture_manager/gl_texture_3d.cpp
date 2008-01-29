@@ -135,12 +135,10 @@ void Texture3D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
                                  ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
     else
     {
-      char* unpacked_buffer = new char [width * height * unpack_texel_size (source_format)];
+      xtl::uninitialized_storage <char> unpacked_buffer (width * height * unpack_texel_size (source_format));
 
-      unpack_dxt (source_format, width, height, buffer, unpacked_buffer);
-      glTexSubImage3D (GL_TEXTURE_3D_EXT, mip_level, x, y, layer, width, height, 1, unpack_format (source_format), unpack_type (source_format), unpacked_buffer);
-
-      delete [] unpacked_buffer;
+      unpack_dxt (source_format, width, height, buffer, unpacked_buffer.data ());
+      glTexSubImage3D (GL_TEXTURE_3D_EXT, mip_level, x, y, layer, width, height, 1, unpack_format (source_format), unpack_type (source_format), unpacked_buffer.data ());
     }
   }
   else
@@ -158,22 +156,20 @@ void Texture3D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
       if (height > 1)
         height = height >> 1;
 
-      char* source_buffer = (char*)buffer;
-      char* mip_buffer = new char [width * height * texel_size (source_format)];
+      char* source_buffer = (char*)buffer; //!!!!
+      xtl::uninitialized_storage <char> mip_buffer (width * height * texel_size (source_format));
 
       for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
       {
-        scale_image_2x_down (source_format, width, height, source_buffer, mip_buffer);
+        scale_image_2x_down (source_format, width, height, source_buffer, mip_buffer.data ());
 
-        glTexSubImage3D (GL_TEXTURE_3D_EXT, i, x, y, layer, width, height, 1, gl_format (source_format), gl_type (source_format), mip_buffer);
+        glTexSubImage3D (GL_TEXTURE_3D_EXT, i, x, y, layer, width, height, 1, gl_format (source_format), gl_type (source_format), mip_buffer.data ());
 
         if (width > 1)
           width = width >> 1;
         if (height > 1)
           height = height >> 1;
       }
-
-      delete [] mip_buffer;
     }
   }
 
@@ -182,28 +178,34 @@ void Texture3D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 
 void Texture3D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::Texture3D::GetData";
+
   Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer);
 
   if (mip_level > mips_count)
-    RaiseOutOfRange ("render::low_level::opengl::Texture3D::GetData", "mip_level", mip_level, (size_t)0, mips_count);
+    RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, (size_t)0, mips_count);
+
   if (x)
-    RaiseOutOfRange ("render::low_level::opengl::Texture3D::GetData", "x", x, (size_t)0, (size_t)0);
+    RaiseOutOfRange (METHOD_NAME, "x", x, (size_t)0, (size_t)0);
+
   if (y)
-    RaiseOutOfRange ("render::low_level::opengl::Texture3D::GetData", "y", y, (size_t)0, (size_t)0);
+    RaiseOutOfRange (METHOD_NAME, "y", y, (size_t)0, (size_t)0);
+  
   if (width != (desc.width >> mip_level))
-    RaiseOutOfRange ("render::low_level::opengl::Texture3D::GetData", "width", width, desc.width >> mip_level, desc.width >> mip_level);
+    RaiseOutOfRange (METHOD_NAME, "width", width, desc.width >> mip_level, desc.width >> mip_level);
+  
   if (height != (desc.height >> mip_level))
-    RaiseOutOfRange ("render::low_level::opengl::Texture3D::GetData", "height", height, desc.height >> mip_level, desc.height >> mip_level);
+    RaiseOutOfRange (METHOD_NAME, "height", height, desc.height >> mip_level, desc.height >> mip_level);
+  
   if (is_compressed_format (target_format))
     if (target_format != desc.format)
-      RaiseInvalidArgument ("render::low_level::opengl::Texture3D::GetData", "target_format", target_format, "Can't get compressed texture data, format is different.");
+      RaiseInvalidArgument (METHOD_NAME, "target_format", target_format, "Can't get compressed texture data, format is different.");
 
   MakeContextCurrent ();
   Bind ();
 
   TextureExtensions ext (GetContextManager ());
 
-  char*  temp_buffer;
   size_t layer_size;
   
   if (is_compressed_format (target_format) && ext.has_ext_texture_compression_s3tc)
@@ -215,24 +217,23 @@ void Texture3D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     else
       layer_size = width * height * texel_size (target_format);
   }
-  temp_buffer = new char [layer_size * desc.layers];
+
+  xtl::uninitialized_storage <char> temp_buffer (layer_size * desc.layers);
 
   if (is_compressed_format (target_format))
   {
     if (ext.has_ext_texture_compression_s3tc)
-      glGetCompressedTexImage (GL_TEXTURE_3D_EXT, mip_level, temp_buffer);
+      glGetCompressedTexImage (GL_TEXTURE_3D_EXT, mip_level, temp_buffer.data ());
     else
-      glGetTexImage (GL_TEXTURE_3D_EXT, mip_level, unpack_format (target_format), unpack_type (target_format), temp_buffer);
+      glGetTexImage (GL_TEXTURE_3D_EXT, mip_level, unpack_format (target_format), unpack_type (target_format), temp_buffer.data ());
   }
   else
-    glGetTexImage (GL_TEXTURE_3D_EXT, mip_level, gl_format (target_format), gl_type (target_format), temp_buffer);
+    glGetTexImage (GL_TEXTURE_3D_EXT, mip_level, gl_format (target_format), gl_type (target_format), temp_buffer.data ());
   
   if (is_compressed_format (target_format) && !ext.has_ext_texture_compression_s3tc)
-    pack_dxt (target_format, width, height, temp_buffer + layer_size * layer, buffer);
+    RaiseNotSupported (METHOD_NAME, "Texture packing not supported. Reason: GL_EXT_texture_compression_s3tc not supported.");
   else
-    memcpy (buffer, temp_buffer + layer_size * layer, layer_size);
+    memcpy (buffer, temp_buffer.data () + layer_size * layer, layer_size);
   
-  delete [] temp_buffer;  
-
-  CheckErrors ("render::low_level::opengl::Texture3D::GetData");
+  CheckErrors (METHOD_NAME);
 }

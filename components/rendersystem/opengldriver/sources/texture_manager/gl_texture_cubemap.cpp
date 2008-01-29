@@ -141,19 +141,19 @@ void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y
                                  ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
     else
     {
-      char* unpacked_buffer = new char [width * height * unpack_texel_size (source_format)];
+      xtl::uninitialized_storage <char> unpacked_buffer (width * height * unpack_texel_size (source_format));
 
-      unpack_dxt (source_format, width, height, buffer, unpacked_buffer);
-      glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, unpack_format (source_format), unpack_type (source_format), unpacked_buffer);
-
-      delete [] unpacked_buffer;
+      unpack_dxt (source_format, width, height, buffer, unpacked_buffer.data ());
+      glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, unpack_format (source_format), unpack_type (source_format), unpacked_buffer.data ());
     }
   }
   else
   {
     if (mip_level && ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, false); 
+    
     glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, gl_format (source_format), gl_type (source_format), buffer);
+    
     if (mip_level && ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, true);
 
@@ -164,22 +164,20 @@ void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y
       if (height > 1)
         height = height >> 1;
 
-      char* source_buffer = (char*)buffer;
-      char* mip_buffer = new char [width * height * texel_size (source_format)];
+      char* source_buffer = (char*)buffer; //!!!!!!1
+      xtl::uninitialized_storage <char> mip_buffer (width * height * texel_size (source_format));
 
       for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
       {
-        scale_image_2x_down (source_format, width, height, source_buffer, mip_buffer);
+        scale_image_2x_down (source_format, width, height, source_buffer, mip_buffer.data ());
 
-        glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, i, x, y, width, height, gl_format (source_format), gl_type (source_format), mip_buffer);
+        glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, i, x, y, width, height, gl_format (source_format), gl_type (source_format), mip_buffer.data ());
 
         if (width > 1)
           width = width >> 1;
         if (height > 1)
           height = height >> 1;
       }
-
-      delete [] mip_buffer;
     }
   }
 
@@ -188,23 +186,25 @@ void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y
 
 void TextureCubemap::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::TextureCubemap::GetData";
+
   Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer);
 
   if (layer > 5)
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::GetData", "layer", layer, (size_t)0, (size_t)5);
+    RaiseOutOfRange (METHOD_NAME, "layer", layer, (size_t)0, (size_t)5);
   if (mip_level > mips_count)
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::GetData", "mip_level", mip_level, (size_t)0, mips_count);
+    RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, (size_t)0, mips_count);
   if (x)
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::GetData", "x", x, (size_t)0, (size_t)0);
+    RaiseOutOfRange (METHOD_NAME, "x", x, (size_t)0, (size_t)0);
   if (y)
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::GetData", "y", y, (size_t)0, (size_t)0);
+    RaiseOutOfRange (METHOD_NAME, "y", y, (size_t)0, (size_t)0);
   if (width != (desc.width >> mip_level))
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::GetData", "width", width, desc.width >> mip_level, desc.width >> mip_level);
+    RaiseOutOfRange (METHOD_NAME, "width", width, desc.width >> mip_level, desc.width >> mip_level);
   if (height != (desc.height >> mip_level))
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::GetData", "height", height, desc.height >> mip_level, desc.height >> mip_level);
+    RaiseOutOfRange (METHOD_NAME, "height", height, desc.height >> mip_level, desc.height >> mip_level);
   if (is_compressed_format (target_format))
     if (target_format != desc.format)
-      RaiseInvalidArgument ("render::low_level::opengl::TextureCubemap::GetData", "target_format", target_format, "Can't get compressed texture data, format is different.");
+      RaiseInvalidArgument (METHOD_NAME, "target_format", target_format, "Can't get compressed texture data, format is different.");
 
   MakeContextCurrent ();
   Bind ();
@@ -216,17 +216,10 @@ void TextureCubemap::GetData (size_t layer, size_t mip_level, size_t x, size_t y
     if (ext.has_ext_texture_compression_s3tc)
       glGetCompressedTexImage (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, buffer);
     else
-    {
-      char* unpacked_buffer = new char [width * height * unpack_texel_size (target_format)];
-
-      glGetTexImage (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, unpack_format (target_format), unpack_type (target_format), unpacked_buffer);
-      pack_dxt      (target_format, width, height, unpacked_buffer, buffer);
-
-      delete [] unpacked_buffer;
-    }
+      RaiseNotSupported (METHOD_NAME, "Texture packing not supported. Reason: GL_EXT_texture_compression_s3tc not supported.");
   }
   else
     glGetTexImage (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, gl_format (target_format), gl_type (target_format), buffer);
   
-  CheckErrors ("render::low_level::opengl::TextureCubemap::GetData");
+  CheckErrors (METHOD_NAME);
 }

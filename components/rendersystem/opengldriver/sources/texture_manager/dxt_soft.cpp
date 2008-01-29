@@ -1,9 +1,5 @@
 #include "shared.h"
 #include "nvidia_texture_tools/BlockDXT.h"
-#include "nvidia_texture_tools/FastCompressDXT.h"
-#include "nvidia_texture_tools/squish/colourset.h"
-#include "nvidia_texture_tools/squish/fastclusterfit.h"
-#include "nvidia_texture_tools/squish/weightedclusterfit.h"
 
 using namespace common;
 using namespace nv;
@@ -19,22 +15,6 @@ struct rgb8_t
   uchar green;
   uchar blue;
 };
-
-}
-
-namespace nv
-{
-
-void doPrecomputation()
-{
-  static bool done = false;
-  
-  if (!done)
-  {
-    done = true;
-    squish::FastClusterFit::doPrecomputation();
-  }
-}
 
 }
 
@@ -110,105 +90,6 @@ void render::low_level::opengl::unpack_dxt (PixelFormat format, size_t width, si
       break;
     }
     default: common::RaiseInvalidArgument ("render::low_level::opengl::unpack_dxt", "format"); return;
-  }
-}
-
-void render::low_level::opengl::pack_dxt (PixelFormat format, size_t width, size_t height, const void* unpacked_data, void* dxt_data)
-{
-  switch (format)
-  {
-    case PixelFormat_DXT1: 
-    {
-      ColorBlock rgba;
-      BlockDXT1  block, *dxt_data_pointer = (BlockDXT1*) dxt_data;
-
-      doPrecomputation();
-
-      for (size_t i = 0; i < height; i += 4)
-        for (size_t j = 0; j < width; j += 4, dxt_data_pointer++) 
-        {          
-          for (size_t k = 0; k < 4; k++)
-            for (size_t l = 0; l < 4; l++)
-            {
-              rgba.color (l, k).r = ((rgb8_t*)unpacked_data)[(i + k) * width + j + l].red;
-              rgba.color (l, k).g = ((rgb8_t*)unpacked_data)[(i + k) * width + j + l].green;
-              rgba.color (l, k).b = ((rgb8_t*)unpacked_data)[(i + k) * width + j + l].blue;
-            }
-
-          // Compress color.
-          squish::ColourSet colours((uint8 *)rgba.colors(), 0);
-          squish::FastClusterFit fit(&colours, squish::kDxt1);
-          //squish::WeightedClusterFit fit(&colours, squish::kDxt1);
-          //squish::ClusterFit fit(&colours, squish::kDxt1);
-          fit.setMetric(1.f, 1.f, 1.f);
-          fit.Compress(&block);
-          
-          *dxt_data_pointer = block;
-        }
-
-      break;
-    }
-    case PixelFormat_DXT3: 
-    {
-      ColorBlock rgba;
-      BlockDXT3  block, *dxt_data_pointer = (BlockDXT3*) dxt_data;
-
-      doPrecomputation();
-
-      for (size_t i = 0; i < height; i += 4)
-        for (size_t j = 0; j < width; j += 4, dxt_data_pointer++) 
-        {          
-          for (size_t k = 0; k < 4; k++)
-            for (size_t l = 0; l < 4; l++)
-              rgba.color (l, k) = ((Color32*)unpacked_data)[(i + k) * width + j + l];
-          
-          // Compress explicit alpha.
-          compressBlock(rgba, &block.alpha);
-
-          // Compress color.
-          squish::ColourSet colours((uint8 *)rgba.colors(), squish::kWeightColourByAlpha);
-          squish::WeightedClusterFit fit(&colours, 0);
-          //squish::WeightedClusterFit fit(&colours, squish::kDxt1);
-          //squish::ClusterFit fit(&colours, squish::kDxt1);
-          fit.setMetric(1.f, 1.f, 1.f);
-          fit.Compress(&block);
-          
-          *dxt_data_pointer = block;
-        }
-
-      break;
-    }
-    case PixelFormat_DXT5:
-    {
-      ColorBlock rgba;
-      BlockDXT5  block, *dxt_data_pointer = (BlockDXT5*) dxt_data;
-
-      doPrecomputation();
-
-      for (size_t i = 0; i < height; i += 4)
-        for (size_t j = 0; j < width; j += 4, dxt_data_pointer++) 
-        {          
-          for (size_t k = 0; k < 4; k++)
-            for (size_t l = 0; l < 4; l++)
-              rgba.color (l, k) = ((Color32*)unpacked_data)[(i + k) * width + j + l];
-          
-          // Compress alpha.
-          compressBlock_Iterative(rgba, &block.alpha);
-
-          // Compress color.
-          squish::ColourSet colours((uint8 *)rgba.colors(), squish::kWeightColourByAlpha);
-          squish::WeightedClusterFit fit(&colours, 0);
-          //squish::WeightedClusterFit fit(&colours, squish::kDxt1);
-          //squish::ClusterFit fit(&colours, squish::kDxt1);
-          fit.setMetric(1.f, 1.f, 1.f);
-          fit.Compress(&block);
-          
-          *dxt_data_pointer = block;
-        }
-
-      break;
-    }
-    default: common::RaiseInvalidArgument ("render::low_level::opengl::pack_dxt", "format"); return;
   }
 }
 
