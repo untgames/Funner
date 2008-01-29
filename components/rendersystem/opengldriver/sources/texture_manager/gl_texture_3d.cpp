@@ -4,30 +4,6 @@ using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
-namespace
-{
-
-struct TextureExtensions
-{
-  bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
-  bool has_sgis_generate_mipmap;         //GL_SGIS_generate_mipmap
-  
-  TextureExtensions (const ContextManager& manager)
-  {
-    static Extension SGIS_generate_mipmap         = "GL_SGIS_generate_mipmap",
-                     EXT_texture_compression_s3tc = "GL_EXT_texture_compression_s3tc",
-                     ARB_texture_compression      = "GL_ARB_texture_compression",
-                     Version_1_3                  = "GL_VERSION_1_3",
-                     Version_1_4                  = "GL_VERSION_1_4";
-      
-    has_ext_texture_compression_s3tc = (manager.IsSupported (ARB_texture_compression) || manager.IsSupported (Version_1_3)) && 
-                                       manager.IsSupported (EXT_texture_compression_s3tc);
-    has_sgis_generate_mipmap         = (manager.IsSupported (SGIS_generate_mipmap) || manager.IsSupported (Version_1_4));
-  }
-};
-
-}
-
 /*
    Конструктор / деструктор
 */
@@ -54,8 +30,7 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
 
   if (tex_desc.generate_mips_enable)
   {
-    tex_desc.width > tex_desc.height ? mips_count = (size_t)(log ((float)tex_desc.width) / log (2.f)) : 
-                                       mips_count = (size_t)(log ((float)tex_desc.height) / log (2.f));
+    mips_count = get_mips_count (tex_desc.width, tex_desc.height);
 
     if (ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_3D_EXT, GL_GENERATE_MIPMAP_SGIS, true);
@@ -77,10 +52,9 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
         else
           glTexImage3DEXT (GL_TEXTURE_3D_EXT, i, gl_internal_format (tex_desc.format), width, height, tex_desc.layers, 0, 
                            gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-        if (width > 1) 
-          width = width >> i;
-        if (height > 1)
-          height = height >> i;
+
+        if (width > 1)   width  /= 2;
+        if (height > 1)  height /= 2;
       }
     }
   }
@@ -91,6 +65,19 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
 /*
    Работа с данными
 */
+
+namespace
+{
+
+void SetTexData3D (size_t mip_level, size_t x, size_t y, size_t z, size_t width, size_t height, GLenum format, GLenum type, const void* data)
+{
+    //проверка расширений!!!!!
+  if (glTexSubImage3D)         glTexSubImage3D    (GL_TEXTURE_3D, mip_level, x, y, z, width, height, 1, format, type, data);
+  else if (glTexSubImage3DEXT) glTexSubImage3DEXT (GL_TEXTURE_3D_EXT, mip_level, x, y, z, width, height, 1, format, type, data);
+     //????....
+}
+
+}
 
 void Texture3D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
@@ -150,26 +137,8 @@ void Texture3D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
       glTexParameteri (GL_TEXTURE_3D_EXT, GL_GENERATE_MIPMAP_SGIS, true);
 
     if (desc.generate_mips_enable && !mip_level && !ext.has_sgis_generate_mipmap)
-    {    
-      if (width > 1)
-        width = width >> 1;
-      if (height > 1)
-        height = height >> 1;
-
-      char* source_buffer = (char*)buffer; //!!!!
-      xtl::uninitialized_storage <char> mip_buffer (width * height * texel_size (source_format));
-
-      for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
-      {
-        scale_image_2x_down (source_format, width, height, source_buffer, mip_buffer.data ());
-
-        glTexSubImage3D (GL_TEXTURE_3D_EXT, i, x, y, layer, width, height, 1, gl_format (source_format), gl_type (source_format), mip_buffer.data ());
-
-        if (width > 1)
-          width = width >> 1;
-        if (height > 1)
-          height = height >> 1;
-      }
+    {
+      generate_mips (x, y, layer, width, height, source_format, buffer, &SetTexData3D);
     }
   }
 
@@ -216,7 +185,7 @@ void Texture3D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
       layer_size = width * height * 4;
     else
       layer_size = width * height * texel_size (target_format);
-  }
+  }  
 
   xtl::uninitialized_storage <char> temp_buffer (layer_size * desc.layers);
 
@@ -228,12 +197,17 @@ void Texture3D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
       glGetTexImage (GL_TEXTURE_3D_EXT, mip_level, unpack_format (target_format), unpack_type (target_format), temp_buffer.data ());
   }
   else
+  {
     glGetTexImage (GL_TEXTURE_3D_EXT, mip_level, gl_format (target_format), gl_type (target_format), temp_buffer.data ());
+  }
   
   if (is_compressed_format (target_format) && !ext.has_ext_texture_compression_s3tc)
     RaiseNotSupported (METHOD_NAME, "Texture packing not supported. Reason: GL_EXT_texture_compression_s3tc not supported.");
   else
+  {
+//    memcpy (buffer, temp_buffer.data () + layer_size * layer, layer_size);
     memcpy (buffer, temp_buffer.data () + layer_size * layer, layer_size);
+  }
   
   CheckErrors (METHOD_NAME);
 }

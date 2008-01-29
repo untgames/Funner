@@ -10,6 +10,8 @@ using namespace render::low_level::opengl;
 Texture::Texture  (const ContextManager& manager, const TextureDesc& tex_desc, GLenum in_target)
   : ContextObject (manager), target (in_target), desc (tex_desc), mips_count (0)
 {
+     //считать mips_count!!!
+
   MakeContextCurrent ();
   glGenTextures(1, &texture_id);
   CheckErrors ("render::low_level::opengl::Texture::Texture");
@@ -83,16 +85,138 @@ void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_
     common::RaiseInvalidArgument ("render::low_level::opengl::Texture::SetData", "source_format");
 }
 
-void Texture::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+void Texture::GetData
+ (size_t      layer,
+  size_t      mip_level,
+  size_t      x,
+  size_t      y,
+  size_t      width,
+  size_t      height,
+  PixelFormat target_format,
+  void*       buffer)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::Texture::GetData";
+
+  if (layer >= desc.layers)
+    common::RaiseOutOfRange (METHOD_NAME, "layer", layer, desc.layers);
+
+  if (mip_level >= mips_count)
+    common::RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, mips_count);
+
+    //отсечение
+
+  size_t level_width  = desc.width >> mip_level,
+         level_height = desc.height >> mip_level;
+
+  if (x > level_width)
+    return;
+    
+  if (y > level_height)
+    return;
+    
+  if (x + width > level_width)
+    width = level_width - x;
+
+  if (y + height > level_height)
+    height = level_height - y;
+
+  if (!width || !height)
+    return;
+
   if (!buffer)
-    common::RaiseNullArgument ("render::low_level::opengl::Texture::GetData", "buffer");
-  if ((target_format == PixelFormat_D24S8)  && (desc.format != PixelFormat_D24S8))
-    common::RaiseInvalidArgument ("render::low_level::opengl::Texture::GetData", "target_format");
-  if (is_depth_format (desc.format) && !is_depth_format (target_format))
-    common::RaiseInvalidArgument ("render::low_level::opengl::Texture::GetData", "target_format");
-  if (!is_depth_format (desc.format) && is_depth_format (target_format))
-    common::RaiseInvalidArgument ("render::low_level::opengl::Texture::GetData", "target_format");
+    common::RaiseNullArgument (METHOD_NAME, "buffer");    
+
+    //проверка совместимости форматов
+
+  bool is_depth_target_format = is_depth_format (target_format),
+       is_depth_tex_format    = is_depth_format (desc.format),
+       is_compatible          = (is_depth_tex_format  && is_depth_target_format) ||
+                                (!is_depth_tex_format && !is_depth_target_format);
+
+  if (target_format == PixelFormat_D24S8 && desc.format != PixelFormat_D24S8)
+    is_compatible = false;
+
+  if (!is_compatible)
+  {
+    common::RaiseNotSupported (METHOD_NAME, "Texture format %s incompatible with target_format %s", get_name (desc.format),
+      get_name (target_format));
+  }
+  
+    //установка текстуры в контекст OpenGL
+  
+  MakeContextCurrent ();
+
+  Bind ();
+  
+    //получение информации о достпных расширениях
+
+  TextureExtensions ext (GetContextManager ());
+  
+    //получение информации о текстуре
+    
+  GLenum layer_target  = GetLayerTarget (layer);
+  bool   is_full_image = width == level_width && height == level_height && desc.layers == 1;
+         
+  if (is_compressed_format (target_format))
+  {
+      //копирование сжатого образа
+    
+    if (!ext.has_ext_texture_compression_s3tc)
+      common::RaiseNotSupported (METHOD_NAME, "Texture packing not supported (GL_EXT_texture_compression_s3tc not supported)");
+      
+    if (is_full_image)
+    {
+      glGetCompressedTexImage (layer_target, mip_level, buffer);      
+    }
+    else
+    {
+      common::RaiseNotImplemented ("Texture::GetData(compressed)");
+    }
+  }
+  else
+  {
+      //копирование несжатого образа
+      
+    GLenum gl_tex_format = gl_format (target_format),
+           gl_tex_type   = gl_type (target_format);
+      
+    if (is_full_image)
+    {
+      glGetTexImage (layer_target, mip_level, gl_tex_format, gl_tex_type, buffer);
+    }
+    else
+    {      
+        //копирование полного образа текстуры во временный буфер
+        
+      size_t texel_size = opengl::texel_size (target_format);
+        
+      xtl::uninitialized_storage<char> temp_buffer (level_width * level_height * desc.layers * texel_size);
+      
+      glGetTexImage (layer_target, mip_level, gl_tex_format, gl_tex_type, temp_buffer.data ());
+      
+        //копирование части образа в пользовательсий буфер
+               
+      size_t line_size    = level_width * texel_size,
+             layer_size   = line_size * level_height,
+             start_offset = layer * layer_size + y * line_size + x * texel_size,
+             block_size   = width * texel_size;
+      
+      const char* src = temp_buffer.data () + start_offset;
+      char*       dst = reinterpret_cast<char*> (buffer);
+      
+      for (size_t i=0; i<height; i++)
+      {
+        memcpy (dst, src, block_size);
+
+        src += line_size;
+        dst += block_size;
+      }
+    }
+  }
+
+    //проверка ошибок
+
+  CheckErrors (METHOD_NAME);
 }
 
 /*
@@ -234,6 +358,29 @@ size_t compressed_quad_size (PixelFormat format)
     case PixelFormat_DXT5: return 16;
     default: common::RaiseInvalidArgument ("render::low_level::opengl::Texture::compressed_texel_size", "format"); return 1;
   }
+}
+
+//получение ближайшей сверху степени двойки
+size_t next_higher_power_of_two (size_t k) 
+{
+  k--;
+
+  for (int i=1; i < sizeof (size_t) * 8; i *= 2)
+          k |= k >> i;
+
+  return k + 1;
+}
+
+//получение количества mip-уровней
+size_t get_mips_count (size_t size) //оптимизировать
+{
+  return (size_t)(log ((float)next_higher_power_of_two (size)) / log (2.f)) + 1;
+}
+
+//получение количества mip-уровней
+size_t get_mips_count (size_t width, size_t height)
+{
+  return width > height ? get_mips_count (width) : get_mips_count (height);
 }
 
 }

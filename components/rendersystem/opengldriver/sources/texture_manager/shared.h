@@ -7,6 +7,8 @@
 
 #include <xtl/uninitialized_storage.h>
 
+#include <render/low_level/utils.h>
+
 #include <shared/texture_manager.h>
 #include <shared/context_object.h>
 
@@ -18,6 +20,26 @@ namespace low_level
 
 namespace opengl
 {
+
+///////переместить в исходники!!!
+struct TextureExtensions
+{
+  bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
+  bool has_sgis_generate_mipmap;         //GL_SGIS_generate_mipmap
+  
+  TextureExtensions (const ContextManager& manager)
+  {
+    static Extension SGIS_generate_mipmap         = "GL_SGIS_generate_mipmap",
+                     EXT_texture_compression_s3tc = "GL_EXT_texture_compression_s3tc",
+                     ARB_texture_compression      = "GL_ARB_texture_compression",
+                     Version_1_3                  = "GL_VERSION_1_3",
+                     Version_1_4                  = "GL_VERSION_1_4";
+      
+    has_ext_texture_compression_s3tc = (manager.IsSupported (ARB_texture_compression) || manager.IsSupported (Version_1_3)) && 
+                                       manager.IsSupported (EXT_texture_compression_s3tc);
+    has_sgis_generate_mipmap         = (manager.IsSupported (SGIS_generate_mipmap) || manager.IsSupported (Version_1_4));
+  }
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ѕазовый класс реализации текстуры
@@ -53,8 +75,14 @@ class Texture : virtual public IBindableTexture, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
     virtual void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+    
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕолучение целевого типа сло€ текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual GLenum GetLayerTarget (size_t layer) { return target; }
 
-  public:
+  public: //???!!!private!!!
     GLenum      target;      //целевой тип текстуры
     GLuint      texture_id;  //идентификатор текстуры
     TextureDesc desc;        //дескриптор текстуры
@@ -193,6 +221,12 @@ class TextureCubemap : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
     void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕолучение целевого типа сло€ текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    GLenum GetLayerTarget (size_t layer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,22 +251,32 @@ class TextureCubemapEmulatedNPOT : public TextureCubemap
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///”тилиты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+size_t next_higher_power_of_two (size_t size); //получение ближайшей сверху степени двойки
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕолучение параметров текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-size_t texel_size           (PixelFormat format);  //размер тексел€ в байтах
-GLint  gl_internal_format   (PixelFormat format);  //внутренний формат OpenGL
-GLenum gl_format            (PixelFormat format);  //формат OpenGL
-GLenum gl_type              (PixelFormat format);  //тип OpenGL
-bool   is_compressed_format (PixelFormat format);  //€вл€етс€ ли формат сжатым
-bool   is_depth_format      (PixelFormat format);  //€вл€етс€ ли форматом глубины
-size_t compressed_quad_size (PixelFormat format);  //размер блока сжатых пикселей 4*4 в байтах
+size_t texel_size           (PixelFormat format);          //размер тексел€ в байтах
+GLint  gl_internal_format   (PixelFormat format);          //внутренний формат OpenGL
+GLenum gl_format            (PixelFormat format);          //формат OpenGL
+GLenum gl_type              (PixelFormat format);          //тип OpenGL
+bool   is_compressed_format (PixelFormat format);          //€вл€етс€ ли формат сжатым
+bool   is_depth_format      (PixelFormat format);          //€вл€етс€ ли форматом глубины
+size_t compressed_quad_size (PixelFormat format);          //размер блока сжатых пикселей 4*4 в байтах
+size_t get_mips_count       (size_t size);                 //получение количества mip-уровней
+size_t get_mips_count       (size_t width, size_t height); //получение количества mip-уровней
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ћасштабирование текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void scale_image_2x_down (PixelFormat format, size_t width,     size_t height,     const void* src, void* dest);
-void scale_image         (PixelFormat format, size_t width,     size_t height, 
-                                              size_t new_width, size_t new_height, const void* src, void* dest);
+typedef void (*SetTexDataFn)(size_t mip_level, size_t x, size_t y, size_t z, size_t width, size_t height, GLenum format, GLenum type, const void* data);
+
+void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest);
+void scale_image         (PixelFormat format, size_t width, size_t height, size_t new_width, size_t new_height, const void* src, void* dest);
+void generate_mips       (size_t x, size_t y, size_t z, size_t width, size_t height, PixelFormat format, const void* data, SetTexDataFn);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абота с DXT форматом при остутствии аппаратной поддержки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,6 +286,11 @@ GLenum unpack_type            (PixelFormat format);                             
 size_t unpack_texel_size      (PixelFormat format);                                                             //размер распакованного тексел€ в байтах
 GLenum unpack_format          (PixelFormat format);                                                             //распакованный формат OpenGL
 PixelFormat unpack_pf         (PixelFormat format);                                                             //распакованный формат
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// опирование двумерной области из образа текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//void get_teximage2d (size_t x, size_t y, size_t z, size_t tex_width, size_t tex_height, size_t tex_depth
 
 }
 

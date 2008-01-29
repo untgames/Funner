@@ -7,15 +7,6 @@ using namespace render::low_level::opengl;
 namespace
 {
 
-template <class T>
-T next_higher_power_of_two (T k) 
-{
-  k--;
-  for (int i=1; i < sizeof(T) * 8; i = i * 2)
-          k = k | k >> i;
-  return k + 1;
-}
-
 struct TextureExtensions
 {
   bool has_ext_texture_rectangle;        //GL_EXT_texture_rectangle

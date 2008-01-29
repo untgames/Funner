@@ -40,7 +40,7 @@ void Texture3DEmulatedNPOT::SetData (size_t layer, size_t mip_level, size_t x, s
   }
 
   try
-  {    
+  {
     if (is_compressed_format (source_format))  
       Texture3D::SetData (layer, mip_level, x, y, scaled_width, scaled_height, unpack_pf (source_format), scaled_buffer.data ());
     else
@@ -62,7 +62,7 @@ void Texture3DEmulatedNPOT::GetData (size_t layer, size_t mip_level, size_t x, s
   if (is_compressed_format (target_format))
     scaled_buffer.resize (((scaled_width * scaled_height) >> 4) * compressed_quad_size (target_format));
   else
-    scaled_buffer.resize (scaled_width * scaled_height * texel_size (target_format));
+    scaled_buffer.resize (scaled_width * scaled_height * texel_size (target_format));    
 
   try
   {
@@ -72,7 +72,7 @@ void Texture3DEmulatedNPOT::GetData (size_t layer, size_t mip_level, size_t x, s
   {
     exception.Touch ("render::low_level::opengl::Texture3DEmulatedNPOT::GetData");
     throw;
-  }
+  }    
 
   if (is_compressed_format (target_format))
   {

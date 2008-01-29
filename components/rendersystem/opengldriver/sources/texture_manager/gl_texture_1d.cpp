@@ -14,15 +14,15 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
   static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
                    Version_1_4          = "GL_VERSION_1_4";
 
-  bool has_SGIS_generate_mipmap = GetContextManager().IsSupported (SGIS_generate_mipmap) || GetContextManager().IsSupported (Version_1_4);
+  bool has_SGIS_generate_mipmap = GetContextManager().IsSupported (SGIS_generate_mipmap) || GetContextManager().IsSupported (Version_1_4);  
 
-  Bind ();
+  Bind ();  
 
   glTexImage1D (GL_TEXTURE_1D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
 
   if (tex_desc.generate_mips_enable)
   {
-    mips_count = (size_t)(log ((float)tex_desc.width) / log (2.f));
+    mips_count = get_mips_count (tex_desc.width);
 
     if (has_SGIS_generate_mipmap)
       glTexParameteri (GL_TEXTURE_1D, GL_GENERATE_MIPMAP_SGIS, true);
@@ -31,7 +31,7 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
       for (size_t i = 1; i < mips_count; i++)
         glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format (tex_desc.format), tex_desc.width >> i, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
     }
-  }
+  }  
 
   CheckErrors ("render::low_level::opengl::Texture1D::Texture1D");
 }
@@ -40,12 +40,23 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
    Работа с данными
 */
 
+namespace
+{
+
+void SetTexData1D (size_t mip_level, size_t x, size_t, size_t, size_t width, size_t, GLenum format, GLenum type, const void* data)
+{
+  glTexSubImage1D (GL_TEXTURE_1D, mip_level, x, width, format, type, data);
+}
+
+}
+
 void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
-  Texture::SetData (layer, mip_level, x, y, width, height, source_format, buffer);
+  Texture::SetData (layer, mip_level, x, y, width, height, source_format, buffer);  
   
   if (mip_level > mips_count)
     RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "mip_level", mip_level, (size_t)0, mips_count);
+    
   if ((x + width) > (desc.width) >> mip_level)
     RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "x + width", x + width, (size_t)0, desc.width >> mip_level);
   if (!width)
@@ -64,20 +75,15 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   
   if (mip_level && has_SGIS_generate_mipmap)
     glTexParameteri (GL_TEXTURE_1D, GL_GENERATE_MIPMAP_SGIS, false); 
+
   glTexSubImage1D (GL_TEXTURE_1D, mip_level, x, width, gl_format (source_format), gl_type (source_format), buffer);
+
   if (mip_level && has_SGIS_generate_mipmap)
     glTexParameteri (GL_TEXTURE_1D, GL_GENERATE_MIPMAP_SGIS, true);
-  
+
   if (desc.generate_mips_enable && !mip_level && !has_SGIS_generate_mipmap)
   {
-    const char* source_buffer = (char*)buffer;   //!!!!!!!!!!!
-    xtl::uninitialized_storage <char> mip_buffer (width / 2 * texel_size (source_format));
-
-    for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
-    {
-      scale_image_2x_down (source_format, width >> i, 1, source_buffer, mip_buffer.data ());
-      glTexSubImage1D (GL_TEXTURE_1D, i, x >> i, width >> i, gl_format (source_format), gl_type (source_format), mip_buffer.data ());
-    }
+    generate_mips (x, 0, 0, width, 1, source_format, buffer, &SetTexData1D);
   }
 
   CheckErrors ("render::low_level::opengl::Texture1D::SetData");

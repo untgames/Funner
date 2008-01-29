@@ -4,30 +4,6 @@ using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
-namespace
-{
-
-struct TextureExtensions
-{
-  bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
-  bool has_sgis_generate_mipmap;         //GL_SGIS_generate_mipmap
-  
-  TextureExtensions (const ContextManager& manager)
-  {
-    static Extension SGIS_generate_mipmap         = "GL_SGIS_generate_mipmap",
-                     EXT_texture_compression_s3tc = "GL_EXT_texture_compression_s3tc",
-                     ARB_texture_compression      = "GL_ARB_texture_compression",
-                     Version_1_3                  = "GL_VERSION_1_3",
-                     Version_1_4                  = "GL_VERSION_1_4";
-      
-    has_ext_texture_compression_s3tc = (manager.IsSupported (ARB_texture_compression) || manager.IsSupported (Version_1_3)) && 
-                                       manager.IsSupported (EXT_texture_compression_s3tc);
-    has_sgis_generate_mipmap         = (manager.IsSupported (SGIS_generate_mipmap) || manager.IsSupported (Version_1_4));
-  }
-};
-
-}
-
 /*
    Конструктор / деструктор
 */
@@ -57,8 +33,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
   if (tex_desc.generate_mips_enable)
   {
-    tex_desc.width > tex_desc.height ? mips_count = (size_t)(log ((float)tex_desc.width) / log (2.f)) : 
-                                       mips_count = (size_t)(log ((float)tex_desc.height) / log (2.f));
+    mips_count = get_mips_count (tex_desc.width, tex_desc.height);
 
     if (ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, true);
@@ -83,10 +58,9 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
             glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format), width, height, 0, 
                           gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
         }
-        if (width > 1) 
-          width = width >> i;
-        if (height > 1)
-          height = height >> i;
+        
+        if (width > 1)  width  /= 2;
+        if (height > 1) height /= 2;
       }
     }
   }
@@ -95,8 +69,30 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 }
 
 /*
+    Получение целевого типа слоя текстуры
+*/
+
+GLenum TextureCubemap::GetLayerTarget (size_t layer)
+{
+  if (layer > 6)
+    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::GetLayerTarget", "layer", layer, 6);
+    
+  return GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer;
+}
+
+/*
    Работа с данными
 */
+
+namespace
+{
+
+void SetTexDataCubemap (size_t mip_level, size_t x, size_t y, size_t z, size_t width, size_t height, GLenum format, GLenum type, const void* data)
+{
+  glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + z, mip_level, x, y, width, height, format, type, data);
+}
+
+}
 
 void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
@@ -159,25 +155,7 @@ void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y
 
     if (desc.generate_mips_enable && !mip_level && !ext.has_sgis_generate_mipmap)
     {    
-      if (width > 1)
-        width = width >> 1;
-      if (height > 1)
-        height = height >> 1;
-
-      char* source_buffer = (char*)buffer; //!!!!!!1
-      xtl::uninitialized_storage <char> mip_buffer (width * height * texel_size (source_format));
-
-      for (size_t i = 1; i < mips_count; i++, source_buffer = mip_buffer)
-      {
-        scale_image_2x_down (source_format, width, height, source_buffer, mip_buffer.data ());
-
-        glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, i, x, y, width, height, gl_format (source_format), gl_type (source_format), mip_buffer.data ());
-
-        if (width > 1)
-          width = width >> 1;
-        if (height > 1)
-          height = height >> 1;
-      }
+      generate_mips (x, y, layer, width, height, source_format, buffer, &SetTexDataCubemap);
     }
   }
 

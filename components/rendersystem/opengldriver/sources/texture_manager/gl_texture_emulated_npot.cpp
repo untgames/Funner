@@ -23,7 +23,7 @@ void TextureEmulatedNPOT::SetData (size_t layer, size_t mip_level, size_t x, siz
   x                     = (size_t)ceil ((float)x * horisontal_scale);
   y                     = (size_t)ceil ((float)y * vertical_scale);    
   xtl::uninitialized_storage <char> scaled_buffer;
-
+  
   if (is_compressed_format (source_format))
   {
     xtl::uninitialized_storage <char> unpacked_buffer (width * height * unpack_texel_size (source_format));
@@ -38,7 +38,7 @@ void TextureEmulatedNPOT::SetData (size_t layer, size_t mip_level, size_t x, siz
     scaled_buffer.resize (scaled_width * scaled_height * texel_size (source_format));
 
     scale_image (source_format, width, height, scaled_width, scaled_height, buffer, scaled_buffer.data ());
-  }
+  }  
 
   try
   {

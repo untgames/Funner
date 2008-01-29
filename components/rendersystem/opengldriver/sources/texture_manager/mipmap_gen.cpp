@@ -1,7 +1,7 @@
-#ifndef RENDER_GL_DRIVER_SCALE
-#define RENDER_GL_DRIVER_SCALE
-
 #include "shared.h"
+
+namespace
+{
 
 typedef unsigned char  uchar;
 typedef unsigned short uint16;
@@ -163,7 +163,18 @@ void scale_image_impl (size_t width, size_t height, const T* src, size_t newWidt
   }    
 }
 
-void render::low_level::opengl::scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest)
+}
+
+namespace render
+{
+
+namespace low_level
+{
+
+namespace opengl
+{
+
+void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest)
 {
   switch (format)
   {
@@ -183,7 +194,7 @@ void render::low_level::opengl::scale_image_2x_down (PixelFormat format, size_t 
   }
 }
 
-void render::low_level::opengl::scale_image (PixelFormat format, size_t width, size_t height, 
+void scale_image (PixelFormat format, size_t width, size_t height, 
                                              size_t new_width, size_t new_height, const void* src, void* dest)
 {
   switch (format)
@@ -204,4 +215,66 @@ void render::low_level::opengl::scale_image (PixelFormat format, size_t width, s
   }
 }
 
-#endif
+namespace
+{
+
+size_t get_next_mip_size (size_t size)
+{
+  switch (size)
+  {
+    case 0:
+    case 1:   return size;
+    default:  return size / 2;
+  }
+}
+
+}
+
+void generate_mips
+ (size_t       x,
+  size_t       y,
+  size_t       z,
+  size_t       width,
+  size_t       height,
+  PixelFormat  format,
+  const void*  data,
+  SetTexDataFn fn)
+{
+  if (!fn)
+    common::RaiseNullArgument ("render::low_level::opengl::generate_mips", "fn");
+
+  const GLenum gl_texformat = gl_format (format),
+               gl_textype   = gl_type (format);
+
+  const size_t buffer_size = get_next_mip_size (width) * get_next_mip_size (height) * texel_size (format);
+
+  xtl::uninitialized_storage<char> dst_buffer (buffer_size),
+                                   src_buffer (buffer_size / 2); //на 4 делить не нужно!
+
+  const char* src = reinterpret_cast<const char*> (data);
+  char*       dst = dst_buffer.data ();
+
+  for (size_t mip_level=1; width > 1 || height > 1; mip_level++)
+  {
+    scale_image_2x_down (format, width, height, src, dst);
+
+    width   = get_next_mip_size (width);
+    height  = get_next_mip_size (height);
+    x      /= 2;
+    y      /= 2;    
+
+    fn (mip_level, x, y, z, width, height, gl_texformat, gl_textype, dst);
+
+    dst_buffer.swap (src_buffer);
+
+    dst = dst_buffer.data ();
+    src = src_buffer.data ();
+  }
+}
+
+}
+
+}
+
+}
+
