@@ -588,13 +588,6 @@ private:
         glActiveTexture(GL_TEXTURE0 + texunit);
         glTexCoordPointer(size, type, attribute.stride, data);
         break;
-      ///////////////////////////////////////////
-      /// Какой-то инфлюэнс...
-      ///////////////////////////////////////////
-      case VertexAttributeSemantic_Influence:
-        RaiseNotSupported("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
-                          "The semantic %s support is not implemented yet", get_name(attribute.semantic));
-        break;
       default:
         RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::BindBufferBySemantics (...)",
                              "attribute.semantic", attribute.semantic, "Unknown VertexAttributeSemantic supplied!"); 
@@ -664,9 +657,6 @@ private:
       case VertexAttributeSemantic_TexCoord6:
       case VertexAttributeSemantic_TexCoord7:
         SetClientState(GL_TEXTURE_COORD_ARRAY, enable);
-        break;
-      case VertexAttributeSemantic_Influence:
-        //SetClientState(, enable);
         break;
       default:
         RaiseInvalidArgument("render::low_level::opengl::InputStage::Impl::SetSemanticClientState (VertexAttributeSemantic semantic, bool enable)",

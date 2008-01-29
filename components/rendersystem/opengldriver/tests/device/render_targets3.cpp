@@ -221,7 +221,6 @@ int main ()
         catch (std::exception& exception)
         {
           printf ("Fail!\n%s\n", exception.what ());
-//          printf ("Bad!\n");
         }
       }
     }
