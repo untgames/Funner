@@ -44,6 +44,12 @@ class Texture : virtual public IBindableTexture, public ContextObject
     GLenum GetTarget    () const { return target; }
     GLuint GetTextureId () const { return texture_id; }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–абота с данными
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
+    virtual void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+
   public:
     GLenum      target;      //целевой тип текстуры
     GLuint      texture_id;  //идентификатор текстуры
@@ -214,6 +220,7 @@ GLint  gl_internal_format   (PixelFormat format);  //внутренний формат OpenGL
 GLenum gl_format            (PixelFormat format);  //формат OpenGL
 GLenum gl_type              (PixelFormat format);  //тип OpenGL
 bool   is_compressed_format (PixelFormat format);  //€вл€етс€ ли формат сжатым
+bool   is_depth_format      (PixelFormat format);  //€вл€етс€ ли форматом глубины
 size_t compressed_quad_size (PixelFormat format);  //размер блока сжатых пикселей 4*4 в байтах
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

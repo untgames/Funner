@@ -42,9 +42,8 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
 
 void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
-  if (!buffer)
-    RaiseNullArgument ("render::low_level::opengl::Texture1D::SetData", "buffer");
-
+  Texture::SetData (layer, mip_level, x, y, width, height, source_format, buffer);
+  
   if (mip_level > mips_count)
     RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "mip_level", mip_level, (size_t)0, mips_count);
   if ((x + width) > (desc.width) >> mip_level)
@@ -88,8 +87,8 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 
 void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
-  if (!buffer)
-    RaiseNullArgument ("render::low_level::opengl::Texture1D::GetData", "buffer");
+  Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer);
+
   if (mip_level > mips_count)
     RaiseOutOfRange ("render::low_level::opengl::Texture1D::GetData", "mip_level", mip_level, (size_t)0, mips_count);
   if (x)

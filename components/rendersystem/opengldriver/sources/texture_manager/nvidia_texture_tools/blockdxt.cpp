@@ -305,12 +305,12 @@ void AlphaBlockDXT5::evaluatePalette8(uint8 alpha[8]) const
   // Bit code 000 = alpha0, 001 = alpha1, others are interpolated.
   alpha[0] = alpha0;
   alpha[1] = alpha1;
-  alpha[2] = (6 * alpha0 + 1 * alpha1) / 7; // bit code 010
-  alpha[3] = (5 * alpha0 + 2 * alpha1) / 7; // bit code 011
-  alpha[4] = (4 * alpha0 + 3 * alpha1) / 7; // bit code 100
-  alpha[5] = (3 * alpha0 + 4 * alpha1) / 7; // bit code 101
-  alpha[6] = (2 * alpha0 + 5 * alpha1) / 7; // bit code 110
-  alpha[7] = (1 * alpha0 + 6 * alpha1) / 7; // bit code 111
+  alpha[2] = (uint8)(6 * alpha0 + 1 * alpha1) / 7; // bit code 010
+  alpha[3] = (uint8)(5 * alpha0 + 2 * alpha1) / 7; // bit code 011
+  alpha[4] = (uint8)(4 * alpha0 + 3 * alpha1) / 7; // bit code 100
+  alpha[5] = (uint8)(3 * alpha0 + 4 * alpha1) / 7; // bit code 101
+  alpha[6] = (uint8)(2 * alpha0 + 5 * alpha1) / 7; // bit code 110
+  alpha[7] = (uint8)(1 * alpha0 + 6 * alpha1) / 7; // bit code 111
 }
 
 void AlphaBlockDXT5::evaluatePalette6(uint8 alpha[8]) const
@@ -319,10 +319,10 @@ void AlphaBlockDXT5::evaluatePalette6(uint8 alpha[8]) const
   // Bit code 000 = alpha0, 001 = alpha1, others are interpolated.
   alpha[0] = alpha0;
   alpha[1] = alpha1;
-  alpha[2] = (4 * alpha0 + 1 * alpha1) / 5; // Bit code 010
-  alpha[3] = (3 * alpha0 + 2 * alpha1) / 5; // Bit code 011
-  alpha[4] = (2 * alpha0 + 3 * alpha1) / 5; // Bit code 100
-  alpha[5] = (1 * alpha0 + 4 * alpha1) / 5; // Bit code 101
+  alpha[2] = (uint8)(4 * alpha0 + 1 * alpha1) / 5; // Bit code 010
+  alpha[3] = (uint8)(3 * alpha0 + 2 * alpha1) / 5; // Bit code 011
+  alpha[4] = (uint8)(2 * alpha0 + 3 * alpha1) / 5; // Bit code 100
+  alpha[5] = (uint8)(1 * alpha0 + 4 * alpha1) / 5; // Bit code 101
   alpha[6] = 0x00;              // Bit code 110
   alpha[7] = 0xFF;              // Bit code 111
 }

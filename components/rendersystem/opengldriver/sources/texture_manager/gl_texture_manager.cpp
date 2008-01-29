@@ -21,8 +21,10 @@ struct TextureExtensions
   bool has_ext_texture_rectangle;        //GL_EXT_texture_rectangle
   bool has_ext_texture3D;                //GL_EXT_texture3D
   bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
+  bool has_ext_packed_depth_stencil;     //GL_EXT_packed_depth_stencil
   bool has_arb_texture_cube_map;         //GL_ARB_texture_cubemap
   bool has_arb_texture_non_power_of_two; //GL_ARB_texture_non_power_of_two
+  bool has_arb_depth_texture;            //GL_ARB_depth_texture
   
   TextureExtensions (const ContextManager& manager)
   {
@@ -30,21 +32,27 @@ struct TextureExtensions
                      EXT_texture3D                = "GL_EXT_texture3D",
                      EXT_texture_compression_s3tc = "GL_EXT_texture_compression_s3tc",
                      EXT_texture_cube_map         = "GL_EXT_texture_cube_map",
+                     EXT_packed_depth_stencil     = "GL_EXT_packed_depth_stencil",
+                     EXT_framebuffer_object       = "GL_EXT_framebuffer_object",
                      NV_texture_rectangle         = "GL_NV_texture_rectangle",
                      ARB_texture_cube_map         = "GL_ARB_texture_cube_map",
                      ARB_texture_compression      = "GL_ARB_texture_compression",
                      ARB_texture_non_power_of_two = "GL_ARB_texture_non_power_of_two",
+                     ARB_depth_texture            = "GL_ARB_depth_texture",
                      Version_1_2                  = "GL_VERSION_1_2",
                      Version_1_3                  = "GL_VERSION_1_3",
+                     Version_1_4                  = "GL_VERSION_1_4",
                      Version_2_0                  = "GL_VERSION_2_0";
       
     has_ext_texture_rectangle        = manager.IsSupported (EXT_texture_rectangle) || manager.IsSupported (NV_texture_rectangle);
     has_ext_texture3D                = manager.IsSupported (EXT_texture3D) || manager.IsSupported (Version_1_2);
     has_ext_texture_compression_s3tc = (manager.IsSupported (ARB_texture_compression) || manager.IsSupported (Version_1_3)) && 
                                        manager.IsSupported (EXT_texture_compression_s3tc);
+    has_ext_packed_depth_stencil     = manager.IsSupported (EXT_packed_depth_stencil) && manager.IsSupported (EXT_framebuffer_object);  
     has_arb_texture_cube_map         = manager.IsSupported (ARB_texture_cube_map) || manager.IsSupported (EXT_texture_cube_map) ||
                                        manager.IsSupported (Version_1_3);
     has_arb_texture_non_power_of_two = manager.IsSupported (ARB_texture_non_power_of_two) || manager.IsSupported (Version_2_0);
+    has_arb_depth_texture            = manager.IsSupported (ARB_depth_texture) || manager.IsSupported (Version_1_4);
   }
 };
 
@@ -117,6 +125,13 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
   GLint width;
   TextureDesc temp_desc = tex_desc;            
 
+  if (((tex_desc.format == PixelFormat_D16) || (tex_desc.format == PixelFormat_D24X8)) && !ext.has_arb_depth_texture)
+    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                       "Can't create depth texture. Reason: GL_ARB_depth_texture extension not supported");
+  if ((tex_desc.format == PixelFormat_D24S8) && !ext.has_ext_packed_depth_stencil)
+    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
+                       "Can't create depth-stencil texture. Reason: GL_EXT_packed_depth_stencil extension not supported");
+
   switch (tex_desc.dimension)
   {
     case TextureDimension_1D: 
@@ -148,10 +163,6 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
           }
           else
           {
-            if (is_compressed_format (tex_desc.format))
-              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                                 "Compression in emulated npot textures not implemented yet.");
-
             temp_desc.width = next_higher_power_of_two (tex_desc.width);
 
             glTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
@@ -263,6 +274,9 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
     {
       if (ext.has_ext_texture3D)
       {
+        if (is_depth_format (tex_desc.format))
+          RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture",
+                             "Can't create depth 3d texture. Reason: depth texture may be only 1d or 2d");
         if (tex_desc.width < 1)
           RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_3d_texture_size);
         if (tex_desc.height < 1)
@@ -336,6 +350,9 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
     {
       if (ext.has_arb_texture_cube_map)
       {
+        if (is_depth_format (tex_desc.format))
+          RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture",
+                             "Can't create depth 3d texture. Reason: depth texture may be only 1d or 2d");
         if (tex_desc.layers != 6)
           RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.layers", (int)tex_desc.layers, 6, 6);
         if (tex_desc.width != tex_desc.height)

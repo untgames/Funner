@@ -25,9 +25,8 @@ TextureNPOT::TextureNPOT  (const ContextManager& manager, const TextureDesc& tex
 
 void TextureNPOT::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
-  if (!buffer)
-    RaiseNullArgument ("render::low_level::opengl::TextureNPOT::SetData", "buffer");
-
+  Texture::SetData (layer, mip_level, x, y, width, height, source_format, buffer);
+  
   if (mip_level)
     RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::SetData", "mip_level", mip_level, (size_t)0, (size_t)0);
   if ((x + width) > desc.width)
@@ -50,8 +49,8 @@ void TextureNPOT::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
 
 void TextureNPOT::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
-  if (!buffer)
-    RaiseNullArgument ("render::low_level::opengl::TextureNPOT::GetData", "buffer");
+  Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer);
+
   if (mip_level)
     RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::GetData", "mip_level", mip_level, (size_t)0, (size_t)0);
   if (x)

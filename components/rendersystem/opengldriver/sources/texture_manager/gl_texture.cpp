@@ -60,6 +60,42 @@ void Texture::Bind ()
 }
 
 /*
+   Работа с данными
+*/
+
+void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+{
+  static Extension EXT_packed_depth_stencil     = "GL_EXT_packed_depth_stencil",
+                   EXT_framebuffer_object       = "GL_EXT_framebuffer_object";
+    
+  bool has_ext_packed_depth_stencil = GetContextManager().IsSupported (EXT_packed_depth_stencil) && GetContextManager().IsSupported (EXT_framebuffer_object);  
+
+  if (!buffer)
+    common::RaiseNullArgument ("render::low_level::opengl::Texture::SetData", "buffer");
+
+  if ((source_format == PixelFormat_D24S8)  && (!has_ext_packed_depth_stencil))
+    common::RaiseNotSupported ("render::low_level::opengl::Texture::SetData", 
+                               "Can't set depth-stencil data. Reason: GL_EXT_packed_depth_stencil extension not supported");
+
+  if (is_depth_format (desc.format) && !is_depth_format (source_format))
+    common::RaiseInvalidArgument ("render::low_level::opengl::Texture::SetData", "source_format");
+  if (!is_depth_format (desc.format) && is_depth_format (source_format))
+    common::RaiseInvalidArgument ("render::low_level::opengl::Texture::SetData", "source_format");
+}
+
+void Texture::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+{
+  if (!buffer)
+    common::RaiseNullArgument ("render::low_level::opengl::Texture::GetData", "buffer");
+  if ((target_format == PixelFormat_D24S8)  && (desc.format != PixelFormat_D24S8))
+    common::RaiseInvalidArgument ("render::low_level::opengl::Texture::GetData", "target_format");
+  if (is_depth_format (desc.format) && !is_depth_format (target_format))
+    common::RaiseInvalidArgument ("render::low_level::opengl::Texture::GetData", "target_format");
+  if (!is_depth_format (desc.format) && is_depth_format (target_format))
+    common::RaiseInvalidArgument ("render::low_level::opengl::Texture::GetData", "target_format");
+}
+
+/*
    Получение параметров текстуры
 */
 
@@ -165,6 +201,26 @@ bool is_compressed_format (PixelFormat format)
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:   
+    default: return false;
+  }
+}
+
+bool is_depth_format (PixelFormat format)
+{
+  switch (format)
+  {
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8: return true;   
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+    case PixelFormat_L8:    
+    case PixelFormat_A8:    
+    case PixelFormat_S8:
+    case PixelFormat_LA8:   
+    case PixelFormat_RGB8:  
+    case PixelFormat_RGBA8: 
     default: return false;
   }
 }
