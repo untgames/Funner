@@ -22,8 +22,6 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
 
   if (tex_desc.generate_mips_enable)
   {
-    mips_count = get_mips_count (tex_desc.width);
-
     if (has_SGIS_generate_mipmap)
       glTexParameteri (GL_TEXTURE_1D, GL_GENERATE_MIPMAP_SGIS, true);
     else
@@ -89,7 +87,7 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   CheckErrors ("render::low_level::opengl::Texture1D::SetData");
 }
 
-void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+/*void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer);
 
@@ -108,4 +106,4 @@ void Texture1D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   glGetTexImage (GL_TEXTURE_1D, mip_level, gl_format (target_format), gl_type (target_format), buffer);
   
   CheckErrors ("render::low_level::opengl::Texture1D::GetData");
-}
+}*/

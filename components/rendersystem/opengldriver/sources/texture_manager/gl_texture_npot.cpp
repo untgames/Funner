@@ -41,13 +41,12 @@ void TextureNPOT::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
   MakeContextCurrent ();
   Bind ();
 
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
   glTexSubImage2D (GL_TEXTURE_RECTANGLE_EXT, 0, x, y, width, height, gl_format (source_format), gl_type (source_format), buffer);
 
   CheckErrors ("render::low_level::opengl::TextureNPOT::SetData");
 }
 
-void TextureNPOT::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+/*void TextureNPOT::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer);
 
@@ -70,4 +69,4 @@ void TextureNPOT::GetData (size_t layer, size_t mip_level, size_t x, size_t y, s
   glGetTexImage (GL_TEXTURE_RECTANGLE_EXT, 0, gl_format (target_format), gl_type (target_format), buffer);
   
   CheckErrors ("render::low_level::opengl::TextureNPOT::GetData");
-}
+}*/

@@ -30,8 +30,6 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
 
   if (tex_desc.generate_mips_enable)
   {
-    mips_count = get_mips_count (tex_desc.width, tex_desc.height);
-
     if (ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, true);
     else
@@ -146,7 +144,7 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   CheckErrors ("render::low_level::opengl::Texture2D::SetData");
 }
 
-void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+/*void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture2D::GetData";
 
@@ -187,5 +185,5 @@ void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     glGetTexImage (GL_TEXTURE_2D, mip_level, gl_format (target_format), gl_type (target_format), buffer);
   
   CheckErrors ("render::low_level::opengl::Texture2D::GetData");
-}
+}*/
                                 

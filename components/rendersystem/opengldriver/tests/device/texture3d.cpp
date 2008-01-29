@@ -12,7 +12,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (texture3d_test)");
+    Test test (L"OpenGL device test window (texture3d_test)", "max_version=1.1 disable=* GL_EXT_texture3D=1");
 
     TextureDesc desc;
     memset (&desc, 0, sizeof (desc));
@@ -29,11 +29,16 @@ int main ()
     desc.generate_mips_enable = false;
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
+    
     memset (image_data, 0, image_data_size);
+    
     for (size_t i = 0; i < layers_count; i++)
       texture->SetData (i, 0, 0, 0, 508, 504, PixelFormat_RGB8, image_data);
+      
     md5 (hash[0], image_data, image_data_size);
+    
     texture->GetData (0, 0, 0, 0, 508, 504, PixelFormat_RGB8, image_data);
+    
     md5 (hash[1], image_data, image_data_size);
 
     if (memcmp (hash[0], hash[1], 16))
@@ -50,8 +55,10 @@ int main ()
 
     for (size_t i = 0; i < layers_count; i++)
       texture2->SetData (i, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data);
+      
     md5 (hash[0], image_data, image_data_size);
     texture2->GetData (2, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data);
+    
     md5 (hash[1], image_data, image_data_size);
 
     if (memcmp (hash[0], hash[1], 16))

@@ -8,13 +8,13 @@ using namespace render::low_level::opengl;
 */
 
 Texture::Texture  (const ContextManager& manager, const TextureDesc& tex_desc, GLenum in_target)
-  : ContextObject (manager), target (in_target), desc (tex_desc), mips_count (0)
+  : ContextObject (manager), target (in_target), desc (tex_desc)
 {
-     //считать mips_count!!!
+  mips_count = get_mips_count (tex_desc.width, tex_desc.height);
 
   MakeContextCurrent ();
-  glGenTextures(1, &texture_id);
-  CheckErrors ("render::low_level::opengl::Texture::Texture");
+  glGenTextures      (1, &texture_id);
+  CheckErrors        ("render::low_level::opengl::Texture::Texture");
 }
 
 Texture::~Texture ()
@@ -222,7 +222,19 @@ void Texture::GetData
     GLenum gl_tex_format = gl_format (target_format),
            gl_tex_type   = gl_type (target_format);
       
-    //!!! Учесть случай RGB 3D текстур
+/*    //!!! Учесть случай RGB 3D текстур
+    
+    int pack_skip_images = -1, pack_image_height, unpack_skip_images = -1, unpack_image_height = -1;            
+    
+    glGetIntegerv (GL_PACK_SKIP_IMAGES_EXT, &pack_skip_images);
+    glGetIntegerv (GL_PACK_IMAGE_HEIGHT_EXT, &pack_image_height);
+    glGetIntegerv (GL_UNPACK_SKIP_IMAGES_EXT, &unpack_skip_images);
+    glGetIntegerv (GL_UNPACK_IMAGE_HEIGHT_EXT, &unpack_image_height);    
+    
+    printf ("#pack_skip_images=%d\n", pack_skip_images);
+    printf ("#pack_image_height=%d\n", pack_image_height);
+    printf ("#unpack_skip_images=%d\n", unpack_skip_images);
+    printf ("#unpack_image_height=%d\n", unpack_image_height);*/
 
     if (is_full_image)
     {

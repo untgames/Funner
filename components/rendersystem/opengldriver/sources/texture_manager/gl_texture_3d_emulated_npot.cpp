@@ -66,7 +66,7 @@ void Texture3DEmulatedNPOT::GetData (size_t layer, size_t mip_level, size_t x, s
 
   try
   {
-    Texture3D::GetData (layer, mip_level, x, y, scaled_width, scaled_height, target_format, scaled_buffer.data ());
+    Texture::GetData (layer, mip_level, x, y, scaled_width, scaled_height, target_format, scaled_buffer.data ());
   }
   catch (common::Exception& exception)
   {

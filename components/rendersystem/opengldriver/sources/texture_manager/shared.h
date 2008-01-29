@@ -104,7 +104,7 @@ class Texture1D : public Texture
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+//    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ class Texture2D : public Texture
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    virtual void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+//    virtual void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ class TextureNPOT : public Texture
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+//    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +180,7 @@ class Texture3D : public Texture
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+//    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,7 +220,7 @@ class TextureCubemap : public Texture
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+//    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

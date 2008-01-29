@@ -33,8 +33,6 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
   if (tex_desc.generate_mips_enable)
   {
-    mips_count = get_mips_count (tex_desc.width, tex_desc.height);
-
     if (ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, true);
     else
@@ -162,7 +160,7 @@ void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y
   CheckErrors ("render::low_level::opengl::TextureCubemap::SetData");
 }
 
-void TextureCubemap::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+/*void TextureCubemap::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureCubemap::GetData";
 
@@ -200,4 +198,4 @@ void TextureCubemap::GetData (size_t layer, size_t mip_level, size_t x, size_t y
     glGetTexImage (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, gl_format (target_format), gl_type (target_format), buffer);
   
   CheckErrors (METHOD_NAME);
-}
+}*/

@@ -11,7 +11,8 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (texture2d_1_test)");
+//    Test test (L"OpenGL device test window (texture2d_1_test)");
+    Test test (L"OpenGL device test window (texture2d_1_test)", "max_version=1.1 disable=*");
 //    Test test (L"OpenGL device test window (texture2d_1_test)", "disable='GL_ARB_texture_non_power_of_two' max_version=1.1");
 //    Test test (L"OpenGL device test window (texture2d_1_test)", "disable='GL_ARB_texture_non_power_of_two GL_EXT_texture_compression_s3tc GL_EXT_texture_rectangle' max_version=1.1");
 
@@ -30,10 +31,15 @@ int main ()
     desc.generate_mips_enable = true;
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
+    
     memset (image_data, 17, image_data_size);
+    
     texture->SetData (0, 0, 0, 0, 508, 508, PixelFormat_RGB8, image_data);
+    
     md5 (hash[0], image_data, image_data_size);
+    
     texture->GetData (0, 0, 0, 0, 508, 508, PixelFormat_RGB8, image_data);
+    
     md5 (hash[1], image_data, image_data_size);
 
     if (memcmp (hash[0], hash[1], 16))
