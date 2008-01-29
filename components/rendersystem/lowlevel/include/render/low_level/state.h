@@ -35,7 +35,6 @@ enum VertexAttributeSemantic
   VertexAttributeSemantic_TexCoord5,
   VertexAttributeSemantic_TexCoord6,  
   VertexAttributeSemantic_TexCoord7,
-  VertexAttributeSemantic_Influence, //индексы отрезка индексных весов
   
   VertexAttributeSemantic_Num
 };
@@ -82,28 +81,17 @@ struct VertexAttribute
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вершинный вес
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct VertexWeight
-{
-  size_t matrix_index;  //индекс в массиве матриц
-  float  weight;        //вес преобразования
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Дескриптор входного потока
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t MAX_VERTEX_ATTRIBUTES_COUNT = 8;
+const size_t MAX_VERTEX_ATTRIBUTES_COUNT = VertexAttributeSemantic_Num; 
 
+//убрать фиксированный размер массива за счёт введения доп-й структуры запроса!!!
 struct InputLayoutDesc
 {
-  size_t                vertex_attributes_count;                        //количество вершинных атрибутов
-  VertexAttribute       vertex_attributes[MAX_VERTEX_ATTRIBUTES_COUNT]; //вершинные атрибуты
-  //size_t                vertex_weights_count;                           //количество вершинных весов
-  //const VertexWeight*   vertex_weights;                                 //вершинные веса  
-  InputDataType         index_type;                                     //тип индексов в вершинном буфере
-  size_t                index_buffer_offset;                            //смещение в индексном буфере
-  size_t                first_matrix;                                   //смещение в массиве матриц
+  size_t          vertex_attributes_count;                         //количество вершинных атрибутов
+  VertexAttribute vertex_attributes [MAX_VERTEX_ATTRIBUTES_COUNT]; //вершинные атрибуты
+  InputDataType   index_type;                                      //тип индексов в вершинном буфере
+  size_t          index_buffer_offset;                             //смещение в индексном буфере
 };
 
 /*
@@ -132,8 +120,7 @@ struct ViewerDesc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct TransformDesc
 {
-  size_t          matrices_count; //количество матриц
-  const Matrix4f* matrices;       //матрицы
+  Matrix4f transform; //матрица преобразований
 };
 
 /*
