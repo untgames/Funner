@@ -112,26 +112,32 @@ void Texture::GetData
 
   if (mip_level >= mips_count)
     common::RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, mips_count);
-
+    
     //отсечение
 
   size_t level_width  = desc.width >> mip_level,
          level_height = desc.height >> mip_level;
 
+  if (!level_width)
+    level_width = 1;
+
+  if (!level_height)
+    level_height = 1;
+
   if (x > level_width)
     return;
     
   if (y > level_height)
-    return;
+    return;    
     
   if (x + width > level_width)
     width = level_width - x;
 
   if (y + height > level_height)
-    height = level_height - y;
+    height = level_height - y;    
 
   if (!width || !height)
-    return;
+    return;    
 
   if (!buffer)
     common::RaiseNullArgument (METHOD_NAME, "buffer");    
@@ -168,7 +174,7 @@ void Texture::GetData
   
   GetLayerDesc (layer, layer_desc);
     
-  bool is_full_image = width == level_width && height == level_height && desc.layers == 1 && !x && !y;  
+  bool is_full_image = width == level_width && height == level_height && desc.layers == 1 && !x && !y;    
          
   if (is_compressed_format (target_format))
   {
@@ -236,14 +242,16 @@ void Texture::GetData
 
     if (is_full_image)
     {
-      printf ("target=%04x error=%04x\n", layer_desc.target, glGetError ());
+//      printf ("target=%04x error=%04x\n", layer_desc.target, glGetError ());
       
       glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, buffer);
       
-      printf ("error=%04x\n", glGetError ());            
+//      printf ("error=%04x\n", glGetError ());            
     }
     else
     {
+//      printf ("fuck!\n");
+      
         //копирование полного образа текстуры во временный буфер
         
       size_t texel_size     = opengl::texel_size (target_format),
@@ -433,7 +441,8 @@ size_t next_higher_power_of_two (size_t k)
 //получение количества mip-уровней
 size_t get_mips_count (size_t size) //оптимизировать
 {
-  return (size_t)(log ((float)next_higher_power_of_two (size)) / log (2.f)) + 1;
+//  return (size_t)(log ((float)next_higher_power_of_two (size)) / log (2.f)) + 1;
+  return (size_t)(log ((float)(size)) / log (2.f)) + 1;
 }
 
 //получение количества mip-уровней

@@ -69,7 +69,7 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   
   if (mip_level && has_SGIS_generate_mipmap)
     glTexParameteri (GL_TEXTURE_1D, GL_GENERATE_MIPMAP_SGIS, false); 
-  
+
   glTexSubImage1D (GL_TEXTURE_1D, mip_level, x, width, gl_format (source_format), gl_type (source_format), buffer);
 
   if (mip_level && has_SGIS_generate_mipmap)

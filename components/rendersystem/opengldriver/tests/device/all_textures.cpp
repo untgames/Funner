@@ -53,7 +53,8 @@ size_t next_higher_power_of_two (size_t k)
 //получение количества mip-уровней
 size_t get_mips_count (size_t size) //оптимизировать
 {
-  return (size_t)(log ((float)next_higher_power_of_two (size)) / log (2.f)) + 1;
+//  return (size_t)(log ((float)next_higher_power_of_two (size)) / log (2.f)) + 1;
+  return (size_t)(log ((float) (size)) / log (2.f)) + 1;
 }
 
 //получение количества mip-уровней
@@ -67,6 +68,36 @@ int myrand ()
   static int holdrand = 1;
   
   return ((holdrand = holdrand * 214013L + 2531011L) >> 16) & 0x7fff;
+}
+
+void print_diff (size_t size, const char* src, const char* dst)
+{
+  printf ("                 Source buffer                                          Destination buffer\n");
+  
+  size_t src_size = size, dst_size = size;
+
+  for (size_t i=0; i<16 && src_size != size_t (-1); i++)
+  {
+    printf ("%03x| ", i * 16);
+    
+    size_t j;
+    
+    for (j=0; j<16 && src_size--; j++, src++)
+      printf ("%02x ", size_t (*src) & 0xff);
+
+    for (;j<16; j++)
+      printf ("?? ");
+      
+    printf ("    ");
+      
+    for (j=0; j<16 && dst_size--; j++, dst++)
+      printf ("%02x ", size_t (*dst) & 0xff);
+
+    for (;j<16; j++)
+      printf ("?? ");
+
+    printf ("\n");
+  }
 }
 
 bool test_texture (const TextureDesc& tex_desc, IDevice* device)
@@ -91,7 +122,7 @@ bool test_texture (const TextureDesc& tex_desc, IDevice* device)
 
       for (size_t j = 0; j < get_mips_count (tex_desc.width, tex_desc.height); j++)
       {
-        printf ("mip = %u wudth = %u, height = %u\n", j, width, height);
+        printf ("  layer %u, mip %u: ", i, j);
 
         memset (dst_buffer.data (), 0, dst_buffer.size ());
         
@@ -118,12 +149,15 @@ bool test_texture (const TextureDesc& tex_desc, IDevice* device)
 
         texture->GetData (i, j, 0, 0, width, height, tex_desc.format, dst_buffer.data ());
 
-        printf ("  layer %u, mip %u: ", i, j);
-
-        if (memcmp (src_buffer.data (), dst_buffer.data (), data_size))
-          printf ("FAIL\n");
+        if (!memcmp (src_buffer.data (), dst_buffer.data (), data_size))
+        {
+          printf ("Ok\n");          
+        }
         else 
-          printf ("Ok\n");
+        {
+          printf ("FAIL\n");
+          print_diff (data_size, src_buffer.data (), dst_buffer.data ());
+        }
 
         if (width > 1)  width  /= 2;
         if (height > 1) height /= 2;

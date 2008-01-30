@@ -100,7 +100,7 @@ GLint render::low_level::opengl::unpack_internal_format (PixelFormat format)
     case PixelFormat_DXT1: return GL_RGB8;
     case PixelFormat_DXT3: 
     case PixelFormat_DXT5: return GL_RGBA8;
-    default: common::RaiseInvalidArgument ("render::low_level::opengl::unpack_internal_format", "format"); return 1;
+    default: return gl_internal_format (format);
   }
 }
 
@@ -111,7 +111,7 @@ GLenum render::low_level::opengl::unpack_format (PixelFormat format)
     case PixelFormat_DXT1: return GL_RGB;
     case PixelFormat_DXT3:
     case PixelFormat_DXT5: return GL_RGBA;
-    default: common::RaiseInvalidArgument ("render::low_level::opengl::unpack_format", "format"); return 1;
+    default: return gl_format (format);
   }
 }
 
@@ -133,7 +133,7 @@ GLenum render::low_level::opengl::unpack_type (PixelFormat format)
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5: return GL_UNSIGNED_BYTE;
-    default: common::RaiseInvalidArgument ("render::low_level::opengl::unpack_type", "format"); return 1;
+    default: return gl_type (format);
   }
 }
 
