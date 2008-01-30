@@ -143,47 +143,4 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
 
   CheckErrors ("render::low_level::opengl::Texture2D::SetData");
 }
-
-/*void Texture2D::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
-{
-  static const char* METHOD_NAME = "render::low_level::opengl::Texture2D::GetData";
-
-  Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer);
-
-  if (mip_level > mips_count)
-    RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, (size_t)0, mips_count);
-    
-  if (x)
-    RaiseOutOfRange (METHOD_NAME, "x", x, (size_t)0, (size_t)0);
-    
-  if (y)
-    RaiseOutOfRange (METHOD_NAME, "y", y, (size_t)0, (size_t)0);
-    
-  if (width != (desc.width >> mip_level))
-    RaiseOutOfRange (METHOD_NAME, "width", width, desc.width >> mip_level, desc.width >> mip_level);
-    
-  if (height != (desc.height >> mip_level))
-    RaiseOutOfRange (METHOD_NAME, "height", height, desc.height >> mip_level, desc.height >> mip_level);
-    
-  if (is_compressed_format (target_format))
-    if (target_format != desc.format)
-      RaiseInvalidArgument (METHOD_NAME, "target_format", target_format, "Can't get compressed texture data, format is different.");
-
-  MakeContextCurrent ();
-  Bind ();
-
-  TextureExtensions ext (GetContextManager ());
-
-  if (is_compressed_format (target_format))
-  {
-    if (ext.has_ext_texture_compression_s3tc)
-      glGetCompressedTexImage (GL_TEXTURE_2D, mip_level, buffer);
-    else                                                                                                  
-      RaiseNotSupported (METHOD_NAME, "Texture packing not supported. Reason: GL_EXT_texture_compression_s3tc not supported.");
-  }
-  else
-    glGetTexImage (GL_TEXTURE_2D, mip_level, gl_format (target_format), gl_type (target_format), buffer);
-  
-  CheckErrors ("render::low_level::opengl::Texture2D::GetData");
-}*/
                                 

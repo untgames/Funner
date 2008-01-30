@@ -222,19 +222,37 @@ void Texture::GetData
     GLenum gl_tex_format = gl_format (target_format),
            gl_tex_type   = gl_type (target_format);
       
-/*    //!!! Учесть случай RGB 3D текстур
+    //!!! Учесть случай RGB 3D текстур
     
-    int pack_skip_images = -1, pack_image_height, unpack_skip_images = -1, unpack_image_height = -1;            
+    int pack_skip_images = -1, pack_image_height, unpack_skip_images = -1, unpack_image_height = -1,
+        pack_row_length = -1, pack_alignment = -1, pack_skip_rows = -1, pack_skip_pixels = -1,
+        unpack_row_length = -1, unpack_alignment = -1, unpack_skip_rows = -1, unpack_skip_pixels = -1;            
     
     glGetIntegerv (GL_PACK_SKIP_IMAGES_EXT, &pack_skip_images);
     glGetIntegerv (GL_PACK_IMAGE_HEIGHT_EXT, &pack_image_height);
     glGetIntegerv (GL_UNPACK_SKIP_IMAGES_EXT, &unpack_skip_images);
     glGetIntegerv (GL_UNPACK_IMAGE_HEIGHT_EXT, &unpack_image_height);    
+    glGetIntegerv (GL_PACK_ROW_LENGTH, &pack_row_length);
+    glGetIntegerv (GL_PACK_ALIGNMENT, &pack_alignment);
+    glGetIntegerv (GL_PACK_SKIP_ROWS, &pack_skip_rows);
+    glGetIntegerv (GL_PACK_SKIP_PIXELS, &pack_skip_pixels);    
+    glGetIntegerv (GL_UNPACK_ROW_LENGTH, &unpack_row_length);
+    glGetIntegerv (GL_UNPACK_ALIGNMENT, &unpack_alignment);
+    glGetIntegerv (GL_UNPACK_SKIP_ROWS, &unpack_skip_rows);
+    glGetIntegerv (GL_UNPACK_SKIP_PIXELS, &unpack_skip_pixels);    
     
     printf ("#pack_skip_images=%d\n", pack_skip_images);
     printf ("#pack_image_height=%d\n", pack_image_height);
     printf ("#unpack_skip_images=%d\n", unpack_skip_images);
-    printf ("#unpack_image_height=%d\n", unpack_image_height);*/
+    printf ("#unpack_image_height=%d\n", unpack_image_height);
+    printf ("#pack_row_length=%d\n", pack_row_length);
+    printf ("#pack_alignment=%d\n", pack_alignment);
+    printf ("#pack_skip_rows=%d\n", pack_skip_rows);
+    printf ("#pack_skip_pixels=%d\n", pack_skip_pixels);
+    printf ("#unpack_row_length=%d\n", unpack_row_length);
+    printf ("#unpack_alignment=%d\n", unpack_alignment);
+    printf ("#unpack_skip_rows=%d\n", unpack_skip_rows);
+    printf ("#unpack_skip_pixels=%d\n", unpack_skip_pixels);
 
     if (is_full_image)
     {
@@ -246,9 +264,33 @@ void Texture::GetData
         
       size_t texel_size = opengl::texel_size (target_format);
         
-      xtl::uninitialized_storage<char> temp_buffer (level_width * level_height * desc.layers * texel_size);
+      xtl::uninitialized_storage<char> temp_buffer (level_width * level_height * desc.layers * texel_size * 2);
       
+      memset (temp_buffer.data (), 0xfe, temp_buffer.size ());
+      printf ("in\n buffer size = %u, width = %u, height = %u, layers = %u, texel_size = %u\n", 
+              temp_buffer.size (), level_width, level_height, desc.layers, texel_size);
       glGetTexImage (layer_target, mip_level, gl_tex_format, gl_tex_type, temp_buffer.data ());
+
+      printf ("byte 0 = %02x\n", temp_buffer.data()[0]);
+      for (size_t i = 0; i < temp_buffer.size (); i++)
+        if (temp_buffer.data ()[i] == 0xfffffffe)
+        {
+          printf ("data ends at byte %u\n", i);
+          printf ("after data:\n");
+
+          while (temp_buffer.data ()[i] == 0xfffffffe)
+          {
+//          for (size_t j = 0; j < 128*128; j++)
+//            printf ("%02x ", (size_t)temp_buffer.data ()[i+j] & 0xff);
+            i++;
+          }
+          printf ("i = %u", i);
+          printf ("\n");
+
+          break;
+        }
+
+      printf ("out\n");
       
         //копирование части образа в пользовательсий буфер
                

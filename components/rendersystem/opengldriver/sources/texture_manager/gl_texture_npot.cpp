@@ -45,28 +45,3 @@ void TextureNPOT::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
 
   CheckErrors ("render::low_level::opengl::TextureNPOT::SetData");
 }
-
-/*void TextureNPOT::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
-{
-  Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer);
-
-  if (mip_level)
-    RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::GetData", "mip_level", mip_level, (size_t)0, (size_t)0);
-  if (x)
-    RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::GetData", "x", x, (size_t)0, (size_t)0);
-  if (y)
-    RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::GetData", "y", y, (size_t)0, (size_t)0);
-  if (width != desc.width)
-    RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::GetData", "width", width, desc.width, desc.width);
-  if (height != desc.height)
-    RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::GetData", "height", height, desc.height, desc.height);
-  if (is_compressed_format (target_format))
-    RaiseInvalidArgument ("render::low_level::opengl::TextureNPOT::GetData", "target_format", target_format, "Can't get compressed texture data, format is different.");
-
-  MakeContextCurrent ();
-  Bind ();
-
-  glGetTexImage (GL_TEXTURE_RECTANGLE_EXT, 0, gl_format (target_format), gl_type (target_format), buffer);
-  
-  CheckErrors ("render::low_level::opengl::TextureNPOT::GetData");
-}*/

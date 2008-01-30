@@ -104,10 +104,11 @@ TextureManager::Impl::Impl (const ContextManager& context_manager)
   
 ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture";
+
   if (((int)tex_desc.width > max_texture_size) || ((int)tex_desc.height > max_texture_size))
-    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                       "Can't create texture %u*%u. Reason: maximum texture size is %u*%u", 
-                        tex_desc.width, tex_desc.height, max_texture_size, max_texture_size);
+    RaiseNotSupported (METHOD_NAME, "Can't create texture %u*%u. Reason: maximum texture size is %u*%u", 
+                       tex_desc.width, tex_desc.height, max_texture_size, max_texture_size);
   
   MakeContextCurrent ();
 
@@ -117,11 +118,10 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
   TextureDesc temp_desc = tex_desc;            
 
   if (((tex_desc.format == PixelFormat_D16) || (tex_desc.format == PixelFormat_D24X8)) && !ext.has_arb_depth_texture)
-    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                       "Can't create depth texture. Reason: GL_ARB_depth_texture extension not supported");
+    RaiseNotSupported (METHOD_NAME, "Can't create depth texture. Reason: GL_ARB_depth_texture extension not supported");
+
   if ((tex_desc.format == PixelFormat_D24S8) && !ext.has_ext_packed_depth_stencil)
-    RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                       "Can't create depth-stencil texture. Reason: GL_EXT_packed_depth_stencil extension not supported");
+    RaiseNotSupported (METHOD_NAME, "Can't create depth-stencil texture. Reason: GL_EXT_packed_depth_stencil extension not supported");
 
   switch (tex_desc.dimension)
   {
@@ -129,26 +129,29 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
     {
       temp_desc.height = 1;
       temp_desc.layers = 1;
+
       if (tex_desc.width < 1)
-        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_texture_size);
+        RaiseOutOfRange (METHOD_NAME, "tex_desc.width", (int)tex_desc.width, 1, max_texture_size);
+      
       if (is_compressed_format (tex_desc.format))
-        RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "1D texture can't be compressed.");
+        RaiseNotSupported (METHOD_NAME, "1D texture can't be compressed.");
+      
       if (!ext.has_arb_texture_non_power_of_two)
         if ((tex_desc.width - 1) & tex_desc.width) 
           if (ext.has_ext_texture_rectangle)
           {
             if (tex_desc.generate_mips_enable)
-              RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Mip maps for non power of two textures not supported.");
+              RaiseNotSupported (METHOD_NAME, "Mip maps for non power of two textures not supported.");
 
             glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, 1, 0, 
                           gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
             
             glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, GL_TEXTURE_WIDTH, &width);
-            if (!width)
-              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                                 "Not enough space to create texture with width = %u", tex_desc.width);
 
-            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+            if (!width)
+              Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u", tex_desc.width);
+
+            CheckErrors (METHOD_NAME);
 
             return new TextureNPOT (GetContextManager (), temp_desc);
           }
@@ -160,11 +163,11 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
                           gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
             
             glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-            if (!width)
-              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                                 "Not enough space to create texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
 
-            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+            if (!width)
+              Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
+
+            CheckErrors (METHOD_NAME);
             LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");
             return new TextureEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width, 1);
           }
@@ -172,25 +175,29 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       glTexImage1D (GL_PROXY_TEXTURE_1D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
       
       glGetTexLevelParameteriv (GL_PROXY_TEXTURE_1D, 0, GL_TEXTURE_WIDTH, &width);
-      if (!width)
-        Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                           "Not enough space to create texture with width = %u", tex_desc.width);
 
-      CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+      if (!width)
+        Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u", tex_desc.width);
+
+      CheckErrors (METHOD_NAME);
       return new Texture1D (GetContextManager (), temp_desc);
     }
     case TextureDimension_2D:
     {
       temp_desc.layers = 1;
+      
       if (tex_desc.width < 1)
-        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_texture_size);
+        RaiseOutOfRange (METHOD_NAME, "tex_desc.width", (int)tex_desc.width, 1, max_texture_size);
+      
       if (tex_desc.height < 1)
-        RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 1, max_texture_size);
+        RaiseOutOfRange (METHOD_NAME, "tex_desc.height", (int)tex_desc.height, 1, max_texture_size);
+      
       if ((tex_desc.width & 3) && is_compressed_format (tex_desc.format))
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width,
+        RaiseInvalidArgument (METHOD_NAME, "tex_desc.width", tex_desc.width,
                               "Texture width for compressed image must be a multiple 4");
+      
       if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
-        RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
+        RaiseInvalidArgument (METHOD_NAME, "tex_desc.height", tex_desc.height,
                               "Texture height for compressed image must be a multiple 4");
       if (!ext.has_arb_texture_non_power_of_two)
       {
@@ -198,17 +205,16 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
           if (ext.has_ext_texture_rectangle && !is_compressed_format (tex_desc.format))
           {
             if (tex_desc.generate_mips_enable)
-              RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Mip maps for non power of two textures not supported.");
+              RaiseNotSupported (METHOD_NAME, "Mip maps for non power of two textures not supported.");
 
             glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
                           gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
             
             glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, GL_TEXTURE_WIDTH, &width);
             if (!width)
-              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                                 "Not enough space to create texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
+              Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
 
-            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+            CheckErrors (METHOD_NAME);
             return new TextureNPOT (GetContextManager (), temp_desc);
           }
           else
@@ -230,11 +236,11 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
                             gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
 
             glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-            if (!width)
-              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                                 "Not enough space to create texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
 
-            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+            if (!width)
+              Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
+
+            CheckErrors (METHOD_NAME);
             LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");
             return new TextureEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width, (float)temp_desc.height / (float)tex_desc.height);
           }
@@ -254,11 +260,11 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
                       gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
       
       glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-      if (!width)
-        Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                           "Not enough space to create texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
 
-      CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+      if (!width)
+        Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
+
+      CheckErrors (METHOD_NAME);
       return new Texture2D (GetContextManager (), temp_desc);
     }
     case TextureDimension_3D: 
@@ -266,20 +272,25 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       if (ext.has_ext_texture3D)
       {
         if (is_depth_format (tex_desc.format))
-          RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture",
-                             "Can't create depth 3d texture. Reason: depth texture may be only 1d or 2d");
+          RaiseNotSupported (METHOD_NAME, "Can't create depth 3d texture. Reason: depth texture may be only 1d or 2d");
+
         if (tex_desc.width < 1)
-          RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_3d_texture_size);
+          RaiseOutOfRange (METHOD_NAME, "tex_desc.width", (int)tex_desc.width, 1, max_3d_texture_size);
+        
         if (tex_desc.height < 1)
-          RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 1, max_3d_texture_size);
+          RaiseOutOfRange (METHOD_NAME, "tex_desc.height", (int)tex_desc.height, 1, max_3d_texture_size);
+        
         if (tex_desc.layers < 1)
-          RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.layers", (int)tex_desc.layers, 1, max_3d_texture_size);
+          RaiseOutOfRange (METHOD_NAME, "tex_desc.layers", (int)tex_desc.layers, 1, max_3d_texture_size);
+        
         if ((tex_desc.width & 3) && is_compressed_format (tex_desc.format))
-          RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width,
+          RaiseInvalidArgument (METHOD_NAME, "tex_desc.width", tex_desc.width,
                                 "Texture width for compressed image must be a multiple 4");
+        
         if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
-          RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
+          RaiseInvalidArgument (METHOD_NAME, "tex_desc.height", tex_desc.height,
                                 "Texture height for compressed image must be a multiple 4");
+        
         if (!ext.has_arb_texture_non_power_of_two)
         {
           if (((tex_desc.width - 1) & tex_desc.width) || ((tex_desc.height - 1) & tex_desc.height))
@@ -301,12 +312,12 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
                                gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
             
             glGetTexLevelParameteriv (GL_PROXY_TEXTURE_3D_EXT, 0, GL_TEXTURE_WIDTH, &width);
+        
             if (!width)
-              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                                 "Not enough space to create 3d texture with width = %u, height = %u and layers = %u", 
+              Raise <Exception> (METHOD_NAME, "Not enough space to create 3d texture with width = %u, height = %u and layers = %u", 
                                  temp_desc.width, temp_desc.height, temp_desc.layers);
 
-            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+            CheckErrors (METHOD_NAME);
             LogPrintf ("Non power of two textures not supported by hardware. Scaled 3d texture created.\n");
             return new Texture3DEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width, (float)temp_desc.height / (float)tex_desc.height);
           }
@@ -326,37 +337,42 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
                            gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
         
         glGetTexLevelParameteriv (GL_PROXY_TEXTURE_3D_EXT, 0, GL_TEXTURE_WIDTH, &width);
+
         if (!width)
-          Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                             "Not enough space to create 3d texture with width = %u, height = %u and layers = %u",
+          Raise <Exception> (METHOD_NAME, "Not enough space to create 3d texture with width = %u, height = %u and layers = %u",
                              tex_desc.width, tex_desc.height, tex_desc.layers);
 
-        CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+        CheckErrors (METHOD_NAME);
         return new Texture3D (GetContextManager (), temp_desc);
       }
       else
-        RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "3D textuers not supported. No 'EXT_texture3D' extension."); 
+        RaiseNotSupported (METHOD_NAME, "3D textuers not supported. No 'EXT_texture3D' extension."); 
     }
     case TextureDimension_Cubemap:
     {
       if (ext.has_arb_texture_cube_map)
       {
         if (is_depth_format (tex_desc.format))
-          RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture",
-                             "Can't create depth 3d texture. Reason: depth texture may be only 1d or 2d");
+          RaiseNotSupported (METHOD_NAME, "Can't create depth 3d texture. Reason: depth texture may be only 1d or 2d");
+
         if (tex_desc.layers != 6)
-          RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.layers", (int)tex_desc.layers, 6, 6);
+          RaiseOutOfRange (METHOD_NAME, "tex_desc.layers", (int)tex_desc.layers, 6, 6);
+        
         if (tex_desc.width != tex_desc.height)
-          Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Cubemap texture width and height must be equal.");
+          Raise <Exception> (METHOD_NAME, "Cubemap texture width and height must be equal.");
+        
         if (tex_desc.width < 1)
-          RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", (int)tex_desc.width, 1, max_cube_map_texture_size);
+          RaiseOutOfRange (METHOD_NAME, "tex_desc.width", (int)tex_desc.width, 1, max_cube_map_texture_size);
+        
         if (tex_desc.height < 1)
-          RaiseOutOfRange ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", (int)tex_desc.height, 1, max_cube_map_texture_size);
+          RaiseOutOfRange (METHOD_NAME, "tex_desc.height", (int)tex_desc.height, 1, max_cube_map_texture_size);
+        
         if ((tex_desc.width & 3) && is_compressed_format (tex_desc.format))
-          RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.width", tex_desc.width,
+          RaiseInvalidArgument (METHOD_NAME, "tex_desc.width", tex_desc.width,
                                 "Texture width for compressed image must be a multiple 4");
+        
         if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
-          RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.height", tex_desc.height,
+          RaiseInvalidArgument (METHOD_NAME, "tex_desc.height", tex_desc.height,
                                 "Texture height for compressed image must be a multiple 4");
 
         if (!ext.has_arb_texture_non_power_of_two)
@@ -379,11 +395,11 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
                             gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
             
             glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, GL_TEXTURE_WIDTH, &width);
+        
             if (!width)
-              Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                                 "Not enough space to create cubemap texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
+              Raise <Exception> (METHOD_NAME, "Not enough space to create cubemap texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
 
-            CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+            CheckErrors (METHOD_NAME);
             LogPrintf ("Non power of two textures not supported by hardware. Scaled  cubemap texture created.\n");
             return new TextureCubemapEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width);
           }
@@ -403,17 +419,17 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
                         gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
         
         glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, GL_TEXTURE_WIDTH, &width);
-        if (!width)
-          Raise <Exception> ("render::low_level::opengl::TextureManager::Impl::CreateTexture", 
-                             "Not enough space to create cubemap texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
 
-        CheckErrors ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+        if (!width)
+          Raise <Exception> (METHOD_NAME, "Not enough space to create cubemap texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
+
+        CheckErrors (METHOD_NAME);
         return new TextureCubemap (GetContextManager (), temp_desc);
       }
       else
-        RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension."); 
+        RaiseNotSupported (METHOD_NAME, "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension."); 
     }
-    default: RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "tex_desc.dimension", tex_desc.dimension);
+    default: RaiseInvalidArgument (METHOD_NAME, "tex_desc.dimension", tex_desc.dimension);
   }
 
   return 0;
