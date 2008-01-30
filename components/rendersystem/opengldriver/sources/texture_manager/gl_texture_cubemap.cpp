@@ -31,37 +31,36 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
                     gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
   }
 
-  if (tex_desc.generate_mips_enable)
+  //Задание мипов
+
+  size_t width = tex_desc.width; size_t height = tex_desc.height;
+
+  for (size_t i = 1; i < mips_count; i++)
   {
+    for (size_t j = 0; j < 6; j++)
+    {
+      if (is_compressed_format (tex_desc.format))   
+      {
+        if (ext.has_ext_texture_compression_s3tc)   
+          glCompressedTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format), width, 
+                                  height, 0, ((width * height) >> 4) / compressed_quad_size (tex_desc.format), NULL);
+        else
+          glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, unpack_internal_format (tex_desc.format), width, height, 0, 
+                        unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+      }
+      else
+        glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format), width, height, 0, 
+                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+    }
+    
+    if (width > 1)  width  /= 2;
+    if (height > 1) height /= 2;
+  }
+
+
+  if (tex_desc.generate_mips_enable)
     if (ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, true);
-    else
-    {
-      size_t width = tex_desc.width; size_t height = tex_desc.height;
-
-      for (size_t i = 1; i < mips_count; i++)
-      {
-        for (size_t j = 0; j < 6; j++)
-        {
-          if (is_compressed_format (tex_desc.format))   
-          {
-            if (ext.has_ext_texture_compression_s3tc)   
-              glCompressedTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format), width, 
-                                      height, 0, ((width * height) >> 4) / compressed_quad_size (tex_desc.format), NULL);
-            else
-              glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, unpack_internal_format (tex_desc.format), width, height, 0, 
-                            unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
-          }
-          else
-            glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format), width, height, 0, 
-                          gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-        }
-        
-        if (width > 1)  width  /= 2;
-        if (height > 1) height /= 2;
-      }
-    }
-  }
 
   CheckErrors ("render::low_level::opengl::TextureCubemap::TextureCubemap");
 }

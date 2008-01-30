@@ -89,8 +89,10 @@ bool test_texture (const TextureDesc& tex_desc, IDevice* device)
       size_t width  = tex_desc.width;
       size_t height = tex_desc.height;
 
-      for (size_t j = 0; get_mips_count (tex_desc.width, tex_desc.height); j++)
+      for (size_t j = 0; j < get_mips_count (tex_desc.width, tex_desc.height); j++)
       {
+        printf ("mip = %u wudth = %u, height = %u\n", j, width, height);
+
         memset (dst_buffer.data (), 0, dst_buffer.size ());
         
         size_t data_size = width * height;
@@ -132,7 +134,7 @@ bool test_texture (const TextureDesc& tex_desc, IDevice* device)
   }
   catch (std::exception& e)
   {
-    printf ("FAIL\n%s\n", e.what ());
+    printf ("FAIL\nException: '%s'\n", e.what ());
     return false;
   }
 }
@@ -166,7 +168,8 @@ int main ()
     Test test (L"OpenGL device test window (all_textures_test)");
 
     bool        status [2][2][TextureDimension_Num][PixelFormat_Num]; 
-    TextureSize sizes [TextureDimension_Num] = {{8, 1, 1}, {8, 8, 1}, {8, 8, 2}, {8, 8, 6}};
+    TextureSize sizes [2][TextureDimension_Num] = {{{16, 1, 1}, {16, 16, 1}, {16, 16, 2}, {16, 16, 6}},
+                                                   {{12, 1, 1}, {12, 12, 1}, {12, 12, 2}, {12, 12, 6}}};
 
     memset (status, 0, sizeof status);
 
@@ -176,27 +179,29 @@ int main ()
       for (size_t j = 0; j < PixelFormat_Num; j++)
       {
         desc.dimension            = (TextureDimension)i;
-        desc.width                = sizes [i].width;
-        desc.height               = sizes [i].height;
-        desc.layers               = sizes [i].layers;
+        desc.width                = sizes [0][i].width;
+        desc.height               = sizes [0][i].height;
+        desc.layers               = sizes [0][i].layers;
         desc.format               = (PixelFormat)j;
         desc.bind_flags           = BindFlag_Texture;
         desc.generate_mips_enable = false;
 
         status [0][0][i][j] = test_texture (desc, test.device.get ());
 
-        desc.width  -= 4;
-        desc.height -= 4;
+        desc.width                = sizes [1][i].width;
+        desc.height               = sizes [1][i].height;
+        desc.layers               = sizes [1][i].layers;
 
         status [0][1][i][j] = test_texture (desc, test.device.get ());
 
         desc.generate_mips_enable = true;
 
         status [1][1][i][j] = test_texture (desc, test.device.get ());
-
-        desc.width  += 4;
-        desc.height += 4;
  
+        desc.width                = sizes [0][i].width;
+        desc.height               = sizes [0][i].height;
+        desc.layers               = sizes [0][i].layers;
+
         status [1][0][i][j] = test_texture (desc, test.device.get ());
       }
       

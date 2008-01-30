@@ -28,34 +28,32 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     glTexImage3DEXT (GL_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
 
-  if (tex_desc.generate_mips_enable)
+   //Задание мипов
+
+  size_t width = tex_desc.width; size_t height = tex_desc.height;
+
+  for (size_t i = 1; i < mips_count; i++)
   {
+    if (is_compressed_format (tex_desc.format))   
+    {
+      if (ext.has_ext_texture_compression_s3tc)
+        glCompressedTexImage3D (GL_TEXTURE_3D_EXT, i, gl_internal_format (tex_desc.format), width, height, tex_desc.layers,
+                                0, ((width * height) >> 4) / compressed_quad_size (tex_desc.format), NULL);
+      else
+        glTexImage3DEXT (GL_TEXTURE_3D_EXT, i, unpack_internal_format (tex_desc.format), width, height, tex_desc.layers, 0, 
+                         unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+    }
+    else
+      glTexImage3DEXT (GL_TEXTURE_3D_EXT, i, gl_internal_format (tex_desc.format), width, height, tex_desc.layers, 0, 
+                       gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+
+    if (width > 1)   width  /= 2;
+    if (height > 1)  height /= 2;
+  }
+
+  if (tex_desc.generate_mips_enable)
     if (ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_3D_EXT, GL_GENERATE_MIPMAP_SGIS, true);
-    else
-    {
-      size_t width = tex_desc.width; size_t height = tex_desc.height;
-
-      for (size_t i = 1; i < mips_count; i++)
-      {
-        if (is_compressed_format (tex_desc.format))   
-        {
-          if (ext.has_ext_texture_compression_s3tc)
-            glCompressedTexImage3D (GL_TEXTURE_3D_EXT, i, gl_internal_format (tex_desc.format), width, height, tex_desc.layers,
-                                    0, ((width * height) >> 4) / compressed_quad_size (tex_desc.format), NULL);
-          else
-            glTexImage3DEXT (GL_TEXTURE_3D_EXT, i, unpack_internal_format (tex_desc.format), width, height, tex_desc.layers, 0, 
-                             unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
-        }
-        else
-          glTexImage3DEXT (GL_TEXTURE_3D_EXT, i, gl_internal_format (tex_desc.format), width, height, tex_desc.layers, 0, 
-                           gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-
-        if (width > 1)   width  /= 2;
-        if (height > 1)  height /= 2;
-      }
-    }
-  }
 
   CheckErrors ("render::low_level::opengl::Texture3D::Texture3D");
 }
