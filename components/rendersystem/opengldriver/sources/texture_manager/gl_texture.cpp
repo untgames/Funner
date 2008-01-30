@@ -236,7 +236,11 @@ void Texture::GetData
 
     if (is_full_image)
     {
+      printf ("target=%04x error=%04x\n", layer_desc.target, glGetError ());
+      
       glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, buffer);
+      
+      printf ("error=%04x\n", glGetError ());            
     }
     else
     {

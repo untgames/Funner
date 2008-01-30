@@ -7,6 +7,38 @@ struct TextureSize
   size_t layers;
 };
 
+const char* get_short_name (TextureDimension param)
+{
+  switch (param)
+  {
+    case TextureDimension_1D:      return "1D";
+    case TextureDimension_2D:      return "2D";
+    case TextureDimension_3D:      return "3D";
+    case TextureDimension_Cubemap: return "Cubemap";
+    default:                       return "??";
+  }
+}
+
+const char* get_short_name (PixelFormat param)
+{
+  switch (param)
+  {
+    case PixelFormat_RGB8:  return "RGB8 ";
+    case PixelFormat_RGBA8: return "RGBA8";
+    case PixelFormat_L8:    return "L8   ";
+    case PixelFormat_A8:    return "A8   ";
+    case PixelFormat_LA8:   return "LA8  ";
+    case PixelFormat_DXT1:  return "DXT1 ";
+    case PixelFormat_DXT3:  return "DXT3 ";
+    case PixelFormat_DXT5:  return "DXT5 ";
+    case PixelFormat_D16:   return "D16  ";
+    case PixelFormat_D24X8: return "D24X8";
+    case PixelFormat_D24S8: return "D24S8";
+    case PixelFormat_S8:    return "S8   ";
+    default:                return "?????";
+  }
+}
+
 //получение ближайшей сверху степени двойки
 size_t next_higher_power_of_two (size_t k) 
 {
@@ -39,7 +71,7 @@ int myrand ()
 
 bool test_texture (const TextureDesc& tex_desc, IDevice* device)
 {
-  printf ("%s %ux%ux%u@%s %s:\n", get_name (tex_desc.dimension), tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format), 
+  printf ("%s %ux%ux%u@%s %s:\n", get_name (tex_desc.dimension), tex_desc.width, tex_desc.height, tex_desc.layers, get_short_name (tex_desc.format), 
           tex_desc.generate_mips_enable ? "auto-mips" : "manual-mips");
 
   try
@@ -105,6 +137,26 @@ bool test_texture (const TextureDesc& tex_desc, IDevice* device)
   }
 }
 
+void print_status_table (bool status [TextureDimension_Num][PixelFormat_Num])
+{
+  printf ("       ");
+
+  for (size_t i=0; i<TextureDimension_Num; i++)
+    printf ("%s ", get_short_name ((TextureDimension)i));
+    
+  printf ("\n");
+    
+  for (size_t i=0; i<PixelFormat_Num; i++)
+  {
+    printf ("%s| ", get_short_name ((PixelFormat)i));
+
+    for (size_t j=0; j<TextureDimension_Num; j++)
+      printf ("%c  ", status [j][i] ? '+' : '-');
+
+    printf ("\n");
+  }
+}
+
 int main ()
 {
   printf ("Results of all_textures_test:\n");
@@ -113,8 +165,8 @@ int main ()
   {
     Test test (L"OpenGL device test window (all_textures_test)");
 
-    bool        status[TextureDimension_Num][PixelFormat_Num][2][2]; 
-    TextureSize sizes [TextureDimension_Num] = {(8, 1, 1), (8, 8, 1), (8, 8, 2), (8, 8, 6)};  
+    bool        status [2][2][TextureDimension_Num][PixelFormat_Num]; 
+    TextureSize sizes [TextureDimension_Num] = {{8, 1, 1}, {8, 8, 1}, {8, 8, 2}, {8, 8, 6}};
 
     memset (status, 0, sizeof status);
 
@@ -124,34 +176,47 @@ int main ()
       for (size_t j = 0; j < PixelFormat_Num; j++)
       {
         desc.dimension            = (TextureDimension)i;
-        desc.width                = sizes[i].width;
-        desc.height               = sizes[i].height;
-        desc.layers               = sizes[i].layers;
+        desc.width                = sizes [i].width;
+        desc.height               = sizes [i].height;
+        desc.layers               = sizes [i].layers;
         desc.format               = (PixelFormat)j;
         desc.bind_flags           = BindFlag_Texture;
         desc.generate_mips_enable = false;
 
-        status [i][j][0][0] = test_texture (desc, test.device.get ());
+        status [0][0][i][j] = test_texture (desc, test.device.get ());
 
         desc.width  -= 4;
         desc.height -= 4;
 
-        status [i][j][0][1] = test_texture (desc, test.device.get ());
+        status [0][1][i][j] = test_texture (desc, test.device.get ());
 
         desc.generate_mips_enable = true;
 
-        status [i][j][1][0] = test_texture (desc, test.device.get ());
+        status [1][1][i][j] = test_texture (desc, test.device.get ());
 
         desc.width  += 4;
         desc.height += 4;
  
-        status [i][j][1][1] = test_texture (desc, test.device.get ());
+        status [1][0][i][j] = test_texture (desc, test.device.get ());
+      }
+      
+    static const char *mips_titles [2] = {"manual-mips", "auto-mips"},
+                      *pot_titles [2] = {"power of two", "non power of two"};
+      
+    for (size_t i=0; i<2; i++)
+      for (size_t j=0; j<2; j++)
+      {
+        printf ("Status table for %s textures with %s:\n", pot_titles [i], mips_titles [j]);
+        
+        print_status_table (status [j][i]);
+        
+        printf ("*************************************\n");
       }
   }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());
   }
-  
+
   return 0;
 }
