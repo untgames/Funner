@@ -15,37 +15,28 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
 
   Bind ();
 
-  if (is_compressed_format (tex_desc.format))   
-  {   
-    if (ext.has_ext_texture_compression_s3tc)
-      glCompressedTexImage3D (GL_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers,
-                              0, ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
-    else
-      glTexImage3DEXT (GL_TEXTURE_3D_EXT, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
-                       unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
-  }
-  else
-    glTexImage3DEXT (GL_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
-                     gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-
-   //Задание мипов
-
   size_t width = tex_desc.width; size_t height = tex_desc.height;
 
-  for (size_t i = 1; i < mips_count; i++)
+  for (size_t i = 0; i < mips_count; i++)
   {
-    if (is_compressed_format (tex_desc.format))   
+    GLenum gl_internal_format, gl_format, gl_type;     
+    
+    if (ext.has_ext_texture_compression_s3tc)
     {
-      if (ext.has_ext_texture_compression_s3tc)
-        glCompressedTexImage3D (GL_TEXTURE_3D_EXT, i, gl_internal_format (tex_desc.format), width, height, tex_desc.layers,
-                                0, ((width * height) >> 4) / compressed_quad_size (tex_desc.format), NULL);
-      else
-        glTexImage3DEXT (GL_TEXTURE_3D_EXT, i, unpack_internal_format (tex_desc.format), width, height, tex_desc.layers, 0, 
-                         unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+      gl_internal_format = opengl::gl_internal_format (tex_desc.format);        
+      gl_format          = opengl::unpack_format      (tex_desc.format);
+      gl_type            = opengl::unpack_type        (tex_desc.format);      
     }
     else
-      glTexImage3DEXT (GL_TEXTURE_3D_EXT, i, gl_internal_format (tex_desc.format), width, height, tex_desc.layers, 0, 
-                       gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+    {
+      gl_internal_format = opengl::unpack_internal_format (tex_desc.format);        
+      gl_format          = opengl::unpack_format          (tex_desc.format);
+      gl_type            = opengl::unpack_type            (tex_desc.format);
+    }
+
+    
+    glTexImage3DEXT (GL_TEXTURE_3D_EXT, i, gl_internal_format, width, height, tex_desc.layers, 0, 
+                     gl_format, gl_type, NULL);
 
     if (width > 1)   width  /= 2;
     if (height > 1)  height /= 2;

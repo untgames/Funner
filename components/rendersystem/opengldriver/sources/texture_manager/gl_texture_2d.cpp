@@ -17,9 +17,6 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
 
   size_t width = tex_desc.width; size_t height = tex_desc.height;
   
-//  if (is_compressed_format (tex_desc.format))
-//    mips_count -= 4; //~!!!!!!!!!!!!!!!!!!
-
   for (size_t i = 0; i < mips_count; i++)
   {
     GLenum gl_internal_format, gl_format, gl_type;     
@@ -37,13 +34,10 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
       gl_type            = opengl::unpack_type            (tex_desc.format);
     }
 
-    if (is_compressed_format (tex_desc.format))
-      glCompressedTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, width, height, 0, width * height * ((float)compressed_quad_size (tex_desc.format) / 16.f), 0);
-    else
-      glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, width, height, 0, gl_format, gl_type, NULL);
+    glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, width, height, 0, gl_format, gl_type, NULL);
 
-    if (width > 1)   width  /= 2; //get_next_mip_size!!!
-    if (height > 1)  height /= 2;
+    if (width > 1)  width  /= 2; //get_next_mip_size!!!
+    if (height > 1) height /= 2;
   }
 
   if (tex_desc.generate_mips_enable)

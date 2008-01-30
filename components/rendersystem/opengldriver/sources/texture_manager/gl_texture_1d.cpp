@@ -18,9 +18,7 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
 
   Bind ();  
 
-  glTexImage1D (GL_TEXTURE_1D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-
-  for (size_t i = 1; i < mips_count; i++)
+  for (size_t i = 0; i < mips_count; i++)
     glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format (tex_desc.format), tex_desc.width >> i, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
 
   if (tex_desc.generate_mips_enable)
