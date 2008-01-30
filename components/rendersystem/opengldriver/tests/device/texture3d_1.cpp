@@ -31,7 +31,14 @@ int main ()
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
     
     memset (image_data, 0XFF, image_data_size);
-    
+
+    for (size_t i=0; i<image_data_size; i+=3)
+    {
+      image_data [i]   = char (0xfa);
+      image_data [i+1] = char (0xfb);
+      image_data [i+2] = char (0xfc);
+    }
+
     for (size_t i = 0; i < layers_count; i++)
       texture->SetData (i, 0, 0, 0, 768, 768, PixelFormat_RGB8, image_data);
       

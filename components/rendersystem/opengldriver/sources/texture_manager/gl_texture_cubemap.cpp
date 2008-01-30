@@ -67,15 +67,16 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 }
 
 /*
-    Получение целевого типа слоя текстуры
+    Получение дескриптора слоя текстуры
 */
 
-GLenum TextureCubemap::GetLayerTarget (size_t layer)
+void TextureCubemap::GetLayerDesc (size_t layer, LayerDesc& desc)
 {
   if (layer > 6)
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::GetLayerTarget", "layer", layer, 6);
-    
-  return GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer;
+    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::GetLayerDesc", "layer", layer, 6);
+
+  desc.target    = GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer;
+  desc.new_index = 0;
 }
 
 /*

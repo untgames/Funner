@@ -28,16 +28,24 @@ int main ()
     desc.generate_mips_enable = false;
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
-    memset (image_data, 17, image_data_size);
-    texture->SetData (3, 0, 0, 0, 508, 508, PixelFormat_DXT5, image_data + desc.width * desc.height * 3);
-    md5 (hash[0], image_data, image_data_size);
-    texture->GetData (3, 0, 0, 0, 508, 508, PixelFormat_DXT5, image_data + desc.width * desc.height * 3);
-    md5 (hash[1], image_data, image_data_size);
+    
+    for (size_t i=0; i<6; i++)
+    {
+      memset (image_data, 17 + i, image_data_size);
 
-    if (memcmp (hash[0], hash[1], 16))
-      printf ("DXT non power of two cubemap texture data operations works incorrect!\n");
-    else
-      printf ("DXT non power of two cubemap texture data operations works correct!\n");
+      texture->SetData (i, 0, 0, 0, 508, 508, PixelFormat_DXT5, image_data + desc.width * desc.height * i);
+
+      md5 (hash[0], image_data, image_data_size);
+
+      texture->GetData (i, 0, 0, 0, 508, 508, PixelFormat_DXT5, image_data + desc.width * desc.height * i);
+
+      md5 (hash[1], image_data, image_data_size);
+
+      if (memcmp (hash[0], hash[1], 16))
+        printf ("Layer%d: DXT5 non power of two cubemap texture data operations works incorrect!\n", i+1);
+      else
+        printf ("Layer%d: DXT5 non power of two cubemap texture data operations works correct!\n", i+1);
+    }
 
     desc.generate_mips_enable = true;
     desc.width                = 512;
@@ -45,16 +53,22 @@ int main ()
     desc.format               = PixelFormat_RGBA8;
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
+    
+    for (size_t i=0; i<6; i++)
+    {
+      texture2->SetData (i, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data + desc.width * desc.height * i * 4);
+      
+      md5 (hash[0], image_data, image_data_size);
+      
+      texture2->GetData (i, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data + desc.width * desc.height * i * 4);
+      
+      md5 (hash[1], image_data, image_data_size);
 
-    texture2->SetData (2, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data + desc.width * desc.height * 2);
-    md5 (hash[0], image_data, image_data_size);
-    texture2->GetData (2, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data + desc.width * desc.height * 2);
-    md5 (hash[1], image_data, image_data_size);
-
-    if (memcmp (hash[0], hash[1], 16))
-      printf ("RGBA cubemap texture data operations works incorrect!\n");
-    else
-      printf ("RGBA cubemap texture data operations works correct!\n");
+      if (memcmp (hash[0], hash[1], 16))
+        printf ("Layer%d: RGBA cubemap texture data operations works incorrect!\n", i+1);
+      else
+        printf ("Layer%d: RGBA cubemap texture data operations works correct!\n", i+1);
+    }
 
     delete [] image_data;
   }

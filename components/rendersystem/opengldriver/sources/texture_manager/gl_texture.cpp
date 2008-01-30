@@ -62,6 +62,16 @@ void Texture::Bind ()
 }
 
 /*
+    Получение дескриптора слоя текстуры
+*/
+
+void Texture::GetLayerDesc (size_t layer, LayerDesc& desc)
+{
+  desc.target    = target;
+  desc.new_index = layer;
+}
+
+/*
    Работа с данными
 */
 
@@ -152,10 +162,13 @@ void Texture::GetData
 
   TextureExtensions ext (GetContextManager ());
   
-    //получение информации о текстуре
+    //получение информации о слое текстуры
+
+  LayerDesc layer_desc;
+  
+  GetLayerDesc (layer, layer_desc);
     
-  GLenum layer_target  = GetLayerTarget (layer);
-  bool   is_full_image = width == level_width && height == level_height && desc.layers == 1 && !x && !y;
+  bool is_full_image = width == level_width && height == level_height && desc.layers == 1 && !x && !y;  
          
   if (is_compressed_format (target_format))
   {
@@ -170,7 +183,7 @@ void Texture::GetData
  
     if (is_full_image)
     {
-      glGetCompressedTexImage (layer_target, mip_level, buffer);      
+      glGetCompressedTexImage (layer_desc.target, mip_level, buffer);      
     }
     else
     {
@@ -187,20 +200,19 @@ void Texture::GetData
       width  /= DXT_EDGE_SIZE;
       height /= DXT_EDGE_SIZE;
 
-        //Копирование полного образа во временный буфер
-
+        //копирование полного образа во временный буфер
 
       size_t quad_size  = compressed_quad_size (target_format),
              layer_size = level_width * level_height / DXT_BLOCK_SIZE * quad_size;
       
       xtl::uninitialized_storage<char> temp_buffer (layer_size * desc.layers);
 
-      glGetCompressedTexImage (layer_target, mip_level, temp_buffer.data ());      
+      glGetCompressedTexImage (layer_desc.target, mip_level, temp_buffer.data ());      
 
-        //копирование части образа в пользовательсий буфер
+        //копирование части образа в пользовательский буфер
                
       size_t quad_line_size = level_width / DXT_EDGE_SIZE * quad_size,
-             start_offset   = layer * layer_size + y * quad_line_size + x * quad_size,
+             start_offset   = layer_desc.new_index * layer_size + y * quad_line_size + x * quad_size,
              block_size     = width * quad_size;
       
       const char* src = temp_buffer.data () + start_offset;
@@ -221,84 +233,29 @@ void Texture::GetData
       
     GLenum gl_tex_format = gl_format (target_format),
            gl_tex_type   = gl_type (target_format);
-      
-    //!!! Учесть случай RGB 3D текстур
-    
-    int pack_skip_images = -1, pack_image_height, unpack_skip_images = -1, unpack_image_height = -1,
-        pack_row_length = -1, pack_alignment = -1, pack_skip_rows = -1, pack_skip_pixels = -1,
-        unpack_row_length = -1, unpack_alignment = -1, unpack_skip_rows = -1, unpack_skip_pixels = -1;            
-    
-    glGetIntegerv (GL_PACK_SKIP_IMAGES_EXT, &pack_skip_images);
-    glGetIntegerv (GL_PACK_IMAGE_HEIGHT_EXT, &pack_image_height);
-    glGetIntegerv (GL_UNPACK_SKIP_IMAGES_EXT, &unpack_skip_images);
-    glGetIntegerv (GL_UNPACK_IMAGE_HEIGHT_EXT, &unpack_image_height);    
-    glGetIntegerv (GL_PACK_ROW_LENGTH, &pack_row_length);
-    glGetIntegerv (GL_PACK_ALIGNMENT, &pack_alignment);
-    glGetIntegerv (GL_PACK_SKIP_ROWS, &pack_skip_rows);
-    glGetIntegerv (GL_PACK_SKIP_PIXELS, &pack_skip_pixels);    
-    glGetIntegerv (GL_UNPACK_ROW_LENGTH, &unpack_row_length);
-    glGetIntegerv (GL_UNPACK_ALIGNMENT, &unpack_alignment);
-    glGetIntegerv (GL_UNPACK_SKIP_ROWS, &unpack_skip_rows);
-    glGetIntegerv (GL_UNPACK_SKIP_PIXELS, &unpack_skip_pixels);    
-    
-    printf ("#pack_skip_images=%d\n", pack_skip_images);
-    printf ("#pack_image_height=%d\n", pack_image_height);
-    printf ("#unpack_skip_images=%d\n", unpack_skip_images);
-    printf ("#unpack_image_height=%d\n", unpack_image_height);
-    printf ("#pack_row_length=%d\n", pack_row_length);
-    printf ("#pack_alignment=%d\n", pack_alignment);
-    printf ("#pack_skip_rows=%d\n", pack_skip_rows);
-    printf ("#pack_skip_pixels=%d\n", pack_skip_pixels);
-    printf ("#unpack_row_length=%d\n", unpack_row_length);
-    printf ("#unpack_alignment=%d\n", unpack_alignment);
-    printf ("#unpack_skip_rows=%d\n", unpack_skip_rows);
-    printf ("#unpack_skip_pixels=%d\n", unpack_skip_pixels);
 
     if (is_full_image)
     {
-      glGetTexImage (layer_target, mip_level, gl_tex_format, gl_tex_type, buffer);
+      glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, buffer);
     }
     else
-    {      
+    {
         //копирование полного образа текстуры во временный буфер
         
-      size_t texel_size = opengl::texel_size (target_format);
-        
-      xtl::uninitialized_storage<char> temp_buffer (level_width * level_height * desc.layers * texel_size * 2);
-      
-      memset (temp_buffer.data (), 0xfe, temp_buffer.size ());
-      printf ("in\n buffer size = %u, width = %u, height = %u, layers = %u, texel_size = %u\n", 
-              temp_buffer.size (), level_width, level_height, desc.layers, texel_size);
-      glGetTexImage (layer_target, mip_level, gl_tex_format, gl_tex_type, temp_buffer.data ());
+      size_t texel_size     = opengl::texel_size (target_format),
+             tmp_texel_size = texel_size != 3 || target != GL_TEXTURE_3D_EXT ? texel_size : 4; ////обход бага (?) OpenGL!!
 
-      printf ("byte 0 = %02x\n", temp_buffer.data()[0]);
-      for (size_t i = 0; i < temp_buffer.size (); i++)
-        if (temp_buffer.data ()[i] == 0xfffffffe)
-        {
-          printf ("data ends at byte %u\n", i);
-          printf ("after data:\n");
+      xtl::uninitialized_storage<char> temp_buffer (level_width * level_height * desc.layers * tmp_texel_size);
 
-          while (temp_buffer.data ()[i] == 0xfffffffe)
-          {
-//          for (size_t j = 0; j < 128*128; j++)
-//            printf ("%02x ", (size_t)temp_buffer.data ()[i+j] & 0xff);
-            i++;
-          }
-          printf ("i = %u", i);
-          printf ("\n");
+      glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, temp_buffer.data ());
 
-          break;
-        }
-
-      printf ("out\n");
-      
         //копирование части образа в пользовательсий буфер
-               
+
       size_t line_size    = level_width * texel_size,
              layer_size   = line_size * level_height,
-             start_offset = layer * layer_size + y * line_size + x * texel_size,
-             block_size   = width * texel_size;
-      
+             block_size   = width * texel_size,
+             start_offset = layer_desc.new_index * layer_size + y * line_size + x * texel_size;
+
       const char* src = temp_buffer.data () + start_offset;
       char*       dst = reinterpret_cast<char*> (buffer);
       
