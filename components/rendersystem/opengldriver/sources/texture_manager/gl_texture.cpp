@@ -13,11 +13,6 @@ Texture::Texture  (const ContextManager& manager, const TextureDesc& tex_desc, G
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::Texture";
 
-    //проверка корректности начальных размеров
-
-  if (desc.width % 4)  RaiseInvalidArgument (METHOD_NAME, "desc.width", desc.width, "Reason: width is not multiple of 4");
-  if (desc.height % 4) RaiseInvalidArgument (METHOD_NAME, "desc.height", desc.height, "Reason: height is not multiple of 4");
-
     //расчёт числа mip-уровней    
 
   size_t max_edge_size = desc.width > desc.height ? desc.width : desc.height;            
@@ -30,6 +25,14 @@ Texture::Texture  (const ContextManager& manager, const TextureDesc& tex_desc, G
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
     {
+        //проверка корректности начальных размеров
+
+      if (mips_count < 3)
+      {
+        if (desc.width % 4)  RaiseInvalidArgument (METHOD_NAME, "desc.width", desc.width, "Reason: width is not multiple of 4");
+        if (desc.height % 4) RaiseInvalidArgument (METHOD_NAME, "desc.height", desc.height, "Reason: height is not multiple of 4");
+      }
+
       mips_count -= 2;
 
       break;
