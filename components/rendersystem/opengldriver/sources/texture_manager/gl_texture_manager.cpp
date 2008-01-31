@@ -180,7 +180,6 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       
       glGetTexLevelParameteriv (GL_PROXY_TEXTURE_1D, 0, GL_TEXTURE_WIDTH, &width);
 
-      CheckErrors (METHOD_NAME);
       if (!width)
         Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u", tex_desc.width);
 
