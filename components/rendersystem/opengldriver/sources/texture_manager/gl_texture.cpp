@@ -308,36 +308,8 @@ void Texture::GetData
       
       xtl::uninitialized_storage<char> temp_buffer (layer_size * desc.layers);
       
-      int iformat = -1;
-      
-      glGetTexLevelParameteriv (GL_TEXTURE_3D, mip_level, GL_TEXTURE_INTERNAL_FORMAT, &iformat);
-      
-      printf (">>>in %04x mip_level=%d iformat=%04x\n", glGetError (), mip_level, iformat);
       if (ext.has_arb_texture_compression) glGetCompressedTexImageARB (layer_desc.target, mip_level, temp_buffer.data ());
       else                                 glGetCompressedTexImage    (layer_desc.target, mip_level, temp_buffer.data ());
-      printf (">>>out %04x\n", glGetError ());      
-      
-      static const size_t LINE_WIDTH = 16;
-
-      printf ("DEBUG buffer\n");
-      
-      const char* data = temp_buffer.data ();
-      size_t size = temp_buffer.size ();
-
-      for (size_t i=0; size; i++)
-      {
-        size_t line_size = size < LINE_WIDTH ? size : LINE_WIDTH, j;
-
-        printf ("%03x| ", i * LINE_WIDTH);
-        
-        for (j=0; j<line_size; j++) printf ("%02x ", data [j] & 0xff);
-        for (;j<LINE_WIDTH; j++)    printf ("?? ");
-
-        printf ("\n");
-
-        size -= line_size;
-        data += line_size;
-      }
 
         //копирование части образа в пользовательский буфер
                
@@ -345,8 +317,6 @@ void Texture::GetData
              start_offset   = layer_desc.new_index * layer_size + y * quad_line_size + x * quad_size,
              block_size     = width * quad_size;
              
-      printf ("START_OFFSET=%u\n", start_offset);
-      
       const char* src = temp_buffer.data () + start_offset;
       char*       dst = reinterpret_cast<char*> (buffer);
       

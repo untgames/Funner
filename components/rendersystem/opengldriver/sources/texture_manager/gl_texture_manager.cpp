@@ -134,149 +134,41 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       temp_desc.height = 1;
       temp_desc.layers = 1;
 
-      if (tex_desc.width < 1)
-        RaiseOutOfRange (METHOD_NAME, "tex_desc.width", (int)tex_desc.width, 1, max_texture_size);
-      
-      if (is_compressed_format (tex_desc.format))
-        RaiseNotSupported (METHOD_NAME, "1D texture can't be compressed.");
-      
       if (!ext.has_arb_texture_non_power_of_two)
         if ((tex_desc.width - 1) & tex_desc.width) 
+        {
           if (ext.has_ext_texture_rectangle)
-          {
-            if (tex_desc.generate_mips_enable)
-              RaiseNotSupported (METHOD_NAME, "Mip maps for non power of two textures not supported.");
-
-            glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, 1, 0, 
-                          gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-            
-            glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, GL_TEXTURE_WIDTH, &width);
-
-            if (!width)
-              Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u", tex_desc.width);
-
-            CheckErrors (METHOD_NAME);
-
             return new TextureNPOT (GetContextManager (), temp_desc);
-          }
           else
           {
             temp_desc.width = next_higher_power_of_two (tex_desc.width);
 
-            glTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
-                          gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-            
-            glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-
-            if (!width)
-              Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
-
-            CheckErrors (METHOD_NAME);
-            LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");
+            LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.");
             return new TextureEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width, 1);
           }
+        }
 
-      glTexImage1D (GL_PROXY_TEXTURE_1D, 0, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-      
-      glGetTexLevelParameteriv (GL_PROXY_TEXTURE_1D, 0, GL_TEXTURE_WIDTH, &width);
-
-      if (!width)
-        Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u", tex_desc.width);
-
-      CheckErrors (METHOD_NAME);
       return new Texture1D (GetContextManager (), temp_desc);
     }
     case TextureDimension_2D:
     {
       temp_desc.layers = 1;
       
-      if (tex_desc.width < 1)
-        RaiseOutOfRange (METHOD_NAME, "tex_desc.width", (int)tex_desc.width, 1, max_texture_size);
-      
-      if (tex_desc.height < 1)
-        RaiseOutOfRange (METHOD_NAME, "tex_desc.height", (int)tex_desc.height, 1, max_texture_size);
-      
-      if ((tex_desc.width & 3) && is_compressed_format (tex_desc.format))
-        RaiseInvalidArgument (METHOD_NAME, "tex_desc.width", tex_desc.width,
-                              "Texture width for compressed image must be a multiple 4");
-      
-      if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
-        RaiseInvalidArgument (METHOD_NAME, "tex_desc.height", tex_desc.height,
-                              "Texture height for compressed image must be a multiple 4");
       if (!ext.has_arb_texture_non_power_of_two)
       {
         if (((tex_desc.width - 1) & tex_desc.width) || ((tex_desc.height - 1) & tex_desc.height))
           if (ext.has_ext_texture_rectangle && !is_compressed_format (tex_desc.format))
-          {
-            if (tex_desc.generate_mips_enable)
-              RaiseNotSupported (METHOD_NAME, "Mip maps for non power of two textures not supported.");
-
-            glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                          gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-            
-            glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, GL_TEXTURE_WIDTH, &width);
-            if (!width)
-              Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
-
-            CheckErrors (METHOD_NAME);
             return new TextureNPOT (GetContextManager (), temp_desc);
-          }
           else
           {
             temp_desc.width  = next_higher_power_of_two (tex_desc.width);
             temp_desc.height = next_higher_power_of_two (tex_desc.height);
 
-            if (is_compressed_format (tex_desc.format))
-            { 
-              if (ext.has_ext_texture_compression_s3tc)
-              {
-                if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
-                                                                               ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
-                else                                 glCompressedTexImage2D    (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
-                                                                               ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
-              }
-              else
-                glTexImage2D (GL_PROXY_TEXTURE_2D, 0, unpack_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
-                              unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
-            }
-            else
-              glTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
-                            gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-
-            glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-
-            if (!width)
-              Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
-
-            CheckErrors (METHOD_NAME);
             LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");
             return new TextureEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width, (float)temp_desc.height / (float)tex_desc.height);
           }
       }
 
-      if (is_compressed_format (tex_desc.format))
-      { 
-        if (ext.has_ext_texture_compression_s3tc)
-        {
-          if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                                                                         ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
-          else                                 glCompressedTexImage2D    (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                                                                         ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
-        }
-        else
-          glTexImage2D (GL_PROXY_TEXTURE_2D, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                        unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
-      }
-      else
-        glTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-      
-      glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-
-      if (!width)
-        Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
-
-      CheckErrors (METHOD_NAME);
       return new Texture2D (GetContextManager (), temp_desc);
     }
     case TextureDimension_3D: 
@@ -389,86 +281,17 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
     {
       if (ext.has_arb_texture_cube_map)
       {
-        if (is_depth_format (tex_desc.format))
-          RaiseNotSupported (METHOD_NAME, "Can't create depth 3d texture. Reason: depth texture may be only 1d or 2d");
-
-        if (tex_desc.layers != 6)
-          RaiseOutOfRange (METHOD_NAME, "tex_desc.layers", (int)tex_desc.layers, 6, 6);
-        
-        if (tex_desc.width != tex_desc.height)
-          Raise <Exception> (METHOD_NAME, "Cubemap texture width and height must be equal.");
-        
-        if (tex_desc.width < 1)
-          RaiseOutOfRange (METHOD_NAME, "tex_desc.width", (int)tex_desc.width, 1, max_cube_map_texture_size);
-        
-        if (tex_desc.height < 1)
-          RaiseOutOfRange (METHOD_NAME, "tex_desc.height", (int)tex_desc.height, 1, max_cube_map_texture_size);
-        
-        if ((tex_desc.width & 3) && is_compressed_format (tex_desc.format))
-          RaiseInvalidArgument (METHOD_NAME, "tex_desc.width", tex_desc.width,
-                                "Texture width for compressed image must be a multiple 4");
-        
-        if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
-          RaiseInvalidArgument (METHOD_NAME, "tex_desc.height", tex_desc.height,
-                                "Texture height for compressed image must be a multiple 4");
-
         if (!ext.has_arb_texture_non_power_of_two)
         {
           if (((tex_desc.width - 1) & tex_desc.width) || ((tex_desc.height - 1) & tex_desc.height))
           {
             temp_desc.width = temp_desc.height = next_higher_power_of_two (tex_desc.width);
 
-            if (is_compressed_format (tex_desc.format))
-            { 
-              if (ext.has_ext_texture_compression_s3tc)
-              {
-                if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 
-                                                                                0, ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
-                else                                 glCompressedTexImage2D    (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 
-                                                                                0, ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
-              }
-              else
-                glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, unpack_internal_format (tex_desc.format), temp_desc.width, temp_desc.height,
-                              0, unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
-            }
-            else
-              glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
-                            gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-            
-            glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, GL_TEXTURE_WIDTH, &width);
-        
-            if (!width)
-              Raise <Exception> (METHOD_NAME, "Not enough space to create cubemap texture with width = %u and height = %u", temp_desc.width, temp_desc.height);
-
-            CheckErrors (METHOD_NAME);
             LogPrintf ("Non power of two textures not supported by hardware. Scaled  cubemap texture created.\n");
             return new TextureCubemapEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width);
           }
         }
 
-        if (is_compressed_format (tex_desc.format))
-        {
-          if (ext.has_ext_texture_compression_s3tc)
-          {
-            if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                                                                           ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
-            else                                 glCompressedTexImage2D    (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                                                                           ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);          //???? Image size may be must multiplied by depth
-          }
-          else
-            glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                          unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
-        }
-        else
-          glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                        gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-        
-        glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, GL_TEXTURE_WIDTH, &width);
-
-        if (!width)
-          Raise <Exception> (METHOD_NAME, "Not enough space to create cubemap texture with width = %u and height = %u", tex_desc.width, tex_desc.height);
-
-        CheckErrors (METHOD_NAME);
         return new TextureCubemap (GetContextManager (), temp_desc);
       }
       else

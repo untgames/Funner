@@ -11,12 +11,29 @@ using namespace render::low_level::opengl;
 TextureNPOT::TextureNPOT  (const ContextManager& manager, const TextureDesc& tex_desc)
   : Texture (manager, tex_desc, GL_TEXTURE_RECTANGLE_EXT)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::TextureNPOT::TextureNPOT";
+  int width = 0;
+
   Bind ();
+
+  if (tex_desc.generate_mips_enable)
+    RaiseNotSupported (METHOD_NAME, "Mip maps for non power of two textures not supported.");
+
+  if (is_compressed_format (tex_desc.format))
+    RaiseNotSupported (METHOD_NAME, "Non power of two texture can't be compressed.");
+
+  glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+  
+  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, GL_TEXTURE_WIDTH, &width);
+
+  if (!width)
+    Raise <Exception> (METHOD_NAME, "Not enough space to create texture %ux%ux%u@%s", tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
 
   glTexImage2D (GL_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
                 gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
 
-  CheckErrors ("render::low_level::opengl::TextureNPOT::TextureNPOT");
+  CheckErrors (METHOD_NAME);
 }
 
 /*
