@@ -12,6 +12,39 @@ Texture::Texture  (const ContextManager& manager, const TextureDesc& tex_desc, G
   : ContextObject (manager), target (in_target), desc (tex_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::Texture";
+  
+    //проверка корректности формата
+
+  static Extension EXT_packed_depth_stencil = "GL_EXT_packed_depth_stencil",
+                   ARB_depth_texture        = "GL_ARB_depth_texture",
+                   Version_1_4              = "GL_VERSION_1_4";
+
+  switch (tex_desc.format)
+  {
+    case PixelFormat_L8:
+    case PixelFormat_A8:
+    case PixelFormat_LA8:
+    case PixelFormat_RGB8:
+    case PixelFormat_RGBA8:
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+    case PixelFormat_D24S8:
+      if (!IsSupported (EXT_packed_depth_stencil))
+        RaiseNotSupported (METHOD_NAME, "Can't create depth-stencil texture (GL_EXT_packed_depth_stencil not supported)");          
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+      if (!IsSupported (ARB_depth_texture) && !IsSupported (Version_1_4))
+        RaiseNotSupported (METHOD_NAME, "Can't create depth texture (GL_ARB_depth_texture & GL_VERSION_1_4 not supported)");
+
+      break;
+    case PixelFormat_S8:
+      RaiseNotSupported (METHOD_NAME, "Stencil textures not supported");
+      return;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.format", tex_desc.format);
+      return;
+  }
 
     //расчёт числа mip-уровней    
 
@@ -268,7 +301,7 @@ void Texture::GetData
   
   GetLayerDesc (layer, layer_desc);
     
-  bool is_full_image = width == level_desc.width && height == level_desc.height && desc.layers == 1 && !x && !y;    
+  bool is_full_image = width == level_desc.width && height == level_desc.height && desc.layers == 1 && !x && !y;
          
   if (is_compressed_format (target_format))
   {
@@ -308,8 +341,10 @@ void Texture::GetData
       
       xtl::uninitialized_storage<char> temp_buffer (layer_size * desc.layers);
       
-      if (ext.has_arb_texture_compression) glGetCompressedTexImageARB (layer_desc.target, mip_level, temp_buffer.data ());
-      else                                 glGetCompressedTexImage    (layer_desc.target, mip_level, temp_buffer.data ());
+
+      if (glGetCompressedTexImage) glGetCompressedTexImage    (layer_desc.target, mip_level, temp_buffer.data ());
+      else                         glGetCompressedTexImageARB (layer_desc.target, mip_level, temp_buffer.data ());
+
 
         //копирование части образа в пользовательский буфер
                
@@ -338,16 +373,10 @@ void Texture::GetData
 
     if (is_full_image)
     {
-//      printf ("target=%04x error=%04x\n", layer_desc.target, glGetError ());
-      
-      glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, buffer);
-      
-//      printf ("error=%04x\n", glGetError ());            
+      glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, buffer);      
     }
     else
     {
-//      printf ("fuck!\n");
-      
         //копирование полного образа текстуры во временный буфер
         
       size_t texel_size     = opengl::texel_size (target_format),
@@ -355,14 +384,14 @@ void Texture::GetData
 
       xtl::uninitialized_storage<char> temp_buffer (level_desc.width * level_desc.height * desc.layers * tmp_texel_size);
 
-      glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, temp_buffer.data ());
+      glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, temp_buffer.data ());      
 
         //копирование части образа в пользовательсий буфер
 
       size_t line_size    = level_desc.width * texel_size,
              layer_size   = level_desc.width * level_desc.height * tmp_texel_size,
              block_size   = width * texel_size,
-             start_offset = layer_desc.new_index * layer_size + y * line_size + x * texel_size;
+             start_offset = layer_desc.new_index * layer_size + y * line_size + x * texel_size;             
 
       const char* src = temp_buffer.data () + start_offset;
       char*       dst = reinterpret_cast<char*> (buffer);

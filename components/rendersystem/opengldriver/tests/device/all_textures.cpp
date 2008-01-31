@@ -156,8 +156,8 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
                                       dst_buffer (src_buffer.size ());
 
     for (size_t i = 0; i < src_buffer.size (); i++)
-//      src_buffer.data ()[i] = (char)myrand () & 63;
-      src_buffer.data ()[i] = i & 63;      
+      src_buffer.data ()[i] = (char)myrand () & 63;
+//      src_buffer.data ()[i] = i & 63;      
 
     for (size_t i = 0; i < tex_desc.layers; i++)
     {  
