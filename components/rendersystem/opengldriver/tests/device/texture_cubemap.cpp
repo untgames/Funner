@@ -14,7 +14,7 @@ int main ()
     Test test (L"OpenGL device test window (texture_cubemap_test)");
 
     TextureDesc desc;
-    memset (&desc, 0, sizeof (desc));
+    memset (&desc, 0xab, sizeof (desc));
 
     char* image_data = new char [image_data_size];
     unsigned char hash[2][16];

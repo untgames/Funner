@@ -44,17 +44,19 @@ void SetTexData1D (size_t mip_level, size_t x, size_t, size_t, size_t width, siz
 
 void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::Texture1D::SetData";
+
   Texture::SetData (layer, mip_level, x, y, width, height, source_format, buffer);  
   
   if (mip_level > mips_count)
-    RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "mip_level", mip_level, (size_t)0, mips_count);
+    RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, (size_t)0, mips_count);
     
   if ((x + width) > (desc.width) >> mip_level)
-    RaiseOutOfRange ("render::low_level::opengl::Texture1D::SetData", "x + width", x + width, (size_t)0, desc.width >> mip_level);
+    RaiseOutOfRange (METHOD_NAME, "x + width", x + width, (size_t)0, desc.width >> mip_level);
   if (!width)
     return;
   if (is_compressed_format (source_format))
-    RaiseInvalidArgument ("render::low_level::opengl::Texture1D::SetData", "source_format", source_format, "Can't set compressed data for 1d texture.");
+    RaiseInvalidArgument (METHOD_NAME, "source_format", source_format, "Can't set compressed data for 1d texture.");
 
   static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
                    Version_1_4          = "GL_VERSION_1_4";
@@ -78,5 +80,5 @@ void Texture1D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
     generate_mips (x, 0, 0, width, 1, source_format, buffer, &SetTexData1D);
   }
 
-  CheckErrors ("render::low_level::opengl::Texture1D::SetData");
+  CheckErrors (METHOD_NAME);
 }

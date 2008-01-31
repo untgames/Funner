@@ -31,8 +31,10 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
       {
         size_t tex_size = level_desc.width * level_desc.height / 16 * compressed_quad_size (tex_desc.format);
        
-        glCompressedTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format),
-                                level_desc.width, level_desc.height, 0, tex_size, 0);
+        if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format),
+                                                                        level_desc.width, level_desc.height, 0, tex_size, 0);
+        else                                 glCompressedTexImage2D    (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format),
+                                                                        level_desc.width, level_desc.height, 0, tex_size, 0);
       }
       else
       {
@@ -117,8 +119,12 @@ void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y
   if (is_compressed_format (source_format))
   {
     if (ext.has_ext_texture_compression_s3tc)
-      glCompressedTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, gl_format (source_format), 
-                                 ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
+    {
+      if (ext.has_arb_texture_compression) glCompressedTexSubImage2DARB (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, gl_format (source_format), 
+                                                                        ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
+      else                                 glCompressedTexSubImage2D    (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, gl_format (source_format), 
+                                                                        ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
+    }
     else
     {
       xtl::uninitialized_storage <char> unpacked_buffer (width * height * unpack_texel_size (source_format));

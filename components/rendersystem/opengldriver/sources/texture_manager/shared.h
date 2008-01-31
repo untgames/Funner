@@ -24,6 +24,7 @@ namespace opengl
 ///////переместить в исходники!!!
 struct TextureExtensions
 {
+  bool has_arb_texture_compression;      //GL_ARB_texture_compression
   bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
   bool has_sgis_generate_mipmap;         //GL_SGIS_generate_mipmap
   
@@ -35,8 +36,8 @@ struct TextureExtensions
                      Version_1_3                  = "GL_VERSION_1_3",
                      Version_1_4                  = "GL_VERSION_1_4";
       
-    has_ext_texture_compression_s3tc = (manager.IsSupported (ARB_texture_compression) || manager.IsSupported (Version_1_3)) && 
-                                       manager.IsSupported (EXT_texture_compression_s3tc);
+    has_arb_texture_compression      = manager.IsSupported (ARB_texture_compression);
+    has_ext_texture_compression_s3tc = (has_arb_texture_compression || manager.IsSupported (Version_1_3)) && manager.IsSupported (EXT_texture_compression_s3tc);
     has_sgis_generate_mipmap         = (manager.IsSupported (SGIS_generate_mipmap) || manager.IsSupported (Version_1_4));
   }
 };

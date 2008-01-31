@@ -142,6 +142,9 @@ void Texture::GetMipLevelDesc (size_t mip_level, MipLevelDesc& out_desc)
       level_width  &= ~3;
       level_height &= ~3;
 
+      if (!level_width)  level_width  = 4;
+      if (!level_height) level_height = 4;
+
       break;
     default:
       break;
@@ -170,22 +173,23 @@ void Texture::GetLayerDesc (size_t layer, LayerDesc& desc)
 
 void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::Texture::SetData";
+
   static Extension EXT_packed_depth_stencil     = "GL_EXT_packed_depth_stencil",
                    EXT_framebuffer_object       = "GL_EXT_framebuffer_object";
     
   bool has_ext_packed_depth_stencil = GetContextManager().IsSupported (EXT_packed_depth_stencil) && GetContextManager().IsSupported (EXT_framebuffer_object);  
 
   if (!buffer)
-    common::RaiseNullArgument ("render::low_level::opengl::Texture::SetData", "buffer");
+    common::RaiseNullArgument (METHOD_NAME, "buffer");
 
   if ((source_format == PixelFormat_D24S8)  && (!has_ext_packed_depth_stencil))
-    common::RaiseNotSupported ("render::low_level::opengl::Texture::SetData", 
-                               "Can't set depth-stencil data. Reason: GL_EXT_packed_depth_stencil extension not supported");
+    common::RaiseNotSupported (METHOD_NAME, "Can't set depth-stencil data. Reason: GL_EXT_packed_depth_stencil extension not supported");
 
   if (is_depth_format (desc.format) && !is_depth_format (source_format))
-    common::RaiseInvalidArgument ("render::low_level::opengl::Texture::SetData", "source_format");
+    common::RaiseInvalidArgument (METHOD_NAME, "source_format");
   if (!is_depth_format (desc.format) && is_depth_format (source_format))
-    common::RaiseInvalidArgument ("render::low_level::opengl::Texture::SetData", "source_format");
+    common::RaiseInvalidArgument (METHOD_NAME, "source_format");
 }
 
 void Texture::GetData
@@ -279,7 +283,8 @@ void Texture::GetData
  
     if (is_full_image)
     {
-      glGetCompressedTexImage (layer_desc.target, mip_level, buffer);      
+      if (ext.has_arb_texture_compression) glGetCompressedTexImageARB (layer_desc.target, mip_level, buffer);      
+      else                                 glGetCompressedTexImage    (layer_desc.target, mip_level, buffer);      
     }
     else
     {
@@ -308,7 +313,8 @@ void Texture::GetData
       glGetTexLevelParameteriv (GL_TEXTURE_3D, mip_level, GL_TEXTURE_INTERNAL_FORMAT, &iformat);
       
       printf (">>>in %04x mip_level=%d iformat=%04x\n", glGetError (), mip_level, iformat);
-      glGetCompressedTexImage (layer_desc.target, mip_level, temp_buffer.data ());
+      if (ext.has_arb_texture_compression) glGetCompressedTexImageARB (layer_desc.target, mip_level, temp_buffer.data ());
+      else                                 glGetCompressedTexImage    (layer_desc.target, mip_level, temp_buffer.data ());
       printf (">>>out %04x\n", glGetError ());      
       
       static const size_t LINE_WIDTH = 16;
@@ -438,6 +444,8 @@ size_t texel_size (PixelFormat format)
 
 GLint gl_internal_format (PixelFormat format)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::Texture::gl_internal_format";
+
   switch (format)
   {
     case PixelFormat_L8:    return GL_LUMINANCE8;
@@ -451,13 +459,15 @@ GLint gl_internal_format (PixelFormat format)
     case PixelFormat_D16:   return GL_DEPTH_COMPONENT16_ARB;
     case PixelFormat_D24X8: return GL_DEPTH_COMPONENT24_ARB;
     case PixelFormat_D24S8: return GL_DEPTH24_STENCIL8_EXT;  
-    case PixelFormat_S8:    common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", "Stencil textures not supported.");
-    default: common::RaiseInvalidArgument ("render::low_level::opengl::Texture::gl_internal_format", "format"); return GL_ALPHA;
+    case PixelFormat_S8:    common::RaiseNotSupported (METHOD_NAME, "Stencil textures not supported.");
+    default: common::RaiseInvalidArgument (METHOD_NAME, "format"); return GL_ALPHA;
   }
 }
 
 GLenum gl_format (PixelFormat format)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::Texture::gl_format";
+
   switch (format)
   {
     case PixelFormat_DXT1:  return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
@@ -471,8 +481,8 @@ GLenum gl_format (PixelFormat format)
     case PixelFormat_D16:   
     case PixelFormat_D24X8: return GL_DEPTH_COMPONENT;
     case PixelFormat_D24S8: return GL_DEPTH_STENCIL_EXT;  
-    case PixelFormat_S8:    common::RaiseNotSupported ("render::low_level::opengl::Texture::gl_format", "Stencil textures not supported.");
-    default: common::RaiseInvalidArgument ("render::low_level::opengl::Texture::gl_format", "format"); return GL_ALPHA;
+    case PixelFormat_S8:    common::RaiseNotSupported (METHOD_NAME, "Stencil textures not supported.");
+    default: common::RaiseInvalidArgument (METHOD_NAME, "format"); return GL_ALPHA;
   }
 }
 
@@ -538,6 +548,8 @@ bool is_depth_format (PixelFormat format)
 
 size_t compressed_quad_size (PixelFormat format)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::Texture::compressed_quad_size";
+
   switch (format)
   {
     case PixelFormat_DXT1: return 8;
@@ -552,10 +564,10 @@ size_t compressed_quad_size (PixelFormat format)
     case PixelFormat_LA8:   
     case PixelFormat_RGB8:  
     case PixelFormat_RGBA8:
-      common::RaiseInvalidArgument ("render::low_level::opengl::Texture::compressed_quad_size", "format", get_name (format));
+      common::RaiseInvalidArgument (METHOD_NAME, "format", get_name (format));
       break;
     default:
-      common::RaiseInvalidArgument ("render::low_level::opengl::Texture::compressed_quad_size", "format", format);
+      common::RaiseInvalidArgument (METHOD_NAME, "format", format);
       break;
   }
   

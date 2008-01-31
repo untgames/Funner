@@ -12,7 +12,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (texture3d_test)", "max_version=1.1 disable=* GL_EXT_texture3D=1");
+    Test test (L"OpenGL device test window (texture3d_test)");//, "max_version=1.1 disable=* GL_EXT_texture3D=1");
 
     TextureDesc desc;
     memset (&desc, 0, sizeof (desc));

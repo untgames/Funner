@@ -44,6 +44,27 @@ const char* get_short_name (PixelFormat param)
   }
 }
 
+
+bool is_compressed_format (PixelFormat format)
+{
+  switch (format)
+  {
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:  return true;
+    case PixelFormat_L8:    
+    case PixelFormat_A8:    
+    case PixelFormat_S8:
+    case PixelFormat_LA8:   
+    case PixelFormat_RGB8:  
+    case PixelFormat_RGBA8: 
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8:   
+    default: return false;
+  }
+}
+
 //получение ближайшей сверху степени двойки
 size_t next_higher_power_of_two (size_t k) 
 {
@@ -140,7 +161,12 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
 
     for (size_t i = 0; i < tex_desc.layers; i++)
     {  
-      for (size_t j = 0; j < get_mips_count (tex_desc.width, tex_desc.height); j++)
+      size_t mips_count = get_mips_count (tex_desc.width, tex_desc.height);
+
+      if (is_compressed_format (tex_desc.format))
+        mips_count -= 2;
+
+      for (size_t j = 0; j < mips_count; j++)
       {
         if (tex_desc.dimension == TextureDimension_3D)
         {
@@ -158,6 +184,24 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
         size_t level_width  = tex_desc.width >> j,
                level_height = tex_desc.height >> j;
         
+        switch (tex_desc.format)
+        {
+          case PixelFormat_DXT1:
+          case PixelFormat_DXT3:
+          case PixelFormat_DXT5:
+               //выравнивание размеров уровня по ближайшему снизу числу, делящемуся на 4
+
+            level_width  &= ~3;
+            level_height &= ~3;
+
+            if (!level_width)  level_width  = 4;
+            if (!level_height) level_height = 4;
+
+            break;
+          default:
+            break;
+        }
+
         printf ("  layer %u, mip %u, width = %u, height = %u: ", i, j, level_width, level_height);
         
         try

@@ -11,8 +11,10 @@ struct TextureManagerExtensions
 {
   bool has_ext_texture_rectangle;        //GL_EXT_texture_rectangle
   bool has_ext_texture3D;                //GL_EXT_texture3D
+  bool has_ext_texture3D_extension;      //GL_EXT_texture3D
   bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
   bool has_ext_packed_depth_stencil;     //GL_EXT_packed_depth_stencil
+  bool has_arb_texture_compression;      //GL_ARB_texture_compression
   bool has_arb_texture_cube_map;         //GL_ARB_texture_cubemap
   bool has_arb_texture_non_power_of_two; //GL_ARB_texture_non_power_of_two
   bool has_arb_depth_texture;            //GL_ARB_depth_texture
@@ -35,9 +37,11 @@ struct TextureManagerExtensions
                      Version_1_4                  = "GL_VERSION_1_4",
                      Version_2_0                  = "GL_VERSION_2_0";
       
+    has_arb_texture_compression      = manager.IsSupported (ARB_texture_compression);
     has_ext_texture_rectangle        = manager.IsSupported (EXT_texture_rectangle) || manager.IsSupported (NV_texture_rectangle);
-    has_ext_texture3D                = manager.IsSupported (EXT_texture3D) || manager.IsSupported (Version_1_2);
-    has_ext_texture_compression_s3tc = (manager.IsSupported (ARB_texture_compression) || manager.IsSupported (Version_1_3)) && 
+    has_ext_texture3D_extension      = manager.IsSupported (EXT_texture3D);
+    has_ext_texture3D                = has_ext_texture3D_extension || manager.IsSupported (Version_1_2);
+    has_ext_texture_compression_s3tc = (has_arb_texture_compression || manager.IsSupported (Version_1_3)) && 
                                        manager.IsSupported (EXT_texture_compression_s3tc);
     has_ext_packed_depth_stencil     = manager.IsSupported (EXT_packed_depth_stencil) && manager.IsSupported (EXT_framebuffer_object);  
     has_arb_texture_cube_map         = manager.IsSupported (ARB_texture_cube_map) || manager.IsSupported (EXT_texture_cube_map) ||
@@ -176,6 +180,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       
       glGetTexLevelParameteriv (GL_PROXY_TEXTURE_1D, 0, GL_TEXTURE_WIDTH, &width);
 
+      CheckErrors (METHOD_NAME);
       if (!width)
         Raise <Exception> (METHOD_NAME, "Not enough space to create texture with width = %u", tex_desc.width);
 
@@ -225,8 +230,12 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
             if (is_compressed_format (tex_desc.format))
             { 
               if (ext.has_ext_texture_compression_s3tc)
-                glCompressedTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
-                                        ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+              {
+                if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
+                                                                               ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+                else                                 glCompressedTexImage2D    (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
+                                                                               ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+              }
               else
                 glTexImage2D (GL_PROXY_TEXTURE_2D, 0, unpack_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 0, 
                               unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
@@ -249,8 +258,12 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       if (is_compressed_format (tex_desc.format))
       { 
         if (ext.has_ext_texture_compression_s3tc)
-          glCompressedTexImage2D (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                                  ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+        {
+          if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                                                                         ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+          else                                 glCompressedTexImage2D    (GL_PROXY_TEXTURE_2D, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                                                                         ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+        }
         else
           glTexImage2D (GL_PROXY_TEXTURE_2D, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
                         unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
@@ -301,16 +314,28 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
             if (is_compressed_format (tex_desc.format))
             { 
               if (ext.has_ext_texture_compression_s3tc)
-                glCompressedTexImage3D (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, tex_desc.layers, 
-                                        0, ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+              {
+                if (ext.has_arb_texture_compression) glCompressedTexImage3DARB (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, tex_desc.layers, 
+                                                                                0, ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+                else                                 glCompressedTexImage3D    (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, tex_desc.layers, 
+                                                                                0, ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+              }
               else
-                glTexImage3DEXT (GL_PROXY_TEXTURE_3D_EXT, 0, unpack_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, tex_desc.layers, 
-                                 0, unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+              {
+                if (ext.has_ext_texture3D_extension) glTexImage3DEXT (GL_PROXY_TEXTURE_3D_EXT, 0, unpack_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, tex_desc.layers, 
+                                                                      0, unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+                else                                 glTexImage3D    (GL_PROXY_TEXTURE_3D_EXT, 0, unpack_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, tex_desc.layers,
+                                                                      0, unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);                 
+              }
             }
             else
-              glTexImage3DEXT (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, tex_desc.layers, 0, 
-                               gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-            
+            {
+                if (ext.has_ext_texture3D_extension) glTexImage3DEXT (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, tex_desc.layers, 0, 
+                                                                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+                else                                 glTexImage3D    (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, tex_desc.layers, 0, 
+                                                                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+            }
+
             glGetTexLevelParameteriv (GL_PROXY_TEXTURE_3D_EXT, 0, GL_TEXTURE_WIDTH, &width);
         
             if (!width)
@@ -326,16 +351,28 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
         if (is_compressed_format (tex_desc.format))
         {
           if (ext.has_ext_texture_compression_s3tc)
-            glCompressedTexImage3D (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers,
-                                    0, ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);       //???? Image size may be must multiplied by depth
+          {
+            if (ext.has_arb_texture_compression) glCompressedTexImage3DARB (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers,
+                                                                            0, ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+            else                                 glCompressedTexImage3D    (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers,
+                                                                            0, ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);       //???? Image size may be must multiplied by depth
+          }
           else
-            glTexImage3DEXT (GL_PROXY_TEXTURE_3D_EXT, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
-                             unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+          {
+            if (ext.has_ext_texture3D_extension) glTexImage3DEXT (GL_PROXY_TEXTURE_3D_EXT, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
+                                                                  unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+            else                                 glTexImage3D    (GL_PROXY_TEXTURE_3D_EXT, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
+                                                                  unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+          }
         }
         else
-          glTexImage3DEXT (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
-                           gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-        
+        {
+          if (ext.has_ext_texture3D_extension) glTexImage3DEXT (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
+                                                                gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+          else                                 glTexImage3D    (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, tex_desc.layers, 0, 
+                                                                gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+        }
+
         glGetTexLevelParameteriv (GL_PROXY_TEXTURE_3D_EXT, 0, GL_TEXTURE_WIDTH, &width);
 
         if (!width)
@@ -385,8 +422,12 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
             if (is_compressed_format (tex_desc.format))
             { 
               if (ext.has_ext_texture_compression_s3tc)
-                glCompressedTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 
-                                        0, ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+              {
+                if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 
+                                                                                0, ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+                else                                 glCompressedTexImage2D    (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), temp_desc.width, temp_desc.height, 
+                                                                                0, ((temp_desc.width * temp_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+              }
               else
                 glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, unpack_internal_format (tex_desc.format), temp_desc.width, temp_desc.height,
                               0, unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
@@ -409,8 +450,12 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
         if (is_compressed_format (tex_desc.format))
         {
           if (ext.has_ext_texture_compression_s3tc)
-            glCompressedTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                                    ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);          //???? Image size may be must multiplied by depth
+          {
+            if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                                                                           ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
+            else                                 glCompressedTexImage2D    (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
+                                                                           ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);          //???? Image size may be must multiplied by depth
+          }
           else
             glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
                           unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
