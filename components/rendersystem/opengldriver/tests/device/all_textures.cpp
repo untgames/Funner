@@ -149,6 +149,15 @@ bool test_texture (const TextureDesc& tex_desc, IDevice* device)
 
         texture->GetData (i, j, 0, 0, width, height, tex_desc.format, dst_buffer.data ());
 
+/*        if (tex_desc.format == PixelFormat_D24X8)
+        {
+          for (size_t k = 0; k < src_buffer.size (); k += 4)
+          {
+            src_buffer.data ()[k] = (char)0;
+            dst_buffer.data ()[k] = (char)0;
+          }
+        }*/
+
         if (!memcmp (src_buffer.data (), dst_buffer.data (), data_size))
         {
           printf ("Ok\n");          
