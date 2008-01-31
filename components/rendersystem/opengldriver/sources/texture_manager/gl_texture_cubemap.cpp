@@ -139,7 +139,7 @@ void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y
 
     if (desc.generate_mips_enable && !mip_level && !ext.has_sgis_generate_mipmap)
     {    
-      generate_mips (x, y, layer, width, height, source_format, buffer, &SetTexDataCubemap);
+      generate_cubemap_mips (x, y, layer, width, height, source_format, buffer, &SetTexDataCubemap);
     }
   }
 

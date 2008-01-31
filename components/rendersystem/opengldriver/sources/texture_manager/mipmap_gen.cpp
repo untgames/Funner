@@ -230,7 +230,10 @@ size_t get_next_mip_size (size_t size)
 
 }
 
-void generate_mips
+namespace
+{
+
+void generate_mips_internal
  (size_t       x,
   size_t       y,
   size_t       z,
@@ -238,7 +241,8 @@ void generate_mips
   size_t       height,
   PixelFormat  format,
   const void*  data,
-  SetTexDataFn fn)
+  SetTexDataFn fn,
+  bool         is_cubemap)
 {
   if (!fn)
     common::RaiseNullArgument ("render::low_level::opengl::generate_mips", "fn");
@@ -253,7 +257,7 @@ void generate_mips
 
   const char* src = reinterpret_cast<const char*> (data);
   char*       dst = dst_buffer.data ();
-
+    
   for (size_t mip_level=1; width > 1 || height > 1; mip_level++)
   {
     scale_image_2x_down (format, width, height, src, dst);
@@ -263,6 +267,9 @@ void generate_mips
     x      /= 2;
     y      /= 2;    
 
+    if (!is_cubemap)
+      z /= 2;
+
     fn (mip_level, x, y, z, width, height, gl_texformat, gl_textype, dst);
 
     dst_buffer.swap (src_buffer);
@@ -270,6 +277,34 @@ void generate_mips
     dst = dst_buffer.data ();
     src = src_buffer.data ();
   }
+}
+
+}
+
+void generate_mips
+ (size_t       x,
+  size_t       y,
+  size_t       z,
+  size_t       width,
+  size_t       height,
+  PixelFormat  format,
+  const void*  data,
+  SetTexDataFn fn)
+{
+  generate_mips_internal (x, y, z, width, height, format, data, fn, false);
+}
+
+void generate_cubemap_mips
+ (size_t       x,
+  size_t       y,
+  size_t       z,
+  size_t       width,
+  size_t       height,
+  PixelFormat  format,
+  const void*  data,
+  SetTexDataFn fn)
+{
+  generate_mips_internal (x, y, z, width, height, format, data, fn, true);
 }
 
 }

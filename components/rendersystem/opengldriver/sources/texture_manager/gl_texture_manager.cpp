@@ -342,6 +342,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
           Raise <Exception> (METHOD_NAME, "Not enough space to create 3d texture with width = %u, height = %u and layers = %u",
                              tex_desc.width, tex_desc.height, tex_desc.layers);
 
+        
         CheckErrors (METHOD_NAME);
         return new Texture3D (GetContextManager (), temp_desc);
       }

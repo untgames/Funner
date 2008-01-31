@@ -7,6 +7,11 @@ struct TextureSize
   size_t layers;
 };
 
+struct TestStatus
+{
+  size_t count, successfull;
+};
+
 const char* get_short_name (TextureDimension param)
 {
   switch (param)
@@ -71,39 +76,56 @@ int myrand ()
 }
 
 void print_diff (size_t size, const char* src, const char* dst)
-{
-  printf ("                 Source buffer                                          Destination buffer\n");
-  
-  size_t src_size = size, dst_size = size;
+{  
+  static const size_t LINE_WIDTH = 16;
 
-  for (size_t i=0; i<16 && src_size != size_t (-1); i++)
+  printf ("                 Source buffer                                          Destination buffer"
+          "                 Diff buffer\n");  
+
+  for (size_t i=0; size; i++)
   {
-    printf ("%03x| ", i * 16);
-    
-    size_t j;
-    
-    for (j=0; j<16 && src_size--; j++, src++)
-      printf ("%02x ", size_t (*src) & 0xff);
+    size_t line_size = size < LINE_WIDTH ? size : LINE_WIDTH, j;
 
-    for (;j<16; j++)
-      printf ("?? ");
-      
+    printf ("%03x| ", i * LINE_WIDTH);
+    
+    for (j=0; j<line_size; j++) printf ("%02x ", src [j] & 0xff);
+    for (;j<LINE_WIDTH; j++)    printf ("?? ");
+
     printf ("    ");
-      
-    for (j=0; j<16 && dst_size--; j++, dst++)
-      printf ("%02x ", size_t (*dst) & 0xff);
 
-    for (;j<16; j++)
-      printf ("?? ");
+    for (j=0; j<line_size; j++) printf ("%02x ", dst [j] & 0xff);
+    for (;j<LINE_WIDTH; j++)    printf ("?? ");
+
+    printf ("    ");
+
+    for (j=0; j<line_size; j++) printf ("%02x ", (dst [j] - src [j]) & 0xff);
+    for (;j<LINE_WIDTH; j++)    printf ("?? ");
 
     printf ("\n");
+
+    size -= line_size;
+    src  += line_size;
+    dst  += line_size;
   }
 }
 
-bool test_texture (const TextureDesc& tex_desc, IDevice* device)
+TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
 {
+  TestStatus status = {0, 0};
+  
+  if (tex_desc.generate_mips_enable)
+  {
+    switch (tex_desc.format)
+    {
+      case PixelFormat_DXT1:
+      case PixelFormat_DXT3:
+      case PixelFormat_DXT5:
+        return status;
+    }
+  }
+
   printf ("%s %ux%ux%u@%s %s:\n", get_name (tex_desc.dimension), tex_desc.width, tex_desc.height, tex_desc.layers, get_short_name (tex_desc.format), 
-          tex_desc.generate_mips_enable ? "auto-mips" : "manual-mips");
+          tex_desc.generate_mips_enable ? "auto-mips" : "manual-mips");          
 
   try
   {
@@ -113,81 +135,98 @@ bool test_texture (const TextureDesc& tex_desc, IDevice* device)
                                       dst_buffer (src_buffer.size ());
 
     for (size_t i = 0; i < src_buffer.size (); i++)
-      src_buffer.data ()[i] = (char)myrand ();
+//      src_buffer.data ()[i] = (char)myrand () & 63;
+      src_buffer.data ()[i] = i & 63;      
 
     for (size_t i = 0; i < tex_desc.layers; i++)
     {  
-      size_t width  = tex_desc.width;
-      size_t height = tex_desc.height;
-
       for (size_t j = 0; j < get_mips_count (tex_desc.width, tex_desc.height); j++)
       {
-        printf ("  layer %u, mip %u: ", i, j);
+        if (tex_desc.dimension == TextureDimension_3D)
+        {
+          size_t layers_count = tex_desc.layers >> j;
+          
+          if (!layers_count)
+            layers_count = 1;
 
-        memset (dst_buffer.data (), 0, dst_buffer.size ());
+          if (i >= layers_count)
+            continue;            
+        }
         
-        size_t data_size = width * height;
+        status.count++;
+        
+        size_t level_width  = tex_desc.width >> j,
+               level_height = tex_desc.height >> j;
+        
+        printf ("  layer %u, mip %u, width = %u, height = %u: ", i, j, level_width, level_height);
+        
+        try
+        {                    
+          memset (dst_buffer.data (), 0xff, dst_buffer.size ());
+          
+          size_t data_size = level_width * level_height;
 
-        switch (tex_desc.format)
-        {
-          case PixelFormat_DXT1:  data_size /= 2; break;
-          case PixelFormat_DXT3:
-          case PixelFormat_DXT5:
-          case PixelFormat_L8:
-          case PixelFormat_A8:
-          case PixelFormat_S8:    break;
-          case PixelFormat_LA8:
-          case PixelFormat_D16:   data_size *= 2; break;
-          case PixelFormat_RGB8:  data_size *= 3; break;
-          case PixelFormat_RGBA8:
-          case PixelFormat_D24X8:
-          case PixelFormat_D24S8: data_size *= 4; break;
-          default: return false;  
-        }
-
-        texture->SetData (i, j, 0, 0, width, height, tex_desc.format, src_buffer.data ());
-
-        texture->GetData (i, j, 0, 0, width, height, tex_desc.format, dst_buffer.data ());
-
-/*        if (tex_desc.format == PixelFormat_D24X8)
-        {
-          for (size_t k = 0; k < src_buffer.size (); k += 4)
+          switch (tex_desc.format)
           {
-            src_buffer.data ()[k] = (char)0;
-            dst_buffer.data ()[k] = (char)0;
+            case PixelFormat_DXT1:  data_size /= 2; break;
+            case PixelFormat_DXT3:
+            case PixelFormat_DXT5:
+            case PixelFormat_L8:
+            case PixelFormat_A8:
+            case PixelFormat_S8:    break;
+            case PixelFormat_LA8:
+            case PixelFormat_D16:   data_size *= 2; break;
+            case PixelFormat_RGB8:  data_size *= 3; break;
+            case PixelFormat_RGBA8:
+            case PixelFormat_D24X8:
+            case PixelFormat_D24S8: data_size *= 4; break;
+            default: return status; 
+          }          
+          
+          texture->SetData (i, j, 0, 0, level_width, level_height, tex_desc.format, src_buffer.data ());
+          texture->GetData (i, j, 0, 0, level_width, level_height, tex_desc.format, dst_buffer.data ());
+          
+          if (tex_desc.format == PixelFormat_D24X8)
+          {
+            for (size_t k = 0; k < src_buffer.size (); k += 4)
+            {
+              src_buffer.data ()[k] = 0;
+              dst_buffer.data ()[k] = 0;
+            }
           }
-        }*/
 
-        if (!memcmp (src_buffer.data (), dst_buffer.data (), data_size))
-        {
-          printf ("Ok\n");          
+          if (!memcmp (src_buffer.data (), dst_buffer.data (), data_size))
+          {
+            status.successfull++;
+            printf ("Ok\n");
+          }
+          else 
+          {
+            printf ("FAIL\n");
+            print_diff (data_size, src_buffer.data (), dst_buffer.data ());
+          }
         }
-        else 
+        catch (std::exception& e)
         {
-          printf ("FAIL\n");
-          print_diff (data_size, src_buffer.data (), dst_buffer.data ());
+          printf ("FAIL\nException: '%s'\n", e.what ());
         }
-
-        if (width > 1)  width  /= 2;
-        if (height > 1) height /= 2;
       }
     }
-
-    return true;
   }
   catch (std::exception& e)
   {
     printf ("FAIL\nException: '%s'\n", e.what ());
-    return false;
   }
+  
+  return status;
 }
 
-void print_status_table (bool status [TextureDimension_Num][PixelFormat_Num])
+void print_status_table (TestStatus status [TextureDimension_Num][PixelFormat_Num])
 {
   printf ("       ");
 
   for (size_t i=0; i<TextureDimension_Num; i++)
-    printf ("%s ", get_short_name ((TextureDimension)i));
+    printf ("%s     ", get_short_name ((TextureDimension)i));
     
   printf ("\n");
     
@@ -196,7 +235,13 @@ void print_status_table (bool status [TextureDimension_Num][PixelFormat_Num])
     printf ("%s| ", get_short_name ((PixelFormat)i));
 
     for (size_t j=0; j<TextureDimension_Num; j++)
-      printf ("%c  ", status [j][i] ? '+' : '-');
+    {
+      TestStatus& s = status [j][i];
+      
+      if (!s.count)                      printf ("  -   ");
+      else if (s.successfull == s.count) printf ("  +   ");
+      else                               printf ("%02u/%02u ", s.successfull, s.count);
+    }
 
     printf ("\n");
   }
@@ -210,9 +255,9 @@ int main ()
   {
     Test test (L"OpenGL device test window (all_textures_test)");
 
-    bool        status [2][2][TextureDimension_Num][PixelFormat_Num]; 
-    TextureSize sizes [2][TextureDimension_Num] = {{{16, 1, 1}, {16, 16, 1}, {16, 16, 2}, {16, 16, 6}},
-                                                   {{12, 1, 1}, {12, 12, 1}, {12, 12, 2}, {12, 12, 6}}};
+    TestStatus  status [2][2][TextureDimension_Num][PixelFormat_Num]; 
+    TextureSize sizes [2][TextureDimension_Num] = {{{16, 1, 1}, {16, 16, 1}, {16, 16, 4}, {16, 16, 6}},
+                                                   {{12, 1, 1}, {12, 12, 1}, {12, 12, 4}, {12, 12, 6}}};
 
     memset (status, 0, sizeof status);
 

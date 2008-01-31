@@ -53,7 +53,7 @@ int main ()
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
 
-    for (size_t i = 0; i < layers_count; i++)
+    for (size_t i=0; i < layers_count; i++)
       texture2->SetData (i, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data);
       
     md5 (hash[0], image_data, image_data_size);

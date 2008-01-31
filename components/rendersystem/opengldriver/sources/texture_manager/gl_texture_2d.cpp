@@ -34,7 +34,7 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     {
       glTexImage2D (GL_TEXTURE_2D, i, unpack_internal_format (tex_desc.format), level_desc.width,
                     level_desc.height, 0, unpack_format (tex_desc.format), unpack_type (tex_desc.format), 0);
-    }    
+    }
   }
 
   if (tex_desc.generate_mips_enable && ext.has_sgis_generate_mipmap)
