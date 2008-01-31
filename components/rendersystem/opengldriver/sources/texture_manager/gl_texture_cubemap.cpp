@@ -12,57 +12,39 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
   : Texture (manager, tex_desc, GL_TEXTURE_CUBE_MAP_ARB)
 {
   TextureExtensions ext (GetContextManager ());
+  
+    //MakeContextCurrent???
 
   Bind ();
 
-  for (size_t i = 0; i < 6; i++)
-  {
-    if (is_compressed_format (tex_desc.format))   
-    {
-      if (ext.has_ext_texture_compression_s3tc)   
-        glCompressedTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, gl_internal_format (tex_desc.format), tex_desc.width, 
-                                tex_desc.height, 0, ((tex_desc.width * tex_desc.height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
-      else
-        glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                      unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
-    }
-    else
-      glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                    gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-  }
+    //создание mip-уровней
 
-  //Задание мипов
+  for (size_t i=0; i<mips_count; i++)
+  {        
+    MipLevelDesc level_desc;
 
-  size_t width = tex_desc.width / 2; size_t height = tex_desc.height / 2;
+    GetMipLevelDesc (i, level_desc);
 
-  for (size_t i = 1; i < mips_count; i++)
-  {
-    for (size_t j = 0; j < 6; j++)
-    {
-
-      if (is_compressed_format (tex_desc.format))   
+    for (size_t j=0; j<6; j++)
+    {      
+      if (is_compressed_format (tex_desc.format) && ext.has_ext_texture_compression_s3tc)
       {
-        if (ext.has_ext_texture_compression_s3tc)   
-          glCompressedTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format), width, 
-                                  height, 0, ((width * height) >> 4) * compressed_quad_size (tex_desc.format), NULL);
-        else
-          glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, unpack_internal_format (tex_desc.format), width, height, 0, 
-                        unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
+        size_t tex_size = level_desc.width * level_desc.height / 16 * compressed_quad_size (tex_desc.format);
+       
+        glCompressedTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format),
+                                level_desc.width, level_desc.height, 0, tex_size, 0);
       }
       else
-        glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format), width, height, 0, 
-                      gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+      {
+        glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, unpack_internal_format (tex_desc.format), level_desc.width,
+                      level_desc.height, 0, unpack_format (tex_desc.format), unpack_type (tex_desc.format), 0);
+      }
     }
-    
-    if (width > 1)  width  /= 2;
-    if (height > 1) height /= 2;
   }
-  
 
-  if (tex_desc.generate_mips_enable)
-    if (ext.has_sgis_generate_mipmap)
+  if (tex_desc.generate_mips_enable && ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, true);
-  
+
   CheckErrors ("render::low_level::opengl::TextureCubemap::TextureCubemap");
 }
 
@@ -99,10 +81,13 @@ void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y
   
   if (layer > 5)
     RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::SetData", "layer", layer, (size_t)0, (size_t)5);
+    
   if (mip_level > mips_count)
     RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::SetData", "mip_level", mip_level, (size_t)0, mips_count);
+    
   if (((x + width) > (desc.width >> mip_level)) && ((x + width) != 1))
     RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::SetData", "x + width", x + width, (size_t)0, desc.width >> mip_level);
+    
   if (((y + height) > (desc.height >> mip_level)) && ((y + height) != 1))
     RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::SetData", "y + height", y + height, (size_t)0, desc.height >> mip_level);
   if (!width || !height)

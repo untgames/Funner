@@ -2,6 +2,7 @@
 
 using namespace render::low_level;
 using namespace render::low_level::opengl;
+using namespace common;
 
 /*
    Конструктор / деструктор
@@ -10,18 +11,76 @@ using namespace render::low_level::opengl;
 Texture::Texture  (const ContextManager& manager, const TextureDesc& tex_desc, GLenum in_target)
   : ContextObject (manager), target (in_target), desc (tex_desc)
 {
-  mips_count = get_mips_count (tex_desc.width, tex_desc.height);
+  static const char* METHOD_NAME = "render::low_level::opengl::Texture::Texture";
+
+    //проверка корректности начальных размеров
+
+  if (desc.width % 4)  RaiseInvalidArgument (METHOD_NAME, "desc.width", desc.width, "Reason: width is not multiple of 4");
+  if (desc.height % 4) RaiseInvalidArgument (METHOD_NAME, "desc.height", desc.height, "Reason: height is not multiple of 4");
+
+    //расчёт числа mip-уровней    
+
+  size_t max_edge_size = desc.width > desc.height ? desc.width : desc.height;            
+
+  mips_count = (size_t)(log ((float)max_edge_size) / log (2.f)) + 1;
+
+  switch (desc.format)
+  {
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+    {
+      mips_count -= 2;
+
+      break;
+    }
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8:
+    case PixelFormat_L8:    
+    case PixelFormat_A8:    
+    case PixelFormat_S8:
+    case PixelFormat_LA8:   
+    case PixelFormat_RGB8:  
+    case PixelFormat_RGBA8:     
+      break;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.format", desc.format);
+      break;
+  }    
+
+    //выделение нового OpenGL-идентификатора текстуры
 
   MakeContextCurrent ();
   glGenTextures      (1, &texture_id);
-  CheckErrors        ("render::low_level::opengl::Texture::Texture");
+
+    //проверка ошибок
+
+  CheckErrors (METHOD_NAME);
 }
 
 Texture::~Texture ()
 {
-  MakeContextCurrent ();
-  glDeleteTextures (1, &texture_id);
-  CheckErrors ("render::low_level::opengl::Texture::~Texture");
+  try
+  {
+    MakeContextCurrent ();
+    glDeleteTextures   (1, &texture_id);
+    CheckErrors        ("");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Texture::~Texture");
+
+    LogPrintf ("%s\n", exception.Message ());
+  }
+  catch (std::exception& exception)
+  {
+    LogPrintf ("%s\n", exception.what ());
+  }
+  catch (...)
+  {
+    //подавляем все исключения
+  }
 }
 
 /*
@@ -59,6 +118,37 @@ void Texture::Bind ()
   MakeContextCurrent ();
   glBindTexture(target, texture_id);
   CheckErrors ("render::low_level::opengl::Texture::Bind");
+}
+
+/*
+    Получение дескриптора mip-уровня текстуры
+*/
+
+void Texture::GetMipLevelDesc (size_t mip_level, MipLevelDesc& out_desc)
+{
+  size_t level_width  = desc.width >> mip_level,
+         level_height = desc.height >> mip_level;
+  
+  switch (desc.format)
+  {
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+         //выравнивание размеров уровня по ближайшему снизу числу, делящемуся на 4
+
+      level_width  &= ~3;
+      level_height &= ~3;
+
+      break;
+    default:
+      break;
+  }
+
+  if (!level_width)  level_width  = 1;
+  if (!level_height) level_height = 1;
+
+  out_desc.width  = level_width;
+  out_desc.height = level_height;
 }
 
 /*
@@ -113,28 +203,25 @@ void Texture::GetData
   if (mip_level >= mips_count)
     common::RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, mips_count);
     
+    //получение дескриптора mip-уровня
+    
+  MipLevelDesc level_desc;
+
+  GetMipLevelDesc (mip_level, level_desc);
+    
     //отсечение
 
-  size_t level_width  = desc.width >> mip_level,
-         level_height = desc.height >> mip_level;
-
-  if (!level_width)
-    level_width = 1;
-
-  if (!level_height)
-    level_height = 1;
-
-  if (x > level_width)
+  if (x > level_desc.width)
     return;
     
-  if (y > level_height)
+  if (y > level_desc.height)
     return;    
     
-  if (x + width > level_width)
-    width = level_width - x;
+  if (x + width > level_desc.width)
+    width = level_desc.width - x;
 
-  if (y + height > level_height)
-    height = level_height - y;    
+  if (y + height > level_desc.height)
+    height = level_desc.height - y;    
 
   if (!width || !height)
     return;    
@@ -174,7 +261,7 @@ void Texture::GetData
   
   GetLayerDesc (layer, layer_desc);
     
-  bool is_full_image = width == level_width && height == level_height && desc.layers == 1 && !x && !y;    
+  bool is_full_image = width == level_desc.width && height == level_desc.height && desc.layers == 1 && !x && !y;    
          
   if (is_compressed_format (target_format))
   {
@@ -209,7 +296,7 @@ void Texture::GetData
         //копирование полного образа во временный буфер
 
       size_t quad_size  = compressed_quad_size (target_format),
-             layer_size = level_width * level_height / DXT_BLOCK_SIZE * quad_size;
+             layer_size = level_desc.width * level_desc.height / DXT_BLOCK_SIZE * quad_size;
       
       xtl::uninitialized_storage<char> temp_buffer (layer_size * desc.layers);
 
@@ -217,7 +304,7 @@ void Texture::GetData
 
         //копирование части образа в пользовательский буфер
                
-      size_t quad_line_size = level_width / DXT_EDGE_SIZE * quad_size,
+      size_t quad_line_size = level_desc.width / DXT_EDGE_SIZE * quad_size,
              start_offset   = layer_desc.new_index * layer_size + y * quad_line_size + x * quad_size,
              block_size     = width * quad_size;
       
@@ -257,14 +344,14 @@ void Texture::GetData
       size_t texel_size     = opengl::texel_size (target_format),
              tmp_texel_size = texel_size != 3 || target != GL_TEXTURE_3D_EXT ? texel_size : 4; ////обход бага (?) OpenGL!!
 
-      xtl::uninitialized_storage<char> temp_buffer (level_width * level_height * desc.layers * tmp_texel_size);
+      xtl::uninitialized_storage<char> temp_buffer (level_desc.width * level_desc.height * desc.layers * tmp_texel_size);
 
       glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, temp_buffer.data ());
 
         //копирование части образа в пользовательсий буфер
 
-      size_t line_size    = level_width * texel_size,
-             layer_size   = line_size * level_height,
+      size_t line_size    = level_desc.width * texel_size,
+             layer_size   = line_size * level_desc.height,
              block_size   = width * texel_size,
              start_offset = layer_desc.new_index * layer_size + y * line_size + x * texel_size;
 
@@ -423,8 +510,23 @@ size_t compressed_quad_size (PixelFormat format)
     case PixelFormat_DXT1: return 8;
     case PixelFormat_DXT3: return 16;
     case PixelFormat_DXT5: return 16;
-    default: common::RaiseInvalidArgument ("render::low_level::opengl::Texture::compressed_texel_size", "format"); return 1;
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8:
+    case PixelFormat_L8:    
+    case PixelFormat_A8:    
+    case PixelFormat_S8:
+    case PixelFormat_LA8:   
+    case PixelFormat_RGB8:  
+    case PixelFormat_RGBA8:
+      common::RaiseInvalidArgument ("render::low_level::opengl::Texture::compressed_quad_size", "format", get_name (format));
+      break;
+    default:
+      common::RaiseInvalidArgument ("render::low_level::opengl::Texture::compressed_quad_size", "format", format);
+      break;
   }
+  
+  return 1;  
 }
 
 //получение ближайшей сверху степени двойки
@@ -436,19 +538,6 @@ size_t next_higher_power_of_two (size_t k)
           k |= k >> i;
 
   return k + 1;
-}
-
-//получение количества mip-уровней
-size_t get_mips_count (size_t size) //оптимизировать
-{
-//  return (size_t)(log ((float)next_higher_power_of_two (size)) / log (2.f)) + 1;
-  return (size_t)(log ((float)(size)) / log (2.f)) + 1;
-}
-
-//получение количества mip-уровней
-size_t get_mips_count (size_t width, size_t height)
-{
-  return width > height ? get_mips_count (width) : get_mips_count (height);
 }
 
 }

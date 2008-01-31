@@ -12,7 +12,7 @@ int main ()
   try
   {
     Test test (L"OpenGL device test window (texture2d_1_test)");
-//    Test test (L"OpenGL device test window (texture2d_1_test)", "max_version=1.1 disable=*");
+//    Test test (L"OpenGL device test window (texture2d_1_test)", "max_version=1.1 GL_VERSION_2_1=0 GL_ARB_texture_non_power_of_two=0 GL_EXT_texture_rectangle=0 GL_NV_texture_rectangle=0");
 //    Test test (L"OpenGL device test window (texture2d_1_test)", "disable='GL_ARB_texture_non_power_of_two' max_version=1.1");
 //    Test test (L"OpenGL device test window (texture2d_1_test)", "disable='GL_ARB_texture_non_power_of_two GL_EXT_texture_compression_s3tc GL_EXT_texture_rectangle' max_version=1.1");
 
@@ -49,12 +49,29 @@ int main ()
 
     desc.generate_mips_enable = false;
     desc.format               = PixelFormat_DXT3;
-    desc.width                = 512;
+//    desc.width                = 512;
+    desc.width                = 508;
     desc.height               = 508;
+//    desc.height               = 512;
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
+    
+    texture2->SetData (0, 0, 0, 0, 508, 508, PixelFormat_RGBA8, image_data);
+    md5 (hash[0], image_data, image_data_size);
+    texture2->GetData (0, 0, 0, 0, 508, 508, PixelFormat_RGBA8, image_data);
+    md5 (hash[1], image_data, image_data_size);
 
-    texture2->SetData (0, 0, 0, 0, 512, 508, PixelFormat_RGBA8, image_data);
+    if (memcmp (hash[0], hash[1], 16))
+      printf ("RGB8 to DXT 2d texture data operations works incorrect!\n");
+    else
+      printf ("RGB8 to DXT 2d texture data operations works correct!\n");
+
+    texture2->SetData (0, 0, 0, 0, 508, 508, PixelFormat_DXT3, image_data);
+    md5 (hash[0], image_data, image_data_size);
+    texture2->GetData (0, 0, 0, 0, 508, 508, PixelFormat_DXT3, image_data);
+    md5 (hash[1], image_data, image_data_size);
+
+/*    texture2->SetData (0, 0, 0, 0, 512, 508, PixelFormat_RGBA8, image_data);
     md5 (hash[0], image_data, image_data_size);
     texture2->GetData (0, 0, 0, 0, 512, 508, PixelFormat_RGBA8, image_data);
     md5 (hash[1], image_data, image_data_size);
@@ -67,7 +84,7 @@ int main ()
     texture2->SetData (0, 0, 0, 0, 512, 508, PixelFormat_DXT3, image_data);
     md5 (hash[0], image_data, image_data_size);
     texture2->GetData (0, 0, 0, 0, 512, 508, PixelFormat_DXT3, image_data);
-    md5 (hash[1], image_data, image_data_size);
+    md5 (hash[1], image_data, image_data_size);*/
 
     if (memcmp (hash[0], hash[1], 16))
       printf ("DXT to DXT 2d texture data operations works incorrect!\n");

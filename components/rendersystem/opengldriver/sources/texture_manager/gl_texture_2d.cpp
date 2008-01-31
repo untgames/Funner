@@ -12,36 +12,32 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
   : Texture (manager, tex_desc, GL_TEXTURE_2D)
 {
   TextureExtensions ext (GetContextManager ());
+  
+    //MakeContextCurrent???
 
   Bind ();
-
-  size_t width = tex_desc.width; size_t height = tex_desc.height;
   
-  for (size_t i = 0; i < mips_count; i++)
+  for (size_t i=0; i<mips_count; i++)
   {
-    GLenum gl_internal_format, gl_format, gl_type;     
-    
-    if (ext.has_ext_texture_compression_s3tc)
+    MipLevelDesc level_desc;
+
+    GetMipLevelDesc (i, level_desc);
+
+    if (is_compressed_format (tex_desc.format) && ext.has_ext_texture_compression_s3tc)
     {
-      gl_internal_format = opengl::gl_internal_format (tex_desc.format);        
-      gl_format          = opengl::unpack_format      (tex_desc.format);
-      gl_type            = opengl::unpack_type        (tex_desc.format);      
+      size_t tex_size = level_desc.width * level_desc.height / 16 * compressed_quad_size (tex_desc.format); //???dup
+     
+      glCompressedTexImage2D (GL_TEXTURE_2D, i, gl_internal_format (tex_desc.format),
+                              level_desc.width, level_desc.height, 0, tex_size, 0);
     }
     else
     {
-      gl_internal_format = opengl::unpack_internal_format (tex_desc.format);        
-      gl_format          = opengl::unpack_format          (tex_desc.format);
-      gl_type            = opengl::unpack_type            (tex_desc.format);
-    }
-
-    glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, width, height, 0, gl_format, gl_type, NULL);
-
-    if (width > 1)  width  /= 2; //get_next_mip_size!!!
-    if (height > 1) height /= 2;
+      glTexImage2D (GL_TEXTURE_2D, i, unpack_internal_format (tex_desc.format), level_desc.width,
+                    level_desc.height, 0, unpack_format (tex_desc.format), unpack_type (tex_desc.format), 0);
+    }    
   }
 
-  if (tex_desc.generate_mips_enable)
-    if (ext.has_sgis_generate_mipmap)
+  if (tex_desc.generate_mips_enable && ext.has_sgis_generate_mipmap)
       glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, true);
 
   CheckErrors ("render::low_level::opengl::Texture2D::Texture2D");
@@ -99,10 +95,8 @@ void Texture2D::SetData (size_t layer, size_t mip_level, size_t x, size_t y, siz
   {
     if (ext.has_ext_texture_compression_s3tc)
     {
-      printf ("in %04x format=%04x mip_level=%u\n", glGetError (), gl_format (source_format), mip_level);
       glCompressedTexSubImage2D (GL_TEXTURE_2D, mip_level, x, y, width, height, gl_format (source_format),
                                  ((width * height) / 16) * compressed_quad_size (source_format), buffer);
-      printf ("out %04x\n", glGetError ());
     }
     else
     {
