@@ -67,7 +67,7 @@ struct TextureManager::Impl: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание текстуры и сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ITexture*      CreateTexture (const TextureDesc&);    
+    ITexture*      CreateTexture (const TextureDesc&, TextureManager& texture_manager);    
     ISamplerState* CreateSamplerState (const SamplerDesc&);
 
   public:
@@ -123,7 +123,7 @@ bool is_power_of_two (size_t size)
 
 }
   
-ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
+ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc, TextureManager& texture_manager)
 {
     //добавить общий код замены нулевых размеров дескриптора текстуры на единичные!!!!
 
@@ -160,11 +160,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
         return new TextureNPOT (GetContextManager (), temp_desc);
       }
 
-      temp_desc.width = next_higher_power_of_two (tex_desc.width);
-
-      LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.");
-      
-      return new TextureEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width, 1);
+      return new ScaledTexture (texture_manager, temp_desc);
     }
     case TextureDimension_2D:
     {
@@ -186,12 +182,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
         return new TextureNPOT (GetContextManager (), temp_desc);
       }
 
-      temp_desc.width  = next_higher_power_of_two (tex_desc.width);
-      temp_desc.height = next_higher_power_of_two (tex_desc.height);
-
-      LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");
-
-      return new TextureEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width, (float)temp_desc.height / (float)tex_desc.height);
+      return new ScaledTexture (texture_manager, temp_desc);
     }
     case TextureDimension_3D: 
     {
@@ -232,14 +223,9 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       bool is_pot = is_power_of_two (tex_desc.width) && is_power_of_two (tex_desc.height);
 
       if (is_pot || ext.has_arb_texture_non_power_of_two)
-        return new TextureCubemap (GetContextManager (), temp_desc);      
+        return new TextureCubemap (GetContextManager (), temp_desc);
 
-      temp_desc.width  = next_higher_power_of_two (tex_desc.width);
-      temp_desc.height = next_higher_power_of_two (tex_desc.height);
-
-      LogPrintf ("Non power of two textures not supported by hardware. Scaled  cubemap texture created.\n");
-
-      return new TextureCubemapEmulatedNPOT (GetContextManager (), temp_desc, (float)temp_desc.width / (float)tex_desc.width);
+      return new ScaledTexture (texture_manager, temp_desc);
     }
     default:
       RaiseInvalidArgument (METHOD_NAME, "desc.dimension", tex_desc.dimension);
@@ -272,7 +258,7 @@ TextureManager::~TextureManager ()
 
 ITexture* TextureManager::CreateTexture (const TextureDesc& tex_desc)
 {
-  return impl->CreateTexture (tex_desc);
+  return impl->CreateTexture (tex_desc, *this);
 }
 
 ISamplerState* TextureManager::CreateSamplerState (const SamplerDesc& sampler_desc)
