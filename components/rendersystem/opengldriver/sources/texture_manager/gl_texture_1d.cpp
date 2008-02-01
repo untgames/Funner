@@ -24,13 +24,6 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
 
   Bind ();  
   
-  glTexImage1D (GL_PROXY_TEXTURE_1D, 1, gl_internal_format (tex_desc.format), tex_desc.width, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
-  
-  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_1D, 1, GL_TEXTURE_WIDTH, &width);
-
-  if (!width)
-    Raise <Exception> (METHOD_NAME, "Can't create 1d texture %ux%ux%u@%s (proxy texture failed)", tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
-
   for (size_t i = 0; i < mips_count; i++)
     glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format (tex_desc.format), tex_desc.width >> i, 0, gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
 
