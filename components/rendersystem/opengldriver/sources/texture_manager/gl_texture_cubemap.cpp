@@ -37,26 +37,6 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
   Bind ();
 
-  size_t tex_size;
-
-  if (is_compressed_format (tex_desc.format) && ext.has_ext_texture_compression_s3tc)
-  {
-    tex_size = tex_desc.width * tex_desc.height / 16 * compressed_quad_size (tex_desc.format);
-
-    if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                                                                   tex_size, 0);
-    else                                 glCompressedTexImage2D    (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                                                                   tex_size, 0);          //???? Image size may be must multiplied by depth
-  }
-  else
-    glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, unpack_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                  unpack_format (tex_desc.format), unpack_type (tex_desc.format), NULL);
-  
-  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP_ARB, 0, GL_TEXTURE_WIDTH, &width);
-
-  if (!width)
-    Raise <Exception> (METHOD_NAME, "Can't create cubemap texture %ux%ux%u@%s (proxy texture fail)", tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
-
     //создание mip-уровней
 
   for (size_t i=0; i<mips_count; i++)
@@ -69,8 +49,8 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     {      
       if (is_compressed_format (tex_desc.format) && ext.has_ext_texture_compression_s3tc)
       {
-        tex_size = level_desc.width * level_desc.height / 16 * compressed_quad_size (tex_desc.format);
-       
+        size_t tex_size = level_desc.width * level_desc.height / 16 * compressed_quad_size (tex_desc.format);
+
         if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format),
                                                                         level_desc.width, level_desc.height, 0, tex_size, 0);
         else                                 glCompressedTexImage2D    (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format (tex_desc.format),

@@ -49,32 +49,7 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     
   GLenum gl_internal_format = opengl::gl_internal_format (desc.format),
          gl_format          = opengl::gl_format (desc.format),
-         gl_type            = opengl::gl_type (desc.format);
-  
-    //проверка возможности создания текстуры
-    
-      //??????????????1 и mip-уровни
-
-  if (glTexImage3D)
-  {
-    glTexImage3D (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format, desc.width, desc.height, desc.layers, 0, gl_format, gl_type, 0);
-  }
-  else
-  {
-    glTexImage3DEXT (GL_PROXY_TEXTURE_3D_EXT, 0, gl_internal_format, desc.width, desc.height, desc.layers, 0, gl_format, gl_type, 0);
-  }
-
-  size_t proxy_width = 0, proxy_height = 0, proxy_depth = 0;
-
-  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_3D_EXT, 0, GL_TEXTURE_WIDTH, (int*)&proxy_width);
-  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_3D_EXT, 0, GL_TEXTURE_HEIGHT, (int*)&proxy_height);
-  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_3D_EXT, 0, GL_TEXTURE_DEPTH, (int*)&proxy_depth);
-
-  if (!proxy_width || !proxy_height || !proxy_depth)
-  {
-    RaiseNotSupported (METHOD_NAME, "Can't create 3D texture %ux%ux%x@%s (proxy texture fail)", desc.width, desc.height, desc.layers,
-                       get_name (desc.format));
-  }
+         gl_type            = opengl::gl_type (desc.format);  
 
     //создание mip-уровней
 

@@ -170,6 +170,12 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
 
       if (!ext.has_ext_texture3D) //перенести в Texture3D!!!
         RaiseNotSupported (METHOD_NAME, "3D textures not supported (GL_EXT_texture3D not supported)");
+        
+      if (tex_desc.width > max_3d_texture_size || tex_desc.height > max_3d_texture_size || tex_desc.layers > max_3d_texture_size)
+      {
+        RaiseNotSupported (METHOD_NAME, "Can't create 3D texture %ux%ux%u (max_edge_size=%u)", tex_desc.width, tex_desc.height,
+                           tex_desc.layers, max_3d_texture_size);
+      }
 
       bool is_pot = is_power_of_two (tex_desc.width) && is_power_of_two (tex_desc.height) && is_power_of_two (tex_desc.layers);
 
@@ -186,6 +192,12 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
       if (!ext.has_arb_texture_cube_map) //перенести в TextureCubemap!!!
         RaiseNotSupported (METHOD_NAME, "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension");
         
+      if (tex_desc.width > max_cube_map_texture_size || tex_desc.height > max_cube_map_texture_size)
+      {
+        RaiseNotSupported (METHOD_NAME, "Can't create cubemap texture %ux%u (max_edge_size=%u)", tex_desc.width, tex_desc.height,
+                           max_cube_map_texture_size);
+      }
+
       bool is_pot = is_power_of_two (tex_desc.width) && is_power_of_two (tex_desc.height);
 
       if (is_pot || ext.has_arb_texture_non_power_of_two)
