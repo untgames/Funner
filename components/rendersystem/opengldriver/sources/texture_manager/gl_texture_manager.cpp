@@ -133,7 +133,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
             
       bool is_pot = is_power_of_two (tex_desc.width);
 
-      if (temp_desc.width > (size_t)max_texture_size)
+      if (temp_desc.width > max_texture_size)
         RaiseNotSupported (METHOD_NAME, "Can't create 1d texture with width = %u (maximum texture size = %u)", tex_desc.width, max_texture_size);      
 
       if (is_pot || ext.has_arb_texture_non_power_of_two)
@@ -141,7 +141,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
 
       if (ext.has_ext_texture_rectangle) ///compressed?????
       {
-        if (temp_desc.width > (size_t)max_rectangle_texture_size)
+        if (temp_desc.width > max_rectangle_texture_size)
           RaiseNotSupported (METHOD_NAME, "Can't create 1d texture with width = %u (maximum texture size = %u)", tex_desc.width, max_rectangle_texture_size);
 
         return new TextureNPOT (GetContextManager (), temp_desc);
@@ -157,7 +157,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
     {
       temp_desc.layers = 1;
 
-      if ((temp_desc.width > (size_t)max_texture_size) || (temp_desc.height > (size_t)max_texture_size))
+      if ((temp_desc.width > max_texture_size) || (temp_desc.height > max_texture_size))
         RaiseNotSupported (METHOD_NAME, "Can't create 2d texture with width = %u height = %u (maximum texture size = %u)", tex_desc.width, tex_desc.height, max_texture_size);
       
       bool is_pot = is_power_of_two (tex_desc.width) && is_power_of_two (tex_desc.height);
@@ -167,7 +167,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
 
       if (ext.has_ext_texture_rectangle && !is_compressed_format (tex_desc.format))
       {
-        if ((temp_desc.width > (size_t)max_texture_size) || (temp_desc.height > (size_t)max_rectangle_texture_size))
+        if ((temp_desc.width > max_texture_size) || (temp_desc.height > max_rectangle_texture_size))
           RaiseNotSupported (METHOD_NAME, "Can't create 2d texture with width = %u height = %u (maximum texture size = %u)", tex_desc.width, tex_desc.height, max_rectangle_texture_size);
       
         return new TextureNPOT (GetContextManager (), temp_desc);
