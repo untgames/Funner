@@ -233,6 +233,8 @@ size_t get_next_mip_size (size_t size)
 namespace
 {
 
+//убрать!!!!
+
 void generate_mips_internal
  (size_t       x,
   size_t       y,

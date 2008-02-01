@@ -5,6 +5,13 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
+    Константы
+*/
+
+const size_t DXT_EDGE_SIZE  = 4;                             //размер стороны блока DXT-сжатия
+const size_t DXT_BLOCK_SIZE = DXT_EDGE_SIZE * DXT_EDGE_SIZE; //размер блока DXT-сжатия
+
+/*
    Конструктор / деструктор
 */
 
@@ -13,6 +20,14 @@ Texture::Texture  (const ContextManager& manager, const TextureDesc& tex_desc, G
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::Texture";
   
+    //+размеры текстуры (нулевые)!!!
+
+    //расчёт числа mip-уровней
+
+  size_t max_edge_size = desc.width > desc.height ? desc.width : desc.height;
+
+  mips_count = (size_t)(log ((float)max_edge_size) / log (2.f)) + 1;  
+
     //проверка корректности формата
 
   static Extension EXT_packed_depth_stencil = "GL_EXT_packed_depth_stencil",
@@ -26,12 +41,31 @@ Texture::Texture  (const ContextManager& manager, const TextureDesc& tex_desc, G
     case PixelFormat_LA8:
     case PixelFormat_RGB8:
     case PixelFormat_RGBA8:
+      break;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
+        //проверка возможности работы совместно с mip-mapping
+        
+      if (desc.generate_mips_enable)
+        RaiseInvalidOperation (METHOD_NAME, "Auto-generate mipmaps incompatible with compressed textures (desc.format=%s)",
+                               get_name (desc.format));
+
+        //проверка корректности начальных размеров
+
+      if (mips_count < 3)
+      {
+        if (desc.width % 4)  RaiseInvalidArgument (METHOD_NAME, "desc.width", desc.width, "Reason: width is not multiple of 4");
+        if (desc.height % 4) RaiseInvalidArgument (METHOD_NAME, "desc.height", desc.height, "Reason: height is not multiple of 4");
+      }
+
+      mips_count -= 2;
+
+      break;
     case PixelFormat_D24S8:
       if (!IsSupported (EXT_packed_depth_stencil))
-        RaiseNotSupported (METHOD_NAME, "Can't create depth-stencil texture (GL_EXT_packed_depth_stencil not supported)");          
+        RaiseNotSupported (METHOD_NAME, "Can't create depth-stencil texture (GL_EXT_packed_depth_stencil not supported)");
+
     case PixelFormat_D16:
     case PixelFormat_D24X8:
       if (!IsSupported (ARB_depth_texture) && !IsSupported (Version_1_4))
@@ -44,46 +78,7 @@ Texture::Texture  (const ContextManager& manager, const TextureDesc& tex_desc, G
     default:
       RaiseInvalidArgument (METHOD_NAME, "desc.format", tex_desc.format);
       return;
-  }
-
-    //расчёт числа mip-уровней    
-
-  size_t max_edge_size = desc.width > desc.height ? desc.width : desc.height;            
-
-  mips_count = (size_t)(log ((float)max_edge_size) / log (2.f)) + 1;
-
-  switch (desc.format)
-  {
-    case PixelFormat_DXT1:
-    case PixelFormat_DXT3:
-    case PixelFormat_DXT5:
-    {
-        //проверка корректности начальных размеров
-
-      if (mips_count < 3)
-      {
-        if (desc.width % 4)  RaiseInvalidArgument (METHOD_NAME, "desc.width", desc.width, "Reason: width is not multiple of 4");
-        if (desc.height % 4) RaiseInvalidArgument (METHOD_NAME, "desc.height", desc.height, "Reason: height is not multiple of 4");
-      }
-
-      mips_count -= 2;
-
-      break;
-    }
-    case PixelFormat_D16:
-    case PixelFormat_D24X8:
-    case PixelFormat_D24S8:
-    case PixelFormat_L8:    
-    case PixelFormat_A8:    
-    case PixelFormat_S8:
-    case PixelFormat_LA8:   
-    case PixelFormat_RGB8:  
-    case PixelFormat_RGBA8:     
-      break;
-    default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.format", desc.format);
-      break;
-  }    
+  }  
 
     //выделение нового OpenGL-идентификатора текстуры
 
@@ -123,26 +118,15 @@ Texture::~Texture ()
    Получение дескриптора
 */
 
-void Texture::GetDesc (TextureDesc& target_desc)
+void Texture::GetDesc (TextureDesc& out_desc)
 {
-  target_desc.dimension    = desc.dimension;
-  target_desc.width        = desc.width;
-  target_desc.height       = desc.height;
-  target_desc.layers       = desc.layers;
-  target_desc.format       = desc.format;
-  target_desc.generate_mips_enable = desc.generate_mips_enable;
-  target_desc.bind_flags   = BindFlag_Texture;
-  target_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
-
-  if ((target_desc.usage_mode != UsageMode_Default) && (target_desc.usage_mode != UsageMode_Static) && 
-      (target_desc.usage_mode != UsageMode_Dynamic) && (target_desc.usage_mode != UsageMode_Stream))
-    target_desc.usage_mode = UsageMode_Default;
+  out_desc = desc;
 }
 
-void Texture::GetDesc (BindableTextureDesc& desc)
+void Texture::GetDesc (BindableTextureDesc& out_desc)
 {
-  desc.id     = texture_id;
-  desc.target = target;
+  out_desc.id     = texture_id;
+  out_desc.target = target;
 }
 
 /*
@@ -201,28 +185,223 @@ void Texture::GetLayerDesc (size_t layer, LayerDesc& desc)
 }
 
 /*
+    Генерация mip-уровней
+*/
+
+namespace
+{
+
+size_t get_next_mip_size (size_t size)
+{
+  switch (size)
+  {
+    case 0:
+    case 1:   return size;
+    default:  return size / 2;
+  }
+}
+
+}
+
+void Texture::BuildMipmaps
+ (size_t       x,
+  size_t       y,
+  size_t       z,
+  size_t       width,
+  size_t       height,
+  PixelFormat  format,
+  const void*  data)
+{
+  GLenum gl_format = opengl::gl_format (format),
+         gl_type   = opengl::gl_type (format);
+
+  const size_t buffer_size = get_next_mip_size (width) * get_next_mip_size (height) * texel_size (format);
+
+  xtl::uninitialized_storage<char> dst_buffer (buffer_size),
+                                   src_buffer (buffer_size / 2); //на 4 делить не нужно!
+
+  const char* src = reinterpret_cast<const char*> (data);
+  char*       dst = dst_buffer.data ();
+    
+  for (size_t mip_level=1; width > 1 || height > 1; mip_level++)
+  {
+    scale_image_2x_down (format, width, height, src, dst);
+
+    width   = get_next_mip_size (width);
+    height  = get_next_mip_size (height);
+    x      /= 2;
+    y      /= 2;    
+
+    if (target != GL_TEXTURE_CUBE_MAP) //????????
+      z /= 2;
+
+    SetUncompressedData (z, mip_level, x, y, width, height, gl_format, gl_type, dst);
+
+    dst_buffer.swap (src_buffer);
+
+    dst = dst_buffer.data ();
+    src = src_buffer.data ();
+  }
+}
+
+/*
+    Установка данных 
+*/
+
+void Texture::SetUncompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, GLenum, const void*)
+{
+  RaiseNotImplemented ("render::low_level::opengl::Texture::SetUncompressedData");
+}
+
+void Texture::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, size_t, const void*)
+{
+  RaiseNotImplemented ("render::low_level::opengl::Texture::SetCompressedData");
+}
+
+/*
    Работа с данными
 */
 
-void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+void Texture::SetData
+ (size_t      layer,
+  size_t      mip_level,
+  size_t      x,
+  size_t      y,
+  size_t      width,
+  size_t      height,
+  PixelFormat source_format,
+  const void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::SetData";
+  
+       //объединить код с GetData!!!
+  
+    //проверка корректности номеров слоя и mip-уровня
 
-  static Extension EXT_packed_depth_stencil     = "GL_EXT_packed_depth_stencil",
-                   EXT_framebuffer_object       = "GL_EXT_framebuffer_object";
-    
-  bool has_ext_packed_depth_stencil = GetContextManager().IsSupported (EXT_packed_depth_stencil) && GetContextManager().IsSupported (EXT_framebuffer_object);  
+  if (layer >= desc.layers)
+    common::RaiseOutOfRange (METHOD_NAME, "layer", layer, desc.layers);
+
+  if (mip_level >= mips_count)
+    common::RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, mips_count);
+
+    //получение дескриптора mip-уровня
+
+  MipLevelDesc level_desc;
+
+  GetMipLevelDesc (mip_level, level_desc);  
+
+    //отсечение
+
+  if (x >= level_desc.width)
+    return;
+
+  if (y >= level_desc.height)
+    return;
+
+  if (x + width > level_desc.width)
+    width = level_desc.width - x;
+
+  if (y + height > level_desc.height)
+    height = level_desc.height - y;    
+
+  if (!width || !height)
+    return;
 
   if (!buffer)
     common::RaiseNullArgument (METHOD_NAME, "buffer");
+    
+    //установка текстуры в контекст OpenGL
 
-  if ((source_format == PixelFormat_D24S8)  && (!has_ext_packed_depth_stencil))
-    common::RaiseNotSupported (METHOD_NAME, "Can't set depth-stencil data. Reason: GL_EXT_packed_depth_stencil extension not supported");
+  MakeContextCurrent ();
 
-  if (is_depth_format (desc.format) && !is_depth_format (source_format))
-    common::RaiseInvalidArgument (METHOD_NAME, "source_format");
-  if (!is_depth_format (desc.format) && is_depth_format (source_format))
-    common::RaiseInvalidArgument (METHOD_NAME, "source_format");
+  Bind ();
+
+    //проверка совместимости форматов
+
+  bool is_depth_source_format = is_depth_format (source_format),
+       is_depth_tex_format    = is_depth_format (desc.format),
+       is_compatible          = (is_depth_tex_format  && is_depth_source_format) ||
+                                (!is_depth_tex_format && !is_depth_source_format);
+
+  if (!is_compatible)
+  {
+    RaiseNotSupported (METHOD_NAME, "Texture format %s incompatible with source_format %s", get_name (desc.format),
+      get_name (source_format));
+  }                                    
+                                
+  if (source_format == PixelFormat_D24S8)
+  {
+    static Extension EXT_packed_depth_stencil = "GL_EXT_packed_depth_stencil";
+
+    if (!IsSupported (EXT_packed_depth_stencil))
+      RaiseNotSupported (METHOD_NAME, "Unsupported format %s (GL_EXT_packed_depth_stencil not supported)", get_name (source_format));
+  }  
+
+    //получение информации о доступных расширениях
+
+  TextureExtensions ext (GetContextManager ());
+
+    //получение информации о слое текстуры
+    
+  LayerDesc layer_desc;
+
+  GetLayerDesc (layer, layer_desc);
+  
+    //преобразование формата пикселей
+  
+  GLenum gl_format = opengl::gl_format (source_format),
+         gl_type   = opengl::gl_type (source_format);  
+         
+  if (is_compressed_format (source_format))
+  {
+      //проверка совместимости форматов
+      
+    if (source_format != desc.format)
+      RaiseNotSupported (METHOD_NAME, "Can't set compressed texture data. Reason: source format %s mismatch with texture format %s",
+                         get_name (source_format), get_name (desc.format));
+
+      //проверка корректности размеров
+
+    if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))          RaiseNotSupported (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
+    if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) RaiseNotSupported (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);
+    
+      //копирование сжатого образа            
+
+    if (ext.has_ext_texture_compression_s3tc)
+    {
+      size_t buffer_size = width * height / DXT_BLOCK_SIZE * compressed_quad_size (source_format);
+
+      SetCompressedData (layer, mip_level, x, y, width, height, gl_format, buffer_size, buffer);
+    }
+    else
+    {
+      xtl::uninitialized_storage<char> unpacked_buffer (width * height * unpack_texel_size (source_format));
+
+      unpack_dxt (source_format, width, height, buffer, unpacked_buffer.data ());
+
+      gl_format = unpack_format (source_format);
+      gl_type   = unpack_type (source_format);
+
+      SetUncompressedData (layer, mip_level, x, y, width, height, gl_format, gl_type, unpacked_buffer.data ());
+    }     
+  }
+  else
+  {
+      //копирование несжатого образа
+
+     // уточнить про перегенерацию при установке mip_level != 0!!!
+
+    SetUncompressedData (layer, mip_level, x, y, width, height, gl_format, gl_type, buffer);
+
+    if (desc.generate_mips_enable && !mip_level && !ext.has_sgis_generate_mipmap)
+    {
+      BuildMipmaps (x, y, layer, width, height, source_format, buffer);
+    }
+  }     
+
+    //проверка ошибок
+
+  CheckErrors (METHOD_NAME);
 }
 
 void Texture::GetData
@@ -236,6 +415,8 @@ void Texture::GetData
   void*       buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::GetData";
+  
+    //проверка корректности номеров слоя и mip-уровня
 
   if (layer >= desc.layers)
     common::RaiseOutOfRange (METHOD_NAME, "layer", layer, desc.layers);
@@ -251,10 +432,10 @@ void Texture::GetData
     
     //отсечение
 
-  if (x > level_desc.width)
+  if (x >= level_desc.width)
     return;
     
-  if (y > level_desc.height)
+  if (y >= level_desc.height)
     return;    
     
   if (x + width > level_desc.width)
@@ -291,7 +472,7 @@ void Texture::GetData
 
   Bind ();
   
-    //получение информации о достпных расширениях
+    //получение информации о доступных расширениях
 
   TextureExtensions ext (GetContextManager ());
   
@@ -321,9 +502,6 @@ void Texture::GetData
     }
     else
     {
-      static const size_t DXT_EDGE_SIZE  = 4,
-                          DXT_BLOCK_SIZE = DXT_EDGE_SIZE * DXT_EDGE_SIZE;
-
       if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))          common::RaiseNotSupported (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
       if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) common::RaiseNotSupported (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);
 

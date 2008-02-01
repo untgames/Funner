@@ -37,10 +37,37 @@ TextureNPOT::TextureNPOT  (const ContextManager& manager, const TextureDesc& tex
 }
 
 /*
+    Установка данных
+*/
+
+void TextureNPOT::SetUncompressedData
+ (size_t      layer,
+  size_t      mip_level,
+  size_t      x,
+  size_t      y,
+  size_t      width,
+  size_t      height,
+  GLenum      format,
+  GLenum      type,
+  const void* buffer)
+{
+  if (mip_level)
+    RaiseNotSupported ("render::low_level::opengl::TextureNPOT::SetUncompressedData",
+      "Mip-mapping not supported for rectangle-textures (mip_level=%u)", mip_level);
+
+  glTexSubImage2D (GL_TEXTURE_RECTANGLE_EXT, 0, x, y, width, height, format, type, buffer);
+}
+
+void TextureNPOT::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, size_t, const void*)
+{
+  RaiseNotSupported ("render::low_level::opengl::TextureNPOT::SetCompressedData", "Compression for NPOT textures not supported");
+}
+
+/*
    Работа с данными
 */
 
-void TextureNPOT::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+/*void TextureNPOT::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
   Texture::SetData (layer, mip_level, x, y, width, height, source_format, buffer);
   
@@ -58,7 +85,6 @@ void TextureNPOT::SetData (size_t layer, size_t mip_level, size_t x, size_t y, s
   MakeContextCurrent ();
   Bind ();
 
-  glTexSubImage2D (GL_TEXTURE_RECTANGLE_EXT, 0, x, y, width, height, gl_format (source_format), gl_type (source_format), buffer);
-
   CheckErrors ("render::low_level::opengl::TextureNPOT::SetData");
 }
+*/

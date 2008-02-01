@@ -85,8 +85,8 @@ class Texture : virtual public IBindableTexture, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    virtual void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
+    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
     
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,6 +99,19 @@ class Texture : virtual public IBindableTexture, public ContextObject
 ///Получение дескриптора слоя текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void GetLayerDesc (size_t layer, LayerDesc& desc);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка данных  --- сделать чисто-виртуальными!!!
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                                      GLenum format, GLenum type, const void* buffer);
+    virtual void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                                    GLenum format, size_t buffer_size, const void* buffer);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Генерация mip-уровней
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void BuildMipmaps (size_t x, size_t y, size_t z, size_t width, size_t height, PixelFormat format, const void* data);
 
   public: //???!!!private!!!
     GLenum      target;      //целевой тип текстуры
@@ -118,11 +131,14 @@ class Texture1D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Texture1D (const ContextManager&, const TextureDesc& texture_desc);
 
+  private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с данными
+///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-//    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                              GLenum format, GLenum type, const void* buffer);
+    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                            GLenum format, size_t buffer_size, const void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,11 +152,14 @@ class Texture2D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Texture2D (const ContextManager&, const TextureDesc&);
 
+  private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с данными
+///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-//    virtual void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                              GLenum format, GLenum type, const void* buffer);
+    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                            GLenum format, size_t buffer_size, const void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,11 +173,14 @@ class TextureNPOT : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     TextureNPOT (const ContextManager&, const TextureDesc& texture_desc);
 
+  private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с данными
+///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-//    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                              GLenum format, GLenum type, const void* buffer);
+    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                            GLenum format, size_t buffer_size, const void* buffer);    
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,11 +216,14 @@ class Texture3D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Texture3D (const ContextManager&, const TextureDesc&);
 
+  private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с данными
+///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-//    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                              GLenum format, GLenum type, const void* buffer);
+    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                            GLenum format, size_t buffer_size, const void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,17 +259,19 @@ class TextureCubemap : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     TextureCubemap (const ContextManager&, const TextureDesc&);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с данными
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-//    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
-
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора слоя текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void GetLayerDesc (size_t layer, LayerDesc& desc);  
+    void GetLayerDesc (size_t layer, LayerDesc& desc);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                              GLenum format, GLenum type, const void* buffer);
+    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+                            GLenum format, size_t buffer_size, const void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -293,6 +320,8 @@ typedef void (*SetTexDataFn)(size_t mip_level, size_t x, size_t y, size_t z, siz
 
 void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest);
 void scale_image         (PixelFormat format, size_t width, size_t height, size_t new_width, size_t new_height, const void* src, void* dest);
+
+  ///убрать!!!
 void generate_mips       (size_t x, size_t y, size_t z, size_t width, size_t height, PixelFormat format, const void* data, SetTexDataFn);
 void generate_cubemap_mips (size_t x, size_t y, size_t z, size_t width, size_t height, PixelFormat format, const void* data, SetTexDataFn);
 

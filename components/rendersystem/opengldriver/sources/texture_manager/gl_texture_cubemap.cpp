@@ -104,90 +104,42 @@ void TextureCubemap::GetLayerDesc (size_t layer, LayerDesc& desc)
 }
 
 /*
-   Работа с данными
+    Установка данных
 */
 
-namespace
+void TextureCubemap::SetUncompressedData
+ (size_t      layer,
+  size_t      mip_level,
+  size_t      x,
+  size_t      y,
+  size_t      width,
+  size_t      height,
+  GLenum      format,
+  GLenum      type,
+  const void* buffer)
 {
-
-void SetTexDataCubemap (size_t mip_level, size_t x, size_t y, size_t z, size_t width, size_t height, GLenum format, GLenum type, const void* data)
-{
-  glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + z, mip_level, x, y, width, height, format, type, data);
+  glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, format, type, buffer);  
 }
 
-}
-
-void TextureCubemap::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+void TextureCubemap::SetCompressedData
+ (size_t      layer,
+  size_t      mip_level,
+  size_t      x,
+  size_t      y,
+  size_t      width,
+  size_t      height,
+  GLenum      format,
+  size_t      buffer_size,
+  const void* buffer)
 {
-  Texture::SetData (layer, mip_level, x, y, width, height, source_format, buffer);
-  
-  if (layer > 5)
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::SetData", "layer", layer, (size_t)0, (size_t)5);
-    
-  if (mip_level > mips_count)
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::SetData", "mip_level", mip_level, (size_t)0, mips_count);
-    
-  if (((x + width) > (desc.width >> mip_level)) && ((x + width) != 1))
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::SetData", "x + width", x + width, (size_t)0, desc.width >> mip_level);
-    
-  if (((y + height) > (desc.height >> mip_level)) && ((y + height) != 1))
-    RaiseOutOfRange ("render::low_level::opengl::TextureCubemap::SetData", "y + height", y + height, (size_t)0, desc.height >> mip_level);
-  if (!width || !height)
-    return;
-  if (is_compressed_format (desc.format))
+  GLenum layer_target = GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer;
+
+  if (glCompressedTexSubImage2D)
   {
-    if (desc.generate_mips_enable)
-      RaiseInvalidOperation ("render::low_level::opengl::TextureCubemap::SetData", "Generate mipmaps not compatible with compressed textures.");
-    if (x & 3)
-      RaiseInvalidArgument ("render::low_level::opengl::TextureCubemap::SetData", "x", x, "x must be a multiple of 4.");
-    if (y & 3)
-      RaiseInvalidArgument ("render::low_level::opengl::TextureCubemap::SetData", "y", y, "y must be a multiple of 4.");
-    if (width & 3)
-      RaiseInvalidArgument ("render::low_level::opengl::TextureCubemap::SetData", "width", width, "width must be a multiple of 4.");
-    if (height & 3)
-      RaiseInvalidArgument ("render::low_level::opengl::TextureCubemap::SetData", "height", height, "height must be a multiple of 4.");
-  }
-  if (is_compressed_format (source_format))
-    if (source_format != desc.format)
-      RaiseInvalidArgument ("render::low_level::opengl::TextureCubemap::SetData", "source_format");
-
-  TextureExtensions ext (GetContextManager ());
-
-  MakeContextCurrent ();
-  Bind ();
-
-  if (is_compressed_format (source_format))
-  {
-    if (ext.has_ext_texture_compression_s3tc)
-    {
-      if (ext.has_arb_texture_compression) glCompressedTexSubImage2DARB (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, gl_format (source_format), 
-                                                                        ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
-      else                                 glCompressedTexSubImage2D    (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, gl_format (source_format), 
-                                                                        ((width * height) >> 4) * compressed_quad_size (source_format), buffer);
-    }
-    else
-    {
-      xtl::uninitialized_storage <char> unpacked_buffer (width * height * unpack_texel_size (source_format));
-
-      unpack_dxt (source_format, width, height, buffer, unpacked_buffer.data ());
-      glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, unpack_format (source_format), unpack_type (source_format), unpacked_buffer.data ());
-    }
+    glCompressedTexSubImage2D (layer_target, mip_level, x, y, width, height, format, buffer_size, buffer);
   }
   else
   {
-    if (mip_level && ext.has_sgis_generate_mipmap)
-      glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, false); 
-    
-    glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, gl_format (source_format), gl_type (source_format), buffer);
-    
-    if (mip_level && ext.has_sgis_generate_mipmap)
-      glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, true);
-
-    if (desc.generate_mips_enable && !mip_level && !ext.has_sgis_generate_mipmap)
-    {    
-      generate_cubemap_mips (x, y, layer, width, height, source_format, buffer, &SetTexDataCubemap);
-    }
+    glCompressedTexSubImage2DARB (layer_target, mip_level, x, y, width, height, format, buffer_size, buffer);
   }
-
-  CheckErrors ("render::low_level::opengl::TextureCubemap::SetData");
 }
