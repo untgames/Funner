@@ -12,6 +12,8 @@
 #include <shared/texture_manager.h>
 #include <shared/context_object.h>
 
+#include "nv_dxt/blockdxt.h"
+
 namespace render
 {
 

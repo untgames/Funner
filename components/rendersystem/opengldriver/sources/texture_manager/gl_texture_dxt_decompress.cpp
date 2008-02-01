@@ -1,5 +1,4 @@
 #include "shared.h"
-#include "nvidia_texture_tools/BlockDXT.h"
 
 using namespace common;
 using namespace nv;
