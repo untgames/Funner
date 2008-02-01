@@ -231,7 +231,7 @@ class Texture3D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Трёхмерная текстура
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Texture3DEmulatedNPOT : public Texture3D
+class Texture3DEmulatedNPOT : public Texture3D ///???????
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -322,10 +322,6 @@ typedef void (*SetTexDataFn)(size_t mip_level, size_t x, size_t y, size_t z, siz
 
 void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest);
 void scale_image         (PixelFormat format, size_t width, size_t height, size_t new_width, size_t new_height, const void* src, void* dest);
-
-  ///убрать!!!
-void generate_mips       (size_t x, size_t y, size_t z, size_t width, size_t height, PixelFormat format, const void* data, SetTexDataFn);
-void generate_cubemap_mips (size_t x, size_t y, size_t z, size_t width, size_t height, PixelFormat format, const void* data, SetTexDataFn);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с DXT форматом при остутствии аппаратной поддержки

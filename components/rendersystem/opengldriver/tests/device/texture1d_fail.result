@@ -1,0 +1,4 @@
+Results of texture1d_test:
+exception: Can't create 1d texture with width = 20000 (maximum texture size = 2048)
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
+    at render::low_level::opengl::Device::CreateTexture

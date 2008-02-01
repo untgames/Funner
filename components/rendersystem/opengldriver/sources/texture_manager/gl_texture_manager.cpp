@@ -83,21 +83,29 @@ struct TextureManager::Impl: public ContextObject
 */
 
 TextureManager::Impl::Impl (const ContextManager& context_manager) 
-  : ContextObject (context_manager), max_cube_map_texture_size (0), max_3d_texture_size (0)
+  : ContextObject (context_manager),
+    max_rectangle_texture_size (0),
+    max_cube_map_texture_size (0),
+    max_3d_texture_size (0)
 {
+    //установка текущего контекста
+
   MakeContextCurrent ();
+  
+    //определение поддерживаемых расширений
 
   TextureManagerExtensions ext (context_manager);
+  
+    //запрос максимальных размеров текстуры
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
-  if (ext.has_ext_texture_rectangle)
-    glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, (GLint*)&max_rectangle_texture_size);
-  else
-    max_rectangle_texture_size = max_texture_size;
-  if (ext.has_arb_texture_cube_map)
-    glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
-  if (ext.has_ext_texture3D)
-    glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
+
+  if (ext.has_ext_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, (GLint*)&max_rectangle_texture_size);
+  if (ext.has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
+  if (ext.has_ext_texture3D)         glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
+
+    //проверка ошибок
+  
   CheckErrors ("render::low_level::opengl::TextureManager::Impl::Impl");
 }
 
@@ -105,9 +113,14 @@ TextureManager::Impl::Impl (const ContextManager& context_manager)
    Создание текстуры и сэмплера
 */
 
+namespace
+{
+
 bool is_power_of_two (size_t size)
 {
   return ((size - 1) & size) == 0;
+}
+
 }
   
 ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
@@ -189,6 +202,8 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc)
         
       if (tex_desc.width > max_3d_texture_size || tex_desc.height > max_3d_texture_size || tex_desc.layers > max_3d_texture_size)
       {
+          //уточнить проверку: если layers = 2^n, width , height - not
+        
         RaiseNotSupported (METHOD_NAME, "Can't create 3D texture %ux%ux%u (max_edge_size=%u)", tex_desc.width, tex_desc.height,
                            tex_desc.layers, max_3d_texture_size);
       }
