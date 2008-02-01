@@ -290,7 +290,6 @@ const char* get_name (VertexAttributeSemantic param)
     case VertexAttributeSemantic_TexCoord5: return "VertexAttributeSemantic_TexCoord5";
     case VertexAttributeSemantic_TexCoord6: return "VertexAttributeSemantic_TexCoord6";
     case VertexAttributeSemantic_TexCoord7: return "VertexAttributeSemantic_TexCoord7";
-    case VertexAttributeSemantic_Influence: return "VertexAttributeSemantic_Influence";
     default:
       RaiseInvalidArgument ("render::low_level::get_name(VertexAttributeSemantic)", "param", param);
       return "";    
