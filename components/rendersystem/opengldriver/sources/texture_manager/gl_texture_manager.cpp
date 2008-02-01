@@ -71,10 +71,10 @@ struct TextureManager::Impl: public ContextObject
     ISamplerState* CreateSamplerState (const SamplerDesc&);
 
   public:
-    GLint max_texture_size;            //максимальный размер текстуры для устройства
-    GLint max_rectangle_texture_size;  //максимальный размер текстуры со сторонами не степени 2 для устройства
-    GLint max_cube_map_texture_size;   //максимальный размер cubemap текстуры
-    GLint max_3d_texture_size;         //максимальный размер 3d текстуры
+    size_t max_texture_size;            //максимальный размер текстуры для устройства
+    size_t max_rectangle_texture_size;  //максимальный размер текстуры со сторонами не степени 2 для устройства
+    size_t max_cube_map_texture_size;   //максимальный размер cubemap текстуры
+    size_t max_3d_texture_size;         //максимальный размер 3d текстуры
 };
 
 
@@ -89,15 +89,15 @@ TextureManager::Impl::Impl (const ContextManager& context_manager)
 
   TextureManagerExtensions ext (context_manager);
 
-  glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_texture_size);
+  glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
   if (ext.has_ext_texture_rectangle)
-    glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, &max_rectangle_texture_size);
+    glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, (GLint*)&max_rectangle_texture_size);
   else
     max_rectangle_texture_size = max_texture_size;
   if (ext.has_arb_texture_cube_map)
-    glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, &max_cube_map_texture_size);
+    glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
   if (ext.has_ext_texture3D)
-    glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, &max_3d_texture_size);
+    glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
   CheckErrors ("render::low_level::opengl::TextureManager::Impl::Impl");
 }
 
