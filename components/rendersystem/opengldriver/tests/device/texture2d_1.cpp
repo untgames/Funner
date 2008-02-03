@@ -11,8 +11,8 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (texture2d_1_test)");
-//    Test test (L"OpenGL device test window (texture2d_1_test)", "max_version=1.1 GL_VERSION_2_1=0 GL_ARB_texture_non_power_of_two=0 GL_EXT_texture_rectangle=1 GL_NV_texture_rectangle=0");
+//    Test test (L"OpenGL device test window (texture2d_1_test)");
+    Test test (L"OpenGL device test window (texture2d_1_test)", "max_version=1.1 GL_VERSION_2_1=0 GL_ARB_texture_non_power_of_two=0 GL_EXT_texture_rectangle=0 GL_NV_texture_rectangle=0");
 //    Test test (L"OpenGL device test window (texture2d_1_test)", "disable='GL_ARB_texture_non_power_of_two' max_version=1.1");
 //    Test test (L"OpenGL device test window (texture2d_1_test)", "disable='GL_ARB_texture_non_power_of_two GL_EXT_texture_compression_s3tc GL_EXT_texture_rectangle' max_version=1.1");
 
@@ -28,7 +28,7 @@ int main ()
     desc.layers               = 1;
     desc.format               = PixelFormat_RGB8;
     desc.bind_flags           = BindFlag_Texture;
-    desc.generate_mips_enable = true;
+    desc.generate_mips_enable = false;
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
     
