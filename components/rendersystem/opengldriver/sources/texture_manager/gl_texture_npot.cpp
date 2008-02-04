@@ -12,9 +12,6 @@ TextureNPOT::TextureNPOT  (const ContextManager& manager, const TextureDesc& tex
   : Texture (manager, tex_desc, GL_TEXTURE_RECTANGLE_EXT)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureNPOT::TextureNPOT";
-  int width = 0;
-
-  Bind ();
 
   if (tex_desc.generate_mips_enable)
     RaiseNotSupported (METHOD_NAME, "Mip maps for non power of two textures not supported.");
@@ -22,8 +19,27 @@ TextureNPOT::TextureNPOT  (const ContextManager& manager, const TextureDesc& tex
   if (is_compressed_format (tex_desc.format))
     RaiseNotSupported (METHOD_NAME, "Non power of two texture can't be compressed.");
 
-  glTexImage2D (GL_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format (tex_desc.format), tex_desc.width, tex_desc.height, 0, 
-                gl_format (tex_desc.format), gl_type (tex_desc.format), NULL);
+  Bind ();
+
+    //преобразование формата текстуры
+    
+  GLenum gl_internal_format = opengl::gl_internal_format (desc.format),
+         gl_format          = opengl::gl_format (desc.format),
+         gl_type            = opengl::gl_type (desc.format);  
+
+  glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
+                gl_format, gl_type, NULL);
+  
+  GLint width = 0;
+
+  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 1, GL_TEXTURE_WIDTH, &width);
+
+  if (!width)
+    RaiseNotSupported (METHOD_NAME, "Can't create rectangle texture %ux%ux%u@%s (proxy texture fail)", 
+                       tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
+  
+  glTexImage2D (GL_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
+                gl_format, gl_type, NULL);
 
   CheckErrors (METHOD_NAME);
 }
@@ -54,29 +70,3 @@ void TextureNPOT::SetCompressedData (size_t, size_t, size_t, size_t, size_t, siz
 {
   RaiseNotSupported ("render::low_level::opengl::TextureNPOT::SetCompressedData", "Compression for NPOT textures not supported");
 }
-
-/*
-   Работа с данными
-*/
-
-/*void TextureNPOT::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
-{
-  Texture::SetData (layer, mip_level, x, y, width, height, source_format, buffer);
-  
-  if (mip_level)
-    RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::SetData", "mip_level", mip_level, (size_t)0, (size_t)0);
-  if ((x + width) > desc.width)
-    RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::SetData", "x + width", x + width, (size_t)0, desc.width);
-  if ((y + height) > desc.height)
-    RaiseOutOfRange ("render::low_level::opengl::TextureNPOT::SetData", "y + height", y + height, (size_t)0, desc.height);
-  if (!width || !height)
-    return;
-  if (is_compressed_format (source_format))
-    RaiseInvalidArgument ("render::low_level::opengl::TextureNPOT::SetData", "source_format");
-
-  MakeContextCurrent ();
-  Bind ();
-
-  CheckErrors ("render::low_level::opengl::TextureNPOT::SetData");
-}
-*/

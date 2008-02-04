@@ -51,6 +51,23 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
          gl_format          = opengl::gl_format (desc.format),
          gl_type            = opengl::gl_type (desc.format);  
 
+  if (glTexImage3D)
+  {
+    glTexImage3D (GL_PROXY_TEXTURE_3D_EXT, 1, gl_internal_format, tex_desc.width, tex_desc.height, tex_desc.layers, 0, gl_format, gl_type, 0);
+  }
+  else
+  {
+    glTexImage3DEXT (GL_PROXY_TEXTURE_3D_EXT, 1, gl_internal_format, tex_desc.width, tex_desc.height, tex_desc.layers, 0, gl_format, gl_type, 0);
+  }
+
+  GLint width = 0;
+
+  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_3D_EXT, 1, GL_TEXTURE_WIDTH, &width);
+
+  if (!width)
+    RaiseNotSupported (METHOD_NAME, "Can't create 3d texture %ux%ux%u@%s (proxy texture fail)", 
+                       tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
+
     //создание mip-уровней
 
   size_t depth = desc.layers;  
