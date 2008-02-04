@@ -3,8 +3,8 @@
 
 using namespace common;
 
-const size_t layers_count    = 4;
-const size_t image_data_size = 768 * 768 * 3;
+const size_t LAYERS_COUNT = 4;
+const size_t TEX_SIZE     = 32;
 
 int main ()
 {
@@ -17,44 +17,37 @@ int main ()
     TextureDesc desc;
     memset (&desc, 0, sizeof (desc));
 
-    char* image_data = new char [image_data_size];
+    xtl::uninitialized_storage<char> image_data (TEX_SIZE * TEX_SIZE);
+    
     unsigned char hash[2][16];
     
     desc.dimension            = TextureDimension_3D;
-    desc.width                = 768;
-    desc.height               = 768;
-    desc.layers               = layers_count;
+    desc.width                = TEX_SIZE;
+    desc.height               = TEX_SIZE;
+    desc.layers               = LAYERS_COUNT;
     desc.format               = PixelFormat_RGB8;
     desc.bind_flags           = BindFlag_Texture;
     desc.generate_mips_enable = false;
-    
+
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
-    
-    memset (image_data, 0XFF, image_data_size);
 
-    for (size_t i=0; i<image_data_size; i+=3)
-    {
-      image_data [i]   = char (0xfa);
-      image_data [i+1] = char (0xfb);
-      image_data [i+2] = char (0xfc);
-    }
+    for (size_t i=0; i<image_data.size (); i++)
+      image_data.data () [i]   = char (0xfa);
 
-    for (size_t i = 0; i < layers_count; i++)
-      texture->SetData (i, 0, 0, 0, 768, 768, PixelFormat_RGB8, image_data);
+    for (size_t i = 0; i < LAYERS_COUNT; i++)
+      texture->SetData (i, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_L8, image_data.data ());
       
-//    md5 (hash[0], image_data, image_data_size);
+    md5 (hash[0], image_data.data (), image_data.size ());
     
-    texture->GetData (0, 0, 0, 0, 768, 768, PixelFormat_RGB8, image_data);
+    texture->GetData (1, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_L8, image_data.data ());
     
-//    md5 (hash[1], image_data, image_data_size);
+    md5 (hash[1], image_data.data (), image_data.size ());
 
-/*    if (memcmp (hash[0], hash[1], 16))
+    if (memcmp (hash[0], hash[1], 16))
       printf ("RGB non power of two 3d texture data operations works incorrect!\n");
     else
       printf ("RGB non power of two 3d texture data operations works correct!\n");
-
-    delete [] image_data;
-*/  }
+  }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());

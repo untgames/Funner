@@ -404,6 +404,16 @@ void Texture::SetData
   CheckErrors (METHOD_NAME);
 }
 
+namespace
+{
+
+size_t align_size (size_t size, size_t align)
+{
+  return (size+align-1)&~(align-1);  
+}
+
+}
+
 void Texture::GetData
  (size_t      layer,
   size_t      mip_level,
@@ -416,7 +426,6 @@ void Texture::GetData
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::GetData";
   
-    printf ("at GetData\n");
     //проверка корректности номеров слоя и mip-уровня
 
   if (layer >= desc.layers)
@@ -482,11 +491,9 @@ void Texture::GetData
   LayerDesc layer_desc;
   
   GetLayerDesc (layer, layer_desc);
-    
-  printf ("in\n");
 
   bool is_full_image = width == level_desc.width && height == level_desc.height && desc.layers == 1 && !x && !y;
-         
+
   if (is_compressed_format (target_format))
   {
       //копирование сжатого образа
@@ -498,16 +505,13 @@ void Texture::GetData
       common::RaiseNotSupported (METHOD_NAME, "Can't get compressed texture data, target format %s mismatch with texture format %s", 
                          get_name (target_format), get_name (desc.format));
  
-    printf ("in2\n");
     if (is_full_image)
     {
-    printf ("in3\n");
       if (ext.has_arb_texture_compression) glGetCompressedTexImageARB (layer_desc.target, mip_level, buffer);      
       else                                 glGetCompressedTexImage    (layer_desc.target, mip_level, buffer);      
     }
     else
     {
-    printf ("in4\n");
       if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))          common::RaiseNotSupported (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
       if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) common::RaiseNotSupported (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);
 
@@ -557,7 +561,6 @@ void Texture::GetData
 
     if (is_full_image)
     {
-    printf ("in full image\n");
       glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, buffer);      
     }
     else
@@ -565,14 +568,11 @@ void Texture::GetData
         //копирование полного образа текстуры во временный буфер
         
       size_t texel_size     = opengl::texel_size (target_format),
-             tmp_texel_size = texel_size != 3 || target != GL_TEXTURE_3D_EXT ? texel_size : 4; ////обход бага (?) OpenGL!!
+             tmp_texel_size = target != GL_TEXTURE_3D_EXT ? texel_size : align_size (texel_size, 4); //обход бага (?) ATI OpenGL
 
-    printf ("in5.0 try to create buffer with size = %u\n", level_desc.width * level_desc.height * desc.layers * tmp_texel_size);
-      try{
       xtl::uninitialized_storage<char> temp_buffer (level_desc.width * level_desc.height * desc.layers * tmp_texel_size);
-    printf ("in5\n");
-      glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, temp_buffer.data ());      
-    printf ("out\n");
+
+      glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, temp_buffer.data ());
 
         //копирование части образа в пользовательсий буфер
 
@@ -590,16 +590,6 @@ void Texture::GetData
 
         src += line_size;
         dst += block_size;
-      }
-      }catch (std::exception& e) 
-      {
-        printf ("exception:%s\n", e.what ()); 
-        throw;
-      }
-      catch (...)
-      {
-        printf ("...\n"); 
-        throw;
       }
     }
   }

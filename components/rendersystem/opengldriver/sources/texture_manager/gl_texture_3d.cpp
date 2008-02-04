@@ -59,7 +59,7 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
   {
     MipLevelDesc level_desc;
 
-    GetMipLevelDesc (mip_level, level_desc);    
+    GetMipLevelDesc (mip_level, level_desc);        
 
     if (glTexImage3D)
     {
@@ -69,6 +69,8 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     {
       glTexImage3DEXT (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, 0);
     }
+
+    if (depth) depth /= 2;
   }
   
     //включение автоматической генерации !!!!вынести в Texture::Texture!!!!

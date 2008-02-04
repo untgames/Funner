@@ -18,16 +18,16 @@ const char* get_short_name (PixelFormat param)
   {
     case PixelFormat_RGB8:  return "RGB8 ";
     case PixelFormat_RGBA8: return "RGBA8";
-    case PixelFormat_L8:    return "L8   ";
-    case PixelFormat_A8:    return "A8   ";
-    case PixelFormat_LA8:   return "LA8  ";
+    case PixelFormat_L8:    return "  L8 ";
+    case PixelFormat_A8:    return "  A8 ";
+    case PixelFormat_LA8:   return " LA8 ";
     case PixelFormat_DXT1:  return "DXT1 ";
     case PixelFormat_DXT3:  return "DXT3 ";
     case PixelFormat_DXT5:  return "DXT5 ";
-    case PixelFormat_D16:   return "D16  ";
+    case PixelFormat_D16:   return " D16 ";
     case PixelFormat_D24X8: return "D24X8";
     case PixelFormat_D24S8: return "D24S8";
-    case PixelFormat_S8:    return "S8   ";
+    case PixelFormat_S8:    return "  S8 ";
     default:                return "?????";
   }
 }
@@ -206,11 +206,8 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
             default: return status; 
           }          
           
-          printf ("setting %s\n", get_name(test_format));
           texture->SetData (i, j, 0, 0, level_width, level_height, test_format, src_buffer.data ());
-          printf ("getting\n");
           texture->GetData (i, j, 0, 0, level_width, level_height, test_format, dst_buffer.data ());
-          printf ("getted\n");
           
           if (test_format == PixelFormat_D24X8)
           {
@@ -229,7 +226,7 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
           else 
           {
             printf ("FAIL\n");
-            print_diff (data_size, src_buffer.data (), dst_buffer.data ());
+//            print_diff (data_size, src_buffer.data (), dst_buffer.data ());
           }
         }
         catch (std::exception& e)
@@ -252,7 +249,7 @@ void print_status_table (TestStatus status [PixelFormat_Num][PixelFormat_Num])
   printf ("       ");
 
   for (size_t i=0; i<PixelFormat_Num; i++)
-    printf ("%s     ", get_short_name ((PixelFormat)i));
+    printf ("%s ", get_short_name ((PixelFormat)i));
     
   printf ("\n");
     
@@ -304,6 +301,9 @@ int main ()
 
         try
         {
+          printf ("%s %ux%ux%u@%s %s:\n", get_name (desc.dimension), desc.width, desc.height, desc.layers, get_short_name (desc.format),
+            desc.generate_mips_enable ? "auto-mips" : "manual-mips");
+
           xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
 
           for (size_t k = 0; k < PixelFormat_Num; k++)

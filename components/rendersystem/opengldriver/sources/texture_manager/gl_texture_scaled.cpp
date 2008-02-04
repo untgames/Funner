@@ -24,7 +24,7 @@ ScaledTexture::ScaledTexture (TextureManager& texture_manager, const TextureDesc
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
   vertical_scale   = (float)scaled_height / (float)original_desc.height;
 
-//      LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");  
+  //LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");  //подробнее!!
 }
 
 /*

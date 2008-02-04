@@ -11,8 +11,9 @@ using namespace render::low_level::opengl;
 Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_desc)
   : Texture (manager, tex_desc, GL_TEXTURE_2D)
 {
-  TextureExtensions ext (GetContextManager ());
   const char* METHOD_NAME = "render::low_level::opengl::Texture2D::Texture2D";
+  
+  TextureExtensions ext (GetContextManager ());  
 
   if ((tex_desc.width & 3) && is_compressed_format (tex_desc.format))
     RaiseInvalidArgument (METHOD_NAME, "tex_desc.width", tex_desc.width,
@@ -21,12 +22,12 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
   if ((tex_desc.height & 3) && is_compressed_format (tex_desc.format))
     RaiseInvalidArgument (METHOD_NAME, "tex_desc.height", tex_desc.height,
                           "Texture height for compressed image must be a multiple 4");
+                          
+  MakeContextCurrent ();
 
   Bind ();
 
-  size_t tex_size; //???dup
-  
-  //MakeContextCurrent???
+  size_t tex_size; //???dup  
  
   for (size_t i=0; i<mips_count; i++)
   {
@@ -38,10 +39,18 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     {
       tex_size = level_desc.width * level_desc.height / 16 * compressed_quad_size (tex_desc.format); //???dup
 
-      if (ext.has_arb_texture_compression) glCompressedTexImage2DARB (GL_TEXTURE_2D, i, gl_internal_format (tex_desc.format),
-                                                                      level_desc.width, level_desc.height, 0, tex_size, 0);
-      else                                 glCompressedTexImage2D    (GL_TEXTURE_2D, i, gl_internal_format (tex_desc.format),
-                                                                      level_desc.width, level_desc.height, 0, tex_size, 0);
+      printf ("in level=%u iformat=%04x w=%u h=%u tex_size=%u\n", i, gl_internal_format (tex_desc.format), level_desc.width, level_desc.height, tex_size);
+
+      if (glCompressedTexImage2D)
+      {
+        glCompressedTexImage2D (GL_TEXTURE_2D, i, gl_internal_format (tex_desc.format), level_desc.width, level_desc.height, 0, tex_size, 0);
+      }
+      else
+      {
+        glCompressedTexImage2DARB (GL_TEXTURE_2D, i, gl_internal_format (tex_desc.format), level_desc.width, level_desc.height, 0, tex_size, 0);
+      }
+
+      printf ("out\n");
     }
     else
     {
