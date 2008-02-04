@@ -35,6 +35,8 @@ struct TextureManagerExtensions
                      Version_1_3                  = "GL_VERSION_1_3",
                      Version_1_4                  = "GL_VERSION_1_4",
                      Version_2_0                  = "GL_VERSION_2_0";
+                     
+    manager.MakeContextCurrent ();
       
     has_arb_texture_compression      = manager.IsSupported (ARB_texture_compression);
     has_ext_texture_rectangle        = manager.IsSupported (EXT_texture_rectangle) || manager.IsSupported (NV_texture_rectangle);
@@ -62,19 +64,27 @@ struct TextureManager::Impl: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Impl (const ContextManager& context_manager);
+    Impl (const ContextManager& context_manager, TextureManager& texture_manager);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание текстуры и сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ITexture*      CreateTexture (const TextureDesc&, TextureManager& texture_manager);    
+    ITexture*      CreateTexture      (const TextureDesc&);
     ISamplerState* CreateSamplerState (const SamplerDesc&);
 
+  private:
+    ITexture* CreateTexture1D      (const TextureDesc&);
+    ITexture* CreateTexture2D      (const TextureDesc&);
+    ITexture* CreateTexture3D      (const TextureDesc&);
+    ITexture* CreateTextureCubemap (const TextureDesc&);
+
   public:
-    size_t max_texture_size;            //максимальный размер текстуры для устройства
-    size_t max_rectangle_texture_size;  //максимальный размер текстуры со сторонами не степени 2 для устройства
-    size_t max_cube_map_texture_size;   //максимальный размер cubemap текстуры
-    size_t max_3d_texture_size;         //максимальный размер 3d текстуры
+    TextureManager&          texture_manager;             //менеджер текстур
+    size_t                   max_texture_size;            //максимальный размер текстуры для устройства
+    size_t                   max_rectangle_texture_size;  //максимальный размер текстуры со сторонами не степени 2 для устройства
+    size_t                   max_cube_map_texture_size;   //максимальный размер cubemap текстуры
+    size_t                   max_3d_texture_size;         //максимальный размер 3d текстуры
+    TextureManagerExtensions ext;                         //поддерживаемые расширения
 };
 
 
@@ -82,20 +92,18 @@ struct TextureManager::Impl: public ContextObject
    Конструктор
 */
 
-TextureManager::Impl::Impl (const ContextManager& context_manager) 
+TextureManager::Impl::Impl (const ContextManager& context_manager, TextureManager& in_texture_manager)
   : ContextObject (context_manager),
+    texture_manager (in_texture_manager),
     max_rectangle_texture_size (0),
     max_cube_map_texture_size (0),
-    max_3d_texture_size (0)
+    max_3d_texture_size (0),
+    ext (context_manager) //????????????????MakeContextCurrent после
 {
     //установка текущего контекста
 
   MakeContextCurrent ();
-  
-    //определение поддерживаемых расширений
 
-  TextureManagerExtensions ext (context_manager);
-  
     //запрос максимальных размеров текстуры
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
@@ -110,7 +118,7 @@ TextureManager::Impl::Impl (const ContextManager& context_manager)
 }
 
 /*
-   Создание текстуры и сэмплера
+    Создание текстуры и сэмплера
 */
 
 namespace
@@ -122,113 +130,111 @@ bool is_power_of_two (size_t size)
 }
 
 }
+
+ITexture* TextureManager::Impl::CreateTexture1D (const TextureDesc& desc)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture1D";
+
+  bool is_pot = is_power_of_two (desc.width);
+
+  if (desc.width > max_texture_size)
+    RaiseNotSupported (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, max_texture_size);
+
+  if (is_pot || ext.has_arb_texture_non_power_of_two)
+    return new Texture1D (GetContextManager (), desc);
+
+  if (ext.has_ext_texture_rectangle)
+  {
+    if (desc.width > max_rectangle_texture_size)
+      RaiseNotSupported (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, max_rectangle_texture_size);
+
+    return new TextureNPOT (GetContextManager (), desc);
+  }
+
+  return new ScaledTexture (texture_manager, desc);
+}
+
+ITexture* TextureManager::Impl::CreateTexture2D (const TextureDesc& desc)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture2D";
+
+  if (desc.width > max_texture_size || desc.height > max_texture_size)
+    RaiseNotSupported (METHOD_NAME, "Can't create 2D texture %ux%u (maximum texture size is %u)", desc.width, desc.height, max_texture_size);
+
+  bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
+
+  if (is_pot || ext.has_arb_texture_non_power_of_two)
+    return new Texture2D (GetContextManager (), desc);      
+
+  if (ext.has_ext_texture_rectangle && !is_compressed_format (desc.format))
+    return new TextureNPOT (GetContextManager (), desc);
+
+  return new ScaledTexture (texture_manager, desc);
+}
+
+ITexture* TextureManager::Impl::CreateTexture3D (const TextureDesc& desc)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture3D";
+
+    //проверка наличия расширений, необходимых для создания трёхмерной текстуры
+
+  if (!ext.has_ext_texture3D) //перенести в Texture3D!!!
+    RaiseNotSupported (METHOD_NAME, "3D textures not supported (GL_EXT_texture3D not supported)");
+    
+  if (desc.width > max_3d_texture_size || desc.height > max_3d_texture_size || desc.layers > max_3d_texture_size)
+  {
+      //уточнить проверку: если layers = 2^n, width , height - not!!!
+    
+    RaiseNotSupported (METHOD_NAME, "Can't create 3D texture %ux%ux%u (max_edge_size=%u)", desc.width, desc.height,
+                       desc.layers, max_3d_texture_size);
+  }
+
+  bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height) && is_power_of_two (desc.layers);
+
+  if (!is_pot && !ext.has_arb_texture_non_power_of_two)
+  {
+    RaiseNotSupported (METHOD_NAME, "Can't create 3D texture %ux%ux%u@%s (GL_ARB_texture_non_power_of_two & GL_VERSION_2_0 not supported)",
+                       desc.width, desc.height, desc.layers, get_name (desc.format));
+  }
+
+  return new Texture3D (GetContextManager (), desc);
+}
+
+ITexture* TextureManager::Impl::CreateTextureCubemap (const TextureDesc& desc)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTextureCubemap";
   
-ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& tex_desc, TextureManager& texture_manager)
+  if (!ext.has_arb_texture_cube_map) //перенести в TextureCubemap!!!
+    RaiseNotSupported (METHOD_NAME, "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension");
+    
+  if (desc.width > max_cube_map_texture_size || desc.height > max_cube_map_texture_size)
+  {
+    RaiseNotSupported (METHOD_NAME, "Can't create cubemap texture %ux%u (max_edge_size=%u)", desc.width, desc.height,
+                       max_cube_map_texture_size);
+  }
+
+  bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
+
+  if (is_pot || ext.has_arb_texture_non_power_of_two)
+    return new TextureCubemap (GetContextManager (), desc);
+
+  return new ScaledTexture (texture_manager, desc);  
+}
+  
+ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& desc)
 {
     //добавить общий код замены нулевых размеров дескриптора текстуры на единичные!!!!
 
-  static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture";
-  
-    //установка текущего контекста
+    //диспетчеризация создания текстур
 
-  MakeContextCurrent ();
-
-  TextureManagerExtensions ext (GetContextManager ());    
-    
-  TextureDesc temp_desc = tex_desc; ////////????????
-
-  switch (tex_desc.dimension)
+  switch (desc.dimension)
   {
-    case TextureDimension_1D: 
-    {
-      temp_desc.height = 1;
-      temp_desc.layers = 1;
-            
-      bool is_pot = is_power_of_two (tex_desc.width);
-
-      if (temp_desc.width > max_texture_size)
-        RaiseNotSupported (METHOD_NAME, "Can't create 1d texture with width = %u (maximum texture size = %u)", tex_desc.width, max_texture_size);      
-
-      if (is_pot || ext.has_arb_texture_non_power_of_two)
-        return new Texture1D (GetContextManager (), temp_desc);
-
-      if (ext.has_ext_texture_rectangle) ///compressed?????
-      {
-        if (temp_desc.width > max_rectangle_texture_size)
-          RaiseNotSupported (METHOD_NAME, "Can't create 1d texture with width = %u (maximum texture size = %u)", tex_desc.width, max_rectangle_texture_size);
-
-        return new TextureNPOT (GetContextManager (), temp_desc);
-      }
-
-      return new ScaledTexture (texture_manager, temp_desc);
-    }
-    case TextureDimension_2D:
-    {
-      temp_desc.layers = 1;
-
-      if ((temp_desc.width > max_texture_size) || (temp_desc.height > max_texture_size))
-        RaiseNotSupported (METHOD_NAME, "Can't create 2d texture with width = %u height = %u (maximum texture size = %u)", tex_desc.width, tex_desc.height, max_texture_size);
-      
-      bool is_pot = is_power_of_two (tex_desc.width) && is_power_of_two (tex_desc.height);
-
-      if (is_pot || ext.has_arb_texture_non_power_of_two)
-        return new Texture2D (GetContextManager (), temp_desc);      
-
-      if (ext.has_ext_texture_rectangle && !is_compressed_format (tex_desc.format))
-      {
-        if ((temp_desc.width > max_texture_size) || (temp_desc.height > max_rectangle_texture_size))
-          RaiseNotSupported (METHOD_NAME, "Can't create 2d texture with width = %u height = %u (maximum texture size = %u)", tex_desc.width, tex_desc.height, max_rectangle_texture_size);
-      
-        return new TextureNPOT (GetContextManager (), temp_desc);
-      }
-
-      return new ScaledTexture (texture_manager, temp_desc);
-    }
-    case TextureDimension_3D: 
-    {
-        //проверка наличия расширений, необходимых для создания трёхмерной текстуры
-
-      if (!ext.has_ext_texture3D) //перенести в Texture3D!!!
-        RaiseNotSupported (METHOD_NAME, "3D textures not supported (GL_EXT_texture3D not supported)");
-        
-      if (tex_desc.width > max_3d_texture_size || tex_desc.height > max_3d_texture_size || tex_desc.layers > max_3d_texture_size)
-      {
-          //уточнить проверку: если layers = 2^n, width , height - not
-        
-        RaiseNotSupported (METHOD_NAME, "Can't create 3D texture %ux%ux%u (max_edge_size=%u)", tex_desc.width, tex_desc.height,
-                           tex_desc.layers, max_3d_texture_size);
-      }
-
-      bool is_pot = is_power_of_two (tex_desc.width) && is_power_of_two (tex_desc.height) && is_power_of_two (tex_desc.layers);
-
-      if (!is_pot && !ext.has_arb_texture_non_power_of_two)
-      {
-        RaiseNotSupported (METHOD_NAME, "Can't create texture %ux%ux%u@%s (GL_ARB_texture_non_power_of_two & GL_VERSION_2_0 not supported)",
-                           tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
-      }
-
-      return new Texture3D (GetContextManager (), tex_desc);
-    }
-    case TextureDimension_Cubemap:
-    {
-      if (!ext.has_arb_texture_cube_map) //перенести в TextureCubemap!!!
-        RaiseNotSupported (METHOD_NAME, "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension");
-        
-      if (tex_desc.width > max_cube_map_texture_size || tex_desc.height > max_cube_map_texture_size)
-      {
-        RaiseNotSupported (METHOD_NAME, "Can't create cubemap texture %ux%u (max_edge_size=%u)", tex_desc.width, tex_desc.height,
-                           max_cube_map_texture_size);
-      }
-
-      bool is_pot = is_power_of_two (tex_desc.width) && is_power_of_two (tex_desc.height);
-
-      if (is_pot || ext.has_arb_texture_non_power_of_two)
-        return new TextureCubemap (GetContextManager (), temp_desc);
-
-      return new ScaledTexture (texture_manager, temp_desc);
-    }
+    case TextureDimension_1D:      return CreateTexture1D (desc);
+    case TextureDimension_2D:      return CreateTexture2D (desc);
+    case TextureDimension_3D:      return CreateTexture3D (desc);
+    case TextureDimension_Cubemap: return CreateTextureCubemap (desc);
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.dimension", tex_desc.dimension);
+      RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "desc.dimension", desc.dimension);
       return 0;
   }
 }
@@ -245,7 +251,7 @@ ISamplerState* TextureManager::Impl::CreateSamplerState (const SamplerDesc&)
 */
 
 TextureManager::TextureManager (const ContextManager& context_manager)
-  : impl (new Impl (context_manager))
+  : impl (new Impl (context_manager, *this))
   {}
 
 TextureManager::~TextureManager ()
@@ -258,7 +264,7 @@ TextureManager::~TextureManager ()
 
 ITexture* TextureManager::CreateTexture (const TextureDesc& tex_desc)
 {
-  return impl->CreateTexture (tex_desc, *this);
+  return impl->CreateTexture (tex_desc);
 }
 
 ISamplerState* TextureManager::CreateSamplerState (const SamplerDesc& sampler_desc)

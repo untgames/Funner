@@ -368,10 +368,7 @@ size_t unpack_texel_size      (PixelFormat format);                             
 GLenum unpack_format          (PixelFormat format);                                                             //распакованный формат OpenGL
 PixelFormat unpack_pf         (PixelFormat format);                                                             //распакованный формат
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Копирование двумерной области из образа текстуры
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//void get_teximage2d (size_t x, size_t y, size_t z, size_t tex_width, size_t tex_height, size_t tex_depth
+size_t get_compressed_image_size (PixelFormat format, size_t width, size_t height);
 
 }
 

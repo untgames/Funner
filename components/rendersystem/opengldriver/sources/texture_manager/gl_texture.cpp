@@ -772,6 +772,12 @@ size_t next_higher_power_of_two (size_t k)
   return k + 1;
 }
 
+//получение размера образа сжатой текстуры
+size_t get_compressed_image_size (PixelFormat format, size_t width, size_t height)
+{
+  return width * height / 16 * compressed_quad_size (format);
+}
+
 }
 
 }
