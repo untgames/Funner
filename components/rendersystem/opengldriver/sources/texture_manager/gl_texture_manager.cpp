@@ -166,8 +166,10 @@ ITexture* TextureManager::Impl::CreateTexture2D (const TextureDesc& desc)
   if (is_pot || ext.has_arb_texture_non_power_of_two)
     return new Texture2D (GetContextManager (), desc);      
 
-  if (ext.has_ext_texture_rectangle && !is_compressed_format (desc.format))
-    return new TextureNPOT (GetContextManager (), desc);
+      //сделать через строку инициализации!!!
+
+//  if (ext.has_ext_texture_rectangle && !is_compressed_format (desc.format))
+//    return new TextureNPOT (GetContextManager (), desc);
 
   return new ScaledTexture (texture_manager, desc);
 }

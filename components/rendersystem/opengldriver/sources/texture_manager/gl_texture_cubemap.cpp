@@ -29,86 +29,55 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
   if (tex_desc.width != tex_desc.height)
     Raise<ArgumentException> (METHOD_NAME, "Cubemap texture sizes must be equal (desc.width=%u, desc.height=%u)", tex_desc.width, tex_desc.height);
-    
-    //создание текстуры
-    
-  if (is_compressed_format (tex_desc.format) && ext.has_ext_texture_compression_s3tc)
+
+     //преобразование формата пикселей
+
+  GLenum gl_internal_format = ext.has_ext_texture_compression_s3tc ? opengl::gl_internal_format (tex_desc.format) : unpack_internal_format (tex_desc.format),
+         gl_format          = unpack_format (tex_desc.format),
+         gl_type            = unpack_type (tex_desc.format);
+
+    //проверка возможности создания текстуры
+
+  glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP, 1, gl_internal_format, tex_desc.width, tex_desc.height, 0, gl_format, gl_type, 0);
+  
+  GLint proxy_width = 0;
+
+  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP, 1, GL_TEXTURE_WIDTH, &proxy_width);
+
+  if (!proxy_width)
   {
-      //получение необходимой точки входа
-
-    PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D_fn = 0;
-
-    if (glCompressedTexImage2D) glCompressedTexImage2D_fn = glCompressedTexImage2D;
-    else                        glCompressedTexImage2D_fn = glCompressedTexImage2DARB;
-
-      //проверка возможности создания текстуры
-
-    GLenum gl_internal_format = opengl::gl_internal_format (tex_desc.format);
-
-    glCompressedTexImage2D_fn (GL_PROXY_TEXTURE_CUBE_MAP, 1, gl_internal_format, tex_desc.width, tex_desc.height, 0,
-                               get_compressed_image_size (tex_desc.format, tex_desc.width, tex_desc.height), 0);
-
-    GLint proxy_width = 0;
-
-    glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP, 1, GL_TEXTURE_WIDTH, &proxy_width);
-
-    if (!proxy_width)
-    {
-      RaiseNotSupported (METHOD_NAME, "Can't create compressed cubemap texture %ux%u@%s. Reason: proxy texure fail",
-                         tex_desc.width, tex_desc.height, get_name (tex_desc.format));
-    }
+    RaiseNotSupported (METHOD_NAME, "Can't create cubemap texture %ux%u@%s. Reason: proxy texure fail",
+                       tex_desc.width, tex_desc.height, get_name (tex_desc.format));
+  }
+  
+    //создание mip-уровней
     
-      //создание mip-уровней
+  for (size_t i=0; i<mips_count; i++)
+  {
+    MipLevelDesc level_desc;
 
-    for (size_t i=0; i<mips_count; i++)
+    GetMipLevelDesc (i, level_desc);
+
+    for (size_t j=0; j<6; j++)
     {
-      MipLevelDesc level_desc;
+      glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format, level_desc.width, level_desc.height,
+                    0, gl_format, gl_type, 0);
 
-      GetMipLevelDesc (i, level_desc);
-
-      for (size_t j=0; j<6; j++)
-      {
-        glCompressedTexImage2D_fn (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format, level_desc.width, level_desc.height, 0,
-                                   get_compressed_image_size (tex_desc.format, level_desc.width, level_desc.height), 0);
-      }
+      glGetTexLevelParameteriv (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
     }
   }
-  else
+  
+   //установка реального внутреннего формата хранения пикселей (связано с установкой сжатого формата)
+   
+  try
   {
-       //преобразование формата пикселей
+    desc.format = get_pixel_format (gl_internal_format);
+  }
+  catch (common::Exception& e)
+  {
+    e.Touch (METHOD_NAME);
 
-     GLenum gl_internal_format = unpack_internal_format (tex_desc.format),
-            gl_format          = unpack_format (tex_desc.format),
-            gl_type            = unpack_type (tex_desc.format);    
-
-      //проверка возможности создания текстуры
-
-    glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP, 1, gl_internal_format, tex_desc.width, tex_desc.height, 0, gl_format, gl_type, 0);
-    
-    GLint proxy_width = 0;
-
-    glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP, 1, GL_TEXTURE_WIDTH, &proxy_width);
-
-    if (!proxy_width)
-    {
-      RaiseNotSupported (METHOD_NAME, "Can't create cubemap texture %ux%u@%s. Reason: proxy texure fail",
-                         tex_desc.width, tex_desc.height, get_name (tex_desc.format));
-    }
-    
-      //создание mip-уровней
-      
-    for (size_t i=0; i<mips_count; i++)
-    {
-      MipLevelDesc level_desc;
-
-      GetMipLevelDesc (i, level_desc);
-
-      for (size_t j=0; j<6; j++)
-      {
-        glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format, level_desc.width, level_desc.height,
-                      0, gl_format, gl_type, 0);
-      }
-    }
+    throw;
   }
 
     //настройка режима генерации mip-уровней

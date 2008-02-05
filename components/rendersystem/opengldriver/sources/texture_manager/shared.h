@@ -267,71 +267,6 @@ class ScaledTexture: virtual public IBindableTexture, public Object
     float      vertical_scale;   //коэффициент растяжения по вертикали
 };
 
-/*///////////////////////////////////////////////////////////////////////////////////////////////////
-///Текстура со сторонами не степени 2, растянутая (используетсяч при остутствии GL_EXT_texture_rectangle)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class TextureEmulatedNPOT : public Texture2D
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    TextureEmulatedNPOT (const ContextManager&, const TextureDesc& texture_desc, float in_horisontal_scale, float in_vertical_scale);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с данными
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
-
-  private:
-    float horisontal_scale; //коэффициент растягивания по горизонтали
-    float vertical_scale;   //коэффициент растягивания по вертикали
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Трёхмерная текстура
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class Texture3DEmulatedNPOT : public Texture3D ///???????
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Texture3DEmulatedNPOT (const ContextManager&, const TextureDesc&, float in_horisontal_scale, float in_vertical_scale);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с данными
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
-
-  private:
-    float horisontal_scale; //коэффициент растягивания по горизонтали
-    float vertical_scale;   //коэффициент растягивания по вертикали
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Кубмап текстура со сторонами не степени 2, растянутая (используетсяч при остутствии GL_ARB_texture_non_power_of_two)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class TextureCubemapEmulatedNPOT : public TextureCubemap
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    TextureCubemapEmulatedNPOT (const ContextManager&, const TextureDesc&, float in_scale_factor);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с данными
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
-
-  private:
-    float scale_factor; //коэффициент растягивания
-};*/
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,6 +302,8 @@ GLenum unpack_type            (PixelFormat format);                             
 size_t unpack_texel_size      (PixelFormat format);                                                             //размер распакованного текселя в байтах
 GLenum unpack_format          (PixelFormat format);                                                             //распакованный формат OpenGL
 PixelFormat unpack_pf         (PixelFormat format);                                                             //распакованный формат
+
+PixelFormat get_pixel_format (GLenum gl_format);
 
 size_t get_compressed_image_size (PixelFormat format, size_t width, size_t height);
 

@@ -106,8 +106,8 @@ class VboBuffer: public Buffer
     void* GetDataPointer ();
 
   private:
-    GLenum      target;     //целевой тип аппаратного буфера (GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER)
-    GLuint      buffer_id;  //номер буфера в контексте OpenGL
+    GLenum target;     //целевой тип аппаратного буфера (GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER)
+    GLuint buffer_id;  //номер буфера в контексте OpenGL
 };
 
 }

@@ -90,7 +90,7 @@ int myrand ()
 
 void print_diff (size_t size, const char* src, const char* dst)
 {  
-  static const size_t LINE_WIDTH = 16;
+  static const size_t LINE_WIDTH = 15;
 
   printf ("                 Source buffer                                          Destination buffer"
           "                 Diff buffer\n");  
@@ -251,7 +251,7 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
               texel_size = 4; 
               break;
             default: return status; 
-          }          
+          }
           
           texture->SetData (i, j, 0, 0, level_width, level_height, test_format, src_buffer.data ());
           texture->GetData (i, j, 0, 0, level_width, level_height, test_format, dst_buffer.data ());          
@@ -332,9 +332,6 @@ void set_compare_masks ()
   compare_mask [PixelFormat_L8][PixelFormat_L8]    = 0x000000ff;
   compare_mask [PixelFormat_L8][PixelFormat_LA8]   = 0x000000ff;
 
-//  compare_mask [PixelFormat_DXT3][PixelFormat_RGB8]  = 0x00ffffff;
-//  compare_mask [PixelFormat_DXT3][PixelFormat_RGBA8] = 0xffffffff;
-
   compare_mask [PixelFormat_A8][PixelFormat_RGBA8] = 0xff000000;
   compare_mask [PixelFormat_A8][PixelFormat_A8]    = 0x000000ff;
   compare_mask [PixelFormat_A8][PixelFormat_LA8]   = 0x0000ff00;
@@ -343,13 +340,13 @@ void set_compare_masks ()
   compare_mask [PixelFormat_LA8][PixelFormat_RGBA8] = 0xff0000ff;
   compare_mask [PixelFormat_LA8][PixelFormat_L8]    = 0x000000ff;
 
-  compare_mask [PixelFormat_D16][PixelFormat_D24X8] = 0xffff0000;   //??
+  compare_mask [PixelFormat_D16][PixelFormat_D24X8] = 0x00ffff00;
 
-  compare_mask [PixelFormat_D24X8][PixelFormat_D16]   = 0xffffffff;
-  compare_mask [PixelFormat_D24X8][PixelFormat_D24X8] = 0xffffff00; //??
+  compare_mask [PixelFormat_D24X8][PixelFormat_D16]   = 0x0000ffff;
+  compare_mask [PixelFormat_D24X8][PixelFormat_D24X8] = 0x00ffffff;
 
-  compare_mask [PixelFormat_D24S8][PixelFormat_D16]   = 0xffff0000;
-  compare_mask [PixelFormat_D24S8][PixelFormat_D24X8] = 0xffffff00; //??
+  compare_mask [PixelFormat_D24S8][PixelFormat_D16]   = 0x0000ffff;
+  compare_mask [PixelFormat_D24S8][PixelFormat_D24X8] = 0x00ffffff;
 
 }
 

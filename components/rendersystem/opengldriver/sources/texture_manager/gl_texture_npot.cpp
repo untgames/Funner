@@ -32,12 +32,12 @@ TextureNPOT::TextureNPOT  (const ContextManager& manager, const TextureDesc& tex
   
   GLint width = 0;
 
-  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 1, GL_TEXTURE_WIDTH, &width);
+  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, GL_TEXTURE_WIDTH, &width);
 
   if (!width)
     RaiseNotSupported (METHOD_NAME, "Can't create rectangle texture %ux%ux%u@%s (proxy texture fail)", 
                        tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
-  
+
   glTexImage2D (GL_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
                 gl_format, gl_type, NULL);
 

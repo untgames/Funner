@@ -349,27 +349,21 @@ void Texture::SetData
     //преобразование формата пикселей
   
   GLenum gl_format = opengl::gl_format (source_format),
-         gl_type   = opengl::gl_type (source_format);  
-         
+         gl_type   = opengl::gl_type (source_format);
+
   if (is_compressed_format (source_format))
   {
-      //проверка совместимости форматов
-      
-    if (source_format != desc.format)
-      RaiseNotSupported (METHOD_NAME, "Can't set compressed texture data. Reason: source format %s mismatch with texture format %s",
-                         get_name (source_format), get_name (desc.format));
-
       //проверка корректности размеров
 
     if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))          RaiseNotSupported (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
-    if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) RaiseNotSupported (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);
-    
-      //копирование сжатого образа            
+    if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) RaiseNotSupported (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);    
 
-    if (ext.has_ext_texture_compression_s3tc)
+      //копирование сжатого образа
+
+    if (ext.has_ext_texture_compression_s3tc && source_format == desc.format)
     {
       size_t buffer_size = width * height / DXT_BLOCK_SIZE * compressed_quad_size (source_format);
-
+      
       SetCompressedData (layer, mip_level, x, y, width, height, gl_format, buffer_size, buffer);
     }
     else
@@ -386,7 +380,46 @@ void Texture::SetData
   }
   else
   {
-      //копирование несжатого образа
+      //копирование несжатого образа      
+      
+      //преобразование данных буфера глубины
+      
+    xtl::uninitialized_storage<size_t> tmp_buffer;  //неверно!!! после отсечения!!!
+      
+    switch (source_format)
+    {
+      case PixelFormat_D16:
+      {
+        tmp_buffer.resize (width * height);
+
+        size_t*               dst_pixel = tmp_buffer.data ();
+        const unsigned short* src_pixel = static_cast<const unsigned short*> (buffer);
+
+        for (size_t count=width*height; count--; src_pixel++, dst_pixel++)
+          *dst_pixel = size_t (*src_pixel) << 16;
+
+        buffer  = tmp_buffer.data ();
+        gl_type = GL_UNSIGNED_INT;
+
+        break;
+      }
+      case PixelFormat_D24X8:
+      {
+        tmp_buffer.resize (width * height);        
+
+        size_t*       dst_pixel = tmp_buffer.data ();
+        const size_t* src_pixel = static_cast<const size_t*> (buffer);
+
+        for (size_t count=width*height; count--; src_pixel++, dst_pixel++)
+          *dst_pixel = *src_pixel << 8;
+
+        buffer = tmp_buffer.data ();
+
+        break;
+      }
+      default:
+        break;
+    }      
 
      // уточнить про перегенерацию при установке mip_level != 0!!!
 
@@ -563,10 +596,22 @@ void Texture::GetData
 
     if (is_full_image)
     {
-//      printf ("Getting unpacked data with format %x and type %x byte 2 = %x...\n", gl_tex_format, gl_tex_type, ((int*)buffer)[2]);
-//      ((int*)buffer)[2] = 0;
       glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, buffer);      
-//      printf ("Data getted, byte 2 = %x\n\n", ((int*)buffer)[2]);
+
+      switch (target_format)
+      {
+        case PixelFormat_D24X8:
+        {
+          size_t* pixel = static_cast<size_t*> (buffer);
+
+          for (size_t count=width*height; count--; pixel++)
+            *pixel >>= 8;
+
+          break;
+        }
+        default:
+          break;
+      }
     }
     else
     {
@@ -591,17 +636,40 @@ void Texture::GetData
       size_t line_size    = level_desc.width * texel_size,
              layer_size   = level_desc.width * level_desc.height * tmp_texel_size,
              block_size   = width * texel_size,
-             start_offset = layer_desc.new_index * layer_size + y * line_size + x * texel_size;             
+             start_offset = layer_desc.new_index * layer_size + y * line_size + x * texel_size;
 
-      const char* src = temp_buffer.data () + start_offset;
-      char*       dst = reinterpret_cast<char*> (buffer);
-      
-      for (size_t i=0; i<height; i++)
+               //отсечка и width!!!
+
+      switch (target_format)
       {
-        memcpy (dst, src, block_size);
+        default:
+        {
+          const char* src = temp_buffer.data () + start_offset;          
+          char*       dst = reinterpret_cast<char*> (buffer);          
 
-        src += line_size;
-        dst += block_size;
+          for (size_t i=0; i<height; i++, src += line_size, dst += block_size)
+            memcpy (dst, src, block_size);
+
+          break;          
+        }
+        case PixelFormat_D24X8:
+        {
+            //преобразование данных буфера глубины
+
+          const size_t* src = reinterpret_cast<const size_t*> (temp_buffer.data () + start_offset);
+          size_t*       dst = reinterpret_cast<size_t*> (buffer);
+
+          block_size /= sizeof (size_t);
+          line_size  /= sizeof (size_t);
+
+          for (size_t i=0; i<height; i++, src += line_size - block_size)
+          {
+            for (size_t j=0; j<block_size; j++, src++, dst++)
+              *dst = *src >> 8;
+          }
+
+          break;
+        }
       }
     }
   }
@@ -771,6 +839,28 @@ size_t compressed_quad_size (PixelFormat format)
   }
   
   return 1;  
+}
+
+//получение формата хранения пикселей по GL-формату
+PixelFormat get_pixel_format (GLenum gl_format)
+{
+  switch (gl_format)
+  {
+    case GL_RGB8:                          return PixelFormat_RGB8;
+    case GL_RGBA8:                         return PixelFormat_RGBA8;
+    case GL_ALPHA8:                        return PixelFormat_A8;
+    case GL_LUMINANCE8:                    return PixelFormat_L8;
+    case GL_LUMINANCE8_ALPHA8:             return PixelFormat_LA8;
+    case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:  return PixelFormat_DXT1;
+    case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT: return PixelFormat_DXT3;
+    case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT: return PixelFormat_DXT5;    
+    case GL_DEPTH_COMPONENT16:             return PixelFormat_D16;
+    case GL_DEPTH_COMPONENT24:             return PixelFormat_D24X8;
+    case GL_DEPTH_STENCIL_EXT:             return PixelFormat_D24S8;
+    default:
+      RaiseNotSupported ("render::low_level::get_pixel_format", "Unknown gl_format=%04x", gl_format);
+      return (PixelFormat)0;
+  }
 }
 
 //получение ближайшей сверху степени двойки

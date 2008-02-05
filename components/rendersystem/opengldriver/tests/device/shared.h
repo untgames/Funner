@@ -21,6 +21,8 @@
 
 #include <common/exception.h>
 
+#include <media/image.h> //??!!!!
+
 using namespace render::low_level;
 
 typedef xtl::com_ptr<IDriver>            DriverPtr;

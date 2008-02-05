@@ -127,40 +127,39 @@ fixed float2fixed (float data)
 ///Полное мастштабирование (не более чем в два раза)
 ////////////////////////////////////////////////////////////////////////////////////////////
 template <class T>
-void scale_image_impl (size_t width, size_t height, const T* src, size_t newWidth, size_t newHeight, T* res)
+void scale_image_impl (size_t width, size_t height, const T* src, size_t new_width, size_t new_height, T* dst)
 {
-  fixed    sw  = int2fixed (width),
-           sh  = int2fixed (height),
-           rw  = int2fixed (newWidth),
-           rh  = int2fixed (newHeight);
-  fixed    dkx = float2fixed ((float)width / (float)newWidth), 
-           dky = float2fixed ((float)height / (float)newHeight);
-  fixed    sx  = 0, 
-           sy  = 0;
+  fixed src_width  = int2fixed (width),
+        src_height = int2fixed (height),
+        dst_width  = int2fixed (new_width),
+        dst_height = int2fixed (new_height),
+        dx         = float2fixed (float (width) / float (new_width)),
+        dy         = float2fixed (float (height) / float (new_height)),
+        src_y      = 0;
+        
   const T* line = src;
-
-  for (size_t ry = 0; ry < newHeight; ry++, sy += dky)
+        
+  for (size_t dst_y=0; dst_y<new_height; dst_y++, src_y += dy)
   {
-    if (fixed2int (sy) > 0)
+    if (fixed2int (src_y))
     {
-      line += fixed2int (sy) * width;
-      sy   &= 0xFFFF;
+      line  += fixed2int (src_y) * width;
+      src_y &= 0xffff;
     }
-
-    sx         = 0;
+    
     const T* s = line;
-
-    for (size_t rx = 0; rx < newWidth; rx++, sx += dkx, res++)
+    
+    for (size_t src_x=0, dst_x=0; dst_x<new_width; dst_x++, src_x += dx, dst++)
     {
-      if (fixed2int (sx) > 0)
+      if (fixed2int (src_x))
       {
-        s   += fixed2int (sx);
-        sx  &= 0xFFFF;
-      }  
-
-      *res = *s;   
+        s     += fixed2int (src_x);
+        src_x &= 0xffff;
+      }
+      
+      *dst = *s;
     }
-  }    
+  }
 }
 
 }

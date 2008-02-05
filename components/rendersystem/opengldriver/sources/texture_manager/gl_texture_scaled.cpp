@@ -22,7 +22,7 @@ ScaledTexture::ScaledTexture (TextureManager& texture_manager, const TextureDesc
   shadow_texture = reinterpret_cast <IBindableTexture*> (texture_manager.CreateTexture (temp_desc));
   
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
-  vertical_scale   = (float)scaled_height / (float)original_desc.height;
+  vertical_scale   = (float)scaled_height / (float)original_desc.height;  
 
   //LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");  //подробнее!!
 }
@@ -90,7 +90,7 @@ void ScaledTexture::GetData (size_t layer, size_t mip_level, size_t x, size_t y,
   const char* METHOD_NAME = "render::low_level::opengl::TextureEmulatedNPOT::GetData";
 
   if (is_compressed_format (target_format))
-    RaiseNotSupported (METHOD_NAME, "Can't get data from scaled texture");
+    RaiseNotSupported (METHOD_NAME, "Can't get data in format %s from scaled texture", get_name (target_format));
 
   size_t scaled_width   = (size_t)ceil ((float)width * horisontal_scale);
   size_t scaled_height  = (size_t)ceil ((float)height * vertical_scale);

@@ -234,7 +234,7 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
           
           if (tex_desc.format == PixelFormat_D24X8)
           {
-            for (size_t k = 0; k < src_buffer.size (); k += 4)
+            for (size_t k=3; k < src_buffer.size (); k += 4)
             {
               src_buffer.data ()[k] = 0;
               dst_buffer.data ()[k] = 0;
