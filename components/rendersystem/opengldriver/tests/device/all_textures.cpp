@@ -199,6 +199,8 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
 
             break;
           default:
+            if (!level_width)  level_width  = 1;
+            if (!level_height) level_height = 1;
             break;
         }
 

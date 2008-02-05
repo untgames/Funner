@@ -55,6 +55,7 @@ int main ()
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
     
+    memset (image_data, 0x01010101, IMAGE_DATA_SIZE);
     texture2->SetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_RGBA8, image_data);
     md5 (hash[0], image_data, IMAGE_DATA_SIZE);
     texture2->GetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_RGBA8, image_data);

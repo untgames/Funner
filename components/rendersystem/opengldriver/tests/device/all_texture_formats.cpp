@@ -1,5 +1,9 @@
 #include "shared.h"
 
+ //Маски сравнения пикселей в результатах тестирования
+
+size_t compare_mask [PixelFormat_Num][PixelFormat_Num];
+
 struct TextureSize
 {
   size_t width;
@@ -9,7 +13,7 @@ struct TextureSize
 
 struct TestStatus
 {
-  size_t count, successfull;
+  size_t count, successfull, match_count;
 };
 
 const char* get_short_name (PixelFormat param)
@@ -118,6 +122,30 @@ void print_diff (size_t size, const char* src, const char* dst)
   }
 }
 
+bool is_buffers_equal (const char* src, const char* dst, size_t size, size_t pixel_size, size_t mask)
+{
+  static const size_t masks [4] = {0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000};
+
+  for (size_t i = 0; i < size / pixel_size; i++, src+=pixel_size, dst+=pixel_size)
+  {
+    size_t src_pixel = 0, dst_pixel = 0; 
+
+    for (size_t j=0; j<pixel_size; j++)
+    {
+      src_pixel += size_t ((src[j]) << (8 * j)) & masks[j];
+      dst_pixel += size_t ((dst[j]) << (8 * j)) & masks[j];
+    }                                    
+
+    src_pixel &= mask;
+    dst_pixel &= mask;
+
+    if (src_pixel != dst_pixel)
+      return false;
+  }
+
+  return true;
+}
+
 TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
 {
   TestStatus status = {0, 0};
@@ -178,6 +206,8 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
 
             break;
           default:
+            if (!level_width)  level_width  = 1;
+            if (!level_height) level_height = 1;
             break;
         }
 
@@ -188,45 +218,55 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
           memset (dst_buffer.data (), 0xff, dst_buffer.size ());
           
           size_t data_size = level_width * level_height;
+          size_t texel_size;
 
-          switch (tex_desc.format)
+          switch (test_format)
           {
-            case PixelFormat_DXT1:  data_size /= 2; break;
+            case PixelFormat_DXT1:  
+              data_size /= 2; 
+              texel_size = 4; 
+              break;
             case PixelFormat_DXT3:
-            case PixelFormat_DXT5:
+            case PixelFormat_DXT5:                  
+              texel_size = 4; 
+              break;
             case PixelFormat_L8:
             case PixelFormat_A8:
-            case PixelFormat_S8:    break;
+            case PixelFormat_S8:    
+              texel_size = 1; 
+              break;
             case PixelFormat_LA8:
-            case PixelFormat_D16:   data_size *= 2; break;
-            case PixelFormat_RGB8:  data_size *= 3; break;
+            case PixelFormat_D16:   
+              data_size *= 2; 
+              texel_size = 2; 
+              break;
+            case PixelFormat_RGB8:  
+              data_size *= 3; 
+              texel_size = 3; 
+              break;
             case PixelFormat_RGBA8:
             case PixelFormat_D24X8:
-            case PixelFormat_D24S8: data_size *= 4; break;
+            case PixelFormat_D24S8: 
+              data_size *= 4; 
+              texel_size = 4; 
+              break;
             default: return status; 
           }          
           
           texture->SetData (i, j, 0, 0, level_width, level_height, test_format, src_buffer.data ());
-          texture->GetData (i, j, 0, 0, level_width, level_height, test_format, dst_buffer.data ());
+          texture->GetData (i, j, 0, 0, level_width, level_height, test_format, dst_buffer.data ());          
           
-          if (test_format == PixelFormat_D24X8)
-          {
-            for (size_t k = 0; k < src_buffer.size (); k += 4)
-            {
-              src_buffer.data ()[k] = 0;
-              dst_buffer.data ()[k] = 0;
-            }
-          }
+          status.successfull++;
 
-          if (!memcmp (src_buffer.data (), dst_buffer.data (), data_size))
+          if (is_buffers_equal (src_buffer.data (), dst_buffer.data (), data_size, texel_size, compare_mask[tex_desc.format][test_format]))
           {
-            status.successfull++;
+            status.match_count++;
             printf ("Ok\n");
           }
           else 
           {
             printf ("FAIL\n");
-//            print_diff (data_size, src_buffer.data (), dst_buffer.data ());
+            print_diff (data_size, src_buffer.data (), dst_buffer.data ());
           }
         }
         catch (std::exception& e)
@@ -261,19 +301,65 @@ void print_status_table (TestStatus status [PixelFormat_Num][PixelFormat_Num])
     {
       TestStatus& s = status [j][i];
       
-      if (!s.count)                      printf ("  -   ");
-      else if (s.successfull == s.count) printf ("  +   ");
-      else                               printf ("%02u/%02u ", s.successfull, s.count);
+      if (!s.count)                      printf ("  N/A ");
+      else if (!s.successfull)           printf ("   -  ");
+      else if (s.match_count == s.count) printf ("   +  ");
+      else                               printf ("%02u/%02u ", s.match_count, s.count);
     }
 
     printf ("\n");
   }
 }
 
+void set_compare_masks ()
+{
+  memset (compare_mask, 0, sizeof compare_mask);
+
+  for (size_t i = 0; i < PixelFormat_Num; i++)
+    compare_mask [i][i] = 0xffffffff;
+
+  compare_mask [PixelFormat_RGB8][PixelFormat_RGBA8] = 0x00ffffff;
+  compare_mask [PixelFormat_RGB8][PixelFormat_L8]    = 0x000000ff;
+  compare_mask [PixelFormat_RGB8][PixelFormat_LA8]   = 0x000000ff;
+  
+  compare_mask [PixelFormat_RGBA8][PixelFormat_RGB8] = 0x00ffffff;
+  compare_mask [PixelFormat_RGBA8][PixelFormat_L8]   = 0x000000ff;
+  compare_mask [PixelFormat_RGBA8][PixelFormat_A8]   = 0x000000ff;
+  compare_mask [PixelFormat_RGBA8][PixelFormat_LA8]  = 0x0000ffff;
+
+  compare_mask [PixelFormat_L8][PixelFormat_RGB8]  = 0x000000ff;
+  compare_mask [PixelFormat_L8][PixelFormat_RGBA8] = 0x000000ff;
+  compare_mask [PixelFormat_L8][PixelFormat_L8]    = 0x000000ff;
+  compare_mask [PixelFormat_L8][PixelFormat_LA8]   = 0x000000ff;
+
+//  compare_mask [PixelFormat_DXT3][PixelFormat_RGB8]  = 0x00ffffff;
+//  compare_mask [PixelFormat_DXT3][PixelFormat_RGBA8] = 0xffffffff;
+
+  compare_mask [PixelFormat_A8][PixelFormat_RGBA8] = 0xff000000;
+  compare_mask [PixelFormat_A8][PixelFormat_A8]    = 0x000000ff;
+  compare_mask [PixelFormat_A8][PixelFormat_LA8]   = 0x0000ff00;
+
+  compare_mask [PixelFormat_LA8][PixelFormat_RGB8]  = 0x000000ff;
+  compare_mask [PixelFormat_LA8][PixelFormat_RGBA8] = 0xff0000ff;
+  compare_mask [PixelFormat_LA8][PixelFormat_L8]    = 0x000000ff;
+
+  compare_mask [PixelFormat_D16][PixelFormat_D24X8] = 0xffff0000;   //??
+
+  compare_mask [PixelFormat_D24X8][PixelFormat_D16]   = 0xffffffff;
+  compare_mask [PixelFormat_D24X8][PixelFormat_D24X8] = 0xffffff00; //??
+
+  compare_mask [PixelFormat_D24S8][PixelFormat_D16]   = 0xffff0000;
+  compare_mask [PixelFormat_D24S8][PixelFormat_D24X8] = 0xffffff00; //??
+
+}
+
+
 int main ()
 {
   printf ("Results of all_texture_formats_test:\n");
-  
+
+  set_compare_masks ();
+
   try
   {
     Test test (L"OpenGL device test window (all_texture_formats_test)");
@@ -301,8 +387,7 @@ int main ()
 
         try
         {
-          printf ("%s %ux%ux%u@%s %s:\n", get_name (desc.dimension), desc.width, desc.height, desc.layers, get_short_name (desc.format),
-            desc.generate_mips_enable ? "auto-mips" : "manual-mips");
+          printf ("%s %ux%ux%u@%s:\n", get_name (desc.dimension), desc.width, desc.height, desc.layers, get_short_name (desc.format));
 
           xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
 

@@ -164,11 +164,10 @@ void Texture::GetMipLevelDesc (size_t mip_level, MipLevelDesc& out_desc)
 
       break;
     default:
+      if (!level_width)  level_width  = 1;
+      if (!level_height) level_height = 1;
       break;
   }
-
-  if (!level_width)  level_width  = 1;
-  if (!level_height) level_height = 1;
 
   out_desc.width  = level_width;
   out_desc.height = level_height;
@@ -507,8 +506,8 @@ void Texture::GetData
  
     if (is_full_image)
     {
-      if (ext.has_arb_texture_compression) glGetCompressedTexImageARB (layer_desc.target, mip_level, buffer);      
-      else                                 glGetCompressedTexImage    (layer_desc.target, mip_level, buffer);      
+      if (ext.has_arb_texture_compression) glGetCompressedTexImageARB (layer_desc.target, mip_level, buffer);
+      else                                 glGetCompressedTexImage    (layer_desc.target, mip_level, buffer);
     }
     else
     {
@@ -554,6 +553,9 @@ void Texture::GetData
   }
   else
   {
+    if (is_compressed_format (desc.format))
+      common::RaiseNotSupported (METHOD_NAME, "Can't get uncompressed data (format %s) from compressed texture (format %s)", get_name (target_format), get_name (desc.format));
+
       //копирование несжатого образа
       
     GLenum gl_tex_format = gl_format (target_format),
@@ -561,16 +563,26 @@ void Texture::GetData
 
     if (is_full_image)
     {
+//      printf ("Getting unpacked data with format %x and type %x byte 2 = %x...\n", gl_tex_format, gl_tex_type, ((int*)buffer)[2]);
+//      ((int*)buffer)[2] = 0;
       glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, buffer);      
+//      printf ("Data getted, byte 2 = %x\n\n", ((int*)buffer)[2]);
     }
     else
     {
         //копирование полного образа текстуры во временный буфер
         
       size_t texel_size     = opengl::texel_size (target_format),
-             tmp_texel_size = target != GL_TEXTURE_3D_EXT ? texel_size : align_size (texel_size, 4); //обход бага (?) ATI OpenGL
+//             tmp_texel_size = target != GL_TEXTURE_3D_EXT ? texel_size : align_size (texel_size, 4); //обход бага (?) ATI OpenGL
+             tmp_texel_size = target == GL_TEXTURE_3D_EXT  && opengl::texel_size (desc.format) == 3 ? texel_size = 4 : texel_size; //обход бага (?) ATI OpenGL
+
+      if (opengl::texel_size (desc.format) > tmp_texel_size)
+        tmp_texel_size = opengl::texel_size (desc.format);
 
       xtl::uninitialized_storage<char> temp_buffer (level_desc.width * level_desc.height * desc.layers * tmp_texel_size);
+
+      if (opengl::texel_size (desc.format) == 1 || opengl::texel_size (desc.format) == 2)
+        tmp_texel_size = opengl::texel_size (desc.format);
 
       glGetTexImage (layer_desc.target, mip_level, gl_tex_format, gl_tex_type, temp_buffer.data ());
 
