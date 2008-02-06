@@ -296,6 +296,50 @@ const char* get_name (VertexAttributeSemantic param)
   }
 }
 
+const char* get_name (TexMinFilter param)
+{
+  switch (param)
+  {
+    case TexMinFilter_Default:         return "TexMinFilter_Default";
+    case TexMinFilter_Point:           return "TexMinFilter_Point";
+    case TexMinFilter_Linear:          return "TexMinFilter_Linear";
+    case TexMinFilter_PointMipPoint:   return "TexMinFilter_PointMipPoint";
+    case TexMinFilter_LinearMipPoint:  return "TexMinFilter_LinearMipPoint";
+    case TexMinFilter_PointMipLinear:  return "TexMinFilter_PointMipLinear";
+    case TexMinFilter_LinearMipLinear: return "TexMinFilter_LinearMipLinear";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(TexMinFilter)", "param", param);
+      return "";    
+  }
+}
+
+const char* get_name (TexMagFilter param)
+{
+  switch (param)
+  {
+    case TexMagFilter_Default: return "TexMagFilter_Default";
+    case TexMagFilter_Point:   return "TexMagFilter_Point";
+    case TexMagFilter_Linear:  return "TexMagFilter_Linear";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(TexMagFilter)", "param", param);
+      return "";    
+  }
+}
+
+const char* get_name (TexcoordWrap param)
+{
+  switch (param)
+  {
+    case TexcoordWrap_Repeat:        return "TexcoordWrap_Repeat";
+    case TexcoordWrap_Mirror:        return "TexcoordWrap_Mirror";
+    case TexcoordWrap_Clamp:         return "TexcoordWrap_Clamp";
+    case TexcoordWrap_ClampToBorder: return "TexcoordWrap_ClampToBorder";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(TexcoordWrap)", "param", param);
+      return "";    
+  }
+}
+
 }
 
 }

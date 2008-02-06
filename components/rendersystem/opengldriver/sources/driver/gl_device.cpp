@@ -448,7 +448,8 @@ bool Device::GetPredicateValue ()
 void Device::Bind (size_t base_vertex, size_t base_index)
 {
   output_stage.Bind ();
-  input_stage.Bind (base_vertex, base_index);
+//  input_stage.Bind (base_vertex, base_index);
+  texture_manager.Bind ();
 }
 
 /*

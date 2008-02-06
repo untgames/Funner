@@ -28,6 +28,7 @@ enum ContextDataTable
   ContextDataTable_ShaderStage,
   ContextDataTable_RasterizerStage,
   ContextDataTable_OutputStage,
+  ContextDataTable_TextureManager,
   
   ContextDataTable_Num
 };

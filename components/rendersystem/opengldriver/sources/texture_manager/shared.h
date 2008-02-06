@@ -5,6 +5,7 @@
 
 #include <common/exception.h>
 
+#include <xtl/trackable_ptr.h>
 #include <xtl/uninitialized_storage.h>
 #include <xtl/intrusive_ptr.h>
 
@@ -23,6 +24,17 @@ namespace low_level
 
 namespace opengl
 {
+
+enum OpenGLTextureTarget
+{
+  OpenGLTextureTarget_Texture1D,
+  OpenGLTextureTarget_Texture2D,
+  OpenGLTextureTarget_TextureRectangle,
+  OpenGLTextureTarget_Texture3D,
+  OpenGLTextureTarget_TextureCubemap,
+
+  OpenGLTextureTarget_Num
+};
 
 ///////переместить в исходники!!!
 struct TextureExtensions
@@ -266,6 +278,35 @@ class ScaledTexture: virtual public IBindableTexture, public Object
     float      horisontal_scale; //коэффициент растяжения по горизонтали
     float      vertical_scale;   //коэффициент растяжения по вертикали
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сэмплер
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class SamplerState : virtual public ISamplerState, public ContextObject
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    SamplerState (const ContextManager& manager, const SamplerDesc& in_desc);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Выбор сэмплера в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Bind (OpenGLTextureTarget tex_target);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение/получение дескриптора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetDesc (const SamplerDesc& in_desc);
+    void GetDesc (SamplerDesc& target_desc)   {target_desc = desc;}
+
+  private:
+    SamplerDesc desc;
+    int         display_list;   //номер первого списка команд конфигурации OpenGL (всего списков OpenGLTextureTarget_Num)
+    size_t      max_anisotropy; //максимально возможная степень анизотропии
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты

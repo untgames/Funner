@@ -186,15 +186,26 @@ struct LightingDesc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Типы фильтров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum Filter
+enum TexMinFilter
 {
-  Filter_Default,     //фильтрация выбирается в соответствии с предпочтениями устройства визуализации
-  Filter_Point,       //точечная фильтрация
-  Filter_Bilinear,    //билинейная фильтрация
-  Filter_Trilinear,   //трилинейная фильтрация
-  Filter_Anisotropic, //анизотропная фильтрация
+  TexMinFilter_Default,         //фильтрация выбирается в соответствии с предпочтениями устройства визуализации
+  TexMinFilter_Point,           //точечная фильтрация
+  TexMinFilter_Linear,          //линейная фильтрация
+  TexMinFilter_PointMipPoint,   //точечная фильтрация по ближайшему мипу
+  TexMinFilter_LinearMipPoint,  //линейная фильтрация по ближайшему мипу
+  TexMinFilter_PointMipLinear,  //точечная фильтрация с линейной интерполяцией мипов
+  TexMinFilter_LinearMipLinear, //трилинейная фильтрация
   
-  FilterType_Num
+  TexMinFilter_Num
+};
+
+enum TexMagFilter
+{
+  TexMagFilter_Default, //фильтрация выбирается в соответствии с предпочтениями устройства визуализации
+  TexMagFilter_Point,   //точечная фильтрация
+  TexMagFilter_Linear,  //линейная фильтрация
+
+  TexMagFilter_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,17 +228,17 @@ enum TexcoordWrap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct SamplerDesc
 {
-  Filter       min_filter;       //фильтрация, используемая если размер текселя меньше размера пикселя
-  Filter       mag_filter;       //фильтрация, используемая если размер текселя больше размера пикселя
-  Filter       mip_filter;       //фильтрация, используемая при переходе между mip-уровнями
-  TexcoordWrap wrap_u;           //свёртка по координате U
-  TexcoordWrap wrap_v;           //свёртка по координате V
-  TexcoordWrap wrap_w;           //свёртка по координате W  
-  float        mip_lod_bias;     //смещение от вычисленного mip-уровня
-  float        min_lod;          //минимальный mip-уровень
-  float        max_lod;          //максимальный mip-уровень
-  size_t       max_anisotropy;   //максимальный уровень анизотропии
-  float        border_color [4]; //цвет бордюра
+  TexMinFilter min_filter;           //фильтрация, используемая если размер текселя меньше размера пикселя
+  TexMagFilter mag_filter;           //фильтрация, используемая если размер текселя больше размера пикселя
+  TexcoordWrap wrap_u;               //свёртка по координате U
+  TexcoordWrap wrap_v;               //свёртка по координате V
+  TexcoordWrap wrap_w;               //свёртка по координате W
+  CompareMode  comparision_function; //функция сравнения для depth подключенных текстур
+  float        mip_lod_bias;         //смещение от вычисленного mip-уровня
+  float        min_lod;              //минимальный mip-уровень
+  float        max_lod;              //максимальный mip-уровень
+  size_t       max_anisotropy;       //максимальный уровень анизотропии
+  float        border_color [4];     //цвет бордюра
 };
 
 /*
