@@ -17,7 +17,6 @@ int main ()
     desc.cull_mode               = CullMode_Front;
     desc.front_counter_clockwise = false;
     desc.depth_bias              = 1;
-    desc.depth_clip_enable       = true;
     desc.scissor_enable          = true;
     desc.multisample_enable      = true;
     desc.antialiased_line_enable = false;
