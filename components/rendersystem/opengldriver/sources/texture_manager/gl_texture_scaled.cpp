@@ -5,30 +5,35 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Љ®­бвагЄв®а
+    Конструктор
 */
 
-ScaledTexture::ScaledTexture (TextureManager& texture_manager, const TextureDesc& original_desc, size_t scaled_width, size_t scaled_height)
-  : original_width (original_desc.width), original_height (original_desc.height)
+ScaledTexture::ScaledTexture
+ (TextureManager&      texture_manager,
+  const TextureDesc&   original_desc,
+  size_t               scaled_width,
+  size_t               scaled_height)
+    : original_width (original_desc.width),
+      original_height (original_desc.height)
 {
-  if (!scaled_width)  scaled_width = next_higher_power_of_two (original_desc.width);
-  if (!scaled_height) scaled_height = next_higher_power_of_two (original_desc.height);
+  if (!scaled_width)  scaled_width  = get_next_higher_power_of_two (original_desc.width);
+  if (!scaled_height) scaled_height = get_next_higher_power_of_two (original_desc.height);
 
   TextureDesc temp_desc = original_desc;
 
   temp_desc.width  = scaled_width;
   temp_desc.height = scaled_height;
 
-  shadow_texture = reinterpret_cast <IBindableTexture*> (texture_manager.CreateTexture (temp_desc));
-  
+  shadow_texture   = texture_manager.CreateTexture (temp_desc);
+
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
   vertical_scale   = (float)scaled_height / (float)original_desc.height;  
 
-  //LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");  //Ї®¤а®Ў­ҐҐ!!
+  //LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");  //подробнее!!
 }
 
 /*
-    Џ®«гзҐ­ЁҐ ¤ҐбЄаЁЇв®а 
+    Получение дескриптора
 */
 
 void ScaledTexture::GetDesc (TextureDesc& out_desc)
@@ -45,35 +50,49 @@ void ScaledTexture::GetDesc (BindableTextureDesc& out_desc)
 }
 
 /*
-    ђ Ў®в  б ¤ ­­л¬Ё
+    Установка текстуры в контекст OpenGL
+*/
+
+void ScaledTexture::Bind ()
+{
+  shadow_texture->Bind ();
+}
+
+/*
+    Работа с данными
 */
 
 void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
-  size_t scaled_width   = (size_t)ceil ((float)width * horisontal_scale);
-  size_t scaled_height  = (size_t)ceil ((float)height * vertical_scale);
-  x                     = (size_t)ceil ((float)x * horisontal_scale);
-  y                     = (size_t)ceil ((float)y * vertical_scale);    
+  size_t scaled_width  = (size_t)ceil ((float)width * horisontal_scale),
+         scaled_height = (size_t)ceil ((float)height * vertical_scale);
+
+  x = (size_t)ceil ((float)x * horisontal_scale);
+  y = (size_t)ceil ((float)y * vertical_scale);    
+
   xtl::uninitialized_storage <char> scaled_buffer;
-  
+
   try
   {
-    if (is_compressed_format (source_format))
+    if (is_compressed (source_format))
     {
-      xtl::uninitialized_storage <char> unpacked_buffer (width * height * unpack_texel_size (source_format));
+      xtl::uninitialized_storage <char> unpacked_buffer (get_uncompressed_image_size (width, height, source_format));
 
-      scaled_buffer.resize (scaled_width * scaled_height * unpack_texel_size (source_format));
+      scaled_buffer.resize (get_uncompressed_image_size (scaled_width, scaled_height, source_format));
 
       unpack_dxt  (source_format, width, height, buffer, unpacked_buffer.data ());
-      scale_image (unpack_pf (source_format), width, height, scaled_width, scaled_height, unpacked_buffer.data (), scaled_buffer.data ());
+      
+      PixelFormat uncompressed_format = get_uncompressed_format (source_format);
+      
+      scale_image (uncompressed_format, width, height, scaled_width, scaled_height, unpacked_buffer.data (), scaled_buffer.data ());
 
-      shadow_texture->SetData (layer, mip_level, x, y, scaled_width, scaled_height, unpack_pf (source_format), scaled_buffer.data ());
+      shadow_texture->SetData (layer, mip_level, x, y, scaled_width, scaled_height, uncompressed_format, scaled_buffer.data ());
     }
     else
     {
-      scaled_buffer.resize (scaled_width * scaled_height * texel_size (source_format));
+      scaled_buffer.resize (get_image_size (scaled_width, scaled_height, source_format));
 
-      scale_image (source_format, width, height, scaled_width, scaled_height, buffer, scaled_buffer.data ());
+      scale_image (source_format, width, height, scaled_width, scaled_height, buffer, scaled_buffer.data ());      
 
       shadow_texture->SetData (layer, mip_level, x, y, scaled_width, scaled_height, source_format, scaled_buffer.data ());
     }  
@@ -89,12 +108,13 @@ void ScaledTexture::GetData (size_t layer, size_t mip_level, size_t x, size_t y,
 {
   const char* METHOD_NAME = "render::low_level::opengl::TextureEmulatedNPOT::GetData";
 
-  if (is_compressed_format (target_format))
+  if (is_compressed (target_format))
     RaiseNotSupported (METHOD_NAME, "Can't get data in format %s from scaled texture", get_name (target_format));
 
-  size_t scaled_width   = (size_t)ceil ((float)width * horisontal_scale);
-  size_t scaled_height  = (size_t)ceil ((float)height * vertical_scale);
-  xtl::uninitialized_storage <char> scaled_buffer (scaled_width * scaled_height * texel_size (target_format));
+  size_t scaled_width  = (size_t)ceil ((float)width * horisontal_scale),
+         scaled_height = (size_t)ceil ((float)height * vertical_scale);
+
+  xtl::uninitialized_storage <char> scaled_buffer (get_image_size (scaled_width, scaled_height, target_format));
 
   try
   {

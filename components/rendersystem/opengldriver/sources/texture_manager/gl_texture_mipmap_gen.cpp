@@ -138,7 +138,7 @@ void scale_image_impl (size_t width, size_t height, const T* src, size_t new_wid
         src_y      = 0;
         
   const T* line = src;
-        
+         
   for (size_t dst_y=0; dst_y<new_height; dst_y++, src_y += dy)
   {
     if (fixed2int (src_y))

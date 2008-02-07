@@ -1,0 +1,4 @@
+Results of utils4_test:
+get_mips_count(1024, 1, 1)=11
+get_mips_count(1024, 500, 1)=11
+get_mips_count(1024, 500, 2049)=12

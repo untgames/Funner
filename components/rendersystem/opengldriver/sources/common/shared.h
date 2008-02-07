@@ -37,10 +37,10 @@ namespace opengl
 {
 
 /*
-    Инициализация состояния OpenGL
+    Определение багов драйверов OpenGL
 */
 
-void init_opengl_state ();
+void detect_opengl_bugs (stl::string& extensions_string);
 
 }
 

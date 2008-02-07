@@ -1,3 +1,4 @@
+#include <math.h>
 #include <render/low_level/utils.h>
 #include <common/exception.h>
 
@@ -338,6 +339,204 @@ const char* get_name (TexcoordWrap param)
       RaiseInvalidArgument ("render::low_level::get_name(TexcoordWrap)", "param", param);
       return "";    
   }
+}
+
+/*
+    Получение параметров формата пикселей
+*/
+
+//получение размеров несжатого текселя
+size_t get_texel_size (PixelFormat format)
+{
+  switch (format)
+  {
+    case PixelFormat_L8:
+    case PixelFormat_A8:
+    case PixelFormat_S8:    return 1;
+    case PixelFormat_LA8:
+    case PixelFormat_D16:   return 2;
+    case PixelFormat_RGB8:  return 3;
+    case PixelFormat_RGBA8:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8: return 4;
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+      common::RaiseInvalidArgument ("render::low_level::get_texel_size", "format", get_name (format), "No texel size semantic in compressed pixel format");
+      return 0;
+    default:
+      common::RaiseInvalidArgument ("render::low_level::get_texel_size", "format");
+      return 0;
+  }
+}
+
+//получение размера изображения
+size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat format)
+{
+  static const size_t DXT_BLOCK_SIZE = 16;
+
+  switch (format)
+  {
+    case PixelFormat_L8:
+    case PixelFormat_A8:
+    case PixelFormat_S8:
+    case PixelFormat_LA8:
+    case PixelFormat_D16:
+    case PixelFormat_RGB8:
+    case PixelFormat_RGBA8:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8: return width * height * depth * get_texel_size (format);
+    case PixelFormat_DXT1:  return width * height * depth * 8 / DXT_BLOCK_SIZE;
+    case PixelFormat_DXT3:  return width * height * depth * 16 / DXT_BLOCK_SIZE;
+    case PixelFormat_DXT5:  return width * height * depth * 16 / DXT_BLOCK_SIZE;
+      common::RaiseInvalidArgument ("render::low_level::get_texel_size", "format", get_name (format), "No texel size semantic in compressed pixel format");
+      return 0;
+    default:
+      common::RaiseInvalidArgument ("render::low_level::get_texel_size", "format");
+      return 0;    
+  }
+}
+
+size_t get_image_size (size_t width, size_t height, PixelFormat format)
+{
+  return get_image_size (width, height, 1, format);
+}
+
+size_t get_image_size (size_t width, PixelFormat format)
+{
+  return get_image_size (width, 1, 1, format);
+}
+
+//проверка является ли формат сжатым
+bool is_compressed (PixelFormat format)
+{
+  switch (format)
+  {
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:  return true;
+    case PixelFormat_L8:    
+    case PixelFormat_A8:    
+    case PixelFormat_S8:
+    case PixelFormat_LA8:   
+    case PixelFormat_RGB8:  
+    case PixelFormat_RGBA8: 
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8: return false;  
+    default:
+      RaiseInvalidArgument ("render::low_level::is_compressed", "format", format);
+      return false;
+  }
+}
+
+//проверка является ли формат несжатым
+bool is_uncompressed (PixelFormat format)
+{
+  return !is_compressed (format);
+}
+
+//проверка на форматы буфера глубина-трафарет
+bool is_depth_stencil (PixelFormat format)
+{
+  switch (format)
+  {
+    case PixelFormat_S8:
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8: return true;   
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+    case PixelFormat_L8:    
+    case PixelFormat_A8:
+    case PixelFormat_LA8:   
+    case PixelFormat_RGB8:  
+    case PixelFormat_RGBA8: return false;
+    default:
+      RaiseInvalidArgument ("render::low_level::is_depth_stencil", "format", format);
+      return false;
+  }
+}
+
+//проверка является ли формат "цветовым"
+bool is_color (PixelFormat format)
+{
+  return !is_depth_stencil (format);
+}
+
+//возвращает распакованный эквивалент переданного формата
+PixelFormat get_uncompressed_format (PixelFormat format)
+{
+  switch (format)
+  {
+    case PixelFormat_RGB8:
+    case PixelFormat_RGBA8:
+    case PixelFormat_L8:
+    case PixelFormat_A8:
+    case PixelFormat_LA8:
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8:
+    case PixelFormat_S8:    return format;
+    case PixelFormat_DXT1:  return PixelFormat_RGB8;
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:  return PixelFormat_RGBA8;
+    default:
+      RaiseInvalidArgument ("render::low_level::get_unpacked_format", "format", format);
+      return (PixelFormat)0;
+  }
+}
+
+//получение размеров распакованного текселя
+size_t get_uncompressed_texel_size (PixelFormat format)
+{
+  return get_texel_size (get_uncompressed_format (format));
+}
+
+//получение размера изображения после распаковки
+size_t get_uncompressed_image_size (size_t width, PixelFormat format)
+{
+  return get_image_size (width, get_uncompressed_format (format));
+}
+
+size_t get_uncompressed_image_size (size_t width, size_t height, PixelFormat format)
+{
+  return get_image_size (width, height, get_uncompressed_format (format));
+}
+
+size_t get_uncompressed_image_size (size_t width, size_t height, size_t depth, PixelFormat format)
+{
+  return get_image_size (width, height, depth, get_uncompressed_format (format));
+}
+
+/*
+    Получение количества mip-уровней
+*/
+
+namespace
+{
+
+size_t get_max_size (size_t a, size_t b)
+{
+  return a > b ? a : b;
+}
+
+}
+
+size_t get_mips_count (size_t size)
+{
+  return (size_t)(log ((float)size) / log (2.f)) + 1;
+}
+
+size_t get_mips_count (size_t width, size_t height)
+{
+  return get_mips_count (get_max_size (width, height));
+}
+
+size_t get_mips_count (size_t width, size_t height, size_t depth)
+{
+  return get_mips_count (get_max_size (width, get_max_size (height, depth)));
 }
 
 }

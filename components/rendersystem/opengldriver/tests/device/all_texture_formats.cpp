@@ -36,51 +36,6 @@ const char* get_short_name (PixelFormat param)
   }
 }
 
-
-bool is_compressed_format (PixelFormat format)
-{
-  switch (format)
-  {
-    case PixelFormat_DXT1:
-    case PixelFormat_DXT3:
-    case PixelFormat_DXT5:  return true;
-    case PixelFormat_L8:    
-    case PixelFormat_A8:    
-    case PixelFormat_S8:
-    case PixelFormat_LA8:   
-    case PixelFormat_RGB8:  
-    case PixelFormat_RGBA8: 
-    case PixelFormat_D16:
-    case PixelFormat_D24X8:
-    case PixelFormat_D24S8:   
-    default: return false;
-  }
-}
-
-//получение ближайшей сверху степени двойки
-size_t next_higher_power_of_two (size_t k) 
-{
-  k--;
-
-  for (int i=1; i < sizeof (size_t) * 8; i *= 2)
-          k |= k >> i;
-
-  return k + 1;
-}
-
-//получение количества mip-уровней
-size_t get_mips_count (size_t size) //оптимизировать
-{
-//  return (size_t)(log ((float)next_higher_power_of_two (size)) / log (2.f)) + 1;
-  return (size_t)(log ((float) (size)) / log (2.f)) + 1;
-}
-
-//получение количества mip-уровней
-size_t get_mips_count (size_t width, size_t height)
-{
-  return width > height ? get_mips_count (width) : get_mips_count (height);
-}
-
 int myrand ()
 {
   static int holdrand = 1;
@@ -170,7 +125,7 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
     {  
       size_t mips_count = get_mips_count (tex_desc.width, tex_desc.height);
 
-      if (is_compressed_format (tex_desc.format))
+      if (is_compressed (tex_desc.format))
         mips_count -= 2;
 
       for (size_t j = 0; j < mips_count; j++)

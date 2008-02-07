@@ -159,6 +159,8 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
   Bind ();
   
+    //сохранение текущего состояния
+  
   RenderBufferTempState temp_state;
 
     //проверка наличия расширения GL_ARB_window_pos либо версии OpenGL не ниже 1.4
@@ -168,11 +170,20 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
   if (!IsSupported (ARB_window_pos) && !IsSupported (Version_1_4))
     RaiseNotSupported (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
+    
+    //установка позиции растра
 
   if      (glWindowPos2iARB) glWindowPos2iARB (x, y);
   else if (glWindowPos2i)    glWindowPos2i    (x, y);
-  else                       return;  
+  else                       return;
   
+    //настройка параметров расположения данных в буфере
+
+  glPixelStorei (GL_UNPACK_ROW_LENGTH,  0); //длина строки в пикселях
+  glPixelStorei (GL_UNPACK_ALIGNMENT,   1); //выравнивание начала строк
+  glPixelStorei (GL_UNPACK_SKIP_ROWS,   0); //количество пропускаемых строк
+  glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей
+
   switch (target_type)
   {
     case RenderTargetType_Color:
@@ -303,6 +314,13 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
   Bind ();
   
+    //настройка параметров расположения данных в буфере
+
+  glPixelStorei (GL_PACK_ROW_LENGTH,  0); //размер строки в пикселях
+  glPixelStorei (GL_PACK_ALIGNMENT,   1); //выравнивание начала строк
+  glPixelStorei (GL_PACK_SKIP_ROWS,   0); //количество пропускаемых строк
+  glPixelStorei (GL_PACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей
+
   switch (target_type)
   {
     case RenderTargetType_Color:

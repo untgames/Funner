@@ -11,6 +11,7 @@
 
 #include <render/low_level/driver.h>
 #include <render/low_level/device.h>
+#include <render/low_level/utils.h>
 
 using namespace render::low_level;
 using namespace common;

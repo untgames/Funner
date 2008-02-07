@@ -154,7 +154,16 @@ void SamplerState::Bind (OpenGLTextureTarget tex_target)
 }
 
 /*
-   Изменение/получение дескриптора
+    Получение дескриптора сэмплера
+*/
+
+void SamplerState::GetDesc (SamplerDesc& out_desc)
+{
+  out_desc = desc;
+}
+
+/*
+   Изменение дескриптора
 */
 
 void SamplerState::SetDesc (const SamplerDesc& in_desc)

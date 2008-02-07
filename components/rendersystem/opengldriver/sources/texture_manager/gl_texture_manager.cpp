@@ -29,54 +29,7 @@ enum TextureManagerDataTable
   TextureManagerDataTable_Num
 };
 
-struct TextureManagerExtensions
-{
-  bool has_ext_texture_rectangle;        //GL_EXT_texture_rectangle
-  bool has_ext_texture3D;                //GL_EXT_texture3D
-  bool has_ext_texture3D_extension;      //GL_EXT_texture3D
-  bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
-  bool has_ext_packed_depth_stencil;     //GL_EXT_packed_depth_stencil
-  bool has_arb_multitexture;             //GL_ARB_multitexture
-  bool has_arb_texture_compression;      //GL_ARB_texture_compression
-  bool has_arb_texture_cube_map;         //GL_ARB_texture_cubemap
-  bool has_arb_texture_non_power_of_two; //GL_ARB_texture_non_power_of_two
-  bool has_arb_depth_texture;            //GL_ARB_depth_texture
-  
-  TextureManagerExtensions (const ContextManager& manager)
-  {
-    static Extension EXT_texture_rectangle        = "GL_EXT_texture_rectangle",
-                     EXT_texture3D                = "GL_EXT_texture3D",
-                     EXT_texture_compression_s3tc = "GL_EXT_texture_compression_s3tc",
-                     EXT_texture_cube_map         = "GL_EXT_texture_cube_map",
-                     EXT_packed_depth_stencil     = "GL_EXT_packed_depth_stencil",
-                     NV_texture_rectangle         = "GL_NV_texture_rectangle",
-                     ARB_multitexture             = "GL_ARB_multitexture",
-                     ARB_texture_cube_map         = "GL_ARB_texture_cube_map",
-                     ARB_texture_compression      = "GL_ARB_texture_compression",
-                     ARB_texture_non_power_of_two = "GL_ARB_texture_non_power_of_two",
-                     ARB_depth_texture            = "GL_ARB_depth_texture",
-                     Version_1_2                  = "GL_VERSION_1_2",
-                     Version_1_3                  = "GL_VERSION_1_3",
-                     Version_1_4                  = "GL_VERSION_1_4",
-                     Version_2_0                  = "GL_VERSION_2_0";
-                     
-    manager.MakeContextCurrent ();
-      
-    has_arb_multitexture             = manager.IsSupported (ARB_multitexture) || manager.IsSupported (Version_1_3);
-    has_arb_texture_compression      = manager.IsSupported (ARB_texture_compression);
-    has_ext_texture_rectangle        = manager.IsSupported (EXT_texture_rectangle) || manager.IsSupported (NV_texture_rectangle);
-    has_ext_texture3D_extension      = manager.IsSupported (EXT_texture3D);
-    has_ext_texture3D                = has_ext_texture3D_extension || manager.IsSupported (Version_1_2);
-    has_ext_texture_compression_s3tc = (has_arb_texture_compression || manager.IsSupported (Version_1_3)) && 
-                                       manager.IsSupported (EXT_texture_compression_s3tc);
-    has_ext_packed_depth_stencil     = manager.IsSupported (EXT_packed_depth_stencil);  
-    has_arb_texture_cube_map         = manager.IsSupported (ARB_texture_cube_map) || manager.IsSupported (EXT_texture_cube_map) ||
-                                       manager.IsSupported (Version_1_3);
-    has_arb_texture_non_power_of_two = manager.IsSupported (ARB_texture_non_power_of_two) || manager.IsSupported (Version_2_0);
-    has_arb_depth_texture            = manager.IsSupported (ARB_depth_texture) || manager.IsSupported (Version_1_4);
-  }
-};
-
+///????
 OpenGLTextureTarget get_OpenGLTextureTarget (GLenum tex_target)
 {
   switch (tex_target)
@@ -112,8 +65,8 @@ struct TextureManager::Impl: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание текстуры и сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ITexture*      CreateTexture      (const TextureDesc&);
-    ISamplerState* CreateSamplerState (const SamplerDesc&);
+    IBindableTexture* CreateTexture      (const TextureDesc&);
+    ISamplerState*    CreateSamplerState (const SamplerDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущей текстуры и сэмплера
@@ -124,14 +77,20 @@ struct TextureManager::Impl: public ContextObject
     ISamplerState* GetSampler (size_t sampler_slot) const;
 
   private:
-    ITexture* CreateTexture1D      (const TextureDesc&);
-    ITexture* CreateTexture2D      (const TextureDesc&);
-    ITexture* CreateTexture3D      (const TextureDesc&);
-    ITexture* CreateTextureCubemap (const TextureDesc&);
+    IBindableTexture* CreateTexture1D      (const TextureDesc&);
+    IBindableTexture* CreateTexture2D      (const TextureDesc&);
+    IBindableTexture* CreateTexture3D      (const TextureDesc&);
+    IBindableTexture* CreateTextureCubemap (const TextureDesc&);
 
   private:    
-    typedef xtl::trackable_ptr<Texture>      TexturePtr;
-    typedef xtl::trackable_ptr<SamplerState> SamplerStatePtr;
+    typedef xtl::trackable_ptr<IBindableTexture> TexturePtr;
+    typedef xtl::trackable_ptr<SamplerState>     SamplerStatePtr;
+    
+/*    struct Sampler
+    {
+      TexturePtr      texture; //текстура
+      SamplerStatePtr state;   //состояние сэмплера
+    };*/
 
   public:
     TextureManager&          texture_manager;                                //менеджер текстур
@@ -142,8 +101,8 @@ struct TextureManager::Impl: public ContextObject
     size_t                   texture_units_count;                            //количество слотов мультитекстурирования
     TexturePtr               binded_textures[DEVICE_SAMPLER_SLOTS_COUNT];    //подключенные текстуры
     SamplerStatePtr          binded_samplers[DEVICE_SAMPLER_SLOTS_COUNT];    //подключенные сэмплеры
-    GLenum                   binded_tex_targets[DEVICE_SAMPLER_SLOTS_COUNT]; //включенные gl тарджеты
-    TextureManagerExtensions ext;                                            //поддерживаемые расширения
+    GLenum                   binded_tex_targets[DEVICE_SAMPLER_SLOTS_COUNT]; //включенные gl тарджеты//????????!!!!!!!!
+    ExtensionsPtr            extensions;                                     //поддерживаемые расширения
 };
 
 
@@ -157,25 +116,29 @@ TextureManager::Impl::Impl (const ContextManager& context_manager, TextureManage
     max_rectangle_texture_size (0),
     max_cube_map_texture_size (0),
     max_3d_texture_size (0),
-    texture_units_count (1),
-    ext (context_manager) //????????????????MakeContextCurrent после
+    texture_units_count (1)
 {
     //установка текущего контекста
 
   MakeContextCurrent ();
+  
+    //получение поддерживаемых расширений
+    
+  extensions = ExtensionsPtr (new TextureExtensions (context_manager));
 
-    //запрос максимальных размеров текстуры
+    //запрос максимальных размеров текстур / количества текстурных юнитов
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
 
-  if (ext.has_ext_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, (GLint*)&max_rectangle_texture_size);
-  if (ext.has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
-  if (ext.has_ext_texture3D)         glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
-
-  if (ext.has_arb_multitexture)      glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
+  if (extensions->has_ext_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, (GLint*)&max_rectangle_texture_size);
+  if (extensions->has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
+  if (extensions->has_ext_texture3d)         glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
+  if (extensions->has_arb_multitexture)      glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
 
   if (texture_units_count > DEVICE_SAMPLER_SLOTS_COUNT)
     texture_units_count = DEVICE_SAMPLER_SLOTS_COUNT;
+    
+    //сброс таблицы
 
   memset (binded_tex_targets, 0, sizeof (binded_tex_targets));
 
@@ -191,52 +154,71 @@ TextureManager::Impl::Impl (const ContextManager& context_manager, TextureManage
 void TextureManager::Impl::Bind ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::Bind";
+  
+    //выбор текущего контекста
 
   MakeContextCurrent ();
 
+    //установка текстур и сэмплеров
+
   for (size_t i = 0; i < texture_units_count; i++)
-    if (binded_textures[i] && binded_samplers[i])
+  {
+    IBindableTexture* texture = binded_textures [i].get ();
+    SamplerState*     sampler = binded_samplers [i].get ();
+    
+    if (!texture || !sampler)
     {
-      if (ext.has_arb_multitexture)
+      if (extensions->has_arb_multitexture)
       {
         if (glActiveTexture) glActiveTexture    (GL_TEXTURE0 + i);
         else                 glActiveTextureARB (GL_TEXTURE0 + i);
       }
 
-      if (binded_tex_targets[i] != binded_textures[i]->target)
+      if (binded_tex_targets [i])
       {
-        binded_tex_targets[i] = binded_textures[i]->target;
-        
-        glEnable (binded_tex_targets[i]);
-      }
-
-      if (GetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Texture0 + i) != binded_textures[i]->GetId ())
-      {
-        SetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Texture0 + i, binded_textures[i]->GetId ());
-        binded_textures[i]->Bind ();
-      }
-
-      if (GetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Sampler0 + i) != binded_samplers[i]->GetId ())
-      {
-        SetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Sampler0 + i, binded_samplers[i]->GetId ());
-        binded_samplers[i]->Bind (get_OpenGLTextureTarget (binded_textures[i]->target));
-      }
-    }
-    else
-    {
-      if (ext.has_arb_multitexture)
-      {
-        if (glActiveTexture) glActiveTexture    (GL_TEXTURE0 + i);
-        else                 glActiveTextureARB (GL_TEXTURE0 + i);
-      }
-
-      if (binded_tex_targets[i])
-      {
-        glDisable (binded_tex_targets[i]);
+        glDisable (binded_tex_targets [i]);
       
-        binded_tex_targets[i] = 0;
+        binded_tex_targets [i] = 0;
       }
+      
+      continue;
     }
+
+    if (extensions->has_arb_multitexture)
+    {
+      if (glActiveTexture) glActiveTexture    (GL_TEXTURE0 + i);
+      else                 glActiveTextureARB (GL_TEXTURE0 + i);
+    }
+
+    BindableTextureDesc tex_desc;
+    
+    texture->GetDesc (tex_desc);
+
+    if (binded_tex_targets [i] != tex_desc.target)
+    {
+      binded_tex_targets [i] = tex_desc.target;
+
+      glEnable (binded_tex_targets[i]);
+    }
+    
+       //доделать!!!!!!!
+
+//    if (GetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Texture0 + i) != texture->GetId ())
+    {
+//      SetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Texture0 + i, texture->GetId ());
+
+      glBindTexture (tex_desc.target, tex_desc.id);
+    }
+
+//    if (GetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Sampler0 + i) != sampler->GetId ())
+    {
+//      SetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Sampler0 + i, sampler->GetId ());
+
+      sampler->Bind (get_OpenGLTextureTarget (tex_desc.target));
+    }
+  }
+
+    //проверка ошибок
 
   CheckErrors (METHOD_NAME);
 }
@@ -255,104 +237,123 @@ bool is_power_of_two (size_t size)
 
 }
 
-ITexture* TextureManager::Impl::CreateTexture1D (const TextureDesc& desc)
+IBindableTexture* TextureManager::Impl::CreateTexture1D (const TextureDesc& in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture1D";
-
-  bool is_pot = is_power_of_two (desc.width);
+  
+    //игнорирование неиспользуемых параметров
+  
+  TextureDesc desc = in_desc;
+  
+  desc.height = desc.layers = 1;
+  
+    //проверка возможности создания текстуры
 
   if (desc.width > max_texture_size)
     RaiseNotSupported (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, max_texture_size);
 
-  if (is_pot || ext.has_arb_texture_non_power_of_two)
-    return new Texture1D (GetContextManager (), desc);
+    //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
 
-  if (ext.has_ext_texture_rectangle)
+  bool is_pot = is_power_of_two (desc.width);    
+
+  if (is_pot || extensions->has_arb_texture_non_power_of_two)
+    return new Texture1D (GetContextManager (), extensions, desc);
+
+  if (extensions->has_ext_texture_rectangle)
   {
     if (desc.width > max_rectangle_texture_size)
       RaiseNotSupported (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, max_rectangle_texture_size);
 
-    return new TextureNPOT (GetContextManager (), desc);
+    return new TextureNpot (GetContextManager (), extensions, desc);
   }
 
   return new ScaledTexture (texture_manager, desc);
 }
 
-ITexture* TextureManager::Impl::CreateTexture2D (const TextureDesc& desc)
+IBindableTexture* TextureManager::Impl::CreateTexture2D (const TextureDesc& in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture2D";
+  
+    //игнорирование неиспользуемых параметров
+  
+  TextureDesc desc = in_desc;
+  
+  desc.layers = 1;  
+  
+    //проверка возможности создания текстуры
 
   if (desc.width > max_texture_size || desc.height > max_texture_size)
     RaiseNotSupported (METHOD_NAME, "Can't create 2D texture %ux%u (maximum texture size is %u)", desc.width, desc.height, max_texture_size);
 
+    //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
+
   bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
 
-  if (is_pot || ext.has_arb_texture_non_power_of_two)
-    return new Texture2D (GetContextManager (), desc);      
+  if (is_pot || extensions->has_arb_texture_non_power_of_two)
+    return new Texture2D (GetContextManager (), extensions, desc);
 
-      //сделать через строку инициализации!!!
-
-//  if (ext.has_ext_texture_rectangle && !is_compressed_format (desc.format))
-//    return new TextureNPOT (GetContextManager (), desc);
+  if (extensions->has_ext_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
+    return new TextureNpot (GetContextManager (), extensions, desc);
 
   return new ScaledTexture (texture_manager, desc);
 }
 
-ITexture* TextureManager::Impl::CreateTexture3D (const TextureDesc& desc)
+IBindableTexture* TextureManager::Impl::CreateTexture3D (const TextureDesc& desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture3D";
 
-    //проверка наличия расширений, необходимых для создания трёхмерной текстуры
+    //проверка возможности создания текстуры
 
-  if (!ext.has_ext_texture3D) //перенести в Texture3D!!!
-    RaiseNotSupported (METHOD_NAME, "3D textures not supported (GL_EXT_texture3D not supported)");
+  if (!extensions->has_ext_texture3d)
+    RaiseNotSupported (METHOD_NAME, "3D textures not supported (GL_ext_texture_3d not supported)");
     
   if (desc.width > max_3d_texture_size || desc.height > max_3d_texture_size || desc.layers > max_3d_texture_size)
   {
-      //уточнить проверку: если layers = 2^n, width , height - not!!!
-    
     RaiseNotSupported (METHOD_NAME, "Can't create 3D texture %ux%ux%u (max_edge_size=%u)", desc.width, desc.height,
                        desc.layers, max_3d_texture_size);
   }
 
   bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height) && is_power_of_two (desc.layers);
 
-  if (!is_pot && !ext.has_arb_texture_non_power_of_two)
+  if (!is_pot && !extensions->has_arb_texture_non_power_of_two)
   {
     RaiseNotSupported (METHOD_NAME, "Can't create 3D texture %ux%ux%u@%s (GL_ARB_texture_non_power_of_two & GL_VERSION_2_0 not supported)",
                        desc.width, desc.height, desc.layers, get_name (desc.format));
   }
+  
+    //создание текстуры
 
-  return new Texture3D (GetContextManager (), desc);
+  return new Texture3D (GetContextManager (), extensions, desc);
 }
 
-ITexture* TextureManager::Impl::CreateTextureCubemap (const TextureDesc& desc)
+IBindableTexture* TextureManager::Impl::CreateTextureCubemap (const TextureDesc& desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTextureCubemap";
   
-  if (!ext.has_arb_texture_cube_map) //перенести в TextureCubemap!!!
+    //проверка возможности создания текстуры
+  
+  if (!extensions->has_arb_texture_cube_map)
     RaiseNotSupported (METHOD_NAME, "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension");
-    
+
   if (desc.width > max_cube_map_texture_size || desc.height > max_cube_map_texture_size)
   {
     RaiseNotSupported (METHOD_NAME, "Can't create cubemap texture %ux%u (max_edge_size=%u)", desc.width, desc.height,
                        max_cube_map_texture_size);
   }
+  
+    //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
 
   bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
 
-  if (is_pot || ext.has_arb_texture_non_power_of_two)
-    return new TextureCubemap (GetContextManager (), desc);
+  if (is_pot || extensions->has_arb_texture_non_power_of_two)
+    return new TextureCubemap (GetContextManager (), extensions, desc);
 
   return new ScaledTexture (texture_manager, desc);  
 }
-  
-ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& desc)
+
+//диспетчеризация создания текстур  
+IBindableTexture* TextureManager::Impl::CreateTexture (const TextureDesc& desc)
 {
-    //добавить общий код замены нулевых размеров дескриптора текстуры на единичные!!!!
-
-    //диспетчеризация создания текстур
-
   switch (desc.dimension)
   {
     case TextureDimension_1D:      return CreateTexture1D (desc);
@@ -378,40 +379,44 @@ void TextureManager::Impl::SetTexture (size_t sampler_slot, ITexture* texture)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::SetTexture";
 
-  if (sampler_slot > texture_units_count - 1)
+  if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't set texture in unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
   
-  binded_textures[sampler_slot] = cast_object <Texture> (*this, texture, METHOD_NAME, "state");
+//  binded_textures [sampler_slot] = cast_object<IBindableTexture> (*this, texture, METHOD_NAME, "state");
+
+    //переделать!!!!!
+
+  binded_textures [sampler_slot] = cast_object<IBindableTexture> (texture, METHOD_NAME, "state");
 }
 
 void TextureManager::Impl::SetSampler (size_t sampler_slot, ISamplerState* state)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::SetSampler";
 
-  if (sampler_slot > texture_units_count - 1)
+  if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't set sampler in unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
 
-  binded_samplers[sampler_slot] = cast_object <SamplerState> (*this, state, METHOD_NAME, "state");
+  binded_samplers [sampler_slot] = cast_object<SamplerState> (*this, state, METHOD_NAME, "state");
 }
 
 ITexture* TextureManager::Impl::GetTexture (size_t sampler_slot) const
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::GetTexture";
 
-  if (sampler_slot > texture_units_count - 1)
+  if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't get texture from unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
 
-  return binded_textures[sampler_slot].get ();
+  return binded_textures [sampler_slot].get ();
 }
 
 ISamplerState* TextureManager::Impl::GetSampler (size_t sampler_slot) const
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::GetSampler";
 
-  if (sampler_slot > texture_units_count - 1)
+  if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't get sampler from unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
 
-  return binded_samplers[sampler_slot].get ();
+  return binded_samplers [sampler_slot].get ();
 }
 
 /*
@@ -439,7 +444,7 @@ void TextureManager::Bind ()
    Создание текстуры и сэмплера
 */
 
-ITexture* TextureManager::CreateTexture (const TextureDesc& tex_desc)
+IBindableTexture* TextureManager::CreateTexture (const TextureDesc& tex_desc)
 {
   return impl->CreateTexture (tex_desc);
 }

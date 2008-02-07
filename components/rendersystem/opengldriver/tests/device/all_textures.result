@@ -1,210 +1,210 @@
 Results of all_textures_test:
 TextureDimension_1D 16x1x1@RGB8  manual-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@RGB8  manual-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@RGB8  auto-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@RGB8  auto-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@RGBA8 manual-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@RGBA8 manual-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@RGBA8 auto-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@RGBA8 auto-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@L8    manual-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@L8    manual-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@L8    auto-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@L8    auto-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@A8    manual-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@A8    manual-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@A8    auto-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@A8    auto-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@LA8   manual-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@LA8   manual-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@LA8   auto-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@LA8   auto-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@DXT1  manual-mips:
 FAIL
-Exception: '1D texture can't be compressed.
+Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 12x1x1@DXT1  manual-mips:
 FAIL
-Exception: '1D texture can't be compressed.
+Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 16x1x1@DXT3  manual-mips:
 FAIL
-Exception: '1D texture can't be compressed.
+Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 12x1x1@DXT3  manual-mips:
 FAIL
-Exception: '1D texture can't be compressed.
+Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 16x1x1@DXT5  manual-mips:
 FAIL
-Exception: '1D texture can't be compressed.
+Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 12x1x1@DXT5  manual-mips:
 FAIL
-Exception: '1D texture can't be compressed.
+Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 16x1x1@D16   manual-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@D16   manual-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@D16   auto-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@D16   auto-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@D24X8 manual-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@D24X8 manual-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@D24X8 auto-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@D24X8 auto-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@D24S8 manual-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@D24S8 manual-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 12x1x1@D24S8 auto-mips:
   layer 0, mip 0, width = 12, height = 1: Ok
-  layer 0, mip 1, width = 6, height = 0: Ok
-  layer 0, mip 2, width = 3, height = 0: Ok
-  layer 0, mip 3, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 6, height = 1: Ok
+  layer 0, mip 2, width = 3, height = 1: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@D24S8 auto-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
-  layer 0, mip 1, width = 8, height = 0: Ok
-  layer 0, mip 2, width = 4, height = 0: Ok
-  layer 0, mip 3, width = 2, height = 0: Ok
-  layer 0, mip 4, width = 1, height = 0: Ok
+  layer 0, mip 1, width = 8, height = 1: Ok
+  layer 0, mip 2, width = 4, height = 1: Ok
+  layer 0, mip 3, width = 2, height = 1: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_1D 16x1x1@S8    manual-mips:
 FAIL
 Exception: 'Stencil textures not supported
@@ -340,22 +340,34 @@ TextureDimension_2D 16x16x1@DXT1  manual-mips:
   layer 0, mip 1, width = 8, height = 8: Ok
   layer 0, mip 2, width = 4, height = 4: Ok
 TextureDimension_2D 12x12x1@DXT1  manual-mips:
-  layer 0, mip 0, width = 12, height = 12: Ok
-  layer 0, mip 1, width = 4, height = 4: Ok
+  layer 0, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 0, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
 TextureDimension_2D 16x16x1@DXT3  manual-mips:
   layer 0, mip 0, width = 16, height = 16: Ok
   layer 0, mip 1, width = 8, height = 8: Ok
   layer 0, mip 2, width = 4, height = 4: Ok
 TextureDimension_2D 12x12x1@DXT3  manual-mips:
-  layer 0, mip 0, width = 12, height = 12: Ok
-  layer 0, mip 1, width = 4, height = 4: Ok
+  layer 0, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 0, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
 TextureDimension_2D 16x16x1@DXT5  manual-mips:
   layer 0, mip 0, width = 16, height = 16: Ok
   layer 0, mip 1, width = 8, height = 8: Ok
   layer 0, mip 2, width = 4, height = 4: Ok
 TextureDimension_2D 12x12x1@DXT5  manual-mips:
-  layer 0, mip 0, width = 12, height = 12: Ok
-  layer 0, mip 1, width = 4, height = 4: Ok
+  layer 0, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 0, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
 TextureDimension_2D 16x16x1@D16   manual-mips:
   layer 0, mip 0, width = 16, height = 16: Ok
   layer 0, mip 1, width = 8, height = 8: Ok
@@ -401,27 +413,29 @@ TextureDimension_2D 16x16x1@D24X8 auto-mips:
   layer 0, mip 3, width = 2, height = 2: Ok
   layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_2D 16x16x1@D24S8 manual-mips:
-  layer 0, mip 0, width = 16, height = 16: Ok
-  layer 0, mip 1, width = 8, height = 8: Ok
-  layer 0, mip 2, width = 4, height = 4: Ok
-  layer 0, mip 3, width = 2, height = 2: Ok
-  layer 0, mip 4, width = 1, height = 1: Ok
+FAIL
+Exception: 'Unknown gl_format=88f0
+    at render::low_level::get_pixel_format
+    at render::low_level::opengl::Texture2D::Texture2D
+    at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_2D 12x12x1@D24S8 manual-mips:
-  layer 0, mip 0, width = 12, height = 12: Ok
-  layer 0, mip 1, width = 6, height = 6: Ok
-  layer 0, mip 2, width = 3, height = 3: Ok
-  layer 0, mip 3, width = 1, height = 1: Ok
+FAIL
+Exception: 'Unknown gl_format=88f0
+    at render::low_level::get_pixel_format
+    at render::low_level::opengl::Texture2D::Texture2D
+    at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_2D 12x12x1@D24S8 auto-mips:
-  layer 0, mip 0, width = 12, height = 12: Ok
-  layer 0, mip 1, width = 6, height = 6: Ok
-  layer 0, mip 2, width = 3, height = 3: Ok
-  layer 0, mip 3, width = 1, height = 1: Ok
+FAIL
+Exception: 'Unknown gl_format=88f0
+    at render::low_level::get_pixel_format
+    at render::low_level::opengl::Texture2D::Texture2D
+    at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_2D 16x16x1@D24S8 auto-mips:
-  layer 0, mip 0, width = 16, height = 16: Ok
-  layer 0, mip 1, width = 8, height = 8: Ok
-  layer 0, mip 2, width = 4, height = 4: Ok
-  layer 0, mip 3, width = 2, height = 2: Ok
-  layer 0, mip 4, width = 1, height = 1: Ok
+FAIL
+Exception: 'Unknown gl_format=88f0
+    at render::low_level::get_pixel_format
+    at render::low_level::opengl::Texture2D::Texture2D
+    at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_2D 16x16x1@S8    manual-mips:
 FAIL
 Exception: 'Stencil textures not supported
@@ -1322,18 +1336,42 @@ TextureDimension_Cubemap 16x16x6@DXT1  manual-mips:
   layer 5, mip 1, width = 8, height = 8: Ok
   layer 5, mip 2, width = 4, height = 4: Ok
 TextureDimension_Cubemap 12x12x6@DXT1  manual-mips:
-  layer 0, mip 0, width = 12, height = 12: Ok
-  layer 0, mip 1, width = 4, height = 4: Ok
-  layer 1, mip 0, width = 12, height = 12: Ok
-  layer 1, mip 1, width = 4, height = 4: Ok
-  layer 2, mip 0, width = 12, height = 12: Ok
-  layer 2, mip 1, width = 4, height = 4: Ok
-  layer 3, mip 0, width = 12, height = 12: Ok
-  layer 3, mip 1, width = 4, height = 4: Ok
-  layer 4, mip 0, width = 12, height = 12: Ok
-  layer 4, mip 1, width = 4, height = 4: Ok
-  layer 5, mip 0, width = 12, height = 12: Ok
-  layer 5, mip 1, width = 4, height = 4: Ok
+  layer 0, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 0, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 1, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 1, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 2, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 2, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 3, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 3, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 4, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 4, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 5, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
+  layer 5, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT1 mismatch with texture format PixelFormat_RGB8
+    at render::low_level::opengl::Texture::GetData'
 TextureDimension_Cubemap 16x16x6@DXT3  manual-mips:
   layer 0, mip 0, width = 16, height = 16: Ok
   layer 0, mip 1, width = 8, height = 8: Ok
@@ -1354,18 +1392,42 @@ TextureDimension_Cubemap 16x16x6@DXT3  manual-mips:
   layer 5, mip 1, width = 8, height = 8: Ok
   layer 5, mip 2, width = 4, height = 4: Ok
 TextureDimension_Cubemap 12x12x6@DXT3  manual-mips:
-  layer 0, mip 0, width = 12, height = 12: Ok
-  layer 0, mip 1, width = 4, height = 4: Ok
-  layer 1, mip 0, width = 12, height = 12: Ok
-  layer 1, mip 1, width = 4, height = 4: Ok
-  layer 2, mip 0, width = 12, height = 12: Ok
-  layer 2, mip 1, width = 4, height = 4: Ok
-  layer 3, mip 0, width = 12, height = 12: Ok
-  layer 3, mip 1, width = 4, height = 4: Ok
-  layer 4, mip 0, width = 12, height = 12: Ok
-  layer 4, mip 1, width = 4, height = 4: Ok
-  layer 5, mip 0, width = 12, height = 12: Ok
-  layer 5, mip 1, width = 4, height = 4: Ok
+  layer 0, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 0, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 1, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 1, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 2, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 2, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 3, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 3, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 4, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 4, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 5, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 5, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT3 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
 TextureDimension_Cubemap 16x16x6@DXT5  manual-mips:
   layer 0, mip 0, width = 16, height = 16: Ok
   layer 0, mip 1, width = 8, height = 8: Ok
@@ -1386,76 +1448,100 @@ TextureDimension_Cubemap 16x16x6@DXT5  manual-mips:
   layer 5, mip 1, width = 8, height = 8: Ok
   layer 5, mip 2, width = 4, height = 4: Ok
 TextureDimension_Cubemap 12x12x6@DXT5  manual-mips:
-  layer 0, mip 0, width = 12, height = 12: Ok
-  layer 0, mip 1, width = 4, height = 4: Ok
-  layer 1, mip 0, width = 12, height = 12: Ok
-  layer 1, mip 1, width = 4, height = 4: Ok
-  layer 2, mip 0, width = 12, height = 12: Ok
-  layer 2, mip 1, width = 4, height = 4: Ok
-  layer 3, mip 0, width = 12, height = 12: Ok
-  layer 3, mip 1, width = 4, height = 4: Ok
-  layer 4, mip 0, width = 12, height = 12: Ok
-  layer 4, mip 1, width = 4, height = 4: Ok
-  layer 5, mip 0, width = 12, height = 12: Ok
-  layer 5, mip 1, width = 4, height = 4: Ok
+  layer 0, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 0, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 1, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 1, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 2, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 2, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 3, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 3, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 4, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 4, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 5, mip 0, width = 12, height = 12: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
+  layer 5, mip 1, width = 4, height = 4: FAIL
+Exception: 'Can't get compressed texture data, target format PixelFormat_DXT5 mismatch with texture format PixelFormat_RGBA8
+    at render::low_level::opengl::Texture::GetData'
 TextureDimension_Cubemap 16x16x6@D16   manual-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D16   manual-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D16   auto-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@D16   auto-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@D24X8 manual-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D24X8 manual-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D24X8 auto-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@D24X8 auto-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@D24S8 manual-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D24S8 manual-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D24S8 auto-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@D24S8 auto-mips:
 FAIL
-Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1d or 2d
+Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@S8    manual-mips:
@@ -1490,7 +1576,7 @@ DXT3 |   -     +     -     +
 DXT5 |   -     +     -     +   
 D16  |   +     +     -     -   
 D24X8|   +     +     -     -   
-D24S8|   +     +     -     -   
+D24S8|   +     -     -     -   
 S8   |   -     -     -     -   
 *************************************
 Status table for power of two textures with auto-mips:
@@ -1505,7 +1591,7 @@ DXT3 |   -     -     -     -
 DXT5 |   -     -     -     -   
 D16  |   +     +     -     -   
 D24X8|   +     +     -     -   
-D24S8|   +     +     -     -   
+D24S8|   +     -     -     -   
 S8   |   -     -     -     -   
 *************************************
 Status table for non power of two textures with manual-mips:
@@ -1515,12 +1601,12 @@ RGBA8|   +     +     +     +
 L8   |   +     +     +     +   
 A8   |   +     +     +     +   
 LA8  |   +     +     +     +   
-DXT1 |   -     +     -     +   
-DXT3 |   -     +     -     +   
-DXT5 |   -     +     -     +   
+DXT1 |   -     -     -     -   
+DXT3 |   -     -     -     -   
+DXT5 |   -     -     -     -   
 D16  |   +     +     -     -   
 D24X8|   +     +     -     -   
-D24S8|   +     +     -     -   
+D24S8|   +     -     -     -   
 S8   |   -     -     -     -   
 *************************************
 Status table for non power of two textures with auto-mips:
@@ -1535,6 +1621,6 @@ DXT3 |   -     -     -     -
 DXT5 |   -     -     -     -   
 D16  |   +     +     -     -   
 D24X8|   +     +     -     -   
-D24S8|   +     +     -     -   
+D24S8|   +     -     -     -   
 S8   |   -     -     -     -   
 *************************************

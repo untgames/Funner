@@ -8,20 +8,18 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDesc& tex_desc)
-  : Texture (manager, tex_desc, GL_TEXTURE_CUBE_MAP_ARB)
+TextureCubemap::TextureCubemap  (const ContextManager& manager, const ExtensionsPtr& extensions, const TextureDesc& tex_desc)
+  : Texture (manager, extensions, tex_desc, GL_TEXTURE_CUBE_MAP_ARB, get_mips_count (tex_desc.width, tex_desc.height))
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureCubemap::TextureCubemap";
   
     //установка текстуры в контекст OpenGL
 
   Bind ();
-
-  TextureExtensions ext (GetContextManager ());
   
     //проверка корректности дескриптора текстуры
 
-  if (is_depth_format (tex_desc.format))
+  if (is_depth_stencil (tex_desc.format))
     RaiseNotSupported (METHOD_NAME, "Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D");
 
   if (tex_desc.layers != 6)
@@ -32,9 +30,10 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
      //преобразование формата пикселей
 
-  GLenum gl_internal_format = ext.has_ext_texture_compression_s3tc ? opengl::gl_internal_format (tex_desc.format) : unpack_internal_format (tex_desc.format),
-         gl_format          = unpack_format (tex_desc.format),
-         gl_type            = unpack_type (tex_desc.format);
+  GLenum gl_internal_format = GetExtensions ().has_ext_texture_compression_s3tc ? get_gl_internal_format (tex_desc.format) :
+                              get_uncompressed_gl_internal_format (tex_desc.format),
+         gl_format          = get_uncompressed_gl_format (tex_desc.format),
+         gl_type            = get_uncompressed_gl_type (tex_desc.format);
 
     //проверка возможности создания текстуры
 
@@ -52,7 +51,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
   
     //создание mip-уровней
     
-  for (size_t i=0; i<mips_count; i++)
+  for (size_t i=0; i<GetMipsCount (); i++)
   {
     MipLevelDesc level_desc;
 
@@ -71,7 +70,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
    
   try
   {
-    desc.format = get_pixel_format (gl_internal_format);
+    SetFormat (get_pixel_format (gl_internal_format));
   }
   catch (common::Exception& e)
   {
@@ -79,11 +78,6 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
     throw;
   }
-
-    //настройка режима генерации mip-уровней
-
-  if (tex_desc.generate_mips_enable && ext.has_sgis_generate_mipmap)
-    glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, true);
 
     //проверка ошибок
 

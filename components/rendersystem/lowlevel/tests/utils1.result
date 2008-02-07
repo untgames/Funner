@@ -1,0 +1,13 @@
+Results of utils1_test:
+104@PixelFormat_RGB8: size=192 uncompressed_size=192
+104@PixelFormat_RGBA8: size=256 uncompressed_size=256
+104@PixelFormat_L8: size=64 uncompressed_size=64
+104@PixelFormat_A8: size=64 uncompressed_size=64
+104@PixelFormat_LA8: size=128 uncompressed_size=128
+104@PixelFormat_DXT1: size=32 uncompressed_size=192
+104@PixelFormat_DXT3: size=64 uncompressed_size=256
+104@PixelFormat_DXT5: size=64 uncompressed_size=256
+104@PixelFormat_D16: size=128 uncompressed_size=128
+104@PixelFormat_D24X8: size=256 uncompressed_size=256
+104@PixelFormat_D24S8: size=256 uncompressed_size=256
+104@PixelFormat_S8: size=64 uncompressed_size=64

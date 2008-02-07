@@ -8,6 +8,7 @@
 #include <xtl/trackable_ptr.h>
 #include <xtl/uninitialized_storage.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/shared_ptr.h>
 
 #include <render/low_level/utils.h>
 
@@ -36,66 +37,73 @@ enum OpenGLTextureTarget
   OpenGLTextureTarget_Num
 };
 
-///////переместить в исходники!!!
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Расширения, поддерживаемые менеджером текстур
+///////////////////////////////////////////////////////////////////////////////////////////////////
 struct TextureExtensions
-{
-  bool has_arb_texture_compression;      //GL_ARB_texture_compression
+{  
   bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
-  bool has_sgis_generate_mipmap;         //GL_SGIS_generate_mipmap
-  
-  TextureExtensions (const ContextManager& manager)
-  {
-    static Extension SGIS_generate_mipmap         = "GL_SGIS_generate_mipmap",
-                     EXT_texture_compression_s3tc = "GL_EXT_texture_compression_s3tc",
-                     ARB_texture_compression      = "GL_ARB_texture_compression",
-                     Version_1_3                  = "GL_VERSION_1_3",
-                     Version_1_4                  = "GL_VERSION_1_4";
-      
-    has_arb_texture_compression      = manager.IsSupported (ARB_texture_compression);
-    has_ext_texture_compression_s3tc = (has_arb_texture_compression || manager.IsSupported (Version_1_3)) && manager.IsSupported (EXT_texture_compression_s3tc);
-    has_sgis_generate_mipmap         = (manager.IsSupported (SGIS_generate_mipmap) || manager.IsSupported (Version_1_4));
-  }
+  bool has_sgis_generate_mipmap;         //GL_SGIS_generate_mipmap  
+  bool has_ext_texture_rectangle;        //GL_EXT_texture_rectangle
+  bool has_ext_texture3d;                //GL_EXT_texture3D
+  bool has_ext_packed_depth_stencil;     //GL_EXT_packed_depth_stencil
+  bool has_arb_multitexture;             //GL_ARB_multitexture
+  bool has_arb_texture_cube_map;         //GL_ARB_texture_cubemap
+  bool has_arb_texture_non_power_of_two; //GL_ARB_texture_non_power_of_two
+  bool has_arb_depth_texture;            //GL_ARB_depth_texture
+
+  TextureExtensions (const ContextManager&);
 };
 
+typedef xtl::shared_ptr<TextureExtensions> ExtensionsPtr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дескриптор слоя текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
 struct LayerDesc
 {
-  GLenum target;
-  size_t new_index;
+  GLenum target;    //тип текстуры
+  size_t new_index; //индекс слоя в образе получаемом посредством glGetTexImage
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дескриптор mip-уровня текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
 struct MipLevelDesc
 {
-  size_t width, height;
+  size_t width, height; //ширина / высота изображения на уровне
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовый класс реализации текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Texture : virtual public IBindableTexture, public ContextObject
+class Texture: virtual public IBindableTexture, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Texture  (const ContextManager&, const TextureDesc&, GLenum target);
+    Texture  (const ContextManager&, const ExtensionsPtr& extensions, const TextureDesc& desc, GLenum target, size_t mips_count);
     ~Texture ();
-
+    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void GetDesc (TextureDesc&);
     void GetDesc (BindableTextureDesc&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Выбор текстуры в контекст OpenGL
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (); //????????????
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение идентификатора и типа текстуры
+///Получение информации о текстуре
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    GLenum GetTarget    () const { return target; }
-    GLuint GetTextureId () const { return texture_id; }
+    GLenum      GetTarget    () const { return target; }     //получение типа текстуры
+    GLuint      GetTextureId () const { return texture_id; } //получение идентификатора текстуры
+    size_t      GetMipsCount () const { return mips_count; }  //получение количества mip-уровней
+    PixelFormat GetFormat    () const { return desc.format; } //получение формата текстуры
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка текстуры в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Bind ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
@@ -108,6 +116,16 @@ class Texture : virtual public IBindableTexture, public ContextObject
 ///Получение дескриптора mip-уровня текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void GetMipLevelDesc (size_t level, MipLevelDesc& desc);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поддерживаемые расширения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const TextureExtensions& GetExtensions () const { return *extensions; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение формата текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetFormat (PixelFormat);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,23 +134,24 @@ class Texture : virtual public IBindableTexture, public ContextObject
     virtual void GetLayerDesc (size_t layer, LayerDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка данных  --- сделать чисто-виртуальными!!!
+///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
-                                      GLenum format, GLenum type, const void* buffer);
+                                      GLenum format, GLenum type, const void* buffer) = 0;
     virtual void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
-                                    GLenum format, size_t buffer_size, const void* buffer);
+                                    GLenum format, size_t buffer_size, const void* buffer) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Генерация mip-уровней
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void BuildMipmaps (size_t x, size_t y, size_t z, size_t width, size_t height, PixelFormat format, const void* data);
-
-  public: //???!!!private!!!
-    GLenum      target;      //целевой тип текстуры
-    GLuint      texture_id;  //идентификатор текстуры
-    TextureDesc desc;        //дескриптор текстуры
-    size_t      mips_count;  //количество мип-уровней
+    
+  private:
+    GLenum        target;      //тип текстуры
+    GLuint        texture_id;  //идентификатор текстуры
+    TextureDesc   desc;        //дескриптор текстуры    
+    size_t        mips_count;  //количество мип-уровней
+    ExtensionsPtr extensions;  //поддерживаемые расширения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +163,7 @@ class Texture1D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Texture1D (const ContextManager&, const TextureDesc& texture_desc);
+    Texture1D (const ContextManager&, const ExtensionsPtr& extensions, const TextureDesc& texture_desc);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,7 +184,7 @@ class Texture2D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Texture2D (const ContextManager&, const TextureDesc&);
+    Texture2D (const ContextManager&, const ExtensionsPtr& extensions, const TextureDesc&);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,13 +199,13 @@ class Texture2D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текстура со сторонами не степени 2, работающая через расширение GL_EXT_texture_rectangle
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class TextureNPOT : public Texture
+class TextureNpot : public Texture
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TextureNPOT (const ContextManager&, const TextureDesc& texture_desc);
+    TextureNpot (const ContextManager&, const ExtensionsPtr& extensions, const TextureDesc& texture_desc);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,7 +226,12 @@ class Texture3D : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Texture3D (const ContextManager&, const TextureDesc&);
+    Texture3D (const ContextManager&, const ExtensionsPtr& extensions, const TextureDesc&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с данными
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,7 +252,7 @@ class TextureCubemap : public Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TextureCubemap (const ContextManager&, const TextureDesc&);
+    TextureCubemap (const ContextManager&, const ExtensionsPtr& extensions, const TextureDesc&);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,6 +287,11 @@ class ScaledTexture: virtual public IBindableTexture, public Object
     void GetDesc (BindableTextureDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка текстуры в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Bind ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
@@ -272,11 +301,12 @@ class ScaledTexture: virtual public IBindableTexture, public Object
     typedef xtl::com_ptr<IBindableTexture> TexturePtr;
 
   private:
-    TexturePtr shadow_texture;   //теневая текстура, со сторонами кратными степени двойки
-    size_t     original_width;   //ширина оригинальной текстуры
-    size_t     original_height;  //высота оригинальной текстуры
-    float      horisontal_scale; //коэффициент растяжения по горизонтали
-    float      vertical_scale;   //коэффициент растяжения по вертикали
+    TexturePtr    shadow_texture;   //теневая текстура, со сторонами кратными степени двойки
+    size_t        original_width;   //ширина оригинальной текстуры
+    size_t        original_height;  //высота оригинальной текстуры
+    float         horisontal_scale; //коэффициент растяжения по горизонтали
+    float         vertical_scale;   //коэффициент растяжения по вертикали
+    ExtensionsPtr extensions;       //поддерживаемые расширения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,7 +318,7 @@ class SamplerState : virtual public ISamplerState, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SamplerState (const ContextManager& manager, const SamplerDesc& in_desc);
+    SamplerState (const ContextManager& manager, const SamplerDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выбор сэмплера в контекст OpenGL
@@ -298,55 +328,42 @@ class SamplerState : virtual public ISamplerState, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение/получение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDesc (const SamplerDesc& in_desc);
-    void GetDesc (SamplerDesc& target_desc)   {target_desc = desc;}
+    void SetDesc (const SamplerDesc&);
+    void GetDesc (SamplerDesc&);
 
   private:
-    SamplerDesc desc;
+    SamplerDesc desc;           //дескриптор сэмплера
     int         display_list;   //номер первого списка команд конфигурации OpenGL (всего списков OpenGLTextureTarget_Num)
     size_t      max_anisotropy; //максимально возможная степень анизотропии
 };
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-size_t next_higher_power_of_two (size_t size); //получение ближайшей сверху степени двойки
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение параметров текстуры
-///////////////////////////////////////////////////////////////////////////////////////////////////
-size_t texel_size           (PixelFormat format);          //размер текселя в байтах
-GLint  gl_internal_format   (PixelFormat format);          //внутренний формат OpenGL
-GLenum gl_format            (PixelFormat format);          //формат OpenGL
-GLenum gl_type              (PixelFormat format);          //тип OpenGL
-bool   is_compressed_format (PixelFormat format);          //является ли формат сжатым
-bool   is_depth_format      (PixelFormat format);          //является ли форматом глубины
-size_t compressed_quad_size (PixelFormat format);          //размер блока сжатых пикселей 4*4 в байтах
-size_t get_mips_count       (size_t size);                 //получение количества mip-уровней
-size_t get_mips_count       (size_t width, size_t height); //получение количества mip-уровней
+size_t      get_next_higher_power_of_two        (size_t size);        //получение ближайшей сверху степени двойки
+GLint       get_gl_internal_format              (PixelFormat format); //внутренний формат OpenGL
+GLenum      get_gl_format                       (PixelFormat format); //формат OpenGL
+GLenum      get_gl_type                         (PixelFormat format); //тип OpenGL
+GLenum      get_uncompressed_gl_internal_format (PixelFormat format); //распакованный внутренний формат OpenGL
+GLenum      get_uncompressed_gl_format          (PixelFormat format); //распакованный формат OpenGL
+GLenum      get_uncompressed_gl_type            (PixelFormat format); //распакованный тип OpenGL
+PixelFormat get_pixel_format                    (GLenum gl_format);   //эквивалент внутреннего формата OpenGL
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Масштабирование текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef void (*SetTexDataFn)(size_t mip_level, size_t x, size_t y, size_t z, size_t width, size_t height, GLenum format, GLenum type, const void* data);
-
 void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest);
 void scale_image         (PixelFormat format, size_t width, size_t height, size_t new_width, size_t new_height, const void* src, void* dest);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с DXT форматом при остутствии аппаратной поддержки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void   unpack_dxt (PixelFormat format, size_t width, size_t height, const void* dxt_data, void* unpacked_data); //распаковка dxt
-GLint  unpack_internal_format (PixelFormat format);                                                             //распакованный внутренний формат OpenGL
-GLenum unpack_type            (PixelFormat format);                                                             //распакованный тип OpenGL
-size_t unpack_texel_size      (PixelFormat format);                                                             //размер распакованного текселя в байтах
-GLenum unpack_format          (PixelFormat format);                                                             //распакованный формат OpenGL
-PixelFormat unpack_pf         (PixelFormat format);                                                             //распакованный формат
+void unpack_dxt (PixelFormat format, size_t width, size_t height, const void* dxt_data, void* unpacked_data);
 
-PixelFormat get_pixel_format (GLenum gl_format);
-
-size_t get_compressed_image_size (PixelFormat format, size_t width, size_t height);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Копирование изображений различных форматов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void copy_image (size_t pixels_count, PixelFormat src_format, const void* src_buffer, PixelFormat dst_format, void* dst_buffer);
 
 }
 

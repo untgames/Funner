@@ -16,34 +16,13 @@ Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char* init_stri
     rasterizer_stage (context_manager),
     texture_manager (context_manager)
 {  
-    //установка текущего контекста
-
-  context_manager.MakeContextCurrent ();
-
     //получение информации об устройстве отрисовки
-    
-  properties.AddProperty ("init_string", init_string);
-  properties.AddProperty ("vendor",      reinterpret_cast<const char*> (glGetString (GL_VENDOR)));
-  properties.AddProperty ("renderer",    reinterpret_cast<const char*> (glGetString (GL_RENDERER)));
-  properties.AddProperty ("gl_version",  reinterpret_cast<const char*> (glGetString (GL_VERSION)));
-  
-    //получение списка расширений
-    
-  const char* swap_chain_extension_string = context_manager.GetSwapChainsExtensionString ();
-  
-  stl::string extension_string = reinterpret_cast<const char*> (glGetString (GL_EXTENSIONS));
-  
-  if (*swap_chain_extension_string)
-  {
-    extension_string += ' ';
-    extension_string += swap_chain_extension_string;
-  }
-  
-  properties.AddProperty ("gl_extensions", extension_string.c_str ());
 
-    //проверка состояния контекста OpenGL
-
-  context_manager.CheckErrors ("render::low_level::opengl::Device::Device");
+  properties.AddProperty ("init_string",   init_string);
+  properties.AddProperty ("gl_vendor",     context_manager.GetVendor ());
+  properties.AddProperty ("gl_renderer",   context_manager.GetRenderer ());
+  properties.AddProperty ("gl_version",    context_manager.GetVersion ());
+  properties.AddProperty ("gl_extensions", context_manager.GetExtensions ());
 }
 
 Device::~Device ()

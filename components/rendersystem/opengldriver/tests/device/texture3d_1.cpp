@@ -1,5 +1,4 @@
 #include "shared.h"
-#include <common/hash.h>
 
 using namespace common;
 

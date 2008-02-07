@@ -20,6 +20,7 @@
 #include <xtl/uninitialized_storage.h>
 
 #include <common/exception.h>
+#include <common/hash.h>
 
 #include <media/image.h> //??!!!!
 

@@ -9,10 +9,10 @@ int main ()
   try
   {
     Test test (L"OpenGL device test window (scaled_texture_test)", "max_version=1.1 disable=*");
-    
-//    media::Image src_image ("pic2.tga");
-    media::Image src_image ("data/pic1.jpg");
-    
+
+    media::Image src_image ("data/pic2.tga", media::PixelFormat_RGB8);
+//    media::Image src_image ("data/pic1.jpg");
+
     size_t tex_width  = src_image.Width (),
            tex_height = src_image.Height ();
 

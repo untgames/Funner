@@ -44,10 +44,13 @@ class ContextImpl: public xtl::reference_counter
       //получение флагов поддержки исключений
           ExtensionSet& GetExtensions ()       { return extensions; }      
     const ExtensionSet& GetExtensions () const { return extensions; }
-    
-      //получение версии OpenGL
-    const char* GetVersion () const { return version.c_str (); }
-       
+
+      //получение информации о реализации OpenGL
+    const char* GetExtensionsString () const { return extensions_string.c_str (); }
+    const char* GetVersionString    () const { return version_string.c_str (); }
+    const char* GetVendorString     () const { return vendor_string.c_str (); }
+    const char* GetRendererString   () const { return renderer_string.c_str (); }
+
       //установка локальных данных
     void SetContextData (ContextDataTable table_id, size_t element_id, size_t value)
     {
@@ -108,9 +111,26 @@ class ContextImpl: public xtl::reference_counter
         
           //определение поддержки расширений        
 
-        const char* supported_extensions = reinterpret_cast<const char*> (glGetString (GL_EXTENSIONS));
+        extensions_string = reinterpret_cast<const char*> (glGetString (GL_EXTENSIONS));
+        version_string    = reinterpret_cast<const char*> (glGetString (GL_VERSION));
+        vendor_string     = reinterpret_cast<const char*> (glGetString (GL_VENDOR));
+        renderer_string   = reinterpret_cast<const char*> (glGetString (GL_RENDERER));        
 
-        extensions.SetGroup (supported_extensions, true);
+        const char* swap_chain_extension_string = Context::GetSwapChainExtensionString ();
+
+        if (*swap_chain_extension_string)
+        {
+          extensions_string += ' ';
+          extensions_string += swap_chain_extension_string;
+        }
+        
+          //определение багов работы OpenGL
+          
+        detect_opengl_bugs (extensions_string);
+        
+          //установка флагов поддержки расширений
+
+        extensions.SetGroup (extensions_string.c_str (), true);
 
           //определение поддержки версий
           
@@ -125,12 +145,6 @@ class ContextImpl: public xtl::reference_counter
         extensions.Set (Version_1_5, GLEW_VERSION_1_5 != 0);
         extensions.Set (Version_2_0, GLEW_VERSION_2_0 != 0);
         extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);
-        
-        version = reinterpret_cast<const char*> (glGetString (GL_VERSION));
-        
-          //инициализация состояния OpenGL
-          
-         init_opengl_state ();
       }
       catch (common::Exception& exception)
       {
@@ -148,8 +162,11 @@ class ContextImpl: public xtl::reference_counter
     Context       context;           //контекст OpenGL
     SwapChainPtr  master_swap_chain; //главная цепочка обмена, связанная с контекстом
     ExtensionSet  extensions;        //флаги поддерживаемых исключений
-    stl::string   version;           //получение версии OpenGL
-    ContextData   data;              //локальные данные контекста 
+    stl::string   extensions_string; //строка поддерживаемых расширений
+    stl::string   version_string;    //версия OpenGL
+    stl::string   vendor_string;     //производитель реализации OpenGL
+    stl::string   renderer_string;   //имя устройства отрисовки OpenGL
+    ContextData   data;              //локальные данные контекста
 };
 
 }
@@ -207,10 +224,10 @@ struct ContextManager::Impl: public xtl::reference_counter
             get_extension_name (id));
         }
         
-      if (!min_version.empty () && strcmp (new_context->GetVersion (), min_version.c_str ()) < 0)
+      if (!min_version.empty () && strcmp (new_context->GetVersionString (), min_version.c_str ()) < 0)
       {
         RaiseNotSupported (METHOD_NAME, "Could not create new context. Reason: OpenGL version '%s' not supported "
-          "(version='%s')", min_version.c_str (), new_context->GetVersion ());
+          "(version='%s')", min_version.c_str (), new_context->GetVersionString ());
       }
 
       if (!max_version.empty ())
@@ -695,14 +712,39 @@ void ContextManager::ClearContextData ()
 }
 
 /*
-    Получение строки со списком расширений, зависящих от активной цепочки обмена
+    Получение информации о текущей реализации OpenGL
 */
 
-const char* ContextManager::GetSwapChainsExtensionString () const
+const char* ContextManager::GetExtensions () const
 {
-  impl->MakeContextCurrent (false);
+  if (!impl->GetContext ())
+    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::GetExtensions", "Null active context");
+    
+  return impl->GetContext ()->GetExtensionsString ();
+}
 
-  return Context::GetSwapChainExtensionString ();
+const char* ContextManager::GetVersion () const
+{
+  if (!impl->GetContext ())
+    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::GetVersion", "Null active context");
+    
+  return impl->GetContext ()->GetVersionString ();
+}
+
+const char* ContextManager::GetVendor () const
+{
+  if (!impl->GetContext ())
+    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::GetVendor", "Null active context");
+
+  return impl->GetContext ()->GetVendorString ();
+}
+
+const char* ContextManager::GetRenderer () const
+{
+  if (!impl->GetContext ())
+    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::GetRenderer", "Null active context");
+
+  return impl->GetContext ()->GetRendererString ();
 }
 
 /*

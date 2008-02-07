@@ -1,0 +1,13 @@
+Results of utils2_test:
+PixelFormat_RGB8: is_compressed=0 is_uncompressed=1 is_depth_stencil=0 is_color=1
+PixelFormat_RGBA8: is_compressed=0 is_uncompressed=1 is_depth_stencil=0 is_color=1
+PixelFormat_L8: is_compressed=0 is_uncompressed=1 is_depth_stencil=0 is_color=1
+PixelFormat_A8: is_compressed=0 is_uncompressed=1 is_depth_stencil=0 is_color=1
+PixelFormat_LA8: is_compressed=0 is_uncompressed=1 is_depth_stencil=0 is_color=1
+PixelFormat_DXT1: is_compressed=1 is_uncompressed=0 is_depth_stencil=0 is_color=1
+PixelFormat_DXT3: is_compressed=1 is_uncompressed=0 is_depth_stencil=0 is_color=1
+PixelFormat_DXT5: is_compressed=1 is_uncompressed=0 is_depth_stencil=0 is_color=1
+PixelFormat_D16: is_compressed=0 is_uncompressed=1 is_depth_stencil=1 is_color=0
+PixelFormat_D24X8: is_compressed=0 is_uncompressed=1 is_depth_stencil=1 is_color=0
+PixelFormat_D24S8: is_compressed=0 is_uncompressed=1 is_depth_stencil=1 is_color=0
+PixelFormat_S8: is_compressed=0 is_uncompressed=1 is_depth_stencil=1 is_color=0

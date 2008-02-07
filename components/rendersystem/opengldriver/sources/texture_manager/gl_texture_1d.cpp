@@ -8,14 +8,9 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_desc)
-  : Texture (manager, tex_desc, GL_TEXTURE_1D)
+Texture1D::Texture1D  (const ContextManager& manager, const ExtensionsPtr& extensions, const TextureDesc& tex_desc)
+  : Texture (manager, extensions, tex_desc, GL_TEXTURE_1D, get_mips_count (tex_desc.width))
 {
-    //игнорирование неиспользуемых размеров
-
-  desc.height = 1;
-  desc.layers = 1;
-
   const char* METHOD_NAME = "render::low_level::opengl::Texture1D::Texture1D";
   
     //установка текстуры в контекст OpenGL
@@ -24,12 +19,12 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
   
     //преобразование формата пикселей
 
-  if (is_compressed_format (tex_desc.format))
+  if (is_compressed (tex_desc.format))
     RaiseNotSupported (METHOD_NAME, "1D texture can't be compressed");
 
-  GLenum gl_internal_format = opengl::gl_internal_format (tex_desc.format),
-         gl_format          = opengl::gl_format (tex_desc.format),
-         gl_type            = opengl::gl_type (tex_desc.format);  
+  GLenum gl_internal_format = get_gl_internal_format (tex_desc.format),
+         gl_format          = get_gl_format (tex_desc.format),
+         gl_type            = get_gl_type (tex_desc.format);  
   
     //проверка возможности создания текстуры
 
@@ -44,18 +39,8 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
 
     //создание текстуры
 
-  for (size_t i=0; i<mips_count; i++)
+  for (size_t i=0; i<GetMipsCount (); i++)
     glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, tex_desc.width >> i, 0, gl_format, gl_type, 0);
-    
-    //настройка режима генерации mip-уровней
-    
-  static Extension SGIS_generate_mipmap = "GL_SGIS_generate_mipmap",
-                   Version_1_4          = "GL_VERSION_1_4";
-
-  bool has_SGIS_generate_mipmap = IsSupported (SGIS_generate_mipmap) || IsSupported (Version_1_4);  
-
-  if (tex_desc.generate_mips_enable && has_SGIS_generate_mipmap)
-    glTexParameteri (GL_TEXTURE_1D, GL_GENERATE_MIPMAP_SGIS, true);
 
     //проверка ошибок
 

@@ -74,7 +74,7 @@ class ContextManager
     void        SetContext       (size_t context_id, ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain);
     ISwapChain* GetDrawSwapChain () const;
     ISwapChain* GetReadSwapChain () const;
-    size_t      GetContextId     () const;    
+    size_t      GetContextId     () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Активация текущего контекста
@@ -90,9 +90,12 @@ class ContextManager
     void   ClearContextData ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение строки со списком расширений, зависящих от активной цепочки обмена
+///Получение информации о текущей реализации OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* GetSwapChainsExtensionString () const; //убрать!!!
+    const char* GetExtensions () const;
+    const char* GetVersion    () const;
+    const char* GetVendor     () const;
+    const char* GetRenderer   () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Определение поддержки расширения контекстом

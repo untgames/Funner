@@ -34,7 +34,7 @@ int main ()
     
     test.device->OSSetDepthStencilState (state.get ());
     test.device->OSSetStencilReference (0x17);
-    
+
     test.device->Draw (PrimitiveType_PointList, 0, 0);
     
     printf ("stencil reference: %02x\n", test.device->OSGetStencilReference ());

@@ -41,6 +41,36 @@ const char* get_name (ShaderMode);
 const char* get_name (ClearFlag);
 const char* get_name (PrimitiveType);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕолучение информации о формате пикселей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+//получение размеров несжатого тексел€ и размера изображени€ в указанном формате
+size_t get_texel_size (PixelFormat format);
+size_t get_image_size (size_t width, PixelFormat format);
+size_t get_image_size (size_t width, size_t height, PixelFormat format);
+size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat format);
+
+//получение размеров распакованного тексел€ и размера изображени€ после распаковки
+size_t get_uncompressed_texel_size (PixelFormat format);
+size_t get_uncompressed_image_size (size_t width, PixelFormat format);
+size_t get_uncompressed_image_size (size_t width, size_t height, PixelFormat format);
+size_t get_uncompressed_image_size (size_t width, size_t height, size_t depth, PixelFormat format);
+
+bool is_compressed    (PixelFormat); //€вл€етс€ ли формат сжатым
+bool is_uncompressed  (PixelFormat); //€вл€етс€ ли формат несжатым
+bool is_depth_stencil (PixelFormat); //проверка на форматы буфера глубина-трафарет
+bool is_color         (PixelFormat); //€вл€етс€ ли формат "цветовым"
+
+PixelFormat get_uncompressed_format (PixelFormat); //возвращает распакованный эквивалент переданного формата
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕолучение количества mip-уровней
+///////////////////////////////////////////////////////////////////////////////////////////////////
+size_t get_mips_count (size_t size);
+size_t get_mips_count (size_t width, size_t height);
+size_t get_mips_count (size_t width, size_t height, size_t depth);
+
 }
 
 }
