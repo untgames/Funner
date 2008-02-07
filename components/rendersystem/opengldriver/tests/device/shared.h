@@ -85,6 +85,7 @@ inline void dump_desc (IBlendState& state)
   
   printf ("Blend state:\n");
   printf ("  blend_enable:                     %s\n", desc.blend_enable ? "true" : "false");
+  printf ("  sample_alpha_to_coverage:         %s\n", desc.sample_alpha_to_coverage ? "true" : "false");
   printf ("  blend_color_operation:            %s\n", get_name (desc.blend_color_operation));
   printf ("  blend_color_source_argument:      %s\n", get_name (desc.blend_color_source_argument));
   printf ("  blend_color_destination_argument: %s\n", get_name (desc.blend_color_destination_argument));

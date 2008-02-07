@@ -1,6 +1,7 @@
 Results of blend_state_test:
 Blend state:
   blend_enable:                     false
+  sample_alpha_to_coverage:         false
   blend_color_operation:            BlendOperation_Add
   blend_color_source_argument:      BlendArgument_Zero
   blend_color_destination_argument: BlendArgument_Zero
@@ -10,6 +11,7 @@ Blend state:
   color_write_mask:                 red | green | blue | alpha
 Blend state:
   blend_enable:                     true
+  sample_alpha_to_coverage:         true
   blend_color_operation:            BlendOperation_Subtraction
   blend_color_source_argument:      BlendArgument_DestinationColor
   blend_color_destination_argument: BlendArgument_SourceAlpha

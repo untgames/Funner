@@ -60,6 +60,7 @@ struct BlendExtensions
   bool has_ext_blend_equation_separate; //GL_EXT_blend_equation_separate
   bool has_ext_blend_minmax;            //GL_EXT_blend_minmax
   bool has_ext_blend_subtract;          //GL_EXT_blend_subtract
+  bool has_arb_multisample;             //GL_ARB_multisample
   
   BlendExtensions (const ContextManager& manager)
   {
@@ -67,7 +68,9 @@ struct BlendExtensions
                      EXT_blend_equation_separate = "GL_EXT_blend_equation_separate",
                      EXT_blend_minmax            = "GL_EXT_blend_minmax",
                      EXT_blend_subtract          = "GL_EXT_blend_subtract",
+                     ARB_multisample             = "GL_ARB_multisample",
                      Version_1_2                 = "GL_VERSION_1_2",
+                     Version_1_3                 = "GL_VERSION_1_3",
                      Version_1_4                 = "GL_VERSION_1_4",
                      Version_2_0                 = "GL_VERSION_2_0";
       
@@ -75,6 +78,7 @@ struct BlendExtensions
     has_ext_blend_equation_separate = manager.IsSupported (EXT_blend_equation_separate) || manager.IsSupported (Version_2_0);
     has_ext_blend_minmax            = manager.IsSupported (EXT_blend_minmax) || manager.IsSupported (Version_1_2);
     has_ext_blend_subtract          = manager.IsSupported (EXT_blend_subtract) || manager.IsSupported (Version_1_2);
+    has_arb_multisample             = manager.IsSupported (ARB_multisample) || manager.IsSupported (Version_1_3);
   }
 };
 
@@ -214,6 +218,9 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
       break;    
   }  
   
+  if (!ext.has_arb_multisample && desc.sample_alpha_to_coverage) 
+    RaiseNotSupported (METHOD_NAME, "Can't enable sample alpha to coverage mode (GL_ARB_multisample extension not supported)");
+
     //проверка поддержки расширений
     
   if (in_desc.blend_enable && (in_desc.color_write_mask & ColorWriteFlag_All))
@@ -266,6 +273,9 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     else if (glBlendEquationSeparateEXT) glBlendEquationSeparateEXT (color_blend_equation, alpha_blend_equation);      
     else if (glBlendEquation)            glBlendEquation            (color_blend_equation);
     else if (glBlendEquationEXT)         glBlendEquationEXT         (color_blend_equation);
+
+    if (ext.has_arb_multisample && desc.sample_alpha_to_coverage) glEnable  (GL_SAMPLE_ALPHA_TO_COVERAGE);
+    else                                                          glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);
 
     if      (glBlendFuncSeparate)    glBlendFuncSeparate    (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
     else if (glBlendFuncSeparateEXT) glBlendFuncSeparateEXT (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);

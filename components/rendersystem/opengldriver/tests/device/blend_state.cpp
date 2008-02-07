@@ -16,6 +16,7 @@ int main ()
     memset (&desc, 0, sizeof (desc));
 
     desc.blend_enable                     = true;    
+    desc.sample_alpha_to_coverage         = true;
     desc.blend_color_operation            = BlendOperation_Subtraction;
     desc.blend_color_source_argument      = BlendArgument_DestinationColor;
     desc.blend_color_destination_argument = BlendArgument_SourceAlpha;

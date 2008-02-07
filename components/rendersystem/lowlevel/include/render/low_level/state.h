@@ -328,6 +328,7 @@ enum FillMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum CullMode
 {
+  CullMode_None,  //без отсечения
   CullMode_Front, //отсекать передние грани
   CullMode_Back,  //отсекать задние грани
   
@@ -343,7 +344,6 @@ struct RasterizerDesc
   CullMode cull_mode;               //режим отсечения
   bool     front_counter_clockwise; //режим определения передних граней (по часовой стрелке - true, против - false)
   int      depth_bias;              //значение прибавляемое к каждому пикселу 
-  bool     depth_clip_enable;       //включено ли отсечение по максимальной глубине
   bool     scissor_enable;          //включено ли scissor-отсечение
   bool     multisample_enable;      //включено ли мультисэмплирование
   bool     antialiased_line_enable; //включен ли антиалиасинг линий
@@ -463,6 +463,7 @@ enum ColorWriteFlag
 struct BlendDesc
 {
   bool           blend_enable;                      //включено ли смешивание цветов
+  bool           sample_alpha_to_coverage;          //работа с альфа при мультисэмплинге
   BlendOperation blend_color_operation;             //вид операции смешивания цветов
   BlendArgument  blend_color_source_argument;       //аргумент функции смешивания цветов, выбранный из источника цвета
   BlendArgument  blend_color_destination_argument;  //аргумент функции смешивания цветов, выбранный из приёмника цвета

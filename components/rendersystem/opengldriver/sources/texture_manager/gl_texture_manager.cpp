@@ -192,6 +192,8 @@ void TextureManager::Impl::Bind ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::Bind";
 
+  MakeContextCurrent ();
+
   for (size_t i = 0; i < texture_units_count; i++)
     if (binded_textures[i] && binded_samplers[i])
     {
@@ -235,6 +237,8 @@ void TextureManager::Impl::Bind ()
         binded_tex_targets[i] = 0;
       }
     }
+
+  CheckErrors (METHOD_NAME);
 }
 
 /*

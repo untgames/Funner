@@ -13,6 +13,7 @@
 #include <shared/input_stage.h>
 #include <shared/texture_manager.h>
 #include <shared/output_stage.h>
+#include <shared/rasterizer_stage.h>
 
 #include <common/exception.h>
 #include <common/singleton.h>
@@ -220,12 +221,13 @@ class Device: virtual public IDevice, public Object
     typedef xtl::com_ptr<Driver> DriverPtr;
     
   private:
-    DriverPtr      driver;          //драйвер OpenGL
-    ContextManager context_manager; //менеджер контекстов OpenGL
-    PropertyList   properties;      //свойства устройства
-    OutputStage    output_stage;    //выходной уровень
-    InputStage     input_stage;     //входной уровень
-    TextureManager texture_manager; //менеджер текстур
+    DriverPtr       driver;           //драйвер OpenGL
+    ContextManager  context_manager;  //менеджер контекстов OpenGL
+    PropertyList    properties;       //свойства устройства
+    OutputStage     output_stage;     //выходной уровень
+    InputStage      input_stage;      //входной уровень
+    RasterizerStage rasterizer_stage; //уровень растеризации
+    TextureManager  texture_manager;  //менеджер текстур
 };
 
 }

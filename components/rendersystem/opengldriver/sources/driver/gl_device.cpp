@@ -13,6 +13,7 @@ Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char* init_stri
     context_manager (xtl::bind (&Driver::LogMessage, in_driver, _1), init_string),
     output_stage (context_manager, swap_chain),
     input_stage (context_manager),
+    rasterizer_stage (context_manager),
     texture_manager (context_manager)
 {  
     //установка текущего контекста
@@ -86,10 +87,9 @@ IMaterialState* Device::CreateMaterialState (const MaterialDesc&)
   return 0;
 }
 
-IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc&)
+IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateRasterizerState");
-  return 0;
+  return rasterizer_stage.CreateRasterizerState (desc);
 }
 
 IPredicate* Device::CreatePredicate ()
@@ -289,42 +289,32 @@ bool Device::SSIsSupported (ShaderMode mode)
 
 void Device::RSSetState (IRasterizerState* state)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::RSSetState");
+  rasterizer_stage.SetState (state);
 }
 
 void Device::RSSetViewport (const Viewport& viewport)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::RSSetViewport");
+  rasterizer_stage.SetViewport (viewport);
 }
 
 void Device::RSSetScissor (const Rect& scissor_rect)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::RSSetScissor");
+  rasterizer_stage.SetScissor (scissor_rect);
 }
 
 IRasterizerState* Device::RSGetState ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::RSGetState");
-  return 0;
+  return rasterizer_stage.GetState ();
 }
 
 const Viewport& Device::RSGetViewport ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::RSGetViewport");
-  
-  static Viewport temp_viewport;
-  
-  return temp_viewport;
+  return rasterizer_stage.GetViewport ();
 }
 
 const Rect& Device::RSGetScissor ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::RSGetScissor");
-  
-  static Rect temp_scissor;
-  
-  return temp_scissor;
-  
+  return rasterizer_stage.GetScissor ();  
 }
 
 /*
@@ -449,6 +439,7 @@ void Device::Bind (size_t base_vertex, size_t base_index)
 {
   output_stage.Bind ();
 //  input_stage.Bind (base_vertex, base_index);
+  rasterizer_stage.Bind ();
   texture_manager.Bind ();
 }
 
