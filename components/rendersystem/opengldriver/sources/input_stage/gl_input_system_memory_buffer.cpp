@@ -10,54 +10,36 @@ using namespace common;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SystemMemoryBuffer::SystemMemoryBuffer (const ContextManager& context_manager, const BufferDesc& desc)
-  : Buffer(context_manager, desc) 
-{
-  try
-  {
-    buffer = new char [buffer_desc.size]; // резервируем память
-  }
-  catch (common::Exception& exception)        // давим все исключения
-  {
-    exception.Touch("render::low_level::opengl::SystemMemoryBuffer::SystemMemoryBuffer ()");
-    throw;
-  }
-}
+  : Buffer(context_manager, desc), buffer (buffer_desc.size)
+  {}
 
 SystemMemoryBuffer::~SystemMemoryBuffer ()
 {
-  try
-  {
-    delete [] buffer;
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
 }
 
 ///Работа с данными буфера
 void SystemMemoryBuffer::SetData (size_t offset, size_t size, const void* data)
 {
-  if (offset >= buffer_desc.size)      // проверяем смещение
+   // проверяем смещение
+  if (offset >= buffer_desc.size)
     return;
-  
-  char* begin = (char*)buffer + offset;             // начало массива
-  size        = offset + size > buffer_desc.size ?   // размер массива
-                buffer_desc.size - offset : size;
+
+    // размер массива
+  size = offset + size > buffer_desc.size ? buffer_desc.size - offset : size;
   // само копирование
-  memcpy (begin, data, size);
+  memcpy (buffer.data () + offset, data, size);
 }
 
 void SystemMemoryBuffer::GetData (size_t offset, size_t size, void* data)
 {
-  if (offset >= buffer_desc.size)      // проверяем смещение
+    // проверяем смещение
+  if (offset >= buffer_desc.size)
     return;
 
-  char* begin = (char*)buffer + offset;
-  size        = offset + size > buffer_desc.size ?   // размер массива
-                buffer_desc.size - offset : size;
+   // размер массива
+  size = offset + size > buffer_desc.size ? buffer_desc.size - offset : size;
   // копирование
-  memcpy (data, begin, size);
+  memcpy (data, buffer.data () + offset, size);
 }
 
 ///Установка буфера в контекст OpenGL
@@ -69,5 +51,5 @@ void SystemMemoryBuffer::Bind ()
 ///Указатель на данные буфера
 void* SystemMemoryBuffer::GetDataPointer ()
 {
-  return buffer;  // возвращаем начало буфера
+  return buffer.data ();  // возвращаем начало буфера
 }

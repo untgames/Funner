@@ -10,6 +10,8 @@ int main ()
   {
     Test test (L"OpenGL device test window (rasterizer_test)");
 
+    dump_desc (*test.device->RSGetState ());    
+
     RasterizerDesc desc;
     memset (&desc, 0, sizeof (desc));
 
@@ -36,6 +38,8 @@ int main ()
     test.device->RSSetState    (rasterizer.get ());
     test.device->RSSetViewport (viewport);
     test.device->RSSetScissor  (scissor);
+
+    dump_desc (*test.device->RSGetState ());    
 
     test.device->Draw (PrimitiveType_PointList, 0, 0);
   }

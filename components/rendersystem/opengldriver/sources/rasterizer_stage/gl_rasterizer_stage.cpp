@@ -75,7 +75,19 @@ struct RasterizerStage::Impl: public ContextObject
 
 RasterizerStage::Impl::Impl (const ContextManager& context_manager)
   : ContextObject (context_manager), state (context_manager)
-  {}
+{
+  RasterizerDesc desc;
+
+  desc.fill_mode               = FillMode_Solid;
+  desc.cull_mode               = CullMode_Back;
+  desc.front_counter_clockwise = true;
+  desc.depth_bias              = 0;
+  desc.scissor_enable          = true;
+  desc.multisample_enable      = false;
+  desc.antialiased_line_enable = true;
+
+  state.SetDesc (desc);
+}
 
 /*
    Биндинг состояния, вьюпорта и отсечения

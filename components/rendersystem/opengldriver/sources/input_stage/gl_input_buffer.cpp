@@ -7,8 +7,14 @@ using namespace common;
 Buffer::Buffer(const ContextManager& context_manager, const BufferDesc& desc)
   : ContextObject(context_manager), buffer_desc(desc)
 {
-  if (desc.usage_mode >= UsageMode_Num)
-    RaiseInvalidArgument("render::low_level::opengl::Buffer::Buffer(const ContextManager& context_manager, const BufferDesc& desc)", "desc.usage_mode", desc.usage_mode);
+  switch (desc.usage_mode)
+  {
+    case UsageMode_Default:
+    case UsageMode_Static:
+    case UsageMode_Dynamic:
+    case UsageMode_Stream: break;
+    default: RaiseInvalidArgument("render::low_level::opengl::Buffer::Buffer", "desc.usage_mode", desc.usage_mode);
+  }
 }
 
 void Buffer::GetDesc(BufferDesc& desc)

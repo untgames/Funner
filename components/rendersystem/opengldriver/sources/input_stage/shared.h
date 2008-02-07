@@ -1,10 +1,13 @@
 #ifndef RENDER_GL_DRIVER_INPUT_STAGE_SHARED_HEADER
 #define RENDER_GL_DRIVER_INPUT_STAGE_SHARED_HEADER
 
+#include <xtl/uninitialized_storage.h>
+
+#include <common/exception.h>
+
 #include <shared/input_stage.h>
 #include <shared/context_object.h>
 #include <shared/object.h>
-#include <common/exception.h>
 
 namespace render
 {
@@ -74,7 +77,7 @@ class SystemMemoryBuffer: public Buffer
     void* GetDataPointer ();
 
   private:
-    void*       buffer;     // указатель на буфер в системной памяти
+    xtl::uninitialized_storage <char> buffer;     //буфер в системной памяти
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

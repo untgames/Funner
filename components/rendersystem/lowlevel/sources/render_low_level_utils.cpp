@@ -341,6 +341,31 @@ const char* get_name (TexcoordWrap param)
   }
 }
 
+const char* get_name (FillMode param)
+{
+  switch (param)
+  {
+    case FillMode_Wireframe: return "FillMode_Wireframe";
+    case FillMode_Solid:     return "FillMode_Solid";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(FillMode)", "param", param);
+      return "";    
+  }
+}
+
+const char* get_name (CullMode param)
+{
+  switch (param)
+  {
+    case CullMode_None:  return "CullMode_None";
+    case CullMode_Front: return "CullMode_Front";
+    case CullMode_Back:  return "CullMode_Back";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(CullMode)", "param", param);
+      return "";    
+  }
+}
+
 /*
     Получение параметров формата пикселей
 */
