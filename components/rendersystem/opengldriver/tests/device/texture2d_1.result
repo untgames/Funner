@@ -1,5 +1,0 @@
-Results of texture2d_1_test:
-RGB non power of two 2d texture data operations works correct!
-RGB8 to DXT 2d texture data operations works correct!
-DXT to DXT 2d texture data operations works correct!
-Depth 2d texture data operations works correct!

@@ -125,7 +125,7 @@ PixelFormat get_pixel_format (GLenum gl_format)
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT: return PixelFormat_DXT5;    
     case GL_DEPTH_COMPONENT16:             return PixelFormat_D16;
     case GL_DEPTH_COMPONENT24:             return PixelFormat_D24X8;
-    case GL_DEPTH_STENCIL_EXT:             return PixelFormat_D24S8;
+    case GL_DEPTH24_STENCIL8_EXT:          return PixelFormat_D24S8;
     default:
       RaiseNotSupported ("render::low_level::get_pixel_format", "Unknown gl_format=%04x", gl_format);
       return (PixelFormat)0;

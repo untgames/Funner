@@ -215,7 +215,7 @@ enum ViewType
   ViewType_Null,                        //отображение отсутствует
   ViewType_SwapChainColorBuffer,        //отображение на буфер цвета цепочки обмена
   ViewType_SwapChainDepthStencilBuffer, //отображение на буфер глубина-трафарет цепочки обмена
-  ViewType_Texture,                     //отображение на текстуру
+  ViewType_RenderTargetTexture,         //отображение на текстуру
   ViewType_FboRenderBuffer              //отображение на frame_buffer_object render-buffer
 };
 
@@ -239,7 +239,7 @@ class View: virtual public IView, public Object, public Trackable
 ///Получение целевых объектов отображения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ITexture*                    GetTexture                     () { return base_texture.get (); }
-    IBindableTexture*            GetBindableTexture             () { return bindable_texture.get (); }
+    IRenderTargetTexture*        GetRenderTargetTexture         () { return render_target_texture.get (); }
     SwapChainColorBuffer*        GetSwapChainColorBuffer        () { return color_buffer.get (); }
     SwapChainDepthStencilBuffer* GetSwapChainDepthStencilBuffer () { return depth_stencil_buffer.get (); }
     FboRenderBuffer*             GetFboRenderBuffer             () { return fbo_render_buffer.get (); }
@@ -251,19 +251,19 @@ class View: virtual public IView, public Object, public Trackable
 
   private:
     typedef xtl::com_ptr<ITexture>                    TexturePtr;
-    typedef xtl::com_ptr<IBindableTexture>            BindableTexturePtr;
+    typedef xtl::com_ptr<IRenderTargetTexture>        RenderTargetTexturePtr;
     typedef xtl::com_ptr<SwapChainColorBuffer>        ColorBufferPtr;
     typedef xtl::com_ptr<SwapChainDepthStencilBuffer> DepthStencilBufferPtr;
     typedef xtl::com_ptr<FboRenderBuffer>             FboRenderBufferPtr;
 
   private:
-    ViewType              type;                 //тип отображения
-    TexturePtr            base_texture;         //указатель на базовую текстуру
-    BindableTexturePtr    bindable_texture;     //текстура
-    ColorBufferPtr        color_buffer;         //буфера цвета цепочки обмена
-    DepthStencilBufferPtr depth_stencil_buffer; //буфер глубина-трафарет цепочки обмена
-    FboRenderBufferPtr    fbo_render_buffer;    //буфер рендеринга
-    ViewDesc              desc;                 //дескриптор отображения
+    ViewType                type;                  //тип отображения
+    TexturePtr              base_texture;          //указатель на базовую текстуру
+    RenderTargetTexturePtr  render_target_texture; //текстура
+    ColorBufferPtr          color_buffer;          //буфера цвета цепочки обмена
+    DepthStencilBufferPtr   depth_stencil_buffer;  //буфер глубина-трафарет цепочки обмена
+    FboRenderBufferPtr      fbo_render_buffer;     //буфер рендеринга
+    ViewDesc                desc;                  //дескриптор отображения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -316,9 +316,9 @@ class SwapChainFrameBuffer: public FrameBuffer, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с текстурами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void              SetRenderTargets       (IBindableTexture*, const ViewDesc*, IBindableTexture*, const ViewDesc*);
-    IBindableTexture* GetRenderTargetTexture () const { return render_target_texture.get (); }
-    IBindableTexture* GetDepthStencilTexture () const { return depth_stencil_texture.get (); }
+    void              SetRenderTargets       (IRenderTargetTexture*, const ViewDesc*, IRenderTargetTexture*, const ViewDesc*);
+    IRenderTargetTexture* GetRenderTargetTexture () const { return render_target_texture.get (); }
+    IRenderTargetTexture* GetDepthStencilTexture () const { return depth_stencil_texture.get (); }
     const ViewDesc&   GetRenderTargetDesc    () const { return render_target_desc; }
     const ViewDesc&   GetDepthStencilDesc    () const { return depth_stencil_desc; }
     void              UpdateRenderTargets    ();
@@ -327,12 +327,12 @@ class SwapChainFrameBuffer: public FrameBuffer, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование изображения в текстуру
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void CopyImage (size_t width, size_t height, const BindableTextureDesc& texture_desc, const ViewDesc& view_desc);
+    void CopyImage (size_t width, size_t height, const RenderTargetTextureDesc& texture_desc, const ViewDesc& view_desc);
 
   private:
     typedef xtl::com_ptr<SwapChainColorBuffer>        ColorBufferPtr;
     typedef xtl::com_ptr<SwapChainDepthStencilBuffer> DepthStencilBufferPtr;
-    typedef xtl::com_ptr<IBindableTexture>            TexturePtr;
+    typedef xtl::com_ptr<IRenderTargetTexture>            TexturePtr;
 
   private:
     ColorBufferPtr        color_buffer;
@@ -393,19 +393,19 @@ class FboFrameBuffer: public FboFrameBufferBase
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     FboFrameBuffer (const ContextManager&, NullView, FboRenderBuffer*);
-    FboFrameBuffer (const ContextManager&, NullView, IBindableTexture*, const ViewDesc&);
+    FboFrameBuffer (const ContextManager&, NullView, IRenderTargetTexture*, const ViewDesc&);
     FboFrameBuffer (const ContextManager&, FboRenderBuffer*, NullView);
     FboFrameBuffer (const ContextManager&, FboRenderBuffer*, FboRenderBuffer*);
-    FboFrameBuffer (const ContextManager&, FboRenderBuffer*, IBindableTexture*, const ViewDesc&);
-    FboFrameBuffer (const ContextManager&, IBindableTexture*, const ViewDesc&, NullView);
-    FboFrameBuffer (const ContextManager&, IBindableTexture*, const ViewDesc&, FboRenderBuffer*);
-    FboFrameBuffer (const ContextManager&, IBindableTexture*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+    FboFrameBuffer (const ContextManager&, FboRenderBuffer*, IRenderTargetTexture*, const ViewDesc&);
+    FboFrameBuffer (const ContextManager&, IRenderTargetTexture*, const ViewDesc&, NullView);
+    FboFrameBuffer (const ContextManager&, IRenderTargetTexture*, const ViewDesc&, FboRenderBuffer*);
+    FboFrameBuffer (const ContextManager&, IRenderTargetTexture*, const ViewDesc&, IRenderTargetTexture*, const ViewDesc&);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение буфера рендеринга к текущему буферу кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetAttachment (RenderTargetType target_type, IBindableTexture* texture, const ViewDesc& desc);
+    void SetAttachment (RenderTargetType target_type, IRenderTargetTexture* texture, const ViewDesc& desc);
     void SetAttachment (RenderTargetType target_type, FboRenderBuffer* render_buffer);
     void SetAttachment (GLenum textarget, GLenum attachment, size_t texture_id, const ViewDesc& view_desc);
 
@@ -482,19 +482,19 @@ class FrameBufferManager: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, NullView, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
-    FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, IRenderTargetTexture*, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (NullView, const ViewDesc&, FboRenderBuffer*, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, NullView, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
-    FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, IRenderTargetTexture*, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, FboRenderBuffer*, const ViewDesc&);
-    FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, NullView, const ViewDesc&);
-    FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
-    FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
-    FrameBuffer* CreateFrameBuffer (IBindableTexture*, const ViewDesc&, FboRenderBuffer*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (IRenderTargetTexture*, const ViewDesc&, NullView, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (IRenderTargetTexture*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (IRenderTargetTexture*, const ViewDesc&, IRenderTargetTexture*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (IRenderTargetTexture*, const ViewDesc&, FboRenderBuffer*, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, NullView, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&);
-    FrameBuffer* CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, IBindableTexture*, const ViewDesc&);
+    FrameBuffer* CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, IRenderTargetTexture*, const ViewDesc&);
     FrameBuffer* CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, FboRenderBuffer*, const ViewDesc&);
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////

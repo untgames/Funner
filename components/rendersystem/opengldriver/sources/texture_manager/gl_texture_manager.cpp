@@ -65,8 +65,8 @@ struct TextureManager::Impl: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание текстуры и сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IBindableTexture* CreateTexture      (const TextureDesc&);
-    ISamplerState*    CreateSamplerState (const SamplerDesc&);
+    ITexture*       CreateTexture      (const TextureDesc&);
+    ISamplerState*  CreateSamplerState (const SamplerDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущей текстуры и сэмплера
@@ -77,14 +77,14 @@ struct TextureManager::Impl: public ContextObject
     ISamplerState* GetSampler (size_t sampler_slot) const;
 
   private:
-    IBindableTexture* CreateTexture1D      (const TextureDesc&);
-    IBindableTexture* CreateTexture2D      (const TextureDesc&);
-    IBindableTexture* CreateTexture3D      (const TextureDesc&);
-    IBindableTexture* CreateTextureCubemap (const TextureDesc&);
+    ITexture* CreateTexture1D      (const TextureDesc&);
+    ITexture* CreateTexture2D      (const TextureDesc&);
+    ITexture* CreateTexture3D      (const TextureDesc&);
+    ITexture* CreateTextureCubemap (const TextureDesc&);
 
   private:    
-    typedef xtl::trackable_ptr<IBindableTexture> TexturePtr;
-    typedef xtl::trackable_ptr<SamplerState>     SamplerStatePtr;
+    typedef xtl::trackable_ptr<BindableTexture> TexturePtr;
+    typedef xtl::trackable_ptr<SamplerState>    SamplerStatePtr;
     
 /*    struct Sampler
     {
@@ -163,8 +163,8 @@ void TextureManager::Impl::Bind ()
 
   for (size_t i = 0; i < texture_units_count; i++)
   {
-    IBindableTexture* texture = binded_textures [i].get ();
-    SamplerState*     sampler = binded_samplers [i].get ();
+    BindableTexture* texture = binded_textures [i].get ();
+    SamplerState*    sampler = binded_samplers [i].get ();
     
     if (!texture || !sampler)
     {
@@ -189,32 +189,37 @@ void TextureManager::Impl::Bind ()
       if (glActiveTexture) glActiveTexture    (GL_TEXTURE0 + i);
       else                 glActiveTextureARB (GL_TEXTURE0 + i);
     }
-
-    BindableTextureDesc tex_desc;
+    
+      //переделать!!!!!
+      
+    RenderTargetTextureDesc tex_desc;
     
     texture->GetDesc (tex_desc);
+    
+    GLenum tex_target = tex_desc.target;
+    size_t tex_id     = tex_desc.id;
 
-    if (binded_tex_targets [i] != tex_desc.target)
+    if (binded_tex_targets [i] != tex_target)
     {
-      binded_tex_targets [i] = tex_desc.target;
+      binded_tex_targets [i] = tex_target;
 
-      glEnable (binded_tex_targets[i]);
+      glEnable (binded_tex_targets [i]);
     }
     
        //доделать!!!!!!!
 
-//    if (GetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Texture0 + i) != texture->GetId ())
+    if (GetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Texture0 + i) != texture->GetId ())
     {
-//      SetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Texture0 + i, texture->GetId ());
+      SetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Texture0 + i, texture->GetId ());
 
-      glBindTexture (tex_desc.target, tex_desc.id);
+      glBindTexture (tex_target, tex_id);
     }
 
 //    if (GetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Sampler0 + i) != sampler->GetId ())
     {
 //      SetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Sampler0 + i, sampler->GetId ());
 
-      sampler->Bind (get_OpenGLTextureTarget (tex_desc.target));
+      sampler->Bind (get_OpenGLTextureTarget (tex_target));
     }
   }
 
@@ -237,7 +242,7 @@ bool is_power_of_two (size_t size)
 
 }
 
-IBindableTexture* TextureManager::Impl::CreateTexture1D (const TextureDesc& in_desc)
+ITexture* TextureManager::Impl::CreateTexture1D (const TextureDesc& in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture1D";
   
@@ -267,10 +272,10 @@ IBindableTexture* TextureManager::Impl::CreateTexture1D (const TextureDesc& in_d
     return new TextureNpot (GetContextManager (), extensions, desc);
   }
 
-  return new ScaledTexture (texture_manager, desc);
+  return new ScaledTexture (GetContextManager (), texture_manager, desc);
 }
 
-IBindableTexture* TextureManager::Impl::CreateTexture2D (const TextureDesc& in_desc)
+ITexture* TextureManager::Impl::CreateTexture2D (const TextureDesc& in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture2D";
   
@@ -295,10 +300,10 @@ IBindableTexture* TextureManager::Impl::CreateTexture2D (const TextureDesc& in_d
   if (extensions->has_ext_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
     return new TextureNpot (GetContextManager (), extensions, desc);
 
-  return new ScaledTexture (texture_manager, desc);
+  return new ScaledTexture (GetContextManager (), texture_manager, desc);
 }
 
-IBindableTexture* TextureManager::Impl::CreateTexture3D (const TextureDesc& desc)
+ITexture* TextureManager::Impl::CreateTexture3D (const TextureDesc& desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture3D";
 
@@ -326,7 +331,7 @@ IBindableTexture* TextureManager::Impl::CreateTexture3D (const TextureDesc& desc
   return new Texture3D (GetContextManager (), extensions, desc);
 }
 
-IBindableTexture* TextureManager::Impl::CreateTextureCubemap (const TextureDesc& desc)
+ITexture* TextureManager::Impl::CreateTextureCubemap (const TextureDesc& desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTextureCubemap";
   
@@ -348,21 +353,30 @@ IBindableTexture* TextureManager::Impl::CreateTextureCubemap (const TextureDesc&
   if (is_pot || extensions->has_arb_texture_non_power_of_two)
     return new TextureCubemap (GetContextManager (), extensions, desc);
 
-  return new ScaledTexture (texture_manager, desc);  
+  return new ScaledTexture (GetContextManager (), texture_manager, desc);  
 }
 
 //диспетчеризация создания текстур  
-IBindableTexture* TextureManager::Impl::CreateTexture (const TextureDesc& desc)
+ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& desc)
 {
-  switch (desc.dimension)
+  try
   {
-    case TextureDimension_1D:      return CreateTexture1D (desc);
-    case TextureDimension_2D:      return CreateTexture2D (desc);
-    case TextureDimension_3D:      return CreateTexture3D (desc);
-    case TextureDimension_Cubemap: return CreateTextureCubemap (desc);
-    default:
-      RaiseInvalidArgument ("render::low_level::opengl::TextureManager::Impl::CreateTexture", "desc.dimension", desc.dimension);
-      return 0;
+    switch (desc.dimension)
+    {
+      case TextureDimension_1D:      return CreateTexture1D (desc);
+      case TextureDimension_2D:      return CreateTexture2D (desc);
+      case TextureDimension_3D:      return CreateTexture3D (desc);
+      case TextureDimension_Cubemap: return CreateTextureCubemap (desc);
+      default:
+        RaiseInvalidArgument ("", "desc.dimension", desc.dimension);
+        return 0;
+    }
+  }
+  catch (common::Exception& e)
+  {
+    e.Touch ("render::low_level::opengl::TextureManager::Impl::CreateTexture");
+
+    throw;
   }
 }
 
@@ -382,11 +396,7 @@ void TextureManager::Impl::SetTexture (size_t sampler_slot, ITexture* texture)
   if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't set texture in unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
   
-//  binded_textures [sampler_slot] = cast_object<IBindableTexture> (*this, texture, METHOD_NAME, "state");
-
-    //переделать!!!!!
-
-  binded_textures [sampler_slot] = cast_object<IBindableTexture> (texture, METHOD_NAME, "state");
+  binded_textures [sampler_slot] = cast_object<BindableTexture> (*this, texture, METHOD_NAME, "state");
 }
 
 void TextureManager::Impl::SetSampler (size_t sampler_slot, ISamplerState* state)
@@ -444,7 +454,7 @@ void TextureManager::Bind ()
    Создание текстуры и сэмплера
 */
 
-IBindableTexture* TextureManager::CreateTexture (const TextureDesc& tex_desc)
+ITexture* TextureManager::CreateTexture (const TextureDesc& tex_desc)
 {
   return impl->CreateTexture (tex_desc);
 }

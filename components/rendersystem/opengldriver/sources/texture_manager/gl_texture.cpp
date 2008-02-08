@@ -16,24 +16,24 @@ const size_t DXT_BLOCK_SIZE = DXT_EDGE_SIZE * DXT_EDGE_SIZE; //размер блока DXT-
 */
 
 Texture::Texture
- (const ContextManager& manager,
+ (const ContextManager& in_context_manager,
   const ExtensionsPtr&  in_extensions,
-  const TextureDesc&    tex_desc,
+  const TextureDesc&    in_desc,
   GLenum                in_target,
   size_t                in_mips_count)
-    : ContextObject (manager),
+    : BindableTexture (in_context_manager),
+      desc (in_desc),    
+      texture_id (0),
       target (in_target),
-      desc (tex_desc),
       mips_count (in_mips_count),
+      binded_sampler_id (0),
       extensions (in_extensions)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::Texture::Texture";
-  
-    //+размеры текстуры (нулевые)!!!
+  static const char* METHOD_NAME = "render::low_level::opengl::Texture::Texture";   
 
     //проверка корректности формата
 
-  switch (tex_desc.format)
+  switch (desc.format)
   {
     case PixelFormat_L8:
     case PixelFormat_A8:
@@ -75,7 +75,7 @@ Texture::Texture
       RaiseNotSupported (METHOD_NAME, "Stencil textures not supported");
       return;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.format", tex_desc.format);
+      RaiseInvalidArgument (METHOD_NAME, "desc.format", desc.format);
       return;
   }  
 
@@ -119,7 +119,7 @@ Texture::~Texture ()
 }
 
 /*
-   Получение дескриптора
+   Получение дескрипторов
 */
 
 void Texture::GetDesc (TextureDesc& out_desc)
@@ -127,8 +127,10 @@ void Texture::GetDesc (TextureDesc& out_desc)
   out_desc = desc;
 }
 
-void Texture::GetDesc (BindableTextureDesc& out_desc)
+void Texture::GetDesc (RenderTargetTextureDesc& out_desc)
 {
+  static_cast<TextureDesc&> (out_desc) = desc;
+
   out_desc.id     = texture_id;
   out_desc.target = target;
 }
@@ -140,6 +142,20 @@ void Texture::GetDesc (BindableTextureDesc& out_desc)
 void Texture::SetFormat (PixelFormat format)
 {
   desc.format = format;
+}
+
+/*
+    Установка / получение номера прикрепленного сэмплера
+*/
+
+void Texture::SetSamplerId (size_t id)
+{
+  binded_sampler_id = id;
+}
+
+size_t Texture::GetSamplerId ()
+{
+  return binded_sampler_id;
 }
 
 /*

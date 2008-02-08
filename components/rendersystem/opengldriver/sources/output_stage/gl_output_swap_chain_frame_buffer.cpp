@@ -77,16 +77,16 @@ void SwapChainFrameBuffer::SetBuffersState (bool in_color_buffer_state, bool in_
 */
 
 void SwapChainFrameBuffer::SetRenderTargets
- (IBindableTexture* in_render_target_texture,
+ (IRenderTargetTexture* in_render_target_texture,
   const ViewDesc*   in_render_target_desc,
-  IBindableTexture* in_depth_stencil_texture,
+  IRenderTargetTexture* in_depth_stencil_texture,
   const ViewDesc*   in_depth_stencil_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBuffer::SetRenderTargets";
 
   if (in_render_target_texture)
   {
-    TextureDesc desc;
+    RenderTargetTextureDesc desc;
     
     in_render_target_texture->GetDesc (desc);
     
@@ -115,7 +115,7 @@ void SwapChainFrameBuffer::SetRenderTargets
   
   if (in_depth_stencil_texture)
   {
-    TextureDesc desc;
+    RenderTargetTextureDesc desc;
     
     in_depth_stencil_texture->GetDesc (desc);
     
@@ -168,7 +168,7 @@ void SwapChainFrameBuffer::SetRenderTargets
      опирование изображени€ в текстуру
 */
 
-void SwapChainFrameBuffer::CopyImage (size_t width, size_t height, const BindableTextureDesc& texture_desc, const ViewDesc& view_desc)
+void SwapChainFrameBuffer::CopyImage (size_t width, size_t height, const RenderTargetTextureDesc& texture_desc, const ViewDesc& view_desc)
 {
   glBindTexture (texture_desc.target, texture_desc.id);  
   
@@ -217,28 +217,22 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
     
   if (render_target_texture)
   {
-    BindableTextureDesc bindable_desc;
-    TextureDesc         texture_desc;
+    RenderTargetTextureDesc tex_desc;
 
-    render_target_texture->GetDesc (bindable_desc);
-    render_target_texture->GetDesc (texture_desc);
+    render_target_texture->GetDesc (tex_desc);
 
-    CopyImage (width < texture_desc.width ? width : texture_desc.width,
-               height < texture_desc.height ? height : texture_desc.height, bindable_desc, render_target_desc);
+    CopyImage (width < tex_desc.width ? width : tex_desc.width, height < tex_desc.height ? height : tex_desc.height, tex_desc, render_target_desc);
   }
   
     //копирование текстуры из буфера глубины
     
   if (depth_stencil_texture)
   {
-    BindableTextureDesc bindable_desc;
-    TextureDesc         texture_desc;
+    RenderTargetTextureDesc tex_desc;
 
-    depth_stencil_texture->GetDesc (bindable_desc);
-    depth_stencil_texture->GetDesc (texture_desc);
+    depth_stencil_texture->GetDesc (tex_desc);
 
-    CopyImage (width < texture_desc.width ? width : texture_desc.width,
-                height < texture_desc.height ? height : texture_desc.height, bindable_desc, depth_stencil_desc);
+    CopyImage (width < tex_desc.width ? width : tex_desc.width, height < tex_desc.height ? height : tex_desc.height, tex_desc, depth_stencil_desc);
   }
   
   CheckErrors ("render::low_level::opengl::SwapChainFrameBuffer::UpdateRenderTargets");

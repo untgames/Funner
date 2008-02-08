@@ -29,9 +29,9 @@ View::View (ITexture* in_texture, const ViewDesc& in_desc)
     
     //определение типа текстуры
     
-  if (bindable_texture = dynamic_cast<IBindableTexture*> (in_texture))
+  if (render_target_texture = dynamic_cast<IRenderTargetTexture*> (in_texture))
   {
-    type = ViewType_Texture;
+    type = ViewType_RenderTargetTexture;
   }
   else if (color_buffer = dynamic_cast<SwapChainColorBuffer*> (in_texture))
   {

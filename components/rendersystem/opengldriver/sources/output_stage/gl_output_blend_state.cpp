@@ -274,9 +274,6 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     else if (glBlendEquation)            glBlendEquation            (color_blend_equation);
     else if (glBlendEquationEXT)         glBlendEquationEXT         (color_blend_equation);
 
-    if (ext.has_arb_multisample && desc.sample_alpha_to_coverage) glEnable  (GL_SAMPLE_ALPHA_TO_COVERAGE);
-    else                                                          glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);
-
     if      (glBlendFuncSeparate)    glBlendFuncSeparate    (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
     else if (glBlendFuncSeparateEXT) glBlendFuncSeparateEXT (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
     else                             glBlendFunc            (src_color_arg, dst_color_arg);      
@@ -284,6 +281,12 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   else
   {
     glDisable (GL_BLEND);
+  }
+  
+  if (ext.has_arb_multisample)
+  {
+    if (desc.sample_alpha_to_coverage) glEnable  (GL_SAMPLE_ALPHA_TO_COVERAGE);
+    else                               glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);
   }
 
   glEndList ();  

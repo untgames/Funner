@@ -9,11 +9,13 @@ using namespace common;
 */
 
 ScaledTexture::ScaledTexture
- (TextureManager&      texture_manager,
-  const TextureDesc&   original_desc,
-  size_t               scaled_width,
-  size_t               scaled_height)
-    : original_width (original_desc.width),
+ (const ContextManager& context_manager,
+  TextureManager&       texture_manager,
+  const TextureDesc&    original_desc,
+  size_t                scaled_width,
+  size_t                scaled_height)
+    : BindableTexture (context_manager),
+      original_width (original_desc.width),
       original_height (original_desc.height)
 {
   if (!scaled_width)  scaled_width  = get_next_higher_power_of_two (original_desc.width);
@@ -24,7 +26,10 @@ ScaledTexture::ScaledTexture
   temp_desc.width  = scaled_width;
   temp_desc.height = scaled_height;
 
-  shadow_texture   = texture_manager.CreateTexture (temp_desc);
+  shadow_texture   = dynamic_cast<BindableTexture*> (texture_manager.CreateTexture (temp_desc));
+
+  if (!shadow_texture.get ())
+    RaiseInvalidOperation ("render::low_level::opengl::ScaledTexture::ScaledTexture", "TextureManager::CreateTexture returned texture with incompatible type");
 
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
   vertical_scale   = (float)scaled_height / (float)original_desc.height;  
@@ -44,9 +49,23 @@ void ScaledTexture::GetDesc (TextureDesc& out_desc)
   out_desc.height = original_height;
 }
 
-void ScaledTexture::GetDesc (BindableTextureDesc& out_desc)
+void ScaledTexture::GetDesc (RenderTargetTextureDesc& out_desc)
 {
   shadow_texture->GetDesc (out_desc);
+}
+
+/*
+    Установка / получение номера прикрепленного сэмплера
+*/
+
+void ScaledTexture::SetSamplerId (size_t id)
+{
+  shadow_texture->SetSamplerId (id);
+}
+
+size_t ScaledTexture::GetSamplerId ()
+{
+  return shadow_texture->GetSamplerId ();
 }
 
 /*

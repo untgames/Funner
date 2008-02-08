@@ -113,31 +113,37 @@ TextureDimension_1D 16x1x1@DXT1  manual-mips:
 FAIL
 Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 12x1x1@DXT1  manual-mips:
 FAIL
 Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 16x1x1@DXT3  manual-mips:
 FAIL
 Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 12x1x1@DXT3  manual-mips:
 FAIL
 Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 16x1x1@DXT5  manual-mips:
 FAIL
 Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 12x1x1@DXT5  manual-mips:
 FAIL
 Exception: '1D texture can't be compressed
     at render::low_level::opengl::Texture1D::Texture1D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 16x1x1@D16   manual-mips:
   layer 0, mip 0, width = 16, height = 1: Ok
@@ -209,21 +215,25 @@ TextureDimension_1D 16x1x1@S8    manual-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 12x1x1@S8    manual-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 12x1x1@S8    auto-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_1D 16x1x1@S8    auto-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_2D 16x16x1@RGB8  manual-mips:
   layer 0, mip 0, width = 16, height = 16: Ok
@@ -413,48 +423,50 @@ TextureDimension_2D 16x16x1@D24X8 auto-mips:
   layer 0, mip 3, width = 2, height = 2: Ok
   layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_2D 16x16x1@D24S8 manual-mips:
-FAIL
-Exception: 'Unknown gl_format=88f0
-    at render::low_level::get_pixel_format
-    at render::low_level::opengl::Texture2D::Texture2D
-    at render::low_level::opengl::Device::CreateTexture'
+  layer 0, mip 0, width = 16, height = 16: Ok
+  layer 0, mip 1, width = 8, height = 8: Ok
+  layer 0, mip 2, width = 4, height = 4: Ok
+  layer 0, mip 3, width = 2, height = 2: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_2D 12x12x1@D24S8 manual-mips:
-FAIL
-Exception: 'Unknown gl_format=88f0
-    at render::low_level::get_pixel_format
-    at render::low_level::opengl::Texture2D::Texture2D
-    at render::low_level::opengl::Device::CreateTexture'
+  layer 0, mip 0, width = 12, height = 12: Ok
+  layer 0, mip 1, width = 6, height = 6: Ok
+  layer 0, mip 2, width = 3, height = 3: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_2D 12x12x1@D24S8 auto-mips:
-FAIL
-Exception: 'Unknown gl_format=88f0
-    at render::low_level::get_pixel_format
-    at render::low_level::opengl::Texture2D::Texture2D
-    at render::low_level::opengl::Device::CreateTexture'
+  layer 0, mip 0, width = 12, height = 12: Ok
+  layer 0, mip 1, width = 6, height = 6: Ok
+  layer 0, mip 2, width = 3, height = 3: Ok
+  layer 0, mip 3, width = 1, height = 1: Ok
 TextureDimension_2D 16x16x1@D24S8 auto-mips:
-FAIL
-Exception: 'Unknown gl_format=88f0
-    at render::low_level::get_pixel_format
-    at render::low_level::opengl::Texture2D::Texture2D
-    at render::low_level::opengl::Device::CreateTexture'
+  layer 0, mip 0, width = 16, height = 16: Ok
+  layer 0, mip 1, width = 8, height = 8: Ok
+  layer 0, mip 2, width = 4, height = 4: Ok
+  layer 0, mip 3, width = 2, height = 2: Ok
+  layer 0, mip 4, width = 1, height = 1: Ok
 TextureDimension_2D 16x16x1@S8    manual-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_2D 12x12x1@S8    manual-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_2D 12x12x1@S8    auto-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_2D 16x16x1@S8    auto-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@RGB8  manual-mips:
   layer 0, mip 0, width = 16, height = 16: Ok
@@ -650,111 +662,133 @@ TextureDimension_3D 16x16x4@DXT1  manual-mips:
 FAIL
 Exception: '3D compressed textures not supported (desc.format=PixelFormat_DXT1)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@DXT1  manual-mips:
 FAIL
 Exception: '3D compressed textures not supported (desc.format=PixelFormat_DXT1)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@DXT3  manual-mips:
 FAIL
 Exception: '3D compressed textures not supported (desc.format=PixelFormat_DXT3)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@DXT3  manual-mips:
 FAIL
 Exception: '3D compressed textures not supported (desc.format=PixelFormat_DXT3)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@DXT5  manual-mips:
 FAIL
 Exception: '3D compressed textures not supported (desc.format=PixelFormat_DXT5)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@DXT5  manual-mips:
 FAIL
 Exception: '3D compressed textures not supported (desc.format=PixelFormat_DXT5)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@D16   manual-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D16)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@D16   manual-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D16)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@D16   auto-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D16)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@D16   auto-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D16)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@D24X8 manual-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D24X8)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@D24X8 manual-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D24X8)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@D24X8 auto-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D24X8)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@D24X8 auto-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D24X8)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@D24S8 manual-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D24S8)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@D24S8 manual-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D24S8)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@D24S8 auto-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D24S8)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@D24S8 auto-mips:
 FAIL
 Exception: '3D depth-stencil textures not supported (desc.format=PixelFormat_D24S8)
     at render::low_level::opengl::Texture3D::Texture3D
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@S8    manual-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@S8    manual-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 12x12x4@S8    auto-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_3D 16x16x4@S8    auto-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@RGB8  manual-mips:
   layer 0, mip 0, width = 16, height = 16: Ok
@@ -1488,81 +1522,97 @@ TextureDimension_Cubemap 16x16x6@D16   manual-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D16   manual-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D16   auto-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@D16   auto-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@D24X8 manual-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D24X8 manual-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D24X8 auto-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@D24X8 auto-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@D24S8 manual-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D24S8 manual-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@D24S8 auto-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@D24S8 auto-mips:
 FAIL
 Exception: 'Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D
     at render::low_level::opengl::TextureCubemap::TextureCubemap
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@S8    manual-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@S8    manual-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 12x12x6@S8    auto-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 TextureDimension_Cubemap 16x16x6@S8    auto-mips:
 FAIL
 Exception: 'Stencil textures not supported
     at render::low_level::opengl::Texture::Texture
+    at render::low_level::opengl::TextureManager::Impl::CreateTexture
     at render::low_level::opengl::Device::CreateTexture'
 Status table for power of two textures with manual-mips:
        1D     2D     3D     Cubemap     
@@ -1576,7 +1626,7 @@ DXT3 |   -     +     -     +
 DXT5 |   -     +     -     +   
 D16  |   +     +     -     -   
 D24X8|   +     +     -     -   
-D24S8|   +     -     -     -   
+D24S8|   +     +     -     -   
 S8   |   -     -     -     -   
 *************************************
 Status table for power of two textures with auto-mips:
@@ -1591,7 +1641,7 @@ DXT3 |   -     -     -     -
 DXT5 |   -     -     -     -   
 D16  |   +     +     -     -   
 D24X8|   +     +     -     -   
-D24S8|   +     -     -     -   
+D24S8|   +     +     -     -   
 S8   |   -     -     -     -   
 *************************************
 Status table for non power of two textures with manual-mips:
@@ -1606,7 +1656,7 @@ DXT3 |   -     -     -     -
 DXT5 |   -     -     -     -   
 D16  |   +     +     -     -   
 D24X8|   +     +     -     -   
-D24S8|   +     -     -     -   
+D24S8|   +     +     -     -   
 S8   |   -     -     -     -   
 *************************************
 Status table for non power of two textures with auto-mips:
@@ -1621,6 +1671,6 @@ DXT3 |   -     -     -     -
 DXT5 |   -     -     -     -   
 D16  |   +     +     -     -   
 D24X8|   +     +     -     -   
-D24S8|   +     -     -     -   
+D24S8|   +     +     -     -   
 S8   |   -     -     -     -   
 *************************************

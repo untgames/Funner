@@ -437,7 +437,7 @@ FboFrameBuffer::FboFrameBuffer (const ContextManager& manager, NullView, FboRend
 FboFrameBuffer::FboFrameBuffer
  (const ContextManager& manager,
   NullView,
-  IBindableTexture*     depth_stencil_texture,
+  IRenderTargetTexture*     depth_stencil_texture,
   const ViewDesc&       depth_stencil_desc)
     : FboFrameBufferBase (manager, false, true)
 {
@@ -463,7 +463,7 @@ FboFrameBuffer::FboFrameBuffer (const ContextManager& manager, FboRenderBuffer* 
 FboFrameBuffer::FboFrameBuffer
  (const ContextManager& manager,
   FboRenderBuffer*      color_buffer,
-  IBindableTexture*     depth_stencil_texture,
+  IRenderTargetTexture*     depth_stencil_texture,
   const ViewDesc&       depth_stencil_desc)
     : FboFrameBufferBase (manager, true, true)
 {
@@ -474,7 +474,7 @@ FboFrameBuffer::FboFrameBuffer
 
 FboFrameBuffer::FboFrameBuffer
  (const ContextManager& manager,
-  IBindableTexture*     render_target_texture,
+  IRenderTargetTexture*     render_target_texture,
   const ViewDesc&       render_target_desc,
   NullView)
     : FboFrameBufferBase (manager, true, false)
@@ -485,7 +485,7 @@ FboFrameBuffer::FboFrameBuffer
 
 FboFrameBuffer::FboFrameBuffer
  (const ContextManager& manager,
-  IBindableTexture*     render_target_texture,
+  IRenderTargetTexture*     render_target_texture,
   const ViewDesc&       render_target_desc,
   FboRenderBuffer*      depth_stencil_buffer)
     : FboFrameBufferBase (manager, true, true)
@@ -497,9 +497,9 @@ FboFrameBuffer::FboFrameBuffer
 
 FboFrameBuffer::FboFrameBuffer
  (const ContextManager& manager,
-  IBindableTexture*     render_target_texture,
+  IRenderTargetTexture*     render_target_texture,
   const ViewDesc&       render_target_desc,
-  IBindableTexture*     depth_stencil_texture,
+  IRenderTargetTexture*     depth_stencil_texture,
   const ViewDesc&       depth_stencil_desc)
     : FboFrameBufferBase (manager, true, true)
 {
@@ -564,28 +564,25 @@ void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t 
   }
 }
 
-void FboFrameBuffer::SetAttachment (RenderTargetType target_type, IBindableTexture* texture, const ViewDesc& view_desc)
+void FboFrameBuffer::SetAttachment (RenderTargetType target_type, IRenderTargetTexture* texture, const ViewDesc& view_desc)
 {
   if (view_desc.mip_level)
     RaiseNotSupported ("render::low_level::opengl::FboFrameBuffer::SetAttachment", "Unsupported mip_level=0 (incompatible with GL_EXT_framebuffer_object)");
 
-  TextureDesc         desc;
-  BindableTextureDesc bind_desc;
+  RenderTargetTextureDesc desc;
 
   memset (&desc, 0, sizeof (desc));
-  memset (&bind_desc, 0, sizeof (bind_desc));
 
   texture->GetDesc (desc);
-  texture->GetDesc (bind_desc);
 
   switch (target_type)
   {
     case RenderTargetType_Color:
-      SetAttachment (GL_COLOR_ATTACHMENT0_EXT, bind_desc.target, bind_desc.id, view_desc);
+      SetAttachment (GL_COLOR_ATTACHMENT0_EXT, desc.target, desc.id, view_desc);
       break;
     case RenderTargetType_DepthStencil:
-      SetAttachment (GL_DEPTH_ATTACHMENT_EXT, bind_desc.target, bind_desc.id, view_desc);
-      SetAttachment (GL_STENCIL_ATTACHMENT_EXT, bind_desc.target, bind_desc.id, view_desc);
+      SetAttachment (GL_DEPTH_ATTACHMENT_EXT, desc.target, desc.id, view_desc);
+      SetAttachment (GL_STENCIL_ATTACHMENT_EXT, desc.target, desc.id, view_desc);
       break;
     default:
       break;

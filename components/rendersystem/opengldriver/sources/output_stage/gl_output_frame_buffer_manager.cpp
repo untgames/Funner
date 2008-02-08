@@ -416,8 +416,8 @@ FrameBuffer* FrameBufferManager::CreateFrameBufferImpl
     case ViewType_SwapChainDepthStencilBuffer:
       return CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetSwapChainDepthStencilBuffer (),
                                 depth_stencil_desc);
-    case ViewType_Texture:
-      return CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetBindableTexture (), depth_stencil_desc);
+    case ViewType_RenderTargetTexture:
+      return CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetRenderTargetTexture (), depth_stencil_desc);
     case ViewType_FboRenderBuffer:
       return CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetFboRenderBuffer (), depth_stencil_desc);
     default:
@@ -480,8 +480,8 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (View* render_target_view, Vi
     case ViewType_SwapChainDepthStencilBuffer:
       RaiseNotSupported (METHOD_NAME, "Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'");
       return 0;
-    case ViewType_Texture:
-      return CreateFrameBufferImpl (render_target_view->GetBindableTexture (), render_target_desc, depth_stencil_view);
+    case ViewType_RenderTargetTexture:
+      return CreateFrameBufferImpl (render_target_view->GetRenderTargetTexture (), render_target_desc, depth_stencil_view);
     case ViewType_FboRenderBuffer:
       return CreateFrameBufferImpl (render_target_view->GetFboRenderBuffer (), render_target_desc, depth_stencil_view);
     default:
@@ -527,7 +527,7 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, S
   }
 }
 
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, IBindableTexture* texture, const ViewDesc& desc)
+FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, IRenderTargetTexture* texture, const ViewDesc& desc)
 {
   try
   {
@@ -547,7 +547,7 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, I
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(NullView,IBindableTexture*)");
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(NullView,IRenderTargetTexture*)");
 
     throw;
   }
@@ -603,7 +603,7 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer* color_
   }
 }
 
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer* color_buffer, const ViewDesc&, IBindableTexture* texture, const ViewDesc& desc)
+FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer* color_buffer, const ViewDesc&, IRenderTargetTexture* texture, const ViewDesc& desc)
 {
   try
   {
@@ -616,7 +616,7 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer* color_
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(SwapChainColorBuffer*,IBindableTexture*)");
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(SwapChainColorBuffer*,IRenderTargetTexture*)");
 
     throw;
   }
@@ -630,7 +630,7 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer*, const
   return 0;
 }
 
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (IBindableTexture* texture, const ViewDesc& desc, NullView, const ViewDesc&)
+FrameBuffer* FrameBufferManager::CreateFrameBuffer (IRenderTargetTexture* texture, const ViewDesc& desc, NullView, const ViewDesc&)
 {
   try
   {
@@ -650,13 +650,13 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (IBindableTexture* texture, c
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IBindableTexture*,NullView)");
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IRenderTargetTexture*,NullView)");
     
     throw;
   }
 }
 
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (IBindableTexture* texture, const ViewDesc& desc, SwapChainDepthStencilBuffer* depth_stencil_buffer, const ViewDesc&)
+FrameBuffer* FrameBufferManager::CreateFrameBuffer (IRenderTargetTexture* texture, const ViewDesc& desc, SwapChainDepthStencilBuffer* depth_stencil_buffer, const ViewDesc&)
 {
   try
   {
@@ -669,16 +669,16 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (IBindableTexture* texture, c
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IBindableTexture*,SwapChainDepthStencilBuffer*)");
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IRenderTargetTexture*,SwapChainDepthStencilBuffer*)");
 
     throw;
   }
 }
 
 FrameBuffer* FrameBufferManager::CreateFrameBuffer
- (IBindableTexture* render_target_texture,
+ (IRenderTargetTexture* render_target_texture,
   const ViewDesc&   render_target_desc,
-  IBindableTexture* depth_stencil_texture,
+  IRenderTargetTexture* depth_stencil_texture,
   const ViewDesc&   depth_stencil_desc)
 {
   try
@@ -699,14 +699,14 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IBindableTexture*,IBindableTexture*)");
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IRenderTargetTexture*,IRenderTargetTexture*)");
 
     throw;
   }
 }
 
 FrameBuffer* FrameBufferManager::CreateFrameBuffer
- (IBindableTexture* render_target_texture,
+ (IRenderTargetTexture* render_target_texture,
   const ViewDesc&   render_target_desc,
   FboRenderBuffer*  depth_stencil_buffer,
   const ViewDesc&)
@@ -720,7 +720,7 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IBindableTexture*,FboRenderBuffer*)");
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IRenderTargetTexture*,FboRenderBuffer*)");
     
     throw;
   }
@@ -754,7 +754,7 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer (FboRenderBuffer*, const View
 FrameBuffer* FrameBufferManager::CreateFrameBuffer
  (FboRenderBuffer*  color_buffer,
   const ViewDesc&,
-  IBindableTexture* depth_stencil_texture,
+  IRenderTargetTexture* depth_stencil_texture,
   const ViewDesc&   depth_stencil_desc)
 {
   try
@@ -766,7 +766,7 @@ FrameBuffer* FrameBufferManager::CreateFrameBuffer
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,IBindableTexture*)");
+    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,IRenderTargetTexture*)");
 
     throw;
   }
