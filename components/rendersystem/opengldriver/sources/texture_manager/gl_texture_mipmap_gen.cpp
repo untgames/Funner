@@ -29,13 +29,15 @@ struct rgba8_t
   uchar alpha;
 };
 
-/*
-  быстрое масштабирование изображений по размеру кратных двойке
-*/
+struct depth24_stencil8
+{
+  size_t depth_component : 24;
+  size_t stencil_index   : 8;
+};
 
-////////////////////////////////////////////////////////////////////////////////////////////
-///Фильтры
-////////////////////////////////////////////////////////////////////////////////////////////
+/*
+    Быстрое масштабирование изображений по размерам кратным двойке
+*/
 
 void scale_pixel (uchar& dest,uchar s1,uchar s2,uchar s3,uchar s4)
 {
@@ -47,41 +49,39 @@ void scale_pixel (uint16& dest, uint16 s1, uint16 s2, uint16 s3, uint16 s4)
   dest = (size_t)(s1 + s2 + s3 + s4) >> 2;
 }
 
-void scale_pixel (r24g8_t& dest, const r24g8_t& s1, const r24g8_t& s2, const r24g8_t& s3, const r24g8_t& s4)
+void scale_pixel (depth24_stencil8& dest, const depth24_stencil8& s1, const depth24_stencil8& s2, const depth24_stencil8& s3, const depth24_stencil8& s4)
 {
-  //Непереносимо!!!
-  dest = ((s1 & 0xffffff) + (s2 & 0xffffff) + (s3 & 0xffffff) + (s4 & 0xffffff)) >> 2;
-  dest |= ((((s1 & 0xff000000) >> 24) + ((s2 & 0xff000000) >> 24) + ((s3 & 0xff000000) >> 24) + ((s4 & 0xff000000) >> 24)) >> 2) << 24;
+  dest.stencil_index   = (size_t)(s1.stencil_index + s2.stencil_index + s3.stencil_index + s4.stencil_index) / 4;
+  dest.depth_component = (size_t)(s1.depth_component + s2.depth_component + s3.depth_component + s4.depth_component) / 4;
 }
 
-void  scale_pixel (two_color8_t& dest, two_color8_t s1, two_color8_t s2, two_color8_t s3, two_color8_t s4)
+void scale_pixel (two_color8_t& dest, two_color8_t s1, two_color8_t s2, two_color8_t s3, two_color8_t s4)
 {
-  dest.red   = (size_t)(s1.red   + s2.red   + s3.red   + s4.red)   >> 2;
-  dest.green = (size_t)(s1.green + s2.green + s3.green + s4.green) >> 2;
+  dest.red   = (size_t)(s1.red   + s2.red   + s3.red   + s4.red)   / 4;
+  dest.green = (size_t)(s1.green + s2.green + s3.green + s4.green) / 4;
 }
 
-void  scale_pixel (rgb8_t& dest,const rgb8_t& s1,const rgb8_t& s2,const rgb8_t& s3,const rgb8_t& s4)
+void scale_pixel (rgb8_t& dest,const rgb8_t& s1,const rgb8_t& s2,const rgb8_t& s3,const rgb8_t& s4)
 {
-  dest.red   = (size_t)(s1.red   + s2.red   + s3.red   + s4.red)   >> 2;
-  dest.green = (size_t)(s1.green + s2.green + s3.green + s4.green) >> 2;
-  dest.blue  = (size_t)(s1.blue  + s2.blue  + s3.blue  + s4.blue ) >> 2;
+  dest.red   = (size_t)(s1.red   + s2.red   + s3.red   + s4.red)   / 4;
+  dest.green = (size_t)(s1.green + s2.green + s3.green + s4.green) / 4;
+  dest.blue  = (size_t)(s1.blue  + s2.blue  + s3.blue  + s4.blue ) / 4;
 }
 
-void  scale_pixel (rgba8_t& dest,const rgba8_t& s1,const rgba8_t& s2,const rgba8_t& s3,const rgba8_t& s4)
+void scale_pixel (rgba8_t& dest,const rgba8_t& s1,const rgba8_t& s2,const rgba8_t& s3,const rgba8_t& s4)
 {
-  dest.red   = (size_t)(s1.red   + s2.red   + s3.red   + s4.red)   >> 2;
-  dest.green = (size_t)(s1.green + s2.green + s3.green + s4.green) >> 2;
-  dest.blue  = (size_t)(s1.blue  + s2.blue  + s3.blue  + s4.blue ) >> 2;
-  dest.alpha = (size_t)(s1.alpha + s2.alpha + s3.alpha + s4.alpha) >> 2;
+  dest.red   = (size_t)(s1.red   + s2.red   + s3.red   + s4.red)   / 4;
+  dest.green = (size_t)(s1.green + s2.green + s3.green + s4.green) / 4;
+  dest.blue  = (size_t)(s1.blue  + s2.blue  + s3.blue  + s4.blue ) / 4;
+  dest.alpha = (size_t)(s1.alpha + s2.alpha + s3.alpha + s4.alpha) / 4;
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Собственно масштабирование
-////////////////////////////////////////////////////////////////////////////////////////////
 
 template <class T>
-void scale_image_2x_down_impl (size_t width, size_t height, const T* src,T* dest)
+void scale_image_2x_down_impl (size_t width, size_t height, const void* in_src, void* in_dest)
 {
+  const T* src  = static_cast<const T*> (in_src);
+  T*       dest = static_cast<T*> (in_dest);
+
   const T *s1 = src,
           *s2 = src + 1,
           *s3 = src + width,
@@ -123,12 +123,12 @@ fixed float2fixed (float data)
   return (fixed)(data * 65536.f);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-///Полное мастштабирование (не более чем в два раза)
-////////////////////////////////////////////////////////////////////////////////////////////
 template <class T>
-void scale_image_impl (size_t width, size_t height, const T* src, size_t new_width, size_t new_height, T* dst)
+void scale_image_impl (size_t width, size_t height, const void* in_src, size_t new_width, size_t new_height, void* in_dst)
 {
+  const T* src = static_cast<const T*> (in_src);
+  T*       dst = static_cast<T*> (in_dst);
+
   fixed src_width  = int2fixed (width),
         src_height = int2fixed (height),
         dst_width  = int2fixed (new_width),
@@ -179,51 +179,41 @@ void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const
   {
     case PixelFormat_L8:
     case PixelFormat_A8:
-    case PixelFormat_S8:    scale_image_2x_down_impl <uchar>        (width, height, (uchar*)       src, (uchar*)       dest); break;
-    case PixelFormat_LA8:   scale_image_2x_down_impl <two_color8_t> (width, height, (two_color8_t*)src, (two_color8_t*)dest); break;
-    case PixelFormat_D16:   scale_image_2x_down_impl <uint16>       (width, height, (uint16*)      src, (uint16*)      dest); break;
-    case PixelFormat_RGB8:  scale_image_2x_down_impl <rgb8_t>       (width, height, (rgb8_t*)      src, (rgb8_t*)      dest); break;
-    case PixelFormat_RGBA8: scale_image_2x_down_impl <rgba8_t>      (width, height, (rgba8_t*)     src, (rgba8_t*)     dest); break;
+    case PixelFormat_S8:    scale_image_2x_down_impl<uchar>        (width, height, src, dest); break;
+    case PixelFormat_LA8:   scale_image_2x_down_impl<two_color8_t> (width, height, src, dest); break;
+    case PixelFormat_D16:   scale_image_2x_down_impl<uint16>       (width, height, src, dest); break;
+    case PixelFormat_RGB8:  scale_image_2x_down_impl<rgb8_t>       (width, height, src, dest); break;
+    case PixelFormat_RGBA8: scale_image_2x_down_impl<rgba8_t>      (width, height, src, dest); break;
     case PixelFormat_D24S8:
-    case PixelFormat_D24X8: scale_image_2x_down_impl <r24g8_t>      (width, height, (r24g8_t*)     src, (r24g8_t*)     dest); break;
+    case PixelFormat_D24X8: scale_image_2x_down_impl<depth24_stencil8> (width, height, src, dest); break;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-    default: common::RaiseNotSupported ("render::low_level::opengl::scale_image_2x_down", "DXT image scaling not supported.");;
+    default:
+      common::RaiseNotSupported ("render::low_level::opengl::scale_image_2x_down", "DXT image scaling not supported");
+      break;
   }
 }
 
-void scale_image (PixelFormat format, size_t width, size_t height, 
-                                             size_t new_width, size_t new_height, const void* src, void* dest)
+void scale_image (PixelFormat format, size_t width, size_t height, size_t new_width, size_t new_height, const void* src, void* dest)
 {
   switch (format)
   {
     case PixelFormat_L8:
     case PixelFormat_A8:
-    case PixelFormat_S8:    scale_image_impl <uchar>        (width, height, (uchar*)       src, new_width, new_height, (uchar*)       dest); break;
-    case PixelFormat_LA8:   scale_image_impl <two_color8_t> (width, height, (two_color8_t*)src, new_width, new_height, (two_color8_t*)dest); break;
-    case PixelFormat_D16:   scale_image_impl <uint16>       (width, height, (uint16*)      src, new_width, new_height, (uint16*)      dest); break;
-    case PixelFormat_RGB8:  scale_image_impl <rgb8_t>       (width, height, (rgb8_t*)      src, new_width, new_height, (rgb8_t*)      dest); break;
-    case PixelFormat_RGBA8: scale_image_impl <rgba8_t>      (width, height, (rgba8_t*)     src, new_width, new_height, (rgba8_t*)     dest); break;
+    case PixelFormat_S8:    scale_image_impl <uchar>        (width, height, src, new_width, new_height, dest); break;
+    case PixelFormat_LA8:   scale_image_impl <two_color8_t> (width, height, src, new_width, new_height, dest); break;
+    case PixelFormat_D16:   scale_image_impl <uint16>       (width, height, src, new_width, new_height, dest); break;
+    case PixelFormat_RGB8:  scale_image_impl <rgb8_t>       (width, height, src, new_width, new_height, dest); break;
+    case PixelFormat_RGBA8: scale_image_impl <rgba8_t>      (width, height, src, new_width, new_height, dest); break;
     case PixelFormat_D24S8:
-    case PixelFormat_D24X8: scale_image_impl <r24g8_t>      (width, height, (r24g8_t*)     src, new_width, new_height, (r24g8_t*)     dest); break;
+    case PixelFormat_D24X8: scale_image_impl <depth24_stencil8>      (width, height, src, new_width, new_height, dest); break;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-    default: common::RaiseNotSupported ("render::low_level::opengl::scale_image", "DXT image scaling not supported.");
-  }
-}
-
-namespace
-{
-
-size_t get_next_mip_size (size_t size)
-{
-  switch (size)
-  {
-    case 0:
-    case 1:   return size;
-    default:  return size / 2;
+    default:
+      common::RaiseNotSupported ("render::low_level::opengl::scale_image", "DXT image scaling not supported");
+      break;
   }
 }
 
@@ -232,6 +222,3 @@ size_t get_next_mip_size (size_t size)
 }
 
 }
-
-}
-

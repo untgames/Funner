@@ -34,7 +34,8 @@ ScaledTexture::ScaledTexture
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
   vertical_scale   = (float)scaled_height / (float)original_desc.height;  
 
-  //LogPrintf ("Non power of two textures not supported by hardware. Scaled texture created.\n");  //подробнее!!
+  LogPrintf ("Scaled texture %ux%ux%u has created for original texture %ux%ux%u@%s", scaled_width, scaled_height, temp_desc.layers,
+             original_desc.width, original_desc.height, original_desc.layers, get_name (original_desc.format));
 }
 
 /*
@@ -47,6 +48,11 @@ void ScaledTexture::GetDesc (TextureDesc& out_desc)
 
   out_desc.width  = original_width;
   out_desc.height = original_height;
+}
+
+void ScaledTexture::GetDesc (BindableTextureDesc& out_desc)
+{
+  shadow_texture->GetDesc (out_desc);
 }
 
 void ScaledTexture::GetDesc (RenderTargetTextureDesc& out_desc)

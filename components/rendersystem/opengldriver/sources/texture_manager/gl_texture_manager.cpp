@@ -4,46 +4,14 @@ using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
-namespace
+//идентификаторы элементов контекстной таблицы
+enum TextureManagerContextTable
 {
+//  TextureManagerContextTable_TexTarget0,
+//  TextureManagerContextTable_TexTargetsNum = TextureManagerContextTable_Texture0 + DEVICE_SAMPLER_SLOTS_COUNT,
 
-enum TextureManagerDataTable
-{
-  TextureManagerDataTable_Texture0,
-  TextureManagerDataTable_Texture1,
-  TextureManagerDataTable_Texture2,
-  TextureManagerDataTable_Texture3,
-  TextureManagerDataTable_Texture4,
-  TextureManagerDataTable_Texture5,
-  TextureManagerDataTable_Texture6,
-  TextureManagerDataTable_Texture7,
-  TextureManagerDataTable_Sampler0,
-  TextureManagerDataTable_Sampler1,
-  TextureManagerDataTable_Sampler2,
-  TextureManagerDataTable_Sampler3,
-  TextureManagerDataTable_Sampler4,
-  TextureManagerDataTable_Sampler5,
-  TextureManagerDataTable_Sampler6,
-  TextureManagerDataTable_Sampler7,
-
-  TextureManagerDataTable_Num
+  TextureManagerContextTable_Num
 };
-
-///????
-OpenGLTextureTarget get_OpenGLTextureTarget (GLenum tex_target)
-{
-  switch (tex_target)
-  {
-    case GL_TEXTURE_1D:            return OpenGLTextureTarget_Texture1D;
-    case GL_TEXTURE_2D:            return OpenGLTextureTarget_Texture2D;
-    case GL_TEXTURE_RECTANGLE_EXT: return OpenGLTextureTarget_TextureRectangle;
-    case GL_TEXTURE_3D:            return OpenGLTextureTarget_Texture3D;
-    case GL_TEXTURE_CUBE_MAP_ARB:  return OpenGLTextureTarget_TextureCubemap;
-    default: RaiseInvalidArgument ("get_OpenGLTextureTarget", "tex_target"); return OpenGLTextureTarget_Texture2D;
-  }
-}
-
-}
 
 /*
     Описание реализации TextureManager
@@ -82,27 +50,27 @@ struct TextureManager::Impl: public ContextObject
     ITexture* CreateTexture3D      (const TextureDesc&);
     ITexture* CreateTextureCubemap (const TextureDesc&);
 
-  private:    
+  private:
     typedef xtl::trackable_ptr<BindableTexture> TexturePtr;
     typedef xtl::trackable_ptr<SamplerState>    SamplerStatePtr;
     
-/*    struct Sampler
+    struct Sampler
     {
       TexturePtr      texture; //текстура
       SamplerStatePtr state;   //состояние сэмплера
-    };*/
+    };
+    
+    typedef xtl::array<Sampler, DEVICE_SAMPLER_SLOTS_COUNT> SamplerArray;
 
   public:
-    TextureManager&          texture_manager;                                //менеджер текстур
-    size_t                   max_texture_size;                               //максимальный размер текстуры для устройства
-    size_t                   max_rectangle_texture_size;                     //максимальный размер текстуры со сторонами не степени 2 для устройства
-    size_t                   max_cube_map_texture_size;                      //максимальный размер cubemap текстуры
-    size_t                   max_3d_texture_size;                            //максимальный размер 3d текстуры
-    size_t                   texture_units_count;                            //количество слотов мультитекстурирования
-    TexturePtr               binded_textures[DEVICE_SAMPLER_SLOTS_COUNT];    //подключенные текстуры
-    SamplerStatePtr          binded_samplers[DEVICE_SAMPLER_SLOTS_COUNT];    //подключенные сэмплеры
-    GLenum                   binded_tex_targets[DEVICE_SAMPLER_SLOTS_COUNT]; //включенные gl тарджеты//????????!!!!!!!!
-    ExtensionsPtr            extensions;                                     //поддерживаемые расширения
+    TextureManager& texture_manager;            //менеджер текстур
+    size_t          max_texture_size;           //максимальный размер текстуры для устройства
+    size_t          max_rectangle_texture_size; //максимальный размер текстуры со сторонами не степени 2 для устройства
+    size_t          max_cube_map_texture_size;  //максимальный размер cubemap текстуры
+    size_t          max_3d_texture_size;        //максимальный размер 3d текстуры
+    size_t          texture_units_count;        //количество слотов мультитекстурирования
+    SamplerArray    samplers;                   //массив сэмплеров
+    ExtensionsPtr   extensions;                 //поддерживаемые расширения
 };
 
 
@@ -127,6 +95,8 @@ TextureManager::Impl::Impl (const ContextManager& context_manager, TextureManage
   extensions = ExtensionsPtr (new TextureExtensions (context_manager));
 
     //запрос максимальных размеров текстур / количества текстурных юнитов
+    
+      //вынести в TextureExtensions!!!!
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
 
@@ -137,10 +107,6 @@ TextureManager::Impl::Impl (const ContextManager& context_manager, TextureManage
 
   if (texture_units_count > DEVICE_SAMPLER_SLOTS_COUNT)
     texture_units_count = DEVICE_SAMPLER_SLOTS_COUNT;
-    
-    //сброс таблицы
-
-  memset (binded_tex_targets, 0, sizeof (binded_tex_targets));
 
     //проверка ошибок
   
@@ -160,15 +126,15 @@ void TextureManager::Impl::Bind ()
   MakeContextCurrent ();
 
     //установка текстур и сэмплеров
-
-  for (size_t i = 0; i < texture_units_count; i++)
-  {
-    BindableTexture* texture = binded_textures [i].get ();
-    SamplerState*    sampler = binded_samplers [i].get ();
     
-    if (!texture || !sampler)
+/*  for (size_t i = 0; i < texture_units_count; i++)
+  {
+    BindableTexture* texture       = samplers [i].texture.get ();
+    SamplerState*    sampler_state = samplers [i].state.get ();
+
+    if (!texture || !state)
     {
-      if (extensions->has_arb_multitexture)
+      if (extensions->has_arb_multitexture) //поднять!!!
       {
         if (glActiveTexture) glActiveTexture    (GL_TEXTURE0 + i);
         else                 glActiveTextureARB (GL_TEXTURE0 + i);
@@ -183,45 +149,53 @@ void TextureManager::Impl::Bind ()
       
       continue;
     }
-
-    if (extensions->has_arb_multitexture)
-    {
-      if (glActiveTexture) glActiveTexture    (GL_TEXTURE0 + i);
-      else                 glActiveTextureARB (GL_TEXTURE0 + i);
-    }
     
-      //переделать!!!!!
+      //убрать!!!
+
+    BindableTextureDesc tex_desc;
+
+    texture->GetDesc (tex_desc);    
+
+      //установка текстуры в контекст OpenGL      
+
+    if (GetContextData (ContextDataTable_TextureManager, TextureManagerContextTable_Texture0 + i) != texture->GetId ())
+    {
+      if (extensions->has_arb_multitexture) //убрать!!!
+      {
+        if (glActiveTexture) glActiveTexture    (GL_TEXTURE0 + i);
+        else                 glActiveTextureARB (GL_TEXTURE0 + i);
+      }      
+
+      glBindTexture (tex_desc.target, tex_desc.id);      
+
+      SetContextData (ContextDataTable_TextureManager, TextureManagerContextTable_Texture0 + i, texture->GetId ());
+
+      GLenum current_target = GetContextData (ContextDataTable_TextureManager, TextureManagerContextTable_TexTarget0 + i);
+
+      if (current_target != tex_desc.target)
+      {       
+        if (current_target)
+          glDisable (current_target);
+
+        glEnable  (tex_desc.target);
+
+        SetContextData (ContextDataTable_TextureManager, TextureManagerContextTable_TexTarget0 + i, tex_desc.target);
+      }
+    }
+
+      //установка состояния сэмплирования
+
+      //проверять случай присоединения к одной текстуре разных сэмплеров!!!!!!!
+
+    if (texture->GetSamplerId () != sampler_state->GetId ())
+    {
+        //неверно!!!!. нужно делать glBindTexture!!!
       
-    RenderTargetTextureDesc tex_desc;
-    
-    texture->GetDesc (tex_desc);
-    
-    GLenum tex_target = tex_desc.target;
-    size_t tex_id     = tex_desc.id;
+      texture->SetSamplerId (sampler_state->GetId ());
 
-    if (binded_tex_targets [i] != tex_target)
-    {
-      binded_tex_targets [i] = tex_target;
-
-      glEnable (binded_tex_targets [i]);
+      sampler_state->Bind (tex_desc.target);
     }
-    
-       //доделать!!!!!!!
-
-    if (GetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Texture0 + i) != texture->GetId ())
-    {
-      SetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Texture0 + i, texture->GetId ());
-
-      glBindTexture (tex_target, tex_id);
-    }
-
-//    if (GetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Sampler0 + i) != sampler->GetId ())
-    {
-//      SetContextData (ContextDataTable_TextureManager, TextureManagerDataTable_Sampler0 + i, sampler->GetId ());
-
-      sampler->Bind (get_OpenGLTextureTarget (tex_target));
-    }
-  }
+  }*/
 
     //проверка ошибок
 
@@ -382,7 +356,7 @@ ITexture* TextureManager::Impl::CreateTexture (const TextureDesc& desc)
 
 ISamplerState* TextureManager::Impl::CreateSamplerState (const SamplerDesc& in_desc)
 {
-  return new SamplerState (GetContextManager (), in_desc);
+  return new SamplerState (GetContextManager (), extensions, in_desc);
 }
 
 /*
@@ -396,7 +370,7 @@ void TextureManager::Impl::SetTexture (size_t sampler_slot, ITexture* texture)
   if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't set texture in unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
   
-  binded_textures [sampler_slot] = cast_object<BindableTexture> (*this, texture, METHOD_NAME, "state");
+  samplers [sampler_slot].texture = cast_object<BindableTexture> (*this, texture, METHOD_NAME, "state");
 }
 
 void TextureManager::Impl::SetSampler (size_t sampler_slot, ISamplerState* state)
@@ -406,7 +380,7 @@ void TextureManager::Impl::SetSampler (size_t sampler_slot, ISamplerState* state
   if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't set sampler in unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
 
-  binded_samplers [sampler_slot] = cast_object<SamplerState> (*this, state, METHOD_NAME, "state");
+  samplers [sampler_slot].state = cast_object<SamplerState> (*this, state, METHOD_NAME, "state");
 }
 
 ITexture* TextureManager::Impl::GetTexture (size_t sampler_slot) const
@@ -416,7 +390,7 @@ ITexture* TextureManager::Impl::GetTexture (size_t sampler_slot) const
   if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't get texture from unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
 
-  return binded_textures [sampler_slot].get ();
+  return samplers [sampler_slot].texture.get ();
 }
 
 ISamplerState* TextureManager::Impl::GetSampler (size_t sampler_slot) const
@@ -426,7 +400,7 @@ ISamplerState* TextureManager::Impl::GetSampler (size_t sampler_slot) const
   if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't get sampler from unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
 
-  return binded_samplers [sampler_slot].get ();
+  return samplers [sampler_slot].state.get ();
 }
 
 /*

@@ -9,6 +9,7 @@
 #include <xtl/uninitialized_storage.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/array>
 
 #include <render/low_level/utils.h>
 
@@ -26,32 +27,27 @@ namespace low_level
 namespace opengl
 {
 
-//??????????????
-enum OpenGLTextureTarget
-{
-  OpenGLTextureTarget_Texture1D,
-  OpenGLTextureTarget_Texture2D,
-  OpenGLTextureTarget_TextureRectangle,
-  OpenGLTextureTarget_Texture3D,
-  OpenGLTextureTarget_TextureCubemap,
-
-  OpenGLTextureTarget_Num
-};
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Расширения, поддерживаемые менеджером текстур
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct TextureExtensions
 {  
-  bool has_ext_texture_compression_s3tc; //GL_EXT_texture_compression_s3tc
-  bool has_sgis_generate_mipmap;         //GL_SGIS_generate_mipmap  
-  bool has_ext_texture_rectangle;        //GL_EXT_texture_rectangle
-  bool has_ext_texture3d;                //GL_EXT_texture3D
-  bool has_ext_packed_depth_stencil;     //GL_EXT_packed_depth_stencil
-  bool has_arb_multitexture;             //GL_ARB_multitexture
-  bool has_arb_texture_cube_map;         //GL_ARB_texture_cubemap
-  bool has_arb_texture_non_power_of_two; //GL_ARB_texture_non_power_of_two
-  bool has_arb_depth_texture;            //GL_ARB_depth_texture
+  bool   has_ext_texture_compression_s3tc;   //GL_EXT_texture_compression_s3tc
+  bool   has_sgis_generate_mipmap;           //GL_SGIS_generate_mipmap
+  bool   has_ext_texture_rectangle;          //GL_EXT_texture_rectangle
+  bool   has_ext_texture3d;                  //GL_EXT_texture3D
+  bool   has_ext_packed_depth_stencil;       //GL_EXT_packed_depth_stencil
+  bool   has_arb_multitexture;               //GL_ARB_multitexture
+  bool   has_arb_texture_cube_map;           //GL_ARB_texture_cubemap
+  bool   has_arb_texture_non_power_of_two;   //GL_ARB_texture_non_power_of_two
+  bool   has_arb_depth_texture;              //GL_ARB_depth_texture
+  bool   has_sgis_texture_lod;               //GL_SGIS_texture_lod
+  bool   has_ext_texture_lod_bias;           //GL_EXT_texture_lod_bias
+  bool   has_ext_texture_filter_anisotropic; //GL_EXT_texture_filter_anisotropic
+  bool   has_ext_shadow_funcs;               //GL_EXT_shadow_funcs
+  bool   has_arb_texture_border_clamp;       //GL_ARB_texture_border_clamp
+  bool   has_arb_texture_mirrored_repeat;    //GL_ARB_texture_mirrored_repeat
+  size_t max_anisotropy;                     //максимально возможная степень анизотропии
 
   TextureExtensions (const ContextManager&);
 };
@@ -76,13 +72,27 @@ struct MipLevelDesc
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дескриптор текстуры устанавливамой в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct BindableTextureDesc
+{
+  size_t target; //целевой тип текстуры
+  size_t id;     //идентификатор текстуры
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текстура устанавливаемая в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class BindableTexture: virtual public ITexture, virtual public IRenderTargetTexture, public ContextObject
 {
   public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение дескрипторов
+///////////////////////////////////////////////////////////////////////////////////////////////////
     using ITexture::GetDesc;
     using IRenderTargetTexture::GetDesc;
+    
+    virtual void GetDesc (BindableTextureDesc&) = 0;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текстуры в контекст OpenGL
@@ -99,7 +109,7 @@ class BindableTexture: virtual public ITexture, virtual public IRenderTargetText
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    BindableTexture (const ContextManager& context_manager) : ContextObject (context_manager) {}
+    BindableTexture (const ContextManager& context_manager) : ContextObject (context_manager) {}      
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +123,7 @@ class Texture: public BindableTexture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void GetDesc (TextureDesc&);
     void GetDesc (RenderTargetTextureDesc&);
+    void GetDesc (BindableTextureDesc&); 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение информации о текстуре
@@ -320,6 +331,7 @@ class ScaledTexture: public BindableTexture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void GetDesc (TextureDesc&);
     void GetDesc (RenderTargetTextureDesc&);
+    void GetDesc (BindableTextureDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / получение номера прикрепленного сэмплера
@@ -359,12 +371,12 @@ class SamplerState : virtual public ISamplerState, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SamplerState (const ContextManager& manager, const SamplerDesc& desc);
+    SamplerState (const ContextManager& manager, const ExtensionsPtr& extensions, const SamplerDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выбор сэмплера в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (OpenGLTextureTarget tex_target);
+    void Bind (GLenum texture_target);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение/получение дескриптора
@@ -373,9 +385,9 @@ class SamplerState : virtual public ISamplerState, public ContextObject
     void GetDesc (SamplerDesc&);
 
   private:
-    SamplerDesc desc;           //дескриптор сэмплера
-    int         display_list;   //номер первого списка команд конфигурации OpenGL (всего списков OpenGLTextureTarget_Num)
-    size_t      max_anisotropy; //максимально возможная степень анизотропии
+    SamplerDesc   desc;         //дескриптор сэмплера
+    int           display_list; //номер первого списка команд конфигурации OpenGL (всего списков OpenGLTextureTarget_Num)
+    ExtensionsPtr extensions;   //поддерживаемые расширения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

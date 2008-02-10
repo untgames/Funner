@@ -127,6 +127,12 @@ void Texture::GetDesc (TextureDesc& out_desc)
   out_desc = desc;
 }
 
+void Texture::GetDesc (BindableTextureDesc& out_desc)
+{
+  out_desc.id     = texture_id;
+  out_desc.target = target;
+}
+
 void Texture::GetDesc (RenderTargetTextureDesc& out_desc)
 {
   static_cast<TextureDesc&> (out_desc) = desc;
@@ -444,8 +450,6 @@ void Texture::SetData
         break;
     }      
 
-     // уточнить про перегенерацию при установке mip_level != 0!!!
-     
     SetUncompressedData (layer, mip_level, x, y, width, height, gl_format, gl_type, buffer);
 
     if (desc.generate_mips_enable && !mip_level && !GetExtensions ().has_sgis_generate_mipmap)
