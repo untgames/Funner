@@ -2,6 +2,11 @@
     Инициализация / разрушение
 */
 
+#ifdef _MSC_VER
+  #pragma warning (push)
+  #pragma warning (disable : 4345) //behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized
+#endif
+
 template <class T>
 inline void destroy_aux (T* x,false_type)
 {
@@ -55,6 +60,10 @@ inline void construct (T* p)
 {
   construct_aux (p,typename type_traits<T>::has_trivial_default_constructor ());
 }
+
+#ifdef _MSC_VER
+  #pragma warning (pop)
+#endif
 
 /*
     Упрощение вызова копирующего конструктора
