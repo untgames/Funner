@@ -103,7 +103,7 @@ class IDevice: virtual public IObject
     virtual IShader*                 SSGetShader                 () = 0;
     virtual ISamplerState*           SSGetSampler                (size_t sampler_slot) = 0;
     virtual ITexture*                SSGetTexture                (size_t sampler_slot) = 0;
-    virtual IBuffer*                 SSGetConstantBufer          (size_t buffer_slot) = 0;
+    virtual IBuffer*                 SSGetConstantBuffer         (size_t buffer_slot) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление растеризатором (rasterizer-stage)
