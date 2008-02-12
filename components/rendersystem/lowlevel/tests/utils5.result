@@ -1,0 +1,65 @@
+Results of utils5_test:
+bind_flags=00, semantic=0
+bind_flags=01, semantic=BindFlag_VertexBuffer
+bind_flags=02, semantic=BindFlag_IndexBuffer
+bind_flags=03, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer
+bind_flags=04, semantic=BindFlag_ConstantBuffer
+bind_flags=05, semantic=BindFlag_VertexBuffer | BindFlag_ConstantBuffer
+bind_flags=06, semantic=BindFlag_IndexBuffer | BindFlag_ConstantBuffer
+bind_flags=07, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer
+bind_flags=08, semantic=BindFlag_Texture
+bind_flags=09, semantic=BindFlag_VertexBuffer | BindFlag_Texture
+bind_flags=0a, semantic=BindFlag_IndexBuffer | BindFlag_Texture
+bind_flags=0b, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture
+bind_flags=0c, semantic=BindFlag_ConstantBuffer | BindFlag_Texture
+bind_flags=0d, semantic=BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture
+bind_flags=0e, semantic=BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture
+bind_flags=0f, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture
+bind_flags=10, semantic=BindFlag_RenderTarget
+bind_flags=11, semantic=BindFlag_VertexBuffer | BindFlag_RenderTarget
+bind_flags=12, semantic=BindFlag_IndexBuffer | BindFlag_RenderTarget
+bind_flags=13, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_RenderTarget
+bind_flags=14, semantic=BindFlag_ConstantBuffer | BindFlag_RenderTarget
+bind_flags=15, semantic=BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget
+bind_flags=16, semantic=BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget
+bind_flags=17, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget
+bind_flags=18, semantic=BindFlag_Texture | BindFlag_RenderTarget
+bind_flags=19, semantic=BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_RenderTarget
+bind_flags=1a, semantic=BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget
+bind_flags=1b, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget
+bind_flags=1c, semantic=BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget
+bind_flags=1d, semantic=BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget
+bind_flags=1e, semantic=BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget
+bind_flags=1f, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget
+bind_flags=20, semantic=BindFlag_DepthStencil
+bind_flags=21, semantic=BindFlag_VertexBuffer | BindFlag_DepthStencil
+bind_flags=22, semantic=BindFlag_IndexBuffer | BindFlag_DepthStencil
+bind_flags=23, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_DepthStencil
+bind_flags=24, semantic=BindFlag_ConstantBuffer | BindFlag_DepthStencil
+bind_flags=25, semantic=BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_DepthStencil
+bind_flags=26, semantic=BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_DepthStencil
+bind_flags=27, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_DepthStencil
+bind_flags=28, semantic=BindFlag_Texture | BindFlag_DepthStencil
+bind_flags=29, semantic=BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_DepthStencil
+bind_flags=2a, semantic=BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_DepthStencil
+bind_flags=2b, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_DepthStencil
+bind_flags=2c, semantic=BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil
+bind_flags=2d, semantic=BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil
+bind_flags=2e, semantic=BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil
+bind_flags=2f, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil
+bind_flags=30, semantic=BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=31, semantic=BindFlag_VertexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=32, semantic=BindFlag_IndexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=33, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=34, semantic=BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=35, semantic=BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=36, semantic=BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=37, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=38, semantic=BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=39, semantic=BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=3a, semantic=BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=3b, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=3c, semantic=BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=3d, semantic=BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=3e, semantic=BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil
+bind_flags=3f, semantic=BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil

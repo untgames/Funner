@@ -75,7 +75,7 @@ struct VertexAttribute
   VertexAttributeSemantic semantic; //семантика вершинного атрибута
   InputDataFormat         format;   //формат данных
   InputDataType           type;     //тип элементов
-  size_t                  slot;     //номер вершинного буфера
+  size_t                  slot;     //номер слота с вершинным буфером
   size_t                  offset;   //смещение от начала вершинного буфера
   size_t                  stride;   //шаг в вершинном буфере
 };
@@ -83,16 +83,61 @@ struct VertexAttribute
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Дескриптор входного потока
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t MAX_VERTEX_ATTRIBUTES_COUNT = VertexAttributeSemantic_Num; 
-
-//убрать фиксированный размер массива за счёт введения доп-й структуры запроса!!!
 struct InputLayoutDesc
 {
-  size_t          vertex_attributes_count;                         //количество вершинных атрибутов
-  VertexAttribute vertex_attributes [MAX_VERTEX_ATTRIBUTES_COUNT]; //вершинные атрибуты
-  InputDataType   index_type;                                      //тип индексов в вершинном буфере
-  size_t          index_buffer_offset;                             //смещение в индексном буфере
+  size_t                 vertex_attributes_count; //количество вершинных атрибутов
+  const VertexAttribute* vertex_attributes;       //вершинные атрибуты
+  InputDataType          index_type;              //тип индексов в вершинном буфере
+  size_t                 index_buffer_offset;     //смещение в индексном буфере
 };
+
+/*
+===================================================================================================
+    Shader stage
+===================================================================================================
+*/
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Типы шейдерных параметров
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum ShaderParameterType
+{
+  ShaderParameterType_Int,         //целое число
+  ShaderParameterType_Float,       //вещественное число
+  ShaderParameterType_Int2,        //вектор из 2-х целых чисел
+  ShaderParameterType_Float2,      //вектор из 2-х вещественных чисел
+  ShaderParameterType_Int3,        //вектор из 3-х целых чисел
+  ShaderParameterType_Float3,      //вектор из 3-х вещественных чисел
+  ShaderParameterType_Int4,        //вектор из 4-х целых чисел
+  ShaderParameterType_Float4,      //вектор из 4-х вещественных чисел
+  ShaderParameterType_Float2x2,    //матрица 2x2 вещественных чисел
+  ShaderParameterType_Float3x3,    //матрица 3x3 вещественных чисел
+  ShaderParameterType_Float4x4,    //матрица 4x4 вещественных чисел
+
+  ShaderParameterType_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметр шейдера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct ShaderParameter
+{
+  const char*         name;   //имя константы
+  ShaderParameterType type;   //тип константы
+  size_t              slot;   //номер слота с константым буфером
+  size_t              offset; //смещение относительно начала константного буфера
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дескриптор расположения параметров шейдера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct ShaderParametersLayoutDesc
+{
+  size_t                 parameters_count; //количество параметров шейдера
+  const ShaderParameter* parameters;       //параметры шейдера
+};
+
+#if 0
 
 /*
 ===================================================================================================
@@ -177,6 +222,8 @@ struct LightingDesc
   const LightDesc* lights;       //описание источников света
 };
 
+#endif
+
 /*
 ===================================================================================================
     Shader stage (sampling)
@@ -241,6 +288,8 @@ struct SamplerDesc
   float        border_color [4];     //цвет бордюра
 };
 
+#if 0
+
 /*
 ===================================================================================================
     Shader stage (material)
@@ -287,6 +336,7 @@ enum MaterialMap
   MaterialMap_Emission,    //текстура эмиссии (self-illumination)
   MaterialMap_Reflective,  //текстура карты отражения (env-map)
   MaterialMap_Bump,        //текстура рельефа поверхности
+    //+MaterialMap_Shadow   //текстура теневой карты
   
   MaterialMap_Num
 };
@@ -294,7 +344,7 @@ enum MaterialMap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Дескриптор материала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct MaterialDesc
+struct CommonMaterialDesc
 {
   Color4f      emission;                //цвет излучения
   Color4f      ambient;                 //цвет поглощения
@@ -305,6 +355,8 @@ struct MaterialDesc
   float        alpha_reference;         //константа альфа теста
   TexmapDesc   maps [MaterialMap_Num];  //текстурные карты
 };
+
+#endif
 
 /*
 ===================================================================================================
@@ -493,17 +545,26 @@ template <class Desc> class IStateTemplate: virtual public IObject
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Шаблонный класс состояния устройства отрисовки без возможности запроса дескриптора состояния
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Desc> class ILayoutTemplate: virtual public IObject
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение дескриптора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void SetDesc (const Desc&) = 0;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Классы состояний устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef IStateTemplate<InputLayoutDesc>  IInputLayoutState;
-typedef IStateTemplate<ViewerDesc>       IViewerState;
-typedef IStateTemplate<TransformDesc>    ITransformState;
-typedef IStateTemplate<LightingDesc>     ILightingState;
-typedef IStateTemplate<SamplerDesc>      ISamplerState;
-typedef IStateTemplate<MaterialDesc>     IMaterialState;
-typedef IStateTemplate<RasterizerDesc>   IRasterizerState;
-typedef IStateTemplate<DepthStencilDesc> IDepthStencilState;
-typedef IStateTemplate<BlendDesc>        IBlendState;
+typedef ILayoutTemplate<InputLayoutDesc>            IInputLayout;
+typedef ILayoutTemplate<ShaderParametersLayoutDesc> IShaderParametersLayout;
+typedef IStateTemplate<SamplerDesc>                 ISamplerState;
+typedef IStateTemplate<RasterizerDesc>              IRasterizerState;
+typedef IStateTemplate<DepthStencilDesc>            IDepthStencilState;
+typedef IStateTemplate<BlendDesc>                   IBlendState;
 
 }
 

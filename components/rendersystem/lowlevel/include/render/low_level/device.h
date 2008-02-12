@@ -5,6 +5,7 @@
 #include <render/low_level/buffer.h>
 #include <render/low_level/state.h>
 #include <render/low_level/view.h>
+#include <render/low_level/shader.h>
 #include <render/low_level/query.h>
 
 namespace render
@@ -19,20 +20,9 @@ class ISwapChain;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Константы устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t DEVICE_VERTEX_BUFFER_SLOTS_COUNT = 8; //количество слотов для размещения вершинных буферов
-const size_t DEVICE_SAMPLER_SLOTS_COUNT       = 8; //количество слотов для размещения сэмплеров
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Режимы шейдинга
-///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ShaderMode
-{
-  ShaderMode_Flat,     //простейшая модель освещения
-  ShaderMode_Gourand,  //модель освещения по Гуро
-  ShaderMode_Phong,    //модель освещения по Фонгу
-
-  ShaderMode_Num
-};
+const size_t DEVICE_VERTEX_BUFFER_SLOTS_COUNT   = 8; //количество слотов для размещения вершинных буферов
+const size_t DEVICE_SAMPLER_SLOTS_COUNT         = 8; //количество слотов для размещения сэмплеров
+const size_t DEVICE_CONSTANT_BUFFER_SLOTS_COUNT = 8; //количество слотов для размещения константных буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Флаги очистки буфера кадра
@@ -76,56 +66,44 @@ class IDevice: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IInputLayoutState*  CreateInputLayoutState    (const InputLayoutDesc&) = 0;
-    virtual ILightingState*     CreateLightingState       (const LightingDesc&) = 0;
-    virtual IViewerState*       CreateViewerState         (const ViewerDesc&) = 0;
-    virtual ITransformState*    CreateTransformState      (const TransformDesc&) = 0;
-    virtual IMaterialState*     CreateMaterialState       (const MaterialDesc&) = 0;
-    virtual IRasterizerState*   CreateRasterizerState     (const RasterizerDesc&) = 0;
-    virtual IBlendState*        CreateBlendState          (const BlendDesc&) = 0;
-    virtual IDepthStencilState* CreateDepthStencilState   (const DepthStencilDesc&) = 0;
-    virtual ISamplerState*      CreateSamplerState        (const SamplerDesc&) = 0;
-    virtual IBuffer*            CreateVertexBuffer        (const BufferDesc&) = 0;
-    virtual IBuffer*            CreateIndexBuffer         (const BufferDesc&) = 0;
-    virtual ITexture*           CreateTexture             (const TextureDesc&) = 0;
-    virtual ITexture*           CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index) = 0;
-    virtual ITexture*           CreateDepthStencilTexture (ISwapChain* swap_chain) = 0;
-    virtual IView*              CreateView                (ITexture* texture, const ViewDesc& desc) = 0;
-    virtual IPredicate*         CreatePredicate           () = 0;
-    virtual IStatisticsQuery*   CreateStatisticsQuery     () = 0;
+    virtual IInputLayout*            CreateInputLayout            (const InputLayoutDesc&) = 0;
+    virtual IShaderParametersLayout* CreateShaderParametersLayout (const ShaderParametersLayoutDesc&) = 0;
+    virtual IRasterizerState*        CreateRasterizerState        (const RasterizerDesc&) = 0;
+    virtual IBlendState*             CreateBlendState             (const BlendDesc&) = 0;
+    virtual IDepthStencilState*      CreateDepthStencilState      (const DepthStencilDesc&) = 0;
+    virtual ISamplerState*           CreateSamplerState           (const SamplerDesc&) = 0;
+    virtual IBuffer*                 CreateBuffer                 (const BufferDesc&) = 0;
+    virtual IShader*                 CreateShader                 (const ShaderDesc& desc, const LogFunction& error_log) = 0;
+    virtual ITexture*                CreateTexture                (const TextureDesc&) = 0;
+    virtual ITexture*                CreateRenderTargetTexture    (ISwapChain* swap_chain, size_t buffer_index) = 0;
+    virtual ITexture*                CreateDepthStencilTexture    (ISwapChain* swap_chain) = 0;
+    virtual IView*                   CreateView                   (ITexture* texture, const ViewDesc& desc) = 0;
+    virtual IPredicate*              CreatePredicate              () = 0;
+    virtual IStatisticsQuery*        CreateStatisticsQuery        () = 0;    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление входным уровнем (input-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void               ISSetInputLayout  (IInputLayoutState* state) = 0;
-    virtual void               ISSetVertexBuffer (size_t vertex_buffer_slot,  IBuffer* buffer) = 0;
-    virtual void               ISSetIndexBuffer  (IBuffer* buffer) = 0;
-    virtual IInputLayoutState* ISGetInputLayout  () = 0;
-    virtual IBuffer*           ISGetVertexBuffer (size_t vertex_buffer_slot) = 0;
-    virtual IBuffer*           ISGetIndexBuffer  () = 0;
+    virtual void          ISSetInputLayout  (IInputLayout* state) = 0;
+    virtual void          ISSetVertexBuffer (size_t vertex_buffer_slot,  IBuffer* buffer) = 0;
+    virtual void          ISSetIndexBuffer  (IBuffer* buffer) = 0;
+    virtual IInputLayout* ISGetInputLayout  () = 0;
+    virtual IBuffer*      ISGetVertexBuffer (size_t vertex_buffer_slot) = 0;
+    virtual IBuffer*      ISGetIndexBuffer  () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление шейдерными уровнями (shader-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void             SSSetMode       (ShaderMode mode) = 0;
-    virtual void             SSSetViewer     (IViewerState* state) = 0;
-    virtual void             SSSetTransform  (ITransformState* state) = 0;
-    virtual void             SSSetLighting   (ILightingState* state) = 0;
-    virtual void             SSSetSampler    (size_t sampler_slot, ISamplerState* state) = 0;
-    virtual void             SSSetTexture    (size_t sampler_slot, ITexture* texture) = 0;
-    virtual void             SSSetMaterial   (IMaterialState* state) = 0;
-    virtual ShaderMode       SSGetMode       () = 0;
-    virtual IViewerState*    SSGetViewer     () = 0;
-    virtual ITransformState* SSGetTransform  () = 0;
-    virtual ILightingState*  SSGetLighting   () = 0;
-    virtual ISamplerState*   SSGetSampler    (size_t sampler_slot) = 0;
-    virtual ITexture*        SSGetTexture    (size_t sampler_slot) = 0;
-    virtual IMaterialState*  SSGetMaterial   () = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение информации о доступных режимах шейдинга устройства
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual bool SSIsSupported (ShaderMode mode) = 0;
+    virtual void                     SSSetShader                 (IShader* shader) = 0;
+    virtual void                     SSSetShaderParametersLayout (IShaderParametersLayout* parameters_layout) = 0;
+    virtual void                     SSSetSampler                (size_t sampler_slot, ISamplerState* state) = 0;
+    virtual void                     SSSetTexture                (size_t sampler_slot, ITexture* texture) = 0;
+    virtual void                     SSSetConstantBuffer         (size_t buffer_slot, IBuffer* buffer) = 0;
+    virtual IShaderParametersLayout* SSGetShaderParametersLayout () = 0;
+    virtual IShader*                 SSGetShader                 () = 0;
+    virtual ISamplerState*           SSGetSampler                (size_t sampler_slot) = 0;
+    virtual ITexture*                SSGetTexture                (size_t sampler_slot) = 0;
+    virtual IBuffer*                 SSGetConstantBufer          (size_t buffer_slot) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление растеризатором (rasterizer-stage)

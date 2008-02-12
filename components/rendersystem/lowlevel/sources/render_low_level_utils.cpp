@@ -42,74 +42,75 @@ const char* get_name (UsageMode param)
   }
 }
 
+//сгенерировано автоматически, не изменять руками (см. утилиту get_name_bind_flags_gen.cpp)
 const char* get_name (BindFlag param)
 {
   switch (param)
   {
-    case 0:
-      return "0";
-    case BindFlag_VertexBuffer:
-      return "VertexBuffer";
-    case BindFlag_IndexBuffer:
-      return "IndexBuffer";
-    case BindFlag_VertexBuffer | BindFlag_IndexBuffer:
-      return "VertexBuffer | IndexBuffer";
-    case BindFlag_Texture:
-      return "Texture";
-    case BindFlag_VertexBuffer | BindFlag_Texture:
-      return "VertexBuffer | Texture";
-    case BindFlag_IndexBuffer | BindFlag_Texture:
-      return "IndexBuffer | Texture";
-    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture:
-      return "VertexBuffer | IndexBuffer | Texture";
-    case BindFlag_RenderTarget:
-      return "RenderTarget";
-    case BindFlag_VertexBuffer | BindFlag_RenderTarget:
-      return "VertexBuffer | RenderTarget";
-    case BindFlag_IndexBuffer | BindFlag_RenderTarget:
-      return "IndexBuffer | RenderTarget";
-    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_RenderTarget:
-      return "VertexBuffer | IndexBuffer | RenderTarget";
-    case BindFlag_Texture | BindFlag_RenderTarget:
-      return "Texture | RenderTarget";
-    case BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_RenderTarget:
-      return "VertexBuffer | Texture | RenderTarget";
-    case BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget:
-      return "IndexBuffer | Texture | RenderTarget";
-    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget:
-      return "VertexBuffer | IndexBuffer | Texture | RenderTarget";
-    case BindFlag_DepthStencil:
-      return "DepthStencil";
-    case BindFlag_VertexBuffer | BindFlag_DepthStencil:
-      return "VertexBuffer | DepthStencil";
-    case BindFlag_IndexBuffer | BindFlag_DepthStencil:
-      return "IndexBuffer | DepthStencil";
-    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_DepthStencil:
-      return "VertexBuffer | IndexBuffer | DepthStencil";
-    case BindFlag_Texture | BindFlag_DepthStencil:
-      return "Texture | DepthStencil";
-    case BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_DepthStencil:
-      return "VertexBuffer | Texture | DepthStencil";
-    case BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_DepthStencil:
-      return "IndexBuffer | Texture | DepthStencil";
-    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_DepthStencil:
-      return "VertexBuffer | IndexBuffer | Texture | DepthStencil";
-    case BindFlag_RenderTarget | BindFlag_DepthStencil:
-      return "RenderTarget | DepthStencil";
-    case BindFlag_VertexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil:
-      return "VertexBuffer | RenderTarget | DepthStencil";
-    case BindFlag_IndexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil:
-      return "IndexBuffer | RenderTarget | DepthStencil";
-    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil:
-      return "VertexBuffer | IndexBuffer | RenderTarget | DepthStencil";
-    case BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil:
-      return "Texture | RenderTarget | DepthStencil";
-    case BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil:
-      return "VertexBuffer | Texture | RenderTarget | DepthStencil";
-    case BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil:
-      return "IndexBuffer | Texture | RenderTarget | DepthStencil";
-    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil:
-      return "VertexBuffer | IndexBuffer | Texture | RenderTarget | DepthStencil";
+    case 0: return "0";
+    case BindFlag_VertexBuffer: return "BindFlag_VertexBuffer";
+    case BindFlag_IndexBuffer: return "BindFlag_IndexBuffer";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer";
+    case BindFlag_ConstantBuffer: return "BindFlag_ConstantBuffer";
+    case BindFlag_VertexBuffer | BindFlag_ConstantBuffer: return "BindFlag_VertexBuffer | BindFlag_ConstantBuffer";
+    case BindFlag_IndexBuffer | BindFlag_ConstantBuffer: return "BindFlag_IndexBuffer | BindFlag_ConstantBuffer";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer";
+    case BindFlag_Texture: return "BindFlag_Texture";
+    case BindFlag_VertexBuffer | BindFlag_Texture: return "BindFlag_VertexBuffer | BindFlag_Texture";
+    case BindFlag_IndexBuffer | BindFlag_Texture: return "BindFlag_IndexBuffer | BindFlag_Texture";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture";
+    case BindFlag_ConstantBuffer | BindFlag_Texture: return "BindFlag_ConstantBuffer | BindFlag_Texture";
+    case BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture: return "BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture";
+    case BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture: return "BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture";
+    case BindFlag_RenderTarget: return "BindFlag_RenderTarget";
+    case BindFlag_VertexBuffer | BindFlag_RenderTarget: return "BindFlag_VertexBuffer | BindFlag_RenderTarget";
+    case BindFlag_IndexBuffer | BindFlag_RenderTarget: return "BindFlag_IndexBuffer | BindFlag_RenderTarget";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_RenderTarget: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_RenderTarget";
+    case BindFlag_ConstantBuffer | BindFlag_RenderTarget: return "BindFlag_ConstantBuffer | BindFlag_RenderTarget";
+    case BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget: return "BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget";
+    case BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget: return "BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget";
+    case BindFlag_Texture | BindFlag_RenderTarget: return "BindFlag_Texture | BindFlag_RenderTarget";
+    case BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_RenderTarget: return "BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_RenderTarget";
+    case BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget: return "BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget";
+    case BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget: return "BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget";
+    case BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget: return "BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget";
+    case BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget: return "BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget";
+    case BindFlag_DepthStencil: return "BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_DepthStencil";
+    case BindFlag_IndexBuffer | BindFlag_DepthStencil: return "BindFlag_IndexBuffer | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_DepthStencil";
+    case BindFlag_ConstantBuffer | BindFlag_DepthStencil: return "BindFlag_ConstantBuffer | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_DepthStencil";
+    case BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_DepthStencil: return "BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_DepthStencil";
+    case BindFlag_Texture | BindFlag_DepthStencil: return "BindFlag_Texture | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_DepthStencil";
+    case BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_DepthStencil: return "BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_DepthStencil";
+    case BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil: return "BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil";
+    case BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil: return "BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_DepthStencil";
+    case BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_IndexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_IndexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
+    case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
     default:
       RaiseInvalidArgument ("render::low_level::get_name(BindFlag)", "param", param);
       return "";

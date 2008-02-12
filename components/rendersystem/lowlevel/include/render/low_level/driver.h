@@ -1,7 +1,6 @@
 #ifndef RENDER_LOW_LEVEL_DRIVER_HEADER
 #define RENDER_LOW_LEVEL_DRIVER_HEADER
 
-#include <xtl/functional_fwd>
 #include <render/low_level/object.h>
 #include <render/low_level/common.h>
 
@@ -149,8 +148,6 @@ class IDriver: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции отладочного протоколирования драйвера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const char*)> LogFunction;
-    
     virtual void               SetDebugLog (const LogFunction&) = 0;
     virtual const LogFunction& GetDebugLog () = 0;
 };

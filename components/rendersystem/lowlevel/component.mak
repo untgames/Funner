@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := RENDER_LOW_LEVEL_SOURCES RENDER_LOW_LEVEL_TESTS
+TARGETS := RENDER_LOW_LEVEL_SOURCES RENDER_LOW_LEVEL_UTILS RENDER_LOW_LEVEL_TESTS
 
 #Цель №1 - RENDER system sources
 RENDER_LOW_LEVEL_SOURCES.TYPE             := static-lib
@@ -23,3 +23,14 @@ RENDER_LOW_LEVEL_TESTS.DLLS             :=
 RENDER_LOW_LEVEL_TESTS.DLL_DIRS         :=
 RENDER_LOW_LEVEL_TESTS.COMPILER_CFLAGS  :=
 RENDER_LOW_LEVEL_TESTS.COMPILER_DEFINES :=
+
+#Цель №2 - RENDER system utils
+RENDER_LOW_LEVEL_UTILS.TYPE             := test-suite
+RENDER_LOW_LEVEL_UTILS.INCLUDE_DIRS     := include ../../xtl/include ../../commonlib/include
+RENDER_LOW_LEVEL_UTILS.SOURCE_DIRS      := utils
+RENDER_LOW_LEVEL_UTILS.LIB_DIRS         :=
+RENDER_LOW_LEVEL_UTILS.LIBS             := commonlib
+RENDER_LOW_LEVEL_UTILS.DLLS             :=
+RENDER_LOW_LEVEL_UTILS.DLL_DIRS         :=
+RENDER_LOW_LEVEL_UTILS.COMPILER_CFLAGS  :=
+RENDER_LOW_LEVEL_UTILS.COMPILER_DEFINES :=
