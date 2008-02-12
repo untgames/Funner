@@ -208,7 +208,7 @@ inline T norm (const quat<T>& q)
 template <class T>
 inline quat<T> normalize (const quat<T>& q)
 {
-  return quat<T> (q,quat_normalize<T,T>);
+  return quat<T> (q,quat_normalize<T>);
 }
 
 template <class T> 

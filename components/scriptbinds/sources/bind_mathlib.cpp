@@ -17,6 +17,7 @@ const char* MATHLIB_VEC2_LIBRARY = "math.vec2";
 const char* MATHLIB_VEC3_LIBRARY = "math.vec3";
 const char* MATHLIB_VEC4_LIBRARY = "math.vec4";
 const char* MATHLIB_MAT4_LIBRARY = "math.mat4";
+const char* MATHLIB_QUAT_LIBRARY = "math.quat";
 
 /*
     Создание шлюзов унарных и бинарных операций
@@ -38,20 +39,22 @@ inline Invoker make_unary_invoker ()
     Селекторы компонент вектора
 */
 
-template <class T, size_t Size> struct vec_get_element
+template <class T> struct vec_get_element
 {
   vec_get_element (size_t in_index) : index (in_index) {}
   
-  T operator () (const vec<T, Size>& v) const { return v [index]; }
+  typename T::value_type operator () (const T& v) const { return v [index]; }
 
   size_t index;
 };
 
-template <class T, size_t Size> struct vec_set_element
+template <class T> struct vec_set_element
 {
+  typedef typename T::value_type value_type;
+
   vec_set_element (size_t in_index) : index (in_index) {}
   
-  T operator () (vec<T, Size>& v, const T& value) const { return v [index] = value; }
+  value_type operator () (T& v, const value_type& value) const { return v [index] = value; }
   
   size_t index;
 };
@@ -273,6 +276,54 @@ mat4f create_mat4 (float a)
 }
 
 /*
+    Селекторы компонент кватерниона
+*/
+
+template <class T>
+T quat_get_element (const quat<T>& q, size_t index)
+{
+  if (index >= 4)
+    RaiseOutOfRange ("script::quat_get_element", "index", index, 4);
+    
+  return q [index];
+}
+
+template <class T>
+void quat_set_element (quat<T>& q, size_t index, T value)
+{
+  if (index >= 4)
+    RaiseOutOfRange ("script::quat_set_element", "index", index, 4);
+  
+  q [index]=value;
+}
+
+/*
+    Создание кватерниона
+*/
+
+template <class T>
+quat<T> create_quat1 (T a)
+{
+  return quat<T> (a);
+}
+
+template <class T>
+quat<T> create_quat (T x, T y, T z, T w)
+{
+  return quat<T> (x, y, z, w);
+}
+
+/*
+    Утилиты кватерниона
+*/
+
+template <class T>
+quat<T> quat_normalize (const quat<T>& q)
+{
+  return normalize (q);
+}
+
+/*
     Регистрация библиотеки работы с векторами
 */
 
@@ -283,19 +334,25 @@ void bind_vec_library (InvokerRegistry& vec_lib)
 
     //регистрация селекторов
 
-  vec_lib.Register ("get_x", make_invoker<T (const vec_type&)> (vec_get_element<T, Size> (0)));
-  vec_lib.Register ("get_y", make_invoker<T (const vec_type&)> (vec_get_element<T, Size> (1)));
-  vec_lib.Register ("get_z", make_invoker<T (const vec_type&)> (vec_get_element<T, Size> (2)));
-  vec_lib.Register ("set_x", make_invoker<T (vec_type&, T)> (vec_set_element<T, Size> (0)));
-  vec_lib.Register ("set_y", make_invoker<T (vec_type&, T)> (vec_set_element<T, Size> (1)));
-  vec_lib.Register ("set_z", make_invoker<T (vec_type&, T)> (vec_set_element<T, Size> (2)));
+  vec_lib.Register ("get_x", make_invoker<T (const vec_type&)> (vec_get_element<vec_type> (0)));
+  vec_lib.Register ("get_y", make_invoker<T (const vec_type&)> (vec_get_element<vec_type> (1)));
+  vec_lib.Register ("get_z", make_invoker<T (const vec_type&)> (vec_get_element<vec_type> (2)));
+  vec_lib.Register ("get_w", make_invoker<T (const vec_type&)> (vec_get_element<vec_type> (3)));
+  vec_lib.Register ("set_x", make_invoker<T (vec_type&, T)> (vec_set_element<vec_type> (0)));
+  vec_lib.Register ("set_y", make_invoker<T (vec_type&, T)> (vec_set_element<vec_type> (1)));
+  vec_lib.Register ("set_z", make_invoker<T (vec_type&, T)> (vec_set_element<vec_type> (2)));
+  vec_lib.Register ("set_w", make_invoker<T (vec_type&, T)> (vec_set_element<vec_type> (3)));
   vec_lib.Register ("get_0", "get_x");
   vec_lib.Register ("get_1", "get_y");
   vec_lib.Register ("get_2", "get_z");
+  vec_lib.Register ("get_3", "get_w");  
   vec_lib.Register ("set_0", "set_x");
   vec_lib.Register ("set_1", "set_y");
   vec_lib.Register ("set_2", "set_z");
+  vec_lib.Register ("set_3", "set_w");
   
+    //занести в массивы!!!
+
     //регистрация селекторов пар
 
   vec_lib.Register ("get_xx", make_vec_get_tuple_invoker<vec_type, 2> (0, 0));
@@ -429,6 +486,50 @@ void bind_matrix_library (InvokerRegistry& mat_lib)
   mat_lib.Register ("det", make_invoker (&math::det<T, Size>));
 }
 
+template <class T>
+void bind_quat_library (InvokerRegistry& quat_lib)
+{
+//  typedef matrix<T, Size> matrix_type;
+//  typedef vec<T, Size>    vec_type;
+  typedef quat<T>         quat_type;  
+
+    //регистрация селекторов
+
+  quat_lib.Register ("get", make_invoker (&quat_get_element<T>));
+  quat_lib.Register ("set", make_invoker (&quat_set_element<T>));
+  quat_lib.Register ("get_x", make_invoker<T (const quat_type&)> (vec_get_element<quat_type> (0)));
+  quat_lib.Register ("get_y", make_invoker<T (const quat_type&)> (vec_get_element<quat_type> (1)));
+  quat_lib.Register ("get_z", make_invoker<T (const quat_type&)> (vec_get_element<quat_type> (2)));
+  quat_lib.Register ("get_w", make_invoker<T (const quat_type&)> (vec_get_element<quat_type> (3)));
+  quat_lib.Register ("set_x", make_invoker<T (quat_type&, T)> (vec_set_element<quat_type> (0)));
+  quat_lib.Register ("set_y", make_invoker<T (quat_type&, T)> (vec_set_element<quat_type> (1)));
+  quat_lib.Register ("set_z", make_invoker<T (quat_type&, T)> (vec_set_element<quat_type> (2)));
+  quat_lib.Register ("set_w", make_invoker<T (quat_type&, T)> (vec_set_element<quat_type> (3)));  
+  quat_lib.Register ("get_0", "get_x");
+  quat_lib.Register ("get_1", "get_y");
+  quat_lib.Register ("get_2", "get_z");
+  quat_lib.Register ("get_3", "get_w");
+  quat_lib.Register ("set_0", "set_x");
+  quat_lib.Register ("set_1", "set_y");
+  quat_lib.Register ("set_2", "set_z");
+  quat_lib.Register ("set_3", "set_w");  
+  
+    //регистрация операций  
+    
+  quat_lib.Register ("__unm", make_unary_invoker<quat_type, quat_type, negate> ());
+  quat_lib.Register ("__add", make_binary_invoker<quat_type, quat_type, quat_type, plus> ());
+  quat_lib.Register ("__sub", make_binary_invoker<quat_type, quat_type, quat_type, minus> ());
+  quat_lib.Register ("__mul", make_binary_invoker<quat_type, quat_type, quat_type, multiplies> ()); //??умножение на скаляр
+  
+  
+    //регистрация функций
+    
+// vec_lib.Register ("get_length",  make_invoker<T (quat_type)> (&math::length<T, Size>));
+//  vec_lib.Register ("get_qlength", make_invoker<T (quat_type)> (&math::qlen<T, Size>));
+  quat_lib.Register ("normalize",   make_invoker<quat_type (quat_type)> (&quat_normalize<T>));
+  quat_lib.Register ("inner",       make_invoker<T (quat_type, quat_type)> (&math::inner<T>));
+}
+
 }
 
 namespace script
@@ -448,6 +549,7 @@ void bind_math_library (Environment& environment)
   InvokerRegistry& vec3_lib   = environment.CreateLibrary (MATHLIB_VEC3_LIBRARY);
   InvokerRegistry& vec4_lib   = environment.CreateLibrary (MATHLIB_VEC4_LIBRARY);
   InvokerRegistry& mat4_lib   = environment.CreateLibrary (MATHLIB_MAT4_LIBRARY);
+  InvokerRegistry& quat_lib   = environment.CreateLibrary (MATHLIB_QUAT_LIBRARY);
   
     //регистрация библиотек
   
@@ -455,6 +557,7 @@ void bind_math_library (Environment& environment)
   bind_vec_library<float, 3> (vec3_lib);
   bind_vec_library<float, 4> (vec4_lib);     
   bind_matrix_library<float, 4> (mat4_lib);
+  bind_quat_library<float> (quat_lib);
   
     //регистрация специфических операций над векторами
 
@@ -478,6 +581,11 @@ void bind_math_library (Environment& environment)
   
   math_lib.Register   ("mat4", make_invoker (&create_mat4));  
   global_lib.Register ("mat4", math_lib, "mat4");
+  
+  quat_lib.Register   ("quat", make_invoker (&create_quat<float>));
+  quat_lib.Register   ("quat1", make_invoker (&create_quat1<float>));
+  global_lib.Register ("quat", quat_lib, "quat");
+  global_lib.Register ("quat1", quat_lib, "quat1");
 
     //регистрация типов данных
 
@@ -485,6 +593,7 @@ void bind_math_library (Environment& environment)
   environment.RegisterType<vec3f> (MATHLIB_VEC3_LIBRARY);
   environment.RegisterType<vec4f> (MATHLIB_VEC4_LIBRARY);
   environment.RegisterType<mat4f> (MATHLIB_MAT4_LIBRARY);
+  environment.RegisterType<quatf> (MATHLIB_QUAT_LIBRARY);  
 }
 
 }

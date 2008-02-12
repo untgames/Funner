@@ -16,13 +16,17 @@ int main ()
     bind_math_library (*env);
     load_script       (*script, SCRIPT_FILE_NAME);
     
-    printf ("Test vec3f library:\n");
+/*    printf ("Test vec3f library:\n");
 
     invoke<void> (*script, "test_vector", vec3f (1, 2, 3));
     
     printf ("Test mat4f library:\n");
     
-    invoke<void> (*script, "test_matrix", mat4f (1));
+    invoke<void> (*script, "test_matrix", mat4f (1));*/
+    
+    printf ("Test quatf library:\n");
+    
+    invoke<void> (*script, "test_quat", quatf (1));
   }
   catch (xtl::bad_any_cast& exception)
   {

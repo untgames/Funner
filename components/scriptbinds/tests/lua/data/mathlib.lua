@@ -78,3 +78,55 @@ function test_matrix (m)
 
   print ("mat4(2):det (): " .. m5:det ()) 
 end
+
+function test_quat (q)
+  print ("Input: " .. tostring (q))
+
+  local q1 = q
+
+--  math.quat.set (q1, 1, 2)
+
+  q1:set (1, 2)
+
+  print ("After q1:set(1,2): " .. tostring (q1))
+
+  for i=0,3 do
+    print ("      q:get(" .. i .. "): " .. q:get (i))
+  end
+
+  for i=0,3 do
+    print ("      q [" .. i .. "]: " .. q [i])
+  end
+
+  print ("      q.x:" .. q.x)
+  print ("      q.y:" .. q.y)
+  print ("      q.z:" .. q.z)
+  print ("      q.w:" .. q.w)
+  
+  print ("Test q.{x,y,z,w}={5,6,7,8}:")
+
+  q.x = 5
+  q.y = 6
+  q.z = 7
+  q.w = 8
+  
+  for i=0,3 do
+      print (" q["..i.."]:"..tostring(q[i]))
+  end
+  
+  local q2 = quat (8, 9, 10, 11)
+  
+  print ("Test q2=quat(8,9,10,11): " .. tostring (q2))
+  
+  print ("Test -q2: " .. tostring (-q2))
+  
+  print ("Test q+q2:"..tostring(q+q2))
+  
+  print ("Test q-q2:"..tostring(q-q2))
+  
+  print ("Test q2*q2:"..tostring(q2*q2))
+
+  print ("Test q2:normalize(): "..tostring(q2:normalize()))
+  
+  print ("Test q2:inner(q): "..tostring(q2:inner(q)))
+end
