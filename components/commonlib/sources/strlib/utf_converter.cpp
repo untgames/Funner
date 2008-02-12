@@ -47,7 +47,7 @@ int encode_UTF32(unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перекодировка Utf -> char32
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-EncodingResult utf_decode (const void* source_buffer,            //буфер-источник с utf-строкой
+EncodingResult 	utf_decode (const void* source_buffer,            //буфер-источник с utf-строкой
                            size_t      source_buffer_size,       //размер буфера-источника в байтах
                            Encoding    source_buffer_encoding,   //кодировка буфера-источника
                            void*       destination_buffer,       //буфер-приёмник для декодируемой строки (char32)

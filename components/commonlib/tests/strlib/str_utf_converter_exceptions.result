@@ -1,0 +1,8 @@
+Results of utf_converter_exceptions_test:
+utf_decode exceptions
+source_buffer is null
+    at common::utf_decode
+destination_buffer is null
+    at common::utf_decode
+Invalid Unicode scalar value (0)
+    at common::utf_encode
