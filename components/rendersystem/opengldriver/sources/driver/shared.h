@@ -204,7 +204,7 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния устройства в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (size_t base_vertex, size_t base_index);
+    void Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout = 0);
 
   private:
     typedef xtl::com_ptr<Driver> DriverPtr;

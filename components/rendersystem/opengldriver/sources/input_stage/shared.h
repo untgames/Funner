@@ -1,9 +1,17 @@
 #ifndef RENDER_GL_DRIVER_INPUT_STAGE_SHARED_HEADER
 #define RENDER_GL_DRIVER_INPUT_STAGE_SHARED_HEADER
 
-#include <xtl/uninitialized_storage.h>
-
 #include <common/exception.h>
+#include <common/singleton.h>
+
+#include <xtl/uninitialized_storage.h>
+#include <xtl/trackable_ptr.h>
+#include <xtl/array>
+
+#include <stl/vector>
+#include <stl/algorithm>
+
+#include <render/low_level/utils.h>
 
 #include <shared/input_stage.h>
 #include <shared/context_object.h>
@@ -27,7 +35,14 @@ class Buffer: virtual public IBuffer, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Buffer(const ContextManager&, const BufferDesc&);
+    Buffer (const ContextManager&, const BufferDesc&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка типа буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool   IsVertexBuffer () const { return (buffer_desc.bind_flags & BindFlag_VertexBuffer) != 0; }
+    bool   IsIndexBuffer  () const { return (buffer_desc.bind_flags & BindFlag_IndexBuffer) != 0; }
+    size_t GetBindFlags   () const { return buffer_desc.bind_flags; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
@@ -44,9 +59,14 @@ class Buffer: virtual public IBuffer, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     virtual void* GetDataPointer () = 0;
  
-  protected:
-    BufferDesc  buffer_desc; // дескриптор буфера
+  protected: //private???
+    BufferDesc buffer_desc; // дескриптор буфера ///???имя
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Указатель на буфер
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+typedef xtl::trackable_ptr<Buffer> BufferPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буфер с хранением в системной памяти
@@ -111,6 +131,48 @@ class VboBuffer: public Buffer
   private:
     GLenum target;     //целевой тип аппаратного буфера (GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER)
     GLuint buffer_id;  //номер буфера в контексте OpenGL
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Состояние подуровня расположения геометрии
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class InputLayout: virtual public IInputLayout, public ContextObject
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    InputLayout  (const ContextManager&, const InputLayoutDesc&, size_t tex_units_count);
+    ~InputLayout ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка дескриптора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetDesc (const InputLayoutDesc&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//Установка состояния в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+   void Bind (size_t         base_vertex,
+              size_t         base_index,
+              BufferPtr*     vertex_buffers,
+              BufferPtr      index_buffer,
+              IndicesLayout* out_indices_layout);
+
+  private:
+    struct GlVertexAttribute;
+    struct GlVertexAttributeGroup;
+
+    typedef stl::vector<GlVertexAttribute>      GlVertexAttributeArray;
+    typedef stl::vector<GlVertexAttributeGroup> GlVertexAttributeGroupArray;
+
+  private:
+    GlVertexAttributeArray      vertex_attributes;       //вершинные атрибуты
+    GlVertexAttributeGroupArray vertex_attribute_groups; //группы вершинных атрибутов
+    GLenum                      index_data_type;         //тип индексов
+    size_t                      index_size;              //размер индекса
+    size_t                      index_buffer_offset;     //смещение в индексном буфере до первого индекса
+    size_t                      tex_units_count;         //количество текстурных юнитов поддерживаемое аппаратно
 };
 
 }

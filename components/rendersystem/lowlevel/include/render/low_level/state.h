@@ -25,8 +25,6 @@ enum VertexAttributeSemantic
   VertexAttributeSemantic_Position,  //положение
   VertexAttributeSemantic_Normal,    //нормаль
   VertexAttributeSemantic_Color,     //цвет
-  VertexAttributeSemantic_Tangent,   //касательная
-  VertexAttributeSemantic_Binormal,  //бинормаль
   VertexAttributeSemantic_TexCoord0, //каналы текстурных координат
   VertexAttributeSemantic_TexCoord1,
   VertexAttributeSemantic_TexCoord2,
@@ -65,6 +63,8 @@ enum InputDataFormat
   InputDataFormat_Vector2,                         //вектор из двух элементов
   InputDataFormat_Vector3,                         //вектор из трёх элементов
   InputDataFormat_Vector4,                         //вектор из четырёх элементов
+  
+  InputDataFormat_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

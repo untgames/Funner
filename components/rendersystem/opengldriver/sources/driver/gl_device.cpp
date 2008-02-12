@@ -61,7 +61,7 @@ IStatisticsQuery* Device::CreateStatisticsQuery ()
 
 IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
 {
-  return input_stage.CreateInputLayoutState (desc);
+  return input_stage.CreateInputLayout (desc);
 }
 
 IBuffer* Device::CreateBuffer (const BufferDesc& desc)
@@ -384,12 +384,13 @@ bool Device::GetPredicateValue ()
     Установка состояния устройства в контекст OpenGL
 */
 
-void Device::Bind (size_t base_vertex, size_t base_index)
+void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout)
 {
   output_stage.Bind ();
-//  input_stage.Bind (base_vertex, base_index);
+//  input_stage.Bind (base_vertex, base_index, out_indices_layout);
   rasterizer_stage.Bind ();
   texture_manager.Bind ();
+//  shader_stage.Bind ();
 }
 
 /*
@@ -420,14 +421,10 @@ GLenum get_mode (PrimitiveType type, const char* source)
 
 void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::Device::Draw";
-
-    //TODO: сделать проверку корректности индексов!!!
-    
-  GLenum mode = get_mode (primitive_type, METHOD_NAME);
-  
   try
   {
+    GLenum mode = get_mode (primitive_type, "");
+    
       //установка состояния устройства в контекст OpenGL
 
     Bind (0, 0);
@@ -442,30 +439,27 @@ void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t ver
   }
   catch (common::Exception& exception)
   {
-    exception.Touch (METHOD_NAME);
-    
+    exception.Touch ("render::low_level::opengl::Device::Draw");
+
     throw;
   }
 }
 
 void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::Device::DrawIndexed";
-
-    //TODO: сделать проверку корректности индексов!!!
-    
-  GLenum mode       = get_mode (primitive_type, METHOD_NAME),
-         index_type = input_stage.GetIndexType ();
-
   try
   {
+    GLenum mode = get_mode (primitive_type, "");
+    
       //установка состояния устройства в контекст OpenGL
 
-    Bind (base_vertex, first_index);
+    IndicesLayout indices_layout;
+
+    Bind (base_vertex, first_index, &indices_layout);
 
       //рисование
 
-    glDrawElements (mode, indices_count, index_type, input_stage.GetIndices ());
+    glDrawElements (mode, indices_count, indices_layout.type, indices_layout.data);
 
       //проверка ошибок
 
@@ -473,7 +467,7 @@ void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size
   }
   catch (common::Exception& exception)
   {
-    exception.Touch (METHOD_NAME);
+    exception.Touch ("render::low_level::opengl::Device::DrawIndexed");
 
     throw;
   }

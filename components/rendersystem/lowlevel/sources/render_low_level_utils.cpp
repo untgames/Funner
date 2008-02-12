@@ -282,8 +282,6 @@ const char* get_name (VertexAttributeSemantic param)
     case VertexAttributeSemantic_Position:  return "VertexAttributeSemantic_Position";
     case VertexAttributeSemantic_Normal:    return "VertexAttributeSemantic_Normal";
     case VertexAttributeSemantic_Color:     return "VertexAttributeSemantic_Color";
-    case VertexAttributeSemantic_Tangent:   return "VertexAttributeSemantic_Tangent";
-    case VertexAttributeSemantic_Binormal:  return "VertexAttributeSemantic_Binormal";
     case VertexAttributeSemantic_TexCoord0: return "VertexAttributeSemantic_TexCoord0";
     case VertexAttributeSemantic_TexCoord1: return "VertexAttributeSemantic_TexCoord1";
     case VertexAttributeSemantic_TexCoord2: return "VertexAttributeSemantic_TexCoord2";
