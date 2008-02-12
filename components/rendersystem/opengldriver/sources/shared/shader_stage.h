@@ -53,7 +53,7 @@ class ShaderStage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IShaderParametersLayout* GetShaderParametersLayout () const;
     IShader*                 GetShader                 () const;
-    IBuffer*                 GetConstantBufer          (size_t buffer_slot) const;
+    IBuffer*                 GetConstantBuffer         (size_t buffer_slot) const;
 
   private:
     ShaderStage (const ShaderStage&);             //no impl

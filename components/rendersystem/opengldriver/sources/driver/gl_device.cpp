@@ -14,7 +14,8 @@ Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char* init_stri
     output_stage (context_manager, swap_chain),
     input_stage (context_manager),
     rasterizer_stage (context_manager),
-    texture_manager (context_manager)
+    texture_manager (context_manager),
+    shader_stage (context_manager)
 {  
     //получение информации об устройстве отрисовки
 
@@ -42,11 +43,6 @@ const char* Device::GetName ()
     Создание ресурсов
 */
 
-IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
-{
-  return rasterizer_stage.CreateRasterizerState (desc);
-}
-
 IPredicate* Device::CreatePredicate ()
 {
   RaiseNotImplemented ("render::low_level::opengl::Device::CreatePredicate");
@@ -70,11 +66,29 @@ IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
 
 IBuffer* Device::CreateBuffer (const BufferDesc& desc)
 {
-  switch (desc.bind_flags)
+  static const char* METHOD_NAME = "render::low_level::opengl::Device::CreateBuffer";
+  
+  try
   {
-    case BindFlag_VertexBuffer: return input_stage.CreateVertexBuffer (desc);
-    case BindFlag_IndexBuffer:  return input_stage.CreateIndexBuffer (desc);
-    default: RaiseInvalidArgument ("render::low_level::opengl::Device::CreateBuffer", "desc.bind_flags", desc.bind_flags); return 0;
+    static const size_t BAD_FLAGS = BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil;
+
+    if (desc.bind_flags & BAD_FLAGS)
+      RaiseInvalidArgument ("", "desc.bind_flags", get_name ((BindFlag)desc.bind_flags));
+
+    switch (desc.bind_flags)
+    {
+      case BindFlag_VertexBuffer:   return input_stage.CreateVertexBuffer (desc);
+      case BindFlag_IndexBuffer:    return input_stage.CreateIndexBuffer (desc);
+      case BindFlag_ConstantBuffer: return shader_stage.CreateConstantBuffer (desc);
+      default:
+        RaiseNotSupported ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
+        return 0;
+    }
+  }
+  catch (Exception& e)
+  {
+    e.Touch (METHOD_NAME);
+    throw;
   }
 }
 
@@ -112,49 +126,44 @@ IBuffer* Device::ISGetIndexBuffer ()
     Управление шейдерными уровнями (shader-stage)
 */
 
-IShaderParametersLayout* Device::CreateShaderParametersLayout (const ShaderParametersLayoutDesc&)
+IShaderParametersLayout* Device::CreateShaderParametersLayout (const ShaderParametersLayoutDesc& desc)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateShaderParametersLayout");
-  return 0;
+  return shader_stage.CreateShaderParametersLayout (desc);
 }
 
 IShader* Device::CreateShader (const ShaderDesc& desc, const LogFunction& error_log)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateShader");
-  return 0;
+  return shader_stage.CreateShader (desc, error_log);
 }
 
 void Device::SSSetShader (IShader* shader)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetShader");
+  shader_stage.SetShader (shader);
 }
 
-void Device::SSSetShaderParametersLayout (IShaderParametersLayout* parameters_layout)
+void Device::SSSetShaderParametersLayout (IShaderParametersLayout* layout)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetShaderParametersLayout");
+  shader_stage.SetShaderParametersLayout (layout);  
 }
 
 void Device::SSSetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetConstantBuffer");
+  shader_stage.SetConstantBuffer (buffer_slot, buffer);
 }
 
 IShaderParametersLayout* Device::SSGetShaderParametersLayout ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetShaderParametersLayout");
-  return 0;
+  return shader_stage.GetShaderParametersLayout ();
 }
 
 IShader* Device::SSGetShader ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetShader");
-  return 0;
+  return shader_stage.GetShader ();
 }
 
-IBuffer* Device::SSGetConstantBufer (size_t buffer_slot)
+IBuffer* Device::SSGetConstantBuffer (size_t buffer_slot)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetConstantBufer");
-  return 0;
+  return shader_stage.GetConstantBuffer (buffer_slot);
 }
 
 /*
@@ -221,6 +230,11 @@ ITexture* Device::SSGetTexture (size_t sampler_slot)
 /*
     Управление растеризатором (rasterizer-stage)
 */
+
+IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
+{
+  return rasterizer_stage.CreateRasterizerState (desc);
+}
 
 void Device::RSSetState (IRasterizerState* state)
 {

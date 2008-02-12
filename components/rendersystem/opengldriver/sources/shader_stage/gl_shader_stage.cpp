@@ -40,7 +40,7 @@ struct ShaderStage::Impl: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IShaderParametersLayout* GetShaderParametersLayout () const;
     IShader*                 GetShader                 () const;
-    IBuffer*                 GetConstantBufer          (size_t buffer_slot) const;
+    IBuffer*                 GetConstantBuffer         (size_t buffer_slot) const;
 
 //  public:
 };
@@ -121,9 +121,9 @@ IShader* ShaderStage::Impl::GetShader () const
   return 0;
 }
 
-IBuffer* ShaderStage::Impl::GetConstantBufer (size_t buffer_slot) const
+IBuffer* ShaderStage::Impl::GetConstantBuffer (size_t buffer_slot) const
 {
-  RaiseNotImplemented ("render::low_level::opengl::ShaderStage::Impl::GetConstantBufer");
+  RaiseNotImplemented ("render::low_level::opengl::ShaderStage::Impl::GetConstantBuffer");
   return 0;
 }
 
@@ -200,7 +200,7 @@ IShader* ShaderStage::GetShader () const
   return impl->GetShader ();
 }
 
-IBuffer* ShaderStage::GetConstantBufer (size_t buffer_slot) const
+IBuffer* ShaderStage::GetConstantBuffer (size_t buffer_slot) const
 {
-  return impl->GetConstantBufer (buffer_slot);
+  return impl->GetConstantBuffer (buffer_slot);
 }
