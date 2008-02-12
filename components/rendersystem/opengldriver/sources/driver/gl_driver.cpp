@@ -90,7 +90,7 @@ void Driver::SetDebugLog (const LogFunction& in_log_fn)
   log_fn = in_log_fn;
 }
 
-const Driver::LogFunction& Driver::GetDebugLog ()
+const LogFunction& Driver::GetDebugLog ()
 {
   return log_fn;
 }

@@ -42,30 +42,6 @@ const char* Device::GetName ()
     Создание ресурсов
 */
 
-ILightingState* Device::CreateLightingState (const LightingDesc&)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateLightingState");
-  return 0;
-}
-
-IViewerState* Device::CreateViewerState (const ViewerDesc&)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateViewerState");
-  return 0;
-}
-
-ITransformState* Device::CreateTransformState (const TransformDesc&)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateTransformState");
-  return 0;
-}
-
-IMaterialState* Device::CreateMaterialState (const MaterialDesc&)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateMaterialState");
-  return 0;
-}
-
 IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
 {
   return rasterizer_stage.CreateRasterizerState (desc);
@@ -87,22 +63,22 @@ IStatisticsQuery* Device::CreateStatisticsQuery ()
     Управление входным уровнем (input-stage)
 */
 
-IInputLayoutState* Device::CreateInputLayoutState (const InputLayoutDesc& desc)
+IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
 {
   return input_stage.CreateInputLayoutState (desc);
 }
 
-IBuffer* Device::CreateVertexBuffer (const BufferDesc& desc)
+IBuffer* Device::CreateBuffer (const BufferDesc& desc)
 {
-  return input_stage.CreateVertexBuffer (desc);
+  switch (desc.bind_flags)
+  {
+    case BindFlag_VertexBuffer: return input_stage.CreateVertexBuffer (desc);
+    case BindFlag_IndexBuffer:  return input_stage.CreateIndexBuffer (desc);
+    default: RaiseInvalidArgument ("render::low_level::opengl::Device::CreateBuffer", "desc.bind_flags", desc.bind_flags); return 0;
+  }
 }
 
-IBuffer* Device::CreateIndexBuffer (const BufferDesc& desc)
-{
-  return input_stage.CreateIndexBuffer (desc);
-}
-
-void Device::ISSetInputLayout (IInputLayoutState* state)
+void Device::ISSetInputLayout (IInputLayout* state)
 {
   input_stage.SetInputLayout (state);
 }
@@ -117,7 +93,7 @@ void Device::ISSetIndexBuffer (IBuffer* buffer)
   input_stage.SetIndexBuffer (buffer);
 }
 
-IInputLayoutState* Device::ISGetInputLayout ()
+IInputLayout* Device::ISGetInputLayout ()
 {
   return input_stage.GetInputLayout ();
 }
@@ -130,6 +106,55 @@ IBuffer* Device::ISGetVertexBuffer (size_t vertex_buffer_slot)
 IBuffer* Device::ISGetIndexBuffer ()
 {
   return input_stage.GetIndexBuffer ();
+}
+
+/*
+    Управление шейдерными уровнями (shader-stage)
+*/
+
+IShaderParametersLayout* Device::CreateShaderParametersLayout (const ShaderParametersLayoutDesc&)
+{
+  RaiseNotImplemented ("render::low_level::opengl::Device::CreateShaderParametersLayout");
+  return 0;
+}
+
+IShader* Device::CreateShader (const ShaderDesc& desc, const LogFunction& error_log)
+{
+  RaiseNotImplemented ("render::low_level::opengl::Device::CreateShader");
+  return 0;
+}
+
+void Device::SSSetShader (IShader* shader)
+{
+  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetShader");
+}
+
+void Device::SSSetShaderParametersLayout (IShaderParametersLayout* parameters_layout)
+{
+  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetShaderParametersLayout");
+}
+
+void Device::SSSetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
+{
+  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetConstantBuffer");
+}
+
+IShaderParametersLayout* Device::SSGetShaderParametersLayout ()
+{
+  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetShaderParametersLayout");
+  return 0;
+}
+
+IShader* Device::SSGetShader ()
+{
+  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetShader");
+  return 0;
+}
+
+IBuffer* Device::SSGetConstantBufer (size_t buffer_slot)
+{
+  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetConstantBufer");
+  return 0;
 }
 
 /*
@@ -191,75 +216,6 @@ ISamplerState* Device::SSGetSampler (size_t sampler_slot)
 ITexture* Device::SSGetTexture (size_t sampler_slot)
 {
   return texture_manager.GetTexture (sampler_slot);
-}
-
-/*
-    Управление шейдерными уровнями (shader-stage)
-*/
-
-void Device::SSSetMode (ShaderMode mode)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetMode");
-}
-
-void Device::SSSetViewer (IViewerState* state)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetViewer");
-}
-
-void Device::SSSetTransform (ITransformState* state)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetTransform");
-}
-
-void Device::SSSetLighting (ILightingState* state)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetLighting");
-}
-
-void Device::SSSetMaterial (IMaterialState* state)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSSetMaterial");
-}
-
-ShaderMode Device::SSGetMode ()
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetMode");
-  return ShaderMode_Flat;
-}
-
-IViewerState* Device::SSGetViewer ()
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetViewer");
-  return 0;
-}
-
-ITransformState* Device::SSGetTransform ()
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetTransform");
-  return 0;
-}
-
-ILightingState* Device::SSGetLighting ()
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetLighting");
-  return 0;
-}
-
-IMaterialState* Device::SSGetMaterial ()
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSGetMaterial");
-  return 0;
-}
-
-/*
-    Получение информации о доступных режимах шейдинга устройства
-*/
-
-bool Device::SSIsSupported (ShaderMode mode)
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::SSIsSupported");
-  return false;
 }
 
 /*

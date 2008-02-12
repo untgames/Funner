@@ -29,15 +29,15 @@ class InputStage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—оздание ресурсов уровн€
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IInputLayoutState* CreateInputLayoutState (const InputLayoutDesc& desc);
-    IBuffer*           CreateVertexBuffer     (const BufferDesc& desc);
-    IBuffer*           CreateIndexBuffer      (const BufferDesc& desc);
+    IInputLayout* CreateInputLayoutState (const InputLayoutDesc& desc);
+    IBuffer*      CreateVertexBuffer     (const BufferDesc& desc);
+    IBuffer*      CreateIndexBuffer      (const BufferDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление конфигурацией входных данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetInputLayout  (IInputLayoutState* state);
-    IInputLayoutState* GetInputLayout  () const;
+    void          SetInputLayout  (IInputLayout* state);
+    IInputLayout* GetInputLayout  () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление вершинными буферами

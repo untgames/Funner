@@ -7,7 +7,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
-class InputLayoutState: public IInputLayoutState, public Object
+class InputLayoutState: public IInputLayout, public Object
 {
   public:
     InputLayoutState(const InputLayoutDesc& desc)
@@ -114,7 +114,7 @@ struct InputStage::Impl: public ContextObject
   /// создание ресурсов
   //////////////////////////////////////////
 
-  IInputLayoutState* CreateInputLayoutState(const InputLayoutDesc& desc)
+  IInputLayout* CreateInputLayoutState(const InputLayoutDesc& desc)
   {
     try
     {
@@ -188,14 +188,15 @@ struct InputStage::Impl: public ContextObject
   /// операции над InputLayoutState
   //////////////////////////////////////////
   
-  IInputLayoutState* GetInputLayoutState()
+  IInputLayout* GetInputLayoutState()
   {
     return input_state;
   }
   
-  void SetInputLayoutState (IInputLayoutState* state)
+  void SetInputLayoutState (IInputLayout* state)
   {
-    if (!state)
+    RaiseNotImplemented ("render::low_level::opengl::InputStage::SetInputLayoutState");
+/*    if (!state)
     {
       input_state = NULL;
       return;
@@ -216,7 +217,7 @@ struct InputStage::Impl: public ContextObject
     MakeContextCurrent();
 
     for (int i = 0; i < VertexAttributeSemantic_Num; i++)
-      SetSemanticClientState(static_cast<VertexAttributeSemantic>(i), attribute_table[i]!=NULL?true:false);
+      SetSemanticClientState(static_cast<VertexAttributeSemantic>(i), attribute_table[i]!=NULL?true:false);*/
   }
   
   //////////////////////////////////////////
@@ -304,20 +305,22 @@ struct InputStage::Impl: public ContextObject
 
   GLenum GetIndexType()
   {
-    if (!input_state)
+    RaiseNotImplemented ("render::low_level::opengl::InputStage::GetIndexType"); return 0;
+/*    if (!input_state)
       RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::GetIndexType()", "InputLayoutState is not set, use SetInputLayoutState (IInputLayoutState* state) first!");
     
     InputLayoutDesc idesc;
     input_state->GetDesc(idesc);
     return idesc.index_type;
-      
+*/      
     //RaiseNotImplemented ("render::low_level::opengl::InputStage::Impl::GetIndexType()");
     //return 0;
   }
     
   void Bind(size_t base_vertex, size_t base_index)
   {
-    if (!input_state)
+    RaiseNotImplemented ("render::low_level::opengl::InputStage::Impl::Bind");
+/*    if (!input_state)
       RaiseInvalidOperation("render::low_level::opengl::InputStage::Impl::Bind()", "InputLayoutState is not set, use SetInputLayoutState (IInputLayoutState* state) first!");
     
     ///////////////////////////////////////////
@@ -368,15 +371,15 @@ struct InputStage::Impl: public ContextObject
         current_buffer->Bind();
         BindBufferBySemantics(*(attribute_table[i]), base_vertex, current_buffer->GetDataPointer());
       }
-    }
+    }  */
   }
     
 private:
-  IInputLayoutState*  input_state;
-  Buffer*             vertex_buffer_slots[DEVICE_VERTEX_BUFFER_SLOTS_COUNT];
-  Buffer*             index_buffer;
-  size_t              max_texture_units_count;
-  size_t              full_index_offset;
+  IInputLayout*  input_state;
+  Buffer*        vertex_buffer_slots[DEVICE_VERTEX_BUFFER_SLOTS_COUNT];
+  Buffer*        index_buffer;
+  size_t         max_texture_units_count;
+  size_t         full_index_offset;
   
   VertexAttribute*    attribute_table[VertexAttributeSemantic_Num];
 
@@ -686,7 +689,7 @@ InputStage::~InputStage()
 ================================================================================
 */
 
-IInputLayoutState* InputStage::CreateInputLayoutState (const InputLayoutDesc& desc)
+IInputLayout* InputStage::CreateInputLayoutState (const InputLayoutDesc& desc)
 {
   try
   {
@@ -737,7 +740,7 @@ IBuffer* InputStage::CreateIndexBuffer (const BufferDesc& desc)
 ================================================================================
 */
 
-void InputStage::SetInputLayout (IInputLayoutState* state)
+void InputStage::SetInputLayout (IInputLayout* state)
 {
   try
   {
@@ -751,7 +754,7 @@ void InputStage::SetInputLayout (IInputLayoutState* state)
   //RaiseNotImplemented ("render::low_level::opengl::InputStage::SetInputLayout");
 }
 
-IInputLayoutState* InputStage::GetInputLayout () const
+IInputLayout* InputStage::GetInputLayout () const
 {
   return impl->GetInputLayoutState();
   //RaiseNotImplemented ("render::low_level::opengl::InputStage::GetInputLayout");

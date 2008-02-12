@@ -34,132 +34,120 @@ namespace opengl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация драйвера для OpenGL
+///╨хрышчрЎш  фЁрщтхЁр фы  OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Driver: virtual public IDriver, public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///╩юэёЄЁєъЄюЁ / фхёЄЁєъЄюЁ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Driver  ();
     ~Driver ();
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание драйвера
+///╬яшёрэшх фЁрщтхЁр
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* GetDescription ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перечисление доступных устройств вывода
+///╧хЁхўшёыхэшх фюёЄєяэ√ї єёЄЁющёЄт т√тюфр
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t   GetOutputsCount ();
     IOutput* GetOutput       (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание цепочки обмена
+///╤ючфрэшх Ўхяюўъш юсьхэр
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ISwapChain* CreateSwapChain (const SwapChainDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание устройства отрисовки
+///╤ючфрэшх єёЄЁющёЄтр юЄЁшёютъш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDevice* CreateDevice (ISwapChain* swap_chain, const char* init_string);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка функции отладочного протоколирования драйвера
+///╙ёЄрэютър ЇєэъЎшш юЄырфюўэюую яЁюЄюъюышЁютрэш  фЁрщтхЁр
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetDebugLog (const LogFunction&);
     const LogFunction& GetDebugLog ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Протоколирование
+///╧ЁюЄюъюышЁютрэшх
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void LogMessage (const char* message) const;
 
   private:
-    OutputManager output_manager; //менеджер устройств вывода
-    LogFunction   log_fn;         //функция отладочного протоколирования
+    OutputManager output_manager; //ьхэхфцхЁ єёЄЁющёЄт т√тюфр
+    LogFunction   log_fn;         //ЇєэъЎш  юЄырфюўэюую яЁюЄюъюышЁютрэш 
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Устройство отрисовки
+///╙ёЄЁющёЄтю юЄЁшёютъш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Device: virtual public IDevice, public Object
 {
   public:  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///╩юэёЄЁєъЄюЁ / фхёЄЁєъЄюЁ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Device  (Driver* driver, ISwapChain* swap_chain, const char* init_string);
     ~Device ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Указатель на устройство отрисовки, которому принадлежит ресурс
+///╙ърчрЄхы№ эр єёЄЁющёЄтю юЄЁшёютъш, ъюЄюЁюьє яЁшэрфыхцшЄ ЁхёєЁё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDevice* GetDevice () { return this; }
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Имя устройства
+///╚ь  єёЄЁющёЄтр
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* GetName ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание ресурсов
+///╤ючфрэшх ЁхёєЁёют
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IInputLayoutState*  CreateInputLayoutState    (const InputLayoutDesc&);
-    ILightingState*     CreateLightingState       (const LightingDesc&);
-    IViewerState*       CreateViewerState         (const ViewerDesc&);
-    ITransformState*    CreateTransformState      (const TransformDesc&);
-    IMaterialState*     CreateMaterialState       (const MaterialDesc&);
-    IRasterizerState*   CreateRasterizerState     (const RasterizerDesc&);
-    IBlendState*        CreateBlendState          (const BlendDesc&);
-    IDepthStencilState* CreateDepthStencilState   (const DepthStencilDesc&);
-    ISamplerState*      CreateSamplerState        (const SamplerDesc&);
-    IBuffer*            CreateVertexBuffer        (const BufferDesc&);
-    IBuffer*            CreateIndexBuffer         (const BufferDesc&);
-    ITexture*           CreateTexture             (const TextureDesc&);
-    ITexture*           CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index);
-    ITexture*           CreateDepthStencilTexture (ISwapChain* swap_chain);
-    IView*              CreateView                (ITexture* texture, const ViewDesc&);
-    IPredicate*         CreatePredicate           ();
-    IStatisticsQuery*   CreateStatisticsQuery     ();
+    IInputLayout*            CreateInputLayout            (const InputLayoutDesc&);
+    IShaderParametersLayout* CreateShaderParametersLayout (const ShaderParametersLayoutDesc&);
+    IRasterizerState*        CreateRasterizerState        (const RasterizerDesc&);
+    IBlendState*             CreateBlendState             (const BlendDesc&);
+    IDepthStencilState*      CreateDepthStencilState      (const DepthStencilDesc&);
+    ISamplerState*           CreateSamplerState           (const SamplerDesc&);
+    IBuffer*                 CreateBuffer                 (const BufferDesc&);
+    IShader*                 CreateShader                 (const ShaderDesc& desc, const LogFunction& error_log);
+    ITexture*                CreateTexture                (const TextureDesc&);
+    ITexture*                CreateRenderTargetTexture    (ISwapChain* swap_chain, size_t buffer_index);
+    ITexture*                CreateDepthStencilTexture    (ISwapChain* swap_chain);
+    IView*                   CreateView                   (ITexture* texture, const ViewDesc&);
+    IPredicate*              CreatePredicate              ();
+    IStatisticsQuery*        CreateStatisticsQuery        ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление входным уровнем (input-stage)
+///╙яЁртыхэшх тїюфэ√ь єЁютэхь (input-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               ISSetInputLayout  (IInputLayoutState* state);
-    void               ISSetVertexBuffer (size_t vertex_buffer_slot,  IBuffer* buffer);
-    void               ISSetIndexBuffer  (IBuffer* buffer);
-    IInputLayoutState* ISGetInputLayout  ();
-    IBuffer*           ISGetVertexBuffer (size_t vertex_buffer_slot);
-    IBuffer*           ISGetIndexBuffer  ();
+    void          ISSetInputLayout  (IInputLayout* state);
+    void          ISSetVertexBuffer (size_t vertex_buffer_slot,  IBuffer* buffer);
+    void          ISSetIndexBuffer  (IBuffer* buffer);
+    IInputLayout* ISGetInputLayout  ();
+    IBuffer*      ISGetVertexBuffer (size_t vertex_buffer_slot);
+    IBuffer*      ISGetIndexBuffer  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление шейдерными уровнями (shader-stage)
+///╙яЁртыхэшх °хщфхЁэ√ьш єЁютэ ьш (shader-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void             SSSetMode       (ShaderMode mode);
-    void             SSSetViewer     (IViewerState* state);
-    void             SSSetTransform  (ITransformState* state);
-    void             SSSetLighting   (ILightingState* state);
-    void             SSSetSampler    (size_t sampler_slot, ISamplerState* state);
-    void             SSSetTexture    (size_t sampler_slot, ITexture* texture);
-    void             SSSetMaterial   (IMaterialState* state);
-    ShaderMode       SSGetMode       ();
-    IViewerState*    SSGetViewer     ();
-    ITransformState* SSGetTransform  ();
-    ILightingState*  SSGetLighting   ();
-    ISamplerState*   SSGetSampler    (size_t sampler_slot);
-    ITexture*        SSGetTexture    (size_t sampler_slot);
-    IMaterialState*  SSGetMaterial   ();
+    void                     SSSetShader                 (IShader* shader);
+    void                     SSSetShaderParametersLayout (IShaderParametersLayout* parameters_layout);
+    void                     SSSetSampler                (size_t sampler_slot, ISamplerState* state);
+    void                     SSSetTexture                (size_t sampler_slot, ITexture* texture);
+    void                     SSSetConstantBuffer         (size_t buffer_slot, IBuffer* buffer);
+    IShaderParametersLayout* SSGetShaderParametersLayout ();
+    IShader*                 SSGetShader                 ();
+    ISamplerState*           SSGetSampler                (size_t sampler_slot);
+    ITexture*                SSGetTexture                (size_t sampler_slot);
+    IBuffer*                 SSGetConstantBufer          (size_t buffer_slot);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение информации о доступных режимах шейдинга устройства
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool SSIsSupported (ShaderMode mode);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление растеризатором (rasterizer-stage)
+///╙яЁртыхэшх ЁрёЄхЁшчрЄюЁюь (rasterizer-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void              RSSetState    (IRasterizerState* state);
     void              RSSetViewport (const Viewport& viewport);
@@ -169,7 +157,7 @@ class Device: virtual public IDevice, public Object
     const Rect&       RSGetScissor  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление выходным уровнем (output-stage)
+///╙яЁртыхэшх т√їюфэ√ь єЁютэхь (output-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                OSSetBlendState        (IBlendState* state);
     void                OSSetDepthStencilState (IDepthStencilState* state);
@@ -182,38 +170,38 @@ class Device: virtual public IDevice, public Object
     IView*              OSGetDepthStencilView  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очистка буферов отрисовки
+///╬ўшёЄър сєЇхЁют юЄЁшёютъш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ClearRenderTargetView (const Color4f& color);
     void ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil);
     void ClearViews            (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление предикатами отрисовки
+///╙яЁртыхэшх яЁхфшърЄрьш юЄЁшёютъш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void        SetPredication    (IPredicate* predicate, bool predicate_value);
     IPredicate* GetPredicate      ();
     bool        GetPredicateValue ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Рисование примитивов
+///╨шёютрэшх яЁшьшЄштют
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Draw        (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count);
     void DrawIndexed (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Ожидание завершения выполнения буфера команд
+///╬цшфрэшх чртхЁ°хэш  т√яюыэхэш  сєЇхЁр ъюьрэф
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Flush ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Список свойств устройства отрисовки
+///╤яшёюъ ётющёЄт єёЄЁющёЄтр юЄЁшёютъш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IPropertyList* GetProperties ();
     
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка состояния устройства в контекст OpenGL
+///╙ёЄрэютър ёюёЄю эш  єёЄЁющёЄтр т ъюэЄхъёЄ OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Bind (size_t base_vertex, size_t base_index);
     
@@ -221,13 +209,13 @@ class Device: virtual public IDevice, public Object
     typedef xtl::com_ptr<Driver> DriverPtr;
     
   private:
-    DriverPtr       driver;           //драйвер OpenGL
-    ContextManager  context_manager;  //менеджер контекстов OpenGL
-    PropertyList    properties;       //свойства устройства
-    OutputStage     output_stage;     //выходной уровень
-    InputStage      input_stage;      //входной уровень
-    RasterizerStage rasterizer_stage; //уровень растеризации
-    TextureManager  texture_manager;  //менеджер текстур
+    DriverPtr       driver;           //фЁрщтхЁ OpenGL
+    ContextManager  context_manager;  //ьхэхфцхЁ ъюэЄхъёЄют OpenGL
+    PropertyList    properties;       //ётющёЄтр єёЄЁющёЄтр
+    OutputStage     output_stage;     //т√їюфэющ єЁютхэ№
+    InputStage      input_stage;      //тїюфэющ єЁютхэ№
+    RasterizerStage rasterizer_stage; //єЁютхэ№ ЁрёЄхЁшчрЎшш
+    TextureManager  texture_manager;  //ьхэхфцхЁ ЄхъёЄєЁ
 };
 
 }
