@@ -8,6 +8,7 @@
 #include <exception>
 
 #include <syslib/window.h>
+#include <syslib/application.h> //???
 
 #include <render/low_level/opengl_driver.h>
 #include <render/low_level/device.h>
@@ -18,6 +19,10 @@
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/uninitialized_storage.h>
+#include <xtl/bind.h>
+#include <xtl/function.h>
+#include <xtl/connection.h>
+#include <xtl/ref.h>
 
 #include <common/exception.h>
 #include <common/hash.h>
@@ -33,6 +38,9 @@ typedef xtl::com_ptr<ITexture>           TexturePtr;
 typedef xtl::com_ptr<IView>              ViewPtr;
 typedef xtl::com_ptr<IBlendState>        BlendStatePtr; 
 typedef xtl::com_ptr<IDepthStencilState> DepthStencilStatePtr; 
+typedef xtl::com_ptr<IInputLayout>       InputLayoutPtr;
+typedef xtl::com_ptr<IBuffer>            BufferPtr;
+typedef xtl::com_ptr<IRasterizerState>   RasterizerStatePtr;
 
 //тестовое приложение
 struct Test

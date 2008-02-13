@@ -387,7 +387,7 @@ bool Device::GetPredicateValue ()
 void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout)
 {
   output_stage.Bind ();
-//  input_stage.Bind (base_vertex, base_index, out_indices_layout);
+  input_stage.Bind (base_vertex, base_index, out_indices_layout);
   rasterizer_stage.Bind ();
   texture_manager.Bind ();
 //  shader_stage.Bind ();
@@ -429,7 +429,7 @@ void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t ver
 
     Bind (0, 0);
 
-      //рисование
+      //рисование      
 
     glDrawArrays (mode, first_vertex, vertices_count);
 

@@ -493,7 +493,7 @@ void InputLayout::Bind
     glDisableClientState (GL_TEXTURE_COORD_ARRAY);
   }  
 
-    //настройка вершинных буферов
+    //настройка вершинных буферов    
     
   for (GlVertexAttributeGroupArray::iterator group_iter=vertex_attribute_groups.begin (), group_end=vertex_attribute_groups.end (); group_iter!=group_end; ++group_iter)
   {
@@ -511,7 +511,7 @@ void InputLayout::Bind
     {
       const GlVertexAttribute& va     = *va_iter;
       const void*              offset = base_offset + va.offset + base_vertex * va.stride; //расчёт начального смещения вершиных атрибутов
-
+      
       switch (va.semantic)
       {
         case VertexAttributeSemantic_Position:

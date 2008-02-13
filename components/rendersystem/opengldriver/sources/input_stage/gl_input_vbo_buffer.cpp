@@ -4,6 +4,9 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
+
+////чистить!!!
+
 ///Конструктор / деструктор
 VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, const BufferDesc& desc)
   : Buffer(context_manager, desc), target (in_target)

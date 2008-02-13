@@ -237,20 +237,18 @@ struct InputStage::Impl: public ContextObject
   {
     static const char* METHOD_NAME = "render::low_level::opengl::InputStage::Impl::Bind";
 
-    InputLayout* layout = state.GetInputLayout ();
-    
+    InputLayout* layout = state.GetInputLayout ();    
+
     if (!layout)
     {
         //сделать нормальное отключение!!!
-        
+
       RaiseInvalidOperation (METHOD_NAME, "Null InputLayout");
-      
+
       return;
-    }
-    else
-    {
-      layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), state.GetIndexBuffer (), out_indices_layout);
-    }
+    }    
+
+    layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), state.GetIndexBuffer (), out_indices_layout);
   }
 };
 

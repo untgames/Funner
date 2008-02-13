@@ -20,13 +20,11 @@ SystemMemoryBuffer::~SystemMemoryBuffer ()
 ///–абота с данными буфера
 void SystemMemoryBuffer::SetData (size_t offset, size_t size, const void* data)
 {
-   // провер€ем смещение
   if (offset >= buffer_desc.size)
     return;
 
-    // размер массива
-  size = offset + size > buffer_desc.size ? buffer_desc.size - offset : size;
-  // само копирование
+  size = offset + size > buffer_desc.size ? buffer_desc.size - offset : size;  
+
   memcpy (buffer.data () + offset, data, size);
 }
 
