@@ -283,7 +283,7 @@ void RegisterWindowClass ()
   
   memset (&wc, 0, sizeof (wc));
 
-  wc.style         = CS_HREDRAW | CS_VREDRAW;
+//  wc.style         = CS_HREDRAW | CS_VREDRAW;
   wc.lpfnWndProc   = &WindowMessageHandler;
   wc.hInstance     = GetApplicationInstance ();
   wc.hIcon         = LoadIcon (GetApplicationInstance (), IDI_APPLICATION);  
@@ -649,6 +649,26 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
   }  
 
   return false;
+}
+
+/*
+    Обновление окна
+*/
+
+void Platform::InvalidateWindow (window_t handle)
+{
+  HWND wnd = (HWND)handle;
+
+  try
+  {
+    if (!InvalidateRect (wnd, 0, FALSE))
+      raise_error ("::InvalidateRect");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("syslib::Win32Platform::InvalidateWindow");
+    throw;
+  }
 }
 
 /*

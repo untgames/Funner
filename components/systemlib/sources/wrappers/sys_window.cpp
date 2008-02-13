@@ -478,6 +478,15 @@ void Window::SetFocus (bool state)
 }
 
 /*
+    Обновление содержимого окна (посылка OnPaint)
+*/
+
+void Window::Invalidate ()
+{
+  Platform::InvalidateWindow ((Platform::window_t)CheckedHandle ());
+}
+
+/*
     Подписка на события окна
 */
 
