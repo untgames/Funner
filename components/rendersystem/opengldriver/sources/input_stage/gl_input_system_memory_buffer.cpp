@@ -5,49 +5,46 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация - SystemMemoryBuffer
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+    Конструктор / деструктор
+*/
 
-SystemMemoryBuffer::SystemMemoryBuffer (const ContextManager& context_manager, const BufferDesc& desc)
-  : Buffer(context_manager, desc), buffer (buffer_desc.size)
+SystemMemoryBuffer::SystemMemoryBuffer (const ContextManager& context_manager, const BufferDesc& in_desc)
+  : Buffer (context_manager, in_desc), buffer (in_desc.size)
   {}
 
 SystemMemoryBuffer::~SystemMemoryBuffer ()
 {
 }
 
-///Работа с данными буфера
-void SystemMemoryBuffer::SetData (size_t offset, size_t size, const void* data)
+/*
+    Установка / чтение данных после отсечения
+*/
+
+void SystemMemoryBuffer::SetDataCore (size_t offset, size_t size, const void* data)
 {
-  if (offset >= buffer_desc.size)
-    return;
-
-  size = offset + size > buffer_desc.size ? buffer_desc.size - offset : size;  
-
   memcpy (buffer.data () + offset, data, size);
 }
 
-void SystemMemoryBuffer::GetData (size_t offset, size_t size, void* data)
+void SystemMemoryBuffer::GetDataCore (size_t offset, size_t size, void* data)
 {
-    // проверяем смещение
-  if (offset >= buffer_desc.size)
-    return;
-
-   // размер массива
-  size = offset + size > buffer_desc.size ? buffer_desc.size - offset : size;
-  // копирование
   memcpy (data, buffer.data () + offset, size);
 }
 
-///Установка буфера в контекст OpenGL
+/*
+    Установка буфера в контекст OpenGL
+*/
+
 void SystemMemoryBuffer::Bind ()
 {
   //установка не требуется
 }
 
-///Указатель на данные буфера
+/*
+    Получение указателя на начало буфера
+*/
+
 void* SystemMemoryBuffer::GetDataPointer ()
 {
-  return buffer.data ();  // возвращаем начало буфера
+  return buffer.data ();
 }

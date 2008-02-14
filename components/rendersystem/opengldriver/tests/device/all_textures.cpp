@@ -273,6 +273,7 @@ int main ()
         desc.layers               = sizes [0][i].layers;
         desc.format               = (PixelFormat)j;
         desc.bind_flags           = BindFlag_Texture;
+        desc.access_flags         = AccessFlag_Read | AccessFlag_Write;
         desc.generate_mips_enable = false;
 
         status [0][0][i][j] = test_texture (desc, test.device.get ());

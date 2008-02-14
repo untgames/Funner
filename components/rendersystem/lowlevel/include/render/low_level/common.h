@@ -102,8 +102,9 @@ enum BindFlag
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum AccessFlag
 {
-  AccessFlag_Read  = 1, //доступ на чтение
-  AccessFlag_Write = 2  //доступ на запись
+  AccessFlag_Read      = 1,                                 //доступ на чтение
+  AccessFlag_Write     = 2,                                 //доступ на запись
+  AccessFlag_ReadWrite = AccessFlag_Read | AccessFlag_Write //доступ на чтение и запись
 };
 
 }

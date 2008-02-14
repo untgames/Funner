@@ -324,6 +324,7 @@ int main ()
     TextureDesc desc;
     
     desc.bind_flags           = BindFlag_Texture;
+    desc.access_flags         = AccessFlag_Read | AccessFlag_Write;    
     desc.generate_mips_enable = false;
 
     for (size_t i = 0; i < TextureDimension_Num; i++)

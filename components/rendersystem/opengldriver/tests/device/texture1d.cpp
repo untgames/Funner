@@ -26,7 +26,7 @@ int main ()
     desc.format               = PixelFormat_RGB8;
     desc.bind_flags           = BindFlag_Texture;
     desc.generate_mips_enable = true;
-    
+    desc.access_flags         = AccessFlag_ReadWrite;
     
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
 

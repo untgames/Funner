@@ -51,7 +51,7 @@ void redraw (Test& test)
     clear_color.blue  = 0.7f;
     clear_color.alpha = 0;
 
-    test.device->ClearViews (ClearFlag_All, clear_color, 0.0f, 0);
+    test.device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);
     test.device->Draw (PrimitiveType_TriangleList, 0, 3);
    
     test.swap_chain->Present ();    
@@ -69,11 +69,11 @@ void close ()
 
 int main ()
 {
-  printf ("Results of input_stage_test:\n");
+  printf ("Results of draw1_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (input_stage)", "max_version=1.1 GL_ARB_vertex_buffer_object=0");
+    Test test (L"OpenGL device test window (draw1)");
     
     test.window.Show ();
    
@@ -118,42 +118,10 @@ int main ()
     layout_desc.index_buffer_offset     = 0;
     
     InputLayoutPtr layout (test.device->CreateInputLayout (layout_desc), false);
-    
+
     test.device->ISSetInputLayout (layout.get ());
     test.device->ISSetVertexBuffer (0, vb.get ());
-    
-    printf ("Set rasterizer\n");
-    
-    RasterizerDesc rs_desc;
 
-    memset (&rs_desc, 0, sizeof (rs_desc));
-
-    rs_desc.fill_mode               = FillMode_Solid;
-    rs_desc.cull_mode               = CullMode_None;
-    rs_desc.front_counter_clockwise = true;
-    rs_desc.depth_bias              = 0;
-    rs_desc.scissor_enable          = false;
-    rs_desc.multisample_enable      = false;
-    rs_desc.antialiased_line_enable = false;    
-    
-    RasterizerStatePtr rasterizer (test.device->CreateRasterizerState (rs_desc), false);
-    
-    test.device->RSSetState (rasterizer.get ());
-    
-    printf ("Set output\n");
-    
-    DepthStencilDesc depth_stencil_desc;
-    
-    memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
-    
-    depth_stencil_desc.depth_test_enable  = false;
-    depth_stencil_desc.depth_write_enable = true;
-    depth_stencil_desc.depth_compare_mode = CompareMode_Less;    
-    
-    DepthStencilStatePtr depth_stencil_state (test.device->CreateDepthStencilState (depth_stencil_desc), false);
-    
-    test.device->OSSetDepthStencilState (depth_stencil_state.get ());    
-    
     printf ("Register callbacks\n");
     
     test.window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&redraw, xtl::ref (test)));

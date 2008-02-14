@@ -113,7 +113,7 @@ void Texture3D::GetData
   static const char* METHOD_NAME = "render::low_level::opengl::Texture3D::GetData";
 
     //если баг работы функции glGetTexImage не обнаружен - копирование производится как и в общем случае
-    
+
   static Extension BUG_Texture3D_GetTexImage = "GLBUG_Texture3D_GetTexImage";
 
   if (!IsSupported (BUG_Texture3D_GetTexImage))

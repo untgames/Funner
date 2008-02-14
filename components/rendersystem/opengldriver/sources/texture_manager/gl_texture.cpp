@@ -22,7 +22,7 @@ Texture::Texture
   GLenum                in_target,
   size_t                in_mips_count)
     : BindableTexture (in_context_manager),
-      desc (in_desc),    
+      desc (in_desc),
       texture_id (0),
       target (in_target),
       mips_count (in_mips_count),
@@ -77,7 +77,21 @@ Texture::Texture
     default:
       RaiseInvalidArgument (METHOD_NAME, "desc.format", desc.format);
       return;
-  }  
+  }
+  
+    //проверка корректности флагов доступа
+    
+  switch (desc.access_flags)
+  {
+    case 0:
+    case AccessFlag_Read:
+    case AccessFlag_Write:
+    case AccessFlag_Read | AccessFlag_Write:
+      break;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.access_flags", desc.access_flags);
+      break;
+  }
 
     //выделение нового OpenGL-идентификатора текстуры
 
@@ -310,6 +324,11 @@ void Texture::SetData
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::SetData";
   
+    //проверка возможности записи
+    
+  if (!(desc.access_flags & AccessFlag_Write))
+    RaiseInvalidOperation (METHOD_NAME, "Can't set texture data (no AccessFlag_Write in desc.access_flags)");
+  
     //проверка корректности номеров слоя и mip-уровня
 
   if (layer >= desc.layers)
@@ -484,7 +503,12 @@ void Texture::GetData
   void*       buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::GetData";
-  
+
+    //проверка возможности чтения
+
+  if (!(desc.access_flags & AccessFlag_Read))
+    RaiseInvalidOperation (METHOD_NAME, "Can't get texture data (no AccessFlag_Read in desc.access_flags)");
+
     //проверка корректности номеров слоя и mip-уровня
 
   if (layer >= desc.layers)

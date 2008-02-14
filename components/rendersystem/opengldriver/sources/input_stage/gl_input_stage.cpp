@@ -11,7 +11,7 @@ using namespace common;
 namespace
 {
 
-struct InputStageState
+class InputStageState
 {
   public:
       //конструктор
@@ -88,7 +88,10 @@ struct InputStageState
 
 struct InputStage::Impl: public ContextObject
 {
+  typedef xtl::com_ptr<InputLayout> InputLayoutPtr;
+
   InputStageState state;                        //состо€ние уровн€
+  InputLayoutPtr  default_layout;               //состо€ние расположени€ геометрии по умолчанию  
   bool            has_arb_multitexture;         //поддерживаетс€ ли GL_ARB_vertex_buffer_object
   bool            has_arb_vertex_buffer_object; //поддерживаетс€ ли GL_ARB_vertex_buffer_object
   size_t          texture_units_count;          //количество текстурных юнитов поддерживаемое аппаратно  
@@ -119,7 +122,19 @@ struct InputStage::Impl: public ContextObject
     if (texture_units_count > DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
       texture_units_count = DEVICE_VERTEX_BUFFER_SLOTS_COUNT;
       
-      //проверика ошибок
+      //инициализаци€ состо€ни€ уровн€
+      
+    InputLayoutDesc default_layout_desc;
+    
+    memset (&default_layout_desc, 0 , sizeof default_layout_desc);
+
+    default_layout_desc.index_type = InputDataType_UInt;
+
+    default_layout = InputLayoutPtr (new InputLayout (GetContextManager (), default_layout_desc, texture_units_count), false);
+    
+    SetInputLayout (default_layout.get ());
+      
+      //проверка ошибок
       
     CheckErrors ("render::low_level::opengl::InputStage::Impl");
   }
@@ -240,13 +255,7 @@ struct InputStage::Impl: public ContextObject
     InputLayout* layout = state.GetInputLayout ();    
 
     if (!layout)
-    {
-        //сделать нормальное отключение!!!
-
-      RaiseInvalidOperation (METHOD_NAME, "Null InputLayout");
-
-      return;
-    }    
+      layout = default_layout.get ();
 
     layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), state.GetIndexBuffer (), out_indices_layout);
   }
