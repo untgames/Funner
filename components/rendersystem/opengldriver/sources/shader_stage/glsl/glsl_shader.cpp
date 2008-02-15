@@ -9,10 +9,10 @@ namespace
 
 void* get_uniform_pointer (const ShaderParameter& shader_parameter_layout, ConstantBufferPtr* constant_buffers)
 {
-  if (!constant_buffers[shader_parameter_layout.slot].get ())
+  if (!constant_buffers[shader_parameter_layout.slot])
     return NULL;
 
-  return constant_buffers[shader_parameter_layout.slot].get () + shader_parameter_layout.offset;
+  return (char*)constant_buffers[shader_parameter_layout.slot]->GetDataPointer () + shader_parameter_layout.offset;
 }
 
 }
@@ -21,9 +21,11 @@ void* get_uniform_pointer (const ShaderParameter& shader_parameter_layout, Const
    Конструктор
 */
 
-GlslShader::GlslShader (const ContextManager& manager, size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& in_error_log)
-  : Shader (manager), program (0), error_log (in_error_log)
+GlslShader::GlslShader (const ContextManager& manager, size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
+  : Shader (manager), program (0)
 {
+  stl::string log_buffer;
+
   static const char* METHOD_NAME = "render::low_level::opengl::GlslShader::GlslShader";
 
   for (size_t i = 0; i < shaders_count; i++)
@@ -83,9 +85,9 @@ GlslShader::GlslShader (const ContextManager& manager, size_t shaders_count, con
       if (glGetShaderiv) glGetShaderiv             (shader[shader_type], GL_COMPILE_STATUS, &compile_status);
       else               glGetObjectParameterivARB (shader[shader_type], GL_COMPILE_STATUS, &compile_status);
 
-      GetShaderLog (shader_type);
+      GetShaderLog (shader_type, log_buffer);
 
-      error_log (log_buffer.data ());
+      error_log (log_buffer.c_str ());
 
       if (!compile_status)
         RaiseError (METHOD_NAME);
@@ -115,9 +117,9 @@ GlslShader::GlslShader (const ContextManager& manager, size_t shaders_count, con
       else                glGetObjectParameterivARB (program, GL_OBJECT_VALIDATE_STATUS_ARB, &compile_status);
     }
 
-    GetProgramLog ();
+    GetProgramLog (log_buffer);
 
-    error_log (log_buffer.data ());
+    error_log (log_buffer.c_str ());
 
     if (!compile_status)
       RaiseError (METHOD_NAME);
@@ -247,8 +249,8 @@ void GlslShader::Bind (ConstantBufferPtr* constant_buffers, ShaderParametersLayo
     int parameter_location = glGetUniformLocation (program, layout_desc.parameters[i].name); //!!! Необходимо реализовать однократное развязывание имён
 
     if (parameter_location == -1)
-      RaiseInvalidOperation (METHOD_NAME, "Uniform with name '%s' not found", layout_desc.parameters[i].name);
-  
+      LogPrintf ("Unreferenced uniform parameter '%s'", layout_desc.parameters [i].name);
+
     void* uniform_pointer = get_uniform_pointer (layout_desc.parameters[i], constant_buffers);
 
     if (!uniform_pointer)
@@ -278,29 +280,31 @@ void GlslShader::Bind (ConstantBufferPtr* constant_buffers, ShaderParametersLayo
    Получение лога OpenGL
 */
 
-void GlslShader::GetShaderLog (size_t shader_index)
+void GlslShader::GetShaderLog (size_t shader_index, stl::string& log_buffer)
 {
   int log_length = 0;
 
   MakeContextCurrent ();
 
-  if (glGetShaderiv) glGetShaderiv             (shader[shader_index], GL_INFO_LOG_LENGTH, &log_length);
-  else               glGetObjectParameterivARB (shader[shader_index], GL_INFO_LOG_LENGTH, &log_length);
+  if (glGetShaderiv) glGetShaderiv             (shader [shader_index], GL_INFO_LOG_LENGTH, &log_length);
+  else               glGetObjectParameterivARB (shader [shader_index], GL_INFO_LOG_LENGTH, &log_length);
 
   if (log_length)
   {
     int getted_log_size = 0;
 
-    log_buffer.resize (log_length);
+    log_buffer.resize (log_length - 1);
 
-    if (glGetShaderInfoLog) glGetShaderInfoLog (shader[shader_index], log_length, &getted_log_size, log_buffer.data ());
-    else                    glGetInfoLogARB    (shader[shader_index], log_length, &getted_log_size, log_buffer.data ());
+    if (glGetShaderInfoLog) glGetShaderInfoLog (shader [shader_index], log_length, &getted_log_size, &log_buffer [0]);
+    else                    glGetInfoLogARB    (shader [shader_index], log_length, &getted_log_size, &log_buffer [0]);
+    
+    log_buffer.resize (getted_log_size - 1);
   }
 
   CheckErrors ("render::low_level::opengl::GlslShader::GetShaderLog");
 }
 
-void GlslShader::GetProgramLog ()
+void GlslShader::GetProgramLog (stl::string& log_buffer)
 {
   int log_length = 0;
 
@@ -313,10 +317,12 @@ void GlslShader::GetProgramLog ()
   {
     int getted_log_size = 0;
 
-    log_buffer.resize (log_length);
+    log_buffer.resize (log_length - 1);
 
-    if (glGetProgramInfoLog) glGetProgramInfoLog (program, log_length, &getted_log_size, log_buffer.data ());
-    else                     glGetInfoLogARB     (program, log_length, &getted_log_size, log_buffer.data ());
+    if (glGetProgramInfoLog) glGetProgramInfoLog (program, log_length, &getted_log_size, &log_buffer [0]);
+    else                     glGetInfoLogARB     (program, log_length, &getted_log_size, &log_buffer [0]);
+    
+    log_buffer.resize (getted_log_size - 1);
   }
 
   CheckErrors ("render::low_level::opengl::GlslShader::GetProgramLog");

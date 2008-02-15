@@ -24,10 +24,12 @@ struct Context::Impl
   const WGLEWContext* wglew_context;              //контекст WGLEW
   Trackable::SlotType on_destroy_draw_swap_chain; //обработчик удаления цепочки обмена (для рисования)
   Trackable::SlotType on_destroy_read_swap_chain; //обработчик удаления цепочки обмена (для чтения)
+  bool                vsync;                      //необходимо ли делать вертикальную синхронизацию
 
   Impl (ISwapChain* in_swap_chain, Impl* shared_context=0) : draw_swap_chain (0), read_swap_chain (0),
     on_destroy_draw_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this)),
-    on_destroy_read_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this))
+    on_destroy_read_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this)),
+    vsync (false)
   {
     if (!in_swap_chain)
       RaiseNullArgument ("render::low_level::opengl::Context::Context", "swap_chain");
@@ -54,9 +56,14 @@ struct Context::Impl
       GLenum status = glewContextInit (&glew_context);
 
       if (status != GLEW_OK)
-        RaiseInvalidOperation ("glewContextInit", "%s", glewGetString (status));
-        
+        RaiseInvalidOperation ("glewContextInit", "%s", glewGetString (status));        
+
       SetSwapChains (swap_chain, swap_chain);
+      
+        //установка вертикальной синхронизации
+      
+      wglewSetContext (wglew_context);
+      SetVSync ();
     }
     catch (...)
     {
@@ -107,6 +114,7 @@ struct Context::Impl
     draw_swap_chain    = in_draw_swap_chain;
     read_swap_chain    = in_read_swap_chain;
     wglew_context      = casted_draw_swap_chain->GetWGLEWContext ();
+    vsync              = casted_draw_swap_chain->HasVSync ();
 
     casted_draw_swap_chain->RegisterDestroyHandler (on_destroy_draw_swap_chain);
     casted_read_swap_chain->RegisterDestroyHandler (on_destroy_read_swap_chain);
@@ -151,6 +159,8 @@ struct Context::Impl
         if (!wglMakeCurrent (draw_swap_chain_dc, gl_context))
           raise_error ("wglMakeCurrent");
       }
+      
+      SetVSync (); 
     }
     catch (common::Exception& exception)
     {
@@ -196,6 +206,16 @@ struct Context::Impl
       return false;
 
     return GetPixelFormat (swap_chain->GetDC ()) == pixel_format;
+  }
+  
+    //установка вертикальной синхронизации
+  void SetVSync ()
+  {
+    if (wglSwapIntervalEXT && wglGetSwapIntervalEXT)
+    {
+      if (wglGetSwapIntervalEXT () != (int)vsync)
+        wglSwapIntervalEXT (vsync);
+    }    
   }
 };
 

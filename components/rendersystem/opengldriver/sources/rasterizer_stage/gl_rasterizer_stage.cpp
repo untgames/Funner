@@ -87,6 +87,10 @@ RasterizerStage::Impl::Impl (const ContextManager& context_manager)
   desc.antialiased_line_enable = true;
 
   state.SetDesc (desc);
+  
+  ///?!!!
+  
+    //default state???
 }
 
 /*
@@ -103,7 +107,7 @@ void RasterizerStage::Impl::Bind ()
   if (need_recalc_state_hash)
     state_hash = crc32 (&state, sizeof state);
 
-  if (GetContextData (ContextDataTable_RasterizerStage, RasterizerStageDataTable_ViewportScissorHash) != viewport_scissor_hash)
+//  if (GetContextData (ContextDataTable_RasterizerStage, RasterizerStageDataTable_ViewportScissorHash) != viewport_scissor_hash)
   {
     glScissor    (viewport_scissor.scissor_rect.x, viewport_scissor.scissor_rect.y, viewport_scissor.scissor_rect.width, viewport_scissor.scissor_rect.height);
     glDepthRange (viewport_scissor.viewport.min_depth, viewport_scissor.viewport.max_depth);

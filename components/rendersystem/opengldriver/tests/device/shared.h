@@ -4,8 +4,11 @@
 #include <stdio.h>
 #include <memory.h>
 #include <math.h>
+#include <time.h>
 
 #include <exception>
+
+#include <mathlib.h>
 
 #include <syslib/window.h>
 #include <syslib/application.h> //???
@@ -15,7 +18,8 @@
 #include <render/low_level/debug.h>
 #include <render/low_level/utils.h>
 
-#include <stl/list>
+//#include <stl/list>
+#include <stl/string>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/uninitialized_storage.h>
@@ -24,6 +28,7 @@
 #include <xtl/connection.h>
 #include <xtl/ref.h>
 
+#include <common/file.h>
 #include <common/exception.h>
 #include <common/hash.h>
 
@@ -64,12 +69,13 @@ struct Test
 
     desc.frame_buffer.color_bits   = 24;
     desc.frame_buffer.alpha_bits   = 8;
-    desc.frame_buffer.depth_bits   = 16;
+    desc.frame_buffer.depth_bits   = 24;
     desc.frame_buffer.stencil_bits = 8;
     desc.buffers_count             = 2;
-    desc.samples_count             = 0;
+//    desc.samples_count             = 0;
+    desc.samples_count             = 6;
     desc.swap_method               = SwapMethod_Discard;
-    desc.vsync                     = false;
+    desc.vsync                     = true;
     desc.fullscreen                = false;
     desc.window_handle             = window.Handle ();
 

@@ -3,6 +3,8 @@
 
 #include "../shared.h"
 
+#include <stl/string> //!!!
+
 namespace render
 {
 
@@ -69,8 +71,8 @@ class GlslShader : public Shader
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение лога OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void GetShaderLog (size_t shader_index);
-    void GetProgramLog ();
+    void GetShaderLog (size_t shader_index, stl::string& buffer);
+    void GetProgramLog (stl::string&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление шейдеров
@@ -78,12 +80,10 @@ class GlslShader : public Shader
     void DeletePrograms ();
 
   private:
-    GLhandleARB                      shader[GlslShaderType_Num];             //шейдера (вертексный, пиксельный)
-    GLhandleARB                      program;                            //линкуемый шейдер    
-    bool                             is_shader_attached[GlslShaderType_Num]; //подключен ли шейдер к программе
-    xtl::uninitialized_storage<char> log_buffer;                         //буфер для получения лога GL
-    ShaderDesc                       descs[GlslShaderType_Num];              //описание шейдеров
-    LogFunction                      error_log;                          //лог ошибок
+    GLhandleARB shader [GlslShaderType_Num];             //шейдера (вертексный, пиксельный)
+    GLhandleARB program;                                 //линкуемый шейдер
+    bool        is_shader_attached [GlslShaderType_Num]; //подключен ли шейдер к программе //????
+    ShaderDesc  descs [GlslShaderType_Num];              //описание шейдеров
 };
 
 GlslShaderType get_shader_type (const char* profile); //получение ShaderType по имени профиля (при получении неизвестного имени возвращается -1)
