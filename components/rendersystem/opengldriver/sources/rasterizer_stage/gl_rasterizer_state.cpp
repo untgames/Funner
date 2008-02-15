@@ -23,6 +23,15 @@ RasterizerState::RasterizerState (const ContextManager& manager)
   CheckErrors (METHOD_NAME);
 }
 
+RasterizerState::~RasterizerState ()
+{
+  MakeContextCurrent ();
+
+  glDeleteLists (display_list, 1);
+
+  CheckErrors ("render::low_level::opengl::RasterizerState::~RasterizerState");
+}
+
 /*
    Биндинг состояния
 */

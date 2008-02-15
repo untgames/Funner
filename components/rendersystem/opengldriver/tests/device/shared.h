@@ -31,16 +31,18 @@
 
 using namespace render::low_level;
 
-typedef xtl::com_ptr<IDriver>            DriverPtr;
-typedef xtl::com_ptr<ISwapChain>         SwapChainPtr;
-typedef xtl::com_ptr<IDevice>            DevicePtr;
-typedef xtl::com_ptr<ITexture>           TexturePtr;
-typedef xtl::com_ptr<IView>              ViewPtr;
-typedef xtl::com_ptr<IBlendState>        BlendStatePtr; 
-typedef xtl::com_ptr<IDepthStencilState> DepthStencilStatePtr; 
-typedef xtl::com_ptr<IInputLayout>       InputLayoutPtr;
-typedef xtl::com_ptr<IBuffer>            BufferPtr;
-typedef xtl::com_ptr<IRasterizerState>   RasterizerStatePtr;
+typedef xtl::com_ptr<IDriver>                 DriverPtr;
+typedef xtl::com_ptr<ISwapChain>              SwapChainPtr;
+typedef xtl::com_ptr<IDevice>                 DevicePtr;
+typedef xtl::com_ptr<ITexture>                TexturePtr;
+typedef xtl::com_ptr<IView>                   ViewPtr;
+typedef xtl::com_ptr<IBlendState>             BlendStatePtr;
+typedef xtl::com_ptr<IDepthStencilState>      DepthStencilStatePtr;
+typedef xtl::com_ptr<IInputLayout>            InputLayoutPtr;
+typedef xtl::com_ptr<IBuffer>                 BufferPtr;
+typedef xtl::com_ptr<IRasterizerState>        RasterizerStatePtr;
+typedef xtl::com_ptr<IShader>                 ShaderPtr;
+typedef xtl::com_ptr<IShaderParametersLayout> ShaderParametersLayoutPtr;
 
 //тестовое приложение
 struct Test

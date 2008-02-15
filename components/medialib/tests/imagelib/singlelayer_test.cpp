@@ -70,6 +70,11 @@ int main ()
     image2.Save("results/image2.jpg", PixelFormat_RGBA16);
     image2.Save("results/image2.tiff", PixelFormat_RGBA16);
     image2.Save("results/image2.tga", PixelFormat_RGBA8);
+
+/*    Image new_image (204, 152, 1, image2.Format (), image2.Bitmap ());
+                                                                             //Просходит непонятный переворот изображения!!!!!!!!!!
+    new_image.Save ("results/new_image.tga");
+*/    
     image1.Save("results/image1.bmp", PixelFormat_RGBA8);
 
     image1.PutImage (10,10,0,60,60,1,image5.Format(),image5.Bitmap());

@@ -115,7 +115,7 @@ class Device: virtual public IDevice, public Object
     IDepthStencilState*      CreateDepthStencilState      (const DepthStencilDesc&);
     ISamplerState*           CreateSamplerState           (const SamplerDesc&);
     IBuffer*                 CreateBuffer                 (const BufferDesc&);
-    IShader*                 CreateShader                 (const ShaderDesc& desc, const LogFunction& error_log);
+    IShader*                 CreateShader                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     ITexture*                CreateTexture                (const TextureDesc&);
     ITexture*                CreateRenderTargetTexture    (ISwapChain* swap_chain, size_t buffer_index);
     ITexture*                CreateDepthStencilTexture    (ISwapChain* swap_chain);

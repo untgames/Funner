@@ -131,9 +131,9 @@ IShaderParametersLayout* Device::CreateShaderParametersLayout (const ShaderParam
   return shader_stage.CreateShaderParametersLayout (desc);
 }
 
-IShader* Device::CreateShader (const ShaderDesc& desc, const LogFunction& error_log)
+IShader* Device::CreateShader (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
 {
-  return shader_stage.CreateShader (desc, error_log);
+  return shader_stage.CreateShader (shaders_count, shader_descs, error_log);
 }
 
 void Device::SSSetShader (IShader* shader)
@@ -390,7 +390,7 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
   input_stage.Bind (base_vertex, base_index, out_indices_layout);
   rasterizer_stage.Bind ();
   texture_manager.Bind ();
-//  shader_stage.Bind ();
+  shader_stage.Bind ();
 }
 
 /*

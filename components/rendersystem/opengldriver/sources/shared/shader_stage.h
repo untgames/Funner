@@ -38,7 +38,7 @@ class ShaderStage
 ///Создание шейдеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IShaderParametersLayout* CreateShaderParametersLayout (const ShaderParametersLayoutDesc&);
-    IShader*                 CreateShader                 (const ShaderDesc& desc, const LogFunction& error_log);
+    IShader*                 CreateShader                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     IBuffer*                 CreateConstantBuffer         (const BufferDesc&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////

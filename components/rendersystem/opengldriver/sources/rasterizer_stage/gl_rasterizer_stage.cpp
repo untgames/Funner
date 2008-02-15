@@ -143,7 +143,7 @@ void RasterizerStage::Impl::SetState (IRasterizerState* in_state)
 {
   RasterizerDesc temp_desc;
 
-  in_state->GetDesc (temp_desc);
+  in_state->GetDesc (temp_desc); //!!!
 
   state.SetDesc (temp_desc);
 }
