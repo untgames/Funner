@@ -115,7 +115,7 @@ class Device: virtual public IDevice, public Object
     IDepthStencilState*      CreateDepthStencilState      (const DepthStencilDesc&);
     ISamplerState*           CreateSamplerState           (const SamplerDesc&);
     IBuffer*                 CreateBuffer                 (const BufferDesc&);
-    IShader*                 CreateShader                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
+    IProgram*                CreateProgram                (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     ITexture*                CreateTexture                (const TextureDesc&);
     ITexture*                CreateRenderTargetTexture    (ISwapChain* swap_chain, size_t buffer_index);
     ITexture*                CreateDepthStencilTexture    (ISwapChain* swap_chain);
@@ -136,13 +136,13 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление шейдерными уровн€ми (shader-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                     SSSetShader                 (IShader* shader);
+    void                     SSSetProgram                (IProgram* program);
     void                     SSSetShaderParametersLayout (IShaderParametersLayout* parameters_layout);
     void                     SSSetSampler                (size_t sampler_slot, ISamplerState* state);
     void                     SSSetTexture                (size_t sampler_slot, ITexture* texture);
     void                     SSSetConstantBuffer         (size_t buffer_slot, IBuffer* buffer);
     IShaderParametersLayout* SSGetShaderParametersLayout ();
-    IShader*                 SSGetShader                 ();
+    IProgram*                SSGetProgram                ();
     ISamplerState*           SSGetSampler                (size_t sampler_slot);
     ITexture*                SSGetTexture                (size_t sampler_slot);
     IBuffer*                 SSGetConstantBuffer         (size_t buffer_slot);

@@ -51,37 +51,18 @@ const char* GlslShaderManager::GetProfile (size_t index)
    Создание шейдера
 */
 
-Shader* GlslShaderManager::CreateShader (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
+Shader* GlslShaderManager::CreateShader (const ShaderDesc& shader_desc, const LogFunction& error_log)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::GlslShaderManager::CreateShader";
-
-  if (!shader_descs)
-    RaiseNullArgument (METHOD_NAME, "shader_descs");
-
-  bool used_profiles[GLSL_PROFILES_COUNT] = {0, 0};
-
-  for (size_t i = 0; i < shaders_count; i++)
-  {
-    if (!strcmp (shader_descs[i].profile, GLSL_PROFILES[0]))
-    {
-      if (used_profiles[0])
-        RaiseInvalidArgument (METHOD_NAME, "shader_descs[i].profile", shader_descs[i].profile, "Can be no more than one shader for each profile");
-      used_profiles[0] = true;
-    }
-    else if (!strcmp (shader_descs[i].profile, GLSL_PROFILES[1]))
-    {
-      if (used_profiles[1])
-        RaiseInvalidArgument (METHOD_NAME, "shader_descs[i].profile", shader_descs[i].profile, "Can be no more than one shader for each profile");
-      used_profiles[1] = true;
-    }
-    else
-      RaiseInvalidArgument (METHOD_NAME, "shader_descs[i].profile", shader_descs[i].profile, "Profile not supported");
-  }
-
-  return new GlslShader (GetContextManager (), shaders_count, shader_descs, error_log);
+  return new GlslShader (GetContextManager (), shader_desc, error_log);
 }
 
+Program* GlslShaderManager::CreateProgram (size_t shaders_count, ShaderPtr* shaders, const LogFunction& error_log)
+{
+  if (!shaders)
+    RaiseNullArgument ("render::low_level::opengl::GlslShaderManager::CreateProgram", "shaders");
 
+  return new GlslProgram (GetContextManager (), shaders_count, shaders, error_log);
+}
 
 namespace render
 {

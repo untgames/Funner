@@ -73,7 +73,7 @@ class IDevice: virtual public IObject
     virtual IDepthStencilState*      CreateDepthStencilState      (const DepthStencilDesc&) = 0;
     virtual ISamplerState*           CreateSamplerState           (const SamplerDesc&) = 0;
     virtual IBuffer*                 CreateBuffer                 (const BufferDesc&) = 0;
-    virtual IShader*                 CreateShader                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log) = 0;
+    virtual IProgram*                CreateProgram                (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log) = 0;
     virtual ITexture*                CreateTexture                (const TextureDesc&) = 0;
     virtual ITexture*                CreateRenderTargetTexture    (ISwapChain* swap_chain, size_t buffer_index) = 0;
     virtual ITexture*                CreateDepthStencilTexture    (ISwapChain* swap_chain) = 0;
@@ -94,13 +94,13 @@ class IDevice: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление шейдерными уровн€ми (shader-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void                     SSSetShader                 (IShader* shader) = 0;
+    virtual void                     SSSetProgram                (IProgram* program) = 0;
     virtual void                     SSSetShaderParametersLayout (IShaderParametersLayout* parameters_layout) = 0;
     virtual void                     SSSetSampler                (size_t sampler_slot, ISamplerState* state) = 0;
     virtual void                     SSSetTexture                (size_t sampler_slot, ITexture* texture) = 0;
     virtual void                     SSSetConstantBuffer         (size_t buffer_slot, IBuffer* buffer) = 0;
     virtual IShaderParametersLayout* SSGetShaderParametersLayout () = 0;
-    virtual IShader*                 SSGetShader                 () = 0;
+    virtual IProgram*                SSGetProgram                () = 0;
     virtual ISamplerState*           SSGetSampler                (size_t sampler_slot) = 0;
     virtual ITexture*                SSGetTexture                (size_t sampler_slot) = 0;
     virtual IBuffer*                 SSGetConstantBuffer         (size_t buffer_slot) = 0;

@@ -131,14 +131,14 @@ IShaderParametersLayout* Device::CreateShaderParametersLayout (const ShaderParam
   return shader_stage.CreateShaderParametersLayout (desc);
 }
 
-IShader* Device::CreateShader (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
+IProgram* Device::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
 {
-  return shader_stage.CreateShader (shaders_count, shader_descs, error_log);
+  return shader_stage.CreateProgram (shaders_count, shader_descs, error_log);
 }
 
-void Device::SSSetShader (IShader* shader)
+void Device::SSSetProgram (IProgram* program)
 {
-  shader_stage.SetShader (shader);
+  shader_stage.SetProgram (program);
 }
 
 void Device::SSSetShaderParametersLayout (IShaderParametersLayout* layout)
@@ -156,9 +156,9 @@ IShaderParametersLayout* Device::SSGetShaderParametersLayout ()
   return shader_stage.GetShaderParametersLayout ();
 }
 
-IShader* Device::SSGetShader ()
+IProgram* Device::SSGetProgram ()
 {
-  return shader_stage.GetShader ();
+  return shader_stage.GetProgram ();
 }
 
 IBuffer* Device::SSGetConstantBuffer (size_t buffer_slot)

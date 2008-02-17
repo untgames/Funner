@@ -205,7 +205,7 @@ int main ()
     
     ShaderParametersLayoutDesc shader_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
 
-    ShaderPtr shader (test.device->CreateShader (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));
+    ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));
     ShaderParametersLayoutPtr shader_parameters_layout (test.device->CreateShaderParametersLayout (shader_parameters_layout_desc));
 
     BufferDesc cb_desc;
@@ -229,7 +229,7 @@ int main ()
 
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
-    test.device->SSSetShader (shader.get ());
+    test.device->SSSetProgram (shader.get ());
     test.device->SSSetShaderParametersLayout (shader_parameters_layout.get ());
     test.device->SSSetConstantBuffer (0, cb.get ());
 

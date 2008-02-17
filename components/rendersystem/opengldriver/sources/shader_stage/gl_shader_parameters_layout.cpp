@@ -38,7 +38,7 @@ void ShaderParametersLayout::SetDesc (const ShaderParametersLayoutDesc& in_desc)
   desc = in_desc;
 }
 
-void ShaderParametersLayout::GetDesc (ShaderParametersLayoutDesc& target_desc)
+ShaderParametersLayoutDesc& ShaderParametersLayout::GetDesc ()
 {
-  target_desc = desc;
+  return desc;
 }

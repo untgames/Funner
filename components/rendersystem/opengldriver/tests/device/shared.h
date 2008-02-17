@@ -46,7 +46,7 @@ typedef xtl::com_ptr<IDepthStencilState>      DepthStencilStatePtr;
 typedef xtl::com_ptr<IInputLayout>            InputLayoutPtr;
 typedef xtl::com_ptr<IBuffer>                 BufferPtr;
 typedef xtl::com_ptr<IRasterizerState>        RasterizerStatePtr;
-typedef xtl::com_ptr<IShader>                 ShaderPtr;
+typedef xtl::com_ptr<IProgram>                ProgramPtr;
 typedef xtl::com_ptr<IShaderParametersLayout> ShaderParametersLayoutPtr;
 
 //тестовое приложение

@@ -38,12 +38,12 @@ class ShaderStage
 ///Создание шейдеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IShaderParametersLayout* CreateShaderParametersLayout (const ShaderParametersLayoutDesc&);
-    IShader*                 CreateShader                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
+    IProgram*                CreateProgram                (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния, вьюпорта и отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetShader                 (IShader* shader);
+    void SetProgram                (IProgram* program);
     void SetShaderParametersLayout (IShaderParametersLayout* parameters_layout);
     void SetConstantBuffer         (size_t buffer_slot, IBuffer* buffer);
 
@@ -51,7 +51,7 @@ class ShaderStage
 ///Получение состояния, вьюпорта и отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IShaderParametersLayout* GetShaderParametersLayout () const;
-    IShader*                 GetShader                 () const;
+    IProgram*                GetProgram                () const;
     IBuffer*                 GetConstantBuffer         (size_t buffer_slot) const;
 
   private:

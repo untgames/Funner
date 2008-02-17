@@ -1,5 +1,10 @@
 #include <stl/string>
 #include <stl/hash_map>
+#include <stl/vector>
+
+#include <xtl/bind.h>
+
+#include <common/hash.h>
 
 #include "shared.h"
 
@@ -47,12 +52,12 @@ struct ShaderStage::Impl: public ContextObject
 ///Создание шейдеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IShaderParametersLayout* CreateShaderParametersLayout (const ShaderParametersLayoutDesc&);
-    IShader*                 CreateShader                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
+    IProgram*                CreateProgram                (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния, вьюпорта и отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetShader                 (IShader* shader);
+    void SetProgram                (IProgram* program);
     void SetShaderParametersLayout (IShaderParametersLayout* parameters_layout);
     void SetConstantBuffer         (size_t buffer_slot, IBuffer* buffer);
 
@@ -60,7 +65,7 @@ struct ShaderStage::Impl: public ContextObject
 ///Получение состояния, вьюпорта и отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IShaderParametersLayout* GetShaderParametersLayout () const;
-    IShader*                 GetShader                 () const;
+    IProgram*                GetProgram                () const;
     IBuffer*                 GetConstantBuffer         (size_t buffer_slot) const;
 
   private:
@@ -69,16 +74,23 @@ struct ShaderStage::Impl: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddShaderManager (ShaderManager*);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление шейдера по хешу исходного кода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RemoveShaderByHash (size_t hash);
+
   private:    
     typedef xtl::trackable_ptr<ShaderParametersLayout>                ShaderParametersLayoutPtr;
-    typedef xtl::trackable_ptr<Shader>                                ShaderPtr;
+    typedef xtl::trackable_ptr<Program>                               ProgramPtr;
     typedef stl::vector <ShaderManager*>                              ShaderManagerArray;
     typedef stl::hash_map<stl::hash_key<const char*>, ShaderManager*> ShaderManagerMap;
+    typedef stl::hash_map<size_t, Shader*>                            ShaderMap;
 
   public:
     ShaderParametersLayoutPtr parameters_layout;                                    //расположение параметров шейдера
-    ShaderPtr                 shader;                                               //шейдер
+    ProgramPtr                program;                                              //шейдер
     ConstantBufferPtr         constant_buffers[DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы шейдера
+    ShaderMap                 shaders_map;                                          //скомпилированные шейдеры
     ShaderManagerArray        shader_managers;                                      //массив менеджеров
     ShaderManagerMap          shader_managers_map;                                  //соответствие профиль/менеджер
 };
@@ -106,10 +118,10 @@ ShaderStage::Impl::~Impl ()
 
 void ShaderStage::Impl::Bind ()
 {
-  if (!shader)
-    RaiseInvalidOperation ("render::low_level::opengl::ShaderStage::Impl::Bind", "Null shader");
+  if (!program)
+    RaiseInvalidOperation ("render::low_level::opengl::ShaderStage::Impl::Bind", "Null program");
 
-  shader->Bind (constant_buffers, parameters_layout.get ());
+  program->Bind (constant_buffers, parameters_layout.get ());
 }
 
 /*
@@ -125,9 +137,9 @@ IShaderParametersLayout* ShaderStage::Impl::CreateShaderParametersLayout (const 
   return ret_value;
 }
 
-IShader* ShaderStage::Impl::CreateShader (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
+IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::CreateShader";
+  static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::CreateProgram";
 
   if (!shader_descs)
     RaiseNullArgument (METHOD_NAME, "shader_descs");
@@ -155,7 +167,30 @@ IShader* ShaderStage::Impl::CreateShader (size_t shaders_count, const ShaderDesc
     manager = search_result->second;
   }
 
-  return manager->CreateShader (shaders_count, shader_descs, error_log);
+  ShaderMap::iterator shader_iterator;
+
+  vector<ShaderPtr> program_shaders (shaders_count);
+
+  for (size_t i = 0; i < shaders_count; i++)
+  {
+    size_t hash = crc32 (&shader_descs[i], sizeof (ShaderDesc));
+
+    shader_iterator = shaders_map.find (hash);
+
+    if (shader_iterator == shaders_map.end ())
+    {
+      ShaderPtr shader (manager->CreateShader (shader_descs[i], error_log), false);
+
+      shader->RegisterDestroyHandler (xtl::bind (&Impl::RemoveShaderByHash, this, hash), GetTrackable ());
+
+      shaders_map [hash] = shader.get ();
+      program_shaders [i] = shader;
+    }
+    else
+      program_shaders [i] = shader_iterator->second;
+  }
+
+  return manager->CreateProgram (shaders_count, &program_shaders[0], error_log);
 }
     
 /*
@@ -172,14 +207,14 @@ void ShaderStage::Impl::SetShaderParametersLayout (IShaderParametersLayout* in_p
   parameters_layout = cast_object <ShaderParametersLayout> (in_parameters_layout, METHOD_NAME, "in_parameters_layout");
 }
 
-void ShaderStage::Impl::SetShader (IShader* in_shader)
+void ShaderStage::Impl::SetProgram (IProgram* in_program)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetShader";
+  static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetProgram";
 
-  if (!in_shader)
-    RaiseNullArgument (METHOD_NAME, "in_shader");
+  if (!in_program)
+    RaiseNullArgument (METHOD_NAME, "in_program");
 
-  shader = cast_object <Shader> (in_shader, METHOD_NAME, "in_shader");
+  program = cast_object <Program> (in_program, METHOD_NAME, "in_program");
 }
 
 void ShaderStage::Impl::SetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
@@ -204,9 +239,9 @@ IShaderParametersLayout* ShaderStage::Impl::GetShaderParametersLayout () const
   return parameters_layout.get ();
 }
 
-IShader* ShaderStage::Impl::GetShader () const
+IProgram* ShaderStage::Impl::GetProgram () const
 {
-  return shader.get ();
+  return program.get ();
 }
 
 IBuffer* ShaderStage::Impl::GetConstantBuffer (size_t buffer_slot) const
@@ -231,7 +266,33 @@ void ShaderStage::Impl::AddShaderManager (ShaderManager* manager)
   shader_managers.push_back (manager);
 
   for (size_t i = 0; i < manager->GetProfilesCount (); i++)
-    shader_managers_map[manager->GetProfile (i)] = manager;    //проверка на исключения!!!
+  {
+    try
+    {
+      shader_managers_map[manager->GetProfile (i)] = manager;
+    }
+    catch (std::exception &e)
+    {
+      shader_managers.pop_back ();
+      throw e;
+    }
+  }
+}
+
+/*
+   Удаление шейдера по хешу исходного кода
+*/
+
+void ShaderStage::Impl::RemoveShaderByHash (size_t hash)
+{
+  ShaderMap::iterator shader_iterator = shaders_map.find (hash);
+
+  if (shader_iterator != shaders_map.end ())
+  {
+    delete shader_iterator->second;
+
+    shaders_map.erase (hash);
+  }
 }
 
 /*
@@ -264,18 +325,18 @@ IShaderParametersLayout* ShaderStage::CreateShaderParametersLayout (const Shader
   return impl->CreateShaderParametersLayout (desc);
 }
 
-IShader* ShaderStage::CreateShader (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
+IProgram* ShaderStage::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
 {
-  return impl->CreateShader (shaders_count, shader_descs, error_log);
+  return impl->CreateProgram (shaders_count, shader_descs, error_log);
 }
    
 /*
    Установка состояния, вьюпорта и отсечения
 */
 
-void ShaderStage::SetShader (IShader* shader)
+void ShaderStage::SetProgram (IProgram* program)
 {
-  impl->SetShader (shader);
+  impl->SetProgram (program);
 }
 
 void ShaderStage::SetShaderParametersLayout (IShaderParametersLayout* parameters_layout)
@@ -297,9 +358,9 @@ IShaderParametersLayout* ShaderStage::GetShaderParametersLayout () const
   return impl->GetShaderParametersLayout ();
 }
 
-IShader* ShaderStage::GetShader () const
+IProgram* ShaderStage::GetProgram () const
 {
-  return impl->GetShader ();
+  return impl->GetProgram ();
 }
 
 IBuffer* ShaderStage::GetConstantBuffer (size_t buffer_slot) const
