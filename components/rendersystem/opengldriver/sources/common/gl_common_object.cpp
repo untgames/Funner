@@ -26,6 +26,17 @@ Object::Object ()
 }
 
 /*
+    Список свойств объекта
+*/
+
+IPropertyList* Object::GetProperties ()
+{
+  typedef common::Singleton<DefaultPropertyList> DefaultPropertyListSingleton;
+  
+  return DefaultPropertyListSingleton::InstancePtr ();
+}
+
+/*
     Подсчёт ссылок
 */
 
@@ -40,12 +51,29 @@ void Object::Release ()
 }
 
 /*
-    Список свойств объекта
+    Получение trackable
 */
 
-IPropertyList* Object::GetProperties ()
+xtl::trackable& Object::GetTrackable ()
 {
-  typedef common::Singleton<DefaultPropertyList> DefaultPropertyListSingleton;
-  
-  return DefaultPropertyListSingleton::InstancePtr ();
+  return trackable;
+}
+
+/*
+    Регистрация обработчиков события удаления объекта
+*/
+
+xtl::connection Object::RegisterDestroyHandler (xtl::trackable::slot_type& handler)
+{
+  return trackable.connect_tracker (handler);
+}
+
+xtl::connection Object::RegisterDestroyHandler (const xtl::trackable::function_type& handler)
+{
+  return trackable.connect_tracker (handler);
+}
+
+xtl::connection Object::RegisterDestroyHandler (const xtl::trackable::function_type& handler, xtl::trackable& linked_trackable)
+{
+  return trackable.connect_tracker (handler, linked_trackable);
 }

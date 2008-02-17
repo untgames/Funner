@@ -8,7 +8,7 @@ using namespace common;
      онструктор / деструктор
 */
 
-PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& in_desc, OutputManager* in_output_manager)
+PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& in_desc, OutputManager& in_output_manager)
   : output_manager (in_output_manager)
 {
     //получение окна вывода
@@ -93,7 +93,7 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
 {
-  return output_manager ? output_manager->FindContainingOutput (output_window) : 0;
+  return output_manager.FindContainingOutput (output_window);
 }
 
 /*

@@ -48,7 +48,6 @@ struct ShaderStage::Impl: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IShaderParametersLayout* CreateShaderParametersLayout (const ShaderParametersLayoutDesc&);
     IShader*                 CreateShader                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
-    IBuffer*                 CreateConstantBuffer         (const BufferDesc& desc);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния, вьюпорта и отсечения
@@ -158,11 +157,6 @@ IShader* ShaderStage::Impl::CreateShader (size_t shaders_count, const ShaderDesc
 
   return manager->CreateShader (shaders_count, shader_descs, error_log);
 }
-
-IBuffer* ShaderStage::Impl::CreateConstantBuffer (const BufferDesc& desc)
-{
-  return new ConstantBuffer (GetContextManager (), desc);
-}
     
 /*
    Установка состояния, вьюпорта и отсечения
@@ -198,7 +192,7 @@ void ShaderStage::Impl::SetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
   if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
     RaiseNotSupported (METHOD_NAME, "Can't set constant buffer to slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
-  constant_buffers[buffer_slot] = cast_object <ConstantBuffer> (buffer, METHOD_NAME, "buffer");
+  constant_buffers [buffer_slot] = cast_object <IBindableBuffer> (buffer, METHOD_NAME, "buffer");
 }
 
 /*
@@ -220,7 +214,7 @@ IBuffer* ShaderStage::Impl::GetConstantBuffer (size_t buffer_slot) const
   if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
     RaiseNotSupported ("render::low_level::opengl::ShaderStage::Impl::GetConstantBuffer", "Can't get constant buffer from slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
-  return constant_buffers[buffer_slot].get ();
+  return constant_buffers [buffer_slot].get ();
 }
 
 /*
@@ -274,12 +268,7 @@ IShader* ShaderStage::CreateShader (size_t shaders_count, const ShaderDesc* shad
 {
   return impl->CreateShader (shaders_count, shader_descs, error_log);
 }
-
-IBuffer* ShaderStage::CreateConstantBuffer (const BufferDesc& desc)
-{
-  return impl->CreateConstantBuffer (desc);
-}
-    
+   
 /*
    Установка состояния, вьюпорта и отсечения
 */

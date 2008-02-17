@@ -2,7 +2,6 @@
 #define RENDER_GL_DRIVER_CONTEXT_OBJECT_HEADER
 
 #include <shared/object.h>
-#include <shared/trackable.h>
 #include <shared/context_manager.h>
 
 #include <common/exception.h>
@@ -17,9 +16,9 @@ namespace opengl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Контекстный объект (врапперы для работы с ContextManager, упрощение иерархии классов и т.д.)
+///Контекстный объект
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ContextObject: public Object, public Trackable
+class ContextObject: public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

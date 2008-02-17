@@ -21,13 +21,30 @@ using namespace common;
 #endif
 
 //объект системы отрисовки
-class ObjectImpl: virtual public IObject, public xtl::reference_counter
+class ObjectImpl: virtual public IObject, public xtl::reference_counter, public xtl::trackable
 {
   public:
     IPropertyList* GetProperties () { return 0; }
   
     void AddRef () { addref (this); }  
     void Release () { release (this); }
+    
+    xtl::trackable& GetTrackable () { return *this; }
+    
+    xtl::connection RegisterDestroyHandler (xtl::trackable::slot_type& handler)
+    {
+      return xtl::trackable::connect_tracker (handler);
+    }
+
+    xtl::connection RegisterDestroyHandler (const xtl::trackable::function_type& handler)
+    {
+      return xtl::trackable::connect_tracker (handler);
+    }
+
+    xtl::connection RegisterDestroyHandler (const xtl::trackable::function_type& handler, xtl::trackable& linked_trackable)
+    {
+      return xtl::trackable::connect_tracker (handler, linked_trackable);
+    }
 };
 
 //тестовое устройство вывода

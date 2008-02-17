@@ -79,7 +79,7 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc)
     {
       case BindFlag_VertexBuffer:   return input_stage.CreateVertexBuffer (desc);
       case BindFlag_IndexBuffer:    return input_stage.CreateIndexBuffer (desc);
-      case BindFlag_ConstantBuffer: return shader_stage.CreateConstantBuffer (desc);
+      case BindFlag_ConstantBuffer: return input_stage.CreateConstantBuffer (desc);
       default:
         RaiseNotSupported ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
         return 0;

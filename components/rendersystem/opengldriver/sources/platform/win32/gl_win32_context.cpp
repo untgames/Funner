@@ -14,17 +14,17 @@ using namespace common;
 
 struct Context::Impl
 {
-  HGLRC               gl_context;                 //контекст OpenGL
-  int                 pixel_format;               //формат пикселей, требуемый контекстом
-  ISwapChain*         draw_swap_chain;            //текущая цепочка обмена (для рисования)
-  ISwapChain*         read_swap_chain;            //текущая цепочка обмена (для чтения)
-  HDC                 draw_swap_chain_dc;         //контекст устройства текущей цепочки обмена (для рисования)
-  HDC                 read_swap_chain_dc;         //контекст устройства текущей цепочки обмена (для чтения)
-  GLEWContext         glew_context;               //контекст GLEW
-  const WGLEWContext* wglew_context;              //контекст WGLEW
-  Trackable::SlotType on_destroy_draw_swap_chain; //обработчик удаления цепочки обмена (для рисования)
-  Trackable::SlotType on_destroy_read_swap_chain; //обработчик удаления цепочки обмена (для чтения)
-  bool                vsync;                      //необходимо ли делать вертикальную синхронизацию
+  HGLRC                     gl_context;                 //контекст OpenGL
+  int                       pixel_format;               //формат пикселей, требуемый контекстом
+  ISwapChain*               draw_swap_chain;            //текущая цепочка обмена (для рисования)
+  ISwapChain*               read_swap_chain;            //текущая цепочка обмена (для чтения)
+  HDC                       draw_swap_chain_dc;         //контекст устройства текущей цепочки обмена (для рисования)
+  HDC                       read_swap_chain_dc;         //контекст устройства текущей цепочки обмена (для чтения)
+  GLEWContext               glew_context;               //контекст GLEW
+  const WGLEWContext*       wglew_context;              //контекст WGLEW
+  xtl::trackable::slot_type on_destroy_draw_swap_chain; //обработчик удаления цепочки обмена (для рисования)
+  xtl::trackable::slot_type on_destroy_read_swap_chain; //обработчик удаления цепочки обмена (для чтения)
+  bool                      vsync;                      //необходимо ли делать вертикальную синхронизацию
 
   Impl (ISwapChain* in_swap_chain, Impl* shared_context=0) : draw_swap_chain (0), read_swap_chain (0),
     on_destroy_draw_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this)),

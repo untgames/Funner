@@ -324,11 +324,8 @@ struct ContextManager::Impl: public xtl::reference_counter
 
         //регистрация обработчиков удаления цепочек обмена
 
-      Trackable *draw_swap_chain_trackable = cast_object<Trackable> (draw_swap_chain, METHOD_NAME, "draw_swap_chain"),
-                *read_swap_chain_trackable = cast_object<Trackable> (read_swap_chain, METHOD_NAME, "read_swap_chain");
-
-      draw_swap_chain_trackable->RegisterDestroyHandler (on_destroy_draw_swap_chain);
-      read_swap_chain_trackable->RegisterDestroyHandler (on_destroy_read_swap_chain);
+      draw_swap_chain->RegisterDestroyHandler (on_destroy_draw_swap_chain);
+      read_swap_chain->RegisterDestroyHandler (on_destroy_read_swap_chain);
 
         //обновление данных
 
@@ -564,19 +561,19 @@ struct ContextManager::Impl: public xtl::reference_counter
     typedef stl::hash_map<size_t, ContextImplPtr> ContextMap;      //карта соответствия контекста OpenGL и цепочки обмена
   
   private:
-    LogHandler          log_handler;                //обработчик протоколирования
-    ExtensionSet        required_extensions;        //расширения, затребованные в строке иициализации
-    ExtensionSet        enabled_extensions;         //расширения, разрешенные к использованию в строке инициализаии
-    stl::string         min_version;                //минимальная требуемой версии OpenGL
-    stl::string         max_version;                //максимальная необходимая версия OpenGL
-    ContextMap          context_map;                //карта отображения цепочки обмена на контекст
-    ContextImpl*        current_context;            //текущий контекст
-    ISwapChain*         current_draw_swap_chain;    //цепочка обмена для рисования
-    ISwapChain*         current_read_swap_chain;    //цепочка обмена для чтения
-    size_t              current_context_id;         //идентификатор текущего контекста (0 - отсутствует)
-    size_t              next_context_id;            //номер следующего создаваемого контекста
-    Trackable::SlotType on_destroy_draw_swap_chain; //обработчик удаления цепочки обмена для рисования 
-    Trackable::SlotType on_destroy_read_swap_chain; //обработчик удаления цепочки обмена для чтения  
+    LogHandler                log_handler;                //обработчик протоколирования
+    ExtensionSet              required_extensions;        //расширения, затребованные в строке иициализации
+    ExtensionSet              enabled_extensions;         //расширения, разрешенные к использованию в строке инициализаии
+    stl::string               min_version;                //минимальная требуемой версии OpenGL
+    stl::string               max_version;                //максимальная необходимая версия OpenGL
+    ContextMap                context_map;                //карта отображения цепочки обмена на контекст
+    ContextImpl*              current_context;            //текущий контекст
+    ISwapChain*               current_draw_swap_chain;    //цепочка обмена для рисования
+    ISwapChain*               current_read_swap_chain;    //цепочка обмена для чтения
+    size_t                    current_context_id;         //идентификатор текущего контекста (0 - отсутствует)
+    size_t                    next_context_id;            //номер следующего создаваемого контекста
+    xtl::trackable::slot_type on_destroy_draw_swap_chain; //обработчик удаления цепочки обмена для рисования 
+    xtl::trackable::slot_type on_destroy_read_swap_chain; //обработчик удаления цепочки обмена для чтения  
 };
 
 /*

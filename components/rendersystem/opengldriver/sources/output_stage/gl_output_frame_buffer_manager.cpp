@@ -79,7 +79,7 @@ FrameBufferManager::ColorBufferPtr FrameBufferManager::GetShadowBuffer (SwapChai
 
   try
   {
-    color_buffer->RegisterDestroyHandler (list_remover<ColorBufferList> (shadow_color_buffers, shadow_color_buffers.begin ()), *this);
+    color_buffer->RegisterDestroyHandler (list_remover<ColorBufferList> (shadow_color_buffers, shadow_color_buffers.begin ()), GetTrackable ());
   }
   catch (...)
   {
@@ -116,7 +116,7 @@ FrameBufferManager::DepthStencilBufferPtr FrameBufferManager::GetShadowBuffer (S
   try
   {
     depth_stencil_buffer->RegisterDestroyHandler (list_remover<DepthStencilBufferList> (shadow_depth_stencil_buffers,
-      shadow_depth_stencil_buffers.begin ()), *this);
+      shadow_depth_stencil_buffers.begin ()), GetTrackable ());
   }
   catch (...)
   {
@@ -179,7 +179,7 @@ void FrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer, DepthSt
 
   try
   {
-    new_color_buffer->RegisterDestroyHandler (list_remover<ColorBufferList> (shadow_color_buffers, shadow_color_buffers.begin ()), *this);
+    new_color_buffer->RegisterDestroyHandler (list_remover<ColorBufferList> (shadow_color_buffers, shadow_color_buffers.begin ()), GetTrackable ());
   }
   catch (...)
   {

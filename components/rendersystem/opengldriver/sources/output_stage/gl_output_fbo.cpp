@@ -190,11 +190,11 @@ FboRenderBuffer::~FboRenderBuffer ()
   {
     exception.Touch ("render::low_level::opengl::FboRenderBuffer::~FboRenderBuffer");
     
-    LogPrintf ("%s\n", exception.Message ());
+    LogPrintf ("%s", exception.Message ());
   }  
   catch (std::exception& exception)
   {
-    LogPrintf ("%s\n", exception.what ());
+    LogPrintf ("%s", exception.what ());
   }
   catch (...)
   {

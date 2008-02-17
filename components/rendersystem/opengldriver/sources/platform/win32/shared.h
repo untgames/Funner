@@ -12,7 +12,6 @@
 #include <shared/platform/context.h>
 #include <shared/object.h>
 #include <shared/property_list.h>
-#include <shared/trackable.h>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
@@ -101,7 +100,7 @@ class Output: virtual public IOutput, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Цепочка обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SwapChain: virtual public ISwapChain, public Object, public Trackable
+class SwapChain: virtual public ISwapChain, public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +131,7 @@ class PrimarySwapChain: public SwapChain
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    PrimarySwapChain  (const SwapChainDesc& desc, OutputManager* output_manager);
+    PrimarySwapChain  (const SwapChainDesc& desc, OutputManager& output_manager);
     ~PrimarySwapChain ();
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,14 +167,11 @@ class PrimarySwapChain: public SwapChain
     const WGLEWContext* GetWGLEWContext () { return &wglew_context; }
     
   private:
-    typedef xtl::trackable_ptr<OutputManager> OutputManagerPtr;
-
-  private:
     WGLEWContext     wglew_context;  //контекст WGLEW
     HWND             output_window;  //окно вывода
     HDC              output_context; //контекст вывода
     SwapChainDesc    desc;           //дескриптор цепочки обмена    
-    OutputManagerPtr output_manager; //менеджер устройств вывода
+    OutputManager&   output_manager; //менеджер устройств вывода
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

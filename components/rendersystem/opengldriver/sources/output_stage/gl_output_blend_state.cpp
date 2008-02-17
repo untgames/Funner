@@ -35,11 +35,11 @@ BlendState::~BlendState ()
   {
     exception.Touch ("render::low_level::opengl::BlendState::~BlendState");
     
-    LogPrintf ("%s\n", exception.Message ());
+    LogPrintf ("%s", exception.Message ());
   }  
   catch (std::exception& exception)
   {
-    LogPrintf ("%s\n", exception.what ());
+    LogPrintf ("%s", exception.what ());
   }
   catch (...)
   {

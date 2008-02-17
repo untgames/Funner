@@ -11,7 +11,7 @@ namespace
     Хранилище для буфера кадра
 */
 
-struct FrameBufferHolder: public Trackable, public xtl::reference_counter
+struct FrameBufferHolder: public xtl::trackable, public xtl::reference_counter
 {
   View*        render_target_view; //целевое отображение буфера цвета
   View*        depth_stencil_view; //целевое отображение буфера глубина-трафарет
@@ -222,7 +222,7 @@ struct OutputStage::Impl: public ContextObject
     //добавление отображения
   void AddView (const xtl::com_ptr<View>& view)
   {
-    RegisterDestroyHandler (xtl::bind (&Impl::RemoveView, this, view.get ()), *this);
+    RegisterDestroyHandler (xtl::bind (&Impl::RemoveView, this, view.get ()), GetTrackable ());
   }
 
     //удаления отображения

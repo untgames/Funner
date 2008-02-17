@@ -143,13 +143,13 @@ struct InputStage::Impl: public ContextObject
       Создание вершинных и индексных буферов
   */
 
-  IBuffer* CreateVertexBuffer (const BufferDesc& desc)
+  IBuffer* CreateBuffer (const BufferDesc& desc, GLenum buffer_target)
   {
     try
     {
       if (has_arb_vertex_buffer_object)
       {
-        return new VboBuffer (GetContextManager (), GL_ARRAY_BUFFER, desc);
+        return new VboBuffer (GetContextManager (), buffer_target, desc);
       }
       else
       {
@@ -158,31 +158,11 @@ struct InputStage::Impl: public ContextObject
     }
     catch (common::Exception& exception)
     {
-      exception.Touch ("render::low_level::opengl::InputStage::Impl::CreateVertexBuffer");
+      exception.Touch ("render::low_level::opengl::InputStage::Impl::CreateBuffer");
       throw;
     }
   }
 
-  IBuffer* CreateIndexBuffer (const BufferDesc& desc)
-  {
-    try
-    {
-      if (has_arb_vertex_buffer_object)
-      {
-        return new VboBuffer (GetContextManager (), GL_ELEMENT_ARRAY_BUFFER, desc);
-      }
-      else
-      {
-        return new SystemMemoryBuffer (GetContextManager (), desc);
-      }
-    }
-    catch (common::Exception& exception)
-    {
-      exception.Touch ("render::low_level::opengl::InputStage::Impl::CreateIndexBuffer");
-      throw;
-    }
-  }
-  
   /*
       Установка / получение InputLayout
   */
@@ -295,7 +275,7 @@ IBuffer* InputStage::CreateVertexBuffer (const BufferDesc& desc)
 {
   try
   {
-    return impl->CreateVertexBuffer (desc);
+    return impl->CreateBuffer (desc, GL_ARRAY_BUFFER);
   }
   catch (common::Exception& exception)
   {
@@ -308,11 +288,24 @@ IBuffer* InputStage::CreateIndexBuffer (const BufferDesc& desc)
 {
   try
   {
-    return impl->CreateIndexBuffer (desc);
+    return impl->CreateBuffer (desc, GL_ELEMENT_ARRAY_BUFFER);
   }
   catch (common::Exception& exception)
   {
     exception.Touch ("render::low_level::opengl::InputStage::CreateIndexBuffer");
+    throw;
+  } 
+}
+
+IBuffer* InputStage::CreateConstantBuffer (const BufferDesc& desc)
+{
+  try
+  {
+    return new SystemMemoryBuffer (impl->GetContextManager (), desc);      
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::InputStage::CreateConstantBuffer");
     throw;
   } 
 }

@@ -12,7 +12,7 @@ ISwapChain* SwapChainManager::CreateSwapChain (OutputManager& output_manager, co
 {
   try
   {
-    return new PrimarySwapChain (swap_chain_desc, &output_manager);
+    return new PrimarySwapChain (swap_chain_desc, output_manager);
   }
   catch (common::Exception& exception)
   {
