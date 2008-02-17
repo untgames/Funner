@@ -108,7 +108,7 @@ ShaderStage::Impl::Impl (const ContextManager& context_manager)
 
 ShaderStage::Impl::~Impl ()
 {
-  for (ShaderManagerArray::iterator i = shader_managers.begin (); i != shader_managers.end (); i++)
+  for (ShaderManagerArray::iterator i = shader_managers.begin (); i != shader_managers.end (); ++i)
     delete *i;
 }
 
@@ -285,14 +285,7 @@ void ShaderStage::Impl::AddShaderManager (ShaderManager* manager)
 
 void ShaderStage::Impl::RemoveShaderByHash (size_t hash)
 {
-  ShaderMap::iterator shader_iterator = shaders_map.find (hash);
-
-  if (shader_iterator != shaders_map.end ())
-  {
-    delete shader_iterator->second;
-
-    shaders_map.erase (hash);
-  }
+  shaders_map.erase (hash);
 }
 
 /*

@@ -74,7 +74,24 @@ GlslShader::GlslShader (const ContextManager& manager, const ShaderDesc& shader_
 
 GlslShader::~GlslShader ()
 {
-  DeleteShader ();
+  try
+  {
+    DeleteShader ();
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::GlslShader::~GlslShader");
+
+    LogPrintf ("%s", exception.Message ());
+  }
+  catch (std::exception& exception)
+  {
+    LogPrintf ("%s", exception.what ());
+  }
+  catch (...)
+  {
+    //подавляем все исключения
+  }
 }
 
 /*
