@@ -3,6 +3,9 @@
 
 #include <shared/rasterizer_stage.h>
 
+#include <xtl/trackable_ptr.h>
+#include <xtl/intrusive_ptr.h>
+
 #include <common/exception.h>
 #include <common/hash.h>
 
@@ -16,6 +19,15 @@ namespace opengl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Элементы таблицы локальных данных контекста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum RasterizerStageCache
+{
+  RasterizerStageCache_ViewportScissorHash, //хэш состояния областей отсечения
+  RasterizerStageCache_RasterizerStateHash, //хэш состояния подуровня растеризации
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Дескриптор растеризатора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class RasterizerState : virtual public IRasterizerState, public ContextObject
@@ -24,23 +36,24 @@ class RasterizerState : virtual public IRasterizerState, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RasterizerState  (const ContextManager& manager);
+    RasterizerState  (const ContextManager& manager, const RasterizerDesc& desc);
     ~RasterizerState ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Биндинг состояния
+///Установка состояния в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Bind ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение/получение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDesc (const RasterizerDesc& in_desc);
-    void GetDesc (RasterizerDesc&       target_desc)   {target_desc = desc;}
+    void SetDesc (const RasterizerDesc&);
+    void GetDesc (RasterizerDesc&);
 
   private:
-    RasterizerDesc desc;
-    int            display_list;   //номер первого списка команд конфигурации OpenGL (всего списков OpenGLTextureTarget_Num)
+    RasterizerDesc desc;         //дескриптор состояния
+    size_t         desc_hash;    //хэш дескриптора состояния
+    int            display_list; //номер списка команд конфигурации состояния в OpenGL
 };
 
 }

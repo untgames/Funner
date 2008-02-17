@@ -2,7 +2,11 @@
 #define RENDER_GL_DRIVER_CONTEXT_MANAGER_HEADER
 
 #include <render/low_level/driver.h>
+
 #include <shared/extensions.h>
+
+#include <xtl/array>
+
 #include <gl/glew.h>
 
 namespace render
@@ -20,23 +24,38 @@ namespace opengl
 const GLEWContext* glewGetContext ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Идентификатор таблицы локальных данных контекста
+///Идентификаторы уровней устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ContextDataTable
+enum Stage
 {
-  ContextDataTable_InputStage,
-  ContextDataTable_ShaderStage,
-  ContextDataTable_RasterizerStage,
-  ContextDataTable_OutputStage,
-  ContextDataTable_TextureManager,
-  
-  ContextDataTable_Num
+  Stage_Input,
+  Stage_Shading,
+  Stage_Rasterizer,
+  Stage_Output,
+  Stage_TextureManager,
+
+  Stage_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Маски уровней
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum StageFlag
+{
+  StageFlag_Input          = 1 << Stage_Input,
+  StageFlag_Shading        = 1 << Stage_Shading,
+  StageFlag_Rasterizer     = 1 << Stage_Rasterizer,
+  StageFlag_Output         = 1 << Stage_Output,
+  StageFlag_TextureManager = 1 << Stage_TextureManager,
+  StageFlag_All            = ~0
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество элементов в каждой из таблиц локальных данных контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const size_t CONTEXT_DATA_TABLE_SIZE = 64;
+
+typedef xtl::array<size_t, CONTEXT_DATA_TABLE_SIZE> ContextDataTable;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер контекстов OpenGL (политика копирования - подсчёт ссылок)
@@ -82,12 +101,10 @@ class ContextManager
     void MakeContextCurrent () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с таблицей локальных данных текущего контекста
+///Работа с таблицами локальных данных текущего контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetContextData   (ContextDataTable table_id, size_t element_id, size_t value);
-    size_t GetContextData   (ContextDataTable table_id, size_t element_id) const;
-    void   ClearContextData (ContextDataTable table_id);
-    void   ClearContextData ();
+    const ContextDataTable& GetContextDataTable (Stage table_id) const;
+          ContextDataTable& GetContextDataTable (Stage table_id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение информации о текущей реализации OpenGL
@@ -102,7 +119,7 @@ class ContextManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool IsSupported (size_t context_id, const Extension& extension) const;
     bool IsSupported (const Extension& extension) const;
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка совместимости контекста и цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,8 +139,11 @@ class ContextManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка ошибок OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void CheckErrors (const char* source) const;
-    void RaiseError  (const char* source) const;
+    void SetValidationState (bool state); //включение / отключение проверки ошибок
+    bool GetValidationState () const;
+    void CheckErrors        (const char* source) const;
+    void RaiseError         (const char* source) const;
+    void ClearErrors        () const;
 
   private:
     struct Impl;

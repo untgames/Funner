@@ -35,27 +35,17 @@ void ContextObject::MakeContextCurrent () const
 }
 
 /*
-    –абота с таблицей локальных данных контекста
+    –абота с таблицами локальных данных текущего контекста
 */
 
-void ContextObject::SetContextData (ContextDataTable table_id, size_t element_id, size_t value)
+const ContextDataTable& ContextObject::GetContextDataTable (Stage table_id) const
 {
-  context_manager.SetContextData (table_id, element_id, value);
+  return context_manager.GetContextDataTable (table_id);
 }
 
-size_t ContextObject::GetContextData (ContextDataTable table_id, size_t element_id) const
+ContextDataTable& ContextObject::GetContextDataTable (Stage table_id)
 {
-  return context_manager.GetContextData (table_id, element_id);
-}
-
-void ContextObject::ClearContextData (ContextDataTable table_id)
-{
-  context_manager.ClearContextData (table_id);
-}
-
-void ContextObject::ClearContextData ()
-{
-  context_manager.ClearContextData ();
+  return context_manager.GetContextDataTable (table_id);
 }
 
 /*
@@ -94,6 +84,16 @@ void ContextObject::LogVPrintf (const char* format, va_list args) const
     ѕроверка ошибок OpenGL
 */
 
+void ContextObject::SetValidationState (bool state)
+{
+  context_manager.SetValidationState (state);  
+}
+
+bool ContextObject::GetValidationState () const
+{
+  return context_manager.GetValidationState ();
+}
+
 void ContextObject::CheckErrors (const char* source) const
 {
   context_manager.CheckErrors (source);
@@ -102,4 +102,9 @@ void ContextObject::CheckErrors (const char* source) const
 void ContextObject::RaiseError (const char* source) const
 {
   context_manager.RaiseError (source);
+}
+
+void ContextObject::ClearErrors () const
+{
+  context_manager.ClearErrors ();
 }

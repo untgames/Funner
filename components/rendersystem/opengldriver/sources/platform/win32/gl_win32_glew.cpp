@@ -98,9 +98,8 @@ void init_wglew_context (const SwapChainDesc& swap_chain_desc, WGLEWContext* wgl
 
     if (!dummy_context)
       raise_error ("wglCreateContext");
-
-    if (!wglMakeCurrent (dummy_dc, dummy_context))
-      raise_error ("wglMakeCurrent");
+      
+    make_current_context (dummy_context, dummy_dc, dummy_dc);
 
       //инициализация расширений WGL
 
@@ -111,14 +110,14 @@ void init_wglew_context (const SwapChainDesc& swap_chain_desc, WGLEWContext* wgl
 
       //освобождение ресурсов
 
-    wglMakeCurrent   (0, 0);
+    make_current_context (0, 0, 0);
     wglDeleteContext (dummy_context);
     ReleaseDC        (dummy_window, dummy_dc);
     DestroyWindow    (dummy_window);    
   }
   catch (...)
   {
-    wglMakeCurrent (0, 0);
+    make_current_context (0, 0, 0);
 
     if (dummy_context) wglDeleteContext (dummy_context);
     if (dummy_dc)      ReleaseDC        (dummy_window, dummy_dc);

@@ -8,28 +8,42 @@ using namespace render::low_level::opengl;
    Конструктор
 */
 
-RasterizerState::RasterizerState (const ContextManager& manager)
-  : ContextObject (manager)
+RasterizerState::RasterizerState (const ContextManager& manager, const RasterizerDesc& in_desc)
+  : ContextObject (manager),
+    desc_hash (0),
+    display_list (0)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::RasterizerState::RasterizerState";
-
-  MakeContextCurrent ();
-
-  display_list = glGenLists (1);
-  
-  if (!display_list)
-    Raise <Exception> (METHOD_NAME, "Can't generate display lists");
-
-  CheckErrors (METHOD_NAME);
+  SetDesc (in_desc);
 }
 
 RasterizerState::~RasterizerState ()
 {
-  MakeContextCurrent ();
+  try
+  {
+      //удаление списка
 
-  glDeleteLists (display_list, 1);
+    MakeContextCurrent ();
 
-  CheckErrors ("render::low_level::opengl::RasterizerState::~RasterizerState");
+    glDeleteLists (display_list, 1);
+
+      //проверка ошибок
+
+    CheckErrors ("");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::RasterizerState::~RasterizerState");
+    
+    LogPrintf ("%s", exception.Message ());
+  }  
+  catch (std::exception& exception)
+  {
+    LogPrintf ("%s", exception.what ());
+  }
+  catch (...)
+  {
+    //подавляем все исключения
+  }
 }
 
 /*
@@ -38,42 +52,80 @@ RasterizerState::~RasterizerState ()
 
 void RasterizerState::Bind ()
 {
-  MakeContextCurrent ();
+  static const char* METHOD_NAME = "render::low_level::opengl::RasterizerState::Bind";
+  
+    //проверка необходимости биндинга (кэширование состояния)
+    
+  size_t& current_desc_hash = GetContextDataTable (Stage_Rasterizer)[RasterizerStageCache_RasterizerStateHash];
+  
+  if (current_desc_hash == desc_hash)
+    return;
+
+    //проверка корректности состояния  
+
+  if (!display_list)
+    RaiseInvalidOperation (METHOD_NAME, "Empty state (null display list)");
+
+    //установка состояния в контекст OpenGL
+
+  MakeContextCurrent ();  
 
   glCallList (display_list);
 
-  CheckErrors ("render::low_level::opengl::RasterizerState::Bind");
+    //проверка ошибок
+
+  CheckErrors (METHOD_NAME);
+
+    //установка кэш-переменной
+
+  current_desc_hash = desc_hash;
 }
 
 /*
-   Изменение/получение дескриптора
+    Получение дескриптора
 */
 
+void RasterizerState::GetDesc (RasterizerDesc& out_desc)
+{
+  out_desc = desc;
+}
+
+/*
+   Изменение дескриптора
+*/
+
+////проверить!!!!!
 void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RasterizerState::SetDesc";
 
   static Extension ARB_multisample = "GL_ARB_multisample",
                    Version_1_3     = "GL_VERSION_1_3";
-                   
+
   bool has_arb_multisample = IsSupported (ARB_multisample) || IsSupported (Version_1_3);
 
   if (in_desc.multisample_enable && !has_arb_multisample)
     RaiseNotSupported (METHOD_NAME, "Multisampling not supported (GL_ARB_multisample extension not supported)");
 
   MakeContextCurrent ();
+  
+  if (!display_list)
+  {
+    display_list = glGenLists (1);
+
+    if (!display_list)
+      RaiseError (METHOD_NAME);
+  }
 
   glNewList (display_list, GL_COMPILE);
 
   switch (in_desc.fill_mode)
   {
     case FillMode_Wireframe:
-      glPolygonMode(GL_FRONT, GL_LINE);
-      glPolygonMode(GL_BACK, GL_LINE);
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       break;
     case FillMode_Solid:
-      glPolygonMode(GL_FRONT, GL_LINE);
-      glPolygonMode(GL_BACK, GL_LINE);
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       break;
   }
 
@@ -129,10 +181,10 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     glEnable  (GL_MULTISAMPLE_ARB);
   }
 
-
   glEndList ();  
 
   CheckErrors (METHOD_NAME);
 
   desc = in_desc;
+  desc_hash = crc32 (&desc, sizeof desc);
 }

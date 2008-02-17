@@ -37,62 +37,26 @@ class ContextImpl: public xtl::reference_counter
     }
     
       //получение контекста и главной цепочки обмена
-          Context&  GetContext () { return context; }
-    const Context&  GetContext () const { return context; }    
-    ISwapChain*     GetMasterSwapChain () const { return master_swap_chain.get (); }
+       Context&  GetContext () { return context; }
+    ISwapChain*  GetMasterSwapChain () const { return master_swap_chain.get (); }
     
       //получение флагов поддержки исключений
-          ExtensionSet& GetExtensions ()       { return extensions; }      
-    const ExtensionSet& GetExtensions () const { return extensions; }
-
+    ExtensionSet& GetExtensions () { return extensions; } 
+ 
       //получение информации о реализации OpenGL
     const char* GetExtensionsString () const { return extensions_string.c_str (); }
     const char* GetVersionString    () const { return version_string.c_str (); }
     const char* GetVendorString     () const { return vendor_string.c_str (); }
     const char* GetRendererString   () const { return renderer_string.c_str (); }
 
-      //установка локальных данных
-    void SetContextData (ContextDataTable table_id, size_t element_id, size_t value)
+      //получение таблицы локальных данных контекста
+    ContextDataTable& GetContextDataTable (Stage table_id)
     {
-      static const char* METHOD_NAME = "render::low_level::opengl::ContextImpl::SetContextData";
-      
-      if (table_id < 0 || table_id >= ContextDataTable_Num)
-        RaiseInvalidArgument (METHOD_NAME, "table_id", table_id);
-        
-      if (element_id >= CONTEXT_DATA_TABLE_SIZE)
-        RaiseOutOfRange (METHOD_NAME, "element_id", element_id, CONTEXT_DATA_TABLE_SIZE);
-        
-      data [table_id][element_id] = value;
+      if (table_id < 0 || table_id >= Stage_Num)
+        RaiseOutOfRange ("render::low_level::opengl::ContextImpl::GetContextDataTable", "table_id", table_id, 0, Stage_Num);
+
+      return context_data_table [table_id];
     }
-
-      //чтение локальных данных
-    size_t GetContextData (ContextDataTable table_id, size_t element_id)
-    {
-      static const char* METHOD_NAME = "render::low_level::opengl::ContextImpl::GetContextData";
-
-      if (table_id < 0 || table_id >= ContextDataTable_Num)
-        RaiseInvalidArgument (METHOD_NAME, "table_id", table_id);
-
-      if (element_id >= CONTEXT_DATA_TABLE_SIZE)
-        RaiseOutOfRange (METHOD_NAME, "element_id", element_id, CONTEXT_DATA_TABLE_SIZE);
-
-      return data [table_id][element_id];
-    }
-    
-      //очистка таблицы локальных данных
-    void ClearContextData (ContextDataTable table_id)
-    {
-      if (table_id < 0 || table_id >= ContextDataTable_Num)
-        RaiseInvalidArgument ("render::low_level::opengl::ContextManager::ClearContextData", "table_id", table_id);
-
-      memset (data [table_id], 0, sizeof (data [table_id]));
-    }
-    
-      //очистка всех таблиц локальных данных
-    void ClearContextData ()
-    {
-      memset (data, 0, sizeof (data));
-    }  
     
   private:
 
@@ -101,10 +65,6 @@ class ContextImpl: public xtl::reference_counter
     {
       try
       {
-          //очистка таблицы локальных данных контекста
-        
-        memset (data, 0, sizeof (data));
-        
           //выбор активного контекста
         
         context.MakeCurrent (master_swap_chain.get ());
@@ -155,18 +115,17 @@ class ContextImpl: public xtl::reference_counter
     }
 
   private:
-    typedef size_t                   ContextData [ContextDataTable_Num][CONTEXT_DATA_TABLE_SIZE];
     typedef xtl::com_ptr<ISwapChain> SwapChainPtr;   //указатель на цепочку обмена  
     
   private:
-    Context       context;           //контекст OpenGL
-    SwapChainPtr  master_swap_chain; //главная цепочка обмена, связанная с контекстом
-    ExtensionSet  extensions;        //флаги поддерживаемых исключений
-    stl::string   extensions_string; //строка поддерживаемых расширений
-    stl::string   version_string;    //версия OpenGL
-    stl::string   vendor_string;     //производитель реализации OpenGL
-    stl::string   renderer_string;   //имя устройства отрисовки OpenGL
-    ContextData   data;              //локальные данные контекста
+    Context          context;                        //контекст OpenGL
+    SwapChainPtr     master_swap_chain;              //главная цепочка обмена, связанная с контекстом
+    ExtensionSet     extensions;                     //флаги поддерживаемых исключений
+    stl::string      extensions_string;              //строка поддерживаемых расширений
+    stl::string      version_string;                 //версия OpenGL
+    stl::string      vendor_string;                  //производитель реализации OpenGL
+    stl::string      renderer_string;                //имя устройства отрисовки OpenGL
+    ContextDataTable context_data_table [Stage_Num]; //таблицы локальных данных контекста
 };
 
 }
@@ -187,6 +146,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       current_read_swap_chain (0),
       current_context_id (0),
       next_context_id (1),
+      check_gl_errors (true),
       on_destroy_draw_swap_chain (xtl::bind (&Impl::RestoreContext, this)),
       on_destroy_read_swap_chain (xtl::bind (&Impl::RestoreContext, this))
     {
@@ -350,7 +310,7 @@ struct ContextManager::Impl: public xtl::reference_counter
           //очистка текущей ошибки
           
         if (clear_errors)
-          while (glGetError () != GL_NO_ERROR);
+          ClearErrors ();
       }
       catch (common::Exception& exception)
       {
@@ -450,6 +410,66 @@ struct ContextManager::Impl: public xtl::reference_counter
       }
     }
     
+      //включение / отключение проверки ошибок
+    void SetValidationState (bool state)
+    {
+      check_gl_errors = state;
+    }
+    
+    bool GetValidationState () const { return check_gl_errors; }
+    
+      //проверка ошибок OpenGL
+    void CheckErrors (const char* source)
+    {
+      if (!check_gl_errors)
+        return;        
+
+      if (!source)
+        source = "render::low_level::ContextManager::Impl::CheckErrors";
+        
+      MakeContextCurrent (false);
+      
+      GLenum error = glGetError ();
+      
+      switch (error)
+      {
+        case GL_NO_ERROR:
+          break;
+        case GL_INVALID_ENUM:
+          Raise<OpenGLException> (source, "OpenGL error: invalid enum");
+          break;
+        case GL_INVALID_VALUE:
+          Raise<OpenGLException> (source, "OpenGL error: invalid value");
+          break;
+        case GL_INVALID_OPERATION:
+          Raise<OpenGLException> (source, "OpenGL error: invalid operation");
+          break;
+        case GL_STACK_OVERFLOW:
+          Raise<OpenGLException> (source, "OpenGL error: stack overflow");
+          break;
+        case GL_STACK_UNDERFLOW:
+          Raise<OpenGLException> (source, "OpenGL error: stack underflow");
+          break;
+        case GL_OUT_OF_MEMORY:
+          Raise<OpenGLException> (source, "OpenGL error: out of memory");
+          break;
+        case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
+          Raise<OpenGLException> (source, "OpenGL error: invalid framebuffer operation");
+          break;
+        default:
+          Raise<OpenGLException> (source, "OpenGL error: code=0x%04x", error);
+          break;
+      }      
+    }
+    
+    void ClearErrors ()
+    {
+      if (!check_gl_errors)
+        return;
+
+      while (glGetError () != GL_NO_ERROR);
+    }
+    
   private:
       //добавление свойства
     void AddInitProperty (const char* name, const char* value)
@@ -494,7 +514,11 @@ struct ContextManager::Impl: public xtl::reference_counter
       {
         max_version = value;
       }
-    }  
+      else if (!stricmp (name, "check_gl_errors"))
+      {
+        check_gl_errors = atoi (value) != 0;
+      }
+    }
     
       //поиск контекста, совместимого с указанной цепочкой обмена
     size_t GetCompatibleContextId (ISwapChain* swap_chain)
@@ -566,6 +590,7 @@ struct ContextManager::Impl: public xtl::reference_counter
     ExtensionSet              enabled_extensions;         //расширения, разрешенные к использованию в строке инициализаии
     stl::string               min_version;                //минимальная требуемой версии OpenGL
     stl::string               max_version;                //максимальная необходимая версия OpenGL
+    bool                      check_gl_errors;            //нужно ли проверять ошибки OpenGL
     ContextMap                context_map;                //карта отображения цепочки обмена на контекст
     ContextImpl*              current_context;            //текущий контекст
     ISwapChain*               current_draw_swap_chain;    //цепочка обмена для рисования
@@ -673,39 +698,20 @@ void ContextManager::MakeContextCurrent () const
 }
 
 /*
-    Работа с таблицей локальных данных контекста
+    Работа с таблицами локальных данных контекста
 */
 
-void ContextManager::SetContextData (ContextDataTable table_id, size_t element_id, size_t value)
+const ContextDataTable& ContextManager::GetContextDataTable (Stage table_id) const
 {
   if (!impl->GetContext ())
-    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::SetContextData", "Null active context");
+    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::GetContextDataTable", "Null active context");
 
-  impl->GetContext ()->SetContextData (table_id, element_id, value);
+  return impl->GetContext ()->GetContextDataTable (table_id);
 }
 
-size_t ContextManager::GetContextData (ContextDataTable table_id, size_t element_id) const
+ContextDataTable& ContextManager::GetContextDataTable (Stage table_id)
 {
-  if (!impl->GetContext ())
-    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::GetContextData", "Null active context");
-
-  return impl->GetContext ()->GetContextData (table_id, element_id);
-}
-
-void ContextManager::ClearContextData (ContextDataTable table_id)
-{
-  if (!impl->GetContext ())
-    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::ClearContextData", "Null active context");
-    
-  impl->GetContext ()->ClearContextData (table_id);
-}
-
-void ContextManager::ClearContextData ()
-{
-  if (!impl->GetContext ())
-    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::ClearContextData", "Null active context");
-
-  impl->GetContext ()->ClearContextData ();
+  return const_cast<ContextDataTable&> (const_cast<const ContextManager&> (*this).GetContextDataTable (table_id));
 }
 
 /*
@@ -800,44 +806,19 @@ void ContextManager::LogVPrintf (const char* format, va_list args) const
     Проверка ошибок OpenGL
 */
 
+void ContextManager::SetValidationState (bool state)
+{
+  impl->SetValidationState (state);  
+}
+
+bool ContextManager::GetValidationState () const
+{
+  return impl->GetValidationState ();
+}
+
 void ContextManager::CheckErrors (const char* source) const
 {
-  if (!source)
-    source = "render::low_level::ContextManager::CheckErrors";
-    
-  impl->MakeContextCurrent (false);
-  
-  GLenum error = glGetError ();
-  
-  switch (error)
-  {
-    case GL_NO_ERROR:
-      break;
-    case GL_INVALID_ENUM:
-      Raise<OpenGLException> (source, "OpenGL error: invalid enum");
-      break;
-    case GL_INVALID_VALUE:
-      Raise<OpenGLException> (source, "OpenGL error: invalid value");
-      break;
-    case GL_INVALID_OPERATION:
-      Raise<OpenGLException> (source, "OpenGL error: invalid operation");
-      break;
-    case GL_STACK_OVERFLOW:
-      Raise<OpenGLException> (source, "OpenGL error: stack overflow");
-      break;
-    case GL_STACK_UNDERFLOW:
-      Raise<OpenGLException> (source, "OpenGL error: stack underflow");
-      break;
-    case GL_OUT_OF_MEMORY:
-      Raise<OpenGLException> (source, "OpenGL error: out of memory");
-      break;
-    case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
-      Raise<OpenGLException> (source, "OpenGL error: invalid framebuffer operation");
-      break;
-    default:
-      Raise<OpenGLException> (source, "OpenGL error: code=0x%04x", error);
-      break;
-  }
+  impl->CheckErrors (source);
 }
 
 void ContextManager::RaiseError (const char* source) const
@@ -848,4 +829,9 @@ void ContextManager::RaiseError (const char* source) const
   CheckErrors (source);
   
   RaiseInvalidOperation (source, "Invalid operation");
+}
+
+void ContextManager::ClearErrors () const
+{
+  impl->ClearErrors ();
 }

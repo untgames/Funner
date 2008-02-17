@@ -50,7 +50,7 @@ class OutputStageState
     {
       if (state == depth_stencil_state)
         return;
-        
+
       depth_stencil_state = state;            
     }
 

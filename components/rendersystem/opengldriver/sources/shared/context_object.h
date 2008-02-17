@@ -45,12 +45,10 @@ class ContextObject: public Object
     void MakeContextCurrent () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с таблицей локальных данных контекста
+///Работа с таблицами локальных данных текущего контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetContextData   (ContextDataTable table_id, size_t element_id, size_t value);
-    size_t GetContextData   (ContextDataTable table_id, size_t element_id) const;
-    void   ClearContextData (ContextDataTable table_id);
-    void   ClearContextData ();
+    const ContextDataTable& GetContextDataTable (Stage table_id) const;
+          ContextDataTable& GetContextDataTable (Stage table_id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Определение поддержки расширения контекстом
@@ -67,8 +65,11 @@ class ContextObject: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка ошибок OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void CheckErrors (const char* source) const;
-    void RaiseError  (const char* source) const;
+    void SetValidationState (bool state); //включение / отключение проверки ошибок
+    bool GetValidationState () const;
+    void CheckErrors        (const char* source) const;
+    void RaiseError         (const char* source) const;
+    void ClearErrors        () const;
 
   private:
     ContextManager context_manager;

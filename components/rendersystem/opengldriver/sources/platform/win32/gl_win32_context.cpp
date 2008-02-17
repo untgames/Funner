@@ -50,8 +50,7 @@ struct Context::Impl
       if (shared_context && !wglShareLists (shared_context->gl_context, gl_context))
         raise_error ("wglShareLists");
       
-      if (!wglMakeCurrent (swap_chain_dc, gl_context))
-        raise_error ("wglMakeCurrent");
+      make_current_context (gl_context, swap_chain_dc, swap_chain_dc);
         
       GLenum status = glewContextInit (&glew_context);
 
@@ -67,7 +66,7 @@ struct Context::Impl
     }
     catch (...)
     {
-      wglMakeCurrent (0, 0);
+      make_current_context (0, 0, 0);
       wglDeleteContext (gl_context);
       throw;
     }
@@ -78,9 +77,8 @@ struct Context::Impl
     if (wglGetCurrentContext () == gl_context)
     {
       wglewSetContext (wglew_context);
-
-      if (wglewGetContext () && WGLEW_ARB_make_current_read) wglMakeContextCurrentARB (0, 0, 0);
-      else                                                   wglMakeCurrent (0, 0);
+      
+      make_current_context (0, 0, 0);
 
       wglewSetContext (0);
       glewSetContext (0);
@@ -139,26 +137,8 @@ struct Context::Impl
 
       wglewSetContext (wglew_context);
       glewSetContext  (&glew_context);
-
-      if (wglewGetContext () && WGLEW_ARB_make_current_read)
-      {
-        if (wglGetCurrentContext () == gl_context && wglGetCurrentDC () == draw_swap_chain_dc && wglGetCurrentReadDCARB () == read_swap_chain_dc)
-          return;
-
-        if (!wglMakeContextCurrentARB (draw_swap_chain_dc, read_swap_chain_dc, gl_context))
-          raise_error ("wglMakeContextCurrentARB");
-      }
-      else
-      {
-        if (read_swap_chain_dc != draw_swap_chain_dc)
-          RaiseNotSupported ("render::low_level::opengl::Context::MakeCurrent", "WGL_ARB_make_current_read extenstion not supported (could not set different read/write swap chains)");
-          
-        if (wglGetCurrentContext () == gl_context && wglGetCurrentDC () == draw_swap_chain_dc)
-          return;
-
-        if (!wglMakeCurrent (draw_swap_chain_dc, gl_context))
-          raise_error ("wglMakeCurrent");
-      }
+      
+      make_current_context (gl_context, draw_swap_chain_dc, read_swap_chain_dc);
       
       SetVSync (); 
     }
@@ -211,11 +191,20 @@ struct Context::Impl
     //установка вертикальной синхронизации
   void SetVSync ()
   {
-    if (wglSwapIntervalEXT && wglGetSwapIntervalEXT)
+    if (!WGLEW_EXT_swap_control)
+      return;
+    
+    static int current_vsync = wglGetSwapIntervalEXT ();
+    
+    if ((int)vsync == current_vsync)
+      return;
+    
+    if (wglGetSwapIntervalEXT () != (int)vsync)
     {
-      if (wglGetSwapIntervalEXT () != (int)vsync)
-        wglSwapIntervalEXT (vsync);
-    }    
+      wglSwapIntervalEXT (vsync);
+      
+      current_vsync = vsync;
+    }
   }
 };
 
@@ -293,4 +282,57 @@ bool Context::IsCompatible (ISwapChain* swap_chain) const
 const char* Context::GetSwapChainExtensionString ()
 {
   return WGLEW_ARB_extensions_string ? wglGetExtensionsStringARB (wglGetCurrentDC ()) : "";
+}
+
+/*
+    Установка текущего контекста  
+*/
+
+namespace render
+{
+
+namespace low_level
+{
+
+namespace opengl
+{
+
+void make_current_context (HGLRC context, HDC draw_dc, HDC read_dc)
+{
+  static HGLRC current_context = 0;
+  static HDC   current_draw_dc = 0,
+               current_read_dc = 0;
+               
+  if (current_context == context && current_draw_dc == draw_dc && current_read_dc == read_dc)
+    return;
+
+  if (wglewGetContext () && WGLEW_ARB_make_current_read)
+  {
+    if (wglGetCurrentContext () == context && wglGetCurrentDC () == draw_dc && wglGetCurrentReadDCARB () == read_dc)
+      return;
+
+    if (!wglMakeContextCurrentARB (draw_dc, read_dc, context))
+      raise_error ("wglMakeContextCurrentARB");
+  }
+  else
+  {
+    if (read_dc != draw_dc)
+      RaiseNotSupported ("render::low_level::opengl::make_current_context", "WGL_ARB_make_current_read extenstion not supported (could not set different read/write swap chains)");
+      
+    if (wglGetCurrentContext () == context && wglGetCurrentDC () == draw_dc)
+      return;
+
+    if (!wglMakeCurrent (draw_dc, context))
+      raise_error ("wglMakeCurrent");
+  }
+  
+  current_context = context;
+  current_draw_dc = draw_dc;
+  current_read_dc = read_dc;
+}
+
+}
+
+}
+
 }

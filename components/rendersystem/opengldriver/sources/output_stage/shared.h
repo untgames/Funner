@@ -19,6 +19,7 @@
 #include <xtl/uninitialized_storage.h>
 
 #include <common/exception.h>
+#include <common/hash.h>
 
 namespace render
 {
@@ -28,6 +29,17 @@ namespace low_level
 
 namespace opengl
 {
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Элементы таблицы локальных данных контекста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum OutputStageCache
+{
+  OutputStageCache_FrameBufferId,         //идентификатор текущего буфера кадра
+  OutputStageCache_BlendStateHash,        //хэш состояния подуровня смешивания цветов
+  OutputStageCache_DepthStencilStateHash, //хэш состояния подуровня попиксельного отсечения
+  OutputStageCache_StencilReference,      //ссылочное значение теста трафарета
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип цели рендеринга
@@ -549,6 +561,7 @@ class BlendState: virtual public IBlendState, public ContextObject
 
   private:
     BlendDesc desc;         //дескриптор состояния
+    size_t    desc_hash;    //хэш дескриптора состояния    
     int       display_list; //номер списка команд конфигурации OpenGL
 };
 
@@ -577,6 +590,7 @@ class DepthStencilState: virtual public IDepthStencilState, public ContextObject
 
   private:
     DepthStencilDesc desc;                           //дескриптор состояния
+    size_t           desc_hash;                      //хэш дескриптора состояния
     int              display_list;                   //номер списка команд конфигурации OpenGL
     GLenum           gl_stencil_func [FaceMode_Num]; //функции отсечения трафарета
     bool             need_two_side_stencil;          //состояние требует двустороннего трафарета

@@ -13,6 +13,7 @@ using namespace common;
 
 BlendState::BlendState (const ContextManager& context_manager, const BlendDesc& in_desc)
   : ContextObject (context_manager),
+    desc_hash (0),
     display_list (0)
 {
   SetDesc (in_desc);
@@ -244,10 +245,6 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     check_blend_operation (in_desc.blend_alpha_operation, ext, METHOD_NAME, "desc.blend_alpha_operation");
   }
 
-    //сохранение дескриптора
-
-  desc = in_desc;
-
     //запись команд в контексте OpenGL
 
   if (!display_list)
@@ -265,7 +262,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   glColorMask ((mask & ColorWriteFlag_Red) != 0, (mask & ColorWriteFlag_Green) != 0,
                (mask & ColorWriteFlag_Blue) != 0, (mask & ColorWriteFlag_Alpha) != 0);
                
-  if (desc.blend_enable && (mask & ColorWriteFlag_All))
+  if (in_desc.blend_enable && (mask & ColorWriteFlag_All))
   {
     glEnable (GL_BLEND);
 
@@ -285,8 +282,8 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   
   if (ext.has_arb_multisample)
   {
-    if (desc.sample_alpha_to_coverage) glEnable  (GL_SAMPLE_ALPHA_TO_COVERAGE);
-    else                               glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);
+    if (in_desc.sample_alpha_to_coverage) glEnable  (GL_SAMPLE_ALPHA_TO_COVERAGE);
+    else                                  glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);
   }
 
   glEndList ();  
@@ -294,6 +291,11 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     //проверка ошибок
   
   CheckErrors (METHOD_NAME);
+  
+    //сохранение дескриптора
+
+  desc      = in_desc;
+  desc_hash = crc32 (&desc, sizeof desc);
 }
 
 void BlendState::GetDesc (BlendDesc& out_desc)
@@ -309,12 +311,29 @@ void BlendState::Bind ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::BlendState::Bind";
 
+    //проверка необходимости биндинга (кэширование состояния)
+
+  size_t& current_desc_hash = GetContextDataTable (Stage_Output)[OutputStageCache_BlendStateHash];
+
+  if (current_desc_hash == desc_hash)
+    return;
+
+    //проверка корректности состояния
+
   if (!display_list)
     RaiseInvalidOperation (METHOD_NAME, "Empty state (null display list)");
+    
+    //установка состояния в контекст OpenGL
 
-  MakeContextCurrent ();
+  MakeContextCurrent ();  
 
-  glCallList (display_list);
+  glCallList (display_list);  
+  
+    //проверка ошибок
   
   CheckErrors (METHOD_NAME);
+  
+    //установка кэш-переменной
+  
+  current_desc_hash = desc_hash;  
 }

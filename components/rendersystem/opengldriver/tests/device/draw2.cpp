@@ -135,7 +135,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (draw2)");
+    Test test (L"OpenGL device test window (draw2)", "check_gl_errors=0");
     
     test.window.Show ();
    

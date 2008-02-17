@@ -18,7 +18,7 @@ const size_t MODE_NAMES_COUNT = sizeof (MODE_NAMES) / sizeof (*MODE_NAMES);
 struct RenderBufferTempState
 {
   public:
-    RenderBufferTempState ()
+    RenderBufferTempState (const ContextManager& manager) : context_manager (manager)
     {
         //сохранение состояния параметров пофрагментных операций          
       
@@ -38,7 +38,7 @@ struct RenderBufferTempState
       glDepthMask   (GL_TRUE);
       glStencilMask (~0);
       
-      ClearErrors ();      
+      context_manager.ClearErrors ();      
     }
     
     ~RenderBufferTempState ()
@@ -53,21 +53,15 @@ struct RenderBufferTempState
       glDepthMask   (depth_write_mask);
       glStencilMask (stencil_write_mask);
 
-      ClearErrors ();      
-    }
-    
+      context_manager.ClearErrors ();
+    }    
+
   private:
-      //очистка ошибки, связанной с использованием неподдерживаемых расширений  
-    void ClearErrors ()
-    {
-      while (glGetError () != GL_NO_ERROR);      
-    }
-    
-  private:
-    bool mode_states [MODE_NAMES_COUNT];
-    int  color_write_mask [4];
-    int  stencil_write_mask;
-    int  depth_write_mask;    
+    ContextManager context_manager;
+    bool           mode_states [MODE_NAMES_COUNT];
+    int            color_write_mask [4];
+    int            stencil_write_mask;
+    int            depth_write_mask;
 };
 
 /*
@@ -161,7 +155,7 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
   
     //сохранение текущего состояния
   
-  RenderBufferTempState temp_state;
+  RenderBufferTempState temp_state (GetContextManager ());
 
     //проверка наличия расширения GL_ARB_window_pos либо версии OpenGL не ниже 1.4
 

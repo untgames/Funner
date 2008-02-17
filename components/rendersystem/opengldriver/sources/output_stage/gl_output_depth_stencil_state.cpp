@@ -32,6 +32,7 @@ struct DepthStencilExtensions
 
 DepthStencilState::DepthStencilState (const ContextManager& manager, const DepthStencilDesc& in_desc)
   : ContextObject (manager),
+    desc_hash (0),
     display_list (0)
 {
   SetDesc (in_desc);
@@ -180,15 +181,6 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
     RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.stencil_desc [FaceMode_Front] != desc.stencil_desc [FaceMode_Back] "
       "(GL_EXT_stencil_two_side and GL_ATI_separate_stencil not supported)");  
          
-    //сохранение дескриптора
-
-  desc = in_desc;
-
-  for (int i=0; i<FaceMode_Num; i++)
-    this->gl_stencil_func [i] = gl_stencil_func [i];
-
-  this->need_two_side_stencil = need_two_side_stencil;
-
     //запись команд в контексте OpenGL
 
   if (!display_list)
@@ -201,7 +193,7 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
   
   glNewList (display_list, GL_COMPILE);
   
-  if (desc.depth_test_enable)
+  if (in_desc.depth_test_enable)
   {
     glEnable    (GL_DEPTH_TEST);
     glDepthFunc (gl_depth_compare_mode);
@@ -211,9 +203,9 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
     glDisable (GL_DEPTH_TEST);
   }
 
-  glDepthMask (desc.depth_write_enable);
+  glDepthMask (in_desc.depth_write_enable);
 
-  if (desc.stencil_test_enable)
+  if (in_desc.stencil_test_enable)
   {
     glEnable (GL_STENCIL_TEST);
     
@@ -258,13 +250,23 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
     glDisable (GL_STENCIL_TEST);
   }
 
-  glStencilMask (desc.stencil_write_mask);
+  glStencilMask (in_desc.stencil_write_mask);
 
   glEndList ();
 
     //проверка ошибок
 
   CheckErrors (METHOD_NAME);
+  
+    //сохранение дескриптора
+
+  desc      = in_desc;
+  desc_hash = crc32 (&desc, sizeof desc);
+
+  for (int i=0; i<FaceMode_Num; i++)
+    this->gl_stencil_func [i] = gl_stencil_func [i];
+
+  this->need_two_side_stencil = need_two_side_stencil;  
 }
 
 void DepthStencilState::GetDesc (DepthStencilDesc& out_desc)
@@ -279,14 +281,30 @@ void DepthStencilState::GetDesc (DepthStencilDesc& out_desc)
 void DepthStencilState::Bind (size_t reference)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::DepthStencilState::Bind";
+  
+    //проверка необходимости биндинга (кэширование состояния)
+
+  ContextDataTable& state_cache        = GetContextDataTable (Stage_Output);
+  size_t            &current_desc_hash = state_cache [OutputStageCache_DepthStencilStateHash],
+                    &current_reference = state_cache [OutputStageCache_StencilReference];
+
+  if (desc_hash == current_desc_hash && reference == current_reference)
+    return;  
+
+    //проверка корректности состояния
 
   if (!display_list)
     RaiseInvalidOperation (METHOD_NAME, "Empty state (null display list)");
+    
+    //установка текущего контекста
 
   MakeContextCurrent ();
-
-  glCallList (display_list);
   
+    //установка состояния в контекст OpenGL
+
+  if (desc_hash != current_desc_hash)
+    glCallList (display_list);
+
   if (desc.stencil_test_enable)
   {
     if (need_two_side_stencil)
@@ -324,5 +342,12 @@ void DepthStencilState::Bind (size_t reference)
     }
   }
 
+    //проверка ошибок
+
   CheckErrors (METHOD_NAME);
+
+    //установка кэш-переменных
+
+  current_desc_hash = desc_hash;
+  current_reference = reference;  
 }
