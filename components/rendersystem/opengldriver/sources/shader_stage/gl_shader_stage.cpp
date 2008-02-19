@@ -51,48 +51,49 @@ struct ShaderStage::Impl: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание шейдеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IShaderParametersLayout* CreateShaderParametersLayout (const ShaderParametersLayoutDesc&);
-    IProgram*                CreateProgram                (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
+    IProgramParametersLayout* CreateProgramParametersLayout (const ProgramParametersLayoutDesc&);
+    IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния, вьюпорта и отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetProgram                (IProgram* program);
-    void SetShaderParametersLayout (IShaderParametersLayout* parameters_layout);
-    void SetConstantBuffer         (size_t buffer_slot, IBuffer* buffer);
+    void SetProgram                 (IProgram* program);
+    void SetProgramParametersLayout (IProgramParametersLayout* parameters_layout);
+    void SetConstantBuffer          (size_t buffer_slot, IBuffer* buffer);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение состояния, вьюпорта и отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IShaderParametersLayout* GetShaderParametersLayout () const;
-    IProgram*                GetProgram                () const;
-    IBuffer*                 GetConstantBuffer         (size_t buffer_slot) const;
+    IProgramParametersLayout* GetProgramParametersLayout () const;
+    IProgram*                 GetProgram                 () const;
+    IBuffer*                  GetConstantBuffer          (size_t buffer_slot) const;
+
+  private:    
+    typedef xtl::trackable_ptr<ProgramParametersLayout>               ProgramParametersLayoutPtr;
+    typedef xtl::trackable_ptr<Program>                               ProgramPtr;
+    typedef xtl::com_ptr<ShaderManager>                               ShaderManagerPtr;
+    typedef stl::vector <ShaderManagerPtr>                            ShaderManagerArray;
+    typedef stl::hash_map<stl::hash_key<const char*>, ShaderManager*> ShaderManagerMap;
+    typedef stl::hash_map<size_t, Shader*>                            ShaderMap;
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление менеджера и его профилей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddShaderManager (ShaderManager*);
+    void AddShaderManager (const ShaderManagerPtr& manager);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление шейдера по хешу исходного кода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RemoveShaderByHash (size_t hash);
 
-  private:    
-    typedef xtl::trackable_ptr<ShaderParametersLayout>                ShaderParametersLayoutPtr;
-    typedef xtl::trackable_ptr<Program>                               ProgramPtr;
-    typedef stl::vector <ShaderManager*>                              ShaderManagerArray;
-    typedef stl::hash_map<stl::hash_key<const char*>, ShaderManager*> ShaderManagerMap;
-    typedef stl::hash_map<size_t, Shader*>                            ShaderMap;
-
   public:
-    ShaderParametersLayoutPtr parameters_layout;                                    //расположение параметров шейдера
-    ProgramPtr                program;                                              //шейдер
-    ConstantBufferPtr         constant_buffers[DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы шейдера
-    ShaderMap                 shaders_map;                                          //скомпилированные шейдеры
-    ShaderManagerArray        shader_managers;                                      //массив менеджеров
-    ShaderManagerMap          shader_managers_map;                                  //соответствие профиль/менеджер
+    ProgramParametersLayoutPtr parameters_layout;                                    //расположение параметров шейдера
+    ProgramPtr                 program;                                              //шейдер
+    ConstantBufferPtr          constant_buffers[DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы шейдера
+    ShaderMap                  shaders_map;                                          //скомпилированные шейдеры
+    ShaderManagerArray         shader_managers;                                      //массив менеджеров
+    ShaderManagerMap           shader_managers_map;                                  //соответствие профиль/менеджер
 };
 
 
@@ -103,13 +104,11 @@ struct ShaderStage::Impl: public ContextObject
 ShaderStage::Impl::Impl (const ContextManager& context_manager)
   : ContextObject (context_manager)
 {
-  AddShaderManager (create_glsl_shader_manager (context_manager));
+  AddShaderManager (ShaderManagerPtr (create_glsl_shader_manager (context_manager), false));
 }
 
 ShaderStage::Impl::~Impl ()
 {
-  for (ShaderManagerArray::iterator i = shader_managers.begin (); i != shader_managers.end (); ++i)
-    delete *i;
 }
 
 /*
@@ -128,9 +127,9 @@ void ShaderStage::Impl::Bind ()
    Создание шейдеров
 */
 
-IShaderParametersLayout* ShaderStage::Impl::CreateShaderParametersLayout (const ShaderParametersLayoutDesc& desc)
+IProgramParametersLayout* ShaderStage::Impl::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
 {
-  IShaderParametersLayout* ret_value = new ShaderParametersLayout (GetContextManager ());
+  IProgramParametersLayout* ret_value = new ProgramParametersLayout (GetContextManager ());
 
   ret_value->SetDesc (desc);
 
@@ -197,14 +196,14 @@ IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDe
    Установка состояния, вьюпорта и отсечения
 */
 
-void ShaderStage::Impl::SetShaderParametersLayout (IShaderParametersLayout* in_parameters_layout)
+void ShaderStage::Impl::SetProgramParametersLayout (IProgramParametersLayout* in_parameters_layout)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetShaderParametersLayout";
+  static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetProgramParametersLayout";
 
   if (!in_parameters_layout)
     RaiseNullArgument (METHOD_NAME, "in_parameters_layout");
 
-  parameters_layout = cast_object <ShaderParametersLayout> (in_parameters_layout, METHOD_NAME, "in_parameters_layout");
+  parameters_layout = cast_object <ProgramParametersLayout> (in_parameters_layout, METHOD_NAME, "in_parameters_layout");
 }
 
 void ShaderStage::Impl::SetProgram (IProgram* in_program)
@@ -234,7 +233,7 @@ void ShaderStage::Impl::SetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
    Получение состояния, вьюпорта и отсечения
 */
 
-IShaderParametersLayout* ShaderStage::Impl::GetShaderParametersLayout () const
+IProgramParametersLayout* ShaderStage::Impl::GetProgramParametersLayout () const
 {
   return parameters_layout.get ();
 }
@@ -256,12 +255,10 @@ IBuffer* ShaderStage::Impl::GetConstantBuffer (size_t buffer_slot) const
    Добавление менеджера и его профилей
 */
 
-void ShaderStage::Impl::AddShaderManager (ShaderManager* manager)
+void ShaderStage::Impl::AddShaderManager (const ShaderManagerPtr& manager)
 {
   if (!manager)
     RaiseNullArgument ("render::low_level::opengl::ShaderStage::Impl::AddShaderManager", "manager");
-
-  pair<ShaderManagerMap, bool> insert_result;
 
   shader_managers.push_back (manager);
 
@@ -269,12 +266,15 @@ void ShaderStage::Impl::AddShaderManager (ShaderManager* manager)
   {
     try
     {
-      shader_managers_map[manager->GetProfile (i)] = manager;
+      shader_managers_map[manager->GetProfile (i)] = manager.get (); //Продумать наложение менеджеров и исключение!!!!
     }
-    catch (std::exception &e)
+    catch (...)
     {
+      for (size_t j = 0; j < manager->GetProfilesCount (); j++)
+        shader_managers_map.erase (manager->GetProfile (i));
+
       shader_managers.pop_back ();
-      throw e;
+      throw;
     }
   }
 }
@@ -313,9 +313,9 @@ void ShaderStage::Bind ()
    Создание шейдеров
 */
 
-IShaderParametersLayout* ShaderStage::CreateShaderParametersLayout (const ShaderParametersLayoutDesc& desc)
+IProgramParametersLayout* ShaderStage::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
 {
-  return impl->CreateShaderParametersLayout (desc);
+  return impl->CreateProgramParametersLayout (desc);
 }
 
 IProgram* ShaderStage::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
@@ -332,9 +332,9 @@ void ShaderStage::SetProgram (IProgram* program)
   impl->SetProgram (program);
 }
 
-void ShaderStage::SetShaderParametersLayout (IShaderParametersLayout* parameters_layout)
+void ShaderStage::SetProgramParametersLayout (IProgramParametersLayout* parameters_layout)
 {
-  impl->SetShaderParametersLayout (parameters_layout);
+  impl->SetProgramParametersLayout (parameters_layout);
 }
 
 void ShaderStage::SetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
@@ -346,9 +346,9 @@ void ShaderStage::SetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
    Получение состояния, вьюпорта и отсечения
 */
 
-IShaderParametersLayout* ShaderStage::GetShaderParametersLayout () const
+IProgramParametersLayout* ShaderStage::GetProgramParametersLayout () const
 {
-  return impl->GetShaderParametersLayout ();
+  return impl->GetProgramParametersLayout ();
 }
 
 IProgram* ShaderStage::GetProgram () const

@@ -37,20 +37,20 @@ class ShaderStage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание шейдеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IShaderParametersLayout* CreateShaderParametersLayout (const ShaderParametersLayoutDesc&);
-    IProgram*                CreateProgram                (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
+    IProgramParametersLayout* CreateProgramParametersLayout (const ProgramParametersLayoutDesc&);
+    IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния, вьюпорта и отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetProgram                (IProgram* program);
-    void SetShaderParametersLayout (IShaderParametersLayout* parameters_layout);
-    void SetConstantBuffer         (size_t buffer_slot, IBuffer* buffer);
+    void SetProgram                 (IProgram* program);
+    void SetProgramParametersLayout (IProgramParametersLayout* parameters_layout);
+    void SetConstantBuffer          (size_t buffer_slot, IBuffer* buffer);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение состояния, вьюпорта и отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IShaderParametersLayout* GetShaderParametersLayout () const;
+    IProgramParametersLayout* GetProgramParametersLayout () const;
     IProgram*                GetProgram                () const;
     IBuffer*                 GetConstantBuffer         (size_t buffer_slot) const;
 

@@ -93,12 +93,13 @@ void idle (Test& test)
   static const   float DT = 0.01f;
   static float   t = 0;
   static clock_t last = 0;
+  static float angle;
 
-  if (clock () - last < CLK_TCK / 30)
+/*  if (clock () - last < CLK_TCK / 30)
   {
     last = clock ();
     return;
-  }
+  }*/
 
   MyShaderParameters my_shader_parameters;
   
@@ -112,11 +113,13 @@ void idle (Test& test)
   
   cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
     
-  my_shader_parameters.transform *= math::rotatef (math::deg2rad (.3f), 0, 0, 1);
+  my_shader_parameters.transform = math::rotatef (math::deg2rad (angle+=1.f), 0, 0, 1);
+//  my_shader_parameters.transform *= math::rotatef (math::deg2rad (.3f), 0, 0, 1);
 
   cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
   
-  test.window.Invalidate ();
+  redraw (test);
+//  test.window.Invalidate ();
 }
 
 void close ()
@@ -194,19 +197,19 @@ int main ()
       {"v_shader", size_t (-1), vertex_shader_source.c_str (), "glsl.vs", ""}
     };
 
-    static ShaderParameter shader_parameters[] = {
-      {"GrainSizeRecip", ShaderParameterType_Float, 0, offsetof (MyShaderParameters, grain_size_recip)},
-      {"DarkColor", ShaderParameterType_Float3, 0, offsetof (MyShaderParameters, dark_color)},
-      {"colorSpread", ShaderParameterType_Float3, 0, offsetof (MyShaderParameters, color_spread)},
-      {"LightPosition", ShaderParameterType_Float3, 0, offsetof (MyShaderParameters, light_position)},
-      {"Scale", ShaderParameterType_Float, 0, offsetof (MyShaderParameters, scale)},
-      {"Transform", ShaderParameterType_Float4x4, 0, offsetof (MyShaderParameters, transform)}
+    static ProgramParameter shader_parameters[] = {
+      {"GrainSizeRecip", ProgramParameterType_Float, 0, offsetof (MyShaderParameters, grain_size_recip)},
+      {"DarkColor", ProgramParameterType_Float3, 0, offsetof (MyShaderParameters, dark_color)},
+      {"colorSpread", ProgramParameterType_Float3, 0, offsetof (MyShaderParameters, color_spread)},
+      {"LightPosition", ProgramParameterType_Float3, 0, offsetof (MyShaderParameters, light_position)},
+      {"Scale", ProgramParameterType_Float, 0, offsetof (MyShaderParameters, scale)},
+      {"Transform", ProgramParameterType_Float4x4, 0, offsetof (MyShaderParameters, transform)}
     };
     
-    ShaderParametersLayoutDesc shader_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
+    ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
 
     ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));
-    ShaderParametersLayoutPtr shader_parameters_layout (test.device->CreateShaderParametersLayout (shader_parameters_layout_desc));
+    ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc));
 
     BufferDesc cb_desc;
     
@@ -230,7 +233,7 @@ int main ()
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
     test.device->SSSetProgram (shader.get ());
-    test.device->SSSetShaderParametersLayout (shader_parameters_layout.get ());
+    test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
     test.device->SSSetConstantBuffer (0, cb.get ());
 
     printf ("Register callbacks\n");
@@ -242,7 +245,12 @@ int main ()
 
     printf ("Main loop\n");
 
-    syslib::Application::Run ();
+    while (1)
+    {
+      syslib::Application::DoEvents ();
+      idle (test);
+    }
+//    syslib::Application::Run ();
   }
   catch (std::exception& e)
   {

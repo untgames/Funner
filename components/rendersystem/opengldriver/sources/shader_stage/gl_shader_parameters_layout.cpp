@@ -8,7 +8,7 @@ using namespace render::low_level::opengl;
    Конструктор
 */
 
-ShaderParametersLayout::ShaderParametersLayout (const ContextManager& manager)
+ProgramParametersLayout::ProgramParametersLayout (const ContextManager& manager)
   : ContextObject (manager)
   {}
 
@@ -16,9 +16,9 @@ ShaderParametersLayout::ShaderParametersLayout (const ContextManager& manager)
    Изменение/получение дескриптора
 */
 
-void ShaderParametersLayout::SetDesc (const ShaderParametersLayoutDesc& in_desc)
+void ProgramParametersLayout::SetDesc (const ProgramParametersLayoutDesc& in_desc)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::ShaderParametersLayout::SetDesc";
+  static const char* METHOD_NAME = "render::low_level::opengl::ProgramParametersLayout::SetDesc";
 
   if (!in_desc.parameters)
     RaiseNullArgument (METHOD_NAME, "in_desc.parameters");
@@ -31,14 +31,14 @@ void ShaderParametersLayout::SetDesc (const ShaderParametersLayoutDesc& in_desc)
     if (in_desc.parameters[i].slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
       RaiseOutOfRange (METHOD_NAME, "in_desc.parameters.slot", in_desc.parameters[i].slot, (size_t)0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
-    if (in_desc.parameters[i].type >= ShaderParameterType_Num)
+    if (in_desc.parameters[i].type >= ProgramParameterType_Num)
       Raise <ArgumentException> (METHOD_NAME, "Invalid argument value in_desc.parameters[%u].type", i);
   }
 
   desc = in_desc;
 }
 
-ShaderParametersLayoutDesc& ShaderParametersLayout::GetDesc ()
+ProgramParametersLayoutDesc& ProgramParametersLayout::GetDesc ()
 {
   return desc;
 }

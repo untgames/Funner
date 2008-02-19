@@ -47,7 +47,7 @@ typedef xtl::com_ptr<IInputLayout>            InputLayoutPtr;
 typedef xtl::com_ptr<IBuffer>                 BufferPtr;
 typedef xtl::com_ptr<IRasterizerState>        RasterizerStatePtr;
 typedef xtl::com_ptr<IProgram>                ProgramPtr;
-typedef xtl::com_ptr<IShaderParametersLayout> ShaderParametersLayoutPtr;
+typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 
 //тестовое приложение
 struct Test
@@ -58,7 +58,7 @@ struct Test
   DevicePtr      device;
   
   Test (const wchar_t* title, const char* init_string="") :
-    window (syslib::WindowStyle_Overlapped, 400, 200), driver (get_opengl_driver ())
+    window (syslib::WindowStyle_Overlapped, 400, 400), driver (get_opengl_driver ())
   {
     window.SetTitle (title);
 //    window.Hide ();
@@ -73,10 +73,10 @@ struct Test
     desc.frame_buffer.stencil_bits = 8;
     desc.buffers_count             = 2;
 //    desc.samples_count             = 0;
-    desc.samples_count             = 6;
+    desc.samples_count             = 0;
     desc.swap_method               = SwapMethod_Discard;
-    desc.vsync                     = true;
-    desc.fullscreen                = false;
+    desc.vsync                     = false;
+    desc.fullscreen                = true;
     desc.window_handle             = window.Handle ();
 
     swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);

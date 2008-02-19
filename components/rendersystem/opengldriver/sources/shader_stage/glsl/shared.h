@@ -25,9 +25,16 @@ enum GlslShaderType
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дескриптор расположения параметров шейдера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct GlslProgramParametersLayoutDesc
+{
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///GLSL шейдер менеджер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class GlslShaderManager : public ShaderManager, public ContextObject
+class GlslShaderManager : virtual public ShaderManager, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +109,7 @@ class GlslProgram : virtual public Program, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Биндинг
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (ConstantBufferPtr* constant_buffers, ShaderParametersLayout* shader_parameters_layout);
+    void Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLayout* parameters_layout);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,12 +123,16 @@ class GlslProgram : virtual public Program, public ContextObject
     void DeleteProgram ();
 
   private:
-    typedef stl::vector<GlslShaderPtr> ShaderArray;
+    struct LayoutCacheEntry;
 
-    GLhandleARB program; //линкуемый шейдер
-    ShaderArray shaders; //используемые шейдеры    
+    typedef stl::vector<GlslShaderPtr>    ShaderArray;
+    typedef stl::vector<LayoutCacheEntry> LayoutsCache;
+
+    GLhandleARB     program;        //линкуемый шейдер
+    ShaderArray     shaders;        //используемые шейдеры
+    LayoutsCache    layouts_cache;  //кэш параметров программы
+    size_t          current_time;   //текущее время
 };
-
 
 GlslShaderType get_shader_type (const char* profile); //получение ShaderType по имени профиля (при получении неизвестного имени возвращается -1)
 

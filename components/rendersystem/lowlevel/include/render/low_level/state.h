@@ -100,41 +100,41 @@ struct InputLayoutDesc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Типы шейдерных параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ShaderParameterType
+enum ProgramParameterType
 {
-  ShaderParameterType_Int,         //целое число
-  ShaderParameterType_Float,       //вещественное число
-  ShaderParameterType_Int2,        //вектор из 2-х целых чисел
-  ShaderParameterType_Float2,      //вектор из 2-х вещественных чисел
-  ShaderParameterType_Int3,        //вектор из 3-х целых чисел
-  ShaderParameterType_Float3,      //вектор из 3-х вещественных чисел
-  ShaderParameterType_Int4,        //вектор из 4-х целых чисел
-  ShaderParameterType_Float4,      //вектор из 4-х вещественных чисел
-  ShaderParameterType_Float2x2,    //матрица 2x2 вещественных чисел
-  ShaderParameterType_Float3x3,    //матрица 3x3 вещественных чисел
-  ShaderParameterType_Float4x4,    //матрица 4x4 вещественных чисел
+  ProgramParameterType_Int,         //целое число
+  ProgramParameterType_Float,       //вещественное число
+  ProgramParameterType_Int2,        //вектор из 2-х целых чисел
+  ProgramParameterType_Float2,      //вектор из 2-х вещественных чисел
+  ProgramParameterType_Int3,        //вектор из 3-х целых чисел
+  ProgramParameterType_Float3,      //вектор из 3-х вещественных чисел
+  ProgramParameterType_Int4,        //вектор из 4-х целых чисел
+  ProgramParameterType_Float4,      //вектор из 4-х вещественных чисел
+  ProgramParameterType_Float2x2,    //матрица 2x2 вещественных чисел
+  ProgramParameterType_Float3x3,    //матрица 3x3 вещественных чисел
+  ProgramParameterType_Float4x4,    //матрица 4x4 вещественных чисел
 
-  ShaderParameterType_Num
+  ProgramParameterType_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметр шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct ShaderParameter
+struct ProgramParameter
 {
-  const char*         name;   //имя константы
-  ShaderParameterType type;   //тип константы
-  size_t              slot;   //номер слота с константым буфером
-  size_t              offset; //смещение относительно начала константного буфера
+  const char*          name;   //имя константы
+  ProgramParameterType type;   //тип константы
+  size_t               slot;   //номер слота с константым буфером
+  size_t               offset; //смещение относительно начала константного буфера
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Дескриптор расположения параметров шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct ShaderParametersLayoutDesc
+struct ProgramParametersLayoutDesc
 {
-  size_t                 parameters_count; //количество параметров шейдера
-  const ShaderParameter* parameters;       //параметры шейдера
+  size_t                  parameters_count; //количество параметров шейдера
+  const ProgramParameter* parameters;       //параметры шейдера
 };
 
 #if 0
@@ -559,12 +559,12 @@ template <class Desc> class ILayoutTemplate: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Классы состояний устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef ILayoutTemplate<InputLayoutDesc>            IInputLayout;
-typedef ILayoutTemplate<ShaderParametersLayoutDesc> IShaderParametersLayout;
-typedef IStateTemplate<SamplerDesc>                 ISamplerState;
-typedef IStateTemplate<RasterizerDesc>              IRasterizerState;
-typedef IStateTemplate<DepthStencilDesc>            IDepthStencilState;
-typedef IStateTemplate<BlendDesc>                   IBlendState;
+typedef ILayoutTemplate<InputLayoutDesc>             IInputLayout;
+typedef ILayoutTemplate<ProgramParametersLayoutDesc> IProgramParametersLayout;
+typedef IStateTemplate<SamplerDesc>                  ISamplerState;
+typedef IStateTemplate<RasterizerDesc>               IRasterizerState;
+typedef IStateTemplate<DepthStencilDesc>             IDepthStencilState;
+typedef IStateTemplate<BlendDesc>                    IBlendState;
 
 }
 

@@ -126,9 +126,9 @@ IBuffer* Device::ISGetIndexBuffer ()
     ”правление шейдерными уровн€ми (shader-stage)
 */
 
-IShaderParametersLayout* Device::CreateShaderParametersLayout (const ShaderParametersLayoutDesc& desc)
+IProgramParametersLayout* Device::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
 {
-  return shader_stage.CreateShaderParametersLayout (desc);
+  return shader_stage.CreateProgramParametersLayout (desc);
 }
 
 IProgram* Device::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
@@ -141,9 +141,9 @@ void Device::SSSetProgram (IProgram* program)
   shader_stage.SetProgram (program);
 }
 
-void Device::SSSetShaderParametersLayout (IShaderParametersLayout* layout)
+void Device::SSSetProgramParametersLayout (IProgramParametersLayout* layout)
 {
-  shader_stage.SetShaderParametersLayout (layout);  
+  shader_stage.SetProgramParametersLayout (layout);  
 }
 
 void Device::SSSetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
@@ -151,9 +151,9 @@ void Device::SSSetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
   shader_stage.SetConstantBuffer (buffer_slot, buffer);
 }
 
-IShaderParametersLayout* Device::SSGetShaderParametersLayout ()
+IProgramParametersLayout* Device::SSGetProgramParametersLayout ()
 {
-  return shader_stage.GetShaderParametersLayout ();
+  return shader_stage.GetProgramParametersLayout ();
 }
 
 IProgram* Device::SSGetProgram ()
