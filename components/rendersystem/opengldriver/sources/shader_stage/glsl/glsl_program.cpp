@@ -1,5 +1,7 @@
 #include "shared.h"
 
+#include <stl/algorithm>
+
 using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
@@ -16,20 +18,36 @@ struct GlslProgramParameter
 {
   int                  location;  //имя константы
   ProgramParameterType type;      //тип константы
-  size_t               slot;      //номер слота с константым буфером
   size_t               offset;    //смещение относительно начала константного буфера
+};
+
+struct GlslProgramParameterGroup
+{
+  size_t                slot;       //номер слота с константым буфером
+  size_t                data_hash;  //хеш данных константного буфера
+  size_t                count;      //количество элементов группы
+  GlslProgramParameter* parameters; //указатель на начало области с элементами
+};
+
+struct ProgramParameterComparator
+{
+  bool operator () (const ProgramParameter* parameter1, const ProgramParameter* parameter2) const
+  {
+    return parameter1->slot < parameter2->slot;
+  }
 };
 
 typedef stl::vector<GlslProgramParameter>           ParametersArray;
 typedef xtl::trackable_ptr<ProgramParametersLayout> ProgramParametersLayoutPtr;
-
+typedef stl::vector<GlslProgramParameterGroup>      ProgramParameterGroupArray;
 }
 
 struct GlslProgram::LayoutCacheEntry
 {
-  ParametersArray            parameters;    //параметры программы
-  ProgramParametersLayoutPtr source_layout; //исходные параметры программы=
-  size_t                     bind_time;     //время последнего биндинга
+  ParametersArray            parameters;       //параметры программы
+  ProgramParametersLayoutPtr source_layout;    //исходные параметры программы
+  ProgramParameterGroupArray parameter_groups; //группы параметров
+  size_t                     bind_time;        //время последнего биндинга
 };
 
 /*
@@ -170,6 +188,8 @@ void GlslProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLa
   if (glUseProgram) glUseProgram          (program);
   else              glUseProgramObjectARB (program);
 
+  //Поиск в кэше
+
   LayoutCacheEntry *hit_layout = NULL;
 
   for (size_t i = 0; i < CACHED_LAYOUT_ARRAY_SIZE; i++)
@@ -190,6 +210,8 @@ void GlslProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLa
 
     ProgramParametersLayoutDesc &layout_desc = parameters_layout->GetDesc ();
 
+    oldest_entry->source_layout = NULL;
+
     oldest_entry->parameters.clear ();
     oldest_entry->parameters.reserve (layout_desc.parameters_count);
 
@@ -198,41 +220,73 @@ void GlslProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLa
 
     if (glGetUniformLocation) glGetUniformLocation_fn = glGetUniformLocation;
     else                      glGetUniformLocation_fn = (PFNGLGETUNIFORMLOCATIONPROC)glGetUniformLocationARB;
+    
+    stl::vector<const ProgramParameter*> temp_parameters (layout_desc.parameters_count);
 
     for (size_t i = 0; i < layout_desc.parameters_count; i++)
+      temp_parameters[i] = &layout_desc.parameters [i];
+
+    stl::sort (temp_parameters.begin (), temp_parameters.end (), ProgramParameterComparator ());
+
+    size_t current_slot = DEVICE_CONSTANT_BUFFER_SLOTS_COUNT + 1; //номер текущего слота (для отслеживания изменения группы параметров)
+    
+    oldest_entry->parameter_groups.reserve (DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
+
+    for (size_t i = 0; i < temp_parameters.size (); i++)
     {
-      int parameter_location = glGetUniformLocation_fn (program, layout_desc.parameters[i].name);
+      int parameter_location = glGetUniformLocation_fn (program, temp_parameters[i]->name);
 
       if (parameter_location == -1)
       {
-        LogPrintf ("Unreferenced uniform parameter '%s'", layout_desc.parameters [i].name);
+        LogPrintf ("Unreferenced uniform parameter '%s'", temp_parameters[i]->name);
         continue;
       }
 
       temp_parameter.location = parameter_location;
-      temp_parameter.type     = layout_desc.parameters [i].type;
-      temp_parameter.slot     = layout_desc.parameters [i].slot;
-      temp_parameter.offset   = layout_desc.parameters [i].offset;
+      temp_parameter.type     = temp_parameters [i]->type;
+      temp_parameter.offset   = temp_parameters [i]->offset;
 
       oldest_entry->parameters.push_back (temp_parameter);
+
+        //отслеживание появления новой группы
+
+      if (current_slot != temp_parameters [i]->slot)
+      {
+        oldest_entry->parameter_groups.push_back ();
+
+        GlslProgramParameterGroup& new_group = oldest_entry->parameter_groups.back ();
+        
+        new_group.slot       = temp_parameters [i]->slot;
+        new_group.parameters = &oldest_entry->parameters.back ();
+        new_group.count      = 0;
+        new_group.data_hash  = 0;
+        current_slot         = temp_parameters [i]->slot;
+      }
     }
+
+    for (ProgramParameterGroupArray::iterator iter = oldest_entry->parameter_groups.begin (), end = oldest_entry->parameter_groups.end ()-1; iter != end; ++iter)
+      iter->count = iter [1].parameters - iter [0].parameters;
+
+    oldest_entry->parameter_groups.back ().count = oldest_entry->parameters.end () - oldest_entry->parameter_groups.back ().parameters;    
 
     oldest_entry->source_layout = parameters_layout;
 
     hit_layout = oldest_entry;
   }
 
-  PFNGLUNIFORM1IPROC          glUniform1i_fn          = 0;
-  PFNGLUNIFORM1FPROC          glUniform1f_fn          = 0;
-  PFNGLUNIFORM2IVPROC         glUniform2iv_fn         = 0;
-  PFNGLUNIFORM2FVPROC         glUniform2fv_fn         = 0;
-  PFNGLUNIFORM3IVPROC         glUniform3iv_fn         = 0;
-  PFNGLUNIFORM3FVPROC         glUniform3fv_fn         = 0;
-  PFNGLUNIFORM4IVPROC         glUniform4iv_fn         = 0;
-  PFNGLUNIFORM4FVPROC         glUniform4fv_fn         = 0;
-  PFNGLUNIFORMMATRIX2FVPROC   glUniformMatrix2fv_fn   = 0;
-  PFNGLUNIFORMMATRIX3FVPROC   glUniformMatrix3fv_fn   = 0;
-  PFNGLUNIFORMMATRIX4FVPROC   glUniformMatrix4fv_fn   = 0;
+  //Установка юниформов
+
+  PFNGLUNIFORM1IPROC        glUniform1i_fn        = 0;
+  PFNGLUNIFORM1FPROC        glUniform1f_fn        = 0;
+  PFNGLUNIFORM2IVPROC       glUniform2iv_fn       = 0;
+  PFNGLUNIFORM2FVPROC       glUniform2fv_fn       = 0;
+  PFNGLUNIFORM3IVPROC       glUniform3iv_fn       = 0;
+  PFNGLUNIFORM3FVPROC       glUniform3fv_fn       = 0;
+  PFNGLUNIFORM4IVPROC       glUniform4iv_fn       = 0;
+  PFNGLUNIFORM4FVPROC       glUniform4fv_fn       = 0;
+  PFNGLUNIFORMMATRIX2FVPROC glUniformMatrix2fv_fn = 0;
+  PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv_fn = 0;
+  PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv_fn = 0;
     
   if (glUniform1i) glUniform1i_fn = glUniform1i;
   else             glUniform1i_fn = glUniform1iARB;
@@ -267,27 +321,36 @@ void GlslProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLa
   if (glUniformMatrix4fv) glUniformMatrix4fv_fn = glUniformMatrix4fv;
   else                    glUniformMatrix4fv_fn = glUniformMatrix4fvARB;
 
-  for (size_t i = 0; i < hit_layout->parameters.size (); i++)
+  for (size_t i = 0; i < hit_layout->parameter_groups.size (); i++)
   {
-    if (!constant_buffers[hit_layout->parameters[i].slot])
-      RaiseInvalidOperation (METHOD_NAME, "No needed constant buffer %u for uniform '%s'", 
-                             hit_layout->parameters[i].slot,  hit_layout->source_layout->GetDesc ().parameters[i].name);
-  
-    void* uniform_pointer = (char*)constant_buffers[hit_layout->parameters[i].slot]->GetDataPointer () + hit_layout->parameters[i].offset;
+    size_t group_slot = hit_layout->parameter_groups[i].slot;
 
-    switch (hit_layout->parameters[i].type)
+    if (!constant_buffers[group_slot])
+      RaiseInvalidOperation (METHOD_NAME, "No needed constant buffer %u", group_slot);
+
+    if ((current_time - hit_layout->bind_time == 1) && (hit_layout->parameter_groups[i].data_hash == constant_buffers[group_slot]->GetDataHash ()))
+      continue;
+    else    
+      hit_layout->parameter_groups[i].data_hash = constant_buffers[group_slot]->GetDataHash ();
+
+    for (size_t j = 0; j < hit_layout->parameter_groups[i].count; j++)
     {
-      case ProgramParameterType_Int:      glUniform1i_fn        (hit_layout->parameters[i].location, *(int*)uniform_pointer);        break;
-      case ProgramParameterType_Float:    glUniform1f_fn        (hit_layout->parameters[i].location, *(float*)uniform_pointer);      break;
-      case ProgramParameterType_Int2:     glUniform2iv_fn       (hit_layout->parameters[i].location, 1, (int*)uniform_pointer);      break;
-      case ProgramParameterType_Float2:   glUniform2fv_fn       (hit_layout->parameters[i].location, 1, (float*)uniform_pointer);    break;
-      case ProgramParameterType_Int3:     glUniform3iv_fn       (hit_layout->parameters[i].location, 1, (int*)uniform_pointer);      break;
-      case ProgramParameterType_Float3:   glUniform3fv_fn       (hit_layout->parameters[i].location, 1, (float*)uniform_pointer);    break;
-      case ProgramParameterType_Int4:     glUniform4iv_fn       (hit_layout->parameters[i].location, 1, (int*)uniform_pointer);      break;
-      case ProgramParameterType_Float4:   glUniform4fv_fn       (hit_layout->parameters[i].location, 1, (float*)uniform_pointer);    break;
-      case ProgramParameterType_Float2x2: glUniformMatrix2fv_fn (hit_layout->parameters[i].location, 1, 0, (float*)uniform_pointer); break;
-      case ProgramParameterType_Float3x3: glUniformMatrix3fv_fn (hit_layout->parameters[i].location, 1, 0, (float*)uniform_pointer); break;
-      case ProgramParameterType_Float4x4: glUniformMatrix4fv_fn (hit_layout->parameters[i].location, 1, 0, (float*)uniform_pointer); break;
+      void* uniform_pointer = (char*)constant_buffers[group_slot]->GetDataPointer () + hit_layout->parameter_groups[i].parameters[j].offset;
+
+      switch (hit_layout->parameter_groups[i].parameters[j].type)
+      {
+        case ProgramParameterType_Int:      glUniform1i_fn        (hit_layout->parameter_groups[i].parameters[j].location, *(int*)uniform_pointer);        break;
+        case ProgramParameterType_Float:    glUniform1f_fn        (hit_layout->parameter_groups[i].parameters[j].location, *(float*)uniform_pointer);      break;
+        case ProgramParameterType_Int2:     glUniform2iv_fn       (hit_layout->parameter_groups[i].parameters[j].location, 1, (int*)uniform_pointer);      break;
+        case ProgramParameterType_Float2:   glUniform2fv_fn       (hit_layout->parameter_groups[i].parameters[j].location, 1, (float*)uniform_pointer);    break;
+        case ProgramParameterType_Int3:     glUniform3iv_fn       (hit_layout->parameter_groups[i].parameters[j].location, 1, (int*)uniform_pointer);      break;
+        case ProgramParameterType_Float3:   glUniform3fv_fn       (hit_layout->parameter_groups[i].parameters[j].location, 1, (float*)uniform_pointer);    break;
+        case ProgramParameterType_Int4:     glUniform4iv_fn       (hit_layout->parameter_groups[i].parameters[j].location, 1, (int*)uniform_pointer);      break;
+        case ProgramParameterType_Float4:   glUniform4fv_fn       (hit_layout->parameter_groups[i].parameters[j].location, 1, (float*)uniform_pointer);    break;
+        case ProgramParameterType_Float2x2: glUniformMatrix2fv_fn (hit_layout->parameter_groups[i].parameters[j].location, 1, 0, (float*)uniform_pointer); break;
+        case ProgramParameterType_Float3x3: glUniformMatrix3fv_fn (hit_layout->parameter_groups[i].parameters[j].location, 1, 0, (float*)uniform_pointer); break;
+        case ProgramParameterType_Float4x4: glUniformMatrix4fv_fn (hit_layout->parameter_groups[i].parameters[j].location, 1, 0, (float*)uniform_pointer); break;
+      }
     }
   }
 
