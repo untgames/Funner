@@ -29,6 +29,10 @@ struct MyShaderParameters
   math::vec3f  color_spread;
   math::vec3f  light_position;
   float        scale;
+};
+
+struct MyShaderParameters2
+{
   math::mat4f  transform;
 };
 
@@ -101,23 +105,23 @@ void idle (Test& test)
     return;
   }*/
 
-  MyShaderParameters my_shader_parameters;
+  MyShaderParameters2 my_shader_parameters2;
   
-  IBuffer* cb = test.device->SSGetConstantBuffer (0);
+  IBuffer* cb = test.device->SSGetConstantBuffer (1);
   
   if (!cb)
   {
-    printf ("Null constant buffer #0\n");
+    printf ("Null constant buffer #1\n");
     return;
   }
   
-  cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+  cb->GetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
     
-  my_shader_parameters.transform = math::rotatef (math::deg2rad (angle+=1.f), 0, 0, 1);
+  my_shader_parameters2.transform = math::rotatef (math::deg2rad (angle+=1.f), 0, 0, 1);
 //  my_shader_parameters.transform *= math::rotatef (math::deg2rad (.3f), 0, 0, 1);
 
-  cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
-  
+  cb->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
+ 
   redraw (test);
 //  test.window.Invalidate ();
 }
@@ -203,7 +207,7 @@ int main ()
       {"colorSpread", ProgramParameterType_Float3, 0, offsetof (MyShaderParameters, color_spread)},
       {"LightPosition", ProgramParameterType_Float3, 0, offsetof (MyShaderParameters, light_position)},
       {"Scale", ProgramParameterType_Float, 0, offsetof (MyShaderParameters, scale)},
-      {"Transform", ProgramParameterType_Float4x4, 0, offsetof (MyShaderParameters, transform)}
+      {"Transform", ProgramParameterType_Float4x4, 1, offsetof (MyShaderParameters2, transform)}
     };
     
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
@@ -219,22 +223,30 @@ int main ()
     cb_desc.usage_mode   = UsageMode_Default;
     cb_desc.bind_flags   = BindFlag_ConstantBuffer;
     cb_desc.access_flags = AccessFlag_ReadWrite;
-    
-    BufferPtr cb (test.device->CreateBuffer (cb_desc), false);
+
+    BufferDesc cb_desc2 (cb_desc);
+   
+    cb_desc2.size = sizeof MyShaderParameters2;
+ 
+    BufferPtr cb (test.device->CreateBuffer (cb_desc), false), cb2 (test.device->CreateBuffer (cb_desc2), false);
 
     MyShaderParameters my_shader_parameters = {
       1.0f,
       math::vec3f (0.6f, 0.3f, 0.1f),
       math::vec3f (0.15f, 0.15f / 2.0f, 0),
       math::vec3f (0.0f, 0.0f, 4.0f),
-      1.0f
+      1.f
     };
 
+    MyShaderParameters2 my_shader_parameters2 = {1.0f};
+
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+    cb2->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
 
     test.device->SSSetProgram (shader.get ());
     test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
     test.device->SSSetConstantBuffer (0, cb.get ());
+    test.device->SSSetConstantBuffer (1, cb2.get ());
 
     printf ("Register callbacks\n");
     

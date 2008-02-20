@@ -28,6 +28,17 @@ namespace opengl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Элементы таблицы локальных данных контекста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum InputStageCache
+{
+  InputStageCache_BindedVboBuffer,    //ID текущего забинденного буфера
+  InputStageCache_EnabledSemantics,   //маска используемых семантик вершинных атрибутов
+  InputStageCache_CurrentBaseVertex,  //текущая базовая вершина
+  InputStageCache_CurrentLayoutHash,  //хэш атрибутов layout'а
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вершинный буфер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Buffer: virtual public IBuffer, virtual public IBindableBuffer, public ContextObject
@@ -179,6 +190,9 @@ class InputLayout: virtual public IInputLayout, public ContextObject
               IndicesLayout* out_indices_layout);
 
   private:
+    void BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers);
+
+  private:
     struct GlVertexAttribute;
     struct GlVertexAttributeGroup;
 
@@ -192,6 +206,8 @@ class InputLayout: virtual public IInputLayout, public ContextObject
     size_t                      index_size;              //размер индекса
     size_t                      index_buffer_offset;     //смещение в индексном буфере до первого индекса
     size_t                      tex_units_count;         //количество текстурных юнитов поддерживаемое аппаратно
+    size_t                      used_semantics_mask;     //маска используемых семантик
+    size_t                      attributes_hash;         //хеш атрибутов
 };
 
 }

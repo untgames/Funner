@@ -1,5 +1,7 @@
 #include "shared.h"
 
+#include <common/hash.h>
+
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
@@ -204,6 +206,8 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
   GlVertexAttributeArray      new_vertex_attributes;
   GlVertexAttributeGroupArray new_vertex_attribute_groups;
 
+  size_t new_semantics_mask = 0;    
+
     //проверка наличия вершинных атрибутов
     
   if (desc.vertex_attributes_count)
@@ -235,7 +239,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
     semantic_attribute.assign (NO_ATTRIBUTE);
 
     va_ptrs.reserve (desc.vertex_attributes_count);
-   
+
     for (size_t i=0; i<desc.vertex_attributes_count; i++)
     {
       const VertexAttribute& va = desc.vertex_attributes [i];
@@ -273,6 +277,8 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           Raise<ArgumentException> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%d", i, va.semantic);
           break;
       }
+
+      new_semantics_mask |= 1 << va.semantic;
 
         //отсечение повторной установки вершинной семантики           
 
@@ -443,25 +449,42 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 
   new_vertex_attributes.swap (vertex_attributes);
   new_vertex_attribute_groups.swap (vertex_attribute_groups);
+
+  attributes_hash = crc32 (&vertex_attributes.front (), vertex_attributes.size () * sizeof (GlVertexAttribute));
+
+  used_semantics_mask = new_semantics_mask;
 }
 
 /*
     Установка состояния в контекст OpenGL
 */
 
-void InputLayout::Bind
- (size_t         base_vertex,
-  size_t         base_index,
-  BufferPtr*     vertex_buffers,
-  BufferPtr      index_buffer,
-  IndicesLayout* out_indices_layout)
+namespace
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::Bind";
 
-    //установка текущего контекста
+void set_client_capability (GLenum capability, size_t current_mask, size_t required_mask, size_t pos)
+{
+  size_t mask = 1 << pos;
 
-  MakeContextCurrent ();
-  
+  if (current_mask & ~required_mask & mask)
+  {
+    glDisableClientState (capability);
+    return;
+  }
+
+  if (required_mask & ~current_mask & mask)
+  {
+    glEnableClientState (capability);
+    return;
+  }
+}
+
+}
+
+void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::BindVertexAttributes";
+
     //проверка поддержки необходимых расширений
     
   static Extension ARB_multitexture = "GL_ARB_multitexture",
@@ -482,25 +505,44 @@ void InputLayout::Bind
     if (!vertex_buffers [iter->slot])
       RaiseInvalidOperation (METHOD_NAME, "Null vertex buffer #%u", iter->slot);
       
-    //отключение всех вершинных массивов !!! заменить на отключение только тех, которые не будут использованы - кеширование!!!
+    //отключение неиспользуемых и включение используемых вершинных массивов
     
-  static const GLenum clients_states [] = {GL_VERTEX_ARRAY, GL_NORMAL_ARRAY, GL_COLOR_ARRAY};
-    
-  for (size_t i=0; i<sizeof clients_states / sizeof *clients_states; i++)
-    glDisableClientState (clients_states [i]);
-    
-  if (has_arb_multitexture)
+  size_t& current_enabled_semantics_mask = GetContextDataTable (Stage_Input)[InputStageCache_EnabledSemantics];
+
+  if (current_enabled_semantics_mask != used_semantics_mask)
   {
-    for (size_t i=VertexAttributeSemantic_TexCoord0; i<=VertexAttributeSemantic_TexCoord7; i++)
+    set_client_capability (GL_VERTEX_ARRAY, current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Position);
+    set_client_capability (GL_NORMAL_ARRAY, current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Normal);
+    set_client_capability (GL_COLOR_ARRAY,  current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Color);
+
+    if (has_arb_multitexture)
     {
-      glClientActiveTexture_fn (GL_TEXTURE0 + i - VertexAttributeSemantic_TexCoord0);
-      glDisableClientState     (GL_TEXTURE_COORD_ARRAY);
+      size_t mask = 1 << VertexAttributeSemantic_TexCoord0;
+
+      for (size_t i=0; i<tex_units_count; i++, mask <<= 1)
+      {
+        if (current_enabled_semantics_mask & ~used_semantics_mask & mask)
+        {
+          glClientActiveTexture_fn (GL_TEXTURE0 + i);
+          glDisableClientState     (GL_TEXTURE_COORD_ARRAY);
+          return;
+        }
+
+        if (used_semantics_mask & ~current_enabled_semantics_mask & mask)
+        {
+          glClientActiveTexture_fn (GL_TEXTURE0 + i);
+          glEnableClientState      (GL_TEXTURE_COORD_ARRAY);
+          return;
+        }
+      }
     }
+    else
+    {
+      set_client_capability (GL_TEXTURE_COORD_ARRAY,  current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_TexCoord0);
+    }
+
+    current_enabled_semantics_mask = used_semantics_mask;
   }
-  else
-  {
-    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-  }  
 
     //настройка вершинных буферов    
     
@@ -525,15 +567,12 @@ void InputLayout::Bind
       {
         case VertexAttributeSemantic_Position:
           glVertexPointer (va.components, va.type, va.stride, offset);          
-          glEnableClientState (GL_VERTEX_ARRAY);
           break;
         case VertexAttributeSemantic_Normal:
           glNormalPointer (va.type, va.stride, offset);
-          glEnableClientState (GL_NORMAL_ARRAY);
           break;
         case VertexAttributeSemantic_Color:
           glColorPointer (va.components, va.type, va.stride, offset);
-          glEnableClientState (GL_COLOR_ARRAY);
           break;
         case VertexAttributeSemantic_TexCoord0:
         case VertexAttributeSemantic_TexCoord1:
@@ -552,13 +591,39 @@ void InputLayout::Bind
           }
 
           glTexCoordPointer (va.components, va.type, va.stride, offset);
-          glEnableClientState (GL_TEXTURE_COORD_ARRAY);
           break;
         }
         default:
           continue;
       }
     }
+  }
+}
+
+void InputLayout::Bind
+ (size_t         base_vertex,
+  size_t         base_index,
+  BufferPtr*     vertex_buffers,
+  BufferPtr      index_buffer,
+  IndicesLayout* out_indices_layout)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::Bind";
+
+    //установка текущего контекста
+
+  MakeContextCurrent ();  
+
+    //установка вершинных атрибутов
+
+  size_t& current_base_vertex = GetContextDataTable (Stage_Input)[InputStageCache_CurrentBaseVertex];
+  size_t& current_layout_hash = GetContextDataTable (Stage_Input)[InputStageCache_CurrentLayoutHash]; 
+
+  if (current_base_vertex != base_vertex || current_layout_hash != attributes_hash)
+  {
+    BindVertexAttributes (base_vertex, vertex_buffers);
+
+    current_base_vertex = base_vertex;
+    current_layout_hash = attributes_hash;
   }
 
     //установка индексного буфера

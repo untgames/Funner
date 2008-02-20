@@ -126,9 +126,18 @@ void VboBuffer::Bind ()
   
   PFNGLBINDBUFFERPROC glBindBuffer_fn = glBindBuffer ? glBindBuffer : glBindBufferARB;
   
+  size_t& current_id = GetContextDataTable (Stage_Input)[InputStageCache_BindedVboBuffer];
+  
+  if (current_id == buffer_id)
+    return;
+
   glBindBuffer_fn (target, buffer_id);
 
   CheckErrors ("render::low_level::opengl::VboBuffer::Bind");
+
+    //установка кэш-переменной
+
+  current_id = buffer_id;
 }
 
 /*
