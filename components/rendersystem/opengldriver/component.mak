@@ -7,7 +7,8 @@ TARGETS := OPENGLDRIVER_SOURCES OPENGLDRIVER_TESTS
 OPENGLDRIVER_SOURCES.TYPE             := static-lib
 OPENGLDRIVER_SOURCES.NAME             := opengl_driver
 OPENGLDRIVER_SOURCES.INCLUDE_DIRS     := include sources ../lowlevel/include ../../commonlib/include ../../xtl/include ../../../extern/glew/include
-OPENGLDRIVER_SOURCES.SOURCE_DIRS      := sources/common sources/platform/win32 sources/driver sources/input_stage sources/output_stage \
+OPENGLDRIVER_SOURCES.SOURCE_DIRS      := sources/common sources/platform/win32 sources/driver sources/input_stage \
+                                         sources/output_stage sources/output_stage/swap_chain_manager sources/output_stage/fbo_manager \
                                          sources/texture_manager sources/texture_manager/nv_dxt sources/rasterizer_stage sources/shader_stage \
                                          sources/shader_stage/glsl
 OPENGLDRIVER_SOURCES.LIB_DIRS         :=  

@@ -365,6 +365,22 @@ const char* get_name (CullMode param)
   }
 }
 
+const char* get_name (PrimitiveType param)
+{
+  switch (param)
+  {
+    case PrimitiveType_PointList:      return "PrimitiveType_PointList";
+    case PrimitiveType_LineList:       return "PrimitiveType_LineList";
+    case PrimitiveType_LineStrip:      return "PrimitiveType_LineStrip";
+    case PrimitiveType_TriangleList:   return "PrimitiveType_TriangleList";
+    case PrimitiveType_TriangleStrip:  return "PrimitiveType_TriangleStrip";
+    case PrimitiveType_TriangleFan:    return "PrimitiveType_TriangleFan";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(PrimitiveType)", "param", param);
+      return "";
+  }
+}
+
 /*
     Получение параметров формата пикселей
 */

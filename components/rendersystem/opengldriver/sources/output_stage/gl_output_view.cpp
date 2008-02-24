@@ -8,47 +8,36 @@ using namespace common;
     Конструктор / деструктор
 */
 
-View::View (ITexture* in_texture, const ViewDesc& in_desc)
-  : base_texture (in_texture)
+View::View (const ContextManager& context_manager, ITexture* in_texture, const ViewDesc& in_desc)
+  : ContextObject (context_manager),
+    texture (in_texture),
+    type (in_texture ? typeid (*in_texture) : typeid (void))
 {
   static const char* METHOD_NAME = "render::low_level::opengl::View::View";
 
-  if (!base_texture)
+    //проверка корректности текстуры и совместимости с текущим контекстом
+
+  if (!texture)
     RaiseNullArgument (METHOD_NAME, "texture");
+
+  cast_object<ContextObject> (GetContextManager (), in_texture, METHOD_NAME, "texture");
 
      //проверка корректности дескриптора
 
   TextureDesc texture_desc;
 
-  base_texture->GetDesc (texture_desc);
+  texture->GetDesc (texture_desc);
 
   if (in_desc.layer >= texture_desc.layers)
     RaiseOutOfRange (METHOD_NAME, "desc.layer", in_desc.layer, texture_desc.layers);
+    
+    //копирование флагов биндинга
+    
+  bind_flags = texture_desc.bind_flags;
+    
+    //установка дескриптора
 
   desc = in_desc;
-    
-    //определение типа текстуры
-    
-  if (render_target_texture = dynamic_cast<IRenderTargetTexture*> (in_texture))
-  {
-    type = ViewType_RenderTargetTexture;
-  }
-  else if (color_buffer = dynamic_cast<SwapChainColorBuffer*> (in_texture))
-  {
-    type = ViewType_SwapChainColorBuffer;
-  }
-  else if (depth_stencil_buffer = dynamic_cast<SwapChainDepthStencilBuffer*> (in_texture))
-  {
-    type = ViewType_SwapChainDepthStencilBuffer;
-  }
-  else if (fbo_render_buffer = dynamic_cast<FboRenderBuffer*> (in_texture))
-  {
-    type = ViewType_FboRenderBuffer;
-  }
-  else
-  {
-    RaiseInvalidArgument (METHOD_NAME, "texture", typeid (in_texture).name (), "Unsupported texture type");
-  }
 }
 
 /*
@@ -58,4 +47,13 @@ View::View (ITexture* in_texture, const ViewDesc& in_desc)
 void View::GetDesc (ViewDesc& out_desc)
 {
   out_desc = desc;
+}
+
+/*
+    Получение целевой текстуры
+*/
+
+ITexture* View::GetTexture ()
+{
+  return texture.get ();
 }

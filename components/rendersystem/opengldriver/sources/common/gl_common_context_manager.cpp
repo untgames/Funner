@@ -69,6 +69,11 @@ class ContextImpl: public xtl::reference_counter
         
         context.MakeCurrent (master_swap_chain.get ());
         
+          //отключение буферов отрисовки
+
+        glDrawBuffer (GL_NONE);
+        glReadBuffer (GL_NONE);
+
           //определение поддержки расширений        
 
         extensions_string = reinterpret_cast<const char*> (glGetString (GL_EXTENSIONS));

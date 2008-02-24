@@ -86,18 +86,140 @@ struct Depth24Stencil8
     Конструктор
 */
 
-RenderBuffer::RenderBuffer (const ContextManager& manager, RenderTargetType in_target_type)
-  : ContextObject (manager), target_type (in_target_type)
+RenderBuffer::RenderBuffer (const ContextManager& context_manager, RenderTargetType in_target_type)
+  : ContextObject (context_manager),
+    target_type (in_target_type)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::RenderBuffer";
+
+  PixelFormat format;
+  size_t      bind_flags;
+
   switch (target_type)
   {
     case RenderTargetType_Color:
+      format     = PixelFormat_RGBA8;
+      bind_flags = BindFlag_RenderTarget;
+      break;
     case RenderTargetType_DepthStencil:
+      format     = PixelFormat_D24S8;
+      bind_flags = BindFlag_DepthStencil;
       break;
     default:
-      RaiseInvalidArgument ("render::low_level::opengl::RenderBuffer::RenderBuffer", "target_type", target_type);
+      RaiseInvalidArgument (METHOD_NAME, "target_type", target_type);
       break;
   }
+
+  memset (&desc, 0, sizeof desc);
+
+  desc.dimension            = TextureDimension_2D;
+  desc.width                = 0;
+  desc.height               = 0;
+  desc.layers               = 1;
+  desc.format               = format;
+  desc.generate_mips_enable = false;
+  desc.access_flags         = AccessFlag_Read | AccessFlag_Write;
+  desc.bind_flags           = bind_flags;
+  desc.usage_mode           = UsageMode_Static;
+}
+
+RenderBuffer::RenderBuffer (const ContextManager& context_manager, const TextureDesc& in_desc)
+  : ContextObject (context_manager),
+    desc (in_desc)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::RenderBuffer";
+
+    //проверка корректности дескриптора
+    
+  switch (desc.format)
+  {
+    case PixelFormat_RGB8:
+    case PixelFormat_RGBA8:   
+    case PixelFormat_L8:
+    case PixelFormat_A8:
+    case PixelFormat_LA8:
+      target_type = RenderTargetType_Color;
+      break;
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8:
+    case PixelFormat_S8:
+      target_type = RenderTargetType_DepthStencil;
+      break;
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+      RaiseNotSupported (METHOD_NAME, "Unsupported desc.format=%s", get_name (desc.format));
+      break;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.format", desc.format);
+      break;
+  }    
+
+  static size_t BAD_BIND_FLAGS = ~(BindFlag_RenderTarget | BindFlag_DepthStencil);
+  
+  if (desc.bind_flags & BAD_BIND_FLAGS)
+    RaiseInvalidArgument (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
+
+  switch (desc.access_flags)
+  {
+    case 0:
+    case AccessFlag_Read:
+    case AccessFlag_Write:
+    case AccessFlag_ReadWrite:
+      break;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.access_flags", desc.access_flags);
+      break;
+  }
+  
+  switch (desc.usage_mode)  
+  {
+    case UsageMode_Default:
+    case UsageMode_Static:
+    case UsageMode_Dynamic:
+    case UsageMode_Stream:
+      break;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.usage_mode", desc.usage_mode);
+      break;
+  }
+  
+  switch (desc.dimension)
+  {
+    case TextureDimension_2D:
+      break;
+    case TextureDimension_1D:
+    case TextureDimension_3D:
+    case TextureDimension_Cubemap:
+      RaiseNotSupported (METHOD_NAME, "Unsupported render-buffer dimension desc.dimension=%s", get_name (desc.dimension));
+      break;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.dimension", desc.dimension);
+      break;
+  }
+  
+  if (desc.generate_mips_enable)
+    RaiseNotSupported (METHOD_NAME, "Automatic mip-map generation for render-buffers not supported");
+}
+
+/*
+    Получение дескриптора
+*/
+
+void RenderBuffer::GetDesc (TextureDesc& out_desc)
+{
+  out_desc = desc;
+}
+
+/*
+    Изменение размеров
+*/
+
+void RenderBuffer::SetSize (size_t width, size_t height)
+{
+  desc.width  = width;
+  desc.height = height;
 }
 
 /*
@@ -136,6 +258,9 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
 void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::SetData";
+  
+  if (!(desc.access_flags & AccessFlag_Write))
+    RaiseInvalidOperation (METHOD_NAME, "Can't set render buffer data (no AccessFlag_Write in desc.access_flags)");
   
   if (layer)
     RaiseOutOfRange (METHOD_NAME, "layer", layer, 1);
@@ -291,6 +416,9 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::GetData";
+
+  if (!(desc.access_flags & AccessFlag_Read))
+    RaiseInvalidOperation (METHOD_NAME, "Can't get render buffer data (no AccessFlag_Read in desc.access_flags)");
 
   if (layer)
     RaiseOutOfRange (METHOD_NAME, "layer", layer, 1);

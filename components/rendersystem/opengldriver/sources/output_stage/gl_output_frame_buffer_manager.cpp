@@ -5,13 +5,61 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
+    Описание реализации менеджера буферов кадра
+*/
+
+struct FrameBufferFactory
+{
+  FrameBufferChecker checker; //функтор, проверяющий возможность создания буфера кадра из двух отображений
+  FrameBufferCreater creater; //функтор, создающий буфер кадра по двум отображениям
+  
+  FrameBufferFactory (const FrameBufferChecker& in_checker, const FrameBufferCreater& in_creater) :
+    checker (in_checker), creater (in_creater) {}
+};
+
+typedef xtl::com_ptr<ISwapChain>      SwapChainPtr;
+typedef stl::list<FrameBufferFactory> FrameBufferFactoryList;
+
+struct FrameBufferManager::Impl: public ContextObject
+{
+  SwapChainPtr              default_swap_chain;             //цепочка обмена по умолчанию
+  FrameBufferFactoryList    frame_buffer_factories;         //список фабрик буферов кадра
+  RenderBufferCreater       render_buffer_creater;          //функтор создания буфера рендеринга
+  ColorBufferCreater        color_buffer_creater;           //функтор создания буфера цвета
+  DepthStencilBufferCreater depth_stencil_buffer_creater;   //функтор создания буфера попиксельного отсечения
+  bool                      is_active_color_buffer;         //активен ли буфер цвета
+  bool                      is_active_depth_stencil_buffer; //активен ли буфера попиксельного отсечения
+
+  Impl (const ContextManager& manager, ISwapChain* in_default_swap_chain) :
+    ContextObject (manager), default_swap_chain (in_default_swap_chain), is_active_color_buffer (false), is_active_depth_stencil_buffer (false) {}
+};
+
+namespace
+{
+
+/*
+    Получение строки с конфигурацией буфера кадра
+*/
+
+void get_configuration_name (View* color_view, View* depth_stencil_view, stl::string& out_name)
+{
+  format ("color-view=%s, depth-stencil-view=%s", color_view ? color_view->GetTextureTypeName () : "null",
+          depth_stencil_view ? depth_stencil_view->GetTextureTypeName () : "null").swap (out_name);
+}
+
+}
+
+/*
     Конструктор / деструктор
 */
 
-FrameBufferManager::FrameBufferManager (const ContextManager& manager, ISwapChain* in_default_swap_chain)
-  : ContextObject (manager),
-    default_swap_chain (in_default_swap_chain),
-    EXT_framebuffer_object ("GL_EXT_framebuffer_object")
+FrameBufferManager::FrameBufferManager (const ContextManager& context_manager, ISwapChain* default_swap_chain)
+  : impl (new Impl (context_manager, default_swap_chain), false)
+{
+}
+
+FrameBufferManager::FrameBufferManager (const FrameBufferManager& manager)
+  : impl (manager.impl)
 {
 }
 
@@ -20,775 +68,252 @@ FrameBufferManager::~FrameBufferManager ()
 }
 
 /*
-    Работа с теневыми буферами
+    Получение менеджера контекстов
 */
 
-FrameBufferManager::ColorBufferPtr FrameBufferManager::CreateColorBuffer (SwapChainDepthStencilBuffer* depth_stencil_buffer)
+const ContextManager& FrameBufferManager::GetContextManager () const
 {
-  xtl::com_ptr<ISwapChain> swap_chain (GetContextManager ().CreateCompatibleSwapChain (depth_stencil_buffer->GetContextId ()), false);
-
-  return ColorBufferPtr (new SwapChainColorBuffer (GetContextManager (), swap_chain.get (), 1), false);
+  return impl->GetContextManager ();
 }
 
-FrameBufferManager::DepthStencilBufferPtr FrameBufferManager::CreateDepthStencilBuffer (SwapChainColorBuffer* color_buffer)
+ContextManager& FrameBufferManager::GetContextManager ()
 {
-  return DepthStencilBufferPtr (new SwapChainDepthStencilBuffer (GetContextManager (), color_buffer->GetSwapChain ()), false);
-}
-
-namespace
-{
-
-template <class List> class list_remover
-{
-  public:
-    typedef typename List::iterator Iter;  
-  
-    list_remover (List& in_list, Iter in_iter) : list (in_list), iter (in_iter) {}
-  
-    void operator () () const { list.erase (iter); }
-    
-  private:
-    List& list;
-    Iter  iter;
-};
-
-}
-
-FrameBufferManager::ColorBufferPtr FrameBufferManager::GetShadowBuffer (SwapChainDepthStencilBuffer* depth_stencil_buffer)
-{
-  ContextManager& manager    = GetContextManager ();
-  size_t          context_id = depth_stencil_buffer->GetContextId ();
-  
-    //попытка найти совместимый по формату буфер цвета
-  
-  for (ColorBufferList::iterator iter=shadow_color_buffers.begin (), end=shadow_color_buffers.end (); iter!=end; ++iter)
-    if (manager.IsCompatible (context_id, (*iter)->GetSwapChain ()))
-    {
-        //оптимизация: перемещение найденного узла в начало списка для ускорения повторного поиска
-
-      shadow_color_buffers.splice (shadow_color_buffers.begin (), shadow_color_buffers, iter);
-
-      return *iter;
-    }
-
-    //создание нового буфера цвета
-
-  ColorBufferPtr color_buffer = CreateColorBuffer (depth_stencil_buffer);
-  
-  shadow_color_buffers.push_front (color_buffer.get ());
-
-  try
-  {
-    color_buffer->RegisterDestroyHandler (list_remover<ColorBufferList> (shadow_color_buffers, shadow_color_buffers.begin ()), GetTrackable ());
-  }
-  catch (...)
-  {
-    shadow_color_buffers.pop_front ();
-    throw;
-  }
-
-  return color_buffer;
-}
-
-FrameBufferManager::DepthStencilBufferPtr FrameBufferManager::GetShadowBuffer (SwapChainColorBuffer* color_buffer)
-{
-  ContextManager& manager    = GetContextManager ();
-  ISwapChain*     swap_chain = color_buffer->GetSwapChain ();
-
-    //попытка найти совместимый по формату буфер глубина-трафарет        
-    
-  for (DepthStencilBufferList::iterator iter=shadow_depth_stencil_buffers.begin (), end=shadow_depth_stencil_buffers.end (); iter!=end; ++iter)
-    if (manager.IsCompatible ((*iter)->GetContextId (), swap_chain))
-    {
-        //оптимизация: перемещение найденного узла в начало списка для ускорения повторного поиска
-
-      shadow_depth_stencil_buffers.splice (shadow_depth_stencil_buffers.begin (), shadow_depth_stencil_buffers, iter);
-
-      return *iter;
-    }
-    
-    //создание нового буфера глубина-трафарет
-    
-  DepthStencilBufferPtr depth_stencil_buffer = CreateDepthStencilBuffer (color_buffer);
-  
-  shadow_depth_stencil_buffers.push_front (depth_stencil_buffer.get ());
-
-  try
-  {
-    depth_stencil_buffer->RegisterDestroyHandler (list_remover<DepthStencilBufferList> (shadow_depth_stencil_buffers,
-      shadow_depth_stencil_buffers.begin ()), GetTrackable ());
-  }
-  catch (...)
-  {
-    shadow_depth_stencil_buffers.pop_front ();
-    throw;
-  }
-
-  return depth_stencil_buffer;
-}
-
-void FrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer, DepthStencilBufferPtr& depth_stencil_buffer)
-{
-  ContextManager& manager = GetContextManager ();
-
-  if (!shadow_color_buffers.empty () && !shadow_depth_stencil_buffers.empty ())
-  {
-    for (ColorBufferList::iterator i=shadow_color_buffers.begin (), end=shadow_color_buffers.end (); i!=end; ++i)
-    {
-      ISwapChain* swap_chain = (*i)->GetSwapChain ();
-      
-      for (DepthStencilBufferList::iterator j=shadow_depth_stencil_buffers.begin (), end=shadow_depth_stencil_buffers.end (); j!=end; ++j)
-        if (manager.IsCompatible ((*j)->GetContextId (), swap_chain))
-        {
-          color_buffer         = *i;
-          depth_stencil_buffer = *j;
-
-            //оптимизация: перемещение найденных узлов в начало списка для ускорения повторного поиска
-
-          shadow_color_buffers.splice (shadow_color_buffers.begin (), shadow_color_buffers, i);
-          shadow_depth_stencil_buffers.splice (shadow_depth_stencil_buffers.begin (), shadow_depth_stencil_buffers, j);
-          
-          return;
-        }
-    }
-  }
-
-  if (!shadow_color_buffers.empty ())
-  {
-    color_buffer         = shadow_color_buffers.front ();
-    depth_stencil_buffer = GetShadowBuffer (color_buffer.get ());
-    
-    return;
-  }
-
-  if (!shadow_depth_stencil_buffers.empty ())
-  {
-    depth_stencil_buffer = shadow_depth_stencil_buffers.front ();
-    color_buffer         = GetShadowBuffer (depth_stencil_buffer.get ());
-    
-    return;
-  }
-
-    //создание новой пары буферов
-
-  SwapChainPtr          swap_chain (GetContextManager ().CreateCompatibleSwapChain (GetDefaultSwapChain ()), false);
-  ColorBufferPtr        new_color_buffer (new SwapChainColorBuffer (manager, swap_chain.get (), 1), false);  
-  DepthStencilBufferPtr new_depth_stencil_buffer = GetShadowBuffer (new_color_buffer.get ());
-
-  shadow_color_buffers.push_front (new_color_buffer.get ());
-
-  try
-  {
-    new_color_buffer->RegisterDestroyHandler (list_remover<ColorBufferList> (shadow_color_buffers, shadow_color_buffers.begin ()), GetTrackable ());
-  }
-  catch (...)
-  {
-    shadow_color_buffers.pop_front ();
-    throw;
-  }
-
-  color_buffer         = new_color_buffer;
-  depth_stencil_buffer = new_depth_stencil_buffer;
-}
-
-SwapChainFrameBuffer* FrameBufferManager::CreateShadowFrameBuffer ()
-{
-  try
-  {
-    ColorBufferPtr        color_buffer;
-    DepthStencilBufferPtr depth_stencil_buffer;
-    
-    GetShadowBuffers (color_buffer, depth_stencil_buffer);
-    
-    return new SwapChainFrameBuffer (GetContextManager (), color_buffer.get (), depth_stencil_buffer.get ());
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateShadowFrameBuffer");
-    
-    throw;
-  }
+  return impl->GetContextManager ();
 }
 
 /*
-    Создание буфера рендеринга
+    Получение цепочки обмена по умолчанию
 */
 
-ITexture* FrameBufferManager::CreateSwapChainRenderBuffer (const TextureDesc& desc)
+ISwapChain* FrameBufferManager::GetDefaultSwapChain () const
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::CreateSwapChainRenderBuffer";
-
-  switch (desc.format)
-  {
-    case PixelFormat_RGB8:
-    case PixelFormat_RGBA8:
-    {
-      try
-      {
-        SwapChainDesc swap_chain_desc;
-        ISwapChain*   default_swap_chain = GetDefaultSwapChain ();
-        
-        default_swap_chain->GetDesc (swap_chain_desc);
-        
-        swap_chain_desc.frame_buffer.width  = desc.width;
-        swap_chain_desc.frame_buffer.height = desc.height;
-
-        SwapChainPtr swap_chain (GetContextManager ().CreateCompatibleSwapChain (default_swap_chain, swap_chain_desc), false);
-
-        return new SwapChainColorBuffer (GetContextManager (), swap_chain.get (), 1);
-      }
-      catch (common::Exception& exception)
-      {
-        exception.Touch (METHOD_NAME);
-        
-        throw;
-      }
-    }
-    case PixelFormat_D16:
-    case PixelFormat_D24X8:
-    case PixelFormat_D24S8:
-    {
-      try
-      {
-        ISwapChain* default_swap_chain = GetDefaultSwapChain ();
-
-        return new SwapChainDepthStencilBuffer (GetContextManager (), default_swap_chain, desc.width, desc.height);
-      }
-      catch (common::Exception& exception)
-      {
-        exception.Touch (METHOD_NAME);
-        
-        throw;
-      }
-    }
-    case PixelFormat_S8:
-    case PixelFormat_L8:
-    case PixelFormat_A8:
-    case PixelFormat_LA8:
-    case PixelFormat_DXT1:
-    case PixelFormat_DXT3:
-    case PixelFormat_DXT5:
-      RaiseNotSupported (METHOD_NAME, "Can not create output-stage texture with format=%s", get_name (desc.format));
-      return 0;
-    default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.format", desc.format);
-      return 0;
-  }
+  return impl->default_swap_chain.get ();
 }
 
-ITexture* FrameBufferManager::CreateFboRenderBuffer (const TextureDesc& desc)
-{
-  try
-  {
-    return new FboRenderBuffer (GetContextManager (), desc.format, desc.width, desc.height);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFboRenderBuffer");
+/*
+    Регистрация обработчиков создания буферов кадра / буферов отрисовки
+*/
 
-    throw;
+void FrameBufferManager::RegisterCreater  (const FrameBufferChecker& checker, const FrameBufferCreater& creater)
+{
+  impl->frame_buffer_factories.push_front (FrameBufferFactory (checker, creater));
+}
+
+void FrameBufferManager::RegisterCreater (const RenderBufferCreater& creater)
+{
+  impl->render_buffer_creater = creater;
+}
+
+void FrameBufferManager::RegisterCreater (const ColorBufferCreater& creater)
+{
+  impl->color_buffer_creater = creater;
+}
+
+void FrameBufferManager::RegisterCreater (const DepthStencilBufferCreater& creater)
+{
+  impl->depth_stencil_buffer_creater = creater;
+}
+
+void FrameBufferManager::UnregisterAllCreaters ()
+{
+  impl->frame_buffer_factories.clear ();
+  impl->render_buffer_creater.clear ();
+  impl->color_buffer_creater.clear ();
+  impl->depth_stencil_buffer_creater.clear ();
+}
+
+/*
+    Создание буфера кадра / буфера рендеринга
+*/
+
+IFrameBuffer* FrameBufferManager::CreateFrameBuffer (View* color_view, View* depth_stencil_view)
+{
+  static const char* METHOD_NAME = "render::low_level::FrameBufferManager::CreateFrameBuffer";
+
+    //поиск фабрики, создающей буфер кадра указанной конфигурации
+
+  for (FrameBufferFactoryList::iterator iter=impl->frame_buffer_factories.begin (), end=impl->frame_buffer_factories.end (); iter!=end; ++iter)
+  {
+    try
+    {    
+        //попытка создания буфера кадра
+
+      if (iter->checker (color_view, depth_stencil_view))
+        return iter->creater (color_view, depth_stencil_view);
+    }
+    catch (common::Exception& exception)
+    {
+      stl::string cfg_name;
+
+      get_configuration_name (color_view, depth_stencil_view, cfg_name);
+
+      exception.Touch ("%s(%s)", METHOD_NAME, cfg_name.c_str ());
+
+      throw;      
+    }
   }
+
+    //буфер не может быть создан, поскольку заданная конфигурация не поддерживается
+
+  stl::string cfg_name;
+
+  get_configuration_name (color_view, depth_stencil_view, cfg_name);    
+
+  RaiseNotSupported (METHOD_NAME, "Frame buffer configuration not supported. %s", cfg_name.c_str ());
+
+  return 0;
 }
 
 ITexture* FrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::CreateRenderBuffer";
-  
-  switch (desc.dimension)
-  {
-    case TextureDimension_2D:
-      break;
-    case TextureDimension_1D:
-    case TextureDimension_3D:
-    case TextureDimension_Cubemap:
-      RaiseNotSupported (METHOD_NAME, "Can not create output-stage texture with dimension %s", get_name (desc.dimension));
-      return 0;
-    default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.dimension", desc.dimension);
-      return 0;
-  }
-  
-  if (desc.layers > 1)
-    RaiseNotSupported (METHOD_NAME, "Could not create output-stage texture with desc.layers=%u", desc.layers);
+  if (!impl->render_buffer_creater)
+    RaiseNotSupported ("render::low_level::opengl::FrameBufferManager::CreateRenderBuffer", "Render buffers not supported");
 
-  if (desc.generate_mips_enable)
-    RaiseNotSupported (METHOD_NAME, "Could not create output-stage texture with automatic mipmap generation");
-
-  try
-  {
-      //выбор текущего контекста
-
-    if (IsSupported (EXT_framebuffer_object)) return CreateFboRenderBuffer (desc);
-    else                                      return CreateSwapChainRenderBuffer (desc);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch (METHOD_NAME);
-
-    throw;
-  }
+  return impl->render_buffer_creater (desc);
 }
 
-ITexture* FrameBufferManager::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
+ITexture* FrameBufferManager::CreateColorBuffer (ISwapChain* swap_chain, size_t index)
 {
-  try
-  {
-    return new SwapChainColorBuffer (GetContextManager (), swap_chain, buffer_index);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateRenderTargetTexture");
+  if (!impl->color_buffer_creater)
+    RaiseNotSupported ("render::low_level::opengl::FrameBufferManager::CreateColorBuffer", "Color buffers not supported");
 
-    throw;
-  }
+  return impl->color_buffer_creater (swap_chain, index);
 }
 
-ITexture* FrameBufferManager::CreateDepthStencilTexture (ISwapChain* swap_chain)
+ITexture* FrameBufferManager::CreateDepthStencilBuffer (ISwapChain* swap_chain)
 {
-  try
-  {
-    return new SwapChainDepthStencilBuffer (GetContextManager (), swap_chain);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateDepthStencilTexture");
+  if (!impl->color_buffer_creater)
+    RaiseNotSupported ("render::low_level::opengl::FrameBufferManager::CreateDepthStencilBuffer", "Depth-stencil buffers not supported");
 
-    throw;
-  }
+  return impl->depth_stencil_buffer_creater (swap_chain);
 }
 
 /*
-    Диспетчеры создания буферов кадра
+    Установка активного буфера кадра
 */
 
-template <class T>
-FrameBuffer* FrameBufferManager::CreateFrameBufferImpl
- (const T&        render_target,
-  const ViewDesc& render_target_desc,
-  View*           depth_stencil_view)
+void FrameBufferManager::SetFrameBuffer
+ (size_t      context_id,
+  ISwapChain* draw_swap_chain,
+  GLenum      draw_buffer_type,
+  ISwapChain* read_swap_chain,
+  GLenum      read_buffer_type)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::CreateFrameBuffer";
-
-  ViewType depth_stencil_type = depth_stencil_view ? depth_stencil_view->GetType () : ViewType_Null;
+  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::SetFrameBuffer(size_t,ISwapChain*,...)";
   
-  ViewDesc depth_stencil_desc;
+  if (!draw_swap_chain)
+    draw_buffer_type = GL_NONE;
+    
+  if (!read_swap_chain)
+    read_buffer_type = GL_NONE;
+    
+    //установка активного контекста
+
+  ContextManager& context_manager = impl->GetContextManager ();        
+
+  context_manager.SetContext (context_id, draw_swap_chain, read_swap_chain);    
+
+    //проверка необходимости переустановки буфера
+
+  ContextDataTable &state_cache              = context_manager.GetContextDataTable (Stage_Output);
+  size_t           &current_draw_buffer_type = state_cache [OutputStageCache_DrawBufferAttachment],
+                   &current_read_buffer_type = state_cache [OutputStageCache_ReadBufferAttachment],
+                   &current_fbo              = state_cache [OutputStageCache_FrameBufferId];
+
+  if (current_draw_buffer_type == draw_buffer_type && current_read_buffer_type == read_buffer_type && !current_fbo)
+    return;
+
+    //установка текущего контекста OpenGL
+
+  context_manager.MakeContextCurrent ();
   
-  if (depth_stencil_view)
-  {
-      //получение дескриптора отображения
+    //установка буфера кадра по умолчанию
     
-    depth_stencil_view->GetDesc (depth_stencil_desc);
-    
-      //получение дескриптора текстуры
+  static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
+  
+  if (context_manager.IsSupported (EXT_framebuffer_object) && current_fbo)
+    glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
 
-    TextureDesc texture_desc;
+    //установка текущего буфера чтения и отрисовки
     
-    depth_stencil_view->GetTexture ()->GetDesc (texture_desc);
+  if (current_draw_buffer_type != draw_buffer_type)
+    glDrawBuffer (draw_buffer_type);
     
-      //проверка формата
-      
-    switch (texture_desc.format)
-    {
-      case PixelFormat_D16:
-      case PixelFormat_D24X8:
-      case PixelFormat_D24S8:
-      case PixelFormat_S8:
-        break;      
-      default:
-        RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view format=%s", get_name (texture_desc.format));
-        break;
-    }    
-  }
+  if (current_read_buffer_type != read_buffer_type)
+    glReadBuffer (read_buffer_type);    
 
-  switch (depth_stencil_type)
-  {
-    case ViewType_Null:
-    {
-      ViewDesc null_view_desc;
-      
-      memset (&null_view_desc, 0, sizeof (null_view_desc));
-      
-      return CreateFrameBuffer (render_target, render_target_desc, NullView (), null_view_desc);
-    }
-    case ViewType_SwapChainColorBuffer:
-      RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type 'ViewType_SwapChainColorBuffer'");
-      return 0;
-    case ViewType_SwapChainDepthStencilBuffer:
-      return CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetSwapChainDepthStencilBuffer (),
-                                depth_stencil_desc);
-    case ViewType_RenderTargetTexture:
-      return CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetRenderTargetTexture (), depth_stencil_desc);
-    case ViewType_FboRenderBuffer:
-      return CreateFrameBuffer (render_target, render_target_desc, depth_stencil_view->GetFboRenderBuffer (), depth_stencil_desc);
-    default:
-      RaiseNotSupported (METHOD_NAME, "Unsupported depth-stencil view type '%s'", typeid (depth_stencil_view->GetTexture ()).name ());
-      return 0;
-  }
+    //проверка ошибок
+
+  context_manager.CheckErrors (METHOD_NAME);
+
+    //установка значений кэш-переменных  
+    
+  current_fbo              = 0;
+  current_draw_buffer_type = draw_buffer_type;
+  current_read_buffer_type = read_buffer_type;
 }
 
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (View* render_target_view, View* depth_stencil_view)
+void FrameBufferManager::SetFrameBuffer (size_t context_id, ISwapChain* swap_chain, GLenum buffer_type)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::CreateFrameBuffer";
+  SetFrameBuffer (context_id, swap_chain, buffer_type, swap_chain, buffer_type);
+}
 
-  ViewType render_target_type = render_target_view ? render_target_view->GetType () : ViewType_Null;
+void FrameBufferManager::SetFrameBuffer (size_t fbo_id, size_t cache_id)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::SetFrameBuffer(size_t)";
 
-  ViewDesc render_target_desc;
-
-  if (render_target_view)
-  {
-      //получение дескриптора отображения
-
-    render_target_view->GetDesc (render_target_desc);    
+    //выбор активного контекста
     
-      //получение дескриптора текстуры
+  ContextManager& context_manager = impl->GetContextManager ();
+  
+    //проверка необходимости переустановки буфера
 
-    TextureDesc texture_desc;
-    
-    render_target_view->GetTexture ()->GetDesc (texture_desc);        
-    
-      //проверка формата
-      
-    switch (texture_desc.format)
-    {
-      case PixelFormat_RGB8:
-      case PixelFormat_RGBA8:
-      case PixelFormat_L8:
-      case PixelFormat_A8:
-      case PixelFormat_LA8:
-      case PixelFormat_DXT1:
-      case PixelFormat_DXT3:
-      case PixelFormat_DXT5:
-        break;      
-      default:
-        RaiseNotSupported (METHOD_NAME, "Unsupported render-target view format=%s", get_name (texture_desc.format));
-        break;
-    }
-  }
+  ContextDataTable &state_cache = context_manager.GetContextDataTable (Stage_Output);
+  size_t           &current_id  = state_cache [OutputStageCache_FrameBufferId];
+  
+  if (current_id == cache_id)
+    return;
 
-  switch (render_target_type)
-  {
-    case ViewType_Null:
-    {
-      ViewDesc null_view_desc;
-      
-      memset (&null_view_desc, 0, sizeof (null_view_desc));
-      
-      return CreateFrameBufferImpl (NullView (), null_view_desc, depth_stencil_view);
-    }
-    case ViewType_SwapChainColorBuffer:
-      return CreateFrameBufferImpl (render_target_view->GetSwapChainColorBuffer (), render_target_desc, depth_stencil_view);
-    case ViewType_SwapChainDepthStencilBuffer:
-      RaiseNotSupported (METHOD_NAME, "Unsupported render-target view type 'ViewType_SwapChainDepthStencilBuffer'");
-      return 0;
-    case ViewType_RenderTargetTexture:
-      return CreateFrameBufferImpl (render_target_view->GetRenderTargetTexture (), render_target_desc, depth_stencil_view);
-    case ViewType_FboRenderBuffer:
-      return CreateFrameBufferImpl (render_target_view->GetFboRenderBuffer (), render_target_desc, depth_stencil_view);
-    default:
-      RaiseNotSupported (METHOD_NAME, "Unsupported render-target view type '%s'", typeid (render_target_view->GetTexture ()).name ());
-      return 0;
-  }
+    //установка текущего контекста  
+
+  context_manager.MakeContextCurrent ();
+
+    //проверка наличия необходимого расширения
+
+  static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
+
+  if (!context_manager.IsSupported (EXT_framebuffer_object))
+    RaiseNotSupported (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
+
+    //установка буфера в контекст OpenGL
+
+  glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, fbo_id);
+
+    //проверка ошибок
+
+  context_manager.CheckErrors (METHOD_NAME);
+
+    //установка значений кэш-переменных
+
+  current_id = cache_id;
 }
 
 /*
-    Создание буферов кадра в различных конфигураций
+    Проверки наличия активных буферов цвета и попиксельного отсечения
 */
 
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, NullView, const ViewDesc&)
+void FrameBufferManager::SetFrameBufferActivity (bool color_buffer_state, bool depth_stencil_buffer_state)
 {
-  try
-  {
-    return new NullFrameBuffer (GetContextManager ());
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(NullView,NullView)");
-    
-    throw;
-  }
+  impl->is_active_color_buffer         = color_buffer_state;
+  impl->is_active_depth_stencil_buffer = depth_stencil_buffer_state;
 }
 
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, SwapChainDepthStencilBuffer* depth_stencil_buffer, const ViewDesc&)
+bool FrameBufferManager::IsActiveColorBuffer () const
 {
-  try
-  {
-    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), GetShadowBuffer (depth_stencil_buffer).get (),
-                                                                   depth_stencil_buffer);
-
-    frame_buffer->SetBuffersState (false, true);
-    
-    return frame_buffer;
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(NullView,SwapChainDepthStencilBuffer*)");
-    
-    throw;
-  }
+  return impl->is_active_color_buffer;
 }
 
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, IRenderTargetTexture* texture, const ViewDesc& desc)
+bool FrameBufferManager::IsActiveDepthStencilBuffer () const
 {
-  try
-  {
-    if (IsSupported (EXT_framebuffer_object))
-    {
-      return new FboFrameBuffer (GetContextManager (), NullView (), texture, desc);
-    }
-    else
-    {
-      SwapChainFrameBuffer* frame_buffer = CreateShadowFrameBuffer ();
-
-      frame_buffer->SetBuffersState  (false, true);
-      frame_buffer->SetRenderTargets (0, 0, texture, &desc);
-
-      return frame_buffer;
-    }
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(NullView,IRenderTargetTexture*)");
-
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (NullView, const ViewDesc&, FboRenderBuffer* render_buffer, const ViewDesc&)
-{
-  try
-  {
-    if (!IsSupported (EXT_framebuffer_object))
-      RaiseNotSupported ("", "GL_EXT_framebuffer_object not supported");
-    
-    return new FboFrameBuffer (GetContextManager (), NullView (), render_buffer);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(NullView,FboRenderBuffer*)");
-    
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer* color_buffer, const ViewDesc&, NullView, const ViewDesc&)
-{
-  try
-  {
-    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), color_buffer,
-                                                                   GetShadowBuffer (color_buffer).get ());
-    
-    frame_buffer->SetBuffersState (true, false);
-    
-    return frame_buffer;
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(SwapChainColorBuffer*,NullView)");
-
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer* color_buffer, const ViewDesc&, SwapChainDepthStencilBuffer* depth_stencil_buffer, const ViewDesc&)
-{
-  try
-  {
-    return new SwapChainFrameBuffer (GetContextManager (), color_buffer, depth_stencil_buffer);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(SwapChainColorBuffer*,SwapChainDepthStencilBuffer*)");
-
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer* color_buffer, const ViewDesc&, IRenderTargetTexture* texture, const ViewDesc& desc)
-{
-  try
-  {
-    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), color_buffer,
-                                                                   GetShadowBuffer (color_buffer).get ());
-
-    frame_buffer->SetRenderTargets (0, 0, texture, &desc);
-
-    return frame_buffer;
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(SwapChainColorBuffer*,IRenderTargetTexture*)");
-
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (SwapChainColorBuffer*, const ViewDesc&, FboRenderBuffer*, const ViewDesc&)
-{
-  RaiseNotSupported ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(SwapChainColorBuffer*,FboRenderBuffer*)",
-                     "Incompatible configuration SwapChainColorBuffer with FboRenderBuffer");
-
-  return 0;
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (IRenderTargetTexture* texture, const ViewDesc& desc, NullView, const ViewDesc&)
-{
-  try
-  {
-    if (IsSupported (EXT_framebuffer_object))
-    {
-      return new FboFrameBuffer (GetContextManager (), texture, desc, NullView ());
-    }
-    else
-    {
-      SwapChainFrameBuffer* frame_buffer = CreateShadowFrameBuffer ();
-
-      frame_buffer->SetBuffersState  (true, false);
-      frame_buffer->SetRenderTargets (texture, &desc, 0, 0);
-
-      return frame_buffer;
-    }
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IRenderTargetTexture*,NullView)");
-    
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (IRenderTargetTexture* texture, const ViewDesc& desc, SwapChainDepthStencilBuffer* depth_stencil_buffer, const ViewDesc&)
-{
-  try
-  {
-    SwapChainFrameBuffer* frame_buffer = new SwapChainFrameBuffer (GetContextManager (), GetShadowBuffer (depth_stencil_buffer).get (),
-                                                                   depth_stencil_buffer);
-
-    frame_buffer->SetRenderTargets (texture, &desc, 0, 0);
-
-    return frame_buffer;
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IRenderTargetTexture*,SwapChainDepthStencilBuffer*)");
-
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer
- (IRenderTargetTexture* render_target_texture,
-  const ViewDesc&   render_target_desc,
-  IRenderTargetTexture* depth_stencil_texture,
-  const ViewDesc&   depth_stencil_desc)
-{
-  try
-  {
-    if (IsSupported (EXT_framebuffer_object))
-    {
-      return new FboFrameBuffer (GetContextManager (), render_target_texture, render_target_desc, depth_stencil_texture,
-                                 depth_stencil_desc);
-    }
-    else
-    {
-      SwapChainFrameBuffer* frame_buffer = CreateShadowFrameBuffer ();
-      
-      frame_buffer->SetRenderTargets (render_target_texture, &render_target_desc, depth_stencil_texture, &depth_stencil_desc);
-      
-      return frame_buffer;
-    }
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IRenderTargetTexture*,IRenderTargetTexture*)");
-
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer
- (IRenderTargetTexture* render_target_texture,
-  const ViewDesc&   render_target_desc,
-  FboRenderBuffer*  depth_stencil_buffer,
-  const ViewDesc&)
-{
-  try
-  {
-    if (!IsSupported (EXT_framebuffer_object))
-      RaiseNotSupported ("", "GL_EXT_framebuffer_object not supported");    
-    
-    return new FboFrameBuffer (GetContextManager (), render_target_texture, render_target_desc, depth_stencil_buffer);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(IRenderTargetTexture*,FboRenderBuffer*)");
-    
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (FboRenderBuffer* color_buffer, const ViewDesc&, NullView, const ViewDesc&)
-{
-  try
-  {
-    if (!IsSupported (EXT_framebuffer_object))
-      RaiseNotSupported ("", "GL_EXT_framebuffer_object not supported");    
-    
-    return new FboFrameBuffer (GetContextManager (), color_buffer, NullView ());
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,NullView)");
-    
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer (FboRenderBuffer*, const ViewDesc&, SwapChainDepthStencilBuffer*, const ViewDesc&)
-{
-  RaiseNotSupported ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,SwapChainDepthStencilBuffer*)",
-                     "Incompatible configuration FboRenderBuffer with SwapChainDepthStencilBuffer");
-
-  return 0;
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer
- (FboRenderBuffer*  color_buffer,
-  const ViewDesc&,
-  IRenderTargetTexture* depth_stencil_texture,
-  const ViewDesc&   depth_stencil_desc)
-{
-  try
-  {
-    if (!IsSupported (EXT_framebuffer_object))
-      RaiseNotSupported ("", "GL_EXT_framebuffer_object not supported");    
-    
-    return new FboFrameBuffer (GetContextManager (), color_buffer, depth_stencil_texture, depth_stencil_desc);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,IRenderTargetTexture*)");
-
-    throw;
-  }
-}
-
-FrameBuffer* FrameBufferManager::CreateFrameBuffer
- (FboRenderBuffer* color_buffer,
-  const ViewDesc&,
-  FboRenderBuffer* depth_stencil_buffer,
-  const ViewDesc&)
-{
-  try
-  {
-    if (!IsSupported (EXT_framebuffer_object))
-      RaiseNotSupported ("", "GL_EXT_framebuffer_object not supported");    
-    
-    return new FboFrameBuffer (GetContextManager (), color_buffer, depth_stencil_buffer);
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("render::low_level::opengl::FrameBufferManager::CreateFrameBuffer(FboRenderBuffer*,FboRenderBuffer*)");
-    
-    throw;
-  }
+  return impl->is_active_depth_stencil_buffer;
 }

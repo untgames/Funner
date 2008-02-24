@@ -386,11 +386,20 @@ bool Device::GetPredicateValue ()
 
 void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout)
 {
-  output_stage.Bind ();
-  input_stage.Bind (base_vertex, base_index, out_indices_layout);
-  rasterizer_stage.Bind ();
-  texture_manager.Bind ();
-  shader_stage.Bind ();
+  try
+  {
+    output_stage.Bind ();
+    output_stage.InvalidateRenderTargets (rasterizer_stage.GetViewport ());
+    input_stage.Bind (base_vertex, base_index, out_indices_layout);
+    rasterizer_stage.Bind ();
+    texture_manager.Bind ();
+    shader_stage.Bind ();
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::Bind");
+    throw;
+  }
 }
 
 /*
@@ -479,8 +488,25 @@ void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size
 
 void Device::Flush ()
 {
-  context_manager.MakeContextCurrent ();
-  glFinish ();
+  try
+  {
+      //установка текущего контекста
+
+    context_manager.MakeContextCurrent ();
+    
+      //сброс очереди команд
+    
+    glFlush ();  
+
+      //обновление целевых буферов отрисовки
+
+    output_stage.UpdateRenderTargets ();
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::Flush");
+    throw;
+  }
 }
 
 /*

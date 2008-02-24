@@ -88,7 +88,7 @@ int main ()
         memset (&texture_desc, 0, sizeof (texture_desc));
 
         texture_desc.dimension  = (TextureDimension)dim;
-        texture_desc.bind_flags = BindFlag_Texture;        
+        texture_desc.bind_flags = BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil;
 
         switch (dim)
         {
@@ -211,11 +211,12 @@ int main ()
         printf (": ");
 
         try
-        {        
+        {
           test.device->OSSetRenderTargets (color_view.get (), depth_stencil_view.get ());
-          
+          test.device->Draw (PrimitiveType_PointList, 0, 0);
+
           status [i*views.size () + j] = true;
-          
+
           printf ("Ok!\n");          
         }
         catch (std::exception& exception)

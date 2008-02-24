@@ -94,6 +94,9 @@ void redraw (Test& test)
 
 void idle (Test& test)
 {
+  if (test.window.IsClosed ())
+    return;
+
   static const   float DT = 0.01f;
   static float   t = 0;
   static clock_t last = 0;
@@ -153,7 +156,7 @@ int main ()
     BufferDesc vb_desc;
     
     memset (&vb_desc, 0, sizeof vb_desc);
-    
+           
     vb_desc.size         = sizeof MyVertex * VERTICES_COUNT;
     vb_desc.usage_mode   = UsageMode_Default;
     vb_desc.bind_flags   = BindFlag_VertexBuffer;
@@ -257,12 +260,7 @@ int main ()
 
     printf ("Main loop\n");
 
-    while (1)
-    {
-      syslib::Application::DoEvents ();
-      idle (test);
-    }
-//    syslib::Application::Run ();
+    syslib::Application::Run ();
   }
   catch (std::exception& e)
   {

@@ -60,6 +60,11 @@ void ScaledTexture::GetDesc (RenderTargetTextureDesc& out_desc)
   shadow_texture->GetDesc (out_desc);
 }
 
+void ScaledTexture::GetMipLevelDesc (size_t level, MipLevelDesc& out_desc)
+{
+  shadow_texture->GetMipLevelDesc (level, out_desc);
+}
+
 /*
     Установка / получение номера прикрепленного сэмплера
 */

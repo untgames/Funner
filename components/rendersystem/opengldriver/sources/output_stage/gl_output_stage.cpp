@@ -13,14 +13,14 @@ namespace
 
 struct FrameBufferHolder: public xtl::trackable, public xtl::reference_counter
 {
-  View*        render_target_view; //целевое отображение буфера цвета
-  View*        depth_stencil_view; //целевое отображение буфера глубина-трафарет
-  FrameBuffer* frame_buffer;       //буфер кадра
+  View*         render_target_view; //целевое отображение буфера цвета
+  View*         depth_stencil_view; //целевое отображение буфера глубина-трафарет
+  IFrameBuffer* frame_buffer;       //буфер кадра
 
   FrameBufferHolder (View* in_render_target_view, View* in_depth_stencil_view, FrameBufferManager& manager) :
     render_target_view (in_render_target_view),
     depth_stencil_view (in_depth_stencil_view),
-    frame_buffer       (manager.CreateFrameBuffer (in_render_target_view, in_depth_stencil_view)) { }  
+    frame_buffer       (manager.CreateFrameBuffer (in_render_target_view, in_depth_stencil_view)) { }
 };
 
 /*
@@ -66,32 +66,27 @@ class OutputStageState
       //получение значения ссылки трафарета
     size_t GetStencilReference () const { return stencil_reference; }
 
-      //установка текущего хранилища буфера кадра
-    void SetFrameBufferHolder (FrameBufferHolder* in_frame_buffer_holder)
+      //установка текущих отображений отрисовки
+    void SetRenderTargets (View* in_render_target_view, View* in_depth_stencil_view)
     {
-      if (frame_buffer_holder == in_frame_buffer_holder)
-        return;        
+      if (render_target_view == in_render_target_view && depth_stencil_view == in_depth_stencil_view)
+        return;
 
-      frame_buffer_holder = in_frame_buffer_holder;
+      render_target_view = in_render_target_view;
+      depth_stencil_view = in_depth_stencil_view;
     }
-    
-      //получение текущего хранилища буфера кадра
-    FrameBufferHolder* GetFrameBufferHolder () const { return frame_buffer_holder.get (); }
-    
-      //получение текущего буфера кадра
-    FrameBuffer* GetFrameBuffer () const { return frame_buffer_holder ? frame_buffer_holder->frame_buffer : 0; }
 
       //получение текущего отображения буфера цвета
-    View* GetRenderTargetView () const { return frame_buffer_holder ? frame_buffer_holder->render_target_view : 0; }
-    
-      //получение текущего отображения буфера глубина-трафарет
-    View* GetDepthStencilView () const { return frame_buffer_holder ? frame_buffer_holder->depth_stencil_view : 0; }        
+    View* GetRenderTargetView () const { return render_target_view.get (); }
+
+      //получение текущего отображения буфера попиксельного отсечения
+    View* GetDepthStencilView () const { return depth_stencil_view.get (); }
 
   private:
     OutputStageState (const OutputStageState&); //no impl        
 
   private:    
-    typedef xtl::trackable_ptr<FrameBufferHolder> FrameBufferHolderPtr;
+    typedef xtl::trackable_ptr<View>              ViewPtr;
     typedef xtl::trackable_ptr<BlendState>        BlendStatePtr;
     typedef xtl::trackable_ptr<DepthStencilState> DepthStencilStatePtr;
 
@@ -99,7 +94,20 @@ class OutputStageState
     BlendStatePtr        blend_state;         //текущее состояние подуровня смешивания цветов
     DepthStencilStatePtr depth_stencil_state; //текущее состояние подуровня попиксельного отсечения
     size_t               stencil_reference;   //текущее значение трафарета
-    FrameBufferHolderPtr frame_buffer_holder; //текущее хранилище буфера кадра
+    ViewPtr              render_target_view;  //текущее отображение буфера цвета
+    ViewPtr              depth_stencil_view;  //текущее отображение буфера попиксельного отсечения
+};
+
+/*
+    Хранилище для менеджера буферов кадра
+*/
+
+struct FrameBufferManagerHolder
+{
+  FrameBufferManager frame_buffer_manager;  //менеджер буферов кадра
+
+  FrameBufferManagerHolder (const ContextManager& manager, ISwapChain* default_swap_chain) : frame_buffer_manager (manager, default_swap_chain) {}
+  ~FrameBufferManagerHolder () { frame_buffer_manager.UnregisterAllCreaters (); }  
 };
 
 }
@@ -108,350 +116,436 @@ class OutputStageState
     Описание реализации выходного уровня конвейера OpenGL
 */
 
-typedef xtl::intrusive_ptr<FrameBufferHolder> FrameBufferHolderPtr;
-typedef xtl::com_ptr<View>                    ViewPtr;
-typedef stl::list<FrameBufferHolderPtr>       FrameBufferHolderList;
-typedef xtl::com_ptr<ISwapChain>              SwapChainPtr;
-typedef xtl::com_ptr<BlendState>              BlendStatePtr;
-typedef xtl::com_ptr<DepthStencilState>       DepthStencilStatePtr;
-
-struct OutputStage::Impl: public ContextObject
+struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
 {
-  OutputStageState      state;                       //состояние уровня
-  FrameBufferManager    frame_buffer_manager;        //менеджер буферов кадра
-  FrameBufferHolderList frame_buffers;               //буферы кадра
-  ViewPtr               default_render_target_view;  //отображение буфера цвета по умолчанию
-  ViewPtr               default_depth_stencil_view;  //отображение буфера глубина-трафарет по умолчанию
-  BlendStatePtr         default_blend_state;         //состояние подуровня смешивания цветов по умолчанию
-  BlendStatePtr         null_blend_state;            //состояние подуровня смешивания цветов соотв. отключению подуровня
-  DepthStencilStatePtr  default_depth_stencil_state; //состояние подуровня попиксельного отсечения по умолчанию
-  DepthStencilStatePtr  null_depth_stencil_state;    //состояние подуровня попиксельного отсечения соотв. отключению подуровня
-
-  Impl (ContextManager& context_manager, ISwapChain* swap_chain) :
-    ContextObject (context_manager),
-    frame_buffer_manager (context_manager, swap_chain)
-  {
-      //инициализация отображений
-      
-    xtl::com_ptr<ITexture> color_texture (frame_buffer_manager.CreateRenderTargetTexture (swap_chain, 1), false),
-                           depth_stencil_texture (frame_buffer_manager.CreateDepthStencilTexture (swap_chain), false);
-
-    ViewDesc view_desc;
-
-    memset (&view_desc, 0, sizeof (view_desc));
-
-    default_render_target_view = ViewPtr (CreateView (color_texture.get (), view_desc), false);
-    default_depth_stencil_view = ViewPtr (CreateView (depth_stencil_texture.get (), view_desc), false);
-
-    SetRenderTargets (default_render_target_view.get (), default_depth_stencil_view.get ());
-    
-      //установка текущего контекста      
-      
-    if (state.GetFrameBuffer ())
+  public:
+    Impl (ContextManager& context_manager, ISwapChain* swap_chain) :
+      ContextObject (context_manager),
+      FrameBufferManagerHolder (context_manager, swap_chain),
+      need_update_render_targets (false)
     {
-      bool buffer_state [2];
+        //регистрация менеджера буферов кадра по умолчанию
+        
+      register_swap_chain_manager (frame_buffer_manager);
+
+        //инициализация отображений
+        
+      xtl::com_ptr<ITexture> color_texture (frame_buffer_manager.CreateColorBuffer (swap_chain, 1), false),
+                             depth_stencil_texture (frame_buffer_manager.CreateDepthStencilBuffer (swap_chain), false);
+                             
+      ViewDesc view_desc;
+
+      memset (&view_desc, 0, sizeof (view_desc));
+
+      default_render_target_view = ViewPtr (CreateView (color_texture.get (), view_desc), false);
+      default_depth_stencil_view = ViewPtr (CreateView (depth_stencil_texture.get (), view_desc), false);    
+
+      SetRenderTargets (default_render_target_view.get (), default_depth_stencil_view.get ());
       
-      state.GetFrameBuffer ()->Bind (buffer_state [0], buffer_state [1]);
+        //установка текущего буфера кадров
+
+      BindRenderTargets ();
+      
+        //регистрация дополнительного менеджера буферов кадра
+        
+      static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
+
+      if (IsSupported (EXT_framebuffer_object))
+        register_fbo_manager (frame_buffer_manager);
+
+        //инициализация BlendState
+          
+      BlendDesc blend_desc;
+      
+      memset (&blend_desc, 0, sizeof (blend_desc));
+
+      blend_desc.blend_enable     = false;
+      blend_desc.color_write_mask = ColorWriteFlag_All;
+
+      default_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);
+      
+      blend_desc.color_write_mask = 0;
+      
+      null_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);
+      
+        //инициализация DepthStencilState
+        
+      DepthStencilDesc depth_stencil_desc;
+      
+      memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
+      
+      depth_stencil_desc.depth_test_enable  = true;
+      depth_stencil_desc.depth_write_enable = true;
+      depth_stencil_desc.depth_compare_mode = CompareMode_Less;
+      
+      default_depth_stencil_state = DepthStencilStatePtr (new DepthStencilState (GetContextManager (), depth_stencil_desc), false);
+      
+      depth_stencil_desc.depth_test_enable  = false;
+      depth_stencil_desc.depth_write_enable = false;
+      depth_stencil_desc.depth_compare_mode = CompareMode_AlwaysPass;
+      
+      null_depth_stencil_state = DepthStencilStatePtr (new DepthStencilState (GetContextManager (), depth_stencil_desc), false);
+      
+        //установка состояния по умолчанию
+
+      SetBlendState (&*default_blend_state);
+      SetDepthStencilState (&*default_depth_stencil_state);
+    }    
+    
+      //получение текущего состояния уровня
+    OutputStageState& GetCurrentState () { return state; }
+    
+      //создание отображения
+    View* CreateView (ITexture* texture, const ViewDesc& desc)
+    {
+      ViewPtr view (new View (GetContextManager (), texture, desc), false);
+
+      AddView (view);
+
+      view->AddRef ();
+
+      return view.get ();
+    }
+    
+      //установка текущих отображений
+    void SetRenderTargets (IView* in_render_target_view, IView* in_depth_stencil_view)
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::OutputStage::Impl::SetRenderTargets";
+      
+        //приведение типов отображений
+
+      View *render_target_view = cast_object<View> (GetContextManager (), in_render_target_view, METHOD_NAME, "render_target_view"),
+           *depth_stencil_view = cast_object<View> (GetContextManager (), in_depth_stencil_view, METHOD_NAME, "depth_stencil_view");
+
+        //обновление текущего состояния уровня
+
+      state.SetRenderTargets (render_target_view, depth_stencil_view);      
+
+        //установка флага необходимости обновления целевых буферов отрисовки
+
+      need_update_render_targets = true;
+    }
+
+      //установка текущего состояния подуровня смешивания цветов
+    void SetBlendState (IBlendState* in_blend_state)
+    {
+      BlendState* blend_state = cast_object<BlendState> (*this, in_blend_state, "render::low_level::opengl::OutputStage::SetBlendState", "blend_state");
+      
+      state.SetBlendState (blend_state);
     }
       
-      //инициализация BlendState
-        
-    BlendDesc blend_desc;
+      //получение текущего состояния подуровня смешивания цветов
+    IBlendState* GetBlendState () { return state.GetBlendState (); }  
     
-    memset (&blend_desc, 0, sizeof (blend_desc));
-
-    blend_desc.blend_enable     = false;
-    blend_desc.color_write_mask = ColorWriteFlag_All;
-
-    default_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);
-    
-    blend_desc.color_write_mask = 0;
-    
-    null_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);
-    
-      //инициализация DepthStencilState
-      
-    DepthStencilDesc depth_stencil_desc;
-    
-    memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
-    
-    depth_stencil_desc.depth_test_enable  = true;
-    depth_stencil_desc.depth_write_enable = true;
-    depth_stencil_desc.depth_compare_mode = CompareMode_Less;
-    
-    default_depth_stencil_state = DepthStencilStatePtr (new DepthStencilState (GetContextManager (), depth_stencil_desc), false);
-    
-    depth_stencil_desc.depth_test_enable  = false;
-    depth_stencil_desc.depth_write_enable = false;
-    depth_stencil_desc.depth_compare_mode = CompareMode_AlwaysPass;
-    
-    null_depth_stencil_state = DepthStencilStatePtr (new DepthStencilState (GetContextManager (), depth_stencil_desc), false);
-    
-      //установка состояния по умолчанию
-
-    SetBlendState (&*default_blend_state);
-    SetDepthStencilState (&*default_depth_stencil_state);
-  }    
-  
-    //получение буфера кадра по отображениям
-  FrameBufferHolder* GetFrameBufferHolder (View* render_target_view, View* depth_stencil_view)
-  {
-      //поиск буфера в списке уже созданных
-    
-    for (FrameBufferHolderList::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)
-      if ((*iter)->render_target_view == render_target_view && (*iter)->depth_stencil_view == depth_stencil_view)
-      {
-          //оптимизация: перемещение найденного узла в начало списка для ускорения повторного поиска
-
-        frame_buffers.splice (frame_buffers.begin (), frame_buffers, iter);
-
-        return &**iter;
-      }
-      
-      //создание нового буфера кадра
-      
-    FrameBufferHolderPtr frame_buffer_holder (new FrameBufferHolder (render_target_view, depth_stencil_view, frame_buffer_manager), false);  
-
-      //добавление нового буфера кадра в список созданных
-
-    frame_buffers.push_front (frame_buffer_holder);
-
-    return &*frame_buffers.front ();
-  }
-  
-    //добавление отображения
-  void AddView (const xtl::com_ptr<View>& view)
-  {
-    RegisterDestroyHandler (xtl::bind (&Impl::RemoveView, this, view.get ()), GetTrackable ());
-  }
-
-    //удаления отображения
-  void RemoveView (View* view)
-  {
-      //удаление всех буферов кадра, в которых присутствует указанное отображение
-    
-    for (FrameBufferHolderList::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end;)
+      //установка текущего состояния подуровня попиксельного отсечения
+    void SetDepthStencilState (IDepthStencilState* in_depth_stencil_state)
     {
-      if ((*iter)->render_target_view == view || (*iter)->depth_stencil_view == view)
-      {
-        FrameBufferHolderList::iterator tmp = iter;
-        
-        ++tmp;
-        
-        frame_buffers.erase (iter);
-        
-        iter = tmp;
-      }
-      else ++iter;
+      DepthStencilState* depth_stencil_state = cast_object<DepthStencilState> (*this, in_depth_stencil_state,
+        "render::low_level::opengl::OutputStage::SetDepthStencilState", "depth_stencil_state");
+
+      state.SetDepthStencilState (depth_stencil_state);
     }
-  }
-  
-    //создание отображения
-  View* CreateView (ITexture* texture, const ViewDesc& desc)
-  {
-    xtl::com_ptr<View> view (new View (texture, desc), false);        
-
-    AddView (view);
-
-    view->AddRef ();
-
-    return view.get ();
-  }
-  
-    //установка текущих отображений
-  void SetRenderTargets (IView* in_render_target_view, IView* in_depth_stencil_view)
-  {
-    static const char* METHOD_NAME = "render::low_level::opengl::OutputStage::Impl::SetRenderTargets";
     
-      //приведение типов отображений
-
-    View *render_target_view = cast_object<View> (in_render_target_view, METHOD_NAME, "render_target_view"),
-         *depth_stencil_view = cast_object<View> (in_depth_stencil_view, METHOD_NAME, "depth_stencil_view");
-
-      //получение хранилища буфера кадра, связанного с указанными отображениями
-
-    FrameBufferHolder* frame_buffer_holder = GetFrameBufferHolder (render_target_view, depth_stencil_view);
-    
-      //обновление целевых буферов отрисовки
-      
-    if (state.GetFrameBuffer ())
+      //получение текущего состояния подуровня попиксельного отсечения
+    IDepthStencilState* GetDepthStencilState () { return state.GetDepthStencilState (); }
+     
+      //совместная очистка буферов цвета и глубина-трафарет
+    void ClearViews (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)
     {
       try
       {
-        state.GetFrameBuffer ()->UpdateRenderTargets ();
+          //установка активного контекста
+
+        MakeContextCurrent ();      
+        
+          //получение значений кэш переменных
+          
+        ContextDataTable& context_cache = GetContextDataTable (Stage_Output);
+        
+        GLbitfield mask = 0;
+        
+        if (clear_flags & ClearFlag_RenderTarget)
+        {
+          size_t clear_color_hash = crc32 (&color, sizeof color);
+          
+          if (context_cache [OutputStageCache_ClearColorHash] != clear_color_hash)
+          {
+            glClearColor (color.red, color.green, color.blue, color.alpha);
+            
+            context_cache [OutputStageCache_ClearColorHash] = clear_color_hash;
+          }
+          
+          mask |= GL_COLOR_BUFFER_BIT;
+        }
+
+        if (clear_flags & ClearFlag_Depth)
+        {
+          size_t clear_depth_hash = crc32 (&depth, sizeof depth);
+          
+          if (context_cache [OutputStageCache_ClearDepthHash] != clear_depth_hash)
+          {
+            glClearDepth (depth);
+            
+            context_cache [OutputStageCache_ClearDepthHash] = clear_depth_hash;
+          }
+
+          mask |= GL_DEPTH_BUFFER_BIT;        
+        }
+
+        if (clear_flags & ClearFlag_Stencil)
+        {
+          if (context_cache [OutputStageCache_ClearStencilValue] != stencil)
+          {
+            glClearStencil (stencil);
+            
+            context_cache [OutputStageCache_ClearStencilValue] = stencil;
+          }
+
+          mask |= GL_STENCIL_BUFFER_BIT;        
+        }      
+
+        glClear     (mask);
+        CheckErrors ("glClear");
       }
       catch (common::Exception& exception)
       {
-        exception.Touch (METHOD_NAME);
-        LogPrintf ("Exception: %s", exception.Message ());
-      }
-      catch (std::exception& exception)
-      {
-        LogPrintf ("Exception '%s'", exception.what ());
-      }
-      catch (...)
-      {
-        LogPrintf ("Unknown exception at %s", METHOD_NAME);
+        exception.Touch ("render::low_level::opengl::OutputStage::ClearViews");
+
+        throw;
       }
     }
-
-      //установка текущего хранилища буфера кадра
-
-    state.SetFrameBufferHolder (frame_buffer_holder);
-  }
-
-    //установка текущего состояния подуровня смешивания цветов
-  void SetBlendState (IBlendState* in_blend_state)
-  {
-    BlendState* blend_state = cast_object<BlendState> (*this, in_blend_state, "render::low_level::opengl::OutputStage::SetBlendState", "blend_state");
     
-    state.SetBlendState (blend_state);
-  }
-    
-    //получение текущего состояния подуровня смешивания цветов
-  IBlendState* GetBlendState () { return state.GetBlendState (); }  
-  
-    //установка текущего состояния подуровня попиксельного отсечения
-  void SetDepthStencilState (IDepthStencilState* in_depth_stencil_state)
-  {
-    DepthStencilState* depth_stencil_state = cast_object<DepthStencilState> (*this, in_depth_stencil_state,
-      "render::low_level::opengl::OutputStage::SetDepthStencilState", "depth_stencil_state");
-
-    state.SetDepthStencilState (depth_stencil_state);
-  }
-  
-    //получение текущего состояния подуровня попиксельного отсечения
-  IDepthStencilState* GetDepthStencilState () { return state.GetDepthStencilState (); }
-  
-    //очистка текущего буфера цвета
-  void ClearRenderTargetView (const Color4f& color)
-  {
-    try
+      //оповещение об изменении целевых буферов отрисовки
+    void InvalidateRenderTargets (const Rect& update_rect)
     {
-      Bind ();
-      
-      glClearColor (color.red, color.green, color.blue, color.alpha);
-      glClear      (GL_COLOR_BUFFER_BIT);      
-      CheckErrors  ("glClear");
+      GetCurrentFrameBuffer ().InvalidateRenderTargets (update_rect);
     }
-    catch (common::Exception& exception)
-    {
-      exception.Touch ("render::low_level::opengl::OutputStage::ClearRenderTargetView");
 
-      throw;
+      //обновление целевых буферов отрисовки
+    void UpdateRenderTargets ()
+    {
+      if (updatable_frame_buffer_holder)
+        updatable_frame_buffer_holder->frame_buffer->UpdateRenderTargets ();
+
+      need_update_render_targets = false;
     }
-  }
 
-    //очистка буфера глубина-трафарет
-  void ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil)
-  {
-    try
+      //установка состояния уровня в контекст OpenGL
+    void Bind ()
     {
-      Bind ();
+      try
+      {      
+        BindRenderTargets ();
 
-      GLbitfield mask = 0;
+        BlendState*        blend_state         = state.GetBlendState ();
+        DepthStencilState* depth_stencil_state = state.GetDepthStencilState ();
 
-      if (clear_flags & ClearFlag_Depth)
-      {
-        glClearDepth (depth);
+        if (blend_state && frame_buffer_manager.IsActiveColorBuffer ())
+        {
+          blend_state->Bind ();      
+        }
+        else
+        {
+          null_blend_state->Bind ();
+        }
 
-        mask |= GL_DEPTH_BUFFER_BIT;        
+        if (depth_stencil_state && frame_buffer_manager.IsActiveDepthStencilBuffer ())
+        {
+          depth_stencil_state->Bind (state.GetStencilReference ());
+        }
+        else
+        {
+          null_depth_stencil_state->Bind (state.GetStencilReference ());
+        }
       }
-
-      if (clear_flags & ClearFlag_Stencil)
+      catch (common::Exception& exception)
       {
-        glClearStencil (stencil);
+        exception.Touch ("render::low_level::opengl::OutputStage::Bind");
+        throw;
+      }
+    }
+    
+  private:
+    typedef xtl::intrusive_ptr<FrameBufferHolder> FrameBufferHolderPtr;
+    typedef xtl::trackable_ptr<FrameBufferHolder> FrameBufferHolderTrackablePtr;
+    typedef xtl::com_ptr<View>                    ViewPtr;
+    typedef stl::list<FrameBufferHolderPtr>       FrameBufferHolderList;
+    typedef xtl::com_ptr<ISwapChain>              SwapChainPtr;
+    typedef xtl::com_ptr<BlendState>              BlendStatePtr;
+    typedef xtl::com_ptr<DepthStencilState>       DepthStencilStatePtr;
 
-        mask |= GL_STENCIL_BUFFER_BIT;        
+  private:
+      //создание нового буфер кадра
+    FrameBufferHolderPtr CreateFrameBufferHolder (View* render_target_view, View* depth_stencil_view)      
+    {
+      try
+      {
+          //проверка корректности конфигурации
+          
+        if (render_target_view)
+        {
+          if (!(render_target_view->GetBindFlags () & BindFlag_RenderTarget))
+            Raise<ArgumentException> ("", "Render-target view has wrong bind flags %s", get_name ((BindFlag)render_target_view->GetBindFlags ()));
+            
+            //проверка корректности формата пикселей
+            
+          ITexture* texture = render_target_view->GetTexture ();
+            
+          TextureDesc desc;
+          
+          texture->GetDesc (desc);
+          
+          switch (desc.format)
+          {
+            case PixelFormat_RGB8:
+            case PixelFormat_RGBA8:
+            case PixelFormat_L8:
+            case PixelFormat_A8:
+            case PixelFormat_LA8:
+            case PixelFormat_DXT1:
+            case PixelFormat_DXT3:
+            case PixelFormat_DXT5:
+              break;
+            case PixelFormat_D16:
+            case PixelFormat_D24X8:
+            case PixelFormat_D24S8:
+            case PixelFormat_S8:
+              RaiseNotSupported ("", "Unsupported render-target view texture format=%s", get_name (desc.format));
+              break;
+            default:
+              RaiseInvalidArgument ("", "texture_desc.format", desc.format);
+              break;
+          }
+        }
+
+        if (depth_stencil_view)
+        {
+          if (!(depth_stencil_view->GetBindFlags () & BindFlag_DepthStencil))
+            Raise<ArgumentException> ("", "Depth-stencil view has wrong bind flags %s", get_name ((BindFlag)depth_stencil_view->GetBindFlags ()));
+            
+            //проверка корректности формата пикселей
+            
+          ITexture* texture = depth_stencil_view->GetTexture ();
+
+          TextureDesc desc;
+
+          texture->GetDesc (desc);
+
+          switch (desc.format)
+          {
+            case PixelFormat_RGB8:
+            case PixelFormat_RGBA8:
+            case PixelFormat_L8:
+            case PixelFormat_A8:
+            case PixelFormat_LA8:
+            case PixelFormat_DXT1:
+            case PixelFormat_DXT3:
+            case PixelFormat_DXT5:
+              RaiseNotSupported ("", "Unsupported depth-stencil view texture format=%s", get_name (desc.format));
+              break;
+            case PixelFormat_D16:
+            case PixelFormat_D24X8:
+            case PixelFormat_D24S8:
+            case PixelFormat_S8:
+              break;
+            default:
+              RaiseInvalidArgument ("", "texture_desc.format", desc.format);
+              break;
+          }
+        }
+
+        return FrameBufferHolderPtr (new FrameBufferHolder (render_target_view, depth_stencil_view, frame_buffer_manager), false);
+      }
+      catch (common::Exception& exception)
+      {
+        exception.Touch ("render::low_level::opengl::OutputStage::Impl::CreateFrameBufferHolder");
+        throw;
       }      
-
-      glClear     (mask);
-      CheckErrors ("glClear");
     }
-    catch (common::Exception& exception)
-    {
-      exception.Touch ("render::low_level::opengl::OutputStage::ClearDepthStencilView");
-
-      throw;
-    }
-  }
   
-    //совместная очистка буферов цвета и глубина-трафарет
-  void ClearViews (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)
-  {
-    try
-    {
-      Bind ();
+      //получение буфера кадра по отображениям
+    FrameBufferHolder* GetFrameBufferHolder (View* render_target_view, View* depth_stencil_view)
+    {            
+        //поиск буфера в списке уже созданных
       
-      GLbitfield mask = 0;
-      
-      if (clear_flags & ClearFlag_RenderTarget)
-      {
-        glClearColor (color.red, color.green, color.blue, color.alpha);
+      for (FrameBufferHolderList::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)
+        if ((*iter)->render_target_view == render_target_view && (*iter)->depth_stencil_view == depth_stencil_view)
+        {
+            //оптимизация: перемещение найденного узла в начало списка для ускорения повторного поиска
+
+          frame_buffers.splice (frame_buffers.begin (), frame_buffers, iter);
+
+          return &**iter;
+        }        
         
-        mask |= GL_COLOR_BUFFER_BIT;
-      }
+        //создание нового буфера кадра
+        
+      FrameBufferHolderPtr frame_buffer_holder = CreateFrameBufferHolder (render_target_view, depth_stencil_view);
 
-      if (clear_flags & ClearFlag_Depth)
-      {
-        glClearDepth (depth);
+        //добавление нового буфера кадра в список созданных
 
-        mask |= GL_DEPTH_BUFFER_BIT;        
-      }
+      frame_buffers.push_front (frame_buffer_holder);
 
-      if (clear_flags & ClearFlag_Stencil)
-      {
-        glClearStencil (stencil);
-
-        mask |= GL_STENCIL_BUFFER_BIT;        
-      }      
-
-      glClear     (mask);
-      CheckErrors ("glClear");
-    }
-    catch (common::Exception& exception)
+      return &*frame_buffers.front ();
+    }    
+    
+      //добавление отображения
+    void AddView (const xtl::com_ptr<View>& view)
     {
-      exception.Touch ("render::low_level::opengl::OutputStage::ClearViews");
-
-      throw;
+      RegisterDestroyHandler (xtl::bind (&Impl::RemoveView, this, view.get ()), GetTrackable ());
     }
-  }
-  
-    //установка состояния уровня в контекст OpenGL
-  void Bind ()
-  {
-    static const char* METHOD_NAME = "render::low_level::opengl::OutputStage::Bind";
-    
-    FrameBuffer*       frame_buffer        = state.GetFrameBuffer ();
-    BlendState*        blend_state         = state.GetBlendState ();
-    DepthStencilState* depth_stencil_state = state.GetDepthStencilState ();
-    
-    if (!frame_buffer)
-      RaiseInvalidOperation (METHOD_NAME, "No frame-buffer selected (use IDevice::OSSetRenderTargets)");
+
+      //удаления отображения
+    void RemoveView (View* view)
+    {
+        //удаление всех буферов кадра, в которых присутствует указанное отображение
       
-    bool color_buffer_state         = true,
-         depth_stencil_buffer_state = true;
+      for (FrameBufferHolderList::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end;)
+      {
+        if ((*iter)->render_target_view == view || (*iter)->depth_stencil_view == view)
+        {
+          FrameBufferHolderList::iterator tmp = iter;
+          
+          ++tmp;
+          
+          frame_buffers.erase (iter);
+          
+          iter = tmp;
+        }
+        else ++iter;
+      }
+    }
+    
+      //получение текущего буфера кадра
+    IFrameBuffer& GetCurrentFrameBuffer ()
+    {
+      return *GetFrameBufferHolder (state.GetRenderTargetView (), state.GetDepthStencilView ())->frame_buffer;
+    }    
 
-    frame_buffer->Bind (color_buffer_state, depth_stencil_buffer_state);
-    
-    if (blend_state && color_buffer_state)
+      //установка текущих целевых буферов отрисовки в контекст OpenGL
+    void BindRenderTargets ()
     {
-      blend_state->Bind ();      
+      if (need_update_render_targets)
+        UpdateRenderTargets ();
+
+      FrameBufferHolder* frame_buffer_holder = GetFrameBufferHolder (state.GetRenderTargetView (), state.GetDepthStencilView ());
+
+      updatable_frame_buffer_holder = frame_buffer_holder;
+
+      frame_buffer_holder->frame_buffer->Bind ();      
     }
-    else
-    {
-      null_blend_state->Bind ();
-    }
-    
-    if (depth_stencil_state && depth_stencil_buffer_state)
-    {
-      depth_stencil_state->Bind (state.GetStencilReference ());
-    }
-    else
-    {
-      null_depth_stencil_state->Bind (state.GetStencilReference ());
-    }
-  }
+
+  private:
+    OutputStageState              state;                         //состояние уровня
+    FrameBufferHolderList         frame_buffers;                 //буферы кадра
+    bool                          need_update_render_targets;    //флаг, указывающий на необходимость обновления целевых буферов отрисовки
+    FrameBufferHolderTrackablePtr updatable_frame_buffer_holder; //обновляемый буфера кадра
+    ViewPtr                       default_render_target_view;    //отображение буфера цвета по умолчанию
+    ViewPtr                       default_depth_stencil_view;    //отображение буфера глубина-трафарет по умолчанию
+    BlendStatePtr                 default_blend_state;           //состояние подуровня смешивания цветов по умолчанию
+    BlendStatePtr                 null_blend_state;              //состояние подуровня смешивания цветов соотв. отключению подуровня
+    DepthStencilStatePtr          default_depth_stencil_state;   //состояние подуровня попиксельного отсечения по умолчанию
+    DepthStencilStatePtr          null_depth_stencil_state;      //состояние подуровня попиксельного отсечения соотв. отключению подуровня
 };
 
 /*
@@ -489,7 +583,7 @@ ITexture* OutputStage::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t
 {
   try
   {
-    return impl->frame_buffer_manager.CreateRenderTargetTexture (swap_chain, buffer_index);
+    return impl->frame_buffer_manager.CreateColorBuffer (swap_chain, buffer_index);
   }
   catch (common::Exception& exception)
   {
@@ -503,7 +597,7 @@ ITexture* OutputStage::CreateDepthStencilTexture (ISwapChain* swap_chain)
 {
   try
   {
-    return impl->frame_buffer_manager.CreateDepthStencilTexture (swap_chain);
+    return impl->frame_buffer_manager.CreateDepthStencilBuffer (swap_chain);
   }
   catch (common::Exception& exception)
   {
@@ -583,12 +677,12 @@ void OutputStage::SetRenderTargets (IView* render_target_view, IView* depth_sten
 
 IView* OutputStage::GetRenderTargetView () const
 {
-  return impl->state.GetRenderTargetView ();
+  return impl->GetCurrentState ().GetRenderTargetView ();
 }
 
 IView* OutputStage::GetDepthStencilView () const
 {
-  return impl->state.GetDepthStencilView ();
+  return impl->GetCurrentState ().GetDepthStencilView ();
 }
 
 /*
@@ -616,7 +710,7 @@ void OutputStage::SetDepthStencilState (IDepthStencilState* state)
 
 void OutputStage::SetStencilReference (size_t reference)
 {
-  impl->state.SetStencilReference (reference);
+  impl->GetCurrentState ().SetStencilReference (reference);
 }
 
 IDepthStencilState* OutputStage::GetDepthStencilState () const
@@ -626,7 +720,7 @@ IDepthStencilState* OutputStage::GetDepthStencilState () const
 
 size_t OutputStage::GetStencilReference () const
 {
-  return impl->state.GetStencilReference ();
+  return impl->GetCurrentState ().GetStencilReference ();
 }
 
 /*
@@ -635,17 +729,49 @@ size_t OutputStage::GetStencilReference () const
 
 void OutputStage::ClearRenderTargetView (const Color4f& color)
 {  
-  impl->ClearRenderTargetView (color);
+  impl->ClearViews (ClearFlag_RenderTarget, color, 0.0f, 0);
 }
 
 void OutputStage::ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil)
 {
-  impl->ClearDepthStencilView (clear_flags, depth, stencil);
+  Color4f clear_color;
+
+  impl->ClearViews (ClearFlag_Depth | ClearFlag_Stencil, clear_color, depth, stencil);
 }
 
 void OutputStage::ClearViews (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)
 {
   impl->ClearViews (clear_flags, color, depth, stencil);
+}
+
+/*
+    Оповещение об изменении целевых буферов отрисовки / обновление целевых буферов отрисовки
+*/
+
+void OutputStage::InvalidateRenderTargets (const Rect& update_rect)
+{
+  try
+  {    
+    impl->InvalidateRenderTargets (update_rect);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::OutputStage::InvalidateRenderTargets");
+    throw;
+  }
+}
+
+void OutputStage::UpdateRenderTargets ()
+{
+  try
+  {
+    impl->UpdateRenderTargets ();
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::OutputStage::UpdateRenderTargets");
+    throw;
+  }
 }
 
 /*

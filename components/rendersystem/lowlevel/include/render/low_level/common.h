@@ -79,7 +79,6 @@ enum UsageMode
   UsageMode_Static,   //созданный буфер не может быть изменён
   UsageMode_Dynamic,  //буфер может меняться каждый кадр
   UsageMode_Stream,   //буфер создан для обмена CPU<->GPU
-    //добавить SystemMemory
   
   UsageMode_Num
 };
