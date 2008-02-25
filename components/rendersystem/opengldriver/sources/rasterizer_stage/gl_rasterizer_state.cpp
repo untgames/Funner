@@ -133,6 +133,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
   {
     case CullMode_None:
       glDisable (GL_CULL_FACE);
+      break;
     case CullMode_Front:
       glEnable (GL_CULL_FACE);
       glCullFace (GL_FRONT);

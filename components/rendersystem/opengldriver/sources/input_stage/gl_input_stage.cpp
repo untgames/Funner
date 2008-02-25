@@ -237,7 +237,7 @@ struct InputStage::Impl: public ContextObject
     if (!layout)
       layout = default_layout.get ();
 
-    layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), state.GetIndexBuffer (), out_indices_layout);
+    layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), state.GetIndexBuffer (), out_indices_layout);    
   }
 };
 
