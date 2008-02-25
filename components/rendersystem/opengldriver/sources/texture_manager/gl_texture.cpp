@@ -26,7 +26,7 @@ Texture::Texture
       texture_id (0),
       target (in_target),
       mips_count (in_mips_count),
-      binded_sampler_id (0),
+      binded_sampler_hash (0),
       extensions (in_extensions)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::Texture";   
@@ -165,17 +165,17 @@ void Texture::SetFormat (PixelFormat format)
 }
 
 /*
-    Установка / получение номера прикрепленного сэмплера
+    Установка / получение хэша дескриптора прикрепленного сэмплера
 */
 
-void Texture::SetSamplerId (size_t id)
+void Texture::SetSamplerHash (size_t hash)
 {
-  binded_sampler_id = id;
+  binded_sampler_hash = hash;
 }
 
-size_t Texture::GetSamplerId ()
+size_t Texture::GetSamplerHash ()
 {
-  return binded_sampler_id;
+  return binded_sampler_hash;
 }
 
 /*
@@ -184,11 +184,32 @@ size_t Texture::GetSamplerId ()
 
 void Texture::Bind ()
 {
+    //получение кэш-переменных
+
+  ContextDataTable& context_data         = GetContextDataTable (Stage_TextureManager);
+  size_t            &current_active_slot = context_data [TextureManagerCache_ActiveSlot],
+                    &current_texture_id  = context_data [current_active_slot];
+
+    //проверка необходимости биндинга текстуры
+
+  if (current_texture_id == GetId ())
+    return;
+
+    //установка текущего контекста
+
   MakeContextCurrent ();
+
+    //биндинг текстуры
 
   glBindTexture (target, texture_id);
 
+    //проверка ошибок
+
   CheckErrors ("render::low_level::opengl::Texture::Bind");
+
+    //обновление кэш-переменных
+
+  current_texture_id = GetId ();
 }
 
 /*

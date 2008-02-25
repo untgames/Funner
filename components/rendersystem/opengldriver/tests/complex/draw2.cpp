@@ -36,60 +36,9 @@ struct MyShaderParameters2
   math::mat4f  transform;
 };
 
-stl::string read_shader (const char* file_name)
-{
-  common::InputFile file (file_name);
-  
-  stl::string buffer (file.Size (), ' ');
-  
-  file.Read (&buffer [0], file.Size ());
-  
-  return buffer;
-} 
-
-void resize (Test& test)
-{
-  try
-  {
-    Viewport vp;
-
-    vp.x         = 0;
-    vp.y         = 0;
-    vp.width     = test.window.Width ();
-    vp.height    = test.window.Height ();
-    vp.min_depth = 0;
-    vp.max_depth = 1;
-
-    test.device->RSSetViewport (vp);
-    
-    test.window.Invalidate ();
-  }
-  catch (std::exception& e)
-  {
-    printf ("resize exception: %s\n", e.what ());
-  }
-}
-
 void redraw (Test& test)
 {
-  try
-  {
-    Color4f clear_color;
-
-    clear_color.red   = 0;
-    clear_color.green = 0.7f;
-    clear_color.blue  = 0.7f;
-    clear_color.alpha = 0;
-
-    test.device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);
-    test.device->Draw (PrimitiveType_TriangleList, 0, 3);
-   
-    test.swap_chain->Present ();    
-  }
-  catch (std::exception& e)
-  {
-    printf ("redraw exception: %s\n", e.what ());
-  }
+  test.device->Draw (PrimitiveType_TriangleList, 0, 3);
 }
 
 void idle (Test& test)
@@ -125,13 +74,7 @@ void idle (Test& test)
 
   cb->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
  
-  redraw (test);
-//  test.window.Invalidate ();
-}
-
-void close ()
-{
-  syslib::Application::Exit (0);
+  test.window.Invalidate ();
 }
 
 void print (const char* message)
@@ -145,7 +88,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (draw2)", "check_gl_errors=0");
+    Test test (L"OpenGL device test window (draw2)", &redraw, "check_gl_errors=0");
     
     test.window.Show ();
    
@@ -212,7 +155,7 @@ int main ()
       {"Scale", ProgramParameterType_Float, 0, offsetof (MyShaderParameters, scale)},
       {"Transform", ProgramParameterType_Float4x4, 1, offsetof (MyShaderParameters2, transform)}
     };
-    
+
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
 
     ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));
@@ -253,9 +196,6 @@ int main ()
 
     printf ("Register callbacks\n");
     
-    test.window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&redraw, xtl::ref (test)));
-    test.window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&resize, xtl::ref (test)));
-    test.window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&close));
     syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test)));
 
     printf ("Main loop\n");

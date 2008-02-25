@@ -11,14 +11,12 @@
 #include <mathlib.h>
 
 #include <syslib/window.h>
-#include <syslib/application.h> //???
 
 #include <render/low_level/opengl_driver.h>
 #include <render/low_level/device.h>
 #include <render/low_level/debug.h>
 #include <render/low_level/utils.h>
 
-//#include <stl/list>
 #include <stl/string>
 
 #include <xtl/intrusive_ptr.h>
@@ -28,25 +26,24 @@
 #include <xtl/connection.h>
 #include <xtl/ref.h>
 
-#include <common/file.h>
+#include <media/image.h>
+
 #include <common/exception.h>
 #include <common/hash.h>
 
-#include <media/image.h> //??!!!!
-
 using namespace render::low_level;
 
-typedef xtl::com_ptr<IDriver>                 DriverPtr;
-typedef xtl::com_ptr<ISwapChain>              SwapChainPtr;
-typedef xtl::com_ptr<IDevice>                 DevicePtr;
-typedef xtl::com_ptr<ITexture>                TexturePtr;
-typedef xtl::com_ptr<IView>                   ViewPtr;
-typedef xtl::com_ptr<IBlendState>             BlendStatePtr;
-typedef xtl::com_ptr<IDepthStencilState>      DepthStencilStatePtr;
-typedef xtl::com_ptr<IInputLayout>            InputLayoutPtr;
-typedef xtl::com_ptr<IBuffer>                 BufferPtr;
-typedef xtl::com_ptr<IRasterizerState>        RasterizerStatePtr;
-typedef xtl::com_ptr<IProgram>                ProgramPtr;
+typedef xtl::com_ptr<IDriver>                  DriverPtr;
+typedef xtl::com_ptr<ISwapChain>               SwapChainPtr;
+typedef xtl::com_ptr<IDevice>                  DevicePtr;
+typedef xtl::com_ptr<ITexture>                 TexturePtr;
+typedef xtl::com_ptr<IView>                    ViewPtr;
+typedef xtl::com_ptr<IBlendState>              BlendStatePtr;
+typedef xtl::com_ptr<IDepthStencilState>       DepthStencilStatePtr;
+typedef xtl::com_ptr<IInputLayout>             InputLayoutPtr;
+typedef xtl::com_ptr<IBuffer>                  BufferPtr;
+typedef xtl::com_ptr<IRasterizerState>         RasterizerStatePtr;
+typedef xtl::com_ptr<IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 
 //тестовое приложение

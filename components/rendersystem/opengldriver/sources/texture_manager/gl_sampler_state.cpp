@@ -63,7 +63,7 @@ TexTargetId get_target_id (GLenum tex_target)
 */
 
 SamplerState::SamplerState (const ContextManager& manager, const ExtensionsPtr& in_extensions, const SamplerDesc& in_desc) 
-  : ContextObject (manager), display_list (0), extensions (in_extensions)
+  : ContextObject (manager), desc_hash (0), display_list (0), extensions (in_extensions)
 {
   SetDesc (in_desc);
 }
@@ -258,8 +258,9 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     //проверка ошибок
 
   CheckErrors (METHOD_NAME);
-  
+
     //сохранение дескриптора
 
-  desc = in_desc;
+  desc      = in_desc;
+  desc_hash = crc32 (&desc, sizeof desc);
 }

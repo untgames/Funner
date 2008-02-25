@@ -4,15 +4,6 @@ using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
-//идентификаторы элементов контекстной таблицы
-enum TextureManagerContextTable
-{
-//  TextureManagerContextTable_TexTarget0,
-//  TextureManagerContextTable_TexTargetsNum = TextureManagerContextTable_Texture0 + DEVICE_SAMPLER_SLOTS_COUNT,
-
-  TextureManagerContextTable_Num
-};
-
 /*
     Описание реализации TextureManager
 */
@@ -56,8 +47,8 @@ struct TextureManager::Impl: public ContextObject
     
     struct Sampler
     {
-      TexturePtr      texture; //текстура
-      SamplerStatePtr state;   //состояние сэмплера
+      TexturePtr      texture;       //текстура
+      SamplerStatePtr sampler_state; //состояние сэмплера
     };
     
     typedef xtl::array<Sampler, DEVICE_SAMPLER_SLOTS_COUNT> SamplerArray;
@@ -121,81 +112,88 @@ void TextureManager::Impl::Bind ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::Bind";
   
+    //получение кэш-переменных
+
+  size_t *cache                  = &GetContextDataTable (Stage_TextureManager)[0],
+         *current_texture_id     = cache + TextureManagerCache_TextureId0,
+         *current_texture_target = cache + TextureManagerCache_TextureTarget0,
+         &current_active_slot    = cache [TextureManagerCache_ActiveSlot];
+  
     //выбор текущего контекста
 
-  MakeContextCurrent ();
+  MakeContextCurrent ();  
+  
+    //получение указателя на функцию выбора активной текстуры
+    
+  PFNGLACTIVETEXTUREPROC glActiveTexture_fn = 0;
+
+  if (extensions->has_arb_multitexture)
+  {
+    if (glActiveTexture) glActiveTexture_fn = glActiveTexture;
+    else                 glActiveTexture_fn = glActiveTextureARB;
+  }
 
     //установка текстур и сэмплеров
     
-/*  for (size_t i = 0; i < texture_units_count; i++)
+  BindableTextureDesc texture_desc;
+
+  for (size_t i = 0; i < texture_units_count; i++)
   {
-    BindableTexture* texture       = samplers [i].texture.get ();
-    SamplerState*    sampler_state = samplers [i].state.get ();
+    BindableTexture* texture        = samplers [i].texture.get ();
+    SamplerState*    sampler_state  = samplers [i].sampler_state.get ();
+    bool             is_active_slot = texture && sampler_state;          
 
-    if (!texture || !state)
+    if (is_active_slot)
+      texture->GetDesc (texture_desc);
+
+    GLenum texture_target      = is_active_slot ? texture_desc.target : 0;
+    bool   need_change_sampler = is_active_slot && texture->GetSamplerHash () != sampler_state->GetDescHash (),
+           need_bind           = need_change_sampler || is_active_slot && current_texture_id [i] != texture->GetId (),
+           need_change_mode    = current_texture_target [i] != texture_target,
+           need_set_slot       = need_bind || need_change_mode;
+
+      //установка активного слота
+
+    if (need_set_slot && current_active_slot != i && glActiveTexture_fn)
     {
-      if (extensions->has_arb_multitexture) //поднять!!!
-      {
-        if (glActiveTexture) glActiveTexture    (GL_TEXTURE0 + i);
-        else                 glActiveTextureARB (GL_TEXTURE0 + i);
-      }
+      glActiveTexture_fn (GL_TEXTURE0 + i);
 
-      if (binded_tex_targets [i])
-      {
-        glDisable (binded_tex_targets [i]);
-      
-        binded_tex_targets [i] = 0;
-      }
-      
-      continue;
+      current_active_slot = i;
     }
     
-      //убрать!!!
-
-    BindableTextureDesc tex_desc;
-
-    texture->GetDesc (tex_desc);    
-
-      //установка текстуры в контекст OpenGL      
-
-    if (GetContextData (ContextDataTable_TextureManager, TextureManagerContextTable_Texture0 + i) != texture->GetId ())
-    {
-      if (extensions->has_arb_multitexture) //убрать!!!
-      {
-        if (glActiveTexture) glActiveTexture    (GL_TEXTURE0 + i);
-        else                 glActiveTextureARB (GL_TEXTURE0 + i);
-      }      
-
-      glBindTexture (tex_desc.target, tex_desc.id);      
-
-      SetContextData (ContextDataTable_TextureManager, TextureManagerContextTable_Texture0 + i, texture->GetId ());
-
-      GLenum current_target = GetContextData (ContextDataTable_TextureManager, TextureManagerContextTable_TexTarget0 + i);
-
-      if (current_target != tex_desc.target)
-      {       
-        if (current_target)
-          glDisable (current_target);
-
-        glEnable  (tex_desc.target);
-
-        SetContextData (ContextDataTable_TextureManager, TextureManagerContextTable_TexTarget0 + i, tex_desc.target);
-      }
-    }
-
-      //установка состояния сэмплирования
-
-      //проверять случай присоединения к одной текстуре разных сэмплеров!!!!!!!
-
-    if (texture->GetSamplerId () != sampler_state->GetId ())
-    {
-        //неверно!!!!. нужно делать glBindTexture!!!
+      //биндинг текстуры
       
-      texture->SetSamplerId (sampler_state->GetId ());
+    if (need_bind)
+      texture->Bind ();
+      
+      //установка сэмплера
+      
+    if (need_change_sampler)
+    {
+        //проверка случая установки для одной и той же текстуры различных сэмплеров
+        
+      for (size_t j=0; j<i; j++)
+        if (samplers [j].texture == texture && samplers [j].sampler_state && samplers [j].sampler_state != sampler_state)
+        {
+          RaiseNotSupported (METHOD_NAME, "Sampler slot #%u conflicts with sampler slot #%u. "
+                             "Reason: different sampler states for same texture", j, i);
+        }
 
-      sampler_state->Bind (tex_desc.target);
+      sampler_state->Bind (texture_target);
+
+      texture->SetSamplerHash (sampler_state->GetDescHash ());
     }
-  }*/
+    
+      //изменение режима текстурирования для текущего слота
+
+    if (need_change_mode)
+    {
+      if (current_texture_target [i]) glDisable (current_texture_target [i]);
+      if (texture_target)             glEnable  (texture_target);
+
+      current_texture_target [i] = texture_target;
+    }    
+  }
 
     //проверка ошибок
 
@@ -380,7 +378,7 @@ void TextureManager::Impl::SetSampler (size_t sampler_slot, ISamplerState* state
   if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't set sampler in unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
 
-  samplers [sampler_slot].state = cast_object<SamplerState> (*this, state, METHOD_NAME, "state");
+  samplers [sampler_slot].sampler_state = cast_object<SamplerState> (*this, state, METHOD_NAME, "state");
 }
 
 ITexture* TextureManager::Impl::GetTexture (size_t sampler_slot) const
@@ -400,7 +398,7 @@ ISamplerState* TextureManager::Impl::GetSampler (size_t sampler_slot) const
   if (sampler_slot >= texture_units_count)
     RaiseNotSupported (METHOD_NAME, "Can't get sampler from unit %u (maximum texture units = %u)", sampler_slot, texture_units_count);
 
-  return samplers [sampler_slot].state.get ();
+  return samplers [sampler_slot].sampler_state.get ();
 }
 
 /*

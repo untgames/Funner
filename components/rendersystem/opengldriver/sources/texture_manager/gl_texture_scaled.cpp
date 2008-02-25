@@ -66,17 +66,17 @@ void ScaledTexture::GetMipLevelDesc (size_t level, MipLevelDesc& out_desc)
 }
 
 /*
-    Установка / получение номера прикрепленного сэмплера
+    Установка / получение хэша дескриптора прикрепленного сэмплера
 */
 
-void ScaledTexture::SetSamplerId (size_t id)
+void ScaledTexture::SetSamplerHash (size_t hash)
 {
-  shadow_texture->SetSamplerId (id);
+  shadow_texture->SetSamplerHash (hash);
 }
 
-size_t ScaledTexture::GetSamplerId ()
+size_t ScaledTexture::GetSamplerHash ()
 {
-  return shadow_texture->GetSamplerId ();
+  return shadow_texture->GetSamplerHash ();
 }
 
 /*

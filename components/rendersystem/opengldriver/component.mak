@@ -19,7 +19,7 @@ OPENGLDRIVER_SOURCES.COMPILER_DEFINES := GLEW_STATIC GLEW_MX
 #Öåëü ¹2 - OpenGL render system tests
 OPENGLDRIVER_TESTS.TYPE             := test-suite
 OPENGLDRIVER_TESTS.INCLUDE_DIRS     := include sources ../lowlevel/include ../../commonlib/include ../../xtl/include ../../systemlib/include ../../medialib/include ../../mathlib/include
-OPENGLDRIVER_TESTS.SOURCE_DIRS      := tests/driver tests/device
+OPENGLDRIVER_TESTS.SOURCE_DIRS      := tests/driver tests/device tests/complex
 OPENGLDRIVER_TESTS.LIB_DIRS         :=
 OPENGLDRIVER_TESTS.LIBS             := commonlib zzip zlib system glew_static render_ll opengl_driver user32 gdi32 opengl32 medialib devil ilu
 OPENGLDRIVER_TESTS.COMPILER_CFLAGS  :=

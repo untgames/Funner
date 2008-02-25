@@ -17,54 +17,9 @@ struct MyVertex
   Color4ub color;
 };
 
-void resize (Test& test)
-{
-  try
-  {
-    Viewport vp;
-
-    vp.x         = 0;
-    vp.y         = 0;
-    vp.width     = test.window.Width ();
-    vp.height    = test.window.Height ();
-    vp.min_depth = 0;
-    vp.max_depth = 1;
-
-    test.device->RSSetViewport (vp);
-    
-    test.window.Invalidate ();
-  }
-  catch (std::exception& e)
-  {
-    printf ("resize exception: %s\n", e.what ());
-  }
-}
-
 void redraw (Test& test)
 {
-  try
-  {
-    Color4f clear_color;
-
-    clear_color.red   = 0;
-    clear_color.green = 0.7f;
-    clear_color.blue  = 0.7f;
-    clear_color.alpha = 0;
-
-    test.device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);
-    test.device->Draw (PrimitiveType_TriangleList, 0, 3);
-   
-    test.swap_chain->Present ();    
-  }
-  catch (std::exception& e)
-  {
-    printf ("redraw exception: %s\n", e.what ());
-  }
-}
-
-void close ()
-{
-  syslib::Application::Exit (0);
+  test.device->Draw (PrimitiveType_TriangleList, 0, 3);
 }
 
 int main ()
@@ -73,7 +28,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (draw1)");
+    Test test (L"OpenGL device test window (draw1)", &redraw);
     
     test.window.Show ();
    
@@ -121,12 +76,6 @@ int main ()
 
     test.device->ISSetInputLayout (layout.get ());
     test.device->ISSetVertexBuffer (0, vb.get ());
-
-    printf ("Register callbacks\n");
-    
-    test.window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&redraw, xtl::ref (test)));
-    test.window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&resize, xtl::ref (test)));
-    test.window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&close));
 
     printf ("Main loop\n");
 

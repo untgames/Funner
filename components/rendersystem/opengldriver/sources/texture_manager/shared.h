@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include <common/exception.h>
+#include <common/hash.h>
 
 #include <xtl/trackable_ptr.h>
 #include <xtl/uninitialized_storage.h>
@@ -26,6 +27,20 @@ namespace low_level
 
 namespace opengl
 {
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Идентификаторы элементов кэша контекстной таблицы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum TextureManagerCache
+{
+  TextureManagerCache_ActiveSlot,
+  TextureManagerCache_TextureId0,
+  TextureManagerCache_TextureIdNum = TextureManagerCache_TextureId0 + DEVICE_SAMPLER_SLOTS_COUNT,
+  TextureManagerCache_TextureTarget0,
+  TextureManagerCache_TextureTargetNum = TextureManagerCache_TextureTarget0 + DEVICE_SAMPLER_SLOTS_COUNT,
+
+  TextureManagerContextTable_Num
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Расширения, поддерживаемые менеджером текстур
@@ -92,10 +107,10 @@ class BindableTexture: virtual public ITexture, virtual public IRenderTargetText
     virtual void Bind () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка / получение номера прикрепленного сэмплера
+///Установка / получение хэша дескриптора прикрепленного сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void   SetSamplerId (size_t id) = 0;
-    virtual size_t GetSamplerId () = 0;
+    virtual void   SetSamplerHash (size_t hash) = 0;
+    virtual size_t GetSamplerHash () = 0;
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,10 +142,10 @@ class Texture: public BindableTexture
     PixelFormat GetFormat    () const { return desc.format; } //получение формата текстуры
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка / получение номера прикрепленного сэмплера
+///Установка / получение хэша дескриптора прикрепленного сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetSamplerId (size_t id);
-    size_t GetSamplerId ();
+    void   SetSamplerHash (size_t hash);
+    size_t GetSamplerHash ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текстуры в контекст OpenGL
@@ -180,12 +195,12 @@ class Texture: public BindableTexture
     void BuildMipmaps (size_t x, size_t y, size_t z, size_t width, size_t height, PixelFormat format, const void* data);
     
   private:
-    TextureDesc   desc;              //дескриптор текстуры  
-    GLenum        target;            //тип текстуры
-    GLuint        texture_id;        //идентификатор текстуры
-    size_t        mips_count;        //количество мип-уровней
-    size_t        binded_sampler_id; //идентификатор прикрепленного сэмплера
-    ExtensionsPtr extensions;        //поддерживаемые расширения
+    TextureDesc   desc;                //дескриптор текстуры  
+    GLenum        target;              //тип текстуры
+    GLuint        texture_id;          //идентификатор текстуры
+    size_t        mips_count;          //количество мип-уровней
+    size_t        binded_sampler_hash; //хэш дескриптора прикрепленного сэмплера
+    ExtensionsPtr extensions;          //поддерживаемые расширения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -323,10 +338,10 @@ class ScaledTexture: public BindableTexture
     void GetMipLevelDesc (size_t level, MipLevelDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка / получение номера прикрепленного сэмплера
+///Установка / получение хэша дескриптора прикрепленного сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetSamplerId (size_t id);
-    size_t GetSamplerId ();
+    void   SetSamplerHash (size_t hash);
+    size_t GetSamplerHash ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текстуры в контекст OpenGL
@@ -371,10 +386,13 @@ class SamplerState : virtual public ISamplerState, public ContextObject
 ///Изменение/получение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetDesc (const SamplerDesc&);
-    void GetDesc (SamplerDesc&);
+    void GetDesc (SamplerDesc&);    
+
+    size_t GetDescHash () const { return desc_hash; }
 
   private:
     SamplerDesc   desc;         //дескриптор сэмплера
+    size_t        desc_hash;    //хэш дескриптора
     int           display_list; //номер первого списка команд конфигурации OpenGL (всего списков OpenGLTextureTarget_Num)
     ExtensionsPtr extensions;   //поддерживаемые расширения
 };
