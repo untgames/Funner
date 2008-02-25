@@ -110,13 +110,13 @@ DepthStencilBufferPtr SwapChainFrameBufferManager::GetShadowBuffer (SwapChainCol
       shadow_depth_stencil_buffers.splice (shadow_depth_stencil_buffers.begin (), shadow_depth_stencil_buffers, iter);
 
       return *iter;
-    }
-    
+    }    
+
     //создание нового буфера глубина-трафарет
     
-  DepthStencilBufferPtr depth_stencil_buffer = CreateShadowDepthStencilBuffer (color_buffer);
-  
-  shadow_depth_stencil_buffers.push_front (depth_stencil_buffer.get ());
+  DepthStencilBufferPtr depth_stencil_buffer = CreateShadowDepthStencilBuffer (color_buffer);  
+
+  shadow_depth_stencil_buffers.push_front (depth_stencil_buffer.get ());  
 
   try
   {
@@ -134,10 +134,10 @@ DepthStencilBufferPtr SwapChainFrameBufferManager::GetShadowBuffer (SwapChainCol
 
 void SwapChainFrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer, DepthStencilBufferPtr& depth_stencil_buffer)
 {
-  ContextManager& manager = frame_buffer_manager.GetContextManager ();
+  ContextManager& manager = frame_buffer_manager.GetContextManager ();    
 
   if (!shadow_color_buffers.empty () && !shadow_depth_stencil_buffers.empty ())
-  {
+  { 
     for (ColorBufferList::iterator i=shadow_color_buffers.begin (), end=shadow_color_buffers.end (); i!=end; ++i)
     {
       ISwapChain* swap_chain = (*i)->GetSwapChain ();
@@ -151,7 +151,7 @@ void SwapChainFrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer
             //оптимизация: перемещение найденных узлов в начало списка для ускорения повторного поиска
 
           shadow_color_buffers.splice (shadow_color_buffers.begin (), shadow_color_buffers, i);
-          shadow_depth_stencil_buffers.splice (shadow_depth_stencil_buffers.begin (), shadow_depth_stencil_buffers, j);
+          shadow_depth_stencil_buffers.splice (shadow_depth_stencil_buffers.begin (), shadow_depth_stencil_buffers, j);          
           
           return;
         }
@@ -161,7 +161,7 @@ void SwapChainFrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer
   if (!shadow_color_buffers.empty ())
   {
     color_buffer         = shadow_color_buffers.front ();
-    depth_stencil_buffer = GetShadowBuffer (color_buffer.get ());
+    depth_stencil_buffer = GetShadowBuffer (color_buffer.get ());    
     
     return;
   }
@@ -174,7 +174,7 @@ void SwapChainFrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer
     return;
   }
 
-    //создание новой пары буферов    
+    //создание новой пары буферов
 
   SwapChainPtr          swap_chain (manager.CreateCompatibleSwapChain (GetDefaultSwapChain ()), false);
   ColorBufferPtr        new_color_buffer (new SwapChainColorBuffer (frame_buffer_manager, swap_chain.get (), 1), false);  

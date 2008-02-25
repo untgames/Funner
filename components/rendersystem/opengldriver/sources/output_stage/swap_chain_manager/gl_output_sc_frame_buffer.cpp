@@ -28,7 +28,7 @@ SwapChainFrameBuffer::SwapChainFrameBuffer (SwapChainFrameBufferManager& manager
   {
     memset (is_buffer_active, 0, sizeof is_buffer_active);
     memset (&dirty_rect, 0, sizeof dirty_rect);
-
+   
     SetColorView         (color_view);
     SetDepthStencilView  (depth_stencil_view);
     FinishInitialization (manager);
@@ -169,7 +169,7 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
       default:
         RaiseInvalidArgument (METHOD_NAME, "texture_desc.format", render_target.texture_desc.format);
         break;
-    }
+    }    
     
     has_texture_targets = true;    
 
@@ -192,7 +192,7 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
 
 void SwapChainFrameBuffer::FinishInitialization (SwapChainFrameBufferManager& manager)
 {
-    //если оба буфера проинициализированы - дополнительная инициализация не требуется
+    //если оба буфера проинициализированы - дополнительная инициализация не требуется    
 
   if (color_buffer && depth_stencil_buffer)
     return;
@@ -202,22 +202,22 @@ void SwapChainFrameBuffer::FinishInitialization (SwapChainFrameBufferManager& ma
   if (color_buffer && !depth_stencil_buffer)
   {
       //отсутствует буфер попиксельного отсечения, но присутствует буфер цвета
-      
+
     depth_stencil_buffer = manager.GetShadowBuffer (color_buffer.get ());
-    
+
     return;
   }
   
   if (!color_buffer && depth_stencil_buffer)
   {
       //отсутствует буфер цвета, но присутствует буфер попиксельного отсечения
-      
-    color_buffer = manager.GetShadowBuffer (depth_stencil_buffer.get ());
+
+    color_buffer = manager.GetShadowBuffer (depth_stencil_buffer.get ());    
     
     return;
   }
   
-    //отсутствуют оба буфера (рендеринг в обе целевые текстуры)
+    //отсутствуют оба буфера (рендеринг в обе целевые текстуры)    
 
   manager.GetShadowBuffers (color_buffer, depth_stencil_buffer);
 }
@@ -326,27 +326,25 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
     render_target.target_texture->Bind ();
 
       //копирование изображения в текстуру
+      
+    GLenum tex_target = texture_desc.target;
 
-    switch (texture_desc.target)
+    switch (tex_target)
     {
       case GL_TEXTURE_1D:
         glCopyTexSubImage1D (GL_TEXTURE_1D, view_desc.mip_level, x, x, y, width);
         break;
+      case GL_TEXTURE_CUBE_MAP:
+        tex_target = GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + view_desc.layer;
       case GL_TEXTURE_2D:
       case GL_TEXTURE_RECTANGLE_ARB:
-      case GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB:
-      case GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB:
-      case GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB:
-      case GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB:
-      case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB:
-      case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB:
-        glCopyTexSubImage2D (texture_desc.target, view_desc.mip_level, x, y, x, y, width, height);
+        glCopyTexSubImage2D (tex_target, view_desc.mip_level, x, y, x, y, width, height);
         break;
       case GL_TEXTURE_3D:
-        glCopyTexSubImage3D (texture_desc.target, view_desc.mip_level, x, y, view_desc.layer, x, y, width, height);
+        glCopyTexSubImage3D (tex_target, view_desc.mip_level, x, y, view_desc.layer, x, y, width, height);
         break;
       default:
-        RaiseNotSupported (METHOD_NAME, "Unsupported texture target 0x%04x", texture_desc.target);
+        RaiseNotSupported (METHOD_NAME, "Unsupported texture target 0x%04x", tex_target);
         break;
     }
   }

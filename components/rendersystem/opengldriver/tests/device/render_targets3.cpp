@@ -63,7 +63,7 @@ int main ()
   {
     printf ("Results of render_targets3_test:\n");
     
-    Test test (L"OpenGL device test window (render_targets3)");
+    Test test (L"OpenGL device test window (render_targets3)", "GL_EXT_packed_depth_stencil=0 GL_EXT_framebuffer_object=0");
     
     typedef stl::vector<TexturePtr> TextureList;        
     
@@ -221,6 +221,7 @@ int main ()
         }
         catch (std::exception& exception)
         {
+//          printf ("Fail!\n");
           printf ("Fail!\n%s\n", exception.what ());
         }
       }
@@ -282,6 +283,33 @@ int main ()
 
       printf ("\n");
     }
+    
+    printf ("Delete views\n");
+    
+    views.clear ();    
+    
+    printf ("Delete textures\n");
+    
+/*    while (!textures.empty ())
+    {
+      ITexture* texture = textures.back ().get ();
+      
+      if (!texture)
+        printf ("NULL\n");
+        
+      TextureDesc desc;
+      
+      texture->GetDesc (desc);
+    
+      printf ("count=%u {%s, %s, %ux%ux%u}\n", textures.size (), get_name (desc.dimension), get_name (desc.format),
+           desc.width, desc.height, desc.layers);
+           
+      textures.pop_back ();
+    }*/
+    
+    textures.clear ();
+    
+    printf ("Exit\n");    
   }
   catch (std::exception& exception)
   {

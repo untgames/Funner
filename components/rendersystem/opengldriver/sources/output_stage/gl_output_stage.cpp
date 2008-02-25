@@ -479,7 +479,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
         }        
         
         //создание нового буфера кадра
-        
+
       FrameBufferHolderPtr frame_buffer_holder = CreateFrameBufferHolder (render_target_view, depth_stencil_view);
 
         //добавление нового буфера кадра в список созданных

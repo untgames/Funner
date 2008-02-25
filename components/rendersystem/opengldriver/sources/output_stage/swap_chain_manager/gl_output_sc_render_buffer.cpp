@@ -135,13 +135,13 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
       
       //установка размеров буфера
 
-    SwapChainDesc swap_chain_desc;
-
-    swap_chain->GetDesc (swap_chain_desc);
+    SwapChainDesc swap_chain_desc;    
     
-    SetSize (swap_chain_desc.frame_buffer.width, swap_chain_desc.frame_buffer.height);    
+    swap_chain->GetDesc (swap_chain_desc);        
+    
+    SetSize (swap_chain_desc.frame_buffer.width, swap_chain_desc.frame_buffer.height);        
 
-      //создание контекста
+      //создание контекста      
 
     context_id = GetContextManager ().CreateContext (swap_chain);
   }

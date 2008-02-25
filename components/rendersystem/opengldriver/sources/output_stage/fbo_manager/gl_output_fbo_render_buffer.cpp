@@ -121,7 +121,7 @@ FboRenderBuffer::~FboRenderBuffer ()
   catch (...)
   {
     //подавляем все исключения
-  }
+  }  
 }
 
 /*

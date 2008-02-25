@@ -109,7 +109,7 @@ class ContextImpl: public xtl::reference_counter
         extensions.Set (Version_1_4, GLEW_VERSION_1_4 != 0);
         extensions.Set (Version_1_5, GLEW_VERSION_1_5 != 0);
         extensions.Set (Version_2_0, GLEW_VERSION_2_0 != 0);
-        extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);
+        extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);        
       }
       catch (common::Exception& exception)
       {
@@ -166,12 +166,12 @@ struct ContextManager::Impl: public xtl::reference_counter
       //создание контекста
     size_t CreateContext (ISwapChain* swap_chain)
     {
-      static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::CreateContext";
+      static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::CreateContext";         
       
       if (!swap_chain)
-        RaiseNullArgument (METHOD_NAME, "swap_chain");
+        RaiseNullArgument (METHOD_NAME, "swap_chain");        
 
-      ContextImplPtr new_context;
+      ContextImplPtr new_context;      
 
       if (context_map.empty ()) new_context = ContextImplPtr (new ContextImpl (swap_chain), false);
       else                      new_context = ContextImplPtr (new ContextImpl (swap_chain, context_map.begin ()->second->GetContext ()), false);
@@ -187,13 +187,13 @@ struct ContextManager::Impl: public xtl::reference_counter
         {
           RaiseNotSupported (METHOD_NAME, "Could not create new context. Reason: required extension '%s' not supported",
             get_extension_name (id));
-        }
+        }        
         
       if (!min_version.empty () && strcmp (new_context->GetVersionString (), min_version.c_str ()) < 0)
       {
         RaiseNotSupported (METHOD_NAME, "Could not create new context. Reason: OpenGL version '%s' not supported "
           "(version='%s')", min_version.c_str (), new_context->GetVersionString ());
-      }
+      }      
 
       if (!max_version.empty ())
       {

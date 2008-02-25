@@ -32,35 +32,35 @@ struct Context::Impl
     vsync (false)
   {
     if (!in_swap_chain)
-      RaiseNullArgument ("render::low_level::opengl::Context::Context", "swap_chain");
+      RaiseNullArgument ("render::low_level::opengl::Context::Context", "swap_chain");      
       
-    SwapChain* swap_chain = cast_object<SwapChain> (in_swap_chain, "render::low_level::opengl::Context::Context", "swap_chain");
+    SwapChain* swap_chain = cast_object<SwapChain> (in_swap_chain, "render::low_level::opengl::Context::Context", "swap_chain");    
     
-    HDC swap_chain_dc = swap_chain->GetDC ();
+    HDC swap_chain_dc = swap_chain->GetDC ();    
     
     pixel_format = GetPixelFormat (swap_chain_dc);
 
-    gl_context = wglCreateContext (swap_chain_dc);
+    gl_context = wglCreateContext (swap_chain_dc);    
 
     if (!gl_context)
-      raise_error ("wglCreateContext");
+      raise_error ("wglCreateContext");      
       
     try
     {
-      if (shared_context && !wglShareLists (shared_context->gl_context, gl_context))
-        raise_error ("wglShareLists");
-      
+      if (shared_context && !wglShareLists (shared_context->gl_context, gl_context))      
+        raise_error ("wglShareLists");        
+
       make_current_context (gl_context, swap_chain_dc, swap_chain_dc);
-        
+
       GLenum status = glewContextInit (&glew_context);
 
       if (status != GLEW_OK)
         RaiseInvalidOperation ("glewContextInit", "%s", glewGetString (status));        
 
       SetSwapChains (swap_chain, swap_chain);
-      
+
         //установка вертикальной синхронизации
-      
+
       wglewSetContext (wglew_context);
       SetVSync ();
     }
@@ -309,7 +309,7 @@ void make_current_context (HGLRC context, HDC draw_dc, HDC read_dc)
   if (wglewGetContext () && WGLEW_ARB_make_current_read)
   {
     if (wglGetCurrentContext () == context && wglGetCurrentDC () == draw_dc && wglGetCurrentReadDCARB () == read_dc)
-      return;
+      return;      
 
     if (!wglMakeContextCurrentARB (draw_dc, read_dc, context))
       raise_error ("wglMakeContextCurrentARB");
