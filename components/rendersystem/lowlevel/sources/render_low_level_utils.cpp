@@ -340,6 +340,27 @@ const char* get_name (TexcoordWrap param)
   }
 }
 
+const char* get_name (ProgramParameterType param)
+{
+  switch (param)
+  {
+    case ProgramParameterType_Int:        return "ProgramParameterType_Int";
+    case ProgramParameterType_Float:      return "ProgramParameterType_Float";
+    case ProgramParameterType_Int2:       return "ProgramParameterType_Int2";
+    case ProgramParameterType_Float2:     return "ProgramParameterType_Float2";
+    case ProgramParameterType_Int3:       return "ProgramParameterType_Int3";
+    case ProgramParameterType_Float3:     return "ProgramParameterType_Float3";
+    case ProgramParameterType_Int4:       return "ProgramParameterType_Int4";
+    case ProgramParameterType_Float4:     return "ProgramParameterType_Float4";
+    case ProgramParameterType_Float2x2:   return "ProgramParameterType_Float2x2";
+    case ProgramParameterType_Float3x3:   return "ProgramParameterType_Float3x3";
+    case ProgramParameterType_Float4x4:   return "ProgramParameterType_Float4x4";
+    default:
+      RaiseInvalidArgument ("render::low_level::get_name(ProgramParameterType)", "param", param);
+      return "";
+  }
+}
+
 const char* get_name (FillMode param)
 {
   switch (param)
