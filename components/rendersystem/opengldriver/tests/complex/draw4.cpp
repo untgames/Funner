@@ -55,42 +55,6 @@ void redraw (Test& test)
   test.device->Draw (PrimitiveType_TriangleList, 6, 3);
 }
 
-void idle (Test& test)
-{
-/*  if (test.window.IsClosed ())
-    return;
-
-  static const   float DT = 0.01f;
-  static float   t = 0;
-  static clock_t last = 0;
-  static float angle;
-
-/*  if (clock () - last < CLK_TCK / 30)
-  {
-    last = clock ();
-    return;
-  }*/
-
-/*  MyShaderParameters2 my_shader_parameters2;
-  
-  IBuffer* cb = test.device->SSGetConstantBuffer (1);
-  
-  if (!cb)
-  {
-    printf ("Null constant buffer #1\n");
-    return;
-  }
-  
-  cb->GetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
-    
-//  my_shader_parameters2.transform = math::rotatef (math::deg2rad (angle+=1.f), 0, 0, 1);
-//  my_shader_parameters.transform *= math::rotatef (math::deg2rad (.3f), 0, 0, 1);
-
-  cb->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
- 
-  test.window.Invalidate ();*/
-}
-
 void print (const char* message)
 {
   printf ("Shader message: '%s'\n", message);
@@ -98,11 +62,11 @@ void print (const char* message)
 
 int main ()
 {
-  printf ("Results of draw2_test:\n");
+  printf ("Results of draw4_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (draw2)", &redraw, "check_gl_errors=0");
+    Test test (L"OpenGL device test window (draw4)", &redraw);
     
     test.window.Show ();
    
@@ -215,10 +179,6 @@ int main ()
     test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
     test.device->SSSetConstantBuffer (0, cb.get ());
     test.device->SSSetConstantBuffer (1, cb2.get ());
-
-    printf ("Register callbacks\n");
-    
-    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test)));
 
     printf ("Main loop\n");
 
