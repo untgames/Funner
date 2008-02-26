@@ -151,10 +151,10 @@ int main ()
     };
 
     static ProgramParameter shader_parameters[] = {
-      {"LightPosition", ProgramParameterType_Float3, 0, offsetof (MyShaderParameters, light_position)},
-      {"bump_sampler2d", ProgramParameterType_Int, 0, offsetof (MyShaderParameters, bump_texture_slot)},
-      {"diffuse_sampler2d", ProgramParameterType_Int, 0, offsetof (MyShaderParameters, diffuse_texture_slot)},      
-      {"Transform", ProgramParameterType_Float4x4, 1, offsetof (MyShaderParameters2, transform)}
+      {"LightPosition", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_position)},
+      {"bump_sampler2d", ProgramParameterType_Int, 0, 1, offsetof (MyShaderParameters, bump_texture_slot)},
+      {"diffuse_sampler2d", ProgramParameterType_Int, 0, 1, offsetof (MyShaderParameters, diffuse_texture_slot)},      
+      {"Transform", ProgramParameterType_Float4x4, 1, 1, offsetof (MyShaderParameters2, transform)}
     };
 
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
@@ -197,6 +197,8 @@ int main ()
     
     media::Image bump_image (BUMP_IMAGE_NAME, media::PixelFormat_RGB8);
     media::Image diffuse_image (DIFFUSE_IMAGE_NAME, media::PixelFormat_RGB8);
+
+    printf ("Textures loaded\n");
 
     TextureDesc texture_desc;
     

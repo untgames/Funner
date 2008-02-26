@@ -1,8 +1,23 @@
+#include <stl/algorithm>
+
 #include "shared.h"
 
 using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
+
+namespace
+{
+
+struct ProgramParameterComparator
+{
+  bool operator () (const ProgramParameter* parameter1, const ProgramParameter* parameter2) const
+  {
+    return parameter1->slot < parameter2->slot;
+  }
+};
+
+}
 
 /*
    Конструктор
@@ -25,6 +40,9 @@ void ProgramParametersLayout::SetDesc (const ProgramParametersLayoutDesc& in_des
 
   for (size_t i = 0; i < in_desc.parameters_count; i++)
   {
+    if (!in_desc.parameters[i].count)
+      Raise <ArgumentNullException> (METHOD_NAME, "Null argument in_desc.parameters[%u].count", i);
+
     if (!in_desc.parameters[i].name)
       Raise <ArgumentNullException> (METHOD_NAME, "Null argument in_desc.parameters[%u].name", i);
   
@@ -35,10 +53,57 @@ void ProgramParametersLayout::SetDesc (const ProgramParametersLayoutDesc& in_des
       Raise <ArgumentException> (METHOD_NAME, "Invalid argument value in_desc.parameters[%u].type", i);
   }
 
-  desc = in_desc;
+  stl::vector<const ProgramParameter*> temp_parameters (in_desc.parameters_count);
+
+  for (size_t i = 0; i < in_desc.parameters_count; i++)
+    temp_parameters[i] = &in_desc.parameters [i];
+
+  stl::sort (temp_parameters.begin (), temp_parameters.end (), ProgramParameterComparator ());
+
+  parameters.reserve (in_desc.parameters_count);
+
+  parameter_groups.reserve (DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
+
+  size_t current_slot = DEVICE_CONSTANT_BUFFER_SLOTS_COUNT + 1; //номер текущего слота (для отслеживания изменения группы параметров)
+    
+  for (size_t i = 0; i < temp_parameters.size (); i++)
+  {
+    parameters.push_back (*temp_parameters[i]);
+
+      //отслеживание появления новой группы
+
+    if (current_slot != temp_parameters [i]->slot)
+    {
+      parameter_groups.push_back ();
+
+      ProgramParameterGroup& new_group = parameter_groups.back ();
+      
+      new_group.slot       = temp_parameters [i]->slot;
+      new_group.parameters = &parameters.back ();
+      new_group.count      = 0;
+      current_slot         = temp_parameters [i]->slot;
+    }
+  }
+
+  for (stl::vector<ProgramParameterGroup>::iterator iter = parameter_groups.begin (), end = parameter_groups.end ()-1; iter != end; ++iter)
+    iter->count = iter [1].parameters - iter [0].parameters;
+
+  parameter_groups.back ().count = parameters.end () - parameter_groups.back ().parameters;    
 }
 
-ProgramParametersLayoutDesc& ProgramParametersLayout::GetDesc ()
+/*
+   Получение данных
+*/
+
+size_t ProgramParametersLayout::GroupsCount ()
 {
-  return desc;
+  return parameter_groups.size ();
+}
+
+ProgramParameterGroup& ProgramParametersLayout::ParametersGroup (size_t index)
+{
+  if (index >= parameter_groups.size ())
+    RaiseOutOfRange ("render::low_level::opengl::ProgramParametersLayout::ParametersGroup", "index", index, 0u, parameter_groups.size ());
+
+  return parameter_groups[index];
 }

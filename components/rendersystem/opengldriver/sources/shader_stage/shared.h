@@ -6,6 +6,8 @@
 
 #include <common/exception.h>
 
+#include <stl/vector>
+
 #include <xtl/intrusive_ptr.h>
 #include <xtl/trackable_ptr.h>
 #include <xtl/uninitialized_storage.h>
@@ -29,6 +31,12 @@ enum ShaderStageCache
   ShaderStageCache_UsedProgram,    //ID текущей используемой программы
 };
 
+struct ProgramParameterGroup
+{
+  size_t            slot;       //номер слота с константым буфером
+  size_t            count;      //количество элементов группы
+  ProgramParameter* parameters; //указатель на начало области с элементами
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание расположения параметров
@@ -42,13 +50,20 @@ class ProgramParametersLayout : virtual public IProgramParametersLayout, public 
     ProgramParametersLayout (const ContextManager& manager);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Изменение/получение дескриптора
+///Изменение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetDesc (const ProgramParametersLayoutDesc& in_desc);
-    ProgramParametersLayoutDesc& GetDesc ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t                 ParametersCount () {return parameters.size ();}
+    size_t                 GroupsCount ();
+    ProgramParameterGroup& ParametersGroup (size_t index);
 
   private:
-    ProgramParametersLayoutDesc desc;
+    stl::vector<ProgramParameterGroup> parameter_groups;
+    stl::vector<ProgramParameter>      parameters;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

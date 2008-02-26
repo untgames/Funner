@@ -148,12 +148,12 @@ int main ()
     };
 
     static ProgramParameter shader_parameters[] = {
-      {"GrainSizeRecip", ProgramParameterType_Float, 0, offsetof (MyShaderParameters, grain_size_recip)},
-      {"DarkColor", ProgramParameterType_Float3, 0, offsetof (MyShaderParameters, dark_color)},
-      {"colorSpread", ProgramParameterType_Float3, 0, offsetof (MyShaderParameters, color_spread)},
-      {"LightPosition", ProgramParameterType_Float3, 0, offsetof (MyShaderParameters, light_position)},
-      {"Scale", ProgramParameterType_Float, 0, offsetof (MyShaderParameters, scale)},
-      {"Transform", ProgramParameterType_Float4x4, 1, offsetof (MyShaderParameters2, transform)}
+      {"GrainSizeRecip", ProgramParameterType_Float, 0, 1, offsetof (MyShaderParameters, grain_size_recip)},
+      {"DarkColor", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, dark_color)},
+      {"colorSpread", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, color_spread)},
+      {"LightPosition", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_position)},
+      {"Scale", ProgramParameterType_Float, 0, 1, offsetof (MyShaderParameters, scale)},
+      {"Transform", ProgramParameterType_Float4x4, 1, 1, offsetof (MyShaderParameters2, transform)}
     };
 
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};

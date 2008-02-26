@@ -125,6 +125,7 @@ struct ProgramParameter
   const char*          name;   //имя константы
   ProgramParameterType type;   //тип константы
   size_t               slot;   //номер слота с константым буфером
+  size_t               count;  //количество элементов массива
   size_t               offset; //смещение относительно начала константного буфера
 };
 
