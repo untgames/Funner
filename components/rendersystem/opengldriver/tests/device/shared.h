@@ -30,6 +30,7 @@
 
 #include <common/exception.h>
 #include <common/hash.h>
+#include <common/file.h>
 
 using namespace render::low_level;
 
@@ -171,5 +172,17 @@ inline void dump_desc (IDepthStencilState& state)
   printf ("  stencil_desc [FaceMode_Back]:\n");
   dump_desc (desc.stencil_desc [FaceMode_Back]);  
 }
+
+//чтение ихсодного текста шейдера в строку
+stl::string read_shader (const char* file_name)
+{
+  common::InputFile file (file_name);
+  
+  stl::string buffer (file.Size (), ' ');
+  
+  file.Read (&buffer [0], file.Size ());
+  
+  return buffer;
+} 
 
 #endif

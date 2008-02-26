@@ -1,0 +1,40 @@
+Parameters
+{
+  float4x4 myViewMatrix myObjectMatrix myTexgen
+  float    myQuadraticAttenuation
+}
+
+ProjectionMatrix
+(
+  1 0 0 0
+  0 1 0 0
+  0 0 0 0
+  0 0 0 1
+)
+ViewMatrix   myViewMatrix
+ObjectMatrix myObjectMatrix
+
+SpecularColor 1 0.2 0 0.5
+Shininess 100
+
+AlphaCompareMode Less
+AlphaReference   0.5
+
+LightsCount 1
+
+Light1
+{
+  Enable 1
+  AmbientColor 1 1 1 1
+  ConstantAttenuation 1
+  QuadraticAttenuation myQuadraticAttenuation
+  Angle 0.1
+}
+
+Texmap1
+{
+  TexcoordU Explicit
+  TexcoordV SphereMap
+  Texgen    myTexgen
+  Transform myObjectMatrix
+}

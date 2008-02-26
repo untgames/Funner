@@ -1,6 +1,8 @@
 #ifndef RENDER_GL_DRIVER_SHADER_STAGE_SHARED_HEADER
 #define RENDER_GL_DRIVER_SHADER_STAGE_SHARED_HEADER
 
+#include <render/low_level/utils.h>
+
 #include <shared/shader_stage.h>
 #include <shared/input_stage.h>
 
@@ -57,9 +59,15 @@ class ProgramParametersLayout : virtual public IProgramParametersLayout, public 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+          ///добавить приставку Get!!!
     size_t                 ParametersCount () {return parameters.size ();}
     size_t                 GroupsCount ();
     ProgramParameterGroup& ParametersGroup (size_t index);
+
+    size_t                 GetGroupsCount     () const { return parameter_groups.size (); }
+    size_t                 GetParametersCount () const { return parameter_groups.size (); }    
+    ProgramParameterGroup* GetGroups          ()       { return &parameter_groups [0]; }
+    ProgramParameter*      GetParameters      ()       { return &parameters [0]; }
 
   private:
     stl::vector<ProgramParameterGroup> parameter_groups;
@@ -118,6 +126,7 @@ class ShaderManager : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание шейдер менеджеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+ShaderManager* create_fpp_shader_manager  (const ContextManager& manager);
 ShaderManager* create_glsl_shader_manager (const ContextManager& manager);
 
 }

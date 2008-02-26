@@ -63,7 +63,7 @@ struct Test
   CallbackFn     redraw;
 
   Test (const wchar_t* title, const CallbackFn& in_redraw, const char* init_string="") :
-    window (syslib::WindowStyle_Overlapped, 400, 400), driver (get_opengl_driver ()), redraw (in_redraw)
+    window (syslib::WindowStyle_PopUp, 1280, 1024), driver (get_opengl_driver ()), redraw (in_redraw)
   {
     window.SetTitle (title);
 
@@ -79,7 +79,7 @@ struct Test
     desc.samples_count             = 0;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = false;
-    desc.fullscreen                = false;
+    desc.fullscreen                = true;
     desc.window_handle             = window.Handle ();
 
     swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);

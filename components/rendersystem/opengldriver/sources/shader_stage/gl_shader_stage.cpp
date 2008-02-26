@@ -109,6 +109,8 @@ ShaderStage::Impl::Impl (const ContextManager& context_manager)
 
   if (IsSupported (ARB_shading_language_100) || IsSupported (Version_2_0))
     AddShaderManager (ShaderManagerPtr (create_glsl_shader_manager (context_manager), false));
+
+  AddShaderManager (ShaderManagerPtr (create_fpp_shader_manager (context_manager), false));
 }
 
 ShaderStage::Impl::~Impl ()
@@ -149,6 +151,8 @@ IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDe
 
   if (!shaders_count)
     RaiseNullArgument (METHOD_NAME, "shaders_count");
+    
+      //вынести проверки в начало!!!
 
   string        profile;
   ShaderManager *manager = NULL;
@@ -182,7 +186,18 @@ IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDe
 
     if (shader_iterator == shaders_map.end ())
     {
-      ShaderPtr shader (manager->CreateShader (shader_descs[i], error_log), false);
+      ShaderDesc shader_desc = shader_descs [i];
+      
+      if (!shader_desc.name)
+        shader_desc.name = "__unnamed__";
+        
+      if (!shader_desc.source_code)
+        Raise<ArgumentNullException> (METHOD_NAME, "shader_descs[%u].source_code", i);
+        
+      if (shader_desc.source_code_size == ~0)
+        shader_desc.source_code_size = strlen (shader_desc.source_code);
+      
+      ShaderPtr shader (manager->CreateShader (shader_desc, error_log), false);      
 
       shader->RegisterDestroyHandler (xtl::bind (&Impl::RemoveShaderByHash, this, hash), GetTrackable ());
 

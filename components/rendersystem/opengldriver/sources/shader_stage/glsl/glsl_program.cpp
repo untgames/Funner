@@ -180,14 +180,14 @@ void GlslProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLa
 
   size_t& current_program = GetContextDataTable (Stage_Shading)[ShaderStageCache_UsedProgram];
   
-  if (current_program != program)
+  if (current_program != GetId ())
   {
     if (glUseProgram) glUseProgram          (program);
     else              glUseProgramObjectARB (program);
   
     //установка кэш-переменной
 
-    current_program = program;
+    current_program = GetId ();
   }
   
   //Поиск в кэше
