@@ -173,7 +173,7 @@ char* ParseContext::AttachTextSource (const char* name,const char* buf,size_t le
     
   size_t name_size = strlen (name)+1,
          buf_size  = len + sizeof (ParseTextBuffer) + name_size; //полагается: sizeof (ParseTextBuffer::buf) = 1
-          
+
   ParseTextBuffer* text_buf = (ParseTextBuffer*)::operator new (buf_size);
   ParseTreeImpl*   tree     = (ParseTreeImpl*)buf;
 
@@ -184,7 +184,7 @@ char* ParseContext::AttachTextSource (const char* name,const char* buf,size_t le
   text_buf->size  = buf_size;
   tree->first_buf = text_buf;
 
-  text_buf->buf [len+name_size] = 0;
+  text_buf->buf [len+name_size] = 0;  
 
   return text_buf->buf+name_size;
 }
@@ -535,7 +535,7 @@ Parser::Parser (ParseLog& log,const char* name,const char* buf,size_t len,const 
 
   try
   {
-    ParseContext context;
+    ParseContext context (&log);
 
     ParseDispatch::Parse (name,buf,len,context,format);
 

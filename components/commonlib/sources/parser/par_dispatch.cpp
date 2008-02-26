@@ -56,7 +56,7 @@ static void ParseBuffer (char* buf,ParseContext& context,ParseFormat format,cons
 
   if (format == PARSE_FORMAT_AUTODETECT)
     format = DetectContentFormat (buf);
-    
+ 
   switch (format)
   {
     case PARSE_FORMAT_WXF: ParseDispatch::ParseWXF (buf,context); break;
