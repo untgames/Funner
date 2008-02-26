@@ -221,6 +221,7 @@ void GlslProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLa
     if (glGetUniformLocation) glGetUniformLocation_fn = glGetUniformLocation;
     else                      glGetUniformLocation_fn = (PFNGLGETUNIFORMLOCATIONPROC)glGetUniformLocationARB;
     
+    oldest_entry->parameter_groups.clear ();
     oldest_entry->parameter_groups.reserve (parameters_layout->GroupsCount ());
 
     for (size_t i = 0, group_count = parameters_layout->GroupsCount (); i < group_count; i++)
