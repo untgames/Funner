@@ -15,7 +15,8 @@ Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char* init_stri
     input_stage (context_manager),
     rasterizer_stage (context_manager),
     texture_manager (context_manager),
-    shader_stage (context_manager)
+    shader_stage (context_manager),
+    query_manager (context_manager)
 {  
     //получение информации об устройстве отрисовки
 
@@ -42,12 +43,6 @@ const char* Device::GetName ()
 /*
     Создание ресурсов
 */
-
-IPredicate* Device::CreatePredicate ()
-{
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreatePredicate");
-  return 0;
-}
 
 IStatisticsQuery* Device::CreateStatisticsQuery ()
 {
@@ -363,21 +358,24 @@ void Device::ClearViews (size_t clear_flags, const Color4f& color, float depth, 
     Управление предикатами отрисовки
 */
 
+IPredicate* Device::CreatePredicate ()
+{
+  return query_manager.CreatePredicate ();
+}
+
 void Device::SetPredication (IPredicate* predicate, bool predicate_value)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::SetPredication");
+  query_manager.SetPredication (predicate, predicate_value);
 }
 
 IPredicate* Device::GetPredicate ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::GetPredicate");
-  return 0;
+  return query_manager.GetPredicate ();
 }
 
 bool Device::GetPredicateValue ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::GetPredicateValue");
-  return false;
+  return query_manager.GetPredicateValue ();
 }
 
 /*
@@ -432,6 +430,13 @@ void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t ver
 {
   try
   {
+      //проверка предиката отрисовки
+
+    if (!query_manager.GetPredicateAsyncResult ())
+      return;
+
+      //преобразование типа примитивов
+
     GLenum mode = get_mode (primitive_type, "");
     
       //установка состояния устройства в контекст OpenGL
@@ -458,6 +463,13 @@ void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size
 {
   try
   {
+      //проверка предиката отрисовки
+
+    if (!query_manager.GetPredicateAsyncResult ())
+      return;
+
+      //преобразование типа примитивов
+
     GLenum mode = get_mode (primitive_type, "");
     
       //установка состояния устройства в контекст OpenGL

@@ -36,19 +36,20 @@
 
 using namespace render::low_level;
 
-typedef xtl::com_ptr<IDriver>                 DriverPtr;
-typedef xtl::com_ptr<ISwapChain>              SwapChainPtr;
-typedef xtl::com_ptr<IDevice>                 DevicePtr;
-typedef xtl::com_ptr<ITexture>                TexturePtr;
-typedef xtl::com_ptr<ISamplerState>           SamplerStatePtr;
-typedef xtl::com_ptr<IView>                   ViewPtr;
-typedef xtl::com_ptr<IBlendState>             BlendStatePtr;
-typedef xtl::com_ptr<IDepthStencilState>      DepthStencilStatePtr;
-typedef xtl::com_ptr<IInputLayout>            InputLayoutPtr;
-typedef xtl::com_ptr<IBuffer>                 BufferPtr;
-typedef xtl::com_ptr<IRasterizerState>        RasterizerStatePtr;
-typedef xtl::com_ptr<IProgram>                ProgramPtr;
+typedef xtl::com_ptr<IDriver>                  DriverPtr;
+typedef xtl::com_ptr<ISwapChain>               SwapChainPtr;
+typedef xtl::com_ptr<IDevice>                  DevicePtr;
+typedef xtl::com_ptr<ITexture>                 TexturePtr;
+typedef xtl::com_ptr<ISamplerState>            SamplerStatePtr;
+typedef xtl::com_ptr<IView>                    ViewPtr;
+typedef xtl::com_ptr<IBlendState>              BlendStatePtr;
+typedef xtl::com_ptr<IDepthStencilState>       DepthStencilStatePtr;
+typedef xtl::com_ptr<IInputLayout>             InputLayoutPtr;
+typedef xtl::com_ptr<IBuffer>                  BufferPtr;
+typedef xtl::com_ptr<IRasterizerState>         RasterizerStatePtr;
+typedef xtl::com_ptr<IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
+typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 
 //тестовое приложение
 struct Test
@@ -62,7 +63,7 @@ struct Test
   CallbackFn     redraw;
 
   Test (const wchar_t* title, const CallbackFn& in_redraw, const char* init_string="") :
-    window (syslib::WindowStyle_PopUp, 1280, 1024), driver (get_opengl_driver ()), redraw (in_redraw)
+    window (syslib::WindowStyle_Overlapped, 400, 400), driver (get_opengl_driver ()), redraw (in_redraw)
   {
     window.SetTitle (title);
 
@@ -75,14 +76,16 @@ struct Test
     desc.frame_buffer.depth_bits   = 24;
     desc.frame_buffer.stencil_bits = 8;
     desc.buffers_count             = 2;
-    desc.samples_count             = 6;
+    desc.samples_count             = 0;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = false;
-    desc.fullscreen                = true;
+    desc.fullscreen                = false;
     desc.window_handle             = window.Handle ();
 
     swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);
     device     = DevicePtr (driver->CreateDevice (&*swap_chain, init_string), false);    
+
+    OnResize ();
     
     window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Test::OnRedraw, this));
     window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Test::OnResize, this));

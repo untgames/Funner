@@ -15,6 +15,7 @@
 #include <shared/output_stage.h>
 #include <shared/rasterizer_stage.h>
 #include <shared/shader_stage.h>
+#include <shared/query_manager.h>
 
 #include <common/exception.h>
 #include <common/singleton.h>
@@ -218,6 +219,7 @@ class Device: virtual public IDevice, public Object
     RasterizerStage rasterizer_stage; //уровень растеризации
     TextureManager  texture_manager;  //менеджер текстур
     ShaderStage     shader_stage;     //уровень шейдинга
+    QueryManager    query_manager;    //менеджер запросов
 };
 
 }

@@ -10,7 +10,7 @@ OPENGLDRIVER_SOURCES.INCLUDE_DIRS     := include sources ../lowlevel/include ../
 OPENGLDRIVER_SOURCES.SOURCE_DIRS      := sources/common sources/platform/win32 sources/driver sources/input_stage \
                                          sources/output_stage sources/output_stage/swap_chain_manager sources/output_stage/fbo_manager \
                                          sources/texture_manager sources/texture_manager/nv_dxt sources/rasterizer_stage sources/shader_stage \
-                                         sources/shader_stage/glsl
+                                         sources/shader_stage/glsl sources/query_manager
 OPENGLDRIVER_SOURCES.LIB_DIRS         :=  
 OPENGLDRIVER_SOURCES.LIBS             := 
 OPENGLDRIVER_SOURCES.COMPILER_CFLAGS  := /wd4355

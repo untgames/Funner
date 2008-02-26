@@ -33,6 +33,7 @@ enum Stage
   Stage_Rasterizer,
   Stage_Output,
   Stage_TextureManager,
+  Stage_QueryManager,
 
   Stage_Num
 };
@@ -47,6 +48,7 @@ enum StageFlag
   StageFlag_Rasterizer     = 1 << Stage_Rasterizer,
   StageFlag_Output         = 1 << Stage_Output,
   StageFlag_TextureManager = 1 << Stage_TextureManager,
+  StageFlag_QueryManager   = 1 << Stage_QueryManager,
   StageFlag_All            = ~0
 };
 

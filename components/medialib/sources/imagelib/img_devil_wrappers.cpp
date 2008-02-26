@@ -263,7 +263,7 @@ struct DevILSystemImpl
     iluInit      ();
     ilEnable     (IL_FILE_OVERWRITE);
     ilEnable     (IL_ORIGIN_SET);
-    ilOriginFunc (IL_ORIGIN_UPPER_LEFT);
+    ilOriginFunc (IL_ORIGIN_LOWER_LEFT);
 
     ilSetMemory (&devil_allocate, &devil_deallocate);
 
