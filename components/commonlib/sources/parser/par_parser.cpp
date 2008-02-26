@@ -139,7 +139,7 @@ char* ParseContext::AttachTextSource (const char* file_name)
            buf_size  = file_size + sizeof (ParseTextBuffer) + name_size; //полагается: sizeof (ParseTextBuffer::buf) = 1
 
     ParseTextBuffer* text_buf = (ParseTextBuffer*)::operator new (buf_size);
-    ParseTreeImpl*   tree     = (ParseTreeImpl*)buf;
+    ParseTreeImpl*   tree     = (ParseTreeImpl*)this->buf;
 
     file_size       = file.Read (text_buf->buf+name_size,file_size);
     text_buf->next  = tree->first_buf;
@@ -175,7 +175,7 @@ char* ParseContext::AttachTextSource (const char* name,const char* buf,size_t le
          buf_size  = len + sizeof (ParseTextBuffer) + name_size; //полагается: sizeof (ParseTextBuffer::buf) = 1
 
   ParseTextBuffer* text_buf = (ParseTextBuffer*)::operator new (buf_size);
-  ParseTreeImpl*   tree     = (ParseTreeImpl*)buf;
+  ParseTreeImpl*   tree     = (ParseTreeImpl*)this->buf;
 
   strcpy (text_buf->buf,name);
   memcpy (text_buf->buf+name_size,buf,len);
