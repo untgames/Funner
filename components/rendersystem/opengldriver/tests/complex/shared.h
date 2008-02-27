@@ -20,8 +20,11 @@
 
 //#include <stl/list>
 #include <stl/string>
+#include <stl/hash_map>
 
 #include <xtl/intrusive_ptr.h>
+#include <xtl/iterator.h>
+#include <xtl/shared_ptr.h>
 #include <xtl/uninitialized_storage.h>
 #include <xtl/bind.h>
 #include <xtl/function.h>
@@ -33,6 +36,7 @@
 #include <common/hash.h>
 
 #include <media/image.h>
+#include <media/mesh.h>
 
 using namespace render::low_level;
 
@@ -63,7 +67,7 @@ struct Test
   CallbackFn     redraw;
 
   Test (const wchar_t* title, const CallbackFn& in_redraw, const char* init_string="") :
-    window (syslib::WindowStyle_PopUp, 1280, 1024), driver (get_opengl_driver ()), redraw (in_redraw)
+    window (syslib::WindowStyle_Overlapped, 400, 300), driver (get_opengl_driver ()), redraw (in_redraw)
   {
     window.SetTitle (title);
 
