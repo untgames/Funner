@@ -683,7 +683,7 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
     default:
       LogError (surface_iter, "Internal error: invalid primitive_type=%d", surface_info.primitive_type);
       return;
-  }
+  }  
 
     //чтение исходного буфера индексов
 
