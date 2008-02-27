@@ -102,7 +102,7 @@ struct WindowEventContext
 class ClosedWindowException: public std::exception
 {
   public:
-    const char* what () const throw () { return "closed window exeption"; }
+    const char* what () const throw () { return "closed window exception"; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
