@@ -356,6 +356,8 @@ void GlslProgram::GetProgramLog (stl::string& log_buffer)
 {
   int log_length = 0;
 
+  log_buffer.clear ();
+
   MakeContextCurrent ();
 
   if (glGetProgramiv) glGetProgramiv            (program, GL_INFO_LOG_LENGTH, &log_length);
@@ -370,7 +372,8 @@ void GlslProgram::GetProgramLog (stl::string& log_buffer)
     if (glGetProgramInfoLog) glGetProgramInfoLog (program, log_length, &getted_log_size, &log_buffer [0]);
     else                     glGetInfoLogARB     (program, log_length, &getted_log_size, &log_buffer [0]);
     
-    log_buffer.resize (getted_log_size - 1);
+    if (getted_log_size)
+      log_buffer.resize (getted_log_size - 1);
   }
 
   CheckErrors ("render::low_level::opengl::GlslProgram::GetProgramLog");

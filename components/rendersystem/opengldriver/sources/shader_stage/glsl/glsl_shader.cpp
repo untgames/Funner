@@ -32,10 +32,26 @@ GlslShader::GlslShader (const ContextManager& manager, const ShaderDesc& shader_
   {
     GLenum gl_shader_type;
 
+    static Extension ARB_vertex_shader   = "GL_ARB_vertex_shader",
+                     ARB_fragment_shader = "GL_ARB_fragment_shader",
+                     Version_2_0         = "GL_VERSION_2_0";
+
     switch (shader_type)
     {
-      case GlslShaderType_Fragment: gl_shader_type = GL_FRAGMENT_SHADER; break;
-      case GlslShaderType_Vertex:   gl_shader_type = GL_VERTEX_SHADER;   break;
+      case GlslShaderType_Fragment: 
+        if (IsSupported (ARB_fragment_shader) || IsSupported (Version_2_0)) 
+          gl_shader_type = GL_FRAGMENT_SHADER;
+        else
+          RaiseNotSupported (METHOD_NAME, "Can't create fragment shader ('GL_ARB_fragment_shader' extension not supported)");
+        
+        break;
+      case GlslShaderType_Vertex: 
+        if (IsSupported (ARB_vertex_shader) || IsSupported (Version_2_0)) 
+          gl_shader_type = GL_VERTEX_SHADER;
+        else
+          RaiseNotSupported (METHOD_NAME, "Can't create vertex shader ('GL_ARB_vertex_shader' extension not supported)");
+
+        break;
       default: Raise <NotImplementedException> (METHOD_NAME, "Shaders with profile '%s' not implemented", shader_desc.profile);
     }
 
@@ -119,6 +135,8 @@ void GlslShader::GetShaderLog (stl::string& log_buffer)
 {
   int log_length = 0;
 
+  log_buffer.clear ();
+
   MakeContextCurrent ();
 
   if (glGetShaderiv) glGetShaderiv             (shader, GL_INFO_LOG_LENGTH, &log_length);
@@ -133,7 +151,8 @@ void GlslShader::GetShaderLog (stl::string& log_buffer)
     if (glGetShaderInfoLog) glGetShaderInfoLog (shader, log_length, &getted_log_size, &log_buffer [0]);
     else                    glGetInfoLogARB    (shader, log_length, &getted_log_size, &log_buffer [0]);
     
-    log_buffer.resize (getted_log_size - 1);
+    if (getted_log_size)
+      log_buffer.resize (getted_log_size - 1);
   }
 
   CheckErrors ("render::low_level::opengl::GlslShader::GetShaderLog");
