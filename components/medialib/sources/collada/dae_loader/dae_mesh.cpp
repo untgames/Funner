@@ -671,6 +671,20 @@ void DaeParser::ParseSurfaceBuffers(Parser::Iterator p_iter, Parser::Iterator su
     return;
   }  
 
+    //преобразование количества индексов
+
+  switch (surface_info.primitive_type)
+  {
+    case PrimitiveType_TriangleList:  indices_count *= 3; break;
+    case PrimitiveType_TriangleStrip:
+    case PrimitiveType_TriangleFan:   indices_count += 2; break;
+    case PrimitiveType_LineList:      indices_count *= 2; break;
+    case PrimitiveType_LineStrip:     indices_count += 1; break;
+    default:
+      LogError (surface_iter, "Internal error: invalid primitive_type=%d", surface_info.primitive_type);
+      return;
+  }
+
     //чтение исходного буфера индексов
 
   typedef stl::vector<size_t> IndexBuffer;

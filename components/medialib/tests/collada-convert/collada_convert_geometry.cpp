@@ -2,7 +2,8 @@
 
 using namespace media::geometry;
 
-const char* COLLADA_FILE_NAME = "../collada/data/ape.dae";
+const char* COLLADA_FILE_NAME = "../collada/data/teapot1.dae";
+//const char* COLLADA_FILE_NAME = "../collada/data/torus.dae";
 const char* DST_FILE_NAME     = "/io/stdout/test.xmesh";
 
 void print (const char* message)
