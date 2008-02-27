@@ -36,6 +36,7 @@ enum InputStageCache
   InputStageCache_EnabledSemantics,   //маска используемых семантик вершинных атрибутов
   InputStageCache_CurrentBaseVertex,  //текущая базовая вершина
   InputStageCache_CurrentLayoutHash,  //хэш атрибутов layout'а
+  InputStageCache_CurrentBuffersHash, //хэш установленных вершинных буферов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

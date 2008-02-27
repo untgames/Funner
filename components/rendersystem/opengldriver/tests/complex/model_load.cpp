@@ -4,7 +4,7 @@
 
 const char* PIXEL_SHADER_FILE_NAME  = "data/glsl/wood.frag";
 const char* VERTEX_SHADER_FILE_NAME = "data/glsl/wood.vert";
-const char* MODEL_NAME              = "data/teapot1.xmesh";
+const char* MODEL_NAME              = "data/spy.xmesh";
 
 #pragma pack (1)
 
@@ -14,6 +14,7 @@ struct ModelVertexBuffer
 {
   BufferArray    vertex_streams;
   InputLayoutPtr input_layout;
+  size_t         id;
 };
 
 typedef xtl::shared_ptr<ModelVertexBuffer>     VertexBufferPtr;
@@ -100,7 +101,7 @@ struct Model
       {
         if (ib.Size ())
         {        
-          printf ("Create new hw index-buffer\n");                
+          printf ("Create new hw index-buffer (%u indices)\n", ib.Size ());
           
           BufferDesc desc;
           
@@ -130,7 +131,6 @@ struct Model
         ModelPrimitive                    dst_primitive;
         
         memset (&dst_primitive, 0, sizeof dst_primitive);                
-
         
         switch (src_primitive.type)
         {
@@ -164,8 +164,8 @@ struct Model
         dst_primitive.vertex_buffer = model_mesh->vertex_buffers [src_primitive.vertex_buffer];
         dst_primitive.first         = src_primitive.first;
 
-        printf ("primitive#%u: type=%s vb-slot=%u first=%u count=%u\n", i, get_name (dst_primitive.type), src_primitive.vertex_buffer,
-                dst_primitive.first, dst_primitive.count);
+        printf ("primitive#%u: type=%s vb-slot=%u vb-id=VB#%u vb-ptr=%p first=%u count=%u (vb-slots=%u)\n", i, get_name (dst_primitive.type), src_primitive.vertex_buffer,
+                dst_primitive.vertex_buffer->id, dst_primitive.vertex_buffer.get (), dst_primitive.first, dst_primitive.count, model_mesh->vertex_buffers.size ());
 
         model_mesh->primitives.push_back (dst_primitive);
       }
@@ -189,6 +189,8 @@ struct Model
         printf ("Load VB#%u\n", vb.Id ());
         
         VertexBufferPtr model_vb (new ModelVertexBuffer);
+        
+        model_vb->id = vb.Id ();
         
         stl::vector<VertexAttribute> vertex_attributes;
         
@@ -332,9 +334,9 @@ struct Model
       {
         const ModelPrimitive& primitive = *iter;
         ModelVertexBuffer&    vb        = *primitive.vertex_buffer;
-        
-        device->ISSetInputLayout (vb.input_layout.get ());
-        
+
+        device->ISSetInputLayout (vb.input_layout.get ());        
+
         for (size_t i=0; i<vb.vertex_streams.size (); i++)
         {
           BufferPtr vs = vb.vertex_streams [i];          
@@ -342,14 +344,23 @@ struct Model
           device->ISSetVertexBuffer (i, vs.get ());
         }
         
-        if (mesh.index_buffer)
-        {
-          device->DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
+        glPushMatrix ();
+        
+        for (size_t i=0; i<20; i++)
+        {        
+          glTranslatef (20, 0, 0);
+          
+          if (mesh.index_buffer)
+          {
+            device->DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
+          }
+          else
+          {
+            device->Draw (primitive.type, primitive.first, primitive.count);
+          }
         }
-        else
-        {
-          device->Draw (primitive.type, primitive.first, primitive.count);
-        }
+        
+        glPopMatrix ();
       }
     }
   }
@@ -383,11 +394,64 @@ void print (const char* message)
 
 Model* model_ptr = 0;
 
+size_t frames_count = 0;
+
 void redraw (Test& test)
 {   
   Model& model = *model_ptr;
 
   model.Draw ();
+  
+  frames_count++;
+}
+
+void idle (Test& test)
+{
+  if (test.window.IsClosed ())
+    return;    
+
+  static const   float DT = 0.01f;
+  static float   t = 0;
+  static clock_t last = 0;
+  static float angle;
+  
+  static size_t last_fps = 0;
+  
+  float dt = float (clock () - last) / float (CLK_TCK);
+
+  if (clock () - last > CLK_TCK / 40)
+  {
+    last = clock ();
+    return;
+  }
+  
+  if (clock () - last_fps > CLK_TCK)
+  {
+    printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
+
+    last_fps = clock ();
+    frames_count = 0;
+    return;
+  }
+
+  MyShaderParameters my_shader_parameters;
+  
+  IBuffer* cb = test.device->SSGetConstantBuffer (0);
+  
+  if (!cb)
+  {
+    printf ("Null constant buffer #0\n");
+    return;
+  }
+  
+  cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+    
+  my_shader_parameters.transform = math::rotatef (math::deg2rad (angle+=50.0f*dt), 0, 0, 1);
+//  my_shader_parameters.transform *= math::rotatef (math::deg2rad (.3f), 0, 0, 1);
+
+  cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+ 
+  test.window.Invalidate ();
 }
 
 int main ()
@@ -443,7 +507,7 @@ int main ()
       1.0f,
       math::vec3f (0.6f, 0.3f, 0.1f),
       math::vec3f (0.15f, 0.15f / 2.0f, 0),
-      math::vec3f (0.0f, 40.0f, 40.0f),
+      math::vec3f (-400.0f, 0.0f, 0.0f),
       1.f
     };
 
@@ -459,7 +523,12 @@ int main ()
     glRotatef    (-90, 1, 0, 0);
     glRotatef    (180, 0, 0, 1);
 //    glTranslatef (0, 0, 400);
-    glTranslatef (0, -400, 0);   
+    glTranslatef (0, 400, 0);   
+    glScalef     (0.5, 0.5, 0.5);
+
+    printf ("Register callbacks\n");
+
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test)));
 
     printf ("Main loop\n");
 

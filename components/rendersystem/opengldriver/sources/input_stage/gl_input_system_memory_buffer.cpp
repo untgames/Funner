@@ -41,7 +41,9 @@ void SystemMemoryBuffer::GetDataCore (size_t offset, size_t size, void* data)
 
 void SystemMemoryBuffer::Bind ()
 {
-  //установка не требуется
+  GetContextDataTable (Stage_Input)[InputStageCache_BindedVboBuffer] = 0;
+  
+    //установка не требуется
 }
 
 /*

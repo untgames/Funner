@@ -554,7 +554,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
     
     vb.Bind ();
     
-    const char* base_offset = (const char*)vb.GetDataPointer ();    
+    const char* base_offset = (const char*)vb.GetDataPointer ();
     
       //настройка вершинных атрибутов
       
@@ -608,22 +608,35 @@ void InputLayout::Bind
   IndicesLayout* out_indices_layout)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::Bind";
-
+  
     //установка текущего контекста
 
   MakeContextCurrent ();  
+  
+    //проверка необходимости переустановки layout
+    
+  ContextDataTable& cache = GetContextDataTable (Stage_Input);
 
-    //установка вершинных атрибутов
+  size_t &current_base_vertex  = cache [InputStageCache_CurrentBaseVertex],  
+         &current_layout_hash  = cache [InputStageCache_CurrentLayoutHash],
+         &current_buffers_hash = cache [InputStageCache_CurrentBuffersHash];
+  
+  size_t vertex_buffers_id [DEVICE_VERTEX_BUFFER_SLOTS_COUNT];
 
-  size_t& current_base_vertex = GetContextDataTable (Stage_Input)[InputStageCache_CurrentBaseVertex];
-  size_t& current_layout_hash = GetContextDataTable (Stage_Input)[InputStageCache_CurrentLayoutHash]; 
+  for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
+    vertex_buffers_id [i] = vertex_buffers [i] ? vertex_buffers [i]->GetId () : 0;
 
-  if (current_base_vertex != base_vertex || current_layout_hash != attributes_hash)
+  size_t buffers_hash = crc32 (vertex_buffers_id, sizeof vertex_buffers_id);
+
+    //установка вершинных атрибутов  
+
+  if (current_base_vertex != base_vertex || current_layout_hash != attributes_hash || buffers_hash != current_buffers_hash)
   {
     BindVertexAttributes (base_vertex, vertex_buffers);
 
-    current_base_vertex = base_vertex;
-    current_layout_hash = attributes_hash;
+    current_base_vertex  = base_vertex;
+    current_layout_hash  = attributes_hash;
+    current_buffers_hash = buffers_hash;
   }
 
     //установка индексного буфера
