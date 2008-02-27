@@ -108,7 +108,7 @@ inline void uninitialized_storage<T, Allocator>::reserve (size_type new_size, bo
   size_type size = end_of_storage - start;
 
   if (new_size <= size)
-    return;
+    return;    
     
   pointer new_buffer = allocate (new_size);
   
