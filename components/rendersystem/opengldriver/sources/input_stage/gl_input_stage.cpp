@@ -92,8 +92,6 @@ struct InputStage::Impl: public ContextObject
 
   InputStageState state;                        //состояние уровня
   InputLayoutPtr  default_layout;               //состояние расположения геометрии по умолчанию  
-  bool            has_arb_multitexture;         //поддерживается ли GL_ARB_vertex_buffer_object
-  bool            has_arb_vertex_buffer_object; //поддерживается ли GL_ARB_vertex_buffer_object
   size_t          texture_units_count;          //количество текстурных юнитов поддерживаемое аппаратно  
 
   /*
@@ -106,18 +104,7 @@ struct InputStage::Impl: public ContextObject
 
     MakeContextCurrent();
 
-      //получение информации о поддерживаемых расширениях
-      
-    static Extension ARB_multitexture         = "GL_ARB_multitexture",
-                     ARB_vertex_buffer_object = "GL_ARB_vertex_buffer_object",
-                     Version_1_3              = "GL_VERSION_1_3",
-                     Version_1_5              = "GL_VERSION_1_5";
-
-    has_arb_multitexture         = IsSupported (ARB_multitexture) || IsSupported (Version_1_3);
-    has_arb_vertex_buffer_object = IsSupported (ARB_vertex_buffer_object) || IsSupported (Version_1_5);
-
-    if (has_arb_multitexture)
-      glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, (GLint*)&texture_units_count);
+    texture_units_count = GetCaps ().texture_units_count;
       
     if (texture_units_count > DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
       texture_units_count = DEVICE_VERTEX_BUFFER_SLOTS_COUNT;
@@ -147,7 +134,7 @@ struct InputStage::Impl: public ContextObject
   {
     try
     {
-      if (has_arb_vertex_buffer_object)
+      if (GetCaps ().has_arb_vertex_buffer_object)
       {
         return new VboBuffer (GetContextManager (), buffer_target, desc);
       }

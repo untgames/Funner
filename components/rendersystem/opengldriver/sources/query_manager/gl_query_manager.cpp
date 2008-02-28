@@ -54,10 +54,7 @@ IPredicate* QueryManager::Impl::CreatePredicate ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::QueryManager::Impl::CreatePredicate";
 
-  static Extension ARB_occlusion_query = "GL_ARB_occlusion_query",
-                   Version_1_5         = "GL_VERSION_1_5";
-
-  if (!(IsSupported (ARB_occlusion_query) || IsSupported (Version_1_5)))
+  if (!GetCaps ().has_arb_occlusion_query)
     return new NullPredicate (GetContextManager ());
 
   int query_counter_bits = 0;

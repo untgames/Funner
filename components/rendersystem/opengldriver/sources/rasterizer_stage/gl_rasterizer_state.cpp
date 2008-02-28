@@ -99,12 +99,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RasterizerState::SetDesc";
 
-  static Extension ARB_multisample = "GL_ARB_multisample",
-                   Version_1_3     = "GL_VERSION_1_3";
-
-  bool has_arb_multisample = IsSupported (ARB_multisample) || IsSupported (Version_1_3);
-
-  if (in_desc.multisample_enable && !has_arb_multisample)
+  if (in_desc.multisample_enable && !GetCaps ().has_arb_multisample)
     RaiseNotSupported (METHOD_NAME, "Multisampling not supported (GL_ARB_multisample extension not supported)");
 
   MakeContextCurrent ();

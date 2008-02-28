@@ -55,35 +55,7 @@ BlendState::~BlendState ()
 namespace
 {
 
-struct BlendExtensions
-{
-  bool has_ext_blend_func_separate;     //GL_EXT_blend_func_separate
-  bool has_ext_blend_equation_separate; //GL_EXT_blend_equation_separate
-  bool has_ext_blend_minmax;            //GL_EXT_blend_minmax
-  bool has_ext_blend_subtract;          //GL_EXT_blend_subtract
-  bool has_arb_multisample;             //GL_ARB_multisample
-  
-  BlendExtensions (const ContextManager& manager)
-  {
-    static Extension EXT_blend_func_separate     = "GL_EXT_blend_func_separate",
-                     EXT_blend_equation_separate = "GL_EXT_blend_equation_separate",
-                     EXT_blend_minmax            = "GL_EXT_blend_minmax",
-                     EXT_blend_subtract          = "GL_EXT_blend_subtract",
-                     ARB_multisample             = "GL_ARB_multisample",
-                     Version_1_2                 = "GL_VERSION_1_2",
-                     Version_1_3                 = "GL_VERSION_1_3",
-                     Version_1_4                 = "GL_VERSION_1_4",
-                     Version_2_0                 = "GL_VERSION_2_0";
-      
-    has_ext_blend_func_separate     = manager.IsSupported (EXT_blend_func_separate) || manager.IsSupported (Version_1_4);
-    has_ext_blend_equation_separate = manager.IsSupported (EXT_blend_equation_separate) || manager.IsSupported (Version_2_0);
-    has_ext_blend_minmax            = manager.IsSupported (EXT_blend_minmax) || manager.IsSupported (Version_1_2);
-    has_ext_blend_subtract          = manager.IsSupported (EXT_blend_subtract) || manager.IsSupported (Version_1_2);
-    has_arb_multisample             = manager.IsSupported (ARB_multisample) || manager.IsSupported (Version_1_3);
-  }
-};
-
-void check_blend_operation (BlendOperation operation, const BlendExtensions& ext, const char* method, const char* param)
+void check_blend_operation (BlendOperation operation, const ContextCaps& caps, const char* method, const char* param)
 {
   switch (operation)
   {
@@ -91,13 +63,13 @@ void check_blend_operation (BlendOperation operation, const BlendExtensions& ext
       break;
     case BlendOperation_Subtraction:
     case BlendOperation_ReverseSubtraction:
-      if (!ext.has_ext_blend_subtract)
+      if (!caps.has_ext_blend_subtract)
         RaiseNotSupported (method, "Unsupported blend operation %s=%s (GL_EXT_blend_subtract not supported)", param, get_name (operation));
 
       break;
     case BlendOperation_Min:
     case BlendOperation_Max:
-      if (!ext.has_ext_blend_minmax)
+      if (!caps.has_ext_blend_minmax)
         RaiseNotSupported (method, "Unsupported blend operation %s=%s (GL_EXT_blend_minmax not supported)", param, get_name (operation));
 
       break;      
@@ -133,7 +105,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   
     //определение поддержки расширений OpenGL
     
-  BlendExtensions ext (GetContextManager ());
+  const ContextCaps& caps = GetCaps ();
 
     //преобразование данных дескриптора
     
@@ -219,18 +191,18 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
       break;    
   }  
   
-  if (!ext.has_arb_multisample && desc.sample_alpha_to_coverage) 
+  if (!caps.has_arb_multisample && desc.sample_alpha_to_coverage) 
     RaiseNotSupported (METHOD_NAME, "Can't enable sample alpha to coverage mode (GL_ARB_multisample extension not supported)");
 
     //проверка поддержки расширений
     
   if (in_desc.blend_enable && (in_desc.color_write_mask & ColorWriteFlag_All))
   {  
-    if (color_blend_equation != alpha_blend_equation && !ext.has_ext_blend_equation_separate)
+    if (color_blend_equation != alpha_blend_equation && !caps.has_ext_blend_equation_separate)
       RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_operation=%s mismatch desc.blend_alpha_operation=%s"
         " (GL_EXT_blend_equation_separate not supported)", get_name (in_desc.blend_color_operation), get_name (in_desc.blend_alpha_operation));
     
-    if (!ext.has_ext_blend_func_separate)
+    if (!caps.has_ext_blend_func_separate)
     {
       if (src_color_arg != src_alpha_arg)
         RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_source_argument=%s mismatch desc.blend_alpha_source_argument=%s"
@@ -241,8 +213,8 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
         " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_destination_argument), get_name (in_desc.blend_alpha_destination_argument));
     }
 
-    check_blend_operation (in_desc.blend_color_operation, ext, METHOD_NAME, "desc.blend_color_operation");
-    check_blend_operation (in_desc.blend_alpha_operation, ext, METHOD_NAME, "desc.blend_alpha_operation");
+    check_blend_operation (in_desc.blend_color_operation, caps, METHOD_NAME, "desc.blend_color_operation");
+    check_blend_operation (in_desc.blend_alpha_operation, caps, METHOD_NAME, "desc.blend_alpha_operation");
   }
 
     //запись команд в контексте OpenGL
@@ -280,7 +252,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     glDisable (GL_BLEND);
   }
   
-  if (ext.has_arb_multisample)
+  if (caps.has_arb_multisample)
   {
     if (in_desc.sample_alpha_to_coverage) glEnable  (GL_SAMPLE_ALPHA_TO_COVERAGE);
     else                                  glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);

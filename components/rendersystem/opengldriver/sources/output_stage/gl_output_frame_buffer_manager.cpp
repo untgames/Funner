@@ -229,9 +229,7 @@ void FrameBufferManager::SetFrameBuffer
   
     //установка буфера кадра по умолчанию
     
-  static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
-  
-  if (context_manager.IsSupported (EXT_framebuffer_object) && current_fbo)
+  if (context_manager.GetCaps().has_ext_framebuffer_object && current_fbo)
     glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
 
     //установка текущего буфера чтения и отрисовки
@@ -280,9 +278,7 @@ void FrameBufferManager::SetFrameBuffer (size_t fbo_id, size_t cache_id)
 
     //проверка наличия необходимого расширения
 
-  static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
-
-  if (!context_manager.IsSupported (EXT_framebuffer_object))
+  if (!context_manager.GetCaps ().has_ext_framebuffer_object)
     RaiseNotSupported (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
 
     //установка буфера в контекст OpenGL

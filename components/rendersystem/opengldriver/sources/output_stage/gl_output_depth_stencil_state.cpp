@@ -4,28 +4,6 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
-
-namespace
-{
-
-struct DepthStencilExtensions
-{
-  bool has_ext_stencil_two_side;
-  bool has_ati_separate_stencil;
-  
-  DepthStencilExtensions (const ContextManager& manager)
-  {
-    static Extension EXT_stencil_two_side = "GL_EXT_stencil_two_side",
-                     ATI_separate_stencil = "GL_ATI_separate_stencil",
-                     Version_2_0          = "GL_VERSION_2_0";
-
-    has_ext_stencil_two_side = manager.IsSupported (EXT_stencil_two_side);
-    has_ati_separate_stencil = manager.IsSupported (ATI_separate_stencil) || manager.IsSupported (Version_2_0);
-  }
-};
-
-}
-
 /*
     Конструктор / деструктор
 */
@@ -124,9 +102,9 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
   
     //получение информации о доступных расширениях    
     
-  DepthStencilExtensions extensions (GetContextManager ());
+  const ContextCaps& caps = GetCaps ();
   
-  bool has_two_side_stencil = extensions.has_ext_stencil_two_side || extensions.has_ati_separate_stencil;
+  bool has_two_side_stencil = caps.has_ext_stencil_two_side || caps.has_ati_separate_stencil;
   
     //преобразование данных дескриптора
     
@@ -211,7 +189,7 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
     
     if (need_two_side_stencil)
     {
-      if (extensions.has_ati_separate_stencil)
+      if (caps.has_ati_separate_stencil)
       {
         if (glStencilOpSeparate)
         {
@@ -228,7 +206,7 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
                                   gl_stencil_operation [FaceMode_Back][2]);
         }
       }
-      else if (extensions.has_ext_stencil_two_side)
+      else if (caps.has_ext_stencil_two_side)
       {
         glEnable               (GL_STENCIL_TEST_TWO_SIDE_EXT);        
         glActiveStencilFaceEXT (GL_FRONT);
@@ -239,7 +217,7 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
     }
     else
     {
-      if (extensions.has_ext_stencil_two_side)
+      if (caps.has_ext_stencil_two_side)
         glDisable (GL_STENCIL_TEST_TWO_SIDE_EXT);
 
       glStencilOp (gl_stencil_operation [0][0], gl_stencil_operation [0][1], gl_stencil_operation [0][2]);
@@ -311,11 +289,11 @@ void DepthStencilState::Bind (size_t reference)
     {
         //получение информации о доступных расширениях
         
-      DepthStencilExtensions extensions (GetContextManager ());
+      const ContextCaps& caps = GetCaps ();
 
         //настройка функции трафарета
 
-      if (extensions.has_ati_separate_stencil)
+      if (caps.has_ati_separate_stencil)
       {
         if (glStencilFuncSeparate)
         {
@@ -328,7 +306,7 @@ void DepthStencilState::Bind (size_t reference)
           glStencilFuncSeparateATI (GL_BACK, gl_stencil_func [1], reference, desc.stencil_read_mask);
         }
       }
-      else if (extensions.has_ext_stencil_two_side)
+      else if (caps.has_ext_stencil_two_side)
       {
         glActiveStencilFaceEXT (GL_FRONT);
         glStencilFunc          (gl_stencil_func [0], reference, desc.stencil_read_mask);

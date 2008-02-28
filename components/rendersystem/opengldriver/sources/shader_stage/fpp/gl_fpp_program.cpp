@@ -265,18 +265,14 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
                    
     //отключение glsl-шейдеров
 
-  static Extension ARB_shading_language_100 = "GL_ARB_shading_language_100",
-                   Version_2_0              = "GL_VERSION_2_0";        
+  const ContextCaps& caps = GetCaps ();
                    
   size_t& current_program = GetContextDataTable (Stage_Shading)[ShaderStageCache_UsedProgram];
 
   if (current_program != GetId ())
   {    
-    if (IsSupported (ARB_shading_language_100) || IsSupported (Version_2_0))
-    {
-      if (glUseProgram) glUseProgram          (0);
-      else              glUseProgramObjectARB (0);
-    }
+    if (caps.has_arb_shading_language_100)
+      caps.glUseProgram_fn (0);
 
     current_program = GetId ();
   }

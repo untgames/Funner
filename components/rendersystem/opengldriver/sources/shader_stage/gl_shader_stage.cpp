@@ -104,10 +104,7 @@ struct ShaderStage::Impl: public ContextObject
 ShaderStage::Impl::Impl (const ContextManager& context_manager)
   : ContextObject (context_manager)
 {
-  static Extension ARB_shading_language_100 = "GL_ARB_shading_language_100",
-                   Version_2_0              = "GL_VERSION_2_0";
-
-  if (IsSupported (ARB_shading_language_100) || IsSupported (Version_2_0))
+  if (GetCaps ().has_arb_shading_language_100)
     AddShaderManager (ShaderManagerPtr (create_glsl_shader_manager (context_manager), false));
 
   AddShaderManager (ShaderManagerPtr (create_fpp_shader_manager (context_manager), false));

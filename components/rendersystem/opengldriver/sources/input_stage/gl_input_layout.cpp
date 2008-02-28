@@ -219,12 +219,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
       
     MakeContextCurrent ();
     
-      //проверка необходимых расширений
-      
-    static Extension ARB_multitexture = "GL_ARB_multitexture",
-                     Version_1_3      = "GL_VERSION_1_3"; 
-
-    bool has_arb_multitexture = IsSupported (ARB_multitexture) || IsSupported (Version_1_3);
+    const ContextCaps& caps = GetCaps ();
 
       //предварительная проверка и сортировка вершинных атрибутов
 
@@ -261,7 +256,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
         case VertexAttributeSemantic_TexCoord6:
         case VertexAttributeSemantic_TexCoord7:
         {
-          if (!has_arb_multitexture)
+          if (!caps.has_arb_multitexture)
             RaiseNotSupported (METHOD_NAME, "Bad desc.vertex_attribute[%u].semantic=%s (GL_ARB_multitexture & GL_VERSION_1_3 not supported)",
                                i, get_name (va.semantic));
 
@@ -485,20 +480,8 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
 {
   static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::BindVertexAttributes";
 
-    //проверка поддержки необходимых расширений
-    
-  static Extension ARB_multitexture = "GL_ARB_multitexture",
-                   Version_1_3      = "GL_VERSION_1_3"; 
-  
-  bool                          has_arb_multitexture     = IsSupported (ARB_multitexture) || IsSupported (Version_1_3);
-  PFNGLCLIENTACTIVETEXTUREPROC  glClientActiveTexture_fn = 0;
-  
-  if (has_arb_multitexture)
-  {
-    if (glClientActiveTexture) glClientActiveTexture_fn = glClientActiveTexture;
-    else                       glClientActiveTexture_fn = glClientActiveTextureARB;
-  }
-  
+  const ContextCaps& caps = GetCaps ();
+
     //проверка возможности установки вершинных буферов
   
   for (GlVertexAttributeGroupArray::iterator iter=vertex_attribute_groups.begin (), end=vertex_attribute_groups.end (); iter!=end; ++iter)
@@ -515,7 +498,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
     set_client_capability (GL_NORMAL_ARRAY, current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Normal);
     set_client_capability (GL_COLOR_ARRAY,  current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Color);
 
-    if (has_arb_multitexture)
+    if (caps.has_arb_multitexture)
     {
       size_t mask = 1 << VertexAttributeSemantic_TexCoord0;
 
@@ -523,15 +506,15 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
       {
         if (current_enabled_semantics_mask & ~used_semantics_mask & mask)
         {
-          glClientActiveTexture_fn (GL_TEXTURE0 + i);
-          glDisableClientState     (GL_TEXTURE_COORD_ARRAY);
+          caps.glClientActiveTexture_fn (GL_TEXTURE0 + i);
+          glDisableClientState          (GL_TEXTURE_COORD_ARRAY);
           return;
         }
 
         if (used_semantics_mask & ~current_enabled_semantics_mask & mask)
         {
-          glClientActiveTexture_fn (GL_TEXTURE0 + i);
-          glEnableClientState      (GL_TEXTURE_COORD_ARRAY);
+          caps.glClientActiveTexture_fn (GL_TEXTURE0 + i);
+          glEnableClientState           (GL_TEXTURE_COORD_ARRAY);
           return;
         }
       }
@@ -583,11 +566,11 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
         case VertexAttributeSemantic_TexCoord6:
         case VertexAttributeSemantic_TexCoord7:          
         {
-          if (has_arb_multitexture)
+          if (caps.has_arb_multitexture)
           {
             size_t tex_unit = va.semantic - VertexAttributeSemantic_TexCoord0;
 
-            glClientActiveTexture_fn (GL_TEXTURE0 + tex_unit);
+            caps.glClientActiveTexture_fn (GL_TEXTURE0 + tex_unit);
           }
 
           glTexCoordPointer (va.components, va.type, va.stride, offset);

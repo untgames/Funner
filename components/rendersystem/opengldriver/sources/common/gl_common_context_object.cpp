@@ -63,6 +63,15 @@ bool ContextObject::IsSupported (const Extension& extension) const
 }
 
 /*
+   Поулчение аппаратно поддерживаемых возможностей контекста
+*/
+
+const ContextCaps& ContextObject::GetCaps () const
+{
+  return context_manager.GetCaps ();
+}
+
+/*
     Протоколирование
 */
 

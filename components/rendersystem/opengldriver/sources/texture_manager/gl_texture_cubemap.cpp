@@ -8,8 +8,8 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-TextureCubemap::TextureCubemap  (const ContextManager& manager, const ExtensionsPtr& extensions, const TextureDesc& tex_desc)
-  : Texture (manager, extensions, tex_desc, GL_TEXTURE_CUBE_MAP_ARB, get_mips_count (tex_desc.width, tex_desc.height))
+TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDesc& tex_desc)
+  : Texture (manager, tex_desc, GL_TEXTURE_CUBE_MAP_ARB, get_mips_count (tex_desc.width, tex_desc.height))
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureCubemap::TextureCubemap";
   
@@ -30,7 +30,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const Extensions
 
      //преобразование формата пикселей
 
-  GLenum gl_internal_format = GetExtensions ().has_ext_texture_compression_s3tc ? get_gl_internal_format (tex_desc.format) :
+  GLenum gl_internal_format = GetCaps ().has_ext_texture_compression_s3tc ? get_gl_internal_format (tex_desc.format) :
                               get_uncompressed_gl_internal_format (tex_desc.format),
          gl_format          = get_uncompressed_gl_format (tex_desc.format),
          gl_type            = get_uncompressed_gl_type (tex_desc.format);
@@ -126,10 +126,5 @@ void TextureCubemap::SetCompressedData
   size_t      buffer_size,
   const void* buffer)
 {
-  PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC glCompressedTexSubImage2D_fn = 0;
-
-  if (glCompressedTexSubImage2D) glCompressedTexSubImage2D_fn = glCompressedTexSubImage2D;
-  else                           glCompressedTexSubImage2D_fn = glCompressedTexSubImage2DARB;
-
-  glCompressedTexSubImage2D_fn (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, format, buffer_size, buffer);
+  GetCaps ().glCompressedTexSubImage2D_fn (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, format, buffer_size, buffer);
 }

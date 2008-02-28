@@ -284,10 +284,7 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
     //проверка наличия расширения GL_ARB_window_pos либо версии OpenGL не ниже 1.4
 
-  static Extension ARB_window_pos = "GL_ARB_window_pos",
-                   Version_1_4    = "GL_VERSION_1_4";
-
-  if (!IsSupported (ARB_window_pos) && !IsSupported (Version_1_4))
+  if (!GetCaps ().has_arb_window_pos)
     RaiseNotSupported (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
     
     //установка позиции растра
@@ -354,9 +351,7 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
             //копирование может быть произведено двумя способами: при помощи расширения EXT_packed_depth_stencil,
             //либо посредством разделения переданного буфера на 2: буфер глубины и буфер трафарета
             
-          static Extension EXT_packed_depth_stencil = "GL_EXT_packed_depth_stencil";        
-
-          if (IsSupported (EXT_packed_depth_stencil))
+          if (GetCaps ().has_ext_packed_depth_stencil)
           {
             glDrawPixels (width, height, GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT_24_8_EXT, buffer);
           }
@@ -480,9 +475,7 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
             //копирование может быть произведено двумя способами: при помощи расширения EXT_packed_depth_stencil,
             //либо посредством разделения переданного буфера на 2: буфер глубины и буфер трафарета
             
-          static Extension EXT_packed_depth_stencil = "GL_EXT_packed_depth_stencil";
-
-          if (IsSupported (EXT_packed_depth_stencil))
+          if (GetCaps ().has_ext_packed_depth_stencil)
           {
             glReadPixels (x, y, width, height, GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT_24_8_EXT, buffer);
           }

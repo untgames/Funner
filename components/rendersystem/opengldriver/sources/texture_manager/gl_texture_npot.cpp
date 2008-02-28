@@ -8,8 +8,8 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-TextureNpot::TextureNpot  (const ContextManager& manager, const ExtensionsPtr& extensions, const TextureDesc& tex_desc)
-  : Texture (manager, extensions, tex_desc, GL_TEXTURE_RECTANGLE_EXT, 1)
+TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex_desc)
+  : Texture (manager, tex_desc, GL_TEXTURE_RECTANGLE_EXT, 1)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureNpot::TextureNpot";
 

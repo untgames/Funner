@@ -8,8 +8,8 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-Texture3D::Texture3D  (const ContextManager& manager, const ExtensionsPtr& extensions, const TextureDesc& tex_desc)
-  : Texture (manager, extensions, tex_desc, GL_TEXTURE_3D_EXT, get_mips_count (tex_desc.width, tex_desc.height, tex_desc.layers))
+Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_desc)
+  : Texture (manager, tex_desc, GL_TEXTURE_3D_EXT, get_mips_count (tex_desc.width, tex_desc.height, tex_desc.layers))
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture3D::Texture3D";
 

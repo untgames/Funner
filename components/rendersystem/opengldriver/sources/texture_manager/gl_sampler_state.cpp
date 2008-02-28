@@ -62,8 +62,8 @@ TexTargetId get_target_id (GLenum tex_target)
    Конструктор
 */
 
-SamplerState::SamplerState (const ContextManager& manager, const ExtensionsPtr& in_extensions, const SamplerDesc& in_desc) 
-  : ContextObject (manager), desc_hash (0), display_list (0), extensions (in_extensions)
+SamplerState::SamplerState (const ContextManager& manager, const SamplerDesc& in_desc) 
+  : ContextObject (manager), desc_hash (0), display_list (0)
 {
   SetDesc (in_desc);
 }
@@ -108,11 +108,13 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
     //сделать проверку отсутствия расширения!!!!
   
-  if (in_desc.max_anisotropy > extensions->max_anisotropy)
-    if (extensions->has_ext_texture_filter_anisotropic)
-      RaiseNotSupported (METHOD_NAME, "Can't set anisotropy level %u (max anisotropy level %u)", in_desc.max_anisotropy, extensions->max_anisotropy);
+  const ContextCaps& caps = GetCaps ();
 
-  if (!extensions->has_ext_shadow_funcs && in_desc.comparision_function != CompareMode_AlwaysPass)
+  if (in_desc.max_anisotropy > caps.max_anisotropy)
+    if (caps.has_ext_texture_filter_anisotropic)
+      RaiseNotSupported (METHOD_NAME, "Can't set anisotropy level %u (max anisotropy level %u)", in_desc.max_anisotropy, caps.max_anisotropy);
+
+  if (!caps.has_ext_shadow_funcs && in_desc.comparision_function != CompareMode_AlwaysPass)
     RaiseNotSupported (METHOD_NAME, "Can't set comparision function %s (GL_EXT_shadow_funcs extension not supported)", get_name (in_desc.comparision_function));
   
     //преобразование дескриптора сэмплера    
@@ -161,14 +163,14 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     switch (wrap [i])
     {
       case TexcoordWrap_Mirror:
-        if (extensions->has_arb_texture_mirrored_repeat)
+        if (caps.has_arb_texture_mirrored_repeat)
           gl_wrap [i] = GL_MIRRORED_REPEAT; 
         else
           RaiseNotSupported (METHOD_NAME, "Can't set %s=%s (GL_ARB_texture_mirrored_repeat not supported)", wrap_name [i], get_name (wrap [i]));
 
         break;
       case TexcoordWrap_ClampToBorder: 
-        if (extensions->has_arb_texture_border_clamp)
+        if (caps.has_arb_texture_border_clamp)
           gl_wrap [i] = GL_CLAMP_TO_BORDER;
         else
           RaiseNotSupported (METHOD_NAME, "Can't set %s=%s (GL_ARB_texture_border_clamp not supported)", wrap_name [i], get_name (wrap [i]));
@@ -228,23 +230,23 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     glTexParameteri (tex_target, GL_TEXTURE_MIN_FILTER, gl_min_filter);
     glTexParameteri (tex_target, GL_TEXTURE_MAG_FILTER, gl_mag_filter);
 
-    if (!extensions->has_ext_texture_filter_anisotropic)
+    if (!caps.has_ext_texture_filter_anisotropic)
       glTexParameteri (tex_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, in_desc.max_anisotropy);
 
     glTexParameteri (tex_target, GL_TEXTURE_WRAP_S, gl_wrap [Texcoord_U]);
     glTexParameteri (tex_target, GL_TEXTURE_WRAP_T, gl_wrap [Texcoord_V]);
     glTexParameteri (tex_target, GL_TEXTURE_WRAP_R, gl_wrap [Texcoord_W]);
 
-    if (extensions->has_sgis_texture_lod)
+    if (caps.has_sgis_texture_lod)
     {
       glTexParameterf (tex_target, GL_TEXTURE_MIN_LOD, in_desc.min_lod);
       glTexParameterf (tex_target, GL_TEXTURE_MAX_LOD, in_desc.max_lod);
     }
 
-    if (extensions->has_ext_texture_lod_bias) //?????????
+    if (caps.has_ext_texture_lod_bias) //?????????
       glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, in_desc.mip_lod_bias);
 
-    if (extensions->has_ext_shadow_funcs) ///неполная проверка!!!!!!
+    if (caps.has_ext_shadow_funcs) ///неполная проверка!!!!!!
     {
       glTexParameteri (tex_target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
       glTexParameteri (tex_target, GL_TEXTURE_COMPARE_FUNC, gl_comparision_function);

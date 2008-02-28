@@ -32,21 +32,17 @@ GlslShader::GlslShader (const ContextManager& manager, const ShaderDesc& shader_
   {
     GLenum gl_shader_type;
 
-    static Extension ARB_vertex_shader   = "GL_ARB_vertex_shader",
-                     ARB_fragment_shader = "GL_ARB_fragment_shader",
-                     Version_2_0         = "GL_VERSION_2_0";
-
     switch (shader_type)
     {
       case GlslShaderType_Fragment: 
-        if (IsSupported (ARB_fragment_shader) || IsSupported (Version_2_0)) 
+        if (GetCaps ().has_arb_fragment_shader) 
           gl_shader_type = GL_FRAGMENT_SHADER;
         else
           RaiseNotSupported (METHOD_NAME, "Can't create fragment shader ('GL_ARB_fragment_shader' extension not supported)");
         
         break;
       case GlslShaderType_Vertex: 
-        if (IsSupported (ARB_vertex_shader) || IsSupported (Version_2_0)) 
+        if (GetCaps ().has_arb_vertex_shader) 
           gl_shader_type = GL_VERTEX_SHADER;
         else
           RaiseNotSupported (METHOD_NAME, "Can't create vertex shader ('GL_ARB_vertex_shader' extension not supported)");

@@ -8,8 +8,8 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-Texture2D::Texture2D  (const ContextManager& manager, const ExtensionsPtr& extensions, const TextureDesc& tex_desc)
-  : Texture (manager, extensions, tex_desc, GL_TEXTURE_2D, get_mips_count (tex_desc.width, tex_desc.height))
+Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_desc)
+  : Texture (manager, tex_desc, GL_TEXTURE_2D, get_mips_count (tex_desc.width, tex_desc.height))
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture2D::Texture2D";
   
@@ -19,7 +19,7 @@ Texture2D::Texture2D  (const ContextManager& manager, const ExtensionsPtr& exten
 
      //преобразование формата пикселей
 
-  GLenum gl_internal_format = GetExtensions ().has_ext_texture_compression_s3tc ? get_gl_internal_format (tex_desc.format) :
+  GLenum gl_internal_format = GetCaps ().has_ext_texture_compression_s3tc ? get_gl_internal_format (tex_desc.format) :
                               get_uncompressed_gl_internal_format (tex_desc.format),
          gl_format          = get_uncompressed_gl_format (tex_desc.format),
          gl_type            = get_uncompressed_gl_type (tex_desc.format);

@@ -56,9 +56,7 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManager& manager, const Textu
   
     //проверка наличия необходимого расширения
     
-  static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
-  
-  if (!IsSupported (EXT_framebuffer_object))
+  if (!GetCaps ().has_ext_framebuffer_object)
     RaiseNotSupported (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
   
     //преобразование формата буфера рендеринга
@@ -67,9 +65,7 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManager& manager, const Textu
   
   if (desc.format == PixelFormat_D24S8)
   {
-    static Extension EXT_packed_depth_stencil = "GL_EXT_packed_depth_stencil";
-      
-    if (!IsSupported (EXT_packed_depth_stencil))
+    if (!GetCaps ().has_ext_packed_depth_stencil)
       RaiseNotSupported (METHOD_NAME, "Unsupported render buffer desc.format=%s (GL_EXT_packed_depth_stencil not supported)", get_name (desc.format));
   }
   

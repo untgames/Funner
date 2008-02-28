@@ -148,9 +148,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
       
         //регистрация дополнительного менеджера буферов кадра
         
-      static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
-
-      if (IsSupported (EXT_framebuffer_object))
+      if (GetCaps ().has_ext_framebuffer_object)
         register_fbo_manager (frame_buffer_manager);
 
         //инициализация BlendState

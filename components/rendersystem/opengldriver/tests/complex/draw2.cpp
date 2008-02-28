@@ -143,8 +143,8 @@ int main ()
                 vertex_shader_source = read_shader (VERTEX_SHADER_FILE_NAME);
     
     ShaderDesc shader_descs [] = {
+      {"v_shader", size_t (-1), vertex_shader_source.c_str (), "glsl.vs", ""},
       {"p_shader", size_t (-1), pixel_shader_source.c_str (), "glsl.ps", ""},
-      {"v_shader", size_t (-1), vertex_shader_source.c_str (), "glsl.vs", ""}
     };
 
     static ProgramParameter shader_parameters[] = {

@@ -43,6 +43,12 @@ class ContextImpl: public xtl::reference_counter
       //получение флагов поддержки исключений
     ExtensionSet& GetExtensions () { return extensions; } 
  
+      ///Получение аппаратно поддерживаемых возможностей контекста
+    const ContextCaps& GetCaps () const
+    {
+      return context_caps;
+    }
+    
       //получение информации о реализации OpenGL
     const char* GetExtensionsString () const { return extensions_string.c_str (); }
     const char* GetVersionString    () const { return version_string.c_str (); }
@@ -110,6 +116,9 @@ class ContextImpl: public xtl::reference_counter
         extensions.Set (Version_1_5, GLEW_VERSION_1_5 != 0);
         extensions.Set (Version_2_0, GLEW_VERSION_2_0 != 0);
         extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);        
+
+          //Инициализация аппаратно поддерживаемых возможностей контекста
+        context_caps.Init (extensions);
       }
       catch (common::Exception& exception)
       {
@@ -131,6 +140,7 @@ class ContextImpl: public xtl::reference_counter
     stl::string      vendor_string;                  //производитель реализации OpenGL
     stl::string      renderer_string;                //имя устройства отрисовки OpenGL
     ContextDataTable context_data_table [Stage_Num]; //таблицы локальных данных контекста
+    ContextCaps      context_caps;                   //аппаратно поддерживаемые возможности контекста
 };
 
 }
@@ -785,6 +795,18 @@ bool ContextManager::IsSupported (size_t context_id, const Extension& extension)
 bool ContextManager::IsSupported (const Extension& extension) const
 {
   return impl->IsSupported (extension);
+}
+
+/*
+   Поулчение аппаратно поддерживаемых возможностей контекста
+*/
+
+const ContextCaps& ContextManager::GetCaps () const
+{
+  if (!impl->GetContext ())
+    RaiseInvalidOperation ("render::low_level::opengl::ContextManager::GetCaps", "Null active context");
+    
+  return impl->GetContext ()->GetCaps ();
 }
 
 /*

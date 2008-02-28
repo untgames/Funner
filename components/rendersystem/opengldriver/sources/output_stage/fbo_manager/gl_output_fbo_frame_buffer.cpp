@@ -25,9 +25,7 @@ FboFrameBuffer::FboFrameBuffer (const FrameBufferManager& manager, View* color_v
 
     //проверка поддержки необходимого расширения
     
-  static Extension EXT_framebuffer_object = "GL_EXT_framebuffer_object";
-  
-  if (!IsSupported (EXT_framebuffer_object))
+  if (!GetCaps ().has_ext_framebuffer_object)
     RaiseNotSupported (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
 
     //создание буфера кадра

@@ -17,7 +17,6 @@ const size_t DXT_BLOCK_SIZE = DXT_EDGE_SIZE * DXT_EDGE_SIZE; //размер блока DXT-
 
 Texture::Texture
  (const ContextManager& in_context_manager,
-  const ExtensionsPtr&  in_extensions,
   const TextureDesc&    in_desc,
   GLenum                in_target,
   size_t                in_mips_count)
@@ -26,8 +25,7 @@ Texture::Texture
       texture_id (0),
       target (in_target),
       mips_count (in_mips_count),
-      binded_sampler_hash (0),
-      extensions (in_extensions)
+      binded_sampler_hash (0)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::Texture";   
 
@@ -62,12 +60,12 @@ Texture::Texture
 
       break;
     case PixelFormat_D24S8:
-      if (!GetExtensions ().has_ext_packed_depth_stencil)
+      if (!GetCaps ().has_ext_packed_depth_stencil)
         RaiseNotSupported (METHOD_NAME, "Can't create depth-stencil texture (GL_EXT_packed_depth_stencil not supported)");
 
     case PixelFormat_D16:
     case PixelFormat_D24X8:
-      if (!GetExtensions ().has_arb_depth_texture)
+      if (!GetCaps ().has_arb_depth_texture)
         RaiseNotSupported (METHOD_NAME, "Can't create depth texture (GL_ARB_depth_texture and GL_VERSION_1_4 not supported)");
 
       break;
@@ -100,7 +98,7 @@ Texture::Texture
   
     //включение автоматической генерации    
 
-  if (mips_count > 1 && desc.generate_mips_enable && GetExtensions ().has_sgis_generate_mipmap)
+  if (mips_count > 1 && desc.generate_mips_enable && GetCaps ().has_sgis_generate_mipmap)
     glTexParameteri (GL_TEXTURE_3D_EXT, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);  
 
     //проверка ошибок
@@ -412,7 +410,7 @@ void Texture::SetData
       get_name (source_format));
   }                                    
                                 
-  if (source_format == PixelFormat_D24S8 && !GetExtensions ().has_ext_packed_depth_stencil)
+  if (source_format == PixelFormat_D24S8 && !GetCaps ().has_ext_packed_depth_stencil)
     RaiseNotSupported (METHOD_NAME, "Unsupported format %s (GL_EXT_packed_depth_stencil not supported)", get_name (source_format));
 
     //преобразование формата пикселей
@@ -429,7 +427,7 @@ void Texture::SetData
 
       //копирование сжатого образа
 
-    if (GetExtensions ().has_ext_texture_compression_s3tc && source_format == desc.format)
+    if (GetCaps ().has_ext_texture_compression_s3tc && source_format == desc.format)
     {
       size_t buffer_size = get_image_size (width, height, source_format);
 
@@ -492,7 +490,7 @@ void Texture::SetData
 
     SetUncompressedData (layer, mip_level, x, y, width, height, gl_format, gl_type, buffer);
 
-    if (desc.generate_mips_enable && !mip_level && !GetExtensions ().has_sgis_generate_mipmap)
+    if (desc.generate_mips_enable && !mip_level && !GetCaps ().has_sgis_generate_mipmap)
     {
       BuildMipmaps (x, y, layer, width, height, source_format, buffer);
     }
@@ -593,10 +591,9 @@ void Texture::GetData
   glPixelStorei (GL_PACK_SKIP_ROWS,   0); //количество пропускаемых строк
   glPixelStorei (GL_PACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей
 
-  static Extension EXT_texture3d = "GL_EXT_texture3d",
-                   Version_1_2   = "GL_VERSION_1_2";
+  const ContextCaps& caps = GetCaps ();
 
-  if (GetExtensions ().has_ext_texture3d)
+  if (caps.has_ext_texture3d)
   {
     glPixelStorei (GL_PACK_SKIP_IMAGES_EXT,  0); //количество пропускаемых слоев
     glPixelStorei (GL_PACK_IMAGE_HEIGHT_EXT, 0); //высота слоя в пикселях
@@ -610,25 +607,16 @@ void Texture::GetData
   {
       //проверка возможности копирования
       
-    static Extension EXT_texture_compression_s3tc = "GL_EXT_texture_compression_s3tc";
-    
-    if (!GetExtensions ().has_ext_texture_compression_s3tc)
+    if (!caps.has_ext_texture_compression_s3tc)
       common::RaiseNotSupported (METHOD_NAME, "Texture packing not supported (GL_EXT_texture_compression_s3tc not supported)");
       
     if (target_format != desc.format)
       common::RaiseNotSupported (METHOD_NAME, "Can't get compressed texture data, target format %s mismatch with texture format %s", 
                          get_name (target_format), get_name (desc.format));
 
-      //получение необходимой точки входа
-
-    PFNGLGETCOMPRESSEDTEXIMAGEPROC glGetCompressedTexImage_fn = 0;
-
-    if (glGetCompressedTexImage) glGetCompressedTexImage_fn = glGetCompressedTexImage;
-    else                         glGetCompressedTexImage_fn = glGetCompressedTexImageARB;
-
     if (is_full_image)
     {      
-      glGetCompressedTexImage_fn (layer_desc.target, mip_level, buffer);
+      caps.glGetCompressedTexImage_fn (layer_desc.target, mip_level, buffer);
     }
     else
     {
@@ -656,7 +644,7 @@ void Texture::GetData
 
       xtl::uninitialized_storage<char> temp_buffer (layer_size * desc.layers);
 
-      glGetCompressedTexImage_fn (layer_desc.target, mip_level, temp_buffer.data ());
+      caps.glGetCompressedTexImage_fn (layer_desc.target, mip_level, temp_buffer.data ());
 
         //копирование части образа в пользовательский буфер        
 
