@@ -2,7 +2,7 @@
 #define COMMONLIB_COMMON_STRING_CONVERTER_HEADER
 
 #include <stddef.h>
-#include <xtl/function>
+#include <xtl/functional_fwd>
 
 namespace common
 {
