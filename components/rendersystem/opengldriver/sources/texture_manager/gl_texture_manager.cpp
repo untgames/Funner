@@ -230,7 +230,12 @@ ITexture* TextureManager::Impl::CreateTexture2D (const TextureDesc& in_desc)
     return new Texture2D (GetContextManager (), desc);
 
   if (caps.has_ext_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
+  {
+    if (desc.width > caps.max_rectangle_texture_size || desc.height > max_rectangle_texture_size)
+      RaiseNotSupported (METHOD_NAME, "Can't create 2D texture %ux%u (maximum texture size is %u)", desc.width, desc.height, caps.max_rectangle_texture_size);
+
     return new TextureNpot (GetContextManager (), desc);
+  }
 
   return new ScaledTexture (GetContextManager (), texture_manager, desc);
 }
