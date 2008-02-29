@@ -69,7 +69,7 @@ class StringConverter
 class StringConverterSystem
 {
   public:
-    typedef stl::function<IStringConverter* ()> ConverterFn;
+    typedef xtl::function<IStringConverter* ()> ConverterFn;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистраци конвертеров строк
