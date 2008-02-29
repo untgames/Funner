@@ -2,6 +2,7 @@
 #define COMMONLIB_COMMON_STRING_CONVERTER_HEADER
 
 #include <stddef.h>
+#include <xtl/function>
 
 namespace common
 {
@@ -42,10 +43,10 @@ class StringConverter
 ///Конструктор / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     StringConverter  (const char* source_encoding, const char* destination_encoding);
-    StringConverter  (const Converter&);
+    StringConverter  (const StringConverter&);
     ~StringConverter ();
   
-    StringConverter& operator = (const Converter&);
+    StringConverter& operator = (const StringConverter&);
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Преобразование буфера
@@ -74,7 +75,9 @@ class StringConverterSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистраци конвертеров строк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterConverter       (const char* source_encoding, const char* destination_encoding, const ConverterFn& converter);
+    static void RegisterConverter       (const char* source_encoding,
+                                         const char* destination_encoding,
+                                         const ConverterFn& converter);
     static void UnregisterConverter     (const char* source_encoding, const char* destination_encoding);
     static void UnregisterAllConverters ();
 };
