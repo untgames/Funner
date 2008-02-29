@@ -46,6 +46,7 @@ typedef xtl::com_ptr<IBuffer>                  BufferPtr;
 typedef xtl::com_ptr<IRasterizerState>         RasterizerStatePtr;
 typedef xtl::com_ptr<IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
+typedef xtl::com_ptr<IStateBlock>              StateBlockPtr;
 
 //тестовое приложение
 struct Test

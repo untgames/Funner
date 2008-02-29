@@ -50,10 +50,13 @@ IStatisticsQuery* Device::CreateStatisticsQuery ()
   return 0;
 }
 
+/*
+    Работа с блоками состояний
+*/
+
 IStateBlock* Device::CreateStateBlock (const StateBlockMask& mask)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateStateBlock");
-  return 0;
+  return new StateBlock (*this, mask);
 }
 
 /*

@@ -4,6 +4,12 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
+/*
+===================================================================================================
+    Утилиты
+===================================================================================================
+*/
+
 namespace
 {
 
@@ -24,14 +30,26 @@ struct FrameBufferHolder: public xtl::trackable, public xtl::reference_counter
 };
 
 /*
+    Хранилище для менеджера буферов кадра
+*/
+
+struct FrameBufferManagerHolder
+{
+  FrameBufferManager frame_buffer_manager;  //менеджер буферов кадра
+
+  FrameBufferManagerHolder (const ContextManager& manager, ISwapChain* default_swap_chain) : frame_buffer_manager (manager, default_swap_chain) {}
+  ~FrameBufferManagerHolder () { frame_buffer_manager.UnregisterAllCreaters (); }  
+};
+
+/*
     Описание состояния выходного уровня конвейера OpenGL
 */
 
-class OutputStageState
+class OutputStageState: public IStageState
 {
   public:  
       //конструктор
-    OutputStageState () : stencil_reference (0) {}
+    OutputStageState (OutputStageState* in_master_state=0) : master_state (in_master_state), stencil_reference (0) {}
 
       //установка текущего состояния подуровня смешивания цветов
     void SetBlendState (BlendState* state)
@@ -67,20 +85,58 @@ class OutputStageState
     size_t GetStencilReference () const { return stencil_reference; }
 
       //установка текущих отображений отрисовки
-    void SetRenderTargets (View* in_render_target_view, View* in_depth_stencil_view)
+    void SetRenderTargetView (View* in_render_target_view)
     {
-      if (render_target_view == in_render_target_view && depth_stencil_view == in_depth_stencil_view)
+      if (render_target_view == in_render_target_view)
         return;
 
       render_target_view = in_render_target_view;
-      depth_stencil_view = in_depth_stencil_view;
     }
+    
+    void SetDepthStencilView (View* in_depth_stencil_view)
+    {
+      if (depth_stencil_view == in_depth_stencil_view)
+        return;
+
+      depth_stencil_view = in_depth_stencil_view;
+    }    
 
       //получение текущего отображения буфера цвета
     View* GetRenderTargetView () const { return render_target_view.get (); }
 
       //получение текущего отображения буфера попиксельного отсечения
-    View* GetDepthStencilView () const { return depth_stencil_view.get (); }
+    View* GetDepthStencilView () const { return depth_stencil_view.get (); }    
+    
+      //захват состояния
+    void Capture (const StateBlockMask& mask)
+    {
+      if (master_state)
+        Copy (*master_state, mask);
+    }
+    
+      //восстановление состояния
+    void Apply (const StateBlockMask& mask)
+    {
+      if (master_state)
+        master_state->Copy (*this, mask);
+    }
+
+  private:    
+      //копирование состояния
+    void Copy (OutputStageState& source, const StateBlockMask& mask)
+    {
+      if (mask.os_blend_state)
+        SetBlendState (source.GetBlendState ());
+
+      if (mask.os_depth_stencil_state)
+        SetDepthStencilState (source.GetDepthStencilState ());
+        
+      if (mask.os_render_target_view)
+        SetRenderTargetView (source.GetRenderTargetView ());
+        
+      if (mask.os_depth_stencil_view)
+        SetDepthStencilView (source.GetDepthStencilView ());
+    }    
 
   private:
     OutputStageState (const OutputStageState&); //no impl        
@@ -89,8 +145,10 @@ class OutputStageState
     typedef xtl::trackable_ptr<View>              ViewPtr;
     typedef xtl::trackable_ptr<BlendState>        BlendStatePtr;
     typedef xtl::trackable_ptr<DepthStencilState> DepthStencilStatePtr;
+    typedef xtl::trackable_ptr<OutputStageState>  OutputStageStatePtr;
 
   private:
+    OutputStageStatePtr  master_state;        //базовое состояние
     BlendStatePtr        blend_state;         //текущее состояние подуровня смешивания цветов
     DepthStencilStatePtr depth_stencil_state; //текущее состояние подуровня попиксельного отсечения
     size_t               stencil_reference;   //текущее значение трафарета
@@ -98,19 +156,13 @@ class OutputStageState
     ViewPtr              depth_stencil_view;  //текущее отображение буфера попиксельного отсечения
 };
 
-/*
-    Хранилище для менеджера буферов кадра
-*/
-
-struct FrameBufferManagerHolder
-{
-  FrameBufferManager frame_buffer_manager;  //менеджер буферов кадра
-
-  FrameBufferManagerHolder (const ContextManager& manager, ISwapChain* default_swap_chain) : frame_buffer_manager (manager, default_swap_chain) {}
-  ~FrameBufferManagerHolder () { frame_buffer_manager.UnregisterAllCreaters (); }  
-};
-
 }
+
+/*
+===================================================================================================
+    OutputStage
+===================================================================================================
+*/
 
 /*
     Описание реализации выходного уровня конвейера OpenGL
@@ -190,8 +242,8 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
       SetDepthStencilState (&*default_depth_stencil_state);
     }    
     
-      //получение текущего состояния уровня
-    OutputStageState& GetCurrentState () { return state; }
+      //получение основного состояния уровня
+    OutputStageState& GetMasterState () { return state; }
     
       //создание отображения
     View* CreateView (ITexture* texture, const ViewDesc& desc)
@@ -217,7 +269,8 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
 
         //обновление текущего состояния уровня
 
-      state.SetRenderTargets (render_target_view, depth_stencil_view);      
+      state.SetRenderTargetView (render_target_view);
+      state.SetDepthStencilView (depth_stencil_view);
 
         //установка флага необходимости обновления целевых буферов отрисовки
 
@@ -560,6 +613,15 @@ OutputStage::~OutputStage ()
 }
 
 /*
+    Создание объекта состояния устройства
+*/
+
+IStageState* OutputStage::CreateStateBlock ()
+{
+  return new OutputStageState (&impl->GetMasterState ());
+}
+
+/*
     Создание текстур
 */
 
@@ -675,12 +737,12 @@ void OutputStage::SetRenderTargets (IView* render_target_view, IView* depth_sten
 
 IView* OutputStage::GetRenderTargetView () const
 {
-  return impl->GetCurrentState ().GetRenderTargetView ();
+  return impl->GetMasterState ().GetRenderTargetView ();
 }
 
 IView* OutputStage::GetDepthStencilView () const
 {
-  return impl->GetCurrentState ().GetDepthStencilView ();
+  return impl->GetMasterState ().GetDepthStencilView ();
 }
 
 /*
@@ -708,7 +770,7 @@ void OutputStage::SetDepthStencilState (IDepthStencilState* state)
 
 void OutputStage::SetStencilReference (size_t reference)
 {
-  impl->GetCurrentState ().SetStencilReference (reference);
+  impl->GetMasterState ().SetStencilReference (reference);
 }
 
 IDepthStencilState* OutputStage::GetDepthStencilState () const
@@ -718,7 +780,7 @@ IDepthStencilState* OutputStage::GetDepthStencilState () const
 
 size_t OutputStage::GetStencilReference () const
 {
-  return impl->GetCurrentState ().GetStencilReference ();
+  return impl->GetMasterState ().GetStencilReference ();
 }
 
 /*
