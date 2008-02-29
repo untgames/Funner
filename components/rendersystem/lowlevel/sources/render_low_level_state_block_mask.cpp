@@ -2,9 +2,20 @@
 
 #include <common/exception.h>
 
+#include <stl/functional>
+
 #include <render/low_level/state_block.h>
 
 using namespace render::low_level;
+
+/*
+    Конструктор
+*/
+
+StateBlockMask::StateBlockMask ()
+{
+  Clear ();
+}
 
 /*
    Групповая установка
@@ -15,25 +26,42 @@ void StateBlockMask::Set (StateBlockGroup group, bool value)
   switch (group)
   {
     case StateBlockGroup_InputStage: 
-      is_input_layout = is_index_buffer = value;
+    {
+      is_input_layout = value;
+      is_index_buffer = value;
+
       for (size_t i = 0; i < DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
         is_vertex_buffers [i] = value;
+
       break;
+    }
     case StateBlockGroup_ShaderStage:
-      ss_program = ss_program_parameters_layout = value;
+    {
+      ss_program                   = value;
+      ss_program_parameters_layout = value;
+
       for (size_t i = 0; i < DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
         ss_constant_buffer [i] = value;
+
       for (size_t i = 0; i < DEVICE_SAMPLER_SLOTS_COUNT; i++)
         ss_samplers [i] = ss_textures [i] = value;
+
       break;
+    }
     case StateBlockGroup_RasterizerStage:
-      rs_state = rs_viewport = rs_scissor = value;
+      rs_state    = value;
+      rs_viewport = value;
+      rs_scissor  = value;
       break;
     case StateBlockGroup_OutputStage:
-      os_blend_state = os_depth_stencil_state = os_render_target_view = os_depth_stencil_view = value;
+      os_blend_state         = value;
+      os_depth_stencil_state = value;
+      os_render_target_view  = value;
+      os_depth_stencil_view  = value;
       break;
     default:
       common::RaiseInvalidArgument ("render::low_level::StateBlockMask::Set", "group", group);
+      break;
   }
 }
 
@@ -61,65 +89,76 @@ void StateBlockMask::Clear ()
    Покомопонентные логические операции
 */
 
+namespace
+{
+
+inline bool*       begin (StateBlockMask& mask)       { return (bool*)&mask; }
+inline bool*       end   (StateBlockMask& mask)       { return (bool*)((char*)&mask + sizeof StateBlockMask); }
+inline const bool* begin (const StateBlockMask& mask) { return (const bool*)&mask; }
+inline const bool* end   (const StateBlockMask& mask) { return (const bool*)((char*)&mask + sizeof StateBlockMask); }
+
+template <class Fn>
+StateBlockMask& for_each (StateBlockMask& left, const StateBlockMask& right, Fn fn)
+{
+  const bool *first  = begin (right),
+             *last   = end (right);
+  bool       *result = begin (left);
+
+  for (; first != last; first++, result++)
+    *result = fn (*result, *first);
+    
+  return left;
+}
+
+struct logical_xor
+{
+  bool operator () (bool a, bool b) const { return b ? !a : a; }
+};
+
+}
+
 StateBlockMask StateBlockMask::operator ~ () const
 {
-  StateBlockMask ret_value (*this);
-  
-  for (char *i = (char*)&ret_value, *end = (char*)&ret_value + sizeof ret_value; i < end; i++)
-    *i = !i;
+  StateBlockMask ret_value = Uninitialized ();
+
+  const bool *first  = begin (*this),
+             *last   = end (*this);
+  bool       *result = begin (ret_value);
+
+  while (first != last)
+    *result++ = !*first++;
 
   return ret_value;
 }
 
-StateBlockMask& StateBlockMask::operator |= (const StateBlockMask& right_mask)
+StateBlockMask& StateBlockMask::operator |= (const StateBlockMask& mask)
 {
-  for (char *i = (char*)this, *j = (char*)&right_mask, *end = (char*)this + sizeof *this; i < end; i++, j++)
-    *i |= *j;
-
-  return *this;
+  return for_each (*this, mask, stl::logical_or<bool> ());
 }
 
-StateBlockMask& StateBlockMask::operator &= (const StateBlockMask& right_mask)
+StateBlockMask& StateBlockMask::operator &= (const StateBlockMask& mask)
 {
-  for (char *i = (char*)this, *j = (char*)&right_mask, *end = (char*)this + sizeof *this; i < end; i++, j++)
-    *i &= *j;
-
-  return *this;
+  return for_each (*this, mask, stl::logical_and<bool> ());
 }
 
-StateBlockMask& StateBlockMask::operator ^= (const StateBlockMask& right_mask)
+StateBlockMask& StateBlockMask::operator ^= (const StateBlockMask& mask)
 {
-  for (char *i = (char*)this, *j = (char*)&right_mask, *end = (char*)this + sizeof *this; i < end; i++, j++)
-    *i ^= *j;
-
-  return *this;
+  return for_each (*this, mask, logical_xor ());
 }
 
-StateBlockMask StateBlockMask::operator | (const StateBlockMask& right_mask) const
+StateBlockMask StateBlockMask::operator | (const StateBlockMask& mask) const
 {
-  StateBlockMask ret_value (*this);
-  
-  ret_value |= right_mask;
-
-  return ret_value;
+  return StateBlockMask (*this) |= mask;
 }
 
-StateBlockMask StateBlockMask::operator & (const StateBlockMask& right_mask) const
+StateBlockMask StateBlockMask::operator & (const StateBlockMask& mask) const
 {
-  StateBlockMask ret_value (*this);
-    
-  ret_value &= right_mask;
-
-  return ret_value;
+  return StateBlockMask (*this) &= mask;
 }
 
-StateBlockMask StateBlockMask::operator ^ (const StateBlockMask& right_mask) const
+StateBlockMask StateBlockMask::operator ^ (const StateBlockMask& mask) const
 {
-  StateBlockMask ret_value (*this);    
-
-  ret_value ^= right_mask;
-
-  return ret_value;
+  return StateBlockMask (*this) ^= mask;
 }
 
 /*
@@ -133,5 +172,5 @@ bool StateBlockMask::operator == (const StateBlockMask& mask) const
 
 bool StateBlockMask::operator != (const StateBlockMask& mask) const
 {
-  return !memcmp (&mask, this, sizeof *this);
+  return !(*this == mask);
 }
