@@ -7,6 +7,7 @@
 #include <render/low_level/view.h>
 #include <render/low_level/shader.h>
 #include <render/low_level/query.h>
+#include <render/low_level/state_block.h>
 
 namespace render
 {
@@ -16,13 +17,6 @@ namespace low_level
 
 //forward declarations
 class ISwapChain;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Константы устройства отрисовки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t DEVICE_VERTEX_BUFFER_SLOTS_COUNT   = 8; //количество слотов для размещения вершинных буферов
-const size_t DEVICE_SAMPLER_SLOTS_COUNT         = 8; //количество слотов для размещения сэмплеров
-const size_t DEVICE_CONSTANT_BUFFER_SLOTS_COUNT = 8; //количество слотов для размещения константных буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Флаги очистки буфера кадра
@@ -80,6 +74,7 @@ class IDevice: virtual public IObject
     virtual IView*                    CreateView                    (ITexture* texture, const ViewDesc& desc) = 0;
     virtual IPredicate*               CreatePredicate               () = 0;
     virtual IStatisticsQuery*         CreateStatisticsQuery         () = 0;
+    virtual IStateBlock*              CreateStateBlock              (const StateBlockMask& mask) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление входным уровнем (input-stage)

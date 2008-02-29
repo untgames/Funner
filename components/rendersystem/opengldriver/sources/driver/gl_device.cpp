@@ -50,6 +50,12 @@ IStatisticsQuery* Device::CreateStatisticsQuery ()
   return 0;
 }
 
+IStateBlock* Device::CreateStateBlock (const StateBlockMask& mask)
+{
+  RaiseNotImplemented ("render::low_level::opengl::Device::CreateStateBlock");
+  return 0;
+}
+
 /*
     ”правление входным уровнем (input-stage)
 */
@@ -62,7 +68,7 @@ IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
 IBuffer* Device::CreateBuffer (const BufferDesc& desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Device::CreateBuffer";
-  
+
   try
   {
     static const size_t BAD_FLAGS = BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil;

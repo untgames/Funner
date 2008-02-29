@@ -2,7 +2,7 @@
 #define RENDER_LOW_LEVEL_OBJECT_HEADER
 
 #include <xtl/functional_fwd>
-#include <xtl/trackable.h>
+#include <xtl/trackable.h> //убрать зависимость!!!
 
 namespace render
 {

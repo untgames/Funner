@@ -123,6 +123,7 @@ class Device: virtual public IDevice, public Object
     IView*                    CreateView                    (ITexture* texture, const ViewDesc&);
     IPredicate*               CreatePredicate               ();
     IStatisticsQuery*         CreateStatisticsQuery         ();
+    IStateBlock*              CreateStateBlock              (const StateBlockMask& mask);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление входным уровнем (input-stage)
