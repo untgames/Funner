@@ -11,7 +11,8 @@ StateBlock::StateBlock (Device& device, const StateBlockMask& in_mask)
   : mask (in_mask),
     output_stage_state (device.output_stage.CreateStageState ()),
     input_stage_state (device.input_stage.CreateStageState ()),
-    rasterizer_stage_state (device.rasterizer_stage.CreateStageState ())
+    rasterizer_stage_state (device.rasterizer_stage.CreateStageState ()),
+    texture_manager_state (device.texture_manager.CreateStageState ())
 {
 }
 
@@ -30,9 +31,18 @@ void StateBlock::GetMask (StateBlockMask& out_mask)
 
 void StateBlock::Capture ()
 {
-  output_stage_state->Capture (mask);
-  input_stage_state->Capture (mask);
-  rasterizer_stage_state->Capture (mask);
+  try
+  {
+    output_stage_state->Capture (mask);
+    input_stage_state->Capture (mask);
+    rasterizer_stage_state->Capture (mask);
+    texture_manager_state->Capture (mask);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::StateBlock::Capture");
+    throw;
+  }
 }
 
 /*
@@ -41,7 +51,16 @@ void StateBlock::Capture ()
 
 void StateBlock::Apply ()
 {
-  output_stage_state->Apply (mask);
-  input_stage_state->Apply (mask);
-  rasterizer_stage_state->Apply (mask);
+  try
+  {
+    output_stage_state->Apply (mask);
+    input_stage_state->Apply (mask);
+    rasterizer_stage_state->Apply (mask);
+    texture_manager_state->Apply (mask);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::StateBlock::Apply");
+    throw;
+  }
 }

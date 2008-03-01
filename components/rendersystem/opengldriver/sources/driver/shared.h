@@ -258,6 +258,7 @@ class StateBlock: virtual public IStateBlock, public Object
     StageStatePtr  output_stage_state;     //состояние выходного уровня
     StageStatePtr  input_stage_state;      //состояние входного уровня
     StageStatePtr  rasterizer_stage_state; //состояние растеризатора
+    StageStatePtr  texture_manager_state;  //состояние менеджера текстур
 };
 
 }

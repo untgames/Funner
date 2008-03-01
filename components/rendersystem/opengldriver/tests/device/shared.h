@@ -38,6 +38,7 @@ typedef xtl::com_ptr<IDriver>                  DriverPtr;
 typedef xtl::com_ptr<ISwapChain>               SwapChainPtr;
 typedef xtl::com_ptr<IDevice>                  DevicePtr;
 typedef xtl::com_ptr<ITexture>                 TexturePtr;
+typedef xtl::com_ptr<ISamplerState>            SamplerStatePtr;
 typedef xtl::com_ptr<IView>                    ViewPtr;
 typedef xtl::com_ptr<IBlendState>              BlendStatePtr;
 typedef xtl::com_ptr<IDepthStencilState>       DepthStencilStatePtr;

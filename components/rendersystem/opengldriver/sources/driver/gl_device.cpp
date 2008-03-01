@@ -56,7 +56,15 @@ IStatisticsQuery* Device::CreateStatisticsQuery ()
 
 IStateBlock* Device::CreateStateBlock (const StateBlockMask& mask)
 {
-  return new StateBlock (*this, mask);
+  try
+  {
+    return new StateBlock (*this, mask);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateStateBlock");
+    throw;
+  }
 }
 
 /*
@@ -65,7 +73,15 @@ IStateBlock* Device::CreateStateBlock (const StateBlockMask& mask)
 
 IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
 {
-  return input_stage.CreateInputLayout (desc);
+  try
+  {
+    return input_stage.CreateInputLayout (desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateInputLayout");
+    throw;
+  }
 }
 
 IBuffer* Device::CreateBuffer (const BufferDesc& desc)
@@ -132,12 +148,28 @@ IBuffer* Device::ISGetIndexBuffer ()
 
 IProgramParametersLayout* Device::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
 {
-  return shader_stage.CreateProgramParametersLayout (desc);
+  try
+  {
+    return shader_stage.CreateProgramParametersLayout (desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateProgramParametersLayout");
+    throw;
+  }
 }
 
 IProgram* Device::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
 {
-  return shader_stage.CreateProgram (shaders_count, shader_descs, error_log);
+  try
+  {
+    return shader_stage.CreateProgram (shaders_count, shader_descs, error_log);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateProgram");
+    throw;
+  }
 }
 
 void Device::SSSetProgram (IProgram* program)
@@ -176,7 +208,15 @@ IBuffer* Device::SSGetConstantBuffer (size_t buffer_slot)
 
 ISamplerState* Device::CreateSamplerState (const SamplerDesc& desc)
 {
-  return texture_manager.CreateSamplerState (desc);
+  try
+  {
+    return texture_manager.CreateSamplerState (desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateSamplerState");
+    throw;
+  }
 }
 
 ITexture* Device::CreateTexture (const TextureDesc& desc)
@@ -237,7 +277,15 @@ ITexture* Device::SSGetTexture (size_t sampler_slot)
 
 IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
 {
-  return rasterizer_stage.CreateRasterizerState (desc);
+  try
+  {
+    return rasterizer_stage.CreateRasterizerState (desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateRasterizerState");
+    throw;
+  }
 }
 
 void Device::RSSetState (IRasterizerState* state)
@@ -276,27 +324,67 @@ const Rect& Device::RSGetScissor ()
 
 ITexture* Device::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
 {
-  return output_stage.CreateRenderTargetTexture (swap_chain, buffer_index);
+  try
+  {
+    return output_stage.CreateRenderTargetTexture (swap_chain, buffer_index);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateRenderTargetTexture");
+    throw;
+  }
 }
 
 ITexture* Device::CreateDepthStencilTexture (ISwapChain* swap_chain)
 {
-  return output_stage.CreateDepthStencilTexture (swap_chain);
+  try
+  {
+    return output_stage.CreateDepthStencilTexture (swap_chain);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateDepthStencilTexture");
+    throw;
+  }
 }
 
 IBlendState* Device::CreateBlendState (const BlendDesc& desc)
 {
-  return output_stage.CreateBlendState (desc);
+  try
+  {
+    return output_stage.CreateBlendState (desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateBlendState");
+    throw;
+  }
 }
 
 IDepthStencilState* Device::CreateDepthStencilState (const DepthStencilDesc& desc)
 {
-  return output_stage.CreateDepthStencilState (desc);
+  try
+  {
+    return output_stage.CreateDepthStencilState (desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateDepthStencilState");
+    throw;
+  }
 }
 
 IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
 {
-  return output_stage.CreateView (texture, desc);
+  try
+  {
+    return output_stage.CreateView (texture, desc);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreateView");
+    throw;
+  }
 }
 
 void Device::OSSetBlendState (IBlendState* state)
@@ -369,7 +457,15 @@ void Device::ClearViews (size_t clear_flags, const Color4f& color, float depth, 
 
 IPredicate* Device::CreatePredicate ()
 {
-  return query_manager.CreatePredicate ();
+  try
+  {
+    return query_manager.CreatePredicate ();
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::Device::CreatePredicate");
+    throw;
+  }
 }
 
 void Device::SetPredication (IPredicate* predicate, bool predicate_value)
