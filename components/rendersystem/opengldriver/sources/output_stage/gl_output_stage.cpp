@@ -49,7 +49,7 @@ class OutputStageState: public IStageState
 {
   public:  
       //конструктор
-    OutputStageState (OutputStageState* in_master_state=0) : master_state (in_master_state), stencil_reference (0) {}
+    OutputStageState (OutputStageState* in_main_state=0) : main_state (in_main_state), stencil_reference (0) {}
 
       //установка текущего состояния подуровня смешивания цветов
     void SetBlendState (BlendState* state)
@@ -110,15 +110,15 @@ class OutputStageState: public IStageState
       //захват состояния
     void Capture (const StateBlockMask& mask)
     {
-      if (master_state)
-        Copy (*master_state, mask);
+      if (main_state)
+        Copy (*main_state, mask);
     }
     
       //восстановление состояния
     void Apply (const StateBlockMask& mask)
     {
-      if (master_state)
-        master_state->Copy (*this, mask);
+      if (main_state)
+        main_state->Copy (*this, mask);
     }
 
   private:    
@@ -148,7 +148,7 @@ class OutputStageState: public IStageState
     typedef xtl::trackable_ptr<OutputStageState>  OutputStageStatePtr;
 
   private:
-    OutputStageStatePtr  master_state;        //базовое состояние
+    OutputStageStatePtr  main_state;          //основное состояние уровня
     BlendStatePtr        blend_state;         //текущее состояние подуровня смешивания цветов
     DepthStencilStatePtr depth_stencil_state; //текущее состояние подуровня попиксельного отсечения
     size_t               stencil_reference;   //текущее значение трафарета
@@ -242,8 +242,8 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
       SetDepthStencilState (&*default_depth_stencil_state);
     }    
     
-      //получение основного состояния уровня
-    OutputStageState& GetMasterState () { return state; }
+      //получение состояния уровня
+    OutputStageState& GetState () { return state; }
     
       //создание отображения
     View* CreateView (ITexture* texture, const ViewDesc& desc)
@@ -618,7 +618,7 @@ OutputStage::~OutputStage ()
 
 IStageState* OutputStage::CreateStageState ()
 {
-  return new OutputStageState (&impl->GetMasterState ());
+  return new OutputStageState (&impl->GetState ());
 }
 
 /*
@@ -737,12 +737,12 @@ void OutputStage::SetRenderTargets (IView* render_target_view, IView* depth_sten
 
 IView* OutputStage::GetRenderTargetView () const
 {
-  return impl->GetMasterState ().GetRenderTargetView ();
+  return impl->GetState ().GetRenderTargetView ();
 }
 
 IView* OutputStage::GetDepthStencilView () const
 {
-  return impl->GetMasterState ().GetDepthStencilView ();
+  return impl->GetState ().GetDepthStencilView ();
 }
 
 /*
@@ -770,7 +770,7 @@ void OutputStage::SetDepthStencilState (IDepthStencilState* state)
 
 void OutputStage::SetStencilReference (size_t reference)
 {
-  impl->GetMasterState ().SetStencilReference (reference);
+  impl->GetState ().SetStencilReference (reference);
 }
 
 IDepthStencilState* OutputStage::GetDepthStencilState () const
@@ -780,7 +780,7 @@ IDepthStencilState* OutputStage::GetDepthStencilState () const
 
 size_t OutputStage::GetStencilReference () const
 {
-  return impl->GetMasterState ().GetStencilReference ();
+  return impl->GetState ().GetStencilReference ();
 }
 
 /*

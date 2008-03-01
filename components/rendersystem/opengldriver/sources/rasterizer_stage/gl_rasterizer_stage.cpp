@@ -11,11 +11,11 @@ namespace
     Состояние уровня растеризации
 */
 
-class RasterizerStageState
+class RasterizerStageState: public IStageState
 {
   public:  
       //конструктор
-    RasterizerStageState () : rasterizer_state (0), need_recalc_hash (true) {}
+    RasterizerStageState (RasterizerStageState* in_main_state = 0) : main_state (in_main_state), rasterizer_state (0), need_recalc_hash (true) {}
     
       //установка состояние растеризатора
     void SetRasterizerState (RasterizerState* state)
@@ -60,9 +60,38 @@ class RasterizerStageState
 
       return viewport_scissor_hash;
     }
-  
+    
+      //захват состояния
+    void Capture (const StateBlockMask& mask)
+    {
+      if (main_state)
+        Copy (*main_state, mask);
+    }
+    
+      //восстановление состояния
+    void Apply (const StateBlockMask& mask)
+    {
+      if (main_state)
+        main_state->Copy (*this, mask);
+    }
+    
   private:
-    typedef xtl::trackable_ptr<RasterizerState> RasterizerStatePtr;
+      //копирование
+    void Copy (const RasterizerStageState& source, const StateBlockMask& mask)
+    {
+      if (mask.rs_state)
+        SetRasterizerState (source.GetRasterizerState ());
+
+      if (mask.rs_viewport)
+        SetViewport (source.GetViewport ());
+
+      if (mask.rs_scissor)
+        SetScissor (source.GetScissor ());
+    }
+
+  private:
+    typedef xtl::trackable_ptr<RasterizerState>      RasterizerStatePtr;
+    typedef xtl::trackable_ptr<RasterizerStageState> RasterizerStageStatePtr;
 
     #pragma pack (1)
 
@@ -74,14 +103,15 @@ class RasterizerStageState
       ViewportScissor ()
       {
         memset (this, 0, sizeof *this);
-      }      
+      }
     };
 
   private:
-    RasterizerStatePtr rasterizer_state;      //состояние уровня растеризации
-    ViewportScissor    viewport_scissor;      //вьюпорт и отсечение
-    mutable size_t     viewport_scissor_hash; //хеш областей вывода и отсечения
-    mutable bool       need_recalc_hash;      //флаг необходимости пересчёта хэша областей вывода и отсечения
+    RasterizerStageStatePtr main_state;            //основное состояние уровня
+    RasterizerStatePtr      rasterizer_state;      //состояние уровня растеризации
+    ViewportScissor         viewport_scissor;      //вьюпорт и отсечение
+    mutable size_t          viewport_scissor_hash; //хеш областей вывода и отсечения
+    mutable bool            need_recalc_hash;      //флаг необходимости пересчёта хэша областей вывода и отсечения
 };
 
 }
@@ -145,9 +175,15 @@ struct RasterizerStage::Impl: public ContextObject
       default_scissor.height = swap_chain_desc.frame_buffer.height;
 
       state.SetViewport (default_viewport);
-      state.SetScissor  (default_scissor);      
+      state.SetScissor  (default_scissor);
     }
-    
+
+    /*
+        Получение основного состояния уровня
+    */
+
+    RasterizerStageState& GetState () { return state; }
+
     /*
         Создание состояние растеризатора
     */
@@ -243,6 +279,15 @@ RasterizerStage::RasterizerStage (const ContextManager& context_manager)
 
 RasterizerStage::~RasterizerStage ()
 {
+}
+
+/*
+    Создание объекта состояния уровня
+*/
+
+IStageState* RasterizerStage::CreateStageState ()
+{
+  return new RasterizerStageState (&impl->GetState ());
 }
 
 /*

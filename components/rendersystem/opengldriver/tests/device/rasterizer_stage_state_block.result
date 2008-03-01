@@ -1,0 +1,9 @@
+Results of rasterizer_stage_state_block_test:
+after reset
+ISGetState: 0
+ISGetViewport: 0
+ISGetScissor: 0
+after apply
+ISGetState: 1
+ISGetViewport: 1
+ISGetScissor: 1

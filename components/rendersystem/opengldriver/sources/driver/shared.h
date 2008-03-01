@@ -254,9 +254,10 @@ class StateBlock: virtual public IStateBlock, public Object
     typedef stl::auto_ptr<IStageState> StageStatePtr;
 
   private:
-    StateBlockMask mask;                //маска состояний
-    StageStatePtr  output_stage_state;  //состояние выходного уровня
-    StageStatePtr  input_stage_state;   //состояние входного уровня
+    StateBlockMask mask;                   //маска состояний
+    StageStatePtr  output_stage_state;     //состояние выходного уровня
+    StageStatePtr  input_stage_state;      //состояние входного уровня
+    StageStatePtr  rasterizer_stage_state; //состояние растеризатора
 };
 
 }

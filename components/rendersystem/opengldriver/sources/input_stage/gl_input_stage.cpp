@@ -15,7 +15,7 @@ class InputStageState: public IStageState
 {
   public:
       //конструктор
-    InputStageState (InputStageState* in_master_state = 0) : master_state (in_master_state)
+    InputStageState (InputStageState* in_main_state = 0) : main_state (in_main_state)
     {
     }
     
@@ -73,15 +73,15 @@ class InputStageState: public IStageState
       //захват состояния
     void Capture (const StateBlockMask& mask)
     {
-      if (master_state)
-        Copy (*master_state, mask);
+      if (main_state)
+        Copy (*main_state, mask);
     }
     
       //восстановление состояния
     void Apply (const StateBlockMask& mask)
     {
-      if (master_state)
-        master_state->Copy (*this, mask);
+      if (main_state)
+        main_state->Copy (*this, mask);
     }
 
   private:
@@ -105,7 +105,7 @@ class InputStageState: public IStageState
     typedef xtl::trackable_ptr<InputStageState>                     InputStageStatePtr;
 
   private:
-    InputStageStatePtr master_state;   //базовое состояние уровня
+    InputStageStatePtr main_state;     //основное состояние уровня
     LayoutPtr          layout;         //описание расположения геометрии
     VertexBufferArray  vertex_buffers; //вершинные буферы
     BufferPtr          index_buffer;   //индексный буфер
@@ -153,10 +153,10 @@ struct InputStage::Impl: public ContextObject
     }
     
     /*
-        Получение объекта базового состояния уровня
+        Получение объекта основного состояния уровня
     */
     
-    InputStageState& GetMasterState () { return state; }
+    InputStageState& GetState () { return state; }
     
     /*
         Создание буферов
@@ -301,7 +301,7 @@ InputStage::~InputStage()
 
 IStageState* InputStage::CreateStageState ()
 {
-  return new InputStageState (&impl->GetMasterState ());
+  return new InputStageState (&impl->GetState ());
 }
 
 /*
