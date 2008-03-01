@@ -11,11 +11,11 @@ using namespace common;
 namespace
 {
 
-class InputStageState
+class InputStageState: public IStageState
 {
   public:
       //конструктор
-    InputStageState ()
+    InputStageState (InputStageState* in_master_state = 0) : master_state (in_master_state)
     {
     }
     
@@ -44,13 +44,13 @@ class InputStageState
     }
     
       //получение вершинного буфера
-    const BufferPtr& GetVertexBuffer (size_t slot) const
+    Buffer* GetVertexBuffer (size_t slot) const
     {
-      return vertex_buffers [slot];
+      return vertex_buffers [slot].get ();
     }
     
       //полученеи всех вершинных буферов
-    BufferPtr* GetVertexBuffers ()  /////???const???
+    BufferPtr* GetVertexBuffers ()
     {
       return vertex_buffers.c_array ();
     }
@@ -65,19 +65,50 @@ class InputStageState
     }
     
       //получение индексного буфера
-    const BufferPtr& GetIndexBuffer () const
+    Buffer* GetIndexBuffer () const
     {
-      return index_buffer;
+      return index_buffer.get ();
     }
-  
+    
+      //захват состояния
+    void Capture (const StateBlockMask& mask)
+    {
+      if (master_state)
+        Copy (*master_state, mask);
+    }
+    
+      //восстановление состояния
+    void Apply (const StateBlockMask& mask)
+    {
+      if (master_state)
+        master_state->Copy (*this, mask);
+    }
+
+  private:
+      //копирование состояния
+    void Copy (const InputStageState& source, const StateBlockMask& mask)
+    {
+      if (mask.is_layout)
+        SetInputLayout (source.GetInputLayout ());
+
+      for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
+        if (mask.is_vertex_buffers [i])
+          SetVertexBuffer (i, source.GetVertexBuffer (i));
+
+      if (mask.is_index_buffer)
+        SetIndexBuffer (source.GetIndexBuffer ());
+    }
+
   private:
     typedef xtl::array<BufferPtr, DEVICE_VERTEX_BUFFER_SLOTS_COUNT> VertexBufferArray;
     typedef xtl::trackable_ptr<InputLayout>                         LayoutPtr;
+    typedef xtl::trackable_ptr<InputStageState>                     InputStageStatePtr;
 
   private:
-    LayoutPtr         layout;         //описание расположения геометрии
-    VertexBufferArray vertex_buffers; //вершинные буферы
-    BufferPtr         index_buffer;   //индексный буфер
+    InputStageStatePtr master_state;   //базовое состояние уровня
+    LayoutPtr          layout;         //описание расположения геометрии
+    VertexBufferArray  vertex_buffers; //вершинные буферы
+    BufferPtr          index_buffer;   //индексный буфер
 };
 
 }
@@ -88,144 +119,167 @@ class InputStageState
 
 struct InputStage::Impl: public ContextObject
 {
-  typedef xtl::com_ptr<InputLayout> InputLayoutPtr;
+  public:
+    /*
+        Конструктор  
+    */
 
-  InputStageState state;                        //состояние уровня
-  InputLayoutPtr  default_layout;               //состояние расположения геометрии по умолчанию  
-  size_t          texture_units_count;          //количество текстурных юнитов поддерживаемое аппаратно  
-
-  /*
-      Конструктор  
-  */
-
-  Impl (const ContextManager& context_manager) : ContextObject (context_manager)
-  {
-      //установка текущего контекста
-
-    MakeContextCurrent();
-
-    texture_units_count = GetCaps ().texture_units_count;
-      
-    if (texture_units_count > DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
-      texture_units_count = DEVICE_VERTEX_BUFFER_SLOTS_COUNT;
-      
-      //инициализация состояния уровня
-      
-    InputLayoutDesc default_layout_desc;
-    
-    memset (&default_layout_desc, 0 , sizeof default_layout_desc);
-
-    default_layout_desc.index_type = InputDataType_UInt;
-
-    default_layout = InputLayoutPtr (new InputLayout (GetContextManager (), default_layout_desc, texture_units_count), false);
-    
-    SetInputLayout (default_layout.get ());
-      
-      //проверка ошибок
-      
-    CheckErrors ("render::low_level::opengl::InputStage::Impl");
-  }
-  
-  /*
-      Создание вершинных и индексных буферов
-  */
-
-  IBuffer* CreateBuffer (const BufferDesc& desc, GLenum buffer_target)
-  {
-    try
+    Impl (const ContextManager& context_manager) : ContextObject (context_manager)
     {
-      if (GetCaps ().has_arb_vertex_buffer_object)
+        //установка текущего контекста
+
+      MakeContextCurrent();
+
+      texture_units_count = GetCaps ().texture_units_count;
+        
+      if (texture_units_count > DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
+        texture_units_count = DEVICE_VERTEX_BUFFER_SLOTS_COUNT;
+        
+        //инициализация состояния уровня
+        
+      InputLayoutDesc default_layout_desc;
+      
+      memset (&default_layout_desc, 0 , sizeof default_layout_desc);
+
+      default_layout_desc.index_type = InputDataType_UInt;
+
+      default_layout = InputLayoutPtr (new InputLayout (GetContextManager (), default_layout_desc, texture_units_count), false);
+      
+      SetInputLayout (default_layout.get ());
+        
+        //проверка ошибок
+        
+      CheckErrors ("render::low_level::opengl::InputStage::Impl");
+    }
+    
+    /*
+        Получение объекта базового состояния уровня
+    */
+    
+    InputStageState& GetMasterState () { return state; }
+    
+    /*
+        Создание буферов
+    */
+
+    IBuffer* CreateBuffer (const BufferDesc& desc, GLenum buffer_target)
+    {
+      try
       {
-        return new VboBuffer (GetContextManager (), buffer_target, desc);
+        if (GetCaps ().has_arb_vertex_buffer_object)
+        {
+          return new VboBuffer (GetContextManager (), buffer_target, desc);
+        }
+        else
+        {
+          return new SystemMemoryBuffer (GetContextManager (), desc);
+        }
       }
-      else
+      catch (common::Exception& exception)
       {
-        return new SystemMemoryBuffer (GetContextManager (), desc);
+        exception.Touch ("render::low_level::opengl::InputStage::Impl::CreateBuffer");
+        throw;
       }
     }
-    catch (common::Exception& exception)
+    
+    IBuffer* CreateSystemMemoryBuffer (const BufferDesc& desc)
     {
-      exception.Touch ("render::low_level::opengl::InputStage::Impl::CreateBuffer");
-      throw;
+      return new SystemMemoryBuffer (GetContextManager (), desc);
     }
-  }
-
-  /*
-      Установка / получение InputLayout
-  */
-
-  void SetInputLayout (IInputLayout* in_layout)
-  {        
-    InputLayout* layout = cast_object<InputLayout> (*this, in_layout, "render::low_level::opengl::InputStage::Impl::SetInputLayout", "layout");
-
-    state.SetInputLayout (layout);
-  }
-  
-  IInputLayout* GetInputLayout ()
-  {
-    return state.GetInputLayout ();
-  }
-  
-  /*
-      Установка / получение вершинного буфера
-  */
-  
-  void SetVertexBuffer (size_t slot, IBuffer* in_buffer)
-  {
-    static const char* METHOD_NAME = "render::low_level::opengl::InputStage::Impl::SetVertexBuffer";
     
-    Buffer* buffer = cast_object<Buffer> (*this, in_buffer, METHOD_NAME, "buffer");
+    /*
+        Создание InputLayout
+    */
     
-    if (buffer && !buffer->IsVertexBuffer ())
-      Raise<ArgumentException> (METHOD_NAME, "Invalid argument <buffer>. Incompatible vertex buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
+    IInputLayout* CreateInputLayout (const InputLayoutDesc& desc)
+    {
+      return new InputLayout (GetContextManager (), desc, texture_units_count);
+    }
+
+    /*
+        Установка / получение InputLayout
+    */
+
+    void SetInputLayout (IInputLayout* in_layout)
+    {        
+      InputLayout* layout = cast_object<InputLayout> (*this, in_layout, "render::low_level::opengl::InputStage::Impl::SetInputLayout", "layout");
+
+      state.SetInputLayout (layout);
+    }
     
-    if (slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
-      RaiseOutOfRange (METHOD_NAME, "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
+    IInputLayout* GetInputLayout ()
+    {
+      return state.GetInputLayout ();
+    }
+    
+    /*
+        Установка / получение вершинного буфера
+    */
+    
+    void SetVertexBuffer (size_t slot, IBuffer* in_buffer)
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::InputStage::Impl::SetVertexBuffer";
       
-    state.SetVertexBuffer (slot, buffer);
-  }  
+      Buffer* buffer = cast_object<Buffer> (*this, in_buffer, METHOD_NAME, "buffer");
+      
+      if (buffer && !buffer->IsVertexBuffer ())
+        Raise<ArgumentException> (METHOD_NAME, "Invalid argument <buffer>. Incompatible vertex buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
+      
+      if (slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
+        RaiseOutOfRange (METHOD_NAME, "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
+        
+      state.SetVertexBuffer (slot, buffer);
+    }  
 
-  IBuffer* GetVertexBuffer (size_t slot)
-  {
-    if (slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
-      RaiseOutOfRange ("render::low_level::opengl::InputStage::Impl::GetVertexBuffer", "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
-  
-    return state.GetVertexBuffer (slot).get ();
-  }  
-
-  /*
-      Установка / получение индексного буфера
-  */
-
-  void SetIndexBuffer (IBuffer* in_buffer)
-  {
-    static const char* METHOD_NAME = "render::low_level::opengl::InputStage::Impl::SetIndexBuffer";
+    IBuffer* GetVertexBuffer (size_t slot)
+    {
+      if (slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
+        RaiseOutOfRange ("render::low_level::opengl::InputStage::Impl::GetVertexBuffer", "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
     
-    Buffer* buffer = cast_object<Buffer> (*this, in_buffer, METHOD_NAME, "buffer");    
+      return state.GetVertexBuffer (slot);
+    }  
+
+    /*
+        Установка / получение индексного буфера
+    */
+
+    void SetIndexBuffer (IBuffer* in_buffer)
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::InputStage::Impl::SetIndexBuffer";
+      
+      Buffer* buffer = cast_object<Buffer> (*this, in_buffer, METHOD_NAME, "buffer");    
+      
+      if (buffer && !buffer->IsIndexBuffer ())
+        Raise<ArgumentException> (METHOD_NAME, "Invalid argument <buffer>. Incompatible index buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
+
+      state.SetIndexBuffer (buffer);
+    }
     
-    if (buffer && !buffer->IsIndexBuffer ())
-      Raise<ArgumentException> (METHOD_NAME, "Invalid argument <buffer>. Incompatible index buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
-
-    state.SetIndexBuffer (buffer);
-  }
-  
-  IBuffer* GetIndexBuffer () { return state.GetIndexBuffer ().get (); }
-  
-  /*
-      Установка состояния уровня в контекст OpenGL
-  */
+    IBuffer* GetIndexBuffer () { return state.GetIndexBuffer (); }
     
-  void Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout)  
-  {
-    static const char* METHOD_NAME = "render::low_level::opengl::InputStage::Impl::Bind";
+    /*
+        Установка состояния уровня в контекст OpenGL
+    */
+      
+    void Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout)  
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::InputStage::Impl::Bind";
 
-    InputLayout* layout = state.GetInputLayout ();    
+      InputLayout* layout = state.GetInputLayout ();    
 
-    if (!layout)
-      layout = default_layout.get ();
+      if (!layout)
+        layout = default_layout.get ();
 
-    layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), state.GetIndexBuffer (), out_indices_layout);    
-  }
+      layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), state.GetIndexBuffer (), out_indices_layout);
+    }
+
+  private:
+    typedef xtl::com_ptr<InputLayout> InputLayoutPtr;
+
+  private:
+    InputStageState state;               //состояние уровня
+    InputLayoutPtr  default_layout;      //состояние расположения геометрии по умолчанию  
+    size_t          texture_units_count; //количество текстурных юнитов поддерживаемое аппаратно
 };
 
 /*
@@ -242,6 +296,15 @@ InputStage::~InputStage()
 }
 
 /*
+    Создание объекта состояния уровня
+*/
+
+IStageState* InputStage::CreateStageState ()
+{
+  return new InputStageState (&impl->GetMasterState ());
+}
+
+/*
     Создание ресурсов
 */
 
@@ -249,7 +312,7 @@ IInputLayout* InputStage::CreateInputLayout (const InputLayoutDesc& desc)
 {
   try
   {
-    return new InputLayout (impl->GetContextManager (), desc, impl->texture_units_count);
+    return impl->CreateInputLayout (desc);
   }
   catch (common::Exception& exception)
   {
@@ -288,7 +351,7 @@ IBuffer* InputStage::CreateConstantBuffer (const BufferDesc& desc)
 {
   try
   {
-    return new SystemMemoryBuffer (impl->GetContextManager (), desc);      
+    return impl->CreateSystemMemoryBuffer (desc);
   }
   catch (common::Exception& exception)
   {

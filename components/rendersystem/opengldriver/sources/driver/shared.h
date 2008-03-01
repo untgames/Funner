@@ -256,6 +256,7 @@ class StateBlock: virtual public IStateBlock, public Object
   private:
     StateBlockMask mask;                //маска состояний
     StageStatePtr  output_stage_state;  //состояние выходного уровня
+    StageStatePtr  input_stage_state;   //состояние входного уровня
 };
 
 }

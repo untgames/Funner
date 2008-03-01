@@ -587,7 +587,7 @@ void InputLayout::Bind
  (size_t         base_vertex,
   size_t         base_index,
   BufferPtr*     vertex_buffers,
-  BufferPtr      index_buffer,
+  Buffer*        index_buffer,
   IndicesLayout* out_indices_layout)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::Bind";
@@ -638,8 +638,8 @@ void InputLayout::Bind
     out_indices_layout->type = index_data_type;
     out_indices_layout->data = (char*)index_buffer->GetDataPointer () + index_buffer_offset + base_index * index_size;
   }
-  
+
     //проверка ошибок
-    
+
   CheckErrors (METHOD_NAME);
 }

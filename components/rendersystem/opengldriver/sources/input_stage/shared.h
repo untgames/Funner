@@ -187,7 +187,7 @@ class InputLayout: virtual public IInputLayout, public ContextObject
    void Bind (size_t         base_vertex,
               size_t         base_index,
               BufferPtr*     vertex_buffers,
-              BufferPtr      index_buffer,
+              Buffer*        index_buffer,
               IndicesLayout* out_indices_layout);
 
   private:

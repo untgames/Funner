@@ -616,7 +616,7 @@ OutputStage::~OutputStage ()
     Создание объекта состояния устройства
 */
 
-IStageState* OutputStage::CreateStateBlock ()
+IStageState* OutputStage::CreateStageState ()
 {
   return new OutputStageState (&impl->GetMasterState ());
 }

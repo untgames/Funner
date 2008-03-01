@@ -3,7 +3,7 @@
 void dump (const char* name, const StateBlockMask& mask)
 {
   printf ("Mask '%s':\n", name);
-  printf ("ISInpoutLayout: %d\n", mask.is_input_layout);
+  printf ("ISInpoutLayout: %d\n", mask.is_layout);
   
   for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
     printf ("ISVertexBuffers[%u]: %d\n", i, mask.is_vertex_buffers [i]);

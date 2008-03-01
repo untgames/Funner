@@ -27,7 +27,7 @@ void StateBlockMask::Set (StateBlockGroup group, bool value)
   {
     case StateBlockGroup_InputStage: 
     {
-      is_input_layout = value;
+      is_layout       = value;
       is_index_buffer = value;
 
       for (size_t i = 0; i < DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
@@ -41,7 +41,7 @@ void StateBlockMask::Set (StateBlockGroup group, bool value)
       ss_program_parameters_layout = value;
 
       for (size_t i = 0; i < DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
-        ss_constant_buffer [i] = value;
+        ss_constant_buffers [i] = value;
 
       for (size_t i = 0; i < DEVICE_SAMPLER_SLOTS_COUNT; i++)
         ss_samplers [i] = ss_textures [i] = value;
