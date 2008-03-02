@@ -28,6 +28,106 @@ void get_base_profile (const char* source, string& profile)
     profile.assign (source);
 }
 
+/*
+    Состояние уровня шейдинга
+*/
+
+class ShaderStageState: public IStageState
+{
+  public:  
+      //конструктор
+    ShaderStageState (ShaderStageState* in_main_state = 0) : main_state (in_main_state) {}
+
+      //установка программы
+    void SetProgram (Program* in_program)
+    {
+      program = in_program;
+    }
+
+      //получение программы
+    Program* GetProgram () const
+    {
+      return program.get ();
+    }
+
+      //установка константного буффера
+    void SetConstantBuffer (size_t buffer_slot, IBindableBuffer* buffer)
+    {
+      constant_buffers [buffer_slot] = buffer;
+    }
+
+      //получение константного буффера
+    IBindableBuffer* GetConstantBuffer (size_t buffer_slot) const
+    {
+      if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
+        RaiseNotSupported ("render::low_level::opengl::ShaderStage::Impl::GetConstantBuffer", "Can't get constant buffer from slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
+
+      return constant_buffers [buffer_slot].get ();
+    }
+    
+      //установка расположения параметров шейдера
+    void SetProgramParametersLayout (ProgramParametersLayout* in_parameters_layout)
+    {
+      parameters_layout = in_parameters_layout;
+    }
+
+      //получение расположения параметров шейдера
+    ProgramParametersLayout* GetProgramParametersLayout () const
+    {
+      return parameters_layout.get ();
+    }
+
+       //Биндинг
+
+    void Bind ()
+    {
+      if (!program)
+        RaiseInvalidOperation ("render::low_level::opengl::ShaderStage::Bind", "Null program");
+
+      program->Bind (constant_buffers, parameters_layout.get ());
+    }
+
+      //захват состояния
+    void Capture (const StateBlockMask& mask)
+    {
+      if (main_state)
+        Copy (*main_state, mask);
+    }
+    
+      //восстановление состояния
+    void Apply (const StateBlockMask& mask)
+    {
+      if (main_state)
+        main_state->Copy (*this, mask);
+    }
+    
+  private:
+      //копирование
+    void Copy (const ShaderStageState& source, const StateBlockMask& mask)
+    {
+      if (mask.ss_program)
+        program = source.GetProgram ();
+
+      if (mask.ss_program_parameters_layout)
+        parameters_layout = source.GetProgramParametersLayout ();
+
+      for (size_t i = 0; i < DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
+        if (mask.ss_constant_buffers [i])
+          constant_buffers[i] = source.GetConstantBuffer (i);
+    }
+
+  private:
+    typedef xtl::trackable_ptr<ShaderStageState>        ShaderStageStatePtr;
+    typedef xtl::trackable_ptr<ProgramParametersLayout> ProgramParametersLayoutPtr;
+    typedef xtl::trackable_ptr<Program>                 ProgramPtr;
+
+  private:
+    ShaderStageStatePtr        main_state;                                           //основное состояние уровня
+    ProgramParametersLayoutPtr parameters_layout;                                    //расположение параметров шейдера
+    ProgramPtr                 program;                                              //шейдер
+    ConstantBufferPtr          constant_buffers[DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы шейдера
+};
+
 }
 
 /*
@@ -44,7 +144,12 @@ struct ShaderStage::Impl: public ContextObject
     ~Impl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Биндинг состояния, вьюпорта и отсечения
+///Получение основного состояния уровня
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ShaderStageState& GetState () { return state; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Биндинг состояния
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Bind ();
 
@@ -55,22 +160,49 @@ struct ShaderStage::Impl: public ContextObject
     IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка состояния, вьюпорта и отсечения
+///Установка программы, параметров и буфферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetProgram                 (IProgram* program);
-    void SetProgramParametersLayout (IProgramParametersLayout* parameters_layout);
-    void SetConstantBuffer          (size_t buffer_slot, IBuffer* buffer);
+    void SetProgram                 (IProgram* program) 
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetProgram";
+
+      if (!program)
+        RaiseNullArgument (METHOD_NAME, "program");
+
+      state.SetProgram (cast_object <Program> (program, METHOD_NAME, "program"));
+    }
+
+    void SetProgramParametersLayout (IProgramParametersLayout* parameters_layout) 
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetProgramParametersLayout";
+
+      if (!parameters_layout)
+        RaiseNullArgument (METHOD_NAME, "parameters_layout");
+
+      state.SetProgramParametersLayout (cast_object <ProgramParametersLayout> (parameters_layout, METHOD_NAME, "parameters_layout"));
+    }
+
+    void SetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetConstantBuffer";
+
+      if (!buffer)
+        RaiseNullArgument (METHOD_NAME, "buffer");
+
+      if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
+        RaiseNotSupported (METHOD_NAME, "Can't set constant buffer to slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
+
+      state.SetConstantBuffer (buffer_slot, cast_object <IBindableBuffer> (buffer, METHOD_NAME, "buffer"));
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение состояния, вьюпорта и отсечения
+///Получение программы, параметров и буфферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IProgramParametersLayout* GetProgramParametersLayout () const;
-    IProgram*                 GetProgram                 () const;
-    IBuffer*                  GetConstantBuffer          (size_t buffer_slot) const;
+    IProgramParametersLayout* GetProgramParametersLayout () const {return state.GetProgramParametersLayout ();}
+    IProgram*                 GetProgram                 () const {return state.GetProgram ();}
+    IBuffer*                  GetConstantBuffer          (size_t buffer_slot) const {return state.GetConstantBuffer (buffer_slot);}
 
   private:    
-    typedef xtl::trackable_ptr<ProgramParametersLayout>               ProgramParametersLayoutPtr;
-    typedef xtl::trackable_ptr<Program>                               ProgramPtr;
     typedef xtl::com_ptr<ShaderManager>                               ShaderManagerPtr;
     typedef stl::vector <ShaderManagerPtr>                            ShaderManagerArray;
     typedef stl::hash_map<stl::hash_key<const char*>, ShaderManager*> ShaderManagerMap;
@@ -88,12 +220,10 @@ struct ShaderStage::Impl: public ContextObject
     void RemoveShaderByHash (size_t hash);
 
   public:
-    ProgramParametersLayoutPtr parameters_layout;                                    //расположение параметров шейдера
-    ProgramPtr                 program;                                              //шейдер
-    ConstantBufferPtr          constant_buffers[DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы шейдера
-    ShaderMap                  shaders_map;                                          //скомпилированные шейдеры
-    ShaderManagerArray         shader_managers;                                      //массив менеджеров
-    ShaderManagerMap           shader_managers_map;                                  //соответствие профиль/менеджер
+    ShaderStageState           state;               //состояние уровня
+    ShaderMap                  shaders_map;         //скомпилированные шейдеры
+    ShaderManagerArray         shader_managers;     //массив менеджеров
+    ShaderManagerMap           shader_managers_map; //соответствие профиль/менеджер
 };
 
 
@@ -115,15 +245,12 @@ ShaderStage::Impl::~Impl ()
 }
 
 /*
-   Биндинг состояния, вьюпорта и отсечения
+   Биндинг
 */
 
 void ShaderStage::Impl::Bind ()
 {
-  if (!program)
-    RaiseInvalidOperation ("render::low_level::opengl::ShaderStage::Impl::Bind", "Null program");
-
-  program->Bind (constant_buffers, parameters_layout.get ());
+  state.Bind ();
 }
 
 /*
@@ -209,65 +336,6 @@ IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDe
 }
     
 /*
-   Установка состояния, вьюпорта и отсечения
-*/
-
-void ShaderStage::Impl::SetProgramParametersLayout (IProgramParametersLayout* in_parameters_layout)
-{
-  static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetProgramParametersLayout";
-
-  if (!in_parameters_layout)
-    RaiseNullArgument (METHOD_NAME, "in_parameters_layout");
-
-  parameters_layout = cast_object <ProgramParametersLayout> (in_parameters_layout, METHOD_NAME, "in_parameters_layout");
-}
-
-void ShaderStage::Impl::SetProgram (IProgram* in_program)
-{
-  static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetProgram";
-
-  if (!in_program)
-    RaiseNullArgument (METHOD_NAME, "in_program");
-
-  program = cast_object <Program> (in_program, METHOD_NAME, "in_program");
-}
-
-void ShaderStage::Impl::SetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
-{
-  static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetConstantBuffer";
-
-  if (!buffer)
-    RaiseNullArgument (METHOD_NAME, "buffer");
-
-  if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
-    RaiseNotSupported (METHOD_NAME, "Can't set constant buffer to slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
-
-  constant_buffers [buffer_slot] = cast_object <IBindableBuffer> (buffer, METHOD_NAME, "buffer");
-}
-
-/*
-   Получение состояния, вьюпорта и отсечения
-*/
-
-IProgramParametersLayout* ShaderStage::Impl::GetProgramParametersLayout () const
-{
-  return parameters_layout.get ();
-}
-
-IProgram* ShaderStage::Impl::GetProgram () const
-{
-  return program.get ();
-}
-
-IBuffer* ShaderStage::Impl::GetConstantBuffer (size_t buffer_slot) const
-{
-  if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
-    RaiseNotSupported ("render::low_level::opengl::ShaderStage::Impl::GetConstantBuffer", "Can't get constant buffer from slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
-
-  return constant_buffers [buffer_slot].get ();
-}
-
-/*
    Добавление менеджера и его профилей
 */
 
@@ -314,6 +382,15 @@ ShaderStage::ShaderStage (const ContextManager& context_manager)
 
 ShaderStage::~ShaderStage ()
 {
+}
+
+/*
+   Создание объекта состояния уровня
+*/
+
+IStageState* ShaderStage::CreateStageState ()
+{
+  return new ShaderStageState (&impl->GetState ());
 }
 
 /*

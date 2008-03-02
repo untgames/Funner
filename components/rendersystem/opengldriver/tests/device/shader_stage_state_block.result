@@ -1,0 +1,23 @@
+Results of shader_stage_state_block_test:
+after reset
+SSGetProgramParametersLayout: 0
+SSGetProgram: 0
+SSGetConstantBuffer(0): 1
+SSGetConstantBuffer(1): 1
+SSGetConstantBuffer(2): 1
+SSGetConstantBuffer(3): 0
+SSGetConstantBuffer(4): 1
+SSGetConstantBuffer(5): 1
+SSGetConstantBuffer(6): 1
+SSGetConstantBuffer(7): 1
+after apply
+SSGetProgramParametersLayout: 1
+SSGetProgram: 1
+SSGetConstantBuffer(0): 1
+SSGetConstantBuffer(1): 1
+SSGetConstantBuffer(2): 1
+SSGetConstantBuffer(3): 1
+SSGetConstantBuffer(4): 1
+SSGetConstantBuffer(5): 1
+SSGetConstantBuffer(6): 1
+SSGetConstantBuffer(7): 1
