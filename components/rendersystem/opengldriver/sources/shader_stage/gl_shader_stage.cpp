@@ -81,8 +81,15 @@ class ShaderStageState: public IStageState
 
     void Bind ()
     {
+        //если NULL, то подстановка дефолтов
+        
+      static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Bind";
+
       if (!program)
-        RaiseInvalidOperation ("render::low_level::opengl::ShaderStage::Bind", "Null program");
+        RaiseInvalidOperation (METHOD_NAME, "Null program");
+
+      if (!parameters_layout)
+        RaiseInvalidOperation (METHOD_NAME, "Null program parameters layout");
 
       program->Bind (constant_buffers, parameters_layout.get ());
     }
@@ -162,22 +169,16 @@ struct ShaderStage::Impl: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка программы, параметров и буфферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetProgram                 (IProgram* program) 
+    void SetProgram (IProgram* program) 
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetProgram";
 
-      if (!program)
-        RaiseNullArgument (METHOD_NAME, "program");
-
-      state.SetProgram (cast_object <Program> (program, METHOD_NAME, "program"));
+      state.SetProgram (cast_object <Program> (*this, program, METHOD_NAME, "program"));
     }
 
     void SetProgramParametersLayout (IProgramParametersLayout* parameters_layout) 
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetProgramParametersLayout";
-
-      if (!parameters_layout)
-        RaiseNullArgument (METHOD_NAME, "parameters_layout");
 
       state.SetProgramParametersLayout (cast_object <ProgramParametersLayout> (parameters_layout, METHOD_NAME, "parameters_layout"));
     }
@@ -186,13 +187,12 @@ struct ShaderStage::Impl: public ContextObject
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetConstantBuffer";
 
-      if (!buffer)
-        RaiseNullArgument (METHOD_NAME, "buffer");
-
       if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
         RaiseNotSupported (METHOD_NAME, "Can't set constant buffer to slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
-      state.SetConstantBuffer (buffer_slot, cast_object <IBindableBuffer> (buffer, METHOD_NAME, "buffer"));
+      cast_object<ContextObject> (*this, buffer, METHOD_NAME, "buffer");
+
+      state.SetConstantBuffer (buffer_slot, cast_object<IBindableBuffer> (buffer, METHOD_NAME, "buffer"));
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,11 +259,7 @@ void ShaderStage::Impl::Bind ()
 
 IProgramParametersLayout* ShaderStage::Impl::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
 {
-  IProgramParametersLayout* ret_value = new ProgramParametersLayout (GetContextManager ());
-
-  ret_value->SetDesc (desc);
-
-  return ret_value;
+  return new ProgramParametersLayout (desc);
 }
 
 IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)

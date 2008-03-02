@@ -23,9 +23,10 @@ struct ProgramParameterComparator
    Конструктор
 */
 
-ProgramParametersLayout::ProgramParametersLayout (const ContextManager& manager)
-  : ContextObject (manager)
-  {}
+ProgramParametersLayout::ProgramParametersLayout (const ProgramParametersLayoutDesc& in_desc)
+{
+  SetDesc (in_desc);
+}
 
 /*
    Изменение/получение дескриптора

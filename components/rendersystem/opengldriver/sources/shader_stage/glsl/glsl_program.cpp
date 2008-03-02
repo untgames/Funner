@@ -50,7 +50,7 @@ struct GlslProgram::LayoutCacheEntry
 */
 
 GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, ShaderPtr* in_shaders, const LogFunction& error_log)
-  : ContextObject (manager), program (0), layouts_cache (CACHED_LAYOUT_ARRAY_SIZE)
+  : Program (manager), program (0), layouts_cache (CACHED_LAYOUT_ARRAY_SIZE)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::GlslProgram::GlslProgram";
 

@@ -55,7 +55,7 @@ struct FppProgram::LayoutCacheEntry
 */
 
 FppProgram::FppProgram (const ContextManager& context_manager, size_t shaders_count, ShaderPtr* shaders)
-  : ContextObject (context_manager), layouts_cache (CACHED_LAYOUT_ARRAY_SIZE), current_time (0)
+  : Program (context_manager), layouts_cache (CACHED_LAYOUT_ARRAY_SIZE), current_time (0)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FppProgram::FppProgram";
   
