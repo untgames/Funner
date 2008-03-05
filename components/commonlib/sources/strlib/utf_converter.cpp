@@ -3,19 +3,383 @@
 #include <common/utf_converter.h>
 #include <common/exception.h>
 
-/*void dump32(void *ptr,int l)
-{
-   FILE *file=fopen("dump.txt","a");
-   char *str=(char*)ptr;
-   for(int i=0;i<l;i++)
-      fputc(str[i],file);
-//       fprintf(file,"%p|",str[i]);
-   fclose(file);
-} */
-
 namespace common
 {
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработчики отдельных символов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CharConverter
+{
+public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Декодирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+  static bool decode_ASCII7 (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const char* src_ptr = (const char*)src_char;
+    size_t* dst_ptr = (size_t*)dst_char;
+    
+    if (src_size < sizeof(char))
+      return false;
+      
+    *dst_ptr = (size_t)(*src_ptr > 0x7F ? '?' : *src_ptr);
+    
+    src_ptr++;
+    src_size -= sizeof(char);
+    src_char = src_ptr;
+    
+    return true;
+  }
+
+  static bool decode_UTF8 (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const char* src_ptr = (const char*)src_char;
+    size_t* dst_ptr = (size_t*)dst_char;
+    
+    if (src_size < sizeof(char))
+      return false;
+    
+    if (*src_ptr >= 0xF0)
+    {
+      if (src_size < sizeof(char)*4)
+        return false;
+      
+      *dst_ptr =   (*(src_ptr+3) & 0x3F) +
+                 ( (*(src_ptr+2) & 0x3F) << 6 ) +
+                 ( (*(src_ptr+1) & 0x3F) << 12 ) +
+                 ( (*(src_ptr) & 0x07) << 18 );
+      
+      src_ptr += 4;
+      src_size -= sizeof(char) * 4;
+      src_char = src_ptr;
+    }
+    else if (*src_ptr >= 0xE0)
+    {
+      if (src_size < sizeof(char)*3)
+        return false;
+
+      *dst_ptr =   (*(src_ptr+2) & 0x3F) +
+                 ( (*(src_ptr+1) & 0x3F) << 6 ) +
+                 ( (*(src_ptr) & 0x0F) << 12 );
+      
+      src_ptr += 3;
+      src_size -= sizeof(char) * 3;
+      src_char = src_ptr;
+    }
+    else if (*src_ptr >= 0xC0)
+    {
+      if (src_size < sizeof(char)*2)
+        return false;
+
+      *dst_ptr =   (*(src_ptr+1) & 0x3F) +
+                 ( (*(src_ptr) & 0x1F) << 6 );
+      
+      src_ptr += 2;
+      src_size -= sizeof(char) * 2;
+      src_char = src_ptr;
+    }
+    else
+    {
+      *dst_ptr = (size_t)(*src_ptr > 0x7F ? '?' : *src_ptr);
+
+      src_ptr++;
+      src_size -= sizeof(char);
+      src_char = src_ptr;
+    }
+    
+    return true;
+  }
+
+  static bool decode_UTF16LE (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const wchar_t* src_ptr = (const wchar_t*) src_char;
+    size_t* dst_ptr = (size_t*) dst_char;
+    
+    if (src_size < sizeof(wchar_t))
+      return false;
+    
+    if ( (*src_ptr < 0xD800) || (*src_ptr > 0xDFFF) )
+    {
+      *dst_ptr = *src_ptr;
+      src_ptr++;
+      src_size -= sizeof(wchar_t);
+      src_char = src_ptr;
+    }
+    else
+    {
+      if ( (src_size < sizeof(wchar_t)*2) || (*src_ptr > 0xDBFF ) )
+        return false;
+      if ( (*(src_ptr+1) < 0xDC00) || (*(src_ptr+1) > 0xDFFF) )
+        return false;
+      
+      *dst_ptr = (*src_ptr & 0x03FF) + ( (*(src_ptr+1) & 0x03FF) << 10) + 0x10000;
+      src_ptr += 2;
+      src_size += sizeof(wchar_t)*2;
+      src_char = src_ptr;
+    }
+    return true;
+  }
+
+  static bool decode_UTF16BE (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const wchar_t* src_ptr = (const wchar_t*) src_char;
+    size_t* dst_ptr = (size_t*) dst_char;
+    wchar_t tmp0, tmp1;
+    
+    if (src_size < sizeof(wchar_t))
+      return false;
+    
+    tmp0 = ((*src_ptr >> 8) & 0xFF) + ((*src_ptr & 0xFF) << 8);
+    
+    if ( (tmp0 < 0xD800) || (tmp0 > 0xDFFF) )
+    {
+      *dst_ptr = tmp0;
+      src_ptr++;
+      src_size -= sizeof(wchar_t);
+      src_char = src_ptr;
+    }
+    else
+    {
+      if ( (src_size < sizeof(wchar_t)*2) || (tmp0 > 0xDBFF ) )
+        return false;
+      
+      tmp1 = ((*(src_ptr+1) >> 8) & 0xFF) + ((*(src_ptr+1) & 0xFF) << 8);
+      
+      if ( (tmp1 < 0xDC00) || (tmp1 > 0xDFFF) )
+        return false;
+      
+      *dst_ptr = ( tmp0 & 0x03FF) + ( ( tmp1 & 0x03FF) << 10) + 0x10000;
+      src_ptr += 2;
+      src_size -= sizeof(wchar_t)*2;
+      src_char = src_ptr;
+    }
+    return true;
+  }
+
+  static bool decode_UTF32LE (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const size_t* src_ptr = (const size_t*) src_char;
+    size_t* dst_ptr = (size_t*) dst_char;
+
+    if (src_size < sizeof(size_t))
+      return false;
+    
+    *dst_ptr = *src_ptr;
+    src_ptr++;
+    src_size -= sizeof(size_t);
+    src_char = src_ptr;
+    
+    return true;
+  }
+
+  static bool decode_UTF32BE (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const size_t* src_ptr = (const size_t*) src_char;
+    size_t* dst_ptr = (size_t*) dst_char;
+
+    if (src_size < sizeof(size_t))
+      return false;
+    
+    *dst_ptr = ((*src_ptr & 0xFF) << 24) +
+               ((*src_ptr & 0xFF00) << 8) +
+               ((*src_ptr & 0xFF0000) >> 8) +
+               ((*src_ptr & 0xFF000000) >> 24);
+    
+    src_ptr++;
+    src_size -= sizeof(size_t);
+    src_char = src_ptr;
+    
+    return true;
+  }
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Кодирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+  static bool encode_ASCII7 (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const size_t* src_ptr = (const size_t*) src_char;
+    char* dst_ptr = (char*) dst_char;
+    
+    if (dst_size < sizeof(char))
+      return false;
+      
+    *dst_ptr = (char)(*src_ptr > 0x7F ? '?' : *src_ptr);
+    
+    dst_ptr++;
+    dst_size -= sizeof(char);
+    dst_char = dst_ptr;
+    
+    return true;
+  }
+
+  static bool encode_UTF8 (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const size_t* src_ptr = (const size_t*) src_char;
+    char* dst_ptr = (char*) dst_char;
+    
+    if (*src_ptr > 0xFFFF)
+    {
+      if (dst_size < sizeof(char)*4)
+        return false;
+      
+      *(dst_ptr+3) = ((*src_ptr) & 0x3F) | 0x80;
+      *(dst_ptr+2) = ( ( (*src_ptr) >> 6) & 0x3F) | 0x80;
+      *(dst_ptr+1) = ( ( (*src_ptr) >> 12) & 0x3F) | 0x80;
+      *(dst_ptr) = ( ( (*src_ptr) >> 18) & 0x07) | 0xF0;
+      
+      dst_ptr += 4;
+      dst_size -= sizeof(char)*4;
+      dst_char = dst_ptr;
+    }
+    else if (*src_ptr > 0x7FF)
+    {
+      if (dst_size < sizeof(char)*3)
+        return false;
+
+      *(dst_ptr+2) = ((*src_ptr) & 0x3F) | 0x80;
+      *(dst_ptr+1) = ( ( (*src_ptr) >> 6) & 0x3F) | 0x80;
+      *(dst_ptr) = ( ( (*src_ptr) >> 12) & 0x0F) | 0xE0;
+      
+      dst_ptr += 3;
+      dst_size -= sizeof(char)*3;
+      dst_char = dst_ptr;
+    }
+    else if (*src_ptr > 0x7F)
+    {
+      if (dst_size < sizeof(char)*2)
+        return false;
+
+      *(dst_ptr+1) = ((*src_ptr) & 0x3F) | 0x80;
+      *(dst_ptr) = ( ( (*src_ptr) >> 6) & 0x1F) | 0xC0;
+      
+      dst_ptr += 2;
+      dst_size -= sizeof(char)*2;
+      dst_char = dst_ptr;
+    }
+    else
+    {
+      if (dst_size < sizeof(char))
+        return false;
+
+      *(dst_ptr) = (*src_ptr) & 0x7F;
+      
+      dst_ptr ++;
+      dst_size -= sizeof(char);
+      dst_char = dst_ptr;
+    }
+    
+    return true;
+  }
+
+  static bool encode_UTF16LE (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const size_t* src_ptr = (const size_t*) src_char;
+    wchar_t* dst_ptr = (wchar_t*) dst_char;
+    size_t tmp;
+    
+    if (*src_ptr > 0x10000)
+    {
+      if (dst_size < sizeof(wchar_t)*2)
+        return false;
+      
+      tmp = *src_ptr - 0x10000;
+      *dst_ptr = (wchar_t) ( ( (tmp >> 10) & 0x03FF ) + 0xD800);
+      *(dst_ptr+1) = (wchar_t) ( ( tmp & 0x03FF ) + 0xDC00);
+      
+      dst_ptr +=2;
+      dst_size -= sizeof(wchar_t)*2;
+      dst_char = dst_ptr;
+    }
+    else
+    {
+      if (dst_size < sizeof(wchar_t))
+        return false;
+      
+      *dst_ptr = (wchar_t)*src_ptr;
+      
+      dst_ptr++;
+      dst_size -= sizeof(wchar_t);
+      dst_char = dst_ptr;
+    }
+    
+    return true;
+  }
+
+  static bool encode_UTF16BE (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const size_t* src_ptr = (const size_t*) src_char;
+    wchar_t* dst_ptr = (wchar_t*) dst_char;
+    wchar_t tmp0, tmp1;
+    
+    if (*src_ptr > 0x10000)
+    {
+      if (dst_size < sizeof(wchar_t)*2)
+        return false;
+      
+      tmp0 = (wchar_t) ( (((*src_ptr - 0x10000) >> 10) & 0x3FF) + 0xD800 );
+      tmp1 = (wchar_t) ( ((*src_ptr - 0x10000) & 0x3FF) + 0xDC00 );
+      *dst_ptr = (wchar_t) ( ((tmp0 & 0xFF) << 8) + ((tmp0 >> 8) & 0xFF));
+      *(dst_ptr+1) = (wchar_t) ( ((tmp1 & 0xFF) << 8) + ((tmp1 >> 8) & 0xFF));
+      
+      dst_ptr +=2;
+      dst_size -= sizeof(wchar_t)*2;
+      dst_char = dst_ptr;
+    }
+    else
+    {
+      if (dst_size < sizeof(wchar_t))
+        return false;
+      
+      *dst_ptr = (wchar_t) ( ((*src_ptr & 0xFF) << 8) + ((*src_ptr >> 8) & 0xFF));
+      
+      dst_ptr++;
+      dst_size -= sizeof(wchar_t);
+      dst_char = dst_ptr;
+    }
+    
+    return true;
+  }
+
+  static bool encode_UTF32LE (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const size_t* src_ptr = (const size_t*) src_char;
+    size_t* dst_ptr = (size_t*) dst_char;
+
+    if (dst_size < sizeof(size_t))
+      return false;
+    
+    *dst_ptr = *src_ptr;
+    
+    dst_ptr++;
+    dst_size -= sizeof(size_t);
+    dst_char = dst_ptr;
+    
+    return true;
+  }
+
+  static bool encode_UTF32BE (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
+  {
+    const size_t* src_ptr = (const size_t*) src_char;
+    size_t* dst_ptr = (size_t*) dst_char;
+
+    if (dst_size < sizeof(size_t))
+      return false;
+    
+    *dst_ptr = ((*src_ptr & 0xFF) << 24) +
+               ((*src_ptr & 0xFF00) << 8) +
+               ((*src_ptr & 0xFF0000) >> 8) +
+               ((*src_ptr & 0xFF000000) >> 24);
+    
+    dst_ptr++;
+    dst_size -= sizeof(size_t);
+    dst_char = dst_ptr;
+    
+    return true;
+  }
+};
+
+/*
 #define Char unsigned __int16
 
 enum
@@ -25,6 +389,7 @@ enum
    UtfError_NotEnoughEncoded=4,
    UtfError_NotEnoughBufferSpace=5
 };
+
 
 void ReturnException(int ex,char *func,int i);
 
@@ -47,7 +412,7 @@ int encode_UTF32(unsigned char* dst, int dstSize, int* dstBytes, char32 cp, bool
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перекодировка Utf -> char32
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-EncodingResult 	utf_decode (const void* source_buffer,            //буфер-источник с utf-строкой
+EncodingResult  utf_decode (const void* source_buffer,            //буфер-источник с utf-строкой
                            size_t      source_buffer_size,       //размер буфера-источника в байтах
                            Encoding    source_buffer_encoding,   //кодировка буфера-источника
                            void*       destination_buffer,       //буфер-приёмник для декодируемой строки (char32)
@@ -202,19 +567,6 @@ EncodingResult convert_to_utf16 (const char* source_buffer,            //буфер-и
             ByteCountMask >>= 1;
             codeMask >>= 1;
          }
-/*         if (!(bytes<2 || bytes>4))
-         {
-            if (!(srcSize<bytes))
-            {
-               // read remaining bytes of the character code
-               cp = first & codeMask;
-               for ( int i = 1 ; i < bytes ; ++i )
-               {
-                  cp <<= 6;
-                  cp |= ( 0x3F & (unsigned int)*src++ );
-               }
-            }
-         }*/
       i+=bytes;
       }
    }
@@ -232,19 +584,6 @@ int decode_ASCII7( const unsigned char* src, int srcSize, int* srcBytes, char32*
    else
       *buffer = *src;
 
-/*   if ( srcSize >= 1 )
-   {
-      cp = *src++;
-      //if ( cp >= (unsigned char)128 )
-      //err = 1;        // ERROR: Out-of-range ASCII-7 code
-   }
-   else
-   {
-      // ERROR: Not enough encoded bytes available
-      err = 4;
-   }
-*/
-//   if ( !err )
    *src++;
    *srcBytes = src-src0;
    return err;
@@ -565,6 +904,10 @@ int encode_UTF32( unsigned char* dst, int dstSize, int* dstBytes,char32 cp, bool
    return err;
 }
 
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Преобразование строк
+///////////////////////////////////////////////////////////////////////////////////////////////////
 stl::wstring towstring (const char* string, int length)
 {
    if(string==NULL)
@@ -649,29 +992,4 @@ stl::string tostring (const stl::wstring& string)
   return tostring (&string [0], string.size ());
 }
 
-void ReturnException(int ex,char *func,int i)
-{
-   switch(ex)
-   {
-      case UtfError_OutOfRange:
-         Raise<ArgumentException>(func,"Out-of-range ASCII-7 code (%d)",i);
-//         throw ArgumentException(func,ErrorBuf);
-         break;
-      case UtfError_InvalidScalarValue:
-         Raise<ArgumentException>(func,"Invalid Unicode scalar value (%d)",i);
-//         throw ArgumentException(func,ErrorBuf);
-         break;
-      case UtfError_NotEnoughEncoded:
-         Raise<ArgumentException>(func,"Not enough encoded bytes available (%d)",i);
-//         throw ArgumentException(func,ErrorBuf);
-         break;
-      case UtfError_NotEnoughBufferSpace:
-         Raise<ArgumentException>(func,"Not enough buffer space (%d)",i);
-//         throw ArgumentException(func,ErrorBuf);
-         break;
-      default:
-         throw ArgumentException(func,"Unknown error");
-         break;
-   }
-}
-}
+} //namespace common
