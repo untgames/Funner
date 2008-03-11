@@ -28,7 +28,7 @@ void XMLLexer::reset (char* buf)
 
   memset (name_char_map,0,sizeof (name_char_map));
 
-  static const char* spec_name_chars       = ".-_:/#";
+  static const char* spec_name_chars       = ".-_:#";
   static size_t      spec_name_chars_count = strlen (spec_name_chars);
 
   for (int i=0;i<256;i++)
@@ -107,7 +107,7 @@ struct Marker
   char        replacement;
 };
 
-void XMLLexer::read_shifted_string ()
+void XMLLexer::read_shifted_string (char border)
 {
   static Marker markers [] = {{"lt",2,'<'},{"gt",2,'>'},{"amp",3,'&'},{"apos",4,'\''},{"quot",4,'"'}};
   const int MARKERS_NUM = sizeof (markers)/sizeof (Marker);
@@ -139,17 +139,21 @@ void XMLLexer::read_shifted_string ()
 
         break;
       }
-      case '"':
-        *write_pos = 0;
-        pos++;
-        return;
       default:
-        *write_pos = *pos;
+        if (*pos == border)
+        {
+          *write_pos = 0;
+          pos++;
+          return;
+        }
+        else
+          *write_pos = *pos;
+  
         break;
     }
 }
 
-void XMLLexer::read_string ()
+void XMLLexer::read_string (char border)
 {
   cur_token = pos;
   cur_lexem = STRING;
@@ -164,11 +168,15 @@ void XMLLexer::read_string ()
         SetError (UNCLOSED_STRING,cur_token);
         return;
       case '&':
-        read_shifted_string ();
+        read_shifted_string (border);
         return;
-      case '"':
-        *pos++ = 0;
-        return;
+      default:
+        if (*pos == border)
+        {
+          *pos++ = 0;
+          return;
+        }
+        break;
     }
 }
 
@@ -315,8 +323,7 @@ XMLLexer::Lexem XMLLexer::next ()
         break;
       case '"':
       case '\'':
-        pos++;
-        read_string ();
+        read_string (*pos++);
         break;
       case '=':
         pos++;

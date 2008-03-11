@@ -276,7 +276,7 @@ void XMLParser::parse_PI ()
     switch (lex.lexem ())
     {
       case XMLLexer::INSTRUCTION_END_BRACKET: return;
-      default:                                process_error (); break;
+      default:                                process_error (); return;
     }
 }
 
@@ -432,6 +432,7 @@ void XMLParser::parse_element ()
     parse_attrlist ();
 
   for (;;lex.next ())
+  {
     switch (lex.lexem ())
     {
       case XMLLexer::TAG_END_BRACKET:
@@ -444,6 +445,7 @@ void XMLParser::parse_element ()
         process_error ();
         break;
     }
+  }
 }
 
 void XMLParser::parse_document ()

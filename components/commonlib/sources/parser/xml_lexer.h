@@ -63,8 +63,8 @@ class XMLLexer
     void skip ();
     void skip_block_comment ();
     void nextline ();
-    void read_string ();
-    void read_shifted_string ();
+    void read_string (char border);
+    void read_shifted_string (char border);
     void read_cdata ();
     void read_identifier (bool identifier);
 
