@@ -6,6 +6,28 @@
 
 namespace common
 {
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Преобразование кодировок
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+enum Encoding
+{
+  Encoding_ASCII7,
+  Encoding_UTF8,
+  Encoding_UTF16LE,
+  Encoding_UTF16BE,
+  Encoding_UTF32LE,
+  Encoding_UTF32BE,
+  
+  Encoding_Count
+};
+
+void ConvertEncoding(Encoding       source_encoding,
+                     const void*&   source,
+                     size_t&        source_size,
+                     Encoding       destination_encoding,
+                     void*&         destination,
+                     size_t&        destination_size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перекодировка char <-> wchar_t
