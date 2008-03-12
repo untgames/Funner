@@ -18,28 +18,24 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   static bool decode_ASCII7 (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
   {
-    const char* src_ptr = (const char*)src_char;
+    const unsigned char* src_ptr = (const unsigned char*)src_char;
     size_t* dst_ptr = (size_t*)dst_char;
-    printf("0");
     
     if (src_size < sizeof(char))
       return false;
-      
-    printf("1");
-    *dst_ptr = (size_t)(*src_ptr > 0x7F ? '?' : *src_ptr);
     
-    printf("2");
+    (*dst_ptr) = (*src_ptr > 0x7F) ? 0x3F : (*src_ptr);
+    
     src_ptr++;
     src_size -= sizeof(char);
     
-    printf("3");
     src_char = src_ptr;
     return true;
   }
 
   static bool decode_UTF8 (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
   {
-    const char* src_ptr = (const char*)src_char;
+    const unsigned char* src_ptr = (const unsigned char*)src_char;
     size_t* dst_ptr = (size_t*)dst_char;
     
     if (src_size < sizeof(char))
@@ -83,7 +79,7 @@ public:
     }
     else
     {
-      *dst_ptr = (size_t)(*src_ptr > 0x7F ? '?' : *src_ptr);
+      *dst_ptr = (size_t)(*src_ptr > 0x7F ? 0x3F : *src_ptr);
 
       src_ptr++;
       src_size -= sizeof(char);
@@ -113,7 +109,7 @@ public:
         return false;
 
       if ( (*src_ptr > 0xDBFF ) || (*(src_ptr+1) < 0xDC00) || (*(src_ptr+1) > 0xDFFF) )
-        *dst_ptr = '?';
+        *dst_ptr = 0x3F;
       else
         *dst_ptr = (*src_ptr & 0x03FF) + ( (*(src_ptr+1) & 0x03FF) << 10) + 0x10000;
       
@@ -150,7 +146,7 @@ public:
       tmp1 = ((*(src_ptr+1) >> 8) & 0xFF) + ((*(src_ptr+1) & 0xFF) << 8);
       
       if ( (tmp0 > 0xDBFF ) || (tmp1 < 0xDC00) || (tmp1 > 0xDFFF) )
-        *dst_ptr = '?';
+        *dst_ptr = 0x3F;
       else
         *dst_ptr = ( tmp0 & 0x03FF) + ( ( tmp1 & 0x03FF) << 10) + 0x10000;
       
@@ -203,12 +199,12 @@ public:
   static bool encode_ASCII7 (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
   {
     const size_t* src_ptr = (const size_t*) src_char;
-    char* dst_ptr = (char*) dst_char;
+    unsigned char* dst_ptr = (unsigned char*) dst_char;
     
     if (dst_size < sizeof(char))
       return false;
       
-    *dst_ptr = (char)(*src_ptr > 0x7F ? '?' : *src_ptr);
+    *dst_ptr = (char)((*src_ptr) > 0x7F ? 0x3F : (*src_ptr));
     
     dst_ptr++;
     dst_size -= sizeof(char);
@@ -220,7 +216,7 @@ public:
   static bool encode_UTF8 (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
   {
     const size_t* src_ptr = (const size_t*) src_char;
-    char* dst_ptr = (char*) dst_char;
+    unsigned char* dst_ptr = (unsigned char*) dst_char;
     
     if (*src_ptr > 0xFFFF)
     {
@@ -446,18 +442,19 @@ void ConvertEncoding(Encoding       source_encoding,
       RaiseInvalidArgument("common::ConvertEncoding (const char*, const void*&, size_t&, const char*, void*&, size_t&)", "destination_encoding");
   }
 
-  size_t* buffer = new size_t[4], buffer_size = 4;
+  size_t buffer;
+  void* buffer_ptr = &buffer;
+  const void* buffer_cptr = &buffer;
+  size_t buffer_size = 4;
   
   for (; source_size && destination_size;)
   {
-    if (!decoder(source, source_size, (void*&)buffer, buffer_size))
+    if (!decoder(source, source_size, buffer_ptr, buffer_size))
       return;
     
-    if (!encoder((const void*&)buffer, buffer_size, destination, destination_size))
+    if (!encoder(buffer_cptr, buffer_size, destination, destination_size))
       return;
   }
-  
-  delete []buffer;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
