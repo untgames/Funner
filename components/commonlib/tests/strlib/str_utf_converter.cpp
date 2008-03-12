@@ -78,24 +78,29 @@ const char* get_encoding_name (Encoding encoding)
 
 void test_utf_converter (const char* file_name, Encoding source_encoding)
 {
-  const size_t buffer_size = 128;
+  const size_t BUFFER_SIZE = 16384;
+  
   Encoding encoding [4] = {Encoding_ASCII7, Encoding_UTF8, Encoding_UTF16LE, Encoding_UTF16BE};
   
   for (size_t i=0; i<4; i++)
   {
     printf ("test encoding chain: %s->UTF32LE->%s: '", get_encoding_name (source_encoding), get_encoding_name (encoding [i]));
   
-    char buffer [2][buffer_size];
+    char buffer [2][BUFFER_SIZE];
 
     InputFile file (file_name);
 
     memset(buffer [0], 0, sizeof(buffer[0]) );
     
-    size_t source_length = file.Read (buffer [0], sizeof (buffer [0]) );
-    size_t dest_length = buffer_size;
-    ConvertEncoding (source_encoding, (const void*&) buffer[0], source_length, encoding[i], (void*&) buffer [1], dest_length);
+    size_t source_length = file.Read (buffer [0], sizeof (buffer [0]) ),
+           dest_length   = sizeof buffer [1];
+           
+    const void* src_ptr = buffer [0];
+    void*       dst_ptr = buffer [1];
 
-    dump (buffer [1], buffer_size - dest_length, encoding [i]);
+    ConvertEncoding (source_encoding, src_ptr, source_length, encoding [i], dst_ptr, dest_length);
+
+    dump (buffer [1], sizeof (buffer [1]) - dest_length, encoding [i]);
 
     printf ("'\n");
   }
@@ -103,25 +108,32 @@ void test_utf_converter (const char* file_name, Encoding source_encoding)
 
 int main()
 {
-  printf ("Results of utf_converter_test:\n");
+  printf ("Results of utf_converter_test:\n");  
   
   if (!setlocale (LC_ALL, ".1251"))
   {
     printf ("Error at set locale\n");
     return 0;
   }
+  
+  try
+  {  
+    const char* source_file_name [4] = {"data\\ansi.txt", "data\\utf8.txt", "data\\utf16le.txt","data\\utf16be.txt"};
+    Encoding    source_encoding [4]  = {Encoding_ASCII7, Encoding_UTF8, Encoding_UTF16LE, Encoding_UTF16BE};
 
-  const char* source_file_name [4] = {"data\\ansi.txt", "data\\utf8.txt", "data\\utf16le.txt","data\\utf16be.txt"};
-  Encoding    source_encoding [4]  = {Encoding_ASCII7, Encoding_UTF8, Encoding_UTF16LE, Encoding_UTF16BE};
+    for (size_t i=0; i<4; i++)
+      test_utf_converter (source_file_name [i], source_encoding [i]);
 
-  for (size_t i=0; i<4; i++)
-    test_utf_converter (source_file_name [i], source_encoding [i]);
+    wchar_t *wc=L"Hello World!!! Привет Мир";
+    char     *c="Hello World!!! Привет Мир";
 
-  wchar_t *wc=L"Hello World!!! Привет Мир";
-  char     *c="Hello World!!! Привет Мир";
-
-  printf("wchar->char %s\n", tostring (wc).c_str());
-  printf("wchar->char %S\n", towstring (c).c_str ());
+    printf("wchar->char %s\n", tostring (wc).c_str());
+    printf("wchar->char %S\n", towstring (c).c_str ());
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
 
   return 0;
 }
