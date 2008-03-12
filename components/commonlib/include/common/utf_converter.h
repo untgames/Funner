@@ -22,12 +22,12 @@ enum Encoding
   Encoding_Count
 };
 
-void ConvertEncoding(Encoding       source_encoding,
-                     const void*&   source,
-                     size_t&        source_size,
-                     Encoding       destination_encoding,
-                     void*&         destination,
-                     size_t&        destination_size);
+void convert_encoding(Encoding       source_encoding,
+                      const void*&   source,
+                      size_t&        source_size,
+                      Encoding       destination_encoding,
+                      void*&         destination,
+                      size_t&        destination_size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перекодировка char <-> wchar_t

@@ -35,12 +35,18 @@ void dump (const void* buffer, size_t length, Encoding encoding)
     }
     case Encoding_UTF8:
     {
+      const char* s = (const char*)buffer;
+  
+      for (size_t i=0; i<length; i++)
+        printf ("%c", s [i]);
+      
+      /*
       stl::wstring result (' ', length);
       
       result.resize (mbstowcs (&result [0], (const char*)buffer, length));
 
       printf ("%S", result.c_str ());
-
+      */
       break;
     }
     case Encoding_UTF16LE:
@@ -91,6 +97,7 @@ void test_utf_converter (const char* file_name, Encoding source_encoding)
     InputFile file (file_name);
 
     memset(buffer [0], 0, sizeof(buffer[0]) );
+    memset(buffer [1], 0, sizeof(buffer[1]) );
     
     size_t source_length = file.Read (buffer [0], sizeof (buffer [0]) ),
            dest_length   = sizeof buffer [1];
@@ -98,7 +105,7 @@ void test_utf_converter (const char* file_name, Encoding source_encoding)
     const void* src_ptr = buffer [0];
     void*       dst_ptr = buffer [1];
 
-    ConvertEncoding (source_encoding, src_ptr, source_length, encoding [i], dst_ptr, dest_length);
+    convert_encoding (source_encoding, src_ptr, source_length, encoding [i], dst_ptr, dest_length);
 
     dump (buffer [1], sizeof (buffer [1]) - dest_length, encoding [i]);
 
