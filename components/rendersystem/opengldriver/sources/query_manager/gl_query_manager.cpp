@@ -6,6 +6,82 @@ using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
+namespace
+{
+
+/*
+    Состояние менеджера запросов
+*/
+
+class QueryManagerState: public IStageState
+{
+  public:  
+      //конструктор
+    QueryManagerState (QueryManagerState* in_main_state = 0) : main_state (in_main_state) {}
+
+      //Управление предикатами отрисовки
+    void SetPredication (AsyncPredicate* in_predicate, bool in_predicate_value)
+    {
+      predicate       = in_predicate;
+      predicate_value = in_predicate_value;
+    }
+
+    AsyncPredicate* GetPredicate () const
+    {
+      return predicate.get ();
+    }
+
+    bool GetPredicateValue () const
+    {
+      return predicate_value;
+    }
+
+      //Получение результата предиката
+    bool GetPredicateAsyncResult () const
+    {
+      if (!(predicate && predicate->IsResultAvailable ()))
+        return true;
+
+      return predicate->GetResult () == predicate_value;
+    }
+
+      //захват состояния
+    void Capture (const StateBlockMask& mask)
+    {
+      if (main_state)
+        Copy (*main_state, mask);
+    }
+    
+      //восстановление состояния
+    void Apply (const StateBlockMask& mask)
+    {
+      if (main_state)
+        main_state->Copy (*this, mask);
+    }
+    
+  private:
+      //копирование
+    void Copy (const QueryManagerState& source, const StateBlockMask& mask)
+    {
+      if (mask.predication)
+      {
+        predicate       = source.GetPredicate ();
+        predicate_value = source.GetPredicateValue ();
+      }
+    }
+
+  private:
+    typedef xtl::trackable_ptr<QueryManagerState> QueryManagerStatePtr;
+    typedef xtl::trackable_ptr<AsyncPredicate>    AsyncPredicatePtr;
+
+  private:
+    QueryManagerStatePtr main_state;
+    AsyncPredicatePtr    predicate;
+    bool                 predicate_value;
+};
+
+}
+
 struct QueryManager::Impl : public ContextObject
 {
   public:
@@ -15,6 +91,11 @@ struct QueryManager::Impl : public ContextObject
     Impl (const ContextManager& manager);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение основного состояния уровня
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    QueryManagerState& GetState () { return state; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание предикатов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IPredicate* CreatePredicate ();
@@ -22,18 +103,21 @@ struct QueryManager::Impl : public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление предикатами отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetPredication    (IPredicate* in_predicate, bool in_predicate_value);
-    IPredicate* GetPredicate      ();
-    bool        GetPredicateValue ();
+    void SetPredication (IPredicate* in_predicate, bool in_predicate_value) 
+    {
+      state.SetPredication (cast_object<AsyncPredicate> (GetContextManager (), in_predicate, "render::low_level::opengl::QueryManager::Impl::SetPredication", "predicate"), in_predicate_value);
+    }
+
+    IPredicate* GetPredicate      () {return state.GetPredicate ();}
+    bool        GetPredicateValue () {return state.GetPredicateValue ();}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение результата предиката
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool GetPredicateAsyncResult ();
+    bool GetPredicateAsyncResult () {return state.GetPredicateAsyncResult ();}
 
   private:
-    xtl::trackable_ptr<AsyncPredicate> predicate;
-    bool                               predicate_value;
+    QueryManagerState state; //состояние уровня
 };
 
 /*
@@ -41,7 +125,7 @@ struct QueryManager::Impl : public ContextObject
 */
 
 QueryManager::Impl::Impl (const ContextManager& manager) 
-  : ContextObject (manager), predicate (0), predicate_value (true)
+  : ContextObject (manager)
 {
   GetContextDataTable (Stage_QueryManager)[QueryManagerCache_IsInRanges] = 0;
 }
@@ -72,38 +156,6 @@ IPredicate* QueryManager::Impl::CreatePredicate ()
 }
 
 /*
-   Управление предикатами отрисовки
-*/
-
-void QueryManager::Impl::SetPredication (IPredicate* in_predicate, bool in_predicate_value)
-{
-  predicate       = cast_object<AsyncPredicate> (GetContextManager (), in_predicate, "render::low_level::opengl::QueryManager::Impl::SetPredication", "predicate");
-  predicate_value = in_predicate_value;
-}
-
-IPredicate* QueryManager::Impl::GetPredicate ()
-{
-  return predicate.get ();
-}
-
-bool QueryManager::Impl::GetPredicateValue ()
-{
-  return predicate_value;
-}
-
-/*
-   Получение результата предиката
-*/
-
-bool QueryManager::Impl::GetPredicateAsyncResult ()
-{
-  if (!(predicate && predicate->IsResultAvailable ()))
-    return true;
-
-  return predicate->GetResult () == predicate_value;
-}
-
-/*
    Конструктор / деструктор
 */
 
@@ -113,6 +165,15 @@ QueryManager::QueryManager (const ContextManager& manager)
 
 QueryManager::~QueryManager ()
 {
+}
+
+/*
+   Создание объекта состояния уровня
+*/
+
+IStageState* QueryManager::CreateStageState ()
+{
+  return new QueryManagerState (&impl->GetState ());
 }
 
 /*

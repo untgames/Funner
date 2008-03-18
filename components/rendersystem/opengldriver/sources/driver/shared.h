@@ -260,6 +260,7 @@ class StateBlock: virtual public IStateBlock, public Object
     StageStatePtr  rasterizer_stage_state; //состояние растеризатора
     StageStatePtr  texture_manager_state;  //состояние менеджера текстур
     StageStatePtr  shader_stage_state;     //состояние шейдерного уровня
+    StageStatePtr  query_manager_state;    //состояние менеджера запросов
 };
 
 }

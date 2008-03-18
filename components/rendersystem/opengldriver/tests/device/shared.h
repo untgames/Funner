@@ -48,6 +48,7 @@ typedef xtl::com_ptr<IRasterizerState>         RasterizerStatePtr;
 typedef xtl::com_ptr<IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<IStateBlock>              StateBlockPtr;
+typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 
 //тестовое приложение
 struct Test
