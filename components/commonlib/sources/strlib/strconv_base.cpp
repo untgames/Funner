@@ -1,4 +1,5 @@
-#include "shared.h"
+#include <common/strconv.h>
+#include <common/utf_converter.h>
 #include "strconv_base.h"
 #include <common/exception.h>
 
