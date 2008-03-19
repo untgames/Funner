@@ -96,12 +96,12 @@ void test_utf_converter (const char* file_name, Encoding source_encoding)
 
     InputFile file (file_name);
 
-    memset(buffer [0], 0, sizeof(buffer[0]) );
-    memset(buffer [1], 0, sizeof(buffer[1]) );
+    memset (buffer [0], 0, sizeof buffer [0]);
+    memset (buffer [1], 0, sizeof buffer [1]);
     
-    size_t source_length = file.Read (buffer [0], sizeof (buffer [0]) ),
+    size_t source_length = file.Read (buffer [0], sizeof buffer [0]),
            dest_length   = sizeof buffer [1];
-           
+ 
     const void* src_ptr = buffer [0];
     void*       dst_ptr = buffer [1];
 

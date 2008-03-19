@@ -3,14 +3,13 @@
 
 #include <wchar.h>
 #include <stl/string_fwd>
-#include <common/strconv.h>
 
 namespace common
 {
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразование кодировок
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Допустимые кодировок
+///////////////////////////////////////////////////////////////////////////////////////////////////
 enum Encoding
 {
   Encoding_ASCII7,
@@ -23,12 +22,12 @@ enum Encoding
   Encoding_Count
 };
 
-void convert_encoding(Encoding       source_encoding,
-                      const void*&   source,
-                      size_t&        source_size,
-                      Encoding       destination_encoding,
-                      void*&         destination,
-                      size_t&        destination_size);
+void convert_encoding (Encoding       source_encoding,
+                       const void*&   source,
+                       size_t&        source_size,
+                       Encoding       destination_encoding,
+                       void*&         destination,
+                       size_t&        destination_size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перекодировка char <-> wchar_t
