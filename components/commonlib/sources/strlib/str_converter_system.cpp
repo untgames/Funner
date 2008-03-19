@@ -1,6 +1,7 @@
 #include <stl/hash_map>
 
 #include <xtl/function.h>
+#include <xtl/bind.h>
 
 #include <common/singleton.h>
 #include <common/utf_converter.h>
@@ -17,23 +18,44 @@ namespace
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Utf-конвертер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <Encoding source_encoding, Encoding destination_encoding>
-struct UtfConverter: public IStringConverter
+class UtfConverter: public IStringConverter
 {
-  void AddRef  () {}
-  void Release () {}
+  public:
+    void AddRef  () {}
+    void Release () {}
 
-  void Convert (const void*& source, size_t& source_size, void*& destination, size_t& destination_size)
-  {
-    convert_encoding (source_encoding, source, source_size, destination_encoding, destination, destination_size);
-  }
-  
-  static IStringConverter* Create ()
-  {
-    UtfConverter converter;
+    void Convert (const void*& source, size_t& source_size, void*& destination, size_t& destination_size)
+    {
+      convert_encoding (source_encoding, source, source_size, destination_encoding, destination, destination_size);
+    }
+    
+    static IStringConverter* Create (Encoding source_encoding, Encoding destination_encoding)
+    {
+      static bool         init = false;
+      static UtfConverter converters [Encoding_Num][Encoding_Num];
 
-    return &converter;
-  }
+      if (!init)
+      {
+        for (int source=Encoding_ASCII7; source<Encoding_Num; source++)
+          for (int destination=Encoding_ASCII7; destination<Encoding_Num; destination++)
+          {
+            UtfConverter& conv = converters [source][destination];
+            
+            conv.source_encoding      = (Encoding)source;
+            conv.destination_encoding = (Encoding)destination;
+          }
+
+        init = true;
+      }
+
+      return &converters [source_encoding][destination_encoding];
+    }
+    
+  private:
+    UtfConverter () {}
+
+  private:
+    Encoding source_encoding, destination_encoding;
 };
 
 }
@@ -91,61 +113,29 @@ typedef common::Singleton<StringConverterSystemImpl> StringConverterSystemImplSi
     Конструктор / деструктор
 */
 
-StringConverterSystemImpl::StringConverterSystemImpl()
+namespace
 {
-    //исходная кодировка - ascii7
 
-  RegisterConverter ("ascii7", "ascii7",  &UtfConverter<Encoding_ASCII7, Encoding_ASCII7>::Create);
-  RegisterConverter ("ascii7", "utf8",    &UtfConverter<Encoding_ASCII7, Encoding_UTF8>::Create);
-  RegisterConverter ("ascii7", "utf16le", &UtfConverter<Encoding_ASCII7, Encoding_UTF16LE>::Create);
-  RegisterConverter ("ascii7", "utf16be", &UtfConverter<Encoding_ASCII7, Encoding_UTF16BE>::Create);
-  RegisterConverter ("ascii7", "utf32le", &UtfConverter<Encoding_ASCII7, Encoding_UTF32LE>::Create);
-  RegisterConverter ("ascii7", "utf32be", &UtfConverter<Encoding_ASCII7, Encoding_UTF32BE>::Create);
+const char* get_encoding_name (Encoding encoding)
+{
+  switch (encoding)
+  {
+    case Encoding_ASCII7:  return "ASCII7";
+    case Encoding_UTF8:    return "UTF8";
+    case Encoding_UTF16LE: return "UTF16LE";
+    case Encoding_UTF16BE: return "UTF16BE";
+    default:               return "Unknown";
+  }
+}
 
-    //исходная кодировка - utf8
+}
 
-  RegisterConverter ("utf8", "ascii7",  &UtfConverter<Encoding_UTF8, Encoding_ASCII7>::Create);
-  RegisterConverter ("utf8", "utf8",    &UtfConverter<Encoding_UTF8, Encoding_UTF8>::Create);
-  RegisterConverter ("utf8", "utf16le", &UtfConverter<Encoding_UTF8, Encoding_UTF16LE>::Create);
-  RegisterConverter ("utf8", "utf16be", &UtfConverter<Encoding_UTF8, Encoding_UTF16BE>::Create);
-  RegisterConverter ("utf8", "utf32le", &UtfConverter<Encoding_UTF8, Encoding_UTF32LE>::Create);
-  RegisterConverter ("utf8", "utf32be", &UtfConverter<Encoding_UTF8, Encoding_UTF32BE>::Create);
-
-    //исходная кодировка - utf16le
-
-  RegisterConverter ("utf16le", "ascii7",  &UtfConverter<Encoding_UTF16LE, Encoding_ASCII7>::Create);
-  RegisterConverter ("utf16le", "utf8",    &UtfConverter<Encoding_UTF16LE, Encoding_UTF8>::Create);
-  RegisterConverter ("utf16le", "utf16le", &UtfConverter<Encoding_UTF16LE, Encoding_UTF16LE>::Create);
-  RegisterConverter ("utf16le", "utf16be", &UtfConverter<Encoding_UTF16LE, Encoding_UTF16BE>::Create);
-  RegisterConverter ("utf16le", "utf32le", &UtfConverter<Encoding_UTF16LE, Encoding_UTF32LE>::Create);
-  RegisterConverter ("utf16le", "utf32be", &UtfConverter<Encoding_UTF16LE, Encoding_UTF32BE>::Create);
-
-    //исходная кодировка - utf16be
-
-  RegisterConverter ("utf16be", "ascii7",  &UtfConverter<Encoding_UTF16BE, Encoding_ASCII7>::Create);
-  RegisterConverter ("utf16be", "utf8",    &UtfConverter<Encoding_UTF16BE, Encoding_UTF8>::Create);
-  RegisterConverter ("utf16be", "utf16le", &UtfConverter<Encoding_UTF16BE, Encoding_UTF16LE>::Create);
-  RegisterConverter ("utf16be", "utf16be", &UtfConverter<Encoding_UTF16BE, Encoding_UTF16BE>::Create);
-  RegisterConverter ("utf16be", "utf32le", &UtfConverter<Encoding_UTF16BE, Encoding_UTF32LE>::Create);
-  RegisterConverter ("utf16be", "utf32be", &UtfConverter<Encoding_UTF16BE, Encoding_UTF32BE>::Create);
-
-    //исходная кодировка - utf32le
-
-  RegisterConverter ("utf32le", "ascii7",  &UtfConverter<Encoding_UTF32LE, Encoding_ASCII7>::Create);
-  RegisterConverter ("utf32le", "utf8",    &UtfConverter<Encoding_UTF32LE, Encoding_UTF8>::Create);
-  RegisterConverter ("utf32le", "utf16le", &UtfConverter<Encoding_UTF32LE, Encoding_UTF16LE>::Create);
-  RegisterConverter ("utf32le", "utf16be", &UtfConverter<Encoding_UTF32LE, Encoding_UTF16BE>::Create);
-  RegisterConverter ("utf32le", "utf32le", &UtfConverter<Encoding_UTF32LE, Encoding_UTF32LE>::Create);
-  RegisterConverter ("utf32le", "utf32be", &UtfConverter<Encoding_UTF32LE, Encoding_UTF32BE>::Create);
-
-    //исходная кодировка - utf32be
-
-  RegisterConverter ("utf32be", "ascii7",  &UtfConverter<Encoding_UTF32BE, Encoding_ASCII7>::Create);
-  RegisterConverter ("utf32be", "utf8",    &UtfConverter<Encoding_UTF32BE, Encoding_UTF8>::Create);
-  RegisterConverter ("utf32be", "utf16le", &UtfConverter<Encoding_UTF32BE, Encoding_UTF16LE>::Create);
-  RegisterConverter ("utf32be", "utf16be", &UtfConverter<Encoding_UTF32BE, Encoding_UTF16BE>::Create);
-  RegisterConverter ("utf32be", "utf32le", &UtfConverter<Encoding_UTF32BE, Encoding_UTF32LE>::Create);
-  RegisterConverter ("utf32be", "utf32be", &UtfConverter<Encoding_UTF32BE, Encoding_UTF32BE>::Create);
+StringConverterSystemImpl::StringConverterSystemImpl()
+{ 
+  for (int source=Encoding_ASCII7; source<Encoding_Num; source++)
+    for (int destination=Encoding_ASCII7; destination<Encoding_Num; destination++)
+      RegisterConverter (get_encoding_name ((Encoding)source), get_encoding_name((Encoding)destination),
+                         xtl::bind (&UtfConverter::Create, (Encoding)source, (Encoding)destination));
 }
 
 /*

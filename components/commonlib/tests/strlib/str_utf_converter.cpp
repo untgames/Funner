@@ -10,16 +10,6 @@
 
 using namespace common;
 
-void dump32(void *ptr,int l)
-{
-   FILE *file=fopen("dump.txt","a");
-   char *str=(char*)ptr;
-   for(int i=0;i<l;i++)
-      fputc(str[i],file);
-//       fprintf(file,"%p|",str[i]);
-   fclose(file);
-}
-
 void dump (const void* buffer, size_t length, Encoding encoding)
 {
   switch (encoding)
@@ -40,13 +30,6 @@ void dump (const void* buffer, size_t length, Encoding encoding)
       for (size_t i=0; i<length; i++)
         printf ("%c", s [i]);
       
-      /*
-      stl::wstring result (' ', length);
-      
-      result.resize (mbstowcs (&result [0], (const char*)buffer, length));
-
-      printf ("%S", result.c_str ());
-      */
       break;
     }
     case Encoding_UTF16LE:

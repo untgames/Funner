@@ -19,7 +19,7 @@ enum Encoding
   Encoding_UTF32LE,
   Encoding_UTF32BE,
 
-  Encoding_Count
+  Encoding_Num
 };
 
 void convert_encoding (Encoding       source_encoding,
