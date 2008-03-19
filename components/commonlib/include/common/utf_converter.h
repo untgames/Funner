@@ -3,6 +3,7 @@
 
 #include <wchar.h>
 #include <stl/string_fwd>
+#include <common/strconv.h>
 
 namespace common
 {
@@ -18,7 +19,7 @@ enum Encoding
   Encoding_UTF16BE,
   Encoding_UTF32LE,
   Encoding_UTF32BE,
-  
+
   Encoding_Count
 };
 

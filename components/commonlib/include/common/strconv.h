@@ -21,10 +21,10 @@ class IStringConverter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Преобразование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void Convert (size_t&      source_buffer_size,
-                          const void*& source_buffer_ptr,
-                          size_t&      destination_buffer_size,
-                          void*&       destination_buffer_ptr) = 0;
+    virtual void Convert (const void*& source_buffer_ptr,
+                          size_t&      source_buffer_size,
+                          void*&       destination_buffer_ptr,
+                          size_t&      destination_buffer_size) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -45,20 +45,16 @@ class StringConverter
     StringConverter  (const char* source_encoding, const char* destination_encoding);
     StringConverter  (const StringConverter& conv);
     ~StringConverter ();
-  
+
     StringConverter& operator = (const StringConverter& conv);
-  
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Преобразование буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Convert     (size_t&      source_buffer_size,
-                      const void*& source_buffer_ptr,
-                      size_t&      destination_buffer_size,
-                      void*&       destination_buffer_ptr) const;
-    void operator () (size_t&      source_buffer_size,
-                      const void*& source_buffer_ptr,
-                      size_t&      destination_buffer_size,
-                      void*&       destination_buffer_ptr) const;
+    void Convert     (const void*& source_buffer_ptr,
+                      size_t&      source_buffer_size,
+                      void*&       destination_buffer_ptr,
+                      size_t&      destination_buffer_size) const;
 
   private:
     IStringConverter* converter;
@@ -76,11 +72,13 @@ class StringConverterSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистраци конвертеров строк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterConverter       (const char* source_encoding,
+    static bool RegisterConverter       (const char* source_encoding,
                                          const char* destination_encoding,
                                          const ConverterFn& converter);
     static void UnregisterConverter     (const char* source_encoding, const char* destination_encoding);
     static void UnregisterAllConverters ();
+    static bool IsConverterRegistered   (const char* source_encoding,
+                                         const char* destination_encoding);
 };
 
 }

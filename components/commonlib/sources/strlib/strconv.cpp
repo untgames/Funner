@@ -1,8 +1,6 @@
-#include <common/strconv.h>
+#include "shared.h"
 #include <common/strlib.h>
 #include <common/exception.h>
-#include <stl/hash_map>
-#include <xtl/function.h>
 
 using namespace stl;
 
@@ -13,40 +11,19 @@ namespace common
 ///Система управления конвертацией строк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-typedef hash_map<size_t, StringConverterSystem::ConverterFn> StringConverterMap;
-StringConverterMap string_converter_map;
 
-void StringConverterSystem::RegisterConverter (const char* source_encoding,
+bool StringConverterSystem::RegisterConverter (const char* source_encoding,
                                                const char* destination_encoding,
                                                const ConverterFn& converter)
 {
+  static const char* METHOD_NAME = "common::StringConverterSystem::RegisterConverter";
   try
   {
-    if (!source_encoding)
-    {
-      RaiseNullArgument("common::StringConverterSystem::RegisterConverter", "source_encoding");
-      return;
-    }
-
-    if (!destination_encoding)
-    {
-      RaiseNullArgument("common::StringConverterSystem::RegisterConverter", "destination_encoding");
-      return;
-    }
-
-    pair<StringConverterMap::iterator, bool> result = string_converter_map.insert_pair( strhash( destination_encoding, strhash(source_encoding) ), converter);
-    if (!result.second)
-    {
-      RaiseInvalidOperation("common::common::StringConverterSystem::RegisterConverter",
-                            "A converter functor for \'%s-to-%s\' already registered", source_encoding, destination_encoding);
-      return;
-    }
-    //RaiseNotImplemented("common::StringConverterSystem::RegisterConverter (...)");
-    //return;
+    return StringConverterManagerSingleton::Instance().RegisterConverter(source_encoding, destination_encoding, converter);
   }
   catch (common::Exception exception)
   {
-    exception.Touch("common::StringConverterSystem::RegisterConverter (...)");
+    exception.Touch(METHOD_NAME);
     throw;
   }
 }
@@ -54,83 +31,47 @@ void StringConverterSystem::RegisterConverter (const char* source_encoding,
 void StringConverterSystem::UnregisterConverter (const char* source_encoding,
                                                  const char* destination_encoding)
 {
+  static const char* METHOD_NAME = "common::StringConverterSystem::UnregisterConverter";
   try
   {
-    if (!source_encoding)
-    {
-      RaiseNullArgument("common::StringConverterSystem::UnregisterConverter", "source_encoding");
-      return;
-    }
-
-    if (!destination_encoding)
-    {
-      RaiseNullArgument("common::StringConverterSystem::UnregisterConverter", "destination_encoding");
-      return;
-    }
-
-    string_converter_map.erase( strhash( destination_encoding, strhash(source_encoding) ) );
-  
-    //RaiseNotImplemented("common::StringConverterSystem::UnregisterConverter (...)");
-    //return;
+    StringConverterManagerSingleton::Instance().UnregisterConverter(source_encoding, destination_encoding);
   }
   catch (common::Exception exception)
   {
-    exception.Touch("common::StringConverterSystem::UnregisterConverter (...)");
+    exception.Touch(METHOD_NAME);
     throw;
   }
 }
 
 void StringConverterSystem::UnregisterAllConverters ()
 {
+  static const char* METHOD_NAME = "common::StringConverterSystem::UnregisterAllConverters";
   try
   {
-    string_converter_map.clear();    
-    //RaiseNotImplemented("common::StringConverterSystem::UnregisterAllConverters (...)");
-    //return;
+    StringConverterManagerSingleton::Instance().UnregisterAllConverters();    
   }
   catch (common::Exception exception)
   {
-    exception.Touch("common::StringConverterSystem::UnregisterAllConverters (...)");
+    exception.Touch(METHOD_NAME);
     throw;
   }
 }
 
-IStringConverter* GetConverter(const char* source_encoding,
-                               const char* destination_encoding)
+bool StringConverterSystem::IsConverterRegistered (const char* source_encoding,
+                                                   const char* destination_encoding)
 {
+  static const char* METHOD_NAME = "common::StringConverterSystem::IsConverterRegistered";
   try
   {
-    if (!source_encoding)
-    {
-      RaiseNullArgument("common::GetConverter", "source_encoding");
-      return NULL;
-    }
-
-    if (!destination_encoding)
-    {
-      RaiseNullArgument("common::GetConverter", "destination_encoding");
-      return NULL;
-    }
-
-    StringConverterMap::iterator conv = string_converter_map.find( strhash( destination_encoding, strhash(source_encoding) ) );
-    
-    if (conv == string_converter_map.end())
-    {
-      RaiseInvalidOperation("common::GetConverter",
-                            "A converter functor for \'%s-to-%s\' is not registered", source_encoding, destination_encoding);
-      return NULL;
-    }
-    
-    return (conv->second)();
-    //RaiseNotImplemented("common::StringConverterSystem::UnregisterConverter (...)");
-    //return;
+    return StringConverterManagerSingleton::Instance().IsConverterRegistered (source_encoding, destination_encoding);    
   }
   catch (common::Exception exception)
   {
-    exception.Touch("common::GetConverter (...)");
+    exception.Touch(METHOD_NAME);
     throw;
   }
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конвертер строк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,7 +79,7 @@ StringConverter::StringConverter (const char* source_encoding, const char* desti
 {
   try
   {
-    converter = GetConverter(source_encoding, destination_encoding);
+    converter = StringConverterManagerSingleton::Instance().GetConverter(source_encoding, destination_encoding);
   }
   catch (...)
   {
@@ -175,7 +116,6 @@ StringConverter& StringConverter::operator = (const StringConverter& conv)
     converter->Release();
     converter = conv.converter;
     converter->AddRef();
-    //RaiseNotImplemented("common::StringConverter::operator =");
     return *this;
   }
   catch (common::Exception exception)
@@ -185,34 +125,18 @@ StringConverter& StringConverter::operator = (const StringConverter& conv)
   }
 }
   
-void StringConverter::Convert (size_t& source_buffer_size, const void*& source_buffer_ptr,
-                               size_t& destination_buffer_size, void*& destination_buffer_ptr) const
+void StringConverter::Convert (const void*& source_buffer_ptr,
+                               size_t&      source_buffer_size,
+                               void*&       destination_buffer_ptr,
+                               size_t&      destination_buffer_size) const
 {
   try
   {
-    converter->Convert(source_buffer_size, source_buffer_ptr, destination_buffer_size, destination_buffer_ptr);
-    //RaiseNotImplemented("common::StringConverter::Convert ()");
-    //return;
+    converter->Convert(source_buffer_ptr, source_buffer_size, destination_buffer_ptr, destination_buffer_size);
   }
   catch (common::Exception exception)
   {
     exception.Touch("common::StringConverter::Convert ()");
-    throw;
-  }
-}
-
-void StringConverter::operator () (size_t& source_buffer_size, const void*& source_buffer_ptr,
-                                   size_t& destination_buffer_size, void*& destination_buffer_ptr) const
-{
-  try
-  {
-    converter->Convert(source_buffer_size, source_buffer_ptr, destination_buffer_size, destination_buffer_ptr);
-    //RaiseNotImplemented("common::StringConverter::operator ()");
-    //return;
-  }
-  catch (common::Exception exception)
-  {
-    exception.Touch("common::StringConverter::operator ()");
     throw;
   }
 }
