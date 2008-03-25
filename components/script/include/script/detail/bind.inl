@@ -12,6 +12,7 @@ inline xtl::any make_invoker_argument (T& value)
 }
 
 inline xtl::any           make_invoker_argument (const xtl::any& value)    { return value; }
+inline bool               make_invoker_argument (bool value)               { return value; }
 inline char               make_invoker_argument (char value)               { return value; }
 inline signed char        make_invoker_argument (signed char value)        { return value; }
 inline unsigned char      make_invoker_argument (unsigned char value)      { return value; }
@@ -96,6 +97,11 @@ template <> struct argument_selector<const void*>:              public raw_point
 template <> struct argument_selector<const volatile void*>:     public raw_pointer_argument_selector {};
 template <> struct argument_selector<const char*>:              public string_argument_selector {};
 template <> struct argument_selector<const volatile char*>:     public string_argument_selector {};
+
+template <> struct argument_selector<bool>
+{
+  static bool get (IStack& stack, size_t index) { return stack.GetInteger (index) != 0; }
+};
 
 template <class Traits, class Allocator>
 struct argument_selector<stl::basic_string<char, Traits, Allocator> >: public string_argument_selector {};
