@@ -9,9 +9,10 @@ struct A: public xtl::reference_counter, public xtl::noncopyable
   ~A () { printf ("A::~A\n"); }
 };
 
-void my_deleter (const xtl::intrusive_ptr<A>&)
+void my_deleter (const xtl::intrusive_ptr<A>& p)
 {
   printf ("my_deleter\n");
+  delete p.get ();
 }
 
 int main ()

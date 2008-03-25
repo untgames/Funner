@@ -1,5 +1,6 @@
 Results of stride_ptr_test:
 0 2 4 6 8 
+0 1 2 3 4 5 6 7 8 9 
 expression '!p' is true
 expression 'p2' is true
 expression 'p1 == p2' is true
