@@ -44,7 +44,9 @@ inline reference_counter::operator safe_bool () const
 
 inline reference_counter& reference_counter::operator ++ ()
 {
-  counter++;
+  if (counter)
+    counter++;
+
   return *this;
 }
 
@@ -59,14 +61,16 @@ inline reference_counter reference_counter::operator ++ (int)
 
 inline reference_counter& reference_counter::operator -- ()
 {
-  counter--;
+  if (counter)
+    counter--;
+
   return *this;
 }
 
 inline reference_counter reference_counter::operator -- (int)
 {
   reference_counter tmp (counter);
-  
+
   --(*this);
  
   return tmp;
@@ -77,7 +81,7 @@ inline reference_counter reference_counter::operator -- (int)
 */
 
 inline void addref (reference_counter& rc)
-{
+{  
   ++rc;
 }
 
@@ -89,7 +93,7 @@ inline void addref (reference_counter* rc)
 template <class Fn>
 inline void release (reference_counter& rc, Fn fn)
 {
-  if (!--rc)
+  if (rc && !--rc)
     fn ();
 }
 
@@ -102,7 +106,9 @@ inline void release (reference_counter* rc, Fn fn)
 template <class T>
 inline void release (T* ptr)
 {
-  if (!--*ptr)
+  reference_counter& rc = *ptr;
+
+  if (rc && !--rc)
     checked_delete (ptr);
 }
 
