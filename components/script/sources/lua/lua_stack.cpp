@@ -153,21 +153,9 @@ void Stack::PushSymbol (const char* symbol)
   lua_getglobal (state, symbol);
 }
 
-void check(lua_State* state,const char* prefix, int index)
-{
-    if (lua_getmetatable (state, index))
-    {
-      lua_getfield (state, -1, "__library_name");
-      
-      printf ("%s: '%s'\n", prefix, lua_tostring (state, -1));
-      
-      lua_pop (state, 2);
-    }
-}
-
 void Stack::Push (const xtl::any& value)
 {
- check_stack (state);
+  check_stack (state);
 
   static const size_t BUFFER_SIZE = sizeof (xtl::any); 
 

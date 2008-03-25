@@ -300,6 +300,30 @@ inline Invoker make_invoker (Fn fn)
 }
 
 /*
+    Создание функции, возвращающей константу
+*/
+
+namespace detail
+{
+
+template <class T> struct identity_functor
+{
+  T value;
+
+  identity_functor (const T& in_value) : value (in_value) {}
+
+  const T operator () () const { return value; }
+};
+
+}
+
+template <class T>
+inline Invoker make_const (const T& value)
+{
+  return make_invoker<T ()> (detail::identity_functor<T> (value));
+}
+
+/*
     Вызов шлюза
 */
 

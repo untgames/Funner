@@ -102,7 +102,7 @@ class InvokerRegistry
     void Register   (const InvokerRegistry& registry); //регистрация копий шлюзов registry        
     void Register   (const char* name, const char* source_name); //регистрация копии
     void Register   (const char* name, const InvokerRegistry& source_registry, const char* source_name); //регистрация копии
-    void Unregister (const char* name);    
+    void Unregister (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка

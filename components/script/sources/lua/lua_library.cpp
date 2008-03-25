@@ -61,10 +61,12 @@ int invoke_dispatch (lua_State* state)
 }
 
 //получение поля по имени
-int unsafe_variant_get_field (lua_State* state)
+int unsafe_variant_get_field_common (lua_State* state)
 {
+  static const char* METHOD_NAME = "script::lua::variant_get_field_common";
+
   if (!lua_getmetatable (state, 1))
-    Raise<RuntimeException> ("script::lua::variant_get_field", "Bad '__index' call. Object isn't variant");
+    Raise<RuntimeException> (METHOD_NAME, "Bad '__index' call. Object isn't variant");
 
   lua_pushvalue (state, 2);
   lua_rawget    (state, -2);
@@ -79,14 +81,32 @@ int unsafe_variant_get_field (lua_State* state)
   lua_rawget      (state, -2);
 
   if (lua_isnil (state, -1)) //свойство с указанным именем не найдено
-    Raise<UndefinedFunctionCallException> ("script::lua::variant_get_field", "Field '%s' not found", lua_tostring (state, 2));
+    Raise<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found", lua_tostring (state, 2));
+
+  return 0;
+}
+
+int unsafe_variant_get_field (lua_State* state)
+{
+  if (unsafe_variant_get_field_common (state))
+    return 1;
 
     //помещение аргумента вызова шлюза в стек
-  
+
   lua_pushvalue (state, 1);
   lua_call      (state, 1, 1);
 
-  return 1;
+  return 1;  
+}
+
+int unsafe_variant_get_static_field (lua_State* state)
+{
+  if (unsafe_variant_get_field_common (state))
+    return 1;
+
+  lua_call (state, 0, 1);
+
+  return 1;  
 }
 
 int variant_get_field (lua_State* state)
@@ -94,11 +114,18 @@ int variant_get_field (lua_State* state)
   return safe_call (state, &unsafe_variant_get_field);
 }
 
-//установка значения поля
-int unsafe_variant_set_field (lua_State* state)
+int variant_get_static_field (lua_State* state)
 {
+  return safe_call (state, &unsafe_variant_get_static_field);
+}
+
+//установка значения поля
+int unsafe_variant_set_field_common (lua_State* state)
+{
+  static const char* METHOD_NAME = "script::lua::variant_set_field_common";
+
   if (!lua_getmetatable (state, 1))
-    Raise<RuntimeException> ("script::lua::variant_set_field", "Bad '__newindex' call. Object isn't variant");    
+    Raise<RuntimeException> (METHOD_NAME, "Bad '__newindex' call. Object isn't variant");    
 
   lua_pushvalue (state, 2);
   lua_rawget    (state, -2);
@@ -112,14 +139,22 @@ int unsafe_variant_set_field (lua_State* state)
     return 1;
   }
 
-    //пытаемся найти поле с префиксом ыet_
+    //пытаемся найти поле с префиксом set_
 
   lua_pop         (state, 1); //удаляем результат предыдущего поиска
   lua_pushfstring (state, "set_%s", lua_tostring (state, 2));
   lua_rawget      (state, -2);
 
   if (lua_isnil (state, -1)) //свойство с указанным именем не найдено
-    Raise<UndefinedFunctionCallException> ("script::lua::variant_set_field", "Field '%s' not found (or read-only)", lua_tostring (state, 2));
+    Raise<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found (or read-only)", lua_tostring (state, 2));
+    
+  return 0;
+}
+
+int unsafe_variant_set_field (lua_State* state)
+{
+  if (unsafe_variant_set_field_common (state))
+    return 1;
 
     //помещение аргументов вызова шлюза в стек
 
@@ -133,9 +168,30 @@ int unsafe_variant_set_field (lua_State* state)
   return lua_gettop (state) - top_index;
 }
 
+int unsafe_variant_set_static_field (lua_State* state)
+{
+  if (unsafe_variant_set_field_common (state))
+    return 1;
+
+    //помещение аргументов вызова шлюза в стек
+
+  lua_pushvalue (state, 3);
+
+  int top_index = lua_gettop (state) - 2;
+
+  lua_call (state, 1, LUA_MULTRET);
+
+  return lua_gettop (state) - top_index;
+}
+
 int variant_set_field (lua_State* state)
 {
   return safe_call (state, &unsafe_variant_set_field);
+}
+
+int variant_set_static_field (lua_State* state)
+{
+  return safe_call (state, &unsafe_variant_set_static_field);
 }
 
 }
@@ -151,13 +207,22 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
     table_name (name),
     is_global (table_name == "global")
 {
+  static const char* METHOD_NAME = "script::lua::Library::Library";
+
+    //проверка: является ли библиотека статически линкуемой
+
+  static const char* STATIC_PREFIX      = "static.";
+  static size_t      STATIC_PREFIX_SIZE = strlen (STATIC_PREFIX);
+
+  bool is_static = strncmp (name, STATIC_PREFIX, STATIC_PREFIX_SIZE) == 0;
+
     //регистрация обработчиков удаления пользовательских типов данных    
 
   static const luaL_reg common_meta_table [] = {
     {"__gc",       &variant_destroy},
     {"__tostring", &variant_tostring},
-    {"__index",    &variant_get_field},
-    {"__newindex", &variant_set_field},
+    {"__index",    is_static ? &variant_get_static_field : &variant_get_field},
+    {"__newindex", is_static ? &variant_set_static_field : &variant_set_field},
     {0, 0}
   };  
 
@@ -170,9 +235,34 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
   lua_pushstring (state, "__library_name");
   lua_pushstring (state, name);
   lua_rawset     (state, -3);
-
+  
   try
   {    
+      //для статически линкуемой библиотеки - регистрируем переменную
+      
+    if (is_static)
+    {
+      if (!lua_checkstack (state, 1))
+        Raise<StackException> (METHOD_NAME, "Not enough stack space."
+        "Attempt to push 1 item in stack with %u items (stack_size=%u)", lua_gettop (state), LUAI_MAXCSTACK);
+        
+      static const size_t BUFFER_SIZE = sizeof (int); 
+
+      void* buffer = lua_newuserdata (state, BUFFER_SIZE);
+
+      if (!buffer)
+        Raise<StackException> (METHOD_NAME, "Fail to allocate %u bytes from stack", BUFFER_SIZE);
+
+      luaL_getmetatable (state, name);
+      lua_setmetatable  (state, -2);
+
+      new (buffer) int (0);
+
+        //регистрация переменной        
+
+      lua_setfield (state, LUA_GLOBALSINDEX, name + STATIC_PREFIX_SIZE);
+    }
+
       //регистрация шлюзов
 
     for (InvokerRegistry::Iterator i=registry.CreateIterator (); i; ++i)
