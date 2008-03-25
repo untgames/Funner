@@ -52,11 +52,12 @@ class reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Увеличение / уменьшение количества ссылок с вызовом пользовательского функтора при потере ссылок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-                    void addref  (reference_counter&);
-template <class Fn> void release (reference_counter&, Fn fn);
-                    void addref  (reference_counter*);
-template <class Fn> void release (reference_counter*, Fn fn);
-template <class T>  void release (T*); //удаление объекта в случае потери ссылок
+                               void addref  (reference_counter&);
+template <class Fn>            void release (reference_counter&, Fn fn);
+                               void addref  (reference_counter*);
+template <class Fn>            void release (reference_counter*, Fn fn);
+template <class Ptr>           void release (const Ptr& ptr); //удаление объекта в случае потери ссылок
+template <class Ptr, class Fn> void release (const Ptr& ptr, Fn deleter);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Взаимодействие с intrusive_ptr

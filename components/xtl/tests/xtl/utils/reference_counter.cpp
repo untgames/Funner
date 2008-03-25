@@ -9,7 +9,7 @@ struct A: public xtl::reference_counter, public xtl::noncopyable
   ~A () { printf ("A::~A\n"); }
 };
 
-void my_deleter ()
+void my_deleter (const xtl::intrusive_ptr<A>&)
 {
   printf ("my_deleter\n");
 }
@@ -20,7 +20,7 @@ int main ()
   
   xtl::intrusive_ptr<A> p1 (new A, false);
 
-  release (*p1, &my_deleter);
+  release (p1, &my_deleter);
   addref  (*p1);
 
   return 0;

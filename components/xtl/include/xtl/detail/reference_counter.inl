@@ -103,13 +103,22 @@ inline void release (reference_counter* rc, Fn fn)
   release (*rc, fn);
 }
 
-template <class T>
-inline void release (T* ptr)
+template <class Ptr>
+inline void release (const Ptr& ptr)
 {
   reference_counter& rc = *ptr;
 
   if (rc && !--rc)
     checked_delete (ptr);
+}
+
+template <class Ptr, class Deleter>
+inline void release (const Ptr& ptr, Deleter deleter)
+{
+  reference_counter& rc = *ptr;
+
+  if (rc && !--rc)
+    deleter (ptr);
 }
 
 /*
