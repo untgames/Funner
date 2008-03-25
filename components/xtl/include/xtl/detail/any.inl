@@ -230,6 +230,11 @@ struct any_holder
     Содержимое вариативной переменной
 */
 
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable:4624) //destructor could not be generated because a base class destructor is inaccessible
+#endif
+
 template <class T> struct any_content: public any_holder
 {
   typedef typename any_stored_type<T>::type base_type;
@@ -264,6 +269,10 @@ template <class T> struct any_content: public any_holder
 
   base_type value;
 };
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif
 
 /*
     Реализации вариативной переменной
