@@ -22,9 +22,9 @@ enum WindowFlag
 class Platform
 {
   public:
-    struct window_handler;
+    struct window_handle;
   
-    typedef const window_handler* window_t;
+    typedef const window_handle* window_t;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—оздание/закрытие/уничтожение окна
@@ -38,9 +38,9 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///«аголовок окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void SetWindowTitle (window_t, const char* title);
+    static void SetWindowTitle (window_t, const char* title); //убрать!!
     static void SetWindowTitle (window_t, const wchar_t* title);
-    static void GetWindowTitle (window_t, size_t buffer_size, char* buffer);
+    static void GetWindowTitle (window_t, size_t buffer_size, char* buffer); //убрать!!
     static void GetWindowTitle (window_t, size_t buffer_size, wchar_t* buffer);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,8 +75,8 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—оздание / уничтожение таймера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    struct timer_handler;
-    typedef const timer_handler* timer_t;
+    struct timer_handle;
+    typedef const timer_handle* timer_t;
     typedef void (*TimerHandler)(void* user_data);
 
     static timer_t CreateTimer (size_t period_in_milliseconds, TimerHandler, void* user_data);
@@ -88,6 +88,17 @@ class Platform
     static bool IsMessageQueueEmpty ();
     static void DoNextEvent         ();
     static void WaitMessage         (); //приостановка выполнени€ приложени€ до по€влени€ следующего сообщени€
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///«агрузка динамических библиотек
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    struct dynamic_library_handle;
+
+    typedef dynamic_library_handle* dll_t;
+
+    static dll_t LoadLibrary   (const wchar_t* name);
+    static void  UnloadLibrary (dll_t);
+    static void* GetSymbol     (dll_t, const char* symbol_name);
 };
 
 }

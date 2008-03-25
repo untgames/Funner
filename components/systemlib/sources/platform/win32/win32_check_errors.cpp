@@ -14,7 +14,7 @@ stl::string get_error_message (DWORD error_code)
   void* buffer = 0;
 
   FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                 0, error_code, 0, (LPSTR)&buffer, 0, 0);
+                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, 0);
 
   if (!buffer)
   {
