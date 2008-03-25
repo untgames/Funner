@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 class MyVisitor: public visitor<void, Node, Light, Camera>
 {
   public:
@@ -17,7 +15,7 @@ void dump (const Node& node, size_t level=1)
     
   printf ("node '%s'\n", node.Name ()); 
   
-  for (const Node* child=node.FirstChild (); child; child=child->NextChild ())
+  for (Node::ConstPointer child=node.FirstChild (); child; child=child->NextChild ())
     dump (*child, level+1);    
 }
 
@@ -25,7 +23,7 @@ int main ()
 {
   printf ("Results of node_traverse_visitor_test:\n");
   
-  NodePtr node (Node::Create (), false), child1 (SpotLight::Create (), false), child2 (PerspectiveCamera::Create (), false);
+  Node::Pointer node (Node::Create ()), child1 (SpotLight::Create ()), child2 (PerspectiveCamera::Create ());
   
   node->SetName ("node");
   child1->SetName ("child1");

@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 void on_update (Node& node, NodeEvent)
 {
   printf ("node '%s' updated\n", node.Name ());
@@ -40,19 +38,19 @@ int main ()
 {
   printf ("Results of node_bind1_test:\n");
   
-  NodePtr node (Node::Create (), false);
+  Node::Pointer node (Node::Create ());
   
   node->SetName   ("node1");
   register_notifiers (*node);
    
-  NodePtr parent1 (Node::Create (), false);
+  Node::Pointer parent1 (Node::Create ());
   
   parent1->SetName ("parent1");
   register_notifiers (*parent1);
   
   node->BindToParent (*parent1);
   
-  NodePtr parent2 (Node::Create (), false);  
+  Node::Pointer parent2 (Node::Create ());  
   
   parent2->SetName ("parent2");
   register_notifiers (*parent2);

@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<DirectLight> DirectLightPtr;
-
 void dump (const aaboxf& box)
 {
   printf ("[");
@@ -26,7 +24,7 @@ int main ()
 {
   printf ("Results of light_direct_test:\n");
   
-  DirectLightPtr light (DirectLight::Create (), false);
+  DirectLight::Pointer light (DirectLight::Create ());
 
   light->SetRadius (48.5f);
   printf ("Light radius: %f\n", light->Radius ());

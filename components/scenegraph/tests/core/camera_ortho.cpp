@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<OrthoCamera> OrthoCameraPtr;
-
 void print (float value)
 {
   printf ("%+.3f", value);
@@ -59,7 +57,7 @@ int main ()
 {
   printf ("Results of camera_ortho_test:\n");
   
-  OrthoCameraPtr camera (OrthoCamera::Create (), false);
+  OrthoCamera::Pointer camera (OrthoCamera::Create ());
 
   camera->SetLeft   (-2);
   camera->SetRight  (2);

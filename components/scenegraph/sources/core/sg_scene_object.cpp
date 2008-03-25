@@ -7,9 +7,8 @@ using namespace scene_graph;
 */
 
 SceneObject::SceneObject (scene_graph::Entity& in_entity)
-  : entity (in_entity)
+  : entity (in_entity), space (0), prev_object (0), next_object (0)
 {
-  prev_object = next_object = 0;
 }
 
 SceneObject::~SceneObject ()
@@ -24,7 +23,7 @@ SceneObject::~SceneObject ()
 void SceneObject::BindToSpace (SceneSpace* new_space)
 {
     //удаление объекта из пространства    
-    
+
   if (space)
   {
       //удаление объекта из цепочки объектов пространства

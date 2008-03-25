@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 void dump_state (Node& node, Node& parent)
 {
   printf ("  parent orientation: ");
@@ -16,7 +14,7 @@ int main ()
 {
   printf ("Results of node_transform_rotate_test:\n");
   
-  NodePtr node (Node::Create (), false), parent (Node::Create (), false);
+  Node::Pointer node (Node::Create ()), parent (Node::Create ());
   
   node->BindToParent (*parent);
   node->SetOrientation (0, 60, 0);

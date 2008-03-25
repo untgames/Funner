@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 void on_destroy (Node& node, NodeEvent)
 {
   printf ("node '%s' destroyed\n", node.Name ());
@@ -11,7 +9,7 @@ int main ()
 {
   printf ("Results of node_basic_test:\n");
   
-  NodePtr node (Node::Create (), false);
+  Node::Pointer node (Node::Create ());
   
   node->SetName ("node1");
   node->Event   (NodeEvent_BeforeDestroy).connect (&on_destroy);  

@@ -1,12 +1,10 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 int main ()
 {
   printf ("Results of node_transform_scale_test:\n");
   
-  NodePtr node (Node::Create (), false);
+  Node::Pointer node (Node::Create ());
     
   printf ("set scale vec3f result: ");
   node->SetScale (vec3f (14.4f, 17.1f, -6.66f));

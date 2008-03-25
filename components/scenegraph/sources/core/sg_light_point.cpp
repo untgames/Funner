@@ -25,9 +25,9 @@ PointLight::~PointLight ()
     Создание источника света
 */
 
-PointLight* PointLight::Create ()
+PointLight::Pointer PointLight::Create ()
 {
-  return new PointLight;
+  return Pointer (new PointLight, false);
 }
 
 /*

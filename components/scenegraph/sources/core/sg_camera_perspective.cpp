@@ -44,9 +44,9 @@ PerspectiveCamera::~PerspectiveCamera ()
     Создание камеры
 */
 
-PerspectiveCamera* PerspectiveCamera::Create ()
+PerspectiveCamera::Pointer PerspectiveCamera::Create ()
 {
-  return new PerspectiveCamera;
+  return Pointer (new PerspectiveCamera, false);
 }
 
 /*

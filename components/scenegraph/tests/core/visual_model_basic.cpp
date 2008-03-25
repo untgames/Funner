@@ -1,12 +1,10 @@
 #include "shared.h"
 
-typedef com_ptr<VisualModel> ModelPtr;
-
 int main ()
 {
   printf ("Results of visual_model_basic_test:\n");
   
-  ModelPtr model (VisualModel::Create (), false);
+  VisualModel::Pointer model (VisualModel::Create ());
 
   model->SetMeshName ("mesh1.mesh");
   

@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 void on_bind_child (Node& node, Node& child, NodeSubTreeEvent)
 {
   printf ("node '%s' binded to '%s' sub-tree\n", child.Name (), node.Name ());
@@ -24,8 +22,8 @@ int main ()
 {
   printf ("Results of node_bind2_test:\n");
   
-  NodePtr node (Node::Create (), false),  parent1 (Node::Create (), false), parent2 (Node::Create (), false),
-          child (Node::Create (), false);
+  Node::Pointer node (Node::Create ()),  parent1 (Node::Create ()), parent2 (Node::Create ()),
+                child (Node::Create ());
   
   parent1->SetName ("parent1");
   parent2->SetName ("parent2");  

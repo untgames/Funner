@@ -10,8 +10,8 @@ SG_COMPONENTS.INCLUDE_DIRS     := include ../commonlib/include ../xtl/include ..
 SG_COMPONENTS.SOURCE_DIRS      := sources/core sources/helpers
 SG_COMPONENTS.LIB_DIRS         :=  
 SG_COMPONENTS.LIBS             :=
-SG_COMPONENTS.COMPILER_CFLAGS  :=
-SG_COMPONENTS.COMPILER_DEFINES := 
+SG_COMPONENTS.COMPILER_CFLAGS  := -wd4355
+SG_COMPONENTS.COMPILER_DEFINES :=  
 
 #Öåëü ¹2 - SG tests
 SG_TESTS.TYPE             := test-suite

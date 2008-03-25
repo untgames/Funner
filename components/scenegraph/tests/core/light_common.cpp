@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<PointLight> PointLightPtr;
-
 void dump (const aaboxf& box)
 {
   printf ("[");
@@ -26,7 +24,7 @@ int main ()
 {
   printf ("Results of light_common_test:\n");
   
-  PointLightPtr light (PointLight::Create (), false);
+  PointLight::Pointer light (PointLight::Create ());
 
   light->SetLightColor (vec3f (0.f, 0.4f, 0.17f));
   printf ("Light color: ");  

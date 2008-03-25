@@ -10,7 +10,7 @@ int main ()
 
     scene.SetName ("scene1");
 
-    Node* node = Node::Create ();
+    Node::Pointer node = Node::Create ();
     
     scene.Root ().BindToParent (*node);
   }

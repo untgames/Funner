@@ -1,10 +1,8 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 void test (const Node& node, const char* child_name, NodeSearchMode mode)
 {
-  const Node* child = node.FindChild (child_name, mode);
+  Node::ConstPointer child = node.FindChild (child_name, mode);
   
   if (!child) printf ("  no child node with name '%s'\n", child_name);
   else        printf ("  child node '%s' found\n", child->Name ());
@@ -17,7 +15,7 @@ void dump (const Node& node, size_t level=1)
     
   printf ("node '%s'\n", node.Name ()); 
   
-  for (const Node* child=node.FirstChild (); child; child=child->NextChild ())
+  for (Node::ConstPointer child=node.FirstChild (); child; child=child->NextChild ())
     dump (*child, level+1);    
 }
 
@@ -25,7 +23,7 @@ int main ()
 {
   printf ("Results of node_find_child_test:\n");
 
-  NodePtr node (Node::Create (), false), child1 (Node::Create (), false), child2 (Node::Create (), false);
+  Node::Pointer node (Node::Create ()), child1 (Node::Create ()), child2 (Node::Create ());
   
   node->SetName ("node");
   child1->SetName ("child1");

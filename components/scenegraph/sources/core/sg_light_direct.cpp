@@ -36,9 +36,9 @@ DirectLight::~DirectLight ()
     Создание источника света
 */
 
-DirectLight* DirectLight::Create ()
+DirectLight::Pointer DirectLight::Create ()
 {
-  return new DirectLight;
+  return Pointer (new DirectLight, false);
 }
 
 /*

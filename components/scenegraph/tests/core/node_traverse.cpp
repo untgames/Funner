@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 void print (Node& node)
 {
   printf ("node '%s'\n", node.Name ());
@@ -19,7 +17,7 @@ void dump (const Node& node, size_t level=1)
     
   cprint (node);
   
-  for (const Node* child=node.FirstChild (); child; child=child->NextChild ())
+  for (Node::ConstPointer child=node.FirstChild (); child; child=child->NextChild ())
     dump (*child, level+1);    
 }
 
@@ -27,7 +25,7 @@ int main ()
 {
   printf ("Results of node_traverse_test:\n");
   
-  NodePtr node (Node::Create (), false), child1 (Node::Create (), false), child2 (Node::Create (), false);
+  Node::Pointer node (Node::Create ()), child1 (Node::Create ()), child2 (Node::Create ());
   
   node->SetName ("node");
   child1->SetName ("child1");

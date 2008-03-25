@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<PerspectiveCamera> PerspectiveCameraPtr;
-
 void print (float value)
 {
   printf ("%+.3f", value);
@@ -59,7 +57,7 @@ int main ()
 {
   printf ("Results of camera_perspective_test:\n");
   
-  PerspectiveCameraPtr camera (PerspectiveCamera::Create (), false);
+  PerspectiveCamera::Pointer camera (PerspectiveCamera::Create ());
 
   camera->SetFovX   (16);
   camera->SetFovY   (9);

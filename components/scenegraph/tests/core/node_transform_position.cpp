@@ -1,12 +1,10 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 int main ()
 {
   printf ("Results of node_transform_position_test:\n");
   
-  NodePtr node (Node::Create (), false);
+  Node::Pointer node (Node::Create ());
     
   printf ("set position vec3f result: ");
   node->SetPosition (vec3f (14.4f, 17.1f, -6.66f));

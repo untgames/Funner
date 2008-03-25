@@ -18,9 +18,9 @@ Box::Box ()
     Создание ()
 */
 
-Box* Box::Create ()
+Box::Pointer Box::Create ()
 {
-  return new Box;
+  return Pointer (new Box, false);
 }
 
 /*

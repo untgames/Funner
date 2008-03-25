@@ -3,6 +3,8 @@
 
 #include <mathlib.h>
 #include <xtl/functional_fwd>
+#include <xtl/dynamic_cast_root.h>
+#include <xtl/intrusive_ptr.h>
 
 namespace scene_graph
 {
@@ -85,14 +87,17 @@ enum NodeSubTreeEvent
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   //добавить NodeIterator / NodeConstIterator
   //добавить блокировку на удаление объектов при оповещениях (скорее всего в Notify)!!!
-class Node
+class Node: public xtl::dynamic_cast_root
 {
   friend class Scene;
   public: 
+    typedef xtl::com_ptr <Node> Pointer;
+    typedef xtl::com_ptr <const Node> ConstPointer;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
-    static Node* Create ();
+    static Pointer Create ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сцена, которой принадлежит объект
@@ -109,23 +114,23 @@ class Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   AddRef   ();         //увеличить число ссылок на узел на 1
-    void   Release  ();         //уменьшить число ссылок на узел на 1
+    void   AddRef   () const;   //увеличить число ссылок на узел на 1
+    void   Release  () const;   //уменьшить число ссылок на узел на 1
     size_t UseCount () const;   //количество активных ссылок на узел
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Связи для перемещения по данному уровню иерархии
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          Node* Parent     ();
-    const Node* Parent     () const;
-          Node* FirstChild ();
-    const Node* FirstChild () const;
-          Node* LastChild  ();
-    const Node* LastChild  () const;
-          Node* PrevChild  ();
-    const Node* PrevChild  () const;
-          Node* NextChild  ();
-    const Node* NextChild  () const;
+    Pointer      Parent     ();
+    ConstPointer Parent     () const;
+    Pointer      FirstChild ();
+    ConstPointer FirstChild () const;
+    Pointer      LastChild  ();
+    ConstPointer LastChild  () const;
+    Pointer      PrevChild  ();
+    ConstPointer PrevChild  () const;
+    Pointer      NextChild  ();
+    ConstPointer NextChild  () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка иерархических связей
@@ -153,8 +158,8 @@ class Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск потомка по имени
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          Node* FindChild (const char* name, NodeSearchMode mode = NodeSearchMode_Default);
-    const Node* FindChild (const char* name, NodeSearchMode mode = NodeSearchMode_Default) const;
+    Pointer      FindChild (const char* name, NodeSearchMode mode = NodeSearchMode_Default);
+    ConstPointer FindChild (const char* name, NodeSearchMode mode = NodeSearchMode_Default) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Посещение узла с динамической диспетчеризацией по типу (применение паттерна Visitor)
@@ -263,7 +268,7 @@ class Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение об изменении узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void UpdateNotify ();
+    void UpdateNotify () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Попытка посещения. Результат: обработано ли посещение
@@ -282,19 +287,10 @@ class Node
     virtual void AfterUpdateWorldTransformEvent () {} //после изменения положения объекта
     virtual void AfterSceneAttachEvent () {}          //после присоединения объекта к сцене
     virtual void BeforeSceneDetachEvent () {}         //перед отсоединением объекта от сцены
-
+    
   private:
-    void UpdateWorldTransformNotify ();
-    void UpdateLocalTransformNotify ();
-    void UpdateWorldTransform () const;
-    void BindToParentImpl (Node*, NodeBindMode, NodeTransformSpace);
-    void BindNotify ();
-    void UnbindNotify ();
-    void BindChildNotify (Node&);
-    void UnbindChildNotify (Node&);
-    void SetScene (scene_graph::Scene*);
-    void Notify (NodeEvent);
-    void Notify (Node&, NodeSubTreeEvent);
+    static void DestroyNode (Node*);
+    void SetScene (scene_graph::Scene* in_scene);
 
   private:
     Node (const Node&); //no impl

@@ -32,9 +32,9 @@ VisualModel::~VisualModel ()
     Создание модели
 */
 
-VisualModel* VisualModel::Create ()
+VisualModel::Pointer VisualModel::Create ()
 {
-  return new VisualModel;
+  return Pointer (new VisualModel, false);
 }
 
 /*

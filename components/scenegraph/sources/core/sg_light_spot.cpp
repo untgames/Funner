@@ -38,9 +38,9 @@ SpotLight::~SpotLight ()
     Создание источника света
 */
 
-SpotLight* SpotLight::Create ()
+SpotLight::Pointer SpotLight::Create ()
 {
-  return new SpotLight;
+  return Pointer (new SpotLight, false);
 }
 
 /*

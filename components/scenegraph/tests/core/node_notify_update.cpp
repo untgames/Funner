@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 void on_update1 (Node& node, NodeEvent)
 {
   printf ("node '%s' updated\n", node.Name ());  
@@ -16,7 +14,7 @@ int main ()
 {
   printf ("Results of node_notify_update_test:\n");
   
-  NodePtr node (Node::Create (), false);
+  Node::Pointer node (Node::Create ());
   
   node->SetName   ("node1");
   node->Event (NodeEvent_AfterUpdate).connect (&on_update1);

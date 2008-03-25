@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<SpotLight> SpotLightPtr;
-
 void dump (const aaboxf& box)
 {
   printf ("[");
@@ -26,7 +24,7 @@ int main ()
 {
   printf ("Results of light_spot_test:\n");
   
-  SpotLightPtr light (SpotLight::Create (), false);
+  SpotLight::Pointer light (SpotLight::Create ());
 
   light->SetAngle (30.4f);
   printf ("Spot angle: %f\n", light->Angle ());

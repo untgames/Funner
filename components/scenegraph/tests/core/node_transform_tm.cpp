@@ -1,12 +1,10 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 int main ()
 {
   printf ("Results of node_transform_tm_test:\n");
   
-  NodePtr node (Node::Create (), false), parent (Node::Create (), false);
+  Node::Pointer node (Node::Create ()), parent (Node::Create ());
   
   node->BindToParent (*parent);
     

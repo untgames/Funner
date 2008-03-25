@@ -33,9 +33,9 @@ Listener::~Listener ()
     Создание слушателя
 */
 
-Listener* Listener::Create ()
+Listener::Pointer Listener::Create ()
 {
-  return new Listener;
+  return Pointer (new Listener, false);
 }
 
 /*

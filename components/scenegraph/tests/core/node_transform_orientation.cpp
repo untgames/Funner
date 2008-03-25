@@ -1,12 +1,10 @@
 #include "shared.h"
 
-typedef com_ptr<Node> NodePtr;
-
 int main ()
 {
   printf ("Results of node_transform_orientation_test:\n");
   
-  NodePtr node (Node::Create (), false);
+  Node::Pointer node (Node::Create ());
     
   printf ("set orientation from axis angle result: ");
   node->SetOrientation (-390, 0, 0, 1);

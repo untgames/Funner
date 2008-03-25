@@ -79,9 +79,9 @@ SoundEmitter::~SoundEmitter ()
     Создание слушателя
 */
 
-SoundEmitter* SoundEmitter::Create (const char* sound_declaration_name)
+SoundEmitter::Pointer SoundEmitter::Create (const char* sound_declaration_name)
 {
-  return new SoundEmitter (sound_declaration_name);
+  return Pointer (new SoundEmitter (sound_declaration_name), false);
 }
 
 /*

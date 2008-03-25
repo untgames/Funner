@@ -48,9 +48,9 @@ OrthoCamera::~OrthoCamera ()
     Создание камеры
 */
 
-OrthoCamera* OrthoCamera::Create ()
+OrthoCamera::Pointer OrthoCamera::Create ()
 {
-  return new OrthoCamera;
+  return Pointer (new OrthoCamera, false);
 }
 
 /*
