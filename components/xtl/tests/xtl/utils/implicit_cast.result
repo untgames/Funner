@@ -1,0 +1,3 @@
+Results of implicit_cast_test:
+test<int>: 3
+test<float>: 1.5
