@@ -208,6 +208,38 @@ inline typename any_stored_type<T>::type& get_unqualified_value (const volatile 
 }
 
 /*
+    Определение RTTI-типа переменной
+*/
+
+template <class T>
+inline const std::type_info& get_typeid (T& value)
+{
+  return &value ? typeid (value) : typeid (T);
+}
+
+template <class T>
+inline const std::type_info& get_typeid (T* value)
+{
+  return &value ? typeid (value) : typeid (T*);
+}
+
+/*
+    Проверка на 0
+*/
+
+template <class T>
+inline bool is_null (const T& value)
+{
+  return &value == 0;
+}
+
+template <class T>
+inline bool is_null (const T* value)
+{
+  return value == 0;
+}
+
+/*
     Интерфейс хранилища вариантных данных 
 */
 
@@ -224,6 +256,7 @@ struct any_holder
   virtual void                  dump                  (stl::string&) = 0;
   virtual void                  set_content           (const stl::string&) = 0;
   virtual dynamic_cast_root*    get_dynamic_cast_root () = 0;
+  virtual bool                  null                  () = 0;
 };
 
 /*
@@ -231,8 +264,8 @@ struct any_holder
 */
 
 #ifdef _MSC_VER
-#pragma warning (push)
-#pragma warning (disable:4624) //destructor could not be generated because a base class destructor is inaccessible
+  #pragma warning (push)
+  #pragma warning (disable:4624) //destructor could not be generated because a base class destructor is inaccessible
 #endif
 
 template <class T> struct any_content: public any_holder
@@ -243,8 +276,9 @@ template <class T> struct any_content: public any_holder
 
   const std::type_info& type           () { return typeid (T); }
   const std::type_info& stored_type    () { return typeid (base_type); }
-  const std::type_info& castable_type  () { return typeid (get_castable_value (value)); }
+  const std::type_info& castable_type  () { return get_typeid (get_castable_value (value)); }
   size_t                qualifier_mask () { return any_qualifier_mask<T>::value; }
+  bool                  null           () { return is_null (get_castable_value (value)); }
 
   dynamic_cast_root* get_dynamic_cast_root ()
   {
@@ -271,7 +305,7 @@ template <class T> struct any_content: public any_holder
 };
 
 #ifdef _MSC_VER
-#pragma warning (pop)
+  #pragma warning (pop)
 #endif
 
 /*
@@ -363,12 +397,17 @@ inline any& any::operator = (const T& value)
 }
 
 /*
-    Проверка на пустоту
+    Проверка на пустоту / проверка на 0
 */
 
 inline bool any::empty () const
 {
   return content_ptr == 0;
+}
+
+inline bool any::null () const
+{
+  return !content_ptr || content_ptr->null ();
 }
 
 /*
