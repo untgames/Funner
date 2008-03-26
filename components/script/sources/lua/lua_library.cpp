@@ -258,7 +258,9 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
 
       new (buffer) int (0);
 
-        //регистрация переменной        
+        //регистрация переменной
+          //!!!сделать удаление переменной в деструкторе!!!
+          //!!!сделать регистрацию вложенных имён!!!
 
       lua_setfield (state, LUA_GLOBALSINDEX, name + STATIC_PREFIX_SIZE);
     }

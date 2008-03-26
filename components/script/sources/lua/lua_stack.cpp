@@ -155,7 +155,16 @@ void Stack::PushSymbol (const char* symbol)
 
 void Stack::Push (const xtl::any& value)
 {
-  check_stack (state);
+  check_stack (state);    
+  
+  if (value.null ())
+  {
+      //обработка специального случая: помещение в стек нулевого указателя
+
+    lua_pushnil (state);
+
+    return;
+  }
 
   static const size_t BUFFER_SIZE = sizeof (xtl::any); 
 
