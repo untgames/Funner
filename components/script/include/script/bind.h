@@ -4,6 +4,7 @@
 #include <xtl/any.h>
 #include <xtl/function.h>
 #include <xtl/type_list.h>
+#include <xtl/type_traits>
 
 #include <script/invoker.h>
 #include <script/interpreter.h>

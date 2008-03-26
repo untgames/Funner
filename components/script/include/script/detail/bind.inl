@@ -3,12 +3,32 @@
 */
 
 namespace detail
-{ 
+{
+
+template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value>
+struct make_invoker_argument_helper
+{
+    //все не скалярные типы данных приводятся к xtl::any
+
+  typedef xtl::any result_type;
+  
+  static result_type get (T& value) { return xtl::make_ref_any (value); }
+};
 
 template <class T>
-inline xtl::any make_invoker_argument (T& value)
-{ 
-  return xtl::make_ref_any (value);
+struct make_invoker_argument_helper<T, true>
+{
+    //enum-типы приводятся к int
+
+  typedef int result_type;
+  
+  static result_type get (const T& value) { return static_cast<result_type> (value); }
+};
+
+template <class T>
+inline typename make_invoker_argument_helper<T>::result_type make_invoker_argument (T& value)
+{
+  return make_invoker_argument_helper<T>::get (value);
 }
 
 inline xtl::any           make_invoker_argument (const xtl::any& value)    { return value; }
@@ -33,12 +53,15 @@ inline const char*        make_invoker_argument (char* string)             { ret
 */
 
 //общая версия
-template <class T> struct argument_selector
+template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value> struct common_argument_selector
 {
-  static T get (IStack& stack, size_t index)
-  {
-    return xtl::any_multicast<T> (stack.GetVariant (index));
-  }
+  static T get (IStack& stack, size_t index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }
+};
+
+//извлечение enum-типов
+template <class T> struct common_argument_selector<T, true>
+{
+  static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetInteger (index)); }  
 };
 
 //извлечение целочисленного аргумента
@@ -71,7 +94,9 @@ struct any_argument_selector
   static xtl::any& get (IStack& stack, size_t index) { return stack.GetVariant (index); }
 };
 
-//специализации взятия аргумента для различных типов данных
+//диспетчеризация взятия аргумента для различных типов данных
+template <class T> struct argument_selector: public common_argument_selector<T> {};
+
 template <> struct argument_selector<xtl::any>:                 public any_argument_selector {};
 template <> struct argument_selector<const xtl::any>:           public any_argument_selector {};
 template <> struct argument_selector<volatile xtl::any>:        public any_argument_selector {};
