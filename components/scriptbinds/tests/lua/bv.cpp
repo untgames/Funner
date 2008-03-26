@@ -1,10 +1,10 @@
 #include "shared.h"
 
-const char* SCRIPT_FILE_NAME = "data/mathlib.lua";
+const char* SCRIPT_FILE_NAME = "data/bv.lua";
 
 int main ()
 {
-  printf ("Results of mathlib1_test:\n");
+  printf ("Results of bv_test:\n");
   
   try
   {
@@ -14,19 +14,12 @@ int main ()
     env->Library ("global").Register ("typename", make_invoker (&get_typename));
   
     bind_math_library (*env);
+    bind_bv_library   (*env);
     load_script       (*script, SCRIPT_FILE_NAME);
     
-    printf ("Test vec3f library:\n");
+    printf ("Test library:\n");
 
-    invoke<void> (*script, "test_vector", vec3f (1, 2, 3));
-    
-    printf ("Test mat4f library:\n");
-    
-    invoke<void> (*script, "test_matrix", mat4f (1));
-    
-    printf ("Test quatf library:\n");
-    
-    invoke<void> (*script, "test_quat", quatf (1));
+    invoke<void> (*script, "test");
   }
   catch (xtl::bad_any_cast& exception)
   {

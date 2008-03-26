@@ -12,12 +12,12 @@ namespace
     Константы (имена библиотек)
 */
 
-const char* MATHLIB_LIBRARY      = "math";
-const char* MATHLIB_VEC2_LIBRARY = "math.vec2";
-const char* MATHLIB_VEC3_LIBRARY = "math.vec3";
-const char* MATHLIB_VEC4_LIBRARY = "math.vec4";
-const char* MATHLIB_MAT4_LIBRARY = "math.mat4";
-const char* MATHLIB_QUAT_LIBRARY = "math.quat";
+const char* MATHLIB_LIBRARY      = "Math";
+const char* MATHLIB_VEC2_LIBRARY = "Math.Vector2";
+const char* MATHLIB_VEC3_LIBRARY = "Math.Vector3";
+const char* MATHLIB_VEC4_LIBRARY = "Math.Vector4";
+const char* MATHLIB_MAT4_LIBRARY = "Math.Matrix4";
+const char* MATHLIB_QUAT_LIBRARY = "Math.Quaternion";
 
 /*
     Создание шлюзов унарных и бинарных операций
