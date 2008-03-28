@@ -55,7 +55,15 @@ int main ()
     stack.Push (2);
 
     f1 (stack);
-    stack.Dump ();    
+    stack.Dump ();
+    
+    stack.Clear ();
+    stack.PushSymbol ("dummy");
+    stack.Push ("Hello world");
+    stack.Push ("3");
+
+    f1 (stack);
+    stack.Dump ();
   }
   catch (std::exception& exception)
   {

@@ -53,8 +53,13 @@ class OverloadedInvoker
       }
 
         //если шлюз не найден, то генерируем исключение о недопустимой перегрузке
+        
+      size_t arguments_count = stack.Size ();
 
-      Raise<RuntimeException> ("script::OverloadedInvoker::operator ()", "Bad invoker overload (%u arguments in stack)", stack.Size ());
+      if (arguments_count)
+        arguments_count--; //удаление имени функции из стека
+
+      Raise<RuntimeException> ("script::OverloadedInvoker::operator ()", "Bad overloaded invoker call (%u arguments in stack)", arguments_count);
 
       return 0;
     }
