@@ -404,3 +404,19 @@ inline binary_compose<Fn1,Fn2,Fn3> compose2 (const Fn1& fn1,const Fn2& fn2,const
 {
   return binary_compose<Fn1,Fn2,Fn3> (fn1,fn2,fn3);
 }
+
+/*
+    Получение "начального" элемента для операций
+*/
+
+template <class Arg1,class Arg2,class Result>
+inline Result identity_element (plus<Arg1,Arg2,Result>)
+{
+  return Result (0);
+}
+
+template <class Arg1,class Arg2,class Result>
+inline Result identity_element (multiplies<Arg1,Arg2,Result>)
+{
+  return Result (1);
+}

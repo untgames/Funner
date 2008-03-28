@@ -573,6 +573,12 @@ template <class Ret> constant_binary_fun<Ret,Ret,Ret> constant2 (const Ret&);
 template <class Fn1,class Fn2>           unary_compose<Fn1,Fn2>      compose1 (const Fn1&,const Fn2&);
 template <class Fn1,class Fn2,class Fn3> binary_compose<Fn1,Fn2,Fn3> compose2 (const Fn1&,const Fn2&,const Fn3&); 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение "начального" элемента для операций
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Arg1,class Arg2,class Result> Result identity_element (plus<Arg1,Arg2,Result>);
+template <class Arg1,class Arg2,class Result> Result identity_element (multiplies<Arg1,Arg2,Result>);
+
 #include <stl/detail/functional.inl>
 
 }

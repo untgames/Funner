@@ -95,6 +95,45 @@ inline OutIter adjacent_difference (InIter first,InIter last,OutIter result)
 }
 
 /*
+    ¬озведение в целую степень (врем€ работы O(logN))
+*/
+
+template <class T,class Integer,class MonoidOperation>
+inline T power (T x,Integer n,MonoidOperation op)
+{
+  if (n <= 0)
+    return identity_element (op);
+
+  while ((n & 1) == 0)
+  {
+    n >>= 1;
+    x   = op (x, x);
+  }
+
+  T result = x;
+
+  n >>= 1;
+
+  while (n != 0)
+  {
+    x = op (x, x);
+
+    if ((n & 1) != 0)
+      result = op (result, x);
+
+    n >>= 1;
+  }
+
+  return result;
+}
+
+template <class T,class Integer>
+inline T power (T x,Integer n)
+{
+  return power (x,n,multiplies<T> ());
+}
+
+/*
     √енераци€ числовой последовательности
 */
 
