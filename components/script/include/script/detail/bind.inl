@@ -1,4 +1,17 @@
 /*
+    Исключение: ошибка приведения аргумента шлюза
+*/
+
+inline bad_argument_cast::bad_argument_cast (const std::exception& in_exception)
+  : exception (in_exception)  
+  {}
+
+inline const char* bad_argument_cast::what () const throw ()
+{
+  return exception.what ();
+}
+
+/*
     Создание аргумента функции-шлюза
 */
 
@@ -133,9 +146,16 @@ struct argument_selector<stl::basic_string<char, Traits, Allocator> >: public st
 
 //функция взятия аргумента из стека
 template <class T>
-inline T get_argument (IStack& stack, size_t index)
+T get_argument (IStack& stack, size_t index)
 {
-  return argument_selector<T>::get (stack, index);
+  try
+  {
+    return argument_selector<T>::get (stack, index);
+  }
+  catch (std::exception& exception)
+  {
+    throw bad_argument_cast (exception);
+  }
 }
 
 /*
@@ -199,16 +219,15 @@ struct stack_argument_selector
 template <class FnTraits, class Fn, class Ret=typename FnTraits::result_type>
 struct invoker_impl
 {
-  enum {
-    arguments_count = FnTraits::arguments_count + FnTraits::is_memfun,
-    results_count   = 1
-  };
-
   invoker_impl (const Fn& in_fn) : fn (in_fn) {}    
 
-  void operator () (IStack& stack) const
+  size_t operator () (IStack& stack) const
   {
+    enum { arguments_count = FnTraits::arguments_count + FnTraits::is_memfun };
+  
     push_argument (stack, xtl::apply<typename FnTraits::result_type, arguments_count> (fn, stack, stack_argument_selector<FnTraits> ()));
+    
+    return 1; //results_count = 1
   }
 
   Fn fn;
@@ -217,16 +236,15 @@ struct invoker_impl
 template <class FnTraits, class Fn>
 struct invoker_impl<FnTraits, Fn, void>
 {
-  enum {
-    arguments_count = FnTraits::arguments_count + FnTraits::is_memfun,
-    results_count   = 0
-  };
-
   invoker_impl (const Fn& in_fn) : fn (in_fn) {}
 
-  void operator () (IStack& stack) const
+  size_t operator () (IStack& stack) const
   {
+    enum { arguments_count = FnTraits::arguments_count + FnTraits::is_memfun };
+  
     xtl::apply<void, arguments_count> (fn, stack, stack_argument_selector<FnTraits> ());
+    
+    return 0; //results_count = 0
   }
 
   Fn fn;
@@ -315,7 +333,7 @@ inline Invoker make_invoker (Fn fn)
 {
   typedef detail::invoker_impl<xtl::functional_traits<Signature>, Fn> invoker_type;
 
-  return Invoker (invoker_type (fn), invoker_type::arguments_count, invoker_type::results_count);
+  return Invoker (invoker_type (fn));
 }
 
 template <class Fn>

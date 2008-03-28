@@ -40,7 +40,7 @@ int main ()
 
     printf ("a.name='%s'\n", a.name.c_str ());
     
-    stack.Pop  (stack.Size ());
+    stack.Clear ();
     stack.PushSymbol ("dummy");    
     stack.Push (xtl::shared_ptr<X> (new Y));
     
@@ -48,7 +48,7 @@ int main ()
 
     stack.Dump ();
     
-    stack.Pop  (stack.Size ());
+    stack.Clear ();    
     stack.PushSymbol ("dummy");    
     stack.Push (xtl::shared_ptr<const X> (new Y));
 

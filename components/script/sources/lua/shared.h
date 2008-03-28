@@ -13,6 +13,7 @@
 #include <xtl/iterator.h>
 #include <xtl/bind.h>
 #include <xtl/reference_counter.h>
+#include <xtl/function.h>
 
 #include <common/heap.h>
 #include <common/strlib.h>
@@ -140,6 +141,7 @@ class Library: public xtl::reference_counter
     InvokerRegistry&     registry;                         //реестр шлюзов
     stl::string          table_name;                       //имя таблицы
     bool                 is_global;                        //является ли библиотека глобальной
+    bool                 is_static;                        //является ли библиотека статической
     xtl::auto_connection on_register_invoker_connection;   //соединение регистрации шлюза
     xtl::auto_connection on_unregister_invoker_connection; //соединение удаления шлюза
 };

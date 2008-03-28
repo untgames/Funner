@@ -10,6 +10,7 @@
 #include <xtl/ref.h>
 #include <xtl/iterator.h>
 #include <xtl/connection.h>
+#include <xtl/implicit_cast.h>
 
 #include <common/strlib.h>
 
@@ -44,6 +45,11 @@ class MyStack: public IStack
         arguments_count = array.size ();
       
       array.erase (array.end () - arguments_count, array.end ());
+    }
+    
+    void Clear ()
+    {
+      array.clear ();
     }
     
     void Dump (size_t index)

@@ -4,12 +4,20 @@ using namespace script;
 using namespace script::lua;
 using namespace common;
 
+namespace
+{
+
+/*
+    Константы
+*/
+
+const char*  GLOBAL_LIBRARY_NAME        = "global";
+const char*  STATIC_LIBRARY_PREFIX      = "static.";
+const size_t STATIC_LIBRARY_PREFIX_SIZE = strlen (STATIC_LIBRARY_PREFIX);
+
 /*
     Функции передаваемые lua
 */
-
-namespace
-{
 
 //диспетчер вызовов
 int unsafe_invoke_dispatch (lua_State* state)
@@ -25,17 +33,17 @@ int unsafe_invoke_dispatch (lua_State* state)
 
     //проверка количества переданных аргументов
 
-  if ((int)invoker->ArgumentsCount () > lua_gettop (state))
-    Raise<StackException> ("script::lua::invoke_dispatch(%s)", "Arguments count mismatch (expected %u, got %u)", 
-                           invoker_name, invoker->ArgumentsCount (), lua_gettop (state));
+//  if ((int)invoker->ArgumentsCount () > lua_gettop (state))
+//    Raise<StackException> ("script::lua::invoke_dispatch(%s)", "Arguments count mismatch (expected %u, got %u)", 
+//                           invoker_name, invoker->ArgumentsCount (), lua_gettop (state));
 
     //вызов шлюза
 
   try
   {
-    (*invoker)(interpreter->Interpreter::Stack ());
+    size_t results_count = (*invoker)(interpreter->Interpreter::Stack ());
     
-    return invoker->ResultsCount ();    
+    return results_count;
   }
   catch (common::Exception& exception)
   {
@@ -205,16 +213,10 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
     interpreter (in_interpreter),
     registry (in_registry),
     table_name (name),
-    is_global (table_name == "global")
+    is_global (table_name == GLOBAL_LIBRARY_NAME),
+    is_static (table_name.compare (0, STATIC_LIBRARY_PREFIX_SIZE, STATIC_LIBRARY_PREFIX) == 0)
 {
   static const char* METHOD_NAME = "script::lua::Library::Library";
-
-    //проверка: является ли библиотека статически линкуемой
-
-  static const char* STATIC_PREFIX      = "static.";
-  static size_t      STATIC_PREFIX_SIZE = strlen (STATIC_PREFIX);
-
-  bool is_static = strncmp (name, STATIC_PREFIX, STATIC_PREFIX_SIZE) == 0;
 
     //регистрация обработчиков удаления пользовательских типов данных    
 
@@ -259,10 +261,9 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
       new (buffer) int (0);
 
         //регистрация переменной
-          //!!!сделать удаление переменной в деструкторе!!!
           //!!!сделать регистрацию вложенных имён!!!
 
-      lua_setfield (state, LUA_GLOBALSINDEX, name + STATIC_PREFIX_SIZE);
+      lua_setfield (state, LUA_GLOBALSINDEX, name + STATIC_LIBRARY_PREFIX_SIZE);
     }
 
       //регистрация шлюзов
@@ -299,6 +300,12 @@ void Library::Destroy ()
   lua_pushvalue (state, -1);
   lua_setfield  (state, LUA_REGISTRYINDEX, table_name.c_str ());
   lua_setfield  (state, LUA_GLOBALSINDEX, table_name.c_str ());
+  
+  if (is_static)
+  {
+    lua_pushnil  (state);  
+    lua_setfield (state, LUA_GLOBALSINDEX, table_name.c_str () + STATIC_LIBRARY_PREFIX_SIZE);
+  }
 }
 
 /*

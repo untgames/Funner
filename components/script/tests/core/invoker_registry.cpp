@@ -5,10 +5,10 @@ void registry_handler (InvokerRegistryEvent event_id, const char* name, Invoker&
   switch (event_id)
   {
     case InvokerRegistryEvent_OnRegisterInvoker:
-      printf ("  register '%s' (arguments_count=%u, results_count=%u)\n", name, invoker.ArgumentsCount (), invoker.ResultsCount ());
+      printf ("  register '%s'\n", name);
       break;
     case InvokerRegistryEvent_OnUnregisterInvoker:
-      printf ("  unregister '%s' (arguments_count=%u, results_count=%u)\n", name, invoker.ArgumentsCount (), invoker.ResultsCount ());
+      printf ("  unregister '%s'\n", name);
       break;    
     default: break;
   }
@@ -48,8 +48,7 @@ int main (int, char** argv)
     printf ("Traverse invokers:\n");
     
     for (InvokerRegistry::Iterator i=registry.CreateIterator (); i; ++i)
-      printf ("  invoker '%s': arguments_count=%u, results_count=%u\n", registry.InvokerId (i), i->ArgumentsCount (),
-              i->ResultsCount ());
+      printf ("  invoker '%s'\n", registry.InvokerId (i));
               
     printf ("Search 'f1', 'f2':\n");
 
