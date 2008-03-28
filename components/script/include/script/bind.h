@@ -46,6 +46,12 @@ Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const In
 Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3, const Invoker& invoker4);
 Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3, const Invoker& invoker4,
                       const Invoker& invoker5);
+Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3, const Invoker& invoker4,
+                      const Invoker& invoker5, const Invoker& invoker6);
+Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3, const Invoker& invoker4,
+                      const Invoker& invoker5, const Invoker& invoker6, const Invoker& invoker7);
+Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3, const Invoker& invoker4,
+                      const Invoker& invoker5, const Invoker& invoker6, const Invoker& invoker7, const Invoker& invoker8);
 Invoker make_invoker (size_t invokers_count, const Invoker* invokers);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -38,36 +38,55 @@ void check_item_index (lua_State* state, size_t index, const char* function_name
     Raise<StackException> (function_name, "Attempt to get item #%u from stack with %u items", index, stack_size);
 }
 
+//проверка корректности типа элемента, извлекаемого из стека
+void check_item (lua_State* state, size_t index, int expected_type, const char* function_name)
+{
+    //проверка корректности индекса элемента
+
+  check_item_index (state, index, function_name);
+  
+    //определение типа элемента, находящегося в стеке
+
+  int item_type = lua_type (state, index);
+  
+    //если фактический тип элемента не совпал с ожидаемым - генерация исключения
+
+  if (item_type != expected_type)
+    Raise<RuntimeException> (function_name, "Bad item #%u type (%s expected, got %s)", index, lua_typename (state, expected_type),
+                             lua_typename (state, item_type));
+}
+
 }
 
 float Stack::GetFloat (size_t index)
 {
-  check_item_index (state, index, "script::lua::Stack::GetFloat");
+  check_item (state, index, LUA_TNUMBER, "script::lua::Stack::GetFloat");
+  
   return (float)lua_tonumber (state, index);
 }
 
 int Stack::GetInteger (size_t index)
 {
-  check_item_index (state, index, "script::lua::Stack::GetInteger");
+  check_item (state, index, LUA_TNUMBER, "script::lua::Stack::GetInteger");
   return lua_tointeger (state, index);
 }
 
 void* Stack::GetPointer (size_t index)
 {
-  check_item_index (state, index, "script::lua::Stack::GetPointer");
+  check_item (state, index, LUA_TLIGHTUSERDATA, "script::lua::Stack::GetPointer");
   return lua_touserdata (state, index);
 }
 
 const char* Stack::GetString (size_t index)
 {
-  check_item_index (state, index, "script::lua::Stack::GetString");
+  check_item (state, index, LUA_TSTRING, "script::lua::Stack::GetString");
   return lua_tostring (state, index);
 }
 
 const char* Stack::GetSymbol (size_t index)
 {
   RaiseNotSupported ("script::lua::Stack::GetSymbol");
-  
+
   return "";
 }
 
@@ -75,7 +94,7 @@ xtl::any& Stack::GetVariant (size_t index)
 {
     //проверка индекса
     
-  check_item_index (state, index, "script::lua::Stack::GetVariant");
+  check_item (state, index, LUA_TUSERDATA, "script::lua::Stack::GetVariant");
 
     //получение аргумента
 
@@ -95,7 +114,7 @@ xtl::any& Stack::GetVariant (size_t index)
 
     //генерация исключения
 
-  Raise<RuntimeException> ("script::Stack::GetVariant", "Item %u has wrong type (non user-data)", index);
+  Raise<RuntimeException> ("script::Stack::GetVariant", "Item %u has wrong type (non xtl::any)", index);
   
   return *variant;
 }

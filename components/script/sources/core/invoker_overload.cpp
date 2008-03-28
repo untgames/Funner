@@ -141,4 +141,70 @@ Invoker make_invoker
   return overloaded_invoker;
 }
 
+Invoker make_invoker
+ (const Invoker& invoker1,
+  const Invoker& invoker2,
+  const Invoker& invoker3,
+  const Invoker& invoker4,
+  const Invoker& invoker5,
+  const Invoker& invoker6)
+{
+  OverloadedInvoker overloaded_invoker;
+
+  overloaded_invoker.Insert (invoker1);
+  overloaded_invoker.Insert (invoker2);
+  overloaded_invoker.Insert (invoker3);
+  overloaded_invoker.Insert (invoker4);
+  overloaded_invoker.Insert (invoker5);
+  overloaded_invoker.Insert (invoker6);
+
+  return overloaded_invoker;
+}
+
+Invoker make_invoker
+ (const Invoker& invoker1,
+  const Invoker& invoker2,
+  const Invoker& invoker3,
+  const Invoker& invoker4,
+  const Invoker& invoker5,
+  const Invoker& invoker6,
+  const Invoker& invoker7)
+{
+  OverloadedInvoker overloaded_invoker;
+
+  overloaded_invoker.Insert (invoker1);
+  overloaded_invoker.Insert (invoker2);
+  overloaded_invoker.Insert (invoker3);
+  overloaded_invoker.Insert (invoker4);
+  overloaded_invoker.Insert (invoker5);
+  overloaded_invoker.Insert (invoker6);
+  overloaded_invoker.Insert (invoker7);
+
+  return overloaded_invoker;
+}
+
+Invoker make_invoker
+ (const Invoker& invoker1,
+  const Invoker& invoker2,
+  const Invoker& invoker3,
+  const Invoker& invoker4,
+  const Invoker& invoker5,
+  const Invoker& invoker6,
+  const Invoker& invoker7,
+  const Invoker& invoker8)
+{
+  OverloadedInvoker overloaded_invoker;
+
+  overloaded_invoker.Insert (invoker1);
+  overloaded_invoker.Insert (invoker2);
+  overloaded_invoker.Insert (invoker3);
+  overloaded_invoker.Insert (invoker4);
+  overloaded_invoker.Insert (invoker5);
+  overloaded_invoker.Insert (invoker6);
+  overloaded_invoker.Insert (invoker7);
+  overloaded_invoker.Insert (invoker8);
+
+  return overloaded_invoker;
+}
+
 }

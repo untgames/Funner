@@ -216,6 +216,20 @@ struct stack_argument_selector
     Функтор шлюза
 */
 
+//проверка наличия достаточного числа аргументов в стеке
+void check_arguments_count (size_t expected_arguments_count, size_t stack_arguments_count, const char* function_name)
+{
+  try
+  {
+    if (stack_arguments_count < expected_arguments_count)
+      common::Raise<RuntimeException> (function_name, "Too few arguments (expected %u, got %u)", expected_arguments_count, stack_arguments_count);
+  }
+  catch (std::exception& exception)
+  {
+    throw bad_argument_cast (exception);
+  }
+}
+
 template <class FnTraits, class Fn, class Ret=typename FnTraits::result_type>
 struct invoker_impl
 {
@@ -224,9 +238,15 @@ struct invoker_impl
   size_t operator () (IStack& stack) const
   {
     enum { arguments_count = FnTraits::arguments_count + FnTraits::is_memfun };
-  
+
+      //проверка наличия достаточного числа аргументов в стеке    
+
+    check_arguments_count (arguments_count, stack.Size (), "script::invoker_impl::operator ()");
+
+      //вызов шлюза и помещение его результата в стек
+
     push_argument (stack, xtl::apply<typename FnTraits::result_type, arguments_count> (fn, stack, stack_argument_selector<FnTraits> ()));
-    
+
     return 1; //results_count = 1
   }
 
@@ -241,9 +261,15 @@ struct invoker_impl<FnTraits, Fn, void>
   size_t operator () (IStack& stack) const
   {
     enum { arguments_count = FnTraits::arguments_count + FnTraits::is_memfun };
-  
+
+      //проверка наличия достаточного числа аргументов в стеке    
+
+    check_arguments_count (arguments_count, stack.Size (), "script::invoker_impl::operator ()");      
+
+      //вызов шлюза
+
     xtl::apply<void, arguments_count> (fn, stack, stack_argument_selector<FnTraits> ());
-    
+
     return 0; //results_count = 0
   }
 
