@@ -324,15 +324,58 @@ quat<T> quat_normalize (const quat<T>& q)
 }
 
 /*
+    Генерация последовательностей xyz
+*/
+
+template <class VecType, size_t Size>
+void register_vector_selector (size_t index, InvokerRegistry& lib)
+{ 
+    //расчёт индексов компонент
+    
+  size_t indices [Size < 4 ? 4 : Size] = {0, 0, 0, 0};
+
+  for (size_t i=0; i<Size; index /= 4, i++)
+    indices [i] = index % 4;
+
+    //формирование базового имени
+
+  static const char component_names [] = {'x', 'y', 'z', 'w'};      
+
+  char name [16] = "get_", *s = name + 4;
+  
+  for (size_t i=0; i<Size; i++, s++)
+    *s = component_names [indices [i]];
+
+  *s = '\0';
+  
+    //регистрация обработчиков
+   
+  lib.Register (name, make_vec_get_tuple_invoker<VecType, Size> (indices [0], indices [1], indices [2], indices [3]));
+  
+  *name = 's';
+  
+  lib.Register (name, make_vec_set_tuple_invoker<VecType, Size> (indices [0], indices [1], indices [2], indices [3]));  
+}
+
+template <class VecType, size_t Size>
+void register_vector_selectors (InvokerRegistry& lib)
+{
+  for (size_t i=0, count=stl::power (4, Size); i<count; i++)
+    register_vector_selector<VecType, Size> (i, lib);
+}
+
+/*
     Регистрация библиотеки работы с векторами
 */
 
 template <class T, size_t Size>
 void bind_vec_library (InvokerRegistry& vec_lib)
 {
-  typedef vec<T, Size> vec_type;
+  typedef vec<T, Size>      vec_type;
+  typedef matrix<T, Size>   matrix_type;
+  typedef matrix<T, Size+1> big_matrix_type;
 
-    //регистрация селекторов
+    //регистрация скалярных селекторов
 
   vec_lib.Register ("get_x", make_invoker<T (const vec_type&)> (vec_get_element<vec_type> (0)));
   vec_lib.Register ("get_y", make_invoker<T (const vec_type&)> (vec_get_element<vec_type> (1)));
@@ -349,100 +392,32 @@ void bind_vec_library (InvokerRegistry& vec_lib)
   vec_lib.Register ("set_0", "set_x");
   vec_lib.Register ("set_1", "set_y");
   vec_lib.Register ("set_2", "set_z");
-  vec_lib.Register ("set_3", "set_w");
-  
-    //занести в массивы!!!
+  vec_lib.Register ("set_3", "set_w");  
 
-    //регистрация селекторов пар
+    //регистрация векторных селекторов
 
-  vec_lib.Register ("get_xx", make_vec_get_tuple_invoker<vec_type, 2> (0, 0));
-  vec_lib.Register ("get_xy", make_vec_get_tuple_invoker<vec_type, 2> (0, 1));
-  vec_lib.Register ("get_xz", make_vec_get_tuple_invoker<vec_type, 2> (0, 2));
-  vec_lib.Register ("get_yx", make_vec_get_tuple_invoker<vec_type, 2> (1, 0));
-  vec_lib.Register ("get_yy", make_vec_get_tuple_invoker<vec_type, 2> (1, 1));
-  vec_lib.Register ("get_yz", make_vec_get_tuple_invoker<vec_type, 2> (1, 2));
-  vec_lib.Register ("get_zx", make_vec_get_tuple_invoker<vec_type, 2> (2, 0));
-  vec_lib.Register ("get_zy", make_vec_get_tuple_invoker<vec_type, 2> (2, 1));
-  vec_lib.Register ("get_zz", make_vec_get_tuple_invoker<vec_type, 2> (2, 2));
-  
-  vec_lib.Register ("set_xx", make_vec_set_tuple_invoker<vec_type, 2> (0, 0));
-  vec_lib.Register ("set_xy", make_vec_set_tuple_invoker<vec_type, 2> (0, 1));
-  vec_lib.Register ("set_xz", make_vec_set_tuple_invoker<vec_type, 2> (0, 2));
-  vec_lib.Register ("set_yx", make_vec_set_tuple_invoker<vec_type, 2> (1, 0));
-  vec_lib.Register ("set_yy", make_vec_set_tuple_invoker<vec_type, 2> (1, 1));
-  vec_lib.Register ("set_yz", make_vec_set_tuple_invoker<vec_type, 2> (1, 2));
-  vec_lib.Register ("set_zx", make_vec_set_tuple_invoker<vec_type, 2> (2, 0));
-  vec_lib.Register ("set_zy", make_vec_set_tuple_invoker<vec_type, 2> (2, 1));
-  vec_lib.Register ("set_zz", make_vec_set_tuple_invoker<vec_type, 2> (2, 2));
+  register_vector_selectors<vec_type, 2> (vec_lib);
+  register_vector_selectors<vec_type, 3> (vec_lib);
+  register_vector_selectors<vec_type, 4> (vec_lib);
 
-    //регистрация селекторов триад
-
-  vec_lib.Register ("get_xxx", make_vec_get_tuple_invoker<vec_type, 3> (0, 0, 0));
-  vec_lib.Register ("get_xxy", make_vec_get_tuple_invoker<vec_type, 3> (0, 0, 1));
-  vec_lib.Register ("get_xxz", make_vec_get_tuple_invoker<vec_type, 3> (0, 0, 2));
-  vec_lib.Register ("get_xyx", make_vec_get_tuple_invoker<vec_type, 3> (0, 1, 0));
-  vec_lib.Register ("get_xyy", make_vec_get_tuple_invoker<vec_type, 3> (0, 1, 1));
-  vec_lib.Register ("get_xyz", make_vec_get_tuple_invoker<vec_type, 3> (0, 1, 2));
-  vec_lib.Register ("get_xzx", make_vec_get_tuple_invoker<vec_type, 3> (0, 2, 0));
-  vec_lib.Register ("get_xzy", make_vec_get_tuple_invoker<vec_type, 3> (0, 2, 1));
-  vec_lib.Register ("get_xzz", make_vec_get_tuple_invoker<vec_type, 3> (0, 2, 2));
-  vec_lib.Register ("get_yxx", make_vec_get_tuple_invoker<vec_type, 3> (1, 0, 0));
-  vec_lib.Register ("get_yxy", make_vec_get_tuple_invoker<vec_type, 3> (1, 0, 1));
-  vec_lib.Register ("get_yxz", make_vec_get_tuple_invoker<vec_type, 3> (1, 0, 2));
-  vec_lib.Register ("get_yyx", make_vec_get_tuple_invoker<vec_type, 3> (1, 1, 0));
-  vec_lib.Register ("get_yyy", make_vec_get_tuple_invoker<vec_type, 3> (1, 1, 1));
-  vec_lib.Register ("get_yyz", make_vec_get_tuple_invoker<vec_type, 3> (1, 1, 2));
-  vec_lib.Register ("get_yzx", make_vec_get_tuple_invoker<vec_type, 3> (1, 2, 0));
-  vec_lib.Register ("get_yzy", make_vec_get_tuple_invoker<vec_type, 3> (1, 2, 1));
-  vec_lib.Register ("get_yzz", make_vec_get_tuple_invoker<vec_type, 3> (1, 2, 2));
-  vec_lib.Register ("get_zxx", make_vec_get_tuple_invoker<vec_type, 3> (2, 0, 0));
-  vec_lib.Register ("get_zxy", make_vec_get_tuple_invoker<vec_type, 3> (2, 0, 1));
-  vec_lib.Register ("get_zxz", make_vec_get_tuple_invoker<vec_type, 3> (2, 0, 2));
-  vec_lib.Register ("get_zyx", make_vec_get_tuple_invoker<vec_type, 3> (2, 1, 0));
-  vec_lib.Register ("get_zyy", make_vec_get_tuple_invoker<vec_type, 3> (2, 1, 1));
-  vec_lib.Register ("get_zyz", make_vec_get_tuple_invoker<vec_type, 3> (2, 1, 2));
-  vec_lib.Register ("get_zzx", make_vec_get_tuple_invoker<vec_type, 3> (2, 2, 0));
-  vec_lib.Register ("get_zzy", make_vec_get_tuple_invoker<vec_type, 3> (2, 2, 1));
-  vec_lib.Register ("get_zzz", make_vec_get_tuple_invoker<vec_type, 3> (2, 2, 2));
-  
-  vec_lib.Register ("set_xxx", make_vec_set_tuple_invoker<vec_type, 3> (0, 0, 0));
-  vec_lib.Register ("set_xxy", make_vec_set_tuple_invoker<vec_type, 3> (0, 0, 1));
-  vec_lib.Register ("set_xxz", make_vec_set_tuple_invoker<vec_type, 3> (0, 0, 2));
-  vec_lib.Register ("set_xyx", make_vec_set_tuple_invoker<vec_type, 3> (0, 1, 0));
-  vec_lib.Register ("set_xyy", make_vec_set_tuple_invoker<vec_type, 3> (0, 1, 1));
-  vec_lib.Register ("set_xyz", make_vec_set_tuple_invoker<vec_type, 3> (0, 1, 2));
-  vec_lib.Register ("set_xzx", make_vec_set_tuple_invoker<vec_type, 3> (0, 2, 0));
-  vec_lib.Register ("set_xzy", make_vec_set_tuple_invoker<vec_type, 3> (0, 2, 1));
-  vec_lib.Register ("set_xzz", make_vec_set_tuple_invoker<vec_type, 3> (0, 2, 2));
-  vec_lib.Register ("set_yxx", make_vec_set_tuple_invoker<vec_type, 3> (1, 0, 0));
-  vec_lib.Register ("set_yxy", make_vec_set_tuple_invoker<vec_type, 3> (1, 0, 1));
-  vec_lib.Register ("set_yxz", make_vec_set_tuple_invoker<vec_type, 3> (1, 0, 2));
-  vec_lib.Register ("set_yyx", make_vec_set_tuple_invoker<vec_type, 3> (1, 1, 0));
-  vec_lib.Register ("set_yyy", make_vec_set_tuple_invoker<vec_type, 3> (1, 1, 1));
-  vec_lib.Register ("set_yyz", make_vec_set_tuple_invoker<vec_type, 3> (1, 1, 2));
-  vec_lib.Register ("set_yzx", make_vec_set_tuple_invoker<vec_type, 3> (1, 2, 0));
-  vec_lib.Register ("set_yzy", make_vec_set_tuple_invoker<vec_type, 3> (1, 2, 1));
-  vec_lib.Register ("set_yzz", make_vec_set_tuple_invoker<vec_type, 3> (1, 2, 2));
-  vec_lib.Register ("set_zxx", make_vec_set_tuple_invoker<vec_type, 3> (2, 0, 0));
-  vec_lib.Register ("set_zxy", make_vec_set_tuple_invoker<vec_type, 3> (2, 0, 1));
-  vec_lib.Register ("set_zxz", make_vec_set_tuple_invoker<vec_type, 3> (2, 0, 2));
-  vec_lib.Register ("set_zyx", make_vec_set_tuple_invoker<vec_type, 3> (2, 1, 0));
-  vec_lib.Register ("set_zyy", make_vec_set_tuple_invoker<vec_type, 3> (2, 1, 1));
-  vec_lib.Register ("set_zyz", make_vec_set_tuple_invoker<vec_type, 3> (2, 1, 2));
-  vec_lib.Register ("set_zzx", make_vec_set_tuple_invoker<vec_type, 3> (2, 2, 0));
-  vec_lib.Register ("set_zzy", make_vec_set_tuple_invoker<vec_type, 3> (2, 2, 1));
-  vec_lib.Register ("set_zzz", make_vec_set_tuple_invoker<vec_type, 3> (2, 2, 2));    
-  
     //регистрация операций
-  
+
   vec_lib.Register ("__unm", make_unary_invoker<vec_type, vec_type, negate> ());
   vec_lib.Register ("__add", make_binary_invoker<vec_type, vec_type, vec_type, plus> ());
   vec_lib.Register ("__sub", make_binary_invoker<vec_type, vec_type, vec_type, minus> ());
-  vec_lib.Register ("__mul", make_binary_invoker<vec_type, vec_type, vec_type, multiplies> ()); //??умножение на скаляр
-  vec_lib.Register ("__div", make_binary_invoker<vec_type, vec_type, vec_type, divides> ()); //??деление на скаляр  
-  
+
+    //регистрация перегруженных операций (умножение/деление на скаляр и вектор)
+
+  vec_lib.Register ("__mul", make_invoker (make_binary_invoker<vec_type, vec_type, big_matrix_type, multiplies> (),
+                                           make_binary_invoker<vec_type, vec_type, matrix_type, multiplies> (),
+                                           make_binary_invoker<vec_type, vec_type, vec_type, multiplies> (),
+                                           make_binary_invoker<vec_type, vec_type, T, multiplies> (),
+                                           make_binary_invoker<vec_type, T, vec_type, multiplies> ()));
+  vec_lib.Register ("__div", make_invoker (make_binary_invoker<vec_type, vec_type, vec_type, divides> (),
+                                           make_binary_invoker<vec_type, vec_type, T, divides> ()));
+
     //регистрация функций
-    
+
   vec_lib.Register ("get_length",  make_invoker<T (vec_type)> (&math::length<T, Size>));
   vec_lib.Register ("get_qlength", make_invoker<T (vec_type)> (&math::qlen<T, Size>));
   vec_lib.Register ("normalize",   make_invoker<vec_type (vec_type)> (&vec_normalize<T, Size>));
@@ -457,6 +432,7 @@ void bind_matrix_library (InvokerRegistry& mat_lib)
 {
   typedef matrix<T, Size> matrix_type;
   typedef vec<T, Size>    vec_type;
+  typedef vec<T, Size-1>  small_vec_type;
 
     //регистрация селекторов
 
@@ -476,9 +452,16 @@ void bind_matrix_library (InvokerRegistry& mat_lib)
 
   mat_lib.Register ("__add", make_binary_invoker<matrix_type, matrix_type, matrix_type, plus> ());
   mat_lib.Register ("__sub", make_binary_invoker<matrix_type, matrix_type, matrix_type, minus> ());
-  mat_lib.Register ("__mul", make_binary_invoker<matrix_type, matrix_type, matrix_type, multiplies> ());
   mat_lib.Register ("__div", make_binary_invoker<matrix_type, matrix_type, T, divides> ());
-  
+
+    //регистрация перегруженных операций (умножение на скаляр, вектор и матрицу)
+
+  mat_lib.Register ("__mul", make_invoker (make_binary_invoker<matrix_type, matrix_type, matrix_type, multiplies> (),
+                                           make_binary_invoker<vec_type, matrix_type, vec_type, multiplies> (),
+                                           make_binary_invoker<small_vec_type, matrix_type, small_vec_type, multiplies> (),
+                                           make_binary_invoker<matrix_type, matrix_type, T, multiplies> (),
+                                           make_binary_invoker<matrix_type, T, matrix_type, multiplies> ()));
+
     //регистрация функций над матрицами  
     
   mat_lib.Register ("transpose", make_invoker (&math::transpose<T, Size>));
@@ -519,8 +502,10 @@ void bind_quat_library (InvokerRegistry& quat_lib)
   quat_lib.Register ("__unm", make_unary_invoker<quat_type, quat_type, negate> ());
   quat_lib.Register ("__add", make_binary_invoker<quat_type, quat_type, quat_type, plus> ());
   quat_lib.Register ("__sub", make_binary_invoker<quat_type, quat_type, quat_type, minus> ());
-  quat_lib.Register ("__mul", make_binary_invoker<quat_type, quat_type, quat_type, multiplies> ()); //??умножение на скаляр
-  
+  quat_lib.Register ("__mul", make_invoker (make_binary_invoker<quat_type, quat_type, quat_type, multiplies> (),
+                                            make_binary_invoker<quat_type, quat_type, T, multiplies> (),
+                                            make_binary_invoker<quat_type, T, quat_type, multiplies> ()));
+
   
     //регистрация функций
     
@@ -566,26 +551,18 @@ void bind_math_library (Environment& environment)
 
     //регистрация функций создания векторов и матриц
 
-  math_lib.Register   ("vec2",    make_invoker (&create_vec2));
-  math_lib.Register   ("vec3",    make_invoker (&create_vec3));
-  math_lib.Register   ("vec4",    make_invoker (&create_vec4));
-  math_lib.Register   ("scalar2", make_invoker (&create_scalar2));
-  math_lib.Register   ("scalar3", make_invoker (&create_scalar3));
-  math_lib.Register   ("scalar4", make_invoker (&create_scalar4));
+  math_lib.Register   ("vec2", make_invoker (make_invoker (&create_vec2), make_invoker (&create_scalar2)));
+  math_lib.Register   ("vec3", make_invoker (make_invoker (&create_vec3), make_invoker (&create_scalar3)));
+  math_lib.Register   ("vec4", make_invoker (make_invoker (&create_vec4), make_invoker (&create_scalar4)));
   global_lib.Register ("vec2", math_lib, "vec2");
   global_lib.Register ("vec3", math_lib, "vec3");
   global_lib.Register ("vec4", math_lib, "vec4");
-  global_lib.Register ("scalar2", math_lib, "scalar2");
-  global_lib.Register ("scalar3", math_lib, "scalar3");
-  global_lib.Register ("scalar4", math_lib, "scalar4");
-  
+
   math_lib.Register   ("mat4", make_invoker (&create_mat4));  
   global_lib.Register ("mat4", math_lib, "mat4");
-  
-  quat_lib.Register   ("quat", make_invoker (&create_quat<float>));
-  quat_lib.Register   ("quat1", make_invoker (&create_quat1<float>));
+
+  quat_lib.Register   ("quat", make_invoker (make_invoker (&create_quat<float>), make_invoker (&create_quat1<float>)));
   global_lib.Register ("quat", quat_lib, "quat");
-  global_lib.Register ("quat1", quat_lib, "quat1");
 
     //регистрация типов данных
 

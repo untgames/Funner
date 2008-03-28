@@ -6,6 +6,7 @@
 #include <script/bind_libraries.h>
 
 #include <stl/functional>
+#include <stl/numeric>
 
 #include <common/strlib.h>
 

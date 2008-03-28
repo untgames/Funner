@@ -13,12 +13,15 @@ function test_vector (v)
   tmp = tmp - v * v.zxy
 
   print ("tmp = tmp - v * v.zxy: " .. tostring (tmp))
+  print ("v * 2: " .. tostring (v * 2))
+  print ("3 * v: " .. tostring (3 * v))
+  print ("4 * v / 2: " .. tostring (4 * v / 2))
 
   print ("vec3(4,5,6): " .. tostring (vec3 (4, 5, 6)))
 
-  v1 = scalar3 (7)
+  v1 = vec3 (7)
 
-  print ("v1 = scalar3(7): " .. tostring (v1))
+  print ("v1 = vec3(7): " .. tostring (v1))
   print ("v1:normalize(): " .. tostring (v1:normalize()))
 
   v1 = vec3 (-1, 2, -3):abs ()
@@ -76,7 +79,16 @@ function test_matrix (m)
 
   local m5 = mat4 (2)
 
-  print ("mat4(2):det (): " .. m5:det ()) 
+  print ("mat4(2):det (): " .. m5:det ())
+
+  print ("m5 * m5: " .. tostring (m5 * m5))
+  print ("m5 * 2: " .. tostring (m5 * 2))
+  print ("3 * m5: " .. tostring (3 * m5))
+  print ("4 * m5 / 2: " .. tostring (4 * m5 / 2))
+  print ("m5 * vec3 (1, 2, 3): " .. tostring (m5 * vec3 (1, 2, 3)))
+  print ("m5 * vec4 (1, 2, 3, 4): " .. tostring (m5 * vec4 (1, 2, 3, 4)))
+  print ("vec3 (1, 2, 3) * m5: " .. tostring (vec3 (1, 2, 3) * m5))
+  print ("vec4 (1, 2, 3, 4) * m5: " .. tostring (vec4 (1, 2, 3, 4) * m5))
 end
 
 function test_quat (q)
@@ -117,7 +129,8 @@ function test_quat (q)
   local q2 = quat (8, 9, 10, 11)
   
   print ("Test q2=quat(8,9,10,11): " .. tostring (q2))
-  
+  print ("Test quat(1): " .. tostring (quat (1)))
+
   print ("Test -q2: " .. tostring (-q2))
   
   print ("Test q+q2:"..tostring(q+q2))
