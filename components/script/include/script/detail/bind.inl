@@ -217,7 +217,8 @@ struct stack_argument_selector
 */
 
 //проверка наличи€ достаточного числа аргументов в стеке
-void check_arguments_count (size_t expected_arguments_count, size_t stack_arguments_count, const char* function_name)
+template <size_t expected_arguments_count>
+void check_arguments_count (size_t stack_arguments_count, const char* function_name)
 {
   try
   {
@@ -241,7 +242,7 @@ struct invoker_impl
 
       //проверка наличи€ достаточного числа аргументов в стеке    
 
-    check_arguments_count (arguments_count, stack.Size (), "script::invoker_impl::operator ()");
+    check_arguments_count<arguments_count> (stack.Size (), "script::invoker_impl::operator ()");
 
       //вызов шлюза и помещение его результата в стек
 
@@ -264,7 +265,7 @@ struct invoker_impl<FnTraits, Fn, void>
 
       //проверка наличи€ достаточного числа аргументов в стеке    
 
-    check_arguments_count (arguments_count, stack.Size (), "script::invoker_impl::operator ()");      
+    check_arguments_count<arguments_count> (stack.Size (), "script::invoker_impl::operator ()");      
 
       //вызов шлюза
 
