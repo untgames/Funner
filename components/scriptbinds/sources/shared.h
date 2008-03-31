@@ -8,8 +8,9 @@
 #include <stl/functional>
 #include <stl/numeric>
 
-#include <common/strlib.h>
+#include <xtl/bind.h>
+#include <xtl/implicit_cast.h>
 
-#include <mathlib.h>
+#include <common/strlib.h>
 
 #endif

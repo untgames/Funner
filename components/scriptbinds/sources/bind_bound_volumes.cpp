@@ -1,8 +1,6 @@
-#include "shared.h"
-
-#include <xtl/implicit_cast.h>
-
 #include <bv/axis_aligned_box.h>
+
+#include "shared.h"
 
 using namespace script;
 using namespace math;

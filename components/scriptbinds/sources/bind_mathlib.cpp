@@ -1,3 +1,5 @@
+#include <mathlib.h>
+
 #include "shared.h"
 
 using namespace script;

@@ -1,13 +1,11 @@
-#include "shared.h"
-
-#include <xtl/implicit_cast.h>
-
 #include <sg/camera.h>
 #include <sg/light.h>
 #include <sg/helper.h>
 #include <sg/listener.h>
 #include <sg/sound_emitter.h>
 #include <sg/visual_model.h>
+
+#include "shared.h"
 
 using namespace script;
 using namespace scene_graph;
@@ -112,7 +110,10 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("PrevChild",  make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::PrevChild)));
   lib.Register ("NextChild",  make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::NextChild)));
 
-  lib.Register ("BindToParent",      make_invoker (&Node::BindToParent));
+  lib.Register ("BindToParent", make_invoker (make_invoker (&Node::BindToParent),
+    make_invoker<void (Node&, Node&, NodeBindMode)> (xtl::bind (&Node::BindToParent, _1, _2, _3, NodeTransformSpace_Local)),
+    make_invoker<void (Node&, Node&)> (xtl::bind (&Node::BindToParent, _1, _2, NodeBindMode_Default, NodeTransformSpace_Local))));
+
   lib.Register ("Unbind",            make_invoker (&Node::Unbind));
 //  lib.Register ("UnbindChild",       make_invoker (&Node::UnbindChild)));
   lib.Register ("UnbindAllChildren", make_invoker (&Node::UnbindAllChildren));

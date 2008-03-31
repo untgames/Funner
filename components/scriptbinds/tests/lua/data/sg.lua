@@ -8,7 +8,7 @@ function test_node_bind ()
   node4 = node2:Parent ()
 
   node1:BindToParent (node3, Scene_NodeBindMode.AddRef, Scene_NodeTransformSpace.Parent)
-  node2:BindToParent (node3, Scene_NodeBindMode.AddRef, Scene_NodeTransformSpace.Parent)
+  node2:BindToParent (node3)
   node1:Unbind (Scene_NodeTransformSpace.Parent)
   node3:UnbindAllChildren ()
 end
