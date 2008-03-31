@@ -658,7 +658,7 @@ void Node::UnbindChild (const char* name, NodeSearchMode mode, NodeTransformSpac
   
   if (!child)
     return;
-    
+
   child->Unbind (invariant_space);
 }
 
@@ -687,13 +687,13 @@ Node::ConstPointer Node::FindChild (const char* name, NodeSearchMode mode) const
   switch (mode)
   {
     case NodeSearchMode_OnNextSublevel:
-      for (const Node* node=impl->first_child; node; node=impl->next_child)
+      for (const Node* node=impl->first_child; node; node=node->impl->next_child)
         if (node->impl->name_hash == name_hash && node->impl->name == name)
           return node;
 
       break;
     case NodeSearchMode_OnAllSublevels:
-      for (const Node* node=impl->first_child; node; node=impl->next_child)
+      for (const Node* node=impl->first_child; node; node=node->impl->next_child)
       {
         if (node->impl->name_hash == name_hash && name == node->impl->name)
           return node;

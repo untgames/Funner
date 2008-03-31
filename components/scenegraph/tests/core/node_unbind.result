@@ -1,0 +1,11 @@
+Results of node_find_child_test:
+entities tree:
+ node 'node'
+  node 'child1'
+  node 'child2'
+unbind child2:
+ node 'node'
+  node 'child1'
+unbind child1:
+ node 'node'
+  node 'child2'
