@@ -42,9 +42,7 @@ class OverloadedInvoker
 
         try
         {
-          size_t results_count = invoker (stack);
-
-          return results_count; //если шлюз вызван успешно, то остальные перегрузки проверять не нужно
+          return invoker (stack); //если шлюз вызван успешно, то остальные перегрузки проверять не нужно
         }
         catch (bad_argument_cast&)
         {

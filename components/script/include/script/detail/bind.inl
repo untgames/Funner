@@ -1,17 +1,4 @@
 /*
-    Исключение: ошибка приведения аргумента шлюза
-*/
-
-inline bad_argument_cast::bad_argument_cast (const std::exception& in_exception)
-  : exception (in_exception)  
-  {}
-
-inline const char* bad_argument_cast::what () const throw ()
-{
-  return exception.what ();
-}
-
-/*
     Создание аргумента функции-шлюза
 */
 
@@ -148,14 +135,7 @@ struct argument_selector<stl::basic_string<char, Traits, Allocator> >: public st
 template <class T>
 T get_argument (IStack& stack, size_t index)
 {
-  try
-  {
-    return argument_selector<T>::get (stack, index);
-  }
-  catch (std::exception& exception)
-  {
-    throw bad_argument_cast (exception);
-  }
+  return argument_selector<T>::get (stack, index);
 }
 
 /*
@@ -201,39 +181,66 @@ struct functional_argument_traits<FunctionalTraits, 0, true>
   enum { argument_index = 1 };
 };
 
-template <class FunctionalTraits>
-struct stack_argument_selector
-{
-  template <size_t I> struct traits: public functional_argument_traits<FunctionalTraits, I> {};  
-
-  template <size_t I> static typename traits<I>::argument_type eval (IStack& stack)
-  {
-    return get_argument<typename traits<I>::argument_type> (stack, traits<I>::argument_index);
-  }
-};
-
 /*
     Функтор шлюза
 */
 
-//проверка наличия достаточного числа аргументов в стеке
-template <size_t expected_arguments_count>
-void check_arguments_count (size_t stack_arguments_count, const char* function_name)
+//базовая политика для работы с аргументами шлюза
+struct invoker_base
 {
-  try
+    //выборка аргумента
+  template <class FunctionalTraits> struct stack_argument_selector
+  {
+    template <size_t I> struct traits: public functional_argument_traits<FunctionalTraits, I> {};  
+
+    template <size_t I> static typename traits<I>::argument_type eval (IStack& stack)
+    {
+      return get_argument<typename traits<I>::argument_type> (stack, traits<I>::argument_index);
+    }
+  };
+  
+    //проверка наличия достаточного числа аргументов в стеке
+  template <size_t expected_arguments_count>
+  static void check_arguments_count (size_t stack_arguments_count)
   {
     if (stack_arguments_count < expected_arguments_count)
-      common::Raise<RuntimeException> (function_name, "Too few arguments (expected %u, got %u)", expected_arguments_count, stack_arguments_count);
+      common::Raise<RuntimeException> ("script::detail::invoker_base::check_arguments_count", "Too few arguments (expected %u, got %u)", expected_arguments_count, stack_arguments_count);
   }
-  catch (std::exception& exception)
-  {
-    throw bad_argument_cast (exception);
-  }
-}
+};
 
-template <class FnTraits, class Fn, class Ret=typename FnTraits::result_type>
-struct invoker_impl
+//базовая политика для работы с аргументами перегрузки
+struct overload_base
 {
+    //выборка аргумента
+  template <class FunctionalTraits> struct stack_argument_selector: public invoker_base::stack_argument_selector<FunctionalTraits>
+  {
+    typedef invoker_base::stack_argument_selector<FunctionalTraits> base;
+    
+    template <size_t I> static typename traits<I>::argument_type eval (IStack& stack)
+    {
+      try
+      {
+        return base::eval<I> (stack);
+      }
+      catch (...)
+      {
+        throw bad_argument_cast ();
+      }
+    }  
+  };
+  
+    //проверка наличия достаточного числа аргументов в стеке
+  template <size_t expected_arguments_count>
+  static void check_arguments_count (size_t stack_arguments_count)
+  {
+    if (stack_arguments_count < expected_arguments_count)
+      throw bad_argument_cast ();
+  }
+};
+
+template <class Base, class FnTraits, class Fn, class Ret=typename FnTraits::result_type>
+struct invoker_impl
+{ 
   invoker_impl (const Fn& in_fn) : fn (in_fn) {}    
 
   size_t operator () (IStack& stack) const
@@ -242,11 +249,11 @@ struct invoker_impl
 
       //проверка наличия достаточного числа аргументов в стеке    
 
-    check_arguments_count<arguments_count> (stack.Size (), "script::invoker_impl::operator ()");
+    Base::check_arguments_count<arguments_count> (stack.Size ());
 
       //вызов шлюза и помещение его результата в стек
 
-    push_argument (stack, xtl::apply<typename FnTraits::result_type, arguments_count> (fn, stack, stack_argument_selector<FnTraits> ()));
+    push_argument (stack, xtl::apply<typename FnTraits::result_type, arguments_count> (fn, stack, Base::stack_argument_selector<FnTraits> ()));
 
     return 1; //results_count = 1
   }
@@ -254,8 +261,8 @@ struct invoker_impl
   Fn fn;
 };
 
-template <class FnTraits, class Fn>
-struct invoker_impl<FnTraits, Fn, void>
+template <class Base, class FnTraits, class Fn>
+struct invoker_impl<Base, FnTraits, Fn, void>
 {
   invoker_impl (const Fn& in_fn) : fn (in_fn) {}
 
@@ -265,11 +272,11 @@ struct invoker_impl<FnTraits, Fn, void>
 
       //проверка наличия достаточного числа аргументов в стеке    
 
-    check_arguments_count<arguments_count> (stack.Size (), "script::invoker_impl::operator ()");      
+    Base::check_arguments_count<arguments_count> (stack.Size ());
 
       //вызов шлюза
 
-    xtl::apply<void, arguments_count> (fn, stack, stack_argument_selector<FnTraits> ());
+    xtl::apply<void, arguments_count> (fn, stack, Base::stack_argument_selector<FnTraits> ());
 
     return 0; //results_count = 0
   }
@@ -358,7 +365,7 @@ Ret invoke_dispatch
 template <class Signature, class Fn>
 inline Invoker make_invoker (Fn fn)
 {
-  typedef detail::invoker_impl<xtl::functional_traits<Signature>, Fn> invoker_type;
+  typedef detail::invoker_impl<detail::invoker_base, xtl::functional_traits<Signature>, Fn> invoker_type;
 
   return Invoker (invoker_type (fn));
 }
@@ -367,6 +374,24 @@ template <class Fn>
 inline Invoker make_invoker (Fn fn)
 {
   return make_invoker<Fn, Fn> (fn);
+}
+
+/*
+    Создание перегрузки шлюза для произвольного функтора с известной сигнатурой
+*/
+
+template <class Signature, class Fn>
+inline Invoker make_overload (Fn fn)
+{
+  typedef detail::invoker_impl<detail::overload_base, xtl::functional_traits<Signature>, Fn> invoker_type;
+
+  return Invoker (invoker_type (fn));
+}
+
+template <class Fn>
+inline Invoker make_overload (Fn fn)
+{
+  return make_overload<Fn, Fn> (fn);
 }
 
 /*

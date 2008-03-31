@@ -49,11 +49,36 @@ void check_item (lua_State* state, size_t index, int expected_type, const char* 
 
   int item_type = lua_type (state, index);
   
-    //если фактический тип элемента не совпал с ожидаемым - генерация исключения
-
+    //проверка совместимости типов
+    
+  switch (item_type)
+  {
+    case LUA_TNIL:
+      switch (expected_type)
+      {
+        case LUA_TNUMBER:
+        case LUA_TNIL:
+        case LUA_TLIGHTUSERDATA:
+          return;
+      }
+      break;
+    case LUA_TBOOLEAN:
+      switch (expected_type)
+      {
+        case LUA_TNUMBER:
+        case LUA_TNIL:
+          return;
+      }
+      break;
+    default:
+      break;
+  }
+  
   if (item_type != expected_type)
+  {
     Raise<RuntimeException> (function_name, "Bad item #%u type (%s expected, got %s)", index, lua_typename (state, expected_type),
                              lua_typename (state, item_type));
+  }  
 }
 
 }

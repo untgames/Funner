@@ -27,9 +27,9 @@ int main ()
   
   try
   {
-    Invoker f1 = make_invoker (make_invoker (xtl::implicit_cast<char* (*)(float, const char*, int)> (&f)),
-                               make_invoker (xtl::implicit_cast<char* (*)(float, const char*)> (&f)),
-                               make_invoker (xtl::implicit_cast<char* (*)(float, int)> (&f)));
+    Invoker f1 = make_invoker (make_overload (xtl::implicit_cast<char* (*)(float, const char*, int)> (&f)),
+                               make_overload (xtl::implicit_cast<char* (*)(float, const char*)> (&f)),
+                               make_overload (xtl::implicit_cast<char* (*)(float, int)> (&f)));
 
     MyStack stack;
 
