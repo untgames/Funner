@@ -1,22 +1,57 @@
+function print_childs (parent_node)
+  local child_node = parent_node:FirstChild ()
+  while (child_node) do
+    print ("Child name - " .. child_node.Name) 
+    child_node = child_node:NextChild ()
+  end
+end
+
 function test_node_bind ()
   print ("Node bind test")
 
-  node1 = Scene.Node.Create ()
-  node2 = Scene.Node.Create ()
-  node3 = Scene.Node.Create ()
+  local node1 = Scene.Node.Create ()
+  local node2 = Scene.Node.Create ()
+  local node3 = Scene.Node.Create ()
 
-  node4 = node2:Parent ()
+  node1.Name = "node1"
+  node2.Name = "node2"
+  node3.Name = "node3"
 
+  local node4 = node2:Parent ()
+  
   node1:BindToParent (node3, Scene_NodeBindMode.AddRef, Scene_NodeTransformSpace.Parent)
   node2:BindToParent (node3)
+
+  node4 = node3:FindChild ("node2")
+
+  print ("node3 child name = " .. node4.Name)
+
+  print_childs (node3)
+    
   node1:Unbind (Scene_NodeTransformSpace.Parent)
+
+  print ("Unbind node1 test")
+  print_childs (node3)
+    
   node3:UnbindAllChildren ()
+
+  print ("Unbind all test")
+  print_childs (node3)
+    
+  node1:BindToParent (node3)
+  node2:BindToParent (node3)
+
+  print ("Unbind node2 by name test")
+
+  node3:UnbindChild ("node2")
+
+  print_childs (node3)
 end
 
 function test_node ()
   print ("Node test")
 
-  node1 = Scene.Node.Create ()
+  local node1 = Scene.Node.Create ()
 
   print ("Name = " .. node1.Name)
   print ("Position = " .. tostring (node1.Position))
@@ -55,7 +90,10 @@ function test_node ()
   print ("Position = " .. tostring (node1.Position))
 
   node1:ResetPosition ()
-  print ("Position = " .. tostring (node1.Position))
+  print ("Reset position = " .. tostring (node1.Position))
+
+  node1:Translate (4, 5, 6)
+  print ("Translate position = " .. tostring (node1.Position))
 
   node1:SetOrientation (41, 15.4, 48, 34)
   print ("Orientation = " .. tostring (node1.Orientation))
@@ -64,13 +102,16 @@ function test_node ()
   print ("Orientation = " .. tostring (node1.Orientation))
 
   node1:ResetOrientation ()
-  print ("Orientation = " .. tostring (node1.Orientation))
+  print ("Reset orientation = " .. tostring (node1.Orientation))
+
+  node1:Rotate (15, 30, 45)
+  print ("Roatate orientation = " .. tostring (node1.Orientation))
 
   node1:SetScale (15, 16.4, 17)
   print ("Scale = " .. tostring (node1.Scale))
 
   node1:Rescale (vec3 (10, 1, 1))
-  print ("Scale = " .. tostring (node1.Scale))
+  print ("Rescale = " .. tostring (node1.Scale))
 
   print ("ObjectTM = " .. tostring (node1:ObjectTM (node1)))
 
@@ -80,10 +121,54 @@ function test_node ()
   test_node_bind ()
 end
 
+function test_entity ()
+  print ("Entity test")
+
+  local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
+  local aabox1 = BV.AxisAlignedBox.Create ()
+
+  print ("IsInfiniteBounds = " .. tostring (sound_emitter1:IsInfiniteBounds ()))
+  print ("Color = " .. tostring (sound_emitter1.Color))
+
+  sound_emitter1.Color = vec3 (1, 0, 0)
+
+  print ("Color = " .. tostring (sound_emitter1.Color))
+
+  aabox1 = sound_emitter1:BoundBox ()
+
+  print ("local bb minimum = " .. tostring (aabox1.minimum))
+  print ("local bb maximum = " .. tostring (aabox1.maximum))
+
+  aabox1 = sound_emitter1:WorldBoundBox ()
+
+  print ("world bb minimum = " .. tostring (aabox1.minimum))
+  print ("world bb maximum = " .. tostring (aabox1.maximum))
+
+  aabox1 = sound_emitter1:ChildrenBoundBox ()
+
+  print ("children bb minimum = " .. tostring (aabox1.minimum))
+  print ("children bb maximum = " .. tostring (aabox1.maximum))
+
+  aabox1 = sound_emitter1:FullBoundBox ()
+
+  print ("full bb minimum = " .. tostring (aabox1.minimum))
+  print ("full bb maximum = " .. tostring (aabox1.maximum))
+
+  aabox1 = sound_emitter1:WorldChildrenBoundBox ()
+
+  print ("world children bb minimum = " .. tostring (aabox1.minimum))
+  print ("world children bb maximum = " .. tostring (aabox1.maximum))
+
+  aabox1 = sound_emitter1:WorldFullBoundBox ()
+
+  print ("world full bb minimum = " .. tostring (aabox1.minimum))
+  print ("world full bb maximum = " .. tostring (aabox1.maximum))
+end
+
 function test_perspective_camera ()
   print ("Perspective camera test")
 
-  camera1 = Scene.PerspectiveCamera.Create ()
+  local camera1 = Scene.PerspectiveCamera.Create ()
 
   print ("FovX  = " .. camera1.FovX)
   print ("FovY  = " .. camera1.FovY)
@@ -102,7 +187,7 @@ end
 function test_ortho_camera ()
   print ("Ortho camera test")
 
-  camera1 = Scene.OrthoCamera.Create ()
+  local camera1 = Scene.OrthoCamera.Create ()
 
   print ("Left   = " .. camera1.Left)
   print ("Right  = " .. camera1.Right)
@@ -127,7 +212,7 @@ end
 function test_light ()
   print ("Common light test (point light)")
 
-  light1 = Scene.PointLight.Create ()
+  local light1 = Scene.PointLight.Create ()
 
   print ("LightColor = " .. tostring (light1.LightColor))
   print ("Attenuation = " .. tostring (light1.Attenuation))
@@ -145,7 +230,7 @@ end
 function test_direct_light ()
   print ("Direct light test")
 
-  light1 = Scene.DirectLight.Create ()
+  local light1 = Scene.DirectLight.Create ()
 
   print ("Radius = " .. light1.Radius)
 
@@ -157,7 +242,7 @@ end
 function test_spot_light ()
   print ("Spot light test")
 
-  light1 = Scene.SpotLight.Create ()
+  local light1 = Scene.SpotLight.Create ()
 
   print ("Name = " .. light1.Name)
   print ("Angle = " .. light1.Angle)
@@ -175,13 +260,13 @@ end
 function test_box_helper ()
   print ("BoxHelper test")
 
-  helper1 = Scene.BoxHelper.Create ()
+  local helper1 = Scene.BoxHelper.Create ()
 end
 
 function test_listener ()
   print ("Listener test")
 
-  listener1 = Scene.Listener.Create ()
+  local listener1 = Scene.Listener.Create ()
 
   print ("Gain = " .. listener1.Gain)
 
@@ -193,26 +278,32 @@ end
 function test_sound_emitter ()
   print ("SoundEmitter test")
 
-  sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
+  local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
 
   sound_emitter1:Play ()
   sound_emitter1:Stop ()
+
+  print ("SoundEmitter sound declaration name = " .. sound_emitter1.SoundDeclarationName)
 end
 
 function test_visual_model ()
   print ("VisualModel test")
 
-  visual_model1 = Scene.VisualModel.Create ()
+  local visual_model1 = Scene.VisualModel.Create ()
 
   print ("Mesh name = " .. visual_model1.MeshName)
 
   visual_model1.MeshName = "mesh.xmesh"
 
   print ("Mesh name = " .. visual_model1.MeshName)
+
+  local aabox1 = BV.AxisAlignedBox.Create ()
 end
 
 function test ()
   test_node ()
+
+--[[  test_entity ()
   
   test_perspective_camera ()
   test_ortho_camera ()
@@ -227,5 +318,5 @@ function test ()
 
   test_sound_emitter ()
 
-  test_visual_model ()
+  test_visual_model ()]]
 end

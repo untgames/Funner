@@ -13,6 +13,7 @@ int main ()
     
     env->Library ("global").Register ("typename", make_invoker (&get_typename));
   
+    bind_bv_library   (*env);
     bind_math_library (*env);
     bind_scene_graph_library (*env);
     load_script       (*script, SCRIPT_FILE_NAME);

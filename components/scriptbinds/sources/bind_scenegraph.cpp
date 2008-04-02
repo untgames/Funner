@@ -22,6 +22,7 @@ namespace
 const char* SCENE_STATIC_NODE_BIND_MODE_LIBRARY       = "static.Scene_NodeBindMode";
 const char* SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY = "static.Scene_NodeTransformSpace";
 const char* SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY   = "static.Scene_NodeTraverseMode";
+const char* SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY     = "static.Scene_NodeSearchMode";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
 const char* SCENE_ENTITY_LIBRARY                      = "Scene.Entity";
 const char* SCENE_PERSPECTIVE_CAMERA_LIBRARY          = "Scene.PerspectiveCamera";
@@ -53,14 +54,20 @@ void bind_static_node_library (Environment& environment)
   InvokerRegistry& node_bind_mode_lib       = environment.CreateLibrary (SCENE_STATIC_NODE_BIND_MODE_LIBRARY);
   InvokerRegistry& node_transform_space_lib = environment.CreateLibrary (SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY);
   InvokerRegistry& node_traverse_mode_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY);
+  InvokerRegistry& node_search_mode_lib     = environment.CreateLibrary (SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY);
 
-  node_bind_mode_lib.Register       ("get_AddRef",      make_const (NodeBindMode_AddRef));
-  node_bind_mode_lib.Register       ("get_Capture",     make_const (NodeBindMode_Capture));
-  node_transform_space_lib.Register ("get_Local",       make_const (NodeTransformSpace_Local));
-  node_transform_space_lib.Register ("get_Parent",      make_const (NodeTransformSpace_Parent));
-  node_transform_space_lib.Register ("get_World",       make_const (NodeTransformSpace_World));
-  node_traverse_mode_lib.Register   ("get_TopToBottom", make_const (NodeTraverseMode_TopToBottom));
-  node_traverse_mode_lib.Register   ("get_BottomToTop", make_const (NodeTraverseMode_BottomToTop));
+  node_bind_mode_lib.Register       ("get_AddRef",         make_const (NodeBindMode_AddRef));
+  node_bind_mode_lib.Register       ("get_Capture",        make_const (NodeBindMode_Capture));
+  node_bind_mode_lib.Register       ("get_Default",        make_const (NodeBindMode_Default));
+  node_transform_space_lib.Register ("get_Local",          make_const (NodeTransformSpace_Local));
+  node_transform_space_lib.Register ("get_Parent",         make_const (NodeTransformSpace_Parent));
+  node_transform_space_lib.Register ("get_World",          make_const (NodeTransformSpace_World));
+  node_traverse_mode_lib.Register   ("get_TopToBottom",    make_const (NodeTraverseMode_TopToBottom));
+  node_traverse_mode_lib.Register   ("get_BottomToTop",    make_const (NodeTraverseMode_BottomToTop));
+  node_traverse_mode_lib.Register   ("get_Default",        make_const (NodeTraverseMode_Default));
+  node_search_mode_lib.Register     ("get_OnNextSublevel", make_const (NodeSearchMode_OnNextSublevel));
+  node_search_mode_lib.Register     ("get_OnAllSublevels", make_const (NodeSearchMode_OnAllSublevels));
+  node_search_mode_lib.Register     ("get_Default",        make_const (NodeSearchMode_Default));
 }
   
 InvokerRegistry& bind_node_library (Environment& environment)
@@ -110,17 +117,34 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("PrevChild",  make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::PrevChild)));
   lib.Register ("NextChild",  make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::NextChild)));
 
-  lib.Register ("BindToParent", make_invoker (make_invoker (&Node::BindToParent),
-    make_invoker<void (Node&, Node&, NodeBindMode)> (xtl::bind (&Node::BindToParent, _1, _2, _3, NodeTransformSpace_Local)),
-    make_invoker<void (Node&, Node&)> (xtl::bind (&Node::BindToParent, _1, _2, NodeBindMode_Default, NodeTransformSpace_Local))));
+  lib.Register ("BindToParent", make_invoker (make_overload (&Node::BindToParent),
+    make_overload<void (Node&, Node&, NodeBindMode)> (xtl::bind (&Node::BindToParent, _1, _2, _3, NodeTransformSpace_Local)),
+    make_overload<void (Node&, Node&)> (xtl::bind (&Node::BindToParent, _1, _2, NodeBindMode_Default, NodeTransformSpace_Local))));
 
-  lib.Register ("Unbind",            make_invoker (&Node::Unbind));
-//  lib.Register ("UnbindChild",       make_invoker (&Node::UnbindChild)));
+  lib.Register ("Unbind",      make_invoker (&Node::Unbind));
+  lib.Register ("UnbindChild", make_invoker (make_overload (implicit_cast<void (Node::*) (const char*, NodeTransformSpace)> (&Node::UnbindChild)), 
+                                             make_overload (implicit_cast<void (Node::*) (const char*, NodeSearchMode, NodeTransformSpace)> (&Node::UnbindChild)),
+                                             make_overload<void (Node&, const char*)> (xtl::bind (implicit_cast<void (Node::*) (const char*, NodeTransformSpace)> (&Node::UnbindChild), _1, _2, NodeTransformSpace_Local)),
+                                             make_overload<void (Node&, const char*, NodeSearchMode)> (xtl::bind (implicit_cast<void (Node::*) (const char*, NodeSearchMode, NodeTransformSpace)> (&Node::UnbindChild), _1, _2, _3, NodeTransformSpace_Local))));
   lib.Register ("UnbindAllChildren", make_invoker (&Node::UnbindAllChildren));
   
+  lib.Register ("FindChild", make_invoker (make_overload<Node::Pointer (Node&, const char*)> (xtl::bind (implicit_cast<Node::Pointer (Node::*) (const char*, NodeSearchMode)> (&Node::FindChild), _1, _2, NodeSearchMode_Default)),
+                                           make_overload (implicit_cast<Node::Pointer (Node::*) (const char*, NodeSearchMode)> (&Node::FindChild))));
+
   lib.Register ("ObjectTM", make_invoker (&Node::ObjectTM));
 
-  lib.Register ("Rescale", make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::Scale)));
+  lib.Register ("Translate", make_invoker (make_overload (implicit_cast<void (Node::*) (const vec3f&, NodeTransformSpace)> (&Node::Translate)),
+                 make_overload (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Translate)),
+                 make_overload<void (Node&, const vec3f&)> (xtl::bind (implicit_cast<void (Node::*) (const vec3f&, NodeTransformSpace)> (&Node::Translate), _1, _2, NodeTransformSpace_Parent)),
+                 make_overload<void (Node&, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Translate), _1, _2, _3, _4, NodeTransformSpace_Parent))));
+  lib.Register ("Rotate", make_invoker (make_overload (implicit_cast<void (Node::*) (const quatf&, NodeTransformSpace)> (&Node::Rotate)),
+                 make_overload (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Rotate)),
+                 make_overload (implicit_cast<void (Node::*) (float, float, float, float, NodeTransformSpace)> (&Node::Rotate)),
+                 make_overload<void (Node&, const quatf&)> (xtl::bind (implicit_cast<void (Node::*) (const quatf&, NodeTransformSpace)> (&Node::Rotate), _1, _2, NodeTransformSpace_Parent)),
+                 make_overload<void (Node&, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, NodeTransformSpace_Parent)),
+                 make_overload<void (Node&, float, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, _5, NodeTransformSpace_Parent))));
+  lib.Register ("Rescale", make_invoker (make_overload (implicit_cast<void (Node::*) (const vec3f&)> (&Node::Scale)),
+                                         make_overload (implicit_cast<void (Node::*) (float, float, float)> (&Node::Scale))));
 
     //регистрация типов данных
 
@@ -145,6 +169,16 @@ InvokerRegistry& bind_entity_library (Environment& environment, InvokerRegistry&
 
   lib.Register ("set_Color",  make_invoker (implicit_cast<void (Entity::*) (const vec3f&)> (&Entity::SetColor)));
   lib.Register ("get_Color",  make_invoker (&Entity::Color));
+
+  lib.Register ("BoundBox", make_invoker (&Entity::BoundBox));
+  lib.Register ("WorldBoundBox", make_invoker (&Entity::WorldBoundBox));
+  
+  lib.Register ("IsInfiniteBounds", make_invoker (&Entity::IsInfiniteBounds));
+
+  lib.Register ("ChildrenBoundBox",      make_invoker (&Entity::ChildrenBoundBox));
+  lib.Register ("FullBoundBox",          make_invoker (&Entity::FullBoundBox));
+  lib.Register ("WorldChildrenBoundBox", make_invoker (&Entity::WorldChildrenBoundBox));
+  lib.Register ("WorldFullBoundBox",     make_invoker (&Entity::WorldFullBoundBox));
 
     //регистрация типов данных
 
@@ -437,6 +471,8 @@ void bind_sound_emitter_library (Environment& environment, InvokerRegistry& enti
 
     //регистрация операций
 
+  lib.Register ("get_SoundDeclarationName", make_invoker (&SoundEmitter::SoundDeclarationName));
+
   lib.Register ("Play", make_invoker (&SoundEmitter::Play));
   lib.Register ("Stop", make_invoker (&SoundEmitter::Stop));
 
@@ -474,8 +510,6 @@ void bind_visual_model_library (Environment& environment, InvokerRegistry& entit
 
   lib.Register ("set_MeshName", make_invoker (&VisualModel::SetMeshName));
   lib.Register ("get_MeshName", make_invoker (&VisualModel::MeshName));
-
-    //регистрация типов данных
 
   environment.RegisterType<VisualModel> (SCENE_VISUAL_MODEL_LIBRARY);
 }

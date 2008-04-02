@@ -1,0 +1,47 @@
+Results of sg_test:
+Test library:
+Node test
+Name = 
+Position = 0 0 0
+WorldPosition = 0 0 0
+Orientation = 0 0 0 1
+WorldOrientation = 0 0 0 1
+Scale = 1 1 1
+WorldScale = 1 1 1
+OrientationInherit = 1
+ScaleInherit = 1
+LocalTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+WorldTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+Name = node1
+Position = 10 10 10
+WorldPosition = 10 10 10
+Orientation = 34 10 15 0
+WorldOrientation = 34 10 15 0
+Scale = 100 0 0
+WorldScale = 100 0 0
+OrientationInherit = 0
+ScaleInherit = 0
+LocalTM = 56.1107330322 0 0 10 45.9149246216 0 0 10 68.8723831177 0 0 10 0 0 0 1
+WorldTM = 56.1107330322 0 0 10 45.9149246216 0 0 10 68.8723831177 0 0 10 0 0 0 1
+ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+Position = 1.39999997616 5 6.77899980545
+Reset position = 0 0 0
+Translate position = 4 5 6
+Orientation = 0.0886976122856 0.276460081339 0.195825889707 0.936672210693
+Orientation = 0.400609970093 0.107610836625 0.207484081388 0.885935664177
+Reset orientation = 0 0 0 1
+Roatate orientation = 0.0182830393314 0.285320132971 0.335270375013 0.89769256115
+Scale = 15 16.3999996185 17
+Rescale = 150 16.3999996185 17
+ObjectTM = 1 -1.19388721131e-009 -3.61509489011e-010 1.86264514923e-009 5.6940820059e-008 1 -1.12445022182e-008 -2.98023223877e-008 3.96146248249e-007 -2.25949925436e-010 1.00000011921 1.49011611938e-008 0 0 0 1
+Scale = 1 1 1
+Node bind test
+node3 child name = node2
+Child name - node1
+Child name - node2
+Unbind node1 test
+Child name - node2
+Unbind all test
+Unbind node2 by name test
+Child name - node1
