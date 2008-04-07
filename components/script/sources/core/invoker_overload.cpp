@@ -44,7 +44,7 @@ class OverloadedInvoker
         {
           return invoker (stack); //если шлюз вызван успешно, то остальные перегрузки проверять не нужно
         }
-        catch (bad_argument_cast&)
+        catch (script::ArgumentException&)
         {
           //поглощение исключений приведения типов аргументов
         }

@@ -117,34 +117,34 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("PrevChild",  make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::PrevChild)));
   lib.Register ("NextChild",  make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::NextChild)));
 
-  lib.Register ("BindToParent", make_invoker (make_overload (&Node::BindToParent),
-    make_overload<void (Node&, Node&, NodeBindMode)> (xtl::bind (&Node::BindToParent, _1, _2, _3, NodeTransformSpace_Local)),
-    make_overload<void (Node&, Node&)> (xtl::bind (&Node::BindToParent, _1, _2, NodeBindMode_Default, NodeTransformSpace_Local))));
+  lib.Register ("BindToParent", make_invoker (make_invoker (&Node::BindToParent),
+    make_invoker<void (Node&, Node&, NodeBindMode)> (xtl::bind (&Node::BindToParent, _1, _2, _3, NodeTransformSpace_Local)),
+    make_invoker<void (Node&, Node&)> (xtl::bind (&Node::BindToParent, _1, _2, NodeBindMode_Default, NodeTransformSpace_Local))));
 
   lib.Register ("Unbind",      make_invoker (&Node::Unbind));
-  lib.Register ("UnbindChild", make_invoker (make_overload (implicit_cast<void (Node::*) (const char*, NodeTransformSpace)> (&Node::UnbindChild)), 
-                                             make_overload (implicit_cast<void (Node::*) (const char*, NodeSearchMode, NodeTransformSpace)> (&Node::UnbindChild)),
-                                             make_overload<void (Node&, const char*)> (xtl::bind (implicit_cast<void (Node::*) (const char*, NodeTransformSpace)> (&Node::UnbindChild), _1, _2, NodeTransformSpace_Local)),
-                                             make_overload<void (Node&, const char*, NodeSearchMode)> (xtl::bind (implicit_cast<void (Node::*) (const char*, NodeSearchMode, NodeTransformSpace)> (&Node::UnbindChild), _1, _2, _3, NodeTransformSpace_Local))));
+  lib.Register ("UnbindChild", make_invoker (make_invoker (implicit_cast<void (Node::*) (const char*, NodeTransformSpace)> (&Node::UnbindChild)), 
+                                             make_invoker (implicit_cast<void (Node::*) (const char*, NodeSearchMode, NodeTransformSpace)> (&Node::UnbindChild)),
+                                             make_invoker<void (Node&, const char*)> (xtl::bind (implicit_cast<void (Node::*) (const char*, NodeTransformSpace)> (&Node::UnbindChild), _1, _2, NodeTransformSpace_Local)),
+                                             make_invoker<void (Node&, const char*, NodeSearchMode)> (xtl::bind (implicit_cast<void (Node::*) (const char*, NodeSearchMode, NodeTransformSpace)> (&Node::UnbindChild), _1, _2, _3, NodeTransformSpace_Local))));
   lib.Register ("UnbindAllChildren", make_invoker (&Node::UnbindAllChildren));
   
-  lib.Register ("FindChild", make_invoker (make_overload<Node::Pointer (Node&, const char*)> (xtl::bind (implicit_cast<Node::Pointer (Node::*) (const char*, NodeSearchMode)> (&Node::FindChild), _1, _2, NodeSearchMode_Default)),
-                                           make_overload (implicit_cast<Node::Pointer (Node::*) (const char*, NodeSearchMode)> (&Node::FindChild))));
+  lib.Register ("FindChild", make_invoker (make_invoker<Node::Pointer (Node&, const char*)> (xtl::bind (implicit_cast<Node::Pointer (Node::*) (const char*, NodeSearchMode)> (&Node::FindChild), _1, _2, NodeSearchMode_Default)),
+                                           make_invoker (implicit_cast<Node::Pointer (Node::*) (const char*, NodeSearchMode)> (&Node::FindChild))));
 
   lib.Register ("ObjectTM", make_invoker (&Node::ObjectTM));
 
-  lib.Register ("Translate", make_invoker (make_overload (implicit_cast<void (Node::*) (const vec3f&, NodeTransformSpace)> (&Node::Translate)),
-                 make_overload (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Translate)),
-                 make_overload<void (Node&, const vec3f&)> (xtl::bind (implicit_cast<void (Node::*) (const vec3f&, NodeTransformSpace)> (&Node::Translate), _1, _2, NodeTransformSpace_Parent)),
-                 make_overload<void (Node&, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Translate), _1, _2, _3, _4, NodeTransformSpace_Parent))));
-  lib.Register ("Rotate", make_invoker (make_overload (implicit_cast<void (Node::*) (const quatf&, NodeTransformSpace)> (&Node::Rotate)),
-                 make_overload (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Rotate)),
-                 make_overload (implicit_cast<void (Node::*) (float, float, float, float, NodeTransformSpace)> (&Node::Rotate)),
-                 make_overload<void (Node&, const quatf&)> (xtl::bind (implicit_cast<void (Node::*) (const quatf&, NodeTransformSpace)> (&Node::Rotate), _1, _2, NodeTransformSpace_Parent)),
-                 make_overload<void (Node&, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, NodeTransformSpace_Parent)),
-                 make_overload<void (Node&, float, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, _5, NodeTransformSpace_Parent))));
-  lib.Register ("Rescale", make_invoker (make_overload (implicit_cast<void (Node::*) (const vec3f&)> (&Node::Scale)),
-                                         make_overload (implicit_cast<void (Node::*) (float, float, float)> (&Node::Scale))));
+  lib.Register ("Translate", make_invoker (make_invoker (implicit_cast<void (Node::*) (const vec3f&, NodeTransformSpace)> (&Node::Translate)),
+                 make_invoker (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Translate)),
+                 make_invoker<void (Node&, const vec3f&)> (xtl::bind (implicit_cast<void (Node::*) (const vec3f&, NodeTransformSpace)> (&Node::Translate), _1, _2, NodeTransformSpace_Parent)),
+                 make_invoker<void (Node&, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Translate), _1, _2, _3, _4, NodeTransformSpace_Parent))));
+  lib.Register ("Rotate", make_invoker (make_invoker (implicit_cast<void (Node::*) (const quatf&, NodeTransformSpace)> (&Node::Rotate)),
+                 make_invoker (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Rotate)),
+                 make_invoker (implicit_cast<void (Node::*) (float, float, float, float, NodeTransformSpace)> (&Node::Rotate)),
+                 make_invoker<void (Node&, const quatf&)> (xtl::bind (implicit_cast<void (Node::*) (const quatf&, NodeTransformSpace)> (&Node::Rotate), _1, _2, NodeTransformSpace_Parent)),
+                 make_invoker<void (Node&, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, NodeTransformSpace_Parent)),
+                 make_invoker<void (Node&, float, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, _5, NodeTransformSpace_Parent))));
+  lib.Register ("Rescale", make_invoker (make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::Scale)),
+                                         make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::Scale))));
 
     //регистрация типов данных
 

@@ -31,12 +31,6 @@ inline Invoker make_binary_invoker ()
   return make_invoker<Ret (Arg1, Arg2)> (Operation<Arg1, Arg2, Ret> ());
 }
 
-template <class Ret, class Arg1, class Arg2, template <class, class, class> class Operation>
-inline Invoker make_binary_overload ()
-{
-  return make_overload<Ret (Arg1, Arg2)> (Operation<Arg1, Arg2, Ret> ());
-}
-
 template <class Ret, class Arg, template <class, class> class Operation>
 inline Invoker make_unary_invoker ()
 {
@@ -416,13 +410,13 @@ void bind_vec_library (InvokerRegistry& vec_lib)
 
     //регистрация перегруженных операций (умножение/деление на скаляр и вектор)
 
-  vec_lib.Register ("__mul", make_invoker (make_binary_overload<vec_type, vec_type, big_matrix_type, multiplies> (),
-                                           make_binary_overload<vec_type, vec_type, matrix_type, multiplies> (),
-                                           make_binary_overload<vec_type, vec_type, vec_type, multiplies> (),
-                                           make_binary_overload<vec_type, vec_type, T, multiplies> (),
-                                           make_binary_overload<vec_type, T, vec_type, multiplies> ()));
-  vec_lib.Register ("__div", make_invoker (make_binary_overload<vec_type, vec_type, vec_type, divides> (),
-                                           make_binary_overload<vec_type, vec_type, T, divides> ()));
+  vec_lib.Register ("__mul", make_invoker (make_binary_invoker<vec_type, vec_type, big_matrix_type, multiplies> (),
+                                           make_binary_invoker<vec_type, vec_type, matrix_type, multiplies> (),
+                                           make_binary_invoker<vec_type, vec_type, vec_type, multiplies> (),
+                                           make_binary_invoker<vec_type, vec_type, T, multiplies> (),
+                                           make_binary_invoker<vec_type, T, vec_type, multiplies> ()));
+  vec_lib.Register ("__div", make_invoker (make_binary_invoker<vec_type, vec_type, vec_type, divides> (),
+                                           make_binary_invoker<vec_type, vec_type, T, divides> ()));
 
     //регистрация функций
 
@@ -464,11 +458,11 @@ void bind_matrix_library (InvokerRegistry& mat_lib)
 
     //регистрация перегруженных операций (умножение на скаляр, вектор и матрицу)
 
-  mat_lib.Register ("__mul", make_invoker (make_binary_overload<matrix_type, matrix_type, matrix_type, multiplies> (),
-                                           make_binary_overload<vec_type, matrix_type, vec_type, multiplies> (),
-                                           make_binary_overload<small_vec_type, matrix_type, small_vec_type, multiplies> (),
-                                           make_binary_overload<matrix_type, matrix_type, T, multiplies> (),
-                                           make_binary_overload<matrix_type, T, matrix_type, multiplies> ()));
+  mat_lib.Register ("__mul", make_invoker (make_binary_invoker<matrix_type, matrix_type, matrix_type, multiplies> (),
+                                           make_binary_invoker<vec_type, matrix_type, vec_type, multiplies> (),
+                                           make_binary_invoker<small_vec_type, matrix_type, small_vec_type, multiplies> (),
+                                           make_binary_invoker<matrix_type, matrix_type, T, multiplies> (),
+                                           make_binary_invoker<matrix_type, T, matrix_type, multiplies> ()));
 
     //регистрация функций над матрицами  
     
@@ -510,9 +504,9 @@ void bind_quat_library (InvokerRegistry& quat_lib)
   quat_lib.Register ("__unm", make_unary_invoker<quat_type, quat_type, negate> ());
   quat_lib.Register ("__add", make_binary_invoker<quat_type, quat_type, quat_type, plus> ());
   quat_lib.Register ("__sub", make_binary_invoker<quat_type, quat_type, quat_type, minus> ());
-  quat_lib.Register ("__mul", make_invoker (make_binary_overload<quat_type, quat_type, quat_type, multiplies> (),
-                                            make_binary_overload<quat_type, quat_type, T, multiplies> (),
-                                            make_binary_overload<quat_type, T, quat_type, multiplies> ()));
+  quat_lib.Register ("__mul", make_invoker (make_binary_invoker<quat_type, quat_type, quat_type, multiplies> (),
+                                            make_binary_invoker<quat_type, quat_type, T, multiplies> (),
+                                            make_binary_invoker<quat_type, T, quat_type, multiplies> ()));
 
   
     //регистрация функций
@@ -559,9 +553,9 @@ void bind_math_library (Environment& environment)
 
     //регистрация функций создания векторов и матриц
 
-  math_lib.Register   ("vec2", make_invoker (make_overload (&create_vec2), make_overload (&create_scalar2)));
-  math_lib.Register   ("vec3", make_invoker (make_overload (&create_vec3), make_overload (&create_scalar3)));
-  math_lib.Register   ("vec4", make_invoker (make_overload (&create_vec4), make_overload (&create_scalar4)));
+  math_lib.Register   ("vec2", make_invoker (make_invoker (&create_vec2), make_invoker (&create_scalar2)));
+  math_lib.Register   ("vec3", make_invoker (make_invoker (&create_vec3), make_invoker (&create_scalar3)));
+  math_lib.Register   ("vec4", make_invoker (make_invoker (&create_vec4), make_invoker (&create_scalar4)));
   global_lib.Register ("vec2", math_lib, "vec2");
   global_lib.Register ("vec3", math_lib, "vec3");
   global_lib.Register ("vec4", math_lib, "vec4");
@@ -569,7 +563,7 @@ void bind_math_library (Environment& environment)
   math_lib.Register   ("mat4", make_invoker (&create_mat4));  
   global_lib.Register ("mat4", math_lib, "mat4");
 
-  quat_lib.Register   ("quat", make_invoker (make_overload (&create_quat<float>), make_overload (&create_quat1<float>)));
+  quat_lib.Register   ("quat", make_invoker (make_invoker (&create_quat<float>), make_invoker (&create_quat1<float>)));
   global_lib.Register ("quat", quat_lib, "quat");
 
     //регистрация типов данных

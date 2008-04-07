@@ -26,10 +26,12 @@ class Environment;
 struct InterpreterExceptionTag;           //базовое скриптовое исключение
 struct RuntimeExceptionTag;               //исключение, возникающее при выполнении скрипта
 struct StackExceptionTag;                 //исключение, возникающее при переполнении/"недополнении" стека
+struct ArgumentExceptionTag;              //исключение, возникающее при получении аргумента
 struct UndefinedFunctionCallExceptionTag; //попытка вызова незарегистрированной функции
 
 typedef common::DerivedException<common::Exception, InterpreterExceptionTag>              InterpreterException;
 typedef common::DerivedException<InterpreterException, StackExceptionTag>                 StackException;
+typedef common::DerivedException<StackException, ArgumentExceptionTag>                    ArgumentException;
 typedef common::DerivedException<InterpreterException, UndefinedFunctionCallExceptionTag> UndefinedFunctionCallException;
 typedef common::DerivedException<InterpreterException, RuntimeExceptionTag>               RuntimeException;
 

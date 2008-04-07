@@ -35,7 +35,7 @@ void check_item_index (lua_State* state, size_t index, const char* function_name
   size_t stack_size = lua_gettop (state) + 1; 
 
   if (index >= stack_size)
-    Raise<StackException> (function_name, "Attempt to get item #%u from stack with %u items", index, stack_size);
+    Raise<script::ArgumentException> (function_name, "Attempt to get item #%u from stack with %u items", index, stack_size);
 }
 
 //проверка корректности типа элемента, извлекаемого из стека
@@ -76,7 +76,7 @@ void check_item (lua_State* state, size_t index, int expected_type, const char* 
   
   if (item_type != expected_type)
   {
-    Raise<RuntimeException> (function_name, "Bad item #%u type (%s expected, got %s)", index, lua_typename (state, expected_type),
+    Raise<script::ArgumentException> (function_name, "Bad item #%u type (%s expected, got %s)", index, lua_typename (state, expected_type),
                              lua_typename (state, item_type));
   }  
 }
@@ -139,7 +139,7 @@ xtl::any& Stack::GetVariant (size_t index)
 
     //генерация исключения
 
-  Raise<RuntimeException> ("script::Stack::GetVariant", "Item %u has wrong type (non xtl::any)", index);
+  Raise<script::ArgumentException> ("script::Stack::GetVariant", "Item %u has wrong type (non xtl::any)", index);
   
   return *variant;
 }
