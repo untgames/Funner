@@ -14,7 +14,7 @@ const char* LOG_FILE_NAME = "water-slides.log"; //имя файла протокола
 
 const size_t   WINDOW_WIDTH  = 400;                         //начальная ширина окна
 const size_t   WINDOW_HEIGHT = 300;                         //начальная высота окна
-const wchar_t* WINDOW_TITLE  = L"Water slides demo ($Id$)"; //заголовок окна
+const wchar_t* WINDOW_TITLE  = L"Water slides demo ($Rev$)"; //заголовок окна
 
 const size_t FB_COLOR_BITS    = 24; //глубина буфера цвета
 const size_t FB_ALPHA_BITS    = 8;  //глубина альфа-буфера
