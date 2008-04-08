@@ -63,6 +63,29 @@ class IGameView
 
 typedef xtl::shared_ptr<IGameView> GameView;
 
+//класс конфигурационного файла
+class Configuration
+{
+  public:
+    Configuration (const char* file_name);
+    ~Configuration ();
+
+    int         GetInteger (const char* property_name, int default_value = 0) const;
+    const char* GetString  (const char* property_name, const char* default_value = "") const;
+
+    size_t      LogMessagesCount () const;
+    const char* LogMessage       (size_t index) const;
+
+  private:
+    Configuration ();
+    Configuration (const Configuration&); //no impl
+    Configuration& operator = (const Configuration&); //no impl
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
+};
+
 //класс приложения
 class MyApplication
 {
@@ -82,6 +105,8 @@ class MyApplication
     void            SetView (const GameView&);
     const GameView& View    () const;
 
+    const ::Configuration& Configuration () const;
+
   private:
       //конструкторы / деструктор / присваивание
     MyApplication  ();
@@ -89,29 +114,6 @@ class MyApplication
 
     MyApplication  (const MyApplication&); // no impl
     MyApplication& operator = (const MyApplication&); //no impl
-
-  private:
-    struct Impl;
-    stl::auto_ptr<Impl> impl;
-};
-
-//класс конфигурационного файла
-class Configuration
-{
-  public:
-    Configuration (const char* file_name);
-    ~Configuration ();
-
-    int         GetInteger (const char* property_name, int default_value = 0);
-    const char* GetString  (const char* property_name, const char* default_value = "");
-
-    size_t      LogMessagesCount ();
-    const char* LogMessage       (size_t index);
-
-  private:
-    Configuration ();
-    Configuration (const Configuration&); //no impl
-    Configuration& operator = (const Configuration&); //no impl
 
   private:
     struct Impl;

@@ -55,22 +55,22 @@ Configuration::~Configuration ()
 {
 }
 
-int Configuration::GetInteger (const char* property_name, int default_value)
+int Configuration::GetInteger (const char* property_name, int default_value) const
 {
   return impl->GetInteger (property_name, default_value);
 }
 
-const char* Configuration::GetString (const char* property_name, const char* default_value)
+const char* Configuration::GetString (const char* property_name, const char* default_value) const
 {
   return impl->GetString (property_name, default_value);
 }
 
-size_t Configuration::LogMessagesCount ()
+size_t Configuration::LogMessagesCount () const
 {
   return impl->LogMessagesCount ();
 }
 
-const char* Configuration::LogMessage (size_t index)
+const char* Configuration::LogMessage (size_t index) const
 {
   return impl->LogMessage (index);
 }

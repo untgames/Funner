@@ -11,7 +11,7 @@ int main ()
     //§ ¯ãáª ¯à¨«®¦¥­¨ï
     
   syslib::Application::Run ();
-  
+
     //§ ¢¥àè¥­¨¥ ¯à¨«®¦¥­¨ï
 
   return syslib::Application::GetExitCode ();

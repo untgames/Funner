@@ -177,6 +177,11 @@ struct MyApplication::Impl
 
     const GameView& View () const { return current_view; }
 
+    const ::Configuration& Configuration () const
+    {
+      return configuration;
+    }
+
   private:
       //сброс буфера в файл-протолирования
     size_t LogWriteBuffer (const void* buffer, size_t size)
@@ -295,7 +300,7 @@ struct MyApplication::Impl
     }        
 
   private:
-    Configuration    configuration; //настрройки
+    ::Configuration  configuration; //настрройки
     OutputFile       log_file;   //файл протолирования
     OutputTextStream log_stream; //поток протоколирования работы приложения
     syslib::Window   window;     //главное окно приложения
@@ -378,3 +383,9 @@ const GameView& MyApplication::View () const
 {
   return impl->View ();
 }
+
+const ::Configuration& MyApplication::Configuration () const
+{
+  return impl->Configuration ();
+}
+
