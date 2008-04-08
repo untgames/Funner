@@ -68,7 +68,7 @@ endef
 #список дефайнов, флаги компиляции, pch файл)
 ###################################################################################################
 define tools.msvc.compile
-cl /nologo /c /EHsc /W3 /wd4996 /FC /Fo"$3\\" $(patsubst %,/I"%",$2) $5 $(patsubst %,/D%,$4) $1 $(if $6,/FI"$6" /Yc"$6" /Fp"$3\\")
+cl /nologo /c /EHsc /W3 /wd4996 $(if $(analyze),/analyze) /FC /Fo"$3\\" $(patsubst %,/I"%",$2) $5 $(patsubst %,/D%,$4) $1 $(if $6,/FI"$6" /Yc"$6" /Fp"$3\\")
 endef
 
 ###################################################################################################
@@ -235,7 +235,9 @@ define process_target.application
 
   $$(eval $$(call process_target_with_sources,$1))
   
-  $1.EXECUTION_DIR ?= $(DIST_BIN_DIR)
+  ifeq (,$$($1.EXECUTION_DIR))
+    $1.EXECUTION_DIR := $(DIST_BIN_DIR)
+  endif
 
   $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
