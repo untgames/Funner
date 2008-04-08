@@ -82,6 +82,11 @@ struct MyApplication::Impl
       window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, this));
       window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Impl::OnResize, this));
       window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, this));
+      
+      for (int i=syslib::WindowEvent_OnLeftButtonDown; i<=syslib::WindowEvent_OnMiddleButtonDoubleClick; i++)
+        window.RegisterEventHandler ((syslib::WindowEvent)i, xtl::bind (&Impl::OnMouse, this, _2, _3));
+        
+      window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Impl::OnMouse, this, _2, _3));        
 
         //регистрация обработчиков событий приложения
         
@@ -93,7 +98,9 @@ struct MyApplication::Impl
     {
       try
       {
-        LogMessage ("Close application");
+        LogMessage ("Close application");        
+        
+        SetView (GameView ());                
 
         LogMessage ("Destroy rendering device...");
         
@@ -148,6 +155,24 @@ struct MyApplication::Impl
 
       log_stream.Buffer ().Flush ();
     }    
+    
+      //работа с игровым отображением
+    void SetView (const GameView& view)
+    {
+      if (current_view)
+        current_view->FlushResources ();                        
+      
+      current_view = view;                  
+      
+      if (current_view)
+      {
+        current_view->LoadResources (*device);        
+
+        window.Invalidate (); 
+      }      
+    }
+
+    const GameView& View () const { return current_view; }
 
   private:
       //сброс буфера в файл-протолирования
@@ -208,8 +233,8 @@ struct MyApplication::Impl
 
         device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);
 
-//        if (redraw)
-//          redraw (*this);      
+        if (current_view)
+          current_view->OnDraw ();
        
         swap_chain->Present ();    
       }
@@ -223,10 +248,47 @@ struct MyApplication::Impl
       }      
     }
     
+      //обработчик нажатия / отпускания клавиш мыши
+    void OnMouse (syslib::WindowEvent event, const syslib::WindowEventContext& context)
+    {
+      if (!current_view)
+        return;
+
+      try
+      {
+        int cursor_x = context.cursor_position.x * current_view->Width () / window.Width (),
+            cursor_y = context.cursor_position.y * current_view->Height () / window.Height ();
+
+        current_view->OnMouse (event, cursor_x, cursor_y);
+      }
+      catch (std::exception& e)
+      {
+        LogMessage (format ("Exception at process mouse click: %s", e.what ()).c_str ());
+      }
+      catch (...)
+      {
+        LogMessage ("Exception at process mouse click");
+      }
+    }
+    
       //обработчик "холостого хода" приложения
     void OnIdle ()
     {
-      LogMessage ("Idle");
+      if (!current_view)
+        return;
+        
+      try
+      {
+        current_view->OnIdle ();
+      }
+      catch (std::exception& e)
+      {
+        LogMessage (format ("Exception at idle: %s", e.what ()).c_str ());
+      }
+      catch (...)
+      {
+        LogMessage ("Exception at idle");
+      }
     }        
 
   private:
@@ -236,8 +298,8 @@ struct MyApplication::Impl
     DriverPtr        driver;     //OpenGL driver
     SwapChainPtr     swap_chain; //цепочка обмена главного окна приложения
     DevicePtr        device;     //устройство рендеринга главного окна приложения
-//    CallbackFn       redraw;     //????
     xtl::connection  app_idle_connection; //соединение сигнала обработчика холостого хода приложения
+    GameView         current_view;        //текущее игровое отображение
 };
 
 /*
@@ -287,7 +349,7 @@ void MyApplication::VLogFormatMessage (const char* format, va_list list)
   if (!format)
     return;
 
-  LogMessage (common::format (format, list).c_str ());
+  LogMessage (common::vformat (format, list).c_str ());
 }
 
 /*
@@ -299,3 +361,16 @@ size_t MyApplication::Milliseconds ()
   return clock () * 1000 / CLOCKS_PER_SEC;
 }
 
+/*
+    Установка текущего отображения
+*/
+
+void MyApplication::SetView (const GameView& view)
+{
+  impl->SetView (view);
+}
+
+const GameView& MyApplication::View () const
+{
+  return impl->View ();
+}

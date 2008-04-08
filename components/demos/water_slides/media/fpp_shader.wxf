@@ -1,0 +1,10 @@
+Parameters
+{
+  float4x4 myProjMatrix myViewMatrix myObjectMatrix
+}
+
+ProjectionMatrix myProjMatrix
+ViewMatrix       myViewMatrix
+ObjectMatrix     myObjectMatrix
+
+AlphaCompareMode AlwaysPass
