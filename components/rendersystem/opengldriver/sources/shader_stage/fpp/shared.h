@@ -88,7 +88,6 @@ struct FppState
   Matrix4f    projection_matrix;                  //матрица проецирования
   Matrix4f    view_matrix;                        //матрица вида
   Matrix4f    object_matrix;                      //матрица преобразований объекта
-  size_t      lights_count;                       //количество источников освещения
   LightDesc   lights [FPP_MAX_LIGHTS_COUNT];      //параметры источников освещения
   Color4f     emission_color;                     //цвет излучения
   Color4f     ambient_color;                      //цвет поглощения

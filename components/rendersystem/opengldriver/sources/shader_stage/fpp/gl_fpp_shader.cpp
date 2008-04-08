@@ -202,7 +202,7 @@ class FppShaderParser
       for (const Tag2Value* i=pairs; i->tag; i++)
         if (!string_wrappers::stricmp (i->tag, value))
         {
-          *(int*)((char*)&base_state) = i->value;
+          *(int*)((char*)&base_state + offset) = i->value;
 
           return;
         }
@@ -316,8 +316,6 @@ class FppShaderParser
       ParseFloatValues (program_iter, "AlphaReference",   offsetof (FppState, alpha_reference), 1);
 
         //разбор параметров освещения
-      
-      ParseIntegerValues (program_iter, "LightsCount", offsetof (FppState, lights_count), 1);
       
       for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
       {

@@ -338,14 +338,20 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
   glMatrixMode  (GL_PROJECTION);
   glLoadMatrixf (&fpp_state.projection_matrix [0][0]);
   glMatrixMode  (GL_MODELVIEW);
-  glLoadMatrixf (&fpp_state.object_matrix [0][0]);  
-  glMultMatrixf (&fpp_state.view_matrix [0][0]);
+  glLoadMatrixf (&fpp_state.view_matrix [0][0]);    
   
     //установка параметров источников освещения
-
-  size_t lights_count = fpp_state.lights_count;
+    
+  bool lighting = false;
   
-  if (lights_count)
+  for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
+    if (fpp_state.lights [i].enable)
+    {
+      lighting = true;
+      break;
+    }
+    
+  if (lighting)
   {
     glEnable (GL_LIGHTING);
 
@@ -362,23 +368,30 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
 
       float position [4] = {light.position [0], light.position [1], light.position [2], light.type != LightType_Remote};
 
-      glEnable  (light_id);      
+      glEnable  (light_id);
       glLightfv (light_id, GL_POSITION,              position);
       glLightfv (light_id, GL_SPOT_DIRECTION,        light.direction);
       glLightfv (light_id, GL_AMBIENT,               (GLfloat*)&light.ambient_color);
       glLightfv (light_id, GL_DIFFUSE,               (GLfloat*)&light.diffuse_color);
       glLightfv (light_id, GL_SPECULAR,              (GLfloat*)&light.specular_color);
       glLightf  (light_id, GL_SPOT_CUTOFF,           light.type != LightType_Point ? light.angle : 180.0f);
-      glLightf  (light_id, GL_SPOT_EXPONENT,         light.exponent);
+/*      glLightf  (light_id, GL_SPOT_EXPONENT,         light.exponent);
       glLightf  (light_id, GL_CONSTANT_ATTENUATION,  light.constant_attenuation);
       glLightf  (light_id, GL_LINEAR_ATTENUATION,    light.linear_attenuation);
-      glLightf  (light_id, GL_QUADRATIC_ATTENUATION, light.quadratic_attenuation);
+      glLightf  (light_id, GL_QUADRATIC_ATTENUATION, light.quadratic_attenuation);*/
     }
+    
+    glLightModeli (GL_LIGHT_MODEL_TWO_SIDE,     GL_TRUE);
+    glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
   }
   else
   {
     glDisable (GL_LIGHTING);    
   }
+  
+    //установка матрицы объекта
+  
+  glMultMatrixf (&fpp_state.object_matrix [0][0]);  
   
     //установка параметров материала
     
@@ -387,9 +400,9 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
   glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE,   (GLfloat*)&fpp_state.diffuse_color);
   glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR,  (GLfloat*)&fpp_state.specular_color);
   glMaterialf  (GL_FRONT_AND_BACK, GL_SHININESS, fpp_state.shininess);
-  
+
     //включение параметров альфа-теста
-    
+
   if (fpp_state.alpha_compare_mode != CompareMode_AlwaysPass)
   {
     glEnable (GL_ALPHA_TEST);
@@ -409,7 +422,7 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
       case CompareMode_GreaterEqual: gl_mode = GL_GEQUAL;   break;
     }
 
-    glAlphaFunc (gl_mode ,fpp_state.alpha_reference);
+    glAlphaFunc (gl_mode, fpp_state.alpha_reference);
   }
   else
   {
