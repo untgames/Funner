@@ -201,13 +201,9 @@ class TestView: public IGameView
 
       memset (&rs_desc, 0, sizeof (rs_desc));
 
-      rs_desc.fill_mode               = FillMode_Solid;
-      rs_desc.cull_mode               = CullMode_Back;
-      rs_desc.front_counter_clockwise = false;
-      rs_desc.depth_bias              = 1;
-      rs_desc.scissor_enable          = true;
-      rs_desc.multisample_enable      = true;
-      rs_desc.antialiased_line_enable = false;
+      rs_desc.fill_mode  = FillMode_Solid;
+      rs_desc.cull_mode  = CullMode_Back;
+      rs_desc.depth_bias = 1;
 
       rasterizer = RasterizerStatePtr (current_device->CreateRasterizerState (rs_desc), false);
       
