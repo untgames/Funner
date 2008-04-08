@@ -95,6 +95,29 @@ class MyApplication
     stl::auto_ptr<Impl> impl;
 };
 
+//класс конфигурационного файла
+class Configuration
+{
+  public:
+    Configuration (const char* file_name);
+    ~Configuration ();
+
+    int         GetInteger (const char* property_name, int default_value = 0);
+    const char* GetString  (const char* property_name, const char* default_value = "");
+
+    size_t      LogMessagesCount ();
+    const char* LogMessage       (size_t index);
+
+  private:
+    Configuration ();
+    Configuration (const Configuration&); //no impl
+    Configuration& operator = (const Configuration&); //no impl
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
+};
+
 //загрузка текстового файла в строку
 stl::string load_text_file (const char* name);
 

@@ -10,19 +10,21 @@ namespace
     Константы (вынести в конфигурацию)!!!
 */
 
-const char* LOG_FILE_NAME = "water-slides.log"; //имя файла протокола
+const char* CONFIG_FILE_NAME = "media/configuration.xml"; //имя файла конфигурации
 
-const size_t   WINDOW_WIDTH  = 400;                         //начальная ширина окна
-const size_t   WINDOW_HEIGHT = 300;                         //начальная высота окна
-const wchar_t* WINDOW_TITLE  = L"Water slides demo ($Id$)"; //заголовок окна
+const char* DEFAULT_LOG_FILE_NAME = "water-slides.log"; //имя файла протокола
 
-const size_t FB_COLOR_BITS    = 24; //глубина буфера цвета
-const size_t FB_ALPHA_BITS    = 8;  //глубина альфа-буфера
-const size_t FB_DEPTH_BITS    = 24; //глубина z-buffer'а
-const size_t FB_STENCIL_BITS  = 8;  //глубина буфера трафарета
-const size_t FB_BUFFERS_COUNT = 2;  //количество буферов в цепочке обмена
+const size_t DEFAULT_WINDOW_WIDTH  = 400;                         //начальная ширина окна
+const size_t DEFAULT_WINDOW_HEIGHT = 300;                         //начальная высота окна
+const char*  DEFAULT_WINDOW_TITLE  = "Water slides demo ($Id$)"; //заголовок окна
 
-const char* DEVICE_INIT_STRING = ""; //строка инициализации устройства рендеринга
+const size_t DEFAULT_FB_COLOR_BITS    = 24; //глубина буфера цвета
+const size_t DEFAULT_FB_ALPHA_BITS    = 8;  //глубина альфа-буфера
+const size_t DEFAULT_FB_DEPTH_BITS    = 24; //глубина z-buffer'а
+const size_t DEFAULT_FB_STENCIL_BITS  = 8;  //глубина буфера трафарета
+const size_t DEFAULT_FB_BUFFERS_COUNT = 2;  //количество буферов в цепочке обмена
+
+const char* DEFAULT_DEVICE_INIT_STRING = ""; //строка инициализации устройства рендеринга
 
 }
 
@@ -35,9 +37,10 @@ struct MyApplication::Impl
   public:
       //конструктор
     Impl () :
-      log_file (LOG_FILE_NAME),
+      configuration (CONFIG_FILE_NAME),
+      log_file (configuration.GetString ("LogFileName", DEFAULT_LOG_FILE_NAME)),
       log_stream (xtl::bind (&Impl::LogWriteBuffer, this, _1, _2)),
-      window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT),
+      window (syslib::WindowStyle_Overlapped, configuration.GetInteger ("WindowWidth", DEFAULT_WINDOW_WIDTH), configuration.GetInteger ("WindowHeight", DEFAULT_WINDOW_HEIGHT)),
       driver (get_opengl_driver ())
     {
       LogMessage ("Create window...");
@@ -48,7 +51,7 @@ struct MyApplication::Impl
       
         //установка заголовка окна
       
-      window.SetTitle (WINDOW_TITLE);
+      window.SetTitle (configuration.GetString ("WindowTitle", DEFAULT_WINDOW_TITLE));
       
         //показ окна
 
@@ -62,16 +65,16 @@ struct MyApplication::Impl
 
       memset (&desc, 0, sizeof (desc));
 
-      desc.frame_buffer.color_bits   = FB_COLOR_BITS;
-      desc.frame_buffer.alpha_bits   = FB_ALPHA_BITS;
-      desc.frame_buffer.depth_bits   = FB_DEPTH_BITS;
-      desc.frame_buffer.stencil_bits = FB_STENCIL_BITS;
-      desc.buffers_count             = FB_BUFFERS_COUNT;
+      desc.frame_buffer.color_bits   = configuration.GetInteger ("ColorBits", DEFAULT_FB_COLOR_BITS);
+      desc.frame_buffer.alpha_bits   = configuration.GetInteger ("AlphaBits", DEFAULT_FB_ALPHA_BITS);
+      desc.frame_buffer.depth_bits   = configuration.GetInteger ("DepthBits", DEFAULT_FB_DEPTH_BITS);
+      desc.frame_buffer.stencil_bits = configuration.GetInteger ("StencilBits", DEFAULT_FB_STENCIL_BITS);
+      desc.buffers_count             = configuration.GetInteger ("BuffersCount", DEFAULT_FB_BUFFERS_COUNT);
       desc.swap_method               = SwapMethod_Discard;
       desc.window_handle             = window.Handle ();
       
       swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);
-      device     = DevicePtr (driver->CreateDevice (&*swap_chain, DEVICE_INIT_STRING), false);
+      device     = DevicePtr (driver->CreateDevice (&*swap_chain, configuration.GetString ("DeviceInitString", DEFAULT_DEVICE_INIT_STRING)), false);
       
         //оповещение об изменении размеров
       
@@ -292,6 +295,7 @@ struct MyApplication::Impl
     }        
 
   private:
+    Configuration    configuration; //настрройки
     OutputFile       log_file;   //файл протолирования
     OutputTextStream log_stream; //поток протоколирования работы приложения
     syslib::Window   window;     //главное окно приложения
