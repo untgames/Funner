@@ -1,5 +1,7 @@
 #include "shared.h"
 
+#pragma pack(1)
+
 using namespace render::low_level;
 
 namespace
@@ -23,6 +25,11 @@ struct Vec3f
   float x, y, z;
 };
 
+struct Vec2f
+{
+  float x, y;
+};
+
 struct Color4ub
 {
   unsigned char red, green, blue, alpha;
@@ -30,9 +37,9 @@ struct Color4ub
 
 struct Vertex
 {
-  Vec3f    position;
-  Vec3f    normal;
-  Color4ub color;
+  Vec3f position;
+  Vec3f normal;
+  Vec2f texcoord;
 };
 
 /*
@@ -76,10 +83,8 @@ class TestView: public IGameView
           vert.position.x  = 1.0f - 2.0f * i / (GRID_SIZE - 1);
           vert.position.y  = 1.0f - 2.0f * j / (GRID_SIZE - 1);
           vert.normal.z    = -4.0f / (GRID_SIZE - 1);
-          vert.color.red   = 0;
-          vert.color.green = 0;
-          vert.color.blue  = 0;
-          vert.color.alpha = 0;          
+          vert.texcoord.x  = float (j) / float (GRID_SIZE - 1);
+          vert.texcoord.y  = float (i) / float (GRID_SIZE - 1);
         }
       }
       
@@ -151,10 +156,10 @@ class TestView: public IGameView
 
       index_buffer->SetData (0, indices.size () * sizeof size_t, &indices [0]);
 
-      VertexAttribute attributes [] = {
+      static VertexAttribute attributes [] = {
         {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, normal), sizeof (Vertex)},
         {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, position), sizeof (Vertex)},
-        {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_UByte, 0, offsetof (Vertex, color), sizeof (Vertex)},
+        {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (Vertex, texcoord), sizeof (Vertex)},
       };
       
       InputLayoutDesc layout_desc;
@@ -230,16 +235,11 @@ class TestView: public IGameView
       
       memset (&sampler_desc, 0, sizeof (sampler_desc));
 
-      sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
-      sampler_desc.mag_filter           = TexMagFilter_Linear;
-      sampler_desc.wrap_u               = TexcoordWrap_Clamp;
-      sampler_desc.wrap_v               = TexcoordWrap_Clamp;
-      sampler_desc.wrap_w               = TexcoordWrap_Clamp;
-//      sampler_desc.max_anisotropy       = 16;      
-//      sampler_desc.comparision_function = CompareMode_Less;
-//      sampler_desc.mip_lod_bias         = 0.2f;
-//      sampler_desc.min_lod              = 1.f;
-//      sampler_desc.max_lod              = 2.f;
+      sampler_desc.min_filter = TexMinFilter_LinearMipLinear;
+      sampler_desc.mag_filter = TexMagFilter_Linear;
+      sampler_desc.wrap_u     = TexcoordWrap_Clamp;
+      sampler_desc.wrap_v     = TexcoordWrap_Clamp;
+      sampler_desc.wrap_w     = TexcoordWrap_Clamp;
 
       texture_sampler = SamplerStatePtr (current_device->CreateSamplerState (sampler_desc), false);
 
@@ -266,7 +266,7 @@ class TestView: public IGameView
       
       float dt = (MyApplication::Milliseconds () - last) / 1000.0f;
       
-      if (dt > WATER_UPDATE_TIME)
+//      if (dt > WATER_UPDATE_TIME)
       {
         UpdateWater ();
 
@@ -291,10 +291,15 @@ class TestView: public IGameView
       
       memset (&shader_parameters, 0, sizeof shader_parameters);
 
-      shader_parameters.projection_matrix = transpose (get_ortho_proj (-2, 2, -2, 2, -1, 1)); //транспонирование не нужно!!!
-//      shader_parameters.view_matrix   = math::mat4f (1.0f);
-      shader_parameters.view_matrix   = math::rotatef (math::deg2rad (45.0f), 1, 0, 0);
-      shader_parameters.object_matrix = math::mat4f (1.0f);
+      shader_parameters.object_matrix     = math::mat4f (1.0f);      
+      shader_parameters.projection_matrix = get_ortho_proj (-1, 1, -1, 1, -1, 1);
+      shader_parameters.view_matrix       = math::rotatef (math::deg2rad (60.0f), 0, 1, 0);
+/*      shader_parameters.projection_matrix = get_perspective_proj (60.0f, 60.0f, 0.2f, 4.0f);
+
+      shader_parameters.view_matrix   = invert (math::rotatef (math::deg2rad (45.0f), 1, 0, 0) *
+                                                math::rotatef (math::deg2rad (45.0f), 0, 0, 1) *
+                                                math::rotatef (math::deg2rad (45.0f), 0, 1, 0) *
+                                                math::translatef (-0.5f, 1.8f, 3.5f));*/
 
       constant_buffer->SetData (0, sizeof shader_parameters, &shader_parameters);
     }
@@ -330,9 +335,7 @@ class TestView: public IGameView
 
           vertices [i][j].position.z = next_field->U [i][j];
           vertices [i][j].normal.x   = next_field->U [i-1][j] - next_field->U [i+1][j];
-          vertices [i][j].normal.y   = next_field->U [i][j-1] - next_field->U [i][j+1];
-          
-          vertices [i][j].color.blue = unsigned char (255.0f * next_field->U [i][j]);
+          vertices [i][j].normal.y   = next_field->U [i][j-1] - next_field->U [i][j+1];          
 
           /*3*/
           

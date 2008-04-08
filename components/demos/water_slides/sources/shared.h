@@ -128,6 +128,9 @@ stl::string load_text_file (const char* name);
 //получение ортографической матрицы проекции
 math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar);
 
+//получение перспективной матрицы проекции
+math::mat4f get_perspective_proj (float fov_x, float fov_y, float znear, float zfar);
+
 //создание игровых отображений
 GameView create_test_game_view ();
 

@@ -8,3 +8,24 @@ ViewMatrix       myViewMatrix
 ObjectMatrix     myObjectMatrix
 
 AlphaCompareMode AlwaysPass
+
+DiffuseColor  1 1 1 1
+SpecularColor 1 1 1 1
+Shininess     15
+
+Light0
+{
+  Enable 1
+  Type   Point
+  AmbientColor  1 1 1 1
+  DiffuseColor  10 10 10 1
+  SpecularColor 1 1 1 1
+  Position  1 1 -1
+}
+
+Texmap0
+{
+  TexcoordU Explicit
+  TexcoordV Explicit
+  Blend     Modulate
+}
