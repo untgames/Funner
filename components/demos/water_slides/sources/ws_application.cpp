@@ -163,15 +163,46 @@ struct MyApplication::Impl
     void SetView (const GameView& view)
     {
       if (current_view)
-        current_view->FlushResources ();                        
+      {
+        try
+        {
+          current_view->FlushResources ();                        
+        }
+        catch (...)
+        {
+          //подавление всех исключений
+        }
+      }
       
       current_view = view;                  
       
       if (current_view)
       {
-        current_view->LoadResources (*device);        
+        try
+        {
+          try
+          {
+            current_view->LoadResources (*device);        
 
-        window.Invalidate (); 
+            window.Invalidate (); 
+          }
+          catch (...)
+          {
+            current_view->FlushResources ();
+            
+            current_view = GameView ();
+            
+            throw;
+          }
+        }
+        catch (std::exception& e)
+        {
+          LogMessage (format ("Exception at LoadResources: %s", e.what ()).c_str ());
+        }
+        catch (...)
+        {
+          LogMessage ("Exception at LoadResources");
+        }
       }      
     }
 
@@ -268,6 +299,8 @@ struct MyApplication::Impl
             cursor_y = context.cursor_position.y * current_view->Height () / window.Height ();
 
         current_view->OnMouse (event, cursor_x, cursor_y);
+
+        window.Invalidate ();        
       }
       catch (std::exception& e)
       {
@@ -288,6 +321,8 @@ struct MyApplication::Impl
       try
       {
         current_view->OnIdle ();
+        
+        window.Invalidate ();
       }
       catch (std::exception& e)
       {

@@ -2,8 +2,10 @@
 #define DEMO_WATER_SLIDES_SHARED_HEADER
 
 #include <time.h>
+#include <stdlib.h>
 
 #include <stl/auto_ptr.h>
+//#include <stl/algorithm>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/shared_ptr.h>
@@ -103,7 +105,7 @@ class MyApplication
     
       //установка текущего отображения
     void            SetView (const GameView&);
-    const GameView& View    () const;
+    const GameView& View    () const;    
 
     const ::Configuration& Configuration () const;
 
