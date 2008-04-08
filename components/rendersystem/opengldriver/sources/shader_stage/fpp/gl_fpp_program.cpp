@@ -259,6 +259,53 @@ FppProgram::LayoutCacheEntry& FppProgram::GetLayout (ProgramParametersLayout* pa
     Биндинг
 */
 
+namespace
+{
+
+//транспонирование матрицы
+void transpose_matrix (const Matrix4f source, Matrix4f destination)
+{
+  for (size_t i=0; i<4; i++)
+    for (size_t j=0; j<4; j++)
+      destination [i][j] = source [j][i];
+}
+
+//эмуляция загрузки транспонированной матрицы в контекст OpenGL
+void load_transpose_matrix (Matrix4f matrix, PFNGLLOADTRANSPOSEMATRIXFPROC fn)
+{
+  if (fn)
+  {
+    fn (&matrix [0][0]);
+    
+    return;
+  }
+  
+  Matrix4f transposed_matrix;
+
+  transpose_matrix (matrix, transposed_matrix);
+
+  glLoadMatrixf (&transposed_matrix [0][0]);
+}
+
+//эмуляция умножения транспонированной матрицы
+void mult_transpose_matrix (Matrix4f matrix, PFNGLMULTTRANSPOSEMATRIXFPROC fn)
+{
+  if (fn)
+  {
+    fn (&matrix [0][0]);
+    
+    return;
+  }
+  
+  Matrix4f transposed_matrix;
+
+  transpose_matrix (matrix, transposed_matrix);
+
+  glMultMatrixf (&transposed_matrix [0][0]);
+}
+
+}
+
 void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLayout* parameters_layout)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FppProgram::Bind";
@@ -330,15 +377,13 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
   }
 
     //установка состояния в контекст OpenGL
-    
+   
     //установка трансформаций
     
-      //сделать ARB_matrix_transpose!!!!!!
-
-  glMatrixMode  (GL_PROJECTION);
-  glLoadMatrixf (&fpp_state.projection_matrix [0][0]);
-  glMatrixMode  (GL_MODELVIEW);
-  glLoadMatrixf (&fpp_state.view_matrix [0][0]);    
+  glMatrixMode          (GL_PROJECTION);
+  load_transpose_matrix (fpp_state.projection_matrix, caps.glLoadTransposeMatrixf_fn);
+  glMatrixMode          (GL_MODELVIEW);
+  load_transpose_matrix (fpp_state.view_matrix, caps.glLoadTransposeMatrixf_fn);
   
     //установка параметров источников освещения
     
@@ -375,10 +420,10 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
       glLightfv (light_id, GL_DIFFUSE,               (GLfloat*)&light.diffuse_color);
       glLightfv (light_id, GL_SPECULAR,              (GLfloat*)&light.specular_color);
       glLightf  (light_id, GL_SPOT_CUTOFF,           light.type != LightType_Point ? light.angle : 180.0f);
-/*      glLightf  (light_id, GL_SPOT_EXPONENT,         light.exponent);
+      glLightf  (light_id, GL_SPOT_EXPONENT,         light.exponent);
       glLightf  (light_id, GL_CONSTANT_ATTENUATION,  light.constant_attenuation);
       glLightf  (light_id, GL_LINEAR_ATTENUATION,    light.linear_attenuation);
-      glLightf  (light_id, GL_QUADRATIC_ATTENUATION, light.quadratic_attenuation);*/
+      glLightf  (light_id, GL_QUADRATIC_ATTENUATION, light.quadratic_attenuation);
     }
     
     glLightModeli (GL_LIGHT_MODEL_TWO_SIDE,     GL_TRUE);
@@ -391,8 +436,8 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
   
     //установка матрицы объекта
   
-  glMultMatrixf (&fpp_state.object_matrix [0][0]);  
-  
+  mult_transpose_matrix (fpp_state.object_matrix, caps.glMultTransposeMatrixf_fn);
+
     //установка параметров материала
     
   glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION,  (GLfloat*)&fpp_state.emission_color);
@@ -427,18 +472,101 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
   else
   {
     glDisable (GL_ALPHA_TEST);
-  }
+  }  
   
     //включение параметров текстурирования
     
-    /////???установка активной текстуры!!!??
-    
-/*  for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+  size_t *common_cache             = &GetContextManager ().GetContextDataTable (Stage_Common)[0],
+         texture_units_count       = caps.has_arb_multitexture ? caps.texture_units_count : 1,
+         &active_texture_slot      = common_cache [CommonCache_ActiveTextureSlot],
+         &current_enabled_textures = common_cache [CommonCache_EnabledTextures];
+
+  if (texture_units_count > DEVICE_SAMPLER_SLOTS_COUNT)
+    texture_units_count = DEVICE_SAMPLER_SLOTS_COUNT;
+
+  glMatrixMode (GL_TEXTURE);
+
+  for (size_t i=0; i<texture_units_count; i++)
   {
-    Matrix4f       transform; //матрица преобразования текстурных координат
-    Matrix4f       texgen;    //матрица параметров генерации текстурных координат
-    TexcoordSource source_u;  //источник текстурных координат для U-координаты
-    TexcoordSource source_v;  //источник текстурных координат для V-координаты
-    TexcoordSource source_w;  //источник текстурных координат для W-координаты    
-  }*/
+      //установка активного слота текстурирования
+
+    if (active_texture_slot != i)
+    {
+      caps.glActiveTexture_fn (GL_TEXTURE0 + i);
+
+      active_texture_slot = i;
+    }
+
+      //если текстура не установлена - отключение текстурирования канала
+
+    if (!(current_enabled_textures & (1 << i)))
+    {
+      glDisable (GL_TEXTURE_2D);
+
+      continue;
+    }
+    
+      //включение текстурирования на канале
+      
+    glEnable (GL_TEXTURE_2D);        
+    
+    TexmapDesc& texmap = fpp_state.maps [i];
+    
+      //установка параметров смешивания цветов
+      
+    GLenum blend_mode;
+      
+    switch (texmap.blend)
+    {
+      default:
+      case TextureBlend_Replace:
+        blend_mode = GL_REPLACE;
+        break;
+      case TextureBlend_Modulate:
+        blend_mode = GL_MODULATE;
+        break;
+      case TextureBlend_Blend:
+        blend_mode = GL_BLEND;
+        break;
+    }    
+
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, blend_mode);
+
+      //установка параметров генерации текстурных координат
+
+    load_transpose_matrix (texmap.transform, caps.glLoadTransposeMatrixf_fn);
+    
+    TexcoordSource source [] = {texmap.source_u, texmap.source_v, texmap.source_w};
+    
+    for (size_t i=0; i<3; i++)
+    {
+      GLenum coord = GL_S + i, coord_gen_mode = GL_TEXTURE_GEN_S + i;
+
+      switch (source [i])
+      {
+        case TexcoordSource_Explicit:
+          glDisable (coord_gen_mode);
+          break;
+        case TexcoordSource_SphereMap:
+        case TexcoordSource_ReflectionMap:
+          glEnable  (coord_gen_mode);
+          glTexGeni (coord, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+          break;
+        case TexcoordSource_ObjectSpace:
+          glEnable   (coord_gen_mode);
+          glTexGeni  (coord, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+          glTexGenfv (coord, GL_OBJECT_PLANE, &texmap.texgen [i][0]);
+          break;
+        case TexcoordSource_ViewerSpace:
+          glEnable   (coord_gen_mode);
+          glTexGeni  (coord, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+          glTexGenfv (coord, GL_EYE_PLANE, &texmap.texgen [i][0]);
+          break;
+      }
+    }
+  }      
+  
+    //проверка ошибок
+    
+  CheckErrors (METHOD_NAME);
 }

@@ -57,8 +57,8 @@ class ShaderStage
 ///Получение состояния, вьюпорта и отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IProgramParametersLayout* GetProgramParametersLayout () const;
-    IProgram*                GetProgram                () const;
-    IBuffer*                 GetConstantBuffer         (size_t buffer_slot) const;
+    IProgram*                 GetProgram                () const;
+    IBuffer*                  GetConstantBuffer         (size_t buffer_slot) const;
 
   private:
     ShaderStage (const ShaderStage&);             //no impl

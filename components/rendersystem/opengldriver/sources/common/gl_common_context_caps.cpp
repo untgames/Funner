@@ -20,6 +20,7 @@ void ContextCaps::Init (const ExtensionSet& extension_set)
                    ARB_texture_cube_map           = "GL_ARB_texture_cube_map",
                    ARB_texture_mirrored_repeat    = "GL_ARB_texture_mirrored_repeat",
                    ARB_texture_non_power_of_two   = "GL_ARB_texture_non_power_of_two",
+                   ARB_transpose_matrix           = "GL_ARB_transpose_matrix",
                    ARB_vertex_buffer_object       = "GL_ARB_vertex_buffer_object",
                    ARB_vertex_shader              = "GL_ARB_vertex_shader",
                    ARB_window_pos                 = "GL_ARB_window_pos",
@@ -57,7 +58,8 @@ void ContextCaps::Init (const ExtensionSet& extension_set)
   has_arb_texture_cube_map           = extension_set.Get (ARB_texture_cube_map) || extension_set.Get (EXT_texture_cube_map) ||
                                        extension_set.Get (Version_1_3);
   has_arb_texture_mirrored_repeat    = extension_set.Get (ARB_texture_mirrored_repeat) || extension_set.Get (Version_1_4);
-  has_arb_texture_non_power_of_two   = extension_set.Get (ARB_texture_non_power_of_two) || extension_set.Get (Version_2_0);                                      
+  has_arb_texture_non_power_of_two   = extension_set.Get (ARB_texture_non_power_of_two) || extension_set.Get (Version_2_0);
+  has_arb_transpose_matrix           = extension_set.Get (ARB_transpose_matrix) || extension_set.Get (Version_1_3);
   has_arb_vertex_buffer_object       = extension_set.Get (ARB_vertex_buffer_object) || extension_set.Get (Version_1_5);
   has_arb_vertex_shader              = extension_set.Get (ARB_vertex_shader) || extension_set.Get (Version_2_0);
   has_arb_window_pos                 = extension_set.Get (ARB_window_pos) || extension_set.Get (Version_1_4);
@@ -98,6 +100,10 @@ void ContextCaps::Init (const ExtensionSet& extension_set)
   glGetBufferSubData_fn        = glGetBufferSubData ? glGetBufferSubData : glGetBufferSubDataARB;
   glGetCompressedTexImage_fn   = glGetCompressedTexImage ? glGetCompressedTexImage : glGetCompressedTexImageARB;
   glGetUniformLocation_fn      = glGetUniformLocation ? glGetUniformLocation : (PFNGLGETUNIFORMLOCATIONPROC)glGetUniformLocationARB;
+  glLoadTransposeMatrixd_fn    = glLoadTransposeMatrixd ? glLoadTransposeMatrixd : (PFNGLLOADTRANSPOSEMATRIXDPROC)glLoadTransposeMatrixdARB;
+  glLoadTransposeMatrixf_fn    = glLoadTransposeMatrixf ? glLoadTransposeMatrixf : (PFNGLLOADTRANSPOSEMATRIXFPROC)glLoadTransposeMatrixfARB;
+  glMultTransposeMatrixd_fn    = glMultTransposeMatrixd ? glMultTransposeMatrixd : (PFNGLMULTTRANSPOSEMATRIXDPROC)glMultTransposeMatrixdARB;
+  glMultTransposeMatrixf_fn    = glMultTransposeMatrixf ? glMultTransposeMatrixf : (PFNGLMULTTRANSPOSEMATRIXFPROC)glMultTransposeMatrixfARB;
   glUniform1fv_fn              = glUniform1fv ? glUniform1fv : glUniform1fvARB;
   glUniform1iv_fn              = glUniform1iv ? glUniform1iv : glUniform1ivARB;
   glUniform2fv_fn              = glUniform2fv ? glUniform2fv : glUniform2fvARB;

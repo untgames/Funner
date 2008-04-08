@@ -49,7 +49,7 @@ int main ()
     BufferPtr cb (test.device->CreateBuffer (cb_desc), false);
     
     MyShaderParameters my_shader_parameters = {
-      0.3
+      0.3f
     };
     
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);

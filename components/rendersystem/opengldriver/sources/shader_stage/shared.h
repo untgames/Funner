@@ -30,7 +30,7 @@ typedef xtl::trackable_ptr<IBindableBuffer> ConstantBufferPtr;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum ShaderStageCache
 {
-  ShaderStageCache_UsedProgram,    //ID текущей используемой программы
+  ShaderStageCache_UsedProgram, //ID текущей используемой программы
 };
 
 struct ProgramParameterGroup

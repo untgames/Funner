@@ -497,7 +497,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
     set_client_capability (GL_VERTEX_ARRAY, current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Position);
     set_client_capability (GL_NORMAL_ARRAY, current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Normal);
     set_client_capability (GL_COLOR_ARRAY,  current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Color);
-
+    
     if (caps.has_arb_multitexture)
     {
       size_t mask = 1 << VertexAttributeSemantic_TexCoord0;
@@ -508,21 +508,21 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
         {
           caps.glClientActiveTexture_fn (GL_TEXTURE0 + i);
           glDisableClientState          (GL_TEXTURE_COORD_ARRAY);
-          return;
+          continue;
         }
 
         if (used_semantics_mask & ~current_enabled_semantics_mask & mask)
         {
           caps.glClientActiveTexture_fn (GL_TEXTURE0 + i);
           glEnableClientState           (GL_TEXTURE_COORD_ARRAY);
-          return;
+          continue;
         }
       }
     }
     else
     {
       set_client_capability (GL_TEXTURE_COORD_ARRAY,  current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_TexCoord0);
-    }
+    }    
 
     current_enabled_semantics_mask = used_semantics_mask;
   }

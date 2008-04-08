@@ -33,13 +33,12 @@ namespace opengl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum TextureManagerCache
 {
-  TextureManagerCache_ActiveSlot,
   TextureManagerCache_TextureId0,
-  TextureManagerCache_TextureIdNum = TextureManagerCache_TextureId0 + DEVICE_SAMPLER_SLOTS_COUNT,
+  TextureManagerCache_TextureIdLast = TextureManagerCache_TextureId0 + DEVICE_SAMPLER_SLOTS_COUNT - 1,
   TextureManagerCache_TextureTarget0,
-  TextureManagerCache_TextureTargetNum = TextureManagerCache_TextureTarget0 + DEVICE_SAMPLER_SLOTS_COUNT,
+  TextureManagerCache_TextureTargetLast = TextureManagerCache_TextureTarget0 + DEVICE_SAMPLER_SLOTS_COUNT - 1,
 
-  TextureManagerContextTable_Num
+  TextureManagerCache_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

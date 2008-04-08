@@ -1,11 +1,9 @@
 #include "shared.h"
 
-#include <gl/glew.h> ///????
+#include <gl/glew.h>
 
-const char* PIXEL_SHADER_FILE_NAME  = "data/glsl/wood.frag";
-const char* VERTEX_SHADER_FILE_NAME = "data/glsl/wood.vert";
-//const char* MODEL_NAME              = "data/spy.xmesh";
-const char* MODEL_NAME              = "data/res.xmesh";
+const char* SHADER_FILE_NAME  = "data/fpp_shader.wxf";
+const char* MODEL_NAME        = "data/spy.xmesh";
 
 #pragma pack (1)
 
@@ -366,12 +364,9 @@ typedef xtl::shared_ptr<Model> ModelPtr;
 
 struct MyShaderParameters
 {
-  float        grain_size_recip;
-  math::vec3f  dark_color;
-  math::vec3f  color_spread;
-  math::vec3f  light_position;
-  float        scale;
-  math::mat4f  transform;  
+  math::mat4f object_tm; 
+  math::mat4f view_tm;
+  math::mat4f proj_tm;
 };
 
 ModelPtr load_model (const DevicePtr& device, const char* file_name)
@@ -439,13 +434,34 @@ void idle (Test& test)
   }
   
   cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
-    
-  my_shader_parameters.transform = math::rotatef (math::deg2rad (angle+=50.0f*dt), 0, 0, 1);
-//  my_shader_parameters.transform *= math::rotatef (math::deg2rad (.3f), 0, 0, 1);
+  
+  angle+=50.0f*dt;
+
+  my_shader_parameters.object_tm = math::rotatef (math::deg2rad (angle), 0, 0, 1) * 
+                                   math::rotatef (math::deg2rad (angle*0.2f), 1, 0, 0);                                   
 
   cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
  
   test.window.Invalidate ();
+}
+
+//получение ортографической матрицы проекции
+math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar)
+{
+  math::mat4f proj_matrix;
+  
+  float width  = right - left,
+        height = top - bottom,
+        depth  = zfar - znear;  
+
+    //выбрана матрица проецирования, используемая gluOrtho2D
+
+  proj_matrix [0] = math::vec4f (2.0f / width, 0, 0, - (right + left) / width);
+  proj_matrix [1] = math::vec4f (0, 2.0f / height, 0, - (top + bottom) / height);
+  proj_matrix [2] = math::vec4f (0, 0, -2.0f / depth, - (znear + zfar) / depth);
+  proj_matrix [3] = math::vec4f (0, 0, 0, 1);
+  
+  return proj_matrix;
 }
 
 int main ()
@@ -464,21 +480,16 @@ int main ()
     
     printf ("Set shader stage\n");
     
-    stl::string pixel_shader_source  = read_shader (PIXEL_SHADER_FILE_NAME),
-                vertex_shader_source = read_shader (VERTEX_SHADER_FILE_NAME);
+    stl::string shader_source  = read_shader (SHADER_FILE_NAME);
     
     ShaderDesc shader_descs [] = {
-      {"p_shader", size_t (-1), pixel_shader_source.c_str (), "glsl.ps", ""},
-      {"v_shader", size_t (-1), vertex_shader_source.c_str (), "glsl.vs", ""}
+      {"fpp_shader", size_t (-1), shader_source.c_str (), "fpp", ""},
     };
 
     static ProgramParameter shader_parameters[] = {
-      {"GrainSizeRecip", ProgramParameterType_Float, 0, 1, offsetof (MyShaderParameters, grain_size_recip)},
-      {"DarkColor", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, dark_color)},
-      {"colorSpread", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, color_spread)},
-      {"LightPosition", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_position)},
-      {"Scale", ProgramParameterType_Float, 0, 1, offsetof (MyShaderParameters, scale)},
-      {"Transform", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, transform)}
+      {"myProjMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, proj_tm)},
+      {"myViewMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, view_tm)},
+      {"myObjectMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, object_tm)},
     };
     
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
@@ -497,28 +508,16 @@ int main ()
 
     BufferPtr cb (test.device->CreateBuffer (cb_desc), false);
 
-    MyShaderParameters my_shader_parameters = {
-      1.0f,
-      math::vec3f (0.6f, 0.3f, 0.1f),
-      math::vec3f (0.15f, 0.15f / 2.0f, 0),
-      math::vec3f (-400.0f, 0.0f, 0.0f),
-      1.f
-    };
+    MyShaderParameters my_shader_parameters;
+    
+    my_shader_parameters.proj_tm   = get_ortho_proj (-100, 100, -100, 100, -1000, 1000);
+    my_shader_parameters.view_tm = invert (math::lookatf (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
 
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
     test.device->SSSetProgram (shader.get ());
     test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
-    test.device->SSSetConstantBuffer (0, cb.get ());
-    
-    glMatrixMode (GL_PROJECTION);
-    glOrtho (-100, 100, -100, 100, -1000, 1000);
-    glMatrixMode (GL_MODELVIEW);
-    glRotatef    (-90, 1, 0, 0);
-    glRotatef    (180, 0, 0, 1);
-//    glTranslatef (0, 0, 400);
-    glTranslatef (0, 400, 0);   
-    glScalef     (24, 24, 24);
+    test.device->SSSetConstantBuffer (0, cb.get ());    
 
     printf ("Register callbacks\n");
 

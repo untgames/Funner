@@ -257,6 +257,15 @@ class FppShaderParser
       ParseEnum (texmap_iter, "TexcoordU", base_offset + offsetof (TexmapDesc, source_u), texcoord_sources);
       ParseEnum (texmap_iter, "TexcoordV", base_offset + offsetof (TexmapDesc, source_v), texcoord_sources);
       ParseEnum (texmap_iter, "TexcoordW", base_offset + offsetof (TexmapDesc, source_w), texcoord_sources);
+      
+      static const Tag2Value texture_blend_modes [] = {
+        {"Replace",  TextureBlend_Replace},
+        {"Modulate", TextureBlend_Modulate},
+        {"Blend",    TextureBlend_Blend},
+        {0, 0}
+      };
+      
+      ParseEnum (texmap_iter, "Blend", base_offset + offsetof (TexmapDesc, blend), texture_blend_modes);
     }
   
       //разбор шейдера
@@ -357,13 +366,44 @@ class FppShaderParser
     Конструктор / деструктор
 */
 
+namespace
+{
+
+void identity_matrix (Matrix4f& m)
+{
+  for (size_t i=0; i<4; i++)
+    for (size_t j=0; j<4; j++)
+      m [i][j] = i == j ? 1.0f : 0.0f;
+}
+
+}
+
 FppShader::FppShader (const ShaderDesc& shader_desc, const LogFunction& error_log)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FppShader::FppShader";
 
-    //очистка состояния fpp-шейдера
+    //инициализация состояния fpp-шейдера
     
   memset (&base_state, 0, sizeof base_state);
+  
+  identity_matrix (base_state.projection_matrix);
+  identity_matrix (base_state.view_matrix);
+  identity_matrix (base_state.object_matrix);
+  
+  for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
+  {
+    LightDesc& light = base_state.lights [i];
+    
+    light.constant_attenuation = 1.0f;
+  }
+  
+  for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+  {
+    TexmapDesc& texmap = base_state.maps [i];
+
+    identity_matrix (texmap.transform);
+    identity_matrix (texmap.texgen);
+  }
 
     //разбор fpp-шейдера
 

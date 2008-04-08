@@ -184,9 +184,8 @@ void Texture::Bind ()
 {
     //получение кэш-переменных
 
-  ContextDataTable& context_data         = GetContextDataTable (Stage_TextureManager);
-  size_t            &current_active_slot = context_data [TextureManagerCache_ActiveSlot],
-                    &current_texture_id  = context_data [current_active_slot];
+  size_t &current_active_slot = GetContextDataTable (Stage_Common)[CommonCache_ActiveTextureSlot],
+         &current_texture_id  = GetContextDataTable (Stage_TextureManager)[current_active_slot];
 
     //проверка необходимости биндинга текстуры
 

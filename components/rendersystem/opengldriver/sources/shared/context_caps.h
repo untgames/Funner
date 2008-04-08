@@ -32,6 +32,7 @@ struct ContextCaps
   bool has_arb_texture_cube_map;           //GL_ARB_texture_cube_map
   bool has_arb_texture_mirrored_repeat;    //GL_ARB_texture_mirrored_repeat
   bool has_arb_texture_non_power_of_two;   //GL_ARB_texture_non_power_of_two
+  bool has_arb_transpose_matrix;           //GL_ARB_transpose_matrix
   bool has_arb_vertex_buffer_object;       //GL_ARB_vertex_buffer_object
   bool has_arb_vertex_shader;              //GL_ARB_vertex_shader
   bool has_arb_window_pos;                 //GL_ARB_window_pos
@@ -76,6 +77,10 @@ struct ContextCaps
   PFNGLGETBUFFERSUBDATAPROC        glGetBufferSubData_fn;
   PFNGLGETCOMPRESSEDTEXIMAGEPROC   glGetCompressedTexImage_fn;
   PFNGLGETUNIFORMLOCATIONPROC      glGetUniformLocation_fn;
+  PFNGLLOADTRANSPOSEMATRIXDPROC    glLoadTransposeMatrixd_fn;    
+  PFNGLLOADTRANSPOSEMATRIXFPROC    glLoadTransposeMatrixf_fn;
+  PFNGLMULTTRANSPOSEMATRIXDPROC    glMultTransposeMatrixd_fn;
+  PFNGLMULTTRANSPOSEMATRIXFPROC    glMultTransposeMatrixf_fn;  
   PFNGLUNIFORM1FVPROC              glUniform1fv_fn;
   PFNGLUNIFORM1IVPROC              glUniform1iv_fn;
   PFNGLUNIFORM2FVPROC              glUniform2fv_fn;

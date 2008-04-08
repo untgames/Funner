@@ -143,21 +143,24 @@ struct TextureManager::Impl: public ContextObject
       
         //получение кэш-переменных
 
-      size_t *cache                  = &GetContextDataTable (Stage_TextureManager)[0],
-             *current_texture_id     = cache + TextureManagerCache_TextureId0,
-             *current_texture_target = cache + TextureManagerCache_TextureTarget0,
-             &current_active_slot    = cache [TextureManagerCache_ActiveSlot];
-      
+      size_t *common_cache             = &GetContextDataTable (Stage_Common)[0],
+             *cache                    = &GetContextDataTable (Stage_TextureManager)[0],
+             *current_texture_id       = cache + TextureManagerCache_TextureId0,
+             *current_texture_target   = cache + TextureManagerCache_TextureTarget0,
+             &current_enabled_textures = common_cache [CommonCache_EnabledTextures],
+             &current_active_slot      = common_cache [CommonCache_ActiveTextureSlot],
+             enabled_textures          = 0;
+
         //выбор текущего контекста
 
       MakeContextCurrent ();  
-      
+
         //установка текстур и сэмплеров
-        
+
       BindableTextureDesc texture_desc;
 
       const ContextCaps& caps     = GetCaps ();
-      SamplerSlot*       samplers = state.GetSlots ();
+      SamplerSlot*       samplers = state.GetSlots ();      
 
       for (size_t i = 0; i < caps.texture_units_count; i++)
       {
@@ -166,7 +169,11 @@ struct TextureManager::Impl: public ContextObject
         bool             is_active_slot = texture && sampler_state;          
 
         if (is_active_slot)
+        {
           texture->GetDesc (texture_desc);
+          
+          enabled_textures |= 1 << i;
+        }
 
         GLenum texture_target      = is_active_slot ? texture_desc.target : 0;
         bool   need_change_sampler = is_active_slot && texture->GetSamplerHash () != sampler_state->GetDescHash (),
@@ -220,6 +227,10 @@ struct TextureManager::Impl: public ContextObject
         //проверка ошибок
 
       CheckErrors (METHOD_NAME);
+
+        //обновление кэш-переменных
+
+      current_enabled_textures = enabled_textures;
     }
 
       //создание текстуры
