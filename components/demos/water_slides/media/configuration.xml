@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <Configuration
   LogFileName="water-slides.log"   
-  WindowWidth="4000"
-  WindowHeight="3000"
-  WindowTitle="Water slides demo ($Id$)"
+  WindowWidth="400"
+  WindowHeight="300"
+  WindowTitle="Water slides demo"
   ColorBits="24"
   AlphaBits="8"
   DepthBits="24"
