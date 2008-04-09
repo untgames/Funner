@@ -308,6 +308,18 @@ class FppShaderParser
       ParseVector4f    (program_iter, "DiffuseColor",  offsetof (FppState, diffuse_color));
       ParseVector4f    (program_iter, "SpecularColor", offsetof (FppState, specular_color));
       ParseFloatValues (program_iter, "Shininess",     offsetof (FppState, shininess), 1);
+      
+      static const Tag2Value color_material_modes [] = {
+        {"Explicit",          ColorMaterial_Explicit},
+        {"Emission",          ColorMaterial_Emission},
+        {"Ambient",           ColorMaterial_Ambient},
+        {"Diffuse",           ColorMaterial_Diffuse},
+        {"Specular",          ColorMaterial_Specular},
+        {"AmbientAndDiffuse", ColorMaterial_AmbientAndDiffuse},
+        {0, 0}
+      };
+
+      ParseEnum (program_iter, "ColorMaterial", offsetof (FppState, color_material), color_material_modes);
 
       static const Tag2Value compare_modes [] = {
         {"AlwaysFail",   CompareMode_AlwaysFail},

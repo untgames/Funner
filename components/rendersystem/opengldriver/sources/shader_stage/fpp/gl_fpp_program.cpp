@@ -446,6 +446,30 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
   glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR,  (GLfloat*)&fpp_state.specular_color);
   glMaterialf  (GL_FRONT_AND_BACK, GL_SHININESS, fpp_state.shininess);
 
+    //настройка передачи цвета материала
+
+  if (fpp_state.color_material == ColorMaterial_Explicit)
+  {
+    glDisable (GL_COLOR_MATERIAL);
+  }
+  else
+  {
+    GLenum mode;
+    
+    switch (fpp_state.color_material)
+    {
+      case ColorMaterial_Emission:           mode = GL_EMISSION; break;
+      case ColorMaterial_Ambient:            mode = GL_AMBIENT; break;
+      default:
+      case ColorMaterial_Diffuse:            mode = GL_DIFFUSE; break;
+      case ColorMaterial_Specular:           mode = GL_SPECULAR; break;
+      case ColorMaterial_AmbientAndDiffuse:  mode = GL_AMBIENT_AND_DIFFUSE; break;
+    }
+    
+    glEnable        (GL_COLOR_MATERIAL);
+    glColorMaterial (GL_FRONT_AND_BACK, mode);
+  }  
+
     //включение параметров альфа-теста
 
   if (fpp_state.alpha_compare_mode != CompareMode_AlwaysPass)

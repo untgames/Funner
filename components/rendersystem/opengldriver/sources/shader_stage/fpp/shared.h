@@ -94,22 +94,38 @@ struct TexmapDesc
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ќастройка передачи цвета материала
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum ColorMaterial
+{
+  ColorMaterial_Explicit,          //цвет материала задаЄтс€ параметрами материала
+  ColorMaterial_Emission,          //цвет геометрии задаЄт emission-составл€ющую материала
+  ColorMaterial_Ambient,           //цвет геометрии задаЄт ambient-составл€ющую материала
+  ColorMaterial_Diffuse,           //цвет геометрии задаЄт diffuse-составл€ющую материала
+  ColorMaterial_Specular,          //цвет геометрии задаЄт specular-составл€ющую материала
+  ColorMaterial_AmbientAndDiffuse, //цвет геометрии задаЄт ambient и diffuse составл€ющие материала  
+  
+  ColorMaterial_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—осто€ние фиксированной программы шейдинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct FppState
 {
-  Matrix4f    projection_matrix;                  //матрица проецировани€
-  Matrix4f    view_matrix;                        //матрица вида
-  Matrix4f    object_matrix;                      //матрица преобразований объекта
-  LightDesc   lights [FPP_MAX_LIGHTS_COUNT];      //параметры источников освещени€
-  Color4f     emission_color;                     //цвет излучени€
-  Color4f     ambient_color;                      //цвет поглощени€
-  Color4f     diffuse_color;                      //цвет рассеивани€
-  Color4f     specular_color;                     //цвет отражени€
-  float       shininess;                          //"металличность"
-  CompareMode alpha_compare_mode;                 //режим альфа теста
-  float       alpha_reference;                    //константа альфа теста
-  TexmapDesc  maps [DEVICE_SAMPLER_SLOTS_COUNT];  //текстурные карты
+  Matrix4f      projection_matrix;                  //матрица проецировани€
+  Matrix4f      view_matrix;                        //матрица вида
+  Matrix4f      object_matrix;                      //матрица преобразований объекта
+  LightDesc     lights [FPP_MAX_LIGHTS_COUNT];      //параметры источников освещени€
+  Color4f       emission_color;                     //цвет излучени€
+  Color4f       ambient_color;                      //цвет поглощени€
+  Color4f       diffuse_color;                      //цвет рассеивани€
+  Color4f       specular_color;                     //цвет отражени€
+  float         shininess;                          //"металличность"
+  ColorMaterial color_material;                     //настройка передачи цвета материала
+  CompareMode   alpha_compare_mode;                 //режим альфа теста
+  float         alpha_reference;                    //константа альфа теста
+  TexmapDesc    maps [DEVICE_SAMPLER_SLOTS_COUNT];  //текстурные карты
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

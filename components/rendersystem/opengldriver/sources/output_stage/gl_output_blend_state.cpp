@@ -157,7 +157,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   {
     case BlendArgument_Zero:                    src_alpha_arg = GL_ZERO; break;
     case BlendArgument_One:                     src_alpha_arg = GL_ONE; break;
-    case BlendArgument_SourceAlpha:             src_color_arg = GL_SRC_ALPHA; break;
+    case BlendArgument_SourceAlpha:             src_alpha_arg = GL_SRC_ALPHA; break;
     case BlendArgument_InverseSourceAlpha:      src_alpha_arg = GL_ONE_MINUS_SRC_ALPHA; break;
     case BlendArgument_DestinationAlpha:        src_alpha_arg = GL_DST_ALPHA; break;
     case BlendArgument_InverseDestinationAlpha: src_alpha_arg = GL_ONE_MINUS_DST_ALPHA; break;
@@ -236,7 +236,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
                
   if (in_desc.blend_enable && (mask & ColorWriteFlag_All))
   {
-    glEnable (GL_BLEND);
+    glEnable (GL_BLEND);    
 
     if      (glBlendEquationSeparate)    glBlendEquationSeparate    (color_blend_equation, alpha_blend_equation);
     else if (glBlendEquationSeparateEXT) glBlendEquationSeparateEXT (color_blend_equation, alpha_blend_equation);      
@@ -299,8 +299,8 @@ void BlendState::Bind ()
 
   MakeContextCurrent ();  
 
-  glCallList (display_list);  
-  
+  glCallList (display_list);
+
     //проверка ошибок
   
   CheckErrors (METHOD_NAME);
