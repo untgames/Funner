@@ -11,10 +11,11 @@ namespace
      онстанты
 */
 
-const char*  SHADER_FILE_NAME   = "media/fpp_shader.wxf"; //им€ файла с шейдером
-const char*  WATER_TEXTURE_NAME = "media/phong.jpg";      //им€ файла с текстурой воды
-const size_t GRID_SIZE          = 128;                    //количество разбиений сетки с водой
-const float  WATER_UPDATE_TIME  = 0.01f;                  //период обновлени€ воды
+const char*  SHADER_FILE_NAME    = "media/fpp_shader.wxf"; //им€ файла с шейдером
+const char*  WATER_TEXTURE_NAME  = "media/phong.jpg";      //им€ файла с текстурой воды
+const char*  GROUND_TEXTURE_NAME = "media/ground.jpg";     //им€ файла с текстурой земли
+const size_t GRID_SIZE           = 128;                    //количество разбиений сетки с водой
+const float  WATER_UPDATE_TIME   = 0.01f;                  //период обновлени€ воды
 
 /*
     ќписание отрисовываемых вершин
@@ -40,6 +41,7 @@ struct Vertex
   Vec3f position;
   Vec3f normal;
   Vec2f texcoord;
+  Color4ub color;
 };
 
 /*
@@ -85,6 +87,8 @@ class TestView: public IGameView
           vert.normal.z    = -4.0f / (GRID_SIZE - 1);
           vert.texcoord.x  = float (j) / float (GRID_SIZE - 1);
           vert.texcoord.y  = float (i) / float (GRID_SIZE - 1);
+          vert.color.red   = vert.color.green = vert.color.blue = 255;
+          vert.color.alpha = 255;
         }
       }
       
@@ -114,18 +118,31 @@ class TestView: public IGameView
 
       UpdateShaderParameters ();        
       
+      DepthStencilStatePtr default_depth_stencil_state = current_device->OSGetDepthStencilState ();      
+      BlendStatePtr        default_blend_state         = current_device->OSGetBlendState ();      
+
+      current_device->RSSetState                   (rasterizer.get ());            
       current_device->SSSetProgram                 (shader.get ());
-      current_device->SSSetProgramParametersLayout (shader_parameters_layout.get ());
+      current_device->SSSetProgramParametersLayout (shader_parameters_layout.get ());      
       current_device->SSSetConstantBuffer          (0, constant_buffer.get ());
-      current_device->ISSetInputLayout             (input_layout.get ());
-      current_device->ISSetVertexBuffer            (0, vertex_buffer.get ());      
-      current_device->ISSetIndexBuffer             (index_buffer.get ());      
-      current_device->RSSetState                   (rasterizer.get ());
       current_device->SSSetSampler                 (0, texture_sampler.get ());
-      current_device->SSSetTexture                 (0, water_texture.get ());
+      current_device->ISSetInputLayout             (input_layout.get ());
+      current_device->OSSetDepthStencilState       (0);
+      
+      current_device->SSSetTexture      (0, ground_texture.get ());
+      current_device->ISSetVertexBuffer (0, rect_vertex_buffer.get ());
+      current_device->Draw              (PrimitiveType_TriangleStrip, 0, 4);
+
+      current_device->OSSetBlendState   (blend_state.get ());
+      current_device->SSSetTexture      (0, water_texture.get ());
+      current_device->ISSetVertexBuffer (0, vertex_buffer.get ());
+      current_device->ISSetIndexBuffer  (index_buffer.get ());
 
       for (size_t i=0; i<GRID_SIZE-2; i++)
         current_device->DrawIndexed (PrimitiveType_TriangleStrip, i * indices_block_size, indices_block_size, 0);
+
+      current_device->OSSetBlendState (default_blend_state.get ());
+      current_device->OSSetDepthStencilState (default_depth_stencil_state.get ());
     }
 
     void LoadResources (IDevice& device)
@@ -160,6 +177,7 @@ class TestView: public IGameView
         {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, normal), sizeof (Vertex)},
         {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, position), sizeof (Vertex)},
         {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (Vertex, texcoord), sizeof (Vertex)},
+        {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_UByte, 0, offsetof (Vertex, color), sizeof (Vertex)},
       };
       
       InputLayoutDesc layout_desc;
@@ -207,30 +225,14 @@ class TestView: public IGameView
       memset (&rs_desc, 0, sizeof (rs_desc));
 
       rs_desc.fill_mode  = FillMode_Solid;
-      rs_desc.cull_mode  = CullMode_Back;
+      rs_desc.cull_mode  = CullMode_None;
       rs_desc.depth_bias = 1;
 
-      rasterizer = RasterizerStatePtr (current_device->CreateRasterizerState (rs_desc), false);
-      
-      media::Image water_image (WATER_TEXTURE_NAME, media::PixelFormat_RGB8);
-      
-      TextureDesc tex_desc;
+      rasterizer = RasterizerStatePtr (current_device->CreateRasterizerState (rs_desc), false);      
 
-      memset (&tex_desc, 0, sizeof (tex_desc));      
-      
-      tex_desc.dimension            = TextureDimension_2D;
-      tex_desc.width                = water_image.Width ();
-      tex_desc.height               = water_image.Height ();
-      tex_desc.layers               = 1;
-      tex_desc.format               = PixelFormat_RGB8;
-      tex_desc.bind_flags           = BindFlag_Texture;
-      tex_desc.generate_mips_enable = true;
-      tex_desc.access_flags         = AccessFlag_ReadWrite;
+      water_texture  = LoadTexture (WATER_TEXTURE_NAME);
+      ground_texture = LoadTexture (GROUND_TEXTURE_NAME);
 
-      water_texture = TexturePtr (current_device->CreateTexture (tex_desc), false);      
-
-      water_texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, PixelFormat_RGB8, water_image.Bitmap ());
-      
       SamplerDesc sampler_desc;
       
       memset (&sampler_desc, 0, sizeof (sampler_desc));
@@ -242,6 +244,34 @@ class TestView: public IGameView
       sampler_desc.wrap_w     = TexcoordWrap_Clamp;
 
       texture_sampler = SamplerStatePtr (current_device->CreateSamplerState (sampler_desc), false);
+      
+      static Vertex rect_vertices [] = {
+        {{-1, -1, 0}, {0, 0, -1}, {0, 0}, {255, 255, 255, 255}},
+        {{ 1, -1, 0}, {0, 0, -1}, {1, 0}, {255, 255, 255, 255}},
+        {{-1,  1, 0}, {0, 0, -1}, {0, 1}, {255, 255, 255, 255}},
+        {{ 1,  1, 0}, {0, 0, -1}, {1, 1}, {255, 255, 255, 255}},
+      };
+
+      vb_desc.size = sizeof (rect_vertices);
+
+      rect_vertex_buffer = BufferPtr (current_device->CreateBuffer (vb_desc), false);
+
+      rect_vertex_buffer->SetData (0, sizeof rect_vertices, rect_vertices);
+
+      BlendDesc blend_desc;
+      
+      memset (&blend_desc, 0, sizeof (blend_desc));
+
+      blend_desc.blend_enable                     = true;
+      blend_desc.blend_color_operation            = BlendOperation_Add;
+      blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
+      blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
+      blend_desc.blend_alpha_operation            = BlendOperation_Add;
+      blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
+      blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
+      blend_desc.color_write_mask                 = ColorWriteFlag_All;
+
+      blend_state = BlendStatePtr (current_device->CreateBlendState (blend_desc), false);            
 
       UpdateWater ();
     }
@@ -250,6 +280,7 @@ class TestView: public IGameView
     {     
       current_device           = 0;
       vertex_buffer            = 0;
+      rect_vertex_buffer       = 0;
       index_buffer             = 0;
       constant_buffer          = 0;
       input_layout             = 0;
@@ -258,6 +289,7 @@ class TestView: public IGameView
       rasterizer               = 0;
       water_texture            = 0;
       texture_sampler          = 0;
+      blend_state              = 0;
     }    
     
     void OnIdle ()
@@ -280,6 +312,30 @@ class TestView: public IGameView
     }
     
   private:
+    TexturePtr LoadTexture (const char* name)
+    {
+      media::Image water_image (name, media::PixelFormat_RGB8);
+      
+      TextureDesc tex_desc;
+
+      memset (&tex_desc, 0, sizeof (tex_desc));      
+      
+      tex_desc.dimension            = TextureDimension_2D;
+      tex_desc.width                = water_image.Width ();
+      tex_desc.height               = water_image.Height ();
+      tex_desc.layers               = 1;
+      tex_desc.format               = PixelFormat_RGB8;
+      tex_desc.bind_flags           = BindFlag_Texture;
+      tex_desc.generate_mips_enable = true;
+      tex_desc.access_flags         = AccessFlag_ReadWrite;
+
+      TexturePtr texture (current_device->CreateTexture (tex_desc), false);
+
+      texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, PixelFormat_RGB8, water_image.Bitmap ());      
+
+      return texture;
+    }
+  
     static void PrintShaderError (const char* message)
     {
       MyApplication::Instance ().LogFormatMessage ("%s", message);
@@ -288,18 +344,16 @@ class TestView: public IGameView
     void UpdateShaderParameters ()
     {
       ShaderParameters shader_parameters;
-      
+
       memset (&shader_parameters, 0, sizeof shader_parameters);
 
       shader_parameters.object_matrix     = math::mat4f (1.0f);      
-      shader_parameters.projection_matrix = get_ortho_proj (-1, 1, -1, 1, -1, 1);
+      shader_parameters.projection_matrix = get_ortho_proj (-0.5, 0.5, -1, 1, -1, 1);
       shader_parameters.view_matrix       = math::rotatef (math::deg2rad (60.0f), 0, 1, 0);
-/*      shader_parameters.projection_matrix = get_perspective_proj (60.0f, 60.0f, 0.2f, 4.0f);
-
-      shader_parameters.view_matrix   = invert (math::rotatef (math::deg2rad (45.0f), 1, 0, 0) *
-                                                math::rotatef (math::deg2rad (45.0f), 0, 0, 1) *
-                                                math::rotatef (math::deg2rad (45.0f), 0, 1, 0) *
-                                                math::translatef (-0.5f, 1.8f, 3.5f));*/
+      
+/*      shader_parameters.object_matrix     = math::rotatef (math::deg2rad (60.0f), 1, 0, 0);
+      shader_parameters.projection_matrix = get_ortho_proj (-0.5, 0.5, -1, 1, -1, 1);
+      shader_parameters.view_matrix       = math::rotatef (math::deg2rad (60.0f), 0, 1, 0);*/
 
       constant_buffer->SetData (0, sizeof shader_parameters, &shader_parameters);
     }
@@ -332,10 +386,24 @@ class TestView: public IGameView
         for (j=1; j<GRID_SIZE-1; j++)
         {
           /*2*/
+          
+          Vertex& v = vertices [i][j];
 
-          vertices [i][j].position.z = next_field->U [i][j];
-          vertices [i][j].normal.x   = next_field->U [i-1][j] - next_field->U [i+1][j];
-          vertices [i][j].normal.y   = next_field->U [i][j-1] - next_field->U [i][j+1];          
+          v.position.z = next_field->U [i][j];                      
+          v.normal.x   = next_field->U [i-1][j] - next_field->U [i+1][j];
+          v.normal.y   = next_field->U [i][j-1] - next_field->U [i][j+1];
+          v.normal.z   = -4.0f / (GRID_SIZE - 1);
+//          v.normal.z   = -sqrt (1.0f - v.normal.x * v.normal.x - v.normal.y * v.normal.y);
+          
+          float length = sqrt (v.normal.x * v.normal.x + v.normal.y * v.normal.y + v.normal.z * v.normal.z);
+
+          v.normal.x /= length;
+          v.normal.y /= length;
+          v.normal.z /= length;
+
+//          printf ("%g ", fabs (255.0f * v.normal.z));
+          
+          v.color.alpha = unsigned char (255.0f - next_field->U [i][j] * 255.0f);
 
           /*3*/
           
@@ -372,6 +440,7 @@ class TestView: public IGameView
     size_t                     indices_block_size;
     IDevice*                   current_device;
     BufferPtr                  vertex_buffer;
+    BufferPtr                  rect_vertex_buffer;
     BufferPtr                  constant_buffer;
     BufferPtr                  index_buffer;
     InputLayoutPtr             input_layout;
@@ -379,7 +448,9 @@ class TestView: public IGameView
     ProgramParametersLayoutPtr shader_parameters_layout;
     RasterizerStatePtr         rasterizer;
     TexturePtr                 water_texture;
+    TexturePtr                 ground_texture;
     SamplerStatePtr            texture_sampler;
+    BlendStatePtr              blend_state;
 };
 
 }
