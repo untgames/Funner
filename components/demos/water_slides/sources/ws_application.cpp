@@ -300,7 +300,7 @@ struct MyApplication::Impl
 
         current_view->OnMouse (event, cursor_x, cursor_y);
 
-        window.Invalidate ();        
+//        window.Invalidate ();        
       }
       catch (std::exception& e)
       {

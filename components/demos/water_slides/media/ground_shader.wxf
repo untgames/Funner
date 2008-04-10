@@ -1,0 +1,35 @@
+Parameters
+{
+  float4x4 myProjMatrix myViewMatrix myObjectMatrix
+}
+
+ProjectionMatrix myProjMatrix
+ViewMatrix       myViewMatrix
+ObjectMatrix     myObjectMatrix
+
+AlphaCompareMode AlwaysPass
+
+DiffuseColor  1 1 1 0.5
+SpecularColor 1 1 1 0.5
+Shininess     15
+
+Normalize 1
+
+//ColorMaterial Diffuse
+
+Light0
+{
+  Enable 1
+  Type   Point
+  AmbientColor  1 1 1 1
+  DiffuseColor  20 20 20 1
+  SpecularColor 1 1 1 1
+  Position  1 1 -1
+}
+
+Texmap0
+{
+  TexcoordU Explicit
+  TexcoordV Explicit
+  Blend     Modulate
+}

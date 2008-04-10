@@ -11,11 +11,12 @@ namespace
     Константы
 */
 
-const char*  SHADER_FILE_NAME    = "media/fpp_shader.wxf"; //имя файла с шейдером
-const char*  WATER_TEXTURE_NAME  = "media/phong.jpg";      //имя файла с текстурой воды
-const char*  GROUND_TEXTURE_NAME = "media/ground.jpg";     //имя файла с текстурой земли
-const size_t GRID_SIZE           = 128;                    //количество разбиений сетки с водой
-const float  WATER_UPDATE_TIME   = 0.01f;                  //период обновления воды
+const char*  WATER_SHADER_FILE_NAME  = "media/water_shader.wxf";  //имя файла с шейдером воды
+const char*  GROUND_SHADER_FILE_NAME = "media/ground_shader.wxf"; //имя файла с шейдером земли
+const char*  WATER_TEXTURE_NAME      = "media/sky.jpg";           //имя файла с текстурой воды
+const char*  GROUND_TEXTURE_NAME     = "media/bottom.jpg";        //имя файла с текстурой земли
+const size_t GRID_SIZE               = 64;                       //количество разбиений сетки с водой
+const float  WATER_UPDATE_TIME       = 0.01f;                     //период обновления воды
 
 /*
     Описание отрисовываемых вершин
@@ -71,7 +72,8 @@ struct ShaderParameters
 class TestView: public IGameView
 {
   public:
-    TestView () : current_device (0), prev_field (&water_field [0]), next_field (&water_field [1])
+    TestView () : update_timer (xtl::bind (&TestView::OnTime, this), 10),
+      water_gen (false), current_device (0), prev_field (&water_field [0]), next_field (&water_field [1])    
     {
       memset (vertices, 0, sizeof vertices);
       memset (water_field, 0, sizeof water_field);
@@ -122,17 +124,18 @@ class TestView: public IGameView
       BlendStatePtr        default_blend_state         = current_device->OSGetBlendState ();      
 
       current_device->RSSetState                   (rasterizer.get ());            
-      current_device->SSSetProgram                 (shader.get ());
       current_device->SSSetProgramParametersLayout (shader_parameters_layout.get ());      
       current_device->SSSetConstantBuffer          (0, constant_buffer.get ());
       current_device->SSSetSampler                 (0, texture_sampler.get ());
       current_device->ISSetInputLayout             (input_layout.get ());
       current_device->OSSetDepthStencilState       (0);
-      
+
+      current_device->SSSetProgram      (ground_shader.get ());
       current_device->SSSetTexture      (0, ground_texture.get ());
       current_device->ISSetVertexBuffer (0, rect_vertex_buffer.get ());
       current_device->Draw              (PrimitiveType_TriangleStrip, 0, 4);
 
+      current_device->SSSetProgram      (water_shader.get ());
       current_device->OSSetBlendState   (blend_state.get ());
       current_device->SSSetTexture      (0, water_texture.get ());
       current_device->ISSetVertexBuffer (0, vertex_buffer.get ());
@@ -189,14 +192,8 @@ class TestView: public IGameView
       layout_desc.index_type              = InputDataType_UInt;
       layout_desc.index_buffer_offset     = 0;            
 
-      input_layout = InputLayoutPtr (current_device->CreateInputLayout (layout_desc), false);
+      input_layout = InputLayoutPtr (current_device->CreateInputLayout (layout_desc), false);      
       
-      stl::string shader_source = load_text_file (SHADER_FILE_NAME);
-      
-      ShaderDesc shader_descs [] = {
-        {"fpp_shader", size_t (-1), shader_source.c_str (), "fpp", ""},
-      };
-
       static ProgramParameter shader_parameters[] = {
         {"myProjMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (ShaderParameters, projection_matrix)},
         {"myViewMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (ShaderParameters, view_matrix)},
@@ -205,7 +202,8 @@ class TestView: public IGameView
 
       ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
 
-      shader = ProgramPtr (current_device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &PrintShaderError));
+      water_shader  = LoadShader (WATER_SHADER_FILE_NAME);
+      ground_shader = LoadShader (GROUND_SHADER_FILE_NAME);      
 
       shader_parameters_layout = ProgramParametersLayoutPtr (current_device->CreateProgramParametersLayout (program_parameters_layout_desc));
       
@@ -284,7 +282,8 @@ class TestView: public IGameView
       index_buffer             = 0;
       constant_buffer          = 0;
       input_layout             = 0;
-      shader                   = 0;
+      water_shader             = 0;
+      ground_shader            = 0;
       shader_parameters_layout = 0;
       rasterizer               = 0;
       water_texture            = 0;
@@ -292,7 +291,7 @@ class TestView: public IGameView
       blend_state              = 0;
     }    
     
-    void OnIdle ()
+    void OnTime ()
     {
       static size_t last = MyApplication::Milliseconds ();
       
@@ -303,15 +302,60 @@ class TestView: public IGameView
         UpdateWater ();
 
         last = MyApplication::Milliseconds ();
-      }
+      }      
+    }
+    
+    void OnIdle ()
+    {
     }
 
     void OnMouse (syslib::WindowEvent event, int x, int y)
     {
-//      printf ("Event %d x=%d y=%d\n", event, x, y);
+      switch (event)
+      {
+        case syslib::WindowEvent_OnLeftButtonUp:
+          water_gen = false;
+          break; 
+        case syslib::WindowEvent_OnLeftButtonDown:
+          water_gen = true;
+        case syslib::WindowEvent_OnMouseMove:
+        {
+          if (water_gen)
+          {
+            int i1 = int (float (100-x) / 100.0f * (GRID_SIZE - 5)),
+                j1 = int (float (y) / 100.0f * (GRID_SIZE - 5));
+
+            for (int i=-3; i<4; i++)
+            {
+              for (int j=-3; j<4; j++)
+              {
+                float v = 6.0f - i * i - j * j;
+
+                if (v < 0.0f)
+                  v = 0.0f;
+
+                next_field->U [i+i1+3][j+j1+3] -= v * 0.004f;
+              }
+            }            
+          }          
+                  
+          break;
+        }
+        default:
+          break;
+      }      
     }
     
   private:
+    ProgramPtr LoadShader (const char* name)
+    {
+      stl::string shader_source = load_text_file (name);
+      
+      ShaderDesc shader_desc = {name, size_t (-1), shader_source.c_str (), "fpp", ""};
+
+      return ProgramPtr (current_device->CreateProgram (1, &shader_desc, &PrintShaderError));
+    }    
+  
     TexturePtr LoadTexture (const char* name)
     {
       media::Image water_image (name, media::PixelFormat_RGB8);
@@ -348,83 +392,43 @@ class TestView: public IGameView
       memset (&shader_parameters, 0, sizeof shader_parameters);
 
       shader_parameters.object_matrix     = math::mat4f (1.0f);      
-      shader_parameters.projection_matrix = get_ortho_proj (-0.5, 0.5, -1, 1, -1, 1);
-      shader_parameters.view_matrix       = math::rotatef (math::deg2rad (60.0f), 0, 1, 0);
-      
-/*      shader_parameters.object_matrix     = math::rotatef (math::deg2rad (60.0f), 1, 0, 0);
-      shader_parameters.projection_matrix = get_ortho_proj (-0.5, 0.5, -1, 1, -1, 1);
-      shader_parameters.view_matrix       = math::rotatef (math::deg2rad (60.0f), 0, 1, 0);*/
+      shader_parameters.projection_matrix = get_ortho_proj (-1, 1, -1, 1, -10, 10);
+      shader_parameters.view_matrix       = math::translatef (0, 0, -5.5);
 
       constant_buffer->SetData (0, sizeof shader_parameters, &shader_parameters);
     }
     
     void UpdateWater ()
     {
-      int i, j, i1, j1;
-
-      i1 = rand () % (GRID_SIZE - 10);
-      j1 = rand () % (GRID_SIZE - 10);
-
-      /*1*/
-      
-      if (!(rand()&31))
-        for(i=-3; i<4; i++)
-        {
-          for (j=-3; j<4; j++)
-          {
-            float v = 6.0f - i * i - j * j;
-
-            if (v < 0.0f)
-              v = 0.0f;
-
-            next_field->U [i+i1+3][j+j1+3] -= v * 0.004f;
-          }
-        }
+      int i, j;
 
       for (i=1; i<GRID_SIZE-1; i++)
       {
         for (j=1; j<GRID_SIZE-1; j++)
         {
-          /*2*/
-          
           Vertex& v = vertices [i][j];
 
           v.position.z = next_field->U [i][j];                      
           v.normal.x   = next_field->U [i-1][j] - next_field->U [i+1][j];
           v.normal.y   = next_field->U [i][j-1] - next_field->U [i][j+1];
-          v.normal.z   = -4.0f / (GRID_SIZE - 1);
-//          v.normal.z   = -sqrt (1.0f - v.normal.x * v.normal.x - v.normal.y * v.normal.y);
-          
-          float length = sqrt (v.normal.x * v.normal.x + v.normal.y * v.normal.y + v.normal.z * v.normal.z);
-
-          v.normal.x /= length;
-          v.normal.y /= length;
-          v.normal.z /= length;
 
 //          printf ("%g ", fabs (255.0f * v.normal.z));
-          
-          v.color.alpha = unsigned char (255.0f - next_field->U [i][j] * 255.0f);
 
-          /*3*/
+//          v.color.alpha = unsigned char (200.0f - next_field->U [i][j] * 150.0f);
           
-          static const float vis = 0.005f;
+//          static const float vis = 0.005f;
+          static const float vis = 0.02f;
 
           float laplas = (next_field->U [i-1][j] +
                           next_field->U [i+1][j] +
                           next_field->U [i][j+1] +
                           next_field->U [i][j-1]) * 0.25f - next_field->U [i][j];
 
-          /*4*/
-
           prev_field->U [i][j] = ((2.0f - vis) * next_field->U [i][j] - prev_field->U [i][j] * (1.0f - vis) + laplas);
         }
       }
 
-      /*5*/
-
       stl::swap (next_field, prev_field);
-      
-      /*6*/
 
       vertex_buffer->SetData (0, GRID_SIZE * GRID_SIZE * sizeof Vertex, vertices);
     }
@@ -433,6 +437,8 @@ class TestView: public IGameView
     typedef stl::vector<size_t> IndexArray;
 
   private:
+    syslib::Timer              update_timer;
+    bool                       water_gen;
     WaterField                 water_field [2];
     WaterField                 *prev_field, *next_field;
     Vertex                     vertices [GRID_SIZE][GRID_SIZE];
@@ -444,7 +450,8 @@ class TestView: public IGameView
     BufferPtr                  constant_buffer;
     BufferPtr                  index_buffer;
     InputLayoutPtr             input_layout;
-    ProgramPtr                 shader;
+    ProgramPtr                 water_shader;
+    ProgramPtr                 ground_shader;    
     ProgramParametersLayoutPtr shader_parameters_layout;
     RasterizerStatePtr         rasterizer;
     TexturePtr                 water_texture;

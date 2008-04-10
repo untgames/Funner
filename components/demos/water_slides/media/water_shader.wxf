@@ -9,11 +9,13 @@ ObjectMatrix     myObjectMatrix
 
 AlphaCompareMode AlwaysPass
 
-DiffuseColor  1 1 1 1
-SpecularColor 1 1 1 1
+DiffuseColor  1 1 1 0.75
+SpecularColor 1 1 1 0.75
 Shininess     15
 
-ColorMaterial Diffuse
+Normalize 1
+
+//ColorMaterial Diffuse
 
 Light0
 {
@@ -27,8 +29,6 @@ Light0
 
 Texmap0
 {
-//  TexcoordU Explicit
-//  TexcoordV Explicit
   TexcoordU SphereMap
   TexcoordV SphereMap
   Blend     Modulate

@@ -20,6 +20,7 @@
 
 #include <syslib/window.h>
 #include <syslib/application.h>
+#include <syslib/timer.h>
 
 #include <media/image.h>
 
