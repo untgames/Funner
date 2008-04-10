@@ -333,8 +333,9 @@ class FppShaderParser
         {0, 0}
       };
 
-      ParseEnum        (program_iter, "AlphaCompareMode", offsetof (FppState, alpha_compare_mode), compare_modes);
-      ParseFloatValues (program_iter, "AlphaReference",   offsetof (FppState, alpha_reference), 1);
+      ParseEnum          (program_iter, "AlphaCompareMode", offsetof (FppState, alpha_compare_mode), compare_modes);
+      ParseFloatValues   (program_iter, "AlphaReference",   offsetof (FppState, alpha_reference), 1);
+      ParseIntegerValues (program_iter, "Normalize",        offsetof (FppState, normalize), 1);
 
         //разбор параметров освещения
       

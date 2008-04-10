@@ -498,6 +498,11 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
     glDisable (GL_ALPHA_TEST);
   }  
   
+    //режимы отрисовки
+
+  if (fpp_state.normalize) glEnable  (GL_NORMALIZE);
+  else                     glDisable (GL_NORMALIZE);
+
     //включение параметров текстурирования
     
   size_t *common_cache             = &GetContextManager ().GetContextDataTable (Stage_Common)[0],

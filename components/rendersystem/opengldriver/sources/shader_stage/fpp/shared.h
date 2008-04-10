@@ -125,6 +125,7 @@ struct FppState
   ColorMaterial color_material;                     //настройка передачи цвета материала
   CompareMode   alpha_compare_mode;                 //режим альфа теста
   float         alpha_reference;                    //константа альфа теста
+  bool          normalize;                          //необходимо ли нормализировать нормали
   TexmapDesc    maps [DEVICE_SAMPLER_SLOTS_COUNT];  //текстурные карты
 };
 
