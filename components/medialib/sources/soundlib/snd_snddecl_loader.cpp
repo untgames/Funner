@@ -29,26 +29,13 @@ void snddecl_load_library (const char* file_name, SoundDeclarationLibrary& libra
       log.Error (i, "Incorrect file format, 'id' tag property missing");
       continue;
     }
-    if (!test (i, "samples.count"))
-    {
-      log.Error (i, "Incorrect file format, 'samples.count' tag property missing");
-      continue;
-    }
-
-    size_t samples_count = get <size_t> (i, "samples.count");
-
-    if (!samples_count)
-    {
-      log.Error (i, "Incorrect file format, No sound samples");
-      continue;
-    }
 
     SoundDeclaration decl;
 
-    decl.Rename     (get <const char*> (i, "name"));
-    decl.SetType    (get <const char*> (i, "type"));
+    decl.Rename     (get <const char*> (i, "name", ""));
+    decl.SetType    (get <const char*> (i, "type", ""));
     decl.SetLooping (get <bool> (i, "looping"));
-
+    
     Parser::Iterator param = i->First ("params");
 
     if (i)
@@ -63,11 +50,20 @@ void snddecl_load_library (const char* file_name, SoundDeclarationLibrary& libra
       decl.SetParam (SoundParam_MaximumDistance,   get <float> (param, "maximum_distance"));
       decl.SetParam (SoundParam_CullDistance,      get <float> (param, "cull_distance"));
     }
+    
+    param = i->First ("samples.#text");    
+    
+    size_t samples_count = param ? param->AttributesCount () : 0;    
 
-    param = i->First ("samples.#text");
+    for (size_t j=0; j<samples_count; j++)
+    {
+      const char* sample_name = param->Attribute (j);
 
-    for (size_t j = 0; j < samples_count; j++)
-      decl.AddSample (param->Attribute (j));
+      if (!sample_name)
+        continue;
+
+      decl.AddSample (sample_name);
+    }
 
     library.Attach (get <const char *> (i, "id"), decl);
   }  

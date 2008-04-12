@@ -354,7 +354,7 @@ class XmlMeshLibraryLoader
   
       //разбор библиотеки
     void ParseLibrary (Parser::Iterator library_iter)
-    {     
+    {
       for_each_child (library_iter, "vertex_streams.vertex_stream", xtl::bind (&XmlMeshLibraryLoader::ParseVertexStream, this, _1));
       for_each_child (library_iter, "vertex_streams.vertex_weight_stream", xtl::bind (&XmlMeshLibraryLoader::ParseVertexWeightStream, this, _1));
       for_each_child (library_iter, "vertex_buffers.vertex_buffer", xtl::bind (&XmlMeshLibraryLoader::ParseVertexBuffer, this, _1));
