@@ -18,6 +18,8 @@ const size_t DEFAULT_WINDOW_WIDTH  = 400;                         //начальная ши
 const size_t DEFAULT_WINDOW_HEIGHT = 300;                         //начальная высота окна
 const char*  DEFAULT_WINDOW_TITLE  = "Water slides demo ($Id$)"; //заголовок окна
 
+const char*  WATER_DROP_SOUND_NAME   = "media/drop.snddecl";      //имя файла декларации с звуком капли
+
 const size_t DEFAULT_FB_COLOR_BITS    = 24; //глубина буфера цвета
 const size_t DEFAULT_FB_ALPHA_BITS    = 8;  //глубина альфа-буфера
 const size_t DEFAULT_FB_DEPTH_BITS    = 24; //глубина z-buffer'а
@@ -41,7 +43,9 @@ struct MyApplication::Impl
       log_file (configuration.GetString ("LogFileName", DEFAULT_LOG_FILE_NAME)),
       log_stream (xtl::bind (&Impl::LogWriteBuffer, this, _1, _2)),
       window (syslib::WindowStyle_Overlapped, configuration.GetInteger ("WindowWidth", DEFAULT_WINDOW_WIDTH), configuration.GetInteger ("WindowHeight", DEFAULT_WINDOW_HEIGHT)),
-      driver (get_opengl_driver ())
+      driver (get_opengl_driver ()),
+      sound_manager (window, sound::SoundManager::FindConfiguration ("*", "*")),
+      sg_player (sound_manager)
     {
       LogMessage ("Create window...");
       
@@ -94,6 +98,9 @@ struct MyApplication::Impl
         //регистрация обработчиков событий приложения
         
       app_idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&Impl::OnIdle, this));      
+
+      LogMessage ("Loading sound declarations...");
+      sound_manager.LoadSoundLibrary (WATER_DROP_SOUND_NAME);
     }
     
       //деструктор
@@ -182,7 +189,7 @@ struct MyApplication::Impl
         {
           try
           {
-            current_view->LoadResources (*device);        
+            current_view->LoadResources (sg_player, *device);        
 
             window.Invalidate (); 
           }
@@ -335,15 +342,17 @@ struct MyApplication::Impl
     }        
 
   private:
-    ::Configuration  configuration; //настрройки
-    OutputFile       log_file;   //файл протолирования
-    OutputTextStream log_stream; //поток протоколирования работы приложения
-    syslib::Window   window;     //главное окно приложения
-    DriverPtr        driver;     //OpenGL driver
-    SwapChainPtr     swap_chain; //цепочка обмена главного окна приложения
-    DevicePtr        device;     //устройство рендеринга главного окна приложения
-    xtl::connection  app_idle_connection; //соединение сигнала обработчика холостого хода приложения
-    GameView         current_view;        //текущее игровое отображение
+    ::Configuration     configuration; //настрройки
+    OutputFile          log_file;   //файл протолирования
+    OutputTextStream    log_stream; //поток протоколирования работы приложения
+    syslib::Window      window;     //главное окно приложения
+    DriverPtr           driver;     //OpenGL driver
+    SwapChainPtr        swap_chain; //цепочка обмена главного окна приложения
+    DevicePtr           device;     //устройство рендеринга главного окна приложения
+    xtl::connection     app_idle_connection; //соединение сигнала обработчика холостого хода приложения
+    GameView            current_view;        //текущее игровое отображение
+    sound::SoundManager sound_manager;       //менеджер звуков
+    sound::SGPlayer     sg_player;           //проигрыватель звуков
 };
 
 /*

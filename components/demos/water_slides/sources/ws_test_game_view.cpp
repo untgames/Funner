@@ -73,7 +73,9 @@ class TestView: public IGameView
 {
   public:
     TestView () : update_timer (xtl::bind (&TestView::OnTime, this), 10),
-      water_gen (false), current_device (0), prev_field (&water_field [0]), next_field (&water_field [1])    
+      water_gen (false), current_device (0), prev_field (&water_field [0]), next_field (&water_field [1]),
+      listener (scene_graph::Listener::Create ()),
+      sound_emitter (scene_graph::SoundEmitter::Create ("drop"))
     {
       memset (vertices, 0, sizeof vertices);
       memset (water_field, 0, sizeof water_field);
@@ -106,6 +108,9 @@ class TestView: public IGameView
           indices.push_back (&vertices [i+1][j] - &vertices [0][0]);
         }        
       }      
+
+      listener->BindToParent (scene.Root ());
+      sound_emitter->BindToParent (scene.Root ());
     }
     
     ~TestView ()
@@ -148,8 +153,10 @@ class TestView: public IGameView
       current_device->OSSetDepthStencilState (default_depth_stencil_state.get ());
     }
 
-    void LoadResources (IDevice& device)
+    void LoadResources (sound::SGPlayer& player, IDevice& device)
     {
+      player.SetListener (*(listener.get ()));
+
       current_device = &device;
       
       BufferDesc vb_desc;
@@ -318,6 +325,9 @@ class TestView: public IGameView
           break; 
         case syslib::WindowEvent_OnLeftButtonDown:
           water_gen = true;
+
+          sound_emitter->SetPosition ((float)x - 50.f, 50.f - y, 0.f);
+          sound_emitter->Play ();
         case syslib::WindowEvent_OnMouseMove:
         {
           if (water_gen)
@@ -458,6 +468,9 @@ class TestView: public IGameView
     TexturePtr                 ground_texture;
     SamplerStatePtr            texture_sampler;
     BlendStatePtr              blend_state;
+    scene_graph::Scene         scene;
+    ListenerPtr                listener;
+    SoundEmitterPtr            sound_emitter;
 };
 
 }

@@ -29,6 +29,13 @@
 #include <render/low_level/utils.h>
 #include <render/low_level/opengl_driver.h>
 
+#include <sg/scene.h>
+#include <sg/listener.h>
+#include <sg/sound_emitter.h>
+
+#include <sound/sgplayer.h>
+#include <sound/openal_device.h>
+
 typedef xtl::com_ptr<render::low_level::IDriver>                  DriverPtr;
 typedef xtl::com_ptr<render::low_level::ISwapChain>               SwapChainPtr;
 typedef xtl::com_ptr<render::low_level::IDevice>                  DevicePtr;
@@ -43,6 +50,8 @@ typedef xtl::com_ptr<render::low_level::IRasterizerState>         RasterizerStat
 typedef xtl::com_ptr<render::low_level::IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<render::low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<render::low_level::IPredicate>               PredicatePtr;
+typedef scene_graph::Listener::Pointer                            ListenerPtr;
+typedef scene_graph::SoundEmitter::Pointer                        SoundEmitterPtr;
 
 //интерфейс игрового отображения
 class IGameView
@@ -55,7 +64,7 @@ class IGameView
     virtual size_t Height () { return 100; }    
     
       //создание ресурсов
-    virtual void LoadResources (render::low_level::IDevice&) {}
+    virtual void LoadResources (sound::SGPlayer&, render::low_level::IDevice&) {}
     virtual void FlushResources () {}
     
       //обработчики событий

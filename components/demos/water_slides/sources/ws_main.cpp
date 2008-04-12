@@ -2,17 +2,27 @@
 
 int main ()
 {
-    //инициализация приложения
+  try
+  {
+    sound::low_level::register_openal_driver ();
+      
+      //инициализация приложения
 
-  MyApplication::Instance ();  
-  
-  MyApplication::Instance ().SetView (create_test_game_view ());
-
-    //запуск приложения
+    MyApplication::Instance ();  
     
-  syslib::Application::Run ();
+    MyApplication::Instance ().SetView (create_test_game_view ());
 
-    //завершение приложения
+      //запуск приложения
+      
+    syslib::Application::Run ();
 
-  return syslib::Application::GetExitCode ();
+      //завершение приложения
+
+    return syslib::Application::GetExitCode ();
+  }
+  catch (std::exception& e)
+  {
+    printf ("Exception caught: %s\n", e.what ());
+    return 1;
+  }
 }
