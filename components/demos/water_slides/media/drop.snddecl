@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sound_declaration_library>
   <declaration id="drop" name="drop" type="ambient" looping="0">
-    <params gain="1.0" min_gain="0.1" max_gain="1.0" inner_angle="180" outer_angle="180" outer_gain="1.0" reference_distance="1" maximum_distance="100" cull_distance="110"/>
+    <params gain="1.0" min_gain="0.1" max_gain="1.0" inner_angle="360" outer_angle="360" outer_gain="1.0" reference_distance="1" maximum_distance="50" cull_distance="110"/>
     <samples>
       'media/drop.wav'
     </samples>

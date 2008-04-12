@@ -326,6 +326,7 @@ class TestView: public IGameView
         case syslib::WindowEvent_OnLeftButtonDown:
           water_gen = true;
 
+          sound_emitter->Stop ();
           sound_emitter->SetPosition ((float)x - 50.f, 50.f - y, 0.f);
           sound_emitter->Play ();
         case syslib::WindowEvent_OnMouseMove:
