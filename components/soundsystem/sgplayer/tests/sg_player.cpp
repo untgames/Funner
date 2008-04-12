@@ -30,7 +30,8 @@ const char* library_file    = "data/test.snddecl";
 typedef com_ptr<scene_graph::Listener>     ListenerPtr;
 typedef com_ptr<scene_graph::SoundEmitter> SoundEmitterPtr;
 
-SoundEmitterPtr sound_emitter (SoundEmitter::Create ("declaration1"), false), sound_emitter2 (SoundEmitter::Create ("declaration2"), false);
+SoundEmitterPtr sound_emitter  = SoundEmitter::Create ("declaration1"),
+                sound_emitter2 = SoundEmitter::Create ("declaration2");
 
 void TimerHandler (Timer&)
 {
@@ -54,7 +55,7 @@ int main ()
     Scene           scene;
     Window          window;
     SoundManager    manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
-    ListenerPtr     listener (scene_graph::Listener::Create (), false);
+    ListenerPtr     listener (scene_graph::Listener::Create ());
 
     srand ((unsigned int) time (NULL));
     listener->BindToParent (scene.Root ());
