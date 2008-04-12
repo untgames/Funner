@@ -119,13 +119,16 @@ SoundManagerEmitter::SoundManagerEmitter (float normalized_offset)
 SoundManager::Impl::Impl (Window& target_window, const char* in_target_configuration, const char* in_init_string)
   : window (target_window), minimize_action (WindowMinimizeAction_Ignore),
     volume (1.f),
-    target_configuration (in_target_configuration),
-    init_string (in_init_string),
     minimize_connection (window.RegisterEventHandler (WindowEvent_OnLostFocus, bind (&SoundManager::Impl::OnMinimize, this, _1, _2, _3))),
     maximize_connection (window.RegisterEventHandler (WindowEvent_OnSetFocus,  bind (&SoundManager::Impl::OnMaximize, this, _1, _2, _3))),
     change_handle_connection (window.RegisterEventHandler (WindowEvent_OnChangeHandle, bind (&SoundManager::Impl::OnChangeHandle, this, _1, _2, _3))),
     emitter_timer (xtl::bind (&SoundManager::Impl::EmitterUpdate, this), (size_t)(DEFAULT_EMITTER_PROPERTIES_UPDATE_PERIOD * 1000))
 {
+  if (in_target_configuration)
+    target_configuration = in_target_configuration;
+  if (in_init_string)
+    init_string = in_init_string;
+  
   Init ();
 }
 
@@ -135,31 +138,22 @@ SoundManager::Impl::Impl (Window& target_window, const char* in_target_configura
 
 void SoundManager::Impl::Init ()
 {
-  try
-  {
-    device = SoundSystem::CreateDevice (target_configuration.c_str (), &window, init_string.c_str ());
+  device = SoundSystem::CreateDevice (target_configuration.c_str (), &window, init_string.c_str ());
 
-    if (device)
+  device->GetCapabilities (capabilities);
+  
+  for (size_t i = free_channels.size (); i; i--)
+    free_channels.pop ();
+
+  for (size_t i = 0; i < capabilities.channels_count; i++)
+    free_channels.push (i);
+
+  for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+    if (i->second.is_playing)
     {
-      device->GetCapabilities (capabilities);
-      
-      for (size_t i = free_channels.size (); i; i--)
-        free_channels.pop ();
-
-      for (size_t i = 0; i < capabilities.channels_count; i++)
-        free_channels.push (i);
-
-      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-        if (i->second.is_playing)
-        {
-          PauseSound (*(i->first));
-          PlaySound  (*(i->first));
-        }
+      PauseSound (*(i->first));
+      PlaySound  (*(i->first));
     }
-  }
-  catch (...)
-  {
-  }
 }
 
 /*
