@@ -273,7 +273,7 @@ void SoundManager::Impl::PlaySound (Emitter& emitter)
     emitter_iter->second.channel_number = channel_to_use;
     device->SetSample (channel_to_use, emitter_iter->second.sound_declaration->Sample (emitter_iter->second.sample_number));
     device->Seek (channel_to_use, emitter_iter->second.cur_position);
-    device->Play (channel_to_use, true);
+    device->Play (channel_to_use, emitter_iter->second.sound_declaration->Looping ());
   }
 }
 

@@ -27,8 +27,8 @@ const size_t ACTION_TIME    = 5000;
 const size_t ACTION2_TIME   = 100;
 const char* library_file    = "data/test.snddecl";
 
-typedef com_ptr<scene_graph::Listener>     ListenerPtr;
-typedef com_ptr<scene_graph::SoundEmitter> SoundEmitterPtr;
+typedef scene_graph::Listener::Pointer     ListenerPtr;
+typedef scene_graph::SoundEmitter::Pointer SoundEmitterPtr;
 
 SoundEmitterPtr sound_emitter  = SoundEmitter::Create ("declaration1"),
                 sound_emitter2 = SoundEmitter::Create ("declaration2");
