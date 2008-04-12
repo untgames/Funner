@@ -64,7 +64,7 @@ class IGameView
     virtual size_t Height () { return 100; }    
     
       //создание ресурсов
-    virtual void LoadResources (sound::SGPlayer&, render::low_level::IDevice&) {}
+    virtual void LoadResources (sound::SGPlayer*, render::low_level::IDevice&) {}
     virtual void FlushResources () {}
     
       //обработчики событий

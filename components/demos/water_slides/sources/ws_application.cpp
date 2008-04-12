@@ -44,9 +44,33 @@ struct MyApplication::Impl
       log_stream (xtl::bind (&Impl::LogWriteBuffer, this, _1, _2)),
       window (syslib::WindowStyle_Overlapped, configuration.GetInteger ("WindowWidth", DEFAULT_WINDOW_WIDTH), configuration.GetInteger ("WindowHeight", DEFAULT_WINDOW_HEIGHT)),
       driver (get_opengl_driver ()),
-      sound_manager (window, sound::SoundManager::FindConfiguration ("*", "*")),
-      sg_player (sound_manager)
+      sound_manager (0),
+      sg_player (0)
     {
+      try
+      {
+        sound_manager = new sound::SoundManager (window, sound::SoundManager::FindConfiguration ("*", "*"));
+
+        LogMessage ("Loading sound declarations...");
+        sound_manager->LoadSoundLibrary (WATER_DROP_SOUND_NAME);
+      }
+      catch (...)
+      {
+        LogMessage ("Can't create sound manager, exception caught");
+      }
+      if (sound_manager)
+      {
+        try
+        {
+          sg_player = new sound::SGPlayer (*sound_manager);
+        }
+        catch (...)
+        {
+          delete sound_manager;
+          LogMessage ("Can't create sgplayer, exception caught");
+        }
+      }
+
       LogMessage ("Create window...");
       
         //установка пользовательской функции отладочного протоколирования
@@ -98,9 +122,6 @@ struct MyApplication::Impl
         //регистрация обработчиков событий приложения
         
       app_idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&Impl::OnIdle, this));      
-
-      LogMessage ("Loading sound declarations...");
-      sound_manager.LoadSoundLibrary (WATER_DROP_SOUND_NAME);
     }
     
       //деструктор
@@ -108,6 +129,9 @@ struct MyApplication::Impl
     {
       try
       {
+        delete sound_manager;
+        delete sg_player;
+
         LogMessage ("Close application");        
         
         SetView (GameView ());                
@@ -351,8 +375,8 @@ struct MyApplication::Impl
     DevicePtr           device;     //устройство рендеринга главного окна приложения
     xtl::connection     app_idle_connection; //соединение сигнала обработчика холостого хода приложения
     GameView            current_view;        //текущее игровое отображение
-    sound::SoundManager sound_manager;       //менеджер звуков
-    sound::SGPlayer     sg_player;           //проигрыватель звуков
+    sound::SoundManager *sound_manager;       //менеджер звуков
+    sound::SGPlayer     *sg_player;           //проигрыватель звуков
 };
 
 /*
