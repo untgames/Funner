@@ -86,8 +86,8 @@ class TestView: public IGameView
         {
           Vertex& vert = vertices [i][j];
           
-          vert.position.x  = 1.0f - 2.0f * i / (GRID_SIZE - 1);
-          vert.position.y  = 1.0f - 2.0f * j / (GRID_SIZE - 1);
+          vert.position.x  = 1.0f - 2.0f * i / (GRID_SIZE - 2); //!!!
+          vert.position.y  = 1.0f - 2.0f * j / (GRID_SIZE - 2); //!!!
           vert.normal.z    = -4.0f / (GRID_SIZE - 1);
           vert.texcoord.x  = float (j) / float (GRID_SIZE - 1);
           vert.texcoord.y  = float (i) / float (GRID_SIZE - 1);
@@ -248,6 +248,7 @@ class TestView: public IGameView
       sampler_desc.wrap_u     = TexcoordWrap_Clamp;
       sampler_desc.wrap_v     = TexcoordWrap_Clamp;
       sampler_desc.wrap_w     = TexcoordWrap_Clamp;
+      sampler_desc.comparision_function = CompareMode_AlwaysPass;
 
       texture_sampler = SamplerStatePtr (current_device->CreateSamplerState (sampler_desc), false);
       

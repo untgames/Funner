@@ -48,7 +48,7 @@ struct MyApplication::Impl
       sg_player (0)
     {
       try
-      {
+      {        
         sound_manager = new sound::SoundManager (window, sound::SoundManager::FindConfiguration ("*", "*"));
 
         LogMessage ("Loading sound declarations...");
@@ -56,8 +56,12 @@ struct MyApplication::Impl
       }
       catch (...)
       {
+        delete sound_manager;
+        sound_manager = 0;        
+
         LogMessage ("Can't create sound manager, exception caught");
-      }
+      }      
+
       if (sound_manager)
       {
         try
@@ -67,6 +71,7 @@ struct MyApplication::Impl
         catch (...)
         {
           delete sound_manager;
+          sound_manager = 0;
           LogMessage ("Can't create sgplayer, exception caught");
         }
       }
