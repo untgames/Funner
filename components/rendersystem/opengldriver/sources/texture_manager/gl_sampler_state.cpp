@@ -230,7 +230,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     glTexParameteri (tex_target, GL_TEXTURE_MIN_FILTER, gl_min_filter);
     glTexParameteri (tex_target, GL_TEXTURE_MAG_FILTER, gl_mag_filter);
 
-    if (!caps.has_ext_texture_filter_anisotropic)
+    if (caps.has_ext_texture_filter_anisotropic)
       glTexParameteri (tex_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, in_desc.max_anisotropy);
 
     glTexParameteri (tex_target, GL_TEXTURE_WRAP_S, gl_wrap [Texcoord_U]);
