@@ -4,13 +4,15 @@
 #include <common/strlib.h>
 #include <common/exception.h>
 
-#include <stl/hash_map>
+#include <stl/vector>
 #include <stl/string>
 
 #include <xtl/intrusive_ptr.h>
 
 using namespace input::low_level;
 using namespace common;
+
+const size_t DRIVER_ARRAY_RESERVE = 5; //резервируемый размер массива драйверов 
 
 namespace input
 {
@@ -25,6 +27,8 @@ namespace low_level
 class DriverManagerImpl
 {
   public:
+    DriverManagerImpl () {drivers.reserve (DRIVER_ARRAY_RESERVE);}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация драйверов
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
@@ -49,11 +53,18 @@ class DriverManagerImpl
     IDevice* CreateDevice (const char* driver_mask, const char* device_mask);
 
   private:
-    typedef xtl::com_ptr<IDriver>      DriverPtr;
-    typedef stl::hash_map<stl::string, DriverPtr> DriverMap;
-    
+    typedef xtl::com_ptr<IDriver>  DriverPtr;
+    struct InputDriver
+    {
+      InputDriver (IDriver* in_driver, const char* in_name) : driver (in_driver), name (in_name) {} 
+
+      DriverPtr   driver;
+      stl::string name;
+    };
+    typedef stl::vector<InputDriver> DriverArray;
+  
   private:
-    DriverMap drivers; //карта драйверов
+    DriverArray drivers; //карта драйверов
 };
 
 }
@@ -72,13 +83,11 @@ void DriverManagerImpl::RegisterDriver (const char* name, IDriver* driver)
   if (!driver)
     RaiseNullArgument ("input::low_level::DriverManager::RegisterDriver", "driver");
 
-  DriverMap::iterator iter = drivers.find (name);
-
-  if (iter != drivers.end ())
+  if (FindDriver (name))
     RaiseInvalidArgument ("input::low_level::DriverManager::RegisterDriver", "name", name,
                           "Driver with this name has been already registered");
 
-  drivers.insert_pair (name, driver);
+  drivers.push_back (InputDriver (driver, name));
 }
 
 void DriverManagerImpl::UnregisterDriver (const char* name)
@@ -86,7 +95,9 @@ void DriverManagerImpl::UnregisterDriver (const char* name)
   if (!name)
     return;
     
-  drivers.erase (name);
+  for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
+    if (i->name == name)
+      drivers.erase (i);
 }
 
 void DriverManagerImpl::UnregisterAllDrivers ()
@@ -103,9 +114,11 @@ IDriver* DriverManagerImpl::FindDriver (const char* name)
   if (!name)
     return 0;
     
-  DriverMap::iterator iter = drivers.find (name);
+  for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
+    if (i->name == name)
+      return get_pointer (i->driver);
   
-  return iter != drivers.end () ? get_pointer (iter->second) : 0;
+  return 0;
 }
 
 /*
@@ -122,11 +135,7 @@ IDriver* DriverManagerImpl::Driver (size_t index)
   if (index >= drivers.size ())
     RaiseOutOfRange ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
 
-  DriverMap::iterator iter = drivers.begin ();
-
-  for (size_t i = 0; i < index; ++iter, ++i);
-
-  return get_pointer (iter->second);
+  return get_pointer (drivers [index].driver);
 }
 
 /*
@@ -143,10 +152,15 @@ IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* d
 
     //поиск драйвера
 
-  for (DriverMap::iterator iter=drivers.begin (), end=drivers.end (); iter != end; ++iter)
-    if (wcimatch (iter->first.c_str (), driver_mask))
-      return iter->second->CreateDevice (device_mask); 
-
+  for (DriverArray::iterator iter=drivers.begin (), end=drivers.end (); iter != end; ++iter)
+    if (wcimatch (iter->name.c_str (), driver_mask))
+    {
+      for (size_t i = 0; i < iter->driver->GetDevicesCount (); i++)
+      {
+        if (wcimatch (iter->driver->GetDeviceName (i), device_mask))
+          return iter->driver->CreateDevice (iter->driver->GetDeviceName (i));
+      }
+    }
   return 0;
 }
 

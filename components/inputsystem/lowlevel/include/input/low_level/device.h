@@ -26,8 +26,8 @@ class IDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (const char* event)> EventHandler;
 
-    virtual void SetEventHandler (const EventHandler& handler) = 0;
-    virtual void GetEventHandler () = 0; //????
+    virtual void                SetEventHandler (const EventHandler& handler) = 0;
+    virtual const EventHandler& GetEventHandler () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройки устройства

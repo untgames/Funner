@@ -39,11 +39,11 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetEventHandler (const EventHandler& handler)
     {
-      RaiseNotImplemented ("TestInput::SetEventHandler");
+      event_handler = handler;
     }
-    void GetEventHandler ()
+    const EventHandler& GetEventHandler ()
     {
-      RaiseNotImplemented ("TestInput::GetEventHandler");
+      return event_handler;
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,8 +78,9 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     void Release () { release (this); }
 
   private:
-    float dead_zone;
-    float saturation_zone;
+    float        dead_zone;
+    float        saturation_zone;
+    EventHandler event_handler;
 };
 
 //тестовый драйвер
@@ -110,7 +111,7 @@ class TestDriver: virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создаение устройства ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IDevice* CreateDevice (const char* name_mask) 
+    IDevice* CreateDevice (const char* name) 
     {
       RaiseNotImplemented ("TestDriver::CreateDevice");
       return 0;
