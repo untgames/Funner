@@ -1,0 +1,9 @@
+Results of events_source1_test:
+Is connected: n
+Is connected: y
+Driver name = 'test_drv'
+Device name = 'TestInput'
+Is connected: n
+New event: 'event1'
+New event: 'event2'
+New event: 'last_event'

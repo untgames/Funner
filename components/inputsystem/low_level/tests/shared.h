@@ -16,10 +16,6 @@
 using namespace input::low_level;
 using namespace common;
 
-#ifdef _MSC_VER
-  #pragma warning (disable : 4250)
-#endif
-
 const char* DEVICE_PROPERTY1 = "Axis_X_dead_zone";
 const char* DEVICE_PROPERTY2 = "Axis_X_saturation_zone";
 
@@ -57,7 +53,7 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
       else if (!strcmp (DEVICE_PROPERTY2, name))
         saturation_zone = value;
       else
-        RaiseInvalidArgument ("TestInput::GetProperty", "name", name);    
+        RaiseInvalidArgument ("TestInput::SetProperty", "name", name);    
     }
     float GetProperty   (const char* name)
     {

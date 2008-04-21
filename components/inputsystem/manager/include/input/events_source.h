@@ -16,7 +16,7 @@ class EventsSource
 ///Конструксторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     EventsSource  ();
-    EventsSource  (const char* driver_mask, const char* device_name_mask);
+    EventsSource  (const char* driver_name_mask, const char* device_name_mask);
     EventsSource  (const EventsSource&);
     ~EventsSource ();
 
@@ -32,7 +32,8 @@ class EventsSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подключение к устройству ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Connect    (const char* driver_mask, const char* device_name);
+    void Connect    (const char* driver_name_mask, const char* device_name_mask);
+    void Connect    (const char* driver_name_mask, const char* device_name_mask, const xtl::function<void (const char*)>& log_function);
     void Disconnect ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

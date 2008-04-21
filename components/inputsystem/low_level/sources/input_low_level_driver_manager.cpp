@@ -44,8 +44,9 @@ class DriverManagerImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перечисление драйверов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t   DriversCount ();
-    IDriver* Driver       (size_t index);
+    size_t      DriversCount ();
+    IDriver*    Driver       (size_t index);
+    const char* DriverName   (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства ввода
@@ -138,6 +139,14 @@ IDriver* DriverManagerImpl::Driver (size_t index)
   return get_pointer (drivers [index].driver);
 }
 
+const char* DriverManagerImpl::DriverName (size_t index)
+{
+  if (index >= drivers.size ())
+    RaiseOutOfRange ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
+
+  return drivers [index].name.c_str ();
+}
+
 /*
    Создание устройства ввода
 */
@@ -198,6 +207,11 @@ size_t DriverManager::DriversCount ()
 IDriver* DriverManager::Driver (size_t index)
 {
   return DriverManagerSingleton::Instance ().Driver (index);
+}
+
+const char* DriverManager::DriverName (size_t index)
+{
+  return DriverManagerSingleton::Instance ().DriverName (index);
 }
 
 IDevice* DriverManager::CreateDevice (const char* driver_mask, const char* device_mask)
