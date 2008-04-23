@@ -1,0 +1,10 @@
+Results of action_map1_test:
+New event: 'my_event' with 0 args
+New event: 'my_event' with 1 args:
+  13
+New event: 'my_event' with 5 args:
+  1
+  2
+  3
+  4
+  5
