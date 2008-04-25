@@ -13,6 +13,7 @@
 #include <common/heap.h>
 #include <common/file.h>
 #include <media/image.h>
+#include <media/dds_image.h>
 #include <shared/resource_manager.h>
 
 namespace media

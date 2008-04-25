@@ -169,11 +169,13 @@ class ImageSystem
     typedef xtl::function<void (const char*,       Image&)> LoadHandler;
     typedef xtl::function<void (const char*, const Image&)> SaveHandler;
 
-    static void RegisterLoader   (const char* extension, const LoadHandler& codec);
-    static void RegisterSaver    (const char* extension, const SaveHandler& codec);
-    static void UnregisterLoader (const char* extension);
-    static void UnregisterSaver  (const char* extension);
-    static void UnregisterAll    ();
+    static void RegisterLoader       (const char* extension, const LoadHandler& codec);
+    static void RegisterSaver        (const char* extension, const SaveHandler& codec);
+    static void UnregisterLoader     (const char* extension);
+    static void UnregisterSaver      (const char* extension);
+    static void UnregisterAllLoaders (); //FIXME: need implementation
+    static void UnregisterAllSavers  (); //FIXME: need implementation
+    static void UnregisterAll        ();
 };
 
 }
