@@ -99,8 +99,8 @@ void parse_event (const char* replacement, TokenArray& tokens)
    Конструктор/деструктор
 */
 
-EventReplacer::EventReplacer (const char* input_event, const char* event_replacement, size_t in_id)
-  : id (in_id)
+EventReplacer::EventReplacer (const char* input_event, const char* event_replacement)
+  : str_event_wildcard (input_event), str_event_replacement (event_replacement)
 {
   parse_event (event_replacement, replacement_tokens);
   

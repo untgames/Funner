@@ -12,6 +12,14 @@ namespace input
 class TranslationMap
 {
   public:
+    struct Translation
+    {
+      const char* input_event;
+      const char* client_event_replacement;
+
+      Translation (const char* in_input_event, const char* in_client_event_replacement) : input_event (in_input_event), client_event_replacement (in_client_event_replacement) {}
+    };
+
     typedef xtl::function<void (const char* event)> EventHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,11 +34,18 @@ class TranslationMap
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация трансляторов
-///  (замены аргументов в клиентской подстановке через {1}, {2}, ...)
+///  (замены аргументов в клиентской подстановке через {1}, {2}, ...) 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Add    (const char* input_event, const char* client_event_replacement);
-    void   Remove (size_t input_event);
+    void Add    (const char* input_event, const char* client_event_replacement);
+    void Remove (const char* input_event_id);
+    void Remove (size_t event_index);
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перебор таблицы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t      Size () const;
+    Translation Item (size_t index) const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка клиентского обработчика оттранслированных событий
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -19,7 +19,7 @@ int main ()
   {
     TranslationMap translation_map;
 
-    size_t event1_id = translation_map.Add ("event1", "Replaced event1: event_name={0}, event_param1={1} end");
+    translation_map.Add ("event1", "Replaced event1: event_name={0}, event_param1={1} end");
     translation_map.Add ("event1 *", "Replaced event1: event_name={0}, event_param1={1} end");
 
     translation_map.ProcessEvent ("event1");
@@ -29,10 +29,16 @@ int main ()
     translation_map.ProcessEvent ("event1");
     translation_map.ProcessEvent ("event1 12asd");
 
-    translation_map.Remove (event1_id);
+    translation_map.Remove (0u);
 
     printf ("Processing removed event...\n");
     translation_map.ProcessEvent ("event1");
+    printf ("Removed event processed\n");
+
+    translation_map.Remove ("event1");
+
+    printf ("Processing removed event...\n");
+    translation_map.ProcessEvent ("event1 45");
     printf ("Removed event processed\n");
 
     translation_map.Add ("event1", "Replaced event1: event_name={0}, event_param1={1}end");  

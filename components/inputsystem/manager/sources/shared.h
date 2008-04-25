@@ -15,7 +15,7 @@ class EventReplacer
 /*
    Конструктор/деструктор
 */
-    EventReplacer (const char* input_event, const char* event_replacement, size_t id);
+    EventReplacer (const char* input_event, const char* event_replacement);
     ~EventReplacer ();
 
 /*
@@ -24,14 +24,16 @@ class EventReplacer
     bool Replace (const stl::vector<stl::string>& event_components, stl::string& result);
 
 /*
-   Получение идентификатора
+   Получение исходных данных
 */
-    size_t Id () {return id;}
+    const char* InputEvent       () const {return str_event_wildcard.c_str ();}
+    const char* EventReplacement () const {return str_event_replacement.c_str ();}
 
   private:
     stl::vector<stl::string> event_wildcard;
     TokenArray               replacement_tokens;
-    size_t                   id;
+    stl::string              str_event_wildcard;
+    stl::string              str_event_replacement;
 };
 
 /*
