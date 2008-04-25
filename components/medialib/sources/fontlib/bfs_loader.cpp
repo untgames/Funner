@@ -18,6 +18,28 @@ FontFace* FontFace::DefaultBFSLoader (const char* file_name)
   GlyphInfo*       glyph_info = NULL;
   KerningInfo*     kerning_info = NULL;
 
+  for (Parser::NamesakeIterator i = iter->First ("Glyphs.Glyph"); i; i++, glyph_count++)
+    if (!test (i, "XPos") || !test (i, "YPos") || !test (i, "Width") || !test (i, "Heigth"))
+    {
+      log.Error (i, "Incorrect file format, one of tag property missing");
+      break;
+    }
+
+  for (Parser::NamesakeIterator i = iter->First ("Kernings.Kerning"); i; i++)
+    if (!test (i, "LeftGlyph") || !test (i, "RightGlyph") || !test (i, "XKerning") || !test (i, "YKerning"))
+    {
+      log.Error (i, "Incorrect file format, one of tag property missing");
+      break;
+    }
+
+  for (size_t i = 0; i < log.MessagesCount (); i++)
+    if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
+    {
+      Raise <Exception> ("FontFace::DefaultBFSLoader", log.Message(i));
+
+      return new FontFace ();
+    }
+
   if (!iter)
     Raise <Exception> ("FontFace::DefaultBFSLoader", "Incorrect file format, no 'Font' root tag");
   if (!test (iter, "FontFile"))
@@ -43,12 +65,6 @@ FontFace* FontFace::DefaultBFSLoader (const char* file_name)
   glyph_count = 0;
   for (Parser::NamesakeIterator i = iter->First ("Glyphs.Glyph"); i; i++, glyph_count++)
   {
-    if (!test (i, "XPos") || !test (i, "YPos") || !test (i, "Width") || !test (i, "Heigth"))
-    {
-      log.Error (i, "Incorrect file format, one of tag property missing");
-      continue;
-    }
-
     read (i, "XPos",     glyph_info[glyph_count].x_pos);
     read (i, "YPos",     glyph_info[glyph_count].y_pos);
     read (i, "Width",    glyph_info[glyph_count].width);
@@ -68,12 +84,6 @@ FontFace* FontFace::DefaultBFSLoader (const char* file_name)
 
   for (Parser::NamesakeIterator i = iter->First ("Kernings.Kerning"); i; i++)
   {
-    if (!test (i, "LeftGlyph") || !test (i, "RightGlyph") || !test (i, "XKerning") || !test (i, "YKerning"))
-    {
-      log.Error (i, "Incorrect file format, one of tag property missing");
-      continue;
-    }
-
     size_t left, right;
 
     read (i, "LeftGlyph",  left);
@@ -81,17 +91,6 @@ FontFace* FontFace::DefaultBFSLoader (const char* file_name)
     read (i, "XKerning",   kerning_info[glyph_count * left + right].x_kerning);
     read (i, "YKerning",   kerning_info[glyph_count * left + right].y_kerning);
   }
-
-  for (size_t i = 0; i < log.MessagesCount (); i++)
-    if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
-    {
-
-      delete [] glyph_info;
-      delete [] kerning_info;
-      Raise <Exception> ("FontFace::DefaultBFSLoader", log.Message(0));
-
-      return new FontFace ();
-    }
 
   return new FontFace (first_char_code, glyph_count, glyph_info, kerning_info, font_file.c_str ());
 }
