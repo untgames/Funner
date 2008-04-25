@@ -26,10 +26,10 @@ class TranslationMap
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация трансляторов
-///  (замены аргументов в клиентской подстановке через #1, #2, ...)
+///  (замены аргументов в клиентской подстановке через {1}, {2}, ...)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Add    (const char* input_event, const char* client_event_replacement);
-    void Remove (const char* input_event);
+    size_t Add    (const char* input_event, const char* client_event_replacement);
+    void   Remove (size_t input_event);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка клиентского обработчика оттранслированных событий
@@ -80,8 +80,8 @@ class TranslationMapManager
     typedef xtl::function<void (const char* file_name,       TranslationMap&)> LoadHandler;
     typedef xtl::function<void (const char* file_name, const TranslationMap&)> SaveHandler;
 
-    static void RegisterLoader       (const char* extension, const LoadHandler& codec);
-    static void RegisterSaver        (const char* extension, const SaveHandler& codec);
+    static void RegisterLoader       (const char* extension, const LoadHandler& handler);
+    static void RegisterSaver        (const char* extension, const SaveHandler& handler);
     static void UnregisterLoader     (const char* extension);
     static void UnregisterSaver      (const char* extension);
     static void UnregisterAllLoaders ();

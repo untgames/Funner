@@ -1,0 +1,8 @@
+Results of translation_map1_test:
+New event: 'Replaced event1: event_name=event1, event_param1= end'
+New event: 'Replaced event1: event_name=event1, event_param1=12asd end'
+Processing removed event...
+Removed event processed
+New event: 'Replaced event1: event_name=event1, event_param1=end'
+Processing cleared event...
+Cleared event processed
