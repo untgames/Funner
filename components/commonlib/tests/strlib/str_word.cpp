@@ -11,9 +11,11 @@ struct Test
   const char* spaces;
 };
 
+const size_t MAX_WORDS = 4;
+
 int main ()
 {
-  printf ("Results of split_test:\n");
+  printf ("Results of str_word_test:\n");
   
   Test test [] = {
       {"hello world"," "," \t"},
@@ -31,13 +33,15 @@ int main ()
   
   for (int i=0;i<tests_count;i++)
   {
-    vector<string> tokens = split (test [i].str,test [i].delimiters,test [i].spaces);
+    const Test& this_test = test [i];
     
-    printf ("split '%s' (delimiters='%s', spaces='%s') on %u tokens:\n",
-            test [i].str,decompress (test [i].delimiters).c_str (),decompress (test [i].spaces).c_str (),tokens.size ());
-    
-    for (size_t i=0;i<tokens.size ();i++)
-      printf ("    '%s'\n",tokens [i].c_str ());    
+    printf ("split '%s' (delimiters='%s', spaces='%s'): {",
+            this_test.str, decompress (this_test.delimiters).c_str (), decompress (this_test.spaces).c_str ());
+
+    for (int j=0; j<MAX_WORDS; j++)
+      printf ("'%s' ", word (this_test.str, j, this_test.delimiters, this_test.spaces).c_str ());
+
+    printf ("}\n");
   }
  
   return 0;
