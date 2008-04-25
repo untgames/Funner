@@ -18,6 +18,8 @@ FontFace* FontFace::DefaultBFSLoader (const char* file_name)
   GlyphInfo*       glyph_info = NULL;
   KerningInfo*     kerning_info = NULL;
 
+  if (!iter)
+    Raise <Exception> ("FontFace::DefaultBFSLoader", "Incorrect file format, no 'Font' root tag");
   if (!test (iter, "FontFile"))
     Raise <Exception> ("FontFace::DefaultBFSLoader", "Incorrect file format, no 'FontFile' property");
   if (!test (iter, "FirstCharCode"))
