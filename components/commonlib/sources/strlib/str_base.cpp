@@ -208,6 +208,69 @@ string decompress (const string& s,const char* exceptions)
     –азбиение строки
 */
 
+namespace
+{
+
+stl::string word (const unsigned char* s, size_t word_index, const unsigned char* delimiters, const unsigned char* spaces, string::allocator_type allocator)
+{
+  if (!*s) //частный случай дл€ пустой строки
+    return "";
+
+  unsigned int brk_map [8], space_map [8];
+      
+  memset (brk_map,0,sizeof (brk_map));
+  memset (space_map,0,sizeof (space_map));
+  
+  for (;*delimiters;delimiters++) brk_map   [*delimiters>>5] |= 1 << (*delimiters & 31);
+  for (;*spaces;spaces++)         space_map [*spaces>>5]     |= 1 << (*spaces & 31);
+  
+  brk_map [0] |= 1; //'/0' is a break symbol
+  
+  --s;
+
+  size_t current_word = 0;
+      
+  do
+  {       
+    for (++s;space_map [*s>>5]&(1<<(*s&31));s++); //cut leading spaces
+    
+    const unsigned char* first = s;
+    
+    for (;!(brk_map [*s>>5]&(1<<(*s&31)));s++);
+        
+    const unsigned char* last = s;
+    
+    if (last != first)
+    {
+      for (--last;space_map [*last>>5]&(1<<(*last&31));last--); //cut trailing spaces
+      ++last;
+    }
+    else if (!*s) break; //avoid last empty token
+         
+    if (current_word == word_index)
+      return string ((string::value_type*)first,last-first, allocator);
+    
+    current_word++;
+  } while (*s);
+  
+  return res;
+}
+
+}
+
+stl::string word (const char* str, size_t word_index, const char* delimiters,const char* spaces)
+{
+  return word ((const unsigned char*)str, word_index, (const unsigned char*)delimiters,(const unsigned char*)spaces,string::allocator_type ());
+}
+
+stl::string word (const string& str, size_t word_index, const char* delimiters,const char* spaces)
+{
+  return word ((const unsigned char*)str.c_str (), word_index, (const unsigned char*)delimiters,(const unsigned char*)spaces,str.get_allocator ());
+}
+
+namespace
+{
+
 inline vector<string> split 
  (const unsigned char*   s,
   const unsigned char*   delimiters,
@@ -255,6 +318,8 @@ inline vector<string> split
   } while (*s);
   
   return res;
+}
+
 }
 
 stl::vector<stl::string> split (const char* str,const char* delimiters,const char* spaces)

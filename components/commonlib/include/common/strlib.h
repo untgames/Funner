@@ -53,6 +53,9 @@ stl::string decompress (const char* str,const char* exception = NULL);
 
 //strip/trim/...
 
+stl::string word (const char* str, size_t word_index, const char* delimiters=" ", const char* spaces=" \t");
+stl::string word (const stl::string& str, size_t word_index, const char* delimiters=" ", const char* spaces=" \t");
+
 stl::vector<stl::string> split (const char* str,const char* delimiters=" ",const char* spaces=" \t");
 stl::vector<stl::string> split (const stl::string& str,const char* delimiters=" ",const char* spaces=" \t");
 
