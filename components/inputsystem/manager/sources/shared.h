@@ -6,6 +6,9 @@
 
 #include <input/translation_map.h>
 
+namespace input
+{
+
 struct Token;
 typedef stl::vector<Token> TokenArray;
 
@@ -43,6 +46,8 @@ class EventReplacer
 class TranslationMapManagerImpl
 {
   public:
+    TranslationMapManagerImpl ();
+
 /*
    Работа с пользовательскими функциями загрузки и сохранения
 */
@@ -68,4 +73,7 @@ class TranslationMapManagerImpl
 
 typedef common::Singleton<TranslationMapManagerImpl> TranslationMapManagerSingleton;
 
+void translation_map_loader (const char* file_name, TranslationMap& target_map);
+void translation_map_saver  (const char* file_name, const TranslationMap& source_map);
 
+}

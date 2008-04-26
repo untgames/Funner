@@ -86,7 +86,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
 
     Translation Item (size_t index) const
     {
-      return Translation (map_iterators[index]->second->InputEvent (), map_iterators[index]->second->InputEvent ());
+      return Translation (map_iterators[index]->second->InputEvent (), map_iterators[index]->second->EventReplacement ());
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -205,6 +205,9 @@ void TranslationMap::Remove (const char* input_event_id)
 
 void TranslationMap::Remove (size_t event_index)
 {
+  if (event_index >= Size ())
+    RaiseOutOfRange ("input::TranslationMap::Remove", "event_index", event_index, 0u, Size ());
+
   impl->Remove (event_index);
 }
     
@@ -219,6 +222,9 @@ size_t TranslationMap::Size () const
 
 TranslationMap::Translation TranslationMap::Item (size_t index) const
 {
+  if (index >= Size ())
+    RaiseOutOfRange ("input::TranslationMap::Item", "index", index, 0u, Size ());
+
   return impl->Item (index);
 }
 

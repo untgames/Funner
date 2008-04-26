@@ -1,0 +1,6 @@
+Results of translation_map2_test:
+<?xml version="1.0" encoding="utf-8"?>
+<TranslationTable>
+  <Translation Event="event1" Replacement="Replaced event1: event_name={0}, event_param1={1} end"/>
+  <Translation Event="event1 *" Replacement="Replaced event1: event_name={0}, event_param1={1} end"/>
+</TranslationTable>

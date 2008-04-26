@@ -9,8 +9,9 @@
 
 using namespace stl;
 using namespace common;
+using namespace input;
 
-struct Token
+struct input::Token
 {
   string prefix;
   size_t argument_index;
@@ -95,6 +96,9 @@ void parse_event (const char* replacement, TokenArray& tokens)
 
 }
 
+namespace input
+{
+
 /*
    Конструктор/деструктор
 */
@@ -141,4 +145,6 @@ bool EventReplacer::Replace (const vector<string>& event_components, string& res
   }
       
   return true;
+}
+
 }

@@ -29,6 +29,11 @@ int main ()
     translation_map.ProcessEvent ("event1");
     translation_map.ProcessEvent ("event1 12asd");
 
+    printf ("Size of translation map is %u.\n Translation map:\n", translation_map.Size ());
+
+    for (size_t i = 0; i < translation_map.Size (); i++)
+      printf ("  item %u: event is '%s', replacement is '%s'\n", i, translation_map.Item (i).input_event, translation_map.Item (i).client_event_replacement);
+
     translation_map.Remove (0u);
 
     printf ("Processing removed event...\n");

@@ -73,6 +73,12 @@ inline const char* get_extension (const char* file_name)
 
 }
 
+TranslationMapManagerImpl::TranslationMapManagerImpl ()
+{
+  RegisterLoader ("keymap", &translation_map_loader);
+  RegisterSaver  ("keymap", &translation_map_saver);
+}
+
 void TranslationMapManagerImpl::Load (const char* file_name, TranslationMap& target_map) const
 {
   if (!file_name)
