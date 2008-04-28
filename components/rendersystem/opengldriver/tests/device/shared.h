@@ -18,6 +18,7 @@
 #include <render/low_level/utils.h>
 
 #include <stl/string>
+#include <stl/vector>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/uninitialized_storage.h>
