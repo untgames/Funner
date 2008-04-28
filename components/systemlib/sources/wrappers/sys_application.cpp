@@ -136,7 +136,8 @@ void ApplicationImpl::Run ()
 
     if (signals [ApplicationEvent_OnIdle].empty ())
     {
-      Platform::WaitMessage ();
+      if (!is_exit_detected)
+        Platform::WaitMessage ();
     }
     else
     {
