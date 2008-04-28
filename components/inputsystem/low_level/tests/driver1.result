@@ -1,2 +1,2 @@
 Results of driver1_test:
-exception: Method 'TestDriver::CreateDevice' doesn't implemented
+exception: Method 'TestDriver::GetDevicesCount' doesn't implemented
