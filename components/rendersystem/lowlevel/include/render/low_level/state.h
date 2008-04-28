@@ -3,7 +3,6 @@
 
 #include <render/low_level/object.h>
 #include <render/low_level/common.h>
-#include <stl/vector>
 
 namespace render
 {
