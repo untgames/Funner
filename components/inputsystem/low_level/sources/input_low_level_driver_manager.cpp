@@ -98,7 +98,7 @@ void DriverManagerImpl::UnregisterDriver (const char* name)
     
   for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
     if (i->name == name)
-      drivers.erase (i);
+      drivers.erase (i--);
 }
 
 void DriverManagerImpl::UnregisterAllDrivers ()
