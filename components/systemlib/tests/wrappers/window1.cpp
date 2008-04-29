@@ -43,8 +43,11 @@ void keys (Window& window, WindowEvent event, const WindowEventContext& context)
     case WindowEvent_OnChar:
       printf ("char '%C'\n", context.char_code);
       break;
-    case WindowEvent_OnMouseWheel:
-      printf ("wheel %.2f\n", context.mouse_wheel_delta);
+    case WindowEvent_OnMouseVerticalWheel:
+      printf ("vertical wheel %.2f\n", context.mouse_vertical_wheel_delta);
+      break;
+    case WindowEvent_OnMouseHorisontalWheel:
+      printf ("horizontal wheel %.2f\n", context.mouse_horisontal_wheel_delta);
       break;
   }
 }
@@ -99,7 +102,8 @@ int main ()
                     connection13 = window.RegisterEventHandler (WindowEvent_OnMiddleButtonUp, &keys),
                     connection14 = window.RegisterEventHandler (WindowEvent_OnMiddleButtonDoubleClick, &keys),
                     connection15 = window.RegisterEventHandler (WindowEvent_OnChar, &keys),
-                    connection16 = window.RegisterEventHandler (WindowEvent_OnMouseWheel, &keys);
+                    connection16 = window.RegisterEventHandler (WindowEvent_OnMouseVerticalWheel, &keys),
+                    connection17 = window.RegisterEventHandler (WindowEvent_OnMouseHorisontalWheel, &keys);
                     
     window.SetDebugLog (&print);        
 

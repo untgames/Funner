@@ -226,9 +226,14 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     case WM_MOUSEMOVE: //изменение положения курсора над областью окна
       impl->Notify (WindowEvent_OnMouseMove, context);
       return 0;
-    case WM_MOUSEWHEEL: //изменилось положение колеса мыши
-      context.mouse_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
-      impl->Notify (WindowEvent_OnMouseWheel, context);
+    case WM_MOUSEWHEEL: //изменилось положение вертикального колеса мыши
+      context.mouse_vertical_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
+      impl->Notify (WindowEvent_OnMouseVerticalWheel, context);
+      return 0;
+    case WM_MOUSEHWHEEL: //изменилось положение горизонтального колеса мыши
+      printf ("hwheel!\n");
+      context.mouse_horisontal_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
+      impl->Notify (WindowEvent_OnMouseHorisontalWheel, context);
       return 0;
     case WM_LBUTTONDOWN: //нажата левая кнопка мыши
       impl->Notify (WindowEvent_OnLeftButtonDown, context);

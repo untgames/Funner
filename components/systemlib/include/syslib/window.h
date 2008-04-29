@@ -38,7 +38,8 @@ enum WindowEvent
   WindowEvent_OnSize,                    //изменились размеры окна
   WindowEvent_OnMove,                    //изменилось положение окна
   WindowEvent_OnMouseMove,               //курсор мыши переместился над областью окна
-  WindowEvent_OnMouseWheel,              //изменилось положение колеса мыши
+  WindowEvent_OnMouseVerticalWheel,      //изменилось положение вертикального колеса мыши
+  WindowEvent_OnMouseHorisontalWheel,    //изменилось положение горизонтального колеса мыши
   WindowEvent_OnLeftButtonDown,          //нажата левая кнопка мыши
   WindowEvent_OnLeftButtonUp,            //отпущена левая кнопка мыши
   WindowEvent_OnLeftButtonDoubleClick,   //двойной щелчок левой клавишей мыши
@@ -85,7 +86,8 @@ struct WindowEventContext
   const void*   handle;                          //дескриптор окна
   Rect          window_rect;                     //область окна
   Point         cursor_position;                 //координаты курсора
-  float         mouse_wheel_delta;               //изменение угла колеса мыши
+  float         mouse_vertical_wheel_delta;      //изменение положения вертикального колеса мыши (в строках)
+  float         mouse_horisontal_wheel_delta;    //изменение положения горизонтального колеса мыши (в строках)
   Key           key;                             //клавиша клавиатуры
   ScanCode      key_scan_code;                   //скэн-код клавиши клавиатуры
   wchar_t       char_code;                       //код символа

@@ -130,7 +130,8 @@ void Window::MessageHandler (WindowEvent event, const WindowEventContext& contex
       case WindowEvent_OnSize:             //изменились размеры окна
       case WindowEvent_OnMove:             //изменилось положение окна
       case WindowEvent_OnMouseMove:        //курсор мыши переместился над областью окна
-      case WindowEvent_OnMouseWheel:       //изменилось положение колеса мыши
+      case WindowEvent_OnMouseVerticalWheel:   //изменилось положение вертикального колеса мыши
+      case WindowEvent_OnMouseHorisontalWheel: //изменилось положение горизонтального колеса мыши
       case WindowEvent_OnLeftButtonDown:   //нажата левая кнопка мыши
       case WindowEvent_OnLeftButtonUp:     //отпущена левая кнопка мыши
       case WindowEvent_OnLeftButtonDoubleClick: //двойной щелчок левой кнопкой мыши
