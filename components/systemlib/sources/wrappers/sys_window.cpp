@@ -3,6 +3,7 @@
 #include <xtl/signal.h>
 #include <common/exception.h>
 #include <common/strlib.h>
+#include <common/utf_converter.h>
 #include <string.h>
 
 using namespace syslib;
@@ -19,18 +20,18 @@ typedef signal<void (Window&, WindowEvent, const WindowEventContext&)> WindowSig
 
 struct Window::Impl
 {
-  const void*  handle;                    //низкоуровневый дескриптор окна  
-  WindowStyle  style;                     //стиль окна
-  WindowSignal signals [WindowEvent_Num]; //сигналы окна
-  bool         close_cancel_flag;         //флаг отмены закрытия окна
-  char         title [MAX_TITLE_LENGTH];  //заголовок окна
-  wchar_t      title_unicode [MAX_TITLE_LENGTH]; //заголовок окна в Unicode
-  LogHandler   debug_log;                 //функция отладочного протоколирования
+  const void*  handle;                             //низкоуровневый дескриптор окна  
+  WindowStyle  style;                              //стиль окна
+  WindowSignal signals [WindowEvent_Num];          //сигналы окна
+  bool         close_cancel_flag;                  //флаг отмены закрытия окна
+  char         title [MAX_TITLE_LENGTH+1];         //заголовок окна
+  wchar_t      title_unicode [MAX_TITLE_LENGTH+1]; //заголовок окна в Unicode
+  LogHandler   debug_log;                          //функция отладочного протоколирования
   
   Impl () : handle (0), style (WindowStyle_Default)
   {
-    *title = 0;
-    *title_unicode = 0;
+    memset (title, 0, sizeof title);
+    memset (title_unicode, 0, sizeof title_unicode);
   }  
 };
 
@@ -271,7 +272,7 @@ void Window::SetStyle (WindowStyle style)
 
 const char* Window::Title () const
 {
-  Platform::GetWindowTitle ((Platform::window_t)CheckedHandle (), MAX_TITLE_LENGTH, impl->title);
+  strncpy (impl->title, tostring (TitleUnicode ()).c_str (), MAX_TITLE_LENGTH);
 
   return impl->title;
 }
@@ -288,7 +289,7 @@ void Window::SetTitle (const char* title)
   if (!title)
     RaiseNullArgument ("syslib::Window::SetTitle(const char*)", "title");
 
-  Platform::SetWindowTitle ((Platform::window_t)CheckedHandle (), title);
+  Platform::SetWindowTitle ((Platform::window_t)CheckedHandle (), towstring (title).c_str ());
 }
 
 void Window::SetTitle (const wchar_t* title)

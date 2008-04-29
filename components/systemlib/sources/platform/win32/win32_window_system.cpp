@@ -104,7 +104,19 @@ Key VirtualKey2SystemKey (size_t vkey)
     0, 0, 0, 0, 0, 0, 0, 0, //0xF8-0xFF
   };
 
-  return vkey < sizeof (map) / sizeof (*map) ? (Key)map [vkey] : Key_Unknown;
+  if (vkey >= sizeof (map) / sizeof (*map))
+    return Key_Unknown;
+
+  return (Key)map [vkey];
+}
+
+/*
+    Получение скэн-кода
+*/
+
+ScanCode GetScanCode (size_t lParam)
+{
+  return (ScanCode)((lParam >> 16) & 0x1ff);
 }
 
 /*
@@ -246,12 +258,16 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       impl->Notify (WindowEvent_OnMiddleButtonDoubleClick, context);
       return 0;
     case WM_KEYDOWN: //нажата клавиша клавиатуры
-      context.key = VirtualKey2SystemKey (wparam);
+      context.key           = VirtualKey2SystemKey (wparam);
+      context.key_scan_code = GetScanCode (lparam);
+      
       impl->Notify (WindowEvent_OnKeyDown, context);
       return 0;
     case WM_KEYUP: //отпущена клавиша клавиатуры
-      context.key = VirtualKey2SystemKey (wparam);
-      impl->Notify (WindowEvent_OnKeyUp, context);      
+      context.key           = VirtualKey2SystemKey (wparam);
+      context.key_scan_code = GetScanCode (lparam);
+
+      impl->Notify (WindowEvent_OnKeyUp, context);
       return 0;
     case WM_UNICHAR: //в буфере окна появился символ
       context.char_code = (wchar_t)wparam;
@@ -408,22 +424,6 @@ void Platform::DestroyWindow (window_t handle)
     Заголовок окна
 */
 
-void Platform::SetWindowTitle (window_t handle, const char* title)
-{
-  try
-  {
-    HWND wnd = (HWND)handle;  
-  
-    if (!SetWindowTextA (wnd, title))
-      raise_error ("::SetWindowTextA");
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("syslib::Win32Platform::SetWindowTitle(const char*)");
-    throw;
-  }
-}
-
 void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
 {
   try
@@ -440,22 +440,6 @@ void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
   }
 }
 
-void Platform::GetWindowTitle (window_t handle, size_t buffer_size, char* buffer)
-{
-  try
-  {
-    HWND wnd = (HWND)handle;
-  
-    if (!GetWindowTextA (wnd, buffer, buffer_size))
-      raise_error ("::GetWindowTextA");
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("syslib::Win32Platform::GetWindowTitle(char*)");
-    throw;
-  }
-}
-
 void Platform::GetWindowTitle (window_t handle, size_t buffer_size, wchar_t* buffer)
 {
   try
@@ -467,7 +451,7 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size, wchar_t* buf
   }
   catch (common::Exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::GetWindowTitle(wchar_t*)");
+    exception.Touch ("syslib::Win32Platform::GetWindowTitle");
     throw;
   }
 }

@@ -6,28 +6,14 @@ void keyboard (Window& window, WindowEvent event, const WindowEventContext& cont
 
   switch (event)
   {
-    case WindowEvent_OnKeyDown: printf ("key %d down\n", context.key); break;
-    case WindowEvent_OnKeyUp:   printf ("key %d up\n", context.key); break;
+    case WindowEvent_OnKeyDown: printf ("key '%s' scan '%s' down\n", get_key_name (context.key), get_key_scan_name (context.key_scan_code)); break;
+    case WindowEvent_OnKeyUp:   printf ("key '%s' scan '%s' up\n", get_key_name (context.key), get_key_scan_name (context.key_scan_code)); break;
   }
-}
-
-void mousemove (Window& window, WindowEvent, const WindowEventContext& context)
-{
-  printf ("window '%s': mouse move x=%u y=%u\n", window.Title (), context.cursor_position.x, context.cursor_position.y);
 }
 
 void destroy (Window& window, WindowEvent, const WindowEventContext&)
 {
-  printf ("window '%s': destroyed\n", window.Title ());  
-
   Application::Exit (0);
-
-  throw std::bad_alloc (); //тестирование распространения исключений в обработчиках событий
-}
-
-void app_exit ()
-{
-  printf ("application exit\n");
 }
 
 void print (const char* message)
@@ -37,7 +23,7 @@ void print (const char* message)
 
 int main ()
 {
-  printf ("Results of window1_test:\n");
+  printf ("Results of keys1_test:\n");
   
   try
   {
@@ -48,10 +34,8 @@ int main ()
 
     auto_connection connection1 = window.RegisterEventHandler (WindowEvent_OnKeyDown, &keyboard),
                     connection2 = window.RegisterEventHandler (WindowEvent_OnKeyUp, &keyboard),
-                    connection3 = window.RegisterEventHandler (WindowEvent_OnMouseMove, &mousemove),
-                    connection4 = window.RegisterEventHandler (WindowEvent_OnDestroy, &destroy),
-                    connection5 = Application::RegisterEventHandler (ApplicationEvent_OnExit, &app_exit);
-                    
+                    connection3 = window.RegisterEventHandler (WindowEvent_OnDestroy, &destroy);
+
     window.SetDebugLog (&print);        
 
     Application::Run ();        

@@ -82,18 +82,19 @@ struct Rect
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct WindowEventContext
 {
-  const void* handle;                          //дескриптор окна
-  Rect        window_rect;                     //область окна
-  Point       cursor_position;                 //координаты курсора
-  float       mouse_wheel_delta;               //изменение угла колеса мыши [-1;1]
-  Key         key;                             //клавиша клавиатуры
-  wchar_t     char_code;                       //код символа
-  bool        mouse_left_button_pressed : 1;   //удерживаетс€ ли лева€ кнопка мыши
-  bool        mouse_right_button_pressed : 1;  //удерживаетс€ ли права€ кнопка мыши
-  bool        mouse_middle_button_pressed : 1; //удерживаетс€ ли средн€€ кнопка мыши
-  bool        keyboard_alt_pressed : 1;        //удерживаетс€ Alt
-  bool        keyboard_control_pressed : 1;    //удерживаетс€ Control
-  bool        keyboard_shift_pressed : 1;      //удерживаетс€ Shift
+  const void*   handle;                          //дескриптор окна
+  Rect          window_rect;                     //область окна
+  Point         cursor_position;                 //координаты курсора
+  float         mouse_wheel_delta;               //изменение угла колеса мыши
+  Key           key;                             //клавиша клавиатуры
+  ScanCode      key_scan_code;                   //скэн-код клавиши клавиатуры
+  wchar_t       char_code;                       //код символа
+  bool          mouse_left_button_pressed : 1;   //удерживаетс€ ли лева€ кнопка мыши
+  bool          mouse_right_button_pressed : 1;  //удерживаетс€ ли права€ кнопка мыши
+  bool          mouse_middle_button_pressed : 1; //удерживаетс€ ли средн€€ кнопка мыши
+  bool          keyboard_alt_pressed : 1;        //удерживаетс€ Alt
+  bool          keyboard_control_pressed : 1;    //удерживаетс€ Control
+  bool          keyboard_shift_pressed : 1;      //удерживаетс€ Shift
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
