@@ -269,8 +269,8 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       impl->Notify (WindowEvent_OnKeyUp, context);
       return 0;
-    case WM_UNICHAR: //в буфере окна появился символ
-      context.char_code = (wchar_t)wparam;
+    case WM_CHAR: //в буфере окна появился символ
+      mbtowc (&context.char_code, (char*)&wparam, 1);
       impl->Notify (WindowEvent_OnChar, context);
       return 0;
   }
@@ -299,7 +299,7 @@ void RegisterWindowClass ()
   
   memset (&wc, 0, sizeof (wc));
 
-//  wc.style         = CS_HREDRAW | CS_VREDRAW;
+  wc.style         = CS_DBLCLKS; // | CS_HREDRAW | CS_VREDRAW
   wc.lpfnWndProc   = &WindowMessageHandler;
   wc.hInstance     = GetApplicationInstance ();
   wc.hIcon         = LoadIcon (GetApplicationInstance (), IDI_APPLICATION);  

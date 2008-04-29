@@ -131,22 +131,22 @@ const char* get_key_name (Key key)
     case Key_8:               return "8";
     case Key_9:               return "9";
 
-    case Key_NumPad0:         return "Numpad 0";
-    case Key_NumPad1:         return "Numpad 1";
-    case Key_NumPad2:         return "Numpad 2";
-    case Key_NumPad3:         return "Numpad 3";
-    case Key_NumPad4:         return "Numpad 4";
-    case Key_NumPad5:         return "Numpad 5";
-    case Key_NumPad6:         return "Numpad 6";
-    case Key_NumPad7:         return "Numpad 7";
-    case Key_NumPad8:         return "Numpad 8";
-    case Key_NumPad9:         return "Numpad 9";
+    case Key_NumPad0:         return "Num 0";
+    case Key_NumPad1:         return "Num 1";
+    case Key_NumPad2:         return "Num 2";
+    case Key_NumPad3:         return "Num 3";
+    case Key_NumPad4:         return "Num 4";
+    case Key_NumPad5:         return "Num 5";
+    case Key_NumPad6:         return "Num 6";
+    case Key_NumPad7:         return "Num 7";
+    case Key_NumPad8:         return "Num 8";
+    case Key_NumPad9:         return "Num 9";
 
-    case Key_NumPadPlus:      return "Numpad +";
-    case Key_NumPadMinus:     return "Numpad -";
-    case Key_NumPadMultiply:  return "Numpad *";
-    case Key_NumPadDivide:    return "Numpad /";
-    case Key_NumPadDot:       return "Numpad .";
+    case Key_NumPadPlus:      return "Num +";
+    case Key_NumPadMinus:     return "Num -";
+    case Key_NumPadMultiply:  return "Num *";
+    case Key_NumPadDivide:    return "Num /";
+    case Key_NumPadDot:       return "Num .";
 
     default:                  return "Unknown";
   }
