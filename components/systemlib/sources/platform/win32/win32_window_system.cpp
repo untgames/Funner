@@ -231,7 +231,6 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       impl->Notify (WindowEvent_OnMouseVerticalWheel, context);
       return 0;
     case WM_MOUSEHWHEEL: //изменилось положение горизонтального колеса мыши
-      printf ("hwheel!\n");
       context.mouse_horisontal_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
       impl->Notify (WindowEvent_OnMouseHorisontalWheel, context);
       return 0;
@@ -253,6 +252,24 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     case WM_RBUTTONDBLCLK: //двойной щелчок правой кнопкой мыши
       impl->Notify (WindowEvent_OnRightButtonDoubleClick, context);
       return 0;
+    case WM_XBUTTONDOWN: //нажата X кнопка мыши
+      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON1)
+        impl->Notify (WindowEvent_OnXButton1Down, context);
+      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON2)
+        impl->Notify (WindowEvent_OnXButton2Down, context);
+      return 1;
+    case WM_XBUTTONUP: //отпущена X кнопка мыши
+      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON1)
+        impl->Notify (WindowEvent_OnXButton1Up, context);
+      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON2)
+        impl->Notify (WindowEvent_OnXButton2Up, context);
+      return 1;
+    case WM_XBUTTONDBLCLK: //двойной щелчок X кнопкой мыши
+      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON1)
+        impl->Notify (WindowEvent_OnXButton1DoubleClick, context);
+      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON2)
+        impl->Notify (WindowEvent_OnXButton2DoubleClick, context);
+      return 1;
     case WM_MBUTTONDOWN: //нажата средн€€ кнопка мыши
       impl->Notify (WindowEvent_OnMiddleButtonDown, context);
       return 0;

@@ -49,6 +49,12 @@ enum WindowEvent
   WindowEvent_OnMiddleButtonDown,        //нажата средняя кнопка мыши  
   WindowEvent_OnMiddleButtonUp,          //отпущена средняя кнопка мыши
   WindowEvent_OnMiddleButtonDoubleClick, //двойной щелчок правой клавишей мыши  
+  WindowEvent_OnXButton1Down,            //нажата первая Х кнопка мыши
+  WindowEvent_OnXButton1Up,              //отпущена первая Х кнопка мыши
+  WindowEvent_OnXButton1DoubleClick,     //двойной щелчок первой Х клавишей мыши
+  WindowEvent_OnXButton2Down,            //нажата вторая Х кнопка мыши
+  WindowEvent_OnXButton2Up,              //отпущена вторая Х кнопка мыши
+  WindowEvent_OnXButton2DoubleClick,     //двойной щелчок второй Х клавишей мыши
   WindowEvent_OnKeyDown,                 //нажата клавиша клавиатуры
   WindowEvent_OnKeyUp,                   //отпущена клавиша клавиатуры
   WindowEvent_OnChar,                    //в буфере ввода окна появился символ

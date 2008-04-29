@@ -13,6 +13,12 @@ const char* get_event_name (WindowEvent event)
     case WindowEvent_OnMiddleButtonDown:        return "middle button down";       
     case WindowEvent_OnMiddleButtonUp:          return "middle button up";         
     case WindowEvent_OnMiddleButtonDoubleClick: return "middle button double click";
+    case WindowEvent_OnXButton1Down:            return "XButton1 down";
+    case WindowEvent_OnXButton1Up:              return "XButton1 up";
+    case WindowEvent_OnXButton1DoubleClick:     return "XButton1 double click";
+    case WindowEvent_OnXButton2Down:            return "XButton2 down";        
+    case WindowEvent_OnXButton2Up:              return "XButton2 up";          
+    case WindowEvent_OnXButton2DoubleClick:     return "XButton2 double click";
     default:                                    return "Unknown";
   }
 }
@@ -38,6 +44,12 @@ void keys (Window& window, WindowEvent event, const WindowEventContext& context)
     case WindowEvent_OnMiddleButtonDown:
     case WindowEvent_OnMiddleButtonUp:
     case WindowEvent_OnMiddleButtonDoubleClick:
+    case WindowEvent_OnXButton1Down:
+    case WindowEvent_OnXButton1Up:
+    case WindowEvent_OnXButton1DoubleClick:
+    case WindowEvent_OnXButton2Down:
+    case WindowEvent_OnXButton2Up:
+    case WindowEvent_OnXButton2DoubleClick:
       printf ("%s x=%d y=%d\n", get_event_name (event), context.cursor_position.x, context.cursor_position.y);
       break;
     case WindowEvent_OnChar:
@@ -103,7 +115,13 @@ int main ()
                     connection14 = window.RegisterEventHandler (WindowEvent_OnMiddleButtonDoubleClick, &keys),
                     connection15 = window.RegisterEventHandler (WindowEvent_OnChar, &keys),
                     connection16 = window.RegisterEventHandler (WindowEvent_OnMouseVerticalWheel, &keys),
-                    connection17 = window.RegisterEventHandler (WindowEvent_OnMouseHorisontalWheel, &keys);
+                    connection17 = window.RegisterEventHandler (WindowEvent_OnMouseHorisontalWheel, &keys),
+                    connection18 = window.RegisterEventHandler (WindowEvent_OnXButton1Down, &keys),
+                    connection19 = window.RegisterEventHandler (WindowEvent_OnXButton1Up, &keys),
+                    connection20 = window.RegisterEventHandler (WindowEvent_OnXButton1DoubleClick, &keys),
+                    connection21 = window.RegisterEventHandler (WindowEvent_OnXButton2Down, &keys),
+                    connection22 = window.RegisterEventHandler (WindowEvent_OnXButton2Up, &keys),
+                    connection23 = window.RegisterEventHandler (WindowEvent_OnXButton2DoubleClick, &keys);
                     
     window.SetDebugLog (&print);        
 

@@ -120,30 +120,36 @@ void Window::MessageHandler (WindowEvent event, const WindowEventContext& contex
         window->Notify (WindowEvent_OnDestroy);
         window->SetHandle (0);
         break;
-      case WindowEvent_OnActivate:         //окно стало активным   
-      case WindowEvent_OnDeactivate:       //окно перестало быть активным
-      case WindowEvent_OnShow:             //окно стало видимым
-      case WindowEvent_OnHide:             //окно стало не видимым
-      case WindowEvent_OnSetFocus:         //окно получило фокус ввода
-      case WindowEvent_OnLostFocus:        //окно потеряло фокус ввода
-      case WindowEvent_OnPaint:            //необходима перерисовка
-      case WindowEvent_OnSize:             //изменились размеры окна
-      case WindowEvent_OnMove:             //изменилось положение окна
-      case WindowEvent_OnMouseMove:        //курсор мыши переместился над областью окна
-      case WindowEvent_OnMouseVerticalWheel:   //изменилось положение вертикального колеса мыши
-      case WindowEvent_OnMouseHorisontalWheel: //изменилось положение горизонтального колеса мыши
-      case WindowEvent_OnLeftButtonDown:   //нажата левая кнопка мыши
-      case WindowEvent_OnLeftButtonUp:     //отпущена левая кнопка мыши
-      case WindowEvent_OnLeftButtonDoubleClick: //двойной щелчок левой кнопкой мыши
-      case WindowEvent_OnRightButtonDown:  //нажата правая кнопка мыши
-      case WindowEvent_OnRightButtonUp:    //отпущена правая кнопка мыши  
-      case WindowEvent_OnRightButtonDoubleClick: //двойной щелчок правой кнопкой мыши
-      case WindowEvent_OnMiddleButtonDown: //нажата средняя кнопка мыши
-      case WindowEvent_OnMiddleButtonUp:   //отпущена средняя кнопка мыши      
+      case WindowEvent_OnActivate:                //окно стало активным   
+      case WindowEvent_OnDeactivate:              //окно перестало быть активным
+      case WindowEvent_OnShow:                    //окно стало видимым
+      case WindowEvent_OnHide:                    //окно стало не видимым
+      case WindowEvent_OnSetFocus:                //окно получило фокус ввода
+      case WindowEvent_OnLostFocus:               //окно потеряло фокус ввода
+      case WindowEvent_OnPaint:                   //необходима перерисовка
+      case WindowEvent_OnSize:                    //изменились размеры окна
+      case WindowEvent_OnMove:                    //изменилось положение окна
+      case WindowEvent_OnMouseMove:               //курсор мыши переместился над областью окна
+      case WindowEvent_OnMouseVerticalWheel:      //изменилось положение вертикального колеса мыши
+      case WindowEvent_OnMouseHorisontalWheel:    //изменилось положение горизонтального колеса мыши
+      case WindowEvent_OnLeftButtonDown:          //нажата левая кнопка мыши
+      case WindowEvent_OnLeftButtonUp:            //отпущена левая кнопка мыши
+      case WindowEvent_OnLeftButtonDoubleClick:   //двойной щелчок левой кнопкой мыши
+      case WindowEvent_OnRightButtonDown:         //нажата правая кнопка мыши
+      case WindowEvent_OnRightButtonUp:           //отпущена правая кнопка мыши  
+      case WindowEvent_OnRightButtonDoubleClick:  //двойной щелчок правой кнопкой мыши
+      case WindowEvent_OnMiddleButtonDown:        //нажата средняя кнопка мыши
+      case WindowEvent_OnMiddleButtonUp:          //отпущена средняя кнопка мыши      
       case WindowEvent_OnMiddleButtonDoubleClick: //двойной щелчок средней кнопкой мыши
-      case WindowEvent_OnKeyDown:          //нажата клавиша клавиатуры
-      case WindowEvent_OnKeyUp:            //отпущена клавиша клавиатуры
-      case WindowEvent_OnChar:             //в буфере ввода окна появился символ
+      case WindowEvent_OnXButton1Down:            //нажата первая Х кнопка мыши
+      case WindowEvent_OnXButton1Up:              //отпущена первая Х кнопка мыши      
+      case WindowEvent_OnXButton1DoubleClick:     //двойной щелчок первой Х кнопкой мыши
+      case WindowEvent_OnXButton2Down:            //нажата вторая Х кнопка мыши
+      case WindowEvent_OnXButton2Up:              //отпущена вторая Х кнопка мыши      
+      case WindowEvent_OnXButton2DoubleClick:     //двойной щелчок второй Х кнопкой мыши
+      case WindowEvent_OnKeyDown:                 //нажата клавиша клавиатуры
+      case WindowEvent_OnKeyUp:                   //отпущена клавиша клавиатуры
+      case WindowEvent_OnChar:                    //в буфере ввода окна появился символ
         window->Notify (event, context);
         break;
       default:
