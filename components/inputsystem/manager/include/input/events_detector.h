@@ -1,8 +1,7 @@
 #ifndef INPUT_SYSTEM_EVENTS_DETECTOR_HEADER
 #define INPUT_SYSTEM_EVENTS_DETECTOR_HEADER
 
-#include <input/translation_map.h>
-#include <input/event_source.h>
+#include <input/events_source.h>
 
 namespace input
 {
@@ -31,7 +30,7 @@ class EventsDetector
 ///////////////////////////////////////////////////////////////////////////////////////////////////
    EventsDetector  ();
    EventsDetector  (const char* file_name);
-   EventsDetector  (const EventDetector&);
+   EventsDetector  (const EventsDetector&);
    ~EventsDetector ();
 
    EventsDetector& operator = (const EventsDetector&);
@@ -59,7 +58,7 @@ class EventsDetector
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (const char* action, const char* event, const char* replacement)> EventHandler;
 
-    xtl::connection Detect (const EventSource& source, const char* action, const EventHandler& handler);
+    xtl::connection Detect (const EventsSource& source, const char* action, const EventHandler& handler);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сохранение / загрузка
@@ -67,10 +66,20 @@ class EventsDetector
     void Load (const char* file_name);
     void Save (const char* file_name);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Swap (EventsDetector&);    
+
   private:
     struct Impl;
     Impl* impl;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void swap (EventsDetector&, EventsDetector&);
 
 }
 

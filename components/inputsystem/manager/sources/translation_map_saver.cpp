@@ -1,7 +1,3 @@
-#include <common/xml_writer.h>
-
-#include <input/translation_map.h>
-
 #include "shared.h"
 
 using namespace input;

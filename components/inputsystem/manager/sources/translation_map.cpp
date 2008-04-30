@@ -26,7 +26,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
       if (!client_event_replacement)
         RaiseNullArgument (METHOD_NAME, "client_event_replacement");
 
-      EventReplacerPtr           replacer (new EventReplacer (input_event, client_event_replacement, tag));
+      EventTranslatorPtr           replacer (new EventTranslator (input_event, client_event_replacement, tag));
       stl::hash_key<const char*> input_event_hash (word (input_event, 0).c_str ());
 
       if (!*tag)
@@ -151,7 +151,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
 
       for (ReplacerMap::const_iterator iter = range_pair.first, end = range_pair.second; iter != end; ++iter)
       {
-        EventReplacer& replacer = *iter->second;
+        EventTranslator& replacer = *iter->second;
 
         if (replacer.Replace (event_components, replacement_buffer))
         {
@@ -162,9 +162,9 @@ struct TranslationMap::Impl : public xtl::reference_counter
     }
     
   private:
-    typedef xtl::shared_ptr<EventReplacer>                                   EventReplacerPtr;
-    typedef stl::hash_multimap<stl::hash_key<const char*>, EventReplacerPtr> ReplacerMap;
-    typedef stl::hash_map<stl::hash_key<const char*>, ReplacerMap::iterator> TagMap;
+    typedef xtl::shared_ptr<EventTranslator>                                   EventTranslatorPtr;
+    typedef stl::hash_multimap<stl::hash_key<const char*>, EventTranslatorPtr> ReplacerMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, ReplacerMap::iterator>   TagMap;
     
   private:
     struct translator_selector

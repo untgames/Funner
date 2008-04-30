@@ -1,17 +1,10 @@
-#include <stdio.h>
-
-#include <stl/string>
-
-#include <common/strlib.h>
-#include <common/exception.h>
-
 #include "shared.h"
 
 using namespace stl;
 using namespace common;
 using namespace input;
 
-struct input::Token
+struct input::EventTranslator::Token
 {
   string prefix;
   size_t argument_index;
@@ -38,7 +31,7 @@ size_t parse_replacement (const char*& s)
   return index;
 }
 
-void parse_event (const char* replacement, TokenArray& tokens)
+void parse_event (const char* replacement, EventTranslator::TokenArray& tokens)
 {
   const char* prefix_begin = replacement, *s = replacement;
   
@@ -55,7 +48,7 @@ void parse_event (const char* replacement, TokenArray& tokens)
         {
           current_prefix.append (prefix_begin, s);
           
-          tokens.push_back (Token (current_prefix, NO_ARGUMENT));
+          tokens.push_back (EventTranslator::Token (current_prefix, NO_ARGUMENT));
         }
 
         return;
@@ -78,7 +71,7 @@ void parse_event (const char* replacement, TokenArray& tokens)
         {
           current_prefix.append (prefix_begin, prefix_end);
           
-          tokens.push_back (Token (current_prefix, argument_index));
+          tokens.push_back (EventTranslator::Token (current_prefix, argument_index));
 
           prefix_begin = s;
           
@@ -103,7 +96,7 @@ namespace input
    Конструктор/деструктор
 */
 
-EventReplacer::EventReplacer (const char* input_event, const char* event_replacement, const char* tag)
+EventTranslator::EventTranslator (const char* input_event, const char* event_replacement, const char* tag)
   : str_event_wildcard (input_event), str_event_replacement (event_replacement), str_tag (tag)
 {
   parse_event (event_replacement, replacement_tokens);
@@ -111,12 +104,12 @@ EventReplacer::EventReplacer (const char* input_event, const char* event_replace
   event_wildcard = split (input_event, " ");
 
   if (event_wildcard.empty ())
-    RaiseInvalidArgument ("input::EventReplacer::EventReplacer", "input_event", input_event, "Empty input event");
+    RaiseInvalidArgument ("input::EventTranslator::EventTranslator", "input_event", input_event, "Empty input event");
   if (replacement_tokens.empty ())
-    RaiseInvalidArgument ("input::EventReplacer::EventReplacer", "event_replacement", event_replacement, "Empty event replacement");
+    RaiseInvalidArgument ("input::EventTranslator::EventTranslator", "event_replacement", event_replacement, "Empty event replacement");
 }
 
-EventReplacer::~EventReplacer ()
+EventTranslator::~EventTranslator ()
 {
 }
 
@@ -124,7 +117,7 @@ EventReplacer::~EventReplacer ()
    Выполнение замены
 */
 
-bool EventReplacer::Replace (const vector<string>& event_components, string& result)
+bool EventTranslator::Replace (const vector<string>& event_components, string& result)
 {
   if (event_components.size () != event_wildcard.size ())
     return false;

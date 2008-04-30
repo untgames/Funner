@@ -1,14 +1,4 @@
-#include <input/action_map.h>
-
-#include <stl/vector>
-#include <stl/hash_map>
-#include <stl/string>
-
-#include <xtl/reference_counter.h>
-#include <xtl/function.h>
-
-#include <common/exception.h>
-#include <common/strlib.h>
+#include "shared.h"
 
 using namespace stl;
 using namespace common;

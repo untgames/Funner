@@ -1,16 +1,4 @@
-#include <input/low_level/device.h>
-#include <input/low_level/driver.h>
-#include <input/events_source.h>
-
-#include <xtl/reference_counter.h>
-#include <xtl/signal.h>
-#include <xtl/bind.h>
-#include <xtl/intrusive_ptr.h>
-
-#include <stl/string>
-
-#include <common/strlib.h>
-#include <common/exception.h>
+#include "shared.h"
 
 using namespace xtl;
 using namespace input;
@@ -249,7 +237,7 @@ void EventsSource::Disconnect ()
    Источник событий ввода
 */
 
-xtl::connection EventsSource::RegisterHandler (const EventHandler& handler)
+xtl::connection EventsSource::RegisterHandler (const EventHandler& handler) const
 {
   return impl->RegisterHandler (handler);
 }

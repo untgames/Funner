@@ -1,9 +1,3 @@
-#include <common/exception.h>
-
-#include <xtl/function.h>
-
-#include <input/translation_map.h>
-
 #include "shared.h"
 
 using namespace common;
