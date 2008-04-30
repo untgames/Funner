@@ -216,12 +216,19 @@ namespace
 class WordParser
 {
   public: 
-    WordParser (const char* string, const char* delimiters, const char* spaces) : pos ((unsigned char*)string)
+    WordParser (const char* string, const char* delimiters, const char* spaces, const char* brackets) : pos ((unsigned char*)string)
     {
-      for (; *delimiters; delimiters++) brk_map.set ((unsigned char)*delimiters);
+      for (; *delimiters; delimiters++) delimiters_map.set ((unsigned char)*delimiters);
       for (; *spaces; spaces++)         space_map.set ((unsigned char)*spaces);
 
-      brk_map.set ('\0');
+      for (; brackets [0] && brackets [1]; brackets += 2)
+      {
+        open_brackets_map.set ((unsigned char)brackets [0]);
+        close_brackets_map.set ((unsigned char)brackets [1]);
+      }
+
+      delimiters_map.set ('\0');
+      close_brackets_map.set ('\0');
     }
     
     typedef stl::pair<const char*, const char*> Word;
@@ -232,13 +239,29 @@ class WordParser
         return Word ((const char*)pos, (const char*)pos);
 
       for (; space_map [*pos]; pos++); //cut leading spaces
-
-      const unsigned char* first = pos;
-
-      for (; !brk_map [*pos]; pos++);
-
-      const unsigned char* last = pos;
       
+      const unsigned char *first, *last;
+      
+      if (open_brackets_map [*pos]) //found open bracket
+      {
+        first = ++pos;
+
+        for (; !close_brackets_map [*pos]; pos++);
+
+        last = pos;
+
+        if (pos [0] && delimiters_map [pos [1]])
+          ++pos;
+      }
+      else
+      {
+        first = pos;
+        
+        for (; !delimiters_map [*pos]; pos++);
+        
+        last = pos;
+      }      
+
       if (*pos)
         pos++;
 
@@ -255,16 +278,16 @@ class WordParser
     bool EndOfString () const { return *pos == '\0'; }
 
   private:
-    bitset<256>    brk_map, space_map;
+    bitset<256>    delimiters_map, space_map, open_brackets_map, close_brackets_map;
     unsigned char* pos;  
 };
 
-inline string word (const char* str, size_t word_index, const char* delimiters, const char* spaces, string::allocator_type allocator)
+inline string word (const char* str, size_t word_index, const char* delimiters, const char* spaces, const char* brackets, string::allocator_type allocator)
 {
   if (!*str)
     return "";
 
-  WordParser parser (str, delimiters, spaces);
+  WordParser parser (str, delimiters, spaces, brackets);
   
   WordParser::Word word;
 
@@ -274,14 +297,14 @@ inline string word (const char* str, size_t word_index, const char* delimiters, 
   return string (word.first, word.second - word.first, allocator);
 }
 
-inline void split (const char* str, const char* delimiters, const char* spaces, string::allocator_type allocator, vector<string>& res)
+inline void split (const char* str, const char* delimiters, const char* spaces, const char* brackets, string::allocator_type allocator, vector<string>& res)
 {
   if (!*str) //частный случай для пустой строки
     return;
 
   res.reserve (8);
   
-  WordParser parser (str, delimiters, spaces);  
+  WordParser parser (str, delimiters, spaces, brackets);
 
   do
   {
@@ -295,30 +318,30 @@ inline void split (const char* str, const char* delimiters, const char* spaces, 
 
 }
 
-string word (const char* str, size_t word_index, const char* delimiters, const char* spaces)
+string word (const char* str, size_t word_index, const char* delimiters, const char* spaces, const char* brackets)
 {
-  return word (str, word_index, delimiters, spaces, string::allocator_type ());
+  return word (str, word_index, delimiters, spaces, brackets, string::allocator_type ());
 }
 
-string word (const string& str, size_t word_index, const char* delimiters, const char* spaces)
+string word (const string& str, size_t word_index, const char* delimiters, const char* spaces, const char* brackets)
 {
-  return word (str.c_str (), word_index, delimiters, spaces, str.get_allocator ());
+  return word (str.c_str (), word_index, delimiters, spaces, brackets, str.get_allocator ());
 }
 
-vector<string> split (const char* str, const char* delimiters, const char* spaces)
+vector<string> split (const char* str, const char* delimiters, const char* spaces, const char* brackets)
 {
   vector<string> res;
 
-  split (str, delimiters, spaces, string::allocator_type (), res);
+  split (str, delimiters, spaces, brackets, string::allocator_type (), res);
 
   return res;
 }
 
-vector<string> split (const string& str, const char* delimiters, const char* spaces)
+vector<string> split (const string& str, const char* delimiters, const char* spaces, const char* brackets)
 {
   vector<string> res;
 
-  split (str.c_str (), delimiters, spaces, str.get_allocator (), res);
+  split (str.c_str (), delimiters, spaces, brackets, str.get_allocator (), res);
 
   return res;
 }
