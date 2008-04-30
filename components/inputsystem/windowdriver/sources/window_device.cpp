@@ -168,12 +168,31 @@ float Device::GetProperty (const char* name)
    Обработчик сообщений окна
 */
 
-//???? Возможно стоит также посылать down по dblclk
-
 void Device::WindowEventHandler (Window& window, WindowEvent event, const WindowEventContext& window_event_context)
 {
   static char message[MESSAGE_BUFFER_SIZE];
   float       axis_pos;
+
+  switch (event)
+  {
+    case WindowEvent_OnLeftButtonDoubleClick:
+    case WindowEvent_OnLeftButtonDown:
+    case WindowEvent_OnLeftButtonUp:
+    case WindowEvent_OnRightButtonDoubleClick:
+    case WindowEvent_OnRightButtonDown:
+    case WindowEvent_OnRightButtonUp:
+    case WindowEvent_OnMiddleButtonDoubleClick:
+    case WindowEvent_OnMiddleButtonDown:
+    case WindowEvent_OnMiddleButtonUp:
+    case WindowEvent_OnXButton1DoubleClick:
+    case WindowEvent_OnXButton1Down:
+    case WindowEvent_OnXButton1Up:
+    case WindowEvent_OnXButton2DoubleClick:
+    case WindowEvent_OnXButton2Down:
+    case WindowEvent_OnXButton2Up:
+      window.SetCursorPosition (window_event_context.cursor_position.x, window_event_context.cursor_position.y);
+      WindowEventHandler (window, WindowEvent_OnMouseMove, window_event_context);
+  }
 
   switch (event)
   {
@@ -273,6 +292,8 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
     case WindowEvent_OnLeftButtonDoubleClick:
       common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 dblclk");
       event_handler (message);
+      common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 down");
+      event_handler (message);
       break;
     case WindowEvent_OnLeftButtonDown:
       common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 down");
@@ -284,6 +305,8 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
       break;
     case WindowEvent_OnRightButtonDoubleClick:
       common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "Mouse1 dblclk");
+      event_handler (message);
+      common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "Mouse1 down");
       event_handler (message);
       break;
     case WindowEvent_OnRightButtonDown:
@@ -297,6 +320,8 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
     case WindowEvent_OnMiddleButtonDoubleClick:
       common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 dblclk");
       event_handler (message);
+      common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 down");
+      event_handler (message);
       break;
     case WindowEvent_OnMiddleButtonDown:
       common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 down");
@@ -309,6 +334,8 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
     case WindowEvent_OnXButton1DoubleClick:
       common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 dblclk");
       event_handler (message);
+      common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 down");
+      event_handler (message);
       break;
     case WindowEvent_OnXButton1Down:
       common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 down");
@@ -320,6 +347,8 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
       break;
     case WindowEvent_OnXButton2DoubleClick:
       common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "MouseX2 dblclk");
+      event_handler (message);
+      common::string_wrappers::snprintf (message, MESSAGE_BUFFER_SIZE, "MouseX2 down");
       event_handler (message);
       break;
     case WindowEvent_OnXButton2Down:
