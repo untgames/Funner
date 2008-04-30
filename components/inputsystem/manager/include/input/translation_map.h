@@ -16,8 +16,10 @@ class TranslationMap
     {
       const char* input_event;
       const char* client_event_replacement;
+      const char* tag;
 
-      Translation (const char* in_input_event, const char* in_client_event_replacement) : input_event (in_input_event), client_event_replacement (in_client_event_replacement) {}
+      Translation (const char* in_input_event, const char* in_client_event_replacement, const char* in_tag) : 
+         input_event (in_input_event), client_event_replacement (in_client_event_replacement), tag (in_tag) {}
     };
 
     typedef xtl::function<void (const char* event)> EventHandler;
@@ -36,10 +38,16 @@ class TranslationMap
 ///Регистрация трансляторов
 ///  (замены аргументов в клиентской подстановке через {1}, {2}, ...) 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Add    (const char* input_event, const char* client_event_replacement);
-    void Remove (const char* input_event_id);
-    void Remove (size_t event_index);
-    
+    size_t Add    (const char* input_event, const char* client_event_replacement);
+    size_t Add    (const char* input_event, const char* client_event_replacement, const char* tag);
+    void   Remove (const char* tag);
+    void   Remove (size_t event_index);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск транслятора по тэгу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    int FindTranslation (const char* tag) const; //return -1 if not found
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор таблицы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
