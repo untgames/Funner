@@ -1,42 +1,56 @@
+#ifndef INPUT_SYSTEM_MANAGER_SHARED_HEADER
+#define INPUT_SYSTEM_MANAGER_SHARED_HEADER
+
 #include <stl/vector>
 #include <stl/hash_map>
 #include <stl/string>
 
+#include <xtl/reference_counter.h>
+#include <xtl/function.h>
+#include <xtl/shared_ptr.h>
+#include <xtl/iterator.h>
+
 #include <common/singleton.h>
+#include <common/exception.h>
+#include <common/strlib.h>
 
 #include <input/translation_map.h>
 
 namespace input
 {
 
-struct Token;
-typedef stl::vector<Token> TokenArray;
+//спрятать в EventReplacer!!!
+    struct Token;
+    typedef stl::vector<Token> TokenArray;  
 
-class EventReplacer
+/*
+    Транслятор событий (переименовать!!! EventTranslator)
+*/
+
+class EventReplacer: public TranslationMap::Translator
 {
   public:
-/*
-   Конструктор/деструктор
-*/
-    EventReplacer (const char* input_event, const char* event_replacement);
+      //конструктор/деструктор
+    EventReplacer (const char* input_event, const char* event_replacement, const char* tag="");
     ~EventReplacer ();
 
-/*
-   Выполнение замены
-*/
+      //выполнение замены
     bool Replace (const stl::vector<stl::string>& event_components, stl::string& result);
 
-/*
-   Получение исходных данных
-*/
-    const char* InputEvent       () const {return str_event_wildcard.c_str ();}
-    const char* EventReplacement () const {return str_event_replacement.c_str ();}
+      //переопределение виртуальный функций - информация об объекте
+    const char* InputEvent  () { return str_event_wildcard.c_str (); }
+    const char* Replacement () { return str_event_replacement.c_str (); }
+    const char* Tag         () { return str_tag.c_str (); }
+
+  private:
+
 
   private:
     stl::vector<stl::string> event_wildcard;
     TokenArray               replacement_tokens;
     stl::string              str_event_wildcard;
     stl::string              str_event_replacement;
+    stl::string              str_tag;
 };
 
 /*
@@ -77,3 +91,5 @@ void translation_map_loader (const char* file_name, TranslationMap& target_map);
 void translation_map_saver  (const char* file_name, const TranslationMap& source_map);
 
 }
+
+#endif

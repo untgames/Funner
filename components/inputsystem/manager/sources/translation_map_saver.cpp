@@ -15,13 +15,19 @@ void translation_map_saver (const char* file_name, const TranslationMap& source_
   XmlWriter        writer (file_name);
   XmlWriter::Scope scope (writer, "TranslationTable");
 
-  for (size_t i = 0; i < source_map.Size (); i++)
+  for (TranslationMap::Iterator iter=source_map.CreateIterator (); iter; ++iter)
   {    
-    TranslationMap::Translation current_translation = source_map.Item (i);
-    XmlWriter::Scope            scope (writer, "Translation");
+    TranslationMap::Translator& translator = *iter;
+
+    XmlWriter::Scope scope (writer, "Translation");
+
+    writer.WriteAttribute ("Event", translator.InputEvent ());
+    writer.WriteAttribute ("Replacement", translator.Replacement ());
     
-    writer.WriteAttribute ("Event", current_translation.input_event);
-    writer.WriteAttribute ("Replacement", current_translation.client_event_replacement);
+    const char* tag = translator.Tag ();
+    
+    if (*tag)
+      writer.WriteAttribute ("Tag", tag);
   }
 }
 

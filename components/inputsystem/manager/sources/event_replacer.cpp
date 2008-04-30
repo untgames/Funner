@@ -103,8 +103,8 @@ namespace input
    Конструктор/деструктор
 */
 
-EventReplacer::EventReplacer (const char* input_event, const char* event_replacement)
-  : str_event_wildcard (input_event), str_event_replacement (event_replacement)
+EventReplacer::EventReplacer (const char* input_event, const char* event_replacement, const char* tag)
+  : str_event_wildcard (input_event), str_event_replacement (event_replacement), str_tag (tag)
 {
   parse_event (event_replacement, replacement_tokens);
   

@@ -1,112 +1,142 @@
-#include <stl/hash_map>
-
-#include <xtl/reference_counter.h>
-#include <xtl/function.h>
-#include <xtl/shared_ptr.h>
-
-#include <common/exception.h>
-#include <common/strlib.h>
-
-#include <input/translation_map.h>
-
 #include "shared.h"
 
 using namespace common;
 using namespace input;
 using namespace stl;
 
-namespace
-{
+/*
+    Реализация таблицы трансляции команд низкоуровневых устройств ввода в клиентские события
+*/
 
-void default_event_handler (const char*)
-{
-}
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация таблицы трансляции команд низкоуровневых устройств ввода в клиентские события
-///////////////////////////////////////////////////////////////////////////////////////////////////
 struct TranslationMap::Impl : public xtl::reference_counter
 {
   public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструксторы / деструктор / присваивание
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Impl  () : handler (&default_event_handler) {}
-    ~Impl () {}
+    /*
+        Регистрация трансляторов    
+          (замены аргументов в клиентской подстановке через {1}, {2}, ...)        
+    */
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация трансляторов
-///  (замены аргументов в клиентской подстановке через {1}, {2}, ...)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Add (const char* input_event, const char* client_event_replacement)
+    void Add (const char* input_event, const char* client_event_replacement, const char* tag)
     {     
-      ReplacerMap::iterator new_translation = replacer_map.insert_pair (word (input_event, 0).c_str (), EventReplacerPtr (new EventReplacer (input_event, client_event_replacement)));
+      static const char* METHOD_NAME = "input::TranslationMap::Impl::Add"; 
+
+      if (!input_event)
+        RaiseNullArgument (METHOD_NAME, "input_event");
+
+      if (!client_event_replacement)
+        RaiseNullArgument (METHOD_NAME, "client_event_replacement");
+
+      EventReplacerPtr           replacer (new EventReplacer (input_event, client_event_replacement, tag));
+      stl::hash_key<const char*> input_event_hash (word (input_event, 0).c_str ());
+
+      if (!*tag)
+      {
+          //добавление трансляции без тэга
+
+        replacer_map.insert_pair (input_event_hash, replacer);
+
+        return;
+      }
+
+        //создание новой трансляции
+
+      ReplacerMap::iterator iter = replacer_map.insert_pair (input_event_hash, replacer);
+
+        //регистрация трансляции по тэгу
 
       try
       {
-        map_iterators.push_back (new_translation);
-      }
-      catch (Exception& exception)
-      {
-        replacer_map.erase (new_translation);
-        exception.Touch ("input::TranslationMap::Add");
-        throw;
+        tags.insert_pair (tag, iter);
       }
       catch (...)
       {
-        replacer_map.erase (new_translation);
+        replacer_map.erase (iter);
         throw;
       }
     }
+    
+    /*
+        Удаление транслятора
+    */
 
-    void Remove (const char* input_event_id)
-    {                                                   
-      ReplacerMap::key_type key = input_event_id;
+    void Remove (const char* tag)
+    {
+      TagMap::iterator iter = tags.find (tag);
 
-      for (size_t i = 0; i < map_iterators.size (); i++)
-        if (map_iterators[i]->first == key)
-          Remove (i--);
+      if (iter == tags.end ())
+        return;
+
+      replacer_map.erase (iter->second);
+      tags.erase (iter);
     }
 
-    void Remove (size_t event_index)
+    void Remove (const Iterator& in_iter)
     {
-      replacer_map.erase (map_iterators[event_index]);
-      map_iterators.erase (map_iterators.begin () + event_index);
+      const ReplacerMap::iterator* iter = in_iter.target<ReplacerMap::iterator> ();
+
+      if (!iter)
+        return;
+
+      stl::hash_key<const char*> tag_hash = (*iter)->first;
+
+      tags.erase (tag_hash);
+      replacer_map.erase (*iter);
     }
     
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перебор таблицы
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Size () const
+    /*
+        Очистка    
+    */
+
+    void Clear ()
     {
-      return map_iterators.size ();
+      replacer_map.clear ();
+      tags.clear ();
+      handler.clear ();
+    }
+    
+    /*
+        Поиск транслятора
+    */
+    
+    Iterator Find (const char* tag)
+    {
+      if (!*tag)
+        return CreateIterator (replacer_map.end ());
+
+      TagMap::iterator iter = tags.find (tag);
+
+      if (iter == tags.end ())
+        return CreateIterator (replacer_map.end ());
+
+      return CreateIterator (iter->second);
+    }
+    
+    /*
+        Создание итератора
+    */    
+    
+    Iterator CreateIterator ()
+    {
+      return CreateIterator (replacer_map.begin ());
     }
 
-    Translation Item (size_t index) const
-    {
-      return Translation (map_iterators[index]->second->InputEvent (), map_iterators[index]->second->EventReplacement ());
-    }
+    /*
+        Установка клиентского обработчика оттранслированных событий    
+    */
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка клиентского обработчика оттранслированных событий
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetHandler (const EventHandler& in_handler)
-    {
-      handler = in_handler;
-    }
+    void SetHandler (const EventHandler& in_handler) { handler = in_handler; }
 
-    const EventHandler& Handler () const
-    {
-      return handler;
-    }
+    const EventHandler& Handler () const { return handler; }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработка события
-///////////////////////////////////////////////////////////////////////////////////////////////////
+    /*
+        Обработка события
+    */
+
     void ProcessEvent (const char* event) const
     {
+      if (!handler)
+        return;
+      
       vector<string> event_components = split (event, " ");
 
       if (event_components.empty ())
@@ -130,24 +160,28 @@ struct TranslationMap::Impl : public xtl::reference_counter
         }
       }
     }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очистка
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Clear ()
-    {
-      replacer_map.clear ();
-    }
-
+    
   private:
     typedef xtl::shared_ptr<EventReplacer>                                   EventReplacerPtr;
     typedef stl::hash_multimap<stl::hash_key<const char*>, EventReplacerPtr> ReplacerMap;
-    typedef stl::vector<ReplacerMap::iterator>                               MapIteratorArray;
+    typedef stl::hash_map<stl::hash_key<const char*>, ReplacerMap::iterator> TagMap;
+    
+  private:
+    struct translator_selector
+    {
+      TranslationMap::Translator& operator () (ReplacerMap::value_type& value) const { return *value.second; }
+    };
+
+      //создание итератора    
+    Iterator CreateIterator (ReplacerMap::iterator iter)
+    {
+      return Iterator (iter, replacer_map.begin (), replacer_map.end (), translator_selector ());
+    }
 
   private:
-    ReplacerMap      replacer_map;
-    MapIteratorArray map_iterators;
-    EventHandler     handler;
+    ReplacerMap  replacer_map;
+    TagMap       tags;
+    EventHandler handler;
 };
 
 /*
@@ -161,7 +195,10 @@ TranslationMap::TranslationMap ()
 TranslationMap::TranslationMap (const char* file_name)
   : impl (new Impl)
 {
-  Load (file_name);
+  if (!file_name)
+    RaiseNullArgument ("input::TranslationMap::TranslationMap", "file_name");
+
+  TranslationMapManagerSingleton::Instance ().Load (file_name, *this);
 }
 
 TranslationMap::TranslationMap (const TranslationMap& source)
@@ -184,52 +221,52 @@ TranslationMap& TranslationMap::operator = (const TranslationMap& source)
 
 /*
    Регистрация трансляторов
-     (замены аргументов в клиентской подстановке через #1, #2, ...)
 */
 
-void TranslationMap::Add (const char* input_event, const char* client_event_replacement)
+void TranslationMap::Add (const char* input_event, const char* client_event_replacement, const char* tag)
 {
-  if (!input_event)
-    RaiseNullArgument ("input::TranslationMap::Add", "input_event");
-
-  if (!client_event_replacement)
-    RaiseNullArgument ("input::TranslationMap::Add", "client_event_replacement");
-
-  impl->Add (input_event, client_event_replacement);
+  impl->Add (input_event, client_event_replacement, tag);
 }
 
-void TranslationMap::Remove (const char* input_event_id)
+void TranslationMap::Remove (const char* tag)
 {
-  impl->Remove (input_event_id);
+  impl->Remove (tag);
 }
 
-void TranslationMap::Remove (size_t event_index)
+void TranslationMap::Remove (const Iterator& iter)
 {
-  if (event_index >= Size ())
-    RaiseOutOfRange ("input::TranslationMap::Remove", "event_index", event_index, 0u, Size ());
+  impl->Remove (iter);
+}
 
-  impl->Remove (event_index);
+/*
+    Очистка
+*/
+
+void TranslationMap::Clear ()
+{
+  impl->Clear ();
 }
     
 /*
-   Перебор таблицы
+    Создание итератора
 */
 
-size_t TranslationMap::Size () const
+TranslationMap::Iterator TranslationMap::CreateIterator () const
 {
-  return impl->Size ();
-}
-
-TranslationMap::Translation TranslationMap::Item (size_t index) const
-{
-  if (index >= Size ())
-    RaiseOutOfRange ("input::TranslationMap::Item", "index", index, 0u, Size ());
-
-  return impl->Item (index);
+  return impl->CreateIterator ();
 }
 
 /*
-   Установка клиентского обработчика оттранслированных событий
+    Поиск по тэгу
+*/
+
+TranslationMap::Iterator TranslationMap::Find (const char* tag) const
+{
+  return impl->Find (tag);
+}
+
+/*
+    Установка клиентского обработчика оттранслированных событий
 */
 
 void TranslationMap::SetHandler (const TranslationMap::EventHandler& handler)
@@ -249,18 +286,9 @@ const TranslationMap::EventHandler& TranslationMap::Handler () const
 void TranslationMap::ProcessEvent (const char* event) const
 {
   if (!event)
-    RaiseNullArgument ("input::TranslationMap::ProcessEvent", "event");
+    return;
 
   impl->ProcessEvent (event);
-}
-
-/*
-   Очистка
-*/
-
-void TranslationMap::Clear ()
-{
-  impl->Clear ();
 }
 
 /*
@@ -269,10 +297,7 @@ void TranslationMap::Clear ()
 
 void TranslationMap::Load (const char* file_name)
 {
-  if (!file_name)
-    RaiseNullArgument ("input::TranslationMap::Load", "file_name");
-
-  TranslationMapManagerSingleton::Instance ().Load (file_name, *this);
+  TranslationMap (file_name).Swap (*this);
 }
 
 void TranslationMap::Save (const char* file_name)

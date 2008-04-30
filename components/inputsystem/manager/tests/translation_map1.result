@@ -1,10 +1,9 @@
 Results of translation_map1_test:
 New event: 'Replaced event1: event_name=event1, event_param1= end'
 New event: 'Replaced event1: event_name=event1, event_param1=12asd end'
-Size of translation map is 2.
- Translation map:
-  item 0: event is 'event1', replacement is 'Replaced event1: event_name={0}, event_param1={1} end'
-  item 1: event is 'event1 *', replacement is 'Replaced event1: event_name={0}, event_param1={1} end'
+Translation map:
+  item 0: event is 'event1', replacement is 'Replaced event1: event_name={0}, event_param1={1} end', tag is 'tag0'
+  item 1: event is 'event1 *', replacement is 'Replaced event1: event_name={0}, event_param1={1} end', tag is 'event1'
 Processing removed event...
 Removed event processed
 Processing removed event...

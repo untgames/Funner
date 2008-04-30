@@ -10,6 +10,7 @@ void my_event_handler (const char* event_id, size_t arguments_count, const char*
 {
   printf ("New event: '%s' ", event_id);
   printf ("with %u args", arguments_count);
+
   if (arguments_count)
   {
     printf (":");

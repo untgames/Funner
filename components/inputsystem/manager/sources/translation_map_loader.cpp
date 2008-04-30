@@ -30,7 +30,13 @@ void translation_map_loader (const char* file_name, TranslationMap& target_map)
       Raise<Exception> (METHOD_NAME, "Incorrect file format, one of tag property missing");
 
   for (Parser::NamesakeIterator i = iter->First ("Translation"); i; i++)
-    target_map.Add (get<const char*> (i, "Event", ""), get<const char*> (i, "Replacement", ""));
+  {
+    const char *event       = get<const char*> (i, "Event", ""),
+               *replacement = get<const char*> (i, "Replacement", ""),
+               *tag         = get<const char*> (i, "Tag", "");
+
+    target_map.Add (event, replacement, tag);
+  }
 }
 
 }

@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <xtl/function.h>
+#include <xtl/iterator.h>
 
 #include <input/translation_map.h>
 
@@ -19,8 +20,8 @@ int main ()
   {
     TranslationMap translation_map;
 
-    translation_map.Add ("event1", "Replaced event1: event_name={0}, event_param1={1} end");
-    translation_map.Add ("event1 *", "Replaced event1: event_name={0}, event_param1={1} end");
+    translation_map.Add ("event1",   "Replaced event1: event_name={0}, event_param1={1} end", "tag0");
+    translation_map.Add ("event1 *", "Replaced event1: event_name={0}, event_param1={1} end", "event1");
 
     translation_map.ProcessEvent ("event1");
 
@@ -29,12 +30,15 @@ int main ()
     translation_map.ProcessEvent ("event1");
     translation_map.ProcessEvent ("event1 12asd");
 
-    printf ("Size of translation map is %u.\n Translation map:\n", translation_map.Size ());
+    printf ("Translation map:\n");    
+    
+    size_t index = 0;
 
-    for (size_t i = 0; i < translation_map.Size (); i++)
-      printf ("  item %u: event is '%s', replacement is '%s'\n", i, translation_map.Item (i).input_event, translation_map.Item (i).client_event_replacement);
-
-    translation_map.Remove (0u);
+    for (TranslationMap::Iterator iter=translation_map.CreateIterator (); iter; ++iter, ++index)
+      printf ("  item %u: event is '%s', replacement is '%s', tag is '%s'\n", index, iter->InputEvent (),
+              iter->Replacement (), iter->Tag ());
+              
+    translation_map.Remove ("tag0");
 
     printf ("Processing removed event...\n");
     translation_map.ProcessEvent ("event1");

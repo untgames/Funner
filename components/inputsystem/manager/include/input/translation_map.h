@@ -3,6 +3,14 @@
 
 #include <xtl/functional_fwd>
 
+namespace xtl
+{
+
+//forward declarations
+template <class T> class iterator;
+
+}
+
 namespace input
 {
 
@@ -12,18 +20,17 @@ namespace input
 class TranslationMap
 {
   public:
-    struct Translation
+    class Translator
     {
-      const char* input_event;
-      const char* client_event_replacement;
-      const char* tag;
-
-      Translation (const char* in_input_event, const char* in_client_event_replacement, const char* in_tag) : 
-         input_event (in_input_event), client_event_replacement (in_client_event_replacement), tag (in_tag) {}
+      public:
+        virtual const char* InputEvent  () = 0;
+        virtual const char* Replacement () = 0;
+        virtual const char* Tag         () = 0;
     };
 
     typedef xtl::function<void (const char* event)> EventHandler;
-  
+    typedef xtl::iterator<Translator> Iterator;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,21 +45,24 @@ class TranslationMap
 ///Регистрация трансляторов
 ///  (замены аргументов в клиентской подстановке через {1}, {2}, ...) 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Add    (const char* input_event, const char* client_event_replacement);
-    size_t Add    (const char* input_event, const char* client_event_replacement, const char* tag);
-    void   Remove (const char* tag);
-    void   Remove (size_t event_index);
+    void Add    (const char* input_event, const char* client_event_replacement, const char* tag="");
+    void Remove (const char* tag);
+    void Remove (const Iterator&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Очистка
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Clear ();    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск транслятора по тэгу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    int FindTranslation (const char* tag) const; //return -1 if not found
+    Iterator Find (const char* tag) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор таблицы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t      Size () const;
-    Translation Item (size_t index) const;
+    Iterator CreateIterator () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка клиентского обработчика оттранслированных событий
@@ -64,11 +74,6 @@ class TranslationMap
 ///Обработка события
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ProcessEvent (const char* event) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очистка
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Clear ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка / сохранение таблицы
