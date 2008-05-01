@@ -26,7 +26,7 @@
 #include <input/low_level/driver.h>
 #include <input/translation_map.h>
 #include <input/action_map.h>
-#include <input/events_detector.h>
+#include <input/controls_detector.h>
 #include <input/events_source.h>
 
 namespace input

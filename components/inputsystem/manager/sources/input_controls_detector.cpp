@@ -8,7 +8,7 @@ using namespace input;
    Фильтр
 */
 
-class EventsFilter : public EventsDetector::Filter
+class EventsFilter : public ControlsDetector::Filter
 {
   public:
     EventsFilter (const char* in_action, const char* in_event_mask, const char* in_replacement) :
@@ -38,7 +38,7 @@ class EventsFilter : public EventsDetector::Filter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Определитель событий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct EventsDetector::Impl : public xtl::reference_counter
+struct ControlsDetector::Impl : public xtl::reference_counter
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ struct EventsDetector::Impl : public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    EventsDetector::Iterator CreateIterator () const
+    ControlsDetector::Iterator CreateIterator () const
     {
       return Iterator (filters.begin (), filters.begin (), filters.end (), FilterSelector ());
     }
@@ -115,12 +115,12 @@ struct EventsDetector::Impl : public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Load (const char* file_name)
     {
-      RaiseNotImplemented ("input::EventsDetector::Load");
+      RaiseNotImplemented ("input::ControlsDetector::Load");
     }
 
     void Save (const char* file_name)
     {
-      RaiseNotImplemented ("input::EventsDetector::Save");
+      RaiseNotImplemented ("input::ControlsDetector::Save");
     }
 
   private:
@@ -134,7 +134,7 @@ struct EventsDetector::Impl : public xtl::reference_counter
 
     struct DetectFunctor
     {
-      DetectFunctor (EventsDetector::Impl* in_detector_impl, const char* in_action, const EventsDetector::EventHandler& in_handler) :
+      DetectFunctor (ControlsDetector::Impl* in_detector_impl, const char* in_action, const ControlsDetector::EventHandler& in_handler) :
         detector_impl (in_detector_impl), action_hash (in_action), handler (in_handler) {}
 
       void operator () (const char* event)
@@ -195,11 +195,11 @@ struct EventsDetector::Impl : public xtl::reference_counter
         }
       }
 
-      typedef xtl::intrusive_ptr<EventsDetector::Impl> EventsDetectorPtr;
+      typedef xtl::intrusive_ptr<ControlsDetector::Impl> ControlsDetectorPtr;
 
-      EventsDetectorPtr            detector_impl;
-      stl::hash_key<const char*>   action_hash;
-      EventsDetector::EventHandler handler;
+      ControlsDetectorPtr            detector_impl;
+      stl::hash_key<const char*>     action_hash;
+      ControlsDetector::EventHandler handler;
     };
 
   private:
@@ -211,30 +211,30 @@ struct EventsDetector::Impl : public xtl::reference_counter
    Конструкторы / деструктор / присваивание
 */
 
-EventsDetector::EventsDetector  ()
+ControlsDetector::ControlsDetector  ()
   : impl (new Impl)
   {}
 
-EventsDetector::EventsDetector (const char* file_name)
+ControlsDetector::ControlsDetector (const char* file_name)
   : impl (new Impl)
 {
   Load (file_name);
 }
 
-EventsDetector::EventsDetector (const EventsDetector& source)
+ControlsDetector::ControlsDetector (const ControlsDetector& source)
   : impl (source.impl)
 {
   addref (impl);
 }
 
-EventsDetector::~EventsDetector ()
+ControlsDetector::~ControlsDetector ()
 {
   release (impl);
 }
 
-EventsDetector& EventsDetector::operator = (const EventsDetector& source)
+ControlsDetector& ControlsDetector::operator = (const ControlsDetector& source)
 {
-  EventsDetector (source).Swap (*this);
+  ControlsDetector (source).Swap (*this);
 
   return *this;
 }
@@ -243,9 +243,9 @@ EventsDetector& EventsDetector::operator = (const EventsDetector& source)
    Регистрация соответствий
 */
 
-void EventsDetector::Add (const char* action, const char* input_event_mask, const char* replacement)
+void ControlsDetector::Add (const char* action, const char* input_event_mask, const char* replacement)
 {
-  static const char* METHOD_NAME = "input::EventsDetector::Add";
+  static const char* METHOD_NAME = "input::ControlsDetector::Add";
 
   if (!action)
     RaiseNullArgument (METHOD_NAME, "action");
@@ -259,9 +259,9 @@ void EventsDetector::Add (const char* action, const char* input_event_mask, cons
   impl->Add (action, input_event_mask, replacement);
 }
 
-void EventsDetector::Remove (const char* action, const char* input_event_mask)
+void ControlsDetector::Remove (const char* action, const char* input_event_mask)
 {
-  static const char* METHOD_NAME = "input::EventsDetector::Remove(const char*,const char*)";
+  static const char* METHOD_NAME = "input::ControlsDetector::Remove(const char*,const char*)";
 
   if (!action)
     RaiseNullArgument (METHOD_NAME, "action");
@@ -272,15 +272,15 @@ void EventsDetector::Remove (const char* action, const char* input_event_mask)
   impl->Remove (action, input_event_mask);
 }
 
-void EventsDetector::Remove (const Iterator& iter)
+void ControlsDetector::Remove (const Iterator& iter)
 {
   impl->Remove (iter);
 }
 
-void EventsDetector::Remove (const char* action)
+void ControlsDetector::Remove (const char* action)
 {
   if (!action)
-    RaiseNullArgument ("input::EventsDetector::Remove(const char*)", "action");
+    RaiseNullArgument ("input::ControlsDetector::Remove(const char*)", "action");
 
   impl->Remove (action);
 }
@@ -289,7 +289,7 @@ void EventsDetector::Remove (const char* action)
    Перебор
 */
 
-EventsDetector::Iterator EventsDetector::CreateIterator () const
+ControlsDetector::Iterator ControlsDetector::CreateIterator () const
 {
   return impl->CreateIterator ();
 }
@@ -298,7 +298,7 @@ EventsDetector::Iterator EventsDetector::CreateIterator () const
    Очистка
 */
 
-void EventsDetector::Clear ()
+void ControlsDetector::Clear ()
 {
   impl->Clear ();
 }
@@ -307,10 +307,10 @@ void EventsDetector::Clear ()
    Определение события для указанного тэга в таблице трансляции
 */
 
-xtl::connection EventsDetector::Detect (const EventsSource& source, const char* action, const EventHandler& handler)
+xtl::connection ControlsDetector::Detect (const EventsSource& source, const char* action, const EventHandler& handler)
 {
   if (!action)
-    RaiseNullArgument ("input::EventsDetector::Detect", "action");
+    RaiseNullArgument ("input::ControlsDetector::Detect", "action");
 
   return impl->Detect (source, action, handler);
 }
@@ -319,18 +319,18 @@ xtl::connection EventsDetector::Detect (const EventsSource& source, const char* 
    Сохранение / загрузка
 */
 
-void EventsDetector::Load (const char* file_name)
+void ControlsDetector::Load (const char* file_name)
 {
   if (!file_name)
-    RaiseNullArgument ("input::EventsDetector::Load", "file_name");
+    RaiseNullArgument ("input::ControlsDetector::Load", "file_name");
 
   impl->Load (file_name);
 }
 
-void EventsDetector::Save (const char* file_name)
+void ControlsDetector::Save (const char* file_name)
 {
   if (!file_name)
-    RaiseNullArgument ("input::EventsDetector::Save", "file_name");
+    RaiseNullArgument ("input::ControlsDetector::Save", "file_name");
 
   impl->Save (file_name);
 }
@@ -339,7 +339,7 @@ void EventsDetector::Save (const char* file_name)
    Обмен
 */
 
-void EventsDetector::Swap (EventsDetector& source)
+void ControlsDetector::Swap (ControlsDetector& source)
 {
   stl::swap (impl, source.impl);
 }
@@ -350,7 +350,7 @@ namespace input
 /*
    Обмен
 */
-void swap (EventsDetector& source1, EventsDetector& source2)
+void swap (ControlsDetector& source1, ControlsDetector& source2)
 {
   source1.Swap (source2);
 }

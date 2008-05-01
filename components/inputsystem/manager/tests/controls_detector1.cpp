@@ -13,7 +13,7 @@
 #include <input/low_level/driver.h>
 #include <input/low_level/device.h>
 #include <input/events_source.h>
-#include <input/events_detector.h>
+#include <input/controls_detector.h>
 
 using namespace input;
 using namespace input::low_level;
@@ -130,7 +130,7 @@ void my_event_handler (const char* action, const char* event, const char* replac
 
 int main ()
 {
-  printf ("Results of events_detector1_test:\n");
+  printf ("Results of controls_detector1_test:\n");
   
   try
   {
@@ -140,13 +140,13 @@ int main ()
     
     EventsSource events_source ("*", "*");
     
-    EventsDetector events_detector;
+    ControlsDetector controls_detector;
 
-    events_detector.Add ("Action1", "* axis *", "action1 {2}");
-    events_detector.Add ("Action1", "* down", "action1 1");
-    events_detector.Add ("Action1", "", "action1 empty event");
+    controls_detector.Add ("Action1", "* axis *", "action1 {2}");
+    controls_detector.Add ("Action1", "* down", "action1 1");
+    controls_detector.Add ("Action1", "", "action1 empty event");
     
-    events_detector.Detect (events_source, "Action1", &my_event_handler);
+    controls_detector.Detect (events_source, "Action1", &my_event_handler);
 
     if (current_input)
       current_input->GenerateTestEvents ();

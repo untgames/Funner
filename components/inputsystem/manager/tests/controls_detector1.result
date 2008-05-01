@@ -1,4 +1,4 @@
-Results of events_detector1_test:
+Results of controls_detector1_test:
 Detected event ''MouseX' axis *' for action 'Action1' with replacement 'action1 {2}'
 Detected event '' for action 'Action1' with replacement 'action1 empty event'
 Detected event ''Page Down' down' for action 'Action1' with replacement 'action1 1'
