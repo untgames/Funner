@@ -1,0 +1,13 @@
+Results of component_manager_test:
+Before load
+Components:
+  component 'common.tests.MyComponent' unloaded
+Load MyComponent
+After load
+Components:
+  component 'common.tests.MyComponent' loaded
+Unload MyComponent
+Components:
+  component 'common.tests.MyComponent' unloaded
+After unregister
+Components:
