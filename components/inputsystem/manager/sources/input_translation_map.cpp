@@ -26,7 +26,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
       if (!client_event_replacement)
         RaiseNullArgument (METHOD_NAME, "client_event_replacement");
 
-      EventTranslatorPtr           replacer (new EventTranslator (input_event, client_event_replacement, tag));
+      EventTranslatorPtr         replacer (new EventTranslator (input_event, client_event_replacement, tag));
       stl::hash_key<const char*> input_event_hash (word (input_event, 0).c_str ());
 
       if (!*tag)
@@ -137,7 +137,9 @@ struct TranslationMap::Impl : public xtl::reference_counter
       if (!handler)
         return;
       
-      vector<string> event_components = split (event, " ");
+      vector<string> event_components;
+      
+      split_event (event, event_components);
 
       if (event_components.empty ())
         return;

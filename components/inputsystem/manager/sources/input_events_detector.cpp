@@ -135,36 +135,70 @@ struct EventsDetector::Impl : public xtl::reference_counter
     struct DetectFunctor
     {
       DetectFunctor (EventsDetector::Impl* in_detector_impl, const char* in_action, const EventsDetector::EventHandler& in_handler) :
-        detector_impl (in_detector_impl), action (in_action), handler (in_handler) {}
+        detector_impl (in_detector_impl), action_hash (in_action), handler (in_handler) {}
 
       void operator () (const char* event)
       {
-        FilterMap::iterator filter = detector_impl->filters.find (action.c_str ());
+        pair<FilterMap::iterator,FilterMap::iterator> filters_range = detector_impl->filters.equal_range (action_hash);
 
-        if (filter == detector_impl->filters.end ())
-          return;
+        vector<string> event_components;
 
-        for (hash_key<const char*> key (action.c_str ()); filter->first == key; ++filter)
+        split_event (event, event_components);
+
+        for (; filters_range.first != filters_range.second; ++filters_range.first)
         {
-          vector<string> event_components = split (event, " ");
-          vector<string> event_mask       = split (filter->second->EventMask (), " ");
+          EventsFilter& filter = *filters_range.first->second;
 
-          if (event_components.size () != event_mask.size ())
+          const char *event_mask  = filter.EventMask (),
+                     *replacement = filter.Replacement (),
+                     *action      = filter.Action ();
+
+          vector<string> event_mask_components;
+
+          split_event (event_mask, event_mask_components);
+
+          if (event_components.size () != event_mask_components.size ())
             continue;
+
+          if (event_components.empty () && event_mask_components.empty ())
+          {
+            handler (action, "", replacement);
+            return;
+          }
 
           size_t matches = 0;
 
           for (; matches < event_components.size (); matches++)
-            if (!wcmatch (event_components[matches].c_str (), event_mask[matches].c_str ()))
+            if (!wcmatch (event_components [matches].c_str (), event_mask_components [matches].c_str ()))
               break;
 
-          if (matches == event_components.size ())
-            handler (action.c_str (), event, filter->second->Replacement ());
+          if (matches != event_components.size ())
+            continue;
+
+          string control_mask;
+
+          control_mask.reserve (event_components [0].size () + strlen (event_mask) + 2); // 2 - кавычки вокруг имени контрола
+
+          control_mask += '\'';
+          control_mask += event_components [0];
+          control_mask += '\'';
+
+          for (size_t i = 1; i < event_mask_components.size (); i++)
+          {
+            control_mask += ' ';
+            control_mask += event_mask_components [i];
+          }
+
+          handler (action, control_mask.c_str (), replacement);
+
+          return;
         }
       }
 
-      EventsDetector::Impl*        detector_impl;
-      string                       action;
+      typedef xtl::intrusive_ptr<EventsDetector::Impl> EventsDetectorPtr;
+
+      EventsDetectorPtr            detector_impl;
+      stl::hash_key<const char*>   action_hash;
       EventsDetector::EventHandler handler;
     };
 

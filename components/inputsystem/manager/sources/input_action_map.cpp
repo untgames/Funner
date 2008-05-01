@@ -48,7 +48,9 @@ struct ActionMap::Impl : public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ProcessEvent (const char* event) const
     {
-      vector<string> event_components = split (event, " ");
+      vector<string> event_components;
+      
+      split_event (event, event_components);
       
       if (event_components.empty ())
         return;

@@ -21,7 +21,8 @@ using namespace common;
 
 const char* TEST_DEVICE_NAME = "TestInput";
 const char* EVENTS [] = {
-  "MouseX axis 0.7", 
+  "MouseX axis 0.7",
+  "", 
   "MouseX halfaxis 0.35", 
   "'Page Down' down"};
 
@@ -129,7 +130,7 @@ void my_event_handler (const char* action, const char* event, const char* replac
 
 int main ()
 {
-  printf ("Results of events_source1_test:\n");
+  printf ("Results of events_detector1_test:\n");
   
   try
   {
@@ -143,6 +144,7 @@ int main ()
 
     events_detector.Add ("Action1", "* axis *", "action1 {2}");
     events_detector.Add ("Action1", "* down", "action1 1");
+    events_detector.Add ("Action1", "", "action1 empty event");
     
     events_detector.Detect (events_source, "Action1", &my_event_handler);
 

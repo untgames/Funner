@@ -101,7 +101,7 @@ EventTranslator::EventTranslator (const char* input_event, const char* event_rep
 {
   parse_event (event_replacement, replacement_tokens);
   
-  event_wildcard = split (input_event, " ");
+  split_event (input_event, event_wildcard);
 
   if (event_wildcard.empty ())
     RaiseInvalidArgument ("input::EventTranslator::EventTranslator", "input_event", input_event, "Empty input event");

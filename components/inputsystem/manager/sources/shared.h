@@ -100,6 +100,8 @@ typedef common::Singleton<TranslationMapManagerImpl> TranslationMapManagerSingle
 void translation_map_loader (const char* file_name, TranslationMap& target_map);
 void translation_map_saver  (const char* file_name, const TranslationMap& source_map);
 
+void split_event (const char* event, stl::vector<stl::string>& target_arguments);
+
 }
 
 #endif
