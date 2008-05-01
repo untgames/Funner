@@ -23,12 +23,8 @@ int main ()
     translation_map.Add ("event1",   "Replaced event1: event_name={0}, event_param1={1} end", "tag0");
     translation_map.Add ("event1 *", "Replaced event1: event_name={0}, event_param1={1} end", "event1");
 
-    translation_map.ProcessEvent ("event1");
-
-    translation_map.SetHandler (&my_event_handler);
-
-    translation_map.ProcessEvent ("event1");
-    translation_map.ProcessEvent ("event1 12asd");
+    translation_map.ProcessEvent ("event1", &my_event_handler);
+    translation_map.ProcessEvent ("event1 12asd", &my_event_handler);
 
     printf ("Translation map:\n");    
     
@@ -41,23 +37,23 @@ int main ()
     translation_map.Remove ("tag0");
 
     printf ("Processing removed event...\n");
-    translation_map.ProcessEvent ("event1");
+    translation_map.ProcessEvent ("event1", &my_event_handler);
     printf ("Removed event processed\n");
 
     translation_map.Remove ("event1");
 
     printf ("Processing removed event...\n");
-    translation_map.ProcessEvent ("event1 45");
+    translation_map.ProcessEvent ("event1 45", &my_event_handler);
     printf ("Removed event processed\n");
 
     translation_map.Add ("event1", "Replaced event1: event_name={0}, event_param1={1}end");  
 
-    translation_map.ProcessEvent ("event1");
+    translation_map.ProcessEvent ("event1", &my_event_handler);
 
     translation_map.Clear ();
 
     printf ("Processing cleared event...\n");
-    translation_map.ProcessEvent ("event1");
+    translation_map.ProcessEvent ("event1", &my_event_handler);
     printf ("Cleared event processed\n");
   }
   catch (std::exception& exception)

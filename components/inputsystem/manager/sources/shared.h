@@ -51,7 +51,11 @@ class EventTranslator: public TranslationMap::Translator
     const char* Replacement () { return str_event_replacement.c_str (); }
     const char* Tag         () { return str_tag.c_str (); }
 
-  public:
+  private:
+      //Разбиение строки замены на составляющие
+    void ParseReplacement (const char* replacement);
+
+  private:
     struct Token;
     typedef stl::vector<Token> TokenArray;  
 

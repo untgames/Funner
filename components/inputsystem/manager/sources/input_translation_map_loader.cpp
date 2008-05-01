@@ -22,7 +22,7 @@ void translation_map_loader (const char* file_name, TranslationMap& target_map)
 
   for (Parser::NamesakeIterator i = iter->First ("Translation"); i; i++)
     if (!test (i, "Event") || !test (i, "Replacement"))
-      Raise<Exception> (METHOD_NAME, "Incorrect file format, one of tag property missing");
+      Raise<Exception> (METHOD_NAME, "Incorrect file format, one of tag property missing at line %u", i->LineNumber ());
 
   for (Parser::NamesakeIterator i = iter->First ("Translation"); i; i++)
   {

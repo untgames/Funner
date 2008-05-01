@@ -91,7 +91,6 @@ struct TranslationMap::Impl : public xtl::reference_counter
     {
       replacer_map.clear ();
       tags.clear ();
-      handler.clear ();
     }
     
     /*
@@ -121,18 +120,10 @@ struct TranslationMap::Impl : public xtl::reference_counter
     }
 
     /*
-        Установка клиентского обработчика оттранслированных событий    
-    */
-
-    void SetHandler (const EventHandler& in_handler) { handler = in_handler; }
-
-    const EventHandler& Handler () const { return handler; }
-
-    /*
         Обработка события
     */
 
-    void ProcessEvent (const char* event) const
+    void ProcessEvent (const char* event, const EventHandler& handler) const
     {
       if (!handler)
         return;
@@ -183,7 +174,6 @@ struct TranslationMap::Impl : public xtl::reference_counter
   private:
     ReplacerMap  replacer_map;
     TagMap       tags;
-    EventHandler handler;
 };
 
 /*
@@ -268,29 +258,15 @@ TranslationMap::Iterator TranslationMap::Find (const char* tag) const
 }
 
 /*
-    Установка клиентского обработчика оттранслированных событий
-*/
-
-void TranslationMap::SetHandler (const TranslationMap::EventHandler& handler)
-{
-  impl->SetHandler (handler);
-}
-
-const TranslationMap::EventHandler& TranslationMap::Handler () const
-{
-  return impl->Handler ();
-}
-
-/*
    Обработка события
 */
 
-void TranslationMap::ProcessEvent (const char* event) const
+void TranslationMap::ProcessEvent (const char* event, const TranslationMap::EventHandler& handler) const
 {
   if (!event)
     return;
 
-  impl->ProcessEvent (event);
+  impl->ProcessEvent (event, handler);
 }
 
 /*

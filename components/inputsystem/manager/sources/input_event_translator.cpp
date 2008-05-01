@@ -31,62 +31,6 @@ size_t parse_replacement (const char*& s)
   return index;
 }
 
-void parse_event (const char* replacement, EventTranslator::TokenArray& tokens)
-{
-  const char* prefix_begin = replacement, *s = replacement;
-  
-  string current_prefix;
-
-  current_prefix.reserve (strlen (replacement));
-
-  for (;;)
-  {
-    switch (*s)
-    {
-      case '\0':
-        if (prefix_begin != s)
-        {
-          current_prefix.append (prefix_begin, s);
-          
-          tokens.push_back (EventTranslator::Token (current_prefix, NO_ARGUMENT));
-        }
-
-        return;
-      case '{':
-      {
-        if (s [1] == '{')
-        {
-          current_prefix.append (prefix_begin, ++s);
-
-          prefix_begin = ++s;
-
-          break;
-        }
-
-        const char* prefix_end = s;
-
-        size_t argument_index = parse_replacement (s);
-
-        if (argument_index != NO_ARGUMENT)
-        {
-          current_prefix.append (prefix_begin, prefix_end);
-          
-          tokens.push_back (EventTranslator::Token (current_prefix, argument_index));
-
-          prefix_begin = s;
-          
-          current_prefix.clear ();
-
-          break;
-        }
-      }
-      default:
-        s++;
-        break;
-    }
-  }
-}
-
 }
 
 namespace input
@@ -99,7 +43,7 @@ namespace input
 EventTranslator::EventTranslator (const char* input_event, const char* event_replacement, const char* tag)
   : str_event_wildcard (input_event), str_event_replacement (event_replacement), str_tag (tag)
 {
-  parse_event (event_replacement, replacement_tokens);
+  ParseReplacement (event_replacement);
   
   split_event (input_event, event_wildcard);
 
@@ -138,6 +82,66 @@ bool EventTranslator::Replace (const vector<string>& event_components, string& r
   }
       
   return true;
+}
+
+/*
+   Разбиение строки замены на составляющие
+*/
+
+void EventTranslator::ParseReplacement (const char* replacement)
+{
+  const char* prefix_begin = replacement, *s = replacement;
+  
+  string current_prefix;
+
+  current_prefix.reserve (strlen (replacement));
+
+  for (;;)
+  {
+    switch (*s)
+    {
+      case '\0':
+        if (prefix_begin != s)
+        {
+          current_prefix.append (prefix_begin, s);
+          
+          replacement_tokens.push_back (EventTranslator::Token (current_prefix, NO_ARGUMENT));
+        }
+
+        return;
+      case '{':
+      {
+        if (s [1] == '{')
+        {
+          current_prefix.append (prefix_begin, ++s);
+
+          prefix_begin = ++s;
+
+          break;
+        }
+
+        const char* prefix_end = s;
+
+        size_t argument_index = parse_replacement (s);
+
+        if (argument_index != NO_ARGUMENT)
+        {
+          current_prefix.append (prefix_begin, prefix_end);
+          
+          replacement_tokens.push_back (EventTranslator::Token (current_prefix, argument_index));
+
+          prefix_begin = s;
+          
+          current_prefix.clear ();
+
+          break;
+        }
+      }
+      default:
+        s++;
+        break;
+    }
+  }
 }
 
 }
