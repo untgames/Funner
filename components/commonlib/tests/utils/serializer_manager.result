@@ -2,7 +2,7 @@ Results of serializer_manager_test:
 my_loader(test,A)
 my_saver(test,A)
 my_saver(test,A)
-exception: Invalid argument <extension>='ext'. No serializer with this extension for signature void __cdecl(char const *,struct A &)
+exception: Invalid argument <name>='ext'. No serializer with this extension for signature void __cdecl(char const *,struct A &)
     at common::SerializerManagerImpl::Find
 is-saver-null: false
 is-saver-null: true

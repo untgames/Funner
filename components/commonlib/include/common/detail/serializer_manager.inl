@@ -67,15 +67,15 @@ inline void SerializerManager::UnregisterAll ()
 */
 
 template <class Signature>
-inline const xtl::function<Signature>& SerializerManager::Get (const char* extension)
+inline const xtl::function<Signature>& SerializerManager::Get (const char* name, SerializerFindMode mode)
 {
-  return static_cast<detail::SerializerHolder<Signature>*> (Find (extension, typeid (Signature), true))->serializer;
+  return static_cast<detail::SerializerHolder<Signature>*> (Find (name, typeid (Signature), mode, true))->serializer;
 }
 
 template <class Signature>
-inline const xtl::function<Signature>* SerializerManager::Find (const char* extension)
+inline const xtl::function<Signature>* SerializerManager::Find (const char* name, SerializerFindMode mode)
 {
-  detail::SerializerHolder<Signature>* holder = static_cast<detail::SerializerHolder<Signature>*> (Find (extension, typeid (Signature), false));
+  detail::SerializerHolder<Signature>* holder = static_cast<detail::SerializerHolder<Signature>*> (Find (name, typeid (Signature), mode, false));
   
   return holder ? &holder->serializer : 0;
 }
@@ -139,28 +139,28 @@ inline void ResourceSerializerManager<LoaderSignature, SaverSignature>::Unregist
 
 template <class LoaderSignature, class SaverSignature>
 inline const typename ResourceSerializerManager<LoaderSignature, SaverSignature>::LoadHandler&
-ResourceSerializerManager<LoaderSignature, SaverSignature>::GetLoader (const char* extension)
+ResourceSerializerManager<LoaderSignature, SaverSignature>::GetLoader (const char* name, SerializerFindMode mode)
 {
-  return SerializerManager::Get<LoaderSignature> (extension);
+  return SerializerManager::Get<LoaderSignature> (name, mode);
 }
 
 template <class LoaderSignature, class SaverSignature>
 inline const typename ResourceSerializerManager<LoaderSignature, SaverSignature>::LoadHandler*
-ResourceSerializerManager<LoaderSignature, SaverSignature>::FindLoader (const char* extension)
+ResourceSerializerManager<LoaderSignature, SaverSignature>::FindLoader (const char* name, SerializerFindMode mode)
 {
-  return SerializerManager::Find<LoaderSignature> (extension);
+  return SerializerManager::Find<LoaderSignature> (name, mode);
 }
 
 template <class LoaderSignature, class SaverSignature>
 inline const typename ResourceSerializerManager<LoaderSignature, SaverSignature>::SaveHandler&
-ResourceSerializerManager<LoaderSignature, SaverSignature>::GetSaver (const char* extension)
+ResourceSerializerManager<LoaderSignature, SaverSignature>::GetSaver (const char* name, SerializerFindMode mode)
 {
-  return SerializerManager::Get<SaverSignature> (extension);
+  return SerializerManager::Get<SaverSignature> (name, mode);
 }
 
 template <class LoaderSignature, class SaverSignature>
 inline const typename ResourceSerializerManager<LoaderSignature, SaverSignature>::SaveHandler*
-ResourceSerializerManager<LoaderSignature, SaverSignature>::FindSaver (const char* extension)
+ResourceSerializerManager<LoaderSignature, SaverSignature>::FindSaver (const char* name, SerializerFindMode mode)
 {
-  return SerializerManager::Find<SaverSignature> (extension);
+  return SerializerManager::Find<SaverSignature> (name, mode);
 }

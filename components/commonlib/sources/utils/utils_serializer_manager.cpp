@@ -94,31 +94,55 @@ class SerializerManagerImpl
     }
     
       //поиск сериализатора
-    detail::ISerializerHolder* Find (const char* extension, const std::type_info& signature, bool raise_exception)
+    detail::ISerializerHolder* Find (const char* name, const std::type_info& signature, SerializerFindMode mode, bool raise_exception)
     {
       static const char* METHOD_NAME = "common::SerializerManagerImpl::Find";
       
-      if (!extension)
+      switch (mode)
+      {
+        case SerializerFindMode_ByExtension:
+          break;
+        case SerializerFindMode_ByName:
+          name = GetExtension (name);
+          break;
+        default:
+          if (raise_exception)
+            RaiseInvalidArgument (METHOD_NAME, "mode", mode);
+
+          return 0;
+      }
+
+      if (!name)
       {
         if (raise_exception)
-          RaiseNullArgument (METHOD_NAME, "extension");
+          RaiseNullArgument (METHOD_NAME, "name");
 
         return 0;
       }
       
-      SerializerMap::iterator iter = serializers.find (SerializerKey (extension, signature));
+      SerializerMap::iterator iter = serializers.find (SerializerKey (name, signature));
       
       if (iter == serializers.end ())
       {
         if (raise_exception)
-          Raise<ArgumentException> (METHOD_NAME, "Invalid argument <extension>='%s'. "
-            "No serializer with this extension for signature %s", extension, signature.name ());
+          Raise<ArgumentException> (METHOD_NAME, "Invalid argument <name>='%s'. "
+            "No serializer with this extension for signature %s", name, signature.name ());
 
         return 0;
       }
       
       return get_pointer (iter->second);
     }
+    
+  private:
+    static const char* GetExtension (const char* file_name)
+    {
+      for (const char* s=file_name+strlen (file_name); s!=file_name; --s)
+        if (*s == '.')
+          return s + 1;
+
+      return file_name;
+    }  
 
   private:
     typedef xtl::shared_ptr<detail::ISerializerHolder>        SerializerHolderPtr;
@@ -169,7 +193,7 @@ void SerializerManager::UnregisterAll ()
     ѕоиск сериализатора
 */
  
-detail::ISerializerHolder* SerializerManager::Find (const char* extension, const std::type_info& signature, bool raise_exception)
+detail::ISerializerHolder* SerializerManager::Find (const char* extension, const std::type_info& signature, SerializerFindMode mode, bool raise_exception)
 {
-  return SerializerManagerSingleton::Instance ().Find (extension, signature, raise_exception);
+  return SerializerManagerSingleton::Instance ().Find (extension, signature, mode, raise_exception);
 }
