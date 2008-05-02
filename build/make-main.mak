@@ -8,6 +8,7 @@ BUILD_DIR_SHORT_NAME                    := build         #Базовое имя каталога с
 TMP_DIR_SHORT_NAME                      := tmp           #Базовое имя каталога с временными файлами сборки
 DIST_DIR_SHORT_NAME                     := dist          #Базовое имя каталога с результатами сборки
 PCH_SHORT_NAME                          := pch.h         #Базовое имя PCH файла
+EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
 VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package #Допустимые типы целей
 PACKAGE_COMMANDS                        := build clean test check run #Команды, делегируемые компонентам пакета
@@ -21,6 +22,7 @@ SOURCE_FILES_SUFFIXES                   := $(strip $(SOURCE_FILES_SUFFIXES))
 BUILD_DIR_SHORT_NAME                    := $(strip $(BUILD_DIR_SHORT_NAME))
 TMP_DIR_SHORT_NAME                      := $(strip $(TMP_DIR_SHORT_NAME))
 DIST_DIR_SHORT_NAME                     := $(strip $(DIST_DIR_SHORT_NAME))
+EXPORT_VAR_PREFIX                       := $(strip $(EXPORT_VAR_PREFIX))
 DIST_DIR                                := $(ROOT)/$(DIST_DIR_SHORT_NAME)
 DIST_LIB_DIR                            := $(DIST_DIR)/lib
 DIST_BIN_DIR                            := $(DIST_DIR)/bin
@@ -305,6 +307,42 @@ define process_target.package
   endif  
 endef
 
+#Импортирование настроек
+define import_settings
+#  $$(warning exporter=$1 importer=$2)
+
+#Получение относительного пути к используемому компоненту
+  DEPENDENCY_EXPORT_FILE   := $$(COMPONENT_DIR)$1
+  DEPENDENCY_COMPONENT_DIR := $$(dir $$(DEPENDENCY_EXPORT_FILE))
+
+#Проверка наличия файла зависимости
+  $$(if $$(wildcard $$(DEPENDENCY_EXPORT_FILE)),,$$(error Component export file '$$(DEPENDENCY_EXPORT_FILE)' not found))
+
+#Очистка переменных $(EXPORT_VAR_PREFIX).*
+  $$(foreach var,$$(filter $$(EXPORT_VAR_PREFIX).%,$$(.VARIABLES)),$$(eval $$(var) :=))
+
+#Подключение файла зависимости
+  include $$(DEPENDENCY_EXPORT_FILE)
+
+#Изменение настроек
+  $2.INCLUDE_DIRS     := $$($2.INCLUDE_DIRS) $$($$(EXPORT_VAR_PREFIX).INCLUDE_DIRS:%=$$(DEPENDENCY_COMPONENT_DIR)%)
+  $2.LIB_DIRS         := $$($2.LIB_DIRS) $$($$(EXPORT_VAR_PREFIX).LIB_DIRS:%=$$(DEPENDENCY_COMPONENT_DIR)%)
+  $2.DLL_DIRS         := $$($2.DLL_DIRS) $$($$(EXPORT_VAR_PREFIX).DLL_DIRS:%=$$(DEPENDENCY_COMPONENT_DIR)%)
+  $2.LIBS             := $$($2.LIBS) $$($$(EXPORT_VAR_PREFIX).LIBS)
+  $2.COMPILER_CFLAGS  := $$($2.COMPILER_CFLAGS) $$($$(EXPORT_VAR_PREFIX).COMPILER_CFLAGS)
+  $2.COMPILER_DEFINES := $$($2.COMPILER_DEFINES) $$($$(EXPORT_VAR_PREFIX).COMPILER_DEFINES)
+  DEPENDENCY_IMPORTS  := $$($$(EXPORT_VAR_PREFIX).IMPORTS:%=$(dir $1)%)  
+
+#Импортирование вложенных зависимостей
+  $$(foreach imp,$$(DEPENDENCY_IMPORTS),$$(eval $$(call import_settings,$$(imp),$2)))
+endef
+
+#Обработка сборки цели
+define process_target_common
+  $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
+  $$(eval $$(call process_target.$$(strip $$($1.TYPE)),$1))
+endef
+
 #Проверка корректности типа цели (тип цели)
 define test_target_type
   ifeq (,$$(findstring $$(strip $$($1.TYPE)),$(VALID_TARGET_TYPES)))
@@ -327,7 +365,7 @@ force:
 
 #Обработка целей компонента
 $(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call test_target_type,$(target))))
-$(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call process_target.$(strip $($(target).TYPE)),$(target))))
+$(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call process_target_common,$(target))))
 
 #Создание каталогов
 create_dirs: $(DIRS)
