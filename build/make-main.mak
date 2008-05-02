@@ -173,6 +173,7 @@ define process_target_with_sources
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
   TMP_DIRS := $$($1.TMP_DIRS) $$(TMP_DIRS)
+  TMP_CLEAN_DIRS := $(TMP_CLEAN_DIRS) $(ROOT)/$(TMP_DIR_SHORT_NAME)/$1
 
   build: $$($1.TARGET_DLLS)
 
@@ -371,12 +372,11 @@ $(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call process_target_co
 create_dirs: $(DIRS)
 
 $(DIRS):
-	@mkdir -p $@
-	@chmod ug+rw $@
+	@mkdir -p --mode=777 $@
 
 #Очистка
 clean:
-	@$(if $(TMP_DIRS),$(RM) -fr $(filter-out $(ROOT_TMP_DIR),$(TMP_DIRS)))
+	@cd $(ROOT_TMP_DIR) && $(RM) -r $(TMP_CLEAN_DIRS:$(ROOT_TMP_DIR)/%=%)
 
 fullyclean: clean
 	@$(RM) -r $(DIRS)
