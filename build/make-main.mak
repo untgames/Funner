@@ -376,7 +376,7 @@ $(DIRS):
 
 #Очистка
 clean:
-	@$(if $(TMP_DIRS),$(RM) -r $(filter-out $(ROOT_TMP_DIR),$(TMP_DIRS)))
+	@$(if $(TMP_DIRS),$(RM) -fr $(filter-out $(ROOT_TMP_DIR),$(TMP_DIRS)))
 
 fullyclean: clean
 	@$(RM) -r $(DIRS)
