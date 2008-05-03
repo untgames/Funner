@@ -1,7 +1,0 @@
-Results of compress_test:
-source string:
-This is hello\b\b\b\b\bworld string with '\132'\n
-compressed string:
-This is helloworld string with 'Z'
-decompressed string:
-This is hello\b\b\b\b\bworld string with 'Z'\n

@@ -1,3 +1,0 @@
-Results of input_stream_buffer_test:
-read data (size=12, result=12): 'ABCABCABCABC'
-read data (size=120, result=11): 'Hello world'

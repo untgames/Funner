@@ -1,6 +1,0 @@
-Results of output_stream_buffer_test:
-flush 10 bytes: 'Hello worl'
-write string 'Hello world' (size=11). result=11
-flush 2 bytes: 'ld'
-write string 'Hello world' (size=11). result=8
-user buffer: 'Hello wo**'
