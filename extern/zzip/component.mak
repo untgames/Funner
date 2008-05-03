@@ -5,7 +5,7 @@ TARGETS := ZZIP
 
 #Цель №1 - ZZIP
 ZZIP.TYPE             := static-lib               #Тип цели
-ZZIP.NAME             := zzip                     #Имя выходного файла
+ZZIP.NAME             := extern.zzip              #Имя выходного файла
 ZZIP.INCLUDE_DIRS     := include ../zlib/include  #Относительные пути к каталогам c заголовочными файлами
 ZZIP.SOURCE_DIRS      := sources                  #Относительные пути к каталогам c исходными файлами
 ZZIP.LIB_DIRS         :=                          #Относительные пути к каталогам с библиотеками
