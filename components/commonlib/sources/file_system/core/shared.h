@@ -5,12 +5,11 @@
 #include <common/singleton.h>
 #include <common/strlib.h>
 #include <common/hash.h>
+#include <common/component.h>
 
 #include <platform/platform.h>
-#include <zzip/zzip.h>
 
 #include <stl/hash_set>
-#include <stl/hash_map>
 #include <stl/vector>
 #include <stl/list>
 #include <stl/algorithm>
@@ -421,8 +420,7 @@ class FileSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static stl::string ConvertFileName (const char* file_name); //приведение файлового имени к стандартному виду
-           const char* CompressPath    (const char* path);      //формирование сокращённого пути
+    const char* CompressPath (const char* path); //формирование сокращённого пути
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -440,12 +438,7 @@ class FileSystemImpl
 ///Поиск в смонтированных файловых системах
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void MountSearch (FileListBuilder& builder,const char* wc_mask,const char* prefix,size_t flags);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание файловой системы zip-файла
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static ICustomFileSystem* CreateZipFileSystem (const char* path);
-    
+   
   private:
     typedef stl::hash_set<File*>       OpenFileSet;
     typedef stl::list<SearchPath>      SearchPathList;

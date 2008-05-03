@@ -110,7 +110,7 @@ FileList FileSystemImpl::Search (const char* src_mask,size_t flags)
   if (!src_mask)
     RaiseNullArgument ("FileSystem::Search","mask");
 
-  string full_mask  = ConvertFileName (src_mask),
+  string full_mask  = FileSystem::GetNormalizedFileName (src_mask),
          src_prefix = dir (full_mask),
          mask       = notdir (full_mask);
 

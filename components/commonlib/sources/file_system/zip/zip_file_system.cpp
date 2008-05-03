@@ -1,7 +1,21 @@
-#include "shared.h"
+#include <zzip/zzip.h>
+
+#include <common/file.h>
+#include <common/component.h>
+#include <common/strlib.h>
+
+#include <stl/hash_map>
+#include <stl/vector>
+#include <stl/list>
+#include <stl/string>
+
+#include <xtl/function.h>
 
 using namespace common;
 using namespace stl;
+
+namespace
+{
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Файловая система zip-файла
@@ -86,7 +100,7 @@ class ZipFileSystem: public ICustomFileSystem
     Получение сообщения об ошибке
 */
 
-static const char* GetZZipErrorMessage (zzip_error_t error) 
+const char* GetZZipErrorMessage (zzip_error_t error) 
 {
   switch (error)
   {
@@ -125,8 +139,8 @@ ZipFileSystem::ZipFileSystem (const char* path)
       FileListItem item;
       
       item.name = (const char*)file_names.size ();    
-      file_name = FileSystemImpl::ConvertFileName (entry.d_name);
-            
+      file_name = FileSystem::GetNormalizedFileName (entry.d_name);
+
       if (!file_name.empty () && file_name.end ()[-1] == '/')
         file_name.erase (file_name.end ()-1);
 
@@ -381,10 +395,36 @@ void ZipFileSystem::Release ()
 }
 
 /*
-    Создание файловой системы zip-файла
+    Компонент, регистрирующий ZipFileSystem
 */
 
-ICustomFileSystem* FileSystemImpl::CreateZipFileSystem (const char* path)
+class ZipFileSystemComponentRegistrator: public AutoRegisteredComponent
 {
-  return new ZipFileSystem (path);
+  public:
+      //имя компонента
+    const char* Name () { return "common.file_systems.ZipFileSystem"; }
+    
+      //загрузка компонента
+    void Load ()
+    {
+      FileSystem::RegisterPackFile ("zip", &Create);
+      FileSystem::RegisterPackFile ("jar", &Create);
+      FileSystem::RegisterPackFile ("pk3", &Create);            
+    }
+
+  private:
+      //создание ZipFileSystem
+    static ICustomFileSystem* Create (const char* path)
+    {
+      return new ZipFileSystem (path);
+    }
+};
+
+}
+
+extern "C"
+{
+
+ZipFileSystemComponentRegistrator ZipFileSystemComponent; //точка входа для регистрации компонента ZipFileSystem
+
 }

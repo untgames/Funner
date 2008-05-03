@@ -4,6 +4,13 @@ using namespace stl;
 using namespace common;
 using namespace xtl;
 
+namespace
+{
+
+const char* FILE_SYSTEM_ADDONS_MASK = "common.file_systems.*"; //маска имён компонентов, пользовательских файловых систем
+
+}
+
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' used in base member initializer list
 #endif
@@ -40,24 +47,6 @@ inline MountFileSystem::MountFileSystem (const MountFileSystem& fs)
   { }
 
 /*
-    Приведение файлового имени к стандартному виду
-*/
-
-string FileSystemImpl::ConvertFileName (const char* file_name)
-{
-  string res = file_name;
-
-  for (string::iterator i=res.begin ();i!=res.end ();++i)
-    switch (*i)
-    {
-      case '\\': *i = '/'; break;
-      default:   *i = tolower (*i); break;
-    }
-
-  return res;
-}
-
-/*
     Инициализация / завершение
 */
 
@@ -66,14 +55,11 @@ FileSystemImpl::FileSystemImpl ()
   default_file_buffer_size = DEFAULT_FILE_BUF_SIZE;
 
   ClosedFileImpl::Instance ();
-
-  RegisterPackFile ("zip",CreateZipFileSystem);
-  RegisterPackFile ("jar",CreateZipFileSystem);
-  RegisterPackFile ("pk3",CreateZipFileSystem);
-
-  Mount          ("/std",Platform::GetFileSystem ());
-  SetDefaultPath ("/std");
-  Mount          ("/io",Platform::GetIOSystem ());
+  
+  Mount ("/std",Platform::GetFileSystem ());
+  Mount ("/io",Platform::GetIOSystem ());  
+  
+  default_path = "/std";  
 }
 
 FileSystemImpl::~FileSystemImpl ()
@@ -157,7 +143,7 @@ const char* FileSystemImpl::CompressPath (const char* path)
 
 void FileSystemImpl::SetDefaultPath (const char* path)
 {
-  string new_path = path ? ConvertFileName (path) : "/";  
+  string new_path = path ? FileSystem::GetNormalizedFileName (path) : "/";  
 
   if (new_path [0] != '/')
     new_path = CompressPath (format ("%s/%s",default_path.c_str (),new_path.c_str ()).c_str ());
@@ -195,7 +181,7 @@ void FileSystemImpl::RegisterPackFile (const char* extension,const PackFileCreat
     {
       i->creater = creater;
       return;
-    }
+    }    
 
   pack_types.push_front (PackFileType (extension,hash,creater));
 }
@@ -221,7 +207,9 @@ void FileSystemImpl::UnregisterPackFile (const char* extension)
 
 void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,const FileSystem::LogHandler& log_handler)
 {
-  string path = ConvertFileName (_path), type = suffix (path);
+  static ComponentLoader custom_file_systems_loader (FILE_SYSTEM_ADDONS_MASK);
+
+  string path = FileSystem::GetNormalizedFileName (_path), type = suffix (path);
          
   if (type.empty ())
     return;
@@ -273,7 +261,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
   if (!log_handler)
     RaiseNullArgument ("FileSystem::AddSearchPath","log_handler");
 
-  string path = ConvertFileName (_path), mount_path;
+  string path = FileSystem::GetNormalizedFileName (_path), mount_path;
 
   if (path [0] != '/')
     path = format ("%s/%s",default_path.c_str (),path.c_str ());
@@ -318,7 +306,7 @@ void FileSystemImpl::RemoveSearchPath (const char* _path)
   if (!_path)
     RaiseNullArgument ("FileSystem::RemoveSearchPath","path");
 
-  string path = ConvertFileName (_path);
+  string path = FileSystem::GetNormalizedFileName (_path);
   
   if (path [0] != '/')
     path = format ("%s/%s",default_path.c_str (),path.c_str ());
@@ -367,7 +355,7 @@ void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystemPtr file_s
   if (*_path_prefix != '/')
     RaiseInvalidArgument ("FileSystem::Mount","path_prefix",_path_prefix,"Mount path must start from '/'");
 
-  string prefix = ConvertFileName (_path_prefix);
+  string prefix = FileSystem::GetNormalizedFileName (_path_prefix);
   size_t hash   = strhash (prefix);
 
   prefix += '/';
@@ -386,7 +374,7 @@ void FileSystemImpl::Unmount (const char* _path_prefix)
   if (!_path_prefix)
     return;
         
-  string prefix = ConvertFileName (_path_prefix);
+  string prefix = FileSystem::GetNormalizedFileName (_path_prefix);
   size_t hash   = strhash (prefix);
 
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
@@ -426,7 +414,7 @@ bool FileSystemImpl::IsPathMount (const char* path) const
   if (!path)
     return false;
         
-  string prefix = ConvertFileName (path);
+  string prefix = FileSystem::GetNormalizedFileName (path);
   size_t hash   = strhash (prefix);
 
   for (MountList::const_iterator i=mounts.begin ();i!=mounts.end ();++i)
@@ -442,6 +430,8 @@ bool FileSystemImpl::IsPathMount (const char* path) const
 
 ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,string& result_file_name)
 {
+  static ComponentLoader custom_file_systems_loader (FILE_SYSTEM_ADDONS_MASK);
+
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
   {
     if (!string_wrappers::strnicmp (i->prefix.c_str (),file_name,i->prefix.size ()-1))
@@ -465,7 +455,7 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
 
 ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,string& result_file_name)
 {
-  string file_name = ConvertFileName (src_file_name);
+  string file_name = FileSystem::GetNormalizedFileName (src_file_name);
   
     //пытаемся найти файл не используя путей поиска
   
@@ -897,4 +887,25 @@ void FileSystem::GetFileHash (const char* file_name,FileHash& hash)
     exception.Touch ("FileSystem::GetFileHash");
     throw;
   }
+}
+
+/*
+    Приведение файлового имени к стандартному виду
+*/
+
+string FileSystem::GetNormalizedFileName (const char* file_name)
+{
+  if (!file_name)
+    RaiseNullArgument ("FileSystem::GetNormalizedFileName", "file_name");
+
+  string res = file_name;
+
+  for (string::iterator i=res.begin ();i!=res.end ();++i)
+    switch (*i)
+    {
+      case '\\': *i = '/'; break;
+      default:   *i = tolower (*i); break;
+    }
+
+  return res;
 }

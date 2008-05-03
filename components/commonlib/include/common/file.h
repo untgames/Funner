@@ -2,8 +2,11 @@
 #define COMMONLIB_FILE_SYSTEM_HEADER
 
 #include <time.h>
+
 #include <xtl/intrusive_ptr.h>
 #include <xtl/functional_fwd>
+#include <stl/string_fwd>
+
 #include <common/exception.h>
 
 namespace common
@@ -504,6 +507,11 @@ class FileSystem
 ///Закрытие всех открытых файлов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void CloseAllFiles ();    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Приведение файлового имени к стандартному виду
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static stl::string GetNormalizedFileName (const char* file_name);
 };
 
 }
