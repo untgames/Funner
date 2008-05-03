@@ -17,11 +17,11 @@ SYSTEMLIB_SOURCES.IMPORTS          := ../common.static.mak
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB_TESTS.TYPE             := test-suite
-SYSTEMLIB_TESTS.INCLUDE_DIRS     := include
+SYSTEMLIB_TESTS.INCLUDE_DIRS     :=
 SYSTEMLIB_TESTS.SOURCE_DIRS      := tests/wrappers
 SYSTEMLIB_TESTS.LIB_DIRS         :=
 SYSTEMLIB_TESTS.EXECTUTION_DIR   :=
-SYSTEMLIB_TESTS.LIBS             := system user32
+SYSTEMLIB_TESTS.LIBS             :=
 SYSTEMLIB_TESTS.COMPILER_CFLAGS  :=
 SYSTEMLIB_TESTS.COMPILER_DEFINES :=
-SYSTEMLIB_TESTS.IMPORTS          := ../common.static.mak
+SYSTEMLIB_TESTS.IMPORTS          := ../system.static.mak
