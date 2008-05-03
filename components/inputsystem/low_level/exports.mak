@@ -3,4 +3,4 @@
 ###################################################################################################
 export.INCLUDE_DIRS     := include
 export.LIBS             := input_ll
-export.IMPORTS	        := ../../commonlib/exports.mak
+export.IMPORTS	        := ../../common.static.mak

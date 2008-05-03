@@ -6,7 +6,7 @@ TARGETS := WATER_SLIDES
 #Öåëü ¹1 - Water slides
 WATER_SLIDES.TYPE             := application
 WATER_SLIDES.NAME             := water-slides
-WATER_SLIDES.INCLUDE_DIRS     := ../../commonlib/include ../../xtl/include ../../mathlib/include ../../medialib/include ../../rendersystem/lowlevel/include ../../rendersystem/opengldriver/include ../../systemlib/include ../../scenegraph/include ../../boundvolumes/include ../../soundsystem/manager/include ../../soundsystem/sgplayer/include ../../soundsystem/lowlevel/include ../../soundsystem/openaldevice/include
+WATER_SLIDES.INCLUDE_DIRS     := ../../commonlib/include ../../xtl/include ../../medialib/include ../../rendersystem/lowlevel/include ../../rendersystem/opengldriver/include ../../systemlib/include ../../scenegraph/include ../../boundvolumes/include ../../soundsystem/manager/include ../../soundsystem/sgplayer/include ../../soundsystem/lowlevel/include ../../soundsystem/openaldevice/include
 WATER_SLIDES.SOURCE_DIRS      := sources
 WATER_SLIDES.LIB_DIRS         := ../../../extern/openalsdk/lib/win32
 WATER_SLIDES.LIBS             := medialib devil ilu commonlib zzip zlib opengl_driver system user32 render_ll glew_static gdi32 opengl32 sg soundmanager sgplayer soundlowlevel openaldevice ogg vorbis_static vorbisfile_static openal32

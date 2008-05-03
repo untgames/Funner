@@ -158,7 +158,9 @@ void MeshLibrary::Load (const char* file_name)
 
   try
   {
-    MeshLibraryManagerSingleton::Instance ().Load (file_name, *this);
+    static ComponentLoader loader ("media.geometry.loaders.*");
+
+    MeshLibraryManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this);
   }
   catch (common::Exception& exception)
   {
@@ -171,7 +173,9 @@ void MeshLibrary::Save (const char* file_name)
 {
   try
   {
-    MeshLibraryManagerSingleton::Instance ().Save (file_name, *this);
+    static ComponentLoader loader ("media.geometry.savers.*");
+    
+    MeshLibraryManager::GetSaver (file_name, SerializerFindMode_ByName)(file_name, *this);
   }
   catch (common::Exception& exception)
   {

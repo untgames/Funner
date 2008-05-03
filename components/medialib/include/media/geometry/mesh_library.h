@@ -2,6 +2,7 @@
 #define MEDIALIB_GEOMETRY_MESH_LIBRARY_HEADER
 
 #include <media/geometry/mesh.h>
+#include <common/serializer_manager.h>
 #include <xtl/functional_fwd>
 #include <stl/auto_ptr.h>
 
@@ -116,9 +117,7 @@ void swap (MeshLibrary&, MeshLibrary&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void convert (const collada::Model& source, MeshLibrary& destination);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Менеджер библиотек мешей
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 class MeshLibraryManager
 {
   public:
@@ -133,7 +132,13 @@ class MeshLibraryManager
     static void UnregisterLoader (const char* extension);
     static void UnregisterSaver  (const char* extension);
     static void UnregisterAll    ();  
-};
+};*/
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер библиотек мешей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef common::ResourceSerializerManager<void (const char*, MeshLibrary&),
+                                          void (const char*, const MeshLibrary&)> MeshLibraryManager;
 
 }
 

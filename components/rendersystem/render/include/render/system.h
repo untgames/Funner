@@ -1,11 +1,16 @@
-#ifndef RENDER_HEADER
-#define RENDER_HEADER
+#ifndef RENDER_SYSTEM_HEADER
+#define RENDER_SYSTEM_HEADER
 
 #include <stl/auto_ptr.h>
 #include <xtl/functional_fwd>
 
 namespace render
 {
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Функтор создания динамической текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef xtl::function<Texture (low_level::IDevice& device, const char* name)> DynamicTextureCreateFunction;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Опция рендера
@@ -34,60 +39,44 @@ class Option
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рендер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Render
+class RenderSystem
 {
   public:  
-      //depth-stencil???
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы / деструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Render  ();
-    ~Render ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание целевых буферов отрисовки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderTarget CreateRenderWindow (syslib::Window& window);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перебор целевых буферов отрисовки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                      RenderTargetsCount () const;
-    render::RenderTarget&       RenderTarget       (size_t index);
-    const render::RenderTarget& RenderTarget       (size_t index) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обновление всех целевых буферов отрисовки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void UpdateAllRenderTargets ();    
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конфигурирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                OptionsCount    () const;
-    render::Option&       Option          (size_t index);
-    const render::Option& Option          (size_t index) const;
-    render::Option&       Option          (const char* name);
-    const render::Option& Option          (const char* name) const;
-    int                   FindOptionIndex (const char* name) const; //no throw, return -1 if fail    
-    void                  SetOptionValue  (const char* name, const char* value);
-    const char*           OptionValue     (const char* name) const;
+    static size_t          OptionsCount    ();
+    static render::Option& Option          (size_t index);
+    static render::Option& Option          (const char* name);
+    static int             FindOptionIndex (const char* name); //no throw, return -1 if fail
+    static void            SetOptionValue  (const char* name, const char* value);
+    static const char*     OptionValue     (const char* name);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Оповещение об обновлении динамических ресурсов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void Invalidate (media::Image&); //???
+    static void Invalidate (media::Material&);
+//    static void Invalidate (media::Font&);
+    static void Invalidate (media::IndexBuffer&);
+    static void Invalidate (media::VertexBuffer&);
+    static void Invalidate (media::VertexStream&);
+    static void Invalidate (media::Mesh&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация функций создания динамических текстур
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void RegisterDynamicTexture       (const char* texture_name, const DynamicTextureCreateFunction& creater);
+    static void UnregisterDynamicTexture     (const char* texture_name);
+    static void UnregisterAllDynamicTextures ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с кэшем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Prefetch     ();
-    void Flush        ();
-    void SetAutoFlush (bool state);
-    bool IsAutoFlush  () const;    
-
-  private:
-    Render (const Render&); //no impl
-    Render& operator = (const Render&); //no impl
-
-  private:
-    struct Impl;
-    stl::auto_ptr<Impl> impl;
+    static void Prefetch     ();
+    static void Flush        ();
+    static void SetAutoFlush (bool state);
+    static bool IsAutoFlush  ();
 };
 
 }

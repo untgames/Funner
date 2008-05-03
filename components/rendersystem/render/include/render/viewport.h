@@ -1,11 +1,10 @@
 #ifndef RENDER_VIEWPORT_HEADER
 #define RENDER_VIEWPORT_HEADER
 
+#include <render/layers.h>
+
 namespace render
 {
-
-//???
-//+clear flags
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Область вывода
@@ -14,68 +13,69 @@ class Viewport
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы / деструктор
+///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Viewport  ();
+    Viewport  (const Viewport&);
     ~Viewport ();
+
+    Viewport& operator = (const Viewport&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры области вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Width  () const;
-    size_t Height () const;
-    size_t Left   () const;
-    size_t Right  () const;
-    size_t Top    () const;
-    size_t Bottom () const;
-    
+    size_t      Width  () const;
+    size_t      Height () const;
+    size_t      Left   () const;
+    size_t      Right  () const;
+    size_t      Top    () const;
+    size_t      Bottom () const;
+    const Rect& Area   () const;
+
     void SetOrigin (size_t left, size_t top);
     void SetSize   (size_t width, size_t height);
-    void SetRect   (size_t left, size_t top, size_t width, size_t height); //???
+    void SetArea   (const Rect&);
+    void SetArea   (size_t left, size_t top, size_t width, size_t height);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очистка области вывода
+///Установка номера слоя и номера mip-уровня текстуры, на которые производится отрисовка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-      ///убрать!!
-    void ClearRenderTarget (const math::vec4f& color);
-    void ClearDepthStencil (size_t clear_flags, float depth_component, size_t stencil_index);
-    void Clear             (size_t clear_flags, const math::vec4f& color, float depth_component, size_t stencil_index);
+    void   SetTargetLayer    (size_t index);
+    void   SetTargetMipLevel (size_t mip_level);
+    size_t TargetLayer       () const;
+    size_t TargetMipLevel    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка параметров автоматической очистки области вывода
+///Использует ли область вывода буфер попиксельно отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-      //???
-    void               SetAutoClearBuffers (size_t clear_flags);
-    void               SetAutoClearColor   (const math::vec4f& clear_color);
-    void               SetAutoClearDepth   (float depth_component);
-    void               SetAutoClearStencil (size_t stencil_index);
-    size_t             AutoClearBuffers    () const;
-    const math::vec4f& ClearColor          () const;
-    float              ClearDepth          () const;
-    size_t             ClearStencil        () const;
+    void SetDepthStencilBufferState (bool state);
+    bool DepthStencilBufferState    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка активной камеры
+///Камера, связанная с областью вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                  SetCamera (const Camera&);
-    const render::Camera& Camera    () const;
-          render::Camera& Camera    () const;
+    void          SetCamera (const Camera&);
+    const Camera& Camera    () const;
+          Camera& Camera    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обновление области вывода
+///Управление активностью области вывода (неакивные области не обновляются)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Update (RenderTarget& render_target);
+    void SetActive  (bool state);
+    bool IsActive   () const;
+    void Activate   () { SetActive (true); }
+    void Deactivate () { SetActive (false); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновляемые слои
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const LayerSet& Layers () const;
+          LayerSet& Layers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (Viewport&);
-
-         //???
-      //+zorder
-      //+material scheme / technique
-      //+visibility mask
-      //+bool flags: skies, shadows, overlays
 
   private:
     struct Impl;
@@ -90,5 +90,3 @@ void swap (Viewport&, Viewport&);
 }
 
 #endif
-
-

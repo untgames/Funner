@@ -1,6 +1,6 @@
 ###################################################################################################
-#Настройки, экспортируемые для библиотек использующих CommonLib
+#Экспортируемые настройки компонента
 ###################################################################################################
-export.INCLUDE_DIRS     := common/include xtl/include
-export.LIBS             := common pcre
-export.COMPILER_DEFINES :=
+export.INCLUDE_DIRS     := include ../bound_volumes/include
+export.LIBS             := scene_graph
+export.IMPORTS          := ../common/exports.static.mak

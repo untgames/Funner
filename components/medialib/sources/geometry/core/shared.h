@@ -23,6 +23,7 @@
 #include <common/exception.h>
 #include <common/xml_writer.h>
 #include <common/parser.h>
+#include <common/component.h>
 
 #include <media/geometry/mesh_library.h>
 
@@ -77,23 +78,6 @@ class Buffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void copy (size_t vertices_count, const void* source, VertexAttributeType source_type, size_t source_stride,
            void* destination, VertexAttributeType destination_type, size_t destination_stride);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сохранение / загрузка мешей
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void xmesh_save_library (const char* file_name, const MeshLibrary& library);
-void xmesh_load_library (const char* file_name, MeshLibrary& library);
-           
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Менеджер библиотек мешей
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class MeshLibraryManagerImpl: public ResourceManager<MeshLibraryManager::LoadHandler, MeshLibraryManager::SaveHandler>
-{
-  public:
-    MeshLibraryManagerImpl ();
-};
-
-typedef common::Singleton<MeshLibraryManagerImpl> MeshLibraryManagerSingleton;
 
 }
 

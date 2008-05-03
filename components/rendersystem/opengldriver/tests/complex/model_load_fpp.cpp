@@ -1,7 +1,5 @@
 #include "shared.h"
 
-#include <gl/glew.h>
-
 const char* SHADER_FILE_NAME  = "data/fpp_shader.wxf";
 const char* MODEL_NAME        = "data/spy.xmesh";
 

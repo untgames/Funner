@@ -12,7 +12,7 @@ INPUT_LOW_LEVEL_SOURCES.LIB_DIRS         :=
 INPUT_LOW_LEVEL_SOURCES.LIBS             := 
 INPUT_LOW_LEVEL_SOURCES.COMPILER_CFLAGS  :=
 INPUT_LOW_LEVEL_SOURCES.COMPILER_DEFINES := 
-INPUT_LOW_LEVEL_SOURCES.IMPORTS          := ../../commonlib/exports.mak
+INPUT_LOW_LEVEL_SOURCES.IMPORTS          := ../../common.static.mak
 
 #Öåëü ¹2 - INPUT system tests
 INPUT_LOW_LEVEL_TESTS.TYPE             := test-suite
@@ -24,4 +24,4 @@ INPUT_LOW_LEVEL_TESTS.DLLS             :=
 INPUT_LOW_LEVEL_TESTS.DLL_DIRS         :=
 INPUT_LOW_LEVEL_TESTS.COMPILER_CFLAGS  :=
 INPUT_LOW_LEVEL_TESTS.COMPILER_DEFINES :=
-INPUT_LOW_LEVEL_TESTS.IMPORTS          := ../../commonlib/exports.mak
+INPUT_LOW_LEVEL_TESTS.IMPORTS          := ../../common.static.mak

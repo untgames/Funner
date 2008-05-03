@@ -383,23 +383,35 @@ class XmlMeshLibraryLoader
     IndexBufferMap        index_buffers;  //загруженные индексные буферы
 };
 
-}
-
-namespace media
-{
-
-namespace geometry
-{
-
 /*
-    Загрузка меш-модели
+    Автоматическая регистрация компонента
 */
 
-void xmesh_load_library (const char* file_name, MeshLibrary& library)
+class XmlMeshLibraryLoaderComponent: public AutoRegisteredComponent
 {
-  XmlMeshLibraryLoader (file_name, library);
-}
+  public:
+      //имя компонента
+    const char* Name () { return "media.geometry.loaders.XmlMeshLibraryLoaderComponent"; }
+    
+      //загрузка компонента
+    void Load ()
+    {
+      MeshLibraryManager::RegisterLoader ("xmesh", &LoadLibrary);
+    }
+    
+  private:
+      //загрузка библиотеки мешей
+    static void LoadLibrary (const char* file_name, MeshLibrary& library)
+    {
+      XmlMeshLibraryLoader (file_name, library);
+    }
+};
 
 }
+
+extern "C"
+{
+
+XmlMeshLibraryLoaderComponent XMeshLoaderComponent;
 
 }

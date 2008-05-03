@@ -333,23 +333,35 @@ class XmlMeshLibrarySaver
     ResourceMap        index_buffers;   //сохранённые индексные буферы
 };
 
-}
-
-namespace media
-{
-
-namespace geometry
-{
-
 /*
-    Сохранение библиотеки мешей
+    Автоматическая регистрация компонента
 */
 
-void xmesh_save_library (const char* file_name, const MeshLibrary& library)
+class XmlMeshLibrarySaverComponent: public AutoRegisteredComponent
 {
-  XmlMeshLibrarySaver (file_name, library);
-}
+  public:
+      //имя компонента
+    const char* Name () { return "media.geometry.savers.XmlMeshLibrarySaverComponent"; }
+
+      //загрузка компонента
+    void Load ()
+    {
+      MeshLibraryManager::RegisterSaver ("xmesh", &SaveLibrary);
+    }
+
+  private:
+      //сохранение библиотеки мешей
+    static void SaveLibrary (const char* file_name, const MeshLibrary& library)
+    {
+      XmlMeshLibrarySaver (file_name, library);
+    }
+};
 
 }
+
+extern "C"
+{
+
+XmlMeshLibrarySaverComponent XMeshSaverComponent;
 
 }

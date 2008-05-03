@@ -1,6 +1,6 @@
 #include "shared.h"
 
-#include <gl/glew.h> ///????
+#include <gl/glew.h> //???
 
 const char* PIXEL_SHADER_FILE_NAME  = "data/glsl/wood.frag";
 const char* VERTEX_SHADER_FILE_NAME = "data/glsl/wood.vert";
@@ -446,6 +446,25 @@ void idle (Test& test)
   cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
  
   test.window.Invalidate ();
+}
+
+//получение ортографической матрицы проекции
+math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar)
+{
+  math::mat4f proj_matrix;
+  
+  float width  = right - left,
+        height = top - bottom,
+        depth  = zfar - znear;  
+
+    //выбрана матрица проецирования, используемая gluOrtho2D
+
+  proj_matrix [0] = math::vec4f (2.0f / width, 0, 0, - (right + left) / width);
+  proj_matrix [1] = math::vec4f (0, 2.0f / height, 0, - (top + bottom) / height);
+  proj_matrix [2] = math::vec4f (0, 0, -2.0f / depth, - (znear + zfar) / depth);
+  proj_matrix [3] = math::vec4f (0, 0, 0, 1);
+  
+  return proj_matrix;
 }
 
 int main ()

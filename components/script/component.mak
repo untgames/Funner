@@ -12,7 +12,7 @@ SCRIPTLIB_COMPONENTS.LIB_DIRS         :=
 SCRIPTLIB_COMPONENTS.LIBS             := lua
 SCRIPTLIB_COMPONENTS.COMPILER_CFLAGS  := 
 SCRIPTLIB_COMPONENTS.COMPILER_DEFINES := 
-SCRIPTLIB_COMPONENTS.IMPORTS				  := ../commonlib/exports.mak
+SCRIPTLIB_COMPONENTS.IMPORTS				  := ../common.static.mak
 
 #Öåëü ¹2 - Scriptlib tests
 SCRIPTLIB_TESTS.TYPE             := test-suite
@@ -22,4 +22,4 @@ SCRIPTLIB_TESTS.LIB_DIRS         :=
 SCRIPTLIB_TESTS.LIBS             := scriptlib lua
 SCRIPTLIB_TESTS.COMPILER_CFLAGS  := 
 SCRIPTLIB_TESTS.COMPILER_DEFINES :=
-SCRIPTLIB_TESTS.IMPORTS				   := ../commonlib/exports.mak
+SCRIPTLIB_TESTS.IMPORTS				   := ../common.static.mak
