@@ -1,6 +1,6 @@
 ###################################################################################################
 #Настройки, экспортируемые для библиотек использующих Scenegraph
 ###################################################################################################
-export.INCLUDE_DIRS     := include ../mathlib/include ../boundvolumes/include
+export.INCLUDE_DIRS     := include ../boundvolumes/include
 export.LIBS             := sg
-export.IMPORTS          := ../commonlib/exports.mak
+export.IMPORTS          := ../common.static.mak
