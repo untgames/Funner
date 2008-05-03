@@ -5,7 +5,7 @@ TARGETS := OPENGLDRIVER_SOURCES OPENGLDRIVER_TESTS
 
 #Öåëü ¹1 - OpenGL render system sources
 OPENGLDRIVER_SOURCES.TYPE             := static-lib
-OPENGLDRIVER_SOURCES.NAME             := opengl_driver
+OPENGLDRIVER_SOURCES.NAME             := render.low_level.opengl_driver
 OPENGLDRIVER_SOURCES.INCLUDE_DIRS     := include sources ../lowlevel/include ../../../extern/glew/include
 OPENGLDRIVER_SOURCES.SOURCE_DIRS      := sources/common sources/platform/win32 sources/driver sources/input_stage \
                                          sources/output_stage sources/output_stage/swap_chain_manager sources/output_stage/fbo_manager \
@@ -15,14 +15,14 @@ OPENGLDRIVER_SOURCES.LIB_DIRS         :=
 OPENGLDRIVER_SOURCES.LIBS             := 
 OPENGLDRIVER_SOURCES.COMPILER_CFLAGS  := -wd4355
 OPENGLDRIVER_SOURCES.COMPILER_DEFINES := GLEW_STATIC GLEW_MX
-OPENGLDRIVER_SOURCES.IMPORTS          := ../../common.static.mak
+OPENGLDRIVER_SOURCES.IMPORTS          := ../../common/exports.static.mak ../low_level/exports.static.mak
 
 #Öåëü ¹2 - OpenGL render system tests
 OPENGLDRIVER_TESTS.TYPE             := test-suite
-OPENGLDRIVER_TESTS.INCLUDE_DIRS     := include sources ../lowlevel/include ../../medialib/include ../../../extern/glew/include
+OPENGLDRIVER_TESTS.INCLUDE_DIRS     := ../../medialib/include ../../../extern/glew/include
 OPENGLDRIVER_TESTS.SOURCE_DIRS      := tests/driver tests/device tests/complex
 OPENGLDRIVER_TESTS.LIB_DIRS         :=
-OPENGLDRIVER_TESTS.LIBS             := glew_static render_ll opengl_driver gdi32 opengl32 medialib devil ilu
+OPENGLDRIVER_TESTS.LIBS             := 
 OPENGLDRIVER_TESTS.COMPILER_CFLAGS  :=
 OPENGLDRIVER_TESTS.COMPILER_DEFINES := 
-OPENGLDRIVER_TESTS.IMPORTS          := ../../systemlib/exports.mak ../../common.static.mak
+OPENGLDRIVER_TESTS.IMPORTS          := exports.static.mak ../low_level/exports.static.mak ../../system/exports.static.mak ../../common/exports.static.mak

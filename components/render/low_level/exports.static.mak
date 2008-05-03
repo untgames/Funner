@@ -1,8 +1,6 @@
 ###################################################################################################
-#ќпределени€ и константы
+#Ёкспортируемые настройки компонента
 ###################################################################################################
-TARGETS := RENDERSYSTEM_COMPONENTS
-
-#÷ель є1 - пакет
-RENDERSYSTEM_COMPONENTS.TYPE       := package
-RENDERSYSTEM_COMPONENTS.COMPONENTS := low_level opengl_driver
+export.INCLUDE_DIRS     := include ../../xtl/include
+export.LIBS             := common render.low_level
+export.IMPORTS          :=
