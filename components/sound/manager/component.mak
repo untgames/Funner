@@ -6,13 +6,13 @@ TARGETS := SOUND_SYSTEM_SOURCES SOUND_SYSTEM_TESTS
 #Öåëü ¹1 - Sound system sources
 SOUND_SYSTEM_SOURCES.TYPE             := static-lib
 SOUND_SYSTEM_SOURCES.NAME             := sound.manager
-SOUND_SYSTEM_SOURCES.INCLUDE_DIRS     := include ../../medialib/include
+SOUND_SYSTEM_SOURCES.INCLUDE_DIRS     := include
 SOUND_SYSTEM_SOURCES.SOURCE_DIRS      := sources/manager
 SOUND_SYSTEM_SOURCES.LIB_DIRS         :=  
 SOUND_SYSTEM_SOURCES.LIBS             := 
 SOUND_SYSTEM_SOURCES.COMPILER_CFLAGS  :=
 SOUND_SYSTEM_SOURCES.COMPILER_DEFINES := 
-SOUND_SYSTEM_SOURCES.IMPORTS          := ../low_level/exports.static.mak ../../system/exports.static.mak
+SOUND_SYSTEM_SOURCES.IMPORTS          := ../low_level/exports.static.mak ../../system/exports.static.mak ../../media/exports.static.mak
 
 #Öåëü ¹2 - Sound system tests
 SOUND_SYSTEM_TESTS.TYPE             := test-suite
