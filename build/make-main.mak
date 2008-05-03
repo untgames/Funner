@@ -77,6 +77,11 @@ endef
 #Обработка цели компонента
 ###################################################################################################
 
+#Преобразование Windows-путей
+define convert_path
+$(subst \,/,$1)
+endef
+
 #Создание зависимости объектного файла от флаг-файла пакетной компиляции (имя исходного файла, временный каталог, флаг-файл)
 define create_object_file_dependency
 $2/$$(notdir $$(basename $1)).obj: $1 $3
@@ -248,7 +253,7 @@ define process_target.application
 		
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@export PATH="$(CURDIR)/$(DIST_BIN_DIR):$$(PATH)" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<)
+		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR):$$(PATH))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<)
 endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
@@ -270,16 +275,17 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.exe
 		@echo Running $$(notdir $$<)...
-		@export PATH="$(CURDIR)/$(DIST_BIN_DIR):$$(PATH)" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
+		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR):$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@export PATH="$(CURDIR)/$(DIST_BIN_DIR):$$(PATH)" && cd $$($2.EXECUTION_DIR) && for file in $$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.exe),$$^)); do $$$$file; done
+		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR):$$(PATH))" && cd $$($2.EXECUTION_DIR) && for file in $$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.exe),$$^)); do $$$$file; done
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
 		@echo Checking results of module '$2'...
-		@for file in $$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)); do diff --strip-trailing-cr --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done
+		@for file in $$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)); do diff --text --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done
+#		@for file in $$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)); do diff --strip-trailing-cr --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done
 endef
 
 #Обработка цели test-suite (имя цели)
