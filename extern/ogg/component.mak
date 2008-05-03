@@ -4,11 +4,11 @@
 TARGETS := OGG
 
 #Цель №1 - OGG
-OGG.TYPE             := static-lib #Тип цели
-OGG.NAME             := ogg        #Имя выходного файла
-OGG.INCLUDE_DIRS     := include    #Относительные пути к каталогам c заголовочными файлами
-OGG.SOURCE_DIRS      := sources    #Относительные пути к каталогам c исходными файлами
-OGG.LIB_DIRS         :=            #Относительные пути к каталогам с библиотеками
-OGG.LIBS             :=            #Список используемых при линковке библиотек
-OGG.COMPILER_DEFINES :=  					 #Определения сборки
-OGG.COMPILER_CFLAGS  :=            #Флаги сборки (зависят от конфигурации)
+OGG.TYPE             := static-lib
+OGG.NAME             := extern.ogg
+OGG.INCLUDE_DIRS     := include
+OGG.SOURCE_DIRS      := sources
+OGG.LIB_DIRS         :=
+OGG.LIBS             :=
+OGG.COMPILER_DEFINES :=
+OGG.COMPILER_CFLAGS  :=

@@ -228,7 +228,7 @@ define process_target.dynamic-lib
     $$(error Empty dynamic library name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,.dll)
+  $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME).dll
   TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE))).lib
 
   build: $$($1.DLL_FILE)  
@@ -352,6 +352,7 @@ define import_settings
   $2.LIBS             := $$($2.LIBS) $$($$(EXPORT_VAR_PREFIX).LIBS)
   $2.COMPILER_CFLAGS  := $$($2.COMPILER_CFLAGS) $$($$(EXPORT_VAR_PREFIX).COMPILER_CFLAGS)
   $2.COMPILER_DEFINES := $$($2.COMPILER_DEFINES) $$($$(EXPORT_VAR_PREFIX).COMPILER_DEFINES)
+  $2.LINK_INCLUDES    := $$($2.LINK_INCLUDES) $$($$(EXPORT_VAR_PREFIX).LINK_INCLUDES)
   DEPENDENCY_IMPORTS  := $$($$(EXPORT_VAR_PREFIX).IMPORTS:%=$(dir $1)%)  
 
 #Импортирование вложенных зависимостей

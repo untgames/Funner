@@ -5,7 +5,7 @@ TARGETS := GLEW_SOURCES_STATIC
 
 #Цель №1 - GLEW sources
 GLEW_SOURCES_STATIC.TYPE             := static-lib
-GLEW_SOURCES_STATIC.NAME             := glew_static
+GLEW_SOURCES_STATIC.NAME             := extern.glew_static
 GLEW_SOURCES_STATIC.INCLUDE_DIRS     := include
 GLEW_SOURCES_STATIC.SOURCE_DIRS      := sources
 GLEW_SOURCES_STATIC.LIB_DIRS         := 
