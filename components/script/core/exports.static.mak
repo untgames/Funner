@@ -3,4 +3,4 @@
 ###################################################################################################
 export.INCLUDE_DIRS     := include
 export.LIBS             := script extern.lua
-export.IMPORTS          := ../common/exports.static.mak
+export.IMPORTS          := ../../common/exports.static.mak
