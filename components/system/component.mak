@@ -13,7 +13,7 @@ SYSTEMLIB_SOURCES.EXECTUTION_DIR   :=
 SYSTEMLIB_SOURCES.LIBS             :=
 SYSTEMLIB_SOURCES.COMPILER_CFLAGS  :=
 SYSTEMLIB_SOURCES.COMPILER_DEFINES :=
-SYSTEMLIB_SOURCES.IMPORTS          := ../commonlib/exports.mak
+SYSTEMLIB_SOURCES.IMPORTS          := ../common.static.mak
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB_TESTS.TYPE             := test-suite
@@ -24,4 +24,4 @@ SYSTEMLIB_TESTS.EXECTUTION_DIR   :=
 SYSTEMLIB_TESTS.LIBS             := system user32
 SYSTEMLIB_TESTS.COMPILER_CFLAGS  :=
 SYSTEMLIB_TESTS.COMPILER_DEFINES :=
-SYSTEMLIB_TESTS.IMPORTS          := ../commonlib/exports.mak
+SYSTEMLIB_TESTS.IMPORTS          := ../common.static.mak
