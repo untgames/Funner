@@ -1,0 +1,61 @@
+Parameters
+{
+  float4x4 myViewMatrix myObjectMatrix myProjMatrix
+}
+
+ProjectionMatrix myProjMatrix
+ViewMatrix       myViewMatrix
+ObjectMatrix     myObjectMatrix
+
+DiffuseColor  1 0 0 1
+SpecularColor 0 1 1 1
+EmissionColor 0.05 0 0.05 1
+Shininess     15
+
+AlphaCompareMode AlwaysPass
+
+Light1
+{
+  Enable 1
+  Type   Point
+  AmbientColor  1 1 1 1
+  DiffuseColor  1 1 1 1
+  SpecularColor 3 1 1 1
+  ConstantAttenuation 1
+  Position  -1800 0 -100
+}
+
+Light2
+{
+  Enable 1
+  Type   Point
+  AmbientColor  1 1 1 1
+  DiffuseColor  1 1 1 1
+  SpecularColor 1 1 5 1
+  ConstantAttenuation 1
+  Position  -1800 0 100
+}
+
+Light3
+{
+  Enable 1
+  Type   Spot
+  AmbientColor  2 2 2 0
+  DiffuseColor  2 2 2 0
+  SpecularColor 2 2 2 0
+  ConstantAttenuation 1
+  Position -1800 0 0
+  Direction 1 0 0
+  Angle 80
+} 
+
+Light4
+{
+  Enable 1
+  Type   Point
+  AmbientColor  1 1 1 1
+  DiffuseColor  3 3 3 1
+  SpecularColor 1 1 1 1
+  ConstantAttenuation 1
+  Position  0 0 0
+}
