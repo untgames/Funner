@@ -78,7 +78,7 @@ endef
 #список подключаемых символов линковки, флаги линковки)
 ###################################################################################################
 define tools.msvc.link
-link -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"%",$4) $5 $2
+link -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2
 endef
 
 ###################################################################################################
@@ -208,7 +208,7 @@ define process_target.static-lib
     $$(error Empty static name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.LIB_FILE  := $(DIST_LIB_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,.lib)
+  $1.LIB_FILE  := $(DIST_LIB_DIR)/$$($1.NAME).lib
   TARGET_FILES := $$(TARGET_FILES) $$($1.LIB_FILE)
   
   build: $$($1.LIB_FILE)
@@ -330,11 +330,11 @@ endef
 
 #Импортирование настроек
 define import_settings
-#  $$(warning exporter=$1 importer=$2)
-
 #Получение относительного пути к используемому компоненту
   DEPENDENCY_EXPORT_FILE   := $$(COMPONENT_DIR)$1
-  DEPENDENCY_COMPONENT_DIR := $$(dir $$(DEPENDENCY_EXPORT_FILE))
+  DEPENDENCY_COMPONENT_DIR := $$(dir $1)
+
+#  $$(warning exporter='$$(DEPENDENCY_EXPORT_FILE)' dep-dir='$$(DEPENDENCY_COMPONENT_DIR)' importer=$2)
 
 #Проверка наличия файла зависимости
   $$(if $$(wildcard $$(DEPENDENCY_EXPORT_FILE)),,$$(error Component export file '$$(DEPENDENCY_EXPORT_FILE)' not found))
