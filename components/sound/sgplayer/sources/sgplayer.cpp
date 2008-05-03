@@ -82,8 +82,7 @@ struct SGPlayer::Impl
 };
 
 SGPlayer::Impl::Impl (sound::SoundManager& in_sound_manager) 
-  : listener (0),
-    sound_manager (in_sound_manager), 
+  : sound_manager (in_sound_manager), 
     listener_timer (xtl::bind (&SGPlayer::Impl::ListenerUpdate, this), (size_t)(DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD * 1000)),
     emitter_timer (xtl::bind (&SGPlayer::Impl::EmitterUpdate, this), (size_t)(DEFAULT_EMITTER_PROPERTIES_UPDATE_PERIOD * 1000))
   {}
