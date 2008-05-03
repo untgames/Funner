@@ -2,5 +2,5 @@
 #Настройки, экспортируемые для библиотек использующих CommonLib
 ###################################################################################################
 export.INCLUDE_DIRS     := include ../xtl/include
-export.LIBS             := commonlib zlib zzip pcre
+export.LIBS             := common zlib zzip pcre
 export.COMPILER_DEFINES :=
