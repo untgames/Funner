@@ -11,6 +11,6 @@ FUNNER_EXTERN_LIBS.COMPONENTS := extern/zlib extern/zzip extern/pcre extern/devi
 #Цель №2 - пакет
 FUNNER_COMPONENTS.TYPE       := package
 FUNNER_COMPONENTS.COMPONENTS := components/xtl components/common components/system components/media \
-                                components/bound_volumes components/script components/scene_graph components/sound \
+                                components/bound_volumes components/scene_graph components/script components/sound \
                                 components/render components/input components/demos
 
