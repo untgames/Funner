@@ -25,11 +25,12 @@ COMMONLIB_ZIP_FILE_SYSTEM.COMPILER_DEFINES :=
 
 #Öåëü ¹3 - CommonLib tests
 COMMONLIB_TESTS.TYPE             := test-suite
-COMMONLIB_TESTS.INCLUDE_DIRS     := include ../xtl/include
+COMMONLIB_TESTS.INCLUDE_DIRS     :=
 COMMONLIB_TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils tests/parser tests/memory
 COMMONLIB_TESTS.EXECUTION_DIR    :=
 COMMONLIB_TESTS.LIB_DIRS         :=  
-COMMONLIB_TESTS.LIBS             := common common.zip_file_system zlib zzip pcre
-COMMONLIB_TESTS.LINK_INCLUDES    := ZipFileSystemComponent
+COMMONLIB_TESTS.LIBS             :=
+COMMONLIB_TESTS.LINK_INCLUDES    :=
 COMMONLIB_TESTS.COMPILER_CFLAGS  :=
 COMMONLIB_TESTS.COMPILER_DEFINES :=
+COMMONLIB_TESTS.IMPORTS          := exports.static.mak exports.zip_file_system.static.mak
