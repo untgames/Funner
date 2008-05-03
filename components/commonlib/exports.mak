@@ -3,4 +3,4 @@
 ###################################################################################################
 export.INCLUDE_DIRS     := include ../xtl/include
 export.LIBS             := commonlib zlib zzip pcre
-export.COMPILER_DEFINES := PCRE_STATIC
+export.COMPILER_DEFINES :=
