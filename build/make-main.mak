@@ -279,13 +279,12 @@ define process_tests_source_dir
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR):$$(PATH))" && cd $$($2.EXECUTION_DIR) && for file in $$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.exe),$$^)); do $$$$file; done
+		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR):$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(foreach file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.exe),$$^)),$$(file) && ) true
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
 		@echo Checking results of module '$2'...
-		@for file in $$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)); do diff --text --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done
-#		@for file in $$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)); do diff --strip-trailing-cr --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file; done
+		@$$(foreach file,$$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)),diff --text --context=1 $$($2.SOURCE_DIR)/$$(file) $$($2.TMP_DIR)/$$(file) && ) true
 endef
 
 #Обработка цели test-suite (имя цели)
