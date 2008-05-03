@@ -2,5 +2,5 @@
 #Экспортируемые настройки компонента
 ###################################################################################################
 export.INCLUDE_DIRS     := include ../xtl/include
-export.LIBS             := common pcre
+export.LIBS             := common extern.pcre
 export.COMPILER_DEFINES :=
