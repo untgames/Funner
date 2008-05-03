@@ -341,7 +341,16 @@ endef
 #Обработка сборки цели
 define process_target_common
   $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
-  $$(eval $$(call process_target.$$(strip $$($1.TYPE)),$1))
+  
+  DUMP.$1:
+		@echo Dump target \'$1\' settings
+		@$$(foreach var,$$(sort $$(filter $1.%,$(.VARIABLES))),echo '    $$(var:$1.%=%) = $$($$(var))' && ) true
+
+  dump: DUMP.$1
+
+  .PHONY: DUMP.$1
+  
+  $$(eval $$(call process_target.$$(strip $$($1.TYPE)),$1))  
 endef
 
 #Проверка корректности типа цели (тип цели)
@@ -362,7 +371,7 @@ test: build
 check: build
 force:
 
-.PHONY: build rebuild clean fullyclean run test check help create_dirs force
+.PHONY: build rebuild clean fullyclean run test check help create_dirs force dump
 
 #Обработка целей компонента
 $(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call test_target_type,$(target))))
@@ -372,7 +381,7 @@ $(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call process_target_co
 create_dirs: $(DIRS)
 
 $(DIRS):
-	@mkdir -p --mode=777 $@
+	@mkdir -p $@
 
 #Очистка
 clean:
