@@ -5,7 +5,7 @@ TARGETS := SCRIPT_CORE_SOURCES SCRIPT_CORE_TESTS
 
 #Öåëü ¹1 - SCRIPT_CORE sources
 SCRIPT_CORE_SOURCES.TYPE             := static-lib
-SCRIPT_CORE_SOURCES.NAME             := script
+SCRIPT_CORE_SOURCES.NAME             := script.core
 SCRIPT_CORE_SOURCES.INCLUDE_DIRS     := include ../../../extern/lua/include
 SCRIPT_CORE_SOURCES.SOURCE_DIRS      := sources/core sources/lua
 SCRIPT_CORE_SOURCES.LIB_DIRS         :=  
