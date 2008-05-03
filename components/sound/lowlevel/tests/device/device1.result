@@ -1,7 +1,0 @@
-Results of device1_test:
-configurations:
-  driver1::configuration1
-  driver2::configuration2
-  driver1::configuration3
-Exception: Attempt to create sound device: driver='driver1' device='configuration3' window_handle=00000000 init_string='0'
-    at my_create_device
