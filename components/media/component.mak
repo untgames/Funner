@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIALIB_COMPONENTS MEDIALIB_UTILS MEDIALIB_COLLADA MEDIALIB_TESTS MEDIALIB_COLLADA_TESTS MEDIALIB_COLLADA_CONVERT_TESTS
+TARGETS := MEDIALIB_COMPONENTS MEDIALIB_COLLADA MEDIALIB_TESTS MEDIALIB_COLLADA_TESTS MEDIALIB_COLLADA_CONVERT_TESTS MEDIALIB_UTILS
 
 #Цель №1 - MediaLib sources
 MEDIALIB_COMPONENTS.TYPE             := static-lib
