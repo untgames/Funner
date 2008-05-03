@@ -4,7 +4,7 @@
 #include <xtl/function.h>
 #include <syslib/application.h>
 #include <syslib/timer.h>
-#include <sound/openal_device.h>
+#include <sound/device.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/bind.h>
 #include <xtl/connection.h>
@@ -96,8 +96,6 @@ int main ()
 {
   try
   {
-    register_openal_driver ();
-    
     xtl::com_ptr<ISoundDevice> sound_system (SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("OpenAL", "*"), 0), false);
 
     Capabilities   info;

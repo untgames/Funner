@@ -6,6 +6,7 @@
 #include <common/strlib.h>
 #include <common/singleton.h>
 #include <common/exception.h>
+#include <common/component.h>
 #include <xtl/function.h>
 
 using namespace sound::low_level;
@@ -62,6 +63,12 @@ class SoundSystemImpl
     
   private:
     static string GetConfigurationName (const char* driver_name, const char* device_name);
+    
+      //загрузка драйверов проигрывания звука по умолчанию
+    static void LoadDefaultDrivers ()
+    {
+      static ComponentLoader loader ("sound.low_level.*");
+    }
   
   private:
     typedef hash_map<hash_key<const char*>, CreateDeviceHandler> DriverMap;
@@ -249,13 +256,16 @@ void SoundSystemImpl::UnregisterAllConfigurations ()
 
 size_t SoundSystemImpl::GetConfigurationsCount () const
 {
+  LoadDefaultDrivers ();
   return configuration_array.size ();
 }
 
 const char* SoundSystemImpl::GetConfiguration (size_t index) const
 {
+  LoadDefaultDrivers ();
+
   if (index >= configuration_array.size ())
-    RaiseOutOfRange ("sound::low_level::SoundSystem::GetConfiguration", "index", index, configuration_array.size ());
+    RaiseOutOfRange ("sound::low_level::SoundSystem::GetConfiguration", "index", index, configuration_array.size ());    
     
   return configuration_array [index]->second.name.c_str ();
 }
@@ -271,6 +281,8 @@ ISoundDevice* SoundSystemImpl::CreateDevice (const char* configuration_name, con
     
   if (!init_string)
     init_string = "";
+    
+  LoadDefaultDrivers ();
 
   ConfigurationMap::iterator cfg_iter = configurations.find (configuration_name);
 
@@ -289,7 +301,7 @@ ISoundDevice* SoundSystemImpl::CreateDevice (const char* driver_name, const char
     RaiseNullArgument ("sound::low_level::SoundSystemImpl::CreateDevice", "driver_name");
 
   if (!device_name)
-    RaiseNullArgument ("sound::low_level::SoundSystemImpl::CreateDevice", "device_name");
+    RaiseNullArgument ("sound::low_level::SoundSystemImpl::CreateDevice", "device_name");        
 
   return CreateDevice (GetConfigurationName (driver_name, device_name).c_str (), window_handle, init_string);
 }
@@ -303,6 +315,8 @@ const char* SoundSystemImpl::FindConfiguration (const char* driver_mask, const c
 {
   if (!driver_mask || !device_mask)
     return 0;
+    
+  LoadDefaultDrivers ();
 
   for (ConfigurationMap::const_iterator i=configurations.begin (), end=configurations.end (); i!=end; ++i)
     if (wcmatch (i->second.driver_name.c_str (), driver_mask) && wcmatch (i->second.device_name.c_str (), device_mask))

@@ -6,13 +6,20 @@
 #include <al.h>
 #include <alc.h>
 #include <efx.h>
+
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/uninitialized_storage.h>
+
 #include <common/strlib.h>
 #include <common/exception.h>
+#include <common/component.h>
+
 #include <media/sound.h>
+
 #include <syslib/timer.h>
+
+#include <sound/device.h>
 #include <sound/openal_device.h>
 
 namespace sound

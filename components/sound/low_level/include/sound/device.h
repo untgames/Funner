@@ -1,9 +1,11 @@
 #ifndef SOUND_SYSTEM_LOW_LEVEL_HEADER
 #define SOUND_SYSTEM_LOW_LEVEL_HEADER
 
+#include <exception>
+
 #include <mathlib.h>
 #include <xtl/functional_fwd>
-#include <exception>
+
 #include <sound/listener.h>
 
 namespace sound

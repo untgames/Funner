@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <exception>
 #include <xtl/intrusive_ptr.h>
-#include <sound/openal_device.h>
+#include <sound/device.h>
 
 using namespace sound::low_level;
 
@@ -11,8 +11,6 @@ int main ()
 
   try
   {
-    register_openal_driver ();
-    
     printf ("configurations:\n");
     
     for (size_t i=0; i<SoundSystem::GetConfigurationsCount (); i++)

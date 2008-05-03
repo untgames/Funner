@@ -1,5 +1,5 @@
 ###################################################################################################
-#Настройки, экспортируемые для библиотек использующих Sound lowlevel
+#Настройки, экспортируемые для библиотек использующих Soundmanager
 ###################################################################################################
-export.INCLUDE_DIRS     := include ../../xtl/include
-export.LIBS             := soundlowlevel commonlib
+export.INCLUDE_DIRS := include
+export.LIBS         := sound.manager sound.low_level

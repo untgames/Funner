@@ -10,7 +10,6 @@
 #include <xtl/bind.h>
 #include <sound/device.h>
 #include <sound/manager.h>
-#include <sound/openal_device.h>
 
 using namespace syslib;
 using namespace sound;
@@ -89,8 +88,6 @@ int main ()
 
   try
   {
-    register_openal_driver ();
-
     Timer timer (bind (&Application::Exit, 0), TEST_WORK_TIME);
 
     srand ((unsigned int)time (NULL));

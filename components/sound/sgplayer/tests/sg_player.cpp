@@ -12,7 +12,7 @@
 #include <sg/sound_emitter.h>
 #include <sound/manager.h>
 #include <sound/sgplayer.h>
-#include <sound/openal_device.h>
+#include <sound/device.h>
 #include <math/mathlib.h>
 
 using namespace sound;
@@ -50,8 +50,6 @@ int main ()
 
   try
   {
-    register_openal_driver ();
-    
     Scene           scene;
     Window          window;
     SoundManager    manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
