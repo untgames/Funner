@@ -1,0 +1,5 @@
+Results of init_string_test:
+  'A123'='12345'
+  'B '='567'
+  'C'='  D  '
+  'E'='asdasd"'

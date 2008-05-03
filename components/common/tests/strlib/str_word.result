@@ -1,0 +1,10 @@
+Results of str_word_test:
+split 'hello world' (delimiters=' ', spaces=' \t'): {'hello' 'world' '' '' }
+split 'hello, world' (delimiters=',', spaces=' \t'): {'hello' 'world' '' '' }
+split 'hello,world' (delimiters=',', spaces=' \t'): {'hello' 'world' '' '' }
+split ',world' (delimiters=',', spaces=' \t'): {'' 'world' '' '' }
+split 'hello,' (delimiters=',', spaces=' \t'): {'hello' '' '' '' }
+split ',,hello,world,' (delimiters=',', spaces=' \t'): {'' '' 'hello' 'world' }
+split 'hello world ' (delimiters=' ', spaces=' \t'): {'hello' 'world' '' '' }
+split '' (delimiters='', spaces=''): {'' '' '' '' }
+split 'hello world' (delimiters='', spaces=' \t'): {'hello world' '' '' '' }

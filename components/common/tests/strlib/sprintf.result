@@ -1,0 +1,7 @@
+Results of sprintf_test:
+result='Hello w', len=-1
+control: 'A'
+len=11
+result='Hello w', len=-1
+control: 'A'
+len=11

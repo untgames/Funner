@@ -1,0 +1,34 @@
+Results of wxf1_test:
+Parse successfull
+root
+  test2_node:  ( '1' )
+  test2_node:  ( '2' )
+  frame:  ( 'frame #1' )
+    node_tag:  ( '1' )
+    another_node_tag:  ( '1' '2' 'hello world' )
+    yet_another_node_tag:  ( '100' '200' '300' '400' )
+    node:  ( 'identifier' '1' '2' '3' '4' '5' '6' )
+    bonus:  ( 'A' 'B' 'C' )
+    some_frame:  ( 'frame #2' )
+      title:  ( 'Hello world' )
+      empty_node
+    yet_one_frame:  ( 'frame #3' )
+      some_node:  ( '1' )
+      frame:  ( 'frame #4' )
+        node:  ( 'Test' )
+  frame:  ( 'frame #1' )
+    float:  ( '1.22' )
+    float:  ( '.22' )
+    int:  ( '-123' )
+    string:  ( 'hello' )
+    level2
+      level3
+        level4
+          test:  ( '!!!' )
+Total nodes count: 25
+Parse log:
+data/test1.wxf(3): error: unexpected characters on line
+data/test1.wxf(5): error: User error
+data/test1.wxf(6): warning: User defined warning
+data/test1.wxf(32): error: syntax error. Unexpected value '1'. Line must start from identifier
+data/test1.wxf(54): error: syntax error. Unexpected value '112'. Line must start from identifier

@@ -1,0 +1,17 @@
+Results of strcmp_test:
+Compare tests:
+strcmp('','Hello')=-1
+strncmp('hello','hello',4)=0
+strncmp('abcd','abc',5)=1
+strncmp('hello','world',0)=0
+strncmp('','',10)=0
+strcmp('hello','Hello')=1
+strncmp('abcde','abcdf',5)=-1
+Case compare tests:
+stricmp('','Hello')=-1
+strnicmp('hello','hello',4)=0
+strnicmp('abcd','abc',5)=1
+strnicmp('hello','world',0)=0
+strnicmp('','',10)=0
+stricmp('hello','Hello')=0
+strnicmp('abcde','abcdf',5)=-1

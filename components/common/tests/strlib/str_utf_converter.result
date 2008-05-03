@@ -1,0 +1,19 @@
+Results of utf_converter_test:
+test encoding chain: ASCII7->UTF32LE->ASCII7: 'Hello World!!! ?????? ???!!!'
+test encoding chain: ASCII7->UTF32LE->UTF8: 'Hello World!!! ?????? ???!!!'
+test encoding chain: ASCII7->UTF32LE->UTF16LE: 'Hello World!!! ?????? ???!!!'
+test encoding chain: ASCII7->UTF32LE->UTF16BE: 'Hello World!!! ?????? ???!!!'
+test encoding chain: UTF8->UTF32LE->ASCII7: 'Hello World!!! ?????? ???!!!'
+test encoding chain: UTF8->UTF32LE->UTF8: 'Hello World!!! РџСЂРёРІРµС‚ РњРёСЂ!!!'
+test encoding chain: UTF8->UTF32LE->UTF16LE: 'Hello World!!! Привет Мир!!!'
+test encoding chain: UTF8->UTF32LE->UTF16BE: 'Hello World!!! Привет Мир!!!'
+test encoding chain: UTF16LE->UTF32LE->ASCII7: 'Hello World!!! ?????? ???!!!'
+test encoding chain: UTF16LE->UTF32LE->UTF8: 'Hello World!!! РџСЂРёРІРµС‚ РњРёСЂ!!!'
+test encoding chain: UTF16LE->UTF32LE->UTF16LE: 'Hello World!!! Привет Мир!!!'
+test encoding chain: UTF16LE->UTF32LE->UTF16BE: 'Hello World!!! Привет Мир!!!'
+test encoding chain: UTF16BE->UTF32LE->ASCII7: 'Hello World!!! ?????? ???!!'
+test encoding chain: UTF16BE->UTF32LE->UTF8: 'Hello World!!! РџСЂРёРІРµС‚ РњРёСЂ!!'
+test encoding chain: UTF16BE->UTF32LE->UTF16LE: 'Hello World!!! Привет Мир!!'
+test encoding chain: UTF16BE->UTF32LE->UTF16BE: 'Hello World!!! Привет Мир!!'
+wchar->char Hello World!!! Привет Мир
+wchar->char Hello World!!! Привет Мир
