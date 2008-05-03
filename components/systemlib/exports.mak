@@ -2,5 +2,5 @@
 #Настройки, экспортируемые для библиотек использующих SystemLib
 ###################################################################################################
 export.INCLUDE_DIRS := include
-export.LIBS         := system user32 commonlib
-export.IMPORTS      :=
+export.LIBS         := system user32
+export.IMPORTS      := ../commonlib/exports.mak
