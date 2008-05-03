@@ -74,7 +74,22 @@ cl -nologo -c -EHsc -W3 -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsub
 endef
 
 ###################################################################################################
-#Обработка цели компонента
+#Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
+#список подключаемых символов линковки, флаги линковки)
+###################################################################################################
+define tools.msvc.link
+link -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"%",$4) $5 $2
+endef
+
+###################################################################################################
+#Сборка библиотеки (имя выходного файла, список файлов)
+###################################################################################################
+define tools.msvc.lib
+lib -nologo -out:$1 $2
+endef
+
+###################################################################################################
+#Обработка целей компонента
 ###################################################################################################
 
 #Преобразование Windows-путей
@@ -202,7 +217,7 @@ define process_target.static-lib
 
   $$($1.LIB_FILE): $$($1.FLAG_FILES)
 		@echo Create library $$(notdir $$@)...
-		@lib -nologo -out:$$@ $$($1.OBJECT_FILES)
+		@$$(call tools.msvc.lib,$$@,$$($1.OBJECT_FILES))
 endef
 
 #Обработка цели dynamic-lib (имя цели)
@@ -222,7 +237,7 @@ define process_target.dynamic-lib
 
   $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Create dynamic library $$(notdir $$@)...
-		@link $$($1.OBJECT_FILES) $$($1.LIBS) -nologo -dll -out:"$$@" $$($1.LIB_DIRS:%=-libpath:"%") $$($1.LINK_FLAGS)
+		@$$(call tools.msvc.link,$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 		@$(RM) $$(basename $$@).exp
 		@mv -f $$(basename $$@).lib $(DIST_LIB_DIR)
 endef
@@ -249,8 +264,8 @@ define process_target.application
 
   $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
-		@link $$($1.OBJECT_FILES) $$($1.LIBS) -nologo -out:"$$@" $$($1.LIB_DIRS:%=-libpath:"%") $$($1.LINK_FLAGS)
-		
+		@$$(call tools.msvc.link,$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
 		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR):$$(PATH))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<)
@@ -270,7 +285,7 @@ define process_tests_source_dir
 #Правило сборки теста
   $$($2.TMP_DIR)/%.exe: $$($2.TMP_DIR)/%.obj $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
-		@link $$(filter %.obj,$$<) $$($1.LIBS) -nologo -out:"$$@" $$($1.LIB_DIRS:%=-libpath:"%") $$($1.LINK_FLAGS)
+		@$$(call tools.msvc.link,$$@,$$(filter %.obj,$$<) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.exe
