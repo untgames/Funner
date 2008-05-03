@@ -7,6 +7,9 @@ namespace script
 //forward declarations
 class Environment;
 
+namespace binds
+{
+
 /*
     Регистрация библиотек
 */
@@ -14,6 +17,8 @@ class Environment;
 void bind_math_library (Environment&);
 void bind_scene_graph_library (Environment&);
 void bind_bv_library (Environment&);
+
+}
 
 }
 

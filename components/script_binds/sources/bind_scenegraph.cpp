@@ -519,6 +519,9 @@ void bind_visual_model_library (Environment& environment, InvokerRegistry& entit
 namespace script
 {
 
+namespace binds
+{
+
 /*
     Регистрация библиотеки работы со сценой
 */
@@ -537,6 +540,8 @@ void bind_scene_graph_library (Environment& environment)
   bind_listener_library           (environment, entity_class_lib);
   bind_sound_emitter_library      (environment, entity_class_lib);
   bind_visual_model_library       (environment, entity_class_lib);
+}
+
 }
 
 }

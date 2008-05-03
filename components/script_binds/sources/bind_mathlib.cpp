@@ -522,6 +522,9 @@ void bind_quat_library (InvokerRegistry& quat_lib)
 namespace script
 {
 
+namespace binds
+{
+
 /*
     Регистрация математической библиотеки
 */
@@ -573,6 +576,8 @@ void bind_math_library (Environment& environment)
   environment.RegisterType<vec4f> (MATHLIB_VEC4_LIBRARY);
   environment.RegisterType<mat4f> (MATHLIB_MAT4_LIBRARY);
   environment.RegisterType<quatf> (MATHLIB_QUAT_LIBRARY);  
+}
+
 }
 
 }

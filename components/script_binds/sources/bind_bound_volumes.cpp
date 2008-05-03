@@ -100,6 +100,9 @@ void bind_axis_aligned_box_library (Environment& environment)
 namespace script
 {
 
+namespace binds
+{
+
 /*
     Регистрация библиотеки ограничивающих объёмов
 */
@@ -109,6 +112,8 @@ void bind_bv_library (Environment& environment)
     //регистрация библиотек
   
   bind_axis_aligned_box_library<float> (environment);
+}
+
 }
 
 }

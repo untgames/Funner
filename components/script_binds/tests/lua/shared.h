@@ -18,6 +18,7 @@
 #include <mathlib.h>
 
 using namespace script;
+using namespace script::binds;
 using namespace math;
 
 /*

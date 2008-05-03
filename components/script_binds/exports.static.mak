@@ -2,4 +2,5 @@
 #Настройки, экспортируемые для библиотек использующих Scriptbinds
 ###################################################################################################
 export.INCLUDE_DIRS     := include
-export.LIBS             := scriptbinds sg
+export.LIBS             := script.binds scene_graph common
+
