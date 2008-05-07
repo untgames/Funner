@@ -7,16 +7,9 @@
 #include <stl/hash_map>
 #include <stl/string>
 
-#include <media/clone.h>
-
-#include <media/detail/resource_holder.h>
-
 #include <common/exception.h>
 
 namespace media
-{
-
-namespace detail
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +57,7 @@ template <class T> class ResourceLibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление элементов из библиотеки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Insert (const char* name, Item& item, CloneMode mode = CloneMode_Instance);
+    void Insert (const char* name, Item& item);
     void Remove (const char* name);
     void Remove (Item&);
 
@@ -79,7 +72,7 @@ template <class T> class ResourceLibrary
     void Swap (ResourceLibrary&);
 
   private:
-    typedef stl::hash_map<stl::string, ResourceHolder<Item> > ItemMap;
+    typedef stl::hash_map<stl::string, Item> ItemMap;
    
   private:
     ItemMap items; //элементы данной библиотеки
@@ -92,8 +85,6 @@ template <class T>
 void swap (ResourceLibrary<T>&, ResourceLibrary<T>&);
 
 #include <media/detail/resource_library.inl>
-
-}
 
 }
 

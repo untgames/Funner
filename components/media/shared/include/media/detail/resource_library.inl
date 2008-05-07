@@ -8,7 +8,7 @@ namespace detail
 template <class T>
 struct resource_selector
 {
-  template <class T1> T& operator () (T1& value) const { return value.second.Resource (); }
+  template <class T1> T& operator () (T1& value) const { return value.second; }
 };
 
 }
@@ -26,8 +26,6 @@ template <class T>
 inline ResourceLibrary<T>::ResourceLibrary (const ResourceLibrary& l)
   : items (l.items)
 {
-  for (ItemMap::iterator i=items.begin (), end=items.end (); i!=end; ++i)
-    i->second = ResourceHolder<Item> (i->second, ForceClone);
 }
 
 template <class T>
@@ -88,7 +86,7 @@ inline const char* ResourceLibrary<T>::ItemId (const ConstIterator& i)
     const ItemMap::iterator* iter = i.target<ItemMap::iterator> ();
 
     if (!iter)
-      common::RaiseInvalidArgument ("media::detail::ResourceLibrary::ItemId", "iterator", "wrong-type");
+      common::RaiseInvalidArgument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
 
     return (*iter)->first.c_str ();
   }
@@ -108,7 +106,7 @@ inline const T* ResourceLibrary<T>::Find (const char* name) const
     
   ItemMap::const_iterator iter = items.find (name);
   
-  return iter != items.end () ? &iter->second.Resource () : 0;
+  return iter != items.end () ? &iter->second : 0;
 }
 
 template <class T>
@@ -122,12 +120,21 @@ inline T* ResourceLibrary<T>::Find (const char* name)
 */
 
 template <class T>
-inline void ResourceLibrary<T>::Insert (const char* name, Item& item, CloneMode mode)
+inline void ResourceLibrary<T>::Insert (const char* name, Item& item)
 {
   if (!name)
-    common::RaiseNullArgument ("media::detail::ResourceLibrary::Insert", "name");
-    
-  items [name].Attach (item, mode);
+    common::RaiseNullArgument ("media::ResourceLibrary::Insert", "name");
+  
+  ItemMap::iterator iter = items.find (name);
+  
+  if (iter != items.end ())
+  {
+    iter->second = item;    
+  }
+  else
+  {
+    items.insert_pair (name, item);
+  }
 }
 
 template <class T>
@@ -143,7 +150,7 @@ template <class T>
 inline void ResourceLibrary<T>::Remove (Item& item)
 {
   for (ItemMap::iterator i=items.begin (), end=items.end (); i!=end;)
-    if (i->second.Resource ().Id () == item.Id ())
+    if (i->second.Id () == item.Id ())
     {
       ItemMap::iterator next = i;
       
