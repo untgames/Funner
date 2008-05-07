@@ -8,7 +8,6 @@ using namespace media;
 using namespace common;
 
 const char* results_dir = "results";
-const char* file_name1 = "data/pic1.jpg";
 const char* file_name2 = "data/pic2.tga";
 const char* file_name3 = "data/pic3.bmp";
       

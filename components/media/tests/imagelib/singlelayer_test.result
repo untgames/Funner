@@ -6,4 +6,4 @@ image new_name format - RGB8
 image new_name format - RGBA16
 image4 width - 171, height - 128, depth - 1
 new image4 width - 1000, height - 1000, depth - 1
-File 'results/image1with5 (PutImage test).bmp' hash: {b7,81,88,27,e4,41,5a,37,49,94,41,eb,80,a5,c8,af}
+File 'results/image1with5 (PutImage test).bmp' hash: {b8,6b,f6,5a,a4,de,d3,57,38,ec,ce,ee,16,5f,d7,71}

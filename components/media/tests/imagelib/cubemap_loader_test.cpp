@@ -27,7 +27,7 @@ int main ()
 {
   try
   {
-    printf ("Results of cubemax loader test:\n");
+    printf ("Results of cubemap loader test:\n");
 
     Image image (file_name);
 
