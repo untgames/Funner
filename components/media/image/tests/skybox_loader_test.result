@@ -1,0 +1,7 @@
+Results of cubemax loader test:
+File 'results/pic1_up.jpg'	hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
+File 'results/pic1_down.jpg'	hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
+File 'results/pic1_left.jpg'	hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
+File 'results/pic1_right.jpg'	hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
+File 'results/pic1_front.jpg'	hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
+File 'results/pic1_back.jpg'	hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
