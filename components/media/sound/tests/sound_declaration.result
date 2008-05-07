@@ -1,0 +1,45 @@
+Results of sound_declaration_test:
+Modified sound declaration:
+SoundDeclaration type: 'Type1'
+Looping: 'looped'
+Samples count: 2
+Samples:
+  'sound1.ogg'
+  'sound2.ogg'
+Gain: 0.700000
+Minimum gain: 0.100000
+Maximum gain: 0.950000
+Inner angle: 20.000000
+Outer angle: 60.000000
+Outer gain: 0.400000
+Reference distance: 25.000000
+Maximum distance: 90.000000
+Cull distance: 95.000000
+Initial sound declaration:
+SoundDeclaration type: ''
+Looping: 'not looped'
+Samples count: 0
+Gain: 1.000000
+Minimum gain: 0.000000
+Maximum gain: 1.000000
+Inner angle: 360.000000
+Outer angle: 360.000000
+Outer gain: 1.000000
+Reference distance: 1000000.000000
+Maximum distance: 1000000.000000
+Cull distance: 1000000.000000
+Deleting one sound:
+SoundDeclaration type: 'Type1'
+Looping: 'looped'
+Samples count: 1
+Samples:
+  'sound2.ogg'
+Gain: 0.700000
+Minimum gain: 0.100000
+Maximum gain: 0.950000
+Inner angle: 20.000000
+Outer angle: 60.000000
+Outer gain: 0.400000
+Reference distance: 25.000000
+Maximum distance: 90.000000
+Cull distance: 95.000000
