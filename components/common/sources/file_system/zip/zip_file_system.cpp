@@ -398,14 +398,10 @@ void ZipFileSystem::Release ()
     Компонент, регистрирующий ZipFileSystem
 */
 
-class ZipFileSystemComponentRegistrator: public AutoRegisteredComponent
+class ZipFileSystemComponent
 {
   public:
-      //имя компонента
-    const char* Name () { return "common.file_systems.ZipFileSystem"; }
-    
-      //загрузка компонента
-    void Load ()
+    ZipFileSystemComponent ()
     {
       FileSystem::RegisterPackFile ("zip", &Create);
       FileSystem::RegisterPackFile ("jar", &Create);
@@ -413,7 +409,6 @@ class ZipFileSystemComponentRegistrator: public AutoRegisteredComponent
     }
 
   private:
-      //создание ZipFileSystem
     static ICustomFileSystem* Create (const char* path)
     {
       return new ZipFileSystem (path);
@@ -425,6 +420,6 @@ class ZipFileSystemComponentRegistrator: public AutoRegisteredComponent
 extern "C"
 {
 
-ZipFileSystemComponentRegistrator ZipFileSystemComponent; //точка входа для регистрации компонента ZipFileSystem
+ComponentRegistrator<ZipFileSystemComponent> ZipFileSystem ("common.file_systems.ZipFileSystem");
 
 }

@@ -20,7 +20,7 @@ class ComponentManagerImpl
     typedef ComponentManager::Iterator   Iterator;
   
       //конструктор
-    ComponentManagerImpl () : components (stl::simple_allocator<ComponentNode> (&malloc, &free)) {}
+    ComponentManagerImpl () : components (MallocAllocator (&malloc, &free)) {}
 
       //деструктор
     ~ComponentManagerImpl ()
@@ -29,16 +29,18 @@ class ComponentManagerImpl
     }
 
       //регистрация компонента
-    void Register (IComponent* component)
+    void Register (const char* name, IComponent* component)
     {
-      if (!component)
+      if (!component || !name)
         return;
 
+      size_t name_hash = strihash (name);
+
       for (ComponentList::iterator iter=components.begin (), end=components.end (); iter != end; ++iter)
-        if (iter->component == component)
+        if (iter->component == component || iter->name_hash == name_hash)
           return;
 
-      components.push_back (ComponentNode (component));
+      components.push_back (ComponentNode (name, component));
     }
 
       //отмена регистрации компонента
@@ -47,30 +49,27 @@ class ComponentManagerImpl
       if (!component)
         return;
 
-      for (ComponentList::iterator iter=components.begin (), end=components.end (); iter != end; ++iter)
+      for (ComponentList::iterator iter=components.begin (), end=components.end (); iter != end;)
+      {
+        ComponentNode& node = *iter;
+
+        if (node.component == component && !node.is_locked) components.erase (iter++);
+        else                                                ++iter;
+      }
+    }
+    
+      //отмена регистрации компонента оп маске имени
+    void Unregister (const char* wc_component_mask)
+    {
+      if (!wc_component_mask)
+        return;
+
+      for (ComponentList::iterator iter=components.begin (), end=components.end (); iter != end;)
       {
         ComponentNode& node = *iter;
         
-        if (node.component == component && !node.is_locked)
-        {
-          if (node.is_loaded)
-          {
-            try
-            {
-              node.is_locked = true;
-              
-              node.component->Unload ();
-            }
-            catch (...)
-            {
-              //подавление всех исключений
-            }
-          }
-
-          components.erase (iter);
-
-          return;
-        }
+        if (wcimatch (node.name.c_str (), wc_component_mask) && !node.is_locked) components.erase (iter++);
+        else                                                                     ++iter;
       }
     }
 
@@ -89,9 +88,7 @@ class ComponentManagerImpl
           
         try
         {
-          const char* name = node.component->Name ();
-
-          if (!wcimatch (name, wc_component_mask))
+          if (!wcimatch (node.name.c_str (), wc_component_mask))
             continue;
 
           node.is_locked = true;
@@ -100,17 +97,17 @@ class ComponentManagerImpl
           {        
             node.component->Load ();
 
-            LogPrintf (log_handler, "Component '%s' loaded successull", name);
+            LogPrintf (log_handler, "Component '%s' loaded successull", node.name.c_str ());
             
             node.is_loaded = true;
           }
           catch (std::exception& e)
           {
-            LogPrintf (log_handler, "Exception at load component '%s': %s", name, e.what ());
+            LogPrintf (log_handler, "Exception at load component '%s': %s", node.name.c_str (), e.what ());
           }
           catch (...)
           {
-            LogPrintf (log_handler, "Unknown exception at load component '%s'", name);
+            LogPrintf (log_handler, "Unknown exception at load component '%s'", node.name.c_str ());
           }
         }
         catch (...)
@@ -137,9 +134,7 @@ class ComponentManagerImpl
 
         try
         {
-          const char* name = node.component->Name ();
-
-          if (!wcimatch (name, wc_component_mask))
+          if (!wcimatch (node.name.c_str (), wc_component_mask))
             continue;
 
           node.is_locked = true;
@@ -186,27 +181,49 @@ class ComponentManagerImpl
     struct ComponentNode: public IComponentState
     {
       IComponent* component; //указатель на компонент
+      stl::string name;      //имя компонента
+      size_t      name_hash; //хэш имени компонента
       bool        is_loaded; //флаг: загружен ли компонент
       bool        is_locked; //флаг: компонент заблокирован для отмены регистрации
 
-      ComponentNode (IComponent* in_component) : component (in_component), is_loaded (false), is_locked (false) {}
+      ComponentNode (const char* in_name, IComponent* in_component) : component (in_component), name (in_name, MallocAllocator (&malloc, &free)),
+        is_loaded (false), is_locked (false)
+      {
+        name_hash = strhash (in_name);
+      }
 
-      const char* Name () { return component->Name (); }
+      ~ComponentNode ()
+      {
+        if (!is_loaded)
+          return;
+
+        try
+        {
+          is_locked = true;
+
+          component->Unload ();
+        }
+        catch (...)
+        {
+          //подавление всех исключений
+        }
+      }
+
+      const char* Name () { return name.c_str (); }
 
       bool IsLoaded () { return is_loaded; }
     };
     
   private:
-    typedef stl::list<ComponentNode, stl::simple_allocator<ComponentNode> > ComponentList;
+    typedef stl::simple_allocator<char>               MallocAllocator;
+    typedef stl::list<ComponentNode, MallocAllocator> ComponentList;
 
   private:
     ComponentList components;
 };
 
 /*
-===================================================================================================
     ComponentManager
-===================================================================================================
 */
 
 typedef Singleton<ComponentManagerImpl, SingletonStatic> ComponentManagerSingleton;
@@ -215,14 +232,19 @@ typedef Singleton<ComponentManagerImpl, SingletonStatic> ComponentManagerSinglet
     Регистрация компонента
 */
 
-void ComponentManager::Register (IComponent* component)
+void ComponentManager::Register (const char* name, IComponent* component)
 {
-  ComponentManagerSingleton::Instance ().Register (component);
+  ComponentManagerSingleton::Instance ().Register (name, component);
 }
 
 void ComponentManager::Unregister (IComponent* component)
 {
   ComponentManagerSingleton::Instance ().Unregister (component);
+}
+
+void ComponentManager::Unregister (const char* wc_component_mask)
+{
+  ComponentManagerSingleton::Instance ().Unregister (wc_component_mask);
 }
 
 /*
@@ -251,45 +273,4 @@ void ComponentManager::Unload (const char* wc_component_mask)
 ComponentManager::Iterator ComponentManager::CreateIterator ()
 {
   return ComponentManagerSingleton::Instance ().CreateIterator ();
-}
-
-/*
-===================================================================================================
-    AutoRegisteredComponent
-===================================================================================================
-*/
-
-AutoRegisteredComponent::AutoRegisteredComponent ()
-{
-  try
-  {
-    ComponentManager::Register (this);
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
-}
-
-AutoRegisteredComponent::~AutoRegisteredComponent ()
-{
-  try
-  {
-    ComponentManager::Unregister (this);
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
-}
-
-/*
-===================================================================================================
-    ComponentLoader
-===================================================================================================
-*/
-
-ComponentLoader::ComponentLoader (const char* wc_mask)
-{
-  ComponentManager::Load (wc_mask);
 }

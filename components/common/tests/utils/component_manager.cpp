@@ -6,24 +6,18 @@ using namespace common;
 
 static const char* COMPONENT_NAME = "common.tests.MyComponent";
 
-struct MyComponent: public AutoRegisteredComponent
+struct MyComponent
 {
-  const char* Name () { return COMPONENT_NAME; }
-  
-  void Load ()
+  MyComponent ()
   {
     printf ("Load MyComponent\n");
 
-    ComponentManager::Unregister (this);
-    ComponentManager::Register (this);
     ComponentManager::Load (COMPONENT_NAME);
     ComponentManager::Unload (COMPONENT_NAME);
   }
   
-  void Unload ()
+  ~MyComponent ()
   {
-    ComponentManager::Unregister (this);
-    ComponentManager::Register (this);
     ComponentManager::Load (COMPONENT_NAME);
     ComponentManager::Unload (COMPONENT_NAME);    
     
@@ -44,7 +38,7 @@ int main ()
   printf ("Results of component_manager_test:\n");
   
   {
-    MyComponent my_component;
+    ComponentRegistrator<MyComponent> my_component (COMPONENT_NAME);
     
     printf ("Before load\n");
     
@@ -62,6 +56,12 @@ int main ()
   }
   
   printf ("After unregister\n");
+  
+  dump ();
+  
+  printf ("After unregister all\n");
+  
+  ComponentManager::Unregister ("*");
   
   dump ();
 

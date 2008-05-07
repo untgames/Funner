@@ -15,3 +15,5 @@ Components:
 After unregister
 Components:
   component 'common.file_systems.ZipFileSystem' unloaded
+After unregister all
+Components:
