@@ -31,7 +31,7 @@ int main ()
     
     printf ("s2 capacity: %u\n", s2.Capacity ());
     
-    s2 = clone (s1, CloneMode_Copy);
+    s2 = s1.Clone ();
     
     printf ("copy s1 to s2\n");
     dump (s2);

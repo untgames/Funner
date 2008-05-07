@@ -50,7 +50,7 @@ int main ()
     
     printf ("copy ib2\n");
     
-    ib1 = clone (ib2);
+    ib1 = ib2.Clone ();
 
     ib2.Resize (4);
 

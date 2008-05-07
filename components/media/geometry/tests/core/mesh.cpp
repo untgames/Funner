@@ -58,7 +58,7 @@ int main ()
   
   printf ("copy mesh\n");
   
-  mesh2 = clone (mesh1, CloneMode_Copy);
+  mesh2 = mesh1.Clone ();
   
   mesh2.Rename ("mesh2");
   

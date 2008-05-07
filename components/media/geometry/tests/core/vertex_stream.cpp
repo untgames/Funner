@@ -23,7 +23,7 @@ int main ()
   
   printf ("copy vs1 to vs2\n");    
   
-  vs2 = clone (vs1, CloneMode_Copy);
+  vs2 = vs1.Clone ();
   
   dump (vs2);
   

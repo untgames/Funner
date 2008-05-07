@@ -22,7 +22,7 @@ int main ()
   VertexBuffer vb1, vb2;
 
   vb1.Attach (vs1);
-  vb1.Attach (vs2, CloneMode_Copy);
+  vb1.Attach (vs2.Clone ());
   vb1.AttachWeights (weights);
   
   printf ("Dump vb1\n");
