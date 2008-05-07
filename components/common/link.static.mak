@@ -1,6 +1,4 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.INCLUDE_DIRS  :=
-export.LIBS          := extern.zzip extern.zlib common.zip_file_system
-export.LINK_INCLUDES := ZipFileSystemComponent
+export.LIBS             := common extern.pcre

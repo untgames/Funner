@@ -33,4 +33,4 @@ COMMONLIB_TESTS.LIBS             :=
 COMMONLIB_TESTS.LINK_INCLUDES    :=
 COMMONLIB_TESTS.COMPILER_CFLAGS  :=
 COMMONLIB_TESTS.COMPILER_DEFINES :=
-COMMONLIB_TESTS.IMPORTS          := exports.static.mak exports.zip_file_system.static.mak
+COMMONLIB_TESTS.IMPORTS          := compile.static.mak link.static.mak zip_file_system.link.static.mak
