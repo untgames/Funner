@@ -1,0 +1,18 @@
+dump vf1
+vertex format (2 attributes, min_vertex_size=14):
+  attribute: semantic='position' type='float3' offset=2
+  attribute: semantic='normal' type='short3' offset=3
+dump vf2
+vertex format (0 attributes, min_vertex_size=0):
+dump vf3 = vf1 + vf2
+vertex format (3 attributes, min_vertex_size=16):
+  attribute: semantic='position' type='float3' offset=2
+  attribute: semantic='normal' type='short3' offset=3
+  attribute: semantic='color' type='float3' offset=4
+dump vf4
+vertex format (1 attributes, min_vertex_size=11):
+  attribute: semantic='normal' type='short3' offset=5
+dump vf5 = vf3 - vf4
+vertex format (2 attributes, min_vertex_size=16):
+  attribute: semantic='position' type='float3' offset=2
+  attribute: semantic='color' type='float3' offset=4

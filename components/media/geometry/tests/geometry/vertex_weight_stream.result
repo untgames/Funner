@@ -1,0 +1,41 @@
+Results of vertex_weight_stream_test:
+Dump s1
+Vertex weight stream (12 weights):
+  joint=0 weight=0.5
+  joint=1 weight=0.5
+  joint=2 weight=0.5
+  joint=3 weight=0.5
+  joint=4 weight=0.5
+  joint=5 weight=0.5
+  joint=6 weight=0.5
+  joint=7 weight=0.5
+  joint=8 weight=0.5
+  joint=9 weight=0.5
+  joint=10 weight=0.5
+  joint=11 weight=0.5
+Dump s2
+Vertex weight stream (0 weights):
+s2 capacity: 14
+copy s1 to s2
+Vertex weight stream (12 weights):
+  joint=0 weight=0.5
+  joint=1 weight=0.5
+  joint=2 weight=0.5
+  joint=3 weight=0.5
+  joint=4 weight=0.5
+  joint=5 weight=0.5
+  joint=6 weight=0.5
+  joint=7 weight=0.5
+  joint=8 weight=0.5
+  joint=9 weight=0.5
+  joint=10 weight=0.5
+  joint=11 weight=0.5
+clear s2
+Vertex weight stream (0 weights):
+instance s2
+Vertex weight stream (5 weights):
+  joint=0 weight=0.5
+  joint=1 weight=0.5
+  joint=2 weight=0.5
+  joint=3 weight=0.5
+  joint=4 weight=0.5

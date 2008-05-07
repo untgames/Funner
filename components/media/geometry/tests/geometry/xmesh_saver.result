@@ -1,0 +1,69 @@
+Results of xmesh_saver_test:
+<?xml version="1.0" encoding="utf-8"?>
+<mesh_library>
+  <vertex_streams>
+    <vertex_stream id="vs#1" vertices_count="4" vertex_size="36">
+      <channel semantic="position" type="float3" offset="0">
+        0 0 0 1 2 3 2 4 6 3 6 9
+      </channel>
+      <channel semantic="normal" type="float3" offset="12">
+        0 1 0 1 0 0 0 1 0 1 0 0
+      </channel>
+      <channel semantic="color" type="ubyte4" offset="24">
+        0 0 0 0 0 1 0 1 0 2 0 2 0 3 0 3
+      </channel>
+      <channel semantic="texcoord0" type="float2" offset="28">
+        0 -0 0 -1 0 -2 0 -3
+      </channel>
+    </vertex_stream>
+    <vertex_stream id="vs#2" vertices_count="4" vertex_size="20">
+      <channel semantic="influence" type="influence" offset="0">
+        0 1 1 1 2 1 3 1
+      </channel>
+      <channel semantic="position" type="float3" offset="8">
+        0 0 0 0 0 0 0 0 0 0 0 0
+      </channel>
+    </vertex_stream>
+    <vertex_weight_stream id="vws#1" weights_count="5">
+      0 0 1 0.2 2 0.4 3 0.6 4 0.8
+    </vertex_weight_stream>
+  </vertex_streams>
+  <vertex_buffers>
+    <vertex_buffer id="vb#1">
+      <streams>
+        vs#1
+      </streams>
+    </vertex_buffer>
+    <vertex_buffer id="vb#2" weights="vws#1">
+      <streams>
+        vs#1
+        vs#2
+      </streams>
+    </vertex_buffer>
+  </vertex_buffers>
+  <index_buffers>
+    <index_buffer id="ib#1" indices_count="5">
+      0 1 2 3 4
+    </index_buffer>
+  </index_buffers>
+  <meshes>
+    <mesh name="mesh1" index_buffer="ib#1">
+      <vertex_buffers>
+        vb#1
+      </vertex_buffers>
+      <primitives>
+        <primitive type="triangle_list" material="material1" vertex_buffer="0" first="0" count="12"/>
+        <primitive type="triangle_strip" material="material2" vertex_buffer="0" first="1" count="14"/>
+      </primitives>
+    </mesh>
+    <mesh name="mesh2">
+      <vertex_buffers>
+        vb#2
+      </vertex_buffers>
+      <primitives>
+        <primitive type="line_list" material="material1" vertex_buffer="0" first="0" count="12"/>
+        <primitive type="line_strip" material="material2" vertex_buffer="0" first="1" count="14"/>
+      </primitives>
+    </mesh>
+  </meshes>
+</mesh_library>

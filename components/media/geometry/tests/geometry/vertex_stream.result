@@ -1,0 +1,41 @@
+Results of vertex_stream_test:
+Dump vs1
+vertex stream (5 vertices):
+  xyz=[0 0 0] normal=[1 0 0] rgba=[0 0 0 0] st=[0 -0]
+  xyz=[1 1 1] normal=[1 0 0] rgba=[1 2 3 4] st=[1 -1]
+  xyz=[2 2 2] normal=[1 0 0] rgba=[2 4 6 8] st=[2 -2]
+  xyz=[3 3 3] normal=[1 0 0] rgba=[3 6 9 12] st=[3 -3]
+  xyz=[4 4 4] normal=[1 0 0] rgba=[4 8 12 16] st=[4 -4]
+copy vs1 to vs2
+vertex stream (5 vertices):
+  xyz=[0 0 0] normal=[1 0 0] rgba=[0 0 0 0] st=[0 -0]
+  xyz=[1 1 1] normal=[1 0 0] rgba=[1 2 3 4] st=[1 -1]
+  xyz=[2 2 2] normal=[1 0 0] rgba=[2 4 6 8] st=[2 -2]
+  xyz=[3 3 3] normal=[1 0 0] rgba=[3 6 9 12] st=[3 -3]
+  xyz=[4 4 4] normal=[1 0 0] rgba=[4 8 12 16] st=[4 -4]
+reserve vs1 (current capacity=5)
+after vs1 reserve capacity=14
+resize vs1
+vertex stream (6 vertices):
+  xyz=[0 0 0] normal=[1 0 0] rgba=[0 0 0 0] st=[0 -0]
+  xyz=[1 1 1] normal=[1 0 0] rgba=[1 2 3 4] st=[1 -1]
+  xyz=[2 2 2] normal=[1 0 0] rgba=[2 4 6 8] st=[2 -2]
+  xyz=[3 3 3] normal=[1 0 0] rgba=[3 6 9 12] st=[3 -3]
+  xyz=[4 4 4] normal=[1 0 0] rgba=[4 8 12 16] st=[4 -4]
+  xyz=[0 0 0] normal=[0 0 0] rgba=[0 0 0 0] st=[0 0]
+instance vs2
+vertex stream (6 vertices):
+  xyz=[0 0 0] normal=[1 0 0] rgba=[0 0 0 0] st=[0 -0]
+  xyz=[1 1 1] normal=[1 0 0] rgba=[1 2 3 4] st=[1 -1]
+  xyz=[2 2 2] normal=[1 0 0] rgba=[2 4 6 8] st=[2 -2]
+  xyz=[3 3 3] normal=[1 0 0] rgba=[3 6 9 12] st=[3 -3]
+  xyz=[4 4 4] normal=[1 0 0] rgba=[4 8 12 16] st=[4 -4]
+  xyz=[0 0 0] normal=[0 0 0] rgba=[0 0 0 0] st=[0 0]
+clear vs1 (dump vs2)
+vertex stream (0 vertices):
+dump vs2 format
+vertex format (4 attributes, min_vertex_size=36, vertex_size=36):
+  attribute: semantic='position' type='float3' offset=0
+  attribute: semantic='normal' type='float3' offset=12
+  attribute: semantic='color' type='ubyte4' offset=24
+  attribute: semantic='texcoord0' type='float2' offset=28

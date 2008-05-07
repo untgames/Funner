@@ -1,0 +1,14 @@
+Results of mesh_library_test:
+attach meshes
+library 'library1' (4 meshes)
+  mesh 'mesh1'
+  mesh 'mesh2'
+  mesh 'mesh3'
+  mesh 'mesh4'
+detach mesh
+library 'library1' (3 meshes)
+  mesh 'mesh1'
+  mesh 'mesh2'
+  mesh 'mesh4'
+clear library
+library '' (0 meshes)
