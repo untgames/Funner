@@ -27,8 +27,22 @@ SoundDeclarationLibrary::SoundDeclarationLibrary ()
 SoundDeclarationLibrary::SoundDeclarationLibrary (const char* file_name)
   : impl (new Impl)
 {
-  Load (file_name);
-  Rename (file_name);
+  if (!file_name)
+    RaiseNullArgument ("media::SoundDeclarationLibrary::SoundDeclarationLibrary", "file_name");
+
+  try
+  {
+    static ComponentLoader loader ("media.sound.loaders.*");
+
+    SoundDeclarationManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, *this);
+    
+    Rename  (file_name);
+  }
+  catch (Exception& exception)
+  {
+    exception.Touch ("media::SoundDeclarationLibrary::SoundDeclarationLibrary");
+    throw;
+  }
 }
 
 SoundDeclarationLibrary::SoundDeclarationLibrary (const SoundDeclarationLibrary& library)
@@ -121,9 +135,9 @@ const SoundDeclaration* SoundDeclarationLibrary::Find (const char* name) const
     Присоединение звуков
 */
 
-void SoundDeclarationLibrary::Attach (const char* name, SoundDeclaration& decl, CloneMode mode)
+void SoundDeclarationLibrary::Attach (const char* name, SoundDeclaration& decl)
 {
-  impl->declarations.Insert (name, decl, mode);
+  impl->declarations.Insert (name, decl);
 }
 
 void SoundDeclarationLibrary::Detach (const char* name)
@@ -142,12 +156,9 @@ void SoundDeclarationLibrary::DetachAll ()
 
 void SoundDeclarationLibrary::Load (const char* file_name)
 {
-  if (!file_name)
-    RaiseNullArgument ("media::SoundDeclarationLibrary::Load", "file_name");
-    
   try
   {
-    SoundDeclarationLibraryManagerSingleton::Instance ().Load (file_name, *this);    
+    SoundDeclarationLibrary (file_name).Swap (*this);
   }
   catch (common::Exception& exception)
   {
@@ -163,7 +174,9 @@ void SoundDeclarationLibrary::Save (const char* file_name)
     
   try
   {
-    SoundDeclarationLibraryManagerSingleton::Instance ().Save (file_name, *this);
+    static ComponentLoader loader ("media.sound.savers.*");
+
+    SoundDeclarationManager::GetSaver (file_name, SerializerFindMode_ByName) (file_name, *this);
   }
   catch (common::Exception& exception)
   {

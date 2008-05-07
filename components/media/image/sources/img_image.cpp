@@ -188,7 +188,15 @@ void Image::GetImage (size_t x, size_t y, size_t z, size_t width, size_t height,
 
 void Image::Load (const char* file_name)
 {
-  Image (file_name).Swap (*this);
+  try
+  {
+    Image (file_name).Swap (*this);
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("media::Image::Load");
+    throw;
+  }
 }
 
 void Image::Save (const char* file_name, PixelFormat recommended_format)

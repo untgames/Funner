@@ -9,35 +9,32 @@ namespace media
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание реализации звукового сэмпла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SoundSample::Impl
+struct SoundSample::Impl
 {
   public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Данные
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    stl::string               str_name;  //SoundSample name
-    SoundSampleInfo           info;      //Информация о файле
-    stl::auto_ptr<SoundCodec> codec;     //Кодек
+    Impl () {}
+    Impl (const stl::string& in_name, const SoundSampleInfo& in_info) : str_name (in_name), info (in_info) {}
+
+    stl::string                     str_name;  //SoundSample name
+    SoundSampleInfo                 info;      //Информация о файле
+    xtl::com_ptr<ISoundInputStream> input_stream;     //Кодек
 };
 
 }
 
 SoundSample::SoundSample ()
-  : impl (new SoundSampleImpl)
+  : impl (new Impl)
 {
 }
 
 SoundSample::SoundSample (const SoundSample& source)
-  : impl (new SoundSampleImpl)
+  : impl (new Impl (source.impl->str_name, source.impl->info))
 {                  
-  impl->str_name = source.impl->str_name;
-  impl->info     = source.impl->info;
-  if (source.impl->codec.get ())
-    impl->codec  = source.impl->codec->Clone ();
+  impl->input_stream  = source.impl->input_stream;
 }
 
 SoundSample::SoundSample (const char* file_name)
-  : impl (new SoundSampleImpl)
+  : impl (new Impl)
 {
   if (!file_name)
     RaiseNullArgument ("media::SoundSample::SoundSample", "file_name");
@@ -46,7 +43,7 @@ SoundSample::SoundSample (const char* file_name)
   {
     static ComponentLoader loader ("media.sound.loaders.*");
 
-    impl->codec    = SoundSampleManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, impl->info);
+    impl->input_stream    = SoundSampleManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, impl->info);
     impl->str_name = file_name;
   }
   catch (Exception& exception)
@@ -57,17 +54,12 @@ SoundSample::SoundSample (const char* file_name)
 }
 
 SoundSample::SoundSample (ISoundInputStream* istream)
-  : impl (new SoundSampleImpl)
+  : impl (new Impl)
 {
   if (!istream)
     RaiseNullArgument ("media::SoundSample::SoundSample", "istream");
 
-  impl->codec = istream;
-}
-
-SoundSample::SoundSample (SoundSampleImpl* source)
-  : impl (source)
-{
+  impl->input_stream = istream;
 }
 
 SoundSample::~SoundSample ()
@@ -155,7 +147,7 @@ size_t SoundSample::Read (size_t first_sample, size_t samples_count, void* data)
   if (first_sample >= impl->info.samples_count)
     return 0;
 
-  return impl->codec->Read (first_sample, samples_count, data);
+  return impl->input_stream->Read (first_sample, samples_count, data);
 }
 
 /*

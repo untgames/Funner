@@ -28,7 +28,7 @@ int main ()
     sound_decl.SetParam   (SoundParam_MaximumDistance, 90.f);
     sound_decl.SetParam   (SoundParam_CullDistance, 95.f);
 
-    sound_decl2 = clone (sound_decl);
+    sound_decl2 = sound_decl.Clone ();
     
     sound_decl2.SetParam (SoundParam_OuterAngle, 2.0f);
     sound_decl2.SetParam (SoundParam_Gain, 0.2f);

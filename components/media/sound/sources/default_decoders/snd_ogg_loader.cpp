@@ -14,8 +14,6 @@ class OggInputStream : public media::ISoundInputStream, public xtl::reference_co
 
     size_t Read (size_t first_sample, size_t samples_count, void* data);
 
-    OggInputStream* Clone ();
-
     void AddRef () { addref (this); }  
     void Release () { release (this); }
 
@@ -126,7 +124,7 @@ OggInputStream::OggInputStream (const char* file_name, SoundSampleInfo& sound_sa
   ov_callbacks callbacks = {OggReadFunc, OggSeekFunc, OggCloseFunc, OggTellFunc};
   int          ret_code;
 
-  ret_code = ov_open_callbacks (file, &vf, NULL, 0, callbacks);
+  ret_code = ov_open_callbacks (&file, &vf, NULL, 0, callbacks);
 
   if (ret_code < 0) 
     Raise <Exception> ("OggCodec::OggCodec", "Can't open ogg file, seems to be not ogg bitstream (return code %d)", ret_code);
@@ -180,22 +178,7 @@ size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* da
   return ret_value;
 }
 
-OggInputStream* OggInputStream::Clone ()
-{
-  OggCodec* ret_value = new OggCodec (*this);
-
-  ret_value->file = new StdFile (*file);
-
-  ov_callbacks callbacks = {OggReadFunc, OggSeekFunc, OggCloseFunc, OggTellFunc};
-
-  ret_value->file->Seek (0, FILE_SEEK_SET);
-
-  ov_open_callbacks (ret_value->file, &(ret_value->vf), NULL, 0, callbacks);
-
-  return ret_value;
-}
-
-SoundCodec* default_ogg_loader (const char* file_name, SoundSampleInfo& sound_sample_info)
+ISoundInputStream* default_ogg_loader (const char* file_name, SoundSampleInfo& sound_sample_info)
 {
   return new OggInputStream (file_name, sound_sample_info);
 }

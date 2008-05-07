@@ -93,18 +93,34 @@ class SoundDeclarationLibrarySaver
     }
 };
 
-}
-
 /*
     Сохранение библиотеки деклараций звуков
 */
 
-namespace media
-{
-
 void snddecl_save_library (const char* file_name, const SoundDeclarationLibrary& library)
 {
   SoundDeclarationLibrarySaver (file_name, library);
+}
+
+/*
+   Компонент загрузки деклараций звука
+*/
+
+class SnddeclSaverComponent
+{
+  public:
+    //загрузка компонента
+    SnddeclSaverComponent () 
+    {
+      SoundDeclarationManager::RegisterSaver ("snddecl", &snddecl_save_library);
+    }
+};
+
+extern "C"
+{
+
+ComponentRegistrator<SnddeclSaverComponent> SnddeclSaver ("media.sound.savers.Snddecl");
+
 }
 
 }

@@ -75,20 +75,20 @@ void snddecl_load_library (const char* file_name, SoundDeclarationLibrary& libra
    Компонент загрузки деклараций звука
 */
 
-class WavLoaderComponent
+class SnddeclLoaderComponent
 {
   public:
     //загрузка компонента
-    WavLoaderComponent () 
+    SnddeclLoaderComponent () 
     {
-      SoundSampleManager::RegisterLoader ("wav", &default_wav_loader);
+      SoundDeclarationManager::RegisterLoader ("snddecl", &snddecl_load_library);
     }
 };
 
 extern "C"
 {
 
-ComponentRegistrator<WavLoaderComponent> WavLoader ("media.sound.loaders.Wav");
+ComponentRegistrator<SnddeclLoaderComponent> SnddeclLoader ("media.sound.loaders.Snddecl");
 
 }
 

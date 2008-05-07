@@ -113,6 +113,11 @@ class SoundDeclaration
 
   private:
     struct Impl;
+
+  private:
+    SoundDeclaration (Impl* in_impl);
+
+  private:
     xtl::intrusive_ptr<Impl> impl;
 };
 

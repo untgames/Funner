@@ -1,6 +1,6 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS             := media.sound
-export.LINK_INCLUDES    := 
-export.IMPORTS          := ../../common/link.static.mak
+export.LIBS             := media.snddecl
+export.LINK_INCLUDES    := SnddeclLoader SnddeclSaver
+export.IMPORTS          :=

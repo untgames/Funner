@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_SOUND_HEADER
 #define MEDIALIB_SOUND_HEADER
 
-#include <stl/auto_ptr>
+#include <stl/auto_ptr.h>
 
 #include <xtl/functional_fwd>
 
@@ -20,11 +20,6 @@ class ISoundInputStream
 ///Чтение декодированного звука количеством size сэмплов начиная с position сэмпла в data
 //////////////////////////////////////////////////////////////////////////////////////////////////
     virtual size_t Read (size_t first_sample, size_t samples_count, void* data) = 0;
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-///Функция клонирования, используется при копировании сэмпла
-//////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual ISoundInputStream* Clone () = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -122,7 +117,7 @@ void swap (SoundSample&,SoundSample&);
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Система управления звуками
 //////////////////////////////////////////////////////////////////////////////////////////////////
-typedef common::ResourceSerializerManager<SoundCodec* (const char* file_name, SoundSampleInfo& sound_sample_info), 
+typedef common::ResourceSerializerManager<ISoundInputStream* (const char* file_name, SoundSampleInfo& sound_sample_info), 
                                           void (const char* file_name, const SoundSample& sound_sample)> SoundSampleManager;
 
 }

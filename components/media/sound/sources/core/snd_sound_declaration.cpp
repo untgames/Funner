@@ -52,8 +52,12 @@ SoundDeclaration::SoundDeclaration ()
   : impl (new Impl, false)
   {}
 
-SoundDeclaration::SoundDeclaration (const SoundDeclaration& sound_decl, CloneMode mode)
-  : impl (clone (sound_decl.impl, mode, "media::SoundDeclaration::SoundDeclaration"))
+SoundDeclaration::SoundDeclaration (Impl* in_impl)
+  : impl (in_impl, false)
+  {}
+
+SoundDeclaration::SoundDeclaration (const SoundDeclaration& sound_decl)
+  : impl (sound_decl.impl)
   {}
 
 SoundDeclaration::~SoundDeclaration ()
@@ -69,6 +73,24 @@ SoundDeclaration& SoundDeclaration::operator = (const SoundDeclaration& sound_de
   impl = sound_decl.impl;
 
   return *this;
+}
+
+/*
+   Создание копии
+*/
+
+SoundDeclaration SoundDeclaration::Clone () const
+{
+  return SoundDeclaration (new Impl (*impl));
+}
+
+/*
+   Идентификатор
+*/
+
+size_t SoundDeclaration::Id () const
+{
+  return reinterpret_cast <size_t> (impl.get ());
 }
 
 /*
