@@ -290,11 +290,11 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.exe
 		@echo Running $$(notdir $$<)...
-		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR):$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
+		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR):$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(foreach file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.exe),$$^)),$$(file) && ) true
+		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(foreach file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.exe),$$^)),$$(file) && ) true
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
