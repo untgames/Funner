@@ -21,19 +21,17 @@ struct PrimitiveImpl: public Primitive
     Описание реализации Mesh
 */
 
-typedef ResourceHolder<VertexBuffer>    VertexBufferHolder;
-typedef ResourceHolder<IndexBuffer>     IndexBufferHolder;
-typedef stl::vector<PrimitiveImpl>      PrimitiveArray;
-typedef stl::vector<VertexBufferHolder> VertexBufferArray;
+typedef stl::vector<PrimitiveImpl> PrimitiveArray;
+typedef stl::vector<VertexBuffer>  VertexBufferArray;
 
 struct Mesh::Impl: public xtl::reference_counter
 {
-  string             name;                       //имя меша
-  VertexBufferArray  vertex_buffers;             //вершинные буферы
-  IndexBufferHolder  index_buffer;               //индексный буфер
-  PrimitiveArray     primitives;                 //примитивы
-  string             material_names;             //имена материалов
-  bool               need_material_names_update; //необходимо обновить имена материалов
+  string                       name;                       //имя меша
+  VertexBufferArray            vertex_buffers;             //вершинные буферы
+  media::geometry::IndexBuffer index_buffer;               //индексный буфер
+  PrimitiveArray               primitives;                 //примитивы
+  string                       material_names;             //имена материалов
+  bool                         need_material_names_update; //необходимо обновить имена материалов
   
   Impl (); 
   Impl (const Impl&);
@@ -53,15 +51,12 @@ Mesh::Impl::Impl ()
 
 Mesh::Impl::Impl (const Impl& impl)
   : name (impl.name),
-    index_buffer (impl.index_buffer, ForceClone),
+    vertex_buffers (impl.vertex_buffers),
+    index_buffer (impl.index_buffer),
     primitives (impl.primitives),
     material_names (impl.material_names),
     need_material_names_update (true)
 {
-  vertex_buffers.reserve (impl.vertex_buffers.size ());
-
-  for (VertexBufferArray::const_iterator i=impl.vertex_buffers.begin (), end=impl.vertex_buffers.end (); i!=end; ++i)
-    vertex_buffers.push_back (VertexBufferHolder (*i, ForceClone));
 }
 
 /*
@@ -71,9 +66,13 @@ Mesh::Impl::Impl (const Impl& impl)
 Mesh::Mesh ()
   : impl (new Impl)
   {}
+  
+Mesh::Mesh (Impl* in_impl)
+  : impl (in_impl, false)
+  {}
 
-Mesh::Mesh (const Mesh& mesh, CloneMode mode)
-  : impl (clone (mesh.impl, mode, "media::geometry::Mesh::Mesh"))
+Mesh::Mesh (const Mesh& mesh)
+  : impl (mesh.impl)
   {}
 
 Mesh::~Mesh ()
@@ -89,6 +88,15 @@ Mesh& Mesh::operator = (const Mesh& mesh)
   impl = mesh.impl;
 
   return *this;
+}
+
+/*
+    Создание копии
+*/
+
+Mesh Mesh::Clone () const
+{
+  return Mesh (new Impl (*impl));
 }
 
 /*
@@ -132,7 +140,7 @@ const media::geometry::VertexBuffer& Mesh::VertexBuffer (size_t index) const
   if (index >= impl->vertex_buffers.size ())
     RaiseOutOfRange ("media::geometry::Mesh::VertexBuffer", "index", index, impl->vertex_buffers.size ());
 
-  return impl->vertex_buffers [index].Resource ();
+  return impl->vertex_buffers [index];
 }
 
 media::geometry::VertexBuffer& Mesh::VertexBuffer (size_t index)
@@ -142,12 +150,12 @@ media::geometry::VertexBuffer& Mesh::VertexBuffer (size_t index)
 
 const media::geometry::IndexBuffer& Mesh::IndexBuffer () const
 {
-  return impl->index_buffer.Resource ();
+  return impl->index_buffer;
 }
 
 media::geometry::IndexBuffer& Mesh::IndexBuffer ()
 {
-  return impl->index_buffer.Resource ();
+  return impl->index_buffer;
 }
 
 
@@ -155,16 +163,16 @@ media::geometry::IndexBuffer& Mesh::IndexBuffer ()
     Присоединение/отсоединение буферов
 */
 
-size_t Mesh::Attach (media::geometry::VertexBuffer& vb, CloneMode mode)
+size_t Mesh::Attach (media::geometry::VertexBuffer& vb)
 {
-  impl->vertex_buffers.push_back (VertexBufferHolder (vb, mode));
+  impl->vertex_buffers.push_back (vb);
 
   return impl->vertex_buffers.size () - 1;
 }
 
-void Mesh::Attach (media::geometry::IndexBuffer& ib, CloneMode mode)
+void Mesh::Attach (media::geometry::IndexBuffer& ib)
 {
-  impl->index_buffer.Attach (ib, mode);
+  impl->index_buffer = ib;
 }
     
 void Mesh::DetachVertexBuffer (size_t index)
@@ -177,7 +185,7 @@ void Mesh::DetachVertexBuffer (size_t index)
 
 void Mesh::DetachIndexBuffer ()
 {
-  impl->index_buffer.Attach (media::geometry::IndexBuffer (), CloneMode_Instance);
+  impl->index_buffer = media::geometry::IndexBuffer ();
 }
 
 void Mesh::DetachAllVertexBuffers ()

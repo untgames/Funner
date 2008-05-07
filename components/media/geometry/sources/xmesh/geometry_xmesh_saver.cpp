@@ -337,20 +337,15 @@ class XmlMeshLibrarySaver
     Автоматическая регистрация компонента
 */
 
-class XmlMeshLibrarySaverComponent: public AutoRegisteredComponent
+class XMeshSaverComponent
 {
   public:
-      //имя компонента
-    const char* Name () { return "media.geometry.savers.XmlMeshLibrarySaverComponent"; }
-
-      //загрузка компонента
-    void Load ()
+    XMeshSaverComponent ()
     {
       MeshLibraryManager::RegisterSaver ("xmesh", &SaveLibrary);
     }
 
   private:
-      //сохранение библиотеки мешей
     static void SaveLibrary (const char* file_name, const MeshLibrary& library)
     {
       XmlMeshLibrarySaver (file_name, library);
@@ -362,6 +357,6 @@ class XmlMeshLibrarySaverComponent: public AutoRegisteredComponent
 extern "C"
 {
 
-XmlMeshLibrarySaverComponent XMeshSaverComponent;
+ComponentRegistrator<XMeshSaverComponent> XMeshSaver ("media.geometry.savers.XMeshSaver");
 
 }

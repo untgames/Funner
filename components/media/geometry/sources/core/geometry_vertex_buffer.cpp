@@ -10,17 +10,14 @@ const size_t DEFAULT_VERTEX_ARRAY_RESERVE = 4; //резервируемый размер вершинного
     ќписание реализации VertexBuffer
 */
 
-typedef ResourceHolder<VertexStream>       VertexStreamHolder;
-typedef ResourceHolder<VertexWeightStream> VertexWeightStreamHolder;
-typedef stl::vector<VertexStreamHolder>    VertexStreamArray;
+typedef stl::vector<VertexStream> VertexStreamArray;
 
 struct VertexBuffer::Impl: public xtl::reference_counter
 {
-  VertexStreamArray        streams;   //вершинные массивы
-  VertexWeightStreamHolder weights;   //массив весов
+  VertexStreamArray  streams;   //вершинные массивы
+  VertexWeightStream weights;   //массив весов
 
   Impl ();
-  Impl (const Impl&);
 };
 
 /*
@@ -32,15 +29,6 @@ VertexBuffer::Impl::Impl ()
   streams.reserve (DEFAULT_VERTEX_ARRAY_RESERVE);
 }
   
-VertexBuffer::Impl::Impl (const Impl& impl)
-  : weights (impl.weights, ForceClone)
-{
-  streams.reserve (impl.streams.size ());
-
-  for (VertexStreamArray::const_iterator i=impl.streams.begin (), end=impl.streams.end (); i!=end; ++i)
-    streams.push_back (VertexStreamHolder (*i, ForceClone));
-}
-
 /*
      онструкторы / деструктор
 */
@@ -49,8 +37,12 @@ VertexBuffer::VertexBuffer ()
   : impl (new Impl)
   {}
 
-VertexBuffer::VertexBuffer (const VertexBuffer& vb, CloneMode mode)
-  : impl (clone (vb.impl, mode, "media::geometry::VertexBuffer::VertexBuffer"))
+VertexBuffer::VertexBuffer (Impl* in_impl)
+  : impl (in_impl, false)
+  {}  
+
+VertexBuffer::VertexBuffer (const VertexBuffer& vb)
+  : impl (vb.impl)
   {}
 
 VertexBuffer::~VertexBuffer ()
@@ -66,6 +58,15 @@ VertexBuffer& VertexBuffer::operator = (const VertexBuffer& vb)
   impl = vb.impl;
 
   return *this;
+}
+
+/*
+    —оздание копии
+*/
+
+VertexBuffer VertexBuffer::Clone () const
+{
+  return VertexBuffer (new Impl (*impl));
 }
 
 /*
@@ -95,7 +96,7 @@ const VertexStream& VertexBuffer::Stream (size_t index) const
   if (index >= impl->streams.size ())
     RaiseOutOfRange ("media::geometry::VertexBuffer::Stream", "index", index, impl->streams.size ());
     
-  return impl->streams [index].Resource ();
+  return impl->streams [index];
 }
 
 VertexStream& VertexBuffer::Stream (size_t index)
@@ -109,29 +110,29 @@ VertexStream& VertexBuffer::Stream (size_t index)
 
 const VertexWeightStream& VertexBuffer::Weights () const
 {
-  return impl->weights.Resource ();
+  return impl->weights;
 }
 
 VertexWeightStream& VertexBuffer::Weights ()
 {
-  return impl->weights.Resource ();
+  return impl->weights;
 }
 
 /*
     ѕрисоединение/отсоединение массивов
 */
 
-size_t VertexBuffer::Attach (VertexStream& vs, CloneMode mode)
+size_t VertexBuffer::Attach (VertexStream& vs)
 {
     //проверка зарегистрирован ли канал
     
   size_t id = vs.Id ();
     
   for (VertexStreamArray::iterator i=impl->streams.begin (), end=impl->streams.end (); i!=end; ++i)
-    if (i->Resource ().Id () == id)
+    if (i->Id () == id)
       return i - impl->streams.begin ();
 
-  impl->streams.push_back (VertexStreamHolder (vs, mode));
+  impl->streams.push_back (vs);
 
   return impl->streams.size () - 1;
 }
@@ -144,14 +145,14 @@ void VertexBuffer::Detach (size_t index)
   impl->streams.erase (impl->streams.begin () + index);
 }
 
-void VertexBuffer::AttachWeights (VertexWeightStream& vws, CloneMode mode)
+void VertexBuffer::AttachWeights (VertexWeightStream& vws)
 {
-  impl->weights.Attach (vws, mode);
+  impl->weights = vws;
 }
 
 void VertexBuffer::DetachWeights ()
 {
-  impl->weights.Attach (VertexWeightStream (), CloneMode_Instance);
+  impl->weights = VertexWeightStream ();
 }
 
 void VertexBuffer::Clear ()
@@ -173,7 +174,7 @@ size_t VertexBuffer::VerticesCount () const
   
   for (VertexStreamArray::iterator i=impl->streams.begin (), end=impl->streams.end (); i!=end; ++i)
   {
-    size_t size = i->Resource ().Size ();
+    size_t size = i->Size ();
     
     if (size < vertices_count)
       vertices_count = size;
@@ -191,8 +192,8 @@ size_t VertexBuffer::VertexSize () const
   size_t vertex_size = 0;
 
   for (VertexStreamArray::iterator i=impl->streams.begin (), end=impl->streams.end (); i!=end; ++i)
-    vertex_size += i->Resource ().VertexSize ();
-    
+    vertex_size += i->VertexSize ();
+
   return vertex_size;
 }
     

@@ -2,5 +2,5 @@
 #Экспортируемые настройки компонента
 ###################################################################################################
 export.LIBS          := media.geometry.xmesh
-export.LINK_INCLUDES := XMeshLoaderSerializer
+export.LINK_INCLUDES := XMeshLoader XMeshSaver
 export.IMPORTS       := link.static.mak

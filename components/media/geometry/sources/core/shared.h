@@ -6,31 +6,19 @@
 
 #include <stl/string>
 #include <stl/vector>
-#include <stl/hash_map>
 
 #include <xtl/function.h>
-#include <xtl/iterator_range.h>
-#include <xtl/stride_ptr.h>
-#include <xtl/bind.h>
-#include <xtl/ref.h>
 #include <xtl/reference_counter.h>
-#include <xtl/iterator.h>
 
 #include <mathlib.h>
 
 #include <common/strlib.h>
 #include <common/hash.h>
 #include <common/exception.h>
-#include <common/xml_writer.h>
-#include <common/parser.h>
 #include <common/component.h>
 
 #include <media/geometry/mesh_library.h>
-
-#include <shared/resource_holder.h>
-#include <shared/clone.h>
-#include <shared/resource_manager.h>
-#include <shared/resource_library.h>
+#include <media/resource_library.h>
 
 namespace media
 {

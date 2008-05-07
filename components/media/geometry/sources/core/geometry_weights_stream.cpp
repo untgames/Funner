@@ -21,14 +21,18 @@ VertexWeightStream::VertexWeightStream ()
   : impl (new Impl, false)
   {}
 
+VertexWeightStream::VertexWeightStream (Impl* in_impl)
+  : impl (in_impl, false)
+  {}  
+
 VertexWeightStream::VertexWeightStream (size_t weights_count)
   : impl (new Impl, false)
 {
   Resize (weights_count);
 }
   
-VertexWeightStream::VertexWeightStream (const VertexWeightStream& vws, CloneMode mode)
-  : impl (clone (vws.impl, mode, "media::geometry::VertexWeightStream::VertexWeightStream"))
+VertexWeightStream::VertexWeightStream (const VertexWeightStream& vws)
+  : impl (vws.impl)
   {}
 
 VertexWeightStream::~VertexWeightStream ()
@@ -44,6 +48,15 @@ VertexWeightStream& VertexWeightStream::operator = (const VertexWeightStream& vw
   impl = vws.impl;
 
   return *this;
+}
+
+/*
+    Создание копии
+*/
+
+VertexWeightStream VertexWeightStream::Clone () const
+{
+  return VertexWeightStream (new Impl (*impl));  
 }
 
 /*

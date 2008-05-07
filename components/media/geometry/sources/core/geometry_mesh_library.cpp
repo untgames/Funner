@@ -121,9 +121,9 @@ const Mesh* MeshLibrary::Find (const char* name) const
     Присоединение мешей
 */
 
-void MeshLibrary::Attach (const char* name, Mesh& mesh, CloneMode mode)
+void MeshLibrary::Attach (const char* name, Mesh& mesh)
 {
-  impl->meshes.Insert (name, mesh, mode);
+  impl->meshes.Insert (name, mesh);
 }
 
 void MeshLibrary::Detach (const char* name)

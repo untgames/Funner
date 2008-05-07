@@ -23,13 +23,13 @@ struct VertexStream::Impl: public xtl::reference_counter
     VertexStream::Impl
 */
 
-VertexStream::Impl::Impl (const VertexDeclaration& declaration)
-  : format (declaration.Format ()), vertex_size (declaration.VertexSize ()), vertices_count (0)
-  {}
-  
 VertexStream::Impl::Impl ()
   : vertex_size (0), vertices_count (0)
   {}
+
+VertexStream::Impl::Impl (const VertexDeclaration& declaration)
+  : format (declaration.Format ()), vertex_size (declaration.VertexSize ()), vertices_count (0)
+  {}  
 
 /*
     VertexStream
@@ -38,6 +38,10 @@ VertexStream::Impl::Impl ()
 /*
     Конструкторы / деструктор
 */
+
+VertexStream::VertexStream (Impl* in_impl)
+  : impl (in_impl, false)
+  {}
   
 VertexStream::VertexStream (const VertexDeclaration& declaration)
   : impl (new Impl (declaration), false)
@@ -89,8 +93,8 @@ VertexStream::VertexStream (const VertexBuffer& src_vb)
   Convert (src_vb);
 }
 
-VertexStream::VertexStream (const VertexStream& vs, CloneMode mode)
-  : impl (clone (vs.impl, mode, "media::geometry::VertexStream::VertexStream"))
+VertexStream::VertexStream (const VertexStream& vs)
+  : impl (vs.impl)
   {}
 
 VertexStream::~VertexStream ()
@@ -105,6 +109,15 @@ VertexStream& VertexStream::operator = (const VertexStream& vs)
 {
   impl = vs.impl;
   return *this;
+}
+
+/*
+    Создание копии
+*/
+
+VertexStream VertexStream::Clone () const
+{
+  return VertexStream (new Impl (*impl));
 }
 
 /*

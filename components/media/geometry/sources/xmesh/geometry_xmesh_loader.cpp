@@ -387,20 +387,15 @@ class XmlMeshLibraryLoader
     Автоматическая регистрация компонента
 */
 
-class XmlMeshLibraryLoaderComponent: public AutoRegisteredComponent
+class XMeshLoaderComponent
 {
   public:
-      //имя компонента
-    const char* Name () { return "media.geometry.loaders.XmlMeshLibraryLoaderComponent"; }
-    
-      //загрузка компонента
-    void Load ()
+    XMeshLoaderComponent ()
     {
-      MeshLibraryManager::RegisterLoader ("xmesh", &LoadLibrary);
+      MeshLibraryManager::RegisterLoader ("xmesh", &LoadLibrary);      
     }
-    
+
   private:
-      //загрузка библиотеки мешей
     static void LoadLibrary (const char* file_name, MeshLibrary& library)
     {
       XmlMeshLibraryLoader (file_name, library);
@@ -412,6 +407,6 @@ class XmlMeshLibraryLoaderComponent: public AutoRegisteredComponent
 extern "C"
 {
 
-XmlMeshLibraryLoaderComponent XMeshLoaderComponent;
+ComponentRegistrator<XMeshLoaderComponent> XMeshLoader ("media.geometry.loaders.XMeshLoader");
 
 }

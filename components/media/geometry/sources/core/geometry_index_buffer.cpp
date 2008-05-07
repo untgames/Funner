@@ -20,6 +20,10 @@ struct IndexBuffer::Impl: public xtl::reference_counter
 IndexBuffer::IndexBuffer ()
   : impl (new Impl, false)
   {}
+  
+IndexBuffer::IndexBuffer (Impl* in_impl)
+  : impl (in_impl, false)
+  {}
 
 IndexBuffer::IndexBuffer (size_t indices_count)
   : impl (new Impl, false)
@@ -27,8 +31,8 @@ IndexBuffer::IndexBuffer (size_t indices_count)
   Resize (indices_count);
 }
   
-IndexBuffer::IndexBuffer (const IndexBuffer& ib, CloneMode mode)
-  : impl (media::clone (ib.impl, mode, "media::geometry::IndexBuffer::IndexBuffer"))
+IndexBuffer::IndexBuffer (const IndexBuffer& ib)
+  : impl (ib.impl)
   {}
 
 IndexBuffer::~IndexBuffer ()
@@ -44,6 +48,15 @@ IndexBuffer& IndexBuffer::operator = (const IndexBuffer& ib)
   impl = ib.impl;
 
   return *this;
+}
+
+/*
+    Создание копии
+*/
+
+IndexBuffer IndexBuffer::Clone () const
+{
+  return IndexBuffer (new Impl (*impl));
 }
 
 /*
