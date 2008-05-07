@@ -80,7 +80,15 @@ FontFace::FontFace (const FontFace& source)
 
 FontFace::FontFace (const char* file_name)
 {
-  Load (file_name);
+  try
+  {
+    Load (file_name);
+  }
+  catch (Exception& exception)
+  {
+    exception.Touch ("media::FontFace::FontFace");
+    throw;
+  }
 }
 
 FontFace::FontFace (FontFaceImpl* source)
