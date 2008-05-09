@@ -65,14 +65,10 @@ namespace
     Компонент драйвера проигрывания звука OpenAL
 */
 
-class OpenALComponentRegistrator: public common::AutoRegisteredComponent
+class OpenALComponent
 {
-  public:
-      //имя компонента
-    const char* Name () { return "sound.low_level.OpenAL"; }
-    
-      //загрузка компонента
-    void Load ()
+  public:   
+    OpenALComponent ()
     {
       register_openal_driver ("OpenAL");
     }
@@ -83,6 +79,6 @@ class OpenALComponentRegistrator: public common::AutoRegisteredComponent
 extern "C"
 {
 
-OpenALComponentRegistrator OpenALComponent;
+common::ComponentRegistrator<OpenALComponent> OpenAL ("sound.low_level.OpenAL");
 
 }
