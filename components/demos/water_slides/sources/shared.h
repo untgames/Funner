@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include <stdlib.h>
+#include <float.h>
 
 #include <stl/auto_ptr.h>
 //#include <stl/algorithm>

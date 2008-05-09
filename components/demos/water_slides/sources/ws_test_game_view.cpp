@@ -247,8 +247,8 @@ class TestView: public IGameView
       sampler_desc.mag_filter = TexMagFilter_Linear;
       sampler_desc.wrap_u     = TexcoordWrap_Clamp;
       sampler_desc.wrap_v     = TexcoordWrap_Clamp;
-      sampler_desc.wrap_w     = TexcoordWrap_Clamp;
       sampler_desc.comparision_function = CompareMode_AlwaysPass;
+      sampler_desc.max_lod    = FLT_MAX;
 
       texture_sampler = SamplerStatePtr (current_device->CreateSamplerState (sampler_desc), false);
       
@@ -404,9 +404,9 @@ class TestView: public IGameView
 
       memset (&shader_parameters, 0, sizeof shader_parameters);
 
-      shader_parameters.object_matrix     = math::mat4f (1.0f);      
-      shader_parameters.projection_matrix = get_ortho_proj (-1, 1, -1, 1, -10, 10);
-      shader_parameters.view_matrix       = math::translatef (0, 0, -5.5);
+      shader_parameters.object_matrix     = math::mat4f (1.0f);
+      shader_parameters.projection_matrix = get_ortho_proj (-1, 1, -1, 1, -30, 30);
+      shader_parameters.view_matrix       = math::translatef (0, 0, -15.5);
 
       constant_buffer->SetData (0, sizeof shader_parameters, &shader_parameters);
     }

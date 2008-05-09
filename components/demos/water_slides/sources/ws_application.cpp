@@ -187,7 +187,7 @@ struct MyApplication::Impl
 
         write (log_stream, prefix);
         write (log_stream, line);
-        write (log_stream, "\n");
+        write (log_stream, "\r\n");
       }
 
         //сброс протокола на диск
