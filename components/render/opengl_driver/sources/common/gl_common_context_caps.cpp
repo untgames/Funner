@@ -15,6 +15,7 @@ void ContextCaps::Init (const ExtensionSet& extension_set)
                    ARB_multitexture               = "GL_ARB_multitexture",
                    ARB_occlusion_query            = "GL_ARB_occlusion_query",
                    ARB_shading_language_100       = "GL_ARB_shading_language_100",
+                   ARB_shadow                     = "GL_ARB_shadow",
                    ARB_texture_border_clamp       = "GL_ARB_texture_border_clamp",
                    ARB_texture_compression        = "GL_ARB_texture_compression",
                    ARB_texture_cube_map           = "GL_ARB_texture_cube_map",
@@ -54,6 +55,7 @@ void ContextCaps::Init (const ExtensionSet& extension_set)
   has_arb_multitexture               = extension_set.Get (ARB_multitexture) || extension_set.Get (Version_1_3);
   has_arb_occlusion_query            = extension_set.Get (ARB_occlusion_query) || extension_set.Get (Version_1_5);
   has_arb_shading_language_100       = extension_set.Get (ARB_shading_language_100) || extension_set.Get (Version_2_0);
+  has_arb_shadow                     = extension_set.Get (ARB_shadow) || extension_set.Get (Version_1_5);
   has_arb_texture_border_clamp       = extension_set.Get (ARB_texture_border_clamp) || extension_set.Get (Version_1_3);
   has_arb_texture_cube_map           = extension_set.Get (ARB_texture_cube_map) || extension_set.Get (EXT_texture_cube_map) ||
                                        extension_set.Get (Version_1_3);
@@ -70,7 +72,7 @@ void ContextCaps::Init (const ExtensionSet& extension_set)
   has_ext_blend_subtract             = extension_set.Get (EXT_blend_subtract) || extension_set.Get (Version_1_2);
   has_ext_framebuffer_object         = extension_set.Get (EXT_framebuffer_object);
   has_ext_packed_depth_stencil       = extension_set.Get (EXT_packed_depth_stencil);
-  has_ext_shadow_funcs               = extension_set.Get (EXT_shadow_funcs) || extension_set.Get (Version_1_5);
+  has_ext_shadow_funcs               = extension_set.Get (EXT_shadow_funcs) || extension_set.Get (Version_1_5);  
   has_ext_stencil_two_side           = extension_set.Get (EXT_stencil_two_side);
   has_ext_texture_compression_s3tc   = (extension_set.Get (ARB_texture_compression) || extension_set.Get (Version_1_3)) && 
                                        extension_set.Get (EXT_texture_compression_s3tc);
@@ -86,8 +88,10 @@ void ContextCaps::Init (const ExtensionSet& extension_set)
   if (has_ext_texture_rectangle)          glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, (GLint*)&max_rectangle_texture_size);
   if (has_arb_texture_cube_map)           glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
   if (has_ext_texture3d)                  glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
-  if (has_arb_multitexture)               glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
-  if (has_ext_texture_filter_anisotropic) glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint*)&max_anisotropy);
+  if (has_ext_texture_filter_anisotropic) glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint*)&max_anisotropy);  
+  
+  if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
+  else                      texture_units_count = 1;
 
   glActiveTexture_fn           = glActiveTexture ? glActiveTexture : glActiveTextureARB;
   glBindBuffer_fn              = glBindBuffer ? glBindBuffer : glBindBufferARB;

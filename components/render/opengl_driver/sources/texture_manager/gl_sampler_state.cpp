@@ -59,13 +59,42 @@ TexTargetId get_target_id (GLenum tex_target)
 }
 
 /*
-   Конструктор
+    Конструктор
 */
 
 SamplerState::SamplerState (const ContextManager& manager, const SamplerDesc& in_desc) 
-  : ContextObject (manager), desc_hash (0), display_list (0)
+  : ContextObject (manager), desc_hash (0)
 {
   SetDesc (in_desc);
+}
+
+SamplerState::~SamplerState ()
+{
+  if (!display_list)
+    return;
+
+  try
+  {
+    MakeContextCurrent ();
+
+    glDeleteLists (display_list, TexTargetId_Num);
+
+    CheckErrors ("");
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("render::low_level::opengl::SamplerState::~SamplerState");
+
+    LogPrintf ("%s", exception.Message ());
+  }
+  catch (std::exception& exception)
+  {
+    LogPrintf ("%s", exception.what ());
+  }
+  catch (...)
+  {
+    //подавляем все исключения
+  }
 }
 
 /*
@@ -105,20 +134,59 @@ void SamplerState::GetDesc (SamplerDesc& out_desc)
 void SamplerState::SetDesc (const SamplerDesc& in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SamplerState::SetDesc";
-
-    //сделать проверку отсутствия расширения!!!!
   
-  const ContextCaps& caps = GetCaps ();
+    //проверка поддержки необхожимых расширений
 
-  if (in_desc.max_anisotropy > caps.max_anisotropy)
-    if (caps.has_ext_texture_filter_anisotropic)
-      RaiseNotSupported (METHOD_NAME, "Can't set anisotropy level %u (max anisotropy level %u)", in_desc.max_anisotropy, caps.max_anisotropy);
+  const ContextCaps& caps = GetCaps ();      
 
-  if (!caps.has_ext_shadow_funcs && in_desc.comparision_function != CompareMode_AlwaysPass)
-    RaiseNotSupported (METHOD_NAME, "Can't set comparision function %s (GL_EXT_shadow_funcs extension not supported)", get_name (in_desc.comparision_function));
-  
+  if (in_desc.max_anisotropy > caps.max_anisotropy) // && caps.has_ext_texture_filter_anisotropic)
+    RaiseNotSupported (METHOD_NAME, "Can't set desc.max_anisotropy=%u (max anisotropy level %u)", in_desc.max_anisotropy, caps.max_anisotropy);
+
+  if (!caps.has_ext_texture3d && in_desc.wrap_w != TexcoordWrap_Default)
+    RaiseNotSupported (METHOD_NAME, "Can't set desc.wrap_w=%s (GL_EXT_texture3D extension not supported)", get_name (in_desc.wrap_w));
+    
+  switch (in_desc.comparision_function)
+  {
+    case CompareMode_AlwaysPass:
+      break;
+    case CompareMode_LessEqual:
+    case CompareMode_GreaterEqual:
+      if (!caps.has_arb_shadow)
+        RaiseNotSupported (METHOD_NAME, "Can't set desc.comparision_function=%s (GL_ARB_shadow extension not supported)", get_name (in_desc.comparision_function));
+
+      break;  
+    case CompareMode_AlwaysFail:
+    case CompareMode_Equal:
+    case CompareMode_NotEqual:
+    case CompareMode_Less:
+    case CompareMode_Greater:
+      if (!caps.has_ext_shadow_funcs)
+        RaiseNotSupported (METHOD_NAME, "Can't set desc.comparision_function=%s (GL_EXT_shadow_funcs extension not supported)", get_name (in_desc.comparision_function));
+
+      break;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.comparision_function", in_desc.comparision_function);
+      break;
+  }  
+    
+  if (!caps.has_sgis_texture_lod)
+  {
+    if (in_desc.min_lod != 0.0f)
+      RaiseNotSupported (METHOD_NAME, "Can't set desc.min_lod=%g (GL_SGIS_texture_lod extension not supported)", in_desc.min_lod);
+
+    if (in_desc.max_lod != FLT_MAX)
+      RaiseNotSupported (METHOD_NAME, "Can't set desc.max_lod=%g (GL_SGIS_texture_lod extension not supported)", in_desc.max_lod);
+  }
+
+  if (in_desc.max_lod < in_desc.min_lod)
+    Raise<ArgumentException> (METHOD_NAME, "desc.max_lod must be gerater or equal than desc.min_lod (desc.min_lod=%g desc.max_lod=%g)",
+      in_desc.min_lod, in_desc.max_lod);
+
+  if (in_desc.mip_lod_bias != 0.0f)
+    RaiseNotSupported (METHOD_NAME, "desc.mip_lod_bias=%g not supported", in_desc.mip_lod_bias);    
+
     //преобразование дескриптора сэмплера    
-  
+
   enum Texcoord
   {
     Texcoord_U,
@@ -132,13 +200,13 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   
   switch (in_desc.min_filter)
   {
-    case TexMinFilter_Point:           gl_min_filter =  GL_NEAREST; break;
-    case TexMinFilter_Linear:          gl_min_filter =  GL_LINEAR; break;
-    case TexMinFilter_PointMipPoint:   gl_min_filter =  GL_NEAREST_MIPMAP_NEAREST; break;
-    case TexMinFilter_LinearMipPoint:  gl_min_filter =  GL_LINEAR_MIPMAP_NEAREST; break;
-    case TexMinFilter_PointMipLinear:  gl_min_filter =  GL_NEAREST_MIPMAP_LINEAR; break;
+    case TexMinFilter_Point:           gl_min_filter = GL_NEAREST; break;
+    case TexMinFilter_Linear:          gl_min_filter = GL_LINEAR; break;
+    case TexMinFilter_PointMipPoint:   gl_min_filter = GL_NEAREST_MIPMAP_NEAREST; break;
+    case TexMinFilter_LinearMipPoint:  gl_min_filter = GL_LINEAR_MIPMAP_NEAREST; break;
+    case TexMinFilter_PointMipLinear:  gl_min_filter = GL_NEAREST_MIPMAP_LINEAR; break;
     case TexMinFilter_Default:
-    case TexMinFilter_LinearMipLinear: gl_min_filter =  GL_LINEAR_MIPMAP_LINEAR; break;
+    case TexMinFilter_LinearMipLinear: gl_min_filter = GL_LINEAR_MIPMAP_LINEAR; break;
     default:
       RaiseInvalidArgument (METHOD_NAME, "desc.min_filter", in_desc.min_filter);
       break;
@@ -148,7 +216,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   {
     case TexMagFilter_Point:  gl_mag_filter = GL_NEAREST; break;
     case TexMagFilter_Default:
-    case TexMagFilter_Linear: gl_mag_filter = GL_LINEAR; break;    
+    case TexMagFilter_Linear: gl_mag_filter = GL_LINEAR; break;
     default:
       RaiseInvalidArgument (METHOD_NAME, "desc.mag_filter", in_desc.mag_filter);
       break;
@@ -187,7 +255,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
         break;
     }
   }
-  
+
   switch (in_desc.comparision_function)
   {
     case CompareMode_AlwaysFail:   gl_comparision_function = GL_NEVER; break;
@@ -208,17 +276,15 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   MakeContextCurrent ();
   
     //запись команд в контексте OpenGL
-
-      ///неверно!!! сделать по строгой гарантии    
     
   if (!display_list)
-  {
+  {    
     display_list = glGenLists (TexTargetId_Num);
-
+  
     if (!display_list)
       RaiseError (METHOD_NAME);
   }
-  
+
     //создание списков инициализации сэмплеров для различных типов текстур
 
   for (size_t i=0; i<TexTargetId_Num; i++)
@@ -235,7 +301,9 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
     glTexParameteri (tex_target, GL_TEXTURE_WRAP_S, gl_wrap [Texcoord_U]);
     glTexParameteri (tex_target, GL_TEXTURE_WRAP_T, gl_wrap [Texcoord_V]);
-    glTexParameteri (tex_target, GL_TEXTURE_WRAP_R, gl_wrap [Texcoord_W]);
+
+    if (caps.has_ext_texture3d)
+      glTexParameteri (tex_target, GL_TEXTURE_WRAP_R, gl_wrap [Texcoord_W]);
 
     if (caps.has_sgis_texture_lod)
     {
@@ -243,10 +311,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
       glTexParameterf (tex_target, GL_TEXTURE_MAX_LOD, in_desc.max_lod);
     }
 
-    if (caps.has_ext_texture_lod_bias) //?????????
-      glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, in_desc.mip_lod_bias);
-
-    if (caps.has_ext_shadow_funcs) ///неполная проверка!!!!!!
+    if (caps.has_ext_shadow_funcs || caps.has_arb_shadow)
     {
       glTexParameteri (tex_target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
       glTexParameteri (tex_target, GL_TEXTURE_COMPARE_FUNC, gl_comparision_function);
@@ -254,9 +319,9 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
     glTexParameterfv (tex_target, GL_TEXTURE_BORDER_COLOR, in_desc.border_color);
 
-    glEndList ();  
+    glEndList ();
   }
-
+  
     //проверка ошибок
 
   CheckErrors (METHOD_NAME);

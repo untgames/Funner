@@ -64,6 +64,12 @@ class ContextImpl: public xtl::reference_counter
       return context_data_table [table_id];
     }
     
+      //инициализация таблицы возможностей контекста
+    void InitContextCaps ()
+    {
+      context_caps.Init (extensions);
+    }
+    
   private:
 
       //инициализация
@@ -116,9 +122,6 @@ class ContextImpl: public xtl::reference_counter
         extensions.Set (Version_1_5, GLEW_VERSION_1_5 != 0);
         extensions.Set (Version_2_0, GLEW_VERSION_2_0 != 0);
         extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);        
-
-          //Инициализация аппаратно поддерживаемых возможностей контекста
-        context_caps.Init (extensions);
       }
       catch (common::Exception& exception)
       {
@@ -224,8 +227,12 @@ struct ContextManager::Impl: public xtl::reference_counter
         {
           if (strcmp (max_version.c_str (), version_string [i]) < 0)
             context_extensions.Set (extension [i], false);
-        }
+        }        
       }
+      
+        //инициализация таблицы возможностей контекста
+      
+      new_context->InitContextCaps ();
 
         //регистрация контекста
 

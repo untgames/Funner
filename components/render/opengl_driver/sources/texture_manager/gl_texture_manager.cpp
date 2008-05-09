@@ -140,7 +140,7 @@ struct TextureManager::Impl: public ContextObject
     void Bind ()
     {
       static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::Bind";
-      
+
         //получение кэш-переменных
 
       size_t *common_cache             = &GetContextDataTable (Stage_Common)[0],
@@ -330,7 +330,7 @@ struct TextureManager::Impl: public ContextObject
 
       return new ScaledTexture (GetContextManager (), texture_manager, desc);
     }
-
+    
       //создание двумерной текстуры
     ITexture* CreateTexture2D (const TextureDesc& in_desc)
     {

@@ -189,9 +189,9 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     default:
       RaiseInvalidArgument (METHOD_NAME, "desc.blend_alpha_destination_argument", in_desc.blend_alpha_destination_argument);
       break;    
-  }  
+  }
   
-  if (!caps.has_arb_multisample && desc.sample_alpha_to_coverage) 
+  if (!caps.has_arb_multisample && in_desc.sample_alpha_to_coverage) 
     RaiseNotSupported (METHOD_NAME, "Can't enable sample alpha to coverage mode (GL_ARB_multisample extension not supported)");
 
     //проверка поддержки расширений

@@ -2,6 +2,7 @@
 #define RENDER_GL_DRIVER_TEXTURE_SHARED_HEADER
 
 #include <math.h>
+#include <float.h>
 
 #include <common/exception.h>
 #include <common/hash.h>
@@ -340,7 +341,8 @@ class SamplerState : virtual public ISamplerState, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SamplerState (const ContextManager& manager, const SamplerDesc& desc);
+    SamplerState  (const ContextManager& manager, const SamplerDesc& desc);
+    ~SamplerState ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выбор сэмплера в контекст OpenGL

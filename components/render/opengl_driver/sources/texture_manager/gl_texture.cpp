@@ -286,7 +286,8 @@ void Texture::BuildMipmaps
   const size_t buffer_size = get_image_size (get_next_mip_size (width), get_next_mip_size (height), format);
 
   xtl::uninitialized_storage<char> dst_buffer (buffer_size),
-                                   src_buffer (buffer_size / 2); //на 4 делить не нужно!
+//                                   src_buffer (buffer_size / 2); //на 4 делить не нужно! (почему-то вылетает glTexSubImage2D  на Microsoft Generic OpenGL)
+                                   src_buffer (buffer_size); //на 4 делить не нужно! 
 
   const char* src = reinterpret_cast<const char*> (data);
   char*       dst = dst_buffer.data ();
@@ -488,7 +489,7 @@ void Texture::SetData
     }      
 
     SetUncompressedData (layer, mip_level, x, y, width, height, gl_format, gl_type, buffer);
-
+    
     if (desc.generate_mips_enable && !mip_level && !GetCaps ().has_sgis_generate_mipmap)
     {
       BuildMipmaps (x, y, layer, width, height, source_format, buffer);

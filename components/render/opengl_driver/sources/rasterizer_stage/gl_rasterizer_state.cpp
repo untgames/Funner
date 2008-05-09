@@ -18,6 +18,9 @@ RasterizerState::RasterizerState (const ContextManager& manager, const Rasterize
 
 RasterizerState::~RasterizerState ()
 {
+  if (!display_list)
+    return;
+
   try
   {
       //удаление списка
@@ -94,16 +97,23 @@ void RasterizerState::GetDesc (RasterizerDesc& out_desc)
    Изменение дескриптора
 */
 
-////проверить!!!!!
 void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RasterizerState::SetDesc";
+  
+    //проверка наличия необходимых расширений
+    
+  const ContextCaps& caps = GetCaps ();
 
-  if (in_desc.multisample_enable && !GetCaps ().has_arb_multisample)
+  if (in_desc.multisample_enable && !caps.has_arb_multisample)
     RaiseNotSupported (METHOD_NAME, "Multisampling not supported (GL_ARB_multisample extension not supported)");
+    
+    //выбор текущего контекста
 
   MakeContextCurrent ();
-  
+
+    //создание нового списка
+
   if (!display_list)
   {
     display_list = glGenLists (1);
@@ -111,18 +121,36 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     if (!display_list)
       RaiseError (METHOD_NAME);
   }
-
-  glNewList (display_list, GL_COMPILE);
+  
+    //преобразование дескриптора
+    
+  GLenum gl_fill_mode;
 
   switch (in_desc.fill_mode)
   {
-    case FillMode_Wireframe:
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      break;
-    case FillMode_Solid:
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    case FillMode_Wireframe: gl_fill_mode = GL_LINE; break;
+    case FillMode_Solid:     gl_fill_mode = GL_FILL; break;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.fill_mode", in_desc.fill_mode);
       break;
   }
+  
+  switch (in_desc.cull_mode)
+  {
+    case CullMode_None:
+    case CullMode_Front:
+    case CullMode_Back:
+      break;
+    default:
+      RaiseInvalidArgument (METHOD_NAME, "desc.cull_mode", in_desc.cull_mode);
+      break;
+  }
+
+    //запись команд в контекст OpenGL
+
+  glNewList (display_list, GL_COMPILE);
+
+  glPolygonMode (GL_FRONT_AND_BACK, gl_fill_mode);
 
   switch (in_desc.cull_mode)
   {
@@ -130,25 +158,24 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
       glDisable (GL_CULL_FACE);
       break;
     case CullMode_Front:
-      glEnable (GL_CULL_FACE);
+      glEnable   (GL_CULL_FACE);
       glCullFace (GL_FRONT);
       break;
     case CullMode_Back:
-      glEnable (GL_CULL_FACE);
+      glEnable   (GL_CULL_FACE);
       glCullFace (GL_BACK);
       break;
   }
 
-  if (in_desc.front_counter_clockwise)
-    glFrontFace (GL_CW);
-  else
-    glFrontFace (GL_CCW);
+  if (in_desc.front_counter_clockwise) glFrontFace (GL_CW);
+  else                                 glFrontFace (GL_CCW);  
 
   if (in_desc.depth_bias)
   {
     glEnable (GL_POLYGON_OFFSET_FILL);
     glEnable (GL_POLYGON_OFFSET_LINE);
     glEnable (GL_POLYGON_OFFSET_POINT);
+
     glPolygonOffset (0.f, (float)in_desc.depth_bias);
   }
   else
@@ -158,10 +185,8 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     glDisable (GL_POLYGON_OFFSET_POINT);
   }
 
-  if (in_desc.scissor_enable)
-    glEnable (GL_SCISSOR_TEST);
-  else
-    glDisable (GL_SCISSOR_TEST);
+  if (in_desc.scissor_enable) glEnable  (GL_SCISSOR_TEST);
+  else                        glDisable (GL_SCISSOR_TEST);
 
   if (in_desc.antialiased_line_enable && !in_desc.multisample_enable)
   {
@@ -174,13 +199,19 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     glDisable (GL_POINT_SMOOTH);
     glDisable (GL_LINE_SMOOTH);
     glDisable (GL_POLYGON_SMOOTH);
-    glEnable  (GL_MULTISAMPLE_ARB);
   }
 
-  glEndList ();  
+  if (caps.has_arb_multisample && in_desc.multisample_enable)
+    glEnable (GL_MULTISAMPLE_ARB);
+
+  glEndList ();
+
+    //проверка ошибок
 
   CheckErrors (METHOD_NAME);
 
-  desc = in_desc;
+    //сохранение параметров
+
+  desc      = in_desc;
   desc_hash = crc32 (&desc, sizeof desc);
 }
