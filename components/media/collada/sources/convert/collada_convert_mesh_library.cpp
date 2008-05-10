@@ -537,11 +537,11 @@ class Converter
 namespace media
 {
 
-namespace geometry
+namespace collada
 {
 
 //преобразование коллада-модели в библиотеку мешей
-void convert (const media::collada::Model& src_model, MeshLibrary& dst_library)
+void convert (const media::collada::Model& src_model, geometry::MeshLibrary& dst_library)
 {
   Converter (src_model, dst_library);
 }
