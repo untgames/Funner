@@ -16,7 +16,7 @@ MEDIA.SOUND.SOURCES.IMPORTS          := compile.static.mak ../shared/compile.sta
 
 #Öåëü ¹2 - Sound sources
 MEDIA.SOUND.DEFAULT_DECODERS.TYPE             := static-lib
-MEDIA.SOUND.DEFAULT_DECODERS.NAME             := media.default_decoders
+MEDIA.SOUND.DEFAULT_DECODERS.NAME             := media.sound.default_decoders
 MEDIA.SOUND.DEFAULT_DECODERS.INCLUDE_DIRS     := ../../../extern/vorbisfile/include ../../../extern/ogg/include
 MEDIA.SOUND.DEFAULT_DECODERS.SOURCE_DIRS      := sources/default_decoders
 MEDIA.SOUND.DEFAULT_DECODERS.LIB_DIRS         :=  
@@ -27,7 +27,7 @@ MEDIA.SOUND.DEFAULT_DECODERS.IMPORTS          := compile.static.mak
 
 #Öåëü ¹3 - Sound sources
 MEDIA.SOUND.SNDDECL.TYPE             := static-lib
-MEDIA.SOUND.SNDDECL.NAME             := media.snddecl
+MEDIA.SOUND.SNDDECL.NAME             := media.sound.snddecl
 MEDIA.SOUND.SNDDECL.INCLUDE_DIRS     := 
 MEDIA.SOUND.SNDDECL.SOURCE_DIRS      := sources/snddecl
 MEDIA.SOUND.SNDDECL.LIB_DIRS         :=  
