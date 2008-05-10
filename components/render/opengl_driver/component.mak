@@ -19,7 +19,7 @@ OPENGLDRIVER_SOURCES.IMPORTS          := ../../common/exports.static.mak ../low_
 
 #Öåëü ¹2 - OpenGL render system tests
 OPENGLDRIVER_TESTS.TYPE             := test-suite
-OPENGLDRIVER_TESTS.INCLUDE_DIRS     := ../../../extern/glew/include
+OPENGLDRIVER_TESTS.INCLUDE_DIRS     :=
 OPENGLDRIVER_TESTS.SOURCE_DIRS      := tests/driver tests/device tests/complex
 OPENGLDRIVER_TESTS.LIB_DIRS         :=
 OPENGLDRIVER_TESTS.LIBS             :=
