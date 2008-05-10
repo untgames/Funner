@@ -40,16 +40,9 @@ Material::~Material ()
     Копирование
 */
 
-Material::Pointer Material::Clone (CloneMode mode)
+Material::Pointer Material::Clone () const
 {
-  switch (mode)
-  {
-    case CloneMode_Instance: return this;
-    case CloneMode_Copy:     return Pointer (CloneCore (), false);
-    default:                 RaiseInvalidArgument ("media::rfx::Material::Clone", "mode", mode);
-  }
-  
-  return 0;
+  return Pointer (CloneCore (), false);
 }
 
 Material* Material::CloneCore () const

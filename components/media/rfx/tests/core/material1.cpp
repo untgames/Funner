@@ -28,9 +28,9 @@ int main ()
   printf ("Results of material1_test:\n");
   
   Material::Pointer common_material1 = CommonMaterial::Create (),
-                    common_material2 = common_material1->Clone (CloneMode_Copy),
+                    common_material2 = common_material1->Clone (),
                     test_material1   = TestMaterial::Create (),
-                    test_material2   = test_material1->Clone (CloneMode_Instance);
+                    test_material2   = test_material1;
 
   common_material1->Rename ("common_material1");
   common_material2->Rename ("common_material2");

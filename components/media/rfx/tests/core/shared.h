@@ -3,7 +3,9 @@
 
 #include <stdio.h>
 #include <exception>
-#include <media/material.h>
+
+#include <media/rfx.h>
+
 #include <xtl/visitor.h>
 #include <xtl/function.h>
 

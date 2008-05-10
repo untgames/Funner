@@ -2,6 +2,7 @@
 #define MEDIALIB_RFX_MATERIAL_LIBRARY_HEADER
 
 #include <media/rfx/material.h>
+#include <common/serializer_manager.h>
 
 namespace xtl
 {
@@ -25,12 +26,14 @@ class MaterialLibrary
   public:
     typedef xtl::iterator<Material::Pointer>      Iterator, ConstIterator; //исправить после доработки итератора
 //    typedef xtl::iterator<Material::ConstPointer> ConstIterator;
+    typedef xtl::function<void (const char* message)> LogHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     MaterialLibrary  ();
     MaterialLibrary  (const char* file_name);
+    MaterialLibrary  (const char* file_name, const LogHandler& log_handler);
     MaterialLibrary  (const MaterialLibrary&);
     ~MaterialLibrary ();
 
@@ -84,7 +87,9 @@ class MaterialLibrary
 ///Загрузка / сохранение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Load (const char* file_name);
+    void Load (const char* file_name, const LogHandler& log);
     void Save (const char* file_name);
+    void Save (const char* file_name, const LogHandler& log);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -104,28 +109,11 @@ void swap (MaterialLibrary&, MaterialLibrary&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер библиотек материалов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class MaterialLibraryManager
-{
-  public:
-    typedef xtl::function<void (const char*,       MaterialLibrary&)> LoadHandler;
-    typedef xtl::function<void (const char*, const MaterialLibrary&)> SaveHandler;
-    typedef xtl::function<void (const char*)>                         LogHandler;    
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка пользовательской функции протоколирования отладочных сообщений
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void              SetDebugLog (const LogHandler&);
-    static const LogHandler& GetDebugLog ();
-  
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с пользовательскими функциями загрузки и сохранения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterLoader   (const char* extension, const LoadHandler& loader);
-    static void RegisterSaver    (const char* extension, const SaveHandler& saver);
-    static void UnregisterLoader (const char* extension);
-    static void UnregisterSaver  (const char* extension);
-    static void UnregisterAll    ();
-};
+typedef common::ResourceSerializerManager
+<
+  void (const char* file_name, MaterialLibrary& library, const MaterialLibrary::LogHandler& log_handler),
+  void (const char* file_name, const MaterialLibrary& library, const MaterialLibrary::LogHandler& log_handler)
+> MaterialLibraryManager;
 
 }
 

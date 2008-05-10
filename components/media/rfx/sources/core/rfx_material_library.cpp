@@ -18,6 +18,20 @@ struct MaterialLibrary::Impl
 };
 
 /*
+    Утилиты
+*/
+
+namespace
+{
+
+//функция протоколирования по умолчанию
+void default_log_handler (const char*)
+{
+}
+
+}
+
+/*
     Конструкторы / деструктор
 */
 
@@ -25,11 +39,42 @@ MaterialLibrary::MaterialLibrary ()
   : impl (new Impl)
   {}
 
+MaterialLibrary::MaterialLibrary (const char* file_name, const LogHandler& log_handler)
+  : impl (new Impl)
+{
+  try
+  {
+    if (!file_name)
+      RaiseNullArgument ("", "file_name");
+
+    MaterialLibraryManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this, log_handler);
+
+    Rename (file_name);    
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("media::rfx::MaterialLibrary::MaterialLibrary(const char*,const LogHandler&)");
+    throw;
+  }
+}
+
 MaterialLibrary::MaterialLibrary (const char* file_name)
   : impl (new Impl)
 {
-  Load (file_name);
-  Rename (file_name);
+  try
+  {
+    if (!file_name)
+      RaiseNullArgument ("", "file_name");
+
+    MaterialLibraryManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this, &default_log_handler);
+
+    Rename (file_name);    
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("media::rfx::MaterialLibrary::MaterialLibrary(const char*)");
+    throw;
+  }
 }
 
 MaterialLibrary::MaterialLibrary (const MaterialLibrary& library)
@@ -180,14 +225,11 @@ void MaterialLibrary::Clear ()
     Загрузка / сохранение
 */
 
-void MaterialLibrary::Load (const char* file_name)
+void MaterialLibrary::Load (const char* file_name, const LogHandler& log_handler)
 {
-  if (!file_name)
-    RaiseNullArgument ("media::rfx::MaterialLibrary::Load", "file_name");
-    
   try
   {
-    MaterialLibraryManagerSingleton::Instance ().Load (file_name, *this);
+    MaterialLibrary (file_name, log_handler).Swap (*this);
   }
   catch (common::Exception& exception)
   {
@@ -196,20 +238,30 @@ void MaterialLibrary::Load (const char* file_name)
   }
 }
 
-void MaterialLibrary::Save (const char* file_name)
+void MaterialLibrary::Load (const char* file_name)
 {
-  if (!file_name)
-    RaiseNullArgument ("media::rfx::MaterialLibrary::Save", "file_name");
-    
+  Load (file_name, &default_log_handler);
+}
+
+void MaterialLibrary::Save (const char* file_name, const LogHandler& log_handler)
+{
   try
   {
-    MaterialLibraryManagerSingleton::Instance ().Save (file_name, *this);
+    if (!file_name)
+      RaiseNullArgument ("", "file_name");    
+
+    MaterialLibraryManager::GetSaver (file_name, SerializerFindMode_ByName)(file_name, *this, log_handler);
   }
   catch (common::Exception& exception)
   {
     exception.Touch ("media::rfx::MaterialLibrary::Save");
     throw;
   }
+}
+
+void MaterialLibrary::Save (const char* file_name)
+{
+  Save (file_name, &default_log_handler);
 }
 
 /*
