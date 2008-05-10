@@ -113,28 +113,6 @@ class MeshLibrary
 void swap (MeshLibrary&, MeshLibrary&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразование коллада-модели в библиотеку мешей
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void convert (const collada::Model& source, MeshLibrary& destination);
-
-/*
-class MeshLibraryManager
-{
-  public:
-    typedef xtl::function<void (const char*,       MeshLibrary&)> LoadHandler;
-    typedef xtl::function<void (const char*, const MeshLibrary&)> SaveHandler;
-  
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с пользовательскими функциями загрузки и сохранения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterLoader   (const char* extension, const LoadHandler& loader);
-    static void RegisterSaver    (const char* extension, const SaveHandler& saver);
-    static void UnregisterLoader (const char* extension);
-    static void UnregisterSaver  (const char* extension);
-    static void UnregisterAll    ();  
-};*/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер библиотек мешей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef common::ResourceSerializerManager<void (const char*, MeshLibrary&),
