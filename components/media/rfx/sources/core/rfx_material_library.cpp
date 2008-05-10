@@ -42,39 +42,13 @@ MaterialLibrary::MaterialLibrary ()
 MaterialLibrary::MaterialLibrary (const char* file_name, const LogHandler& log_handler)
   : impl (new Impl)
 {
-  try
-  {
-    if (!file_name)
-      RaiseNullArgument ("", "file_name");
-
-    MaterialLibraryManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this, log_handler);
-
-    Rename (file_name);    
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("media::rfx::MaterialLibrary::MaterialLibrary(const char*,const LogHandler&)");
-    throw;
-  }
+  Init (file_name, log_handler);
 }
 
 MaterialLibrary::MaterialLibrary (const char* file_name)
   : impl (new Impl)
 {
-  try
-  {
-    if (!file_name)
-      RaiseNullArgument ("", "file_name");
-
-    MaterialLibraryManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this, &default_log_handler);
-
-    Rename (file_name);    
-  }
-  catch (common::Exception& exception)
-  {
-    exception.Touch ("media::rfx::MaterialLibrary::MaterialLibrary(const char*)");
-    throw;
-  }
+  Init (file_name, &default_log_handler);
 }
 
 MaterialLibrary::MaterialLibrary (const MaterialLibrary& library)
@@ -83,6 +57,26 @@ MaterialLibrary::MaterialLibrary (const MaterialLibrary& library)
 
 MaterialLibrary::~MaterialLibrary ()
 {
+}
+
+void MaterialLibrary::Init (const char* file_name, const LogHandler& log_handler)
+{
+  try
+  {
+    if (!file_name)
+      RaiseNullArgument ("", "file_name");
+      
+    static ComponentLoader loader ("media.rfx.loaders.*");
+
+    MaterialLibraryManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this, log_handler);
+
+    Rename (file_name);    
+  }
+  catch (common::Exception& exception)
+  {
+    exception.Touch ("media::rfx::MaterialLibrary::MaterialLibrary");
+    throw;
+  }
 }
 
 /*
@@ -249,6 +243,8 @@ void MaterialLibrary::Save (const char* file_name, const LogHandler& log_handler
   {
     if (!file_name)
       RaiseNullArgument ("", "file_name");    
+      
+    static ComponentLoader loader ("media.rfx.savers.*");      
 
     MaterialLibraryManager::GetSaver (file_name, SerializerFindMode_ByName)(file_name, *this, log_handler);
   }

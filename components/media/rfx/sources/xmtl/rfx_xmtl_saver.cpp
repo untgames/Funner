@@ -311,23 +311,30 @@ class XmlMaterialLibrarySaver: public xtl::visitor<void, CommonMaterial, MultiPa
     }
 };
 
-}
-
 /*
-    Сохранение библиотеки материалов
+    Регистратор компонента сохранения библиотеки материалов
 */
 
-namespace media
+class XmlMaterialLibrarySaverComponent
 {
+  public:
+    XmlMaterialLibrarySaverComponent ()
+    {
+      MaterialLibraryManager::RegisterSaver ("xmtl", &SaveLibrary);            
+    }
+    
+  private:
+    static void SaveLibrary (const char* file_name, const MaterialLibrary& library, const MaterialLibrary::LogHandler&)
+    {
+      XmlMaterialLibrarySaver (file_name, library);
+    }
+};
 
-namespace rfx
-{
-
-void mtl_save_library (const char* file_name, const MaterialLibrary& library)
-{
-  XmlMaterialLibrarySaver (file_name, library);
 }
 
-}
+extern "C"
+{
+
+ComponentRegistrator<XmlMaterialLibrarySaverComponent> XMtlSaver ("media.rfx.savers.XMtl");
 
 }

@@ -1,8 +1,8 @@
-Results of mtl_loader_test:
-data/test.mtl(24): error: Unknown profile at load material 'test_material2'
-data/test.mtl(44): error: Material 'test_material2' not found
-data/test.mtl(45): error: Material 'test_material2' not found
-data/test.mtl(47): error: Material 'material1' not found
+Results of xmtl_loader_test:
+data/test.xmtl(24): error: Unknown profile at load material 'test_material2'
+data/test.xmtl(44): error: Material 'test_material2' not found
+data/test.xmtl(45): error: Material 'test_material2' not found
+data/test.xmtl(47): error: Material 'material1' not found
 <?xml version="1.0" encoding="utf-8"?>
 <material_library>
   <material id="common_material1" name="common_material1" sort_group="0" two_sided="0" wireframe="0" lighting="0" cast_shadows="0" recv_shadows="0" self_shadow="0">

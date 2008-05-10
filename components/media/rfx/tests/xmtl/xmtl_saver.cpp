@@ -1,17 +1,17 @@
 #include "shared.h"
 
-const char* DST_FILE_NAME = "/io/stdout/test.mtl";
+const char* DST_FILE_NAME = "/io/stdout/test.xmtl";
 
 int main ()
 {
-  printf ("Results of mtl_saver_test:\n");
+  printf ("Results of xmtl_saver_test:\n");
   
   try
   {
     CommonMaterial::Pointer common_material1 = CommonMaterial::Create (),
-                            common_material2 = xtl::static_pointer_cast<CommonMaterial> (clone (common_material1));
+                            common_material2 = xtl::static_pointer_cast<CommonMaterial> (common_material1->Clone ());
     Material::Pointer       test_material1   = TestMaterial::Create (),
-                            test_material2   = test_material1->Clone (CloneMode_Instance);
+                            test_material2   = test_material1;
 
     common_material1->Rename ("common_material1");
     common_material2->Rename ("common_material2");

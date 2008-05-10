@@ -95,7 +95,10 @@ class MaterialLibrary
 ///Ξαμεν
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (MaterialLibrary&);
-  
+    
+  private:
+    void Init (const char* file_name, const LogHandler& log_handler);
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;

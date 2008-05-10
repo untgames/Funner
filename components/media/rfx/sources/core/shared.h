@@ -7,6 +7,8 @@
 #include <xtl/visitor.h>
 #include <xtl/reference_counter.h>
 
+#include <common/component.h>
+
 #include <media/rfx/common_material.h>
 #include <media/rfx/multipass_material.h>
 #include <media/rfx/material_library.h>

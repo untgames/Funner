@@ -2,5 +2,5 @@
 #Экспортируемые настройки компонента
 ###################################################################################################
 export.LIBS          := media.rfx.xmtl
-export.LINK_INCLUDES := ???
+export.LINK_INCLUDES := XMtlLoader XMtlSaver
 export.IMPORTS       := link.static.mak

@@ -407,7 +407,7 @@ class XmlMaterialLibraryLoader
     }
 
   public:
-    XmlMaterialLibraryLoader (const char* file_name, MaterialLibrary& in_library)
+    XmlMaterialLibraryLoader (const char* file_name, MaterialLibrary& in_library, const MaterialLibrary::LogHandler& log_handler)
       : material_library (in_library), parser (file_name, "xml")
     {
         //загрузка библиотеки
@@ -423,31 +423,36 @@ class XmlMaterialLibraryLoader
       LoadLibrary (library_iter);
       
         //вывод протокола загрузки
-        
-      MaterialLibraryManagerImpl& manager = MaterialLibraryManagerSingleton::Instance ();
-        
+
       for (size_t i=0, count=log.MessagesCount (); i<count; i++)
-        manager.Printf ("%s", log.Message (i));
+        log_handler (log.Message (i));
+    }
+};
+
+/*
+    –егистратор компонента загрузки библиотеки материалов
+*/
+
+class XmlMaterialLibraryLoaderComponent
+{
+  public:
+    XmlMaterialLibraryLoaderComponent ()
+    {
+      MaterialLibraryManager::RegisterLoader ("xmtl", &LoadLibrary);
+    }
+    
+  private:
+    static void LoadLibrary (const char* file_name, MaterialLibrary& library, const MaterialLibrary::LogHandler& log_handler)
+    {
+      XmlMaterialLibraryLoader (file_name, library, log_handler);
     }
 };
 
 }
 
-/*
-    «агрузка библиотеки материалов
-*/
-
-namespace media
+extern "C"
 {
 
-namespace rfx
-{
-
-void mtl_load_library (const char* file_name, MaterialLibrary& library)
-{
-  XmlMaterialLibraryLoader (file_name, library);
-}
-
-}
+ComponentRegistrator<XmlMaterialLibraryLoaderComponent> XMtlLoader ("media.rfx.loaders.XMtl");
 
 }
