@@ -1,5 +1,0 @@
-Results of font_test:
-Font 'data/my_font.bfs' original name = 'data/my_font.bfs';new name = 'font_new_name'
-Font 'font_new_name' image name = 'my_font.bmp'
-glyphs count = 2, first glyph code = 31
-Kerning between 0 and 1 = 12, between 1 and 0 = 10

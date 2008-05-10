@@ -1,8 +1,0 @@
-Results of material2_test:
-Material 'Material1'
-  pin 'two_sided' enabled
-  pin 'wireframe' enabled
-  pin 'lighting' disabled
-  pin 'cast_shadows' enabled
-  pin 'receive_shadows' disabled
-  pin 'self_shadow' enabled

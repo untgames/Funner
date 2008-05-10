@@ -1,8 +1,0 @@
-Results of multilayer image test:
-multilayer image name - ''
-multilayer image new name - 'new_name'
-image new_name format - BGR8
-image new_name format - RGB8
-multilayer image width - 400, height - 400, depth - 4
-new multilayer image width - 1000, height - 1000, depth - 6
-File 'results/multilayer_image_down.bmp' hash: {00,88,d8,67,05,0a,a0,57,db,7d,7a,3c,7d,82,71,25}

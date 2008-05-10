@@ -1,9 +1,0 @@
-mesh 'mesh1': primitive[0].first=6 > indices_count=5
-mesh 'mesh1': primitive[1] is out of range (first=0, points_count=6, indices_count=5)
-mesh 'mesh1': index[2]=2 >= vertices_count=2 (at primitive #2)
-mesh 'mesh1': primitive[3].vertex_buffer=1 >= vertex_buffers_count=1
-mesh 'mesh1': inifinite value vertex_buffer[0].stream[0].vertex[0].position.x=1.#INF (attribute_type='float3')
-mesh 'mesh1': inifinite value vertex_buffer[0].stream[0].vertex[1].texcoord0.x=-1.#IND (attribute_type='float2')
-mesh 'mesh1': vertex_buffer[0].stream[0].vertex[0] not normalized (weights_sum=0.100)
-mesh 'mesh1': vertex_buffer[0].stream[0].vertex[1].last_weight=5 > weights_count=4 (last_weight=first_weight+weights_count)
-mesh 'mesh1': vertex_buffer[0].weight[2].joint_index=6 >= joints_count=5
