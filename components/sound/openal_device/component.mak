@@ -12,7 +12,7 @@ OPENALDEVICE_COMPONENTS.LIB_DIRS         :=
 OPENALDEVICE_COMPONENTS.LIBS             := 
 OPENALDEVICE_COMPONENTS.COMPILER_CFLAGS  :=
 OPENALDEVICE_COMPONENTS.COMPILER_DEFINES := 
-OPENALDEVICE_COMPONENTS.IMPORTS          := ../low_level/exports.static.mak ../../system/exports.static.mak ../../media/exports.static.mak
+OPENALDEVICE_COMPONENTS.IMPORTS          := ../low_level/exports.static.mak ../../system/exports.static.mak ../../media/sound/compile.static.mak
 
 #Öåëü ¹2 - OPENALDEVICE tests
 OPENALDEVICE_TESTS.TYPE             := test-suite

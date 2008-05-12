@@ -12,7 +12,7 @@ SOUND_SYSTEM_SOURCES.LIB_DIRS         :=
 SOUND_SYSTEM_SOURCES.LIBS             := 
 SOUND_SYSTEM_SOURCES.COMPILER_CFLAGS  :=
 SOUND_SYSTEM_SOURCES.COMPILER_DEFINES := 
-SOUND_SYSTEM_SOURCES.IMPORTS          := ../low_level/exports.static.mak ../../system/exports.static.mak ../../media/exports.static.mak
+SOUND_SYSTEM_SOURCES.IMPORTS          := ../low_level/exports.static.mak ../../system/exports.static.mak ../../media/sound/compile.static.mak
 
 #Öåëü ¹2 - Sound system tests
 SOUND_SYSTEM_TESTS.TYPE             := test-suite
