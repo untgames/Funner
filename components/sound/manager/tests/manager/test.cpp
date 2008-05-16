@@ -17,8 +17,8 @@ using namespace sound::low_level;
 using namespace xtl;
 using namespace math;
 
-const size_t ACTION_TIME = 100;
-const size_t TEST_WORK_TIME = 5000;  //время работы теста (в милисекундах)
+const size_t ACTION_TIME = 1000;
+const size_t TEST_WORK_TIME = 15000;  //время работы теста (в милисекундах)
 const char* library_file = "data/test.snddecl";
 
 Emitter emitter ("declaration1");
