@@ -50,10 +50,8 @@ void GetEventContext (HWND wnd, WindowEventContext& context)
   POINT cursor_position;
   
   GetCursorPos (&cursor_position);
-  
-  context.cursor_position.x = cursor_position.x - window_rect.left;
-  context.cursor_position.y = cursor_position.y - window_rect.top;
-  
+  ScreenToClient (wnd, &cursor_position);  
+
   context.keyboard_alt_pressed        = (GetKeyState (VK_MENU) & 2) != 0;
   context.keyboard_control_pressed    = (GetKeyState (VK_CONTROL) & 2) != 0;
   context.keyboard_shift_pressed      = (GetKeyState (VK_SHIFT) & 2) != 0;
@@ -224,10 +222,14 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       impl->Notify (WindowEvent_OnMove, context);
       return 0;
     case WM_MOUSEMOVE: //изменение положени€ курсора над областью окна
-      impl->Notify (WindowEvent_OnMouseMove, context);
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
+      impl->Notify (WindowEvent_OnMouseMove, context);      
       return 0;
     case WM_MOUSEWHEEL: //изменилось положение вертикального колеса мыши
       context.mouse_vertical_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
+      
       impl->Notify (WindowEvent_OnMouseVerticalWheel, context);
       return 0;
     case WM_MOUSEHWHEEL: //изменилось положение горизонтального колеса мыши
@@ -235,48 +237,111 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       impl->Notify (WindowEvent_OnMouseHorisontalWheel, context);
       return 0;
     case WM_LBUTTONDOWN: //нажата лева€ кнопка мыши
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
       impl->Notify (WindowEvent_OnLeftButtonDown, context);
       return 0;
     case WM_LBUTTONUP: //отпущена лева€ кнопка мыши
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
       impl->Notify (WindowEvent_OnLeftButtonUp, context);
       return 0;
     case WM_LBUTTONDBLCLK: //двойной щелчок левой кнопкой мыши
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
       impl->Notify (WindowEvent_OnLeftButtonDoubleClick, context);
       return 0;
     case WM_RBUTTONDOWN: //нажата права€ кнопка мыши
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
       impl->Notify (WindowEvent_OnRightButtonDown, context);
       return 0;
     case WM_RBUTTONUP: //отпущена права€ кнопка мыши
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
       impl->Notify (WindowEvent_OnRightButtonUp, context);
       return 0;
     case WM_RBUTTONDBLCLK: //двойной щелчок правой кнопкой мыши
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
       impl->Notify (WindowEvent_OnRightButtonDoubleClick, context);
       return 0;
     case WM_XBUTTONDOWN: //нажата X кнопка мыши
-      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON1)
-        impl->Notify (WindowEvent_OnXButton1Down, context);
-      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON2)
-        impl->Notify (WindowEvent_OnXButton2Down, context);
+    {
+      WindowEvent event;
+      
+      switch (GET_XBUTTON_WPARAM (wparam))
+      {
+        case XBUTTON1: event = WindowEvent_OnXButton1Down; break;
+        case XBUTTON2: event = WindowEvent_OnXButton2Down; break;
+        default:       return 1;
+      }
+
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
+      impl->Notify (event, context);      
+
       return 1;
+    }
     case WM_XBUTTONUP: //отпущена X кнопка мыши
-      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON1)
-        impl->Notify (WindowEvent_OnXButton1Up, context);
-      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON2)
-        impl->Notify (WindowEvent_OnXButton2Up, context);
+    {
+      WindowEvent event;
+      
+      switch (GET_XBUTTON_WPARAM (wparam))
+      {
+        case XBUTTON1: event = WindowEvent_OnXButton1Up; break;
+        case XBUTTON2: event = WindowEvent_OnXButton2Up; break;
+        default:       return 1;
+      }
+      
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
+      impl->Notify (event, context);      
+
       return 1;
+    }    
     case WM_XBUTTONDBLCLK: //двойной щелчок X кнопкой мыши
-      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON1)
-        impl->Notify (WindowEvent_OnXButton1DoubleClick, context);
-      if (GET_XBUTTON_WPARAM (wparam) == XBUTTON2)
-        impl->Notify (WindowEvent_OnXButton2DoubleClick, context);
+    {
+      WindowEvent event;
+      
+      switch (GET_XBUTTON_WPARAM (wparam))
+      {
+        case XBUTTON1: event = WindowEvent_OnXButton1DoubleClick; break;
+        case XBUTTON2: event = WindowEvent_OnXButton2DoubleClick; break;
+        default:       return 1;
+      }
+      
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
+      impl->Notify (event, context);      
+
       return 1;
+    }    
     case WM_MBUTTONDOWN: //нажата средн€€ кнопка мыши
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
       impl->Notify (WindowEvent_OnMiddleButtonDown, context);
       return 0;
     case WM_MBUTTONUP: //отпущена средн€€ кнопка мыши
-      impl->Notify (WindowEvent_OnMiddleButtonUp, context);
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
+      impl->Notify (WindowEvent_OnMiddleButtonUp, context);            
       return 0;
     case WM_MBUTTONDBLCLK: //двойной щелчок средней кнопкой мыши
+      context.cursor_position.x = LOWORD (lparam);
+      context.cursor_position.y = HIWORD (lparam);    
+    
       impl->Notify (WindowEvent_OnMiddleButtonDoubleClick, context);
       return 0;
     case WM_KEYDOWN: //нажата клавиша клавиатуры
