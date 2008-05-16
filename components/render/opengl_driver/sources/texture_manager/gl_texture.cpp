@@ -99,7 +99,11 @@ Texture::Texture
     //включение автоматической генерации    
 
   if (mips_count > 1 && desc.generate_mips_enable && GetCaps ().has_sgis_generate_mipmap)
-    glTexParameteri (GL_TEXTURE_3D_EXT, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);  
+  {
+    Bind ();
+
+    glTexParameteri (target, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+  }
 
     //проверка ошибок
 

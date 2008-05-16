@@ -141,6 +141,9 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
   if (in_desc.max_anisotropy > caps.max_anisotropy) // && caps.has_ext_texture_filter_anisotropic)
     RaiseNotSupported (METHOD_NAME, "Can't set desc.max_anisotropy=%u (max anisotropy level %u)", in_desc.max_anisotropy, caps.max_anisotropy);
+    
+  if (in_desc.max_anisotropy < 1.0f)
+    RaiseInvalidArgument (METHOD_NAME, "desc.max_anisotropy", in_desc.max_anisotropy, "Maximum anisotropy must be >= 1.0");
 
   if (!caps.has_ext_texture3d && in_desc.wrap_w != TexcoordWrap_Default)
     RaiseNotSupported (METHOD_NAME, "Can't set desc.wrap_w=%s (GL_EXT_texture3D extension not supported)", get_name (in_desc.wrap_w));
@@ -303,7 +306,17 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     glTexParameteri (tex_target, GL_TEXTURE_WRAP_T, gl_wrap [Texcoord_V]);
 
     if (caps.has_ext_texture3d)
-      glTexParameteri (tex_target, GL_TEXTURE_WRAP_R, gl_wrap [Texcoord_W]);
+    {
+      switch (tex_target)
+      {
+        case GL_TEXTURE_3D:
+        case GL_TEXTURE_CUBE_MAP:
+          glTexParameteri (tex_target, GL_TEXTURE_WRAP_R, gl_wrap [Texcoord_W]);
+          break;
+        default:
+          break;        
+      }
+    }
 
     if (caps.has_sgis_texture_lod)
     {
