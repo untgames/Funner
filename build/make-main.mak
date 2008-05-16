@@ -7,15 +7,20 @@ SOURCE_FILES_SUFFIXES                   := c cpp         #Расширения исходных фа
 BUILD_DIR_SHORT_NAME                    := build         #Базовое имя каталога со скриптами сборки
 TMP_DIR_SHORT_NAME                      := tmp           #Базовое имя каталога с временными файлами сборки
 DIST_DIR_SHORT_NAME                     := dist          #Базовое имя каталога с результатами сборки
+TOOLSETS_DIR_SHORT_NAME                 := toolsets      #Базовое имя каталога с конфигурациями toolset-ов
 PCH_SHORT_NAME                          := pch.h         #Базовое имя PCH файла
 EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
 VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package #Допустимые типы целей
 PACKAGE_COMMANDS                        := build clean test check run #Команды, делегируемые компонентам пакета
+COMPILE_TOOL                            := tools.c++compile #Имя макроса утилиты компиляции C++ файлов
+LINK_TOOL                               := tools.link       #Имя макроса утилиты редактора связей
+LIB_TOOL                                := tools.lib        #Имя макроса утилиты архивирования объектных файлов
 
 ###################################################################################################
 #Производные пути и переменные
 ###################################################################################################
+
 COMPONENT_CONFIGURATION_FILE_SHORT_NAME := $(strip $(COMPONENT_CONFIGURATION_FILE_SHORT_NAME))
 TMP_DIR_SHORT_NAME                      := $(strip $(TMP_DIR_SHORT_NAME))
 SOURCE_FILES_SUFFIXES                   := $(strip $(SOURCE_FILES_SUFFIXES))
@@ -23,15 +28,22 @@ BUILD_DIR_SHORT_NAME                    := $(strip $(BUILD_DIR_SHORT_NAME))
 TMP_DIR_SHORT_NAME                      := $(strip $(TMP_DIR_SHORT_NAME))
 DIST_DIR_SHORT_NAME                     := $(strip $(DIST_DIR_SHORT_NAME))
 EXPORT_VAR_PREFIX                       := $(strip $(EXPORT_VAR_PREFIX))
-DIST_DIR                                := $(ROOT)/$(DIST_DIR_SHORT_NAME)
+CURRENT_TOOLSET                         := $(TOOLSET)
+BUILD_DIR                               := $(ROOT)/$(BUILD_DIR_SHORT_NAME)
+TOOLSETS_DIR                            := $(BUILD_DIR)/$(strip $(TOOLSETS_DIR_SHORT_NAME))
+TOOLSETS                                := $(patsubst $(TOOLSETS_DIR)/%.mak,%,$(wildcard $(TOOLSETS_DIR)/*.mak))
+TOOLSET_FILE                            := $(TOOLSETS_DIR)/$(CURRENT_TOOLSET).mak
+DIST_DIR                                := $(ROOT)/$(DIST_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)
 DIST_LIB_DIR                            := $(DIST_DIR)/lib
 DIST_BIN_DIR                            := $(DIST_DIR)/bin
-BUILD_DIR                               := $(ROOT)/$(BUILD_DIR_SHORT_NAME)
 PCH_SHORT_NAME                          := $(strip $(PCH_SHORT_NAME))
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := $(strip $(BATCH_COMPILE_FLAG_FILE_SHORT_NAME))
-ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)
+ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)
 TMP_DIRS                                := $(ROOT_TMP_DIR)
 DIRS                                     = $(TMP_DIRS) $(DIST_DIR) $(DIST_LIB_DIR) $(DIST_BIN_DIR)
+COMPILE_TOOL                            := $(strip $(COMPILE_TOOL))
+LINK_TOOL                               := $(strip $(LINK_TOOL))
+LIB_TOOL                                := $(strip $(LIB_TOOL))
 EMPTY                                   :=
 SPACE                                   := $(EMPTY) $(EMPTY)
 
@@ -45,6 +57,41 @@ targets ?= %
 #Цель сборки "по умолчанию"
 ###################################################################################################
 default: build
+
+###################################################################################################
+#Преобразование Windows-путей
+###################################################################################################
+define convert_path
+$(subst \,/,$1)
+endef
+
+###################################################################################################
+#Перебор списка файлов (имя переменной с именем файла, список файлов, действие)
+###################################################################################################
+define for_each_file
+$(if $2,for $1 in $2; do $3; done,true)
+endef
+
+###################################################################################################
+#Подключение файла конфигурации утилит сборки
+###################################################################################################
+ifeq (,$(filter $(CURRENT_TOOLSET),$(TOOLSETS)))
+  $(error Unknown toolset '$(CURRENT_TOOLSET)'. Use one of available toolsets '$(TOOLSETS)')
+endif
+
+include $(TOOLSET_FILE)
+
+###################################################################################################
+#Проверка наличия констант
+###################################################################################################
+define check_toolset_constant
+  $(if $(strip $($1)),,$(warning Build variable '$1' not defined (check file '$(TOOLSET_FILE)')))
+endef
+
+$(call check_toolset_constant,LIB_SUFFIX)
+$(call check_toolset_constant,OBJ_SUFFIX)
+$(call check_toolset_constant,DLL_SUFFIX)
+$(call check_toolset_constant,EXE_SUFFIX)
 
 ###################################################################################################
 #Подключение файла конфигурации компонента
@@ -66,46 +113,18 @@ $(foreach dir,$1,$(COMPONENT_DIR)$(dir))
 endef
 
 ###################################################################################################
-#Компиляция исходников (список исходников, список подключаемых каталогов, каталог с объектными файлами,
-#список дефайнов, флаги компиляции, pch файл)
-###################################################################################################
-define tools.msvc.compile
-cl -nologo -c -EHsc -W3 -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsubst %,-I"%",$2) $5 $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
-endef
-
-###################################################################################################
-#Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки)
-###################################################################################################
-define tools.msvc.link
-link -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2
-endef
-
-###################################################################################################
-#Сборка библиотеки (имя выходного файла, список файлов)
-###################################################################################################
-define tools.msvc.lib
-lib -nologo -out:$1 $2
-endef
-
-###################################################################################################
 #Обработка целей компонента
 ###################################################################################################
 
-#Преобразование Windows-путей
-define convert_path
-$(subst \,/,$1)
-endef
-
 #Создание зависимости объектного файла от флаг-файла пакетной компиляции (имя исходного файла, временный каталог, флаг-файл)
 define create_object_file_dependency
-$2/$$(notdir $$(basename $1)).obj: $1 $3
+$2/$$(notdir $$(basename $1)).$(OBJ_SUFFIX): $1 $3
 	@
 endef
 
 #Тестирование времени изменения исходных файлов и соотв. им объектных (список исходных файлов, временный каталог)
 define test_source_and_object_files
-$(foreach src,$1,if [ $(src) -nt $2/$(notdir $(basename $(src))).obj ]; then echo $(src); fi &&) true
+$(foreach src,$1,if [ $(src) -nt $2/$(notdir $(basename $(src))).$(OBJ_SUFFIX) ]; then echo $(src); fi &&) true 
 endef
 
 #Правила пакетной компиляции (имя цели, имя модуля)
@@ -117,7 +136,7 @@ define batch-compile
   
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
 			@echo build-start > $$@.incomplete-build
-			@$$(call tools.msvc.compile,$$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
+			@$$(call $(COMPILE_TOOL),$$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -126,7 +145,7 @@ define batch-compile
     $$($2.FLAG_FILE): $2.UPDATED_SOURCE_FILES := $$(shell $$(call test_source_and_object_files,$$($2.SOURCE_FILES),$$($2.TMP_DIR)))
   
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
-			@$$(call tools.msvc.compile,$$(sort $$($2.UPDATED_SOURCE_FILES) $$($2.NEW_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
+			@$$(call $(COMPILE_TOOL),$$(sort $$($2.UPDATED_SOURCE_FILES) $$($2.NEW_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -160,8 +179,8 @@ define process_source_dir
 
   $$(MODULE_NAME).SOURCE_DIR       := $2
   $$(MODULE_NAME).TMP_DIR          := $$($1.TMP_DIR)/$$(MODULE_PATH)
-  $$(MODULE_NAME).OBJECT_FILES     := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
-  $$(MODULE_NAME).NEW_SOURCE_FILES := $$(patsubst ./%,%,$$(strip $$(foreach file,$$($$(MODULE_NAME).SOURCE_FILES),$$(if $$(wildcard $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.obj,$$(notdir $$(basename $$(file))))),,$$(file)))))
+  $$(MODULE_NAME).OBJECT_FILES     := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.$(OBJ_SUFFIX),$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
+  $$(MODULE_NAME).NEW_SOURCE_FILES := $$(patsubst ./%,%,$$(strip $$(foreach file,$$($$(MODULE_NAME).SOURCE_FILES),$$(if $$(wildcard $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%.$(OBJ_SUFFIX),$$(notdir $$(basename $$(file))))),,$$(file)))))
   $$(MODULE_NAME).PCH              := $$(if $$(wildcard $2/$(PCH_SHORT_NAME)),$(PCH_SHORT_NAME))
   $1.TMP_DIRS                      := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
   $1.OBJECT_FILES                  := $$($1.OBJECT_FILES) $$($$(MODULE_NAME).OBJECT_FILES)
@@ -184,16 +203,16 @@ define process_target_with_sources
   $1.DLL_DIRS      := $$(call specialize_paths,$$($1.DLL_DIRS))
   $1.EXECUTION_DIR := $$(strip $$($1.EXECUTION_DIR))
   $1.EXECUTION_DIR := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
-  $1.LIBS          := $$($1.LIBS:%=%.lib)
-  $1.TARGET_DLLS   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%.dll)
-  $1.LIB_DEPS      := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(TARGET_FILES))
-  $1.TMP_DIR       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$1
-  $1.TMP_DIRS      := $$($1.TMP_DIR)
+  $1.LIBS          := $$($1.LIBS:%=$(LIB_PREFIX)%.$(LIB_SUFFIX))
+  $1.TARGET_DLLS   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%.$(DLL_SUFFIX))  
+  $1.LIB_DEPS      := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))
+  $1.TMP_DIR       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+  $1.TMP_DIRS      := $$($1.TMP_DIR)  
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
   TMP_DIRS := $$($1.TMP_DIRS) $$(TMP_DIRS)
-  TMP_CLEAN_DIRS := $(TMP_CLEAN_DIRS) $(ROOT)/$(TMP_DIR_SHORT_NAME)/$1
+  TMP_CLEAN_DIRS := $(TMP_CLEAN_DIRS) $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
 
   build: $$($1.TARGET_DLLS)
 
@@ -208,7 +227,7 @@ define process_target.static-lib
     $$(error Empty static name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.LIB_FILE  := $(DIST_LIB_DIR)/$$($1.NAME).lib
+  $1.LIB_FILE  := $(DIST_LIB_DIR)/$(LIB_PREFIX)$$($1.NAME).$(LIB_SUFFIX)
   TARGET_FILES := $$(TARGET_FILES) $$($1.LIB_FILE)
   
   build: $$($1.LIB_FILE)
@@ -217,7 +236,7 @@ define process_target.static-lib
 
   $$($1.LIB_FILE): $$($1.FLAG_FILES)
 		@echo Create library $$(notdir $$@)...
-		@$$(call tools.msvc.lib,$$@,$$($1.OBJECT_FILES))
+		@$$(call $(LIB_TOOL),$$@,$$($1.OBJECT_FILES))
 endef
 
 #Обработка цели dynamic-lib (имя цели)
@@ -228,8 +247,8 @@ define process_target.dynamic-lib
     $$(error Empty dynamic library name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME).dll
-  TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE))).lib
+  $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME).$(DLL_SUFFIX)
+  TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE))).$(LIB_SUFFIX)
 
   build: $$($1.DLL_FILE)  
 
@@ -237,9 +256,9 @@ define process_target.dynamic-lib
 
   $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Create dynamic library $$(notdir $$@)...
-		@$$(call tools.msvc.link,$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 		@$(RM) $$(basename $$@).exp
-		@mv -f $$(basename $$@).lib $(DIST_LIB_DIR)
+		@mv -f $$(basename $$@).$(LIB_SUFFIX) $(DIST_LIB_DIR)
 endef
 
 #Обработка цели application (имя цели)
@@ -250,7 +269,7 @@ define process_target.application
     $$(error Empty application name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.EXE_FILE  := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,.exe)
+  $1.EXE_FILE  := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,.$(EXE_SUFFIX))
   TARGET_FILES := $$(TARGET_FILES) $$($1.EXE_FILE)
 
   build: $$($1.EXE_FILE)
@@ -261,19 +280,19 @@ define process_target.application
   ifeq (,$$($1.EXECUTION_DIR))
     $1.EXECUTION_DIR := $(DIST_BIN_DIR)
   endif
-
+  
   $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
-		@$$(call tools.msvc.link,$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR):$$(PATH))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<)
+		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<)
 endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
 define process_tests_source_dir
-  $2.TEST_EXE_FILES    := $$(filter $$(files:%=$$($2.TMP_DIR)/%.exe),$$($2.OBJECT_FILES:%.obj=%.exe))
+  $2.TEST_EXE_FILES    := $$(filter $$(files:%=$$($2.TMP_DIR)/%.$(EXE_SUFFIX)),$$($2.OBJECT_FILES:%.$(OBJ_SUFFIX)=%.$(EXE_SUFFIX)))
   $2.TEST_RESULT_FILES := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
   $2.EXECUTION_DIR     := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
 
@@ -283,23 +302,23 @@ define process_tests_source_dir
   .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2
   
 #Правило сборки теста
-  $$($2.TMP_DIR)/%.exe: $$($2.TMP_DIR)/%.obj $$($1.LIB_DEPS)
+  $$($2.TMP_DIR)/%.$(EXE_SUFFIX): $$($2.TMP_DIR)/%.$(OBJ_SUFFIX) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
-		@$$(call tools.msvc.link,$$@,$$(filter %.obj,$$<) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $(LINK_TOOL),$$@,$$(filter %.$(OBJ_SUFFIX),$$<) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
 #Правило получения файла-результата тестирования
-  $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.exe
+  $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
 		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(foreach file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.exe),$$^)),$$(file) && ) true
+		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.$(EXE_SUFFIX)),$$^)),$$(file))
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
 		@echo Checking results of module '$2'...
-		@$$(foreach file,$$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)),diff --text --context=1 $$($2.SOURCE_DIR)/$$(file) $$($2.TMP_DIR)/$$(file) && ) true
+		@$$(for_each_file,file,$$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)),diff --text --context=1 $$($2.SOURCE_DIR)/$$(file) $$($2.TMP_DIR)/$$(file))
 endef
 
 #Обработка цели test-suite (имя цели)
@@ -361,7 +380,11 @@ endef
 
 #Обработка сборки цели
 define process_target_common
+    #Импорт настроек
   $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
+  
+    #Добавление toolset-настроек к общему списку настроек
+  $$(foreach var,$$(filter $1.$(CURRENT_TOOLSET).%,$$(.VARIABLES)),$$(eval $$(var:$1.$(CURRENT_TOOLSET).%=$1.%) = $$($$(var:$1.$(CURRENT_TOOLSET).%=$1.%)) $$($$(var))))
   
   DUMP.$1:
 		@echo Dump target \'$1\' settings
