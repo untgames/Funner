@@ -645,7 +645,8 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
     {      
       case WindowFlag_Visible: //видимость окна
         ShowWindow (wnd, state ? SW_SHOW : SW_HIDE);
-        check_errors ("::ShowWindow");
+        SetLastError (0);  //подавление ошибки Win32 error 126. Не найден указанный модуль. Возникающей при запуске fraps.
+//        check_errors ("::ShowWindow");
         break;
       case WindowFlag_Active: //активность окна
         if (state)
@@ -665,7 +666,7 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
           raise_error ("::SetFocus");
         break;
       default:
-        RaiseInvalidArgument ("syslib::Win32Platform::SetWindowFlag", "flag", flag);
+        RaiseInvalidArgument ("", "flag", flag);
         break;
     }
   }
@@ -686,9 +687,9 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     {
       case WindowFlag_Visible:
       {
-        bool result = ShowWindow (wnd, SW_SHOWNA) == TRUE;
+        bool result = (GetWindowLong (wnd, GWL_STYLE) & WS_VISIBLE) != 0;
         
-        check_errors ("::ShowWindow");
+        check_errors ("::GetWindowLong");
 
         return result;
       }
