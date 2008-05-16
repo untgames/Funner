@@ -25,6 +25,7 @@ const size_t DEFAULT_FB_ALPHA_BITS    = 8;  //глубина альфа-буфера
 const size_t DEFAULT_FB_DEPTH_BITS    = 24; //глубина z-buffer'а
 const size_t DEFAULT_FB_STENCIL_BITS  = 8;  //глубина буфера трафарета
 const size_t DEFAULT_FB_BUFFERS_COUNT = 2;  //количество буферов в цепочке обмена
+const size_t DEFAULT_FB_FULL_SCREEN_STATE = 0; //fullscreen по умолчанию
 
 const char* DEFAULT_DEVICE_INIT_STRING = ""; //строка инициализации устройства рендеринга
 
@@ -42,7 +43,8 @@ struct MyApplication::Impl
       configuration (CONFIG_FILE_NAME),
       log_file (configuration.GetString ("LogFileName", DEFAULT_LOG_FILE_NAME)),
       log_stream (xtl::bind (&Impl::LogWriteBuffer, this, _1, _2)),
-      window (syslib::WindowStyle_Overlapped, configuration.GetInteger ("WindowWidth", DEFAULT_WINDOW_WIDTH), configuration.GetInteger ("WindowHeight", DEFAULT_WINDOW_HEIGHT)),
+      window (configuration.GetInteger ("FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ? 
+        syslib::WindowStyle_PopUp : syslib::WindowStyle_Overlapped, configuration.GetInteger ("WindowWidth", DEFAULT_WINDOW_WIDTH), configuration.GetInteger ("WindowHeight", DEFAULT_WINDOW_HEIGHT)),
       driver (get_opengl_driver ()),
       sound_manager (0),
       sg_player (0)
@@ -104,6 +106,7 @@ struct MyApplication::Impl
       desc.frame_buffer.stencil_bits = configuration.GetInteger ("StencilBits", DEFAULT_FB_STENCIL_BITS);
       desc.buffers_count             = configuration.GetInteger ("BuffersCount", DEFAULT_FB_BUFFERS_COUNT);
       desc.swap_method               = SwapMethod_Discard;
+      desc.fullscreen                = configuration.GetInteger ("FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) != 0;
       desc.window_handle             = window.Handle ();
       
       swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);
@@ -272,11 +275,12 @@ struct MyApplication::Impl
       try
       {
         Viewport vp;
+        syslib::Rect client_rect = window.ClientRect ();
 
-        vp.x         = 0;
-        vp.y         = 0;
-        vp.width     = window.Width ();
-        vp.height    = window.Height ();
+        vp.x         = client_rect.left;
+        vp.y         = client_rect.top;
+        vp.width     = client_rect.right - client_rect.left;
+        vp.height    = client_rect.bottom - client_rect.top;
         vp.min_depth = 0;
         vp.max_depth = 1;
 
@@ -331,8 +335,10 @@ struct MyApplication::Impl
 
       try
       {
-        int cursor_x = context.cursor_position.x * current_view->Width () / window.Width (),
-            cursor_y = context.cursor_position.y * current_view->Height () / window.Height ();
+        syslib::Rect client_rect = window.ClientRect ();
+
+        int cursor_x = (context.cursor_position.x - client_rect.left) * current_view->Width () / (client_rect.right - client_rect.left),
+            cursor_y = (context.cursor_position.y - client_rect.top) * current_view->Height () / (client_rect.bottom - client_rect.top);
 
         current_view->OnMouse (event, cursor_x, cursor_y);
 

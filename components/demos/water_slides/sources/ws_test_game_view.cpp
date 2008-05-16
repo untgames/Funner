@@ -15,8 +15,10 @@ const char*  WATER_SHADER_FILE_NAME  = "media/water_shader.wxf";  //имя файла с 
 const char*  GROUND_SHADER_FILE_NAME = "media/ground_shader.wxf"; //имя файла с шейдером земли
 const char*  WATER_TEXTURE_NAME      = "media/sky.jpg";           //имя файла с текстурой воды
 const char*  GROUND_TEXTURE_NAME     = "media/bottom.jpg";        //имя файла с текстурой земли
-const size_t GRID_SIZE               = 64;                       //количество разбиений сетки с водой
+const char*  BOAT_TEXTURE_NAME       = "media/boat.tif";          //имя файла с лодкой
+const size_t GRID_SIZE               = 128;                       //количество разбиений сетки с водой
 const float  WATER_UPDATE_TIME       = 0.01f;                     //период обновления воды
+const float  SCALE_FACTOR            = 1.1f;                      //коэффициент растяжения сетки
 
 /*
     Описание отрисовываемых вершин
@@ -75,7 +77,7 @@ class TestView: public IGameView
     TestView () : update_timer (xtl::bind (&TestView::OnTime, this), 10),
       water_gen (false), current_device (0), prev_field (&water_field [0]), next_field (&water_field [1]),
       listener (scene_graph::Listener::Create ()),
-      sound_emitter (scene_graph::SoundEmitter::Create ("drop"))
+      sound_emitter (scene_graph::SoundEmitter::Create ("drop")), boat_x (50), boat_y (50)
     {
       memset (vertices, 0, sizeof vertices);
       memset (water_field, 0, sizeof water_field);
@@ -86,8 +88,8 @@ class TestView: public IGameView
         {
           Vertex& vert = vertices [i][j];
           
-          vert.position.x  = 1.0f - 2.0f * i / (GRID_SIZE - 2); //!!!
-          vert.position.y  = 1.0f - 2.0f * j / (GRID_SIZE - 2); //!!!
+          vert.position.x  = SCALE_FACTOR - 2 * SCALE_FACTOR * i / float (GRID_SIZE - 1);
+          vert.position.y  = SCALE_FACTOR - 2 * SCALE_FACTOR * j / float (GRID_SIZE - 1);
           vert.normal.z    = -4.0f / (GRID_SIZE - 1);
           vert.texcoord.x  = float (j) / float (GRID_SIZE - 1);
           vert.texcoord.y  = float (i) / float (GRID_SIZE - 1);
@@ -148,7 +150,13 @@ class TestView: public IGameView
 
       for (size_t i=0; i<GRID_SIZE-2; i++)
         current_device->DrawIndexed (PrimitiveType_TriangleStrip, i * indices_block_size, indices_block_size, 0);
-
+        
+      current_device->ISSetVertexBuffer   (0, rect_vertex_buffer.get ());      
+      current_device->SSSetProgram        (ground_shader.get ());
+      current_device->SSSetConstantBuffer (0, boat_constant_buffer.get ());
+      current_device->SSSetTexture        (0, boat_texture.get ());
+//      current_device->Draw                (PrimitiveType_TriangleStrip, 0, 4);
+        
       current_device->OSSetBlendState (default_blend_state.get ());
       current_device->OSSetDepthStencilState (default_depth_stencil_state.get ());
     }
@@ -224,7 +232,8 @@ class TestView: public IGameView
       cb_desc.bind_flags   = BindFlag_ConstantBuffer;
       cb_desc.access_flags = AccessFlag_ReadWrite;
 
-      constant_buffer = BufferPtr (current_device->CreateBuffer (cb_desc), false);                  
+      constant_buffer = BufferPtr (current_device->CreateBuffer (cb_desc), false);
+      boat_constant_buffer = BufferPtr (current_device->CreateBuffer (cb_desc), false);
       
       RasterizerDesc rs_desc;
 
@@ -232,22 +241,24 @@ class TestView: public IGameView
 
       rs_desc.fill_mode  = FillMode_Solid;
       rs_desc.cull_mode  = CullMode_None;
-      rs_desc.depth_bias = 1;
 
       rasterizer = RasterizerStatePtr (current_device->CreateRasterizerState (rs_desc), false);      
 
       water_texture  = LoadTexture (WATER_TEXTURE_NAME);
       ground_texture = LoadTexture (GROUND_TEXTURE_NAME);
+      boat_texture   = LoadTexture (BOAT_TEXTURE_NAME);
 
       SamplerDesc sampler_desc;
       
       memset (&sampler_desc, 0, sizeof (sampler_desc));
 
-      sampler_desc.min_filter = TexMinFilter_LinearMipLinear;
+      sampler_desc.min_filter = TexMinFilter_Linear;
       sampler_desc.mag_filter = TexMagFilter_Linear;
-      sampler_desc.wrap_u     = TexcoordWrap_Clamp;
-      sampler_desc.wrap_v     = TexcoordWrap_Clamp;
+      sampler_desc.max_anisotropy = 1;
+      sampler_desc.wrap_u     = TexcoordWrap_Repeat;
+      sampler_desc.wrap_v     = TexcoordWrap_Repeat;
       sampler_desc.comparision_function = CompareMode_AlwaysPass;
+      sampler_desc.min_lod    = 0;
       sampler_desc.max_lod    = FLT_MAX;
 
       texture_sampler = SamplerStatePtr (current_device->CreateSamplerState (sampler_desc), false);
@@ -290,12 +301,14 @@ class TestView: public IGameView
       rect_vertex_buffer       = 0;
       index_buffer             = 0;
       constant_buffer          = 0;
+      boat_constant_buffer     = 0;
       input_layout             = 0;
       water_shader             = 0;
       ground_shader            = 0;
       shader_parameters_layout = 0;
       rasterizer               = 0;
       water_texture            = 0;
+      boat_texture             = 0;
       texture_sampler          = 0;
       blend_state              = 0;
     }    
@@ -317,6 +330,11 @@ class TestView: public IGameView
     void OnIdle ()
     {
     }
+    
+    float TransformMouseCoord (float x)
+    {
+      return (2.0f * x + SCALE_FACTOR - 1.0f) / 2.0f / SCALE_FACTOR;
+    }
 
     void OnMouse (syslib::WindowEvent event, int x, int y)
     {
@@ -327,30 +345,40 @@ class TestView: public IGameView
           break; 
         case syslib::WindowEvent_OnLeftButtonDown:
           water_gen = true;
+          
+          boat_x = x;
+          boat_y = 100 - y;
 
           sound_emitter->Stop ();
           sound_emitter->SetPosition ((float)x - 50.f, 50.f - y, 0.f);
           sound_emitter->Play ();
+
         case syslib::WindowEvent_OnMouseMove:
         {
-          if (water_gen)
+          boat_x = x;
+          boat_y = 100 - y;  
+
+          int i1 = int (TransformMouseCoord (float (100 - x) / 100.0f) * (GRID_SIZE - 1)),
+              j1 = int (TransformMouseCoord (float (y) / 100.0f) * (GRID_SIZE - 1));
+
+          for (int i=-3; i<4; i++)
           {
-            int i1 = int (float (100-x) / 100.0f * (GRID_SIZE - 5)),
-                j1 = int (float (y) / 100.0f * (GRID_SIZE - 5));
-
-            for (int i=-3; i<4; i++)
+            if (i+i1+3 >= GRID_SIZE)
+              continue;
+            
+            for (int j=-3; j<4; j++)
             {
-              for (int j=-3; j<4; j++)
-              {
-                float v = 6.0f - i * i - j * j;
+              if (j+j1+3 >= GRID_SIZE)
+                continue;
 
-                if (v < 0.0f)
-                  v = 0.0f;
+              float v = 6.0f - i * i - j * j;
 
-                next_field->U [i+i1+3][j+j1+3] -= v * 0.004f;
-              }
-            }            
-          }          
+              if (v < 0.0f)
+                v = 0.0f;                                  
+
+              next_field->U [i+i1+3][j+j1+3] -= v * 0.004f;
+            }
+          }
                   
           break;
         }
@@ -371,24 +399,57 @@ class TestView: public IGameView
   
     TexturePtr LoadTexture (const char* name)
     {
-      media::Image water_image (name, media::PixelFormat_RGB8);
+      media::Image image (name);
+      
+      PixelFormat format;
+      
+      switch (image.Format ())
+      {
+        case media::PixelFormat_RGB8:
+          format = PixelFormat_RGB8;
+          break;
+        case media::PixelFormat_BGR8:
+          image.Convert (media::PixelFormat_RGB8);
+        
+          format = PixelFormat_RGB8;
+          break;        
+        case media::PixelFormat_RGBA8:
+          format = PixelFormat_RGBA8;
+          break;
+        case media::PixelFormat_BGRA8:
+          image.Convert (media::PixelFormat_RGBA8);
+        
+          format = PixelFormat_RGBA8;
+          break;
+        case media::PixelFormat_L8:
+          format = PixelFormat_L8;
+          break;
+        case media::PixelFormat_A8:
+          format = PixelFormat_A8;
+          break;        
+        case media::PixelFormat_LA8:
+          format = PixelFormat_LA8;
+          break;        
+        default:
+          common::RaiseInvalidOperation ("TestView::LoadTexture", "Unknown texture format=%d", image.Format ());
+          break;
+      }
       
       TextureDesc tex_desc;
 
       memset (&tex_desc, 0, sizeof (tex_desc));      
       
-      tex_desc.dimension            = TextureDimension_2D;
-      tex_desc.width                = water_image.Width ();
-      tex_desc.height               = water_image.Height ();
-      tex_desc.layers               = 1;
-      tex_desc.format               = PixelFormat_RGB8;
-      tex_desc.bind_flags           = BindFlag_Texture;
-      tex_desc.generate_mips_enable = true;
-      tex_desc.access_flags         = AccessFlag_ReadWrite;
+      tex_desc.dimension    = TextureDimension_2D;
+      tex_desc.width        = image.Width ();
+      tex_desc.height       = image.Height ();
+      tex_desc.layers       = 1;
+      tex_desc.format       = format;
+      tex_desc.bind_flags   = BindFlag_Texture;
+      tex_desc.access_flags = AccessFlag_ReadWrite;
 
       TexturePtr texture (current_device->CreateTexture (tex_desc), false);
 
-      texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, PixelFormat_RGB8, water_image.Bitmap ());      
+      texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, PixelFormat_RGB8, image.Bitmap ());      
 
       return texture;
     }
@@ -404,11 +465,16 @@ class TestView: public IGameView
 
       memset (&shader_parameters, 0, sizeof shader_parameters);
 
-      shader_parameters.object_matrix     = math::mat4f (1.0f);
+      shader_parameters.object_matrix     = 1.0f;
       shader_parameters.projection_matrix = get_ortho_proj (-1, 1, -1, 1, -30, 30);
       shader_parameters.view_matrix       = math::translatef (0, 0, -15.5);
 
       constant_buffer->SetData (0, sizeof shader_parameters, &shader_parameters);
+      
+      shader_parameters.object_matrix = math::translatef (float (boat_x) / 50.0f - 1.0f, float (boat_y) / 50.0f - 1.0f, 2.0f) * 
+                                        math::scalef (0.1f, 0.1f, 0.1f);
+
+      boat_constant_buffer->SetData (0, sizeof shader_parameters, &shader_parameters);
     }
     
     void UpdateWater ()
@@ -421,7 +487,7 @@ class TestView: public IGameView
         {
           Vertex& v = vertices [i][j];
 
-          v.position.z = next_field->U [i][j];                      
+          v.position.z = next_field->U [i][j];
           v.normal.x   = next_field->U [i-1][j] - next_field->U [i+1][j];
           v.normal.y   = next_field->U [i][j-1] - next_field->U [i][j+1];
 
@@ -429,8 +495,8 @@ class TestView: public IGameView
 
 //          v.color.alpha = unsigned char (200.0f - next_field->U [i][j] * 150.0f);
           
-//          static const float vis = 0.005f;
-          static const float vis = 0.02f;
+          static const float vis = 0.01f;
+//          static const float vis = 0.02f;
 
           float laplas = (next_field->U [i-1][j] +
                           next_field->U [i+1][j] +
@@ -461,6 +527,7 @@ class TestView: public IGameView
     BufferPtr                  vertex_buffer;
     BufferPtr                  rect_vertex_buffer;
     BufferPtr                  constant_buffer;
+    BufferPtr                  boat_constant_buffer;
     BufferPtr                  index_buffer;
     InputLayoutPtr             input_layout;
     ProgramPtr                 water_shader;
@@ -469,11 +536,14 @@ class TestView: public IGameView
     RasterizerStatePtr         rasterizer;
     TexturePtr                 water_texture;
     TexturePtr                 ground_texture;
+    TexturePtr                 boat_texture;
     SamplerStatePtr            texture_sampler;
     BlendStatePtr              blend_state;
     scene_graph::Scene         scene;
     ListenerPtr                listener;
     SoundEmitterPtr            sound_emitter;
+    int                        boat_x;
+    int                        boat_y;
 };
 
 }
