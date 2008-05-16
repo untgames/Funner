@@ -190,6 +190,12 @@ size_t OpenALSource::TellInTicks () const
 
 void OpenALSource::Play (bool looping)
 {
+  if (!sound_sample.SizeInBytes ())
+  {
+    device.DebugPrintf ("Can't play, empty sound sample");
+    return;
+  }
+
   if (is_playing)
     play_time_offset = 0;
 
@@ -388,7 +394,7 @@ void OpenALSource::BufferUpdate ()
       context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
 
       if (queued_buffers_count)
-        context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers);
+        context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers); //FIXME: Invalid operation???
 
       play_sample_position = sound_sample.SecondsToSamples (Tell ());      
 

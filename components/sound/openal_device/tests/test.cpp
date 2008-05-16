@@ -15,8 +15,8 @@ using namespace sound::low_level;
 using namespace sound;
 using namespace xtl;
 
-//const char* file_name = "data/sound1.ogg";
-const char* file_name = "data/1.wav";
+const char* file_name = "data/sound1.ogg";
+//const char* file_name = "data/1.wav";
 const char* file_name2 = "data/sound2.ogg";
 
 const size_t SOURCE_UPDATE_TIME = 100;   //период обновления параметров источника звука (в милисекундах)
