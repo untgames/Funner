@@ -4,11 +4,11 @@
 TARGETS := ZZIP
 
 #Цель №1 - ZZIP
-ZZIP.TYPE             := static-lib               #Тип цели
-ZZIP.NAME             := extern.zzip              #Имя выходного файла
-ZZIP.INCLUDE_DIRS     := include ../zlib/include  #Относительные пути к каталогам c заголовочными файлами
-ZZIP.SOURCE_DIRS      := sources                  #Относительные пути к каталогам c исходными файлами
-ZZIP.LIB_DIRS         :=                          #Относительные пути к каталогам с библиотеками
-ZZIP.LIBS             :=                          #Список используемых при линковке библиотек
-ZZIP.COMPILER_DEFINES := _CRT_SECURE_NO_DEPRECATE #Определения сборки
-ZZIP.COMPILER_CFLAGS  :=                          #Флаги сборки (зависят от конфигурации)
+ZZIP.TYPE                := static-lib               #Тип цели
+ZZIP.NAME                := extern.zzip              #Имя выходного файла
+ZZIP.INCLUDE_DIRS        := include ../zlib/include  #Относительные пути к каталогам c заголовочными файлами
+ZZIP.SOURCE_DIRS         := sources                  #Относительные пути к каталогам c исходными файлами
+ZZIP.LIB_DIRS            :=                          #Относительные пути к каталогам с библиотеками
+ZZIP.LIBS                :=                          #Список используемых при линковке библиотек
+ZZIP.COMPILER_DEFINES    := _CRT_SECURE_NO_DEPRECATE #Определения сборки
+ZZIP.g++.COMPILER_CFLAGS := --no-warn                #Флаги сборки (зависят от конфигурации)
