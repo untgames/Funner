@@ -378,14 +378,19 @@ define import_settings
   $$(foreach imp,$$(DEPENDENCY_IMPORTS),$$(eval $$(call import_settings,$$(imp),$2)))
 endef
 
+#Импорт значений toolset-настроек (имя цели, имя профиля)
+define import_toolset_settings
+$$(foreach var,$$(filter $1.$2.%,$$(.VARIABLES)),$$(eval $$(var:$1.$2.%=$1.%) = $$($$(var:$1.$2.%=$1.%)) $$($$(var))))
+endef
+
 #Обработка сборки цели
 define process_target_common
     #Импорт настроек
   $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
-  
+
     #Добавление toolset-настроек к общему списку настроек
-  $$(foreach var,$$(filter $1.$(CURRENT_TOOLSET).%,$$(.VARIABLES)),$$(eval $$(var:$1.$(CURRENT_TOOLSET).%=$1.%) = $$($$(var:$1.$(CURRENT_TOOLSET).%=$1.%)) $$($$(var))))
-  
+  $$(foreach profile,$$(PROFILES),$$(eval $$(call import_toolset_settings,$1,$$(profile))))
+
   DUMP.$1:
 		@echo Dump target \'$1\' settings
 		@$$(foreach var,$$(sort $$(filter $1.%,$(.VARIABLES))),echo '    $$(var:$1.%=%) = $$($$(var))' && ) true
@@ -396,6 +401,7 @@ define process_target_common
   
   $$(eval $$(call process_target.$$(strip $$($1.TYPE)),$1))  
 endef
+#  $$(foreach var,$$(filter $1.$(CURRENT_TOOLSET).%,$$(.VARIABLES)),$$(eval $$(var:$1.$(CURRENT_TOOLSET).%=$1.%) = $$($$(var:$1.$(CURRENT_TOOLSET).%=$1.%)) $$($$(var))))
 
 #Проверка корректности типа цели (тип цели)
 define test_target_type
