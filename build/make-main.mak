@@ -258,7 +258,7 @@ define process_target.dynamic-lib
 		@echo Create dynamic library $$(notdir $$@)...
 		@$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 		@$(RM) $$(basename $$@).exp
-		@mv -f $$(basename $$@).$(LIB_SUFFIX) $(DIST_LIB_DIR)
+		@mv -f $$(dir $$@)$(LIB_PREFIX)$$(notdir $$(basename $$@)).$(LIB_SUFFIX) $(DIST_LIB_DIR)
 endef
 
 #Обработка цели application (имя цели)
