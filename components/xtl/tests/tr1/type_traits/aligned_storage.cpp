@@ -2,7 +2,7 @@
 
 template <size_t size, size_t align> void check_helper ()
 {
-  typedef aligned_storage<size, align>::type type;
+  typedef typename aligned_storage<size, align>::type type;
   
   enum {
     check_align  = alignment_of<type>::value == align,

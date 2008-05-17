@@ -437,9 +437,9 @@ void vector<T,Allocator>::_insert (iterator position,const value_type& value)
     if (!is_grow_possible (1))
       stl_raise_length_error (*this,size ()+1);
   
-    const size_type len        = next_size (1);
-    iterator        new_start  = allocator.allocate (len,start),
-                    new_finish = new_start;
+    const size_type   len        = next_size (1);
+    volatile iterator new_start  = allocator.allocate (len,start), //обход предупреждения на gcc: 'new_start' might be used uninitialized in this function
+                      new_finish = new_start;
              
     try 
     {

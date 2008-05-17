@@ -57,6 +57,10 @@ struct null_ptr_type
   template <class T> operator T* () const { return 0; }
 };
 
+#ifdef __GNUC__
+__attribute((unused))
+#endif
+
 static null_ptr_type null;
 
 /*

@@ -16,7 +16,7 @@ template <class From, class To> struct is_convertible_basic_impl
 #ifdef _MSC_VER
   #pragma warning (push)
   #pragma warning (disable : 4244)
-#endif  
+#endif
 
   enum { value = sizeof (yes_type) == sizeof (test (from)) };
   

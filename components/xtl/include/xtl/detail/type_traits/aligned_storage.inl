@@ -75,7 +75,7 @@ template <size_t alignment> union lower_alignment
   typename type_aligner<found18, alignment, struct_aligner<void*> >::type                         field18;
   typename type_aligner<found19, alignment, struct_aligner<alignment_function_ptr> >::type        field19;
   typename type_aligner<found20, alignment, struct_aligner<alignment_member_ptr> >::type          field20;
-  typename type_aligner<found21, alignment, struct_aligner<alignment_member_function_ptr>> ::type field21;
+  typename type_aligner<found21, alignment, struct_aligner<alignment_member_function_ptr> >::type field21;
 };
 
 union max_align

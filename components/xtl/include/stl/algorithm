@@ -6,6 +6,7 @@
 #define __MYSTL_ALGORITHM__
 
 #include <stl/iterator_traits.h>
+#include <stl/reverse_iterator.h>
 #include <stl/functional>
 #include <stl/utility>
 #include <stl/tempbuf.h>

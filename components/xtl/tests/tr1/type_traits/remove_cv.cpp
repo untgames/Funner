@@ -17,10 +17,10 @@ DECL_TRANSFORM_TEST(remove_cv_test_14, remove_cv, const volatile[2], [2])
 DECL_TRANSFORM_TEST(remove_cv_test_15, remove_cv, [2], [2])
 DECL_TRANSFORM_TEST(remove_cv_test_16, remove_cv, const*, const*)
 DECL_TRANSFORM_TEST(remove_cv_test_17, remove_cv, const*volatile, const*)
-DECL_TRANSFORM_TEST(remove_cv_test_18, remove_cv, volatile[], [])
-DECL_TRANSFORM_TEST(remove_cv_test_19, remove_cv, const volatile [], [])
-DECL_TRANSFORM_TEST(remove_cv_test_20, remove_cv, const [], [])
-DECL_TRANSFORM_TEST(remove_cv_test_21, remove_cv, [], [])
+//DECL_TRANSFORM_TEST(remove_cv_test_18, remove_cv, volatile[], [])
+//DECL_TRANSFORM_TEST(remove_cv_test_19, remove_cv, const volatile [], [])
+//DECL_TRANSFORM_TEST(remove_cv_test_20, remove_cv, const [], [])
+//DECL_TRANSFORM_TEST(remove_cv_test_21, remove_cv, [], [])
 
 int main ()
 {
@@ -43,10 +43,10 @@ int main ()
   remove_cv_test_15();
   remove_cv_test_16();
   remove_cv_test_17();
-  remove_cv_test_18();
-  remove_cv_test_19();
-  remove_cv_test_20();
-  remove_cv_test_21();
+//  remove_cv_test_18();
+//  remove_cv_test_19();
+//  remove_cv_test_20();
+//  remove_cv_test_21();
 
   return 0;
 }
