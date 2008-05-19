@@ -243,11 +243,11 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события Node
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::signal<void (Node& sender, NodeEvent event), xtl::default_signal_accumulator<void> > Signal;
-    typedef xtl::signal<void (Node& sender, Node& child, NodeSubTreeEvent event), xtl::default_signal_accumulator<void> > SubTreeSignal;
+    typedef xtl::function<void (Node& sender, NodeEvent event)> EventHandler;
+    typedef xtl::function<void (Node& sender, Node& child, NodeSubTreeEvent event)> SubTreeEventHandler;
 
-    Signal&        Event (NodeEvent) const;
-    SubTreeSignal& Event (NodeSubTreeEvent) const;
+    xtl::connection RegisterEventHandler (NodeEvent event, const EventHandler& handler) const;
+    xtl::connection RegisterEventHandler (NodeSubTreeEvent event, const SubTreeEventHandler& handler) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление транзакциями обновления

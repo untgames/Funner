@@ -17,7 +17,7 @@ int main ()
   Node::Pointer node (Node::Create ());
   
   node->SetName   ("node1");
-  node->Event (NodeEvent_AfterUpdate).connect (&on_update1);
+  xtl::auto_connection update1_connection = node->RegisterEventHandler (NodeEvent_AfterUpdate, &on_update1);
   
   printf ("Update color\n");  
   
@@ -27,7 +27,7 @@ int main ()
   
   node->SetName ("node2");
   
-  node->Event (NodeEvent_AfterUpdate).connect (&on_update2);
+  xtl::auto_connection update2_connection = node->RegisterEventHandler (NodeEvent_AfterUpdate, &on_update2);
   
   printf ("Begin update\n");
   

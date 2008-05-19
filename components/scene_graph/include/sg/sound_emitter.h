@@ -47,9 +47,9 @@ class SoundEmitter : public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события SoundEmitter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::signal<void (SoundEmitter& sender, SoundEmitterEvent event), xtl::default_signal_accumulator<void> > Signal;
+    typedef xtl::function<void (SoundEmitter& sender, SoundEmitterEvent event)> EventHandler;
 
-    Signal& Event (SoundEmitterEvent) const;
+    xtl::connection RegisterEventHandler (SoundEmitterEvent, const EventHandler& handler) const;
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

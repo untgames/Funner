@@ -12,6 +12,9 @@ using namespace common;
     Описание реализации Node
 */
 
+typedef xtl::signal<void (Node& sender, NodeEvent event)> NodeSignal;
+typedef xtl::signal<void (Node& sender, Node& child, NodeSubTreeEvent event)> SubTreeNodeSignal;
+
 struct Node::Impl
 {
   scene_graph::Scene* scene;                            //сцена, которой принадлежит объект
@@ -25,9 +28,9 @@ struct Node::Impl
   Node*               prev_child;                       //предыдущий потомок
   Node*               next_child;                       //следующий потомок
   bool                bind_lock;                        //флаг блокировки на вызов BindToParent
-  Signal              signals [NodeEvent_Num];          //сигналы
+  NodeSignal          signals [NodeEvent_Num];          //сигналы
   bool                signal_process [NodeEvent_Num];   //флаги обработки сигналов
-  SubTreeSignal       subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
+  SubTreeNodeSignal   subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
   bool                subtree_signal_process [NodeSubTreeEvent_Num]; //флаги обработки сигналов, возникающих в узлах потомках
   vec3f               local_position;                   //локальное положение
   quatf               local_orientation;                //локальная ориентация
@@ -1078,20 +1081,20 @@ mat4f Node::ObjectTM (Node& object) const
     Подписка на события Node
 */
 
-Node::Signal& Node::Event (NodeEvent event) const
+xtl::connection Node::RegisterEventHandler (NodeEvent event, const EventHandler& handler) const
 {
   if (event < 0 || event >= NodeEvent_Num)
     RaiseInvalidArgument ("scene_graph::Node::Event(NodeEvent)", "event", event);
 
-  return impl->signals [event];
+  return impl->signals [event].connect (handler);
 }
 
-Node::SubTreeSignal& Node::Event (NodeSubTreeEvent event) const
+xtl::connection Node::RegisterEventHandler (NodeSubTreeEvent event, const SubTreeEventHandler& handler) const
 {
   if (event < 0 || event >= NodeSubTreeEvent_Num)
     RaiseInvalidArgument ("scene_graph::Node::Event(NodeSubTreeEvent)", "event", event);
 
-  return impl->subtree_signals [event];
+  return impl->subtree_signals [event].connect (handler);
 }
 
 /*

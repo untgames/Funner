@@ -47,9 +47,9 @@ int main ()
     
     entity->SetName (name);
     
-    entity->Event (NodeEvent_BeforeDestroy).connect (&on_destroy);
-    entity->Event (NodeEvent_BeforeSceneDetach).connect (&on_scene_detach);
-    entity->Event (NodeEvent_AfterSceneAttach).connect (&on_scene_attach);
+    entity->RegisterEventHandler (NodeEvent_BeforeDestroy, &on_destroy);
+    entity->RegisterEventHandler (NodeEvent_BeforeSceneDetach, &on_scene_detach);
+    entity->RegisterEventHandler (NodeEvent_AfterSceneAttach, &on_scene_attach);
     
     entity->BindToScene (scene, NodeBindMode_Capture);
   }
