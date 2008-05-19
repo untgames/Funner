@@ -35,7 +35,6 @@
 #include <sg/sound_emitter.h>
 
 #include <sound/sgplayer.h>
-#include <sound/openal_device.h>
 
 typedef xtl::com_ptr<render::low_level::IDriver>                  DriverPtr;
 typedef xtl::com_ptr<render::low_level::ISwapChain>               SwapChainPtr;

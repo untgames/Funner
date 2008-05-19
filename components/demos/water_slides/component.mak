@@ -19,6 +19,8 @@ WATER_SLIDES.IMPORTS          := ../../common/exports.static.mak ../../system/ex
                                  ../../media/image/compile.static.mak ../../media/image/link.static.mak \
                                  ../../render/opengl_driver/exports.static.mak \
                                  ../../scene_graph/exports.static.mak \
-                                 ../../render/low_level/exports.static.mak ../../sound/openal_device/exports.static.mak \
-                                 ../../sound/manager/exports.static.mak ../../media/sound/default_decoders.link.static.mak \
-                                 ../../media/sound/snddecl.link.static.mak  ../../sound/sgplayer/exports.static.mak
+                                 ../../render/low_level/exports.static.mak ../../sound/openal_device/link.static.mak \
+                                 ../../sound/openal_device/run.static.mak \
+                                 ../../sound/manager/link.static.mak ../../media/sound/default_decoders.link.static.mak \
+                                 ../../media/sound/snddecl.link.static.mak  ../../sound/sgplayer/link.static.mak \
+                                 ../../sound/sgplayer/compile.static.mak

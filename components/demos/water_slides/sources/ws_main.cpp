@@ -4,8 +4,6 @@ int main ()
 {
   try
   {
-    sound::low_level::register_openal_driver ();
-      
       //инициализация приложения
 
     MyApplication::Instance ();  

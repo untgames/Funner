@@ -349,8 +349,7 @@ class TestView: public IGameView
           boat_x = x;
           boat_y = 100 - y;
 
-          sound_emitter->Stop ();
-          sound_emitter->SetPosition ((float)x - 50.f, 50.f - y, 0.f);
+          sound_emitter->SetPosition ((float)x - 50.f, 0.f, 0.f);
           sound_emitter->Play ();
 
         case syslib::WindowEvent_OnMouseMove:
