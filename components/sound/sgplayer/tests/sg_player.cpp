@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/function.h>
 #include <xtl/bind.h>
@@ -52,6 +54,8 @@ int main ()
     SoundManager    manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
     ListenerPtr     listener (scene_graph::Listener::Create ());
 
+    srand (clock ());
+
     listener->BindToParent (scene.Root ());
     sound_emitter->BindToParent (scene.Root ());
     sound_emitter->SetPosition (0.1f, 0.1f, 0.1f);
@@ -67,7 +71,7 @@ int main ()
     sound_emitter->Play ();
 
     Timer timer (bind (&Application::Exit, 0), TEST_WORK_TIME);
-//    Timer timer2 (&TimerHandler, ACTION_TIME);
+    Timer timer2 (&TimerHandler, ACTION_TIME);
     Timer timer3 (&TimerHandler2, ACTION2_TIME);
   
     Application::Run ();
