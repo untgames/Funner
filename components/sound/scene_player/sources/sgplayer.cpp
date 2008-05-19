@@ -9,7 +9,7 @@
 #include <sg/entity.h>
 #include <sg/listener.h>
 #include <sg/sound_emitter.h>
-#include <sound/sgplayer.h>
+#include <sound/scene_player.h>
 #include <math/mathlib.h>
 
 using namespace sound;
@@ -24,27 +24,27 @@ using namespace math;
 #endif
 
 /*
-    Описание реализации SGPlayer
+    Описание реализации ScenePlayer
 */
 
-struct SGPlayerEmitter
+struct ScenePlayerEmitter
 {
   sound::Emitter  emitter;           //эмиттер
   auto_connection play_connection;   //соединение события запуска проигрывания
   auto_connection stop_connection;   //соединение события остановки проигрывания
   auto_connection update_connection; //соединение события обновления свойств
 
-  SGPlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection);
+  ScenePlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection);
 };
 
-SGPlayerEmitter::SGPlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection)
+ScenePlayerEmitter::ScenePlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection)
   : emitter (source_name), play_connection (in_play_connection), stop_connection (in_stop_connection), update_connection (in_update_connection) 
   {}
 
-typedef xtl::shared_ptr<SGPlayerEmitter>                              SGPlayerEmitterPtr;
-typedef stl::hash_map<scene_graph::SoundEmitter*, SGPlayerEmitterPtr> EmitterSet;
+typedef xtl::shared_ptr<ScenePlayerEmitter>                              ScenePlayerEmitterPtr;
+typedef stl::hash_map<scene_graph::SoundEmitter*, ScenePlayerEmitterPtr> EmitterSet;
 
-struct SGPlayer::Impl
+struct ScenePlayer::Impl
 {
   scene_graph::Listener* listener;               //слушатель
   sound::SoundManager&   sound_manager;          //менеджер
@@ -79,7 +79,7 @@ struct SGPlayer::Impl
   void StopEmitter (SoundEmitter& emitter, SoundEmitterEvent event);
 };
 
-SGPlayer::Impl::Impl (sound::SoundManager& in_sound_manager) 
+ScenePlayer::Impl::Impl (sound::SoundManager& in_sound_manager) 
   : listener (0),
     sound_manager (in_sound_manager)
   {}
@@ -88,7 +88,7 @@ SGPlayer::Impl::Impl (sound::SoundManager& in_sound_manager)
    Обновление свойств слушателя/эмиттеров
 */
 
-void SGPlayer::Impl::ListenerUpdate (Node& sender, NodeEvent event)
+void ScenePlayer::Impl::ListenerUpdate (Node& sender, NodeEvent event)
 {
   if (!listener)
     return;
@@ -102,7 +102,7 @@ void SGPlayer::Impl::ListenerUpdate (Node& sender, NodeEvent event)
   sound_manager.SetListener (snd_listener);
 }
 
-void SGPlayer::Impl::EmitterUpdate (Node& sender, NodeEvent event)
+void ScenePlayer::Impl::EmitterUpdate (Node& sender, NodeEvent event)
 {
   EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&sender));
 
@@ -117,18 +117,18 @@ void SGPlayer::Impl::EmitterUpdate (Node& sender, NodeEvent event)
    Добавление Entity сцены в список, если является эмиттером
 */
 
-void SGPlayer::Impl::CheckNode (scene_graph::Node& node)
+void ScenePlayer::Impl::CheckNode (scene_graph::Node& node)
 {
   scene_graph::SoundEmitter* emitter = dynamic_cast<scene_graph::SoundEmitter*> (&node);
 
   if (emitter)
   {
-    SGPlayerEmitterPtr sgplayer_emitter (new SGPlayerEmitter (emitter->SoundDeclarationName (), 
-                                                              emitter->RegisterEventHandler (SoundEmitterEvent_Play, bind (&SGPlayer::Impl::PlayEmitter, this, _1, _2)),
-                                                              emitter->RegisterEventHandler (SoundEmitterEvent_Stop, bind (&SGPlayer::Impl::StopEmitter, this, _1, _2)),
-                                                              node.RegisterEventHandler     (NodeEvent_AfterUpdate,  bind (&SGPlayer::Impl::EmitterUpdate, this, _1, _2))));
+    ScenePlayerEmitterPtr scene_player_emitter (new ScenePlayerEmitter (emitter->SoundDeclarationName (), 
+                                                              emitter->RegisterEventHandler (SoundEmitterEvent_Play, bind (&ScenePlayer::Impl::PlayEmitter, this, _1, _2)),
+                                                              emitter->RegisterEventHandler (SoundEmitterEvent_Stop, bind (&ScenePlayer::Impl::StopEmitter, this, _1, _2)),
+                                                              node.RegisterEventHandler     (NodeEvent_AfterUpdate,  bind (&ScenePlayer::Impl::EmitterUpdate, this, _1, _2))));
 
-    emitters.insert_pair (emitter, sgplayer_emitter);
+    emitters.insert_pair (emitter, scene_player_emitter);
   }
 }
 
@@ -136,12 +136,12 @@ void SGPlayer::Impl::CheckNode (scene_graph::Node& node)
    Обработка добавления/удаления нодов в сцене
 */
 
-void SGPlayer::Impl::ProcessAttachNode (Node& sender, Node& node, NodeSubTreeEvent event)
+void ScenePlayer::Impl::ProcessAttachNode (Node& sender, Node& node, NodeSubTreeEvent event)
 {
   CheckNode (node);
 }
 
-void SGPlayer::Impl::ProcessDetachNode (Node& sender, Node& node, NodeSubTreeEvent event)
+void ScenePlayer::Impl::ProcessDetachNode (Node& sender, Node& node, NodeSubTreeEvent event)
 {
   EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&node));
 
@@ -155,7 +155,7 @@ void SGPlayer::Impl::ProcessDetachNode (Node& sender, Node& node, NodeSubTreeEve
    Проигрывание эмиттеров
 */
 
-void SGPlayer::Impl::PlayEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
+void ScenePlayer::Impl::PlayEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
 {
   EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&emitter));
 
@@ -165,7 +165,7 @@ void SGPlayer::Impl::PlayEmitter (SoundEmitter& emitter, SoundEmitterEvent event
   sound_manager.PlaySound (emitter_iter->second->emitter);
 }
 
-void SGPlayer::Impl::StopEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
+void ScenePlayer::Impl::StopEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
 {
   EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&emitter));
 
@@ -179,11 +179,11 @@ void SGPlayer::Impl::StopEmitter (SoundEmitter& emitter, SoundEmitterEvent event
    Конструктор / деструктор
 */
 
-SGPlayer::SGPlayer (sound::SoundManager& sound_manager)
+ScenePlayer::ScenePlayer (sound::SoundManager& sound_manager)
   : impl (new Impl (sound_manager))
   {}
 
-SGPlayer::~SGPlayer ()
+ScenePlayer::~ScenePlayer ()
 {
 }
 
@@ -191,19 +191,19 @@ SGPlayer::~SGPlayer ()
    Установка слушателя
 */
 
-void SGPlayer::SetListener (scene_graph::Listener& listener)
+void ScenePlayer::SetListener (scene_graph::Listener& listener)
 {
   scene_graph::Scene* scene = listener.Scene ();
 
   if (!scene)
-    Raise <Exception> ("sound::SGPlayer::Impl::Impl", "Listener is not binded to any scene.");
+    Raise <Exception> ("sound::ScenePlayer::Impl::Impl", "Listener is not binded to any scene.");
 
   if (impl->listener)
     if (impl->listener->Scene () == scene)
     {
       impl->listener = &listener;
 
-      impl->update_connection = listener.RegisterEventHandler (NodeEvent_AfterUpdate, bind (&SGPlayer::Impl::ListenerUpdate, impl.get (), _1, _2));
+      impl->update_connection = listener.RegisterEventHandler (NodeEvent_AfterUpdate, bind (&ScenePlayer::Impl::ListenerUpdate, impl.get (), _1, _2));
     
       return;
     }
@@ -213,8 +213,8 @@ void SGPlayer::SetListener (scene_graph::Listener& listener)
 
   impl->emitters.erase (impl->emitters.begin (), impl->emitters.end ());
 
-  scene->Traverse (xtl::bind (&SGPlayer::Impl::CheckNode, impl.get (), _1));
+  scene->Traverse (xtl::bind (&ScenePlayer::Impl::CheckNode, impl.get (), _1));
 
-  impl->bind_node_connection   = scene->Root ().RegisterEventHandler (NodeSubTreeEvent_AfterBind,    bind (&SGPlayer::Impl::ProcessAttachNode, impl.get (), _1, _2, _3));
-  impl->unbind_node_connection = scene->Root ().RegisterEventHandler (NodeSubTreeEvent_BeforeUnbind, bind (&SGPlayer::Impl::ProcessDetachNode, impl.get (), _1, _2, _3));
+  impl->bind_node_connection   = scene->Root ().RegisterEventHandler (NodeSubTreeEvent_AfterBind,    bind (&ScenePlayer::Impl::ProcessAttachNode, impl.get (), _1, _2, _3));
+  impl->unbind_node_connection = scene->Root ().RegisterEventHandler (NodeSubTreeEvent_BeforeUnbind, bind (&ScenePlayer::Impl::ProcessDetachNode, impl.get (), _1, _2, _3));
 }

@@ -11,7 +11,7 @@
 #include <sg/listener.h>
 #include <sg/sound_emitter.h>
 #include <sound/manager.h>
-#include <sound/sgplayer.h>
+#include <sound/scene_player.h>
 #include <sound/device.h>
 
 using namespace sound;
@@ -45,7 +45,7 @@ void TimerHandler2 (Timer&)
 
 int main ()
 {
-  printf ("SGPlayer test.\n");
+  printf ("ScenePlayer test.\n");
 
   try
   {
@@ -62,9 +62,9 @@ int main ()
 
     manager.LoadSoundLibrary (library_file);
 
-    SGPlayer sgplayer (manager);
+    ScenePlayer scene_player (manager);
 
-    sgplayer.SetListener (*(listener.get ()));
+    scene_player.SetListener (*(listener.get ()));
 
     sound_emitter2->BindToParent (scene.Root ());
 
