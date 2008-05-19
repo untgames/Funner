@@ -20,7 +20,6 @@
 #include <syslib/timer.h>
 
 #include <sound/device.h>
-#include <sound/openal_device.h>
 
 namespace sound
 {

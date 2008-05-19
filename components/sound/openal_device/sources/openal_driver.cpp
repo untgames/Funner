@@ -11,14 +11,6 @@ ISoundDevice* create_device (const char* driver_name, const char* device_name, c
   return new OpenALDevice (driver_name, device_name);  
 }
 
-}
-
-namespace sound
-{
-
-namespace low_level
-{
-
 /*
     Регистрация драйвера воспроизведения звука на базе OpenAL
 */
@@ -53,13 +45,6 @@ void register_openal_driver (const char* name)
     throw;
   }
 }
-
-}
-
-}
-
-namespace
-{
 
 /*
     Компонент драйвера проигрывания звука OpenAL

@@ -12,7 +12,7 @@ OPENALDEVICE_COMPONENTS.LIB_DIRS         :=
 OPENALDEVICE_COMPONENTS.LIBS             := 
 OPENALDEVICE_COMPONENTS.COMPILER_CFLAGS  :=
 OPENALDEVICE_COMPONENTS.COMPILER_DEFINES := 
-OPENALDEVICE_COMPONENTS.IMPORTS          := compile.static.mak ../low_level/compile.static.mak ../../media/sound/compile.static.mak ../../system/exports.static.mak 
+OPENALDEVICE_COMPONENTS.IMPORTS          := ../low_level/compile.static.mak ../../media/sound/compile.static.mak ../../system/exports.static.mak 
 
 #Öåëü ¹2 - OPENALDEVICE tests
 OPENALDEVICE_TESTS.TYPE             := test-suite
@@ -24,4 +24,4 @@ OPENALDEVICE_TESTS.DLLS             :=
 OPENALDEVICE_TESTS.DLL_DIRS         :=
 OPENALDEVICE_TESTS.COMPILER_CFLAGS  :=
 OPENALDEVICE_TESTS.COMPILER_DEFINES :=
-OPENALDEVICE_TESTS.IMPORTS          := compile.static.mak link.static.mak run.static.mak ../../common/compile.static.mak ../../system/exports.static.mak ../low_level/compile.static.mak ../../media/sound/default_decoders.link.static.mak
+OPENALDEVICE_TESTS.IMPORTS          := link.static.mak run.static.mak ../../common/compile.static.mak ../../system/exports.static.mak ../low_level/compile.static.mak ../../media/sound/default_decoders.link.static.mak
