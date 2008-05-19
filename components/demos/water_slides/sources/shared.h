@@ -34,7 +34,7 @@
 #include <sg/listener.h>
 #include <sg/sound_emitter.h>
 
-#include <sound/sgplayer.h>
+#include <sound/scene_player.h>
 
 typedef xtl::com_ptr<render::low_level::IDriver>                  DriverPtr;
 typedef xtl::com_ptr<render::low_level::ISwapChain>               SwapChainPtr;
@@ -64,7 +64,7 @@ class IGameView
     virtual size_t Height () { return 100; }    
     
       //создание ресурсов
-    virtual void LoadResources (sound::SGPlayer*, render::low_level::IDevice&) {}
+    virtual void LoadResources (sound::ScenePlayer*, render::low_level::IDevice&) {}
     virtual void FlushResources () {}
     
       //обработчики событий

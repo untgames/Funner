@@ -47,7 +47,7 @@ struct MyApplication::Impl
         syslib::WindowStyle_PopUp : syslib::WindowStyle_Overlapped, configuration.GetInteger ("WindowWidth", DEFAULT_WINDOW_WIDTH), configuration.GetInteger ("WindowHeight", DEFAULT_WINDOW_HEIGHT)),
       driver (get_opengl_driver ()),
       sound_manager (0),
-      sg_player (0)
+      scene_player (0)
     {
       try
       {        
@@ -68,13 +68,13 @@ struct MyApplication::Impl
       {
         try
         {
-          sg_player = new sound::SGPlayer (*sound_manager);
+          scene_player = new sound::ScenePlayer (*sound_manager);
         }
         catch (...)
         {
           delete sound_manager;
           sound_manager = 0;
-          LogMessage ("Can't create sgplayer, exception caught");
+          LogMessage ("Can't create scene player, exception caught");
         }
       }
 
@@ -138,7 +138,7 @@ struct MyApplication::Impl
       try
       {
         delete sound_manager;
-        delete sg_player;
+        delete scene_player;
 
         LogMessage ("Close application");        
         
@@ -221,7 +221,7 @@ struct MyApplication::Impl
         {
           try
           {
-            current_view->LoadResources (sg_player, *device);        
+            current_view->LoadResources (scene_player, *device);        
 
             window.Invalidate (); 
           }
@@ -377,17 +377,17 @@ struct MyApplication::Impl
     }        
 
   private:
-    ::Configuration     configuration; //настрройки
-    OutputFile          log_file;   //файл протолирования
-    OutputTextStream    log_stream; //поток протоколирования работы приложения
-    syslib::Window      window;     //главное окно приложения
-    DriverPtr           driver;     //OpenGL driver
-    SwapChainPtr        swap_chain; //цепочка обмена главного окна приложения
-    DevicePtr           device;     //устройство рендеринга главного окна приложения
+    ::Configuration     configuration;       //настрройки
+    OutputFile          log_file;            //файл протолирования
+    OutputTextStream    log_stream;          //поток протоколирования работы приложения
+    syslib::Window      window;              //главное окно приложения
+    DriverPtr           driver;              //OpenGL driver
+    SwapChainPtr        swap_chain;          //цепочка обмена главного окна приложения
+    DevicePtr           device;              //устройство рендеринга главного окна приложения
     xtl::connection     app_idle_connection; //соединение сигнала обработчика холостого хода приложения
     GameView            current_view;        //текущее игровое отображение
-    sound::SoundManager *sound_manager;       //менеджер звуков
-    sound::SGPlayer     *sg_player;           //проигрыватель звуков
+    sound::SoundManager *sound_manager;      //менеджер звуков
+    sound::ScenePlayer  *scene_player;       //проигрыватель звуков
 };
 
 /*

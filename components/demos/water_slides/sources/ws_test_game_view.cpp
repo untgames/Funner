@@ -161,7 +161,7 @@ class TestView: public IGameView
       current_device->OSSetDepthStencilState (default_depth_stencil_state.get ());
     }
 
-    void LoadResources (sound::SGPlayer* player, IDevice& device)
+    void LoadResources (sound::ScenePlayer* player, IDevice& device)
     {
       if (player)
         player->SetListener (*(listener.get ()));

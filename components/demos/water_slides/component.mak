@@ -22,5 +22,5 @@ WATER_SLIDES.IMPORTS          := ../../common/exports.static.mak ../../system/ex
                                  ../../render/low_level/exports.static.mak ../../sound/openal_device/link.static.mak \
                                  ../../sound/openal_device/run.static.mak \
                                  ../../sound/manager/link.static.mak ../../media/sound/default_decoders.link.static.mak \
-                                 ../../media/sound/snddecl.link.static.mak  ../../sound/sgplayer/link.static.mak \
-                                 ../../sound/sgplayer/compile.static.mak
+                                 ../../media/sound/snddecl.link.static.mak  ../../sound/scene_player/link.static.mak \
+                                 ../../sound/scene_player/compile.static.mak
