@@ -369,11 +369,7 @@ void OpenALSource::BufferUpdate ()
     if (status != AL_PLAYING)
     {
       if (IsPlaying ()) sample_need_update = true;
-      else
-      {
-        printf ("Stopping source %d\n", al_source);
-                    is_playing         = false;
-      }
+      else              is_playing         = false;
     }
     
       //добавление / удаление источника в список активных, заказ буферов
