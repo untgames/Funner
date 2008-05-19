@@ -313,7 +313,7 @@ define process_tests_source_dir
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.$(EXE_SUFFIX)),$$^)),$$(file))
+		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.$(EXE_SUFFIX)),$$^)),$$$$file)
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
