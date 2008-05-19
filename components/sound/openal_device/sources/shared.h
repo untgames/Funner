@@ -39,7 +39,6 @@ class OpenALContext;
 const size_t SOURCE_BUFFERS_COUNT         = 4;    //количество буферов проигрывания на источник
 const size_t MAX_DEVICE_CHANNELS_COUNT    = 1024; //максимальное количество каналов проигрывания
 const size_t DEFAULT_SAMPLE_BUFFER_SIZE   = 4096; //размер буфера сэмплирования по умолчанию
-//const float  SOURCE_BUFFERS_UPDATE_PERIOD = 0.1f; //период обновления буферов
 const float  SOURCE_BUFFERS_UPDATE_PERIOD = 0.01f; //период обновления буферов
 const size_t DEVICE_BUFFERS_POOL_SIZE     = 32;   //размер пула буферов
 

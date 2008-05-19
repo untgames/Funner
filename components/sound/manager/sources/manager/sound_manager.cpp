@@ -142,7 +142,7 @@ void SoundManager::Impl::Init ()
 {
   try
   {
-    device = SoundSystem::CreateDevice (target_configuration.c_str (), &window, init_string.c_str ());
+    device = DevicePtr (SoundSystem::CreateDevice (target_configuration.c_str (), &window, init_string.c_str ()), false);
 
     device->GetCapabilities (capabilities);
     
@@ -281,18 +281,30 @@ void SoundManager::Impl::PlaySound (Emitter& emitter)
     emitter_iter->second->source.maximum_distance   = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumDistance);
 
   }
-  emitter_iter->second->is_playing      = true;
-  emitter_iter->second->play_start_time = clock ();
 
-  if (!free_channels.empty ())
+  if (!emitter_iter->second->is_playing || emitter_iter->second->channel_number == -1)
   {
-    size_t channel_to_use = free_channels.top ();
-    free_channels.pop ();
+    emitter_iter->second->is_playing = true;
+    
+    if (!free_channels.empty ())
+    {
+      size_t channel_to_use = free_channels.top ();
+      free_channels.pop ();
 
-    emitter_iter->second->channel_number = channel_to_use;
-    device->SetSample (channel_to_use, emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_number));
-    device->Seek (channel_to_use, emitter_iter->second->cur_position);
-    device->Play (channel_to_use, emitter_iter->second->sound_declaration->Looping ());
+      emitter_iter->second->channel_number = channel_to_use;
+    }
+    else
+      emitter_iter->second->channel_number = -1;
+  }
+
+  emitter_iter->second->play_start_time = clock ();
+  
+
+  if (emitter_iter->second->channel_number != -1)
+  {
+    device->SetSample (emitter_iter->second->channel_number, emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_number));
+    device->Seek (emitter_iter->second->channel_number, emitter_iter->second->cur_position);
+    device->Play (emitter_iter->second->channel_number, emitter_iter->second->sound_declaration->Looping ());
   }
 }
 

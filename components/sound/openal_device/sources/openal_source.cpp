@@ -301,7 +301,11 @@ void OpenALSource::FillBuffer (size_t al_buffer)
   }      
   
   size_t readed_samples_count = max_samples_count - available_samples_count;
-  ALenum format               = sound_sample.Channels () == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+
+  if (!readed_samples_count)
+    return;
+
+  ALenum format = sound_sample.Channels () == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
 
   OpenALContext& context = device.Context ();  
 
@@ -337,7 +341,7 @@ void OpenALSource::FillBuffers ()
     for (int i=0; i<processed_buffers_count; i++)
       FillBuffer (buffers [i]);
   }
-
+  
   last_buffers_fill_time = clock ();    
 }
 
@@ -365,7 +369,11 @@ void OpenALSource::BufferUpdate ()
     if (status != AL_PLAYING)
     {
       if (IsPlaying ()) sample_need_update = true;
-      else              is_playing         = false;
+      else
+      {
+        printf ("Stopping source %d\n", al_source);
+                    is_playing         = false;
+      }
     }
     
       //добавление / удаление источника в список активных, заказ буферов
@@ -394,7 +402,7 @@ void OpenALSource::BufferUpdate ()
       context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
 
       if (queued_buffers_count)
-        context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers); //FIXME: Invalid operation???
+        context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers); //FIXME: Invalid operation??? при проигрывании звука и малом размере буффера
 
       play_sample_position = sound_sample.SecondsToSamples (Tell ());      
 
