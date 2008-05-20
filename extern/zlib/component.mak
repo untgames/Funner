@@ -10,5 +10,5 @@ ZLIB.INCLUDE_DIRS     := include     #Относительные пути к каталогам c заголовоч
 ZLIB.SOURCE_DIRS      := sources     #Относительные пути к каталогам c исходными файлами
 ZLIB.LIB_DIRS         :=             #Относительные пути к каталогам с библиотеками
 ZLIB.LIBS             :=             #Список используемых при линковке библиотек
-ZLIB.COMPILER_DEFINES := _CRT_SECURE_NO_DEPRECATE #Определения сборки
 ZLIB.COMPILER_CFLAGS  :=             #Флаги сборки (зависят от конфигурации)
+ZLIB.msvc.COMPILER_DEFINES := _CRT_SECURE_NO_DEPRECATE #Определения сборки
