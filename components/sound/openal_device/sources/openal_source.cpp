@@ -245,12 +245,18 @@ void OpenALSource::Seek (float offset)
   float duration = (float)sound_sample.Duration ();
 
   if (offset < 0)        offset = 0.0f;
-  if (offset > duration) offset = duration;
+  if (offset > duration) 
+  {
+    if (is_looped)
+      offset = fmod (duration, offset);
+    else
+      offset = duration;
+  }
 
   play_time_start  = clock ();
   play_time_offset = size_t (offset * CLOCKS_PER_SEC);
 
-  UpdateSourceNotify ();
+  UpdateSampleNotify ();
 }
 
 bool OpenALSource::IsPlaying () const
