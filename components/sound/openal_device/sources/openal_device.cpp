@@ -263,18 +263,15 @@ void OpenALDevice::DebugVPrintf (const char* format, va_list list)
     Установка текущего проигрываемого звука
 */
 
-void OpenALDevice::SetSample (size_t channel, const char* sample_name)
+void OpenALDevice::SetSample (size_t channel, const media::SoundSample& sample)
 {
   if (channel >= channels_count)
     RaiseOutOfRange ("sound::low_level::OpenALDevice::SetSample", "channel", channel, channels_count);
     
-  if (!sample_name)
-    RaiseNullArgument ("sound::low_level::OpenALDevice::SetSample", "sample_name");
-    
-  channels [channel]->SetSample (sample_name);
+  channels [channel]->SetSample (sample);
 }
 
-const char* OpenALDevice::GetSample (size_t channel)
+const media::SoundSample& OpenALDevice::GetSample (size_t channel)
 {
   if (channel >= channels_count)
     RaiseOutOfRange ("sound::low_level::OpenALDevice::GetSample", "channel", channel, channels_count);

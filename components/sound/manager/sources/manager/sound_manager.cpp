@@ -34,7 +34,6 @@ using namespace media;
 struct SoundManagerEmitter
 {
   int               channel_number;               //номер канала проигрывания (-1 - отсечён или не проигрывается)
-  float             start_offset;                 //нормализованный сдвиг начала проигрывания
   float             start_position;               //позиция начала проигрывания в секундах
   float             cur_position;                 //текущая позиция проигрывания в секундах
   clock_t           play_start_time;              //время начала проигрывания
@@ -47,7 +46,10 @@ struct SoundManagerEmitter
   auto_connection   update_volume_connection;     //соединение события изменения громкости
   auto_connection   update_properties_connection; //соединение события изменения свойств
 
-  SoundManagerEmitter  (float normalized_offset, connection in_update_volume_connection, connection in_update_properties_connection);
+  SoundManagerEmitter  (float offset, connection in_update_volume_connection, connection in_update_properties_connection)
+    : channel_number (-1), is_playing (false), start_position (offset), sample_chosen (false), 
+      update_volume_connection (in_update_volume_connection), update_properties_connection (in_update_properties_connection)
+    {}
 };
 
 typedef xtl::shared_ptr<SoundManagerEmitter>            SoundManagerEmitterPtr;
@@ -73,305 +75,292 @@ struct SoundManager::Impl
   SoundDeclarationLibrary     sound_decl_library;       //библиотека описаний звуков
   string                      target_configuration;     //конфигурация устройства вывода
   string                      init_string;              //строка инициализации
+  xtl::trackable              trackable;
 
-  Impl (Window& target_window, const char* in_target_configuration, const char* in_init_string);
+  Impl (Window& target_window, const char* in_target_configuration, const char* in_init_string)
+    : window (target_window), minimize_action (WindowMinimizeAction_Ignore),
+      volume (1.f),
+      minimize_connection (window.RegisterEventHandler (WindowEvent_OnLostFocus, bind (&SoundManager::Impl::OnMinimize, this, _1, _2, _3))),
+      maximize_connection (window.RegisterEventHandler (WindowEvent_OnSetFocus,  bind (&SoundManager::Impl::OnMaximize, this, _1, _2, _3))),
+      change_handle_connection (window.RegisterEventHandler (WindowEvent_OnChangeHandle, bind (&SoundManager::Impl::OnChangeHandle, this, _1, _2, _3)))
+  {
+    if (in_target_configuration)
+      target_configuration = in_target_configuration;
+    if (in_init_string)
+      init_string = in_init_string;
+    
+    Init ();
+  }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Инициализация устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void Init ();
+  void Init ()
+  {
+    try
+    {
+      device = DevicePtr (SoundSystem::CreateDevice (target_configuration.c_str (), &window, init_string.c_str ()), false);
+
+      device->GetCapabilities (capabilities);
+      
+      for (size_t i = free_channels.size (); i; i--)
+        free_channels.pop ();
+
+      for (size_t i = 0; i < capabilities.channels_count; i++)
+        free_channels.push (i);
+
+      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+        if (i->second->is_playing)
+        {
+          PauseSound (*(i->first));
+          PlaySound  (*(i->first));
+        }
+    }
+    catch (Exception& exception)
+    {
+      exception.Touch ("sound::low_level::SoundManager::SoundManager");
+      throw;
+    }
+  }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Блокировка проигрывания звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void SetMute (bool state);
+  void SetMute (bool state)
+  {
+    was_muted = is_muted;
+    is_muted = state;
+    device->SetMute (state);
+  }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ////Функция, вызываемая при сворачивании окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void OnMinimize (Window& window, WindowEvent event, const WindowEventContext& context);
-  void OnMaximize (Window& window, WindowEvent event, const WindowEventContext& context);
+  void OnMinimize (Window& window, WindowEvent event, const WindowEventContext& context)
+  {
+    switch (minimize_action)
+    {
+      case WindowMinimizeAction_Mute:  SetMute (true); break;
+      case WindowMinimizeAction_Pause: 
+        for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+          PauseSound (*(i->first));
+        break;
+    }
+  }
+
+  void OnMaximize (Window& window, WindowEvent event, const WindowEventContext& context)
+  {
+    switch (minimize_action)
+    {
+      case WindowMinimizeAction_Mute:
+        SetMute (was_muted);
+        break;
+      case WindowMinimizeAction_Pause:
+        for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+          PlaySound (*(i->first));
+        break;
+    }
+  }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ////Функция, вызываемая при изменении хэндла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void OnChangeHandle (Window& in_window, WindowEvent event, const WindowEventContext& context);
+  void OnChangeHandle (Window& in_window, WindowEvent event, const WindowEventContext& context)
+  {
+    Init ();
+  }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление свойств эмиттеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void UpdateEmitterVolume     (Emitter& emitter, EmitterEvent event);
-  void UpdateEmitterProperties (Emitter& emitter, EmitterEvent event);
+  void UpdateEmitterVolume (Emitter& emitter, EmitterEvent event)
+  {
+    EmitterSet::iterator emitter_iter = emitters.find (&emitter);
+
+    if (emitter_iter == emitters.end ())
+      return;
+
+    emitter_iter->second->source.gain = emitter_iter->first->Volume ();
+
+    if (emitter_iter->second->channel_number != -1)
+      device->SetSource (emitter_iter->second->channel_number, emitter_iter->second->source);
+  }
+
+  void UpdateEmitterProperties (Emitter& emitter, EmitterEvent event)
+  {
+    EmitterSet::iterator emitter_iter = emitters.find (&emitter);
+
+    if (emitter_iter == emitters.end ())
+      return;
+
+    emitter_iter->second->source.position  = emitter_iter->first->Position  ();
+    emitter_iter->second->source.direction = emitter_iter->first->Direction ();
+    emitter_iter->second->source.velocity  = emitter_iter->first->Velocity  ();
+
+    if (emitter_iter->second->channel_number != -1)
+      device->SetSource (emitter_iter->second->channel_number, emitter_iter->second->source);
+  }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проигрывание звуков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void PlaySound    (Emitter& emitter);
-  void PauseSound   (Emitter& emitter);
-  void StopSound    (Emitter& emitter);
-  void StopPlaying  (EmitterSet::iterator emitter_iter);
-
-  float GetNormalizedOffset (Emitter& emitter);
-};
-
-SoundManagerEmitter::SoundManagerEmitter (float normalized_offset, connection in_update_volume_connection, connection in_update_properties_connection)
-  : channel_number (-1), is_playing (false), start_offset (normalized_offset), sample_chosen (false), 
-    update_volume_connection (in_update_volume_connection), update_properties_connection (in_update_properties_connection)
-  {}
-
-SoundManager::Impl::Impl (Window& target_window, const char* in_target_configuration, const char* in_init_string)
-  : window (target_window), minimize_action (WindowMinimizeAction_Ignore),
-    volume (1.f),
-    minimize_connection (window.RegisterEventHandler (WindowEvent_OnLostFocus, bind (&SoundManager::Impl::OnMinimize, this, _1, _2, _3))),
-    maximize_connection (window.RegisterEventHandler (WindowEvent_OnSetFocus,  bind (&SoundManager::Impl::OnMaximize, this, _1, _2, _3))),
-    change_handle_connection (window.RegisterEventHandler (WindowEvent_OnChangeHandle, bind (&SoundManager::Impl::OnChangeHandle, this, _1, _2, _3)))
-{
-  if (in_target_configuration)
-    target_configuration = in_target_configuration;
-  if (in_init_string)
-    init_string = in_init_string;
-  
-  Init ();
-}
-
-/*
-   Инициализация устройства
-*/
-
-void SoundManager::Impl::Init ()
-{
-  try
+  void PlaySound (Emitter& emitter)
   {
-    device = DevicePtr (SoundSystem::CreateDevice (target_configuration.c_str (), &window, init_string.c_str ()), false);
+    EmitterSet::iterator emitter_iter = emitters.find (&emitter);
 
-    device->GetCapabilities (capabilities);
-    
-    for (size_t i = free_channels.size (); i; i--)
-      free_channels.pop ();
-
-    for (size_t i = 0; i < capabilities.channels_count; i++)
-      free_channels.push (i);
-
-    for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-      if (i->second->is_playing)
-      {
-        PauseSound (*(i->first));
-        PlaySound  (*(i->first));
-      }
-  }
-  catch (Exception& exception)
-  {
-    exception.Touch ("sound::low_level::SoundManager::SoundManager");
-    throw;
-  }
-}
-
-/*
-   Блокировка проигрывания звука
-*/
-
-void SoundManager::Impl::SetMute (bool state)
-{
-  was_muted = is_muted;
-  is_muted = state;
-  device->SetMute (state);
-}
-
-/*
-   Функция, вызываемая при сворачивании окна
-*/
-
-void SoundManager::Impl::OnMinimize (Window& window, WindowEvent event, const WindowEventContext& context)
-{
-  switch (minimize_action)
-  {
-    case WindowMinimizeAction_Mute:  SetMute (true); break;
-    case WindowMinimizeAction_Pause: 
-      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-        PauseSound (*(i->first));
-      break;
-  }
-}
-
-void SoundManager::Impl::OnMaximize (Window& window, WindowEvent event, const WindowEventContext& context)
-{
-  switch (minimize_action)
-  {
-    case WindowMinimizeAction_Mute:
-      SetMute (was_muted);
-      break;
-    case WindowMinimizeAction_Pause:
-      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-        PlaySound (*(i->first));
-      break;
-  }
-}
-
-/*
-   Функция, вызываемая при изменении хэндла
-*/
-
-void SoundManager::Impl::OnChangeHandle (Window& window, WindowEvent event, const WindowEventContext& context)
-{
-  Init ();
-}
-
-/*
-   Обновление свойств эмиттеров
-*/
-
-void SoundManager::Impl::UpdateEmitterVolume (Emitter& emitter, EmitterEvent event)
-{
-  EmitterSet::iterator emitter_iter = emitters.find (&emitter);
-
-  if (emitter_iter == emitters.end ())
-    return;
-
-  emitter_iter->second->source.gain = emitter_iter->first->Volume ();
-
-  if (emitter_iter->second->channel_number != -1)
-    device->SetSource (emitter_iter->second->channel_number, emitter_iter->second->source);
-}
-
-void SoundManager::Impl::UpdateEmitterProperties (Emitter& emitter, EmitterEvent event)
-{
-  EmitterSet::iterator emitter_iter = emitters.find (&emitter);
-
-  if (emitter_iter == emitters.end ())
-    return;
-
-  emitter_iter->second->source.position  = emitter_iter->first->Position  ();
-  emitter_iter->second->source.direction = emitter_iter->first->Direction ();
-  emitter_iter->second->source.velocity  = emitter_iter->first->Velocity  ();
-
-  if (emitter_iter->second->channel_number != -1)
-    device->SetSource (emitter_iter->second->channel_number, emitter_iter->second->source);
-}
-
-/*
-   Проигрывание звуков
-*/
-
-void SoundManager::Impl::PlaySound (Emitter& emitter)
-{
-  EmitterSet::iterator emitter_iter = emitters.find (&emitter);
-
-  if (emitter_iter == emitters.end ())
-    return;
-
-  if (!emitter_iter->second->sample_chosen)
-  {
-    emitter_iter->second->sound_declaration = sound_decl_library.Find (emitter.Source ());
-    if (!emitter_iter->second->sound_declaration)
+    if (emitter_iter == emitters.end ())
       return;
 
-    emitter_iter->second->sample_number = rand () % emitter_iter->second->sound_declaration->SamplesCount ();
-    emitter_iter->second->sound_sample.Load (emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_number));
-    emitter_iter->second->start_position = (float)emitter_iter->second->sound_sample.Duration () * emitter_iter->second->start_offset;
-    emitter_iter->second->cur_position = emitter_iter->second->start_position;
-    emitter_iter->second->sample_chosen = true;
+    if (!emitter_iter->second->sample_chosen)
+    {
+      emitter_iter->second->sound_declaration = sound_decl_library.Find (emitter.Source ());
+      if (!emitter_iter->second->sound_declaration)
+        return;
 
-    emitter_iter->second->source.gain               = emitter_iter->second->sound_declaration->Param (SoundParam_Gain);
-    emitter_iter->second->source.minimum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MinimumGain);
-    emitter_iter->second->source.maximum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumGain);
-    emitter_iter->second->source.inner_angle        = emitter_iter->second->sound_declaration->Param (SoundParam_InnerAngle);
-    emitter_iter->second->source.outer_angle        = emitter_iter->second->sound_declaration->Param (SoundParam_OuterAngle);
-    emitter_iter->second->source.outer_gain         = emitter_iter->second->sound_declaration->Param (SoundParam_OuterGain);
-    emitter_iter->second->source.reference_distance = emitter_iter->second->sound_declaration->Param (SoundParam_ReferenceDistance);
-    emitter_iter->second->source.maximum_distance   = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumDistance);
+      emitter_iter->second->sample_number = rand () % emitter_iter->second->sound_declaration->SamplesCount ();
+      emitter_iter->second->sound_sample.Load (emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_number));
+      emitter_iter->second->cur_position = emitter_iter->second->start_position;
+      emitter_iter->second->sample_chosen = true;
 
+      emitter_iter->second->source.gain               = emitter_iter->second->sound_declaration->Param (SoundParam_Gain);
+      emitter_iter->second->source.minimum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MinimumGain);
+      emitter_iter->second->source.maximum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumGain);
+      emitter_iter->second->source.inner_angle        = emitter_iter->second->sound_declaration->Param (SoundParam_InnerAngle);
+      emitter_iter->second->source.outer_angle        = emitter_iter->second->sound_declaration->Param (SoundParam_OuterAngle);
+      emitter_iter->second->source.outer_gain         = emitter_iter->second->sound_declaration->Param (SoundParam_OuterGain);
+      emitter_iter->second->source.reference_distance = emitter_iter->second->sound_declaration->Param (SoundParam_ReferenceDistance);
+      emitter_iter->second->source.maximum_distance   = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumDistance);
+
+    }
+
+    if (!emitter_iter->second->is_playing || emitter_iter->second->channel_number == -1)
+    {
+      emitter_iter->second->is_playing = true;
+      
+      if (!free_channels.empty ())
+      {
+        size_t channel_to_use = free_channels.top ();
+        free_channels.pop ();
+
+        emitter_iter->second->channel_number = channel_to_use;
+      }
+      else
+        emitter_iter->second->channel_number = -1;
+    }
+
+    emitter_iter->second->play_start_time = clock ();
+    
+
+    if (emitter_iter->second->channel_number != -1)
+    {
+      device->SetSample (emitter_iter->second->channel_number, emitter_iter->second->sound_sample);
+      device->Seek (emitter_iter->second->channel_number, emitter_iter->second->cur_position);
+      device->Play (emitter_iter->second->channel_number, emitter_iter->second->sound_declaration->Looping ());
+    }
   }
 
-  if (!emitter_iter->second->is_playing || emitter_iter->second->channel_number == -1)
+  void PauseSound (Emitter& emitter)
   {
-    emitter_iter->second->is_playing = true;
-    
-    if (!free_channels.empty ())
-    {
-      size_t channel_to_use = free_channels.top ();
-      free_channels.pop ();
+    EmitterSet::iterator emitter_iter = emitters.find (&emitter);
 
-      emitter_iter->second->channel_number = channel_to_use;
+    if (emitter_iter == emitters.end ())
+      return;
+
+    if (emitter_iter->second->is_playing)
+    {
+      float offset = (clock () - emitter_iter->second->play_start_time) / (float)CLOCKS_PER_SEC + emitter_iter->second->start_position;
+
+      if (emitter_iter->second->sound_declaration->Looping ()) 
+        emitter_iter->second->cur_position = fmod (offset, (float)emitter_iter->second->sound_sample.Duration ());
+      else
+        emitter_iter->second->cur_position = offset < emitter_iter->second->sound_sample.Duration () ? offset : 0.0f;
+
+      StopPlaying (emitter_iter);
+    }
+  }
+
+  void StopSound (Emitter& emitter)
+  {
+    EmitterSet::iterator emitter_iter = emitters.find (&emitter);
+
+    if (emitter_iter == emitters.end ())
+      return;
+
+    if (emitter_iter->second->is_playing)
+      StopPlaying (emitter_iter);
+
+    emitters.erase (emitter_iter);
+  }
+
+  void StopPlaying (EmitterSet::iterator emitter_iter)
+  {
+    emitter_iter->second->is_playing = false;
+
+    if (emitter_iter->second->channel_number != -1)
+    {
+      device->Stop (emitter_iter->second->channel_number);
+      free_channels.push (emitter_iter->second->channel_number);
+      emitter_iter->second->channel_number = -1;
+    }
+  }
+
+  float Tell (Emitter& emitter)
+  {
+    EmitterSet::iterator emitter_iter = emitters.find (&emitter);
+
+    if (emitter_iter == emitters.end ())
+      return 0.f;
+
+    if (emitter_iter->second->is_playing)
+    {
+      float offset = (clock () - emitter_iter->second->play_start_time) / (float)CLOCKS_PER_SEC + emitter_iter->second->start_position;
+
+      if (emitter_iter->second->sound_declaration->Looping ()) return fmod (offset, (float)emitter_iter->second->sound_sample.Duration ());
+      else                                                     return offset < emitter_iter->second->sound_sample.Duration () ? offset : 0.0f;
     }
     else
-      emitter_iter->second->channel_number = -1;
+      return emitter_iter->second->cur_position;
   }
 
-  emitter_iter->second->play_start_time = clock ();
-  
-
-  if (emitter_iter->second->channel_number != -1)
+  float Duration (Emitter& emitter) const
   {
-    device->SetSample (emitter_iter->second->channel_number, emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_number));
-    device->Seek (emitter_iter->second->channel_number, emitter_iter->second->cur_position);
-    device->Play (emitter_iter->second->channel_number, emitter_iter->second->sound_declaration->Looping ());
+    EmitterSet::const_iterator emitter_iter = emitters.find (&emitter);
+
+    if (emitter_iter == emitters.end ())
+      return 0.f;
+
+    return (float)emitter_iter->second->sound_sample.Duration ();
   }
-}
 
-void SoundManager::Impl::PauseSound (Emitter& emitter)
-{
-  EmitterSet::iterator emitter_iter = emitters.find (&emitter);
-
-  if (emitter_iter == emitters.end ())
-    return;
-
-  if (emitter_iter->second->is_playing)
+  bool IsPlaying (Emitter& emitter) const
   {
-    float offset = (clock () - emitter_iter->second->play_start_time) / (float)CLOCKS_PER_SEC + emitter_iter->second->start_position;
+    EmitterSet::const_iterator emitter_iter = emitters.find (&emitter);
 
-    if (emitter_iter->second->sound_declaration->Looping ()) 
-      emitter_iter->second->cur_position = fmod (offset, (float)emitter_iter->second->sound_sample.Duration ());
-    else
-      emitter_iter->second->cur_position = offset < emitter_iter->second->sound_sample.Duration () ? offset : 0.0f;
+    if (emitter_iter == emitters.end ())
+      return 0.f;
 
-    StopPlaying (emitter_iter);
+    return emitter_iter->second->is_playing;
   }
-}
 
-void SoundManager::Impl::StopSound (Emitter& emitter)
-{
-  EmitterSet::iterator emitter_iter = emitters.find (&emitter);
-
-  if (emitter_iter == emitters.end ())
-    return;
-
-  if (emitter_iter->second->is_playing)
-    StopPlaying (emitter_iter);
-
-  emitters.erase (emitter_iter);
-}
-
-void SoundManager::Impl::StopPlaying (EmitterSet::iterator emitter_iter)
-{
-  emitter_iter->second->is_playing = false;
-
-  if (emitter_iter->second->channel_number != -1)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация обработчиков события удаления объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+  xtl::connection RegisterDestroyHandler (xtl::trackable::slot_type& handler)
   {
-    device->Stop (emitter_iter->second->channel_number);
-    free_channels.push (emitter_iter->second->channel_number);
-    emitter_iter->second->channel_number = -1;
+    return trackable.connect_tracker (handler);
   }
-}
 
-float SoundManager::Impl::GetNormalizedOffset (Emitter& emitter)
-{
-  EmitterSet::iterator emitter_iter = emitters.find (&emitter);
-
-  if (emitter_iter == emitters.end ())
-    return 0.f;
-
-  if (emitter_iter->second->is_playing)
+  xtl::connection RegisterDestroyHandler (const xtl::trackable::function_type& handler)
   {
-    float offset = (clock () - emitter_iter->second->play_start_time) / (float)CLOCKS_PER_SEC + emitter_iter->second->start_position;
-
-    if (emitter_iter->second->sound_declaration->Looping ()) return fmod (offset, (float)emitter_iter->second->sound_sample.Duration ()) / 
-                                                                   (float)emitter_iter->second->sound_sample.Duration ();
-    else                                                    return offset < emitter_iter->second->sound_sample.Duration () ? 
-                                                                   offset / (float)emitter_iter->second->sound_sample.Duration () : 0.0f;
+    return trackable.connect_tracker (handler);
   }
-  else
-    return emitter_iter->second->cur_position / (float)emitter_iter->second->sound_sample.Duration ();
-}
+
+  xtl::connection RegisterDestroyHandler (const xtl::trackable::function_type& handler, xtl::trackable& trackable)
+  {
+    return trackable.connect_tracker (handler, trackable);
+  }
+};
+
 
 /*
    Конструктор / деструктор
@@ -445,10 +434,10 @@ bool SoundManager::IsMuted () const
    Проигрывание звуков
 */
 
-void SoundManager::PlaySound (Emitter& emitter, float normalized_offset)
+void SoundManager::PlaySound (Emitter& emitter, float offset)
 {
-  SoundManagerEmitterPtr manager_emitter (new SoundManagerEmitter (normalized_offset, emitter.RegisterEventHandler (EmitterEvent_OnUpdateVolume, xtl::bind (&SoundManager::Impl::UpdateEmitterVolume, impl.get (), _1, _2)),
-                                                                                      emitter.RegisterEventHandler (EmitterEvent_OnUpdateProperties, xtl::bind (&SoundManager::Impl::UpdateEmitterProperties, impl.get (), _1, _2))));
+  SoundManagerEmitterPtr manager_emitter (new SoundManagerEmitter (offset, emitter.RegisterEventHandler (EmitterEvent_OnUpdateVolume, xtl::bind (&SoundManager::Impl::UpdateEmitterVolume, impl.get (), _1, _2)),
+                                                                           emitter.RegisterEventHandler (EmitterEvent_OnUpdateProperties, xtl::bind (&SoundManager::Impl::UpdateEmitterProperties, impl.get (), _1, _2))));
 
   impl->emitters.insert_pair (&emitter, manager_emitter);
   impl->PlaySound (emitter);
@@ -461,9 +450,19 @@ void SoundManager::StopSound (Emitter& emitter)
   emitter.Deactivate ();
 }
 
-float SoundManager::GetNormalizedOffset (Emitter& emitter) const
+float SoundManager::Tell (Emitter& emitter) const
 {
-  return impl->GetNormalizedOffset (emitter);
+  return impl->Tell (emitter);
+}
+
+float SoundManager::Duration (Emitter& emitter) const
+{
+  return impl->Duration (emitter);
+}
+
+bool SoundManager::IsPlaying (Emitter& emitter) const
+{
+  return impl->IsPlaying (emitter);
 }
 
 /*
@@ -504,6 +503,25 @@ void SoundManager::ForEachEmitter (const char* type, const ConstEmitterHandler& 
   for (EmitterSet::iterator i = impl->emitters.begin (); i != impl->emitters.end (); ++i)
    if (!strcmp (type, i->second->sound_declaration->Type ()))
      emitter_handler (*(i->first));
+}
+
+/*
+   Регистрация обработчиков события удаления объекта
+*/
+
+xtl::connection SoundManager::RegisterDestroyHandler (xtl::trackable::slot_type& handler)
+{
+  return impl->RegisterDestroyHandler (handler);
+}
+
+xtl::connection SoundManager::RegisterDestroyHandler (const xtl::trackable::function_type& handler)
+{
+  return impl->RegisterDestroyHandler (handler);
+}
+
+xtl::connection SoundManager::RegisterDestroyHandler (const xtl::trackable::function_type& handler, xtl::trackable& trackable)
+{
+  return impl->RegisterDestroyHandler (handler, trackable);
 }
 
 /*

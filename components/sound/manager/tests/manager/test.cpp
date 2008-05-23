@@ -150,7 +150,9 @@ int main ()
 */
     manager.PlaySound (emitter, 0.3f);
 
-    printf ("Current offset = %f\n", manager.GetNormalizedOffset (emitter));
+    printf ("Current offset in seconds = %f\n", manager.Tell (emitter));
+    printf ("Duration in seconds = %f\n", manager.Duration (emitter));
+    printf ("Is Playing = %c\n", manager.IsPlaying (emitter) ? 'y' : 'n');
 
     Timer timer2 (&TimerHandler, ACTION_TIME);
 

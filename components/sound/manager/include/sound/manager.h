@@ -2,6 +2,7 @@
 #define SOUND_MANAGER_HEADER
 
 #include <xtl/functional_fwd>
+#include <xtl/trackable.h>
 #include <stl/auto_ptr.h>
 #include <mathlib.h>
 #include <sound/listener.h>
@@ -137,9 +138,11 @@ class SoundManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проигрывание звуков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  PlaySound           (Emitter& emitter, float normalized_offset=0.0f); //normalized_offset in [0;1]
-    void  StopSound           (Emitter& emitter);
-    float GetNormalizedOffset (Emitter&) const;
+    void  PlaySound        (Emitter& emitter, float offset=0.0f);
+    void  StopSound        (Emitter& emitter);
+    float Tell             (Emitter&) const;
+    float Duration         (Emitter&) const;
+    bool  IsPlaying        (Emitter&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Применение операции ко всем слушателям
@@ -155,6 +158,13 @@ class SoundManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ForEachEmitter (const char* type, const EmitterHandler&);
     void ForEachEmitter (const char* type, const ConstEmitterHandler&) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация обработчиков события удаления объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    xtl::connection RegisterDestroyHandler (xtl::trackable::slot_type& handler);
+    xtl::connection RegisterDestroyHandler (const xtl::trackable::function_type& handler);
+    xtl::connection RegisterDestroyHandler (const xtl::trackable::function_type& handler, xtl::trackable& trackable);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка слушателя

@@ -62,9 +62,11 @@ int main ()
 
     manager.LoadSoundLibrary (library_file);
 
-    ScenePlayer scene_player (manager);
+    ScenePlayer scene_player;
 
-    scene_player.SetListener (*(listener.get ()));
+    scene_player.SetListener (listener.get ());
+
+    scene_player.SetManager (&manager);
 
     sound_emitter2->BindToParent (scene.Root ());
 

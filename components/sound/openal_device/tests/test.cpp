@@ -1,19 +1,26 @@
 #include <stdio.h>
 #include <mathlib.h>
-#include <common/exception.h>
+
 #include <xtl/function.h>
-#include <syslib/application.h>
-#include <syslib/timer.h>
-#include <sound/device.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/bind.h>
 #include <xtl/connection.h>
+
+#include <common/exception.h>
+
+#include <syslib/application.h>
+#include <syslib/timer.h>
+
+#include <sound/device.h>
+
+#include <media/sound.h>
 
 using namespace math;
 using namespace syslib;
 using namespace sound::low_level;
 using namespace sound;
 using namespace xtl;
+using namespace media;
 
 const char* file_name = "data/sound1.ogg";
 //const char* file_name = "data/1.wav";
@@ -141,9 +148,12 @@ int main ()
 
     source.gain         = 0.3f;
     sound_system->SetSource (1, source);
-    sound_system->SetSample (1, file_name2);
+    
+    SoundSample sample1 (file_name), sample2 (file_name2);
+    
+    sound_system->SetSample (1, sample2);
 
-    sound_system->SetSample (0, file_name);
+    sound_system->SetSample (0, sample1);
     sound_system->Seek (0, 1.f);
     sound_system->Play (0, true);
     sound_system->Play (1, true);

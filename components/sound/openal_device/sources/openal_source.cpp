@@ -131,48 +131,49 @@ void OpenALSource::SetSource (const Source& in_source)
    Установка текущего проигрываемого звука
 */
 
-void OpenALSource::SetSample (const char* sample_name)
+void OpenALSource::SetSample (const media::SoundSample& sample)
 {   
-  if (!sample_name)
-    RaiseNullArgument ("sound::low_level::OpenALSource::SetSample", "sample_name");
+  if (!sample.SizeInBytes ())
+  {
+    sound_sample = sample;
+    return;
+  }
 
   try
   {
-    SoundSample new_sample (sample_name);
-
-    if (new_sample.BitsPerSample () != 16)
+    if (sample.BitsPerSample () != 16)
       RaiseNotSupported ("sound::low_level::OpenALSource::SetSample", "Sound sample '%s' has unsupported bits_per_sample=%u",
-                         new_sample.Name (), new_sample.BitsPerSample ());
+                         sample.Name (), sample.BitsPerSample ());
 
-    switch (new_sample.Channels ())
+    switch (sample.Channels ())
     {
       case 1:
       case 2:
         break;
       default:
-        RaiseNotSupported ("sound::low_level::OpenALSource::SetSample", "Sound sample '%s' has unsupported channels_count=%u", new_sample.Name (), new_sample.Channels ());
+        RaiseNotSupported ("sound::low_level::OpenALSource::SetSample", "Sound sample '%s' has unsupported channels_count=%u", sample.Name (), sample.Channels ());
         break;
     }
     
-    sound_sample.Swap (new_sample);
+    sound_sample = sample;
     
     UpdateSampleNotify ();
   }
   catch (std::exception& exception)
   {                                               
-    device.DebugPrintf ("Exception at load sample '%s': %s", sample_name, exception.what ());
+    device.DebugPrintf ("Exception at load sample '%s': %s", sample.Name (), exception.what ());
     Stop ();
   }                                               
   catch (...)
   {
-    device.DebugPrintf ("Unknown exception at load sample '%s'", sample_name);
+    device.DebugPrintf ("Unknown exception at load sample '%s'", sample.Name ());
     Stop ();
   }
 }
 
-const char* OpenALSource::GetSample () const
+const media::SoundSample& OpenALSource::GetSample () const
 {   
-  return sound_sample.Name ();
+  return sound_sample;
 }
 
 /*

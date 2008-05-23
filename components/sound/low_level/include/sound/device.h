@@ -8,6 +8,8 @@
 
 #include <sound/listener.h>
 
+#include <media/sound.h>
+
 namespace sound
 {
 
@@ -87,8 +89,8 @@ struct ISoundDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”становка текущего проигрываемого звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void        SetSample (size_t channel, const char* sample_name) = 0;
-    virtual const char* GetSample (size_t channel) = 0;
+    virtual void                      SetSample (size_t channel, const media::SoundSample& sample) = 0;
+    virtual const media::SoundSample& GetSample (size_t channel) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕроверка цикличности проигрывани€ канала
