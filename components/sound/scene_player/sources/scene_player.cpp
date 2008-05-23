@@ -1,15 +1,22 @@
+#include <time.h>
+
 #include <stl/hash_map>
+
 #include <xtl/bind.h>
 #include <xtl/shared_ptr.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
+
 #include <common/exception.h>
+
 #include <sg/scene.h>
 #include <sg/node.h>
 #include <sg/entity.h>
 #include <sg/listener.h>
 #include <sg/sound_emitter.h>
+
 #include <sound/scene_player.h>
+
 #include <math/mathlib.h>
 
 using namespace sound;
@@ -33,12 +40,15 @@ struct ScenePlayerEmitter
   auto_connection play_connection;   //соединение события запуска проигрывания
   auto_connection stop_connection;   //соединение события остановки проигрывания
   auto_connection update_connection; //соединение события обновления свойств
+  clock_t         play_start_time;   //время начала проигрывания
+  float           play_start_offset; //смещение начала проигрывания
+  bool            is_playing;        //проигрывается ли звук
 
   ScenePlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection);
 };
 
 ScenePlayerEmitter::ScenePlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection)
-  : emitter (source_name), play_connection (in_play_connection), stop_connection (in_stop_connection), update_connection (in_update_connection) 
+  : emitter (source_name), play_connection (in_play_connection), stop_connection (in_stop_connection), update_connection (in_update_connection), is_playing (false), play_start_offset (0.f)
   {}
 
 typedef xtl::shared_ptr<ScenePlayerEmitter>                              ScenePlayerEmitterPtr;
@@ -64,6 +74,9 @@ struct ScenePlayer::Impl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void SetListener (scene_graph::Listener* in_listener)
   {
+    if (listener == in_listener)
+      return;
+
     if (!in_listener)
     {
       listener = in_listener;
@@ -84,8 +97,9 @@ struct ScenePlayer::Impl
 
     if (!listener || (listener->Scene () != scene))
     {
-      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-        sound_manager->StopSound (i->second->emitter);
+      if (sound_manager)
+        for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+          sound_manager->StopSound (i->second->emitter);
 
       emitters.clear ();
 
@@ -101,7 +115,10 @@ struct ScenePlayer::Impl
     listener_unbind_connection = in_listener->RegisterEventHandler (NodeEvent_BeforeUnbind, bind (&ScenePlayer::Impl::ListenerUnbind, this, _1, _2));
 
     if (sound_manager)
+    {
       sound_manager->SetMute (false);
+      ListenerUpdate (*listener, NodeEvent_AfterUpdate);
+    }
   }
 
   scene_graph::Listener* Listener () const
@@ -114,18 +131,37 @@ struct ScenePlayer::Impl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void SetManager (sound::SoundManager* in_sound_manager)
   {
-    sound_manager = in_sound_manager;
+    if (sound_manager == in_sound_manager)
+      return;
 
-    if (!sound_manager)
+    if (!in_sound_manager)
     {
+      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+        sound_manager->StopSound (i->second->emitter);
+
       manager_destroy_connection.disconnect ();
+      
+      sound_manager = 0;
+
       return;
     }
+
+    sound_manager = in_sound_manager;
 
     manager_destroy_connection = in_sound_manager->RegisterDestroyHandler (bind (&ScenePlayer::Impl::ProcessDestroyManager, this));
 
     if (listener)
       SetListener (listener);
+
+    for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+      if (i->second->is_playing)
+      {
+        i->second->play_start_offset += (float)(clock () - i->second->play_start_time) / CLOCKS_PER_SEC;
+
+        i->second->play_start_time = clock ();
+
+        sound_manager->PlaySound (i->second->emitter, i->second->play_start_offset);
+      }
   }
 
   sound::SoundManager* Manager () const
@@ -215,7 +251,7 @@ struct ScenePlayer::Impl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void PlayEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
   {
-    if (!sound_manager || !listener)
+    if (!sound_manager)
       return;
 
     EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&emitter));
@@ -224,6 +260,10 @@ struct ScenePlayer::Impl
       return;
 
     sound_manager->PlaySound (emitter_iter->second->emitter);
+
+    emitter_iter->second->is_playing        = true;
+    emitter_iter->second->play_start_time   = clock ();
+    emitter_iter->second->play_start_offset = 0.f;
   }
 
   void StopEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
@@ -237,6 +277,8 @@ struct ScenePlayer::Impl
       return;
 
     sound_manager->StopSound (emitter_iter->second->emitter);
+
+    emitter_iter->second->is_playing = false;
   }
 };
 

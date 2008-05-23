@@ -4,6 +4,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/function.h>
 #include <xtl/bind.h>
+#include <xtl/ref.h>
 #include <syslib/window.h>
 #include <syslib/timer.h>
 #include <syslib/application.h>
@@ -23,24 +24,28 @@ using namespace math;
 
 const size_t TEST_WORK_TIME = 8000;  //время работы теста (в милисекундах)
 const size_t ACTION_TIME    = 5000;
-const size_t ACTION2_TIME   = 100;
+const size_t ACTION2_TIME   = 250;
 const char* library_file    = "data/test.snddecl";
 
 typedef scene_graph::Listener::Pointer     ListenerPtr;
 typedef scene_graph::SoundEmitter::Pointer SoundEmitterPtr;
 
-SoundEmitterPtr sound_emitter  = SoundEmitter::Create ("declaration1"),
-                sound_emitter2 = SoundEmitter::Create ("declaration2");
-
-void TimerHandler (Timer&)
+void TimerHandler (SoundEmitterPtr sound_emitter, SoundEmitterPtr sound_emitter2)
 {
   sound_emitter->Stop ();
   sound_emitter2->Play ();
 }
 
-void TimerHandler2 (Timer&)
+void TimerHandler2 (SoundEmitterPtr sound_emitter, SoundManager& manager, ScenePlayer& scene_player, bool& set_manager)
 {
   sound_emitter->SetPosition (sound_emitter->Position () * -1.f);
+
+  if (set_manager)
+    scene_player.SetManager (&manager);
+  else
+    scene_player.SetManager (0);
+  
+  set_manager = !set_manager;
 }
 
 int main ()
@@ -53,6 +58,9 @@ int main ()
     Window          window;
     SoundManager    manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
     ListenerPtr     listener (scene_graph::Listener::Create ());
+    SoundEmitterPtr sound_emitter  = SoundEmitter::Create ("declaration1"),
+                    sound_emitter2 = SoundEmitter::Create ("declaration2");
+    bool            set_manager = false;
 
     srand (clock ());
 
@@ -73,8 +81,8 @@ int main ()
     sound_emitter->Play ();
 
     Timer timer (bind (&Application::Exit, 0), TEST_WORK_TIME);
-    Timer timer2 (&TimerHandler, ACTION_TIME);
-    Timer timer3 (&TimerHandler2, ACTION2_TIME);
+//    Timer timer2 (bind (&TimerHandler, sound_emitter, sound_emitter2), ACTION_TIME);
+    Timer timer3 (bind (&TimerHandler2, sound_emitter, ref (manager), ref (scene_player), ref (set_manager)), ACTION2_TIME);
   
     Application::Run ();
   }
