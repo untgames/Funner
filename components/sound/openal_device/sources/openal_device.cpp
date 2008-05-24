@@ -339,12 +339,12 @@ void OpenALDevice::Stop (size_t channel)
   channels [channel]->Stop ();
 }
 
-void OpenALDevice::Seek (size_t channel, float time_in_seconds)
+void OpenALDevice::Seek (size_t channel, float time_in_seconds, SeekMode seek_mode)
 {
   if (channel >= channels_count)
     RaiseOutOfRange ("sound::low_level::OpenALDevice::Seek", "channel", channel, channels_count);
 
-  channels [channel]->Seek (time_in_seconds);
+  channels [channel]->Seek (time_in_seconds, seek_mode);
 }
 
 float OpenALDevice::Tell (size_t channel)

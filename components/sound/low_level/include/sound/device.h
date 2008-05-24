@@ -19,6 +19,15 @@ namespace low_level
 const size_t MaxTryAuxSends = 8; //установка максимального количество подключённых к источнику фильтров
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Режим работы seek
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum SeekMode
+{
+  SeekMode_Clamp,   //обрезание по длине проигрывания
+  SeekMode_Repeat   //остато от деления на длину проигрывания
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Источник звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Source
@@ -109,7 +118,7 @@ struct ISoundDevice
     virtual void  Play  (size_t channel, bool looping = false) = 0;
     virtual void  Pause (size_t channel) = 0;
     virtual void  Stop  (size_t channel) = 0;
-    virtual void  Seek  (size_t channel, float time_in_seconds) = 0;
+    virtual void  Seek  (size_t channel, float time_in_seconds, SeekMode seek_mode) = 0;
     virtual float Tell  (size_t channel) = 0;
     virtual bool  IsPlaying (size_t channel) = 0;
     

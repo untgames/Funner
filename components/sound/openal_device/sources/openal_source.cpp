@@ -240,18 +240,24 @@ float OpenALSource::Tell () const
   else           return offset < duration ? offset : 0.0f;
 }
 
-void OpenALSource::Seek (float offset)
+void OpenALSource::Seek (float offset, SeekMode seek_mode)
 {
   float duration = (float)sound_sample.Duration ();
 
-  if (offset < 0)        offset = 0.0f;
+  if (offset < 0) offset = 0.0f;
+
   if (offset > duration) 
-  {
-    if (is_looped)
-      offset = fmod (duration, offset);
-    else
-      offset = duration;
-  }
+    switch (seek_mode)
+    {
+      case SeekMode_Clamp: 
+        offset = duration;
+        break;
+      case SeekMode_Repeat:
+        offset = fmod (offset, duration);
+        break;
+      default:
+        RaiseInvalidArgument ("sound::low_level::OpenALDevice::Seek", "seek_mode", seek_mode);
+    }
 
   play_time_start  = clock ();
   play_time_offset = size_t (offset * CLOCKS_PER_SEC);

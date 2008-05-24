@@ -154,7 +154,7 @@ int main ()
     sound_system->SetSample (1, sample2);
 
     sound_system->SetSample (0, sample1);
-    sound_system->Seek (0, 1.f);
+    sound_system->Seek (1, 2.f, SeekMode_Clamp);
     sound_system->Play (0, true);
     sound_system->Play (1, true);
 

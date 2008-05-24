@@ -27,6 +27,17 @@ using namespace media;
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
 
+namespace
+{
+
+SeekMode get_seek_mode (bool looping)
+{
+  if (looping) return SeekMode_Repeat;
+  else         return SeekMode_Clamp;
+}
+
+}
+
 /*
     Описание реализации SoundManager
 */
@@ -254,24 +265,13 @@ struct SoundManager::Impl
 
     emitter_iter->second->play_start_time = clock ();
 
-    float duration = (float)emitter_iter->second->sound_sample.Duration ();
-
-    if (offset < 0)        offset = 0.0f;
-    if (offset > duration)
-    {
-      if (emitter_iter->second->sound_declaration->Looping ())
-        offset = fmod (offset, duration);
-      else
-        offset = duration;
-    }
-
-    emitter_iter->second->cur_position    = offset;
+    emitter_iter->second->cur_position = offset;
 
     if (emitter_iter->second->channel_number != -1)
     {
       device->Stop (emitter_iter->second->channel_number);
       device->SetSample (emitter_iter->second->channel_number, emitter_iter->second->sound_sample);
-      device->Seek (emitter_iter->second->channel_number, emitter_iter->second->cur_position);
+      device->Seek (emitter_iter->second->channel_number, emitter_iter->second->cur_position, get_seek_mode (emitter_iter->second->sound_declaration->Looping ()));
       device->Play (emitter_iter->second->channel_number, emitter_iter->second->sound_declaration->Looping ());
     }
   }

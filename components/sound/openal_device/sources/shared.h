@@ -260,7 +260,7 @@ class OpenALDevice : public sound::low_level::ISoundDevice
     void  Play  (size_t channel, bool looping = false);
     void  Pause (size_t channel);
     void  Stop  (size_t channel);
-    void  Seek  (size_t channel, float time_in_seconds);
+    void  Seek  (size_t channel, float time_in_seconds, SeekMode seek_mode);
     float Tell  (size_t channel);
     bool  IsPlaying (size_t channel);
     
@@ -406,7 +406,7 @@ class OpenALSource
     void  Play      (bool looping = false);
     void  Pause     ();
     void  Stop      ();
-    void  Seek      (float time_in_seconds);
+    void  Seek      (float time_in_seconds, SeekMode seek_mode);
     float Tell      () const;
     bool  IsPlaying () const;
     
