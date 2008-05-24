@@ -117,14 +117,22 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name)
 
 OpenALDevice::~OpenALDevice ()
 {
-    //удаление каналов
+  try
+  {
+      //удаление каналов
 
-  for (size_t i=0; i<channels_count; i++)
-    delete channels [i];
-    
-    //очистка пула буферов
-    
-  context.alDeleteBuffers (al_buffers_pool_size, al_buffers_pool);
+    for (size_t i=0; i<channels_count; i++)
+      delete channels [i];
+      
+      //очистка пула буферов
+      
+    context.MakeCurrent ();
+
+    context.alDeleteBuffers (al_buffers_pool_size, al_buffers_pool);
+  }
+  catch (...)
+  {
+  }
 }
 
 /*
@@ -409,6 +417,8 @@ void OpenALDevice::ListenerUpdate ()
     float orientation [6] = {listener.direction.x, listener.direction.y, listener.direction.z, 
                              listener.up.x,        listener.up.y,        listener.up.z};
 
+    context.MakeCurrent ();
+
     context.alListenerfv (AL_POSITION,    &listener.position [0]);
     context.alListenerfv (AL_VELOCITY,    &listener.velocity [0]);
     context.alListenerfv (AL_ORIENTATION, &orientation [0]);
@@ -522,6 +532,8 @@ ALuint OpenALDevice::AllocateSourceBuffer ()
 
   ALuint buffer = WRONG_BUFFER_ID;
   
+  context.MakeCurrent ();
+
   context.alGenBuffers (1, &buffer);
   
   if (buffer == WRONG_BUFFER_ID)
@@ -536,6 +548,8 @@ void OpenALDevice::DeallocateSourceBuffer (ALuint buffer)
   {
     size_t flush_size = DEVICE_BUFFERS_POOL_SIZE / 2 + 1;
     
+    context.MakeCurrent ();
+
     context.alDeleteBuffers (flush_size, al_buffers_pool);
     
     al_buffers_pool_size -= flush_size;

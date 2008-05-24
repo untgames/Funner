@@ -22,33 +22,59 @@ struct Emitter::Impl
   vec3f         velocity;                   //скорость
   EmitterSignal signals [EmitterEvent_Num]; //сигналы
   size_t        activation_count;           //счётчик активаций
+  size_t        sample_index;               //индекс сэмпла для проигрывания
 
-  Impl (const char* source_name);
+  Impl ()
+    : volume (1.f), activation_count (0), sample_index (0)
+    {}
 
-  void Notify (EmitterEvent event, Emitter& emitter);
+  void Notify (EmitterEvent event, Emitter& emitter)
+  {
+    try
+    {
+      signals [event] (emitter, event);
+    }
+    catch (...)
+    {
+    }
+  }
+
+/*
+   Источник звука
+*/
+
+  void SetSource (const char* source_name)
+  {
+    source = source_name;
+  }
+
+  const char* Source () const
+  {
+    return source.c_str ();
+  }
+
+/*
+   Указание номера сэмпла на источнике звука
+*/
+
+  void SetSampleIndex (size_t in_sample_index)
+  {
+    sample_index = in_sample_index;
+  }
+
+  size_t SampleIndex () const
+  {
+    return sample_index;
+  }
+
 };
-
-Emitter::Impl::Impl (const char* source_name)
-  : source (source_name), volume (1.f)
-  {}
-
-void Emitter::Impl::Notify (EmitterEvent event, Emitter& emitter)
-{
-  try
-  {
-    signals [event] (emitter, event);
-  }
-  catch (...)
-  {
-  }
-}
 
 /*
     Конструктор / деструктор
 */
 
-Emitter::Emitter (const char* source_name)
-  : impl (new Impl (source_name))
+Emitter::Emitter ()
+  : impl (new Impl ())
   {}
 
 Emitter::~Emitter ()
@@ -60,9 +86,31 @@ Emitter::~Emitter ()
     Источник звука
 */
 
+void Emitter::SetSource (const char* source_name)
+{
+  if (!source_name)
+    RaiseNullArgument ("sound::Emitter::SetSource", "source_name");
+
+  impl->SetSource (source_name);
+}
+
 const char* Emitter::Source () const
 {
-  return impl->source.c_str ();
+  return impl->Source ();
+}
+
+/*
+   Указание номера сэмпла на источнике звука
+*/
+
+void Emitter::SetSampleIndex (size_t sample_index)
+{
+  impl->SetSampleIndex (sample_index);
+}
+
+size_t Emitter::SampleIndex () const
+{
+  return impl->SampleIndex ();
 }
 
 /*

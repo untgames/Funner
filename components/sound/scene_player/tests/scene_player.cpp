@@ -56,25 +56,30 @@ int main ()
   {
     Scene           scene;
     Window          window;
-    SoundManager    manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
+    SoundManager    manager (window, SoundSystem::FindConfiguration ("OpenAL", "SB*"));
+    SoundManager    manager2 (window, SoundSystem::FindConfiguration ("OpenAL", "Generic*Real*"));
     ListenerPtr     listener (scene_graph::Listener::Create ());
     SoundEmitterPtr sound_emitter  = SoundEmitter::Create ("declaration1"),
                     sound_emitter2 = SoundEmitter::Create ("declaration2");
     bool            set_manager = false;
 
-    srand (clock ());
-
     listener->BindToParent (scene.Root ());
     sound_emitter->BindToParent (scene.Root ());
     sound_emitter->SetPosition (0.1f, 0.1f, 0.1f);
 
+    srand (clock ());
+
     manager.LoadSoundLibrary (library_file);
+    manager2.LoadSoundLibrary (library_file);
 
     ScenePlayer scene_player;
+    ScenePlayer scene_player2;
 
     scene_player.SetListener (listener.get ());
+    scene_player2.SetListener (listener.get ());
 
     scene_player.SetManager (&manager);
+    scene_player2.SetManager (&manager2);
 
     sound_emitter2->BindToParent (scene.Root ());
 

@@ -50,14 +50,15 @@ struct SoundManagerEmitter
   bool              is_playing;                   //статус проигрывания
   SoundDeclaration* sound_declaration;            //описание звука
   SoundSample       sound_sample;                 //звуковой сэмпл (используется для определения длительности звука)
-  size_t            sample_number;                //номер проигрываемого сэмпла
   bool              sample_chosen;                //эммитер ещё не проигрывался
   Source            source;                       //излучатель звука
+  string            source_name;                  //имя источника
+  size_t            sample_index;                 //индекс сэмпла
   auto_connection   update_volume_connection;     //соединение события изменения громкости
   auto_connection   update_properties_connection; //соединение события изменения свойств
 
   SoundManagerEmitter  (connection in_update_volume_connection, connection in_update_properties_connection)
-    : channel_number (-1), is_playing (false), sample_chosen (false), 
+    : channel_number (-1), is_playing (false), sample_chosen (false), sample_index (0),
       update_volume_connection (in_update_volume_connection), update_properties_connection (in_update_properties_connection)
     {}
 };
@@ -228,15 +229,15 @@ struct SoundManager::Impl
       emitter_iter = emitters.insert_pair (&emitter, manager_emitter).first;
     }
 
-    if (!emitter_iter->second->sample_chosen)
+    if (strcmp (emitter_iter->second->source_name.c_str (), emitter.Source ()))
     {
       emitter_iter->second->sound_declaration = sound_decl_library.Find (emitter.Source ());
-      if (!emitter_iter->second->sound_declaration)
-        return;
 
-      emitter_iter->second->sample_number = rand () % emitter_iter->second->sound_declaration->SamplesCount ();
-      emitter_iter->second->sound_sample.Load (emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_number));
-      emitter_iter->second->sample_chosen = true;
+      if (!emitter_iter->second->sound_declaration)
+      {
+        StopSound (emitter);
+        return;
+      }
 
       emitter_iter->second->source.gain               = emitter_iter->second->sound_declaration->Param (SoundParam_Gain);
       emitter_iter->second->source.minimum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MinimumGain);
@@ -246,6 +247,18 @@ struct SoundManager::Impl
       emitter_iter->second->source.outer_gain         = emitter_iter->second->sound_declaration->Param (SoundParam_OuterGain);
       emitter_iter->second->source.reference_distance = emitter_iter->second->sound_declaration->Param (SoundParam_ReferenceDistance);
       emitter_iter->second->source.maximum_distance   = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumDistance);
+
+      emitter_iter->second->source_name = emitter.Source ();
+    }
+
+    if (!emitter_iter->second->sound_declaration)
+      return;
+
+    if (!emitter_iter->second->sample_chosen || emitter_iter->second->sample_index != emitter.SampleIndex ())
+    {
+      emitter_iter->second->sample_index = emitter.SampleIndex ();
+      emitter_iter->second->sound_sample.Load (emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_index % emitter_iter->second->sound_declaration->SamplesCount ()));
+      emitter_iter->second->sample_chosen = true;
     }
 
     if (!emitter_iter->second->is_playing || emitter_iter->second->channel_number == -1)

@@ -8,6 +8,7 @@
 #include <syslib/application.h>
 #include <xtl/function.h>
 #include <xtl/bind.h>
+#include <xtl/ref.h>
 #include <sound/device.h>
 #include <sound/manager.h>
 
@@ -20,8 +21,6 @@ using namespace math;
 const size_t ACTION_TIME = 1000;
 const size_t TEST_WORK_TIME = 15000;  //время работы теста (в милисекундах)
 const char* library_file = "data/test.snddecl";
-
-Emitter emitter ("declaration1");
 
 //печать числа с плавающей точкой
 void print (float value)
@@ -77,7 +76,7 @@ void print (bool arg)
     printf ("false\n");
 }
 
-void TimerHandler (Timer&)
+void TimerHandler (Emitter& emitter)
 {
   emitter.SetPosition (emitter.Position () + vec3f (5.f, 0.f, 0.f));
 }
@@ -95,6 +94,10 @@ int main ()
     Window       window;
     SoundManager manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
     Listener     listener;
+    Emitter      emitter;
+
+    emitter.SetSource ("declaration1");
+    emitter.SetSampleIndex (rand ());
 
 /*
    Testing basic manager properties
@@ -154,7 +157,7 @@ int main ()
     printf ("Duration in seconds = %f\n", manager.Duration (emitter));
     printf ("Is Playing = %c\n", manager.IsPlaying (emitter) ? 'y' : 'n');
 
-    Timer timer2 (&TimerHandler, ACTION_TIME);
+    Timer timer2 (bind (&TimerHandler, ref (emitter)), ACTION_TIME);
 
     Application::Run ();
   }

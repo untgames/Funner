@@ -39,6 +39,8 @@ OpenALSource::~OpenALSource ()
 
   try
   {
+    device.Context ().MakeCurrent ();
+
     device.Context ().alDeleteSources (1, &al_source);
   }
   catch (...)
@@ -322,6 +324,8 @@ void OpenALSource::FillBuffer (size_t al_buffer)
 
   OpenALContext& context = device.Context ();  
 
+  context.MakeCurrent ();
+
   context.alBufferData (al_buffer, format, device.GetSampleBuffer (), sound_sample.SamplesToBytes (readed_samples_count),
                         sound_sample.Frequency ());
   context.alSourceQueueBuffers (al_source, 1, &al_buffer);
@@ -334,6 +338,8 @@ void OpenALSource::FillBuffers ()
 
   ALint          queued_buffers_count = 0, processed_buffers_count = 0;
   OpenALContext& context              = device.Context ();
+
+  context.MakeCurrent ();
 
   context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
   context.alGetSourcei (al_source, AL_BUFFERS_PROCESSED, &processed_buffers_count);
@@ -374,6 +380,8 @@ void OpenALSource::BufferUpdate ()
       //определение состояния проигрывания
 
     int status = AL_STOPPED;
+
+    context.MakeCurrent ();
 
     context.alGetSourcei (al_source, AL_SOURCE_STATE, &status);
 
@@ -447,6 +455,8 @@ void OpenALSource::PropertiesUpdate ()
     if (source_need_update)
     {
       source_need_update = false;
+
+      context.MakeCurrent ();
 
       context.alSourcefv (al_source, AL_POSITION, &source.position [0]);
       context.alSourcefv (al_source, AL_DIRECTION, &source.direction [0]);

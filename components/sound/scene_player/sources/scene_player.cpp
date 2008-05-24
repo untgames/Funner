@@ -48,8 +48,10 @@ struct ScenePlayerEmitter
 };
 
 ScenePlayerEmitter::ScenePlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection)
-  : emitter (source_name), play_connection (in_play_connection), stop_connection (in_stop_connection), update_connection (in_update_connection), is_playing (false), play_start_offset (0.f)
-  {}
+  : play_connection (in_play_connection), stop_connection (in_stop_connection), update_connection (in_update_connection), is_playing (false), play_start_offset (0.f)
+  {
+    emitter.SetSource (source_name);
+  }
 
 typedef xtl::shared_ptr<ScenePlayerEmitter>                              ScenePlayerEmitterPtr;
 typedef stl::hash_map<scene_graph::SoundEmitter*, ScenePlayerEmitterPtr> EmitterSet;
@@ -258,6 +260,8 @@ struct ScenePlayer::Impl
 
     if (emitter_iter == emitters.end ())
       return;
+
+    emitter_iter->second->emitter.SetSampleIndex (rand ());
 
     sound_manager->PlaySound (emitter_iter->second->emitter);
 
