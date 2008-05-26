@@ -7,9 +7,12 @@
 #include <alc.h>
 #include <efx.h>
 
+#include <stl/vector>
+
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/uninitialized_storage.h>
+#include <xtl/ref.h>
 
 #include <common/strlib.h>
 #include <common/exception.h>
@@ -35,11 +38,9 @@ class OpenALContext;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Константы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t SOURCE_BUFFERS_COUNT         = 4;    //количество буферов проигрывания на источник
-const size_t MAX_DEVICE_CHANNELS_COUNT    = 1024; //максимальное количество каналов проигрывания
-const size_t DEFAULT_SAMPLE_BUFFER_SIZE   = 4096; //размер буфера сэмплирования по умолчанию
-const float  SOURCE_BUFFERS_UPDATE_PERIOD = 0.01f; //период обновления буферов
-const size_t DEVICE_BUFFERS_POOL_SIZE     = 32;   //размер пула буферов
+const size_t SOURCE_BUFFERS_COUNT            = 4;    //количество буферов проигрывания на источник
+const size_t DEVICE_BUFFERS_POOL_SIZE        = 32;   //размер пула буферов
+const size_t SOURCE_BUFFERS_UPDATE_FREQUENCY = 100;  //частота обновления буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключения OpenAL
@@ -71,7 +72,7 @@ class OpenALContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OpenALContext  (const char* device_name);
+    OpenALContext  (const char* device_name, const char* init_string = "");
     ~OpenALContext ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +220,7 @@ class OpenALDevice : public sound::low_level::ISoundDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OpenALDevice  (const char* driver_name, const char* device_name);
+    OpenALDevice  (const char* driver_name, const char* device_name, const char* init_string = "");
     ~OpenALDevice ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,7 +236,7 @@ class OpenALDevice : public sound::low_level::ISoundDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество микшируемых каналов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t ChannelsCount () { return channels_count; }
+    size_t ChannelsCount () { return channels.size (); }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего проигрываемого звука
@@ -346,27 +347,27 @@ class OpenALDevice : public sound::low_level::ISoundDevice
 
   private:
     typedef xtl::uninitialized_storage<char> SampleBuffer;
+    typedef stl::vector<OpenALSource*>       ChannelsArray;
 
   private:
-    stl::string    name;                 //имя устройства
-    OpenALContext  context;              //контекст    
-    syslib::Timer  buffer_timer;         //таймер обновления буфера
-    syslib::Timer  listener_timer;       //таймер обновления слушателя
-    syslib::Timer  source_timer;         //таймер обновления источников
-    LogHandler     log_handler;          //функция лога
-    Capabilities   info;                 //информация о устройстве
-    Listener       listener;             //слушатель
-    bool           listener_need_update; //слушатель требует обновления
-    SampleBuffer   sample_buffer;        //буфер сэмплирования        
-    size_t         ref_count;            //количество ссылок на устройство    
-    float          gain;                 //коэффициент усиления
-    bool           is_muted;             //флг блокировки проигрывания
-    size_t         channels_count;       //количество каналов
-    OpenALSource*  channels [MAX_DEVICE_CHANNELS_COUNT]; //каналы проигрывания
-    size_t         buffer_update_frequency;              //частота обновления буффера
-    size_t         source_properties_update_frequency;   //частота обновления свойств источника
-    size_t         listener_properties_update_frequency; //частота обновления свойств слушателя
-    OpenALSource*  first_active_source;  //первый активный источник
+    stl::string    name;                                       //имя устройства
+    OpenALContext  context;                                    //контекст    
+    syslib::Timer  buffer_timer;                               //таймер обновления буфера
+    syslib::Timer  listener_timer;                             //таймер обновления слушателя
+    syslib::Timer  source_timer;                               //таймер обновления источников
+    LogHandler     log_handler;                                //функция лога
+    Capabilities   info;                                       //информация о устройстве
+    Listener       listener;                                   //слушатель
+    bool           listener_need_update;                       //слушатель требует обновления
+    SampleBuffer   sample_buffer;                              //буфер сэмплирования        
+    size_t         ref_count;                                  //количество ссылок на устройство    
+    float          gain;                                       //коэффициент усиления
+    bool           is_muted;                                   //флг блокировки проигрывания
+    ChannelsArray  channels;                                   //каналы проигрывания
+    size_t         buffer_update_frequency;                    //частота обновления буффера
+    size_t         source_properties_update_frequency;         //частота обновления свойств источника
+    size_t         listener_properties_update_frequency;       //частота обновления свойств слушателя
+    OpenALSource*  first_active_source;                        //первый активный источник
     ALuint         al_buffers_pool [DEVICE_BUFFERS_POOL_SIZE]; //пул буферов
     size_t         al_buffers_pool_size;                       //размер пула буферов
 };
@@ -455,6 +456,13 @@ class OpenALSource
     ALuint         al_buffers [SOURCE_BUFFERS_COUNT]; //OpenAL буферы
     OpenALSource   *prev_active, *next_active;        //список активных источников (проигрываемых)
 };
+
+namespace openal
+{
+
+const char* get_al_constant_name (ALenum value);
+
+}
 
 }
 

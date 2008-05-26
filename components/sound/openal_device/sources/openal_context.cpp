@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace sound::low_level;
+using namespace sound::low_level::openal;
 using namespace common;
 using namespace stl;
 using namespace xtl;
@@ -35,79 +36,6 @@ const char* get_al_error_message (ALenum error)
     case AL_INVALID_OPERATION: return "Invalid operation";
     case AL_OUT_OF_MEMORY:     return "Out of memory";
     default:                   return "Unknown error";
-  }
-}
-
-//получение текстового имени константы OpenAL
-const char* get_al_constant_name (ALenum value)
-{
-  switch (value)
-  {
-    case AL_SOURCE_RELATIVE                        : return "AL_SOURCE_RELATIVE";
-    case AL_CONE_INNER_ANGLE                       : return "AL_CONE_INNER_ANGLE";
-    case AL_CONE_OUTER_ANGLE                       : return "AL_CONE_OUTER_ANGLE";
-    case AL_PITCH                                  : return "AL_PITCH";
-    case AL_POSITION                               : return "AL_POSITION";
-    case AL_DIRECTION                              : return "AL_DIRECTION";
-    case AL_VELOCITY                               : return "AL_VELOCITY";
-    case AL_LOOPING                                : return "AL_LOOPING";
-    case AL_BUFFER                                 : return "AL_BUFFER";
-    case AL_GAIN                                   : return "AL_GAIN";
-    case AL_MIN_GAIN                               : return "AL_MIN_GAIN";
-    case AL_MAX_GAIN                               : return "AL_MAX_GAIN";
-    case AL_ORIENTATION                            : return "AL_ORIENTATION";
-    case AL_CHANNEL_MASK                           : return "AL_CHANNEL_MASK";
-    case AL_SOURCE_STATE                           : return "AL_SOURCE_STATE";
-    case AL_INITIAL                                : return "AL_INITIAL";
-    case AL_PLAYING                                : return "AL_PLAYING";
-    case AL_PAUSED                                 : return "AL_PAUSED";
-    case AL_STOPPED                                : return "AL_STOPPED";
-    case AL_BUFFERS_QUEUED                         : return "AL_BUFFERS_QUEUED";
-    case AL_BUFFERS_PROCESSED                      : return "AL_BUFFERS_PROCESSED";
-    case AL_SEC_OFFSET                             : return "AL_SEC_OFFSET";
-    case AL_SAMPLE_OFFSET                          : return "AL_SAMPLE_OFFSET";
-    case AL_BYTE_OFFSET                            : return "AL_BYTE_OFFSET";
-    case AL_SOURCE_TYPE                            : return "AL_SOURCE_TYPE";
-    case AL_STATIC                                 : return "AL_STATIC";
-    case AL_STREAMING                              : return "AL_STREAMING";
-    case AL_UNDETERMINED                           : return "AL_UNDETERMINED";
-    case AL_FORMAT_MONO8                           : return "AL_FORMAT_MONO8";
-    case AL_FORMAT_MONO16                          : return "AL_FORMAT_MONO16";
-    case AL_FORMAT_STEREO8                         : return "AL_FORMAT_STEREO8";
-    case AL_FORMAT_STEREO16                        : return "AL_FORMAT_STEREO16";
-    case AL_REFERENCE_DISTANCE                     : return "AL_REFERENCE_DISTANCE";
-    case AL_ROLLOFF_FACTOR                         : return "AL_ROLLOFF_FACTOR";
-    case AL_CONE_OUTER_GAIN                        : return "AL_CONE_OUTER_GAIN";
-    case AL_MAX_DISTANCE                           : return "AL_MAX_DISTANCE";
-    case AL_FREQUENCY                              : return "AL_FREQUENCY";
-    case AL_BITS                                   : return "AL_BITS";
-    case AL_CHANNELS                               : return "AL_CHANNELS";
-    case AL_SIZE                                   : return "AL_SIZE";
-    case AL_UNUSED                                 : return "AL_UNUSED";
-    case AL_PENDING                                : return "AL_PENDING";
-    case AL_PROCESSED                              : return "AL_PROCESSED";
-    case AL_INVALID_NAME                           : return "AL_INVALID_NAME";
-//    case AL_ILLEGAL_ENUM                           : return "AL_ILLEGAL_ENUM";
-    case AL_INVALID_ENUM                           : return "AL_INVALID_ENUM";
-    case AL_INVALID_VALUE                          : return "AL_INVALID_VALUE";
-//    case AL_ILLEGAL_COMMAND                        : return "AL_ILLEGAL_COMMAND";
-    case AL_INVALID_OPERATION                      : return "AL_INVALID_OPERATION";
-    case AL_OUT_OF_MEMORY                          : return "AL_OUT_OF_MEMORY";
-    case AL_VENDOR                                 : return "AL_VENDOR";
-    case AL_VERSION                                : return "AL_VERSION";
-    case AL_RENDERER                               : return "AL_RENDERER";
-    case AL_EXTENSIONS                             : return "AL_EXTENSIONS";
-    case AL_DOPPLER_FACTOR                         : return "AL_DOPPLER_FACTOR";
-    case AL_DOPPLER_VELOCITY                       : return "AL_DOPPLER_VELOCITY";
-    case AL_SPEED_OF_SOUND                         : return "AL_SPEED_OF_SOUND";
-    case AL_DISTANCE_MODEL                         : return "AL_DISTANCE_MODEL";
-    case AL_INVERSE_DISTANCE                       : return "AL_INVERSE_DISTANCE";
-    case AL_INVERSE_DISTANCE_CLAMPED               : return "AL_INVERSE_DISTANCE_CLAMPED";
-    case AL_LINEAR_DISTANCE                        : return "AL_LINEAR_DISTANCE";
-    case AL_LINEAR_DISTANCE_CLAMPED                : return "AL_LINEAR_DISTANCE_CLAMPED";
-    case AL_EXPONENT_DISTANCE                      : return "AL_EXPONENT_DISTANCE";
-    case AL_EXPONENT_DISTANCE_CLAMPED              : return "AL_EXPONENT_DISTANCE_CLAMPED";
-    default                                        : return 0;
   }
 }
 
@@ -322,22 +250,125 @@ inline void dump_argument (const ArrayWrapper<T>& arg, string& result)
   result += '}';
 }
 
+struct ContextInitProperties
+{
+  size_t frequency;
+
+  ContextInitProperties () : frequency (0) {}
+};
+
+void process_init_string (const char* property, const char* value, ContextInitProperties& properties)
+{
+  if (!common::string_wrappers::stricmp (property, "frequency"))
+    properties.frequency = atoi (value);
+}
+
+}
+
+namespace sound
+{
+
+namespace low_level
+{
+
+namespace openal
+{
+
+//получение текстового имени константы OpenAL
+const char* get_al_constant_name (ALenum value)
+{
+  switch (value)
+  {
+    case AL_SOURCE_RELATIVE                        : return "AL_SOURCE_RELATIVE";
+    case AL_CONE_INNER_ANGLE                       : return "AL_CONE_INNER_ANGLE";
+    case AL_CONE_OUTER_ANGLE                       : return "AL_CONE_OUTER_ANGLE";
+    case AL_PITCH                                  : return "AL_PITCH";
+    case AL_POSITION                               : return "AL_POSITION";
+    case AL_DIRECTION                              : return "AL_DIRECTION";
+    case AL_VELOCITY                               : return "AL_VELOCITY";
+    case AL_LOOPING                                : return "AL_LOOPING";
+    case AL_BUFFER                                 : return "AL_BUFFER";
+    case AL_GAIN                                   : return "AL_GAIN";
+    case AL_MIN_GAIN                               : return "AL_MIN_GAIN";
+    case AL_MAX_GAIN                               : return "AL_MAX_GAIN";
+    case AL_ORIENTATION                            : return "AL_ORIENTATION";
+    case AL_CHANNEL_MASK                           : return "AL_CHANNEL_MASK";
+    case AL_SOURCE_STATE                           : return "AL_SOURCE_STATE";
+    case AL_INITIAL                                : return "AL_INITIAL";
+    case AL_PLAYING                                : return "AL_PLAYING";
+    case AL_PAUSED                                 : return "AL_PAUSED";
+    case AL_STOPPED                                : return "AL_STOPPED";
+    case AL_BUFFERS_QUEUED                         : return "AL_BUFFERS_QUEUED";
+    case AL_BUFFERS_PROCESSED                      : return "AL_BUFFERS_PROCESSED";
+    case AL_SEC_OFFSET                             : return "AL_SEC_OFFSET";
+    case AL_SAMPLE_OFFSET                          : return "AL_SAMPLE_OFFSET";
+    case AL_BYTE_OFFSET                            : return "AL_BYTE_OFFSET";
+    case AL_SOURCE_TYPE                            : return "AL_SOURCE_TYPE";
+    case AL_STATIC                                 : return "AL_STATIC";
+    case AL_STREAMING                              : return "AL_STREAMING";
+    case AL_UNDETERMINED                           : return "AL_UNDETERMINED";
+    case AL_FORMAT_MONO8                           : return "AL_FORMAT_MONO8";
+    case AL_FORMAT_MONO16                          : return "AL_FORMAT_MONO16";
+    case AL_FORMAT_STEREO8                         : return "AL_FORMAT_STEREO8";
+    case AL_FORMAT_STEREO16                        : return "AL_FORMAT_STEREO16";
+    case AL_REFERENCE_DISTANCE                     : return "AL_REFERENCE_DISTANCE";
+    case AL_ROLLOFF_FACTOR                         : return "AL_ROLLOFF_FACTOR";
+    case AL_CONE_OUTER_GAIN                        : return "AL_CONE_OUTER_GAIN";
+    case AL_MAX_DISTANCE                           : return "AL_MAX_DISTANCE";
+    case AL_FREQUENCY                              : return "AL_FREQUENCY";
+    case AL_BITS                                   : return "AL_BITS";
+    case AL_CHANNELS                               : return "AL_CHANNELS";
+    case AL_SIZE                                   : return "AL_SIZE";
+    case AL_UNUSED                                 : return "AL_UNUSED";
+    case AL_PENDING                                : return "AL_PENDING";
+    case AL_PROCESSED                              : return "AL_PROCESSED";
+    case AL_INVALID_NAME                           : return "AL_INVALID_NAME";
+//    case AL_ILLEGAL_ENUM                           : return "AL_ILLEGAL_ENUM";
+    case AL_INVALID_ENUM                           : return "AL_INVALID_ENUM";
+    case AL_INVALID_VALUE                          : return "AL_INVALID_VALUE";
+//    case AL_ILLEGAL_COMMAND                        : return "AL_ILLEGAL_COMMAND";
+    case AL_INVALID_OPERATION                      : return "AL_INVALID_OPERATION";
+    case AL_OUT_OF_MEMORY                          : return "AL_OUT_OF_MEMORY";
+    case AL_VENDOR                                 : return "AL_VENDOR";
+    case AL_VERSION                                : return "AL_VERSION";
+    case AL_RENDERER                               : return "AL_RENDERER";
+    case AL_EXTENSIONS                             : return "AL_EXTENSIONS";
+    case AL_DOPPLER_FACTOR                         : return "AL_DOPPLER_FACTOR";
+    case AL_DOPPLER_VELOCITY                       : return "AL_DOPPLER_VELOCITY";
+    case AL_SPEED_OF_SOUND                         : return "AL_SPEED_OF_SOUND";
+    case AL_DISTANCE_MODEL                         : return "AL_DISTANCE_MODEL";
+    case AL_NONE                                   : return "AL_NONE";
+    case AL_INVERSE_DISTANCE                       : return "AL_INVERSE_DISTANCE";
+    case AL_INVERSE_DISTANCE_CLAMPED               : return "AL_INVERSE_DISTANCE_CLAMPED";
+    case AL_LINEAR_DISTANCE                        : return "AL_LINEAR_DISTANCE";
+    case AL_LINEAR_DISTANCE_CLAMPED                : return "AL_LINEAR_DISTANCE_CLAMPED";
+    case AL_EXPONENT_DISTANCE                      : return "AL_EXPONENT_DISTANCE";
+    case AL_EXPONENT_DISTANCE_CLAMPED              : return "AL_EXPONENT_DISTANCE_CLAMPED";
+    default                                        : return 0;
+  }
+}
+
+}
+
+}
+
 }
 
 /*
     Конструктор / деструктор
 */
 
-OpenALContext::OpenALContext  (const char* device_name)
+OpenALContext::OpenALContext (const char* device_name, const char* init_string)
   : debug_log_state (false)
 {
-  ALint attribs[4] = {0};
-
   if (!device_name)
     RaiseNullArgument ("sound::low_level::OpenALContext::OpenALContext", "device_name");
     
   if (!::strcmp (device_name, "default"))
     device_name = 0;
+
+  if (!init_string)
+    RaiseNullArgument ("sound::low_level::OpenALContext::OpenALContext", "init_string");
     
   device = alcOpenDevice (device_name);
   
@@ -346,12 +377,18 @@ OpenALContext::OpenALContext  (const char* device_name)
 
   efx_present = alcIsExtensionPresent ("ALC_EXT_EFX") == ALC_TRUE;
 
-  if (efx_present)
+  ContextInitProperties properties;
+
+  common::parse_init_string (init_string, xtl::bind (&process_init_string, _1, _2, ref (properties)));
+
+  ALint attribs[4] = {0};
+
+  if (properties.frequency)
   {
-    attribs[0] = ALC_MAX_AUXILIARY_SENDS;
-    attribs[1] = MaxTryAuxSends;    
+    attribs[0] = ALC_FREQUENCY;
+    attribs[1] = properties.frequency;
   }
-  
+
   context = alcCreateContext (device, attribs);
 
   if (!context)

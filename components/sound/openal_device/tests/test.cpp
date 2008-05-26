@@ -27,7 +27,7 @@ const char* file_name = "data/sound1.ogg";
 const char* file_name2 = "data/sound2.ogg";
 
 const size_t SOURCE_UPDATE_TIME = 100;   //период обновления параметров источника звука (в милисекундах)
-const size_t TEST_WORK_TIME     = 8000;  //время работы теста (в милисекундах)
+const size_t TEST_WORK_TIME     = 80000;  //время работы теста (в милисекундах)
 
 float        source_angle = 0;
 Source       source;
@@ -104,7 +104,7 @@ int main ()
 {
   try
   {
-    xtl::com_ptr<ISoundDevice> sound_system (SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("OpenAL", "*"), 0), false);
+    xtl::com_ptr<ISoundDevice> sound_system (SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("OpenAL", "Generic*"), 0, "frequency=44100 min_channels_count=32 max_channels_count=2048"), false);
 
     Capabilities   info;
     Listener       listener;
@@ -119,6 +119,8 @@ int main ()
     printf ("Supported EAX %u.%u.\n", info.eax_major_version, info.eax_minor_version);
     printf ("Supported EFX %u.%u.\n", info.efx_major_version, info.efx_minor_version);
     printf ("Maximum auxilary sends %u.\n", info.max_aux_sends);
+
+    printf ("Distance model is '%s'\n", sound_system->GetStringParam ("al_distance_model"));
 
     sound_system->GetListener (listener);
     dump (listener);
@@ -146,16 +148,16 @@ int main ()
     sound_system->GetSource (0, source);
     dump (source);
 
-    source.gain         = 0.3f;
+//    source.gain         = 0.3f;
     sound_system->SetSource (1, source);
     
     SoundSample sample1 (file_name), sample2 (file_name2);
     
     sound_system->SetSample (1, sample2);
 
-    sound_system->SetSample (0, sample1);
+//    sound_system->SetSample (0, sample1);
     sound_system->Seek (1, 2.f, SeekMode_Clamp);
-    sound_system->Play (0, true);
+//    sound_system->Play (0, true);
     sound_system->Play (1, true);
 
     Timer timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),

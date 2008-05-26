@@ -8,7 +8,7 @@ using namespace common;
 #endif
 
 //период обновлени€ буферов источника в тиках
-const size_t SOURCE_BUFFERS_UPDATE_TICKS = size_t (SOURCE_BUFFERS_UPDATE_PERIOD * CLOCKS_PER_SEC);
+const size_t SOURCE_BUFFERS_UPDATE_TICKS = size_t (1.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY * CLOCKS_PER_SEC);
 
 /*
      онструктор / деструктор
