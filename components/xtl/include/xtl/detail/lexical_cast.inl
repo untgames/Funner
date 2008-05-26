@@ -61,19 +61,18 @@ inline void to_string (stl::string& buffer, const char* value)
   buffer = value ? value : "(null)";
 }
 
-inline void to_string (stl::string& buffer, const wchar_t* value)
+inline void to_string (stl::string& buffer, const wchar_t* string)
 {
-  if (!value)
-    value = L"";      
+  if (!string)
+    string = L"";
 
-  buffer.resize ((wcslen (value) + 1)* 2);
-  
-  size_t len = _snprintf (&buffer [0], buffer.size () + 1, "%S", value);
-  
-  if (len > buffer.size ())
-    len = buffer.size ();
-    
-  buffer.resize (len);
+  int source_size = wcslen (string);
+
+  buffer.fast_resize (source_size * 4);
+
+  int result_size = (int)wcstombs (&buffer [0], string, source_size);  
+
+  buffer.resize (result_size <= 0 ? 0 : result_size);
 }
 
 inline void to_string (stl::string& buffer, const stl::wstring& value)
@@ -97,11 +96,11 @@ namespace detail
 inline void integer_to_string (stl::string& buffer, long value, bool sign)
 {
   const size_t MAX_INTEGER_STRING_SIZE = 16; //максимальное количество знаков для символьного представления целого числа 
-  
+
   char char_buffer [MAX_INTEGER_STRING_SIZE];
 
-  _snprintf (char_buffer, sizeof (char_buffer), sign ? "%d" : "%u", value);
-  
+  xtl_snprintf (char_buffer, sizeof (char_buffer), sign ? "%d" : "%u", value);
+
   buffer = char_buffer;
 }
 
@@ -172,7 +171,7 @@ inline void to_string (stl::string& buffer, const double& value)
   
   char char_buffer [MAX_REAL_STRING_SIZE];
   
-  _snprintf (char_buffer, sizeof (char_buffer), "%.12g", value);
+  xtl_snprintf (char_buffer, sizeof (char_buffer), "%.12g", value);
   
   char_buffer [MAX_REAL_STRING_SIZE - 1] = 0;
   
@@ -193,7 +192,7 @@ inline void to_string (stl::string& buffer, const void* pointer)
 {
   buffer.resize (8);
   
-  _snprintf (&buffer [0], buffer.size () + 1, "%p", pointer);
+  xtl_snprintf (&buffer [0], buffer.size () + 1, "%p", pointer);
 }
 
 template <class T>
@@ -210,6 +209,18 @@ inline stl::string to_string (const T& value)
     Преобразования строка -> тип
 */
 
+namespace detail
+{
+
+template <class Char, class Traits, class Allocator, class Value>
+inline void to_value (const stl::basic_string<Char, Traits, Allocator>& buffer, Value& value)
+{
+  if (buffer.empty () || !xtl::io::read (buffer.c_str (), value))
+    throw bad_lexical_cast (typeid (stl::basic_string<Char, Traits, Allocator>), typeid (Value));
+}
+
+}
+
 inline void to_value (const stl::string& buffer, stl::string& value)
 {
   value = buffer;
@@ -218,48 +229,34 @@ inline void to_value (const stl::string& buffer, stl::string& value)
 inline void to_value (const stl::string& buffer, stl::wstring& value)
 {
   if (buffer.empty ())
+  {
+    value.clear ();
+    return;
+  }
+
+  value.fast_resize (buffer.size ());
+
+  int result_size = (int)mbstowcs (&value [0], buffer.c_str (), buffer.size ());
+
+  if (result_size <= 0)
     throw bad_lexical_cast (typeid (stl::string), typeid (stl::wstring));
 
-  value.resize (buffer.size ());
-  
-  size_t length = _snwprintf (&value [0], value.size (), L"%S", buffer.c_str ());
-  
-  if (length > value.size ())
-    length = value.size ();
-    
-  value.resize (length);
+  value.fast_resize (result_size);
 }
 
 inline void to_value (const stl::string& buffer, wchar_t& value)
 {
-  if (buffer.empty () || !_snscanf (buffer.c_str (), buffer.size (), "%C", &value))
-    throw bad_lexical_cast (typeid (stl::string), typeid (wchar_t));
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, long& value)
 {
-  if (buffer.empty () || !_snscanf (buffer.c_str (), buffer.size (), "%d", &value))
-    throw bad_lexical_cast (typeid (stl::string), typeid (long));
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, unsigned long& value)
 {
-  to_value (buffer, *reinterpret_cast<long*> (&value));
-}
-
-namespace detail
-{
-
-template <class T>
-inline void string_to_integer (const stl::string& buffer, T& value)
-{
-  long tmp;
-  
-  to_value (buffer, tmp);
-  
-  value = static_cast<T> (tmp);
-}
-
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, char& value)
@@ -267,77 +264,64 @@ inline void to_value (const stl::string& buffer, char& value)
   if (buffer.size () != 1)
     throw bad_lexical_cast (typeid (stl::string), typeid (char));
     
-  value = buffer [0];
+  detail::to_value (buffer, value);  
 }
 
 inline void to_value (const stl::string& buffer, signed char& value)
 {
-  to_value (buffer, reinterpret_cast<char&> (value));
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, unsigned char& value)
 {
-  to_value (buffer, reinterpret_cast<char&> (value));
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, short& value)
 {
-  detail::string_to_integer (buffer, value);
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, unsigned short& value)
 {
-  detail::string_to_integer (buffer, value);
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, int& value)
 {
-  detail::string_to_integer (buffer, value);
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, unsigned int& value)
 {
-  detail::string_to_integer (buffer, value);
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, bool& value)
 {
-  long tmp;
-
-  to_value (buffer, tmp);
-  
-  value = tmp != 0;
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, float& value)
 {
-  if (buffer.empty () || !_snscanf (buffer.c_str (), buffer.size (), "%f", &value))
-    throw bad_lexical_cast (typeid (stl::string), typeid (float));
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, double& value)
 {
-  float tmp;
-  
-  to_value (buffer, tmp);
-  
-  value = static_cast<double> (tmp);
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, long double& value)
 {
-  float tmp;
-  
-  to_value (buffer, tmp);
-  
-  value = static_cast<long double> (tmp);  
+  detail::to_value (buffer, value);
 }
 
 inline void to_value (const stl::string& buffer, void*& pointer)
-{
+{ 
   long tmp;
 
-  detail::string_to_integer (buffer, tmp);
+  detail::to_value (buffer, tmp);
 
   pointer = reinterpret_cast<void*> (tmp);
 }

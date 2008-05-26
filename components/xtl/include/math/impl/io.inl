@@ -95,7 +95,9 @@ inline void to_string_helper (String& buffer, const T* values)
 
   for (size_t i=0; i<size; i++)
   {
-    xtl::to_string (item_buffer, values [i]);
+    using namespace xtl;
+  
+    to_string (item_buffer, values [i]);
 
     buffer += item_buffer;
 

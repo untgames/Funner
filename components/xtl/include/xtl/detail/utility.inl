@@ -16,3 +16,13 @@ template <class TrueType, class FalseType> struct select<false, TrueType, FalseT
 //compile-time assertion
 template <bool condition> struct compile_time_assert;
 template <>               struct compile_time_assert<true> { enum { value = 1 }; };
+
+/*
+    Враперы
+*/
+
+template <class T>
+inline const T& make_const_ref (const T& x)
+{
+  return x;
+}

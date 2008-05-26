@@ -2575,32 +2575,32 @@ class deleter
 {
 public:
 
-    deleter(): lock(0)
+    deleter(int& in_lock): lock(&in_lock)
     {
-    }
-
-    ~deleter()
-    {
-        TEST (lock == 0);
     }
 
     void operator() (foo * p)
     {
-        ++lock;
+        ++*lock;
         delete p;
-        --lock;
-    }
- 
-private:
-
-    int lock;
+        --*lock;
+    } 
+    
+  private:
+    int* lock;
 };
  
 void test()
 {
-    shared_ptr<foo> s(new foo, deleter());
+    int lock = 0;
+    {
+
+    shared_ptr<foo> s(new foo, deleter(lock));
     s->setWeak(s);
     s.reset();
+    }
+    
+    TEST (lock == 0);
 }
 
 } // namespace n_report_2
@@ -2693,7 +2693,7 @@ public:
 
 protected:
 
-    ~X() {}
+    virtual ~X() {}
 };
 
 shared_ptr<X> createX();
@@ -3049,7 +3049,7 @@ public:
 
 protected:
 
-    ~X() {}
+    virtual ~X() {}
 };
 
 class Y
@@ -3060,7 +3060,7 @@ public:
 
 protected:
 
-    ~Y() {}
+    virtual ~Y() {}
 };
 
 class impl: public X, public Y

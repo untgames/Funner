@@ -5,7 +5,7 @@ int cnt = 0;
 struct X
 {
   X  () { ++cnt; }
-  ~X () { --cnt; }
+  virtual ~X () { --cnt; }
 
   virtual int id () const { return 1; }
 

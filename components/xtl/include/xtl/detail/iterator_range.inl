@@ -28,7 +28,7 @@ inline bool range_equal (const FwdRange1& r1, const FwdRange2& r2)
 
   size_type size1 = size (r1),
             size2 = size (r2);
-
+            
   return size1 == size2 && stl::equal (begin (r1), end (r1), begin (r2));
 }
 
@@ -201,76 +201,76 @@ inline bool iterator_range<FwdIter>::equal (const iterator_range& r) const
     Сравнение двух интервалов
 */
 
-template <class FwdIter> template <class FwdIter2>
-inline bool iterator_range<FwdIter>::operator == (const iterator_range<FwdIter2>& r) const
+template <class FwdIter1, class FwdIter2>
+inline bool operator == (const iterator_range<FwdIter1>& r1, const iterator_range<FwdIter2>& r2)
 {
-  return detail::range_equal (*this, r);
+  return detail::range_equal (r1, r2);
 }
 
-template <class FwdIter> template <class FwdIter2>
-inline bool iterator_range<FwdIter>::operator != (const iterator_range<FwdIter2>& r) const
+template <class FwdIter1, class FwdIter2>
+inline bool operator != (const iterator_range<FwdIter1>& r1, const iterator_range<FwdIter2>& r2)
 {
-  return !(*this == r);
+  return !(r1 == r2);
 }
 
-template <class FwdIter> template <class FwdIter2>
-inline bool iterator_range<FwdIter>::operator < (const iterator_range<FwdIter2>& r) const
+template <class FwdIter1, class FwdIter2>
+inline bool operator < (const iterator_range<FwdIter1>& r1, const iterator_range<FwdIter2>& r2)
 {
-  return detail::range_less (*this, r);
+  return detail::range_less (r1, r2);
 }
 
-template <class FwdIter> template <class FwdIter2>
-inline bool iterator_range<FwdIter>::operator > (const iterator_range<FwdIter2>& r) const
+template <class FwdIter1, class FwdIter2>
+inline bool operator > (const iterator_range<FwdIter1>& r1, const iterator_range<FwdIter2>& r2)
 {
-  return r < *this;
+  return r2 < r1;
 }
 
-template <class FwdIter> template <class FwdIter2>
-inline bool iterator_range<FwdIter>::operator <= (const iterator_range<FwdIter2>& r) const
+template <class FwdIter1, class FwdIter2>
+inline bool operator <= (const iterator_range<FwdIter1>& r1, const iterator_range<FwdIter2>& r2)
 {
-  return !(r < *this);
+  return !(r2 < r1);
 }
 
-template <class FwdIter> template <class FwdIter2>
-inline bool iterator_range<FwdIter>::operator >= (const iterator_range<FwdIter2>& r) const
+template <class FwdIter1, class FwdIter2>
+inline bool operator >= (const iterator_range<FwdIter1>& r1, const iterator_range<FwdIter2>& r2)
 {
-  return !(*this < r);
+  return !(r1 < r2);
 }
 
-template <class FwdIter> template <class FwdRange>
-inline bool iterator_range<FwdIter>::operator == (const FwdRange& r) const
+template <class FwdIter, class FwdRange>
+inline bool operator == (const iterator_range<FwdIter>& r1, const FwdRange& r2)
 {
-  return detail::range_equal (*this, r);  
+  return detail::range_equal (r1, r2);
 }
 
-template <class FwdIter> template <class FwdRange>
-inline bool iterator_range<FwdIter>::operator != (const FwdRange& r) const
+template <class FwdIter, class FwdRange>
+inline bool operator != (const iterator_range<FwdIter>& r1, const FwdRange& r2)
 {
-  return !(*this == r);
+  return !(r1 == r2);
 }
 
-template <class FwdIter> template <class FwdRange>
-inline bool iterator_range<FwdIter>::operator < (const FwdRange& r) const
+template <class FwdIter, class FwdRange>
+inline bool operator < (const iterator_range<FwdIter>& r1, const FwdRange& r2)
 {
-  return detail::range_less (*this, r);
+  return detail::range_less (r1, r2);
 }
 
-template <class FwdIter> template <class FwdRange>
-inline bool iterator_range<FwdIter>::operator > (const FwdRange& r) const
+template <class FwdIter, class FwdRange>
+inline bool operator > (const iterator_range<FwdIter>& r1, const FwdRange& r2)
 {
-  return r < *this;
+  return r2 < r1;
 }
 
-template <class FwdIter> template <class FwdRange>
-inline bool iterator_range<FwdIter>::operator <= (const FwdRange& r) const
+template <class FwdIter, class FwdRange>
+inline bool operator <= (const iterator_range<FwdIter>& r1, const FwdRange& r2)
 {
-  return !(r < *this);
+  return !(r2 < r1);
 }
 
-template <class FwdIter> template <class FwdRange>
-inline bool iterator_range<FwdIter>::operator >= (const FwdRange& r) const
+template <class FwdIter, class FwdRange>
+inline bool operator >= (const iterator_range<FwdIter>& r1, const FwdRange& r2)
 {
-  return !(*this < r);
+  return !(r1 < r2);
 }
 
 template <class FwdRange, class FwdIter>

@@ -78,11 +78,15 @@ inline float quat_length (const quat<float>& v)
   return sqrtf (quat_norm (v));
 }
 
+#ifdef _MSC_VER
+
 template <>
 inline long double quat_length (const quat<long double>& v)
 {
   return sqrtl (quat_norm (v));
 }
+
+#endif
 
 template <class T> 
 inline T quat_norm (const quat<T>& v)

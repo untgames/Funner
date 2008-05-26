@@ -1,53 +1,53 @@
-#include "test.h"
+#include "../test.h"
 
 //
 
-long __fastcall f_0()
+long __stdcall f_0()
 {
     return 17041L;
 }
 
-long __fastcall f_1(long a)
+long __stdcall f_1(long a)
 {
     return a;
 }
 
-long __fastcall f_2(long a, long b)
+long __stdcall f_2(long a, long b)
 {
     return a + 10 * b;
 }
 
-long __fastcall f_3(long a, long b, long c)
+long __stdcall f_3(long a, long b, long c)
 {
     return a + 10 * b + 100 * c;
 }
 
-long __fastcall f_4(long a, long b, long c, long d)
+long __stdcall f_4(long a, long b, long c, long d)
 {
     return a + 10 * b + 100 * c + 1000 * d;
 }
 
-long __fastcall f_5(long a, long b, long c, long d, long e)
+long __stdcall f_5(long a, long b, long c, long d, long e)
 {
     return a + 10 * b + 100 * c + 1000 * d + 10000 * e;
 }
 
-long __fastcall f_6(long a, long b, long c, long d, long e, long f)
+long __stdcall f_6(long a, long b, long c, long d, long e, long f)
 {
     return a + 10 * b + 100 * c + 1000 * d + 10000 * e + 100000 * f;
 }
 
-long __fastcall f_7(long a, long b, long c, long d, long e, long f, long g)
+long __stdcall f_7(long a, long b, long c, long d, long e, long f, long g)
 {
     return a + 10 * b + 100 * c + 1000 * d + 10000 * e + 100000 * f + 1000000 * g;
 }
 
-long __fastcall f_8(long a, long b, long c, long d, long e, long f, long g, long h)
+long __stdcall f_8(long a, long b, long c, long d, long e, long f, long g, long h)
 {
     return a + 10 * b + 100 * c + 1000 * d + 10000 * e + 100000 * f + 1000000 * g + 10000000 * h;
 }
 
-long __fastcall f_9(long a, long b, long c, long d, long e, long f, long g, long h, long i)
+long __stdcall f_9(long a, long b, long c, long d, long e, long f, long g, long h, long i)
 {
     return a + 10 * b + 100 * c + 1000 * d + 10000 * e + 100000 * f + 1000000 * g + 10000000 * h + 100000000 * i;
 }
@@ -70,7 +70,8 @@ void function_test()
 
 int main()
 {
-    printf ("Results of bind_fastcall_test:\n");
+    printf ("Results of bind_stdcall_test:\n");
+
     function_test();
     return 0;
 }

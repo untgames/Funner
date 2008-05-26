@@ -81,6 +81,37 @@ void print (const volatile test_namespace::Y& y)
 }
 
 template <class T>
+void print (const T* value)
+{
+  print (static_cast<const volatile T*> (value));
+}
+
+void print (const A& a)
+{
+  print (static_cast<const volatile A&> (a));
+}
+
+void print (const B& b)
+{
+  print (static_cast<const volatile B&> (b));
+}
+
+void print (const C& c)
+{
+  print (static_cast<const volatile C&> (c));
+}
+
+void print (const test_namespace::X& x)
+{
+  print (static_cast<const volatile test_namespace::X&> (x));
+}
+
+void print (const test_namespace::Y& y)
+{
+  print (static_cast<const volatile test_namespace::Y&> (y));
+}
+
+template <class T>
 void test (const char* name, const any& a)
 {
   printf ("cast to '%s': ", name);
@@ -159,9 +190,11 @@ int main ()
     test<const volatile C*> ("const volatile class C", a4);
     
     printf ("check dynamic any_multicast (source type - stl::auto_ptr<const class C>)\n");
-    
-    const any a5 (stl::auto_ptr<const C> (new C));
-    
+  
+    stl::auto_ptr<const C> a5_ptr (new C);
+
+    const any a5 (a5_ptr);
+
     test<A*> ("class A", a5);
     test<B*> ("class B", a5);    
     test<C*> ("class C", a5);    

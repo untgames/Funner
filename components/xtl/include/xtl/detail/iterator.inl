@@ -53,10 +53,10 @@ template <class Iter> void iterator_prev (Iter& iter, stl::bidirectional_iterato
 template <class T, class Iter, class Fn> class iterator_base: public iterator_interface<T>
 {
   public:
-    iterator_base (const Iter& in_iter, const Fn& in_selector) : iter (in_iter), selector (in_selector), ref_count (1) {}
-    iterator_base (const iterator_base& i) : iter (i.iter), selector (i.selector), ref_count (1) {}
+    iterator_base (const Iter& in_iter, const Fn& in_selector) : iter (in_iter), ref_count (1), selector (in_selector) {}
+    iterator_base (const iterator_base& i) : iter (i.iter), ref_count (1), selector (i.selector) {}
     
-    bool equal (const iterator_interface& i)
+    bool equal (const iterator_interface<T>& i)
     {
       const iterator_base* impl = dynamic_cast<const iterator_base*> (&i);
 
@@ -82,7 +82,7 @@ template <class T, class Iter, class Fn> class iterator_base: public iterator_in
 
   protected:
     Iter   iter;
-    size_t ref_count;
+    size_t ref_count;        
     Fn     selector;
 };
 
@@ -98,10 +98,10 @@ template <class T, class Iter, class Fn> class iterator_impl: public iterator_ba
   
     iterator_impl (const Iter& in_iter, const Fn& in_selector) : base (in_iter, in_selector) {}
     
-    bool                empty () { return !iter; }
-    void                next  () { detail::iterator_next (iter, iterator_category ()); }
-    void                prev  () { detail::iterator_prev (iter, iterator_category ()); }
-    iterator_interface* clone () { return new iterator_impl (*this); }
+    bool                   empty () { return !iter; }
+    void                   next  () { detail::iterator_next (iter, iterator_category ()); }
+    void                   prev  () { detail::iterator_prev (iter, iterator_category ()); }
+    iterator_interface<T>* clone () { return new iterator_impl (*this); }
 
     T& get ()
     {
@@ -109,7 +109,10 @@ template <class T, class Iter, class Fn> class iterator_impl: public iterator_ba
         throw xtl::bad_iterator_dereference ();
 
       return base::get ();
-    }    
+    }
+
+  protected:
+    using base::iter;
 };
 
 /*
@@ -147,7 +150,10 @@ template <class T, class Iter, class Fn> class range_iterator_impl: public itera
       else               iter = last;
     }
 
-    iterator_interface* clone () { return new range_iterator_impl (*this); }
+    iterator_interface<T>* clone () { return new range_iterator_impl (*this); }
+
+  protected:
+    using base::iter;
 
   private:
     Iter first, last;
@@ -159,18 +165,18 @@ template <class T, class Iter, class Fn> class range_iterator_impl: public itera
 
 template <class T> struct empty_iterator_impl: public iterator_interface<T>
 {
-  const std::type_info& target_type () { return typeid (empty_iterator_impl); }
-  void*                 target      () { return this; }
-  T&                    get         () { throw xtl::bad_iterator_dereference (); }
-  bool                  empty       () { return true; }
-  void                  next        () {}
-  void                  prev        () {}
-  iterator_interface*   clone       () { return this; }
-  size_t                use_count   () { return 1; }
-  void                  addref      () {}
-  void                  release     () {}
+  const std::type_info&  target_type () { return typeid (empty_iterator_impl); }
+  void*                  target      () { return this; }
+  T&                     get         () { throw xtl::bad_iterator_dereference (); }
+  bool                   empty       () { return true; }
+  void                   next        () {}
+  void                   prev        () {}
+  iterator_interface<T>* clone       () { return this; }
+  size_t                 use_count   () { return 1; }
+  void                   addref      () {}
+  void                   release     () {}
 
-  bool equal (const iterator_interface& iter)
+  bool equal (const iterator_interface<T>& iter)
   {
     return this == &iter;
   }

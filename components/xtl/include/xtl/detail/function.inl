@@ -44,7 +44,7 @@ struct function_invoker_base
 template <class Signature, class Fn>
 inline bool function_equals (const function<Signature>& a, Fn& b)
 {
-  const Fn* a_fn = a.target<Fn> ();
+  const Fn* a_fn = a.template target<Fn> ();
   
   return a_fn ? *a_fn == b : false;
 }
@@ -52,7 +52,7 @@ inline bool function_equals (const function<Signature>& a, Fn& b)
 template <class Signature, class Fn>
 inline bool function_equals (Fn& a, const function<Signature>& b)
 {
-  const Fn* b_fn = b.target<Fn> ();
+  const Fn* b_fn = b.template target<Fn> ();
   
   return b_fn ? a == *b_fn : false;
 }
@@ -60,7 +60,7 @@ inline bool function_equals (Fn& a, const function<Signature>& b)
 template <class Signature, class Fn>
 inline bool function_not_equals (const function<Signature>& a, Fn& b)
 {
-  const Fn* a_fn = a.target<Fn> ();
+  const Fn* a_fn = a.template target<Fn> ();
   
   return a_fn ? *a_fn != b : false;
 }
@@ -68,7 +68,7 @@ inline bool function_not_equals (const function<Signature>& a, Fn& b)
 template <class Signature, class Fn>
 inline bool function_not_equals (Fn& a, const function<Signature>& b)
 {
-  const Fn* b_fn = b.target<Fn> ();
+  const Fn* b_fn = b.template target<Fn> ();
   
   return b_fn ? a != *b_fn : false;
 }
@@ -108,8 +108,8 @@ template <class Signature> class function<Signature>::empty_invoker_impl: public
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение типа хранимого функционального объекта и указателя на него
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const std::type_info& target_type () { return typeid (null_ptr_type); }
-    void*                 target      () { return &null; }
+    const std::type_info& target_type () { return typeid (void); }
+    void*                 target      () { return 0; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вызов обработчика для разного набора аргументов

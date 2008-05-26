@@ -1070,9 +1070,6 @@ expression 'i->first.use_count() == i->second + 1' is true
 expression '!p->next->next' is true
 expression '!p->next' is true
 expression 'lock == 0' is true
-expression 'lock == 0' is true
-expression 'lock == 0' is true
-expression 'lock == 0' is true
 expression 'file_instances == 0' is true
 expression 'file_instances == 1' is true
 expression 'fread_called' is true

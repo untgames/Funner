@@ -1,5 +1,7 @@
 Results of any_reference_test:
 A::A()
+A::A()
 A::A(const A&)
+A::~A()
 A::~A()
 A::~A()

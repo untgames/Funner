@@ -1,6 +1,6 @@
-#include "test.h"
-
 #include <stl/string>
+
+#include "test.h"
 
 using namespace stl;
 
@@ -28,10 +28,9 @@ struct remove_connection {
 bool operator==(const remove_connection& x, const remove_connection& y)
 { return x.value == y.value && x.idx == y.idx; }
 
-static void
-test_remove_self()
+static void test_remove_self()
 {
-  signal<void ()> s0;
+  xtl::signal<void ()> s0;
 
   connections[0] = s0.connect(remove_connection(0));
   connections[1] = s0.connect(remove_connection(1));
@@ -150,7 +149,7 @@ test_remove_self()
 static void
 test_remove_prior()
 {
-  signal<void ()> s0;
+  xtl::signal<void ()> s0;
 
   connections[0] = s0.connect(remove_connection(0));
   connections[1] = s0.connect(remove_connection(1, 0));
@@ -195,7 +194,7 @@ test_remove_prior()
 static void
 test_remove_after()
 {
-  signal<void ()> s0;
+  xtl::signal<void ()> s0;
 
   connections[0] = s0.connect(remove_connection(0, 1));
   connections[1] = s0.connect(remove_connection(1));
@@ -234,7 +233,7 @@ test_remove_after()
 static void
 test_bloodbath()
 {
-  signal<void ()> s0;
+  xtl::signal<void ()> s0;
 
   connections[0] = s0.connect(remove_connection(0, 1));
   connections[1] = s0.connect(remove_connection(1, 1));
@@ -262,7 +261,7 @@ test_bloodbath()
 static void
 test_disconnect_equal()
 {
-  signal<void ()> s0;
+  xtl::signal<void ()> s0;
 
   connections[0] = s0.connect(remove_connection(0));
   connections[1] = s0.connect(remove_connection(1));

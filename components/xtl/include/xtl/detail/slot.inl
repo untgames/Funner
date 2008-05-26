@@ -23,7 +23,7 @@ template <class Signature> class slot_impl: public connection_impl
     }
     
     slot_impl (const function_type& in_fn, slot_impl* in_next_slot) :
-      fn (in_fn), next_slot (in_next_slot), prev_slot (in_next_slot->prev_slot), lock_count (0), wait_next_slot (0), is_blocked (false)
+      fn (in_fn), prev_slot (in_next_slot->prev_slot), next_slot (in_next_slot), lock_count (0), wait_next_slot (0), is_blocked (false)
     {
       prev_slot->next_slot = next_slot->prev_slot = this;
     }
@@ -313,7 +313,7 @@ inline auto_slot<Signature>::auto_slot (const function_type& fn)
 template <class Signature>
 inline auto_slot<Signature>::~auto_slot ()
 {
-  disconnect ();
+  base::disconnect ();
 }
 
 template <class Signature>

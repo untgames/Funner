@@ -57,11 +57,22 @@ struct null_ptr_type
   template <class T> operator T* () const { return 0; }
 };
 
-#ifdef __GNUC__
-__attribute((unused))
-#endif
+#ifdef _MSC_VER
 
 static null_ptr_type null;
+
+#else
+
+namespace
+{
+
+null_ptr_type null;
+
+}
+
+#endif
+
+
 
 /*
     ”правл€ющие шаблоны
@@ -98,6 +109,12 @@ namespace noncopyable_namespace  //защита от ADL
 }
 
 typedef noncopyable_namespace::noncopyable noncopyable;
+
+/*
+    ¬раперы
+*/
+
+template <class T> const T& make_const_ref (const T& x);
 
 #include <xtl/detail/utility.inl>
 #include <xtl/detail/pair_tuple.inl>

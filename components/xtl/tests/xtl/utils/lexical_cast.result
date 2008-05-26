@@ -24,7 +24,7 @@ expression '1 == lexical_cast<int>(1)' is true
 expression '(stl::numeric_limits<int>::max)() == lexical_cast<int>((stl::numeric_limits<int>::max)())' is true
 expression '1 == lexical_cast<int>(1.0)' is true
 executed 'lexical_cast<int>(1.23)'
-executed 'lexical_cast<int>(1e20)'
+exception 'bad_lexical_cast' accepted
 expression '1 == lexical_cast<int>(true)' is true
 expression '0 == lexical_cast<int>(false)' is true
 expression '123 == lexical_cast<int>("123")' is true
@@ -115,7 +115,7 @@ exception 'bad_lexical_cast' accepted
 conversion to wchar_t:
 expression 'L'1' == lexical_cast<wchar_t>(1)' is true
 expression 'L'0' == lexical_cast<wchar_t>(0)' is true
-executed 'lexical_cast<wchar_t>(123)'
+exception 'bad_lexical_cast' accepted
 expression 'L'1' == lexical_cast<wchar_t>(1.0)' is true
 expression 'L'0' == lexical_cast<wchar_t>(0.0)' is true
 expression 'L'1' == lexical_cast<wchar_t>(true)' is true
@@ -125,11 +125,11 @@ expression 'L' ' == lexical_cast<wchar_t>(L' ')' is true
 expression 'L'A' == lexical_cast<wchar_t>(L"A")' is true
 expression 'L' ' == lexical_cast<wchar_t>(L" ")' is true
 exception 'bad_lexical_cast' accepted
-executed 'lexical_cast<wchar_t>(L"Test")'
+exception 'bad_lexical_cast' accepted
 expression 'L'A' == lexical_cast<wchar_t>(stl::wstring(L"A"))' is true
 expression 'L' ' == lexical_cast<wchar_t>(stl::wstring(L" "))' is true
 exception 'bad_lexical_cast' accepted
-executed 'lexical_cast<wchar_t>(stl::wstring(L"Test"))'
+exception 'bad_lexical_cast' accepted
 conversion from wstring:
 expression '123 == lexical_cast<int>(stl::wstring(L"123"))' is true
 exception 'bad_lexical_cast' accepted
@@ -148,4 +148,13 @@ expression 'L"A" == lexical_cast<stl::wstring>(L'A')' is true
 expression 'L" " == lexical_cast<stl::wstring>(L' ')' is true
 expression 'L"Test" == lexical_cast<stl::wstring>(L"Test")' is true
 expression 'L" " == lexical_cast<stl::wstring>(L" ")' is true
-exception: xtl::bad_lexical_cast
+expression 'L"" == lexical_cast<stl::wstring>(L"")' is true
+expression 'L"Test" == lexical_cast<stl::wstring>(stl::wstring(L"Test"))' is true
+expression 'L" " == lexical_cast<stl::wstring>(stl::wstring(L" "))' is true
+expression 'L"" == lexical_cast<stl::wstring>(stl::wstring(L""))' is true
+bad_lexical_cast test:
+expression '&e.source_type() == &typeid(stl::string)' is true
+expression '&e.target_type() == &typeid(int)' is true
+no whitespace stripping test:
+executed 'lexical_cast<int>(" 123")'
+exception 'bad_lexical_cast' accepted

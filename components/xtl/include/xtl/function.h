@@ -49,18 +49,18 @@ template <class Signature> class function
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-                               function  ();
-                               function  (const function&);
-    template <class Fn>        function  (Fn fn);
-    template <class Signature> function  (const function<Signature>&);
-                               ~function ();
+                                function  ();
+                                function  (const function&);
+    template <class Fn>         function  (Fn fn);
+    template <class Signature1> function  (const function<Signature1>&);
+                                ~function ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-                               function& operator = (const function&);
-    template <class Fn>        function& operator = (Fn);
-    template <class Signature> function& operator = (const function<Signature>&);
+                                function& operator = (const function&);
+    template <class Fn>         function& operator = (Fn);
+    template <class Signature1> function& operator = (const function<Signature1>&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка
@@ -72,8 +72,8 @@ template <class Signature> class function
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const std::type_info& target_type () const;
 
-    template <class T>       T*  target ();
-    template <class T> const T*  target () const;
+    template <class T>       T* target ();
+    template <class T> const T* target () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка хранит ли функция функциональный объект эквивалентный заданному
@@ -112,8 +112,8 @@ template <class Signature> class function
     template <class Fn> bool operator == (Fn) const;
     template <class Fn> bool operator != (Fn) const;
 
-    template <class Signature, class Fn> friend bool operator == (Fn, const function<Signature>&);
-    template <class Signature, class Fn> friend bool operator != (Fn, const function<Signature>&);
+    template <class Signature1, class Fn> friend bool operator == (Fn, const function<Signature1>&);
+    template <class Signature1, class Fn> friend bool operator != (Fn, const function<Signature1>&);
 
   private:                        
     template <class Fn> static invoker_type* create_invoker (Fn&);

@@ -17,6 +17,8 @@ using namespace tr1;
                                         correct_result ? "true" : "false"); \
 }
 
+#define TEST(X) printf ((X)?"expression '%s' is true\n":"failed expression '%s'\n",#X);
+
 #define CHECK_TYPE(EXPECTED_TYPE, TYPE_EXPRESSION) \
 { \
   if (is_same<TYPE_EXPRESSION, EXPECTED_TYPE>::value) \

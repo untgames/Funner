@@ -238,110 +238,110 @@ struct binder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
      result_type operator () ()
      {
-       return eval (tie ());
+       return eval (make_const_ref (tie ()));
      }
 
      template <class A1> result_type operator () (A1& a1)
      {
-       return eval (tie (a1));
+       return eval (make_const_ref (tie (a1)));
      }
 
      template <class A1, class A2> result_type operator () (A1& a1, A2& a2)
      {
-       return eval (tie (a1, a2));
+       return eval (make_const_ref (tie (a1, a2)));
      }
 
      template <class A1, class A2, class A3> result_type operator () (A1& a1, A2& a2, A3& a3)
      {
-       return eval (tie (a1, a2, a3));
+       return eval (make_const_ref (tie (a1, a2, a3)));
      }
 
      template <class A1, class A2, class A3, class A4> result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4)
      {
-       return eval (tie (a1, a2, a3, a4));
+       return eval (make_const_ref (tie (a1, a2, a3, a4)));
      }
 
      template <class A1, class A2, class A3, class A4, class A5> result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4, A5& a5)
      {
-       return eval (tie (a1, a2, a3, a4, a5));
+       return eval (make_const_ref (tie (a1, a2, a3, a4, a5)));
      }
 
      template <class A1, class A2, class A3, class A4, class A5, class A6>
      result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4, A5& a5, A6& a6)
      {
-       return eval (tie (a1, a2, a3, a4, a5, a6));
+       return eval (make_const_ref (tie (a1, a2, a3, a4, a5, a6)));
      }
 
      template <class A1, class A2, class A3, class A4, class A5, class A6, class A7>
      result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4, A5& a5, A6& a6, A7& a7)
      {
-       return eval (tie (a1, a2, a3, a4, a5, a6, a7));
+       return eval (make_const_ref (tie (a1, a2, a3, a4, a5, a6, a7)));
      }
 
      template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
      result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4, A5& a5, A6& a6, A7& a7, A8& a8)
      {
-       return eval (tie (a1, a2, a3, a4, a5, a6, a7, a8));
+       return eval (make_const_ref (tie (a1, a2, a3, a4, a5, a6, a7, a8)));
      }
 
      template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
      result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4, A5& a5, A6& a6, A7& a7, A8& a8, A9& a9)
      {
-       return eval (tie (a1, a2, a3, a4, a5, a6, a7, a8, a9));
+       return eval (make_const_ref (tie (a1, a2, a3, a4, a5, a6, a7, a8, a9)));
      }
      
      result_type operator () () const
      {
-       return eval (tie ());
+       return eval (make_const_ref (tie ()));
      }
 
      template <class A1> result_type operator () (A1& a1) const
      {
-       return eval (tie (a1));
+       return eval (make_const_ref (tie (a1)));
      }
 
      template <class A1, class A2> result_type operator () (A1& a1, A2& a2) const
      {
-       return eval (tie (a1, a2));
+       return eval (make_const_ref (tie (a1, a2)));
      }
 
      template <class A1, class A2, class A3> result_type operator () (A1& a1, A2& a2, A3& a3) const
      {
-       return eval (tie (a1, a2, a3));
+       return eval (make_const_ref (tie (a1, a2, a3)));
      }
 
      template <class A1, class A2, class A3, class A4> result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4) const
      {
-       return eval (tie (a1, a2, a3, a4));
+       return eval (make_const_ref (tie (a1, a2, a3, a4)));
      }
 
      template <class A1, class A2, class A3, class A4, class A5> result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4, A5& a5) const
      {
-       return eval (tie (a1, a2, a3, a4, a5));
+       return eval (make_const_ref (tie (a1, a2, a3, a4, a5)));
      }
 
      template <class A1, class A2, class A3, class A4, class A5, class A6>
      result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4, A5& a5, A6& a6) const
      {
-       return eval (tie (a1, a2, a3, a4, a5, a6));
+       return eval (make_const_ref (tie (a1, a2, a3, a4, a5, a6)));
      }
 
      template <class A1, class A2, class A3, class A4, class A5, class A6, class A7>
      result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4, A5& a5, A6& a6, A7& a7) const
      {
-       return eval (tie (a1, a2, a3, a4, a5, a6, a7));
+       return eval (make_const_ref (tie (a1, a2, a3, a4, a5, a6, a7)));
      }
 
      template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
      result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4, A5& a5, A6& a6, A7& a7, A8& a8) const
      {
-       return eval (tie (a1, a2, a3, a4, a5, a6, a7, a8));
+       return eval (make_const_ref (tie (a1, a2, a3, a4, a5, a6, a7, a8)));
      }
 
      template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
      result_type operator () (A1& a1, A2& a2, A3& a3, A4& a4, A5& a5, A6& a6, A7& a7, A8& a8, A9& a9) const
      {
-       return eval (tie (a1, a2, a3, a4, a5, a6, a7, a8, a9));
+       return eval (make_const_ref (tie (a1, a2, a3, a4, a5, a6, a7, a8, a9)));
      }
      
 ///////////////////////////////////////////////////////////////////////////////////////////////////

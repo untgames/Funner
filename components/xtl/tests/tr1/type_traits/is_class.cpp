@@ -16,15 +16,6 @@ int main ()
   CHECK_INTEGRAL_CONSTANT (is_class<f1>::value, false);
   CHECK_INTEGRAL_CONSTANT (is_class<enum_UDT>::value, false);
 
-#ifdef XTL_HAS_TYPE_TRAITS_INTRINSICS
-  CHECK_INTEGRAL_CONSTANT (is_class<union_UDT>::value, false);
-  CHECK_INTEGRAL_CONSTANT (is_class<POD_union_UDT>::value, false);
-  CHECK_INTEGRAL_CONSTANT (is_class<empty_union_UDT>::value, false);
-  CHECK_INTEGRAL_CONSTANT (is_class<empty_POD_union_UDT>::value, false);
-#else
-  printf ("This compiler version does not provide support for is_class on union types\n");
-#endif
-
   CHECK_INTEGRAL_CONSTANT (is_class<UDT>::value, true);
   CHECK_INTEGRAL_CONSTANT (is_class<UDT const>::value, true);
   CHECK_INTEGRAL_CONSTANT (is_class<UDT volatile>::value, true);

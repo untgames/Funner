@@ -59,7 +59,7 @@ inline shared_ptr<T>::shared_ptr (const shared_ptr<T1>& p)
 
 template <class T> template <class T1>
 shared_ptr<T>::shared_ptr (const weak_ptr<T1>& p)
-  : counter (p.counter), ptr (p.ptr)
+  : ptr (p.ptr), counter (p.counter)
 {
   if (!counter || !counter->add_ref_lock ())
     throw bad_weak_ptr ();
@@ -75,6 +75,21 @@ inline shared_ptr<T>::shared_ptr (stl::auto_ptr<T1>& p)
 
   p.release ();
         
+  sp_enable_shared_from_this (tmp, tmp);
+}
+
+template <class T> template <class Ptr>
+inline shared_ptr<T>::shared_ptr (Ptr p, typename detail::sp_enable_if_auto_ptr<Ptr, int>::type)
+  : ptr (p.get ())
+{
+  typedef typename Ptr::element_type element_type;
+
+  element_type* tmp = p.get ();
+
+  counter = new detail::std_shared_counter<element_type> (p.get ());
+
+  p.release ();
+
   sp_enable_shared_from_this (tmp, tmp);
 }
 
@@ -151,6 +166,14 @@ inline shared_ptr<T>& shared_ptr<T>::operator = (stl::auto_ptr<T1>& p)
   shared_ptr (p).swap (*this);
 
   return *this;  
+}
+
+template <class T> template <class Ptr>
+inline typename detail::sp_enable_if_auto_ptr<Ptr, shared_ptr<T>&>::type shared_ptr<T>::operator = (Ptr p)
+{
+  shared_ptr (p).swap (*this);
+  
+  return *this;
 }
 
 /*

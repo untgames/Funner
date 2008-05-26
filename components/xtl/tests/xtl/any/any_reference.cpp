@@ -11,7 +11,9 @@ int main ()
 {
   printf ("Results of any_reference_test:\n");
   
-  any a = make_ref_any (A ()), b = a;
+  A var_a;
+   
+  any a = make_ref_any (make_const_ref (A ())), b = a, c = make_ref_any (make_const_ref (ref (var_a)));
 
   return 0;
 }

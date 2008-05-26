@@ -13,7 +13,7 @@ class dual_trackable_handler_wrapper
   public: 
     dual_trackable_handler_wrapper (dual_trackable_handler& in_handler) : handler (in_handler) {}
 
-    void operator () () const { handler.notify (*this); }
+    void operator () () const;
 
   private:
     dual_trackable_handler& handler;
@@ -89,6 +89,12 @@ class dual_trackable_handler: public connection_impl
 #ifdef _MSC_VER
   #pragma warning (pop)
 #endif
+
+template <size_t selector>
+inline void dual_trackable_handler_wrapper<selector>::operator () () const
+{
+  handler.notify (*this);
+}
 
 /*
     Дуальное соединение между двумя trackable

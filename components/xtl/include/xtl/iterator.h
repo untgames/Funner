@@ -56,7 +56,7 @@ template <class T> struct iterator_value_type<const T> { typedef T type; };
 template <class T>
 class iterator
 {
-  template <class T> friend class iterator;
+  template <class T1> friend class iterator;
   typedef bool (iterator::*safe_bool)() const;
   public:
     typedef typename iterator_value_type<T>::type value_type;

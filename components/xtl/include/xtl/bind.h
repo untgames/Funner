@@ -28,6 +28,8 @@ namespace placeholders
 
 template <size_t I> struct argument {};
 
+#ifdef _MSC_VER
+
 static argument<1> _1;
 static argument<2> _2;
 static argument<3> _3;
@@ -37,6 +39,25 @@ static argument<6> _6;
 static argument<7> _7;
 static argument<8> _8;
 static argument<9> _9;
+
+#else
+
+namespace
+{
+
+argument<1> _1;
+argument<2> _2;
+argument<3> _3;
+argument<4> _4;
+argument<5> _5;
+argument<6> _6;
+argument<7> _7;
+argument<8> _8;
+argument<9> _9;
+
+}
+
+#endif
 
 }
 

@@ -1,8 +1,7 @@
 #ifndef XTL_TOKEN_ITERATOR_HEADER
 #define XTL_TOKEN_ITERATOR_HEADER
 
-#include <cstdlib>
-#include <cctype>
+#include <xtl/token_parser.h>
 
 namespace stl
 {
@@ -138,7 +137,7 @@ Ret get (token_iterator<Token, BaseIter>&, const Ret& default_value = Ret ());
 template <class Token, class BaseIter, class Value>
 void read (token_iterator<Token, BaseIter>&, Value& value, const Value& default_value);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование токена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Token, class BaseIter>
@@ -150,11 +149,11 @@ bool read (token_iterator<Token, BaseIter>&, Token& result);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, bool&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, char&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, unsigned char&);
-template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, short&);
+template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, signed short&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, unsigned short&);
-template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, int&);
+template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, signed int&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, unsigned int&);
-template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, long&);
+template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, signed long&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, unsigned long&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, float&);
 template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, double&);
@@ -162,11 +161,11 @@ template <class BaseIter> bool read (token_iterator<const char*, BaseIter>&, lon
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, bool&);
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, char&);
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, unsigned char&);
-template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, short&);
+template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, signed short&);
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, unsigned short&);
-template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, int&);
+template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, signed int&);
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, unsigned int&);
-template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, long&);
+template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, signed long&);
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, unsigned long&);
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, float&);
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, double&);

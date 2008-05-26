@@ -8,7 +8,7 @@ public:
 
 protected:
 
-    ~X() {}
+    virtual ~X() {}
 };
 
 class Y
@@ -19,7 +19,7 @@ public:
 
 protected:
 
-    ~Y() {}
+    virtual ~Y() {}
 };
 
 shared_ptr<Y> createY();

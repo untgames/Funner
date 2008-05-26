@@ -2,9 +2,14 @@
 #define XTL_LEXICAL_CAST_HEADER
 
 #include <stdio.h>
+
 #include <exception>
 #include <typeinfo>
+
 #include <stl/string>
+
+#include <xtl/string.h>
+#include <xtl/token_parser.h>
 
 namespace xtl
 {

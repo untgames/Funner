@@ -42,6 +42,10 @@ struct static_cast_tag {};
 struct const_cast_tag {};
 struct dynamic_cast_tag {};
 
+//rvalue auto_ptr support based on a technique by Dave Abrahams
+template <class T, class R> struct sp_enable_if_auto_ptr {};
+template <class T, class R> struct sp_enable_if_auto_ptr<stl::auto_ptr<T>, R> { typedef R type; }; 
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,15 +73,17 @@ template <class T> class shared_ptr
     template <class T1>       explicit shared_ptr (T1*);
     template <class T1>       explicit shared_ptr (const weak_ptr<T1>&);
     template <class T1>       explicit shared_ptr (stl::auto_ptr<T1>&);
+    template <class Ptr>      explicit shared_ptr (Ptr p, typename detail::sp_enable_if_auto_ptr<Ptr, int>::type = 0);
     template <class T1, class Deleter> shared_ptr (T1*, Deleter);
                                       ~shared_ptr ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Операторы присваивания
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-                        shared_ptr& operator = (const shared_ptr&);
-    template <class T1> shared_ptr& operator = (const shared_ptr<T1>&);
-    template <class T1> shared_ptr& operator = (stl::auto_ptr<T1>&);
+                         shared_ptr& operator = (const shared_ptr&);
+    template <class T1>  shared_ptr& operator = (const shared_ptr<T1>&);
+    template <class T1>  shared_ptr& operator = (stl::auto_ptr<T1>&);
+    template <class Ptr> typename detail::sp_enable_if_auto_ptr<Ptr, shared_ptr&>::type operator = (Ptr);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Операции доступа

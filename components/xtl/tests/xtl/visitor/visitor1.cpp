@@ -54,7 +54,9 @@ int main ()
   
   printf ("visit vector elements\n");
   
-  visit_each (v.begin (), v.end (), my_visitor_impl ());
+  my_visitor_impl vis;
+  
+  visit_each (v.begin (), v.end (), vis);
 
   return 0;
 }

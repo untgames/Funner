@@ -36,7 +36,7 @@ template <class T>
 void swap (T&,T&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Возвращение случайного номера в диапозоне [0;n)
+///Возвращение случайного номера в диапазоне [0;n)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Distance>
 Distance random_number (Distance n);
@@ -67,7 +67,7 @@ const T& median (const T& a,const T& b,const T& c,Compare less);
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск значения в диапозоне
+///Поиск значения в диапазоне
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter,class T>
 Iter find (Iter first,Iter last,const T& val);
@@ -76,7 +76,7 @@ template <class Iter,class Predicate>
 Iter find_if (Iter first,Iter last,Predicate pred);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск одного из значений [first2;last2) в диапозоне [first1;last1)
+///Поиск одного из значений [first2;last2) в диапазоне [first1;last1)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class InIter,class Iter>
 InIter find_first_of (InIter first1,InIter last1,Iter first2,Iter last2);
@@ -85,7 +85,7 @@ template <class InIter,class Iter,class Predicate>
 InIter find_first_of (InIter first1,InIter last1,Iter first2,Iter last2,Predicate equal);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск смежных дубликатов в диапозоне
+///Поиск смежных дубликатов в диапазоне
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter>
 Iter adjacent_find (Iter first,Iter last);  
@@ -94,7 +94,7 @@ template <class Iter,class Predicate>
 Iter adjacent_find (Iter first,Iter last,Predicate equal);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск первого вхождения диапозона [first2;last2) в диапозон [first1;last1)
+///Поиск первого вхождения диапазона [first2;last2) в диапазон [first1;last1)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter1,class Iter2>
 Iter1 search (Iter1 first1,Iter1 last1,Iter2 first2,Iter2 last2);
@@ -103,7 +103,7 @@ template <class Iter1,class Iter2,class Predicate>
 Iter1 search (Iter1 first1,Iter1 last1,Iter2 first2,Iter2 last2,Predicate equal);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск последнего вхождения диапозона [first2;last2) в диапозон [first1;last1)
+///Поиск последнего вхождения диапазона [first2;last2) в диапазон [first1;last1)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter1,class Iter2> 
 Iter1 find_end (Iter1 first1,Iter1 last1,Iter2 first2,Iter2 last2);
@@ -112,7 +112,7 @@ template <class Iter1,class Iter2,class Predicate>
 Iter1 find_end (Iter1 first1,Iter1 last1,Iter2 first2,Iter2 last2,Predicate equal);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск первого вхождения диапозона val [count] в диапозон [first1;last1)
+///Поиск первого вхождения диапазона val [count] в диапазон [first1;last1)
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter,class Int,class T>
 Iter search_n (Iter first,Iter last,Int count,const T& val);
@@ -121,7 +121,7 @@ template <class Iter,class Int,class T,class Predicate>
 Iter search_n (Iter first,Iter last,Int count,const T& val,Predicate equal);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Максимальный / минимальный элемент диапозона [first;last)
+///Максимальный / минимальный элемент диапазона [first;last)
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter> 
 Iter max_element (Iter first,Iter last);
@@ -136,7 +136,7 @@ template <class Iter,class Compare>
 Iter min_element (Iter first,Iter last,Compare less);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Предикат принадлежности значения val диапозону [first;last)
+///Предикат принадлежности значения val диапазону [first;last)
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter,class T>
 bool binary_search (Iter first,Iter last,const T& val);
@@ -145,7 +145,7 @@ template <class Iter,class T,class Compare>
 bool binary_search (Iter first,Iter last,const T& val,Compare less);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Левое вхождение элемента val в диапозон [first;last)
+///Левое вхождение элемента val в диапазон [first;last)
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter,class T>
 Iter lower_bound (Iter first,Iter last,const T& val);
@@ -154,7 +154,7 @@ template <class Iter,class T,class Compare>
 Iter lower_bound (Iter first,Iter last,const T& val,Compare less);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Правое вхождение элемента val в диапозон [first;last)
+///Правое вхождение элемента val в диапазон [first;last)
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter,class T>
 Iter upper_bound (Iter first,Iter last,const T& val);
@@ -163,7 +163,7 @@ template <class Iter,class T,class Compare>
 Iter upper_bound (Iter first,Iter last,const T& val,Compare less);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск поддиапозона вхождения элемента val в диапозон [first;last)
+///Поиск поддиапазона вхождения элемента val в диапазон [first;last)
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter,class T>
 pair<Iter,Iter> equal_range (Iter first,Iter last,const T& val);
@@ -172,7 +172,7 @@ template <class Iter,class T,class Compare>
 pair<Iter,Iter> equal_range (Iter first,Iter last,const T& val,Compare less);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество вхождений элемента val в диапозон [first;last)
+///Количество вхождений элемента val в диапазон [first;last)
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter,class T,class Size>
 void count (Iter first,Iter last,const T& value,Size& n);
@@ -187,7 +187,7 @@ template <class Iter,class Predicate>
 typename iterator_traits<Iter>::difference_type count_if (Iter first,Iter last,Predicate equal);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Предикат эквивалентности диапозонов
+///Предикат эквивалентности диапазонов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter1,class Iter2>
 bool equal (Iter1 first1,Iter1 last1,Iter2 first2);
@@ -196,7 +196,7 @@ template <class Iter1,class Iter2,class BinPredicate>
 bool equal (Iter1 first1,Iter1 last1,Iter2 first2,BinPredicate pred);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Определение первого несовпадающего элемента диапозонов
+///Определение первого несовпадающего элемента диапазонов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter1,class Iter2>
 pair<Iter1,Iter2> mismatch (Iter1 first1,Iter1 last1,Iter2 first2);
@@ -205,7 +205,7 @@ template <class Iter1,class Iter2,class BinPredicate>
 pair<Iter1,Iter2> mismatch (Iter1 first1,Iter1 last1,Iter2 first2,BinPredicate pred);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Лексикографическое сравнение диапозонов
+///Лексикографическое сравнение диапазонов
 ///   lexicographical_compare - return true if [first1;last1) < [first2;last2)
 ///   lexicographical_compare_3way - analog of strcmp
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,7 +223,7 @@ int lexicographical_compare_3way (Iter1 first1,Iter1 last1,Iter2 first2,Iter2 la
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание кучи из диапозона [first;last)
+///Создание кучи из диапазона [first;last)
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter> 
 void make_heap (Iter first,Iter last);
@@ -250,7 +250,7 @@ template <class Iter,class Compare>
 void pop_heap (Iter first,Iter last,Compare less);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразование кучи [first;last) в отсортированный диапозон
+///Преобразование кучи [first;last) в отсортированный диапазон
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter> 
 void sort_heap (Iter first,Iter last);
@@ -272,7 +272,7 @@ bool is_heap (Iter first,Iter last,Compare less);
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перемещение объектов удовлетворяющих условию в начало диапозона
+///Перемещение объектов удовлетворяющих условию в начало диапазона
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter,class Predicate>
 Iter partition (Iter first,Iter last,Predicate pred);
@@ -290,7 +290,7 @@ template <class Iter,class Compare>
 void nth_element (Iter first,Iter nth,Iter last,Compare less);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Частичная сортировка с перемещением елементов в диапозон [first,middle) или 
+///Частичная сортировка с перемещением елементов в диапазон [first,middle) или 
 ///[result_first;result_last)
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter>
@@ -333,7 +333,7 @@ template <class Iter,class Compare>
 bool is_sorted (Iter first,Iter last,Compare less);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Слияние диапозонов с сохранением относительной упорядоченности
+///Слияние диапазонов с сохранением относительной упорядоченности
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class InIter1,class InIter2,class OutIter>
 OutIter merge (InIter1 first1,InIter1 last1,InIter2 first2,InIter2 last2,OutIter result);
@@ -352,7 +352,7 @@ void inplace_merge (Iter first,Iter middle,Iter last,Compare less);
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Копирование диапозона (через operator =)
+///Копирование диапазона (через operator =)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class InIter,class OutIter>
 OutIter copy (InIter first,InIter last,OutIter result);
@@ -364,7 +364,7 @@ template <class Iter1,class Iter2>
 Iter2 copy_backward (Iter1 first,Iter1 last,Iter2 result);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Копирование диапозона (через конструктор копирования)
+///Копирование диапазона (через конструктор копирования)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class InIter,class OutIter>
 OutIter uninitialized_copy (InIter first,InIter last,OutIter result);
@@ -373,7 +373,7 @@ template <class InIter,class Size,class OutIter>
 pair<InIter,OutIter> uninitialized_copy_n (InIter first,Size count,OutIter result);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Заполнение диапозона (через operator =)
+///Заполнение диапазона (через operator =)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter,class T>
 void fill (Iter first,Iter last,const T& val);
@@ -382,7 +382,7 @@ template <class Iter,class Size,class T>
 Iter fill_n (Iter first,Size n,const T& value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Заполнение диапозона (через конструктор)
+///Заполнение диапазона (через конструктор)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter,class T>
 void uninitialized_fill (Iter first,Iter last,const T& value);
@@ -491,7 +491,7 @@ template <class Iter,class Rand>
 void random_shuffle (Iter first,Iter last,Rand rand);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Выполнение функции fn для каждого из элементов диапозона [first;last)
+///Выполнение функции fn для каждого из элементов диапазона [first;last)
 ///////////////////////////////////////////////////////////////////////////////////////////////////         
 template <class Iter,class Func>
 Func for_each (Iter first,Iter last,Func fn);
@@ -510,7 +510,7 @@ OutIter transform (InIter1 first1,InIter1 last1,InIter2 first2,OutIter result,Bi
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Присваивание каждому элементу диапозона [first;last) значения функции gen
+///Присваивание каждому элементу диапазона [first;last) значения функции gen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter,class Generator> 
 void generate (Iter first,Iter last,Generator gen);
@@ -523,7 +523,7 @@ void generate_n (Iter first,Size count,Generator gen);
 */
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-///Предикат проверки вхождения диапозона [first2;last2) в диапозон [first1;last1) (порядок не важен)
+///Предикат проверки вхождения диапазона [first2;last2) в диапазон [first1;last1) (порядок не важен)
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter1,class Iter2>
 bool includes (Iter1 first1,Iter1 last1,Iter2 first2,Iter2 last2);

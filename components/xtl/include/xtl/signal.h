@@ -35,7 +35,7 @@ class slot
 {
   template <class Signature1, class Accumulator> friend class signal;
   public:
-    typedef xtl::function<Signature> function_type;    
+    typedef xtl::function<Signature> function_type;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
@@ -108,6 +108,8 @@ class auto_slot: public slot<Signature>
 {
   typedef slot<Signature> base;
   public:
+    typedef typename base::function_type function_type;  
+  
     auto_slot  () {}
     auto_slot  (const slot<Signature>&);
     auto_slot  (const function_type& fn);
@@ -186,7 +188,7 @@ class signal
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Распространение сигнала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class Tuple> result_type invoke (Tuple&) const;
+    template <class Tuple> result_type invoke (const Tuple&) const;
 
   private:
     signal (const signal&); //no impl

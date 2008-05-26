@@ -22,6 +22,7 @@ TR1_TESTS.EXECTUTION_DIR      :=
 TR1_TESTS.LIBS                :=
 TR1_TESTS.COMPILER_CFLAGS     :=
 TR1_TESTS.COMPILER_DEFINES    := __MYSTL_STANDALONE__
+TR1_TESTS.msvc.SOURCE_DIRS    := tests/tr1/functional/msvc
 
 #Цель №3 - XTL tests
 XTL_TESTS.TYPE             := test-suite

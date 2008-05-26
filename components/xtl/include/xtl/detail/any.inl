@@ -128,9 +128,9 @@ template <class T> struct any_qualifier_mask<T* volatile>       { enum { value =
 template <class T> struct any_qualifier_mask<T* const volatile> { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_volatile_bit | any_qualifier_ptr_const_bit }; };
 
 template <class T> struct any_qualifier_mask<reference_wrapper<T> >          { enum { value = any_qualifier_mask<T>::value }; };
-template <class T> struct any_qualifier_mask<const reference_wrapper<T> >    { enum { value = any_qualifier_mask<T>::value | any_qualifier_mask_const_bit }; };
-template <class T> struct any_qualifier_mask<volatile reference_wrapper<T> > { enum { value = any_qualifier_mask<T>::value | any_qualifier_mask_volatile_bit }; };
-template <class T> struct any_qualifier_mask<const volatile reference_wrapper<T> > { enum { value = any_qualifier_mask<T>::value | any_qualifier_mask_volatile_bit | any_qualifier_mask_const_bit }; };
+template <class T> struct any_qualifier_mask<const reference_wrapper<T> >    { enum { value = any_qualifier_mask<T>::value | any_qualifier_const_bit }; };
+template <class T> struct any_qualifier_mask<volatile reference_wrapper<T> > { enum { value = any_qualifier_mask<T>::value | any_qualifier_volatile_bit }; };
+template <class T> struct any_qualifier_mask<const volatile reference_wrapper<T> > { enum { value = any_qualifier_mask<T>::value | any_qualifier_volatile_bit | any_qualifier_const_bit }; };
 
 /*
     Определение хранимого типа

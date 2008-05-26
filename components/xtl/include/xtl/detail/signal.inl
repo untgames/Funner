@@ -238,9 +238,9 @@ inline size_t signal<Signature, Accumulator>::num_slots () const
 */
 
 template <class Signature, class Accumulator> template <class Tuple>
-inline typename signal<Signature, Accumulator>::result_type signal<Signature, Accumulator>::invoke (Tuple& args) const
+inline typename signal<Signature, Accumulator>::result_type signal<Signature, Accumulator>::invoke (const Tuple& args) const
 {
-  typedef detail::signal_invoke_iterator<slot_impl, Tuple> iterator;
+  typedef detail::signal_invoke_iterator<slot_impl, const Tuple> iterator;
 
   return Accumulator () (iterator (args, first.next (), &first), iterator (args, &first, &first));
 }

@@ -246,27 +246,6 @@ inline void trackable_ptr<T>::disconnect_all ()
 }
 
 /*
-    Обмен
-*/
-
-template <class T>
-inline void trackable_ptr<T>::swap (trackable_ptr<T>& p)
-{
-  T* tmp = ptr;
-  ptr    = p.ptr;
-  p.ptr  = tmp;
-
-  on_destroy.swap (p.on_destroy);
-  notification.swap (p.notification);
-}
-
-template <class T>
-inline void swap (trackable_ptr<T>& p1, trackable_ptr<T>& p2)
-{
-  p1.swap (p2);
-}
-
-/*
     Сравнение
 */
 

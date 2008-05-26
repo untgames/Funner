@@ -14,18 +14,20 @@
 namespace detail
 {
 
-//определение наличия типа Fn::result_type
-struct no_result_type_tag {};
-
-template <class T, class result_type = no_result_type_tag> struct has_result_type: public T
+template <class T> struct has_result_type
 {
-  typedef char                       no_type;
-  typedef struct { char dummy [2]; } yes_type;
-
-  static yes_type test (...);
-  static no_type  test (void (*)(no_result_type_tag));
+  private:
+    typedef char                       no_type;
+    typedef struct { char dummy [2]; } yes_type;  
   
-  enum { value = sizeof (test (static_cast<void (*)(result_type)> (0))) == sizeof (yes_type) };
+    template <class T1> struct type_wrapper { typedef T1 type; };  
+
+    template <class T1> static yes_type test (type_wrapper<T1> const volatile*, type_wrapper<typename T1::result_type>* = 0);
+
+    static no_type test (...);
+
+  public:
+    enum { value = sizeof (test (static_cast<type_wrapper<T>*> (0))) == sizeof (yes_type) };
 };
 
 //определение типа возвращаемого значения пользовательского типа Fn
