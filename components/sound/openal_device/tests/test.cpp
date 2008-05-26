@@ -23,7 +23,7 @@ using namespace xtl;
 using namespace media;
 
 const char* file_name = "data/sound1.ogg";
-//const char* file_name = "data/1.wav";
+//const char* file_name2 = "data/sound1.wav";
 const char* file_name2 = "data/sound2.ogg";
 
 const size_t SOURCE_UPDATE_TIME = 100;   //период обновления параметров источника звука (в милисекундах)
@@ -104,7 +104,7 @@ int main ()
 {
   try
   {
-    xtl::com_ptr<ISoundDevice> sound_system (SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("OpenAL", "Generic*"), 0, "frequency=44100 min_channels_count=32 max_channels_count=2048"), false);
+    xtl::com_ptr<ISoundDevice> sound_system (SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("OpenAL", "Generic*"), 0, "frequency=192000 min_channels_count=32 max_channels_count=192"), false);
 
     Capabilities   info;
     Listener       listener;
@@ -156,11 +156,11 @@ int main ()
     sound_system->SetSample (1, sample2);
 
 //    sound_system->SetSample (0, sample1);
-    sound_system->Seek (1, 2.f, SeekMode_Clamp);
+    sound_system->Seek (1, 40.f, SeekMode_Clamp);
 //    sound_system->Play (0, true);
     sound_system->Play (1, true);
 
-    Timer timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),
+    Timer /*timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),*/
           timer2 (bind (&Application::Exit, 0), TEST_WORK_TIME);
           
 //    xtl::auto_connection c = Application::RegisterEventHandler (ApplicationEvent_OnIdle, &idle);

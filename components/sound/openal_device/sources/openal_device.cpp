@@ -12,8 +12,9 @@ using namespace sound::low_level;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онстанты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t MAX_DEVICE_CHANNELS_COUNT       = 1024; //максимальное количество каналов проигрывани€
-const size_t DEFAULT_SAMPLE_BUFFER_SIZE      = 4096; //размер буфера сэмплировани€ по умолчанию
+const size_t MAX_DEVICE_CHANNELS_COUNT  = 1024;   //максимальное количество каналов проигрывани€
+const size_t MAX_SOUND_CHANNELS         = 2;      //максимальное количество каналов
+const size_t MAX_SOUND_BYTES_PER_SAMPLE = 2;      //максимальна€ разр€дность звука
 
 //врем€ обновлени€ буферов источника в миллисекундах
 const size_t SOURCE_BUFFERS_UPDATE_MILLISECONDS = size_t (1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY);
@@ -63,7 +64,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
    listener_timer (xtl::bind (&OpenALDevice::ListenerUpdate, this), (size_t)(DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD * 1000)),
    source_timer   (xtl::bind (&OpenALDevice::SourceUpdate, this), (size_t)(DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD * 1000)),
    listener_need_update (false),
-   sample_buffer (DEFAULT_SAMPLE_BUFFER_SIZE),
+   sample_buffer (MAX_SOUND_SAMPLE_RATE * MAX_SOUND_CHANNELS * MAX_SOUND_BYTES_PER_SAMPLE / SOURCE_BUFFERS_UPDATE_FREQUENCY / (SOURCE_BUFFERS_COUNT - 2)),
    ref_count (1),
    is_muted (false), 
    gain (1.0f),

@@ -135,6 +135,8 @@ void OpenALSource::SetSource (const Source& in_source)
 
 void OpenALSource::SetSample (const media::SoundSample& sample)
 {   
+  static const char* METHOD_NAME = "sound::low_level::OpenALSource::SetSample";
+
   if (!sample.SizeInBytes ())
   {
     sound_sample = sample;
@@ -143,8 +145,12 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
 
   try
   {
+    if (sample.Frequency () > MAX_SOUND_SAMPLE_RATE)
+      RaiseNotSupported (METHOD_NAME, "Sound sample '%s' has unsupported sample rate=%u. Maximum supported sample rate is %u", 
+                         sample.Name (), sample.Frequency (), MAX_SOUND_SAMPLE_RATE);
+
     if (sample.BitsPerSample () != 16)
-      RaiseNotSupported ("sound::low_level::OpenALSource::SetSample", "Sound sample '%s' has unsupported bits_per_sample=%u",
+      RaiseNotSupported (METHOD_NAME, "Sound sample '%s' has unsupported bits_per_sample=%u",
                          sample.Name (), sample.BitsPerSample ());
 
     switch (sample.Channels ())
@@ -153,7 +159,7 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
       case 2:
         break;
       default:
-        RaiseNotSupported ("sound::low_level::OpenALSource::SetSample", "Sound sample '%s' has unsupported channels_count=%u", sample.Name (), sample.Channels ());
+        RaiseNotSupported (METHOD_NAME, "Sound sample '%s' has unsupported channels_count=%u", sample.Name (), sample.Channels ());
         break;
     }
     
