@@ -144,6 +144,7 @@ int main ()
     source.outer_angle  = 360.f;
     source.outer_gain   = 1.f;
     source.reference_distance = 1.f;
+    source.maximum_distance   = 2.f;
     sound_system->SetSource (0, source);
     sound_system->GetSource (0, source);
     dump (source);
@@ -160,7 +161,7 @@ int main ()
 //    sound_system->Play (0, true);
     sound_system->Play (1, true);
 
-    Timer /*timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),*/
+    Timer timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),
           timer2 (bind (&Application::Exit, 0), TEST_WORK_TIME);
           
 //    xtl::auto_connection c = Application::RegisterEventHandler (ApplicationEvent_OnIdle, &idle);

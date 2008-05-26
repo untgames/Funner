@@ -30,8 +30,6 @@ enum SeekMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Source
 {
-  Source ();
-
   math::vec3f position;            //позиция
   math::vec3f direction;           //направление
   math::vec3f velocity;            //скорость
@@ -54,8 +52,6 @@ struct Source
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Capabilities
 {
-  Capabilities () {}
-
   size_t channels_count;          //количество поддерживаемых каналов
   size_t eax_major_version;       //старшая часть версии EAX
   size_t eax_minor_version;       //младшая часть версии EAX
@@ -211,8 +207,6 @@ class SoundSystem
     static ISoundDevice* CreateDevice (const char* driver_name, const char* device_name, const void* window_handlezz, const char* init_string);
     static ISoundDevice* CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string = "");
 };
-
-#include <sound/detail/device.inl>
 
 }
 
