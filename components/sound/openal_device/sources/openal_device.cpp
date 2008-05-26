@@ -136,19 +136,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
   {
     try
     {
-        //удаление каналов
-
-      for (size_t i=0; i < channels.size (); i++)
-        delete channels [i];
-        
-      if (al_buffers_pool_size)
-      {
-          //очистка пула буферов
-          
-        context.MakeCurrent ();
-
-        context.alDeleteBuffers (al_buffers_pool_size, al_buffers_pool);
-      }
+      ClearALData ();
     }
     catch (...)
     {
@@ -174,19 +162,31 @@ OpenALDevice::~OpenALDevice ()
 {
   try
   {
-      //удаление каналов
-
-    for (size_t i = 0; i < channels.size (); i++)
-      delete channels [i];
-      
-      //очистка пула буферов
-      
-    context.MakeCurrent ();
-
-    context.alDeleteBuffers (al_buffers_pool_size, al_buffers_pool);
+    ClearALData ();
   }
   catch (...)
   {
+  }
+}
+
+/*
+    Удаление каналов и буферов
+*/
+
+void OpenALDevice::ClearALData ()
+{
+    //удаление каналов
+
+  for (size_t i = 0; i < channels.size (); i++)
+    delete channels [i];
+    
+    //очистка пула буферов
+    
+  if (al_buffers_pool_size)
+  {
+    context.MakeCurrent ();
+
+    context.alDeleteBuffers (al_buffers_pool_size, al_buffers_pool);
   }
 }
 

@@ -343,6 +343,11 @@ class OpenALDevice : public sound::low_level::ISoundDevice
     void SourceUpdate ();
     void UpdateListenerNotify ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление каналов и буферов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void OpenALDevice::ClearALData ();
+
     OpenALDevice (const OpenALDevice&);
     OpenALDevice& operator = (const OpenALDevice&);
 
