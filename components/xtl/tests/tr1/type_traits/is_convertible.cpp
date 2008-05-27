@@ -81,7 +81,7 @@ int main ()
   CHECK_INTEGRAL_CONSTANT ((is_convertible<float,convertible_from<char> >::value), true);
   CHECK_INTEGRAL_CONSTANT ((is_convertible<float,convertible_from<char const&> >::value), true);
   CHECK_INTEGRAL_CONSTANT ((is_convertible<float,convertible_from<char&> >::value), false);
-
+ 
   CHECK_INTEGRAL_CONSTANT ((is_convertible<char,convertible_from<char> >::value), true);
   CHECK_INTEGRAL_CONSTANT ((is_convertible<char,convertible_from<char const&> >::value), true);
   CHECK_INTEGRAL_CONSTANT ((is_convertible<char,convertible_from<char&> >::value), true);

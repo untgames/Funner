@@ -1,0 +1,163 @@
+Results of aligned_storage_test:
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
+expression 'alignment_of<t1>::value == T::value' is true
+expression 'sizeof(t1) == T::value' is true
+expression 'is_pod<t1>::value == true' is true
+expression 'alignment_of<t2>::value == T::value' is true
+expression 'sizeof(t2) == T::value*2' is true
+expression 'is_pod<t2>::value == true' is true
+expression 'alignment_of<t3>::value == alignment_of<xtl::type_traits::detail::max_align>::value' is true
+expression '(sizeof(t3) % T::value) == 0' is true
+expression 'is_pod<t3>::value == true' is true
