@@ -13,7 +13,7 @@ int main ()
 {
   printf ("Results of binsrch2_test:\n");
 
-  char* labels [] = {"aa","dd","ff","jj","ss","zz"};
+  const char* labels [] = {"aa","dd","ff","jj","ss","zz"};
 
   const unsigned count = sizeof(labels) / sizeof(labels[0]);
   
