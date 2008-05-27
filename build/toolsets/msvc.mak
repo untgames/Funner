@@ -60,7 +60,7 @@ export LIB
 #список дефайнов, флаги компиляции, pch файл)
 ###################################################################################################
 define tools.c++compile
-export PATH="$(MSVC_PATH)" && cl -nologo -c -EHsc -W3 -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsubst %,-I"%",$2) $5 $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
+export PATH="$(MSVC_PATH)" && cl -nologo -c -EHsc -W3 -Ox -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsubst %,-I"%",$2) $5 $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
 endef
 
 ###################################################################################################
