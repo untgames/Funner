@@ -13,7 +13,7 @@ int main ()
 {
   printf ("Results of lwrbnd2_test:\n");
 
-  char* str [] = {"a","a","b","b","q","w","z"};
+  const char* str [] = {"a","a","b","b","q","w","z"};
 
   const unsigned strCt = sizeof (str)/sizeof (str[0]);
 

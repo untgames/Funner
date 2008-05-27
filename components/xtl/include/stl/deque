@@ -100,8 +100,8 @@ class deque
     typedef const value_type&                             const_reference;
     typedef deque_iterator<T,T&,T*,Allocator>             iterator;
     typedef deque_iterator<T,const T&,const T*,Allocator> const_iterator;
-    typedef reverse_iterator<const_iterator>              const_reverse_iterator;
-    typedef reverse_iterator<iterator>                    reverse_iterator;
+    typedef stl::reverse_iterator<const_iterator>         const_reverse_iterator;
+    typedef stl::reverse_iterator<iterator>               reverse_iterator;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы

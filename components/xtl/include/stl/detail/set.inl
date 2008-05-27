@@ -91,7 +91,7 @@ inline typename set_base<Key,Compare,Allocator>::reverse_iterator set_base<Key,C
 template <class Key,class Compare,class Allocator>
 inline void set_base<Key,Compare,Allocator>::erase (iterator position)
 {
-  tree.erase ((typename tree_type::iterator&)position);
+  tree.erase (position.get_unqualified_iterator ());
 }
 
 template <class Key,class Compare,class Allocator>
@@ -103,7 +103,7 @@ inline typename set_base<Key,Compare,Allocator>::size_type set_base<Key,Compare,
 template <class Key,class Compare,class Allocator>
 inline void set_base<Key,Compare,Allocator>::erase (iterator first,iterator last)
 {
-  tree.erase ((typename tree_type::iterator&)first,(typename tree_type::iterator&)last);
+  tree.erase (first.get_unqualified_iterator (),last.get_unqualified_iterator ());
 }
 
 template <class Key,class Compare,class Allocator>
@@ -220,13 +220,13 @@ inline pair<typename set<Key,Compare,Allocator>::iterator,bool> set<Key,Compare,
 {
   pair<typename tree_type::iterator,bool> p = tree.insert_unique (x);
   
-  return pair<iterator,bool> ((iterator&)p.first,p.second);
+  return pair<iterator,bool> (p.first.get_unqualified_iterator (),p.second);
 }
 
 template <class Key,class Compare,class Allocator>
 inline typename set<Key,Compare,Allocator>::iterator set<Key,Compare,Allocator>::insert (iterator position,const value_type& x)
 {
-  return tree.insert_unique ((typename tree_type::iterator&)position,x);
+  return tree.insert_unique (position.get_unqualified_iterator (),x);
 }
   
 template <class Key,class Compare,class Allocator> template <class Iter> 
@@ -285,7 +285,7 @@ inline typename multiset<Key,Compare,Allocator>::iterator multiset<Key,Compare,A
 template <class Key,class Compare,class Allocator>
 inline typename multiset<Key,Compare,Allocator>::iterator multiset<Key,Compare,Allocator>::insert (iterator position,const value_type& x)
 {
-  return tree.insert_equal ((typename tree_type::iterator&)position,x);
+  return tree.insert_equal (position.get_unqualified_iterator (),x);
 }
   
 template <class Key,class Compare,class Allocator> template <class Iter> 

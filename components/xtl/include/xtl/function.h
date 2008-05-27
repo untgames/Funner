@@ -33,7 +33,7 @@ struct bad_function_call: public std::exception
 template <class Signature> class function
 {
   typedef void (function::*safe_bool)();
-  typedef invoker<Signature, detail::function_invoker_base> invoker_type;
+  typedef xtl::invoker<Signature, detail::function_invoker_base> invoker_type;
   public:
     typedef typename invoker_type::arg1_type   arg1_type;
     typedef typename invoker_type::arg2_type   arg2_type;

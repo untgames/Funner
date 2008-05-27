@@ -54,7 +54,7 @@ inline bool abs_less (int x,int y) { return abs (x) < abs (y); }
 inline bool negative (int x)       { return x < 0; }
 inline bool positive (int x)       { return x > 0; }
 
-#if !defined (__NIOS2__)
+#ifdef _MSC_VER
 #pragma pack (push,1)
 #endif
 
@@ -113,7 +113,7 @@ template <class T> class MyAlloc: public stl::allocator<T>
     size_type max_size () const { return 10; }
 };
 
-#if !defined (__NIOS2__)
+#ifdef _MSC_VER
 #pragma pack(pop)
 #endif
 

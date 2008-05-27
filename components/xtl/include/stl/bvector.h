@@ -114,8 +114,8 @@ class bit_vector
     typedef const bool*                              const_pointer;
     typedef bit_iterator<word_type,reference>        iterator;
     typedef bit_iterator<word_type,const_reference>  const_iterator;
-    typedef reverse_iterator<const_iterator>         const_reverse_iterator;
-    typedef reverse_iterator<iterator>               reverse_iterator;
+    typedef stl::reverse_iterator<const_iterator>    const_reverse_iterator;
+    typedef stl::reverse_iterator<iterator>          reverse_iterator;
     
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы

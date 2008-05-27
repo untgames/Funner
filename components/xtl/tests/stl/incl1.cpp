@@ -12,7 +12,8 @@ int main ()
   
   int i;
   
-  for (i=0;i<(int)v1.size();v1 [i]=i++);
+  for (i=0;i<(int)v1.size();i++)
+    v1 [i] = i;
   
   if(includes(v1.begin (),v1.end (),v2.begin (),v2.end ()))
     printf ("v1 includes v2\n");

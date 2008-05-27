@@ -39,6 +39,7 @@ template <class T>
 class list_iterator 
 { 
   template <class T1,class Allocator> friend class list;
+  template <class T1> friend class list_iterator;
   public:
     typedef typename non_const_type<T>::value_type  value_type;
     typedef size_t                                  size_type;
@@ -49,7 +50,7 @@ class list_iterator
     typedef list_iterator<const value_type>         const_iterator;
     typedef bidirectional_iterator_tag              iterator_category;
 
-    list_iterator () {} //????? node = 0??? or private
+    list_iterator ();
     list_iterator (const iterator&);
     
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +77,11 @@ class list_iterator
 /////////////////////////////////////////////////////////////////////////////////////////////
     bool operator == (const list_iterator&) const;
     bool operator != (const list_iterator&) const;
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Получение unqualified итератора
+/////////////////////////////////////////////////////////////////////////////////////////////
+    iterator get_unqualified_iterator () const;
 
   private:          
     typedef list_node_base Node;
@@ -105,8 +111,8 @@ class list
     typedef const value_type&                                const_reference;
     typedef list_iterator<T>                                 iterator;
     typedef list_iterator<const T>                           const_iterator;
-    typedef reverse_iterator<const_iterator>                 const_reverse_iterator;
-    typedef reverse_iterator<iterator>                       reverse_iterator;
+    typedef stl::reverse_iterator<const_iterator>            const_reverse_iterator;
+    typedef stl::reverse_iterator<iterator>                  reverse_iterator;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы

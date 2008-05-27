@@ -14,7 +14,7 @@ namespace stl
 template <class Value,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
 class hashtable 
 {
-  typedef list<Value,Allocator> list_type;
+  typedef stl::list<Value,Allocator> list_type;
   public:
     typedef size_t        size_type;
     typedef ptrdiff_t     difference_type;  

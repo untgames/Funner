@@ -422,7 +422,7 @@ inline bool iterator<T>::contains (const Iter& i) const
 template <class T>
 inline bool iterator<T>::operator == (const iterator& i) const
 {
-  return impl == i.impl || impl->equal (*i.impl) || !*this && !i;
+  return impl == i.impl || impl->equal (*i.impl) || ( !*this && !i );
 }
 
 template <class T>

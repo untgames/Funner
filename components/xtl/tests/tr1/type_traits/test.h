@@ -2,6 +2,7 @@
 #define XTL_TYPE_TRAITS_TEST_HEADER
 
 #include <stdio.h>
+#include <string.h>
 #include <typeinfo>
 #include <xtl/type_traits>
 

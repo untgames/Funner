@@ -35,8 +35,8 @@ class basic_string
     typedef ptrdiff_t                                     difference_type;
     typedef const value_type*                             const_iterator;
     typedef value_type*                                   iterator;
-    typedef reverse_iterator<const_iterator>              const_reverse_iterator;
-    typedef reverse_iterator<iterator>                    reverse_iterator;
+    typedef stl::reverse_iterator<const_iterator>         const_reverse_iterator;
+    typedef stl::reverse_iterator<iterator>               reverse_iterator;
 
     static const size_type npos = (size_type)-1;   
 
@@ -274,7 +274,7 @@ class basic_string
     bool operator >  (const value_type*) const;
     
   private:
-    typedef eq_traits<traits_type> eq_traits;
+    typedef stl::eq_traits<traits_type> eq_traits;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вспомогательные функции

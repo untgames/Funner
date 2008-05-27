@@ -45,15 +45,23 @@ static argument<9> _9;
 namespace
 {
 
-argument<1> _1;
-argument<2> _2;
-argument<3> _3;
-argument<4> _4;
-argument<5> _5;
-argument<6> _6;
-argument<7> _7;
-argument<8> _8;
-argument<9> _9;
+#ifdef __GNUC__
+  #define XTL_UNUSED_ATTRIBUTE __attribute__((unused))
+#else
+  #define XTL_UNUSED_ATTRIBUTE
+#endif
+
+XTL_UNUSED_ATTRIBUTE argument<1> _1;
+XTL_UNUSED_ATTRIBUTE argument<2> _2;
+XTL_UNUSED_ATTRIBUTE argument<3> _3;
+XTL_UNUSED_ATTRIBUTE argument<4> _4;
+XTL_UNUSED_ATTRIBUTE argument<5> _5;
+XTL_UNUSED_ATTRIBUTE argument<6> _6;
+XTL_UNUSED_ATTRIBUTE argument<7> _7;
+XTL_UNUSED_ATTRIBUTE argument<8> _8;
+XTL_UNUSED_ATTRIBUTE argument<9> _9;
+
+#undef XTL_UNUSED_ATTRIBUTE
 
 }
 

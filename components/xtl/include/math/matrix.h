@@ -1,7 +1,9 @@
 #ifndef __MATHLIB_MATRIX__
 #define __MATHLIB_MATRIX__
 
-#pragma pack(push,1)
+#ifdef _MSC_VER  
+  #pragma pack(push,1)
+#endif
 
 #ifdef minor
 #undef minor
@@ -96,7 +98,9 @@ class matrix
     vector x [size];  
 };
 
-#pragma pack(pop)
+#ifdef _MSC_VER
+  #pragma pack(pop)
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты

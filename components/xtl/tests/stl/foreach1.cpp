@@ -15,7 +15,8 @@ int main ()
 
   vector <int> v1(10);
   
-  for (int i=0;i<(int)v1.size();v1[i]=i++);
+  for (size_t i=0; i<v1.size();i++)
+    v1 [i] = (int)i;
 
   for_each (v1.begin (),v1.end (),ptr_fun (print_sqr));
   printf ("\n");

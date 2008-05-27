@@ -13,7 +13,7 @@ int main ()
 {
   printf ("Results of maxelem2_test:\n");
 
-  char* names [] = {"Brett","Graham","Jack","Mike","Todd"};
+  const char* names [] = {"Brett","Graham","Jack","Mike","Todd"};
 
   const unsigned namesCt = sizeof (names)/sizeof (names[0]);
   

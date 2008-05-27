@@ -330,6 +330,11 @@ inline rbtree_node_base* rbtree_node_base::rebalance_for_erase (Node*& root,Node
 */
 
 template <class Val,class Ref,class Ptr>
+inline rbtree_iterator<Val,Ref,Ptr>::rbtree_iterator ()
+  : node (0)
+{ }
+
+template <class Val,class Ref,class Ptr>
 inline rbtree_iterator<Val,Ref,Ptr>::rbtree_iterator (link_type link)
   : node (link)
 { }
@@ -394,6 +399,17 @@ inline bool rbtree_iterator<Val,Ref,Ptr>::operator != (const rbtree_iterator& i)
 {
   return i.node != node;
 }
+
+/*
+    Получение unqualified итератора
+*/
+
+template <class Val,class Ref,class Ptr>
+inline typename rbtree_iterator<Val,Ref,Ptr>::iterator rbtree_iterator<Val,Ref,Ptr>::get_unqualified_iterator () const
+{
+  return iterator (node);
+}
+
 
 /*
     Конструкторы
@@ -771,8 +787,10 @@ rbtree<Key,Value,KeyOfValue,Compare,Allocator>::insert_unique (const value_type&
   iterator j = y;
   
   if (comp)
+  {
     if (j == begin ()) return pair<iterator,bool> (_insert (x,y,v),true);
     else               --j;
+  }
           
   if (compare (key (j.node),key (v)))
     return pair<iterator,bool> (_insert (x,y,v),true);

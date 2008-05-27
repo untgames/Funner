@@ -14,9 +14,9 @@ int main ()
 {
   printf ("Results of adjfind2_test:\n");
   
-  typedef vector<char*> CStrVector;
+  typedef vector<const char*> CStrVector;
 
-  char* names [] = {"Brett","Graham","Jack","Mike","Todd"};
+  const char* names [] = {"Brett","Graham","Jack","Mike","Todd"};
   const int nameCount = sizeof(names)/sizeof(names[0]);
   
   CStrVector v (nameCount);

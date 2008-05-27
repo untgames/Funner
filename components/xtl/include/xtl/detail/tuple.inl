@@ -231,22 +231,22 @@ class cons: private tuple_element_holder<Head, Tail>, public Tail
     
     template <class Head1, class Tail1> bool operator < (const cons<Head1, Tail1>& t) const
     {
-      return get_head () < t.get_head () || !(t.get_head () < get_head ()) && get_tail () < t.get_tail ();
+      return get_head () < t.get_head () || ( !(t.get_head () < get_head ()) && get_tail () < t.get_tail () );
     }
     
     template <class Head1, class Tail1> bool operator > (const cons<Head1, Tail1>& t) const
     {
-      return get_head () > t.get_head () || !(t.get_head () > get_head ()) && get_tail () > t.get_tail ();
+      return get_head () > t.get_head () || ( !(t.get_head () > get_head ()) && get_tail () > t.get_tail () );
     }
 
     template <class Head1, class Tail1> bool operator <= (const cons<Head1, Tail1>& t) const
     {
-      return get_head () <= t.get_head () || !(t.get_head () <= get_head ()) && get_tail () <= t.get_tail ();
+      return get_head () <= t.get_head () || ( !(t.get_head () <= get_head ()) && get_tail () <= t.get_tail () );
     }
     
     template <class Head1, class Tail1> bool operator >= (const cons<Head1, Tail1>& t) const
     {
-      return get_head () >= t.get_head () || !(t.get_head () >= get_head ()) && get_tail () >= t.get_tail ();
+      return get_head () >= t.get_head () || ( !(t.get_head () >= get_head ()) && get_tail () >= t.get_tail () );
     }
 };
 

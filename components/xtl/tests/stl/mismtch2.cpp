@@ -15,11 +15,11 @@ int main ()
 
   const unsigned size = 5;
   
-  char* n1 [size] = {"Brett","Graham","Jack","Mike","Todd"}, *n2 [size];
+  const char* n1 [size] = {"Brett","Graham","Jack","Mike","Todd"}, *n2 [size];
 
   copy (n1,n1+5,n2);
   
-  pair<char**,char**> result = mismatch (n1,n1+size,n2,str_equal);
+  pair<const char**,const char**> result = mismatch (n1,n1+size,n2,str_equal);
   
   if (result.first == n1+size && result.second == n2+size)
     printf ("n1 and n2 are the same\n");

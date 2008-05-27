@@ -135,7 +135,7 @@ inline void hash_set_base<Value,HashFn,EqualKey,Allocator>::resize (size_type si
 template <class Value,class HashFn,class EqualKey,class Allocator>
 inline void hash_set_base<Value,HashFn,EqualKey,Allocator>::erase (iterator position)
 {
-  ht.erase ((typename table_type::iterator&)position);
+  ht.erase (position.get_unqualified_iterator ());
 }
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -148,7 +148,7 @@ hash_set_base<Value,HashFn,EqualKey,Allocator>::erase (const key_type& x)
 template <class Value,class HashFn,class EqualKey,class Allocator>
 inline void hash_set_base<Value,HashFn,EqualKey,Allocator>::erase (iterator first,iterator last)
 {
-  ht.erase ((typename table_type::iterator&)first,(typename table_type::iterator&)last);
+  ht.erase (first.get_unqualified_iterator (), last.get_unqualified_iterator ());
 }
 
 template <class Value,class HashFn,class EqualKey,class Allocator>

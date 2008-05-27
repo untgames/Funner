@@ -66,6 +66,10 @@ static null_ptr_type null;
 namespace
 {
 
+#ifdef __GNUC__
+__attribute__((unused))
+#endif
+
 null_ptr_type null;
 
 }

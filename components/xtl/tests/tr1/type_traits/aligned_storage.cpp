@@ -13,7 +13,9 @@ void check (const T&)
 {
    typedef typename aligned_storage<T::value, T::value>::type t1;
    
-   t1 as1 = { 0, };
+   t1 as1;
+   
+   memset (&as1, 0, sizeof as1);
    
    must_be_pod<t1> pod1;
    
@@ -26,7 +28,9 @@ void check (const T&)
 
    typedef typename aligned_storage<T::value*2, T::value>::type t2;
    
-   t2 as2 = { 0, };
+   t2 as2;
+   
+   memset (&as2, 0, sizeof as2);
    
    must_be_pod<t2> pod2;
    
@@ -39,8 +43,10 @@ void check (const T&)
 
    typedef typename aligned_storage<T::value,-1L>::type t3;
 
-   t3 as3 = { 0, };
+   t3 as3;
 
+   memset (&as3, 0, sizeof as3);   
+   
    must_be_pod<t3> pod3;
    
    no_unused_warning (as3);

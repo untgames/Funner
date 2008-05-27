@@ -49,12 +49,6 @@ void to_string (stl::string& buffer, X& x)
 
 }
 
-template <class T>
-void print (const volatile T* value)
-{
-  print (*value);
-}
-
 void print (const volatile A& a)
 {
   printf ("static-type='class A' dynamic-type='%s'", const_cast<const A&> (a).name ());
@@ -81,9 +75,9 @@ void print (const volatile test_namespace::Y& y)
 }
 
 template <class T>
-void print (const T* value)
+void print (const volatile T* value)
 {
-  print (static_cast<const volatile T*> (value));
+  print (*value);
 }
 
 void print (const A& a)
@@ -109,6 +103,12 @@ void print (const test_namespace::X& x)
 void print (const test_namespace::Y& y)
 {
   print (static_cast<const volatile test_namespace::Y&> (y));
+}
+
+template <class T>
+void print (const T* value)
+{
+  print (static_cast<const volatile T*> (value));
 }
 
 template <class T>

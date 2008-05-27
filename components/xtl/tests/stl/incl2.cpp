@@ -14,11 +14,11 @@ int main ()
 {
   printf ("Results of incl2_test:\n");
 
-  char* names [] = {"Todd","Mike","Graham","Jack","Brett"};
+  const char* names [] = {"Todd","Mike","Graham","Jack","Brett"};
 
   const unsigned nameSize = sizeof (names) / sizeof (names[0]);
   
-  vector<char*> v1 (nameSize), v2 (2);
+  vector<const char*> v1 (nameSize), v2 (2);
   
   for (int i=0;i<(int)v1.size();i++) v1 [i] = names [i]; 
 

@@ -9,13 +9,13 @@ int main ()
 {
   printf ("Results of finsert2_test:\n");
   
-  char* array [] = {"laurie","jennifer","leisa"};
+  const char* array [] = {"laurie","jennifer","leisa"};
 
-  deque<char*> names;
+  deque<const char*> names;
   
   copy (array,array+3,front_inserter (names));
     
-  for (deque<char*>::iterator i=names.begin ();i!=names.end ();i++)
+  for (deque<const char*>::iterator i=names.begin ();i!=names.end ();i++)
     printf ("%s\n",*i);
 
   return 0;

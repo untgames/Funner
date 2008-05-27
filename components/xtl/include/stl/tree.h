@@ -56,6 +56,7 @@ template <class Value,class Reference,class Pointer>
 class rbtree_iterator
 {
   template <class Key,class T,class KeyOfValue,class Compare,class Allocator> friend class rbtree;
+  template <class Value1,class Reference1, class Pointer1> friend class rbtree_iterator;
   public:
     typedef ptrdiff_t  difference_type;  
     typedef Value      value_type;
@@ -66,7 +67,7 @@ class rbtree_iterator
     typedef rbtree_iterator<Value,const Value&,const Value*> const_iterator;
     typedef bidirectional_iterator_tag                       iterator_category;
 
-    rbtree_iterator () {}
+    rbtree_iterator ();
     rbtree_iterator (const iterator&);
     
     reference         operator *  () const;
@@ -77,6 +78,8 @@ class rbtree_iterator
     rbtree_iterator   operator -- (int);
     bool              operator == (const rbtree_iterator&) const;
     bool              operator != (const rbtree_iterator&) const;
+    
+    iterator get_unqualified_iterator () const;    
 
   private:        
     typedef rbtree_node_base* link_type;

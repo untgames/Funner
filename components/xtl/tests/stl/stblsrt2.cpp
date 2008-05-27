@@ -13,7 +13,7 @@ int main ()
 {
   printf ("Results of stblsrt2_test:\n");
 
-  char* letters [6] = {"bb","aa","ll","dd","qq","cc"};
+  const char* letters [6] = {"bb","aa","ll","dd","qq","cc"};
 
   stable_sort (letters,letters+6,string_less);
   

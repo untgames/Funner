@@ -1,7 +1,9 @@
 #ifndef __MATHLIB_QUATERNION__
 #define __MATHLIB_QUATERNION__
 
-#pragma pack (push,1)
+#ifdef _MSC_VER
+  #pragma pack (push,1)
+#endif
 
 namespace math
 {
@@ -92,7 +94,9 @@ class quat: public quat_base<type>
     using quat_base<type>::w;
 };
 
-#pragma pack (pop)
+#ifdef _MSC_VER
+  #pragma pack (pop)
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты

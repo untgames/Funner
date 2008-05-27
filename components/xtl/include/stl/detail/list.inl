@@ -29,6 +29,11 @@ inline void list_node_base::transfer (list_node_base* position,list_node_base* f
 */
 
 template <class T>
+inline list_iterator<T>::list_iterator ()
+  : node (0)
+  { }
+
+template <class T>
 inline list_iterator<T>::list_iterator (Node* _node)
   : node (_node)
  { }  
@@ -100,6 +105,16 @@ inline bool list_iterator<T>::operator != (const list_iterator& i) const
 {
   return !(*this == i);
 }  
+
+/*
+    Получение unqualified итератора
+*/
+
+template <class T>
+inline typename list_iterator<T>::iterator list_iterator<T>::get_unqualified_iterator () const
+{
+  return iterator (node);
+}
 
 /*
     Конструкторы

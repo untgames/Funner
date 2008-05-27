@@ -29,6 +29,20 @@ extern "C" __declspec (dllimport) long __stdcall InterlockedCompareExchange (vol
 #define XTL_INTERLOCKED_DECREMENT        InterlockedDecrement
 #define XTL_INTERLOCKED_COMPARE_EXCHANGE InterlockedCompareExchange
 
+#elif defined (ARM9)
+
+inline long arm9_interlocked_increment (volatile long* ref) { return ++*ref; }
+inline long arm9_interlocked_decrement (volatile long* ref) { return --*ref; }
+
+inline long arm9_interlocked_compare_exchange (volatile long* destination, long exchange, long comparand)
+{
+  return *destination == comparand ? *destination = exchange : *destination;
+}
+
+#define XTL_INTERLOCKED_INCREMENT        arm9_interlocked_increment
+#define XTL_INTERLOCKED_DECREMENT        arm9_interlocked_decrement
+#define XTL_INTERLOCKED_COMPARE_EXCHANGE arm9_interlocked_compare_exchange
+
 #else
   #error "Interlocked intrinsics not available"
 #endif
