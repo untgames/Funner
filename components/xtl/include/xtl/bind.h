@@ -138,14 +138,6 @@ detail::binder<detail::unspecified_result, Fn, T1, T2, T3, T4, T5, T6, T7, T8> b
 template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 detail::binder<detail::unspecified_result, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> bind (Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка равенства bind-выражений
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Ret1, class Fn1, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19,
-          class Ret2, class Fn2, class T21, class T22, class T23, class T24, class T25, class T26, class T27, class T28, class T29>
-bool function_equal (const detail::binder<Ret1, Fn1, T11, T12, T13, T14, T15, T16, T17, T18, T19>&,
-                     const detail::binder<Ret2, Fn2, T21, T22, T23, T24, T25, T26, T27, T28, T29>&);
-
 #include <xtl/detail/bind.inl>
 
 }
