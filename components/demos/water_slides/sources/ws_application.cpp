@@ -68,7 +68,9 @@ struct MyApplication::Impl
       {
         try
         {
-          scene_player = new sound::ScenePlayer (*sound_manager);
+          scene_player = new sound::ScenePlayer;
+          
+          scene_player->SetManager (sound_manager);
         }
         catch (...)
         {

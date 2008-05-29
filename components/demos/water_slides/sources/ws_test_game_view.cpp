@@ -164,7 +164,7 @@ class TestView: public IGameView
     void LoadResources (sound::ScenePlayer* player, IDevice& device)
     {
       if (player)
-        player->SetListener (*(listener.get ()));
+        player->SetListener (&*(listener.get ()));
 
       current_device = &device;
       
@@ -240,6 +240,7 @@ class TestView: public IGameView
       memset (&rs_desc, 0, sizeof (rs_desc));
 
       rs_desc.fill_mode  = FillMode_Solid;
+//      rs_desc.fill_mode  = FillMode_Wireframe;
       rs_desc.cull_mode  = CullMode_None;
 
       rasterizer = RasterizerStatePtr (current_device->CreateRasterizerState (rs_desc), false);      
