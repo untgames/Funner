@@ -7,17 +7,16 @@
 #include <common/strlib.h>
 #include <xtl/function.h>
 
-#ifdef _WIN32
+#ifdef _MSC_VER
   #include <io.h>
   #include <direct.h>
-#endif
-
-#ifdef _MSC_VER
+  
   #pragma warning (disable : 4996) //declare deprecated
-#endif
 
-#ifdef __GNUC__
+#elif __GNUC__
   #include <unistd.h>
+#else
+  #error Unknown compiler
 #endif
 
 using namespace common;

@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <platform/default/shared.h>
+#include <xtl/function.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
