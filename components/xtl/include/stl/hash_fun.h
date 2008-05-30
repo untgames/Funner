@@ -4,7 +4,7 @@
 #include <cwchar>
 
 #ifndef __MYSTL_STANDALONE__
-  #include <common/strwrap.h>
+  #include <common/hash.h>
 #endif
 
 namespace stl

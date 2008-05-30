@@ -1,6 +1,7 @@
 #ifndef XTL_TOKEN_ITERATOR_HEADER
 #define XTL_TOKEN_ITERATOR_HEADER
 
+#include <stddef.h>
 #include <xtl/token_parser.h>
 
 namespace stl
@@ -175,7 +176,7 @@ template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, 
 ///Чтение интервалов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Token, class BaseIter, class OutIter>
-size_t read_range (token_iterator<Token, BaseIter>&, OutIter first, size_t count = size_t (-1));
+size_t read_range (token_iterator<Token, BaseIter>&, OutIter first, size_t count = ~0);
 
 template <class Token, class BaseIter, class OutIter>
 size_t read_range (token_iterator<Token, BaseIter>&, OutIter first, size_t count, size_t step);

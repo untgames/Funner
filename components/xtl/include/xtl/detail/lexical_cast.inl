@@ -99,7 +99,7 @@ inline void integer_to_string (stl::string& buffer, long value, bool sign)
 
   char char_buffer [MAX_INTEGER_STRING_SIZE];
 
-  xtl_snprintf (char_buffer, sizeof (char_buffer), sign ? "%d" : "%u", value);
+  xsnprintf (char_buffer, sizeof (char_buffer), sign ? "%d" : "%u", value);
 
   buffer = char_buffer;
 }
@@ -171,7 +171,7 @@ inline void to_string (stl::string& buffer, const double& value)
   
   char char_buffer [MAX_REAL_STRING_SIZE];
   
-  xtl_snprintf (char_buffer, sizeof (char_buffer), "%.12g", value);
+  xsnprintf (char_buffer, sizeof (char_buffer), "%.12g", value);
   
   char_buffer [MAX_REAL_STRING_SIZE - 1] = 0;
   
@@ -192,7 +192,7 @@ inline void to_string (stl::string& buffer, const void* pointer)
 {
   buffer.resize (8);
   
-  xtl_snprintf (&buffer [0], buffer.size () + 1, "%p", pointer);
+  xsnprintf (&buffer [0], buffer.size () + 1, "%p", pointer);
 }
 
 template <class T>

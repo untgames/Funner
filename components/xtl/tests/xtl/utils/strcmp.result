@@ -1,0 +1,31 @@
+Results of strcmp_test:
+Compare tests:
+xstrcmp('','Hello')=-1
+xstrncmp('hello','hello',4)=0
+xstrncmp('abcd','abc',5)=1
+xstrncmp('hello','world',0)=0
+xstrncmp('','',10)=0
+xstrcmp('hello','Hello')=1
+xstrncmp('abcde','abcdf',5)=-1
+xstrcmp('','Hello')=-1
+xstrncmp('hello','hello',4)=0
+xstrncmp('abcd','abc',5)=1
+xstrncmp('hello','world',0)=0
+xstrncmp('','',10)=0
+xstrcmp('hello','Hello')=1
+xstrncmp('abcde','abcdf',5)=-1
+Case compare tests:
+xstricmp('','Hello')=-1
+xstrnicmp('hello','hello',4)=0
+xstrnicmp('abcd','abc',5)=1
+xstrnicmp('hello','world',0)=0
+xstrnicmp('','',10)=0
+xstricmp('hello','Hello')=0
+xstrnicmp('abcde','abcdf',5)=-1
+xstricmp('','Hello')=-1
+xstrnicmp('hello','hello',4)=0
+xstrnicmp('abcd','abc',5)=1
+xstrnicmp('hello','world',0)=0
+xstrnicmp('','',10)=0
+xstricmp('hello','Hello')=0
+xstrnicmp('abcde','abcdf',5)=-1
