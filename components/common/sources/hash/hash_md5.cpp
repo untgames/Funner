@@ -1,5 +1,5 @@
 #include <common/hash.h>
-#include <memory.h>
+#include <string.h>
 #include <new>
 
 using namespace common;

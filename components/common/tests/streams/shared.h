@@ -2,7 +2,7 @@
 #define COMMONLIB_STREAMS_TESTS_HEADER
 
 #include <stdio.h>
-#include <memory.h>
+#include <string.h>
 
 #include <xtl/function.h>
 #include <xtl/iterator_range.h>

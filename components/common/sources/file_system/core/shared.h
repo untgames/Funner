@@ -19,7 +19,7 @@
 #include <xtl/reference_counter.h>
 #include <xtl/string.h>
 
-#include <memory.h>
+#include <string.h>
 
 namespace common
 {

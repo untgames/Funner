@@ -1,6 +1,6 @@
 #include <common/file.h>
 #include <stdio.h>
-#include <memory.h>
+#include <string.h>
 
 using namespace common;
 

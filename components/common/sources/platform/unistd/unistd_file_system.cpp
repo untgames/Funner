@@ -1,5 +1,9 @@
 #include <unistd.h>
-#include <dirent.h>
+
+#ifndef COMMONLIB_NDS
+  #include <dirent.h>
+#endif
+
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
@@ -24,6 +28,7 @@ namespace
 class UnistdFileSystem: public StdioFileSystem
 {
   public:
+#ifndef COMMONLIB_NDS
     void FileResize (file_t file,filesize_t new_size)
     {
       static const char* METHOD_NAME = "UnistdFileSystem::FileResize";
@@ -39,6 +44,7 @@ class UnistdFileSystem: public StdioFileSystem
         }    
       }      
     }
+#endif
 
     void Mkdir (const char* dir_name)
     {
@@ -54,7 +60,8 @@ class UnistdFileSystem: public StdioFileSystem
         }
       }
     }
-    
+
+#ifndef COMMONLIB_NDS    
     void Search (const char* full_mask,const FileSearchHandler& find_handler)
     {
       string dir_name = dir (full_mask), mask = full_mask + dir_name.size (), file_name;
@@ -80,6 +87,7 @@ class UnistdFileSystem: public StdioFileSystem
 
       closedir (dir);
     }    
+#endif    
 };
 
 }

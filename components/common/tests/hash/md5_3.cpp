@@ -20,7 +20,7 @@ int main ()
     MD5Context    context;
     unsigned char buffer [READ_BUFFER_SIZE], digest [16];    
     
-    for (size_t len;len=file.Read (buffer,READ_BUFFER_SIZE);)
+    for (size_t len;(len=file.Read (buffer,READ_BUFFER_SIZE));)
       context.Update (buffer,len);
       
     context.Finish (digest);      

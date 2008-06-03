@@ -1,7 +1,9 @@
+#include <string.h>
+
 #include <common/heap.h>
 #include <common/strlib.h>
 #include <platform/platform.h>
-#include <memory.h>
+
 #include <xtl/function.h>
 
 #include "shared.h"
