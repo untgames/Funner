@@ -3,17 +3,8 @@
 
 #include <stddef.h>
 
-namespace xtl
-{
-
-namespace io
-{
-
-template <class Token, class BaseIter> class token_iterator;
-
-}
-
-}
+#include <xtl/lexical_cast.h>
+#include <xtl/token_iterator.h>
 
 namespace common
 {
