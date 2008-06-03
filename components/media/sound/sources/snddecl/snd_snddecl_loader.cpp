@@ -88,7 +88,7 @@ class SnddeclLoaderComponent
 extern "C"
 {
 
-ComponentRegistrator<SnddeclLoaderComponent> SnddeclLoader ("media.sound.loaders.Snddecl");
+ComponentRegistrator<SnddeclLoaderComponent> SnddeclLoader ("media.sound.loaders.snddecl");
 
 }
 

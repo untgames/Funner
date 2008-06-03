@@ -119,7 +119,7 @@ class SnddeclSaverComponent
 extern "C"
 {
 
-ComponentRegistrator<SnddeclSaverComponent> SnddeclSaver ("media.sound.savers.Snddecl");
+ComponentRegistrator<SnddeclSaverComponent> SnddeclSaver ("media.sound.savers.snddecl");
 
 }
 
