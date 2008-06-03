@@ -35,7 +35,7 @@ endef
 #список подключаемых символов линковки, флаги линковки)
 ###################################################################################################
 define tools.g++.link
-$(LINKER_GCC) -o "$1" $(if $(filter %.$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(patsubst %,-L "%",$3) $5 $(patsubst lib%.a,-l %,$(filter lib%.a,$2) $(COMMON_LINK_FLAGS))
+$(LINKER_GCC) -o "$1" $(if $(filter %.$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(patsubst %,-L "%",$3) $5 $(patsubst lib%.a,-l %,$(filter lib%.a,$2) $(COMMON_LINK_FLAGS) $(patsubst %,-u _%,$4))
 endef
 
 ###################################################################################################
