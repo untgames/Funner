@@ -30,7 +30,7 @@ VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, c
         gl_usage_mode = GL_STREAM_DRAW;
         break;  
       default:
-        RaiseInvalidArgument ("", "desc.usage_mode", in_desc.usage_mode);
+        raise_invalid_argument ("", "desc.usage_mode", in_desc.usage_mode);
         break;
     }
 

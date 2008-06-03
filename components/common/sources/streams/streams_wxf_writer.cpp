@@ -120,7 +120,7 @@ void WxfWriter::Write (const char* tag)
 void WxfWriter::WriteComment (const char* comment)
 {
   if (!comment)
-    RaiseNullArgument ("common::WxfWriter::WriteComment", "comment");
+    raise_null_argument ("common::WxfWriter::WriteComment", "comment");
 
   if (!impl->begin_frame_flag)
     write (impl->stream, "\n");
@@ -168,7 +168,7 @@ void WxfWriter::WriteComment (const char* comment)
 
 void WxfWriter::WriteComment (const wchar_t*)
 {
-  RaiseNotImplemented ("common::WxfWriter::WriteComment");
+  raise_not_implemented ("common::WxfWriter::WriteComment");
 }
 
 /*
@@ -203,7 +203,7 @@ void WxfWriter::WriteIndent (size_t indent)
 void WxfWriter::CheckTag (const char* tag, const char* function_name)
 {
   if (!tag)
-    RaiseNullArgument (function_name, "tag");
+    raise_null_argument (function_name, "tag");
 
   for (const char* s=tag; *s; s++)
     switch (*s)
@@ -225,7 +225,7 @@ void WxfWriter::CheckTag (const char* tag, const char* function_name)
       case '_':
         break;
       default:
-        Raise<WrongWxfTagException> (function_name, "Wrong wxf-format tag '%s'", tag);
+        raise<WrongWxfTagException> (function_name, "Wrong wxf-format tag '%s'", tag);
         break;
     }
 }

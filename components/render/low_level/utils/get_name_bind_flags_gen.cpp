@@ -62,7 +62,7 @@ int main ()
   }
 
   printf ("    default:\n");
-  printf ("      RaiseInvalidArgument (\"render::low_level::get_name(BindFlag)\", \"param\", param);\n");
+  printf ("      raise_invalid_argument (\"render::low_level::get_name(BindFlag)\", \"param\", param);\n");
   printf ("      return \"\";\n");
   printf ("  }\n");
   printf ("}\n");

@@ -59,7 +59,7 @@ void AsyncPredicate::Begin ()
   size_t &is_in_ranges = GetContextDataTable (Stage_QueryManager)[QueryManagerCache_IsInRanges];
 
   if (is_in_ranges)
-    RaiseInvalidOperation (METHOD_NAME, "Begin already called without end call");
+    raise_invalid_operation (METHOD_NAME, "Begin already called without end call");
 
   if (glBeginQuery) glBeginQuery    (GL_SAMPLES_PASSED, query);
   else              glBeginQueryARB (GL_SAMPLES_PASSED, query);
@@ -78,7 +78,7 @@ void AsyncPredicate::End ()
   size_t &is_in_ranges = GetContextDataTable (Stage_QueryManager)[QueryManagerCache_IsInRanges];
 
   if (!is_in_ranges)
-    RaiseInvalidOperation (METHOD_NAME, "There was not begin call");
+    raise_invalid_operation (METHOD_NAME, "There was not begin call");
 
   if (glEndQuery) glEndQuery    (GL_SAMPLES_PASSED);
   else            glEndQueryARB (GL_SAMPLES_PASSED);

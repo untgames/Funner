@@ -223,10 +223,10 @@ struct InputStage::Impl: public ContextObject
       Buffer* buffer = cast_object<Buffer> (*this, in_buffer, METHOD_NAME, "buffer");
       
       if (buffer && !buffer->IsVertexBuffer ())
-        Raise<ArgumentException> (METHOD_NAME, "Invalid argument <buffer>. Incompatible vertex buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
+        raise<ArgumentException> (METHOD_NAME, "Invalid argument <buffer>. Incompatible vertex buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
       
       if (slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
-        RaiseOutOfRange (METHOD_NAME, "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
+        raise_out_of_range (METHOD_NAME, "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
         
       state.SetVertexBuffer (slot, buffer);
     }  
@@ -234,7 +234,7 @@ struct InputStage::Impl: public ContextObject
     IBuffer* GetVertexBuffer (size_t slot)
     {
       if (slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
-        RaiseOutOfRange ("render::low_level::opengl::InputStage::Impl::GetVertexBuffer", "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
+        raise_out_of_range ("render::low_level::opengl::InputStage::Impl::GetVertexBuffer", "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
     
       return state.GetVertexBuffer (slot);
     }  
@@ -250,7 +250,7 @@ struct InputStage::Impl: public ContextObject
       Buffer* buffer = cast_object<Buffer> (*this, in_buffer, METHOD_NAME, "buffer");    
       
       if (buffer && !buffer->IsIndexBuffer ())
-        Raise<ArgumentException> (METHOD_NAME, "Invalid argument <buffer>. Incompatible index buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
+        raise<ArgumentException> (METHOD_NAME, "Invalid argument <buffer>. Incompatible index buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
 
       state.SetIndexBuffer (buffer);
     }

@@ -50,7 +50,7 @@ float Listener::Gain () const
 void Listener::SetGain (float gain)
 {
   if (gain < 0)
-    RaiseOutOfRange ("Listener::SetGain", "gain", gain, 0.f, 1e9f);
+    raise_out_of_range ("Listener::SetGain", "gain", gain, 0.f, 1e9f);
 
   impl->gain = gain;
 }

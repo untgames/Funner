@@ -447,7 +447,7 @@ void convert_dispatcher1(const void*&   source,
     convert_dispatcher2<source_encoding, Encoding_UTF32BE> (source, source_size, destination, destination_size);
     break;
   default:
-    RaiseInvalidArgument(METHOD_NAME, "destination_encoding");
+    raise_invalid_argument(METHOD_NAME, "destination_encoding");
   }
 }
 
@@ -481,7 +481,7 @@ void convert_dispatcher0(Encoding       source_encoding,
     convert_dispatcher1<Encoding_UTF32BE> (source, source_size, destination_encoding, destination, destination_size);
     break;
   default:
-    RaiseInvalidArgument(METHOD_NAME, "source_encoding");
+    raise_invalid_argument(METHOD_NAME, "source_encoding");
   }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -500,10 +500,10 @@ void convert_encoding(Encoding       source_encoding,
     return;
 
   if (!source)
-    RaiseNullArgument(METHOD_NAME, "source");
+    raise_null_argument(METHOD_NAME, "source");
 
   if (!destination)
-    RaiseNullArgument(METHOD_NAME, "destination");
+    raise_null_argument(METHOD_NAME, "destination");
 
   convert_dispatcher0(source_encoding, source, source_size, destination_encoding, destination, destination_size);
 }

@@ -76,7 +76,7 @@ const char* Texmap::Image () const
 void Texmap::SetImage (const char* image_name)
 {
   if (!image_name)
-    RaiseNullArgument ("media::Texmap::SetImage", "image_name");
+    raise_null_argument ("media::Texmap::SetImage", "image_name");
     
   impl->image = image_name;
 }
@@ -102,7 +102,7 @@ void Texmap::SetTransform (const math::mat4f& tm)
 int Texmap::Source (Texcoord coord) const
 {
   if (coord < 0 || coord >= Texcoord_Num)
-    RaiseInvalidArgument ("media::Texmap::Source", "coord", coord);
+    raise_invalid_argument ("media::Texmap::Source", "coord", coord);
     
   return impl->texcoord_params [coord].source;
 }
@@ -110,7 +110,7 @@ int Texmap::Source (Texcoord coord) const
 void Texmap::SetSource (Texcoord coord, int source)
 {
   if (coord < 0 || coord >= Texcoord_Num)
-    RaiseInvalidArgument ("media::Texmap::SetSource", "coord", coord);
+    raise_invalid_argument ("media::Texmap::SetSource", "coord", coord);
     
   impl->texcoord_params [coord].source = source;
 }
@@ -122,7 +122,7 @@ void Texmap::SetSource (Texcoord coord, int source)
 TexcoordWrap Texmap::Wrap (Texcoord coord) const
 {
   if (coord < 0 || coord >= Texcoord_Num)
-    RaiseInvalidArgument ("media::Texmap::Wrap", "coord", coord);
+    raise_invalid_argument ("media::Texmap::Wrap", "coord", coord);
     
   return impl->texcoord_params [coord].wrap;
 }
@@ -130,7 +130,7 @@ TexcoordWrap Texmap::Wrap (Texcoord coord) const
 void Texmap::SetWrap (Texcoord coord, TexcoordWrap wrap)
 {
   if (coord < 0 || coord >= Texcoord_Num)
-    RaiseInvalidArgument ("media::Texmap::SetWrap", "coord", coord);
+    raise_invalid_argument ("media::Texmap::SetWrap", "coord", coord);
     
   impl->texcoord_params [coord].wrap = wrap;
 }
@@ -142,7 +142,7 @@ void Texmap::SetWrap (Texcoord coord, TexcoordWrap wrap)
 TexmapFilterType Texmap::FilterType (TexmapFilter filter) const
 {
   if (filter < 0 || filter >= TexmapFilter_Num)
-    RaiseInvalidArgument ("media::Texmap::FilterType", "filter", filter);
+    raise_invalid_argument ("media::Texmap::FilterType", "filter", filter);
     
   return impl->filters [filter];
 }
@@ -150,7 +150,7 @@ TexmapFilterType Texmap::FilterType (TexmapFilter filter) const
 void Texmap::SetFilterType (TexmapFilter filter, TexmapFilterType type)
 {
   if (filter < 0 || filter >= TexmapFilter_Num)
-    RaiseInvalidArgument ("media::Texmap::SetFilterType", "filter", filter);
+    raise_invalid_argument ("media::Texmap::SetFilterType", "filter", filter);
     
   switch (type)
   {
@@ -161,7 +161,7 @@ void Texmap::SetFilterType (TexmapFilter filter, TexmapFilterType type)
     case TexmapFilterType_Anisotropic:
       break;
     default:
-      RaiseInvalidArgument ("media::Texmap::SetFilterType", "type", type);
+      raise_invalid_argument ("media::Texmap::SetFilterType", "type", type);
       break;
   }
   
@@ -199,7 +199,7 @@ const char* get_name (Texcoord id)
     case Texcoord_S: return "s";
     case Texcoord_T: return "t";
     case Texcoord_Q: return "q";
-    default:         RaiseInvalidArgument ("media::rfx::get_name(Texcoord)", "id", id);
+    default:         raise_invalid_argument ("media::rfx::get_name(Texcoord)", "id", id);
   }
   
   return "";
@@ -223,7 +223,7 @@ const char* get_name (TexcoordWrap id)
     case TexcoordWrap_Mirror:        return "mirror";
     case TexcoordWrap_Clamp:         return "clamp";
     case TexcoordWrap_ClampToBorder: return "clamp_to_border";
-    default:                         RaiseInvalidArgument ("media::rfx::get_name(TexcoordWrap)", "id", id);
+    default:                         raise_invalid_argument ("media::rfx::get_name(TexcoordWrap)", "id", id);
   }
   
   return "";
@@ -236,7 +236,7 @@ const char* get_name (TexmapFilter id)
     case TexmapFilter_Min: return "min";
     case TexmapFilter_Mag: return "mag";
     case TexmapFilter_Mip: return "mip";
-    default:               RaiseInvalidArgument ("media::rfx::get_name(TexmapFilter)", "id", id);
+    default:               raise_invalid_argument ("media::rfx::get_name(TexmapFilter)", "id", id);
   }
   
   return "";
@@ -251,7 +251,7 @@ const char* get_name (TexmapFilterType id)
     case TexmapFilterType_Bilinear:    return "bilinear";
     case TexmapFilterType_Trilinear:   return "trilinear";
     case TexmapFilterType_Anisotropic: return "anisotropic";
-    default:                           RaiseInvalidArgument ("media::rfx::get_name(TexmapFilterType)", "id", id);
+    default:                           raise_invalid_argument ("media::rfx::get_name(TexmapFilterType)", "id", id);
   }
 
   return "";  

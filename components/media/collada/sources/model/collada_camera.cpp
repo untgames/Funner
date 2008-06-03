@@ -69,7 +69,7 @@ const char* Camera::Id () const
 void Camera::SetId (const char* id)
 {
   if (!id)
-    RaiseNullArgument ("media::collada::Camera::SetId", "id");
+    raise_null_argument ("media::collada::Camera::SetId", "id");
 
   impl->id = id;
 }
@@ -91,7 +91,7 @@ void Camera::SetType (CameraType type)
     case CameraType_Orthographic:
       break;
     default:
-      RaiseInvalidArgument ("media::collada::Camera::SetType", "type", type);
+      raise_invalid_argument ("media::collada::Camera::SetType", "type", type);
       break;
   }
   
@@ -105,7 +105,7 @@ void Camera::SetType (CameraType type)
 void Camera::SetParam (CameraParam param, float value)
 {
   if (param < 0 || param >= CameraParam_Num)
-    RaiseInvalidArgument ("media::collada::Camera::SetParam", "param", param);
+    raise_invalid_argument ("media::collada::Camera::SetParam", "param", param);
     
   impl->params [param] = value;
 }
@@ -113,7 +113,7 @@ void Camera::SetParam (CameraParam param, float value)
 float Camera::Param (CameraParam param) const
 {
   if (param < 0 || param >= CameraParam_Num)
-    RaiseInvalidArgument ("media::collada::Camera::Param", "param", param);
+    raise_invalid_argument ("media::collada::Camera::Param", "param", param);
     
   return impl->params [param];
 }

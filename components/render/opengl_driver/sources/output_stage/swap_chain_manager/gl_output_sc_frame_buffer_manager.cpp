@@ -256,10 +256,10 @@ ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& de
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-      RaiseNotSupported (METHOD_NAME, "Can't create output-stage texture with format=%s", get_name (desc.format));
+      raise_not_supported (METHOD_NAME, "Can't create output-stage texture with format=%s", get_name (desc.format));
       return 0;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.format", desc.format);
+      raise_invalid_argument (METHOD_NAME, "desc.format", desc.format);
       return 0;
   }
 }

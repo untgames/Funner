@@ -61,14 +61,14 @@ StdioIOSystem::file_t StdioIOSystem::FileOpen (const char* file_name,filemode_t 
     {
       if (stdio_file->mode & ~mode)
       {
-        Raise<FileLoadException> ("StdioIOSystem::FileOpen","Wrong <file_mode>='%s' at open '%s' stream",
+        raise<FileLoadException> ("StdioIOSystem::FileOpen","Wrong <file_mode>='%s' at open '%s' stream",
                                   strfilemode (mode).c_str (),file_name);
       }
 
       return (file_t)stdio_file->stream;
     }
   
-  Raise<FileNotFoundException> ("StdioIOSystem::FileOpen","File '%s' not found",file_name);
+  raise<FileNotFoundException> ("StdioIOSystem::FileOpen","File '%s' not found",file_name);
     
   return (file_t)NULL;
 }
@@ -113,15 +113,15 @@ bool StdioIOSystem::GetFileInfo (const char* file_name,FileInfo& info)
 
 void StdioIOSystem::Remove (const char* file_name)
 {
-  RaiseNotSupported ("StdioIOSystem::Remove","File '%s' can not be removed",file_name);
+  raise_not_supported ("StdioIOSystem::Remove","File '%s' can not be removed",file_name);
 }
 
 void StdioIOSystem::Rename (const char* file_name,const char*)
 {
-  RaiseNotSupported ("StdioIOSystem::Rename","File '%s' can not be renamed",file_name);
+  raise_not_supported ("StdioIOSystem::Rename","File '%s' can not be renamed",file_name);
 }
 
 void StdioIOSystem::Mkdir (const char* dir_name)
 {
-  RaiseNotSupported ("StdioIOSystem::Mkdir","Unable to make dir '%s'. This file system is static",dir_name);
+  raise_not_supported ("StdioIOSystem::Mkdir","Unable to make dir '%s'. This file system is static",dir_name);
 }

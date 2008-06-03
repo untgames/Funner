@@ -47,7 +47,7 @@ class CollectionImpl: public ICollection<Item>
     const Item& operator [] (size_t index) const
     {
       if (index >= items.size ())
-        common::RaiseOutOfRange ("media::collada::ICollection::operator []", "index", index, items.size ());
+        common::raise_out_of_range ("media::collada::ICollection::operator []", "index", index, items.size ());
 
       return items [index];
     }

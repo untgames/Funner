@@ -157,10 +157,10 @@ bool StringConverterSystemImpl::RegisterConverter
   try
   {
     if (!source_encoding)
-      RaiseNullArgument ("", "source_encoding");
+      raise_null_argument ("", "source_encoding");
 
     if (!destination_encoding)
-      RaiseNullArgument ("", "destination_encoding");
+      raise_null_argument ("", "destination_encoding");
       
     size_t hash = GetConverterHash (source_encoding, destination_encoding);
       
@@ -222,15 +222,15 @@ IStringConverter* StringConverterSystemImpl::CreateConverter
   try
   {
     if (!source_encoding)
-      RaiseNullArgument ("", "source_encoding");
+      raise_null_argument ("", "source_encoding");
 
     if (!destination_encoding)
-      RaiseNullArgument ("", "destination_encoding");
+      raise_null_argument ("", "destination_encoding");
 
     StringConverterMap::const_iterator iter = converters.find (GetConverterHash (source_encoding, destination_encoding));
     
     if (iter == converters.end ())
-      RaiseInvalidOperation ("", "A converter functor for \'%s-to-%s\' is not registered", source_encoding, destination_encoding);
+      raise_invalid_operation ("", "A converter functor for \'%s-to-%s\' is not registered", source_encoding, destination_encoding);
    
     return (iter->second)();
   }

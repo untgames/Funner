@@ -67,7 +67,7 @@ size_t Material::NameHash () const
 void Material::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("media::rfx::Material::Rename", "name");
+    raise_null_argument ("media::rfx::Material::Rename", "name");
         
   impl->name      = name;
   impl->name_hash = strhash (name);
@@ -80,7 +80,7 @@ void Material::Rename (const char* name)
 bool Material::IsEnabled (MaterialPin pin) const
 {
   if (pin < 0 || pin >= MaterialPin_Num)
-    RaiseInvalidArgument ("media::rfx::Material::IsEnabled", "pin", pin);
+    raise_invalid_argument ("media::rfx::Material::IsEnabled", "pin", pin);
     
   return impl->pins.test (pin);
 }
@@ -88,7 +88,7 @@ bool Material::IsEnabled (MaterialPin pin) const
 void Material::SetPin (MaterialPin pin, bool state)
 {
   if (pin < 0 || pin >= MaterialPin_Num)
-    RaiseInvalidArgument ("media::rfx::Material::SetPin", "pin", pin); 
+    raise_invalid_argument ("media::rfx::Material::SetPin", "pin", pin); 
     
   impl->pins.set (pin, state);
 }
@@ -159,7 +159,7 @@ const char* get_name (MaterialPin pin)
     case MaterialPin_CastShadows:     return "cast_shadows";
     case MaterialPin_ReceiveShadows:  return "recv_shadows";
     case MaterialPin_SelfShadow:      return "self_shadow";
-    default:                          RaiseInvalidArgument ("media::rfx::get_name(MaterialPin)", "pin", pin);
+    default:                          raise_invalid_argument ("media::rfx::get_name(MaterialPin)", "pin", pin);
   }
 
   return "";

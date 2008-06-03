@@ -513,7 +513,7 @@ void SoundManager::ForEachEmitter (const ConstEmitterHandler& emitter_handler) c
 void SoundManager::ForEachEmitter (const char* type, const EmitterHandler& emitter_handler)
 {
   if (!type)
-    RaiseNullArgument ("sound::SoundManager::ForEachEmitter", "type");
+    raise_null_argument ("sound::SoundManager::ForEachEmitter", "type");
 
   for (EmitterSet::iterator i = impl->emitters.begin (); i != impl->emitters.end (); ++i)
    if (!strcmp (type, i->second->sound_declaration->Type ()))
@@ -523,7 +523,7 @@ void SoundManager::ForEachEmitter (const char* type, const EmitterHandler& emitt
 void SoundManager::ForEachEmitter (const char* type, const ConstEmitterHandler& emitter_handler) const
 {
   if (!type)
-    RaiseNullArgument ("sound::SoundManager::ForEachEmitter", "type");
+    raise_null_argument ("sound::SoundManager::ForEachEmitter", "type");
 
   for (EmitterSet::iterator i = impl->emitters.begin (); i != impl->emitters.end (); ++i)
    if (!strcmp (type, i->second->sound_declaration->Type ()))

@@ -94,7 +94,7 @@ class MyInterpreter: public IInterpreter
 
     void DoCommands (const char*, const void*, size_t, const LogFunction&)
     {
-      common::RaiseNotImplemented ("MyInterpreter::DoCommands");
+      common::raise_not_implemented ("MyInterpreter::DoCommands");
     }
 
     bool HasFunction (const char*) { return true; }

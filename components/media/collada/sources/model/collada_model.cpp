@@ -51,7 +51,7 @@ Model::Model (const char* file_name)
   try
   {
     if (!file_name)
-      RaiseNullArgument ("", "file_name");
+      raise_null_argument ("", "file_name");
     
     static ComponentLoader loader (COLLADA_LOADERS_MASK);
 
@@ -70,7 +70,7 @@ Model::Model (const char* file_name, const LogHandler& log)
   try
   {
     if (!file_name)
-      RaiseNullArgument ("", "file_name");
+      raise_null_argument ("", "file_name");
 
     static ComponentLoader loader (COLLADA_LOADERS_MASK);
 
@@ -110,7 +110,7 @@ const char* Model::Name () const
 void Model::Rename (const char* new_name)
 {
   if (!new_name)
-    RaiseNullArgument ("media::collada::Model::Rename", "new_name");
+    raise_null_argument ("media::collada::Model::Rename", "new_name");
     
   impl->name = new_name;
 }
@@ -127,7 +127,7 @@ const char* Model::ActiveSceneName () const
 void Model::SetActiveSceneName (const char* scene_name)
 {
   if (!scene_name)
-    RaiseNullArgument ("media::collada::Model::SetActiveSceneName", "scene_name");
+    raise_null_argument ("media::collada::Model::SetActiveSceneName", "scene_name");
     
   impl->active_scene = scene_name;
 }
@@ -290,7 +290,7 @@ void Model::Save (const char* file_name, const LogHandler& log)
   try
   {
     if (!file_name)
-      RaiseNullArgument ("", "file_name");
+      raise_null_argument ("", "file_name");
 
     static ComponentLoader loader (COLLADA_SAVERS_MASK);
 

@@ -117,13 +117,13 @@ class TestDriver: public IDriver, public ObjectImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ISwapChain* CreateSwapChain (const SwapChainDesc&)
     {
-      RaiseNotImplemented ("TestDriver::CreateSwapChain");
+      raise_not_implemented ("TestDriver::CreateSwapChain");
       return 0;
     }
 
     ISwapChain* CreateSwapChain (IOutput*, const SwapChainDesc&)
     {
-      RaiseNotImplemented ("TestDriver::CreateSwapChain");
+      raise_not_implemented ("TestDriver::CreateSwapChain");
       return 0;
     }    
 
@@ -132,7 +132,7 @@ class TestDriver: public IDriver, public ObjectImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDevice* CreateDevice (ISwapChain*, const char*)
     {
-      RaiseNotImplemented ("TestDriver::CreateDevice");
+      raise_not_implemented ("TestDriver::CreateDevice");
       return 0;
     }
 

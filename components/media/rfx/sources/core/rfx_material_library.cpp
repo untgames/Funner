@@ -64,7 +64,7 @@ void MaterialLibrary::Init (const char* file_name, const LogHandler& log_handler
   try
   {
     if (!file_name)
-      RaiseNullArgument ("", "file_name");
+      raise_null_argument ("", "file_name");
       
     static ComponentLoader loader ("media.rfx.loaders.*");
 
@@ -101,7 +101,7 @@ const char* MaterialLibrary::Name () const
 void MaterialLibrary::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("media::rfx::MaterialLibrary::Rename", name);
+    raise_null_argument ("media::rfx::MaterialLibrary::Rename", name);
     
   impl->name = name;
 }
@@ -155,7 +155,7 @@ const char* MaterialLibrary::ItemId (const ConstIterator& i) const
   const MaterialMap::iterator* iter = i.target<MaterialMap::iterator> ();
 
   if (!iter)
-    common::RaiseInvalidArgument ("media::rfx::MaterialLibrary::ItemId", "iterator", "wrong-type");
+    common::raise_invalid_argument ("media::rfx::MaterialLibrary::ItemId", "iterator", "wrong-type");
 
   return (*iter)->first.c_str ();
 }
@@ -186,7 +186,7 @@ Material::ConstPointer MaterialLibrary::Find (const char* name) const
 void MaterialLibrary::Attach (const char* id, const Material::Pointer& material)
 {
   if (!id)
-    common::RaiseNullArgument ("media::rfx::MaterialLibrary::Insert", "id");
+    common::raise_null_argument ("media::rfx::MaterialLibrary::Insert", "id");
     
   impl->materials.insert_pair (id, material);
 }
@@ -242,7 +242,7 @@ void MaterialLibrary::Save (const char* file_name, const LogHandler& log_handler
   try
   {
     if (!file_name)
-      RaiseNullArgument ("", "file_name");    
+      raise_null_argument ("", "file_name");    
       
     static ComponentLoader loader ("media.rfx.savers.*");      
 

@@ -18,12 +18,12 @@ struct DdsImage::Impl
 
 DdsImage::DdsImage ()
 {
-  RaiseNotImplemented ("media::DdsImage::DdsImage");
+  raise_not_implemented ("media::DdsImage::DdsImage");
 }
 
 DdsImage::DdsImage (const char* file_name)
 {
-  RaiseNotImplemented ("media::DdsImage::DdsImage");
+  raise_not_implemented ("media::DdsImage::DdsImage");
 }
 
 DdsImage::DdsImage (const DdsImage& image)
@@ -48,13 +48,13 @@ DdsImage& DdsImage::operator = (const DdsImage& image)
 
 size_t DdsImage::Width () const
 {
-  RaiseNotImplemented ("media::DdsImage::Width");
+  raise_not_implemented ("media::DdsImage::Width");
   return 0;
 }
 
 size_t DdsImage::Height () const
 {
-  RaiseNotImplemented ("media::DdsImage::Height");
+  raise_not_implemented ("media::DdsImage::Height");
   return 0;
 }
 
@@ -64,13 +64,13 @@ size_t DdsImage::Height () const
 
 size_t DdsImage::Depth () const
 {
-  RaiseNotImplemented ("media::DdsImage::Depth");
+  raise_not_implemented ("media::DdsImage::Depth");
   return 0;
 }
 
 size_t DdsImage::MipsCount () const
 {
-  RaiseNotImplemented ("media::DdsImage::MipsCount");
+  raise_not_implemented ("media::DdsImage::MipsCount");
   return 0;
 }
 
@@ -80,13 +80,13 @@ size_t DdsImage::MipsCount () const
 
 size_t DdsImage::BlockSize () const
 {
-  RaiseNotImplemented ("media::DdsImage::BlockSize");
+  raise_not_implemented ("media::DdsImage::BlockSize");
   return 0;
 }
 
 size_t DdsImage::LayerSize (size_t mip_level) const
 {
-  RaiseNotImplemented ("media::DdsImage::LayerSize");
+  raise_not_implemented ("media::DdsImage::LayerSize");
   return 0;
 }
 
@@ -96,7 +96,7 @@ size_t DdsImage::LayerSize (size_t mip_level) const
 
 DdsPixelFormat DdsImage::Format () const
 {
-  RaiseNotImplemented ("media::DdsImage::Format");
+  raise_not_implemented ("media::DdsImage::Format");
   return (DdsPixelFormat)-1;
 }
 
@@ -106,7 +106,7 @@ DdsPixelFormat DdsImage::Format () const
 
 const void* DdsImage::Bitmap (size_t layer, size_t mip_level) const
 {
-  RaiseNotImplemented ("media::DdsImage::Bitmap");
+  raise_not_implemented ("media::DdsImage::Bitmap");
   return 0;
 }
 

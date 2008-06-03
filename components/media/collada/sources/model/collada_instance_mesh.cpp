@@ -60,7 +60,7 @@ const char* InstanceMesh::Mesh () const
 void InstanceMesh::SetMesh (const char* mesh_id)
 {
   if (!mesh_id)
-    common::RaiseNullArgument ("media::collada::InstanceMesh::SetMesh", "mesh_id");
+    common::raise_null_argument ("media::collada::InstanceMesh::SetMesh", "mesh_id");
     
   impl->mesh = mesh_id;
 }

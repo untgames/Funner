@@ -97,7 +97,7 @@ size_t MultiPassMaterial::PassesCount () const
 media::rfx::Material::ConstPointer MultiPassMaterial::Material (size_t index) const
 {
   if (index >= impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::Material", "index", index, impl->passes.size ());
+    raise_out_of_range ("media::rfx::MultiPassMaterial::Material", "index", index, impl->passes.size ());
     
   return impl->passes [index].material;
 }
@@ -114,10 +114,10 @@ media::rfx::Material::Pointer MultiPassMaterial::Material (size_t index)
 void MultiPassMaterial::InsertPass (size_t index, const Material::Pointer& material_ptr)
 {
   if (index > impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::InsertPass", "index", index, impl->passes.size ());
+    raise_out_of_range ("media::rfx::MultiPassMaterial::InsertPass", "index", index, impl->passes.size ());
 
   if (!material_ptr)
-    RaiseNullArgument ("media::rfx::MultiPassMaterial::InsertPass", "material_ptr");
+    raise_null_argument ("media::rfx::MultiPassMaterial::InsertPass", "material_ptr");
 
   impl->passes.insert (impl->passes.begin () + index, PassImpl (material_ptr));
 }
@@ -149,10 +149,10 @@ void MultiPassMaterial::RemoveAllPasses ()
 void MultiPassMaterial::SetMaterial (size_t index, const Material::Pointer& material_ptr)
 {
   if (index >= impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::SetMaterial", "index", index, impl->passes.size ());
+    raise_out_of_range ("media::rfx::MultiPassMaterial::SetMaterial", "index", index, impl->passes.size ());
 
   if (!material_ptr)
-    RaiseNullArgument ("media::rfx::MultiPassMaterial::SetMaterial", "material_ptr");
+    raise_null_argument ("media::rfx::MultiPassMaterial::SetMaterial", "material_ptr");
 
   impl->passes [index].material = material_ptr;
 }
@@ -164,10 +164,10 @@ void MultiPassMaterial::SetMaterial (size_t index, const Material::Pointer& mate
 void MultiPassMaterial::MovePass (size_t source_index, size_t destination_index)
 {
   if (source_index >= impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::MovePass", "source_index", source_index, impl->passes.size ());
+    raise_out_of_range ("media::rfx::MultiPassMaterial::MovePass", "source_index", source_index, impl->passes.size ());
 
   if (destination_index >= impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::MovePass", "destination_index", destination_index, impl->passes.size ());
+    raise_out_of_range ("media::rfx::MultiPassMaterial::MovePass", "destination_index", destination_index, impl->passes.size ());
     
   PassImpl slot = impl->passes [source_index];
     
@@ -178,10 +178,10 @@ void MultiPassMaterial::MovePass (size_t source_index, size_t destination_index)
 void MultiPassMaterial::SwapPasses (size_t index1, size_t index2)
 {
   if (index1 >= impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::SwapPasses", "index1", index1, impl->passes.size ());
+    raise_out_of_range ("media::rfx::MultiPassMaterial::SwapPasses", "index1", index1, impl->passes.size ());
 
   if (index2 >= impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::SwapPasses", "index2", index2, impl->passes.size ());
+    raise_out_of_range ("media::rfx::MultiPassMaterial::SwapPasses", "index2", index2, impl->passes.size ());
     
   stl::swap (impl->passes [index1], impl->passes [index2]);
 }
@@ -193,7 +193,7 @@ void MultiPassMaterial::SwapPasses (size_t index1, size_t index2)
 int MultiPassMaterial::FindPass (const char* name) const
 {
   if (!name)
-    RaiseNullArgument ("media::rfx::MultiPassMaterial::FindPass", "name");
+    raise_null_argument ("media::rfx::MultiPassMaterial::FindPass", "name");
     
   size_t hash = strhash (name);
   
@@ -230,7 +230,7 @@ Material::Pointer MultiPassMaterial::FindMaterial (const char* name)
 media::rfx::PassState MultiPassMaterial::PassState (size_t index) const
 {
   if (index >= impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::PassState", "index", index, impl->passes.size ());
+    raise_out_of_range ("media::rfx::MultiPassMaterial::PassState", "index", index, impl->passes.size ());
     
   return impl->passes [index].state;
 }
@@ -238,7 +238,7 @@ media::rfx::PassState MultiPassMaterial::PassState (size_t index) const
 void MultiPassMaterial::SetPassState (size_t index, media::rfx::PassState state)
 {
   if (index >= impl->passes.size ())
-    RaiseOutOfRange ("media::rfx::MultiPassMaterial::SetPassState", "index", index, impl->passes.size ());
+    raise_out_of_range ("media::rfx::MultiPassMaterial::SetPassState", "index", index, impl->passes.size ());
 
   switch (state)
   {
@@ -246,7 +246,7 @@ void MultiPassMaterial::SetPassState (size_t index, media::rfx::PassState state)
     case PassState_Disabled:
       break;
     default:
-      RaiseInvalidArgument ("media::rfx::MultiPassMaterial::SetPassState", "state", state);
+      raise_invalid_argument ("media::rfx::MultiPassMaterial::SetPassState", "state", state);
       break;
   }
 

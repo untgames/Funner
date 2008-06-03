@@ -159,7 +159,7 @@ IFrameBuffer* FrameBufferManager::CreateFrameBuffer (View* color_view, View* dep
 
   get_configuration_name (color_view, depth_stencil_view, cfg_name);    
 
-  RaiseNotSupported (METHOD_NAME, "Frame buffer configuration not supported. %s", cfg_name.c_str ());
+  raise_not_supported (METHOD_NAME, "Frame buffer configuration not supported. %s", cfg_name.c_str ());
 
   return 0;
 }
@@ -167,7 +167,7 @@ IFrameBuffer* FrameBufferManager::CreateFrameBuffer (View* color_view, View* dep
 ITexture* FrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
 {
   if (!impl->render_buffer_creater)
-    RaiseNotSupported ("render::low_level::opengl::FrameBufferManager::CreateRenderBuffer", "Render buffers not supported");
+    raise_not_supported ("render::low_level::opengl::FrameBufferManager::CreateRenderBuffer", "Render buffers not supported");
 
   return impl->render_buffer_creater (desc);
 }
@@ -175,7 +175,7 @@ ITexture* FrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
 ITexture* FrameBufferManager::CreateColorBuffer (ISwapChain* swap_chain, size_t index)
 {
   if (!impl->color_buffer_creater)
-    RaiseNotSupported ("render::low_level::opengl::FrameBufferManager::CreateColorBuffer", "Color buffers not supported");
+    raise_not_supported ("render::low_level::opengl::FrameBufferManager::CreateColorBuffer", "Color buffers not supported");
 
   return impl->color_buffer_creater (swap_chain, index);
 }
@@ -183,7 +183,7 @@ ITexture* FrameBufferManager::CreateColorBuffer (ISwapChain* swap_chain, size_t 
 ITexture* FrameBufferManager::CreateDepthStencilBuffer (ISwapChain* swap_chain)
 {
   if (!impl->color_buffer_creater)
-    RaiseNotSupported ("render::low_level::opengl::FrameBufferManager::CreateDepthStencilBuffer", "Depth-stencil buffers not supported");
+    raise_not_supported ("render::low_level::opengl::FrameBufferManager::CreateDepthStencilBuffer", "Depth-stencil buffers not supported");
 
   return impl->depth_stencil_buffer_creater (swap_chain);
 }
@@ -279,7 +279,7 @@ void FrameBufferManager::SetFrameBuffer (size_t fbo_id, size_t cache_id)
     //проверка наличия необходимого расширения
 
   if (!context_manager.GetCaps ().has_ext_framebuffer_object)
-    RaiseNotSupported (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
+    raise_not_supported (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
 
     //установка буфера в контекст OpenGL
 

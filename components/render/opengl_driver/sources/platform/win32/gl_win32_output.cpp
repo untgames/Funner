@@ -146,7 +146,7 @@ size_t Output::GetModesCount ()
 void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 {
   if (mode_index >= modes.size ())
-    RaiseOutOfRange ("render::low_level::opengl::Output::GetModeDesc", "mode_index", mode_index, modes.size ());
+    raise_out_of_range ("render::low_level::opengl::Output::GetModeDesc", "mode_index", mode_index, modes.size ());
     
   mode_desc = modes [mode_index];
 }
@@ -181,7 +181,7 @@ void set_mode_desc (const char* device_name, DEVMODE* mode)
       break;
   }
 
-  RaiseInvalidOperation ("ChangeDisplaySettingsEx", msg);
+  raise_invalid_operation ("ChangeDisplaySettingsEx", msg);
 }
 
 }

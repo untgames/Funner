@@ -60,10 +60,10 @@ StdioFileSystem::file_t StdioFileSystem::FileOpen (const char* file_name,filemod
   {
     switch (errno)
     {
-      case EACCES: Raise<FileLoadException>     ("StdioFileSystem::FileOpen","Access denied to file '%s' mode=%s",file_name,strfilemode (mode).c_str ()); break;
-      case EMFILE: Raise<FileLoadException>     ("StdioFileSystem::FileOpen","Unable to open file '%s'. Too many open files",file_name); break;
-      case ENOENT: Raise<FileNotFoundException> ("StdioFileSystem::FileOpen","File '%s' not found",file_name); break;
-      default:     Raise<FileLoadException>     ("StdioFileSystem::FileOpen","Unable to open fie '%s' mode=%s. Reason unknown",file_name,strfilemode (mode).c_str ()); break;
+      case EACCES: raise<FileLoadException>     ("StdioFileSystem::FileOpen","Access denied to file '%s' mode=%s",file_name,strfilemode (mode).c_str ()); break;
+      case EMFILE: raise<FileLoadException>     ("StdioFileSystem::FileOpen","Unable to open file '%s'. Too many open files",file_name); break;
+      case ENOENT: raise<FileNotFoundException> ("StdioFileSystem::FileOpen","File '%s' not found",file_name); break;
+      default:     raise<FileLoadException>     ("StdioFileSystem::FileOpen","Unable to open fie '%s' mode=%s. Reason unknown",file_name,strfilemode (mode).c_str ()); break;
     }
   }
   
@@ -87,9 +87,9 @@ size_t StdioFileSystem::FileRead (file_t file,void* buf,size_t size)
   {
     switch (errno)
     {
-      case EBADF:  RaiseInvalidArgument ("StdioFileSystem::FileRead","file"); break;
-      case EINVAL: RaiseNullArgument    ("StdioFileSystem::FileRead","buffer"); break;
-      default:     Raise<FileException> ("StdioFileSystem::FileRead","Unknown error"); break;
+      case EBADF:  raise_invalid_argument ("StdioFileSystem::FileRead","file"); break;
+      case EINVAL: raise_null_argument    ("StdioFileSystem::FileRead","buffer"); break;
+      default:     raise<FileException> ("StdioFileSystem::FileRead","Unknown error"); break;
     }
   }
   
@@ -104,10 +104,10 @@ size_t StdioFileSystem::FileWrite (file_t file,const void* buf,size_t size)
   {
     switch (errno)
     {
-      case EBADF:  RaiseInvalidArgument ("StdioFileSystem::FileWrite","file"); break;
-      case EINVAL: RaiseNullArgument    ("StdioFileSystem::FileWrite","buffer"); break;
-      case ENOSPC: Raise<FileNoSpaceException> ("StdioFileSystem::FileWrite","No enough space for write %u bytes to file",size); break;
-      default:     Raise<FileException> ("StdioFileSystem::FileWrite","Unknown error"); break;
+      case EBADF:  raise_invalid_argument ("StdioFileSystem::FileWrite","file"); break;
+      case EINVAL: raise_null_argument    ("StdioFileSystem::FileWrite","buffer"); break;
+      case ENOSPC: raise<FileNoSpaceException> ("StdioFileSystem::FileWrite","No enough space for write %u bytes to file",size); break;
+      default:     raise<FileException> ("StdioFileSystem::FileWrite","Unknown error"); break;
     }
   }
   
@@ -122,8 +122,8 @@ void StdioFileSystem::FileRewind (file_t file)
   {
     switch (errno)
     {
-      case EBADF:  RaiseInvalidArgument ("StdioFileSystem::FileRewind","file"); break;
-      default:     Raise<FileException> ("StdioFileSystem::FileRewind","Unknown error"); break;
+      case EBADF:  raise_invalid_argument ("StdioFileSystem::FileRewind","file"); break;
+      default:     raise<FileException> ("StdioFileSystem::FileRewind","Unknown error"); break;
     }
   }
 }
@@ -134,8 +134,8 @@ filepos_t StdioFileSystem::FileSeek (file_t file,filepos_t pos)
   {
     switch (errno)
     {
-      case EBADF:  RaiseInvalidArgument ("StdioFileSystem::FileSeek","file"); break;
-      default:     Raise<FileException> ("StdioFileSystem::FileSeek","Unknown error"); break;
+      case EBADF:  raise_invalid_argument ("StdioFileSystem::FileSeek","file"); break;
+      default:     raise<FileException> ("StdioFileSystem::FileSeek","Unknown error"); break;
     }    
   }
 
@@ -150,8 +150,8 @@ filepos_t StdioFileSystem::FileTell (file_t file)
   {
     switch (errno)
     {
-      case EBADF: RaiseInvalidArgument ("StdioFileSystem::FileTell","file"); break;
-      default:    Raise<FileException> ("StdioFileSystem::FileTell","Unknown error"); break;
+      case EBADF: raise_invalid_argument ("StdioFileSystem::FileTell","file"); break;
+      default:    raise<FileException> ("StdioFileSystem::FileTell","Unknown error"); break;
     }    
   }
 
@@ -166,8 +166,8 @@ filesize_t StdioFileSystem::FileSize (file_t file)
   {
     switch (errno)
     {
-      case EBADF: RaiseInvalidArgument ("StdioFileSystem::FileSize","file"); break;
-      default:    Raise<FileException> ("StdioFileSystem::FileSize","Unknown error"); break;
+      case EBADF: raise_invalid_argument ("StdioFileSystem::FileSize","file"); break;
+      default:    raise<FileException> ("StdioFileSystem::FileSize","Unknown error"); break;
     }
   }
 
@@ -181,14 +181,14 @@ void StdioFileSystem::FileResize (file_t file,filesize_t new_size)
   {
     switch (errno)
     {
-      case EBADF:  RaiseInvalidArgument ("StdioFileSystem::FileResize","file"); break;
-      case EINVAL: RaiseNullArgument    ("StdioFileSystem::FileResize","buffer"); break;
-      case ENOSPC: Raise<FileNoSpaceException> ("StdioFileSystem::FileResize","No enough space for resize file up to %u bytes",new_size); break;
-      default:     Raise<FileException> ("StdioFileSystem::FileResize","Unknown error"); break;
+      case EBADF:  raise_invalid_argument ("StdioFileSystem::FileResize","file"); break;
+      case EINVAL: raise_null_argument    ("StdioFileSystem::FileResize","buffer"); break;
+      case ENOSPC: raise<FileNoSpaceException> ("StdioFileSystem::FileResize","No enough space for resize file up to %u bytes",new_size); break;
+      default:     raise<FileException> ("StdioFileSystem::FileResize","Unknown error"); break;
     }
   }    
 #else
-  Raise<PlatformNotSupportedException> ("StdioFileSystem::FileResize","There is no default implementation for this operation");
+  raise<PlatformNotSupportedException> ("StdioFileSystem::FileResize","There is no default implementation for this operation");
 #endif  
 }
 
@@ -203,9 +203,9 @@ void StdioFileSystem::FileFlush (file_t file)
   {
     switch (errno)
     {
-      case EBADF:  RaiseInvalidArgument ("StdioFileSystem::FileFlush","file",(int)file,"Invalid file descriptor"); break;
-      case ENOSPC: Raise<FileNoSpaceException> ("StdioFileSystem::FileFlush","Unable to flush file buffers due to write failure"); break;
-      default:     Raise<FileException> ("StdioFileSystem::FileFlush","Unknown error"); break;
+      case EBADF:  raise_invalid_argument ("StdioFileSystem::FileFlush","file",(int)file,"Invalid file descriptor"); break;
+      case ENOSPC: raise<FileNoSpaceException> ("StdioFileSystem::FileFlush","Unable to flush file buffers due to write failure"); break;
+      default:     raise<FileException> ("StdioFileSystem::FileFlush","Unknown error"); break;
     }
   }
 }
@@ -220,9 +220,9 @@ void StdioFileSystem::Remove (const char* file_name)
   {
     switch (errno)
     {
-      case EACCES: Raise<FileException>         ("StdioFileSystem::Remove","Access to file '%s' denied",file_name); break;
-      case ENOENT: Raise<FileNotFoundException> ("StdioFileSystem::Remove","File '%s' not found",file_name); break;
-      default:     Raise<FileException>         ("StdioFileSystem::Remove","Unknown error"); break;
+      case EACCES: raise<FileException>         ("StdioFileSystem::Remove","Access to file '%s' denied",file_name); break;
+      case ENOENT: raise<FileNotFoundException> ("StdioFileSystem::Remove","File '%s' not found",file_name); break;
+      default:     raise<FileException>         ("StdioFileSystem::Remove","Unknown error"); break;
     }
   }
 }
@@ -233,10 +233,10 @@ void StdioFileSystem::Rename (const char* file_name,const char* new_name)
   {
     switch (errno)
     {
-      case EACCES: Raise<FileException>         ("StdioFileSystem::Rename","Access to file '%s' denied",file_name); break;
-      case ENOENT: Raise<FileNotFoundException> ("StdioFileSystem::Rename","File '%s' not found",file_name); break;
-      case EINVAL: Raise<FileException>         ("StdioFileSystem::Rename","Invalid name <old_name>='%s' <new_name>='%s'",file_name,new_name); break;
-      default:     Raise<FileException>         ("StdioFileSystem::Rename","Unknown error"); break;
+      case EACCES: raise<FileException>         ("StdioFileSystem::Rename","Access to file '%s' denied",file_name); break;
+      case ENOENT: raise<FileNotFoundException> ("StdioFileSystem::Rename","File '%s' not found",file_name); break;
+      case EINVAL: raise<FileException>         ("StdioFileSystem::Rename","Invalid name <old_name>='%s' <new_name>='%s'",file_name,new_name); break;
+      default:     raise<FileException>         ("StdioFileSystem::Rename","Unknown error"); break;
     }
   }
 }
@@ -248,13 +248,13 @@ void StdioFileSystem::Mkdir (const char* dir_name)
   {
     switch (errno)
     {
-      case EEXIST: Raise<FileException> ("StdioFileSystem::Mkdir","Path '%s' already exist",dir_name); break;
-      case ENOENT: Raise<FileNotFoundException> ("StdioFileSystem::Mkdir","Path '%s' not found",dir_name); break;
-      default:     Raise<FileException> ("StdioFileSystem::Mkdir","Unknown error"); break;
+      case EEXIST: raise<FileException> ("StdioFileSystem::Mkdir","Path '%s' already exist",dir_name); break;
+      case ENOENT: raise<FileNotFoundException> ("StdioFileSystem::Mkdir","Path '%s' not found",dir_name); break;
+      default:     raise<FileException> ("StdioFileSystem::Mkdir","Unknown error"); break;
     }
   }
 #else
-  Raise<PlatformNotSupportedException> ("StdioFileSystem::Mkdir","There is no default implementation for this operation");
+  raise<PlatformNotSupportedException> ("StdioFileSystem::Mkdir","There is no default implementation for this operation");
 #endif  
 }
 
@@ -328,7 +328,7 @@ void StdioFileSystem::Search (const char* mask,const FileSearchHandler& insert_h
 
 void StdioFileSystem::Search (const char* mask,const FileSearchHandler& handler)
 {
-  Raise<PlatformNotSupportedException> ("StdioFileSystem::Search","There is no default implementation for this operation");
+  raise<PlatformNotSupportedException> ("StdioFileSystem::Search","There is no default implementation for this operation");
 }
 
 #endif

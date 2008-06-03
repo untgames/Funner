@@ -115,12 +115,12 @@ struct ControlsDetector::Impl : public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Load (const char* file_name)
     {
-      RaiseNotImplemented ("input::ControlsDetector::Load");
+      raise_not_implemented ("input::ControlsDetector::Load");
     }
 
     void Save (const char* file_name)
     {
-      RaiseNotImplemented ("input::ControlsDetector::Save");
+      raise_not_implemented ("input::ControlsDetector::Save");
     }
 
   private:
@@ -248,13 +248,13 @@ void ControlsDetector::Add (const char* action, const char* input_event_mask, co
   static const char* METHOD_NAME = "input::ControlsDetector::Add";
 
   if (!action)
-    RaiseNullArgument (METHOD_NAME, "action");
+    raise_null_argument (METHOD_NAME, "action");
 
   if (!input_event_mask)
-    RaiseNullArgument (METHOD_NAME, "input_event_mask");
+    raise_null_argument (METHOD_NAME, "input_event_mask");
 
   if (!replacement)
-    RaiseNullArgument (METHOD_NAME, "replacement");
+    raise_null_argument (METHOD_NAME, "replacement");
 
   impl->Add (action, input_event_mask, replacement);
 }
@@ -264,10 +264,10 @@ void ControlsDetector::Remove (const char* action, const char* input_event_mask)
   static const char* METHOD_NAME = "input::ControlsDetector::Remove(const char*,const char*)";
 
   if (!action)
-    RaiseNullArgument (METHOD_NAME, "action");
+    raise_null_argument (METHOD_NAME, "action");
 
   if (!input_event_mask)
-    RaiseNullArgument (METHOD_NAME, "input_event_mask");
+    raise_null_argument (METHOD_NAME, "input_event_mask");
 
   impl->Remove (action, input_event_mask);
 }
@@ -280,7 +280,7 @@ void ControlsDetector::Remove (const Iterator& iter)
 void ControlsDetector::Remove (const char* action)
 {
   if (!action)
-    RaiseNullArgument ("input::ControlsDetector::Remove(const char*)", "action");
+    raise_null_argument ("input::ControlsDetector::Remove(const char*)", "action");
 
   impl->Remove (action);
 }
@@ -310,7 +310,7 @@ void ControlsDetector::Clear ()
 xtl::connection ControlsDetector::Detect (const EventsSource& source, const char* action, const EventHandler& handler)
 {
   if (!action)
-    RaiseNullArgument ("input::ControlsDetector::Detect", "action");
+    raise_null_argument ("input::ControlsDetector::Detect", "action");
 
   return impl->Detect (source, action, handler);
 }
@@ -322,7 +322,7 @@ xtl::connection ControlsDetector::Detect (const EventsSource& source, const char
 void ControlsDetector::Load (const char* file_name)
 {
   if (!file_name)
-    RaiseNullArgument ("input::ControlsDetector::Load", "file_name");
+    raise_null_argument ("input::ControlsDetector::Load", "file_name");
 
   impl->Load (file_name);
 }
@@ -330,7 +330,7 @@ void ControlsDetector::Load (const char* file_name)
 void ControlsDetector::Save (const char* file_name)
 {
   if (!file_name)
-    RaiseNullArgument ("input::ControlsDetector::Save", "file_name");
+    raise_null_argument ("input::ControlsDetector::Save", "file_name");
 
   impl->Save (file_name);
 }

@@ -86,7 +86,7 @@ inline const char* ResourceLibrary<T>::ItemId (const ConstIterator& i)
     const ItemMap::iterator* iter = i.target<ItemMap::iterator> ();
 
     if (!iter)
-      common::RaiseInvalidArgument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
+      common::raise_invalid_argument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
 
     return (*iter)->first.c_str ();
   }
@@ -123,7 +123,7 @@ template <class T>
 inline void ResourceLibrary<T>::Insert (const char* name, Item& item)
 {
   if (!name)
-    common::RaiseNullArgument ("media::ResourceLibrary::Insert", "name");
+    common::raise_null_argument ("media::ResourceLibrary::Insert", "name");
   
   ItemMap::iterator iter = items.find (name);
   

@@ -15,14 +15,14 @@ void translation_map_loader (const char* file_name, TranslationMap& target_map)
 
   for (size_t i = 0; i < log.MessagesCount (); i++)
     if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
-      Raise <Exception> (METHOD_NAME, log.Message(0));
+      raise <Exception> (METHOD_NAME, log.Message(0));
 
   if (!iter)
-    Raise<Exception> (METHOD_NAME, "Invalid file format, no root 'TranslationTable' tag");
+    raise<Exception> (METHOD_NAME, "Invalid file format, no root 'TranslationTable' tag");
 
   for (Parser::NamesakeIterator i = iter->First ("Translation"); i; i++)
     if (!test (i, "Event") || !test (i, "Replacement"))
-      Raise<Exception> (METHOD_NAME, "Incorrect file format, one of tag property missing at line %u", i->LineNumber ());
+      raise<Exception> (METHOD_NAME, "Incorrect file format, one of tag property missing at line %u", i->LineNumber ());
 
   for (Parser::NamesakeIterator i = iter->First ("Translation"); i; i++)
   {

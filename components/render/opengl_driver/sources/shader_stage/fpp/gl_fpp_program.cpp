@@ -62,15 +62,15 @@ FppProgram::FppProgram (const ContextManager& context_manager, size_t shaders_co
     //проверка корректности шейдеров
 
   if (!shaders)
-    RaiseNullArgument (METHOD_NAME, "shaders");
+    raise_null_argument (METHOD_NAME, "shaders");
 
   if (shaders_count > 1)
-    RaiseNotSupported (METHOD_NAME, "Multiple shaders not supported (shaders_count=%u)", shaders_count);
+    raise_not_supported (METHOD_NAME, "Multiple shaders not supported (shaders_count=%u)", shaders_count);
 
   shader = cast_object<FppShader> (shaders [0].get (), METHOD_NAME, "shaders[0]");
 
   if (!shader)
-    RaiseNullArgument (METHOD_NAME, "shaders[0]");
+    raise_null_argument (METHOD_NAME, "shaders[0]");
 }
 
 FppProgram::~FppProgram ()
@@ -86,7 +86,7 @@ FppProgram::LayoutCacheEntry& FppProgram::GetLayout (ProgramParametersLayout* pa
   static const char* METHOD_NAME = "render::low_level::opengl::FppProgram::GetLayout";
 
   if (!parameters_layout)
-    RaiseNullArgument (METHOD_NAME, "parameters_layout");
+    raise_null_argument (METHOD_NAME, "parameters_layout");
     
     //поиск layout в кэше
 
@@ -343,7 +343,7 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
       //проверка наличия требуемого константного буфера
 
     if (!buffer)
-      RaiseInvalidOperation (METHOD_NAME, "Null constant buffer #%u", group.slot);
+      raise_invalid_operation (METHOD_NAME, "Null constant buffer #%u", group.slot);
 
       //проверка необходимости переустановки параметров
 
@@ -357,7 +357,7 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
     char* buffer_base = (char*)buffer->GetDataPointer ();
     
     if (!buffer_base)
-      RaiseInvalidOperation (METHOD_NAME, "Null constant buffer #%u data pointer", group.slot);
+      raise_invalid_operation (METHOD_NAME, "Null constant buffer #%u data pointer", group.slot);
       
       //обновление динамических параметров
       

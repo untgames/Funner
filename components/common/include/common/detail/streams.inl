@@ -43,7 +43,7 @@ template <class InIter>
 inline void write_range (OutputTextStream& stream, InIter first, InIter last, const char* format)
 {
   if (!format)
-    RaiseNullArgument ("common::write_range", "format");
+    raise_null_argument ("common::write_range", "format");
 
   if (first == last)
     return;

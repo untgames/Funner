@@ -67,7 +67,7 @@ void RasterizerState::Bind ()
     //проверка корректности состояния  
 
   if (!display_list)
-    RaiseInvalidOperation (METHOD_NAME, "Empty state (null display list)");
+    raise_invalid_operation (METHOD_NAME, "Empty state (null display list)");
 
     //установка состояния в контекст OpenGL
 
@@ -106,7 +106,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
   const ContextCaps& caps = GetCaps ();
 
   if (in_desc.multisample_enable && !caps.has_arb_multisample)
-    RaiseNotSupported (METHOD_NAME, "Multisampling not supported (GL_ARB_multisample extension not supported)");
+    raise_not_supported (METHOD_NAME, "Multisampling not supported (GL_ARB_multisample extension not supported)");
     
     //выбор текущего контекста
 
@@ -131,7 +131,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     case FillMode_Wireframe: gl_fill_mode = GL_LINE; break;
     case FillMode_Solid:     gl_fill_mode = GL_FILL; break;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.fill_mode", in_desc.fill_mode);
+      raise_invalid_argument (METHOD_NAME, "desc.fill_mode", in_desc.fill_mode);
       break;
   }
   
@@ -142,7 +142,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     case CullMode_Back:
       break;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.cull_mode", in_desc.cull_mode);
+      raise_invalid_argument (METHOD_NAME, "desc.cull_mode", in_desc.cull_mode);
       break;
   }
 

@@ -37,7 +37,7 @@ class TextureManagerState: public IStageState
     SamplerSlot& GetSlot (size_t slot)
     {
       if (slot >= DEVICE_SAMPLER_SLOTS_COUNT)
-        RaiseOutOfRange ("render::low_level::opengl::TextureManagerState::GetSlot", "slot", slot, DEVICE_SAMPLER_SLOTS_COUNT);
+        raise_out_of_range ("render::low_level::opengl::TextureManagerState::GetSlot", "slot", slot, DEVICE_SAMPLER_SLOTS_COUNT);
         
       return samplers [slot];
     }
@@ -204,7 +204,7 @@ struct TextureManager::Impl: public ContextObject
           for (size_t j=0; j<i; j++)
             if (samplers [j].texture == texture && samplers [j].sampler_state && samplers [j].sampler_state != sampler_state)
             {
-              RaiseNotSupported (METHOD_NAME, "Sampler slot #%u conflicts with sampler slot #%u. "
+              raise_not_supported (METHOD_NAME, "Sampler slot #%u conflicts with sampler slot #%u. "
                                  "Reason: different sampler states for same texture", j, i);
             }
 
@@ -243,7 +243,7 @@ struct TextureManager::Impl: public ContextObject
         case TextureDimension_3D:      return CreateTexture3D (desc);
         case TextureDimension_Cubemap: return CreateTextureCubemap (desc);
         default:
-          RaiseInvalidArgument ("", "desc.dimension", desc.dimension);
+          raise_invalid_argument ("", "desc.dimension", desc.dimension);
           return 0;
       }
     }
@@ -289,7 +289,7 @@ struct TextureManager::Impl: public ContextObject
       const ContextCaps& caps = GetCaps ();
 
       if (sampler_slot >= caps.texture_units_count)
-        RaiseNotSupported ("render::low_level::opengl::TextureManager::Impl::CheckSamplerSlot",
+        raise_not_supported ("render::low_level::opengl::TextureManager::Impl::CheckSamplerSlot",
                            "Sampler slot #%u not supported (texture units count = %u)", sampler_slot, caps.texture_units_count);
 
       return sampler_slot;
@@ -311,7 +311,7 @@ struct TextureManager::Impl: public ContextObject
       const ContextCaps& caps = GetCaps ();
 
       if (desc.width > caps.max_texture_size)
-        RaiseNotSupported (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, caps.max_texture_size);
+        raise_not_supported (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, caps.max_texture_size);
 
         //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
 
@@ -323,7 +323,7 @@ struct TextureManager::Impl: public ContextObject
       if (caps.has_ext_texture_rectangle)
       {
         if (desc.width > caps.max_rectangle_texture_size)
-          RaiseNotSupported (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, caps.max_rectangle_texture_size);
+          raise_not_supported (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, caps.max_rectangle_texture_size);
 
         return new TextureNpot (GetContextManager (), desc);
       }
@@ -347,7 +347,7 @@ struct TextureManager::Impl: public ContextObject
       const ContextCaps& caps = GetCaps ();
 
       if (desc.width > caps.max_texture_size || desc.height > caps.max_texture_size)
-        RaiseNotSupported (METHOD_NAME, "Can't create 2D texture %ux%u (maximum texture size is %u)", desc.width, desc.height, caps.max_texture_size);
+        raise_not_supported (METHOD_NAME, "Can't create 2D texture %ux%u (maximum texture size is %u)", desc.width, desc.height, caps.max_texture_size);
 
         //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
 
@@ -359,7 +359,7 @@ struct TextureManager::Impl: public ContextObject
       if (caps.has_ext_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
       {
         if (desc.width > caps.max_rectangle_texture_size || desc.height > caps.max_rectangle_texture_size)
-          RaiseNotSupported (METHOD_NAME, "Can't create 2D texture %ux%u (maximum texture size is %u)", desc.width, desc.height, caps.max_rectangle_texture_size);
+          raise_not_supported (METHOD_NAME, "Can't create 2D texture %ux%u (maximum texture size is %u)", desc.width, desc.height, caps.max_rectangle_texture_size);
 
         return new TextureNpot (GetContextManager (), desc);
       }
@@ -377,11 +377,11 @@ struct TextureManager::Impl: public ContextObject
       const ContextCaps& caps = GetCaps ();
 
       if (!caps.has_ext_texture3d)
-        RaiseNotSupported (METHOD_NAME, "3D textures not supported (GL_ext_texture_3d not supported)");
+        raise_not_supported (METHOD_NAME, "3D textures not supported (GL_ext_texture_3d not supported)");
         
       if (desc.width > caps.max_3d_texture_size || desc.height > caps.max_3d_texture_size || desc.layers > caps.max_3d_texture_size)
       {
-        RaiseNotSupported (METHOD_NAME, "Can't create 3D texture %ux%ux%u (max_edge_size=%u)", desc.width, desc.height,
+        raise_not_supported (METHOD_NAME, "Can't create 3D texture %ux%ux%u (max_edge_size=%u)", desc.width, desc.height,
                            desc.layers, caps.max_3d_texture_size);
       }
 
@@ -389,7 +389,7 @@ struct TextureManager::Impl: public ContextObject
 
       if (!is_pot && !caps.has_arb_texture_non_power_of_two)
       {
-        RaiseNotSupported (METHOD_NAME, "Can't create 3D texture %ux%ux%u@%s (GL_ARB_texture_non_power_of_two & GL_VERSION_2_0 not supported)",
+        raise_not_supported (METHOD_NAME, "Can't create 3D texture %ux%ux%u@%s (GL_ARB_texture_non_power_of_two & GL_VERSION_2_0 not supported)",
                            desc.width, desc.height, desc.layers, get_name (desc.format));
       }
       
@@ -408,11 +408,11 @@ struct TextureManager::Impl: public ContextObject
       const ContextCaps& caps = GetCaps ();
 
       if (!caps.has_arb_texture_cube_map)
-        RaiseNotSupported (METHOD_NAME, "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension");
+        raise_not_supported (METHOD_NAME, "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension");
 
       if (desc.width > caps.max_cube_map_texture_size || desc.height > caps.max_cube_map_texture_size)
       {
-        RaiseNotSupported (METHOD_NAME, "Can't create cubemap texture %ux%u (max_edge_size=%u)", desc.width, desc.height,
+        raise_not_supported (METHOD_NAME, "Can't create cubemap texture %ux%u (max_edge_size=%u)", desc.width, desc.height,
                            caps.max_cube_map_texture_size);
       }
       

@@ -69,15 +69,15 @@ class DriverManagerImpl
 void DriverManagerImpl::RegisterDriver (const char* name, IDriver* driver)
 {
   if (!name)
-    RaiseNullArgument ("render::low_level::DriverManager::RegisterDriver", "name");
+    raise_null_argument ("render::low_level::DriverManager::RegisterDriver", "name");
 
   if (!driver)
-    RaiseNullArgument ("render::low_level::DriverManager::RegisterDriver", "driver");
+    raise_null_argument ("render::low_level::DriverManager::RegisterDriver", "driver");
 
   DriverMap::iterator iter = drivers.find (name);
 
   if (iter != drivers.end ())
-    RaiseInvalidArgument ("render::low_level::DriverManager::RegisterDriver", "name", name,
+    raise_invalid_argument ("render::low_level::DriverManager::RegisterDriver", "name", name,
                           "Driver with this name has been already registered");
 
   drivers.insert_pair (name, driver);

@@ -60,7 +60,7 @@ void StateBlockMask::Set (StateBlockGroup group, bool value)
       os_depth_stencil_view  = value;
       break;
     default:
-      common::RaiseInvalidArgument ("render::low_level::StateBlockMask::Set", "group", group);
+      common::raise_invalid_argument ("render::low_level::StateBlockMask::Set", "group", group);
       break;
   }
 }

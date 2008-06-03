@@ -46,7 +46,7 @@ const char* Device::GetName ()
 
 IStatisticsQuery* Device::CreateStatisticsQuery ()
 {
-  RaiseNotImplemented ("render::low_level::opengl::Device::CreateStatisticsQuery");
+  raise_not_implemented ("render::low_level::opengl::Device::CreateStatisticsQuery");
   return 0;
 }
 
@@ -93,7 +93,7 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc)
     static const size_t BAD_FLAGS = BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil;
 
     if (desc.bind_flags & BAD_FLAGS)
-      RaiseInvalidArgument ("", "desc.bind_flags", get_name ((BindFlag)desc.bind_flags));
+      raise_invalid_argument ("", "desc.bind_flags", get_name ((BindFlag)desc.bind_flags));
 
     switch (desc.bind_flags)
     {
@@ -101,7 +101,7 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc)
       case BindFlag_IndexBuffer:    return input_stage.CreateIndexBuffer (desc);
       case BindFlag_ConstantBuffer: return input_stage.CreateConstantBuffer (desc);
       default:
-        RaiseNotSupported ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
+        raise_not_supported ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
         return 0;
     }
   }
@@ -225,7 +225,7 @@ ITexture* Device::CreateTexture (const TextureDesc& desc)
 
   if (!(desc.bind_flags & (BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil)))
   {
-    RaiseNotSupported (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s",
+    raise_not_supported (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s",
       get_name ((BindFlag)desc.bind_flags));
 
     return 0;
@@ -524,7 +524,7 @@ GLenum get_mode (PrimitiveType type, const char* source)
     case PrimitiveType_TriangleStrip: return GL_TRIANGLE_STRIP;
     case PrimitiveType_TriangleFan:   return GL_TRIANGLE_FAN;
     default:
-      RaiseInvalidArgument (source, "primitive_type", type);
+      raise_invalid_argument (source, "primitive_type", type);
       return 0;
   }
 }

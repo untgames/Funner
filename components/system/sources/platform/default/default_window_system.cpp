@@ -10,9 +10,9 @@ using namespace syslib;
 namespace
 {
 
-void Raise (const char* method_name)
+void raise (const char* method_name)
 {
-  common::RaiseNotSupported (method_name, "No window support for default platform");
+  common::raise_not_supported (method_name, "No window support for default platform");
 }
 
 }
@@ -23,19 +23,19 @@ void Raise (const char* method_name)
 
 Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler, void*)
 {
-  Raise ("syslib::DefaultPlatform::CreateWindow");
+  raise ("syslib::DefaultPlatform::CreateWindow");
   
   return 0;
 }
 
 void Platform::CloseWindow (window_t)
 {
-  Raise ("syslib::DefaultPlatform::CloseWindow");
+  raise ("syslib::DefaultPlatform::CloseWindow");
 }
 
 void Platform::DestroyWindow (window_t)
 {
-  Raise ("syslib::DefaultPlatform::DestroyWindow");
+  raise ("syslib::DefaultPlatform::DestroyWindow");
 }
     
 /*
@@ -44,22 +44,22 @@ void Platform::DestroyWindow (window_t)
 
 void Platform::SetWindowTitle (window_t, const char*)
 {
-  Raise ("syslib::DefaultPlatform::SetWindowTitle");
+  raise ("syslib::DefaultPlatform::SetWindowTitle");
 }
 
 void Platform::SetWindowTitle (window_t, const wchar_t*)
 {
-  Raise ("syslib::DefaultPlatform::SetWindowTitle");
+  raise ("syslib::DefaultPlatform::SetWindowTitle");
 }
 
 void Platform::GetWindowTitle (window_t, size_t, char*)
 {
-  Raise ("syslib::DefaultPlatform::GetWindowTitle");
+  raise ("syslib::DefaultPlatform::GetWindowTitle");
 }
 
 void Platform::GetWindowTitle (window_t, size_t, wchar_t*)
 {
-  Raise ("syslib::DefaultPlatform::GetWindowTitle");
+  raise ("syslib::DefaultPlatform::GetWindowTitle");
 }
 
 /*
@@ -68,17 +68,17 @@ void Platform::GetWindowTitle (window_t, size_t, wchar_t*)
 
 void Platform::SetWindowRect (window_t, const Rect&)
 {
-  Raise ("syslib::DefaultPlatform::SetWindowRect");
+  raise ("syslib::DefaultPlatform::SetWindowRect");
 }
 
 void Platform::GetWindowRect (window_t, Rect&)
 {
-  Raise ("syslib::DefaultPlatform::GetWindowRect");  
+  raise ("syslib::DefaultPlatform::GetWindowRect");  
 }
 
 void Platform::GetClientRect (window_t, Rect&)
 {
-  Raise ("syslib::DefaultPlatform::GetClientRect");
+  raise ("syslib::DefaultPlatform::GetClientRect");
 }
 
 /*
@@ -87,12 +87,12 @@ void Platform::GetClientRect (window_t, Rect&)
 
 void Platform::SetWindowFlag (window_t, WindowFlag, bool)
 {
-  Raise ("syslib::DefaultPlatform::SetWindowFlag");
+  raise ("syslib::DefaultPlatform::SetWindowFlag");
 }
 
 bool Platform::GetWindowFlag (window_t, WindowFlag)
 {
-  Raise ("syslib::DefaultPlatform::GetWindowFlag");
+  raise ("syslib::DefaultPlatform::GetWindowFlag");
   
   return false;
 }
@@ -103,12 +103,12 @@ bool Platform::GetWindowFlag (window_t, WindowFlag)
 
 void Platform::SetCursorPosition (const Point&)
 {
-  Raise ("syslib::DefaultPlatform::SetCursorPosition");
+  raise ("syslib::DefaultPlatform::SetCursorPosition");
 }
 
 Point Platform::GetCursorPosition ()
 {
-  Raise ("syslib::DefaultPlatform::GetCursorPosition");
+  raise ("syslib::DefaultPlatform::GetCursorPosition");
   
   return Point ();
 }

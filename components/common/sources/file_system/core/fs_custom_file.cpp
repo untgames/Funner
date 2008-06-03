@@ -6,10 +6,10 @@ CustomFileImpl::CustomFileImpl (ICustomFileSystemPtr _file_system,const char* _f
   : FileImpl (mode_flags), auto_close (true)
 {
   if (!_file_system)
-    RaiseNullArgument ("CustomFileImpl::CustomFileImpl","file_system");
+    raise_null_argument ("CustomFileImpl::CustomFileImpl","file_system");
 
   if (!_file_name)
-    RaiseNullArgument ("CustomFileImpl::CustomFileImpl","file_name");
+    raise_null_argument ("CustomFileImpl::CustomFileImpl","file_name");
 
   file_system = _file_system;
   file_handle = file_system->FileOpen (_file_name,mode_flags,0);
@@ -19,7 +19,7 @@ CustomFileImpl::CustomFileImpl (ICustomFileSystemPtr _file_system,file_t _handle
   : FileImpl (mode_flags), auto_close (_auto_close), file_system (_file_system), file_handle (_handle)
 {
   if (!_file_system)
-    RaiseNullArgument ("CustomFileImpl::CustomFileImpl","file_system");
+    raise_null_argument ("CustomFileImpl::CustomFileImpl","file_system");
 }
 
 CustomFileImpl::~CustomFileImpl ()

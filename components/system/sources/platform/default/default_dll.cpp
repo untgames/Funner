@@ -10,9 +10,9 @@ using namespace syslib;
 namespace
 {
 
-void Raise (const char* method_name)
+void raise (const char* method_name)
 {
-  common::RaiseNotSupported (method_name, "No dynamic libraries support for default platform");
+  common::raise_not_supported (method_name, "No dynamic libraries support for default platform");
 }
 
 }
@@ -23,18 +23,18 @@ void Raise (const char* method_name)
 
 Platform::dll_t Platform::LoadLibrary (const wchar_t* name)
 {
-  Raise ("syslib::DefaultPlatform::LoadLibrary");
+  raise ("syslib::DefaultPlatform::LoadLibrary");
 
   return 0;
 }
 
 void Platform::UnloadLibrary (dll_t)
 {
-  Raise ("syslib::DefaultPlatform::UnloadLibrary");
+  raise ("syslib::DefaultPlatform::UnloadLibrary");
 }
 
 void* Platform::GetSymbol (dll_t, const char*)
 {
-  Raise ("syslib::DefaultPlatform::GetSymbol");
+  raise ("syslib::DefaultPlatform::GetSymbol");
   return 0;
 }

@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdarg.h>
+#include <common/hash.h>
 
 /*
     Приведенные ниже функции являются оболочками над их непортируемыми аналогами
@@ -36,19 +37,6 @@ int snwprintf  (wchar_t* buffer,size_t count,const wchar_t* format,...);
 int vsnwprintf (wchar_t* buffer,size_t count,const wchar_t* format,va_list list);
 
 }
-
-/*
-    Хэширование
-*/
-
-size_t strhash  (const char*,size_t init_hash=0xFFFFFFFF);
-size_t strihash (const char*,size_t init_hash=0xFFFFFFFF);
-size_t strhash  (const wchar_t*,size_t init_hash=0xFFFFFFFF);
-size_t strihash (const wchar_t*,size_t init_hash=0xFFFFFFFF);
-size_t strnhash  (const char*,size_t length,size_t init_hash=0xFFFFFFFF);
-size_t strnihash (const char*,size_t length,size_t init_hash=0xFFFFFFFF);
-size_t strnhash  (const wchar_t*,size_t length,size_t init_hash=0xFFFFFFFF);
-size_t strnihash (const wchar_t*,size_t length,size_t init_hash=0xFFFFFFFF);
 
 }
 

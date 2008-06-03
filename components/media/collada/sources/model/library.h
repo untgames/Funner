@@ -29,12 +29,12 @@ template <class Item> class LibraryImpl: public ILibrary<Item>
     const Item& operator [] (const char* id) const
     {
       if (!id)
-        common::RaiseNullArgument ("media::collada::ILibrary::operator []", "id");
+        common::raise_null_argument ("media::collada::ILibrary::operator []", "id");
         
       const Item* item = impl.Find (id);
       
       if (!item)
-        common::RaiseInvalidArgument ("media::collada::ILibrary::operator []", "id", id);
+        common::raise_invalid_argument ("media::collada::ILibrary::operator []", "id", id);
         
       return *item;
     }

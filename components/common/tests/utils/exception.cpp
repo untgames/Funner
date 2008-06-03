@@ -25,18 +25,18 @@ int main ()
 {
   printf ("Results of exception_test:\n");
 
-  TEST (RaiseInvalidArgument ("foo","x"));
-  TEST (RaiseInvalidArgument ("foo","x","hello world"));
-  TEST (RaiseInvalidArgument ("foo","x",-1));
-  TEST (RaiseInvalidArgument ("foo","x",1));
-  TEST (RaiseInvalidArgument ("foo","x",3.14f));
-  TEST (RaiseOutOfRange ("foo","x"));
-  TEST (RaiseOutOfRange ("foo","x",0,1,2));
-  TEST (RaiseOutOfRange ("foo","x",0,-2,-1));
-  TEST (RaiseOutOfRange ("foo","x",3.14f,0.0f,1.0f));
-  TEST (RaiseOutOfRange ("foo","x",5,4));
-  TEST (RaiseNullArgument ("foo","ptr"));
-  TEST (RaiseNotImplemented ("foo"));
+  TEST (raise_invalid_argument ("foo","x"));
+  TEST (raise_invalid_argument ("foo","x","hello world"));
+  TEST (raise_invalid_argument ("foo","x",-1));
+  TEST (raise_invalid_argument ("foo","x",1));
+  TEST (raise_invalid_argument ("foo","x",3.14f));
+  TEST (raise_out_of_range ("foo","x"));
+  TEST (raise_out_of_range ("foo","x",0,1,2));
+  TEST (raise_out_of_range ("foo","x",0,-2,-1));
+  TEST (raise_out_of_range ("foo","x",3.14f,0.0f,1.0f));
+  TEST (raise_out_of_range ("foo","x",5,4));
+  TEST (raise_null_argument ("foo","ptr"));
+  TEST (raise_not_implemented ("foo"));
 
   return 0;
 }

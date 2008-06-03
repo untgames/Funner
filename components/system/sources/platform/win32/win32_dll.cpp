@@ -14,7 +14,7 @@ Platform::dll_t Platform::LoadLibrary (const wchar_t* name)
   try
   {  
     if (!name)
-      RaiseNullArgument ("", "name");
+      raise_null_argument ("", "name");
 
     HMODULE library = LoadLibraryW (name);
   
@@ -39,7 +39,7 @@ void Platform::UnloadLibrary (dll_t handle)
     HMODULE library = (HMODULE)handle;
 
     if (!library)
-      RaiseNullArgument ("", "library");
+      raise_null_argument ("", "library");
 
     FreeLibrary (library);
 
@@ -59,10 +59,10 @@ void* Platform::GetSymbol (dll_t handle, const char* symbol_name)
   HMODULE library = (HMODULE)handle;
 
   if (!library)
-    RaiseNullArgument ("", "library");
+    raise_null_argument ("", "library");
 
   if (!symbol_name)
-    RaiseNullArgument ("", "symbol_name");
+    raise_null_argument ("", "symbol_name");
 
   void* address = GetProcAddress (library, symbol_name);
   

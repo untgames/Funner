@@ -84,10 +84,10 @@ size_t XmlWriter::NodeIndent () const
 void XmlWriter::BeginAttribute (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("common::XmlWriter::WriteAttribute", "name");    
+    raise_null_argument ("common::XmlWriter::WriteAttribute", "name");    
     
   if (impl->state != WriterState_AttributeList)
-    RaiseInvalidOperation ("common::XmlWriter::WriteAttribute", "Can't write attribute. Attribute list not opened");
+    raise_invalid_operation ("common::XmlWriter::WriteAttribute", "Can't write attribute. Attribute list not opened");
         
   write (impl->stream, " ");
   write (impl->stream, name);
@@ -125,7 +125,7 @@ void XmlWriter::CloseAttributeList ()
 void XmlWriter::BeginNode (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("common::XmlWriter::BeginNode", "name");
+    raise_null_argument ("common::XmlWriter::BeginNode", "name");
 
     //проверка возможности записи
 
@@ -227,7 +227,7 @@ void XmlWriter::EndCData ()
 void XmlWriter::WriteComment (const char* comment)
 {
   if (!comment)
-    RaiseNullArgument ("common::XmlWriter::WriteComment", "comment");
+    raise_null_argument ("common::XmlWriter::WriteComment", "comment");
     
     //проверка возможности записи
     
@@ -316,7 +316,7 @@ void XmlWriter::WriteIndent (int offset)
 
 void XmlWriter::RaiseEndOfDocument (const char* source)
 {
-  RaiseInvalidOperation (source, "Root node has been closed");
+  raise_invalid_operation (source, "Root node has been closed");
 }
 
 void XmlWriter::CheckEndOfDocument (const char* source)

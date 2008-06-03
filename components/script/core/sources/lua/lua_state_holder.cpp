@@ -55,7 +55,7 @@ StateHolder::StateHolder ()
   state = lua_newstate (&reallocate, &MemoryManager::GetHeap ());
 
   if (!state)
-    Raise <InterpreterException> ("script::lua::StateHolder::StateHolder", "Can't create lua state");
+    raise <InterpreterException> ("script::lua::StateHolder::StateHolder", "Can't create lua state");
 }
 
 StateHolder::~StateHolder ()

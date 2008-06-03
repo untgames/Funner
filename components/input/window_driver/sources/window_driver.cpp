@@ -72,7 +72,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     const char* GetDeviceName (size_t index)
     {
       if (index >= GetDevicesCount ())
-        RaiseOutOfRange ("input::low_level::window::Driver::GetDeviceName", "index", index, 0u, GetDevicesCount ());
+        raise_out_of_range ("input::low_level::window::Driver::GetDeviceName", "index", index, 0u, GetDevicesCount ());
 
       return device_entries[index]->device_name.c_str ();
     }
@@ -86,7 +86,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
         if (!strcmp ((*iter)->device_name.c_str (), name))
           return new Device ((*iter)->window, name);
 
-      RaiseInvalidArgument ("input::low_level::window::Driver::CreateDevice", "name", name);
+      raise_invalid_argument ("input::low_level::window::Driver::CreateDevice", "name", name);
       return 0;
     }
 
@@ -116,7 +116,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     {
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
         if (!strcmp ((*iter)->device_name.c_str (), device_name))
-          RaiseInvalidArgument ("input::low_level::window::Driver::RegisterDevice", "device_name", device_name, "Name already registered");
+          raise_invalid_argument ("input::low_level::window::Driver::RegisterDevice", "device_name", device_name, "Name already registered");
 
       device_entries.push_back (DeviceEntryPtr (new DeviceEntry (device_name, &window, window.RegisterEventHandler (WindowEvent_OnDestroy, xtl::bind (&Driver::DestroyWindowHandler, this, _1, _2, _3)))));
 
@@ -238,7 +238,7 @@ IDriver* WindowDriver::Driver ()
 void WindowDriver::RegisterDevice (const char* device_name, syslib::Window& window)
 {
   if (!device_name)
-    RaiseNullArgument ("input::low_level::WindowDriver::RegisterDevice", "device_name");
+    raise_null_argument ("input::low_level::WindowDriver::RegisterDevice", "device_name");
 
   WindowDriverSingleton::Instance ().RegisterDevice (device_name, window);
 }
@@ -251,7 +251,7 @@ void WindowDriver::RegisterDevice (syslib::Window& window)
 void WindowDriver::UnregisterDevice (const char* device_name)
 {
   if (!device_name)
-    RaiseNullArgument ("input::low_level::WindowDriver::UnregisterDevice", "device_name");
+    raise_null_argument ("input::low_level::WindowDriver::UnregisterDevice", "device_name");
 
   WindowDriverSingleton::Instance ().UnregisterDevice (device_name);
 }

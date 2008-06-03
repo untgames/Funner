@@ -18,7 +18,7 @@ void snddecl_load_library (const char* file_name, SoundDeclarationLibrary& libra
   Parser::Iterator iter = p.Root ()->First ("sound_declaration_library");
 
   if (!iter)
-    Raise <Exception> ("media::snddecl_load_library", "Incorrect file format, no root 'sound_declaration_library' tag");
+    raise <Exception> ("media::snddecl_load_library", "Incorrect file format, no root 'sound_declaration_library' tag");
 
   for (Parser::NamesakeIterator i = iter->First ("declaration"); i; i++)
   {
@@ -68,7 +68,7 @@ void snddecl_load_library (const char* file_name, SoundDeclarationLibrary& libra
 
   for (size_t i = 0; i < log.MessagesCount (); i++)
     if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
-      Raise <Exception> ("media::snddecl_load_library", log.Message(i));
+      raise <Exception> ("media::snddecl_load_library", log.Message(i));
 }
 
 /*

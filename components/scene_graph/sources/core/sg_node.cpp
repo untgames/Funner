@@ -186,10 +186,10 @@ struct Node::Impl
       case NodeTransformSpace_Local:
         break;
       case NodeTransformSpace_World:
-        RaiseNotImplemented ("scene_graph::Node::BindToParent (invariant_space=NodeTransformSpace_World)");
+        raise_not_implemented ("scene_graph::Node::BindToParent (invariant_space=NodeTransformSpace_World)");
         break;
       default:
-        RaiseInvalidArgument ("scene_graph::Node::BindToParent", "invariant_space", invariant_space);
+        raise_invalid_argument ("scene_graph::Node::BindToParent", "invariant_space", invariant_space);
         break;
     }
     
@@ -201,7 +201,7 @@ struct Node::Impl
       case NodeBindMode_Capture:
         break;
       default:
-        RaiseInvalidArgument ("scene_graph::Node::BindToParent", "mode", mode);
+        raise_invalid_argument ("scene_graph::Node::BindToParent", "mode", mode);
         break;
     }
     
@@ -213,13 +213,13 @@ struct Node::Impl
       //проверка попытки отсоединения корневого узла от сцены
 
     if (!parent && scene)
-      RaiseNotSupported ("scene_graph::Node::BindToParent", "Attempt to bind scene '%s' root to parent not supproted", scene->Name ());
+      raise_not_supported ("scene_graph::Node::BindToParent", "Attempt to bind scene '%s' root to parent not supproted", scene->Name ());
 
       //проверка не присоединяется ли узел к своему потомку
       
     for (Node* node = parent_node; node; node=node->impl->parent)
       if (node == this_node)
-        RaiseInvalidArgument ("scene_graph::Node::BindToParent", "parent", "Attempt to bind object to one of it's child");
+        raise_invalid_argument ("scene_graph::Node::BindToParent", "parent", "Attempt to bind object to one of it's child");
         
       //устанавливаем блокировку на вызов BindToParent
       
@@ -534,7 +534,7 @@ const char* Node::Name () const
 void Node::SetName (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("scene_graph::Node::SetName", "name");
+    raise_null_argument ("scene_graph::Node::SetName", "name");
 
   impl->name      = name;
   impl->name_hash = strhash (name);
@@ -655,7 +655,7 @@ void Node::UnbindChild (const char* name, NodeTransformSpace invariant_space)
 void Node::UnbindChild (const char* name, NodeSearchMode mode, NodeTransformSpace invariant_space)
 {
   if (!name)
-    RaiseNullArgument ("scene_graph::Node::UnbindChild", "name");
+    raise_null_argument ("scene_graph::Node::UnbindChild", "name");
 
   Node::Pointer child = FindChild (name, mode);
   
@@ -683,7 +683,7 @@ Node::Pointer Node::FindChild (const char* name, NodeSearchMode mode) //no throw
 Node::ConstPointer Node::FindChild (const char* name, NodeSearchMode mode) const //no throw
 {
   if (!name)
-    RaiseNullArgument ("scene_graph::Node::FindChild", "name");    
+    raise_null_argument ("scene_graph::Node::FindChild", "name");    
     
   size_t name_hash = strhash (name);
     
@@ -709,7 +709,7 @@ Node::ConstPointer Node::FindChild (const char* name, NodeSearchMode mode) const
 
       break;
     default:
-      RaiseInvalidArgument ("scene_graph::Node::FindChild", "mode", mode);
+      raise_invalid_argument ("scene_graph::Node::FindChild", "mode", mode);
       break;
   }
 
@@ -744,7 +744,7 @@ void Node::Traverse (const TraverseFunction& fn, NodeTraverseMode mode)
       fn (*this);
       break;
     default:
-      RaiseInvalidArgument ("scene_graph::Node::Traverse", "mode", mode);
+      raise_invalid_argument ("scene_graph::Node::Traverse", "mode", mode);
       break;
   }  
 
@@ -765,7 +765,7 @@ void Node::Traverse (const ConstTraverseFunction& fn, NodeTraverseMode mode) con
       fn (*this);
       break;
     default:
-      RaiseInvalidArgument ("scene_graph::Node::Traverse", "mode", mode);
+      raise_invalid_argument ("scene_graph::Node::Traverse", "mode", mode);
       break;
   }
 
@@ -786,7 +786,7 @@ void Node::VisitEach (Visitor& visitor, NodeTraverseMode mode) const
       const_cast<Node&> (*this).AcceptCore (visitor);
       break;
     default:
-      RaiseInvalidArgument ("scene_graph::Node::VisitEach", "mode", mode);
+      raise_invalid_argument ("scene_graph::Node::VisitEach", "mode", mode);
       break;
   }
 
@@ -962,7 +962,7 @@ void Node::Translate (const math::vec3f& offset, NodeTransformSpace space)
 
       break;
     default:
-      RaiseInvalidArgument ("scene_graph::Node::Translate", "space", space);
+      raise_invalid_argument ("scene_graph::Node::Translate", "space", space);
       break;
   }
   
@@ -992,7 +992,7 @@ void Node::Rotate (const math::quatf& q, NodeTransformSpace space)
       break;
     }      
     default:
-      RaiseInvalidArgument ("scene_graph::Node::Rotate", "space", space);
+      raise_invalid_argument ("scene_graph::Node::Rotate", "space", space);
       break;
   }
 
@@ -1063,7 +1063,7 @@ const mat4f& Node::TransformationMatrix (NodeTransformSpace space) const
 
       return impl->world_tm;
     default:
-      RaiseInvalidArgument ("scene_graph::Node::TransformationMatrix", "space", space);
+      raise_invalid_argument ("scene_graph::Node::TransformationMatrix", "space", space);
       return idNode;
   } 
 }
@@ -1084,7 +1084,7 @@ mat4f Node::ObjectTM (Node& object) const
 xtl::connection Node::RegisterEventHandler (NodeEvent event, const EventHandler& handler) const
 {
   if (event < 0 || event >= NodeEvent_Num)
-    RaiseInvalidArgument ("scene_graph::Node::Event(NodeEvent)", "event", event);
+    raise_invalid_argument ("scene_graph::Node::Event(NodeEvent)", "event", event);
 
   return impl->signals [event].connect (handler);
 }
@@ -1092,7 +1092,7 @@ xtl::connection Node::RegisterEventHandler (NodeEvent event, const EventHandler&
 xtl::connection Node::RegisterEventHandler (NodeSubTreeEvent event, const SubTreeEventHandler& handler) const
 {
   if (event < 0 || event >= NodeSubTreeEvent_Num)
-    RaiseInvalidArgument ("scene_graph::Node::Event(NodeSubTreeEvent)", "event", event);
+    raise_invalid_argument ("scene_graph::Node::Event(NodeSubTreeEvent)", "event", event);
 
   return impl->subtree_signals [event].connect (handler);
 }
@@ -1109,7 +1109,7 @@ void Node::BeginUpdate ()
 void Node::EndUpdate ()
 {
   if (!impl->update_lock)
-    RaiseNotSupported ("scene_graph::Node::EndUpdate", "Attempt to call EndUpdate without previous BeginUpdate call");  
+    raise_not_supported ("scene_graph::Node::EndUpdate", "Attempt to call EndUpdate without previous BeginUpdate call");  
     
   if (!--impl->update_lock)
   {

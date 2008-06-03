@@ -128,10 +128,10 @@ void Exception::Touch (const char* format, ...)
 }    
 
 /*
-    VRaise
+    vraise
 */
 
-void common::VRaise (const char* source,const char* format,va_list list,void (*raise)(const char* source,const char* message))
+void common::vraise (const char* source,const char* format,va_list list,void (*raise)(const char* source,const char* message))
 {
   raise (source,common::vformat (format,list).c_str ());
 }

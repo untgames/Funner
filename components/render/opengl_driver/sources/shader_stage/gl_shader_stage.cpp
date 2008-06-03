@@ -60,7 +60,7 @@ class ShaderStageState: public IStageState
     IBindableBuffer* GetConstantBuffer (size_t buffer_slot) const
     {
       if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
-        RaiseNotSupported ("render::low_level::opengl::ShaderStage::Impl::GetConstantBuffer", "Can't get constant buffer from slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
+        raise_not_supported ("render::low_level::opengl::ShaderStage::Impl::GetConstantBuffer", "Can't get constant buffer from slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
       return constant_buffers [buffer_slot].get ();
     }
@@ -86,10 +86,10 @@ class ShaderStageState: public IStageState
       static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Bind";
 
       if (!program)
-        RaiseInvalidOperation (METHOD_NAME, "Null program");
+        raise_invalid_operation (METHOD_NAME, "Null program");
 
       if (!parameters_layout)
-        RaiseInvalidOperation (METHOD_NAME, "Null program parameters layout");
+        raise_invalid_operation (METHOD_NAME, "Null program parameters layout");
 
       program->Bind (constant_buffers, parameters_layout.get ());
     }
@@ -188,7 +188,7 @@ struct ShaderStage::Impl: public ContextObject
       static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetConstantBuffer";
 
       if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
-        RaiseNotSupported (METHOD_NAME, "Can't set constant buffer to slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
+        raise_not_supported (METHOD_NAME, "Can't set constant buffer to slot %u (maximum supported slots %u)", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
       cast_object<ContextObject> (*this, buffer, METHOD_NAME, "buffer");
 
@@ -267,10 +267,10 @@ IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDe
   static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::CreateProgram";
 
   if (!shader_descs)
-    RaiseNullArgument (METHOD_NAME, "shader_descs");
+    raise_null_argument (METHOD_NAME, "shader_descs");
 
   if (!shaders_count)
-    RaiseNullArgument (METHOD_NAME, "shaders_count");
+    raise_null_argument (METHOD_NAME, "shaders_count");
     
       //вынести проверки в начало!!!
 
@@ -286,10 +286,10 @@ IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDe
     search_result = shader_managers_map.find (profile.c_str ());
 
     if (search_result == shader_managers_map.end ())
-      RaiseNotSupported (METHOD_NAME, "Shader profile '%s' not supported (no registered shader manager for this profile)", profile.c_str ());
+      raise_not_supported (METHOD_NAME, "Shader profile '%s' not supported (no registered shader manager for this profile)", profile.c_str ());
 
     if (manager && (search_result->second != manager))
-      RaiseInvalidArgument (METHOD_NAME, "Can't create shader, detected profiles of different shader managers");
+      raise_invalid_argument (METHOD_NAME, "Can't create shader, detected profiles of different shader managers");
 
     manager = search_result->second;
   }
@@ -312,7 +312,7 @@ IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDe
         shader_desc.name = "__unnamed__";
         
       if (!shader_desc.source_code)
-        Raise<ArgumentNullException> (METHOD_NAME, "shader_descs[%u].source_code", i);
+        raise<ArgumentNullException> (METHOD_NAME, "shader_descs[%u].source_code", i);
         
       if (shader_desc.source_code_size == ~0)
         shader_desc.source_code_size = strlen (shader_desc.source_code);
@@ -338,7 +338,7 @@ IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDe
 void ShaderStage::Impl::AddShaderManager (const ShaderManagerPtr& manager)
 {
   if (!manager)
-    RaiseNullArgument ("render::low_level::opengl::ShaderStage::Impl::AddShaderManager", "manager");
+    raise_null_argument ("render::low_level::opengl::ShaderStage::Impl::AddShaderManager", "manager");
 
   shader_managers.push_back (manager);
 

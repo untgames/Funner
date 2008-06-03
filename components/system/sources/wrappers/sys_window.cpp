@@ -174,7 +174,7 @@ void Window::Init (WindowStyle style)
     case WindowStyle_PopUp:
       break;
     default:
-      RaiseInvalidArgument ("syslib::Window::Window", "style", style);
+      raise_invalid_argument ("syslib::Window::Window", "style", style);
       return;
   }
   
@@ -294,7 +294,7 @@ const wchar_t* Window::TitleUnicode () const
 void Window::SetTitle (const char* title)
 {
   if (!title)
-    RaiseNullArgument ("syslib::Window::SetTitle(const char*)", "title");
+    raise_null_argument ("syslib::Window::SetTitle(const char*)", "title");
 
   Platform::SetWindowTitle ((Platform::window_t)CheckedHandle (), towstring (title).c_str ());
 }
@@ -302,7 +302,7 @@ void Window::SetTitle (const char* title)
 void Window::SetTitle (const wchar_t* title)
 {
   if (!title)
-    RaiseNullArgument ("syslib::Window::SetTitle(const wchar_t*)", "title");
+    raise_null_argument ("syslib::Window::SetTitle(const wchar_t*)", "title");
 
   Platform::SetWindowTitle ((Platform::window_t)CheckedHandle (), title);
 }
@@ -501,7 +501,7 @@ void Window::Invalidate ()
 connection Window::RegisterEventHandler (WindowEvent event, const EventHandler& handler)
 {
   if (event < 0 || event >= WindowEvent_Num)
-    RaiseInvalidArgument ("syslib::Window::RegisterEventHandler", "event", event);
+    raise_invalid_argument ("syslib::Window::RegisterEventHandler", "event", event);
     
   return impl->signals [event].connect (handler);
 }

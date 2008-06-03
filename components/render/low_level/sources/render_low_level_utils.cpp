@@ -23,7 +23,7 @@ const char* get_name (CompareMode param)
     case CompareMode_Greater:      return "CompareMode_Greater";
     case CompareMode_GreaterEqual: return "CompareMode_GreaterEqual";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(CompareMode)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(CompareMode)", "param", param);
       return "";
   }
 }
@@ -37,7 +37,7 @@ const char* get_name (UsageMode param)
     case UsageMode_Dynamic: return "UsageMode_Dynamic";
     case UsageMode_Stream:  return "UsageMode_Stream";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(UsageMode)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(UsageMode)", "param", param);
       return "";
   }
 }
@@ -112,7 +112,7 @@ const char* get_name (BindFlag param)
     case BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
     case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(BindFlag)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(BindFlag)", "param", param);
       return "";
   }
 }
@@ -126,7 +126,7 @@ const char* get_name (AccessFlag param)
     case AccessFlag_Write:                   return "write";
     case AccessFlag_Read | AccessFlag_Write: return "read | write";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(AccessFlag)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(AccessFlag)", "param", param);
       return "";
   }
 }
@@ -148,7 +148,7 @@ const char* get_name (PixelFormat param)
     case PixelFormat_D24S8: return "PixelFormat_D24S8";
     case PixelFormat_S8:    return "PixelFormat_S8";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(PixelFormat)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(PixelFormat)", "param", param);
       return "";
   }
 }
@@ -162,7 +162,7 @@ const char* get_name (TextureDimension param)
     case TextureDimension_3D:      return "TextureDimension_3D";
     case TextureDimension_Cubemap: return "TextureDimension_Cubemap";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(TextureDimension)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(TextureDimension)", "param", param);
       return "";
   }
 }
@@ -178,7 +178,7 @@ const char* get_name (StencilOperation param)
     case StencilOperation_Decrement:  return "StencilOperation_Decrement";
     case StencilOperation_Invert:     return "StencilOperation_Invert";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(StencilOperation)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(StencilOperation)", "param", param);
       return "";
   }
 }
@@ -193,7 +193,7 @@ const char* get_name (BlendOperation param)
     case BlendOperation_Min:                return "BlendOperation_Min";
     case BlendOperation_Max:                return "BlendOperation_Max";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(BlendOperation)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(BlendOperation)", "param", param);
       return "";
   }
 }
@@ -213,7 +213,7 @@ const char* get_name (BlendArgument param)
     case BlendArgument_InverseDestinationColor: return "BlendArgument_InverseDestinationColor";
     case BlendArgument_InverseDestinationAlpha: return "BlendArgument_InverseDestinationAlpha";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(BlendArgument)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(BlendArgument)", "param", param);
       return "";
   }  
 }
@@ -239,7 +239,7 @@ const char* get_name (ColorWriteFlag param)
     case ColorWriteFlag_Green | ColorWriteFlag_Blue | ColorWriteFlag_Alpha: return "green | blue | alpha";    
     case ColorWriteFlag_Red | ColorWriteFlag_Green | ColorWriteFlag_Blue | ColorWriteFlag_Alpha:  return "red | green | blue | alpha";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(ColorWriteFlag)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(ColorWriteFlag)", "param", param);
       return "";    
   }
 }
@@ -256,7 +256,7 @@ const char* get_name (InputDataType param)
     case InputDataType_UInt:    return "InputDataType_UInt";
     case InputDataType_Float:   return "InputDataType_Float";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(InputDataType)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(InputDataType)", "param", param);
       return "";    
   }
 }
@@ -270,7 +270,7 @@ const char* get_name (InputDataFormat param)
     case InputDataFormat_Vector3: return "InputDataFormat_Vector3";
     case InputDataFormat_Vector4: return "InputDataFormat_Vector4";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(InputDataFormat)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(InputDataFormat)", "param", param);
       return "";    
   }
 }
@@ -291,7 +291,7 @@ const char* get_name (VertexAttributeSemantic param)
     case VertexAttributeSemantic_TexCoord6: return "VertexAttributeSemantic_TexCoord6";
     case VertexAttributeSemantic_TexCoord7: return "VertexAttributeSemantic_TexCoord7";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(VertexAttributeSemantic)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(VertexAttributeSemantic)", "param", param);
       return "";    
   }
 }
@@ -308,7 +308,7 @@ const char* get_name (TexMinFilter param)
     case TexMinFilter_PointMipLinear:  return "TexMinFilter_PointMipLinear";
     case TexMinFilter_LinearMipLinear: return "TexMinFilter_LinearMipLinear";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(TexMinFilter)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(TexMinFilter)", "param", param);
       return "";    
   }
 }
@@ -321,7 +321,7 @@ const char* get_name (TexMagFilter param)
     case TexMagFilter_Point:   return "TexMagFilter_Point";
     case TexMagFilter_Linear:  return "TexMagFilter_Linear";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(TexMagFilter)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(TexMagFilter)", "param", param);
       return "";    
   }
 }
@@ -335,7 +335,7 @@ const char* get_name (TexcoordWrap param)
     case TexcoordWrap_Clamp:         return "TexcoordWrap_Clamp";
     case TexcoordWrap_ClampToBorder: return "TexcoordWrap_ClampToBorder";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(TexcoordWrap)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(TexcoordWrap)", "param", param);
       return "";    
   }
 }
@@ -356,7 +356,7 @@ const char* get_name (ProgramParameterType param)
     case ProgramParameterType_Float3x3:   return "ProgramParameterType_Float3x3";
     case ProgramParameterType_Float4x4:   return "ProgramParameterType_Float4x4";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(ProgramParameterType)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(ProgramParameterType)", "param", param);
       return "";
   }
 }
@@ -368,7 +368,7 @@ const char* get_name (FillMode param)
     case FillMode_Wireframe: return "FillMode_Wireframe";
     case FillMode_Solid:     return "FillMode_Solid";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(FillMode)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(FillMode)", "param", param);
       return "";    
   }
 }
@@ -381,7 +381,7 @@ const char* get_name (CullMode param)
     case CullMode_Front: return "CullMode_Front";
     case CullMode_Back:  return "CullMode_Back";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(CullMode)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(CullMode)", "param", param);
       return "";    
   }
 }
@@ -397,7 +397,7 @@ const char* get_name (PrimitiveType param)
     case PrimitiveType_TriangleStrip:  return "PrimitiveType_TriangleStrip";
     case PrimitiveType_TriangleFan:    return "PrimitiveType_TriangleFan";
     default:
-      RaiseInvalidArgument ("render::low_level::get_name(PrimitiveType)", "param", param);
+      raise_invalid_argument ("render::low_level::get_name(PrimitiveType)", "param", param);
       return "";
   }
 }
@@ -423,10 +423,10 @@ size_t get_texel_size (PixelFormat format)
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-      common::RaiseInvalidArgument ("render::low_level::get_texel_size", "format", get_name (format), "No texel size semantic in compressed pixel format");
+      common::raise_invalid_argument ("render::low_level::get_texel_size", "format", get_name (format), "No texel size semantic in compressed pixel format");
       return 0;
     default:
-      common::RaiseInvalidArgument ("render::low_level::get_texel_size", "format");
+      common::raise_invalid_argument ("render::low_level::get_texel_size", "format");
       return 0;
   }
 }
@@ -450,10 +450,10 @@ size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat fo
     case PixelFormat_DXT1:  return width * height * depth * 8 / DXT_BLOCK_SIZE;
     case PixelFormat_DXT3:  return width * height * depth * 16 / DXT_BLOCK_SIZE;
     case PixelFormat_DXT5:  return width * height * depth * 16 / DXT_BLOCK_SIZE;
-      common::RaiseInvalidArgument ("render::low_level::get_texel_size", "format", get_name (format), "No texel size semantic in compressed pixel format");
+      common::raise_invalid_argument ("render::low_level::get_texel_size", "format", get_name (format), "No texel size semantic in compressed pixel format");
       return 0;
     default:
-      common::RaiseInvalidArgument ("render::low_level::get_texel_size", "format");
+      common::raise_invalid_argument ("render::low_level::get_texel_size", "format");
       return 0;    
   }
 }
@@ -486,7 +486,7 @@ bool is_compressed (PixelFormat format)
     case PixelFormat_D24X8:
     case PixelFormat_D24S8: return false;  
     default:
-      RaiseInvalidArgument ("render::low_level::is_compressed", "format", format);
+      raise_invalid_argument ("render::low_level::is_compressed", "format", format);
       return false;
   }
 }
@@ -515,7 +515,7 @@ bool is_depth_stencil (PixelFormat format)
     case PixelFormat_RGB8:  
     case PixelFormat_RGBA8: return false;
     default:
-      RaiseInvalidArgument ("render::low_level::is_depth_stencil", "format", format);
+      raise_invalid_argument ("render::low_level::is_depth_stencil", "format", format);
       return false;
   }
 }
@@ -544,7 +544,7 @@ PixelFormat get_uncompressed_format (PixelFormat format)
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:  return PixelFormat_RGBA8;
     default:
-      RaiseInvalidArgument ("render::low_level::get_unpacked_format", "format", format);
+      raise_invalid_argument ("render::low_level::get_unpacked_format", "format", format);
       return (PixelFormat)0;
   }
 }

@@ -146,11 +146,11 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
   try
   {
     if (sample.Frequency () > MAX_SOUND_SAMPLE_RATE)
-      RaiseNotSupported (METHOD_NAME, "Sound sample '%s' has unsupported sample rate=%u. Maximum supported sample rate is %u", 
+      raise_not_supported (METHOD_NAME, "Sound sample '%s' has unsupported sample rate=%u. Maximum supported sample rate is %u", 
                          sample.Name (), sample.Frequency (), MAX_SOUND_SAMPLE_RATE);
 
     if (sample.BitsPerSample () != 16)
-      RaiseNotSupported (METHOD_NAME, "Sound sample '%s' has unsupported bits_per_sample=%u",
+      raise_not_supported (METHOD_NAME, "Sound sample '%s' has unsupported bits_per_sample=%u",
                          sample.Name (), sample.BitsPerSample ());
 
     switch (sample.Channels ())
@@ -159,7 +159,7 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
       case 2:
         break;
       default:
-        RaiseNotSupported (METHOD_NAME, "Sound sample '%s' has unsupported channels_count=%u", sample.Name (), sample.Channels ());
+        raise_not_supported (METHOD_NAME, "Sound sample '%s' has unsupported channels_count=%u", sample.Name (), sample.Channels ());
         break;
     }
     
@@ -264,7 +264,7 @@ void OpenALSource::Seek (float offset, SeekMode seek_mode)
         offset = fmod (offset, duration);
         break;
       default:
-        RaiseInvalidArgument ("sound::low_level::OpenALDevice::Seek", "seek_mode", seek_mode);
+        raise_invalid_argument ("sound::low_level::OpenALDevice::Seek", "seek_mode", seek_mode);
     }
 
   play_time_start  = clock ();

@@ -171,10 +171,10 @@ void GlslProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLa
   static const char* METHOD_NAME = "render::low_level::opengl::GlslProgram::Bind";
 
   if (!constant_buffers)
-    RaiseNullArgument (METHOD_NAME, "constant_buffers");
+    raise_null_argument (METHOD_NAME, "constant_buffers");
 
   if (!parameters_layout)
-    RaiseNullArgument (METHOD_NAME, "parameters_layout");
+    raise_null_argument (METHOD_NAME, "parameters_layout");
 
   MakeContextCurrent ();
 
@@ -264,7 +264,7 @@ void GlslProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLa
     GlslProgramParameterGroup& group = hit_layout->parameter_groups [i];
 
     if (!constant_buffers[group.slot])
-      RaiseInvalidOperation (METHOD_NAME, "No needed constant buffer %u", group.slot);
+      raise_invalid_operation (METHOD_NAME, "No needed constant buffer %u", group.slot);
 
     if ((current_time - hit_layout->bind_time == 1) && (group.data_hash == constant_buffers[group.slot]->GetDataHash ()))
       continue;

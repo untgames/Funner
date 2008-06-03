@@ -120,7 +120,7 @@ const char* Mesh::Name () const
 void Mesh::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("media::geometry::Mesh::Rename", "name");
+    raise_null_argument ("media::geometry::Mesh::Rename", "name");
     
   impl->name = name;
 }
@@ -138,7 +138,7 @@ size_t Mesh::VertexBuffersCount () const
 const media::geometry::VertexBuffer& Mesh::VertexBuffer (size_t index) const
 {
   if (index >= impl->vertex_buffers.size ())
-    RaiseOutOfRange ("media::geometry::Mesh::VertexBuffer", "index", index, impl->vertex_buffers.size ());
+    raise_out_of_range ("media::geometry::Mesh::VertexBuffer", "index", index, impl->vertex_buffers.size ());
 
   return impl->vertex_buffers [index];
 }
@@ -211,7 +211,7 @@ size_t Mesh::PrimitivesCount () const
 const Primitive& Mesh::Primitive (size_t index) const
 {
   if (index >= impl->primitives.size ())
-    RaiseOutOfRange ("media::geometry::Mesh::Primitive", "index", index, impl->primitives.size ());
+    raise_out_of_range ("media::geometry::Mesh::Primitive", "index", index, impl->primitives.size ());
     
   if (impl->need_material_names_update)
   {
@@ -233,7 +233,7 @@ const Primitive& Mesh::Primitive (size_t index) const
 size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, const char* material)
 {
   if (type < 0 || type >= PrimitiveType_Num)
-    RaiseInvalidArgument ("media::geometry::Mesh::AddPrimitive", "type", type);
+    raise_invalid_argument ("media::geometry::Mesh::AddPrimitive", "type", type);
     
   if (!material)
     material = "";
@@ -328,7 +328,7 @@ const char* get_type_name (PrimitiveType type)
     case PrimitiveType_TriangleList:  return "triangle_list";
     case PrimitiveType_TriangleStrip: return "triangle_strip";
     case PrimitiveType_TriangleFan:   return "triangle_fan";
-    default:                          RaiseInvalidArgument ("media::geometry::get_type_name (PrimitiveType)", "type", type);
+    default:                          raise_invalid_argument ("media::geometry::get_type_name (PrimitiveType)", "type", type);
   }
   
   return "";
@@ -382,7 +382,7 @@ size_t get_points_count (PrimitiveType type, size_t primitives_count)
     case PrimitiveType_TriangleList:  return primitives_count * 3;
     case PrimitiveType_TriangleStrip: return primitives_count + 2;
     case PrimitiveType_TriangleFan:   return primitives_count + 2;
-    default:                          RaiseInvalidArgument ("media::geometry::get_points_count", "type", type);
+    default:                          raise_invalid_argument ("media::geometry::get_points_count", "type", type);
   }
   
   return 0;
@@ -401,7 +401,7 @@ size_t get_primitives_count (PrimitiveType type, size_t points_count)
     case PrimitiveType_TriangleList:  return points_count / 3;
     case PrimitiveType_TriangleStrip: return points_count >= 2 ? points_count - 2 : 0;
     case PrimitiveType_TriangleFan:   return points_count >= 2 ? points_count - 2 : 0;
-    default:                          RaiseInvalidArgument ("media::geometry::get_primitives_count", "type", type);
+    default:                          raise_invalid_argument ("media::geometry::get_primitives_count", "type", type);
   }
   
   return 0;

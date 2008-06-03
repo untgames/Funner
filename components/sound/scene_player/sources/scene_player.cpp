@@ -95,7 +95,7 @@ struct ScenePlayer::Impl
     scene_graph::Scene* scene = in_listener->Scene ();
 
     if (!scene)
-      Raise <Exception> ("sound::ScenePlayer::SetListener", "Listener is not binded to any scene.");
+      raise <Exception> ("sound::ScenePlayer::SetListener", "Listener is not binded to any scene.");
 
     if (!listener || (listener->Scene () != scene))
     {

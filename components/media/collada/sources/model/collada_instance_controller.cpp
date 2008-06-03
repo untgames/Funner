@@ -65,7 +65,7 @@ const char* InstanceController::Controller () const
 void InstanceController::SetController (const char* controller_id)
 {
   if (!controller_id)
-    RaiseNullArgument ("media::collada::InstanceController::SetController", "controller_id");
+    raise_null_argument ("media::collada::InstanceController::SetController", "controller_id");
     
   impl->controller = controller_id;
 }
@@ -125,7 +125,7 @@ size_t InstanceController::JointSearchRootsCount () const
 const char* InstanceController::JointSearchRoot (size_t root_index) const
 {
   if (root_index >= impl->search_roots.size ())
-    RaiseOutOfRange ("media::collada::InstanceController::JointSearchRoot", "root_index", root_index, impl->search_roots.size ());
+    raise_out_of_range ("media::collada::InstanceController::JointSearchRoot", "root_index", root_index, impl->search_roots.size ());
     
   return impl->search_root_names.c_str () + impl->search_roots [root_index];
 }
@@ -133,7 +133,7 @@ const char* InstanceController::JointSearchRoot (size_t root_index) const
 size_t InstanceController::InsertJointSearchRoot (const char* node_id)
 {
   if (!node_id)
-    RaiseNullArgument ("media::collada::InstanceController::InsertJointSearchRoot", "node_id");
+    raise_null_argument ("media::collada::InstanceController::InsertJointSearchRoot", "node_id");
     
   size_t offset = impl->search_root_names.size ();
   

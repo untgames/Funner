@@ -139,7 +139,7 @@ void Device::SetProperty (const char* name, float value)
     return;
   }
 
-  RaiseInvalidArgument ("input::low_level::window::Device::SetProperty", "name", name);
+  raise_invalid_argument ("input::low_level::window::Device::SetProperty", "name", name);
 }
 
 float Device::GetProperty (const char* name)
@@ -160,7 +160,7 @@ float Device::GetProperty (const char* name)
   if (!common::string_wrappers::strcmp (HORISONTAL_WHEEL_SENSITIVITY, name))
     return horisontal_wheel_sensitivity;
 
-  RaiseInvalidArgument ("input::low_level::window::Device::GetProperty", "name", name);
+  raise_invalid_argument ("input::low_level::window::Device::GetProperty", "name", name);
   return 0.f;
 }
 

@@ -10,7 +10,7 @@ MountPointFileSystem::MountPointFileSystem (MountFileSystem& _owner)
 
 MountPointFileSystem::file_t MountPointFileSystem::FileOpen (const char* file_name,filemode_t,size_t)
 {
-  RaiseNotSupported ("MountPointFileSystem::FileOpen","Unable to open mount-point file '%s'",file_name);
+  raise_not_supported ("MountPointFileSystem::FileOpen","Unable to open mount-point file '%s'",file_name);
   return (file_t)0;
 }
 
@@ -20,53 +20,53 @@ void MountPointFileSystem::FileClose (file_t)
 
 size_t MountPointFileSystem::FileRead (file_t,void*,size_t)
 {
-  RaiseNotSupported ("MountPointFileSystem::FileRead");
+  raise_not_supported ("MountPointFileSystem::FileRead");
   return 0;
 }
 
 size_t MountPointFileSystem::FileWrite (file_t,const void* buf,size_t size)
 {
-  RaiseNotSupported ("MountPointFileSystem::FileWrite");
+  raise_not_supported ("MountPointFileSystem::FileWrite");
   return 0;
 }
 
 void MountPointFileSystem::FileRewind (file_t)
 {
-  RaiseNotSupported ("MountPointFileSystem::FileRewind");
+  raise_not_supported ("MountPointFileSystem::FileRewind");
 }
 
 filepos_t MountPointFileSystem::FileSeek (file_t,filepos_t)
 {
-  RaiseNotSupported ("MountPointFileSystem::FileSeek");
+  raise_not_supported ("MountPointFileSystem::FileSeek");
   return 0;
 }
 
 filepos_t MountPointFileSystem::FileTell (file_t)
 {
-  RaiseNotSupported ("MountPointFileSystem::FileTell");
+  raise_not_supported ("MountPointFileSystem::FileTell");
   return 0;
 }
 
 filesize_t MountPointFileSystem::FileSize (file_t)
 {
-  RaiseNotSupported ("MountPointFileSystem::FileSize");
+  raise_not_supported ("MountPointFileSystem::FileSize");
   return 0;
 }
 
 void MountPointFileSystem::FileResize (file_t,filesize_t)
 {
-  RaiseNotSupported ("MountPointFileSystem::FileResize");
+  raise_not_supported ("MountPointFileSystem::FileResize");
 }
 
 bool MountPointFileSystem::FileEof (file_t)
 {
-  RaiseNotSupported ("MountPointFileSystem::FileEof");
+  raise_not_supported ("MountPointFileSystem::FileEof");
   return true;
 }
 
 void MountPointFileSystem::FileFlush (file_t)
 {
-  RaiseNotSupported ("MountPointFileSystem::FileFlush");
+  raise_not_supported ("MountPointFileSystem::FileFlush");
 }
 
 void MountPointFileSystem::Remove (const char* file_name)
@@ -109,5 +109,5 @@ bool MountPointFileSystem::GetFileInfo (const char* name,FileInfo& info)
 
 void MountPointFileSystem::Search (const char* mask,const FileSearchHandler& insert_handler)
 {
-  RaiseNotSupported ("MountPointFileSystem::Search");
+  raise_not_supported ("MountPointFileSystem::Search");
 }

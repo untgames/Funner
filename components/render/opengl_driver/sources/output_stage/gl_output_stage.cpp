@@ -436,7 +436,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
         if (render_target_view)
         {
           if (!(render_target_view->GetBindFlags () & BindFlag_RenderTarget))
-            Raise<ArgumentException> ("", "Render-target view has wrong bind flags %s", get_name ((BindFlag)render_target_view->GetBindFlags ()));
+            raise<ArgumentException> ("", "Render-target view has wrong bind flags %s", get_name ((BindFlag)render_target_view->GetBindFlags ()));
             
             //проверка корректности формата пикселей
             
@@ -461,10 +461,10 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
             case PixelFormat_D24X8:
             case PixelFormat_D24S8:
             case PixelFormat_S8:
-              RaiseNotSupported ("", "Unsupported render-target view texture format=%s", get_name (desc.format));
+              raise_not_supported ("", "Unsupported render-target view texture format=%s", get_name (desc.format));
               break;
             default:
-              RaiseInvalidArgument ("", "texture_desc.format", desc.format);
+              raise_invalid_argument ("", "texture_desc.format", desc.format);
               break;
           }
         }
@@ -472,7 +472,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
         if (depth_stencil_view)
         {
           if (!(depth_stencil_view->GetBindFlags () & BindFlag_DepthStencil))
-            Raise<ArgumentException> ("", "Depth-stencil view has wrong bind flags %s", get_name ((BindFlag)depth_stencil_view->GetBindFlags ()));
+            raise<ArgumentException> ("", "Depth-stencil view has wrong bind flags %s", get_name ((BindFlag)depth_stencil_view->GetBindFlags ()));
             
             //проверка корректности формата пикселей
             
@@ -492,7 +492,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
             case PixelFormat_DXT1:
             case PixelFormat_DXT3:
             case PixelFormat_DXT5:
-              RaiseNotSupported ("", "Unsupported depth-stencil view texture format=%s", get_name (desc.format));
+              raise_not_supported ("", "Unsupported depth-stencil view texture format=%s", get_name (desc.format));
               break;
             case PixelFormat_D16:
             case PixelFormat_D24X8:
@@ -500,7 +500,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
             case PixelFormat_S8:
               break;
             default:
-              RaiseInvalidArgument ("", "texture_desc.format", desc.format);
+              raise_invalid_argument ("", "texture_desc.format", desc.format);
               break;
           }
         }

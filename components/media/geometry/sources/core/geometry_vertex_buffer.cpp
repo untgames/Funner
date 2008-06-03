@@ -94,7 +94,7 @@ size_t VertexBuffer::StreamsCount () const
 const VertexStream& VertexBuffer::Stream (size_t index) const
 {
   if (index >= impl->streams.size ())
-    RaiseOutOfRange ("media::geometry::VertexBuffer::Stream", "index", index, impl->streams.size ());
+    raise_out_of_range ("media::geometry::VertexBuffer::Stream", "index", index, impl->streams.size ());
     
   return impl->streams [index];
 }

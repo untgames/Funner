@@ -63,7 +63,7 @@ const char* Mesh::Id () const
 void Mesh::SetId (const char* id)
 {
   if (!id)
-    RaiseNullArgument ("media::collada::Mesh::SetId", "id");
+    raise_null_argument ("media::collada::Mesh::SetId", "id");
     
   impl->id = id;
 }

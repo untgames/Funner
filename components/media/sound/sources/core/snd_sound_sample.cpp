@@ -15,9 +15,9 @@ struct SoundSample::Impl
     Impl () {}
     Impl (const stl::string& in_name, const SoundSampleInfo& in_info) : str_name (in_name), info (in_info) {}
 
-    stl::string                     str_name;  //SoundSample name
-    SoundSampleInfo                 info;      //Информация о файле
-    xtl::com_ptr<ISoundInputStream> input_stream;     //Кодек
+    stl::string                     str_name;     //SoundSample name
+    SoundSampleInfo                 info;         //Информация о файле
+    xtl::com_ptr<ISoundInputStream> input_stream; //Кодек
 };
 
 }
@@ -30,14 +30,14 @@ SoundSample::SoundSample ()
 SoundSample::SoundSample (const SoundSample& source)
   : impl (new Impl (source.impl->str_name, source.impl->info))
 {                  
-  impl->input_stream  = source.impl->input_stream;
+  impl->input_stream = source.impl->input_stream;
 }
 
 SoundSample::SoundSample (const char* file_name)
   : impl (new Impl)
 {
   if (!file_name)
-    RaiseNullArgument ("media::SoundSample::SoundSample", "file_name");
+    raise_null_argument ("media::SoundSample::SoundSample", "file_name");
 
   try
   {
@@ -57,7 +57,7 @@ SoundSample::SoundSample (ISoundInputStream* istream)
   : impl (new Impl)
 {
   if (!istream)
-    RaiseNullArgument ("media::SoundSample::SoundSample", "istream");
+    raise_null_argument ("media::SoundSample::SoundSample", "istream");
 
   impl->input_stream = istream;
 }
@@ -157,7 +157,7 @@ size_t SoundSample::Read (size_t first_sample, size_t samples_count, void* data)
 void SoundSample::Save (const char* file_name) const
 {
   if (!file_name)
-    RaiseNullArgument ("media::SoundSample::Save", "file_name");
+    raise_null_argument ("media::SoundSample::Save", "file_name");
     
   try
   {

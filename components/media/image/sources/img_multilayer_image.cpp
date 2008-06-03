@@ -86,10 +86,10 @@ class MultilayerImageImpl: public ImageImpl
 MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersCloneMode clone_mode)
 {
   if (!count)
-    RaiseNullArgument ("media::MultilayerImageImpl::MultilayerImageImpl", "count");
+    raise_null_argument ("media::MultilayerImageImpl::MultilayerImageImpl", "count");
     
   if (!images)
-    RaiseNullArgument ("media::MultilayerImageImpl::MultilayerImageImpl", "images");
+    raise_null_argument ("media::MultilayerImageImpl::MultilayerImageImpl", "images");
 
   layers_width  = images [0].Width ();
   layers_height = images [0].Height ();
@@ -107,7 +107,7 @@ MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersClo
         images [i].Swap (layers [i]);
       break;
     default:
-      RaiseInvalidArgument ("media::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
+      raise_invalid_argument ("media::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
       break;
   }
 
@@ -204,7 +204,7 @@ void MultilayerImageImpl::Convert (PixelFormat new_format)
 void MultilayerImageImpl::SaveSixLayersImage (const char* file_name, const char* suffixes [6])
 {
   if (layers.size () < 6)
-    RaiseNotSupported ("media::MultilayerImageImpl::SaveSixLayerImage", "Can't save image '%s', depth=%d<6.", Name (), layers.size ());
+    raise_not_supported ("media::MultilayerImageImpl::SaveSixLayerImage", "Can't save image '%s', depth=%d<6.", Name (), layers.size ());
     
   string basename1 = common::basename (file_name),
          basename2 = common::basename (basename1),
@@ -247,7 +247,7 @@ void MultilayerImageImpl::Save (const char* file_name)
   else if (!::strcmp (DDS_SUFFIX,     suffix.c_str ())) SaveDDS     (file_name);
   else
   {
-    RaiseNotSupported ("media::MultilayerImageImpl::Save", "Can't save image '%s' in file '%s. Unknown extension '%s'",
+    raise_not_supported ("media::MultilayerImageImpl::Save", "Can't save image '%s' in file '%s. Unknown extension '%s'",
                        Name (), file_name, suffix.c_str ());
   }
 }
@@ -271,7 +271,7 @@ ImageImpl* create_multilayer_image (size_t count, Image* images, LayersCloneMode
 void load_image_array (const char* file_name, size_t count, const char** suffixes, Image* images)
 {
   if (!file_name)
-    RaiseNullArgument ("media::load_image_array", "file_name");
+    raise_null_argument ("media::load_image_array", "file_name");
 
   string basename1 = common::basename (file_name),
          basename2 = common::basename (basename1),

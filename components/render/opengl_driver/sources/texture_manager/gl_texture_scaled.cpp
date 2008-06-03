@@ -29,7 +29,7 @@ ScaledTexture::ScaledTexture
   shadow_texture   = dynamic_cast<BindableTexture*> (texture_manager.CreateTexture (temp_desc));
 
   if (!shadow_texture.get ())
-    RaiseInvalidOperation ("render::low_level::opengl::ScaledTexture::ScaledTexture", "TextureManager::CreateTexture returned texture with incompatible type");
+    raise_invalid_operation ("render::low_level::opengl::ScaledTexture::ScaledTexture", "TextureManager::CreateTexture returned texture with incompatible type");
 
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
   vertical_scale   = (float)scaled_height / (float)original_desc.height;  
@@ -139,7 +139,7 @@ void ScaledTexture::GetData (size_t layer, size_t mip_level, size_t x, size_t y,
   const char* METHOD_NAME = "render::low_level::opengl::TextureEmulatedNPOT::GetData";
 
   if (is_compressed (target_format))
-    RaiseNotSupported (METHOD_NAME, "Can't get data in format %s from scaled texture", get_name (target_format));
+    raise_not_supported (METHOD_NAME, "Can't get data in format %s from scaled texture", get_name (target_format));
 
   size_t scaled_width  = (size_t)ceil ((float)width * horisontal_scale),
          scaled_height = (size_t)ceil ((float)height * vertical_scale);

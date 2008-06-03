@@ -86,33 +86,33 @@ typedef DerivedException<Exception,PlatformNotSupportedExceptionTag>       Platf
 ///Выброс исключения с форматированием сообщения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Exception>
-void Raise (const char* source,const char* format,...);
+void raise (const char* source,const char* format,...);
 
 template <class Exception>
-void VRaise (const char* source,const char* format,va_list list);
+void vraise (const char* source,const char* format,va_list list);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вспомогательные функции для выброса стандартных исключений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void RaiseInvalidArgument   (const char* source,const char* param);
-void RaiseInvalidArgument   (const char* source,const char* param,const char* value,const char* comment=NULL);
-void RaiseInvalidArgument   (const char* source,const char* param,int value,const char* comment=NULL);
-void RaiseInvalidArgument   (const char* source,const char* param,size_t value,const char* comment=NULL);
-void RaiseInvalidArgument   (const char* source,const char* param,float value,const char* comment=NULL);
-void RaiseInvalidArgument   (const char* source,const char* param,double value,const char* comment=NULL);
-void RaiseOutOfRange        (const char* source,const char* param);
-void RaiseOutOfRange        (const char* source,const char* param,int value,int first,int last);
-void RaiseOutOfRange        (const char* source,const char* param,size_t value,size_t first,size_t last);
-void RaiseOutOfRange        (const char* source,const char* param,float value,float first,float last);
-void RaiseOutOfRange        (const char* source,const char* param,double value,double first,double last);
-void RaiseOutOfRange        (const char* source,const char* param,size_t index,size_t max_count);
-void RaiseNullArgument      (const char* source,const char* param);
-void RaiseNotImplemented    (const char* source);
-void RaiseInvalidOperation  (const char* source, const char* format, ...);
-void VRaiseInvalidOperation (const char* source, const char* format, va_list list);
-void RaiseNotSupported      (const char* source);
-void RaiseNotSupported      (const char* source,const char* format,...);
-void VRaiseNotSupported     (const char* source,const char* format,va_list list);
+void raise_invalid_argument   (const char* source,const char* param);
+void raise_invalid_argument   (const char* source,const char* param,const char* value,const char* comment=NULL);
+void raise_invalid_argument   (const char* source,const char* param,int value,const char* comment=NULL);
+void raise_invalid_argument   (const char* source,const char* param,size_t value,const char* comment=NULL);
+void raise_invalid_argument   (const char* source,const char* param,float value,const char* comment=NULL);
+void raise_invalid_argument   (const char* source,const char* param,double value,const char* comment=NULL);
+void raise_out_of_range        (const char* source,const char* param);
+void raise_out_of_range        (const char* source,const char* param,int value,int first,int last);
+void raise_out_of_range        (const char* source,const char* param,size_t value,size_t first,size_t last);
+void raise_out_of_range        (const char* source,const char* param,float value,float first,float last);
+void raise_out_of_range        (const char* source,const char* param,double value,double first,double last);
+void raise_out_of_range        (const char* source,const char* param,size_t index,size_t max_count);
+void raise_null_argument      (const char* source,const char* param);
+void raise_not_implemented    (const char* source);
+void raise_invalid_operation  (const char* source, const char* format, ...);
+void vraise_invalid_operation (const char* source, const char* format, va_list list);
+void raise_not_supported      (const char* source);
+void raise_not_supported      (const char* source,const char* format,...);
+void vraise_not_supported     (const char* source,const char* format,va_list list);
 
 #include <common/detail/exception.inl>
 

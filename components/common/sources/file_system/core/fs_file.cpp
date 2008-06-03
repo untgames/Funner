@@ -107,11 +107,11 @@ bool File::IsBuffered () const
 size_t File::Read (void* buf,size_t size)
 {
   if (!(impl->Mode () & FILE_MODE_READ))
-    RaiseNotSupported ("File::Read","This file can't be read");
+    raise_not_supported ("File::Read","This file can't be read");
 
   if (!buf)
   {
-    if (size) RaiseNullArgument ("File::Read","buffer");    
+    if (size) raise_null_argument ("File::Read","buffer");    
     else      return 0;
   }
     
@@ -121,11 +121,11 @@ size_t File::Read (void* buf,size_t size)
 size_t File::Write (const void* buf,size_t size)
 {
   if (!(impl->Mode () & FILE_MODE_WRITE))
-    RaiseNotSupported ("File::Write","This file can't be write");
+    raise_not_supported ("File::Write","This file can't be write");
 
   if (!buf)
   {
-    if (size) RaiseNullArgument ("File::Write","buffer");
+    if (size) raise_null_argument ("File::Write","buffer");
     else      return 0;
   }
 
@@ -139,7 +139,7 @@ size_t File::Write (const void* buf,size_t size)
 void File::Rewind ()
 {
   if (!(impl->Mode () & FILE_MODE_REWIND))
-    RaiseNotSupported ("File::Rewind","This file can't be rewind");
+    raise_not_supported ("File::Rewind","This file can't be rewind");
 
   return impl->Rewind ();
 }
@@ -147,7 +147,7 @@ void File::Rewind ()
 filepos_t File::Seek (filepos_t pos,FileSeekMode seek_mode)
 {
   if (!(impl->Mode () & FILE_MODE_SEEK))
-    RaiseNotSupported ("File::Seek","This file can't be seek");
+    raise_not_supported ("File::Seek","This file can't be seek");
     
   size_t position = 0;
 
@@ -156,7 +156,7 @@ filepos_t File::Seek (filepos_t pos,FileSeekMode seek_mode)
     case FILE_SEEK_SET: position = pos; break;
     case FILE_SEEK_CUR: position = impl->Tell () + pos; break;
     case FILE_SEEK_END: position = impl->Size () + pos; break;
-    default:            RaiseInvalidArgument ("File::Seek","seek_mode",seek_mode);
+    default:            raise_invalid_argument ("File::Seek","seek_mode",seek_mode);
   }
 
   if (position > Size () && (impl->Mode () & FILE_MODE_RESIZE))
@@ -182,7 +182,7 @@ filesize_t File::Size () const
 void File::Resize (filesize_t new_size)
 {
   if (!(impl->Mode () & FILE_MODE_RESIZE))
-    RaiseNotSupported ("File::Resize","This file can't be resize");
+    raise_not_supported ("File::Resize","This file can't be resize");
 
   impl->Resize (new_size);
 }

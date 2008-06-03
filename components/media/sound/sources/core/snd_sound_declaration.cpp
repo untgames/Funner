@@ -105,7 +105,7 @@ const char* SoundDeclaration::Name () const
 void SoundDeclaration::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("media::SoundDeclaration::Rename", "name");
+    raise_null_argument ("media::SoundDeclaration::Rename", "name");
     
   impl->name = name;
 }
@@ -122,7 +122,7 @@ const char* SoundDeclaration::Type () const
 void SoundDeclaration::SetType (const char* type)
 {
   if (!type)
-    RaiseNullArgument ("media::SoundDeclaration::SetType", "type");
+    raise_null_argument ("media::SoundDeclaration::SetType", "type");
 
   impl->type = type;
 }
@@ -153,7 +153,7 @@ size_t SoundDeclaration::SamplesCount () const
 const char* SoundDeclaration::Sample (size_t sample_index) const
 {
   if (sample_index >= impl->samples.size ())
-    RaiseOutOfRange ("media::SoundDeclaration::Sample", "sample_index", sample_index, impl->samples.size ());
+    raise_out_of_range ("media::SoundDeclaration::Sample", "sample_index", sample_index, impl->samples.size ());
 
   return impl->samples [sample_index].c_str ();
 }
@@ -161,7 +161,7 @@ const char* SoundDeclaration::Sample (size_t sample_index) const
 size_t SoundDeclaration::AddSample (const char* sample_name)
 {
   if (!sample_name)
-    RaiseNullArgument ("media::SoundDeclaration::AddSample", "sample_name");
+    raise_null_argument ("media::SoundDeclaration::AddSample", "sample_name");
 
   impl->samples.push_back (sample_name);
 
@@ -188,7 +188,7 @@ void SoundDeclaration::RemoveAllSamples ()
 void SoundDeclaration::SetParam (SoundParam param, float value)
 {
   if (param < 0 || param >= SoundParam_Num)
-    RaiseInvalidArgument ("media::SoundDeclaration::SetParam", "param", param);
+    raise_invalid_argument ("media::SoundDeclaration::SetParam", "param", param);
     
   impl->params [param] = value;
 }
@@ -196,7 +196,7 @@ void SoundDeclaration::SetParam (SoundParam param, float value)
 float SoundDeclaration::Param (SoundParam param) const
 {
   if (param < 0 || param >= SoundParam_Num)
-    RaiseInvalidArgument ("media::SoundDeclaration::Param", "param", param);
+    raise_invalid_argument ("media::SoundDeclaration::Param", "param", param);
 
   return impl->params [param];
 }

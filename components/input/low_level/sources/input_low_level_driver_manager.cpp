@@ -79,13 +79,13 @@ class DriverManagerImpl
 void DriverManagerImpl::RegisterDriver (const char* name, IDriver* driver)
 {
   if (!name)
-    RaiseNullArgument ("input::low_level::DriverManager::RegisterDriver", "name");
+    raise_null_argument ("input::low_level::DriverManager::RegisterDriver", "name");
 
   if (!driver)
-    RaiseNullArgument ("input::low_level::DriverManager::RegisterDriver", "driver");
+    raise_null_argument ("input::low_level::DriverManager::RegisterDriver", "driver");
 
   if (FindDriver (name))
-    RaiseInvalidArgument ("input::low_level::DriverManager::RegisterDriver", "name", name,
+    raise_invalid_argument ("input::low_level::DriverManager::RegisterDriver", "name", name,
                           "Driver with this name has been already registered");
 
   drivers.push_back (InputDriver (driver, name));
@@ -134,7 +134,7 @@ size_t DriverManagerImpl::DriversCount ()
 IDriver* DriverManagerImpl::Driver (size_t index)
 {
   if (index >= drivers.size ())
-    RaiseOutOfRange ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
+    raise_out_of_range ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
 
   return get_pointer (drivers [index].driver);
 }
@@ -142,7 +142,7 @@ IDriver* DriverManagerImpl::Driver (size_t index)
 const char* DriverManagerImpl::DriverName (size_t index)
 {
   if (index >= drivers.size ())
-    RaiseOutOfRange ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
+    raise_out_of_range ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
 
   return drivers [index].name.c_str ();
 }

@@ -126,7 +126,7 @@ const char* InvokerRegistry::InvokerId (const ConstIterator& i) const
   const InvokerMap::iterator* iter = i.target<InvokerMap::iterator> ();
 
   if (!iter)
-    common::RaiseInvalidArgument ("script::InvokerRegistry::InvokerId", "iterator", "wrong-type");
+    common::raise_invalid_argument ("script::InvokerRegistry::InvokerId", "iterator", "wrong-type");
 
   return (*iter)->second.name.c_str ();
 }
@@ -138,7 +138,7 @@ const char* InvokerRegistry::InvokerId (const ConstIterator& i) const
 void InvokerRegistry::Register (const char* name, const Invoker& invoker)
 {
   if (!name)
-    common::RaiseNullArgument ("script::InvokerRegistry::Register", "name");
+    common::raise_null_argument ("script::InvokerRegistry::Register", "name");
     
   Unregister (name);
 
@@ -150,12 +150,12 @@ void InvokerRegistry::Register (const char* name, const Invoker& invoker)
 void InvokerRegistry::Register (const char* name, const InvokerRegistry& source_registry, const char* source_name)
 {
   if (!source_name)
-    common::RaiseNullArgument ("script::InvokerRegistry::Register", "source_name");
+    common::raise_null_argument ("script::InvokerRegistry::Register", "source_name");
     
   const Invoker* invoker = source_registry.Find (source_name);
     
   if (!invoker)
-    common::RaiseInvalidArgument ("script::InvokerRegistry::Register", "source_name", source_name, "No invoker found");
+    common::raise_invalid_argument ("script::InvokerRegistry::Register", "source_name", source_name, "No invoker found");
     
   Register (name, *invoker);
 }
@@ -209,7 +209,7 @@ void InvokerRegistry::Clear ()
 xtl::connection InvokerRegistry::RegisterEventHandler (InvokerRegistryEvent event_id, const EventHandler& handler) const
 {
   if (event_id < 0 || event_id >= InvokerRegistryEvent_Num)
-    common::RaiseInvalidArgument ("script::InvokerRegistry::RegisterEventHandler", "event_id", event_id);
+    common::raise_invalid_argument ("script::InvokerRegistry::RegisterEventHandler", "event_id", event_id);
 
   return impl->handlers [event_id].connect (handler);
 }

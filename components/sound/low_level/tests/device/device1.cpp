@@ -8,7 +8,7 @@ using namespace common;
 
 ISoundDevice* my_create_device (const char* driver_name, const char* device_name, const void* window_handle, const char* init_string)
 {
-  Raise<Exception> ("my_create_device", "Attempt to create sound device: driver='%s' device='%s' window_handle=%p init_string='%s'",
+  raise<Exception> ("my_create_device", "Attempt to create sound device: driver='%s' device='%s' window_handle=%p init_string='%s'",
                     driver_name, device_name, window_handle, init_string);
 
   return 0;

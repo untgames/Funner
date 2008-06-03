@@ -44,7 +44,7 @@ VisualModel::Pointer VisualModel::Create ()
 void VisualModel::SetMeshName (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("scene_graph::VisualModel::SetMeshName", "name");
+    raise_null_argument ("scene_graph::VisualModel::SetMeshName", "name");
     
   impl->mesh_name = name;
 }

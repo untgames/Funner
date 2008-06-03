@@ -34,10 +34,10 @@ GLint get_gl_internal_format (PixelFormat format)
     case PixelFormat_D24X8: return GL_DEPTH_COMPONENT24_ARB;
     case PixelFormat_D24S8: return GL_DEPTH24_STENCIL8_EXT;  
     case PixelFormat_S8:
-      RaiseNotSupported (METHOD_NAME, "Stencil textures not supported.");
+      raise_not_supported (METHOD_NAME, "Stencil textures not supported.");
       return 0;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "format", format);
+      raise_invalid_argument (METHOD_NAME, "format", format);
       return 0;
   }
 }
@@ -61,10 +61,10 @@ GLenum get_gl_format (PixelFormat format)
     case PixelFormat_D24X8: return GL_DEPTH_COMPONENT;
     case PixelFormat_D24S8: return GL_DEPTH_STENCIL_EXT;  
     case PixelFormat_S8:
-      RaiseNotSupported (METHOD_NAME, "Stencil textures not supported");
+      raise_not_supported (METHOD_NAME, "Stencil textures not supported");
       return 0;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "format", format);
+      raise_invalid_argument (METHOD_NAME, "format", format);
       return 0;
   }
 }
@@ -87,7 +87,7 @@ GLenum get_gl_type (PixelFormat format)
     case PixelFormat_D24X8: return GL_UNSIGNED_INT;
     case PixelFormat_D24S8: return GL_UNSIGNED_INT_24_8_EXT;
     default:
-      RaiseInvalidArgument ("render::low_level::opengl::get_gl_type", "format", format);
+      raise_invalid_argument ("render::low_level::opengl::get_gl_type", "format", format);
       return 0;
   }
 }
@@ -127,7 +127,7 @@ PixelFormat get_pixel_format (GLenum gl_format)
     case GL_DEPTH_COMPONENT24:             return PixelFormat_D24X8;
     case GL_DEPTH24_STENCIL8_EXT:          return PixelFormat_D24S8;
     default:
-      RaiseNotSupported ("render::low_level::get_pixel_format", "Unknown gl_format=%04x", gl_format);
+      raise_not_supported ("render::low_level::get_pixel_format", "Unknown gl_format=%04x", gl_format);
       return (PixelFormat)0;
   }
 }

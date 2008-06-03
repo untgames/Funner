@@ -19,28 +19,28 @@ void check_frame_buffer_status (const char* source, GLenum status)
     case GL_FRAMEBUFFER_COMPLETE_EXT:
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-      RaiseInvalidOperation (source, "OpenGL bad framebuffer status: incomplete attachment");
+      raise_invalid_operation (source, "OpenGL bad framebuffer status: incomplete attachment");
       break;
     case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-      RaiseInvalidOperation (source, "OpenGL bad framebuffer status: unsupported framebuffer format");
+      raise_invalid_operation (source, "OpenGL bad framebuffer status: unsupported framebuffer format");
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-      RaiseInvalidOperation (source, "OpenGL bad framebuffer status: missing attachment");
+      raise_invalid_operation (source, "OpenGL bad framebuffer status: missing attachment");
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-      RaiseInvalidOperation (source, "OpenGL bad framebuffer status: attached images must have same dimensions");
+      raise_invalid_operation (source, "OpenGL bad framebuffer status: attached images must have same dimensions");
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-      RaiseInvalidOperation (source, "OpenGL bad framebuffer status: attached images must have same format");
+      raise_invalid_operation (source, "OpenGL bad framebuffer status: attached images must have same format");
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-      RaiseInvalidOperation (source, "OpenGL bad framebuffer status: missing draw buffer");
+      raise_invalid_operation (source, "OpenGL bad framebuffer status: missing draw buffer");
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-      RaiseInvalidOperation (source, "OpenGL bad framebuffer status: missing read buffer");
+      raise_invalid_operation (source, "OpenGL bad framebuffer status: missing read buffer");
       break;
     default:
-      RaiseInvalidOperation (source, "OpenGL bad framebuffer status: 0x%04x", status);
+      raise_invalid_operation (source, "OpenGL bad framebuffer status: 0x%04x", status);
       break;
   }
 }

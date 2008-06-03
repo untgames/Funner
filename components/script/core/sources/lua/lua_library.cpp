@@ -29,12 +29,12 @@ int unsafe_invoke_dispatch (lua_State* state)
   const char*    invoker_name = lua_tostring (state, lua_upvalueindex (3));
 
   if (!invoker || !interpreter || !invoker_name)
-    Raise<RuntimeException> ("script::lua::invoke_dispatch", "Bad invoker call (no up-values found)");
+    raise<RuntimeException> ("script::lua::invoke_dispatch", "Bad invoker call (no up-values found)");
 
     //проверка количества переданных аргументов
 
 //  if ((int)invoker->ArgumentsCount () > lua_gettop (state))
-//    Raise<StackException> ("script::lua::invoke_dispatch(%s)", "Arguments count mismatch (expected %u, got %u)", 
+//    raise<StackException> ("script::lua::invoke_dispatch(%s)", "Arguments count mismatch (expected %u, got %u)", 
 //                           invoker_name, invoker->ArgumentsCount (), lua_gettop (state));
 
     //вызов шлюза
@@ -52,12 +52,12 @@ int unsafe_invoke_dispatch (lua_State* state)
   }
   catch (xtl::bad_any_cast& exception)
   {
-    Raise<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\")", invoker_name).c_str (),
+    raise<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\")", invoker_name).c_str (),
                              "%s: %s->%s", exception.what (), exception.source_type ().name (), exception.target_type ().name ());
   }
   catch (std::exception& exception)
   {
-    Raise<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\")", invoker_name).c_str (), "%s", exception.what ());
+    raise<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\")", invoker_name).c_str (), "%s", exception.what ());
   }
 
   return 0;
@@ -74,7 +74,7 @@ int unsafe_variant_get_field_common (lua_State* state)
   static const char* METHOD_NAME = "script::lua::variant_get_field_common";
 
   if (!lua_getmetatable (state, 1))
-    Raise<RuntimeException> (METHOD_NAME, "Bad '__index' call. Object isn't variant");
+    raise<RuntimeException> (METHOD_NAME, "Bad '__index' call. Object isn't variant");
 
   lua_pushvalue (state, 2);
   lua_rawget    (state, -2);
@@ -89,7 +89,7 @@ int unsafe_variant_get_field_common (lua_State* state)
   lua_rawget      (state, -2);
 
   if (lua_isnil (state, -1)) //свойство с указанным именем не найдено
-    Raise<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found", lua_tostring (state, 2));
+    raise<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found", lua_tostring (state, 2));
 
   return 0;
 }
@@ -133,7 +133,7 @@ int unsafe_variant_set_field_common (lua_State* state)
   static const char* METHOD_NAME = "script::lua::variant_set_field_common";
 
   if (!lua_getmetatable (state, 1))
-    Raise<RuntimeException> (METHOD_NAME, "Bad '__newindex' call. Object isn't variant");    
+    raise<RuntimeException> (METHOD_NAME, "Bad '__newindex' call. Object isn't variant");    
 
   lua_pushvalue (state, 2);
   lua_rawget    (state, -2);
@@ -154,7 +154,7 @@ int unsafe_variant_set_field_common (lua_State* state)
   lua_rawget      (state, -2);
 
   if (lua_isnil (state, -1)) //свойство с указанным именем не найдено
-    Raise<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found (or read-only)", lua_tostring (state, 2));
+    raise<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found (or read-only)", lua_tostring (state, 2));
     
   return 0;
 }
@@ -245,7 +245,7 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
     if (is_static)
     {
       if (!lua_checkstack (state, 1))
-        Raise<StackException> (METHOD_NAME, "Not enough stack space."
+        raise<StackException> (METHOD_NAME, "Not enough stack space."
         "Attempt to push 1 item in stack with %u items (stack_size=%u)", lua_gettop (state), LUAI_MAXCSTACK);
         
       static const size_t BUFFER_SIZE = sizeof (int); 
@@ -253,7 +253,7 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
       void* buffer = lua_newuserdata (state, BUFFER_SIZE);
 
       if (!buffer)
-        Raise<StackException> (METHOD_NAME, "Fail to allocate %u bytes from stack", BUFFER_SIZE);
+        raise<StackException> (METHOD_NAME, "Fail to allocate %u bytes from stack", BUFFER_SIZE);
 
       luaL_getmetatable (state, name);
       lua_setmetatable  (state, -2);

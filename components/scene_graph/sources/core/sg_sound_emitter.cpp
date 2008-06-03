@@ -116,7 +116,7 @@ void SoundEmitter::Stop ()
 xtl::connection SoundEmitter::RegisterEventHandler (SoundEmitterEvent event, const EventHandler& handler) const
 {
   if (event < 0 || event >= SoundEmitterEvent_Num)
-    RaiseInvalidArgument ("scene_graph::SoundEmitter::Event", "event", event);
+    raise_invalid_argument ("scene_graph::SoundEmitter::Event", "event", event);
 
   return impl->signals [event].connect (handler);
 }

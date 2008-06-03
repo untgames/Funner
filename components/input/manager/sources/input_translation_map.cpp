@@ -21,10 +21,10 @@ struct TranslationMap::Impl : public xtl::reference_counter
       static const char* METHOD_NAME = "input::TranslationMap::Impl::Add"; 
 
       if (!input_event)
-        RaiseNullArgument (METHOD_NAME, "input_event");
+        raise_null_argument (METHOD_NAME, "input_event");
 
       if (!client_event_replacement)
-        RaiseNullArgument (METHOD_NAME, "client_event_replacement");
+        raise_null_argument (METHOD_NAME, "client_event_replacement");
 
       EventTranslatorPtr         replacer (new EventTranslator (input_event, client_event_replacement, tag));
       stl::hash_key<const char*> input_event_hash (word (input_event, 0).c_str ());
@@ -188,7 +188,7 @@ TranslationMap::TranslationMap (const char* file_name)
   : impl (new Impl)
 {
   if (!file_name)
-    RaiseNullArgument ("input::TranslationMap::TranslationMap", "file_name");
+    raise_null_argument ("input::TranslationMap::TranslationMap", "file_name");
 
   TranslationMapManagerSingleton::Instance ().Load (file_name, *this);
 }
@@ -281,7 +281,7 @@ void TranslationMap::Load (const char* file_name)
 void TranslationMap::Save (const char* file_name)
 {
   if (!file_name)
-    RaiseNullArgument ("input::TranslationMap::Save", "file_name");
+    raise_null_argument ("input::TranslationMap::Save", "file_name");
 
   TranslationMapManagerSingleton::Instance ().Save (file_name, *this);
 }

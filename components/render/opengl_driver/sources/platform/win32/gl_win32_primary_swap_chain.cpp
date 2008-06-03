@@ -16,7 +16,7 @@ PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& in_desc, OutputManager&
   output_window = (HWND)in_desc.window_handle;
   
   if (!output_window)
-    RaiseNullArgument ("render::low_level::opengl::PrimarySwapChain::PrimarySwapChain", "swap_chain_desc.window_handle");  
+    raise_null_argument ("render::low_level::opengl::PrimarySwapChain::PrimarySwapChain", "swap_chain_desc.window_handle");  
     
   output_context = ::GetDC (output_window);
   

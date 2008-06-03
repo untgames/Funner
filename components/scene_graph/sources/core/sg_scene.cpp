@@ -85,7 +85,7 @@ Scene::~Scene ()
 void Scene::SetName (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("scene_graph::Scene::SetName", "name");
+    raise_null_argument ("scene_graph::Scene::SetName", "name");
     
   impl->name = name;
 }

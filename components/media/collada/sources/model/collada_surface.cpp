@@ -55,7 +55,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     size_t Create (const char* name)
     {
       if (!name)
-        RaiseNullArgument ("media::collada::Surface::IChannelList::Create", "name");
+        raise_null_argument ("media::collada::Surface::IChannelList::Create", "name");
         
       Channel* channel = new Channel (vertices_count, name);
       
@@ -75,7 +75,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     void Remove (size_t channel)
     {
       if (channel >= channels.size ())
-        RaiseOutOfRange ("media::collada::Surface::IChannelList::Remove", "channel", channel, channels.size ());
+        raise_out_of_range ("media::collada::Surface::IChannelList::Remove", "channel", channel, channels.size ());
         
       delete channels [channel];
       
@@ -96,7 +96,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     const char* Name (size_t channel) const
     {
       if (channel >= channels.size ())
-        RaiseOutOfRange ("media::collada::Surface::IChannelList::Name", "channel", channel, channels.size ());
+        raise_out_of_range ("media::collada::Surface::IChannelList::Name", "channel", channel, channels.size ());
         
       return channels [channel]->name.c_str ();
     }
@@ -107,7 +107,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     int Find (const char* name) const
     {
       if (!name)
-        RaiseNullArgument ("media::collada::Surface::IChannelList::Find", "name");
+        raise_null_argument ("media::collada::Surface::IChannelList::Find", "name");
         
       for (ChannelArray::const_iterator i=channels.begin (), end=channels.end (); i!=end; ++i)
         if ((*i)->name == name)
@@ -122,7 +122,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     const T* Data (size_t channel) const
     {
       if (channel >= channels.size ())
-        RaiseOutOfRange ("media::collada::Surface::IChannelList::Data", "channel", channel, channels.size ());
+        raise_out_of_range ("media::collada::Surface::IChannelList::Data", "channel", channel, channels.size ());
         
       return &channels [channel]->data [0];
     }
@@ -186,7 +186,7 @@ struct Surface::Impl: public xtl::reference_counter
       case PrimitiveType_TriangleFan:
         break;
       default:
-        RaiseInvalidArgument ("media::collada::Surface::Surface", "primitive_type", in_primitive_type);
+        raise_invalid_argument ("media::collada::Surface::Surface", "primitive_type", in_primitive_type);
         break;
     }    
   }
@@ -240,7 +240,7 @@ const char* Surface::Material () const
 void Surface::SetMaterial (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("media::collada::Surface::SetMaterial", "name");
+    raise_null_argument ("media::collada::Surface::SetMaterial", "name");
     
   impl->material_name = name;
 }

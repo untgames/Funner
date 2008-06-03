@@ -115,7 +115,7 @@ class ClosedFileImpl: public FileImpl
     static FileImpl* Instance ();
     
   private:
-    void Raise (const char* source);
+    void raise (const char* source);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

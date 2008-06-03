@@ -61,7 +61,7 @@ const char* MeshLibrary::Name () const
 void MeshLibrary::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("media::geometry::MeshLibrary::Rename", name);
+    raise_null_argument ("media::geometry::MeshLibrary::Rename", name);
     
   impl->name = name;
 }
@@ -154,7 +154,7 @@ void MeshLibrary::Clear ()
 void MeshLibrary::Load (const char* file_name)
 {
   if (!file_name)
-    RaiseNullArgument ("media::MeshLibrary::Load", "file_name");
+    raise_null_argument ("media::MeshLibrary::Load", "file_name");
 
   try
   {

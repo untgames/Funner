@@ -32,7 +32,7 @@ struct Context::Impl
     vsync (false)
   {
     if (!in_swap_chain)
-      RaiseNullArgument ("render::low_level::opengl::Context::Context", "swap_chain");      
+      raise_null_argument ("render::low_level::opengl::Context::Context", "swap_chain");      
       
     SwapChain* swap_chain = cast_object<SwapChain> (in_swap_chain, "render::low_level::opengl::Context::Context", "swap_chain");    
     
@@ -55,7 +55,7 @@ struct Context::Impl
       GLenum status = glewContextInit (&glew_context);
 
       if (status != GLEW_OK)
-        RaiseInvalidOperation ("glewContextInit", "%s", glewGetString (status));        
+        raise_invalid_operation ("glewContextInit", "%s", glewGetString (status));        
 
       SetSwapChains (swap_chain, swap_chain);
 
@@ -122,10 +122,10 @@ struct Context::Impl
   void MakeCurrent (ISwapChain* in_draw_swap_chain, ISwapChain* in_read_swap_chain)
   {
     if (!in_draw_swap_chain)
-      RaiseNullArgument ("render::low_level::opengl::Context::MakeCurrent", "draw_swap_chain");
+      raise_null_argument ("render::low_level::opengl::Context::MakeCurrent", "draw_swap_chain");
 
     if (!in_read_swap_chain)
-      RaiseNullArgument ("render::low_level::opengl::Context::MakeCurrent", "read_swap_chain");
+      raise_null_argument ("render::low_level::opengl::Context::MakeCurrent", "read_swap_chain");
       
     const GLEWContext*  old_glew_context  = glewGetContext ();
     const WGLEWContext* old_wglew_context = wglewGetContext ();
@@ -317,7 +317,7 @@ void make_current_context (HGLRC context, HDC draw_dc, HDC read_dc)
   else
   {
     if (read_dc != draw_dc)
-      RaiseNotSupported ("render::low_level::opengl::make_current_context", "WGL_ARB_make_current_read extenstion not supported (could not set different read/write swap chains)");
+      raise_not_supported ("render::low_level::opengl::make_current_context", "WGL_ARB_make_current_read extenstion not supported (could not set different read/write swap chains)");
       
     if (wglGetCurrentContext () == context && wglGetCurrentDC () == draw_dc)
       return;

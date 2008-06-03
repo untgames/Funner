@@ -431,7 +431,7 @@ class TestView: public IGameView
           format = PixelFormat_LA8;
           break;        
         default:
-          common::RaiseInvalidOperation ("TestView::LoadTexture", "Unknown texture format=%d", image.Format ());
+          common::raise_invalid_operation ("TestView::LoadTexture", "Unknown texture format=%d", image.Format ());
           break;
       }
       

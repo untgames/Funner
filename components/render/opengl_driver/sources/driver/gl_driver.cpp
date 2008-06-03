@@ -65,7 +65,7 @@ ISwapChain* Driver::CreateSwapChain (const SwapChainDesc& desc)
 IDevice* Driver::CreateDevice (ISwapChain* swap_chain, const char* init_string)
 {
   if (!swap_chain)
-    RaiseNullArgument ("render::low_level::opengl::Driver::CreateDevice", "swap_chain");
+    raise_null_argument ("render::low_level::opengl::Driver::CreateDevice", "swap_chain");
     
   if (!init_string)
     init_string = "";

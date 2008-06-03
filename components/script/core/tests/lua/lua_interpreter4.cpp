@@ -33,7 +33,7 @@ int get_id (const A& a)
 int set_id (A& a, int id)
 {
   if (!id)
-   common::RaiseInvalidArgument ("set_id(A)", "id", id);
+   common::raise_invalid_argument ("set_id(A)", "id", id);
 
   return a.id = id;
 }

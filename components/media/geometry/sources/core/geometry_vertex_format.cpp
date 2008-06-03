@@ -74,7 +74,7 @@ const VertexAttribute* VertexFormat::Attributes () const
 const VertexAttribute& VertexFormat::Attribute (size_t index) const
 {
   if (index >= impl->attributes_count)
-    RaiseOutOfRange ("media::geometry::VertexFormat::Attribute", "index", index, impl->attributes_count);
+    raise_out_of_range ("media::geometry::VertexFormat::Attribute", "index", index, impl->attributes_count);
     
   return impl->attributes [index];
 }
@@ -109,21 +109,21 @@ VertexAttribute* VertexFormat::FindAttribute (VertexAttributeSemantic semantic)
 size_t VertexFormat::AddAttribute (VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset)
 {
   if (semantic < 0 || semantic >= VertexAttributeSemantic_Num)
-    RaiseInvalidArgument ("media::geometry::VertexFormat::AddAttribute", "semantic", semantic);
+    raise_invalid_argument ("media::geometry::VertexFormat::AddAttribute", "semantic", semantic);
     
   if (type < 0 || type >= VertexAttributeType_Num)
-    RaiseInvalidArgument ("media::geometry::VertexFormat::AddAttribute", "type", type);
+    raise_invalid_argument ("media::geometry::VertexFormat::AddAttribute", "type", type);
     
     //проверка совместимости типа атрибута с его семантикой
     
   if (!is_compatible (semantic, type))
-    RaiseNotSupported ("media::geometry::VertexFormat::AddAttribute", "Semantic '%s' is not compatible with type '%s'",
+    raise_not_supported ("media::geometry::VertexFormat::AddAttribute", "Semantic '%s' is not compatible with type '%s'",
                        get_semantic_name (semantic), get_type_name (type));  
   
     //проверка наличия атрибута в формате
 
   if (FindAttribute (semantic))
-    RaiseNotSupported ("media::geometry::VertexFormat::AddAttribute", "Attribute with semantic '%s' has been already inserted",
+    raise_not_supported ("media::geometry::VertexFormat::AddAttribute", "Attribute with semantic '%s' has been already inserted",
                        get_semantic_name (semantic));
     
     //добавление атрибута
@@ -146,7 +146,7 @@ size_t VertexFormat::AddAttributes (const VertexFormat& format)
 {
   for (size_t i=0, count=format.impl->attributes_count; i<count; i++)
     if (FindAttribute (format.impl->attributes [i].semantic))
-      RaiseInvalidArgument ("media::geometry::VertexFormat::AddAttributes", "semantic",
+      raise_invalid_argument ("media::geometry::VertexFormat::AddAttributes", "semantic",
                             format.impl->attributes [i].semantic, "Attribute has been already inserted");
                             
   for (size_t i=0, count=format.impl->attributes_count; i<count; i++)
@@ -331,7 +331,7 @@ size_t get_type_size (VertexAttributeType type)
     case VertexAttributeType_Short4:    return sizeof (short) * 4;
     case VertexAttributeType_UByte4:    return sizeof (unsigned char) * 4;
     case VertexAttributeType_Influence: return sizeof (VertexInfluence);
-    default:                            RaiseInvalidArgument ("media::get_type_size", "type", type);
+    default:                            raise_invalid_argument ("media::get_type_size", "type", type);
   }
   
   return 0;
@@ -350,7 +350,7 @@ size_t get_components_count (VertexAttributeType type)
     case VertexAttributeType_UByte4:
     case VertexAttributeType_Float4:    return 4;
     case VertexAttributeType_Influence: return 1;
-    default:                            RaiseInvalidArgument ("media::get_components_count", "type", type);
+    default:                            raise_invalid_argument ("media::get_components_count", "type", type);
   }
 
   return 0;
@@ -375,7 +375,7 @@ const char* get_semantic_name (VertexAttributeSemantic semantic)
     case VertexAttributeSemantic_TexCoord6: return "texcoord6";
     case VertexAttributeSemantic_TexCoord7: return "texcoord7";
     case VertexAttributeSemantic_Influence: return "influence";
-    default:                                RaiseInvalidArgument ("media::geometry::get_semantic_name(VertexAttributeSemantic)", "semantic", semantic);
+    default:                                raise_invalid_argument ("media::geometry::get_semantic_name(VertexAttributeSemantic)", "semantic", semantic);
   }
 
   return "";
@@ -435,7 +435,7 @@ const char* get_type_name (VertexAttributeType type)
     case VertexAttributeType_Short4:    return "short4";
     case VertexAttributeType_UByte4:    return "ubyte4";
     case VertexAttributeType_Influence: return "influence";
-    default:                            RaiseInvalidArgument ("media::geometry::get_type_name(VertexAttributeType)", "type", type);
+    default:                            raise_invalid_argument ("media::geometry::get_type_name(VertexAttributeType)", "type", type);
   }
 
   return "";

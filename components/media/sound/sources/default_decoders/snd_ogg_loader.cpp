@@ -127,7 +127,7 @@ OggInputStream::OggInputStream (const char* file_name, SoundSampleInfo& sound_sa
   ret_code = ov_open_callbacks (&file, &vf, NULL, 0, callbacks);
 
   if (ret_code < 0) 
-    Raise <Exception> ("OggCodec::OggCodec", "Can't open ogg file, seems to be not ogg bitstream (return code %d)", ret_code);
+    raise <Exception> ("OggCodec::OggCodec", "Can't open ogg file, seems to be not ogg bitstream (return code %d)", ret_code);
 
   vorbis_info *vi = ov_info (&vf, -1);
   sound_sample_info.frequency       = vi->rate;

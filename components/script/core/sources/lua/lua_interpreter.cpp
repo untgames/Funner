@@ -27,7 +27,7 @@ namespace
 //функция обработки ошибок lua
 int error_handler (lua_State* state)
 {
-  Raise<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
+  raise<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
 
   return 0;
 }
@@ -195,7 +195,7 @@ void Interpreter::Invoke (size_t arguments_count, size_t results_count)
 
       //возбуждаем исключение
 
-    Raise<RuntimeException> ("script::lua::Interpreter::Invoke", "%s", error_msg.c_str ());    
+    raise<RuntimeException> ("script::lua::Interpreter::Invoke", "%s", error_msg.c_str ());    
   }
 }
 
@@ -220,7 +220,7 @@ void Interpreter::Release ()
 void Interpreter::RegisterLibrary (const char* name, InvokerRegistry& registry)
 {
   if (!name)
-    RaiseNullArgument ("script::lua::RegisterLibrary", "name");
+    raise_null_argument ("script::lua::RegisterLibrary", "name");
 
   libraries.insert_pair (name, LibraryPtr (new Library (*this, name, registry), false));
 }
@@ -243,7 +243,7 @@ namespace script
 xtl::com_ptr<IInterpreter> create_lua_interpreter (const xtl::shared_ptr<Environment>& environment)
 {
   if (!environment)
-    common::RaiseNullArgument ("script::create_lua_interpreter", "environment");
+    common::raise_null_argument ("script::create_lua_interpreter", "environment");
 
   return xtl::com_ptr<IInterpreter> (new Interpreter (environment), false);
 }

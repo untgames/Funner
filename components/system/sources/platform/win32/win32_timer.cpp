@@ -127,7 +127,7 @@ Platform::timer_t Platform::CreateTimer (size_t period_in_milliseconds, TimerHan
 void Platform::KillTimer (timer_t handle)
 {
   if (!handle)
-    RaiseNullArgument ("syslib::Platform::KillTimer", "handle");
+    raise_null_argument ("syslib::Platform::KillTimer", "handle");
 
   Win32Timer* timer = (Win32Timer*)handle;
 

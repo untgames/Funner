@@ -50,10 +50,10 @@ class SerializerManagerImpl
       static const char* METHOD_NAME = "common::SerializerManagerImpl::Register";
       
       if (!extension)
-        RaiseNullArgument (METHOD_NAME, "extension");
+        raise_null_argument (METHOD_NAME, "extension");
         
       if (!holder)
-        RaiseNullArgument (METHOD_NAME, "holder");
+        raise_null_argument (METHOD_NAME, "holder");
 
       serializers [SerializerKey (extension, signature)] = SerializerHolderPtr (holder);
     }
@@ -107,7 +107,7 @@ class SerializerManagerImpl
           break;
         default:
           if (raise_exception)
-            RaiseInvalidArgument (METHOD_NAME, "mode", mode);
+            raise_invalid_argument (METHOD_NAME, "mode", mode);
 
           return 0;
       }
@@ -115,7 +115,7 @@ class SerializerManagerImpl
       if (!name)
       {
         if (raise_exception)
-          RaiseNullArgument (METHOD_NAME, "name");
+          raise_null_argument (METHOD_NAME, "name");
 
         return 0;
       }
@@ -125,7 +125,7 @@ class SerializerManagerImpl
       if (iter == serializers.end ())
       {
         if (raise_exception)
-          Raise<ArgumentException> (METHOD_NAME, "Invalid argument <name>='%s'. "
+          raise<ArgumentException> (METHOD_NAME, "Invalid argument <name>='%s'. "
             "No serializer with this extension for signature %s", name, signature.name ());
 
         return 0;

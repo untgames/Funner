@@ -6,10 +6,10 @@ MemFileImpl::MemFileImpl (void* buffer,size_t buffer_size,filemode_t mode)
   : FileImpl (mode|FILE_MODE_SEEK|FILE_MODE_REWIND), is_auto_deleted (false)
 {
   if (!buffer && buffer_size)
-    RaiseNullArgument ("MemFileImpl::MemFileImpl","buffer");
+    raise_null_argument ("MemFileImpl::MemFileImpl","buffer");
 
   if (mode & FILE_MODE_RESIZE)
-    RaiseNotSupported ("MemFileImpl::MemFileImpl","Memory files with FILE_MODE_RESIZE mode not supported");
+    raise_not_supported ("MemFileImpl::MemFileImpl","Memory files with FILE_MODE_RESIZE mode not supported");
 
   start  = (char*)buffer;
   finish = start + buffer_size;
@@ -20,10 +20,10 @@ MemFileImpl::MemFileImpl (FileImplPtr base_file)
   : FileImpl (base_file->Mode ()|FILE_MODE_SEEK|FILE_MODE_REWIND), is_auto_deleted (true)    
 {
   if (!base_file)
-    RaiseNullArgument ("MemFileImpl::MemFileImpl","base_file");
+    raise_null_argument ("MemFileImpl::MemFileImpl","base_file");
     
   if (base_file->Mode () & (FILE_MODE_RESIZE|FILE_MODE_WRITE))
-    RaiseNotSupported ("MemFileImpl::MemFileImpl","Memory files with FILE_MODE_RESIZE|FILE_MODE_WRITE mode not supported");
+    raise_not_supported ("MemFileImpl::MemFileImpl","Memory files with FILE_MODE_RESIZE|FILE_MODE_WRITE mode not supported");
     
   size_t buffer_size = base_file->Size ();    
   void*  buffer      = ::operator new (buffer_size);

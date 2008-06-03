@@ -16,15 +16,15 @@ GlslShader::GlslShader (const ContextManager& manager, const ShaderDesc& shader_
   static const char* METHOD_NAME = "render::low_level::opengl::GlslShader::GlslShader";
 
   if (!shader_desc.profile)
-    RaiseNullArgument (METHOD_NAME, "shader_desc.profile");
+    raise_null_argument (METHOD_NAME, "shader_desc.profile");
   
   if (!shader_desc.source_code)
-    RaiseNullArgument (METHOD_NAME, "shader_desc.source_code");
+    raise_null_argument (METHOD_NAME, "shader_desc.source_code");
   
   size_t shader_type = get_shader_type (shader_desc.profile);
 
   if (shader_type == -1)
-    RaiseInvalidArgument (METHOD_NAME, "shader_desc.profile", shader_desc.profile, "Shader has uncknown type");
+    raise_invalid_argument (METHOD_NAME, "shader_desc.profile", shader_desc.profile, "Shader has uncknown type");
 
   MakeContextCurrent ();
 
@@ -38,17 +38,17 @@ GlslShader::GlslShader (const ContextManager& manager, const ShaderDesc& shader_
         if (GetCaps ().has_arb_fragment_shader) 
           gl_shader_type = GL_FRAGMENT_SHADER;
         else
-          RaiseNotSupported (METHOD_NAME, "Can't create fragment shader ('GL_ARB_fragment_shader' extension not supported)");
+          raise_not_supported (METHOD_NAME, "Can't create fragment shader ('GL_ARB_fragment_shader' extension not supported)");
         
         break;
       case GlslShaderType_Vertex: 
         if (GetCaps ().has_arb_vertex_shader) 
           gl_shader_type = GL_VERTEX_SHADER;
         else
-          RaiseNotSupported (METHOD_NAME, "Can't create vertex shader ('GL_ARB_vertex_shader' extension not supported)");
+          raise_not_supported (METHOD_NAME, "Can't create vertex shader ('GL_ARB_vertex_shader' extension not supported)");
 
         break;
-      default: Raise <NotImplementedException> (METHOD_NAME, "Shaders with profile '%s' not implemented", shader_desc.profile);
+      default: raise <NotImplementedException> (METHOD_NAME, "Shaders with profile '%s' not implemented", shader_desc.profile);
     }
 
     if (glCreateShader) shader = glCreateShader (gl_shader_type);

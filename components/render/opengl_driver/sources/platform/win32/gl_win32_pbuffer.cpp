@@ -44,7 +44,7 @@ void PBuffer::Create ()
   try
   {
     if (!WGLEW_ARB_pbuffer)
-      RaiseNotSupported ("render::low_level::opengl::PBuffer::PBuffer", "PBuffer does not supported");
+      raise_not_supported ("render::low_level::opengl::PBuffer::PBuffer", "PBuffer does not supported");
       
     HDC primary_device_context = primary_swap_chain->GetDC ();
       

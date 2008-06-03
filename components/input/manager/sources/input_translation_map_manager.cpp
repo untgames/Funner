@@ -12,7 +12,7 @@ void TranslationMapManagerImpl::RegisterLoader (const char* extension, const Tra
   LoadHandlersMap::iterator iter = load_handlers.find (extension);
   
   if (iter != load_handlers.end ())
-    RaiseInvalidArgument ("input::TranslationMapManager::RegisterLoader", "extension", extension, "Handler already registered");
+    raise_invalid_argument ("input::TranslationMapManager::RegisterLoader", "extension", extension, "Handler already registered");
 
   load_handlers.insert_pair (extension, handler);
 }
@@ -22,7 +22,7 @@ void TranslationMapManagerImpl::RegisterSaver (const char* extension, const Tran
   SaveHandlersMap::iterator iter = save_handlers.find (extension);
   
   if (iter != save_handlers.end ())
-    RaiseInvalidArgument ("input::TranslationMapManager::RegisterSaver", "extension", extension, "Handler already registered");
+    raise_invalid_argument ("input::TranslationMapManager::RegisterSaver", "extension", extension, "Handler already registered");
 
   save_handlers.insert_pair (extension, handler);
 }
@@ -76,12 +76,12 @@ TranslationMapManagerImpl::TranslationMapManagerImpl ()
 void TranslationMapManagerImpl::Load (const char* file_name, TranslationMap& target_map) const
 {
   if (!file_name)
-    RaiseNullArgument ("input::TranslationMapManagerImpl::GetLoader", "file_name");
+    raise_null_argument ("input::TranslationMapManagerImpl::GetLoader", "file_name");
 
   LoadHandlersMap::const_iterator iter = load_handlers.find (get_extension (file_name));
 
   if (iter == load_handlers.end ())
-    RaiseNotSupported ("input::TranslationMapManagerImpl::GetLoader", "Extension '%s' not registered", get_extension (file_name));
+    raise_not_supported ("input::TranslationMapManagerImpl::GetLoader", "Extension '%s' not registered", get_extension (file_name));
 
   iter->second (file_name, target_map);
 }
@@ -89,12 +89,12 @@ void TranslationMapManagerImpl::Load (const char* file_name, TranslationMap& tar
 void TranslationMapManagerImpl::Save (const char* file_name, const TranslationMap& source_map) const
 {
   if (!file_name)
-    RaiseNullArgument ("input::TranslationMapManagerImpl::GetSaver", "file_name");
+    raise_null_argument ("input::TranslationMapManagerImpl::GetSaver", "file_name");
 
   SaveHandlersMap::const_iterator iter = save_handlers.find (get_extension (file_name));
 
   if (iter == save_handlers.end ())
-    RaiseNotSupported ("input::TranslationMapManagerImpl::GetSaver", "Extension '%s' not registered", get_extension (file_name));
+    raise_not_supported ("input::TranslationMapManagerImpl::GetSaver", "Extension '%s' not registered", get_extension (file_name));
 
   iter->second (file_name, source_map);
 }
@@ -106,7 +106,7 @@ void TranslationMapManagerImpl::Save (const char* file_name, const TranslationMa
 void TranslationMapManager::RegisterLoader (const char* extension, const LoadHandler& handler)
 {
   if (!extension)
-    RaiseNullArgument ("input::TranslationMapManager::RegisterLoader", "extension");
+    raise_null_argument ("input::TranslationMapManager::RegisterLoader", "extension");
 
   TranslationMapManagerSingleton::Instance ().RegisterLoader (extension, handler);
 }
@@ -114,7 +114,7 @@ void TranslationMapManager::RegisterLoader (const char* extension, const LoadHan
 void TranslationMapManager::RegisterSaver (const char* extension, const SaveHandler& handler)
 {
   if (!extension)
-    RaiseNullArgument ("input::TranslationMapManager::RegisterSaver", "extension");
+    raise_null_argument ("input::TranslationMapManager::RegisterSaver", "extension");
 
   TranslationMapManagerSingleton::Instance ().RegisterSaver (extension, handler);
 }
@@ -122,7 +122,7 @@ void TranslationMapManager::RegisterSaver (const char* extension, const SaveHand
 void TranslationMapManager::UnregisterLoader (const char* extension)
 {
   if (!extension)
-    RaiseNullArgument ("input::TranslationMapManager::UnregisterLoader", "extension");
+    raise_null_argument ("input::TranslationMapManager::UnregisterLoader", "extension");
 
   TranslationMapManagerSingleton::Instance ().UnregisterLoader (extension);
 }
@@ -130,7 +130,7 @@ void TranslationMapManager::UnregisterLoader (const char* extension)
 void TranslationMapManager::UnregisterSaver (const char* extension)
 {
   if (!extension)
-    RaiseNullArgument ("input::TranslationMapManager::UnregisterSaver", "extension");
+    raise_null_argument ("input::TranslationMapManager::UnregisterSaver", "extension");
 
   TranslationMapManagerSingleton::Instance ().UnregisterSaver (extension);
 }

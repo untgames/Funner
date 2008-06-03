@@ -95,7 +95,7 @@ void copy_image_dispatch (size_t pixels_count, const void* src_buffer, PixelForm
     case PixelFormat_L8:    copy_image_dispatch2<SrcT, PixelL8>    (pixels_count, src_buffer, dst_buffer); break;
     case PixelFormat_LA8:   copy_image_dispatch2<SrcT, PixelLa8>   (pixels_count, src_buffer, dst_buffer); break;
     default:
-      RaiseNotSupported ("render::low_level::opengl::copy_image_dispatch", "Unsupported destination format %s", get_name (dst_format));
+      raise_not_supported ("render::low_level::opengl::copy_image_dispatch", "Unsupported destination format %s", get_name (dst_format));
       break;
   }
 }
@@ -121,7 +121,7 @@ void copy_image (size_t pixels_count, PixelFormat src_format, const void* src_bu
     case PixelFormat_L8:    copy_image_dispatch<PixelL8>    (pixels_count, src_buffer, dst_format, dst_buffer); break;
     case PixelFormat_LA8:   copy_image_dispatch<PixelLa8>   (pixels_count, src_buffer, dst_format, dst_buffer); break;
     default:
-      RaiseNotSupported ("render::low_level::opengl::copy_image", "Unsupported source format %s", get_name (src_format));
+      raise_not_supported ("render::low_level::opengl::copy_image", "Unsupported source format %s", get_name (src_format));
       break;
   }
 }

@@ -38,7 +38,7 @@ DynamicLibrary::DynamicLibrary (const char* name)
   try
   {
     if (!name)
-      RaiseNullArgument ("", "name");
+      raise_null_argument ("", "name");
 
     impl->name         = name;
     impl->name_unicode = towstring (name);
@@ -57,7 +57,7 @@ DynamicLibrary::DynamicLibrary (const wchar_t* name)
   try
   {
     if (!name)
-      RaiseNullArgument ("", "name");
+      raise_null_argument ("", "name");
 
     impl->name_unicode = name;
     impl->name         = tostring (name);

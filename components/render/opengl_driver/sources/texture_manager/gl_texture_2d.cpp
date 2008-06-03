@@ -33,7 +33,7 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
   glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 1, GL_TEXTURE_WIDTH, &proxy_width);
 
   if (!proxy_width)
-    RaiseNotSupported (METHOD_NAME, "Can't create 2D texture %ux%u@%s. Reason: proxy texure fail", tex_desc.width,
+    raise_not_supported (METHOD_NAME, "Can't create 2D texture %ux%u@%s. Reason: proxy texure fail", tex_desc.width,
     tex_desc.height, get_name (tex_desc.format));
 
       //создание mip-уровней

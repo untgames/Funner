@@ -54,22 +54,22 @@ WavInputStream::WavInputStream (const char* file_name, SoundSampleInfo& sound_sa
   file.Seek (0, FILE_SEEK_SET);
   file.Read (read_buffer, 16);
   if (common::string_wrappers::strnicmp("RIFF", read_buffer, 4))
-    Raise <Exception> (METHOD_NAME, "No 'RIFF' chunk in file.");
+    raise <Exception> (METHOD_NAME, "No 'RIFF' chunk in file.");
   if (common::string_wrappers::strnicmp("WAVE", read_buffer+8, 4))
-    Raise <Exception> (METHOD_NAME, "No 'WAVE' ID in file.");
+    raise <Exception> (METHOD_NAME, "No 'WAVE' ID in file.");
 
   if (SeekToWAVChunk (file, "fmt ") < 0)
-    Raise <Exception> (METHOD_NAME, "No 'fmt ' chunk in file.");
+    raise <Exception> (METHOD_NAME, "No 'fmt ' chunk in file.");
   file.Read (read_buffer, 16);
   if (*(short*)(read_buffer) != 1)
-    RaiseNotSupported (METHOD_NAME, "Compressed wav currently not supported.");
+    raise_not_supported (METHOD_NAME, "Compressed wav currently not supported.");
   sound_sample_info.channels        = *(short*)(read_buffer + 2);
   sound_sample_info.frequency       = *(int*)  (read_buffer + 4);
   sound_sample_info.bits_per_sample = *(short*)(read_buffer + 14);
 
   chunk_size = SeekToWAVChunk (file, "data");
   if (chunk_size < 0)
-    Raise <Exception> (METHOD_NAME, "No 'data' chunk in file.");
+    raise <Exception> (METHOD_NAME, "No 'data' chunk in file.");
   data_chunk_pos = file.Tell();
   sample_size    = sound_sample_info.bits_per_sample / 8 * sound_sample_info.channels;
 

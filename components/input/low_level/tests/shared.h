@@ -53,7 +53,7 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
       else if (!strcmp (DEVICE_PROPERTY2, name))
         saturation_zone = value;
       else
-        RaiseInvalidArgument ("TestInput::SetProperty", "name", name);    
+        raise_invalid_argument ("TestInput::SetProperty", "name", name);    
     }
     float GetProperty   (const char* name)
     {
@@ -62,7 +62,7 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
       else if (!strcmp (DEVICE_PROPERTY2, name))
         return saturation_zone;
       else
-        RaiseInvalidArgument ("TestInput::GetProperty", "name", name);
+        raise_invalid_argument ("TestInput::GetProperty", "name", name);
 
       return 0;
     }    
@@ -95,12 +95,12 @@ class TestDriver: virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t      GetDevicesCount ()
     {
-      RaiseNotImplemented ("TestDriver::GetDevicesCount");
+      raise_not_implemented ("TestDriver::GetDevicesCount");
       return 0;
     }
     const char* GetDeviceName (size_t index)
     {
-      RaiseNotImplemented ("TestDriver::GetDeviceName");
+      raise_not_implemented ("TestDriver::GetDeviceName");
       return 0;
     }
 
@@ -109,7 +109,7 @@ class TestDriver: virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDevice* CreateDevice (const char* name) 
     {
-      RaiseNotImplemented ("TestDriver::CreateDevice");
+      raise_not_implemented ("TestDriver::CreateDevice");
       return 0;
     }
 

@@ -45,15 +45,15 @@ Texture::Texture
         //проверка возможности работы совместно с mip-mapping
         
       if (desc.generate_mips_enable)
-        RaiseInvalidOperation (METHOD_NAME, "Auto-generate mipmaps incompatible with compressed textures (desc.format=%s)",
+        raise_invalid_operation (METHOD_NAME, "Auto-generate mipmaps incompatible with compressed textures (desc.format=%s)",
                                get_name (desc.format));
 
         //проверка корректности начальных размеров
 
       if (mips_count < 3)
       {
-        if (desc.width % 4)  RaiseInvalidArgument (METHOD_NAME, "desc.width", desc.width, "Reason: width is not multiple of 4");
-        if (desc.height % 4) RaiseInvalidArgument (METHOD_NAME, "desc.height", desc.height, "Reason: height is not multiple of 4");
+        if (desc.width % 4)  raise_invalid_argument (METHOD_NAME, "desc.width", desc.width, "Reason: width is not multiple of 4");
+        if (desc.height % 4) raise_invalid_argument (METHOD_NAME, "desc.height", desc.height, "Reason: height is not multiple of 4");
       }
 
       mips_count -= 2;
@@ -61,19 +61,19 @@ Texture::Texture
       break;
     case PixelFormat_D24S8:
       if (!GetCaps ().has_ext_packed_depth_stencil)
-        RaiseNotSupported (METHOD_NAME, "Can't create depth-stencil texture (GL_EXT_packed_depth_stencil not supported)");
+        raise_not_supported (METHOD_NAME, "Can't create depth-stencil texture (GL_EXT_packed_depth_stencil not supported)");
 
     case PixelFormat_D16:
     case PixelFormat_D24X8:
       if (!GetCaps ().has_arb_depth_texture)
-        RaiseNotSupported (METHOD_NAME, "Can't create depth texture (GL_ARB_depth_texture and GL_VERSION_1_4 not supported)");
+        raise_not_supported (METHOD_NAME, "Can't create depth texture (GL_ARB_depth_texture and GL_VERSION_1_4 not supported)");
 
       break;
     case PixelFormat_S8:
-      RaiseNotSupported (METHOD_NAME, "Stencil textures not supported");
+      raise_not_supported (METHOD_NAME, "Stencil textures not supported");
       return;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.format", desc.format);
+      raise_invalid_argument (METHOD_NAME, "desc.format", desc.format);
       return;
   }
   
@@ -87,7 +87,7 @@ Texture::Texture
     case AccessFlag_Read | AccessFlag_Write:
       break;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.access_flags", desc.access_flags);
+      raise_invalid_argument (METHOD_NAME, "desc.access_flags", desc.access_flags);
       break;
   }
 
@@ -323,12 +323,12 @@ void Texture::BuildMipmaps
 
 void Texture::SetUncompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, GLenum, const void*)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Texture::SetUncompressedData");
+  raise_not_implemented ("render::low_level::opengl::Texture::SetUncompressedData");
 }
 
 void Texture::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, size_t, const void*)
 {
-  RaiseNotImplemented ("render::low_level::opengl::Texture::SetCompressedData");
+  raise_not_implemented ("render::low_level::opengl::Texture::SetCompressedData");
 }
 
 /*
@@ -350,15 +350,15 @@ void Texture::SetData
     //проверка возможности записи
     
   if (!(desc.access_flags & AccessFlag_Write))
-    RaiseInvalidOperation (METHOD_NAME, "Can't set texture data (no AccessFlag_Write in desc.access_flags)");
+    raise_invalid_operation (METHOD_NAME, "Can't set texture data (no AccessFlag_Write in desc.access_flags)");
   
     //проверка корректности номеров слоя и mip-уровня
 
   if (layer >= desc.layers)
-    common::RaiseOutOfRange (METHOD_NAME, "layer", layer, desc.layers);
+    common::raise_out_of_range (METHOD_NAME, "layer", layer, desc.layers);
 
   if (mip_level >= mips_count)
-    common::RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, mips_count);
+    common::raise_out_of_range (METHOD_NAME, "mip_level", mip_level, mips_count);
 
     //сохранение неотсеченных размеров
 
@@ -388,7 +388,7 @@ void Texture::SetData
     return;
 
   if (!buffer)
-    common::RaiseNullArgument (METHOD_NAME, "buffer");    
+    common::raise_null_argument (METHOD_NAME, "buffer");    
     
     //установка текстуры в контекст OpenGL
 
@@ -410,12 +410,12 @@ void Texture::SetData
 
   if (!is_compatible)
   {
-    RaiseNotSupported (METHOD_NAME, "Texture format %s incompatible with source_format %s", get_name (desc.format),
+    raise_not_supported (METHOD_NAME, "Texture format %s incompatible with source_format %s", get_name (desc.format),
       get_name (source_format));
   }                                    
                                 
   if (source_format == PixelFormat_D24S8 && !GetCaps ().has_ext_packed_depth_stencil)
-    RaiseNotSupported (METHOD_NAME, "Unsupported format %s (GL_EXT_packed_depth_stencil not supported)", get_name (source_format));
+    raise_not_supported (METHOD_NAME, "Unsupported format %s (GL_EXT_packed_depth_stencil not supported)", get_name (source_format));
 
     //преобразование формата пикселей
   
@@ -426,8 +426,8 @@ void Texture::SetData
   {
       //проверка корректности размеров
 
-    if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))          RaiseNotSupported (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
-    if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) RaiseNotSupported (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);    
+    if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))          raise_not_supported (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
+    if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) raise_not_supported (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);    
 
       //копирование сжатого образа
 
@@ -530,15 +530,15 @@ void Texture::GetData
     //проверка возможности чтения
 
   if (!(desc.access_flags & AccessFlag_Read))
-    RaiseInvalidOperation (METHOD_NAME, "Can't get texture data (no AccessFlag_Read in desc.access_flags)");
+    raise_invalid_operation (METHOD_NAME, "Can't get texture data (no AccessFlag_Read in desc.access_flags)");
 
     //проверка корректности номеров слоя и mip-уровня
 
   if (layer >= desc.layers)
-    common::RaiseOutOfRange (METHOD_NAME, "layer", layer, desc.layers);
+    common::raise_out_of_range (METHOD_NAME, "layer", layer, desc.layers);
 
   if (mip_level >= mips_count)
-    common::RaiseOutOfRange (METHOD_NAME, "mip_level", mip_level, mips_count);
+    common::raise_out_of_range (METHOD_NAME, "mip_level", mip_level, mips_count);
     
     //получение дескриптора mip-уровня и информации о слое текстуры
 
@@ -566,7 +566,7 @@ void Texture::GetData
     return;    
 
   if (!buffer)
-    common::RaiseNullArgument (METHOD_NAME, "buffer");    
+    common::raise_null_argument (METHOD_NAME, "buffer");    
 
     //проверка совместимости форматов
 
@@ -580,7 +580,7 @@ void Texture::GetData
 
   if (!is_compatible)
   {
-    common::RaiseNotSupported (METHOD_NAME, "Texture format %s incompatible with target_format %s", get_name (desc.format),
+    common::raise_not_supported (METHOD_NAME, "Texture format %s incompatible with target_format %s", get_name (desc.format),
       get_name (target_format));
   }
   
@@ -612,10 +612,10 @@ void Texture::GetData
       //проверка возможности копирования
       
     if (!caps.has_ext_texture_compression_s3tc)
-      common::RaiseNotSupported (METHOD_NAME, "Texture packing not supported (GL_EXT_texture_compression_s3tc not supported)");
+      common::raise_not_supported (METHOD_NAME, "Texture packing not supported (GL_EXT_texture_compression_s3tc not supported)");
       
     if (target_format != desc.format)
-      common::RaiseNotSupported (METHOD_NAME, "Can't get compressed texture data, target format %s mismatch with texture format %s", 
+      common::raise_not_supported (METHOD_NAME, "Can't get compressed texture data, target format %s mismatch with texture format %s", 
                          get_name (target_format), get_name (desc.format));
 
     if (is_full_image)
@@ -627,10 +627,10 @@ void Texture::GetData
         //проверка корректности смещения и размеров запрашиваемого образа
 
       if (x % DXT_EDGE_SIZE || y % DXT_EDGE_SIZE)
-        common::RaiseNotSupported (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
+        common::raise_not_supported (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
 
       if (width % DXT_EDGE_SIZE || height % DXT_EDGE_SIZE)
-        common::RaiseNotSupported (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);
+        common::raise_not_supported (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);
 
         //переход к размерности блока в DXT
 
@@ -667,7 +667,7 @@ void Texture::GetData
   else
   {
     if (is_compressed (desc.format))
-      common::RaiseNotSupported (METHOD_NAME, "Can't get uncompressed data (format %s) from compressed texture (format %s)", get_name (target_format), get_name (desc.format));
+      common::raise_not_supported (METHOD_NAME, "Can't get uncompressed data (format %s) from compressed texture (format %s)", get_name (target_format), get_name (desc.format));
 
       //копирование несжатого образа
       

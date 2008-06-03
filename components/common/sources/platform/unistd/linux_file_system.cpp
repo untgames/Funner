@@ -28,10 +28,10 @@ void LinuxFileSystem::FileResize (file_t file,filesize_t new_size)
   {
     switch (errno)
     {
-      case EBADF:  RaiseInvalidArgument ("LinuxFileSystem::FileResize","file"); break;
-      case EINVAL: RaiseNullArgument    ("LinuxFileSystem::FileResize","buffer"); break;
-      case ENOSPC: Raise<FileNoSpaceException> ("LinuxFileSystem::FileResize","No enough space for resize file up to %u bytes",new_size); break;
-      default:     Raise<FileException> ("LinuxFileSystem::FileResize","Unknown error"); break;
+      case EBADF:  raise_invalid_argument ("LinuxFileSystem::FileResize","file"); break;
+      case EINVAL: raise_null_argument    ("LinuxFileSystem::FileResize","buffer"); break;
+      case ENOSPC: raise<FileNoSpaceException> ("LinuxFileSystem::FileResize","No enough space for resize file up to %u bytes",new_size); break;
+      default:     raise<FileException> ("LinuxFileSystem::FileResize","Unknown error"); break;
     }    
   }
 }
@@ -42,9 +42,9 @@ void LinuxFileSystem::Mkdir (const char* dir_name)
   {
     switch (errno)
     {
-      case EEXIST: Raise<FileException> ("LinuxFileSystem::Mkdir","Path '%s' already exist",dir_name); break;
-      case ENOENT: Raise<FileNotFoundException> ("LinuxFileSystem::Mkdir","Path '%s' not found",dir_name); break;
-      default:     Raise<FileException> ("LinuxFileSystem::Mkdir","Unknown error"); break;
+      case EEXIST: raise<FileException> ("LinuxFileSystem::Mkdir","Path '%s' already exist",dir_name); break;
+      case ENOENT: raise<FileNotFoundException> ("LinuxFileSystem::Mkdir","Path '%s' not found",dir_name); break;
+      default:     raise<FileException> ("LinuxFileSystem::Mkdir","Unknown error"); break;
     }
   }
 }

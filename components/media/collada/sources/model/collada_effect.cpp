@@ -78,7 +78,7 @@ const char* Effect::Id () const
 void Effect::SetId (const char* id)
 {
   if (!id)
-    RaiseNullArgument ("media::collada::Effect::SetId", "id");
+    raise_null_argument ("media::collada::Effect::SetId", "id");
     
   impl->id = id;
 }
@@ -103,7 +103,7 @@ void Effect::SetShaderType (media::collada::ShaderType type)
       impl->shader_type = type;
       break;
     default:
-      RaiseInvalidArgument ("media::collada::Effect::SetShaderType", "type", type);
+      raise_invalid_argument ("media::collada::Effect::SetShaderType", "type", type);
       break;
   }
 }
@@ -115,7 +115,7 @@ void Effect::SetShaderType (media::collada::ShaderType type)
 const Texture& Effect::Texture (TextureMap map) const
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("media::collada::Effect::Texture", "map", map);
+    raise_invalid_argument ("media::collada::Effect::Texture", "map", map);
     
   return impl->maps [map].texture;
 }
@@ -128,7 +128,7 @@ Texture& Effect::Texture (TextureMap map)
 void Effect::SetTexture (TextureMap map, media::collada::Texture& texture)
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("media::collada::Effect::SetTexture", "map", map);
+    raise_invalid_argument ("media::collada::Effect::SetTexture", "map", map);
     
   impl->maps [map].texture = texture;
 }
@@ -148,7 +148,7 @@ bool Effect::HasTexture (TextureMap map) const
 const math::vec4f& Effect::MapColor (TextureMap map) const
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("media::collada::Effect::MapColor", "map", map);
+    raise_invalid_argument ("media::collada::Effect::MapColor", "map", map);
     
   return impl->maps [map].color;
 }
@@ -156,7 +156,7 @@ const math::vec4f& Effect::MapColor (TextureMap map) const
 void Effect::SetMapColor (TextureMap map, const math::vec4f& color)
 {
   if (map < 0 || map >= TextureMap_Num)
-    RaiseInvalidArgument ("Effect::SetMapColor", "map", map);
+    raise_invalid_argument ("Effect::SetMapColor", "map", map);
     
   impl->maps [map].color = color;
 }
@@ -168,7 +168,7 @@ void Effect::SetMapColor (TextureMap map, const math::vec4f& color)
 float Effect::Param (EffectParam param) const
 {
   if (param < 0 || param >= EffectParam_Num)
-    RaiseInvalidArgument ("media::collada::Effect::Param", "param", param);
+    raise_invalid_argument ("media::collada::Effect::Param", "param", param);
     
   return impl->shader_params [param];
 }
@@ -176,7 +176,7 @@ float Effect::Param (EffectParam param) const
 void Effect::SetParam (EffectParam param, float value)
 {
   if (param < 0 || param >= EffectParam_Num)
-    RaiseInvalidArgument ("media::collada::Effect::SetParam", "param", param);
+    raise_invalid_argument ("media::collada::Effect::SetParam", "param", param);
     
   impl->shader_params [param] = value;
 }

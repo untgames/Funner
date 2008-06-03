@@ -135,7 +135,7 @@ void Timer::SetState (TimerState state)
   {
     case TimerState_Running: impl->SetTimer (impl->period); break;
     case TimerState_Paused:  impl->KillTimer (); break;
-    default:                 RaiseInvalidArgument ("syslib::Timer::SetState", "state", state); break;
+    default:                 raise_invalid_argument ("syslib::Timer::SetState", "state", state); break;
   }
 }
 

@@ -45,7 +45,7 @@ class FppShaderParser
         error_log (parse_log.Message (i));
         
       if (parse_log.HasErrors ())
-        Raise<ArgumentException> ("render::low_level::opengl::FppShaderParser::FppShaderParser", "Errors in shader '%s'", shader_desc.name);
+        raise<ArgumentException> ("render::low_level::opengl::FppShaderParser::FppShaderParser", "Errors in shader '%s'", shader_desc.name);
     }
     
   private:
@@ -421,13 +421,13 @@ FppShader::FppShader (const ShaderDesc& shader_desc, const LogFunction& error_lo
     //разбор fpp-шейдера
 
   if (!shader_desc.profile)
-    RaiseNullArgument (METHOD_NAME, "shader_desc.profile");
+    raise_null_argument (METHOD_NAME, "shader_desc.profile");
 
   if (!shader_desc.source_code)
-    RaiseNullArgument (METHOD_NAME, "shader_desc.source_code");
+    raise_null_argument (METHOD_NAME, "shader_desc.source_code");
 
   if (!shader_desc.name)
-    RaiseNullArgument (METHOD_NAME, "shader_desc.name");    
+    raise_null_argument (METHOD_NAME, "shader_desc.name");    
 
   error_log (format ("Compiling %s...", shader_desc.name).c_str ());
 

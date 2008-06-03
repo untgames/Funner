@@ -21,10 +21,10 @@ void Platform::Sleep (size_t miliseconds)
 
 Platform::timer_t Platform::CreateTimer (size_t, TimerHandler, void*)
 {
-  common::RaiseNotImplemented ("syslib::DefaultPlatform::CreateTimer");
+  common::raise_not_implemented ("syslib::DefaultPlatform::CreateTimer");
 }
 
 void Platform::KillTimer (timer_t)
 {
-  common::RaiseNotImplemented ("syslib::DefaultPlatform::KillTimer");
+  common::raise_not_implemented ("syslib::DefaultPlatform::KillTimer");
 }

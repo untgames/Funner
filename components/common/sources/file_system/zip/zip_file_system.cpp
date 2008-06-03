@@ -193,13 +193,13 @@ ZipFileSystem::~ZipFileSystem ()
 ZipFileSystem::file_t ZipFileSystem::FileOpen (const char* file_name,filemode_t mode_flags,size_t)
 {
   if ((mode_flags & FILE_MODE_WRITE) || (mode_flags & FILE_MODE_RESIZE) || (mode_flags & FILE_MODE_CREATE))
-    RaiseNotSupported ("ZipFileSystem::FileOpen","Unable to open file '%s' in zip-file '%s' with mode='%s'",
+    raise_not_supported ("ZipFileSystem::FileOpen","Unable to open file '%s' in zip-file '%s' with mode='%s'",
           file_name,zip_file_name.c_str (),strfilemode (mode_flags).c_str ());
 
   EntryMap::iterator iter = entry_map.find (strihash (file_name));
   
   if (iter == entry_map.end ())
-    Raise<FileNotFoundException> ("ZipFileSystem::FileOpen","File '%s' not found in zip-file '%s'",file_name,zip_file_name.c_str ());
+    raise<FileNotFoundException> ("ZipFileSystem::FileOpen","File '%s' not found in zip-file '%s'",file_name,zip_file_name.c_str ());
 
   ZipFile* file = new ZipFile;
   
@@ -253,7 +253,7 @@ size_t ZipFileSystem::FileRead (file_t _file,void* buf,size_t size)
 
 size_t ZipFileSystem::FileWrite (file_t,const void* buf,size_t size)
 {
-  RaiseNotSupported ("ZipFileSystem::FileWrite","There is not write operation in zip-files");
+  raise_not_supported ("ZipFileSystem::FileWrite","There is not write operation in zip-files");
   return 0;
 }
 
@@ -291,7 +291,7 @@ filesize_t ZipFileSystem::FileSize (file_t _file)
 
 void ZipFileSystem::FileResize (file_t,filesize_t)
 {
-  RaiseNotSupported ("ZipFileSystem::FileResize","There is not resize operation in zip-files");
+  raise_not_supported ("ZipFileSystem::FileResize","There is not resize operation in zip-files");
 }
 
 bool ZipFileSystem::FileEof (file_t _file)
@@ -311,19 +311,19 @@ void ZipFileSystem::FileFlush (file_t)
 
 void ZipFileSystem::Remove (const char* file_name)
 {
-  RaiseNotSupported ("ZipFileSystem::Remove","Unable to remove file '%s' from zip-file '%s'",
+  raise_not_supported ("ZipFileSystem::Remove","Unable to remove file '%s' from zip-file '%s'",
                      file_name,zip_file_name.c_str ());
 }
 
 void ZipFileSystem::Rename (const char* file_name,const char* new_name)
 {
-  RaiseNotSupported ("ZipFileSystem::Rename","Unable to rename file '%s' to '%s' in zip-file '%s'",
+  raise_not_supported ("ZipFileSystem::Rename","Unable to rename file '%s' to '%s' in zip-file '%s'",
                      file_name,new_name,zip_file_name.c_str ());
 }
 
 void ZipFileSystem::Mkdir (const char* dir_name)
 {
-  RaiseNotSupported ("ZipFileSystem::Mkdir","Unable to create dir '%s' in zip-file '%s'",
+  raise_not_supported ("ZipFileSystem::Mkdir","Unable to create dir '%s' in zip-file '%s'",
                      dir_name,zip_file_name.c_str ());
 }
 
@@ -375,7 +375,7 @@ void ZipFileSystem::CheckError (zzip_error_t error)
   if (error == ZZIP_NO_ERROR)
     return;
     
-  Raise<FileException> (NULL,"ZZip internal error (zip-file '%s'): %s",
+  raise<FileException> (NULL,"ZZip internal error (zip-file '%s'): %s",
                         zip_file_name.c_str (),GetZZipErrorMessage (error));
 }
 

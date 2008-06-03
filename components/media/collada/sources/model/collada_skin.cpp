@@ -98,7 +98,7 @@ const char* Skin::Id () const
 void Skin::SetId (const char* id)
 {
   if (!id)
-    common::RaiseNullArgument ("media::collada::Skin::SetId", "id");
+    common::raise_null_argument ("media::collada::Skin::SetId", "id");
     
   impl->id = id;
 }
@@ -129,7 +129,7 @@ size_t Skin::JointsCount () const
 size_t Skin::CreateJoint (const char* name)
 {
   if (!name)
-    common::RaiseNullArgument ("media::collada::Skin::CreateJoint", "name");
+    common::raise_null_argument ("media::collada::Skin::CreateJoint", "name");
 
   Joint* joint = new Joint (name);
   
@@ -164,7 +164,7 @@ void Skin::RemoveAllJoints ()
 void Skin::SetJointInvMatrix (size_t joint, const math::mat4f& inv_matrix)
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("media::collada::Skin::SetJointInvMatrix", "joint", joint, impl->joints.size ());
+    common::raise_out_of_range ("media::collada::Skin::SetJointInvMatrix", "joint", joint, impl->joints.size ());
     
   impl->joints [joint]->inv_matrix = inv_matrix;
 }
@@ -172,7 +172,7 @@ void Skin::SetJointInvMatrix (size_t joint, const math::mat4f& inv_matrix)
 const math::mat4f& Skin::JointInvMatrix (size_t joint) const
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("media::collada::Skin::GetJointInvMatrix", "joint", joint, impl->joints.size ());
+    common::raise_out_of_range ("media::collada::Skin::GetJointInvMatrix", "joint", joint, impl->joints.size ());
     
   return impl->joints [joint]->inv_matrix;
 }
@@ -192,7 +192,7 @@ int Skin::FindJoint (const char* name) const
 const char* Skin::JointName (size_t joint) const
 {
   if (joint >= impl->joints.size ())
-    common::RaiseOutOfRange ("media::collada::Skin::JointName", "joint", joint, impl->joints.size ());
+    common::raise_out_of_range ("media::collada::Skin::JointName", "joint", joint, impl->joints.size ());
     
   return impl->joints [joint]->name.c_str ();
 }
@@ -204,7 +204,7 @@ const char* Skin::JointName (size_t joint) const
 void Skin::SetBaseMesh (const char* mesh)
 {
   if (!mesh)
-    common::RaiseNullArgument ("media::collada::Skin::SetBaseMesh", "mesh");
+    common::raise_null_argument ("media::collada::Skin::SetBaseMesh", "mesh");
     
   impl->base_mesh = mesh;
 }

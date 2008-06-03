@@ -153,7 +153,7 @@ void ApplicationImpl::Run ()
 connection ApplicationImpl::RegisterEventHandler (ApplicationEvent event, const Application::EventHandler& handler)
 {
   if (event < 0 || event >= ApplicationEvent_Num)
-    RaiseInvalidArgument ("syslib::Application::RegisterEventHandler", "event", event);
+    raise_invalid_argument ("syslib::Application::RegisterEventHandler", "event", event);
 
   return signals [event].connect (handler);
 }

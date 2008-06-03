@@ -22,7 +22,7 @@ Image::Image (const Image& source, PixelFormat format)
 Image::Image (const char* file_name, PixelFormat format)
 {  
   if (!file_name)
-    RaiseNullArgument ("media::Image::Image", "file_name");
+    raise_null_argument ("media::Image::Image", "file_name");
 
   try
   {
@@ -31,7 +31,7 @@ Image::Image (const char* file_name, PixelFormat format)
     ImageManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, *this);
     
     if (!impl.get ())
-      RaiseInvalidOperation ("media::Image::Image", "Error at load image '%s' (format=%s)", file_name, get_format_name (format));
+      raise_invalid_operation ("media::Image::Image", "Error at load image '%s' (format=%s)", file_name, get_format_name (format));
 
     Rename  (file_name);
     Convert (format);
@@ -46,10 +46,10 @@ Image::Image (const char* file_name, PixelFormat format)
 Image::Image (size_t layers_count, Image* layers, LayersCloneMode clone_mode)
 {
   if (!layers_count)
-    RaiseNullArgument ("media::Image::Image", "layers_count");
+    raise_null_argument ("media::Image::Image", "layers_count");
     
   if (!layers)
-    RaiseNullArgument ("media::Image::Image", "layers");
+    raise_null_argument ("media::Image::Image", "layers");
     
   switch (clone_mode)
   {
@@ -57,7 +57,7 @@ Image::Image (size_t layers_count, Image* layers, LayersCloneMode clone_mode)
     case LayersCloneMode_Capture:
       break;
     default:
-      RaiseInvalidArgument ("media::Image::Image", "clone_mode", clone_mode);
+      raise_invalid_argument ("media::Image::Image", "clone_mode", clone_mode);
       break;
   }
 
@@ -97,7 +97,7 @@ const char* Image::Name () const
 void Image::Rename (const char* new_name)
 {
   if (!new_name)
-    RaiseNullArgument ("media::Image::Rename", "new_name");
+    raise_null_argument ("media::Image::Rename", "new_name");
 
   impl->Rename (new_name);
 }
@@ -117,7 +117,7 @@ void Image::Convert (PixelFormat new_format)
     return;
 
   if (new_format < 0 || new_format >= PixelFormat_Num)
-    RaiseInvalidArgument ("media::Image::Convert", "new_format", new_format);
+    raise_invalid_argument ("media::Image::Convert", "new_format", new_format);
 
   impl->Convert (new_format);
 }
@@ -142,9 +142,9 @@ void Image::Resize (size_t width, size_t height, size_t depth)
   if (width == impl->Width () && height == impl->Height () && depth == impl->Depth ())
     return;
 
-  if (!width)  RaiseInvalidArgument ("media::Image::Resize", "width", width);
-  if (!height) RaiseInvalidArgument ("media::Image::Resize", "height", height);
-  if (!depth)  RaiseInvalidArgument ("media::Image::Resize", "depth", depth);
+  if (!width)  raise_invalid_argument ("media::Image::Resize", "width", width);
+  if (!height) raise_invalid_argument ("media::Image::Resize", "height", height);
+  if (!depth)  raise_invalid_argument ("media::Image::Resize", "depth", depth);
 
   impl->Resize (width, height, depth);
 }
@@ -156,7 +156,7 @@ void Image::Resize (size_t width, size_t height, size_t depth)
 const void* Image::Bitmap (size_t z) const
 {
   if (z >= impl->Depth ())
-    RaiseOutOfRange ("media::Image::Bitmap", "z", z, impl->Depth ());
+    raise_out_of_range ("media::Image::Bitmap", "z", z, impl->Depth ());
 
   return impl->Bitmap (z);
 }
@@ -169,7 +169,7 @@ void* Image::Bitmap (size_t z)
 void Image::PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data)
 {
   if (!data)
-    RaiseNullArgument ("media::Image::PutImage", "data");
+    raise_null_argument ("media::Image::PutImage", "data");
 
   impl->PutImage (x, y, z, width, height, depth, format, data);
 }
@@ -177,7 +177,7 @@ void Image::PutImage (size_t x, size_t y, size_t z, size_t width, size_t height,
 void Image::GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data) const
 {
   if (!data)
-    RaiseNullArgument ("media::Image::GetImage", "data");
+    raise_null_argument ("media::Image::GetImage", "data");
 
   impl->GetImage (x, y, z, width, height, depth, format, data);
 }
@@ -202,10 +202,10 @@ void Image::Load (const char* file_name)
 void Image::Save (const char* file_name, PixelFormat recommended_format)
 {
   if (!file_name)
-    RaiseNullArgument ("media::Image::Save", "file_name");
+    raise_null_argument ("media::Image::Save", "file_name");
     
   if (recommended_format < 0 || recommended_format >= PixelFormat_Num)
-    RaiseInvalidArgument ("media::Image::Save", "recommended_format", recommended_format);
+    raise_invalid_argument ("media::Image::Save", "recommended_format", recommended_format);
 
   if (recommended_format != PixelFormat_Default && recommended_format != Format ())
   {  

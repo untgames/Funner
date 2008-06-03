@@ -89,7 +89,7 @@ Emitter::~Emitter ()
 void Emitter::SetSource (const char* source_name)
 {
   if (!source_name)
-    RaiseNullArgument ("sound::Emitter::SetSource", "source_name");
+    raise_null_argument ("sound::Emitter::SetSource", "source_name");
 
   impl->SetSource (source_name);
 }
@@ -202,7 +202,7 @@ bool Emitter::IsActive () const
 xtl::connection Emitter::RegisterEventHandler (EmitterEvent event, const EventHandler& handler)
 {
   if (event < 0 || event >= EmitterEvent_Num)
-    RaiseInvalidArgument ("sound::Emitter::RegisterEventHandler", "event", event);
+    raise_invalid_argument ("sound::Emitter::RegisterEventHandler", "event", event);
     
   return impl->signals [event].connect (handler);
 }

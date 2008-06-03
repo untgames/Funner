@@ -33,7 +33,7 @@ size_t FppShaderManager::GetProfilesCount ()
 const char* FppShaderManager::GetProfile (size_t index)
 {
   if (index)
-    RaiseOutOfRange ("render::low_level::opengl::FppShaderManager::GetProfile", "index", index, 1);
+    raise_out_of_range ("render::low_level::opengl::FppShaderManager::GetProfile", "index", index, 1);
     
   return "fpp";
 }

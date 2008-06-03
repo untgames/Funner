@@ -64,13 +64,13 @@ void check_blend_operation (BlendOperation operation, const ContextCaps& caps, c
     case BlendOperation_Subtraction:
     case BlendOperation_ReverseSubtraction:
       if (!caps.has_ext_blend_subtract)
-        RaiseNotSupported (method, "Unsupported blend operation %s=%s (GL_EXT_blend_subtract not supported)", param, get_name (operation));
+        raise_not_supported (method, "Unsupported blend operation %s=%s (GL_EXT_blend_subtract not supported)", param, get_name (operation));
 
       break;
     case BlendOperation_Min:
     case BlendOperation_Max:
       if (!caps.has_ext_blend_minmax)
-        RaiseNotSupported (method, "Unsupported blend operation %s=%s (GL_EXT_blend_minmax not supported)", param, get_name (operation));
+        raise_not_supported (method, "Unsupported blend operation %s=%s (GL_EXT_blend_minmax not supported)", param, get_name (operation));
 
       break;      
     default:
@@ -88,7 +88,7 @@ GLenum get_blend_equation (BlendOperation operation, const char* method, const c
     case BlendOperation_Min:                return GL_MIN_EXT;
     case BlendOperation_Max:                return GL_MAX_EXT;
     default:
-      RaiseInvalidArgument (method, param, operation);
+      raise_invalid_argument (method, param, operation);
       return 0;
   }
 }
@@ -127,10 +127,10 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     case BlendArgument_InverseDestinationAlpha: src_color_arg = GL_ONE_MINUS_DST_ALPHA; break;
     case BlendArgument_SourceColor:
     case BlendArgument_InverseSourceColor:
-      RaiseInvalidArgument (METHOD_NAME, "desc.blend_color_source_argument", get_name (in_desc.blend_color_source_argument));
+      raise_invalid_argument (METHOD_NAME, "desc.blend_color_source_argument", get_name (in_desc.blend_color_source_argument));
       break;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.blend_color_source_argument", in_desc.blend_color_source_argument);
+      raise_invalid_argument (METHOD_NAME, "desc.blend_color_source_argument", in_desc.blend_color_source_argument);
       break;
   }
 
@@ -146,10 +146,10 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     case BlendArgument_InverseDestinationAlpha: dst_color_arg = GL_ONE_MINUS_DST_ALPHA; break;
     case BlendArgument_DestinationColor:
     case BlendArgument_InverseDestinationColor:
-      RaiseInvalidArgument (METHOD_NAME, "desc.blend_color_destination_argument", get_name (in_desc.blend_color_destination_argument));
+      raise_invalid_argument (METHOD_NAME, "desc.blend_color_destination_argument", get_name (in_desc.blend_color_destination_argument));
       break;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.blend_color_destination_argument", in_desc.blend_color_destination_argument);
+      raise_invalid_argument (METHOD_NAME, "desc.blend_color_destination_argument", in_desc.blend_color_destination_argument);
       break;    
   }
 
@@ -165,10 +165,10 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     case BlendArgument_InverseSourceColor:
     case BlendArgument_DestinationColor:
     case BlendArgument_InverseDestinationColor:
-      RaiseInvalidArgument (METHOD_NAME, "desc.blend_alpha_source_argument", get_name (in_desc.blend_alpha_source_argument));
+      raise_invalid_argument (METHOD_NAME, "desc.blend_alpha_source_argument", get_name (in_desc.blend_alpha_source_argument));
       break;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.blend_alpha_source_argument", in_desc.blend_alpha_source_argument);
+      raise_invalid_argument (METHOD_NAME, "desc.blend_alpha_source_argument", in_desc.blend_alpha_source_argument);
       break;
   }  
   
@@ -184,32 +184,32 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     case BlendArgument_InverseSourceColor:
     case BlendArgument_DestinationColor:
     case BlendArgument_InverseDestinationColor:
-      RaiseInvalidArgument (METHOD_NAME, "desc.blend_alpha_destination_argument", get_name (in_desc.blend_alpha_destination_argument));
+      raise_invalid_argument (METHOD_NAME, "desc.blend_alpha_destination_argument", get_name (in_desc.blend_alpha_destination_argument));
       break;
     default:
-      RaiseInvalidArgument (METHOD_NAME, "desc.blend_alpha_destination_argument", in_desc.blend_alpha_destination_argument);
+      raise_invalid_argument (METHOD_NAME, "desc.blend_alpha_destination_argument", in_desc.blend_alpha_destination_argument);
       break;    
   }
   
   if (!caps.has_arb_multisample && in_desc.sample_alpha_to_coverage) 
-    RaiseNotSupported (METHOD_NAME, "Can't enable sample alpha to coverage mode (GL_ARB_multisample extension not supported)");
+    raise_not_supported (METHOD_NAME, "Can't enable sample alpha to coverage mode (GL_ARB_multisample extension not supported)");
 
     //проверка поддержки расширений
     
   if (in_desc.blend_enable && (in_desc.color_write_mask & ColorWriteFlag_All))
   {  
     if (color_blend_equation != alpha_blend_equation && !caps.has_ext_blend_equation_separate)
-      RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_operation=%s mismatch desc.blend_alpha_operation=%s"
+      raise_not_supported (METHOD_NAME, "Unsupported configuration: desc.blend_color_operation=%s mismatch desc.blend_alpha_operation=%s"
         " (GL_EXT_blend_equation_separate not supported)", get_name (in_desc.blend_color_operation), get_name (in_desc.blend_alpha_operation));
     
     if (!caps.has_ext_blend_func_separate)
     {
       if (src_color_arg != src_alpha_arg)
-        RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_source_argument=%s mismatch desc.blend_alpha_source_argument=%s"
+        raise_not_supported (METHOD_NAME, "Unsupported configuration: desc.blend_color_source_argument=%s mismatch desc.blend_alpha_source_argument=%s"
         " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_source_argument), get_name (in_desc.blend_alpha_source_argument));
 
       if (dst_color_arg != dst_alpha_arg)
-        RaiseNotSupported (METHOD_NAME, "Unsupported configuration: desc.blend_color_destination_argument=%s mismatch desc.blend_alpha_destination_argument=%s"
+        raise_not_supported (METHOD_NAME, "Unsupported configuration: desc.blend_color_destination_argument=%s mismatch desc.blend_alpha_destination_argument=%s"
         " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_destination_argument), get_name (in_desc.blend_alpha_destination_argument));
     }
 
@@ -293,7 +293,7 @@ void BlendState::Bind ()
     //проверка корректности состояния
 
   if (!display_list)
-    RaiseInvalidOperation (METHOD_NAME, "Empty state (null display list)");
+    raise_invalid_operation (METHOD_NAME, "Empty state (null display list)");
     
     //установка состояния в контекст OpenGL
 

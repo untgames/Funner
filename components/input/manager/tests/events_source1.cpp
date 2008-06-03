@@ -48,11 +48,11 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     const char* GetProperties () {return "";}
     void        SetProperty   (const char* name, float value) 
     {
-      RaiseInvalidArgument ("TestInput::SetProperty", "name", name);
+      raise_invalid_argument ("TestInput::SetProperty", "name", name);
     }
     float GetProperty   (const char* name)
     {
-      RaiseInvalidArgument ("TestInput::GetProperty", "name", name);
+      raise_invalid_argument ("TestInput::GetProperty", "name", name);
       return 0;
     }    
 

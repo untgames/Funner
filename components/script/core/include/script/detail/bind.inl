@@ -145,11 +145,11 @@ T get_argument (IStack& stack, size_t index)
   }
   catch (std::exception& exception)
   {
-    common::Raise<script::ArgumentException> ("script::detail::get_argument", "Exception on argument #%u: %s", index, exception.what ());
+    common::raise<script::ArgumentException> ("script::detail::get_argument", "Exception on argument #%u: %s", index, exception.what ());
   }
   catch (...)
   {
-    common::Raise<script::ArgumentException> ("script::detail::get_argument", "Exception on argument #%u: unknown", index);
+    common::raise<script::ArgumentException> ("script::detail::get_argument", "Exception on argument #%u: unknown", index);
   }
 }
 
@@ -158,7 +158,7 @@ template <size_t expected_arguments_count>
 inline void check_arguments_count (size_t stack_arguments_count)
 {
   if (stack_arguments_count < expected_arguments_count)
-    common::Raise<script::ArgumentException> ("script::detail::check_arguments_count", "Too few arguments (expected %u, got %u)", expected_arguments_count, stack_arguments_count);
+    common::raise<script::ArgumentException> ("script::detail::check_arguments_count", "Too few arguments (expected %u, got %u)", expected_arguments_count, stack_arguments_count);
 }
 
 /*

@@ -421,7 +421,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       win_style = WS_POPUP;
       break;
     default:
-      RaiseInvalidArgument ("syslib::Win32Platform::CreateWindow", "style", style);
+      raise_invalid_argument ("syslib::Win32Platform::CreateWindow", "style", style);
       return 0;
   }
   
@@ -666,7 +666,7 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
           raise_error ("::SetFocus");
         break;
       default:
-        RaiseInvalidArgument ("", "flag", flag);
+        raise_invalid_argument ("", "flag", flag);
         break;
     }
   }
@@ -710,7 +710,7 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
         return focus_wnd == wnd;
       }
       default:
-        RaiseInvalidArgument ("", "flag", flag);
+        raise_invalid_argument ("", "flag", flag);
         break;
     }
   }  

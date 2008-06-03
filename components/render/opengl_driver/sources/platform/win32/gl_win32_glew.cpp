@@ -106,7 +106,7 @@ void init_wglew_context (const SwapChainDesc& swap_chain_desc, WGLEWContext* wgl
     GLenum status = wglewContextInit (wglew_context);
 
     if (status != GLEW_OK)
-      RaiseInvalidOperation ("wglewContextInit", "%s", glewGetString (status));
+      raise_invalid_operation ("wglewContextInit", "%s", glewGetString (status));
 
       //освобождение ресурсов
 

@@ -28,7 +28,7 @@ SoundDeclarationLibrary::SoundDeclarationLibrary (const char* file_name)
   : impl (new Impl)
 {
   if (!file_name)
-    RaiseNullArgument ("media::SoundDeclarationLibrary::SoundDeclarationLibrary", "file_name");
+    raise_null_argument ("media::SoundDeclarationLibrary::SoundDeclarationLibrary", "file_name");
 
   try
   {
@@ -75,7 +75,7 @@ const char* SoundDeclarationLibrary::Name () const
 void SoundDeclarationLibrary::Rename (const char* name)
 {
   if (!name)
-    RaiseNullArgument ("media::SoundDeclarationLibrary::Rename", name);
+    raise_null_argument ("media::SoundDeclarationLibrary::Rename", name);
     
   impl->name = name;
 }
@@ -170,7 +170,7 @@ void SoundDeclarationLibrary::Load (const char* file_name)
 void SoundDeclarationLibrary::Save (const char* file_name)
 {
   if (!file_name)
-    RaiseNullArgument ("media::SoundDeclarationLibrary::Save", "file_name");
+    raise_null_argument ("media::SoundDeclarationLibrary::Save", "file_name");
     
   try
   {
