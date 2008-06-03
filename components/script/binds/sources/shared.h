@@ -11,6 +11,9 @@
 #include <xtl/bind.h>
 #include <xtl/implicit_cast.h>
 
+#include <mathlib.h>
+#include <math/io.h>
+
 #include <common/strlib.h>
 
 #endif
