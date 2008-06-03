@@ -7,60 +7,60 @@ ClosedFileImpl::ClosedFileImpl ()
   : FileImpl ((size_t)-1)
   { }
   
-void ClosedFileImpl::raise (const char* source)
+void ClosedFileImpl::Raise (const char* source)
 {
   throw FileClosedException (source, "File already closed");
 }
 
 size_t ClosedFileImpl::Read (void*,size_t)
 {
-  raise ("File::Read");
+  Raise ("File::Read");
   return 0;
 }
 
 size_t ClosedFileImpl::Write (const void*,size_t)
 {
-  raise ("File::Write");
+  Raise ("File::Write");
   return 0;
 }
 
 filepos_t ClosedFileImpl::Tell ()
 {
-  raise ("File::Tell");
+  Raise ("File::Tell");
   return 0;
 }
 
 filepos_t ClosedFileImpl::Seek (filepos_t)
 {
-  raise ("File::Seek");
+  Raise ("File::Seek");
   return 0;
 }
 
 void ClosedFileImpl::Rewind ()
 {
-  raise ("File::Rewind");
+  Raise ("File::Rewind");
 }
 
 filesize_t ClosedFileImpl::Size ()
 {
-  raise ("File::Size");
+  Raise ("File::Size");
   return 0;
 }
 
 void ClosedFileImpl::Resize (filesize_t)
 {
-  raise ("File::Resize");
+  Raise ("File::Resize");
 }
 
 bool ClosedFileImpl::Eof ()
 {
-  raise ("File::Eof");
+  Raise ("File::Eof");
   return false;
 }
 
 void ClosedFileImpl::Flush ()
 {
-  raise ("File::Instance");
+  Raise ("File::Instance");
 }
 
 FileImpl* ClosedFileImpl::Instance ()
