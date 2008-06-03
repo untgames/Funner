@@ -1,3 +1,2 @@
 Results of format_test:
 string::format test, x=A, y=12, pi=3.1415
-wstring::format test, x=A, y=12, pi=3.1415

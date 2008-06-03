@@ -28,7 +28,7 @@ int main ()
 //    printf ("Time modify: %s",ctime (&info.time_modify));
 //    printf ("Time create: %s",ctime (&info.time_create));
 //    printf ("Time access: %s",ctime (&info.time_access));
-  }
+  }  
 
   return 0;
 }

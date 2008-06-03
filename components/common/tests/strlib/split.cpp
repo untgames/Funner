@@ -31,9 +31,9 @@ int main ()
       {"hello (my world}world"," }"," \t","(}"},
   };
   
-  static const int tests_count = sizeof (test) / sizeof (*test);
+  static const size_t tests_count = sizeof (test) / sizeof (*test);
   
-  for (int i=0;i<tests_count;i++)
+  for (size_t i=0;i<tests_count;i++)
   {
     vector<string> tokens = split (test [i].str,test [i].delimiters,test [i].spaces, test [i].brackets);
     

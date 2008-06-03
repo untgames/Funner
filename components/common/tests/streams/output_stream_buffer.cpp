@@ -1,6 +1,6 @@
 #include "shared.h"
 
-size_t write (const void* buffer, size_t size)
+size_t my_write (const void* buffer, size_t size)
 {
   size_t result = size;
 
@@ -33,7 +33,7 @@ int main ()
   
   try
   {   
-    OutputStreamBuffer buffer (&write, 10);
+    OutputStreamBuffer buffer (&my_write, 10);
     
     test_write (buffer, "Hello world");
     

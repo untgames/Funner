@@ -1,6 +1,6 @@
 #include "shared.h"
 
-size_t read (void* buffer, size_t size)
+size_t my_read (void* buffer, size_t size)
 {
   char src [3] = {'A', 'B', 'C'};
   
@@ -34,7 +34,7 @@ int main ()
   
   try
   {
-    InputStreamBuffer buffer (&read, 10);
+    InputStreamBuffer buffer (&my_read, 10);
     
     test_read (buffer, 12);
 

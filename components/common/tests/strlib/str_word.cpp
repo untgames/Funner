@@ -17,7 +17,7 @@ int main ()
 {
   printf ("Results of str_word_test:\n");
   
-  Test test [] = {
+  static Test test [] = {
       {"hello world"," "," \t"},
       {"hello, world",","," \t"},
       {"hello,world",","," \t"},
@@ -29,16 +29,16 @@ int main ()
       {"hello world",""," \t"}
   };
   
-  const int tests_count = 9;
+  const size_t tests_count = sizeof (test)/sizeof (*test);
   
-  for (int i=0;i<tests_count;i++)
+  for (size_t i=0;i<tests_count;i++)
   {
     const Test& this_test = test [i];
     
     printf ("split '%s' (delimiters='%s', spaces='%s'): {",
             this_test.str, decompress (this_test.delimiters).c_str (), decompress (this_test.spaces).c_str ());
 
-    for (int j=0; j<MAX_WORDS; j++)
+    for (size_t j=0; j<MAX_WORDS; j++)
       printf ("'%s' ", word (this_test.str, j, this_test.delimiters, this_test.spaces).c_str ());
 
     printf ("}\n");

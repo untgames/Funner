@@ -27,15 +27,17 @@ int main ()
   {
     AManager::RegisterLoader ("ext", &my_loader);
     AManager::RegisterSaver  ("ext", &my_saver);
+    
+    A a;
 
-    AManager::GetLoader ("ext")("test", A ());
-    AManager::GetSaver ("ext")("test", A ());
+    AManager::GetLoader ("ext")("test", a);
+    AManager::GetSaver ("ext")("test", a);
     
     AManager::UnregisterAllLoaders ();
     
-    AManager::GetSaver ("my.ext", SerializerFindMode_ByName)("test", A ());    
+    AManager::GetSaver ("my.ext", SerializerFindMode_ByName)("test", a);
     
-    AManager::GetLoader ("ext")("test", A ());
+    AManager::GetLoader ("ext")("test", a);
   }
   catch (std::exception& exception)
   {

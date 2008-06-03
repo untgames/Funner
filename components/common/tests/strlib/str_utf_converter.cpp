@@ -49,7 +49,9 @@ void dump (const void* buffer, size_t length, Encoding encoding)
         printf ("%C", (s [i]>>8)|((s [i]<<8)&0xFF00));
 
       break;    
-    }    
+    }
+    default:
+      break;
   }
 }
 
@@ -108,17 +110,17 @@ int main()
   
   try
   {  
-    const char* source_file_name [4] = {"data\\ansi.txt", "data\\utf8.txt", "data\\utf16le.txt","data\\utf16be.txt"};
+    const char* source_file_name [4] = {"data/ansi.txt", "data/utf8.txt", "data/utf16le.txt","data/utf16be.txt"};
     Encoding    source_encoding [4]  = {Encoding_ASCII7, Encoding_UTF8, Encoding_UTF16LE, Encoding_UTF16BE};
 
     for (size_t i=0; i<4; i++)
       test_utf_converter (source_file_name [i], source_encoding [i]);
 
-    wchar_t *wc=L"Hello World!!! Привет Мир";
-    char     *c="Hello World!!! Привет Мир";
+    const wchar_t* wc = L"Hello World!!!";
+    const char*    c = "Hello World!!!";
 
-    printf("wchar->char %s\n", tostring (wc).c_str());
-    printf("wchar->char %S\n", towstring (c).c_str ());
+    printf ("wchar->char %s\n", tostring (wc).c_str());
+    printf ("wchar->char %S\n", towstring (c).c_str ());
   }
   catch (std::exception& exception)
   {

@@ -3,6 +3,7 @@
 #include <stl/vector>
 #include <stl/insert_iterators.h>
 #include <mathlib.h>
+#include <math/io.h>
 #include <stdio.h>
 
 using namespace common;
