@@ -309,7 +309,7 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
-		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) | unix2dos > $$(patsubst %,"$(CURDIR)/%",$$@)
+		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
@@ -318,7 +318,7 @@ define process_tests_source_dir
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
 		@echo Checking results of module '$2'...
-		@$$(call for_each_file,file,$$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)),diff --text --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file)
+		@$$(call for_each_file,file,$$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)),diff --strip-trailing-cr --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file)
 endef
 
 #Обработка цели test-suite (имя цели)
