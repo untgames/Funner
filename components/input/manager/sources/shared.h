@@ -21,6 +21,7 @@
 #include <common/strlib.h>
 #include <common/parser.h>
 #include <common/xml_writer.h>
+#include <common/component.h>
 
 #include <input/low_level/device.h>
 #include <input/low_level/driver.h>
@@ -66,43 +67,6 @@ class EventTranslator: public TranslationMap::Translator
     stl::string              str_event_replacement;
     stl::string              str_tag;
 };
-
-/*
-   Менеджер таблиц трансляции
-*/
-
-class TranslationMapManagerImpl
-{
-  public:
-    TranslationMapManagerImpl ();
-
-/*
-   Работа с пользовательскими функциями загрузки и сохранения
-*/
-    void RegisterLoader       (const char* extension, const input::TranslationMapManager::LoadHandler& handler);
-    void RegisterSaver        (const char* extension, const input::TranslationMapManager::SaveHandler& handler);
-    void UnregisterLoader     (const char* extension);
-    void UnregisterSaver      (const char* extension);
-    void UnregisterAllLoaders ();
-    void UnregisterAllSavers  ();
-    void UnregisterAll        ();
-
-    void Load (const char* file_name,       input::TranslationMap&) const;
-    void Save (const char* file_name, const input::TranslationMap&) const;
-
-  private:
-    typedef stl::hash_map<stl::hash_key<const char*>, input::TranslationMapManager::LoadHandler> LoadHandlersMap;
-    typedef stl::hash_map<stl::hash_key<const char*>, input::TranslationMapManager::SaveHandler> SaveHandlersMap;
-
-  private:
-    LoadHandlersMap load_handlers;
-    SaveHandlersMap save_handlers;
-};
-
-typedef common::Singleton<TranslationMapManagerImpl> TranslationMapManagerSingleton;
-
-void translation_map_loader (const char* file_name, TranslationMap& target_map);
-void translation_map_saver  (const char* file_name, const TranslationMap& source_map);
 
 void split_event (const char* event, stl::vector<stl::string>& target_arguments);
 

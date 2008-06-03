@@ -45,7 +45,6 @@ struct ControlsDetector::Impl : public xtl::reference_counter
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
    Impl  () {}
-   Impl  (const char* file_name) {Load (file_name);}
    ~Impl () {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,19 +107,6 @@ struct ControlsDetector::Impl : public xtl::reference_counter
     {
       DetectFunctor functor (this, action, handler);
       return source.RegisterHandler (functor);
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сохранение / загрузка
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Load (const char* file_name)
-    {
-      raise_not_implemented ("input::ControlsDetector::Load");
-    }
-
-    void Save (const char* file_name)
-    {
-      raise_not_implemented ("input::ControlsDetector::Save");
     }
 
   private:
@@ -324,7 +310,9 @@ void ControlsDetector::Load (const char* file_name)
   if (!file_name)
     raise_null_argument ("input::ControlsDetector::Load", "file_name");
 
-  impl->Load (file_name);
+  static ComponentLoader loader ("input.loaders.*");
+
+  ControlsDetectorManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, *this);
 }
 
 void ControlsDetector::Save (const char* file_name)
@@ -332,7 +320,9 @@ void ControlsDetector::Save (const char* file_name)
   if (!file_name)
     raise_null_argument ("input::ControlsDetector::Save", "file_name");
 
-  impl->Save (file_name);
+  static ComponentLoader loader ("input.savers.*");
+
+  ControlsDetectorManager::GetSaver (file_name, SerializerFindMode_ByName) (file_name, *this);
 }
 
 /*

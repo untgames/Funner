@@ -3,6 +3,8 @@
 
 #include <xtl/functional_fwd>
 
+#include <common/serializer_manager.h>
+
 namespace xtl
 {
 
@@ -93,23 +95,8 @@ void swap (TranslationMap&, TranslationMap&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер таблиц трансляции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class TranslationMapManager
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с пользовательскими функциями загрузки и сохранения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const char* file_name,       TranslationMap&)> LoadHandler;
-    typedef xtl::function<void (const char* file_name, const TranslationMap&)> SaveHandler;
-
-    static void RegisterLoader       (const char* extension, const LoadHandler& handler);
-    static void RegisterSaver        (const char* extension, const SaveHandler& handler);
-    static void UnregisterLoader     (const char* extension);
-    static void UnregisterSaver      (const char* extension);
-    static void UnregisterAllLoaders ();
-    static void UnregisterAllSavers  ();
-    static void UnregisterAll        ();
-};
+typedef common::ResourceSerializerManager<void (const char* file_name, TranslationMap& map), 
+                                          void (const char* file_name, const TranslationMap& map)> TranslationMapManager;
 
 }
 

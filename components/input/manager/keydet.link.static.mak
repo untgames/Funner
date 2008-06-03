@@ -1,6 +1,4 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.INCLUDE_DIRS     := include
-export.LIBS             := input.low_level
-export.IMPORTS	        := ../../common/exports.static.mak
+export.LINK_INCLUDES := KeydetLoader KeydetSaver

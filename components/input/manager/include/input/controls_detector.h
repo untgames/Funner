@@ -3,6 +3,10 @@
 
 #include <input/events_source.h>
 
+#include <xtl/iterator.h>
+
+#include <common/serializer_manager.h>
+
 namespace input
 {
 
@@ -80,6 +84,12 @@ class ControlsDetector
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (ControlsDetector&, ControlsDetector&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер определителей контролов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef common::ResourceSerializerManager<void (const char* file_name, ControlsDetector& map), 
+                                          void (const char* file_name, const ControlsDetector& map)> ControlsDetectorManager;
 
 }
 

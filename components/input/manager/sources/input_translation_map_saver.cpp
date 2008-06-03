@@ -3,7 +3,7 @@
 using namespace input;
 using namespace common;
 
-namespace input
+namespace
 {
 
 void translation_map_saver (const char* file_name, const TranslationMap& source_map)
@@ -25,6 +25,27 @@ void translation_map_saver (const char* file_name, const TranslationMap& source_
     if (*tag)
       writer.WriteAttribute ("Tag", tag);
   }
+}
+
+/*
+   Компонент сохранения карт трансляции
+*/
+
+class KeymapSaverComponent
+{
+  public:
+    //загрузка компонента
+    KeymapSaverComponent () 
+    {
+      TranslationMapManager::RegisterSaver ("keymap", &translation_map_saver);
+    }
+};
+
+extern "C"
+{
+
+ComponentRegistrator<KeymapSaverComponent> KeymapSaver ("input.savers.keymap");
+
 }
 
 }

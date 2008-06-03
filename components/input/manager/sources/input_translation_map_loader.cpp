@@ -3,7 +3,7 @@
 using namespace input;
 using namespace common;
 
-namespace input
+namespace
 {
 
 void translation_map_loader (const char* file_name, TranslationMap& target_map)
@@ -32,6 +32,27 @@ void translation_map_loader (const char* file_name, TranslationMap& target_map)
 
     target_map.Add (event, replacement, tag);
   }
+}
+
+/*
+   Компонент загрузки карт трансляции
+*/
+
+class KeymapLoaderComponent
+{
+  public:
+    //загрузка компонента
+    KeymapLoaderComponent () 
+    {
+      TranslationMapManager::RegisterLoader ("keymap", &translation_map_loader);
+    }
+};
+
+extern "C"
+{
+
+ComponentRegistrator<KeymapLoaderComponent> KeymapLoader ("input.loaders.keymap");
+
 }
 
 }

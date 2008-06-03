@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<ControlsDetector>
+  <Filter Action="Action1" InputEventMask="* axis *" Replacement="action1 {2}"/>
+  <Filter Action="Action1" InputEventMask="* down"   Replacement="action1 1"/>
+  <Filter Action="Action1" InputEventMask=""         Replacement="action1 empty event"/>
+</ControlsDetector>

@@ -190,7 +190,9 @@ TranslationMap::TranslationMap (const char* file_name)
   if (!file_name)
     raise_null_argument ("input::TranslationMap::TranslationMap", "file_name");
 
-  TranslationMapManagerSingleton::Instance ().Load (file_name, *this);
+  static ComponentLoader loader ("input.loaders.*");
+
+  TranslationMapManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, *this);
 }
 
 TranslationMap::TranslationMap (const TranslationMap& source)
@@ -283,7 +285,9 @@ void TranslationMap::Save (const char* file_name)
   if (!file_name)
     raise_null_argument ("input::TranslationMap::Save", "file_name");
 
-  TranslationMapManagerSingleton::Instance ().Save (file_name, *this);
+  static ComponentLoader loader ("input.savers.*");
+
+  TranslationMapManager::GetSaver (file_name, SerializerFindMode_ByName) (file_name, *this);
 }
 
 /*
