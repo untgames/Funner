@@ -193,7 +193,7 @@ void get_int_printf_format (const char*& format, bool sign, char buffer [FORMAT_
       break;
   }
 
-  string_wrappers::snprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%u%c",
+  xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%u%c",
                              *format == '0' ? "0" : "", strlen (format), base_format);
 }
 
@@ -207,7 +207,7 @@ void write_int (OutputTextStream& stream, unsigned int value, const char* format
 
   get_int_printf_format (format, sign, format_buffer);
 
-  string_wrappers::snprintf (value_buffer, sizeof (value_buffer), format_buffer, value);
+  xtl::xsnprintf (value_buffer, sizeof (value_buffer), format_buffer, value);
 
   stream.Write (value_buffer);
 }
@@ -258,12 +258,12 @@ void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SI
     const char* frac_format = dot + 1;
     size_t      frac_size   = strlen (frac_format);
     
-    string_wrappers::snprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%u.%uf",
+    xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%u.%uf",
                              *format == '0' ? "0" : "", dot - format + frac_size + 1, frac_size);
   }
   else
   {
-    string_wrappers::snprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%ug",
+    xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%ug",
                              *format == '0' ? "0" : "", strlen (format));
   }
 }
@@ -279,7 +279,7 @@ void write (OutputTextStream& stream, double value, const char* format)
 
   get_float_printf_format (format, format_buffer);
 
-  string_wrappers::snprintf (value_buffer, sizeof (value_buffer), format_buffer, value);
+  xtl::xsnprintf (value_buffer, sizeof (value_buffer), format_buffer, value);
 
   stream.Write (value_buffer);  
 }

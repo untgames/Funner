@@ -1,5 +1,6 @@
 #include <wchar.h>
 #include <string.h>
+#include <stl/string>
 #include <common/utf_converter.h>
 #include <common/exception.h>
 
@@ -513,35 +514,31 @@ void convert_encoding(Encoding       source_encoding,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 stl::wstring towstring (const char* string, int length)
 {
-   if(string==NULL)
-      throw ArgumentNullException("towstring","string is null");
   if (!string)
-    return L"";
+    raise_null_argument ("common::towstring", "string");
 
   if (length == -1)
     length = strlen (string);
 
   stl::wstring result;
 
-  int result_size = (int)mbstowcs (0, string, length);
+  result.fast_resize (length);
 
-  if (result_size == -1)
+  int result_size =mbstowcs (&result [0], string, length);
+
+  if (result_size < 0)
     return L"(common::towstring error)";
 
-  if (!result_size)
-    return L"";
-
   result.fast_resize (result_size);
-
-  mbstowcs (&result [0], string, length);
 
   return result;
 }
 
 stl::wstring towstring (const char* string)
 {
-   if(string==NULL)
-      throw ArgumentNullException("towstring","string is null");
+  if (!string)
+     raise_null_argument ("common::towstring", "string");
+
   return towstring (string, -1);
 }
 
@@ -555,35 +552,31 @@ stl::wstring towstring (const stl::string& string)
 
 stl::string tostring (const wchar_t* string, int length)
 {
-   if(string==NULL)
-      throw ArgumentNullException("tostring","string is null");
   if (!string)
-    return "";
+    raise_null_argument ("common::tostring", "string");
 
   if (length == -1)
     length = wcslen (string);
 
-  stl::string result;
+  stl::string result;  
+  
+  result.fast_resize (length * 4);
 
-  int result_size = (int)wcstombs (0, string, length);
-
-  if (result_size == -1)
+  int result_size = wcstombs (&result [0], string, length);
+  
+  if (result_size < 0)
     return "(common::tostring error)";
 
-  if (!result_size)
-    return "";
-
   result.fast_resize (result_size);
-
-  wcstombs (&result [0], string, length);
 
   return result;
 }
 
 stl::string tostring (const wchar_t* string)
 {
-   if(string==NULL)
-      throw ArgumentNullException("tostring","string is null");
+  if (!string)
+    raise_null_argument ("common::tostring", "string");
+
   return tostring (string, -1);
 }
 

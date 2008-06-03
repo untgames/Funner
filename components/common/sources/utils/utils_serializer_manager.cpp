@@ -126,7 +126,7 @@ class SerializerManagerImpl
       {
         if (raise_exception)
           raise<ArgumentException> (METHOD_NAME, "Invalid argument <name>='%s'. "
-            "No serializer with this extension for signature %s", name, signature.name ());
+            "No serializer with this extension found (check signature)", name);
 
         return 0;
       }

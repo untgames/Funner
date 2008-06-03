@@ -3,6 +3,7 @@
 #include <common/file.h>
 #include <common/component.h>
 #include <common/strlib.h>
+#include <common/hash.h>
 
 #include <stl/hash_map>
 #include <stl/vector>
@@ -153,7 +154,7 @@ ZipFileSystem::ZipFileSystem (const char* path)
       item.info.time_access = 0;
       item.info.time_modify = 0;
 
-      entry_map [strihash (file_name)] = entries.size ();
+      entry_map [strihash (file_name.c_str ())] = entries.size ();
 
       entries.push_back (item);      
     }

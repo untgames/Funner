@@ -1,9 +1,32 @@
 #ifndef COMMLIB_DEFAULT_PLATFORM_HEADER
 #define COMMLIB_DEFAULT_PLATFORM_HEADER
 
-#include <platform/platform.h>
+#include <stdio.h>
+#include <errno.h>
+#include <sys/stat.h>
+#include <malloc.h>
+
+#ifdef _MSC_VER
+  #include <io.h>
+  #include <direct.h>
+
+  #pragma warning (disable : 4996) //declare deprecated
+
+#elif __GNUC__
+  #include <unistd.h>
+#else
+  #error Unknown compiler
+#endif
+
+#include <xtl/function.h>
+
 #include <common/heap.h>
 #include <common/file.h>
+#include <common/exception.h>
+#include <common/strlib.h>
+#include <common/singleton.h>
+
+#include <platform/platform.h>
 
 namespace common
 {

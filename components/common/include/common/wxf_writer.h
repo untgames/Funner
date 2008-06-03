@@ -2,6 +2,7 @@
 #define COMMONLIB_WXF_WRITER_HEADER
 
 #include <common/streams.h>
+#include <string.h>
 
 namespace common
 {

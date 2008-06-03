@@ -66,7 +66,7 @@ FileSystemImpl::~FileSystemImpl ()
 {
   CloseAllFiles ();
   RemoveAllSearchPaths ();
-  UnmountAll ();  
+  UnmountAll ();
 }
 
 /*
@@ -216,7 +216,7 @@ void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,cons
 
   type.erase (type.begin ());
 
-  size_t path_hash = strhash (path), type_hash = strhash (type);
+  volatile size_t path_hash = strhash (path.c_str ()), type_hash = strhash (type.c_str ());
     
   for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
     if (i->file_name_hash == path_hash)
@@ -232,7 +232,7 @@ void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,cons
       {        
         ICustomFileSystemPtr pack_file_system (i->creater (path.c_str ()),false);
 
-        pack_files.push_front (PackFile (strihash (path),search_path_hash,pack_file_system));
+        pack_files.push_front (PackFile (strihash (path.c_str ()),search_path_hash,pack_file_system));
 
         return;
       }
@@ -275,7 +275,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
     return;
   }
   
-  size_t path_hash = strhash (path);
+  size_t path_hash = strhash (path.c_str ());
 
   if (file_info.is_dir)
   {
@@ -311,7 +311,7 @@ void FileSystemImpl::RemoveSearchPath (const char* _path)
   if (path [0] != '/')
     path = format ("%s/%s",default_path.c_str (),path.c_str ());
 
-  size_t hash = strhash (path);
+  size_t hash = strhash (path.c_str ());
     
   for (SearchPathList::iterator i=search_paths.begin ();i!=search_paths.end ();++i)
     if (i->hash == hash)
@@ -356,7 +356,7 @@ void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystemPtr file_s
     raise_invalid_argument ("FileSystem::Mount","path_prefix",_path_prefix,"Mount path must start from '/'");
 
   string prefix = FileSystem::GetNormalizedFileName (_path_prefix);
-  size_t hash   = strhash (prefix);
+  size_t hash   = strhash (prefix.c_str ());
 
   prefix += '/';
 
@@ -375,7 +375,7 @@ void FileSystemImpl::Unmount (const char* _path_prefix)
     return;
         
   string prefix = FileSystem::GetNormalizedFileName (_path_prefix);
-  size_t hash   = strhash (prefix);
+  size_t hash   = strhash (prefix.c_str ());
 
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
     if (i->hash == hash && !strncmp (prefix.c_str (),i->prefix.c_str (),i->prefix.size ()-1))
@@ -415,7 +415,7 @@ bool FileSystemImpl::IsPathMount (const char* path) const
     return false;
         
   string prefix = FileSystem::GetNormalizedFileName (path);
-  size_t hash   = strhash (prefix);
+  size_t hash   = strhash (prefix.c_str ());
 
   for (MountList::const_iterator i=mounts.begin ();i!=mounts.end ();++i)
     if (i->hash == hash && !strncmp (prefix.c_str (),i->prefix.c_str (),i->prefix.size ()-1))
@@ -434,7 +434,7 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
 
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
   {
-    if (!string_wrappers::strnicmp (i->prefix.c_str (),file_name,i->prefix.size ()-1))
+    if (!xtl::xstrnicmp (i->prefix.c_str (),file_name,i->prefix.size ()-1))
     {
       switch (file_name [i->prefix.size ()-1])
       {
@@ -524,7 +524,7 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
 
   try
   {    
-    ICustomFileSystem::file_t file = file_system->FileOpen (file_name.c_str (),mode_flags,buffer_size);
+    volatile ICustomFileSystem::file_t file = file_system->FileOpen (file_name.c_str (),mode_flags,buffer_size);
     
     try
     {

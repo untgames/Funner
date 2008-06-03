@@ -806,7 +806,7 @@ void Heap::Deallocate (void* p)
     return;
 
   unsigned char* block = (unsigned char*)p - sizeof (BlockTag);
-  AllocNode*     node  = (AllocNode*)(block - sizeof (AllocNode*)); //переменная используется не во всех ветвях  
+  AllocNode*     node  = (AllocNode*)(block - sizeof (AllocNode*)); //переменная используется не во всех ветвях    
   
   switch (*(BlockTag*)block)
   {
@@ -848,7 +848,7 @@ void Heap::Deallocate (void* p)
     default:
      //call user handler
      break;
-  }  
+  }
 }
 
 size_t Heap::Size (void* p) const

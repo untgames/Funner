@@ -4,6 +4,7 @@
 #include <xtl/token_iterator.h>
 //#include <math/io.h>
 #include <string.h>
+#include <stdarg.h>
 
 namespace common
 {

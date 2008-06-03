@@ -37,9 +37,9 @@ class OutputStreamBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OutputStreamBuffer  (size_t buffer_size = DEFAULT_BUFFER_SIZE);
-    OutputStreamBuffer  (const WriteFunction& writer, size_t buffer_size = DEFAULT_BUFFER_SIZE);
-    ~OutputStreamBuffer ();
+    explicit OutputStreamBuffer  (size_t buffer_size = DEFAULT_BUFFER_SIZE);
+    explicit OutputStreamBuffer  (const WriteFunction& writer, size_t buffer_size = DEFAULT_BUFFER_SIZE);
+             ~OutputStreamBuffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запись
@@ -105,9 +105,9 @@ class InputStreamBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    InputStreamBuffer  (size_t buffer_size = DEFAULT_BUFFER_SIZE);
-    InputStreamBuffer  (const ReadFunction& reader, size_t buffer_size = DEFAULT_BUFFER_SIZE);
-    ~InputStreamBuffer ();
+    explicit InputStreamBuffer  (size_t buffer_size = DEFAULT_BUFFER_SIZE);
+    explicit InputStreamBuffer  (const ReadFunction& reader, size_t buffer_size = DEFAULT_BUFFER_SIZE);
+             ~InputStreamBuffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение
@@ -173,9 +173,9 @@ class OutputTextStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OutputTextStream  (size_t buffer_size = OutputStreamBuffer::DEFAULT_BUFFER_SIZE);
-    OutputTextStream  (const WriteFunction& writer, size_t buffer_size = OutputStreamBuffer::DEFAULT_BUFFER_SIZE);
-    ~OutputTextStream ();
+    explicit OutputTextStream  (size_t buffer_size = OutputStreamBuffer::DEFAULT_BUFFER_SIZE);
+    explicit OutputTextStream  (const WriteFunction& writer, size_t buffer_size = OutputStreamBuffer::DEFAULT_BUFFER_SIZE);
+             ~OutputTextStream ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буфер потока

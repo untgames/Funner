@@ -1,6 +1,6 @@
 #include <common/hash.h>
 #include <common/file.h>
-#include <common/strwrap.h>
+#include <xtl/string.h>
 #include "context.h"
 #include "dispatch.h"
 
@@ -266,7 +266,7 @@ void ParseContext::Resize (size_t size)
   {
     char buf [128];
     
-    string_wrappers::snprintf (buf,sizeof (buf),"Buffer can not be enlarged by %u bytes (cur_size=%u, max_size=%u)",
+    xtl::xsnprintf (buf,sizeof (buf),"Buffer can not be enlarged by %u bytes (cur_size=%u, max_size=%u)",
                size,cur_size,MAX_ATTR_BUF_SIZE);
     
     throw ParseBufferTooLargeException (buf);

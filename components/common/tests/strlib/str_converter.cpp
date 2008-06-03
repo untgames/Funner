@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <locale.h>
 
 #include <stl/string>
 
@@ -76,13 +75,7 @@ void test_converter (const char* file_name, const char* source_encoding)
 int main ()
 {
   printf ("Results of string_converter_test:\n");  
-  
-  if (!setlocale (LC_ALL, ".1251"))
-  {
-    printf ("Error at set locale\n");
-    return 0;
-  }
-  
+
   try
   {  
     const char* source_file_name [4] = {"data\\ansi.txt", "data\\utf8.txt", "data\\utf16le.txt","data\\utf16be.txt"};

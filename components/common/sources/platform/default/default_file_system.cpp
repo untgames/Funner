@@ -1,23 +1,4 @@
-#include <stdio.h>
-#include <errno.h>
-#include <sys/stat.h>
-
 #include "shared.h"
-#include <common/exception.h>
-#include <common/strlib.h>
-#include <xtl/function.h>
-
-#ifdef _MSC_VER
-  #include <io.h>
-  #include <direct.h>
-  
-  #pragma warning (disable : 4996) //declare deprecated
-
-#elif __GNUC__
-  #include <unistd.h>
-#else
-  #error Unknown compiler
-#endif
 
 using namespace common;
 using namespace stl;
@@ -176,7 +157,7 @@ filesize_t StdioFileSystem::FileSize (file_t file)
 
 void StdioFileSystem::FileResize (file_t file,filesize_t new_size)
 {
-#ifdef _WIN32
+#ifdef _MSC_VER
   if (chsize (fileno ((FILE*)file),new_size) == -1)
   {
     switch (errno)
@@ -243,7 +224,7 @@ void StdioFileSystem::Rename (const char* file_name,const char* new_name)
 
 void StdioFileSystem::Mkdir (const char* dir_name)
 {
-#ifdef _WIN32
+#ifdef _MSC_VER
   if (mkdir (dir_name))
   {
     switch (errno)
@@ -289,7 +270,7 @@ bool StdioFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
     Поиск файлов
 */
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 
 void StdioFileSystem::Search (const char* mask,const FileSearchHandler& insert_handler)
 {

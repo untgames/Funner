@@ -53,15 +53,14 @@ void md5 (unsigned char result_hash_value [16],const void* buf,size_t len);
     Хэширование строк
 */
 
-size_t strhash  (const char*,size_t init_hash=0xFFFFFFFF);
-size_t strihash (const char*,size_t init_hash=0xFFFFFFFF);
-size_t strhash  (const wchar_t*,size_t init_hash=0xFFFFFFFF);
-size_t strihash (const wchar_t*,size_t init_hash=0xFFFFFFFF);
+size_t strhash   (const char*,size_t init_hash=0xFFFFFFFF);
+size_t strihash  (const char*,size_t init_hash=0xFFFFFFFF);
+size_t strhash   (const wchar_t*,size_t init_hash=0xFFFFFFFF);
+size_t strihash  (const wchar_t*,size_t init_hash=0xFFFFFFFF);
 size_t strnhash  (const char*,size_t length,size_t init_hash=0xFFFFFFFF);
 size_t strnihash (const char*,size_t length,size_t init_hash=0xFFFFFFFF);
 size_t strnhash  (const wchar_t*,size_t length,size_t init_hash=0xFFFFFFFF);
 size_t strnihash (const wchar_t*,size_t length,size_t init_hash=0xFFFFFFFF);
-
 
 }
 

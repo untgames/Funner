@@ -1,4 +1,3 @@
-#include <common/strwrap.h>
 #include "wxf_lexer.h"
 #include "context.h"
 #include "dispatch.h"

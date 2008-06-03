@@ -48,7 +48,7 @@ class UnistdPlatform: public DefaultPlatform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef _MSC_VER
   typedef DefaultPlatform Platform;
-#elif defined (__GNUC__)
+#elif defined __GNUC__
   typedef UnistdPlatform Platform;
 #else
   #error Unknown compiler

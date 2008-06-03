@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <locale.h>
 
 #include <stl/string>
 
@@ -100,14 +99,8 @@ void test_utf_converter (const char* file_name, Encoding source_encoding)
 
 int main()
 {
-  printf ("Results of utf_converter_test:\n");  
-  
-  if (!setlocale (LC_ALL, ".1251"))
-  {
-    printf ("Error at set locale\n");
-    return 0;
-  }
-  
+  printf ("Results of str_utf_converter_test:\n");  
+ 
   try
   {  
     const char* source_file_name [4] = {"data/ansi.txt", "data/utf8.txt", "data/utf16le.txt","data/utf16be.txt"};
@@ -118,7 +111,7 @@ int main()
 
     const wchar_t* wc = L"Hello World!!!";
     const char*    c = "Hello World!!!";
-
+    
     printf ("wchar->char %s\n", tostring (wc).c_str());
     printf ("wchar->char %S\n", towstring (c).c_str ());
   }

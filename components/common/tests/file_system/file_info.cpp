@@ -6,7 +6,7 @@ const char* file_names [] = {"data","data/test.txt"};
 int main ()
 {
   printf ("Results of file_info_test:\n");
-
+  
   FileInfo info;
   
   for (size_t i=0;i<sizeof (file_names)/sizeof (const char*);i++)

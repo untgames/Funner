@@ -16,7 +16,7 @@ CustomFileImpl::CustomFileImpl (ICustomFileSystemPtr _file_system,const char* _f
 }
 
 CustomFileImpl::CustomFileImpl (ICustomFileSystemPtr _file_system,file_t _handle,filemode_t mode_flags,bool _auto_close)
-  : FileImpl (mode_flags), auto_close (_auto_close), file_system (_file_system), file_handle (_handle)
+  : FileImpl (mode_flags), file_system (_file_system), file_handle (_handle), auto_close (_auto_close)
 {
   if (!_file_system)
     raise_null_argument ("CustomFileImpl::CustomFileImpl","file_system");

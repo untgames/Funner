@@ -1,16 +1,19 @@
 #ifndef STREAMS_SHARED_HEADER
 #define STREAMS_SHARED_HEADER
 
+#include <string.h>
+
+#include <stl/stack>
+#include <stl/string>
+
+#include <xtl/function.h>
+#include <xtl/string.h>
+
 #include <common/streams.h>
 #include <common/wxf_writer.h>
 #include <common/xml_writer.h>
 #include <common/exception.h>
-#include <common/strwrap.h>
 #include <common/file.h>
-#include <stl/stack>
-#include <stl/string>
-#include <xtl/function.h>
-#include <string.h>
 
 namespace common
 {

@@ -297,7 +297,7 @@ void FileListBuilder::InsertSubname (const char* file_name,size_t file_name_size
 
 inline bool CompareItems (const FileListItem& a,const FileListItem& b)
 {
-  return string_wrappers::strcmp (a.name,b.name) < 0;
+  return xtl::xstrcmp (a.name,b.name) < 0;
 }
 
 FileList FileListBuilder::Build (bool need_sort)

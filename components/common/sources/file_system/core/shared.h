@@ -17,6 +17,7 @@
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/reference_counter.h>
+#include <xtl/string.h>
 
 #include <memory.h>
 
@@ -319,7 +320,7 @@ class MountPointFileSystem: public ICustomFileSystem
     void       Release     () {}
     
   private:
-    MountFileSystem& owner; //владелец
+    MountFileSystem* owner; //владелец
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -329,7 +330,7 @@ struct MountFileSystem
 {
   size_t                hash;                    //хэш префикса точки монтирования
   stl::string           prefix;                  //префикс точки монтирования
-  ICustomFileSystemPtr   file_system;             //интерфейс файловой системы
+  ICustomFileSystemPtr  file_system;             //интерфейс файловой системы
   FileInfo              mount_point_info;        //информация о точке монтирования
   MountPointFileSystem  mount_point_file_system; //фиктивная файловая система
 

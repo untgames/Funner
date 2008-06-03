@@ -114,6 +114,8 @@ size_t strihash (const char* s,size_t init_hash)
   return hash;
 }
 
+#ifndef __GNUC__
+
 size_t strihash (const wchar_t* s,size_t init_hash)
 {
   if (!s)
@@ -125,6 +127,8 @@ size_t strihash (const wchar_t* s,size_t init_hash)
 
   return hash;
 }
+
+#endif
 
 size_t strnhash (const char* s,size_t length,size_t init_hash)
 {
@@ -154,6 +158,8 @@ size_t strnihash (const char* s,size_t size,size_t init_hash)
   return hash;
 }
 
+#ifndef __GNUC__
+
 size_t strnihash (const wchar_t* s,size_t size,size_t init_hash)
 {
   if (!s)
@@ -165,5 +171,7 @@ size_t strnihash (const wchar_t* s,size_t size,size_t init_hash)
 
   return hash;
 }
+
+#endif
 
 }

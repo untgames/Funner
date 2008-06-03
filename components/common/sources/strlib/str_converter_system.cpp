@@ -5,7 +5,6 @@
 
 #include <common/singleton.h>
 #include <common/utf_converter.h>
-#include <common/strwrap.h>
 #include <common/strconv.h>
 #include <common/exception.h>
 

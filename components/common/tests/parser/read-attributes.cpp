@@ -1,10 +1,13 @@
-#include <common/parser.h>
-#include <common/strlib.h>
+#include <stdio.h>
+
 #include <stl/vector>
 #include <stl/insert_iterators.h>
+
 #include <mathlib.h>
 #include <math/io.h>
-#include <stdio.h>
+
+#include <common/parser.h>
+#include <common/strlib.h>
 
 using namespace common;
 using namespace stl;

@@ -1,5 +1,5 @@
 #include <common/parser.h>
-#include <common/strwrap.h>
+#include <xtl/string.h>
 #include <new>
 #include <stdio.h>
 
@@ -147,7 +147,7 @@ void ParseLog::Impl::InsertMessage
     
   if (type != PARSE_LOG_FATAL_ERROR)
   {
-    size_t size = string_wrappers::vsnprintf (NULL,0,format,list) + string_wrappers::snprintf (NULL,0,"%s(%u): %s: ",file_name,line,message_type_string);
+    size_t size = xtl::xvsnprintf (NULL,0,format,list) + xtl::xsnprintf (NULL,0,"%s(%u): %s: ",file_name,line,message_type_string);
     
     if (size == (size_t)-1)
       return;
@@ -163,7 +163,7 @@ void ParseLog::Impl::InsertMessage
   }
   else
   {    
-    size_t size = string_wrappers::vsnprintf (NULL,0,format,list) + string_wrappers::snprintf (NULL,0,"%s: ",message_type_string);
+    size_t size = xtl::xvsnprintf (NULL,0,format,list) + xtl::xsnprintf (NULL,0,"%s: ",message_type_string);
     
     if (size == (size_t)-1)
       return;

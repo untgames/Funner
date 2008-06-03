@@ -5,7 +5,7 @@ using namespace common;
 using namespace xtl;
 
 MountPointFileSystem::MountPointFileSystem (MountFileSystem& _owner)
-  : owner (_owner)
+  : owner (&_owner)
   { }
 
 MountPointFileSystem::file_t MountPointFileSystem::FileOpen (const char* file_name,filemode_t,size_t)
@@ -76,7 +76,7 @@ void MountPointFileSystem::Remove (const char* file_name)
 
 void MountPointFileSystem::Rename (const char* file_name,const char* new_name)
 {
-  ICustomFileSystemPtr file_system = owner.file_system;
+  ICustomFileSystemPtr file_system = owner->file_system;
   
   FileSystemSingleton::Instance ().Unmount (file_name);
   
@@ -103,7 +103,7 @@ bool MountPointFileSystem::IsFileExist (const char*)
 
 bool MountPointFileSystem::GetFileInfo (const char* name,FileInfo& info)
 {
-  info = owner.mount_point_info;
+  info = owner->mount_point_info;
   return true;
 }
 

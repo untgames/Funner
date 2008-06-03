@@ -78,7 +78,7 @@ inline ParseNode* Parser::NextNamesakeNodeFun::operator () (ParseNode* node) con
 }
 
 /*
-    Получение итератора атрибутов
+    ╧юыєўхэшх шЄхЁрЄюЁр рЄЁшсєЄют
 */
 
 inline Parser::AttributeIterator make_attribute_iterator (ParseNode* node)
@@ -100,16 +100,18 @@ inline Parser::AttributeIterator make_attribute_iterator (ParseNode* node, const
 }
 
 /*
-    Чтение атрибутов    
+    ╫Єхэшх рЄЁшсєЄют    
 */
 
 template <class T>
 inline bool read (ParseNode* node, const char* tag, T& value)
 {
   if (node && tag)
-    node = node->First (tag);
+    node = node->First (tag);      
+    
+  Parser::AttributeIterator iter = make_attribute_iterator (node);
   
-  return node && read (make_attribute_iterator (node), value);
+  return node && read (iter, value);
 }
 
 template <class T>
@@ -135,7 +137,7 @@ inline T get (ParseNode* node, const char* tag, const T& default_value)
 }
 
 /*
-    Чтение атрибутов с протоколированием ошибок
+    ╫Єхэшх рЄЁшсєЄют ё яЁюЄюъюышЁютрэшхь ю°шсюъ
 */
 
 template <class T>
@@ -155,9 +157,11 @@ inline bool read (ParseLog& log, ParseNode* node, const char* tag, T& value)
     }
       
     node = child;
-  }    
-  
-  if (!read (make_attribute_iterator (node), value))
+  }
+
+  Parser::AttributeIterator iter = make_attribute_iterator (node);
+
+  if (!read (iter, value))
   {
     log.Error (node, "Error at read value");
     return false;
@@ -189,7 +193,7 @@ inline T get (ParseLog& log, ParseNode* node, const char* tag, const T& default_
 }
 
 /*
-    Чтение интервалов
+    ╫Єхэшх шэЄхЁтрыют
 */
 
 template <class OutIter>
@@ -197,8 +201,10 @@ inline size_t read_range (ParseNode* node, const char* tag, OutIter first, size_
 {
   if (node && tag)
     node = node->First (tag);
+    
+  Parser::AttributeIterator iter = make_attribute_iterator (node);
 
-  return node ? read_range (make_attribute_iterator (node), first, count) : 0;
+  return node ? read_range (iter, first, count) : 0;
 }
 
 template <class OutIter>
@@ -221,7 +227,7 @@ inline size_t read_range (ParseNode* node, const char* tag, OutIter first, size_
 }
 
 /*
-    Чтение интервалов с протоколированием ошибок
+    ╫Єхэшх шэЄхЁтрыют ё яЁюЄюъюышЁютрэшхь ю°шсюъ
 */
 
 template <class OutIter>
@@ -289,7 +295,7 @@ inline size_t read_range (ParseLog& log, ParseNode* node, const char* tag, OutIt
 }
 
 /*
-    Тестирование узлов и атрибутов
+    ╥хёЄшЁютрэшх єчыют ш рЄЁшсєЄют
 */
 
 inline bool test_tag (ParseNode* node, const char* tag)
@@ -324,7 +330,7 @@ inline bool test (ParseNode* node, const char* tag, const char* value)
 }
 
 /*
-    Применение функционала ко всем вложенным узлам
+    ╧Ёшьхэхэшх ЇєэъЎшюэрыр ъю тёхь тыюцхээ√ь єчырь
 */
 
 template <class Fn>
@@ -348,7 +354,7 @@ inline void for_each_child (ParseNode* node, const char* tag, Fn fn)
 }
 
 /*
-    Вызов функтора, если существует вложенный узел с указанным именем
+    ┬√чют ЇєэъЄюЁр, хёыш ёє∙хёЄтєхЄ тыюцхээ√щ єчхы ё єърчрээ√ь шьхэхь
 */
 
 template <class Fn>
@@ -362,7 +368,7 @@ inline void parse_if (ParseNode* node, const char* tag, Fn then_fn)
 }
 
 template <class Fn1, class Fn2>
-inline void parse_if (ParseNode*, const char* tag, Fn1 then_fn, Fn2 else_fn)
+inline void parse_if (ParseNode* node, const char* tag, Fn1 then_fn, Fn2 else_fn)
 {
   if (tag && node)
     node = node->First (tag);

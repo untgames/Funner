@@ -25,8 +25,8 @@ MemFileImpl::MemFileImpl (FileImplPtr base_file)
   if (base_file->Mode () & (FILE_MODE_RESIZE|FILE_MODE_WRITE))
     raise_not_supported ("MemFileImpl::MemFileImpl","Memory files with FILE_MODE_RESIZE|FILE_MODE_WRITE mode not supported");
     
-  size_t buffer_size = base_file->Size ();    
-  void*  buffer      = ::operator new (buffer_size);
+  size_t          buffer_size = base_file->Size ();    
+  void* volatile  buffer      = ::operator new (buffer_size);
   
   try
   {

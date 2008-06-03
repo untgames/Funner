@@ -83,12 +83,12 @@ void FileSystemImpl::MountSearch (FileListBuilder& builder,const char* wc_mask,c
   
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
   {
-    if (!string_wrappers::strnicmp (i->prefix.c_str (),prefix,i->prefix.size ()))  
+    if (!xtl::xstrnicmp (i->prefix.c_str (),prefix,i->prefix.size ()))  
     {
       builder.SetPrefix    (i->prefix.c_str ());
       search_helper.Search (i->file_system,prefix+i->prefix.size ());
     }
-    else if (!string_wrappers::strnicmp (i->prefix.c_str (),prefix,prefix_size))
+    else if (!xtl::xstrnicmp (i->prefix.c_str (),prefix,prefix_size))
     {
       if (flags & FILE_SEARCH_DIRS && wcimatch (i->prefix.c_str ()+prefix_size,wc_mask))
       {

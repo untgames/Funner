@@ -1,10 +1,11 @@
 #ifndef COMMONLIB_STRING_LIBRARY_HEADER
 #define COMMONLIB_STRING_LIBRARY_HEADER
 
-#include <common/strwrap.h>
 #include <stl/string>
 #include <stl/vector>
 #include <xtl/functional_fwd>
+
+#include <common/hash.h>
 
 namespace common
 {
@@ -35,10 +36,8 @@ stl::string strsearchflags (size_t search_flags);
     Форматированный вывод в строку
 */
 
-stl::string  format  (const char*,...);
-stl::string  vformat (const char*,va_list);
-stl::wstring format  (const wchar_t*,...);
-stl::wstring vformat (const wchar_t*,va_list);
+stl::string format  (const char*,...);
+stl::string vformat (const char*,va_list);
 
 /*
     Замена управляющих символов их обозначениями (\n, \r, etc.)
@@ -75,13 +74,6 @@ stl::string              replace (const char* string,const char* re_pattern,cons
 bool rematch  (const char* string,const char* re_pattern, const char* flags="");
 bool wcmatch  (const char* string,const char* wildcard);
 bool wcimatch (const char* string,const char* wildcard);
-
-/*
-    Хэширование
-*/
-
-size_t strhash  (const stl::string&,size_t init_hash=0xFFFFFFFF);
-size_t strihash (const stl::string&,size_t init_hash=0xFFFFFFFF);
 
 #include <common/detail/strlib.inl>
 

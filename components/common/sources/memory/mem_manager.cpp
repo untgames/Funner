@@ -63,7 +63,7 @@ void* MemoryManager::Allocate (size_t size)
 }
 
 void MemoryManager::Deallocate (void* p)
-{
+{  
   if (p && MemoryManagerSingleton::IsInitialized ())
     MemoryManagerSingleton::Instance ().heap.Deallocate (p);
 }

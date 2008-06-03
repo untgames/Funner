@@ -1,4 +1,3 @@
-#include <malloc.h>
 #include "shared.h"
 
 using namespace common;

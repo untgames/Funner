@@ -1,5 +1,6 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS          := extern.zzip extern.zlib common.zip_file_system
+export.LIBS          := common.zip_file_system extern.zzip extern.zlib
 export.LINK_INCLUDES := ZipFileSystem
+export.IMPORTS       := link.static.mak

@@ -1,4 +1,4 @@
-#include <common/strwrap.h>
+#include <xtl/string.h>
 #include "xml_lexer.h"
 #include "context.h"
 #include "dispatch.h"
@@ -174,7 +174,7 @@ inline XMLParser::Instruction XMLParser::instruction (const char* name)
     return INSTRUCTION_UNDEFINED;
 
   for (String2Instruction* i=instruction_map;i->name;i++)
-    if (!string_wrappers::stricmp (i->name,name))
+    if (!xtl::xstricmp (i->name,name))
       return i->instruction;
       
   return INSTRUCTION_UNDEFINED;
@@ -209,8 +209,8 @@ void XMLParser::process_instruction (const char* name,const char* value,size_t l
     {
       int result = -1;
       
-      if      (!string_wrappers::stricmp (value,"yes")) result = 1;
-      else if (!string_wrappers::stricmp (value,"no"))  result = 0;
+      if      (!xtl::xstricmp (value,"yes")) result = 1;
+      else if (!xtl::xstricmp (value,"no"))  result = 0;
       
       if (result == -1)
       {
@@ -263,7 +263,7 @@ void XMLParser::parse_PI ()
     return;
   }  
   
-  if (string_wrappers::strnicmp ("xml",lex.token (),3))
+  if (xtl::xstrnicmp ("xml",lex.token (),3))
   {
     error ("processing directive must start from 'xml' prefix");
     return;

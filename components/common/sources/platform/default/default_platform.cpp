@@ -1,4 +1,3 @@
-#include <common/singleton.h>
 #include "shared.h"
 
 using namespace common;
