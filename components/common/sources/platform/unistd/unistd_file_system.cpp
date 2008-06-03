@@ -1,6 +1,6 @@
 #include <unistd.h>
 
-#ifndef COMMONLIB_NDS
+#ifndef ARM9
   #include <dirent.h>
 #endif
 
@@ -28,7 +28,7 @@ namespace
 class UnistdFileSystem: public StdioFileSystem
 {
   public:
-#ifndef COMMONLIB_NDS
+#ifndef ARM9
     void FileResize (file_t file,filesize_t new_size)
     {
       static const char* METHOD_NAME = "UnistdFileSystem::FileResize";
@@ -61,7 +61,7 @@ class UnistdFileSystem: public StdioFileSystem
       }
     }
 
-#ifndef COMMONLIB_NDS    
+#ifndef ARM9
     void Search (const char* full_mask,const FileSearchHandler& find_handler)
     {
       string dir_name = dir (full_mask), mask = full_mask + dir_name.size (), file_name;
