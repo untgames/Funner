@@ -13,3 +13,4 @@ ZZIP.LIBS             :=                          #Список используемых при линко
 ZZIP.COMPILER_CFLAGS  :=                          #Флаги сборки (зависят от конфигурации)
 ZZIP.msvc.COMPILER_DEFINES := _CRT_SECURE_NO_DEPRECATE #Определения сборки
 ZZIP.g++.COMPILER_CFLAGS := --no-warn                #Флаги сборки (зависят от конфигурации)
+ZZIP.nds.g++.COMPILER_DEFINES := ZZIP_1_H
