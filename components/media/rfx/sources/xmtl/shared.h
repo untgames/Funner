@@ -12,3 +12,5 @@
 #include <xtl/iterator.h>
 
 #include <media/rfx.h>
+
+#include <math/io.h>
