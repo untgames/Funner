@@ -21,7 +21,7 @@ int main ()
 
     if (verts)
     { 
-      float z = 0.0f;
+      static float z = 0.0f;
       
       verts [0].position      = vec3f (1.0f/z, -1.0f, 0.0f);
       verts [0].normal        = 0.0f;

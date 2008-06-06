@@ -54,7 +54,7 @@ int main ()
 
     ib2.Resize (4);
 
-    dump (ib1);
+    dump (ib1);    
   }
   catch (std::exception& exception)
   {
