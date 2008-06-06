@@ -29,7 +29,7 @@ int SeekToWAVChunk (StdFile& file, const char* chunk_name)
 
   file.Seek (12, FILE_SEEK_SET);
   file.Read (read_buffer, 8);
-  while (common::string_wrappers::strnicmp(chunk_name, read_buffer, 4) && !file.Eof())
+  while (xtl::xstrnicmp(chunk_name, read_buffer, 4) && !file.Eof())
   {
     file.Seek ((*((int*)(read_buffer + 4))), FILE_SEEK_CUR);
     file.Read (read_buffer, 8);  
@@ -53,9 +53,9 @@ WavInputStream::WavInputStream (const char* file_name, SoundSampleInfo& sound_sa
 
   file.Seek (0, FILE_SEEK_SET);
   file.Read (read_buffer, 16);
-  if (common::string_wrappers::strnicmp("RIFF", read_buffer, 4))
+  if (xtl::xstrnicmp("RIFF", read_buffer, 4))
     raise <Exception> (METHOD_NAME, "No 'RIFF' chunk in file.");
-  if (common::string_wrappers::strnicmp("WAVE", read_buffer+8, 4))
+  if (xtl::xstrnicmp("WAVE", read_buffer+8, 4))
     raise <Exception> (METHOD_NAME, "No 'WAVE' ID in file.");
 
   if (SeekToWAVChunk (file, "fmt ") < 0)

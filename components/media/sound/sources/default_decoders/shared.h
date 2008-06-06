@@ -4,11 +4,11 @@
 #include <stl/algorithm>
 
 #include <xtl/reference_counter.h>
+#include <xtl/string.h>
 
 #include <common/exception.h>
 #include <common/file.h>
 #include <common/component.h>
-#include <common/strwrap.h>
 
 #include <media/sound.h>
 
