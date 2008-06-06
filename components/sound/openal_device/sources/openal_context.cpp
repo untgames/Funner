@@ -259,7 +259,7 @@ struct ContextInitProperties
 
 void process_init_string (const char* property, const char* value, ContextInitProperties& properties)
 {
-  if (!common::string_wrappers::stricmp (property, "frequency"))
+  if (!xstricmp (property, "frequency"))
     properties.frequency = atoi (value);
 }
 
@@ -364,7 +364,7 @@ OpenALContext::OpenALContext (const char* device_name, const char* init_string)
   if (!device_name)
     raise_null_argument ("sound::low_level::OpenALContext::OpenALContext", "device_name");
     
-  if (!::strcmp (device_name, "default"))
+  if (!xstrcmp (device_name, "default"))
     device_name = 0;
 
   if (!init_string)

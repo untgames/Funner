@@ -13,6 +13,7 @@
 #include <xtl/bind.h>
 #include <xtl/uninitialized_storage.h>
 #include <xtl/ref.h>
+#include <xtl/string.h>
 
 #include <common/strlib.h>
 #include <common/exception.h>

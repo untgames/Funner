@@ -2,6 +2,7 @@
 
 using namespace common;
 using namespace stl;
+using namespace xtl;
 using namespace sound;
 using namespace sound::low_level;
 
@@ -43,9 +44,9 @@ struct OpenALDeviceProperties
 
 void process_init_string (const char* property, const char* value, OpenALDeviceProperties& properties)
 {
-  if (!common::string_wrappers::stricmp (property, "min_channels_count"))
+  if (!xstricmp (property, "min_channels_count"))
     properties.min_channels_count = atoi (value);
-  else if (!common::string_wrappers::stricmp (property, "max_channels_count"))
+  else if (!xstricmp (property, "max_channels_count"))
     properties.max_channels_count = atoi (value);
 }
 
@@ -516,22 +517,22 @@ void OpenALDevice::SetIntegerParam (const char* name, int value)
   if (!value)
     raise_null_argument ("sound::low_level::OpenALDevice::SetIntegerParam", "value");
 
-  if (!::strcmp (name, "buffer_update_frequency"))
+  if (!xstrcmp (name, "buffer_update_frequency"))
   {
     buffer_update_frequency = (size_t)value;
     buffer_timer.SetPeriod ((size_t)(1000.0f / value));
   }
-  else if (!::strcmp (name, "source_update_frequency"))
+  else if (!xstrcmp (name, "source_update_frequency"))
   {
     source_properties_update_frequency = (size_t)value;
     source_timer.SetPeriod ((size_t)(1000.0f / value));    
   }
-  else if (!::strcmp (name, "listener_update_frequency"))
+  else if (!xstrcmp (name, "listener_update_frequency"))
   {
     listener_properties_update_frequency = (size_t)value;
     listener_timer.SetPeriod ((size_t)(1000.0f / value));    
   }
-  else if (!::strcmp (name, "al_debug_log"))
+  else if (!xstrcmp (name, "al_debug_log"))
   {
     context.SetDebugLogState (value != 0);
   }
@@ -546,10 +547,10 @@ int OpenALDevice::GetIntegerParam (const char* name)
   if (!name)
     raise_null_argument ("sound::low_level::OpenALDevice::GetIntegerParam", "name");
     
-  if      (!::strcmp (name, "buffer_update_frequency"))   return static_cast<int> (buffer_update_frequency);
-  else if (!::strcmp (name, "source_update_frequency"))   return static_cast<int> (source_properties_update_frequency);
-  else if (!::strcmp (name, "listener_update_frequency")) return static_cast<int> (listener_properties_update_frequency);
-  else if (!::strcmp (name, "al_debug_log"))              return context.GetDebugLogState ();
+  if      (!xstrcmp (name, "buffer_update_frequency"))   return static_cast<int> (buffer_update_frequency);
+  else if (!xstrcmp (name, "source_update_frequency"))   return static_cast<int> (source_properties_update_frequency);
+  else if (!xstrcmp (name, "listener_update_frequency")) return static_cast<int> (listener_properties_update_frequency);
+  else if (!xstrcmp (name, "al_debug_log"))              return context.GetDebugLogState ();
   else
   {
     raise_invalid_argument ("sound::low_level::OpenALDevice::GetIntegerParam", "name", name);
@@ -565,23 +566,23 @@ void OpenALDevice::SetStringParam (const char* name, const char* value)
   if (!name)
     raise_null_argument (METHOD_NAME, "name");
 
-  if (!::strcmp (name, "AL_DISTANCE_MODEL")) 
+  if (!xstrcmp (name, "AL_DISTANCE_MODEL")) 
   {
     context.MakeCurrent ();
 
-    if (!::strcmp (value, "AL_NONE"))
+    if (!xstrcmp (value, "AL_NONE"))
       context.alDistanceModel (AL_NONE);
-    else if (!::strcmp (value, "AL_INVERSE_DISTANCE"))
+    else if (!xstrcmp (value, "AL_INVERSE_DISTANCE"))
       context.alDistanceModel (AL_INVERSE_DISTANCE);
-    else if (!::strcmp (value, "AL_INVERSE_DISTANCE_CLAMPED"))
+    else if (!xstrcmp (value, "AL_INVERSE_DISTANCE_CLAMPED"))
       context.alDistanceModel (AL_INVERSE_DISTANCE_CLAMPED);
-    else if (!::strcmp (value, "AL_LINEAR_DISTANCE"))
+    else if (!xstrcmp (value, "AL_LINEAR_DISTANCE"))
       context.alDistanceModel (AL_LINEAR_DISTANCE);
-    else if (!::strcmp (value, "AL_LINEAR_DISTANCE_CLAMPED"))
+    else if (!xstrcmp (value, "AL_LINEAR_DISTANCE_CLAMPED"))
       context.alDistanceModel (AL_LINEAR_DISTANCE_CLAMPED);
-    else if (!::strcmp (value, "AL_EXPONENT_DISTANCE"))
+    else if (!xstrcmp (value, "AL_EXPONENT_DISTANCE"))
       context.alDistanceModel (AL_EXPONENT_DISTANCE);
-    else if (!::strcmp (value, "AL_EXPONENT_DISTANCE_CLAMPED"))
+    else if (!xstrcmp (value, "AL_EXPONENT_DISTANCE_CLAMPED"))
       context.alDistanceModel (AL_EXPONENT_DISTANCE_CLAMPED);
     else
       raise_invalid_argument (METHOD_NAME, "value", value);
@@ -595,7 +596,7 @@ const char* OpenALDevice::GetStringParam (const char* name)
   if (!name)
     raise_null_argument ("sound::low_level::OpenALDevice::GetStringParam", "name");
 
-  if (!::strcmp (name, "al_distance_model")) 
+  if (!xstrcmp (name, "al_distance_model")) 
   {
     context.MakeCurrent ();
 
