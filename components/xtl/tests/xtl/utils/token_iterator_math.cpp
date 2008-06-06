@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <xtl/token_iterator.h>
 #include <mathlib.h>
+#include <math/io.h>
 
 void print (const char* s)
 {
