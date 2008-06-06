@@ -1,6 +1,6 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS             := media.image extern.devil extern.ilu
+export.LIBS             := media.image
 export.LINK_INCLUDES    := DevIL
-export.IMPORTS          := ../../common/link.static.mak
+export.IMPORTS          := ../../common/link.static.mak ../../../extern/devil/link.static.mak
