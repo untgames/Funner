@@ -200,7 +200,7 @@ class FppShaderParser
       const char* value = iter->Attribute (0);
 
       for (const Tag2Value* i=pairs; i->tag; i++)
-        if (!string_wrappers::stricmp (i->tag, value))
+        if (!xtl::xstricmp (i->tag, value))
         {
           *(int*)((char*)&base_state + offset) = i->value;
 

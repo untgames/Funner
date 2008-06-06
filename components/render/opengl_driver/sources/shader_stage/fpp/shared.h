@@ -6,6 +6,8 @@
 #include <stl/string>
 #include <stl/hash_map>
 
+#include <xtl/string.h>
+
 #include <common/parser.h>
 #include <common/strlib.h>
 

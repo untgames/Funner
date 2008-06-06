@@ -202,7 +202,7 @@ struct ContextManager::Impl: public xtl::reference_counter
             get_extension_name (id));
         }        
         
-      if (!min_version.empty () && strcmp (new_context->GetVersionString (), min_version.c_str ()) < 0)
+      if (!min_version.empty () && xtl::xstrcmp (new_context->GetVersionString (), min_version.c_str ()) < 0)
       {
         raise_not_supported (METHOD_NAME, "Could not create new context. Reason: OpenGL version '%s' not supported "
           "(version='%s')", min_version.c_str (), new_context->GetVersionString ());
@@ -225,7 +225,7 @@ struct ContextManager::Impl: public xtl::reference_counter
 
         for (size_t i=0; i<versions_count; i++)
         {
-          if (strcmp (max_version.c_str (), version_string [i]) < 0)
+          if (xtl::xstrcmp (max_version.c_str (), version_string [i]) < 0)
             context_extensions.Set (extension [i], false);
         }        
       }
@@ -496,47 +496,47 @@ struct ContextManager::Impl: public xtl::reference_counter
       //добавление свойства
     void AddInitProperty (const char* name, const char* value)
     {
-      if (!common::string_wrappers::stricmp (name, "require"))
+      if (!xtl::xstricmp (name, "require"))
       {
         required_extensions.SetGroup (value, true);
       }
-      else if (!common::string_wrappers::stricmp (name, "disable"))
+      else if (!xtl::xstricmp (name, "disable"))
       {     
         enabled_extensions.SetGroup (value, false);
       }
-      else if (!common::string_wrappers::stricmp (name, "enable"))
+      else if (!xtl::xstricmp (name, "enable"))
       {
         enabled_extensions.SetGroup (value, true);
       }
-      else if (!common::string_wrappers::strnicmp (name, "gl_", 3))
+      else if (!xtl::xstrnicmp (name, "gl_", 3))
       {
-        if (!strcmp (value, "0"))
+        if (!xtl::xstrcmp (value, "0"))
         {
           enabled_extensions.Set (name, false);
         }
-        else if (!strcmp (value, "1"))
+        else if (!xtl::xstrcmp (value, "1"))
         {
           enabled_extensions.Set (name, true);
         }
-        else if (!strcmp (value, "!"))
+        else if (!xtl::xstrcmp (value, "!"))
         {
           required_extensions.Set (name, true);
         }
-        else if (!strcmp (value, "1!"))
+        else if (!xtl::xstrcmp (value, "1!"))
         {
           enabled_extensions.Set (name, true);
           required_extensions.Set (name, true);
         }
       }
-      else if (!common::string_wrappers::stricmp (name, "min_version"))
+      else if (!xtl::xstricmp (name, "min_version"))
       {
         min_version = value;
       }
-      else if (!common::string_wrappers::stricmp (name, "max_version"))
+      else if (!xtl::xstricmp (name, "max_version"))
       {
         max_version = value;
       }
-      else if (!stricmp (name, "check_gl_errors"))
+      else if (!xtl::xstricmp (name, "check_gl_errors"))
       {
         check_gl_errors = atoi (value) != 0;
       }
