@@ -5,10 +5,6 @@
 #include <stl/utility>
 #include <stl/config.h>
 
-#ifndef __MYSTL_STANDALONE__
-  #include <common/heap.h>
-#endif
-
 namespace stl
 {
 

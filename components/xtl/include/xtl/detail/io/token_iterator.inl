@@ -201,25 +201,6 @@ inline token_iterator<typename iterator_traits<BaseIter>::value_type, BaseIter> 
 }
 
 /*
-    Чтение токенов
-*/
-
-template <class Ret, class Token, class BaseIter>
-inline Ret get (token_iterator<Token, BaseIter>& iter, const Ret& default_value)
-{
-  Ret value;
-
-  return read (iter, value) ? value : default_value;
-}
-
-template <class Token, class BaseIter, class Value>
-inline void read (token_iterator<Token, BaseIter>& iter, Value& value, const Value& default_value)
-{
-  if (!read (iter, value))
-    value = default_value;
-}
-
-/*
     Чтение интервальных значений
 */
 
@@ -523,4 +504,55 @@ inline bool read (token_iterator<const T*, BaseIter>& iter, stl::basic_string<T,
   ++iter;
 
   return true;
+}
+
+/*
+    Чтение токенов с приведением типов
+*/
+
+template <class Base, class Token, class BaseIter, class Value>
+inline bool read_and_cast (token_iterator<Token, BaseIter>& iter, Value& value)
+{
+  Base base_value;
+
+  if (!read (iter, base_value))
+    return false;
+
+  value = static_cast<Value> (base_value);
+
+  return true;  
+}
+
+/*
+    Чтение токенов с возвратом значения
+*/
+
+template <class Value, class Token, class BaseIter>
+inline Value get (token_iterator<Token, BaseIter>& iter)
+{
+  Value result;
+  
+  if (read (iter, result))
+    return result;
+    
+  throw bad_lexical_cast (typeid (token_iterator<Token, BaseIter>), typeid (Value));
+}
+
+template <class Value, class Token, class BaseIter>
+inline Value get (token_iterator<Token, BaseIter>& iter, const Value& default_value)
+{
+  Value result;
+  
+  return read (iter, result) ? result : default_value;
+}
+
+/*
+    Чтение токенов
+*/
+
+template <class Token, class BaseIter, class Value>
+inline void read (token_iterator<Token, BaseIter>& iter, Value& value, const Value& default_value)
+{
+  if (!read (iter, value))
+    value = default_value;
 }

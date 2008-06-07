@@ -1,20 +1,6 @@
-namespace detail
-{
-
-template <class Base, class Char, class Value>
-inline bool read_and_cast (const Char* string, Value& value)
-{
-  Base base_value = 0;
-
-  if (!read (string, base_value))
-    return false;
-
-  value = static_cast<Value> (base_value);
-
-  return true;
-}
-
-}
+/*
+    Разбор базовых типов
+*/
 
 inline bool read (const char* string, long& value)
 {
@@ -50,7 +36,7 @@ inline bool read (const char* string, bool& value)
 {
   long tmp_value;
 
-  if (!detail::read_and_cast<long> (string, tmp_value))
+  if (!read_and_cast<long> (string, tmp_value))
     return false;
     
   value = tmp_value != 0;
@@ -97,22 +83,22 @@ inline bool read (const char* string, unsigned char& value)
 
 inline bool read (const char* string, short& value)
 {
-  return detail::read_and_cast<long> (string, value);
+  return read_and_cast<long> (string, value);
 }
 
 inline bool read (const char* string, unsigned short& value)
 {
-  return detail::read_and_cast<long> (string, value);
+  return read_and_cast<long> (string, value);
 }
 
 inline bool read (const char* string, int& value)
 {
-  return detail::read_and_cast<long> (string, value);
+  return read_and_cast<long> (string, value);
 }
 
 inline bool read (const char* string, unsigned int& value)
 {
-  return detail::read_and_cast<long> (string, value);
+  return read_and_cast<long> (string, value);
 }
 
 inline bool read (const char* string, double& value)
@@ -132,12 +118,12 @@ inline bool read (const char* string, double& value)
 
 inline bool read (const char* string, float& value)
 {
-  return detail::read_and_cast<double> (string, value);
+  return read_and_cast<double> (string, value);
 }
 
 inline bool read (const char* string, long double& value)
 {
-  return detail::read_and_cast<double> (string, value);
+  return read_and_cast<double> (string, value);
 }
 
 namespace detail
@@ -156,7 +142,7 @@ struct wchar_string_converter
 
       int string_length = wcslen (string);
       
-      static const int MAX_LENGTH = BUFFER_SIZE-1; //¤ ­­л© а §¬Ґа б®ўЇ ¤ Ґв б Є®«ЁзҐбвў®¬ бЁ¬ў®«®ў multibyte бва®ЄҐ, Ї®бЄ®«мЄг а Ў®в  Їа®Ё§ў®¤Ёвбп в®«мЄ® б Ў §®ўл¬Ё вЁЇ ¬Ё: зЁб«  Ё Їа®бвлҐ бЁ¬ў®«л
+      static const int MAX_LENGTH = BUFFER_SIZE-1; //данный размер совпадает с количеством символов multibyte строке, поскольку работа производится только с базовыми типами: числа и простые символы
 
       if (string_length > MAX_LENGTH)
         string_length = MAX_LENGTH;
@@ -254,4 +240,44 @@ inline bool read (const wchar_t* string, double& result_value)
 inline bool read (const wchar_t* string, long double& result_value)
 {
   return detail::read_wchar_string (string, result_value);
+}
+
+/*
+    Чтение токенов с приведением типов
+*/
+
+template <class Base, class Char, class Value>
+inline bool read_and_cast (const Char* string, Value& value)
+{
+  Base base_value;
+
+  if (!read (string, base_value))
+    return false;
+
+  value = static_cast<Value> (base_value);
+
+  return true;
+}
+
+/*
+    Чтение токенов с возвратом значения
+*/
+
+template <class Value, class Char>
+inline Value get (const Char* string)
+{
+  Value result;
+
+  if (read (string, result))
+    return result;      
+
+  throw bad_lexical_cast (typeid (const Char*), typeid (Value));
+}
+
+template <class Value, class Char>
+inline Value get (const Char* string, const Value& default_value)
+{
+  Value result;
+  
+  return read (string, result) ? result : default_value;
 }

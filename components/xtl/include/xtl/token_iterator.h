@@ -129,15 +129,6 @@ token_iterator<Token> make_token_iterator (Token* first, Token* last);
 template <class BaseIter>
 token_iterator<typename iterator_traits<BaseIter>::value_type, BaseIter> make_token_iterator (BaseIter first, BaseIter last);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение токенов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Ret, class Token, class BaseIter>
-Ret get (token_iterator<Token, BaseIter>&, const Ret& default_value = Ret ());
-
-template <class Token, class BaseIter, class Value>
-void read (token_iterator<Token, BaseIter>&, Value& value, const Value& default_value);
-
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование токена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,6 +164,18 @@ template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, 
 template <class BaseIter> bool read (token_iterator<const wchar_t*, BaseIter>&, long double&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Чтение STL строк
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T, class BaseIter, class CharT, class Allocator>
+bool read (token_iterator<const T*, BaseIter>&, stl::basic_string<T, CharT, Allocator>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Чтение токенов с приведением типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Base, class Token, class BaseIter, class Value>
+bool read_and_cast (token_iterator<Token, BaseIter>&, Value& value);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение интервалов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Token, class BaseIter, class OutIter>
@@ -182,10 +185,16 @@ template <class Token, class BaseIter, class OutIter>
 size_t read_range (token_iterator<Token, BaseIter>&, OutIter first, size_t count, size_t step);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение STL строк
+///Чтение токенов с возвратом значения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T, class BaseIter, class CharT, class Allocator>
-bool read (token_iterator<const T*, BaseIter>&, stl::basic_string<T, CharT, Allocator>&);
+template <class Value, class Token, class BaseIter> Value get (token_iterator<Token, BaseIter>&); //throws bad_lexical_cast
+template <class Value, class Token, class BaseIter> Value get (token_iterator<Token, BaseIter>&, const Value& default_value); //nothrow
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Чтение токенов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Token, class BaseIter, class Value>
+void read (token_iterator<Token, BaseIter>&, Value& value, const Value& default_value);
 
 #include <xtl/detail/io/token_iterator.inl>
 

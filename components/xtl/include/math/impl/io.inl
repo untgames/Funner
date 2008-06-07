@@ -2,6 +2,35 @@
     Чтение математических типов
 */
 
+namespace detail
+{
+
+template <class Token, class BaseIter, class T>
+bool read_value (xtl::io::token_iterator<Token, BaseIter>& iter, T& value)
+{
+  return xtl::io::read (iter, value);
+}
+
+template <class Token, class BaseIter>
+bool read_value (xtl::io::token_iterator<Token, BaseIter>& iter, unsigned char& value)
+{
+  return xtl::io::read_and_cast<unsigned int> (iter, value);
+}
+
+template <class Token, class BaseIter>
+bool read_value (xtl::io::token_iterator<Token, BaseIter>& iter, signed char& value)
+{
+  return xtl::io::read_and_cast<int> (iter, value);
+}
+
+template <class Token, class BaseIter>
+bool read_value (xtl::io::token_iterator<Token, BaseIter>& iter, char& value)
+{
+  return xtl::io::read_and_cast<int> (iter, value);
+}
+
+}
+
 template <class Token, class BaseIter, class T, size_t size>
 inline bool read (xtl::io::token_iterator<Token, BaseIter>& iter, vec<T, size>& value)
 {
@@ -11,7 +40,7 @@ inline bool read (xtl::io::token_iterator<Token, BaseIter>& iter, vec<T, size>& 
   xtl::io::token_iterator<Token, BaseIter> save = iter;
     
   for (size_t i=0; i<size; i++) 
-    if (!read (iter, value [i]))
+    if (!detail::read_value (iter, value [i]))
     {
       iter = save;
       return false;
@@ -30,7 +59,7 @@ inline bool read (xtl::io::token_iterator<Token, BaseIter>& iter, matrix<T, size
 
   for (size_t i=0; i<size; i++) 
     for (size_t j=0; j<size; j++)   
-      if (!read (iter, value [i][j]))
+      if (!detail::read_value (iter, value [i][j]))
       {
         iter = save;
         return false;
@@ -48,7 +77,7 @@ inline bool read (xtl::io::token_iterator<Token, BaseIter>& iter, quat<T>& value
   xtl::io::token_iterator<Token, BaseIter> save = iter;
     
   for (size_t i=0; i<4; i++) 
-    if (!read (iter, value [i]))
+    if (!detail::read_value (iter, value [i]))
     {
       iter = save;
       return false;

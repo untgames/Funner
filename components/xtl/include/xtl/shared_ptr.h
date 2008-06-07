@@ -7,7 +7,6 @@
 
 #include <exception>
 #include <typeinfo>
-#include <xtl/interlocked.h>
 
 namespace stl
 {
@@ -253,6 +252,17 @@ template <class T1, class T2> shared_ptr<T1> const_pointer_cast   (const shared_
 template <class Deleter, class T> Deleter* get_deleter (const shared_ptr<T>&);
 template <class T>                T*       get_pointer (T*);
 template <class T>                T*       get_pointer (const shared_ptr<T>&);
+
+#if defined (WIN32) || defined (_WIN32) || defined (__WIN32__)
+  #include <xtl/interlocked.h>
+  #include <xtl/detail/shared_counter_w32.inl>
+#elif defined (__GNUC__) && (defined( __i386__) || defined (__x86_64__))
+  #include <xtl/detail/shared_counter_gcc_x86.inl>
+#elif defined (ARM9)
+  #include <xtl/detail/shared_counter_nothreads.inl>
+#else
+  #error Unknown platform
+#endif
 
 #include <xtl/detail/shared_counter.inl>
 #include <xtl/detail/shared_ptr.inl>
