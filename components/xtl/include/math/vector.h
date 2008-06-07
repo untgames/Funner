@@ -133,8 +133,8 @@ class vec: public vec_base<type,size>
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕриведение типов (понижение размерности вектора)
 ////////////////////////////////////////////////////////////////////////////////////////////
-    operator const vec<type,size-1>& () const;
-    operator       vec<type,size-1>& ();
+//    operator const vec<type,size-1>& () const;
+//    operator       vec<type,size-1>& ();
 };
 
 template <class type> class vec<type,0> {};

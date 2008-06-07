@@ -216,7 +216,7 @@ bool vec<T,size>::operator != (const vec& v) const
   return vec_nequal (*this,v);
 }
 
-template <class T,size_t size>
+/*template <class T,size_t size>
 vec<T,size>::operator const vec<T,size-1>& () const
 {
   return *(const vec<T,size-1>*)this;
@@ -226,7 +226,7 @@ template <class T,size_t size>
 vec<T,size>::operator vec<T,size-1>& ()
 {
   return *(vec<T,size-1>*)this;
-} 
+} */
 
 /*
         Утилиты
