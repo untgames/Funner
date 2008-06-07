@@ -1,0 +1,20 @@
+Results of action_queue_test:
+Action queue empty - y
+Action queue has action 0 - n
+Action queue has action 1 - n
+Action queue empty - n
+Action queue has action 0 - y
+Action queue has action 1 - y
+action 0 executed.
+New log message: Exception occured during executing of action 2
+    at action_handler
+action 1 executed.
+action 1 executed.
+action 1 executed.
+Action queue empty - n
+Action queue has action 0 - n
+Action queue has action 1 - y
+Action queue has action 1 - n
+action 0 executed.
+Action queue empty - n
+Action queue empty - y
