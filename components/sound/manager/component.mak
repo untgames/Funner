@@ -12,7 +12,7 @@ SOUND_SYSTEM_SOURCES.LIB_DIRS         :=
 SOUND_SYSTEM_SOURCES.LIBS             := 
 SOUND_SYSTEM_SOURCES.COMPILER_CFLAGS  :=
 SOUND_SYSTEM_SOURCES.COMPILER_DEFINES := 
-SOUND_SYSTEM_SOURCES.IMPORTS          := compile.static.mak ../../system/exports.static.mak ../../media/sound/compile.static.mak
+SOUND_SYSTEM_SOURCES.IMPORTS          := compile.static.mak ../../system/compile.static.mak ../../media/sound/compile.static.mak
 
 #Öåëü ¹2 - Sound system tests
 SOUND_SYSTEM_TESTS.TYPE             := test-suite
@@ -23,5 +23,5 @@ SOUND_SYSTEM_TESTS.DLLS             :=
 SOUND_SYSTEM_TESTS.DLL_DIRS         :=
 SOUND_SYSTEM_TESTS.COMPILER_CFLAGS  :=
 SOUND_SYSTEM_TESTS.COMPILER_DEFINES :=
-SOUND_SYSTEM_TESTS.IMPORTS          := compile.static.mak link.static.mak ../openal_device/link.static.mak ../../system/exports.static.mak ../../media/sound/snddecl.link.static.mak \
+SOUND_SYSTEM_TESTS.IMPORTS          := compile.static.mak link.static.mak ../openal_device/link.static.mak ../../system/compile.static.mak ../../media/sound/snddecl.link.static.mak \
 																       ../../media/sound/default_decoders.link.static.mak ../openal_device/run.static.mak

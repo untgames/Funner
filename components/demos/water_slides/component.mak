@@ -15,7 +15,7 @@ WATER_SLIDES.DLL_DIRS         :=
 WATER_SLIDES.COMPILER_CFLAGS  := -wd4355
 WATER_SLIDES.COMPILER_DEFINES :=
 WATER_SLIDES.EXECUTION_DIR    := .
-WATER_SLIDES.IMPORTS          := ../../common/exports.static.mak ../../system/exports.static.mak \
+WATER_SLIDES.IMPORTS          := ../../common/exports.static.mak ../../system/compile.static.mak ../../system/link.static.mak \
                                  ../../media/image/compile.static.mak ../../media/image/link.static.mak \
                                  ../../render/opengl_driver/exports.static.mak \
                                  ../../scene_graph/exports.static.mak \

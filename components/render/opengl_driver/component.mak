@@ -26,7 +26,7 @@ OPENGLDRIVER_TESTS.LIBS             :=
 OPENGLDRIVER_TESTS.COMPILER_CFLAGS  :=
 OPENGLDRIVER_TESTS.COMPILER_DEFINES := 
 OPENGLDRIVER_TESTS.IMPORTS          := exports.static.mak ../low_level/exports.static.mak \
-                                       ../../system/exports.static.mak ../../common/exports.static.mak \
+                                       ../../system/compile.static.mak ../../system/link.static.mak ../../common/exports.static.mak \
                                        ../../media/image/compile.static.mak ../../media/geometry/compile.static.mak \
                                        ../../media/geometry/compile.static.mak  ../../media/image/link.static.mak \
                                        ../../media/geometry/xmesh.link.static.mak

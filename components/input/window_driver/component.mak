@@ -12,7 +12,7 @@ WINDOW_DRIVER_SOURCES.LIB_DIRS         :=
 WINDOW_DRIVER_SOURCES.LIBS             := 
 WINDOW_DRIVER_SOURCES.COMPILER_CFLAGS  :=
 WINDOW_DRIVER_SOURCES.COMPILER_DEFINES := 
-WINDOW_DRIVER_SOURCES.IMPORTS          := compile.static.mak ../manager/compile.static.mak ../../system/exports.static.mak ../../common/compile.static.mak ../low_level/compile.static.mak
+WINDOW_DRIVER_SOURCES.IMPORTS          := compile.static.mak ../manager/compile.static.mak ../../system/compile.static.mak ../../common/compile.static.mak ../low_level/compile.static.mak
 
 #Öåëü ¹2 - Window driver tests
 WINDOW_DRIVER_TESTS.TYPE             := test-suite
@@ -24,4 +24,4 @@ WINDOW_DRIVER_TESTS.DLLS             :=
 WINDOW_DRIVER_TESTS.DLL_DIRS         :=
 WINDOW_DRIVER_TESTS.COMPILER_CFLAGS  :=
 WINDOW_DRIVER_TESTS.COMPILER_DEFINES :=
-WINDOW_DRIVER_TESTS.IMPORTS          := compile.static.mak link.static.mak ../../common/compile.static.mak ../low_level/compile.static.mak ../../system/exports.static.mak
+WINDOW_DRIVER_TESTS.IMPORTS          := compile.static.mak link.static.mak ../../common/compile.static.mak ../low_level/compile.static.mak ../../system/compile.static.mak

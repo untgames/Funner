@@ -284,6 +284,7 @@ struct SoundManager::Impl
     {
       device->Stop (emitter_iter->second->channel_number);
       device->SetSample (emitter_iter->second->channel_number, emitter_iter->second->sound_sample);
+      device->SetSource (emitter_iter->second->channel_number, emitter_iter->second->source);
       device->Seek (emitter_iter->second->channel_number, emitter_iter->second->cur_position, get_seek_mode (emitter_iter->second->sound_declaration->Looping ()));
       device->Play (emitter_iter->second->channel_number, emitter_iter->second->sound_declaration->Looping ());
     }

@@ -67,8 +67,6 @@ int main ()
     sound_emitter->BindToParent (scene.Root ());
     sound_emitter->SetPosition (0.1f, 0.1f, 0.1f);
 
-    srand (clock ());
-
     manager.LoadSoundLibrary (library_file);
     manager2.LoadSoundLibrary (library_file);
 
@@ -82,6 +80,8 @@ int main ()
     scene_player2.SetManager (&manager2);
 
     sound_emitter2->BindToParent (scene.Root ());
+
+    srand (clock ());
 
     sound_emitter->Play ();
 

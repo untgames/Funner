@@ -3,10 +3,11 @@
 #include <stl/hash_map>
 
 #include <xtl/bind.h>
-#include <xtl/shared_ptr.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
+#include <xtl/shared_ptr.h>
 
+#include <common/action_queue.h>
 #include <common/exception.h>
 
 #include <sg/scene.h>
@@ -18,6 +19,8 @@
 #include <sound/scene_player.h>
 
 #include <math/mathlib.h>
+
+#include <syslib/timer.h>
 
 using namespace sound;
 using namespace syslib;
@@ -56,6 +59,13 @@ ScenePlayerEmitter::ScenePlayerEmitter (const char* source_name, xtl::connection
 typedef xtl::shared_ptr<ScenePlayerEmitter>                              ScenePlayerEmitterPtr;
 typedef stl::hash_map<scene_graph::SoundEmitter*, ScenePlayerEmitterPtr> EmitterSet;
 
+namespace
+{
+
+const size_t ACTION_QUEUE_PROCESS_MILLISECONDS = 100;
+
+}
+
 struct ScenePlayer::Impl
 {
   scene_graph::Listener* listener;                   //слушатель
@@ -66,9 +76,13 @@ struct ScenePlayer::Impl
   auto_connection        update_connection;          //соединение события обновления свойств
   auto_connection        listener_unbind_connection; //соединение события удаления слушателя
   auto_connection        manager_destroy_connection; //соединение события удаления менеджера
+  ActionQueue            action_queue;               //очередь событий остановки проигрывания эмиттера
+  syslib::Timer          action_queue_timer;         //таймер вызова обработки очереди
 
   Impl ()
-    : listener (0), sound_manager (0)
+    : listener (0), 
+      sound_manager (0),
+      action_queue_timer (xtl::bind (&ScenePlayer::Impl::DoActions, this), ACTION_QUEUE_PROCESS_MILLISECONDS)
     {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,119 +185,132 @@ struct ScenePlayer::Impl
     return sound_manager;
   }
 
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вызов обработчика очереди событий
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void DoActions ()
+    {
+      action_queue.DoActions (action_queue_timer.ElapsedMilliseconds ());
+    }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка удаления менеджера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void ProcessDestroyManager ()
-  {
-    sound_manager = 0;
-  }
+    void ProcessDestroyManager ()
+    {
+      sound_manager = 0;
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление свойств слушателя/эмиттеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void ListenerUpdate (Node& sender, NodeEvent event)
-  {
-    if (!listener || !sound_manager)
-      return;
+    void ListenerUpdate (Node& sender, NodeEvent event)
+    {
+      if (!listener || !sound_manager)
+        return;
 
-    sound::Listener snd_listener;
-      
-    snd_listener.position  = listener->WorldPosition ();                              //!!!!!!!!добавить скорость
-    snd_listener.direction = listener->WorldOrientation () * vec3f(0.f,0.f,1.f);
-    snd_listener.up        = listener->WorldOrientation () * vec3f(0.f,1.f,0.f);
+      sound::Listener snd_listener;
+        
+      snd_listener.position  = listener->WorldPosition ();                              //!!!!!!!!добавить скорость
+      snd_listener.direction = listener->WorldOrientation () * vec3f(0.f,0.f,1.f);
+      snd_listener.up        = listener->WorldOrientation () * vec3f(0.f,1.f,0.f);
 
-    sound_manager->SetListener (snd_listener);
-  }
+      sound_manager->SetListener (snd_listener);
+    }
 
-  void EmitterUpdate  (Node& sender, NodeEvent event)
-  {
-    EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&sender));
+    void EmitterUpdate (Node& sender, NodeEvent event)
+    {
+      EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&sender));
 
-    if (emitter_iter == emitters.end ())
-      return;
+      if (emitter_iter == emitters.end ())
+        return;
 
-    emitter_iter->second->emitter.SetPosition (sender.WorldPosition ());               //!!!!!!!!добавить скорость
-    emitter_iter->second->emitter.SetDirection (sender.WorldOrientation () * vec3f(0.f,0.f,1.f));
-  }
+      emitter_iter->second->emitter.SetPosition (sender.WorldPosition ());               //!!!!!!!!добавить скорость
+      emitter_iter->second->emitter.SetDirection (sender.WorldOrientation () * vec3f(0.f,0.f,1.f));
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление Node сцены в список, если является эмиттером
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void CheckNode (scene_graph::Node& node)
-  {
-    scene_graph::SoundEmitter* emitter = dynamic_cast<scene_graph::SoundEmitter*> (&node);
-
-    if (emitter)
+    void CheckNode (scene_graph::Node& node)
     {
-      ScenePlayerEmitterPtr scene_player_emitter (new ScenePlayerEmitter (emitter->SoundDeclarationName (), 
-                                                                emitter->RegisterEventHandler (SoundEmitterEvent_Play, bind (&ScenePlayer::Impl::PlayEmitter, this, _1, _2)),
-                                                                emitter->RegisterEventHandler (SoundEmitterEvent_Stop, bind (&ScenePlayer::Impl::StopEmitter, this, _1, _2)),
-                                                                node.RegisterEventHandler     (NodeEvent_AfterUpdate,  bind (&ScenePlayer::Impl::EmitterUpdate, this, _1, _2))));
+      scene_graph::SoundEmitter* emitter = dynamic_cast<scene_graph::SoundEmitter*> (&node);
 
-      emitters.insert_pair (emitter, scene_player_emitter);
+      if (emitter)
+      {
+        ScenePlayerEmitterPtr scene_player_emitter (new ScenePlayerEmitter (emitter->SoundDeclarationName (), 
+                                                                  emitter->RegisterEventHandler (SoundEmitterEvent_Play, bind (&ScenePlayer::Impl::PlayEmitter, this, _1, _2)),
+                                                                  emitter->RegisterEventHandler (SoundEmitterEvent_Stop, bind (&ScenePlayer::Impl::StopEmitter, this, _1, _2)),
+                                                                  node.RegisterEventHandler     (NodeEvent_AfterUpdate,  bind (&ScenePlayer::Impl::EmitterUpdate, this, _1, _2))));
+
+        emitters.insert_pair (emitter, scene_player_emitter);
+      }
     }
-  }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка добавления/удаления нодов в сцене
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void ListenerUnbind (Node& sender, NodeEvent event)
-  {
-    SetListener (0);
-  }
+    void ListenerUnbind (Node& sender, NodeEvent event)
+    {
+      SetListener (0);
+    }
 
-  void ProcessAttachNode (Node& sender, Node& node, NodeSubTreeEvent event)
-  {
-    CheckNode (node);
-  }
+    void ProcessAttachNode (Node& sender, Node& node, NodeSubTreeEvent event)
+    {
+      CheckNode (node);
+    }
 
-  void ProcessDetachNode (Node& sender, Node& node, NodeSubTreeEvent event)
-  {
-    EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&node));
+    void ProcessDetachNode (Node& sender, Node& node, NodeSubTreeEvent event)
+    {
+      EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&node));
 
-    if (emitter_iter == emitters.end ())
-      return;
+      if (emitter_iter == emitters.end ())
+        return;
 
-    emitters.erase (emitter_iter);
-  }
+      emitters.erase (emitter_iter);
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проигрывание эмиттеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  void PlayEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
-  {
-    if (!sound_manager)
-      return;
+    void PlayEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
+    {
+      EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&emitter));
 
-    EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&emitter));
+      if (emitter_iter == emitters.end ())
+        return;
 
-    if (emitter_iter == emitters.end ())
-      return;
+      emitter_iter->second->emitter.SetSampleIndex (rand ());
 
-    emitter_iter->second->emitter.SetSampleIndex (rand ());
+      emitter_iter->second->is_playing        = true;
+      emitter_iter->second->play_start_time   = clock ();
+      emitter_iter->second->play_start_offset = 0.f;
 
-    sound_manager->PlaySound (emitter_iter->second->emitter);
+      if (!sound_manager)
+        return;
 
-    emitter_iter->second->is_playing        = true;
-    emitter_iter->second->play_start_time   = clock ();
-    emitter_iter->second->play_start_offset = 0.f;
-  }
+      sound_manager->PlaySound (emitter_iter->second->emitter);
 
-  void StopEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
-  {
-    if (!sound_manager)
-      return;
+      emitter.AddRef ();
+      
+      action_queue.SetAction ((size_t)&emitter, size_t(sound_manager->Duration (emitter_iter->second->emitter) * 1000.f), bind (&scene_graph::SoundEmitter::Release, &emitter));
+    }
 
-    EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&emitter));
+    void StopEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
+    {
+      if (!sound_manager)
+        return;
 
-    if (emitter_iter == emitters.end ())
-      return;
+      EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&emitter));
 
-    sound_manager->StopSound (emitter_iter->second->emitter);
+      if (emitter_iter == emitters.end ())
+        return;
 
-    emitter_iter->second->is_playing = false;
-  }
+      sound_manager->StopSound (emitter_iter->second->emitter);
+
+      emitter_iter->second->is_playing = false;
+    }
 };
 
 /*

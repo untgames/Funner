@@ -119,6 +119,7 @@ int main ()
     manager.SetMute (true);
     printf ("Mute: "); print (manager.IsMuted ());
     manager.SetMute (false);
+    printf ("Mute: "); print (manager.IsMuted ());
 
     printf ("Initial listener status: "); print (manager.Listener ());
     listener.position  = vec3f (0.f, 1.f, 0.f);

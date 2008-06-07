@@ -12,7 +12,7 @@ SCENE_PLAYER_SOURCES.LIB_DIRS         :=
 SCENE_PLAYER_SOURCES.LIBS             := 
 SCENE_PLAYER_SOURCES.COMPILER_CFLAGS  :=
 SCENE_PLAYER_SOURCES.COMPILER_DEFINES :=
-SCENE_PLAYER_SOURCES.IMPORTS          := compile.static.mak ../low_level/compile.static.mak
+SCENE_PLAYER_SOURCES.IMPORTS          := compile.static.mak ../low_level/compile.static.mak ../../system/compile.static.mak
 
 #Öåëü ¹2 - ScenePlayer tests
 SCENE_PLAYER_TESTS.TYPE             := test-suite
@@ -23,5 +23,5 @@ SCENE_PLAYER_TESTS.DLLS             :=
 SCENE_PLAYER_TESTS.DLL_DIRS         :=
 SCENE_PLAYER_TESTS.COMPILER_CFLAGS  :=
 SCENE_PLAYER_TESTS.COMPILER_DEFINES :=
-SCENE_PLAYER_TESTS.IMPORTS          := link.static.mak compile.static.mak ../../system/exports.static.mak ../openal_device/link.static.mak ../../media/sound/snddecl.link.static.mak \
+SCENE_PLAYER_TESTS.IMPORTS          := link.static.mak compile.static.mak ../../system/compile.static.mak ../openal_device/link.static.mak ../../media/sound/snddecl.link.static.mak \
 						  				                 ../../media/sound/default_decoders.link.static.mak ../openal_device/run.static.mak

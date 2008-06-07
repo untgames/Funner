@@ -1,5 +1,5 @@
 ###################################################################################################
-#Настройки, экспортируемые для библиотек использующих WindowDriver
+#Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS    := input.window_driver system
-export.IMPORTS := ../low_level/link.static.mak ../../system/link.statik.mak
+export.INCLUDE_DIRS := include
+export.IMPORTS      := ../common/compile.static.mak
