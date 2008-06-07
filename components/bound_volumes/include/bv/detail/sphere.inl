@@ -195,7 +195,7 @@ inline bool sphere<T>::operator == (const sphere<T>& s) const
 }
 
 template <class T>
-inline bool typename sphere<T>::operator != (const sphere& s) const
+inline bool sphere<T>::operator != (const sphere& s) const
 {
   return !(*this == s);
 }

@@ -361,7 +361,7 @@ inline bool contains (const axis_aligned_box<T>& box, const sphere<T>& s)
 template <class T>
 inline axis_aligned_box<T> intersection (const axis_aligned_box<T>& a, const axis_aligned_box<T>& b)
 {
-  axis_aligned_box<T>::vec_type vmin = a.minimum (), vmax = a.maximum ();
+  typename axis_aligned_box<T>::vec_type vmin = a.minimum (), vmax = a.maximum ();
   
   for (size_t i=0; i<3; i++)
   {
