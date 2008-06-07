@@ -2,4 +2,4 @@
 #Настройки, экспортируемые для библиотек использующих WindowDriver
 ###################################################################################################
 export.LIBS    := input.window_driver system
-export.IMPORTS := ../low_level/link.static.mak ../../system/link.statik.mak
+export.IMPORTS := ../low_level/link.static.mak ../../system/link.static.mak
