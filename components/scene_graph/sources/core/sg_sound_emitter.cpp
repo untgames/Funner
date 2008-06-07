@@ -12,7 +12,7 @@ using namespace common;
     Описание реализации SoundEmitter
 */
 
-typedef signal<void (SoundEmitter& sender, SoundEmitterEvent event)> SoundEmitterSignal;
+typedef xtl::signal<void (SoundEmitter& sender, SoundEmitterEvent event)> SoundEmitterSignal;
 
 struct SoundEmitter::Impl
 {

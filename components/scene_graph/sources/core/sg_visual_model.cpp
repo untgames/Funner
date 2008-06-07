@@ -1,5 +1,6 @@
 #include <sg/visual_model.h>
 #include <stl/string>
+#include <xtl/visitor.h>
 #include <common/exception.h>
 
 using namespace scene_graph;

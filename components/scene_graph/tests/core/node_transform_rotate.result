@@ -1,13 +1,13 @@
 Results of node_transform_rotate_test:
 initial state
-  parent orientation: local=[90 0 0] world=[90 0 0]
-  node orientation: local=[0 60 0] world=[90 0 60]
+  parent orientation: local=[90.0 0.0 0.0] world=[90.0 0.0 0.0]
+  node orientation: local=[0.0 60.0 0.0] world=[90.0 0.0 60.0]
 rotate node in parent space
-  parent orientation: local=[90 0 0] world=[90 0 0]
-  node orientation: local=[-90 0 60] world=[0 60 0]
+  parent orientation: local=[90.0 0.0 0.0] world=[90.0 0.0 0.0]
+  node orientation: local=[-90.0 0.0 60.0] world=[0.0 60.0 0.0]
 rotate node in local space
-  parent orientation: local=[90 0 0] world=[90 0 0]
-  node orientation: local=[-90 0 30] world=[0 30 0]
+  parent orientation: local=[90.0 0.0 0.0] world=[90.0 0.0 0.0]
+  node orientation: local=[-90.0 0.0 30.0] world=[0.0 30.0 0.0]
 rotate node in world space
-  parent orientation: local=[90 0 0] world=[90 0 0]
-  node orientation: local=[6.47054e-007 -60 90] world=[-6.83019e-006 30 90]
+  parent orientation: local=[90.0 0.0 0.0] world=[90.0 0.0 0.0]
+  node orientation: local=[0.0 -60.0 90.0] world=[-0.0 30.0 90.0]

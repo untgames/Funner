@@ -44,8 +44,8 @@ void dump (const aaboxf& box)
 
 void dump_bounds (Camera& camera)
 {
-  if (camera.IsInfiniteBounds ()) printf ("camera has infinite bounds:\n  local=", camera.Name ());
-  else                            printf ("camera bound:\n  local=", camera.Name ());
+  if (camera.IsInfiniteBounds ()) printf ("camera '%s' has infinite bounds:\n  local=", camera.Name ());
+  else                            printf ("camera '%s' bound:\n  local=", camera.Name ());
 
   dump (camera.BoundBox ());
   printf ("\n  world=");

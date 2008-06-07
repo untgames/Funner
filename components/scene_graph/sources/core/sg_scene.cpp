@@ -1,6 +1,7 @@
 #include <sg/scene.h>
 #include <stl/string>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/function.h>
 #include <common/exception.h>
 
 #include "scene_object.h"
@@ -191,7 +192,9 @@ void Scene::Traverse (const ConstTraverseFunction& fn) const
 
 void Scene::VisitEach (Visitor& visitor) const
 {
-  const_cast<Impl*> (impl)->ForEach (VisitorWrapper (visitor));
+  VisitorWrapper visitor_wrapper (visitor);
+
+  const_cast<Impl*> (impl)->ForEach (visitor_wrapper);
 }
 
 /*
@@ -200,15 +203,22 @@ void Scene::VisitEach (Visitor& visitor) const
 
 void Scene::Traverse (const aaboxf& box, const TraverseFunction& fn)
 {  
-  impl->ForEach (BoundsCheckFunction<const TraverseFunction> (box, fn));
+  BoundsCheckFunction<const TraverseFunction> checker (box, fn);
+
+  impl->ForEach (checker);
 }
 
 void Scene::Traverse (const aaboxf& box, const ConstTraverseFunction& fn) const
 {
-  impl->ForEach (BoundsCheckFunction<const ConstTraverseFunction> (box, fn));
+  BoundsCheckFunction<const ConstTraverseFunction> checker (box, fn);
+
+  impl->ForEach (checker);
 }
 
 void Scene::VisitEach (const aaboxf& box, Visitor& visitor) const
 {
-  const_cast<Impl*> (impl)->ForEach (BoundsCheckFunction<VisitorWrapper> (box, VisitorWrapper (visitor)));
+  VisitorWrapper visitor_wrapper (visitor);
+  BoundsCheckFunction<VisitorWrapper> checker (box, visitor_wrapper);
+
+  const_cast<Impl*> (impl)->ForEach (checker);
 }

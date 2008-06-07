@@ -45,7 +45,10 @@ int main ()
   printf ("traverse\n");
   scene.Traverse (aaboxf (-5.0f, 5.0f), &traverse_fn);
   printf ("visit_each\n");  
-  scene.VisitEach (aaboxf (-30.0f, -15.0f), MyVisitor ());
+    
+  MyVisitor visitor;
+  
+  scene.VisitEach (aaboxf (-30.0f, -15.0f), visitor);
   printf ("const traverse\n");
   scene.Traverse (aaboxf (-100.0f, 100.0f), &ctraverse_fn);
 

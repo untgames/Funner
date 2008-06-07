@@ -37,10 +37,13 @@ int main ()
   dump (*node);  
   
   printf ("visitor traverse top-to-bottom\n");
-  node->VisitEach (MyVisitor (), NodeTraverseMode_TopToBottom);
+  
+  MyVisitor visitor;
+  
+  node->VisitEach (visitor, NodeTraverseMode_TopToBottom);
   
   printf ("visitor traverse bottom-to-top\n");
-  node->VisitEach (MyVisitor (), NodeTraverseMode_BottomToTop);
+  node->VisitEach (visitor, NodeTraverseMode_BottomToTop);
 
   return 0;
 }

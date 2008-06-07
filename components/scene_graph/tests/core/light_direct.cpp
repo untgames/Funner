@@ -11,8 +11,8 @@ void dump (const aaboxf& box)
 
 void dump_bounds (Light& light)
 {
-  if (light.IsInfiniteBounds ()) printf ("light has infinite bounds:\n  local=", light.Name ());
-  else                           printf ("light bound:\n  local=", light.Name ());
+  if (light.IsInfiniteBounds ()) printf ("light '%s' has infinite bounds:\n  local=", light.Name ());
+  else                           printf ("light '%s' bound:\n  local=", light.Name ());
 
   dump (light.BoundBox ());
   printf ("\n  world=");

@@ -3,6 +3,8 @@
 #include <common/exception.h>
 #include <bv/axis_aligned_box.h>
 
+#include <stl/algorithm>
+
 using namespace scene_graph;
 using namespace math;
 using namespace common;

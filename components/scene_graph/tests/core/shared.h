@@ -1,9 +1,13 @@
 #ifndef SG_TESTS_SHARED
 #define SG_TESTS_SHARED
 
+#include <stdio.h>
+
 #include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/visitor.h>
+#include <xtl/string.h>
+
 #include <sg/node.h>
 #include <sg/light.h>
 #include <sg/listener.h>
@@ -11,7 +15,6 @@
 #include <sg/sound_emitter.h>
 #include <sg/visual_model.h>
 #include <sg/scene.h>
-#include <stdio.h>
 
 using namespace scene_graph;
 using namespace math;
@@ -44,7 +47,7 @@ class TestEntity: public Entity
 
 inline void dump (const vec3f& v)
 {
-  printf ("[%g %g %g]", v.x, v.y, v.z);
+  printf ("[%.2f %.2f %.2f]", v.x, v.y, v.z);
 }
 
 inline void dump (const quatf& q)
@@ -57,7 +60,7 @@ inline void dump (const quatf& q)
   yaw   = fmod (rad2deg (yaw), 360.0f);
   roll  = fmod (rad2deg (roll), 360.0f);
 
-  printf ("[%g %g %g]", pitch, yaw, roll);
+  printf ("[%.1f %.1f %.1f]", pitch, yaw, roll);
 }
 
 inline void dump_position (Node& node)

@@ -41,7 +41,7 @@ int main ()
   {
     char name [40];
     
-    _snprintf (name, sizeof (name), "entity%u", i);
+    xtl::xsnprintf (name, sizeof (name), "entity%u", i);
     
     Entity* entity = TestEntity::Create ();
     
@@ -62,7 +62,9 @@ int main ()
   
   printf ("visit_each\n");
 
-  scene.VisitEach (MyVisitor ());
+  MyVisitor visitor;
+
+  scene.VisitEach (visitor);
 
   printf ("exit\n");
 
