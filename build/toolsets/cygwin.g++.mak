@@ -1,4 +1,4 @@
-COMMON_CFLAGS += -mwin32
-PROFILES      += cygwin.g++ win32
+COMMON_CFLAGS +=
+PROFILES      += cygwin.g++
 
 include $(TOOLSETS_DIR)/g++.mak
