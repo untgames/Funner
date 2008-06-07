@@ -55,7 +55,7 @@ void DaeParser::ParseLight (Parser::Iterator iter)
   static const size_t light_types_count = sizeof (light_types) / sizeof (*light_types);
   
   size_t i;
-  LightType type;
+  LightType type = LightType_Point;
     
   for (i=0; i<light_types_count; i++)
     if (test (iter, light_types [i].string))

@@ -309,7 +309,7 @@ void dump (Skin& skin, int level, Model& model)
   for (size_t i = 0; i < skin.WeightsCount (); i++)
   {
     print_space (level);
-    printf ("joint %d weight %f\n", skin.Weights ()[i].joint, skin.Weights ()[i].weight);
+    printf ("joint %d weight %.4f\n", skin.Weights ()[i].joint, skin.Weights ()[i].weight);
   }
 }
 
@@ -537,7 +537,7 @@ template <class Item> void dump (const char* library_name, ILibrary<Item>& libra
   print_space (level++);
   printf      ("Library '%s' (%u items)\n", library_name, library.Size ());
   
-  for (ILibrary<Item>::Iterator i=library.CreateIterator (); i; ++i)
+  for (typename ILibrary<Item>::Iterator i=library.CreateIterator (); i; ++i)
     dump (*i, level, model);
 }
 

@@ -22,7 +22,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     {
       channels.reserve (impl.channels.size ());
       
-      for (ChannelArray::const_iterator i=impl.channels.begin (), end=impl.channels.end (); i!=end; ++i)
+      for (typename ChannelArray::const_iterator i=impl.channels.begin (), end=impl.channels.end (); i!=end; ++i)
       {
         Channel* channel = new Channel (**i);
         
@@ -84,7 +84,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     
     void Clear ()
     {
-      for (ChannelArray::iterator i=channels.begin (); i!=channels.end (); ++i)
+      for (typename ChannelArray::iterator i=channels.begin (); i!=channels.end (); ++i)
         delete *i;
         
       channels.clear ();      
@@ -109,7 +109,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
       if (!name)
         raise_null_argument ("media::collada::Surface::IChannelList::Find", "name");
         
-      for (ChannelArray::const_iterator i=channels.begin (), end=channels.end (); i!=end; ++i)
+      for (typename ChannelArray::const_iterator i=channels.begin (), end=channels.end (); i!=end; ++i)
         if ((*i)->name == name)
           return i - channels.begin ();
 
@@ -174,7 +174,7 @@ struct Surface::Impl: public xtl::reference_counter
   InfluenceChannelListImpl  influence_channels; //каналы вершинных весов
   
   Impl (collada::PrimitiveType in_primitive_type, size_t in_vertices_count, size_t in_indices_count) :
-    vertices (in_vertices_count), indices (in_indices_count), primitive_type (in_primitive_type),
+    primitive_type (in_primitive_type), vertices (in_vertices_count), indices (in_indices_count),
     color_channels (in_vertices_count), texvertex_channels (in_vertices_count), influence_channels (in_vertices_count)
   {
     switch (primitive_type)

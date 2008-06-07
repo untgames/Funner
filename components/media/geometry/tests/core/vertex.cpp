@@ -1,5 +1,9 @@
 #include "shared.h"
 
+#if defined (_MSC_VER) || defined (__GNUC__)
+#pragma pack(1)
+#endif
+
 template <class Vertex> void dump_format ()
 {
   VertexFormat format;

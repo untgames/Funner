@@ -205,13 +205,13 @@ DevILImageImpl::DevILImageImpl (DevILImageImpl& source)
 DevILImageImpl::DevILImageImpl (const char* file_name)
   : width (0), height (0), depth (0), format (PixelFormat_Default)
 {
-  LoadComponent ();
+  LoadComponent ();  
 
   ilGenImages        (1, &il_image);
   check_devil_errors ("media::DevILImageImpl::DevILImageImpl(const char*)", "ilGenImages");
   
   try
-  {
+  {    
     ilBindImage        (il_image);
     check_devil_errors ("media::DevILImageImpl::DevILImageImpl(const char*)", "ilBindImage");    
     ilLoadImage        (const_cast<ILstring> (file_name));

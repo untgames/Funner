@@ -20,7 +20,9 @@ class MyVisitor: public xtl::visitor<void, TestMaterial, CommonMaterial, MultiPa
 
 void dump (Material& mtl)
 {
-  mtl.Accept (MyVisitor ());
+  MyVisitor visitor;
+
+  mtl.Accept (visitor);
 }
 
 int main ()

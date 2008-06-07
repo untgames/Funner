@@ -15,9 +15,9 @@ struct Material::Impl: public xtl::reference_counter
   stl::string name;       //имя материала
   size_t      name_hash;  //хэш имени
   PinSet      pins;       //пины  
-  int         sort_group; //группа сортировки  
+  int         sort_group; //группа сортировки
 
-  Impl () : sort_group (0), name_hash (strhash ("")) {}
+  Impl () : name_hash (strhash ("")), sort_group (0) {}
 };
 
 /*

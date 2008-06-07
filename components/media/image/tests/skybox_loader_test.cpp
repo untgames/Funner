@@ -29,10 +29,10 @@ int main ()
   {
     printf ("Results of cubemax loader test:\n");
 
-    Image image (file_name);
+    Image image (file_name);    
 
     if (!FileSystem::IsDir (results_dir))
-      FileSystem::Mkdir (results_dir);
+      FileSystem::Mkdir (results_dir);      
 
     image.Save ("results/pic1.jpg.skybox");
 

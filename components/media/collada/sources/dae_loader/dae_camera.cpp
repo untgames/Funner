@@ -50,12 +50,12 @@ void DaeParser::ParseCamera (Parser::Iterator iter)
   static const size_t types_count = sizeof (types) / sizeof (*types);
   
   size_t i;
-  CameraType type;
+  CameraType type = CameraType_Orthographic;
     
   for (i=0; i<types_count; i++)
     if (test (iter, types [i].string))
     {
-      type = types [i].value;      
+      type = types [i].value;
       iter = iter->First (types [i].string);
       break;
     }

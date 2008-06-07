@@ -76,7 +76,7 @@ class MultiPassMaterial: public Material
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Разрешение / запрещение проходов
 ///////////////////////////////////////////////////////////////////////////////////////////////////        
-    void           SetPassState (size_t index, PassState state);
+    void           SetPassState (size_t index, rfx::PassState state);
     rfx::PassState PassState    (size_t index) const;
 
     bool IsPassEnabled (size_t index) const { return PassState (index) == PassState_Enabled; }

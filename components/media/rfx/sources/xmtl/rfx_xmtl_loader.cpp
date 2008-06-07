@@ -158,7 +158,9 @@ class XmlMaterialLibraryLoader
         {
           int source_channel = -1;
           
-          if (read (xtl::io::make_token_iterator<const char*> (&source, &source + 1), source_channel))
+          xtl::io::token_iterator<const char*> token_iter (&source, &source + 1);
+          
+          if (read (token_iter, source_channel))
           {
             texmap.SetSource (texcoord, source_channel);
           }

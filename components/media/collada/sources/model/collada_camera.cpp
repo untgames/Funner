@@ -16,7 +16,7 @@ struct Camera::Impl: public xtl::reference_counter
   
   Impl () : type (CameraType_Perspective)
   {
-    for (size_t i=0; i<LightParam_Num; i++)
+    for (size_t i=0; i<CameraParam_Num; i++)
       params [i] = 0.0f;
   }
 };

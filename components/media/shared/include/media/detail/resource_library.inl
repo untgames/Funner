@@ -79,17 +79,15 @@ inline typename ResourceLibrary<T>::ConstIterator ResourceLibrary<T>::CreateCons
 template <class T>
 inline const char* ResourceLibrary<T>::ItemId (const ConstIterator& i)
 {
-  const ItemMap::const_iterator* iter = i.target<ItemMap::const_iterator> ();    
+  const typename ItemMap::const_iterator* citer = i.template target<typename ItemMap::const_iterator> ();
   
+  if (citer)
+    return (*citer)->first.c_str ();
+
+  const typename ItemMap::iterator* iter = i.template target<typename ItemMap::iterator> ();
+
   if (!iter)
-  {
-    const ItemMap::iterator* iter = i.target<ItemMap::iterator> ();
-
-    if (!iter)
-      common::raise_invalid_argument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
-
-    return (*iter)->first.c_str ();
-  }
+    common::raise_invalid_argument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
 
   return (*iter)->first.c_str ();
 }
@@ -104,7 +102,7 @@ inline const T* ResourceLibrary<T>::Find (const char* name) const
   if (!name)
     return 0;
     
-  ItemMap::const_iterator iter = items.find (name);
+  typename ItemMap::const_iterator iter = items.find (name);
   
   return iter != items.end () ? &iter->second : 0;
 }
@@ -125,7 +123,7 @@ inline void ResourceLibrary<T>::Insert (const char* name, Item& item)
   if (!name)
     common::raise_null_argument ("media::ResourceLibrary::Insert", "name");
   
-  ItemMap::iterator iter = items.find (name);
+  typename ItemMap::iterator iter = items.find (name);
   
   if (iter != items.end ())
   {
@@ -149,10 +147,10 @@ inline void ResourceLibrary<T>::Remove (const char* name)
 template <class T>
 inline void ResourceLibrary<T>::Remove (Item& item)
 {
-  for (ItemMap::iterator i=items.begin (), end=items.end (); i!=end;)
+  for (typename ItemMap::iterator i=items.begin (), end=items.end (); i!=end;)
     if (i->second.Id () == item.Id ())
     {
-      ItemMap::iterator next = i;
+      typename ItemMap::iterator next = i;
       
       ++next;
       

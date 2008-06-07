@@ -526,6 +526,8 @@ bool is_compatible (VertexAttributeSemantic semantic, VertexAttributeType type)
         case VertexAttributeType_Influence: return true;
         default:                            return false;
       }
+    default:
+      break;
   }
   
   return false;

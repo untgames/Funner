@@ -17,6 +17,7 @@ Buffer::Buffer (size_t size)
 }
 
 Buffer::Buffer (const Buffer& Buffer)
+  : start (0), finish (0), end_of_storage (0)
 {
   Resize (Buffer.Size ());
   

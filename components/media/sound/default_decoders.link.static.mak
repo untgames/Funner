@@ -3,4 +3,4 @@
 ###################################################################################################
 export.LIBS             := media.sound.default_decoders extern.vorbisfile_static extern.vorbis_static extern.ogg
 export.LINK_INCLUDES    := WavLoader OggLoader
-export.IMPORTS          :=
+export.IMPORTS          := link.static.mak

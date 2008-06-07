@@ -78,7 +78,7 @@ class Converter
     template <class T>
     void ConvertLibrary (const media::collada::ILibrary<T>& library, void (Converter::*fn)(const char* id, const T&))
     {
-      for (media::collada::ILibrary<T>::ConstIterator i=library.CreateIterator (); i; ++i)
+      for (typename media::collada::ILibrary<T>::ConstIterator i=library.CreateIterator (); i; ++i)
         (this->*fn)(library.ItemId (i), *i);
     }
 

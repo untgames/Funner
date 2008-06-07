@@ -68,6 +68,7 @@ int OggSeekFunc (void* file_ptr, ogg_int64_t offset, int origin)
 
      switch (seek_mode[origin])
      {
+       default:
        case FILE_SEEK_SET: seek_pos = (filepos_t)offset; break;
        case FILE_SEEK_CUR: seek_pos = ((StdFile*)file_ptr)->Tell () + (filepos_t)offset; break;
        case FILE_SEEK_END: seek_pos = ((StdFile*)file_ptr)->Size () + (filepos_t)offset; break;
@@ -93,11 +94,9 @@ int OggCloseFunc (void* file_ptr)
 
 long OggTellFunc (void *file_ptr)
 {
-  int ret_value;
-
   try
   {
-     ret_value = ((File*)file_ptr)->Tell ();
+    return ((File*)file_ptr)->Tell ();
   }
   catch (std::exception& exception)
   {
@@ -108,7 +107,7 @@ long OggTellFunc (void *file_ptr)
     log_exception ("::OggTellFunc");
   }
 
-  return ret_value;
+  return 0;
 }
 
 void SwapSamples (short &s1, short &s2)

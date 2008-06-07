@@ -33,7 +33,10 @@ int main ()
   vb.Attach (vs);  
   
   mesh1.Attach (vb);
-  mesh1.Attach (IndexBuffer (12));
+    
+  IndexBuffer ib (12);
+  
+  mesh1.Attach (ib);
   
   vs.Resize (5);
   

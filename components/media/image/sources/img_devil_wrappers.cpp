@@ -179,6 +179,7 @@ ILint ILAPIENTRY devil_file_seek (ILHANDLE file_ptr, ILint offset, ILint origin)
     
     switch (seek_mode [origin])
     {
+      default:
       case FILE_SEEK_SET: seek_pos = offset; break;
       case FILE_SEEK_CUR: seek_pos = ((StdFile*)file_ptr)->Tell () + offset; break;
       case FILE_SEEK_END: seek_pos = ((StdFile*)file_ptr)->Size () + offset; break;
@@ -269,7 +270,7 @@ class DevILComponent
       iluInit      ();
       ilEnable     (IL_FILE_OVERWRITE);
       ilEnable     (IL_ORIGIN_SET);
-      ilOriginFunc (IL_ORIGIN_LOWER_LEFT);
+      ilOriginFunc (IL_ORIGIN_LOWER_LEFT);      
 
       ilSetMemory (&devil_allocate, &devil_deallocate);
 
@@ -286,6 +287,7 @@ class DevILComponent
       ImageManager::RegisterLoader ("tga",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("tif",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("dds",     &Image::DefaultLoader);    
+      ImageManager::RegisterLoader ("psd",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("cubemap", &Image::CubemapLoader);
       ImageManager::RegisterLoader ("skybox",  &Image::SkyBoxLoader);
 
@@ -293,6 +295,7 @@ class DevILComponent
       ImageManager::RegisterSaver  ("bmp",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("tga",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("tif",     &Image::DefaultSaver);
+      ImageManager::RegisterSaver  ("psd",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("cubemap", &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("skybox",  &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("dds",     &Image::DefaultSaver);

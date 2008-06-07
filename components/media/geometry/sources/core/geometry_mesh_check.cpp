@@ -96,18 +96,23 @@ inline void check_attribute (Log& log, CheckContext& context, const vec<float, S
   static const char* component_name [] = {"x", "y", "z", "w"};
 
   for (size_t i=0; i<Size; i++)
-    if (!_finite (attribute [i]))
-      log.Error ("inifinite value vertex_buffer[%u].stream[%u].vertex[%u].%s.%s=%g (attribute_type='%s')",
+  {
+    #ifdef _MSC_VER
+    #define isfinite _finite
+    #endif
+    
+    if (!isfinite (attribute [i]))
+      log.Error ("infinite value vertex_buffer[%u].stream[%u].vertex[%u].%s.%s (attribute_type='%s')",
                  context.vertex_buffer_index, context.stream_index, context.vertex_index, get_semantic_name (context.attribute->semantic), component_name [i],
-                 attribute [i], get_type_name (context.attribute->type));
+                 get_type_name (context.attribute->type));
+  }
 }
 
 template <class T>
 void check_stream (Log& log, CheckContext& context, const char* iter)
 {
-  size_t verts_count   = context.stream.Size (),
-         weights_count = context.weights_count,
-         stride        = context.stream.VertexSize ();
+  size_t verts_count = context.stream.Size (),
+         stride      = context.stream.VertexSize ();
 
   for (size_t i=0; i<verts_count; i++, iter += stride)
   {
@@ -296,7 +301,11 @@ bool check (const Mesh& mesh, size_t joints_count, const xtl::function<void (con
       const VertexBuffer& vertex_buffer = mesh.VertexBuffer (i);
 
       for (size_t j=0, count=vertex_buffer.StreamsCount (); j<count; j++)
-        check_stream (log, CheckContext (vertex_buffer, i, j));
+      {
+        CheckContext check_context (vertex_buffer, i, j);
+        
+        check_stream (log, check_context);
+      }
 
         //проверка массива весов
         

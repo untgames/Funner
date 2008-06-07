@@ -62,9 +62,9 @@ CommonMaterial::CommonMaterial ()
   : impl (new Impl)
   {}
 
-CommonMaterial::CommonMaterial (const CommonMaterial& Material)
-  : Material (Material),
-    impl (new Impl (*Material.impl))
+CommonMaterial::CommonMaterial (const CommonMaterial& material)
+  : Material (material),
+    impl (new Impl (*material.impl))
   {}
 
 CommonMaterial::~CommonMaterial ()

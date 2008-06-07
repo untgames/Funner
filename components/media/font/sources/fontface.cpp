@@ -192,7 +192,8 @@ void FontFace::Load (const char* file_name)
     read (i, "YKerning",   kerning_info[glyph_count * left + right].y_kerning);
   }
 
-  Swap (FontFace (first_char_code, glyph_count, glyph_info, kerning_info, font_file.c_str ()));
+  FontFace (first_char_code, glyph_count, glyph_info, kerning_info, font_file.c_str ()).Swap (*this);
+
   impl->str_name = file_name;
 }
 
