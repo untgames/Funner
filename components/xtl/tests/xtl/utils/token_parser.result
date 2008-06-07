@@ -1,0 +1,9 @@
+Results of token_parser_test:
+try get int from '123': 123
+try get int from '': exception: xtl::bad_lexical_cast
+try get int from 'h123': exception: xtl::bad_lexical_cast
+try get int from '123h': exception: xtl::bad_lexical_cast
+get int from '123': 123
+get int from '': -1
+get int from 'h123': -1
+get int from '123h': -1

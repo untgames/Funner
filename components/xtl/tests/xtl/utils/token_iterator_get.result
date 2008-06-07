@@ -3,4 +3,4 @@ value=-1
 value=1
 value='hello'
 value=3.14
-value=0
+exception: xtl::bad_lexical_cast
