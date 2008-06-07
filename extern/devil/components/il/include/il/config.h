@@ -200,3 +200,17 @@
 
 /* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */
+
+//FIX: решение проблемы с функциями stricmp/strnicmp
+
+#include <string.h>
+
+#ifdef stricmp
+#undef stricmp
+#define stricmp devil_stricmp
+#endif
+
+#ifdef strnicmp
+#undef strnicmp
+#define strnicmp devil_strnicmp
+#endif

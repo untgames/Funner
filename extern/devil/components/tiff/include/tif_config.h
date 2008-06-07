@@ -43,4 +43,18 @@
 # endif
 #endif
 
-#define lfind _lfind
+#ifdef __CYGWIN__
+
+#ifndef WOPEN_CYGWIN_FIX
+#define WOPEN_CYGWIN_FIX
+
+static int _wopen (const void* name, int mode, ...)
+{
+  return -1;
+}
+
+#endif
+
+#else
+  #define lfind _lfind
+#endif

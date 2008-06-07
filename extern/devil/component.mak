@@ -22,23 +22,22 @@ EXTERN.TIFFLIB.LIB_DIRS         :=
 EXTERN.TIFFLIB.LIBS             :=
 EXTERN.TIFFLIB.COMPILER_CFLAGS  :=
 EXTERN.TIFFLIB.COMPILER_DEFINES :=
-EXTERN.TIFFLIB.nds.g++.COMPILER_CFLAGS := --no-warn
+EXTERN.TIFFLIB.g++.COMPILER_CFLAGS := --no-warn
 
 #Öåëü ¹3 - DevILDLL sources
 EXTERN.DEVIL.TYPE                 := static-lib
 EXTERN.DEVIL.NAME                 := extern.devil
-EXTERN.DEVIL.INCLUDE_DIRS         := include include/il components/jpeg/include components/tiff/include components/il/include ../zlib/include
+EXTERN.DEVIL.INCLUDE_DIRS         := include components/il/include/il components/jpeg/include components/tiff/include components/il/include ../zlib/include
 EXTERN.DEVIL.SOURCE_DIRS          := components/il/sources
-EXTERN.DEVIL.COMPILER_DEFINES     := IL_NO_LCMS IL_NO_MNG IL_NO_PNG IL_STATIC_LIB
+EXTERN.DEVIL.COMPILER_DEFINES     := IL_NO_LCMS IL_NO_MNG IL_NO_PNG IL_STATIC_LIB XMD_H HAVE_CONFIG_H
 EXTERN.DEVIL.msvc.COMPILER_CFLAGS := -wd4142 -wd4005 -wd4018
 EXTERN.DEVIL.g++.COMPILER_CFLAGS  := --no-warn
-EXTERN.DEVIL.g++.COMPILER_DEFINES := XMD_H
 
 #Öåëü ¹4 - ILUDLL sources
 EXTERN.ILU.TYPE                 := static-lib
 EXTERN.ILU.NAME                 := extern.ilu
-EXTERN.ILU.INCLUDE_DIRS         := include include/il components/jpeg/include components/tiff/include components/il/include components/ilu/include ../zlib/include
+EXTERN.ILU.INCLUDE_DIRS         := include components/il/include/il components/jpeg/include components/tiff/include components/il/include components/ilu/include ../zlib/include
 EXTERN.ILU.SOURCE_DIRS          := components/ilu/sources
-EXTERN.ILU.COMPILER_DEFINES     := IL_STATIC_LIB
+EXTERN.ILU.COMPILER_DEFINES     := IL_STATIC_LIB HAVE_CONFIG_H
 EXTERN.ILU.msvc.COMPILER_CFLAGS := -wd4090
 EXTERN.ILU.g++.COMPILER_CFLAGS  := --no-warn
