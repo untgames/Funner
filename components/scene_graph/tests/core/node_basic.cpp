@@ -12,7 +12,7 @@ int main ()
   Node::Pointer node (Node::Create ());
   
   node->SetName ("node1");
-  xtl::auto_connection destroy_connection = node->RegisterEventHandler (NodeEvent_BeforeDestroy, &on_destroy);  
+  node->RegisterEventHandler (NodeEvent_BeforeDestroy, &on_destroy);  
 
   printf ("name: '%s'\n", node->Name ());
   printf ("use count: %u\n", node->UseCount ());

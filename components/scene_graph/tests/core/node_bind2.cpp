@@ -30,8 +30,8 @@ int main ()
   node->SetName    ("child1");
   child->SetName   ("child2");
   
-  xtl::auto_connection bind_child_connection   = parent1->RegisterEventHandler (NodeSubTreeEvent_AfterBind, &on_bind_child);
-  xtl::auto_connection unbind_child_connection = parent1->RegisterEventHandler (NodeSubTreeEvent_BeforeUnbind, &on_unbind_child);
+  parent1->RegisterEventHandler (NodeSubTreeEvent_AfterBind, &on_bind_child);
+  parent1->RegisterEventHandler (NodeSubTreeEvent_BeforeUnbind, &on_unbind_child);
   
   parent2->BindToParent (*parent1);
   child->BindToParent (*node);
