@@ -1,5 +1,5 @@
 #include <stdio.h>
 
-#include <xtl/message_exception.h>
+#include <xtl/common_exceptions.h>
 
 using namespace xtl;

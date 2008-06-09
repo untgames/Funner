@@ -16,8 +16,10 @@ class message_exception: public exception
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    message_exception (const char* message);
-    message_exception (const char* source, const char* message);
+    message_exception  (const char* message);
+    message_exception  (const char* format, va_list args);    
+    message_exception  (const char* source, const char* message);
+    message_exception  (const char* source, const char* format, va_list args);
     ~message_exception () throw () {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,8 +45,16 @@ class derived_exception: public BaseException
 {
   public:
     derived_exception (const char* message);
+    derived_exception (const char* format, va_list args);
     derived_exception (const char* source, const char* message);
+    derived_exception (const char* source, const char* format, va_list args);
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание исключения с форматированным сообщением
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Exception> Exception format_exception  (const char* source, const char* format, ...);
+template <class Exception> Exception vformat_exception (const char* source, const char* format, va_list args);
 
 #include <xtl/detail/message_exception.inl>
 
