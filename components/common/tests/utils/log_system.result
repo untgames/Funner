@@ -1,0 +1,6 @@
+Results of log_system_test:
+New log message received in 'critical' log handler from log 'file_system_critical': 'Can't acquire file system access'
+New log message received in 'all' log handler from log 'file_system_critical': 'Can't acquire file system access'
+New log message received in 'critical' log handler from log 'critical_system_log': 'System fail at 17::15'
+New log message received in 'all' log handler from log 'critical_system_log': 'System fail at 17::15'
+New log message received in 'all' log handler from log 'trivial_log': 'System start...'
