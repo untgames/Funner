@@ -63,6 +63,7 @@ stl::vector<stl::string> split (const stl::string& str,const char* delimiters=" 
 */
 
 void parse_init_string (const char* init_string, const xtl::function<void (const char* property, const char* value)>& fn);
+void parse_format_string (const char* format_string, const xtl::function<void (const char* prefix, const char* replacement_tag)>& fn);
 
 /*
     Работа с регулярными выражениями
