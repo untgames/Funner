@@ -1,7 +1,7 @@
 #ifndef XTL_CONNECTION_HEADER
 #define XTL_CONNECTION_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 #include <new>
 
 namespace xtl

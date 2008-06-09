@@ -2,7 +2,7 @@
 #define XTL_UNINITIALIZED_BUFFER_HEADER
 
 #include <stl/alloc.h>
-#include <memory.h>
+#include <cstring>
 
 namespace xtl
 {
@@ -14,10 +14,11 @@ template <class T, class Allocator=typename stl::default_allocator<T>::allocator
 class uninitialized_storage: private Allocator
 {
   public:
-    typedef T                                  value_type;
-    typedef Allocator                          allocator_type;
-    typedef typename allocator_type::pointer   pointer;    
-    typedef typename allocator_type::size_type size_type;
+    typedef T                                      value_type;
+    typedef Allocator                              allocator_type;
+    typedef typename allocator_type::pointer       pointer;
+    typedef typename allocator_type::const_pointer const_pointer;    
+    typedef typename allocator_type::size_type     size_type;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
@@ -51,7 +52,7 @@ class uninitialized_storage: private Allocator
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Данные
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const pointer data () const;
+    const_pointer data () const;
           pointer data ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +66,7 @@ class uninitialized_storage: private Allocator
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void swap (uninitialized_storage&);
   
-  private:      
+  private:
     pointer start, finish, end_of_storage;
 };
 

@@ -1,7 +1,7 @@
 #ifndef XTL_REFERENCE_COUNTER_HEADER
 #define XTL_REFERENCE_COUNTER_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 #include <xtl/checked_delete.h>
 
 namespace xtl

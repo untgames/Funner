@@ -1,7 +1,7 @@
 #ifndef XTL_LEXICAL_CAST_HEADER
 #define XTL_LEXICAL_CAST_HEADER
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <stl/string>
 

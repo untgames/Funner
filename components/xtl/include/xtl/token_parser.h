@@ -1,10 +1,10 @@
 #ifndef XTL_TOKEN_PARSER_HEADER
 #define XTL_TOKEN_PARSER_HEADER
 
-#include <ctype.h>
-#include <wchar.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cctype>
+#include <cwchar>
+#include <cstdlib>
+#include <cstring>
 
 #include <typeinfo>
 #include <exception>

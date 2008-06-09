@@ -38,7 +38,7 @@ TR1_TESTS.msvc.SOURCE_DIRS    := tests/tr1/functional/msvc
 #Öåëü ¹4 - XTL tests
 XTL_TESTS.TYPE             := test-suite
 XTL_TESTS.INCLUDE_DIRS     := include ../mathlib/include
-XTL_TESTS.SOURCE_DIRS      := tests/xtl/signals tests/xtl/utils tests/xtl/visitor tests/xtl/range tests/xtl/smart_ptr tests/xtl/any
+XTL_TESTS.SOURCE_DIRS      := tests/xtl/signals tests/xtl/utils tests/xtl/visitor tests/xtl/range tests/xtl/smart_ptr tests/xtl/any tests/xtl/exception
 XTL_TESTS.LIB_DIRS         :=  
 XTL_TESTS.EXECTUTION_DIR   :=
 XTL_TESTS.LIBS             :=

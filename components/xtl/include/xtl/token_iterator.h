@@ -1,7 +1,7 @@
 #ifndef XTL_TOKEN_ITERATOR_HEADER
 #define XTL_TOKEN_ITERATOR_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 #include <xtl/token_parser.h>
 
 namespace stl

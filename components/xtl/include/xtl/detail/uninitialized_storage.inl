@@ -73,7 +73,7 @@ inline bool uninitialized_storage<T, Allocator>::empty () const
 */
 
 template <class T, class Allocator>
-inline const typename uninitialized_storage<T, Allocator>::pointer uninitialized_storage<T, Allocator>::data () const
+inline typename uninitialized_storage<T, Allocator>::const_pointer uninitialized_storage<T, Allocator>::data () const
 {
   return start;
 }

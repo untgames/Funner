@@ -39,11 +39,57 @@ inline int xstrnicmp (const char* s1, const char* s2, size_t max_count)
 }
 
 /*
-    Форматированный вывод в строку
+    Получение длины строки
 */
 
+inline size_t xstrlen (const char* s)
+{
+  return s ? strlen (s) : 0;
+}
+
+inline size_t xstrlen (const wchar_t* s)
+{
+  if (!s)
+    return 0;
+
+  const wchar_t* i = s;
+
+  while (*i++);
+
+  return size_t (i - s - 1);
+}
+
 /*
-    Печать в строку
+    Копирование строк
+*/
+
+inline char* xstrncpy (char* dst, const char* src, int length)
+{
+  if (!dst || !src)
+    return dst;
+    
+  return strncpy (dst, src, length);  
+}
+
+inline wchar_t* xstrncpy (wchar_t* dst, const wchar_t* src, int length)
+{
+  if (!dst || !src)
+    return dst;
+
+  wchar_t* start = dst;
+
+  while (length && (*dst++ = *src++)) length--;
+
+  if (length)
+  {
+    while (--length) *dst++ = L'\0';
+  }
+
+  return start; 
+}
+
+/*
+    Форматированный вывод в строку
 */
 
 inline int xsnprintf (char* buffer, size_t count, const char* format, ...)

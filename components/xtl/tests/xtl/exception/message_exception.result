@@ -1,0 +1,13 @@
+Results of message_exception_test:
+exception: test exception message
+    at ::f0
+    at ::f1
+    at ::f2
+    at ::f3
+    at ::f4
+    at ::f5
+    at ::f6
+    at ::f7
+    at ::f8
+    at ::f9
+    at ::f10

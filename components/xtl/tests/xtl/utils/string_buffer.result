@@ -1,0 +1,12 @@
+Results of string_buffer_test:
+buf1.size ()=13 strlen (buf1.data ())=13
+buf1 = 'Hello world 1 !!!' buf2=''
+buf1.empty (): false
+buf2.empty (): true
+buf1.size ()=17 strlen (buf1.data ())=17
+buf2.size ()=0 strlen (buf2.data ())=0
+buf1 = 'Hello world 1 !!!' buf2='Hello world 1 !!! (after append string)'
+buf1.empty (): false
+buf2.empty (): false
+buf1.size ()=17 strlen (buf1.data ())=17
+buf2.size ()=39 strlen (buf2.data ())=39
