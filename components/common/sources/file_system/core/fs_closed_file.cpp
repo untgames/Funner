@@ -4,7 +4,7 @@ using namespace common;
 using namespace stl;
 
 ClosedFileImpl::ClosedFileImpl ()
-  : FileImpl ((size_t)-1)
+  : FileImpl (0u)
   { }
   
 void ClosedFileImpl::Raise (const char* source)

@@ -4,34 +4,20 @@ using namespace stl;
 using namespace common;
 using namespace input;
 
+namespace
+{
+
+size_t NO_ARGUMENT = ~0;
+
+}
+
 struct input::EventTranslator::Token
 {
   string prefix;
   size_t argument_index;
 
-  Token (const string& in_prefix, size_t in_index) : prefix (in_prefix), argument_index (in_index) {}
+  Token (const char* in_prefix, size_t in_index) : prefix (in_prefix), argument_index (in_index) {}
 };
-
-namespace
-{
-
-const size_t NO_ARGUMENT = ~0;
-
-size_t parse_replacement (const char*& s)
-{
-  char* end;
-
-  size_t index = strtoul (s+1, &end, 10);
-
-  if (*end != '}')
-    return NO_ARGUMENT;
-
-  s = end + 1;
-
-  return index;
-}
-
-}
 
 namespace input
 {
@@ -43,8 +29,8 @@ namespace input
 EventTranslator::EventTranslator (const char* input_event, const char* event_replacement, const char* tag)
   : str_event_wildcard (input_event), str_event_replacement (event_replacement), str_tag (tag)
 {
-  ParseReplacement (event_replacement);
-  
+  parse_format_string (event_replacement, xtl::bind (&EventTranslator::ParseFormatString, this, _1, _2));
+
   split_event (input_event, event_wildcard);
 
   if (event_wildcard.empty ())
@@ -88,60 +74,11 @@ bool EventTranslator::Replace (const vector<string>& event_components, string& r
    Разбиение строки замены на составляющие
 */
 
-void EventTranslator::ParseReplacement (const char* replacement)
+void EventTranslator::ParseFormatString (const char* prefix, const char* replacement_tag)
 {
-  const char* prefix_begin = replacement, *s = replacement;
-  
-  string current_prefix;
+  size_t argument_index = xtl::io::get<size_t> (replacement_tag, NO_ARGUMENT);
 
-  current_prefix.reserve (strlen (replacement));
-
-  for (;;)
-  {
-    switch (*s)
-    {
-      case '\0':
-        if (prefix_begin != s)
-        {
-          current_prefix.append (prefix_begin, s);
-          
-          replacement_tokens.push_back (EventTranslator::Token (current_prefix, NO_ARGUMENT));
-        }
-
-        return;
-      case '{':
-      {
-        if (s [1] == '{')
-        {
-          current_prefix.append (prefix_begin, ++s);
-
-          prefix_begin = ++s;
-
-          break;
-        }
-
-        const char* prefix_end = s;
-
-        size_t argument_index = parse_replacement (s);
-
-        if (argument_index != NO_ARGUMENT)
-        {
-          current_prefix.append (prefix_begin, prefix_end);
-          
-          replacement_tokens.push_back (EventTranslator::Token (current_prefix, argument_index));
-
-          prefix_begin = s;
-          
-          current_prefix.clear ();
-
-          break;
-        }
-      }
-      default:
-        s++;
-        break;
-    }
-  }
+  replacement_tokens.push_back (Token (prefix, argument_index));
 }
 
 }

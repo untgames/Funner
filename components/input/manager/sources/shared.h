@@ -15,6 +15,7 @@
 #include <xtl/signal.h>
 #include <xtl/bind.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/token_parser.h>
 
 #include <common/singleton.h>
 #include <common/exception.h>
@@ -54,7 +55,7 @@ class EventTranslator: public TranslationMap::Translator
 
   private:
       //Разбиение строки замены на составляющие
-    void ParseReplacement (const char* replacement);
+    void ParseFormatString (const char* prefix, const char* replacement_tag);
 
   private:
     struct Token;
