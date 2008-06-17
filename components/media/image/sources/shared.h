@@ -11,12 +11,13 @@
 #include <stl/hash_map>
 
 #include <xtl/function.h>
+#include <xtl/common_exceptions.h>
 
-#include <common/exception.h>
 #include <common/singleton.h>
 #include <common/heap.h>
 #include <common/file.h>
 #include <common/component.h>
+#include <common/log.h>
 #include <common/strlib.h>
 
 #include <media/image.h>

@@ -1,9 +1,9 @@
-#include <windows.h>
-#include <stdio.h>
-#include <common/exception.h>
+#include <cstdio>
+#include <exception>
+
 #include <common/hash.h>
+
 #include <media/sound.h>
-#include <memory.h>
 
 using namespace media;
 using namespace common;

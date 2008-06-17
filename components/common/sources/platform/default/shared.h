@@ -19,10 +19,10 @@
 #endif
 
 #include <xtl/function.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/heap.h>
 #include <common/file.h>
-#include <common/exception.h>
 #include <common/strlib.h>
 #include <common/singleton.h>
 

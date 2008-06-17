@@ -1,6 +1,5 @@
 #include "shared.h"
 
-using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
@@ -30,11 +29,11 @@ AsyncPredicate::~AsyncPredicate ()
 
     CheckErrors ("");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::AsyncPredicate::~AsyncPredicate");
+    exception.touch ("render::low_level::opengl::AsyncPredicate::~AsyncPredicate");
     
-    LogPrintf ("%s", exception.Message ());
+    LogPrintf ("%s", exception.what ());
   }  
   catch (std::exception& exception)
   {
@@ -59,7 +58,7 @@ void AsyncPredicate::Begin ()
   size_t &is_in_ranges = GetContextDataTable (Stage_QueryManager)[QueryManagerCache_IsInRanges];
 
   if (is_in_ranges)
-    raise_invalid_operation (METHOD_NAME, "Begin already called without end call");
+    throw xtl::format_operation_exception (METHOD_NAME, "Begin already called without end call");
 
   if (glBeginQuery) glBeginQuery    (GL_SAMPLES_PASSED, query);
   else              glBeginQueryARB (GL_SAMPLES_PASSED, query);
@@ -78,7 +77,7 @@ void AsyncPredicate::End ()
   size_t &is_in_ranges = GetContextDataTable (Stage_QueryManager)[QueryManagerCache_IsInRanges];
 
   if (!is_in_ranges)
-    raise_invalid_operation (METHOD_NAME, "There was not begin call");
+    throw xtl::format_operation_exception (METHOD_NAME, "There was not begin call");
 
   if (glEndQuery) glEndQuery    (GL_SAMPLES_PASSED);
   else            glEndQueryARB (GL_SAMPLES_PASSED);

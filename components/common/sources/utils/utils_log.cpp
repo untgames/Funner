@@ -7,10 +7,10 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/string.h>
 #include <xtl/uninitialized_storage.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/log.h>
 #include <common/singleton.h>
-#include <common/exception.h>
 #include <common/strlib.h>
 
 using namespace common;
@@ -126,7 +126,7 @@ struct Log::Impl : public xtl::reference_counter
 Log::Log (const char* name)
 {
   if (!name)
-    raise_null_argument ("common::Log::Log", "message");
+    throw xtl::make_null_argument_exception ("common::Log::Log", "message");
 
   impl = new Impl (name);
 }
@@ -169,7 +169,7 @@ const char* Log::Name () const
 void Log::Print (const char* message) const
 {
   if (!message)
-    raise_null_argument ("common::Log::Print", "message");
+    throw xtl::make_null_argument_exception ("common::Log::Print", "message");
 
   impl->Print (message);
 }
@@ -177,7 +177,7 @@ void Log::Print (const char* message) const
 void Log::Printf (const char* message, ...) const
 {
   if (!message)
-    raise_null_argument ("common::Log::Printf", "message");
+    throw xtl::make_null_argument_exception ("common::Log::Printf", "message");
 
   va_list list;
   
@@ -189,7 +189,7 @@ void Log::Printf (const char* message, ...) const
 void Log::VPrintf (const char* message, va_list list) const
 {
   if (!message)
-    raise_null_argument ("common::Log::VPrintf", "message");
+    throw xtl::make_null_argument_exception ("common::Log::VPrintf", "message");
 
   impl->VPrintf (message, list);
 }
@@ -228,7 +228,7 @@ void swap (Log& source1, Log& source2)
 xtl::connection LogSystem::RegisterLogHandler (const char* log_name_mask, const LogHandler& handler)
 {
   if (!log_name_mask)
-    raise_null_argument ("common::LogSystem::RegisterLogHandler", "log_name_mask");
+    throw xtl::make_null_argument_exception ("common::LogSystem::RegisterLogHandler", "log_name_mask");
 
   return LogSystemSingleton::Instance ().RegisterLogHandler (log_name_mask, handler);
 }
@@ -242,10 +242,10 @@ void LogSystem::Print (const char* log_name, const char* message)
   static const char* METHOD_NAME = "common::LogSystem::Print";
 
   if (!log_name)
-    raise_null_argument (METHOD_NAME, "log_name");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "log_name");
 
   if (!message)
-    raise_null_argument (METHOD_NAME, "message");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "message");
 
   LogSystemSingleton::Instance ().Print (log_name, message);
 }
@@ -255,10 +255,10 @@ void LogSystem::Printf (const char* log_name, const char* message, ...)
   static const char* METHOD_NAME = "common::LogSystem::Printf";
 
   if (!log_name)
-    raise_null_argument (METHOD_NAME, "log_name");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "log_name");
 
   if (!message)
-    raise_null_argument (METHOD_NAME, "message");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "message");
 
   va_list list;
   
@@ -272,10 +272,10 @@ void LogSystem::VPrintf (const char* log_name, const char* message, va_list list
   static const char* METHOD_NAME = "common::LogSystem::VPrintf";
 
   if (!log_name)
-    raise_null_argument (METHOD_NAME, "log_name");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "log_name");
 
   if (!message)
-    raise_null_argument (METHOD_NAME, "message");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "message");
 
   LogSystemSingleton::Instance ().VPrintf (log_name, message, list);
 }

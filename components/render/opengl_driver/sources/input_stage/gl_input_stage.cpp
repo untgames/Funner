@@ -175,9 +175,9 @@ struct InputStage::Impl: public ContextObject
           return new SystemMemoryBuffer (GetContextManager (), desc);
         }
       }
-      catch (common::Exception& exception)
+      catch (xtl::exception& exception)
       {
-        exception.Touch ("render::low_level::opengl::InputStage::Impl::CreateBuffer");
+        exception.touch ("render::low_level::opengl::InputStage::Impl::CreateBuffer");
         throw;
       }
     }
@@ -223,10 +223,10 @@ struct InputStage::Impl: public ContextObject
       Buffer* buffer = cast_object<Buffer> (*this, in_buffer, METHOD_NAME, "buffer");
       
       if (buffer && !buffer->IsVertexBuffer ())
-        raise<ArgumentException> (METHOD_NAME, "Invalid argument <buffer>. Incompatible vertex buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
+        throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument <buffer>. Incompatible vertex buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
       
       if (slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
-        raise_out_of_range (METHOD_NAME, "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
+        throw xtl::make_range_exception (METHOD_NAME, "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
         
       state.SetVertexBuffer (slot, buffer);
     }  
@@ -234,7 +234,7 @@ struct InputStage::Impl: public ContextObject
     IBuffer* GetVertexBuffer (size_t slot)
     {
       if (slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
-        raise_out_of_range ("render::low_level::opengl::InputStage::Impl::GetVertexBuffer", "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
+        throw xtl::make_range_exception ("render::low_level::opengl::InputStage::Impl::GetVertexBuffer", "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
     
       return state.GetVertexBuffer (slot);
     }  
@@ -250,7 +250,7 @@ struct InputStage::Impl: public ContextObject
       Buffer* buffer = cast_object<Buffer> (*this, in_buffer, METHOD_NAME, "buffer");    
       
       if (buffer && !buffer->IsIndexBuffer ())
-        raise<ArgumentException> (METHOD_NAME, "Invalid argument <buffer>. Incompatible index buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
+        throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument <buffer>. Incompatible index buffer, desc.bind_flags=%s", get_name ((BindFlag)buffer->GetBindFlags ()));
 
       state.SetIndexBuffer (buffer);
     }
@@ -314,9 +314,9 @@ IInputLayout* InputStage::CreateInputLayout (const InputLayoutDesc& desc)
   {
     return impl->CreateInputLayout (desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::InputStage::CreateInputLayout");
+    exception.touch ("render::low_level::opengl::InputStage::CreateInputLayout");
     throw;
   }
 }
@@ -327,9 +327,9 @@ IBuffer* InputStage::CreateVertexBuffer (const BufferDesc& desc)
   {
     return impl->CreateBuffer (desc, GL_ARRAY_BUFFER);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::InputStage::CreateVertexBuffer");
+    exception.touch ("render::low_level::opengl::InputStage::CreateVertexBuffer");
     throw;
   } 
 }
@@ -340,9 +340,9 @@ IBuffer* InputStage::CreateIndexBuffer (const BufferDesc& desc)
   {
     return impl->CreateBuffer (desc, GL_ELEMENT_ARRAY_BUFFER);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::InputStage::CreateIndexBuffer");
+    exception.touch ("render::low_level::opengl::InputStage::CreateIndexBuffer");
     throw;
   } 
 }
@@ -353,9 +353,9 @@ IBuffer* InputStage::CreateConstantBuffer (const BufferDesc& desc)
   {
     return impl->CreateSystemMemoryBuffer (desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::InputStage::CreateConstantBuffer");
+    exception.touch ("render::low_level::opengl::InputStage::CreateConstantBuffer");
     throw;
   } 
 }
@@ -370,9 +370,9 @@ void InputStage::SetInputLayout (IInputLayout* layout)
   {
     impl->SetInputLayout (layout);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::InputStage::SetInputLayout");
+    exception.touch ("render::low_level::opengl::InputStage::SetInputLayout");
     throw;
   }
 }
@@ -392,9 +392,9 @@ void InputStage::SetVertexBuffer (size_t slot, IBuffer* buffer)
   {
     impl->SetVertexBuffer (slot, buffer);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::InputStage::SetVertexBuffer");
+    exception.touch ("render::low_level::opengl::InputStage::SetVertexBuffer");
     throw;
   }
 }
@@ -405,9 +405,9 @@ IBuffer* InputStage::GetVertexBuffer (size_t slot) const
   {
     return impl->GetVertexBuffer (slot);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::InputStage::GetVertexBuffer");
+    exception.touch ("render::low_level::opengl::InputStage::GetVertexBuffer");
     throw;
   }
 }
@@ -422,9 +422,9 @@ void InputStage::SetIndexBuffer (IBuffer* buffer)
   {
     impl->SetIndexBuffer (buffer);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::InputStage::SetIndexBuffer");
+    exception.touch ("render::low_level::opengl::InputStage::SetIndexBuffer");
     throw;
   }
 }
@@ -444,9 +444,9 @@ void InputStage::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out
   {
     impl->Bind (base_vertex, base_index, out_indices_layout);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::InputStage::Bind");
+    exception.touch ("render::low_level::opengl::InputStage::Bind");
     throw;
   }  
 }

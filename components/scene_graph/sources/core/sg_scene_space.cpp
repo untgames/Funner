@@ -1,4 +1,4 @@
-#include "scene_object.h"
+#include "shared.h"
 
 using namespace scene_graph;
 

@@ -1,6 +1,15 @@
 #ifndef RENDER_GL_DRIVER_DRIVER_SHARED_HEADER
 #define RENDER_GL_DRIVER_DRIVER_SHARED_HEADER
 
+#include <stl/string>
+
+#include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
+
+#include <common/singleton.h>
+
 #include <render/low_level/device.h>
 #include <render/low_level/utils.h>
 #include <render/low_level/opengl_driver.h>
@@ -16,15 +25,6 @@
 #include <shared/rasterizer_stage.h>
 #include <shared/shader_stage.h>
 #include <shared/query_manager.h>
-
-#include <common/exception.h>
-#include <common/singleton.h>
-
-#include <stl/string>
-
-#include <xtl/function.h>
-#include <xtl/intrusive_ptr.h>
-#include <xtl/bind.h>
 
 namespace render
 {

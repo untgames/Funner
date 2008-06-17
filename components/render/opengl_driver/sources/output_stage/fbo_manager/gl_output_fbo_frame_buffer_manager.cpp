@@ -23,9 +23,9 @@ ITexture* FboFrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
   {
     return new FboRenderBuffer (frame_buffer_manager, desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FboFrameBufferManager::CreateRenderBuffer");
+    exception.touch ("render::low_level::opengl::FboFrameBufferManager::CreateRenderBuffer");
     throw;
   }
 }
@@ -58,9 +58,9 @@ IFrameBuffer* FboFrameBufferManager::CreateFrameBuffer (View* color_view, View* 
   {
     return new FboFrameBuffer (frame_buffer_manager, color_view, depth_stencil_view);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FboFrameBufferManager::CreateFrameBuffer");
+    exception.touch ("render::low_level::opengl::FboFrameBufferManager::CreateFrameBuffer");
     throw;
   }
 }

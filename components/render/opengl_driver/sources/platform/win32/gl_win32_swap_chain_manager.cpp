@@ -14,9 +14,9 @@ ISwapChain* SwapChainManager::CreateSwapChain (OutputManager& output_manager, co
   {
     return new PrimarySwapChain (swap_chain_desc, output_manager);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainManager::CreateSwapChain");
+    exception.touch ("render::low_level::opengl::SwapChainManager::CreateSwapChain");
 
     throw;
   }
@@ -33,9 +33,9 @@ ISwapChain* SwapChainManager::CreatePBuffer (ISwapChain* primary_swap_chain, con
     return new PBuffer (cast_object<PrimarySwapChain> (primary_swap_chain, "render::low_level::SwapChainManager::CreatePBuffer", 
       "primary_swap_chain"), pbuffer_desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainManager::CreatePBuffer(%ux%ux%u)",
+    exception.touch ("render::low_level::opengl::SwapChainManager::CreatePBuffer(%ux%ux%u)",
       pbuffer_desc.frame_buffer.width, pbuffer_desc.frame_buffer.height, pbuffer_desc.frame_buffer.color_bits);
 
     throw;
@@ -48,9 +48,9 @@ ISwapChain* SwapChainManager::CreatePBuffer (ISwapChain* swap_chain)
   {
     return new PBuffer (cast_object<PrimarySwapChain> (swap_chain, "render::low_level::SwapChainManager::CreatePBuffer", "swap_chain"));
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainManager::CreatePBuffer");
+    exception.touch ("render::low_level::opengl::SwapChainManager::CreatePBuffer");
 
     throw;
   }

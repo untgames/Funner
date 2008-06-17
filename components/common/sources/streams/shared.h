@@ -8,11 +8,11 @@
 
 #include <xtl/function.h>
 #include <xtl/string.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/streams.h>
 #include <common/wxf_writer.h>
 #include <common/xml_writer.h>
-#include <common/exception.h>
 #include <common/file.h>
 
 namespace common

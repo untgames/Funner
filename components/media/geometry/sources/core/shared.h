@@ -9,12 +9,12 @@
 
 #include <xtl/function.h>
 #include <xtl/reference_counter.h>
+#include <xtl/common_exceptions.h>
 
 #include <mathlib.h>
 
 #include <common/strlib.h>
 #include <common/hash.h>
-#include <common/exception.h>
 #include <common/component.h>
 
 #include <media/geometry/mesh_library.h>

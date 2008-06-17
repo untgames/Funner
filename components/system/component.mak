@@ -7,13 +7,15 @@ TARGETS := SYSTEMLIB_SOURCES SYSTEMLIB_TESTS
 SYSTEMLIB_SOURCES.TYPE             := static-lib
 SYSTEMLIB_SOURCES.NAME             := system
 SYSTEMLIB_SOURCES.INCLUDE_DIRS     := sources
-SYSTEMLIB_SOURCES.SOURCE_DIRS      := sources/wrappers sources/platform/win32
+SYSTEMLIB_SOURCES.SOURCE_DIRS      := sources/wrappers
 SYSTEMLIB_SOURCES.LIB_DIRS         :=
 SYSTEMLIB_SOURCES.EXECTUTION_DIR   :=
 SYSTEMLIB_SOURCES.LIBS             :=
 SYSTEMLIB_SOURCES.COMPILER_CFLAGS  :=
 SYSTEMLIB_SOURCES.COMPILER_DEFINES :=
 SYSTEMLIB_SOURCES.IMPORTS          := compile.static.mak
+SYSTEMLIB_SOURCES.win32.SOURCE_DIRS := sources/platform/win32
+SYSTEMLIB_SOURCES.unistd.SOURCE_DIRS := sources/platform/unistd
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB_TESTS.TYPE             := test-suite

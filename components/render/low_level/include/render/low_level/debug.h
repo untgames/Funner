@@ -1,7 +1,7 @@
 #ifndef RENDER_LOW_LEVEL_DEBUG_HEADER
 #define RENDER_LOW_LEVEL_DEBUG_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 
 namespace render
 {

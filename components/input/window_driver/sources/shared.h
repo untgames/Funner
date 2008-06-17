@@ -1,17 +1,29 @@
 #ifndef INPUT_LOW_LEVEL_WINDOW_DRIVER_SHARED_HEADER
 #define INPUT_LOW_LEVEL_WINDOW_DRIVER_SHARED_HEADER
 
-#include <stl/string>
+#include <cstdio>
+
+#include <stl/algorithm>
 #include <stl/vector>
+#include <stl/string>
 #include <stl/bitset>
 
-#include <xtl/reference_counter.h>
+#include <xtl/bind.h>
+#include <xtl/connection.h>
+#include <xtl/string.h>
 #include <xtl/function.h>
+#include <xtl/reference_counter.h>
+#include <xtl/shared_ptr.h>
+#include <xtl/common_exceptions.h>
 
-#include <input/low_level/device.h>
+#include <common/singleton.h>
 
 #include <syslib/window.h>
 #include <syslib/keydefs.h>
+
+#include <input/low_level/driver.h>
+#include <input/low_level/device.h>
+#include <input/low_level/window_driver.h>
 
 namespace input
 {

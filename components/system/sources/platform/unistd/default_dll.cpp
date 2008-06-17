@@ -1,5 +1,4 @@
-#include <platform/platform.h>
-#include <common/exception.h>
+#include "shared.h"
 
 using namespace syslib;
 
@@ -12,7 +11,7 @@ namespace
 
 void raise (const char* method_name)
 {
-  common::raise_not_supported (method_name, "No dynamic libraries support for default platform");
+  throw xtl::format_not_supported_exception (method_name, "No dynamic libraries support for default platform");
 }
 
 }

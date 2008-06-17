@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <xtl/iterator.h>
-#include <xtl/shared_ptr.h>
-#include <common/strlib.h>
-#include <script/bind.h>
-#include <script/environment.h>
+#include "shared.h"
 
 using namespace script;
 

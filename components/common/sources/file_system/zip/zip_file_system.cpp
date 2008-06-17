@@ -11,6 +11,7 @@
 #include <stl/string>
 
 #include <xtl/function.h>
+#include <xtl/common_exceptions.h>
 
 using namespace common;
 using namespace stl;
@@ -164,9 +165,9 @@ ZipFileSystem::ZipFileSystem (const char* path)
     for (EntryList::iterator i=entries.begin ();i!=entries.end ();++i)
       i->name = string_base + (size_t)i->name;
   }
-  catch (Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("ZipFileSystem::ZipFileSystem");
+    exception.touch ("ZipFileSystem::ZipFileSystem");
     throw;
   }
   catch (...)
@@ -193,14 +194,14 @@ ZipFileSystem::~ZipFileSystem ()
 
 ZipFileSystem::file_t ZipFileSystem::FileOpen (const char* file_name,filemode_t mode_flags,size_t)
 {
-  if ((mode_flags & FILE_MODE_WRITE) || (mode_flags & FILE_MODE_RESIZE) || (mode_flags & FILE_MODE_CREATE))
-    raise_not_supported ("ZipFileSystem::FileOpen","Unable to open file '%s' in zip-file '%s' with mode='%s'",
+  if ((mode_flags & FileMode_Write) || (mode_flags & FileMode_Resize) || (mode_flags & FileMode_Create))
+    throw xtl::format_not_supported_exception ("ZipFileSystem::FileOpen","Unable to open file '%s' in zip-file '%s' with mode='%s'",
           file_name,zip_file_name.c_str (),strfilemode (mode_flags).c_str ());
 
   EntryMap::iterator iter = entry_map.find (strihash (file_name));
   
   if (iter == entry_map.end ())
-    raise<FileNotFoundException> ("ZipFileSystem::FileOpen","File '%s' not found in zip-file '%s'",file_name,zip_file_name.c_str ());
+    throw xtl::format_exception<FileNotFoundException> ("ZipFileSystem::FileOpen","File '%s' not found in zip-file '%s'",file_name,zip_file_name.c_str ());
 
   ZipFile* file = new ZipFile;
   
@@ -254,8 +255,7 @@ size_t ZipFileSystem::FileRead (file_t _file,void* buf,size_t size)
 
 size_t ZipFileSystem::FileWrite (file_t,const void* buf,size_t size)
 {
-  raise_not_supported ("ZipFileSystem::FileWrite","There is not write operation in zip-files");
-  return 0;
+  throw xtl::format_not_supported_exception ("ZipFileSystem::FileWrite","There is not write operation in zip-files");
 }
 
 void ZipFileSystem::FileRewind (file_t _file)
@@ -292,7 +292,7 @@ filesize_t ZipFileSystem::FileSize (file_t _file)
 
 void ZipFileSystem::FileResize (file_t,filesize_t)
 {
-  raise_not_supported ("ZipFileSystem::FileResize","There is not resize operation in zip-files");
+  throw xtl::format_not_supported_exception ("ZipFileSystem::FileResize","There is not resize operation in zip-files");
 }
 
 bool ZipFileSystem::FileEof (file_t _file)
@@ -312,19 +312,19 @@ void ZipFileSystem::FileFlush (file_t)
 
 void ZipFileSystem::Remove (const char* file_name)
 {
-  raise_not_supported ("ZipFileSystem::Remove","Unable to remove file '%s' from zip-file '%s'",
+  throw xtl::format_not_supported_exception ("ZipFileSystem::Remove","Unable to remove file '%s' from zip-file '%s'",
                      file_name,zip_file_name.c_str ());
 }
 
 void ZipFileSystem::Rename (const char* file_name,const char* new_name)
 {
-  raise_not_supported ("ZipFileSystem::Rename","Unable to rename file '%s' to '%s' in zip-file '%s'",
+  throw xtl::format_not_supported_exception ("ZipFileSystem::Rename","Unable to rename file '%s' to '%s' in zip-file '%s'",
                      file_name,new_name,zip_file_name.c_str ());
 }
 
 void ZipFileSystem::Mkdir (const char* dir_name)
 {
-  raise_not_supported ("ZipFileSystem::Mkdir","Unable to create dir '%s' in zip-file '%s'",
+  throw xtl::format_not_supported_exception ("ZipFileSystem::Mkdir","Unable to create dir '%s' in zip-file '%s'",
                      dir_name,zip_file_name.c_str ());
 }
 
@@ -376,7 +376,7 @@ void ZipFileSystem::CheckError (zzip_error_t error)
   if (error == ZZIP_NO_ERROR)
     return;
     
-  raise<FileException> (NULL,"ZZip internal error (zip-file '%s'): %s",
+  throw xtl::format_exception<FileException> ("", "ZZip internal error (zip-file '%s'): %s",
                         zip_file_name.c_str (),GetZZipErrorMessage (error));
 }
 

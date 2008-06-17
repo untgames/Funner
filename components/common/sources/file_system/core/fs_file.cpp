@@ -53,41 +53,41 @@ filemode_t File::Mode () const
 
 bool File::CanRead () const
 {
-  return (impl->Mode () & FILE_MODE_READ) != 0;
+  return (impl->Mode () & FileMode_Read) != 0;
 }
 
 bool File::CanWrite () const
 {
-  return (impl->Mode () & FILE_MODE_WRITE) != 0;
+  return (impl->Mode () & FileMode_Write) != 0;
 }
 
 bool File::CanResize () const
 {
-  return (impl->Mode () & FILE_MODE_RESIZE) != 0;
+  return (impl->Mode () & FileMode_Resize) != 0;
 }
 
 bool File::CanSeek () const
 {
-  return (impl->Mode () & FILE_MODE_SEEK) != 0;
+  return (impl->Mode () & FileMode_Seek) != 0;
 }
 
 bool File::CanRewind () const
 {
-  return (impl->Mode () & FILE_MODE_REWIND) != 0;
+  return (impl->Mode () & FileMode_Rewind) != 0;
 }
 
 bool File::IsReadOnly () const
 {
   filemode_t mode = impl->Mode ();
 
-  return (mode & FILE_MODE_READ) && !(mode & (FILE_MODE_WRITE|FILE_MODE_RESIZE));
+  return (mode & FileMode_Read) && !(mode & (FileMode_Write | FileMode_Resize));
 }
 
 bool File::IsWriteOnly () const
 {
   filemode_t mode = impl->Mode ();
 
-  return (mode & FILE_MODE_WRITE) && !(mode & FILE_MODE_READ);
+  return (mode & FileMode_Write) && !(mode & FileMode_Read);
 }
 
 bool File::IsClosed () const
@@ -106,12 +106,12 @@ bool File::IsBuffered () const
 
 size_t File::Read (void* buf,size_t size)
 {
-  if (!(impl->Mode () & FILE_MODE_READ))
-    raise_not_supported ("File::Read","This file can't be read");
+  if (!(impl->Mode () & FileMode_Read))
+    throw xtl::format_not_supported_exception ("File::Read","This file can't be read");
 
   if (!buf)
   {
-    if (size) raise_null_argument ("File::Read","buffer");    
+    if (size) throw xtl::make_null_argument_exception ("File::Read","buffer");    
     else      return 0;
   }
     
@@ -120,12 +120,12 @@ size_t File::Read (void* buf,size_t size)
 
 size_t File::Write (const void* buf,size_t size)
 {
-  if (!(impl->Mode () & FILE_MODE_WRITE))
-    raise_not_supported ("File::Write","This file can't be write");
+  if (!(impl->Mode () & FileMode_Write))
+    throw xtl::format_not_supported_exception ("File::Write","This file can't be write");
 
   if (!buf)
   {
-    if (size) raise_null_argument ("File::Write","buffer");
+    if (size) throw xtl::make_null_argument_exception ("File::Write","buffer");
     else      return 0;
   }
 
@@ -138,28 +138,28 @@ size_t File::Write (const void* buf,size_t size)
 
 void File::Rewind ()
 {
-  if (!(impl->Mode () & FILE_MODE_REWIND))
-    raise_not_supported ("File::Rewind","This file can't be rewind");
+  if (!(impl->Mode () & FileMode_Rewind))
+    throw xtl::format_not_supported_exception ("File::Rewind","This file can't be rewind");
 
   return impl->Rewind ();
 }
 
 filepos_t File::Seek (filepos_t pos,FileSeekMode seek_mode)
 {
-  if (!(impl->Mode () & FILE_MODE_SEEK))
-    raise_not_supported ("File::Seek","This file can't be seek");
+  if (!(impl->Mode () & FileMode_Seek))
+    throw xtl::format_not_supported_exception ("File::Seek","This file can't be seek");
     
   size_t position = 0;
 
   switch (seek_mode)
   {
-    case FILE_SEEK_SET: position = pos; break;
-    case FILE_SEEK_CUR: position = impl->Tell () + pos; break;
-    case FILE_SEEK_END: position = impl->Size () + pos; break;
-    default:            raise_invalid_argument ("File::Seek","seek_mode",seek_mode);
+    case FileSeekMode_Set:     position = pos; break;
+    case FileSeekMode_Current: position = impl->Tell () + pos; break;
+    case FileSeekMode_End:     position = impl->Size () + pos; break;
+    default:                   throw xtl::make_argument_exception ("File::Seek","seek_mode",seek_mode);
   }
 
-  if (position > Size () && (impl->Mode () & FILE_MODE_RESIZE))
+  if (position > Size () && (impl->Mode () & FileMode_Resize))
     impl->Resize (position);
 
   return impl->Seek (position);
@@ -181,8 +181,8 @@ filesize_t File::Size () const
 
 void File::Resize (filesize_t new_size)
 {
-  if (!(impl->Mode () & FILE_MODE_RESIZE))
-    raise_not_supported ("File::Resize","This file can't be resize");
+  if (!(impl->Mode () & FileMode_Resize))
+    throw xtl::format_not_supported_exception ("File::Resize","This file can't be resize");
 
   impl->Resize (new_size);
 }
@@ -260,7 +260,7 @@ filepos_t FileImpl::Seek (filepos_t)
 void FileImpl::Rewind ()
 {
   if (Seek (0))
-    throw FileException ("FileImpl::Rewind", "Internal seek error");
+    throw xtl::message_exception<FileException> ("FileImpl::Rewind", "Internal seek error");
 }
 
 filesize_t FileImpl::Size ()

@@ -33,11 +33,11 @@ RasterizerState::~RasterizerState ()
 
     CheckErrors ("");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::RasterizerState::~RasterizerState");
+    exception.touch ("render::low_level::opengl::RasterizerState::~RasterizerState");
     
-    LogPrintf ("%s", exception.Message ());
+    LogPrintf ("%s", exception.what ());
   }  
   catch (std::exception& exception)
   {
@@ -67,7 +67,7 @@ void RasterizerState::Bind ()
     //проверка корректности состояния  
 
   if (!display_list)
-    raise_invalid_operation (METHOD_NAME, "Empty state (null display list)");
+    throw xtl::format_operation_exception (METHOD_NAME, "Empty state (null display list)");
 
     //установка состояния в контекст OpenGL
 
@@ -106,7 +106,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
   const ContextCaps& caps = GetCaps ();
 
   if (in_desc.multisample_enable && !caps.has_arb_multisample)
-    raise_not_supported (METHOD_NAME, "Multisampling not supported (GL_ARB_multisample extension not supported)");
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Multisampling not supported (GL_ARB_multisample extension not supported)");
     
     //выбор текущего контекста
 
@@ -131,7 +131,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     case FillMode_Wireframe: gl_fill_mode = GL_LINE; break;
     case FillMode_Solid:     gl_fill_mode = GL_FILL; break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.fill_mode", in_desc.fill_mode);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.fill_mode", in_desc.fill_mode);
       break;
   }
   
@@ -142,7 +142,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     case CullMode_Back:
       break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.cull_mode", in_desc.cull_mode);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.cull_mode", in_desc.cull_mode);
       break;
   }
 

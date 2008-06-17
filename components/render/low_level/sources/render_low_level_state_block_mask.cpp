@@ -1,8 +1,8 @@
 #include <memory.h>
 
-#include <common/exception.h>
-
 #include <stl/functional>
+
+#include <xtl/common_exceptions.h>
 
 #include <render/low_level/state_block.h>
 
@@ -60,7 +60,7 @@ void StateBlockMask::Set (StateBlockGroup group, bool value)
       os_depth_stencil_view  = value;
       break;
     default:
-      common::raise_invalid_argument ("render::low_level::StateBlockMask::Set", "group", group);
+      throw xtl::make_argument_exception ("render::low_level::StateBlockMask::Set", "group", group);
       break;
   }
 }

@@ -30,7 +30,7 @@ OpenALSource::OpenALSource (OpenALDevice& in_device)
   alGenSources (1, &al_source);  
   
   if (alGetError () != AL_NO_ERROR)
-    throw OpenALGenSourceException ();
+    throw xtl::format_exception<OpenALException> ("sound::low_level::OpenALSource::OpenALSource", "No enough sources");
 }
 
 OpenALSource::~OpenALSource ()
@@ -146,11 +146,11 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
   try
   {
     if (sample.Frequency () > MAX_SOUND_SAMPLE_RATE)
-      raise_not_supported (METHOD_NAME, "Sound sample '%s' has unsupported sample rate=%u. Maximum supported sample rate is %u", 
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported sample rate=%u. Maximum supported sample rate is %u", 
                          sample.Name (), sample.Frequency (), MAX_SOUND_SAMPLE_RATE);
 
     if (sample.BitsPerSample () != 16)
-      raise_not_supported (METHOD_NAME, "Sound sample '%s' has unsupported bits_per_sample=%u",
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported bits_per_sample=%u",
                          sample.Name (), sample.BitsPerSample ());
 
     switch (sample.Channels ())
@@ -159,7 +159,7 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
       case 2:
         break;
       default:
-        raise_not_supported (METHOD_NAME, "Sound sample '%s' has unsupported channels_count=%u", sample.Name (), sample.Channels ());
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported channels_count=%u", sample.Name (), sample.Channels ());
         break;
     }
     
@@ -264,7 +264,7 @@ void OpenALSource::Seek (float offset, SeekMode seek_mode)
         offset = fmod (offset, duration);
         break;
       default:
-        raise_invalid_argument ("sound::low_level::OpenALDevice::Seek", "seek_mode", seek_mode);
+        throw xtl::make_argument_exception ("sound::low_level::OpenALDevice::Seek", "seek_mode", seek_mode);
     }
 
   play_time_start  = clock ();

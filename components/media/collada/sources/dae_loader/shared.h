@@ -1,20 +1,21 @@
 #ifndef MEDIALIB_DAE_SHARED_HEADER
 #define MEDIALIB_DAE_SHARED_HEADER
 
-#include <stdarg.h>
+#include <cstdarg>
 
 #include <stl/hash_map>
 #include <stl/vector>
 #include <stl/string>
 
-#include <media/collada.h>
+#include <xtl/functional>
+#include <xtl/common_exceptions.h>
 
 #include <common/parser.h>
 #include <common/hash.h>
 #include <common/strlib.h>
 #include <common/component.h>
 
-#include <xtl/functional>
+#include <media/collada.h>
 
 #include <math/io.h>
 

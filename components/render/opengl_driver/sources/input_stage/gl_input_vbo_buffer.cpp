@@ -30,7 +30,7 @@ VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, c
         gl_usage_mode = GL_STREAM_DRAW;
         break;  
       default:
-        raise_invalid_argument ("", "desc.usage_mode", in_desc.usage_mode);
+        throw xtl::make_argument_exception ("", "desc.usage_mode", in_desc.usage_mode);
         break;
     }
 
@@ -56,9 +56,9 @@ VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, c
     
     CheckErrors ("");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::VboBuffer::VboBuffer");
+    exception.touch ("render::low_level::opengl::VboBuffer::VboBuffer");
     throw;
   }
 }
@@ -74,11 +74,11 @@ VboBuffer::~VboBuffer ()
     glDeleteBuffers_fn (1, &buffer_id);
     CheckErrors        ("");
   }
-  catch (Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::VboBuffer::~VboBuffer");
+    exception.touch ("render::low_level::opengl::VboBuffer::~VboBuffer");
     
-    LogPrintf ("%s", exception.Message ());
+    LogPrintf ("%s", exception.what ());
   }
   catch (std::exception& exception)
   {

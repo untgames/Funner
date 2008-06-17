@@ -2,11 +2,11 @@
 
 #include <xtl/function.h>
 #include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/singleton.h>
 #include <common/utf_converter.h>
 #include <common/strconv.h>
-#include <common/exception.h>
 
 using namespace stl;
 using namespace common;
@@ -156,10 +156,10 @@ bool StringConverterSystemImpl::RegisterConverter
   try
   {
     if (!source_encoding)
-      raise_null_argument ("", "source_encoding");
+      throw xtl::make_null_argument_exception ("", "source_encoding");
 
     if (!destination_encoding)
-      raise_null_argument ("", "destination_encoding");
+      throw xtl::make_null_argument_exception ("", "destination_encoding");
       
     size_t hash = GetConverterHash (source_encoding, destination_encoding);
       
@@ -172,9 +172,9 @@ bool StringConverterSystemImpl::RegisterConverter
 
     return true;
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch(METHOD_NAME);
+    exception.touch(METHOD_NAME);
     throw;
   }
 }
@@ -221,21 +221,21 @@ IStringConverter* StringConverterSystemImpl::CreateConverter
   try
   {
     if (!source_encoding)
-      raise_null_argument ("", "source_encoding");
+      throw xtl::make_null_argument_exception ("", "source_encoding");
 
     if (!destination_encoding)
-      raise_null_argument ("", "destination_encoding");
+      throw xtl::make_null_argument_exception ("", "destination_encoding");
 
     StringConverterMap::const_iterator iter = converters.find (GetConverterHash (source_encoding, destination_encoding));
     
     if (iter == converters.end ())
-      raise_invalid_operation ("", "A converter functor for \'%s-to-%s\' is not registered", source_encoding, destination_encoding);
+      throw xtl::format_operation_exception ("", "A converter functor for \'%s-to-%s\' is not registered", source_encoding, destination_encoding);
    
     return (iter->second)();
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch (METHOD_NAME);
+    exception.touch (METHOD_NAME);
     throw;
   }
 }
@@ -314,9 +314,9 @@ void StringConverter::Convert
   {
     converter->Convert (source_buffer_ptr, source_buffer_size, destination_buffer_ptr, destination_buffer_size);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("common::StringConverter::Convert");
+    exception.touch ("common::StringConverter::Convert");
     throw;
   }
 }

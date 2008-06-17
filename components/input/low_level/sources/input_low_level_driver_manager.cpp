@@ -1,13 +1,13 @@
-#include <input/low_level/driver.h>
-
-#include <common/singleton.h>
-#include <common/strlib.h>
-#include <common/exception.h>
-
 #include <stl/vector>
 #include <stl/string>
 
 #include <xtl/intrusive_ptr.h>
+#include <xtl/common_exceptions.h>
+
+#include <common/singleton.h>
+#include <common/strlib.h>
+
+#include <input/low_level/driver.h>
 
 using namespace input::low_level;
 using namespace common;
@@ -79,13 +79,13 @@ class DriverManagerImpl
 void DriverManagerImpl::RegisterDriver (const char* name, IDriver* driver)
 {
   if (!name)
-    raise_null_argument ("input::low_level::DriverManager::RegisterDriver", "name");
+    throw xtl::make_null_argument_exception ("input::low_level::DriverManager::RegisterDriver", "name");
 
   if (!driver)
-    raise_null_argument ("input::low_level::DriverManager::RegisterDriver", "driver");
+    throw xtl::make_null_argument_exception ("input::low_level::DriverManager::RegisterDriver", "driver");
 
   if (FindDriver (name))
-    raise_invalid_argument ("input::low_level::DriverManager::RegisterDriver", "name", name,
+    throw xtl::make_argument_exception ("input::low_level::DriverManager::RegisterDriver", "name", name,
                           "Driver with this name has been already registered");
 
   drivers.push_back (InputDriver (driver, name));
@@ -134,7 +134,7 @@ size_t DriverManagerImpl::DriversCount ()
 IDriver* DriverManagerImpl::Driver (size_t index)
 {
   if (index >= drivers.size ())
-    raise_out_of_range ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
+    throw xtl::make_range_exception ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
 
   return get_pointer (drivers [index].driver);
 }
@@ -142,7 +142,7 @@ IDriver* DriverManagerImpl::Driver (size_t index)
 const char* DriverManagerImpl::DriverName (size_t index)
 {
   if (index >= drivers.size ())
-    raise_out_of_range ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
+    throw xtl::make_range_exception ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
 
   return drivers [index].name.c_str ();
 }

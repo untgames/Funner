@@ -1,10 +1,11 @@
 #ifndef RENDER_GL_DRIVER_QUERY_MANAGER_SHARED_HEADER
 #define RENDER_GL_DRIVER_QUERY_MANAGER_SHARED_HEADER
 
+#include <xtl/common_exceptions.h>
+#include <xtl/trackable_ptr.h>
+
 #include <shared/context_object.h>
 #include <shared/query_manager.h>
-
-#include <common/exception.h>
 
 namespace render
 {

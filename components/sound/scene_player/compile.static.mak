@@ -2,4 +2,4 @@
 #Экспортируемые настройки компонента
 ###################################################################################################
 export.INCLUDE_DIRS     := include
-export.IMPORTS          := ../../scene_graph/exports.static.mak ../manager/compile.static.mak
+export.IMPORTS          := ../../scene_graph/compile.static.mak ../manager/compile.static.mak

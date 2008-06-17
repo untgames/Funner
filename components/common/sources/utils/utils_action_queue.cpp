@@ -1,10 +1,11 @@
-#include <common/action_queue.h>
-#include <common/exception.h>
+#include <exception>
 
 #include <stl/hash_map>
 #include <stl/queue>
 
 #include <xtl/function.h>
+
+#include <common/action_queue.h>
 
 using namespace common;
 
@@ -25,7 +26,7 @@ struct Action
     {}
 
   Action (size_t in_action_id, size_t in_next_time, size_t in_period, const ActionQueue::ActionHandler& in_handler) 
-    : action_id (in_action_id), next_time (in_next_time), period (in_period), handler (in_handler), count (0), is_deleted (false) 
+    : action_id (in_action_id), next_time (in_next_time), period (in_period), count (0), is_deleted (false), handler (in_handler) 
     {}
 };
 

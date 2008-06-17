@@ -14,9 +14,9 @@
 #include <xtl/uninitialized_storage.h>
 #include <xtl/ref.h>
 #include <xtl/string.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/strlib.h>
-#include <common/exception.h>
 #include <common/component.h>
 
 #include <media/sound.h>
@@ -45,23 +45,9 @@ const size_t SOURCE_BUFFERS_COUNT            = 4;      //количество буферов прои
 const size_t SOURCE_BUFFERS_UPDATE_FREQUENCY = 10;     //частота обновления буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Исключения OpenAL
+///Исключение OpenAL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct OpenALExceptionTag;
-
-//исключение, возникающее при невозможности создания источника
-struct OpenALGenSourceException: public std::exception
-{
-  const char* what () const throw () { return "OpenALGenSourceException"; }
-};
-
-//исключение, возникающее при невозможности создания буфера
-struct OpenALGenBufferException: public std::exception
-{
-  const char* what () const throw () { return "OpenALGenBufferException"; }
-};
-
-typedef common::DerivedException<common::Exception, OpenALExceptionTag> OpenALException;
+struct OpenALException: virtual public xtl::exception {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Контекст OpenAL
@@ -300,8 +286,9 @@ class OpenALDevice : public sound::low_level::ISoundDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буфер сэмплирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void*  GetSampleBuffer     () const { return sample_buffer.data (); }
-    size_t GetSampleBufferSize () const { return sample_buffer.size (); }
+    const void* GetSampleBuffer     () const { return sample_buffer.data (); }
+          void* GetSampleBuffer     ()       { return sample_buffer.data (); }    
+    size_t      GetSampleBufferSize () const { return sample_buffer.size (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление распределением буферов проигрывания

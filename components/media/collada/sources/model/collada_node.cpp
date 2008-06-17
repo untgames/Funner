@@ -73,7 +73,7 @@ const char* Node::Id () const
 void Node::SetId (const char* id)
 {
   if (!id)
-    common::raise_null_argument ("media::collada::Node::SetId", "id");
+    throw xtl::make_null_argument_exception ("media::collada::Node::SetId", "id");
     
   impl->id = id;
 }
@@ -90,7 +90,7 @@ const char* Node::SubId () const
 void Node::SetSubId (const char* sid)
 {
   if (!sid)
-    common::raise_null_argument ("media::collada::Node::SetSubId", "sid");
+    throw xtl::make_null_argument_exception ("media::collada::Node::SetSubId", "sid");
     
   impl->sid = sid;
 }
@@ -107,7 +107,7 @@ const char* Node::Name () const
 void Node::SetName (const char* name)
 {
   if (!name)
-    common::raise_null_argument ("media::collada::Node::SetName", "name");
+    throw xtl::make_null_argument_exception ("media::collada::Node::SetName", "name");
     
   impl->name = name;
 }

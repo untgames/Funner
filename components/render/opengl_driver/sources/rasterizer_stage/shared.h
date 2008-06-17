@@ -1,13 +1,13 @@
 #ifndef RENDER_GL_DRIVER_RASTERIZER_STAGE_SHARED_HEADER
 #define RENDER_GL_DRIVER_RASTERIZER_STAGE_SHARED_HEADER
 
-#include <shared/rasterizer_stage.h>
-
 #include <xtl/trackable_ptr.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/common_exceptions.h>
 
-#include <common/exception.h>
 #include <common/hash.h>
+
+#include <shared/rasterizer_stage.h>
 
 namespace render
 {

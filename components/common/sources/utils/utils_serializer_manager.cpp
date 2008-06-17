@@ -1,11 +1,11 @@
-#include <common/serializer_manager.h>
-#include <common/exception.h>
-#include <common/singleton.h>
-#include <common/hash.h>
-
 #include <stl/hash_map>
 
 #include <xtl/shared_ptr.h>
+#include <xtl/common_exceptions.h>
+
+#include <common/serializer_manager.h>
+#include <common/singleton.h>
+#include <common/hash.h>
 
 using namespace common;
 
@@ -50,10 +50,10 @@ class SerializerManagerImpl
       static const char* METHOD_NAME = "common::SerializerManagerImpl::Register";
       
       if (!extension)
-        raise_null_argument (METHOD_NAME, "extension");
+        throw xtl::make_null_argument_exception (METHOD_NAME, "extension");
         
       if (!holder)
-        raise_null_argument (METHOD_NAME, "holder");
+        throw xtl::make_null_argument_exception (METHOD_NAME, "holder");
 
       serializers [SerializerKey (extension, signature)] = SerializerHolderPtr (holder);
     }
@@ -107,7 +107,7 @@ class SerializerManagerImpl
           break;
         default:
           if (raise_exception)
-            raise_invalid_argument (METHOD_NAME, "mode", mode);
+            throw xtl::make_argument_exception (METHOD_NAME, "mode", mode);
 
           return 0;
       }
@@ -115,7 +115,7 @@ class SerializerManagerImpl
       if (!name)
       {
         if (raise_exception)
-          raise_null_argument (METHOD_NAME, "name");
+          throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
         return 0;
       }
@@ -125,8 +125,7 @@ class SerializerManagerImpl
       if (iter == serializers.end ())
       {
         if (raise_exception)
-          raise<ArgumentException> (METHOD_NAME, "Invalid argument <name>='%s'. "
-            "No serializer with this extension found (check signature)", name);
+          throw xtl::make_argument_exception (METHOD_NAME, "name", name, "No serializer with this extension found (check signature)");
 
         return 0;
       }

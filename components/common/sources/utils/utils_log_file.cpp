@@ -10,8 +10,8 @@
 #include <xtl/function.h>
 #include <xtl/lexical_cast.h>
 #include <xtl/string.h>
+#include <xtl/common_exceptions.h>
 
-#include <common/exception.h>
 #include <common/log.h>
 #include <common/strlib.h>
 
@@ -197,7 +197,7 @@ struct LogFile::Impl
       LogFiltersSet::iterator filter = FindFilter (filter_index);
 
       if (filter == log_filters.end ())
-        raise_invalid_argument ("LogFilter::SetFilter", "filter_index", filter_index);
+        throw xtl::make_argument_exception ("LogFilter::SetFilter", "filter_index", filter_index);
 
       log_filters.erase (filter);
 
@@ -343,10 +343,10 @@ void LogFile::Print (const char* log_name, const char* message)
   static const char* METHOD_NAME = "common::LogFile::Print";
 
   if (!log_name)
-    raise_null_argument (METHOD_NAME, "log_name");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "log_name");
 
   if (!message)
-    raise_null_argument (METHOD_NAME, "message");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "message");
 
   impl->Print (log_name, message);
 }
@@ -360,10 +360,10 @@ size_t LogFile::AddFilter (const char* replace_mask, const char* replacement, si
   static const char* METHOD_NAME = "common::LogFile::AddFilter";
 
   if (!replace_mask)
-    raise_null_argument (METHOD_NAME, "replace_mask");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "replace_mask");
 
   if (!replacement)
-    raise_null_argument (METHOD_NAME, "replacement");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "replacement");
 
   return impl->AddFilter (replace_mask, replacement, sort_order);
 }
@@ -373,10 +373,10 @@ void LogFile::SetFilter (size_t filter_index, const char* replace_mask, const ch
   static const char* METHOD_NAME = "common::LogFile::SetFilter";
 
   if (!replace_mask)
-    raise_null_argument (METHOD_NAME, "replace_mask");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "replace_mask");
 
   if (!replacement)
-    raise_null_argument (METHOD_NAME, "replacement");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "replacement");
 
   impl->SetFilter (filter_index, replace_mask, replacement, sort_order);
 }

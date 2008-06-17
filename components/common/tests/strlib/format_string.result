@@ -1,9 +1,8 @@
 Results of format_string_test:
-prefix: '	
- A123	=12345 '; replacement_tag: '5asd4'
+prefix: '\t\r\n A123\t=12345 '; replacement_tag: '5asd4'
 prefix: ''; replacement_tag: 'i'
 prefix: ''; replacement_tag: ''
-prefix: '  'B ' = 567 CC C="{'; replacement_tag: 'double_open'
+prefix: '  'B ' = 567 CC C=\"{'; replacement_tag: 'double_open'
 prefix: ' '; replacement_tag: 'double_close'
-prefix: '} D  " E='asdasd"' "z'z"'; replacement_tag: 'end'
+prefix: '} D  \" E='asdasd\"' \"z'z\"'; replacement_tag: 'end'
 prefix: ''; replacement_tag: ''

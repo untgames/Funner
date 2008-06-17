@@ -16,7 +16,7 @@ int main ()
   size_t default_filter_index = log_file.AddFilter ("*", "[{time}] {log}: {message}<br>\n", 1);
   log_file.AddFilter ("*error*", "<font color=#ff0000><strong>[{day}-{month}-{year} {hour}:{minutes}:{seconds}] {log}: {message}</strong></font><br>\n", 0);
 
-  StdFile output_file (DST_FILE_NAME, FILE_MODE_WRITE_ONLY);
+  OutputFile output_file (DST_FILE_NAME);
   File    dummy_file;
 
   log_file.Print ("not_visible_logger", "Not visible message");

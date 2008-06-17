@@ -60,7 +60,7 @@ size_t PropertyList::GetSize ()
 const char* PropertyList::GetKey (size_t index)
 {
   if (index >= impl->properties.size ())
-    raise_out_of_range ("render::low_level::opengl::PropertyList::GetKey", "index", index, impl->properties.size ());
+    throw xtl::make_range_exception ("render::low_level::opengl::PropertyList::GetKey", "index", index, impl->properties.size ());
     
   return impl->properties [index]->key.c_str ();
 }
@@ -68,7 +68,7 @@ const char* PropertyList::GetKey (size_t index)
 const char* PropertyList::GetValue (size_t index)
 {
   if (index >= impl->properties.size ())
-    raise_out_of_range ("render::low_level::opengl::PropertyList::GetValue", "index", index, impl->properties.size ());
+    throw xtl::make_range_exception ("render::low_level::opengl::PropertyList::GetValue", "index", index, impl->properties.size ());
     
   return impl->properties [index]->value.c_str ();
 }
@@ -80,10 +80,10 @@ const char* PropertyList::GetValue (size_t index)
 size_t PropertyList::AddProperty (const char* key, const char* value)
 {
   if (!key)
-    raise_null_argument ("render::low_level::opengl::PropertyList::AddProperty", "key");
+    throw xtl::make_null_argument_exception ("render::low_level::opengl::PropertyList::AddProperty", "key");
 
   if (!value)
-    raise_null_argument ("render::low_level::opengl::PropertyList::AddProperty", "value");
+    throw xtl::make_null_argument_exception ("render::low_level::opengl::PropertyList::AddProperty", "value");
 
   Property* property = new Property (key, value);
 

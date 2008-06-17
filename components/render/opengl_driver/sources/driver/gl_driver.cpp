@@ -51,9 +51,9 @@ ISwapChain* Driver::CreateSwapChain (const SwapChainDesc& desc)
   {
     return SwapChainManager::CreateSwapChain (output_manager, desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Driver::CreateSwapChain(const SwapChainDesc&)");
+    exception.touch ("render::low_level::opengl::Driver::CreateSwapChain(const SwapChainDesc&)");
     throw;
   }
 }
@@ -65,7 +65,7 @@ ISwapChain* Driver::CreateSwapChain (const SwapChainDesc& desc)
 IDevice* Driver::CreateDevice (ISwapChain* swap_chain, const char* init_string)
 {
   if (!swap_chain)
-    raise_null_argument ("render::low_level::opengl::Driver::CreateDevice", "swap_chain");
+    throw xtl::make_null_argument_exception ("render::low_level::opengl::Driver::CreateDevice", "swap_chain");
     
   if (!init_string)
     init_string = "";
@@ -74,9 +74,9 @@ IDevice* Driver::CreateDevice (ISwapChain* swap_chain, const char* init_string)
   {
     return new Device (this, swap_chain, init_string);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Driver::CreateDevice");
+    exception.touch ("render::low_level::opengl::Driver::CreateDevice");
     throw;
   }
 }

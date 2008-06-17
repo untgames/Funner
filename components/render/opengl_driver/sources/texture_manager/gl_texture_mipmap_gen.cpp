@@ -190,7 +190,7 @@ void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
     default:
-      common::raise_not_supported ("render::low_level::opengl::scale_image_2x_down", "DXT image scaling not supported");
+      throw xtl::format_not_supported_exception ("render::low_level::opengl::scale_image_2x_down", "DXT image scaling not supported");
       break;
   }
 }
@@ -212,7 +212,7 @@ void scale_image (PixelFormat format, size_t width, size_t height, size_t new_wi
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
     default:
-      common::raise_not_supported ("render::low_level::opengl::scale_image", "DXT image scaling not supported");
+      throw xtl::format_not_supported_exception ("render::low_level::opengl::scale_image", "DXT image scaling not supported");
       break;
   }
 }

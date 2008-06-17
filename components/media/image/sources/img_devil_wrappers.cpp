@@ -7,17 +7,23 @@ namespace
 {
 
 /*
+    Константы
+*/
+
+const char* LOG_NAME = "media.image.devil"; //имя потока протоколирования
+
+/*
     Протоколирование исключения
 */
 
 void log_exception (const char* source, std::exception& exception)
 {
-//  media::ImageSystemSingleton::Instance ().Printf ("Exception at %s: %s", source, exception.what ());
+  common::LogSystem::Printf (LOG_NAME, "Exception at %s: %s", source, exception.what ());
 }
 
 void log_exception (const char* source)
 {
-//  media::ImageSystemSingleton::Instance ().Printf ("Unknown exception at %s", source);
+  common::LogSystem::Printf (LOG_NAME, "Unknown exception at %s", source);
 }
 
 /*
@@ -62,7 +68,7 @@ ILHANDLE ILAPIENTRY devil_file_open_read_only (const ILstring file_name)
 {
   try
   {
-    return new StdFile (file_name, FILE_MODE_READ_ONLY);
+    return new StdFile (file_name, FileMode_ReadOnly);
   }
   catch (std::exception& exception)
   {
@@ -80,7 +86,7 @@ ILHANDLE ILAPIENTRY devil_file_open_write_only (const ILstring file_name)
 {
   try
   {
-    return new StdFile (file_name, FILE_MODE_WRITE_ONLY);
+    return new StdFile (file_name, FileMode_WriteOnly);
   }
   catch (std::exception& exception)
   {
@@ -173,16 +179,16 @@ ILint ILAPIENTRY devil_file_seek (ILHANDLE file_ptr, ILint offset, ILint origin)
 {
   try
   {
-    static FileSeekMode seek_mode [] = {FILE_SEEK_SET, FILE_SEEK_CUR, FILE_SEEK_END};
+    static FileSeekMode seek_mode [] = {FileSeekMode_Set, FileSeekMode_Current, FileSeekMode_End};
 
     filepos_t seek_pos;
     
     switch (seek_mode [origin])
     {
       default:
-      case FILE_SEEK_SET: seek_pos = offset; break;
-      case FILE_SEEK_CUR: seek_pos = ((StdFile*)file_ptr)->Tell () + offset; break;
-      case FILE_SEEK_END: seek_pos = ((StdFile*)file_ptr)->Size () + offset; break;
+      case FileSeekMode_Set:     seek_pos = offset; break;
+      case FileSeekMode_Current: seek_pos = ((StdFile*)file_ptr)->Tell () + offset; break;
+      case FileSeekMode_End:     seek_pos = ((StdFile*)file_ptr)->Size () + offset; break;
     }
 
     return seek_pos != ((StdFile*)file_ptr)->Seek (seek_pos); //return 1 if error

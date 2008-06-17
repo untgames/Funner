@@ -3,11 +3,10 @@
 
 #include <xtl/function.h>
 #include <xtl/iterator.h>
+#include <xtl/common_exceptions.h>
 
 #include <stl/hash_map>
 #include <stl/string>
-
-#include <common/exception.h>
 
 namespace media
 {

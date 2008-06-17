@@ -1,5 +1,4 @@
-#include <sg/camera.h>
-#include <xtl/visitor.h>
+#include "shared.h"
 
 using namespace scene_graph;
 using namespace math;

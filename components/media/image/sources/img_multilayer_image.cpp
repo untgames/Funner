@@ -86,10 +86,10 @@ class MultilayerImageImpl: public ImageImpl
 MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersCloneMode clone_mode)
 {
   if (!count)
-    raise_null_argument ("media::MultilayerImageImpl::MultilayerImageImpl", "count");
+    throw xtl::make_null_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "count");
     
   if (!images)
-    raise_null_argument ("media::MultilayerImageImpl::MultilayerImageImpl", "images");
+    throw xtl::make_null_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "images");
 
   layers_width  = images [0].Width ();
   layers_height = images [0].Height ();
@@ -107,7 +107,7 @@ MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersClo
         images [i].Swap (layers [i]);
       break;
     default:
-      raise_invalid_argument ("media::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
+      throw xtl::make_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
       break;
   }
 
@@ -204,7 +204,7 @@ void MultilayerImageImpl::Convert (PixelFormat new_format)
 void MultilayerImageImpl::SaveSixLayersImage (const char* file_name, const char* suffixes [6])
 {
   if (layers.size () < 6)
-    raise_not_supported ("media::MultilayerImageImpl::SaveSixLayerImage", "Can't save image '%s', depth=%d<6.", Name (), layers.size ());
+    throw xtl::format_not_supported_exception ("media::MultilayerImageImpl::SaveSixLayerImage", "Can't save image '%s', depth=%d<6.", Name (), layers.size ());
     
   string basename1 = common::basename (file_name),
          basename2 = common::basename (basename1),
@@ -247,7 +247,7 @@ void MultilayerImageImpl::Save (const char* file_name)
   else if (!::strcmp (DDS_SUFFIX,     suffix.c_str ())) SaveDDS     (file_name);
   else
   {
-    raise_not_supported ("media::MultilayerImageImpl::Save", "Can't save image '%s' in file '%s. Unknown extension '%s'",
+    throw xtl::format_not_supported_exception ("media::MultilayerImageImpl::Save", "Can't save image '%s' in file '%s. Unknown extension '%s'",
                        Name (), file_name, suffix.c_str ());
   }
 }
@@ -271,7 +271,7 @@ ImageImpl* create_multilayer_image (size_t count, Image* images, LayersCloneMode
 void load_image_array (const char* file_name, size_t count, const char** suffixes, Image* images)
 {
   if (!file_name)
-    raise_null_argument ("media::load_image_array", "file_name");
+    throw xtl::make_null_argument_exception ("media::load_image_array", "file_name");
 
   string basename1 = common::basename (file_name),
          basename2 = common::basename (basename1),
@@ -282,9 +282,9 @@ void load_image_array (const char* file_name, size_t count, const char** suffixe
     for (size_t i=0; i<6; i++)
       images [i].Load ((basename2 + suffixes [i] + suffix).c_str ());      
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::load_image_array");
+    exception.touch ("media::load_image_array");
     throw;
   }
 }

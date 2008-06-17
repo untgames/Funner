@@ -35,7 +35,7 @@ void check_item_index (lua_State* state, size_t index, const char* function_name
   size_t stack_size = lua_gettop (state) + 1; 
 
   if (index >= stack_size)
-    raise<script::ArgumentException> (function_name, "Attempt to get item #%u from stack with %u items", index, stack_size);
+    throw xtl::format_exception<script::ArgumentException> (function_name, "Attempt to get item #%u from stack with %u items", index, stack_size);
 }
 
 //проверка корректности типа элемента, извлекаемого из стека
@@ -76,7 +76,7 @@ void check_item (lua_State* state, size_t index, int expected_type, const char* 
   
   if (item_type != expected_type)
   {
-    raise<script::ArgumentException> (function_name, "Bad item #%u type (%s expected, got %s)", index, lua_typename (state, expected_type),
+    throw xtl::format_exception<script::ArgumentException> (function_name, "Bad item #%u type (%s expected, got %s)", index, lua_typename (state, expected_type),
                              lua_typename (state, item_type));
   }  
 }
@@ -110,7 +110,7 @@ const char* Stack::GetString (size_t index)
 
 const char* Stack::GetSymbol (size_t index)
 {
-  raise_not_supported ("script::lua::Stack::GetSymbol");
+  throw xtl::format_not_supported_exception ("script::lua::Stack::GetSymbol");
 
   return "";
 }
@@ -139,7 +139,7 @@ xtl::any& Stack::GetVariant (size_t index)
 
     //генерация исключения
 
-  raise<script::ArgumentException> ("script::Stack::GetVariant", "Item %u has wrong type (non xtl::any)", index);
+  throw xtl::format_exception<script::ArgumentException> ("script::Stack::GetVariant", "Item %u has wrong type (non xtl::any)", index);
   
   return *variant;
 }
@@ -155,7 +155,7 @@ namespace
 void check_stack (lua_State* state, size_t count = 1)
 {
   if (!lua_checkstack (state, count))
-    raise<StackException> ("script::lua::Stack::Push", "Not enough stack space."
+    throw xtl::format_exception<StackException> ("script::lua::Stack::Push", "Not enough stack space."
     "Attempt to push %u items in stack with %u items (stack_size=%u)", count, lua_gettop (state), LUAI_MAXCSTACK);
 }
 
@@ -176,7 +176,7 @@ void Stack::Push (int value)
 void Stack::Push (const char* string)
 {
   if (!string)
-    raise_null_argument ("script::lua::Stack::Push", "string");
+    throw xtl::make_null_argument_exception ("script::lua::Stack::Push", "string");
 
   check_stack    (state);
   lua_pushstring (state, string);
@@ -191,7 +191,7 @@ void Stack::Push (void* value)
 void Stack::PushSymbol (const char* symbol)
 {
   if (!symbol)
-    raise_null_argument ("script::lua::Stack::PushSymbol", "symbol");
+    throw xtl::make_null_argument_exception ("script::lua::Stack::PushSymbol", "symbol");
 
   check_stack   (state);    
   lua_getglobal (state, symbol);
@@ -215,7 +215,7 @@ void Stack::Push (const xtl::any& value)
   void* buffer = lua_newuserdata (state, BUFFER_SIZE); 
 
   if (!buffer) 
-    raise<StackException> ("script::lua::Stack::Push(const xtl::any&)", "Fail to allocate %u bytes from stack", BUFFER_SIZE);
+    throw xtl::format_exception<StackException> ("script::lua::Stack::Push(const xtl::any&)", "Fail to allocate %u bytes from stack", BUFFER_SIZE);
     
   const char* library_id = environment.FindLibraryId (value.castable_type ());
   

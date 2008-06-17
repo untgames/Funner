@@ -100,12 +100,12 @@ Environment& Environment::operator = (const Environment& environment)
 InvokerRegistry& Environment::CreateLibrary (const char* id)
 {
   if (!id)
-    raise_null_argument ("script::Environment::CreateLibrary", "id");
+    throw xtl::make_null_argument_exception ("script::Environment::CreateLibrary", "id");
 
   LibraryMap::const_iterator iter = impl->libraries.find (id);
 
   if (iter != impl->libraries.end ())
-    raise_invalid_argument ("script::Environment::CreateLibrary", "id", id, "Library with this id already registered");
+    throw xtl::make_argument_exception ("script::Environment::CreateLibrary", "id", id, "Library with this id already registered");
 
   LibraryImpl* library = new LibraryImpl (id);
 
@@ -165,12 +165,12 @@ void Environment::RemoveAllLibraries ()
 void Environment::RegisterType (const std::type_info& type, const char* library_id)
 {
   if (!library_id)
-    raise_null_argument ("script::Environment::RegisterType", "library_id");
+    throw xtl::make_null_argument_exception ("script::Environment::RegisterType", "library_id");
     
   LibraryMap::iterator iter = impl->libraries.find (library_id);
   
   if (iter == impl->libraries.end ())
-    raise_invalid_argument ("script::Environment::RegisterType", "library_id", library_id, "No library with this id");
+    throw xtl::make_argument_exception ("script::Environment::RegisterType", "library_id", library_id, "No library with this id");
 
   impl->links [&type] = iter->second;
 }
@@ -270,7 +270,7 @@ const char* Environment::LibraryId (const ConstIterator& i) const
   const LibraryMap::iterator* iter = i.target<LibraryMap::iterator> ();
 
   if (!iter)
-    common::raise_invalid_argument ("script::Environment::LibraryId", "iterator", "wrong-type");
+    throw xtl::make_argument_exception ("script::Environment::LibraryId", "iterator", "wrong-type");
 
   return (*iter)->second->id.c_str ();
 }
@@ -282,7 +282,7 @@ const char* Environment::LibraryId (const ConstIterator& i) const
 xtl::connection Environment::RegisterEventHandler (EnvironmentLibraryEvent event_id, const EventHandler& handler)
 {
   if (event_id < 0 || event_id >= EnvironmentLibraryEvent_Num)
-    common::raise_invalid_argument ("script::Environment::RegisterEventHandler", "event_id", event_id);
+    throw xtl::make_argument_exception ("script::Environment::RegisterEventHandler", "event_id", event_id);
 
   return impl->handlers [event_id].connect (handler);
 }

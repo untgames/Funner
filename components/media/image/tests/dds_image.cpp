@@ -1,7 +1,4 @@
-#include <exception>
-#include <stdio.h>
-
-#include <media/dds_image.h>
+#include "shared.h"
 
 using namespace media;
 

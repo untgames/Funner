@@ -154,7 +154,7 @@ char* ParseContext::AttachTextSource (const char* file_name)
   }
   catch (FileException& exception)
   {
-    LogError (file_name,0,"%s",exception.Message ());
+    LogError (file_name,0,"%s",exception.what ());
     return NULL;
   }
   catch (...)

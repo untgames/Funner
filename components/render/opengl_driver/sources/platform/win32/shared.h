@@ -7,22 +7,22 @@
 #include <gl/glew.h>
 #include <gl/wglew.h>
 
-#include <shared/platform/output_manager.h>
-#include <shared/platform/swap_chain_manager.h>
-#include <shared/platform/context.h>
-#include <shared/object.h>
-#include <shared/property_list.h>
+#include <stl/vector>
+#include <stl/string>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/trackable_ptr.h>
 #include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
 
-#include <stl/vector>
-#include <stl/string>
-
-#include <common/exception.h>
 #include <common/strlib.h>
+
+#include <shared/platform/output_manager.h>
+#include <shared/platform/swap_chain_manager.h>
+#include <shared/platform/context.h>
+#include <shared/object.h>
+#include <shared/property_list.h>
 
 namespace render
 {

@@ -1,11 +1,9 @@
 #ifndef RENDER_GL_DRIVER_COMPLEX_TESTS_SHARED_HEADER
 #define RENDER_GL_DRIVER_COMPLEX_TESTS_SHARED_HEADER
 
-#include <stdio.h>
-#include <memory.h>
-#include <math.h>
-#include <time.h>
-
+#include <cstdio>
+#include <cmath>
+#include <ctime>
 #include <exception>
 
 #include <mathlib.h>
@@ -30,9 +28,9 @@
 #include <xtl/function.h>
 #include <xtl/connection.h>
 #include <xtl/ref.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/file.h>
-#include <common/exception.h>
 #include <common/hash.h>
 
 #include <media/image.h>

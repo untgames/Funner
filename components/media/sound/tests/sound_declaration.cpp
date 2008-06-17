@@ -1,6 +1,8 @@
-#include <stdio.h>
-#include <media/sound_declaration.h>
+#include <cstdio>
+
 #include <common/file.h>
+
+#include <media/sound_declaration.h>
 
 using namespace media;
 using namespace common;

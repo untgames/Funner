@@ -24,9 +24,9 @@ void SwapChainNullFrameBuffer::Bind ()
     frame_buffer_manager.SetFrameBuffer         (GetContextManager ().GetContextId (), 0, GL_NONE);
     frame_buffer_manager.SetFrameBufferActivity (false, false);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainNullFrameBuffer::Bind");
+    exception.touch ("render::low_level::opengl::SwapChainNullFrameBuffer::Bind");
     throw;
   }
 }

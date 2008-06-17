@@ -16,7 +16,7 @@ PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& in_desc, OutputManager&
   output_window = (HWND)in_desc.window_handle;
   
   if (!output_window)
-    raise_null_argument ("render::low_level::opengl::PrimarySwapChain::PrimarySwapChain", "swap_chain_desc.window_handle");  
+    throw xtl::make_null_argument_exception ("render::low_level::opengl::PrimarySwapChain::PrimarySwapChain", "swap_chain_desc.window_handle");  
     
   output_context = ::GetDC (output_window);
   
@@ -114,9 +114,9 @@ void PrimarySwapChain::Present ()
     if (!SwapBuffers (output_context))
       raise_error ("SwapBuffers");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::PrimarySwapChain::Present");
+    exception.touch ("render::low_level::opengl::PrimarySwapChain::Present");
 
     throw;
   }

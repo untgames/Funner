@@ -16,9 +16,9 @@
 #include <xtl/bind.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/token_parser.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/singleton.h>
-#include <common/exception.h>
 #include <common/strlib.h>
 #include <common/parser.h>
 #include <common/xml_writer.h>

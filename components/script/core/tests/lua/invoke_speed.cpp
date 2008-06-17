@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <time.h>
-#include <xtl/iterator.h>
-#include <xtl/shared_ptr.h>
-#include <script/bind.h>
-#include <script/environment.h>
+#include "shared.h"
 
 const size_t TOTAL = 100000;
 

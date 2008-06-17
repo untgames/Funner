@@ -421,7 +421,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       win_style = WS_POPUP;
       break;
     default:
-      raise_invalid_argument ("syslib::Win32Platform::CreateWindow", "style", style);
+      throw xtl::make_argument_exception ("syslib::Win32Platform::CreateWindow", "style", style);
       return 0;
   }
   
@@ -467,9 +467,9 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       throw;
     }
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::CreateWindow");
+    exception.touch ("syslib::Win32Platform::CreateWindow");
     
     throw;
   }  
@@ -484,9 +484,9 @@ void Platform::CloseWindow (window_t handle)
     if (!PostMessage (wnd, WM_CLOSE, 0, 0))
       raise_error ("::PostMessage(window, WM_CLOSE,0, 0)");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::CloseWindow");
+    exception.touch ("syslib::Win32Platform::CloseWindow");
     throw;
   }
 }
@@ -500,9 +500,9 @@ void Platform::DestroyWindow (window_t handle)
    if (!::DestroyWindow (wnd))
       raise_error ("::DestroyWindow");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::DestroyWindow");
+    exception.touch ("syslib::Win32Platform::DestroyWindow");
     throw;
   }
 }
@@ -520,9 +520,9 @@ void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
     if (!SetWindowTextW (wnd, title))
       raise_error ("::SetWindowTextW");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::SetWindowTitle(const wchar_t*)");
+    exception.touch ("syslib::Win32Platform::SetWindowTitle(const wchar_t*)");
     throw;
   }
 }
@@ -536,9 +536,9 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size, wchar_t* buf
     if (!GetWindowTextW (wnd, buffer, buffer_size))
       raise_error ("::GetWindowText(wchar_t*)");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::GetWindowTitle");
+    exception.touch ("syslib::Win32Platform::GetWindowTitle");
     throw;
   }
 }
@@ -578,9 +578,9 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
     if (!SetWindowPos (wnd, HWND_TOP, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, flags))
       raise_error ("::SetWindowPos");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::SetWindowRect");
+    exception.touch ("syslib::Win32Platform::SetWindowRect");
     throw;
   }
 }
@@ -601,9 +601,9 @@ void Platform::GetWindowRect (window_t handle, Rect& rect)
     rect.top    = window_rect.top;
     rect.bottom = window_rect.bottom;
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::GetWindowRect");
+    exception.touch ("syslib::Win32Platform::GetWindowRect");
     throw;
   }
 }
@@ -624,9 +624,9 @@ void Platform::GetClientRect (window_t handle, Rect& rect)
     rect.top    = window_rect.top;
     rect.bottom = window_rect.bottom;
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::GetClientRect");
+    exception.touch ("syslib::Win32Platform::GetClientRect");
     throw;
   }
 }
@@ -666,13 +666,13 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
           raise_error ("::SetFocus");
         break;
       default:
-        raise_invalid_argument ("", "flag", flag);
+        throw xtl::make_argument_exception ("", "flag", flag);
         break;
     }
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::SetWindowFlag");
+    exception.touch ("syslib::Win32Platform::SetWindowFlag");
     throw;
   }
 }
@@ -710,13 +710,13 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
         return focus_wnd == wnd;
       }
       default:
-        raise_invalid_argument ("", "flag", flag);
+        throw xtl::make_argument_exception ("", "flag", flag);
         break;
     }
   }  
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::GetWindowFlag");
+    exception.touch ("syslib::Win32Platform::GetWindowFlag");
     throw;
   }  
 
@@ -736,9 +736,9 @@ void Platform::InvalidateWindow (window_t handle)
     if (!InvalidateRect (wnd, 0, FALSE))
       raise_error ("::InvalidateRect");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::InvalidateWindow");
+    exception.touch ("syslib::Win32Platform::InvalidateWindow");
     throw;
   }
 }
@@ -754,9 +754,9 @@ void Platform::SetCursorPosition (const Point& position)
     if (!SetCursorPos (position.x, position.y))
       raise_error  ("::SetCursorPos");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::SetCursorPosition");
+    exception.touch ("syslib::Win32Platform::SetCursorPosition");
     throw;
   }
 }
@@ -772,9 +772,9 @@ Point Platform::GetCursorPosition ()
 
     return Point (position.x, position.y);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::GetCursorPosition");
+    exception.touch ("syslib::Win32Platform::GetCursorPosition");
     throw;
   }
 }

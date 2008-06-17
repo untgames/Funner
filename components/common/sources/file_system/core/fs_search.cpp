@@ -41,7 +41,7 @@ void FileSearchHelper::Search (ICustomFileSystemPtr _file_system,const char* dir
   file_system = _file_system;
   full_mask   = format ("%s%s",dir,mask);
 
-  if (search_flags & FILE_SEARCH_SUBDIRS)
+  if (search_flags & FileSearch_SubDirs)
     file_system->Search (format ("%s*",dir).c_str (),SearchHandler (bind (&FileSearchHelper::InsertRecursive, this, _1, _2)));
   else
     file_system->Search (full_mask.c_str (),SearchHandler (bind (&FileSearchHelper::Insert, this, _1, _2)));
@@ -66,12 +66,12 @@ void FileSearchHelper::Insert (const char* file_name,const FileInfo& info)
 
   if (!info.is_dir)
   {
-    if (search_flags & FILE_SEARCH_FILES)
+    if (search_flags & FileSearch_Files)
       builder.Insert (file_name,info);
   }
   else
   {
-    if (search_flags & FILE_SEARCH_DIRS)
+    if (search_flags & FileSearch_Dirs)
       builder.Insert (file_name,info);
   }
 }
@@ -90,13 +90,13 @@ void FileSystemImpl::MountSearch (FileListBuilder& builder,const char* wc_mask,c
     }
     else if (!xtl::xstrnicmp (i->prefix.c_str (),prefix,prefix_size))
     {
-      if (flags & FILE_SEARCH_DIRS && wcimatch (i->prefix.c_str ()+prefix_size,wc_mask))
+      if (flags & FileSearch_Dirs && wcimatch (i->prefix.c_str ()+prefix_size,wc_mask))
       {
         builder.SetPrefix     ("");
         builder.InsertSubname (i->prefix.c_str (),i->prefix.size ()-1,i->mount_point_info);
       }
       
-      if (flags & FILE_SEARCH_SUBDIRS)
+      if (flags & FileSearch_SubDirs)
       {       
         builder.SetPrefix    (i->prefix.c_str ());
         search_helper.Search (i->file_system,"");
@@ -108,7 +108,7 @@ void FileSystemImpl::MountSearch (FileListBuilder& builder,const char* wc_mask,c
 FileList FileSystemImpl::Search (const char* src_mask,size_t flags)
 {
   if (!src_mask)
-    raise_null_argument ("FileSystem::Search","mask");
+    throw xtl::make_null_argument_exception ("FileSystem::Search","mask");
 
   string full_mask  = FileSystem::GetNormalizedFileName (src_mask),
          src_prefix = dir (full_mask),
@@ -129,14 +129,14 @@ FileList FileSystemImpl::Search (const char* src_mask,size_t flags)
     
     if (src_prefix.empty ())
     {
-      if (!(flags & FILE_SEARCH_FULL_PATHS))
+      if (!(flags & FileSearch_FullPaths))
         builder.SetTruncateSize (default_path.size ()+1);
 
       MountSearch (builder,mask.c_str (),default_path.c_str (),flags);
       
       for (SearchPathList::iterator i=search_paths.begin ();i!=search_paths.end ();++i)
       {
-        if (!(flags & FILE_SEARCH_FULL_PATHS))
+        if (!(flags & FileSearch_FullPaths))
           builder.SetTruncateSize (i->path.size ()+1);
 
         MountSearch (builder,mask.c_str (),i->path.c_str (),flags);
@@ -144,14 +144,14 @@ FileList FileSystemImpl::Search (const char* src_mask,size_t flags)
     }
     else
     {
-      if (!(flags & FILE_SEARCH_FULL_PATHS))
+      if (!(flags & FileSearch_FullPaths))
         builder.SetTruncateSize (default_path.size ()+1);
 
       MountSearch (builder,mask.c_str (),format ("%s/%s",default_path.c_str (),src_prefix.c_str ()).c_str (),flags);
 
       for (SearchPathList::iterator i=search_paths.begin ();i!=search_paths.end ();++i)
       {
-        if (!(flags & FILE_SEARCH_FULL_PATHS))
+        if (!(flags & FileSearch_FullPaths))
           builder.SetTruncateSize (i->path.size ()+1);
 
         MountSearch (builder,mask.c_str (),format ("%s/%s",i->path.c_str (),src_prefix.c_str ()).c_str (),flags);
@@ -160,7 +160,7 @@ FileList FileSystemImpl::Search (const char* src_mask,size_t flags)
 
       //поиск в паках
       
-    if (!(flags & FILE_SEARCH_NO_PACKS))
+    if (!(flags & FileSearch_NoPacks))
     {
       FileSearchHelper search_helper (builder,mask.c_str (),flags);
       
@@ -172,5 +172,5 @@ FileList FileSystemImpl::Search (const char* src_mask,size_t flags)
     }
   }
 
-  return builder.Build ((flags & FILE_SEARCH_SORT) != 0);
+  return builder.Build ((flags & FileSearch_Sort) != 0);
 }

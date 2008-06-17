@@ -6,15 +6,13 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/function.h>
 #include <xtl/reference_counter.h>
-
-#include <common/exception.h>
+#include <xtl/common_exceptions.h>
 
 #include <render/low_level/driver.h>
 #include <render/low_level/device.h>
 #include <render/low_level/utils.h>
 
 using namespace render::low_level;
-using namespace common;
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4250)
@@ -117,13 +115,13 @@ class TestDriver: public IDriver, public ObjectImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ISwapChain* CreateSwapChain (const SwapChainDesc&)
     {
-      raise_not_implemented ("TestDriver::CreateSwapChain");
+      throw xtl::make_not_implemented_exception ("TestDriver::CreateSwapChain");
       return 0;
     }
 
     ISwapChain* CreateSwapChain (IOutput*, const SwapChainDesc&)
     {
-      raise_not_implemented ("TestDriver::CreateSwapChain");
+      throw xtl::make_not_implemented_exception ("TestDriver::CreateSwapChain");
       return 0;
     }    
 
@@ -132,7 +130,7 @@ class TestDriver: public IDriver, public ObjectImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDevice* CreateDevice (ISwapChain*, const char*)
     {
-      raise_not_implemented ("TestDriver::CreateDevice");
+      throw xtl::make_not_implemented_exception ("TestDriver::CreateDevice");
       return 0;
     }
 

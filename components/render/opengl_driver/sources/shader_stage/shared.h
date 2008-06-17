@@ -1,18 +1,18 @@
 #ifndef RENDER_GL_DRIVER_SHADER_STAGE_SHARED_HEADER
 #define RENDER_GL_DRIVER_SHADER_STAGE_SHARED_HEADER
 
-#include <render/low_level/utils.h>
-
-#include <shared/shader_stage.h>
-#include <shared/input_stage.h>
-
-#include <common/exception.h>
-
 #include <stl/vector>
+#include <stl/algorithm>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/trackable_ptr.h>
 #include <xtl/uninitialized_storage.h>
+#include <xtl/common_exceptions.h>
+
+#include <render/low_level/utils.h>
+
+#include <shared/shader_stage.h>
+#include <shared/input_stage.h>
 
 namespace render
 {

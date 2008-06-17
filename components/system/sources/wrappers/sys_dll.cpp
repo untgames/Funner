@@ -1,11 +1,4 @@
-#include <syslib/dll.h>
-
-#include <common/exception.h>
-#include <common/utf_converter.h>
-
-#include <stl/string>
-
-#include <platform/platform.h>
+#include "shared.h"
 
 using namespace syslib;
 using namespace common;
@@ -38,15 +31,15 @@ DynamicLibrary::DynamicLibrary (const char* name)
   try
   {
     if (!name)
-      raise_null_argument ("", "name");
+      throw xtl::make_null_argument_exception ("", "name");
 
     impl->name         = name;
     impl->name_unicode = towstring (name);
     impl->handle       = Platform::LoadLibrary (impl->name_unicode.c_str ());
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::DynamicLibrary::DynamicLibrary(const char*)");
+    exception.touch ("syslib::DynamicLibrary::DynamicLibrary(const char*)");
     throw;
   }
 }
@@ -57,15 +50,15 @@ DynamicLibrary::DynamicLibrary (const wchar_t* name)
   try
   {
     if (!name)
-      raise_null_argument ("", "name");
+      throw xtl::make_null_argument_exception ("", "name");
 
     impl->name_unicode = name;
     impl->name         = tostring (name);
     impl->handle       = Platform::LoadLibrary (impl->name_unicode.c_str ());
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::DynamicLibrary::DynamicLibrary(const wchar_t*)");
+    exception.touch ("syslib::DynamicLibrary::DynamicLibrary(const wchar_t*)");
     throw;
   }
 }
@@ -126,9 +119,9 @@ void* DynamicLibrary::GetSymbol (const char* name) const
 
     return Platform::GetSymbol (impl->handle, name);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::DynamicLibrary::GetSymbol");
+    exception.touch ("syslib::DynamicLibrary::GetSymbol");
     throw;
   }
 }

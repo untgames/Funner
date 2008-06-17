@@ -28,10 +28,10 @@ GLenum get_render_buffer_format (PixelFormat format, const char* source, const c
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-      raise_not_supported (source, "Unsupported %p=%s", param, get_name (format));
+      throw xtl::format_not_supported_exception (source, "Unsupported %p=%s", param, get_name (format));
       return 0;
     default:
-      raise_invalid_argument (source, param, format);
+      throw xtl::make_argument_exception (source, param, format);
       return 0;
   }
 }
@@ -57,7 +57,7 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManager& manager, const Textu
     //проверка наличия необходимого расширения
     
   if (!GetCaps ().has_ext_framebuffer_object)
-    raise_not_supported (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
+    throw xtl::format_not_supported_exception (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
   
     //преобразование формата буфера рендеринга
   
@@ -66,7 +66,7 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManager& manager, const Textu
   if (desc.format == PixelFormat_D24S8)
   {
     if (!GetCaps ().has_ext_packed_depth_stencil)
-      raise_not_supported (METHOD_NAME, "Unsupported render buffer desc.format=%s (GL_EXT_packed_depth_stencil not supported)", get_name (desc.format));
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported render buffer desc.format=%s (GL_EXT_packed_depth_stencil not supported)", get_name (desc.format));
   }
   
   try
@@ -104,11 +104,11 @@ FboRenderBuffer::~FboRenderBuffer ()
 
     CheckErrors ("");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FboRenderBuffer::~FboRenderBuffer");
+    exception.touch ("render::low_level::opengl::FboRenderBuffer::~FboRenderBuffer");
     
-    LogPrintf ("%s", exception.Message ());
+    LogPrintf ("%s", exception.what ());
   }  
   catch (std::exception& exception)
   {
@@ -225,9 +225,9 @@ void FboRenderBuffer::Bind ()
         break;
     }
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FboRenderBuffer::Bind");
+    exception.touch ("render::low_level::opengl::FboRenderBuffer::Bind");
 
     throw;
   }

@@ -53,7 +53,7 @@ int main ()
     
     printf ("Test #3. Seek and read file content\n");
     
-    file.Seek (-8,FILE_SEEK_END);
+    file.Seek (-8,FileSeekMode_End);
     
     ReadFileContent (file);
   }

@@ -1,7 +1,4 @@
-#include <sg/light.h>
-#include <xtl/visitor.h>
-#include <bv/axis_aligned_box.h>
-//#include <bv/sphere.h>
+#include "shared.h"
 
 using namespace scene_graph;
 using namespace math;

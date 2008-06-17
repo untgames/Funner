@@ -6,6 +6,13 @@ using namespace common;
 namespace
 {
 
+/*
+    Константы
+*/
+
+const char* LOG_NAME = "media.sound.ogg"; //имя потока протоколирования
+
+//поток декодированияogg
 class OggInputStream : public media::ISoundInputStream, public xtl::reference_counter
 {
   public:
@@ -22,17 +29,17 @@ class OggInputStream : public media::ISoundInputStream, public xtl::reference_co
 };
 
 /*
-    Џа®в®Є®«Ёа®ў ­ЁҐ ЁбЄ«озҐ­Ёп
+    Протоколирование исключения
 */
 
 void log_exception (const char* source, std::exception& exception)
 {
-//  media::ImageSystemSingleton::Instance ().Printf ("Exception at %s: %s", source, exception.what ());
+  common::LogSystem::Printf (LOG_NAME, "Exception at %s: %s", source, exception.what ());
 }
 
 void log_exception (const char* source)
 {
-//  media::ImageSystemSingleton::Instance ().Printf ("Unknown exception at %s", source);
+  common::LogSystem::Printf (LOG_NAME, "Unknown exception at %s", source);
 }
 
 size_t OggReadFunc (void* data, size_t size, size_t count, void* file_ptr)
@@ -60,7 +67,7 @@ size_t OggReadFunc (void* data, size_t size, size_t count, void* file_ptr)
 
 int OggSeekFunc (void* file_ptr, ogg_int64_t offset, int origin)
 {
-  FileSeekMode seek_mode[3] = {FILE_SEEK_SET, FILE_SEEK_CUR, FILE_SEEK_END};
+  FileSeekMode seek_mode[3] = {FileSeekMode_Set, FileSeekMode_Current, FileSeekMode_End};
 
   try
   {
@@ -69,9 +76,9 @@ int OggSeekFunc (void* file_ptr, ogg_int64_t offset, int origin)
      switch (seek_mode[origin])
      {
        default:
-       case FILE_SEEK_SET: seek_pos = (filepos_t)offset; break;
-       case FILE_SEEK_CUR: seek_pos = ((StdFile*)file_ptr)->Tell () + (filepos_t)offset; break;
-       case FILE_SEEK_END: seek_pos = ((StdFile*)file_ptr)->Size () + (filepos_t)offset; break;
+       case FileSeekMode_Set:     seek_pos = (filepos_t)offset; break;
+       case FileSeekMode_Current: seek_pos = ((StdFile*)file_ptr)->Tell () + (filepos_t)offset; break;
+       case FileSeekMode_End:     seek_pos = ((StdFile*)file_ptr)->Size () + (filepos_t)offset; break;
      } 
      return seek_pos != ((StdFile*)file_ptr)->Seek ((filepos_t)offset, seek_mode[origin]);  
   }
@@ -118,7 +125,7 @@ void SwapSamples (short &s1, short &s2)
 }
 
 OggInputStream::OggInputStream (const char* file_name, SoundSampleInfo& sound_sample_info)
-  : file (file_name, FILE_MODE_READ_ONLY)
+  : file (file_name, FileMode_ReadOnly)
 {
   ov_callbacks callbacks = {OggReadFunc, OggSeekFunc, OggCloseFunc, OggTellFunc};
   int          ret_code;
@@ -126,7 +133,7 @@ OggInputStream::OggInputStream (const char* file_name, SoundSampleInfo& sound_sa
   ret_code = ov_open_callbacks (&file, &vf, NULL, 0, callbacks);
 
   if (ret_code < 0) 
-    raise <Exception> ("OggCodec::OggCodec", "Can't open ogg file, seems to be not ogg bitstream (return code %d)", ret_code);
+    throw xtl::format_operation_exception ("OggCodec::OggCodec", "Can't open ogg file, seems to be not ogg bitstream (return code %d)", ret_code);
 
   vorbis_info *vi = ov_info (&vf, -1);
   sound_sample_info.frequency       = vi->rate;
@@ -183,13 +190,13 @@ ISoundInputStream* default_ogg_loader (const char* file_name, SoundSampleInfo& s
 }
 
 /*
-   Љ®¬Ї®­Ґ­в а Ў®вл б §ўгЄ ¬Ё
+   Компонент работы с звуками
 */
 
 class OggLoaderComponent
 {
   public:
-    //§ Јаг§Є  Є®¬Ї®­Ґ­в 
+    //загрузка компонента
     OggLoaderComponent () 
     {
       SoundSampleManager::RegisterLoader ("ogg", &default_ogg_loader);

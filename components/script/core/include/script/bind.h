@@ -5,6 +5,7 @@
 #include <xtl/function.h>
 #include <xtl/type_list.h>
 #include <xtl/type_traits>
+#include <xtl/message_exception.h>
 
 #include <script/invoker.h>
 #include <script/interpreter.h>

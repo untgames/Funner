@@ -42,9 +42,9 @@ void StateBlock::Capture ()
     shader_stage_state->Capture (mask);
     query_manager_state->Capture (mask);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::StateBlock::Capture");
+    exception.touch ("render::low_level::opengl::StateBlock::Capture");
     throw;
   }
 }
@@ -64,9 +64,9 @@ void StateBlock::Apply ()
     shader_stage_state->Apply (mask);
     query_manager_state->Apply (mask);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::StateBlock::Apply");
+    exception.touch ("render::low_level::opengl::StateBlock::Apply");
     throw;
   }
 }

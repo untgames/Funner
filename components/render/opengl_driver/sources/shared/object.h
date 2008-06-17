@@ -2,9 +2,11 @@
 #define RENDER_GL_DRIVER_OBJECT_HEADER
 
 #include <typeinfo>
-#include <render/low_level/object.h>
+
 #include <xtl/reference_counter.h>
-#include <common/exception.h>
+#include <xtl/common_exceptions.h>
+
+#include <render/low_level/object.h>
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4250) //'class1' : inherits 'class2::member' via dominance

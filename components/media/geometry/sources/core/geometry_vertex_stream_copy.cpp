@@ -13,7 +13,7 @@ namespace
 
 void raise_incompatible (VertexAttributeType src_type, VertexAttributeType dst_type)
 {
-  raise_not_supported ("media::geometry::copy", "Convertion from vertex type '%s' to vertex type '%s' not supported",
+  throw xtl::format_not_supported_exception ("media::geometry::copy", "Convertion from vertex type '%s' to vertex type '%s' not supported",
                      get_type_name (src_type), get_type_name (dst_type));
 }
 
@@ -109,10 +109,10 @@ void copy
   size_t              destination_stride)
 {
   if (!source && vertices_count)
-    raise_null_argument ("media::geometry::copy", "source");
+    throw xtl::make_null_argument_exception ("media::geometry::copy", "source");
     
   if (!destination && vertices_count)
-    raise_null_argument ("media::geometry::copy", "destination");
+    throw xtl::make_null_argument_exception ("media::geometry::copy", "destination");
     
   switch (source_type)
   {

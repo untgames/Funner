@@ -87,7 +87,7 @@ inline const char* ResourceLibrary<T>::ItemId (const ConstIterator& i)
   const typename ItemMap::iterator* iter = i.template target<typename ItemMap::iterator> ();
 
   if (!iter)
-    common::raise_invalid_argument ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
+    throw xtl::make_argument_exception ("media::ResourceLibrary::ItemId", "iterator", "wrong-type");
 
   return (*iter)->first.c_str ();
 }
@@ -121,7 +121,7 @@ template <class T>
 inline void ResourceLibrary<T>::Insert (const char* name, Item& item)
 {
   if (!name)
-    common::raise_null_argument ("media::ResourceLibrary::Insert", "name");
+    throw xtl::make_null_argument_exception ("media::ResourceLibrary::Insert", "name");
   
   typename ItemMap::iterator iter = items.find (name);
   

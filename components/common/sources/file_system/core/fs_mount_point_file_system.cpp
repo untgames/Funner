@@ -10,8 +10,7 @@ MountPointFileSystem::MountPointFileSystem (MountFileSystem& _owner)
 
 MountPointFileSystem::file_t MountPointFileSystem::FileOpen (const char* file_name,filemode_t,size_t)
 {
-  raise_not_supported ("MountPointFileSystem::FileOpen","Unable to open mount-point file '%s'",file_name);
-  return (file_t)0;
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::FileOpen","Unable to open mount-point file '%s'",file_name);
 }
 
 void MountPointFileSystem::FileClose (file_t)
@@ -20,53 +19,47 @@ void MountPointFileSystem::FileClose (file_t)
 
 size_t MountPointFileSystem::FileRead (file_t,void*,size_t)
 {
-  raise_not_supported ("MountPointFileSystem::FileRead");
-  return 0;
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::FileRead");
 }
 
 size_t MountPointFileSystem::FileWrite (file_t,const void* buf,size_t size)
 {
-  raise_not_supported ("MountPointFileSystem::FileWrite");
-  return 0;
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::FileWrite");
 }
 
 void MountPointFileSystem::FileRewind (file_t)
 {
-  raise_not_supported ("MountPointFileSystem::FileRewind");
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::FileRewind");
 }
 
 filepos_t MountPointFileSystem::FileSeek (file_t,filepos_t)
 {
-  raise_not_supported ("MountPointFileSystem::FileSeek");
-  return 0;
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::FileSeek");
 }
 
 filepos_t MountPointFileSystem::FileTell (file_t)
 {
-  raise_not_supported ("MountPointFileSystem::FileTell");
-  return 0;
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::FileTell");
 }
 
 filesize_t MountPointFileSystem::FileSize (file_t)
 {
-  raise_not_supported ("MountPointFileSystem::FileSize");
-  return 0;
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::FileSize");
 }
 
 void MountPointFileSystem::FileResize (file_t,filesize_t)
 {
-  raise_not_supported ("MountPointFileSystem::FileResize");
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::FileResize");
 }
 
 bool MountPointFileSystem::FileEof (file_t)
 {
-  raise_not_supported ("MountPointFileSystem::FileEof");
-  return true;
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::FileEof");
 }
 
 void MountPointFileSystem::FileFlush (file_t)
 {
-  raise_not_supported ("MountPointFileSystem::FileFlush");
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::FileFlush");
 }
 
 void MountPointFileSystem::Remove (const char* file_name)
@@ -87,7 +80,7 @@ void MountPointFileSystem::Rename (const char* file_name,const char* new_name)
   catch (FileMountException& exception)
   {
     FileSystemSingleton::Instance ().Mount (file_name,file_system);
-    exception.Touch ("MountPointFileSystem::Rename");
+    exception.touch ("MountPointFileSystem::Rename");
     throw;
   }
 }
@@ -109,5 +102,5 @@ bool MountPointFileSystem::GetFileInfo (const char* name,FileInfo& info)
 
 void MountPointFileSystem::Search (const char* mask,const FileSearchHandler& insert_handler)
 {
-  raise_not_supported ("MountPointFileSystem::Search");
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::Search");
 }

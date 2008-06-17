@@ -23,7 +23,7 @@ Buffer::Buffer (const ContextManager& context_manager, const BufferDesc& in_desc
     case UsageMode_Stream:
       break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.usage_mode", desc.usage_mode);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.usage_mode", desc.usage_mode);
       break;
   }
 
@@ -37,7 +37,7 @@ Buffer::Buffer (const ContextManager& context_manager, const BufferDesc& in_desc
     case AccessFlag_Read | AccessFlag_Write:
       break;
     default:
-      raise_invalid_argument ("", "desc.access_flags", desc.access_flags);
+      throw xtl::make_argument_exception ("", "desc.access_flags", desc.access_flags);
       break;
   }
 }
@@ -62,7 +62,7 @@ void Buffer::SetData (size_t offset, size_t size, const void* data)
     //проверка возможности установки данных
     
   if (!(desc.access_flags & AccessFlag_Write))
-    raise_invalid_operation (METHOD_NAME, "Can't set buffer data (no AccessFlag_Write in desc.access_flags)");
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't set buffer data (no AccessFlag_Write in desc.access_flags)");
 
     //отсечение
 
@@ -78,7 +78,7 @@ void Buffer::SetData (size_t offset, size_t size, const void* data)
     //проверка корректности переданных данных
 
   if (!data)
-    raise_null_argument (METHOD_NAME, "data");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "data");
 
     //установка данных
 
@@ -92,7 +92,7 @@ void Buffer::GetData (size_t offset, size_t size, void* data)
     //проверка возможности установки данных
     
   if (!(desc.access_flags & AccessFlag_Read))
-    raise_invalid_operation (METHOD_NAME, "Can't get buffer data (no AccessFlag_Read in desc.access_flags)");
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't get buffer data (no AccessFlag_Read in desc.access_flags)");
 
     //отсечение
 
@@ -108,7 +108,7 @@ void Buffer::GetData (size_t offset, size_t size, void* data)
     //проверка корректности результирующего буфера
 
   if (!data)
-    raise_null_argument (METHOD_NAME, "data");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "data");
 
     //чтение данных
 

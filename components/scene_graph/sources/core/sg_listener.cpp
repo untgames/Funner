@@ -1,6 +1,4 @@
-#include <sg/listener.h>
-#include <xtl/visitor.h>
-#include <common/exception.h>
+#include "shared.h"
 
 using namespace scene_graph;
 using namespace common;
@@ -50,7 +48,7 @@ float Listener::Gain () const
 void Listener::SetGain (float gain)
 {
   if (gain < 0)
-    raise_out_of_range ("Listener::SetGain", "gain", gain, 0.f, 1e9f);
+    throw xtl::make_range_exception ("Listener::SetGain", "gain", gain, 0.f, 1e9f);
 
   impl->gain = gain;
 }

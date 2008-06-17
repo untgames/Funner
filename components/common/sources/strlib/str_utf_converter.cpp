@@ -1,8 +1,8 @@
 #include <wchar.h>
 #include <string.h>
 #include <stl/string>
+#include <xtl/common_exceptions.h>
 #include <common/utf_converter.h>
-#include <common/exception.h>
 
 namespace common
 {
@@ -448,7 +448,7 @@ void convert_dispatcher1(const void*&   source,
     convert_dispatcher2<source_encoding, Encoding_UTF32BE> (source, source_size, destination, destination_size);
     break;
   default:
-    raise_invalid_argument(METHOD_NAME, "destination_encoding");
+    throw xtl::make_argument_exception(METHOD_NAME, "destination_encoding");
   }
 }
 
@@ -482,7 +482,7 @@ void convert_dispatcher0(Encoding       source_encoding,
     convert_dispatcher1<Encoding_UTF32BE> (source, source_size, destination_encoding, destination, destination_size);
     break;
   default:
-    raise_invalid_argument(METHOD_NAME, "source_encoding");
+    throw xtl::make_argument_exception(METHOD_NAME, "source_encoding");
   }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -501,10 +501,10 @@ void convert_encoding(Encoding       source_encoding,
     return;
 
   if (!source)
-    raise_null_argument(METHOD_NAME, "source");
+    throw xtl::make_null_argument_exception(METHOD_NAME, "source");
 
   if (!destination)
-    raise_null_argument(METHOD_NAME, "destination");
+    throw xtl::make_null_argument_exception(METHOD_NAME, "destination");
 
   convert_dispatcher0(source_encoding, source, source_size, destination_encoding, destination, destination_size);
 }
@@ -515,7 +515,7 @@ void convert_encoding(Encoding       source_encoding,
 stl::wstring towstring (const char* string, int length)
 {
   if (!string)
-    raise_null_argument ("common::towstring", "string");
+    throw xtl::make_null_argument_exception ("common::towstring", "string");
 
   if (length == -1)
     length = strlen (string);
@@ -537,7 +537,7 @@ stl::wstring towstring (const char* string, int length)
 stl::wstring towstring (const char* string)
 {
   if (!string)
-     raise_null_argument ("common::towstring", "string");
+     throw xtl::make_null_argument_exception ("common::towstring", "string");
 
   return towstring (string, -1);
 }
@@ -553,7 +553,7 @@ stl::wstring towstring (const stl::string& string)
 stl::string tostring (const wchar_t* string, int length)
 {
   if (!string)
-    raise_null_argument ("common::tostring", "string");
+    throw xtl::make_null_argument_exception ("common::tostring", "string");
 
   if (length == -1)
     length = wcslen (string);
@@ -575,7 +575,7 @@ stl::string tostring (const wchar_t* string, int length)
 stl::string tostring (const wchar_t* string)
 {
   if (!string)
-    raise_null_argument ("common::tostring", "string");
+    throw xtl::make_null_argument_exception ("common::tostring", "string");
 
   return tostring (string, -1);
 }

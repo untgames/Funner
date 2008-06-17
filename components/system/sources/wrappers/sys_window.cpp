@@ -1,10 +1,4 @@
-#include <syslib/window.h>
-#include <platform/platform.h>
-#include <xtl/signal.h>
-#include <common/exception.h>
-#include <common/strlib.h>
-#include <common/utf_converter.h>
-#include <string.h>
+#include "shared.h"
 
 using namespace syslib;
 using namespace xtl;
@@ -16,7 +10,7 @@ const size_t MAX_TITLE_LENGTH = 256;
     Описание реализации Window
 */
 
-typedef signal<void (Window&, WindowEvent, const WindowEventContext&)> WindowSignal;
+typedef xtl::signal<void (Window&, WindowEvent, const WindowEventContext&)> WindowSignal;
 
 struct Window::Impl
 {
@@ -174,7 +168,7 @@ void Window::Init (WindowStyle style)
     case WindowStyle_PopUp:
       break;
     default:
-      raise_invalid_argument ("syslib::Window::Window", "style", style);
+      throw xtl::make_argument_exception ("syslib::Window::Window", "style", style);
       return;
   }
   
@@ -234,7 +228,7 @@ const void* Window::Handle () const
 const void* Window::CheckedHandle () const
 {
   if (!impl->handle)
-    throw ClosedWindowException ();    
+    throw xtl::message_exception<ClosedWindowException> ("syslib::Window::CheckedHandle", "Closed window exception");
 
   return impl->handle;
 }
@@ -294,7 +288,7 @@ const wchar_t* Window::TitleUnicode () const
 void Window::SetTitle (const char* title)
 {
   if (!title)
-    raise_null_argument ("syslib::Window::SetTitle(const char*)", "title");
+    throw xtl::make_null_argument_exception ("syslib::Window::SetTitle(const char*)", "title");
 
   Platform::SetWindowTitle ((Platform::window_t)CheckedHandle (), towstring (title).c_str ());
 }
@@ -302,7 +296,7 @@ void Window::SetTitle (const char* title)
 void Window::SetTitle (const wchar_t* title)
 {
   if (!title)
-    raise_null_argument ("syslib::Window::SetTitle(const wchar_t*)", "title");
+    throw xtl::make_null_argument_exception ("syslib::Window::SetTitle(const wchar_t*)", "title");
 
   Platform::SetWindowTitle ((Platform::window_t)CheckedHandle (), title);
 }
@@ -501,7 +495,7 @@ void Window::Invalidate ()
 connection Window::RegisterEventHandler (WindowEvent event, const EventHandler& handler)
 {
   if (event < 0 || event >= WindowEvent_Num)
-    raise_invalid_argument ("syslib::Window::RegisterEventHandler", "event", event);
+    throw xtl::make_argument_exception ("syslib::Window::RegisterEventHandler", "event", event);
     
   return impl->signals [event].connect (handler);
 }

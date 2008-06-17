@@ -1,10 +1,12 @@
 #ifndef SYSLIB_WINDOW_HEADER
 #define SYSLIB_WINDOW_HEADER
 
-#include <stddef.h>
-#include <exception>
-#include <syslib/keydefs.h>
+#include <cstddef>
+
 #include <xtl/functional_fwd>
+#include <xtl/exception.h>
+
+#include <syslib/keydefs.h>
 
 namespace syslib
 {
@@ -108,11 +110,7 @@ struct WindowEventContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение: попытка работы с закрытым окном
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ClosedWindowException: public std::exception
-{
-  public:
-    const char* what () const throw () { return "closed window exception"; }
-};
+struct ClosedWindowException: virtual public xtl::exception {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Фасад для работы с окнами

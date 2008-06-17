@@ -1,10 +1,3 @@
-#include <sg/camera.h>
-#include <sg/light.h>
-#include <sg/helper.h>
-#include <sg/listener.h>
-#include <sg/sound_emitter.h>
-#include <sg/visual_model.h>
-
 #include "shared.h"
 
 using namespace script;

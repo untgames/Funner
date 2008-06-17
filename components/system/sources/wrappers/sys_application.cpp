@@ -1,8 +1,4 @@
-#include <syslib/application.h>
-#include <xtl/signal.h>
-#include <common/singleton.h>
-#include <common/exception.h>
-#include <platform/platform.h>
+#include "shared.h"
 
 using namespace syslib;
 using namespace xtl;
@@ -47,7 +43,7 @@ class ApplicationImpl
     void Notify (ApplicationEvent);
   
   private:
-    typedef signal<void ()> ApplicationSignal;
+    typedef xtl::signal<void ()> ApplicationSignal;
 
     ApplicationSignal signals [ApplicationEvent_Num]; //сигналы приложения
     int               exit_code;                      //код завершения приложения
@@ -153,7 +149,7 @@ void ApplicationImpl::Run ()
 connection ApplicationImpl::RegisterEventHandler (ApplicationEvent event, const Application::EventHandler& handler)
 {
   if (event < 0 || event >= ApplicationEvent_Num)
-    raise_invalid_argument ("syslib::Application::RegisterEventHandler", "event", event);
+    throw xtl::make_argument_exception ("syslib::Application::RegisterEventHandler", "event", event);
 
   return signals [event].connect (handler);
 }

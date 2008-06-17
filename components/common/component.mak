@@ -12,7 +12,7 @@ COMMONLIB_SOURCES.LIB_DIRS         :=
 COMMONLIB_SOURCES.LIBS             := 
 COMMONLIB_SOURCES.COMPILER_CFLAGS  :=
 COMMONLIB_SOURCES.COMPILER_DEFINES := PCRE_STATIC
-COMMONLIB_SOURCES.g++.SOURCE_DIRS  := sources/platform/unistd
+COMMONLIB_SOURCES.unistd.SOURCE_DIRS  := sources/platform/unistd
 
 #Öåëü ¹2 - CommonLib zip file system sources
 COMMONLIB_ZIP_FILE_SYSTEM.TYPE             := static-lib

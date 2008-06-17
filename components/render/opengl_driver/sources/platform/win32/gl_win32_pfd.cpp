@@ -124,7 +124,7 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
     
     return pixel_format;
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
     const char* swap_method_name = "unknown";
     
@@ -135,7 +135,7 @@ int choose_pixel_format (HDC device_context, const SwapChainDesc& swap_chain_des
       case SwapMethod_Copy:    swap_method_name = "copy"; break;
     }
 
-    exception.Touch ("render::low_level::opengl::choose_pixel_format(color=%u, alpha=%u, depth=%u, stencil=%u, "
+    exception.touch ("render::low_level::opengl::choose_pixel_format(color=%u, alpha=%u, depth=%u, stencil=%u, "
       "samples=%u, swap_buffers=%u, swap=%s%s%s)", swap_chain_desc.frame_buffer.color_bits, swap_chain_desc.frame_buffer.alpha_bits,
       swap_chain_desc.frame_buffer.depth_bits, swap_chain_desc.frame_buffer.stencil_bits,
       swap_chain_desc.samples_count, swap_chain_desc.buffers_count, swap_method_name, swap_chain_desc.fullscreen ? ", fullscreen" : "",

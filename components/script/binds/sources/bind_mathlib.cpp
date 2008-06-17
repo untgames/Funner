@@ -1,5 +1,3 @@
-#include <mathlib.h>
-
 #include "shared.h"
 
 using namespace script;
@@ -186,10 +184,10 @@ template <class T, size_t Size>
 T matrix_get_element (const matrix<T, Size>& m, size_t row, size_t column)
 {
   if (row >= Size)
-    raise_out_of_range ("script::matrix_get_element", "row", row, Size);
+    throw xtl::make_range_exception ("script::matrix_get_element", "row", row, Size);
     
   if (column >= Size)
-    raise_out_of_range ("script::matrix_get_element", "column", column, Size);
+    throw xtl::make_range_exception ("script::matrix_get_element", "column", column, Size);
 
   return m [row][column];
 }
@@ -198,10 +196,10 @@ template <class T, size_t Size>
 void matrix_set_element (matrix<T, Size>& m, size_t row, size_t column, T value)
 {
   if (row >= Size)
-    raise_out_of_range ("script::matrix_set_element", "row", row, Size);
+    throw xtl::make_range_exception ("script::matrix_set_element", "row", row, Size);
     
   if (column >= Size)
-    raise_out_of_range ("script::matrix_set_element", "column", column, Size);
+    throw xtl::make_range_exception ("script::matrix_set_element", "column", column, Size);
 
   m [row][column] = value;
 }
@@ -285,7 +283,7 @@ template <class T>
 T quat_get_element (const quat<T>& q, size_t index)
 {
   if (index >= 4)
-    raise_out_of_range ("script::quat_get_element", "index", index, 4);
+    throw xtl::make_range_exception ("script::quat_get_element", "index", index, 4);
     
   return q [index];
 }
@@ -294,7 +292,7 @@ template <class T>
 void quat_set_element (quat<T>& q, size_t index, T value)
 {
   if (index >= 4)
-    raise_out_of_range ("script::quat_set_element", "index", index, 4);
+    throw xtl::make_range_exception ("script::quat_set_element", "index", index, 4);
   
   q [index]=value;
 }

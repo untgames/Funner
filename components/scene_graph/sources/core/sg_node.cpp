@@ -1,8 +1,4 @@
-#include <sg/scene.h>
-#include <stl/string>
-#include <xtl/signal.h>
-#include <xtl/visitor.h>
-#include <common/exception.h>
+#include "shared.h"
 
 using namespace scene_graph;
 using namespace math;
@@ -186,10 +182,10 @@ struct Node::Impl
       case NodeTransformSpace_Local:
         break;
       case NodeTransformSpace_World:
-        raise_not_implemented ("scene_graph::Node::BindToParent (invariant_space=NodeTransformSpace_World)");
+        throw xtl::make_not_implemented_exception ("scene_graph::Node::BindToParent (invariant_space=NodeTransformSpace_World)");
         break;
       default:
-        raise_invalid_argument ("scene_graph::Node::BindToParent", "invariant_space", invariant_space);
+        throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "invariant_space", invariant_space);
         break;
     }
     
@@ -201,7 +197,7 @@ struct Node::Impl
       case NodeBindMode_Capture:
         break;
       default:
-        raise_invalid_argument ("scene_graph::Node::BindToParent", "mode", mode);
+        throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "mode", mode);
         break;
     }
     
@@ -213,13 +209,13 @@ struct Node::Impl
       //проверка попытки отсоединения корневого узла от сцены
 
     if (!parent && scene)
-      raise_not_supported ("scene_graph::Node::BindToParent", "Attempt to bind scene '%s' root to parent not supproted", scene->Name ());
+      throw xtl::format_not_supported_exception ("scene_graph::Node::BindToParent", "Attempt to bind scene '%s' root to parent not supproted", scene->Name ());
 
       //проверка не присоединяется ли узел к своему потомку
       
     for (Node* node = parent_node; node; node=node->impl->parent)
       if (node == this_node)
-        raise_invalid_argument ("scene_graph::Node::BindToParent", "parent", "Attempt to bind object to one of it's child");
+        throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "parent", "Attempt to bind object to one of it's child");
         
       //устанавливаем блокировку на вызов BindToParent
       
@@ -379,8 +375,8 @@ struct Node::Impl
     scene = in_scene;
     
       //обновление сцены в потомках
-      
-    for (Node* node=first_child; node; node=node->impl->next_child)
+
+    for (Node* volatile node=first_child; node; node=node->impl->next_child)
       node->impl->SetScene (scene);
       
       //оповещение о присоединии к новой сцене
@@ -534,7 +530,7 @@ const char* Node::Name () const
 void Node::SetName (const char* name)
 {
   if (!name)
-    raise_null_argument ("scene_graph::Node::SetName", "name");
+    throw xtl::make_null_argument_exception ("scene_graph::Node::SetName", "name");
 
   impl->name      = name;
   impl->name_hash = strhash (name);
@@ -655,7 +651,7 @@ void Node::UnbindChild (const char* name, NodeTransformSpace invariant_space)
 void Node::UnbindChild (const char* name, NodeSearchMode mode, NodeTransformSpace invariant_space)
 {
   if (!name)
-    raise_null_argument ("scene_graph::Node::UnbindChild", "name");
+    throw xtl::make_null_argument_exception ("scene_graph::Node::UnbindChild", "name");
 
   Node::Pointer child = FindChild (name, mode);
   
@@ -683,7 +679,7 @@ Node::Pointer Node::FindChild (const char* name, NodeSearchMode mode) //no throw
 Node::ConstPointer Node::FindChild (const char* name, NodeSearchMode mode) const //no throw
 {
   if (!name)
-    raise_null_argument ("scene_graph::Node::FindChild", "name");    
+    throw xtl::make_null_argument_exception ("scene_graph::Node::FindChild", "name");    
     
   size_t name_hash = strhash (name);
     
@@ -709,7 +705,7 @@ Node::ConstPointer Node::FindChild (const char* name, NodeSearchMode mode) const
 
       break;
     default:
-      raise_invalid_argument ("scene_graph::Node::FindChild", "mode", mode);
+      throw xtl::make_argument_exception ("scene_graph::Node::FindChild", "mode", mode);
       break;
   }
 
@@ -744,7 +740,7 @@ void Node::Traverse (const TraverseFunction& fn, NodeTraverseMode mode)
       fn (*this);
       break;
     default:
-      raise_invalid_argument ("scene_graph::Node::Traverse", "mode", mode);
+      throw xtl::make_argument_exception ("scene_graph::Node::Traverse", "mode", mode);
       break;
   }  
 
@@ -765,7 +761,7 @@ void Node::Traverse (const ConstTraverseFunction& fn, NodeTraverseMode mode) con
       fn (*this);
       break;
     default:
-      raise_invalid_argument ("scene_graph::Node::Traverse", "mode", mode);
+      throw xtl::make_argument_exception ("scene_graph::Node::Traverse", "mode", mode);
       break;
   }
 
@@ -786,7 +782,7 @@ void Node::VisitEach (Visitor& visitor, NodeTraverseMode mode) const
       const_cast<Node&> (*this).AcceptCore (visitor);
       break;
     default:
-      raise_invalid_argument ("scene_graph::Node::VisitEach", "mode", mode);
+      throw xtl::make_argument_exception ("scene_graph::Node::VisitEach", "mode", mode);
       break;
   }
 
@@ -962,7 +958,7 @@ void Node::Translate (const math::vec3f& offset, NodeTransformSpace space)
 
       break;
     default:
-      raise_invalid_argument ("scene_graph::Node::Translate", "space", space);
+      throw xtl::make_argument_exception ("scene_graph::Node::Translate", "space", space);
       break;
   }
   
@@ -992,7 +988,7 @@ void Node::Rotate (const math::quatf& q, NodeTransformSpace space)
       break;
     }      
     default:
-      raise_invalid_argument ("scene_graph::Node::Rotate", "space", space);
+      throw xtl::make_argument_exception ("scene_graph::Node::Rotate", "space", space);
       break;
   }
 
@@ -1063,7 +1059,7 @@ const mat4f& Node::TransformationMatrix (NodeTransformSpace space) const
 
       return impl->world_tm;
     default:
-      raise_invalid_argument ("scene_graph::Node::TransformationMatrix", "space", space);
+      throw xtl::make_argument_exception ("scene_graph::Node::TransformationMatrix", "space", space);
       return idNode;
   } 
 }
@@ -1084,7 +1080,7 @@ mat4f Node::ObjectTM (Node& object) const
 xtl::connection Node::RegisterEventHandler (NodeEvent event, const EventHandler& handler) const
 {
   if (event < 0 || event >= NodeEvent_Num)
-    raise_invalid_argument ("scene_graph::Node::Event(NodeEvent)", "event", event);
+    throw xtl::make_argument_exception ("scene_graph::Node::Event(NodeEvent)", "event", event);
 
   return impl->signals [event].connect (handler);
 }
@@ -1092,7 +1088,7 @@ xtl::connection Node::RegisterEventHandler (NodeEvent event, const EventHandler&
 xtl::connection Node::RegisterEventHandler (NodeSubTreeEvent event, const SubTreeEventHandler& handler) const
 {
   if (event < 0 || event >= NodeSubTreeEvent_Num)
-    raise_invalid_argument ("scene_graph::Node::Event(NodeSubTreeEvent)", "event", event);
+    throw xtl::make_argument_exception ("scene_graph::Node::Event(NodeSubTreeEvent)", "event", event);
 
   return impl->subtree_signals [event].connect (handler);
 }
@@ -1109,7 +1105,7 @@ void Node::BeginUpdate ()
 void Node::EndUpdate ()
 {
   if (!impl->update_lock)
-    raise_not_supported ("scene_graph::Node::EndUpdate", "Attempt to call EndUpdate without previous BeginUpdate call");  
+    throw xtl::format_not_supported_exception ("scene_graph::Node::EndUpdate", "Attempt to call EndUpdate without previous BeginUpdate call");  
     
   if (!--impl->update_lock)
   {

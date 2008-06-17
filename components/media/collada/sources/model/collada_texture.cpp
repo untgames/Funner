@@ -66,7 +66,7 @@ const char* Texture::Image () const
 void Texture::SetImage (const char* image_name)
 {
   if (!image_name)
-    raise_null_argument ("media::collada::Texture::SetImage", "image_name");
+    throw xtl::make_null_argument_exception ("media::collada::Texture::SetImage", "image_name");
     
   impl->image_name = image_name;
 }
@@ -83,7 +83,7 @@ const char* Texture::TexcoordChannel () const
 void Texture::SetTexcoordChannel (const char* name)
 {
   if (!name)
-    raise_null_argument ("media::collada::Texture::SetTexcoordChannel", "name");
+    throw xtl::make_null_argument_exception ("media::collada::Texture::SetTexcoordChannel", "name");
     
   impl->texcoord = name;
 }

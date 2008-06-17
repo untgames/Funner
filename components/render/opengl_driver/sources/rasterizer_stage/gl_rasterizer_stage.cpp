@@ -157,7 +157,7 @@ struct RasterizerStage::Impl: public ContextObject
       ISwapChain*   draw_swap_chain = context_manager.GetDrawSwapChain ();
       
       if (!draw_swap_chain)
-        raise_invalid_operation ("render::low_level::opengl::RasterizerStage::Impl::Impl", "Null draw swap chain");
+        throw xtl::format_operation_exception ("render::low_level::opengl::RasterizerStage::Impl::Impl", "Null draw swap chain");
 
       draw_swap_chain->GetDesc (swap_chain_desc);
 

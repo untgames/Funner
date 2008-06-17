@@ -4,7 +4,7 @@
 
 void process_replacement (const char* prefix, const char* replacement_tag)
 {
-  printf ("prefix: '%s'; replacement_tag: '%s'\n", prefix, replacement_tag);
+  printf ("prefix: '%s'; replacement_tag: '%s'\n", common::decompress (prefix).c_str (), replacement_tag);
 }
 
 int main ()

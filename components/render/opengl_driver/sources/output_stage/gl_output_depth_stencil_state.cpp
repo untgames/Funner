@@ -29,11 +29,11 @@ DepthStencilState::~DepthStencilState ()
       CheckErrors ("");
     }
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::DepthStencilState::~DepthStencilState");
+    exception.touch ("render::low_level::opengl::DepthStencilState::~DepthStencilState");
     
-    LogPrintf ("%s", exception.Message ());
+    LogPrintf ("%s", exception.what ());
   }
   catch (std::exception& exception)
   {
@@ -69,7 +69,7 @@ GLenum get_gl_compare_mode (CompareMode mode, const char* source, const char* pa
     case CompareMode_Greater:      return GL_GREATER;
     case CompareMode_GreaterEqual: return GL_GEQUAL;
     default:
-      raise_invalid_argument (source, param, mode);
+      throw xtl::make_argument_exception (source, param, mode);
       return 0;
   }
 }
@@ -85,7 +85,7 @@ GLenum get_gl_stencil_operation (StencilOperation operation, const char* source,
     case StencilOperation_Decrement: return GL_DECR;
     case StencilOperation_Invert:    return GL_INVERT;
     default:
-      raise_invalid_argument (source, param, operation);
+      throw xtl::make_argument_exception (source, param, operation);
       return 0;
   }
 }
@@ -156,7 +156,7 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
     //проверка наличия расширений
   
   if (in_desc.stencil_test_enable && need_two_side_stencil && !has_two_side_stencil)
-    raise_not_supported (METHOD_NAME, "Unsupported configuration: desc.stencil_desc [FaceMode_Front] != desc.stencil_desc [FaceMode_Back] "
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported configuration: desc.stencil_desc [FaceMode_Front] != desc.stencil_desc [FaceMode_Back] "
       "(GL_EXT_stencil_two_side and GL_ATI_separate_stencil not supported)");  
          
     //запись команд в контексте OpenGL
@@ -272,7 +272,7 @@ void DepthStencilState::Bind (size_t reference)
     //проверка корректности состояния
 
   if (!display_list)
-    raise_invalid_operation (METHOD_NAME, "Empty state (null display list)");
+    throw xtl::format_operation_exception (METHOD_NAME, "Empty state (null display list)");
     
     //установка текущего контекста
 

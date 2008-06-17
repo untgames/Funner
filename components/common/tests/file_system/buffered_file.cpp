@@ -18,7 +18,7 @@ int main ()
   
   try
   {
-    StdFile file (RESULTS_FILE_NAME,FILE_MODE_READ_WRITE|FILE_MODE_CREATE,strlen (MESSAGE1) * 2 + 1);
+    StdFile file (RESULTS_FILE_NAME,FileMode_ReadWrite|FileMode_Create,strlen (MESSAGE1) * 2 + 1);
 
     printf ("Is file buffered: %s\n",file.IsBuffered () ? "true" : "false");
 
@@ -29,15 +29,15 @@ int main ()
 
     message_len = strlen (MESSAGE2);
 
-    file.Seek (message_len*9,FILE_SEEK_CUR);
+    file.Seek (message_len*9,FileSeekMode_Current);
 
     for (size_t i=0;i<10;i++)
     {
       file.Write (MESSAGE2,message_len);
-      file.Seek  (-message_len*2,FILE_SEEK_CUR);
+      file.Seek  (-message_len*2,FileSeekMode_Current);
     }
 
-    file.Seek  (-message_len,FILE_SEEK_CUR);
+    file.Seek  (-message_len,FileSeekMode_Current);
     file.Write (MESSAGE3,strlen (MESSAGE3));
     file.Write (MESSAGE3,strlen (MESSAGE3));
     
@@ -64,12 +64,12 @@ int main ()
       return 0;
     }
 
-    file.Seek (0,FILE_SEEK_END);
+    file.Seek (0,FileSeekMode_End);
 
     while (file.Tell ())
     {
-      file.Read (buffer+file.Seek (-(int)READ_BLOCK_SIZE,FILE_SEEK_CUR),READ_BLOCK_SIZE);
-      file.Seek (-(int)READ_BLOCK_SIZE,FILE_SEEK_CUR);
+      file.Read (buffer+file.Seek (-(int)READ_BLOCK_SIZE,FileSeekMode_Current),READ_BLOCK_SIZE);
+      file.Seek (-(int)READ_BLOCK_SIZE,FileSeekMode_Current);
     }
 
     buffer [file.Size ()] = 0;

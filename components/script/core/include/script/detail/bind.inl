@@ -145,11 +145,11 @@ T get_argument (IStack& stack, size_t index)
   }
   catch (std::exception& exception)
   {
-    common::raise<script::ArgumentException> ("script::detail::get_argument", "Exception on argument #%u: %s", index, exception.what ());
+    throw xtl::format_exception<script::ArgumentException> ("script::detail::get_argument", "Exception on argument #%u: %s", index, exception.what ());
   }
   catch (...)
   {
-    common::raise<script::ArgumentException> ("script::detail::get_argument", "Exception on argument #%u: unknown", index);
+    throw xtl::format_exception<script::ArgumentException> ("script::detail::get_argument", "Exception on argument #%u: unknown", index);
   }
 }
 
@@ -158,7 +158,7 @@ template <size_t expected_arguments_count>
 inline void check_arguments_count (size_t stack_arguments_count)
 {
   if (stack_arguments_count < expected_arguments_count)
-    common::raise<script::ArgumentException> ("script::detail::check_arguments_count", "Too few arguments (expected %u, got %u)", expected_arguments_count, stack_arguments_count);
+    throw xtl::format_exception<script::ArgumentException> ("script::detail::check_arguments_count", "Too few arguments (expected %u, got %u)", expected_arguments_count, stack_arguments_count);
 }
 
 /*
@@ -234,7 +234,7 @@ struct invoker_impl
 
       //вызов шлюза и помещение его результата в стек
 
-    push_argument (stack, xtl::apply<typename FnTraits::result_type, arguments_count> (fn, stack, stack_argument_selector<FnTraits> ()));
+    push_argument (stack, xtl::apply<typename FnTraits::result_type, arguments_count> (fn, stack, xtl::make_const_ref (stack_argument_selector<FnTraits> ())));
 
     return 1; //results_count = 1
   }
@@ -257,7 +257,7 @@ struct invoker_impl<FnTraits, Fn, void>
 
       //вызов шлюза
 
-    xtl::apply<void, arguments_count> (fn, stack, stack_argument_selector<FnTraits> ());
+    xtl::apply<void, arguments_count> (fn, stack, xtl::make_const_ref (stack_argument_selector<FnTraits> ()));
 
     return 0; //results_count = 0
   }
@@ -280,9 +280,9 @@ Ret get_result (IStack& stack)
 
     return result;
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("script::get_result");
+    exception.touch ("script::get_result");
     throw;
   }
 }
@@ -330,9 +330,9 @@ Ret invoke_dispatch
 
     return get_result<Ret> (stack);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("script::invoke(\"%s\",\"%s\",...)", interpreter.Name (), name);
+    exception.touch ("script::invoke(\"%s\",\"%s\",...)", interpreter.Name (), name);
     throw;
   }
 }

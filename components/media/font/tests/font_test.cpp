@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <common/exception.h>
+#include <cstdio>
+#include <exception>
+
 #include <media/font.h>
 
 using namespace media;
-using namespace common;
 
 const char* file_name = "data/my_font.bfs";
 

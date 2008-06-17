@@ -13,9 +13,7 @@ namespace
 ===================================================================================================    
 */
 
-struct OpenGLExceptionTag;
-
-typedef DerivedException<Exception, OpenGLExceptionTag> OpenGLException; //исключение: внутренн€€ ошибка OpenGL
+struct OpenGLException: virtual public xtl::exception {};
 
 /*
 ===================================================================================================
@@ -59,7 +57,7 @@ class ContextImpl: public xtl::reference_counter
     ContextDataTable& GetContextDataTable (Stage table_id)
     {
       if (table_id < 0 || table_id >= Stage_Num)
-        raise_out_of_range ("render::low_level::opengl::ContextImpl::GetContextDataTable", "table_id", table_id, 0, Stage_Num);
+        throw xtl::make_range_exception ("render::low_level::opengl::ContextImpl::GetContextDataTable", "table_id", table_id, 0, Stage_Num);
 
       return context_data_table [table_id];
     }
@@ -123,9 +121,9 @@ class ContextImpl: public xtl::reference_counter
         extensions.Set (Version_2_0, GLEW_VERSION_2_0 != 0);
         extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);        
       }
-      catch (common::Exception& exception)
+      catch (xtl::exception& exception)
       {
-        exception.Touch ("render::low_level::opengl::ContextImpl::Init");
+        exception.touch ("render::low_level::opengl::ContextImpl::Init");
         
         throw;        
       }
@@ -169,7 +167,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       on_destroy_read_swap_chain (xtl::bind (&Impl::RestoreContext, this))
     {
       if (!init_string)
-        raise_null_argument ("render::low_level::opengl::ContextManager::ContextManager", "init_string");          
+        throw xtl::make_null_argument_exception ("render::low_level::opengl::ContextManager::ContextManager", "init_string");          
         
       enabled_extensions.Set (true);
       
@@ -182,7 +180,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::CreateContext";         
       
       if (!swap_chain)
-        raise_null_argument (METHOD_NAME, "swap_chain");        
+        throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");        
 
       ContextImplPtr new_context;      
 
@@ -198,13 +196,13 @@ struct ContextManager::Impl: public xtl::reference_counter
       for (size_t id=0, count=ExtensionSet::Size (); id<count; id++)
         if (required_extensions.Get (id) && !context_extensions.Get (id))
         {
-          raise_not_supported (METHOD_NAME, "Could not create new context. Reason: required extension '%s' not supported",
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Could not create new context. Reason: required extension '%s' not supported",
             get_extension_name (id));
         }        
         
       if (!min_version.empty () && xtl::xstrcmp (new_context->GetVersionString (), min_version.c_str ()) < 0)
       {
-        raise_not_supported (METHOD_NAME, "Could not create new context. Reason: OpenGL version '%s' not supported "
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Could not create new context. Reason: OpenGL version '%s' not supported "
           "(version='%s')", min_version.c_str (), new_context->GetVersionString ());
       }      
 
@@ -263,7 +261,7 @@ struct ContextManager::Impl: public xtl::reference_counter
         return;
         
       if (!context_id && !draw_swap_chain)
-        raise_null_argument (METHOD_NAME, "draw_swap_chain && context_id");
+        throw xtl::make_null_argument_exception (METHOD_NAME, "draw_swap_chain && context_id");
         
       if (!context_id) //поиск совместимого контекста
       {
@@ -271,9 +269,9 @@ struct ContextManager::Impl: public xtl::reference_counter
         {
           context_id = GetCompatibleContextId (draw_swap_chain);
         }
-        catch (common::Exception& exception)
+        catch (xtl::exception& exception)
         {
-          exception.Touch (METHOD_NAME);
+          exception.touch (METHOD_NAME);
           
           throw;
         }
@@ -284,7 +282,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       ContextMap::iterator iter = context_map.find (context_id);
       
       if (iter == context_map.end ())
-        raise_invalid_argument (METHOD_NAME, "context_id", context_id);
+        throw xtl::make_argument_exception (METHOD_NAME, "context_id", context_id);
 
       ContextImplPtr context = iter->second;
       
@@ -299,10 +297,10 @@ struct ContextManager::Impl: public xtl::reference_counter
         //проверка совместимости контекста с цепочками обмена
 
       if (!context->GetContext ().IsCompatible (draw_swap_chain))
-        raise_invalid_argument (METHOD_NAME, "draw_swap_chain", "ISwapChain instance", "Swap chain incompatible with context");
+        throw xtl::make_argument_exception (METHOD_NAME, "draw_swap_chain", "ISwapChain instance", "Swap chain incompatible with context");
 
       if (draw_swap_chain != read_swap_chain && !context->GetContext ().IsCompatible (read_swap_chain))
-        raise_invalid_argument (METHOD_NAME, "read_swap_chain", "ISwapChain instance", "Swap chain incompatible with context");
+        throw xtl::make_argument_exception (METHOD_NAME, "read_swap_chain", "ISwapChain instance", "Swap chain incompatible with context");
 
         //регистраци€ обработчиков удалени€ цепочек обмена
 
@@ -323,7 +321,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::MakeContextCurrent";
 
       if (!current_context)
-        raise_invalid_operation (METHOD_NAME, "Null active context");
+        throw xtl::format_operation_exception (METHOD_NAME, "Null active context");
 
       try
       {
@@ -334,9 +332,9 @@ struct ContextManager::Impl: public xtl::reference_counter
         if (clear_errors)
           ClearErrors ();
       }
-      catch (common::Exception& exception)
+      catch (xtl::exception& exception)
       {
-        exception.Touch (METHOD_NAME);
+        exception.touch (METHOD_NAME);
 
         throw;
       }
@@ -358,7 +356,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       ContextMap::iterator iter = context_map.find (context_id);
 
       if (iter == context_map.end ())
-        raise_invalid_argument (METHOD_NAME, "context_id", context_id);
+        throw xtl::make_argument_exception (METHOD_NAME, "context_id", context_id);
 
       ContextImplPtr context = iter->second;
       
@@ -371,7 +369,7 @@ struct ContextManager::Impl: public xtl::reference_counter
     ISwapChain* CreateCompatibleSwapChain (ISwapChain* swap_chain)
     {
       if (!swap_chain)
-        raise_null_argument ("render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(ISwapChain*)", "swap_chain");
+        throw xtl::make_null_argument_exception ("render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(ISwapChain*)", "swap_chain");
       
       return SwapChainManager::CreatePBuffer (swap_chain);
     }
@@ -380,7 +378,7 @@ struct ContextManager::Impl: public xtl::reference_counter
     ISwapChain* CreateCompatibleSwapChain (ISwapChain* swap_chain, const SwapChainDesc& desc)
     {
       if (!swap_chain)
-        raise_null_argument ("render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(ISwapChain*,const SwapChainDesc&)", "swap_chain");
+        throw xtl::make_null_argument_exception ("render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(ISwapChain*,const SwapChainDesc&)", "swap_chain");
       
       return SwapChainManager::CreatePBuffer (swap_chain, desc);
     }    
@@ -458,28 +456,28 @@ struct ContextManager::Impl: public xtl::reference_counter
         case GL_NO_ERROR:
           break;
         case GL_INVALID_ENUM:
-          raise<OpenGLException> (source, "OpenGL error: invalid enum");
+          throw xtl::format_exception<OpenGLException> (source, "OpenGL error: invalid enum");
           break;
         case GL_INVALID_VALUE:
-          raise<OpenGLException> (source, "OpenGL error: invalid value");
+          throw xtl::format_exception<OpenGLException> (source, "OpenGL error: invalid value");
           break;
         case GL_INVALID_OPERATION:
-          raise<OpenGLException> (source, "OpenGL error: invalid operation");
+          throw xtl::format_exception<OpenGLException> (source, "OpenGL error: invalid operation");
           break;
         case GL_STACK_OVERFLOW:
-          raise<OpenGLException> (source, "OpenGL error: stack overflow");
+          throw xtl::format_exception<OpenGLException> (source, "OpenGL error: stack overflow");
           break;
         case GL_STACK_UNDERFLOW:
-          raise<OpenGLException> (source, "OpenGL error: stack underflow");
+          throw xtl::format_exception<OpenGLException> (source, "OpenGL error: stack underflow");
           break;
         case GL_OUT_OF_MEMORY:
-          raise<OpenGLException> (source, "OpenGL error: out of memory");
+          throw xtl::format_exception<OpenGLException> (source, "OpenGL error: out of memory");
           break;
         case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
-          raise<OpenGLException> (source, "OpenGL error: invalid framebuffer operation");
+          throw xtl::format_exception<OpenGLException> (source, "OpenGL error: invalid framebuffer operation");
           break;
         default:
-          raise<OpenGLException> (source, "OpenGL error: code=0x%04x", error);
+          throw xtl::format_exception<OpenGLException> (source, "OpenGL error: code=0x%04x", error);
           break;
       }      
     }
@@ -558,7 +556,7 @@ struct ContextManager::Impl: public xtl::reference_counter
           
         //совместимый контекст не найден
         
-      raise_not_supported ("render::low_level::opengl::ContextManager::Impl::GetCompatibleContextId",
+      throw xtl::format_not_supported_exception ("render::low_level::opengl::ContextManager::Impl::GetCompatibleContextId",
         "No context compatible with swap_chain");
 
       return 0;
@@ -726,7 +724,7 @@ void ContextManager::MakeContextCurrent () const
 const ContextDataTable& ContextManager::GetContextDataTable (Stage table_id) const
 {
   if (!impl->GetContext ())
-    raise_invalid_operation ("render::low_level::opengl::ContextManager::GetContextDataTable", "Null active context");
+    throw xtl::format_operation_exception ("render::low_level::opengl::ContextManager::GetContextDataTable", "Null active context");
 
   return impl->GetContext ()->GetContextDataTable (table_id);
 }
@@ -743,7 +741,7 @@ ContextDataTable& ContextManager::GetContextDataTable (Stage table_id)
 const char* ContextManager::GetExtensions () const
 {
   if (!impl->GetContext ())
-    raise_invalid_operation ("render::low_level::opengl::ContextManager::GetExtensions", "Null active context");
+    throw xtl::format_operation_exception ("render::low_level::opengl::ContextManager::GetExtensions", "Null active context");
     
   return impl->GetContext ()->GetExtensionsString ();
 }
@@ -751,7 +749,7 @@ const char* ContextManager::GetExtensions () const
 const char* ContextManager::GetVersion () const
 {
   if (!impl->GetContext ())
-    raise_invalid_operation ("render::low_level::opengl::ContextManager::GetVersion", "Null active context");
+    throw xtl::format_operation_exception ("render::low_level::opengl::ContextManager::GetVersion", "Null active context");
     
   return impl->GetContext ()->GetVersionString ();
 }
@@ -759,7 +757,7 @@ const char* ContextManager::GetVersion () const
 const char* ContextManager::GetVendor () const
 {
   if (!impl->GetContext ())
-    raise_invalid_operation ("render::low_level::opengl::ContextManager::GetVendor", "Null active context");
+    throw xtl::format_operation_exception ("render::low_level::opengl::ContextManager::GetVendor", "Null active context");
 
   return impl->GetContext ()->GetVendorString ();
 }
@@ -767,7 +765,7 @@ const char* ContextManager::GetVendor () const
 const char* ContextManager::GetRenderer () const
 {
   if (!impl->GetContext ())
-    raise_invalid_operation ("render::low_level::opengl::ContextManager::GetRenderer", "Null active context");
+    throw xtl::format_operation_exception ("render::low_level::opengl::ContextManager::GetRenderer", "Null active context");
 
   return impl->GetContext ()->GetRendererString ();
 }
@@ -811,7 +809,7 @@ bool ContextManager::IsSupported (const Extension& extension) const
 const ContextCaps& ContextManager::GetCaps () const
 {
   if (!impl->GetContext ())
-    raise_invalid_operation ("render::low_level::opengl::ContextManager::GetCaps", "Null active context");
+    throw xtl::format_operation_exception ("render::low_level::opengl::ContextManager::GetCaps", "Null active context");
     
   return impl->GetContext ()->GetCaps ();
 }
@@ -862,7 +860,7 @@ void ContextManager::RaiseError (const char* source) const
     
   CheckErrors (source);
   
-  raise_invalid_operation (source, "Invalid operation");
+  throw xtl::format_operation_exception (source, "Invalid operation");
 }
 
 void ContextManager::ClearErrors () const

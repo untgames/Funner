@@ -64,13 +64,6 @@ class DevILImageImpl: public ImageImpl
     PixelFormat format;               //кэшируемый формат картинки
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///DevIL исключение
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct DevILExceptionTag;
-
-typedef DerivedException<Exception, DevILExceptionTag> DevILException;
-
 //генерация DevIL исключения
 void raise_devil_exception (const char* source, const char* format, ...)
 {
@@ -78,7 +71,7 @@ void raise_devil_exception (const char* source, const char* format, ...)
 
   va_start (list, format);
 
-  vraise<DevILException> (source, format, list);
+  throw xtl::vformat_operation_exception (source, format, list);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,8 +99,8 @@ DevILPixelFormat get_devil_format (PixelFormat format)
     case PixelFormat_BGRA8:  return DevILPixelFormat (IL_BGRA, IL_UNSIGNED_BYTE, 4);
     case PixelFormat_L8:     return DevILPixelFormat (IL_LUMINANCE, IL_UNSIGNED_BYTE, 1);
     case PixelFormat_LA8:    return DevILPixelFormat (IL_LUMINANCE_ALPHA, IL_UNSIGNED_BYTE, 2);
-    case PixelFormat_A8:     raise_not_implemented ("media::get_devil_format(PixelFormat_A8)"); break;
-    default:                 raise_invalid_argument ("media::get_devil_format", "format", format); break;
+    case PixelFormat_A8:     throw xtl::make_not_implemented_exception ("media::get_devil_format(PixelFormat_A8)"); break;
+    default:                 throw xtl::make_argument_exception ("media::get_devil_format", "format", format); break;
   }
   
   return DevILPixelFormat (0, 0, 0); //для обхода предупреждений компилятора, данная точка недостижима
@@ -134,7 +127,7 @@ const char* get_devil_format_name (ILenum format)
     case IL_BGRA:             return "IL_BGRA";
     case IL_LUMINANCE:        return "IL_LUMINANCE";
     case IL_LUMINANCE_ALPHA:  return "IL_LUMINANCE_ALPHA";
-    default:                  raise_invalid_argument ("media::get_devil_format_name", "format", format);
+    default:                  throw xtl::make_argument_exception ("media::get_devil_format_name", "format", format);
   }
   
   return "";
@@ -152,7 +145,7 @@ const char* get_devil_type_name (ILenum type)
     case IL_UNSIGNED_INT:   return "IL_UNSIGNED_INT";
     case IL_FLOAT:          return "IL_FLOAT";
     case IL_DOUBLE:         return "IL_DOUBLE";
-    default:                raise_invalid_argument ("media::get_devil_type_name", "type", type);
+    default:                throw xtl::make_argument_exception ("media::get_devil_type_name", "type", type);
   }
 
   return "";

@@ -5,9 +5,9 @@
 #include <stl/algorithm>
 #include <common/strlib.h>
 #include <common/singleton.h>
-#include <common/exception.h>
 #include <common/component.h>
 #include <xtl/function.h>
+#include <xtl/common_exceptions.h>
 
 using namespace sound::low_level;
 using namespace common;
@@ -100,15 +100,15 @@ class SoundSystemImpl
 void SoundSystemImpl::RegisterDriver (const char* driver_name, const CreateDeviceHandler& creater)
 {
   if (!driver_name)
-    raise_null_argument ("sound::low_level::SoundSystem::RegisterDriver", "driver_name");
+    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystem::RegisterDriver", "driver_name");
     
   if (!creater)
-    raise_null_argument ("sound::low_level::SoundSystem::RegisterDriver", "creater");
+    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystem::RegisterDriver", "creater");
     
   DriverMap::iterator iter = drivers.find (driver_name);
   
   if (iter != drivers.end ())
-    raise_invalid_argument ("sound::low_level::SoundSystem::RegisterDriver", "driver_name", driver_name,
+    throw xtl::make_argument_exception ("sound::low_level::SoundSystem::RegisterDriver", "driver_name", driver_name,
                           "Driver with this name already registered");
 
   drivers.insert_pair (driver_name, creater);
@@ -146,15 +146,15 @@ string SoundSystemImpl::GetConfigurationName (const char* driver_name, const cha
 const char* SoundSystemImpl::RegisterConfiguration (const char* driver_name, const char* device_name)
 {
   if (!driver_name)
-    raise_null_argument ("sound::low_level::SoundSystem::RegisterConfiguration", "driver_name");
+    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystem::RegisterConfiguration", "driver_name");
 
   if (!device_name)
-    raise_null_argument ("sound::low_level::SoundSystem::RegisterConfiguration", "device_name");
+    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystem::RegisterConfiguration", "device_name");
 
   DriverMap::iterator driver_iter = drivers.find (driver_name);
 
   if (driver_iter == drivers.end ())
-    raise_invalid_argument ("sound::low_level::SoundSystem::RegisterConfiguration", "driver_name", driver_name,
+    throw xtl::make_argument_exception ("sound::low_level::SoundSystem::RegisterConfiguration", "driver_name", driver_name,
                           "There is no driver with this name");
 
     //формирование имени конфигурации
@@ -265,7 +265,7 @@ const char* SoundSystemImpl::GetConfiguration (size_t index) const
   LoadDefaultDrivers ();
 
   if (index >= configuration_array.size ())
-    raise_out_of_range ("sound::low_level::SoundSystem::GetConfiguration", "index", index, configuration_array.size ());    
+    throw xtl::make_range_exception ("sound::low_level::SoundSystem::GetConfiguration", "index", index, configuration_array.size ());    
     
   return configuration_array [index]->second.name.c_str ();
 }
@@ -277,7 +277,7 @@ const char* SoundSystemImpl::GetConfiguration (size_t index) const
 ISoundDevice* SoundSystemImpl::CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string)
 {
   if (!configuration_name)
-    raise_null_argument ("sound::low_level::SoundSystem::CreateDevice", "configuration_name");
+    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystem::CreateDevice", "configuration_name");
     
   if (!init_string)
     init_string = "";
@@ -287,7 +287,7 @@ ISoundDevice* SoundSystemImpl::CreateDevice (const char* configuration_name, con
   ConfigurationMap::iterator cfg_iter = configurations.find (configuration_name);
 
   if (cfg_iter == configurations.end ())
-    raise_invalid_argument ("sound::low_level::SoundSystem::CreateDevice", "configuration_name", configuration_name,
+    throw xtl::make_argument_exception ("sound::low_level::SoundSystem::CreateDevice", "configuration_name", configuration_name,
                           "There is no configuration with this name");
                           
   Configuration& cfg = cfg_iter->second;
@@ -298,10 +298,10 @@ ISoundDevice* SoundSystemImpl::CreateDevice (const char* configuration_name, con
 ISoundDevice* SoundSystemImpl::CreateDevice (const char* driver_name, const char* device_name, const void* window_handle, const char* init_string)
 {
   if (!driver_name)
-    raise_null_argument ("sound::low_level::SoundSystemImpl::CreateDevice", "driver_name");
+    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystemImpl::CreateDevice", "driver_name");
 
   if (!device_name)
-    raise_null_argument ("sound::low_level::SoundSystemImpl::CreateDevice", "device_name");        
+    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystemImpl::CreateDevice", "device_name");        
 
   return CreateDevice (GetConfigurationName (driver_name, device_name).c_str (), window_handle, init_string);
 }

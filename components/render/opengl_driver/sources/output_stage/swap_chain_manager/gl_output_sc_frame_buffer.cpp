@@ -33,9 +33,9 @@ SwapChainFrameBuffer::SwapChainFrameBuffer (SwapChainFrameBufferManager& manager
     SetDepthStencilView  (depth_stencil_view);
     FinishInitialization (manager);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainFrameBuffer::SwapChainFrameBuffer");
+    exception.touch ("render::low_level::opengl::SwapChainFrameBuffer::SwapChainFrameBuffer");
     throw;
   }
 }
@@ -58,7 +58,7 @@ void SwapChainFrameBuffer::SetColorView (View* view)
   ITexture* base_texture = view->GetTexture ();
   
   if (!base_texture)
-    raise_invalid_operation (METHOD_NAME, "Internal error: view with null texture");
+    throw xtl::format_operation_exception (METHOD_NAME, "Internal error: view with null texture");
   
     //установка флага активности буфера цвета
 
@@ -91,10 +91,10 @@ void SwapChainFrameBuffer::SetColorView (View* view)
       case PixelFormat_D24X8:
       case PixelFormat_D24S8:
       case PixelFormat_S8:
-        raise_not_supported (METHOD_NAME, "Unsupported color render-target texture format=%s", get_name (render_target.texture_desc.format));
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported color render-target texture format=%s", get_name (render_target.texture_desc.format));
         break;
       default:
-        raise_invalid_argument (METHOD_NAME, "texture_desc.format", render_target.texture_desc.format);
+        throw xtl::make_argument_exception (METHOD_NAME, "texture_desc.format", render_target.texture_desc.format);
         break;
     }    
     
@@ -114,7 +114,7 @@ void SwapChainFrameBuffer::SetColorView (View* view)
   
     //если целевая текстура имеет неизвестный тип - создание буфера кадра невозможно
 
-  raise_invalid_operation (METHOD_NAME, "Color-view texture has unknown type %s", view->GetTextureTypeName ());
+  throw xtl::format_operation_exception (METHOD_NAME, "Color-view texture has unknown type %s", view->GetTextureTypeName ());
 }
 
 void SwapChainFrameBuffer::SetDepthStencilView (View* view)
@@ -131,7 +131,7 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
   ITexture* base_texture = view->GetTexture ();
   
   if (!base_texture)
-    raise_invalid_operation (METHOD_NAME, "Internal error: view with null texture");
+    throw xtl::format_operation_exception (METHOD_NAME, "Internal error: view with null texture");
   
     //установка флага активности буфера попиксельного отсечения
 
@@ -159,7 +159,7 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
       case PixelFormat_DXT1:
       case PixelFormat_DXT3:
       case PixelFormat_DXT5:
-        raise_not_supported (METHOD_NAME, "Unsupported depth-stencil render-target texture format=%s", get_name (render_target.texture_desc.format));
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported depth-stencil render-target texture format=%s", get_name (render_target.texture_desc.format));
         break;
       case PixelFormat_D16:
       case PixelFormat_D24X8:
@@ -167,7 +167,7 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
       case PixelFormat_S8:
         break;
       default:
-        raise_invalid_argument (METHOD_NAME, "texture_desc.format", render_target.texture_desc.format);
+        throw xtl::make_argument_exception (METHOD_NAME, "texture_desc.format", render_target.texture_desc.format);
         break;
     }    
     
@@ -187,7 +187,7 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
 
     //если целевая текстура имеет неизвестный тип - создание буфера кадра невозможно
 
-  raise_invalid_operation (METHOD_NAME, "Depth-stencil-view texture has unknown type %s", view->GetTextureTypeName ());
+  throw xtl::format_operation_exception (METHOD_NAME, "Depth-stencil-view texture has unknown type %s", view->GetTextureTypeName ());
 }
 
 void SwapChainFrameBuffer::FinishInitialization (SwapChainFrameBufferManager& manager)
@@ -235,9 +235,9 @@ void SwapChainFrameBuffer::Bind ()
     frame_buffer_manager.SetFrameBufferActivity (is_buffer_active [RenderTargetType_Color],
                                                  is_buffer_active [RenderTargetType_DepthStencil]);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainFrameBuffer::Bind");
+    exception.touch ("render::low_level::opengl::SwapChainFrameBuffer::Bind");
     throw;
   }
 }
@@ -344,7 +344,7 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
         glCopyTexSubImage3D (tex_target, view_desc.mip_level, x, y, view_desc.layer, x, y, width, height);
         break;
       default:
-        raise_not_supported (METHOD_NAME, "Unsupported texture target 0x%04x", tex_target);
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported texture target 0x%04x", tex_target);
         break;
     }
   }

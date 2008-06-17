@@ -3,7 +3,8 @@
 
 #include <xtl/functional_fwd>
 #include <xtl/intrusive_ptr.h>
-#include <common/exception.h>
+#include <xtl/exception.h>
+
 #include <script/stack.h>
 
 namespace xtl
@@ -23,17 +24,11 @@ class Environment;
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключения
 //////////////////////////////////////////////////////////////////////////////////////////////////
-struct InterpreterExceptionTag;           //базовое скриптовое исключение
-struct RuntimeExceptionTag;               //исключение, возникающее при выполнении скрипта
-struct StackExceptionTag;                 //исключение, возникающее при переполнении/"недополнении" стека
-struct ArgumentExceptionTag;              //исключение, возникающее при получении аргумента
-struct UndefinedFunctionCallExceptionTag; //попытка вызова незарегистрированной функции
-
-typedef common::DerivedException<common::Exception, InterpreterExceptionTag>              InterpreterException;
-typedef common::DerivedException<InterpreterException, StackExceptionTag>                 StackException;
-typedef common::DerivedException<StackException, ArgumentExceptionTag>                    ArgumentException;
-typedef common::DerivedException<InterpreterException, UndefinedFunctionCallExceptionTag> UndefinedFunctionCallException;
-typedef common::DerivedException<InterpreterException, RuntimeExceptionTag>               RuntimeException;
+struct InterpreterException:   virtual public xtl::exception {};        //базовое скриптовое исключение
+struct RuntimeException:               public InterpreterException {};  //исключение, возникающее при выполнении скрипта
+struct StackException:                 public InterpreterException {};  //исключение, возникающее при переполнении/"недополнении" стека
+struct ArgumentException:              public StackException {};        //исключение, возникающее при получении аргумента
+struct UndefinedFunctionCallException: public InterpreterException {};  //попытка вызова незарегистрированной функции
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерпретатор

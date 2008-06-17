@@ -60,7 +60,7 @@ size_t OutputManager::GetOutputsCount () const
 IOutput* OutputManager::GetOutput (size_t index) const
 {
   if (index >= impl->outputs.size ())
-    raise_out_of_range ("render::low_level::opengl::OutputManager::GetOutput", "index", index, impl->outputs.size ());
+    throw xtl::make_range_exception ("render::low_level::opengl::OutputManager::GetOutput", "index", index, impl->outputs.size ());
     
   return get_pointer (impl->outputs [index]);
 }

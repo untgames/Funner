@@ -26,7 +26,7 @@ FboFrameBuffer::FboFrameBuffer (const FrameBufferManager& manager, View* color_v
     //проверка поддержки необходимого расширения
     
   if (!GetCaps ().has_ext_framebuffer_object)
-    raise_not_supported (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
+    throw xtl::format_not_supported_exception (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
 
     //создание буфера кадра
 
@@ -79,11 +79,11 @@ FboFrameBuffer::~FboFrameBuffer ()
 
     glDeleteFramebuffersEXT (1, &id);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FboFrameBuffer::~FboFrameBuffer");
+    exception.touch ("render::low_level::opengl::FboFrameBuffer::~FboFrameBuffer");
 
-    LogPrintf ("%s\n", exception.Message ());
+    LogPrintf ("%s\n", exception.what ());
   }  
   catch (std::exception& exception)
   {
@@ -115,7 +115,7 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, View* view)
   ITexture* base_texture = view->GetTexture ();
   
   if (!base_texture)
-    raise_invalid_operation (METHOD_NAME, "Internal error: view with null texture");
+    throw xtl::format_operation_exception (METHOD_NAME, "Internal error: view with null texture");
   
     //обработка случая рендеринга в текстуру
   
@@ -151,7 +151,7 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, View* view)
     default:                            target_name = "Unknown target view"; break;
   }
 
-  raise_invalid_operation (METHOD_NAME, "%s has unknown texture type %s", target_name, view->GetTextureTypeName ());
+  throw xtl::format_operation_exception (METHOD_NAME, "%s has unknown texture type %s", target_name, view->GetTextureTypeName ());
 }
 
 void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t texture_id, const ViewDesc& view_desc)
@@ -171,7 +171,7 @@ void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t 
       glFramebufferTexture3DEXT (GL_FRAMEBUFFER_EXT, attachment, textarget, texture_id, view_desc.mip_level, view_desc.layer);
       break;
     default:
-      raise_invalid_operation ("render::low_level::opengl::FboFrameBuffer::SetAttachment", "Unknown textarget=0x%04x", textarget);
+      throw xtl::format_operation_exception ("render::low_level::opengl::FboFrameBuffer::SetAttachment", "Unknown textarget=0x%04x", textarget);
       break;
   }
 }
@@ -181,7 +181,7 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, IRenderTargetT
   static const char* METHOD_NAME = "render::low_level::opengl::FboFrameBuffer::SetAttachment(RenderTargetType,IRenderTargetTexture*,const ViewDesc&)";
 
   if (view_desc.mip_level)
-    raise_not_supported (METHOD_NAME, "Unsupported mip_level=0 (incompatible with GL_EXT_framebuffer_object)");
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported mip_level=0 (incompatible with GL_EXT_framebuffer_object)");
 
   RenderTargetTextureDesc render_target_desc;
 
@@ -282,9 +282,9 @@ void FboFrameBuffer::Bind ()
     frame_buffer_manager.SetFrameBuffer (id, GetId ());
     frame_buffer_manager.SetFrameBufferActivity (is_active [RenderTargetType_Color], is_active [RenderTargetType_DepthStencil]);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::FboFrameBuffer::Bind");
+    exception.touch ("render::low_level::opengl::FboFrameBuffer::Bind");
     throw;
   }
 }

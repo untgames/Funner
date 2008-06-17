@@ -14,7 +14,7 @@ Platform::dll_t Platform::LoadLibrary (const wchar_t* name)
   try
   {  
     if (!name)
-      raise_null_argument ("", "name");
+      throw xtl::make_null_argument_exception ("", "name");
 
     HMODULE library = LoadLibraryW (name);
   
@@ -23,9 +23,9 @@ Platform::dll_t Platform::LoadLibrary (const wchar_t* name)
       
     return (dll_t)library;
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::LoadLibrary");
+    exception.touch ("syslib::Win32Platform::LoadLibrary");
     throw;
   }
 
@@ -39,15 +39,15 @@ void Platform::UnloadLibrary (dll_t handle)
     HMODULE library = (HMODULE)handle;
 
     if (!library)
-      raise_null_argument ("", "library");
+      throw xtl::make_null_argument_exception ("", "library");
 
     FreeLibrary (library);
 
     check_errors ("::UnloadLibrary");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::UnloadLibrary");
+    exception.touch ("syslib::Win32Platform::UnloadLibrary");
     throw;
   }
 }
@@ -59,10 +59,10 @@ void* Platform::GetSymbol (dll_t handle, const char* symbol_name)
   HMODULE library = (HMODULE)handle;
 
   if (!library)
-    raise_null_argument ("", "library");
+    throw xtl::make_null_argument_exception ("", "library");
 
   if (!symbol_name)
-    raise_null_argument ("", "symbol_name");
+    throw xtl::make_null_argument_exception ("", "symbol_name");
 
   void* address = GetProcAddress (library, symbol_name);
   

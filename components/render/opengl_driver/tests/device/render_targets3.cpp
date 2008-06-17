@@ -50,7 +50,7 @@ RenderTargetType get_target_type (IView* view)
       case PixelFormat_S8:
         return RenderTargetType_DepthStencil;
       default:
-        common::raise_not_supported ("get_target_type", "Unknown format=%d", tex_desc.format);
+        throw xtl::format_not_supported_exception ("get_target_type", "Unknown format=%d", tex_desc.format);
         return RenderTargetType_Null;
     }
   }

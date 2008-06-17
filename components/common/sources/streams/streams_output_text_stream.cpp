@@ -52,32 +52,32 @@ common::OutputStreamBuffer& OutputTextStream::Buffer ()
 void OutputTextStream::Write (const char* string, size_t size)
 {
   if (!string && size)
-    raise_null_argument ("common::OutputTextStream::Write(const char*,size_t)", "string");
+    throw xtl::make_null_argument_exception ("common::OutputTextStream::Write(const char*,size_t)", "string");
     
   size_t write_size = impl->buffer.Write (string, size);
     
   if (write_size != size)
-    raise<StreamWriteException> ("common::OutputTextStream::Write", "Could not write block with size %u to the buffer (write_size=%u)",
+    throw xtl::format_exception<StreamWriteException> ("common::OutputTextStream::Write", "Could not write block with size %u to the buffer (write_size=%u)",
                                  size, write_size);
 }
 
 void OutputTextStream::Write (const char* string)
 {
   if (!string)
-    raise_null_argument ("common::OutputTextStream::Write(const char*)", "string");
+    throw xtl::make_null_argument_exception ("common::OutputTextStream::Write(const char*)", "string");
     
   Write (string, strlen (string));
 }
 
 void OutputTextStream::Write (const wchar_t*, size_t)
 {
-  raise_not_implemented ("common::OutputTextStream::Write(const wchar_t*,size_t)");
+  throw xtl::make_not_implemented_exception ("common::OutputTextStream::Write(const wchar_t*,size_t)");
 }
 
 void OutputTextStream::Write (const wchar_t* string)
 {
   if (!string)
-    raise_null_argument ("common::OutputTextStream::Write(const wchar_t*)", "string");
+    throw xtl::make_null_argument_exception ("common::OutputTextStream::Write(const wchar_t*)", "string");
 
   return Write (string, wcslen (string));
 }
@@ -201,7 +201,7 @@ void get_int_printf_format (const char*& format, bool sign, char buffer [FORMAT_
 void write_int (OutputTextStream& stream, unsigned int value, const char* format, bool sign)
 {
   if (!format)
-    raise_null_argument ("common::write", "format");
+    throw xtl::make_null_argument_exception ("common::write", "format");
 
   char format_buffer [FORMAT_BUFFER_SIZE], value_buffer [16];
 
@@ -273,7 +273,7 @@ void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SI
 void write (OutputTextStream& stream, double value, const char* format)
 {
   if (!format)
-    raise_null_argument ("common::write", "format");
+    throw xtl::make_null_argument_exception ("common::write", "format");
 
   char format_buffer [FORMAT_BUFFER_SIZE], value_buffer [16];
 
@@ -304,13 +304,13 @@ void write (OutputTextStream& stream, long double value, const char* format)
 void write (OutputTextStream& stream, bool value, const char* format)
 {
   if (!format)
-    raise_null_argument ("common::write", "format");
+    throw xtl::make_null_argument_exception ("common::write", "format");
     
   if (!strcmp (format, "alpha")) stream.Write (value ? "true" : "false");
   else if (!*format)             stream.Write (value ? "1" : "0");
   else
   {
-    raise_invalid_argument ("common::write", "format", format);
+    throw xtl::make_argument_exception ("common::write", "format", format);
   }
 }
 

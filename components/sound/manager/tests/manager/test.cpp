@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include <time.h>
 #include <mathlib.h>
-#include <common/exception.h>
 #include <syslib/window.h>
 #include <syslib/timer.h>
 #include <syslib/application.h>
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/ref.h>
+#include <xtl/common_exceptions.h>
 #include <sound/device.h>
 #include <sound/manager.h>
 

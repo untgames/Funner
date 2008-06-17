@@ -34,7 +34,7 @@ void StreamBuffer::SetBuffer (void* in_buffer, size_t in_buffer_size, bool in_is
 void StreamBuffer::SetUserBuffer (void* in_buffer, size_t in_buffer_size)
 {
   if (!in_buffer && in_buffer_size)
-    raise_null_argument ("common::StreamBuffer::SetUserBuffer", "buffer");
+    throw xtl::make_null_argument_exception ("common::StreamBuffer::SetUserBuffer", "buffer");
 
   SetBuffer (in_buffer, in_buffer_size, in_buffer != 0);
 }

@@ -1,13 +1,13 @@
 #ifndef COMMONLIB_FILE_SYSTEM_HEADER
 #define COMMONLIB_FILE_SYSTEM_HEADER
 
-#include <time.h>
+#include <ctime>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/functional_fwd>
-#include <stl/string_fwd>
+#include <xtl/exception.h>
 
-#include <common/exception.h>
+#include <stl/string_fwd>
 
 namespace common
 {
@@ -28,23 +28,14 @@ typedef xtl::com_ptr<ICustomFileSystem>  ICustomFileSystemPtr;
     Файловые исключения
 */
 
-struct FileExceptionTag;         //тэг базового класса файловых исключений
-struct FileNotFoundExceptionTag; //файл не найден
-struct FileNotDirExceptionTag;   //файл не является каталогом
-struct FileLoadExceptionTag;     //ошибка загрузки файла
-struct FileClosedExceptionTag;   //попытка обращения к закрытому файлу
-struct FileNoSpaceExceptionTag;  //недостаточно места на носителе для завершения операции
-struct FileMountExceptionTag;    //ошибка монтирования файловой системы
-struct BufferedFileExceptionTag; //исключения связанные с буферизацией файла
-
-typedef DerivedException<Exception,FileExceptionTag>              FileException;
-typedef DerivedException<FileException,FileNotFoundExceptionTag>  FileNotFoundException;
-typedef DerivedException<FileException,FileNotDirExceptionTag>    FileNotDirException;
-typedef DerivedException<FileException,FileLoadExceptionTag>      FileLoadException;
-typedef DerivedException<FileException,FileClosedExceptionTag>    FileClosedException;
-typedef DerivedException<FileException,FileNoSpaceExceptionTag>   FileNoSpaceException;
-typedef DerivedException<FileException,FileMountExceptionTag>     FileMountException;
-typedef DerivedException<FileException,BufferedFileExceptionTag>  BufferedFileException;
+struct FileException:         virtual public xtl::exception {}; //тэг базового класса файловых исключений
+struct FileNotFoundException:         public FileException {};  //файл не найден
+struct FileNotDirException:           public FileException {};  //файл не является каталогом
+struct FileLoadException:             public FileException {};  //ошибка загрузки файла
+struct FileClosedException:           public FileException {};  //попытка обращения к закрытому файлу
+struct FileNoSpaceException:          public FileException {};  //недостаточно места на носителе для завершения операции
+struct FileMountException:            public FileException {};  //ошибка монтирования файловой системы
+struct BufferedFileException:         public FileException {};  //исключения связанные с буферизацией файла
 
 /*
     Основные структуры
@@ -53,33 +44,33 @@ typedef DerivedException<FileException,BufferedFileExceptionTag>  BufferedFileEx
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Файловые атрибуты 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum FileModeFlags
+enum FileMode
 {
-  FILE_MODE_READ          = 1,  //чтение разрешено
-  FILE_MODE_WRITE         = 2,  //запись разрешена
-  FILE_MODE_RESIZE        = 4,  //изменение размера разрешено
-  FILE_MODE_REWIND        = 8,  //сброс файлового указателя разрешён
-  FILE_MODE_SEEK          = 16, //перемещение файлового указателя разрешено
-  FILE_MODE_CREATE        = 32, //при отсутствии файл создаётся, размер файла усекается
-  FILE_MODE_STREAM_READ   = FILE_MODE_READ|FILE_MODE_REWIND,         //чтение потока
-  FILE_MODE_STREAM_WRITE  = FILE_MODE_WRITE|FILE_MODE_REWIND|FILE_MODE_RESIZE, //запись потока
-  FILE_MODE_READ_ONLY     = FILE_MODE_STREAM_READ|FILE_MODE_SEEK,    //чтение файла произвольного доступа
-  FILE_MODE_WRITE_ONLY    = FILE_MODE_CREATE|FILE_MODE_STREAM_WRITE|FILE_MODE_SEEK,   //запись файла произвольного доступа (сброс размера файла)
-  FILE_MODE_READ_WRITE    = FILE_MODE_READ_ONLY|FILE_MODE_STREAM_WRITE, //чтение/запись файла произвольного доступа
+  FileMode_Read        = 1,  //чтение разрешено
+  FileMode_Write       = 2,  //запись разрешена
+  FileMode_Resize      = 4,  //изменение размера разрешено
+  FileMode_Rewind      = 8,  //сброс файлового указателя разрешён
+  FileMode_Seek        = 16, //перемещение файлового указателя разрешено
+  FileMode_Create      = 32, //при отсутствии файл создаётся, размер файла усекается
+  FileMode_StreamRead  = FileMode_Read | FileMode_Rewind,                        //чтение потока
+  FileMode_StreamWrite = FileMode_Write | FileMode_Rewind | FileMode_Resize,     //запись потока
+  FileMode_ReadOnly    = FileMode_StreamRead | FileMode_Seek,                    //чтение файла произвольного доступа
+  FileMode_WriteOnly   = FileMode_Create | FileMode_StreamWrite | FileMode_Seek, //запись файла произвольного доступа (сброс размера файла)
+  FileMode_ReadWrite   = FileMode_ReadOnly | FileMode_StreamWrite,               //чтение/запись файла произвольного доступа
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Флаги поиска файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum FileSearchFlags
+enum FileSearch
 {
-  FILE_SEARCH_FILES          = 1,  //искать файлы
-  FILE_SEARCH_DIRS           = 2,  //искать каталоги
-  FILE_SEARCH_SORT           = 4,  //отсортировать по имени
-  FILE_SEARCH_NO_PACKS       = 8,  //не искать в паках
-  FILE_SEARCH_SUBDIRS        = 16, //искать в подкаталогах
-  FILE_SEARCH_FULL_PATHS     = 32, //выводить полные пути
-  FILE_SEARCH_FILES_AND_DIRS = FILE_SEARCH_FILES|FILE_SEARCH_DIRS
+  FileSearch_Files        = 1,  //искать файлы
+  FileSearch_Dirs         = 2,  //искать каталоги
+  FileSearch_Sort         = 4,  //отсортировать по имени
+  FileSearch_NoPacks      = 8,  //не искать в паках
+  FileSearch_SubDirs      = 16, //искать в подкаталогах
+  FileSearch_FullPaths    = 32, //выводить полные пути
+  FileSearch_FilesAndDirs = FileSearch_Files | FileSearch_Dirs
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,9 +78,9 @@ enum FileSearchFlags
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum FileSeekMode
 {
-  FILE_SEEK_SET, //установка позиции от начала файла
-  FILE_SEEK_CUR, //установка позиции от текущего положения файлового указателя
-  FILE_SEEK_END  //установка позиции от конца файла
+  FileSeekMode_Set,     //установка позиции от начала файла
+  FileSeekMode_Current, //установка позиции от текущего положения файлового указателя
+  FileSeekMode_End      //установка позиции от конца файла
 };
 
 typedef size_t filesize_t, filemode_t;
@@ -222,7 +213,7 @@ class File
 ///Файловый указатель
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void      Rewind ();
-    filepos_t Seek   (filepos_t pos,FileSeekMode mode = FILE_SEEK_SET);
+    filepos_t Seek   (filepos_t pos,FileSeekMode mode = FileSeekMode_Set);
     filepos_t Tell   () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,7 +292,7 @@ class AppendFile: public StdFile
 class MemFile: public File
 {
   public:
-    MemFile (void* buf,size_t size,filemode_t mode_flags=FILE_MODE_READ_WRITE);
+    MemFile (void* buf,size_t size,filemode_t mode_flags=FileMode_ReadWrite);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -498,7 +489,7 @@ class FileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о файле
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static FileList Search (const char* wc_mask,size_t flags=FILE_SEARCH_FILES_AND_DIRS);
+    static FileList Search (const char* wc_mask,size_t flags=FileSearch_FilesAndDirs);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка размера буфера файла по умолчанию

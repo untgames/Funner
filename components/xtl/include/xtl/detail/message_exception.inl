@@ -1,46 +1,48 @@
 /*
-    message_exception
+===================================================================================================
+    message_exception_base
+===================================================================================================
 */
 
 /*
     Конструкторы
 */
 
-inline message_exception::message_exception (const char* in_message)
+inline message_exception_base::message_exception_base (const char* in_message)
 {
   if (in_message)
     message += in_message;
 }
 
-inline message_exception::message_exception (const char* format, va_list args)
+inline message_exception_base::message_exception_base (const char* format, va_list args)
 {
   if (format)
-    message.append_vformat (format, args);       
+    message.append_vformat (format, args);
 }
 
-inline message_exception::message_exception (const char* in_source, const char* in_message)
+inline message_exception_base::message_exception_base (const char* in_source, const char* in_message)
 {
   if (in_message)
-    message += in_message;
+    message += in_message;    
 
   if (in_source)
-    message_exception::touch (in_source);
+    message_exception_base::touch (in_source);
 }
 
-inline message_exception::message_exception (const char* source, const char* format, va_list args)
+inline message_exception_base::message_exception_base (const char* source, const char* format, va_list args)
 {
   if (format)
-    message.append_vformat (format, args);       
+    message.append_vformat (format, args);
     
   if (source)
-    message_exception::touch (source);    
+    message_exception_base::touch (source);
 }
 
 /*
     Получение сообщения
 */
 
-inline const char* message_exception::what () const throw ()
+inline const char* message_exception_base::what () const throw ()
 {
   return message.data ();
 }
@@ -49,16 +51,16 @@ inline const char* message_exception::what () const throw ()
     Добавление информации о контексте выброса
 */
 
-inline void message_exception::touch  (const char* format, ...) throw ()
+inline void message_exception_base::touch (const char* format, ...) throw ()
 {
   va_list args;
   
   va_start (args, format);
   
-  message_exception::vtouch (format, args);
+  message_exception_base::vtouch (format, args);
 }
 
-inline void message_exception::vtouch (const char* format, va_list args) throw ()
+inline void message_exception_base::vtouch (const char* format, va_list args) throw ()
 {
   if (!format)
     return;
@@ -68,27 +70,29 @@ inline void message_exception::vtouch (const char* format, va_list args) throw (
 }
 
 /*
-    derived_exception
+===================================================================================================
+    message_exception
+===================================================================================================
 */
 
-template <class Tag, class BaseException>
-inline derived_exception<Tag, BaseException>::derived_exception (const char* message)
-  : BaseException (message)
+template <class BaseException>
+inline message_exception<BaseException>::message_exception (const char* message)
+  : message_exception_base (message)
   {}
 
-template <class Tag, class BaseException>
-inline derived_exception<Tag, BaseException>::derived_exception (const char* source, const char* message)
-  : BaseException (source, message)
+template <class BaseException>
+inline message_exception<BaseException>::message_exception (const char* format, va_list args)
+  : message_exception_base (format, args)
   {}
 
-template <class Tag, class BaseException>  
-inline derived_exception<Tag, BaseException>::derived_exception (const char* format, va_list args)
-  : BaseException (format, args)
+template <class BaseException>
+inline message_exception<BaseException>::message_exception (const char* source, const char* message)
+  : message_exception_base (source, message)
   {}
 
-template <class Tag, class BaseException>
-inline derived_exception<Tag, BaseException>::derived_exception (const char* source, const char* format, va_list args)
-  : BaseException (source, format, args)
+template <class BaseException>
+inline message_exception<BaseException>::message_exception (const char* source, const char* format, va_list args)
+  : message_exception_base (source, format, args)
   {}
 
 /*
@@ -96,17 +100,17 @@ inline derived_exception<Tag, BaseException>::derived_exception (const char* sou
 */
 
 template <class Exception>
-inline Exception vformat_exception (const char* source, const char* format, va_list args)
+inline message_exception<Exception> vformat_exception (const char* source, const char* format, va_list args)
 {
-  return Exception (source, format, args);
+  return message_exception<Exception> (source, format, args);
 }
 
 template <class Exception>
-inline Exception format_exception (const char* source, const char* format, ...)
+inline message_exception<Exception> format_exception (const char* source, const char* format, ...)
 {
   va_list args;
   
   va_start (args, format);
   
-  return Exception (source, format, args);
+  return message_exception<Exception> (source, format, args);
 }

@@ -1,7 +1,7 @@
 #ifndef SCRIPTLIB_CORE_TESTS_SHARED_HEADER
 #define SCRIPTLIB_CORE_TESTS_SHARED_HEADER
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <stl/vector>
 #include <stl/memory>
@@ -11,6 +11,7 @@
 #include <xtl/iterator.h>
 #include <xtl/connection.h>
 #include <xtl/implicit_cast.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/strlib.h>
 
@@ -94,7 +95,7 @@ class MyInterpreter: public IInterpreter
 
     void DoCommands (const char*, const void*, size_t, const LogFunction&)
     {
-      common::raise_not_implemented ("MyInterpreter::DoCommands");
+      throw xtl::make_not_implemented_exception ("MyInterpreter::DoCommands");
     }
 
     bool HasFunction (const char*) { return true; }
@@ -102,7 +103,7 @@ class MyInterpreter: public IInterpreter
     void Invoke (size_t arguments_count, size_t results_count)
     {
       if (arguments_count >= stack.Size ())
-        throw StackException ("MyInterpreter::Invoke", "Stack underflow");
+        throw xtl::format_exception<StackException> ("MyInterpreter::Invoke", "Stack underflow");
         
       const char* function_name = stack.GetSymbol (stack.Size () - arguments_count - 1);
       

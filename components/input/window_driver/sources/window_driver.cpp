@@ -1,23 +1,3 @@
-#include <stdio.h>
-
-#include <common/exception.h>
-#include <common/singleton.h>
-
-#include <stl/vector>
-#include <stl/string>
-
-#include <xtl/function.h>
-#include <xtl/reference_counter.h>
-#include <xtl/shared_ptr.h>
-#include <xtl/connection.h>
-#include <xtl/bind.h>
-
-#include <input/low_level/driver.h>
-#include <input/low_level/device.h>
-#include <input/low_level/window_driver.h>
-
-#include <syslib/window.h>
-
 #include "shared.h"
 
 using namespace common;
@@ -72,7 +52,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     const char* GetDeviceName (size_t index)
     {
       if (index >= GetDevicesCount ())
-        raise_out_of_range ("input::low_level::window::Driver::GetDeviceName", "index", index, 0u, GetDevicesCount ());
+        throw xtl::make_range_exception ("input::low_level::window::Driver::GetDeviceName", "index", index, 0u, GetDevicesCount ());
 
       return device_entries[index]->device_name.c_str ();
     }
@@ -86,7 +66,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
         if (!strcmp ((*iter)->device_name.c_str (), name))
           return new Device ((*iter)->window, name);
 
-      raise_invalid_argument ("input::low_level::window::Driver::CreateDevice", "name", name);
+      throw xtl::make_argument_exception ("input::low_level::window::Driver::CreateDevice", "name", name);
       return 0;
     }
 
@@ -116,7 +96,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     {
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
         if (!strcmp ((*iter)->device_name.c_str (), device_name))
-          raise_invalid_argument ("input::low_level::window::Driver::RegisterDevice", "device_name", device_name, "Name already registered");
+          throw xtl::make_argument_exception ("input::low_level::window::Driver::RegisterDevice", "device_name", device_name, "Name already registered");
 
       device_entries.push_back (DeviceEntryPtr (new DeviceEntry (device_name, &window, window.RegisterEventHandler (WindowEvent_OnDestroy, xtl::bind (&Driver::DestroyWindowHandler, this, _1, _2, _3)))));
 
@@ -238,7 +218,7 @@ IDriver* WindowDriver::Driver ()
 void WindowDriver::RegisterDevice (const char* device_name, syslib::Window& window)
 {
   if (!device_name)
-    raise_null_argument ("input::low_level::WindowDriver::RegisterDevice", "device_name");
+    throw xtl::make_null_argument_exception ("input::low_level::WindowDriver::RegisterDevice", "device_name");
 
   WindowDriverSingleton::Instance ().RegisterDevice (device_name, window);
 }
@@ -251,7 +231,7 @@ void WindowDriver::RegisterDevice (syslib::Window& window)
 void WindowDriver::UnregisterDevice (const char* device_name)
 {
   if (!device_name)
-    raise_null_argument ("input::low_level::WindowDriver::UnregisterDevice", "device_name");
+    throw xtl::make_null_argument_exception ("input::low_level::WindowDriver::UnregisterDevice", "device_name");
 
   WindowDriverSingleton::Instance ().UnregisterDevice (device_name);
 }

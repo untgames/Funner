@@ -1,10 +1,9 @@
-#include <stdio.h>
+#include <cstdio>
 
 #include <xtl/function.h>
 #include <xtl/connection.h>
 
 #include <common/log.h>
-#include <common/exception.h>
 
 using namespace common;
 

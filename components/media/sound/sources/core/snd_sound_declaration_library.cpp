@@ -28,7 +28,7 @@ SoundDeclarationLibrary::SoundDeclarationLibrary (const char* file_name)
   : impl (new Impl)
 {
   if (!file_name)
-    raise_null_argument ("media::SoundDeclarationLibrary::SoundDeclarationLibrary", "file_name");
+    throw xtl::make_null_argument_exception ("media::SoundDeclarationLibrary::SoundDeclarationLibrary", "file_name");
 
   try
   {
@@ -38,9 +38,9 @@ SoundDeclarationLibrary::SoundDeclarationLibrary (const char* file_name)
     
     Rename  (file_name);
   }
-  catch (Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::SoundDeclarationLibrary::SoundDeclarationLibrary");
+    exception.touch ("media::SoundDeclarationLibrary::SoundDeclarationLibrary");
     throw;
   }
 }
@@ -75,7 +75,7 @@ const char* SoundDeclarationLibrary::Name () const
 void SoundDeclarationLibrary::Rename (const char* name)
 {
   if (!name)
-    raise_null_argument ("media::SoundDeclarationLibrary::Rename", name);
+    throw xtl::make_null_argument_exception ("media::SoundDeclarationLibrary::Rename", name);
     
   impl->name = name;
 }
@@ -160,9 +160,9 @@ void SoundDeclarationLibrary::Load (const char* file_name)
   {
     SoundDeclarationLibrary (file_name).Swap (*this);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::SoundDeclarationLibrary::Load");
+    exception.touch ("media::SoundDeclarationLibrary::Load");
     throw;
   }
 }
@@ -170,7 +170,7 @@ void SoundDeclarationLibrary::Load (const char* file_name)
 void SoundDeclarationLibrary::Save (const char* file_name)
 {
   if (!file_name)
-    raise_null_argument ("media::SoundDeclarationLibrary::Save", "file_name");
+    throw xtl::make_null_argument_exception ("media::SoundDeclarationLibrary::Save", "file_name");
     
   try
   {
@@ -178,9 +178,9 @@ void SoundDeclarationLibrary::Save (const char* file_name)
 
     SoundDeclarationManager::GetSaver (file_name, SerializerFindMode_ByName) (file_name, *this);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::SoundDeclarationLibrary::Save");
+    exception.touch ("media::SoundDeclarationLibrary::Save");
     throw;
   }
 }

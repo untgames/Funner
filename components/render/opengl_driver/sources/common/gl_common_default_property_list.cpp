@@ -18,12 +18,12 @@ size_t DefaultPropertyList::GetSize ()
 
 const char* DefaultPropertyList::GetKey (size_t index)
 {
-  raise_out_of_range ("render::low_level::opengl::DefaultPropertyList::GetKey", "index", index, 0);  
+  throw xtl::make_range_exception ("render::low_level::opengl::DefaultPropertyList::GetKey", "index", index, 0);  
   return "";
 }
 
 const char* DefaultPropertyList::GetValue (size_t index)
 {
-  raise_out_of_range ("render::low_level::opengl::DefaultPropertyList::GetValue", "index", index, 0);
+  throw xtl::make_range_exception ("render::low_level::opengl::DefaultPropertyList::GetValue", "index", index, 0);
   return "";
 }

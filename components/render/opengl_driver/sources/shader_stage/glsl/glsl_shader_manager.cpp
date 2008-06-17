@@ -42,7 +42,7 @@ size_t GlslShaderManager::GetProfilesCount ()
 const char* GlslShaderManager::GetProfile (size_t index)
 {
   if (index)
-    raise_out_of_range ("render::low_level::opengl::GlslShaderManager::GetProfile", "index", index, 0u, 1u);
+    throw xtl::make_range_exception ("render::low_level::opengl::GlslShaderManager::GetProfile", "index", index, 0u, 1u);
 
   return GLSL_BASE_PROFILE;
 }
@@ -59,7 +59,7 @@ Shader* GlslShaderManager::CreateShader (const ShaderDesc& shader_desc, const Lo
 Program* GlslShaderManager::CreateProgram (size_t shaders_count, ShaderPtr* shaders, const LogFunction& error_log)
 {
   if (!shaders)
-    raise_null_argument ("render::low_level::opengl::GlslShaderManager::CreateProgram", "shaders");
+    throw xtl::make_null_argument_exception ("render::low_level::opengl::GlslShaderManager::CreateProgram", "shaders");
 
   return new GlslProgram (GetContextManager (), shaders_count, shaders, error_log);
 }
@@ -89,7 +89,7 @@ GlslShaderType get_shader_type (const char* profile)
   else if (!strcmp (profile, GLSL_PROFILES[1]))
     return GlslShaderType_Vertex;
   else
-    raise_invalid_argument ("render::low_level::opengl::get_shader_type", "profile", profile);
+    throw xtl::make_argument_exception ("render::low_level::opengl::get_shader_type", "profile", profile);
 
   return GlslShaderType_Fragment;
 }

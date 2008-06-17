@@ -20,13 +20,13 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     //проверка корректности дескриптора текстуры
 
   if (is_depth_stencil (tex_desc.format))
-    raise_not_supported (METHOD_NAME, "Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D");
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D");
 
   if (tex_desc.layers != 6)
-    raise_invalid_argument (METHOD_NAME, "desc.layers", tex_desc.layers, "Cubemap texture must has desc.layers = 6");
+    throw xtl::make_argument_exception (METHOD_NAME, "desc.layers", tex_desc.layers, "Cubemap texture must has desc.layers = 6");
 
   if (tex_desc.width != tex_desc.height)
-    raise<ArgumentException> (METHOD_NAME, "Cubemap texture sizes must be equal (desc.width=%u, desc.height=%u)", tex_desc.width, tex_desc.height);
+    throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Cubemap texture sizes must be equal (desc.width=%u, desc.height=%u)", tex_desc.width, tex_desc.height);
 
      //преобразование формата пикселей
 
@@ -45,7 +45,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
   if (!proxy_width)
   {
-    raise_not_supported (METHOD_NAME, "Can't create cubemap texture %ux%u@%s. Reason: proxy texure fail",
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create cubemap texture %ux%u@%s. Reason: proxy texure fail",
                        tex_desc.width, tex_desc.height, get_name (tex_desc.format));
   }
   
@@ -72,9 +72,9 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
   {
     SetFormat (get_pixel_format (gl_internal_format));
   }
-  catch (common::Exception& e)
+  catch (xtl::exception& e)
   {
-    e.Touch (METHOD_NAME);
+    e.touch (METHOD_NAME);
 
     throw;
   }
@@ -91,7 +91,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 void TextureCubemap::GetLayerDesc (size_t layer, LayerDesc& desc)
 {
   if (layer > 6)
-    raise_out_of_range ("render::low_level::opengl::TextureCubemap::GetLayerDesc", "layer", layer, 6);
+    throw xtl::make_range_exception ("render::low_level::opengl::TextureCubemap::GetLayerDesc", "layer", layer, 6);
 
   desc.target    = GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer;
   desc.new_index = 0;

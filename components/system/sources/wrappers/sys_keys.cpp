@@ -1,5 +1,4 @@
-#include <syslib/keydefs.h>
-#include <platform/platform.h>
+#include "shared.h"
 
 namespace syslib
 {
@@ -26,7 +25,7 @@ const char* get_key_scan_name (ScanCode scan_code)
         size_t max_size = end - pos,
                size     = Platform::GetKeyName ((ScanCode)i, max_size, pos);
 
-        names [i] = size ? pos : "Unknown";
+        names [i] = size ? pos : (char*)"Unknown";
 
         pos += size + 1;
       }

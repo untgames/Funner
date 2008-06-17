@@ -362,18 +362,18 @@ OpenALContext::OpenALContext (const char* device_name, const char* init_string)
   : debug_log_state (false)
 {
   if (!device_name)
-    raise_null_argument ("sound::low_level::OpenALContext::OpenALContext", "device_name");
+    throw xtl::make_null_argument_exception ("sound::low_level::OpenALContext::OpenALContext", "device_name");
     
   if (!xstrcmp (device_name, "default"))
     device_name = 0;
 
   if (!init_string)
-    raise_null_argument ("sound::low_level::OpenALContext::OpenALContext", "init_string");
+    throw xtl::make_null_argument_exception ("sound::low_level::OpenALContext::OpenALContext", "init_string");
     
   device = alcOpenDevice (device_name);
   
   if (!device) 
-    raise<OpenALException> ("sound::low_level::OpenALContext::OpenALContext", "Can't open device '%s'", device_name);
+    throw xtl::format_exception<OpenALException> ("sound::low_level::OpenALContext::OpenALContext", "Can't open device '%s'", device_name);
 
   efx_present = alcIsExtensionPresent ("ALC_EXT_EFX") == ALC_TRUE;
 
@@ -394,7 +394,7 @@ OpenALContext::OpenALContext (const char* device_name, const char* init_string)
   if (!context)
   {
     alcCloseDevice (device);
-    raise<OpenALException> ("OpenALDevice::OpenALDevice", "Can't create context. %s", get_alc_error_message (alcGetError (device)));
+    throw xtl::format_exception<OpenALException> ("OpenALDevice::OpenALDevice", "Can't create context. %s", get_alc_error_message (alcGetError (device)));
   }
 }
 

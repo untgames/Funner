@@ -56,8 +56,8 @@ int main ()
   {
     Scene           scene;
     Window          window;
-    SoundManager    manager (window, SoundSystem::FindConfiguration ("OpenAL", "SB*"));
-    SoundManager    manager2 (window, SoundSystem::FindConfiguration ("OpenAL", "Generic*Real*"));
+    SoundManager    manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
+    SoundManager    manager2 (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
     ListenerPtr     listener (scene_graph::Listener::Create ());
     SoundEmitterPtr sound_emitter  = SoundEmitter::Create ("declaration1"),
                     sound_emitter2 = SoundEmitter::Create ("declaration2");

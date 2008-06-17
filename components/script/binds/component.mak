@@ -12,14 +12,14 @@ SCRIPT_BINDS_COMPONENTS.LIB_DIRS         :=
 SCRIPT_BINDS_COMPONENTS.LIBS             := 
 SCRIPT_BINDS_COMPONENTS.COMPILER_CFLAGS  := 
 SCRIPT_BINDS_COMPONENTS.COMPILER_DEFINES := 
-SCRIPT_BINDS_COMPONENTS.IMPORTS				  := ../core/exports.static.mak ../../scene_graph/exports.static.mak
+SCRIPT_BINDS_COMPONENTS.IMPORTS				  := compile.static.mak ../core/compile.static.mak ../../scene_graph/compile.static.mak ../../common/compile.static.mak
 
 #Öåëü ¹2 - SCRIPT_BINDS tests
 SCRIPT_BINDS_TESTS.TYPE             := test-suite
-SCRIPT_BINDS_TESTS.INCLUDE_DIRS     := include
+SCRIPT_BINDS_TESTS.INCLUDE_DIRS     :=
 SCRIPT_BINDS_TESTS.SOURCE_DIRS      := tests/lua
 SCRIPT_BINDS_TESTS.LIB_DIRS         :=  
 SCRIPT_BINDS_TESTS.LIBS             :=
 SCRIPT_BINDS_TESTS.COMPILER_CFLAGS  := 
 SCRIPT_BINDS_TESTS.COMPILER_DEFINES :=
-SCRIPT_BINDS_TESTS.IMPORTS	  		   := ../core/exports.static.mak ../../scene_graph/exports.static.mak exports.static.mak
+SCRIPT_BINDS_TESTS.IMPORTS	  		  := compile.static.mak link.static.mak ../core/compile.static.mak  ../../common/compile.static.mak

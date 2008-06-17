@@ -1,8 +1,4 @@
-#include <xtl/visitor.h>
-#include <xtl/signal.h>
-#include <stl/string>
-#include <common/exception.h>
-#include <sg/sound_emitter.h>
+#include "shared.h"
 
 using namespace scene_graph;
 using namespace xtl;
@@ -116,7 +112,7 @@ void SoundEmitter::Stop ()
 xtl::connection SoundEmitter::RegisterEventHandler (SoundEmitterEvent event, const EventHandler& handler) const
 {
   if (event < 0 || event >= SoundEmitterEvent_Num)
-    raise_invalid_argument ("scene_graph::SoundEmitter::Event", "event", event);
+    throw xtl::make_argument_exception ("scene_graph::SoundEmitter::Event", "event", event);
 
   return impl->signals [event].connect (handler);
 }

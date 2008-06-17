@@ -62,7 +62,7 @@ const char* Material::Id () const
 void Material::SetId (const char* id)
 {
   if (!id)
-    raise_null_argument ("media::collada::Material::SetId", "id");
+    throw xtl::make_null_argument_exception ("media::collada::Material::SetId", "id");
     
   impl->id = id;
 }
@@ -79,7 +79,7 @@ const char* Material::Effect () const
 void Material::SetEffect (const char* effect_id)
 {
   if (!effect_id)
-    raise_null_argument ("media::collada::Material::SetEffect", "effect_id");
+    throw xtl::make_null_argument_exception ("media::collada::Material::SetEffect", "effect_id");
 
   impl->effect = effect_id;
 }

@@ -51,15 +51,15 @@ Model::Model (const char* file_name)
   try
   {
     if (!file_name)
-      raise_null_argument ("", "file_name");
+      throw xtl::make_null_argument_exception ("", "file_name");
     
     static ComponentLoader loader (COLLADA_LOADERS_MASK);
 
     ModelManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this, &default_collada_log);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::collada::Model::Model(const char*)");
+    exception.touch ("media::collada::Model::Model(const char*)");
     throw;
   }
 }
@@ -70,15 +70,15 @@ Model::Model (const char* file_name, const LogHandler& log)
   try
   {
     if (!file_name)
-      raise_null_argument ("", "file_name");
+      throw xtl::make_null_argument_exception ("", "file_name");
 
     static ComponentLoader loader (COLLADA_LOADERS_MASK);
 
     ModelManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this, log);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::collada::Model::Model(const char*,const LogHandler&)");
+    exception.touch ("media::collada::Model::Model(const char*,const LogHandler&)");
     throw;
   }
 }
@@ -110,7 +110,7 @@ const char* Model::Name () const
 void Model::Rename (const char* new_name)
 {
   if (!new_name)
-    raise_null_argument ("media::collada::Model::Rename", "new_name");
+    throw xtl::make_null_argument_exception ("media::collada::Model::Rename", "new_name");
     
   impl->name = new_name;
 }
@@ -127,7 +127,7 @@ const char* Model::ActiveSceneName () const
 void Model::SetActiveSceneName (const char* scene_name)
 {
   if (!scene_name)
-    raise_null_argument ("media::collada::Model::SetActiveSceneName", "scene_name");
+    throw xtl::make_null_argument_exception ("media::collada::Model::SetActiveSceneName", "scene_name");
     
   impl->active_scene = scene_name;
 }
@@ -260,9 +260,9 @@ void Model::Load (const char* file_name)
   {
     Model (file_name).Swap (*this);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::collada::Model::Load");
+    exception.touch ("media::collada::Model::Load");
     throw;
   }
 }
@@ -273,9 +273,9 @@ void Model::Load (const char* file_name, const LogHandler& log)
   {
     Model (file_name, log).Swap (*this);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::collada::Model::Load");
+    exception.touch ("media::collada::Model::Load");
     throw;
   }
 }
@@ -290,15 +290,15 @@ void Model::Save (const char* file_name, const LogHandler& log)
   try
   {
     if (!file_name)
-      raise_null_argument ("", "file_name");
+      throw xtl::make_null_argument_exception ("", "file_name");
 
     static ComponentLoader loader (COLLADA_SAVERS_MASK);
 
     ModelManager::GetSaver (file_name, SerializerFindMode_ByName)(file_name, *this, log);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::collada::Model::Save");
+    exception.touch ("media::collada::Model::Save");
     throw;
   }
 }

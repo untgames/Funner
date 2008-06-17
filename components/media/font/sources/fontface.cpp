@@ -4,9 +4,9 @@
 #include <stl/memory>
 
 #include <xtl/function.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/singleton.h>
-#include <common/exception.h>
 #include <common/parser.h>
 
 #include <media/font.h>
@@ -68,9 +68,9 @@ FontFace::FontFace (size_t first_char_index, size_t glyph_table_size, GlyphInfo*
   : impl (new FontFaceImpl (first_char_index, glyph_table_size, glyph, kerning_table, font_file_name))
 {
   if (!glyph_table_size)
-    raise_null_argument ("FontFace::FontFace", "glyph_table_size");
+    throw xtl::make_null_argument_exception ("FontFace::FontFace", "glyph_table_size");
   if (!glyph)
-    raise_null_argument ("FontFace::FontFace", "glyph");
+    throw xtl::make_null_argument_exception ("FontFace::FontFace", "glyph");
 }
 
 FontFace::FontFace (const FontFace& source)
@@ -84,9 +84,9 @@ FontFace::FontFace (const char* file_name)
   {
     Load (file_name);
   }
-  catch (Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::FontFace::FontFace");
+    exception.touch ("media::FontFace::FontFace");
     throw;
   }
 }
@@ -138,16 +138,19 @@ void FontFace::Load (const char* file_name)
 
   for (size_t i = 0; i < log.MessagesCount (); i++)
     if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
-      raise <Exception> (METHOD_NAME, log.Message(i));
+      throw xtl::format_operation_exception (METHOD_NAME, log.Message(i));
 
   if (!iter)
-    raise <Exception> (METHOD_NAME, "Incorrect file format, no 'Font' root tag");
+    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'Font' root tag");
+    
   if (!test (iter, "FontFile"))
-    raise <Exception> (METHOD_NAME, "Incorrect file format, no 'FontFile' property");
+    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'FontFile' property");
+    
   if (!test (iter, "FirstCharCode"))
-    raise <Exception> (METHOD_NAME, "Incorrect file format, no 'FirstCharCode' property");
+    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'FirstCharCode' property");
+    
   if (!test (iter, "Glyphs"))
-    raise <Exception> (METHOD_NAME, "Incorrect file format, no 'Glyphs' tag");
+    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'Glyphs' tag");
 
   read (iter, "Name", temp_name, "");
   read (iter, "FontFile", font_file);
@@ -157,7 +160,7 @@ void FontFace::Load (const char* file_name)
     glyph_count++;
 
   if (!glyph_count)
-    raise <Exception> (METHOD_NAME, "Incorrect file format, no glyphs");
+    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no glyphs");
 
   glyph_info   = new GlyphInfo [glyph_count];
   kerning_info = new KerningInfo [glyph_count * glyph_count];
@@ -225,7 +228,7 @@ size_t FontFace::FirstGlyphCode () const
 GlyphInfo* FontFace::GlyphData (size_t glyph_index) const
 {
   if (glyph_index >= impl->glyphs_count)
-    raise_out_of_range ("FontFace::GlyphData", "glyph_index", glyph_index, 0u, impl->glyphs_count);
+    throw xtl::make_range_exception ("FontFace::GlyphData", "glyph_index", glyph_index, 0u, impl->glyphs_count);
       
   return &(impl->glyphs.get()[glyph_index]);
 }
@@ -238,9 +241,9 @@ GlyphInfo* FontFace::GlyphData () const
 KerningInfo* FontFace::Kerning (size_t left_glyph_index, size_t right_glyph_index) const
 {
   if (left_glyph_index >= impl->glyphs_count)
-    raise_out_of_range ("FontFace::Kerning", "left_glyph_index", left_glyph_index, 0u, impl->glyphs_count);
+    throw xtl::make_range_exception ("FontFace::Kerning", "left_glyph_index", left_glyph_index, 0u, impl->glyphs_count);
   if (right_glyph_index >= impl->glyphs_count)
-    raise_out_of_range ("FontFace::Kerning", "right_glyph_index", right_glyph_index, 0u, impl->glyphs_count);
+    throw xtl::make_range_exception ("FontFace::Kerning", "right_glyph_index", right_glyph_index, 0u, impl->glyphs_count);
       
   return &(impl->kerning_table.get()[left_glyph_index * impl->glyphs_count + right_glyph_index]);
 }
@@ -256,7 +259,7 @@ KerningInfo* FontFace::Kerning () const
 
 void FontFace::Save (const char* file_name) const
 {
-  raise_not_implemented ("media::FontFace::Save");
+  throw xtl::make_not_implemented_exception ("media::FontFace::Save");
 }
 
 void FontFace::Swap (FontFace& font)

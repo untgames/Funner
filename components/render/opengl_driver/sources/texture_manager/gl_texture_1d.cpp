@@ -20,7 +20,7 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
     //преобразование формата пикселей
 
   if (is_compressed (tex_desc.format))
-    raise_not_supported (METHOD_NAME, "1D texture can't be compressed");
+    throw xtl::format_not_supported_exception (METHOD_NAME, "1D texture can't be compressed");
 
   GLenum gl_internal_format = get_gl_internal_format (tex_desc.format),
          gl_format          = get_gl_format (tex_desc.format),
@@ -35,7 +35,7 @@ Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_des
   glGetTexLevelParameteriv (GL_PROXY_TEXTURE_1D, 1, GL_TEXTURE_WIDTH, &proxy_width);
 
   if (!proxy_width)
-    raise_not_supported (METHOD_NAME, "Can't create 1D texture %u@%s. Reason: proxy texure fail", tex_desc.width, get_name (tex_desc.format));
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 1D texture %u@%s. Reason: proxy texure fail", tex_desc.width, get_name (tex_desc.format));
 
     //создание текстуры
 
@@ -58,5 +58,5 @@ void Texture1D::SetUncompressedData (size_t layer, size_t mip_level, size_t x, s
 
 void Texture1D::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, size_t, const void*)
 {
-  raise_not_supported ("render::low_level::opengl::Texture1D::SetCompressedData", "Compression for 1D textures not supported");
+  throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture1D::SetCompressedData", "Compression for 1D textures not supported");
 }

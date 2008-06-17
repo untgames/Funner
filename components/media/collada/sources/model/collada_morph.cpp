@@ -63,7 +63,7 @@ const char* MorphTarget::Mesh () const
 void MorphTarget::SetMesh (const char* mesh)
 {
   if (!mesh)
-    raise_null_argument ("media::collada::MorphTarget::SetMesh", "mesh");
+    throw xtl::make_null_argument_exception ("media::collada::MorphTarget::SetMesh", "mesh");
     
   impl->mesh = mesh;
 }
@@ -146,7 +146,7 @@ const char* Morph::Id () const
 void Morph::SetId (const char* id)
 {
   if (!id)
-    raise_null_argument ("media::collada::Morph::SetId", "id");
+    throw xtl::make_null_argument_exception ("media::collada::Morph::SetId", "id");
     
   impl->id = id;
 }
@@ -168,7 +168,7 @@ void Morph::SetMethod (MorphMethod method)
     case MorphMethod_Relative:
       break;
     default:
-      raise_invalid_argument ("media::collada::Morph::SetMethod", "method", method);
+      throw xtl::make_argument_exception ("media::collada::Morph::SetMethod", "method", method);
       break;
   }
   
@@ -187,7 +187,7 @@ const char* Morph::BaseMesh () const
 void Morph::SetBaseMesh (const char* mesh)
 {
   if (!mesh)
-    raise_null_argument ("media::collada::Morph::SetBaseMesh", "mesh");
+    throw xtl::make_null_argument_exception ("media::collada::Morph::SetBaseMesh", "mesh");
     
   impl->base_mesh = mesh;
 }

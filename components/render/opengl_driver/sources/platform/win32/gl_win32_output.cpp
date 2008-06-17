@@ -146,7 +146,7 @@ size_t Output::GetModesCount ()
 void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 {
   if (mode_index >= modes.size ())
-    raise_out_of_range ("render::low_level::opengl::Output::GetModeDesc", "mode_index", mode_index, modes.size ());
+    throw xtl::make_range_exception ("render::low_level::opengl::Output::GetModeDesc", "mode_index", mode_index, modes.size ());
     
   mode_desc = modes [mode_index];
 }
@@ -181,7 +181,7 @@ void set_mode_desc (const char* device_name, DEVMODE* mode)
       break;
   }
 
-  raise_invalid_operation ("ChangeDisplaySettingsEx", msg);
+  throw xtl::format_operation_exception ("ChangeDisplaySettingsEx", msg);
 }
 
 }
@@ -203,9 +203,9 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   {
     set_mode_desc (win_name.c_str (), &dev_mode_desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Output::SetCurrentMode(device-name='%s', mode='%ux%ux%u @ %uHz')",
+    exception.touch ("render::low_level::opengl::Output::SetCurrentMode(device-name='%s', mode='%ux%ux%u @ %uHz')",
       name.c_str (), mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);
     throw;
   }
@@ -217,9 +217,9 @@ void Output::RestoreDefaultMode ()
   {
     set_mode_desc (win_name.c_str (), 0);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Output::RestoreDefaultMode(device-name='%s')", name.c_str ());
+    exception.touch ("render::low_level::opengl::Output::RestoreDefaultMode(device-name='%s')", name.c_str ());
     throw;
   }
 }

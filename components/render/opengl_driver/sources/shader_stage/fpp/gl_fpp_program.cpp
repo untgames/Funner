@@ -62,15 +62,15 @@ FppProgram::FppProgram (const ContextManager& context_manager, size_t shaders_co
     //проверка корректности шейдеров
 
   if (!shaders)
-    raise_null_argument (METHOD_NAME, "shaders");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "shaders");
 
   if (shaders_count > 1)
-    raise_not_supported (METHOD_NAME, "Multiple shaders not supported (shaders_count=%u)", shaders_count);
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Multiple shaders not supported (shaders_count=%u)", shaders_count);
 
   shader = cast_object<FppShader> (shaders [0].get (), METHOD_NAME, "shaders[0]");
 
   if (!shader)
-    raise_null_argument (METHOD_NAME, "shaders[0]");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "shaders[0]");
 }
 
 FppProgram::~FppProgram ()
@@ -86,7 +86,7 @@ FppProgram::LayoutCacheEntry& FppProgram::GetLayout (ProgramParametersLayout* pa
   static const char* METHOD_NAME = "render::low_level::opengl::FppProgram::GetLayout";
 
   if (!parameters_layout)
-    raise_null_argument (METHOD_NAME, "parameters_layout");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "parameters_layout");
     
     //поиск layout в кэше
 
@@ -343,7 +343,7 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
       //проверка наличия требуемого константного буфера
 
     if (!buffer)
-      raise_invalid_operation (METHOD_NAME, "Null constant buffer #%u", group.slot);
+      throw xtl::format_operation_exception (METHOD_NAME, "Null constant buffer #%u", group.slot);
 
       //проверка необходимости переустановки параметров
 
@@ -357,7 +357,7 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
     char* buffer_base = (char*)buffer->GetDataPointer ();
     
     if (!buffer_base)
-      raise_invalid_operation (METHOD_NAME, "Null constant buffer #%u data pointer", group.slot);
+      throw xtl::format_operation_exception (METHOD_NAME, "Null constant buffer #%u data pointer", group.slot);
       
       //обновление динамических параметров
       

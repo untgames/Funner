@@ -141,13 +141,13 @@ IFrameBuffer* FrameBufferManager::CreateFrameBuffer (View* color_view, View* dep
       if (iter->checker (color_view, depth_stencil_view))
         return iter->creater (color_view, depth_stencil_view);
     }
-    catch (common::Exception& exception)
+    catch (xtl::exception& exception)
     {
       stl::string cfg_name;
 
       get_configuration_name (color_view, depth_stencil_view, cfg_name);
 
-      exception.Touch ("%s(%s)", METHOD_NAME, cfg_name.c_str ());
+      exception.touch ("%s(%s)", METHOD_NAME, cfg_name.c_str ());
 
       throw;      
     }
@@ -159,7 +159,7 @@ IFrameBuffer* FrameBufferManager::CreateFrameBuffer (View* color_view, View* dep
 
   get_configuration_name (color_view, depth_stencil_view, cfg_name);    
 
-  raise_not_supported (METHOD_NAME, "Frame buffer configuration not supported. %s", cfg_name.c_str ());
+  throw xtl::format_not_supported_exception (METHOD_NAME, "Frame buffer configuration not supported. %s", cfg_name.c_str ());
 
   return 0;
 }
@@ -167,7 +167,7 @@ IFrameBuffer* FrameBufferManager::CreateFrameBuffer (View* color_view, View* dep
 ITexture* FrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
 {
   if (!impl->render_buffer_creater)
-    raise_not_supported ("render::low_level::opengl::FrameBufferManager::CreateRenderBuffer", "Render buffers not supported");
+    throw xtl::format_not_supported_exception ("render::low_level::opengl::FrameBufferManager::CreateRenderBuffer", "Render buffers not supported");
 
   return impl->render_buffer_creater (desc);
 }
@@ -175,7 +175,7 @@ ITexture* FrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
 ITexture* FrameBufferManager::CreateColorBuffer (ISwapChain* swap_chain, size_t index)
 {
   if (!impl->color_buffer_creater)
-    raise_not_supported ("render::low_level::opengl::FrameBufferManager::CreateColorBuffer", "Color buffers not supported");
+    throw xtl::format_not_supported_exception ("render::low_level::opengl::FrameBufferManager::CreateColorBuffer", "Color buffers not supported");
 
   return impl->color_buffer_creater (swap_chain, index);
 }
@@ -183,7 +183,7 @@ ITexture* FrameBufferManager::CreateColorBuffer (ISwapChain* swap_chain, size_t 
 ITexture* FrameBufferManager::CreateDepthStencilBuffer (ISwapChain* swap_chain)
 {
   if (!impl->color_buffer_creater)
-    raise_not_supported ("render::low_level::opengl::FrameBufferManager::CreateDepthStencilBuffer", "Depth-stencil buffers not supported");
+    throw xtl::format_not_supported_exception ("render::low_level::opengl::FrameBufferManager::CreateDepthStencilBuffer", "Depth-stencil buffers not supported");
 
   return impl->depth_stencil_buffer_creater (swap_chain);
 }
@@ -279,7 +279,7 @@ void FrameBufferManager::SetFrameBuffer (size_t fbo_id, size_t cache_id)
     //проверка наличия необходимого расширения
 
   if (!context_manager.GetCaps ().has_ext_framebuffer_object)
-    raise_not_supported (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
+    throw xtl::format_not_supported_exception (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
 
     //установка буфера в контекст OpenGL
 

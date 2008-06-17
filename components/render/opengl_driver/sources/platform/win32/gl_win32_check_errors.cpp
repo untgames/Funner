@@ -14,7 +14,7 @@ class Win32ErrorMessage
 //MAKELANGID (LANG_NEUTRAL,SUBLANG_DEFAULT)                     
 
       if (!buffer)
-        common::raise_invalid_operation ("render::low_level::opengl::Win32ErrorMessage::Win32ErrorMessage", "Internal error at FormatMessage");
+        throw xtl::format_operation_exception ("render::low_level::opengl::Win32ErrorMessage::Win32ErrorMessage", "Internal error at FormatMessage");
         
         //отсечение завершающих \n и пробелов
         
@@ -68,9 +68,9 @@ void raise_error (const char* source)
   DWORD error_code = GetLastError ();
   
   if (error_code)
-    common::raise_invalid_operation (source, Win32ErrorMessage (GetLastError ()).Message ());
+    throw xtl::format_operation_exception (source, Win32ErrorMessage (GetLastError ()).Message ());
   
-  common::raise_invalid_operation (source, "Operation failed");
+  throw xtl::format_operation_exception (source, "Operation failed");
 }
 
 }

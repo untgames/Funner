@@ -143,7 +143,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
     {
     }
   
-    raise_not_supported ("sound::low_level::OpenALDevice::OpenALDevice", "Device doesn't support %u channels. Only %u channels supported.", 
+    throw xtl::format_not_supported_exception ("sound::low_level::OpenALDevice::OpenALDevice", "Device doesn't support %u channels. Only %u channels supported.", 
                         properties.min_channels_count, channels.size ());
   }
 
@@ -330,7 +330,7 @@ void OpenALDevice::DebugVPrintf (const char* format, va_list list)
 void OpenALDevice::SetSample (size_t channel, const media::SoundSample& sample)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::SetSample", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::SetSample", "channel", channel, channels.size ());
     
   channels [channel]->SetSample (sample);
 }
@@ -338,7 +338,7 @@ void OpenALDevice::SetSample (size_t channel, const media::SoundSample& sample)
 const media::SoundSample& OpenALDevice::GetSample (size_t channel)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::GetSample", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::GetSample", "channel", channel, channels.size ());
     
   return channels [channel]->GetSample ();
 }
@@ -350,7 +350,7 @@ const media::SoundSample& OpenALDevice::GetSample (size_t channel)
 bool OpenALDevice::IsLooped (size_t channel)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::IsLooped", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::IsLooped", "channel", channel, channels.size ());
     
   return channels [channel]->IsLooped ();
 }
@@ -362,7 +362,7 @@ bool OpenALDevice::IsLooped (size_t channel)
 void OpenALDevice::SetSource (size_t channel, const Source& source)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::SetSource", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::SetSource", "channel", channel, channels.size ());
     
   channels [channel]->SetSource (source);
 }
@@ -370,7 +370,7 @@ void OpenALDevice::SetSource (size_t channel, const Source& source)
 void OpenALDevice::GetSource (size_t channel, Source& source)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::GetSource", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::GetSource", "channel", channel, channels.size ());
 
   source = channels [channel]->GetSource ();
 }
@@ -382,7 +382,7 @@ void OpenALDevice::GetSource (size_t channel, Source& source)
 void OpenALDevice::Play (size_t channel, bool looping)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::Play", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::Play", "channel", channel, channels.size ());
     
   channels [channel]->Play (looping);
 }
@@ -390,7 +390,7 @@ void OpenALDevice::Play (size_t channel, bool looping)
 void OpenALDevice::Pause (size_t channel)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::Pause", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::Pause", "channel", channel, channels.size ());
     
   channels [channel]->Pause ();
 }
@@ -398,7 +398,7 @@ void OpenALDevice::Pause (size_t channel)
 void OpenALDevice::Stop (size_t channel)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::Stop", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::Stop", "channel", channel, channels.size ());
     
   channels [channel]->Stop ();
 }
@@ -406,7 +406,7 @@ void OpenALDevice::Stop (size_t channel)
 void OpenALDevice::Seek (size_t channel, float time_in_seconds, SeekMode seek_mode)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::Seek", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::Seek", "channel", channel, channels.size ());
 
   channels [channel]->Seek (time_in_seconds, seek_mode);
 }
@@ -414,7 +414,7 @@ void OpenALDevice::Seek (size_t channel, float time_in_seconds, SeekMode seek_mo
 float OpenALDevice::Tell (size_t channel)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::Tell", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::Tell", "channel", channel, channels.size ());
     
   return channels [channel]->Tell (); 
 }
@@ -422,7 +422,7 @@ float OpenALDevice::Tell (size_t channel)
 bool OpenALDevice::IsPlaying (size_t channel)
 {
   if (channel >= channels.size ())
-    raise_out_of_range ("sound::low_level::OpenALDevice::IsPlaying", "channel", channel, channels.size ());
+    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::IsPlaying", "channel", channel, channels.size ());
     
   return channels [channel]->IsPlaying ();
 }
@@ -510,12 +510,12 @@ bool OpenALDevice::IsStringParam (const char* name)
 void OpenALDevice::SetIntegerParam (const char* name, int value)
 {
   if (!name)
-    raise_null_argument ("sound::low_level::OpenALDevice::SetIntegerParam", "name");    
+    throw xtl::make_null_argument_exception ("sound::low_level::OpenALDevice::SetIntegerParam", "name");    
     
     //заменить на дефолтные значения!!!    
     
   if (!value)
-    raise_null_argument ("sound::low_level::OpenALDevice::SetIntegerParam", "value");
+    throw xtl::make_null_argument_exception ("sound::low_level::OpenALDevice::SetIntegerParam", "value");
 
   if (!xstrcmp (name, "buffer_update_frequency"))
   {
@@ -538,14 +538,14 @@ void OpenALDevice::SetIntegerParam (const char* name, int value)
   }
   else
   {
-    raise_invalid_argument ("sound::low_level::OpenALDevice::SetIntegerParam", "name", name);
+    throw xtl::make_argument_exception ("sound::low_level::OpenALDevice::SetIntegerParam", "name", name);
   }
 }
 
 int OpenALDevice::GetIntegerParam (const char* name)
 {
   if (!name)
-    raise_null_argument ("sound::low_level::OpenALDevice::GetIntegerParam", "name");
+    throw xtl::make_null_argument_exception ("sound::low_level::OpenALDevice::GetIntegerParam", "name");
     
   if      (!xstrcmp (name, "buffer_update_frequency"))   return static_cast<int> (buffer_update_frequency);
   else if (!xstrcmp (name, "source_update_frequency"))   return static_cast<int> (source_properties_update_frequency);
@@ -553,7 +553,7 @@ int OpenALDevice::GetIntegerParam (const char* name)
   else if (!xstrcmp (name, "al_debug_log"))              return context.GetDebugLogState ();
   else
   {
-    raise_invalid_argument ("sound::low_level::OpenALDevice::GetIntegerParam", "name", name);
+    throw xtl::make_argument_exception ("sound::low_level::OpenALDevice::GetIntegerParam", "name", name);
   }
 
   return 0;
@@ -564,7 +564,7 @@ void OpenALDevice::SetStringParam (const char* name, const char* value)
   static const char* METHOD_NAME = "sound::low_level::OpenALDevice::SetStringParam";
 
   if (!name)
-    raise_null_argument (METHOD_NAME, "name");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
   if (!xstrcmp (name, "AL_DISTANCE_MODEL")) 
   {
@@ -585,16 +585,16 @@ void OpenALDevice::SetStringParam (const char* name, const char* value)
     else if (!xstrcmp (value, "AL_EXPONENT_DISTANCE_CLAMPED"))
       context.alDistanceModel (AL_EXPONENT_DISTANCE_CLAMPED);
     else
-      raise_invalid_argument (METHOD_NAME, "value", value);
+      throw xtl::make_argument_exception (METHOD_NAME, "value", value);
   }
 
-  raise_invalid_argument (METHOD_NAME, "name", name);
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name);
 }
 
 const char* OpenALDevice::GetStringParam (const char* name)
 {
   if (!name)
-    raise_null_argument ("sound::low_level::OpenALDevice::GetStringParam", "name");
+    throw xtl::make_null_argument_exception ("sound::low_level::OpenALDevice::GetStringParam", "name");
 
   if (!xstrcmp (name, "al_distance_model")) 
   {
@@ -603,7 +603,7 @@ const char* OpenALDevice::GetStringParam (const char* name)
     return openal::get_al_constant_name (context.alGetInteger (AL_DISTANCE_MODEL));
   }
   else
-    raise_invalid_argument ("sound::low_level::OpenALDevice::GetStringParam", "name", name);
+    throw xtl::make_argument_exception ("sound::low_level::OpenALDevice::GetStringParam", "name", name);
 
   return "";
 }
@@ -626,7 +626,7 @@ ALuint OpenALDevice::AllocateSourceBuffer ()
   context.alGenBuffers (1, &buffer);
   
   if (buffer == WRONG_BUFFER_ID)
-    throw OpenALGenBufferException ();
+    throw xtl::format_exception<OpenALException> ("sound::low_level::OpenALDevice::AllocateSourceBuffer", "No enough buffers");
 
   return buffer;
 }

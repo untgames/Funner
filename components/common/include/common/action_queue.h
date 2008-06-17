@@ -1,6 +1,7 @@
 #ifndef COMMONLIB_ACTION_QUEUE_HEADER
 #define COMMONLIB_ACTION_QUEUE_HEADER
 
+#include <cstddef>
 #include <xtl/functional_fwd>
 
 namespace common

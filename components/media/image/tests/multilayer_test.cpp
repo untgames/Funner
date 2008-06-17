@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <common/exception.h>
-#include <common/file.h>
-#include <media/image.h>
-#include <xtl/functional>
+#include "shared.h"
 
 using namespace media;
 using namespace common;

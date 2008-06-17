@@ -10,8 +10,8 @@
 #include <xtl/function.h>
 #include <xtl/signal.h>
 #include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
 #include <syslib/window.h>
-#include <common/exception.h>
 #include <media/sound.h>
 #include <media/sound_declaration.h>
 
@@ -127,9 +127,9 @@ struct SoundManager::Impl
           PlaySound  (*(i->first), i->second->cur_position);
         }
     }
-    catch (Exception& exception)
+    catch (xtl::exception& exception)
     {
-      exception.Touch ("sound::low_level::SoundManager::SoundManager");
+      exception.touch ("sound::low_level::SoundManager::SoundManager");
       throw;
     }
   }
@@ -514,7 +514,7 @@ void SoundManager::ForEachEmitter (const ConstEmitterHandler& emitter_handler) c
 void SoundManager::ForEachEmitter (const char* type, const EmitterHandler& emitter_handler)
 {
   if (!type)
-    raise_null_argument ("sound::SoundManager::ForEachEmitter", "type");
+    throw xtl::make_null_argument_exception ("sound::SoundManager::ForEachEmitter", "type");
 
   for (EmitterSet::iterator i = impl->emitters.begin (); i != impl->emitters.end (); ++i)
    if (!strcmp (type, i->second->sound_declaration->Type ()))
@@ -524,7 +524,7 @@ void SoundManager::ForEachEmitter (const char* type, const EmitterHandler& emitt
 void SoundManager::ForEachEmitter (const char* type, const ConstEmitterHandler& emitter_handler) const
 {
   if (!type)
-    raise_null_argument ("sound::SoundManager::ForEachEmitter", "type");
+    throw xtl::make_null_argument_exception ("sound::SoundManager::ForEachEmitter", "type");
 
   for (EmitterSet::iterator i = impl->emitters.begin (); i != impl->emitters.end (); ++i)
    if (!strcmp (type, i->second->sound_declaration->Type ()))

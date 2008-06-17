@@ -70,7 +70,7 @@ const char* Light::Id () const
 void Light::SetId (const char* id)
 {
   if (!id)
-    raise_null_argument ("media::collada::Light::SetId", "id");
+    throw xtl::make_null_argument_exception ("media::collada::Light::SetId", "id");
     
   impl->id = id;
 }
@@ -94,7 +94,7 @@ void Light::SetType (LightType type)
     case LightType_Direct:
       break;
     default:
-      raise_invalid_argument ("media::collada::Light::SetType", "type", type);
+      throw xtl::make_argument_exception ("media::collada::Light::SetType", "type", type);
       break;
   }
   
@@ -122,7 +122,7 @@ void Light::SetColor (const vec3f& color)
 void Light::SetParam (LightParam param, float value)
 {
   if (param < 0 || param >= LightParam_Num)
-    raise_invalid_argument ("media::collada::Light::SetParam", "param", param);
+    throw xtl::make_argument_exception ("media::collada::Light::SetParam", "param", param);
     
   impl->params [param] = value;
 }
@@ -130,7 +130,7 @@ void Light::SetParam (LightParam param, float value)
 float Light::Param (LightParam param) const
 {
   if (param < 0 || param >= LightParam_Num)
-    raise_invalid_argument ("media::collada::Light::Param", "param", param);
+    throw xtl::make_argument_exception ("media::collada::Light::Param", "param", param);
     
   return impl->params [param];
 }

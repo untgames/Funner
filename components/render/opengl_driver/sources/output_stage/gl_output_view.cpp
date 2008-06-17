@@ -18,7 +18,7 @@ View::View (const ContextManager& context_manager, ITexture* in_texture, const V
     //проверка корректности текстуры и совместимости с текущим контекстом
 
   if (!texture)
-    raise_null_argument (METHOD_NAME, "texture");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "texture");
 
   cast_object<ContextObject> (GetContextManager (), in_texture, METHOD_NAME, "texture");
 
@@ -29,7 +29,7 @@ View::View (const ContextManager& context_manager, ITexture* in_texture, const V
   texture->GetDesc (texture_desc);
 
   if (in_desc.layer >= texture_desc.layers)
-    raise_out_of_range (METHOD_NAME, "desc.layer", in_desc.layer, texture_desc.layers);
+    throw xtl::make_range_exception (METHOD_NAME, "desc.layer", in_desc.layer, texture_desc.layers);
     
     //копирование флагов биндинга
     

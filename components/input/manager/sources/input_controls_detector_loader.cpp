@@ -15,14 +15,14 @@ void controls_detector_loader (const char* file_name, ControlsDetector& target_d
 
   for (size_t i = 0; i < log.MessagesCount (); i++)
     if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
-      raise <Exception> (METHOD_NAME, log.Message(0));
+      throw xtl::format_operation_exception (METHOD_NAME, log.Message(0));
 
   if (!iter)
-    raise<Exception> (METHOD_NAME, "Invalid file format, no root 'ControlsDetector' tag");
+    throw xtl::format_operation_exception (METHOD_NAME, "Invalid file format, no root 'ControlsDetector' tag");
 
   for (Parser::NamesakeIterator i = iter->First ("Filter"); i; i++)
     if (!test (i, "Action") || !test (i, "InputEventMask") || !test (i, "Replacement"))
-      raise<Exception> (METHOD_NAME, "Incorrect file format, one of tag property missing at line %u", i->LineNumber ());
+      throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, one of tag property missing at line %u", i->LineNumber ());
 
   for (Parser::NamesakeIterator i = iter->First ("Filter"); i; i++)
   {

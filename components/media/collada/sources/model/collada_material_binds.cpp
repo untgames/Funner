@@ -76,10 +76,10 @@ const char* MaterialBinds::FindMaterial (const Surface& surface) const //nothrow
 void MaterialBinds::SetMaterial (const char* symbol, const char* material)
 {
   if (!symbol)
-    raise_null_argument ("media::collada::MaterialBinds::SetMaterial", "symbol");    
+    throw xtl::make_null_argument_exception ("media::collada::MaterialBinds::SetMaterial", "symbol");    
 
   if (!material)
-    raise_null_argument ("media::collada::MaterialBinds::SetMaterial", "material");
+    throw xtl::make_null_argument_exception ("media::collada::MaterialBinds::SetMaterial", "material");
 
   impl->materials [symbol] = material;
 }
@@ -119,13 +119,13 @@ const char* MaterialBinds::TexcoordChannelName (const char* material, const char
 void MaterialBinds::SetTexcoordChannelName (const char* material, const char* texture_channel, const char* surface_channel)
 {
   if (!material)
-    raise_null_argument ("media::collada::MaterialBinds::SetTexcoordChannelName", "material");
+    throw xtl::make_null_argument_exception ("media::collada::MaterialBinds::SetTexcoordChannelName", "material");
 
   if (!texture_channel)
-    raise_null_argument ("media::collada::MaterialBinds::SetTexcoordChannelName", "texture_channel");
+    throw xtl::make_null_argument_exception ("media::collada::MaterialBinds::SetTexcoordChannelName", "texture_channel");
 
   if (!surface_channel)
-    raise_null_argument ("media::collada::MaterialBinds::SetTexcoordChannelName", "surface_channel");
+    throw xtl::make_null_argument_exception ("media::collada::MaterialBinds::SetTexcoordChannelName", "surface_channel");
     
   size_t hash = get_hash (material, texture_channel);
     
@@ -142,10 +142,10 @@ void MaterialBinds::SetTexcoordChannelName (const char* material, const char* te
 void MaterialBinds::RemoveTexcoordChannelName (const char* material, const char* texture_channel)
 {
   if (!material)
-    raise_null_argument ("media::collada::MaterialBinds::RemoveTexcoordChannelName", "material");
+    throw xtl::make_null_argument_exception ("media::collada::MaterialBinds::RemoveTexcoordChannelName", "material");
 
   if (!texture_channel)
-    raise_null_argument ("media::collada::MaterialBinds::RemoveSurfaceChannelName", "texture_channel");
+    throw xtl::make_null_argument_exception ("media::collada::MaterialBinds::RemoveSurfaceChannelName", "texture_channel");
     
   size_t hash = get_hash (material, texture_channel);
   

@@ -1,5 +1,3 @@
-#include <bv/axis_aligned_box.h>
-
 #include "shared.h"
 
 using namespace script;
@@ -59,9 +57,9 @@ void bind_axis_aligned_box_library (Environment& environment)
     
     //регистрация операций
 
-  lib.Register ("set_minimum", make_invoker (implicit_cast<void (axis_aligned_box<T>::*) (const axis_aligned_box<T>::vec_type&)> 
+  lib.Register ("set_minimum", make_invoker (implicit_cast<void (axis_aligned_box<T>::*) (const typename axis_aligned_box<T>::vec_type&)> 
                                             (&axis_aligned_box<T>::set_minimum)));
-  lib.Register ("set_maximum", make_invoker (implicit_cast<void (axis_aligned_box<T>::*) (const axis_aligned_box<T>::vec_type&)> 
+  lib.Register ("set_maximum", make_invoker (implicit_cast<void (axis_aligned_box<T>::*) (const typename axis_aligned_box<T>::vec_type&)> 
                                             (&axis_aligned_box<T>::set_maximum)));
   lib.Register ("get_minimum", make_invoker (&axis_aligned_box<T>::minimum));
   lib.Register ("get_maximum", make_invoker (&axis_aligned_box<T>::maximum));
@@ -72,7 +70,7 @@ void bind_axis_aligned_box_library (Environment& environment)
   lib.Register ("get_empty",  make_invoker (&axis_aligned_box<T>::empty));
 
   lib.Register ("SetExtents", make_invoker (implicit_cast<void (axis_aligned_box<T>::*)
-               (const axis_aligned_box<T>::vec_type&, const axis_aligned_box<T>::vec_type&)> (&axis_aligned_box<T>::set_extents)));
+               (const typename axis_aligned_box<T>::vec_type&, const typename axis_aligned_box<T>::vec_type&)> (&axis_aligned_box<T>::set_extents)));
 
   lib.Register ("GetCorner", make_invoker (&axis_aligned_box<T>::corner));
 
@@ -92,7 +90,7 @@ void bind_axis_aligned_box_library (Environment& environment)
 
     //регистрация типов данных
 
-  environment.RegisterType<axis_aligned_box<T>> (BV_AXIS_ALIGNED_BOX_LIBRARY);
+  environment.RegisterType<axis_aligned_box<T> > (BV_AXIS_ALIGNED_BOX_LIBRARY);
 }
 
 }

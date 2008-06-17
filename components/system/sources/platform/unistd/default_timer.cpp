@@ -1,6 +1,4 @@
-#include <time.h>
-#include <platform/platform.h>
-#include <common/exception.h>
+#include "shared.h"
 
 using namespace syslib;
 
@@ -21,10 +19,10 @@ void Platform::Sleep (size_t miliseconds)
 
 Platform::timer_t Platform::CreateTimer (size_t, TimerHandler, void*)
 {
-  common::raise_not_implemented ("syslib::DefaultPlatform::CreateTimer");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::CreateTimer");
 }
 
 void Platform::KillTimer (timer_t)
 {
-  common::raise_not_implemented ("syslib::DefaultPlatform::KillTimer");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::KillTimer");
 }

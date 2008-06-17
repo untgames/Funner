@@ -11,29 +11,29 @@ StdFile::StdFile (const char* file_name,filemode_t mode_flags,size_t buffer_size
   { }
 
 InputFile::InputFile (const char* file_name)
-  : StdFile (file_name,FILE_MODE_READ_ONLY)
+  : StdFile (file_name,FileMode_ReadOnly)
   { }
   
 InputFile::InputFile (const char* file_name,size_t buffer_size)
-  : StdFile (file_name,FILE_MODE_READ_ONLY,buffer_size)
+  : StdFile (file_name,FileMode_ReadOnly,buffer_size)
   { }
 
 OutputFile::OutputFile (const char* file_name)
-  : StdFile (file_name,FILE_MODE_WRITE_ONLY)
+  : StdFile (file_name,FileMode_WriteOnly)
   { }
 
 OutputFile::OutputFile (const char* file_name,size_t buffer_size)
-  : StdFile (file_name,FILE_MODE_WRITE_ONLY,buffer_size)
+  : StdFile (file_name,FileMode_WriteOnly,buffer_size)
   { }
 
 AppendFile::AppendFile (const char* file_name)
-  : StdFile (file_name,FILE_MODE_READ_WRITE|FILE_MODE_CREATE)
+  : StdFile (file_name,FileMode_ReadWrite|FileMode_Create)
 { 
   Seek (Size ());
 }
 
 AppendFile::AppendFile (const char* file_name,size_t buffer_size)
-  : StdFile (file_name,FILE_MODE_READ_WRITE|FILE_MODE_CREATE,buffer_size)
+  : StdFile (file_name,FileMode_ReadWrite|FileMode_Create,buffer_size)
 {
   Seek (Size ());
 }

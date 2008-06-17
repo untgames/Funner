@@ -22,8 +22,8 @@
 #include <xtl/uninitialized_storage.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/string.h>
+#include <xtl/common_exceptions.h>
 
-#include <common/exception.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 #include <common/singleton.h>

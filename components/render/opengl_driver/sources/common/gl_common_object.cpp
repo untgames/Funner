@@ -21,7 +21,7 @@ Object::Object ()
   if (!id)
   {
     --current_object_id;
-    raise_not_supported ("render::low_level::opengl::Object::Object", "Too many object created. No enough identifiers");
+    throw xtl::format_not_supported_exception ("render::low_level::opengl::Object::Object", "Too many object created. No enough identifiers");
   }
 }
 

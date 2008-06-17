@@ -114,7 +114,7 @@ void EventsSource::Impl::Connect (const char* driver_name_mask, const char* devi
         }
     }
 
-  raise<Exception> ("input::EventSource::Impl::Connect", "Can't connect to any device with driver mask '%s' and device mask '%s'", driver_name_mask, device_name_mask);
+  throw xtl::format_operation_exception ("input::EventSource::Impl::Connect", "Can't connect to any device with driver mask '%s' and device mask '%s'", driver_name_mask, device_name_mask);
 }
 
 void EventsSource::Impl::Disconnect ()

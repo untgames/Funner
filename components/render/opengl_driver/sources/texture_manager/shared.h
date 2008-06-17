@@ -1,10 +1,9 @@
 #ifndef RENDER_GL_DRIVER_TEXTURE_SHARED_HEADER
 #define RENDER_GL_DRIVER_TEXTURE_SHARED_HEADER
 
-#include <math.h>
-#include <float.h>
+#include <cmath>
+#include <cfloat>
 
-#include <common/exception.h>
 #include <common/hash.h>
 
 #include <xtl/trackable_ptr.h>
@@ -12,6 +11,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/shared_ptr.h>
 #include <xtl/array>
+#include <xtl/common_exceptions.h>
 
 #include <render/low_level/utils.h>
 

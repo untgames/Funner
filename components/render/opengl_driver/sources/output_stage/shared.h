@@ -3,23 +3,23 @@
 
 #include <memory.h>
 
-#include <render/low_level/utils.h>
-
-#include <shared/output_stage.h>
-#include <shared/context_object.h>
-#include <shared/texture_manager.h>
-#include <shared/platform/swap_chain_manager.h>
-
 #include <stl/list>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/trackable_ptr.h>
 #include <xtl/bind.h>
 #include <xtl/uninitialized_storage.h>
+#include <xtl/common_exceptions.h>
 
-#include <common/exception.h>
 #include <common/strlib.h>
 #include <common/hash.h>
+
+#include <render/low_level/utils.h>
+
+#include <shared/output_stage.h>
+#include <shared/context_object.h>
+#include <shared/texture_manager.h>
+#include <shared/platform/swap_chain_manager.h>
 
 namespace render
 {

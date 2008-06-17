@@ -1,8 +1,5 @@
-#include <xtl/trackable_ptr.h>
-
 #include "shared.h"
 
-using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 

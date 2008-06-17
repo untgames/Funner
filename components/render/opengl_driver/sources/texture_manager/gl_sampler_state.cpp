@@ -36,7 +36,7 @@ GLenum get_gl_texture_target (TexTargetId tex_target)
     case TexTargetId_Texture3D:        return GL_TEXTURE_3D;
     case TexTargetId_TextureCubemap:   return GL_TEXTURE_CUBE_MAP_ARB;
     default:
-      raise_invalid_argument ("get_gl_texture_target", "tex_target", tex_target);
+      throw xtl::make_argument_exception ("get_gl_texture_target", "tex_target", tex_target);
       return 0;
   }
 }
@@ -51,7 +51,7 @@ TexTargetId get_target_id (GLenum tex_target)
     case GL_TEXTURE_3D:            return TexTargetId_Texture3D;
     case GL_TEXTURE_CUBE_MAP_ARB:  return TexTargetId_TextureCubemap;
     default:
-      raise_invalid_argument ("get_TexTargetId", "tex_target", tex_target);
+      throw xtl::make_argument_exception ("get_TexTargetId", "tex_target", tex_target);
       return (TexTargetId)0;
   }
 }
@@ -81,11 +81,11 @@ SamplerState::~SamplerState ()
 
     CheckErrors ("");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SamplerState::~SamplerState");
+    exception.touch ("render::low_level::opengl::SamplerState::~SamplerState");
 
-    LogPrintf ("%s", exception.Message ());
+    LogPrintf ("%s", exception.what ());
   }
   catch (std::exception& exception)
   {
@@ -140,13 +140,13 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   const ContextCaps& caps = GetCaps ();      
 
   if (in_desc.max_anisotropy > caps.max_anisotropy) // && caps.has_ext_texture_filter_anisotropic)
-    raise_not_supported (METHOD_NAME, "Can't set desc.max_anisotropy=%u (max anisotropy level %u)", in_desc.max_anisotropy, caps.max_anisotropy);
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set desc.max_anisotropy=%u (max anisotropy level %u)", in_desc.max_anisotropy, caps.max_anisotropy);
     
   if (in_desc.max_anisotropy < 1.0f)
-    raise_invalid_argument (METHOD_NAME, "desc.max_anisotropy", in_desc.max_anisotropy, "Maximum anisotropy must be >= 1.0");
+    throw xtl::make_argument_exception (METHOD_NAME, "desc.max_anisotropy", in_desc.max_anisotropy, "Maximum anisotropy must be >= 1.0");
 
   if (!caps.has_ext_texture3d && in_desc.wrap_w != TexcoordWrap_Default)
-    raise_not_supported (METHOD_NAME, "Can't set desc.wrap_w=%s (GL_EXT_texture3D extension not supported)", get_name (in_desc.wrap_w));
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set desc.wrap_w=%s (GL_EXT_texture3D extension not supported)", get_name (in_desc.wrap_w));
     
   switch (in_desc.comparision_function)
   {
@@ -155,7 +155,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     case CompareMode_LessEqual:
     case CompareMode_GreaterEqual:
       if (!caps.has_arb_shadow)
-        raise_not_supported (METHOD_NAME, "Can't set desc.comparision_function=%s (GL_ARB_shadow extension not supported)", get_name (in_desc.comparision_function));
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set desc.comparision_function=%s (GL_ARB_shadow extension not supported)", get_name (in_desc.comparision_function));
 
       break;  
     case CompareMode_AlwaysFail:
@@ -164,29 +164,29 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     case CompareMode_Less:
     case CompareMode_Greater:
       if (!caps.has_ext_shadow_funcs)
-        raise_not_supported (METHOD_NAME, "Can't set desc.comparision_function=%s (GL_EXT_shadow_funcs extension not supported)", get_name (in_desc.comparision_function));
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set desc.comparision_function=%s (GL_EXT_shadow_funcs extension not supported)", get_name (in_desc.comparision_function));
 
       break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.comparision_function", in_desc.comparision_function);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.comparision_function", in_desc.comparision_function);
       break;
   }  
     
   if (!caps.has_sgis_texture_lod)
   {
     if (in_desc.min_lod != 0.0f)
-      raise_not_supported (METHOD_NAME, "Can't set desc.min_lod=%g (GL_SGIS_texture_lod extension not supported)", in_desc.min_lod);
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set desc.min_lod=%g (GL_SGIS_texture_lod extension not supported)", in_desc.min_lod);
 
     if (in_desc.max_lod != FLT_MAX)
-      raise_not_supported (METHOD_NAME, "Can't set desc.max_lod=%g (GL_SGIS_texture_lod extension not supported)", in_desc.max_lod);
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set desc.max_lod=%g (GL_SGIS_texture_lod extension not supported)", in_desc.max_lod);
   }
 
   if (in_desc.max_lod < in_desc.min_lod)
-    raise<ArgumentException> (METHOD_NAME, "desc.max_lod must be gerater or equal than desc.min_lod (desc.min_lod=%g desc.max_lod=%g)",
+    throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "desc.max_lod must be gerater or equal than desc.min_lod (desc.min_lod=%g desc.max_lod=%g)",
       in_desc.min_lod, in_desc.max_lod);
 
   if (in_desc.mip_lod_bias != 0.0f)
-    raise_not_supported (METHOD_NAME, "desc.mip_lod_bias=%g not supported", in_desc.mip_lod_bias);    
+    throw xtl::format_not_supported_exception (METHOD_NAME, "desc.mip_lod_bias=%g not supported", in_desc.mip_lod_bias);    
 
     //преобразование дескриптора сэмплера    
 
@@ -211,7 +211,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     case TexMinFilter_Default:
     case TexMinFilter_LinearMipLinear: gl_min_filter = GL_LINEAR_MIPMAP_LINEAR; break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.min_filter", in_desc.min_filter);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.min_filter", in_desc.min_filter);
       break;
   }
   
@@ -221,7 +221,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     case TexMagFilter_Default:
     case TexMagFilter_Linear: gl_mag_filter = GL_LINEAR; break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.mag_filter", in_desc.mag_filter);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.mag_filter", in_desc.mag_filter);
       break;
   }
 
@@ -237,14 +237,14 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
         if (caps.has_arb_texture_mirrored_repeat)
           gl_wrap [i] = GL_MIRRORED_REPEAT; 
         else
-          raise_not_supported (METHOD_NAME, "Can't set %s=%s (GL_ARB_texture_mirrored_repeat not supported)", wrap_name [i], get_name (wrap [i]));
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set %s=%s (GL_ARB_texture_mirrored_repeat not supported)", wrap_name [i], get_name (wrap [i]));
 
         break;
       case TexcoordWrap_ClampToBorder: 
         if (caps.has_arb_texture_border_clamp)
           gl_wrap [i] = GL_CLAMP_TO_BORDER;
         else
-          raise_not_supported (METHOD_NAME, "Can't set %s=%s (GL_ARB_texture_border_clamp not supported)", wrap_name [i], get_name (wrap [i]));
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set %s=%s (GL_ARB_texture_border_clamp not supported)", wrap_name [i], get_name (wrap [i]));
           
         break;
       case TexcoordWrap_Clamp:
@@ -254,7 +254,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
         gl_wrap [i] = GL_REPEAT;
         break;
       default:
-        raise_invalid_argument (METHOD_NAME, wrap_name [i], wrap [i]);
+        throw xtl::make_argument_exception (METHOD_NAME, wrap_name [i], wrap [i]);
         break;
     }
   }
@@ -270,7 +270,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     case CompareMode_Greater:      gl_comparision_function = GL_GREATER; break;
     case CompareMode_GreaterEqual: gl_comparision_function = GL_GEQUAL; break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.comparision_function", in_desc.comparision_function);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.comparision_function", in_desc.comparision_function);
       break;
   }
 

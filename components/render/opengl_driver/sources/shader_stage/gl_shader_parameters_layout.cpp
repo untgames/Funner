@@ -1,8 +1,5 @@
-#include <stl/algorithm>
-
 #include "shared.h"
 
-using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
@@ -37,21 +34,21 @@ void ProgramParametersLayout::SetDesc (const ProgramParametersLayoutDesc& in_des
   static const char* METHOD_NAME = "render::low_level::opengl::ProgramParametersLayout::SetDesc";
 
   if (!in_desc.parameters)
-    raise_null_argument (METHOD_NAME, "in_desc.parameters");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "in_desc.parameters");
 
   for (size_t i = 0; i < in_desc.parameters_count; i++)
   {
     if (!in_desc.parameters[i].count)
-      raise <ArgumentNullException> (METHOD_NAME, "Null argument in_desc.parameters[%u].count", i);
+      throw xtl::format_exception<xtl::null_argument_exception> (METHOD_NAME, "Null argument in_desc.parameters[%u].count", i);
 
     if (!in_desc.parameters[i].name)
-      raise <ArgumentNullException> (METHOD_NAME, "Null argument in_desc.parameters[%u].name", i);
+      throw xtl::format_exception<xtl::null_argument_exception> (METHOD_NAME, "Null argument in_desc.parameters[%u].name", i);
   
     if (in_desc.parameters[i].slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
-      raise_out_of_range (METHOD_NAME, "in_desc.parameters.slot", in_desc.parameters[i].slot, (size_t)0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
+      throw xtl::make_range_exception (METHOD_NAME, "in_desc.parameters.slot", in_desc.parameters[i].slot, (size_t)0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
     if (in_desc.parameters[i].type >= ProgramParameterType_Num)
-      raise <ArgumentException> (METHOD_NAME, "Invalid argument value in_desc.parameters[%u].type", i);
+      throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument value in_desc.parameters[%u].type", i);
   }
 
   stl::vector<const ProgramParameter*> temp_parameters (in_desc.parameters_count);
@@ -104,7 +101,7 @@ size_t ProgramParametersLayout::GroupsCount ()
 ProgramParameterGroup& ProgramParametersLayout::ParametersGroup (size_t index)
 {
   if (index >= parameter_groups.size ())
-    raise_out_of_range ("render::low_level::opengl::ProgramParametersLayout::ParametersGroup", "index", index, 0u, parameter_groups.size ());
+    throw xtl::make_range_exception ("render::low_level::opengl::ProgramParametersLayout::ParametersGroup", "index", index, 0u, parameter_groups.size ());
 
   return parameter_groups[index];
 }

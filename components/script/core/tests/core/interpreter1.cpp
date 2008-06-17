@@ -10,7 +10,9 @@ int main ()
     
     invoke<void> (interpreter, "f1", 1, 2.0f, "Hello world");
     
-    printf ("result: '%s'\n", invoke<const char*> (interpreter, "f2", xtl::shared_ptr<X> (new Y), xtl::ref (A ("A1"))));
+    A a ("A1");
+    
+    printf ("result: '%s'\n", invoke<const char*> (interpreter, "f2", xtl::shared_ptr<X> (new Y), xtl::ref (a)));
   }
   catch (xtl::bad_any_cast& exception)
   {

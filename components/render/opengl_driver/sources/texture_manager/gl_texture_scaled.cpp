@@ -29,7 +29,7 @@ ScaledTexture::ScaledTexture
   shadow_texture   = dynamic_cast<BindableTexture*> (texture_manager.CreateTexture (temp_desc));
 
   if (!shadow_texture.get ())
-    raise_invalid_operation ("render::low_level::opengl::ScaledTexture::ScaledTexture", "TextureManager::CreateTexture returned texture with incompatible type");
+    throw xtl::format_operation_exception ("render::low_level::opengl::ScaledTexture::ScaledTexture", "TextureManager::CreateTexture returned texture with incompatible type");
 
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
   vertical_scale   = (float)scaled_height / (float)original_desc.height;  
@@ -127,9 +127,9 @@ void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y,
       shadow_texture->SetData (layer, mip_level, x, y, scaled_width, scaled_height, source_format, scaled_buffer.data ());
     }  
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::ScaledTexture::SetData");
+    exception.touch ("render::low_level::opengl::ScaledTexture::SetData");
     throw;
   }
 }
@@ -139,7 +139,7 @@ void ScaledTexture::GetData (size_t layer, size_t mip_level, size_t x, size_t y,
   const char* METHOD_NAME = "render::low_level::opengl::TextureEmulatedNPOT::GetData";
 
   if (is_compressed (target_format))
-    raise_not_supported (METHOD_NAME, "Can't get data in format %s from scaled texture", get_name (target_format));
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't get data in format %s from scaled texture", get_name (target_format));
 
   size_t scaled_width  = (size_t)ceil ((float)width * horisontal_scale),
          scaled_height = (size_t)ceil ((float)height * vertical_scale);
@@ -150,9 +150,9 @@ void ScaledTexture::GetData (size_t layer, size_t mip_level, size_t x, size_t y,
   {
     shadow_texture->GetData (layer, mip_level, x, y, scaled_width, scaled_height, target_format, scaled_buffer.data ());
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch (METHOD_NAME);
+    exception.touch (METHOD_NAME);
     throw;
   }
 

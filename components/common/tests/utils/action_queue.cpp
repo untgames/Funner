@@ -1,9 +1,9 @@
-#include <stdio.h>
+#include <cstdio>
 
 #include <xtl/function.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/action_queue.h>
-#include <common/exception.h>
 
 using namespace common;
 
@@ -13,7 +13,7 @@ void action_handler (size_t action_id)
   {
     case 0: printf ("action 0 executed.\n"); break;
     case 1: printf ("action 1 executed.\n"); break;
-    case 2: raise <Exception> ("action_handler", "Exception occured during executing of action 2");
+    case 2: throw xtl::format_exception<xtl::bad_operation> ("action_handler", "Exception occured during executing of action 2");
   }
 }
 

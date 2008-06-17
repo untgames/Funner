@@ -1,16 +1,16 @@
 #ifndef RENDER_GL_DRIVER_INPUT_STAGE_SHARED_HEADER
 #define RENDER_GL_DRIVER_INPUT_STAGE_SHARED_HEADER
 
-#include <common/exception.h>
-#include <common/singleton.h>
+#include <stl/vector>
+#include <stl/algorithm>
 
 #include <xtl/uninitialized_storage.h>
 #include <xtl/trackable_ptr.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/array>
+#include <xtl/common_exceptions.h>
 
-#include <stl/vector>
-#include <stl/algorithm>
+#include <common/singleton.h>
 
 #include <render/low_level/utils.h>
 

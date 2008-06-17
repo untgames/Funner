@@ -24,7 +24,7 @@ struct ActionMap::Impl : public xtl::reference_counter
       HandlerMap::iterator iter = handlers.find (event_id);
 
       if (iter != handlers.end ())
-        raise_invalid_argument ("input::ActionMap::Add", "event_id", event_id,
+        throw xtl::make_argument_exception ("input::ActionMap::Add", "event_id", event_id,
                               "Event handler for this event id has been already added");
 
       handlers.insert_pair (event_id, handler);
@@ -110,7 +110,7 @@ ActionMap& ActionMap::operator = (const ActionMap& source)
 void ActionMap::Add (const char* event_id, const EventHandler& handler)
 {
   if (!event_id)
-    raise_null_argument ("input::ActionMap::Add", "event_id");
+    throw xtl::make_null_argument_exception ("input::ActionMap::Add", "event_id");
 
   impl->Add (event_id, handler);
 }
@@ -118,7 +118,7 @@ void ActionMap::Add (const char* event_id, const EventHandler& handler)
 void ActionMap::Remove (const char* event_id)
 {
   if (!event_id)
-    raise_null_argument ("input::ActionMap::Remove", "event_id");
+    throw xtl::make_null_argument_exception ("input::ActionMap::Remove", "event_id");
 
   impl->Remove (event_id);
 }
@@ -139,7 +139,7 @@ void ActionMap::Clear ()
 void ActionMap::ProcessEvent (const char* event) const
 {
   if (!event)
-    raise_null_argument ("input::ActionMap::ProcessEvent", "event");
+    throw xtl::make_null_argument_exception ("input::ActionMap::ProcessEvent", "event");
 
   impl->ProcessEvent (event);
 }

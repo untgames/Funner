@@ -34,9 +34,9 @@ EventTranslator::EventTranslator (const char* input_event, const char* event_rep
   split_event (input_event, event_wildcard);
 
   if (event_wildcard.empty ())
-    raise_invalid_argument ("input::EventTranslator::EventTranslator", "input_event", input_event, "Empty input event");
+    throw xtl::make_argument_exception ("input::EventTranslator::EventTranslator", "input_event", input_event, "Empty input event");
   if (replacement_tokens.empty ())
-    raise_invalid_argument ("input::EventTranslator::EventTranslator", "event_replacement", event_replacement, "Empty event replacement");
+    throw xtl::make_argument_exception ("input::EventTranslator::EventTranslator", "event_replacement", event_replacement, "Empty event replacement");
 }
 
 EventTranslator::~EventTranslator ()

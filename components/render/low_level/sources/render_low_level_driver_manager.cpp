@@ -1,13 +1,13 @@
-#include <render/low_level/driver.h>
-
-#include <common/singleton.h>
-#include <common/strlib.h>
-#include <common/exception.h>
-
 #include <stl/hash_map>
 #include <stl/string>
 
 #include <xtl/intrusive_ptr.h>
+#include <xtl/common_exceptions.h>
+
+#include <render/low_level/driver.h>
+
+#include <common/singleton.h>
+#include <common/strlib.h>
 
 using namespace render::low_level;
 using namespace common;
@@ -69,15 +69,15 @@ class DriverManagerImpl
 void DriverManagerImpl::RegisterDriver (const char* name, IDriver* driver)
 {
   if (!name)
-    raise_null_argument ("render::low_level::DriverManager::RegisterDriver", "name");
+    throw xtl::make_null_argument_exception ("render::low_level::DriverManager::RegisterDriver", "name");
 
   if (!driver)
-    raise_null_argument ("render::low_level::DriverManager::RegisterDriver", "driver");
+    throw xtl::make_null_argument_exception ("render::low_level::DriverManager::RegisterDriver", "driver");
 
   DriverMap::iterator iter = drivers.find (name);
 
   if (iter != drivers.end ())
-    raise_invalid_argument ("render::low_level::DriverManager::RegisterDriver", "name", name,
+    throw xtl::make_argument_exception ("render::low_level::DriverManager::RegisterDriver", "name", name,
                           "Driver with this name has been already registered");
 
   drivers.insert_pair (name, driver);

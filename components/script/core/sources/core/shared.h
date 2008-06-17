@@ -8,8 +8,7 @@
 #include <xtl/iterator.h>
 #include <xtl/signal.h>
 #include <xtl/shared_ptr.h>
-
-#include <common/exception.h>
+#include <xtl/common_exceptions.h>
 
 #include <script/environment.h>
 #include <script/bind.h>

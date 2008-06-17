@@ -1,7 +1,7 @@
 #include <sound/manager.h>
 #include <stl/string>
 #include <xtl/signal.h>
-#include <common/exception.h>
+#include <xtl/common_exceptions.h>
 
 using namespace sound;
 using namespace math;
@@ -89,7 +89,7 @@ Emitter::~Emitter ()
 void Emitter::SetSource (const char* source_name)
 {
   if (!source_name)
-    raise_null_argument ("sound::Emitter::SetSource", "source_name");
+    throw xtl::make_null_argument_exception ("sound::Emitter::SetSource", "source_name");
 
   impl->SetSource (source_name);
 }
@@ -202,7 +202,7 @@ bool Emitter::IsActive () const
 xtl::connection Emitter::RegisterEventHandler (EmitterEvent event, const EventHandler& handler)
 {
   if (event < 0 || event >= EmitterEvent_Num)
-    raise_invalid_argument ("sound::Emitter::RegisterEventHandler", "event", event);
+    throw xtl::make_argument_exception ("sound::Emitter::RegisterEventHandler", "event", event);
     
   return impl->signals [event].connect (handler);
 }

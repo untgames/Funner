@@ -1,5 +1,4 @@
-#include <platform/platform.h>
-#include <common/exception.h>
+#include "shared.h"
 
 using namespace syslib;
 
@@ -12,7 +11,7 @@ namespace
 
 void raise (const char* method_name)
 {
-  common::raise_not_supported (method_name, "No window support for default platform");
+  throw xtl::format_not_supported_exception (method_name, "No window support for default platform");
 }
 
 }
@@ -42,19 +41,9 @@ void Platform::DestroyWindow (window_t)
     Заголовок окна
 */
 
-void Platform::SetWindowTitle (window_t, const char*)
-{
-  raise ("syslib::DefaultPlatform::SetWindowTitle");
-}
-
 void Platform::SetWindowTitle (window_t, const wchar_t*)
 {
   raise ("syslib::DefaultPlatform::SetWindowTitle");
-}
-
-void Platform::GetWindowTitle (window_t, size_t, char*)
-{
-  raise ("syslib::DefaultPlatform::GetWindowTitle");
 }
 
 void Platform::GetWindowTitle (window_t, size_t, wchar_t*)
@@ -95,6 +84,15 @@ bool Platform::GetWindowFlag (window_t, WindowFlag)
   raise ("syslib::DefaultPlatform::GetWindowFlag");
   
   return false;
+}
+
+/*
+    Обновление окна
+*/
+
+void Platform::InvalidateWindow (window_t)
+{
+  raise ("syslib::DefaultPlatform::InvalidateWindow");    
 }
 
 /*

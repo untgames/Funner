@@ -1,7 +1,4 @@
-#include <sg/visual_model.h>
-#include <stl/string>
-#include <xtl/visitor.h>
-#include <common/exception.h>
+#include "shared.h"
 
 using namespace scene_graph;
 using namespace stl;
@@ -45,7 +42,7 @@ VisualModel::Pointer VisualModel::Create ()
 void VisualModel::SetMeshName (const char* name)
 {
   if (!name)
-    raise_null_argument ("scene_graph::VisualModel::SetMeshName", "name");
+    throw xtl::make_null_argument_exception ("scene_graph::VisualModel::SetMeshName", "name");
     
   impl->mesh_name = name;
 }

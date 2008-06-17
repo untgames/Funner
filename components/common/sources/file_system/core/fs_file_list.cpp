@@ -39,7 +39,7 @@ class common::FileListImpl: public xtl::reference_counter
 const FileListItem& FileListImpl::Item (size_t index) const
 {
   if (index >= items.size ())
-    raise_out_of_range ("FileList::Item","index",index,items.size ());
+    throw xtl::make_range_exception ("FileList::Item","index",index,items.size ());
 
   return items [index];
 }

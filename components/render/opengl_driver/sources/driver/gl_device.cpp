@@ -46,7 +46,7 @@ const char* Device::GetName ()
 
 IStatisticsQuery* Device::CreateStatisticsQuery ()
 {
-  raise_not_implemented ("render::low_level::opengl::Device::CreateStatisticsQuery");
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::CreateStatisticsQuery");
   return 0;
 }
 
@@ -60,9 +60,9 @@ IStateBlock* Device::CreateStateBlock (const StateBlockMask& mask)
   {
     return new StateBlock (*this, mask);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateStateBlock");
+    exception.touch ("render::low_level::opengl::Device::CreateStateBlock");
     throw;
   }
 }
@@ -77,9 +77,9 @@ IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
   {
     return input_stage.CreateInputLayout (desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateInputLayout");
+    exception.touch ("render::low_level::opengl::Device::CreateInputLayout");
     throw;
   }
 }
@@ -93,7 +93,7 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc)
     static const size_t BAD_FLAGS = BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil;
 
     if (desc.bind_flags & BAD_FLAGS)
-      raise_invalid_argument ("", "desc.bind_flags", get_name ((BindFlag)desc.bind_flags));
+      throw xtl::make_argument_exception ("", "desc.bind_flags", get_name ((BindFlag)desc.bind_flags));
 
     switch (desc.bind_flags)
     {
@@ -101,13 +101,13 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc)
       case BindFlag_IndexBuffer:    return input_stage.CreateIndexBuffer (desc);
       case BindFlag_ConstantBuffer: return input_stage.CreateConstantBuffer (desc);
       default:
-        raise_not_supported ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
+        throw xtl::format_not_supported_exception ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
         return 0;
     }
   }
-  catch (Exception& e)
+  catch (xtl::exception& e)
   {
-    e.Touch (METHOD_NAME);
+    e.touch (METHOD_NAME);
     throw;
   }
 }
@@ -152,9 +152,9 @@ IProgramParametersLayout* Device::CreateProgramParametersLayout (const ProgramPa
   {
     return shader_stage.CreateProgramParametersLayout (desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateProgramParametersLayout");
+    exception.touch ("render::low_level::opengl::Device::CreateProgramParametersLayout");
     throw;
   }
 }
@@ -165,9 +165,9 @@ IProgram* Device::CreateProgram (size_t shaders_count, const ShaderDesc* shader_
   {
     return shader_stage.CreateProgram (shaders_count, shader_descs, error_log);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateProgram");
+    exception.touch ("render::low_level::opengl::Device::CreateProgram");
     throw;
   }
 }
@@ -212,9 +212,9 @@ ISamplerState* Device::CreateSamplerState (const SamplerDesc& desc)
   {
     return texture_manager.CreateSamplerState (desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateSamplerState");
+    exception.touch ("render::low_level::opengl::Device::CreateSamplerState");
     throw;
   }
 }
@@ -225,7 +225,7 @@ ITexture* Device::CreateTexture (const TextureDesc& desc)
 
   if (!(desc.bind_flags & (BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil)))
   {
-    raise_not_supported (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s",
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s",
       get_name ((BindFlag)desc.bind_flags));
 
     return 0;
@@ -243,9 +243,9 @@ ITexture* Device::CreateTexture (const TextureDesc& desc)
     }
     else return 0;
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch (METHOD_NAME);
+    exception.touch (METHOD_NAME);
     
     throw;
   }
@@ -281,9 +281,9 @@ IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
   {
     return rasterizer_stage.CreateRasterizerState (desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateRasterizerState");
+    exception.touch ("render::low_level::opengl::Device::CreateRasterizerState");
     throw;
   }
 }
@@ -328,9 +328,9 @@ ITexture* Device::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buff
   {
     return output_stage.CreateRenderTargetTexture (swap_chain, buffer_index);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateRenderTargetTexture");
+    exception.touch ("render::low_level::opengl::Device::CreateRenderTargetTexture");
     throw;
   }
 }
@@ -341,9 +341,9 @@ ITexture* Device::CreateDepthStencilTexture (ISwapChain* swap_chain)
   {
     return output_stage.CreateDepthStencilTexture (swap_chain);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateDepthStencilTexture");
+    exception.touch ("render::low_level::opengl::Device::CreateDepthStencilTexture");
     throw;
   }
 }
@@ -354,9 +354,9 @@ IBlendState* Device::CreateBlendState (const BlendDesc& desc)
   {
     return output_stage.CreateBlendState (desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateBlendState");
+    exception.touch ("render::low_level::opengl::Device::CreateBlendState");
     throw;
   }
 }
@@ -367,9 +367,9 @@ IDepthStencilState* Device::CreateDepthStencilState (const DepthStencilDesc& des
   {
     return output_stage.CreateDepthStencilState (desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateDepthStencilState");
+    exception.touch ("render::low_level::opengl::Device::CreateDepthStencilState");
     throw;
   }
 }
@@ -380,9 +380,9 @@ IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
   {
     return output_stage.CreateView (texture, desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreateView");
+    exception.touch ("render::low_level::opengl::Device::CreateView");
     throw;
   }
 }
@@ -461,9 +461,9 @@ IPredicate* Device::CreatePredicate ()
   {
     return query_manager.CreatePredicate ();
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::CreatePredicate");
+    exception.touch ("render::low_level::opengl::Device::CreatePredicate");
     throw;
   }
 }
@@ -498,9 +498,9 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
     texture_manager.Bind ();
     shader_stage.Bind ();
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::Bind");
+    exception.touch ("render::low_level::opengl::Device::Bind");
     throw;
   }
 }
@@ -524,7 +524,7 @@ GLenum get_mode (PrimitiveType type, const char* source)
     case PrimitiveType_TriangleStrip: return GL_TRIANGLE_STRIP;
     case PrimitiveType_TriangleFan:   return GL_TRIANGLE_FAN;
     default:
-      raise_invalid_argument (source, "primitive_type", type);
+      throw xtl::make_argument_exception (source, "primitive_type", type);
       return 0;
   }
 }
@@ -556,9 +556,9 @@ void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t ver
 
     context_manager.CheckErrors ("glDrawArrays");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::Draw");
+    exception.touch ("render::low_level::opengl::Device::Draw");
 
     throw;
   }
@@ -591,9 +591,9 @@ void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size
 
     context_manager.CheckErrors ("glDrawElements");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::DrawIndexed");
+    exception.touch ("render::low_level::opengl::Device::DrawIndexed");
 
     throw;
   }
@@ -619,9 +619,9 @@ void Device::Flush ()
 
     output_stage.UpdateRenderTargets ();
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Device::Flush");
+    exception.touch ("render::low_level::opengl::Device::Flush");
     throw;
   }
 }

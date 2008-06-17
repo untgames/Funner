@@ -1,8 +1,6 @@
 #include "shared.h"
 
-struct test_exception_tag;
-
-typedef derived_exception<test_exception_tag> test_exception;
+struct test_exception : virtual public xtl::exception {};
 
 template <int I>
 void f ()
@@ -20,7 +18,7 @@ void f ()
 
 template <> void f<0> ()
 {
-  throw test_exception ("::f0", "test exception message");
+  throw message_exception<test_exception> ("::f0", "test exception message");
 }
 
 int main ()

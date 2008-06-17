@@ -1,8 +1,4 @@
-#include <syslib/timer.h>
-#include <platform/platform.h>
-#include <xtl/function.h>
-#include <common/exception.h>
-#include <time.h>
+#include "shared.h"
 
 using namespace syslib;
 using namespace common;
@@ -135,7 +131,7 @@ void Timer::SetState (TimerState state)
   {
     case TimerState_Running: impl->SetTimer (impl->period); break;
     case TimerState_Paused:  impl->KillTimer (); break;
-    default:                 raise_invalid_argument ("syslib::Timer::SetState", "state", state); break;
+    default:                 throw xtl::make_argument_exception ("syslib::Timer::SetState", "state", state); break;
   }
 }
 

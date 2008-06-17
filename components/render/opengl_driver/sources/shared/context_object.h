@@ -1,10 +1,10 @@
 #ifndef RENDER_GL_DRIVER_CONTEXT_OBJECT_HEADER
 #define RENDER_GL_DRIVER_CONTEXT_OBJECT_HEADER
 
+#include <xtl/common_exceptions.h>
+
 #include <shared/object.h>
 #include <shared/context_manager.h>
-
-#include <common/exception.h>
 
 namespace render
 {

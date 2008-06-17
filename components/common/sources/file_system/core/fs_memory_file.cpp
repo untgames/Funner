@@ -3,13 +3,13 @@
 using namespace common;
 
 MemFileImpl::MemFileImpl (void* buffer,size_t buffer_size,filemode_t mode)
-  : FileImpl (mode|FILE_MODE_SEEK|FILE_MODE_REWIND), is_auto_deleted (false)
+  : FileImpl (mode|FileMode_Seek|FileMode_Rewind), is_auto_deleted (false)
 {
   if (!buffer && buffer_size)
-    raise_null_argument ("MemFileImpl::MemFileImpl","buffer");
+    throw xtl::make_null_argument_exception ("MemFileImpl::MemFileImpl","buffer");
 
-  if (mode & FILE_MODE_RESIZE)
-    raise_not_supported ("MemFileImpl::MemFileImpl","Memory files with FILE_MODE_RESIZE mode not supported");
+  if (mode & FileMode_Resize)
+    throw xtl::format_not_supported_exception ("MemFileImpl::MemFileImpl","Memory files with FileMode_Resize mode not supported");
 
   start  = (char*)buffer;
   finish = start + buffer_size;
@@ -17,13 +17,13 @@ MemFileImpl::MemFileImpl (void* buffer,size_t buffer_size,filemode_t mode)
 }
 
 MemFileImpl::MemFileImpl (FileImplPtr base_file)
-  : FileImpl (base_file->Mode ()|FILE_MODE_SEEK|FILE_MODE_REWIND), is_auto_deleted (true)    
+  : FileImpl (base_file->Mode ()|FileMode_Seek|FileMode_Rewind), is_auto_deleted (true)    
 {
   if (!base_file)
-    raise_null_argument ("MemFileImpl::MemFileImpl","base_file");
+    throw xtl::make_null_argument_exception ("MemFileImpl::MemFileImpl","base_file");
     
-  if (base_file->Mode () & (FILE_MODE_RESIZE|FILE_MODE_WRITE))
-    raise_not_supported ("MemFileImpl::MemFileImpl","Memory files with FILE_MODE_RESIZE|FILE_MODE_WRITE mode not supported");
+  if (base_file->Mode () & (FileMode_Resize|FileMode_Write))
+    throw xtl::format_not_supported_exception ("MemFileImpl::MemFileImpl","Memory files with FileMode_Resize|FileMode_Write mode not supported");
     
   size_t          buffer_size = base_file->Size ();    
   void* volatile  buffer      = ::operator new (buffer_size);
@@ -32,10 +32,10 @@ MemFileImpl::MemFileImpl (FileImplPtr base_file)
   {
     buffer_size = base_file->Read (buffer,buffer_size);
   }
-  catch (Exception& exception)
+  catch (xtl::exception& exception)
   {
     ::operator delete (buffer);
-    exception.Touch ("MemFileImpl::MemFileImpl");
+    exception.touch ("MemFileImpl::MemFileImpl");
     throw;
   }
   catch (...)

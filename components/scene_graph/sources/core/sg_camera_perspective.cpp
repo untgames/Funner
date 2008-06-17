@@ -1,9 +1,4 @@
-#include <sg/camera.h>
-#include <xtl/visitor.h>
-#include <common/exception.h>
-#include <bv/axis_aligned_box.h>
-
-#include <stl/algorithm>
+#include "shared.h"
 
 using namespace scene_graph;
 using namespace math;
@@ -105,9 +100,9 @@ void PerspectiveCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
         height = tan (deg2rad (impl->fov_y)) * impl->z_near,
         depth  = impl->z_far - impl->z_near;
 
-  if (fabs (width)  < EPS) raise <Exception> ("scene_graph::PerspectiveCamera::ComputeProjectionMatrix", "Zero camera width");
-  if (fabs (height) < EPS) raise <Exception> ("scene_graph::PerspectiveCamera::ComputeProjectionMatrix", "Zero camera height");
-  if (fabs (depth) < EPS)  raise <Exception> ("scene_graph::PerspectiveCamera::ComputeProjectionMatrix", "Zero camera depth");
+  if (fabs (width)  < EPS) throw xtl::format_operation_exception ("scene_graph::PerspectiveCamera::ComputeProjectionMatrix", "Zero camera width");
+  if (fabs (height) < EPS) throw xtl::format_operation_exception ("scene_graph::PerspectiveCamera::ComputeProjectionMatrix", "Zero camera height");
+  if (fabs (depth) < EPS)  throw xtl::format_operation_exception ("scene_graph::PerspectiveCamera::ComputeProjectionMatrix", "Zero camera depth");
 
   proj_matrix [0] = vec4f (2.0f * impl->z_near / width, 0, 0, 0);
   proj_matrix [1] = vec4f (0, 2.0f * impl->z_near / height, 0, 0);

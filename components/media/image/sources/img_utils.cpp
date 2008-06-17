@@ -24,7 +24,7 @@ const char* get_format_name (PixelFormat format)
     case PixelFormat_L8:      return "l8";
     case PixelFormat_A8:      return "a8";
     case PixelFormat_LA8:     return "la8";
-    default:                  raise_invalid_argument ("media::get_format_name(PixelFormat)", "format", format);
+    default:                  throw xtl::make_argument_exception ("media::get_format_name(PixelFormat)", "format", format);
   }
 
   return "";
@@ -44,7 +44,7 @@ size_t get_bits_per_pixel (PixelFormat format)
     case PixelFormat_L8:     return 8;
     case PixelFormat_A8:     return 8;
     case PixelFormat_LA8:    return 16;
-    default:                 raise_invalid_argument ("media::get_bits_per_pixel(PixelFormat)", "format", format);
+    default:                 throw xtl::make_argument_exception ("media::get_bits_per_pixel(PixelFormat)", "format", format);
   }
 
   return 0; 

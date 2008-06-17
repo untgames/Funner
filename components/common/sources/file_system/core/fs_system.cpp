@@ -154,10 +154,10 @@ void FileSystemImpl::SetDefaultPath (const char* path)
   FileInfo info;
 
   if (!GetFileInfo (new_path.c_str (),info))
-    raise<FileNotFoundException> ("FileSystem::SetCurrentDir","Dir '%s' does not exist",new_path.c_str ());
+    throw xtl::format_exception<FileNotFoundException> ("FileSystem::SetCurrentDir","Dir '%s' does not exist",new_path.c_str ());
 
   if (!info.is_dir)
-    raise<FileNotDirException> ("FileSystem::SetCurrentDir","Can not set current dir '%s' because it is not dir",new_path.c_str ());
+    throw xtl::format_exception<FileNotDirException> ("FileSystem::SetCurrentDir","Can not set current dir '%s' because it is not dir",new_path.c_str ());
     
   swap (default_path,new_path);
 }
@@ -169,10 +169,10 @@ void FileSystemImpl::SetDefaultPath (const char* path)
 void FileSystemImpl::RegisterPackFile (const char* extension,const PackFileCreater& creater)
 {
   if (!extension)
-    raise_null_argument ("FileSystem::RegisterPackFile","extension");
+    throw xtl::make_null_argument_exception ("FileSystem::RegisterPackFile","extension");
 
   if (!creater)
-    raise_null_argument ("FileSystem::RegisterPackFile","creater");
+    throw xtl::make_null_argument_exception ("FileSystem::RegisterPackFile","creater");
 
   size_t hash = strihash (extension);
   
@@ -189,7 +189,7 @@ void FileSystemImpl::RegisterPackFile (const char* extension,const PackFileCreat
 void FileSystemImpl::UnregisterPackFile (const char* extension)
 {
   if (!extension)
-    raise_null_argument ("FileSystem::UnregisterPackFile","extension");
+    throw xtl::make_null_argument_exception ("FileSystem::UnregisterPackFile","extension");
 
   size_t hash = strihash (extension);
     
@@ -238,7 +238,7 @@ void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,cons
       }
       catch (FileException& exception)
       {
-        log_handler (format ("File exception at open pack-file '%s': %s",_path,exception.Message ()).c_str ());
+        log_handler (format ("File exception at open pack-file '%s': %s",_path,exception.what ()).c_str ());
       }
       catch (std::exception& exception)
       {
@@ -256,10 +256,10 @@ void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,cons
 void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_handler)
 {
   if (!_path)
-    raise_null_argument ("FileSystem::AddSearchPath","path");
+    throw xtl::make_null_argument_exception ("FileSystem::AddSearchPath","path");
 
   if (!log_handler)
-    raise_null_argument ("FileSystem::AddSearchPath","log_handler");
+    throw xtl::make_null_argument_exception ("FileSystem::AddSearchPath","log_handler");
 
   string path = FileSystem::GetNormalizedFileName (_path), mount_path;
 
@@ -304,7 +304,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 void FileSystemImpl::RemoveSearchPath (const char* _path)
 {
   if (!_path)
-    raise_null_argument ("FileSystem::RemoveSearchPath","path");
+    throw xtl::make_null_argument_exception ("FileSystem::RemoveSearchPath","path");
 
   string path = FileSystem::GetNormalizedFileName (_path);
   
@@ -347,13 +347,13 @@ void FileSystemImpl::RemoveAllSearchPaths ()
 void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystemPtr file_system)
 {
   if (!_path_prefix)
-    raise_null_argument ("FileSystem::Mount","path_prefix");
+    throw xtl::make_null_argument_exception ("FileSystem::Mount","path_prefix");
     
   if (!file_system)
-    raise_null_argument ("FileSystem::Mount","file_system");
+    throw xtl::make_null_argument_exception ("FileSystem::Mount","file_system");
 
   if (*_path_prefix != '/')
-    raise_invalid_argument ("FileSystem::Mount","path_prefix",_path_prefix,"Mount path must start from '/'");
+    throw xtl::make_argument_exception ("FileSystem::Mount","path_prefix",_path_prefix,"Mount path must start from '/'");
 
   string prefix = FileSystem::GetNormalizedFileName (_path_prefix);
   size_t hash   = strhash (prefix.c_str ());
@@ -362,7 +362,7 @@ void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystemPtr file_s
 
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
     if (!strncmp (i->prefix.c_str (),prefix.c_str (),i->prefix.size ()))
-      raise<FileMountException> ("FileSystem::Mount","Can not mount file system '%s' "
+      throw xtl::format_exception<FileMountException> ("FileSystem::Mount","Can not mount file system '%s' "
                                  "because it intersects with already mounted file system '%s'",
                                  prefix.c_str (),i->prefix.c_str ());
 
@@ -502,7 +502,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
     //возвращаем ссылку на файловую систему включающую путь по умолчанию      
 
   if (!default_file_system)
-    raise<FileNotFoundException> (NULL,"File '%s' does not belong to any file system",src_file_name);
+    throw format_exception<FileNotFoundException> ("","File '%s' does not belong to any file system",src_file_name);
 
   swap (result_file_name,default_mount_name);
 
@@ -516,7 +516,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
 FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_flags,size_t buffer_size)
 {
   if (!src_file_name)
-    raise_null_argument ("FileSystemImpl::OpenFile","file_name");
+    throw xtl::make_null_argument_exception ("FileSystemImpl::OpenFile","file_name");
 
   string file_name;
 
@@ -535,7 +535,7 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
       if (!buffer_size || self_buffer_size >= buffer_size)
         return base_file;
 
-      if (base_file->Size () < default_file_buffer_size && !(mode_flags & (FILE_MODE_RESIZE|FILE_MODE_WRITE)))
+      if (base_file->Size () < default_file_buffer_size && !(mode_flags & (FileMode_Resize|FileMode_Write)))
         return FileImplPtr (new MemFileImpl (base_file), false);
 
       return FileImplPtr (new BufferedFileImpl (base_file,buffer_size), false);
@@ -552,11 +552,11 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
   }
   catch (std::exception& exception)
   {
-    raise<FileLoadException> ("FileSystemImpl::OpenFile","Unknown exception at open file '%s': %s",src_file_name,exception.what ());
+    throw format_exception<FileLoadException> ("FileSystemImpl::OpenFile","Unknown exception at open file '%s': %s",src_file_name,exception.what ());
   }
   catch (...)
   {
-    raise<FileLoadException> ("FileSystemImpl::OpenFile","Unknown exception at open file '%s'",src_file_name);
+    throw format_exception<FileLoadException> ("FileSystemImpl::OpenFile","Unknown exception at open file '%s'",src_file_name);
   }
   
   return NULL;
@@ -584,7 +584,7 @@ size_t FileSystemImpl::GetDefaultFileBufferSize () const
 void FileSystemImpl::Remove (const char* src_file_name)
 {
   if (!src_file_name)
-    raise_null_argument ("FileSystem::Remove","file_name");
+    throw xtl::make_null_argument_exception ("FileSystem::Remove","file_name");
     
   string file_name;
   
@@ -594,9 +594,9 @@ void FileSystemImpl::Remove (const char* src_file_name)
     
     file_system->Remove (file_name.c_str ());
   }
-  catch (Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("FileSystem::Remove");
+    exception.touch ("FileSystem::Remove");
     throw;
   }
 }
@@ -604,10 +604,10 @@ void FileSystemImpl::Remove (const char* src_file_name)
 void FileSystemImpl::Rename (const char* src_file_name,const char* new_name)
 {
   if (!src_file_name)
-    raise_null_argument ("FileSystem::Rename","file_name");
+    throw xtl::make_null_argument_exception ("FileSystem::Rename","file_name");
   
   if (!new_name)
-    raise_null_argument ("FileSystem::Rename","new_name");
+    throw xtl::make_null_argument_exception ("FileSystem::Rename","new_name");
 
   string file_name;
   
@@ -617,9 +617,9 @@ void FileSystemImpl::Rename (const char* src_file_name,const char* new_name)
     
     file_system->Rename (file_name.c_str (),new_name);
   }
-  catch (Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("FileSystem::Rename");
+    exception.touch ("FileSystem::Rename");
     throw;
   }
 }
@@ -627,7 +627,7 @@ void FileSystemImpl::Rename (const char* src_file_name,const char* new_name)
 void FileSystemImpl::Mkdir (const char* src_dir_name)
 {
   if (!src_dir_name)
-    raise_null_argument ("FileSystem::Mkdir","dir_name");
+    throw xtl::make_null_argument_exception ("FileSystem::Mkdir","dir_name");
 
   string dir_name;
 
@@ -637,9 +637,9 @@ void FileSystemImpl::Mkdir (const char* src_dir_name)
     
     file_system->Mkdir (dir_name.c_str ());
   }
-  catch (Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("FileSystem::Mkdir");
+    exception.touch ("FileSystem::Mkdir");
     throw;
   }
 }
@@ -845,14 +845,14 @@ static void InternalGetFileHash (File& file,FileHash& hash)
 void FileSystem::GetFileHash (File& file,FileHash& hash)
 {
   if (!file.CanRead ())
-    raise_not_supported ("FileSystem::GetFileHash","Unable to compute FileHash. Reason: file can't be read");
+    throw xtl::format_not_supported_exception ("FileSystem::GetFileHash","Unable to compute FileHash. Reason: file can't be read");
     
   filepos_t current_position = file.Tell ();
 
   if (current_position)
   {
     if (!file.CanSeek ())
-      raise_not_supported ("FileSystem::GetFileHash","Can't compute FileHash. Reason: file can't be seek");
+      throw xtl::format_not_supported_exception ("FileSystem::GetFileHash","Can't compute FileHash. Reason: file can't be seek");
 
     file.Seek (0);  
 
@@ -863,7 +863,7 @@ void FileSystem::GetFileHash (File& file,FileHash& hash)
   else
   {
     if (!file.CanRewind ())
-      raise_not_supported ("FileSystem::GetFileHash","Can't compute FileHash. Reason: file can't be rewind");
+      throw xtl::format_not_supported_exception ("FileSystem::GetFileHash","Can't compute FileHash. Reason: file can't be rewind");
 
     InternalGetFileHash (file,hash);
 
@@ -874,7 +874,7 @@ void FileSystem::GetFileHash (File& file,FileHash& hash)
 void FileSystem::GetFileHash (const char* file_name,FileHash& hash)
 {
   if (!file_name)
-    raise_null_argument ("FileSystem::GetFileHash","file_name");
+    throw xtl::make_null_argument_exception ("FileSystem::GetFileHash","file_name");
 
   try
   {
@@ -884,7 +884,7 @@ void FileSystem::GetFileHash (const char* file_name,FileHash& hash)
   }
   catch (FileException& exception)
   {
-    exception.Touch ("FileSystem::GetFileHash");
+    exception.touch ("FileSystem::GetFileHash");
     throw;
   }
 }
@@ -896,7 +896,7 @@ void FileSystem::GetFileHash (const char* file_name,FileHash& hash)
 string FileSystem::GetNormalizedFileName (const char* file_name)
 {
   if (!file_name)
-    raise_null_argument ("FileSystem::GetNormalizedFileName", "file_name");
+    throw xtl::make_null_argument_exception ("FileSystem::GetNormalizedFileName", "file_name");
 
   string res = file_name;
 

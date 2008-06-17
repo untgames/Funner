@@ -1,13 +1,3 @@
-#include <stl/algorithm>
-
-#include <xtl/bind.h>
-#include <xtl/connection.h>
-#include <xtl/string.h>
-
-#include <common/exception.h>
-
-#include <syslib/window.h>
-
 #include "shared.h"
 
 using namespace xtl;
@@ -86,10 +76,10 @@ Device::Device (Window* window, const char* in_name)
     if (!properties.empty ())
       properties.pop_back ();
   }
-  catch (Exception& exception)
+  catch (xtl::exception& exception)
   {
     connections.clear ();
-    exception.Touch ("input::low_level::window::Device::Device");
+    exception.touch ("input::low_level::window::Device::Device");
     throw;
   }
   catch (...)
@@ -139,7 +129,7 @@ void Device::SetProperty (const char* name, float value)
     return;
   }
 
-  raise_invalid_argument ("input::low_level::window::Device::SetProperty", "name", name);
+  throw xtl::make_argument_exception ("input::low_level::window::Device::SetProperty", "name", name);
 }
 
 float Device::GetProperty (const char* name)
@@ -160,7 +150,7 @@ float Device::GetProperty (const char* name)
   if (!xstrcmp (HORISONTAL_WHEEL_SENSITIVITY, name))
     return horisontal_wheel_sensitivity;
 
-  raise_invalid_argument ("input::low_level::window::Device::GetProperty", "name", name);
+  throw xtl::make_argument_exception ("input::low_level::window::Device::GetProperty", "name", name);
   return 0.f;
 }
 

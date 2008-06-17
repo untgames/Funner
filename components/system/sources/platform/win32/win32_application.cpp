@@ -33,9 +33,9 @@ void Platform::DoNextEvent ()
     DispatchMessage  (&msg);
     SetLastError     (0);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::DoNextEvent");
+    exception.touch ("syslib::Win32Platform::DoNextEvent");
     throw;
   }
 }
@@ -47,9 +47,9 @@ void Platform::WaitMessage ()
     if (!::WaitMessage ())
       raise_error ("::WaitMessage");
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Platform::WaitMessage");
+    exception.touch ("syslib::Win32Platform::WaitMessage");
     throw;
   }
 }

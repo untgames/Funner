@@ -234,13 +234,13 @@ void ControlsDetector::Add (const char* action, const char* input_event_mask, co
   static const char* METHOD_NAME = "input::ControlsDetector::Add";
 
   if (!action)
-    raise_null_argument (METHOD_NAME, "action");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "action");
 
   if (!input_event_mask)
-    raise_null_argument (METHOD_NAME, "input_event_mask");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "input_event_mask");
 
   if (!replacement)
-    raise_null_argument (METHOD_NAME, "replacement");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "replacement");
 
   impl->Add (action, input_event_mask, replacement);
 }
@@ -250,10 +250,10 @@ void ControlsDetector::Remove (const char* action, const char* input_event_mask)
   static const char* METHOD_NAME = "input::ControlsDetector::Remove(const char*,const char*)";
 
   if (!action)
-    raise_null_argument (METHOD_NAME, "action");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "action");
 
   if (!input_event_mask)
-    raise_null_argument (METHOD_NAME, "input_event_mask");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "input_event_mask");
 
   impl->Remove (action, input_event_mask);
 }
@@ -266,7 +266,7 @@ void ControlsDetector::Remove (const Iterator& iter)
 void ControlsDetector::Remove (const char* action)
 {
   if (!action)
-    raise_null_argument ("input::ControlsDetector::Remove(const char*)", "action");
+    throw xtl::make_null_argument_exception ("input::ControlsDetector::Remove(const char*)", "action");
 
   impl->Remove (action);
 }
@@ -296,7 +296,7 @@ void ControlsDetector::Clear ()
 xtl::connection ControlsDetector::Detect (const EventsSource& source, const char* action, const EventHandler& handler)
 {
   if (!action)
-    raise_null_argument ("input::ControlsDetector::Detect", "action");
+    throw xtl::make_null_argument_exception ("input::ControlsDetector::Detect", "action");
 
   return impl->Detect (source, action, handler);
 }
@@ -308,7 +308,7 @@ xtl::connection ControlsDetector::Detect (const EventsSource& source, const char
 void ControlsDetector::Load (const char* file_name)
 {
   if (!file_name)
-    raise_null_argument ("input::ControlsDetector::Load", "file_name");
+    throw xtl::make_null_argument_exception ("input::ControlsDetector::Load", "file_name");
 
   static ComponentLoader loader ("input.loaders.*");
 
@@ -318,7 +318,7 @@ void ControlsDetector::Load (const char* file_name)
 void ControlsDetector::Save (const char* file_name)
 {
   if (!file_name)
-    raise_null_argument ("input::ControlsDetector::Save", "file_name");
+    throw xtl::make_null_argument_exception ("input::ControlsDetector::Save", "file_name");
 
   static ComponentLoader loader ("input.savers.*");
 

@@ -358,9 +358,9 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
         glClear     (mask);
         CheckErrors ("glClear");
       }
-      catch (common::Exception& exception)
+      catch (xtl::exception& exception)
       {
-        exception.Touch ("render::low_level::opengl::OutputStage::ClearViews");
+        exception.touch ("render::low_level::opengl::OutputStage::ClearViews");
 
         throw;
       }
@@ -409,9 +409,9 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
           null_depth_stencil_state->Bind (state.GetStencilReference ());
         }
       }
-      catch (common::Exception& exception)
+      catch (xtl::exception& exception)
       {
-        exception.Touch ("render::low_level::opengl::OutputStage::Bind");
+        exception.touch ("render::low_level::opengl::OutputStage::Bind");
         throw;
       }
     }
@@ -436,7 +436,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
         if (render_target_view)
         {
           if (!(render_target_view->GetBindFlags () & BindFlag_RenderTarget))
-            raise<ArgumentException> ("", "Render-target view has wrong bind flags %s", get_name ((BindFlag)render_target_view->GetBindFlags ()));
+            throw xtl::format_exception<xtl::bad_argument> ("", "Render-target view has wrong bind flags %s", get_name ((BindFlag)render_target_view->GetBindFlags ()));
             
             //проверка корректности формата пикселей
             
@@ -461,10 +461,10 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
             case PixelFormat_D24X8:
             case PixelFormat_D24S8:
             case PixelFormat_S8:
-              raise_not_supported ("", "Unsupported render-target view texture format=%s", get_name (desc.format));
+              throw xtl::format_not_supported_exception ("", "Unsupported render-target view texture format=%s", get_name (desc.format));
               break;
             default:
-              raise_invalid_argument ("", "texture_desc.format", desc.format);
+              throw xtl::make_argument_exception ("", "texture_desc.format", desc.format);
               break;
           }
         }
@@ -472,7 +472,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
         if (depth_stencil_view)
         {
           if (!(depth_stencil_view->GetBindFlags () & BindFlag_DepthStencil))
-            raise<ArgumentException> ("", "Depth-stencil view has wrong bind flags %s", get_name ((BindFlag)depth_stencil_view->GetBindFlags ()));
+            throw xtl::format_exception<xtl::bad_argument> ("", "Depth-stencil view has wrong bind flags %s", get_name ((BindFlag)depth_stencil_view->GetBindFlags ()));
             
             //проверка корректности формата пикселей
             
@@ -492,7 +492,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
             case PixelFormat_DXT1:
             case PixelFormat_DXT3:
             case PixelFormat_DXT5:
-              raise_not_supported ("", "Unsupported depth-stencil view texture format=%s", get_name (desc.format));
+              throw xtl::format_not_supported_exception ("", "Unsupported depth-stencil view texture format=%s", get_name (desc.format));
               break;
             case PixelFormat_D16:
             case PixelFormat_D24X8:
@@ -500,16 +500,16 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
             case PixelFormat_S8:
               break;
             default:
-              raise_invalid_argument ("", "texture_desc.format", desc.format);
+              throw xtl::make_argument_exception ("", "texture_desc.format", desc.format);
               break;
           }
         }
 
         return FrameBufferHolderPtr (new FrameBufferHolder (render_target_view, depth_stencil_view, frame_buffer_manager), false);
       }
-      catch (common::Exception& exception)
+      catch (xtl::exception& exception)
       {
-        exception.Touch ("render::low_level::opengl::OutputStage::Impl::CreateFrameBufferHolder");
+        exception.touch ("render::low_level::opengl::OutputStage::Impl::CreateFrameBufferHolder");
         throw;
       }      
     }
@@ -631,9 +631,9 @@ ITexture* OutputStage::CreateTexture (const TextureDesc& desc)
   {
     return impl->frame_buffer_manager.CreateRenderBuffer (desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::OutputStage::CreateTexture");
+    exception.touch ("render::low_level::opengl::OutputStage::CreateTexture");
 
     throw;
   }
@@ -645,9 +645,9 @@ ITexture* OutputStage::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t
   {
     return impl->frame_buffer_manager.CreateColorBuffer (swap_chain, buffer_index);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::OutputStage::CreateRenderTargetTexture");
+    exception.touch ("render::low_level::opengl::OutputStage::CreateRenderTargetTexture");
     
     throw;
   }
@@ -659,9 +659,9 @@ ITexture* OutputStage::CreateDepthStencilTexture (ISwapChain* swap_chain)
   {
     return impl->frame_buffer_manager.CreateDepthStencilBuffer (swap_chain);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::OutputStage::CreateDepthStencilTexture");
+    exception.touch ("render::low_level::opengl::OutputStage::CreateDepthStencilTexture");
     
     throw;
   }
@@ -677,9 +677,9 @@ IView* OutputStage::CreateView (ITexture* texture, const ViewDesc& desc)
   {
     return impl->CreateView (texture, desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::OutputStage::CreateView");
+    exception.touch ("render::low_level::opengl::OutputStage::CreateView");
 
     throw;
   }
@@ -695,9 +695,9 @@ IBlendState* OutputStage::CreateBlendState (const BlendDesc& desc)
   {
     return new BlendState (impl->GetContextManager (), desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::OutputStage::CreateBlendState");
+    exception.touch ("render::low_level::opengl::OutputStage::CreateBlendState");
 
     throw;
   }
@@ -709,9 +709,9 @@ IDepthStencilState* OutputStage::CreateDepthStencilState (const DepthStencilDesc
   {
     return new DepthStencilState (impl->GetContextManager (), desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::OutputStage::CreateDepthStencilState");
+    exception.touch ("render::low_level::opengl::OutputStage::CreateDepthStencilState");
     
     throw;
   }
@@ -727,9 +727,9 @@ void OutputStage::SetRenderTargets (IView* render_target_view, IView* depth_sten
   {
     return impl->SetRenderTargets (render_target_view, depth_stencil_view);          
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::OutputStage::SetRenderTargets");
+    exception.touch ("render::low_level::opengl::OutputStage::SetRenderTargets");
 
     throw;
   }
@@ -814,9 +814,9 @@ void OutputStage::InvalidateRenderTargets (const Rect& update_rect)
   {    
     impl->InvalidateRenderTargets (update_rect);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::OutputStage::InvalidateRenderTargets");
+    exception.touch ("render::low_level::opengl::OutputStage::InvalidateRenderTargets");
     throw;
   }
 }
@@ -827,9 +827,9 @@ void OutputStage::UpdateRenderTargets ()
   {
     impl->UpdateRenderTargets ();
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::OutputStage::UpdateRenderTargets");
+    exception.touch ("render::low_level::opengl::OutputStage::UpdateRenderTargets");
     throw;
   }
 }

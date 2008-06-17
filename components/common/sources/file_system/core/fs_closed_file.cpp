@@ -9,7 +9,7 @@ ClosedFileImpl::ClosedFileImpl ()
   
 void ClosedFileImpl::Raise (const char* source)
 {
-  throw FileClosedException (source, "File already closed");
+  throw xtl::message_exception<FileClosedException> (source, "File already closed");
 }
 
 size_t ClosedFileImpl::Read (void*,size_t)

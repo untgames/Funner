@@ -32,7 +32,7 @@ struct Context::Impl
     vsync (false)
   {
     if (!in_swap_chain)
-      raise_null_argument ("render::low_level::opengl::Context::Context", "swap_chain");      
+      throw xtl::make_null_argument_exception ("render::low_level::opengl::Context::Context", "swap_chain");      
       
     SwapChain* swap_chain = cast_object<SwapChain> (in_swap_chain, "render::low_level::opengl::Context::Context", "swap_chain");    
     
@@ -55,7 +55,7 @@ struct Context::Impl
       GLenum status = glewContextInit (&glew_context);
 
       if (status != GLEW_OK)
-        raise_invalid_operation ("glewContextInit", "%s", glewGetString (status));        
+        throw xtl::format_operation_exception ("glewContextInit", "%s", glewGetString (status));        
 
       SetSwapChains (swap_chain, swap_chain);
 
@@ -122,10 +122,10 @@ struct Context::Impl
   void MakeCurrent (ISwapChain* in_draw_swap_chain, ISwapChain* in_read_swap_chain)
   {
     if (!in_draw_swap_chain)
-      raise_null_argument ("render::low_level::opengl::Context::MakeCurrent", "draw_swap_chain");
+      throw xtl::make_null_argument_exception ("render::low_level::opengl::Context::MakeCurrent", "draw_swap_chain");
 
     if (!in_read_swap_chain)
-      raise_null_argument ("render::low_level::opengl::Context::MakeCurrent", "read_swap_chain");
+      throw xtl::make_null_argument_exception ("render::low_level::opengl::Context::MakeCurrent", "read_swap_chain");
       
     const GLEWContext*  old_glew_context  = glewGetContext ();
     const WGLEWContext* old_wglew_context = wglewGetContext ();
@@ -142,12 +142,12 @@ struct Context::Impl
       
       SetVSync (); 
     }
-    catch (common::Exception& exception)
+    catch (xtl::exception& exception)
     {
       glewSetContext (old_glew_context);
       wglewSetContext (old_wglew_context);
       
-      exception.Touch ("render::low_level::opengl::Context::MakeCurrent");
+      exception.touch ("render::low_level::opengl::Context::MakeCurrent");
       
       throw;
     }
@@ -218,9 +218,9 @@ Context::Context (ISwapChain* in_swap_chain)
   {
     impl = new Impl (in_swap_chain);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Context::Context");
+    exception.touch ("render::low_level::opengl::Context::Context");
     throw;
   }
 }
@@ -231,9 +231,9 @@ Context::Context (ISwapChain* in_swap_chain, const Context& shared_context)
   {
     impl = new Impl (in_swap_chain, get_pointer (shared_context.impl));
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::Context::Context");
+    exception.touch ("render::low_level::opengl::Context::Context");
     throw;
   }
 }
@@ -317,7 +317,7 @@ void make_current_context (HGLRC context, HDC draw_dc, HDC read_dc)
   else
   {
     if (read_dc != draw_dc)
-      raise_not_supported ("render::low_level::opengl::make_current_context", "WGL_ARB_make_current_read extenstion not supported (could not set different read/write swap chains)");
+      throw xtl::format_not_supported_exception ("render::low_level::opengl::make_current_context", "WGL_ARB_make_current_read extenstion not supported (could not set different read/write swap chains)");
       
     if (wglGetCurrentContext () == context && wglGetCurrentDC () == draw_dc)
       return;

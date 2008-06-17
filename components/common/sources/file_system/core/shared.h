@@ -1,13 +1,7 @@
 #ifndef COMMONLIB_FILE_SYSTEM_SHARED_HEADER
 #define COMMONLIB_FILE_SYSTEM_SHARED_HEADER
 
-#include <common/file.h>
-#include <common/singleton.h>
-#include <common/strlib.h>
-#include <common/hash.h>
-#include <common/component.h>
-
-#include <platform/platform.h>
+#include <cstring>
 
 #include <stl/hash_set>
 #include <stl/vector>
@@ -18,8 +12,15 @@
 #include <xtl/bind.h>
 #include <xtl/reference_counter.h>
 #include <xtl/string.h>
+#include <xtl/common_exceptions.h>
 
-#include <string.h>
+#include <common/file.h>
+#include <common/singleton.h>
+#include <common/strlib.h>
+#include <common/hash.h>
+#include <common/component.h>
+
+#include <platform/platform.h>
 
 namespace common
 {

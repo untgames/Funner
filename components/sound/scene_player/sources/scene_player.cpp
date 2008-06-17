@@ -6,9 +6,9 @@
 #include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/common_exceptions.h>
 
 #include <common/action_queue.h>
-#include <common/exception.h>
 
 #include <sg/scene.h>
 #include <sg/node.h>
@@ -109,7 +109,7 @@ struct ScenePlayer::Impl
     scene_graph::Scene* scene = in_listener->Scene ();
 
     if (!scene)
-      raise <Exception> ("sound::ScenePlayer::SetListener", "Listener is not binded to any scene.");
+      throw xtl::format_operation_exception ("sound::ScenePlayer::SetListener", "Listener is not binded to any scene.");
 
     if (!listener || (listener->Scene () != scene))
     {

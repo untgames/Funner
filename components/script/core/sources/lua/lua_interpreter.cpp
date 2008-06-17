@@ -27,9 +27,7 @@ namespace
 //функция обработки ошибок lua
 int error_handler (lua_State* state)
 {
-  raise<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
-
-  return 0;
+  throw xtl::format_exception<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
 }
 
 }
@@ -195,7 +193,7 @@ void Interpreter::Invoke (size_t arguments_count, size_t results_count)
 
       //возбуждаем исключение
 
-    raise<RuntimeException> ("script::lua::Interpreter::Invoke", "%s", error_msg.c_str ());    
+    throw xtl::format_exception<RuntimeException> ("script::lua::Interpreter::Invoke", "%s", error_msg.c_str ());    
   }
 }
 
@@ -220,7 +218,7 @@ void Interpreter::Release ()
 void Interpreter::RegisterLibrary (const char* name, InvokerRegistry& registry)
 {
   if (!name)
-    raise_null_argument ("script::lua::RegisterLibrary", "name");
+    throw xtl::make_null_argument_exception ("script::lua::RegisterLibrary", "name");
 
   libraries.insert_pair (name, LibraryPtr (new Library (*this, name, registry), false));
 }
@@ -243,7 +241,7 @@ namespace script
 xtl::com_ptr<IInterpreter> create_lua_interpreter (const xtl::shared_ptr<Environment>& environment)
 {
   if (!environment)
-    common::raise_null_argument ("script::create_lua_interpreter", "environment");
+    throw xtl::make_null_argument_exception ("script::create_lua_interpreter", "environment");
 
   return xtl::com_ptr<IInterpreter> (new Interpreter (environment), false);
 }

@@ -1,9 +1,4 @@
-#include <sg/camera.h>
-#include <xtl/visitor.h>
-#include <common/exception.h>
-#include <bv/axis_aligned_box.h>
-
-#include <stl/algorithm>
+#include "shared.h"
 
 using namespace scene_graph;
 using namespace math;
@@ -131,9 +126,9 @@ void OrthoCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
         height = impl->top - impl->bottom,
         depth  = impl->z_far - impl->z_near;
 
-  if (fabs (width)  < EPS) raise<Exception> ("scene_graph::OrthoCamera::ComputeProjectionMatrix", "Zero camera width");
-  if (fabs (height) < EPS) raise<Exception> ("scene_graph::OrthoCamera::ComputeProjectionMatrix", "Zero camera height");
-  if (fabs (depth)  < EPS) raise<Exception> ("scene_graph::OrthoCamera::ComputeProjectionMatrix", "Zero camera depth");
+  if (fabs (width)  < EPS) throw xtl::format_operation_exception ("scene_graph::OrthoCamera::ComputeProjectionMatrix", "Zero camera width");
+  if (fabs (height) < EPS) throw xtl::format_operation_exception ("scene_graph::OrthoCamera::ComputeProjectionMatrix", "Zero camera height");
+  if (fabs (depth)  < EPS) throw xtl::format_operation_exception ("scene_graph::OrthoCamera::ComputeProjectionMatrix", "Zero camera depth");
   
   //выбрана матрица проецирования, используемая gluOrtho2D
   proj_matrix [0] = vec4f (2.0f / width, 0, 0, - (impl->right + impl->left) / width);

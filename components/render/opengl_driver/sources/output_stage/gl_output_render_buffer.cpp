@@ -106,7 +106,7 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, RenderTargetT
       bind_flags = BindFlag_DepthStencil;
       break;
     default:
-      raise_invalid_argument (METHOD_NAME, "target_type", target_type);
+      throw xtl::make_argument_exception (METHOD_NAME, "target_type", target_type);
       break;
   }
 
@@ -149,17 +149,17 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-      raise_not_supported (METHOD_NAME, "Unsupported desc.format=%s", get_name (desc.format));
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported desc.format=%s", get_name (desc.format));
       break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.format", desc.format);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);
       break;
   }    
 
   static size_t BAD_BIND_FLAGS = ~(BindFlag_RenderTarget | BindFlag_DepthStencil);
   
   if (desc.bind_flags & BAD_BIND_FLAGS)
-    raise_invalid_argument (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
+    throw xtl::make_argument_exception (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
 
   switch (desc.access_flags)
   {
@@ -169,7 +169,7 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
     case AccessFlag_ReadWrite:
       break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.access_flags", desc.access_flags);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", desc.access_flags);
       break;
   }
   
@@ -181,7 +181,7 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
     case UsageMode_Stream:
       break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.usage_mode", desc.usage_mode);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.usage_mode", desc.usage_mode);
       break;
   }
   
@@ -192,15 +192,15 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
     case TextureDimension_1D:
     case TextureDimension_3D:
     case TextureDimension_Cubemap:
-      raise_not_supported (METHOD_NAME, "Unsupported render-buffer dimension desc.dimension=%s", get_name (desc.dimension));
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported render-buffer dimension desc.dimension=%s", get_name (desc.dimension));
       break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.dimension", desc.dimension);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.dimension", desc.dimension);
       break;
   }
   
   if (desc.generate_mips_enable)
-    raise_not_supported (METHOD_NAME, "Automatic mip-map generation for render-buffers not supported");
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Automatic mip-map generation for render-buffers not supported");
 }
 
 /*
@@ -245,10 +245,10 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
     case PixelFormat_S8:
-      raise_not_supported (source, "Unsupported %s=%s", param, get_name (format));
+      throw xtl::format_not_supported_exception (source, "Unsupported %s=%s", param, get_name (format));
       return 0;
     default:
-      raise_invalid_argument (source, param, format);
+      throw xtl::make_argument_exception (source, param, format);
       return 0;
   }
 }
@@ -260,19 +260,19 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::SetData";
   
   if (!(desc.access_flags & AccessFlag_Write))
-    raise_invalid_operation (METHOD_NAME, "Can't set render buffer data (no AccessFlag_Write in desc.access_flags)");
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't set render buffer data (no AccessFlag_Write in desc.access_flags)");
   
   if (layer)
-    raise_out_of_range (METHOD_NAME, "layer", layer, 1);
+    throw xtl::make_range_exception (METHOD_NAME, "layer", layer, 1);
 
   if (mip_level)
-    raise_out_of_range (METHOD_NAME, "mip_level", mip_level, 1);
+    throw xtl::make_range_exception (METHOD_NAME, "mip_level", mip_level, 1);
 
   if (!width || !height)
     return;
     
   if (!buffer)
-    raise_null_argument (METHOD_NAME, "buffer");    
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");    
 
     //установка буфера в контекст OpenGL
 
@@ -285,7 +285,7 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
     //проверка наличия расширения GL_ARB_window_pos либо версии OpenGL не ниже 1.4
 
   if (!GetCaps ().has_arb_window_pos)
-    raise_not_supported (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
     
     //установка позиции растра
 
@@ -391,10 +391,10 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         case PixelFormat_DXT1:
         case PixelFormat_DXT3:
         case PixelFormat_DXT5:
-          raise_not_supported (METHOD_NAME, "Unsupported source_format=%s", get_name (source_format));
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported source_format=%s", get_name (source_format));
           return;
         default:
-          raise_invalid_argument (METHOD_NAME, "source_format", source_format);
+          throw xtl::make_argument_exception (METHOD_NAME, "source_format", source_format);
           return;
       }      
 
@@ -413,19 +413,19 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::GetData";
 
   if (!(desc.access_flags & AccessFlag_Read))
-    raise_invalid_operation (METHOD_NAME, "Can't get render buffer data (no AccessFlag_Read in desc.access_flags)");
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't get render buffer data (no AccessFlag_Read in desc.access_flags)");
 
   if (layer)
-    raise_out_of_range (METHOD_NAME, "layer", layer, 1);
+    throw xtl::make_range_exception (METHOD_NAME, "layer", layer, 1);
     
   if (mip_level)
-    raise_out_of_range (METHOD_NAME, "mip_level", mip_level, 1);        
+    throw xtl::make_range_exception (METHOD_NAME, "mip_level", mip_level, 1);        
 
   if (!width || !height)
     return;
 
   if (!buffer)
-    raise_null_argument (METHOD_NAME, "buffer");    
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");    
 
     //установка буфера в контекст OpenGL
 
@@ -514,10 +514,10 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         case PixelFormat_DXT1:
         case PixelFormat_DXT3:
         case PixelFormat_DXT5:
-          raise_not_supported (METHOD_NAME, "Unsupported target_format=%s", get_name (target_format));
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported target_format=%s", get_name (target_format));
           return;
         default:
-          raise_invalid_argument (METHOD_NAME, "target_format", target_format);
+          throw xtl::make_argument_exception (METHOD_NAME, "target_format", target_format);
           return;
       }      
 

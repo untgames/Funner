@@ -1,6 +1,4 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.INCLUDE_DIRS     := include ../bound_volumes/include
-export.LIBS             := scene_graph
-export.IMPORTS          := ../common/exports.static.mak
+export.INCLUDE_DIRS     := include ../../xtl/include

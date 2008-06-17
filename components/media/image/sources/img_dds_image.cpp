@@ -18,12 +18,12 @@ struct DdsImage::Impl
 
 DdsImage::DdsImage ()
 {
-  raise_not_implemented ("media::DdsImage::DdsImage");
+  throw xtl::make_not_implemented_exception ("media::DdsImage::DdsImage");
 }
 
 DdsImage::DdsImage (const char* file_name)
 {
-  raise_not_implemented ("media::DdsImage::DdsImage");
+  throw xtl::make_not_implemented_exception ("media::DdsImage::DdsImage");
 }
 
 DdsImage::DdsImage (const DdsImage& image)
@@ -48,13 +48,13 @@ DdsImage& DdsImage::operator = (const DdsImage& image)
 
 size_t DdsImage::Width () const
 {
-  raise_not_implemented ("media::DdsImage::Width");
+  throw xtl::make_not_implemented_exception ("media::DdsImage::Width");
   return 0;
 }
 
 size_t DdsImage::Height () const
 {
-  raise_not_implemented ("media::DdsImage::Height");
+  throw xtl::make_not_implemented_exception ("media::DdsImage::Height");
   return 0;
 }
 
@@ -64,13 +64,13 @@ size_t DdsImage::Height () const
 
 size_t DdsImage::Depth () const
 {
-  raise_not_implemented ("media::DdsImage::Depth");
+  throw xtl::make_not_implemented_exception ("media::DdsImage::Depth");
   return 0;
 }
 
 size_t DdsImage::MipsCount () const
 {
-  raise_not_implemented ("media::DdsImage::MipsCount");
+  throw xtl::make_not_implemented_exception ("media::DdsImage::MipsCount");
   return 0;
 }
 
@@ -80,13 +80,13 @@ size_t DdsImage::MipsCount () const
 
 size_t DdsImage::BlockSize () const
 {
-  raise_not_implemented ("media::DdsImage::BlockSize");
+  throw xtl::make_not_implemented_exception ("media::DdsImage::BlockSize");
   return 0;
 }
 
 size_t DdsImage::LayerSize (size_t mip_level) const
 {
-  raise_not_implemented ("media::DdsImage::LayerSize");
+  throw xtl::make_not_implemented_exception ("media::DdsImage::LayerSize");
   return 0;
 }
 
@@ -96,7 +96,7 @@ size_t DdsImage::LayerSize (size_t mip_level) const
 
 DdsPixelFormat DdsImage::Format () const
 {
-  raise_not_implemented ("media::DdsImage::Format");
+  throw xtl::make_not_implemented_exception ("media::DdsImage::Format");
   return (DdsPixelFormat)-1;
 }
 
@@ -106,7 +106,7 @@ DdsPixelFormat DdsImage::Format () const
 
 const void* DdsImage::Bitmap (size_t layer, size_t mip_level) const
 {
-  raise_not_implemented ("media::DdsImage::Bitmap");
+  throw xtl::make_not_implemented_exception ("media::DdsImage::Bitmap");
   return 0;
 }
 

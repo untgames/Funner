@@ -23,5 +23,6 @@ SCENE_PLAYER_TESTS.DLLS             :=
 SCENE_PLAYER_TESTS.DLL_DIRS         :=
 SCENE_PLAYER_TESTS.COMPILER_CFLAGS  :=
 SCENE_PLAYER_TESTS.COMPILER_DEFINES :=
+SCENE_PLAYER_TESTS.LINK_INCLUDES    :=
 SCENE_PLAYER_TESTS.IMPORTS          := link.static.mak compile.static.mak ../../system/compile.static.mak ../openal_device/link.static.mak ../../media/sound/snddecl.link.static.mak \
 						  				                 ../../media/sound/default_decoders.link.static.mak ../openal_device/run.static.mak

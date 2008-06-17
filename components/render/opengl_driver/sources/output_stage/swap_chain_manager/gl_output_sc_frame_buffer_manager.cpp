@@ -225,9 +225,9 @@ ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& de
 
         return new SwapChainColorBuffer (frame_buffer_manager, swap_chain.get (), desc);
       }
-      catch (common::Exception& exception)
+      catch (xtl::exception& exception)
       {
-        exception.Touch (METHOD_NAME);
+        exception.touch (METHOD_NAME);
         
         throw;
       }
@@ -242,9 +242,9 @@ ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& de
 
         return new SwapChainDepthStencilBuffer (frame_buffer_manager, default_swap_chain, desc);
       }
-      catch (common::Exception& exception)
+      catch (xtl::exception& exception)
       {
-        exception.Touch (METHOD_NAME);
+        exception.touch (METHOD_NAME);
         
         throw;
       }
@@ -256,10 +256,10 @@ ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& de
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-      raise_not_supported (METHOD_NAME, "Can't create output-stage texture with format=%s", get_name (desc.format));
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create output-stage texture with format=%s", get_name (desc.format));
       return 0;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.format", desc.format);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);
       return 0;
   }
 }
@@ -270,9 +270,9 @@ ITexture* SwapChainFrameBufferManager::CreateColorBuffer (ISwapChain* swap_chain
   {
     return new SwapChainColorBuffer (frame_buffer_manager, swap_chain, buffer_index);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainFrameBufferManager::CreateColorBuffer");
+    exception.touch ("render::low_level::opengl::SwapChainFrameBufferManager::CreateColorBuffer");
 
     throw;
   }
@@ -284,9 +284,9 @@ ITexture* SwapChainFrameBufferManager::CreateDepthStencilBuffer (ISwapChain* swa
   {
     return new SwapChainDepthStencilBuffer (frame_buffer_manager, swap_chain);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainFrameBufferManager::CreateDepthStencilBuffer");
+    exception.touch ("render::low_level::opengl::SwapChainFrameBufferManager::CreateDepthStencilBuffer");
 
     throw;
   }
@@ -332,9 +332,9 @@ IFrameBuffer* SwapChainFrameBufferManager::CreateFrameBuffer (View* color_view, 
 
     return new SwapChainFrameBuffer (*this, color_view, depth_stencil_view);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainFrameBufferManager::CreateFrameBuffer");
+    exception.touch ("render::low_level::opengl::SwapChainFrameBufferManager::CreateFrameBuffer");
 
     throw;
   }  

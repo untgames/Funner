@@ -1,4 +1,4 @@
-#include <platform/platform.h>
+#include "shared.h"
 
 using namespace syslib;
 

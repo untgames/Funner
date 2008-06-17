@@ -57,7 +57,7 @@ class OverloadedInvoker
       if (arguments_count)
         arguments_count--; //удаление имени функции из стека
 
-      raise<RuntimeException> ("script::OverloadedInvoker::operator ()", "Bad overloaded invoker call (%u arguments in stack)", arguments_count);
+      throw xtl::format_exception<RuntimeException> ("script::OverloadedInvoker::operator ()", "Bad overloaded invoker call (%u arguments in stack)", arguments_count);
 
       return 0;
     }

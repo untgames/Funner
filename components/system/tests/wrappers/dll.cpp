@@ -1,6 +1,6 @@
 #include "shared.h"
 
-#ifdef _MSC_VER
+#if defined (_MSC_VER) || defined (__CYGWIN__)
   const char* LIBRARY_NAME = "kernel32.dll";
   const char* SYMBOL_NAME  = "LoadLibraryA";
 #else

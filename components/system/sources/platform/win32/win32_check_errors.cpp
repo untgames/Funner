@@ -1,7 +1,5 @@
 #include "shared.h"
 
-#include <locale.h>
-
 namespace syslib
 {
 
@@ -63,14 +61,14 @@ void check_errors (const char* source)
   DWORD error_code = GetLastError ();
   
   if (error_code)
-    throw WinAPIException (source, get_error_message (GetLastError ()).c_str ());
+    throw xtl::format_operation_exception ("syslib::check_errors", get_error_message (GetLastError ()).c_str ());
 }
 
 void raise_error (const char* source)
 {
   check_errors (source);
-  
-  throw WinAPIException (source, "Invalid operation");
+
+  throw xtl::format_operation_exception (source, "Invalid operation");
 }
 
 }

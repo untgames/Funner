@@ -23,12 +23,12 @@ string common::strfilemode (filemode_t mode)
 {   
   string res;
 
-  TestModeFlag (res,mode,FILE_MODE_READ,"read");
-  TestModeFlag (res,mode,FILE_MODE_WRITE,"write");
-  TestModeFlag (res,mode,FILE_MODE_SEEK,"seek");
-  TestModeFlag (res,mode,FILE_MODE_REWIND,"rewind");
-  TestModeFlag (res,mode,FILE_MODE_RESIZE,"resize");
-  TestModeFlag (res,mode,FILE_MODE_CREATE,"create");
+  TestModeFlag (res,mode,FileMode_Read,"read");
+  TestModeFlag (res,mode,FileMode_Write,"write");
+  TestModeFlag (res,mode,FileMode_Seek,"seek");
+  TestModeFlag (res,mode,FileMode_Rewind,"rewind");
+  TestModeFlag (res,mode,FileMode_Resize,"resize");
+  TestModeFlag (res,mode,FileMode_Create,"create");
 
   return res;
 }
@@ -41,12 +41,12 @@ string common::strsearchflags (size_t flags)
 {   
   string res;
 
-  TestModeFlag (res,flags,FILE_SEARCH_FILES,"files");
-  TestModeFlag (res,flags,FILE_SEARCH_DIRS,"dirs");
-  TestModeFlag (res,flags,~FILE_SEARCH_NO_PACKS,"packs");
-  TestModeFlag (res,flags,FILE_SEARCH_SUBDIRS,"recursive");
-  TestModeFlag (res,flags,FILE_SEARCH_FULL_PATHS,"full-paths");
-  TestModeFlag (res,flags,FILE_SEARCH_SORT,"sort");
+  TestModeFlag (res,flags,FileSearch_Files,"files");
+  TestModeFlag (res,flags,FileSearch_Dirs,"dirs");
+  TestModeFlag (res,flags,~FileSearch_NoPacks,"packs");
+  TestModeFlag (res,flags,FileSearch_SubDirs,"recursive");
+  TestModeFlag (res,flags,FileSearch_FullPaths,"full-paths");
+  TestModeFlag (res,flags,FileSearch_Sort,"sort");
 
   return res;
 }

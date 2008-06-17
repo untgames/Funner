@@ -21,9 +21,9 @@ struct StdioFile
 ///Потоковые файлы стандартной библиотеки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static StdioFile stdio_files [] = {
-  {"stdout","stdout/",stdout,FILE_MODE_WRITE},
-  {"stderr","stderr/",stderr,FILE_MODE_WRITE},
-  {"stdin","stdin/",stdin,FILE_MODE_READ}
+  {"stdout","stdout/",stdout,FileMode_Write},
+  {"stderr","stderr/",stderr,FileMode_Write},
+  {"stdin","stdin/",stdin,FileMode_Read}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,16 +56,14 @@ StdioIOSystem::file_t StdioIOSystem::FileOpen (const char* file_name,filemode_t 
     {
       if (stdio_file->mode & ~mode)
       {
-        raise<FileLoadException> ("StdioIOSystem::FileOpen","Wrong <file_mode>='%s' at open '%s' stream",
+        throw xtl::format_exception<FileLoadException> ("common::StdioIOSystem::FileOpen","Wrong <file_mode>='%s' at open '%s' stream",
                                   strfilemode (mode).c_str (),file_name);
       }
 
       return (file_t)stdio_file->stream;
     }
   
-  raise<FileNotFoundException> ("StdioIOSystem::FileOpen","File '%s' not found",file_name);
-    
-  return (file_t)NULL;
+  throw xtl::format_exception<FileNotFoundException> ("common::StdioIOSystem::FileOpen","File '%s' not found",file_name);
 }
 
 bool StdioIOSystem::IsFileExist (const char* file_name)
@@ -108,15 +106,15 @@ bool StdioIOSystem::GetFileInfo (const char* file_name,FileInfo& info)
 
 void StdioIOSystem::Remove (const char* file_name)
 {
-  raise_not_supported ("StdioIOSystem::Remove","File '%s' can not be removed",file_name);
+  throw xtl::format_not_supported_exception ("common::StdioIOSystem::Remove","File '%s' can not be removed",file_name);
 }
 
 void StdioIOSystem::Rename (const char* file_name,const char*)
 {
-  raise_not_supported ("StdioIOSystem::Rename","File '%s' can not be renamed",file_name);
+  throw xtl::format_not_supported_exception ("common::StdioIOSystem::Rename","File '%s' can not be renamed",file_name);
 }
 
 void StdioIOSystem::Mkdir (const char* dir_name)
 {
-  raise_not_supported ("StdioIOSystem::Mkdir","Unable to make dir '%s'. This file system is static",dir_name);
+  throw xtl::format_not_supported_exception ("common::StdioIOSystem::Mkdir","Unable to make dir '%s'. This file system is static",dir_name);
 }

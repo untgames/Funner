@@ -7,83 +7,60 @@ namespace xtl
 {
 
 /*
-    Базовые классы исключений
+    Иерархия базовых классов исключений
 */
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Неверное значение аргумента переданного функции
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct argument_exception_tag;
+struct argument_exception:               virtual public exception {};
+struct null_argument_exception:                  public argument_exception {};
+struct argument_range_exception:                 public argument_exception {};
+struct operation_exception:              virtual public exception {};
+struct not_supported_exception:                  public operation_exception {};
+struct platform_not_supported_exception:         public not_supported_exception {};
+struct not_implemented_exception:        virtual public exception {};
 
-typedef derived_exception<argument_exception_tag> argument_exception, bad_argument;
+typedef argument_exception               bad_argument;
+typedef argument_range_exception         bad_range;
+typedef operation_exception              bad_operation;
+typedef not_implemented_exception        bad_implementation;
+typedef platform_not_supported_exception bad_platform;
 
-argument_exception make_argument_exception (const char* source, const char* argument_name);
-argument_exception make_argument_exception (const char* source, const char* argument_name, const char* value, const char* comment=0);
-argument_exception make_argument_exception (const char* source, const char* argument_name, int value, const char* comment=0);
-argument_exception make_argument_exception (const char* source, const char* argument_name, size_t value, const char* comment=0);
-argument_exception make_argument_exception (const char* source, const char* argument_name, float value, const char* comment=0);
-argument_exception make_argument_exception (const char* source, const char* argument_name, double value, const char* comment=0);
+/*
+    Создание исключений
+*/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Нулевое значение аргумента
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct null_argument_exception_tag;
+///неверное значение аргумента переданного функции
+message_exception<argument_exception> make_argument_exception (const char* source, const char* argument_name);
+message_exception<argument_exception> make_argument_exception (const char* source, const char* argument_name, const char* value, const char* comment=0);
+message_exception<argument_exception> make_argument_exception (const char* source, const char* argument_name, int value, const char* comment=0);
+message_exception<argument_exception> make_argument_exception (const char* source, const char* argument_name, size_t value, const char* comment=0);
+message_exception<argument_exception> make_argument_exception (const char* source, const char* argument_name, float value, const char* comment=0);
+message_exception<argument_exception> make_argument_exception (const char* source, const char* argument_name, double value, const char* comment=0);
 
-typedef derived_exception<null_argument_exception_tag, argument_exception> null_argument_exception;
+///нулевое значение аргумента
+message_exception<null_argument_exception> make_null_argument_exception (const char* source, const char* argument_name);
 
-null_argument_exception make_null_argument_exception (const char* source, const char* argument_name);
+///значение аргумента выходит за пределы допустимых значений
+message_exception<bad_range> make_range_exception (const char* source, const char* argument_name);
+message_exception<bad_range> make_range_exception (const char* source, const char* argument_name, int value, int first, int last);
+message_exception<bad_range> make_range_exception (const char* source, const char* argument_name, size_t value, size_t first, size_t last);
+message_exception<bad_range> make_range_exception (const char* source, const char* argument_name, float value, float first, float last);
+message_exception<bad_range> make_range_exception (const char* source, const char* argument_name, double value, double first, double last);
+message_exception<bad_range> make_range_exception (const char* source, const char* argument_name, size_t index, size_t max_count);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Значение аргумента выходит за пределы допустимых значений
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct argument_range_exception_tag;
+///неверная операция
+message_exception<operation_exception> format_operation_exception  (const char* source, const char* format, ...);
+message_exception<operation_exception> vformat_operation_exception (const char* source, const char* format, va_list list);
 
-typedef derived_exception<argument_range_exception_tag, argument_exception> argument_range_exception, bad_range;
+///функция не реализована
+message_exception<not_implemented_exception> make_not_implemented_exception (const char* source);
 
-bad_range make_range_exception (const char* source, const char* argument_name);
-bad_range make_range_exception (const char* source, const char* argument_name, int value, int first, int last);
-bad_range make_range_exception (const char* source, const char* argument_name, size_t value, size_t first, size_t last);
-bad_range make_range_exception (const char* source, const char* argument_name, float value, float first, float last);
-bad_range make_range_exception (const char* source, const char* argument_name, double value, double first, double last);
-bad_range make_range_exception (const char* source, const char* argument_name, size_t index, size_t max_count);
+///aункция не поддерживается
+message_exception<not_supported_exception> format_not_supported_exception  (const char* source);
+message_exception<not_supported_exception> format_not_supported_exception  (const char* source, const char* format, ...);
+message_exception<not_supported_exception> vformat_not_supported_exception (const char* source, const char* format, va_list list);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Неверная операция
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct operation_exception_tag;
-
-typedef derived_exception<operation_exception_tag> operation_exception, bad_operation;
-
-operation_exception format_operation_exception  (const char* source, const char* format, ...);
-operation_exception vformat_operation_exception (const char* source, const char* format, va_list list);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Функция не реализована
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct not_implemented_exception_tag;
-
-typedef derived_exception<not_implemented_exception_tag> not_implemented_exception;
-
-not_implemented_exception make_not_implemented_exception (const char* source);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Функция не поддерживается
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct not_supported_exception_tag;
-
-typedef derived_exception<not_supported_exception_tag, bad_operation> not_supported_exception;
-
-not_supported_exception format_not_supported_exception  (const char* source, const char* format, ...);
-not_supported_exception vformat_not_supported_exception (const char* source, const char* format, va_list list);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Платформа не поддерживается
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct platform_not_supported_exception_tag;
-
-typedef derived_exception<platform_not_supported_exception_tag, not_supported_exception> platform_not_supported_exception, bad_platform;
-
-bad_platform make_unsupported_platform_exception (const char* source, const char* platform=0);
+///gлатформа не поддерживается
+message_exception<bad_platform> make_unsupported_platform_exception (const char* source, const char* platform=0);
 
 #include <xtl/detail/common_exceptions.inl>
 

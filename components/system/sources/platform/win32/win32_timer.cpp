@@ -62,9 +62,9 @@ Win32Timer::Win32Timer (size_t period_in_milliseconds, const TimerHandler& in_ha
       throw;
     }
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("syslib::Win32Timer::Win32Timer");
+    exception.touch ("syslib::Win32Timer::Win32Timer");
     throw;
   }
 }
@@ -127,7 +127,7 @@ Platform::timer_t Platform::CreateTimer (size_t period_in_milliseconds, TimerHan
 void Platform::KillTimer (timer_t handle)
 {
   if (!handle)
-    raise_null_argument ("syslib::Platform::KillTimer", "handle");
+    throw xtl::make_null_argument_exception ("syslib::Platform::KillTimer", "handle");
 
   Win32Timer* timer = (Win32Timer*)handle;
 

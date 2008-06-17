@@ -1,6 +1,5 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.INCLUDE_DIRS     := include ../../xtl/include
-export.LIBS             := common render.low_level
-export.IMPORTS          :=
+export.LIBS     := render.low_level
+export.IMPORTS  := ../../common/link.static.mak

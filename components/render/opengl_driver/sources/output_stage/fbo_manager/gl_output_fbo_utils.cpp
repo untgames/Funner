@@ -19,28 +19,28 @@ void check_frame_buffer_status (const char* source, GLenum status)
     case GL_FRAMEBUFFER_COMPLETE_EXT:
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-      raise_invalid_operation (source, "OpenGL bad framebuffer status: incomplete attachment");
+      throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: incomplete attachment");
       break;
     case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-      raise_invalid_operation (source, "OpenGL bad framebuffer status: unsupported framebuffer format");
+      throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: unsupported framebuffer format");
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-      raise_invalid_operation (source, "OpenGL bad framebuffer status: missing attachment");
+      throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: missing attachment");
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-      raise_invalid_operation (source, "OpenGL bad framebuffer status: attached images must have same dimensions");
+      throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: attached images must have same dimensions");
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-      raise_invalid_operation (source, "OpenGL bad framebuffer status: attached images must have same format");
+      throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: attached images must have same format");
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-      raise_invalid_operation (source, "OpenGL bad framebuffer status: missing draw buffer");
+      throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: missing draw buffer");
       break;
     case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-      raise_invalid_operation (source, "OpenGL bad framebuffer status: missing read buffer");
+      throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: missing read buffer");
       break;
     default:
-      raise_invalid_operation (source, "OpenGL bad framebuffer status: 0x%04x", status);
+      throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: 0x%04x", status);
       break;
   }
 }

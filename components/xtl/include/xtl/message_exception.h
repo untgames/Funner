@@ -10,17 +10,17 @@ namespace xtl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Класс исключения, основанный на строковом сообщении
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class message_exception: public exception
+class message_exception_base: virtual public exception
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    message_exception  (const char* message);
-    message_exception  (const char* format, va_list args);    
-    message_exception  (const char* source, const char* message);
-    message_exception  (const char* source, const char* format, va_list args);
-    ~message_exception () throw () {}
+    message_exception_base  (const char* message);
+    message_exception_base  (const char* format, va_list args);    
+    message_exception_base  (const char* source, const char* message);
+    message_exception_base  (const char* source, const char* format, va_list args);
+    ~message_exception_base () throw () {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение сообщения
@@ -32,29 +32,38 @@ class message_exception: public exception
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void touch  (const char* format, ...) throw ();
     void vtouch (const char* format, va_list args) throw ();
-
+    
   private:
-    string_buffer message;
+    string_buffer message;    
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Враппер для создания производного класса исключения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Tag, class BaseException=message_exception>
-class derived_exception: public BaseException
+#ifdef _MSC_VER
+  #pragma warning (push)
+  #pragma warning (disable : 4250) //inherits via dominance
+#endif
+
+template <class BaseException>
+class message_exception: public BaseException, public message_exception_base
 {
   public:
-    derived_exception (const char* message);
-    derived_exception (const char* format, va_list args);
-    derived_exception (const char* source, const char* message);
-    derived_exception (const char* source, const char* format, va_list args);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    message_exception (const char* message);
+    message_exception (const char* format, va_list args);
+    message_exception (const char* source, const char* message);
+    message_exception (const char* source, const char* format, va_list args);
 };
+
+#ifdef _MSC_VER
+  #pragma warning (pop)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание исключения с форматированным сообщением
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Exception> Exception format_exception  (const char* source, const char* format, ...);
-template <class Exception> Exception vformat_exception (const char* source, const char* format, va_list args);
+template <class Exception> message_exception<Exception> format_exception  (const char* source, const char* format, ...);
+template <class Exception> message_exception<Exception> vformat_exception (const char* source, const char* format, va_list args);
 
 #include <xtl/detail/message_exception.inl>
 

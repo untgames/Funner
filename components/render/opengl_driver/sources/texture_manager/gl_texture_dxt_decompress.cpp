@@ -88,6 +88,6 @@ void render::low_level::opengl::unpack_dxt (PixelFormat format, size_t width, si
 
       break;
     }
-    default: common::raise_invalid_argument ("render::low_level::opengl::unpack_dxt", "format"); return;
+    default: throw xtl::make_argument_exception ("render::low_level::opengl::unpack_dxt", "format"); return;
   }
 }

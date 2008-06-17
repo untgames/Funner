@@ -368,7 +368,7 @@ size_t get_extension_id (const char* full_name, size_t length)
   static const char* METHOD_NAME = "render::low_level::opengl::get_extension_id";
 
   if (!full_name)
-    raise_null_argument (METHOD_NAME, "full_name");  
+    throw xtl::make_null_argument_exception (METHOD_NAME, "full_name");  
 
   typedef Singleton<ExtensionMap> ExtensionMapSingleton;
 
@@ -387,7 +387,7 @@ size_t get_extension_id (const char* full_name)
 const char* get_extension_name (size_t id)
 {
   if (id >= EXTENSIONS_COUNT)
-    raise_out_of_range ("render::low_level::opengl::get_extension_name", "id", id, EXTENSIONS_COUNT);
+    throw xtl::make_range_exception ("render::low_level::opengl::get_extension_name", "id", id, EXTENSIONS_COUNT);
 
   return extensions [id];
 }
@@ -401,14 +401,14 @@ Extension::Extension (size_t in_id)
   : id (in_id)
 {
   if (id >= EXTENSIONS_COUNT)
-    raise_out_of_range ("render::low_level::opengl::Extension::Extension", "id", id, EXTENSIONS_COUNT);
+    throw xtl::make_range_exception ("render::low_level::opengl::Extension::Extension", "id", id, EXTENSIONS_COUNT);
 }
 
 Extension::Extension (const char* full_name)
   : id (get_extension_id (full_name))
 {
   if (id >= EXTENSIONS_COUNT)
-    raise_not_supported ("render::low_level::opengl::Extension::Extension", "Extension '%s' not supported", full_name);
+    throw xtl::format_not_supported_exception ("render::low_level::opengl::Extension::Extension", "Extension '%s' not supported", full_name);
 }
 
 //имя расширения

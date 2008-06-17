@@ -64,7 +64,7 @@ void MaterialLibrary::Init (const char* file_name, const LogHandler& log_handler
   try
   {
     if (!file_name)
-      raise_null_argument ("", "file_name");
+      throw xtl::make_null_argument_exception ("", "file_name");
       
     static ComponentLoader loader ("media.rfx.loaders.*");
 
@@ -72,9 +72,9 @@ void MaterialLibrary::Init (const char* file_name, const LogHandler& log_handler
 
     Rename (file_name);    
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::rfx::MaterialLibrary::MaterialLibrary");
+    exception.touch ("media::rfx::MaterialLibrary::MaterialLibrary");
     throw;
   }
 }
@@ -101,7 +101,7 @@ const char* MaterialLibrary::Name () const
 void MaterialLibrary::Rename (const char* name)
 {
   if (!name)
-    raise_null_argument ("media::rfx::MaterialLibrary::Rename", name);
+    throw xtl::make_null_argument_exception ("media::rfx::MaterialLibrary::Rename", name);
     
   impl->name = name;
 }
@@ -155,7 +155,7 @@ const char* MaterialLibrary::ItemId (const ConstIterator& i) const
   const MaterialMap::iterator* iter = i.target<MaterialMap::iterator> ();
 
   if (!iter)
-    common::raise_invalid_argument ("media::rfx::MaterialLibrary::ItemId", "iterator", "wrong-type");
+    throw xtl::make_argument_exception ("media::rfx::MaterialLibrary::ItemId", "iterator", "wrong-type");
 
   return (*iter)->first.c_str ();
 }
@@ -186,7 +186,7 @@ Material::ConstPointer MaterialLibrary::Find (const char* name) const
 void MaterialLibrary::Attach (const char* id, const Material::Pointer& material)
 {
   if (!id)
-    common::raise_null_argument ("media::rfx::MaterialLibrary::Insert", "id");
+    throw xtl::make_null_argument_exception ("media::rfx::MaterialLibrary::Insert", "id");
     
   impl->materials.insert_pair (id, material);
 }
@@ -225,9 +225,9 @@ void MaterialLibrary::Load (const char* file_name, const LogHandler& log_handler
   {
     MaterialLibrary (file_name, log_handler).Swap (*this);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::rfx::MaterialLibrary::Load");
+    exception.touch ("media::rfx::MaterialLibrary::Load");
     throw;
   }
 }
@@ -242,15 +242,15 @@ void MaterialLibrary::Save (const char* file_name, const LogHandler& log_handler
   try
   {
     if (!file_name)
-      raise_null_argument ("", "file_name");    
+      throw xtl::make_null_argument_exception ("", "file_name");    
       
     static ComponentLoader loader ("media.rfx.savers.*");      
 
     MaterialLibraryManager::GetSaver (file_name, SerializerFindMode_ByName)(file_name, *this, log_handler);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::rfx::MaterialLibrary::Save");
+    exception.touch ("media::rfx::MaterialLibrary::Save");
     throw;
   }
 }

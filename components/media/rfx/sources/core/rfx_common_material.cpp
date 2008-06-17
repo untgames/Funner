@@ -101,7 +101,7 @@ CommonMaterialShaderType CommonMaterial::ShaderType () const
 void CommonMaterial::SetShaderType (CommonMaterialShaderType type)
 {
   if (type < 0 || type >= CommonMaterialShaderType_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::SetShaderType", "type", type);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetShaderType", "type", type);
     
   impl->shader_type = type;
 }
@@ -113,7 +113,7 @@ void CommonMaterial::SetShaderType (CommonMaterialShaderType type)
 const vec3f& CommonMaterial::Color (CommonMaterialColor color_id) const
 {
   if (color_id < 0 || color_id >= CommonMaterialColor_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::Color", "color_id", color_id);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::Color", "color_id", color_id);
     
   return impl->colors [color_id];
 }
@@ -121,7 +121,7 @@ const vec3f& CommonMaterial::Color (CommonMaterialColor color_id) const
 void CommonMaterial::SetColor (CommonMaterialColor color_id, const vec3f& color)
 {
   if (color_id < 0 || color_id >= CommonMaterialColor_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::SetColor", "color_id", color_id);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetColor", "color_id", color_id);
     
   impl->colors [color_id] = clamp (color, vec3f (0.0f), vec3f (1.0f));
 }
@@ -171,13 +171,13 @@ const BlendFunction& CommonMaterial::Blend () const
 void CommonMaterial::SetBlend (const BlendFunction& blend)
 {
   if (blend.equation < 0 || blend.equation >= BlendEquation_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::SetBlend", "blend.equation", blend.equation);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetBlend", "blend.equation", blend.equation);
 
   if (blend.argument [0] < 0 || blend.argument [0] >= BlendArgument_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::SetBlend", "blend.argument[0]", blend.argument [0]);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetBlend", "blend.argument[0]", blend.argument [0]);
 
   if (blend.argument [1] < 0 || blend.argument [1] >= BlendArgument_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::SetBlend", "blend.argument[1]", blend.argument [1]);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetBlend", "blend.argument[1]", blend.argument [1]);
 
   impl->blend_function = blend;
 }
@@ -204,7 +204,7 @@ float CommonMaterial::AlphaTestReference () const
 void CommonMaterial::SetAlphaTestMode (CompareMode mode)
 {
   if (mode < 0 || mode >= CompareMode_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::SetAlphaTestMode", "mode", mode);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetAlphaTestMode", "mode", mode);
     
   impl->alpha_test_mode = mode;
 }
@@ -227,7 +227,7 @@ void CommonMaterial::SetAlphaTest (CompareMode mode, float alpha_reference)
 const Texmap& CommonMaterial::Map (CommonMaterialMap map) const
 {
   if (map < 0 || map >= CommonMaterialMap_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::Map", "map", map);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::Map", "map", map);
     
   return impl->maps [map].texmap;
 }
@@ -244,7 +244,7 @@ Texmap& CommonMaterial::Map (CommonMaterialMap map)
 float CommonMaterial::MapWeight (CommonMaterialMap map) const
 {
   if (map < 0 || map >= CommonMaterialMap_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::MapWeight", "map", map);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::MapWeight", "map", map);
     
   return impl->maps [map].weight;
 }
@@ -252,7 +252,7 @@ float CommonMaterial::MapWeight (CommonMaterialMap map) const
 void CommonMaterial::SetMapWeight (CommonMaterialMap map, float weight)
 {
   if (map < 0 || map >= CommonMaterialMap_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::SetMapWeight", "map", map);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetMapWeight", "map", map);
 
   impl->maps [map].weight = clamp (weight, 0.0f, 1.0f);
 }
@@ -264,7 +264,7 @@ void CommonMaterial::SetMapWeight (CommonMaterialMap map, float weight)
 media::rfx::MapState CommonMaterial::MapState (CommonMaterialMap map) const
 {
   if (map < 0 || map >= CommonMaterialMap_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::MapState", "map", map);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::MapState", "map", map);
     
   return impl->maps [map].state;
 }
@@ -272,7 +272,7 @@ media::rfx::MapState CommonMaterial::MapState (CommonMaterialMap map) const
 void CommonMaterial::SetMapState (CommonMaterialMap map, media::rfx::MapState state)
 {
   if (map < 0 || map >= CommonMaterialMap_Num)
-    raise_invalid_argument ("media::rfx::CommonMaterial::SetMapState", "map", map);
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetMapState", "map", map);
     
   switch (state)
   {
@@ -280,7 +280,7 @@ void CommonMaterial::SetMapState (CommonMaterialMap map, media::rfx::MapState st
     case MapState_Disabled:
       break;
     default:
-      raise_invalid_argument ("media::rfx::CommonMaterial::SetMapState", "state", state);
+      throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetMapState", "state", state);
       break;
   }
 
@@ -316,7 +316,7 @@ const char* get_name (BlendEquation id)
     case BlendEquation_ReverseSubtraction: return "rev_sub";
     case BlendEquation_Min:                return "min";
     case BlendEquation_Max:                return "max";
-    default:                               raise_invalid_argument ("media::rfx::get_name(BlendEquation)", "id", id);
+    default:                               throw xtl::make_argument_exception ("media::rfx::get_name(BlendEquation)", "id", id);
   }
 
   return "";
@@ -336,7 +336,7 @@ const char* get_name (BlendArgument id)
     case BlendArgument_DestinationAlpha:        return "dst_alpha";
     case BlendArgument_InverseDestinationColor: return "inv_dst_color";
     case BlendArgument_InverseDestinationAlpha: return "inv_dst_alpha";
-    default:                                    raise_invalid_argument ("media::rfx::get_name(BlendArgument)", "id", id);
+    default:                                    throw xtl::make_argument_exception ("media::rfx::get_name(BlendArgument)", "id", id);
   }
 
   return "";
@@ -354,7 +354,7 @@ const char* get_name (CompareMode id)
     case CompareMode_LessEqual:    return "less_equal";
     case CompareMode_Greater:      return "greater";
     case CompareMode_GreaterEqual: return "greater_equal";
-    default:                       raise_invalid_argument ("media::rfx::get_name(CompareMode)", "id", id);
+    default:                       throw xtl::make_argument_exception ("media::rfx::get_name(CompareMode)", "id", id);
   }
   
   return "";
@@ -367,7 +367,7 @@ const char* get_name (CommonMaterialShaderType id)
     case CommonMaterialShaderType_Flat:    return "flat";
     case CommonMaterialShaderType_Gourand: return "gourand";
     case CommonMaterialShaderType_Phong:   return "phong";
-    default:                         raise_invalid_argument ("media::rfx::get_name(CommonMaterialShaderType)", "id", id);
+    default:                         throw xtl::make_argument_exception ("media::rfx::get_name(CommonMaterialShaderType)", "id", id);
   }
   
   return "";
@@ -381,7 +381,7 @@ const char* get_name (CommonMaterialColor id)
     case CommonMaterialColor_Diffuse:  return "diffuse";
     case CommonMaterialColor_Specular: return "specular";
     case CommonMaterialColor_Emission: return "emission";
-    default:                           raise_invalid_argument ("media::rfx::get_name(CommonMaterialColor)", "id", id);
+    default:                           throw xtl::make_argument_exception ("media::rfx::get_name(CommonMaterialColor)", "id", id);
   }
 
   return "";
@@ -398,7 +398,7 @@ const char* get_name (CommonMaterialMap id)
     case CommonMaterialMap_Emission:    return "emission";
     case CommonMaterialMap_Reflective:  return "reflective";
     case CommonMaterialMap_Bump:        return "bump";
-    default:                            raise_invalid_argument ("media::rfx::get_name(CommonMaterialMap)", "id", id);
+    default:                            throw xtl::make_argument_exception ("media::rfx::get_name(CommonMaterialMap)", "id", id);
   }
 
   return "";

@@ -37,7 +37,7 @@ SoundSample::SoundSample (const char* file_name)
   : impl (new Impl)
 {
   if (!file_name)
-    raise_null_argument ("media::SoundSample::SoundSample", "file_name");
+    throw xtl::make_null_argument_exception ("media::SoundSample::SoundSample", "file_name");
 
   try
   {
@@ -46,9 +46,9 @@ SoundSample::SoundSample (const char* file_name)
     impl->input_stream    = SoundSampleManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, impl->info);
     impl->str_name = file_name;
   }
-  catch (Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::SoundSample::SoundSample");
+    exception.touch ("media::SoundSample::SoundSample");
     throw;
   }
 }
@@ -57,7 +57,7 @@ SoundSample::SoundSample (ISoundInputStream* istream)
   : impl (new Impl)
 {
   if (!istream)
-    raise_null_argument ("media::SoundSample::SoundSample", "istream");
+    throw xtl::make_null_argument_exception ("media::SoundSample::SoundSample", "istream");
 
   impl->input_stream = istream;
 }
@@ -157,7 +157,7 @@ size_t SoundSample::Read (size_t first_sample, size_t samples_count, void* data)
 void SoundSample::Save (const char* file_name) const
 {
   if (!file_name)
-    raise_null_argument ("media::SoundSample::Save", "file_name");
+    throw xtl::make_null_argument_exception ("media::SoundSample::Save", "file_name");
     
   try
   {
@@ -165,9 +165,9 @@ void SoundSample::Save (const char* file_name) const
 
     SoundSampleManager::GetSaver (file_name, SerializerFindMode_ByName) (file_name, *this);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::SoundSample::Save");
+    exception.touch ("media::SoundSample::Save");
     throw;
   }
 }

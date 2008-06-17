@@ -37,7 +37,7 @@ struct Configuration::Impl
     const char* LogMessage (size_t index)
     {
       if (index >= LogMessagesCount ())
-        raise_out_of_range ("Configuration::LogMessage", "index", index, (size_t)0, LogMessagesCount ());
+        throw xtl::make_range_exception ("Configuration::LogMessage", "index", index, (size_t)0, LogMessagesCount ());
 
       return parse_log.Message (index);
     }

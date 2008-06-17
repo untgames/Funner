@@ -34,7 +34,7 @@ int main ()
   }
   catch (FileException& exception)
   {
-    printf ("FileException: %s\n",exception.Message ());
+    printf ("FileException: %s\n",exception.what ());
   }
 
   return 0;

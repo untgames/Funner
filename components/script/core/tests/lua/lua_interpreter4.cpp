@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <xtl/iterator.h>
-#include <xtl/shared_ptr.h>
-#include <common/strlib.h>
-#include <script/bind.h>
-#include <script/environment.h>
+#include "shared.h"
 
 using namespace script;
 
@@ -33,7 +28,7 @@ int get_id (const A& a)
 int set_id (A& a, int id)
 {
   if (!id)
-   common::raise_invalid_argument ("set_id(A)", "id", id);
+   throw xtl::make_argument_exception ("set_id(A)", "id", id);
 
   return a.id = id;
 }

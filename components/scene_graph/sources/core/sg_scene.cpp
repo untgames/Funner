@@ -1,10 +1,4 @@
-#include <sg/scene.h>
-#include <stl/string>
-#include <xtl/intrusive_ptr.h>
-#include <xtl/function.h>
-#include <common/exception.h>
-
-#include "scene_object.h"
+#include "shared.h"
 
 using namespace scene_graph;
 using namespace bound_volumes;
@@ -86,7 +80,7 @@ Scene::~Scene ()
 void Scene::SetName (const char* name)
 {
   if (!name)
-    raise_null_argument ("scene_graph::Scene::SetName", "name");
+    throw xtl::make_null_argument_exception ("scene_graph::Scene::SetName", "name");
     
   impl->name = name;
 }

@@ -61,7 +61,7 @@ const char* MeshLibrary::Name () const
 void MeshLibrary::Rename (const char* name)
 {
   if (!name)
-    raise_null_argument ("media::geometry::MeshLibrary::Rename", name);
+    throw xtl::make_null_argument_exception ("media::geometry::MeshLibrary::Rename", name);
     
   impl->name = name;
 }
@@ -154,7 +154,7 @@ void MeshLibrary::Clear ()
 void MeshLibrary::Load (const char* file_name)
 {
   if (!file_name)
-    raise_null_argument ("media::MeshLibrary::Load", "file_name");
+    throw xtl::make_null_argument_exception ("media::MeshLibrary::Load", "file_name");
 
   try
   {
@@ -162,9 +162,9 @@ void MeshLibrary::Load (const char* file_name)
 
     MeshLibraryManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::MeshLibrary::Load");
+    exception.touch ("media::MeshLibrary::Load");
     throw;
   }
 }
@@ -177,9 +177,9 @@ void MeshLibrary::Save (const char* file_name)
     
     MeshLibraryManager::GetSaver (file_name, SerializerFindMode_ByName)(file_name, *this);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("media::MeshLibrary::Save");
+    exception.touch ("media::MeshLibrary::Save");
     throw;
   }
 }

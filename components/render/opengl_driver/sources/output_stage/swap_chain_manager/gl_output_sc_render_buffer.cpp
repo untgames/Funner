@@ -59,14 +59,14 @@ SwapChainColorBuffer::SwapChainColorBuffer
     //проверка корректности переданных параметров
   
   if (!swap_chain)
-    raise_null_argument (METHOD_NAME, "swap_chain");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");
 
   SwapChainDesc swap_chain_desc;
 
   swap_chain->GetDesc (swap_chain_desc);
 
   if (buffer_index >= swap_chain_desc.buffers_count)
-    raise_out_of_range (METHOD_NAME, "buffer_index", buffer_index, swap_chain_desc.buffers_count);
+    throw xtl::make_range_exception (METHOD_NAME, "buffer_index", buffer_index, swap_chain_desc.buffers_count);
     
     //получение целевого буфера цвета
 
@@ -92,7 +92,7 @@ SwapChainColorBuffer::SwapChainColorBuffer (const FrameBufferManager& manager, I
     //проверка корректности переданных параметров
 
   if (!swap_chain)
-    raise_null_argument (METHOD_NAME, "swap_chain");   
+    throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");   
 }
 
 /*
@@ -105,9 +105,9 @@ void SwapChainColorBuffer::Bind ()
   {
     SetFrameBuffer (0, swap_chain.get (), buffer_type);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainColorBuffer::Bind");
+    exception.touch ("render::low_level::opengl::SwapChainColorBuffer::Bind");
 
     throw;
   }
@@ -131,7 +131,7 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
       //проверка корректности переданных параметров
     
     if (!swap_chain)
-      raise_null_argument ("", "swap_chain");
+      throw xtl::make_null_argument_exception ("", "swap_chain");
       
       //установка размеров буфера
 
@@ -145,9 +145,9 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
 
     context_id = GetContextManager ().CreateContext (swap_chain);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer");
+    exception.touch ("render::low_level::opengl::SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer");
     throw;
   }
 }
@@ -160,27 +160,27 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
       //проверка переданных параметров
 
     if (!swap_chain)
-      raise_null_argument ("", "swap_chain");
+      throw xtl::make_null_argument_exception ("", "swap_chain");
 
     SwapChainDesc swap_chain_desc;
 
     swap_chain->GetDesc (swap_chain_desc);
 
     if (desc.width > swap_chain_desc.frame_buffer.width)
-      raise_not_supported ("", "Depth-stencil buffer width=%u is greater than swap-chain desc.width=%u", desc.width,
+      throw xtl::format_not_supported_exception ("", "Depth-stencil buffer width=%u is greater than swap-chain desc.width=%u", desc.width,
         swap_chain_desc.frame_buffer.width);
 
     if (desc.height > swap_chain_desc.frame_buffer.height)
-      raise_not_supported ("", "Depth-stencil buffer height=%u is greater than swap-chain desc.height=%u", desc.height,
+      throw xtl::format_not_supported_exception ("", "Depth-stencil buffer height=%u is greater than swap-chain desc.height=%u", desc.height,
         swap_chain_desc.frame_buffer.height);
 
       //создание контекста  
 
     context_id = GetContextManager ().CreateContext (swap_chain);    
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer");
+    exception.touch ("render::low_level::opengl::SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer");
     throw;
   }
 }
@@ -201,9 +201,9 @@ void SwapChainDepthStencilBuffer::Bind ()
   {
     SetFrameBuffer (context_id, 0, 0);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::SwapChainDepthStencilBuffer::Bind");
+    exception.touch ("render::low_level::opengl::SwapChainDepthStencilBuffer::Bind");
     
     throw;
   }  

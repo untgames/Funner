@@ -3,7 +3,7 @@
 
 #include <stl/auto_ptr.h>
 #include <xtl/functional_fwd>
-#include <common/exception.h>
+#include <xtl/common_exceptions.h>
 
 namespace stl
 {
@@ -158,9 +158,7 @@ void swap (InputStreamBuffer&, InputStreamBuffer&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение: невозможно записать в поток
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct StreamWriteExceptionTag;
-
-typedef DerivedException<Exception, StreamWriteExceptionTag> StreamWriteException;
+struct StreamWriteException: virtual public xtl::exception {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текстовый поток вывода (выход потока в UTF8)

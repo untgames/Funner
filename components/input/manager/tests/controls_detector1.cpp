@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #include <xtl/bind.h>
 #include <xtl/intrusive_ptr.h>
@@ -7,8 +7,7 @@
 #include <xtl/iterator.h>
 #include <xtl/reference_counter.h>
 #include <xtl/connection.h>
-
-#include <common/exception.h>
+#include <xtl/common_exceptions.h>
 
 #include <input/low_level/driver.h>
 #include <input/low_level/device.h>
@@ -54,11 +53,11 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     const char* GetProperties () {return "";}
     void        SetProperty   (const char* name, float value) 
     {
-      raise_invalid_argument ("TestInput::SetProperty", "name", name);
+      throw xtl::make_argument_exception ("TestInput::SetProperty", "name", name);
     }
     float GetProperty   (const char* name)
     {
-      raise_invalid_argument ("TestInput::GetProperty", "name", name);
+      throw xtl::make_argument_exception ("TestInput::GetProperty", "name", name);
       return 0;
     }    
 

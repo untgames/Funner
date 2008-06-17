@@ -152,9 +152,9 @@ InputLayout::InputLayout (const ContextManager& context_manager, const InputLayo
   {
     SetDesc (desc);
   }
-  catch (common::Exception& exception)
+  catch (xtl::exception& exception)
   {
-    exception.Touch ("render::low_level::opengl::InputLayout::InputLayout");
+    exception.touch ("render::low_level::opengl::InputLayout::InputLayout");
     throw;
   }
 }
@@ -194,10 +194,10 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
     case InputDataType_Short:
     case InputDataType_Int:
     case InputDataType_Float:
-      raise_not_supported (METHOD_NAME, "desc.index_type", get_name (desc.index_type));
+      throw xtl::format_not_supported_exception (METHOD_NAME, "desc.index_type", get_name (desc.index_type));
       break;
     default:
-      raise_invalid_argument (METHOD_NAME, "desc.index_type", desc.index_type);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.index_type", desc.index_type);
       break;
   }
 
@@ -213,7 +213,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
   if (desc.vertex_attributes_count)
   {
     if (!desc.vertex_attributes)
-      raise_null_argument (METHOD_NAME, "desc.vertex_attributes");
+      throw xtl::make_null_argument_exception (METHOD_NAME, "desc.vertex_attributes");
 
       //установка текущего контекста
       
@@ -257,19 +257,19 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
         case VertexAttributeSemantic_TexCoord7:
         {
           if (!caps.has_arb_multitexture)
-            raise_not_supported (METHOD_NAME, "Bad desc.vertex_attribute[%u].semantic=%s (GL_ARB_multitexture & GL_VERSION_1_3 not supported)",
+            throw xtl::format_not_supported_exception (METHOD_NAME, "Bad desc.vertex_attribute[%u].semantic=%s (GL_ARB_multitexture & GL_VERSION_1_3 not supported)",
                                i, get_name (va.semantic));
 
           size_t tex_unit = va.semantic - VertexAttributeSemantic_TexCoord0;
 
           if (tex_unit >= tex_units_count)
-            raise_not_supported (METHOD_NAME, "Bad desc.vertex_attribute[%u].semantic=%s (only %u texture units supported)",
+            throw xtl::format_not_supported_exception (METHOD_NAME, "Bad desc.vertex_attribute[%u].semantic=%s (only %u texture units supported)",
                                i, get_name (va.semantic), tex_units_count);
 
           break;
         }
         default:
-          raise<ArgumentException> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%d", i, va.semantic);
+          throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%d", i, va.semantic);
           break;
       }
 
@@ -278,7 +278,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
         //отсечение повторной установки вершинной семантики           
 
       if (semantic_attribute [va.semantic] != NO_ATTRIBUTE)
-        raise<ArgumentException> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%s (semantic has been "
+        throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%s (semantic has been "
           "already defined in attribute %u)", i, get_name (va.semantic), semantic_attribute [va.semantic]);
 
       semantic_attribute [va.semantic] = i;
@@ -292,12 +292,12 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
         case InputDataFormat_Vector3:
         case InputDataFormat_Vector4:
           if (!VertexAttributeSemanticTraits::IsCompatible (va.semantic, va.format))
-            raise<NotSupportedException> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with format %s)", i,
+            throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with format %s)", i,
                                           get_name (va.semantic), get_name (va.format));
 
           break;
         default:
-          raise<ArgumentException> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].format=%d", i, va.format);
+          throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].format=%d", i, va.format);
           break;
       }
       
@@ -311,19 +311,19 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
         case InputDataType_UInt:
         case InputDataType_Float:
           if (!VertexAttributeSemanticTraits::IsCompatible (va.semantic, va.type))
-            raise<NotSupportedException> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with type %s)", i,
+            throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with type %s)", i,
                                           get_name (va.semantic), get_name (va.type));
 
           break;
         default:
-          raise<ArgumentException> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].type=%d", i, va.type);
+          throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].type=%d", i, va.type);
           break;
       }
       
         //проверка корректности номера слота
 
       if (va.slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
-        raise<ArgumentOutOfRangeException> (METHOD_NAME, "Argument desc.vertex_attributes[%u].slot=%u is out of range [0;%u)",
+        throw xtl::format_exception<xtl::bad_range> (METHOD_NAME, "Argument desc.vertex_attributes[%u].slot=%u is out of range [0;%u)",
                                             i, va.slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
 
         //добавление указателя на атрибут в массив
@@ -336,7 +336,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
     size_t position_attribute = semantic_attribute [VertexAttributeSemantic_Position];
 
     if (position_attribute == NO_ATTRIBUTE)
-      raise<ArgumentException> (METHOD_NAME, "Invalid argument desc.vertex_attributes. Attribute with semantic 'VertexAttributeSemantic_Position' not found");
+      throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes. Attribute with semantic 'VertexAttributeSemantic_Position' not found");
 
       //сортировка вершинных атрибутов для оптимизации установки в контекст OpenGL
 
@@ -366,7 +366,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
         case InputDataFormat_Vector4: gl_va.components = 4; break;
           break;
         default:
-          raise_invalid_operation (METHOD_NAME, "Internal error at vertex attribute format convertation");
+          throw xtl::format_operation_exception (METHOD_NAME, "Internal error at vertex attribute format convertation");
           break;
       }
       
@@ -403,7 +403,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           type_size  = sizeof (float);
           break;
         default:
-          raise_invalid_operation (METHOD_NAME, "Internal error at vertex attribute type convertation");
+          throw xtl::format_operation_exception (METHOD_NAME, "Internal error at vertex attribute type convertation");
           break;
       }
       
@@ -428,7 +428,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
       //установка размеров групп вершинных атрибутов
 
     if (new_vertex_attribute_groups.empty ())
-      raise_invalid_operation (METHOD_NAME, "Internal error at build vertex attribute groups");
+      throw xtl::format_operation_exception (METHOD_NAME, "Internal error at build vertex attribute groups");
 
     for (GlVertexAttributeGroupArray::iterator iter=new_vertex_attribute_groups.begin (), end=new_vertex_attribute_groups.end ()-1; iter!=end; ++iter)
       iter->attributes_count = iter [1].attributes - iter [0].attributes;
@@ -486,7 +486,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
   
   for (GlVertexAttributeGroupArray::iterator iter=vertex_attribute_groups.begin (), end=vertex_attribute_groups.end (); iter!=end; ++iter)
     if (!vertex_buffers [iter->slot])
-      raise_invalid_operation (METHOD_NAME, "Null vertex buffer #%u", iter->slot);
+      throw xtl::format_operation_exception (METHOD_NAME, "Null vertex buffer #%u", iter->slot);
       
     //отключение неиспользуемых и включение используемых вершинных массивов
     
@@ -629,7 +629,7 @@ void InputLayout::Bind
       //установка индексного буфера в контекст OpenGL
 
     if (!index_buffer)
-      raise_invalid_operation (METHOD_NAME, "Null index buffer");
+      throw xtl::format_operation_exception (METHOD_NAME, "Null index buffer");
 
     index_buffer->Bind ();
 

@@ -5,8 +5,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/bind.h>
 #include <xtl/connection.h>
-
-#include <common/exception.h>
+#include <xtl/common_exceptions.h>
 
 #include <syslib/application.h>
 #include <syslib/timer.h>

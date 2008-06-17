@@ -6,6 +6,7 @@
 
 #include <stl/hash_map>
 
+#include <xtl/common_exceptions.h>
 #include <xtl/any.h>
 #include <xtl/connection.h>
 #include <xtl/shared_ptr.h>

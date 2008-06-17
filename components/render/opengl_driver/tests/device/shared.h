@@ -26,10 +26,10 @@
 #include <xtl/function.h>
 #include <xtl/connection.h>
 #include <xtl/ref.h>
+#include <xtl/common_exceptions.h>
 
 #include <media/image.h>
 
-#include <common/exception.h>
 #include <common/hash.h>
 #include <common/file.h>
 

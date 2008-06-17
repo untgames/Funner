@@ -7,8 +7,8 @@
 
 #include <xtl/reference_counter.h>
 #include <xtl/functional>
+#include <xtl/common_exceptions.h>
 
-#include <common/exception.h>
 #include <common/component.h>
 
 #include <media/collada.h>
