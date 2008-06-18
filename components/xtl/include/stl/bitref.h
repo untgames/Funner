@@ -1,6 +1,8 @@
 #ifndef __MYSTL_BITS_OPERATIONS__
 #define __MYSTL_BITS_OPERATIONS__
 
+#include <stl/config.h>
+
 namespace stl
 {
 

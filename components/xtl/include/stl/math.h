@@ -1,9 +1,10 @@
 #ifndef __MYSTL_MATH_ADAPTORS__
 #define __MYSTL_MATH_ADAPTORS__
 
-#include <stl/type_traits.h>
 #include <cmath>
 #include <cstdlib>
+
+#include <stl/type_traits.h>
 
 namespace stl
 {

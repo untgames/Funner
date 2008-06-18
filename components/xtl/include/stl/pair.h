@@ -1,6 +1,8 @@
 #ifndef __MYSTL_PAIR__
 #define __MYSTL_PAIR__
 
+#include <stl/config.h>
+
 #ifdef _MSC_VER 
   #pragma warning (disable:4512) //'class' : assignment operator could not be generated
 #endif

@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include <stl/config.h>
+
 namespace stl
 {
 

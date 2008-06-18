@@ -2,8 +2,8 @@
 #define __MYSTL_ALLOC__
 
 #include <new>
+
 #include <stl/utility>
-#include <stl/config.h>
 
 namespace stl
 {

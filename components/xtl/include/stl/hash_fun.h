@@ -3,6 +3,8 @@
 
 #include <cwchar>
 
+#include <stl/config.h>
+
 #ifndef __MYSTL_STANDALONE__
   #include <common/hash.h>
 #endif

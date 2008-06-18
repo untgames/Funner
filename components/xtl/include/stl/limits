@@ -9,6 +9,8 @@
 #include <cwchar>
 #include <cfloat>
 
+#include <stl/config.h>
+
 namespace stl
 {
 

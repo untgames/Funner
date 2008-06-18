@@ -1,6 +1,8 @@
 #ifndef __MYSTL_ADAPTORS__
 #define __MYSTL_ADAPTORS__
 
+#include <stl/config.h>
+
 namespace stl
 {
 

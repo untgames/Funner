@@ -2,6 +2,7 @@
 #define __MYSTL_BIT_VECTOR__
 
 #include <climits>
+
 #include <stl/bitref.h>
 #include <stl/vector>
 

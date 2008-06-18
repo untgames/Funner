@@ -5,7 +5,8 @@
 #ifndef __MYSTL_STRING_FORWARD_DECLARATIONS__
 #define __MYSTL_STRING_FORWARD_DECLARATIONS__
 
-#include <wchar.h>
+#include <cwchar>
+
 #include <stl/config.h>
 
 namespace stl

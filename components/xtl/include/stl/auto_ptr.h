@@ -5,7 +5,9 @@
 #ifndef MYSTL_AUTO_PTR_HEADER
 #define MYSTL_AUTO_PTR_HEADER
 
-#include <stddef.h>
+#include <cstddef>
+
+#include <stl/config.h>
 
 namespace stl
 {
