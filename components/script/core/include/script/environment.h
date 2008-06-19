@@ -2,8 +2,10 @@
 #define SCRIPTLIB_ENVIRONMENT_HEADER
 
 #include <typeinfo>
-#include <xtl/functional_fwd>
+
 #include <stl/auto_ptr.h>
+#include <xtl/functional_fwd>
+
 #include <script/invoker.h>
 
 namespace script

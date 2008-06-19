@@ -10,7 +10,12 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/common_exceptions.h>
 
+#include <common/file.h>
+#include <common/singleton.h>
+#include <common/component.h>
+
 #include <script/environment.h>
 #include <script/bind.h>
+#include <script/shell.h>
 
 #endif
