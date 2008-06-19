@@ -28,7 +28,9 @@ int main ()
 
     registry.Register ("f1", invoker);
 
-    xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (env));
+    Shell shell ("lua", env);
+    
+    xtl::com_ptr<IInterpreter> interpreter (shell.Interpreter ());
 
     printf ("Interpreter name - %s\n", interpreter->Name ());
     printf ("Interpreter has function 'f1': %d\n", interpreter->HasFunction ("f1"));

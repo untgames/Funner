@@ -40,7 +40,9 @@ int main ()
     InvokerRegistry& enum_registry = env->CreateLibrary ("static.MyEnum");
     InvokerRegistry& var_registry  = env->CreateLibrary ("static.MyVar");
 
-    xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (env));
+    Shell shell ("lua", env);
+    
+    xtl::com_ptr<IInterpreter> interpreter (shell.Interpreter ());
 
     enum_registry.Register ("get_Zero",  make_const (MyEnum_Zero));
     enum_registry.Register ("get_One",   make_const (MyEnum_One));

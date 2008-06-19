@@ -9,3 +9,4 @@
 
 #include <script/bind.h>
 #include <script/environment.h>
+#include <script/shell.h>

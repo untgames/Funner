@@ -33,7 +33,9 @@ int main ()
 
     InvokerRegistry& registry = env->CreateLibrary ("static.MyLibrary");
 
-    xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (env));
+    Shell shell ("lua", env);
+    
+    xtl::com_ptr<IInterpreter> interpreter (shell.Interpreter ());
 
     registry.Register ("get_Id", make_invoker (&get_id));
     registry.Register ("set_Id", make_invoker (&set_id));

@@ -50,7 +50,9 @@ int main ()
 
     env->RegisterType<A> ("my_library");
 
-    xtl::com_ptr<IInterpreter> interpreter (create_lua_interpreter (env));
+    Shell shell ("lua", env);
+    
+    xtl::com_ptr<IInterpreter> interpreter (shell.Interpreter ());
 
     registry.Register ("get_id", make_invoker (&get_id));
     registry.Register ("set_id", make_invoker (&set_id));

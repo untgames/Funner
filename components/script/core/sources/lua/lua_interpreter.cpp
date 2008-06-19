@@ -231,19 +231,41 @@ void Interpreter::UnregisterLibrary (const char* name)
   libraries.erase (name);
 }
 
-namespace script
+namespace
 {
 
 /*
     Создание интерпретатора lua
 */
 
-xtl::com_ptr<IInterpreter> create_lua_interpreter (const xtl::shared_ptr<Environment>& environment)
+IInterpreter* create_lua_interpreter (const xtl::shared_ptr<Environment>& environment)
 {
   if (!environment)
     throw xtl::make_null_argument_exception ("script::create_lua_interpreter", "environment");
 
-  return xtl::com_ptr<IInterpreter> (new Interpreter (environment), false);
+  return new Interpreter (environment);
 }
+
+/*
+   Компонент создания интерпретатора lua
+*/
+
+class LuaInterpreterComponent
+{
+  public:
+    //загрузка компонента
+    LuaInterpreterComponent () 
+    {
+      InterpreterManager::RegisterInterpreter ("lua", &create_lua_interpreter);
+    }
+};
+
+extern "C"
+{
+
+ComponentRegistrator<LuaInterpreterComponent> LuaInterpreter ("script.interpreters.lua");
+
+}
+
 
 }

@@ -16,6 +16,7 @@
 #include <xtl/reference_counter.h>
 #include <xtl/function.h>
 
+#include <common/component.h>
 #include <common/heap.h>
 #include <common/strlib.h>
 

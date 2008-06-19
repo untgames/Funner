@@ -31,13 +31,13 @@ class InterpreterManagerImpl
 
       if (!creater)
         throw xtl::make_null_argument_exception (METHOD_NAME, "creater");
-        
+
       InterpreterCreaterMap::iterator iter = creaters.find (name);
       
-      if (iter == creaters.end ())
+      if (iter != creaters.end ())
         throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Interpreter with this name has already registered");
         
-      creaters.insert_pair (name, creater);
+      stl::pair<InterpreterCreaterMap::iterator, bool> insert_result = creaters.insert_pair (name, creater);
     }
     
       //удаление интерпретатора
@@ -165,12 +165,12 @@ Shell& Shell::operator = (const Shell& shell)
     Получение имени интерптератора / получение интерпретатора
 */
 
-const char* Shell::InterpeterName () const
+const char* Shell::InterpreterName () const
 {
   return interpreter ? interpreter->Name () : "(no interpreter binded)";
 }
 
-Shell::InterpeterPtr Shell::Interpeter () const
+Shell::InterpeterPtr Shell::Interpreter () const
 {
   return interpreter;
 }
