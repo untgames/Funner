@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := STL_TESTS TR1_TYPE_TRAITS_TESTS TR1_TESTS XTL_TESTS
+TARGETS := STL_TESTS TR1_TYPE_TRAITS_TESTS TR1_TESTS XTL_TESTS MATH_TESTS
 
 #Цель №1 - STL tests
 STL_TESTS.TYPE             := test-suite
@@ -44,3 +44,13 @@ XTL_TESTS.EXECTUTION_DIR   :=
 XTL_TESTS.LIBS             :=
 XTL_TESTS.COMPILER_CFLAGS  :=
 XTL_TESTS.COMPILER_DEFINES := __MYSTL_STANDALONE__
+
+#Цель №5 - Math tests
+MATH_TESTS.TYPE             := test-suite
+MATH_TESTS.INCLUDE_DIRS     := include
+MATH_TESTS.SOURCE_DIRS      := tests/math
+MATH_TESTS.LIB_DIRS         :=  
+MATH_TESTS.EXECTUTION_DIR   :=
+MATH_TESTS.LIBS             :=
+MATH_TESTS.COMPILER_CFLAGS  :=
+MATH_TESTS.COMPILER_DEFINES := __MYSTL_STANDALONE__
