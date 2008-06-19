@@ -36,7 +36,7 @@ int main ()
     
     xtl::shared_ptr<Environment> env (new Environment);
     
-    InvokerRegistry&           registry = env->CreateLibrary ("my_library");
+    InvokerRegistry& registry = env->CreateLibrary ("my_library");
 
     Shell shell ("lua", env);
     
