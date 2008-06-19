@@ -1,8 +1,11 @@
 #ifndef COMMONLIB_FILE_SYSTEM_TEST_HEADER
 #define COMMONLIB_FILE_SYSTEM_TEST_HEADER
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
+
+#include <stl/string>
+
 #include <common/file.h>
 #include <common/streams.h>
 
