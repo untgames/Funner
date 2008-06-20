@@ -108,6 +108,9 @@ struct SoundManager::Impl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void Init ()
   {
+    if (window.IsClosed ()) //temp fix
+      return;
+
     try
     {
       device = DevicePtr (SoundSystem::CreateDevice (target_configuration.c_str (), &window, init_string.c_str ()), false);
