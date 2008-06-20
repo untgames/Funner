@@ -239,7 +239,7 @@ void Window::SetHandle (const void* handle)
     return;
 
   impl->handle = handle;
-  
+
   Notify (WindowEvent_OnChangeHandle);
 }
 

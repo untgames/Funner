@@ -24,7 +24,14 @@ struct WindowImpl
   
   void Notify (WindowEvent event, const WindowEventContext& context)
   {
-    message_handler (event, context, user_data);
+    try
+    {
+      message_handler (event, context, user_data);
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
   }
 };
 
@@ -172,9 +179,9 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
   {
     case WM_DESTROY: //уничтожение окна
       impl->Notify (WindowEvent_OnDestroy, context);
-      
+
       delete impl;
-      
+     
       SetWindowLong (wnd, GWL_USERDATA, 0);
 
       return 0;
