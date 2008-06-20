@@ -176,7 +176,7 @@ class TestView: public IGameView
       vb_desc.usage_mode   = UsageMode_Default;
       vb_desc.bind_flags   = BindFlag_VertexBuffer;
       vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
-      
+     
       vertex_buffer = BufferPtr (current_device->CreateBuffer (vb_desc), false);
       
       BufferDesc ib_desc;
@@ -209,7 +209,7 @@ class TestView: public IGameView
       layout_desc.index_buffer_offset     = 0;            
 
       input_layout = InputLayoutPtr (current_device->CreateInputLayout (layout_desc), false);      
-      
+     
       static ProgramParameter shader_parameters[] = {
         {"myProjMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (ShaderParameters, projection_matrix)},
         {"myViewMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (ShaderParameters, view_matrix)},

@@ -326,7 +326,7 @@ struct MyApplication::Impl
       catch (...)
       {
         LogMessage ("Exception at window redraw");
-      }      
+      }
     }
     
       //обработчик нажатия / отпускания клавиш мыши
