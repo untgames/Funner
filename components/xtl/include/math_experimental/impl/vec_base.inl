@@ -1,69 +1,48 @@
+
+
 /*
-        Покомпонентные векторные операции
+	Шаблонный класс покомпонентных векторных операций
 */
 
-template <class T,size_t size> 
-	inline void vec_add<T,size>::operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b)
+
+template <class Fn> template <class T,size_t size> 
+	inline void component_fn<Fn>::operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b)
 {
-  for (size_t i=0;i<size;i++) res [i] = a [i] + b [i];
+  for (size_t i=0;i<size;i++) res [i] = Fn ()(a [i],b [i]);
 }
 
-template <class T,size_t size> 
-	inline void vec_sub<T,size>::operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b)
+template<class Fn> template <class T,size_t size> 
+	inline void component_fn<Fn>::operator() (vec<T,size>& res,const vec<T,size>& a,const T& b)
 {
-  for (size_t i=0;i<size;i++) res [i] = a [i] - b [i];
+  for (size_t i=0;i<size;i++) res [i] = Fn ()(a [i],b);
 }
 
-template <class T,size_t size> 
-	inline void vec_mul<T,size>::operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b)
+template <class Fn> template <class T,size_t size>
+	inline void component_fn<Fn>::operator() (vec<T,size>& res,const vec<T,size>& src)
 {
-  for (size_t i=0;i<size;i++) res [i] = a [i] * b [i];
+  for (size_t i=0;i<size;i++) res [i] = Fn ()(src [i]);
 }
 
-template <class T,size_t size> 
-	inline void vec_div<T,size>::operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b)
+template<class Fn> template <class T,size_t size> 
+	inline void component_fn<Fn>::operator() (vec<T,size>& res,const T& src)
 {
-  for (size_t i=0;i<size;i++) res [i] = a [i] / b [i];
+  for (size_t i=0;i<size;i++) res [i] = Fn ()(src);
 }
 
-template <class T,size_t size> 
-	inline void vec_mul_scalar<T,size>::operator() (vec<T,size>& res,const vec<T,size>& a,const T& b)
-{
-  for (size_t i=0;i<size;i++) res [i] = a [i] * b;
-}
+/*
+	Шаблонный класс операций сравнения
+*/
 
-template <class T,size_t size> 
-	inline void vec_div_scalar<T,size>::operator() (vec<T,size>& res,const vec<T,size>& a,const T& b)
+template <class Fn> template<class T,size_t size>
+inline bool compare_fn<Fn>::operator () (const vec<T,size>& a,const vec<T,size>& b,const T& eps)
 {
-  if (b==T(0))
+  for(size_t i=0;i<size;i++)
   {
-	return;
+    if (!Fn()(a[i],b[i]),eps) return 0;
   }
-  for (size_t i=0;i<size;i++) res [i] = a [i] / b;
+  return 1;
 }
-
-/*
-        Векторное присваивание
-*/
-
-template <class T,size_t size,size_t size1> 
-void vec_copy (vec<T,size>& res,const vec<T,size1>& src)
-{
-  size_t s1, s2, i;
-  
-  if (size < size1) s1 = size,  s2 = size1;
-  else              s1 = size1, s2 = size;
-
-  for (i=0;i<s1;i++) res [i] = src [i];
-  for (;i<s2;i++) res [i] = T(0);
-}
-
-template <class T,size_t size> 
-void vec_assign_scalar (vec<T,size>& res,const T& a)
-{
-  for (size_t i=0;i<size;i++) res [i] = a;
-}
-
+    
 /*
         Утилиты
 */
@@ -79,64 +58,6 @@ T vec_dot_product (const vec<T,size>& a,const vec<T,size>& b)
   return result;  
 }
 
-template <class T,size_t size> 
-void vec_neg (vec<T,size>& res,const vec<T,size>& src)
-{
-  for (size_t i=0;i<size;i++) res [i] = -src [i]; 
-}
-
-template <class T,size_t size> 
-void vec_abs (vec<T,size>& res,const vec<T,size>& src)
-{
-  for (size_t i=0;i<size;i++) res [i] = src [i] < T (0) ? -src [i] : src [i];
-}
-
-template <class T,size_t size> 
-void vec_min (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b)
-{
-  for (size_t i=0;i<size;i++) res [i] = a [i] < b [i] ? a [i] : b [i];
-}
-
-template <class T,size_t size> 
-void vec_max (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b)
-{
-  for (size_t i=0;i<size;i++) res [i] = a [i] > b [i] ? a [i] : b [i];
-}
-
-template <class T,size_t size> 
-bool vec_equal (const vec<T,size>& a,const vec<T,size>& b)
-{
-  for (size_t i=0;i<size;i++)
-    if (a [i] != b [i])
-      return false;
-
-  return true;
-}
-
-template <class T,size_t size> 
-bool vec_nequal (const vec<T,size>& a,const vec<T,size>& b)
-{
-  for (size_t i=0;i<size;i++)
-    if (a [i] != b [i])
-      return true;
-
-  return false;
-}
-
-template <class T,size_t size> 
-bool vec_equal (const vec<T,size>& a,const vec<T,size>& b,const T& eps)
-{
-  vec<T,size> tmp;
-
-  vec_sub<T,size> (tmp,a,b);
-  vec_abs (tmp,tmp);
-
-  for (size_t i=0;i<size;i++)
-    if (tmp [i] > eps)
-      return false;  
-
-  return true;  
-} 
 
 /*
         Длина и нормализация
@@ -164,13 +85,6 @@ template <class T,size_t size>
 T vec_qlength (const vec<T,size>& v)
 {
   return vec_dot_product (v,v);
-}
-
-template <class T,size_t size> 
-void vec_normalize (vec<T,size>& res,const vec<T,size>& src)
-{
-  vec_div_scalar<T,size> _Div;
-  _Div(res,src,vec_length (src));
 }
 
 /*

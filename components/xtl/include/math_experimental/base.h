@@ -12,66 +12,41 @@ template <class T>             class quat;
         Векторы
 */
 
-///Основные операции
-template <class T,size_t size> 
-class vec_add
+
+/*
+	Шаблонный класс покомпонентных векторных операций
+*/
+
+template <class Fn>
+class component_fn
 {
- public:
-	void operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b);
-};
-template <class T,size_t size>
-class vec_sub
-{
- public:
-	void operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b);
-};
-template <class T,size_t size>
-class vec_mul
-{
- public:
-	void operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b);
-};
-template <class T,size_t size> 
-class vec_div
-{
- public:
-	void operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b);
+  public:
+	template <class T,size_t size> 
+		void operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b);
+	template <class T,size_t size>
+		void operator() (vec<T,size>& res,const vec<T,size>& a,const T& b);
+	template <class T,size_t size>
+		void operator() (vec<T,size>& res,const vec<T,size>& src);
+	template <class T,size_t size>
+		void operator() (vec<T,size>& res,const T& src);
 };
 
-template <class T,size_t size>
-class vec_mul_scalar
+/*
+	Шаблонный класс операций сравнения
+*/
+template <class Fn>
+class compare_fn
 {
- public:
-	void operator() (vec<T,size>& res,const vec<T,size>& a,const T& b);
+  public:
+	template<class T,size_t size>
+		bool operator () (const vec<T,size>& a,const vec<T,size>& b,const T& eps=T(0));
 };
 
-template <class T,size_t size> 
-class vec_div_scalar
-{
- public:
-	void operator() (vec<T,size>& res,const vec<T,size>& a,const T& b);
-
-};
-
-///Присваивание / копирование
-template <class T,size_t size,size_t size1> void vec_copy          (vec<T,size>& res,const vec<T,size1>& src);
-template <class T,size_t size>           void vec_assign_scalar (vec<T,size>& res,const T& value);
-
-///Сравнение 
-template <class T,size_t size> bool vec_equal  (const vec<T,size>& a,const vec<T,size>& b);
-template <class T,size_t size> bool vec_equal  (const vec<T,size>& a,const vec<T,size>& b,const T& eps);
-template <class T,size_t size> bool vec_nequal (const vec<T,size>& a,const vec<T,size>& b);
-
-///Изменение знака
-template <class T,size_t size> void vec_neg (vec<T,size>& res,const vec<T,size>& src);
 
 ///Утилиты
-template <class T,size_t size> void  vec_abs       (vec<T,size>& res,const vec<T,size>& src);
-template <class T,size_t size> void  vec_min       (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b);
-template <class T,size_t size> void  vec_max       (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b);
 template <class T,size_t size> T     vec_length    (const vec<T,size>&);
 template <class T,size_t size> T     vec_qlength   (const vec<T,size>&);
-template <class T,size_t size> void  vec_normalize (vec<T,size>& res,const vec<T,size>& src);
+
 
 ///Скалярное произведение
 template <class T,size_t size> T vec_dot_product (const vec<T,size>& a,const vec<T,size>& b);

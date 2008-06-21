@@ -5,19 +5,19 @@
 template <class T,size_t size>
 inline vec<T,size>::vec ()
 {
-  vec_assign_scalar (*this,T (0));
+  component_fn<assign<T,T> > ()(*this,T (0));
 }
 
 template <class T,size_t size> template <size_t size1>
 vec<T,size>::vec (const vec<T,size1>& v) 
 {
-  vec_copy (*this,v);
+  component_fn<assign<T,T> > () (*this,v);
 }
 
 template <class T,size_t size> 
 vec<T,size>::vec (const T& a)
 {
-  vec_assign_scalar (*this,a);
+  component_fn<assign<T,T> > ()(*this,a);
 }
 
 template <class T,size_t size> 
@@ -37,6 +37,13 @@ template<class type,size_t size> template <size_t size1,class Fn>
 {
 	fn(*this,v1,arg);
 }
+
+template<class type,size_t size> template <size_t size1,class Fn>
+	inline vec<type,size>::vec (const vec<type,size1>& v1,Fn fn)
+{
+	fn(*this,v1);
+}
+
 
 
 /*template <class T,size_t size> template <class T1>
@@ -116,7 +123,7 @@ const vec<T,size>& vec<T,size>::operator + () const
 template <class T,size_t size>
 const vec<T,size> vec<T,size>::operator - () const
 { 
-  return vec (*this,vec_neg<T,size>);
+  return vec (*this,component_fn<negate <T,T> > ());
 }
 
 template <class T,size_t size> 
@@ -138,85 +145,79 @@ T vec<T,size>::operator & (const vec& v) const
 template <class T,size_t size>
 vec<T,size>& vec<T,size>::operator += (const vec& v) 
 { 
-  vec_add<T,size> (*this,*this,v);
+  component_fn<plus <T,T,T> > () (*this,*this,v);
   return *this; 
 }
 
 template <class T,size_t size>
 vec<T,size>& vec<T,size>::operator -= (const vec& v) 
 { 
-  vec_sub<T,size> (*this,*this,v);
+  component_fn<minus<T,T,T> > () (*this,*this,v);
   return *this; 
 }
 
 template <class T,size_t size>
 vec<T,size>& vec<T,size>::operator *= (const vec& v) 
 { 
-  vec_mul<T,size> (*this,*this,v);
+  component_fn<multiplies<T,T,T> > () (*this,*this,v);
   return *this; 
 }
 
 template <class T,size_t size>
 vec<T,size>& vec<T,size>::operator /= (const vec& v) 
 { 
-  vec_div<T,size> (*this,*this,v);
+  component_fn<divides<T,T,T> > () (*this,*this,v);
   return *this; 
 }
         
 template <class T,size_t size>
 vec<T,size>& vec<T,size>::operator *= (const T& d)
 { 
-  vec_mul_scalar<T,size> (*this,*this,d);
+  component_fn<multiplies<T,T,T> > () (*this,*this,d);
   return *this; 
 }
 
 template <class T,size_t size>
 vec<T,size>& vec<T,size>::operator /= (const T& d)
 { 
-  vec_div_scalar<T,size> (*this,*this,d);
+  component_fn<divides<T,T,T> > () (*this,*this,d);
   return *this; 
 }
 
 template <class T,size_t size>
 const vec<T,size> vec<T,size>::operator + (const vec& v) const  
 { 
-  vec_add<T,size> _Add;
-  return vec<T,size>(*this,v,_Add);
+  return vec<T,size>(*this,v,component_fn<plus<T,T,T> > ());
 }
 
 template <class T,size_t size>
 const vec<T,size> vec<T,size>::operator - (const vec& v) const  
 { 
-  vec_sub<T,size> _Sub;
-  return vec (*this,v,_Sub);
+  return vec (*this,v,component_fn<minus<T,T,T> > ());
 }
 
 template <class T,size_t size>
 const vec<T,size> vec<T,size>::operator * (const vec& v) const  
 { 
-  vec_mul<T,size> _Mul;
-  return vec (*this,v,_Mul);
+  return vec (*this,v,component_fn<multiplies<T,T,T> > ());
 }
 
 template <class T,size_t size>
 const vec<T,size> vec<T,size>::operator / (const vec& v) const  
 { 
-  vec_div<T,size> _Div;
-  return vec<T,size> (*this,v,_Div);
+  return vec<T,size> (*this,v,component_fn<divides<T,T,T> > ());
 }
 
 template <class T,size_t size>
 const vec<T,size> vec<T,size>::operator * (const T& a) const  
 { 
-  vec_mul_scalar<T,size> _Mul;
-  return vec (*this,a,_Mul);
+  return vec (*this,a,component_fn<multiplies<T,T,T> > ());
 }
 
 template <class T,size_t size> 
 const vec<T,size> vec<T,size>::operator / (const T& a) const  
 { 
-  vec_div_scalar<T,size> _Div;
-  return vec (*this,a,_Div);
+  return vec (*this,a,component_fn<divides<T,T,T> > ());
 }
 
 /*
@@ -226,13 +227,13 @@ const vec<T,size> vec<T,size>::operator / (const T& a) const
 template <class T,size_t size>
 bool vec<T,size>::operator == (const vec& v) const
 {
-  return vec_equal (*this,v);
+  return compare_fn<equal_to<T> >() (*this,v);
 }
 
 template <class T,size_t size>
 bool vec<T,size>::operator != (const vec& v) const
 {
-  return vec_nequal (*this,v);
+  return compare_fn<not_equal_to<T> >() (*this,v) (*this,v);
 }
 
 template <class T,size_t size>
@@ -260,25 +261,25 @@ T dot (const vec<T,size>& a,const vec<T,size>& b)
 template <class T,size_t size> 
 const vec<T,size> abs (const vec<T,size>& v)
 {
-  return vec<T,size> (v,vec_abs<T,size>);
+  return vec<T,size> (v,component_fn<absol<T> >());
 }
 
 template <class T,size_t size>
 const vec<T,size> min (const vec<T,size>& a,const vec<T,size>& b)
 {
-  return vec<T,size> (a,b,vec_min<T,size>);
+  return vec<T,size> (a,b,component_fn<min_fn<T> > ());
 }
 
 template <class T,size_t size>
 const vec<T,size> max (const vec<T,size>& a,const vec<T,size>& b)
 {
-  return vec<T,size> (a,b,vec_max<T,size>);
+  return vec<T,size> (a,b,component_fn<max_fn<T> > ());
 } 
 
 template <class T,size_t size> 
 const vec<T,size> normalize (const vec<T,size>& v)
 {
-  return vec<T,size> (v,vec_normalize<T,size>);
+  return vec<T,size> (v,vec_length(v),component_fn<divides <T> > ());
 }
 
 template <class T,size_t size> 

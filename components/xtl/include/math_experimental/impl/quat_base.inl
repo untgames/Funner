@@ -146,7 +146,8 @@ void quat_mul_vec (vec<T,3>& res,const quat<T>& q,const vec<T,3>& v)
   res [1] = q.w * y + q.y * w + q.z * x - q.x * z;
   res [2] = q.w * z + q.z * w + q.x * y - q.y * x;
 
-  vec_div_scalar<T,3> (res,res,quat_norm (q));
+  T _norm=quat_norm (q);
+  component_fn<divides<T,T,T> > () (res,res,_norm);
 }
 
 template <class T>
@@ -162,7 +163,8 @@ void  quat_mul_vec (vec<T,4>& res,const quat<T>& q,const vec<T,4>& v)
   res [2] = q.w * z + q.z * w + q.x * y - q.y * x;
   res [3] = 0;
 
-  vec_div_scalar<T,4> (res,res,quat_norm (q));
+  T _norm=quat_norm (q);
+  component_fn<divides<T,T,T> > () (res,res,_norm);
 }
 
 template <class T>

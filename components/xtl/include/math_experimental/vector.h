@@ -72,11 +72,21 @@ class vec: public vec_base<type,size>
     vec (const vec<type,size-1>&,const type&);
 
       //для использования оптимизации возвращаемого значения
-    template <class T>           vec (const T&,void (*eval)(vec&,const T&));
-    template <size_t size1, size_t size2, class Fn>
+//  template <class T>           vec (const T&,void (*eval)(vec&,const T&));
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+  template <size_t size1, size_t size2, class Fn>
 				 vec (const vec<type,size1>v1,const vec<type,size2>v2,Fn fn);
-    template <size_t size1,class Fn>
+  template <size_t size1,class Fn>
 				 vec (const vec<type,size1>& v1,const type& arg,Fn fn);
+  template <size_t size1,class Fn>
+				 vec (const vec<type,size1>& v1,Fn fn);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     template <class T1,class T2> vec (const T1&,const T2&,void (*eval)(vec&,const T1&,const T2&));
 
     template <size_t size1>         vec (const vec<type,size1>&); 

@@ -9,6 +9,7 @@
 //#pragma auto_inline (on)
 
 #include <stddef.h>
+#include <math_experimental/functional.h>
 #include <math_experimental/base.h>
 #include <math_experimental/vector.h>
 #include <math_experimental/matrix.h>
@@ -23,13 +24,13 @@
   {
     #include <math_experimental/impl/vec4f_sse.inl>
     #include <math_experimental/impl/matrix4f_sse.inl>
-    #include <math_experimental/impl/quatf_sse.inl>    
+    #include <math_experimental/impl/quatf_sse.inl>
   }
 #endif
 
 namespace math
 {
-
+#include <math_experimental/impl/functional.inl>
 #include <math_experimental/impl/vec_base.inl>
 #include <math_experimental/impl/vector.inl>
 #include <math_experimental/impl/matrix_base.inl>
