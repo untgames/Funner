@@ -5,7 +5,7 @@
 */
 
 
-template <class Fn> template <class T,size_t size> 
+/*template <class Fn> template <class T,size_t size> 
 	inline void component_fn<Fn>::operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b)
 {
   for (size_t i=0;i<size;i++) res [i] = Fn ()(a [i],b [i]);
@@ -27,21 +27,13 @@ template<class Fn> template <class T,size_t size>
 	inline void component_fn<Fn>::operator() (vec<T,size>& res,const T& src)
 {
   for (size_t i=0;i<size;i++) res [i] = Fn ()(src);
-}
+}*/
 
 /*
 	Шаблонный класс операций сравнения
 */
 
-template <class Fn> template<class T,size_t size>
-inline bool compare_fn<Fn>::operator () (const vec<T,size>& a,const vec<T,size>& b,const T& eps)
-{
-  for(size_t i=0;i<size;i++)
-  {
-    if (!Fn()(a[i],b[i]),eps) return 0;
-  }
-  return 1;
-}
+
     
 /*
         Утилиты

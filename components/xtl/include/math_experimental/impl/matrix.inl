@@ -1,3 +1,16 @@
+
+template <class T, size_t Size> vec<T, Size>& get_component (matrix<T, Size>& v, size_t index)
+{
+  return v [index];
+}
+
+template <class T, size_t Size> const vec<T, Size>& get_component (const matrix<T, Size>& v, size_t index)
+{
+  return v [index];
+}
+
+
+
 template <class T,size_t size>
 inline matrix<T,size>::matrix ()
 {

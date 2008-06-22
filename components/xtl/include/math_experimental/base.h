@@ -17,7 +17,7 @@ template <class T>             class quat;
 	Шаблонный класс покомпонентных векторных операций
 */
 
-template <class Fn>
+/*template <class Fn>
 class component_fn
 {
   public:
@@ -29,18 +29,12 @@ class component_fn
 		void operator() (vec<T,size>& res,const vec<T,size>& src);
 	template <class T,size_t size>
 		void operator() (vec<T,size>& res,const T& src);
-};
+};*/
 
 /*
 	Шаблонный класс операций сравнения
 */
-template <class Fn>
-class compare_fn
-{
-  public:
-	template<class T,size_t size>
-		bool operator () (const vec<T,size>& a,const vec<T,size>& b,const T& eps=T(0));
-};
+
 
 
 ///Утилиты

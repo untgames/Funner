@@ -1,6 +1,74 @@
 
 namespace math
 {
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Применение функционалов для векторов
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template <class T> 
+struct scalar
+{
+  scalar (T in_value) : value (in_value) {}
+
+  T value;  
+};
+
+//template <class T> T& get_component (T& v, size_t);
+
+template <class T> const T& get_component (const T& v, size_t);
+
+template <class Ret, class Fn> struct unary_component_function
+{ 
+  unary_component_function () {}
+  unary_component_function (Fn in_fn) : fn (in_fn) {}
+
+  template <class T1> void operator () (Ret& res, const T1& a);
+  
+  Fn fn;
+};
+
+template <class Ret, class Fn> struct binary_component_function
+{
+  binary_component_function (){}
+  binary_component_function (Fn in_fn) : fn (in_fn) {}
+
+  template <class T1, class T2> void operator () (Ret& res, const T1& a, const T2& b);
+  
+  Fn fn;
+};
+
+template <class Fn1,class Fn2>
+class binary_accumulation_function
+{
+ public:
+  template <class Res,class T>
+   T operator()(const T& a,const T& b,const Res& init);
+};
+
+template <class Fn1,class Fn2>
+class unary_accumulation_function
+{
+ public:
+  template <class T,class T1>
+   T operator()(const T1& a,T& init);
+};
+
+template <class T,class Fn>
+class compare_function
+{
+  public:
+	template<class T1>
+		bool operator () (const T1& a,const T1& b,const T& eps=T(0));
+};
+
+template <class Ret, class Fn, class T>
+Ret make_unary_operation (const T& a,const Fn& fn);
+
+template <class Ret, class T1, class T2, class Fn>
+Ret make_binary_operation (const T1& a, const T2& b, Fn fn);
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Определение одноместного функтора
 /////////////////////////////////////////////////////////////////////////////////////////////////////////

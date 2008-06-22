@@ -14,6 +14,15 @@ namespace math
 {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
+///Вспомогательные операции
+////////////////////////////////////////////////////////////////////////////////////////////
+
+template <class T, size_t Size> T& get_component (vec<T, Size>& v, size_t index);
+
+template <class T, size_t Size> const T& get_component (const vec<T, Size>& v, size_t index);
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
 ///Векторная база по умолчанию
 ////////////////////////////////////////////////////////////////////////////////////////////
 template <class type,size_t size> struct vec_base
@@ -83,6 +92,8 @@ class vec: public vec_base<type,size>
 				 vec (const vec<type,size1>& v1,const type& arg,Fn fn);
   template <size_t size1,class Fn>
 				 vec (const vec<type,size1>& v1,Fn fn);
+  template <class Fn>
+				 vec (const type& v1,Fn fn);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -111,16 +122,20 @@ class vec: public vec_base<type,size>
 ////////////////////////////////////////////////////////////////////////////////////////////
     vec&      operator += (const vec&);
     vec&      operator -= (const vec&);
-    vec&      operator *= (const vec&);
-    vec&      operator /= (const vec&);
-    vec&      operator *= (const type&);
-    vec&      operator /= (const type&);
-    const vec operator +  (const vec&) const;
-    const vec operator -  (const vec&) const;
-    const vec operator *  (const vec&) const;
-    const vec operator /  (const vec&) const;
-    const vec operator *  (const type&) const;
-    const vec operator /  (const type&) const;
+    template <class T2>
+     vec&      operator *= (const T2&);
+    template <class T2>
+     vec&      operator /= (const T2&);
+//  vec&      operator *= (const type&);
+//  vec&      operator /= (const type&);
+    const vec& operator +  (const vec&) const;
+    const vec& operator -  (const vec&) const;
+//  const vec operator *  (const vec&) const;
+//  const vec operator /  (const vec&) const;
+    template <class T2>
+    const vec& operator *  (const T2&) const;
+    template <class T2>
+    const vec& operator /  (const T2&) const;
 
     friend const vec operator *  (const type& a,const vec& v)    { return v * a; }
 
