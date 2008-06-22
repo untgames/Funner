@@ -1,15 +1,14 @@
 #include <math_experimental/mathlib.h>
 #include <stdio.h>
-#include <iostream.h>
+
 using namespace math;
 
 void _printf(int x);
 void _printf(float x);
 void _printf(const char* x);
 
-template <class T,size_t size> void vec_print(const char* Message,vec<T,size>& V);
 
-template <class T,size_t size> void vec_print(const char* Message,vec<T,size>& V)
+template <class T,size_t size> void vec_print(const char* Message,const vec<T,size>& V)
 {
 	printf("%s",Message);
 	for (int i=0;i<size;i++)
@@ -18,8 +17,6 @@ template <class T,size_t size> void vec_print(const char* Message,vec<T,size>& V
 	}
 	printf("\n");
 }
-
-template <class T,size_t size> void vec_print(vec<T,size>& V);
 
 template <class T,size_t size> void vec_print(vec<T,size>& V)
 {

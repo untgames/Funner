@@ -31,11 +31,11 @@ int main()
 	//---------------------------------------------------------
 	//-----------Оптимизированные конструкторы-----------------
 	printf("\nvec(vec& v1,v2,functional) V5=");
-	vec<int,5> V5(V1,V2,component_fn<divides<int,int,int> > ());
+	vec<int,5> V5=make_binary_operation<vec<int,5> >(V1,V2,divides<int,int,int> ());//(V1,V2,binary_component_function<vec<int,5>,divides<int,int,int> > ());
 	vec_print(V5);
 	//---------------------------------------------------------
 	printf("\nvec(vec& v1,val arg,func)  V6=");
-	vec<int,5> V6(V1,int (2),component_fn<divides<int,int,int> > ());
+	vec<int,5> V6=make_binary_operation<vec<int,5> >(V1,int (2),divides<int,int,int> ());//(V1,int (2),binary_component_function<vec<int,5>,divides<int,int,int> > ());
 	vec_print(V6);
 	//---------------------------------------------------------
 	//--------------С 4-мя параметрами-------------------------
