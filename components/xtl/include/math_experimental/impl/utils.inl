@@ -301,7 +301,7 @@ void matrix_rotate (matrix<T,3>& res,const T& angle,const vec<T,3>& axis)
 template <class T> 
 void AxisAngle2quat  (const T& angle,const vec<T,3>& axis,quat<T>& q)
 {
-  vec<T,3> v = normalize (axis);
+  vec<T,3> v = axis.normalize();
 
   T half_angle = angle*T(0.5);
   T sin_a      = sin (half_angle);
@@ -387,11 +387,11 @@ inline const matrix<float,4> lookatf (const vec<float,3>& pos,const vec<float,3>
 { 
   matrix<float,4> view;
      
-  vec<float,3> z = normalize (pos - center),
+  vec<float,3> z = vec<float,3> (pos - center).normalize(),
                y = up,
-               x = normalize (y ^ z);
+               x = vec<float,3> (y ^ z).normalize();
 
-  y = normalize (z ^ x);
+  y = vec<float,3> (z ^ x).normalize();
   
   view [0] = vec<float,4> (x,0.0f);
   view [1] = vec<float,4> (y,0.0f);

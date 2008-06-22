@@ -13,23 +13,6 @@ template <class T>             class quat;
 */
 
 
-/*
-	Шаблонный класс покомпонентных векторных операций
-*/
-
-/*template <class Fn>
-class component_fn
-{
-  public:
-	template <class T,size_t size> 
-		void operator() (vec<T,size>& res,const vec<T,size>& a,const vec<T,size>& b);
-	template <class T,size_t size>
-		void operator() (vec<T,size>& res,const vec<T,size>& a,const T& b);
-	template <class T,size_t size>
-		void operator() (vec<T,size>& res,const vec<T,size>& src);
-	template <class T,size_t size>
-		void operator() (vec<T,size>& res,const T& src);
-};*/
 
 /*
 	Шаблонный класс операций сравнения
@@ -37,13 +20,9 @@ class component_fn
 
 
 
-///Утилиты
-template <class T,size_t size> T     vec_length    (const vec<T,size>&);
-template <class T,size_t size> T     vec_qlength   (const vec<T,size>&);
-
 
 ///Скалярное произведение
-template <class T,size_t size> T vec_dot_product (const vec<T,size>& a,const vec<T,size>& b);
+//template <class T,size_t size> T vec_dot_product (const vec<T,size>& a,const vec<T,size>& b);
 
 //Векторное произведение
 template <class T>  void  vec_cross_product (vec<T,3>& res,const vec<T,3>& a,const vec<T,3>& b);

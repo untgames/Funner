@@ -15,12 +15,13 @@ struct scalar
 };
 
 //template <class T> T& get_component (T& v, size_t);
-
+namespace detail
+{
 template <class T> const T& get_component (const T& v, size_t);
-
+}
 template <class Ret, class Fn> struct unary_component_function
 { 
-  unary_component_function () {}
+//unary_component_function () {}
   unary_component_function (Fn in_fn) : fn (in_fn) {}
 
   template <class T1> void operator () (Ret& res, const T1& a);
@@ -30,7 +31,7 @@ template <class Ret, class Fn> struct unary_component_function
 
 template <class Ret, class Fn> struct binary_component_function
 {
-  binary_component_function (){}
+//binary_component_function (){}
   binary_component_function (Fn in_fn) : fn (in_fn) {}
 
   template <class T1, class T2> void operator () (Ret& res, const T1& a, const T2& b);
@@ -38,12 +39,12 @@ template <class Ret, class Fn> struct binary_component_function
   Fn fn;
 };
 
-template <class Fn1,class Fn2>
+template <class Res>
 class binary_accumulation_function
 {
  public:
-  template <class Res,class T>
-   T operator()(const T& a,const T& b,const Res& init);
+  template <class T,class Fn1,class Fn2>
+   Res operator()(const T& a,const T& b,const Res& init,const Fn1& fn1,const Fn2& fn2);
 };
 
 template <class Fn1,class Fn2>

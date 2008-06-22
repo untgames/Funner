@@ -9,16 +9,23 @@
 #undef minor
 #endif
 
-namespace math
+
+namespace detail
 {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 ///Вспомогательные операции
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-template <class T, size_t Size> vec<T, Size>& get_component (matrix<T, Size>& v, size_t index);
+template <class T, size_t Size> math::vec<T, Size>& get_component (math::matrix<T, Size>& v, size_t index);
 
-template <class T, size_t Size> const vec<T, Size>& get_component (const matrix<T, Size>& v, size_t index);
+template <class T, size_t Size> const math::vec<T, Size>& get_component (const math::matrix<T, Size>& v, size_t index);
+
+}
+
+namespace math
+{
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////

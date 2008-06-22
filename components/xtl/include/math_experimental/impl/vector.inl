@@ -3,17 +3,20 @@
 	Вспомогательные операции
 */
 
-template <class T, size_t Size> T& get_component (vec<T, Size>& v, size_t index)
+namespace detail
+{
+
+template <class T, size_t Size> T& get_component (math::vec<T, Size>& v, size_t index)
 {
   return v [index];
 }
 
-template <class T, size_t Size> const T& get_component (const vec<T, Size>& v, size_t index)
+template <class T, size_t Size> const T& get_component (const math::vec<T, Size>& v, size_t index)
 {
   return v [index];
 }
 
-
+}
 
 /*
         Конструкторы
@@ -22,7 +25,7 @@ template <class T, size_t Size> const T& get_component (const vec<T, Size>& v, s
 template <class T,size_t size>
 inline vec<T,size>::vec ()
 {
-  *this=make_unary_operation<vec<T,size> > (T(0),assign<T,T>()); //component_fn<assign<T,T> > ()(*this,T (0));
+  *this=make_unary_operation<vec<T,size> > (T(0),assign<T,T>()); 
 }
 
 template <class T,size_t size> template <size_t size1>
@@ -148,9 +151,16 @@ const vec<T,size> vec<T,size>::operator - () const
 }
 
 template <class T,size_t size> 
-T vec<T,size>::operator ~ () const
+T vec<T,size>::squared_length () const
 { 
-  return vec_length (*this); 
+    return binary_accumulation_function<T>()(*this,*this,T(0),plus<T>(),multiplies<T>());
+}
+
+
+template <class T,size_t size> 
+T vec<T,size>::length () const
+{ 
+  return sqrt(squared_length());
 }
 
 /*
@@ -160,7 +170,7 @@ T vec<T,size>::operator ~ () const
 template <class T,size_t size>
 T vec<T,size>::operator & (const vec& v) const
 { 
-  return vec_dot_product (*this,v);
+  return binary_accumulation_function<T>()(*this,v,T(0),plus<T>(),multiplies<T>());
 }
 
 template <class T,size_t size>
@@ -270,19 +280,26 @@ vec<T,size>::operator vec<T,size-1>& ()
 }
 
 /*
+	Векторное произведение
+*/
+
+
+
+
+/*
         Утилиты
 */
 
-template <class T,size_t size> 
-T dot (const vec<T,size>& a,const vec<T,size>& b)
+/*template <class T,size_t size> 
+T scalar_multiply (const vec<T,size>& a,const vec<T,size>& b)
 {
   return vec_dot_product (a,b);
-}
+} */
 
 template <class T,size_t size> 
-const vec<T,size> abs (const vec<T,size>& v)
+const vec<T,size> vec<T,size>::abs ()
 {
-  return make_unary_operation<vec<T,size> >(v,absol<T> ());
+  return make_unary_operation<vec<T,size> >(*this,absol<T> ());
 }
 
 template <class T,size_t size>
@@ -298,33 +315,21 @@ const vec<T,size> max (const vec<T,size>& a,const vec<T,size>& b)
 } 
 
 template <class T,size_t size> 
-const vec<T,size> normalize (const vec<T,size>& v)
+const vec<T,size> vec<T,size>::normalize() const
 {
-  return make_binary_operation<vec<T,size> > (v,vec_length(v),divides <T> ());
+  return make_binary_operation<vec<T,size> > (*this,length(),divides <T> ());
 }
 
 template <class T,size_t size> 
-T length (const vec<T,size>& v)
+bool vec<T,size>::equal (const vec<T,size>& b,const T& eps)
 {
-  return vec_length (v);
-}
-
-template <class T,size_t size> 
-T qlen (const vec<T,size>& v)
-{
-  return vec_qlength (v);
-}
-
-template <class T,size_t size> 
-bool equal (const vec<T,size>& a,const vec<T,size>& b,const T& eps)
-{
-  return vec_equal (a,b,eps);
+  return compare_function<T,equal_to<T> >() (*this,b,eps);
 }
 
 template <class T,size_t size>
 T angle (const vec<T,size>& a,const vec<T,size>& b)
 {
-  T ang = acos((a&b)/sqrt(qlen(a)*qlen(b)));
+  T ang = acos((a&b)/sqrt(a.squared_length()*b.squared_length()));
 
   return _isnan(ang)?0:ang;
 }
@@ -333,23 +338,17 @@ T angle (const vec<T,size>& a,const vec<T,size>& b)
     Векторное произведение
 */
 
-template <class type>
-vec<type,3> cross (const vec<type,3>& a,const vec<type,3>& b)
-{
-  return vec<type,3> (a,b,vec_cross_product<type>);
-}
 
-template <class type>
-vec<type,4> cross (const vec<type,4>& a,const vec<type,4>& b)
+template <class T>
+vec<T,3> operator ^ (const vec<T,3>& a,const vec<T,3>& b)
 {
-  return vec<type,4> (a,b,vec_cross_product<type>);
-}
+  vec<T,3> res;
+  res [0] = a [1] * b [2] - b [1] * a [2];
+  res [1] = b [0] * a [2] - b [2] * a [0];
+  res [2] = a [0] * b [1] - b [0] * a [1];
 
-template <class type>
-vec<type,3> operator ^ (const vec<type,3>& a,const vec<type,3>& b)
-{
-  return vec<type,3> (a,b,vec_cross_product<type>);
-}
+  return res;
+} 
 
 template <class type>
 vec<type,4> operator ^ (const vec<type,4>& a,const vec<type,4>& b)

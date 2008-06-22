@@ -1,4 +1,7 @@
+#include <stdio.h>
 
+namespace detail
+{
 template <class T, size_t Size> vec<T, Size>& get_component (matrix<T, Size>& v, size_t index);
 
 template <class T, size_t Size> const vec<T, Size>& get_component (const matrix<T, Size>& v, size_t index);
@@ -14,31 +17,32 @@ template <class T, size_t Size> const T& get_component (const vec<T, Size>& v, s
 
 template <class T> const T& get_component (const T& v, size_t)
 {
-  return v/*.value*/;
+  return v;
 }
-
+}
 template <class Ret, class Fn> template <class T1> 
 inline void unary_component_function<Ret,Fn>::operator () (Ret& res, const T1& a)
 {
   for (size_t i=0; i<Ret::_size; i++)
-    res [i] = Fn ()(get_component (a, i));
+    res [i] = Fn ()(detail::get_component (a, i));
 }
 
 template <class Ret, class Fn> template <class T1, class T2>
 inline void binary_component_function<Ret,Fn>::operator () (Ret& res, const T1& a, const T2& b)
 {
   for (size_t i=0; i<Ret::_size; i++)
-    res [i] = Fn() (get_component (a, i), get_component (b, i));
+    res [i] = Fn() (detail::get_component (a, i), detail::get_component (b, i));
 }
 
-template <class Fn1,class Fn2> template <class Res,class T>
-inline T binary_accumulation_function<Fn1,Fn2>::operator()(const T& a,const T& b,const Res& init)
+template <class Res> template <class T,class Fn1,class Fn2>
+inline Res binary_accumulation_function<Res>::operator()(const T& a,const T& b,const Res& init,const Fn1& fn1,const Fn2& fn2)
 {
-  Res res=init;
+  Res res(init);
   for (int i=0;i<T::_size;i++)
   {
-    res=Fn1()(res,Fn2()(get_component(a,i),get_component(b,i)));
+    res=fn1(res,fn2(detail::get_component(a,i),detail::get_component(b,i)));
   }
+  return res;
 }
 
 template <class Fn1,class Fn2> template <class T,class T1>
@@ -47,15 +51,16 @@ inline T unary_accumulation_function<Fn1,Fn2>::operator()(const T1& a,T& init)
   T res=init;
   for (int i=0;i<T1::_size;i++)
   {
-    res=Fn1()(res,Fn2()(a));
+    res=Fn1()(res,Fn2()(detail::get_component(a,i)));
   }
+  return res;
 }
 template <class T,class Fn> template<class T1>
 inline bool compare_function<T,Fn>::operator () (const T1& a,const T1& b,const T& eps)
 {
   for(size_t i=0;i<T1::_size;i++)
   {
-    if (!Fn()(get_component(a,i),get_component(b,i),eps)) return false;
+    if (!Fn()(detail::get_component(a,i),detail::get_component(b,i),eps)) return false;
   }
   return true;
 }
@@ -63,7 +68,7 @@ inline bool compare_function<T,Fn>::operator () (const T1& a,const T1& b,const T
 template <class Ret, class Fn, class T>
 Ret make_unary_operation (const T& a,const Fn& fn)
 {
-  return Ret (a, unary_component_function<Ret, Fn> ());
+  return Ret (a, unary_component_function<Ret, Fn> (fn));
 }
 
 template <class Ret, class T1, class T2, class Fn>
@@ -71,6 +76,8 @@ Ret make_binary_operation (const T1& a, const T2& b, Fn fn)
 {
   return Ret (a, b, binary_component_function<Ret, Fn> (fn));
 }
+
+
 
 
 /*
