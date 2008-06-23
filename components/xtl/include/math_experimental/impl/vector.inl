@@ -331,7 +331,7 @@ T angle (const vec<T,size>& a,const vec<T,size>& b)
 {
   T ang = acos((a&b)/sqrt(a.squared_length()*b.squared_length()));
 
-  return _isnan(ang)?0:ang;
+  return isnan(ang)?0:ang;
 }
 
 /*
