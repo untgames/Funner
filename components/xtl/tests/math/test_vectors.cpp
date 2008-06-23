@@ -44,7 +44,7 @@ int main()
 //------------------------------------------------------------
   vec_print<float,3>("\nNormalized V1: ",vec3f(V1.normalize()));
   vec_print<float,3>("\nAbsolute V2: ",vec3f(V2.abs()));
-  vec_print<float,3>("\nMin of V1,V2: ",min<float,3>(V1,V2));
+  vec_print<float,3>("\nMin of V1,V2: ",vec3f(min<float,3>(V1,V2)));
   vec_print<float,3>("\nV1*V2 (vectors): ",vec3f(V1^V2));
 //------------------------------------------------------------
   printf("\nLength of V2= %.2f",V2.length());
@@ -55,8 +55,6 @@ int main()
 
   if (V1.equal(V2,1000)) printf("\nV1=V2+(-)1000");
     else printf("\nV1!=V2");
- 
-  
 
   return 0;
 }

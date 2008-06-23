@@ -23,14 +23,14 @@ template <class T> const T& get_component (const T& v, size_t)
 template <class Ret, class Fn> template <class T1> 
 inline void unary_component_function<Ret,Fn>::operator () (Ret& res, const T1& a)
 {
-  for (size_t i=0; i<Ret::_size; i++)
+  for (size_t i=0; i<Ret::Size; i++)
     res [i] = Fn ()(detail::get_component (a, i));
 }
 
 template <class Ret, class Fn> template <class T1, class T2>
 inline void binary_component_function<Ret,Fn>::operator () (Ret& res, const T1& a, const T2& b)
 {
-  for (size_t i=0; i<Ret::_size; i++)
+  for (size_t i=0; i<Ret::Size; i++)
     res [i] = Fn() (detail::get_component (a, i), detail::get_component (b, i));
 }
 
@@ -38,7 +38,7 @@ template <class Res> template <class T,class Fn1,class Fn2>
 inline Res binary_accumulation_function<Res>::operator()(const T& a,const T& b,const Res& init,const Fn1& fn1,const Fn2& fn2)
 {
   Res res(init);
-  for (int i=0;i<T::_size;i++)
+  for (int i=0;i<T::Size;i++)
   {
     res=fn1(res,fn2(detail::get_component(a,i),detail::get_component(b,i)));
   }
@@ -49,7 +49,7 @@ template <class Fn1,class Fn2> template <class T,class T1>
 inline T unary_accumulation_function<Fn1,Fn2>::operator()(const T1& a,T& init)
 {
   T res=init;
-  for (int i=0;i<T1::_size;i++)
+  for (int i=0;i<T1::Size;i++)
   {
     res=Fn1()(res,Fn2()(detail::get_component(a,i)));
   }
@@ -58,7 +58,7 @@ inline T unary_accumulation_function<Fn1,Fn2>::operator()(const T1& a,T& init)
 template <class T,class Fn> template<class T1>
 inline bool compare_function<T,Fn>::operator () (const T1& a,const T1& b,const T& eps)
 {
-  for(size_t i=0;i<T1::_size;i++)
+  for(size_t i=0;i<T1::Size;i++)
   {
     if (!Fn()(detail::get_component(a,i),detail::get_component(b,i),eps)) return false;
   }

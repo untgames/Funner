@@ -139,7 +139,7 @@ vec<T,size>& vec<T,size>::operator = (const T& a)
 */
 
 template <class T,size_t size>
-const vec<T,size>& vec<T,size>::operator + () const
+const vec<T,size> vec<T,size>::operator + () const
 { 
   return *this; 
 }
@@ -216,13 +216,13 @@ vec<T,size>& vec<T,size>::operator /= (const T& d)
 } */
 
 template <class T,size_t size>
-const vec<T,size>& vec<T,size>::operator + (const vec& v) const  
+const vec<T,size> vec<T,size>::operator + (const vec& v) const  
 { 
   return make_binary_operation<vec<T,size> >(*this,v,plus<T,T,T> ());
 }
 
 template <class T,size_t size>
-const vec<T,size>& vec<T,size>::operator - (const vec& v) const  
+const vec<T,size> vec<T,size>::operator - (const vec& v) const  
 { 
   return make_binary_operation<vec<T,size> >(*this,v,minus<T,T,T> ());
 }
@@ -240,13 +240,13 @@ const vec<T,size> vec<T,size>::operator / (const vec& v) const
 }*/
 
 template <class T,size_t size> template<class T2>
-const vec<T,size>& vec<T,size>::operator * (const T2& a) const  
+const vec<T,size> vec<T,size>::operator * (const T2& a) const  
 { 
   return make_binary_operation<vec<T,size> >(*this,a,multiplies<T,T,T> ());
 }
 
 template <class T,size_t size> template<class T2>
-const vec<T,size>& vec<T,size>::operator / (const T2& a) const  
+const vec<T,size> vec<T,size>::operator / (const T2& a) const  
 { 
   return make_binary_operation<vec<T,size> >(*this,a,divides<T,T,T> ());
 }

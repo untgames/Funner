@@ -70,7 +70,7 @@ class vec: public vec_base<type,size>
     typedef vec_base<type,size> base;
     typedef type                value_type;
 
-    enum { _size = size }; //исправить!!!
+    enum { Size = size }; //исправить!!!
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
@@ -108,7 +108,7 @@ class vec: public vec_base<type,size>
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Унарный +,-, длина (~)
 ////////////////////////////////////////////////////////////////////////////////////////////
-    const vec&   operator +  () const;
+    const vec   operator +  () const;
     const vec    operator -  () const;
           type   length  () const;
           type   squared_length() const;
@@ -125,8 +125,8 @@ class vec: public vec_base<type,size>
 ////////////////////////////////////////////////////////////////////////////////////////////
     vec&      operator += (const vec&);
     vec&      operator -= (const vec&);
-    const vec& operator +  (const vec&) const;
-    const vec& operator -  (const vec&) const;
+    const vec operator +  (const vec&) const;
+    const vec operator -  (const vec&) const;
 
 
     template <class T2>
@@ -136,10 +136,10 @@ class vec: public vec_base<type,size>
        vec&      operator /= (const T2&);
 
     template <class T2>
-      const vec& operator *  (const T2&) const;
+       const vec operator *  (const T2&) const;
 
     template <class T2>
-      const vec& operator /  (const T2&) const;
+       const vec operator /  (const T2&) const;
 
 
     friend const vec operator *  (const type& a,const vec& v)    { return v * a; }

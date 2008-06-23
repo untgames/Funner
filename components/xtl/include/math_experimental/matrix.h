@@ -38,7 +38,7 @@ class matrix
     typedef vec<type,size>              vector;     //вектор строка
     typedef typename vector::value_type value_type; //тип элементов
     
-    enum { _size = size }; //исправить!!
+    enum { Size = size }; //исправить!!
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
