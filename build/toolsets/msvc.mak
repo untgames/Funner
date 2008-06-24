@@ -6,23 +6,27 @@
 #Выбор конфигурации MSVC
 ###################################################################################################
 ifneq (,$(VS90COMNTOOLS))
-  MSVC_PATH        ?= $(VS90COMNTOOLS)../../vc
-  MSVS_COMMON_PATH ?= $(VS90COMNTOOLS)../../Common7/Ide
+  MSVC_PATH         ?= $(VS90COMNTOOLS)../../vc
+  MSVS_COMMON_PATH  ?= $(VS90COMNTOOLS)../../Common7/Ide
 endif
 
 ifneq (,$(VS80COMNTOOLS))
-  MSVC_PATH        ?= $(VS80COMNTOOLS)../../vc
-  MSVS_COMMON_PATH ?= $(VS80COMNTOOLS)../../Common7/Ide
+  MSVC_PATH         ?= $(VS80COMNTOOLS)../../vc
+  MSVS_COMMON_PATH  ?= $(VS80COMNTOOLS)../../Common7/Ide
+  PLATFORM_SDK_PATH ?= $(MSVC_PATH)/platformsdk
 endif
 
 ifneq (,$(VS71COMNTOOLS))
-  MSVC_PATH        ?= $(VS71COMNTOOLS)../../vc7
-  MSVS_COMMON_PATH ?= $(VS71COMNTOOLS)../../Common7/Ide
+  MSVC_PATH         ?= $(VS71COMNTOOLS)../../vc7
+  MSVS_COMMON_PATH  ?= $(VS71COMNTOOLS)../../Common7/Ide
+  PLATFORM_SDK_PATH ?= $(MSVC_PATH)/platformsdk
+  PROFILES          += vc7
 endif
 
 ifneq (,$(VCTOOLKITINSTALLDIR))
-  MSVC_PATH        ?= $(VCTOOLKITINSTALLDIR).
-  MSVS_COMMON_PATH ?= $(VCTOOLKITINSTALLDIR)bin
+  MSVC_PATH         ?= $(VCTOOLKITINSTALLDIR).
+  MSVS_COMMON_PATH  ?= $(VCTOOLKITINSTALLDIR)bin
+  PROFILES          += vc7
 endif
 
 ifeq (,$(MSVS_COMMON_PATH))
@@ -34,8 +38,8 @@ ifeq (,$(MSVC_PATH))
 endif
 
 MSVC_PATH        := $(call convert_path,$(MSVC_PATH))
+MSVC_BIN_PATH    := $(MSVC_PATH)/bin
 MSVS_COMMON_PATH := $(call convert_path,$(MSVS_COMMON_PATH))
-MSVC_PATH        := $(MSVC_PATH);$(MSVS_COMMON_PATH);$$PATH
 
 ###################################################################################################
 #Константы
@@ -49,8 +53,15 @@ PROFILES   += msvc win32
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
 ###################################################################################################
-INCLUDE := $(MSVC_DIR)/include;$(MSVC_DIR)/platformsdk/include;$(INCLUDE)
-LIB     := $(MSVC_DIR)/lib;$(MSVC_DIR)/platformsdk/lib;$(LIB)
+INCLUDE := $(MSVC_PATH)/include;$(INCLUDE)
+LIB     := $(MSVC_PATH)/lib;$(LIB)
+
+ifneq (,$(PLATFORM_SDK_PATH))
+
+INCLUDE := $(PLATFORM_SDK_PATH)/include;$(INCLUDE)
+LIB     := $(PLATFORM_SDK_PATH)/lib;$(LIB)
+
+endif
 
 export INCLUDE
 export LIB
@@ -60,7 +71,7 @@ export LIB
 #список дефайнов, флаги компиляции, pch файл)
 ###################################################################################################
 define tools.c++compile
-export PATH="$(MSVC_PATH)" && cl -nologo -c -EHsc -W3 -Ox -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsubst %,-I"%",$2) $5 $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && $(MSVC_BIN_PATH)/cl -nologo -c -EHsc -W3 -Ox -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsubst %,-I"%",$2) $5 $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
 endef
 
 ###################################################################################################
@@ -68,12 +79,12 @@ endef
 #список подключаемых символов линковки, флаги линковки)
 ###################################################################################################
 define tools.link
-export PATH="$(MSVC_PATH)" && link -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && $(MSVC_BIN_PATH)/link -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2
 endef
 
 ###################################################################################################
 #Сборка библиотеки (имя выходного файла, список файлов)
 ###################################################################################################
 define tools.lib
-export PATH="$(MSVC_PATH)" && lib -nologo -out:$1 $2
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && $(MSVC_BIN_PATH)/lib -nologo -out:$1 $2
 endef

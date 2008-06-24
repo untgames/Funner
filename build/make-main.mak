@@ -11,11 +11,13 @@ TOOLSETS_DIR_SHORT_NAME                 := toolsets      #Базовое имя каталога с
 PCH_SHORT_NAME                          := pch.h         #Базовое имя PCH файла
 EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
-VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package #Допустимые типы целей
+VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package sdk #Допустимые типы целей
 PACKAGE_COMMANDS                        := build clean test check run #Команды, делегируемые компонентам пакета
 COMPILE_TOOL                            := tools.c++compile #Имя макроса утилиты компиляции C++ файлов
 LINK_TOOL                               := tools.link       #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib        #Имя макроса утилиты архивирования объектных файлов
+EXPORT_EXCLUDE_PATTERN                  := .svn            #Шаблон файлов, исключаемых из копирования при выполнении цели export-dirs
+EXPORT_TAR_TMP_FILE_SHORT_NAME          := export-file.tar #Базовое имя файла архива, используемого при выполнении цели export-dirs
 
 ###################################################################################################
 #Производные пути и переменные
@@ -28,6 +30,8 @@ BUILD_DIR_SHORT_NAME                    := $(strip $(BUILD_DIR_SHORT_NAME))
 TMP_DIR_SHORT_NAME                      := $(strip $(TMP_DIR_SHORT_NAME))
 DIST_DIR_SHORT_NAME                     := $(strip $(DIST_DIR_SHORT_NAME))
 EXPORT_VAR_PREFIX                       := $(strip $(EXPORT_VAR_PREFIX))
+EXPORT_TAR_TMP_FILE_SHORT_NAME          := $(strip $(EXPORT_TAR_TMP_FILE_SHORT_NAME))
+EXPORT_EXCLUDE_PATTERN                  := $(strip $(EXPORT_EXCLUDE_PATTERN))
 CURRENT_TOOLSET                         := $(TOOLSET)
 BUILD_DIR                               := $(ROOT)/$(BUILD_DIR_SHORT_NAME)
 TOOLSETS_DIR                            := $(BUILD_DIR)/$(strip $(TOOLSETS_DIR_SHORT_NAME))
@@ -197,17 +201,17 @@ endef
 
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
 define process_target_with_sources
-  $1.INCLUDE_DIRS  := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
-  $1.SOURCE_DIRS   := $$(call specialize_paths,$$($1.SOURCE_DIRS))
-  $1.LIB_DIRS      := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
-  $1.DLL_DIRS      := $$(call specialize_paths,$$($1.DLL_DIRS))
-  $1.EXECUTION_DIR := $$(strip $$($1.EXECUTION_DIR))
-  $1.EXECUTION_DIR := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
-  $1.LIBS          := $$($1.LIBS:%=$(LIB_PREFIX)%.$(LIB_SUFFIX))
-  $1.TARGET_DLLS   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%.$(DLL_SUFFIX))  
-  $1.LIB_DEPS      := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))
-  $1.TMP_DIR       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
-  $1.TMP_DIRS      := $$($1.TMP_DIR)  
+  $1.INCLUDE_DIRS   := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
+  $1.SOURCE_DIRS    := $$(call specialize_paths,$$($1.SOURCE_DIRS))
+  $1.LIB_DIRS       := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
+  $1.DLL_DIRS       := $$(call specialize_paths,$$($1.DLL_DIRS))
+  $1.EXECUTION_DIR  := $$(strip $$($1.EXECUTION_DIR))
+  $1.EXECUTION_DIR  := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
+  $1.LIBS           := $$($1.LIBS:%=$(LIB_PREFIX)%.$(LIB_SUFFIX))
+  $1.TARGET_DLLS    := $$($1.DLLS:%=$(DIST_BIN_DIR)/%.$(DLL_SUFFIX))  
+  $1.LIB_DEPS       := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))
+  $1.TMP_DIR        := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+  $1.TMP_DIRS       := $$($1.TMP_DIR)
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
@@ -216,7 +220,7 @@ define process_target_with_sources
 
   build: $$($1.TARGET_DLLS)
 
-  $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
+  $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))  
 endef
 
 #Обработка цели static-lib (имя цели)
@@ -347,6 +351,29 @@ define process_target.package
   endif  
 endef
 
+#Обработка цели sdk (имя цели)
+define process_target.sdk
+
+ifneq (,$$($1.EXPORT_DIRS))
+  $1.TMP_DIR        := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+  $1.EXPORT_DIRS    := $$(sort $$(call specialize_paths,$$($1.EXPORT_DIRS)))
+  $1.EXPORT_TMP_TAR := $$($1.TMP_DIR)/$(EXPORT_TAR_TMP_FILE_SHORT_NAME)
+
+  TMP_DIRS := $$($1.TMP_DIR) $$(TMP_DIRS)
+  TMP_CLEAN_DIRS := $(TMP_CLEAN_DIRS) $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+
+    #Экспорт каталогов
+  export-dirs: EXPORT_DIRS_TARGET.$1  
+  .PHONY: EXPORT_DIRS_TARGET.$1
+  
+  EXPORT_DIRS_TARGET.$1:
+		@echo Export dirs "$(DIST_DIR) <- $$($1.EXPORT_DIRS)"
+		@tar --exclude=$(EXPORT_EXCLUDE_PATTERN) -cf $$($1.EXPORT_TMP_TAR) $$($1.EXPORT_DIRS)
+		@tar --directory=$(DIST_DIR) --overwrite --overwrite-dir -xf $$($1.EXPORT_TMP_TAR)
+endif
+
+endef
+
 #Импортирование настроек
 define import_settings
 #Получение относительного пути к используемому компоненту
@@ -414,20 +441,23 @@ endef
 ###################################################################################################
 all: build check
 run: build
-build: create_dirs
+build: create-dirs
 rebuild: clean build
 test: build
 check: build
+export-dirs: create-dirs
+#dist: check
+dist : export-dirs
 force:
 
-.PHONY: build rebuild clean fullyclean run test check help create_dirs force dump
+.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump export-dirs dist tar-dist
 
 #Обработка целей компонента
 $(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call test_target_type,$(target))))
 $(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call process_target_common,$(target))))
 
 #Создание каталогов
-create_dirs: $(DIRS)
+create-dirs: $(DIRS)
 
 $(DIRS):
 	@mkdir -p $@
@@ -438,3 +468,8 @@ clean:
 
 fullyclean: clean
 	@$(RM) -r $(DIRS)
+
+#Создание архива с дистрибутивом
+tar-dist: dist
+	@echo Create $(basename $(DIST_DIR)).tar...
+	@tar -cf $(basename $(DIST_DIR)).tar $(DIST_DIR)
