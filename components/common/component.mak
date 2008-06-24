@@ -27,7 +27,7 @@ COMMONLIB_ZIP_FILE_SYSTEM.COMPILER_DEFINES :=
 #Öåëü ¹3 - CommonLib tests
 COMMONLIB_TESTS.TYPE             := test-suite
 COMMONLIB_TESTS.INCLUDE_DIRS     :=
-COMMONLIB_TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils tests/parser tests/memory
+COMMONLIB_TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils tests/parser tests/memory tests/var_registry
 COMMONLIB_TESTS.EXECUTION_DIR    :=
 COMMONLIB_TESTS.LIB_DIRS         :=  
 COMMONLIB_TESTS.LIBS             :=
