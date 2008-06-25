@@ -1,5 +1,5 @@
 template <>
-__forceinline matrix<float,4>& matrix<float,4>::operator = (const matrix<float,4>& m)
+__forceinline matrix<float,4,4>& matrix<float,4,4>::operator = (const matrix<float,4,4>& m)
 {
   row (0) = m [0];
   row (1) = m [1];
@@ -10,7 +10,7 @@ __forceinline matrix<float,4>& matrix<float,4>::operator = (const matrix<float,4
 }
 
 template <>
-__forceinline void matrix_assign_scalar (matrix<float,4>& res,const float& a)
+__forceinline void matrix_assign_scalar (matrix<float,4,4>& res,const float& a)
 {
   __m128 r = _mm_set_ps (0.0f,0.0f,0.0f,a);
 
@@ -21,7 +21,7 @@ __forceinline void matrix_assign_scalar (matrix<float,4>& res,const float& a)
 }
 
 template <>
-__forceinline void matrix_mul_scalar (matrix<float,4>& res,const matrix<float,4>& a,const float& b)
+__forceinline void matrix_mul_scalar (matrix<float,4,4>& res,const matrix<float,4,4>& a,const float& b)
 {
   __m128 r = _mm_set_ps1 (b);
 
@@ -32,7 +32,7 @@ __forceinline void matrix_mul_scalar (matrix<float,4>& res,const matrix<float,4>
 }
 
 template <>
-__forceinline void matrix_add (matrix<float,4>& res,const matrix<float,4>& a,const matrix<float,4>& b)
+__forceinline void matrix_add (matrix<float,4,4>& res,const matrix<float,4,4>& a,const matrix<float,4,4>& b)
 {
   res [0] = _mm_add_ps (a [0],b [0]);  
   res [1] = _mm_add_ps (a [1],b [1]);  
@@ -41,7 +41,7 @@ __forceinline void matrix_add (matrix<float,4>& res,const matrix<float,4>& a,con
 } 
 
 template <>
-__forceinline void matrix_sub (matrix<float,4>& res,const matrix<float,4>& a,const matrix<float,4>& b)
+__forceinline void matrix_sub (matrix<float,4,4>& res,const matrix<float,4,4>& a,const matrix<float,4,4>& b)
 {
   res [0] = _mm_sub_ps (a [0],b [0]);  
   res [1] = _mm_sub_ps (a [1],b [1]);  
@@ -49,7 +49,7 @@ __forceinline void matrix_sub (matrix<float,4>& res,const matrix<float,4>& a,con
   res [3] = _mm_sub_ps (a [3],b [2]);  
 } 
 
-inline float matrix_det (const matrix<float,4>& m) 
+inline float matrix_det (const matrix<float,4,4>& m) 
 { 
   __m128 r1,r2,r3,r4,r5,r6; 
   float res;
@@ -106,13 +106,13 @@ inline float matrix_det (const matrix<float,4>& m)
 }
 
 template <>
-__forceinline void matrix_transpose (matrix<float,4>& m)
+__forceinline void matrix_transpose (matrix<float,4,4>& m)
 {
   _MM_TRANSPOSE4_PS (m [0],m [1],m [2],m [3]);
 }
 
 template <>
-__forceinline void matrix_transpose (matrix<float,4>& dst,const matrix<float,4>& src)
+__forceinline void matrix_transpose (matrix<float,4,4>& dst,const matrix<float,4,4>& src)
 {
   __m128 r3, r2, r1, r0;
 
@@ -128,7 +128,7 @@ __forceinline void matrix_transpose (matrix<float,4>& dst,const matrix<float,4>&
 }
 
 template <>
-__forceinline void matrix_mul_rr (matrix<float,4>& res,const matrix<float,4>& a,const matrix<float,4>& b)
+__forceinline void matrix_mul_rr (matrix<float,4,4>& res,const matrix<float,4,4>& a,const matrix<float,4,4>& b)
 {
   __m128 r0,r1,r2,r3,r4,r5,r6;
 
@@ -159,29 +159,29 @@ __forceinline void matrix_mul_rr (matrix<float,4>& res,const matrix<float,4>& a,
 } 
 
 template <>  
-__forceinline void matrix_mul_cc (matrix<float,4>& res,const matrix<float,4>& a,const matrix<float,4>& b)
+__forceinline void matrix_mul_cc (matrix<float,4,4>& res,const matrix<float,4,4>& a,const matrix<float,4,4>& b)
 {
   matrix_mul_rr (res,transpose (a),transpose (b));
 }
 
 template <>
-__forceinline void matrix_mul_rc (matrix<float,4>& res,const matrix<float,4>& a,const matrix<float,4>& b)
+__forceinline void matrix_mul_rc (matrix<float,4,4>& res,const matrix<float,4,4>& a,const matrix<float,4,4>& b)
 {
-  matrix<float,4> tmp;
+  matrix<float,4,4> tmp;
 
   matrix_transpose (tmp,b);
   matrix_mul_rr    (res,a,tmp);
 } 
 
 template <>
-inline void matrix_mul_cr (matrix<float,4>& res,const matrix<float,4>& a,const matrix<float,4>& b)
+inline void matrix_mul_cr (matrix<float,4,4>& res,const matrix<float,4,4>& a,const matrix<float,4,4>& b)
 {
   matrix_mul_rc (res,b,a);
   matrix_transpose (res);
 }
 
 template <>
-inline void matrix_mul_rr (matrix<float,4>& a,const matrix<float,4>& b)
+inline void matrix_mul_rr (matrix<float,4,4>& a,const matrix<float,4,4>& b)
 {
   __m128 r0,r1,r2,r3,r4,r5,r6;
 
@@ -212,15 +212,15 @@ inline void matrix_mul_rr (matrix<float,4>& a,const matrix<float,4>& b)
 } 
 
 template <>
-inline void matrix_mul_rc (matrix<float,4>& a,const matrix<float,4>& b)
+inline void matrix_mul_rc (matrix<float,4,4>& a,const matrix<float,4,4>& b)
 {
-  matrix<float,4> tmp;
+  matrix<float,4,4> tmp;
 
   matrix_transpose (tmp,b);
   matrix_mul_rr    (a,tmp);  
 } 
 
-__forceinline void matrix_swaprow (matrix<float,4>& a,size_t i,size_t j)
+__forceinline void matrix_swaprow (matrix<float,4,4>& a,size_t i,size_t j)
 {
   vec<float,4> tmp = a [i];
   a [i]            = a [j];
@@ -228,9 +228,9 @@ __forceinline void matrix_swaprow (matrix<float,4>& a,size_t i,size_t j)
 }
 
 //template <>
-__forceinline void matrix_invert (matrix<float,4>& res,const matrix<float,4>& src)
+__forceinline void matrix_invert (matrix<float,4,4>& res,const matrix<float,4,4>& src)
 {
-  matrix<float,4> a = src;
+  matrix<float,4,4> a = src;
   res = 1;
 
   for (size_t i=0;i<4;i++)
@@ -268,7 +268,7 @@ __forceinline void matrix_invert (matrix<float,4>& res,const matrix<float,4>& sr
 }
 
 /*template <>
-__forceinline void matrix_mul_vec (vec<float,4>& res,const matrix<float,4>& m,const vec<float,4>& v)
+__forceinline void matrix_mul_vec (vec<float,4>& res,const matrix<float,4,4>& m,const vec<float,4>& v)
 {
   __m128 r0,r1,r2,r3,r4,r5,r6;
 
@@ -296,7 +296,7 @@ __forceinline void matrix_mul_vec (vec<float,4>& res,const matrix<float,4>& m,co
 }
 
 template <>
-__forceinline void vec_mul_matrix (vec<float,4>& res,const vec<float,4>& v,const matrix<float,4>& m)
+__forceinline void vec_mul_matrix (vec<float,4>& res,const vec<float,4>& v,const matrix<float,4,4>& m)
 {
   __m128 r0,r1,r2,r3,r4,r5,r6;
   __m128 t0,t1,t2,t3;

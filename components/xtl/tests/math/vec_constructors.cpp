@@ -48,5 +48,3 @@ int main()
 	vec_print(V8);
 	return 0;
 }
-
-

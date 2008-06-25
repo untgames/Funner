@@ -3,7 +3,6 @@
 
 namespace math
 {
-
 template <class T,size_t size> class vec;
 template <class T,size_t size> class matrix;
 template <class T>             class quat;
@@ -25,16 +24,16 @@ template <class T>             class quat;
 //template <class T,size_t size> T vec_dot_product (const vec<T,size>& a,const vec<T,size>& b);
 
 //Векторное произведение
-template <class T>  void  vec_cross_product (vec<T,3>& res,const vec<T,3>& a,const vec<T,3>& b);
-template <class T>  void  vec_cross_product (vec<T,4>& res,const vec<T,4>& a,const vec<T,4>& b); //???
+/*template <class T>  void  vec_cross_product (vec<T,3>& res,const vec<T,3>& a,const vec<T,3>& b);
+template <class T>  void  vec_cross_product (vec<T,4>& res,const vec<T,4>& a,const vec<T,4>& b); //???*/
 
 /*
         Матрицы
 */
 
 ///Основные операции
-template <class T,size_t size> void matrix_add (matrix<T,size>& res,const matrix<T,size>& a,const matrix<T,size>& b);
-template <class T,size_t size> void matrix_sub (matrix<T,size>& res,const matrix<T,size>& a,const matrix<T,size>& b);
+template <class T,size_t size> void matrix_add (matrix<T,size,size>& res,const matrix<T,size,size>& a,const matrix<T,size,size>& b);
+template <class T,size_t size> void matrix_sub (matrix<T,size,size>& res,const matrix<T,size,size>& a,const matrix<T,size,size>& b);
 
 /*
   Умножение матрицы на матрицу
@@ -43,52 +42,52 @@ template <class T,size_t size> void matrix_sub (matrix<T,size>& res,const matrix
     rc - строка на столбец 
     cr - столбец на строку
 */
-template <class T,size_t size> void matrix_mul_rr (matrix<T,size>& res,const matrix<T,size>& a,const matrix<T,size>& b);
-template <class T,size_t size> void matrix_mul_cc (matrix<T,size>& res,const matrix<T,size>& a,const matrix<T,size>& b);
-template <class T,size_t size> void matrix_mul_rc (matrix<T,size>& res,const matrix<T,size>& a,const matrix<T,size>& b);
-template <class T,size_t size> void matrix_mul_cr (matrix<T,size>& res,const matrix<T,size>& a,const matrix<T,size>& b);
+template <class T,size_t size> void matrix_mul_rr (matrix<T,size,size>& res,const matrix<T,size,size>& a,const matrix<T,size,size>& b);
+template <class T,size_t size> void matrix_mul_cc (matrix<T,size,size>& res,const matrix<T,size,size>& a,const matrix<T,size,size>& b);
+template <class T,size_t size> void matrix_mul_rc (matrix<T,size,size>& res,const matrix<T,size,size>& a,const matrix<T,size,size>& b);
+template <class T,size_t size> void matrix_mul_cr (matrix<T,size,size>& res,const matrix<T,size,size>& a,const matrix<T,size,size>& b);
 
-template <class T,size_t size> void matrix_mul_rr (matrix<T,size>& a,const matrix<T,size>& b); //*=
-template <class T,size_t size> void matrix_mul_cc (matrix<T,size>& a,const matrix<T,size>& b); //*=
-template <class T,size_t size> void matrix_mul_rc (matrix<T,size>& a,const matrix<T,size>& b); //*=
-template <class T,size_t size> void matrix_mul_cr (matrix<T,size>& a,const matrix<T,size>& b); //*=
+template <class T,size_t size> void matrix_mul_rr (matrix<T,size,size>& a,const matrix<T,size,size>& b); //*=
+template <class T,size_t size> void matrix_mul_cc (matrix<T,size,size>& a,const matrix<T,size,size>& b); //*=
+template <class T,size_t size> void matrix_mul_rc (matrix<T,size,size>& a,const matrix<T,size,size>& b); //*=
+template <class T,size_t size> void matrix_mul_cr (matrix<T,size,size>& a,const matrix<T,size,size>& b); //*=
 
 //По умолчанию строка на столбец
-template <class T,size_t size> void matrix_mul (matrix<T,size>& res,const matrix<T,size>& a,const matrix<T,size>& b);
-template <class T,size_t size> void matrix_mul (matrix<T,size>& a,const matrix<T,size>& b); //*=
+template <class T,size_t size> void matrix_mul (matrix<T,size,size>& res,const matrix<T,size,size>& a,const matrix<T,size,size>& b);
+template <class T,size_t size> void matrix_mul (matrix<T,size,size>& a,const matrix<T,size,size>& b); //*=
 
-template <class T,size_t size> void matrix_mul_scalar (matrix<T,size>& res,const matrix<T,size>& a,const T& b);
-template <class T,size_t size> void matrix_div_scalar (matrix<T,size>& res,const matrix<T,size>& a,const T& b);
+template <class T,size_t size> void matrix_mul_scalar (matrix<T,size,size>& res,const matrix<T,size,size>& a,const T& b);
+template <class T,size_t size> void matrix_div_scalar (matrix<T,size,size>& res,const matrix<T,size,size>& a,const T& b);
 
 ///Присваивание / копирование
-template <class T,size_t size> void matrix_copy          (matrix<T,size>& res,const matrix<T,size>& src);
-template <class T,size_t size> void matrix_assign_scalar (matrix<T,size>& res,const T& value);
+template <class T,size_t size> void matrix_copy          (matrix<T,size,size>& res,const matrix<T,size,size>& src);
+template <class T,size_t size> void matrix_assign_scalar (matrix<T,size,size>& res,const T& value);
 
 ///Сравнение 
-template <class T,size_t size> bool matrix_equal  (const matrix<T,size>& a,const matrix<T,size>& b);
-template <class T,size_t size> bool matrix_equal  (const matrix<T,size>& a,const matrix<T,size>& b,const T& eps);
-template <class T,size_t size> bool matrix_nequal (const matrix<T,size>& a,const matrix<T,size>& b);
+template <class T,size_t size> bool matrix_equal  (const matrix<T,size,size>& a,const matrix<T,size,size>& b);
+template <class T,size_t size> bool matrix_equal  (const matrix<T,size,size>& a,const matrix<T,size,size>& b,const T& eps);
+template <class T,size_t size> bool matrix_nequal (const matrix<T,size,size>& a,const matrix<T,size,size>& b);
 
 ///Изменение знака
-template <class T,size_t size> void matrix_neg (matrix<T,size>& res,const matrix<T,size>& src);
+template <class T,size_t size> void matrix_neg (matrix<T,size,size>& res,const matrix<T,size,size>& src);
 
 ///Утилиты
-template <class T,size_t size> T     matrix_det       (const matrix<T,size>&);
-template <class T,size_t size> T     matrix_minor     (const matrix<T,size>&,size_t,size_t);
-template <class T,size_t size> void  matrix_transpose (matrix<T,size>& res,const matrix<T,size>& src);
-template <class T,size_t size> void  matrix_transpose (matrix<T,size>&);
-template <class T,size_t size> void  matrix_invert    (matrix<T,size>& res,const matrix<T,size>& src);
-template <class T,size_t size> void  matrix_invert    (matrix<T,size>&);
-template <class T,size_t size> void  matrix_normalize (matrix<T,size>& res,const matrix<T,size>& src);
-template <class T,size_t size> void  matrix_normalize (matrix<T,size>&);
+template <class T,size_t size> T     matrix_det       (const matrix<T,size,size>&);
+template <class T,size_t size> T     matrix_minor     (const matrix<T,size,size>&,size_t,size_t);
+template <class T,size_t size> void  matrix_transpose (matrix<T,size,size>& res,const matrix<T,size,size>& src);
+template <class T,size_t size> void  matrix_transpose (matrix<T,size,size>&);
+template <class T,size_t size> void  matrix_invert    (matrix<T,size,size>& res,const matrix<T,size,size>& src);
+template <class T,size_t size> void  matrix_invert    (matrix<T,size,size>&);
+template <class T,size_t size> void  matrix_normalize (matrix<T,size,size>& res,const matrix<T,size,size>& src);
+template <class T,size_t size> void  matrix_normalize (matrix<T,size,size>&);
 
 /*
    Умножение матрицы на вектор     
      1. Матрица строка на вектор столбец
      2. Матрица столбец на вектор строку
 */
-template <class T,size_t size> void  matrix_mul_vec (vec<T,size>&,const matrix<T,size>&,const vec<T,size>&);
-template <class T,size_t size> void  vec_mul_matrix (vec<T,size>&,const vec<T,size>&,const matrix<T,size>&);
+template <class T,size_t size> void  matrix_mul_vec (vec<T,size>&,const matrix<T,size,size>&,const vec<T,size>&);
+template <class T,size_t size> void  vec_mul_matrix (vec<T,size>&,const vec<T,size>&,const matrix<T,size,size>&);
 
 //Без учета смещения
 template <class T,size_t size> void  matrix_mul_vec (vec<T,size>&,const matrix<T,size+1>&,const vec<T,size>&);

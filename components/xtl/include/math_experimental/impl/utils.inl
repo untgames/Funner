@@ -383,7 +383,7 @@ inline const quat<double>  fromAxisAngled  (double angle,double x,double y,doubl
   return fromAxisAngle (angle,vec<double,3>(x,y,z));
 }
 
-inline const matrix<float,4> lookatf (const vec<float,3>& pos,const vec<float,3>& center,const vec<float,3>& up)
+/*inline const matrix<float,4> lookatf (const vec<float,3>& pos,const vec<float,3>& center,const vec<float,3>& up)
 { 
   matrix<float,4> view;
      
@@ -399,4 +399,4 @@ inline const matrix<float,4> lookatf (const vec<float,3>& pos,const vec<float,3>
   view [3] = vec<float,4> (0.0f,0.0f,0.0f,1.0f);
 
   return invert (view * translate (-pos));
-}
+} */

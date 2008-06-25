@@ -113,12 +113,12 @@ vec<T,size>::vec (const vec<T,size-1>& v,const T& a)
         Привсаивание
 */
 
-template <class T,size_t size> template <size_t size1>
+/*template <class T,size_t size> template <size_t size1>
 vec<T,size>& vec<T,size>::operator = (const vec<T,size1>& v)
 {
   vec_copy (*this,v);
   return *this;
-} 
+} */
 
 template <class T,size_t size>
 vec<T,size>& vec<T,size>::operator = (const base& b)
@@ -127,10 +127,12 @@ vec<T,size>& vec<T,size>::operator = (const base& b)
   return *this;
 } 
 
-template <class T,size_t size> 
-vec<T,size>& vec<T,size>::operator = (const T& a)
+template <class T,size_t size> template<class T1>
+vec<T,size>& vec<T,size>::operator = (const T1& a)
 {
-  vec_assign_scalar (*this,a);
+  assign<T,T> fn;
+  unary_component_function<vec<T,size>,assign<T,T> > _fn (fn);
+  _fn (*this,a);
   return *this;
 }
 
@@ -268,6 +270,35 @@ bool vec<T,size>::operator != (const vec& v) const
 }
 
 template <class T,size_t size>
+bool vec<T,size>::operator < (const vec& v) const
+{
+  return compare_function<T,less<T> >() (*this,v);
+}
+
+template <class T,size_t size>
+bool vec<T,size>::operator > (const vec& v) const
+{
+  return compare_function<T,greater<T> >() (*this,v);
+}
+
+template <class T,size_t size>
+bool vec<T,size>::operator <= (const vec& v) const
+{
+  return compare_function<T,less_equal<T> >() (*this,v);
+}
+
+template <class T,size_t size>
+bool vec<T,size>::operator >= (const vec& v) const
+{
+  return compare_function<T,greater_equal<T> >() (*this,v);
+}
+
+
+
+
+
+
+template <class T,size_t size>
 vec<T,size>::operator const vec<T,size-1>& () const
 {
   return *(const vec<T,size-1>*)this;
@@ -350,8 +381,8 @@ vec<T,3> operator ^ (const vec<T,3>& a,const vec<T,3>& b)
   return res;
 } 
 
-template <class type>
+/*template <class type>
 vec<type,4> operator ^ (const vec<type,4>& a,const vec<type,4>& b)
 {
   return vec<type,4> (a,b,vec_cross_product<type>);
-}
+} */

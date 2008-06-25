@@ -18,13 +18,26 @@ template <class T,size_t size> void vec_print(const char* Message,const vec<T,si
 	printf("\n");
 }
 
-template <class T,size_t size> void vec_print(vec<T,size>& V)
+template <class T,size_t size> void vec_print(const vec<T,size>& V)
 {
 	for (int i=0;i<size;i++)
 	{
 		_printf(V[i]);
 	}
+
 }
+
+template <class T,size_t sizeX,size_t sizeY> void matrix_print(const char* Message,const matrix<T,sizeX,sizeY>& V)
+{
+	printf("%s",Message);
+	for (int i=0;i<sizeX;i++)
+	{
+		printf("\n");
+		vec_print(V[i]);
+	}
+	printf("\n");
+}
+
 
 void _printf(int x)
 {

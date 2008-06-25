@@ -19,6 +19,8 @@ namespace detail
 {
 template <class T> const T& get_component (const T& v, size_t);
 }
+
+
 template <class Ret, class Fn> struct unary_component_function
 { 
 //unary_component_function () {}
@@ -39,6 +41,8 @@ template <class Ret, class Fn> struct binary_component_function
   Fn fn;
 };
 
+
+
 template <class Res>
 class binary_accumulation_function
 {
@@ -55,6 +59,8 @@ class unary_accumulation_function
    T operator()(const T1& a,T& init);
 };
 
+
+
 template <class T,class Fn>
 class compare_function
 {
@@ -62,6 +68,8 @@ class compare_function
 	template<class T1>
 		bool operator () (const T1& a,const T1& b,const T& eps=T(0));
 };
+
+
 
 template <class Ret, class Fn, class T>
 Ret make_unary_operation (const T& a,const Fn& fn);
@@ -141,7 +149,7 @@ struct divides: public binary_function<Arg1,Arg2,Result>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Arg,class Result>
+template <class Arg,class Result=Arg>
 struct assign: public unary_function<Arg,Result>
 {
   Result operator() (const Arg&) const;

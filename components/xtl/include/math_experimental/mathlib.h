@@ -10,11 +10,12 @@
 
 #include <stddef.h>
 #include <math_experimental/functional.h>
-#include <math_experimental/base.h>
+#include <math_experimental/quat_base.h>
 #include <math_experimental/vector.h>
 #include <math_experimental/matrix.h>
 #include <math_experimental/quat.h>
 #include <math_experimental/utils.h>
+//#include <math_experimental/base.h>
 //#include <math_experimental/io.h>
 
 #ifdef __MATHLIB_SSE__
@@ -31,10 +32,11 @@
 namespace math
 {
 #include <math_experimental/impl/functional.inl>
-#include <math_experimental/impl/vec_base.inl>
+//#include <math_experimental/impl/vec_base.inl>
 #include <math_experimental/impl/vector.inl>
-#include <math_experimental/impl/matrix_base.inl>
-#include <math_experimental/impl/matrix.inl>
+//#include <math_experimental/impl/matrix_base.inl>
+#include <math_experimental/impl/matrix_reconstructed.inl>
+//#include <math_experimental/impl/matrix.inl>
 #include <math_experimental/impl/quat_base.inl>
 #include <math_experimental/impl/quat.inl>
 #include <math_experimental/impl/utils.inl>
@@ -67,15 +69,15 @@ typedef vec<unsigned short,4>     vec4us;
 typedef vec<char,4>               vec4b;
 typedef vec<unsigned char,4>      vec4ub;
 
-typedef matrix<float,2>           mat2f;
-typedef matrix<float,3>           mat3f;
-typedef matrix<float,4>           mat4f;
-typedef matrix<double,2>          mat2d;
-typedef matrix<double,3>          mat3d;
-typedef matrix<double,4>          mat4d;
-typedef matrix<int,2>             mat2i;
-typedef matrix<int,3>             mat3i;
-typedef matrix<int,4>             mat4i;
+typedef matrix<float,2,2>         mat2f;
+typedef matrix<float,3,3>         mat3f;
+typedef matrix<float,4,4>         mat4f;
+typedef matrix<double,2,2>        mat2d;
+typedef matrix<double,3,3>        mat3d;
+typedef matrix<double,4,4>        mat4d;
+typedef matrix<int,2,2>           mat2i;
+typedef matrix<int,3,3>           mat3i;
+typedef matrix<int,4,4>           mat4i;
 
 typedef quat<float>              quatf;
 typedef quat<double>             quatd;

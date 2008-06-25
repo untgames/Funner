@@ -11,19 +11,13 @@
 #undef max
 
 
-////////////////////////////////////////////////////////////////////////////////////////////
-///Вспомогательные операции
-////////////////////////////////////////////////////////////////////////////////////////////
-namespace detail
-{
-template <class T, size_t Size> T& get_component (math::vec<T, Size>& v, size_t index);
-
-template <class T, size_t Size> const T& get_component (const math::vec<T, Size>& v, size_t index);
-}
 
 
 namespace math
 {
+
+
+//template <class type,size_t sizeX,size_t sizeY=sizeX> class matrix;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Векторная база по умолчанию
@@ -115,10 +109,10 @@ class vec: public vec_base<type,size>
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ////////////////////////////////////////////////////////////////////////////////////////////
-    vec&   operator =  (const type&); 
+  template<class T> vec&   operator =  (const T&); 
     vec&   operator =  (const base&);
 
-    template <size_t size1> vec& operator = (const vec<type,size1>&); 
+//    template <size_t size1> vec& operator = (const vec<type,size1>&); 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Основные бинарные операции
@@ -147,17 +141,21 @@ class vec: public vec_base<type,size>
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Умножение вектора строки на матрицу столбец
 ////////////////////////////////////////////////////////////////////////////////////////////
-    vec&      operator *= (const matrix<type,size>&);
-    vec&      operator *= (const matrix<type,size+1>&);
+    vec&      operator *= (const matrix<type,size,size>&);
+    vec&      operator *= (const matrix<type,size+1,size+1>&);
 
-    const vec operator *  (const matrix<type,size>&) const;
-    const vec operator *  (const matrix<type,size+1>&) const;
+    const vec operator *  (const matrix<type,size,size>&) const;
+    const vec operator *  (const matrix<type,size+1,size+1>&) const;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Отношения между векторами           
 ////////////////////////////////////////////////////////////////////////////////////////////
     bool operator == (const vec&) const;      
     bool operator != (const vec&) const;
+    bool operator <  (const vec&) const;      
+    bool operator >  (const vec&) const;
+    bool operator <= (const vec&) const;      
+    bool operator >= (const vec&) const;
 
     bool equal (const vec&,const type& eps); 
 
@@ -224,5 +222,16 @@ template <class type>
 vec<type,4> operator ^ (const vec<type,4>& a,const vec<type,4>& b);
 
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+///Вспомогательные операции
+////////////////////////////////////////////////////////////////////////////////////////////
+namespace detail
+{
+template <class T, size_t Size> T& get_component (math::vec<T, Size>& v, size_t index);
+
+template <class T, size_t Size> const T& get_component (const math::vec<T, Size>& v, size_t index);
+}
+
 
 #endif

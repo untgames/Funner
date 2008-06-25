@@ -43,7 +43,9 @@ void trick_matrix4_rotate3 (matrix<T,4>& m,const T& angle,const vec<T,3>& v)
 template <class T> 
 const matrix<T,4> rotate (const T& angle,const vec<T,3>& axis)
 {
-  return matrix<T,4> (angle,axis,trick_matrix4_rotate3<T>);
+  matrix<T,4> res;
+  trick_matrix4_rotate3<T>(res,angle,axis);
+  return res;//matrix<T,4> (angle,axis,trick_matrix4_rotate3<T>);
 }
 
 template <class T> 

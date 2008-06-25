@@ -32,6 +32,13 @@ inline matrix<T,size>::matrix (const T* a)
       (*this)[i][j] = *a++;                
 }
 
+template<class T,size_t size> template <class Fn>
+inline matrix<T,size>::matrix(const matrix<T,size>& a,const matrix<T,size>& b,Fn fn)
+{
+  fn(*this,a,b);
+} 
+
+
 /*template <class T,size_t size>
 matrix<T,size>::matrix (const matrix<T,size>& src)
 {
@@ -65,11 +72,11 @@ inline matrix<T,size>::matrix (const T1& a,void (*eval)(matrix&,const T1&))
   eval (*this,a);
 }
 
-template <class T,size_t size> template <class T1,class T2>
+/*template <class T,size_t size> template <class T1,class T2>
 inline matrix<T,size>::matrix (const T1& a,const T2& b,void (*eval)(matrix&,const T1&,const T2&))
 {
   eval (*this,a,b);
-}
+} */
 
 template <class T,size_t size>
 typename matrix<T,size>::vector& matrix<T,size>::row (size_t i) 
@@ -126,66 +133,77 @@ const matrix<T,size> matrix<T,size>::operator - () const
 template <class T,size_t size> 
 inline matrix<T,size>& matrix<T,size>::operator += (const matrix<T,size>& a)
 {
-  matrix_add (*this,*this,a);
+  *this=make_binary_operation<matrix<T,size> >(*this,a,plus<vec<T,size> >());
+//matrix_add (*this,*this,a);
   return *this;
 }
 
 template <class T,size_t size>   
 inline matrix<T,size>& matrix<T,size>::operator -= (const matrix<T,size>& a)
 {
-  matrix_sub (*this,*this,a);
+  *this=make_binary_operation<matrix<T,size> >(*this,a,minus<vec<T,size> >());
+//matrix_sub (*this,*this,a);
   return *this;
 }
 
 template <class T,size_t size>   
 inline matrix<T,size>& matrix<T,size>::operator *= (const matrix<T,size>& a)
 {
-  matrix_mul (*this,a);
+  *this=make_binary_operation<matrix<T,size> >(*this,a,multiplies<vec<T,size> >());
+//matrix_mul (*this,a);
   return *this;
 }
 
 template <class T,size_t size>
 inline matrix<T,size>& matrix<T,size>::operator *= (const T& a)
 {
-  matrix_mul_scalar (*this,*this,a);
+  *this=make_binary_operation<matrix<T,size> >(*this,a,multiplies<vec<T,size> >());
+//matrix_mul_scalar (*this,*this,a);
   return *this;
 }
 
 template <class T,size_t size>
 inline matrix<T,size>& matrix<T,size>::operator /= (const T& a)
 {
-  matrix_div_scalar (*this,*this,a);
+  *this=make_binary_operation<matrix<T,size> >(*this,a,divides<vec<T,size> >());
+//matrix_div_scalar (*this,*this,a);
   return *this;
 }
 
 template <class T,size_t size>   
 inline const matrix<T,size> matrix<T,size>::operator + (const matrix<T,size>& m) const
 {
-  return matrix (*this,m,matrix_add<T,size>);
+  return make_binary_operation<matrix<T,size> >(*this,m,plus<vec<T,size> >());
+//return matrix (*this,m,matrix_add<T,size>);
 }
 
 template <class T,size_t size>   
 inline const matrix<T,size> matrix<T,size>::operator - (const matrix<T,size>& m) const
 {
-  return matrix (*this,m,matrix_sub<T,size>);
+  return make_binary_operation<matrix<T,size> >(*this,m,minus<vec<T,size> >());
+//return matrix (*this,m,matrix_sub<T,size>);
 }
 
 template <class T,size_t size>
 inline const matrix<T,size> matrix<T,size>::operator * (const T& a) const
 {
-  return matrix (*this,a,matrix_mul_scalar<T,size>);
+  return make_binary_operation<matrix<T,size> >(*this,a,multiplies<vec<T,size> >());
+//return matrix (*this,a,matrix_mul_scalar<T,size>);
 }
 
 template <class T,size_t size>
-inline const matrix<T,size> matrix<T,size>::operator / (const T& a) const
+inline const matrix<T,size> matrix<T,size>::operator / (const matrix<T,size>& a) const
 {
-  return matrix (*this,a,matrix_div_scalar<T,size>);
+  return make_binary_operation<matrix<T,size> >(*this,a,divides<vec<T,size> >());
+//return matrix (*this,a,matrix_div_scalar<T,size>);
 }
+
 
 template <class T,size_t size>   
 inline const matrix<T,size> matrix<T,size>::operator * (const matrix<T,size>& a) const
 {
-  return matrix (*this,a,matrix_mul<T,size>);
+  return make_binary_operation<matrix<T,size> >(*this,a,multiplies<vec<T,size> >());
+//return matrix (*this,a,matrix_mul<T,size>);
 } 
 
 template <class T,size_t size>

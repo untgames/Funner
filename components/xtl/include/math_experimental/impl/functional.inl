@@ -2,9 +2,12 @@
 
 namespace detail
 {
-template <class T, size_t Size> vec<T, Size>& get_component (matrix<T, Size>& v, size_t index);
 
-template <class T, size_t Size> const vec<T, Size>& get_component (const matrix<T, Size>& v, size_t index);
+template <class T, size_t SizeX, size_t SizeY> 
+  const vec<T, SizeY>& get_component (const math::matrix<T, SizeX,SizeY>& v, size_t index);
+
+template <class T, size_t SizeX, size_t SizeY> 
+  vec<T, SizeY>& get_component (math::matrix<T,SizeX,SizeY>& v, size_t index);
 
 template <class T, size_t Size> T& get_component (vec<T, Size>& v, size_t index);
 
@@ -19,12 +22,13 @@ template <class T> const T& get_component (const T& v, size_t)
 {
   return v;
 }
+
 }
 template <class Ret, class Fn> template <class T1> 
 inline void unary_component_function<Ret,Fn>::operator () (Ret& res, const T1& a)
 {
   for (size_t i=0; i<Ret::Size; i++)
-    res [i] = Fn ()(detail::get_component (a, i));
+    res [i] = fn (detail::get_component (a, i));
 }
 
 template <class Ret, class Fn> template <class T1, class T2>
