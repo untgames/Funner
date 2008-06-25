@@ -71,7 +71,7 @@ export LIB
 #список дефайнов, флаги компиляции, pch файл)
 ###################################################################################################
 define tools.c++compile
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && $(MSVC_BIN_PATH)/cl -nologo -c -EHsc -W3 -Ox -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsubst %,-I"%",$2) $5 $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -nologo -c -EHsc -W3 -Ox -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsubst %,-I"%",$2) $5 $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
 endef
 
 ###################################################################################################
@@ -79,12 +79,12 @@ endef
 #список подключаемых символов линковки, флаги линковки)
 ###################################################################################################
 define tools.link
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && $(MSVC_BIN_PATH)/link -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2
 endef
 
 ###################################################################################################
 #Сборка библиотеки (имя выходного файла, список файлов)
 ###################################################################################################
 define tools.lib
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && $(MSVC_BIN_PATH)/lib -nologo -out:$1 $2
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/lib" -nologo -out:$1 $2
 endef
