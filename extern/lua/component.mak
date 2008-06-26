@@ -12,6 +12,7 @@ EXTERN.LUALIB.LIB_DIRS             :=                   #Относительные пути к ка
 EXTERN.LUALIB.LIBS                 :=                   #Список используемых при линковке библиотек
 EXTERN.LUALIB.COMPILER_DEFINES     :=  								 #Определения сборки
 EXTERN.LUALIB.msvc.COMPILER_CFLAGS := -TP               #Флаги сборки (зависят от конфигурации)
+EXTERN.LUALIB.g++.COMPILER_CFLAGS  := -x c++
 
 #Цель №2 - LUA_UTILS
 EXTERN.LUA_UTILS.TYPE                 := test-suite     	 #Тип цели
@@ -21,3 +22,4 @@ EXTERN.LUA_UTILS.LIB_DIRS             :=                  #Относительные пути к 
 EXTERN.LUA_UTILS.LIBS                 := extern.lua       #Список используемых при линковке библиотек
 EXTERN.LUA_UTILS.COMPILER_DEFINES     :=  							   #Определения сборки
 EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS := -TP              #Флаги сборки (зависят от конфигурации)
+EXTERN.LUA_UTILS.g++.COMPILER_CFLAGS  := -x c++
