@@ -1,26 +1,26 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := RENDER_MID_LEVEL_SOURCES RENDER_MID_LEVEL_TESTS
+TARGETS := RENDER.MID_LEVEL.SOURCES RENDER.MID_LEVEL.TESTS
 
 #Цель №1 - RENDER system sources
-RENDER_MID_LEVEL_SOURCES.TYPE             := static-lib
-RENDER_MID_LEVEL_SOURCES.NAME             := render.mid_level
-RENDER_MID_LEVEL_SOURCES.INCLUDE_DIRS     :=
-RENDER_MID_LEVEL_SOURCES.SOURCE_DIRS      := sources
-RENDER_MID_LEVEL_SOURCES.LIB_DIRS         :=  
-RENDER_MID_LEVEL_SOURCES.LIBS             := 
-RENDER_MID_LEVEL_SOURCES.COMPILER_CFLAGS  :=
-RENDER_MID_LEVEL_SOURCES.COMPILER_DEFINES := 
-RENDER_MID_LEVEL_SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak
+RENDER.MID_LEVEL.SOURCES.TYPE             := static-lib
+RENDER.MID_LEVEL.SOURCES.NAME             := render.mid_level
+RENDER.MID_LEVEL.SOURCES.INCLUDE_DIRS     :=
+RENDER.MID_LEVEL.SOURCES.SOURCE_DIRS      := sources
+RENDER.MID_LEVEL.SOURCES.LIB_DIRS         :=  
+RENDER.MID_LEVEL.SOURCES.LIBS             := 
+RENDER.MID_LEVEL.SOURCES.COMPILER_CFLAGS  :=
+RENDER.MID_LEVEL.SOURCES.COMPILER_DEFINES := 
+RENDER.MID_LEVEL.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak
 
 #Цель №2 - RENDER system tests
-RENDER_MID_LEVEL_TESTS.TYPE             := test-suite
-RENDER_MID_LEVEL_TESTS.INCLUDE_DIRS     := ../../xtl/include
-RENDER_MID_LEVEL_TESTS.SOURCE_DIRS      := tests
-RENDER_MID_LEVEL_TESTS.LIB_DIRS         :=
-RENDER_MID_LEVEL_TESTS.LIBS             :=
-RENDER_MID_LEVEL_TESTS.DLLS             :=
-RENDER_MID_LEVEL_TESTS.DLL_DIRS         :=
-RENDER_MID_LEVEL_TESTS.COMPILER_CFLAGS  :=
-RENDER_MID_LEVEL_TESTS.IMPORTS          := compile.static.mak link.static.mak
+RENDER.MID_LEVEL.TESTS.TYPE             := test-suite
+RENDER.MID_LEVEL.TESTS.INCLUDE_DIRS     := ../../xtl/include
+RENDER.MID_LEVEL.TESTS.SOURCE_DIRS      := tests
+RENDER.MID_LEVEL.TESTS.LIB_DIRS         :=
+RENDER.MID_LEVEL.TESTS.LIBS             :=
+RENDER.MID_LEVEL.TESTS.DLLS             :=
+RENDER.MID_LEVEL.TESTS.DLL_DIRS         :=
+RENDER.MID_LEVEL.TESTS.COMPILER_CFLAGS  :=
+RENDER.MID_LEVEL.TESTS.IMPORTS          := compile.static.mak link.static.mak
