@@ -1,6 +1,6 @@
 
 /*
-	Вспомогательные операции
+  Вспомогательные операции
 */
 
 namespace detail
@@ -47,28 +47,28 @@ vec<T,size>::vec (const base& b)
 }
 
 template <class type,size_t size> template <size_t size1, size_t size2, class Fn>
-	inline vec<type,size>::vec (const vec<type,size1>v1,const vec<type,size2>v2,Fn fn)
+  inline vec<type,size>::vec (const vec<type,size1>v1,const vec<type,size2>v2,Fn fn)
 {
-	fn(*this,v1,v2);
+  fn(*this,v1,v2);
 }
 
 template<class type,size_t size> template <size_t size1,class Fn>
-	inline vec<type,size>::vec (const vec<type,size1>& v1,const type& arg,Fn fn)
+  inline vec<type,size>::vec (const vec<type,size1>& v1,const type& arg,Fn fn)
 {
-	fn(*this,v1,arg);
+  fn(*this,v1,arg);
 }
 
 template<class type,size_t size> template <size_t size1,class Fn>
-	inline vec<type,size>::vec (const vec<type,size1>& v1,Fn fn)
+  inline vec<type,size>::vec (const vec<type,size1>& v1,Fn fn)
 {
-	fn(*this,v1);
+  fn(*this,v1);
 }
 
 
 template <class type,size_t size> template <class Fn>
-	inline vec<type,size>::vec (const type& v1,Fn fn)
+  inline vec<type,size>::vec (const type& v1,Fn fn)
 {
-	fn(*this,v1);
+  fn(*this,v1);
 }
 /*template <class T,size_t size> template <class T1>
 vec<T,size>::vec (const T1& a,void (*eval)(vec&,const T1&))
@@ -311,7 +311,7 @@ vec<T,size>::operator vec<T,size-1>& ()
 }
 
 /*
-	Векторное произведение
+  Векторное произведение
 */
 
 
@@ -362,7 +362,7 @@ T angle (const vec<T,size>& a,const vec<T,size>& b)
 {
   T ang = acos((a&b)/sqrt(a.squared_length()*b.squared_length()));
 
-  return isnan(ang)?0:ang;
+  return _isnan(ang)?0:ang;
 }
 
 /*

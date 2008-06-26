@@ -1,7 +1,7 @@
 #include"shared.h"
 #include<stdio.h>
 
-using namespace std;
+using namespace math;
 template<class T,size_t size>
 matrix<T,size> create_matrix(const T& val)
 {

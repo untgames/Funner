@@ -3,6 +3,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <float.h>
 
 //#pragma inline_depth (255)
 //#pragma inline_recursion( on )
