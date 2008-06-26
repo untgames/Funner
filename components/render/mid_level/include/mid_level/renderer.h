@@ -9,6 +9,9 @@ class Image;
 
 }
 
+namespace render
+{
+
 namespace mid_level
 {
 
@@ -86,6 +89,8 @@ class IRenderer: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void DrawFrames () = 0;
 };
+
+}
 
 }
 

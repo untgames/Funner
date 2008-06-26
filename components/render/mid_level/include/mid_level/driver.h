@@ -3,6 +3,9 @@
 
 #include <render/mid_level/renderer.h>
 
+namespace render
+{
+
 namespace mid_level
 {
 
@@ -59,6 +62,8 @@ class DriverManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static IRenderer* CreateRenderer (const char* driver_mask, const char* device_mask);
 };
+
+}
 
 }
 

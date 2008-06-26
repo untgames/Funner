@@ -3,6 +3,9 @@
 
 #include <mathlib.h>
 
+namespace render
+{
+
 namespace mid_level
 {
 
@@ -31,6 +34,8 @@ struct Frame
   float         clear_depth;                     //значение глубины, используемое при очистке
   unsigned char clear_stencil;                   //значение трафарета, используемое при очистке
 };
+
+}
 
 }
 
