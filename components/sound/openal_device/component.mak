@@ -1,27 +1,27 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := OPENALDEVICE_COMPONENTS OPENALDEVICE_TESTS
+TARGETS := SOUND.OPEAL_DRIVER.SOURCES SOUND.OPEAL_DRIVER.TESTS
 
 #Цель №1 - OPENALDEVICE sources
-OPENALDEVICE_COMPONENTS.TYPE             := static-lib
-OPENALDEVICE_COMPONENTS.NAME             := sound.low_level.openal_driver
-OPENALDEVICE_COMPONENTS.INCLUDE_DIRS     := ../../../extern/openalsdk/include
-OPENALDEVICE_COMPONENTS.SOURCE_DIRS      := sources
-OPENALDEVICE_COMPONENTS.LIB_DIRS         :=  
-OPENALDEVICE_COMPONENTS.LIBS             := 
-OPENALDEVICE_COMPONENTS.COMPILER_CFLAGS  :=
-OPENALDEVICE_COMPONENTS.COMPILER_DEFINES := 
-OPENALDEVICE_COMPONENTS.IMPORTS          := ../low_level/compile.static.mak ../../media/sound/compile.static.mak ../../system/compile.static.mak 
+SOUND.OPEAL_DRIVER.SOURCES.TYPE             := static-lib
+SOUND.OPEAL_DRIVER.SOURCES.NAME             := sound.low_level.openal_driver
+SOUND.OPEAL_DRIVER.SOURCES.INCLUDE_DIRS     := ../../../extern/openalsdk/include
+SOUND.OPEAL_DRIVER.SOURCES.SOURCE_DIRS      := sources
+SOUND.OPEAL_DRIVER.SOURCES.LIB_DIRS         :=  
+SOUND.OPEAL_DRIVER.SOURCES.LIBS             := 
+SOUND.OPEAL_DRIVER.SOURCES.COMPILER_CFLAGS  :=
+SOUND.OPEAL_DRIVER.SOURCES.COMPILER_DEFINES := 
+SOUND.OPEAL_DRIVER.SOURCES.IMPORTS          := ../low_level/compile.static.mak ../../media/sound/compile.static.mak ../../system/compile.static.mak 
 
 #Цель №2 - OPENALDEVICE tests
-OPENALDEVICE_TESTS.TYPE             := test-suite
-OPENALDEVICE_TESTS.INCLUDE_DIRS     := ../../xtl/include
-OPENALDEVICE_TESTS.SOURCE_DIRS      := tests
-OPENALDEVICE_TESTS.LIB_DIRS         :=
-OPENALDEVICE_TESTS.LIBS             :=
-OPENALDEVICE_TESTS.DLLS             :=
-OPENALDEVICE_TESTS.DLL_DIRS         :=
-OPENALDEVICE_TESTS.COMPILER_CFLAGS  :=
-OPENALDEVICE_TESTS.COMPILER_DEFINES :=
-OPENALDEVICE_TESTS.IMPORTS          := link.static.mak run.static.mak ../../common/compile.static.mak ../../system/compile.static.mak ../low_level/compile.static.mak ../../media/sound/default_decoders.link.static.mak
+SOUND.OPEAL_DRIVER.TESTS.TYPE             := test-suite
+SOUND.OPEAL_DRIVER.TESTS.INCLUDE_DIRS     := ../../xtl/include
+SOUND.OPEAL_DRIVER.TESTS.SOURCE_DIRS      := tests
+SOUND.OPEAL_DRIVER.TESTS.LIB_DIRS         :=
+SOUND.OPEAL_DRIVER.TESTS.LIBS             :=
+SOUND.OPEAL_DRIVER.TESTS.DLLS             :=
+SOUND.OPEAL_DRIVER.TESTS.DLL_DIRS         :=
+SOUND.OPEAL_DRIVER.TESTS.COMPILER_CFLAGS  :=
+SOUND.OPEAL_DRIVER.TESTS.COMPILER_DEFINES :=
+SOUND.OPEAL_DRIVER.TESTS.IMPORTS          := link.static.mak run.static.mak ../../common/compile.static.mak ../../system/compile.static.mak ../low_level/compile.static.mak ../../media/sound/default_decoders.link.static.mak

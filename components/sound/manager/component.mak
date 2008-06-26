@@ -1,27 +1,27 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := SOUND_SYSTEM_SOURCES SOUND_SYSTEM_TESTS
+TARGETS := SOUND.MANAGER.SOURCES SOUND.MANAGER.TESTS
 
 #Цель №1 - Sound system sources
-SOUND_SYSTEM_SOURCES.TYPE             := static-lib
-SOUND_SYSTEM_SOURCES.NAME             := sound.manager
-SOUND_SYSTEM_SOURCES.INCLUDE_DIRS     := 
-SOUND_SYSTEM_SOURCES.SOURCE_DIRS      := sources/manager
-SOUND_SYSTEM_SOURCES.LIB_DIRS         :=  
-SOUND_SYSTEM_SOURCES.LIBS             := 
-SOUND_SYSTEM_SOURCES.COMPILER_CFLAGS  :=
-SOUND_SYSTEM_SOURCES.COMPILER_DEFINES := 
-SOUND_SYSTEM_SOURCES.IMPORTS          := compile.static.mak ../../system/compile.static.mak ../../media/sound/compile.static.mak
+SOUND.MANAGER.SOURCES.TYPE             := static-lib
+SOUND.MANAGER.SOURCES.NAME             := sound.manager
+SOUND.MANAGER.SOURCES.INCLUDE_DIRS     := 
+SOUND.MANAGER.SOURCES.SOURCE_DIRS      := sources/manager
+SOUND.MANAGER.SOURCES.LIB_DIRS         :=  
+SOUND.MANAGER.SOURCES.LIBS             := 
+SOUND.MANAGER.SOURCES.COMPILER_CFLAGS  :=
+SOUND.MANAGER.SOURCES.COMPILER_DEFINES := 
+SOUND.MANAGER.SOURCES.IMPORTS          := compile.static.mak ../../system/compile.static.mak ../../media/sound/compile.static.mak
 
 #Цель №2 - Sound system tests
-SOUND_SYSTEM_TESTS.TYPE             := test-suite
-SOUND_SYSTEM_TESTS.INCLUDE_DIRS     :=
-SOUND_SYSTEM_TESTS.SOURCE_DIRS      := tests/manager
-SOUND_SYSTEM_TESTS.LIBS             :=
-SOUND_SYSTEM_TESTS.DLLS             :=
-SOUND_SYSTEM_TESTS.DLL_DIRS         :=
-SOUND_SYSTEM_TESTS.COMPILER_CFLAGS  :=
-SOUND_SYSTEM_TESTS.COMPILER_DEFINES :=
-SOUND_SYSTEM_TESTS.IMPORTS          := compile.static.mak link.static.mak ../openal_device/link.static.mak ../../system/compile.static.mak ../../media/sound/snddecl.link.static.mak \
+SOUND.MANAGER.TESTS.TYPE             := test-suite
+SOUND.MANAGER.TESTS.INCLUDE_DIRS     :=
+SOUND.MANAGER.TESTS.SOURCE_DIRS      := tests/manager
+SOUND.MANAGER.TESTS.LIBS             :=
+SOUND.MANAGER.TESTS.DLLS             :=
+SOUND.MANAGER.TESTS.DLL_DIRS         :=
+SOUND.MANAGER.TESTS.COMPILER_CFLAGS  :=
+SOUND.MANAGER.TESTS.COMPILER_DEFINES :=
+SOUND.MANAGER.TESTS.IMPORTS          := compile.static.mak link.static.mak ../openal_device/link.static.mak ../../system/compile.static.mak ../../media/sound/snddecl.link.static.mak \
 																       ../../media/sound/default_decoders.link.static.mak ../openal_device/run.static.mak
