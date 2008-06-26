@@ -1,27 +1,27 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := INPUT_LOW_LEVEL_SOURCES INPUT_LOW_LEVEL_TESTS
+TARGETS := INPUT.LOW_LEVEL.SOURCES INPUT.LOW_LEVEL.TESTS
 
 #Цель №1 - INPUT system sources
-INPUT_LOW_LEVEL_SOURCES.TYPE             := static-lib
-INPUT_LOW_LEVEL_SOURCES.NAME             := input.low_level
-INPUT_LOW_LEVEL_SOURCES.INCLUDE_DIRS     := 
-INPUT_LOW_LEVEL_SOURCES.SOURCE_DIRS      := sources
-INPUT_LOW_LEVEL_SOURCES.LIB_DIRS         :=  
-INPUT_LOW_LEVEL_SOURCES.LIBS             := 
-INPUT_LOW_LEVEL_SOURCES.COMPILER_CFLAGS  :=
-INPUT_LOW_LEVEL_SOURCES.COMPILER_DEFINES := 
-INPUT_LOW_LEVEL_SOURCES.IMPORTS          := compile.static.mak
+INPUT.LOW_LEVEL.SOURCES.TYPE             := static-lib
+INPUT.LOW_LEVEL.SOURCES.NAME             := input.low_level
+INPUT.LOW_LEVEL.SOURCES.INCLUDE_DIRS     := 
+INPUT.LOW_LEVEL.SOURCES.SOURCE_DIRS      := sources
+INPUT.LOW_LEVEL.SOURCES.LIB_DIRS         :=  
+INPUT.LOW_LEVEL.SOURCES.LIBS             := 
+INPUT.LOW_LEVEL.SOURCES.COMPILER_CFLAGS  :=
+INPUT.LOW_LEVEL.SOURCES.COMPILER_DEFINES := 
+INPUT.LOW_LEVEL.SOURCES.IMPORTS          := compile.static.mak
 
 #Цель №2 - INPUT system tests
-INPUT_LOW_LEVEL_TESTS.TYPE             := test-suite
-INPUT_LOW_LEVEL_TESTS.INCLUDE_DIRS     :=
-INPUT_LOW_LEVEL_TESTS.SOURCE_DIRS      := tests
-INPUT_LOW_LEVEL_TESTS.LIB_DIRS         :=
-INPUT_LOW_LEVEL_TESTS.LIBS             :=
-INPUT_LOW_LEVEL_TESTS.DLLS             :=
-INPUT_LOW_LEVEL_TESTS.DLL_DIRS         :=
-INPUT_LOW_LEVEL_TESTS.COMPILER_CFLAGS  :=
-INPUT_LOW_LEVEL_TESTS.COMPILER_DEFINES :=
-INPUT_LOW_LEVEL_TESTS.IMPORTS          := compile.static.mak link.static.mak
+INPUT.LOW_LEVEL.TESTS.TYPE             := test-suite
+INPUT.LOW_LEVEL.TESTS.INCLUDE_DIRS     :=
+INPUT.LOW_LEVEL.TESTS.SOURCE_DIRS      := tests
+INPUT.LOW_LEVEL.TESTS.LIB_DIRS         :=
+INPUT.LOW_LEVEL.TESTS.LIBS             :=
+INPUT.LOW_LEVEL.TESTS.DLLS             :=
+INPUT.LOW_LEVEL.TESTS.DLL_DIRS         :=
+INPUT.LOW_LEVEL.TESTS.COMPILER_CFLAGS  :=
+INPUT.LOW_LEVEL.TESTS.COMPILER_DEFINES :=
+INPUT.LOW_LEVEL.TESTS.IMPORTS          := compile.static.mak link.static.mak

@@ -41,7 +41,7 @@ int main ()
 
     printf ("Device has properties: '%s'\n", device->GetProperties ());
 
-    device->SetProperty ("AUTOCENTER_CURSOR", 1.f);
+//    device->SetProperty ("AUTOCENTER_CURSOR", 1.f);
     device->SetProperty ("HORISONTAL_WHEEL_SENSITIVITY", -2.4f);
     device->SetProperty ("CURSOR_SENSITIVITY", -1.1f);
 
