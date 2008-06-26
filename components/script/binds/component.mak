@@ -22,4 +22,4 @@ SCRIPT_BINDS_TESTS.LIB_DIRS         :=
 SCRIPT_BINDS_TESTS.LIBS             :=
 SCRIPT_BINDS_TESTS.COMPILER_CFLAGS  := 
 SCRIPT_BINDS_TESTS.COMPILER_DEFINES :=
-SCRIPT_BINDS_TESTS.IMPORTS	  		  := compile.static.mak link.static.mak ../core/compile.static.mak  ../../common/compile.static.mak
+SCRIPT_BINDS_TESTS.IMPORTS	  		  := compile.static.mak link.static.mak ../core/compile.static.mak  ../../common/compile.static.mak ../core/lua.link.static.mak

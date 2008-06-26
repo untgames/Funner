@@ -11,11 +11,13 @@
 #include <script/bind_libraries.h>
 #include <script/environment.h>
 #include <script/bind.h>
+#include <script/shell.h>
 
 #include <common/file.h>
 #include <common/strlib.h>
 
 #include <mathlib.h>
+#include <math/io.h>
 
 using namespace script;
 using namespace script::binds;
