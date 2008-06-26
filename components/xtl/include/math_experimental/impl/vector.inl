@@ -70,17 +70,7 @@ template <class type,size_t size> template <class Fn>
 {
   fn(*this,v1);
 }
-/*template <class T,size_t size> template <class T1>
-vec<T,size>::vec (const T1& a,void (*eval)(vec&,const T1&))
-{
-  eval (*this,a);
-}
 
-template <class T,size_t size> template <class T1,class T2>
-vec<T,size>::vec (const T1& a,const T2& b,void (*eval)(vec&,const T1&,const T2&))
-{
-  eval (*this,a,b);  
-}*/
 
 template <class T,size_t size>
 vec<T,size>::vec (const T& x1,const T& x2,const T& x3,const T& x4)
@@ -112,13 +102,6 @@ vec<T,size>::vec (const vec<T,size-1>& v,const T& a)
 /*
         Привсаивание
 */
-
-/*template <class T,size_t size> template <size_t size1>
-vec<T,size>& vec<T,size>::operator = (const vec<T,size1>& v)
-{
-  vec_copy (*this,v);
-  return *this;
-} */
 
 template <class T,size_t size>
 vec<T,size>& vec<T,size>::operator = (const base& b)
@@ -203,20 +186,6 @@ vec<T,size>& vec<T,size>::operator /= (const T2& v)
   return *this; 
 }
         
-/*template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator *= (const T& d)
-{ 
-  *this=make_binary_operation<vec<T,size> >(*this,d,multiplies<T,T,T> ());
-  return *this; 
-}
-
-template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator /= (const T& d)
-{ 
-  *this=make_binary_operation<vec<T,size> >(*this,d,divides<T,T,T> ());
-  return *this; 
-} */
-
 template <class T,size_t size>
 const vec<T,size> vec<T,size>::operator + (const vec& v) const  
 { 
@@ -228,18 +197,6 @@ const vec<T,size> vec<T,size>::operator - (const vec& v) const
 { 
   return make_binary_operation<vec<T,size> >(*this,v,minus<T,T,T> ());
 }
-
-/*template <class T,size_t size>
-const vec<T,size> vec<T,size>::operator * (const vec& v) const  
-{ 
-  return make_binary_operation<vec<T,size> >(*this,v,multiplies<T,T,T> ());
-}
-
-template <class T,size_t size>
-const vec<T,size> vec<T,size>::operator / (const vec& v) const  
-{ 
-  return make_binary_operation<vec<T,size> >(*this,v,multiplies<T,T,T> ());
-}*/
 
 template <class T,size_t size> template<class T2>
 const vec<T,size> vec<T,size>::operator * (const T2& a) const  
@@ -294,9 +251,25 @@ bool vec<T,size>::operator >= (const vec& v) const
 }
 
 
+/*
+	Приведение типов
+*/
 
+template<class T,size_t size>
+inline const matrix<T,size,1>  vec<T,size>::to_matrix_column () const
+{
+  matrix<T,size,1> res;
+  for(int i=0;i<size;i++) res[i][1]=(*this)[i];
+  return res;
+}
 
-
+template<class T,size_t size>
+inline const matrix<T,1,size> vec<T,size>::to_matrix_row () const
+{
+  matrix<T,1,size> res;
+  for(int i=0;i<size;i++) res[1]=(*this);
+  return res;
+}
 
 template <class T,size_t size>
 vec<T,size>::operator const vec<T,size-1>& () const

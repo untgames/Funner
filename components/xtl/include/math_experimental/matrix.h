@@ -16,6 +16,8 @@ namespace math
 {
 
 template <class type> class quat;
+
+
 namespace detail
 {
 template <class T, size_t SizeX,size_t SizeY> 
@@ -63,9 +65,7 @@ class matrix
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Индексирование
 ////////////////////////////////////////////////////////////////////////////////////////////
-/*          vector& row     (size_t i);
-    const vector& row     (size_t i) const;
-    const vector  column  (size_t i) const; //копия!*/
+  const vec<type,sizeX>  column  (size_t j) const;
 
         vector& operator [] (size_t index)       { return x [index]; }
   const vector& operator [] (size_t index) const { return x [index]; }
@@ -87,13 +87,33 @@ class matrix
 ////////////////////////////////////////////////////////////////////////////////////////////
     matrix&      operator += (const matrix&);
     matrix&      operator -= (const matrix&);
-    matrix&      operator *= (const matrix&);
-    matrix&      operator /= (const matrix&);
+    matrix&	 operator *= (const type& a);
+    matrix&	 operator /= (const type&);
+
+    const matrix operator *  (const type& a) const;
+    const matrix operator /  (const type&)   const; 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
 
     const matrix operator +  (const matrix&) const;
     const matrix operator -  (const matrix&) const;
-    const matrix operator /  (const matrix&) const; 
-    const matrix operator *  (const matrix&) const; 
+
+///////////////////////////////////////////////
+
+    template<size_t size2Y>
+     const matrix<type,sizeX,size2Y> operator *  (const matrix<type,sizeY,size2Y>&);
+
+    template<class T,size_t size>
+     friend matrix<T,size>&          operator *= (matrix<T,size>&,const matrix<T,size>&);
+
+    template<class T,size_t size>
+     friend const matrix<T,size>     operator /  (const matrix<T,size>&,const matrix<T,size>&);
+
+    template<class T,size_t size>
+     friend matrix<T,size>&	     operator /= (matrix<T,size>&,const matrix<T,size>&);
+
+//////////////////////////////////////////////////////////////////////////////////////////
 
     friend const matrix operator * (const type& a,const matrix& m) { return m*a; }
 
@@ -109,15 +129,43 @@ class matrix
   bool operator == (const matrix&) const;
   bool operator != (const matrix&) const;             
 
+
+////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление строки/столбца
+////////////////////////////////////////////////////////////////////////////////////////////
+  
+   const matrix<type,sizeX-1,sizeY> delete_row(size_t) const; 
+   const matrix<type,sizeX,sizeY-1> delete_column(size_t) const;
+   const matrix<type,sizeX-1,sizeY-1> delete_row_column(size_t,size_t) const;
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Транспонирование / инвертирование / нормализация матрицы
 ////////////////////////////////////////////////////////////////////////////////////////////
-/*    void  transpose ();
-    void  invert    ();
-    void  normalize ();*/
+   const matrix<type,sizeY,sizeX>  transpose ();
 
+/*
+	Утилиты
+*/
+
+    template<class T,size_t size>
+     friend const T det(const matrix<T,size,size>&);
+    
+    template<class T,size_t size>
+     friend const matrix<T,size,size> three_angle_view(const matrix<T,size,size>&);
+
+    template<class T,size_t size>
+     friend const T mathematical_add(const matrix<T,size>&, size_t,size_t);
+
+    template<class T,size_t size>
+     friend const matrix<T,size> invert(const matrix<T,size>&);
+
+    template<class T,size_t size>
+     friend const matrix<T,size> normalize(const matrix<T,size>&);
+
+////////////////////////////////////////////////////////////////////////////////////////////
   private:
     vector x [sizeX];  
+
 };
 
 #ifdef _MSC_VER
@@ -163,10 +211,7 @@ type minor (const matrix<type,size>&,size_t,size_t);
 ////////////////////////////////////////////////////////////////////////////////////////////
 template <class type,size_t size> 
 bool equal (const matrix<type,size>&,const matrix<type,size>&,const type& eps);*/
-
-}
-
-namespace detail
+/*namespace detail
 {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,6 +221,7 @@ namespace detail
 template <class T, size_t SizeX,size_t SizeY> math::vec<T, SizeY>& get_component (math::matrix<T, SizeX,SizeY>& v, size_t index);
 
 template <class T, size_t SizeX,size_t SizeY> const math::vec<T, SizeY>& get_component (const math::matrix<T, SizeX,SizeY>& v, size_t index);
+} */
 
 }
 

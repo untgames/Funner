@@ -17,7 +17,7 @@ namespace math
 {
 
 
-//template <class type,size_t sizeX,size_t sizeY=sizeX> class matrix;
+template <class type,size_t sizeX,size_t sizeY> class matrix;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Векторная база по умолчанию
@@ -64,7 +64,7 @@ class vec: public vec_base<type,size>
     typedef vec_base<type,size> base;
     typedef type                value_type;
 
-    enum { Size = size }; //исправить!!!
+    enum { Size = size };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
@@ -170,6 +170,10 @@ class vec: public vec_base<type,size>
 ////////////////////////////////////////////////////////////////////////////////////////////
     operator const vec<type,size-1>& () const;
     operator       vec<type,size-1>& ();
+    
+    const matrix<type,size,1> to_matrix_column() const;
+
+    const matrix<type,1,size> to_matrix_row() const;
 
 /*
 	Утилиты
