@@ -16,7 +16,7 @@ RENDER_MID_LEVEL_SOURCES.IMPORTS          := compile.static.mak ../../common/com
 
 #Öåëü ¹2 - RENDER system tests
 RENDER_MID_LEVEL_TESTS.TYPE             := test-suite
-RENDER_MID_LEVEL_TESTS.INCLUDE_DIRS     :=
+RENDER_MID_LEVEL_TESTS.INCLUDE_DIRS     := ../../xtl/include
 RENDER_MID_LEVEL_TESTS.SOURCE_DIRS      := tests
 RENDER_MID_LEVEL_TESTS.LIB_DIRS         :=
 RENDER_MID_LEVEL_TESTS.LIBS             :=
