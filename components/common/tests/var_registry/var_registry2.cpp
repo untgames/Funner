@@ -42,11 +42,12 @@ int main ()
     
     VarRegistrySystem::Mount ("test", test_registry.get ());
 
-    VarRegistry registry;
+    VarRegistry registry ("test");
 
     register_handler ("*y*", registry);
     register_handler ("*", registry);
 
+    registry.SetValue ("x", "x");
     registry.SetValue ("x", "x");
     registry.SetValue ("y", "y");
     registry.SetValue ("x.y", "x.y");

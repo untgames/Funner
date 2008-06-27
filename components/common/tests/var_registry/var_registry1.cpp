@@ -2,7 +2,7 @@
 
 void enumerator (const char* var_name, const VarRegistry& registry)
 {
-  printf ("%s=%s", var_name, registry.GetValue (var_name));
+  printf ("%s=%s; ", var_name, registry.GetValue (var_name));
 }
 
 int main ()
@@ -13,7 +13,7 @@ int main ()
   {
     VarRegistrySystem::Mount ("test", TestVarRegistry::Create ().get ());
     
-    VarRegistry registry;
+    VarRegistry registry ("test");
     
     registry.SetValue ("x", "x");
     registry.SetValue ("y", "y");
@@ -23,7 +23,7 @@ int main ()
     printf ("enumerate all vars:\n");
     registry.EnumerateVars (xtl::bind (&enumerator, _1, xtl::cref (registry)));
 
-    printf ("enumerate 'x*' vars:\n");
+    printf ("\nenumerate 'x*' vars:\n");
     registry.EnumerateVars ("x*", xtl::bind (&enumerator, _1, xtl::cref (registry)));
   }
   catch (std::exception& e)

@@ -24,12 +24,12 @@ class TestVarRegistry: public ICustomVarRegistry, public xtl::reference_counter
   public:
     TestVarRegistry ()
     {
-      printf ("TestVarRegistry::TestVarRegistry()");
+      printf ("TestVarRegistry::TestVarRegistry()\n");
     }
     
     ~TestVarRegistry ()
     {
-      printf ("TestVarRegistry::~TestVarRegistry");
+      printf ("TestVarRegistry::~TestVarRegistry\n");
     }
   
 ///Получение/установка данных

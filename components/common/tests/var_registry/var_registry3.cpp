@@ -27,7 +27,7 @@ int main ()
     
     VarRegistry registry;
     
-    registry.Open ("foo");    
+    registry.Open ("foo.bar");    
 
     registry.SetValue ("x", "x");
     registry.SetValue ("y", "y");
