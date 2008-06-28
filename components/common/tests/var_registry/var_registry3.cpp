@@ -23,8 +23,8 @@ int main ()
   {
     TestVarRegistry::Pointer test_registry = TestVarRegistry::Create ();
 
-    VarRegistrySystem::Mount ("foo.bar", test_registry.get ());    
-    
+    VarRegistrySystem::Mount ("foo.bar", test_registry.get ());
+
     VarRegistry registry;
     
     registry.Open ("foo.bar");    
