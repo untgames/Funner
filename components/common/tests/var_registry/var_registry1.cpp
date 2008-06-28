@@ -25,6 +25,7 @@ int main ()
 
     printf ("\nenumerate 'x*' vars:\n");
     registry.EnumerateVars ("x*", xtl::bind (&enumerator, _1, xtl::cref (registry)));
+    printf ("\n");
   }
   catch (std::exception& e)
   {

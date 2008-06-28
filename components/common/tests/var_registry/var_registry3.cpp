@@ -2,16 +2,16 @@
 
 void test_vars (const VarRegistry& registry)
 {
-  const char* var_names [] = {"x", "xxxx.y", "y", "x.y"};
+  const char* var_names [] = {"x", "xxxx.y", "y", "x.y", 0, ""};
 
   for (int i=0; i<sizeof (var_names)/sizeof (*var_names); i++)
   {
     const char* name = var_names [i];
     
     if (registry.HasVariable (name))
-      printf ("'%s'=%s\n", name, registry.GetValue (name));
+      printf ("'%s'='%s'\n", name ? name : "(null)", registry.GetValue (name));
     else
-      printf ("variable '%s' not found\n", name);
+      printf ("variable '%s' not found\n", name ? name : "(null)");
   }
 }
 

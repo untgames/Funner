@@ -1,0 +1,16 @@
+Results of var_registry3_test:
+TestVarRegistry::TestVarRegistry()
+'x'='x'
+'xxxx.y'='xxxx.y'
+'y'='y'
+'x.y'='x.y'
+variable '(null)' not found
+variable '' not found
+after remove variables
+variable 'x' not found
+variable 'xxxx.y' not found
+'y'='y'
+'x.y'='x.y'
+variable '(null)' not found
+variable '' not found
+TestVarRegistry::~TestVarRegistry
