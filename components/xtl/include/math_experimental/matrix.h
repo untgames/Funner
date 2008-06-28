@@ -15,7 +15,7 @@
 namespace math
 {
 
-template <class type> class quat;
+template <class Type> class quat;
 
 
 namespace detail
@@ -31,28 +31,28 @@ template <class T, size_t SizeX,size_t SizeY>
 /////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица
 /////////////////////////////////////////////////////////////////////////////////////////////
-template <class type,size_t sizeX,size_t sizeY=sizeX>
+template <class Type,size_t SizeX,size_t SizeY=SizeX>
 class matrix
 {
   public:
-    typedef vec<type,sizeY>              vector;     //вектор строка
+    typedef vec<Type,SizeY>              vector;     //вектор строка
     typedef typename vector::value_type value_type; //тип элементов
     
-    enum { SizeY = sizeY,
-           SizeX = sizeX, 
-           Size  = sizeX }; //исправить!!
+    enum { sizeY = SizeY,
+           sizeX = SizeX, 
+           size  = SizeX };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ////////////////////////////////////////////////////////////////////////////////////////////
     matrix ();
-    matrix (const matrix<type,sizeX,sizeY>& src);
-    matrix (const type& a);  //a будет записано на главной диагонали
-    matrix (const type*);                                            
-    matrix (const quat<type>&);   //только для матриц 3-го и 4-го порядка
+    matrix (const matrix<Type,SizeX,SizeY>& src);
+    matrix (const Type& a);  //a будет записано на главной диагонали
+    matrix (const Type*);                                            
+    matrix (const quat<Type>&);   //только для матриц 3-го и 4-го порядка
 
-    template <class Fn>
-      matrix(const matrix<type,sizeX,sizeY>& a,const matrix<type,sizeX,sizeY>& b,Fn fn);
+    template <class T1,class T2, class Fn>
+      matrix(const T1& a,const T2& b,Fn fn);
 
     template <class T1, class Fn>
       matrix(const T1& src,Fn fn);
@@ -60,12 +60,11 @@ class matrix
 
       //для использования оптимизации возвращаемого значения
       template <class T1>           matrix (const T1&,void (*eval)(matrix&,const T1&));
-//    template <class T1,class T2>  matrix (const T1&,const T2&,void (*eval)(matrix&,const T1&,const T2&));
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Индексирование
 ////////////////////////////////////////////////////////////////////////////////////////////
-  const vec<type,sizeX>  column  (size_t j) const;
+  const vec<Type,SizeX>  column  (size_t j) const;
 
         vector& operator [] (size_t index)       { return x [index]; }
   const vector& operator [] (size_t index) const { return x [index]; }
@@ -73,25 +72,24 @@ class matrix
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Унарные операции
 ////////////////////////////////////////////////////////////////////////////////////////////
-//const matrix&  operator +  () const;
   const matrix   operator -  () const;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ////////////////////////////////////////////////////////////////////////////////////////////
-/*  matrix&  operator = (const quat<type>&);  //только для матриц 3-го и 4-го порядка
-  matrix&  operator = (const type&);*/
+/*  matrix&  operator = (const quat<Type>&);  //только для матриц 3-го и 4-го порядка
+  matrix&  operator = (const Type&);*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Основные арифметические операции
 ////////////////////////////////////////////////////////////////////////////////////////////
     matrix&      operator += (const matrix&);
     matrix&      operator -= (const matrix&);
-    matrix&	 operator *= (const type& a);
-    matrix&	 operator /= (const type&);
+    matrix&	 operator *= (const Type& a);
+    matrix&	 operator /= (const Type&);
 
-    const matrix operator *  (const type& a) const;
-    const matrix operator /  (const type&)   const; 
+    const matrix operator *  (const Type& a) const;
+    const matrix operator /  (const Type&)   const; 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -101,27 +99,21 @@ class matrix
 
 ///////////////////////////////////////////////
 
-    template<size_t size2Y>
-     const matrix<type,sizeX,size2Y> operator *  (const matrix<type,sizeY,size2Y>&);
+    template<size_t Size2Y>
+     const matrix<Type,SizeX,Size2Y> operator *  (const matrix<Type,SizeY,Size2Y>&) const;
 
-    template<class T,size_t size>
-     friend matrix<T,size>&          operator *= (matrix<T,size>&,const matrix<T,size>&);
+    template<class T,size_t Size>
+     friend matrix<T,Size>&          operator *= (matrix<T,Size>&,const matrix<T,Size>&);
 
-    template<class T,size_t size>
-     friend const matrix<T,size>     operator /  (const matrix<T,size>&,const matrix<T,size>&);
+    template<class T,size_t Size>
+     friend const matrix<T,Size>     operator /  (const matrix<T,Size>&,const matrix<T,Size>&);
 
-    template<class T,size_t size>
-     friend matrix<T,size>&	     operator /= (matrix<T,size>&,const matrix<T,size>&);
+    template<class T,size_t Size>
+     friend matrix<T,Size>&	     operator /= (matrix<T,Size>&,const matrix<T,Size>&);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-    friend const matrix operator * (const type& a,const matrix& m) { return m*a; }
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Умножение на вектор (матрица строка - вектор столбец)
-////////////////////////////////////////////////////////////////////////////////////////////
-/*    const vec<type,size>   operator * (const vec<type,size>&) const;
-    const vec<type,size-1> operator * (const vec<type,size-1>&) const;*/
+    friend const matrix operator * (const Type& a,const matrix& m) { return m*a; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Отношения между матрицами
@@ -134,94 +126,43 @@ class matrix
 ///Удаление строки/столбца
 ////////////////////////////////////////////////////////////////////////////////////////////
   
-   const matrix<type,sizeX-1,sizeY> delete_row(size_t) const; 
-   const matrix<type,sizeX,sizeY-1> delete_column(size_t) const;
-   const matrix<type,sizeX-1,sizeY-1> delete_row_column(size_t,size_t) const;
+   const matrix<Type,SizeX-1,SizeY> delete_row(size_t) const; 
+   const matrix<Type,SizeX,SizeY-1> delete_column(size_t) const;
+   const matrix<Type,SizeX-1,SizeY-1> delete_row_column(size_t,size_t) const;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Транспонирование / инвертирование / нормализация матрицы
 ////////////////////////////////////////////////////////////////////////////////////////////
-   const matrix<type,sizeY,sizeX>  transpose ();
+   const matrix<Type,SizeY,SizeX>  transpose ();
 
 /*
 	Утилиты
 */
 
-    template<class T,size_t size>
-     friend const T det(const matrix<T,size,size>&);
+    template<class T,size_t Size>
+     friend const T det(const matrix<T,Size,Size>&);
     
-    template<class T,size_t size>
-     friend const matrix<T,size,size> three_angle_view(const matrix<T,size,size>&);
+    template<class T,size_t Size>
+     friend const matrix<T,Size,Size> three_angle_view(const matrix<T,Size,Size>&,int&);
 
-    template<class T,size_t size>
-     friend const T mathematical_add(const matrix<T,size>&, size_t,size_t);
+    template<class T,size_t Size>
+     friend const T mathematical_add(const matrix<T,Size>&, size_t,size_t);
 
-    template<class T,size_t size>
-     friend const matrix<T,size> invert(const matrix<T,size>&);
+    template<class T,size_t Size>
+     friend const matrix<T,Size> invert(const matrix<T,Size>&);
 
-    template<class T,size_t size>
-     friend const matrix<T,size> normalize(const matrix<T,size>&);
+    template<class T,size_t Size>
+     friend const matrix<T,Size> normalize(const matrix<T,Size>&);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
   private:
-    vector x [sizeX];  
+    vector x [SizeX];  
 
 };
 
 #ifdef _MSC_VER
   #pragma pack(pop)
 #endif
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Утилиты
-////////////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Взятие транспонированнной матрицы 
-////////////////////////////////////////////////////////////////////////////////////////////
-/*template <class type,size_t size>
-matrix<type,size> transpose (const matrix<type,size>&);
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Взятие обратной матрицы
-////////////////////////////////////////////////////////////////////////////////////////////
-template <class type,size_t size>
-matrix<type,size> invert (const matrix<type,size>&);
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Взятие нормированной матрицы
-////////////////////////////////////////////////////////////////////////////////////////////
-template <class type,size_t size>
-matrix<type,size> normalize (const matrix<type,size>&);
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Определитель (для квадратной матрицы)
-////////////////////////////////////////////////////////////////////////////////////////////
-template <class type,size_t size> 
-type det (const matrix<type,size>&);
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Минор
-////////////////////////////////////////////////////////////////////////////////////////////
-template <class type,size_t size>
-type minor (const matrix<type,size>&,size_t,size_t);
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Сравнение матриц
-////////////////////////////////////////////////////////////////////////////////////////////
-template <class type,size_t size> 
-bool equal (const matrix<type,size>&,const matrix<type,size>&,const type& eps);*/
-/*namespace detail
-{
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-///Вспомогательные операции
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-template <class T, size_t SizeX,size_t SizeY> math::vec<T, SizeY>& get_component (math::matrix<T, SizeX,SizeY>& v, size_t index);
-
-template <class T, size_t SizeX,size_t SizeY> const math::vec<T, SizeY>& get_component (const math::matrix<T, SizeX,SizeY>& v, size_t index);
-} */
 
 }
 

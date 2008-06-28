@@ -33,11 +33,8 @@
 namespace math
 {
 #include <math_experimental/impl/functional.inl>
-//#include <math_experimental/impl/vec_base.inl>
 #include <math_experimental/impl/vector.inl>
-//#include <math_experimental/impl/matrix_base.inl>
-#include <math_experimental/impl/matrix_reconstructed.inl>
-//#include <math_experimental/impl/matrix.inl>
+#include <math_experimental/impl/matrix.inl>
 #include <math_experimental/impl/quat_base.inl>
 #include <math_experimental/impl/quat.inl>
 #include <math_experimental/impl/utils.inl>

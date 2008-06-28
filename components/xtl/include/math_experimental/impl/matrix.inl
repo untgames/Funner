@@ -1,341 +1,342 @@
 namespace detail
 {
-template <class T, size_t Size> vec<T, Size>& get_component (math::matrix<T, Size>& v, size_t index)
+template <class T, size_t SizeX, size_t SizeY> 
+  vec<T, SizeY>& get_component (math::matrix<T, SizeX,SizeY>& v, size_t index)
 {
   return v [index];
 }
 
-template <class T, size_t Size> const vec<T, Size>& get_component (const math::matrix<T, Size>& v, size_t index)
+template <class T, size_t SizeX, size_t SizeY> const
+  vec<T, SizeY>& get_component (const math::matrix<T, SizeX,SizeY>& v, size_t index)
 {
   return v [index];
 }
 
 }
 
-template <class T,size_t size>
-inline matrix<T,size>::matrix ()
+/*
+	Конструкторы
+*/
+
+template <class T,size_t SizeX,size_t SizeY>
+inline matrix<T,SizeX,SizeY>::matrix ()
 {
-  matrix_assign_scalar (*this,T (1));
+  *this=make_unary_operation<matrix<T,SizeX,SizeY> >(T(1), assign<vec<T,SizeY> >());
 }
 
-template <class T,size_t size>
-inline matrix<T,size>::matrix (const T& a)
+template <class T,size_t SizeX,size_t SizeY>
+inline matrix<T,SizeX,SizeY>::matrix (const T& a)
 {
-  matrix_assign_scalar (*this,a);
+  *this=make_unary_operation<matrix<T,SizeX,SizeY> >(a, assign<vec<T,SizeY> >());
 }
 
-template <class T,size_t size>
-inline matrix<T,size>::matrix (const T* a)
+template<class T,size_t SizeX,size_t SizeY>
+  matrix<T,SizeX,SizeY>::matrix (const matrix<T,SizeX,SizeY>& src)
 {
-  for (size_t i=0;i<size;i++)
-    for (size_t j=0;j<size;j++)
+  *this=make_unary_operation<matrix<T,SizeX,SizeY> >(src,assign<vec<T,SizeY> >());
+}
+
+template <class T,size_t SizeX,size_t SizeY>
+inline matrix<T,SizeX,SizeY>::matrix (const T* a)
+{
+  for (size_t i=0;i<SizeX;i++)
+    for (size_t j=0;j<SizeY;j++)
       (*this)[i][j] = *a++;                
 }
 
-template<class T,size_t size> template <class Fn>
-inline matrix<T,size>::matrix(const matrix<T,size>& a,const matrix<T,size>& b,Fn fn)
+template<class T,size_t SizeX,size_t SizeY> template <class T1,class T2, class Fn>
+inline matrix<T,SizeX,SizeY>::matrix(const T1& a,const T2& b,Fn fn)
 {
   fn(*this,a,b);
 } 
-
-
-/*template <class T,size_t size>
-matrix<T,size>::matrix (const matrix<T,size>& src)
+template <class T,size_t SizeX,size_t SizeY> template <class T1,class Fn>
+inline matrix<T,SizeX,SizeY>::matrix(const T1& src,Fn fn)
 {
-  matrix_copy (*this,src);
+  fn(*this,src);
 }
 
-template <class T,size_t size>
-void trick_quat2matrix (const quat<T>& q,matrix<T,size>&);
-
-template <class T>
-void trick_quat2matrix (const quat<T>& q,matrix<T,3>& m)
-{
-  quat2matrix (q,m);
-}*/
-
-template <class T>
-void trick_quat2matrix (const quat<T>& q,matrix<T,4>& m)
-{
-  quat2matrix (q,m);
-}
-
-template <class T,size_t size> 
-matrix<T,size>::matrix (const quat<T>& q)
-{
-  trick_quat2matrix (q,*this);
-}
-
-template <class T,size_t size> template <class T1>
-inline matrix<T,size>::matrix (const T1& a,void (*eval)(matrix&,const T1&))
+template <class T,size_t SizeX,size_t SizeY> template <class T1>
+inline matrix<T,SizeX,SizeY>::matrix (const T1& a,void (*eval)(matrix&,const T1&))
 {
   eval (*this,a);
 }
 
-/*template <class T,size_t size> template <class T1,class T2>
-inline matrix<T,size>::matrix (const T1& a,const T2& b,void (*eval)(matrix&,const T1&,const T2&))
-{
-  eval (*this,a,b);
-} */
+/*
+	Индексация
+*/
 
-template <class T,size_t size>
-typename matrix<T,size>::vector& matrix<T,size>::row (size_t i) 
+template<class T,size_t SizeX,size_t SizeY>
+inline const vec<T,SizeX> matrix<T,SizeX,SizeY>::column (size_t j) const
 {
-  return x [i];
+  vec<T,SizeX> res;
+  for(int i=0;i<SizeX;i++) res[i]=(*this)[i][j];
+  return res;
 }
 
-template <class T,size_t size>
-const typename matrix<T,size>::vector& matrix<T,size>::row (size_t i) const
+/*
+	Унарные операторы
+*/
+
+template <class T,size_t SizeX,size_t SizeY>
+inline const matrix<T,SizeX,SizeY> matrix<T,SizeX,SizeY>::operator -() const
 {
-  return x [i];
+  return make_unary_operation<matrix<T,SizeX,SizeY> >(*this,negate<vec<T,SizeY> >());
 }
 
-template <class T,size_t size>
-void matrix_copy_column (vec<T,size>& res,const matrix<T,size>& m,const size_t& column)
-{
-  for (size_t i=0;i<size;i++)
-    res [i] = m [i][column];
-}
+/*
+	Бинарные операторы
+*/
 
-template <class T,size_t size>
-const typename matrix<T,size>::vector matrix<T,size>::column (size_t i) const
-{
-  return vector (*this,i,matrix_copy_column<T,size>);
-}
 
-/*template <class T,size_t size>
-matrix<T,size>& matrix<T,size>::operator = (const matrix<T,size>& src)
-{
-  matrix_copy (*this,src);
-  return *this;
-} */
 
-template <class T,size_t size>
-matrix<T,size>& matrix<T,size>::operator = (const quat<T>& q)
+template <class T,size_t SizeX,size_t SizeY>
+inline matrix<T,SizeX,SizeY>& matrix<T,SizeX,SizeY>::operator *= (const T& a)
 {
-  trick_quat2matrix (q,*this);
-  return *this;
-} 
-
-template <class T,size_t size> 
-matrix<T,size>& matrix<T,size>::operator = (const T& a)
-{
-  matrix_assign_scalar (*this,a);
-  return *this;
-} 
-
-template <class T,size_t size>
-const matrix<T,size> matrix<T,size>::operator - () const
-{
-  return matrix (*this,matrix_neg<T,size>);
-}
-
-template <class T,size_t size> 
-inline matrix<T,size>& matrix<T,size>::operator += (const matrix<T,size>& a)
-{
-  *this=make_binary_operation<matrix<T,size> >(*this,a,plus<vec<T,size> >());
-//matrix_add (*this,*this,a);
+  (*this)=(*this)*a;
   return *this;
 }
 
-template <class T,size_t size>   
-inline matrix<T,size>& matrix<T,size>::operator -= (const matrix<T,size>& a)
+template<class T,size_t SizeX,size_t SizeY>
+inline matrix<T,SizeX,SizeY>& matrix<T,SizeX,SizeY>::operator /= (const T& a)
 {
-  *this=make_binary_operation<matrix<T,size> >(*this,a,minus<vec<T,size> >());
-//matrix_sub (*this,*this,a);
+  (*this)=(*this)/a;
+  return (*this);
+}
+
+template <class T,size_t SizeX,size_t SizeY>
+  inline const matrix<T,SizeX,SizeY> matrix<T,SizeX,SizeY>::operator * (const T& a) const
+{
+  return make_binary_operation<matrix<T,SizeX,SizeY> >(*this,a,multiplies<vec<T,SizeY> >());
+}
+
+template <class T,size_t SizeX,size_t SizeY>
+  inline const matrix<T,SizeX,SizeY> matrix<T,SizeX,SizeY>::operator / (const T& a) const
+{
+  return make_binary_operation<matrix<T,SizeX,SizeY> >(*this,a,divides<vec<T,SizeY>,T >());
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template <class T,size_t SizeX,size_t SizeY>   
+inline const matrix<T,SizeX,SizeY> matrix<T,SizeX,SizeY>::operator + (const matrix<T,SizeX,SizeY>& m) const
+{
+  return make_binary_operation<matrix<T,SizeX,SizeY> >(*this,m,plus<vec<T,SizeY> >());
+}
+
+template <class T,size_t SizeX,size_t SizeY>   
+inline const matrix<T,SizeX,SizeY> matrix<T,SizeX,SizeY>::operator - (const matrix<T,SizeX,SizeY>& m) const
+{
+  return make_binary_operation<matrix<T,SizeX,SizeY> >(*this,m,minus<vec<T,SizeY> >());
+}
+
+template <class T,size_t SizeX,size_t SizeY> 
+inline matrix<T,SizeX,SizeY>& matrix<T,SizeX,SizeY>::operator += (const matrix<T,SizeX,SizeY>& a)
+{
+  *this=make_binary_operation<matrix<T,SizeX,SizeY> >(*this,a,plus<vec<T,SizeY> >());
   return *this;
 }
 
-template <class T,size_t size>   
-inline matrix<T,size>& matrix<T,size>::operator *= (const matrix<T,size>& a)
+template <class T,size_t SizeX,size_t SizeY>   
+inline matrix<T,SizeX,SizeY>& matrix<T,SizeX,SizeY>::operator -= (const matrix<T,SizeX,SizeY>& a)
 {
-  *this=make_binary_operation<matrix<T,size> >(*this,a,multiplies<vec<T,size> >());
-//matrix_mul (*this,a);
+  *this=make_binary_operation<matrix<T,SizeX,SizeY> >(*this,a,minus<vec<T,SizeY> >());
   return *this;
 }
 
-template <class T,size_t size>
-inline matrix<T,size>& matrix<T,size>::operator *= (const T& a)
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class T,size_t SizeX,size_t SizeY> template<size_t Size2Y>
+inline const matrix<T, SizeX,Size2Y> matrix<T,SizeX,SizeY>::operator *(const matrix<T, SizeY,Size2Y>&b) const
 {
-  *this=make_binary_operation<matrix<T,size> >(*this,a,multiplies<vec<T,size> >());
-//matrix_mul_scalar (*this,*this,a);
-  return *this;
+  matrix<T,SizeX,Size2Y> res;
+  for(int i=0;i<SizeX;i++)
+  {
+    for(int j=0;j<Size2Y;j++)
+    {
+      res[i][j]=binary_accumulation_function<T>()((*this)[i],b.column(j),T(0),plus<T> (),multiplies<T> ());
+    }
+  }
+  return res;
 }
 
-template <class T,size_t size>
-inline matrix<T,size>& matrix<T,size>::operator /= (const T& a)
+template<class T,size_t Size>
+inline matrix<T,Size>& operator *=(matrix<T,Size>& left,const matrix<T,Size>& right)
 {
-  *this=make_binary_operation<matrix<T,size> >(*this,a,divides<vec<T,size> >());
-//matrix_div_scalar (*this,*this,a);
-  return *this;
+  left=left*right;
+  return left;
 }
 
-template <class T,size_t size>   
-inline const matrix<T,size> matrix<T,size>::operator + (const matrix<T,size>& m) const
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class T,size_t Size>
+inline const matrix<T,Size> operator /  (const matrix<T,Size>& left,const matrix<T,Size>& right)
 {
-  return make_binary_operation<matrix<T,size> >(*this,m,plus<vec<T,size> >());
-//return matrix (*this,m,matrix_add<T,size>);
+  matrix<T,Size> tmp(invert(right));
+  return left*tmp;
 }
 
-template <class T,size_t size>   
-inline const matrix<T,size> matrix<T,size>::operator - (const matrix<T,size>& m) const
+template<class T,size_t Size>
+inline matrix<T,Size>& operator /= (matrix<T,Size>& left,const matrix<T,Size>& right)
 {
-  return make_binary_operation<matrix<T,size> >(*this,m,minus<vec<T,size> >());
-//return matrix (*this,m,matrix_sub<T,size>);
+  return left*=invert(right);
 }
 
-template <class T,size_t size>
-inline const matrix<T,size> matrix<T,size>::operator * (const T& a) const
+/*
+	Удаление строки/столбца
+*/
+template<class T,size_t SizeX,size_t SizeY>
+inline const matrix<T,SizeX-1,SizeY> matrix<T,SizeX,SizeY>::delete_row(size_t row) const
 {
-  return make_binary_operation<matrix<T,size> >(*this,a,multiplies<vec<T,size> >());
-//return matrix (*this,a,matrix_mul_scalar<T,size>);
+  matrix<T,SizeX-1,SizeY> res;
+  for(int i=0,i_=0;i<SizeX;i++,i_++)
+  {
+    if (i==row) 
+     {
+       i_--;
+       continue;
+     }
+    for(int j=0,j_=0;j<SizeY;j++,j_++) res[i_][j_]=(*this)[i][j];
+  }
+  return res;
 }
 
-template <class T,size_t size>
-inline const matrix<T,size> matrix<T,size>::operator / (const matrix<T,size>& a) const
+template<class T,size_t SizeX,size_t SizeY>
+inline const matrix<T,SizeX,SizeY-1> matrix<T,SizeX,SizeY>::delete_column(size_t column) const
 {
-  return make_binary_operation<matrix<T,size> >(*this,a,divides<vec<T,size> >());
-//return matrix (*this,a,matrix_div_scalar<T,size>);
+  matrix<T, SizeX,SizeY-1> res;
+  for(int i=0,i_=0;i<SizeX;i++,i_++)
+  {
+    for(int j=0,j_=0;j<SizeY;j++,j_++)
+    {
+      if (j==column) 
+      {
+        j_--;
+        continue;
+      }
+      res[i_][j_]=(*this)[i][j];
+    }
+  }
+  return res;
+}
+
+template<class T,size_t SizeX,size_t SizeY>
+inline const matrix<T,SizeX-1,SizeY-1> matrix<T,SizeX,SizeY>::delete_row_column(size_t row,size_t column) const
+{
+  matrix<T,SizeX-1,SizeY-1> res=this->delete_row(row).delete_column(column);
+  return res;
 }
 
 
-template <class T,size_t size>   
-inline const matrix<T,size> matrix<T,size>::operator * (const matrix<T,size>& a) const
-{
-  return make_binary_operation<matrix<T,size> >(*this,a,multiplies<vec<T,size> >());
-//return matrix (*this,a,matrix_mul<T,size>);
-} 
 
-template <class T,size_t size>
-void trick_matrix_mul_vec (vec<T,size>& res,const matrix<T,size>& m,const vec<T,size>& v)
+/*
+	Сравнение
+*/
+
+template <class T,size_t SizeX,size_t SizeY>
+inline bool matrix<T,SizeX,SizeY>::operator == (const matrix<T,SizeX,SizeY>& v) const
 {
-  matrix_mul_vec (res,m,v);
+  return compare_function<vec<T,SizeY>, equal_to<vec<T,SizeY> > >() (*this,v);
 }
 
-template <class T,size_t size>
-void trick_vec_mul_matrix (vec<T,size>& res,const vec<T,size>& v,const matrix<T,size>& m)
+template <class T,size_t SizeX,size_t SizeY>
+inline bool matrix<T,SizeX,SizeY>::operator != (const matrix<T,SizeX,SizeY>& v) const
 {
-  vec_mul_matrix (res,v,m);
+  return compare_function<vec<T,SizeY>, not_equal_to<vec<T,SizeY> > >() (*this,v);
 }
 
-template <class T,size_t size>
-void trick_matrix_mul_vec1 (vec<T,size-1>& res,const matrix<T,size>& m,const vec<T,size-1>& v)
+
+/*
+	Утилиты
+*/
+template<class T,size_t SizeX,size_t SizeY>
+inline const matrix<T,SizeY,SizeX> matrix<T,SizeX,SizeY>::transpose ()
 {
-  matrix_mul_vec<T,size-1> (res,m,v);
+  matrix<T,SizeY,SizeX> res;
+  for (int i=0;i<SizeX;i++)
+  {
+    for(int j=0;j<SizeY;j++)
+    {
+      res[i][j]=(*this)[j][i];
+    }
+  }
+  return res;
 }
 
-template <class T,size_t size>
-void trick_vec1_mul_matrix (vec<T,size-1>& res,const vec<T,size-1>& v,const matrix<T,size>& m)
-{
-  vec_mul_matrix<T,size-1> (res,v,m);
-} 
+////////////////////////////////////////////////////////////////////////////////////////////
 
-template <class T,size_t size> 
-const vec<T,size> matrix<T,size>::operator * (const vec<T,size>& v) const
+template<class T,size_t Size>
+inline const matrix<T,Size,Size> three_angle_view(const matrix<T,Size,Size>& src,int& num_of_changes)
 {
-  return vec<T,size> (*this,v,trick_matrix_mul_vec<T,size>);
+  matrix<T,Size> tmp(src);
+  num_of_changes=0;
+  for (int i=0;i<Size-1;i++)
+  {
+    if (!tmp[i][i])
+    {
+      int first_non_zero=0;
+      for (int j=i+1;j<Size;j++)
+      {
+        if (tmp[j][i]) first_non_zero=j;
+      }
+      if (!first_non_zero) continue;
+      num_of_changes++;
+      for(int j=0;j<Size;j++)
+      {
+        T _tmp(tmp[i][j]);
+        tmp[i][j]=tmp[first_non_zero][j];
+        tmp[first_non_zero][j]=_tmp;
+      }
+    }
+    for(int j=i+1;j<Size;j++)
+    {
+      T coeff=tmp[j][i];
+      for(int k=i;k<Size;k++) tmp[j][k]-=tmp[i][k]*(coeff/tmp[i][i]);
+    }
+  }
+  return tmp;
 }
 
-template <class T,size_t size> 
-const vec<T,size-1> matrix<T,size>::operator * (const vec<T,size-1>& v) const
+template<class T,size_t Size>
+inline const T det(const matrix<T,Size,Size>& src)
 {
-  return vec<T,size-1> (*this,v,trick_matrix_mul_vec1<T,size>);
-} 
-
-template <class T,size_t size>
-const vec<T,size> vec<T,size>::operator * (const matrix<T,size>& m) const
-{
-  return vec (*this,m,trick_vec_mul_matrix<T,size>);
-} 
-
-template <class T,size_t size>
-const vec<T,size> vec<T,size>::operator * (const matrix<T,size+1>& m) const
-{
-  return vec (*this,m,trick_vec1_mul_matrix<T,size+1>);
-} 
-
-template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator *= (const matrix<T,size>& m)
-{
-  vec_mul_matrix (*this,*this,m);
-  return *this;
+  int num_of_changes;
+  matrix<T,Size,Size> tmp(three_angle_view(src,num_of_changes));
+  T res(1);
+  for(int i=0;i<num_of_changes;i++) res*=T(-1);
+  for(int i=0;i<Size;i++) res*=tmp[i][i];
+  return res;
 }
 
-template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator *= (const matrix<T,size+1>& m)
+template<class T,size_t Size>
+inline const T mathematical_add(const matrix<T,Size>& src,size_t row,size_t column)
 {
-  vec_mul_matrix<T,size> (*this,*this,m);
-  return *this;
+  T res(1);
+  for (int i=0;i<row+column;i++) res*=T(-1);
+  res*=det(src.delete_row_column(row,column));
+  return res;
 }
 
-template <class T,size_t size> 
-bool matrix<T,size>::operator == (const matrix<T,size>& a) const
+template<class T,size_t Size>
+inline const matrix<T,Size> invert(const matrix<T,Size>& src)
 {
-  return matrix_equal (*this,a);
+  matrix<T,Size> res;
+  T d(det(src));
+  for(int i=0;i<Size;i++)
+  {
+    for(int j=0;j<Size;j++)
+    {
+      res[i][j]=mathematical_add(src,j,i)/d;
+    }
+  }
+  return res;
 }
 
-template <class T,size_t size> 
-bool matrix<T,size>::operator != (const matrix<T,size>& a) const
+template<class T,size_t Size>
+inline const matrix<T,Size> normalize(const matrix<T,Size>& src)
 {
-  return matrix_nequal (*this,a);
+  return src/sqrt(det(src));
 }
-
-template <class T,size_t size>
-void matrix<T,size>::transpose ()
-{
-  matrix_transpose (*this);
-}
-
-template <class T,size_t size>
-void matrix<T,size>::invert ()
-{
-  matrix_invert (*this);
-}
-
-template <class T,size_t size>
-void matrix<T,size>::normalize ()
-{
-  matrix_mormalize (*this);
-}
-
-template <class T,size_t size> 
-bool equal (const matrix<T,size>& a,const matrix<T,size>& b,const T& eps)
-{
-  return matrix_equal (a,b,eps);
-} 
-
-template <class T,size_t size>
-matrix<T,size> transpose (const matrix<T,size>& m)
-{
-  return matrix<T,size> (m,matrix_transpose<T,size>);
-} 
-
-template <class T,size_t size>
-void trick_matrix_invert (matrix<T,size>& res,const matrix<T,size>& src)
-{
-  matrix_invert (res,src);
-}
-
-template <class T,size_t size>
-matrix<T,size> invert (const matrix<T,size>& m)
-{
-  return matrix<T,size> (m,trick_matrix_invert<T,size>); 
-}
-
-template <class T,size_t size>
-matrix<T,size> normalize (const matrix<T,size>& m)
-{
-  return matrix<T,size> (m,matrix_normalize<T,size>);
-} 
-
-template <class T,size_t size>
-T det (const matrix<T,size>& m)
-{
-  return matrix_det (m);
-}
-
-template <class T,size_t size> 
-T minor (const matrix<T,size>& src,size_t m,size_t n) 
-{
-  return matrix_minor (src,m,n);
-} 
