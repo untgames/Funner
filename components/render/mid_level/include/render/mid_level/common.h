@@ -25,14 +25,14 @@ struct Viewport
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Frame
 {
-  ITexture*     render_target;                   //целевой буфер цвета
-  ITexture*     depth_stencil_target;            //целевой буфер попиксельного отсечения
-  Viewport      viewport;                        //параметры области вывода
-  bool          need_clear_color_buffer;         //нужно ли очищать буфер цвета
-  bool          need_clear_depth_stencil_buffer; //нужно ли очищать буфер попиксельного отсечения
-  math::vec4f   clear_color;                     //цвет очистки
-  float         clear_depth;                     //значение глубины, используемое при очистке
-  unsigned char clear_stencil;                   //значение трафарета, используемое при очистке
+  IRenderTarget* render_target;                   //целевой буфер цвета
+  IRenderTarget* depth_stencil_target;            //целевой буфер попиксельного отсечения
+  Viewport       viewport;                        //параметры области вывода
+  bool           need_clear_color_buffer;         //нужно ли очищать буфер цвета
+  bool           need_clear_depth_stencil_buffer; //нужно ли очищать буфер попиксельного отсечения
+  math::vec4f    clear_color;                     //цвет очистки
+  float          clear_depth;                     //значение глубины, используемое при очистке
+  unsigned char  clear_stencil;                   //значение трафарета, используемое при очистке
 };
 
 }
