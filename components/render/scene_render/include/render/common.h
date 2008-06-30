@@ -11,12 +11,14 @@ namespace render
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Rect
 {
-  int    x, y;
+  int    left, top;
   size_t width, height;
   
   Rect ();
-  Rect (int x, int y, size_t width, size_t height);
+  Rect (int left, int top, size_t width, size_t height);
 };
+
+#include <render/detail/common.inl>
 
 }
 

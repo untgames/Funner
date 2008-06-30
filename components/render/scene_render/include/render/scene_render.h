@@ -2,7 +2,18 @@
 #define RENDER_SCENE_RENDER_HEADER
 
 #include <stl/auto_ptr.h>
+
+#include <mathlib.h>
+
 #include <render/viewport.h>
+
+namespace media
+{
+
+//forward declaration
+class Image;
+
+}
 
 namespace render
 {
@@ -17,36 +28,36 @@ class SceneRender
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     SceneRender  ();
-    SceneRender  (const char* driver_name_mask, const char* renderer_name_mask);
+    SceneRender  (const char* driver_name_mask, const char* renderer_name_mask, const char* render_path_masks="*");
     ~SceneRender ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка/получение системы рендеринга
+///Установка / сброс системы рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetRenderer  (const char* driver_name_mask, const char* renderer_name_mask);
-    const char* DriverName   () const;
-    const char* RendererName () const;
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление доступными путями рендеринга
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetRenderPathState  (const char* path_mask, bool state);
-    bool IsRenderPathEnabled (const char* path_name) const; 
-    void EnableRenderPath    (const char* path_mask) { SetRenderPathState (path_mask, true); }
-    void DisableRenderPath   (const char* path_mask) { SetRenderPathState (path_mask, false); }
+    void SetRenderer (const char* driver_name_mask,          //маска имени драйвера системы рендеринга
+                      const char* renderer_name_mask,        //маска имени системы рендеринга в драйвере
+                      const char* render_path_masks = "*");  //список масок имён требуемых путей рендеринга (разделитель - пробел)
+    void ResetRenderer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление областей вывода
+///Получение параметров текущей системы рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* RendererDescription () const; //описание системы рендеринга
+    const char* RenderPaths         () const; //список доступных путей рендеринга
+    bool        HasRenderPath       (const char* name) const; //проверка доступности указанного пути рендеринга
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление областями вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Attach             (const Viewport&);
     void Detach             (const Viewport&);
     void DetachAllViewports ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка размеров виртуального экрана
+///Установка логического окна вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void        SetWindow (const Rect& window);
-    void        SetWindow (int x, int y, size_t width, size_t height);
+    void        SetWindow (int left, int top, size_t width, size_t height);
     const Rect& Window    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,7 +69,10 @@ class SceneRender
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отрисовка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (const char* message)> LogHandler;
+
     void Render ();
+    void Render (const LogHandler&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Захват изображения (screen-shot)
