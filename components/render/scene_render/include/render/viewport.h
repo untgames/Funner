@@ -104,7 +104,7 @@ class Viewport
 void swap (Viewport&, Viewport&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка типизированных свойств
+///Установка/чтение типизированных свойств
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> void set_property (Viewport&, const char* name, const T& value);
 template <class T> T    get_property (Viewport&, const char* name);

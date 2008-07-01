@@ -1,5 +1,7 @@
 #include "shared.h"
 
+//!!!кэшировать расчёты порядка вывода областей вывода и их размеров. следить за viewport
+
 using namespace render;
 
 /*
@@ -33,7 +35,7 @@ struct SceneRender::Impl
   }  
   
     //отрисовка содержимого области вывода
-  void Render (const Viewport& viewport, const LogHandler& log)
+  void Render (const Viewport& viewport, const LogHandler& log, bool need_clear)
   {
     try
     {
@@ -48,7 +50,9 @@ struct SceneRender::Impl
       
         //визуализация
         
-      render->Render (window, viewport);
+      RenderContext render_context (viewport, *renderer, window, need_clear, background_color);
+        
+      render->Render (render_context);
     }
     catch (std::exception& exception)
     {
@@ -92,12 +96,18 @@ struct SceneRender::Impl
     
       //рисование областей вывода
       
+    bool need_clear = true;
+      
     for (ViewportArray::iterator iter=viewports.begin (), end=viewports.end (); iter!=end; ++iter)
     {
       const Viewport& viewport = *iter;
       
       if (viewport.IsActive ())
-        Render (viewport, log);
+      {
+        Render (viewport, log, need_clear);
+        
+        need_clear = false;
+      }
     }
   }
 };
