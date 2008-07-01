@@ -170,7 +170,9 @@ IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* d
           return iter->driver->CreateDevice (iter->driver->GetDeviceName (i));
       }
     }
-  return 0;
+    
+  throw xtl::format_operation_exception ("input::low_level::DriverManagerImpl::CreateDevice",
+    "No configuration with driver_mask='%s' and device_mask='%s'", driver_mask, device_mask);
 }
 
 /*
