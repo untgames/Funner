@@ -13,6 +13,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/lexical_cast.h>
 
 #include <common/var_registry.h>
 
@@ -33,7 +34,7 @@ class TestVarRegistry: public ICustomVarRegistry, public xtl::reference_counter
     }
   
 ///Получение/установка данных
-    const char* GetValue (const char* var_name)
+    xtl::any GetValue (const char* var_name)
     {
       static const char* METHOD_NAME = "TestVarRegistry::GetValue";
 
@@ -45,19 +46,16 @@ class TestVarRegistry: public ICustomVarRegistry, public xtl::reference_counter
       if (iter == vars.end ())
         throw xtl::make_argument_exception (METHOD_NAME, "var_name", var_name, "Variable not found");              
 
-      return iter->second.c_str ();
+      return iter->second;
     }
     
-    void SetValue (const char* var_name, const char* value)
+    void SetValue (const char* var_name, const xtl::any& value)
     {
       static const char* METHOD_NAME = "TestVarRegistry::SetValue";
 
       if (!var_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "var_name");
 
-      if (!value)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "value");
-        
       VarMap::iterator iter = vars.find (var_name);
       
       if (iter == vars.end ())
@@ -152,7 +150,7 @@ class TestVarRegistry: public ICustomVarRegistry, public xtl::reference_counter
     }
     
   private:
-    typedef stl::hash_map<stl::string, stl::string> VarMap;
+    typedef stl::hash_map<stl::string, xtl::any> VarMap;
 
   private:  
     VarMap       vars;

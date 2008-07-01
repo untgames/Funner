@@ -9,7 +9,7 @@ void test_vars (const VarRegistry& registry)
     const char* name = var_names [i];
     
     if (registry.HasVariable (name))
-      printf ("'%s'='%s'\n", name ? name : "(null)", registry.GetValue (name));
+      printf ("'%s'='%s'\n", name ? name : "(null)", to_string (registry.GetValue (name)).c_str ());
     else
       printf ("variable '%s' not found\n", name ? name : "(null)");
   }
@@ -29,10 +29,10 @@ int main ()
     
     registry.Open ("foo.bar");    
 
-    registry.SetValue ("x", "x");
-    registry.SetValue ("y", "y");
-    registry.SetValue ("x.y", "x.y");
-    registry.SetValue ("xxxx.y", "xxxx.y");    
+    registry.SetValue ("x", xtl::any (stl::string ("x"), true));
+    registry.SetValue ("y", xtl::any (stl::string ("y"), true));
+    registry.SetValue ("x.y", xtl::any (stl::string ("x.y"), true));
+    registry.SetValue ("xxxx.y", xtl::any (stl::string ("xxxx.y"), true));    
     
     test_vars (registry);
     

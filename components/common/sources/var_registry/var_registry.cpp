@@ -37,7 +37,7 @@ struct VarRegistry::Impl : public trackable, public reference_counter, private M
     }
 
 ///Получение данных
-    const char* GetValue (const char* var_name)
+    xtl::any GetValue (const char* var_name)
     {
       static const char* METHOD_NAME = "common::VarRegistry::Impl::GetValue";
 
@@ -55,15 +55,12 @@ struct VarRegistry::Impl : public trackable, public reference_counter, private M
     }
 
 ///Установка данных
-    void SetValue (const char* var_name, const char* value)
+    void SetValue (const char* var_name, const xtl::any& value)
     {
       static const char* METHOD_NAME = "common::VarRegistry::Impl::SetValue";
       
       if (!var_name)
         throw make_null_argument_exception (METHOD_NAME, "var_name");
-
-      if (!value)
-        throw make_null_argument_exception (METHOD_NAME, "value");
 
       stl::string var_sub_name;
 
@@ -361,12 +358,12 @@ VarRegistry& VarRegistry::operator = (const VarRegistry& source)
    Получение/установка данных
 */
 
-const char* VarRegistry::GetValue (const char* var_name) const
+xtl::any VarRegistry::GetValue (const char* var_name) const
 {
   return impl->GetValue (var_name);
 }
 
-void VarRegistry::SetValue (const char* var_name, const char* value)
+void VarRegistry::SetValue (const char* var_name, const xtl::any& value)
 {
   impl->SetValue (var_name, value);
 }

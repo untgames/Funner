@@ -8,7 +8,7 @@ void notify (const char* var_name, VarRegistryEvent event_id, const char* var_ma
       printf ("create '%s'", var_name);
       break;
     case VarRegistryEvent_OnChangeVar:
-      printf ("change '%s'='%s'", var_name, registry.GetValue (var_name));
+      printf ("change '%s'='%s'", var_name, to_string (registry.GetValue (var_name)).c_str ());
       break;
     case VarRegistryEvent_OnDeleteVar:
       printf ("delete '%s'", var_name);
@@ -47,11 +47,11 @@ int main ()
     register_handler ("*y*", registry);
     register_handler ("*", registry);
 
-    registry.SetValue ("x", "x");
-    registry.SetValue ("x", "x");
-    registry.SetValue ("y", "y");
-    registry.SetValue ("x.y", "x.y");
-    registry.SetValue ("xxxx.y", "xxxx.y");    
+    registry.SetValue ("x", xtl::any (stl::string ("x"), true));
+    registry.SetValue ("x", xtl::any (stl::string ("x"), true));
+    registry.SetValue ("y", xtl::any (stl::string ("y"), true));
+    registry.SetValue ("x.y", xtl::any (stl::string ("x.y"), true));
+    registry.SetValue ("xxxx.y", xtl::any (stl::string ("xxxx.y"), true));    
     
     test_registry->RemoveVariable ("x");
     test_registry->RemoveVariable ("xxxx.y");

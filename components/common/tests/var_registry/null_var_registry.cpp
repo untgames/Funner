@@ -17,12 +17,11 @@ int main ()
   try
   {   
     VarRegistry registry;
-
     registry.Close ();
     
     registry.RegisterEventHandler ("*", VarRegistryEvent_OnCreateVar, &notify);
 
-    registry.SetValue ("x", "x");
+    registry.SetValue ("x", xtl::any (stl::string ("x"), true));
     registry.GetValue ("x");       
 
     printf ("has 'y': %s\n", registry.HasVariable ("y") ? "true" : "false");
