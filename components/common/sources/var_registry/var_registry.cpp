@@ -119,6 +119,9 @@ struct VarRegistry::Impl : public trackable, public reference_counter, private M
                 sub_name++;
 
               current_prefix = sub_name;
+              
+              if (!current_prefix.empty ())
+                current_prefix += '.';
 
               mount_point.Registry ()->EnumerateVars (wrapper);
             }
@@ -253,7 +256,7 @@ struct VarRegistry::Impl : public trackable, public reference_counter, private M
     {
       size_t match_size = stl::min (new_mount_point->Name ().size (), branch_name.size ());
       
-      if (!branch_name.compare (0, match_size, new_mount_point->Name ()))
+      if (!xtl::xstrncmp (branch_name.c_str (), new_mount_point->Name ().c_str (), match_size))
       {
           //добавление новой точки монтирования
         

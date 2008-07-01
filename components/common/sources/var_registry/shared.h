@@ -11,6 +11,7 @@
 #include <xtl/ref.h>
 #include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
+#include <xtl/string.h>
 #include <xtl/trackable.h>
 
 #include <common/var_registry.h>
