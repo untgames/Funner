@@ -19,8 +19,6 @@ int main ()
       for (size_t j=0; j<driver.GetRenderersCount (); j++)
         printf ("    renderer #%u: '%s'\n", j+1, driver.GetRendererName (j));      
     }
-    
-    DriverManager::UnregisterAllDrivers ();
   }
   catch (std::exception& exception)
   {

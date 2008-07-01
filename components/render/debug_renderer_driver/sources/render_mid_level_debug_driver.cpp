@@ -12,7 +12,6 @@ namespace
 
 const char* DRIVER_NAME           = "debug";                  //имя драйвера
 const char* DRIVER_COMPONENT_NAME = "render.mid_level.debug"; //имя компонента драйвера
-const char* LOG_NAME              = DRIVER_COMPONENT_NAME;    //имя потока протоколирования
 const char* RENDERER2D_NAME       = "renderer2d";             //имя системы двумерного рендеринга
 
 }
@@ -22,7 +21,6 @@ const char* RENDERER2D_NAME       = "renderer2d";             //имя системы двум
 */
 
 Driver::Driver ()
-  : log (LOG_NAME)
 {
   log.Printf ("Create debug driver");
 }
@@ -76,24 +74,10 @@ IRenderer* Driver::CreateRenderer (const char* name)
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
     
-  if (!xtl::xstrcmp (name, RENDERER2D_NAME))
+  if (xtl::xstrcmp (name, RENDERER2D_NAME))
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Unknown renderer");
     
-  throw xtl::make_not_implemented_exception (METHOD_NAME);
-}
-
-/*
-    Подсчёт ссылок
-*/
-
-void Driver::AddRef ()
-{
-  addref (this);
-}
-
-void Driver::Release ()
-{
-  release (this);
+  return new Renderer2d;
 }
 
 namespace
