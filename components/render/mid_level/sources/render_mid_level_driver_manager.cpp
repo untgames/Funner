@@ -6,6 +6,7 @@
 #include <xtl/common_exceptions.h>
 
 #include <common/singleton.h>
+#include <common/component.h>
 #include <common/strlib.h>
 
 #include <render/mid_level/driver.h>
@@ -73,6 +74,8 @@ class DriverManagerImpl
     {
       if (!name)
         return 0;
+        
+      LoadDefaultDrivers ();
 
       for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
         if (i->name == name)
@@ -82,11 +85,18 @@ class DriverManagerImpl
     }
 
 ///Получение количества зарегистрированных драйверов
-    size_t DriversCount () { return drivers.size (); }
+    size_t DriversCount ()
+    {
+      LoadDefaultDrivers ();
+
+      return drivers.size ();
+    }
 
 ///Получение драйвера по индексу
     IDriver* Driver (size_t index)
     {
+      LoadDefaultDrivers ();
+
       if (index >= drivers.size ())
         throw xtl::make_range_exception ("input::mid_level::DriverManager::Driver", "index", index, drivers.size ());
 
@@ -96,6 +106,8 @@ class DriverManagerImpl
 ///Получение имени драйвера по индексу
     const char* DriverName (size_t index)
     {
+      LoadDefaultDrivers ();      
+      
       if (index >= drivers.size ())
         throw xtl::make_range_exception ("input::mid_level::DriverManager::Driver", "index", index, drivers.size ());
 
@@ -110,6 +122,8 @@ class DriverManagerImpl
         
       if (!renderer_mask)
         renderer_mask = "*";
+        
+      LoadDefaultDrivers ();
 
         //поиск драйвера
 
@@ -126,6 +140,12 @@ class DriverManagerImpl
         }
 
       return 0;
+    }
+    
+  private:
+    void LoadDefaultDrivers ()
+    {
+      static common::ComponentLoader loader ("render.mid_level.*");
     }
 
   private:
