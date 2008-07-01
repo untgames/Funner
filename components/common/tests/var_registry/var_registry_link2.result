@@ -1,0 +1,19 @@
+Results of var_registry_link2_test:
+TestVarRegistry::TestVarRegistry()
+create 'x' (mask='*')
+change 'x'='x' (mask='*')
+create 'y' (mask='*y*')
+create 'y' (mask='*')
+create 'x.y' (mask='*y*')
+create 'x.y' (mask='*')
+create 'xxxx.y' (mask='*y*')
+create 'xxxx.y' (mask='*')
+delete 'x' (mask='*')
+delete 'xxxx.y' (mask='*y*')
+delete 'xxxx.y' (mask='*')
+end scope
+delete 'y' (mask='*y*')
+delete 'y' (mask='*')
+delete 'x.y' (mask='*y*')
+delete 'x.y' (mask='*')
+TestVarRegistry::~TestVarRegistry

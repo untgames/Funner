@@ -14,6 +14,91 @@ void remove_suffix (stl::string& s)
   s.erase (pos != stl::string::npos ? pos : 0);
 }
 
+void dummy_event_handler (const char*, VarRegistryEvent)
+{
+}
+
+/*
+   —сылка на реестр переменных
+*/
+class VarRegistryLink : public ICustomVarRegistry, public xtl::reference_counter
+{
+  public:
+    VarRegistryLink (const char* link_name, const char* in_source_name)
+      : source_registry (in_source_name), source_name (in_source_name), handler (&dummy_event_handler)
+    {
+      for (size_t i = 0; i < VarRegistryEvent_Num; i++)
+        event_coonection[i] = source_registry.RegisterEventHandler ("*", (VarRegistryEvent)i, xtl::bind (&VarRegistryLink::RegistryEventHandler, this, _1, (VarRegistryEvent)i));
+    }
+
+/*
+   ѕолучение/установка данных
+*/
+    xtl::any GetValue (const char* var_name)
+    {
+      return source_registry.GetValue (var_name);
+    }
+
+    void SetValue (const char* var_name, const xtl::any& value)
+    {
+      source_registry.SetValue (var_name, value);
+    }
+
+/*
+   ѕроверка наличи€ переменной
+*/
+    bool HasVariable (const char* var_name)
+    {
+      return source_registry.HasVariable (var_name);
+    }
+
+/*
+   ќбход всех переменных
+*/
+    void EnumerateVars (const EnumHandler& handler)
+    {
+      source_registry.EnumerateVars (handler);
+    }
+
+/*
+   ƒобавление/удаление ссылки
+*/
+    void AddRef ()
+    {
+      addref (this);
+    }
+
+    void Release ()
+    {
+      release (this);
+    }
+
+/*
+   ѕодписка на добавление/изменение/удаление переменных
+*/
+    void SetEventHandler (const EventHandler& in_handler)
+    {
+      handler = in_handler;
+    }
+
+    const EventHandler& GetEventHandler ()
+    {
+      return handler;
+    }
+
+  private:
+    void RegistryEventHandler (const char* var_name, VarRegistryEvent event)
+    {
+      handler (var_name, event);
+    }
+
+  private:
+    VarRegistry          source_registry;
+    xtl::auto_connection event_coonection[VarRegistryEvent_Num];
+    stl::string          source_name;
+    EventHandler         handler;
+};
+
 }
 
 /*
@@ -23,6 +108,41 @@ void remove_suffix (stl::string& s)
 MountPointsMap::~MountPointsMap ()
 {
   UnmountAll ();
+}
+
+/*
+   —озданеие/удаление ссылки
+*/
+
+void MountPointsMap::Link (const char* link_name, const char* source)
+{
+  static const char* METHOD_NAME = "common::MountPointsMap::Link";
+
+  if (!link_name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "link_name");
+
+  if (!source)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "source");
+
+  xtl::com_ptr<VarRegistryLink> link (new VarRegistryLink (link_name, source), false);
+
+  Mount (link_name, link.get ());
+}
+
+void MountPointsMap::Unlink (const char* link_name)
+{
+  if (!link_name)
+    return;
+
+    //поиск точки монтировани€ с указанным именем
+
+  MountMap::iterator iter = mount_points_map.find (link_name);      
+
+  if (iter == mount_points_map.end ())
+    return;
+    
+  if (dynamic_cast<VarRegistryLink*> (iter->second->Registry ()))
+    Unmount (link_name);
 }
 
 /*
@@ -146,20 +266,27 @@ void MountPointsMap::Unmount (const char* branch_name)
 
 void MountPointsMap::UnmountAll (ICustomVarRegistry* registry)
 {
-  for (MountMap::iterator map_iter = mount_points_map.begin (), map_end = mount_points_map.end (); map_iter != map_end; ++map_iter)
+  for (MountMap::iterator map_iter = mount_points_map.begin (), map_end = mount_points_map.end (); map_iter != map_end;)
   {
     MountPoint* mount_point = map_iter->second.get ();
       
-    if (mount_point->Registry () != registry)
-      continue;
+    if (mount_point->Registry () == registry)
+    {
+        //оповещение об удалении точки монтировани€
+      
+      OnUnmount (mount_point);
 
-      //оповещение об удалении точки монтировани€
-    
-    OnUnmount (mount_point);
+       //удаление точки монтировани€
 
-     //удаление точки монтировани€
+      MountMap::iterator next = map_iter;
 
-    mount_points_map.erase (map_iter);
+      ++next;
+
+      mount_points_map.erase (map_iter);
+
+      map_iter = next;
+    }
+    else ++map_iter;
   }
 }
 
@@ -245,6 +372,11 @@ MountPointsMap::Pointer MountPointsMap::GetGlobalMap ()
   struct MountPointsMapWrapper
   {
     MountPointsMapWrapper () : instance (new MountPointsMap) {}
+
+    ~MountPointsMapWrapper ()
+    {
+      instance->UnmountAll (); //???????????
+    }
 
     MountPointsMap::Pointer instance;
   };

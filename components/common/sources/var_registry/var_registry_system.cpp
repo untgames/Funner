@@ -4,6 +4,28 @@ using namespace common;
 using namespace xtl;
 
 /*
+   Созданеие/удаление ссылки
+*/
+
+void VarRegistrySystem::Link (const char* link_name, const char* source)
+{
+  try
+  {
+    MountPointsMap::GetGlobalMap ()->Link (link_name, source);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::VarRegistrySystem::Link");
+    throw;
+  }
+}
+
+void VarRegistrySystem::Unlink (const char* link_name)
+{
+  MountPointsMap::GetGlobalMap ()->Unlink (link_name);
+}
+
+/*
    Присоединение/отсоединение реестра
 */
 

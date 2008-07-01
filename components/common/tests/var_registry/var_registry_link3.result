@@ -1,0 +1,17 @@
+Results of var_registry_link3_test:
+TestVarRegistry::TestVarRegistry()
+create 'c.x' (mask='*')
+create 'b.y' (mask='*')
+create 'b.x.y' (mask='*')
+create 'c.xxxx.y' (mask='*')
+enumerate a.c vars:
+c.x=x; b.y=y; b.x.y=x.y; c.xxxx.y=xxxx.y; 
+delete 'c.x' (mask='*')
+delete 'b.y' (mask='*')
+delete 'b.x.y' (mask='*')
+delete 'c.xxxx.y' (mask='*')
+enumerate a.b vars:
+c.x=x; b.y=y; b.x.y=x.y; c.xxxx.y=xxxx.y; 
+enumerate a.c vars:
+
+TestVarRegistry::~TestVarRegistry

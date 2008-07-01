@@ -20,8 +20,8 @@ int main ()
   
   try
   {
-    TestVarRegistry::Pointer registry1 = TestVarRegistry::Create ().get ();
-    TestVarRegistry::Pointer registry2 = TestVarRegistry::Create ().get ();
+    TestVarRegistry::Pointer registry1 = TestVarRegistry::Create ();
+    TestVarRegistry::Pointer registry2 = TestVarRegistry::Create ();
 
     VarRegistrySystem::Mount ("registry_1:1", registry1.get ());
     VarRegistrySystem::Mount ("registry_1:2", registry1.get ());
