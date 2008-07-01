@@ -1,0 +1,9 @@
+Results of renderer2d_1_test:
+Create debug driver
+Create 2D renderer (id=1)
+Create texture 400x300 (format=4)
+check texture size: 400x300
+Capture image from texture #4
+check image after capture: 400x300x1 (format=4)
+Destroy 2D renderer (id=1)
+Destroy debug driver

@@ -10,6 +10,19 @@ using namespace render::mid_level::debug;
 
 Renderer2d::Renderer2d ()
 {
+  log.Printf ("Create 2D renderer (id=%u)", Id ());
+}
+
+Renderer2d::~Renderer2d ()
+{
+  try
+  {
+    log.Printf ("Destroy 2D renderer (id=%u)", Id ());
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
 /*
@@ -18,12 +31,12 @@ Renderer2d::Renderer2d ()
 
 ITexture* Renderer2d::CreateTexture (const media::Image& image)
 {
-  throw xtl::make_not_implemented_exception ("render::mid_level::debug::Renderer2d::CreateTexture(const media::Image&)");
+  return CreateTexture (image.Width (), image.Height (), image.Format ());
 }
 
 ITexture* Renderer2d::CreateTexture (size_t width, size_t height, media::PixelFormat pixel_format)
 {
-  throw xtl::make_not_implemented_exception ("render::mid_level::debug::Renderer2d::CreateTexture(size_t,size_t,media::PixelFormat)");
+  return new Texture2d (width, height, pixel_format);
 }
 
 ISpriteList* Renderer2d::CreateSpriteList (size_t sprites_count)

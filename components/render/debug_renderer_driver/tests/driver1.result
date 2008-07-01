@@ -3,3 +3,4 @@ Create debug driver
 1 drivers registered:
   driver #1: 'debug' (1 renderers)
     renderer #1: 'renderer2d'
+Destroy debug driver

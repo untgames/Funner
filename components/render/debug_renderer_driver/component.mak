@@ -21,4 +21,4 @@ RENDER.DEBUG_RENDERER_DRIVER.TESTS.LIB_DIRS         :=
 RENDER.DEBUG_RENDERER_DRIVER.TESTS.LIBS             :=
 RENDER.DEBUG_RENDERER_DRIVER.TESTS.COMPILER_CFLAGS  :=
 RENDER.DEBUG_RENDERER_DRIVER.TESTS.COMPILER_DEFINES := 
-RENDER.DEBUG_RENDERER_DRIVER.TESTS.IMPORTS          := link.static.mak ../mid_level/compile.static.mak ../../common/compile.static.mak ../../media/image/link.static.mak
+RENDER.DEBUG_RENDERER_DRIVER.TESTS.IMPORTS          := link.static.mak ../mid_level/compile.static.mak ../../common/compile.static.mak ../../media/image/compile.static.mak

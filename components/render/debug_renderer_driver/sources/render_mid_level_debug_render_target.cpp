@@ -40,7 +40,16 @@ size_t RenderTarget::GetHeight ()
 
 void RenderTarget::CaptureImage (media::Image& image)
 {
-  log.Printf ("Capture image from render-target #%u", Id ());
-  
-  media::Image ().Swap (image);
+  switch (type)
+  {
+    case RenderTargetType_Color:
+      log.Printf ("Capture image from render-target #%u", Id ());
+      media::Image (width, height, 1, media::PixelFormat_RGBA8).Swap (image);
+      break;
+    case RenderTargetType_DepthStencil:
+      throw xtl::format_not_supported_exception ("render::mid_level::debug::RenderTarget::CaptureImage",
+        "Can't capture depth-stencil render-targets");
+    default:
+      break;
+  }
 }

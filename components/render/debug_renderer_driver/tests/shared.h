@@ -7,12 +7,17 @@
 
 #include <common/log.h>
 
+#include <media/image.h>
+
 #include <render/mid_level/driver.h>
+#include <render/mid_level/renderer2d.h>
 
 using namespace render::mid_level;
 
-typedef xtl::com_ptr<IDriver>   DriverPtr;
-typedef xtl::com_ptr<IRenderer> RendererPtr;
+typedef xtl::com_ptr<IDriver>               DriverPtr;
+typedef xtl::com_ptr<IRenderer>             RendererPtr;
+typedef xtl::com_ptr<renderer2d::IRenderer> Renderer2dPtr;
+typedef xtl::com_ptr<renderer2d::ITexture>  Texture2dPtr;
 
 //общий код тестов
 class Test
@@ -25,7 +30,7 @@ class Test
     
     ~Test ()
     {
-      DriverManager::UnregisterDriver ("render.mid_level.debug"); //проверка корректности удаления
+      DriverManager::UnregisterDriver ("debug"); //проверка корректности удаления
     }    
 
   private:
