@@ -20,9 +20,19 @@ void VarRegistrySystem::Mount (const char* branch_name, ICustomVarRegistry* regi
   }
 }
 
+void VarRegistrySystem::Unmount (const char* branch_name, ICustomVarRegistry* registry)
+{
+  MountPointsMap::GetGlobalMap ()->Unmount (branch_name, registry);
+}
+
 void VarRegistrySystem::Unmount (const char* branch_name)
 {
   MountPointsMap::GetGlobalMap ()->Unmount (branch_name);
+}
+
+void VarRegistrySystem::UnmountAll (ICustomVarRegistry* registry)
+{
+  MountPointsMap::GetGlobalMap ()->UnmountAll (registry);
 }
 
 void VarRegistrySystem::UnmountAll ()

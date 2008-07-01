@@ -78,7 +78,9 @@ class MountPointsMap
 ///Монтирование реестров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Mount      (const char* branch_name, ICustomVarRegistry* registry);
+    void Unmount    (const char* branch_name, ICustomVarRegistry* registry);
     void Unmount    (const char* branch_name);
+    void UnmountAll (ICustomVarRegistry* registry);
     void UnmountAll ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

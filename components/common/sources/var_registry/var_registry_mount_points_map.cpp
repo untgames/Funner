@@ -95,6 +95,32 @@ void MountPointsMap::OnUnmount (MountPoint* mount_point)
   }
 }
 
+void MountPointsMap::Unmount (const char* branch_name, ICustomVarRegistry* registry)
+{
+  if (!branch_name)
+    return;
+
+    //поиск точки монтирования с указанным именем
+
+  MountMap::iterator iter = mount_points_map.find (branch_name);      
+
+  if (iter == mount_points_map.end ())
+    return;
+    
+  MountPoint* mount_point = iter->second.get ();
+    
+  if (mount_point->Registry () != registry)
+    return;
+
+    //оповещение об удалении точки монтирования
+  
+  OnUnmount (mount_point);
+
+   //удаление точки монтирования
+
+  mount_points_map.erase (iter);
+}
+
 void MountPointsMap::Unmount (const char* branch_name)
 {
   if (!branch_name)
@@ -116,6 +142,25 @@ void MountPointsMap::Unmount (const char* branch_name)
    //удаление точки монтирования
 
   mount_points_map.erase (iter);
+}
+
+void MountPointsMap::UnmountAll (ICustomVarRegistry* registry)
+{
+  for (MountMap::iterator map_iter = mount_points_map.begin (), map_end = mount_points_map.end (); map_iter != map_end; ++map_iter)
+  {
+    MountPoint* mount_point = map_iter->second.get ();
+      
+    if (mount_point->Registry () != registry)
+      continue;
+
+      //оповещение об удалении точки монтирования
+    
+    OnUnmount (mount_point);
+
+     //удаление точки монтирования
+
+    mount_points_map.erase (map_iter);
+  }
 }
 
 void MountPointsMap::UnmountAll ()
