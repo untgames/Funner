@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := RENDER.LOW_LEVEL_RENDERER_DRIVER.SOURCES RENDER.LOW_LEVEL_RENDERER_DRIVER.TESTS
 
-#Цель №1 - OpenGL render system sources
+#Цель №1 - Low level render system sources
 RENDER.LOW_LEVEL_RENDERER_DRIVER.SOURCES.TYPE             := static-lib
 RENDER.LOW_LEVEL_RENDERER_DRIVER.SOURCES.NAME             := render.mid_level.low_level_renderer_driver
 RENDER.LOW_LEVEL_RENDERER_DRIVER.SOURCES.INCLUDE_DIRS     := sources
@@ -13,7 +13,7 @@ RENDER.LOW_LEVEL_RENDERER_DRIVER.SOURCES.LIBS             :=
 RENDER.LOW_LEVEL_RENDERER_DRIVER.SOURCES.COMPILER_DEFINES :=
 RENDER.LOW_LEVEL_RENDERER_DRIVER.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak
 
-#Цель №2 - OpenGL render system tests
+#Цель №2 - Low level render system tests
 RENDER.LOW_LEVEL_RENDERER_DRIVER.TESTS.TYPE             := test-suite
 RENDER.LOW_LEVEL_RENDERER_DRIVER.TESTS.INCLUDE_DIRS     :=
 RENDER.LOW_LEVEL_RENDERER_DRIVER.TESTS.SOURCE_DIRS      :=
