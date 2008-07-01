@@ -2,7 +2,7 @@
 
 int main ()
 {
-  printf ("Results of renderer2d_1_test:\n");
+  printf ("Results of renderer2d_texture_test:\n");
   
   try
   {
@@ -18,7 +18,7 @@ int main ()
     
       //создание текстуры
     
-    Texture2dPtr texture (renderer->CreateTexture (400, 300, media::PixelFormat_RGBA8));
+    Texture2dPtr texture (renderer->CreateTexture (400, 300, media::PixelFormat_RGBA8), false);
     
       //вывод параметров текстуры
       

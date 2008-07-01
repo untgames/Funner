@@ -41,7 +41,7 @@ ITexture* Renderer2d::CreateTexture (size_t width, size_t height, media::PixelFo
 
 ISpriteList* Renderer2d::CreateSpriteList (size_t sprites_count)
 {
-  throw xtl::make_not_implemented_exception ("render::mid_level::debug::Renderer2d::CreateSpriteList");
+  return new SpriteList (sprites_count);
 }
 
 /*

@@ -13,11 +13,13 @@
 #include <render/mid_level/renderer2d.h>
 
 using namespace render::mid_level;
+using namespace render::mid_level::renderer2d;
 
-typedef xtl::com_ptr<IDriver>               DriverPtr;
-typedef xtl::com_ptr<IRenderer>             RendererPtr;
-typedef xtl::com_ptr<renderer2d::IRenderer> Renderer2dPtr;
-typedef xtl::com_ptr<renderer2d::ITexture>  Texture2dPtr;
+typedef xtl::com_ptr<IDriver>                      DriverPtr;
+typedef xtl::com_ptr<render::mid_level::IRenderer> RendererPtr;
+typedef xtl::com_ptr<renderer2d::IRenderer>        Renderer2dPtr;
+typedef xtl::com_ptr<renderer2d::ITexture>         Texture2dPtr;
+typedef xtl::com_ptr<renderer2d::ISpriteList>      SpriteListPtr;
 
 //общий код тестов
 class Test
