@@ -139,7 +139,8 @@ class DriverManagerImpl
           }
         }
 
-      return 0;
+      throw xtl::format_operation_exception ("render::mid_level::DriverManagerImpl::CreateRenderer",
+        "No configuration with driver_mask='%s' and renderer_mask='%s'", driver_mask, renderer_mask);
     }
     
   private:
