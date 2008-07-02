@@ -1,4 +1,4 @@
-Results of var_registry_link3_test:
+Results of var_registry5_test:
 TestVarRegistry::TestVarRegistry()
 create 'b.y' (mask='*')
 create 'b.x.y' (mask='*')

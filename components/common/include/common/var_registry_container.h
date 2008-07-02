@@ -79,12 +79,6 @@ class VarRegistryContainer
 template <class T>
 void swap (VarRegistryContainer<T>& source1, VarRegistryContainer<T>& source2);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Загрузка конфигураций из XML файла
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void load_xml_configurations (VarRegistryContainer<stl::string>& registry, const char* file_mask);
-void load_xml_configuration  (VarRegistryContainer<stl::string>& registry, const char* file_name);
-
 #include <common/detail/var_registry_container.inl>
 
 }

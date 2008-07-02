@@ -1,0 +1,16 @@
+Results of var_registry_xml_cfg2_test:
+TestVarRegistry::TestVarRegistry()
+enumerate all vars:
+Configuration.Render.size_x=1024
+Configuration.Render.size_y=768
+Configuration.Render.title=Big game
+Configuration.Input.common=Input enabled
+Configuration.Input.Mouse.x_sensitivity=1.05
+Configuration.Input.DXJoy1.forcefeedback_strength=0.8
+Configuration2.Render.size_x=800
+Configuration2.Render.size_y=600
+Configuration2.Render.title=Big game
+Configuration2.Input.common=Input enabled
+Configuration2.Input.Mouse.x_sensitivity=0.5
+Configuration2.Input.DXJoy1.forcefeedback_strength=0.996
+TestVarRegistry::~TestVarRegistry

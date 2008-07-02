@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <Render size_x="1024" size_y="768" title="Big game"/>
+  <Input common="Input enabled">
+    <Mouse x_sensitivity = "1.05"/>
+    <DXJoy1 forcefeedback_strength = "0.8"/>
+  </Input>
+</Configuration>

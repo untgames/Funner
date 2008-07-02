@@ -159,6 +159,12 @@ class VarRegistrySystem
     static void UnmountAll ();
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Загрузка конфигураций из XML файла
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void load_xml_configurations (VarRegistry& registry, const char* file_mask);
+void load_xml_configuration  (VarRegistry& registry, const char* file_name);
+
 }
 
 #endif

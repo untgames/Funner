@@ -39,7 +39,7 @@ void register_handler (const char* mask, const VarRegistry& registry)
 
 int main ()
 {
-  printf ("Results of var_registry_link3_test:\n");
+  printf ("Results of var_registry5_test:\n");
   
   try
   {
