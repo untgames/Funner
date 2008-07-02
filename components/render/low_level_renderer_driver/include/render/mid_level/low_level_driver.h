@@ -38,8 +38,7 @@ class LowLevelDriver
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация систем рендернинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterRenderer       (const char* name, IDevice* device);
-    static void RegisterRenderer       (const char* name, IDevice* device, ISwapChain* swap_chain);
+    static void RegisterRenderer       (const char* name, low_level::IDevice* device, low_level::ISwapChain* swap_chain);
     static void UnregisterRenderer     (const char* name);
     static void UnregisterAllRenderers ();
 };

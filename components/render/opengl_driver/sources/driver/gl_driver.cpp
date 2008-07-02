@@ -4,8 +4,6 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
-typedef Singleton<Driver> OpenGLDriverSingleton;
-
 /*
     Конструктор / деструктор
 */
@@ -126,7 +124,16 @@ namespace low_level
 
 IDriver* get_opengl_driver ()
 {
-  return OpenGLDriverSingleton::InstancePtr ();
+  struct DriverHolder
+  {
+    DriverHolder () : driver (new Driver, false) {}
+
+    xtl::com_ptr<Driver> driver;
+  };
+
+  typedef Singleton<DriverHolder> DriverSingleton;
+
+  return DriverSingleton::Instance ().driver.get ();
 }
 
 }

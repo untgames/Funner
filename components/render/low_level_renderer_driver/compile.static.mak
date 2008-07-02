@@ -2,4 +2,4 @@
 #Экспортируемые настройки компонента
 ###################################################################################################
 export.INCLUDE_DIRS := include
-export.IMPORTS      := ../mid_leve/compile.static.mak
+export.IMPORTS      := ../mid_level/compile.static.mak
