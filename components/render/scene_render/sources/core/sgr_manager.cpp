@@ -3,6 +3,17 @@
 using namespace render;
 
 /*
+    Константы
+*/
+
+namespace
+{
+
+const char* RENDER_PATH_COMPONENTS_MASK = "render.scene_render.*"; //маска имён компонентов путей рендеринга
+
+}
+
+/*
 ===================================================================================================
     SceneRenderManagerImpl::RenderPath
 ===================================================================================================
@@ -41,6 +52,15 @@ class SceneRenderManagerImpl::RenderPath: public SceneRenderManager::IRenderPath
     SceneRenderManagerImpl
 ===================================================================================================
 */
+
+/*
+   Загрузка компонентов по умолчанию
+*/
+
+void SceneRenderManagerImpl::LoadDefaultComponents ()
+{
+  static common::ComponentLoader loader (RENDER_PATH_COMPONENTS_MASK);  
+}
 
 /*
     Регистрация путей рендеринга
@@ -84,6 +104,8 @@ SceneRenderManagerImpl::Iterator SceneRenderManagerImpl::CreateIterator ()
   {
     SceneRenderManager::IRenderPath& operator () (RenderPathMap::value_type& v) const { return *v.second; }
   };
+  
+  LoadDefaultComponents ();
 
   return Iterator (paths.begin (), paths.begin (), paths.end (), RenderPathSelector ());  
 }
@@ -101,17 +123,19 @@ CustomSceneRenderPtr SceneRenderManagerImpl::CreateRender (mid_level::IRenderer*
       
     if (!path_name)
       throw xtl::make_null_argument_exception ("", "path_name");
+      
+    LoadDefaultComponents ();
 
     RenderPathMap::iterator iter = paths.find (path_name);
 
     if (iter == paths.end ())
       throw xtl::make_argument_exception ("", "path_name", path_name, "Render path has not registered");
 
-    return iter->second->CreateRender (renderer);
+    return CustomSceneRenderPtr (iter->second->CreateRender (renderer), false);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render:SceneRenderManagerImpl::CreateRender");
+    exception.touch ("render::SceneRenderManagerImpl::CreateRender");
     throw;
   }
 }

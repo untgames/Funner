@@ -10,6 +10,8 @@ using namespace render;
 
 const size_t VIEWPORT_ARRAY_RESERVE      = 32;  //резервируемое количество областей видимости
 const size_t RENDER_PATHS_STRING_RESERVE = 256; //резервируемый размер строки с имёна путей рендеринга
+const size_t DEFAULT_WINDOW_WIDTH        = 100; //ширина окна по умолчанию
+const size_t DEFAULT_WINDOW_HEIGHT       = 100; //высота окна по умолчанию
 
 /*
     Описание реализации SceneRender
@@ -29,7 +31,7 @@ struct SceneRender::Impl
   math::vec4f   background_color;    //цвет фона
   
     //конструктор
-  Impl ()
+  Impl () : window (0, 0, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT)
   {
     viewports.reserve (VIEWPORT_ARRAY_RESERVE);
   }  
@@ -174,11 +176,20 @@ void SceneRender::SetRenderer
 
     for (StringArray::iterator iter=path_masks.begin (), end=path_masks.end (); iter!=end; ++iter)
     {
-      const char* render_path_mask = iter->c_str ();
+      const char* render_path_mask = iter->c_str ();      
       
-      for (SceneRenderManager::Iterator render_path_iter=render_path_begin; render_path_iter; ++render_path_iter)
-        if (common::wcmatch (render_path_iter->Name (), render_path_mask))
-          path_names.insert (render_path_iter->Name ());
+      if (!strchr (render_path_mask, '*') && !strchr (render_path_mask, '?'))
+      {
+        path_names.insert (render_path_mask);
+      }
+      else
+      {
+        for (SceneRenderManager::Iterator render_path_iter=render_path_begin; render_path_iter; ++render_path_iter)
+        {
+          if (common::wcmatch (render_path_iter->Name (), render_path_mask))  
+            path_names.insert (render_path_iter->Name ());
+        }
+      }
     }
     
       //создание путей рендеринга
@@ -191,7 +202,7 @@ void SceneRender::SetRenderer
     for (StringSet::iterator iter=path_names.begin (), end=path_names.end (); iter!=end; ++iter)
     {
       const char* path_name = iter->c_str ();
-      
+
         //создание пути ренедринга
         
       CustomSceneRenderPtr render_path = SceneRenderManagerImpl::Instance ().CreateRender (renderer.get (), path_name);

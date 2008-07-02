@@ -18,6 +18,7 @@
 
 #include <common/singleton.h>
 #include <common/strlib.h>
+#include <common/component.h>
 
 #include <sg/camera.h>
 
@@ -61,6 +62,9 @@ class SceneRenderManagerImpl
 ///Получение экземпляра менеджера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static SceneRenderManagerImpl& Instance ();
+    
+  private:
+    void LoadDefaultComponents ();
 
   private:
     class RenderPath;

@@ -2,6 +2,7 @@
 #define RENDER_SCENE_RENDER_HEADER
 
 #include <stl/auto_ptr.h>
+#include <xtl/functional_fwd>
 
 #include <mathlib.h>
 
