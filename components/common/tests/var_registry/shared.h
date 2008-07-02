@@ -16,6 +16,7 @@
 #include <xtl/lexical_cast.h>
 
 #include <common/var_registry.h>
+#include <common/var_registry_container.h>
 
 using namespace common;
 
