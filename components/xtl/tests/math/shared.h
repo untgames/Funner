@@ -38,6 +38,16 @@ template <class T,size_t sizeX,size_t sizeY> void matrix_print(const char* Messa
 	printf("\n");
 }
 
+template <class T> void quat_print(const char* Message,const quat<T>& V)
+{
+	printf("%s",Message);
+	for (int i=0;i<4;i++)
+	{
+		_printf(V[i]);
+	}
+	printf("\n");
+}
+
 
 void _printf(int x)
 {

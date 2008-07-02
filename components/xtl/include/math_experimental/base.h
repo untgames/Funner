@@ -1,5 +1,5 @@
-#ifndef __MATHLIB_BASE__
-#define __MATHLIB_BASE__
+#ifndef MATHLIB_BASE_HEADER
+#define MATHLIB_BASE_HEADER
 
 namespace math
 {

@@ -1,5 +1,5 @@
-#ifndef __MATHLIB_QUATERNION__
-#define __MATHLIB_QUATERNION__
+#ifndef MATHLIB_QUATERNION_HEADER
+#define MATHLIB_QUATERNION_HEADER
 
 #ifdef _MSC_VER
   #pragma pack (push,1)
@@ -24,14 +24,22 @@ class quat: public quat_base<type>
 {
   public:
     typedef type value_type;
+    enum {size=4};
   
     quat ();
-    quat (const type& x,const type& y,const type& z,const type& w);
+    quat (const type& x_,const type& y_,const type& z_,const type& w_);
     quat (const type&);
     quat (const matrix<type,3>&);
     quat (const matrix<type,4>&);
     
         //для использования оптимизации возвращаемого значения
+
+    template <class T,class Fn>           quat (const T&,Fn fn);
+    template <class T1,class T2,class Fn> quat (const T1&,const T2&,Fn fn);
+/*  template <class T1,class T2,class T3> 
+ 					  quat (const T1&,const T2&,const T3&,Fn fn);*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////
     template <class T>                    quat (const T&,void (*eval)(quat&,const T&));
     template <class T1,class T2>          quat (const T1&,const T2&,void (*eval)(quat&,const T1&,const T2&));
     template <class T1,class T2,class T3> quat (const T1&,const T2&,const T3&,void (*eval)(quat&,const T1&,const T2&,const T3&));

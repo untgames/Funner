@@ -1,5 +1,5 @@
-#ifndef __MATHLIB__
-#define __MATHLIB__
+#ifndef MATHLIB_HEADER
+#define MATHLIB_HEADER
 
 #define _USE_MATH_DEFINES
 #include <math.h>

@@ -301,7 +301,7 @@ void matrix_rotate (matrix<T,3>& res,const T& angle,const vec<T,3>& axis)
 template <class T> 
 void AxisAngle2quat  (const T& angle,const vec<T,3>& axis,quat<T>& q)
 {
-  vec<T,3> v = axis.normalize();
+  vec<T,3> v = normalize(axis);
 
   T half_angle = angle*T(0.5);
   T sin_a      = sin (half_angle);

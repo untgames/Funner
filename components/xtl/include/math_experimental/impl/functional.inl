@@ -13,10 +13,7 @@ template <class T, size_t Size> T& get_component (vec<T, Size>& v, size_t index)
 
 template <class T, size_t Size> const T& get_component (const vec<T, Size>& v, size_t index);
 
-/*template <class T> T& get_component (T& v, size_t)
-{
-  return v.value;
-} */
+
 
 template <class T> const T& get_component (const T& v, size_t)
 {
@@ -24,6 +21,10 @@ template <class T> const T& get_component (const T& v, size_t)
 }
 
 }
+
+/*
+	Общие функции для унарных и бинарных операций
+*/
 template <class Ret, class Fn> template <class T1> 
 inline void unary_component_function<Ret,Fn>::operator () (Ret& res, const T1& a)
 {
@@ -81,7 +82,19 @@ Ret make_binary_operation (const T1& a, const T2& b, Fn fn)
   return Ret (a, b, binary_component_function<Ret, Fn> (fn));
 }
 
+template <class Ret, class Fn, class T>
+inline void make_unary_operation (const T& a,const Fn& fn, Ret& result)
+{
+  unary_component_function<Ret, Fn> MyFn(fn);
+  MyFn(result, a);
+}
 
+template <class Ret, class T1, class T2, class Fn>
+inline void make_binary_operation (const T1& a, const T2& b, Fn fn, Ret& result)
+{
+  binary_component_function<Ret, Fn> my_fn(fn);
+  my_fn(result, a, b);
+}
 
 
 /*

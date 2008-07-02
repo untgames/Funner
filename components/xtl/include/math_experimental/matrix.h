@@ -1,5 +1,5 @@
-#ifndef __MATHLIB_MATRIX__
-#define __MATHLIB_MATRIX__
+#ifndef MATHLIB_MATRIX_HEADER
+#define MATHLIB_MATRIX_HEADER
 
 #ifdef _MSC_VER  
   #pragma pack(push,1)
@@ -15,18 +15,9 @@
 namespace math
 {
 
+//forward declaration
 template <class Type> class quat;
 
-
-namespace detail
-{
-template <class T, size_t SizeX,size_t SizeY> 
-  vec<T, SizeY>& get_component (math::matrix<T, SizeX,SizeY>& v, size_t index);
-
-template <class T, size_t SizeX,size_t SizeY> 
-  const vec<T, SizeY>& get_component (const math::matrix<T, SizeX,SizeY>& v, size_t index);
-
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица
@@ -38,9 +29,9 @@ class matrix
     typedef vec<Type,SizeY>              vector;     //вектор строка
     typedef typename vector::value_type value_type; //тип элементов
     
-    enum { sizeY = SizeY,
-           sizeX = SizeX, 
-           size  = SizeX };
+    enum { size_y = SizeY,
+           size_x = SizeX, 
+           size   = SizeX };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
@@ -49,8 +40,7 @@ class matrix
     matrix (const matrix<Type,SizeX,SizeY>& src);
     matrix (const Type& a);  //a будет записано на главной диагонали
     matrix (const Type*);                                            
-    matrix (const quat<Type>&);   //только для матриц 3-го и 4-го порядка
-
+    
     template <class T1,class T2, class Fn>
       matrix(const T1& a,const T2& b,Fn fn);
 
@@ -77,8 +67,9 @@ class matrix
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ////////////////////////////////////////////////////////////////////////////////////////////
-/*  matrix&  operator = (const quat<Type>&);  //только для матриц 3-го и 4-го порядка
-  matrix&  operator = (const Type&);*/
+//  matrix&  operator = (const quat<Type>&);  //только для матриц 3-го и 4-го порядка
+    matrix&  operator = (const Type&);
+    matrix&  operator = (const matrix&);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Основные арифметические операции
@@ -99,7 +90,7 @@ class matrix
 
 ///////////////////////////////////////////////
 
-    template<size_t Size2Y>
+    template<size_t Size2Y>  
      const matrix<Type,SizeX,Size2Y> operator *  (const matrix<Type,SizeY,Size2Y>&) const;
 
     template<class T,size_t Size>
@@ -126,39 +117,50 @@ class matrix
 ///Удаление строки/столбца
 ////////////////////////////////////////////////////////////////////////////////////////////
   
-   const matrix<Type,SizeX-1,SizeY> delete_row(size_t) const; 
-   const matrix<Type,SizeX,SizeY-1> delete_column(size_t) const;
-   const matrix<Type,SizeX-1,SizeY-1> delete_row_column(size_t,size_t) const;
+   const matrix<Type,SizeX-1,SizeY>   remove_row        (size_t)        const; 
+   const matrix<Type,SizeX,SizeY-1>   remove_column     (size_t)        const;
+   const matrix<Type,SizeX-1,SizeY-1> remove_row_column (size_t,size_t) const;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-///Транспонирование / инвертирование / нормализация матрицы
+///Транспонирование матрицы
 ////////////////////////////////////////////////////////////////////////////////////////////
    const matrix<Type,SizeY,SizeX>  transpose ();
-
-/*
-	Утилиты
-*/
-
-    template<class T,size_t Size>
-     friend const T det(const matrix<T,Size,Size>&);
-    
-    template<class T,size_t Size>
-     friend const matrix<T,Size,Size> three_angle_view(const matrix<T,Size,Size>&,int&);
-
-    template<class T,size_t Size>
-     friend const T mathematical_add(const matrix<T,Size>&, size_t,size_t);
-
-    template<class T,size_t Size>
-     friend const matrix<T,Size> invert(const matrix<T,Size>&);
-
-    template<class T,size_t Size>
-     friend const matrix<T,Size> normalize(const matrix<T,Size>&);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
   private:
     vector x [SizeX];  
 
 };
+
+
+/*
+	Преобразование матрицы в кватернион
+*/
+template <class T>
+ const quat<T> matrix_to_quat (const matrix<T,3>&);
+
+template <class T>
+ const quat<T> matrix_to_quat (const matrix<T,4>&);
+
+/*
+	Утилиты
+*/
+
+template<class T,size_t Size>
+ const T                   det               (const matrix<T,Size,Size>&);
+    
+template<class T,size_t Size>
+ const matrix<T,Size,Size> three_angle_view  (const matrix<T,Size,Size>&,int&);
+
+template<class T,size_t Size>
+ const T                   mathematical_add  (const matrix<T,Size>&, size_t,size_t);
+
+template<class T,size_t Size>
+ const matrix<T,Size>      invert            (const matrix<T,Size>&);
+
+template<class T,size_t Size>
+ const matrix<T,Size>      normalize         (const matrix<T,Size>&);
+
 
 #ifdef _MSC_VER
   #pragma pack(pop)

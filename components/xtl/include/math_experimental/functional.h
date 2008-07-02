@@ -77,6 +77,11 @@ Ret make_unary_operation (const T& a,const Fn& fn);
 template <class Ret, class T1, class T2, class Fn>
 Ret make_binary_operation (const T1& a, const T2& b, Fn fn);
 
+template <class Ret, class Fn, class T>
+void make_unary_operation (const T& a,const Fn& fn, Ret& result);
+
+template <class Ret, class T1, class T2, class Fn>
+void make_binary_operation (const T1& a, const T2& b, Fn fn, Ret& result);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Определение одноместного функтора

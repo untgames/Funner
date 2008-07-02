@@ -21,19 +21,19 @@ template <class T, size_t SizeX, size_t SizeY> const
 template <class T,size_t SizeX,size_t SizeY>
 inline matrix<T,SizeX,SizeY>::matrix ()
 {
-  *this=make_unary_operation<matrix<T,SizeX,SizeY> >(T(1), assign<vec<T,SizeY> >());
+  make_unary_operation<matrix<T,SizeX,SizeY> >(T(1), assign<vec<T,SizeY> >(),*this);
 }
 
 template <class T,size_t SizeX,size_t SizeY>
 inline matrix<T,SizeX,SizeY>::matrix (const T& a)
 {
-  *this=make_unary_operation<matrix<T,SizeX,SizeY> >(a, assign<vec<T,SizeY> >());
+  make_unary_operation<matrix<T,SizeX,SizeY> >(a, assign<vec<T,SizeY> >(),*this);
 }
 
 template<class T,size_t SizeX,size_t SizeY>
   matrix<T,SizeX,SizeY>::matrix (const matrix<T,SizeX,SizeY>& src)
 {
-  *this=make_unary_operation<matrix<T,SizeX,SizeY> >(src,assign<vec<T,SizeY> >());
+  make_unary_operation<matrix<T,SizeX,SizeY> >(src,assign<vec<T,SizeY> >(),*this);
 }
 
 template <class T,size_t SizeX,size_t SizeY>
@@ -189,7 +189,7 @@ inline matrix<T,Size>& operator /= (matrix<T,Size>& left,const matrix<T,Size>& r
 	Удаление строки/столбца
 */
 template<class T,size_t SizeX,size_t SizeY>
-inline const matrix<T,SizeX-1,SizeY> matrix<T,SizeX,SizeY>::delete_row(size_t row) const
+inline const matrix<T,SizeX-1,SizeY> matrix<T,SizeX,SizeY>::remove_row(size_t row) const
 {
   matrix<T,SizeX-1,SizeY> res;
   for(int i=0,i_=0;i<SizeX;i++,i_++)
@@ -205,7 +205,7 @@ inline const matrix<T,SizeX-1,SizeY> matrix<T,SizeX,SizeY>::delete_row(size_t ro
 }
 
 template<class T,size_t SizeX,size_t SizeY>
-inline const matrix<T,SizeX,SizeY-1> matrix<T,SizeX,SizeY>::delete_column(size_t column) const
+inline const matrix<T,SizeX,SizeY-1> matrix<T,SizeX,SizeY>::remove_column(size_t column) const
 {
   matrix<T, SizeX,SizeY-1> res;
   for(int i=0,i_=0;i<SizeX;i++,i_++)
@@ -224,13 +224,28 @@ inline const matrix<T,SizeX,SizeY-1> matrix<T,SizeX,SizeY>::delete_column(size_t
 }
 
 template<class T,size_t SizeX,size_t SizeY>
-inline const matrix<T,SizeX-1,SizeY-1> matrix<T,SizeX,SizeY>::delete_row_column(size_t row,size_t column) const
+inline const matrix<T,SizeX-1,SizeY-1> matrix<T,SizeX,SizeY>::remove_row_column(size_t row,size_t column) const
 {
-  matrix<T,SizeX-1,SizeY-1> res=this->delete_row(row).delete_column(column);
+  matrix<T,SizeX-1,SizeY-1> res=this->remove_row(row).remove_column(column);
   return res;
 }
 
+/*
+	Присваивание
+*/
+template <class T,size_t SizeX,size_t SizeY> 
+inline matrix<T,SizeX,SizeY>& matrix<T,SizeX,SizeY>::operator =(const T& src)
+{
+  make_unary_operation (src,assign<T>(),*this);
+  return *this;
+}
 
+template <class T,size_t SizeX,size_t SizeY> 
+inline matrix<T,SizeX,SizeY>& matrix<T,SizeX,SizeY>::operator =(const matrix<T,SizeX,SizeY>& src)
+{
+  make_unary_operation (src,assign<vec<T,SizeY> >(),*this);
+  return *this;
+}
 
 /*
 	Сравнение
@@ -316,7 +331,7 @@ inline const T mathematical_add(const matrix<T,Size>& src,size_t row,size_t colu
 {
   T res(1);
   for (int i=0;i<row+column;i++) res*=T(-1);
-  res*=det(src.delete_row_column(row,column));
+  res*=det(src.remove_row_column(row,column));
   return res;
 }
 
@@ -340,3 +355,88 @@ inline const matrix<T,Size> normalize(const matrix<T,Size>& src)
 {
   return src/sqrt(det(src));
 }
+
+/*
+	Преобразование матрицы в кватернион
+*/
+
+template <class T>
+ const quat<T> matrix_to_quat (const matrix<T,3>& m)
+{
+  quat<T> res;
+  T tr = m [0][0] + m [1][1] + m [2][2];
+
+  if (tr > 0)
+  {
+    T  s   = sqrt (tr + T (1));
+    res.w  = s * T (0.5);
+    s      = T (0.5) / s;
+    res.x  = (m [2][1] - m [1][2]) * s;
+    res.y  = (m [0][2] - m [2][0]) * s;
+    res.z  = (m [1][0] - m [0][1]) * s;
+  }
+  else
+  {
+    const size_t nxt [3] = {1, 2, 0};
+
+    size_t i = 0;
+
+    if (m [1][1] > m[0][0]) i = 1;
+    if (m [2][2] > m[i][i]) i = 2;
+
+    size_t j = nxt[i];
+    size_t k = nxt[j];
+
+    T s  = sqrt ((m [i][i] - (m [j][j] + m [k][k])) + T (1));
+
+    res [i] = s * T (0.5);
+
+    if (s != T (0)) s = T (0.5) / s;
+
+    res [3] = (m [k][j] - m [j][k]) * s;
+    res [j] = (m [j][i] + m [i][j]) * s;
+    res [k] = (m [k][i] + m [i][k]) * s;
+  }
+  return res;
+}
+
+template <class T>
+ const quat<T> matrix_to_quat (const matrix<T,4>& m)
+{
+  quat<T> res;
+  T tr = m [0][0] + m [1][1] + m [2][2];
+
+  if (tr > 0)
+  {
+    T  s   = sqrt (tr + T (1));
+    res.w  = s * T (0.5);
+    s      = T (0.5) / s;
+    res.x  = (m [2][1] - m [1][2]) * s;
+    res.y  = (m [0][2] - m [2][0]) * s;
+    res.z  = (m [1][0] - m [0][1]) * s;
+  }
+  else
+  {
+    const size_t nxt [3] = {1, 2, 0};
+
+    size_t i = 0;
+
+    if (m [1][1] > m[0][0]) i = 1;
+    if (m [2][2] > m[i][i]) i = 2;
+
+    size_t j = nxt[i];
+    size_t k = nxt[j];
+
+    T s  = sqrt ((m [i][i] - (m [j][j] + m [k][k])) + T (1));
+
+    res [i] = s * T (0.5);
+
+    if (s != T (0)) s = T (0.5) / s;
+
+    res [3] = (m [k][j] - m [j][k]) * s;
+    res [j] = (m [j][i] + m [i][j]) * s;
+    res [k] = (m [k][i] + m [i][k]) * s;
+  }
+  return res;
+}
+

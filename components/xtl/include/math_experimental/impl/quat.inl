@@ -7,6 +7,20 @@ inline quat<T>::quat ()
   w = T (1);
 }
 
+template <class T> template <class T1,class Fn>
+inline quat<T>::quat (const T1& a,Fn fn)
+{
+  fn (*this,a);
+}
+
+template <class T> template <class T1,class T2,class Fn> 
+inline quat<T>::quat (const T1& a,const T2& b,Fn fn)
+{
+  eval (*this,a,b);
+}
+
+
+
 template <class T> template <class T1>
 inline quat<T>::quat (const T1& a,void (*eval)(quat&,const T1&))
 {
@@ -26,18 +40,18 @@ inline quat<T>::quat (const T1& a,const T2& b,const T3& c,void (*eval)(quat&,con
 }
 
 template <class T> 
-inline quat<T>::quat (const T& _x,const T& _y,const T& _z,const T& _w)
+inline quat<T>::quat (const T& x_,const T& y_,const T& z_,const T& w_)
 {  
-  x = _x;
-  y = _y;
-  z = _z;
-  w = _w;
+  x = x_;
+  y = y_;
+  z = z_;
+  w = w_;
 }
 
 template <class T>
 inline quat<T>::quat (const T& a)
 {
-  quat_assign_scalar (*this,a);
+  *this=make_unary_operation<quat<T> > (a,assign<T> ());
 }
 
 template <class T>

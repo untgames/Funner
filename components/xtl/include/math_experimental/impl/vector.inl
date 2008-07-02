@@ -153,59 +153,85 @@ T vec<T,Size>::length () const
 */
 
 template <class T,size_t Size>
-T vec<T,Size>::operator & (const vec& v) const
+inline T const vec<T,Size>::operator & (const vec<T,Size>& right) const
 { 
-  return binary_accumulation_function<T>()(*this,v,T(0),plus<T>(),multiplies<T>());
+  return binary_accumulation_function<T>()(*this,right,T(0),plus<T>(),multiplies<T>());
 }
 
 template <class T,size_t Size>
-vec<T,Size>& vec<T,Size>::operator += (const vec& v) 
+inline vec<T,Size>& vec<T,Size>::operator += (const vec& v) 
 { 
-  *this=make_binary_operation<vec<T,Size> >(*this,v,plus<T,T,T> ());
+  make_binary_operation<vec<T,Size> >(*this,v,plus<T,T,T> (),*this);
   return *this; 
 }
 
 template <class T,size_t Size>
 vec<T,Size>& vec<T,Size>::operator -= (const vec& v) 
 { 
-  *this=make_binary_operation<vec<T,Size> >(*this,v,minus<T,T,T> ());
+  make_binary_operation<vec<T,Size> >(*this,v,minus<T,T,T> (),*this);
   return *this; 
 }
 
-template <class T,size_t Size> template<class T2>
-vec<T,Size>& vec<T,Size>::operator *= (const T2& v) 
+template <class T,size_t Size>
+vec<T,Size>& vec<T,Size>::operator *= (const T& v) 
 { 
-  *this=make_binary_operation<vec<T,Size> >(*this,v,multiplies<T,T,T> ());
+  make_binary_operation<vec<T,Size> >(*this,v,multiplies<T,T,T> (),*this);
   return *this; 
 }
 
-template <class T,size_t Size> template<class T2>
-vec<T,Size>& vec<T,Size>::operator /= (const T2& v) 
+template <class T,size_t Size>
+vec<T,Size>& vec<T,Size>::operator *= (const vec<T,Size>& v) 
 { 
-  *this=make_binary_operation<vec<T,Size> >(*this,v,divides<T,T,T> ());
+  make_binary_operation<vec<T,Size> >(*this,v,multiplies<T,T,T> (),*this);
+  return *this; 
+}
+
+template <class T,size_t Size>
+vec<T,Size>& vec<T,Size>::operator /= (const T& v) 
+{ 
+  make_binary_operation<vec<T,Size> >(*this,v,divides<T,T,T> (),*this);
+  return *this; 
+}
+
+template <class T,size_t Size>
+vec<T,Size>& vec<T,Size>::operator /= (const vec<T,Size>& v) 
+{ 
+  make_binary_operation<vec<T,Size> >(*this,v,divides<T,T,T> (),*this);
   return *this; 
 }
         
 template <class T,size_t Size>
-const vec<T,Size> vec<T,Size>::operator + (const vec& v) const  
+const vec<T,Size> vec<T,Size>::operator + (const vec<T,Size>& v) const  
 { 
   return make_binary_operation<vec<T,Size> >(*this,v,plus<T,T,T> ());
 }
 
 template <class T,size_t Size>
-const vec<T,Size> vec<T,Size>::operator - (const vec& v) const  
+const vec<T,Size> vec<T,Size>::operator - (const vec<T,Size>& v) const  
 { 
   return make_binary_operation<vec<T,Size> >(*this,v,minus<T,T,T> ());
 }
 
-template <class T,size_t Size> template<class T2>
-const vec<T,Size> vec<T,Size>::operator * (const T2& a) const  
+template <class T,size_t Size>
+const vec<T,Size> vec<T,Size>::operator * (const T& a) const  
 { 
   return make_binary_operation<vec<T,Size> >(*this,a,multiplies<T,T,T> ());
 }
 
-template <class T,size_t Size> template<class T2>
-const vec<T,Size> vec<T,Size>::operator / (const T2& a) const  
+template <class T,size_t Size>
+const vec<T,Size> vec<T,Size>::operator * (const vec<T,Size>& a) const  
+{ 
+  return make_binary_operation<vec<T,Size> >(*this,a,multiplies<T,T,T> ());
+}
+
+template <class T,size_t Size>
+const vec<T,Size> vec<T,Size>::operator / (const T& a) const  
+{ 
+  return make_binary_operation<vec<T,Size> >(*this,a,divides<T,T,T> ());
+}
+
+template <class T,size_t Size>
+const vec<T,Size> vec<T,Size>::operator / (const vec<T,Size>& a) const  
 { 
   return make_binary_operation<vec<T,Size> >(*this,a,divides<T,T,T> ());
 }
@@ -256,32 +282,21 @@ bool vec<T,Size>::operator >= (const vec& v) const
 */
 
 template<class T,size_t Size>
-inline const matrix<T,Size,1>  vec<T,Size>::to_matrix_column () const
+  const matrix<T,Size,1>  to_matrix_column (const vec<T,Size>& src)
 {
   matrix<T,Size,1> res;
-  for(int i=0;i<Size;i++) res[i][0]=(*this)[i];
+  for(int i=0;i<Size;i++) res[i][0]=src[i];
   return res;
 }
 
 template<class T,size_t Size>
-inline const matrix<T,1,Size> vec<T,Size>::to_matrix_row () const
+  const matrix<T,1,Size> to_matrix_row (const vec<T,Size>& src)
 {
   matrix<T,1,Size> res;
-  res[0]=(*this);
+  res[0]=(src);
   return res;
 }
 
-template <class T,size_t Size>
-vec<T,Size>::operator const vec<T,Size-1>& () const
-{
-  return *(const vec<T,Size-1>*)this;
-}
-
-template <class T,size_t Size>
-vec<T,Size>::operator vec<T,Size-1>& ()
-{
-  return *(vec<T,Size-1>*)this;
-}
 
 /*
   Векторное произведение
@@ -294,16 +309,11 @@ vec<T,Size>::operator vec<T,Size-1>& ()
         Утилиты
 */
 
-/*template <class T,size_t Size> 
-T scalar_multiply (const vec<T,Size>& a,const vec<T,Size>& b)
-{
-  return vec_dot_product (a,b);
-} */
 
 template <class T,size_t Size> 
-const vec<T,Size> vec<T,Size>::abs ()
+inline const vec<T,Size> abs (const vec<T,Size>& src)
 {
-  return make_unary_operation<vec<T,Size> >(*this,absol<T> ());
+  return make_unary_operation<vec<T,Size> >(src,absol<T> ());
 }
 
 template <class T,size_t Size>
@@ -319,9 +329,9 @@ const vec<T,Size> max (const vec<T,Size>& a,const vec<T,Size>& b)
 } 
 
 template <class T,size_t Size> 
-const vec<T,Size> vec<T,Size>::normalize() const
+const vec<T,Size> normalize(const vec<T, Size>& src)
 {
-  return make_binary_operation<vec<T,Size> > (*this,length(),divides <T> ());
+  return make_binary_operation<vec<T,Size> > (src,src.length(),divides <T> ());
 }
 
 template <class T,size_t Size> 
@@ -331,7 +341,7 @@ bool vec<T,Size>::equal (const vec<T,Size>& b,const T& eps)
 }
 
 template <class T,size_t Size>
-T angle (const vec<T,Size>& a,const vec<T,Size>& b)
+const T angle (const vec<T,Size>& a,const vec<T,Size>& b)
 {
   T ang = acos((a&b)/sqrt(a.squared_length()*b.squared_length()));
 
@@ -353,9 +363,3 @@ vec<T,3> operator ^ (const vec<T,3>& a,const vec<T,3>& b)
 
   return res;
 } 
-
-/*template <class type>
-vec<type,4> operator ^ (const vec<type,4>& a,const vec<type,4>& b)
-{
-  return vec<type,4> (a,b,vec_cross_product<type>);
-} */
