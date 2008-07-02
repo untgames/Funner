@@ -27,6 +27,15 @@ Renderer::~Renderer ()
 }
 
 /*
+    Описание
+*/
+
+const char* Renderer::GetDescription ()
+{
+  return "render::mid_level::debug::renderer2d::Renderer";
+}
+
+/*
     Создание ресурсов
 */
 
