@@ -19,7 +19,8 @@ typedef xtl::com_ptr<IDriver>                      DriverPtr;
 typedef xtl::com_ptr<render::mid_level::IRenderer> RendererPtr;
 typedef xtl::com_ptr<renderer2d::IRenderer>        Renderer2dPtr;
 typedef xtl::com_ptr<renderer2d::ITexture>         Texture2dPtr;
-typedef xtl::com_ptr<renderer2d::ISpriteList>      SpriteListPtr;
+typedef xtl::com_ptr<renderer2d::IPrimitive>       Primitive2dPtr;
+typedef xtl::com_ptr<renderer2d::IFrame>           Frame2dPtr;
 
 //общий код тестов
 class Test

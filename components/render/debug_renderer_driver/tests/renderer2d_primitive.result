@@ -1,12 +1,12 @@
-Results of renderer2d_sprite_list_test:
+Results of renderer2d_primitive_test:
 Create debug driver
-Create 2D renderer (id=1)
-Create sprite list (id=4)
-SpriteList (size=4):
+Create 2D renderer (id=2)
+Create primitive (id=5)
+Primitive (size=4):
 sprite #0: position=[0 0 0] size=[1 0] color=[0 1 0 0] tex_offset=[0 0] tex_size=[1 1]
 sprite #1: position=[1 1 1] size=[1 1] color=[0 1 0 1] tex_offset=[0 0] tex_size=[1 1]
 sprite #2: position=[2 2 2] size=[1 4] color=[0 1 0 2] tex_offset=[0 0] tex_size=[1 1]
 sprite #3: position=[3 3 3] size=[1 9] color=[0 1 0 3] tex_offset=[0 0] tex_size=[1 1]
-Destroy sprite list (id=4)
-Destroy 2D renderer (id=1)
+Destroy primitive (id=5)
+Destroy 2D renderer (id=2)
 Destroy debug driver

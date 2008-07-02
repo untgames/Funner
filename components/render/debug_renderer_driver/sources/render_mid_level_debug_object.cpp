@@ -21,7 +21,7 @@ const char* LOG_NAME = "render.mid_level.debug";    //имя потока протоколировани
 Object::Object ()
   : log (LOG_NAME)
 {
-  static size_t global_id = 0;
+  static size_t global_id = 1;
 
   id = global_id++;
   

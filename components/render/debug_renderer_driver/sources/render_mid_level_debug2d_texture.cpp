@@ -3,13 +3,14 @@
 using namespace render::mid_level;
 using namespace render::mid_level::renderer2d;
 using namespace render::mid_level::debug;
+using namespace render::mid_level::debug::renderer2d;
 using namespace media;
 
 /*
     Конструктор / деструктор
 */
 
-Texture2d::Texture2d (size_t width, size_t height, media::PixelFormat in_format)
+Texture::Texture (size_t width, size_t height, media::PixelFormat in_format)
   : RenderTarget (width, height, RenderTargetType_Color), format (in_format)
 {
   switch (format)
@@ -25,13 +26,13 @@ Texture2d::Texture2d (size_t width, size_t height, media::PixelFormat in_format)
     case PixelFormat_LA8:
       break;
     default:
-      throw xtl::make_argument_exception ("render::mid_level::debug::Texture2d::Texture2d", "format", format);
+      throw xtl::make_argument_exception ("render::mid_level::debug::renderer2d::Texture::Texture", "format", format);
   }
   
   log.Printf ("Create texture %ux%u (format=%d)", width, height, format);
 }
 
-Texture2d::~Texture2d ()
+Texture::~Texture ()
 {
   try
   {
@@ -47,9 +48,9 @@ Texture2d::~Texture2d ()
     Копирование образа текстуры в картинку
 */
 
-void Texture2d::CaptureImage (media::Image& image)
+void Texture::CaptureImage (media::Image& image)
 {
   media::Image (GetWidth (), GetHeight (), 1, GetFormat ()).Swap (image);
 
-  log.Printf ("Capture image from texture #%u", Id ());  
+  log.Printf ("Capture image from texture (id=%u)", Id ());  
 }

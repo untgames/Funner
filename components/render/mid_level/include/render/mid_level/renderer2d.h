@@ -2,7 +2,6 @@
 #define RENDER_MID_LEVEL_RENDERER2D_HEADER
 
 #include <render/mid_level/renderer.h>
-#include <render/mid_level/common.h>
 
 namespace media
 {
@@ -53,44 +52,60 @@ struct Sprite
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///—писок спрайтов
+///ѕримитив
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ISpriteList: virtual public IObject
+class IPrimitive: virtual public IObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-/// оличество спрайтов в списке
+///ћатрица преобразований
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t GetSize () = 0;
+    virtual void SetTransform (const math::mat4f&) = 0;
+    virtual void GetTransform (math::mat4f&) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///”становка / чтение данных
+///”становка базовой текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetSprites (size_t first, size_t count, const Sprite* sprites) = 0;
-    virtual void GetSprites (size_t first, size_t count, Sprite* sprites) = 0;
+    virtual void      SetTexture (ITexture*) = 0;
+    virtual ITexture* GetTexture () = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–ежим смешивани€ цветов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void      SetBlendMode (BlendMode blend_mode) = 0;
+    virtual BlendMode GetBlendMode () = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///—прайты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual size_t GetSpritesCount  () = 0;                                            //количество спрайтов
+    virtual void   GetSprite        (size_t index, Sprite& sprite) = 0;                //получение спрайта
+    virtual size_t AddSprites       (size_t sprites_count, const Sprite* sprites) = 0; //добавление спрайтов
+    virtual void   RemoveSprites    (size_t first_sprite, size_t sprites_count) = 0;   //удаление спрайтов
+    virtual void   RemoveAllSprites () = 0;                                            //удаление всех спрайтов
+    virtual void   ReserveSprites   (size_t sprites_count) = 0;                        //резервирование места дл€ спрайтов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///—писок спрайтов
+/// адр 2D визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct Primitive
+class IFrame: virtual public mid_level::IFrame
 {
-  ITexture*    texture;       //базова€ текстура
-  ISpriteList* sprite_list;   //список спрайтов
-  math::mat4f  transform;     //матрица преобразовани€ координат
-  BlendMode    blend_mode;    //режим наложени€  
-  size_t       first_sprite;  //номер первого спрайта
-  size_t       sprites_count; //количество спрайтов
-};
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ћатрица вида / матрица преобразовани€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void SetView       (const math::mat4f&) = 0;
+    virtual void SetProjection (const math::mat4f&) = 0;
+    virtual void GetView       (math::mat4f&) = 0;
+    virtual void GetProjection (math::mat4f&) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ѕакет визуализации 2D-примитивов
+///ѕримитивы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct Frame: public mid_level::Frame
-{
-  math::vec2f size;             //логические размеры кадра
-  size_t      primitives_count; //количество примитивов в кадре
-  Primitive*  primitives;       //примитивы
+    virtual size_t PrimitivesCount () = 0;            //количество примитивов в кадре
+    virtual void   AddPrimitive    (IPrimitive*) = 0; //добавление примитива
+    virtual void   Clear           () = 0;            //очистка кадра
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,14 +117,10 @@ class IRenderer: virtual public mid_level::IRenderer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—оздание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual ITexture*    CreateTexture    (const media::Image& image) = 0;
-    virtual ITexture*    CreateTexture    (size_t width, size_t height, media::PixelFormat pixel_format) = 0;
-    virtual ISpriteList* CreateSpriteList (size_t sprites_count) = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///ƒобавление кадра на отрисовку
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void AddFrame (Frame*) = 0;
+    virtual ITexture*   CreateTexture   (const media::Image& image) = 0;
+    virtual ITexture*   CreateTexture   (size_t width, size_t height, media::PixelFormat pixel_format) = 0;
+    virtual IPrimitive* CreatePrimitive () = 0;
+    virtual IFrame*     CreateFrame     () = 0;
 };
 
 }

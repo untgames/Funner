@@ -77,7 +77,7 @@ IRenderer* Driver::CreateRenderer (const char* name)
   if (xtl::xstrcmp (name, RENDERER2D_NAME))
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Unknown renderer");
     
-  return new Renderer2d;
+  return new renderer2d::Renderer;
 }
 
 namespace
