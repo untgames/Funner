@@ -18,6 +18,7 @@
 #include <sg/camera.h>
 #include <sg/visual_model.h>
 #include <sg/sound_emitter.h>
+#include <sg/sprite.h>
 
 #include "scene_object.h"
 

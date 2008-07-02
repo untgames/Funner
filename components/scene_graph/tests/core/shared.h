@@ -14,6 +14,7 @@
 #include <sg/camera.h>
 #include <sg/sound_emitter.h>
 #include <sg/visual_model.h>
+#include <sg/sprite.h>
 #include <sg/scene.h>
 
 using namespace scene_graph;
