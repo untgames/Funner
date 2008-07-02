@@ -148,9 +148,13 @@ class XmlMaterialLibrarySaver: public xtl::visitor<void, CommonMaterial, MultiPa
 
     void visit (CommonMaterial& material)
     {
-      XmlWriter::Scope scope (writer, "common_profile");
+      XmlWriter::Scope scope (writer, "common_profile");      
       
-      writer.WriteAttribute ("shader_type", get_name (material.ShaderType ()));
+      writer.WriteAttribute ("shader_type", get_name (material.ShaderType ()));      
+
+      for (size_t i=0; i<CommonMaterialPin_Num; i++)
+        writer.WriteAttribute (get_name ((CommonMaterialPin)i), material.IsEnabled ((CommonMaterialPin)i));      
+      
       writer.WriteAttribute ("shininess", material.Shininess ());
       writer.WriteAttribute ("transparency", material.Transparency ());
       
@@ -262,11 +266,6 @@ class XmlMaterialLibrarySaver: public xtl::visitor<void, CommonMaterial, MultiPa
       writer.WriteAttribute ("id", id);
       writer.WriteAttribute ("name", material.Name ());
       writer.WriteAttribute ("sort_group", material.SortGroup ());
-
-        //сохранение пинов
-
-      for (size_t i=0; i<MaterialPin_Num; i++)
-        writer.WriteAttribute (get_name ((MaterialPin)i), material.IsEnabled ((MaterialPin)i));
 
         //сохранение специализации материала
 

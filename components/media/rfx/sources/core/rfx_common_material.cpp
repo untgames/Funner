@@ -26,9 +26,12 @@ struct MapImpl
     Описание реализации CommonMaterial
 */
 
+typedef stl::bitset<CommonMaterialPin_Num> PinSet;
+
 struct CommonMaterial::Impl
 {
   CommonMaterialShaderType shader_type;                      //тип шейдера
+  PinSet                   pins;                             //пины    
   vec3f                    colors [CommonMaterialColor_Num]; //цвета
   float                    shininess;                        //"металличность"
   float                    transparency;                     //прозрачность
@@ -104,6 +107,26 @@ void CommonMaterial::SetShaderType (CommonMaterialShaderType type)
     throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetShaderType", "type", type);
     
   impl->shader_type = type;
+}
+
+/*
+    Работа с логическими свойствами
+*/
+
+bool CommonMaterial::IsEnabled (CommonMaterialPin pin) const
+{
+  if (pin < 0 || pin >= CommonMaterialPin_Num)
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::IsEnabled", "pin", pin);
+
+  return impl->pins.test (pin);
+}
+
+void CommonMaterial::SetPin (CommonMaterialPin pin, bool state)
+{
+  if (pin < 0 || pin >= CommonMaterialPin_Num)
+    throw xtl::make_argument_exception ("media::rfx::CommonMaterial::SetPin", "pin", pin);
+
+  impl->pins.set (pin, state);
 }
 
 /*
@@ -399,6 +422,22 @@ const char* get_name (CommonMaterialMap id)
     case CommonMaterialMap_Reflective:  return "reflective";
     case CommonMaterialMap_Bump:        return "bump";
     default:                            throw xtl::make_argument_exception ("media::rfx::get_name(CommonMaterialMap)", "id", id);
+  }
+
+  return "";
+}
+
+const char* get_name (CommonMaterialPin pin)
+{
+  switch (pin)
+  {
+    case CommonMaterialPin_TwoSided:        return "two_sided";
+    case CommonMaterialPin_Wireframe:       return "wireframe";
+    case CommonMaterialPin_Lighting:        return "lighting";
+    case CommonMaterialPin_CastShadows:     return "cast_shadows";
+    case CommonMaterialPin_ReceiveShadows:  return "recv_shadows";
+    case CommonMaterialPin_SelfShadow:      return "self_shadow";
+    default:                          throw xtl::make_argument_exception ("media::rfx::get_name(CommonMaterialPin)", "pin", pin);
   }
 
   return "";

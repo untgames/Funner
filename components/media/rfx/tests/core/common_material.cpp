@@ -60,6 +60,13 @@ void dump (const Texmap& texmap)
 void dump (const CommonMaterial& shader)
 {
   printf ("Common material '%s'\n", shader.Name ());
+
+  static const char* pin_name [] = {"two_sided", "wireframe", "lighting", "cast_shadows", "receive_shadows",
+                                    "self_shadow"};
+
+  for (size_t i=0; i<CommonMaterialPin_Num; i++)
+    printf ("  pin '%s' %s\n", pin_name [i], shader.IsEnabled ((CommonMaterialPin)i) ? "enabled" : "disabled");    
+
   printf ("  type: ");
 
   switch (shader.ShaderType ())
@@ -126,6 +133,14 @@ int main ()
   CommonMaterial::Pointer shader = CommonMaterial::Create ();
   
   shader->Rename ("shader1");
+  
+  shader->Enable (CommonMaterialPin_TwoSided);
+  shader->Enable (CommonMaterialPin_Wireframe);
+//  shader->Enable (CommonMaterialPin_Lighting);
+  shader->Enable (CommonMaterialPin_CastShadows);
+//  shader->Enable (CommonMaterialPin_ReceiveShadows);
+  shader->Enable (CommonMaterialPin_SelfShadow);  
+
   shader->SetColor (CommonMaterialColor_Emission, 0.2f, 1.2f, -2.0f);
   shader->SetShininess (320);
   shader->SetTransparency (0.4f);

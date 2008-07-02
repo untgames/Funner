@@ -176,7 +176,7 @@ class XmlMaterialLibraryLoader
     {
         //создание материала
       
-      CommonMaterial::Pointer material = CommonMaterial::Create ();
+      CommonMaterial::Pointer material = CommonMaterial::Create ();            
       
         //чтение типа шейдера
         
@@ -190,6 +190,23 @@ class XmlMaterialLibraryLoader
         
       material->SetShaderType (GetEnumValue (profile_iter, "shader_type", shader_type_map_size, shader_type_map,
                                              material->ShaderType ()));
+                                             
+        //загрузка пинов
+             
+      static const Name2Value<CommonMaterialPin> pin_name_map [] = {
+        {"two_sided",    CommonMaterialPin_TwoSided},
+        {"wireframe",    CommonMaterialPin_Wireframe},
+        {"lighting",     CommonMaterialPin_Lighting},
+        {"cast_shadows", CommonMaterialPin_CastShadows},
+        {"recv_shadows", CommonMaterialPin_ReceiveShadows},
+        {"self_shadow",  CommonMaterialPin_SelfShadow}
+      };
+      
+      static const size_t pin_name_map_size = sizeof (pin_name_map) / sizeof (*pin_name_map);
+      
+      for (size_t i=0; i<pin_name_map_size; i++)
+        material->SetPin (pin_name_map [i].value, get<size_t> (log, profile_iter, pin_name_map [i].string,
+                          material->IsEnabled (pin_name_map [i].value)) ? true : false);                                             
       
         //чтение вещественных параметров
         
@@ -344,23 +361,6 @@ class XmlMaterialLibraryLoader
       int sort_group = get<int> (log, mtl_iter, "sort_group", material->SortGroup ());
 
       material->SetSortGroup (sort_group);
-
-        //загрузка пинов
-             
-      static const Name2Value<MaterialPin> pin_name_map [] = {
-        {"two_sided",    MaterialPin_TwoSided},
-        {"wireframe",    MaterialPin_Wireframe},
-        {"lighting",     MaterialPin_Lighting},
-        {"cast_shadows", MaterialPin_CastShadows},
-        {"recv_shadows", MaterialPin_ReceiveShadows},
-        {"self_shadow",  MaterialPin_SelfShadow}
-      };
-      
-      static const size_t pin_name_map_size = sizeof (pin_name_map) / sizeof (*pin_name_map);
-      
-      for (size_t i=0; i<pin_name_map_size; i++)
-        material->SetPin (pin_name_map [i].value, get<size_t> (log, mtl_iter, pin_name_map [i].string,
-                          material->IsEnabled (pin_name_map [i].value)) ? true : false);
 
         //регистрация материала
 

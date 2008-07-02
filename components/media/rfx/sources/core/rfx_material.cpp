@@ -8,13 +8,10 @@ using namespace common;
     Описание реализации Material
 */
 
-typedef stl::bitset<MaterialPin_Num> PinSet;
-
 struct Material::Impl: public xtl::reference_counter
 {
   stl::string name;       //имя материала
   size_t      name_hash;  //хэш имени
-  PinSet      pins;       //пины  
   int         sort_group; //группа сортировки
 
   Impl () : name_hash (strhash ("")), sort_group (0) {}
@@ -74,26 +71,6 @@ void Material::Rename (const char* name)
 }
 
 /*
-    Работа с логическими свойствами
-*/
-
-bool Material::IsEnabled (MaterialPin pin) const
-{
-  if (pin < 0 || pin >= MaterialPin_Num)
-    throw xtl::make_argument_exception ("media::rfx::Material::IsEnabled", "pin", pin);
-    
-  return impl->pins.test (pin);
-}
-
-void Material::SetPin (MaterialPin pin, bool state)
-{
-  if (pin < 0 || pin >= MaterialPin_Num)
-    throw xtl::make_argument_exception ("media::rfx::Material::SetPin", "pin", pin); 
-    
-  impl->pins.set (pin, state);
-}
-
-/*
     Динамическая диспетчеризация
 */
 
@@ -133,38 +110,4 @@ void Material::AddRef () const
 void Material::Release () const
 {
   release (impl.get ());
-}
-
-/*
-    Утилиты
-*/
-
-namespace media
-{
-
-namespace rfx
-{
-
-/*
-    Получение имени пина
-*/
-
-const char* get_name (MaterialPin pin)
-{
-  switch (pin)
-  {
-    case MaterialPin_TwoSided:        return "two_sided";
-    case MaterialPin_Wireframe:       return "wireframe";
-    case MaterialPin_Lighting:        return "lighting";
-    case MaterialPin_CastShadows:     return "cast_shadows";
-    case MaterialPin_ReceiveShadows:  return "recv_shadows";
-    case MaterialPin_SelfShadow:      return "self_shadow";
-    default:                          throw xtl::make_argument_exception ("media::rfx::get_name(MaterialPin)", "pin", pin);
-  }
-
-  return "";
-}
-
-}
-
 }

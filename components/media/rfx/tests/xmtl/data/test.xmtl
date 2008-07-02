@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <material_library>
-  <material id="common_material1" name="common_material1" sort_group="0" two_sided="0" wireframe="0" lighting="0" cast_shadows="0" recv_shadows="0" self_shadow="0">
-    <common_profile shader_type="gourand" shininess="0" transparency="0" blend_equation="add" blend_arg1="one" blend_arg2="zero" alpha_test_mode="pass" alpha_test_ref="0">
+  <material id="common_material1" name="common_material1" sort_group="0">
+    <common_profile shader_type="gourand" two_sided="0" wireframe="0" lighting="0" cast_shadows="0" recv_shadows="0" self_shadow="0" shininess="0" transparency="0" blend_equation="add" blend_arg1="one" blend_arg2="zero" alpha_test_mode="pass" alpha_test_ref="0">
       <emission>
         0 0 0
       </emission>
@@ -21,9 +21,9 @@
       </map>
     </common_profile>
   </material>
-  <material id="test_material2" name="test_material2" sort_group="0" two_sided="0" wireframe="0" lighting="0" cast_shadows="0" recv_shadows="0" self_shadow="0"/>
+  <material id="test_material2" name="test_material2" sort_group="0"/>
   <material id="common_material2" name="common_material2" sort_group="0" two_sided="0" wireframe="0" lighting="0" cast_shadows="0" recv_shadows="0" self_shadow="0">
-    <common_profile shader_type="gourand" shininess="0" transparency="0" blend_equation="add" blend_arg1="one" blend_arg2="zero" alpha_test_mode="pass" alpha_test_ref="0">
+    <common_profile shader_type="gourand" two_sided="0" wireframe="0" lighting="0" cast_shadows="0" recv_shadows="0" self_shadow="0" shininess="0" transparency="0" blend_equation="add" blend_arg1="one" blend_arg2="zero" alpha_test_mode="pass" alpha_test_ref="0">
       <emission>
         0 0 0
       </emission>
@@ -38,7 +38,7 @@
       </specular>
     </common_profile>
   </material>
-  <material id="material1" name="material1" sort_group="234" two_sided="0" wireframe="0" lighting="0" cast_shadows="0" recv_shadows="0" self_shadow="0">
+  <material id="material1" name="material1" sort_group="234">
     <multipass_profile passes_count="5">
       <pass material="common_material1" enable="1"/>
       <pass material="test_material2" enable="1"/>

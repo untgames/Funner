@@ -129,6 +129,21 @@ enum MapState
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ћогические свойства материала
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum CommonMaterialPin
+{
+  CommonMaterialPin_TwoSided,       //двусторонний материал
+  CommonMaterialPin_Wireframe,      //проволочное представление
+  CommonMaterialPin_Lighting,       //освещение
+  CommonMaterialPin_CastShadows,    //геометри€, св€занна€ с материалом, отбрасывает тень
+  CommonMaterialPin_ReceiveShadows, //геометри€, св€занна€ с материалом, принимает тень
+  CommonMaterialPin_SelfShadow,     //самозатенение геометрии
+
+  CommonMaterialPin_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕолучение имени
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const char* get_name (BlendEquation);
@@ -137,6 +152,7 @@ const char* get_name (CompareMode);
 const char* get_name (CommonMaterialShaderType);
 const char* get_name (CommonMaterialColor);
 const char* get_name (CommonMaterialMap);
+const char* get_name (CommonMaterialPin);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕроход по умолчанию
@@ -157,6 +173,14 @@ class CommonMaterial: public Material
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     CommonMaterialShaderType ShaderType    () const;
     void                     SetShaderType (CommonMaterialShaderType);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–абота с логическими свойствами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool IsEnabled (CommonMaterialPin) const;
+    void SetPin    (CommonMaterialPin pin, bool state);
+    void Enable    (CommonMaterialPin pin) { SetPin (pin, true); }
+    void Disable   (CommonMaterialPin pin) { SetPin (pin, false); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///÷вета
