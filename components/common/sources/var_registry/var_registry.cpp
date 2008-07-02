@@ -7,7 +7,7 @@ using namespace xtl;
     Описание реализации реестра переменных
 */
 
-struct VarRegistry::Impl : public trackable, public reference_counter, private MountPointsMap::IListener
+class VarRegistry::Impl : public trackable, public reference_counter, private MountPointsMap::IListener
 {
   public:
 ///Конструкторы
