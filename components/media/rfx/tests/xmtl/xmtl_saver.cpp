@@ -10,6 +10,7 @@ int main ()
   {
     CommonMaterial::Pointer common_material1 = CommonMaterial::Create (),
                             common_material2 = xtl::static_pointer_cast<CommonMaterial> (common_material1->Clone ());
+    SpriteMaterial::Pointer sprite_material  = SpriteMaterial::Create ();
     Material::Pointer       test_material1   = TestMaterial::Create (),
                             test_material2   = test_material1;
 
@@ -17,12 +18,18 @@ int main ()
     common_material2->Rename ("common_material2");
     test_material1->Rename   ("test_material1");
     test_material2->Rename   ("test_material2");
+    sprite_material->Rename  ("sprite_material");
     
     common_material2->SetColor (CommonMaterialColor_Diffuse, vec3f (0.5f));
     
     Texmap& texmap = common_material1->Map (CommonMaterialMap_Diffuse);
     
     common_material1->SetMapWeight (CommonMaterialMap_Diffuse, 0.5f);
+    
+    sprite_material->SetImage ("image1.tga");
+    sprite_material->EnableTiling ();
+    sprite_material->SetTileSize (10, 20);
+    sprite_material->SetBlendMode (SpriteBlendMode_Translucent);
     
     texmap.SetTransform  (math::translatef (1, 2, 3));
     texmap.SetSource     (Texcoord_S, TexcoordSource_SphereMap);
@@ -55,6 +62,7 @@ int main ()
     library.Attach ("material1", mtl1);
     library.Attach ("material2", mtl1);
     library.Attach ("common_material2", common_material2);
+    library.Attach ("sprite_material", sprite_material);
     
     library.Save (DST_FILE_NAME);
   }

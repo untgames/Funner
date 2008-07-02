@@ -103,7 +103,7 @@ class XmlMaterialLibraryPreSaver: public xtl::visitor<void, MultiPassMaterial>
     }
 };
 
-class XmlMaterialLibrarySaver: public xtl::visitor<void, CommonMaterial, MultiPassMaterial>
+class XmlMaterialLibrarySaver: public xtl::visitor<void, CommonMaterial, MultiPassMaterial, SpriteMaterial>
 {
   private: 
     typedef stl::hash_set<const Material*> MaterialSet;
@@ -141,14 +141,33 @@ class XmlMaterialLibrarySaver: public xtl::visitor<void, CommonMaterial, MultiPa
         writer.WriteAttribute ("enable", material.IsPassEnabled (i));
       }
     }
+    
+    /*
+        Сохранение SpriteMaterial
+    */
 
+    void visit (SpriteMaterial& material)
+    {
+      XmlWriter::Scope scope (writer, "sprite_profile");
+            
+      writer.WriteAttribute ("image", material.Image ());
+      writer.WriteAttribute ("blend_mode", get_name (material.BlendMode ()));
+      writer.WriteAttribute ("tiling", material.IsTiled ());            
+      
+      if (material.IsTiled () || material.TileWidth ())
+        writer.WriteAttribute ("tile_width", material.TileWidth ());
+        
+      if (material.IsTiled () || material.TileHeight ())        
+        writer.WriteAttribute ("tile_height", material.TileHeight ());
+    }
+    
     /*
         Сохранение CommonMaterial
     */
 
     void visit (CommonMaterial& material)
     {
-      XmlWriter::Scope scope (writer, "common_profile");      
+      XmlWriter::Scope scope (writer, "common_profile");
       
       writer.WriteAttribute ("shader_type", get_name (material.ShaderType ()));      
 

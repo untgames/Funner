@@ -285,6 +285,42 @@ class XmlMaterialLibraryLoader
     }
     
     /*
+        Разбор профиля "sprite"
+    */
+    
+    SpriteMaterial::Pointer ParseSpriteMaterial (Parser::Iterator profile_iter)
+    {
+        //создание материала
+
+      SpriteMaterial::Pointer material = SpriteMaterial::Create ();            
+      
+        //чтение имени базового изображения
+      
+      material->SetImage (get<const char*> (log, profile_iter, "image", material->Image ()));
+
+        //чтение режима смешивания цветов
+
+      static const Name2Value<SpriteBlendMode> blend_mode_map [] = {
+        {"none",        SpriteBlendMode_None},
+        {"translucent", SpriteBlendMode_Translucent},
+        {"mask",        SpriteBlendMode_Mask},
+        {"additive",    SpriteBlendMode_Additive}
+      };
+      
+      static const size_t blend_mode_map_size = sizeof (blend_mode_map) / sizeof (*blend_mode_map);
+      
+      material->SetBlendMode (GetEnumValue (profile_iter, "blend_mode", blend_mode_map_size, blend_mode_map, material->BlendMode ()));      
+      
+        //чтение параметров тайлинга
+        
+      material->SetTiling   (get<size_t> (log, profile_iter, "tiling", material->IsTiled ()) != 0);
+      material->SetTileSize (get<size_t> (log, profile_iter, "tile_width", material->TileWidth ()),
+                             get<size_t> (log, profile_iter, "tile_height", material->TileHeight ()));
+                                
+      return material;
+    }
+    
+    /*
         Разбор профиля "multipass"
     */
     
@@ -340,6 +376,7 @@ class XmlMaterialLibraryLoader
       
       if      (profile_iter = mtl_iter->First ("common_profile"))    material = ParseCommonMaterial (profile_iter);
       else if (profile_iter = mtl_iter->First ("multipass_profile")) material = ParseMultiPassMaterial (profile_iter);
+      else if (profile_iter = mtl_iter->First ("sprite_profile"))    material = ParseSpriteMaterial (profile_iter);
       else
       {
         log.Error (mtl_iter, "Unknown profile at load material '%s'", id);
@@ -348,16 +385,16 @@ class XmlMaterialLibraryLoader
       
       if (!material)
         return;
-      
+
         //чтение имени материала
-        
+
       const char* name = get<const char*> (log, mtl_iter, "name");
-      
+
       if (name)
         material->Rename (name);
-        
+
         //чтение группы сортировки
-        
+
       int sort_group = get<int> (log, mtl_iter, "sort_group", material->SortGroup ());
 
       material->SetSortGroup (sort_group);
