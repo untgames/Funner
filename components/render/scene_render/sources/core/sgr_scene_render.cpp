@@ -72,9 +72,9 @@ struct View: public IViewportListener, public xtl::reference_counter
     common.need_reorder = true;    
   }  
   
-  ~View ()
+///Отсоединение от области вывода
+  void DetachFromViewport ()
   {
-    printf ("~View!!!\n");
     viewport.DetachListener (this);
   }
   
@@ -234,10 +234,17 @@ struct SceneRender::Impl: public ViewCommon
   {
     try
     {
+        //сброс функции отладочного протоколирования в пользовательских рендерах
+      
       LogFunction render_log;
 
       for (RenderPathMap::iterator iter=render_paths.begin (), end=render_paths.end (); iter!=end; ++iter)
         iter->second.render->SetLogHandler (render_log);
+        
+        //отсоединение View от областей вывода
+        
+      for (ViewArray::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
+        (*iter)->DetachFromViewport ();
     }
     catch (...)
     {
