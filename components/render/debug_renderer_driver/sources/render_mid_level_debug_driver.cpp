@@ -10,9 +10,9 @@ namespace
     Константы
 */
 
-const char* DRIVER_NAME           = "debug";                  //имя драйвера
-const char* DRIVER_COMPONENT_NAME = "render.mid_level.debug"; //имя компонента драйвера
-const char* RENDERER2D_NAME       = "renderer2d";             //имя системы двумерного рендеринга
+const char* DRIVER_NAME           = "Debug";                  //имя драйвера
+const char* DRIVER_COMPONENT_NAME = "render.mid_level.Debug"; //имя компонента драйвера
+const char* RENDERER2D_NAME       = "Renderer2d";             //имя системы двумерного рендеринга
 
 }
 

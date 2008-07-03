@@ -28,12 +28,12 @@ class Test
   public:
     Test ()
     {
-      log_connection = common::LogSystem::RegisterLogHandler ("render.mid_level.debug", &Print);
+      log_connection = common::LogSystem::RegisterLogHandler ("render.mid_level.Debug", &Print);
     }
     
     ~Test ()
     {
-      DriverManager::UnregisterDriver ("debug"); //проверка корректности удаления
+      DriverManager::UnregisterDriver ("Debug"); //проверка корректности удаления
     }    
 
   private:

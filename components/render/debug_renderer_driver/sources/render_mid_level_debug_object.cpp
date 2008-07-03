@@ -10,7 +10,7 @@ namespace
     Константы
 */
 
-const char* LOG_NAME = "render.mid_level.debug";    //имя потока протоколирования
+const char* LOG_NAME = "render.mid_level.Debug"; //имя потока протоколирования
 
 }
 

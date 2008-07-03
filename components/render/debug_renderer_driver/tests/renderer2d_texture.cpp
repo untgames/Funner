@@ -10,7 +10,7 @@ int main ()
     
       //создание базового рендера
     
-    RendererPtr basic_renderer (DriverManager::CreateRenderer ("debug", "renderer2d"), false);
+    RendererPtr basic_renderer (DriverManager::CreateRenderer ("Debug", "Renderer2d"), false);
     
       //приведение к думерному рендеру
     
