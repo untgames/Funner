@@ -11,7 +11,7 @@
 #include <syslib/window.h>
 #include <syslib/application.h>
 
-#include <render/low_level/opengl_driver.h>
+#include <render/low_level/driver.h>
 #include <render/low_level/device.h>
 #include <render/low_level/debug.h>
 #include <render/low_level/utils.h>
@@ -65,8 +65,11 @@ struct Test
   CallbackFn     redraw;
 
   Test (const wchar_t* title, const CallbackFn& in_redraw, const char* init_string="") :
-    window (syslib::WindowStyle_Overlapped, 1024, 768), driver (get_opengl_driver ()), redraw (in_redraw)
+    window (syslib::WindowStyle_Overlapped, 1024, 768), driver (DriverManager::FindDriver ("OpenGL")), redraw (in_redraw)
   {
+    if (!driver)
+      throw xtl::format_operation_exception ("Test::Test", "OpenGL driver not found");
+  
     window.SetTitle (title);
 
     SwapChainDesc desc;

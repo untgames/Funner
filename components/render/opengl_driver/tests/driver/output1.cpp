@@ -6,7 +6,7 @@ int main ()
   
   try
   {
-    IDriver* driver = get_opengl_driver ();
+    xtl::com_ptr<IDriver> driver = DriverManager::FindDriver ("OpenGL");
     
     printf ("Driver:\n");
     printf ("  description: '%s'\n", driver->GetDescription ());

@@ -8,11 +8,11 @@
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 
-#include <common/singleton.h>
+#include <common/component.h>
 
 #include <render/low_level/device.h>
 #include <render/low_level/utils.h>
-#include <render/low_level/opengl_driver.h>
+#include <render/low_level/driver.h>
 
 #include <shared/platform/output_manager.h>
 #include <shared/platform/swap_chain_manager.h>

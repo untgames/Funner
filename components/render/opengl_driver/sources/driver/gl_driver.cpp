@@ -5,6 +5,18 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
+    Константы
+*/
+
+namespace
+{
+
+const char* DRIVER_NAME    = "OpenGL";                  //имя драйвера
+const char* COMPONENT_NAME = "render.low_level.opengl"; //имя компонента
+
+}
+
+/*
     Конструктор / деструктор
 */
 
@@ -113,29 +125,26 @@ void Driver::LogMessage (const char* message) const
 }
 
 /*
-    Получение драйвера
+    Компонент драйвера
 */
 
-namespace render
+namespace
 {
 
-namespace low_level
+class OpenGLDriverComponent
 {
+  public:
+    OpenGLDriverComponent ()
+    {
+      DriverManager::RegisterDriver (DRIVER_NAME, xtl::com_ptr<Driver> (new Driver, false).get ());
+    }
+};
 
-IDriver* get_opengl_driver ()
-{
-  struct DriverHolder
-  {
-    DriverHolder () : driver (new Driver, false) {}
-
-    xtl::com_ptr<Driver> driver;
-  };
-
-  typedef Singleton<DriverHolder> DriverSingleton;
-
-  return DriverSingleton::Instance ().driver.get ();
 }
 
-}
+extern "C"
+{
+
+common::ComponentRegistrator<OpenGLDriverComponent> OpenGLDriver (COMPONENT_NAME);
 
 }

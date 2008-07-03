@@ -40,7 +40,13 @@ int main ()
     window.SetTitle ("OpenGL driver test window");
 //    window.SetPosition (1280 - 400 / 2-1, 200);    
     
-    IDriver* driver = get_opengl_driver ();    
+    xtl::com_ptr<IDriver> driver = DriverManager::FindDriver ("OpenGL");
+    
+    if (!driver)
+    {
+      printf ("OpenGL driver not found");
+      return 0;
+    }
     
     SwapChainDesc desc;
     

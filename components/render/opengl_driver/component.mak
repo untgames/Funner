@@ -14,7 +14,7 @@ RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS      := sources/common sources/platform
 RENDER.OPENGL_DRIVER.SOURCES.LIB_DIRS         :=  
 RENDER.OPENGL_DRIVER.SOURCES.LIBS             := 
 RENDER.OPENGL_DRIVER.SOURCES.COMPILER_DEFINES := GLEW_STATIC GLEW_MX
-RENDER.OPENGL_DRIVER.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak
+RENDER.OPENGL_DRIVER.SOURCES.IMPORTS          := ../low_level/compile.static.mak ../../common/compile.static.mak
 RENDER.OPENGL_DRIVER.SOURCES.msvc.COMPILER_CFLAGS  := -wd4355
 
 #Öåëü ¹2 - OpenGL render system tests
@@ -25,7 +25,7 @@ RENDER.OPENGL_DRIVER.TESTS.LIB_DIRS         :=
 RENDER.OPENGL_DRIVER.TESTS.LIBS             :=
 RENDER.OPENGL_DRIVER.TESTS.COMPILER_CFLAGS  :=
 RENDER.OPENGL_DRIVER.TESTS.COMPILER_DEFINES := 
-RENDER.OPENGL_DRIVER.TESTS.IMPORTS          := link.static.mak compile.static.mak \
+RENDER.OPENGL_DRIVER.TESTS.IMPORTS          := link.static.mak ../low_level/compile.static.mak \
                                        ../../system/compile.static.mak ../../system/link.static.mak ../../common/link.static.mak \
                                        ../../media/image/compile.static.mak ../../media/geometry/compile.static.mak \
                                        ../../media/geometry/compile.static.mak  ../../media/image/link.static.mak \

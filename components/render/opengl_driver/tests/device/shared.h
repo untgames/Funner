@@ -12,7 +12,7 @@
 
 #include <syslib/window.h>
 
-#include <render/low_level/opengl_driver.h>
+#include <render/low_level/driver.h>
 #include <render/low_level/device.h>
 #include <render/low_level/debug.h>
 #include <render/low_level/utils.h>
@@ -60,8 +60,11 @@ struct Test
   DevicePtr      device;
   
   Test (const wchar_t* title, const char* init_string="") :
-    window (syslib::WindowStyle_Overlapped, 400, 400), driver (get_opengl_driver ())
+    window (syslib::WindowStyle_Overlapped, 400, 400), driver (DriverManager::FindDriver ("OpenGL"))
   {
+    if (!driver)
+      throw xtl::format_operation_exception ("Test::Test", "OpenGL driver not found");
+
     window.SetTitle (title);
 //    window.Hide ();
 

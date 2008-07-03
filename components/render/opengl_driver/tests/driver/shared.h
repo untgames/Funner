@@ -8,7 +8,7 @@
 
 #include <syslib/window.h>
 
-#include <render/low_level/opengl_driver.h>
+#include <render/low_level/driver.h>
 #include <render/low_level/debug.h>
 
 #include <xtl/intrusive_ptr.h>
