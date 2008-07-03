@@ -27,6 +27,7 @@ RENDER.SCENE_RENDER.RENDER2D.SOURCES.COMPILER_CFLAGS  :=
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.COMPILER_DEFINES :=
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak ../../scene_graph/compile.static.mak \
                                                          ../mid_level/compile.static.mak
+RENDER.SCENE_RENDER.RENDER2D.SOURCES.msvc.COMPILER_CFLAGS  := -wd4355
 
 #Öåëü ¹3 - Scene render tests
 RENDER.SCENE_RENDER.CORE.TESTS.TYPE             := test-suite
@@ -48,4 +49,5 @@ RENDER.SCENE_RENDER.RENDER2D.TESTS.LIBS             :=
 RENDER.SCENE_RENDER.RENDER2D.TESTS.DLLS             :=
 RENDER.SCENE_RENDER.RENDER2D.TESTS.DLL_DIRS         :=
 RENDER.SCENE_RENDER.RENDER2D.TESTS.COMPILER_CFLAGS  :=
-RENDER.SCENE_RENDER.RENDER2D.TESTS.IMPORTS          := compile.static.mak render2d.link.static.mak ../debug_renderer_driver/link.static.mak
+RENDER.SCENE_RENDER.RENDER2D.TESTS.IMPORTS          := compile.static.mak render2d.link.static.mak ../debug_renderer_driver/link.static.mak \
+                                                       ../../scene_graph/compile.static.mak ../../common/compile.static.mak

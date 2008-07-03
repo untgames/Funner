@@ -2,6 +2,8 @@
 
 int main ()
 {
+  printf ("Results of init2d_test:\n");
+
   try
   {
     SceneRender render ("Debug", "Renderer2d", "Render2d");    

@@ -66,6 +66,7 @@ struct View: public IViewportListener, public xtl::reference_counter
   
   ~View ()
   {
+    printf ("~View\n");
     viewport.DetachListener (this);
   }
   
@@ -77,7 +78,7 @@ struct View: public IViewportListener, public xtl::reference_counter
         //определение сцены
 
       scene_graph::Camera* camera = viewport.Camera ();
-      scene_graph::Scene*  scene  = camera ? camera->Scene () : 0;
+      scene_graph::Scene*  scene  = camera ? camera->Scene () : 0;            
 
       if (need_update_path || scene != current_scene) //условие пересоздания области вывода
         render_view = 0;
@@ -106,8 +107,10 @@ struct View: public IViewportListener, public xtl::reference_counter
           //создание области рендеринга
 
         ICustomSceneRender& render = *iter->second;
-
+        
         render_view = RenderViewPtr (render.CreateRenderView (scene), false);
+        
+          //добавить перечисление и установку свойств из Viewport!!!
 
           //явное разрешение обновления всех параметров вывода
 
@@ -138,7 +141,7 @@ struct View: public IViewportListener, public xtl::reference_counter
         need_update_area = false;
       }
 
-      need_update_view = false;            
+      need_update_view = false;
     }
     catch (xtl::exception& exception)
     {
@@ -229,12 +232,15 @@ struct SceneRender::Impl: public ViewCommon
     catch (...)
     {
       //подавление всех исключений
-    }
+    }    
   }
   
     //отладочное протоколирование
   void LogMessage (const char* message)
   {
+    if (!log_handler)
+      return;
+
     try
     {
       log_handler (message);
@@ -247,6 +253,9 @@ struct SceneRender::Impl: public ViewCommon
   
   void LogPrintf (const char* format, ...)
   {
+    if (!log_handler)
+      return;
+    
     va_list args;
     
     va_start (args, format);
@@ -297,7 +306,7 @@ struct SceneRender::Impl: public ViewCommon
       UpdateBackgroundColor ();
       
       //рисование областей вывода
-      
+
     for (ViewArray::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
     {
       try
@@ -307,15 +316,32 @@ struct SceneRender::Impl: public ViewCommon
       catch (std::exception& exception)
       {
         Viewport& viewport = (*iter)->viewport;
-        
-        LogPrintf ("Exception at render viewport '%s' render_path '%s': %s", viewport.Name (), viewport.RenderPath (), exception.what ());
+
+        LogPrintf ("Exception at render viewport '%s' with render_path '%s' on renderer '%s': %s", viewport.Name (),
+          viewport.RenderPath (), renderer->GetDescription (), exception.what ());
       }
       catch (...)
       {
         Viewport& viewport = (*iter)->viewport;
 
-        LogPrintf ("Unknown exception at render viewport '%s' render_path '%s': %s", viewport.Name (), viewport.RenderPath ());
+        LogPrintf ("Unknown exception at render viewport '%s' with render_path '%s' on renderer '%s': %s", viewport.Name (),
+          renderer->GetDescription (), viewport.RenderPath ());
       }
+    }
+    
+      //рисование кадров
+      
+    try
+    {
+      renderer->DrawFrames ();
+    }
+    catch (std::exception& exception)
+    {
+      LogPrintf ("Exception at draw frames on renderer '%s': %s", renderer->GetDescription (), exception.what ());
+    }
+    catch (...)
+    {
+      LogPrintf ("Unknown exception at draw frames on renderer '%s'", renderer->GetDescription ());
     }
   }
 };
@@ -411,7 +437,7 @@ void SceneRender::SetRenderer
     {
       const char* path_name = iter->c_str ();
 
-        //создание пути ренедринга        
+        //создание пути рендеринга
         
       CustomSceneRenderPtr render_path = SceneRenderManagerImpl::Instance ().CreateRender (renderer.get (), path_name);
       

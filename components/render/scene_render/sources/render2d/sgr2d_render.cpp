@@ -2,6 +2,7 @@
 
 using namespace render;
 using namespace render::render2d;
+using namespace scene_graph;
 
 /*
     Конструктор / деструктор
@@ -33,7 +34,7 @@ Render::~Render ()
 
 IRenderView* Render::CreateRenderView (scene_graph::Scene* scene)
 {
-  throw xtl::make_not_implemented_exception ("render::render2d::Render::CreateRenderView");
+  return new RenderView (scene, this);
 }
 
 /*
@@ -78,30 +79,44 @@ void Render::Release ()
   release (this);
 }
 
-#if 0
-
 /*
-    Получение примитива соответствующего объекту сцены / удаление примитива из кэша
+    Работа с кэшем
 */
 
-Render::Primitive* Render::FindPrimitive (scene_graph::Entity* entity)
+Renderable* Render::GetRenderable (scene_graph::Sprite* entity)
 {
-  PrimitiveMap::iterator iter = primitives_cache.find (entity);
-  
-  if (iter != primitives_cache.end ())
-    return iter->second.get ();
-    
-  return 0;
+    //попытка найти объект в кэше
+
+  RenderableMap::iterator iter = renderables_cache.find (entity);
+
+  if (iter != renderables_cache.end ())
+    return iter->second.renderable.get ();
+
+    //создание нового спрайта
+
+  RenderablePtr renderable (new RenderableSprite (entity, *renderer), false);
+
+  InsertRenderable (entity, renderable);
+
+  return &*renderable;
 }
 
-void Render::InsertPrimitive (scene_graph::Sprite* sprite)
-{
-  
+void Render::InsertRenderable (scene_graph::Entity* entity, const RenderablePtr& renderable)
+{  
+  renderables_cache.insert_pair (entity, RenderableHolder (renderable,
+    entity->RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&Render::RemoveRenderable, this, entity))));
 }
 
-void Render::RemovePrimitive (scene_graph::Entity* entity)
+void Render::RemoveRenderable (scene_graph::Entity* entity)
 {
-  primitives_cache.erase (entity);
+  renderables_cache.erase (entity);
 }
 
-#endif
+/*
+    Добавление кадра на отрисовку    
+*/
+
+void Render::AddFrame (IFrame* frame)
+{
+  renderer->AddFrame (frame);
+}
