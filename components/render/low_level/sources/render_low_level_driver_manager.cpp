@@ -7,10 +7,22 @@
 #include <render/low_level/driver.h>
 
 #include <common/singleton.h>
+#include <common/component.h>
 #include <common/strlib.h>
 
 using namespace render::low_level;
 using namespace common;
+
+/*
+    Константы
+*/
+
+namespace
+{
+
+const char* DRIVER_COMPONENTS_MASK = "render.low_level.*"; //маска имён компонентов низкоуровневых драйверов отрисовки
+
+}
 
 namespace render
 {
@@ -51,6 +63,12 @@ class DriverManagerImpl
                                    IDevice*&            out_device);     //результирующее устройство отрисовки
 
   private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Загрузка драйверов по умолчанию
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LoadDefaultDrivers ();
+
+  private:
     typedef xtl::com_ptr<IDriver>      DriverPtr;
     typedef stl::hash_map<stl::string, DriverPtr> DriverMap;
     
@@ -60,6 +78,21 @@ class DriverManagerImpl
 
 }
 
+}
+
+/*
+    Загрузка драйверов по умолчанию
+*/
+
+void DriverManagerImpl::LoadDefaultDrivers ()
+{
+  try
+  {
+    static ComponentLoader loader (DRIVER_COMPONENTS_MASK);
+  }
+  catch (...)
+  {
+  }
 }
 
 /*
@@ -100,6 +133,8 @@ IDriver* DriverManagerImpl::FindDriver (const char* name)
   if (!name)
     return 0;
     
+  LoadDefaultDrivers ();
+    
   DriverMap::iterator iter = drivers.find (name);
   
   return iter != drivers.end () ? get_pointer (iter->second) : 0;
@@ -113,6 +148,8 @@ ISwapChain* DriverManagerImpl::CreateSwapChain (const char* driver_mask, const S
 {
   if (!driver_mask)
     driver_mask = "*";
+    
+  LoadDefaultDrivers ();
     
     //поиск драйвера
 
@@ -139,6 +176,8 @@ bool DriverManagerImpl::CreateSwapChainAndDevice
     
   if (!init_string)
     init_string = "";
+    
+  LoadDefaultDrivers ();
     
     //поиск драйвера
     
