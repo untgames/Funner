@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<material_library>
+  <material id="sprite_material" name="sprite_material" sort_group="0">
+    <sprite_profile image="data/pic2.tga" blend_mode="translucent" tiling="1" tile_width="10" tile_height="20"/>
+  </material>
+</material_library>

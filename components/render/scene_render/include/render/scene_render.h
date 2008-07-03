@@ -86,6 +86,12 @@ class SceneRender
     void CaptureImage (media::Image&);
     void CaptureImage (const char* image_name);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с ресурсами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LoadResource (const char* tag, const char* file_name);
+    void LoadResource (const char* file_name) { LoadResource ("auto", file_name); }
+
   private:
     SceneRender (const SceneRender&); //no impl
     SceneRender& operator = (const SceneRender&); //no impl

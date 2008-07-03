@@ -18,11 +18,19 @@ const size_t DEFAULT_WINDOW_HEIGHT       = 100; //высота окна по умолчанию
     ќсновные переопределени€
 */
 
-typedef xtl::com_ptr<IRenderView>                   RenderViewPtr;
-typedef stl::hash_map<size_t, CustomSceneRenderPtr> RenderPathMap;
+struct RenderPathHolder
+{
+  CustomSceneRenderPtr render;  
+  stl::string          name;
+  
+  RenderPathHolder (const CustomSceneRenderPtr& in_render, const char* in_name) : render (in_render), name (in_name) {}
+};
+
+typedef xtl::com_ptr<IRenderView>               RenderViewPtr;
+typedef stl::hash_map<size_t, RenderPathHolder> RenderPathMap;
 
 /*
-    ќбщие пераметры дл€ всех облстей вывода
+    ќбщие пераметры дл€ всех областей вывода
 */
 
 struct ViewCommon
@@ -66,7 +74,7 @@ struct View: public IViewportListener, public xtl::reference_counter
   
   ~View ()
   {
-    printf ("~View\n");
+    printf ("~View!!!\n");
     viewport.DetachListener (this);
   }
   
@@ -106,7 +114,7 @@ struct View: public IViewportListener, public xtl::reference_counter
 
           //создание области рендеринга
 
-        ICustomSceneRender& render = *iter->second;
+        ICustomSceneRender& render = *iter->second.render;
         
         render_view = RenderViewPtr (render.CreateRenderView (scene), false);
         
@@ -122,6 +130,8 @@ struct View: public IViewportListener, public xtl::reference_counter
 
       if (need_update_camera)
       {
+        render_view->SetCamera (camera);
+        
         current_scene = scene;
         
         need_update_camera = false;
@@ -227,7 +237,7 @@ struct SceneRender::Impl: public ViewCommon
       LogFunction render_log;
 
       for (RenderPathMap::iterator iter=render_paths.begin (), end=render_paths.end (); iter!=end; ++iter)
-        iter->second->SetLogHandler (render_log);
+        iter->second.render->SetLogHandler (render_log);
     }
     catch (...)
     {
@@ -287,7 +297,7 @@ struct SceneRender::Impl: public ViewCommon
   void UpdateBackgroundColor ()
   {
     for (RenderPathMap::iterator iter=render_paths.begin (), end=render_paths.end (); iter!=end; ++iter)
-      iter->second->SetBackgroundColor (background_color);
+      iter->second.render->SetBackgroundColor (background_color);
 
     need_update_background_color = false;
   }
@@ -317,15 +327,15 @@ struct SceneRender::Impl: public ViewCommon
       {
         Viewport& viewport = (*iter)->viewport;
 
-        LogPrintf ("Exception at render viewport '%s' with render_path '%s' on renderer '%s': %s", viewport.Name (),
-          viewport.RenderPath (), renderer->GetDescription (), exception.what ());
+        LogPrintf ("%s\n    at render viewport='%s', render_path='%s', renderer='%s'", exception.what (), viewport.Name (),
+          viewport.RenderPath (), renderer->GetDescription ());
       }
       catch (...)
       {
         Viewport& viewport = (*iter)->viewport;
 
-        LogPrintf ("Unknown exception at render viewport '%s' with render_path '%s' on renderer '%s': %s", viewport.Name (),
-          renderer->GetDescription (), viewport.RenderPath ());
+        LogPrintf ("Unknown exception\n    at render viewport='%s', render_path='%s', renderer='%s'", viewport.Name (),
+          viewport.RenderPath (), renderer->GetDescription ());        
       }
     }
     
@@ -342,6 +352,38 @@ struct SceneRender::Impl: public ViewCommon
     catch (...)
     {
       LogPrintf ("Unknown exception at draw frames on renderer '%s'", renderer->GetDescription ());
+    }
+  }
+  
+    //загрузка ресурса
+  void LoadResource (const char* tag, const char* file_name)
+  {
+    static const char* METHOD_NAME = "render::SceneRender::Impl::LoadResource";
+    
+    if (!tag)
+      throw xtl::make_null_argument_exception ("", "tag");
+      
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+      
+    for (RenderPathMap::iterator iter=render_paths.begin (), end=render_paths.end (); iter!=end; ++iter)
+    {
+      RenderPathHolder& holder = iter->second;
+
+      try
+      {
+        holder.render->LoadResource (tag, file_name);
+      }
+      catch (std::exception& exception)
+      {
+        LogPrintf ("%s\n    at load resource (file_name='%s', tag='%s', render_path='%s', renderer='%s')",
+          exception.what (), file_name, tag, holder.name.c_str (), renderer->GetDescription ());
+      }
+      catch (...)
+      {
+        LogPrintf ("Unknown exception\n    at SceneRender::LoadResource (file_name='%s', tag='%s', render_path='%s', renderer='%s')",
+          file_name, tag, holder.name.c_str (), renderer->GetDescription ());
+      }
     }
   }
 };
@@ -447,7 +489,7 @@ void SceneRender::SetRenderer
 
         //регистраци€ пути рендеринга
         
-      render_paths.insert_pair (common::strhash (path_name), render_path);
+      render_paths.insert_pair (common::strhash (path_name), RenderPathHolder (render_path, path_name));
 
         //модификаци€ строки имЄн путей рендеринга
 
@@ -572,6 +614,15 @@ void SceneRender::Draw ()
   {
     //подавление всех исключений
   }
+}
+
+/*
+    –абота с ресурсами
+*/
+
+void SceneRender::LoadResource (const char* tag, const char* file_name)
+{
+  impl->LoadResource (tag, file_name);
 }
 
 /*

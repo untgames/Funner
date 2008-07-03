@@ -32,7 +32,7 @@ int main ()
     
     sprite->SetName ("Sprite1");
     camera->SetName ("Camera1");
-    sprite->SetMaterial ("Material1");
+    sprite->SetMaterial ("sprite_material");
 
       //!!!отсутствует настройка положения камеры и спрайта!!!
 
@@ -51,6 +51,10 @@ int main ()
     vp1.SetRenderPath ("Render2d");
 
     render.Attach (vp1);
+    
+      //загрузка ресурсов
+      
+    render.LoadResource ("data/materials.xmtl");
     
       //отрисовка
       

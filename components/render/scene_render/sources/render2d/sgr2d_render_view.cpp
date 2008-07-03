@@ -146,19 +146,35 @@ void RenderView::GetProperty (const char*, size_t buffer_size, char* value_buffe
 
 void RenderView::Draw ()
 {
+  if (!camera)
+    return;
+
+    //очистка кадра
+    
+  frame->Clear ();
+
     //установка цвета очистки
 
   math::vec4f clear_color;
 
   render->GetBackgroundColor (clear_color);
 
-  frame->SetClearColor (clear_color);
+  frame->SetClearColor (clear_color);    
+  
+    //установка матриц вида и проекции
+    
+  frame->SetProjection (camera->ProjectionMatrix ());
+  frame->SetView       (invert (camera->WorldTM ()));
 
     //обход сцены
 
   RenderViewVisitor visitor (frame, render);
 
   scene->VisitEach (visitor);
+  
+    //добавление кадра на отрисовку
+    
+  render->Renderer ()->AddFrame (frame.get ());
 }
 
 /*

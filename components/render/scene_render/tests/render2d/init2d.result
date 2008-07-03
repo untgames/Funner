@@ -1,4 +1,4 @@
 Results of init2d_test:
 renderer: render::mid_level::debug::renderer2d::Renderer
-paths:    render2d
+paths:    Render2d
 window:   left=0 top=0 width=100 height=100

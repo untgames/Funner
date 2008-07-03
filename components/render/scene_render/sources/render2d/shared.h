@@ -10,8 +10,14 @@
 #include <xtl/connection.h>
 #include <xtl/bind.h>
 #include <xtl/visitor.h>
+#include <xtl/iterator.h>
 
 #include <common/component.h>
+#include <common/strlib.h>
+
+#include <media/image.h>
+#include <media/rfx/material_library.h>
+#include <media/rfx/sprite_material.h>
 
 #include <sg/scene.h>
 #include <sg/camera.h>
@@ -30,13 +36,18 @@ namespace render2d
 //forward declaration
 class Render;
 
-typedef mid_level::renderer2d::IPrimitive IPrimitive;
-typedef mid_level::renderer2d::IRenderer  IRenderer;
-typedef mid_level::renderer2d::IFrame     IFrame;
+typedef mid_level::renderer2d::IPrimitive  IPrimitive;
+typedef mid_level::renderer2d::IRenderer   IRenderer;
+typedef mid_level::renderer2d::IFrame      IFrame;
+typedef mid_level::renderer2d::ITexture    ITexture;
+typedef mid_level::renderer2d::BlendMode   BlendMode;
+typedef media::rfx::SpriteMaterial         SpriteMaterial;
 
-typedef xtl::com_ptr<IPrimitive> PrimitivePtr;
-typedef xtl::com_ptr<IRenderer>  RendererPtr;
-typedef xtl::com_ptr<IFrame>     FramePtr;
+typedef xtl::com_ptr<IPrimitive>     PrimitivePtr;
+typedef xtl::com_ptr<IRenderer>      RendererPtr;
+typedef xtl::com_ptr<IFrame>         FramePtr;
+typedef xtl::com_ptr<ITexture>       TexturePtr;
+typedef xtl::com_ptr<SpriteMaterial> SpriteMaterialPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовый визуализируемый объект
@@ -70,7 +81,7 @@ class Renderable: public xtl::reference_counter
 class RenderableSprite: public Renderable
 {
   public:
-    RenderableSprite (scene_graph::Sprite* sprite, IRenderer& renderer);
+    RenderableSprite (scene_graph::Sprite* sprite, Render& render);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование
@@ -81,6 +92,7 @@ class RenderableSprite: public Renderable
     void UpdateNotify ();
 
   private:
+    Render&              render;
     scene_graph::Sprite* sprite;
     PrimitivePtr         primitive;
 };
@@ -160,10 +172,17 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     void GetBackgroundColor (math::vec4f& color);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с ресурсами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LoadResource (const char* tag, const char* file_name);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции отладочного протоколирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetLogHandler (const LogFunction&);
     const LogFunction& GetLogHandler ();
+
+    void LogPrintf (const char* format, ...);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -177,9 +196,11 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     const RendererPtr& Renderer () const { return renderer; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с кэшем примитивов
+///Работа с кэшем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Renderable* GetRenderable (scene_graph::Sprite*);
+    Renderable*     GetRenderable (scene_graph::Sprite*);
+    ITexture*       GetTexture    (const char* file_name);    
+    SpriteMaterial* GetMaterial   (const char* name);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление кадра на отрисовку
@@ -188,7 +209,20 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 
   private:
     typedef xtl::intrusive_ptr<Renderable> RenderablePtr;
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с кэшем примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void InsertRenderable (scene_graph::Entity*, const RenderablePtr&);
+    void RemoveRenderable (scene_graph::Entity*);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с ресурсами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LoadMaterialLibrary (const char* file_name);
+    void InsertMaterial      (const char* id, const SpriteMaterialPtr&);
+
+  private:
     struct RenderableHolder
     {
       RenderablePtr        renderable;
@@ -196,19 +230,19 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 
       RenderableHolder (const RenderablePtr& in_renderable, const xtl::connection& in_on_destroy) :
         renderable (in_renderable), on_destroy (in_on_destroy) {}
-    };
+    };  
 
-    void InsertRenderable (scene_graph::Entity*, const RenderablePtr&);
-    void RemoveRenderable (scene_graph::Entity*);
-
-  private:
-    typedef stl::hash_map<scene_graph::Entity*, RenderableHolder> RenderableMap;
+    typedef stl::hash_map<scene_graph::Entity*, RenderableHolder>        RenderableMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, SpriteMaterialPtr> MaterialMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr>        TextureMap;
 
   private:
-    math::vec4f    clear_color;       //цвет очистки
-    LogFunction    log_handler;       //функция протоколирования
-    RendererPtr    renderer;          //система рендеринга
-    RenderableMap  renderables_cache; //кэш визуализируемых объектов
+    math::vec4f   clear_color;       //цвет очистки
+    LogFunction   log_handler;       //функция протоколирования
+    RendererPtr   renderer;          //система рендеринга
+    RenderableMap renderables_cache; //кэш визуализируемых объектов
+    MaterialMap   materials;         //материалы
+    TextureMap    textures;          //текстуры
 };
 
 }
