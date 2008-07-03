@@ -45,7 +45,6 @@ struct MyApplication::Impl
       log_stream (xtl::bind (&Impl::LogWriteBuffer, this, _1, _2)),
       window (configuration.GetInteger ("FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ? 
         syslib::WindowStyle_PopUp : syslib::WindowStyle_Overlapped, configuration.GetInteger ("WindowWidth", DEFAULT_WINDOW_WIDTH), configuration.GetInteger ("WindowHeight", DEFAULT_WINDOW_HEIGHT)),
-      driver (get_opengl_driver ()),
       sound_manager (0),
       scene_player (0)
     {
@@ -111,8 +110,8 @@ struct MyApplication::Impl
       desc.fullscreen                = configuration.GetInteger ("FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) != 0;
       desc.window_handle             = window.Handle ();
       
-      swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);
-      device     = DevicePtr (driver->CreateDevice (&*swap_chain, configuration.GetString ("DeviceInitString", DEFAULT_DEVICE_INIT_STRING)), false);
+      render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, configuration.GetString ("DeviceInitString", DEFAULT_DEVICE_INIT_STRING),
+        swap_chain, device);
       
         //оповещение об изменении размеров
       
@@ -383,7 +382,6 @@ struct MyApplication::Impl
     OutputFile          log_file;            //файл протолирования
     OutputTextStream    log_stream;          //поток протоколирования работы приложения
     syslib::Window      window;              //главное окно приложения
-    DriverPtr           driver;              //OpenGL driver
     SwapChainPtr        swap_chain;          //цепочка обмена главного окна приложения
     DevicePtr           device;              //устройство рендеринга главного окна приложения
     xtl::connection     app_idle_connection; //соединение сигнала обработчика холостого хода приложения

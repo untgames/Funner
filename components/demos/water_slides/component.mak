@@ -17,7 +17,7 @@ WATER_SLIDES.COMPILER_DEFINES :=
 WATER_SLIDES.EXECUTION_DIR    := .
 WATER_SLIDES.IMPORTS          := ../../system/compile.static.mak ../../system/link.static.mak \
                                  ../../media/image/compile.static.mak ../../media/image/link.static.mak \
-                                 ../../render/opengl_driver/compile.static.mak ../../render/opengl_driver/link.static.mak  \
+                                 ../../render/low_level/compile.static.mak ../../render/opengl_driver/link.static.mak  \
                                  ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
                                   ../../media/sound/default_decoders.link.static.mak \
                                  ../../media/sound/snddecl.link.static.mak  \

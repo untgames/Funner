@@ -495,7 +495,8 @@ class TestView: public IGameView
 
 //          v.color.alpha = unsigned char (200.0f - next_field->U [i][j] * 150.0f);
           
-          static const float vis = 0.01f;
+//          static const float vis = 0.01f;
+          static const float vis = 0.1f;          
 //          static const float vis = 0.02f;
 
           float laplas = (next_field->U [i-1][j] +
