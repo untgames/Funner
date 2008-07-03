@@ -4,6 +4,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/common_exceptions.h>
 
+#include <render/low_level/device.h>
 #include <render/low_level/driver.h>
 
 #include <common/singleton.h>
@@ -56,11 +57,11 @@ class DriverManagerImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool CreateSwapChainAndDevice (const char*          driver_mask,     //маска имени драйвера
-                                   const SwapChainDesc& swap_chain_desc, //дескриптор цепочки обмена
-                                   const char*          init_string,     //строка инициализации
-                                   ISwapChain*&         out_swap_chain,  //результирующая цепочка обмена
-                                   IDevice*&            out_device);     //результирующее устройство отрисовки
+    void CreateSwapChainAndDevice (const char*               driver_mask,     //маска имени драйвера
+                                   const SwapChainDesc&      swap_chain_desc, //дескриптор цепочки обмена
+                                   const char*               init_string,     //строка инициализации
+                                   xtl::com_ptr<ISwapChain>& out_swap_chain,  //результирующая цепочка обмена
+                                   xtl::com_ptr<IDevice>&    out_device);     //результирующее устройство отрисовки
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,12 +165,12 @@ ISwapChain* DriverManagerImpl::CreateSwapChain (const char* driver_mask, const S
     Создание устройства отрисовки
 */
 
-bool DriverManagerImpl::CreateSwapChainAndDevice
- (const char*          driver_mask,      //маска имени драйвера
-  const SwapChainDesc& swap_chain_desc,  //дескриптор цепочки обмена
-  const char*          init_string,      //строка инициализации
-  ISwapChain*&         out_swap_chain,   //результирующая цепочка обмена
-  IDevice*&            out_device)       //результирующее устройство отрисовки
+void DriverManagerImpl::CreateSwapChainAndDevice
+ (const char*               driver_mask,      //маска имени драйвера
+  const SwapChainDesc&      swap_chain_desc,  //дескриптор цепочки обмена
+  const char*               init_string,      //строка инициализации
+  xtl::com_ptr<ISwapChain>& out_swap_chain,   //результирующая цепочка обмена
+  xtl::com_ptr<IDevice>&    out_device)       //результирующее устройство отрисовки
 {
   if (!driver_mask)
     driver_mask = "*";
@@ -189,21 +190,16 @@ bool DriverManagerImpl::CreateSwapChainAndDevice
         //создание SwapChain и устройства отрисовки
 
       xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (swap_chain_desc), false);
-      
-      IDevice* device = driver->CreateDevice (get_pointer (swap_chain), init_string);
-      
-      swap_chain->AddRef ();
+      xtl::com_ptr<IDevice>    device (driver->CreateDevice (get_pointer (swap_chain), init_string), false);      
 
-      out_swap_chain = get_pointer (swap_chain);
+      out_swap_chain = swap_chain;
       out_device     = device;
 
-      return true;
+      return;
     }
-    
-  out_swap_chain = 0;
-  out_device     = 0;
 
-  return false;
+  throw xtl::format_operation_exception ("render::low_level::DriverManagerImpl::CreateSwapChainAndDevice",
+    "No match driver found (driver_mask='%s')", driver_mask);
 }
 
 /*
@@ -232,12 +228,31 @@ ISwapChain* DriverManager::CreateSwapChain (const char* driver_mask, const SwapC
   return DriverManagerSingleton::Instance ().CreateSwapChain (driver_mask, swap_chain_desc);
 }
 
-bool DriverManager::CreateSwapChainAndDevice
+void DriverManager::CreateSwapChainAndDevice
+ (const char*               driver_mask,
+  const SwapChainDesc&      swap_chain_desc,
+  const char*               init_string,
+  xtl::com_ptr<ISwapChain>& out_swap_chain,
+  xtl::com_ptr<IDevice>&    out_device)
+{
+  DriverManagerSingleton::Instance ().CreateSwapChainAndDevice (driver_mask, swap_chain_desc, init_string, out_swap_chain, out_device);
+}
+
+void DriverManager::CreateSwapChainAndDevice
  (const char*          driver_mask,
   const SwapChainDesc& swap_chain_desc,
   const char*          init_string,
   ISwapChain*&         out_swap_chain,
   IDevice*&            out_device)
 {
-  return DriverManagerSingleton::Instance ().CreateSwapChainAndDevice (driver_mask, swap_chain_desc, init_string, out_swap_chain, out_device);
+  xtl::com_ptr<ISwapChain> swap_chain;
+  xtl::com_ptr<IDevice>    device;
+
+  CreateSwapChainAndDevice (driver_mask, swap_chain_desc, init_string, swap_chain, device);
+  
+  swap_chain->AddRef ();
+  device->AddRef ();
+  
+  out_swap_chain = &*swap_chain;
+  out_device     = &*device;
 }

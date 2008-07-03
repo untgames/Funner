@@ -4,6 +4,14 @@
 #include <render/low_level/object.h>
 #include <render/low_level/common.h>
 
+namespace xtl
+{
+
+//forward declaration
+template <class T> class com_ptr;
+
+}
+
 namespace render
 {
 
@@ -178,11 +186,16 @@ class DriverManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static bool CreateSwapChainAndDevice (const char*          driver_mask,     //маска имени драйвера
+    static void CreateSwapChainAndDevice (const char*          driver_mask,     //маска имени драйвера
                                           const SwapChainDesc& swap_chain_desc, //дескриптор цепочки обмена
                                           const char*          init_string,     //строка инициализации
                                           ISwapChain*&         out_swap_chain,  //результирующая цепочка обмена
                                           IDevice*&            out_device);     //результирующее устройство отрисовки
+    static void CreateSwapChainAndDevice (const char*               driver_mask,     //маска имени драйвера
+                                          const SwapChainDesc&      swap_chain_desc, //дескриптор цепочки обмена
+                                          const char*               init_string,     //строка инициализации
+                                          xtl::com_ptr<ISwapChain>& out_swap_chain,  //результирующая цепочка обмена
+                                          xtl::com_ptr<IDevice>&    out_device);     //результирующее устройство отрисовки
 };
 
 }
