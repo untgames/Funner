@@ -25,19 +25,19 @@ template <class T, size_t Size> const T& get_component (const math::vec<T, Size>
 template <class T,size_t Size>
 inline vec<T,Size>::vec ()
 {
-  *this=make_unary_operation<vec<T,Size> > (T(0),assign<T,T>()); 
+  make_unary_operation<vec<T,Size> > (T(0),assign<T,T>(),*this); 
 }
 
 template <class T,size_t Size> template <size_t Size1>
 vec<T,Size>::vec (const vec<T,Size1>& v) 
 {
-  *this=make_unary_operation<vec<T,Size> > (v,assign<T,T> ());
+  make_unary_operation<vec<T,Size> > (v,assign<T,T> (),*this);
 }
 
 template <class T,size_t Size> 
 vec<T,Size>::vec (const T& a)
 {
-  *this=make_unary_operation<vec<T,Size> > (a,assign<T,T>());
+  make_unary_operation<vec<T,Size> > (a,assign<T,T>(),*this);
 }
 
 template <class T,size_t Size> 
@@ -354,7 +354,7 @@ const T angle (const vec<T,Size>& a,const vec<T,Size>& b)
 
 
 template <class T>
-vec<T,3> operator ^ (const vec<T,3>& a,const vec<T,3>& b)
+const vec<T,3> operator ^ (const vec<T,3>& a,const vec<T,3>& b)
 {
   vec<T,3> res;
   res [0] = a [1] * b [2] - b [1] * a [2];

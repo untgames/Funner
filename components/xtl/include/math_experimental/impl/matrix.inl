@@ -133,14 +133,14 @@ inline const matrix<T,SizeX,SizeY> matrix<T,SizeX,SizeY>::operator - (const matr
 template <class T,size_t SizeX,size_t SizeY> 
 inline matrix<T,SizeX,SizeY>& matrix<T,SizeX,SizeY>::operator += (const matrix<T,SizeX,SizeY>& a)
 {
-  *this=make_binary_operation<matrix<T,SizeX,SizeY> >(*this,a,plus<vec<T,SizeY> >());
+  make_binary_operation<matrix<T,SizeX,SizeY> >(*this,a,plus<vec<T,SizeY> >(),*this);
   return *this;
 }
 
 template <class T,size_t SizeX,size_t SizeY>   
 inline matrix<T,SizeX,SizeY>& matrix<T,SizeX,SizeY>::operator -= (const matrix<T,SizeX,SizeY>& a)
 {
-  *this=make_binary_operation<matrix<T,SizeX,SizeY> >(*this,a,minus<vec<T,SizeY> >());
+  make_binary_operation<matrix<T,SizeX,SizeY> >(*this,a,minus<vec<T,SizeY> >(),*this);
   return *this;
 }
 

@@ -79,14 +79,10 @@ class vec: public vec_base<Type, Size>
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-  template <size_t Size1,  size_t Size2,  class Fn>
-				 vec (const vec<Type, Size1>v1, const vec<Type, Size2>v2, Fn fn);
-  template <size_t Size1, class Fn>
-				 vec (const vec<Type, Size1>& v1, const Type& arg, Fn fn);
-  template <size_t Size1, class Fn>
-				 vec (const vec<Type, Size1>& v1, Fn fn);
-  template <class Fn>
-				 vec (const Type& v1, Fn fn);
+  template <size_t Size1,  size_t Size2,  class Fn> vec (const vec<Type, Size1>v1, const vec<Type, Size2>v2, Fn fn);
+  template <size_t Size1, class Fn>                 vec (const vec<Type, Size1>& v1, const Type& arg, Fn fn);
+  template <size_t Size1, class Fn>                 vec (const vec<Type, Size1>& v1, Fn fn);
+  template <class Fn>                               vec (const Type& v1, Fn fn);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
    //временные конструкторы. Удалить после редактирования библиотеки
@@ -96,7 +92,7 @@ class vec: public vec_base<Type, Size>
     template <size_t Size1>       vec (const vec<Type, Size1>&); 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-///Унарный +, -,  длина (~)
+///Унарный +, -,  длина (length)
 ////////////////////////////////////////////////////////////////////////////////////////////
     const vec    operator +     () const;
     const vec    operator -     () const;
@@ -106,7 +102,7 @@ class vec: public vec_base<Type, Size>
 ///Присваивание
 ////////////////////////////////////////////////////////////////////////////////////////////
   template<class T> vec&   operator =  (const T&); 
-    vec&   operator =  (const base&);
+                    vec&   operator =  (const base&);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Основные бинарные операции
@@ -129,18 +125,6 @@ class vec: public vec_base<Type, Size>
     const vec  operator /  (const vec& ) const;
     const vec  operator /  (const Type&) const;
 
-////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Умножение вектора строки на матрицу столбец
-////////////////////////////////////////////////////////////////////////////////////////////
-    vec&      operator *= (const matrix<Type, Size, Size>&);
-    vec&      operator *= (const matrix<Type, Size+1, Size+1>&);
-
-    const vec operator *  (const matrix<Type, Size, Size>&) const;
-    const vec operator *  (const matrix<Type, Size+1, Size+1>&) const;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Отношения между векторами           
@@ -169,40 +153,44 @@ template <class Type> class vec<Type, 0> {};
   #pragma pack(pop)
 #endif
 
-/*
-	бинарные операции
-*/
+////////////////////////////////////////////////////////////////////////////////////////////
+///Бинарные операции
+////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T,size_t Size>
   const vec<T,Size> operator *  (const T& a, const vec<T,Size>& v)    { return v * a; }
 
 
-/*
-	Преобразования
-*/
+////////////////////////////////////////////////////////////////////////////////////////////
+///Преобразования
+////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T,size_t Size>
-  const matrix<T, Size, 1>    to_matrix_column (const vec<T,Size>&);
+const matrix<T, Size, 1>    to_matrix_column (const vec<T,Size>&);
 
 template<class T,size_t Size>
-  const matrix<T, 1, Size> to_matrix_row    (const vec<T,Size>&);
+const matrix<T, 1, Size>    to_matrix_row    (const vec<T,Size>&);
 
-/*
-	Утилиты
-*/
-
-template<class T,size_t Size>
-  const vec<T, Size> normalize (const vec<T, Size>&);
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+///Нормализация
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T,size_t Size>
-  const vec<T, Size> abs       (const vec<T, Size>&);
+const vec<T, Size> normalize (const vec<T, Size>&);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+///Покомпонентный модуль
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class T,size_t Size>
+const vec<T, Size> abs       (const vec<T, Size>&);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ///Векторное произведение
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <class T>
-  vec<T, 3> operator ^ (const vec<T, 3>& a, const vec<T, 3>& b);
+const vec<T, 3> operator ^ (const vec<T, 3>& a, const vec<T, 3>& b);
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,16 +198,16 @@ template <class T>
 //////////////////////////////////////////////////////////////////////////////////////////////////////
     
 template <class T,size_t Size>
-  const vec<T,Size> min (const vec<T,Size>&,const vec<T,Size>&); 
+const vec<T,Size> min (const vec<T,Size>&,const vec<T,Size>&); 
 
 template <class T,size_t Size>
-  const vec<T,Size> max (const vec<T,Size>&,const vec<T,Size>&); 
+const vec<T,Size> max (const vec<T,Size>&,const vec<T,Size>&); 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ///Угол между векторами
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T,size_t Size>
-  const T angle (const vec<T, Size>& a, const vec<T, Size>& b);
+const T angle (const vec<T, Size>& a, const vec<T, Size>& b);
 
 
 }
