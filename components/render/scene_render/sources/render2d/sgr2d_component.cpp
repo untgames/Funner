@@ -10,8 +10,8 @@ namespace
     Константы
 */
 
-const char* COMPONENT_NAME   = "render.scene_render.render2d"; //имя компонента
-const char* RENDER_PATH_NAME = "render2d";                     //имя пути рендеринга
+const char* COMPONENT_NAME   = "render.scene_render.Render2d"; //имя компонента
+const char* RENDER_PATH_NAME = "Render2d";                     //имя пути рендеринга
 
 /*
     Компонент рендера двумерной сцены
@@ -28,7 +28,7 @@ class SceneRender2dComponent
   private:
     static ICustomSceneRender* CreateRender (mid_level::IRenderer* renderer, const char*)
     {
-      return new SceneRender2d;
+      return new render2d::Render (renderer);
     }
 };
 

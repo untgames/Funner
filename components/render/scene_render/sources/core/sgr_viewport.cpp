@@ -3,9 +3,22 @@
 using namespace render;
 
 /*
+    Константы
+*/
+
+namespace
+{
+
+const size_t LISTENER_ARRAY_RESERVE_SIZE = 16; //резервируемый размер массива слушателей
+
+}
+
+/*
     Описание реализации Viewport
 */
 
+typedef xtl::com_ptr<IViewportListener>                        ListenerPtr;
+typedef stl::vector<ListenerPtr>                               ListenerArray;
 typedef stl::hash_map<stl::hash_key<const char*>, stl::string> PropertyMap;
 
 struct Viewport::Impl: public xtl::reference_counter
@@ -18,15 +31,26 @@ struct Viewport::Impl: public xtl::reference_counter
   bool                 is_active;         //флаг активности области вывода
   int                  z_order;           //порядок отрисовки области вывода
   PropertyMap          properties;        //переменные рендеринга
+  ListenerArray        listeners;         //слушатели событий области вывода
   xtl::auto_connection on_destroy_camera; //слот соединения с сигналом оповещения об удалении камеры
-  
+
   Impl () : camera (0), is_active (true), z_order (INT_MAX)
   {
     path_name_hash = common::strhash (path_name.c_str ());
+    
+    listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
   }
-  
+
+  ~Impl ()
+  {
+    DestroyNotify ();
+  }
+
   void SetCamera (scene_graph::Camera* in_camera)
   {
+    if (camera == in_camera)
+      return;
+    
     on_destroy_camera.disconnect ();
 
     camera = in_camera;
@@ -36,7 +60,65 @@ struct Viewport::Impl: public xtl::reference_counter
       on_destroy_camera = camera->RegisterEventHandler (scene_graph::NodeEvent_AfterDestroy,
         xtl::bind (&Impl::SetCamera, this, (scene_graph::Camera*)0));
     }
+
+    ChangeCameraNotify (camera);
+  }
+
+  template <class Fn>
+  void Notify (Fn fn)
+  {
+    for (ListenerArray::iterator iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
+    {
+      try
+      {
+        fn (*iter);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }    
+  }
+    
+  void ChangeNameNotify (const char* new_name)
+  {
+    Notify (xtl::bind (&IViewportListener::OnChangeName, _1, new_name));
+  }
+  
+  void ChangeAreaNotify (const Rect& new_area)
+  {
+    Notify (xtl::bind (&IViewportListener::OnChangeArea, _1, xtl::cref (new_area)));
+  }
+  
+  void ChangeCameraNotify (scene_graph::Camera* new_camera)
+  {
+    Notify (xtl::bind (&IViewportListener::OnChangeCamera, _1, new_camera));
+  }
+  
+  void ChangeZOrderNotify (int new_z_order)
+  {
+    Notify (xtl::bind (&IViewportListener::OnChangeZOrder, _1, new_z_order));
+  }
+  
+  void ChangeActiveNotify (bool new_state)
+  {
+    Notify (xtl::bind (&IViewportListener::OnChangeActive, _1, new_state));
+  }
+  
+  void ChangeRenderPathNotify (const char* new_path_name)
+  {
+    Notify (xtl::bind (&IViewportListener::OnChangeRenderPath, _1, new_path_name));
+  }
+  
+  void ChangePropertyNotify (const char* name, const char* new_value)
+  {
+    Notify (xtl::bind (&IViewportListener::OnChangeProperty, _1, name, new_value));
   }  
+  
+  void DestroyNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnDestroy, _1));    
+  }
 };
 
 /*
@@ -75,7 +157,12 @@ void Viewport::SetName (const char* name)
   if (!name)
     throw xtl::make_null_argument_exception ("render::Viewport::SetName", "name");
     
+  if (name == impl->name)
+    return;
+    
   impl->name = name;
+  
+  impl->ChangeNameNotify (impl->name.c_str ());
 }
 
 const char* Viewport::Name () const
@@ -101,8 +188,13 @@ void Viewport::SetRenderPath (const char* path_name)
   if (!path_name)
     throw xtl::make_null_argument_exception ("render::Viewport::SetRenderPath", "path_name");
     
+  if (impl->path_name == path_name)
+    return;
+    
   impl->path_name      = path_name;
   impl->path_name_hash = common::strhash (path_name);
+  
+  impl->ChangeRenderPathNotify (impl->path_name.c_str ());
 }
 
 const char* Viewport::RenderPath () const
@@ -121,7 +213,12 @@ size_t Viewport::RenderPathHash () const
 
 void Viewport::SetArea (const Rect& rect)
 {
+  if (impl->rect.left == rect.left && impl->rect.top == rect.top && impl->rect.width == rect.width && impl->rect.height == rect.height)
+    return;
+
   impl->rect = rect;
+
+  impl->ChangeAreaNotify (impl->rect);
 }
 
 void Viewport::SetArea (size_t left, size_t top, size_t width, size_t height)
@@ -160,7 +257,12 @@ const Rect& Viewport::Area () const
 
 void Viewport::SetZOrder (int z_order)
 {
+  if (z_order == impl->z_order)
+    return;
+
   impl->z_order = z_order;
+  
+  impl->ChangeZOrderNotify (impl->z_order);
 }
 
 int Viewport::ZOrder () const
@@ -193,7 +295,12 @@ scene_graph::Camera* Viewport::Camera ()
 
 void Viewport::SetActive (bool state)
 {
+  if (state == impl->is_active)
+    return;
+
   impl->is_active = state;
+  
+  impl->ChangeActiveNotify (impl->is_active);
 }
 
 bool Viewport::IsActive () const
@@ -219,12 +326,17 @@ void Viewport::SetProperty (const char* name, const char* value)
   
   if (iter != impl->properties.end ())
   {
-    iter->second = value;
+    if (iter->second == value)
+      return;
+
+    iter->second = value;    
   }
   else
   {
-    impl->properties.insert_pair (name, value);
+    impl->properties.insert_pair (name, value);    
   }
+  
+  impl->ChangePropertyNotify (name, value);  
 }
 
 const char* Viewport::GetProperty (const char* name) const
@@ -259,8 +371,33 @@ void Viewport::RemoveProperty (const char* name)
 }
 
 void Viewport::RemoveAllProperties ()
-{
+{  
   impl->properties.clear ();
+}
+
+/*
+    Работа со слушателями
+*/
+
+void Viewport::AttachListener (IViewportListener* listener)
+{
+  if (!listener)
+    throw xtl::make_null_argument_exception ("render::Viewport::AttachListener", "listener");
+
+  impl->listeners.push_back (listener);
+}
+
+void Viewport::DetachListener (IViewportListener* listener)
+{
+  if (!listener)
+    return;
+
+  impl->listeners.erase (stl::remove (impl->listeners.begin (), impl->listeners.end (), listener), impl->listeners.end ());
+}
+
+void Viewport::DetachAllListeners ()
+{
+  impl->listeners.clear ();
 }
 
 /*
