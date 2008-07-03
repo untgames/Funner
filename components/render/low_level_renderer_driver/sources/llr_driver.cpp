@@ -13,10 +13,7 @@ Driver::Driver ()
 
 Driver::~Driver ()
 {
-  printf ("in");
-  UnregisterAllRenderers ();
-//  UnregisterDriver ();
-  printf ("out");
+  UnregisterDriver ();
 }
 
 /*

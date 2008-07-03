@@ -267,15 +267,6 @@ class Driver: virtual public IDriver
       RendererEntry (const char* in_renderer_name, render::low_level::IDevice* in_device, render::low_level::ISwapChain* in_swap_chain)
         : renderer_name (in_renderer_name), device (in_device), swap_chain (in_swap_chain)
         {}
-
-      ~RendererEntry ()
-      {
-        printf ("1\n");
-        device = 0;
-        printf ("2\n");
-        swap_chain = 0;
-        printf ("3\n");
-      }
     };
 
     typedef xtl::shared_ptr<RendererEntry> RendererEntryPtr;

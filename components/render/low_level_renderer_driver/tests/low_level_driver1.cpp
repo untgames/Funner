@@ -9,8 +9,6 @@ typedef xtl::com_ptr<IDevice>                    DevicePtr;
 
 int main ()
 {
-    DriverPtr      opengl_driver (get_opengl_driver (), true); ///!!!!!!!!!!!!!!!!!!!!!bug
-
   try
   {
     printf ("Low level driver name is '%s'\n", LowLevelDriver::Name ());
@@ -26,6 +24,7 @@ int main ()
     printf ("\n");
 
     syslib::Window window (syslib::WindowStyle_Overlapped, 1024, 768);
+
     SwapChainPtr   swap_chain;
     DevicePtr      device;
     SwapChainDesc  desc;
@@ -42,22 +41,17 @@ int main ()
     desc.vsync                     = false;
     desc.fullscreen                = false;
     desc.window_handle             = window.Handle ();
+    
+    render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, "", swap_chain, device);
 
-    swap_chain = SwapChainPtr (opengl_driver->CreateSwapChain (desc), false);
-    device     = DevicePtr (opengl_driver->CreateDevice (&*swap_chain, ""), false);    
+    LowLevelDriver::RegisterRenderer ("MyRenderer", device.get (), swap_chain.get ());
 
-    LowLevelDriver::RegisterRenderer ("OpenGL2DRenderer", device.get (), swap_chain.get ());
-
-    IRenderer *renderer (low_level_driver->CreateRenderer ("OpenGL2DRenderer"));
-
-    printf ("exit\n");
+    xtl::com_ptr<IRenderer> renderer (render::mid_level::DriverManager::CreateRenderer (LowLevelDriver::Name (), "MyRenderer"), false);
   }
   catch (std::exception& e)
   {
     printf ("exception: %s\n", e.what ());
   }
-
-      printf ("exit1\n");
 
   return 0;
 }
