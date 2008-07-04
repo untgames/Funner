@@ -48,20 +48,23 @@ struct ViewCommon
 
 struct View: public IViewportListener, public xtl::reference_counter
 {
-  Viewport            viewport;           //область вывода
-  ViewCommon&         common;             //общие для всех областей вывода параметра
-  RenderViewPtr       render_view;        //область рендеринга
-  scene_graph::Scene* current_scene;      //текущая сцена
-  bool                need_update_view;   //необходимо обновить параметры области вывода
-  bool                need_update_area;   //необходимо обновить координаты области вывода
-  bool                need_update_camera; //необходимо обновить камеру
-  bool                need_update_path;   //необходимо обновить путь рендеринга
+  Viewport             viewport;               //область вывода
+  ViewCommon&          common;                 //общие для всех областей вывода параметра
+  RenderViewPtr        render_view;            //область рендеринга
+  scene_graph::Scene*  current_scene;          //текущая сцена
+  scene_graph::Camera* current_camera;         //текущая камера
+  bool                 need_update_view;       //необходимо обновить параметры области вывода
+  bool                 need_update_area;       //необходимо обновить координаты области вывода
+  bool                 need_update_camera;     //необходимо обновить камеру
+  bool                 need_update_path;       //необходимо обновить путь рендеринга
+  xtl::auto_connection on_camera_scene_change; //соединение с сигналом оповещения об изменении сцены в камере
 
 ///Конструктор / деструктор
   View (const Viewport& vp, ViewCommon& in_common)
     : viewport (vp),
       common (in_common),
       current_scene (0),
+      current_camera (0),
       need_update_view (true),
       need_update_area (true),
       need_update_camera (true),
@@ -86,24 +89,31 @@ struct View: public IViewportListener, public xtl::reference_counter
         //определение сцены
 
       scene_graph::Camera* camera = viewport.Camera ();
-      scene_graph::Scene*  scene  = camera ? camera->Scene () : 0;            
+      scene_graph::Scene*  scene  = camera ? camera->Scene () : 0;
+      
+      if (camera && current_camera != camera)
+      {
+          //подписка на изменение сцены в камере
+
+        on_camera_scene_change = camera->RegisterEventHandler (scene_graph::NodeEvent_AfterSceneChange, xtl::bind (&View::OnChangeScene, this));
+        current_camera         = camera;
+      }      
 
       if (need_update_path || scene != current_scene) //условие пересоздания области вывода
-        render_view = 0;
+      {
+        render_view      = 0;
+        current_scene    = 0;
+        need_update_path = need_update_camera = need_update_view = need_update_area = false;
+      }
 
           //пересоздание области вывода
 
       if (!render_view)
       {
-          //при отсутствии камеры невозможно создать область рендеринга
-
-        if (!camera)
-        {
-          need_update_path = need_update_camera = need_update_view = need_update_area = false;
-          current_scene    = 0;
-
+          //при отсутствии камеры или сцены невозможно создать область рендеринга
+        
+        if (!camera || !scene)
           return;
-        }
 
           //поиск пути рендеринга
 
@@ -115,15 +125,19 @@ struct View: public IViewportListener, public xtl::reference_counter
           //создание области рендеринга
 
         ICustomSceneRender& render = *iter->second.render;
-        
-        render_view = RenderViewPtr (render.CreateRenderView (scene), false);
-        
-          //добавить перечисление и установку свойств из Viewport!!!
+
+        RenderViewPtr new_render_view (render.CreateRenderView (scene), false);
+
+          //установка свойств области вывода в область рендеринга
+
+        for (Viewport::PropertyIterator prop_iter=viewport.CreatePropertyIterator (); prop_iter; ++prop_iter)
+          new_render_view->SetProperty (prop_iter->Name (), prop_iter->Value ());
 
           //явное разрешение обновления всех параметров вывода
 
         need_update_area = need_update_camera = true;
         need_update_path = false;
+        render_view      = new_render_view;
       }
 
         //обновление камеры
@@ -155,19 +169,7 @@ struct View: public IViewportListener, public xtl::reference_counter
     }
     catch (xtl::exception& exception)
     {
-      need_update_view = need_update_camera = need_update_path = need_update_area = false;
-      render_view      = 0;
-      current_scene    = 0;
-
       exception.touch ("render::View::UpdateRenderView");
-
-      throw;
-    }
-    catch (...)
-    {
-      need_update_view = need_update_camera = need_update_path = need_update_area = false;
-      render_view      = 0;
-      current_scene    = 0;
 
       throw;
     }
@@ -186,10 +188,18 @@ struct View: public IViewportListener, public xtl::reference_counter
   }
 
 ///Обработчики событий
+  
+  void OnChangeCamera (scene_graph::Camera*)
+  {
+    need_update_view = need_update_camera = true;
+
+    on_camera_scene_change.disconnect ();
+  }
+
   void OnChangeArea       (const Rect&)          { need_update_view    = need_update_area   = true; }
-  void OnChangeCamera     (scene_graph::Camera*) { need_update_view    = need_update_camera = true; }
   void OnChangeRenderPath (const char*)          { need_update_view    = need_update_path   = true; }
   void OnChangeZOrder     (int)                  { common.need_reorder = true; }
+  void OnChangeScene      ()                     { need_update_view    = true; }
 
   void OnChangeProperty (const char* name, const char* value)
   {

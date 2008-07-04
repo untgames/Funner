@@ -38,7 +38,8 @@ RENDER.SCENE_RENDER.CORE.TESTS.DLLS             :=
 RENDER.SCENE_RENDER.CORE.TESTS.DLL_DIRS         :=
 RENDER.SCENE_RENDER.CORE.TESTS.COMPILER_CFLAGS  :=
 RENDER.SCENE_RENDER.CORE.TESTS.IMPORTS          := compile.static.mak link.static.mak ../debug_renderer_driver/link.static.mak \
-                                                       ../../scene_graph/compile.static.mak ../../common/compile.static.mak
+                                                   ../../scene_graph/compile.static.mak ../../common/compile.static.mak \
+                                                   ../mid_level/compile.static.mak
 
 #Öåëü ¹4 - Scene render2d tests
 RENDER.SCENE_RENDER.RENDER2D.TESTS.TYPE             := test-suite

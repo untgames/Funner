@@ -1,0 +1,24 @@
+Results of custom_render_test:
+MySceneRender::Create(render::mid_level::debug::renderer2d::Renderer, MySceneRender)
+MySceneRender::MySceneRender
+LoadResource(auto, data/materials.xmtl)
+SetBackgroundColor(0.00, 0.00, 0.00, 0.00)
+Bind camera to scene
+CreateRenderView('Scene1')
+MyRenderView #1: Create view
+MyRenderView #1: SetCamera(Camera1)
+MyRenderView #1: SetViewport(0.00, 0.00, 1.00, 1.00)
+MyRenderView #1: Draw view
+Change camera scene
+MyRenderView #1: Destroy view
+CreateRenderView('Scene2')
+MyRenderView #2: Create view
+MyRenderView #2: SetCamera(Camera1)
+MyRenderView #2: SetViewport(0.00, 0.00, 1.00, 1.00)
+MyRenderView #2: Draw view
+Change viewport camera
+MyRenderView #2: SetCamera(Camera2)
+MyRenderView #2: Draw view
+Unbind camera from scene
+MyRenderView #2: Destroy view
+MySceneRender::~MySceneRender
