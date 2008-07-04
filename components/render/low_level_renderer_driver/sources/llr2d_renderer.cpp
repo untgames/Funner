@@ -28,12 +28,17 @@ void default_error_log (const char* message)
 const char* SHADER_SOURCE_CODE =
 "Parameters\n"
 "{\n"
-"  float4x4 currentViewMatrix currentObjectMatrix currentProjMatrix\n"
+"  float4x4 currentViewMatrix currentProjMatrix\n"
 "}\n"
 "ProjectionMatrix currentProjMatrix\n"
 "ViewMatrix       currentViewMatrix\n"
 "AlphaCompareMode AlwaysPass\n"
-"ObjectMatrix     currentObjectMatrix\n";
+"Texmap0\n"
+"{\n"
+"  TexcoordU Explicit\n"
+"  TexcoordV Explicit\n"
+"  Blend     Modulate\n"
+"}";
 
 }
 
@@ -46,17 +51,42 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
 {
   try
   {
-    ShaderDesc shader_desc = {"render.mid_level.low_level_driver.renderer2d.Renderer.common_shader", strlen (SHADER_SOURCE_CODE), SHADER_SOURCE_CODE, "fpp", ""};
+    ShaderDesc shader_desc;
+
+    memset (&shader_desc, 0, sizeof (shader_desc));
+
+    shader_desc.name             = "render.mid_level.low_level_driver.renderer2d.Renderer.common_shader";
+    shader_desc.source_code_size = strlen (SHADER_SOURCE_CODE);
+    shader_desc.source_code      = SHADER_SOURCE_CODE;
+    shader_desc.profile          = "fpp";
+    shader_desc.options          = "";
 
     program = device->CreateProgram (1, &shader_desc, &default_error_log);
 
     device->SSSetProgram (program.get ());
 
-    ProgramParameter program_parameters[3] = { {"currentViewMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (ProgramParameters, view_matrix)}, 
-                                               {"currentObjectMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (ProgramParameters, object_matrix)},
-                                               {"currentProjMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (ProgramParameters, projection_matrix)} };
+    ProgramParameter program_parameters[2];
+    
+    memset (program_parameters, 0, sizeof (program_parameters));
+     
+    program_parameters[0].name   = "currentViewMatrix";
+    program_parameters[0].type   = ProgramParameterType_Float4x4;
+    program_parameters[0].slot   = 0;
+    program_parameters[0].count  = 1;
+    program_parameters[0].offset = offsetof (ProgramParameters, view_matrix);
 
-    ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof (program_parameters) / sizeof (program_parameters[0]), program_parameters};
+    program_parameters[1].name   = "currentProjMatrix";
+    program_parameters[1].type   = ProgramParameterType_Float4x4;
+    program_parameters[1].slot   = 0;
+    program_parameters[1].count  = 1;
+    program_parameters[1].offset = offsetof (ProgramParameters, projection_matrix);
+
+    ProgramParametersLayoutDesc program_parameters_layout_desc;
+
+    memset (&program_parameters_layout_desc, 0, sizeof (program_parameters_layout_desc));
+
+    program_parameters_layout_desc.parameters_count = sizeof (program_parameters) / sizeof (program_parameters[0]);
+    program_parameters_layout_desc.parameters       = program_parameters;
 
     program_parameters_layout = device->CreateProgramParametersLayout (program_parameters_layout_desc);
 

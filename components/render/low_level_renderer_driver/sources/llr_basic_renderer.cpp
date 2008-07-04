@@ -88,7 +88,12 @@ IRenderTarget* BasicRenderer::CreateDepthStencilBuffer ()
 
   xtl::com_ptr<ITexture> depth_stencil_texture (device->CreateDepthStencilTexture (swap_chain.get ()), false);
 
-  ViewDesc depth_stencil_view_desc = {0, 0};
+  ViewDesc depth_stencil_view_desc;
+
+  memset (&depth_stencil_view_desc, 0, sizeof (depth_stencil_view_desc));
+
+  depth_stencil_view_desc.layer     = 0;
+  depth_stencil_view_desc.mip_level = 0;
 
   xtl::com_ptr<IView> depth_stencil_view (device->CreateView (depth_stencil_texture.get (), depth_stencil_view_desc), false);
   
@@ -101,7 +106,12 @@ IRenderTarget* BasicRenderer::CreateRenderBuffer ()
 
   xtl::com_ptr<ITexture> render_target_texture (device->CreateRenderTargetTexture (swap_chain.get (), 1), false);
 
-  ViewDesc render_target_view_desc = {0, 0};
+  ViewDesc render_target_view_desc;
+
+  memset (&render_target_view_desc, 0, sizeof (render_target_view_desc));
+
+  render_target_view_desc.layer     = 0;
+  render_target_view_desc.mip_level = 0;
 
   xtl::com_ptr<IView> render_target_view (device->CreateView (render_target_texture.get (), render_target_view_desc), false);
   

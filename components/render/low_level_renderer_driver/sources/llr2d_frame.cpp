@@ -97,33 +97,23 @@ void Frame::Clear ()
     Реализация визуализации
 */
 
-namespace
-{
-
-#pragma pack (1)
-
-struct Vertex
-{
-  math::vec3f position;
-  math::vec2f texcoord;      //color
-};
-
-}
-
 void Frame::DrawCore (render::low_level::IDevice* device)
 {
   using namespace render::low_level;
 
   if (!constant_buffer)
   {
-    BufferDesc constant_buffer_desc = {sizeof (ProgramParameters), UsageMode_Default, BindFlag_ConstantBuffer, AccessFlag_ReadWrite};
+    BufferDesc constant_buffer_desc;
+
+    constant_buffer_desc.size         = sizeof (ProgramParameters);
+    constant_buffer_desc.usage_mode   = UsageMode_Default;
+    constant_buffer_desc.bind_flags   = BindFlag_ConstantBuffer;
+    constant_buffer_desc.access_flags = AccessFlag_ReadWrite;
 
     constant_buffer = device->CreateBuffer (constant_buffer_desc);
 
     device->SSSetConstantBuffer (0, constant_buffer.get ());
   }
-
-  view_tm = math::translatef (0, 0, -15.5); //??????????
 
   constant_buffer->SetData (offsetof (ProgramParameters, view_matrix), sizeof (view_tm), &view_tm);
   constant_buffer->SetData (offsetof (ProgramParameters, projection_matrix), sizeof (proj_tm), &proj_tm);
@@ -156,11 +146,23 @@ void Frame::DrawCore (render::low_level::IDevice* device)
         break;
     }
 */    
-    math::mat4f object_tm;
-    
-    primitive.GetTransform (object_tm);
+    BlendDesc blend_desc;
 
-    constant_buffer->SetData (offsetof (ProgramParameters, object_matrix), sizeof (object_tm), &object_tm);
+    memset (&blend_desc, 0, sizeof (blend_desc));
+
+    blend_desc.blend_enable                     = true;
+    blend_desc.sample_alpha_to_coverage         = false;
+    blend_desc.blend_color_operation            = BlendOperation_Add;
+    blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
+    blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
+    blend_desc.blend_alpha_operation            = BlendOperation_Add;
+    blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
+    blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
+    blend_desc.color_write_mask                 = ColorWriteFlag_All;
+
+    xtl::com_ptr<IBlendState> blend_state (device->CreateBlendState (blend_desc), false);
+
+    device->OSSetBlendState (blend_state.get ());
 
     size_t sprites_count=primitive.GetSpritesCount ();
 
@@ -170,30 +172,44 @@ void Frame::DrawCore (render::low_level::IDevice* device)
       
       primitive.GetSprite (i, s);    
 
-      BufferDesc vertex_buffer_desc = {sizeof (Vertex) * 4, UsageMode_Default, BindFlag_VertexBuffer, AccessFlag_ReadWrite};
+      BufferDesc vertex_buffer_desc;
+
+      memset (&vertex_buffer_desc, 0, sizeof (vertex_buffer_desc));
+
+      vertex_buffer_desc.size         = sizeof (SpriteVertex) * 4;
+      vertex_buffer_desc.usage_mode   = UsageMode_Default;
+      vertex_buffer_desc.bind_flags   = BindFlag_VertexBuffer;
+      vertex_buffer_desc.access_flags = AccessFlag_ReadWrite;
 
       xtl::com_ptr<IBuffer> vertex_buffer (device->CreateBuffer (vertex_buffer_desc), false);
 
-      Vertex vertices[4] = { { math::vec3f (s.position.x - s.size.x,       s.position.y - s.size.y, s.position.z),
-                               math::vec2f (0.f, 0.f) },
-//                               math::vec2f (s.tex_offset.x,                s.tex_offset.y + s.tex_size.y) },
-                             { math::vec3f (s.position.x + s.size.x,       s.position.y - s.size.y, s.position.z), 
-                               math::vec2f (1.f, 0.f) },
-//                               math::vec2f (s.tex_offset.x + s.tex_size.x, s.tex_offset.y + s.tex_size.y) },
-                             { math::vec3f (s.position.x - s.size.x,       s.position.y + s.size.y, s.position.z), 
-                               math::vec2f (0.f, 1.f) },
-//                               math::vec2f (s.tex_offset.x,                s.tex_offset.y) },
-                             { math::vec3f (s.position.x + s.size.x,       s.position.y + s.size.y, s.position.z),
-                               math::vec2f (1.f, 1.f) } };
-//                               math::vec2f (s.tex_offset.x + s.tex_size.x, s.tex_offset.y) } };
+      vertex_buffer->SetData (0, sizeof (SpriteVertex) * 4 , primitive.GetVertexBuffer () + i * 4);
 
-      vertex_buffer->SetData (0, sizeof (vertices), vertices);
+      static VertexAttribute attributes [3];
 
-      static VertexAttribute attributes [] = {
-        {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, position), sizeof (Vertex)},
-        {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (Vertex, texcoord), sizeof (Vertex)},
-      };
-      
+      memset (attributes, 0, sizeof (attributes));      
+
+      attributes[0].semantic = VertexAttributeSemantic_Position;
+      attributes[0].format   = InputDataFormat_Vector3;
+      attributes[0].type     = InputDataType_Float;
+      attributes[0].slot     = 0;
+      attributes[0].offset   = offsetof (SpriteVertex, position);
+      attributes[0].stride   = sizeof (SpriteVertex);
+
+      attributes[1].semantic = VertexAttributeSemantic_TexCoord0;
+      attributes[1].format   = InputDataFormat_Vector2;
+      attributes[1].type     = InputDataType_Float;
+      attributes[1].slot     = 0;
+      attributes[1].offset   = offsetof (SpriteVertex, texcoord);
+      attributes[1].stride   = sizeof (SpriteVertex);
+
+      attributes[2].semantic = VertexAttributeSemantic_Color;
+      attributes[2].format   = InputDataFormat_Vector4;
+      attributes[2].type     = InputDataType_Float;
+      attributes[2].slot     = 0;
+      attributes[2].offset   = offsetof (SpriteVertex, color);
+      attributes[2].stride   = sizeof (SpriteVertex);
+
       InputLayoutDesc layout_desc;
       
       memset (&layout_desc, 0, sizeof layout_desc);

@@ -151,7 +151,7 @@ void BasicFrame::Draw (render::low_level::IDevice* device)
 
   if (need_clear_depth_stencil_target && depth_stencil_target)
     clear_flags |= ClearFlag_Depth | ClearFlag_Stencil;
-    
+
   device->ClearViews (clear_flags, clear_color, clear_depth_value, clear_stencil_index);
 
     //собственно отрисовка

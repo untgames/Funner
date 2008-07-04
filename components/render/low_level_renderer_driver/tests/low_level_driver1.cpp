@@ -16,6 +16,7 @@ const char* texture_name    = "data/texture_hut.tga";
 
 
 float sprite_angle = 0;
+float sprite_rotation = 0;
 bool screenshot_made = false;
 
 void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* renderer, Sprite& sprite1, Sprite& sprite2, IPrimitive* primitive1, IPrimitive* primitive2)
@@ -36,16 +37,24 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
     screenshot_made = true;
   }
 
-  sprite1.position = vec3f (cos (sprite_angle) * 10, sin (sprite_angle) * 10, 1.f);
-  sprite2.position = vec3f (cos (sprite_angle + 180.f) * 10, sin (sprite_angle + 180.f) * 10, -1.f);
+/*  sprite1.position = vec3f (cos (sprite_angle) * 10, sin (sprite_angle) * 10, 0.2f);  
+  sprite2.position = vec3f (cos (sprite_angle + 180.f) * 10, sin (sprite_angle + 180.f) * 10, 0.1f);
 
   primitive1->RemoveAllSprites ();
   primitive1->AddSprites (1, &sprite1);
 
   primitive2->RemoveAllSprites ();
   primitive2->AddSprites (1, &sprite2);
+  */
 
+  mat4f tm1 = translatef (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (20, 20, 1);
+  mat4f tm2 = translatef (cos (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, sin (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (20, 20, 1);
+
+  primitive1->SetTransform (tm1);
+  primitive2->SetTransform (tm2);
+  
   sprite_angle += 0.005f;
+  sprite_rotation += 0.005f;
 }
 
 //получение ортографической матрицы проекции
@@ -129,11 +138,11 @@ int main ()
 
     media::Image texture_image (texture_name, media::PixelFormat_RGBA8);
 
-    xtl::com_ptr<render::mid_level::renderer2d::ITexture>   texture1  (renderer->CreateTexture (64, 64, media::PixelFormat_RGBA8), false), texture2 (renderer->CreateTexture (texture_image), false);
+    xtl::com_ptr<render::mid_level::renderer2d::ITexture>   /*texture1  (renderer->CreateTexture (64, 64, media::PixelFormat_RGBA8), false),*/ texture2 (renderer->CreateTexture (texture_image), false), texture1 (texture2);
     xtl::com_ptr<render::mid_level::renderer2d::IPrimitive> primitive1 (renderer->CreatePrimitive (), false), primitive2 (renderer->CreatePrimitive (), false);
 
-    Sprite sprite1 = {vec3f (-10.f, -10.f, 1.f), vec2f (20.f, 20.f), vec4f (1.f, 1.f, 1.f, 0.5f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
-    Sprite sprite2 = {vec3f (10.f, 10.f, -1.f), vec2f (20.f, 20.f), vec4f (1.f, 1.f, 1.f, 0.5f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
+    Sprite sprite1 = {vec3f (0.f, 0.f, 0.f), vec2f (1.f, 1.f), vec4f (1.f, 1.f, 1.f, 0.5f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
+    Sprite sprite2 = {vec3f (0.f, 0.f, 0.f), vec2f (1.f, 1.f), vec4f (1.f, 1.f, 1.f, 0.5f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
 
     primitive1->SetTexture (texture1.get ());
     primitive2->SetTexture (texture2.get ());

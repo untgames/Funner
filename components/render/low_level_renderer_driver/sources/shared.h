@@ -348,6 +348,16 @@ class RenderTargetTexture: virtual public mid_level::renderer2d::ITexture, publi
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Выводимая вершина
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct SpriteVertex
+{
+  math::vec3f position;
+  math::vec2f texcoord;
+  math::vec4f color;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Примитив
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
@@ -357,7 +367,6 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Primitive  ();
-    ~Primitive ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица преобразований
@@ -392,8 +401,20 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     void   RemoveAllSprites ();
     void   ReserveSprites   (size_t sprites_count);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение данных для отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    SpriteVertex* GetVertexBuffer () { return sprite_vertex_buffer.data (); }
+
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Построение вершинных данных для спрайта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void BuildSpriteVertexData (size_t sprite_index);
+
   private:
     typedef stl::vector<mid_level::renderer2d::Sprite>    SpriteArray;
+    typedef xtl::uninitialized_storage<SpriteVertex>      SpriteVertexArray;
     typedef xtl::com_ptr<mid_level::renderer2d::ITexture> TexturePtr;
 
   private:
@@ -402,6 +423,7 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     render::low_level::ITexture      *low_level_texture;
     mid_level::renderer2d::BlendMode blend_mode;
     SpriteArray                      sprites;
+    SpriteVertexArray                sprite_vertex_buffer;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -410,7 +432,6 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 struct ProgramParameters
 {
   math::mat4f view_matrix;
-  math::mat4f object_matrix;
   math::mat4f projection_matrix;
 };
 
