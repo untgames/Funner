@@ -11,6 +11,20 @@ namespace
 
 const size_t LISTENER_ARRAY_RESERVE_SIZE = 16; //резервируемый размер массива слушателей
 
+/*
+    Переменная ренедринга
+*/
+
+struct RenderProperty: public IViewportProperty, public xtl::reference_counter
+{
+  stl::string name, value;
+
+  const char* Name  () const { return name.c_str (); }
+  const char* Value () const { return value.c_str (); }
+
+  RenderProperty (const char* in_name, const char* in_value) : name (in_name), value (in_value) {}
+};
+
 }
 
 /*
@@ -19,7 +33,8 @@ const size_t LISTENER_ARRAY_RESERVE_SIZE = 16; //резервируемый размер массива сл
 
 typedef xtl::com_ptr<IViewportListener>                        ListenerPtr;
 typedef stl::vector<ListenerPtr>                               ListenerArray;
-typedef stl::hash_map<stl::hash_key<const char*>, stl::string> PropertyMap;
+typedef xtl::intrusive_ptr<RenderProperty>                     PropertyPtr;
+typedef stl::hash_map<stl::hash_key<const char*>, PropertyPtr> PropertyMap;
 
 struct Viewport::Impl: public xtl::reference_counter
 {
@@ -326,17 +341,17 @@ void Viewport::SetProperty (const char* name, const char* value)
   
   if (iter != impl->properties.end ())
   {
-    if (iter->second == value)
+    if (iter->second->value == value)
       return;
 
-    iter->second = value;    
+    iter->second->value = value;
   }
   else
   {
-    impl->properties.insert_pair (name, value);    
+    impl->properties.insert_pair (name, PropertyPtr (new RenderProperty (name, value), false));
   }
   
-  impl->ChangePropertyNotify (name, value);  
+  impl->ChangePropertyNotify (name, value);
 }
 
 const char* Viewport::GetProperty (const char* name) const
@@ -349,7 +364,7 @@ const char* Viewport::GetProperty (const char* name) const
   if (iter == impl->properties.end ())
     return "";
 
-  return iter->second.c_str ();
+  return iter->second->value.c_str ();
 }
 
 bool Viewport::HasProperty (const char* name) const
@@ -373,6 +388,20 @@ void Viewport::RemoveProperty (const char* name)
 void Viewport::RemoveAllProperties ()
 {  
   impl->properties.clear ();
+}
+
+/*
+    Перечисление переменных рендеринга
+*/
+
+Viewport::PropertyIterator Viewport::CreatePropertyIterator () const
+{
+  struct PropertySelector
+  {
+    const IViewportProperty& operator () (const PropertyMap::value_type& value) const { return *value.second; }
+  };
+
+  return PropertyIterator (impl->properties.begin (), impl->properties.begin (), impl->properties.end (), PropertySelector ());
 }
 
 /*

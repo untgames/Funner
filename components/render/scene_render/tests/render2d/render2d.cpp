@@ -33,6 +33,7 @@ int main ()
     sprite->SetName ("Sprite1");
     camera->SetName ("Camera1");
     sprite->SetMaterial ("sprite_material");
+//    sprite->SetFrame (20);
 
       //!!!отсутствует настройка положения камеры и спрайта!!!
 

@@ -1,0 +1,23 @@
+Results of viewport_test:
+MyViewportListener::MyViewportListener
+OnChangeName(viewport1)
+OnChangeZOrder(12)
+OnChangeRenderPath(RenderPath1)
+OnChangeArea(0, 0, 100, 200)
+OnChangeActive(false)
+OnChangeCamera()
+Delete camera
+OnChangeCamera(null)
+OnChangeProperty(prop1, value1)
+OnChangeProperty(prop2, value2)
+Viewport 'viewport1':
+  z-order:     12
+  render-path: 'RenderPath1'
+  area:        (0, 0, 100, 200)
+  state:       off
+  camera:      'null'
+Viewport properties:
+'prop1'='value1'
+'prop2'='value2'
+OnDestroy()
+MyViewportListener::~MyViewportListener

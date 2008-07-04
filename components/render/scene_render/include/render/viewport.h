@@ -5,6 +5,14 @@
 
 #include <render/common.h>
 
+namespace xtl
+{
+
+//forward declaration
+template <class T> class iterator;
+
+}
+
 namespace scene_graph
 {
 
@@ -42,6 +50,19 @@ class IViewportListener
     
   protected:
     virtual ~IViewportListener () {}
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Переменная области вывода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class IViewportProperty
+{
+  public:
+    virtual const char* Name  () const = 0;
+    virtual const char* Value () const = 0;
+
+  protected:
+    virtual ~IViewportProperty () {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,6 +136,13 @@ class Viewport
     bool        HasProperty    (const char* name) const; //nothrow
     void        RemoveProperty (const char* name); //nothrow
     void        RemoveAllProperties (); //nothrow
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перечисление переменных рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    typedef xtl::iterator<const IViewportProperty> PropertyIterator;
+    
+    PropertyIterator CreatePropertyIterator () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со слушателями
