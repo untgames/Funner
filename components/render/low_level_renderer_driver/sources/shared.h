@@ -435,7 +435,31 @@ struct ProgramParameters
   math::mat4f projection_matrix;
 };
 
-class Renderer;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Общие ресурсы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class CommonResources : public Object
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    CommonResources (render::low_level::IDevice* device);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение низкоуровневых данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    render::low_level::IBuffer*     GetConstantBuffer () { return constant_buffer.get (); }
+    render::low_level::IBlendState* GetBlendState (render::mid_level::renderer2d::BlendMode blend_mode) { return blend_states[blend_mode].get (); }
+
+  private:
+    typedef xtl::com_ptr<render::low_level::IBlendState> BlendStatePtr;
+    typedef xtl::com_ptr<render::low_level::IBuffer>     BufferPtr;
+  
+  private:
+    BufferPtr     constant_buffer;
+    BlendStatePtr blend_states[render::mid_level::renderer2d::BlendMode_Num];
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Кадр 2D визуализации
@@ -444,9 +468,9 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Frame  (Renderer* in_renderer, render::low_level::IDevice* device);
+    Frame (CommonResources* in_common_resources, render::low_level::IDevice* device);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица вида / матрица преобразования
@@ -470,13 +494,17 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     void DrawCore (render::low_level::IDevice* device);
 
   private:
-    typedef xtl::com_ptr<Primitive>                      PrimitivePtr;
-    typedef stl::vector<PrimitivePtr>                    PrimitiveArray;
+    typedef xtl::com_ptr<Primitive>                  PrimitivePtr;
+    typedef stl::vector<PrimitivePtr>                PrimitiveArray;
+    typedef xtl::com_ptr<render::low_level::IBuffer> BufferPtr;
+    typedef xtl::com_ptr<CommonResources>            CommonResourcesPtr;
 
   private:
-    math::mat4f    view_tm, proj_tm;
-    PrimitiveArray primitives;
-    Renderer*      renderer;
+    math::mat4f        view_tm, proj_tm;
+    PrimitiveArray     primitives;
+    CommonResourcesPtr common_resources;
+    BufferPtr          vertex_buffer;
+    size_t             current_vertex_buffer_size;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -498,18 +526,19 @@ class Renderer: virtual public mid_level::renderer2d::IRenderer, public BasicRen
     mid_level::renderer2d::IPrimitive* CreatePrimitive ();
     mid_level::renderer2d::IFrame*     CreateFrame     ();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение низкоуровневых данных
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    render::low_level::IBuffer*     GetConstantBuffer () { return constant_buffer.get (); }
-    render::low_level::IBlendState* GetBlendState (render::mid_level::renderer2d::BlendMode blend_mode) { return blend_states[blend_mode].get (); }
-    
   private:
-    xtl::com_ptr<render::low_level::IProgram>                 program;
-    xtl::com_ptr<render::low_level::IProgramParametersLayout> program_parameters_layout;
-    xtl::com_ptr<render::low_level::ISamplerState>            sampler;
-    xtl::com_ptr<render::low_level::IBuffer>                  constant_buffer;
-    xtl::com_ptr<render::low_level::IBlendState>              blend_states[render::mid_level::renderer2d::BlendMode_Num];
+    typedef xtl::com_ptr<render::low_level::IProgram>                 ProgramPtr;
+    typedef xtl::com_ptr<render::low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
+    typedef xtl::com_ptr<render::low_level::ISamplerState>            SamplerStatePtr;
+    typedef xtl::com_ptr<render::low_level::IInputLayout>             InputLayoutPtr;
+    typedef xtl::com_ptr<CommonResources>                             CommonResourcesPtr;
+
+  private:
+    ProgramPtr                 program;
+    ProgramParametersLayoutPtr program_parameters_layout;
+    SamplerStatePtr            sampler;
+    InputLayoutPtr             input_layout;
+    CommonResourcesPtr         common_resources;
 };
 
 }

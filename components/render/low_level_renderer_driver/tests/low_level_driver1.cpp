@@ -53,8 +53,8 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
   primitive1->SetTransform (tm1);
   primitive2->SetTransform (tm2);
   
-  sprite_angle += 0.005f;
-  sprite_rotation += 0.005f;
+  sprite_angle += 0.0005f;
+  sprite_rotation += 0.0005f;
 }
 
 //получение ортографической матрицы проекции

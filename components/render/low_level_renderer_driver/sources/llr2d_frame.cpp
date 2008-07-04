@@ -12,7 +12,8 @@ using namespace render::mid_level::low_level_driver::renderer2d;
 namespace
 {
 
-const size_t PRIMITIVE_ARRAY_RESERVE_SIZE = 4096; //резервируемое количество примитивов
+const size_t PRIMITIVE_ARRAY_RESERVE_SIZE = 4096;  //резервируемое количество примитивов
+const size_t DEFAULT_VERTEX_BUFFER_SIZE   = 10000; //размер вершинного буффера по умолчанию (количество вершин)
 
 }
 
@@ -20,9 +21,22 @@ const size_t PRIMITIVE_ARRAY_RESERVE_SIZE = 4096; //резервируемое количество при
     Конструктор / деструктор
 */
 
-Frame::Frame (Renderer* in_renderer, render::low_level::IDevice* device)
-  : renderer (in_renderer)
+Frame::Frame (CommonResources* in_common_resources, render::low_level::IDevice* device)
+  : common_resources (in_common_resources), current_vertex_buffer_size (DEFAULT_VERTEX_BUFFER_SIZE)
 {
+  using namespace render::low_level;
+
+  BufferDesc vertex_buffer_desc;
+
+  memset (&vertex_buffer_desc, 0, sizeof (vertex_buffer_desc));
+
+  vertex_buffer_desc.size         = sizeof (SpriteVertex) * current_vertex_buffer_size;
+  vertex_buffer_desc.usage_mode   = UsageMode_Default;
+  vertex_buffer_desc.bind_flags   = BindFlag_VertexBuffer;
+  vertex_buffer_desc.access_flags = AccessFlag_ReadWrite;
+
+  vertex_buffer = device->CreateBuffer (vertex_buffer_desc);
+
   primitives.reserve (PRIMITIVE_ARRAY_RESERVE_SIZE);
 }
 
@@ -91,8 +105,8 @@ void Frame::DrawCore (render::low_level::IDevice* device)
 {
   using namespace render::low_level;
 
-  renderer->GetConstantBuffer ()->SetData (offsetof (ProgramParameters, view_matrix), sizeof (view_tm), &view_tm);
-  renderer->GetConstantBuffer ()->SetData (offsetof (ProgramParameters, projection_matrix), sizeof (proj_tm), &proj_tm);
+  common_resources->GetConstantBuffer ()->SetData (offsetof (ProgramParameters, view_matrix), sizeof (view_tm), &view_tm);
+  common_resources->GetConstantBuffer ()->SetData (offsetof (ProgramParameters, projection_matrix), sizeof (proj_tm), &proj_tm);
 
   /*
     в нормальной реализации в этом методе должна быть реализована сортировка спрайтов по удалению от наблюдателя
@@ -104,26 +118,7 @@ void Frame::DrawCore (render::low_level::IDevice* device)
     
     device->SSSetTexture (0, primitive.GetLowLevelTexture ());
     
-/*    switch (primitive.GetBlendMode ())
-    {
-      case BlendMode_None:
-        log.Printf ("  blend=none");
-        break;
-      case BlendMode_Translucent:
-        log.Printf ("  blend=translucent");
-        break;
-      case BlendMode_Mask:
-        log.Printf ("  blend=mask");
-        break;
-      case BlendMode_Additive:
-        log.Printf ("  blend=additive");
-        break;
-      default:
-        break;
-    }
-*/    
-
-    device->OSSetBlendState (renderer->GetBlendState (primitive.GetBlendMode ()));
+    device->OSSetBlendState (common_resources->GetBlendState (primitive.GetBlendMode ()));
 
     size_t sprites_count=primitive.GetSpritesCount ();
 
@@ -133,57 +128,9 @@ void Frame::DrawCore (render::low_level::IDevice* device)
       
       primitive.GetSprite (i, s);    
 
-      BufferDesc vertex_buffer_desc;
-
-      memset (&vertex_buffer_desc, 0, sizeof (vertex_buffer_desc));
-
-      vertex_buffer_desc.size         = sizeof (SpriteVertex) * 4;
-      vertex_buffer_desc.usage_mode   = UsageMode_Default;
-      vertex_buffer_desc.bind_flags   = BindFlag_VertexBuffer;
-      vertex_buffer_desc.access_flags = AccessFlag_ReadWrite;
-
-      xtl::com_ptr<IBuffer> vertex_buffer (device->CreateBuffer (vertex_buffer_desc), false);
-
       vertex_buffer->SetData (0, sizeof (SpriteVertex) * 4 , primitive.GetVertexBuffer () + i * 4);
 
-      static VertexAttribute attributes [3];
-
-      memset (attributes, 0, sizeof (attributes));      
-
-      attributes[0].semantic = VertexAttributeSemantic_Position;
-      attributes[0].format   = InputDataFormat_Vector3;
-      attributes[0].type     = InputDataType_Float;
-      attributes[0].slot     = 0;
-      attributes[0].offset   = offsetof (SpriteVertex, position);
-      attributes[0].stride   = sizeof (SpriteVertex);
-
-      attributes[1].semantic = VertexAttributeSemantic_TexCoord0;
-      attributes[1].format   = InputDataFormat_Vector2;
-      attributes[1].type     = InputDataType_Float;
-      attributes[1].slot     = 0;
-      attributes[1].offset   = offsetof (SpriteVertex, texcoord);
-      attributes[1].stride   = sizeof (SpriteVertex);
-
-      attributes[2].semantic = VertexAttributeSemantic_Color;
-      attributes[2].format   = InputDataFormat_Vector4;
-      attributes[2].type     = InputDataType_Float;
-      attributes[2].slot     = 0;
-      attributes[2].offset   = offsetof (SpriteVertex, color);
-      attributes[2].stride   = sizeof (SpriteVertex);
-
-      InputLayoutDesc layout_desc;
-      
-      memset (&layout_desc, 0, sizeof layout_desc);
-      
-      layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
-      layout_desc.vertex_attributes       = attributes;
-      layout_desc.index_type              = InputDataType_UInt;
-      layout_desc.index_buffer_offset     = 0;            
-
-      xtl::com_ptr<IInputLayout> input_layout (device->CreateInputLayout (layout_desc), false);      
-
       device->OSSetDepthStencilState (0);
-      device->ISSetInputLayout       (input_layout.get ());
       device->ISSetVertexBuffer      (0, vertex_buffer.get ());
 
       device->Draw (PrimitiveType_TriangleStrip, 0, 4);
