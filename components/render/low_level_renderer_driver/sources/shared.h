@@ -360,9 +360,10 @@ class RenderTargetTexture: virtual public mid_level::renderer2d::ITexture, publi
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct SpriteVertex
 {
-  math::vec3f position;
-  math::vec2f texcoord;
-  math::vec4f color;
+  math::vec3f                      position;
+  math::vec2f                      texcoord;
+  math::vec4f                      color;
+  mid_level::renderer2d::ITexture* texture;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

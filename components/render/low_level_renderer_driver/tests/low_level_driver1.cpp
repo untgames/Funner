@@ -19,10 +19,21 @@ float sprite_angle = 0;
 float sprite_rotation = 0;
 bool screenshot_made = false;
 
-void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* renderer, Sprite& sprite1, Sprite& sprite2, IPrimitive* primitive1, IPrimitive* primitive2)
+void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* renderer, render::mid_level::renderer2d::IFrame* frame, IPrimitive* primitive1, IPrimitive* primitive2)
 {
   if (window.IsClosed ())
     return;
+
+  mat4f tm1 = rotatef (sprite_rotation, 0, 0, 1) * translatef (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f) * scalef (20, 20, 1) * rotatef (-sprite_rotation, 0, 0, 1);
+  mat4f tm2 = translatef (cos (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, sin (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (20, 20, 1) * rotatef (-sprite_rotation, 0, 0, 1);
+
+  primitive1->SetTransform (tm1);
+  primitive2->SetTransform (tm2);
+  
+  renderer->AddFrame (frame);
+     
+  sprite_angle += 0.0005f;
+  sprite_rotation += 0.0005f;
 
   renderer->DrawFrames ();
 
@@ -36,25 +47,6 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
 
     screenshot_made = true;
   }
-
-/*  sprite1.position = vec3f (cos (sprite_angle) * 10, sin (sprite_angle) * 10, 0.2f);  
-  sprite2.position = vec3f (cos (sprite_angle + 180.f) * 10, sin (sprite_angle + 180.f) * 10, 0.1f);
-
-  primitive1->RemoveAllSprites ();
-  primitive1->AddSprites (1, &sprite1);
-
-  primitive2->RemoveAllSprites ();
-  primitive2->AddSprites (1, &sprite2);
-  */
-
-  mat4f tm1 = rotatef (sprite_rotation, 0, 0, 1) * translatef (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f) * scalef (20, 20, 1) * rotatef (-sprite_rotation, 0, 0, 1);
-  mat4f tm2 = translatef (cos (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, sin (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (20, 20, 1) * rotatef (-sprite_rotation, 0, 0, 1);
-
-  primitive1->SetTransform (tm1);
-  primitive2->SetTransform (tm2);
-  
-  sprite_angle += 0.0005f;
-  sprite_rotation += 0.0005f;
 }
 
 //получение ортографической матрицы проекции
@@ -170,9 +162,7 @@ int main ()
     frame->AddPrimitive (primitive2.get ());
     printf ("Frame primitives count is %u\n", frame->PrimitivesCount ());
 
-    renderer->AddFrame (frame.get ());
-     
-    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (window), renderer.get (), xtl::ref(sprite1), xtl::ref (sprite2), primitive1.get (), primitive2.get ()));
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (window), renderer.get (), frame.get (), primitive1.get (), primitive2.get ()));
 
     syslib::Application::Run ();
   }

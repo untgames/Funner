@@ -108,6 +108,8 @@ void Frame::DrawCore (render::low_level::IDevice* device)
   common_resources->GetConstantBuffer ()->SetData (offsetof (ProgramParameters, view_matrix), sizeof (view_tm), &view_tm);
   common_resources->GetConstantBuffer ()->SetData (offsetof (ProgramParameters, projection_matrix), sizeof (proj_tm), &proj_tm);
 
+  device->ISSetVertexBuffer (0, vertex_buffer.get ());
+
   /*
     в нормальной реализации в этом методе должна быть реализована сортировка спрайтов по удалению от наблюдателя
   */
@@ -129,9 +131,6 @@ void Frame::DrawCore (render::low_level::IDevice* device)
       primitive.GetSprite (i, s);    
 
       vertex_buffer->SetData (0, sizeof (SpriteVertex) * 4 , primitive.GetVertexBuffer () + i * 4);
-
-      device->OSSetDepthStencilState (0);
-      device->ISSetVertexBuffer      (0, vertex_buffer.get ());
 
       device->Draw (PrimitiveType_TriangleStrip, 0, 4);
     }

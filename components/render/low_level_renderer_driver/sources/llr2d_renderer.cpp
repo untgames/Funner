@@ -51,6 +51,8 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
 {
   try
   {
+    device->OSSetDepthStencilState (0);
+  
     ShaderDesc shader_desc;
 
     memset (&shader_desc, 0, sizeof (shader_desc));

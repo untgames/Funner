@@ -70,6 +70,9 @@ void Primitive::SetTexture (render::mid_level::renderer2d::ITexture* in_texture)
     low_level_texture = render_target_texture->GetView ()->GetTexture ();
     texture = render_target_texture;
   }
+
+  for (SpriteVertex* iter = sprite_vertex_buffer.data (), *end = sprite_vertex_buffer.data () + sprite_vertex_buffer.size (); iter < end; iter++)
+    iter->texture = texture.get ();
 }
 
 ITexture* Primitive::GetTexture ()
@@ -196,4 +199,9 @@ void Primitive::BuildSpriteVertexData (size_t i)
   sprite_vertex_buffer.data ()[i*4 + 1].color = sprites[i].color;
   sprite_vertex_buffer.data ()[i*4 + 2].color = sprites[i].color;
   sprite_vertex_buffer.data ()[i*4 + 3].color = sprites[i].color;  
+
+  sprite_vertex_buffer.data ()[i*4].texture     = texture.get ();
+  sprite_vertex_buffer.data ()[i*4 + 1].texture = texture.get ();
+  sprite_vertex_buffer.data ()[i*4 + 2].texture = texture.get ();
+  sprite_vertex_buffer.data ()[i*4 + 3].texture = texture.get ();
 }
