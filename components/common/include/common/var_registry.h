@@ -1,7 +1,7 @@
 #ifndef COMMONLIB_VAR_REGISTRY_HEADER
 #define COMMONLIB_VAR_REGISTRY_HEADER
 
-#include <xtl/any.h>
+#include <xtl/any.h> //сделать через forward!!!
 #include <xtl/functional_fwd>
 
 namespace common
