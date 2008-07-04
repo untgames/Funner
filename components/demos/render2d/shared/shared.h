@@ -9,6 +9,7 @@
 
 #include <sg/scene.h>
 #include <sg/camera.h>
+#include <sg/sprite.h>
 
 #include <render/scene_render.h>
 
@@ -40,7 +41,7 @@ class TestApplication
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка idle-функции 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void ()> IdleFunction;
+    typedef xtl::function<void (TestApplication&)> IdleFunction;
     
     void SetIdleHandler (const IdleFunction&);
 

@@ -2,6 +2,7 @@
 #include <xtl/connection.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/bind.h>
+#include <xtl/ref.h>
 
 #include <common/var_registry.h>
 #include <common/var_registry_container.h>
@@ -101,13 +102,35 @@ struct TestApplication::Impl
     }
     catch (std::exception& e)
     {
-      printf (format ("Exception at window redraw: %s", e.what ()).c_str ());
+      printf (format ("Exception at window redraw: %s\n", e.what ()).c_str ());
     }
     catch (...)
     {
-      printf ("Exception at window redraw");
+      printf ("Exception at window redraw\n");
     }
   }  
+  
+  void OnResize ()
+  {
+    try
+    {
+      syslib::Rect            client_rect = window->ClientRect ();
+      render::low_level::Rect viewport;
+
+      viewport.x      = client_rect.left;
+      viewport.y      = client_rect.top;
+      viewport.width  = client_rect.right - client_rect.left;
+      viewport.height = client_rect.bottom - client_rect.top;
+
+      mid_level::LowLevelDriver::SetViewport (MID_LEVEL_RENDERER_NAME, viewport);
+
+      window->Invalidate ();
+    }
+    catch (std::exception& exception)
+    {
+      printf ("Eexception at window resize: %s\n", exception.what ());
+    }
+  }
 };
 
 /*
@@ -144,7 +167,7 @@ TestApplication::TestApplication ()
       //регистрация обработчиков событий окна
 
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, &*impl));
-//    impl->window->RegisterEventHandler (syslib::WindowEvent_OnSize,  xtl::bind (&Impl::OnResize, &*impl));
+    impl->window->RegisterEventHandler (syslib::WindowEvent_OnSize,  xtl::bind (&Impl::OnResize, &*impl));
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*impl));    
 
       //создание цепочки обмена и устройства рендеринга
@@ -178,6 +201,10 @@ TestApplication::TestApplication ()
       //загрузка ресурсов
 
     impl->render.LoadResource (MATERIAL_LIB_FILE_NAME);
+    
+      //установка начальной области вывода
+    
+    impl->OnResize ();    
   }
   catch (xtl::exception& exception)
   {
@@ -216,5 +243,5 @@ int TestApplication::Run ()
 
 void TestApplication::SetIdleHandler (const IdleFunction& idle)
 {
-  impl->app_idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, idle);
+  impl->app_idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (idle, xtl::ref (*this)));
 }
