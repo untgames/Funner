@@ -140,7 +140,7 @@ class BasicFrame: virtual public IFrame, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Визуализация
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Draw (render::low_level::IDevice* device);
+    void Draw (render::low_level::IDevice* device, const low_level::Rect& device_viewport);
     
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,18 +148,28 @@ class BasicFrame: virtual public IFrame, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void DrawCore (render::low_level::IDevice* device) = 0;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление нормированной области вывода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void UpdateNormalizedViewport ();
+
   private:
-    typedef xtl::com_ptr<RenderTarget>               RenderTargetPtr;
+    typedef xtl::com_ptr<RenderTarget> RenderTargetPtr;
 
   private:
     RenderTargetPtr             render_target;
     RenderTargetPtr             depth_stencil_target;
     render::low_level::Viewport viewport;
+    float                       normalized_viewport_left;
+    float                       normalized_viewport_top;
+    float                       normalized_viewport_width;
+    float                       normalized_viewport_height;
     render::low_level::Color4f  clear_color;
     float                       clear_depth_value;
     unsigned char               clear_stencil_index;
     bool                        need_clear_render_target;
     bool                        need_clear_depth_stencil_target;
+    bool                        need_update_normalized_viewport;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,6 +217,12 @@ class BasicRenderer: virtual public IRenderer, public Object
     void DrawFrames   ();
     void CancelFrames ();
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка области вывода для системы рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                   SetViewport (const low_level::Rect& viewport);
+    const low_level::Rect& GetViewport () const { return viewport; }
+    
   private:
     typedef xtl::com_ptr<IRenderTarget>                 RenderTargetPtr;
     typedef xtl::com_ptr<render::low_level::IDevice>    DevicePtr;
@@ -223,6 +239,7 @@ class BasicRenderer: virtual public IRenderer, public Object
     SwapChainPtr    swap_chain;
     FrameArray      frames;
     size_t          resource_pool_id;  
+    low_level::Rect viewport;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -254,10 +271,10 @@ class Driver: virtual public IDriver
     IRenderer* CreateRenderer (const char* name);    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Имя драйвера
+///Установка области вывода для системы рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* Name ();
-    
+    void SetViewport (const char* name, const low_level::Rect& viewport);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация систем рендернинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -275,16 +292,7 @@ class Driver: virtual public IDriver
     void UnregisterDriver ();
 
   private:
-    struct RendererEntry
-    {
-      stl::string                                 renderer_name;
-      xtl::com_ptr<render::low_level::IDevice>    device;
-      xtl::com_ptr<render::low_level::ISwapChain> swap_chain;
-
-      RendererEntry (const char* in_renderer_name, render::low_level::IDevice* in_device, render::low_level::ISwapChain* in_swap_chain)
-        : renderer_name (in_renderer_name), device (in_device), swap_chain (in_swap_chain)
-        {}
-    };
+    struct RendererEntry;
 
     typedef xtl::shared_ptr<RendererEntry> RendererEntryPtr;
     typedef stl::vector<RendererEntryPtr>  RendererEntries;

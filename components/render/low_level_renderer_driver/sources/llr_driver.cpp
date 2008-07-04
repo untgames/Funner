@@ -4,6 +4,36 @@ using namespace render::mid_level;
 using namespace render::mid_level::low_level_driver;
 
 /*
+    Константы
+*/
+
+namespace
+{
+
+const char* DRIVER_NAME = "LowLevel"; //имя драйвера
+
+}
+
+/*
+    Вхождение системы рендеринга в список драйвера
+*/
+
+struct Driver::RendererEntry
+{
+  stl::string                                 renderer_name;
+  xtl::com_ptr<render::low_level::IDevice>    device;
+  xtl::com_ptr<render::low_level::ISwapChain> swap_chain;
+  xtl::com_ptr<BasicRenderer>                 renderer;
+
+  RendererEntry (const char* in_renderer_name, render::low_level::IDevice* in_device, render::low_level::ISwapChain* in_swap_chain)
+    : renderer_name (in_renderer_name),
+      device (in_device),
+      swap_chain (in_swap_chain),
+      renderer (new renderer2d::Renderer (in_device, in_swap_chain))
+    {}
+};
+
+/*
     Конструктор / деструктор
 */
 
@@ -43,6 +73,31 @@ const char* Driver::GetRendererName (size_t index)
 }
 
 /*
+    Установка области вывода для системы рендеринга
+*/
+
+void Driver::SetViewport (const char* name, const render::low_level::Rect& viewport)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+      
+    for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
+      if (!xtl::xstrcmp ((*iter)->renderer_name.c_str (), name))
+      {
+        (*iter)->renderer->SetViewport (viewport);
+        return;
+      }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::mid_level::low_level_driver::Driver::SetViewport");
+    throw;
+  }
+}
+
+/*
     Создание устройства визуализации
 */
 
@@ -55,20 +110,11 @@ IRenderer* Driver::CreateRenderer (const char* name)
     
   for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
     if (!xtl::xstrcmp ((*iter)->renderer_name.c_str (), name))
-      return new render::mid_level::low_level_driver::renderer2d::Renderer ((*iter)->device.get (), (*iter)->swap_chain.get ());
+      return (*iter)->renderer.get ();
 
   throw xtl::make_argument_exception (METHOD_NAME, "name", name);
 }
 
-/*
-   Имя драйвера
-*/
-
-const char* Driver::Name ()
-{
-  return "LowLevel";
-}
-    
 /*
    Регистрация систем рендернинга
 */
@@ -93,7 +139,7 @@ void Driver::RegisterRenderer (const char* name, render::low_level::IDevice* dev
   renderer_entries.push_back (RendererEntryPtr (new RendererEntry (name, device, swap_chain)));
 
   if (renderer_entries.size () == 1)
-    DriverManager::RegisterDriver (Name (), this);
+    DriverManager::RegisterDriver (DRIVER_NAME, this);
 }
 
 void Driver::UnregisterRenderer (const char* name)
@@ -121,7 +167,7 @@ void Driver::UnregisterAllRenderers ()
 
 void Driver::UnregisterDriver ()
 {
-  DriverManager::UnregisterDriver (Name ());
+  DriverManager::UnregisterDriver (DRIVER_NAME);
 }
 
 namespace
@@ -145,7 +191,7 @@ typedef common::Singleton<Driver> LowLevelDriverSingleton;
 
 const char* LowLevelDriver::Name ()
 {
-  return LowLevelDriverSingleton::Instance ().Name ();
+  return DRIVER_NAME;
 }
     
 /*
@@ -155,6 +201,15 @@ const char* LowLevelDriver::Name ()
 IDriver* LowLevelDriver::Driver ()
 {
   return LowLevelDriverSingleton::InstancePtr ();
+}
+
+/*
+    Установка области вывода для системы рендеринга
+*/
+
+void LowLevelDriver::SetViewport (const char* name, const render::low_level::Rect& viewport)
+{
+  LowLevelDriverSingleton::Instance ().SetViewport (name, viewport);
 }
     
 /*
