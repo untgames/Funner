@@ -56,7 +56,7 @@ void RenderableSprite::UpdateNotify ()
     
     s.position = math::vec3f (0.0f);
     s.size     = math::vec2f (1.0f);
-    s.color    = sprite->Color ();
+    s.color    = math::vec4f (sprite->Color (), sprite->Alpha ());
     
     if (material->IsTiled ())
     {
