@@ -47,8 +47,8 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
   primitive2->AddSprites (1, &sprite2);
   */
 
-  mat4f tm1 = translatef (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (20, 20, 1);
-  mat4f tm2 = translatef (cos (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, sin (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (20, 20, 1);
+  mat4f tm1 = rotatef (sprite_rotation, 0, 0, 1) * translatef (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f) * scalef (20, 20, 1) * rotatef (-sprite_rotation, 0, 0, 1);
+  mat4f tm2 = translatef (cos (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, sin (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (20, 20, 1) * rotatef (-sprite_rotation, 0, 0, 1);
 
   primitive1->SetTransform (tm1);
   primitive2->SetTransform (tm2);
@@ -146,6 +146,9 @@ int main ()
 
     primitive1->SetTexture (texture1.get ());
     primitive2->SetTexture (texture2.get ());
+
+    primitive1->SetBlendMode (BlendMode_Additive);
+    primitive2->SetBlendMode (BlendMode_Mask);
 
     printf ("Primitive1 sprites count is %u\n", primitive1->GetSpritesCount ());
     primitive1->AddSprites (1, &sprite1);

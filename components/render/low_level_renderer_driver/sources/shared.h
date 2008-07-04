@@ -435,6 +435,8 @@ struct ProgramParameters
   math::mat4f projection_matrix;
 };
 
+class Renderer;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Кадр 2D визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -444,8 +446,7 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Frame  ();
-    ~Frame ();
+    Frame  (Renderer* in_renderer, render::low_level::IDevice* device);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица вида / матрица преобразования
@@ -469,14 +470,13 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     void DrawCore (render::low_level::IDevice* device);
 
   private:
-    typedef xtl::com_ptr<Primitive>                  PrimitivePtr;
-    typedef stl::vector<PrimitivePtr>                PrimitiveArray;
-    typedef xtl::com_ptr<render::low_level::IBuffer> IBufferPtr;
+    typedef xtl::com_ptr<Primitive>                      PrimitivePtr;
+    typedef stl::vector<PrimitivePtr>                    PrimitiveArray;
 
   private:
     math::mat4f    view_tm, proj_tm;
     PrimitiveArray primitives;
-    IBufferPtr     constant_buffer;
+    Renderer*      renderer;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -498,10 +498,18 @@ class Renderer: virtual public mid_level::renderer2d::IRenderer, public BasicRen
     mid_level::renderer2d::IPrimitive* CreatePrimitive ();
     mid_level::renderer2d::IFrame*     CreateFrame     ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение низкоуровневых данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    render::low_level::IBuffer*     GetConstantBuffer () { return constant_buffer.get (); }
+    render::low_level::IBlendState* GetBlendState (render::mid_level::renderer2d::BlendMode blend_mode) { return blend_states[blend_mode].get (); }
+    
   private:
     xtl::com_ptr<render::low_level::IProgram>                 program;
     xtl::com_ptr<render::low_level::IProgramParametersLayout> program_parameters_layout;
     xtl::com_ptr<render::low_level::ISamplerState>            sampler;
+    xtl::com_ptr<render::low_level::IBuffer>                  constant_buffer;
+    xtl::com_ptr<render::low_level::IBlendState>              blend_states[render::mid_level::renderer2d::BlendMode_Num];
 };
 
 }

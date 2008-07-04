@@ -108,6 +108,53 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
     sampler = device->CreateSamplerState (sampler_desc);
 
     device->SSSetSampler (0, sampler.get ());
+
+    BufferDesc constant_buffer_desc;
+
+    memset (&constant_buffer_desc, 0, sizeof (constant_buffer_desc));
+
+    constant_buffer_desc.size         = sizeof (ProgramParameters);
+    constant_buffer_desc.usage_mode   = UsageMode_Default;
+    constant_buffer_desc.bind_flags   = BindFlag_ConstantBuffer;
+    constant_buffer_desc.access_flags = AccessFlag_ReadWrite;
+
+    constant_buffer = device->CreateBuffer (constant_buffer_desc);
+
+    device->SSSetConstantBuffer (0, constant_buffer.get ());
+
+    BlendDesc blend_desc;
+
+    memset (&blend_desc, 0, sizeof (blend_desc));
+
+    blend_desc.blend_enable             = false;
+    blend_desc.sample_alpha_to_coverage = false;
+    blend_desc.blend_color_operation    = BlendOperation_Add;
+    blend_desc.blend_alpha_operation    = BlendOperation_Add;
+    blend_desc.color_write_mask         = ColorWriteFlag_All;
+
+    blend_states[BlendMode_None] = device->CreateBlendState (blend_desc);
+
+    blend_desc.blend_enable                     = true;
+    blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
+    blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
+    blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
+    blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
+    
+    blend_states[BlendMode_Translucent] = device->CreateBlendState (blend_desc);
+
+    blend_desc.blend_color_source_argument      = BlendArgument_Zero;
+    blend_desc.blend_color_destination_argument = BlendArgument_SourceColor;
+    blend_desc.blend_alpha_source_argument      = BlendArgument_Zero;
+    blend_desc.blend_alpha_destination_argument = BlendArgument_SourceAlpha;
+    
+    blend_states[BlendMode_Mask] = device->CreateBlendState (blend_desc);
+
+    blend_desc.blend_color_source_argument      = BlendArgument_One;
+    blend_desc.blend_color_destination_argument = BlendArgument_One;
+    blend_desc.blend_alpha_source_argument      = BlendArgument_One;
+    blend_desc.blend_alpha_destination_argument = BlendArgument_One;
+    
+    blend_states[BlendMode_Additive] = device->CreateBlendState (blend_desc);
   }
   catch (xtl::exception& e)
   {
@@ -146,5 +193,5 @@ render::mid_level::renderer2d::IPrimitive* Renderer::CreatePrimitive ()
 
 render::mid_level::renderer2d::IFrame* Renderer::CreateFrame ()
 {
-  return new Frame;
+  return new Frame (this, device.get ());
 }
