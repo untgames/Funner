@@ -15,6 +15,11 @@ void on_scene_detach (Node& node, NodeEvent)
   printf ("node '%s' detached from scene '%s'\n", node.Name (), node.Scene  ()->Name ());
 }
 
+void on_scene_change (Node& node, NodeEvent)
+{
+  printf ("node '%s' change scene '%s'\n", node.Name (), node.Scene () ? node.Scene ()->Name () : "null");
+}
+
 void traverse_fn (Entity& entity)
 {
   printf ("  entity '%s'\n", entity.Name ());
@@ -50,6 +55,7 @@ int main ()
     entity->RegisterEventHandler (NodeEvent_BeforeDestroy, &on_destroy);
     entity->RegisterEventHandler (NodeEvent_BeforeSceneDetach, &on_scene_detach);
     entity->RegisterEventHandler (NodeEvent_AfterSceneAttach, &on_scene_attach);
+    entity->RegisterEventHandler (NodeEvent_AfterSceneChange, &on_scene_change);
     
     entity->BindToScene (scene, NodeBindMode_Capture);
   }

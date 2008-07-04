@@ -382,7 +382,10 @@ struct Node::Impl
       //оповещение о присоединии к новой сцене
       
     if (!in_scene)
+    {
+      Notify (NodeEvent_AfterSceneChange);
       return;
+    }
 
     try
     {
@@ -393,7 +396,8 @@ struct Node::Impl
       //игнорируем все исключения
     }
 
-    Notify (NodeEvent_AfterSceneAttach);
+    Notify (NodeEvent_AfterSceneAttach);    
+    Notify (NodeEvent_AfterSceneChange);
   }
 
 /*

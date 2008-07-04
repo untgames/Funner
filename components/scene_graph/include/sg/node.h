@@ -67,6 +67,7 @@ enum NodeEvent
   NodeEvent_BeforeUnbind,      //срабатывает перед отсоединением узла от родителя
   NodeEvent_AfterSceneAttach,  //срабатывает после присоединения объекта к сцене
   NodeEvent_BeforeSceneDetach, //срабатывает перед отсоединением объекта от сцены
+  NodeEvent_AfterSceneChange,  //срабатывает после изменения сцены
 
   NodeEvent_Num
 };
