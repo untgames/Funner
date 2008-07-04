@@ -6,6 +6,8 @@
 #include <stl/auto_ptr.h>
 
 #include <xtl/function.h>
+#include <xtl/bind.h>
+#include <xtl/ref.h>
 
 #include <sg/scene.h>
 #include <sg/camera.h>

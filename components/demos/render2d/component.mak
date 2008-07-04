@@ -21,4 +21,4 @@ DEMOS.RENDER2D.TESTS.LIBS             := demos.render2d.shared
 DEMOS.RENDER2D.TESTS.IMPORTS          := ../../system/link.static.mak ../../scene_graph/compile.static.mak \
                                          ../../render/scene_render/compile.static.mak ../../render/scene_render/render2d.link.static.mak \
                                          ../../render/low_level_renderer_driver/link.static.mak ../../render/opengl_driver/link.static.mak \
-                                         ../../media/rfx/xmtl.link.static.mak                                         
+                                         ../../media/rfx/xmtl.link.static.mak ../../render/debug_renderer_driver/link.static.mak

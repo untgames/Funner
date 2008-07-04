@@ -212,6 +212,7 @@ TestApplication::TestApplication ()
     impl->render.SetLogHandler (&log_print);
 
     impl->render.SetRenderer (render::mid_level::LowLevelDriver::Name (), MID_LEVEL_RENDERER_NAME);
+//    impl->render.SetRenderer ("Debug", "Renderer2d");
 
       //загрузка ресурсов
 

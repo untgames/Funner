@@ -1,9 +1,43 @@
 #include "shared.h"
 
-void idle (TestApplication& app)
+struct TestScene
+{
+  Sprite::Pointer      sprite;
+  OrthoCamera::Pointer camera;
+  Scene                scene;  
+
+  TestScene ()
+  {
+    sprite = Sprite::Create ();
+    camera = OrthoCamera::Create ();    
+    
+    sprite->BindToScene (scene, NodeBindMode_Capture);
+    camera->BindToScene (scene, NodeBindMode_Capture);
+
+    sprite->SetName ("Sprite1");
+    camera->SetName ("Camera1");
+    sprite->SetMaterial ("sprite_material");
+    sprite->SetColor (math::vec4f (1.0f, 1.0f, 1.0f));
+    sprite->SetAlpha (0.5f);
+    
+    sprite->Scale (20, 20, 1);
+    
+    camera->SetPosition (0, 0, -3);
+    camera->SetLeft     (-10);
+    camera->SetRight    (10);
+    camera->SetTop      (10);
+    camera->SetBottom   (-10);
+    camera->SetZNear    (-10);
+    camera->SetZFar     (10);    
+  }
+};
+
+void idle (TestApplication& app, TestScene& scene)
 {
   try
   {
+//    scene.sprite->Rotate (1, 0, 0, 1);
+    
     app.PostRedraw ();
   }
   catch (std::exception& exception)
@@ -30,37 +64,15 @@ int main ()
     
       //создание сцены
       
-    Sprite::Pointer      sprite = Sprite::Create ();
-    OrthoCamera::Pointer camera = OrthoCamera::Create ();
-
-    Scene scene;
-
-    sprite->BindToScene (scene, NodeBindMode_Capture);
-    camera->BindToScene (scene, NodeBindMode_Capture);
-
-    sprite->SetName ("Sprite1");
-    camera->SetName ("Camera1");
-    sprite->SetMaterial ("sprite_material");
-    sprite->SetColor (math::vec4f (1.0f, 1.0f, 1.0f));
-    sprite->SetAlpha (0.5f);
-    
-    sprite->Scale (20, 20, 1);
-    
-    camera->SetPosition (0, 0, -3);
-    camera->SetLeft     (-10);
-    camera->SetRight    (10);
-    camera->SetTop      (10);
-    camera->SetBottom   (-10);
-    camera->SetZNear    (-10);
-    camera->SetZFar     (10);
-
+    TestScene scene;
+      
       //создание областей вывода
       
     Viewport vp;
     
     vp.SetName       ("Viewport1");
     vp.SetRenderPath ("Render2d");
-    vp.SetCamera     (camera.get ());
+    vp.SetCamera     (scene.camera.get ());
     
     vp.SetArea (0, 0, 100, 100);
     
@@ -68,7 +80,7 @@ int main ()
 
       //установка idle-функции
 
-    test.SetIdleHandler (&idle);
+    test.SetIdleHandler (xtl::bind (&idle, _1, xtl::ref (scene)));
 
       //запуск приложения
 
