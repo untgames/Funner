@@ -195,5 +195,5 @@ void Primitive::BuildSpriteVertexData (size_t i)
   sprite_vertex_buffer.data ()[i*4].color     = sprites[i].color;
   sprite_vertex_buffer.data ()[i*4 + 1].color = sprites[i].color;
   sprite_vertex_buffer.data ()[i*4 + 2].color = sprites[i].color;
-  sprite_vertex_buffer.data ()[i*4 + 3].color = sprites[i].color;
+  sprite_vertex_buffer.data ()[i*4 + 3].color = sprites[i].color;  
 }

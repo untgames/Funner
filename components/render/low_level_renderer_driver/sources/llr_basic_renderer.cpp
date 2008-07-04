@@ -157,6 +157,12 @@ void BasicRenderer::DrawFrames ()
   {
     (*iter)->Draw (device.get (), viewport);
   }
+  
+    //очистка списка кадров
+    
+  frames.clear ();
+  
+    //вывод сформированной картинки
 
   swap_chain->Present ();
 }

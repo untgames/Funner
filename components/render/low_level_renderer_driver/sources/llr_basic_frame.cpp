@@ -180,10 +180,12 @@ void BasicFrame::Draw (render::low_level::IDevice* device, const render::low_lev
     
   render::low_level::Viewport rs_viewport;
   
-  rs_viewport.x      = int (normalized_viewport_left * device_viewport.width + device_viewport.x);
-  rs_viewport.y      = int (normalized_viewport_top * device_viewport.height + device_viewport.y);
-  rs_viewport.width  = size_t (normalized_viewport_width * device_viewport.width);
-  rs_viewport.height = size_t (normalized_viewport_height * device_viewport.height);
+  rs_viewport.x         = int (normalized_viewport_left * device_viewport.width + device_viewport.x);
+  rs_viewport.y         = int (normalized_viewport_top * device_viewport.height + device_viewport.y);
+  rs_viewport.width     = size_t (normalized_viewport_width * device_viewport.width);
+  rs_viewport.height    = size_t (normalized_viewport_height * device_viewport.height);
+  rs_viewport.min_depth = viewport.min_depth;
+  rs_viewport.max_depth = viewport.max_depth;
 
   device->RSSetViewport (rs_viewport);
 
