@@ -7,6 +7,7 @@
 #include <xtl/any.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/reference_counter.h>
+#include <xtl/function.h>
 
 #include <common/var_registry.h>
 
