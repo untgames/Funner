@@ -116,6 +116,10 @@ void BasicRenderer::DrawFrames ()
     frame.Draw ();
   }
   
+    //очистка списка кадров
+    
+  frames.clear ();
+  
     //конец отрисовки
     
   log.Printf ("End draw frames (id=%u, frame_id=%u)", Id (), frame_id);
