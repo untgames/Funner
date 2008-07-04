@@ -4,9 +4,7 @@ void idle (TestApplication& app)
 {
   try
   {
-    SceneRender& render = app.Render ();        
-
-    render.Draw ();
+    app.PostRedraw ();
   }
   catch (std::exception& exception)
   {
@@ -70,7 +68,7 @@ int main ()
 
       //установка idle-функции
 
-//    test.SetIdleHandler (&idle);
+    test.SetIdleHandler (&idle);
 
       //запуск приложения
 

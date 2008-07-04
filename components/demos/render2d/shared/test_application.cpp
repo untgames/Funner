@@ -1,3 +1,5 @@
+#include <ctime>
+
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/intrusive_ptr.h>
@@ -98,7 +100,20 @@ struct TestApplication::Impl
   {
     try
     {
+      static clock_t last     = 0;  
+      static size_t  last_fps = 0, frames_count = 0;
+    
+      if (clock () - last_fps > CLK_TCK)
+      {
+        printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
+
+        last_fps     = clock ();
+        frames_count = 0;
+      }
+
       render.Draw ();
+      
+      frames_count++;
     }
     catch (std::exception& e)
     {
@@ -235,6 +250,15 @@ int TestApplication::Run ()
   syslib::Application::Run ();
 
   return syslib::Application::GetExitCode ();
+}
+
+/*
+    Перерисовка
+*/
+
+void TestApplication::PostRedraw ()
+{
+  impl->window->Invalidate ();
 }
 
 /*
