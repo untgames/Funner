@@ -1,8 +1,7 @@
-#if 0
 #include "shared.h"
 
 using namespace render::mid_level;
-using namespace render::mid_level::debug;
+using namespace render::mid_level::low_level_driver;
 
 /*
     Константы
@@ -19,9 +18,27 @@ const size_t FRAME_ARRAY_RESERVE_SIZE = 128; //резервируемое число кадров
     Конструктор
 */
 
-BasicRenderer::BasicRenderer ()  
-  : frame_id (0)
+BasicRenderer::BasicRenderer (render::low_level::IDevice* in_device, render::low_level::ISwapChain* in_swap_chain)
+  : device (in_device), swap_chain (in_swap_chain)
 {
+  static const char* METHOD_NAME = "render::mid_level::low_level_driver::BasicRenderer::BasicRenderer";
+
+  if (!in_device)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "device");
+
+  if (!in_swap_chain)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");
+
+  static size_t free_pool_id = 1;
+
+  resource_pool_id = free_pool_id++;
+
+  if (!free_pool_id)
+  {
+    --free_pool_id;
+    throw xtl::format_operation_exception (METHOD_NAME, "No free resource pool");
+  }
+
   color_buffer         = RenderTargetPtr (CreateRenderBuffer (), false);
   depth_stencil_buffer = RenderTargetPtr (CreateDepthStencilBuffer (), false);  
   
@@ -34,7 +51,7 @@ BasicRenderer::BasicRenderer ()
 
 const char* BasicRenderer::GetDescription ()
 {
-  return "render::mid_level::debug::BasicRenderer";
+  return "render::mid_level::low_level_driver::BasicRenderer";
 }
 
 /*
@@ -44,7 +61,7 @@ const char* BasicRenderer::GetDescription ()
 
 size_t BasicRenderer::GetResourcePoolId ()
 {
-  return 0;
+  return resource_pool_id;
 }
 
 /*
@@ -67,12 +84,28 @@ IRenderTarget* BasicRenderer::GetDepthStencilBuffer ()
 
 IRenderTarget* BasicRenderer::CreateDepthStencilBuffer ()
 {
-  return new RenderTarget (SCREEN_WIDTH, SCREEN_HEIGHT, RenderTargetType_DepthStencil);
+  using namespace render::low_level;
+
+  xtl::com_ptr<ITexture> depth_stencil_texture (device->CreateDepthStencilTexture (swap_chain.get ()), false);
+
+  ViewDesc depth_stencil_view_desc = {0, 0};
+
+  xtl::com_ptr<IView> depth_stencil_view (device->CreateView (depth_stencil_texture.get (), depth_stencil_view_desc), false);
+  
+  return new RenderTarget (depth_stencil_view.get (), RenderTargetType_DepthStencil);
 }
 
 IRenderTarget* BasicRenderer::CreateRenderBuffer ()
 {
-  return new RenderTarget (SCREEN_WIDTH, SCREEN_HEIGHT, RenderTargetType_Color);
+  using namespace render::low_level;
+
+  xtl::com_ptr<ITexture> render_target_texture (device->CreateRenderTargetTexture (swap_chain.get (), 1), false);
+
+  ViewDesc render_target_view_desc = {0, 0};
+
+  xtl::com_ptr<IView> render_target_view (device->CreateView (render_target_texture.get (), render_target_view_desc), false);
+  
+  return new RenderTarget (render_target_view.get (), RenderTargetType_Color);
 }
 
 /*
@@ -81,7 +114,7 @@ IRenderTarget* BasicRenderer::CreateRenderBuffer ()
 
 void BasicRenderer::AddFrame (IFrame* in_frame)
 {
-  static const char* METHOD_NAME = "render::mid_level::debug::BasicRenderer::AddFrame";
+  static const char* METHOD_NAME = "render::mid_level::low_level_driver::BasicRenderer::AddFrame";
 
   if (!in_frame)
     throw xtl::make_null_argument_exception (METHOD_NAME, "frame");
@@ -90,7 +123,7 @@ void BasicRenderer::AddFrame (IFrame* in_frame)
   
   if (!frame)  
     throw xtl::make_argument_exception (METHOD_NAME, "frame", typeid (in_frame).name (),
-      "Frame type incompatible with render::mid_level::debug::BasicFrame");
+      "Frame type incompatible with render::mid_level::low_level_driver::BasicFrame");
       
   frames.push_back (frame);
 }
@@ -103,34 +136,18 @@ void BasicRenderer::DrawFrames ()
 {
   if (frames.empty ())
     return;
-        
-    //начало отрисовки
     
-  log.Printf ("Begin draw frames (id=%u, frame_id=%u)", Id (), frame_id);
-
     //отрисовка кадров
 
   for (FrameArray::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
   {
-    BasicFrame& frame = **iter;
-    
-    frame.Draw ();
+    (*iter)->Draw (device.get ());
   }
-  
-    //конец отрисовки
-    
-  log.Printf ("End draw frames (id=%u, frame_id=%u)", Id (), frame_id);
-    
-    //увеличение счётчика кадров
-    
-  frame_id++;
+
+  swap_chain->Present ();
 }
 
 void BasicRenderer::CancelFrames ()
 {
   frames.clear ();
-  
-  log.Printf ("Renderer cancel frames (id=%u)", Id ());
 }
-
-#endif

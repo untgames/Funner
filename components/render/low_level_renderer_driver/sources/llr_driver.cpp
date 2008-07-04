@@ -55,7 +55,7 @@ IRenderer* Driver::CreateRenderer (const char* name)
     
   for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
     if (!xtl::xstrcmp ((*iter)->renderer_name.c_str (), name))
-      throw xtl::make_not_implemented_exception (METHOD_NAME); //!!!!!!!!!!
+      return new render::mid_level::low_level_driver::renderer2d::Renderer ((*iter)->device.get (), (*iter)->swap_chain.get ());
 
   throw xtl::make_argument_exception (METHOD_NAME, "name", name);
 }

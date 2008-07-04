@@ -1,6 +1,8 @@
 #ifndef RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_SHARED_HEADER
 #define RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_SHARED_HEADER
 
+#include <climits>
+
 #include <stl/string>
 #include <stl/vector>
 
@@ -11,12 +13,14 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/string.h>
 
+#include <common/log.h>
 #include <common/singleton.h>
 
 #include <media/image.h>
 
 #include <render/low_level/device.h>
 #include <render/low_level/driver.h>
+#include <render/low_level/utils.h>
 
 #include <render/mid_level/driver.h>
 #include <render/mid_level/low_level_driver.h>
@@ -47,7 +51,7 @@ class Object: virtual public IObject, public xtl::reference_counter
     void AddRef  ();    
     void Release ();
 };
-#if 0
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип целевого буфера отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +72,7 @@ class RenderTarget: virtual public IRenderTarget, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderTarget (size_t width, size_t height, RenderTargetType type);
+    RenderTarget (render::low_level::IView* render_target_view, RenderTargetType type);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип целевого буфера
@@ -86,8 +90,16 @@ class RenderTarget: virtual public IRenderTarget, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void CaptureImage (media::Image&);
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение View
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    render::low_level::IView* GetView () { return render_target_view.get (); } 
+  
   private:
-    size_t           width, height;
+    typedef xtl::com_ptr<render::low_level::IView> IViewPtr;
+
+  private:
+    IViewPtr         render_target_view;
     RenderTargetType type;
 };
 
@@ -112,8 +124,8 @@ class BasicFrame: virtual public IFrame, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры области вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetViewport (const Viewport&);
-    void GetViewport (Viewport&);
+    void SetViewport (const render::mid_level::Viewport&);
+    void GetViewport (render::mid_level::Viewport&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры очистки целевых буферов
@@ -128,26 +140,26 @@ class BasicFrame: virtual public IFrame, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Визуализация
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Draw ();
+    void Draw (render::low_level::IDevice* device);
     
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void DrawCore () = 0;
+    virtual void DrawCore (render::low_level::IDevice* device) = 0;
 
   private:
-    typedef xtl::com_ptr<RenderTarget> RenderTargetPtr;
+    typedef xtl::com_ptr<RenderTarget>               RenderTargetPtr;
 
   private:
-    RenderTargetPtr render_target;
-    RenderTargetPtr depth_stencil_target;
-    Viewport        viewport;
-    math::vec4f     clear_color;
-    float           clear_depth_value;
-    unsigned char   clear_stencil_index;
-    bool            need_clear_render_target;
-    bool            need_clear_depth_stencil_target;
+    RenderTargetPtr             render_target;
+    RenderTargetPtr             depth_stencil_target;
+    render::low_level::Viewport viewport;
+    render::low_level::Color4f  clear_color;
+    float                       clear_depth_value;
+    unsigned char               clear_stencil_index;
+    bool                        need_clear_render_target;
+    bool                        need_clear_depth_stencil_target;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +171,7 @@ class BasicRenderer: virtual public IRenderer, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    BasicRenderer ();
+    BasicRenderer (render::low_level::IDevice* device, render::low_level::ISwapChain* swap_chain);
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание
@@ -196,17 +208,22 @@ class BasicRenderer: virtual public IRenderer, public Object
     void CancelFrames ();
     
   private:
-    typedef xtl::com_ptr<IRenderTarget> RenderTargetPtr;
-    typedef xtl::com_ptr<BasicFrame>    FramePtr;
-    typedef stl::vector<FramePtr>       FrameArray;
+    typedef xtl::com_ptr<IRenderTarget>                 RenderTargetPtr;
+    typedef xtl::com_ptr<render::low_level::IDevice>    DevicePtr;
+    typedef xtl::com_ptr<render::low_level::ISwapChain> SwapChainPtr;
+    typedef xtl::com_ptr<BasicFrame>                    FramePtr;
+    typedef stl::vector<FramePtr>                       FrameArray;
+
+  protected:
+    DevicePtr device;
 
   private:
     RenderTargetPtr color_buffer;
     RenderTargetPtr depth_stencil_buffer;
+    SwapChainPtr    swap_chain;
     FrameArray      frames;
-    size_t          frame_id;
+    size_t          resource_pool_id;  
 };
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отладочный драйвер системы рендеринга
@@ -276,35 +293,58 @@ class Driver: virtual public IDriver
     RendererEntries renderer_entries;
 };
 
-#if 0
-
 namespace renderer2d
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Двумерная текстура
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Texture: virtual public mid_level::renderer2d::ITexture, public RenderTarget
+class ImageTexture: virtual public mid_level::renderer2d::ITexture, public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Texture  (size_t width, size_t height, media::PixelFormat format);
-    ~Texture ();
+    ImageTexture  (render::low_level::ITexture*);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Размеры текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t GetWidth  ();
+    size_t GetHeight ();
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Формат
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    media::PixelFormat GetFormat () { return format; }
+    media::PixelFormat GetFormat ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование образа текстуры в картинку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void CaptureImage (media::Image&);    
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    render::low_level::ITexture* GetTexture ();
+
   private:
-    media::PixelFormat format;
+    typedef xtl::com_ptr<render::low_level::ITexture> ITexturePtr;
+    
+  private:
+    ITexturePtr texture;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Двумерная текстура с возможностью рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class RenderTargetTexture: virtual public mid_level::renderer2d::ITexture, public RenderTarget
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    RenderTargetTexture (render::low_level::IView* render_target_view);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -330,7 +370,11 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                             SetTexture (mid_level::renderer2d::ITexture*);
     mid_level::renderer2d::ITexture* GetTexture ();
-    size_t                           GetTextureId () { return texture ? texture->Id () : 0; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение низкоуровневой текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    render::low_level::ITexture* GetLowLevelTexture () { return low_level_texture; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим смешивания цветов
@@ -349,14 +393,25 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     void   ReserveSprites   (size_t sprites_count);
 
   private:
-    typedef stl::vector<mid_level::renderer2d::Sprite> SpriteArray;
-    typedef xtl::com_ptr<Texture>                      TexturePtr;
+    typedef stl::vector<mid_level::renderer2d::Sprite>    SpriteArray;
+    typedef xtl::com_ptr<mid_level::renderer2d::ITexture> TexturePtr;
 
   private:
     math::mat4f                      transform;
     TexturePtr                       texture;
+    render::low_level::ITexture      *low_level_texture;
     mid_level::renderer2d::BlendMode blend_mode;
     SpriteArray                      sprites;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметры шейдера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct ProgramParameters
+{
+  math::mat4f view_matrix;
+  math::mat4f object_matrix;
+  math::mat4f projection_matrix;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -390,15 +445,17 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void DrawCore ();
+    void DrawCore (render::low_level::IDevice* device);
 
   private:
-    typedef xtl::com_ptr<Primitive>   PrimitivePtr;
-    typedef stl::vector<PrimitivePtr> PrimitiveArray;
+    typedef xtl::com_ptr<Primitive>                  PrimitivePtr;
+    typedef stl::vector<PrimitivePtr>                PrimitiveArray;
+    typedef xtl::com_ptr<render::low_level::IBuffer> IBufferPtr;
 
   private:
     math::mat4f    view_tm, proj_tm;
     PrimitiveArray primitives;
+    IBufferPtr     constant_buffer;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -410,8 +467,7 @@ class Renderer: virtual public mid_level::renderer2d::IRenderer, public BasicRen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Renderer  ();
-    ~Renderer ();
+    Renderer  (render::low_level::IDevice* device, render::low_level::ISwapChain* swap_chain);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
@@ -420,11 +476,14 @@ class Renderer: virtual public mid_level::renderer2d::IRenderer, public BasicRen
     mid_level::renderer2d::ITexture*   CreateTexture   (size_t width, size_t height, media::PixelFormat pixel_format);
     mid_level::renderer2d::IPrimitive* CreatePrimitive ();
     mid_level::renderer2d::IFrame*     CreateFrame     ();
+
+  private:
+    xtl::com_ptr<render::low_level::IProgram>                 program;
+    xtl::com_ptr<render::low_level::IProgramParametersLayout> program_parameters_layout;
+    xtl::com_ptr<render::low_level::ISamplerState>            sampler;
 };
 
 }
-
-#endif
 
 }
 

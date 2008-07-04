@@ -1,59 +1,106 @@
-#if 0
 #include "shared.h"
 
 using namespace render::mid_level;
 using namespace render::mid_level::renderer2d;
-using namespace render::mid_level::debug;
-using namespace render::mid_level::debug::renderer2d;
+using namespace render::mid_level::low_level_driver;
+using namespace render::mid_level::low_level_driver::renderer2d;
 using namespace media;
+
+/*
+===================================================================================================
+   Двумерная текстура
+===================================================================================================
+*/
 
 /*
     Конструктор / деструктор
 */
 
-Texture::Texture (size_t width, size_t height, media::PixelFormat in_format)
-  : RenderTarget (width, height, RenderTargetType_Color), format (in_format)
+ImageTexture::ImageTexture (render::low_level::ITexture* in_texture)
+  : texture (in_texture)
 {
-  switch (format)
-  {
-    case PixelFormat_RGB8:
-    case PixelFormat_RGB16:
-    case PixelFormat_BGR8:
-    case PixelFormat_RGBA8:
-    case PixelFormat_RGBA16:
-    case PixelFormat_BGRA8:
-    case PixelFormat_L8:
-    case PixelFormat_A8:
-    case PixelFormat_LA8:
-      break;
-    default:
-      throw xtl::make_argument_exception ("render::mid_level::debug::renderer2d::Texture::Texture", "format", format);
-  }
-  
-  log.Printf ("Create texture %ux%u (format=%d)", width, height, format);
+  if (!in_texture)
+    throw xtl::make_null_argument_exception ("render::mid_level::low_level_driver::ImageTexture::ImageTexture", "texture");
 }
 
-Texture::~Texture ()
+/*
+   Размеры текстуры
+*/
+
+size_t ImageTexture::GetWidth ()
 {
-  try
+  render::low_level::TextureDesc texture_desc;
+
+  texture->GetDesc (texture_desc);
+
+  return texture_desc.width;
+}
+
+size_t ImageTexture::GetHeight ()
+{
+  render::low_level::TextureDesc texture_desc;
+
+  texture->GetDesc (texture_desc);
+
+  return texture_desc.height;
+}
+
+/*
+   Формат
+*/
+
+media::PixelFormat ImageTexture::GetFormat ()
+{
+  render::low_level::TextureDesc texture_desc;
+
+  texture->GetDesc (texture_desc);
+
+  switch (texture_desc.format)
   {
-    log.Printf ("Destroy texture2d (id=%u)", Id ());
-  }
-  catch (...)
-  {
-    //подавление всех исключений
+    case render::low_level::PixelFormat_RGB8:  return media::PixelFormat_RGB8;
+    case render::low_level::PixelFormat_RGBA8: return media::PixelFormat_RGBA8;
+    default:
+      throw xtl::format_not_supported_exception ("render::mid_level::low_level_driver::ImageTexture::GetFormat", "Texture uses incompatible format %s", render::low_level::get_name (texture_desc.format));
   }
 }
 
 /*
-    Копирование образа текстуры в картинку
+   Копирование образа текстуры в картинку
 */
 
-void Texture::CaptureImage (media::Image& image)
+void ImageTexture::CaptureImage (media::Image& image)
 {
-  media::Image (GetWidth (), GetHeight (), 1, GetFormat ()).Swap (image);
+  static const char* METHOD_NAME = "render::mid_level::low_level_driver::ImageTexture::CaptureImage";
+  
+  render::low_level::TextureDesc texture_desc;
 
-  log.Printf ("Capture image from texture (id=%u)", Id ());  
+  texture->GetDesc (texture_desc);
+
+  media::Image (texture_desc.width, texture_desc.height, 1, GetFormat ()).Swap (image);
+
+  texture->GetData (0, 0, 0, 0, texture_desc.width, texture_desc.height, texture_desc.format, image.Bitmap ());
 }
 
-#endif
+/*
+   Получение текстуры
+*/
+
+render::low_level::ITexture* ImageTexture::GetTexture ()
+{
+  return texture.get ();
+}
+
+/*
+===================================================================================================
+   Двумерная текстура с возможностью рендеринга
+===================================================================================================
+*/
+
+/*
+   Конструктор / деструктор
+*/
+
+RenderTargetTexture::RenderTargetTexture (render::low_level::IView* render_target_view)
+  : RenderTarget (render_target_view, RenderTargetType_Color)
+{
+}

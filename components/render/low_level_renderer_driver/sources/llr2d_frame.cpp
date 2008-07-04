@@ -1,10 +1,9 @@
-#if 0
 #include "shared.h"
 
 using namespace render::mid_level;
 using namespace render::mid_level::renderer2d;
-using namespace render::mid_level::debug;
-using namespace render::mid_level::debug::renderer2d;
+using namespace render::mid_level::low_level_driver;
+using namespace render::mid_level::low_level_driver::renderer2d;
 
 /*
     Константы
@@ -24,15 +23,12 @@ const size_t PRIMITIVE_ARRAY_RESERVE_SIZE = 4096; //резервируемое количество при
 Frame::Frame ()
 {
   primitives.reserve (PRIMITIVE_ARRAY_RESERVE_SIZE);
-  
-  log.Printf ("Create frame2d (id=%u)", Id ());
 }
 
 Frame::~Frame ()
 {
   try
   {
-    log.Printf ("Destroy frame2d (id=%u)", Id ());
   }
   catch (...)
   {
@@ -77,7 +73,7 @@ size_t Frame::PrimitivesCount ()
 //добавление примитива
 void Frame::AddPrimitive (IPrimitive* in_primitive)
 {
-  static const char* METHOD_NAME = "render::mid_level::debug::renderer2d::Frame::AddPrimitive";
+  static const char* METHOD_NAME = "render::mid_level::low_level_driver::renderer2d::Frame::AddPrimitive";
 
   if (!in_primitive)
     throw xtl::make_null_argument_exception (METHOD_NAME, "primitive");
@@ -86,7 +82,7 @@ void Frame::AddPrimitive (IPrimitive* in_primitive)
   
   if (!casted_primitive)
     throw xtl::make_argument_exception (METHOD_NAME, "primitive", typeid (in_primitive).name (),
-      "Primitive type incompatible with render::mid_level::debug::renderer2d::Primitive");
+      "Primitive type incompatible with render::mid_level::low_level_driver::renderer2d::Primitive");
 
   primitives.push_back (casted_primitive);
 }
@@ -101,34 +97,48 @@ void Frame::Clear ()
     Реализация визуализации
 */
 
-void Frame::DrawCore ()
+namespace
 {
+
+#pragma pack (1)
+
+struct Vertex
+{
+  math::vec3f position;
+  math::vec2f texcoord;      //color
+};
+
+}
+
+void Frame::DrawCore (render::low_level::IDevice* device)
+{
+  using namespace render::low_level;
+
+  if (!constant_buffer)
+  {
+    BufferDesc constant_buffer_desc = {sizeof (ProgramParameters), UsageMode_Default, BindFlag_ConstantBuffer, AccessFlag_ReadWrite};
+
+    constant_buffer = device->CreateBuffer (constant_buffer_desc);
+
+    device->SSSetConstantBuffer (0, constant_buffer.get ());
+  }
+
+  view_tm = math::translatef (0, 0, -15.5); //??????????
+
+  constant_buffer->SetData (offsetof (ProgramParameters, view_matrix), sizeof (view_tm), &view_tm);
+  constant_buffer->SetData (offsetof (ProgramParameters, projection_matrix), sizeof (proj_tm), &proj_tm);
+
   /*
     в нормальной реализации в этом методе должна быть реализована сортировка спрайтов по удалению от наблюдателя
   */
 
-  log.Printf ("Projection matrix=[[%.2f %.2f %.2f] [%.2f %.2f %.2f] [%.2f %.2f %.2f] [%.2f %.2f %.2f]]",
-    proj_tm [0][0], proj_tm [0][1], proj_tm [0][2], proj_tm [0][3],
-    proj_tm [1][0], proj_tm [1][1], proj_tm [1][2], proj_tm [1][3],
-    proj_tm [2][0], proj_tm [2][1], proj_tm [2][2], proj_tm [2][3],
-    proj_tm [3][0], proj_tm [3][1], proj_tm [3][2], proj_tm [3][3]);
-
-  log.Printf ("View matrix=[[%.2f %.2f %.2f] [%.2f %.2f %.2f] [%.2f %.2f %.2f] [%.2f %.2f %.2f]]",
-    view_tm [0][0], view_tm [0][1], view_tm [0][2], view_tm [0][3],
-    view_tm [1][0], view_tm [1][1], view_tm [1][2], view_tm [1][3],
-    view_tm [2][0], view_tm [2][1], view_tm [2][2], view_tm [2][3],
-    view_tm [3][0], view_tm [3][1], view_tm [3][2], view_tm [3][3]);
-  
   for (PrimitiveArray::iterator iter=primitives.begin (), end=primitives.end (); iter!=end; ++iter)
   {
     Primitive& primitive = **iter;
-   
-    log.Printf ("Draw primitive (id=%u)", primitive.Id ());
     
-    if (primitive.GetTexture ()) log.Printf ("  texture_id=%u", primitive.GetTextureId ());
-    else                         log.Printf ("  texture_id=none");
+    device->SSSetTexture (0, primitive.GetLowLevelTexture ());
     
-    switch (primitive.GetBlendMode ())
+/*    switch (primitive.GetBlendMode ())
     {
       case BlendMode_None:
         log.Printf ("  blend=none");
@@ -145,32 +155,61 @@ void Frame::DrawCore ()
       default:
         break;
     }
-    
+*/    
     math::mat4f object_tm;
     
     primitive.GetTransform (object_tm);
 
-    log.Printf ("  transform=[[%.2f %.2f %.2f] [%.2f %.2f %.2f] [%.2f %.2f %.2f] [%.2f %.2f %.2f]]",
-      object_tm [0][0], object_tm [0][1], object_tm [0][2], object_tm [0][3],
-      object_tm [1][0], object_tm [1][1], object_tm [1][2], object_tm [1][3],
-      object_tm [2][0], object_tm [2][1], object_tm [2][2], object_tm [2][3],
-      object_tm [3][0], object_tm [3][1], object_tm [3][2], object_tm [3][3]);
-      
-    size_t sprites_count=primitive.GetSpritesCount ();
+    constant_buffer->SetData (offsetof (ProgramParameters, object_matrix), sizeof (object_tm), &object_tm);
 
-    log.Printf ("  sprites (count=%u):", sprites_count);
+    size_t sprites_count=primitive.GetSpritesCount ();
 
     for (size_t i=0; i<sprites_count; i++)
     {
       Sprite s;
       
-      primitive.GetSprite (i, s);
-           
-      log.Printf ("    sprite #%u: position=[%.2f %.2f %.2f] size=[%.2f %.2f] color=[%.2f %.2f %.2f %.2f] tex_offset=[%.2f %.2f] tex_size=[%.2f %.2f]",
-        i, s.position.x, s.position.y, s.position.z, s.size.x, s.size.y, s.color.x, s.color.y, s.color.z, s.color.w, 
-        s.tex_offset.x, s.tex_offset.y, s.tex_size.x, s.tex_size.y);
+      primitive.GetSprite (i, s);    
+
+      BufferDesc vertex_buffer_desc = {sizeof (Vertex) * 4, UsageMode_Default, BindFlag_VertexBuffer, AccessFlag_ReadWrite};
+
+      xtl::com_ptr<IBuffer> vertex_buffer (device->CreateBuffer (vertex_buffer_desc), false);
+
+      Vertex vertices[4] = { { math::vec3f (s.position.x - s.size.x,       s.position.y - s.size.y, s.position.z),
+                               math::vec2f (0.f, 0.f) },
+//                               math::vec2f (s.tex_offset.x,                s.tex_offset.y + s.tex_size.y) },
+                             { math::vec3f (s.position.x + s.size.x,       s.position.y - s.size.y, s.position.z), 
+                               math::vec2f (1.f, 0.f) },
+//                               math::vec2f (s.tex_offset.x + s.tex_size.x, s.tex_offset.y + s.tex_size.y) },
+                             { math::vec3f (s.position.x - s.size.x,       s.position.y + s.size.y, s.position.z), 
+                               math::vec2f (0.f, 1.f) },
+//                               math::vec2f (s.tex_offset.x,                s.tex_offset.y) },
+                             { math::vec3f (s.position.x + s.size.x,       s.position.y + s.size.y, s.position.z),
+                               math::vec2f (1.f, 1.f) } };
+//                               math::vec2f (s.tex_offset.x + s.tex_size.x, s.tex_offset.y) } };
+
+      vertex_buffer->SetData (0, sizeof (vertices), vertices);
+
+      static VertexAttribute attributes [] = {
+        {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, position), sizeof (Vertex)},
+        {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (Vertex, texcoord), sizeof (Vertex)},
+      };
+      
+      InputLayoutDesc layout_desc;
+      
+      memset (&layout_desc, 0, sizeof layout_desc);
+      
+      layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
+      layout_desc.vertex_attributes       = attributes;
+      layout_desc.index_type              = InputDataType_UInt;
+      layout_desc.index_buffer_offset     = 0;            
+
+      xtl::com_ptr<IInputLayout> input_layout (device->CreateInputLayout (layout_desc), false);      
+
+      device->OSSetDepthStencilState (0);
+      device->ISSetInputLayout       (input_layout.get ());
+      device->ISSetVertexBuffer      (0, vertex_buffer.get ());
+
+      device->Draw (PrimitiveType_TriangleStrip, 0, 4);
     }
   }
 }
-
-#endif

@@ -21,4 +21,5 @@ RENDER.LOW_LEVEL_RENDERER_DRIVER.TESTS.LIB_DIRS         :=
 RENDER.LOW_LEVEL_RENDERER_DRIVER.TESTS.LIBS             :=
 RENDER.LOW_LEVEL_RENDERER_DRIVER.TESTS.COMPILER_CFLAGS  :=
 RENDER.LOW_LEVEL_RENDERER_DRIVER.TESTS.COMPILER_DEFINES := 
-RENDER.LOW_LEVEL_RENDERER_DRIVER.TESTS.IMPORTS          := link.static.mak compile.static.mak ../low_level/compile.static.mak ../../system/compile.static.mak ../../system/link.static.mak ../opengl_driver/link.static.mak
+RENDER.LOW_LEVEL_RENDERER_DRIVER.TESTS.IMPORTS          := link.static.mak compile.static.mak ../low_level/compile.static.mak ../../system/compile.static.mak ../../system/link.static.mak  \
+                                                           ../opengl_driver/link.static.mak ../../media/image/compile.static.mak

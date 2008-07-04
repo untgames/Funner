@@ -1,26 +1,24 @@
-#if 0
 #include "shared.h"
 
 using namespace render::mid_level;
 using namespace render::mid_level::renderer2d;
-using namespace render::mid_level::debug;
-using namespace render::mid_level::debug::renderer2d;
+using namespace render::mid_level::low_level_driver;
+using namespace render::mid_level::low_level_driver::renderer2d;
 
 /*
     Конструктор / деструктор
 */
 
 Primitive::Primitive ()
-  : blend_mode (BlendMode_None)
+  : blend_mode (BlendMode_None),
+    low_level_texture (0)
 {
-  log.Printf ("Create primitive (id=%u)", Id ());
 }
 
 Primitive::~Primitive ()
 {
   try
   {
-    log.Printf ("Destroy primitive (id=%u)", Id ());
   }
   catch (...)
   {
@@ -46,7 +44,7 @@ void Primitive::GetTransform (math::mat4f& out_transform)
     Установка базовой текстуры
 */
 
-void Primitive::SetTexture (ITexture* in_texture)
+void Primitive::SetTexture (render::mid_level::renderer2d::ITexture* in_texture)
 {
   if (!in_texture)
   {
@@ -54,13 +52,26 @@ void Primitive::SetTexture (ITexture* in_texture)
     return;
   }
 
-  Texture* casted_texture = dynamic_cast<Texture*> (in_texture);
+  render::mid_level::low_level_driver::renderer2d::ImageTexture* image_texture = dynamic_cast<ImageTexture*> (in_texture);
 
-  if (!casted_texture)
-    throw xtl::make_argument_exception ("render::mid_level::debug::renderer2d::Primitive::SetTexture", "texture", typeid (in_texture).name (),
-      "Texture type is incompatible with render::mid_level::debug::renderer2d::Texture");
-      
-  texture = casted_texture;
+  if (image_texture)
+  {
+    low_level_texture = image_texture->GetTexture ();      
+    texture = image_texture;
+  }
+  else
+  {
+    render::mid_level::low_level_driver::renderer2d::RenderTargetTexture* render_target_texture = dynamic_cast<RenderTargetTexture*> (in_texture);
+
+    render_target_texture = dynamic_cast<RenderTargetTexture*> (in_texture);
+
+    if (!render_target_texture)
+      throw xtl::make_argument_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::SetTexture", "texture", typeid (in_texture).name (),
+        "Texture type must be render::mid_level::low_level_driver::renderer2d::ImageTexture or render::mid_level::low_level_driver::renderer2d::RenderTargetTexture");
+
+    low_level_texture = render_target_texture->GetView ()->GetTexture ();
+    texture = render_target_texture;
+  }
 }
 
 ITexture* Primitive::GetTexture ()
@@ -82,7 +93,7 @@ void Primitive::SetBlendMode (BlendMode in_blend_mode)
     case BlendMode_Additive:
       break;
     default:
-      throw xtl::make_argument_exception ("render::mid_level::debug::renderer2d::Primitive::SetBlendMode", "blend_mode", in_blend_mode);
+      throw xtl::make_argument_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::SetBlendMode", "blend_mode", in_blend_mode);
   }
   
   blend_mode = in_blend_mode;
@@ -107,7 +118,7 @@ size_t Primitive::GetSpritesCount ()
 void Primitive::GetSprite (size_t index, Sprite& sprite)
 {
   if (index >= sprites.size ())
-    throw xtl::make_range_exception ("render::mid_level::debug::renderer2d::Primitive::GetSprite", "index", index, sprites.size ());
+    throw xtl::make_range_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::GetSprite", "index", index, sprites.size ());
 
   sprite = sprites [index];
 }
@@ -145,5 +156,3 @@ void Primitive::ReserveSprites (size_t sprites_count)
 {
   sprites.reserve (sprites_count);
 }
-
-#endif
