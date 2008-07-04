@@ -5,7 +5,7 @@ class MyVisitor: public visitor<void, Sprite>
   public:
     void visit (Sprite& sprite)
     {
-      printf ("Sprite: material='%s' frame=%u\n", sprite.Material (), sprite.Frame ());        
+      printf ("Sprite: material='%s' frame=%u alpha=%.1f\n", sprite.Material (), sprite.Frame (), sprite.Alpha ());
     }
 };
 
@@ -17,6 +17,7 @@ int main ()
 
   sprite->SetMaterial ("material1");
   sprite->SetFrame (12);
+  sprite->SetAlpha (0.5f);
   
   MyVisitor visitor;
   

@@ -11,6 +11,7 @@ struct Sprite::Impl
 {
   stl::string material; //имя материала
   size_t      frame;    //номер кадра
+  float       alpha;    //прозрачность
 };
 
 /*
@@ -64,6 +65,23 @@ void Sprite::SetFrame (size_t frame)
 size_t Sprite::Frame () const
 {
   return impl->frame;
+}
+
+/*
+    Управление прозрачностью
+*/
+
+void Sprite::SetAlpha (float alpha)
+{
+  if (alpha < 0.0f || alpha > 1.0f)
+    throw xtl::make_range_exception ("scene_graph::Sprite::SetAlpha", "alpha", alpha, 0.0f, 1.0f);
+    
+  impl->alpha = alpha;
+}
+
+float Sprite::Alpha () const
+{
+  return impl->alpha;
 }
 
 /*
