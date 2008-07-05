@@ -116,6 +116,7 @@ void Frame::DrawCore (render::low_level::IDevice* device)
 
   for (PrimitiveArray::iterator iter=primitives.begin (), end=primitives.end (); iter!=end; ++iter)
   {
+    printf ("Draw Primitive.\n");
     Primitive& primitive = **iter;
     
     device->SSSetTexture (0, primitive.GetLowLevelTexture ());
@@ -126,6 +127,7 @@ void Frame::DrawCore (render::low_level::IDevice* device)
 
     for (size_t i=0; i<sprites_count; i++)
     {
+      printf ("Draw sprite.\n");
       Sprite s;
       
       primitive.GetSprite (i, s);    

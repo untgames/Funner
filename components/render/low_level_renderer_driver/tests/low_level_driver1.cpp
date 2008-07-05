@@ -24,8 +24,8 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
   if (window.IsClosed ())
     return;
 
-  mat4f tm1 = rotatef (sprite_rotation, 0, 0, 1) * translatef (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f) * scalef (20, 20, 1) * rotatef (-sprite_rotation, 0, 0, 1);
-  mat4f tm2 = translatef (cos (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, sin (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (20, 20, 1) * rotatef (-sprite_rotation, 0, 0, 1);
+  mat4f tm1 = rotatef (sprite_rotation, 0, 0, 1) * translatef (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f) * scalef (40, 40, 1) * rotatef (-sprite_rotation, 0, 0, 1);
+  mat4f tm2 = translatef (cos (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, sin (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (40, 40, 1) * rotatef (-sprite_rotation, 0, 0, 1);
 
   primitive1->SetTransform (tm1);
   primitive2->SetTransform (tm2);
@@ -133,8 +133,8 @@ int main ()
     xtl::com_ptr<render::mid_level::renderer2d::ITexture>   /*texture1  (renderer->CreateTexture (64, 64, media::PixelFormat_RGBA8), false),*/ texture2 (renderer->CreateTexture (texture_image), false), texture1 (texture2);
     xtl::com_ptr<render::mid_level::renderer2d::IPrimitive> primitive1 (renderer->CreatePrimitive (), false), primitive2 (renderer->CreatePrimitive (), false);
 
-    Sprite sprite1 = {vec3f (0.f, 0.f, 0.f), vec2f (1.f, 1.f), vec4f (1.f, 1.f, 1.f, 0.5f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
-    Sprite sprite2 = {vec3f (0.f, 0.f, 0.f), vec2f (1.f, 1.f), vec4f (1.f, 1.f, 1.f, 0.5f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
+    Sprite sprite1 = {vec3f (0.f, 0.f, 0.f), vec2f (1.f, 1.f), vec4f (1.f, 1.f, 1.f, 0.6f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
+    Sprite sprite2 = {vec3f (0.f, 0.f, 0.f), vec2f (1.f, 1.f), vec4f (1.f, 1.f, 1.f, 0.4f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
 
     primitive1->SetTexture (texture1.get ());
     primitive2->SetTexture (texture2.get ());
@@ -153,7 +153,7 @@ int main ()
 
     frame->SetProjection (get_ortho_proj (-100, 100, -100, 100, -1000, 1000));
     frame->SetViewport (viewport);
-    frame->SetClearColor (math::vec4f (0.7f, 0.f, 0.f, 0.4f));
+    frame->SetClearColor (math::vec4f (0.7f, 0.f, 0.f, 0.f));
     frame->SetClearBuffers (true, true);
     frame->SetRenderTargets (renderer->GetColorBuffer (), renderer->GetDepthStencilBuffer ());
 

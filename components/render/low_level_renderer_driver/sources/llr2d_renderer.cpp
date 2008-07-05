@@ -40,6 +40,11 @@ const char* SHADER_SOURCE_CODE =
 "  Blend     Modulate\n"
 "}";
 
+/*const char* PIXEL_SHADER =
+"uniform sampler2D texture; varying vec4 color; void main (void) {gl_FragColor = vec4 (vec3 (texture2D (texture, vec2 (gl_TexCoord[0]))), color.w);}";
+const char* VERTEX_SHADER = 
+"uniform mat4 currentViewMatrix; uniform mat4 currentProjMatrix; varying vec4 color; void main (void) {gl_Position = currentViewMatrix * currentProjMatrix * gl_Vertex; gl_TexCoord[0] = gl_MultiTexCoord0; color = gl_Color;}";
+*/
 }
 
 /*
@@ -64,7 +69,14 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
     shader_desc.options          = "";
 
     program = ProgramPtr (device->CreateProgram (1, &shader_desc, &default_error_log), false);
+/*
+    ShaderDesc shader_descs [] = {
+      {"p_shader", strlen (PIXEL_SHADER), PIXEL_SHADER, "glsl.ps", ""},
+      {"v_shader", strlen (VERTEX_SHADER), VERTEX_SHADER, "glsl.vs", ""}
+    };
 
+    program = ProgramPtr (device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &default_error_log), false);
+*/
     device->SSSetProgram (program.get ());
 
     common_resources = CommonResourcesPtr (new CommonResources (device), false); //ѕри переносе выше CreateProgram бленд стейты не работают!!!!!!!
@@ -84,7 +96,7 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
     program_parameters[1].slot   = 0;
     program_parameters[1].count  = 1;
     program_parameters[1].offset = offsetof (ProgramParameters, projection_matrix);
-
+  
     ProgramParametersLayoutDesc program_parameters_layout_desc;
 
     memset (&program_parameters_layout_desc, 0, sizeof (program_parameters_layout_desc));
@@ -100,7 +112,7 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
     
     memset (&sampler_desc, 0, sizeof (sampler_desc));
 
-    sampler_desc.min_filter           = TexMinFilter_Linear;
+    sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
     sampler_desc.mag_filter           = TexMagFilter_Linear;
     sampler_desc.max_anisotropy       = 1;
     sampler_desc.wrap_u               = TexcoordWrap_Mirror;
