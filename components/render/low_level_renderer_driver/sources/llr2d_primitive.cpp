@@ -25,12 +25,7 @@ void Primitive::SetTransform (const math::mat4f& in_transform)
   transform = in_transform;
 
   for (size_t i = 0; i < sprites.size (); i++)
-  {
-    (sprite_vertex_buffer.data () + i * 4)->position     = in_transform * math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y - sprites[i].size.y, sprites[i].position.z);
-    (sprite_vertex_buffer.data () + i * 4 + 1)->position = in_transform * math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y - sprites[i].size.y, sprites[i].position.z);
-    (sprite_vertex_buffer.data () + i * 4 + 2)->position = in_transform * math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
-    (sprite_vertex_buffer.data () + i * 4 + 3)->position = in_transform * math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
-  }
+    ComputeSpriteTransorm (i);
 }
 
 void Primitive::GetTransform (math::mat4f& out_transform)
@@ -190,6 +185,11 @@ void Primitive::BuildSpriteVertexData (size_t i)
   sprite_vertex_buffer.data ()[i * 4 + 2].position = math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
   sprite_vertex_buffer.data ()[i * 4 + 3].position = math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
 
+  ComputeSpriteTransorm (i*4);
+  ComputeSpriteTransorm (i*4 + 1);
+  ComputeSpriteTransorm (i*4 + 2);
+  ComputeSpriteTransorm (i*4 + 3);
+
   sprite_vertex_buffer.data ()[i * 4].texcoord     = math::vec2f (sprites[i].tex_offset.x,                         sprites[i].tex_offset.y);
   sprite_vertex_buffer.data ()[i * 4 + 1].texcoord = math::vec2f (sprites[i].tex_offset.x + sprites[i].tex_size.x, sprites[i].tex_offset.y);
   sprite_vertex_buffer.data ()[i * 4 + 2].texcoord = math::vec2f (sprites[i].tex_offset.x,                         sprites[i].tex_offset.y + sprites[i].tex_size.y);
@@ -204,4 +204,12 @@ void Primitive::BuildSpriteVertexData (size_t i)
   sprite_vertex_buffer.data ()[i*4 + 1].texture = texture.get ();
   sprite_vertex_buffer.data ()[i*4 + 2].texture = texture.get ();
   sprite_vertex_buffer.data ()[i*4 + 3].texture = texture.get ();
+}
+
+void Primitive::ComputeSpriteTransorm (size_t i)
+{
+  (sprite_vertex_buffer.data () + i * 4)->position     = transform * math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y - sprites[i].size.y, sprites[i].position.z);
+  (sprite_vertex_buffer.data () + i * 4 + 1)->position = transform * math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y - sprites[i].size.y, sprites[i].position.z);
+  (sprite_vertex_buffer.data () + i * 4 + 2)->position = transform * math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
+  (sprite_vertex_buffer.data () + i * 4 + 3)->position = transform * math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
 }

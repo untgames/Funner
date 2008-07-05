@@ -420,6 +420,7 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 ///ѕостроение вершинных данных дл€ спрайта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void BuildSpriteVertexData (size_t sprite_index);
+    void ComputeSpriteTransorm (size_t sprite_index);
 
   private:
     typedef stl::vector<mid_level::renderer2d::Sprite>    SpriteArray;
