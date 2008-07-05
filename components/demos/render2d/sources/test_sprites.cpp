@@ -36,7 +36,7 @@ void idle (TestApplication& app, TestScene& scene)
 {
   try
   {
-//    scene.sprite->Rotate (1, 0, 0, 1);
+    scene.sprite->Rotate (10, 0, 0, 1);
     
     app.PostRedraw ();
   }
