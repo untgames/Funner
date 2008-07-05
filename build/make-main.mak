@@ -4,7 +4,6 @@
 COMPONENT_CONFIGURATION_FILE_SHORT_NAME := component.mak #Базовое имя файла конфигурации компонента
 TMP_DIR_SHORT_NAME                      := tmp           #Базовое имя каталога с временными файлами
 SOURCE_FILES_SUFFIXES                   := c cpp         #Расширения исходных файлов
-BUILD_DIR_SHORT_NAME                    := build         #Базовое имя каталога со скриптами сборки
 TMP_DIR_SHORT_NAME                      := tmp           #Базовое имя каталога с временными файлами сборки
 DIST_DIR_SHORT_NAME                     := dist          #Базовое имя каталога с результатами сборки
 TOOLSETS_DIR_SHORT_NAME                 := toolsets      #Базовое имя каталога с конфигурациями toolset-ов
@@ -22,19 +21,18 @@ EXPORT_TAR_TMP_FILE_SHORT_NAME          := export-file.tar #Базовое имя файла ар
 ###################################################################################################
 #Производные пути и переменные
 ###################################################################################################
-
 COMPONENT_CONFIGURATION_FILE_SHORT_NAME := $(strip $(COMPONENT_CONFIGURATION_FILE_SHORT_NAME))
 TMP_DIR_SHORT_NAME                      := $(strip $(TMP_DIR_SHORT_NAME))
 SOURCE_FILES_SUFFIXES                   := $(strip $(SOURCE_FILES_SUFFIXES))
-BUILD_DIR_SHORT_NAME                    := $(strip $(BUILD_DIR_SHORT_NAME))
+
 TMP_DIR_SHORT_NAME                      := $(strip $(TMP_DIR_SHORT_NAME))
 DIST_DIR_SHORT_NAME                     := $(strip $(DIST_DIR_SHORT_NAME))
 EXPORT_VAR_PREFIX                       := $(strip $(EXPORT_VAR_PREFIX))
 EXPORT_TAR_TMP_FILE_SHORT_NAME          := $(strip $(EXPORT_TAR_TMP_FILE_SHORT_NAME))
 EXPORT_EXCLUDE_PATTERN                  := $(strip $(EXPORT_EXCLUDE_PATTERN))
 CURRENT_TOOLSET                         := $(TOOLSET)
-BUILD_DIR                               := $(ROOT)/$(BUILD_DIR_SHORT_NAME)
-TOOLSETS_DIR                            := $(BUILD_DIR)/$(strip $(TOOLSETS_DIR_SHORT_NAME))
+BUILD_DIR                               := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+TOOLSETS_DIR                            := $(BUILD_DIR)$(strip $(TOOLSETS_DIR_SHORT_NAME))
 TOOLSETS                                := $(patsubst $(TOOLSETS_DIR)/%.mak,%,$(wildcard $(TOOLSETS_DIR)/*.mak))
 TOOLSET_FILE                            := $(TOOLSETS_DIR)/$(CURRENT_TOOLSET).mak
 DIST_DIR                                := $(ROOT)/$(DIST_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)

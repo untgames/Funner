@@ -49,6 +49,7 @@ OBJ_SUFFIX := obj
 EXE_SUFFIX := exe
 DLL_SUFFIX := dll
 PROFILES   += msvc win32
+COMMON_LINK_FLAGS += /stack:128000
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
@@ -79,7 +80,7 @@ endef
 #список подключаемых символов линковки, флаги линковки)
 ###################################################################################################
 define tools.link
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2 $(COMMON_LINK_FLAGS)
 endef
 
 ###################################################################################################
