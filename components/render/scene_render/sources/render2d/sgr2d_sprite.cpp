@@ -22,6 +22,8 @@ RenderableSprite::RenderableSprite (scene_graph::Sprite* in_sprite, Render& in_r
 
 void RenderableSprite::UpdateNotify ()
 {  
+  primitive->RemoveAllSprites ();
+
     //оптимизировать в расчёте на частичное изменение параметров!!!
 
   try
