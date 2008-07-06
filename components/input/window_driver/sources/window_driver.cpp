@@ -33,6 +33,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     ~Driver () 
     { 
       UnregisterDriver ();
+      UnregisterAllDevices ();
       Release (); 
     }
 
@@ -86,8 +87,8 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddRef () { addref (this); }  
-    void Release () { release (this); }
+    void AddRef () {}  
+    void Release () {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация окна как устройства ввода

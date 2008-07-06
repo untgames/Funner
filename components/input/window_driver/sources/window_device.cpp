@@ -231,11 +231,8 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
 
       if (autocenter_cursor)
       {
-        x_cursor_pos = (window_event_context.window_rect.right - window_event_context.window_rect.left) / 2;
-        y_cursor_pos = (window_event_context.window_rect.bottom - window_event_context.window_rect.top) / 2;
-//        x_cursor_pos = window.Width () / 2;
-//        y_cursor_pos = window.Height () / 2;
-//        printf ("\nSetting cursor from %u.%u to %u.%u\n\n", window_event_context.cursor_position.x, window_event_context.cursor_position.y, x_cursor_pos, y_cursor_pos);
+        x_cursor_pos = window.Width () / 2;
+        y_cursor_pos = window.Height () / 2;
         window.SetCursorPosition (window.Width () / 2, window.Height () / 2);
       }
 
