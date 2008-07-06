@@ -115,8 +115,8 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
     sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
     sampler_desc.mag_filter           = TexMagFilter_Linear;
     sampler_desc.max_anisotropy       = 1;
-    sampler_desc.wrap_u               = TexcoordWrap_Mirror;
-    sampler_desc.wrap_v               = TexcoordWrap_Mirror;
+    sampler_desc.wrap_u               = TexcoordWrap_Repeat; //Дрожание краёв !!!!! нужно TexcoordWrap_Mirror либо TexcoordWrap_ClampToBorder !!!!!!
+    sampler_desc.wrap_v               = TexcoordWrap_Repeat;
     sampler_desc.comparision_function = CompareMode_AlwaysPass;
     sampler_desc.min_lod              = 0;
     sampler_desc.max_lod              = FLT_MAX;

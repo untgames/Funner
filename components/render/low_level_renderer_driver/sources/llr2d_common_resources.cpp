@@ -40,7 +40,7 @@ CommonResources::CommonResources (render::low_level::IDevice* device)
   blend_states[BlendMode_Translucent] = BlendStatePtr (device->CreateBlendState (blend_desc), false);
 
   blend_desc.blend_color_source_argument      = BlendArgument_Zero;
-  blend_desc.blend_color_destination_argument = BlendArgument_SourceColor;
+  blend_desc.blend_color_destination_argument = BlendArgument_SourceAlpha; //Should bi BlendArgument_SourceColor
   blend_desc.blend_alpha_source_argument      = BlendArgument_Zero;
   blend_desc.blend_alpha_destination_argument = BlendArgument_SourceAlpha;
   
