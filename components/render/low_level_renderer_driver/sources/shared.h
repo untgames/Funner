@@ -434,6 +434,7 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     mid_level::renderer2d::BlendMode blend_mode;
     SpriteArray                      sprites;
     SpriteVertexArray                sprite_vertex_buffer;
+    bool                             dirty_transform;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -43,8 +43,8 @@ const char* SHADER_SOURCE_CODE =
 /*const char* PIXEL_SHADER =
 "uniform sampler2D texture; varying vec4 color; void main (void) {gl_FragColor = vec4 (vec3 (texture2D (texture, vec2 (gl_TexCoord[0]))), color.w);}";
 const char* VERTEX_SHADER = 
-"uniform mat4 currentViewMatrix; uniform mat4 currentProjMatrix; varying vec4 color; void main (void) {gl_Position = currentViewMatrix * currentProjMatrix * gl_Vertex; gl_TexCoord[0] = gl_MultiTexCoord0; color = gl_Color;}";
-*/
+"uniform mat4 currentViewMatrix; uniform mat4 currentProjMatrix; varying vec4 color; void main (void) {gl_Position = currentViewMatrix * currentProjMatrix * gl_Vertex; gl_TexCoord[0] = gl_MultiTexCoord0; color = gl_Color;}";*/
+
 }
 
 /*
