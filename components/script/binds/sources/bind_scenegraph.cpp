@@ -27,6 +27,7 @@ const char* SCENE_POINT_LIGHT_LIBRARY                 = "Scene.PointLight";
 const char* SCENE_BOX_HELPER_LIBRARY                  = "Scene.BoxHelper";
 const char* SCENE_LISTENER_LIBRARY                    = "Scene.Listener";
 const char* SCENE_SOUND_EMITTER_LIBRARY               = "Scene.SoundEmitter";
+const char* SCENE_SPRITE_LIBRARY                      = "Scene.Sprite";
 const char* SCENE_VISUAL_MODEL_LIBRARY                = "Scene.VisualModel";
 
 /*
@@ -475,6 +476,45 @@ void bind_sound_emitter_library (Environment& environment, InvokerRegistry& enti
 }
 
 /*
+    Создание спрайта
+*/
+
+Sprite::Pointer create_sprite ()
+{
+  return Sprite::Create ();
+}
+
+/*
+   Регистрация библиотеки работы с спрайтами
+*/
+
+void bind_sprite_library (Environment& environment, InvokerRegistry& entity_lib)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_SPRITE_LIBRARY);
+
+    //наследование
+
+  lib.Register (entity_lib);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&create_sprite));
+
+    //регистрация операций
+
+  lib.Register ("set_Material", make_invoker (&Sprite::SetMaterial));
+  lib.Register ("set_Alpha",    make_invoker (&Sprite::SetAlpha));
+  lib.Register ("set_Frame",    make_invoker (&Sprite::SetFrame));
+  lib.Register ("get_Material", make_invoker (&Sprite::Material));
+  lib.Register ("get_Alpha",    make_invoker (&Sprite::Alpha));
+  lib.Register ("get_Frame",    make_invoker <int (Sprite&)> (&Sprite::Frame));
+
+    //регистрация типов данных
+
+  environment.RegisterType<Sprite> (SCENE_SPRITE_LIBRARY);
+}
+
+/*
     Создание модели
 */
 
@@ -532,6 +572,7 @@ void bind_scene_graph_library (Environment& environment)
   bind_box_helper_library         (environment, entity_class_lib);
   bind_listener_library           (environment, entity_class_lib);
   bind_sound_emitter_library      (environment, entity_class_lib);
+  bind_sprite_library             (environment, entity_class_lib);
   bind_visual_model_library       (environment, entity_class_lib);
 }
 

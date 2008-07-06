@@ -24,6 +24,7 @@
 #include <sg/helper.h>
 #include <sg/listener.h>
 #include <sg/sound_emitter.h>
+#include <sg/sprite.h>
 #include <sg/visual_model.h>
 
 #endif

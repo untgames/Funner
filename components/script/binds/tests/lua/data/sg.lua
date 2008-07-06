@@ -286,6 +286,24 @@ function test_sound_emitter ()
   print ("SoundEmitter sound declaration name = " .. sound_emitter1.SoundDeclarationName)
 end
 
+function test_sprite ()
+  print ("Sprite test")
+
+  local sprite1 = Scene.Sprite.Create ()
+
+  print ("Material name = " .. sprite1.Material)
+  print ("Alpha value = " .. sprite1.Alpha)
+  print ("Frame number = " .. sprite1.Frame)
+
+  sprite1.Material = "SettedMaterial"
+  sprite1.Alpha    = 0.8
+  sprite1.Frame    = 9
+   
+  print ("Material name = " .. sprite1.Material)
+  print ("Alpha value = " .. sprite1.Alpha)
+  print ("Frame number = " .. sprite1.Frame)
+end
+
 function test_visual_model ()
   print ("VisualModel test")
 
@@ -318,5 +336,7 @@ function test ()
 
   test_sound_emitter ()
 
-  test_visual_model ()]]
+  test_visual_model ()
+
+  test_sprite ()]]
 end
