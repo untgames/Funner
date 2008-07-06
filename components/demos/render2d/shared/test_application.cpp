@@ -51,9 +51,13 @@ const char* DEFAULT_DEVICE_INIT_STRING = ""; //строка инициализации устройства р
 
 template <class T> T get (VarRegistry& registry, const char* name, const T& default_value)
 {
+//  printf ("Read value of %s, branch name is %s\n", name, registry.BranchName ());
+
   if (!registry.HasVariable (name))
     return default_value;
     
+//  printf ("Readed value of %s\n", name);
+
   try
   {
     return xtl::any_multicast<T> (registry.GetValue (name));
@@ -163,7 +167,7 @@ TestApplication::TestApplication ()
       
     impl->config.Open (CONFIGURATION_BRANCH_NAME);
 
-    load_xml_configuration (impl->config, CONFIGURATION_FILE_NAME);
+    load_xml_configuration (VarRegistry (""), CONFIGURATION_FILE_NAME);
 
       //создание окна
       
