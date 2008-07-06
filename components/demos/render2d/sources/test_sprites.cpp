@@ -24,11 +24,9 @@ struct TestScene
       Sprite::Pointer sprite = Sprite::Create ();      
 
       sprite->SetName     (common::format ("Sprite%u", i+1).c_str ());
-      sprite->SetMaterial ("burst_material");
+      sprite->SetMaterial ("font_material");
       
-      float intensity = frand ();
-      
-      sprite->SetColor    (math::vec4f (intensity, intensity, 0));
+      sprite->SetColor    (math::vec4f (frand (), frand (), frand ()));
       sprite->SetAlpha    (frand ());    
       
       float scale = frand (1, 4);
