@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <material_library>
-  <material id="sprite_material" name="sprite_material">
+  <material id="sprite_material">
     <sprite_profile image="media/bottom.jpg" blend_mode="translucent"/>
   </material>
-  <material id="font_material" name="sprite_material">
+  <material id="font_material">
     <sprite_profile image="media/font.tga" blend_mode="additive" tiling="1" tile_width="16" tile_height="16"/>
+  </material>
+  <material id="burst_material">
+    <sprite_profile image="media/burst_strip.tga" blend_mode="additive" tiling="1" tile_width="64" tile_height="64"/>
+  </material>
+  <material id="pistol_material">
+    <sprite_profile image="media/pistol_mflash_strip.tga" blend_mode="additive" tiling="1" tile_width="256" tile_height="256"/>
   </material>
 </material_library>

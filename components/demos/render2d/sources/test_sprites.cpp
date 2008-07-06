@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const size_t SPRITES_COUNT = 80;
+const size_t SPRITES_COUNT = 180;
 
 typedef stl::vector<Sprite::Pointer> SpriteArray;
 
@@ -24,10 +24,16 @@ struct TestScene
       Sprite::Pointer sprite = Sprite::Create ();      
 
       sprite->SetName     (common::format ("Sprite%u", i+1).c_str ());
-      sprite->SetMaterial ("font_material");
-      sprite->SetColor    (math::vec4f (frand (), frand (), frand ()));
+      sprite->SetMaterial ("burst_material");
+      
+      float intensity = frand ();
+      
+      sprite->SetColor    (math::vec4f (intensity, intensity, 0));
       sprite->SetAlpha    (frand ());    
-      sprite->Scale       (frand (1, 4), frand (1, 4), 1);
+      
+      float scale = frand (1, 4);
+      
+      sprite->Scale       (scale, scale, 1);
       sprite->SetOrientation (frand () * 360.0f, 0, 0, 1);
       sprite->BindToScene (scene); 
       sprite->SetPosition (frand (-10, 10), frand (-10, 10), frand (-10, 10));
