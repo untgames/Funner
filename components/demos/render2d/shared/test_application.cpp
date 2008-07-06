@@ -1,5 +1,3 @@
-#include <ctime>
-
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/intrusive_ptr.h>

@@ -2,12 +2,16 @@
 #define DEMOS_RENDER2D_SHARED_HEADER
 
 #include <cstdio>
+#include <ctime>
 
 #include <stl/auto_ptr.h>
+#include <stl/vector>
 
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/ref.h>
+
+#include <common/strlib.h>
 
 #include <sg/scene.h>
 #include <sg/camera.h>

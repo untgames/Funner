@@ -1,27 +1,43 @@
 #include "shared.h"
 
+const size_t SPRITES_COUNT = 1000;
+
+typedef stl::vector<Sprite::Pointer> SpriteArray;
+
+float frand (float min_value=0.0f, float max_value=1.0f)
+{
+  return min_value + float (rand ()) / RAND_MAX * (max_value - min_value);
+}
+
 struct TestScene
 {
-  Sprite::Pointer      sprite;
+  SpriteArray          sprites;
   OrthoCamera::Pointer camera;
   Scene                scene;  
 
   TestScene ()
   {
-    sprite = Sprite::Create ();
+    sprites.reserve (SPRITES_COUNT);
+    
+    for (size_t i=0; i<SPRITES_COUNT; i++)
+    {
+      Sprite::Pointer sprite = Sprite::Create ();      
+
+      sprite->SetName     (common::format ("Sprite%u", i+1).c_str ());
+      sprite->SetMaterial ("sprite_material");
+      sprite->SetColor    (math::vec4f (frand (), frand (), frand ()));
+      sprite->SetAlpha    (frand ());    
+      sprite->Scale       (frand (1, 4), frand (1, 4), 1);
+      sprite->BindToScene (scene); 
+      sprite->SetPosition (frand (-10, 10), frand (-10, 10), 0);
+      
+      sprites.push_back (sprite);
+    }
+
     camera = OrthoCamera::Create ();    
     
-    sprite->BindToScene (scene, NodeBindMode_Capture);
     camera->BindToScene (scene, NodeBindMode_Capture);
-
-    sprite->SetName ("Sprite1");
-    camera->SetName ("Camera1");
-    sprite->SetMaterial ("sprite_material");
-    sprite->SetColor (math::vec4f (1.0f, 1.0f, 1.0f));
-    sprite->SetAlpha (0.5f);
-    
-    sprite->Scale (20, 20, 1);
-    
+    camera->SetName ("Camera1");                
     camera->SetPosition (0, 0, -3);
     camera->SetLeft     (-10);
     camera->SetRight    (10);
@@ -36,8 +52,16 @@ void idle (TestApplication& app, TestScene& scene)
 {
   try
   {
-    scene.sprite->Rotate (10, 0, 0, 1);
+    static clock_t last_update = 0;
     
+    if (clock () - last_update >= CLK_TCK / 20)
+    {    
+      for (SpriteArray::iterator iter=scene.sprites.begin (), end=scene.sprites.end (); iter!=end; ++iter)
+        (*iter)->Rotate (1, 0, 0, 1);
+        
+      last_update = clock ();
+    }    
+
     app.PostRedraw ();
   }
   catch (std::exception& exception)
