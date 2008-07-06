@@ -46,6 +46,8 @@ void Sprite::SetMaterial (const char* in_material)
     throw xtl::make_null_argument_exception ("scene_graph::Sprite::SetMaterial", "material");
 
   impl->material = in_material;
+  
+  UpdateNotify ();
 }
 
 const char* Sprite::Material () const
@@ -60,6 +62,8 @@ const char* Sprite::Material () const
 void Sprite::SetFrame (size_t frame)
 {
   impl->frame = frame;
+  
+  UpdateNotify ();
 }
 
 size_t Sprite::Frame () const
@@ -77,6 +81,8 @@ void Sprite::SetAlpha (float alpha)
     throw xtl::make_range_exception ("scene_graph::Sprite::SetAlpha", "alpha", alpha, 0.0f, 1.0f);
     
   impl->alpha = alpha;
+  
+  UpdateNotify ();
 }
 
 float Sprite::Alpha () const
