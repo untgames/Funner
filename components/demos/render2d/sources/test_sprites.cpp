@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const size_t SPRITES_COUNT = 1000;
+const size_t SPRITES_COUNT = 80;
 
 typedef stl::vector<Sprite::Pointer> SpriteArray;
 
@@ -24,12 +24,14 @@ struct TestScene
       Sprite::Pointer sprite = Sprite::Create ();      
 
       sprite->SetName     (common::format ("Sprite%u", i+1).c_str ());
-      sprite->SetMaterial ("sprite_material");
+      sprite->SetMaterial ("font_material");
       sprite->SetColor    (math::vec4f (frand (), frand (), frand ()));
       sprite->SetAlpha    (frand ());    
       sprite->Scale       (frand (1, 4), frand (1, 4), 1);
+      sprite->SetOrientation (frand () * 360.0f, 0, 0, 1);
       sprite->BindToScene (scene); 
-      sprite->SetPosition (frand (-10, 10), frand (-10, 10), 0);
+      sprite->SetPosition (frand (-10, 10), frand (-10, 10), frand (-10, 10));
+      sprite->SetFrame    (rand ());
       
       sprites.push_back (sprite);
     }
@@ -54,10 +56,15 @@ void idle (TestApplication& app, TestScene& scene)
   {
     static clock_t last_update = 0;
     
-    if (clock () - last_update >= CLK_TCK / 20)
+    if (clock () - last_update >= CLK_TCK / 25)
     {    
       for (SpriteArray::iterator iter=scene.sprites.begin (), end=scene.sprites.end (); iter!=end; ++iter)
-        (*iter)->Rotate (1, 0, 0, 1);
+      {
+        scene_graph::Sprite& sprite = **iter;
+        
+        sprite.Rotate (1, 0, 0, 1);
+        sprite.SetFrame ((*iter)->Frame () + 1);
+      }
         
       last_update = clock ();
     }    
@@ -84,7 +91,7 @@ int main ()
       
     SceneRender& render = test.Render ();
     
-    render.SetBackgroundColor (math::vec4f (1, 1, 1, 1));
+//    render.SetBackgroundColor (math::vec4f (1, 1, 1, 1));
     
       //создание сцены
       
