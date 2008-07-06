@@ -158,7 +158,7 @@ void MountPointsMap::Mount (const char* branch_name, ICustomVarRegistry* registr
 
   if (!registry)
     throw xtl::make_null_argument_exception (METHOD_NAME, "registry");
-    
+
     //проверка конфликтов в именах точек монтирования
 
   for (stl::string parent_branch=branch_name; !parent_branch.empty (); )
@@ -337,7 +337,9 @@ MountPoint* MountPointsMap::FindMountPoint (const char* branch_name, const char*
 {
   stl::string full_name (branch_name);
   
-  full_name += '.';
+  if (*branch_name)
+    full_name += '.';
+  
   full_name += var_name;
   
   return FindMountPoint (full_name.c_str (), var_sub_name);

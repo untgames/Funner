@@ -115,14 +115,14 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
               
               const char* sub_name = mount_point.Name ().c_str () + branch_name_size;
               
-              if (*sub_name)
+              if (*sub_name && branch_name_size)
                 sub_name++;
 
               current_prefix = sub_name;
               
               if (!current_prefix.empty ())
                 current_prefix += '.';
-
+    
               mount_point.Registry ()->EnumerateVars (wrapper);
             }
           
