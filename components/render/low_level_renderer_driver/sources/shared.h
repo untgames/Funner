@@ -3,6 +3,7 @@
 
 #include <climits>
 
+#include <stl/algorithm>
 #include <stl/string>
 #include <stl/vector>
 
@@ -356,14 +357,20 @@ class RenderTargetTexture: virtual public mid_level::renderer2d::ITexture, publi
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Выводимая вершина
+///Данные о вершине, необходимые для сортировки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct SpriteVertex
+struct SpriteVertexData
 {
-  math::vec3f                      position;
-  math::vec2f                      texcoord;
+  struct SpriteVertex
+  {
+    math::vec3f position;
+    math::vec2f texcoord;
+  };
+
+  SpriteVertex                     vertices[4];
   math::vec4f                      color;
-  mid_level::renderer2d::ITexture* texture;
+  render::low_level::ITexture*     texture;
+  mid_level::renderer2d::BlendMode blend_mode;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -413,7 +420,7 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных для отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SpriteVertex* GetVertexBuffer () { return sprite_vertex_buffer.data (); }
+    SpriteVertexData* GetSpriteVertexBuffer ();
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -424,7 +431,7 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 
   private:
     typedef stl::vector<mid_level::renderer2d::Sprite>    SpriteArray;
-    typedef xtl::uninitialized_storage<SpriteVertex>      SpriteVertexArray;
+    typedef xtl::uninitialized_storage<SpriteVertexData>  SpriteVertexArray;
     typedef xtl::com_ptr<mid_level::renderer2d::ITexture> TexturePtr;
 
   private:
@@ -460,16 +467,29 @@ class CommonResources : public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение низкоуровневых данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    render::low_level::IBuffer*     GetConstantBuffer () { return constant_buffer.get (); }
-    render::low_level::IBlendState* GetBlendState (render::mid_level::renderer2d::BlendMode blend_mode) { return blend_states[blend_mode].get (); }
+    render::low_level::IBlendState*        GetBlendState (render::mid_level::renderer2d::BlendMode blend_mode) { return blend_states[blend_mode].get (); }
+    render::low_level::IBuffer*            GetConstantBuffer () { return constant_buffer.get (); }
+    render::low_level::IDepthStencilState* GetDepthStencilState (bool depth_write_enabled);
 
   private:
-    typedef xtl::com_ptr<render::low_level::IBlendState> BlendStatePtr;
-    typedef xtl::com_ptr<render::low_level::IBuffer>     BufferPtr;
+    typedef xtl::com_ptr<render::low_level::IBlendState>        BlendStatePtr;
+    typedef xtl::com_ptr<render::low_level::IBuffer>            BufferPtr;
+    typedef xtl::com_ptr<render::low_level::IDepthStencilState> DepthStencilStatePtr;
   
   private:
-    BufferPtr     constant_buffer;
-    BlendStatePtr blend_states[render::mid_level::renderer2d::BlendMode_Num];
+    BlendStatePtr        blend_states[render::mid_level::renderer2d::BlendMode_Num];
+    BufferPtr            constant_buffer;
+    DepthStencilStatePtr depth_stencil_states[2];
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Данные о вершине, необходимые для вывода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct RenderedSpriteVertex
+{
+  math::vec3f position;
+  math::vec2f texcoord;
+  math::vec4f color;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -499,23 +519,40 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     void   Clear           ();
 
   private:
+    typedef xtl::com_ptr<Primitive>                  PrimitivePtr;
+    typedef stl::vector<PrimitivePtr>                PrimitiveArray;
+    typedef stl::vector<SpriteVertexData*>           SpriteVertexArray;
+    typedef xtl::com_ptr<render::low_level::IBuffer> BufferPtr;
+    typedef xtl::com_ptr<CommonResources>            CommonResourcesPtr;
+
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Резервирование места под вершинные буферы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ReserveNotBlendedSpritesVertexBuffer (render::low_level::IDevice* device, size_t sprites_count);
+    void ReserveBlendedSpritesVertexBuffer    (render::low_level::IDevice* device, size_t sprites_count);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Формирование вершинного буффера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void MakeVertexBuffer (SpriteVertexArray& vertex_data_array, BufferPtr& buffer);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void DrawCore (render::low_level::IDevice* device);
 
   private:
-    typedef xtl::com_ptr<Primitive>                  PrimitivePtr;
-    typedef stl::vector<PrimitivePtr>                PrimitiveArray;
-    typedef xtl::com_ptr<render::low_level::IBuffer> BufferPtr;
-    typedef xtl::com_ptr<CommonResources>            CommonResourcesPtr;
-
-  private:
-    math::mat4f        view_tm, proj_tm;
-    PrimitiveArray     primitives;
-    CommonResourcesPtr common_resources;
-    BufferPtr          vertex_buffer;
-    size_t             current_vertex_buffer_size;
+    math::mat4f                   view_tm, proj_tm;
+    PrimitiveArray                primitives;
+    CommonResourcesPtr            common_resources;
+    BufferPtr                     not_blended_sprites_vertex_buffer;              //вершинный буффер спрайтов без блендинга
+    BufferPtr                     blended_sprites_vertex_buffer;                  //вершинный буффер спрайтов с блендингом
+    SpriteVertexArray             not_blended_sprites_vertex_data_buffer;         //сортируемый буффер, из которого формируется буффер для отрисовки
+    SpriteVertexArray             blended_sprites_vertex_data_buffer;             //сортируемый буффер, из которого формируется буффер для отрисовки
+    size_t                        current_not_blended_sprites_vertex_buffer_size; //текущий размер вершинного буффера спрайтов без блендинга
+    size_t                        current_blended_sprites_vertex_buffer_size;     //текущий размер вершинного буффера спрайтов с блендингом
+    render::low_level::BufferDesc vertex_buffer_desc;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

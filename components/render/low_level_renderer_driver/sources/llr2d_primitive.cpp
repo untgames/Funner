@@ -12,7 +12,7 @@ using namespace render::mid_level::low_level_driver::renderer2d;
 Primitive::Primitive ()
   : blend_mode (BlendMode_None),
     low_level_texture (0),
-    sprite_vertex_buffer (sizeof (SpriteVertex) * 4),
+    sprite_vertex_buffer (sizeof (SpriteVertexData)),
     dirty_transform (false)
 {
 }
@@ -66,8 +66,8 @@ void Primitive::SetTexture (render::mid_level::renderer2d::ITexture* in_texture)
     texture = render_target_texture;
   }
 
-  for (SpriteVertex* iter = sprite_vertex_buffer.data (), *end = sprite_vertex_buffer.data () + sprite_vertex_buffer.size (); iter < end; iter++)
-    iter->texture = texture.get ();
+  for (SpriteVertexData* iter = sprite_vertex_buffer.data (), *end = sprite_vertex_buffer.data () + sprite_vertex_buffer.size (); iter < end; iter++)
+    iter->texture = low_level_texture;
 }
 
 ITexture* Primitive::GetTexture ()
@@ -93,6 +93,9 @@ void Primitive::SetBlendMode (BlendMode in_blend_mode)
   }
   
   blend_mode = in_blend_mode;
+
+  for (SpriteVertexData* iter = sprite_vertex_buffer.data (), *end = sprite_vertex_buffer.data () + sprite_vertex_buffer.size (); iter < end; iter++)
+    iter->blend_mode = blend_mode;
 }
 
 BlendMode Primitive::GetBlendMode ()
@@ -116,14 +119,6 @@ void Primitive::GetSprite (size_t index, Sprite& sprite)
   if (index >= sprites.size ())
     throw xtl::make_range_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::GetSprite", "index", index, sprites.size ());
 
-  if (dirty_transform)
-  {
-    for (size_t i = 0; i < sprites.size (); i++)
-      ComputeSpriteTransorm (i);
-
-    dirty_transform = false;
-  }
-
   sprite = sprites [index];
 }
 
@@ -136,7 +131,7 @@ size_t Primitive::AddSprites (size_t sprites_count, const Sprite* sprites_array)
 
   try
   {
-    sprite_vertex_buffer.resize (sizeof (SpriteVertex) * 4 * sprites.size ());
+    sprite_vertex_buffer.resize (sizeof (SpriteVertexData) * sprites.size ());
   }
   catch (xtl::exception& e)
   {
@@ -162,7 +157,7 @@ void Primitive::RemoveSprites (size_t first_sprite, size_t sprites_count)
 
   sprites.erase (sprites.begin () + first_sprite, sprites.begin () + first_sprite + sprites_count);  
 
-  sprite_vertex_buffer.resize (sizeof (SpriteVertex) * 4 * sprites.size ());
+  sprite_vertex_buffer.resize (sizeof (SpriteVertexData) * sprites.size ());
 
   for (size_t i = 0; i < sprites.size (); i++)
     BuildSpriteVertexData (i);
@@ -179,7 +174,24 @@ void Primitive::RemoveAllSprites ()
 void Primitive::ReserveSprites (size_t sprites_count)
 {
   sprites.reserve (sprites_count);
-  sprite_vertex_buffer.reserve (sprites_count * 4 * sizeof (SpriteVertex));
+  sprite_vertex_buffer.reserve (sprites_count * sizeof (SpriteVertexData));
+}
+
+/*
+   Получение данных для отрисовки
+*/
+
+SpriteVertexData* Primitive::GetSpriteVertexBuffer () 
+{ 
+  if (dirty_transform)
+  {
+    for (size_t i = 0; i < sprites.size (); i++)
+      ComputeSpriteTransorm (i);
+
+    dirty_transform = false;
+  }
+
+  return sprite_vertex_buffer.data (); 
 }
 
 /*
@@ -190,22 +202,20 @@ void Primitive::BuildSpriteVertexData (size_t i)
 {
   ComputeSpriteTransorm (i);
 
-  for (size_t j = 0; j < 4; j++)
-  {
-    sprite_vertex_buffer.data ()[i * 4 + j].color   = sprites[i].color;
-    sprite_vertex_buffer.data ()[i * 4 + j].texture = texture.get ();
-  }
+  sprite_vertex_buffer.data ()[i].color      = sprites[i].color;
+  sprite_vertex_buffer.data ()[i].texture    = low_level_texture;
+  sprite_vertex_buffer.data ()[i].blend_mode = blend_mode;
 
-  sprite_vertex_buffer.data ()[i * 4].texcoord     = math::vec2f (sprites[i].tex_offset.x,                         sprites[i].tex_offset.y);
-  sprite_vertex_buffer.data ()[i * 4 + 1].texcoord = math::vec2f (sprites[i].tex_offset.x + sprites[i].tex_size.x, sprites[i].tex_offset.y);
-  sprite_vertex_buffer.data ()[i * 4 + 2].texcoord = math::vec2f (sprites[i].tex_offset.x,                         sprites[i].tex_offset.y + sprites[i].tex_size.y);
-  sprite_vertex_buffer.data ()[i * 4 + 3].texcoord = math::vec2f (sprites[i].tex_offset.x + sprites[i].tex_size.x, sprites[i].tex_offset.y + sprites[i].tex_size.y);
+  sprite_vertex_buffer.data ()[i].vertices[0].texcoord = math::vec2f (sprites[i].tex_offset.x,                         sprites[i].tex_offset.y);
+  sprite_vertex_buffer.data ()[i].vertices[1].texcoord = math::vec2f (sprites[i].tex_offset.x + sprites[i].tex_size.x, sprites[i].tex_offset.y);
+  sprite_vertex_buffer.data ()[i].vertices[2].texcoord = math::vec2f (sprites[i].tex_offset.x,                         sprites[i].tex_offset.y + sprites[i].tex_size.y);
+  sprite_vertex_buffer.data ()[i].vertices[3].texcoord = math::vec2f (sprites[i].tex_offset.x + sprites[i].tex_size.x, sprites[i].tex_offset.y + sprites[i].tex_size.y);
 }
 
 void Primitive::ComputeSpriteTransorm (size_t i)
 {
-  (sprite_vertex_buffer.data () + i * 4)->position     = transform * math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y - sprites[i].size.y, sprites[i].position.z);
-  (sprite_vertex_buffer.data () + i * 4 + 1)->position = transform * math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y - sprites[i].size.y, sprites[i].position.z);
-  (sprite_vertex_buffer.data () + i * 4 + 2)->position = transform * math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
-  (sprite_vertex_buffer.data () + i * 4 + 3)->position = transform * math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
+  sprite_vertex_buffer.data ()[i].vertices[0].position = transform * math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y - sprites[i].size.y, sprites[i].position.z);
+  sprite_vertex_buffer.data ()[i].vertices[1].position = transform * math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y - sprites[i].size.y, sprites[i].position.z);
+  sprite_vertex_buffer.data ()[i].vertices[2].position = transform * math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
+  sprite_vertex_buffer.data ()[i].vertices[3].position = transform * math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
 }

@@ -56,8 +56,6 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
 {
   try
   {
-    device->OSSetDepthStencilState (0);
-  
     ShaderDesc shader_desc;
 
     memset (&shader_desc, 0, sizeof (shader_desc));
@@ -133,31 +131,31 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
     attributes[0].format   = InputDataFormat_Vector3;
     attributes[0].type     = InputDataType_Float;
     attributes[0].slot     = 0;
-    attributes[0].offset   = offsetof (SpriteVertex, position);
-    attributes[0].stride   = sizeof (SpriteVertex);
+    attributes[0].offset   = offsetof (RenderedSpriteVertex, position);
+    attributes[0].stride   = sizeof (RenderedSpriteVertex);
 
     attributes[1].semantic = VertexAttributeSemantic_TexCoord0;
     attributes[1].format   = InputDataFormat_Vector2;
     attributes[1].type     = InputDataType_Float;
     attributes[1].slot     = 0;
-    attributes[1].offset   = offsetof (SpriteVertex, texcoord);
-    attributes[1].stride   = sizeof (SpriteVertex);
+    attributes[1].offset   = offsetof (RenderedSpriteVertex, texcoord);
+    attributes[1].stride   = sizeof (RenderedSpriteVertex);
 
     attributes[2].semantic = VertexAttributeSemantic_Color;
     attributes[2].format   = InputDataFormat_Vector4;
     attributes[2].type     = InputDataType_Float;
     attributes[2].slot     = 0;
-    attributes[2].offset   = offsetof (SpriteVertex, color);
-    attributes[2].stride   = sizeof (SpriteVertex);
+    attributes[2].offset   = offsetof (RenderedSpriteVertex, color);
+    attributes[2].stride   = sizeof (RenderedSpriteVertex);
 
     InputLayoutDesc layout_desc;
-    
+
     memset (&layout_desc, 0, sizeof layout_desc);
-    
+
     layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
     layout_desc.vertex_attributes       = attributes;
     layout_desc.index_type              = InputDataType_UInt;
-    layout_desc.index_buffer_offset     = 0;            
+    layout_desc.index_buffer_offset     = 0;
 
     input_layout = InputLayoutPtr (device->CreateInputLayout (layout_desc), false);
 

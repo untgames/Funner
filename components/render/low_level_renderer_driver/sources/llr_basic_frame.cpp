@@ -12,7 +12,7 @@ BasicFrame::BasicFrame ()
   : need_clear_render_target (false),
     need_clear_depth_stencil_target (false),
     need_update_normalized_viewport (true),
-    clear_depth_value (0.0f),
+    clear_depth_value (FLT_MAX),
     clear_stencil_index (0)
 {
   viewport.min_depth = 0.f;

@@ -76,19 +76,9 @@ int main ()
 {
   try
   {
-    printf ("Low level driver name is '%s'\n", LowLevelDriver::Name ());
-
     common::LogSystem::RegisterLogHandler ("*", &log_handler);
 
     render::mid_level::IDriver *low_level_driver = LowLevelDriver::Driver ();
-
-    printf ("Driver description: '%s'\n", low_level_driver->GetDescription ());
-    printf ("Renderers count is %u\n", low_level_driver->GetRenderersCount ());
-
-    printf ("Renderers: ");
-    for (size_t i = 0; i < low_level_driver->GetRenderersCount (); i++)
-      printf ("%s; ", low_level_driver->GetRendererName (i));
-    printf ("\n");
 
     syslib::Window window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -134,7 +124,7 @@ int main ()
 
     primitive->SetTexture (texture.get ());
 
-    primitive->SetBlendMode (BlendMode_Translucent);
+//    primitive->SetBlendMode (BlendMode_Translucent);
 
     for (size_t i = 0; i < SPRITES_COUNT; i++)
     {

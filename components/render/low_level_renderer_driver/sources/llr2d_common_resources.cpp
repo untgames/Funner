@@ -6,19 +6,6 @@ using namespace render::mid_level::low_level_driver::renderer2d;
 
 CommonResources::CommonResources (render::low_level::IDevice* device)
 {
-  BufferDesc constant_buffer_desc;
-
-  memset (&constant_buffer_desc, 0, sizeof (constant_buffer_desc));
-
-  constant_buffer_desc.size         = sizeof (ProgramParameters);
-  constant_buffer_desc.usage_mode   = UsageMode_Default;
-  constant_buffer_desc.bind_flags   = BindFlag_ConstantBuffer;
-  constant_buffer_desc.access_flags = AccessFlag_ReadWrite;
-
-  constant_buffer = BufferPtr (device->CreateBuffer (constant_buffer_desc), false);
-
-  device->SSSetConstantBuffer (0, constant_buffer.get ());
-
   BlendDesc blend_desc;
 
   memset (&blend_desc, 0, sizeof (blend_desc));
@@ -52,4 +39,38 @@ CommonResources::CommonResources (render::low_level::IDevice* device)
   blend_desc.blend_alpha_destination_argument = BlendArgument_One;
   
   blend_states[BlendMode_Additive] = BlendStatePtr (device->CreateBlendState (blend_desc), false);
+
+  BufferDesc constant_buffer_desc;
+
+  memset (&constant_buffer_desc, 0, sizeof (constant_buffer_desc));
+
+  constant_buffer_desc.size         = sizeof (ProgramParameters);
+  constant_buffer_desc.usage_mode   = UsageMode_Default;
+  constant_buffer_desc.bind_flags   = BindFlag_ConstantBuffer;
+  constant_buffer_desc.access_flags = AccessFlag_ReadWrite;
+
+  constant_buffer = BufferPtr (device->CreateBuffer (constant_buffer_desc), false);
+
+  device->SSSetConstantBuffer (0, constant_buffer.get ());
+
+  DepthStencilDesc depth_stencil_desc;
+
+  memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
+
+  depth_stencil_desc.depth_test_enable   = true;
+  depth_stencil_desc.stencil_test_enable = false;
+  depth_stencil_desc.depth_compare_mode  = CompareMode_Less;
+  depth_stencil_desc.depth_write_enable  = false;
+
+  depth_stencil_states[0] = DepthStencilStatePtr (device->CreateDepthStencilState (depth_stencil_desc), false);
+
+  depth_stencil_desc.depth_write_enable = true;
+
+  depth_stencil_states[1] = DepthStencilStatePtr (device->CreateDepthStencilState (depth_stencil_desc), false);
+}
+
+render::low_level::IDepthStencilState* CommonResources::GetDepthStencilState (bool depth_write_enabled) 
+{ 
+  if (depth_write_enabled) return depth_stencil_states[1].get (); 
+  else                     return depth_stencil_states[0].get (); 
 }
