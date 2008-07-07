@@ -188,9 +188,10 @@ void Primitive::ReserveSprites (size_t sprites_count)
 
 void Primitive::BuildSpriteVertexData (size_t i)
 {
+  ComputeSpriteTransorm (i);
+
   for (size_t j = 0; j < 4; j++)
   {
-    ComputeSpriteTransorm (i * 4 + j);
     sprite_vertex_buffer.data ()[i * 4 + j].color   = sprites[i].color;
     sprite_vertex_buffer.data ()[i * 4 + j].texture = texture.get ();
   }
