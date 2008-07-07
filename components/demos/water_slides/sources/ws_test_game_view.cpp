@@ -112,6 +112,9 @@ class TestView: public IGameView
       }      
 
       listener->BindToParent (scene.Root ());
+
+      listener->SetOrientation (180.f, 0.f, 0.f, 1.f);
+
       sound_emitter->BindToParent (scene.Root ());
     }
     
