@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const size_t SPRITES_COUNT = 180;
+const size_t SPRITES_COUNT = 200;
 
 typedef stl::vector<Sprite::Pointer> SpriteArray;
 

@@ -68,6 +68,14 @@ template <class T> T get (VarRegistry& registry, const char* name, const T& defa
   }
 }
 
+stl::string get (VarRegistry& registry, const char* name, const char* default_value) //??????
+{
+  if (!registry.HasVariable (name))
+    return default_value;
+
+  return to_string (registry.GetValue (name));
+}
+
 void log_print (const char* message)
 {
   printf ("%s\n", message);
@@ -177,7 +185,7 @@ TestApplication::TestApplication ()
         
     impl->window->SetDebugLog (&log_print);
 
-    impl->window->SetTitle (get (impl->config, "WindowTitle", DEFAULT_WINDOW_TITLE));    
+    impl->window->SetTitle (get (impl->config, "WindowTitle", DEFAULT_WINDOW_TITLE).c_str ());    
 
     impl->window->Show ();
     
@@ -202,7 +210,7 @@ TestApplication::TestApplication ()
     desc.fullscreen                = get (impl->config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) != 0;
     desc.window_handle             = impl->window->Handle ();
     
-    render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, get (impl->config, "DeviceInitString", DEFAULT_DEVICE_INIT_STRING),
+    render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, get (impl->config, "DeviceInitString", DEFAULT_DEVICE_INIT_STRING).c_str (),
       impl->swap_chain, impl->device);
       
       //создание системы визуализации среднего уровня
