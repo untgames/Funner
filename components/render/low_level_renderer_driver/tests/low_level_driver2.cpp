@@ -12,7 +12,7 @@ typedef xtl::com_ptr<IDevice>                    DevicePtr;
 const size_t WINDOW_WIDTH   = 1024;
 const size_t WINDOW_HEIGHT  = 768;
 const char* TEXTURE_NAME    = "data/texture_hut.tga";
-const size_t SPRITES_COUNT  = 1000;
+const size_t SPRITES_COUNT  = 500;
 
 float rotation_angle = 0;
 
@@ -21,6 +21,17 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
   if (window.IsClosed ())
     return;
 
+  static clock_t last     = 0;  
+  static size_t  last_fps = 0, frames_count = 0;
+
+  if (clock () - last_fps > CLK_TCK)
+  {
+    printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
+
+    last_fps     = clock ();
+    frames_count = 0;
+  }
+
   primitive->SetTransform (rotatef (rotation_angle, 0, 0, 1));
   
   renderer->AddFrame (frame);
@@ -28,9 +39,11 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
   rotation_angle += 0.05f;
 
   renderer->DrawFrames ();
+
+  frames_count++;
 }
 
-//получение ортографической матрицы проекции
+//яюыєўхэшх юЁЄюуЁрЇшўхёъющ ьрЄЁшЎ√ яЁюхъЎшш
 math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar)
 {
   math::mat4f proj_matrix;
@@ -39,7 +52,7 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
         height = top - bottom,
         depth  = zfar - znear;  
 
-    //выбрана матрица проецирования, используемая gluOrtho2D
+    //т√сЁрэр ьрЄЁшЎр яЁюхЎшЁютрэш , шёяюы№чєхьр  gluOrtho2D
 
   proj_matrix [0] = math::vec4f (2.0f / width, 0, 0, - (right + left) / width);
   proj_matrix [1] = math::vec4f (0, 2.0f / height, 0, - (top + bottom) / height);
@@ -127,7 +140,7 @@ int main ()
     {
       Sprite sprite;
 
-      sprite.position   = vec3f (frand (-100, 100), frand (-100, 100), 0);
+      sprite.position   = vec3f (frand (-100, 100), frand (-100, 100), frand (-100, 100));
       sprite.size       = vec2f (frand (1, 20), frand (1, 20));
       sprite.color      = vec4f (frand (), frand (), frand (), frand ());
       sprite.tex_offset = vec2f (0.f, 0.f);
