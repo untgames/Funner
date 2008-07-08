@@ -177,7 +177,7 @@ void BasicFrame::Draw (render::low_level::IDevice* device, const render::low_lev
     UpdateNormalizedViewport ();
 
     //установка вьюпорта
-    
+
   render::low_level::Viewport rs_viewport;
   
   rs_viewport.x         = int (normalized_viewport_left * device_viewport.width + device_viewport.x);

@@ -24,6 +24,17 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
   if (window.IsClosed ())
     return;
 
+  static clock_t last     = 0;  
+  static size_t  last_fps = 0, frames_count = 0;
+
+  if (clock () - last_fps > CLK_TCK)
+  {
+    printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
+
+    last_fps     = clock ();
+    frames_count = 0;
+  }
+
   mat4f tm1 = rotatef (sprite_rotation, 0, 0, 1) * translatef (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f) * scalef (40, 40, 1) * rotatef (-sprite_rotation, 0, 0, 1);
   mat4f tm2 = translatef (cos (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, sin (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (40, 40, 1) * rotatef (-sprite_rotation, 0, 0, 1);
 
@@ -36,6 +47,8 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
   sprite_rotation += 0.0005f;
 
   renderer->DrawFrames ();
+
+  frames_count++;
 
   if (!screenshot_made)
   {
