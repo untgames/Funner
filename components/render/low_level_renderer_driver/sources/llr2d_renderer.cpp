@@ -110,7 +110,7 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
     
     memset (&sampler_desc, 0, sizeof (sampler_desc));
 
-    sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
+    sampler_desc.min_filter           = TexMinFilter_Point; //???TexMinFilter_LinearMipLinear
     sampler_desc.mag_filter           = TexMagFilter_Linear;
     sampler_desc.max_anisotropy       = 1;
     sampler_desc.wrap_u               = TexcoordWrap_Repeat; //Дрожание краёв !!!!! нужно TexcoordWrap_Mirror либо TexcoordWrap_ClampToBorder !!!!!!

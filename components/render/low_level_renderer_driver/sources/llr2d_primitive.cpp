@@ -5,6 +5,13 @@ using namespace render::mid_level::renderer2d;
 using namespace render::mid_level::low_level_driver;
 using namespace render::mid_level::low_level_driver::renderer2d;
 
+namespace
+{
+
+const size_t DEFAULT_SPRITE_VERTEX_BUFFER_SIZE = 4; //размер вершинного буффера по умолчанию
+
+}
+
 /*
     Конструктор / деструктор
 */
@@ -12,7 +19,7 @@ using namespace render::mid_level::low_level_driver::renderer2d;
 Primitive::Primitive ()
   : blend_mode (BlendMode_None),
     low_level_texture (0),
-    sprite_vertex_buffer (sizeof (SpriteVertexData)),
+    sprite_vertex_buffer (DEFAULT_SPRITE_VERTEX_BUFFER_SIZE * sizeof (SpriteVertexData)),
     dirty_transform (false)
 {
 }
@@ -131,7 +138,10 @@ size_t Primitive::AddSprites (size_t sprites_count, const Sprite* sprites_array)
 
   try
   {
-    sprite_vertex_buffer.resize (sizeof (SpriteVertexData) * sprites.size ());
+    if (sprite_vertex_buffer.capacity () < (sprites.size ()  * sizeof (SpriteVertexData)))
+      sprite_vertex_buffer.reserve ((sprites.size () + DEFAULT_SPRITE_VERTEX_BUFFER_SIZE) * sizeof (SpriteVertexData));
+
+    sprite_vertex_buffer.resize (sprites.size () * sizeof (SpriteVertexData));
   }
   catch (xtl::exception& e)
   {
@@ -157,7 +167,7 @@ void Primitive::RemoveSprites (size_t first_sprite, size_t sprites_count)
 
   sprites.erase (sprites.begin () + first_sprite, sprites.begin () + first_sprite + sprites_count);  
 
-  sprite_vertex_buffer.resize (sizeof (SpriteVertexData) * sprites.size ());
+  sprite_vertex_buffer.resize (sprites.size () * sizeof (SpriteVertexData));
 
   for (size_t i = 0; i < sprites.size (); i++)
     BuildSpriteVertexData (i);
@@ -174,7 +184,9 @@ void Primitive::RemoveAllSprites ()
 void Primitive::ReserveSprites (size_t sprites_count)
 {
   sprites.reserve (sprites_count);
-  sprite_vertex_buffer.reserve (sprites_count * sizeof (SpriteVertexData));
+
+  if (sprite_vertex_buffer.capacity () < (sprites_count * sizeof (SpriteVertexData)))
+    sprite_vertex_buffer.reserve (sprites_count * sizeof (SpriteVertexData));
 }
 
 /*

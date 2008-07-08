@@ -114,7 +114,7 @@ int main ()
     desc.fullscreen                = false;
     desc.window_handle             = window.Handle ();
     
-    render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, "", swap_chain, device);
+    render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, "max_version=1.1 disable=*", swap_chain, device);
 
     LowLevelDriver::RegisterRenderer ("MyRenderer", device.get (), swap_chain.get ());
 

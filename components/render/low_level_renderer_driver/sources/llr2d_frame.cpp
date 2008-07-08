@@ -203,13 +203,13 @@ void Frame::DrawCore (render::low_level::IDevice* device)
 
   if (not_blended_sprites_vertex_data_buffer.size () > current_not_blended_sprites_vertex_buffer_size)
   {
-    current_not_blended_sprites_vertex_buffer_size += DEFAULT_VERTEX_BUFFER_SIZE;
+    current_not_blended_sprites_vertex_buffer_size = not_blended_sprites_vertex_data_buffer.size () + DEFAULT_VERTEX_BUFFER_SIZE;
     ReserveNotBlendedSpritesVertexBuffer (device, current_not_blended_sprites_vertex_buffer_size);
   }
 
   if (blended_sprites_vertex_data_buffer.size () > current_blended_sprites_vertex_buffer_size)
   {
-    current_blended_sprites_vertex_buffer_size += DEFAULT_VERTEX_BUFFER_SIZE;
+    current_blended_sprites_vertex_buffer_size = blended_sprites_vertex_data_buffer.size () + DEFAULT_VERTEX_BUFFER_SIZE;
     ReserveBlendedSpritesVertexBuffer (device, current_blended_sprites_vertex_buffer_size);
   }
 
