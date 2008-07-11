@@ -1,8 +1,10 @@
 #ifndef MATHLIB_VECTOR_HEADER
 #define MATHLIB_VECTOR_HEADER
 
+#include "forward.h"
 #include <stddef.h>
-
+#include <math.h>
+#include "functional.h"
 #ifdef _MSC_VER
   #pragma pack (push,1)
 #endif
@@ -17,8 +19,6 @@ namespace math
 {
 
 //forward declaration
-template <class Type, size_t SizeX, size_t SizeY> class matrix;
-
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///¬екторна€ база по умолчанию
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,6 +83,8 @@ class vec: public vec_base<Type, Size>
   template <size_t Size1, class Fn>                 vec (const vec<Type, Size1>& v1, const Type& arg, Fn fn);
   template <size_t Size1, class Fn>                 vec (const vec<Type, Size1>& v1, Fn fn);
   template <class Fn>                               vec (const Type& v1, Fn fn);
+
+  template <class Fn>                               vec (const quat<Type>& q1, const Type& arg, Fn fn);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
    //временные конструкторы. ”далить после редактировани€ библиотеки
@@ -209,6 +211,37 @@ const vec<T,Size> max (const vec<T,Size>&,const vec<T,Size>&);
 template <class T,size_t Size>
 const T angle (const vec<T, Size>& a, const vec<T, Size>& b);
 
+/*
+	ќсновные типы
+*/
+typedef vec<float,2>              vec2f;
+typedef vec<double,2>             vec2d;
+typedef vec<int,2>                vec2i;
+typedef vec<unsigned int,2>       vec2ui;
+typedef vec<short,2>              vec2s;
+typedef vec<unsigned short,2>     vec2us;
+typedef vec<char,2>               vec2b;
+typedef vec<unsigned char,2>      vec2ub;
 
+typedef vec<float,3>              vec3f;
+typedef vec<double,3>             vec3d;
+typedef vec<int,3>                vec3i;
+typedef vec<unsigned int,3>       vec3ui;
+typedef vec<short,3>              vec3s;
+typedef vec<unsigned short,3>     vec3us;
+typedef vec<char,3>               vec3b;
+typedef vec<unsigned char,3>      vec3ub;
+
+typedef vec<float,4>              vec4f;
+typedef vec<double,4>             vec4d;
+typedef vec<int,4>                vec4i;
+typedef vec<unsigned int,4>       vec4ui;
+typedef vec<short,4>              vec4s;
+typedef vec<unsigned short,4>     vec4us;
+typedef vec<char,4>               vec4b;
+typedef vec<unsigned char,4>      vec4ub;
+
+
+#include <math_experimental/impl/vector.inl>
 }
 #endif

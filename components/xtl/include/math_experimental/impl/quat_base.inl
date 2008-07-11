@@ -164,8 +164,7 @@ void  quat_mul_vec (vec<T,4>& res,const quat<T>& q,const vec<T,4>& v)
   res [3] = 0;
 
   T _norm=quat_norm (q);
-//component_fn<divides<T,T,T> > () (res,res,_norm);
-  res=make_binary_operation<vec<T,3> >(res,_norm,divides<T,T,T> ());
+  res=make_binary_operation<vec<T,4> >(res,_norm,divides<T,T,T> ());
 }
 
 template <class T>

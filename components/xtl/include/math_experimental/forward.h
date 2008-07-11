@@ -1,0 +1,12 @@
+#ifndef MATHLIB_FORWARD_HEADER
+#define MATHLIB_FORWARD_HEADER
+#include <stddef.h>
+
+namespace math
+{
+  template <class Type, size_t Size> class vec;
+  template <class Type, size_t SizeX, size_t SizeY=SizeX> class matrix;
+  template <class T> class quat;
+}
+
+#endif

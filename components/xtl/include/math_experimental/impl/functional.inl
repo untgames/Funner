@@ -2,16 +2,20 @@
 
 namespace detail
 {
+template <class T> 
+  const T& get_component(const math::quat<T>& q,size_t i);
 
 template <class T, size_t SizeX, size_t SizeY> 
-  const vec<T, SizeY>& get_component (const math::matrix<T, SizeX,SizeY>& v, size_t index);
+  const math::vec<T, SizeY>& get_component (const math::matrix<T, SizeX,SizeY>& v, size_t index);
 
 template <class T, size_t SizeX, size_t SizeY> 
-  vec<T, SizeY>& get_component (math::matrix<T,SizeX,SizeY>& v, size_t index);
+  vec<T, SizeY>& get_component (matrix<T,SizeX,SizeY>& v, size_t index);
 
-template <class T, size_t Size> T& get_component (vec<T, Size>& v, size_t index);
+template <class T, size_t Size> 
+  T& get_component (vec<T, Size>& v, size_t index);
 
-template <class T, size_t Size> const T& get_component (const vec<T, Size>& v, size_t index);
+template <class T, size_t Size> 
+  const T& get_component (const vec<T, Size>& v, size_t index);
 
 
 

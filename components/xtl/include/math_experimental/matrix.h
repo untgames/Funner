@@ -1,5 +1,9 @@
 #ifndef MATHLIB_MATRIX_HEADER
 #define MATHLIB_MATRIX_HEADER
+#include "forward.h"
+#include "functional.h"
+#include <stddef.h>
+
 
 #ifdef _MSC_VER  
   #pragma pack(push,1)
@@ -17,12 +21,14 @@ namespace math
 
 //forward declaration
 template <class Type> class quat;
+template <class Type, size_t Size> class vec;
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица
 /////////////////////////////////////////////////////////////////////////////////////////////
-template <class Type, size_t SizeX, size_t SizeY=SizeX>
+template <class Type, size_t SizeX, size_t SizeY/*=SizeX*/>
 class matrix
 {
   public:
@@ -37,7 +43,7 @@ class matrix
 ///Конструктор
 ////////////////////////////////////////////////////////////////////////////////////////////
     matrix ();
-    matrix (const matrix<Type, SizeX, SizeY>& src);
+    matrix (const matrix& src);
     matrix (const Type& a);  //a будет записано на главной диагонали
     matrix (const Type*);                                            
     
@@ -179,11 +185,28 @@ const matrix<T, Size> invert (const matrix<T, Size>&);
 template<class T, size_t Size>
 const matrix<T, Size> normalize (const matrix<T, Size>&);
 
+////////////////////////////////////////////////////////////////////////////////////////////
+///Основные типы
+////////////////////////////////////////////////////////////////////////////////////////////
+
+typedef matrix<float,2,2>         mat2f;
+typedef matrix<float,3,3>         mat3f;
+typedef matrix<float,4,4>         mat4f;
+typedef matrix<double,2,2>        mat2d;
+typedef matrix<double,3,3>        mat3d;
+typedef matrix<double,4,4>        mat4d;
+typedef matrix<int,2,2>           mat2i;
+typedef matrix<int,3,3>           mat3i;
+typedef matrix<int,4,4>           mat4i;
+
+#include <math_experimental/impl/matrix.inl>
 
 #ifdef _MSC_VER
   #pragma pack(pop)
 #endif
 
 }
+
+
 
 #endif

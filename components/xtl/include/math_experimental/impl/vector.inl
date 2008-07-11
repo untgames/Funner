@@ -71,6 +71,12 @@ template <class type,size_t Size> template <class Fn>
   fn(*this,v1);
 }
 
+template<class type,size_t Size> template <class Fn>
+inline vec<type,Size>::vec (const quat<type>& q1,const type& arg,Fn fn)
+{
+  fn(*this,q1,arg);
+}
+
 
 template <class T,size_t Size>
 vec<T,Size>::vec (const T& x1,const T& x2,const T& x3,const T& x4)

@@ -2,6 +2,7 @@
 #define MATHLIB_HEADER
 
 #define _USE_MATH_DEFINES
+#include <stddef.h>
 #include <math.h>
 #include <float.h>
 
@@ -35,10 +36,10 @@ namespace math
 #include <math_experimental/impl/functional.inl>
 #include <math_experimental/impl/vector.inl>
 #include <math_experimental/impl/matrix.inl>
-#include <math_experimental/impl/quat_base.inl>
+//#include <math_experimental/impl/quat_base.inl>
 #include <math_experimental/impl/quat.inl>
 #include <math_experimental/impl/utils.inl>
-#include <math_experimental/impl/affine.inl>
+//#include <math_experimental/impl/affine.inl>
 
 typedef vec<float,2>              vec2f;
 typedef vec<double,2>             vec2d;

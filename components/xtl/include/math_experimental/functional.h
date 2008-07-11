@@ -1,3 +1,10 @@
+#ifndef MATHLIB_FUNCTIONAL_HEADER
+#define MATHLIB_FUNCTIONAL_HEADER
+#include "forward.h"
+
+#ifdef _MSC_VER  
+  #pragma pack(push,1)
+#endif
 
 namespace math
 {
@@ -252,4 +259,6 @@ struct max_fn: public binary_function<Arg1,Arg2,Result>
   Result operator () (const Arg1&,const Arg2&) const;
 };
 
+#include<math_experimental/impl/functional.inl>
 }
+#endif

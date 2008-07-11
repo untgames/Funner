@@ -1,80 +1,58 @@
 #ifndef MATHLIB_UTILS_HEADER
 #define MATHLIB_UTILS_HEADER
 
+#include "forward.h"
+#include <stddef.h>
 namespace math
 {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования углов (градусы - радианы)
+///ЏаҐ®Ўа §®ў ­Ёп гЈ«®ў (Ја ¤гбл - а ¤Ё ­л)
 ////////////////////////////////////////////////////////////////////////////////////////////
-long double deg2rad (long double angle);
-long double rad2deg (long double angle);
-double      deg2rad (double angle);
-double      rad2deg (double angle);
-float       deg2rad (float angle);
-float       rad2deg (float angle);
+template <class T>
+const T deg_to_rad (const T& angle);
 
-////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования: кватернион - матрица, осевой угол, углы Эйлера
-////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> void quat2matrix     (const quat<T>& q,matrix<T,4>& res);
-template <class T> void quat2matrix     (const quat<T>& q,matrix<T,3>& res);
-template <class T> void quat2AxisAngle  (const quat<T>& q,T& angle,vec<T,3>& axis,const T& eps = 1e-03f);
-template <class T> void quat2EulerAngle (const quat<T>& q,T& pitch,T& yaw,T& roll);
+template <class T>
+const T rad_to_deg (const T& angle);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования осевой угол - кватернион, углы Эйлера - кватернион
+///ЏаҐ®Ўа §®ў ­Ёп ®бҐў®© гЈ®« - Єў вҐа­Ё®­, гЈ«л ќ©«Ґа  - Єў вҐа­Ё®­
 ////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> void AxisAngle2quat  (const T& angle,const vec<T,3>& axis,quat<T>& q);
-template <class T> void EulerAngle2quat (const T& pitch,const T& yaw,const T& roll,quat<T>& q);
+template <class T> const quat<T> axis_angle_to_quat  (const T& angle,const vec<T,3>& axis);
+template <class T> const quat<T> axis_angle_to_quat  (const T& angle,const T& axis_x,const T& axis_y,const T& axis_z);
+template <class T> void          axis_angle_to_quat  (const T& angle,const vec<T,3>& axis,quat<T>& res);
+template <class T> void          axis_angle_to_quat  (const T& angle,const T& axis_x,const T& axis_y,const T& axis_z,quat<T>& res);
 
-template <class T> const quat<T> fromEulerAngle (const T& pitch,const T& yaw,const T& roll);
-template <class T> const quat<T> fromAxisAngle  (const T& angle,const vec<T,3>& axis);
-
-const quat<float>  fromEulerAnglef (float pitch,float yaw,float roll);
-const quat<double> fromEulerAngled (double pitch,double yaw,double roll);
-const quat<float>  fromAxisAnglef  (float angle,float axis_x,float axis_y,float axis_z);
-const quat<double> fromAxisAngled  (double angle,double axis_x,double axis_y,double axis_z);
+template <class T> const quat<T> euler_angle_to_quat (const T& pitch,const T& yaw,const T& roll);
+template <class T> void          euler_angle_to_quat (const T& pitch,const T& yaw,const T& roll,quat<T>&q);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования: матрица - кватернион
-////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> void matrix2quat (const matrix<T,4>& m,quat<T>& res);
-template <class T> void matrix2quat (const matrix<T,3>& m,quat<T>& res);
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Афинные преобразования
+///ЂдЁ­­лҐ ЇаҐ®Ўа §®ў ­Ёп
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-///Параллельный перенос
-template <class T> void matrix_translate (matrix<T,4>& res,const vec<T,3>&);
+///Џ а ««Ґ«м­л© ЇҐаҐ­®б
+template <class T> const matrix<T,4> matrix_translate (const vec<T,3>&);
+template <class T> const matrix<T,4> matrix_translate (const T&,const T&, const T&);
+template <class T> void              matrix_translate (const vec<T,3>&,matrix<T,4>&);
+template <class T> void              matrix_translate (const T&,const T&, const T&,matrix<T,4>&);
 
-///Масштабирование
-template <class T> void matrix_scale (matrix<T,4>& res,const vec<T,3>&);
-template <class T> void matrix_scale (matrix<T,3>& res,const vec<T,3>&);
 
-///Поворот вокруг оси
-template <class T> void matrix_rotate (matrix<T,4>& res,const T& angle,const vec<T,3>& axis);
-template <class T> void matrix_rotate (matrix<T,3>& res,const T& angle,const vec<T,3>& axis);
+///Њ бив ЎЁа®ў ­ЁҐ
+template <class T> const matrix<T,4> matrix4_scale    (const vec<T,3>&);
+template <class T> const matrix<T,3> matrix3_scale    (const vec<T,3>&);
+template <class T> void              matrix4_scale    (const vec<T,3>&,matrix<T,4>&);
+template <class T> void              matrix3_scale    (const vec<T,3>&,matrix<T,3>&);
 
-template <class T> const matrix<T,4> translate (const vec<T,3>&);
-template <class T> const matrix<T,4> translate (const T& x,const T& y,const T& z);
-template <class T> const matrix<T,4> scale     (const vec<T,3>&);
-template <class T> const matrix<T,4> scale     (const T& x,const T& y,const T& z);
-template <class T> const matrix<T,4> rotate    (const T& angle,const vec<T,3>& axis);
-template <class T> const matrix<T,4> rotate    (const T& angle,const T& x,const T& y,const T& z);
 
-const matrix<float,4>  translatef (float x,float y,float z);
-const matrix<double,4> translated (double x,double y,double z);
-const matrix<float,4>  scalef     (float x,float y,float z);
-const matrix<double,4> scaled     (double x,double y,double z);
-const matrix<float,4>  rotatef    (float angle,const vec<float,3>& axis);
-const matrix<float,4>  rotatef    (float angle,float x,float y,float z);
-const matrix<double,4> rotated    (double angle,const vec<double,3>& axis);
-const matrix<double,4> rotated    (double angle,double x,double y,double z);
+///Џ®ў®а®в ў®ЄагЈ ®бЁ
+template <class T> const matrix<T,4> matrix4_rotate   (const T& angle,const vec<T,3>& axis);
+template <class T> const matrix<T,3> matrix3_rotate   (const T& angle,const vec<T,3>& axis);
+template <class T> void              matrix4_rotate   (const T& angle,const vec<T,3>& axis,matrix<T,4>& res);
+template <class T> void              matrix3_rotate   (const T& angle,const vec<T,3>& axis,matrix<T,3>& res);
 
-const matrix<float,4> lookatf (const vec<float,3>& pos,const vec<float,3>& center,const vec<float,3>& up);
+#include <math_experimental/impl/utils.inl>
 
 }
 
 #endif
+
