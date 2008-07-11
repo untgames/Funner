@@ -1,8 +1,17 @@
 #include <math_experimental/vector.h>
-#include "shared.h"
 #include <stdio.h>
 
 using namespace math;
+
+template <class T,size_t size> void vec_print(const char* Message,const vec<T,size>& V)
+{
+	printf("%s",Message);
+	for (int i=0;i<size;i++)
+	{
+		printf("%.2f ",V[i]);
+	}
+	printf("\n");
+}
 
 int main()
 {

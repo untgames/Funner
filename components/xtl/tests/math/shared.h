@@ -1,7 +1,14 @@
-#include <math_experimental/mathlib.h>
+#include <math_experimental/vector.h>
+#include <math_experimental/quat.h>
+#include <math_experimental/matrix.h>
 #include <stdio.h>
 
 using namespace math;
+
+/*template <class T,size_t size> class vec;
+template <class type,size_t sizeX,size_t sizeY> class matrix;
+template <class T> class quat;                               */
+
 
 void _printf(int x);
 void _printf(float x);
