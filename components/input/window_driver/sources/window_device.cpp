@@ -181,7 +181,6 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
     case WindowEvent_OnXButton2Down:
     case WindowEvent_OnXButton2Up:
       window.SetCursorPosition (window_event_context.cursor_position.x, window_event_context.cursor_position.y);
-      WindowEventHandler (window, WindowEvent_OnMouseMove, window_event_context);
   }
 
   switch (event)
