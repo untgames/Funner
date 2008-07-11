@@ -27,7 +27,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
         throw xtl::make_null_argument_exception (METHOD_NAME, "client_event_replacement");
 
       EventTranslatorPtr         replacer (new EventTranslator (input_event, client_event_replacement, tag));
-      stl::hash_key<const char*> input_event_hash (word (input_event, 0).c_str ());
+      stl::hash_key<const char*> input_event_hash (word (input_event, 0, " ", " \t", "''\"\"").c_str ());
 
       if (!*tag)
       {
