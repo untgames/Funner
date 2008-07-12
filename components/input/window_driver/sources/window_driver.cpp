@@ -34,7 +34,6 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     { 
       UnregisterDriver ();
       UnregisterAllDevices ();
-      Release (); 
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
