@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<TranslationTable>
+  <Translation Event="Down down" Replacement="vertical_move (-0.1)" Tag=""/>
+  <Translation Event="Down repeat" Replacement="vertical_move (-0.1)" Tag=""/>
+  <Translation Event="Up down" Replacement="vertical_move (0.1)" Tag=""/>
+  <Translation Event="Up repeat" Replacement="vertical_move (0.1)" Tag=""/>
+  <Translation Event="Left down" Replacement="horisontal_move (-0.1)" Tag=""/>
+  <Translation Event="Left repeat" Replacement="horisontal_move (-0.1)" Tag=""/>
+  <Translation Event="Right down" Replacement="horisontal_move (0.1)" Tag=""/>
+  <Translation Event="Right repeat" Replacement="horisontal_move (0.1)" Tag=""/>
+</TranslationTable>
