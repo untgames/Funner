@@ -39,7 +39,8 @@ void default_event_handler (const char*)
 */
 
 Device::Device (Window* window, const char* in_name)
-  : event_handler (&default_event_handler), name (in_name), autocenter_cursor (0), cursor_sensitivity (1.f), vertical_wheel_sensitivity (1.f), horisontal_wheel_sensitivity (1.f)
+  : event_handler (&default_event_handler), name (in_name), x_cursor_pos (window->CursorPosition ().x), y_cursor_pos (window->CursorPosition ().y),
+    autocenter_cursor (0), cursor_sensitivity (1.f), vertical_wheel_sensitivity (1.f), horisontal_wheel_sensitivity (1.f)
 {
   connections.reserve (CONNECTIONS_COUNT);
 
