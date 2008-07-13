@@ -43,7 +43,7 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     MipLevelDesc level_desc;
 
     GetMipLevelDesc (i, level_desc);
-    
+
     glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_format, gl_type, 0);
 
     glGetTexLevelParameteriv (GL_TEXTURE_2D, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
@@ -82,7 +82,7 @@ void Texture2D::SetUncompressedData
   GLenum      type,
   const void* buffer)
 {
-  glTexSubImage2D (GL_TEXTURE_2D, mip_level, x, y, width, height, format, type, buffer);  
+  glTexSubImage2D (GL_TEXTURE_2D, mip_level, x, y, width, height, format, type, buffer);
 }
 
 void Texture2D::SetCompressedData

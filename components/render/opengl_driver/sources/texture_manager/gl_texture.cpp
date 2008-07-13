@@ -280,6 +280,7 @@ void Texture::BuildMipmaps
   size_t       y,
   size_t       z,
   size_t       width,
+  size_t       unclamped_width,
   size_t       height,
   PixelFormat  format,
   const void*  data)
@@ -290,8 +291,7 @@ void Texture::BuildMipmaps
   const size_t buffer_size = get_image_size (get_next_mip_size (width), get_next_mip_size (height), format);
 
   xtl::uninitialized_storage<char> dst_buffer (buffer_size),
-//                                   src_buffer (buffer_size / 2); //на 4 делить не нужно! (почему-то вылетает glTexSubImage2D  на Microsoft Generic OpenGL)
-                                   src_buffer (buffer_size); //на 4 делить не нужно! 
+                                   src_buffer (buffer_size / 2); //на 4 делить не нужно! (необходимо для прямоугольных текстур с длиной стороны 1)
 
   const char* src = reinterpret_cast<const char*> (data);
   char*       dst = dst_buffer.data ();
@@ -300,13 +300,16 @@ void Texture::BuildMipmaps
   {
     scale_image_2x_down (format, width, height, src, dst);
 
-    width   = get_next_mip_size (width);
-    height  = get_next_mip_size (height);
-    x      /= 2;
-    y      /= 2;    
+    width            = get_next_mip_size (width);
+    height           = get_next_mip_size (height);
+    unclamped_width  = get_next_mip_size (unclamped_width);
+    x               /= 2;
+    y               /= 2;
 
     if (target != GL_TEXTURE_CUBE_MAP)
       z /= 2;
+
+    glPixelStorei (GL_UNPACK_ROW_LENGTH,  unclamped_width); //длина строки в пикселях (для данного mip-уровня)
 
     SetUncompressedData (z, mip_level, x, y, width, height, gl_format, gl_type, dst);
 
@@ -396,7 +399,7 @@ void Texture::SetData
 
     //настройка параметров расположения данных в буфере
 
-  glPixelStorei (GL_UNPACK_ROW_LENGTH,  unclamped_width); //длина строки в пикселях
+  glPixelStorei (GL_UNPACK_ROW_LENGTH,  unclamped_width); //длина строки в пикселях (для нулевого mip-уровня)
   glPixelStorei (GL_UNPACK_ALIGNMENT,   1);               //выравнивание начала строк
   glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);               //количество пропускаемых строк
   glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);               //количество пропускаемых пикселей
@@ -496,7 +499,7 @@ void Texture::SetData
     
     if (desc.generate_mips_enable && !mip_level && !GetCaps ().has_sgis_generate_mipmap)
     {
-      BuildMipmaps (x, y, layer, width, height, source_format, buffer);
+      BuildMipmaps (x, y, layer, width, unclamped_width, height, source_format, buffer);
     }
   }     
 

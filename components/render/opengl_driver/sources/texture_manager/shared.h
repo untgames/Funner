@@ -160,7 +160,7 @@ class Texture: public BindableTexture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Генерация mip-уровней
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void BuildMipmaps (size_t x, size_t y, size_t z, size_t width, size_t height, PixelFormat format, const void* data);
+    void BuildMipmaps (size_t x, size_t y, size_t z, size_t width, size_t unclamped_width, size_t height, PixelFormat format, const void* data);
     
   private:
     TextureDesc   desc;                //дескриптор текстуры  
