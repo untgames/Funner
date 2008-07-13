@@ -763,7 +763,7 @@ void Platform::SetCursorPosition (const Point& position)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Win32Platform::SetCursorPosition");
+    exception.touch ("syslib::Win32Platform::SetCursorPosition(const Point&)");
     throw;
   }
 }
@@ -781,7 +781,53 @@ Point Platform::GetCursorPosition ()
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Win32Platform::GetCursorPosition");
+    exception.touch ("syslib::Win32Platform::GetCursorPosition()");
+    throw;
+  }
+}
+
+//в клиентских координатах окна
+void Platform::SetCursorPosition (window_t handle, const Point& client_position)
+{
+  try
+  {
+    HWND wnd = (HWND)handle;
+    
+    POINT screen_position = { client_position.x, client_position.y };
+    
+    if (!ClientToScreen (wnd, &screen_position))
+      raise_error ("::ClientToScreen");
+      
+    if (!SetCursorPos (screen_position.x, screen_position.y))
+      raise_error ("::SetCursorPos");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::SetCursorPosition(window_t, const Point&)");
+    throw;
+  }
+}
+
+//в клиентских координатах окна
+Point Platform::GetCursorPosition (window_t handle)
+{
+  try
+  {
+    HWND wnd = (HWND)handle;
+    
+    POINT position;
+    
+    if (!GetCursorPos (&position))
+      raise_error ("::GetCursorPos");
+      
+    if (!ScreenToClient (wnd, &position))
+      raise_error ("::ScreenToClient");
+      
+    return Point (position.x, position.y);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::GetCursorPosition(window_t)");
     throw;
   }
 }

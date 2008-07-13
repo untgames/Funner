@@ -64,6 +64,8 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void  SetCursorPosition (const Point& position);
     static Point GetCursorPosition ();
+    static void  SetCursorPosition (window_t, const Point& client_position); //в клиентских координатах окна
+    static Point GetCursorPosition (window_t);                               //в клиентских координатах окна
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени клавиши

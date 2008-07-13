@@ -408,28 +408,12 @@ void Window::SetPosition (size_t x, size_t y)
 
 Point Window::CursorPosition () const
 {
-  Rect window_rect, client_rect;
-  
-  Platform::GetWindowRect ((Platform::window_t)CheckedHandle (), window_rect);
-  Platform::GetClientRect ((Platform::window_t)CheckedHandle (), client_rect);
-
-  Point position = Platform::GetCursorPosition ();
-
-  position.x -= window_rect.left + client_rect.left;
-  position.y -= window_rect.top + client_rect.top;
-
-  return position;
+  return Platform::GetCursorPosition ((Platform::window_t)CheckedHandle ());
 }
 
 void Window::SetCursorPosition (const Point& position)
 {
-  Rect window_rect, client_rect;
-  
-  Platform::GetWindowRect ((Platform::window_t)CheckedHandle (), window_rect);
-  Platform::GetClientRect ((Platform::window_t)CheckedHandle (), client_rect);
-
-  Platform::SetCursorPosition (Point (position.x + client_rect.left + window_rect.left,
-                                      position.y + client_rect.top + window_rect.top));
+  Platform::SetCursorPosition ((Platform::window_t)CheckedHandle (), position);
 }
 
 void Window::SetCursorPosition (size_t x, size_t y)
