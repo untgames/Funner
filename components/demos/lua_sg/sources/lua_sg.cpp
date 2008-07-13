@@ -77,16 +77,6 @@ int main ()
 
     camera = OrthoCamera::Create ();    
     
-    camera->BindToScene (scene, NodeBindMode_Capture);
-    camera->SetName ("Camera1");                
-    camera->SetPosition (0, 0, -3);
-    camera->SetLeft     (-10);
-    camera->SetRight    (10);
-    camera->SetTop      (10);
-    camera->SetBottom   (-10);
-    camera->SetZNear    (-10);
-    camera->SetZFar     (10);    
-
       //создание областей вывода
       
     Viewport vp;
@@ -111,6 +101,7 @@ int main ()
     load_script (*script, SCRIPT_FILE_NAME);
 
     invoke<void> (*script, "set_root_node", xtl::ref (scene.Root ()));
+    invoke<void> (*script, "set_camera", camera);
 
     input::TranslationMap translation_map (TRANSLATION_MAP_FILE_NAME);
 

@@ -10,10 +10,27 @@ sprite    = Scene.Sprite.Create ()
 sprite.Material = "sprite_material"
 sprite.Color = vec3 (1, 1, 1)
 
+camera = Scene.OrthoCamera.Create ()
+
 function set_root_node (new_root_node)
   root_node = new_root_node
 
   sprite:BindToParent (root_node)
+end
+
+function set_camera (new_camera)
+  camera = new_camera
+
+  camera:BindToParent (root_node)
+
+  camera.Name = "Camera1"
+  camera.Position = vec3 (0, 0, -3)
+  camera.Left = -10
+  camera.Right = 10
+  camera.Top = 10
+  camera.Bottom = -10
+  camera.ZNear = -10
+  camera.ZFar = 10
 end
 
 function onBeginMove(ort)
