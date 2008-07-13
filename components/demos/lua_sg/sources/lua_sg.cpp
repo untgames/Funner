@@ -1,12 +1,23 @@
 #include "shared.h"
 
+static clock_t MOVE_PERIOD = CLOCKS_PER_SEC / 100;
+
 const char* SCRIPT_FILE_NAME = "script/sg.lua";
 const char* TRANSLATION_MAP_FILE_NAME = "media/translation_table.keymap";
 
-void idle (TestApplication& app)
+void idle (TestApplication& app, Shell& shell)
 {
   try
   {
+    static clock_t last_time = clock ();
+    
+    if (clock () - last_time > MOVE_PERIOD)
+    {
+      invoke<void> (*shell.Interpreter (), "idle", float (clock () - last_time) / CLOCKS_PER_SEC);
+
+      last_time = clock ();
+    }        
+
     app.PostRedraw ();
   }
   catch (std::exception& exception)
@@ -88,10 +99,6 @@ int main ()
     
     render.Attach (vp);
 
-      //установка idle-функции
-
-    test.SetIdleHandler (xtl::bind (&idle, _1));
-
     xtl::shared_ptr<Environment> env (new Environment);
     
     Shell shell ("lua", env);
@@ -110,6 +117,10 @@ int main ()
     input::TranslationMap::EventHandler event_handler = xtl::bind (&input_event_handler, _1, script.get ());
 
     test.InputDevice ().SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &translation_map, _1, event_handler));
+    
+      //установка idle-функции
+
+    test.SetIdleHandler (xtl::bind (&idle, _1, xtl::ref (shell)));    
 
       //запуск приложения
 

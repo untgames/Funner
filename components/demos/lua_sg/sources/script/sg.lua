@@ -1,3 +1,5 @@
+velocity = {['+x']=0; ['-x']=0; ['+y']=0; ['-y']=0}
+
 root_node = Scene.Node.Create ()
 sprite    = Scene.Sprite.Create ()
 
@@ -10,10 +12,14 @@ function set_root_node (new_root_node)
   sprite:BindToParent (root_node)
 end
 
-function vertical_move (distance)
-  sprite:Translate (0, distance, 0)
+function onBeginMove(ort)
+  velocity [ort] = velocity [ort] + 3
 end
 
-function horisontal_move (distance)
-  sprite:Translate (distance, 0, 0)
+function onEndMove(ort)
+  velocity [ort] = velocity [ort] - 3
+end
+
+function idle(dt)
+  sprite:Translate ((velocity ['+x'] - velocity ['-x'])*dt, (velocity ['+y'] - velocity ['-y'])*dt, 0)
 end
