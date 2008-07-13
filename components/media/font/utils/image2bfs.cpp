@@ -70,7 +70,7 @@ int main (int argc, char *argv[])
 
     XmlWriter bfs_file (bfs_file_name.c_str ());
     
-    xtl::uninitialized_storage<char> mask_buffer (img.Width () * img.Height () * bpp);        
+    xtl::uninitialized_storage<char> mask_buffer (img.Width () * img.Height ());
 
     char* mask = mask_buffer.data ();
 
