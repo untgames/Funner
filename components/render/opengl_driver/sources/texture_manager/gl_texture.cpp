@@ -211,6 +211,10 @@ void Texture::Bind ()
     //обновление кэш-переменных
 
   current_texture_id = GetId ();
+  
+    //оповещение о необходимости ребиндинга уровня
+    
+  StageRebindNotify (Stage_TextureManager);
 }
 
 /*

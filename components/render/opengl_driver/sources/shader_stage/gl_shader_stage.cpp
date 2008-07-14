@@ -35,13 +35,19 @@ void get_base_profile (const char* source, string& profile)
 class ShaderStageState: public IStageState
 {
   public:  
-      //конструктор
-    ShaderStageState (ShaderStageState* in_main_state = 0) : main_state (in_main_state) {}
+      //конструкторы
+    ShaderStageState (ShaderStageState* in_main_state) : owner (0), main_state (in_main_state) {}
+    ShaderStageState (ContextObject* in_owner) : owner (in_owner), main_state (0) {}    
 
       //установка программы
     void SetProgram (Program* in_program)
     {
+      if (in_program == program)
+        return;
+
       program = in_program;
+
+      UpdateNotify ();
     }
 
       //получение программы
@@ -53,7 +59,12 @@ class ShaderStageState: public IStageState
       //установка константного буффера
     void SetConstantBuffer (size_t buffer_slot, IBindableBuffer* buffer)
     {
+      if (buffer == constant_buffers [buffer_slot])
+        return;
+      
       constant_buffers [buffer_slot] = buffer;
+
+      UpdateNotify ();
     }
 
       //получение константного буффера
@@ -68,7 +79,12 @@ class ShaderStageState: public IStageState
       //установка расположения параметров шейдера
     void SetProgramParametersLayout (ProgramParametersLayout* in_parameters_layout)
     {
+      if (in_parameters_layout == parameters_layout)
+        return;
+      
       parameters_layout = in_parameters_layout;
+      
+      UpdateNotify ();
     }
 
       //получение расположения параметров шейдера
@@ -77,8 +93,7 @@ class ShaderStageState: public IStageState
       return parameters_layout.get ();
     }
 
-       //Биндинг
-
+      //биндинг (перенести в IMpl!!!)
     void Bind ()
     {
         //если NULL, то подстановка дефолтов
@@ -107,20 +122,29 @@ class ShaderStageState: public IStageState
       if (main_state)
         main_state->Copy (*this, mask);
     }
-    
+
   private:
       //копирование
     void Copy (const ShaderStageState& source, const StateBlockMask& mask)
     {
       if (mask.ss_program)
-        program = source.GetProgram ();
+        SetProgram (source.GetProgram ());
 
       if (mask.ss_program_parameters_layout)
-        parameters_layout = source.GetProgramParametersLayout ();
+        SetProgramParametersLayout (source.GetProgramParametersLayout ());
 
       for (size_t i = 0; i < DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
         if (mask.ss_constant_buffers [i])
-          constant_buffers[i] = source.GetConstantBuffer (i);
+          SetConstantBuffer (i, source.GetConstantBuffer (i));
+    }
+
+      //оповещение об изменении состояния
+    void UpdateNotify ()
+    {
+      if (!owner)
+        return;
+
+      owner->GetContextManager ().StageRebindNotify (Stage_Shading);
     }
 
   private:
@@ -129,10 +153,11 @@ class ShaderStageState: public IStageState
     typedef xtl::trackable_ptr<Program>                 ProgramPtr;
 
   private:
-    ShaderStageStatePtr        main_state;                                           //основное состояние уровня
-    ProgramParametersLayoutPtr parameters_layout;                                    //расположение параметров шейдера
-    ProgramPtr                 program;                                              //шейдер
-    ConstantBufferPtr          constant_buffers[DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы шейдера
+    ContextObject*             owner;                                                 //владелец состояния
+    ShaderStageStatePtr        main_state;                                            //основное состояние уровня
+    ProgramParametersLayoutPtr parameters_layout;                                     //расположение параметров шейдера
+    ProgramPtr                 program;                                               //шейдер
+    ConstantBufferPtr          constant_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы шейдера
 };
 
 }
@@ -180,7 +205,7 @@ struct ShaderStage::Impl: public ContextObject
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::SetProgramParametersLayout";
 
-      state.SetProgramParametersLayout (cast_object <ProgramParametersLayout> (parameters_layout, METHOD_NAME, "parameters_layout"));
+      state.SetProgramParametersLayout (cast_object<ProgramParametersLayout> (*this, parameters_layout, METHOD_NAME, "parameters_layout"));
     }
 
     void SetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
@@ -232,7 +257,8 @@ struct ShaderStage::Impl: public ContextObject
 */
 
 ShaderStage::Impl::Impl (const ContextManager& context_manager)
-  : ContextObject (context_manager)
+  : ContextObject (context_manager),
+    state (this)
 {
   if (GetCaps ().has_arb_shading_language_100)
     AddShaderManager (ShaderManagerPtr (create_glsl_shader_manager (context_manager), false));
@@ -259,7 +285,7 @@ void ShaderStage::Impl::Bind ()
 
 IProgramParametersLayout* ShaderStage::Impl::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
 {
-  return new ProgramParametersLayout (desc);
+  return new ProgramParametersLayout (GetContextManager (), desc);
 }
 
 IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
@@ -271,6 +297,10 @@ IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDe
 
   if (!shaders_count)
     throw xtl::make_null_argument_exception (METHOD_NAME, "shaders_count");
+    
+    //оповещение о необходимости ребиндинга уровня
+    
+  StageRebindNotify (Stage_Shading);
     
       //вынести проверки в начало!!!
 
@@ -326,7 +356,7 @@ IProgram* ShaderStage::Impl::CreateProgram (size_t shaders_count, const ShaderDe
     }
     else
       program_shaders [i] = shader_iterator->second;
-  }
+  }  
 
   return manager->CreateProgram (shaders_count, &program_shaders[0], error_log);
 }

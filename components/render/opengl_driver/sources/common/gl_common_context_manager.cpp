@@ -66,7 +66,7 @@ class ContextImpl: public xtl::reference_counter
     void InitContextCaps (const ExtensionSet& enabled_extensions)
     {
       context_caps.Init (extensions, enabled_extensions);
-    }
+    }    
     
   private:
 
@@ -119,7 +119,7 @@ class ContextImpl: public xtl::reference_counter
         extensions.Set (Version_1_4, GLEW_VERSION_1_4 != 0);
         extensions.Set (Version_1_5, GLEW_VERSION_1_5 != 0);
         extensions.Set (Version_2_0, GLEW_VERSION_2_0 != 0);
-        extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);        
+        extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);
       }
       catch (xtl::exception& exception)
       {
@@ -166,12 +166,19 @@ struct ContextManager::Impl: public xtl::reference_counter
       on_destroy_draw_swap_chain (xtl::bind (&Impl::RestoreContext, this)),
       on_destroy_read_swap_chain (xtl::bind (&Impl::RestoreContext, this))
     {
+        //разбор строки инициализации устройства
+
       if (!init_string)
         throw xtl::make_null_argument_exception ("render::low_level::opengl::ContextManager::ContextManager", "init_string");          
-        
-      enabled_extensions.Set (true);
-      
+
+      enabled_extensions.Set (true);      
+
       common::parse_init_string (init_string, xtl::bind (&Impl::AddInitProperty, this, _1, _2));
+
+        //инициализация флагов ребиндинга уровней
+
+      for (size_t stage=0; stage<Stage_Num; stage++)
+        need_stage_rebind [stage] = true;
     }    
     
       //создание контекста
@@ -313,6 +320,10 @@ struct ContextManager::Impl: public xtl::reference_counter
       current_draw_swap_chain = draw_swap_chain;
       current_read_swap_chain = read_swap_chain;
       current_context_id      = context_id;
+
+        //оповещение о необходимости ребиндинга выходного уровня
+
+      StageRebindNotify (Stage_Output);
     }
     
       //активация текущего контекста
@@ -482,6 +493,31 @@ struct ContextManager::Impl: public xtl::reference_counter
       while (glGetError () != GL_NO_ERROR);
     }
     
+      //оповещение о необходимости ребинда уровня
+    void StageRebindNotify (Stage stage)
+    {
+      if (stage < 0 || stage >= Stage_Num)
+        throw xtl::make_argument_exception ("render::low_level::opengl::ContextManager::Impl::StageRebindNotify", "stage", stage);
+
+      need_stage_rebind [stage] = true;
+    }
+    
+      //очистка флагов ребиндинга
+    void ResetRebindNotifications ()
+    {
+      for (size_t stage=0; stage<Stage_Num; stage++)
+        need_stage_rebind [stage] = false;
+    }
+    
+      //проверка необходимости ребинда уровня
+    bool NeedStageRebind (Stage stage)
+    {
+      if (stage < 0 || stage >= Stage_Num)
+        return false;
+
+      return need_stage_rebind [stage];
+    }  
+    
   private:
       //добавление свойства
     void AddInitProperty (const char* name, const char* value)
@@ -557,6 +593,10 @@ struct ContextManager::Impl: public xtl::reference_counter
       //восставление контекста (после удаления контекста или цепочки обмена)
     void RestoreContext ()
     {
+        //оповещение о необходимости ребиндинга выходного уровня
+
+      StageRebindNotify (Stage_Output);      
+
         //если текущий контекст не удалён - устанавливаем в качестве текущих цепочек обмена основную цепочку обмена контекста
       
       ContextMap::iterator iter = context_map.find (current_context_id);
@@ -567,7 +607,7 @@ struct ContextManager::Impl: public xtl::reference_counter
 
         return;
       }
-      
+
         //если был удалён текущий контекст
         
       if (context_map.empty ())
@@ -590,27 +630,28 @@ struct ContextManager::Impl: public xtl::reference_counter
       current_read_swap_chain = context->GetMasterSwapChain ();
       current_draw_swap_chain = current_read_swap_chain;
       current_context_id      = context_map.begin ()->first;
-    }    
-    
+    }
+
   private:
     typedef xtl::intrusive_ptr<ContextImpl>       ContextImplPtr;  //указатель на реализацию контекста
     typedef stl::hash_map<size_t, ContextImplPtr> ContextMap;      //карта соответствия контекста OpenGL и цепочки обмена
   
   private:
-    LogHandler                log_handler;                //обработчик протоколирования
-    ExtensionSet              required_extensions;        //расширения, затребованные в строке иициализации
-    ExtensionSet              enabled_extensions;         //расширения, разрешенные к использованию в строке инициализаии
-    stl::string               min_version;                //минимальная требуемой версии OpenGL
-    stl::string               max_version;                //максимальная необходимая версия OpenGL
-    bool                      check_gl_errors;            //нужно ли проверять ошибки OpenGL
-    ContextMap                context_map;                //карта отображения цепочки обмена на контекст
-    ContextImpl*              current_context;            //текущий контекст
-    ISwapChain*               current_draw_swap_chain;    //цепочка обмена для рисования
-    ISwapChain*               current_read_swap_chain;    //цепочка обмена для чтения
-    size_t                    current_context_id;         //идентификатор текущего контекста (0 - отсутствует)
-    size_t                    next_context_id;            //номер следующего создаваемого контекста
-    xtl::trackable::slot_type on_destroy_draw_swap_chain; //обработчик удаления цепочки обмена для рисования 
-    xtl::trackable::slot_type on_destroy_read_swap_chain; //обработчик удаления цепочки обмена для чтения  
+    LogHandler                log_handler;                   //обработчик протоколирования
+    ExtensionSet              required_extensions;           //расширения, затребованные в строке иициализации
+    ExtensionSet              enabled_extensions;            //расширения, разрешенные к использованию в строке инициализаии
+    stl::string               min_version;                   //минимальная требуемой версии OpenGL
+    stl::string               max_version;                   //максимальная необходимая версия OpenGL
+    bool                      check_gl_errors;               //нужно ли проверять ошибки OpenGL
+    ContextMap                context_map;                   //карта отображения цепочки обмена на контекст
+    ContextImpl*              current_context;               //текущий контекст
+    ISwapChain*               current_draw_swap_chain;       //цепочка обмена для рисования
+    ISwapChain*               current_read_swap_chain;       //цепочка обмена для чтения
+    size_t                    current_context_id;            //идентификатор текущего контекста (0 - отсутствует)
+    size_t                    next_context_id;               //номер следующего создаваемого контекста
+    xtl::trackable::slot_type on_destroy_draw_swap_chain;    //обработчик удаления цепочки обмена для рисования
+    xtl::trackable::slot_type on_destroy_read_swap_chain;    //обработчик удаления цепочки обмена для чтения
+    bool                      need_stage_rebind [Stage_Num]; //флаги, определяющие необходимость ребиндинга уровня
 };
 
 /*
@@ -858,4 +899,23 @@ void ContextManager::RaiseError (const char* source) const
 void ContextManager::ClearErrors () const
 {
   impl->ClearErrors ();
+}
+
+/*
+    Оповещение о необходимости ребинда уровня / очистка флагов ребиндинга / проверка необходимости ребинда уровней
+*/
+
+void ContextManager::StageRebindNotify (Stage stage)
+{
+  impl->StageRebindNotify (stage);
+}
+
+void ContextManager::ResetRebindNotifications ()
+{
+  impl->ResetRebindNotifications ();
+}
+
+bool ContextManager::NeedStageRebind (Stage stage) const
+{
+  return impl->NeedStageRebind (stage);
 }

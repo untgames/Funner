@@ -16,8 +16,14 @@ Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char* init_stri
     rasterizer_stage (context_manager),
     texture_manager (context_manager),
     shader_stage (context_manager),
-    query_manager (context_manager)
+    query_manager (context_manager),
+    cached_base_vertex (~0),
+    cached_base_index (~0)
 {  
+    //инициализаци€ кэша
+    
+  memset (&cached_indices_layout, 0, sizeof cached_indices_layout);
+
     //получение информации об устройстве отрисовки
 
   properties.AddProperty ("init_string",   init_string);
@@ -47,7 +53,6 @@ const char* Device::GetName ()
 IStatisticsQuery* Device::CreateStatisticsQuery ()
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::CreateStatisticsQuery");
-  return 0;
 }
 
 /*
@@ -491,12 +496,57 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
 {
   try
   {
-    output_stage.Bind ();
+      //установка состо€ни€ выходного уровн€
+    
+    if (context_manager.NeedStageRebind (Stage_Output))
+      output_stage.Bind ();
+
     output_stage.InvalidateRenderTargets (rasterizer_stage.GetViewport ());
-    input_stage.Bind (base_vertex, base_index, out_indices_layout);
-    rasterizer_stage.Bind ();
-    texture_manager.Bind ();
-    shader_stage.Bind ();
+    
+      //установка состо€ни€ входного уровн€
+
+    if (context_manager.NeedStageRebind (Stage_Input) || base_vertex != cached_base_vertex || base_index != cached_base_index && out_indices_layout)
+    {
+      input_stage.Bind (base_vertex, base_index, out_indices_layout);
+      
+      cached_base_vertex = base_vertex;
+
+      if (out_indices_layout)
+      {
+        cached_indices_layout = *out_indices_layout;
+        cached_base_index     = base_index;
+      }
+      else
+      {
+        cached_base_index = ~0;
+
+        memset (&cached_indices_layout, 0, sizeof cached_indices_layout);
+      }
+    }
+    else
+    {
+      if (out_indices_layout)
+        *out_indices_layout = cached_indices_layout;
+    }
+
+      //установка состо€ни€ уровн€ растеризации
+
+    if (context_manager.NeedStageRebind (Stage_Rasterizer))
+      rasterizer_stage.Bind ();
+
+      //установка состо€ни€ менеджера текстур
+
+    if (context_manager.NeedStageRebind (Stage_TextureManager))
+      texture_manager.Bind ();
+
+      //установка состо€ни€ шейдерного уровн€
+
+    if (context_manager.NeedStageRebind (Stage_Shading))
+      shader_stage.Bind ();
+
+      //очистка флагов ребиндинга
+      
+    context_manager.ResetRebindNotifications ();
   }
   catch (xtl::exception& exception)
   {

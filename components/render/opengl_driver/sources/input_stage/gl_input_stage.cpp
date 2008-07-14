@@ -14,10 +14,9 @@ namespace
 class InputStageState: public IStageState
 {
   public:
-      //конструктор
-    InputStageState (InputStageState* in_main_state = 0) : main_state (in_main_state)
-    {
-    }
+      //конструкторы
+    InputStageState (InputStageState* in_main_state) : owner (0), main_state (in_main_state) {}
+    InputStageState (ContextObject* in_owner) : owner (in_owner), main_state (0) {}
     
       //установка расположения геометрии
     void SetInputLayout (InputLayout* in_layout)
@@ -26,6 +25,8 @@ class InputStageState: public IStageState
         return;
         
       layout = in_layout;
+      
+      UpdateNotify ();
     }
 
       //получение расположения геометрии
@@ -41,6 +42,8 @@ class InputStageState: public IStageState
         return;
         
       vertex_buffers [slot] = buffer;
+      
+      UpdateNotify ();
     }
     
       //получение вершинного буфера
@@ -62,6 +65,8 @@ class InputStageState: public IStageState
         return;
         
       index_buffer = buffer;
+      
+      UpdateNotify ();
     }
     
       //получение индексного буфера
@@ -98,6 +103,15 @@ class InputStageState: public IStageState
       if (mask.is_index_buffer)
         SetIndexBuffer (source.GetIndexBuffer ());
     }
+    
+      //оповещение об изменении состояния уровня
+    void UpdateNotify ()
+    {
+      if (!owner)
+        return;
+        
+      owner->GetContextManager ().StageRebindNotify (Stage_Input);
+    }
 
   private:
     typedef xtl::array<BufferPtr, DEVICE_VERTEX_BUFFER_SLOTS_COUNT> VertexBufferArray;
@@ -105,6 +119,7 @@ class InputStageState: public IStageState
     typedef xtl::trackable_ptr<InputStageState>                     InputStageStatePtr;
 
   private:
+    ContextObject*     owner;          //владелец состояния уровня
     InputStageStatePtr main_state;     //основное состояние уровня
     LayoutPtr          layout;         //описание расположения геометрии
     VertexBufferArray  vertex_buffers; //вершинные буферы
@@ -124,7 +139,7 @@ struct InputStage::Impl: public ContextObject
         Конструктор  
     */
 
-    Impl (const ContextManager& context_manager) : ContextObject (context_manager)
+    Impl (const ContextManager& context_manager) : ContextObject (context_manager), state (this)
     {
         //установка текущего контекста
 
@@ -172,7 +187,7 @@ struct InputStage::Impl: public ContextObject
         }
         else
         {
-          return new SystemMemoryBuffer (GetContextManager (), desc);
+          return new SystemMemoryInputBuffer (GetContextManager (), buffer_target, desc);
         }
       }
       catch (xtl::exception& exception)
@@ -184,7 +199,7 @@ struct InputStage::Impl: public ContextObject
     
     IBuffer* CreateSystemMemoryBuffer (const BufferDesc& desc)
     {
-      return new SystemMemoryBuffer (GetContextManager (), desc);
+      return new ConstantBuffer (GetContextManager (), desc);
     }
     
     /*

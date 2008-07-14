@@ -27,8 +27,9 @@ struct SamplerSlot
 class TextureManagerState: public IStageState
 {
   public:
-      //конструктор
-    TextureManagerState (TextureManagerState* in_main_state = 0) : main_state (in_main_state) {}
+      //конструкторы
+    TextureManagerState (TextureManagerState* in_main_state) : owner (0), main_state (in_main_state) {}
+    TextureManagerState (ContextObject* in_owner) : owner (in_owner), main_state (0) {}    
     
       //получение слотов сэмплирования
     SamplerSlot* GetSlots () { return &samplers [0]; }
@@ -51,6 +52,8 @@ class TextureManagerState: public IStageState
         return;
         
       texture = in_texture;
+      
+      UpdateNotify ();
     }
 
       //получение текстуры
@@ -68,6 +71,8 @@ class TextureManagerState: public IStageState
         return;
         
       state = in_state;
+      
+      UpdateNotify ();
     }
     
       //получение состояния сэмплирования
@@ -94,14 +99,34 @@ class TextureManagerState: public IStageState
       //копирование состояния
     void Copy (const TextureManagerState& source, const StateBlockMask& mask)
     {
+      bool need_rebind = false;
+      
       for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
       {
         if (mask.ss_textures [i])
+        {
           samplers [i].texture = source.samplers [i].texture;
+          need_rebind          = true;
+        }
 
         if (mask.ss_samplers [i])
+        {
           samplers [i].sampler_state = source.samplers [i].sampler_state;
+          need_rebind                = true;
+        }
       }
+      
+      if (need_rebind)
+        UpdateNotify ();
+    }
+    
+      //оповещение об изменении
+    void UpdateNotify ()
+    {
+      if (!owner)
+        return;
+        
+      owner->GetContextManager ().StageRebindNotify (Stage_TextureManager);
     }
   
   private:
@@ -109,6 +134,7 @@ class TextureManagerState: public IStageState
     typedef xtl::array<SamplerSlot, DEVICE_SAMPLER_SLOTS_COUNT> SamplerSlotArray;
 
   private:
+    ContextObject*         owner;      //владелец состояния
     TextureManagerStatePtr main_state; //основное состояние
     SamplerSlotArray       samplers;   //слоты сэмплирования
 };
@@ -131,7 +157,8 @@ struct TextureManager::Impl: public ContextObject
       //конструктор    
     Impl (const ContextManager& context_manager, TextureManager& in_texture_manager) :
       ContextObject (context_manager),
-      texture_manager (in_texture_manager) {}
+      texture_manager (in_texture_manager),
+      state (this) {}
     
       //получение основного состояния
     TextureManagerState& GetState () { return state; }

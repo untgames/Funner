@@ -117,3 +117,12 @@ void ContextObject::ClearErrors () const
 {
   context_manager.ClearErrors ();
 }
+
+/*
+    Оповещение о необходимости ребинда уровня
+*/
+
+void ContextObject::StageRebindNotify (Stage stage)
+{
+  context_manager.StageRebindNotify (stage);
+}

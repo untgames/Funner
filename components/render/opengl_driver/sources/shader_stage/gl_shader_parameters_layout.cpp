@@ -20,7 +20,8 @@ struct ProgramParameterComparator
    Конструктор
 */
 
-ProgramParametersLayout::ProgramParametersLayout (const ProgramParametersLayoutDesc& in_desc)
+ProgramParametersLayout::ProgramParametersLayout (const ContextManager& manager, const ProgramParametersLayoutDesc& in_desc)
+  : ContextObject (manager)
 {
   SetDesc (in_desc);
 }
@@ -86,7 +87,11 @@ void ProgramParametersLayout::SetDesc (const ProgramParametersLayoutDesc& in_des
   for (stl::vector<ProgramParameterGroup>::iterator iter = parameter_groups.begin (), end = parameter_groups.end ()-1; iter != end; ++iter)
     iter->count = iter [1].parameters - iter [0].parameters;
 
-  parameter_groups.back ().count = parameters.end () - parameter_groups.back ().parameters;    
+  parameter_groups.back ().count = parameters.end () - parameter_groups.back ().parameters;
+  
+    //оповещение о необходимости ребиндинга уровня
+    
+  StageRebindNotify (Stage_Shading);
 }
 
 /*

@@ -1,7 +1,5 @@
 #include "shared.h"
 
-#include <common/hash.h>
-
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
@@ -448,6 +446,10 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
   attributes_hash = crc32 (&vertex_attributes.front (), vertex_attributes.size () * sizeof (GlVertexAttribute));
 
   used_semantics_mask = new_semantics_mask;
+  
+    //оповещение об изменении состояния уровня
+
+  StageRebindNotify (Stage_Input);
 }
 
 /*

@@ -214,4 +214,8 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
 
   desc      = in_desc;
   desc_hash = crc32 (&desc, sizeof desc);
+  
+    //оповещение о необходимости ребиндинга уровня
+
+  StageRebindNotify (Stage_Rasterizer);
 }

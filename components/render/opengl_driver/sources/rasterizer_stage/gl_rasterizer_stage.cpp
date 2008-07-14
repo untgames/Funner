@@ -15,7 +15,8 @@ class RasterizerStageState: public IStageState
 {
   public:  
       //конструктор
-    RasterizerStageState (RasterizerStageState* in_main_state = 0) : main_state (in_main_state), rasterizer_state (0), need_recalc_hash (true) {}
+    RasterizerStageState (RasterizerStageState* in_main_state) : owner (0), main_state (in_main_state), rasterizer_state (0), need_recalc_hash (true) {}
+    RasterizerStageState (ContextObject* in_owner) : owner (in_owner), main_state (0), rasterizer_state (0), need_recalc_hash (true)  {}
     
       //установка состояние растеризатора
     void SetRasterizerState (RasterizerState* state)
@@ -24,6 +25,8 @@ class RasterizerStageState: public IStageState
         return;
         
       rasterizer_state = state;
+      
+      UpdateNotify ();
     }
 
       //получение состояния растеризатора
@@ -34,6 +37,8 @@ class RasterizerStageState: public IStageState
     {
       viewport_scissor.viewport = viewport;
       need_recalc_hash          = true;
+
+      UpdateNotify ();
     }
     
       //получение текущей области вывода
@@ -44,6 +49,8 @@ class RasterizerStageState: public IStageState
     {
       viewport_scissor.scissor = scissor;
       need_recalc_hash         = true;
+      
+      UpdateNotify ();
     }
     
       //получение текущей области отсечения
@@ -88,6 +95,15 @@ class RasterizerStageState: public IStageState
       if (mask.rs_scissor)
         SetScissor (source.GetScissor ());
     }
+    
+      //оповещение об обновлении уровня
+    void UpdateNotify ()
+    {
+      if (!owner)
+        return;
+        
+      owner->GetContextManager ().StageRebindNotify (Stage_Rasterizer);
+    }
 
   private:
     typedef xtl::trackable_ptr<RasterizerState>      RasterizerStatePtr;
@@ -107,6 +123,7 @@ class RasterizerStageState: public IStageState
     };
 
   private:
+    ContextObject*          owner;                 //владелец состояния уровня
     RasterizerStageStatePtr main_state;            //основное состояние уровня
     RasterizerStatePtr      rasterizer_state;      //состояние уровня растеризации
     ViewportScissor         viewport_scissor;      //вьюпорт и отсечение
@@ -131,7 +148,7 @@ struct RasterizerStage::Impl: public ContextObject
         Конструктор    
     */
 
-    Impl (const ContextManager& context_manager) : ContextObject (context_manager)
+    Impl (const ContextManager& context_manager) : ContextObject (context_manager), state (this)
     {
         //инициализация состояния растеризатора по умолчанию
 

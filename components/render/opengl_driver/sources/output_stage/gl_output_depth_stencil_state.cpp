@@ -328,4 +328,8 @@ void DepthStencilState::Bind (size_t reference)
 
   current_desc_hash = desc_hash;
   current_reference = reference;  
+
+    //оповещение о необходимости ребиндинга уровня
+
+  StageRebindNotify (Stage_Output);
 }

@@ -213,15 +213,18 @@ class Device: virtual public IDevice, public Object
     typedef xtl::com_ptr<Driver> DriverPtr;
 
   private:
-    DriverPtr       driver;           //драйвер OpenGL
-    ContextManager  context_manager;  //менеджер контекстов OpenGL
-    PropertyList    properties;       //свойства устройства
-    OutputStage     output_stage;     //выходной уровень
-    InputStage      input_stage;      //входной уровень
-    RasterizerStage rasterizer_stage; //уровень растеризации
-    TextureManager  texture_manager;  //менеджер текстур
-    ShaderStage     shader_stage;     //уровень шейдинга
-    QueryManager    query_manager;    //менеджер запросов
+    DriverPtr       driver;                 //драйвер OpenGL
+    ContextManager  context_manager;        //менеджер контекстов OpenGL
+    PropertyList    properties;             //свойства устройства
+    OutputStage     output_stage;           //выходной уровень
+    InputStage      input_stage;            //входной уровень
+    RasterizerStage rasterizer_stage;       //уровень растеризации
+    TextureManager  texture_manager;        //менеджер текстур
+    ShaderStage     shader_stage;           //уровень шейдинга
+    QueryManager    query_manager;          //менеджер запросов
+    size_t          cached_base_vertex;     //кэшированный индекс базовой вершины
+    size_t          cached_base_index;      //кэшированный индекс базового индекса
+    IndicesLayout   cached_indices_layout;  //кэшированное расположение индексов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

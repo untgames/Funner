@@ -167,6 +167,13 @@ class ContextManager
     void RaiseError         (const char* source) const;
     void ClearErrors        () const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Оповещение о необходимости ребинда уровня / очистка флагов ребиндинга / проверка необходимости ребинда уровней
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void StageRebindNotify        (Stage);
+    void ResetRebindNotifications ();
+    bool NeedStageRebind          (Stage) const;
+
   private:
     struct Impl;
     Impl* impl;

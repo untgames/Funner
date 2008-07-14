@@ -122,16 +122,16 @@ void VboBuffer::GetDataCore (size_t offset, size_t size, void* data)
 
 void VboBuffer::Bind ()
 {
-  MakeContextCurrent ();
-  
-  PFNGLBINDBUFFERPROC glBindBuffer_fn = glBindBuffer ? glBindBuffer : glBindBufferARB;
-  
   size_t& current_id = GetContextDataTable (Stage_Input)[InputStageCache_BindedVboBuffer];
 
   if (current_id == GetId ())
     return;
 
-  glBindBuffer_fn (target, buffer_id);
+  MakeContextCurrent ();
+  
+  const ContextCaps& caps = GetCaps ();    
+
+  caps.glBindBuffer_fn (target, buffer_id);
 
   CheckErrors ("render::low_level::opengl::VboBuffer::Bind");
 

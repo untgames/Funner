@@ -48,8 +48,9 @@ struct FrameBufferManagerHolder
 class OutputStageState: public IStageState
 {
   public:  
-      //конструктор
-    OutputStageState (OutputStageState* in_main_state=0) : main_state (in_main_state), stencil_reference (0) {}
+      //конструкторы
+    OutputStageState (OutputStageState* in_main_state) : owner (0), main_state (in_main_state), stencil_reference (0) {}
+    OutputStageState (ContextObject* in_owner) : owner (in_owner), main_state (0), stencil_reference (0) {}    
 
       //установка текущего состояния подуровня смешивания цветов
     void SetBlendState (BlendState* state)
@@ -58,6 +59,8 @@ class OutputStageState: public IStageState
         return;
 
       blend_state = state;
+      
+      UpdateNotify ();
     }
 
       //получение текущего состояния подуровня смешивания цветов
@@ -69,7 +72,9 @@ class OutputStageState: public IStageState
       if (state == depth_stencil_state)
         return;
 
-      depth_stencil_state = state;            
+      depth_stencil_state = state;
+
+      UpdateNotify ();      
     }
 
       //получение текущего состояния подуровня попиксельного отсечения
@@ -79,6 +84,8 @@ class OutputStageState: public IStageState
     void SetStencilReference (size_t reference)
     {
       stencil_reference = reference;
+
+      UpdateNotify ();
     }
 
       //получение значения ссылки трафарета
@@ -91,6 +98,8 @@ class OutputStageState: public IStageState
         return;
 
       render_target_view = in_render_target_view;
+      
+      UpdateNotify ();
     }
     
     void SetDepthStencilView (View* in_depth_stencil_view)
@@ -99,6 +108,8 @@ class OutputStageState: public IStageState
         return;
 
       depth_stencil_view = in_depth_stencil_view;
+
+      UpdateNotify ();
     }    
 
       //получение текущего отображения буфера цвета
@@ -133,10 +144,19 @@ class OutputStageState: public IStageState
         
       if (mask.os_render_target_view)
         SetRenderTargetView (source.GetRenderTargetView ());
-        
+
       if (mask.os_depth_stencil_view)
         SetDepthStencilView (source.GetDepthStencilView ());
-    }    
+    }
+    
+      //оповещение об обновлении состояния уровня
+    void UpdateNotify ()
+    {
+      if (!owner)
+        return;
+
+      owner->GetContextManager ().StageRebindNotify (Stage_Output);
+    }
 
   private:
     OutputStageState (const OutputStageState&); //no impl        
@@ -148,6 +168,7 @@ class OutputStageState: public IStageState
     typedef xtl::trackable_ptr<OutputStageState>  OutputStageStatePtr;
 
   private:
+    ContextObject*       owner;               //владелец состояния уровня
     OutputStageStatePtr  main_state;          //основное состояние уровня
     BlendStatePtr        blend_state;         //текущее состояние подуровня смешивания цветов
     DepthStencilStatePtr depth_stencil_state; //текущее состояние подуровня попиксельного отсечения
@@ -174,6 +195,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
     Impl (ContextManager& context_manager, ISwapChain* swap_chain) :
       ContextObject (context_manager),
       FrameBufferManagerHolder (context_manager, swap_chain),
+      state (this),
       need_update_render_targets (false)
     {
         //регистрация менеджера буферов кадра по умолчанию
@@ -284,10 +306,10 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
       
       state.SetBlendState (blend_state);
     }
-      
+
       //получение текущего состояния подуровня смешивания цветов
-    IBlendState* GetBlendState () { return state.GetBlendState (); }  
-    
+    IBlendState* GetBlendState () { return state.GetBlendState (); }
+
       //установка текущего состояния подуровня попиксельного отсечения
     void SetDepthStencilState (IDepthStencilState* in_depth_stencil_state)
     {
