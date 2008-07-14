@@ -1,5 +1,5 @@
 /*
-** $Id: lapi.c,v 2.55 2006/06/07 12:37:17 roberto Exp $
+** $Id: lapi.c,v 2.55.1.3 2008/01/03 15:20:39 roberto Exp $
 ** Lua API
 ** See Copyright Notice in lua.h
 */
@@ -38,9 +38,9 @@ const char lua_ident[] =
 
 
 
-#define api_checknelems(L, n) api_check(L, (n) <= (L->top - L->base))
+#define api_checknelems(L, n)	api_check(L, (n) <= (L->top - L->base))
 
-#define api_checkvalidindex(L, i) api_check(L, (i) != luaO_nilobject)
+#define api_checkvalidindex(L, i)	api_check(L, (i) != luaO_nilobject)
 
 #define api_incr_top(L)   {api_check(L, L->top < L->ci->top); L->top++;}
 
@@ -120,6 +120,11 @@ LUA_API void lua_xmove (lua_State *from, lua_State *to, int n) {
     setobj2s(to, to->top++, from->top + i);
   }
   lua_unlock(to);
+}
+
+
+LUA_API void lua_setlevel (lua_State *from, lua_State *to) {
+  to->nCcalls = from->nCcalls;
 }
 
 
@@ -749,7 +754,7 @@ LUA_API int lua_setfenv (lua_State *L, int idx) {
       res = 0;
       break;
   }
-  luaC_objbarrier(L, gcvalue(o), hvalue(L->top - 1));
+  if (res) luaC_objbarrier(L, gcvalue(o), hvalue(L->top - 1));
   L->top--;
   lua_unlock(L);
   return res;
@@ -767,7 +772,7 @@ LUA_API int lua_setfenv (lua_State *L, int idx) {
 
 #define checkresults(L,na,nr) \
      api_check(L, (nr) == LUA_MULTRET || (L->ci->top - L->top >= (nr) - (na)))
-  
+	
 
 LUA_API void lua_call (lua_State *L, int nargs, int nresults) {
   StkId func;
