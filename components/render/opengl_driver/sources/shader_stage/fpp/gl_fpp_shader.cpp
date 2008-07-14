@@ -297,17 +297,17 @@ class FppShaderParser
 
         //разбор параметров трансформации
 
-      ParseMatrix4f (program_iter, "ProjectionMatrix", offsetof (FppState, projection_matrix));
-      ParseMatrix4f (program_iter, "ViewMatrix", offsetof (FppState, view_matrix));
-      ParseMatrix4f (program_iter, "ObjectMatrix", offsetof (FppState, object_matrix));
+      ParseMatrix4f (program_iter, "ProjectionMatrix", offsetof (FppState, viewer.projection_matrix));
+      ParseMatrix4f (program_iter, "ViewMatrix", offsetof (FppState, viewer.view_matrix));
+      ParseMatrix4f (program_iter, "ObjectMatrix", offsetof (FppState, object.matrix));
       
         //разбор параметров материала
       
-      ParseVector4f    (program_iter, "EmissionColor", offsetof (FppState, emission_color));
-      ParseVector4f    (program_iter, "AmbientColor",  offsetof (FppState, ambient_color));
-      ParseVector4f    (program_iter, "DiffuseColor",  offsetof (FppState, diffuse_color));
-      ParseVector4f    (program_iter, "SpecularColor", offsetof (FppState, specular_color));
-      ParseFloatValues (program_iter, "Shininess",     offsetof (FppState, shininess), 1);
+      ParseVector4f    (program_iter, "EmissionColor", offsetof (FppState, material.emission_color));
+      ParseVector4f    (program_iter, "AmbientColor",  offsetof (FppState, material.ambient_color));
+      ParseVector4f    (program_iter, "DiffuseColor",  offsetof (FppState, material.diffuse_color));
+      ParseVector4f    (program_iter, "SpecularColor", offsetof (FppState, material.specular_color));
+      ParseFloatValues (program_iter, "Shininess",     offsetof (FppState, material.shininess), 1);
       
       static const Tag2Value color_material_modes [] = {
         {"Explicit",          ColorMaterial_Explicit},
@@ -319,7 +319,7 @@ class FppShaderParser
         {0, 0}
       };
 
-      ParseEnum (program_iter, "ColorMaterial", offsetof (FppState, color_material), color_material_modes);
+      ParseEnum (program_iter, "ColorMaterial", offsetof (FppState, material.color_material), color_material_modes);
 
       static const Tag2Value compare_modes [] = {
         {"AlwaysFail",   CompareMode_AlwaysFail},
@@ -333,9 +333,9 @@ class FppShaderParser
         {0, 0}
       };
 
-      ParseEnum          (program_iter, "AlphaCompareMode", offsetof (FppState, alpha_compare_mode), compare_modes);
-      ParseFloatValues   (program_iter, "AlphaReference",   offsetof (FppState, alpha_reference), 1);
-      ParseIntegerValues (program_iter, "Normalize",        offsetof (FppState, normalize), 1);
+      ParseEnum          (program_iter, "AlphaCompareMode", offsetof (FppState, material.alpha_compare_mode), compare_modes);
+      ParseFloatValues   (program_iter, "AlphaReference",   offsetof (FppState, material.alpha_reference), 1);
+      ParseIntegerValues (program_iter, "Normalize",        offsetof (FppState, modes.normalize), 1);
 
         //разбор параметров освещения
       
@@ -343,7 +343,7 @@ class FppShaderParser
       {
         char light_name [32];
         
-        _snprintf (light_name, sizeof light_name, "Light%u", i);
+        xtl::xsnprintf (light_name, sizeof light_name, "Light%u", i);
         
         Parser::Iterator light_iter = program_iter->First (light_name);
 
@@ -357,7 +357,7 @@ class FppShaderParser
       {
         char texmap_name [32];
         
-        _snprintf (texmap_name, sizeof texmap_name, "Texmap%u", i);
+        xtl::xsnprintf (texmap_name, sizeof texmap_name, "Texmap%u", i);
         
         Parser::Iterator texmap_iter = program_iter->First (texmap_name);
         
@@ -399,10 +399,12 @@ FppShader::FppShader (const ShaderDesc& shader_desc, const LogFunction& error_lo
     
   memset (&base_state, 0, sizeof base_state);
   
-  identity_matrix (base_state.projection_matrix);
-  identity_matrix (base_state.view_matrix);
-  identity_matrix (base_state.object_matrix);
-  
+  identity_matrix (base_state.viewer.projection_matrix);
+  identity_matrix (base_state.viewer.view_matrix);
+  identity_matrix (base_state.object.matrix);
+
+  base_state.material.alpha_compare_mode = CompareMode_AlwaysPass;
+
   for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
   {
     LightDesc& light = base_state.lights [i];
