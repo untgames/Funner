@@ -40,6 +40,8 @@ void bind_static_axis_aligned_box_library (Environment& environment)
   aabox_box_corner_lib.Register ("get_pxpynz", make_const (box_corner_pxpynz));
   aabox_box_corner_lib.Register ("get_nxnypz", make_const (box_corner_nxnypz));
   aabox_box_corner_lib.Register ("get_pxnypz", make_const (box_corner_pxnypz));
+  aabox_box_corner_lib.Register ("get_nxpypz", make_const (box_corner_nxpypz));
+  aabox_box_corner_lib.Register ("get_pxpypz", make_const (box_corner_pxpypz));
 }  
 
 template <class T>
