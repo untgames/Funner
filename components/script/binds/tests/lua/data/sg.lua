@@ -124,8 +124,8 @@ end
 function test_entity ()
   print ("Entity test")
 
+  local aabox1 = BV.AxisAlignedBox.create ()
   local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
-  local aabox1 = BV.AxisAlignedBox.Create ()
 
   print ("IsInfiniteBounds = " .. tostring (sound_emitter1:IsInfiniteBounds ()))
   print ("Color = " .. tostring (sound_emitter1.Color))
@@ -314,8 +314,6 @@ function test_visual_model ()
   visual_model1.MeshName = "mesh.xmesh"
 
   print ("Mesh name = " .. visual_model1.MeshName)
-
-  local aabox1 = BV.AxisAlignedBox.Create ()
 end
 
 function test ()
