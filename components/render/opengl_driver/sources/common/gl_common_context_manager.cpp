@@ -63,9 +63,9 @@ class ContextImpl: public xtl::reference_counter
     }
     
       //инициализация таблицы возможностей контекста
-    void InitContextCaps ()
+    void InitContextCaps (const ExtensionSet& enabled_extensions)
     {
-      context_caps.Init (extensions);
+      context_caps.Init (extensions, enabled_extensions);
     }
     
   private:
@@ -230,7 +230,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       
         //инициализация таблицы возможностей контекста
       
-      new_context->InitContextCaps ();
+      new_context->InitContextCaps (enabled_extensions);
 
         //регистрация контекста
 
@@ -446,39 +446,31 @@ struct ContextManager::Impl: public xtl::reference_counter
 
       if (!source)
         source = "render::low_level::ContextManager::Impl::CheckErrors";
-        
+
       MakeContextCurrent (false);
-      
+
       GLenum error = glGetError ();
-      
+
       switch (error)
       {
         case GL_NO_ERROR:
           break;
         case GL_INVALID_ENUM:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: invalid enum");
-          break;
         case GL_INVALID_VALUE:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: invalid value");
-          break;
         case GL_INVALID_OPERATION:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: invalid operation");
-          break;
         case GL_STACK_OVERFLOW:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: stack overflow");
-          break;
         case GL_STACK_UNDERFLOW:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: stack underflow");
-          break;
         case GL_OUT_OF_MEMORY:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: out of memory");
-          break;
         case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: invalid framebuffer operation");
-          break;
         default:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: code=0x%04x", error);
-          break;
       }      
     }
     
