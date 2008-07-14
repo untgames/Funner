@@ -49,7 +49,7 @@ void bind_axis_aligned_box_library (Environment& environment)
   
     //регистрация функций создания
 
-  lib.Register ("Create", make_invoker (&create_axis_aligned_box<T>));
+  lib.Register ("create", make_invoker (&create_axis_aligned_box<T>));
 
     //регистрация статических переменных
 
@@ -69,12 +69,12 @@ void bind_axis_aligned_box_library (Environment& environment)
   lib.Register ("get_radius", make_invoker (&axis_aligned_box<T>::radius));
   lib.Register ("get_empty",  make_invoker (&axis_aligned_box<T>::empty));
 
-  lib.Register ("SetExtents", make_invoker (implicit_cast<void (axis_aligned_box<T>::*)
+  lib.Register ("set_extents", make_invoker (implicit_cast<void (axis_aligned_box<T>::*)
                (const typename axis_aligned_box<T>::vec_type&, const typename axis_aligned_box<T>::vec_type&)> (&axis_aligned_box<T>::set_extents)));
 
-  lib.Register ("GetCorner", make_invoker (&axis_aligned_box<T>::corner));
+  lib.Register ("get_corner", make_invoker (&axis_aligned_box<T>::corner));
 
-  lib.Register ("Reset", make_invoker (&axis_aligned_box<T>::reset));
+  lib.Register ("reset", make_invoker (&axis_aligned_box<T>::reset));
 
   lib.Register ("__add", make_invoker (implicit_cast<axis_aligned_box<T> (axis_aligned_box<T>::*) 
                                       (const axis_aligned_box<T>&) const> (&axis_aligned_box<T>::operator +)));
@@ -82,11 +82,11 @@ void bind_axis_aligned_box_library (Environment& environment)
                                       (const matrix<T, 4>&) const> (&axis_aligned_box<T>::operator *)));
 //  lib.Register ("__eq",  make_invoker (&axis_aligned_box<T>::operator ==));
 
-  lib.Register ("Volume", make_invoker (&bound_volumes::volume<T>));
-  lib.Register ("Equal", make_invoker (&bound_volumes::equal<T>));
-  lib.Register ("Intersects", make_invoker (implicit_cast<bool (*) (const axis_aligned_box<T>&, const axis_aligned_box<T>&)> (&bound_volumes::intersects)));
-  lib.Register ("Contains", make_invoker (implicit_cast<bool (*) (const axis_aligned_box<T>&, const axis_aligned_box<T>&)> (&bound_volumes::contains)));
-  lib.Register ("Intersection", make_invoker (implicit_cast<axis_aligned_box<T> (*) (const axis_aligned_box<T>&, const axis_aligned_box<T>&)> (&bound_volumes::intersection)));
+  lib.Register ("volume", make_invoker (&bound_volumes::volume<T>));
+  lib.Register ("equal", make_invoker (&bound_volumes::equal<T>));
+  lib.Register ("intersects", make_invoker (implicit_cast<bool (*) (const axis_aligned_box<T>&, const axis_aligned_box<T>&)> (&bound_volumes::intersects)));
+  lib.Register ("contains", make_invoker (implicit_cast<bool (*) (const axis_aligned_box<T>&, const axis_aligned_box<T>&)> (&bound_volumes::contains)));
+  lib.Register ("intersection", make_invoker (implicit_cast<axis_aligned_box<T> (*) (const axis_aligned_box<T>&, const axis_aligned_box<T>&)> (&bound_volumes::intersection)));
 
     //регистрация типов данных
 
