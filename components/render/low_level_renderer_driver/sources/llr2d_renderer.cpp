@@ -15,6 +15,9 @@ render::low_level::PixelFormat get_pixel_format (media::PixelFormat format)
   {
     case media::PixelFormat_RGB8:  return render::low_level::PixelFormat_RGB8;
     case media::PixelFormat_RGBA8: return render::low_level::PixelFormat_RGBA8;
+    case media::PixelFormat_A8:
+    case media::PixelFormat_L8:    return render::low_level::PixelFormat_A8;
+    case media::PixelFormat_LA8:   return render::low_level::PixelFormat_LA8;
     default:
       throw xtl::format_operation_exception ("get_pixel_format", "Can't convert media format %s to render format.", media::get_format_name (format));
   }
@@ -110,7 +113,7 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
     
     memset (&sampler_desc, 0, sizeof (sampler_desc));
 
-    sampler_desc.min_filter           = TexMinFilter_Point; //???TexMinFilter_LinearMipLinear
+    sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
     sampler_desc.mag_filter           = TexMagFilter_Linear;
     sampler_desc.max_anisotropy       = 1;
     sampler_desc.wrap_u               = TexcoordWrap_Repeat; //Дрожание краёв !!!!! нужно TexcoordWrap_Mirror либо TexcoordWrap_ClampToBorder !!!!!!
@@ -174,21 +177,62 @@ Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwap
 
 render::mid_level::renderer2d::ITexture* Renderer::CreateTexture (const media::Image& image)
 {
-  TextureDesc texture_desc = {TextureDimension_2D, image.Width (), image.Height (), 1, get_pixel_format (image.Format ()), true, AccessFlag_ReadWrite, BindFlag_Texture, UsageMode_Default};
+  try
+  {
+    TextureDesc tex_desc;
 
-  xtl::com_ptr<render::low_level::ITexture> new_texture (device->CreateTexture (texture_desc), false);
+    memset (&tex_desc, 0, sizeof (tex_desc));
 
-  new_texture->SetData (0, 0, 0, 0, image.Width (), image.Height (), get_pixel_format (image.Format ()), image.Bitmap ());
+    tex_desc.dimension            = TextureDimension_2D;
+    tex_desc.width                = image.Width ();
+    tex_desc.height               = image.Height ();
+    tex_desc.layers               = 1;
+    tex_desc.format               = get_pixel_format (image.Format ());
+    tex_desc.generate_mips_enable = true;
+    tex_desc.bind_flags           = BindFlag_Texture;
+    tex_desc.access_flags         = AccessFlag_ReadWrite;
 
-  return new ImageTexture (new_texture.get ());
+    xtl::com_ptr<render::low_level::ITexture> texture (device->CreateTexture (tex_desc), false);
+
+    texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, tex_desc.format, image.Bitmap ());
+
+    return new ImageTexture (texture.get ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::mid_level::low_level_driver::renderer2d::Renderer::CreateTexture(const media::Image&)");
+    throw;
+  }
 }
 
 render::mid_level::renderer2d::ITexture* Renderer::CreateTexture (size_t width, size_t height, media::PixelFormat pixel_format)
 {
-  TextureDesc texture_desc = {TextureDimension_2D, width, height, 1, get_pixel_format (pixel_format), false, AccessFlag_ReadWrite, BindFlag_Texture | BindFlag_RenderTarget, UsageMode_Default};
-  ViewDesc    view_desc = {0, 0};
+  try
+  {
+    TextureDesc tex_desc;
 
-  return new RenderTargetTexture (device->CreateView (device->CreateTexture (texture_desc), view_desc));
+    memset (&tex_desc, 0, sizeof (tex_desc));
+    
+    tex_desc.dimension            = TextureDimension_2D;
+    tex_desc.width                = width;
+    tex_desc.height               = height;
+    tex_desc.layers               = 1;
+    tex_desc.format               = get_pixel_format (pixel_format);
+    tex_desc.generate_mips_enable = true;
+    tex_desc.bind_flags           = BindFlag_Texture | BindFlag_RenderTarget;
+    tex_desc.access_flags         = AccessFlag_ReadWrite;
+
+    ViewDesc view_desc;
+    
+    memset (&view_desc, 0, sizeof (view_desc));
+    
+    return new RenderTargetTexture (device->CreateView (device->CreateTexture (tex_desc), view_desc));
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::mid_level::low_level_driver::renderer2d::Renderer::CreateTexture(size_t, size_t, media::PixelFormat)");
+    throw;
+  }
 }
 
 render::mid_level::renderer2d::IPrimitive* Renderer::CreatePrimitive ()

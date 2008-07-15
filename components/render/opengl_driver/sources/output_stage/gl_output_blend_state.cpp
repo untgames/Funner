@@ -89,7 +89,24 @@ GLenum get_blend_equation (BlendOperation operation, const char* method, const c
     case BlendOperation_Max:                return GL_MAX_EXT;
     default:
       throw xtl::make_argument_exception (method, param, operation);
-      return 0;
+  }
+}
+
+GLenum get_alpha_equivalent (GLenum color_arg)
+{
+  switch (color_arg)
+  {
+    default:
+    case GL_ZERO:                return GL_ZERO;
+    case GL_ONE:                 return GL_ONE;
+    case GL_SRC_COLOR:
+    case GL_SRC_ALPHA:           return GL_SRC_ALPHA;
+    case GL_ONE_MINUS_SRC_COLOR:
+    case GL_ONE_MINUS_SRC_ALPHA: return GL_ONE_MINUS_SRC_ALPHA;
+    case GL_DST_COLOR:
+    case GL_DST_ALPHA:           return GL_DST_ALPHA;
+    case GL_ONE_MINUS_DST_COLOR:
+    case GL_ONE_MINUS_DST_ALPHA: return GL_ONE_MINUS_DST_ALPHA;
   }
 }
 
@@ -203,13 +220,15 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
         " (GL_EXT_blend_equation_separate not supported)", get_name (in_desc.blend_color_operation), get_name (in_desc.blend_alpha_operation));
     
     if (!caps.has_ext_blend_func_separate)
-    {
-      if (src_color_arg != src_alpha_arg)
-        throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported configuration: desc.blend_color_source_argument=%s mismatch desc.blend_alpha_source_argument=%s"
-        " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_source_argument), get_name (in_desc.blend_alpha_source_argument));
+    {            
+      if (get_alpha_equivalent (src_color_arg) != src_alpha_arg)
+      {
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported configuration: desc.blend_color_source_argument=%s mismatch desc.blend_alpha_source_argument=%s (GL_EXT_blend_func_separate not supported)"
+          " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_source_argument), get_name (in_desc.blend_alpha_source_argument));
+      }
 
-      if (dst_color_arg != dst_alpha_arg)
-        throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported configuration: desc.blend_color_destination_argument=%s mismatch desc.blend_alpha_destination_argument=%s"
+      if (get_alpha_equivalent (dst_color_arg) != dst_alpha_arg)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported configuration: desc.blend_color_destination_argument=%s mismatch desc.blend_alpha_destination_argument=%s (GL_EXT_blend_func_separate not supported)"
         " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_destination_argument), get_name (in_desc.blend_alpha_destination_argument));
     }
 

@@ -28,7 +28,8 @@ Frame::Frame (CommonResources* in_common_resources, render::low_level::IDevice* 
 
   memset (&vertex_buffer_desc, 0, sizeof (vertex_buffer_desc));
 
-  vertex_buffer_desc.usage_mode   = UsageMode_Default;
+//  vertex_buffer_desc.usage_mode   = UsageMode_Default;
+  vertex_buffer_desc.usage_mode   = UsageMode_Stream;
   vertex_buffer_desc.bind_flags   = BindFlag_VertexBuffer;
   vertex_buffer_desc.access_flags = AccessFlag_ReadWrite;
 
@@ -241,11 +242,27 @@ void Frame::DrawCore (render::low_level::IDevice* device)
   device->ISSetVertexBuffer      (0, blended_sprites_vertex_buffer.get ());
   device->OSSetDepthStencilState (common_resources->GetDepthStencilState (false));
   
+  render::low_level::ITexture*     current_texture     = device->SSGetTexture (0);
+  render::low_level::IBlendState*  current_blend_state = device->OSGetBlendState ();
+  
   for (size_t i = 0; i < blended_sprites_vertex_data_buffer.size (); i++)
   {
-    device->SSSetTexture    (0, blended_sprites_vertex_data_buffer[i]->texture);
-    device->OSSetBlendState (common_resources->GetBlendState (blended_sprites_vertex_data_buffer[i]->blend_mode));
+    if (current_texture != blended_sprites_vertex_data_buffer[i]->texture)
+    {
+      device->SSSetTexture (0, blended_sprites_vertex_data_buffer[i]->texture);
+      
+      current_texture = blended_sprites_vertex_data_buffer[i]->texture;
+    }
     
+    render::low_level::IBlendState* blend_state = common_resources->GetBlendState (blended_sprites_vertex_data_buffer[i]->blend_mode);
+
+    if (current_blend_state != blend_state)
+    {
+      device->OSSetBlendState (blend_state);
+      
+      current_blend_state = blend_state;
+    }
+
     device->Draw (render::low_level::PrimitiveType_TriangleList, i * 6, 6);
   }
 }
