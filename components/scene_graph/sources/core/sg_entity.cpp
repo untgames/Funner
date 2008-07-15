@@ -17,7 +17,7 @@ const float INFINITE_BOUND_VALUE = 1e8f; //значение бесконечности дл€ ограничива
 
 struct Entity::Impl: public SceneObject
 {
-  vec3f  color;                    //цвет объекта
+  vec3f  wire_color;               //цвет проволочного представлени€ объекта
   aaboxf local_bound_box;          //ограничивающий параллелипиппед в локальной системе координат
   aaboxf world_bound_box;          //ограничивающий параллелипиппед в мировой системе координат
   bool   need_local_bounds_update; //локальные ограничивающие объЄмы требуют пересчЄта
@@ -46,24 +46,24 @@ Entity::~Entity ()
 }
 
 /*
-    ÷вет узла
+    ÷вет проволочного представлени€ объекта
 */
 
-void Entity::SetColor (const vec3f& color)
+void Entity::SetWireColor (const vec3f& color)
 {
-  impl->color = color;
+  impl->wire_color = color;
   
   UpdateNotify ();
 }
 
-void Entity::SetColor (float red, float green, float blue)
+void Entity::SetWireColor (float red, float green, float blue)
 {
-  SetColor (vec3f (red, green, blue));
+  SetWireColor (vec3f (red, green, blue));
 }
 
-const vec3f& Entity::Color () const
+const vec3f& Entity::WireColor () const
 {
-  return impl->color;
+  return impl->wire_color;
 }
 
 /*

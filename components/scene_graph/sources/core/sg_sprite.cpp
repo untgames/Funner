@@ -10,8 +10,8 @@ using namespace math;
 struct Sprite::Impl
 {
   stl::string material; //им€ материала
+  vec4f       color;    //цвет объекта
   size_t      frame;    //номер кадра
-  float       alpha;    //прозрачность
 };
 
 /*
@@ -72,22 +72,59 @@ size_t Sprite::Frame () const
 }
 
 /*
-    ”правление прозрачностью
+    ÷вет спрайта
 */
+
+namespace
+{
+
+float clamp (float x)
+{
+  if (x < 0.0f) return 0.0f;
+  if (x > 1.0f) return 1.0f;
+  
+  return x;
+}
+
+vec4f clamp (const vec4f& color)
+{
+  return vec4f (clamp (color.x), clamp (color.y), clamp (color.z), clamp (color.w));
+}
+
+}
+
+void Sprite::SetColor (const vec4f& color)
+{
+  impl->color = clamp (color);
+
+  UpdateNotify ();
+}
+
+void Sprite::SetColor (float red, float green, float blue, float alpha)
+{
+  SetColor (vec4f (red, green, blue, alpha));
+}
+
+void Sprite::SetColor (float red, float green, float blue)
+{
+  SetColor (vec4f (red, green, blue, impl->color.w));
+}
 
 void Sprite::SetAlpha (float alpha)
 {
-  if (alpha < 0.0f || alpha > 1.0f)
-    throw xtl::make_range_exception ("scene_graph::Sprite::SetAlpha", "alpha", alpha, 0.0f, 1.0f);
-    
-  impl->alpha = alpha;
-  
+  impl->color.w = clamp (alpha);
+
   UpdateNotify ();
+}
+
+const vec4f& Sprite::Color () const
+{
+  return impl->color;
 }
 
 float Sprite::Alpha () const
 {
-  return impl->alpha;
+  return impl->color.w;
 }
 
 /*

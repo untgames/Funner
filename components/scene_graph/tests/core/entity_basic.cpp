@@ -9,9 +9,9 @@ int main ()
   EntityPtr entity (TestEntity::Create (), false);
   
   entity->SetName ("entity1");
-  entity->SetColor (1.0f, 0.5f, 0.7f);
+  entity->SetWireColor (1.0f, 0.5f, 0.7f);
   
-  const vec3f& color = entity->Color ();
+  const vec3f& color = entity->WireColor ();
 
   printf ("color: [%g %g %g]\n", color.x, color.y, color.z);
   

@@ -9,6 +9,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/function.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/uninitialized_storage.h>
 
 #include <bv/axis_aligned_box.h>
 

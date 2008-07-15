@@ -17,11 +17,11 @@ class Entity: public Node
     typedef xtl::com_ptr<const Entity> ConstPointer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Цвет объекта
+///Цвет проволочного представления объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetColor (const math::vec3f& color);
-    void               SetColor (float red, float green, float blue);
-    const math::vec3f& Color    () const;
+    void               SetWireColor (const math::vec3f& color);
+    void               SetWireColor (float red, float green, float blue);
+    const math::vec3f& WireColor    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с ограничивающим объёмом

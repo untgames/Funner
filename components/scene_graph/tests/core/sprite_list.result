@@ -1,0 +1,12 @@
+Results of sprite_list_test:
+SpriteList (material='material1'):
+  #0: position=[0 0 0] size=[0 0] color=[1.00 0.00 0.50 0.25] frame=0
+  #1: position=[1 0 1] size=[1 1] color=[1.00 0.00 0.50 0.25] frame=1
+  #2: position=[2 0 2] size=[4 2] color=[1.00 0.00 0.50 0.25] frame=2
+  #3: position=[3 0 3] size=[9 3] color=[1.00 0.00 0.50 0.25] frame=0
+  #4: position=[4 0 4] size=[16 4] color=[1.00 0.00 0.50 0.25] frame=1
+  #5: position=[5 0 5] size=[25 5] color=[1.00 0.00 0.50 0.25] frame=2
+  #6: position=[6 0 6] size=[36 6] color=[1.00 0.00 0.50 0.25] frame=0
+  #7: position=[7 0 7] size=[49 7] color=[1.00 0.00 0.50 0.25] frame=1
+  #8: position=[8 0 8] size=[64 8] color=[1.00 0.00 0.50 0.25] frame=2
+  #9: position=[9 0 9] size=[81 9] color=[1.00 0.00 0.50 0.25] frame=0
