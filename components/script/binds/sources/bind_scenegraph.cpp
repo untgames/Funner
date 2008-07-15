@@ -161,8 +161,10 @@ InvokerRegistry& bind_entity_library (Environment& environment, InvokerRegistry&
 
     //регистрация операций
 
-  lib.Register ("set_Color",  make_invoker (implicit_cast<void (Entity::*) (const vec3f&)> (&Entity::SetColor)));
-  lib.Register ("get_Color",  make_invoker (&Entity::Color));
+  lib.Register ("set_WireColor",  make_invoker (implicit_cast<void (Entity::*) (const vec3f&)> (&Entity::SetWireColor)));
+  lib.Register ("get_WireColor",  make_invoker (&Entity::WireColor));
+
+  lib.Register ("SetWireColor", make_invoker (implicit_cast<void (Entity::*) (float, float, float)> (&Entity::SetWireColor)));
 
   lib.Register ("BoundBox", make_invoker (&Entity::BoundBox));
   lib.Register ("WorldBoundBox", make_invoker (&Entity::WorldBoundBox));
@@ -505,12 +507,17 @@ void bind_sprite_library (Environment& environment, InvokerRegistry& entity_lib)
 
     //регистрация операций
 
+  lib.Register ("set_Color",    make_invoker (implicit_cast<void (Sprite::*) (const vec4f&)> (&Sprite::SetColor)));
   lib.Register ("set_Material", make_invoker (&Sprite::SetMaterial));
   lib.Register ("set_Alpha",    make_invoker (&Sprite::SetAlpha));
   lib.Register ("set_Frame",    make_invoker (&Sprite::SetFrame));
+  lib.Register ("get_Color",    make_invoker (&Sprite::Color));
   lib.Register ("get_Material", make_invoker (&Sprite::Material));
   lib.Register ("get_Alpha",    make_invoker (&Sprite::Alpha));
   lib.Register ("get_Frame",    make_invoker <int (Sprite&)> (&Sprite::Frame));
+
+  lib.Register ("SetColor", make_invoker (make_invoker (implicit_cast<void (Sprite::*) (float, float, float, float)> (&Sprite::SetColor)),
+                                          make_invoker (implicit_cast<void (Sprite::*) (float, float, float)>        (&Sprite::SetColor))));
 
     //регистрация типов данных
 

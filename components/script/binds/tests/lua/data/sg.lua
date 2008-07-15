@@ -128,11 +128,15 @@ function test_entity ()
   local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
 
   print ("IsInfiniteBounds = " .. tostring (sound_emitter1:IsInfiniteBounds ()))
-  print ("Color = " .. tostring (sound_emitter1.Color))
+  print ("WireColor = " .. tostring (sound_emitter1.WireColor))
 
-  sound_emitter1.Color = vec3 (1, 0, 0)
+  sound_emitter1.WireColor = vec3 (1, 0, 0)
 
-  print ("Color = " .. tostring (sound_emitter1.Color))
+  print ("WireColor = " .. tostring (sound_emitter1.WireColor))
+
+  sound_emitter1:SetWireColor (0, 0, 1)
+
+  print ("WireColor = " .. tostring (sound_emitter1.WireColor))
 
   aabox1 = sound_emitter1:BoundBox ()
 
@@ -297,15 +301,29 @@ function test_sprite ()
 
   local sprite1 = Scene.Sprite.Create ()
 
+  print ("Color = " .. tostring (sprite1.Color))
   print ("Material name = " .. sprite1.Material)
 
   sprite1.Material = "SettedMaterial"
   sprite1.Alpha    = 0.8
   sprite1.Frame    = 9
-   
-  print ("Material name = " .. sprite1.Material)
+
   print ("Alpha value = " .. sprite1.Alpha)
+  print ("Material name = " .. sprite1.Material)
   print ("Frame number = " .. sprite1.Frame)
+   
+  sprite1.Color    = vec4 (1, 0, 0, 0.7)
+
+  print ("Color = " .. tostring (sprite1.Color))
+
+  sprite1:SetColor (0, 0, 1, 0.3)
+
+  print ("Color = " .. tostring (sprite1.Color))
+
+  sprite1:SetColor (0, 1, 0)
+
+  print ("Color = " .. tostring (sprite1.Color))
+  
 end
 
 function test_visual_model ()

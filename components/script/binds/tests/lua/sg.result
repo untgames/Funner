@@ -47,8 +47,9 @@ Unbind node2 by name test
 Child name - node1
 Entity test
 IsInfiniteBounds = 1
-Color = 0 0 0
-Color = 1 0 0
+WireColor = 0 0 0
+WireColor = 1 0 0
+WireColor = 0 0 1
 local bb minimum = -100000000 -100000000 -100000000
 local bb maximum = 100000000 100000000 100000000
 world bb minimum = -100000000 -100000000 -100000000
@@ -112,7 +113,11 @@ VisualModel test
 Mesh name = 
 Mesh name = mesh.xmesh
 Sprite test
+Color = 0 0 0 0
 Material name = 
-Material name = SettedMaterial
 Alpha value = 0.80000001192093
+Material name = SettedMaterial
 Frame number = 9
+Color = 1 0 0 0.699999988079
+Color = 0 0 1 0.300000011921
+Color = 0 1 0 0.300000011921
