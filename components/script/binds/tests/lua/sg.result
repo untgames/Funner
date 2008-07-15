@@ -45,3 +45,74 @@ Child name - node2
 Unbind all test
 Unbind node2 by name test
 Child name - node1
+Entity test
+IsInfiniteBounds = 1
+Color = 0 0 0
+Color = 1 0 0
+local bb minimum = -100000000 -100000000 -100000000
+local bb maximum = 100000000 100000000 100000000
+world bb minimum = -100000000 -100000000 -100000000
+world bb maximum = 100000000 100000000 100000000
+children bb minimum = -100000000 -100000000 -100000000
+children bb maximum = 100000000 100000000 100000000
+full bb minimum = -100000000 -100000000 -100000000
+full bb maximum = 100000000 100000000 100000000
+world children bb minimum = -100000000 -100000000 -100000000
+world children bb maximum = 100000000 100000000 100000000
+world full bb minimum = -100000000 -100000000 -100000000
+world full bb maximum = 100000000 100000000 100000000
+Perspective camera test
+FovX  = 1
+FovY  = 1
+ZNear = 0
+ZFar  = 1
+FovX = 36
+FovY  = 20
+ZNear = 10
+ZFar  = 1000
+Ortho camera test
+Left   = 0
+Right  = 1
+Top    = 1
+Bottom = 0
+ZNear  = 0
+ZFar   = 1
+Left   = -18
+Right  = 18
+Top    = 10
+Bottom = -10
+ZNear  = 10
+ZFar   = 1000
+Common light test (point light)
+LightColor = 0 0 0
+Attenuation = 0 0 0
+Range = 1000000000
+LightColor = 1 0 0
+Attenuation = 1 1 0
+Range = 579
+Direct light test
+Radius = 1000000000
+Radius = 763
+Spot light test
+Name = 
+Angle = 0
+Exponent = 0
+Name = light1
+Angle = 75
+Exponent = 0.69999998807907
+BoxHelper test
+Listener test
+Gain = 1
+Gain = 0.75
+SoundEmitter test
+Gain = 1
+Gain = 0.69999998807907
+SoundEmitter sound declaration name = sound.snddecl
+VisualModel test
+Mesh name = 
+Mesh name = mesh.xmesh
+Sprite test
+Material name = 
+Material name = SettedMaterial
+Alpha value = 0.80000001192093
+Frame number = 9

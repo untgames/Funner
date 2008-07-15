@@ -465,6 +465,9 @@ void bind_sound_emitter_library (Environment& environment, InvokerRegistry& enti
 
     //регистрация операций
 
+  lib.Register ("set_Gain", make_invoker (&SoundEmitter::SetGain));
+  lib.Register ("get_Gain", make_invoker (&SoundEmitter::Gain));
+
   lib.Register ("get_SoundDeclarationName", make_invoker (&SoundEmitter::SoundDeclarationName));
 
   lib.Register ("Play", make_invoker (&SoundEmitter::Play));

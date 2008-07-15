@@ -8,5 +8,11 @@ int main ()
 
   printf ("Sound emitter declaration = %s\n", sound_emitter->SoundDeclarationName ());  
 
+  printf ("Gain is %f.\n", sound_emitter->Gain ());
+
+  sound_emitter->SetGain (0.7f);
+
+  printf ("Gain is %f.\n", sound_emitter->Gain ());
+
   return 0;
 }

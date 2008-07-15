@@ -280,6 +280,12 @@ function test_sound_emitter ()
 
   local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
 
+  print ("Gain = " .. sound_emitter1.Gain)
+
+  sound_emitter1.Gain = 0.7
+  
+  print ("Gain = " .. sound_emitter1.Gain)
+
   sound_emitter1:Play ()
   sound_emitter1:Stop ()
 
@@ -292,8 +298,6 @@ function test_sprite ()
   local sprite1 = Scene.Sprite.Create ()
 
   print ("Material name = " .. sprite1.Material)
-  print ("Alpha value = " .. sprite1.Alpha)
-  print ("Frame number = " .. sprite1.Frame)
 
   sprite1.Material = "SettedMaterial"
   sprite1.Alpha    = 0.8
@@ -319,7 +323,7 @@ end
 function test ()
   test_node ()
 
---[[  test_entity ()
+  test_entity ()
   
   test_perspective_camera ()
   test_ortho_camera ()
@@ -336,5 +340,5 @@ function test ()
 
   test_visual_model ()
 
-  test_sprite ()]]
+  test_sprite ()
 end

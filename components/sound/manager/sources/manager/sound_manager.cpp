@@ -50,6 +50,7 @@ struct SoundManagerEmitter
   bool              is_playing;                   //статус проигрывания
   SoundDeclaration* sound_declaration;            //описание звука
   SoundSample       sound_sample;                 //звуковой сэмпл (используется для определения длительности звука)
+  float             sound_declaration_gain;       //громкость, заданная в описании звука (установка громкости производится относительно этого значения)
   bool              sample_chosen;                //эммитер ещё не проигрывался
   Source            source;                       //излучатель звука
   string            source_name;                  //имя источника
@@ -92,8 +93,8 @@ struct SoundManager::Impl
     : window (target_window), minimize_action (WindowMinimizeAction_Ignore),
       volume (1.f),
       minimize_connection (window.RegisterEventHandler (WindowEvent_OnLostFocus, bind (&SoundManager::Impl::OnMinimize, this, _1, _2, _3))),
-      maximize_connection (window.RegisterEventHandler (WindowEvent_OnSetFocus,  bind (&SoundManager::Impl::OnMaximize, this, _1, _2, _3))),
-      change_handle_connection (window.RegisterEventHandler (WindowEvent_OnChangeHandle, bind (&SoundManager::Impl::OnChangeHandle, this, _1, _2, _3)))
+      maximize_connection (window.RegisterEventHandler (WindowEvent_OnSetFocus,  bind (&SoundManager::Impl::OnMaximize, this, _1, _2, _3)))//,
+//      change_handle_connection (window.RegisterEventHandler (WindowEvent_OnChangeHandle, bind (&SoundManager::Impl::OnChangeHandle, this, _1, _2, _3)))
   {
     if (in_target_configuration)
       target_configuration = in_target_configuration;
@@ -108,9 +109,9 @@ struct SoundManager::Impl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void Init ()
   {
-    if (window.IsClosed ()) //temp fix
+/*    if (window.IsClosed ()) //temp fix
       return;
-
+  */
     try
     {
       device = DevicePtr (SoundSystem::CreateDevice (target_configuration.c_str (), &window, init_string.c_str ()), false);
@@ -194,7 +195,7 @@ struct SoundManager::Impl
     if (emitter_iter == emitters.end ())
       return;
 
-    emitter_iter->second->source.gain = emitter_iter->first->Volume ();
+    emitter_iter->second->source.gain = emitter_iter->second->sound_declaration_gain * emitter_iter->first->Volume ();
 
     if (emitter_iter->second->channel_number != -1)
       device->SetSource (emitter_iter->second->channel_number, emitter_iter->second->source);
@@ -242,7 +243,8 @@ struct SoundManager::Impl
         return;
       }
 
-      emitter_iter->second->source.gain               = emitter_iter->second->sound_declaration->Param (SoundParam_Gain);
+      emitter_iter->second->sound_declaration_gain = emitter_iter->second->source.gain = emitter_iter->second->sound_declaration->Param (SoundParam_Gain);
+            
       emitter_iter->second->source.minimum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MinimumGain);
       emitter_iter->second->source.maximum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumGain);
       emitter_iter->second->source.inner_angle        = emitter_iter->second->sound_declaration->Param (SoundParam_InnerAngle);

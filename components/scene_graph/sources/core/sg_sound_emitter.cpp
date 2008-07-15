@@ -15,8 +15,9 @@ struct SoundEmitter::Impl
   stl::string        sound_declaration_name;                   //имя описания звука
   SoundEmitterSignal signals [SoundEmitterEvent_Num];          //сигналы
   bool               signal_process [SoundEmitterEvent_Num];   //флаги обработки сигналов
+  float              gain;                                     //громкость
 
-  Impl (const char* in_sound_declaration_name) : sound_declaration_name (in_sound_declaration_name) {}
+  Impl (const char* in_sound_declaration_name) : sound_declaration_name (in_sound_declaration_name), gain (1.f) {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение клиентов о наступлении события
@@ -103,6 +104,25 @@ void SoundEmitter::Play ()
 void SoundEmitter::Stop ()
 {
   impl->Notify (*this, SoundEmitterEvent_Stop);
+}
+
+/*
+   Управление громкостью
+*/
+
+void SoundEmitter::SetGain (float gain)
+{
+  if (gain > 1.f) gain = 1.f;
+  if (gain < 0.f) gain = 0.f;
+
+  impl->gain = gain;
+
+  UpdateNotify ();
+}
+
+float SoundEmitter::Gain ()
+{
+  return impl->gain;
 }
 
 /*

@@ -226,8 +226,9 @@ struct ScenePlayer::Impl
       if (emitter_iter == emitters.end ())
         return;
 
-      emitter_iter->second->emitter.SetPosition (sender.WorldPosition ());               //!!!!!!!!добавить скорость
+      emitter_iter->second->emitter.SetPosition  (sender.WorldPosition ());               //!!!!!!!!добавить скорость
       emitter_iter->second->emitter.SetDirection (sender.WorldOrientation () * vec3f(0.f,0.f,1.f));
+      emitter_iter->second->emitter.SetVolume    (((scene_graph::SoundEmitter*)&sender)->Gain ());
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
