@@ -289,6 +289,7 @@ class DevILComponent
                   &devil_file_tell, &devil_file_write);      
 
       ImageManager::RegisterLoader ("jpg",     &Image::DefaultLoader);
+      ImageManager::RegisterLoader ("png",     &Image::DefaultLoader);      
       ImageManager::RegisterLoader ("bmp",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("tga",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("tif",     &Image::DefaultLoader);
@@ -298,6 +299,7 @@ class DevILComponent
       ImageManager::RegisterLoader ("skybox",  &Image::SkyBoxLoader);
 
       ImageManager::RegisterSaver  ("jpg",     &Image::DefaultSaver);
+      ImageManager::RegisterSaver  ("png",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("bmp",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("tga",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("tif",     &Image::DefaultSaver);
