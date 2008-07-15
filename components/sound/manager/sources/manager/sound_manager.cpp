@@ -11,13 +11,11 @@
 #include <xtl/signal.h>
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
-#include <syslib/window.h>
 #include <media/sound.h>
 #include <media/sound_declaration.h>
 
 using namespace sound;
 using namespace sound::low_level;
-using namespace syslib;
 using namespace stl;
 using namespace xtl;
 using namespace common;
@@ -69,67 +67,36 @@ typedef stl::hash_map<Emitter*, SoundManagerEmitterPtr> EmitterSet;
 typedef xtl::com_ptr<low_level::ISoundDevice>           DevicePtr;
 typedef stl::stack<size_t>                              ChannelsSet;
 
-struct SoundManager::Impl
+struct SoundManager::Impl : public xtl::trackable
 {
-  Window&                     window;                   //окно
   DevicePtr                   device;                   //устройство воспроизведения
-  sound::WindowMinimizeAction minimize_action;          //поведение при сворачивании окна
   float                       volume;                   //добавочная громкость
   bool                        is_muted;                 //флаг блокировки проигрывания звука
-  bool                        was_muted;                //предыдущее состояние флага блокировки проигрывания звука
   sound::Listener             listener;                 //параметры слушателя
   EmitterSet                  emitters;                 //излучатели звука
   ChannelsSet                 free_channels;            //номера свободных каналов
   Capabilities                capabilities;             //возможности устройства
-  auto_connection             minimize_connection;      //соединения события потери фокуса
-  auto_connection             maximize_connection;      //соединения события получения фокуса
-  auto_connection             change_handle_connection; //соединение собятия изменения хэндла
   SoundDeclarationLibrary     sound_decl_library;       //библиотека описаний звуков
   string                      target_configuration;     //конфигурация устройства вывода
   string                      init_string;              //строка инициализации
   xtl::trackable              trackable;
 
-  Impl (Window& target_window, const char* in_target_configuration, const char* in_init_string)
-    : window (target_window), minimize_action (WindowMinimizeAction_Ignore),
-      volume (1.f),
-      minimize_connection (window.RegisterEventHandler (WindowEvent_OnLostFocus, bind (&SoundManager::Impl::OnMinimize, this, _1, _2, _3))),
-      maximize_connection (window.RegisterEventHandler (WindowEvent_OnSetFocus,  bind (&SoundManager::Impl::OnMaximize, this, _1, _2, _3)))//,
-//      change_handle_connection (window.RegisterEventHandler (WindowEvent_OnChangeHandle, bind (&SoundManager::Impl::OnChangeHandle, this, _1, _2, _3)))
+  Impl (const char* in_target_configuration, const char* in_init_string)
+    : volume (1.f)
   {
     if (in_target_configuration)
       target_configuration = in_target_configuration;
     if (in_init_string)
       init_string = in_init_string;
     
-    Init ();
-  }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Инициализация устройства
-///////////////////////////////////////////////////////////////////////////////////////////////////
-  void Init ()
-  {
-/*    if (window.IsClosed ()) //temp fix
-      return;
-  */
     try
     {
-      device = DevicePtr (SoundSystem::CreateDevice (target_configuration.c_str (), &window, init_string.c_str ()), false);
+      device = DevicePtr (SoundSystem::CreateDevice (target_configuration.c_str (), init_string.c_str ()), false);
 
       device->GetCapabilities (capabilities);
       
-      for (size_t i = free_channels.size (); i; i--)
-        free_channels.pop ();
-
       for (size_t i = 0; i < capabilities.channels_count; i++)
         free_channels.push (i);
-
-      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-        if (i->second->is_playing)
-        {
-          PauseSound (*(i->first));
-          PlaySound  (*(i->first), i->second->cur_position);
-        }
     }
     catch (xtl::exception& exception)
     {
@@ -143,46 +110,8 @@ struct SoundManager::Impl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void SetMute (bool state)
   {
-    was_muted = is_muted;
     is_muted = state;
     device->SetMute (state);
-  }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-////Функция, вызываемая при сворачивании окна
-///////////////////////////////////////////////////////////////////////////////////////////////////
-  void OnMinimize (Window& window, WindowEvent event, const WindowEventContext& context)
-  {
-    switch (minimize_action)
-    {
-      case WindowMinimizeAction_Mute:  SetMute (true); break;
-      case WindowMinimizeAction_Pause: 
-        for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-          PauseSound (*(i->first));
-        break;
-    }
-  }
-
-  void OnMaximize (Window& window, WindowEvent event, const WindowEventContext& context)
-  {
-    switch (minimize_action)
-    {
-      case WindowMinimizeAction_Mute:
-        SetMute (was_muted);
-        break;
-      case WindowMinimizeAction_Pause:
-        for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-          PlaySound (*(i->first), i->second->cur_position);
-        break;
-    }
-  }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-////Функция, вызываемая при изменении хэндла
-///////////////////////////////////////////////////////////////////////////////////////////////////
-  void OnChangeHandle (Window& in_window, WindowEvent event, const WindowEventContext& context)
-  {
-    Init ();
   }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -377,24 +306,6 @@ struct SoundManager::Impl
 
     return emitter_iter->second->is_playing;
   }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация обработчиков события удаления объекта
-///////////////////////////////////////////////////////////////////////////////////////////////////
-  xtl::connection RegisterDestroyHandler (xtl::trackable::slot_type& handler)
-  {
-    return trackable.connect_tracker (handler);
-  }
-
-  xtl::connection RegisterDestroyHandler (const xtl::trackable::function_type& handler)
-  {
-    return trackable.connect_tracker (handler);
-  }
-
-  xtl::connection RegisterDestroyHandler (const xtl::trackable::function_type& handler, xtl::trackable& trackable)
-  {
-    return trackable.connect_tracker (handler, trackable);
-  }
 };
 
 
@@ -402,8 +313,8 @@ struct SoundManager::Impl
    Конструктор / деструктор
 */
 
-SoundManager::SoundManager (Window& target_window, const char* target_configuration, const char* init_string)
-  : impl (new Impl (target_window, target_configuration, init_string))
+SoundManager::SoundManager (const char* target_configuration, const char* init_string)
+  : impl (new Impl (target_configuration, init_string))
 {
 }
 
@@ -418,20 +329,6 @@ SoundManager::~SoundManager ()
 const char* SoundManager::FindConfiguration (const char* driver_mask, const char* device_mask)
 {
   return SoundSystem::FindConfiguration (driver_mask, device_mask);
-}
-
-/*
-   Установка поведения при сворачивании окна
-*/
-
-void SoundManager::SetWindowMinimizeAction (sound::WindowMinimizeAction action)
-{
-  impl->minimize_action = action;
-}
-
-WindowMinimizeAction SoundManager::WindowMinimizeAction () const
-{
-  return impl->minimize_action;
 }
 
 /*
@@ -542,17 +439,17 @@ void SoundManager::ForEachEmitter (const char* type, const ConstEmitterHandler& 
 
 xtl::connection SoundManager::RegisterDestroyHandler (xtl::trackable::slot_type& handler)
 {
-  return impl->RegisterDestroyHandler (handler);
+  return impl->connect_tracker (handler);
 }
 
 xtl::connection SoundManager::RegisterDestroyHandler (const xtl::trackable::function_type& handler)
 {
-  return impl->RegisterDestroyHandler (handler);
+  return impl->connect_tracker (handler);
 }
 
 xtl::connection SoundManager::RegisterDestroyHandler (const xtl::trackable::function_type& handler, xtl::trackable& trackable)
 {
-  return impl->RegisterDestroyHandler (handler, trackable);
+  return impl->connect_tracker (handler, trackable);
 }
 
 /*

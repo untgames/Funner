@@ -12,7 +12,7 @@ SOUND.MANAGER.SOURCES.LIB_DIRS         :=
 SOUND.MANAGER.SOURCES.LIBS             := 
 SOUND.MANAGER.SOURCES.COMPILER_CFLAGS  :=
 SOUND.MANAGER.SOURCES.COMPILER_DEFINES := 
-SOUND.MANAGER.SOURCES.IMPORTS          := compile.static.mak ../../system/compile.static.mak ../../media/sound/compile.static.mak
+SOUND.MANAGER.SOURCES.IMPORTS          := compile.static.mak ../../media/sound/compile.static.mak
 
 #Öåëü ¹2 - Sound system tests
 SOUND.MANAGER.TESTS.TYPE             := test-suite

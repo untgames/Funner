@@ -6,7 +6,7 @@ namespace
 {
 
 //функция создания OpenAL устройства
-ISoundDevice* create_device (const char* driver_name, const char* device_name, const void*, const char* init_string)
+ISoundDevice* create_device (const char* driver_name, const char* device_name, const char* init_string)
 {
   return new OpenALDevice (driver_name, device_name, init_string);  
 }

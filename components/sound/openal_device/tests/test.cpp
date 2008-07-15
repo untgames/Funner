@@ -26,7 +26,7 @@ const char* file_name = "data/sound1.ogg";
 const char* file_name2 = "data/sound2.ogg";
 
 const size_t SOURCE_UPDATE_TIME = 100;   //период обновления параметров источника звука (в милисекундах)
-const size_t TEST_WORK_TIME     = 80000;  //время работы теста (в милисекундах)
+const size_t TEST_WORK_TIME     = 8000;  //время работы теста (в милисекундах)
 
 float        source_angle = 0;
 Source       source;
@@ -103,7 +103,7 @@ int main ()
 {
   try
   {
-    xtl::com_ptr<ISoundDevice> sound_system (SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("OpenAL", "Generic*"), 0, "frequency=192000 min_channels_count=32 max_channels_count=192"), false);
+    xtl::com_ptr<ISoundDevice> sound_system (SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("OpenAL", "Generic*"), "frequency=192000 min_channels_count=32 max_channels_count=192"), false);
 
     Capabilities   info;
     Listener       listener;

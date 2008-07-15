@@ -6,10 +6,10 @@
 using namespace sound::low_level;
 using namespace common;
 
-ISoundDevice* my_create_device (const char* driver_name, const char* device_name, const void* window_handle, const char* init_string)
+ISoundDevice* my_create_device (const char* driver_name, const char* device_name, const char* init_string)
 {
-  throw xtl::format_operation_exception ("my_create_device", "Attempt to create sound device: driver='%s' device='%s' window_handle=%p init_string='%s'",
-                    driver_name, device_name, window_handle, init_string);
+  throw xtl::format_operation_exception ("my_create_device", "Attempt to create sound device: driver='%s' device='%s' init_string='%s'",
+                    driver_name, device_name, init_string);
 
   return 0;
 }
@@ -31,7 +31,7 @@ int main ()
     for (size_t i=0; i<SoundSystem::GetConfigurationsCount (); i++)
       printf ("  %s\n", SoundSystem::GetConfiguration (i));
 
-    SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("*", "*3"), 0, "0");
+    SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("*", "*3"), "0");
   }
   catch (std::exception& exception)
   {

@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <time.h>
 #include <mathlib.h>
-#include <syslib/window.h>
 #include <syslib/timer.h>
 #include <syslib/application.h>
 #include <xtl/function.h>
@@ -57,17 +56,6 @@ void print (const Listener& listener)
   printf ("\n");
 }
 
-void print (sound::WindowMinimizeAction minimize_action)
-{
-  switch (minimize_action)
-  {
-    case WindowMinimizeAction_Mute:    printf ("Mute\n");   break;
-    case WindowMinimizeAction_Pause:   printf ("Pause\n");  break;
-    case WindowMinimizeAction_Ignore:  printf ("Ignore\n"); break;
-    default:                           printf ("Unknown minimize action\n");
-  }
-}
-
 void print (bool arg)
 {
   if (arg)
@@ -91,8 +79,7 @@ int main ()
 
     srand ((unsigned int)time (NULL));
 
-    Window       window;
-    SoundManager manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
+    SoundManager manager (SoundSystem::FindConfiguration ("OpenAL", "*"));
     Listener     listener;
     Emitter      emitter;
 
@@ -104,12 +91,6 @@ int main ()
 */
 
     printf ("OpenAL configuration:\n%s\n", manager.FindConfiguration ("OpenAL", "*"));
-
-    printf ("Minimize action: ");
-    print  (manager.WindowMinimizeAction ());
-    manager.SetWindowMinimizeAction (WindowMinimizeAction_Pause);
-    printf ("New minimize action: ");
-    print  (manager.WindowMinimizeAction ());
 
     printf ("Initial volume = %f,", manager.Volume ());
     manager.SetVolume (0.7f);

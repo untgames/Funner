@@ -6,7 +6,6 @@
 #include <xtl/function.h>
 #include <xtl/bind.h>
 
-#include <syslib/window.h>
 #include <syslib/timer.h>
 #include <syslib/application.h>
 
@@ -49,8 +48,7 @@ int main ()
   try
   {
     scene_graph::Scene scene;
-    Window             window;
-    SoundManager       manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
+    SoundManager       manager (SoundSystem::FindConfiguration ("OpenAL", "*"));
     ListenerPtr        listener (scene_graph::Listener::Create ());
     
     listener->BindToParent (scene.Root ());

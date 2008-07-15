@@ -5,7 +5,6 @@
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/ref.h>
-#include <syslib/window.h>
 #include <syslib/timer.h>
 #include <syslib/application.h>
 #include <sg/scene.h>
@@ -55,9 +54,8 @@ int main ()
   try
   {
     Scene           scene;
-    Window          window;
-    SoundManager    manager (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
-    SoundManager    manager2 (window, SoundSystem::FindConfiguration ("OpenAL", "*"));
+    SoundManager    manager (SoundSystem::FindConfiguration ("OpenAL", "*"));
+    SoundManager    manager2 (SoundSystem::FindConfiguration ("OpenAL", "*"));
     ListenerPtr     listener (scene_graph::Listener::Create ());
     SoundEmitterPtr sound_emitter  = SoundEmitter::Create ("declaration1"),
                     sound_emitter2 = SoundEmitter::Create ("declaration2");
