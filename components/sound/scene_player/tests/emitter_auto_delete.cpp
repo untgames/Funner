@@ -16,10 +16,8 @@
 
 #include <sound/manager.h>
 #include <sound/scene_player.h>
-#include <sound/device.h>
 
 using namespace sound;
-using namespace sound::low_level;
 using namespace syslib;
 using namespace scene_graph;
 
@@ -48,7 +46,7 @@ int main ()
   try
   {
     scene_graph::Scene scene;
-    SoundManager       manager (SoundSystem::FindConfiguration ("OpenAL", "*"));
+    SoundManager       manager ("OpenAL", "*");
     ListenerPtr        listener (scene_graph::Listener::Create ());
     
     listener->BindToParent (scene.Root ());

@@ -12,10 +12,8 @@
 #include <sg/sound_emitter.h>
 #include <sound/manager.h>
 #include <sound/scene_player.h>
-#include <sound/device.h>
 
 using namespace sound;
-using namespace sound::low_level;
 using namespace xtl;
 using namespace syslib;
 using namespace scene_graph;
@@ -54,8 +52,8 @@ int main ()
   try
   {
     Scene           scene;
-    SoundManager    manager (SoundSystem::FindConfiguration ("OpenAL", "*"));
-    SoundManager    manager2 (SoundSystem::FindConfiguration ("OpenAL", "*"));
+    SoundManager    manager ("OpenAL", "*");
+    SoundManager    manager2 ("OpenAL", "*");
     ListenerPtr     listener (scene_graph::Listener::Create ());
     SoundEmitterPtr sound_emitter  = SoundEmitter::Create ("declaration1"),
                     sound_emitter2 = SoundEmitter::Create ("declaration2");

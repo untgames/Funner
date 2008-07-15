@@ -2,6 +2,7 @@
 #include <exception>
 #include <xtl/intrusive_ptr.h>
 #include <sound/device.h>
+#include <sound/driver.h>
 
 using namespace sound::low_level;
 
@@ -13,15 +14,23 @@ int main ()
   {
     printf ("configurations:\n");
     
-    for (size_t i=0; i<SoundSystem::GetConfigurationsCount (); i++)
+    IDriver* driver = DriverManager::FindDriver ("OpenAL");
+
+    if (!driver)
     {
-      printf ("  %s:\n", SoundSystem::GetConfiguration (i));
+      printf ("OpenAL driver not registered.\n");
+      return 1;
+    }
+
+    for (size_t i = 0; i < driver->GetDevicesCount (); i++)
+    {
+      printf ("  %s:\n", driver->GetDeviceName (i));
       
-      xtl::com_ptr<ISoundDevice> sound_system (SoundSystem::CreateDevice (SoundSystem::GetConfiguration (i), 0), false);
+      xtl::com_ptr<IDevice> sound_device (driver->CreateDevice (driver->GetDeviceName (i), 0), false);
 
-      Capabilities   info;
+      Capabilities info;
 
-      sound_system->GetCapabilities (info);
+      sound_device->GetCapabilities (info);
       
       printf ("    Total channels available: %u.\n", info.channels_count);
       printf ("    Supported EAX %u.%u.\n", info.eax_major_version, info.eax_minor_version);

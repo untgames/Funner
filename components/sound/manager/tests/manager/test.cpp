@@ -8,12 +8,10 @@
 #include <xtl/bind.h>
 #include <xtl/ref.h>
 #include <xtl/common_exceptions.h>
-#include <sound/device.h>
 #include <sound/manager.h>
 
 using namespace syslib;
 using namespace sound;
-using namespace sound::low_level;
 using namespace xtl;
 using namespace math;
 
@@ -79,7 +77,7 @@ int main ()
 
     srand ((unsigned int)time (NULL));
 
-    SoundManager manager (SoundSystem::FindConfiguration ("OpenAL", "*"));
+    SoundManager manager ("OpenAL", "*");
     Listener     listener;
     Emitter      emitter;
 
@@ -89,8 +87,6 @@ int main ()
 /*
    Testing basic manager properties
 */
-
-    printf ("OpenAL configuration:\n%s\n", manager.FindConfiguration ("OpenAL", "*"));
 
     printf ("Initial volume = %f,", manager.Volume ());
     manager.SetVolume (0.7f);

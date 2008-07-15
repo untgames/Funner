@@ -1,6 +1,7 @@
 #include <time.h>
 #include <sound/manager.h>
 #include <sound/device.h>
+#include <sound/driver.h>
 #include <stl/hash_map>
 #include <stl/algorithm>
 #include <stl/stack>
@@ -64,7 +65,8 @@ struct SoundManagerEmitter
 
 typedef xtl::shared_ptr<SoundManagerEmitter>            SoundManagerEmitterPtr;
 typedef stl::hash_map<Emitter*, SoundManagerEmitterPtr> EmitterSet;
-typedef xtl::com_ptr<low_level::ISoundDevice>           DevicePtr;
+typedef xtl::com_ptr<low_level::IDevice>                DevicePtr;
+typedef xtl::com_ptr<low_level::IDriver>                DriverPtr;
 typedef stl::stack<size_t>                              ChannelsSet;
 
 struct SoundManager::Impl : public xtl::trackable
@@ -77,21 +79,14 @@ struct SoundManager::Impl : public xtl::trackable
   ChannelsSet                 free_channels;            //номера свободных каналов
   Capabilities                capabilities;             //возможности устройства
   SoundDeclarationLibrary     sound_decl_library;       //библиотека описаний звуков
-  string                      target_configuration;     //конфигурация устройства вывода
-  string                      init_string;              //строка инициализации
   xtl::trackable              trackable;
 
-  Impl (const char* in_target_configuration, const char* in_init_string)
+  Impl (const char* driver_mask, const char* device_mask, const char* init_string)
     : volume (1.f)
   {
-    if (in_target_configuration)
-      target_configuration = in_target_configuration;
-    if (in_init_string)
-      init_string = in_init_string;
-    
     try
     {
-      device = DevicePtr (SoundSystem::CreateDevice (target_configuration.c_str (), init_string.c_str ()), false);
+      device = DevicePtr (DriverManager::CreateDevice (driver_mask, device_mask, init_string), false);
 
       device->GetCapabilities (capabilities);
       
@@ -313,22 +308,13 @@ struct SoundManager::Impl : public xtl::trackable
    Конструктор / деструктор
 */
 
-SoundManager::SoundManager (const char* target_configuration, const char* init_string)
-  : impl (new Impl (target_configuration, init_string))
+SoundManager::SoundManager (const char* driver_mask, const char* device_mask, const char* init_string)
+  : impl (new Impl (driver_mask, device_mask, init_string))
 {
 }
 
 SoundManager::~SoundManager ()
 {
-}
-
-/*
-   Поиск конфигурации (делегирование от low_level::SoundDeviceSystem)
-*/
-
-const char* SoundManager::FindConfiguration (const char* driver_mask, const char* device_mask)
-{
-  return SoundSystem::FindConfiguration (driver_mask, device_mask);
 }
 
 /*

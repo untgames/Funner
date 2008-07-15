@@ -7,12 +7,15 @@
 #include <alc.h>
 #include <efx.h>
 
+#include <stl/string>
 #include <stl/vector>
 
 #include <xtl/function.h>
 #include <xtl/bind.h>
+#include <xtl/intrusive_ptr.h>
 #include <xtl/uninitialized_storage.h>
 #include <xtl/ref.h>
+#include <xtl/reference_counter.h>
 #include <xtl/string.h>
 #include <xtl/common_exceptions.h>
 
@@ -24,11 +27,15 @@
 #include <syslib/timer.h>
 
 #include <sound/device.h>
+#include <sound/driver.h>
 
 namespace sound
 {
 
 namespace low_level
+{
+
+namespace openal
 {
 
 //implementation forwards
@@ -55,7 +62,7 @@ struct OpenALException: virtual public xtl::exception {};
 class OpenALContext
 {
   public:
-    typedef ISoundDevice::LogHandler LogHandler;
+    typedef IDevice::LogHandler LogHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
@@ -202,7 +209,7 @@ class OpenALContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Cистема воспроизведения звука, реализованная через OpenAL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class OpenALDevice : public sound::low_level::ISoundDevice
+class OpenALDevice : public sound::low_level::IDevice
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -450,9 +457,6 @@ class OpenALSource
     ALuint         al_buffers [SOURCE_BUFFERS_COUNT]; //OpenAL буферы
     OpenALSource   *prev_active, *next_active;        //список активных источников (проигрываемых)
 };
-
-namespace openal
-{
 
 const char* get_al_constant_name (ALenum value);
 

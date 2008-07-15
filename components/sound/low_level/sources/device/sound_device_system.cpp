@@ -1,17 +1,30 @@
-#include <sound/device.h>
-#include <stl/string>
-#include <stl/hash_map>
 #include <stl/vector>
-#include <stl/algorithm>
-#include <common/strlib.h>
-#include <common/singleton.h>
-#include <common/component.h>
-#include <xtl/function.h>
+#include <stl/string>
+
+#include <xtl/intrusive_ptr.h>
 #include <xtl/common_exceptions.h>
+
+#include <common/component.h>
+#include <common/singleton.h>
+#include <common/strlib.h>
+
+#include <sound/driver.h>
 
 using namespace sound::low_level;
 using namespace common;
-using namespace stl;
+
+/*
+    Константы
+*/
+
+namespace
+{
+
+const size_t DRIVER_ARRAY_RESERVE = 5; //резервируемый размер массива драйверов 
+const char*  DRIVER_COMPONENTS_MASK = "sound.low_level.*"; //маска имён компонентов устройств воспроизведения
+
+}
+
 
 namespace sound
 {
@@ -20,378 +33,208 @@ namespace low_level
 {
 
 /*
-    Описание реализации системы управления устройствами воспроизведения звука
+    Описание реализации системы управления низкоуровневыми драйверами устройств ввода
 */
 
-class SoundSystemImpl
+class DriverManagerImpl
 {
   public:
-    typedef SoundSystem::CreateDeviceHandler CreateDeviceHandler;
-  
+    DriverManagerImpl () { drivers.reserve (DRIVER_ARRAY_RESERVE); }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация драйверов
-///////////////////////////////////////////////////////////////////////////////////////////////////  
-    void RegisterDriver       (const char* driver_name, const CreateDeviceHandler& creater);
-    void UnregisterDriver     (const char* driver_name);
-    void UnregisterAllDrivers ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация конфигураций
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* RegisterConfiguration       (const char* driver_name, const char* device_name);
-    void        UnregisterConfiguration     (const char* configuration_name);
-    void        UnregisterConfiguration     (const char* driver_name, const char* device_name);
-    void        UnregisterAllConfigurations (const char* driver_mask, const char* device_mask);
-    void        UnregisterAllConfigurations ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перечисление доступных конфигураций
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t      GetConfigurationsCount () const;
-    const char* GetConfiguration       (size_t index) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск конфигурации
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* FindConfiguration (const char* driver_mask, const char* device_mask) const; //в случае неудачи - 0
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание устройства воспроизведения звука
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISoundDevice* CreateDevice (const char* driver_name, const char* device_name, const char* init_string);
-    ISoundDevice* CreateDevice (const char* configuration_name, const char* init_string = "");
-    
-  private:
-    static string GetConfigurationName (const char* driver_name, const char* device_name);
-    
-      //загрузка драйверов проигрывания звука по умолчанию
-    static void LoadDefaultDrivers ()
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    void RegisterDriver (const char* name, IDriver* driver)
     {
-      static ComponentLoader loader ("sound.low_level.*");
+      static const char* METHOD_NAME = "sound::low_level::DriverManager::RegisterDriver";
+
+      if (!name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+      if (!driver)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "driver");
+
+      if (FindDriver (name))
+        throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Driver with this name has been already registered");
+
+      drivers.push_back (SoundDriver (driver, name));
     }
-  
-  private:
-    typedef hash_map<hash_key<const char*>, CreateDeviceHandler> DriverMap;
-  
-    struct Configuration
-    {      
-      string              name;
-      string              driver_name, device_name;
-      DriverMap::iterator driver_iter;
-    };
-  
-    typedef hash_map<hash_key<const char*>, Configuration> ConfigurationMap;
-    typedef vector<ConfigurationMap::iterator>             ConfigurationArray;
+
+    void UnregisterDriver (const char* name)
+    {
+      if (!name)
+        return;
+        
+      for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
+        if (i->name == name)
+          drivers.erase (i--);
+    }
+
+    void UnregisterAllDrivers ()
+    {
+      drivers.clear ();
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск драйвера по имени
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IDriver* FindDriver (const char* name)
+    {
+      if (!name)
+        return 0;
+        
+      LoadDefaultDrivers ();
+
+      for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
+        if (i->name == name)
+          return get_pointer (i->driver);
+      
+      return 0;
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перечисление драйверов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t DriversCount ()
+    {
+      LoadDefaultDrivers ();
+
+      return drivers.size ();
+    }
+
+    IDriver* Driver (size_t index)
+    {
+      LoadDefaultDrivers ();
+
+      if (index >= drivers.size ())
+        throw xtl::make_range_exception ("sound::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
+
+      return get_pointer (drivers [index].driver);
+    }
+
+    const char* DriverName (size_t index)
+    {
+      LoadDefaultDrivers ();
+
+      if (index >= drivers.size ())
+        throw xtl::make_range_exception ("sound::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
+
+      return drivers [index].name.c_str ();
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание устройства ввода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IDevice* CreateDevice (const char* driver_mask, const char* device_mask, const char* init_string)
+    {
+      LoadDefaultDrivers ();
+
+      if (!driver_mask)
+        driver_mask = "*";
+        
+      if (!device_mask)
+        device_mask = "*";
+
+      if (!init_string)
+        init_string = "";
+
+        //поиск драйвера
+
+      for (DriverArray::iterator iter=drivers.begin (), end=drivers.end (); iter != end; ++iter)
+        if (wcimatch (iter->name.c_str (), driver_mask))
+        {
+          for (size_t i = 0; i < iter->driver->GetDevicesCount (); i++)
+          {
+            if (wcimatch (iter->driver->GetDeviceName (i), device_mask))
+              return iter->driver->CreateDevice (iter->driver->GetDeviceName (i), init_string);
+          }
+        }
+        
+      throw xtl::format_operation_exception ("sound::low_level::DriverManagerImpl::CreateDevice",
+        "No configuration with driver_mask='%s' and device_mask='%s'", driver_mask, device_mask);
+    }
 
   private:
-    DriverMap          drivers;
-    ConfigurationMap   configurations;
-    ConfigurationArray configuration_array;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///‡ Јаг§Є  ¤а ©ўҐа®ў Ї® г¬®«з ­Ёо
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void DriverManagerImpl::LoadDefaultDrivers ()
+    {
+      try
+      {
+        static ComponentLoader loader (DRIVER_COMPONENTS_MASK);
+      }
+      catch (...)
+      {
+      }
+    }
+
+  private:
+    typedef xtl::com_ptr<IDriver>  DriverPtr;
+    struct SoundDriver
+    {
+      SoundDriver (IDriver* in_driver, const char* in_name) : driver (in_driver), name (in_name) {} 
+
+      DriverPtr   driver;
+      stl::string name;
+    };
+    typedef stl::vector<SoundDriver> DriverArray;
+  
+  private:
+    DriverArray drivers; //карта драйверов
 };
 
 }
 
 }
 
-/*
-    Регистрация драйверов
-*/
-
-void SoundSystemImpl::RegisterDriver (const char* driver_name, const CreateDeviceHandler& creater)
+namespace
 {
-  if (!driver_name)
-    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystem::RegisterDriver", "driver_name");
-    
-  if (!creater)
-    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystem::RegisterDriver", "creater");
-    
-  DriverMap::iterator iter = drivers.find (driver_name);
-  
-  if (iter != drivers.end ())
-    throw xtl::make_argument_exception ("sound::low_level::SoundSystem::RegisterDriver", "driver_name", driver_name,
-                          "Driver with this name already registered");
 
-  drivers.insert_pair (driver_name, creater);
-}
+typedef Singleton<DriverManagerImpl> DriverManagerSingleton;
 
-void SoundSystemImpl::UnregisterDriver (const char* driver_name)
-{
-  if (!driver_name)
-    return;
-
-  drivers.erase (driver_name);
-
-  UnregisterAllConfigurations (driver_name, "*");
-}
-
-void SoundSystemImpl::UnregisterAllDrivers ()
-{
-  drivers.clear ();
-  UnregisterAllConfigurations ();
 }
 
 /*
-    Получение имени конфигурации
+    Обёртки над обращениями к системе управления низкоуровневыми драйверами отрисовки
 */
 
-string SoundSystemImpl::GetConfigurationName (const char* driver_name, const char* device_name)
+void DriverManager::RegisterDriver (const char* name, IDriver* driver)
 {
-  return format ("%s::%s", driver_name, device_name);
+  DriverManagerSingleton::Instance ().RegisterDriver (name, driver);
 }
 
-/*
-    Регистрация конфигураций
-*/
-
-const char* SoundSystemImpl::RegisterConfiguration (const char* driver_name, const char* device_name)
+void DriverManager::UnregisterDriver (const char* name)
 {
-  if (!driver_name)
-    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystem::RegisterConfiguration", "driver_name");
-
-  if (!device_name)
-    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystem::RegisterConfiguration", "device_name");
-
-  DriverMap::iterator driver_iter = drivers.find (driver_name);
-
-  if (driver_iter == drivers.end ())
-    throw xtl::make_argument_exception ("sound::low_level::SoundSystem::RegisterConfiguration", "driver_name", driver_name,
-                          "There is no driver with this name");
-
-    //формирование имени конфигурации
-
-  string configuration_name;
-
-  GetConfigurationName (driver_name, device_name).swap (configuration_name);
-
-    //проверка наличия конфигурации
-
-  ConfigurationMap::iterator cfg_iter = configurations.find (configuration_name.c_str ());
-
-  if (cfg_iter != configurations.end ())
-    return cfg_iter->second.name.c_str (); //конфигурация с таким именем уже зарегистрирована
-    
-  cfg_iter = configurations.insert_pair (configuration_name.c_str (), Configuration ()).first;
-  
-  try
-  {  
-    Configuration& configuration = cfg_iter->second;
-    
-    configuration.name.swap (configuration_name);
-    
-    configuration.driver_name = driver_name;
-    configuration.device_name = device_name;
-    configuration.driver_iter = driver_iter;
-    
-    configuration_array.push_back (cfg_iter);
-    
-    return configuration.name.c_str ();
-  }
-  catch (...)
-  {
-    configurations.erase (cfg_iter);
-    throw;
-  }
+  DriverManagerSingleton::Instance ().UnregisterDriver (name);
 }
 
-void SoundSystemImpl::UnregisterConfiguration (const char* configuration_name)
+void DriverManager::UnregisterAllDrivers ()
 {
-  if (!configuration_name)
-    return;
-    
-  ConfigurationMap::iterator cfg_iter = configurations.find (configuration_name);
-
-  if (cfg_iter == configurations.end ())
-    return; //конфигурация с таким именем отсутствует
-
-  configuration_array.erase (remove (configuration_array.begin (), configuration_array.end (), cfg_iter), configuration_array.end ());
-
-  configurations.erase (cfg_iter);
+  DriverManagerSingleton::Instance ().UnregisterAllDrivers ();
 }
 
-void SoundSystemImpl::UnregisterConfiguration (const char* driver_name, const char* device_name)
+IDriver* DriverManager::FindDriver (const char* name)
 {
-  if (!driver_name || !device_name)
-    return;
-
-  for (ConfigurationMap::iterator i=configurations.begin (), end=configurations.end (); i!=end; ++i)
-    if (i->second.driver_name == driver_name && i->second.device_name == device_name)
-    {      
-      configuration_array.erase (remove (configuration_array.begin (), configuration_array.end (), i), configuration_array.end ());      
-      
-      configurations.erase (i);
-      return;
-    }
+  return DriverManagerSingleton::Instance ().FindDriver (name);
 }
 
-void SoundSystemImpl::UnregisterAllConfigurations (const char* driver_mask, const char* device_mask)
+size_t DriverManager::DriversCount ()
 {
-  if (!driver_mask || !device_mask)
-    return;
-
-  for (ConfigurationMap::iterator i=configurations.begin (), end=configurations.end (); i!=end;)
-    if (wcmatch (i->second.driver_name.c_str (), driver_mask) && wcmatch (i->second.device_name.c_str (), device_mask))
-    {      
-      configuration_array.erase (remove (configuration_array.begin (), configuration_array.end (), i), configuration_array.end ());      
-      
-      ConfigurationMap::iterator next = i;
-      
-      ++next;
-      
-      configurations.erase (i);
-
-      i = next;
-    }
-    else ++i;
+  return DriverManagerSingleton::Instance ().DriversCount ();
 }
 
-void SoundSystemImpl::UnregisterAllConfigurations ()
+IDriver* DriverManager::Driver (size_t index)
 {
-  configurations.clear ();
-  configuration_array.clear ();
+  return DriverManagerSingleton::Instance ().Driver (index);
 }
 
-/*
-    Перечисление доступных конфигураций
-*/
-
-size_t SoundSystemImpl::GetConfigurationsCount () const
+const char* DriverManager::DriverName (size_t index)
 {
-  LoadDefaultDrivers ();
-  return configuration_array.size ();
+  return DriverManagerSingleton::Instance ().DriverName (index);
 }
 
-const char* SoundSystemImpl::GetConfiguration (size_t index) const
+IDevice* DriverManager::CreateDevice (const char* driver_mask, const char* device_mask, const char* init_string)
 {
-  LoadDefaultDrivers ();
-
-  if (index >= configuration_array.size ())
-    throw xtl::make_range_exception ("sound::low_level::SoundSystem::GetConfiguration", "index", index, configuration_array.size ());    
-    
-  return configuration_array [index]->second.name.c_str ();
-}
-
-/*
-    Создание устройства воспроизведения звука
-*/
-
-ISoundDevice* SoundSystemImpl::CreateDevice (const char* configuration_name, const char* init_string)
-{
-  if (!configuration_name)
-    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystem::CreateDevice", "configuration_name");
-    
-  if (!init_string)
-    init_string = "";
-    
-  LoadDefaultDrivers ();
-
-  ConfigurationMap::iterator cfg_iter = configurations.find (configuration_name);
-
-  if (cfg_iter == configurations.end ())
-    throw xtl::make_argument_exception ("sound::low_level::SoundSystem::CreateDevice", "configuration_name", configuration_name,
-                          "There is no configuration with this name");
-                          
-  Configuration& cfg = cfg_iter->second;
-
-  return cfg.driver_iter->second (cfg.driver_name.c_str (), cfg.device_name.c_str (), init_string);  
-}
-    
-ISoundDevice* SoundSystemImpl::CreateDevice (const char* driver_name, const char* device_name, const char* init_string)
-{
-  if (!driver_name)
-    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystemImpl::CreateDevice", "driver_name");
-
-  if (!device_name)
-    throw xtl::make_null_argument_exception ("sound::low_level::SoundSystemImpl::CreateDevice", "device_name");        
-
-  return CreateDevice (GetConfigurationName (driver_name, device_name).c_str (), init_string);
-}
-
-/*
-    Поиск конфигурации
-*/
-
-//в случае неудачи - 0
-const char* SoundSystemImpl::FindConfiguration (const char* driver_mask, const char* device_mask) const
-{
-  if (!driver_mask || !device_mask)
-    return 0;
-    
-  LoadDefaultDrivers ();
-
-  for (ConfigurationMap::const_iterator i=configurations.begin (), end=configurations.end (); i!=end; ++i)
-    if (wcmatch (i->second.driver_name.c_str (), driver_mask) && wcmatch (i->second.device_name.c_str (), device_mask))
-      return i->second.name.c_str ();
-      
-  return 0;
-}
-
-/*
-    Обёртки над обращениями к системе управления устройствами воспроизведения звука
-*/
-
-typedef Singleton<sound::low_level::SoundSystemImpl> SoundSystemSingleton;
-
-void SoundSystem::RegisterDriver (const char* driver_name, const CreateDeviceHandler& creater)
-{
-  SoundSystemSingleton::Instance ().RegisterDriver (driver_name, creater);
-}
-
-void SoundSystem::UnregisterDriver (const char* driver_name)
-{
-  SoundSystemSingleton::Instance ().UnregisterDriver (driver_name);
-}
-
-void SoundSystem::UnregisterAllDrivers ()
-{
-  SoundSystemSingleton::Instance ().UnregisterAllDrivers ();
-}
-
-const char* SoundSystem::RegisterConfiguration (const char* driver_name, const char* device_name)
-{
-  return SoundSystemSingleton::Instance ().RegisterConfiguration (driver_name, device_name);
-}
-
-void SoundSystem::UnregisterConfiguration (const char* configuration_name)
-{
-  SoundSystemSingleton::Instance ().UnregisterConfiguration (configuration_name);
-}
-
-void SoundSystem::UnregisterConfiguration (const char* driver_name, const char* device_name)
-{
-  SoundSystemSingleton::Instance ().UnregisterConfiguration (driver_name, device_name);
-}
-
-void SoundSystem::UnregisterAllConfigurations (const char* driver_mask, const char* device_mask)
-{
-  SoundSystemSingleton::Instance ().UnregisterAllConfigurations (driver_mask, device_mask);
-}
-
-void SoundSystem::UnregisterAllConfigurations ()
-{
-  SoundSystemSingleton::Instance ().UnregisterAllConfigurations ();
-}
-
-size_t SoundSystem::GetConfigurationsCount ()
-{
-  return SoundSystemSingleton::Instance ().GetConfigurationsCount ();
-}
-
-const char* SoundSystem::GetConfiguration (size_t index)
-{
-  return SoundSystemSingleton::Instance ().GetConfiguration (index);
-}
-
-const char* SoundSystem::FindConfiguration (const char* driver_mask, const char* device_mask)
-{
-  return SoundSystemSingleton::Instance ().FindConfiguration (driver_mask, device_mask);
-}
-
-ISoundDevice* SoundSystem::CreateDevice (const char* driver_name, const char* device_name, const char* init_string)
-{
-  return SoundSystemSingleton::Instance ().CreateDevice (driver_name, device_name, init_string);
-}
-
-ISoundDevice* SoundSystem::CreateDevice (const char* configuration_name, const char* init_string)
-{
-  return SoundSystemSingleton::Instance ().CreateDevice (configuration_name, init_string);
+  return DriverManagerSingleton::Instance ().CreateDevice (driver_mask, device_mask, init_string);
 }

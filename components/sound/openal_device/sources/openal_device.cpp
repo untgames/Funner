@@ -5,6 +5,7 @@ using namespace stl;
 using namespace xtl;
 using namespace sound;
 using namespace sound::low_level;
+using namespace sound::low_level::openal;
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' : used in base member initializer list

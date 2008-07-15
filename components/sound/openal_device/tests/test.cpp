@@ -11,6 +11,7 @@
 #include <syslib/timer.h>
 
 #include <sound/device.h>
+#include <sound/driver.h>
 
 #include <media/sound.h>
 
@@ -87,7 +88,7 @@ void dump (Source& source)
   printf ("\n");
 }
 
-void TimerHandler (ISoundDevice* sound_system, Timer&)
+void TimerHandler (IDevice* sound_system, Timer&)
 {
   source.position = vec3f (sin (deg2rad (source_angle)), 0, cos (deg2rad (source_angle)));
   source_angle++;
@@ -103,7 +104,7 @@ int main ()
 {
   try
   {
-    xtl::com_ptr<ISoundDevice> sound_system (SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("OpenAL", "Generic*"), "frequency=192000 min_channels_count=32 max_channels_count=192"), false);
+    xtl::com_ptr<IDevice> sound_system (DriverManager::CreateDevice ("OpenAL", "Generic*", "frequency=192000 min_channels_count=32 max_channels_count=192"), false);
 
     Capabilities   info;
     Listener       listener;

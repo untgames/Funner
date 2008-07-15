@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace sound::low_level;
+using namespace sound::low_level::openal;
 using namespace common;
 
 #ifdef _MSC_VER

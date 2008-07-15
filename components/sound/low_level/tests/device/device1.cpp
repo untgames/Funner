@@ -1,18 +1,4 @@
-#include <sound/device.h>
-#include <xtl/function.h>
-#include <xtl/common_exceptions.h>
-#include <stdio.h>
-
-using namespace sound::low_level;
-using namespace common;
-
-ISoundDevice* my_create_device (const char* driver_name, const char* device_name, const char* init_string)
-{
-  throw xtl::format_operation_exception ("my_create_device", "Attempt to create sound device: driver='%s' device='%s' init_string='%s'",
-                    driver_name, device_name, init_string);
-
-  return 0;
-}
+#include "shared.h"
 
 int main ()
 {
@@ -20,22 +6,15 @@ int main ()
   
   try
   {
-    SoundSystem::RegisterDriver ("driver1", &my_create_device);
-    SoundSystem::RegisterDriver ("driver2", &my_create_device);
-    SoundSystem::RegisterConfiguration  ("driver1", "configuration1");
-    SoundSystem::RegisterConfiguration  ("driver2", "configuration2");
-    SoundSystem::RegisterConfiguration  ("driver1", "configuration3");
+    xtl::com_ptr<sound::low_level::IDriver> driver (new TestDriver, false);
     
-    printf ("configurations:\n");
+    DriverManager::RegisterDriver ("test_drv", get_pointer (driver));
     
-    for (size_t i=0; i<SoundSystem::GetConfigurationsCount (); i++)
-      printf ("  %s\n", SoundSystem::GetConfiguration (i));
-
-    SoundSystem::CreateDevice (SoundSystem::FindConfiguration ("*", "*3"), "0");
+    IDevice* device = DriverManager::CreateDevice ("*_drv", "*");
   }
   catch (std::exception& exception)
   {
-    printf ("Exception: %s\n", exception.what ());
+    printf ("exception: %s\n", exception.what ());
   }
 
   return 0;

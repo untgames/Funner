@@ -50,7 +50,7 @@ struct MyApplication::Impl
     {
       try
       {        
-        sound_manager = new sound::SoundManager (window, sound::SoundManager::FindConfiguration ("*", "*"));
+        sound_manager = new sound::SoundManager ("*", "*");
 
         LogMessage ("Loading sound declarations...");
         sound_manager->LoadSoundLibrary (WATER_DROP_SOUND_NAME);
