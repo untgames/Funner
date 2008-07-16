@@ -11,6 +11,7 @@
 #include <xtl/bind.h>
 #include <xtl/visitor.h>
 #include <xtl/iterator.h>
+#include <xtl/trackable.h>
 
 #include <common/component.h>
 #include <common/strlib.h>
@@ -80,26 +81,44 @@ class Renderable: public xtl::reference_counter
     void UpdateNotify ();
   
   private:
-    xtl::auto_connection on_update_connection;
-    bool                 need_update;
+    xtl::auto_connection on_update_connection;  //соединение на сигнал оповещения об обновлении объекта
+    bool                 need_update;           //флаг необходимости обновления внутренних структур данных объекта
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Модель, состоящая из спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class RenderableSpriteModel: public Renderable
+class RenderableSpriteModel: public Renderable, public xtl::trackable
 {
   public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
     RenderableSpriteModel (scene_graph::SpriteModel* model, Render& render);
 
   private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление модели
+///////////////////////////////////////////////////////////////////////////////////////////////////
     void Update ();
+    void UpdateMaterialNotify ();
+    void UpdateSpritesNotify ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Рисование модели
+///////////////////////////////////////////////////////////////////////////////////////////////////
     void DrawCore (IFrame&);
 
   private:
-    Render&                   render;
-    scene_graph::SpriteModel* model;
-    PrimitivePtr              primitive;
+    Render&                   render;                          //ссылка на рендер
+    scene_graph::SpriteModel* model;                           //исходная модель
+    PrimitivePtr              primitive;                       //визуализируемый примитив
+    bool                      need_update_tm;                  //флаг необходимости обновления матрицы преобразований
+    bool                      need_update_material;            //флаг необходимости обновления материала
+    bool                      need_update_sprites;             //флаг необходимости обновления массива спрайтов
+    size_t                    tile_columns;                    //количество столбцов тайлов
+    float                     tile_tex_width, tile_tex_height; //размеры тайла в текстурных координатах
+    size_t                    current_world_tm_hash;           //хэш текущей матрицы трансформации
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
