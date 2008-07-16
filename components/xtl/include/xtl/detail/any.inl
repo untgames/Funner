@@ -268,32 +268,6 @@ struct any_holder
   #pragma warning (disable:4624) //destructor could not be generated because a base class destructor is inaccessible
 #endif
 
-template <class T> class value_holder
-{
-  public:
-    template <class T1> value_holder (T1& in_value) : value (in_value) {}
-    
-    T& get () { return value; }
-    
-  private:
-    T value;
-};
-
-template <class T> class value_holder<T&>
-{
-  public:
-    template <class T1> value_holder (T1& in_value) : value (&in_value) {}
-    
-    T& get () { return *value; }
-    
-  private:
-    T* value;
-};
-
-#ifdef _MSC_VER
-  #pragma warning (pop)
-#endif
-
 /*
     Содержимое вариативной переменной
 */
@@ -301,39 +275,42 @@ template <class T> class value_holder<T&>
 template <class T> struct any_content: public any_holder
 {
   typedef typename any_stored_type<T>::type base_type;
-  typedef value_holder<base_type>           holder_type;
 
   any_content (const T& in_value) : value (get_unqualified_value (in_value)) {}
 
   const std::type_info& type           () { return typeid (T); }
   const std::type_info& stored_type    () { return typeid (base_type); }
-  const std::type_info& castable_type  () { return get_typeid (get_castable_value (value.get ())); }
+  const std::type_info& castable_type  () { return get_typeid (get_castable_value (value)); }
   size_t                qualifier_mask () { return any_qualifier_mask<T>::value; }
-  bool                  null           () { return is_null (get_castable_value (value.get ())); }
+  bool                  null           () { return is_null (get_castable_value (value)); }
 
   dynamic_cast_root* get_dynamic_cast_root ()
   {
     using adl_defaults::get_root;
   
-    return get_unqualified_value (get_root (get_castable_value (value.get ())));
+    return get_unqualified_value (get_root (get_castable_value (value)));
   }
   
   void dump (stl::string& buffer)
   {
     using adl_defaults::to_string;
 
-    to_string (buffer, get_castable_value (value.get ()));
+    to_string (buffer, get_castable_value (value));
   }
   
   void set_content (const stl::string& buffer)
   {
     using adl_defaults::to_value;
 
-    to_value (buffer, get_castable_value (value.get ()));
+    to_value (buffer, get_castable_value (value));
   }
 
-  holder_type value;
+  base_type value;
 };
+
+#ifdef _MSC_VER
+  #pragma warning (pop)
+#endif
 
 /*
     Реализации вариативной переменной
@@ -466,7 +443,7 @@ inline const T* any::content () const
   if (&typeid (T) != &content_ptr->type ())
     return 0; //преобразование невозможно, из-за неэквивалентности базовых типов
     
-  return &static_cast<detail::any_content<T>*> (const_cast<detail::any_holder*> (content_ptr))->value.get ();
+  return &static_cast<detail::any_content<T>*> (const_cast<detail::any_holder*> (content_ptr))->value;
 }
 
 /*
@@ -533,6 +510,25 @@ inline T& try_lexical_cast (const stl::string&, type<reference_wrapper<T> >)
   throw bad_any_cast_internal (bad_any_cast::bad_to_reference_cast);
 }
 
+//попытка прямого приведения
+template <class Dst>
+inline Dst& try_direct_cast (any_holder* content_ptr, false_type)
+{
+  return static_cast<any_content<Dst>*> (content_ptr)->value;
+}
+
+template <class Dst>
+inline Dst& try_direct_cast (any_holder* content_ptr, true_type)
+{
+  throw bad_any_cast (bad_any_cast::bad_direct_cast, content_ptr->type (), typeid (Dst));
+}
+
+template <class Dst>
+inline Dst& try_direct_cast (any_holder* content_ptr)
+{
+  return try_direct_cast<Dst> (content_ptr, bool_constant<type_traits::is_abstract<Dst>::value> ());
+}
+
 }
 
 template <class T>
@@ -543,12 +539,12 @@ inline const T any::cast () const
     
   try
   {    
-    typedef typename type_traits::remove_reference<T>::type nonref;    
-    typedef typename detail::any_stored_type<nonref>::type  stored_type;  
-    
+    typedef typename type_traits::remove_reference<T>::type  nonref;
+    typedef typename detail::any_stored_type<nonref>::type   stored_type;
+
       //проверка возможности const_cast приведения
-    
-    static const size_t target_qualifier_mask = detail::any_qualifier_mask<nonref>::value;  
+
+    static const size_t target_qualifier_mask = detail::any_qualifier_mask<nonref>::value;
     
     bool is_lost_qualifiers = (content_ptr->qualifier_mask () & ~target_qualifier_mask) != 0;
 
@@ -565,7 +561,7 @@ inline const T any::cast () const
         throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));      
       }
     
-      return static_cast<detail::any_content<stored_type>*> (content_ptr)->value.get ();
+      return detail::try_direct_cast<stored_type> (content_ptr);
     }
       
       //попытка приведения из reference_wrapper
@@ -579,7 +575,7 @@ inline const T any::cast () const
         throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));      
       }
     
-      return static_cast<detail::any_content<reference_wrapper<stored_type> >*> (content_ptr)->value.get ();
+      return detail::try_direct_cast<reference_wrapper<stored_type> > (content_ptr);
     }
       
       //попытка приведения через dynamic_cast_root    

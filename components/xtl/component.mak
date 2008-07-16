@@ -1,7 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := XTL.STL.TESTS XTL.TR1.TESTS XTL.XTL.TESTS XTL.XTL.EXPORT XTL.MATH.TESTS
+#TARGETS := XTL.STL.TESTS XTL.TR1.TESTS XTL.XTL.TESTS XTL.XTL.EXPORT XTL.MATH.TESTS
+TARGETS := XTL.STL.TESTS XTL.TR1.TESTS XTL.XTL.TESTS XTL.XTL.EXPORT
 
 #Цель №1 - STL tests
 XTL.STL.TESTS.TYPE             := test-suite
