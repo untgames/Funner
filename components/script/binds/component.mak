@@ -1,25 +1,25 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := SCRIPT_BINDS_COMPONENTS SCRIPT_BINDS_TESTS
+TARGETS := SCRIPT.BINDS.SOURCES SCRIPT.BINDS.TESTS
 
 #Цель №1 - SCRIPT_BINDS sources
-SCRIPT_BINDS_COMPONENTS.TYPE             := static-lib
-SCRIPT_BINDS_COMPONENTS.NAME             := script.binds
-SCRIPT_BINDS_COMPONENTS.INCLUDE_DIRS     := include
-SCRIPT_BINDS_COMPONENTS.SOURCE_DIRS      := sources
-SCRIPT_BINDS_COMPONENTS.LIB_DIRS         :=  
-SCRIPT_BINDS_COMPONENTS.LIBS             := 
-SCRIPT_BINDS_COMPONENTS.COMPILER_CFLAGS  := 
-SCRIPT_BINDS_COMPONENTS.COMPILER_DEFINES := 
-SCRIPT_BINDS_COMPONENTS.IMPORTS				  := compile.static.mak ../core/compile.static.mak ../../scene_graph/compile.static.mak ../../common/compile.static.mak
+SCRIPT.BINDS.SOURCES.TYPE             := static-lib
+SCRIPT.BINDS.SOURCES.NAME             := script.binds
+SCRIPT.BINDS.SOURCES.INCLUDE_DIRS     := include
+SCRIPT.BINDS.SOURCES.SOURCE_DIRS      := sources
+SCRIPT.BINDS.SOURCES.LIB_DIRS         :=  
+SCRIPT.BINDS.SOURCES.LIBS             := 
+SCRIPT.BINDS.SOURCES.COMPILER_CFLAGS  := 
+SCRIPT.BINDS.SOURCES.COMPILER_DEFINES := 
+SCRIPT.BINDS.SOURCES.IMPORTS				  := compile.static.mak ../core/compile.static.mak ../../scene_graph/compile.static.mak ../../common/compile.static.mak
 
 #Цель №2 - SCRIPT_BINDS tests
-SCRIPT_BINDS_TESTS.TYPE             := test-suite
-SCRIPT_BINDS_TESTS.INCLUDE_DIRS     :=
-SCRIPT_BINDS_TESTS.SOURCE_DIRS      := tests/lua
-SCRIPT_BINDS_TESTS.LIB_DIRS         :=  
-SCRIPT_BINDS_TESTS.LIBS             :=
-SCRIPT_BINDS_TESTS.COMPILER_CFLAGS  := 
-SCRIPT_BINDS_TESTS.COMPILER_DEFINES :=
-SCRIPT_BINDS_TESTS.IMPORTS	  		  := compile.static.mak link.static.mak ../core/compile.static.mak  ../../common/compile.static.mak ../core/lua.link.static.mak
+SCRIPT.BINDS.TESTS.TYPE             := test-suite
+SCRIPT.BINDS.TESTS.INCLUDE_DIRS     :=
+SCRIPT.BINDS.TESTS.SOURCE_DIRS      := tests/lua
+SCRIPT.BINDS.TESTS.LIB_DIRS         :=  
+SCRIPT.BINDS.TESTS.LIBS             :=
+SCRIPT.BINDS.TESTS.COMPILER_CFLAGS  := 
+SCRIPT.BINDS.TESTS.COMPILER_DEFINES :=
+SCRIPT.BINDS.TESTS.IMPORTS	  		  := compile.static.mak link.static.mak ../core/compile.static.mak  ../../common/compile.static.mak ../core/lua.link.static.mak
