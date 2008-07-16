@@ -9,9 +9,12 @@ using namespace math;
 
 struct Sprite::Impl
 {
-  stl::string material; //имя материала
-  vec4f       color;    //цвет объекта
-  size_t      frame;    //номер кадра
+  SpriteDesc sprite_desc; //описание спрайта
+  
+  Impl ()
+  {
+    sprite_desc.frame = 0;
+  }
 };
 
 /*
@@ -37,38 +40,19 @@ Sprite::Pointer Sprite::Create ()
 }
 
 /*
-    Материал
-*/
-
-void Sprite::SetMaterial (const char* in_material)
-{
-  if (!in_material)
-    throw xtl::make_null_argument_exception ("scene_graph::Sprite::SetMaterial", "material");
-
-  impl->material = in_material;
-  
-  UpdateNotify ();
-}
-
-const char* Sprite::Material () const
-{
-  return impl->material.c_str ();
-}
-
-/*
    Установка номера кадра
 */
 
 void Sprite::SetFrame (size_t frame)
 {
-  impl->frame = frame;
+  impl->sprite_desc.frame = frame;
   
   UpdateNotify ();
 }
 
 size_t Sprite::Frame () const
 {
-  return impl->frame;
+  return impl->sprite_desc.frame;
 }
 
 /*
@@ -95,7 +79,7 @@ vec4f clamp (const vec4f& color)
 
 void Sprite::SetColor (const vec4f& color)
 {
-  impl->color = clamp (color);
+  impl->sprite_desc.color = clamp (color);
 
   UpdateNotify ();
 }
@@ -107,24 +91,24 @@ void Sprite::SetColor (float red, float green, float blue, float alpha)
 
 void Sprite::SetColor (float red, float green, float blue)
 {
-  SetColor (vec4f (red, green, blue, impl->color.w));
+  SetColor (vec4f (red, green, blue, impl->sprite_desc.color.w));
 }
 
 void Sprite::SetAlpha (float alpha)
 {
-  impl->color.w = clamp (alpha);
+  impl->sprite_desc.color.w = clamp (alpha);
 
   UpdateNotify ();
 }
 
 const vec4f& Sprite::Color () const
 {
-  return impl->color;
+  return impl->sprite_desc.color;
 }
 
 float Sprite::Alpha () const
 {
-  return impl->color.w;
+  return impl->sprite_desc.color.w;
 }
 
 /*
@@ -134,5 +118,19 @@ float Sprite::Alpha () const
 void Sprite::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);
+    SpriteModel::AcceptCore (visitor);
+}
+
+/*
+    Реализация получения количества спрайтов и массива спрайтов
+*/
+
+size_t Sprite::SpritesCountCore ()
+{
+  return 1;
+}
+
+const SpriteModel::SpriteDesc* Sprite::SpritesCore ()
+{
+  return &impl->sprite_desc;
 }

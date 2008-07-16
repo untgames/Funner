@@ -7,9 +7,9 @@ class MyVisitor: public visitor<void, SpriteList>
     {
       printf ("SpriteList (material='%s'):\n", sprite_list.Material ());
 
-      for (size_t i=0; i<sprite_list.Size (); i++)
+      for (size_t i=0; i<sprite_list.SpritesCount (); i++)
       {
-        const SpriteList::Item& s = sprite_list.Data ()[i];
+        const SpriteList::SpriteDesc& s = sprite_list.Sprites ()[i];
 
         printf ("  #%u: position=[%.0f %.0f %.0f] size=[%.0f %.0f] color=[%.2f %.2f %.2f %.2f] frame=%u\n",
           i, s.position.x, s.position.y, s.position.z, s.size.x, s.size.y, s.color.x, s.color.y, s.color.z, s.color.w, s.frame);
@@ -29,7 +29,7 @@ int main ()
 
   for (size_t i=0; i<10; i++)
   {
-    SpriteList::Item s;
+    SpriteList::SpriteDesc s;
     
     s.position = vec3f (float (i), 0, float (i));
     s.size     = vec2f (float (i * i), float (i));

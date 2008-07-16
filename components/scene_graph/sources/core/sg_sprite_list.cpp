@@ -7,12 +7,11 @@ using namespace math;
     Описание реализации списка спрайтов
 */
 
-typedef xtl::uninitialized_storage<SpriteList::Item> ItemArray;
+typedef xtl::uninitialized_storage<SpriteModel::SpriteDesc> SpriteDescArray;
 
 struct SpriteList::Impl
 {
-  stl::string material; //имя материала
-  ItemArray   items;    //массив спрайтов  
+  SpriteDescArray items;    //массив спрайтов  
 };
 
 /*
@@ -38,29 +37,15 @@ SpriteList::Pointer SpriteList::Create ()
 }
 
 /*
-    Материал
-*/
-
-void SpriteList::SetMaterial (const char* material)
-{
-  if (!material)
-    throw xtl::make_null_argument_exception ("scene_graph::SpriteList::SetMaterial", "material");
-    
-  impl->material = material;
-  
-  UpdateNotify ();
-}
-
-const char* SpriteList::Material () const
-{
-  return impl->material.c_str ();
-}
-
-/*
     Размер массива спрайтов
 */
 
-size_t SpriteList::Size () const
+size_t SpriteList::SpritesCount () const
+{
+  return impl->items.size ();
+}
+
+size_t SpriteList::SpritesCountCore ()
 {
   return impl->items.size ();
 }
@@ -85,26 +70,31 @@ void SpriteList::Reserve (size_t count)
     Массив спрайтов
 */
 
-const SpriteList::Item* SpriteList::Data () const
+const SpriteModel::SpriteDesc* SpriteList::Sprites () const
 {
   return impl->items.data ();
 }
 
-SpriteList::Item* SpriteList::Data ()
+const SpriteModel::SpriteDesc* SpriteList::SpritesCore ()
 {
-  return const_cast<Item*> (const_cast<const SpriteList&> (*this).Data ());
+  return impl->items.data ();
+}
+
+SpriteModel::SpriteDesc* SpriteList::Sprites ()
+{
+  return const_cast<SpriteDesc*> (const_cast<const SpriteList&> (*this).Sprites ());
 }
 
 /*
     Добавление спрайтов в массив
 */
 
-void SpriteList::Insert (const Item& item)
+void SpriteList::Insert (const SpriteDesc& SpriteDesc)
 {
-  Insert (1, &item);  
+  Insert (1, &SpriteDesc);  
 }
 
-void SpriteList::Insert (size_t items_count, const Item* items)
+void SpriteList::Insert (size_t items_count, const SpriteDesc* items)
 {
   if (items_count && !items)
     throw xtl::make_null_argument_exception ("scene_graph::SpriteList::Insert", "items");
@@ -116,7 +106,7 @@ void SpriteList::Insert (size_t items_count, const Item* items)
 
   impl->items.resize (impl->items.size () + items_count);
 
-  memcpy (impl->items.data () + old_size, items, items_count * sizeof (Item));
+  memcpy (impl->items.data () + old_size, items, items_count * sizeof (SpriteDesc));
 
   UpdateNotify ();
 }
@@ -137,7 +127,7 @@ void SpriteList::RemoveAll ()
 void SpriteList::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);
+    SpriteModel::AcceptCore (visitor);
 }
 
 /*
