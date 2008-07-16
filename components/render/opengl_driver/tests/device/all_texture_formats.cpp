@@ -1,6 +1,6 @@
 #include "shared.h"
 
- //Маски сравнения пикселей в результатах тестирования
+ //╠рёъш ёЁртэхэш  яшъёхыхщ т Ёхчєы№ЄрЄрї ЄхёЄшЁютрэш 
 
 size_t compare_mask [PixelFormat_Num][PixelFormat_Num];
 
@@ -151,7 +151,7 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
           case PixelFormat_DXT1:
           case PixelFormat_DXT3:
           case PixelFormat_DXT5:
-               //выравнивание размеров уровня по ближайшему снизу числу, делящемуся на 4
+               //т√Ёртэштрэшх ЁрчьхЁют єЁютэ  яю сышцрщ°хьє ёэшчє ўшёыє, фхы ∙хьєё  эр 4
 
             level_width  &= ~3;
             level_height &= ~3;
