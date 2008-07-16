@@ -113,7 +113,7 @@ inline void uninitialized_storage<T, Allocator>::reserve (size_type new_size, bo
   pointer new_buffer = allocate (new_size);
   
   if (need_copy && start)
-    memcpy (new_buffer, start, finish - start);
+    memcpy (new_buffer, start, (finish - start) * sizeof (T));
 
   if (start)
     deallocate (start, end_of_storage - start);
