@@ -14,6 +14,7 @@ struct Sprite::Impl
   Impl ()
   {
     sprite_desc.frame = 0;
+    sprite_desc.size  = vec2f (1.0f);
   }
 };
 
@@ -125,12 +126,12 @@ void Sprite::AcceptCore (Visitor& visitor)
     Реализация получения количества спрайтов и массива спрайтов
 */
 
-size_t Sprite::SpritesCountCore ()
+size_t Sprite::SpriteDescsCountCore ()
 {
   return 1;
 }
 
-const SpriteModel::SpriteDesc* Sprite::SpritesCore ()
+const SpriteModel::SpriteDesc* Sprite::SpriteDescsCore ()
 {
   return &impl->sprite_desc;
 }

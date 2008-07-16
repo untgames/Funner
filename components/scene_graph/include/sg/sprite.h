@@ -27,8 +27,8 @@ class SpriteModel: public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество спрайтов / получение массива спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t            SpritesCount () const;
-    const SpriteDesc* Sprites      () const;
+    size_t            SpriteDescsCount () const;
+    const SpriteDesc* SpriteDescs      () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Материал
@@ -52,8 +52,8 @@ class SpriteModel: public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация получения количества спрайтов и массива спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t            SpritesCountCore () = 0;
-    virtual const SpriteDesc* SpritesCore      () = 0;
+    virtual size_t            SpriteDescsCountCore () = 0;
+    virtual const SpriteDesc* SpriteDescsCore      () = 0;
     
   private:
     struct Impl;
@@ -106,8 +106,8 @@ class Sprite: public SpriteModel
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация получения количества спрайтов и массива спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t            SpritesCountCore ();
-    const SpriteDesc* SpritesCore      ();
+    size_t            SpriteDescsCountCore ();
+    const SpriteDesc* SpriteDescsCore      ();
 
   private:
     struct Impl;
@@ -177,8 +177,8 @@ class SpriteList: public SpriteModel
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация получения количества спрайтов и массива спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t            SpritesCountCore ();
-    const SpriteDesc* SpritesCore      ();
+    size_t            SpriteDescsCountCore ();
+    const SpriteDesc* SpriteDescsCore      ();
 
   private:
     struct Impl;

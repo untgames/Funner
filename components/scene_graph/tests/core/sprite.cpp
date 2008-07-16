@@ -5,7 +5,21 @@ class MyVisitor: public visitor<void, Sprite>
   public:
     void visit (Sprite& sprite)
     {
-      printf ("Sprite: material='%s' frame=%u alpha=%.1f\n", sprite.Material (), sprite.Frame (), sprite.Alpha ());
+      printf ("Sprite '%s': \n", sprite.Name ());
+      printf ("  material: '%s'\n", sprite.Material ());
+      printf ("  frame:    %u\n", sprite.Frame ());
+      printf ("  color:    [%.2f %.2f %.2f %.2f]\n", sprite.Color ().x, sprite.Color ().y, sprite.Color ().z, sprite.Color ().w);
+      printf ("  descs (count=%u):\n", sprite.SpriteDescsCount ());
+      
+      for (size_t i=0; i<sprite.SpriteDescsCount (); i++)
+      {
+        const SpriteModel::SpriteDesc& desc = sprite.SpriteDescs () [i];
+        
+        printf ("    position: [%.2f %.2f %.2f]\n", desc.position.x, desc.position.y, desc.position.z);
+        printf ("    size:     [%.2f %.2f]\n", desc.size.x, desc.size.y);
+        printf ("    frame:    %u\n", desc.frame);
+        printf ("    color:    [%.2f %.2f %.2f %.2f]\n", desc.color.x, desc.color.y, desc.color.z, desc.color.w);
+      }
     }
 };
 

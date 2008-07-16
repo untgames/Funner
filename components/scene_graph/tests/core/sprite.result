@@ -1,2 +1,10 @@
 Results of sprite_test:
-Sprite: material='material1' frame=12 alpha=0.5
+Sprite '': 
+  material: 'material1'
+  frame:    12
+  color:    [0.00 0.00 0.00 0.50]
+  descs (count=1):
+    position: [0.00 0.00 0.00]
+    size:     [1.00 1.00]
+    frame:    12
+    color:    [0.00 0.00 0.00 0.50]

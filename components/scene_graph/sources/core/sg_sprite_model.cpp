@@ -47,14 +47,14 @@ const char* SpriteModel::Material () const
      оличество спрайтов / получение массива спрайтов
 */
 
-size_t SpriteModel::SpritesCount () const
+size_t SpriteModel::SpriteDescsCount () const
 {
-  return const_cast<SpriteModel&> (*this).SpritesCountCore ();
+  return const_cast<SpriteModel&> (*this).SpriteDescsCountCore ();
 }
 
-const SpriteModel::SpriteDesc* SpriteModel::Sprites () const
+const SpriteModel::SpriteDesc* SpriteModel::SpriteDescs () const
 {
-  return const_cast<SpriteModel&> (*this).SpritesCore ();
+  return const_cast<SpriteModel&> (*this).SpriteDescsCore ();
 }
 
 /*

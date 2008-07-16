@@ -45,7 +45,7 @@ size_t SpriteList::SpritesCount () const
   return impl->items.size ();
 }
 
-size_t SpriteList::SpritesCountCore ()
+size_t SpriteList::SpriteDescsCountCore ()
 {
   return impl->items.size ();
 }
@@ -75,7 +75,7 @@ const SpriteModel::SpriteDesc* SpriteList::Sprites () const
   return impl->items.data ();
 }
 
-const SpriteModel::SpriteDesc* SpriteList::SpritesCore ()
+const SpriteModel::SpriteDesc* SpriteList::SpriteDescsCore ()
 {
   return impl->items.data ();
 }
