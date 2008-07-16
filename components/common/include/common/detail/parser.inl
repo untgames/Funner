@@ -234,7 +234,7 @@ template <class OutIter>
 inline size_t read_range (ParseLog& log, ParseNode* node, const char* tag, OutIter first, size_t count)
 {
   if (!node)
-    return;
+    return 0;
 
   if (tag)
   {
