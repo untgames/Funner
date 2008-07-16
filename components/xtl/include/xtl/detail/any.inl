@@ -140,7 +140,7 @@ template <class T> struct any_stored_type                    { typedef T type; }
 template <class T> struct any_stored_type<const T>           { typedef T type; };
 template <class T> struct any_stored_type<volatile T>        { typedef T type; };
 template <class T> struct any_stored_type<const volatile T>  { typedef T type; };
-template <class T> struct any_stored_type<T&>                { typedef typename any_stored_type<T>::type& type; };
+template <class T> struct any_stored_type<T&>                { typedef reference_wrapper<typename any_stored_type<T>::type> type; };
 template <class T> struct any_stored_type<T*>                { typedef typename any_stored_type<T>::type* type; };
 template <class T> struct any_stored_type<T* const>          { typedef typename any_stored_type<T>::type* type; };
 template <class T> struct any_stored_type<T* volatile>       { typedef typename any_stored_type<T>::type* type; };
@@ -494,6 +494,13 @@ inline T try_lexical_cast (const stl::string& buffer, type<T>)
 
 template <class T>
 inline T& try_lexical_cast (const stl::string&, type<T&>)
+{
+    //невозможно лексикографически приводить к ссылочным типам данных
+  throw bad_any_cast_internal (bad_any_cast::bad_to_reference_cast);
+}
+
+template <class T>
+inline T& try_lexical_cast (const stl::string&, type<reference_wrapper<T> >)
 {
     //невозможно лексикографически приводить к ссылочным типам данных
   throw bad_any_cast_internal (bad_any_cast::bad_to_reference_cast);
