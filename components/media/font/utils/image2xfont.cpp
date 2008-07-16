@@ -1,15 +1,18 @@
-#include <stdio.h>
+#include <cstdio>
 
 #include <stl/string>
+#include <stl/vector>
+
 #include <xtl/uninitialized_storage.h>
 
-#include <common/xml_writer.h>
-
 #include <media/image.h>
+#include <media/font.h>
 
 using namespace media;
 using namespace common;
-using stl::string;
+using namespace stl;
+
+const size_t DEFAULT_GLYPH_BUFFER_SIZE = 256;
 
 size_t GetBpp (PixelFormat pf)
 {
@@ -64,25 +67,24 @@ int main (int argc, char *argv[])
     if (!bpp)
       return 1;    
 
-    string bfs_file_name (argv [1], FileName (argv [1]));
+    string xfont_file_name (argv [1], FileName (argv [1]));
 
-    bfs_file_name += ".bfs";
+    xfont_file_name += ".xfont";
 
-    XmlWriter bfs_file (bfs_file_name.c_str ());
-    
     xtl::uninitialized_storage<char> mask_buffer (img.Width () * img.Height ());
+    stl::vector<GlyphInfo>           glyphs_buffer;
+    
+    glyphs_buffer.reserve (DEFAULT_GLYPH_BUFFER_SIZE);
+
+    Font font;
 
     char* mask = mask_buffer.data ();
 
     memset (mask, 1, mask_buffer.size ());
     
-    XmlNodeScope font_node (bfs_file, "Font");
-    
-    bfs_file.WriteAttribute ("Name", bfs_file_name.c_str ());
-    bfs_file.WriteAttribute ("FontFile", argv [1]);
-    bfs_file.WriteAttribute ("FirstCharCode", 0);
-    
-    XmlNodeScope glyphs_node (bfs_file, "Glyphs");
+    font.Rename            (xfont_file_name.c_str ());
+    font.SetImageName      (argv[1]);
+    font.SetFirstGlyphCode (0);
 
     mask [0] = 0;
 
@@ -119,17 +121,30 @@ int main (int argc, char *argv[])
               for (size_t n = 0; n < width; n++)
                 mask [(i + m) * img.Width () + j + n] = 0;
                 
-            XmlNodeScope glyph_node (bfs_file, "Glyph");
-  
-            bfs_file.WriteAttribute ("XPos",   j + 1);
-            bfs_file.WriteAttribute ("YPos",   i + 1);
-            bfs_file.WriteAttribute ("Width",  width - 2);
-            bfs_file.WriteAttribute ("Height", height - 2);
+            GlyphInfo glyph_info;
+
+            memset (&glyph_info, 0, sizeof (glyph_info));
+
+            glyph_info.x_pos  = j + 1;
+            glyph_info.y_pos  = i + 1;
+            glyph_info.width  = width - 2;
+            glyph_info.height = height - 2;
+            glyph_info.bearing_y = glyph_info.height;
+            glyph_info.advance_x = glyph_info.width;
+
+            glyphs_buffer.push_back (glyph_info);
 
             j += width - 1;
           }
       }
     }
+
+    font.ResizeGlyphsTable (glyphs_buffer.size ());
+
+    for (size_t i = 0; i < glyphs_buffer.size (); i++)
+      font.Glyphs ()[i] = glyphs_buffer[i];
+
+    font.Save (xfont_file_name.c_str ());
   }
   catch (std::exception& exception)
   {                                               

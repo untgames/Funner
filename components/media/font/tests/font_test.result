@@ -1,5 +1,11 @@
 Results of font_test:
-Font 'data/my_font.bfs' original name = 'data/my_font.bfs';new name = 'font_new_name'
-Font 'font_new_name' image name = 'my_font.bmp'
-glyphs count = 2, first glyph code = 31
-Kerning between 0 and 1 = 12, between 1 and 0 = 10
+<?xml version="1.0" encoding="utf-8"?>
+<Font Name="my_font.xfont" FontFile="my_font.bmp" FirstCharCode="31">
+  <Glyphs>
+    <Glyph XPos="1" YPos="18" Width="10" Height="16" BearingX="1" BearingY="10" AdvanceX="12" AdvanceY="0"/>
+    <Glyph XPos="15" YPos="18" Width="10" Height="16" BearingX="1" BearingY="10" AdvanceX="12" AdvanceY="0"/>
+  </Glyphs>
+  <Kernings>
+    <Kerning LeftGlyph="1" RightGlyph="0" XKerning="10" YKerning="0"/>
+  </Kernings>
+</Font>
