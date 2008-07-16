@@ -174,7 +174,7 @@ SpriteMaterial* Render::GetMaterial (const char* name)
     Работа с кэшем
 */
 
-Renderable* Render::GetRenderable (scene_graph::Sprite* entity)
+Renderable* Render::GetRenderable (scene_graph::SpriteModel* entity)
 {
     //попытка найти объект в кэше
 
@@ -185,7 +185,7 @@ Renderable* Render::GetRenderable (scene_graph::Sprite* entity)
 
     //создание нового спрайта
 
-  RenderablePtr renderable (new RenderableSprite (entity, *this), false);
+  RenderablePtr renderable (new RenderableSpriteModel (entity, *this), false);
 
   InsertRenderable (entity, renderable);
 

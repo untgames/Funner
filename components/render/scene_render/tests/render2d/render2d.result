@@ -19,5 +19,5 @@ Draw primitive (id=6)
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[0.00 0.00 0.00 0.00] tex_offset=[0.00 0.00] tex_size=[0.06 0.16]
 End draw frame (id=5)
 End draw frames (id=2, frame_id=0)
-Destroy 2D renderer (id=2)
 Destroy frame2d (id=5)
+Destroy 2D renderer (id=2)
