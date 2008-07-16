@@ -24,7 +24,7 @@ struct TestScene
       Sprite::Pointer sprite = Sprite::Create ();      
 
       sprite->SetName     (common::format ("Sprite%u", i+1).c_str ());
-      sprite->SetMaterial ("font_material");
+      sprite->SetMaterial ("burst_material");
       
       sprite->SetColor    (math::vec4f (frand (), frand (), frand ()));
       sprite->SetAlpha    (frand ());    
