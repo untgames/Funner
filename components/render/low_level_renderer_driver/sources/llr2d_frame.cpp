@@ -245,24 +245,36 @@ void Frame::DrawCore (render::low_level::IDevice* device)
   render::low_level::ITexture*     current_texture     = device->SSGetTexture (0);
   render::low_level::IBlendState*  current_blend_state = device->OSGetBlendState ();
   
-  for (size_t i = 0; i < blended_sprites_vertex_data_buffer.size (); i++)
+  for (size_t i = 0; i < blended_sprites_vertex_data_buffer.size ();)
   {
-    if (current_texture != blended_sprites_vertex_data_buffer[i]->texture)
+    size_t j = i + 1;
+
+    render::low_level::ITexture*     texture    = blended_sprites_vertex_data_buffer [i]->texture;
+    mid_level::renderer2d::BlendMode blend_mode = blended_sprites_vertex_data_buffer [i]->blend_mode;
+
+    for (; j < blended_sprites_vertex_data_buffer.size () && blended_sprites_vertex_data_buffer [j]->texture == texture &&
+           blended_sprites_vertex_data_buffer [j]->blend_mode == blend_mode; j++);
+
+    device->SSSetTexture (0, texture);
+
+    if (current_texture != texture)
     {
-      device->SSSetTexture (0, blended_sprites_vertex_data_buffer[i]->texture);
+      device->SSSetTexture (0, texture);
       
-      current_texture = blended_sprites_vertex_data_buffer[i]->texture;
+      current_texture = texture;
     }
-    
-    render::low_level::IBlendState* blend_state = common_resources->GetBlendState (blended_sprites_vertex_data_buffer[i]->blend_mode);
+
+    render::low_level::IBlendState* blend_state = common_resources->GetBlendState (blend_mode);
 
     if (current_blend_state != blend_state)
     {
       device->OSSetBlendState (blend_state);
-      
+
       current_blend_state = blend_state;
     }
 
-    device->Draw (render::low_level::PrimitiveType_TriangleList, i * 6, 6);
+    device->Draw (render::low_level::PrimitiveType_TriangleList, i * 6,  (j - i) * 6);
+    
+    i = j;
   }
 }
