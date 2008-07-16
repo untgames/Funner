@@ -64,7 +64,7 @@ void idle (TestApplication& app, TestScene& scene)
       for (size_t i=0; i<sprites_count; i++, sprite++)
         sprite->frame++;
 
-      scene.sprite_list->InvalidateData ();
+      scene.sprite_list->Invalidate ();
 
       last_update = clock ();
     }    
