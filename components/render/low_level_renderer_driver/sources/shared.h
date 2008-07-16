@@ -553,6 +553,10 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     size_t                        current_not_blended_sprites_vertex_buffer_size; //текущий размер вершинного буффера спрайтов без блендинга
     size_t                        current_blended_sprites_vertex_buffer_size;     //текущий размер вершинного буффера спрайтов с блендингом
     render::low_level::BufferDesc vertex_buffer_desc;
+    
+    typedef xtl::uninitialized_storage<RenderedSpriteVertex> RenderedSpriteVertexArray;
+    
+    RenderedSpriteVertexArray vertex_buffer_cache;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

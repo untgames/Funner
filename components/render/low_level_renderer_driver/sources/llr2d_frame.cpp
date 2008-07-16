@@ -126,38 +126,25 @@ void Frame::ReserveBlendedSpritesVertexBuffer (render::low_level::IDevice* devic
 
 void Frame::MakeVertexBuffer (SpriteVertexArray& vertex_data_array, BufferPtr& buffer)
 {
-  size_t base_offset = 0;
-  
-  RenderedSpriteVertex new_vertex;
+  vertex_buffer_cache.resize (vertex_data_array.size () * 6, false);
 
-  for (SpriteVertexArray::iterator iter = vertex_data_array.begin (), end = vertex_data_array.end (); iter < end; ++iter, base_offset += sizeof (RenderedSpriteVertex) * 6)
-  {     
-    new_vertex.color = (*iter)->color;
+  RenderedSpriteVertex* new_vertex = vertex_buffer_cache.data ();
 
-    new_vertex.position = (*iter)->vertices[0].position;
-    new_vertex.texcoord = (*iter)->vertices[0].texcoord;
-    buffer->SetData (base_offset,                                     sizeof (RenderedSpriteVertex), &new_vertex);
-
-    new_vertex.position = (*iter)->vertices[1].position;
-    new_vertex.texcoord = (*iter)->vertices[1].texcoord;
-    buffer->SetData (base_offset + sizeof (RenderedSpriteVertex),     sizeof (RenderedSpriteVertex), &new_vertex);
+  for (SpriteVertexArray::iterator iter = vertex_data_array.begin (), end = vertex_data_array.end (); iter != end; ++iter)
+  {
+    const SpriteVertexData& sprite_vertex_data = **iter;
     
-    new_vertex.position = (*iter)->vertices[2].position;
-    new_vertex.texcoord = (*iter)->vertices[2].texcoord;
-    buffer->SetData (base_offset + sizeof (RenderedSpriteVertex) * 2, sizeof (RenderedSpriteVertex), &new_vertex);
-    
-    new_vertex.position = (*iter)->vertices[3].position;
-    new_vertex.texcoord = (*iter)->vertices[3].texcoord;
-    buffer->SetData (base_offset + sizeof (RenderedSpriteVertex) * 3, sizeof (RenderedSpriteVertex), &new_vertex);
-    
-    new_vertex.position = (*iter)->vertices[2].position;
-    new_vertex.texcoord = (*iter)->vertices[2].texcoord;
-    buffer->SetData (base_offset + sizeof (RenderedSpriteVertex) * 4, sizeof (RenderedSpriteVertex), &new_vertex);
-    
-    new_vertex.position = (*iter)->vertices[1].position;
-    new_vertex.texcoord = (*iter)->vertices[1].texcoord;
-    buffer->SetData (base_offset + sizeof (RenderedSpriteVertex) * 5, sizeof (RenderedSpriteVertex), &new_vertex);
+    for (size_t j=0; j<6; j++, new_vertex++)
+    {
+      static size_t order [6] = {0, 1, 2, 3, 2, 1};
+      
+      new_vertex->color    = sprite_vertex_data.color;
+      new_vertex->position = sprite_vertex_data.vertices [order [j]].position;
+      new_vertex->texcoord = sprite_vertex_data.vertices [order [j]].texcoord;
+    }
   }
+
+  buffer->SetData (0, vertex_buffer_cache.size () * sizeof (RenderedSpriteVertex), vertex_buffer_cache.data ());
 }
 
 /*
