@@ -2,8 +2,6 @@
 
 const size_t SPRITES_COUNT = 200;
 
-typedef stl::vector<Sprite::Pointer> SpriteArray;
-
 float frand (float min_value=0.0f, float max_value=1.0f)
 {
   return min_value + float (rand ()) / RAND_MAX * (max_value - min_value);
@@ -11,39 +9,37 @@ float frand (float min_value=0.0f, float max_value=1.0f)
 
 struct TestScene
 {
-  SpriteArray          sprites;
+  SpriteList::Pointer  sprite_list;
   OrthoCamera::Pointer camera;
   Scene                scene;  
 
   TestScene ()
   {
-    sprites.reserve (SPRITES_COUNT);
+    sprite_list = SpriteList::Create ();    
     
+    sprite_list->SetName     ("SpriteList");
+    sprite_list->SetMaterial ("burst_material");
+    sprite_list->Reserve     (SPRITES_COUNT);
+    sprite_list->BindToScene (scene);
+
     for (size_t i=0; i<SPRITES_COUNT; i++)
     {
-      Sprite::Pointer sprite = Sprite::Create ();      
+      SpriteModel::SpriteDesc sprite;
 
-      sprite->SetName     (common::format ("Sprite%u", i+1).c_str ());
-      sprite->SetMaterial ("burst_material");
-      
-      sprite->SetColor    (math::vec4f (frand (), frand (), frand ()));
-      sprite->SetAlpha    (frand ());    
-      
-      float scale = frand (1, 4);
-      
-      sprite->Scale       (scale, scale, 1);
-      sprite->SetOrientation (frand () * 360.0f, 0, 0, 1);
-      sprite->BindToScene (scene); 
-      sprite->SetPosition (frand (-10, 10), frand (-10, 10), frand (-10, 10));
-      sprite->SetFrame    (rand ());
-      
-      sprites.push_back (sprite);
+      float scale = frand (1, 4);      
+
+      sprite.position = math::vec3f (frand (-10, 10), frand (-10, 10), frand (-10, 10));
+      sprite.size     = scale;
+      sprite.color    = math::vec4f (frand (), frand (), frand (), frand ());
+      sprite.frame    = rand ();  
+
+      sprite_list->Insert (sprite);
     }
 
     camera = OrthoCamera::Create ();    
     
     camera->BindToScene (scene, NodeBindMode_Capture);
-    camera->SetName ("Camera1");                
+    camera->SetName     ("Camera1");
     camera->SetPosition (0, 0, -3);
     camera->SetLeft     (-10);
     camera->SetRight    (10);
@@ -59,17 +55,17 @@ void idle (TestApplication& app, TestScene& scene)
   try
   {
     static clock_t last_update = 0;
-    
+
     if (clock () - last_update >= CLK_TCK / 25)
     {    
-      for (SpriteArray::iterator iter=scene.sprites.begin (), end=scene.sprites.end (); iter!=end; ++iter)
-      {
-        scene_graph::Sprite& sprite = **iter;
-        
-        sprite.Rotate (1, 0, 0, 1);
-        sprite.SetFrame ((*iter)->Frame () + 1);
-      }
-        
+      SpriteModel::SpriteDesc* sprite        = scene.sprite_list->Sprites ();
+      size_t                   sprites_count = scene.sprite_list->SpritesCount ();
+
+      for (size_t i=0; i<sprites_count; i++, sprite++)
+        sprite->frame++;
+
+      scene.sprite_list->InvalidateData ();
+
       last_update = clock ();
     }    
 
