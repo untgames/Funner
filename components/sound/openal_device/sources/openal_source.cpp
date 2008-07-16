@@ -426,7 +426,7 @@ void OpenALSource::BufferUpdate ()
       context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
 
       if (queued_buffers_count)
-        context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers); //FIXME: Invalid operation??? при проигрывании звука и малом размере буффера
+        context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers);
 
       play_sample_position = sound_sample.SecondsToSamples (Tell ());      
 

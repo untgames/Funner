@@ -45,7 +45,8 @@ class Driver : virtual public IDriver, public xtl::reference_counter
       }
       catch (...)
       {
-        DriverManager::UnregisterDriver (DRIVER_NAME); //??кидать ли исключение??
+        DriverManager::UnregisterDriver (DRIVER_NAME);
+        throw;
       }
     }
 
