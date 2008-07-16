@@ -140,7 +140,7 @@ template <class T> struct any_stored_type                    { typedef T type; }
 template <class T> struct any_stored_type<const T>           { typedef T type; };
 template <class T> struct any_stored_type<volatile T>        { typedef T type; };
 template <class T> struct any_stored_type<const volatile T>  { typedef T type; };
-template <class T> struct any_stored_type<T&>                { typedef reference_wrapper<typename any_stored_type<T>::type> type; };
+template <class T> struct any_stored_type<T&>                { typedef typename any_stored_type<T>::type& type; };
 template <class T> struct any_stored_type<T*>                { typedef typename any_stored_type<T>::type* type; };
 template <class T> struct any_stored_type<T* const>          { typedef typename any_stored_type<T>::type* type; };
 template <class T> struct any_stored_type<T* volatile>       { typedef typename any_stored_type<T>::type* type; };
@@ -260,7 +260,7 @@ struct any_holder
 };
 
 /*
-    Содержимое вариативной переменной
+    Объект, хранящий значение (испрользуется для корректной работы с неполными ссылочными типами)
 */
 
 #ifdef _MSC_VER
@@ -268,45 +268,72 @@ struct any_holder
   #pragma warning (disable:4624) //destructor could not be generated because a base class destructor is inaccessible
 #endif
 
+template <class T> class value_holder
+{
+  public:
+    template <class T1> value_holder (T1& in_value) : value (in_value) {}
+    
+    T& get () { return value; }
+    
+  private:
+    T value;
+};
+
+template <class T> class value_holder<T&>
+{
+  public:
+    template <class T1> value_holder (T1& in_value) : value (&in_value) {}
+    
+    T& get () { return *value; }
+    
+  private:
+    T* value;
+};
+
+#ifdef _MSC_VER
+  #pragma warning (pop)
+#endif
+
+/*
+    Содержимое вариативной переменной
+*/
+
 template <class T> struct any_content: public any_holder
 {
   typedef typename any_stored_type<T>::type base_type;
+  typedef value_holder<base_type>           holder_type;
 
   any_content (const T& in_value) : value (get_unqualified_value (in_value)) {}
 
   const std::type_info& type           () { return typeid (T); }
   const std::type_info& stored_type    () { return typeid (base_type); }
-  const std::type_info& castable_type  () { return get_typeid (get_castable_value (value)); }
+  const std::type_info& castable_type  () { return get_typeid (get_castable_value (value.get ())); }
   size_t                qualifier_mask () { return any_qualifier_mask<T>::value; }
-  bool                  null           () { return is_null (get_castable_value (value)); }
+  bool                  null           () { return is_null (get_castable_value (value.get ())); }
 
   dynamic_cast_root* get_dynamic_cast_root ()
   {
     using adl_defaults::get_root;
   
-    return get_unqualified_value (get_root (get_castable_value (value)));
+    return get_unqualified_value (get_root (get_castable_value (value.get ())));
   }
   
   void dump (stl::string& buffer)
   {
     using adl_defaults::to_string;
 
-    to_string (buffer, get_castable_value (value));
+    to_string (buffer, get_castable_value (value.get ()));
   }
   
   void set_content (const stl::string& buffer)
   {
     using adl_defaults::to_value;
-    
-    to_value (buffer, get_castable_value (value));
+
+    to_value (buffer, get_castable_value (value.get ()));
   }
 
-  base_type value;
+  holder_type value;
 };
-
-#ifdef _MSC_VER
-  #pragma warning (pop)
-#endif
 
 /*
     Реализации вариативной переменной
@@ -439,7 +466,7 @@ inline const T* any::content () const
   if (&typeid (T) != &content_ptr->type ())
     return 0; //преобразование невозможно, из-за неэквивалентности базовых типов
     
-  return &static_cast<const detail::any_content<T>*> (content_ptr)->value;
+  return &static_cast<detail::any_content<T>*> (const_cast<detail::any_holder*> (content_ptr))->value.get ();
 }
 
 /*
@@ -538,7 +565,7 @@ inline const T any::cast () const
         throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));      
       }
     
-      return static_cast<detail::any_content<stored_type>*> (content_ptr)->value;
+      return static_cast<detail::any_content<stored_type>*> (content_ptr)->value.get ();
     }
       
       //попытка приведения из reference_wrapper
