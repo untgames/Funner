@@ -10,5 +10,5 @@ DepthBits="16"
 StencilBits="8"
 FullScreen="0"
 BuffersCount="2"
-DeviceInitString="max_version=1.1 disable=*"
+DeviceInitString=""
 />

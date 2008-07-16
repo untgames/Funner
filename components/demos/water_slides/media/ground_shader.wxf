@@ -9,8 +9,8 @@ ObjectMatrix     myObjectMatrix
 
 AlphaCompareMode AlwaysPass
 
-DiffuseColor  1 1 1 0.5
-SpecularColor 1 1 1 0.5
+DiffuseColor  1 1 1 1
+SpecularColor 1 1 1 1
 Shininess     15
 
 Normalize 1

@@ -153,13 +153,14 @@ class TestView: public IGameView
 
       for (size_t i=0; i<GRID_SIZE-2; i++)
         current_device->DrawIndexed (PrimitiveType_TriangleStrip, i * indices_block_size, indices_block_size, 0);
-        
+
+      current_device->SSSetProgram        (ground_shader.get ());
       current_device->ISSetVertexBuffer   (0, rect_vertex_buffer.get ());      
       current_device->SSSetProgram        (ground_shader.get ());
       current_device->SSSetConstantBuffer (0, boat_constant_buffer.get ());
       current_device->SSSetTexture        (0, boat_texture.get ());
-//      current_device->Draw                (PrimitiveType_TriangleStrip, 0, 4);
-        
+      current_device->Draw                (PrimitiveType_TriangleStrip, 0, 4);
+
       current_device->OSSetBlendState (default_blend_state.get ());
       current_device->OSSetDepthStencilState (default_depth_stencil_state.get ());
     }
@@ -452,7 +453,7 @@ class TestView: public IGameView
 
       TexturePtr texture (current_device->CreateTexture (tex_desc), false);
 
-      texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, PixelFormat_RGB8, image.Bitmap ());      
+      texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, format, image.Bitmap ());      
 
       return texture;
     }
