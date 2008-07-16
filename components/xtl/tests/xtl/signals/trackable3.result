@@ -1,0 +1,4 @@
+Results of trackable3_test:
+c1 before t1 create: disconnected
+c1 after t1 create: connected
+c1 after t1 destroy: disconnected

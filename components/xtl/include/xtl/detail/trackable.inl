@@ -106,6 +106,19 @@ struct trackable_connection: public connection
     trackable_connection (connection_impl* impl) : connection (impl) {}
 };
 
+/*
+    Функтор разрыва соединения
+*/
+
+struct connection_disconnector
+{
+  connection_disconnector (const connection& in_c) : c (in_c) {}
+  
+  void operator () () { c.disconnect (); }
+
+  connection c;
+};
+
 }
 
 /*
@@ -141,6 +154,12 @@ inline connection trackable::connect_tracker (slot_type& s)
 inline connection trackable::connect_tracker (const function_type& fn, trackable& owner)
 {
   return detail::trackable_connection (new detail::dual_trackable_handler (fn, *this, owner));
+}
+
+//разрыв соединения при удалении объекта
+inline connection trackable::connect_tracker (const connection& c)
+{
+  return connect_tracker (function_type (detail::connection_disconnector (c)));
 }
 
 template <class Fn>

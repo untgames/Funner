@@ -30,6 +30,7 @@ class trackable
     connection connect_tracker (const function_type& handler);
     connection connect_tracker (slot_type& handler);
     connection connect_tracker (const function_type& handler, trackable& owner);
+    connection connect_tracker (const connection&); //разрыв соединения при удалении объекта
 
     template <class Fn> void disconnect_tracker (Fn);
 

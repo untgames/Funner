@@ -25,7 +25,7 @@ inline message_exception_base::message_exception_base (const char* in_source, co
   if (in_message)
     message += in_message;    
 
-  if (in_source)
+  if (in_source && *in_source)
     message_exception_base::touch (in_source);
 }
 
@@ -34,7 +34,7 @@ inline message_exception_base::message_exception_base (const char* source, const
   if (format)
     message.append_vformat (format, args);
     
-  if (source)
+  if (source && *source)
     message_exception_base::touch (source);
 }
 
@@ -62,7 +62,7 @@ inline void message_exception_base::touch (const char* format, ...) throw ()
 
 inline void message_exception_base::vtouch (const char* format, va_list args) throw ()
 {
-  if (!format)
+  if (!format || !*format)
     return;
 
   message.append         ("\n    at ");
