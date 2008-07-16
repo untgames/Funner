@@ -68,6 +68,13 @@ $(subst \,/,$1)
 endef
 
 ###################################################################################################
+#Формирование пути для выполнения программы (список путей к dll-файлам)
+###################################################################################################
+define build_execution_path
+$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$1,$(dir);)$$PATH))
+endef
+
+###################################################################################################
 #Перебор списка файлов (имя переменной с именем файла, список файлов, действие)
 ###################################################################################################
 define for_each_file
@@ -289,7 +296,7 @@ define process_target.application
 
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<)
+		@export PATH="$$(call build_execution_path,$$($1.DLL_DIRS))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<)
 endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
@@ -311,11 +318,11 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%.$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
-		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
+		@export PATH="$$(call build_execution_path,$$($1.DLL_DIRS))" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@export PATH="$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(PATH))" && cd $$($2.EXECUTION_DIR) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.$(EXE_SUFFIX)),$$^)),$$$$file)
+		@export PATH="$$(call build_execution_path,$$($1.DLL_DIRS))" && cd $$($2.EXECUTION_DIR) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%.$(EXE_SUFFIX)),$$^)),$$$$file)
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
