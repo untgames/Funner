@@ -25,7 +25,7 @@ class MyVisitor: public visitor<void, Sprite>
 
 int main ()
 {
-  printf ("Results of sprite_test:\n");
+  printf ("Results of sprite1_test:\n");
   
   Sprite::Pointer sprite (Sprite::Create ());
 

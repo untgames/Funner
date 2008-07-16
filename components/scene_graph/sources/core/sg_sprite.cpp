@@ -48,7 +48,7 @@ void Sprite::SetFrame (size_t frame)
 {
   impl->sprite_desc.frame = frame;
   
-  UpdateNotify ();
+  UpdateSpriteDescsNotify ();
 }
 
 size_t Sprite::Frame () const
@@ -82,7 +82,7 @@ void Sprite::SetColor (const vec4f& color)
 {
   impl->sprite_desc.color = clamp (color);
 
-  UpdateNotify ();
+  UpdateSpriteDescsNotify ();
 }
 
 void Sprite::SetColor (float red, float green, float blue, float alpha)
@@ -99,7 +99,7 @@ void Sprite::SetAlpha (float alpha)
 {
   impl->sprite_desc.color.w = clamp (alpha);
 
-  UpdateNotify ();
+  UpdateSpriteDescsNotify ();
 }
 
 const vec4f& Sprite::Color () const

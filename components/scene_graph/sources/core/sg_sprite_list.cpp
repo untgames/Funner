@@ -134,7 +134,7 @@ void SpriteList::AcceptCore (Visitor& visitor)
     Оповещение об обновлении данных
 */
 
-void SpriteList::InvalidateData ()
+void SpriteList::Invalidate ()
 {
-  UpdateNotify ();
+  UpdateSpriteDescsNotify ();
 }
