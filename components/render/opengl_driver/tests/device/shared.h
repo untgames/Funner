@@ -51,6 +51,18 @@ typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<IStateBlock>              StateBlockPtr;
 typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 
+// режим вывода логов
+enum OutputMode
+{
+  OutputMode_All,
+  OutputMode_SuccessOnly,
+  OutputMode_FailOnly,
+  
+  OutputMode_Default = OutputMode_All,
+  
+  OutputMode_Num
+};
+
 //тестовое приложение
 struct Test
 {
@@ -58,6 +70,7 @@ struct Test
   DriverPtr      driver;
   SwapChainPtr   swap_chain;
   DevicePtr      device;
+  OutputMode     log_mode;
   
   Test (const wchar_t* title, const char* init_string="") :
     window (syslib::WindowStyle_Overlapped, 400, 400), driver (DriverManager::FindDriver ("OpenGL"))
@@ -85,6 +98,20 @@ struct Test
 
     swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);
     device     = DevicePtr (driver->CreateDevice (&*swap_chain, init_string), false);    
+    
+    char* modestr = getenv("TestResultOutputMode");
+  
+    if (modestr)
+    {
+      if (!stricmp(modestr, "All"))
+        log_mode =  OutputMode_All;
+      if (!stricmp(modestr, "Success"))
+        log_mode = OutputMode_SuccessOnly;
+      if (!stricmp(modestr, "Failure"))
+        log_mode = OutputMode_FailOnly;
+    }
+    else
+      log_mode = OutputMode_Default;
   }
 };
 

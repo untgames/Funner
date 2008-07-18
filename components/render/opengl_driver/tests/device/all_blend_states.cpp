@@ -1,15 +1,6 @@
 #include "shared.h"
 
-enum OutputMode
-{
-  OutputMode_All,
-  OutputMode_SuccessOnly,
-  OutputMode_FailOnly,
-  
-  OutputMode_Num
-};
-
-const OutputMode MODE = OutputMode_All;
+OutputMode Mode = OutputMode_Default;
 
 void print_blend_desc(const BlendDesc& desc)
 {
@@ -18,11 +9,11 @@ void print_blend_desc(const BlendDesc& desc)
   printf(" Sample alpha to coverage: %s\n", desc.sample_alpha_to_coverage ? "yes" : "no");
   printf(" Color write mask: %02X\n", desc.color_write_mask);  
   printf("=====================================================================================================================================\n");
-  printf(" Channel | Operation | Source argument | Dest argument \n");
+  printf(" Channel | Operation                         | Source argument                       | Destination argument                  \n");
   printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
-  printf(" Color   | %-24s | %-24s | %-24s \n",
+  printf(" Color   | %-33s | %-37s | %-37s \n",
     get_name(desc.blend_color_operation), get_name(desc.blend_color_source_argument), get_name(desc.blend_color_destination_argument));
-  printf(" Alpha   | %-24s | %-24s | %-24s \n",
+  printf(" Alpha   | %-33s | %-37s | %-37s \n",
     get_name(desc.blend_alpha_operation), get_name(desc.blend_alpha_source_argument), get_name(desc.blend_alpha_destination_argument));
   printf("=====================================================================================================================================\n");
   fflush(stdout);
@@ -33,7 +24,7 @@ void test_blend_state(const BlendDesc& desc, IDevice* device)
   try
   {
     device->OSSetBlendState(device->CreateBlendState(desc));
-    if (MODE != OutputMode_FailOnly)
+    if (Mode != OutputMode_FailOnly)
     {
       print_blend_desc(desc);
       printf("Testing... OK\n");
@@ -41,7 +32,7 @@ void test_blend_state(const BlendDesc& desc, IDevice* device)
   }
   catch (std::exception& exception)
   {
-    if (MODE != OutputMode_SuccessOnly)
+    if (Mode != OutputMode_SuccessOnly)
     {
       print_blend_desc(desc);
       printf ("Testing... FAIL! exception: %s\n", exception.what ());
@@ -56,6 +47,8 @@ int main ()
   try
   {
     Test test (L"OpenGL device test window (all_blend_states test)");
+    
+    Mode = test.log_mode;
     
     BlendDesc desc;
     

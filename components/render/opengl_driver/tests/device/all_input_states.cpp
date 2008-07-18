@@ -1,15 +1,6 @@
 #include "shared.h"
 
-enum OutputMode
-{
-  OutputMode_All,
-  OutputMode_SuccessOnly,
-  OutputMode_FailOnly,
-  
-  OutputMode_Num
-};
-
-const OutputMode MODE = OutputMode_All;
+OutputMode Mode = OutputMode_Default;
 
 void print_input_layout_desc(const InputLayoutDesc& desc)
 {
@@ -46,7 +37,7 @@ void test_input_layout_desc(const InputLayoutDesc& desc, IDevice* device)
   {
     device->ISSetInputLayout(device->CreateInputLayout(desc));
     device->Draw(PrimitiveType_PointList, 0, 0);
-    if (MODE != OutputMode_FailOnly)
+    if (Mode != OutputMode_FailOnly)
     {
       print_input_layout_desc(desc);
       printf("Testing... OK\n");
@@ -54,7 +45,7 @@ void test_input_layout_desc(const InputLayoutDesc& desc, IDevice* device)
   }
   catch (std::exception& exception)
   {
-    if (MODE != OutputMode_SuccessOnly)
+    if (Mode != OutputMode_SuccessOnly)
     {
       print_input_layout_desc(desc);
       printf ("Testing... FAIL! exception: %s\n", exception.what ());
@@ -69,6 +60,8 @@ int main ()
   try
   {
     Test test (L"OpenGL device test window (all_input_states_test)");
+    
+    Mode = test.log_mode;
     
     InputLayoutDesc desc;
     BufferDesc index, vertex;
