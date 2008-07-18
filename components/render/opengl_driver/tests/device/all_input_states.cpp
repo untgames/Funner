@@ -1,5 +1,16 @@
 #include "shared.h"
 
+enum OutputMode
+{
+  OutputMode_All,
+  OutputMode_SuccessOnly,
+  OutputMode_FailOnly,
+  
+  OutputMode_Num
+};
+
+const OutputMode MODE = OutputMode_All;
+
 void print_input_layout_desc(const InputLayoutDesc& desc)
 {
   static const char* header_names[] = {"Buffer", "Data type", "Data format", "Semantic", "Slot", "Offset", "Stride"};
@@ -31,17 +42,23 @@ void print_input_layout_desc(const InputLayoutDesc& desc)
 
 void test_input_layout_desc(const InputLayoutDesc& desc, IDevice* device)
 {
-  print_input_layout_desc(desc);
-  printf("Testing...");
   try
   {
     device->ISSetInputLayout(device->CreateInputLayout(desc));
     device->Draw(PrimitiveType_PointList, 0, 0);
-    printf("OK\n");
+    if (MODE != OutputMode_FailOnly)
+    {
+      print_input_layout_desc(desc);
+      printf("Testing... OK\n");
+    }
   }
   catch (std::exception& exception)
   {
-    printf ("FAIL! exception: %s\n", exception.what ());
+    if (MODE != OutputMode_SuccessOnly)
+    {
+      print_input_layout_desc(desc);
+      printf ("Testing... FAIL! exception: %s\n", exception.what ());
+    }
   }
 }
 
