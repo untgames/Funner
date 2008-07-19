@@ -102,8 +102,8 @@ class Viewport
 ///Границы области вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void        SetArea   (const Rect& rect);
-    void        SetArea   (size_t left, size_t top, size_t width, size_t height);    
-    void        SetOrigin (size_t left, size_t top);
+    void        SetArea   (int left, int top, size_t width, size_t height);    
+    void        SetOrigin (int left, int top);
     void        SetSize   (size_t width, size_t height);
     const Rect& Area      () const;
 

@@ -236,12 +236,12 @@ void Viewport::SetArea (const Rect& rect)
   impl->ChangeAreaNotify (impl->rect);
 }
 
-void Viewport::SetArea (size_t left, size_t top, size_t width, size_t height)
+void Viewport::SetArea (int left, int top, size_t width, size_t height)
 {
   SetArea (Rect (left, top, width, height));
 }
 
-void Viewport::SetOrigin (size_t left, size_t top)
+void Viewport::SetOrigin (int left, int top)
 {
   Rect new_rect = impl->rect;
   
