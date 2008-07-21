@@ -2,8 +2,6 @@ Results of desktop_test:
 MyDesktopListener::MyDesktopListener
 OnChangeBackgroundColor(0.50, 0.25, 1.00, 0.30)
 OnChangeName(Desktop1)
-OnChangeArea (-100, -100, 100, 100)
-OnChangeArea (-100, -100, 1000, 1000)
 OnAttachViewport(Viewport1)
 OnAttachViewport(Viewport2)
 Desktop 'Desktop1' viewports (count=2): 'Viewport1' 'Viewport2'

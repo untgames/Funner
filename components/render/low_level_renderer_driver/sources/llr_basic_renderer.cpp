@@ -122,6 +122,11 @@ IRenderTarget* BasicRenderer::CreateRenderBuffer ()
   return new RenderTarget (render_target_view.get (), RenderTargetType_Color);
 }
 
+IClearFrame* BasicRenderer::CreateClearFrame ()
+{
+  return new ClearFrame;
+}
+
 /*
    ƒобавление кадра в список отрисовки
 */
@@ -161,8 +166,8 @@ void BasicRenderer::DrawFrames ()
     //очистка списка кадров
     
   frames.clear ();
-  
-    //вывод сформированной картинки
+
+    //вывод сформированной картинки    
 
   swap_chain->Present ();
 }

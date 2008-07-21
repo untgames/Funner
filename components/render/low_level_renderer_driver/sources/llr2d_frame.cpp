@@ -174,7 +174,7 @@ void Frame::DrawCore (render::low_level::IDevice* device)
   //Подготовка вершинных буфферов
 
   not_blended_sprites_vertex_data_buffer.clear ();
-  blended_sprites_vertex_data_buffer.clear ();
+  blended_sprites_vertex_data_buffer.clear ();  
 
   for (PrimitiveArray::iterator iter=primitives.begin (), end=primitives.end (); iter!=end; ++iter)
   {
@@ -228,7 +228,7 @@ void Frame::DrawCore (render::low_level::IDevice* device)
 
   device->ISSetVertexBuffer      (0, blended_sprites_vertex_buffer.get ());
   device->OSSetDepthStencilState (common_resources->GetDepthStencilState (false));
-  
+
   render::low_level::ITexture*     current_texture     = device->SSGetTexture (0);
   render::low_level::IBlendState*  current_blend_state = device->OSGetBlendState ();
   
@@ -258,7 +258,7 @@ void Frame::DrawCore (render::low_level::IDevice* device)
       device->OSSetBlendState (blend_state);
 
       current_blend_state = blend_state;
-    }
+    }    
 
     device->Draw (render::low_level::PrimitiveType_TriangleList, i * 6,  (j - i) * 6);
     

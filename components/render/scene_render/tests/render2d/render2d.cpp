@@ -51,7 +51,13 @@ int main ()
     vp1.SetCamera     (&*camera);
     vp1.SetRenderPath ("Render2d");
 
-    render.Attach (vp1);
+    Desktop desktop;
+
+    desktop.Attach (vp1);
+
+    RenderTarget render_target = render.CreateRenderTarget ("default", "default");    
+
+    render_target.SetDesktop (&desktop);    
     
       //загрузка ресурсов
       
@@ -59,7 +65,7 @@ int main ()
     
       //отрисовка
       
-    render.Draw ();
+    render_target.Update ();
   }
   catch (std::exception& exception)
   {

@@ -52,20 +52,6 @@ IRenderView* Render::CreateRenderView (scene_graph::Scene* scene)
 }
 
 /*
-    Установка цвета очистка буфера кадра
-*/
-
-void Render::SetBackgroundColor (const math::vec4f& color)
-{
-  clear_color = color;
-}
-
-void Render::GetBackgroundColor (math::vec4f& color)
-{
-  color = clear_color;
-}
-
-/*
     Установка функции отладочного протоколирования
 */
 

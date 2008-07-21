@@ -9,11 +9,8 @@ using namespace render::mid_level::debug;
 */
 
 BasicFrame::BasicFrame ()
-  : need_clear_render_target (false),
-    need_clear_depth_stencil_target (false),
-    clear_depth_value (0.0f),
-    clear_stencil_index (0)
 {
+  memset (&viewport, 0, sizeof viewport);
 }
 
 /*
@@ -76,44 +73,6 @@ void BasicFrame::GetViewport (Viewport& out_viewport)
 }
 
 /*
-    Параметры очистки целевых буферов
-*/
-
-void BasicFrame::SetClearBuffers (bool clear_render_target, bool clear_depth_stencil_target)
-{
-  need_clear_render_target        = clear_render_target;
-  need_clear_depth_stencil_target = clear_depth_stencil_target;
-}
-
-void BasicFrame::GetClearBuffers (bool& clear_render_target, bool& clear_depth_stencil_target)
-{
-  clear_render_target        = need_clear_render_target;
-  clear_depth_stencil_target = need_clear_depth_stencil_target;  
-}
-
-void BasicFrame::SetClearColor (const math::vec4f& color)
-{
-  clear_color = color;
-}
-
-void BasicFrame::SetClearDepthStencil (float depth_value, unsigned char stencil_index)
-{
-  clear_depth_value   = depth_value;
-  clear_stencil_index = stencil_index;
-}  
-
-void BasicFrame::GetClearColor (math::vec4f& color)
-{
-  color = clear_color;
-}
-
-void BasicFrame::GetClearDepthStencil (float& depth_value, unsigned char& stencil_index)
-{
-  depth_value   = clear_depth_value;
-  stencil_index = clear_stencil_index;
-}
-
-/*
     Визуализация
 */
 
@@ -141,14 +100,6 @@ void BasicFrame::Draw ()
   {
     log.Printf ("Set render targets: render-target=none, depth-stencil-target=none");
   }
-
-    //очистка целевых буферов отрисовки  
-
-  if (need_clear_render_target && render_target)
-    log.Printf ("Clear render target [%.2f %.2f %.2f %.2f]", clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    
-  if (need_clear_depth_stencil_target && depth_stencil_target)
-    log.Printf ("Clear depth-stencil target [%.3f %u]", clear_depth_value, clear_stencil_index);
 
     //собственно отрисовка
 

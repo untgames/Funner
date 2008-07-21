@@ -94,17 +94,6 @@ class MySceneRender: public ICustomSceneRender, public xtl::reference_counter
       return new MyRenderView;
     }
 
-///Установка цвета очистка буфера кадра
-    void SetBackgroundColor (const math::vec4f& color)
-    {
-      printf ("SetBackgroundColor(%.2f, %.2f, %.2f, %.2f)\n", color.x, color.y, color.z, color.w);
-    }
-    
-    void GetBackgroundColor (math::vec4f&)
-    {
-      throw xtl::make_not_implemented_exception ("MyRenderView::GetBackgroundColor");
-    }
-
 ///Работа с ресурсами
     void LoadResource (const char* tag, const char* file_name)
     {
@@ -170,20 +159,25 @@ int main ()
     render.SetLogHandler (&log_print);
     
     Viewport vp1;
+    Desktop desktop;
 
     vp1.SetArea       (0, 0, 100, 100);
     vp1.SetCamera     (&*camera1);
     vp1.SetRenderPath ("MySceneRender");
-
-    render.Attach (vp1);
-
+    
+    desktop.Attach (vp1);
+    
+    RenderTarget render_target = render.CreateRenderTarget ("default", "default");
+    
+    render_target.SetDesktop (&desktop);
+    
       //загрузка ресурсов
 
     render.LoadResource ("data/materials.xmtl");
 
       //отрисовка
 
-    render.Draw ();
+    render_target.Update ();
     
       //присоединение камеры к сцене
       
@@ -197,7 +191,7 @@ int main ()
     camera1->BindToScene (scene1);
     camera2->BindToScene (scene2);
 
-    render.Draw ();
+    render_target.Update ();
     
       //смена сцены
       
@@ -205,7 +199,7 @@ int main ()
 
     camera1->BindToScene (scene2);
 
-    render.Draw ();
+    render_target.Update ();
     
       //изменение камеры
       
@@ -215,7 +209,7 @@ int main ()
 
     camera1->BindToScene (scene1);
 
-    render.Draw ();    
+    render_target.Update ();    
     
       //отсоединение камеры от сцены
       
@@ -223,7 +217,7 @@ int main ()
     
     camera2->Unbind ();
     
-    render.Draw ();
+    render_target.Update ();
   }
   catch (std::exception& exception)
   {

@@ -63,8 +63,6 @@ void Primitive::SetTexture (render::mid_level::renderer2d::ITexture* in_texture)
   {
     render::mid_level::low_level_driver::renderer2d::RenderTargetTexture* render_target_texture = dynamic_cast<RenderTargetTexture*> (in_texture);
 
-    render_target_texture = dynamic_cast<RenderTargetTexture*> (in_texture);
-
     if (!render_target_texture)
       throw xtl::make_argument_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::SetTexture", "texture", typeid (in_texture).name (),
         "Texture type must be render::mid_level::low_level_driver::renderer2d::ImageTexture or render::mid_level::low_level_driver::renderer2d::RenderTargetTexture");

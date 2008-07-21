@@ -8,6 +8,7 @@ Create frame2d (id=8)
 Begin draw frames (id=2, frame_id=0)
 Begin draw frame (id=8)
 Set render targets: render-target=3, depth-stencil-target=4
+Set viewport (left=0, top=0, width=100, height=100)
 Projection matrix=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
 View matrix=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
 Draw primitive (id=6)
@@ -30,9 +31,9 @@ Draw primitive (id=7)
     sprite #3: position=[3.00 3.00 3.00] size=[1.00 9.00] color=[0.00 1.00 0.00 3.00] tex_offset=[0.00 0.00] tex_size=[0.50 0.50]
 End draw frame (id=8)
 End draw frames (id=2, frame_id=0)
-Destroy 2D renderer (id=2)
 Destroy frame2d (id=8)
-Destroy primitive (id=6)
 Destroy primitive (id=7)
+Destroy primitive (id=6)
 Destroy texture2d (id=5)
+Destroy 2D renderer (id=2)
 Destroy debug driver

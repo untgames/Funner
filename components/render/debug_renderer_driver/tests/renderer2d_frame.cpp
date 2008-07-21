@@ -63,8 +63,16 @@ int main ()
       
     Frame2dPtr frame (renderer->CreateFrame (), false);
     
-    frame->SetRenderTargets (renderer->GetColorBuffer (), renderer->GetDepthStencilBuffer ());
+    Viewport viewport;
+
+    viewport.x      = 0;
+    viewport.y      = 0;    
+    viewport.width  = 100;
+    viewport.height = 100;
     
+    frame->SetRenderTargets (renderer->GetColorBuffer (), renderer->GetDepthStencilBuffer ());
+    frame->SetViewport      (viewport);
+            
     frame->AddPrimitive (primitive1.get ());
     frame->AddPrimitive (primitive2.get ());
     

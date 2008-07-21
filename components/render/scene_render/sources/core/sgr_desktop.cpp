@@ -11,8 +11,6 @@ namespace
 
 const size_t VIEWPORT_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива областей вывода
 const size_t LISTENER_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива слушателей
-const size_t DEFAULT_AREA_WIDTH          = 100; //ширина рабочего пространства по умолчанию
-const size_t DEFAULT_AREA_HEIGHT         = 100; //высота рабочего пространства по умолчанию
 
 }
 
@@ -28,11 +26,10 @@ struct Desktop::Impl: public xtl::reference_counter
 {
   stl::string   name;             //имя рабочего стола
   math::vec4f   background_color; //цвет фона
-  Rect          area;             //рабочее пространство
   ViewportArray viewports;        //области вывода
   ListenerArray listeners;        //слушатели
 
-  Impl () : area (0, 0, DEFAULT_AREA_WIDTH, DEFAULT_AREA_HEIGHT)
+  Impl ()
   {
     viewports.reserve (VIEWPORT_ARRAY_RESERVE_SIZE);
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
@@ -62,11 +59,6 @@ struct Desktop::Impl: public xtl::reference_counter
   void ChangeNameNotify (const char* new_name)
   {
     Notify (xtl::bind (&IDesktopListener::OnChangeName, _1, new_name));
-  }
-  
-  void ChangeAreaNotify (const Rect& new_area)
-  {
-    Notify (xtl::bind (&IDesktopListener::OnChangeArea, _1, xtl::cref (new_area)));
   }
   
   void ChangeBackgroundColorNotify (const math::vec4f& color)
@@ -170,40 +162,6 @@ void Desktop::SetBackgroundColor (float red, float green, float blue, float alph
 const math::vec4f& Desktop::BackgroundColor () const
 {
   return impl->background_color;
-}
-
-/*
-    Границы области вывода
-*/
-
-void Desktop::SetArea (const Rect& rect)
-{
-  if (impl->area.left == rect.left && impl->area.top == rect.top && impl->area.width == rect.width && impl->area.height == rect.height)
-    return;
-
-  impl->area = rect;
-  
-  impl->ChangeAreaNotify (impl->area);
-}
-
-void Desktop::SetArea (int left, int top, size_t width, size_t height)
-{
-  SetArea (Rect (left, top, width, height));
-}
-
-void Desktop::SetOrigin (int left, int top)
-{
-  SetArea (Rect (left, top, impl->area.width, impl->area.height));
-}
-
-void Desktop::SetSize (size_t width, size_t height)
-{
-  SetArea (Rect (impl->area.left, impl->area.top, width, height));
-}
-
-const Rect& Desktop::Area () const
-{
-  return impl->area;
 }
 
 /*

@@ -41,7 +41,6 @@ struct Viewport::Impl: public xtl::reference_counter
   stl::string          name;              //имя области вывода
   scene_graph::Camera* camera;            //камера
   stl::string          path_name;         //имя пути рендеринга
-  size_t               path_name_hash;    //хэш имени пути рендеринга
   Rect                 rect;              //границы области вывода
   bool                 is_active;         //флаг активности области вывода
   int                  z_order;           //порядок отрисовки области вывода
@@ -51,8 +50,6 @@ struct Viewport::Impl: public xtl::reference_counter
 
   Impl () : camera (0), is_active (true), z_order (INT_MAX)
   {
-    path_name_hash = common::strhash (path_name.c_str ());
-    
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
   }
 
@@ -206,8 +203,7 @@ void Viewport::SetRenderPath (const char* path_name)
   if (impl->path_name == path_name)
     return;
     
-  impl->path_name      = path_name;
-  impl->path_name_hash = common::strhash (path_name);
+  impl->path_name = path_name;
   
   impl->ChangeRenderPathNotify (impl->path_name.c_str ());
 }
@@ -215,11 +211,6 @@ void Viewport::SetRenderPath (const char* path_name)
 const char* Viewport::RenderPath () const
 {
   return impl->path_name.c_str ();
-}
-
-size_t Viewport::RenderPathHash () const
-{
-  return impl->path_name_hash;
 }
 
 /*

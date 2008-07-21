@@ -10,8 +10,10 @@ int main ()
     
     printf ("renderer: %s\n", render.RendererDescription ());
     printf ("paths:    %s\n", render.RenderPaths ());
+    
+    RenderTarget render_target = render.CreateRenderTarget ("default", "default");    
 
-    const Rect& window = render.Window ();
+    const Rect& window = render_target.Area ();
     
     printf ("window:   left=%u top=%u width=%u height=%u\n", window.left, window.top, window.width, window.height);    
   }

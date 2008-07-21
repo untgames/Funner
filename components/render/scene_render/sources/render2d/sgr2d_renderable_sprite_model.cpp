@@ -20,6 +20,10 @@ RenderableSpriteModel::RenderableSpriteModel (scene_graph::SpriteModel* in_model
   connect_tracker (model->RegisterEventHandler (SpriteModelEvent_AfterMaterialUpdate, xtl::bind (&RenderableSpriteModel::UpdateMaterialNotify, this)));
 }
 
+RenderableSpriteModel::~RenderableSpriteModel ()
+{
+}
+
 /*
     Оповещения об обновлении модели
 */

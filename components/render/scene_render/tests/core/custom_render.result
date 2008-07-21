@@ -2,7 +2,6 @@ Results of custom_render_test:
 MySceneRender::Create(render::mid_level::debug::renderer2d::Renderer, MySceneRender)
 MySceneRender::MySceneRender
 LoadResource(auto, data/materials.xmtl)
-SetBackgroundColor(0.00, 0.00, 0.00, 0.00)
 Bind camera to scene
 CreateRenderView('Scene1')
 MyRenderView #1: Create view

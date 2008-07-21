@@ -74,6 +74,11 @@ IRenderTarget* BasicRenderer::CreateRenderBuffer ()
   return new RenderTarget (SCREEN_WIDTH, SCREEN_HEIGHT, RenderTargetType_Color);
 }
 
+IClearFrame* BasicRenderer::CreateClearFrame ()
+{
+  return new ClearFrame;
+}
+
 /*
    ƒобавление кадра в список отрисовки
 */

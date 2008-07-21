@@ -44,11 +44,11 @@ typedef mid_level::renderer2d::ITexture    ITexture;
 typedef mid_level::renderer2d::BlendMode   BlendMode;
 typedef media::rfx::SpriteMaterial         SpriteMaterial;
 
-typedef xtl::com_ptr<IPrimitive>     PrimitivePtr;
-typedef xtl::com_ptr<IRenderer>      RendererPtr;
-typedef xtl::com_ptr<IFrame>         FramePtr;
-typedef xtl::com_ptr<ITexture>       TexturePtr;
-typedef xtl::com_ptr<SpriteMaterial> SpriteMaterialPtr;
+typedef xtl::com_ptr<IPrimitive>  PrimitivePtr;
+typedef xtl::com_ptr<IRenderer>   RendererPtr;
+typedef xtl::com_ptr<IFrame>      FramePtr;
+typedef xtl::com_ptr<ITexture>    TexturePtr;
+typedef SpriteMaterial::Pointer   SpriteMaterialPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовый визуализируемый объект
@@ -59,7 +59,8 @@ class Renderable: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Renderable (scene_graph::Entity*);
+            Renderable  (scene_graph::Entity*);
+    virtual ~Renderable () {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование
@@ -95,6 +96,7 @@ class RenderableSpriteModel: public Renderable, public xtl::trackable
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     RenderableSpriteModel (scene_graph::SpriteModel* model, Render& render);
+    ~RenderableSpriteModel ();
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -190,12 +192,6 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     IRenderView* CreateRenderView (scene_graph::Scene* scene);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка цвета очистка буфера кадра
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetBackgroundColor (const math::vec4f& color);
-    void GetBackgroundColor (math::vec4f& color);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с ресурсами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void LoadResource (const char* tag, const char* file_name);
@@ -261,7 +257,6 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr>        TextureMap;
 
   private:
-    math::vec4f   clear_color;       //цвет очистки
     LogFunction   log_handler;       //функция протоколирования
     RendererPtr   renderer;          //система рендеринга
     RenderableMap renderables_cache; //кэш визуализируемых объектов

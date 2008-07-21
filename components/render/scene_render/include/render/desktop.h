@@ -16,7 +16,6 @@ class IDesktopListener
 ///События
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnChangeName            (const char* new_name) {}
-    virtual void OnChangeArea            (const Rect& new_area) {}
     virtual void OnChangeBackgroundColor (const math::vec4f& new_color) {}
     virtual void OnAttachViewport        (Viewport&) {}
     virtual void OnDetachViewport        (Viewport&) {}
@@ -64,15 +63,6 @@ class Desktop
     void               SetBackgroundColor (const math::vec4f& color);
     void               SetBackgroundColor (float red, float green, float blue, float alpha=0.0f);
     const math::vec4f& BackgroundColor    () const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Границы области вывода
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetArea   (const Rect& rect);
-    void        SetArea   (int left, int top, size_t width, size_t height);    
-    void        SetOrigin (int left, int top);
-    void        SetSize   (size_t width, size_t height);
-    const Rect& Area      () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление областей вывода

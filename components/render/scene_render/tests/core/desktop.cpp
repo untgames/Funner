@@ -12,11 +12,6 @@ class MyDesktopListener: public IDesktopListener, public xtl::reference_counter
       printf ("OnChangeName(%s)\n", new_name);
     }
     
-    void OnChangeArea (const Rect& new_area)
-    {
-      printf ("OnChangeArea (%d, %d, %u, %u)\n", new_area.left, new_area.top, new_area.width, new_area.height);
-    }
-
     void OnChangeBackgroundColor (const math::vec4f& new_color)
     {
       printf ("OnChangeBackgroundColor(%.2f, %.2f, %.2f, %.2f)\n", new_color.x, new_color.y, new_color.z, new_color.w);
@@ -69,8 +64,6 @@ int main ()
       
     desktop1.SetBackgroundColor (0.5f, 0.25f, 1.0f, 0.3f);
     desktop1.SetName            ("Desktop1");
-    desktop1.SetOrigin          (-100, -100);
-    desktop1.SetSize            (1000, 1000);
 
       //присоединение областей вывода
       

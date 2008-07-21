@@ -16,7 +16,7 @@ const size_t SPRITES_COUNT  = 500;
 
 float rotation_angle = 0;
 
-void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* renderer, render::mid_level::renderer2d::IFrame* frame, IPrimitive* primitive)
+void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* renderer, render::mid_level::renderer2d::IFrame* frame, render::mid_level::IClearFrame* clear_frame, IPrimitive* primitive)
 {
   if (window.IsClosed ())
     return;
@@ -33,7 +33,8 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
   }
 
   primitive->SetTransform (rotatef (rotation_angle, 0, 0, 1));
-  
+
+  renderer->AddFrame (clear_frame);  
   renderer->AddFrame (frame);
      
   rotation_angle += 0.05f;
@@ -112,7 +113,8 @@ int main ()
     if (!renderer)
       throw xtl::format_operation_exception ("", "No 2d renderer");
 
-    xtl::com_ptr<render::mid_level::renderer2d::IFrame> frame (dynamic_cast<render::mid_level::renderer2d::IFrame*> (renderer->CreateFrame ()), false);
+    xtl::com_ptr<render::mid_level::IClearFrame>        clear_frame (renderer->CreateClearFrame (), false);
+    xtl::com_ptr<render::mid_level::renderer2d::IFrame> frame (renderer->CreateFrame (), false);    
 
     if (!frame)
       throw xtl::format_operation_exception ("", "Can't create 2d frame");
@@ -125,6 +127,7 @@ int main ()
     primitive->SetTexture (texture.get ());
 
 //    primitive->SetBlendMode (BlendMode_Translucent);
+//    primitive->SetBlendMode (BlendMode_Additive);
 
     for (size_t i = 0; i < SPRITES_COUNT; i++)
     {
@@ -142,15 +145,18 @@ int main ()
     // building frame
 
     render::mid_level::Viewport viewport = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+    
+    clear_frame->SetRenderTargets (renderer->GetColorBuffer (), renderer->GetDepthStencilBuffer ());
+    clear_frame->SetFlags (render::mid_level::ClearFlag_All);
+    clear_frame->SetColor (math::vec4f (0.7f, 0.f, 0.f, 0.f));
 
-    frame->SetProjection (get_ortho_proj (-100, 100, -100, 100, -1000, 1000));
-    frame->SetViewport (viewport);
-    frame->SetClearColor (math::vec4f (0.7f, 0.f, 0.f, 0.f));
-    frame->SetClearBuffers (true, true);
-    frame->SetRenderTargets (renderer->GetColorBuffer (), renderer->GetDepthStencilBuffer ());
-    frame->AddPrimitive (primitive.get ());
+    frame->SetRenderTargets (renderer->GetColorBuffer (), renderer->GetDepthStencilBuffer ());    
+    frame->SetViewport      (viewport);
+    frame->SetProjection    (get_ortho_proj (-100, 100, -100, 100, -1000, 1000));
+    frame->SetView          (math::lookatf (vec3f (0, 0, 3), vec3f (0.0f), vec3f (0, 1, 0)));
+    frame->AddPrimitive     (primitive.get ());
 
-    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (window), renderer.get (), frame.get (), primitive.get ()));
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (window), renderer.get (), frame.get (), clear_frame.get (), primitive.get ()));
 
     syslib::Application::Run ();
   }

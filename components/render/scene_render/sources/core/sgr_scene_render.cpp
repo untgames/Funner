@@ -1,267 +1,29 @@
-#include "shared.h"
+#include "scene_render_shared.h"
 
 using namespace render;
-
-namespace
-{
-
-/*
-   Константы
-*/
-
-const size_t VIEW_ARRAY_RESERVE          = 32;  //резервируемое количество областей видимости
-const size_t RENDER_PATHS_STRING_RESERVE = 256; //резервируемый размер строки с имёна путей рендеринга
-const size_t DEFAULT_WINDOW_WIDTH        = 100; //ширина окна по умолчанию
-const size_t DEFAULT_WINDOW_HEIGHT       = 100; //высота окна по умолчанию
-
-/*
-    Основные переопределения
-*/
-
-struct RenderPathHolder
-{
-  CustomSceneRenderPtr render;  
-  stl::string          name;
-  
-  RenderPathHolder (const CustomSceneRenderPtr& in_render, const char* in_name) : render (in_render), name (in_name) {}
-};
-
-typedef xtl::com_ptr<IRenderView>               RenderViewPtr;
-typedef stl::hash_map<size_t, RenderPathHolder> RenderPathMap;
-
-/*
-    Общие пераметры для всех областей вывода
-*/
-
-struct ViewCommon
-{
-  RenderPathMap  render_paths; //таблица путей рендеринга
-  Rect           window;       //логическое окно вывода  
-  bool           need_reorder; //необходимо пересортировать области вывода
-  
-  ViewCommon () : window (0, 0, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), need_reorder (true) {}
-};
-
-/*
-    Реализация области вывода
-*/
-
-struct View: public IViewportListener, public xtl::reference_counter
-{
-  Viewport             viewport;               //область вывода
-  ViewCommon&          common;                 //общие для всех областей вывода параметра
-  RenderViewPtr        render_view;            //область рендеринга
-  scene_graph::Scene*  current_scene;          //текущая сцена
-  scene_graph::Camera* current_camera;         //текущая камера
-  bool                 need_update_view;       //необходимо обновить параметры области вывода
-  bool                 need_update_area;       //необходимо обновить координаты области вывода
-  bool                 need_update_camera;     //необходимо обновить камеру
-  bool                 need_update_path;       //необходимо обновить путь рендеринга
-  xtl::auto_connection on_camera_scene_change; //соединение с сигналом оповещения об изменении сцены в камере
-
-///Конструктор / деструктор
-  View (const Viewport& vp, ViewCommon& in_common)
-    : viewport (vp),
-      common (in_common),
-      current_scene (0),
-      current_camera (0),
-      need_update_view (true),
-      need_update_area (true),
-      need_update_camera (true),
-      need_update_path (true)
-  {
-    viewport.AttachListener (this);
-    
-    common.need_reorder = true;    
-  }  
-  
-///Отсоединение от области вывода
-  void DetachFromViewport ()
-  {
-    viewport.DetachListener (this);
-  }
-  
-///Обновление параметров области рендеринга
-  void UpdateRenderView ()
-  {
-    try
-    {
-        //определение сцены
-
-      scene_graph::Camera* camera = viewport.Camera ();
-      scene_graph::Scene*  scene  = camera ? camera->Scene () : 0;
-      
-      if (camera && current_camera != camera)
-      {
-          //подписка на изменение сцены в камере
-
-        on_camera_scene_change = camera->RegisterEventHandler (scene_graph::NodeEvent_AfterSceneChange, xtl::bind (&View::OnChangeScene, this));
-        current_camera         = camera;
-      }      
-
-      if (need_update_path || scene != current_scene) //условие пересоздания области вывода
-      {
-        render_view      = 0;
-        current_scene    = 0;
-        need_update_path = need_update_camera = need_update_view = need_update_area = false;
-      }
-
-          //пересоздание области вывода
-
-      if (!render_view)
-      {
-          //при отсутствии камеры или сцены невозможно создать область рендеринга
-        
-        if (!camera || !scene)
-          return;
-
-          //поиск пути рендеринга
-
-        RenderPathMap::iterator iter = common.render_paths.find (viewport.RenderPathHash ());
-
-        if (iter == common.render_paths.end ())
-          throw xtl::format_not_supported_exception ("", "Unknown path '%s'", viewport.RenderPath ()); //путь не найден          
-
-          //создание области рендеринга
-
-        ICustomSceneRender& render = *iter->second.render;
-
-        RenderViewPtr new_render_view (render.CreateRenderView (scene), false);
-
-          //установка свойств области вывода в область рендеринга
-
-        for (Viewport::PropertyIterator prop_iter=viewport.CreatePropertyIterator (); prop_iter; ++prop_iter)
-          new_render_view->SetProperty (prop_iter->Name (), prop_iter->Value ());
-
-          //явное разрешение обновления всех параметров вывода
-
-        need_update_area = need_update_camera = true;
-        need_update_path = false;
-        render_view      = new_render_view;
-      }
-
-        //обновление камеры
-
-      if (need_update_camera)
-      {
-        render_view->SetCamera (camera);
-        
-        current_scene = scene;
-        
-        need_update_camera = false;
-      }
-      
-        //обновление параметров области вывода
-        
-      if (need_update_area)
-      {
-        float kx = 1.0f / common.window.width,
-              ky = 1.0f / common.window.height;
-
-        const Rect& viewport_rect = viewport.Area ();
-
-        render_view->SetViewport (common.window.left * kx, common.window.top * ky, viewport_rect.width * kx, viewport_rect.height * ky);
-
-        need_update_area = false;
-      }
-
-      need_update_view = false;
-    }
-    catch (xtl::exception& exception)
-    {
-      exception.touch ("render::View::UpdateRenderView");
-
-      throw;
-    }
-  }
-
-///Отрисовка
-  void Draw ()
-  {
-    if (need_update_view)
-      UpdateRenderView ();
-
-    if (!render_view || !viewport.IsActive ())
-      return;
-
-    render_view->Draw ();
-  }
-
-///Обработчики событий
-  
-  void OnChangeCamera (scene_graph::Camera*)
-  {
-    need_update_view = need_update_camera = true;
-
-    on_camera_scene_change.disconnect ();
-  }
-
-  void OnChangeArea       (const Rect&)          { need_update_view    = need_update_area   = true; }
-  void OnChangeRenderPath (const char*)          { need_update_view    = need_update_path   = true; }
-  void OnChangeZOrder     (int)                  { common.need_reorder = true; }
-  void OnChangeScene      ()                     { need_update_view    = true; }
-
-  void OnChangeProperty (const char* name, const char* value)
-  {
-    if (!render_view)
-      return;
-
-    render_view->SetProperty (name, value);
-  }
-
-///Подсчёт ссылок
-  void AddRef  () { addref (this); }
-  void Release () { release (this); }  
-};
-
-}
 
 /*
     Описание реализации SceneRender
 */
 
-typedef xtl::com_ptr<mid_level::IRenderer> RendererPtr;
-typedef xtl::com_ptr<View>                 ViewPtr;
-typedef stl::vector<ViewPtr>               ViewArray;
+typedef xtl::intrusive_ptr<RenderTargetManager> RenderTargetManagerPtr;
 
-struct SceneRender::Impl: public ViewCommon
+struct SceneRender::Impl
 {  
-  RendererPtr              renderer;            //система рендеринга
-  stl::string              render_paths_string; //строка с именами доступных путей рендеринга
-  ViewArray                views;               //области вывода
-  math::vec4f              background_color;    //цвет фона
-  SceneRender::LogFunction log_handler;         //функция отладочного протоколирования
-  bool                     need_update_background_color; //необходимо обновить цвет фона
+  RenderPathManager        render_path_manager;   //менеджер путей рендеринга
+  RenderTargetManagerPtr   render_target_manager; //менеджер целей рендеринга
+  SceneRender::LogFunction log_handler;           //функция отладочного протоколирования
 
     //конструктор
-  Impl () : need_update_background_color (true)
+  Impl () : render_target_manager (new RenderTargetManager, false)
   {
-    views.reserve (VIEW_ARRAY_RESERVE);
   }
   
-    //деструктор
   ~Impl ()
   {
-    try
-    {
-        //сброс функции отладочного протоколирования в пользовательских рендерах
-      
-      LogFunction render_log;
-
-      for (RenderPathMap::iterator iter=render_paths.begin (), end=render_paths.end (); iter!=end; ++iter)
-        iter->second.render->SetLogHandler (render_log);
-        
-        //отсоединение View от областей вывода
-        
-      for (ViewArray::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
-        (*iter)->DetachFromViewport ();
-    }
-    catch (...)
-    {
-      //подавление всех исключений
-    }    
+    render_target_manager->SetRenderPathManager (0);
   }
-  
+
     //отладочное протоколирование
   void LogMessage (const char* message)
   {
@@ -294,113 +56,6 @@ struct SceneRender::Impl: public ViewCommon
     catch (...)
     {
       //подавление всех исключений
-    }    
-  }
-  
-    //сортировка областей вывода
-  void SortViews ()
-  {
-    struct ViewComparator
-    {
-      bool operator () (const ViewPtr& vp1, const ViewPtr& vp2) const { return vp1->viewport.ZOrder () < vp2->viewport.ZOrder (); }
-    };
-
-    stl::sort (views.begin (), views.end (), ViewComparator ());
-    
-    need_reorder = false;    
-  }
-  
-    //обновление цвета фона
-  void UpdateBackgroundColor ()
-  {
-    for (RenderPathMap::iterator iter=render_paths.begin (), end=render_paths.end (); iter!=end; ++iter)
-      iter->second.render->SetBackgroundColor (background_color);
-
-    need_update_background_color = false;
-  }
-  
-    //отрисовка содержимого всех активных областей вывода
-  void Draw ()
-  {        
-      //упорядочение областей вывода
-    
-    if (need_reorder)
-      SortViews ();
-     
-      //установка цвета фона
-      
-    if (need_update_background_color)
-      UpdateBackgroundColor ();
-      
-      //рисование областей вывода
-
-    for (ViewArray::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
-    {
-      try
-      {
-        (*iter)->Draw ();
-      }
-      catch (std::exception& exception)
-      {
-        Viewport& viewport = (*iter)->viewport;
-
-        LogPrintf ("%s\n    at render viewport='%s', render_path='%s', renderer='%s'", exception.what (), viewport.Name (),
-          viewport.RenderPath (), renderer->GetDescription ());
-      }
-      catch (...)
-      {
-        Viewport& viewport = (*iter)->viewport;
-
-        LogPrintf ("Unknown exception\n    at render viewport='%s', render_path='%s', renderer='%s'", viewport.Name (),
-          viewport.RenderPath (), renderer->GetDescription ());        
-      }
-    }
-    
-      //рисование кадров
-      
-    try
-    {
-      renderer->DrawFrames ();
-    }
-    catch (std::exception& exception)
-    {
-      LogPrintf ("Exception at draw frames on renderer '%s': %s", renderer->GetDescription (), exception.what ());
-    }
-    catch (...)
-    {
-      LogPrintf ("Unknown exception at draw frames on renderer '%s'", renderer->GetDescription ());
-    }
-  }
-  
-    //загрузка ресурса
-  void LoadResource (const char* tag, const char* file_name)
-  {
-    static const char* METHOD_NAME = "render::SceneRender::Impl::LoadResource";
-    
-    if (!tag)
-      throw xtl::make_null_argument_exception ("", "tag");
-      
-    if (!file_name)
-      throw xtl::make_null_argument_exception ("", "file_name");
-      
-    for (RenderPathMap::iterator iter=render_paths.begin (), end=render_paths.end (); iter!=end; ++iter)
-    {
-      RenderPathHolder& holder = iter->second;
-
-      try
-      {
-        holder.render->LoadResource (tag, file_name);
-      }
-      catch (std::exception& exception)
-      {
-        LogPrintf ("%s\n    at load resource (file_name='%s', tag='%s', render_path='%s', renderer='%s')",
-          exception.what (), file_name, tag, holder.name.c_str (), renderer->GetDescription ());
-      }
-      catch (...)
-      {
-        LogPrintf ("Unknown exception\n    at SceneRender::LoadResource (file_name='%s', tag='%s', render_path='%s', renderer='%s')",
-          file_name, tag, holder.name.c_str (), renderer->GetDescription ());
-      }
     }
   }
 };
@@ -443,86 +98,12 @@ void SceneRender::SetRenderer
 {
   try
   {
-    if (!driver_name_mask)
-      throw xtl::make_null_argument_exception ("", "driver_name_mask");
-      
-    if (!renderer_name_mask)
-      throw xtl::make_null_argument_exception ("", "renderer_name_mask");
-      
-    if (!render_path_masks)
-      throw xtl::make_null_argument_exception ("", "render_path_masks");      
+    RenderPathManager new_manager (driver_name_mask, renderer_name_mask, render_path_masks,
+      xtl::bind (&Impl::LogMessage, &*impl, _1));      
 
-      //создание системы ренедринга      
+    new_manager.Swap (impl->render_path_manager);
 
-    RendererPtr renderer (mid_level::DriverManager::CreateRenderer (driver_name_mask, renderer_name_mask), false);
-    
-      //построение множества имён путей ренедринга
-      
-    typedef stl::vector<stl::string>   StringArray;
-    typedef stl::hash_set<stl::string> StringSet;
-      
-    StringSet                    path_names;
-    StringArray                  path_masks        = common::split (render_path_masks);
-    SceneRenderManager::Iterator render_path_begin = SceneRenderManager::CreateIterator ();
-
-    for (StringArray::iterator iter=path_masks.begin (), end=path_masks.end (); iter!=end; ++iter)
-    {
-      const char* render_path_mask = iter->c_str ();      
-      
-      if (!strchr (render_path_mask, '*') && !strchr (render_path_mask, '?'))
-      {
-        path_names.insert (render_path_mask);
-      }
-      else
-      {
-        for (SceneRenderManager::Iterator render_path_iter=render_path_begin; render_path_iter; ++render_path_iter)
-        {
-          if (common::wcmatch (render_path_iter->Name (), render_path_mask))  
-            path_names.insert (render_path_iter->Name ());
-        }
-      }
-    }
-    
-      //создание путей рендеринга
-
-    RenderPathMap render_paths;
-    stl::string   render_paths_string;
-    
-    render_paths_string.reserve (RENDER_PATHS_STRING_RESERVE);
-    
-    LogFunction render_log = xtl::bind (&Impl::LogMessage, &*impl, _1);
-    
-    for (StringSet::iterator iter=path_names.begin (), end=path_names.end (); iter!=end; ++iter)
-    {
-      const char* path_name = iter->c_str ();
-
-        //создание пути рендеринга
-        
-      CustomSceneRenderPtr render_path = SceneRenderManagerImpl::Instance ().CreateRender (renderer.get (), path_name);
-      
-        //установка функции отладочного протоколирования
-
-      render_path->SetLogHandler (render_log);
-
-        //регистрация пути рендеринга
-        
-      render_paths.insert_pair (common::strhash (path_name), RenderPathHolder (render_path, path_name));
-
-        //модификация строки имён путей рендеринга
-
-      if (!render_paths_string.empty ())
-        render_paths_string += ' ';
-
-      render_paths_string += path_name;
-    }
-    
-      //установка текущего состояния
-      
-    impl->renderer.swap (renderer);
-    impl->render_paths.swap (render_paths);
-    impl->render_paths_string.swap (render_paths_string);
-    
-    impl->need_update_background_color = true;
+    impl->render_target_manager->SetRenderPathManager (&impl->render_path_manager);
   }
   catch (xtl::exception& exception)
   {
@@ -533,104 +114,28 @@ void SceneRender::SetRenderer
 
 void SceneRender::ResetRenderer ()
 {
-  RenderPathMap ().swap (impl->render_paths);
+  RenderPathManager new_manager;
 
-  impl->render_paths_string.clear ();
+  new_manager.Swap (impl->render_path_manager);
 
-  impl->renderer = 0;
+  impl->render_target_manager->SetRenderPathManager (0);
 }
 
 const char* SceneRender::RendererDescription () const
 {
-  return impl->renderer ? impl->renderer->GetDescription () : "";
+  mid_level::IRenderer* renderer = impl->render_path_manager.Renderer ();
+  
+  return renderer ? renderer->GetDescription () : "";
 }
 
 const char* SceneRender::RenderPaths () const
 {
-  return impl->render_paths_string.c_str ();
+  return impl->render_path_manager.RenderPaths ();
 }
 
 bool SceneRender::HasRenderPath (const char* path_name) const
 {
-  if (!path_name)
-    return false;
-
-  RenderPathMap::iterator iter = impl->render_paths.find (common::strhash (path_name));
-
-  return iter != impl->render_paths.end ();
-}
-
-/*
-    Управление областями вывода
-*/
-
-void SceneRender::Attach (const Viewport& viewport)
-{
-  impl->views.push_back (ViewPtr (new View (viewport, *impl), false));
-}
-
-void SceneRender::Detach (const Viewport& viewport)
-{
-  size_t id = viewport.Id ();
-
-  for (ViewArray::iterator iter=impl->views.begin (); iter!=impl->views.end ();)
-    if ((*iter)->viewport.Id () == id) impl->views.erase (iter);
-    else                               ++iter;
-}
-
-void SceneRender::DetachAllViewports ()
-{
-  impl->views.clear ();
-}
-
-/*
-    Установка логического окна вывода
-*/
-
-void SceneRender::SetWindow (const Rect& window)
-{
-  impl->window = window;
-}
-
-void SceneRender::SetWindow (int left, int top, size_t width, size_t height)
-{
-  SetWindow (Rect (left, top, width, height));
-}
-
-const Rect& SceneRender::Window () const
-{
-  return impl->window;
-}
-
-/*
-    Цвет очистки буфера отрисовки
-*/
-
-void SceneRender::SetBackgroundColor (const math::vec4f& color)
-{
-  impl->background_color             = color;  
-  impl->need_update_background_color = true;
-}
-
-const math::vec4f& SceneRender::BackgroundColor () const
-{
-  return impl->background_color;
-}
-
-/*
-    Отрисовка
-*/
-
-void SceneRender::Draw ()
-{
-  try
-  {
-    impl->Draw ();    
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
+  return impl->render_path_manager.HasRenderPath (path_name);
 }
 
 /*
@@ -639,7 +144,24 @@ void SceneRender::Draw ()
 
 void SceneRender::LoadResource (const char* tag, const char* file_name)
 {
-  impl->LoadResource (tag, file_name);
+  impl->render_path_manager.LoadResource (tag, file_name, impl->log_handler);
+}
+
+/*
+    Создание цели рендеринга
+*/
+
+RenderTarget SceneRender::CreateRenderTarget (const char* color_attachment_name, const char* depth_stencil_attachment_name)
+{
+  try
+  {
+    return RenderTarget (*impl->render_target_manager, color_attachment_name, depth_stencil_attachment_name);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::SceneRender::CreateRenderTarget");
+    throw;
+  }
 }
 
 /*
@@ -657,15 +179,29 @@ const SceneRender::LogFunction& SceneRender::LogHandler () const
 }
 
 /*
-    Захват изображения (screen-shot)
+    Отладочное протоколирование
 */
 
-void SceneRender::CaptureImage (media::Image&)
+namespace render
 {
-  throw xtl::make_not_implemented_exception ("render::SceneRender::CaptureImage(media::Image&)");
+
+void log_printf (const SceneRender::LogFunction& log_handler, const char* format, ...)
+{
+  if (!log_handler || !format)
+    return;
+
+  va_list args;
+
+  va_start (args, format);
+
+  try
+  {
+    log_handler (common::vformat (format, args).c_str ());
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
-void SceneRender::CaptureImage (const char* image_name)
-{
-  throw xtl::make_not_implemented_exception ("render::SceneRender::CaptureImage(const char*)");
 }

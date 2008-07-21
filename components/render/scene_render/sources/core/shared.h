@@ -28,7 +28,6 @@
 #include <render/mid_level/driver.h>
 
 #include <render/custom_render.h>
-#include <render/desktop.h>
 #include <render/scene_render.h>
 
 namespace render

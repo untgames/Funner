@@ -54,7 +54,6 @@ RenderView::RenderView (Scene* in_scene, Render* in_render)
     
     frame = FramePtr (renderer.CreateFrame (), false);
 
-    frame->SetClearBuffers  (true, true);
     frame->SetRenderTargets (renderer.GetColorBuffer (), renderer.GetDepthStencilBuffer ());
 
       //настройка области вывода по умолчанию
@@ -153,14 +152,6 @@ void RenderView::Draw ()
     
   frame->Clear ();
 
-    //установка цвета очистки
-
-  math::vec4f clear_color;
-
-  render->GetBackgroundColor (clear_color);
-
-  frame->SetClearColor (clear_color);    
-  
     //установка матриц вида и проекции
     
   frame->SetProjection (camera->ProjectionMatrix ());
