@@ -19,12 +19,12 @@ class MyRenderView: public IRenderView, public xtl::reference_counter
     }
   
 ///Установка области вывода
-    void SetViewport (float left, float top, float width, float height)
+    void SetViewport (const Rect& rect)
     {
-      printf ("MyRenderView #%u: SetViewport(%.2f, %.2f, %.2f, %.2f)\n", id, left, top, width, height);
+      printf ("MyRenderView #%u: SetViewport(%d, %d, %u, %u)\n", id, rect.left, rect.top, rect.width, rect.height);
     }
     
-    void GetViewport (float [4])
+    void GetViewport (Rect&)
     {
       throw xtl::make_not_implemented_exception ("MyRenderView::GetViewport");
     }

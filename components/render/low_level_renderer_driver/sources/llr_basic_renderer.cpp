@@ -41,12 +41,8 @@ BasicRenderer::BasicRenderer (render::low_level::IDevice* in_device, render::low
 
   color_buffer         = RenderTargetPtr (CreateRenderBuffer (), false);
   depth_stencil_buffer = RenderTargetPtr (CreateDepthStencilBuffer (), false);  
-  
-  frames.reserve (FRAME_ARRAY_RESERVE_SIZE);
 
-  viewport.x      = viewport.y = 0;
-  viewport.width  = color_buffer->GetWidth ();
-  viewport.height = color_buffer->GetHeight ();
+  frames.reserve (FRAME_ARRAY_RESERVE_SIZE);
 }
 
 /*
@@ -160,11 +156,11 @@ void BasicRenderer::DrawFrames ()
 
   for (FrameArray::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
   {
-    (*iter)->Draw (device.get (), viewport);
+    (*iter)->Draw (device.get ());
   }
-  
+
     //очистка списка кадров
-    
+
   frames.clear ();
 
     //вывод сформированной картинки    
@@ -175,13 +171,4 @@ void BasicRenderer::DrawFrames ()
 void BasicRenderer::CancelFrames ()
 {
   frames.clear ();
-}
-
-/*
-    Установка области вывода для системы рендеринга
-*/
-
-void BasicRenderer::SetViewport (const render::low_level::Rect& in_viewport)
-{
-  viewport = in_viewport;
 }

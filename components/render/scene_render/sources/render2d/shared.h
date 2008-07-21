@@ -138,8 +138,8 @@ class RenderView: public IRenderView, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка области вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetViewport (float left, float top, float width, float height);
-    void GetViewport (float viewport [4]);
+    void SetViewport (const Rect& rect);
+    void GetViewport (Rect& out_rect);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка камеры
@@ -167,11 +167,10 @@ class RenderView: public IRenderView, public xtl::reference_counter
   private:
     typedef xtl::intrusive_ptr<Render> RenderPtr;
 
-    RenderPtr            render;       //рендер
-    FramePtr             frame;        //кадр
-    scene_graph::Scene*  scene;        //сцена
-    scene_graph::Camera* camera;       //камера
-    float                viewport [4]; //границы области вывода
+    RenderPtr            render; //рендер
+    FramePtr             frame;  //кадр
+    scene_graph::Scene*  scene;  //сцена
+    scene_graph::Camera* camera; //камера
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

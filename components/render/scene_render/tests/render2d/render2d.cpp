@@ -54,8 +54,10 @@ int main ()
     Desktop desktop;
 
     desktop.Attach (vp1);
+    
+    RenderTarget render_target;
 
-    RenderTarget render_target = render.CreateRenderTarget ("default", "default");    
+    render_target = render.CreateRenderTarget ("default", "default");    
 
     render_target.SetDesktop (&desktop);    
     

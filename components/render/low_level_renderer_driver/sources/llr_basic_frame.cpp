@@ -60,16 +60,12 @@ IRenderTarget* BasicFrame::GetDepthStencilTarget ()
     Визуализация
 */
 
-void BasicFrame::Draw (render::low_level::IDevice* device, const render::low_level::Rect& device_viewport)
+void BasicFrame::Draw (render::low_level::IDevice* device)
 {
   using namespace render::low_level;
 
   if (!render_target && !depth_stencil_target)
     return;
-    
-    //установка области вывода
-    
-  SetDeviceViewportCore (device, device_viewport);
 
     //собственно отрисовка
 

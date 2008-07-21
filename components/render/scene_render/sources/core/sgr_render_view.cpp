@@ -117,15 +117,19 @@ void RenderView::UpdateRenderView ()
       
     if (need_update_area)
     {
-      const Rect& render_target_area = render_target_api.GetRenderTargetArea ();
-      
-      float kx = 1.0f / render_target_area.width,
-            ky = 1.0f / render_target_area.height;
+      const Rect &renderable_area = render_target_api.GetRenderableArea (),
+                 &desktop_area    = render_target_api.GetDesktopArea (),
+                 &viewport_area   = viewport.Area ();
 
-      const Rect& viewport_rect = viewport.Area ();
+      float x_scale  = float (renderable_area.width) / desktop_area.width,
+            y_scale  = float (renderable_area.height) / desktop_area.height;
+            
+      Rect result (int (renderable_area.left - (viewport_area.left - desktop_area.left) * x_scale),
+                   int (renderable_area.top - (viewport_area.top - desktop_area.top) * y_scale),
+                   size_t (viewport_area.width * x_scale),
+                   size_t (viewport_area.height * y_scale));
 
-      render_view->SetViewport (render_target_area.left * kx, render_target_area.top * ky,
-        viewport_rect.width * kx, viewport_rect.height * ky);
+      render_view->SetViewport (result);
 
       need_update_area = false;
     }

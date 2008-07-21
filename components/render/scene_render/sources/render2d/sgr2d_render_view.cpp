@@ -54,11 +54,7 @@ RenderView::RenderView (Scene* in_scene, Render* in_render)
     
     frame = FramePtr (renderer.CreateFrame (), false);
 
-    frame->SetRenderTargets (renderer.GetColorBuffer (), renderer.GetDepthStencilBuffer ());
-
-      //настройка области вывода по умолчанию
-      
-    SetViewport (0, 0, 100.0f, 100.0f);
+    frame->SetRenderTargets (renderer.GetColorBuffer (), renderer.GetDepthStencilBuffer ());    
   }
   catch (xtl::exception& exception)
   {
@@ -75,28 +71,18 @@ RenderView::~RenderView ()
     Установка области вывода
 */
 
-void RenderView::SetViewport (float left, float top, float width, float height)
+void RenderView::SetViewport (const Rect& rect)
 {
   try
   {
-    viewport [0] = left;
-    viewport [1] = top;
-    viewport [2] = width;
-    viewport [3] = height;
-
-    mid_level::IRenderTarget& screen = *render->Renderer ()->GetColorBuffer ();
-
-    size_t screen_width  = screen.GetWidth (),
-           screen_height = screen.GetHeight ();
-           
-    mid_level::Viewport viewport_rect;
+    render::mid_level::Viewport viewport;
     
-    viewport_rect.x      = int (left * screen_width);
-    viewport_rect.y      = int (top * screen_height);
-    viewport_rect.width  = size_t (width * screen_width);
-    viewport_rect.height = size_t (height * screen_height);
-
-    frame->SetViewport (viewport_rect);
+    viewport.x      = rect.left;
+    viewport.y      = rect.top;
+    viewport.width  = rect.width;
+    viewport.height = rect.height;
+    
+    frame->SetViewport (viewport);
   }
   catch (xtl::exception& exception)
   {
@@ -105,10 +91,24 @@ void RenderView::SetViewport (float left, float top, float width, float height)
   }
 }
 
-void RenderView::GetViewport (float out_viewport [4])
+void RenderView::GetViewport (Rect& out_rect)
 {
-  for (size_t i=0; i<4; i++)
-    out_viewport [i] = viewport [i];
+  try
+  {
+    render::mid_level::Viewport viewport;
+    
+    frame->GetViewport (viewport);
+    
+    out_rect.left   = viewport.x;
+    out_rect.top    = viewport.y;
+    out_rect.width  = viewport.width;
+    out_rect.height = viewport.height;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::render2d::RenderView::GetViewport");
+    throw;
+  }
 }
 
 /*

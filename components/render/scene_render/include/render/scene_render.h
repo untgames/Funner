@@ -21,6 +21,7 @@ namespace render
 
 //forward declaration
 class RenderTargetManager;
+class IRenderTargetImpl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Целевые буферы рендеринга
@@ -42,6 +43,7 @@ class RenderTarget
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    RenderTarget  ();
     RenderTarget  (RenderTargetManager& manager, const char* color_attachment_name, const char* depth_stencil_attachment_name);
     RenderTarget  (const RenderTarget&); //политика копирования - подсчёт ссылок
     ~RenderTarget ();
@@ -59,13 +61,18 @@ class RenderTarget
     const char* Attachment (RenderTargetAttachment buffer_id) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Логические размеры целевого буфера рендеринга
+///Границы логически отображаемой области рабочего стола
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetArea   (const Rect& rect);
-    void        SetArea   (int left, int top, size_t width, size_t height);    
-    void        SetOrigin (int left, int top);
-    void        SetSize   (size_t width, size_t height);
-    const Rect& Area      () const;
+    void        SetDesktopArea (const Rect& rect);
+    void        SetDesktopArea (int left, int top, size_t width, size_t height);
+    const Rect& DesktopArea    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Физические границы визуализируемой области (например, в оконных координатах)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetRenderableArea (const Rect& rect);
+    void        SetRenderableArea (int left, int top, size_t width, size_t height);
+    const Rect& RenderableArea    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рабочий стол (политика владения - weak-ref)
@@ -91,8 +98,7 @@ class RenderTarget
     void Swap (RenderTarget&);
 
   private:
-    struct Impl;
-    Impl* impl;
+    IRenderTargetImpl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

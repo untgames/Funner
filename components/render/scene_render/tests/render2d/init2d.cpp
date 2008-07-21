@@ -13,9 +13,11 @@ int main ()
     
     RenderTarget render_target = render.CreateRenderTarget ("default", "default");    
 
-    const Rect& window = render_target.Area ();
+    const Rect& desktop_window    = render_target.DesktopArea ();
+    const Rect& renderable_window = render_target.RenderableArea ();    
     
-    printf ("window:   left=%u top=%u width=%u height=%u\n", window.left, window.top, window.width, window.height);    
+    printf ("desktop:    left=%u top=%u width=%u height=%u\n", desktop_window.left, desktop_window.top, desktop_window.width, desktop_window.height);
+    printf ("renderable: left=%u top=%u width=%u height=%u\n", renderable_window.left, renderable_window.top, renderable_window.width, renderable_window.height);
   }
   catch (std::exception& exception)
   {

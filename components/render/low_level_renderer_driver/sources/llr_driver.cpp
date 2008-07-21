@@ -73,31 +73,6 @@ const char* Driver::GetRendererName (size_t index)
 }
 
 /*
-    Установка области вывода для системы рендеринга
-*/
-
-void Driver::SetViewport (const char* name, const render::low_level::Rect& viewport)
-{
-  try
-  {
-    if (!name)
-      throw xtl::make_null_argument_exception ("", "name");
-      
-    for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
-      if (!xtl::xstrcmp ((*iter)->renderer_name.c_str (), name))
-      {
-        (*iter)->renderer->SetViewport (viewport);
-        return;
-      }
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::mid_level::low_level_driver::Driver::SetViewport");
-    throw;
-  }
-}
-
-/*
     Создание устройства визуализации
 */
 
@@ -203,15 +178,6 @@ IDriver* LowLevelDriver::Driver ()
   return LowLevelDriverSingleton::InstancePtr ();
 }
 
-/*
-    Установка области вывода для системы рендеринга
-*/
-
-void LowLevelDriver::SetViewport (const char* name, const render::low_level::Rect& viewport)
-{
-  LowLevelDriverSingleton::Instance ().SetViewport (name, viewport);
-}
-    
 /*
    Регистрация систем рендернинга
 */

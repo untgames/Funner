@@ -15,32 +15,152 @@ const size_t DEFAULT_AREA_HEIGHT = 100; //высота рабочего пространства по умолча
 
 }
 
+namespace render
+{
+
+/*
+    Базовый класс реализации цели рендеринга
+*/
+
+class IRenderTargetImpl: public xtl::reference_counter
+{
+  public:  
+    virtual ~IRenderTargetImpl () {}
+
+///Имена ассоциированных буферов
+    virtual const char* ColorAttachment () = 0;
+    virtual const char* DepthStencilAttachment () = 0;
+
+///Текущий рабочий стол
+    virtual render::Desktop* Desktop () = 0;
+
+///Смена текущего рабочего стола
+    virtual void SetDesktop (render::Desktop* in_desktop) = 0;
+    
+///Текущее логическое окно вывода
+    virtual const Rect& DesktopArea () = 0;
+    
+///Изменение логического окна вывода
+    virtual void SetDesktopArea (const Rect& rect) = 0;
+    
+///Текущее физическое окно вывода
+    virtual const Rect& RenderableArea () = 0;
+    
+///Изменение физическое окна вывода
+    virtual void SetRenderableArea (const Rect& rect) = 0;
+    
+///Перерисовка
+    virtual void Draw () = 0;
+};
+
+}
+
+/*
+    Пустая цель рендеринга    
+*/
+
+namespace
+{
+
+class NullRenderTarget: public IRenderTargetImpl
+{
+  public:
+///Имена ассоциированных буферов
+    const char* ColorAttachment () { return ""; }
+    const char* DepthStencilAttachment () { return ""; }
+
+///Текущий рабочий стол
+    render::Desktop* Desktop () { return 0; }
+
+///Смена текущего рабочего стола
+    void SetDesktop (render::Desktop*)
+    {
+      Raise ("render::NullRenderTarget::SetDesktop");
+    }
+    
+///Текущее логическое окно вывода
+    const Rect& DesktopArea () { return desktop_area; }
+    
+///Изменение логического окна вывода
+    void SetDesktopArea (const Rect&)
+    {
+      Raise ("render::NullRenderTarget::SetDesktopArea");
+    }
+    
+///Текущее физическое окно вывода
+    const Rect& RenderableArea () { return renderable_area; }
+    
+///Изменение физическое окна вывода
+    void SetRenderableArea (const Rect&)
+    {
+      Raise ("render::NullRenderTarget::SetRenderableArea");
+    }
+
+///Перерисовка
+    void Draw ()
+    {
+      Raise ("render::NullRenderTarget::Draw");
+    }
+
+///Получение экземпляра
+    static NullRenderTarget* Instance ()
+    {
+      static char              buffer [sizeof NullRenderTarget];
+      static NullRenderTarget* target = new (buffer) NullRenderTarget;
+
+      return target;
+    }
+
+  private:
+    NullRenderTarget () {}
+  
+    void Raise (const char* source)
+    {
+      throw xtl::format_operation_exception (source, "Invalid operation on null render-target");      
+    }
+    
+  private:
+    Rect desktop_area;
+    Rect renderable_area;
+};
+
 /*
     Описание реализации цели рендеринга
 */
 
-typedef xtl::intrusive_ptr<RenderView> ViewPtr;
-typedef stl::vector<ViewPtr>               ViewArray;
-
-struct RenderTarget::Impl: private IDesktopListener, private RenderView::IRenderTargetAPI, public xtl::reference_counter, public RenderTargetBase
+class RenderTargetImpl: private IDesktopListener, private RenderView::IRenderTargetAPI, public IRenderTargetImpl, public RenderTargetBase
 {
   public:
 ///Конструктор
-    Impl (RenderTargetManager& manager, const char* in_color_attachment_name, const char* in_depth_stencil_attachment_name) :  
+    RenderTargetImpl (RenderTargetManager& manager, const char* in_color_attachment_name, const char* in_depth_stencil_attachment_name) :  
       RenderTargetBase (manager),
       color_attachment_name (in_color_attachment_name),
       depth_stencil_attachment_name (in_depth_stencil_attachment_name),
       desktop (0),
-      area (0, 0, DEFAULT_AREA_WIDTH, DEFAULT_AREA_HEIGHT),
+      desktop_area (0, 0, DEFAULT_AREA_WIDTH, DEFAULT_AREA_HEIGHT),
       need_update_background_color (true),
       need_update_areas (true),
       need_reorder (true)
     {
-      views.reserve (VIEW_ARRAY_RESERVE);    
+        //резервирование памяти для хранения областей вывода
+
+      views.reserve (VIEW_ARRAY_RESERVE);
+      
+        //инициализация физически визуализируемой области рендеринга
+
+      RenderPathManager*                render_path_manager = manager.RenderPathManager ();
+      mid_level::IRenderer*             renderer            = render_path_manager ? render_path_manager->Renderer () : 0;
+      render::mid_level::IRenderTarget* render_target       = renderer->GetColorBuffer (); //заменить в будущем на attachment!!!
+      
+      if (render_target)
+      {
+        renderable_area.width  = render_target->GetWidth ();
+        renderable_area.height = render_target->GetHeight ();
+      }
     }
 
 ///Деструктор
-    ~Impl ()
+    ~RenderTargetImpl ()
     {
       SetDesktop (0);
     }
@@ -79,18 +199,32 @@ struct RenderTarget::Impl: private IDesktopListener, private RenderView::IRender
     }
     
 ///Текущее логическое окно вывода
-    const Rect& Area () { return area; }
+    const Rect& DesktopArea () { return desktop_area; }
     
 ///Изменение логического окна вывода
-    void SetArea (const Rect& rect)
+    void SetDesktopArea (const Rect& rect)
     {
-      if (area.left == rect.left && area.top == rect.top && area.width == rect.width && area.height == rect.height)
+      if (desktop_area.left == rect.left && desktop_area.top == rect.top && desktop_area.width == rect.width && desktop_area.height == rect.height)
         return;      
 
-      area = rect;
+      desktop_area = rect;
 
       need_update_areas = true;
     }
+    
+///Текущее физическое окно вывода
+    const Rect& RenderableArea () { return renderable_area; }
+    
+///Изменение физическое окна вывода
+    void SetRenderableArea (const Rect& rect)
+    {
+      if (renderable_area.left == rect.left && renderable_area.top == rect.top && renderable_area.width == rect.width && renderable_area.height == rect.height)
+        return;      
+
+      renderable_area = rect;
+
+      need_update_areas = true;
+    }    
     
 ///Перерисовка
     void Draw ()
@@ -158,7 +292,7 @@ struct RenderTarget::Impl: private IDesktopListener, private RenderView::IRender
       }
 
       manager.EndDraw ();
-    }
+    }    
     
   private:
 ///Очистка цели рендеринга
@@ -204,7 +338,7 @@ struct RenderTarget::Impl: private IDesktopListener, private RenderView::IRender
     {
       for (ViewArray::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
         (*iter)->UpdateAreaNotify ();
-        
+
       need_update_areas = false;
     }
 
@@ -221,8 +355,9 @@ struct RenderTarget::Impl: private IDesktopListener, private RenderView::IRender
       need_reorder = false;    
     }  
     
-///Получение границ области рендеринга    
-    const Rect& GetRenderTargetArea  () { return area; }
+///Получение границ области рендеринга
+    const Rect& GetRenderableArea  () { return renderable_area; }
+    const Rect& GetDesktopArea () { return desktop_area; }
     
 ///Получение менеджера путей рендеринга
     RenderPathManager* GetRenderPathManager () { return Manager ().RenderPathManager (); }
@@ -276,12 +411,15 @@ struct RenderTarget::Impl: private IDesktopListener, private RenderView::IRender
     
   private:
     typedef xtl::com_ptr<render::mid_level::IClearFrame> ClearFramePtr;
+    typedef xtl::intrusive_ptr<RenderView>               ViewPtr;
+    typedef stl::vector<ViewPtr>                         ViewArray;
 
   private:
     stl::string      color_attachment_name;         //имя ассоциированного буфера цвета
     stl::string      depth_stencil_attachment_name; //имя ассоциированного буфера попиксельного отсечения
     render::Desktop* desktop;                       //рабочий стол
-    Rect             area;                          //логическое окно вывода
+    Rect             desktop_area;                  //логическое окно вывода
+    Rect             renderable_area;               //физическое окно вывода
     ViewArray        views;                         //массив областей рендеринга
     ClearFramePtr    clear_frame;                   //очищающий кадр
     bool             need_update_background_color;  //необходимо обновить цвет фона    
@@ -289,9 +427,17 @@ struct RenderTarget::Impl: private IDesktopListener, private RenderView::IRender
     bool             need_reorder;                  //необходимо пересортировать области вывода
 };
 
+}
+
 /*
     Конструкторы / деструктор / присваивание
 */
+
+RenderTarget::RenderTarget ()
+  : impl (NullRenderTarget::Instance ())
+{
+  addref (impl);
+}
 
 RenderTarget::RenderTarget (RenderTargetManager& manager, const char* color_attachment_name, const char* depth_stencil_attachment_name)
 {
@@ -303,7 +449,7 @@ RenderTarget::RenderTarget (RenderTargetManager& manager, const char* color_atta
   if (!depth_stencil_attachment_name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "depth_stencil_attachment_name");
 
-  impl = new Impl (manager, color_attachment_name, depth_stencil_attachment_name);
+  impl = new RenderTargetImpl (manager, color_attachment_name, depth_stencil_attachment_name);
 }
 
 RenderTarget::RenderTarget (const RenderTarget& target)
@@ -338,7 +484,7 @@ size_t RenderTarget::Id () const
 */
 
 const char* RenderTarget::Attachment (RenderTargetAttachment buffer_id) const
-{
+{  
   switch (buffer_id)
   {
     case RenderTargetAttachment_Color:        return impl->ColorAttachment ();
@@ -349,36 +495,57 @@ const char* RenderTarget::Attachment (RenderTargetAttachment buffer_id) const
 }
 
 /*
-    Логические размеры целевого буфера рендеринга
+    Границы логически отображаемой области рабочего стола
 */
 
-void RenderTarget::SetArea (const Rect& rect)
+void RenderTarget::SetDesktopArea (const Rect& rect)
 {
-  impl->SetArea (rect);
+  try
+  {
+    impl->SetDesktopArea (rect);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::RenderTarget::SetDesktopArea");
+    throw;
+  }
 }
 
-void RenderTarget::SetArea (int left, int top, size_t width, size_t height)
+void RenderTarget::SetDesktopArea (int left, int top, size_t width, size_t height)
 {
-  SetArea (Rect (left, top, width, height));
+  SetDesktopArea (Rect (left, top, width, height));
 }
 
-void RenderTarget::SetOrigin (int left, int top)
+const Rect& RenderTarget::DesktopArea () const
 {
-  const Rect& area = impl->Area ();
-
-  SetArea (Rect (left, top, area.width, area.height));
+  return impl->DesktopArea ();
 }
 
-void RenderTarget::SetSize (size_t width, size_t height)
-{
-  const Rect& area = impl->Area ();
+/*
+    Физические границы визуализируемой области (например, в оконных координатах)
+*/
 
-  SetArea (Rect (area.left, area.top, width, height));
+void RenderTarget::SetRenderableArea (const Rect& rect)
+{
+  try
+  {
+    impl->SetRenderableArea (rect);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::RenderTarget::SetRenderableArea");
+    throw;
+  }
 }
 
-const Rect& RenderTarget::Area () const
+void RenderTarget::SetRenderableArea (int left, int top, size_t width, size_t height)
 {
-  return impl->Area ();
+  SetRenderableArea (Rect (left, top, width, height));
+}
+
+const Rect& RenderTarget::RenderableArea () const
+{
+  return impl->RenderableArea ();
 }
 
 /*
@@ -387,7 +554,15 @@ const Rect& RenderTarget::Area () const
 
 void RenderTarget::SetDesktop (render::Desktop* desktop)
 {
-  impl->SetDesktop (desktop);
+  try
+  {
+    impl->SetDesktop (desktop);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::RenderTarget::SetDesktop");
+    throw;
+  }
 }
 
 Desktop* RenderTarget::Desktop ()
@@ -406,7 +581,15 @@ const Desktop* RenderTarget::Desktop () const
 
 void RenderTarget::Update ()
 {
-  impl->Draw ();
+  try
+  {
+    impl->Draw ();
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::RenderTarget::Update");
+    throw;
+  }  
 }
 
 /*

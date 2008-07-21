@@ -165,7 +165,8 @@ class RenderView: private IViewportListener, public xtl::reference_counter
     class IRenderTargetAPI
     {
       public:
-        virtual const Rect&        GetRenderTargetArea  () = 0; //получение границ области рендеринга
+        virtual const Rect&        GetRenderableArea    () = 0; //получение логических границ области рендеринга
+        virtual const Rect&        GetDesktopArea       () = 0; //получение физических границ области рендеринга        
         virtual RenderPathManager* GetRenderPathManager () = 0; //получение менеджера путей рендеринга
         virtual void               UpdateOrderNotify    () = 0; //оповещение об обновлении порядка следования областей вывода        
         
