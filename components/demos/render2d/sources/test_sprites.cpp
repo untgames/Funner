@@ -11,7 +11,7 @@ struct TestScene
 {
   SpriteList::Pointer  sprite_list;
   OrthoCamera::Pointer camera;
-  Scene                scene;  
+  Scene                scene;
 
   TestScene ()
   {
@@ -87,12 +87,6 @@ int main ()
 
     TestApplication test;
     
-      //инициализация рендера
-      
-    SceneRender& render = test.Render ();
-    
-//    render.SetBackgroundColor (math::vec4f (1, 1, 1, 1));
-    
       //создание сцены
       
     TestScene scene;
@@ -100,14 +94,19 @@ int main ()
       //создание областей вывода
       
     Viewport vp;
-    
+    Desktop  desktop;
+
     vp.SetName       ("Viewport1");
     vp.SetRenderPath ("Render2d");
     vp.SetCamera     (scene.camera.get ());
-    
+
     vp.SetArea (0, 0, 100, 100);
+
+    desktop.Attach (vp);
+
+    RenderTarget& render_target = test.RenderTarget ();
     
-    render.Attach (vp);
+    render_target.SetDesktop (&desktop);
 
       //установка idle-функции
 

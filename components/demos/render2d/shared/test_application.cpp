@@ -93,13 +93,14 @@ typedef VarRegistryContainer<stl::string>           StringRegistry;
 
 struct TestApplication::Impl
 {
-  StringRegistry                string_registry;     //монтируемый реестр строк  
-  VarRegistry                   config;              //реестр конфигурационных настроек
-  stl::auto_ptr<syslib::Window> window;              //главное окно приложения
-  SwapChainPtr                  swap_chain;          //цепочка обмена главного окна приложения
-  DevicePtr                     device;              //устройство рендеринга главного окна приложения
-  xtl::auto_connection          app_idle_connection; //соединение сигнала обработчика холостого хода приложения
-  SceneRender                   render;              //рендер сцены
+  StringRegistry                 string_registry;     //монтируемый реестр строк
+  VarRegistry                    config;              //реестр конфигурационных настроек
+  stl::auto_ptr<syslib::Window>  window;              //главное окно приложения
+  SwapChainPtr                   swap_chain;          //цепочка обмена главного окна приложения
+  DevicePtr                      device;              //устройство рендеринга главного окна приложения
+  xtl::auto_connection           app_idle_connection; //соединение сигнала обработчика холостого хода приложения
+  SceneRender                    render;              //рендер сцены
+  render::RenderTarget           render_target;       //цель рендеринга
   
   void OnClose ()
   {
@@ -112,7 +113,7 @@ struct TestApplication::Impl
     {
       static clock_t last     = 0;  
       static size_t  last_fps = 0, frames_count = 0;
-    
+
       if (clock () - last_fps > CLK_TCK)
       {
         printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
@@ -121,8 +122,8 @@ struct TestApplication::Impl
         frames_count = 0;
       }
 
-      render.Draw ();
-      
+      render_target.Update ();
+
       frames_count++;
     }
     catch (std::exception& e)
@@ -139,21 +140,16 @@ struct TestApplication::Impl
   {
     try
     {
-      syslib::Rect            client_rect = window->ClientRect ();
-      render::low_level::Rect viewport;
+      syslib::Rect client_rect = window->ClientRect ();
 
-      viewport.x      = client_rect.left;
-      viewport.y      = client_rect.top;
-      viewport.width  = client_rect.right - client_rect.left;
-      viewport.height = client_rect.bottom - client_rect.top;
-
-      mid_level::LowLevelDriver::SetViewport (MID_LEVEL_RENDERER_NAME, viewport);
+      render_target.SetRenderableArea (client_rect.left, client_rect.top, client_rect.right - client_rect.left,
+                                       client_rect.bottom - client_rect.top);
 
       window->Invalidate ();
     }
     catch (std::exception& exception)
     {
-      printf ("Eexception at window resize: %s\n", exception.what ());
+      printf ("Exception at window resize: %s\n", exception.what ());
     }
   }
 };
@@ -209,12 +205,12 @@ TestApplication::TestApplication ()
     desc.swap_method               = SwapMethod_Discard;
     desc.fullscreen                = get (impl->config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) != 0;
     desc.window_handle             = impl->window->Handle ();
-    
+
     render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, get (impl->config, "DeviceInitString", DEFAULT_DEVICE_INIT_STRING).c_str (),
       impl->swap_chain, impl->device);
-      
+
       //создание системы визуализации среднего уровня
-      
+
     render::mid_level::LowLevelDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, impl->device.get (), impl->swap_chain.get ());
     
       //инициализация рендера
@@ -224,9 +220,11 @@ TestApplication::TestApplication ()
     impl->render.SetRenderer (render::mid_level::LowLevelDriver::Name (), MID_LEVEL_RENDERER_NAME);
 //    impl->render.SetRenderer ("Debug", "Renderer2d");
 
+    impl->render_target = impl->render.CreateRenderTarget ("default", "default");
+
       //загрузка ресурсов
 
-    impl->render.LoadResource (MATERIAL_LIB_FILE_NAME);
+    impl->render.LoadResource (MATERIAL_LIB_FILE_NAME);    
     
       //установка начальной области вывода
     
@@ -250,6 +248,15 @@ TestApplication::~TestApplication ()
 SceneRender& TestApplication::Render ()
 {
   return impl->render;
+}
+
+/*
+    Получение цели рендеринга
+*/
+
+RenderTarget& TestApplication::RenderTarget ()
+{
+  return impl->render_target;
 }
 
 /*
