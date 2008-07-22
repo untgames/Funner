@@ -77,6 +77,28 @@ void idle (Test& test)
   test.window.Invalidate ();
 }
 
+ViewPtr create_depth_stencil_view (IDevice* device, ISwapChain* swap_chain)
+{
+  TexturePtr depth_stencil_texture (device->CreateDepthStencilTexture (swap_chain), false);
+
+  ViewDesc depth_stencil_view_desc;
+
+  memset (&depth_stencil_view_desc, 0, sizeof (depth_stencil_view_desc));
+
+  return ViewPtr (device->CreateView (depth_stencil_texture.get (), depth_stencil_view_desc), false);
+}
+
+ViewPtr create_render_view (IDevice* device, ISwapChain* swap_chain)
+{
+  TexturePtr render_target_texture (device->CreateRenderTargetTexture (swap_chain, 1), false);
+
+  ViewDesc render_target_view_desc;
+
+  memset (&render_target_view_desc, 0, sizeof (render_target_view_desc));
+
+  return ViewPtr (device->CreateView (render_target_texture.get (), render_target_view_desc), false);
+}
+
 void print (const char* message)
 {
   printf ("Shader message: '%s'\n", message);
@@ -194,6 +216,21 @@ int main ()
     test.device->SSSetConstantBuffer (0, cb.get ());
     test.device->SSSetConstantBuffer (1, cb2.get ());
     
+    printf ("Set output stage\n");
+   
+    DepthStencilDesc depth_stencil_desc;
+
+    memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
+
+    depth_stencil_desc.depth_test_enable   = true; //???
+    depth_stencil_desc.stencil_test_enable = false;
+    depth_stencil_desc.depth_compare_mode  = CompareMode_Less;
+    depth_stencil_desc.depth_write_enable  = false;
+
+    DepthStencilStatePtr depth_stencil_state (test.device->CreateDepthStencilState (depth_stencil_desc), false);
+    
+    test.device->OSSetDepthStencilState (depth_stencil_state.get ());
+
     printf ("Register callbacks\n");
     
     syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test)));

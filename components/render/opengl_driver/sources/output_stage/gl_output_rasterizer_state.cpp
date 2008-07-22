@@ -58,9 +58,11 @@ void RasterizerState::Bind ()
   static const char* METHOD_NAME = "render::low_level::opengl::RasterizerState::Bind";
   
     //проверка необходимости биндинга (кэширование состояния)
-    
-  size_t& current_desc_hash = GetContextDataTable (Stage_Rasterizer)[RasterizerStageCache_RasterizerStateHash];
-  
+
+  size_t *state_cache            = &GetContextDataTable (Stage_Output)[0],
+         &current_desc_hash      = state_cache [OutputStageCache_RasterizerStateHash],
+         &current_scissor_enable = state_cache [OutputStageCache_ScissorEnable];
+
   if (current_desc_hash == desc_hash)
     return;
 
@@ -81,7 +83,8 @@ void RasterizerState::Bind ()
 
     //установка кэш-переменной
 
-  current_desc_hash = desc_hash;
+  current_desc_hash      = desc_hash;
+  current_scissor_enable = desc.scissor_enable;
 }
 
 /*
@@ -107,7 +110,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
 
   if (in_desc.multisample_enable && !caps.has_arb_multisample)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Multisampling not supported (GL_ARB_multisample extension not supported)");
-    
+
     //выбор текущего контекста
 
   MakeContextCurrent ();
@@ -217,5 +220,5 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
   
     //оповещение о необходимости ребиндинга уровня
 
-  StageRebindNotify (Stage_Rasterizer);
+  StageRebindNotify (Stage_Output);
 }

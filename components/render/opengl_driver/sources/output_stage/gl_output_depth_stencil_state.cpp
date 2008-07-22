@@ -262,9 +262,11 @@ void DepthStencilState::Bind (size_t reference)
   
     //проверка необходимости биндинга (кэширование состояния)
 
-  ContextDataTable& state_cache        = GetContextDataTable (Stage_Output);
-  size_t            &current_desc_hash = state_cache [OutputStageCache_DepthStencilStateHash],
-                    &current_reference = state_cache [OutputStageCache_StencilReference];
+  ContextDataTable& state_cache                 = GetContextDataTable (Stage_Output);
+  size_t            &current_desc_hash          = state_cache [OutputStageCache_DepthStencilStateHash],
+                    &current_reference          = state_cache [OutputStageCache_StencilReference],
+                    &current_depth_write_enable = state_cache [OutputStageCache_DepthWriteEnable],
+                    &current_stencil_write_mask = state_cache [OutputStageCache_StencilWriteMask];
 
   if (desc_hash == current_desc_hash && reference == current_reference)
     return;  
@@ -273,7 +275,7 @@ void DepthStencilState::Bind (size_t reference)
 
   if (!display_list)
     throw xtl::format_operation_exception (METHOD_NAME, "Empty state (null display list)");
-    
+
     //установка текущего контекста
 
   MakeContextCurrent ();
@@ -326,8 +328,10 @@ void DepthStencilState::Bind (size_t reference)
 
     //установка кэш-переменных
 
-  current_desc_hash = desc_hash;
-  current_reference = reference;  
+  current_desc_hash          = desc_hash;
+  current_reference          = reference;
+  current_depth_write_enable = desc.depth_write_enable;
+  current_stencil_write_mask = desc.stencil_write_mask;
 
     //оповещение о необходимости ребиндинга уровня
 

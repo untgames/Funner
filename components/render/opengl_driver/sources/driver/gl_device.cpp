@@ -13,7 +13,6 @@ Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char* init_stri
     context_manager (xtl::bind (&Driver::LogMessage, in_driver, _1), init_string),
     output_stage (context_manager, swap_chain),
     input_stage (context_manager),
-    rasterizer_stage (context_manager),
     texture_manager (context_manager),
     shader_stage (context_manager),
     query_manager (context_manager),
@@ -284,7 +283,7 @@ IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
 {
   try
   {
-    return rasterizer_stage.CreateRasterizerState (desc);
+    return output_stage.CreateRasterizerState (desc);
   }
   catch (xtl::exception& exception)
   {
@@ -295,32 +294,32 @@ IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
 
 void Device::RSSetState (IRasterizerState* state)
 {
-  rasterizer_stage.SetState (state);
+  output_stage.SetRasterizerState (state);
 }
 
 void Device::RSSetViewport (const Viewport& viewport)
 {
-  rasterizer_stage.SetViewport (viewport);
+  output_stage.SetViewport (viewport);
 }
 
 void Device::RSSetScissor (const Rect& scissor_rect)
 {
-  rasterizer_stage.SetScissor (scissor_rect);
+  output_stage.SetScissor (scissor_rect);
 }
 
 IRasterizerState* Device::RSGetState ()
 {
-  return rasterizer_stage.GetState ();
+  return output_stage.GetRasterizerState ();
 }
 
 const Viewport& Device::RSGetViewport ()
 {
-  return rasterizer_stage.GetViewport ();
+  return output_stage.GetViewport ();
 }
 
 const Rect& Device::RSGetScissor ()
 {
-  return rasterizer_stage.GetScissor ();  
+  return output_stage.GetScissor ();  
 }
 
 /*
@@ -500,8 +499,6 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
     
     if (context_manager.NeedStageRebind (Stage_Output))
       output_stage.Bind ();
-
-    output_stage.InvalidateRenderTargets (rasterizer_stage.GetViewport ());
     
       //установка состояния входного уровня
 
@@ -528,11 +525,6 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
       if (out_indices_layout)
         *out_indices_layout = cached_indices_layout;
     }
-
-      //установка состояния уровня растеризации
-
-    if (context_manager.NeedStageRebind (Stage_Rasterizer))
-      rasterizer_stage.Bind ();
 
       //установка состояния менеджера текстур
 

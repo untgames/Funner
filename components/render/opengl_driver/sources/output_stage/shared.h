@@ -44,6 +44,13 @@ enum OutputStageCache
   OutputStageCache_BlendStateHash,        //хэш состояния подуровня смешивания цветов
   OutputStageCache_DepthStencilStateHash, //хэш состояния подуровня попиксельного отсечения
   OutputStageCache_StencilReference,      //ссылочное значение теста трафарета
+  OutputStageCache_ViewportHash,          //хэш состояния области вывода
+  OutputStageCache_ScissorHash,           //хэш состояния области отсечения
+  OutputStageCache_RasterizerStateHash,   //хэш состояния подуровня растеризации
+  OutputStageCache_ColorWriteMask,        //маска записи в буфер цвета
+  OutputStageCache_DepthWriteEnable,      //включена ли запись в буфер глубины
+  OutputStageCache_StencilWriteMask,      //маска записи в буфер трафарета
+  OutputStageCache_ScissorEnable,         //включен ли тест отсечения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -304,6 +311,35 @@ class DepthStencilState: virtual public IDepthStencilState, public ContextObject
     int              display_list;                   //номер списка команд конфигурации OpenGL
     GLenum           gl_stencil_func [FaceMode_Num]; //функции отсечения трафарета
     bool             need_two_side_stencil;          //состояние требует двустороннего трафарета
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Состояние подуровня растеризации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class RasterizerState : virtual public IRasterizerState, public ContextObject
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    RasterizerState  (const ContextManager& manager, const RasterizerDesc& desc);
+    ~RasterizerState ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка состояния в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Bind ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение/получение дескриптора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetDesc (const RasterizerDesc&);
+    void GetDesc (RasterizerDesc&);
+
+  private:
+    RasterizerDesc desc;         //дескриптор состояния
+    size_t         desc_hash;    //хэш дескриптора состояния
+    int            display_list; //номер списка команд конфигурации состояния в OpenGL
 };
 
 }

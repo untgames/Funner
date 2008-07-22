@@ -49,8 +49,15 @@ class OutputStageState: public IStageState
 {
   public:  
       //конструкторы
-    OutputStageState (OutputStageState* in_main_state) : owner (0), main_state (in_main_state), stencil_reference (0) {}
-    OutputStageState (ContextObject* in_owner) : owner (in_owner), main_state (0), stencil_reference (0) {}    
+    OutputStageState (OutputStageState* in_main_state)
+    {
+      Init (in_main_state, 0);
+    }
+
+    OutputStageState (ContextObject* in_owner)
+    {
+      Init (0, in_owner);
+    }
 
       //установка текущего состояния подуровня смешивания цветов
     void SetBlendState (BlendState* state)
@@ -117,7 +124,69 @@ class OutputStageState: public IStageState
 
       //получение текущего отображения буфера попиксельного отсечения
     View* GetDepthStencilView () const { return depth_stencil_view.get (); }    
+
+      //установка состояние растеризатора
+    void SetRasterizerState (RasterizerState* state)
+    {
+      if (state == rasterizer_state)
+        return;
+        
+      rasterizer_state = state;
+      
+      UpdateNotify ();
+    }
+
+      //получение состояния растеризатора
+    RasterizerState* GetRasterizerState () const { return rasterizer_state.get (); }
     
+      //установка текущей области вывода
+    void SetViewport (const Viewport& in_viewport)
+    {
+      viewport                  = in_viewport;
+      need_recalc_viewport_hash = true;
+
+      UpdateNotify ();
+    }
+    
+      //получение текущей области вывода
+    const Viewport& GetViewport () const { return viewport; }
+    
+      //установка текущей области отсечения
+    void SetScissor (const Rect& in_scissor)
+    {
+      scissor                  = in_scissor;
+      need_recalc_scissor_hash = true;
+
+      UpdateNotify ();
+    }
+
+      //получение текущей области отсечения
+    const Rect& GetScissor () const { return scissor; }
+
+      //получение хэша области вывода
+    size_t GetViewportHash () const
+    {
+      if (need_recalc_viewport_hash)
+      {
+        viewport_hash             = crc32 (&viewport, sizeof viewport);
+        need_recalc_viewport_hash = false;
+      }
+
+      return viewport_hash;
+    }
+
+      //получение хэша области отсечения
+    size_t GetScissorHash () const
+    {
+      if (need_recalc_scissor_hash)
+      {
+        scissor_hash             = crc32 (&scissor, sizeof scissor);
+        need_recalc_scissor_hash = false;
+      }
+
+      return scissor_hash;
+    }    
+
       //захват состояния
     void Capture (const StateBlockMask& mask)
     {
@@ -147,6 +216,15 @@ class OutputStageState: public IStageState
 
       if (mask.os_depth_stencil_view)
         SetDepthStencilView (source.GetDepthStencilView ());
+
+      if (mask.rs_state)
+        SetRasterizerState (source.GetRasterizerState ());
+
+      if (mask.rs_viewport)
+        SetViewport (source.GetViewport ());
+
+      if (mask.rs_scissor)
+        SetScissor (source.GetScissor ());        
     }
     
       //оповещение об обновлении состояния уровня
@@ -159,22 +237,42 @@ class OutputStageState: public IStageState
     }
 
   private:
-    OutputStageState (const OutputStageState&); //no impl        
+    OutputStageState (const OutputStageState&); //no impl
+    
+    void Init (OutputStageState* in_main_state, ContextObject* in_owner)
+    {
+      owner                     = in_owner;
+      main_state                = in_main_state;
+      stencil_reference         = 0;
+      need_recalc_viewport_hash = true;
+      need_recalc_scissor_hash  = true;
+
+      memset (&viewport, 0, sizeof viewport);
+      memset (&scissor, 0, sizeof scissor);
+    }
 
   private:    
-    typedef xtl::trackable_ptr<View>              ViewPtr;
-    typedef xtl::trackable_ptr<BlendState>        BlendStatePtr;
-    typedef xtl::trackable_ptr<DepthStencilState> DepthStencilStatePtr;
-    typedef xtl::trackable_ptr<OutputStageState>  OutputStageStatePtr;
+    typedef xtl::trackable_ptr<View>               ViewPtr;
+    typedef xtl::trackable_ptr<BlendState>         BlendStatePtr;
+    typedef xtl::trackable_ptr<DepthStencilState>  DepthStencilStatePtr;
+    typedef xtl::trackable_ptr<OutputStageState>   OutputStageStatePtr;
+    typedef xtl::trackable_ptr<RasterizerState>    RasterizerStatePtr;
 
   private:
-    ContextObject*       owner;               //владелец состояния уровня
-    OutputStageStatePtr  main_state;          //основное состояние уровня
-    BlendStatePtr        blend_state;         //текущее состояние подуровня смешивания цветов
-    DepthStencilStatePtr depth_stencil_state; //текущее состояние подуровня попиксельного отсечения
-    size_t               stencil_reference;   //текущее значение трафарета
-    ViewPtr              render_target_view;  //текущее отображение буфера цвета
-    ViewPtr              depth_stencil_view;  //текущее отображение буфера попиксельного отсечения
+    ContextObject*       owner;                     //владелец состояния уровня
+    OutputStageStatePtr  main_state;                //основное состояние уровня
+    BlendStatePtr        blend_state;               //текущее состояние подуровня смешивания цветов
+    DepthStencilStatePtr depth_stencil_state;       //текущее состояние подуровня попиксельного отсечения
+    size_t               stencil_reference;         //текущее значение трафарета
+    ViewPtr              render_target_view;        //текущее отображение буфера цвета
+    ViewPtr              depth_stencil_view;        //текущее отображение буфера попиксельного отсечения
+    RasterizerStatePtr   rasterizer_state;          //состояние уровня растеризации
+    Viewport             viewport;                  //область вывода
+    Rect                 scissor;                   //область отсечения
+    mutable size_t       viewport_hash;             //хеш области вывода
+    mutable size_t       scissor_hash;              //хэш области отсечения
+    mutable bool         need_recalc_viewport_hash; //флаг необходимости пересчёта хэша области вывода
+    mutable bool         need_recalc_scissor_hash;  //флаг необходимости пересчёта хэша области отсечения
 };
 
 }
@@ -189,13 +287,13 @@ class OutputStageState: public IStageState
     Описание реализации выходного уровня конвейера OpenGL
 */
 
-struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
+struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder, public OutputStageState
 {
   public:
     Impl (ContextManager& context_manager, ISwapChain* swap_chain) :
       ContextObject (context_manager),
       FrameBufferManagerHolder (context_manager, swap_chain),
-      state (this),
+      OutputStageState (static_cast<ContextObject*> (this)),
       need_update_render_targets (false)
     {
         //регистрация менеджера буферов кадра по умолчанию
@@ -258,14 +356,50 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
       
       null_depth_stencil_state = DepthStencilStatePtr (new DepthStencilState (GetContextManager (), depth_stencil_desc), false);
       
+        //инициализация состояния растеризатора по умолчанию
+
+      RasterizerDesc rasterizer_desc;
+
+      memset (&rasterizer_desc, 0, sizeof rasterizer_desc);
+
+      rasterizer_desc.fill_mode               = FillMode_Solid;
+      rasterizer_desc.cull_mode               = CullMode_None;
+      rasterizer_desc.front_counter_clockwise = true;
+      rasterizer_desc.depth_bias              = 0;
+      rasterizer_desc.scissor_enable          = false;
+      rasterizer_desc.multisample_enable      = false;
+      rasterizer_desc.antialiased_line_enable = false;
+
+      default_rasterizer_state = RasterizerStatePtr (new RasterizerState (GetContextManager (), rasterizer_desc), false);
+      
+        //инициализация областей отсечения и вывода
+        
+      SwapChainDesc swap_chain_desc;
+
+      swap_chain->GetDesc (swap_chain_desc);
+
+      Viewport default_viewport;
+      Rect     default_scissor;
+
+      memset (&default_viewport, 0, sizeof default_viewport);
+      memset (&default_scissor, 0, sizeof default_scissor);
+
+      default_viewport.width     = swap_chain_desc.frame_buffer.width;
+      default_viewport.height    = swap_chain_desc.frame_buffer.height;
+      default_viewport.min_depth = 0.0f;
+      default_viewport.max_depth = 1.0f;
+
+      default_scissor.width  = swap_chain_desc.frame_buffer.width;
+      default_scissor.height = swap_chain_desc.frame_buffer.height;
+
         //установка состояния по умолчанию
 
-      SetBlendState (&*default_blend_state);
+      SetBlendState        (&*default_blend_state);
       SetDepthStencilState (&*default_depth_stencil_state);
+      SetRasterizerState   (&*default_rasterizer_state);
+      SetViewport          (default_viewport);
+      SetScissor           (default_scissor);
     }    
-    
-      //получение состояния уровня
-    OutputStageState& GetState () { return state; }
     
       //создание отображения
     View* CreateView (ITexture* texture, const ViewDesc& desc)
@@ -291,51 +425,35 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
 
         //обновление текущего состояния уровня
 
-      state.SetRenderTargetView (render_target_view);
-      state.SetDepthStencilView (depth_stencil_view);
+      SetRenderTargetView (render_target_view);
+      SetDepthStencilView (depth_stencil_view);
 
         //установка флага необходимости обновления целевых буферов отрисовки
 
       need_update_render_targets = true;
     }
 
-      //установка текущего состояния подуровня смешивания цветов
-    void SetBlendState (IBlendState* in_blend_state)
-    {
-      BlendState* blend_state = cast_object<BlendState> (*this, in_blend_state, "render::low_level::opengl::OutputStage::SetBlendState", "blend_state");
-      
-      state.SetBlendState (blend_state);
-    }
-
-      //получение текущего состояния подуровня смешивания цветов
-    IBlendState* GetBlendState () { return state.GetBlendState (); }
-
-      //установка текущего состояния подуровня попиксельного отсечения
-    void SetDepthStencilState (IDepthStencilState* in_depth_stencil_state)
-    {
-      DepthStencilState* depth_stencil_state = cast_object<DepthStencilState> (*this, in_depth_stencil_state,
-        "render::low_level::opengl::OutputStage::SetDepthStencilState", "depth_stencil_state");
-
-      state.SetDepthStencilState (depth_stencil_state);
-    }
-    
-      //получение текущего состояния подуровня попиксельного отсечения
-    IDepthStencilState* GetDepthStencilState () { return state.GetDepthStencilState (); }
-     
       //совместная очистка буферов цвета и глубина-трафарет
     void ClearViews (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)
     {
       try
       {
-          //установка активного контекста
+          //установка целей рендеринга и активного контекста
 
-        MakeContextCurrent ();      
-        
+        BindRenderTargets ();
+
           //получение значений кэш переменных
-          
-        ContextDataTable& context_cache = GetContextDataTable (Stage_Output);
-        
+
+        size_t* context_cache = &GetContextDataTable (Stage_Output)[0];
+
         GLbitfield mask = 0;
+        
+        bool need_restore_color_write_mask   = false,
+             need_restore_depth_write_mask   = false,
+             need_restore_stencil_write_mask = false,
+             need_restore_scissor_test       = false;
+             
+          //настройка параметров очистки буфера цвета
         
         if (clear_flags & ClearFlag_RenderTarget)
         {
@@ -348,8 +466,17 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
             context_cache [OutputStageCache_ClearColorHash] = clear_color_hash;
           }
           
+          if (context_cache [OutputStageCache_ColorWriteMask] != ColorWriteFlag_All)
+          {
+            glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+            
+            need_restore_color_write_mask = true;
+          }
+          
           mask |= GL_COLOR_BUFFER_BIT;
         }
+        
+          //настройка параметров очистки буфера глубины
 
         if (clear_flags & ClearFlag_Depth)
         {
@@ -361,9 +488,18 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
             
             context_cache [OutputStageCache_ClearDepthHash] = clear_depth_hash;
           }
+          
+          if (!context_cache [OutputStageCache_DepthWriteEnable])
+          {
+            glDepthMask (GL_TRUE);
+            
+            need_restore_depth_write_mask = true;
+          }          
 
           mask |= GL_DEPTH_BUFFER_BIT;        
         }
+        
+          //настройка параметров очистки буфера трафарета
 
         if (clear_flags & ClearFlag_Stencil)
         {
@@ -374,10 +510,68 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
             context_cache [OutputStageCache_ClearStencilValue] = stencil;
           }
 
-          mask |= GL_STENCIL_BUFFER_BIT;        
-        }      
+          if (context_cache [OutputStageCache_StencilWriteMask] != unsigned char (~0))
+          {
+            glStencilMask (~0);
+            
+            need_restore_stencil_write_mask = true;
+          }                    
 
-        glClear     (mask);
+          mask |= GL_STENCIL_BUFFER_BIT;
+        }
+        
+          //настройка области отсечения
+          
+        if (clear_flags & ClearFlag_ViewportOnly)
+        {          
+          if (!context_cache [OutputStageCache_ScissorEnable])
+          {
+            glEnable (GL_SCISSOR_TEST);
+
+            need_restore_scissor_test = true;
+          }
+
+          if (context_cache [OutputStageCache_ScissorHash] != GetViewportHash ())
+          {
+            const Viewport& viewport = GetViewport ();
+
+            glScissor (viewport.x, viewport.y, viewport.width, viewport.height);          
+
+            context_cache [OutputStageCache_ScissorHash] = GetViewportHash ();
+
+            StageRebindNotify (Stage_Output);
+          }
+        }
+        
+          //очистка выбранных буферов
+
+        glClear (mask);
+        
+          //восстановление состояния OpenGL
+        
+        if (need_restore_color_write_mask)
+        {
+          size_t mask = context_cache [OutputStageCache_ColorWriteMask];
+
+          glColorMask ((mask & ColorWriteFlag_Red) != 0, (mask & ColorWriteFlag_Green) != 0,
+                      (mask & ColorWriteFlag_Blue) != 0, (mask & ColorWriteFlag_Alpha) != 0);
+        }
+        
+        if (need_restore_depth_write_mask)
+        {
+          glDepthMask (GL_FALSE);
+        }
+        
+        if (need_restore_stencil_write_mask)
+        {
+          glStencilMask (context_cache [OutputStageCache_StencilWriteMask]);
+        }
+        
+        if (need_restore_scissor_test)
+        {
+          glDisable (GL_SCISSOR_TEST);
+        }
+
         CheckErrors ("glClear");
       }
       catch (xtl::exception& exception)
@@ -386,13 +580,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
 
         throw;
       }
-    }
-    
-      //оповещение об изменении целевых буферов отрисовки
-    void InvalidateRenderTargets (const Rect& update_rect)
-    {
-      GetCurrentFrameBuffer ().InvalidateRenderTargets (update_rect);
-    }
+    }    
 
       //обновление целевых буферов отрисовки
     void UpdateRenderTargets ()
@@ -408,10 +596,13 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
     {
       try
       {      
+          //установка целей рендеринга
+        
         BindRenderTargets ();
+        
+          //установка состояния подуровня смешивания цветов        
 
-        BlendState*        blend_state         = state.GetBlendState ();
-        DepthStencilState* depth_stencil_state = state.GetDepthStencilState ();
+        BlendState* blend_state = GetBlendState ();        
 
         if (blend_state && frame_buffer_manager.IsActiveColorBuffer ())
         {
@@ -421,15 +612,61 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
         {
           null_blend_state->Bind ();
         }
+        
+          //установка состояния подуровня попиксельного отсечения
+
+        DepthStencilState* depth_stencil_state = GetDepthStencilState ();        
 
         if (depth_stencil_state && frame_buffer_manager.IsActiveDepthStencilBuffer ())
         {
-          depth_stencil_state->Bind (state.GetStencilReference ());
+          depth_stencil_state->Bind (GetStencilReference ());
         }
         else
         {
-          null_depth_stencil_state->Bind (state.GetStencilReference ());
+          null_depth_stencil_state->Bind (GetStencilReference ());
         }
+
+          //установка состояния растеризатора
+
+        RasterizerState* rasterizer_state = GetRasterizerState ();
+      
+        if (!rasterizer_state)
+          rasterizer_state = default_rasterizer_state.get ();
+
+        rasterizer_state->Bind ();
+
+          //установка областей вывода и отсечения
+          
+        size_t *context_cache = &GetContextDataTable (Stage_Output)[0],
+               &current_viewport_hash = context_cache [OutputStageCache_ViewportHash],
+               &current_scissor_hash  = context_cache [OutputStageCache_ScissorHash];
+        
+        if (current_viewport_hash != GetViewportHash ())
+        {
+          const Viewport& viewport = GetViewport ();
+
+          glViewport   (viewport.x, viewport.y, viewport.width, viewport.height);
+          glDepthRange (viewport.min_depth, viewport.max_depth);
+          
+          current_viewport_hash = GetViewportHash ();
+        }
+        
+        if (current_scissor_hash != GetScissorHash ())
+        {        
+          const Rect& scissor  = GetScissor ();          
+          
+          glScissor (scissor.x, scissor.y, scissor.width, scissor.height);
+
+          current_scissor_hash = GetScissorHash ();
+        }
+
+          //оповещение об изменении целевых буферов отрисовки
+
+        GetCurrentFrameBuffer ().InvalidateRenderTargets (GetViewport ());
+
+          //проверка ошибок
+
+        CheckErrors ("");
       }
       catch (xtl::exception& exception)
       {
@@ -446,6 +683,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
     typedef xtl::com_ptr<ISwapChain>              SwapChainPtr;
     typedef xtl::com_ptr<BlendState>              BlendStatePtr;
     typedef xtl::com_ptr<DepthStencilState>       DepthStencilStatePtr;
+    typedef xtl::com_ptr<RasterizerState>         RasterizerStatePtr;
 
   private:
       //создание нового буфер кадра
@@ -592,24 +830,26 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
       //получение текущего буфера кадра
     IFrameBuffer& GetCurrentFrameBuffer ()
     {
-      return *GetFrameBufferHolder (state.GetRenderTargetView (), state.GetDepthStencilView ())->frame_buffer;
+      return *GetFrameBufferHolder (GetRenderTargetView (), GetDepthStencilView ())->frame_buffer;
     }    
 
       //установка текущих целевых буферов отрисовки в контекст OpenGL
+      ///оптимизировать!!!! под кэширование состояния
     void BindRenderTargets ()
     {
       if (need_update_render_targets)
         UpdateRenderTargets ();
 
-      FrameBufferHolder* frame_buffer_holder = GetFrameBufferHolder (state.GetRenderTargetView (), state.GetDepthStencilView ());
+      FrameBufferHolder* frame_buffer_holder = GetFrameBufferHolder (GetRenderTargetView (), GetDepthStencilView ());
 
       updatable_frame_buffer_holder = frame_buffer_holder;
 
-      frame_buffer_holder->frame_buffer->Bind ();      
-    }
+      frame_buffer_holder->frame_buffer->Bind ();
+
+      MakeContextCurrent ();
+    }    
 
   private:
-    OutputStageState              state;                         //состояние уровня
     FrameBufferHolderList         frame_buffers;                 //буферы кадра
     bool                          need_update_render_targets;    //флаг, указывающий на необходимость обновления целевых буферов отрисовки
     FrameBufferHolderTrackablePtr updatable_frame_buffer_holder; //обновляемый буфера кадра
@@ -619,6 +859,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder
     BlendStatePtr                 null_blend_state;              //состояние подуровня смешивания цветов соотв. отключению подуровня
     DepthStencilStatePtr          default_depth_stencil_state;   //состояние подуровня попиксельного отсечения по умолчанию
     DepthStencilStatePtr          null_depth_stencil_state;      //состояние подуровня попиксельного отсечения соотв. отключению подуровня
+    RasterizerStatePtr            default_rasterizer_state;      //состояние растеризатора по умолчанию
 };
 
 /*
@@ -640,7 +881,7 @@ OutputStage::~OutputStage ()
 
 IStageState* OutputStage::CreateStageState ()
 {
-  return new OutputStageState (&impl->GetState ());
+  return new OutputStageState (static_cast<OutputStageState*> (&*impl));
 }
 
 /*
@@ -739,6 +980,19 @@ IDepthStencilState* OutputStage::CreateDepthStencilState (const DepthStencilDesc
   }
 }
 
+IRasterizerState* OutputStage::CreateRasterizerState (const RasterizerDesc& desc)
+{
+  try
+  {
+    return new RasterizerState (impl->GetContextManager (), desc);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::OutputStage::CreateRasterizerState");
+    throw;
+  }
+}
+
 /*
     Выбор целевых отображений
 */
@@ -759,12 +1013,12 @@ void OutputStage::SetRenderTargets (IView* render_target_view, IView* depth_sten
 
 IView* OutputStage::GetRenderTargetView () const
 {
-  return impl->GetState ().GetRenderTargetView ();
+  return impl->GetRenderTargetView ();
 }
 
 IView* OutputStage::GetDepthStencilView () const
 {
-  return impl->GetState ().GetDepthStencilView ();
+  return impl->GetDepthStencilView ();
 }
 
 /*
@@ -773,7 +1027,9 @@ IView* OutputStage::GetDepthStencilView () const
 
 void OutputStage::SetBlendState (IBlendState* state)
 {
-  impl->SetBlendState (state);
+  BlendState* blend_state = cast_object<BlendState> (*impl, state, "render::low_level::opengl::OutputStage::SetBlendState", "state");
+      
+  impl->SetBlendState (blend_state);
 }
 
 IBlendState* OutputStage::GetBlendState () const
@@ -787,12 +1043,14 @@ IBlendState* OutputStage::GetBlendState () const
 
 void OutputStage::SetDepthStencilState (IDepthStencilState* state)
 {
-  impl->SetDepthStencilState (state);
+  DepthStencilState* depth_stencil_state = cast_object<DepthStencilState> (*impl, state, "render::low_level::opengl::OutputStage::SetDepthStencilState", "state");
+
+  impl->SetDepthStencilState (depth_stencil_state);
 }
 
 void OutputStage::SetStencilReference (size_t reference)
 {
-  impl->GetState ().SetStencilReference (reference);
+  impl->SetStencilReference (reference);
 }
 
 IDepthStencilState* OutputStage::GetDepthStencilState () const
@@ -802,8 +1060,45 @@ IDepthStencilState* OutputStage::GetDepthStencilState () const
 
 size_t OutputStage::GetStencilReference () const
 {
-  return impl->GetState ().GetStencilReference ();
+  return impl->GetStencilReference ();
 }
+
+/*
+    Настройка подуровня растеризации
+*/
+
+void OutputStage::SetRasterizerState (IRasterizerState* state)
+{
+  RasterizerState* rasterizer_state = cast_object<RasterizerState> (*impl, state, "render::low_level::opengl::OutputStage::SetState", "state");
+
+  impl->SetRasterizerState (rasterizer_state);
+}
+
+void OutputStage::SetViewport (const Viewport& viewport)
+{
+  impl->SetViewport (viewport);
+}
+
+void OutputStage::SetScissor (const Rect& scissor_rect)
+{
+  impl->SetScissor (scissor_rect);
+}
+
+IRasterizerState* OutputStage::GetRasterizerState () const
+{
+  return impl->GetRasterizerState ();
+}
+
+const Viewport& OutputStage::GetViewport () const
+{
+  return impl->GetViewport ();
+}
+
+const Rect& OutputStage::GetScissor () const
+{
+  return impl->GetScissor ();
+}
+
 
 /*
     Очистка буферов отрисовки
@@ -829,19 +1124,6 @@ void OutputStage::ClearViews (size_t clear_flags, const Color4f& color, float de
 /*
     Оповещение об изменении целевых буферов отрисовки / обновление целевых буферов отрисовки
 */
-
-void OutputStage::InvalidateRenderTargets (const Rect& update_rect)
-{
-  try
-  {    
-    impl->InvalidateRenderTargets (update_rect);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::OutputStage::InvalidateRenderTargets");
-    throw;
-  }
-}
 
 void OutputStage::UpdateRenderTargets ()
 {

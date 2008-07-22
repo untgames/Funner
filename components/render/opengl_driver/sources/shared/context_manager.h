@@ -32,7 +32,6 @@ enum Stage
   Stage_Common,
   Stage_Input,
   Stage_Shading,
-  Stage_Rasterizer,
   Stage_Output,
   Stage_TextureManager,
   Stage_QueryManager,
@@ -45,8 +44,8 @@ enum Stage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum CommonCache
 {
-  CommonCache_ActiveTextureSlot, //номер текущего активного слота текстурироания
-  CommonCache_EnabledTextures,   //маска: установлена ли текстура в определенном слоте
+  CommonCache_ActiveTextureSlot,   //номер текущего активного слота текстурироания
+  CommonCache_EnabledTextures,     //маска: установлена ли текстура в определенном слоте
 
   CommonCache_Num
 };
@@ -58,7 +57,6 @@ enum StageFlag
 {
   StageFlag_Input          = 1 << Stage_Input,
   StageFlag_Shading        = 1 << Stage_Shading,
-  StageFlag_Rasterizer     = 1 << Stage_Rasterizer,
   StageFlag_Output         = 1 << Stage_Output,
   StageFlag_TextureManager = 1 << Stage_TextureManager,
   StageFlag_QueryManager   = 1 << Stage_QueryManager,

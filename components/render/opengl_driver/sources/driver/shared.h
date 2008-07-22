@@ -22,7 +22,6 @@
 #include <shared/input_stage.h>
 #include <shared/texture_manager.h>
 #include <shared/output_stage.h>
-#include <shared/rasterizer_stage.h>
 #include <shared/shader_stage.h>
 #include <shared/query_manager.h>
 
@@ -218,7 +217,6 @@ class Device: virtual public IDevice, public Object
     PropertyList    properties;             //свойства устройства
     OutputStage     output_stage;           //выходной уровень
     InputStage      input_stage;            //входной уровень
-    RasterizerStage rasterizer_stage;       //уровень растеризации
     TextureManager  texture_manager;        //менеджер текстур
     ShaderStage     shader_stage;           //уровень шейдинга
     QueryManager    query_manager;          //менеджер запросов
@@ -260,7 +258,6 @@ class StateBlock: virtual public IStateBlock, public Object
     StateBlockMask mask;                   //маска состояний
     StageStatePtr  output_stage_state;     //состояние выходного уровня
     StageStatePtr  input_stage_state;      //состояние входного уровня
-    StageStatePtr  rasterizer_stage_state; //состояние растеризатора
     StageStatePtr  texture_manager_state;  //состояние менеджера текстур
     StageStatePtr  shader_stage_state;     //состояние шейдерного уровня
     StageStatePtr  query_manager_state;    //состояние менеджера запросов

@@ -129,7 +129,7 @@ struct Test
       clear_color.red   = 0;
       clear_color.green = 0.7f;
       clear_color.blue  = 0.7f;
-      clear_color.alpha = 0;
+      clear_color.alpha = 0;      
 
       device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);
       
