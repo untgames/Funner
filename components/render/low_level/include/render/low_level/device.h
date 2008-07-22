@@ -26,6 +26,7 @@ enum ClearFlag
   ClearFlag_RenderTarget = 1, //очищать буферы цвета (render-target)
   ClearFlag_Depth        = 2, //очищать буфер глубины
   ClearFlag_Stencil      = 4, //очищать буфер трафарета
+  ClearFlag_ViewportOnly = 8, //очищать только область вывода
 
   ClearFlag_DepthStencil = ClearFlag_Depth | ClearFlag_Stencil,
   ClearFlag_All          = ClearFlag_RenderTarget | ClearFlag_DepthStencil
