@@ -170,9 +170,9 @@ int main ()
     clear_frame->SetFlags (render::mid_level::ClearFlag_All);
     clear_frame->SetColor (math::vec4f (0.7f, 0.f, 0.f, 0.f));
 
+    frame->SetRenderTargets (renderer->GetColorBuffer (), renderer->GetDepthStencilBuffer ());
     frame->SetProjection (get_ortho_proj (-100, 100, -100, 100, -1000, 1000));
     frame->SetViewport (viewport);
-    frame->SetRenderTargets (renderer->GetColorBuffer (), renderer->GetDepthStencilBuffer ());
 
     printf ("Frame primitives count is %u\n", frame->PrimitivesCount ());
     frame->AddPrimitive (primitive1.get ());

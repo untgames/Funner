@@ -38,7 +38,7 @@ BasicRenderer::BasicRenderer (render::low_level::IDevice* in_device, render::low
     --free_pool_id;
     throw xtl::format_operation_exception (METHOD_NAME, "No free resource pool");
   }
-
+  
   color_buffer         = RenderTargetPtr (CreateRenderBuffer (), false);
   depth_stencil_buffer = RenderTargetPtr (CreateDepthStencilBuffer (), false);  
 

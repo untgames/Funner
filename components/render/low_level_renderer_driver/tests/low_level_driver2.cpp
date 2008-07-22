@@ -36,7 +36,7 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
 
   renderer->AddFrame (clear_frame);  
   renderer->AddFrame (frame);
-     
+
   rotation_angle += 0.05f;
 
   renderer->DrawFrames ();
@@ -105,6 +105,7 @@ int main ()
     desc.window_handle             = window.Handle ();
     
     render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, "max_version=1.1 disable=*", swap_chain, device);
+//    render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, "", swap_chain, device);
 
     LowLevelDriver::RegisterRenderer ("MyRenderer", device.get (), swap_chain.get ());
 
@@ -126,7 +127,7 @@ int main ()
 
     primitive->SetTexture (texture.get ());
 
-//    primitive->SetBlendMode (BlendMode_Translucent);
+//   primitive->SetBlendMode (BlendMode_Translucent);
 //    primitive->SetBlendMode (BlendMode_Additive);
 
     for (size_t i = 0; i < SPRITES_COUNT; i++)
@@ -145,7 +146,7 @@ int main ()
     // building frame
 
     render::mid_level::Viewport viewport = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-    
+
     clear_frame->SetRenderTargets (renderer->GetColorBuffer (), renderer->GetDepthStencilBuffer ());
     clear_frame->SetFlags (render::mid_level::ClearFlag_All);
     clear_frame->SetColor (math::vec4f (0.7f, 0.f, 0.f, 0.f));
