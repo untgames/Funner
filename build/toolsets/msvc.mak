@@ -8,12 +8,14 @@
 ifneq (,$(VS90COMNTOOLS))
   MSVC_PATH         ?= $(VS90COMNTOOLS)../../vc
   MSVS_COMMON_PATH  ?= $(VS90COMNTOOLS)../../Common7/Ide
+  PROFILES          += vc9 haswchar
 endif
 
 ifneq (,$(VS80COMNTOOLS))
   MSVC_PATH         ?= $(VS80COMNTOOLS)../../vc
   MSVS_COMMON_PATH  ?= $(VS80COMNTOOLS)../../Common7/Ide
   PLATFORM_SDK_PATH ?= $(MSVC_PATH)/platformsdk
+  PROFILES          += vc8 haswchar
 endif
 
 ifneq (,$(VS71COMNTOOLS))
@@ -27,6 +29,11 @@ ifneq (,$(VCTOOLKITINSTALLDIR))
   MSVC_PATH         ?= $(VCTOOLKITINSTALLDIR).
   MSVS_COMMON_PATH  ?= $(VCTOOLKITINSTALLDIR)bin
   PROFILES          += vc7
+endif
+
+ifneq (,$(filter vc7,$(PROFILES)))
+  COMMON_CFLAGS += -wd4675 -GR
+  PROFILES      += nowchar
 endif
 
 ifeq (,$(MSVS_COMMON_PATH))
@@ -72,7 +79,7 @@ export LIB
 #список дефайнов, флаги компиляции, pch файл)
 ###################################################################################################
 define tools.c++compile
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -nologo -c -EHsc -W3 -Ox -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsubst %,-I"%",$2) $5 $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -nologo -c -EHsc -W3 -Ox -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsubst %,-I"%",$2) $(COMMON_CFLAGS) $5 $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
 endef
 
 ###################################################################################################

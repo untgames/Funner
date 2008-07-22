@@ -13,7 +13,7 @@ LIB_PREFIX   ?= lib
 COMPILER_GCC ?= gcc
 LINKER_GCC   ?= g++
 LIB_GCC      ?= ar
-PROFILES     += g++
+PROFILES     += g++ haswchar
 DEFAULT_LIBS +=
 
 ###################################################################################################
