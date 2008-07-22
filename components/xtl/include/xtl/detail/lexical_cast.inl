@@ -97,12 +97,16 @@ inline void to_string (stl::string& buffer, unsigned char value)
   buffer = value;
 }
 
+#ifndef XTL_NO_WCHAR
+
 inline void to_string (stl::string& buffer, wchar_t value)
 {
   wchar_t tmp_buffer [2] = {value, L'\0'};
 
   to_string (buffer, tmp_buffer);
 }
+
+#endif
 
 inline void to_string (stl::string& buffer, short value)
 {
@@ -220,10 +224,14 @@ inline void to_value (const stl::string& buffer, stl::wstring& value)
   value.fast_resize (result_size);
 }
 
+#ifndef XTL_NO_WCHAR
+
 inline void to_value (const stl::string& buffer, wchar_t& value)
 {
   detail::to_value (buffer, value);
 }
+
+#endif
 
 inline void to_value (const stl::string& buffer, long& value)
 {

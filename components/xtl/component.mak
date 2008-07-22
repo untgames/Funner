@@ -27,14 +27,15 @@ XTL.TR1.TESTS.msvc.SOURCE_DIRS    := tests/tr1/functional/msvc
 XTL.TR1.TYPE_TRAITS_TESTS.cygwin.g++.COMPILER_CFLAGS := --no-warn
 
 #Öåëü ¹3 - XTL tests
-XTL.XTL.TESTS.TYPE             := test-suite
-XTL.XTL.TESTS.INCLUDE_DIRS     := include
-XTL.XTL.TESTS.SOURCE_DIRS      := tests/xtl/signals tests/xtl/utils tests/xtl/visitor tests/xtl/range tests/xtl/smart_ptr tests/xtl/any tests/xtl/exception
-XTL.XTL.TESTS.LIB_DIRS         :=  
-XTL.XTL.TESTS.EXECTUTION_DIR   :=
-XTL.XTL.TESTS.LIBS             :=
-XTL.XTL.TESTS.COMPILER_CFLAGS  :=
-XTL.XTL.TESTS.COMPILER_DEFINES := __MYSTL_STANDALONE__
+XTL.XTL.TESTS.TYPE                 := test-suite
+XTL.XTL.TESTS.INCLUDE_DIRS         := include
+XTL.XTL.TESTS.SOURCE_DIRS          := tests/xtl/signals tests/xtl/utils tests/xtl/visitor tests/xtl/range tests/xtl/smart_ptr tests/xtl/any tests/xtl/exception
+XTL.XTL.TESTS.LIB_DIRS             :=
+XTL.XTL.TESTS.EXECTUTION_DIR       :=
+XTL.XTL.TESTS.LIBS                 :=
+XTL.XTL.TESTS.COMPILER_CFLAGS      :=
+XTL.XTL.TESTS.COMPILER_DEFINES     := __MYSTL_STANDALONE__
+XTL.XTL.TESTS.haswchar.SOURCE_DIRS := tests/xtl/utils/wchar
 
 #Öåëü ¹4 - Math tests
 XTL.MATH.TESTS.TYPE             := test-suite

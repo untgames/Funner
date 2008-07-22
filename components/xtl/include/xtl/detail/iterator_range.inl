@@ -148,12 +148,6 @@ inline bool iterator_range<FwdIter>::empty () const
 }
 
 template <class FwdIter>
-inline iterator_range<FwdIter>::operator unspecified_bool_type () const
-{
-  return !empty () ? &iterator_range::empty : 0;
-}
-
-template <class FwdIter>
 inline bool empty (const iterator_range<FwdIter>& r)
 {
   return r.empty ();

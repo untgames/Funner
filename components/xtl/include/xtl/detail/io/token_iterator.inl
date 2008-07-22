@@ -76,12 +76,6 @@ inline bool token_iterator<Token, BaseIter>::empty () const
   return !(first < last);
 }
 
-template <class Token, class BaseIter>
-inline token_iterator<Token, BaseIter>::operator safe_bool () const
-{
-  return first < last ? &token_iterator::dummy : 0;
-}
-
 /*
     Арифметика
 */
@@ -322,11 +316,15 @@ inline bool read (token_iterator<const char*, BaseIter>& iter, bool& value)
   return detail::read_value (iter, value);
 }
 
+#ifndef XTL_NO_WCHAR
+
 template <class BaseIter>
 inline bool read (token_iterator<const char*, BaseIter>& iter, wchar_t& value)
 {
   return detail::read_value (iter, value);
 }
+
+#endif
 
 template <class BaseIter>
 inline bool read (token_iterator<const char*, BaseIter>& iter, char& value)
@@ -406,11 +404,15 @@ inline bool read (token_iterator<const wchar_t*, BaseIter>& iter, bool& value)
   return detail::read_value (iter, value);
 }
 
+#ifndef XTL_NO_WCHAR
+
 template <class BaseIter>
 inline bool read (token_iterator<const wchar_t*, BaseIter>& iter, wchar_t& value)
 {
   return detail::read_value (iter, value);
 }
+
+#endif
 
 template <class BaseIter>
 inline bool read (token_iterator<const wchar_t*, BaseIter>& iter, char& value)

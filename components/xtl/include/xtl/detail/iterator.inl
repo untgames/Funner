@@ -307,12 +307,6 @@ inline bool iterator<T>::empty () const
   return impl->empty ();
 }
 
-template <class T>
-inline iterator<T>::operator safe_bool () const
-{
-  return empty () ? 0 : &iterator::empty;
-}
-
 /*
     Селекторы
 */

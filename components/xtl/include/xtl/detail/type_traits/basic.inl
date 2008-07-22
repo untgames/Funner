@@ -5,66 +5,76 @@
 namespace detail
 {
 
+struct is_void_tag;
+struct is_integral_tag;
+struct is_floating_point_tag;
+struct is_array_tag;
+struct is_function_tag;
+struct is_member_function_pointer_tag;
+
 //вспомогательный класс дл€ проверки свойства типа без учЄта cv-модификаторов
-template <template <class T1> class Tag, class T>
+template <class Tag, class T>
 struct type_trait_checker: public false_type {}; //если тип неизвестен - то результат проверки свойства - ложь
 
-template <template <class T1> class Tag, class T>
+template <class Tag, class T>
 struct cv_type_trait_checker: public type_trait_checker<Tag, T> {};
 
-template <template <class T1> class Tag, class T>
+template <class Tag, class T>
 struct cv_type_trait_checker<Tag, const T>: public type_trait_checker<Tag, T> {};
 
-template <template <class T1> class Tag, class T>
+template <class Tag, class T>
 struct cv_type_trait_checker<Tag, volatile T>: public type_trait_checker<Tag, T> {};
 
-template <template <class T1> class Tag, class T>
+template <class Tag, class T>
 struct cv_type_trait_checker<Tag, const volatile T>: public type_trait_checker<Tag, T> {};
 
 //специализации дл€ проверки €вл€етс€ ли T void-типом
-template <> struct type_trait_checker<is_void, void>: public true_type {};
+template <> struct type_trait_checker<is_void_tag, void>: public true_type {};
 
 //специализации дл€ проверки €вл€етс€ ли T целочисленным типом
-template <> struct type_trait_checker<is_integral, unsigned char>:  public true_type {};
-template <> struct type_trait_checker<is_integral, unsigned short>: public true_type {};
-template <> struct type_trait_checker<is_integral, unsigned int>:   public true_type {};
-template <> struct type_trait_checker<is_integral, unsigned long>:  public true_type {};
-template <> struct type_trait_checker<is_integral, signed char>:    public true_type {};
-template <> struct type_trait_checker<is_integral, signed short>:   public true_type {};
-template <> struct type_trait_checker<is_integral, signed int>:     public true_type {};
-template <> struct type_trait_checker<is_integral, signed long>:    public true_type {};
-template <> struct type_trait_checker<is_integral, bool>:           public true_type {};
-template <> struct type_trait_checker<is_integral, char>:           public true_type {};
-template <> struct type_trait_checker<is_integral, wchar_t>:        public true_type {};
+template <> struct type_trait_checker<is_integral_tag, unsigned char>:  public true_type {};
+template <> struct type_trait_checker<is_integral_tag, unsigned short>: public true_type {};
+template <> struct type_trait_checker<is_integral_tag, unsigned int>:   public true_type {};
+template <> struct type_trait_checker<is_integral_tag, unsigned long>:  public true_type {};
+template <> struct type_trait_checker<is_integral_tag, signed char>:    public true_type {};
+template <> struct type_trait_checker<is_integral_tag, signed short>:   public true_type {};
+template <> struct type_trait_checker<is_integral_tag, signed int>:     public true_type {};
+template <> struct type_trait_checker<is_integral_tag, signed long>:    public true_type {};
+template <> struct type_trait_checker<is_integral_tag, bool>:           public true_type {};
+template <> struct type_trait_checker<is_integral_tag, char>:           public true_type {};
+
+#ifndef XTL_NO_WCHAR
+template <> struct type_trait_checker<is_integral_tag, wchar_t>: public true_type {};
+#endif
 
 #ifdef _MSC_VER
 
-template <> struct type_trait_checker<is_integral, unsigned __int64>: public true_type {};
-template <> struct type_trait_checker<is_integral, signed __int64>: public true_type {};
+template <> struct type_trait_checker<is_integral_tag, unsigned __int64>: public true_type {};
+template <> struct type_trait_checker<is_integral_tag, signed __int64>: public true_type {};
 
 #endif
 
 //специализации дл€ проверки €вл€етс€ ли T вещественным типом
-template <> struct type_trait_checker<is_floating_point, float>:       public true_type {};
-template <> struct type_trait_checker<is_floating_point, double>:      public true_type {};
-template <> struct type_trait_checker<is_floating_point, long double>: public true_type {};
+template <> struct type_trait_checker<is_floating_point_tag, float>:       public true_type {};
+template <> struct type_trait_checker<is_floating_point_tag, double>:      public true_type {};
+template <> struct type_trait_checker<is_floating_point_tag, long double>: public true_type {};
 
 //специализации дл€ проверки €вл€етс€ ли T массивом
-template <class T, size_t N> struct type_trait_checker<is_array, T [N]>:                public true_type {};
-template <class T, size_t N> struct type_trait_checker<is_array, T const [N]>:          public true_type {};
-template <class T, size_t N> struct type_trait_checker<is_array, T volatile [N]>:       public true_type {};
-template <class T, size_t N> struct type_trait_checker<is_array, T const volatile [N]>: public true_type {};
-template <class T>           struct type_trait_checker<is_array, T []>:                 public true_type {};
-template <class T>           struct type_trait_checker<is_array, T const []>:           public true_type {};
-template <class T>           struct type_trait_checker<is_array, T volatile []>:        public true_type {};
-template <class T>           struct type_trait_checker<is_array, T const volatile []>:  public true_type {};
+template <class T, size_t N> struct type_trait_checker<is_array_tag, T [N]>:                public true_type {};
+template <class T, size_t N> struct type_trait_checker<is_array_tag, T const [N]>:          public true_type {};
+template <class T, size_t N> struct type_trait_checker<is_array_tag, T volatile [N]>:       public true_type {};
+template <class T, size_t N> struct type_trait_checker<is_array_tag, T const volatile [N]>: public true_type {};
+template <class T>           struct type_trait_checker<is_array_tag, T []>:                 public true_type {};
+template <class T>           struct type_trait_checker<is_array_tag, T const []>:           public true_type {};
+template <class T>           struct type_trait_checker<is_array_tag, T volatile []>:        public true_type {};
+template <class T>           struct type_trait_checker<is_array_tag, T const volatile []>:  public true_type {};
 
 }
 
-template <class T> struct is_void:           public detail::cv_type_trait_checker<is_void, T> {};
-template <class T> struct is_integral:       public detail::cv_type_trait_checker<is_integral, T> {};
-template <class T> struct is_floating_point: public detail::cv_type_trait_checker<is_floating_point, T> {};
-template <class T> struct is_array:          public detail::cv_type_trait_checker<is_array, T> {};
+template <class T> struct is_void:           public detail::cv_type_trait_checker<detail::is_void_tag, T> {};
+template <class T> struct is_integral:       public detail::cv_type_trait_checker<detail::is_integral_tag, T> {};
+template <class T> struct is_floating_point: public detail::cv_type_trait_checker<detail::is_floating_point_tag, T> {};
+template <class T> struct is_array:          public detail::cv_type_trait_checker<detail::is_array_tag, T> {};
 
 /*
     ѕроверка €вл€етс€ ли T объединением
@@ -126,14 +136,14 @@ template <class T, class U> struct is_member_pointer<U T::*>: public true_type {
 namespace detail
 {
 
-template <class T> struct type_trait_checker<is_function, T>: public bool_constant<functional_traits<T>::is_function> {};
-template <class T> struct type_trait_checker<is_member_function_pointer, T>: 
+template <class T> struct type_trait_checker<is_function_tag, T>: public bool_constant<functional_traits<T>::is_function> {};
+template <class T> struct type_trait_checker<is_member_function_pointer_tag, T>: 
          public bool_constant<functional_traits<T>::is_memfun> {};
 
 }
 
-template <class T> struct is_function: public detail::cv_type_trait_checker<is_function, T> {};
-template <class T> struct is_member_function_pointer: public detail::cv_type_trait_checker<is_member_function_pointer, T> {};
+template <class T> struct is_function: public detail::cv_type_trait_checker<detail::is_function_tag, T> {};
+template <class T> struct is_member_function_pointer: public detail::cv_type_trait_checker<detail::is_member_function_pointer_tag, T> {};
 template <class T> struct is_member_object_pointer: 
          public bool_constant<is_member_pointer<T>::value && !is_member_function_pointer<T>::value> {};
 

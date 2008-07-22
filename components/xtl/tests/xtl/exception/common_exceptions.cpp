@@ -7,7 +7,7 @@
     {                                             \
       throw X;                                    \
     }                                             \
-    catch (exception& exception)                  \
+    catch (xtl::exception& exception)             \
     {                                             \
       exception.touch ("some_function");          \
       throw;                                      \

@@ -253,22 +253,23 @@ class cons: private tuple_element_holder<Head, Tail>, public Tail
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Специализация последнего элемента cons-списка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <> struct cons<mpl::null_type, mpl::null_type>
+template <> class cons<mpl::null_type, mpl::null_type>
 {
-  enum { tuple_size = 0 };
+  public:
+    enum { tuple_size = 0 };
 
-  cons () {}
+    cons () {}
 
-  void assign () {}
+    void assign () {}
 
-  bool operator == (const cons&) const { return true;  }
+    bool operator == (const cons&) const { return true;  }
 
-  template <class Head, class Tail> bool operator == (const cons<Head, Tail>&) const { return false; }
-  template <class Head, class Tail> bool operator != (const cons<Head, Tail>&) const { return false; }
-  template <class Head, class Tail> bool operator <  (const cons<Head, Tail>&) const { return false; }
-  template <class Head, class Tail> bool operator >  (const cons<Head, Tail>&) const { return false; }
-  template <class Head, class Tail> bool operator <= (const cons<Head, Tail>&) const { return false; }
-  template <class Head, class Tail> bool operator >= (const cons<Head, Tail>&) const { return false; }
+    template <class Head, class Tail> bool operator == (const cons<Head, Tail>&) const { return false; }
+    template <class Head, class Tail> bool operator != (const cons<Head, Tail>&) const { return false; }
+    template <class Head, class Tail> bool operator <  (const cons<Head, Tail>&) const { return false; }
+    template <class Head, class Tail> bool operator >  (const cons<Head, Tail>&) const { return false; }
+    template <class Head, class Tail> bool operator <= (const cons<Head, Tail>&) const { return false; }
+    template <class Head, class Tail> bool operator >= (const cons<Head, Tail>&) const { return false; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

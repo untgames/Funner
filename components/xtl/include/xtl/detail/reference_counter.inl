@@ -33,11 +33,6 @@ inline bool reference_counter::empty () const
   return counter == 0;
 }
 
-inline reference_counter::operator safe_bool () const
-{
-  return counter != 0 ? &reference_counter::empty : 0;
-}
-
 /*
     Увеличение / уменьшение количества ссылок
 */

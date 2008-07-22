@@ -1,5 +1,10 @@
 #include "shared.h"
 
+#ifdef _MSC_VER
+#pragma warning (disable : 4800) //'int' : forcing value to bool 'true' or 'false' (performance warning)
+#pragma warning (disable : 4927) //illegal conversion; more than one user-defined conversion has been implicitly applied
+#endif
+
 template<typename string_type, typename function_type>
 struct test
 {

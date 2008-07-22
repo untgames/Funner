@@ -8,7 +8,7 @@ namespace detail
 namespace type_traits_intrinsics
 {
 
-#ifdef _MSC_VER
+#if defined (_MSC_VER) && (_MSC_VER >= 1400)
 
 template <class T> struct is_union:                public bool_constant<__is_union (T)> {};
 template <class T> struct is_pod:                  public bool_constant<__is_pod (T) && __has_trivial_constructor (T)> {};

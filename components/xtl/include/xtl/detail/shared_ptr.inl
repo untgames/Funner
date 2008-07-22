@@ -225,12 +225,6 @@ inline bool shared_ptr<T>::unique () const
 {
   return use_count () == 1;
 }
-    
-template <class T>
-inline shared_ptr<T>::operator unspecified_bool_type () const
-{
-  return ptr ? &shared_ptr::get : 0;
-}
 
 template <class T>
 inline bool shared_ptr<T>::operator ! () const

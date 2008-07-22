@@ -203,15 +203,6 @@ inline T* get_pointer (trackable_ptr<T>& p)
 */
 
 template <class T>
-inline trackable_ptr<T>::operator unspecified_bool_type () const
-{
-  if (ptr)
-    return &trackable_ptr::get;
-
-  return 0;
-}
-
-template <class T>
 inline bool trackable_ptr<T>::operator ! () const
 {
   return ptr == 0;

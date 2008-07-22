@@ -97,7 +97,7 @@ template <class T> class shared_ptr
     long use_count () const; //количество ссылок на объект
     bool unique    () const; //является ли данный указатель единственным указателем на объект    
     
-    operator unspecified_bool_type () const; //неявное приведение типа для проверки if (p)
+    operator unspecified_bool_type () const { return ptr ? &shared_ptr::get : 0; } //неявное приведение типа для проверки if (p)
     bool     operator !            () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

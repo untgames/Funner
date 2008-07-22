@@ -73,16 +73,6 @@ inline typename stride_ptr<T>::reference stride_ptr<T>::operator [] (difference_
 }
 
 /*
-    Проверка указателя
-*/
-
-template <class T>
-inline stride_ptr<T>::operator unspecified_bool_type () const
-{
-  return ptr ? &stride_ptr::get : 0;
-}
-
-/*
     Арифметика указателей
 */
 

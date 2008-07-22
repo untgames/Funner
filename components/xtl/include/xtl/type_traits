@@ -6,6 +6,7 @@
 #define XTL_TYPE_TRAITS_HEADER
 
 #include <cstddef>
+#include <xtl/config.h>
 #include <xtl/functional_traits.h>
 #include <xtl/utility>
 
@@ -109,10 +110,10 @@ template <size_t Len, size_t Align=-1> struct aligned_storage;
 #include <xtl/detail/type_traits/cv.inl>
 #include <xtl/detail/type_traits/refptr.inl>
 
-#ifndef _MSC_VER
-  #include <xtl/detail/type_traits/hard_properties.inl>
-#else
+#if defined (_MSC_VER) && _MSC_VER >= 1400
   #include <xtl/detail/type_traits/hard_properties_msvc.inl>
+#else
+  #include <xtl/detail/type_traits/hard_properties.inl>
 #endif
 
 #include <xtl/detail/type_traits/relations.inl>

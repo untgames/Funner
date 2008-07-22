@@ -9,6 +9,8 @@
 #include <typeinfo>
 #include <exception>
 
+#include <xtl/config.h>
+
 namespace xtl
 {
 

@@ -44,23 +44,6 @@ inline bool read (const char* string, bool& value)
   return true;
 }
 
-inline bool read (const char* string, wchar_t& value)
-{
-  if (!string || !*string)
-    return false;
-
-  wchar_t tmp;
-  
-  int length = strlen (string), result_length = mbtowc (&tmp, string, length);
-  
-  if (length != result_length)
-    return false;
-
-  value = tmp;
-
-  return true;
-}
-
 inline bool read (const char* string, char& value)
 {
   if (!string || !*string || string [1])
@@ -80,6 +63,27 @@ inline bool read (const char* string, unsigned char& value)
 {
   return read (string, *(char*)&value);
 }
+
+#ifndef XTL_NO_WCHAR
+
+inline bool read (const char* string, wchar_t& value)
+{
+  if (!string || !*string)
+    return false;
+
+  wchar_t tmp;
+  
+  int length = strlen (string), result_length = mbtowc (&tmp, string, length);
+  
+  if (length != result_length)
+    return false;
+
+  value = tmp;
+
+  return true;
+}
+
+#endif
 
 inline bool read (const char* string, short& value)
 {
@@ -172,16 +176,6 @@ inline bool read (const wchar_t* string, bool& result_value)
   return detail::read_wchar_string (string, result_value);
 }
 
-inline bool read (const wchar_t* string, wchar_t& result_value)
-{
-  if (!string || !*string || wcslen (string) != 1)
-    return false;
-
-  result_value = *string;
-
-  return true;
-}
-
 inline bool read (const wchar_t* string, char& result_value)
 {
   return detail::read_wchar_string (string, result_value);
@@ -206,6 +200,20 @@ inline bool read (const wchar_t* string, unsigned short& result_value)
 {
   return detail::read_wchar_string (string, result_value);
 }
+
+#ifndef XTL_NO_WCHAR
+
+inline bool read (const wchar_t* string, wchar_t& result_value)
+{
+  if (!string || !*string || wcslen (string) != 1)
+    return false;
+
+  result_value = *string;
+
+  return true;
+}
+
+#endif
 
 inline bool read (const wchar_t* string, int& result_value)
 {

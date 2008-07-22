@@ -1,9 +1,12 @@
 #include "test.h"
 
-template <int id> void handler ()
+template <int id> struct handler
 {
-  printf ("handler%d\n", id);
-}
+  void operator () () const
+  {
+    printf ("handler%d\n", id);
+  }
+};
 
 int main ()
 {
@@ -12,19 +15,19 @@ int main ()
   connection c1;  
   
   trackable t1;
-  
-  t1.connect_tracker (&handler<1>);  
+
+  t1.connect_tracker (handler<1> ());
 
   {
     trackable t2;
     
-    t2.connect_tracker (&handler<2>);
-    t2.connect_tracker (&handler<21>, t1);
-    t1.connect_tracker (&handler<12>, t2);
+    t2.connect_tracker (handler<2> ());
+    t2.connect_tracker (handler<21> (), t1);
+    t1.connect_tracker (handler<12> (), t2);
     
-    connection c2 = t2.connect_tracker (&handler<0>,  t1),
-               c3 = t2.connect_tracker (&handler<-1>, t1),
-               c4 = t2.connect_tracker (&handler<-2>, t1);
+    connection c2 = t2.connect_tracker (handler<0> (),  t1),
+               c3 = t2.connect_tracker (handler<-1> (), t1),
+               c4 = t2.connect_tracker (handler<-2> (), t1);
                
     c4.block ();
                
