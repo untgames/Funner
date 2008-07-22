@@ -13,6 +13,7 @@ namespace xtl
 template <class T, class Allocator=typename stl::default_allocator<T>::allocator_type>
 class uninitialized_storage: private Allocator
 {
+  static Allocator create_allocator () { return Allocator::create (); }
   public:
     typedef T                                      value_type;
     typedef Allocator                              allocator_type;
@@ -23,8 +24,8 @@ class uninitialized_storage: private Allocator
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
-    uninitialized_storage  (const allocator_type& = allocator_type::create ());
-    uninitialized_storage  (size_type size, const allocator_type& = allocator_type::create ());
+    uninitialized_storage  (const allocator_type& = create_allocator ());
+    uninitialized_storage  (size_type size, const allocator_type& = create_allocator ());
     uninitialized_storage  (const uninitialized_storage&);
     ~uninitialized_storage ();
 
