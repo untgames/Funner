@@ -187,24 +187,33 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
   switch (event)
   {
     case WindowEvent_OnMouseMove:
+    {
       if (x_cursor_pos == window_event_context.cursor_position.x && y_cursor_pos == window_event_context.cursor_position.y)
         break;
 
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s at %u %u", CURSOR_AXIS_NAME, window_event_context.cursor_position.x, window_event_context.cursor_position.y);
       event_handler (message);
       
+      Rect client_rect = window.ClientRect ();
+
+      size_t client_rect_width  = client_rect.right - client_rect.left;
+      size_t client_rect_height = client_rect.bottom - client_rect.top;
+
       if (x_cursor_pos != window_event_context.cursor_position.x)
       {
         if (window.Width ())
         {
-          axis_pos = (float)window_event_context.cursor_position.x * 2.f / window.Width () - 1.f;
+          if (!autocenter_cursor)
+          {
+            axis_pos = (float)window_event_context.cursor_position.x * 2.f / client_rect_width - 1.f;
 
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX axis %f", CURSOR_AXIS_NAME, axis_pos);
-          event_handler (message);
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX axis %f", CURSOR_AXIS_NAME, axis_pos);
+            event_handler (message);
+          }
 
           int dx = window_event_context.cursor_position.x - x_cursor_pos;
 
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX delta %f", CURSOR_AXIS_NAME, (float)dx / stl::max (window.Width (), window.Height ()) * cursor_sensitivity);
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX delta %f", CURSOR_AXIS_NAME, (float)dx / client_rect_width);
           event_handler (message);
         }
 
@@ -215,14 +224,17 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
       {
         if (window.Height ())
         {
-          axis_pos = -(float)window_event_context.cursor_position.y * 2.f / window.Height () + 1.f;
+          if (!autocenter_cursor)
+          {
+            axis_pos = -(float)window_event_context.cursor_position.y * 2.f / client_rect_height + 1.f;
 
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY axis %f", CURSOR_AXIS_NAME, axis_pos);
-          event_handler (message);
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY axis %f", CURSOR_AXIS_NAME, axis_pos);
+            event_handler (message);
+          }
 
           int dx = y_cursor_pos - window_event_context.cursor_position.y;
 
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", CURSOR_AXIS_NAME, (float)dx / stl::max (window.Width (), window.Height ()) * cursor_sensitivity);
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", CURSOR_AXIS_NAME, (float)dx / client_rect_height);
           event_handler (message);
         }
 
@@ -237,6 +249,7 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
       }
 
       break;
+    }
     case WindowEvent_OnMouseVerticalWheel:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", WHEEL_AXIS_NAME, window_event_context.mouse_vertical_wheel_delta * vertical_wheel_sensitivity);
       event_handler (message);
