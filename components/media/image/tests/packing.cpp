@@ -13,12 +13,12 @@ using namespace media;
 
 #pragma pack (1)
 
-const size_t IMAGES_COUNT    = 1000;
-const size_t MAX_IMAGE_WIDTH = 100;
-const size_t MAX_IMAGE_HEIGHT = 200;
-const size_t START_LARGE_IMAGE_WIDTH = 128;
+const size_t IMAGES_COUNT             = 200;
+const size_t MAX_IMAGE_WIDTH          = 1000;
+const size_t MAX_IMAGE_HEIGHT         = 1000;
+const size_t START_LARGE_IMAGE_WIDTH  = 128;
 const size_t START_LARGE_IMAGE_HEIGHT = 128;
-const char*  RESULT_IMAGE_NAME = "results/atlas.tga";
+const char*  RESULT_IMAGE_NAME        = "results/atlas.tga";
 
 struct Rect
 {
@@ -43,9 +43,7 @@ struct ImageDesc
   
   ImageDesc (int in_id, size_t in_width, size_t in_height) : width (in_width), height (in_height), id (in_id)
   {
-    color.red   = unsigned char (rand () % 128 + 127);
-    color.green = unsigned char (rand () % 128 + 127);
-    color.blue  = unsigned char (rand () % 128 + 127);
+    color.red = color.green = color.blue;
   }
 };
 
@@ -186,7 +184,7 @@ bool image_order (const ImageDesc& image1, const ImageDesc& image2)
 float get_usage (const Image& image)
 {
   size_t               non_zero_pixels = 0,
-                       total_pixels    = image.Width () * image.Height () * sizeof (Color);
+                       total_pixels    = image.Width () * image.Height () * get_bytes_per_pixel (image.Format ());
   const unsigned char* pixel           = reinterpret_cast<const unsigned char*> (image.Bitmap ());
   
   for (size_t i=total_pixels; i--; pixel++)
@@ -198,91 +196,112 @@ float get_usage (const Image& image)
 
 int main ()
 {
-    //генерация картинок
-    
-  typedef stl::vector<ImageDesc> ImageArray;
-  
-  ImageArray images;
-  
-  images.reserve (IMAGES_COUNT);
-  
-  for (size_t i=0; i<IMAGES_COUNT; i++)
+  try
   {
-    ImageDesc image (i, rand () % (MAX_IMAGE_WIDTH-1) + 1, rand () % (MAX_IMAGE_HEIGHT-1) + 1);
+    srand (0);
     
-    images.push_back (image);
-  }  
-  
-    //сортировка картинок
+      //генерация картинок
+      
+    typedef stl::vector<ImageDesc> ImageArray;
     
-  stl::sort (images.begin (), images.end (), &image_order);
-
-    //заполнение дерева картинками        
+    ImageArray images;
     
-  size_t bad_inserts;
-  Node* root = 0;
-  
-  size_t large_image_width = START_LARGE_IMAGE_WIDTH,
-         large_image_height = START_LARGE_IMAGE_HEIGHT;
-         
-  clock_t start_time = clock ();
-  
-  int next_edge = 0;
-  
-  for (;;)
-  {
-      //инициализация корневого узла
-
-    root = new Node;
-
-    root->rect = Rect (0, 0, large_image_width, large_image_height);
-
-    bad_inserts = 0;
-
-    for (size_t i=0; i<images.size (); i++)
+    images.reserve (IMAGES_COUNT);
+    
+    for (size_t i=0; i<IMAGES_COUNT; i++)
     {
-      if (!root->Insert (images [i]))
+      ImageDesc image (i, rand () % MAX_IMAGE_WIDTH + 1, rand () % MAX_IMAGE_HEIGHT + 1);
+//      ImageDesc image (i, (sinf (i) + 1.0) * MAX_IMAGE_WIDTH, (cosf (i) + 1.0f) * MAX_IMAGE_HEIGHT);
+//      ImageDesc image (i, i + 1, i + 1);
+
+      unsigned char* colors = &image.color.red;
+
+      colors [i%3] = unsigned char (rand () % 128 + 127);
+
+      images.push_back (image);
+    }  
+    
+      //сортировка картинок
+      
+    stl::sort (images.begin (), images.end (), &image_order);
+
+      //заполнение дерева картинками        
+      
+    size_t bad_inserts;
+    Node* root = 0;
+    
+    size_t large_image_width = START_LARGE_IMAGE_WIDTH,
+           large_image_height = START_LARGE_IMAGE_HEIGHT;
+           
+    clock_t start_time = clock ();
+    
+    int next_edge = 0;
+    size_t iterations_count = 0;
+    
+    for (;;)
+    {
+      iterations_count++;
+      
+        //инициализация корневого узла
+
+      root = new Node;
+
+      root->rect = Rect (0, 0, large_image_width, large_image_height);
+
+      bad_inserts = 0;
+
+      for (size_t i=0; i<images.size (); i++)
       {
-        bad_inserts++;
-        break;
-  //      printf ("failed image insert %d width=%u height=%u\n", images [i].id, images [i].width, images [i].height);
+        if (!root->Insert (images [i]))
+        {
+          bad_inserts++;
+          break;
+    //      printf ("failed image insert %d width=%u height=%u\n", images [i].id, images [i].width, images [i].height);
+        }
       }
+    
+  //    printf ("Bad inserts: %u (%.2f%%)\n", bad_inserts, 100 * float (bad_inserts) / images.size ());    
+
+      if (!bad_inserts)
+        break;      
+
+      delete root;
+
+      if (next_edge) large_image_width  *= 2;
+      else           large_image_height *= 2;
+      
+      next_edge = !next_edge;
     }
-  
-//    printf ("Bad inserts: %u (%.2f%%)\n", bad_inserts, 100 * float (bad_inserts) / images.size ());    
 
-    if (!bad_inserts)
-      break;      
+      //вывод результатов
 
-    delete root;
+  //  root->PrintImages ();
 
-    if (next_edge) large_image_width  *= 2;
-    else           large_image_height *= 2;
+      //сохранение картинки
+      
+    printf ("Create large image (%ux%u)...\n", large_image_width, large_image_height);
+      
+    Image result (large_image_width, large_image_height, 1, PixelFormat_RGB8);
+
+    memset (result.Bitmap (), 0, large_image_width * large_image_height * sizeof (Color));
+
+    root->FillImages (result);
     
-    next_edge = !next_edge;
+    clock_t end_time = clock ();  
+
+    result.Save (RESULT_IMAGE_NAME);    
+    
+      //вывод статистики
+
+    printf ("At time:          %.2f seconds\n", float (end_time - start_time) / CLOCKS_PER_SEC);
+    printf ("Iterations count: %u\n", iterations_count);
+    printf ("Image size:       %ux%u\n", large_image_width, large_image_height);
+    printf ("Usage:            %.2f%%\n", get_usage (result) * 100);
+
+    return 0;
   }
-
-    //вывод результатов
-
-//  root->PrintImages ();
-  
-    //сохранение картинки
-    
-  Image result (large_image_width, large_image_height, 1, PixelFormat_RGB8);
-
-  memset (result.Bitmap (), 0, large_image_width * large_image_height * sizeof (Color));
-
-  root->FillImages (result);
-  
-  clock_t end_time = clock ();  
-
-  result.Save (RESULT_IMAGE_NAME);    
-  
-    //вывод статистики
-
-  printf ("At time:    %.2f seconds\n", float (end_time - start_time) / CLOCKS_PER_SEC);
-  printf ("Image size: %ux%u\n", large_image_width, large_image_height);
-  printf ("Usage:      %.2f%%\n", get_usage (result) * 100);
-
-  return 0;
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
 }
