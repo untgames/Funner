@@ -2,6 +2,7 @@
 #define MATHLIB_BASE_HEADER
 
 
+
 namespace math
 {
 

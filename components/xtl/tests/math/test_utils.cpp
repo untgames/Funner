@@ -5,14 +5,13 @@
 #include <math_experimental/utils.h>
 #include <stdio.h>
 
-#include <math.h>
 using namespace math;
 
 
 int main()
 {
   printf("180deg= %.2f rad\n",deg_to_rad<float> (float (180) ) );
-  printf("PI rad= %.2f deg\n",rad_to_deg<float> (M_PI) );
+  printf("PI rad= %.2f deg\n",rad_to_deg<float> (3.14159265358979323846));
 
   quat_print("quat from axis/angle",quat<float> (axis_angle_to_quat(float (180), vec<float,3>(0,1,0,0) ) ) );
   quat_print("quat from euler angle",quat<float> (euler_angle_to_quat(float (90),float(90),float(90) ) ) );

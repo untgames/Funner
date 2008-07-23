@@ -5,13 +5,13 @@
 template <class T>
 inline const T deg_to_rad (const T& angle)
 {
-  return angle * T (M_PI) / T(180); 
+  return angle * T (3.14159265358979323846) / T(180); 
 }
 
 template <class T>
 inline const T rad_to_deg (const T& angle)
 {
-  return angle * T (180) /  T(M_PI); 
+  return angle * T (180) /  T(3.14159265358979323846); 
 }
 
 /*

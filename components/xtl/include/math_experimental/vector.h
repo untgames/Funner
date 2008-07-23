@@ -1,6 +1,7 @@
 #ifndef MATHLIB_VECTOR_HEADER
 #define MATHLIB_VECTOR_HEADER
 
+#include <float.h>
 #include "forward.h"
 #include <stddef.h>
 #include <math.h>

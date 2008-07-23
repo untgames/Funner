@@ -162,8 +162,9 @@ inline const matrix<T, SizeX,Size2Y> matrix<T,SizeX,SizeY>::operator *(const mat
   return res;
 }
 
-template<class T,size_t Size>
-inline matrix<T,Size>& operator *=(matrix<T,Size>& left,const matrix<T,Size>& right)
+
+template<class T, size_t Size>
+matrix<T, Size>& operator *= (matrix<T, Size>& left, const matrix<T, Size>& right)
 {
   left=left*right;
   return left;
@@ -173,14 +174,14 @@ inline matrix<T,Size>& operator *=(matrix<T,Size>& left,const matrix<T,Size>& ri
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T,size_t Size>
-inline const matrix<T,Size> operator /  (const matrix<T,Size>& left,const matrix<T,Size>& right)
+const matrix<T,Size>& operator /  (const matrix<T,Size>& left,const matrix<T,Size>& right)
 {
   matrix<T,Size> tmp(invert(right));
   return left*tmp;
 }
 
 template<class T,size_t Size>
-inline matrix<T,Size>& operator /= (matrix<T,Size>& left,const matrix<T,Size>& right)
+matrix<T,Size>& operator /= (matrix<T,Size>& left,const matrix<T,Size>& right)
 {
   return left*=invert(right);
 }

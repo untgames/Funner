@@ -99,14 +99,7 @@ class matrix
     template<size_t Size2Y>  
      const matrix<Type, SizeX, Size2Y> operator *  (const matrix<Type, SizeY, Size2Y>&) const;
 
-    template<class T, size_t Size>
-     friend matrix<T, Size>&          operator *= (matrix<T, Size>&, const matrix<T, Size>&);
 
-    template<class T, size_t Size>
-     friend const matrix<T, Size>     operator /  (const matrix<T, Size>&, const matrix<T, Size>&);
-
-    template<class T, size_t Size>
-     friend matrix<T, Size>&	     operator /= (matrix<T, Size>&, const matrix<T, Size>&);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -137,6 +130,23 @@ class matrix
     vector x [SizeX];  
 
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////
+///Перемножение мартиц
+////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class T, size_t Size>
+matrix<T, Size>& operator *= (matrix<T, Size>& left, const matrix<T, Size>& right);
+
+////////////////////////////////////////////////////////////////////////////////////////////
+///Деление матриц
+////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class T, size_t Size>
+const matrix<T, Size>& operator /  (const matrix<T, Size>& left, const matrix<T, Size>& right);
+
+template<class T, size_t Size>
+matrix<T, Size>&       operator /= (matrix<T, Size>& left, const matrix<T, Size>& right);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////

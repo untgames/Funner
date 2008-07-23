@@ -243,8 +243,8 @@ inline quat<T> normalize (const quat<T>& q)
 	“β¨«¨βλ
 */
 
-template <class T>
-inline const quat<T> invert (const quat<T>& src)
+template <class type>
+const quat<type>& invert (const quat<type>&)
 {
   quat<T> res;
   T norm = normalize (src);

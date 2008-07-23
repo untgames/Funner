@@ -123,7 +123,7 @@ type inner (const quat<type>&,const quat<type>&);//+*/
 
 ///Обратный кватернион
 template <class type>
-quat<type> invert (const quat<type>&);//+
+const quat<type>& invert (const quat<type>&);//+
 
 ///Преобразование кватерниона в матрицу
 template <class T> const matrix<T,4> quat_to_matrix     (const quat<T>& q);
