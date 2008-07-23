@@ -13,9 +13,9 @@ using namespace media;
 
 #pragma pack (1)
 
-const size_t IMAGES_COUNT             = 200;
-const size_t MAX_IMAGE_WIDTH          = 1000;
-const size_t MAX_IMAGE_HEIGHT         = 1000;
+const size_t IMAGES_COUNT             = 1000;
+const size_t MAX_IMAGE_WIDTH          = 100;
+const size_t MAX_IMAGE_HEIGHT         = 100;
 const size_t START_LARGE_IMAGE_WIDTH  = 128;
 const size_t START_LARGE_IMAGE_HEIGHT = 128;
 const char*  RESULT_IMAGE_NAME        = "results/atlas.tga";
@@ -43,7 +43,7 @@ struct ImageDesc
   
   ImageDesc (int in_id, size_t in_width, size_t in_height) : width (in_width), height (in_height), id (in_id)
   {
-    color.red = color.green = color.blue;
+    color.red = color.green = color.blue = 0;
   }
 };
 
@@ -183,14 +183,14 @@ bool image_order (const ImageDesc& image1, const ImageDesc& image2)
 
 float get_usage (const Image& image)
 {
-  size_t               non_zero_pixels = 0,
-                       total_pixels    = image.Width () * image.Height () * get_bytes_per_pixel (image.Format ());
-  const unsigned char* pixel           = reinterpret_cast<const unsigned char*> (image.Bitmap ());
+  size_t       non_zero_pixels = 0,
+               total_pixels    = image.Width () * image.Height ();
+  const Color* pixel           = reinterpret_cast<const Color*> (image.Bitmap ());
   
   for (size_t i=total_pixels; i--; pixel++)
-    if (*pixel)
+    if (pixel->red || pixel->green || pixel->blue)
       non_zero_pixels++;
-      
+
   return float (non_zero_pixels) / total_pixels;
 }
 
@@ -210,8 +210,9 @@ int main ()
     
     for (size_t i=0; i<IMAGES_COUNT; i++)
     {
-      ImageDesc image (i, rand () % MAX_IMAGE_WIDTH + 1, rand () % MAX_IMAGE_HEIGHT + 1);
-//      ImageDesc image (i, (sinf (i) + 1.0) * MAX_IMAGE_WIDTH, (cosf (i) + 1.0f) * MAX_IMAGE_HEIGHT);
+//      ImageDesc image (i, rand () % MAX_IMAGE_WIDTH + 1, rand () % MAX_IMAGE_HEIGHT + 1);
+      ImageDesc image (i, size_t (1 + (sinf (float (i)) + 1.0) * MAX_IMAGE_WIDTH),
+                       size_t (1 + (cosf (float (i)) + 1.0f) * MAX_IMAGE_HEIGHT));
 //      ImageDesc image (i, i + 1, i + 1);
 
       unsigned char* colors = &image.color.red;
