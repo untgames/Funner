@@ -82,8 +82,8 @@ class matrix
 ////////////////////////////////////////////////////////////////////////////////////////////
     matrix&      operator += (const matrix&);
     matrix&      operator -= (const matrix&);
-    matrix&	 operator *= (const Type& a);
-    matrix&	 operator /= (const Type&);
+    matrix&  operator *= (const Type& a);
+    matrix&  operator /= (const Type&);
 
     const matrix operator *  (const Type& a) const;
     const matrix operator /  (const Type&)   const; 
@@ -136,7 +136,7 @@ class matrix
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T, size_t Size>
-matrix<T, Size>& operator *= (matrix<T, Size>& left, const matrix<T, Size>& right);
+matrix<T, Size, Size>& operator *= (matrix<T, Size, Size>& left, const matrix<T, Size, Size>& right);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Деление матриц

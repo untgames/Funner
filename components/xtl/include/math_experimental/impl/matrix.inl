@@ -15,7 +15,7 @@ template <class T, size_t SizeX, size_t SizeY> const
 }
 
 /*
-	Конструкторы
+  Конструкторы
 */
 
 template <class T,size_t SizeX,size_t SizeY>
@@ -62,7 +62,7 @@ inline matrix<T,SizeX,SizeY>::matrix (const T1& a,void (*eval)(matrix&,const T1&
 }
 
 /*
-	Индексация
+  Индексация
 */
 
 template<class T,size_t SizeX,size_t SizeY>
@@ -74,7 +74,7 @@ inline const vec<T,SizeX> matrix<T,SizeX,SizeY>::column (size_t j) const
 }
 
 /*
-	Унарные операторы
+  Унарные операторы
 */
 
 template <class T,size_t SizeX,size_t SizeY>
@@ -84,7 +84,7 @@ inline const matrix<T,SizeX,SizeY> matrix<T,SizeX,SizeY>::operator -() const
 }
 
 /*
-	Бинарные операторы
+  Бинарные операторы
 */
 
 
@@ -162,9 +162,8 @@ inline const matrix<T, SizeX,Size2Y> matrix<T,SizeX,SizeY>::operator *(const mat
   return res;
 }
 
-
 template<class T, size_t Size>
-matrix<T, Size>& operator *= (matrix<T, Size>& left, const matrix<T, Size>& right)
+matrix<T, Size, Size>& operator *= (matrix<T, Size, Size>& left, const matrix<T, Size, Size>& right)
 {
   left=left*right;
   return left;
@@ -187,7 +186,7 @@ matrix<T,Size>& operator /= (matrix<T,Size>& left,const matrix<T,Size>& right)
 }
 
 /*
-	Удаление строки/столбца
+  Удаление строки/столбца
 */
 template<class T,size_t SizeX,size_t SizeY>
 inline const matrix<T,SizeX-1,SizeY> matrix<T,SizeX,SizeY>::remove_row(size_t row) const
@@ -232,7 +231,7 @@ inline const matrix<T,SizeX-1,SizeY-1> matrix<T,SizeX,SizeY>::remove_row_column(
 }
 
 /*
-	Присваивание
+  Присваивание
 */
 template <class T,size_t SizeX,size_t SizeY> 
 inline matrix<T,SizeX,SizeY>& matrix<T,SizeX,SizeY>::operator =(const T& src)
@@ -249,7 +248,7 @@ inline matrix<T,SizeX,SizeY>& matrix<T,SizeX,SizeY>::operator =(const matrix<T,S
 }
 
 /*
-	Сравнение
+  Сравнение
 */
 
 template <class T,size_t SizeX,size_t SizeY>
@@ -266,7 +265,7 @@ inline bool matrix<T,SizeX,SizeY>::operator != (const matrix<T,SizeX,SizeY>& v) 
 
 
 /*
-	Утилиты
+  Утилиты
 */
 template<class T,size_t SizeX,size_t SizeY>
 inline const matrix<T,SizeY,SizeX> matrix<T,SizeX,SizeY>::transpose ()
@@ -358,7 +357,7 @@ inline const matrix<T,Size> normalize(const matrix<T,Size>& src)
 }
 
 /*
-	Преобразование матрицы в кватернион
+  Преобразование матрицы в кватернион
 */
 
 template <class T>
