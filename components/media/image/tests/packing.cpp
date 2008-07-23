@@ -262,8 +262,6 @@ int main ()
     next_edge = !next_edge;
   }
 
-  clock_t end_time = clock ();
-
     //вывод результатов
 
 //  root->PrintImages ();
@@ -275,8 +273,10 @@ int main ()
   memset (result.Bitmap (), 0, large_image_width * large_image_height * sizeof (Color));
 
   root->FillImages (result);
+  
+  clock_t end_time = clock ();  
 
-  result.Save (RESULT_IMAGE_NAME);  
+  result.Save (RESULT_IMAGE_NAME);    
   
     //вывод статистики
 
