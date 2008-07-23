@@ -2,7 +2,7 @@
 #define MATHLIB_VECTOR_HEADER
 
 #include <float.h>
-#include "forward.h"
+#include <math_experimental/forward.h>
 #include <stddef.h>
 #include <math.h>
 #include "functional.h"

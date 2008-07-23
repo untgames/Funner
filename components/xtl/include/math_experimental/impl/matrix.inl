@@ -55,11 +55,11 @@ inline matrix<T,SizeX,SizeY>::matrix(const T1& src,Fn fn)
   fn(*this,src);
 }
 
-template <class T,size_t SizeX,size_t SizeY> template <class T1>
+/*template <class T,size_t SizeX,size_t SizeY> template <class T1>
 inline matrix<T,SizeX,SizeY>::matrix (const T1& a,void (*eval)(matrix&,const T1&))
 {
   eval (*this,a);
-}
+} */
 
 /*
   Индексация

@@ -1,6 +1,6 @@
 #ifndef MATHLIB_MATRIX_HEADER
 #define MATHLIB_MATRIX_HEADER
-#include "forward.h"
+#include <math_experimental/forward.h>
 #include "functional.h"
 #include <stddef.h>
 
@@ -45,7 +45,7 @@ class matrix
     matrix ();
     matrix (const matrix& src);
     matrix (const Type& a);  //a будет записано на главной диагонали
-    matrix (const Type*);                                            
+    matrix (const Type* a);                                            
     
     template <class T1, class T2,  class Fn>
       matrix(const T1& a, const T2& b, Fn fn);
@@ -55,7 +55,7 @@ class matrix
 
 
       //для использования оптимизации возвращаемого значения
-      template <class T1>           matrix (const T1&, void (*eval)(matrix&, const T1&));
+//    template <class T1>           matrix (const T1&, void (*eval)(matrix&, const T1&));
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Индексирование
@@ -74,30 +74,30 @@ class matrix
 ///Присваивание
 ////////////////////////////////////////////////////////////////////////////////////////////
 //  matrix&  operator = (const quat<Type>&);  //только для матриц 3-го и 4-го порядка
-    matrix&  operator = (const Type&);
-    matrix&  operator = (const matrix&);
+    matrix&  operator = (const Type& src);
+    matrix&  operator = (const matrix& src);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Основные арифметические операции
 ////////////////////////////////////////////////////////////////////////////////////////////
-    matrix&      operator += (const matrix&);
-    matrix&      operator -= (const matrix&);
+    matrix&      operator += (const matrix& a);
+    matrix&      operator -= (const matrix& a);
     matrix&  operator *= (const Type& a);
-    matrix&  operator /= (const Type&);
+    matrix&  operator /= (const Type& a);
 
     const matrix operator *  (const Type& a) const;
-    const matrix operator /  (const Type&)   const; 
+    const matrix operator /  (const Type& a) const; 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-    const matrix operator +  (const matrix&) const;
-    const matrix operator -  (const matrix&) const;
+    const matrix operator +  (const matrix& m) const;
+    const matrix operator -  (const matrix& m) const;
 
 ///////////////////////////////////////////////
 
     template<size_t Size2Y>  
-     const matrix<Type, SizeX, Size2Y> operator *  (const matrix<Type, SizeY, Size2Y>&) const;
+     const matrix<Type, SizeX, Size2Y> operator *  (const matrix<Type, SizeY, Size2Y>& b) const;
 
 
 
@@ -108,17 +108,17 @@ class matrix
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Отношения между матрицами
 ////////////////////////////////////////////////////////////////////////////////////////////
-    bool operator == (const matrix&) const;
-    bool operator != (const matrix&) const;             
+    bool operator == (const matrix& v) const;
+    bool operator != (const matrix& v) const;             
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление строки/столбца
 ////////////////////////////////////////////////////////////////////////////////////////////
   
-   const matrix<Type, SizeX-1, SizeY>   remove_row        (size_t)        const; 
-   const matrix<Type, SizeX, SizeY-1>   remove_column     (size_t)        const;
-   const matrix<Type, SizeX-1, SizeY-1> remove_row_column (size_t, size_t) const;
+   const matrix<Type, SizeX-1, SizeY>   remove_row        (size_t row)                const; 
+   const matrix<Type, SizeX, SizeY-1>   remove_column     (size_t column)             const;
+   const matrix<Type, SizeX-1, SizeY-1> remove_row_column (size_t row, size_t column) const;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Транспонирование матрицы
@@ -154,10 +154,10 @@ matrix<T, Size>&       operator /= (matrix<T, Size>& left, const matrix<T, Size>
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 template <class T>
-const quat<T> matrix_to_quat (const matrix<T, 3>&);
+const quat<T> matrix_to_quat (const matrix<T, 3>& m);
 
 template <class T>
-const quat<T> matrix_to_quat (const matrix<T, 4>&);
+const quat<T> matrix_to_quat (const matrix<T, 4>& m);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,35 +165,35 @@ const quat<T> matrix_to_quat (const matrix<T, 4>&);
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T, size_t Size>
-const T det (const matrix<T, Size, Size>&);
+const T det (const matrix<T, Size, Size>& src);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Треугольный вид
 ////////////////////////////////////////////////////////////////////////////////////////////
     
 template<class T, size_t Size>
-const matrix<T, Size, Size> three_angle_view  (const matrix<T, Size, Size>&, int&);
+const matrix<T, Size, Size> three_angle_view  (const matrix<T, Size, Size>& src, int& num_of_changes);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Математическое дополнение
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T, size_t Size>
-const T mathematical_add (const matrix<T, Size>&,  size_t, size_t);
+const T mathematical_add (const matrix<T, Size>& src,  size_t row, size_t column);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Обратная матрица
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T, size_t Size>
-const matrix<T, Size> invert (const matrix<T, Size>&);
+const matrix<T, Size> invert (const matrix<T, Size>& src);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Норимнование матрицы
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T, size_t Size>
-const matrix<T, Size> normalize (const matrix<T, Size>&);
+const matrix<T, Size> normalize (const matrix<T, Size>& src);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Основные типы

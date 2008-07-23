@@ -1,7 +1,7 @@
 #ifndef MATHLIB_QUATERNION_HEADER
 #define MATHLIB_QUATERNION_HEADER
 
-#include "forward.h"
+#include <math_experimental/forward.h>
 #include "functional.h"
 #include <stddef.h>
 #ifdef _MSC_VER
@@ -56,19 +56,19 @@ class quat: public quat_base<type>
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ////////////////////////////////////////////////////////////////////////////////////////////
-    quat&   operator = (const type&);  //+
-    quat&   operator = (const quat_base<type>&);//+
+    quat&   operator = (const type& a);  //+
+    quat&   operator = (const quat_base<type>& a);//+
     bool    equal      (const quat<type>&,const type& eps);//+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Основные арифметические операции
 ////////////////////////////////////////////////////////////////////////////////////////////
-    quat&       operator += (const quat&);//+
-    quat&       operator -= (const quat&);//+
-    quat&       operator *= (const quat&);//+
-    quat&       operator *= (const type&);//+
-    quat&       operator /= (const type&);//+
+    quat&       operator += (const quat& q);//+
+    quat&       operator -= (const quat& q);//+
+    quat&       operator *= (const quat& q);//+
+    quat&       operator *= (const type& a);//+
+    quat&       operator /= (const type& a);//+
      
     const quat  operator +  (const quat& q) const;//+
     const quat  operator -  (const quat& q) const;//+

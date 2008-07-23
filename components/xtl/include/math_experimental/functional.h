@@ -1,6 +1,6 @@
 #ifndef MATHLIB_FUNCTIONAL_HEADER
 #define MATHLIB_FUNCTIONAL_HEADER
-#include "forward.h"
+#include <math_experimental/forward.h>
 
 #ifdef _MSC_VER  
   #pragma pack(push,1)
