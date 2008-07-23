@@ -45,7 +45,7 @@ int main()
   matrix_print("M2/M2:",matrix<float,2>(M2/M2));
   if (M1==M2)
   {
-    printf("M1=M2");
+    printf("M1==M2");
   }
   else
   {
