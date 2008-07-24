@@ -13,7 +13,7 @@ using namespace media;
 
 #pragma pack (1)
 
-const size_t IMAGES_COUNT             = 1000;
+const size_t IMAGES_COUNT             = 200;
 const size_t MAX_IMAGE_WIDTH          = 100;
 const size_t MAX_IMAGE_HEIGHT         = 100;
 const size_t START_LARGE_IMAGE_WIDTH  = 128;
@@ -68,6 +68,8 @@ struct Node
   
   void PrintImages ();
   void FillImages (Image& image);
+  
+  size_t GetSummarySquare () const;
 };
 
 Node* Node::Insert (const ImageDesc& image)
@@ -87,8 +89,8 @@ Node* Node::Insert (const ImageDesc& image)
     //если в узел уже вставлена картинка - добавление невозможно
 
   if (image_id)
-    return 0;  
-  
+    return 0;
+
     //если нет места для вставки картинки - добавление невозможно  
     
   if (rect.width < image.width || rect.height < image.height)
@@ -99,7 +101,7 @@ Node* Node::Insert (const ImageDesc& image)
   if (rect.width == image.width && rect.height == image.height)
   {
     image_id = image.id;
-    color    = image.color;
+    color    = image.color;    
 
     return this;
   }
@@ -167,6 +169,19 @@ void Node::FillImages (Image& image)
     child [1]->FillImages (image);    
 }
 
+size_t Node::GetSummarySquare () const
+{
+  size_t summary_square = 0;
+  
+  if (image_id)
+    summary_square += rect.width * rect.height;
+    
+  if (child [0])
+    summary_square += child [0]->GetSummarySquare () + child [1]->GetSummarySquare ();
+    
+  return summary_square;
+}
+
 bool image_order (const ImageDesc& image1, const ImageDesc& image2)
 {
 //  return sqrtf (image1.width * image1.width + image1.height * image1.height) >
@@ -181,17 +196,17 @@ bool image_order (const ImageDesc& image1, const ImageDesc& image2)
   return image1.height > image2.height;
 }
 
-float get_usage (const Image& image)
+size_t get_non_zero_pixels (const Image& image)
 {
   size_t       non_zero_pixels = 0,
                total_pixels    = image.Width () * image.Height ();
   const Color* pixel           = reinterpret_cast<const Color*> (image.Bitmap ());
-  
+
   for (size_t i=total_pixels; i--; pixel++)
     if (pixel->red || pixel->green || pixel->blue)
       non_zero_pixels++;
 
-  return float (non_zero_pixels) / total_pixels;
+  return non_zero_pixels;
 }
 
 int main ()
@@ -199,6 +214,8 @@ int main ()
   try
   {
     srand (0);
+    
+    size_t total_square = 0;
     
       //генерация картинок
       
@@ -210,10 +227,14 @@ int main ()
     
     for (size_t i=0; i<IMAGES_COUNT; i++)
     {
-//      ImageDesc image (i, rand () % MAX_IMAGE_WIDTH + 1, rand () % MAX_IMAGE_HEIGHT + 1);
-      ImageDesc image (i, size_t (1 + (sinf (float (i)) + 1.0) * MAX_IMAGE_WIDTH),
-                       size_t (1 + (cosf (float (i)) + 1.0f) * MAX_IMAGE_HEIGHT));
-//      ImageDesc image (i, i + 1, i + 1);
+//      ImageDesc image (i+1, rand () % MAX_IMAGE_WIDTH + 1, rand () % MAX_IMAGE_HEIGHT + 1);
+//      ImageDesc image (i+1, size_t (1 + (sinf (float (i)) + 1.0) * MAX_IMAGE_WIDTH),
+//                       size_t (1 + (cosf (float (i)) + 1.0f) * MAX_IMAGE_HEIGHT));
+//      ImageDesc image (i+1, i + 1, i + 1);
+
+      ImageDesc image (i+1, 10, rand () % MAX_IMAGE_HEIGHT + 1);
+
+      total_square += image.width * image.height;
 
       unsigned char* colors = &image.color.red;
 
@@ -268,15 +289,15 @@ int main ()
 
       delete root;
 
-      if (next_edge) large_image_width  *= 2;
-      else           large_image_height *= 2;
+      if (next_edge) large_image_width  *= 1.01f;
+      else           large_image_height *= 1.01f;
       
       next_edge = !next_edge;
     }
 
       //вывод результатов
 
-  //  root->PrintImages ();
+//    root->PrintImages ();
 
       //сохранение картинки
       
@@ -293,11 +314,17 @@ int main ()
     result.Save (RESULT_IMAGE_NAME);    
     
       //вывод статистики
+      
+    size_t total_pixels    = result.Width () * result.Height (),
+           non_zero_pixels = get_non_zero_pixels (result);
 
-    printf ("At time:          %.2f seconds\n", float (end_time - start_time) / CLOCKS_PER_SEC);
-    printf ("Iterations count: %u\n", iterations_count);
-    printf ("Image size:       %ux%u\n", large_image_width, large_image_height);
-    printf ("Usage:            %.2f%%\n", get_usage (result) * 100);
+    printf ("At time:             %.3f seconds\n", float (end_time - start_time) / CLOCKS_PER_SEC);
+    printf ("Iterations count:    %u\n", iterations_count);
+    printf ("Image size:          %ux%u (%u pixels)\n", large_image_width, large_image_height, large_image_width * large_image_height);
+    printf ("Total square:        %u\n", total_square);
+    printf ("Non-zero pixels:     %u\n", non_zero_pixels);
+    printf ("Tree summary square: %u\n", root->GetSummarySquare ());
+    printf ("Usage:               %.2f%%\n", float (non_zero_pixels) / total_pixels * 100);
 
     return 0;
   }
