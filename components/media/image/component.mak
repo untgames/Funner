@@ -7,7 +7,7 @@ TARGETS := MEDIA.IMAGE.SOURCES MEDIA.IMAGE.TESTS
 MEDIA.IMAGE.SOURCES.TYPE             := static-lib
 MEDIA.IMAGE.SOURCES.NAME             := media.image
 MEDIA.IMAGE.SOURCES.INCLUDE_DIRS     := ../../../extern/devil/include
-MEDIA.IMAGE.SOURCES.SOURCE_DIRS      := sources
+MEDIA.IMAGE.SOURCES.SOURCE_DIRS      := sources/image
 MEDIA.IMAGE.SOURCES.LIB_DIRS         :=  
 MEDIA.IMAGE.SOURCES.LIBS             := 
 MEDIA.IMAGE.SOURCES.COMPILER_CFLAGS  :=
@@ -16,8 +16,8 @@ MEDIA.IMAGE.SOURCES.IMPORTS          := compile.static.mak
 
 #Öåëü ¹3 - Image tests
 MEDIA.IMAGE.TESTS.TYPE             := test-suite
-MEDIA.IMAGE.TESTS.INCLUDE_DIRS     :=
-MEDIA.IMAGE.TESTS.SOURCE_DIRS      := tests
+MEDIA.IMAGE.TESTS.INCLUDE_DIRS     := ../../bound_volumes/include
+MEDIA.IMAGE.TESTS.SOURCE_DIRS      := tests/image
 MEDIA.IMAGE.TESTS.LIB_DIRS         :=  
 MEDIA.IMAGE.TESTS.LIBS             :=
 MEDIA.IMAGE.TESTS.COMPILER_CFLAGS  :=
