@@ -64,9 +64,18 @@ void ClearFrame::SetStencilIndex (unsigned char stencil_index)
 
 void ClearFrame::DrawCore (render::low_level::IDevice* device)
 {
-    //очистка целевых буферов отрисовки          
-
   size_t device_clear_flags = 0;
+
+    //если необходимо очищать только область вывода - устанавливаем её
+    
+  if (clear_flags & render::mid_level::ClearFlag_ViewportOnly)
+  {
+    BasicFrame::BindViewport (device);
+
+    device_clear_flags |= render::low_level::ClearFlag_ViewportOnly;
+  }
+
+    //очистка целевых буферов отрисовки          
   
   if ((clear_flags & render::mid_level::ClearFlag_RenderTarget) && BasicFrame::GetRenderTarget ())
     device_clear_flags |= render::low_level::ClearFlag_RenderTarget;
@@ -76,6 +85,6 @@ void ClearFrame::DrawCore (render::low_level::IDevice* device)
     if (clear_flags & render::mid_level::ClearFlag_Depth)   device_clear_flags |= render::low_level::ClearFlag_Depth;
     if (clear_flags & render::mid_level::ClearFlag_Stencil) device_clear_flags |= render::low_level::ClearFlag_Stencil;
   }
- 
+
   device->ClearViews (device_clear_flags, clear_color, clear_depth_value, clear_stencil_index);
 }

@@ -38,6 +38,11 @@ class MyViewportListener: public IViewportListener, public xtl::reference_counte
     {
       printf ("OnChangeActive(%s)\n", new_state ? "true" : "false");
     }
+    
+    void OnChangeBackground (bool new_state, const math::vec4f& new_color)
+    {
+      printf ("OnChangeBackground(%s, %.2f, %.2f, %.2f, %.2f)\n", new_state ? "true" : "false", new_color.x, new_color.y, new_color.z, new_color.w);
+    }        
 
     void OnChangeRenderPath (const char* new_path_name)
     {
@@ -47,7 +52,7 @@ class MyViewportListener: public IViewportListener, public xtl::reference_counte
     void OnChangeProperty (const char* name, const char* new_value)
     {
       printf ("OnChangeProperty(%s, %s)\n", name, new_value);
-    }
+    }    
 
     void OnDestroy ()
     {
@@ -82,6 +87,8 @@ int main ()
     viewport.SetArea (0, 0, 100, 200);
     viewport.Deactivate ();
     viewport.SetCamera (camera.get ());
+    viewport.SetBackgroundColor (1, 1, 0, 1);
+    viewport.EnableBackground ();
     
       //удаление камеры (проверка weak-reference области вывода)
 

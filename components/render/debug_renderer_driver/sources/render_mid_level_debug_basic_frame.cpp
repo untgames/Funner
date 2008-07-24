@@ -72,6 +72,12 @@ void BasicFrame::GetViewport (Viewport& out_viewport)
   out_viewport = viewport;
 }
 
+//установка области вывода
+void BasicFrame::BindViewport ()
+{
+  log.Printf ("Set viewport (left=%d, top=%d, width=%u, height=%u)", viewport.x, viewport.y, viewport.width, viewport.height);
+}
+
 /*
     Визуализация
 */
@@ -99,7 +105,7 @@ void BasicFrame::Draw ()
   else
   {
     log.Printf ("Set render targets: render-target=none, depth-stencil-target=none");
-  }
+  }  
 
     //собственно отрисовка
 

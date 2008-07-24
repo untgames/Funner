@@ -42,13 +42,15 @@ struct Viewport::Impl: public xtl::reference_counter
   scene_graph::Camera* camera;            //камера
   stl::string          path_name;         //имя пути рендеринга
   Rect                 rect;              //границы области вывода
-  bool                 is_active;         //флаг активности области вывода
+  bool                 is_active;         //флаг активности области вывода  
   int                  z_order;           //порядок отрисовки области вывода
+  math::vec4f          background_color;  //цвет фона
+  bool                 has_background;    //наличие фона
   PropertyMap          properties;        //переменные рендеринга
   ListenerArray        listeners;         //слушатели событий области вывода
   xtl::auto_connection on_destroy_camera; //слот соединения с сигналом оповещения об удалении камеры
 
-  Impl () : camera (0), is_active (true), z_order (INT_MAX)
+  Impl () : camera (0), is_active (true), z_order (INT_MAX), has_background (false)
   {
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
   }
@@ -73,7 +75,7 @@ struct Viewport::Impl: public xtl::reference_counter
         xtl::bind (&Impl::SetCamera, this, (scene_graph::Camera*)0));
     }
 
-    ChangeCameraNotify (camera);
+    ChangeCameraNotify ();
   }
 
   template <class Fn>
@@ -92,34 +94,39 @@ struct Viewport::Impl: public xtl::reference_counter
     }    
   }
     
-  void ChangeNameNotify (const char* new_name)
+  void ChangeNameNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeName, _1, new_name));
+    Notify (xtl::bind (&IViewportListener::OnChangeName, _1, name.c_str ()));
   }
   
-  void ChangeAreaNotify (const Rect& new_area)
+  void ChangeAreaNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeArea, _1, xtl::cref (new_area)));
+    Notify (xtl::bind (&IViewportListener::OnChangeArea, _1, xtl::cref (rect)));
   }
   
-  void ChangeCameraNotify (scene_graph::Camera* new_camera)
+  void ChangeCameraNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeCamera, _1, new_camera));
+    Notify (xtl::bind (&IViewportListener::OnChangeCamera, _1, camera));
   }
   
-  void ChangeZOrderNotify (int new_z_order)
+  void ChangeZOrderNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeZOrder, _1, new_z_order));
+    Notify (xtl::bind (&IViewportListener::OnChangeZOrder, _1, z_order));
   }
   
-  void ChangeActiveNotify (bool new_state)
+  void ChangeActiveNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeActive, _1, new_state));
+    Notify (xtl::bind (&IViewportListener::OnChangeActive, _1, is_active));
   }
   
-  void ChangeRenderPathNotify (const char* new_path_name)
+  void ChangeBackgroundNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeRenderPath, _1, new_path_name));
+    Notify (xtl::bind (&IViewportListener::OnChangeBackground, _1, has_background, xtl::cref (background_color)));
+  }  
+  
+  void ChangeRenderPathNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnChangeRenderPath, _1, path_name.c_str ()));
   }
   
   void ChangePropertyNotify (const char* name, const char* new_value)
@@ -174,7 +181,7 @@ void Viewport::SetName (const char* name)
     
   impl->name = name;
   
-  impl->ChangeNameNotify (impl->name.c_str ());
+  impl->ChangeNameNotify ();
 }
 
 const char* Viewport::Name () const
@@ -205,7 +212,7 @@ void Viewport::SetRenderPath (const char* path_name)
     
   impl->path_name = path_name;
   
-  impl->ChangeRenderPathNotify (impl->path_name.c_str ());
+  impl->ChangeRenderPathNotify ();
 }
 
 const char* Viewport::RenderPath () const
@@ -224,7 +231,7 @@ void Viewport::SetArea (const Rect& rect)
 
   impl->rect = rect;
 
-  impl->ChangeAreaNotify (impl->rect);
+  impl->ChangeAreaNotify ();
 }
 
 void Viewport::SetArea (int left, int top, size_t width, size_t height)
@@ -268,7 +275,7 @@ void Viewport::SetZOrder (int z_order)
 
   impl->z_order = z_order;
   
-  impl->ChangeZOrderNotify (impl->z_order);
+  impl->ChangeZOrderNotify ();
 }
 
 int Viewport::ZOrder () const
@@ -306,12 +313,51 @@ void Viewport::SetActive (bool state)
 
   impl->is_active = state;
   
-  impl->ChangeActiveNotify (impl->is_active);
+  impl->ChangeActiveNotify ();
 }
 
 bool Viewport::IsActive () const
 {
   return impl->is_active;
+}
+
+/*
+    Настройка фона
+*/
+
+void Viewport::SetBackgroundColor (const math::vec4f& color)
+{
+  if (impl->background_color == color)
+    return;
+
+  impl->background_color = color;
+  
+  impl->ChangeBackgroundNotify ();
+}
+
+void Viewport::SetBackgroundColor (float red, float green, float blue, float alpha)
+{
+  SetBackgroundColor (math::vec4f (red, green, blue, alpha));
+}
+
+const math::vec4f& Viewport::BackgroundColor () const
+{
+  return impl->background_color;
+}
+
+void Viewport::SetBackgroundState (bool state)
+{
+  if (state == impl->has_background)
+    return;
+
+  impl->has_background = state;
+
+  impl->ChangeBackgroundNotify ();
+}
+
+bool Viewport::HasBackground () const
+{
+  return impl->has_background;
 }
 
 /*

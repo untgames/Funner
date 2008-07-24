@@ -15,11 +15,11 @@ class IDesktopListener
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///События
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnChangeName            (const char* new_name) {}
-    virtual void OnChangeBackgroundColor (const math::vec4f& new_color) {}
-    virtual void OnAttachViewport        (Viewport&) {}
-    virtual void OnDetachViewport        (Viewport&) {}
-    virtual void OnDestroy               () {}
+    virtual void OnChangeName       (const char* new_name) {}
+    virtual void OnChangeBackground (bool state, const math::vec4f& new_color) {}
+    virtual void OnAttachViewport   (Viewport&) {}
+    virtual void OnDetachViewport   (Viewport&) {}
+    virtual void OnDestroy          () {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -63,6 +63,14 @@ class Desktop
     void               SetBackgroundColor (const math::vec4f& color);
     void               SetBackgroundColor (float red, float green, float blue, float alpha=0.0f);
     const math::vec4f& BackgroundColor    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Нужно ли очищать рабочий стол при каждой перерисовке
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetBackgroundState (bool state);
+    void EnableBackground   () { SetBackgroundState (true); }
+    void DisableBackground  () { SetBackgroundState (false); }
+    bool HasBackground      () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление областей вывода

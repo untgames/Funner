@@ -6,6 +6,8 @@ OnChangeRenderPath(RenderPath1)
 OnChangeArea(0, 0, 100, 200)
 OnChangeActive(false)
 OnChangeCamera()
+OnChangeBackground(false, 1.00, 1.00, 0.00, 1.00)
+OnChangeBackground(true, 1.00, 1.00, 0.00, 1.00)
 Delete camera
 OnChangeCamera(null)
 OnChangeProperty(prop1, value1)

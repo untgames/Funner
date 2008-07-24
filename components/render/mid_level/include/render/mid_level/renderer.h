@@ -74,6 +74,12 @@ class IFrame: virtual public IObject
     virtual void           SetRenderTargets      (IRenderTarget* render_target, IRenderTarget* depth_stencil_target) = 0;
     virtual IRenderTarget* GetRenderTarget       () = 0; //целевой буфер цвета
     virtual IRenderTarget* GetDepthStencilTarget () = 0; //целевой буфер попиксельного отсечения
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Область вывода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void SetViewport (const Viewport&) = 0;
+    virtual void GetViewport (Viewport&) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,6 +90,7 @@ enum ClearFlag
   ClearFlag_RenderTarget  = 1, //очистка буфера цвета
   ClearFlag_Depth         = 2, //очистка буфера глубины
   ClearFlag_Stencil       = 4, //очистка буфера трафарета
+  ClearFlag_ViewportOnly  = 8, //очистка только области вывода (могут быть потери производительности)
 
   ClearFlag_DepthStencil = ClearFlag_Depth | ClearFlag_Stencil,
   ClearFlag_All          = ClearFlag_DepthStencil | ClearFlag_RenderTarget
@@ -114,19 +121,6 @@ class IClearFrame: virtual public IFrame
     virtual void          SetStencilIndex (unsigned char stencil_index) = 0;
     virtual float         GetDepthValue   () = 0;
     virtual unsigned char GetStencilIndex () = 0;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Кадр с установленной областью вывода
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class IViewportFrame: virtual public IFrame
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Параметры области вывода
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetViewport (const Viewport&) = 0;
-    virtual void GetViewport (Viewport&) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

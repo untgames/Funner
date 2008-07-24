@@ -57,6 +57,11 @@ void ClearFrame::SetStencilIndex (unsigned char stencil_index)
 
 void ClearFrame::DrawCore ()
 {
+    //если требуется очищать только область вывода
+
+  if (clear_flags & ClearFlag_ViewportOnly)
+    BasicFrame::BindViewport ();
+
     //очистка целевых буферов отрисовки
 
   if ((clear_flags & ClearFlag_RenderTarget) && GetRenderTarget ())

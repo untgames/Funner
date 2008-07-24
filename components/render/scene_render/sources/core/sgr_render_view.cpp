@@ -14,7 +14,8 @@ RenderView::RenderView (const render::Viewport& vp, IRenderTargetAPI& in_render_
     need_update_view (true),
     need_update_area (true),
     need_update_camera (true),
-    need_update_path (true)
+    need_update_path (true),
+    need_update_clear_frame (true)
 {
   viewport.AttachListener (this);
   
@@ -32,11 +33,27 @@ RenderView::~RenderView ()
 
 void RenderView::Draw ()
 {
+    //обновление области рендеринга
+
   if (need_update_view)
     UpdateRenderView ();
+    
+    //обновление очищающего кадра
+    
+  if (need_update_clear_frame)
+    UpdateClearFrame ();
 
   if (!render_view || !viewport.IsActive ())
     return;
+
+    //очистка кадра
+
+  if (viewport.HasBackground ())
+  {
+    render_target_api.GetRenderer ().AddFrame (clear_frame.get ());
+  }
+
+    //визуализация
 
   render_view->Draw ();
 }
@@ -124,13 +141,13 @@ void RenderView::UpdateRenderView ()
       float x_scale  = float (renderable_area.width) / desktop_area.width,
             y_scale  = float (renderable_area.height) / desktop_area.height;
             
-      Rect result (int (renderable_area.left - (viewport_area.left - desktop_area.left) * x_scale),
-                   int (renderable_area.top - (viewport_area.top - desktop_area.top) * y_scale),
+      Rect result (int (renderable_area.left + (viewport_area.left - desktop_area.left) * x_scale),
+                   int (renderable_area.top + (viewport_area.top - desktop_area.top) * y_scale),
                    size_t (viewport_area.width * x_scale),
                    size_t (viewport_area.height * y_scale));
 
       render_view->SetViewport (result);
-
+      
       need_update_area = false;
     }
 
@@ -145,16 +162,70 @@ void RenderView::UpdateRenderView ()
 }
 
 /*
+    Обновление очищающего кадра
+*/
+
+void RenderView::UpdateClearFrame ()
+{  
+    //сброс очищающего кадра
+
+  if (!viewport.HasBackground () || !render_view)
+  {
+    if (clear_frame)
+      clear_frame = 0;
+
+    return;
+  }
+  
+    //создание очищающего кадра (при необходимости)
+    
+  if (!clear_frame)
+  {
+    render::mid_level::IRenderer& renderer = render_target_api.GetRenderer ();        
+    
+    clear_frame = ClearFramePtr (renderer.CreateClearFrame (), false);
+
+    clear_frame->SetRenderTargets (renderer.GetColorBuffer (), renderer.GetDepthStencilBuffer ()); ////изменить!!!
+    clear_frame->SetFlags         (render::mid_level::ClearFlag_All | render::mid_level::ClearFlag_ViewportOnly);    
+  }
+  
+      //установка начальной области вывода
+
+  Rect src_viewport_rect;
+
+  render_view->GetViewport (src_viewport_rect);
+
+  render::mid_level::Viewport dst_viewport_rect;
+
+  dst_viewport_rect.x      = src_viewport_rect.left;
+  dst_viewport_rect.y      = src_viewport_rect.top;
+  dst_viewport_rect.width  = src_viewport_rect.width;
+  dst_viewport_rect.height = src_viewport_rect.height;
+
+  clear_frame->SetViewport (dst_viewport_rect);
+
+    //обновление цвет очистки
+
+  clear_frame->SetColor (viewport.BackgroundColor ());
+
+    //снятие флага необходимости обновления очищающего кадра
+
+  need_update_clear_frame = false;
+}
+
+/*
     Сброс ресурсов
 */
 
 void RenderView::FlushResources ()
 {
-  need_update_view = true;
-  need_update_area = true;
-  need_update_path = true;
-  
+  need_update_view        = true;
+  need_update_area        = true;
+  need_update_path        = true;
+  need_update_clear_frame = true;
+
   render_view = 0;
+  clear_frame = 0;
 }
 
 /*
@@ -173,8 +244,9 @@ void RenderView::OnChangeCamera (scene_graph::Camera*)
 //оповещение о необходимости изменения границ области вывода (приходит от RenderTarget)
 void RenderView::UpdateAreaNotify ()
 {
-  need_update_view = true;
-  need_update_area = true;
+  need_update_view        = true;
+  need_update_area        = true;
+  need_update_clear_frame = true;
 }
 
 //оповещение о необходимости изменения границ области вывода (приходит от Viewport)
@@ -209,6 +281,11 @@ void RenderView::OnChangeProperty (const char* name, const char* value)
     return;
 
   render_view->SetProperty (name, value);
+}
+
+void RenderView::OnChangeBackground (bool, const math::vec4f&)
+{
+  need_update_clear_frame = true;
 }
 
 /*

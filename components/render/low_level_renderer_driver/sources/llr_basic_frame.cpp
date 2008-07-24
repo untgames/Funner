@@ -9,6 +9,10 @@ using namespace render::mid_level::low_level_driver;
 
 BasicFrame::BasicFrame ()
 {
+  memset (&viewport, 0, sizeof viewport);
+
+  viewport.min_depth = 0.f;
+  viewport.max_depth = 1.f;
 }
 
 /*
@@ -54,6 +58,35 @@ IRenderTarget* BasicFrame::GetRenderTarget ()
 IRenderTarget* BasicFrame::GetDepthStencilTarget ()
 {
   return depth_stencil_target.get ();
+}
+
+/*
+    Параметры области вывода
+*/
+
+void BasicFrame::SetViewport (const render::mid_level::Viewport& in_viewport)
+{
+  viewport.x      = in_viewport.x;
+  viewport.y      = in_viewport.y;
+  viewport.width  = in_viewport.width;
+  viewport.height = in_viewport.height;
+}
+
+void BasicFrame::GetViewport (render::mid_level::Viewport& out_viewport)
+{
+  out_viewport.x      = viewport.x;
+  out_viewport.y      = viewport.y;
+  out_viewport.width  = viewport.width;
+  out_viewport.height = viewport.height;
+}
+
+/*
+    Установка области вывода
+*/
+
+void BasicFrame::BindViewport (render::low_level::IDevice* device)
+{
+  device->RSSetViewport (viewport);
 }
 
 /*

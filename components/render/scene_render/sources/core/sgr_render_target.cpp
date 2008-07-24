@@ -355,6 +355,24 @@ class RenderTargetImpl: private IDesktopListener, private RenderView::IRenderTar
       need_reorder = false;    
     }  
     
+///Получение системы рендеринга
+    render::mid_level::IRenderer& GetRenderer ()
+    {
+      static const char* METHOD_NAME = "render::RenderView::GetRenderer";
+
+      RenderPathManager* render_path_manager = Manager ().RenderPathManager ();
+
+      if (!render_path_manager)
+        throw xtl::format_operation_exception (METHOD_NAME, "Null render path manager");
+
+      render::mid_level::IRenderer* renderer = render_path_manager->Renderer ();
+
+      if (!renderer)
+        throw xtl::format_operation_exception (METHOD_NAME, "Null renderer");
+
+      return *renderer;
+    }
+    
 ///Получение границ области рендеринга
     const Rect& GetRenderableArea  () { return renderable_area; }
     const Rect& GetDesktopArea () { return desktop_area; }

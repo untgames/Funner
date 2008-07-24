@@ -26,10 +26,11 @@ struct Desktop::Impl: public xtl::reference_counter
 {
   stl::string   name;             //им€ рабочего стола
   math::vec4f   background_color; //цвет фона
+  bool          has_background;   //есть ли фон
   ViewportArray viewports;        //области вывода
   ListenerArray listeners;        //слушатели
 
-  Impl ()
+  Impl () : has_background (true)
   {
     viewports.reserve (VIEWPORT_ARRAY_RESERVE_SIZE);
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
@@ -56,14 +57,14 @@ struct Desktop::Impl: public xtl::reference_counter
     }        
   }  
   
-  void ChangeNameNotify (const char* new_name)
+  void ChangeNameNotify ()
   {
-    Notify (xtl::bind (&IDesktopListener::OnChangeName, _1, new_name));
+    Notify (xtl::bind (&IDesktopListener::OnChangeName, _1, name.c_str ()));
   }
   
-  void ChangeBackgroundColorNotify (const math::vec4f& color)
+  void ChangeBackgroundNotify ()
   {
-    Notify (xtl::bind (&IDesktopListener::OnChangeBackgroundColor, _1, xtl::cref (color)));
+    Notify (xtl::bind (&IDesktopListener::OnChangeBackground, _1, has_background, xtl::cref (background_color)));
   }
   
   void AttachViewportNotify (render::Viewport& viewport)
@@ -132,7 +133,7 @@ void Desktop::SetName (const char* name)
     
   impl->name = name;
   
-  impl->ChangeNameNotify (impl->name.c_str ());
+  impl->ChangeNameNotify ();
 }
 
 const char* Desktop::Name () const
@@ -141,7 +142,7 @@ const char* Desktop::Name () const
 }
 
 /*
-    ÷вет фона
+    ”правление фона
 */
 
 void Desktop::SetBackgroundColor (const math::vec4f& color)
@@ -150,8 +151,8 @@ void Desktop::SetBackgroundColor (const math::vec4f& color)
     return;
 
   impl->background_color = color;
-  
-  impl->ChangeBackgroundColorNotify (impl->background_color);
+
+  impl->ChangeBackgroundNotify ();
 }
 
 void Desktop::SetBackgroundColor (float red, float green, float blue, float alpha)
@@ -162,6 +163,21 @@ void Desktop::SetBackgroundColor (float red, float green, float blue, float alph
 const math::vec4f& Desktop::BackgroundColor () const
 {
   return impl->background_color;
+}
+
+void Desktop::SetBackgroundState (bool state)
+{
+  if (state == impl->has_background)
+    return;
+
+  impl->has_background = state;
+
+  impl->ChangeBackgroundNotify ();
+}
+
+bool Desktop::HasBackground () const
+{
+  return impl->has_background;
 }
 
 /*

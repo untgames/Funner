@@ -38,6 +38,7 @@ class IViewportListener
     virtual void OnChangeCamera     (scene_graph::Camera* new_camera) {}
     virtual void OnChangeZOrder     (int new_z_order) {}
     virtual void OnChangeActive     (bool new_state) {}
+    virtual void OnChangeBackground (bool new_state, const math::vec4f& new_color) {}
     virtual void OnChangeRenderPath (const char* new_path_name) {}
     virtual void OnChangeProperty   (const char* name, const char* new_value) {}
     virtual void OnDestroy          () {}
@@ -126,6 +127,21 @@ class Viewport
     bool IsActive   () const;
     void Activate   () { SetActive (true); }
     void Deactivate () { SetActive (false); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Цвет фона
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void               SetBackgroundColor (const math::vec4f& color);
+    void               SetBackgroundColor (float red, float green, float blue, float alpha=0.0f);
+    const math::vec4f& BackgroundColor    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Нужно ли очищать область вывода при каждой перерисовке
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetBackgroundState (bool state);
+    void EnableBackground   () { SetBackgroundState (true); }
+    void DisableBackground  () { SetBackgroundState (false); }
+    bool HasBackground      () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка переменных рендеринга

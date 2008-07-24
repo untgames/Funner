@@ -165,10 +165,11 @@ class RenderView: private IViewportListener, public xtl::reference_counter
     class IRenderTargetAPI
     {
       public:
-        virtual const Rect&        GetRenderableArea    () = 0; //получение логических границ области рендеринга
-        virtual const Rect&        GetDesktopArea       () = 0; //получение физических границ области рендеринга        
-        virtual RenderPathManager* GetRenderPathManager () = 0; //получение менеджера путей рендеринга
-        virtual void               UpdateOrderNotify    () = 0; //оповещение об обновлении порядка следования областей вывода        
+        virtual render::mid_level::IRenderer& GetRenderer          () = 0; //получение системы визуализации
+        virtual const Rect&                   GetRenderableArea    () = 0; //получение логических границ области рендеринга
+        virtual const Rect&                   GetDesktopArea       () = 0; //получение физических границ области рендеринга
+        virtual RenderPathManager*            GetRenderPathManager () = 0; //получение менеджера путей рендеринга
+        virtual void                          UpdateOrderNotify    () = 0; //оповещение об обновлении порядка следования областей вывода
         
       protected:
         virtual ~IRenderTargetAPI () {}
@@ -202,29 +203,34 @@ class RenderView: private IViewportListener, public xtl::reference_counter
 
   private:
     void UpdateRenderView   ();
+    void UpdateClearFrame   ();
     void OnChangeCamera     (scene_graph::Camera*);
     void OnChangeArea       (const Rect&);
     void OnChangeRenderPath (const char*);
     void OnChangeZOrder     (int);
     void OnChangeScene      ();
     void OnChangeProperty   (const char* name, const char* value);
+    void OnChangeBackground (bool state, const math::vec4f& color);
     void AddRef             ();
     void Release            ();
 
   private:
-    typedef xtl::com_ptr<IRenderView> RenderViewPtr;
-  
+    typedef xtl::com_ptr<IRenderView>                    RenderViewPtr;
+    typedef xtl::com_ptr<render::mid_level::IClearFrame> ClearFramePtr;
+
   private:
-    render::Viewport      viewport;               //область вывода
-    IRenderTargetAPI&     render_target_api;      //интерфейс обратной связи к RenderTarget
-    RenderViewPtr         render_view;            //область рендеринга
-    scene_graph::Scene*   current_scene;          //текущая сцена
-    scene_graph::Camera*  current_camera;         //текущая камера
-    bool                  need_update_view;       //необходимо обновить параметры области вывода
-    bool                  need_update_area;       //необходимо обновить координаты области вывода
-    bool                  need_update_camera;     //необходимо обновить камеру
-    bool                  need_update_path;       //необходимо обновить путь рендеринга
-    xtl::auto_connection  on_camera_scene_change; //соединение с сигналом оповещения об изменении сцены в камере  
+    render::Viewport      viewport;                //область вывода
+    IRenderTargetAPI&     render_target_api;       //интерфейс обратной связи к RenderTarget
+    RenderViewPtr         render_view;             //область рендеринга
+    scene_graph::Scene*   current_scene;           //текущая сцена
+    scene_graph::Camera*  current_camera;          //текущая камера
+    ClearFramePtr         clear_frame;             //кадр очистки
+    bool                  need_update_view;        //необходимо обновить параметры области вывода
+    bool                  need_update_area;        //необходимо обновить координаты области вывода
+    bool                  need_update_camera;      //необходимо обновить камеру
+    bool                  need_update_path;        //необходимо обновить путь рендеринга
+    bool                  need_update_clear_frame; //необходимо обновить очищающий кадр
+    xtl::auto_connection  on_camera_scene_change;  //соединение с сигналом оповещения об изменении сцены в камере  
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

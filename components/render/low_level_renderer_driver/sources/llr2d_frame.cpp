@@ -168,7 +168,9 @@ bool blended_sprite_sort_predicate (SpriteVertexData* data1, SpriteVertexData* d
 
 void Frame::DrawCore (render::low_level::IDevice* device)
 {
-  ViewportFrame::DrawCore (device);
+    //установка области вывода
+
+  BasicFrame::BindViewport (device);
 
   common_resources->GetConstantBuffer ()->SetData (offsetof (ProgramParameters, view_matrix), sizeof (view_tm), &view_tm);
   common_resources->GetConstantBuffer ()->SetData (offsetof (ProgramParameters, projection_matrix), sizeof (proj_tm), &proj_tm);

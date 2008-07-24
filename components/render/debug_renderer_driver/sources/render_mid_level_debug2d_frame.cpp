@@ -102,7 +102,9 @@ void Frame::Clear ()
 
 void Frame::DrawCore ()
 {
-  ViewportFrame::DrawCore ();
+    //установка области вывода
+
+  BasicFrame::BindViewport ();
 
   /*
     в нормальной реализации в этом методе должна быть реализована сортировка спрайтов по удалению от наблюдателя

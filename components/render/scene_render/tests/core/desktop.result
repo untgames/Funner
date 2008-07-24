@@ -1,6 +1,7 @@
 Results of desktop_test:
 MyDesktopListener::MyDesktopListener
-OnChangeBackgroundColor(0.50, 0.25, 1.00, 0.30)
+OnChangeBackground(true, 0.50, 0.25, 1.00, 0.30)
+OnChangeBackground(false, 0.50, 0.25, 1.00, 0.30)
 OnChangeName(Desktop1)
 OnAttachViewport(Viewport1)
 OnAttachViewport(Viewport2)

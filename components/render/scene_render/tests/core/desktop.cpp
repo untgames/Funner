@@ -12,9 +12,9 @@ class MyDesktopListener: public IDesktopListener, public xtl::reference_counter
       printf ("OnChangeName(%s)\n", new_name);
     }
     
-    void OnChangeBackgroundColor (const math::vec4f& new_color)
+    void OnChangeBackground (bool new_state, const math::vec4f& new_color)
     {
-      printf ("OnChangeBackgroundColor(%.2f, %.2f, %.2f, %.2f)\n", new_color.x, new_color.y, new_color.z, new_color.w);
+      printf ("OnChangeBackground(%s, %.2f, %.2f, %.2f, %.2f)\n", new_state ? "true" : "false", new_color.x, new_color.y, new_color.z, new_color.w);
     }
 
     void OnAttachViewport (Viewport& viewport)
@@ -63,6 +63,7 @@ int main ()
       //изменение базовых параметров
       
     desktop1.SetBackgroundColor (0.5f, 0.25f, 1.0f, 0.3f);
+    desktop1.DisableBackground  ();
     desktop1.SetName            ("Desktop1");
 
       //присоединение областей вывода
