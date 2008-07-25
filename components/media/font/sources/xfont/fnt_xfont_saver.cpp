@@ -98,7 +98,7 @@ class XmlFontSaver
 };
 
 /*
-    Сохранение библиотеки деклараций звуков
+    Сохранение шрифта
 */
 
 void xfont_save (const char* file_name, const Font& font)

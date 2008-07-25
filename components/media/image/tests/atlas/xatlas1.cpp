@@ -1,19 +1,19 @@
 #include <cstdio>
 
-#include <media/font.h>
+#include <media/atlas.h>
 
 using namespace media;
 
-const char* file_name = "data/my_font.xfont";
-const char* RESULT_FILE_NAME = "/io/stdout/my_font.xfont";
+const char* file_name = "data/atlas.xatlas";
+const char* RESULT_FILE_NAME = "/io/stdout/atlas.xatlas";
 
 int main ()
 {
-  printf ("Results of font_test:\n");
+  printf ("Results of xatlas1 test:\n");
 
   try
   {
-    Font (file_name).Save (RESULT_FILE_NAME);
+    Atlas (file_name).Save (RESULT_FILE_NAME);
   }
   catch (std::exception& exception)
   {                                               

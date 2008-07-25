@@ -1,5 +1,6 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.INCLUDE_DIRS     := include ../../xtl/include
-export.IMPORTS          := ../../common/compile.static.mak
+export.LIBS             := media.image.xatlas
+export.LINK_INCLUDES    := XAtlasLoader XAtlasSaver
+export.IMPORTS          := link.static.mak

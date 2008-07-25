@@ -99,7 +99,7 @@ void xfont_load (const char* file_name, Font& font)
 }
 
 /*
-   Компонент загрузки деклараций звука
+   Компонент загрузки шрифтов
 */
 
 class XFontLoaderComponent

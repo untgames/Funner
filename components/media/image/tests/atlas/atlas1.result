@@ -1,0 +1,29 @@
+Results of atlas1 test:
+Atlas image is ''
+Atlas image is 'atlas_image.tga'
+Tiles count is 0
+Tiles count is 2
+Tile 1 is:
+Tile name is 'tile2'
+Tile origin is 8x8
+Tile size is 16x16
+Tile 'tile1' is:
+Tile name is 'tile1'
+Tile origin is 16x8
+Tile size is 8x8
+Tile name is 'tile2'
+Tile origin is 8x8
+Tile size is 16x16
+Tiles count is 2
+Tile 0 is:
+Tile name is 'tilex'
+Tile origin is 24x16
+Tile size is 4x4
+Tile 1 is:
+Tile name is 'tilexx'
+Tile origin is 18x18
+Tile size is 6x6
+Tiles count is 1
+Tiles count is 0
+Tiles count is 1
+Tiles count is 0
