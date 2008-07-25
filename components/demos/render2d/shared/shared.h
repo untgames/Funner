@@ -6,12 +6,17 @@
 
 #include <stl/auto_ptr.h>
 #include <stl/vector>
+#include <stl/iterator>
 
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/ref.h>
+#include <xtl/shared_ptr.h>
+
+#include <math/io.h>
 
 #include <common/strlib.h>
+#include <common/parser.h>
 
 #include <sg/scene.h>
 #include <sg/camera.h>
