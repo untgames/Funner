@@ -1,0 +1,8 @@
+Results of atlas_builder1 test:
+Atlas image name is ''
+Atlas image name is 'atlas_image'
+File 'results/power_of_two_atlas.xatlas' hash: {a0,d8,47,47,d6,57,fb,33,5b,22,8e,c2,c1,c0,31,d2}
+File 'results/non_power_of_two_atlas.xatlas' hash: {e0,80,0f,ad,d4,13,8e,e8,75,75,6e,1b,ee,4f,b5,44}
+File 'results/empty_atlas.xatlas' hash: {24,6e,82,cc,eb,f1,db,b6,a1,91,76,3e,0c,1d,70,09}
+File 'results/power_of_two_image.bmp' hash: {ef,94,0b,70,1a,f0,ba,75,53,1d,b7,34,fe,c5,ef,c9}
+File 'results/non_power_of_two_image.bmp' hash: {8a,7f,dd,f6,9f,5e,17,d0,07,6c,4c,20,91,5a,e5,5d}

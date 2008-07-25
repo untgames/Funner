@@ -1,11 +1,4 @@
-#include <media/atlas.h>
-
-#include <stl/string>
-#include <stl/vector>
-
-#include <xtl/common_exceptions.h>
-
-#include <common/component.h>
+#include "shared.h"
 
 using namespace media;
 using namespace common;

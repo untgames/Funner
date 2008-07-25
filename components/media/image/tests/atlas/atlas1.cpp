@@ -1,6 +1,4 @@
-#include <cstdio>
-
-#include <media/atlas.h>
+#include "shared.h"
 
 using namespace media;
 using namespace math;
