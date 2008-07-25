@@ -95,12 +95,16 @@ int main ()
       
     Viewport vp;
     Desktop  desktop;
+    
+    desktop.SetBackgroundColor (1, 0, 0, 0);
 
     vp.SetName       ("Viewport1");
     vp.SetRenderPath ("Render2d");
     vp.SetCamera     (scene.camera.get ());
+    vp.SetBackgroundColor (0, 0, 0, 0);
+    vp.EnableBackground ();
 
-    vp.SetArea (0, 0, 100, 100);
+    vp.SetArea (10, 10, 80, 80);
 
     desktop.Attach (vp);
 
