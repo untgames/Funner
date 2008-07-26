@@ -244,7 +244,7 @@ inline quat<T> normalize (const quat<T>& q)
 */
 
 template <class type>
-const quat<type>& invert (const quat<type>&)
+const quat<type> invert (const quat<type>& src)
 {
   quat<T> res;
   T norm = normalize (src);

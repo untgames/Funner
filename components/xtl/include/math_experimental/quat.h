@@ -81,19 +81,19 @@ class quat: public quat_base<type>
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Отношения между кватернионами
 ////////////////////////////////////////////////////////////////////////////////////////////
-    bool operator  ==   (const quat&) const;//+
-    bool operator  !=   (const quat&) const;//+
+    bool operator  ==   (const quat& q) const;//+
+    bool operator  !=   (const quat& q) const;//+
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Поворот вектора
 ////////////////////////////////////////////////////////////////////////////////////////////
-   const vec<type,4> operator * (const vec<type,4>&) const;//+
-   const vec<type,3> operator * (const vec<type,3>&) const;
+   const vec<type,4> operator * (const vec<type,4>& v) const;//+
+   const vec<type,3> operator * (const vec<type,3>& v) const;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Скалярное произведение
 ////////////////////////////////////////////////////////////////////////////////////////////
-   const type operator & (const quat&) const;//+
+   const type operator & (const quat& q) const;//+
    
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Для корректного использования в данном классе
@@ -115,7 +115,7 @@ class quat: public quat_base<type>
 
 ///Возвращает единичный кватернион
 template <class type>
-quat<type> normalize (const quat<type>&);//+
+quat<type> normalize (const quat<type>& q);//+
 
 ///Скалярное произведение
 /*template <class type>
@@ -123,7 +123,7 @@ type inner (const quat<type>&,const quat<type>&);//+*/
 
 ///Обратный кватернион
 template <class type>
-const quat<type>& invert (const quat<type>&);//+
+const quat<type> invert (const quat<type>& src);//+
 
 ///Преобразование кватерниона в матрицу
 template <class T> const matrix<T,4> quat_to_matrix     (const quat<T>& q);

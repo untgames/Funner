@@ -120,8 +120,8 @@ template <class T,size_t Size> template<class T1>
 vec<T,Size>& vec<T,Size>::operator = (const T1& a)
 {
   assign<T,T> fn;
-  unary_component_function<vec<T,Size>,assign<T,T> > _fn (fn);
-  _fn (*this,a);
+  unary_component_function<vec<T,Size>,assign<T,T> > fn_ (fn);
+  fn_ (*this,a);
   return *this;
 }
 

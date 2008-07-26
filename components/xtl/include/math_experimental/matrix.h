@@ -73,7 +73,6 @@ class matrix
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕрисваивание
 ////////////////////////////////////////////////////////////////////////////////////////////
-//  matrix&  operator = (const quat<Type>&);  //только дл€ матриц 3-го и 4-го пор€дка
     matrix&  operator = (const Type& src);
     matrix&  operator = (const matrix& src);
 
@@ -82,8 +81,8 @@ class matrix
 ////////////////////////////////////////////////////////////////////////////////////////////
     matrix&      operator += (const matrix& a);
     matrix&      operator -= (const matrix& a);
-    matrix&  operator *= (const Type& a);
-    matrix&  operator /= (const Type& a);
+    matrix&      operator *= (const Type& a);
+    matrix&      operator /= (const Type& a);
 
     const matrix operator *  (const Type& a) const;
     const matrix operator /  (const Type& a) const; 

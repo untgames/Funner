@@ -36,17 +36,17 @@ template <class T> void          euler_angle_to_quat (const T& pitch,const T& ya
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 ///Параллельный перенос
-template <class T> const matrix<T,4> matrix_translate (const vec<T,3>&);
-template <class T> const matrix<T,4> matrix_translate (const T&,const T&, const T&);
-template <class T> void              matrix_translate (const vec<T,3>&,matrix<T,4>&);
-template <class T> void              matrix_translate (const T&,const T&, const T&,matrix<T,4>&);
+template <class T> const matrix<T,4> matrix_translate (const vec<T,3>& v);
+template <class T> const matrix<T,4> matrix_translate (const T& a,const T& b, const T& c);
+template <class T> void              matrix_translate (const vec<T,3>& v,matrix<T,4>& res);
+template <class T> void              matrix_translate (const T& a,const T& b, const T& c,matrix<T,4>& res);
 
 
 ///Масштабирование
-template <class T> const matrix<T,4> matrix4_scale    (const vec<T,3>&);
-template <class T> const matrix<T,3> matrix3_scale    (const vec<T,3>&);
-template <class T> void              matrix4_scale    (const vec<T,3>&,matrix<T,4>&);
-template <class T> void              matrix3_scale    (const vec<T,3>&,matrix<T,3>&);
+template <class T> const matrix<T,4> matrix4_scale    (const vec<T,3>& v);
+template <class T> const matrix<T,3> matrix3_scale    (const vec<T,3>& v);
+template <class T> void              matrix4_scale    (const vec<T,3>& v,matrix<T,4>& res);
+template <class T> void              matrix3_scale    (const vec<T,3>& v,matrix<T,3>& res);
 
 
 ///Поворот вокруг оси
