@@ -104,9 +104,9 @@ class quat: public quat_base<type>
     using quat_base<type>::w;
 };
 
-#ifdef _MSC_VER
+/*#ifdef _MSC_VER
   #pragma pack (pop)
-#endif
+#endif*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты
@@ -147,7 +147,9 @@ typedef quat<unsigned char>      quatub;
 
 #include <math_experimental/impl/quat.inl>
 
+#ifdef _MSC_VER
+  #pragma pack (pop)
+#endif
 }
-
 
 #endif

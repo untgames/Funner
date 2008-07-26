@@ -13,7 +13,7 @@ int main()
   V1=V2;
   vec_print<float,3>("\nV1=V2:",V1);
 //--------------------------------------------------------
-  vec_print<float,3>("\nV1=5:      ",V1=5);
+  vec_print<float,3>("\nV1=5:      ",V1=5.0f);
   vec_print<float,3>("\nV2=V2+5:   ",V2+=5);
   vec_print<float,3>("\nV1=V1-2:   ",V1-=2);
   vec_print<float,3>("\nV2=V2*3:   ",V2*=3);

@@ -4,9 +4,9 @@
 #include <math_experimental/forward.h>
 #include <stddef.h>
 
-/*#ifdef _MSC_VER  
+#ifdef _MSC_VER  
   #pragma pack(push,1)
-#endif*/
+#endif
 
 namespace math
 {
@@ -57,6 +57,9 @@ template <class T> void              matrix3_rotate   (const T& angle,const vec<
 
 #include <math_experimental/impl/utils.inl>
 
+#ifdef _MSC_VER
+  #pragma pack (pop)
+#endif
 }
 
 #endif

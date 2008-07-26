@@ -173,7 +173,7 @@ matrix<T, Size, Size>& operator *= (matrix<T, Size, Size>& left, const matrix<T,
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T,size_t Size>
-const matrix<T,Size>& operator /  (const matrix<T,Size>& left,const matrix<T,Size>& right)
+const matrix<T,Size> operator /  (const matrix<T,Size>& left,const matrix<T,Size>& right)
 {
   matrix<T,Size> tmp(invert(right));
   return left*tmp;
@@ -330,7 +330,7 @@ template<class T,size_t Size>
 inline const T mathematical_add(const matrix<T,Size>& src,size_t row,size_t column)
 {
   T res(1);
-  for (int i=0;i<row+column;i++) res*=T(-1);
+  for (size_t i=0;i<row+column;i++) res*=T(-1);
   res*=det(src.remove_row_column(row,column));
   return res;
 }

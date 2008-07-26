@@ -142,7 +142,7 @@ matrix<T, Size, Size>& operator *= (matrix<T, Size, Size>& left, const matrix<T,
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T, size_t Size>
-const matrix<T, Size>& operator /  (const matrix<T, Size>& left, const matrix<T, Size>& right);
+const matrix<T, Size>  operator /  (const matrix<T, Size>& left, const matrix<T, Size>& right);
 
 template<class T, size_t Size>
 matrix<T, Size>&       operator /= (matrix<T, Size>& left, const matrix<T, Size>& right);
@@ -215,7 +215,6 @@ typedef matrix<int,4,4>           mat4i;
 #endif
 
 }
-
 
 
 #endif

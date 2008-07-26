@@ -260,5 +260,9 @@ struct max_fn: public binary_function<Arg1,Arg2,Result>
 };
 
 #include<math_experimental/impl/functional.inl>
+
+#ifdef _MSC_VER
+  #pragma pack (pop)
+#endif
 }
 #endif

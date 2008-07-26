@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <math.h>
 #include "functional.h"
+
 #ifdef _MSC_VER
   #pragma pack (push,1)
 #endif
@@ -152,10 +153,6 @@ class vec: public vec_base<Type, Size>
 
 template <class Type> class vec<Type, 0> {};
 
-#ifdef _MSC_VER
-  #pragma pack(pop)
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Бинарные операции
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,5 +241,10 @@ typedef vec<unsigned char,4>      vec4ub;
 
 
 #include <math_experimental/impl/vector.inl>
+
+#ifdef _MSC_VER
+  #pragma pack (pop)
+#endif
+
 }
 #endif
