@@ -96,6 +96,11 @@ size_t get_object_data_size (ObjectType type)
   }
 }
 
+bool is_pov_pressed (void* pov_status)
+{
+  return LOWORD (*((DWORD*)pov_status)) != 0xFFFF;
+}
+
 BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance, LPVOID device)
 {
 /*  printf ("Device object:\n");
@@ -130,7 +135,7 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
 
 OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevice8* in_direct_input_device_interface)
   : event_handler (&default_event_handler), name (in_name), device_interface (in_direct_input_device_interface, false), 
-    poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10)
+    poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10), device_lost (false)
 {
   static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::OtherDevice";
 
@@ -173,12 +178,52 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
   operation_result = device_interface->SetCooperativeLevel ((HWND)window->Handle (), DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
 
   if (operation_result != DI_OK)
-    throw xtl::format_operation_exception (METHOD_NAME, "Can't set device cooperative level, error '%s'", get_direct_input_error_name (operation_result));
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't set device cooperative level, error '%s'", get_direct_input_error_name (operation_result));
 
   operation_result = device_interface->Acquire ();
 
   if (operation_result != DI_OK)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't set device cooperative level, error '%s'", get_direct_input_error_name (operation_result));
+
+  for (ObjectsArray::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
+  {
+    if (iter->type == ObjectType_AbsoluteAxis)
+    {
+      DIPROPRANGE range_property;
+
+      range_property.diph.dwSize       = sizeof(DIPROPRANGE); 
+      range_property.diph.dwHeaderSize = sizeof(DIPROPHEADER); 
+      range_property.diph.dwObj        = iter->offset;
+      range_property.diph.dwHow        = DIPH_BYOFFSET; 
+
+      operation_result = device_interface->GetProperty (DIPROP_RANGE, &range_property.diph);
+
+      if (operation_result != DI_OK)
+      {
+        iter->bad_object = true;
+        continue;                         //Log this!!!
+      }
+
+      iter->min_value = range_property.lMin;
+      iter->max_value = range_property.lMax;
+    }
+    if (iter->type == ObjectType_RelativeAxis)
+    {
+      stl::string sensitivity_name = iter->name;
+
+      sensitivity_name.append (".sensitivity");
+
+      ObjectPropertyMap::iterator property_iter = objects_properties_map.insert_pair (sensitivity_name.c_str (), 1.f).first;
+      iter->properties[ObjectPropertyType_Sensitivity] = property_iter;
+
+      if (!properties.empty ())
+        properties += ' ';
+
+      properties += '\'';
+      properties.append (sensitivity_name);
+      properties += '\'';
+    }
+  }
 
   device_interface->Poll ();
   device_interface->GetDeviceState (last_device_data.size (), last_device_data.data ());
@@ -189,6 +234,30 @@ OtherDevice::~OtherDevice ()
   device_interface->Unacquire ();
 
   Release ();
+}
+
+/*
+   Настройки устройства
+*/
+
+void OtherDevice::SetProperty (const char* name, float value)
+{
+  ObjectPropertyMap::iterator property_iter = objects_properties_map.find (name);
+
+  if (property_iter == objects_properties_map.end ())
+    throw xtl::make_argument_exception ("input::low_level::direct_input_driver::OtherDevice::SetProperty", "name", name);
+
+  property_iter->second = value;
+}
+
+float OtherDevice::GetProperty (const char* name)
+{
+  ObjectPropertyMap::iterator property_iter = objects_properties_map.find (name);
+
+  if (property_iter == objects_properties_map.end ())
+    throw xtl::make_argument_exception ("input::low_level::direct_input_driver::OtherDevice::GetProperty", "name", name);
+
+  return property_iter->second;
 }
 
 /*
@@ -214,24 +283,47 @@ void OtherDevice::PollDevice ()
 
   if ((operation_result != DI_OK) && (operation_result != DI_NOEFFECT))
   {
-    operation_result = device_interface->Acquire ();
+    HRESULT acquire_operation_result;
+  
+    device_interface->Unacquire ();
+    acquire_operation_result = device_interface->Acquire ();
 
-    if (operation_result != DI_OK)
-      printf ("%s: Can't set device %s cooperative level, error '%s'\n", METHOD_NAME, name.c_str (), get_direct_input_error_name (operation_result));
+    if (acquire_operation_result != DI_OK)
+    {
+      if ((operation_result == DIERR_INPUTLOST) && !device_lost)
+      {
+        printf ("Device %s lost\n", name.c_str ());
+        event_handler ("device lost");
+        device_lost = true;
+      }
+
+      return;
 //      throw xtl::format_operation_exception (METHOD_NAME, "Can't set device cooperative level, error '%s'", get_direct_input_error_name (operation_result));
+    }
+    else
+    {
+      printf ("Device %s reacquired\n", name.c_str ());
+      event_handler ("device reacquired");
+      device_lost = false;
+    }
   }
-
 
   operation_result = device_interface->GetDeviceState (current_device_data.size (), current_device_data.data ());
 
   if (operation_result != DI_OK)
+  {
     printf ("%s: Can't get device %s state, error '%s'\n", METHOD_NAME, name.c_str (), get_direct_input_error_name (operation_result));
 //    throw xtl::format_operation_exception (METHOD_NAME, "Can't get device state, error '%s'", get_direct_input_error_name (operation_result));
+    return;
+  }
 
   static char message[MESSAGE_BUFFER_SIZE];
 
   for (ObjectsArray::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
   {
+    if (iter->bad_object)
+      continue;
+
     char* current_value = &(current_device_data.data ()[iter->offset]);
 
     if (memcmp (&(last_device_data.data ()[iter->offset]), current_value, get_object_data_size (iter->type)))
@@ -239,20 +331,40 @@ void OtherDevice::PollDevice ()
       switch (iter->type)
       {
         case ObjectType_AbsoluteAxis:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %ld", iter->name.c_str (), *((LONG*)current_value));
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %.4f", iter->name.c_str (), (((float)(*((LONG*)current_value) - iter->min_value)) / (float)(iter->max_value - iter->min_value)) * 2.f - 1.f);
+          event_handler (message);
+          
           break;
         case ObjectType_RelativeAxis:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %ld", iter->name.c_str (), *((LONG*)current_value) - *((LONG*)(&last_device_data.data ()[iter->offset])));
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %f", iter->name.c_str (), (float)(*((LONG*)current_value) - *((LONG*)(&last_device_data.data ()[iter->offset]))) * iter->properties[ObjectPropertyType_Sensitivity]->second);
+          event_handler (message);
+          
           break;
         case ObjectType_Button:
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' %s", iter->name.c_str (), (*current_value & 0x80) ? "down" : "up");
+          event_handler (message);
+          
           break;
         case ObjectType_POV:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' pov %d", iter->name.c_str (), *((DWORD*)current_value));
+          if (!is_pov_pressed (current_value))
+          {
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", iter->name.c_str ());
+            event_handler (message);
+          }
+          else
+          {
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' pov %d", iter->name.c_str (), *((DWORD*)current_value));
+            event_handler (message);
+            
+            if (!is_pov_pressed (&last_device_data.data ()[iter->offset]))
+            {
+              xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", iter->name.c_str ());
+              event_handler (message);
+            }
+          }
           break;
       }
 
-      event_handler (message);
     }
   }
 

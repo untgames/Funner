@@ -4,15 +4,16 @@
 TARGETS := INPUT.DIRECT_INPUT_DRIVER.SOURCES INPUT.DIRECT_INPUT_DRIVER.TESTS
 
 #Öåëü ¹1 - Window driver sources
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.TYPE             := static-lib
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.NAME             := input.direct_input_driver
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.INCLUDE_DIRS     := ../../../extern/dinputsdk/include
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.SOURCE_DIRS      := sources
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.LIB_DIRS         :=  
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.LIBS             := 
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.COMPILER_CFLAGS  :=
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.COMPILER_DEFINES := 
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.IMPORTS          := compile.static.mak ../manager/compile.static.mak ../../system/compile.static.mak ../../common/compile.static.mak ../low_level/compile.static.mak
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.TYPE                 := static-lib
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.NAME                 := input.direct_input_driver
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.INCLUDE_DIRS         := ../../../extern/dinputsdk/include
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.SOURCE_DIRS          := sources
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.LIB_DIRS             :=  
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.LIBS                 := 
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.COMPILER_CFLAGS      :=
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.COMPILER_DEFINES     := 
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.IMPORTS              := compile.static.mak ../manager/compile.static.mak ../../system/compile.static.mak ../../common/compile.static.mak ../low_level/compile.static.mak
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.msvc.COMPILER_CFLAGS := -wd4503
 
 #Öåëü ¹2 - Window driver tests
 INPUT.DIRECT_INPUT_DRIVER.TESTS.TYPE             := test-suite

@@ -1,6 +1,7 @@
 #ifndef INPUT_LOW_LEVEL_DIRECT_INPUT_DRIVER_SHARED_HEADER
 #define INPUT_LOW_LEVEL_DIRECT_INPUT_DRIVER_SHARED_HEADER
 
+#include <stl/hash_map>
 #include <stl/string>
 #include <stl/vector>
 
@@ -24,6 +25,8 @@
 #define DIRECTINPUT_VERSION 0x0800
 
 #include <Dinput.h>
+
+#pragma pack (1)
 
 namespace input
 {
@@ -133,9 +136,9 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройки устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* GetProperties () {return "";}
-    void        SetProperty   (const char* name, float value) {}
-    float       GetProperty   (const char* name) {return 0.f;}
+    const char* GetProperties () { return properties.c_str (); }
+    void        SetProperty   (const char* name, float value);
+    float       GetProperty   (const char* name);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -161,16 +164,34 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     OtherDevice ();                                      //no impl
 
   private:
-    struct ObjectData
+    enum ObjectPropertyType
     {
-      stl::string name;
-      size_t      offset;
-      ObjectType  type;
+      ObjectPropertyType_Sensitivity,
+      ObjectPropertyType_DeadZone,
+      ObjectPropertyType_Saturation,
 
-      ObjectData () {}
-      ObjectData (const char* in_name, size_t in_offset, ObjectType in_type) : name (in_name), offset (in_offset), type (in_type) {}
+      ObjectPropertyType_Num
     };
 
+    typedef stl::hash_map<stl::hash_key<const char*>, float> ObjectPropertyMap;
+
+    struct ObjectData
+    {
+      stl::string                 name;
+      size_t                      offset;
+      ObjectType                  type;
+      size_t                      min_value;                          //минимальное значение (для объектов типа ось)
+      size_t                      max_value;                          //максимальное значение (для объектов типа ось)
+      bool                        bad_object;                         //true для объекта типа ось, если нельзя получить пределы значения
+      ObjectPropertyMap::iterator properties[ObjectPropertyType_Num]; //свойства
+
+      ObjectData () {}
+      ObjectData (const char* in_name, size_t in_offset, ObjectType in_type) 
+        : name (in_name), offset (in_offset), type (in_type), min_value (-65536), max_value (65535), bad_object (0)
+        {}
+    };
+
+  private:
     typedef xtl::com_ptr<IDirectInputDevice8> DirectInputDeviceInterfacePtr;
     typedef stl::vector<ObjectData>           ObjectsArray;
     typedef xtl::uninitialized_storage<char>  DeviceDataBuffer;
@@ -183,6 +204,9 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     ObjectsArray                            objects;
     DeviceDataBuffer                        last_device_data;
     DeviceDataBuffer                        current_device_data;
+    bool                                    device_lost;
+    ObjectPropertyMap                       objects_properties_map;
+    stl::string                             properties;
 };
 
 const char* get_direct_input_error_name (HRESULT error);

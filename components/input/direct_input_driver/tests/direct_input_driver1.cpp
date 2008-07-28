@@ -15,6 +15,7 @@
 #include <syslib/window.h>
 #include <syslib/application.h>
 
+using namespace common;
 using namespace syslib;
 using namespace input::low_level;
 
@@ -60,6 +61,9 @@ int main ()
       devices.back ()->SetEventHandler (&input_event_handler);
 
       printf ("Device has properties: '%s'\n", devices.back ()->GetProperties ());
+
+      for (size_t j = 0; !word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").empty (); j++)
+        printf ("  '%s' = %f\n", word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").c_str (), devices.back ()->GetProperty (word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").c_str ()));
     }
     
     window.Show ();
