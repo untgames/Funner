@@ -72,8 +72,8 @@ class vec: public vec_base<Type, Size>
 ///Конструкторы
 ////////////////////////////////////////////////////////////////////////////////////////////
     vec ();
-    vec (const Type&);
-    vec (const base&);
+    vec (const Type& a);
+    vec (const base& b);
 
       //это решение - не лучшее,  но оно меня устраивает
     vec (const Type&, const Type&, const Type& = 0, const Type& = 0); 
@@ -89,11 +89,8 @@ class vec: public vec_base<Type, Size>
   template <class Fn>                               vec (const quat<Type>& q1, const Type& arg, Fn fn);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-   //временные конструкторы. Удалить после редактирования библиотеки
 
-    template <class T1, class T2> vec (const T1&, const T2&, void (*eval)(vec&, const T1&, const T2&));
-
-    template <size_t Size1>       vec (const vec<Type, Size1>&); 
+    template <size_t Size1>       vec (const vec<Type, Size1>& v); 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Унарный +, -,  длина (length)

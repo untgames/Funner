@@ -28,10 +28,14 @@ inline vec<T,Size>::vec ()
   make_unary_operation<vec<T,Size> > (T(0),assign<T,T>(),*this); 
 }
 
-template <class T,size_t Size> template <size_t Size1>
+template <class T,size_t Size> template<size_t Size1>
 vec<T,Size>::vec (const vec<T,Size1>& v) 
 {
-  make_unary_operation<vec<T,Size> > (v,assign<T,T> (),*this);
+  for (size_t i=0;i<min_fn<size_t,size_t>()(Size,Size1);i++) (*this)[i]=v[i];
+  if (Size>Size1)
+  {
+    for (size_t i=Size1;i<Size;i++) (*this)[i]=T(0);
+  }
 }
 
 template <class T,size_t Size> 

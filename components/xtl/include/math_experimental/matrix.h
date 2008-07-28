@@ -28,7 +28,7 @@ template <class Type, size_t Size> class vec;
 /////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица
 /////////////////////////////////////////////////////////////////////////////////////////////
-template <class Type, size_t SizeX, size_t SizeY/*=SizeX*/>
+template <class Type, size_t SizeX, size_t SizeY>
 class matrix
 {
   public:
@@ -53,9 +53,6 @@ class matrix
     template <class T1,  class Fn>
       matrix(const T1& src, Fn fn);
 
-
-      //для использования оптимизации возвращаемого значения
-//    template <class T1>           matrix (const T1&, void (*eval)(matrix&, const T1&));
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Индексирование

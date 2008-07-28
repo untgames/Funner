@@ -33,24 +33,6 @@ inline quat<T>::quat (const T1& a,const T2& b,Fn fn)
 
 
 
-template <class T> template <class T1>
-inline quat<T>::quat (const T1& a,void (*eval)(quat&,const T1&))
-{
-  eval (*this,a);
-}
-
-template <class T> template <class T1,class T2> 
-inline quat<T>::quat (const T1& a,const T2& b,void (*eval)(quat&,const T1&,const T2&))
-{
-  eval (*this,a,b);
-}
-
-template <class T> template <class T1,class T2,class T3> 
-inline quat<T>::quat (const T1& a,const T2& b,const T3& c,void (*eval)(quat&,const T1&,const T2&,const T3&))
-{
-  eval (*this,a,b,c);
-}
-
 template <class T> 
 inline quat<T>::quat (const T& x_,const T& y_,const T& z_,const T& w_)
 {  

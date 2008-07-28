@@ -30,70 +30,63 @@ class quat: public quat_base<type>
     typedef type value_type;
     enum {size=4};
   
-    quat ();//+
-    quat (const type& x_,const type& y_,const type& z_,const type& w_);//+
-    quat (const type&);//+
+    quat ();
+    quat (const type& x_,const type& y_,const type& z_,const type& w_);
+    quat (const type& a);
        //для использования оптимизации возвращаемого значения
 
-    template <class T,class Fn>           quat (const T&,Fn fn);//+
-    template <class T1,class T2,class Fn> quat (const T1&,const T2&,Fn fn);//+
-/*  template <class T1,class T2,class T3> 
- 					  quat (const T1&,const T2&,const T3&,Fn fn);*/
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T>                    quat (const T&,void (*eval)(quat&,const T&));
-    template <class T1,class T2>          quat (const T1&,const T2&,void (*eval)(quat&,const T1&,const T2&));
-    template <class T1,class T2,class T3> quat (const T1&,const T2&,const T3&,void (*eval)(quat&,const T1&,const T2&,const T3&));
+    template <class T,class Fn>           quat (const T&,Fn fn);
+    template <class T1,class T2,class Fn> quat (const T1&,const T2&,Fn fn);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Унарные операции
 ////////////////////////////////////////////////////////////////////////////////////////////
     const quat& operator +              () const { return *this; }
-    const quat  operator -              () const;//+
-    type        length                  () const;//+
-    type        squared_length          () const;//+
+    const quat  operator -              () const;
+    type        length                  () const;
+    type        squared_length          () const;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
 ////////////////////////////////////////////////////////////////////////////////////////////
-    quat&   operator = (const type& a);  //+
-    quat&   operator = (const quat_base<type>& a);//+
-    bool    equal      (const quat<type>&,const type& eps);//+
+    quat&   operator = (const type& a);  
+    quat&   operator = (const quat_base<type>& a);
+    bool    equal      (const quat<type>&,const type& eps);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Основные арифметические операции
 ////////////////////////////////////////////////////////////////////////////////////////////
-    quat&       operator += (const quat& q);//+
-    quat&       operator -= (const quat& q);//+
-    quat&       operator *= (const quat& q);//+
-    quat&       operator *= (const type& a);//+
-    quat&       operator /= (const type& a);//+
+    quat&       operator += (const quat& q);
+    quat&       operator -= (const quat& q);
+    quat&       operator *= (const quat& q);
+    quat&       operator *= (const type& a);
+    quat&       operator /= (const type& a);
      
-    const quat  operator +  (const quat& q) const;//+
-    const quat  operator -  (const quat& q) const;//+
-    const quat  operator *  (const quat& q) const;//+
-    const quat  operator *  (const type& a) const;//+
-    const quat  operator /  (const type& a) const;//+
+    const quat  operator +  (const quat& q) const;
+    const quat  operator -  (const quat& q) const;
+    const quat  operator *  (const quat& q) const;
+    const quat  operator *  (const type& a) const;
+    const quat  operator /  (const type& a) const;
 
-    friend const quat operator * (const type& a,const quat& q)  { return q * a; }//+
+    friend const quat operator * (const type& a,const quat& q)  { return q * a; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Отношения между кватернионами
 ////////////////////////////////////////////////////////////////////////////////////////////
-    bool operator  ==   (const quat& q) const;//+
-    bool operator  !=   (const quat& q) const;//+
+    bool operator  ==   (const quat& q) const;
+    bool operator  !=   (const quat& q) const;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Поворот вектора
 ////////////////////////////////////////////////////////////////////////////////////////////
-   const vec<type,4> operator * (const vec<type,4>& v) const;//+
+   const vec<type,4> operator * (const vec<type,4>& v) const;
    const vec<type,3> operator * (const vec<type,3>& v) const;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Скалярное произведение
 ////////////////////////////////////////////////////////////////////////////////////////////
-   const type operator & (const quat& q) const;//+
+   const type operator & (const quat& q) const;
    
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Для корректного использования в данном классе
@@ -104,30 +97,29 @@ class quat: public quat_base<type>
     using quat_base<type>::w;
 };
 
-/*#ifdef _MSC_VER
-  #pragma pack (pop)
-#endif*/
-
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 
 ///Возвращает единичный кватернион
-template <class type>
-quat<type> normalize (const quat<type>& q);//+
 
-///Скалярное произведение
-/*template <class type>
-type inner (const quat<type>&,const quat<type>&);//+*/
+template <class type>
+quat<type> normalize (const quat<type>& q);
+
 
 ///Обратный кватернион
+
 template <class type>
-const quat<type> invert (const quat<type>& src);//+
+const quat<type> invert (const quat<type>& src);
 
 ///Преобразование кватерниона в матрицу
+
 template <class T> const matrix<T,4> quat_to_matrix     (const quat<T>& q);
 template <class T> const matrix<T,3> quat_to_matrix     (const quat<T>& q);
+
+///Преобразование кватерниона в углы Эйлера
+
 template <class T> void quat_to_axis_angle  (const quat<T>& q,T& angle,vec<T,4>& axis,const T& eps = 1e-03f);
 template <class T> void quat_to_axis_angle  (const quat<T>& q,T& angle,vec<T,3>& axis,const T& eps = 1e-03f);
 template <class T> void quat_to_euler_angle (const quat<T>& q,T& pitch,T& yaw,T& roll);
