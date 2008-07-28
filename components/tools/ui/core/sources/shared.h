@@ -8,6 +8,7 @@
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 
+#include <common/component.h>
 #include <common/singleton.h>
 
 #include <tools/ui/custom_window_system.h>

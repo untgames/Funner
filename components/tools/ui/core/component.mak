@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := TOOLS.UI.CORE.SOURCES TOOLS.UI.CORE.TESTS
 
-#Цель №1 - SCRIPT_CORE sources
+#Цель №1 - Tools UI core sources
 TOOLS.UI.CORE.SOURCES.TYPE             := static-lib
 TOOLS.UI.CORE.SOURCES.NAME             := tools.ui.core
 TOOLS.UI.CORE.SOURCES.INCLUDE_DIRS     := 
@@ -14,7 +14,7 @@ TOOLS.UI.CORE.SOURCES.COMPILER_CFLAGS  :=
 TOOLS.UI.CORE.SOURCES.COMPILER_DEFINES := 
 TOOLS.UI.CORE.SOURCES.IMPORTS				   := compile.static.mak ../../../common/compile.static.mak
 
-#Цель №2 - SCRIPT_CORE tests
+#Цель №2 - Tool UI core tests
 TOOLS.UI.CORE.TESTS.TYPE             := test-suite
 TOOLS.UI.CORE.TESTS.INCLUDE_DIRS     :=
 TOOLS.UI.CORE.TESTS.SOURCE_DIRS      := tests

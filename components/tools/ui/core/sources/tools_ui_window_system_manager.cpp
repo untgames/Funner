@@ -2,6 +2,18 @@
 
 using namespace tools::ui;
 
+namespace
+{
+
+/*
+    Константы
+*/
+
+const char* PROFILES_COMPONENTS_MASK           = "tools.ui.profiles.*";      //маска имён компонентов оконных систем
+const char* APPLICATION_SERVER_COMPONENTS_MASK = "tools.ui.applications.*";  //маска имён компонентов приложений
+
+}
+
 /*
     Регистрация оконных систем
 */
@@ -82,6 +94,8 @@ void WindowSystemManagerImpl::UnregisterAllApplicationServers ()
 //получение сервера приложения
 WindowSystemManagerImpl::ApplicationServerPtr WindowSystemManagerImpl::GetApplicationServer (const char* server_name)
 {
+  static common::ComponentLoader loader (APPLICATION_SERVER_COMPONENTS_MASK);
+
   static const char* METHOD_NAME = "tools::ui::WindowSystemManagerImpl::GetApplicationServer";
 
   if (!server_name)
@@ -100,6 +114,8 @@ CustomWindowSystemPtr WindowSystemManagerImpl::CreateWindowSystem (const char* a
 {
   try
   {
+    static common::ComponentLoader loader (PROFILES_COMPONENTS_MASK);
+    
       //получение сервера приложения
 
     ApplicationServerPtr application = GetApplicationServer (application_server_name);
