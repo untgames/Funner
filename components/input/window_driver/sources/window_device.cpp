@@ -211,9 +211,7 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
             event_handler (message);
           }
 
-          int dx = window_event_context.cursor_position.x - x_cursor_pos;
-
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX delta %f", CURSOR_AXIS_NAME, (float)dx / client_rect_width);
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX delta %f", CURSOR_AXIS_NAME, ((float)((float)window_event_context.cursor_position.x - (float)x_cursor_pos)) * cursor_sensitivity);
           event_handler (message);
         }
 
@@ -232,9 +230,7 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
             event_handler (message);
           }
 
-          int dx = y_cursor_pos - window_event_context.cursor_position.y;
-
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", CURSOR_AXIS_NAME, (float)dx / client_rect_height);
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", CURSOR_AXIS_NAME, ((float)((float)y_cursor_pos - (float)window_event_context.cursor_position.y)) * cursor_sensitivity);
           event_handler (message);
         }
 
