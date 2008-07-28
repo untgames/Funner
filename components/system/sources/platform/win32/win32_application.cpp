@@ -27,11 +27,14 @@ void Platform::DoNextEvent ()
     
     bool is_quit = GetMessage (&msg, 0, 0, 0) == 0;
 
+    if (is_quit)
+      syslib::Application::Exit (msg.wParam);
+
     check_errors ("::GetMessage");
 
     TranslateMessage (&msg);
     DispatchMessage  (&msg);
-    SetLastError     (0);
+    SetLastError     (0);        
   }
   catch (xtl::exception& exception)
   {
