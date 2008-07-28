@@ -1,0 +1,10 @@
+Results of custom_ws_test:
+MyApplicationServer::MyApplicationServer
+MyWindowSystem::MyWindowSystem
+Profile:            'mywndsys'
+Application server: 'myapp'
+MyWindowSystem::~MyWindowSystem
+MyWindowSystem::MyWindowSystem
+MyWindowSystem::ExecuteCommand(test_command)
+MyWindowSystem::~MyWindowSystem
+MyApplicationServer::~MyApplicationServer
