@@ -19,7 +19,7 @@ inline const T rad_to_deg (const T& angle)
 */
 
 template <class T> 
-inline const quat<T> axis_angle_to_quat  (const T& angle,const vec<T,3>& axis)
+inline const quat<T> axis_angle_to_quat (const T& angle,const vec<T,3>& axis)
 {
   quat<T> q;
   vec<T,3> v = normalize(axis);
@@ -35,16 +35,27 @@ inline const quat<T> axis_angle_to_quat  (const T& angle,const vec<T,3>& axis)
 }
 
 template <class T> 
-inline const quat<T> axis_angle_to_quat  (const T& angle,const T& axis_x,const T& axis_y,const T& axis_z)
+inline const quat<T> axis_angle_to_quat (const T& angle,const T& axis_x,const T& axis_y,const T& axis_z)
 {
-  return axis_angle_to_quat(angle,vec<T,3>(axis_x,axis_y,axis_z));
+  quat<T> q;
+
+  T len(sqrt(axis_x_*axis_x_+axis_y_*axis_y_+axis_z_*axis_z_));
+  T axis_x_(axis_x/len);
+  T axis_y_(axis_y/len);
+  T axis_z_(axis_z/len);
+
+  T half_angle = angle*T(0.5);
+  T sin_a      = sin (half_angle);
+
+  q.x = v.x * sin_a;
+  q.y = v.y * sin_a;
+  q.z = v.z * sin_a;
+  q.w = cos (half_angle);
+  return q;
 }
 
-
-
-
 template <class T> 
-inline void axis_angle_to_quat  (const T& angle,const vec<T,3>& axis,quat<T> q)
+inline void axis_angle_to_quat (const T& angle,const vec<T,3>& axis,quat<T>& res)
 {
   vec<T,3> v = normalize(axis);
 
@@ -56,6 +67,27 @@ inline void axis_angle_to_quat  (const T& angle,const vec<T,3>& axis,quat<T> q)
   q.z = v.z * sin_a;
   q.w = cos (half_angle);
 }
+
+
+template <class T> 
+void axis_angle_to_quat (const T& angle,const T& axis_x,const T& axis_y,const T& axis_z,quat<T>& res)
+{
+  quat<T> q;
+
+  T len(sqrt(axis_x_*axis_x_+axis_y_*axis_y_+axis_z_*axis_z_));
+  T axis_x_(axis_x/len);
+  T axis_y_(axis_y/len);
+  T axis_z_(axis_z/len);
+
+  T half_angle = angle*T(0.5);
+  T sin_a      = sin (half_angle);
+
+  q.x = v.x * sin_a;
+  q.y = v.y * sin_a;
+  q.z = v.z * sin_a;
+  q.w = cos (half_angle);
+}
+
 
 template <class T> 
 inline const quat<T> euler_angle_to_quat (const T& pitch,const T& yaw,const T& roll)

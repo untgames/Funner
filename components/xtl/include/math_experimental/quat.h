@@ -115,8 +115,8 @@ const quat<type> invert (const quat<type>& src);
 
 ///Преобразование кватерниона в матрицу
 
-template <class T> const matrix<T,4> quat_to_matrix     (const quat<T>& q);
-template <class T> const matrix<T,3> quat_to_matrix     (const quat<T>& q);
+template <class T> const matrix<T,4> quat_to_matrix4 (const quat<T>& q);
+template <class T> const matrix<T,3> quat_to_matrix3 (const quat<T>& q);
 
 ///Преобразование кватерниона в углы Эйлера
 

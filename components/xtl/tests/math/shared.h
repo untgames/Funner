@@ -1,15 +1,10 @@
-#include <math_experimental/vector.h>
-#include <math_experimental/quat.h>
-#include <math_experimental/matrix.h>
+#include <math_experimental/forward.h>
 #include <stdio.h>
 
 
 using namespace math;
 
-/*template <class T,size_t size> class vec;
-template <class type,size_t sizeX,size_t sizeY> class matrix;
-template <class T> class quat;                               */
-
+const float PI_=3.14159265358979323846f;
 
 void _printf(int x);
 void _printf(float x);
@@ -30,6 +25,7 @@ template <class T,size_t size> void vec_print(const vec<T,size>& V)
 {
 	for (int i=0;i<size;i++)
 	{
+		if (V[i]>=0) printf(" ");
 		_printf(V[i]);
 	}
 

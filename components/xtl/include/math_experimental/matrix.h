@@ -1,6 +1,7 @@
 #ifndef MATHLIB_MATRIX_HEADER
 #define MATHLIB_MATRIX_HEADER
 #include <math_experimental/forward.h>
+#include <math_experimental/vector.h>
 #include "functional.h"
 #include <stddef.h>
 

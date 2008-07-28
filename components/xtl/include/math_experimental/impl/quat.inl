@@ -85,7 +85,7 @@ inline T quat<T>::length () const
 template <class T>
 inline const quat<T> quat<T>::operator - () const
 {
-  return make_unary_operation(*this,negate<T> ());
+  return make_unary_operation<quat<T> > (*this,negate<T> ());
 }
 
 /*
@@ -245,7 +245,7 @@ const quat<type> invert (const quat<type>& src)
 }
 
 template <class T> 
-inline const matrix<T,4> quat_to_matrix (const quat<T>& q)
+inline const matrix<T,4> quat_to_matrix4 (const quat<T>& q)
 {
   matrix<T,4> m;
   T wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
@@ -275,7 +275,7 @@ inline const matrix<T,4> quat_to_matrix (const quat<T>& q)
 }
 
 template <class T> 
-inline const matrix<T,3> quat_to_matrix (const quat<T>& q)
+inline const matrix<T,3> quat_to_matrix3 (const quat<T>& q)
 {
   matrix<T,3> res;
   T wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
