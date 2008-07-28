@@ -36,7 +36,8 @@ namespace direct_input_driver
 
 enum ObjectType
 {
-  ObjectType_Axis,
+  ObjectType_AbsoluteAxis,
+  ObjectType_RelativeAxis,
   ObjectType_Button,
   ObjectType_POV,
   ObjectType_Unknown

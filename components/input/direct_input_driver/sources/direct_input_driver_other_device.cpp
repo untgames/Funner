@@ -71,11 +71,12 @@ void print_flags (DWORD flags)
 ObjectType get_object_type (DWORD type)
 {
   if (type & DIDFT_BUTTON)          return ObjectType_Button;
-  if (type & DIDFT_AXIS)            return ObjectType_Axis;
   if (type & DIDFT_POV)             return ObjectType_POV;
 
-  if (type & DIDFT_ABSAXIS)         return ObjectType_Axis;
-  if (type & DIDFT_RELAXIS)         return ObjectType_Axis;
+  if (type & DIDFT_RELAXIS)         return ObjectType_RelativeAxis;
+  if (type & DIDFT_ABSAXIS)         return ObjectType_AbsoluteAxis;
+
+  if (type & DIDFT_AXIS)            return ObjectType_RelativeAxis;  //если нет точной информации о типе оси
 
   if (type & DIDFT_PSHBUTTON)       return ObjectType_Button;
   if (type & DIDFT_TGLBUTTON)       return ObjectType_Button;
@@ -87,10 +88,11 @@ size_t get_object_data_size (ObjectType type)
 {
   switch (type)
   {
-    case ObjectType_Axis:   return sizeof (LONG);
-    case ObjectType_Button: return sizeof (BYTE);
-    case ObjectType_POV:    return sizeof (DWORD);
-    default:                return sizeof (size_t);
+    case ObjectType_AbsoluteAxis:
+    case ObjectType_RelativeAxis: return sizeof (LONG);
+    case ObjectType_Button:       return sizeof (BYTE);
+    case ObjectType_POV:          return sizeof (DWORD);
+    default:                      return sizeof (size_t);
   }
 }
 
@@ -236,8 +238,11 @@ void OtherDevice::PollDevice ()
     {
       switch (iter->type)
       {
-        case ObjectType_Axis:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' %ld", iter->name.c_str (), *((LONG*)current_value));
+        case ObjectType_AbsoluteAxis:
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %ld", iter->name.c_str (), *((LONG*)current_value));
+          break;
+        case ObjectType_RelativeAxis:
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %ld", iter->name.c_str (), *((LONG*)current_value) - *((LONG*)(&last_device_data.data ()[iter->offset])));
           break;
         case ObjectType_Button:
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' %s", iter->name.c_str (), (*current_value & 0x80) ? "down" : "up");
