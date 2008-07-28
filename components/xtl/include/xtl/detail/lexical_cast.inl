@@ -138,7 +138,7 @@ inline void to_string (stl::string& buffer, unsigned long value)
   detail::integer_to_string (buffer, value, false);
 }
 
-inline void to_string (stl::string& buffer, bool value)
+inline void to_string (stl::string& buffer, const volatile bool& value)
 {
   long tmp = value != 0;
 
