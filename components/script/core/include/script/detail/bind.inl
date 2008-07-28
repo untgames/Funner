@@ -91,7 +91,7 @@ struct string_argument_selector
 //извлечение вариантных типов данных
 struct any_argument_selector
 {
-  static xtl::any& get (IStack& stack, size_t index) { return stack.GetVariant (index); }
+  static xtl::any get (IStack& stack, size_t index) { return stack.GetVariant (index); }
 };
 
 //диспетчеризация взятия аргумента для различных типов данных
@@ -101,10 +101,10 @@ template <> struct argument_selector<xtl::any>:                 public any_argum
 template <> struct argument_selector<const xtl::any>:           public any_argument_selector {};
 template <> struct argument_selector<volatile xtl::any>:        public any_argument_selector {};
 template <> struct argument_selector<const volatile xtl::any>:  public any_argument_selector {};
-template <> struct argument_selector<xtl::any&>:                public any_argument_selector {};
-template <> struct argument_selector<const xtl::any&>:          public any_argument_selector {};
-template <> struct argument_selector<volatile xtl::any&>:       public any_argument_selector {};
-template <> struct argument_selector<const volatile xtl::any&>: public any_argument_selector {};
+//template <> struct argument_selector<xtl::any&>:                public any_argument_selector {};
+//template <> struct argument_selector<const xtl::any&>:          public any_argument_selector {};
+//template <> struct argument_selector<volatile xtl::any&>:       public any_argument_selector {};
+//template <> struct argument_selector<const volatile xtl::any&>: public any_argument_selector {};
 template <> struct argument_selector<char>:                     public int_argument_selector<char> {};
 template <> struct argument_selector<signed char>:              public int_argument_selector<signed char> {};
 template <> struct argument_selector<unsigned char>:            public int_argument_selector<unsigned char> {};

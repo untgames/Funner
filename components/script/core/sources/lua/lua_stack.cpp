@@ -85,15 +85,49 @@ void check_item (lua_State* state, size_t index, int expected_type, const char* 
 
 float Stack::GetFloat (size_t index)
 {
-  check_item (state, index, LUA_TNUMBER, "script::lua::Stack::GetFloat");
+  try
+  {
+      //проверка корректности индекса элемента
+
+    check_item_index (state, index, "");
   
-  return (float)lua_tonumber (state, index);
+      //определение типа элемента, находящегося в стеке
+
+    int item_type = lua_type (state, index);
+    
+      //проверка совместимости типов
+      
+    switch (item_type)
+    {
+      case LUA_TNIL:
+      case LUA_TBOOLEAN:
+      case LUA_TNUMBER:
+        return (float)lua_tonumber (state, index);
+      case LUA_TUSERDATA:
+        return xtl::any_multicast<float> (Stack::GetVariant (index));
+      default:
+        throw xtl::format_exception<script::ArgumentException> ("", "Bad item #%u type (%s expected, got %s)", index,
+          lua_typename (state, LUA_TNUMBER), lua_typename (state, item_type));
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("script::lua::Stack::GetFloat");
+    throw;
+  }
 }
 
 int Stack::GetInteger (size_t index)
 {
-  check_item (state, index, LUA_TNUMBER, "script::lua::Stack::GetInteger");
-  return lua_tointeger (state, index);
+  try
+  {
+    return static_cast<int> (Stack::GetFloat (index));
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("script::lua::Stack::GetInteger");
+    throw;
+  }
 }
 
 void* Stack::GetPointer (size_t index)
@@ -104,8 +138,34 @@ void* Stack::GetPointer (size_t index)
 
 const char* Stack::GetString (size_t index)
 {
-  check_item (state, index, LUA_TSTRING, "script::lua::Stack::GetString");
-  return lua_tostring (state, index);
+  try
+  {
+      //проверка корректности индекса элемента
+
+    check_item_index (state, index, "");
+  
+      //определение типа элемента, находящегося в стеке
+
+    int item_type = lua_type (state, index);
+    
+      //проверка совместимости типов
+      
+    switch (item_type)
+    {
+      case LUA_TSTRING:
+        return lua_tostring (state, index);
+      case LUA_TUSERDATA:
+        return xtl::any_multicast<const stl::string&> (Stack::GetVariant (index)).c_str ();
+      default:
+        throw xtl::format_exception<script::ArgumentException> ("", "Bad item #%u type (%s expected, got %s)", index,
+          lua_typename (state, LUA_TSTRING), lua_typename (state, item_type));
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("script::lua::Stack::GetString");
+    throw;
+  }
 }
 
 const char* Stack::GetSymbol (size_t index)
@@ -115,33 +175,65 @@ const char* Stack::GetSymbol (size_t index)
   return "";
 }
 
-xtl::any& Stack::GetVariant (size_t index)
+xtl::any Stack::GetVariant (size_t index)
 {
-    //проверка индекса
-    
-  check_item (state, index, LUA_TUSERDATA, "script::lua::Stack::GetVariant");
 
-    //получение аргумента
-
-  xtl::any* variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, index));
-  
-  if (variant && lua_getmetatable (state, index))
+  try
   {
-      //все пользовательские типы данных, хранимые в стеке, приводятся к xtl::any*. проверка совпадения метатаблиц не требуется
-    
-    lua_pop (state, 1);
-    return *variant;
-  }
+      //проверка корректности индекса элемента
 
-    //если типы не совпали
-
-  luaL_typerror (state, index, "xtl::any");
-
-    //генерация исключения
-
-  throw xtl::format_exception<script::ArgumentException> ("script::Stack::GetVariant", "Item %u has wrong type (non xtl::any)", index);
+    check_item_index (state, index, "");
   
-  return *variant;
+      //определение типа элемента, находящегося в стеке
+
+    int item_type = lua_type (state, index);
+    
+      //проверка совместимости типов
+      
+    switch (item_type)
+    {
+      case LUA_TSTRING:
+        return xtl::make_ref_any (stl::string (lua_tostring (state, index)));
+      case LUA_TNUMBER:
+      {
+        float value = static_cast<float> (lua_tonumber (state, index));
+        
+        return xtl::make_ref_any (value);
+      }
+      case LUA_TUSERDATA:
+      {
+          //получение аргумента
+
+        xtl::any* variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, index));
+        
+        if (variant && lua_getmetatable (state, index))
+        {
+            //все пользовательские типы данных, хранимые в стеке, приводятся к xtl::any*. проверка совпадения метатаблиц не требуется
+          
+          lua_pop (state, 1);
+          return *variant;
+        }
+
+          //если типы не совпали
+
+        luaL_typerror (state, index, "xtl::any");
+
+          //генерация исключения
+
+        throw xtl::format_exception<script::ArgumentException> ("", "Item %u has wrong type (non xtl::any)", index);
+
+        return *variant;
+      }
+      default:
+        throw xtl::format_exception<script::ArgumentException> ("", "Bad item #%u type (%s expected, got %s)", index,
+          lua_typename (state, LUA_TSTRING), lua_typename (state, item_type));
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("script::lua::Stack::GetVariant");
+    throw;
+  } 
 }
 
 /*

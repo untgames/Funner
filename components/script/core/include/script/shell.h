@@ -15,8 +15,9 @@ template <class T> class shared_ptr;
 namespace script
 {
 
-//forward declaration
+//forward declarations
 class IInterpreter;
+class Environment;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оболочка над командным интерпретатором

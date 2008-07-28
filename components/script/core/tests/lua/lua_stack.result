@@ -1,0 +1,26 @@
+Results of lua_stack_test:
+int -> int: ok
+float -> int: ok
+const char* -> int: fail (Bad item #1 type (number expected, got string)
+    at script::lua::Stack::GetFloat
+    at script::lua::Stack::GetInteger)
+stl::string -> int: fail (Exception on argument #1: xtl::bad_lexical_cast
+    at script::detail::get_argument)
+int -> float: ok
+float -> float: ok
+const char* -> float: fail (Bad item #1 type (number expected, got string)
+    at script::lua::Stack::GetFloat)
+stl::string -> float: fail (Exception on argument #1: xtl::bad_lexical_cast
+    at script::detail::get_argument)
+int -> const char*: fail (Bad item #1 type (string expected, got number)
+    at script::lua::Stack::GetString)
+float -> const char*: fail (Bad item #1 type (string expected, got number)
+    at script::lua::Stack::GetString)
+const char* -> const char*: ok
+stl::string -> const char*: ok
+int -> stl::string: fail (Bad item #1 type (string expected, got number)
+    at script::lua::Stack::GetString)
+float -> stl::string: fail (Bad item #1 type (string expected, got number)
+    at script::lua::Stack::GetString)
+const char* -> stl::string: ok
+stl::string -> stl::string: ok

@@ -87,7 +87,7 @@ class Stack: public IStack
     void*       GetPointer (size_t index);
     const char* GetString  (size_t index);
     const char* GetSymbol  (size_t index);
-    xtl::any&   GetVariant (size_t index);
+    xtl::any    GetVariant (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Помещение аргументов в стек
