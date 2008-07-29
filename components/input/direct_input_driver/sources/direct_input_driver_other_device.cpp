@@ -13,6 +13,7 @@ namespace
 {
 
 const size_t MESSAGE_BUFFER_SIZE  = 32;
+const size_t BUFFER_SIZE = 16;
 
 void default_event_handler (const char*)
 {
@@ -96,9 +97,9 @@ size_t get_object_data_size (ObjectType type)
   }
 }
 
-bool is_pov_pressed (void* pov_status)
+bool is_pov_pressed (DWORD pov_status)
 {
-  return LOWORD (*((DWORD*)pov_status)) != 0xFFFF;
+  return LOWORD (pov_status) != 0xFFFF;
 }
 
 BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance, LPVOID device)
@@ -148,22 +149,20 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
 
   size_t device_data_size = 0;
 
-  for (ObjectsArray::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
-    if (iter->offset >= device_data_size)
-      device_data_size = iter->offset + get_object_data_size (iter->type);
+  for (ObjectsMap::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
+    if (iter->second.offset >= device_data_size)
+      device_data_size = iter->second.offset + get_object_data_size (iter->second.type);
 
   if (device_data_size % 4)
     device_data_size += 4 - device_data_size % 4;
 
-  last_device_data.resize (device_data_size);
-  current_device_data.resize (device_data_size);
-
   xtl::uninitialized_storage<DIOBJECTDATAFORMAT> objects_data_format (objects.size ());
 
-  for (size_t i = 0; i < objects.size (); i++)
+  size_t i = 0;
+  for (ObjectsMap::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter, i++)
   {
     objects_data_format.data ()[i].pguid   = NULL;
-    objects_data_format.data ()[i].dwOfs   = objects[i].offset;
+    objects_data_format.data ()[i].dwOfs   = iter->second.offset;
     objects_data_format.data ()[i].dwType  = DIDFT_AXIS | DIDFT_BUTTON | DIDFT_POV | DIDFT_PSHBUTTON | DIDFT_TGLBUTTON | DIDFT_ABSAXIS | DIDFT_RELAXIS | DIDFT_ANYINSTANCE;
     objects_data_format.data ()[i].dwFlags = 0;
   } 
@@ -180,47 +179,81 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
   if (operation_result != DI_OK)
       throw xtl::format_operation_exception (METHOD_NAME, "Can't set device cooperative level, error '%s'", get_direct_input_error_name (operation_result));
 
+  DIPROPDWORD buffer_size_property;
+
+  buffer_size_property.diph.dwSize       = sizeof(DIPROPDWORD);
+  buffer_size_property.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+  buffer_size_property.diph.dwObj        = 0;
+  buffer_size_property.diph.dwHow        = DIPH_DEVICE;
+  buffer_size_property.dwData            = BUFFER_SIZE;
+
+  operation_result = device_interface->SetProperty (DIPROP_BUFFERSIZE, &buffer_size_property.diph);
+
+  if (operation_result != DI_OK)
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't set device buffer size, error '%s'", get_direct_input_error_name (operation_result));
+
   operation_result = device_interface->Acquire ();
 
   if (operation_result != DI_OK)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't set device cooperative level, error '%s'", get_direct_input_error_name (operation_result));
 
-  for (ObjectsArray::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
+  for (ObjectsMap::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
   {
-    if (iter->type == ObjectType_AbsoluteAxis)
+    if (iter->second.type == ObjectType_AbsoluteAxis)
     {
       DIPROPRANGE range_property;
 
       range_property.diph.dwSize       = sizeof(DIPROPRANGE); 
       range_property.diph.dwHeaderSize = sizeof(DIPROPHEADER); 
-      range_property.diph.dwObj        = iter->offset;
+      range_property.diph.dwObj        = iter->second.offset;
       range_property.diph.dwHow        = DIPH_BYOFFSET; 
 
       operation_result = device_interface->GetProperty (DIPROP_RANGE, &range_property.diph);
 
       if (operation_result != DI_OK)
       {
-        iter->bad_object = true;
+        iter->second.bad_object = true;
 
-        stl::string log_message = common::format ("Can't get object's %s range, not using this object.", iter->name.c_str ());
+        stl::string log_message = common::format ("Can't get object's %s range, not using this object.", iter->second.name.c_str ());
 
         debug_log_handler (log_message.c_str ());
 
         continue;
       }
 
-      iter->min_value = range_property.lMin;
-      iter->max_value = range_property.lMax;
+      iter->second.min_value = range_property.lMin;
+      iter->second.max_value = range_property.lMax;
         
       AddProperty (".dead_zone", iter, ObjectPropertyType_DeadZone, 0.f);
       AddProperty (".saturation", iter, ObjectPropertyType_Saturation, 1.f);
     }
-    if (iter->type == ObjectType_RelativeAxis)
+    if (iter->second.type == ObjectType_RelativeAxis)
       AddProperty (".sensitivity", iter, ObjectPropertyType_Sensitivity, 1.f);
   }
 
+  xtl::uninitialized_storage<char> initial_device_data (device_data_size);
+
   device_interface->Poll ();
-  device_interface->GetDeviceState (last_device_data.size (), last_device_data.data ());
+  device_interface->GetDeviceState (initial_device_data.size (), initial_device_data.data ());
+
+  for (ObjectsMap::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
+  {
+    switch (iter->second.type)
+    {
+      case ObjectType_AbsoluteAxis:
+        iter->second.last_value = *(DWORD*)&(initial_device_data.data ()[iter->second.offset]);
+        break;
+      case ObjectType_RelativeAxis:
+        iter->second.last_value = *(DWORD*)&(initial_device_data.data ()[iter->second.offset]);
+        break;
+      case ObjectType_Button:
+        iter->second.last_value = initial_device_data.data ()[iter->second.offset];
+        break;
+      case ObjectType_POV:
+        iter->second.last_value = *(DWORD*)&(initial_device_data.data ()[iter->second.offset]);
+        break;
+    }
+  }
 }
 
 OtherDevice::~OtherDevice ()
@@ -295,7 +328,7 @@ float OtherDevice::GetProperty (const char* name)
 
 void OtherDevice::RegisterObject (const char* name, size_t offset, ObjectType type)
 {
-  objects.push_back (ObjectData (name, offset, type));
+  objects.insert_pair (offset, ObjectData (name, offset, type));
 }
 
 /*
@@ -348,9 +381,18 @@ void OtherDevice::PollDevice ()
       return;
   }
 
-  operation_result = device_interface->GetDeviceState (current_device_data.size (), current_device_data.data ());
+  DIDEVICEOBJECTDATA events[BUFFER_SIZE];
+  DWORD              events_count = BUFFER_SIZE;
 
-  if (operation_result != DI_OK)
+  operation_result = device_interface->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), events, &events_count, 0);
+
+  if (operation_result == DI_BUFFEROVERFLOW)
+  {
+    log_message = common::format ("Device %s buffer was overflowed", name.c_str ());
+
+    debug_log_handler (log_message.c_str ());
+  }
+  else if (operation_result != DI_OK)
   {
     if (operation_result == DIERR_INPUTLOST)
     {
@@ -370,9 +412,15 @@ void OtherDevice::PollDevice ()
     
       if (reacquire_result)
       {
-        operation_result = device_interface->GetDeviceState (current_device_data.size (), current_device_data.data ());
+        operation_result = device_interface->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), events, &events_count, 0);
 
-        if (operation_result != DI_OK)
+        if (operation_result == DI_BUFFEROVERFLOW)
+        {
+          log_message = common::format ("Device %s buffer was overflowed", name.c_str ());
+
+          debug_log_handler (log_message.c_str ());
+        }
+        else if (operation_result != DI_OK)
         { 
           log_message = common::format ("Can't get device %s state, error '%s'", name.c_str (), get_direct_input_error_name (operation_result));
 
@@ -402,70 +450,70 @@ void OtherDevice::PollDevice ()
 
   static char message[MESSAGE_BUFFER_SIZE];
 
-  for (ObjectsArray::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
+  for (size_t i = 0; i < events_count; i++)
   {
-    if (iter->bad_object)
+    ObjectsMap::iterator iter = objects.find (events[i].dwOfs);
+
+    if (iter == objects.end ())
       continue;
 
-    char* current_value = &(current_device_data.data ()[iter->offset]);
+    if (iter->second.bad_object)
+      continue;
 
-    if (memcmp (&(last_device_data.data ()[iter->offset]), current_value, get_object_data_size (iter->type)))
+    switch (iter->second.type)
     {
-      switch (iter->type)
-      {
-        case ObjectType_AbsoluteAxis:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %.4f", iter->name.c_str (), (((float)(*((LONG*)current_value) - iter->min_value)) / (float)(iter->max_value - iter->min_value)) * 2.f - 1.f);
+      case ObjectType_AbsoluteAxis:
+        xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %.4f", iter->second.name.c_str (), (((float)(events[i].dwData - iter->second.min_value)) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
+        event_handler (message);
+        
+        break;
+      case ObjectType_RelativeAxis:
+        xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %f", iter->second.name.c_str (), ((float)(LONG)(events[i].dwData - iter->second.last_value)) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
+        event_handler (message);
+        
+        break;
+      case ObjectType_Button:
+        xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' %s", iter->second.name.c_str (), (events[i].dwData & 0x80) ? "down" : "up");
+        event_handler (message);
+        
+        break;
+      case ObjectType_POV:
+        if (!is_pov_pressed (events[i].dwData))
+        {
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", iter->second.name.c_str ());
+          event_handler (message);
+        }
+        else
+        {
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' pov %d", iter->second.name.c_str (), events[i].dwData);
           event_handler (message);
           
-          break;
-        case ObjectType_RelativeAxis:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %f", iter->name.c_str (), (float)(*((LONG*)current_value) - *((LONG*)(&last_device_data.data ()[iter->offset]))) * iter->properties[ObjectPropertyType_Sensitivity]->second.value);
-          event_handler (message);
-          
-          break;
-        case ObjectType_Button:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' %s", iter->name.c_str (), (*current_value & 0x80) ? "down" : "up");
-          event_handler (message);
-          
-          break;
-        case ObjectType_POV:
-          if (!is_pov_pressed (current_value))
+          if (!is_pov_pressed (iter->second.last_value))
           {
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", iter->name.c_str ());
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", iter->second.name.c_str ());
             event_handler (message);
           }
-          else
-          {
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' pov %d", iter->name.c_str (), *((DWORD*)current_value));
-            event_handler (message);
-            
-            if (!is_pov_pressed (&last_device_data.data ()[iter->offset]))
-            {
-              xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", iter->name.c_str ());
-              event_handler (message);
-            }
-          }
-          break;
-      }
+        }
+        break;
     }
-  }
 
-  current_device_data.swap (last_device_data);
+    iter->second.last_value = events[i].dwData;
+  }
 }
 
 /*
    Добавление свойства объекта
 */
 
-void OtherDevice::AddProperty (const char* property_name, ObjectsArray::iterator object_iter, ObjectPropertyType property_type, float default_value)
+void OtherDevice::AddProperty (const char* property_name, ObjectsMap::iterator object_iter, ObjectPropertyType property_type, float default_value)
 {
-  stl::string full_property_name = object_iter->name;
+  stl::string full_property_name = object_iter->second.name;
 
   full_property_name.append (property_name);
 
-  ObjectPropertyMap::iterator property_iter = objects_properties_map.insert_pair (full_property_name.c_str (), ObjectPropertyMapElement (default_value, object_iter->offset, property_type)).first;
+  ObjectPropertyMap::iterator property_iter = objects_properties_map.insert_pair (full_property_name.c_str (), ObjectPropertyMapElement (default_value, object_iter->second.offset, property_type)).first;
 
-  object_iter->properties[property_type] = property_iter;
+  object_iter->second.properties[property_type] = property_iter;
 
   if (!properties.empty ())
     properties += ' ';

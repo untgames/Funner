@@ -13,6 +13,7 @@ const char* get_direct_input_error_name (HRESULT error)
 {
   switch (error)
   {
+    case DI_PROPNOEFFECT:              return "DI_PROPNOEFFECT";
     case DIERR_ACQUIRED:               return "DIERR_ACQUIRED";
     case DIERR_BETADIRECTINPUTVERSION: return "DIERR_BETADIRECTINPUTVERSION";
     case DIERR_DEVICENOTREG:           return "DIERR_DEVICENOTREG";

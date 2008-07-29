@@ -123,10 +123,11 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
       stl::string                 name;
       size_t                      offset;
       ObjectType                  type;
-      size_t                      min_value;                          //минимальное значение (для объектов типа ось)
-      size_t                      max_value;                          //максимальное значение (для объектов типа ось)
+      DWORD                       min_value;                          //минимальное значение (для объектов типа ось)
+      DWORD                       max_value;                          //максимальное значение (для объектов типа ось)
       bool                        bad_object;                         //true для объекта типа ось, если нельзя получить пределы значения
       ObjectPropertyMap::iterator properties[ObjectPropertyType_Num]; //свойства
+      DWORD                       last_value;                         //последнее значение
 
       ObjectData () {}
       ObjectData (const char* in_name, size_t in_offset, ObjectType in_type) 
@@ -135,8 +136,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     };
 
     typedef xtl::com_ptr<IDirectInputDevice8> DirectInputDeviceInterfacePtr;
-    typedef stl::vector<ObjectData>           ObjectsArray;
-    typedef xtl::uninitialized_storage<char>  DeviceDataBuffer;
+    typedef stl::hash_map<size_t, ObjectData> ObjectsMap;
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,7 +147,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление свойства объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddProperty (const char* property_name, ObjectsArray::iterator object_iter, ObjectPropertyType property_type, float default_value);
+    void AddProperty (const char* property_name, ObjectsMap::iterator object_iter, ObjectPropertyType property_type, float default_value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка свойства объекта
@@ -169,9 +169,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     DirectInputDeviceInterfacePtr           device_interface;
     input::low_level::IDevice::EventHandler event_handler;
     syslib::Timer                           poll_timer;
-    ObjectsArray                            objects;
-    DeviceDataBuffer                        last_device_data;
-    DeviceDataBuffer                        current_device_data;
+    ObjectsMap                              objects;
     bool                                    device_lost;
     ObjectPropertyMap                       objects_properties_map;
     stl::string                             properties;
