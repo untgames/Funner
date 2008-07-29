@@ -133,9 +133,9 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
    Конструктор/деструктор
 */
 
-OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevice8* in_direct_input_device_interface)
+OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevice8* in_direct_input_device_interface, const DebugLogHandler& in_debug_log_handler)
   : event_handler (&default_event_handler), name (in_name), device_interface (in_direct_input_device_interface, false), 
-    poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10), device_lost (false)
+    poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10), device_lost (false), debug_log_handler (in_debug_log_handler)
 {
   static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::OtherDevice";
 
@@ -201,7 +201,12 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
       if (operation_result != DI_OK)
       {
         iter->bad_object = true;
-        continue;                         //Log this!!!
+
+        stl::string log_message = common::format ("Can't get object's %s range, not using this object.", iter->name.c_str ());
+
+        debug_log_handler (log_message.c_str ());
+
+        continue;
       }
 
       iter->min_value = range_property.lMin;
@@ -299,46 +304,100 @@ void OtherDevice::RegisterObject (const char* name, size_t offset, ObjectType ty
 
 void OtherDevice::PollDevice ()
 {
-  static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::PollDevice";
-
-  HRESULT operation_result;
+  HRESULT     operation_result;
+  bool        device_reacquired = false;
+  stl::string log_message;
 
   operation_result = device_interface->Poll ();
 
   if ((operation_result != DI_OK) && (operation_result != DI_NOEFFECT))
   {
-    HRESULT acquire_operation_result;
-  
-    device_interface->Unacquire ();
-    acquire_operation_result = device_interface->Acquire ();
+    bool reacquire_result = ReAcquireDevice ();
 
-    if (acquire_operation_result != DI_OK)
+    if (reacquire_result)
     {
-      if ((operation_result == DIERR_INPUTLOST) && !device_lost)
+      log_message = common::format ("Device %s reacquired", name.c_str ());
+
+      debug_log_handler (log_message.c_str ());
+      event_handler ("device reacquired");
+      
+      device_lost       = false;
+      device_reacquired = true;
+    }
+    else if (operation_result == DIERR_INPUTLOST)
+    {
+      if (!device_lost)
       {
-        printf ("Device %s lost\n", name.c_str ());
+        log_message = common::format ("Device %s lost", name.c_str ());
+
+        debug_log_handler (log_message.c_str ());
         event_handler ("device lost");
+        
         device_lost = true;
       }
 
       return;
-//      throw xtl::format_operation_exception (METHOD_NAME, "Can't set device cooperative level, error '%s'", get_direct_input_error_name (operation_result));
+    }
+    else if (!device_lost)
+    {
+      log_message = common::format ("Can't poll device %s, error '%s'", name.c_str (), get_direct_input_error_name (operation_result));
+
+      debug_log_handler (log_message.c_str ());
     }
     else
-    {
-      printf ("Device %s reacquired\n", name.c_str ());
-      event_handler ("device reacquired");
-      device_lost = false;
-    }
+      return;
   }
 
   operation_result = device_interface->GetDeviceState (current_device_data.size (), current_device_data.data ());
 
   if (operation_result != DI_OK)
   {
-    printf ("%s: Can't get device %s state, error '%s'\n", METHOD_NAME, name.c_str (), get_direct_input_error_name (operation_result));
-//    throw xtl::format_operation_exception (METHOD_NAME, "Can't get device state, error '%s'", get_direct_input_error_name (operation_result));
-    return;
+    if (operation_result == DIERR_INPUTLOST)
+    {
+      if (device_reacquired)
+      {
+        log_message = common::format ("Bad device %s (loosing at get state)", name.c_str ());
+
+        debug_log_handler (log_message.c_str ());
+        event_handler ("device bad");
+        
+        poll_timer.Pause ();
+
+        return;
+      }
+
+      bool reacquire_result = ReAcquireDevice ();
+    
+      if (reacquire_result)
+      {
+        operation_result = device_interface->GetDeviceState (current_device_data.size (), current_device_data.data ());
+
+        if (operation_result != DI_OK)
+        { 
+          log_message = common::format ("Can't get device %s state, error '%s'", name.c_str (), get_direct_input_error_name (operation_result));
+
+          debug_log_handler (log_message.c_str ());
+          return;
+        }
+      }
+      else
+      {
+        log_message = common::format ("Device %s lost", name.c_str ());
+
+        debug_log_handler (log_message.c_str ());
+        event_handler ("device lost");
+        device_lost = true;
+
+        return;
+      }      
+    }
+    else
+    {
+      log_message = common::format ("Can't get device %s state, error '%s'", name.c_str (), get_direct_input_error_name (operation_result));
+
+      debug_log_handler (log_message.c_str ());
+      return;
+    }
   }
 
   static char message[MESSAGE_BUFFER_SIZE];
@@ -414,4 +473,21 @@ void OtherDevice::AddProperty (const char* property_name, ObjectsArray::iterator
   properties += '\'';
   properties.append (full_property_name);
   properties += '\'';
+}
+
+/*
+   Попытка переполучения устройства
+*/
+
+bool OtherDevice::ReAcquireDevice ()
+{
+  HRESULT operation_result;
+
+  device_interface->Unacquire ();
+  operation_result = device_interface->Acquire ();
+
+  if (operation_result == DI_OK)
+    return true;
+
+  return false;
 }

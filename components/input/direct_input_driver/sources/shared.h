@@ -14,6 +14,7 @@
 #include <xtl/shared_ptr.h>
 
 #include <common/singleton.h>
+#include <common/strlib.h>
 
 #include <syslib/timer.h>
 #include <syslib/window.h>
@@ -46,74 +47,15 @@ enum ObjectType
   ObjectType_Unknown
 };
 
-/*class GameControlDevice: virtual public input::low_level::IDevice, public xtl::reference_counter
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор/деструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    GameControlDevice (syslib::Window* window, const char* name, IDirectInputDevice8* direct_input_device_interface);
-    ~GameControlDevice ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение имени устройства
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* GetName () { return name.c_str (); }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подписка на события устройства
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetEventHandler (const input::low_level::IDevice::EventHandler& handler)
-    {
-      event_handler = handler;
-    }
-    const input::low_level::IDevice::EventHandler& GetEventHandler ()
-    {
-      return event_handler;
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Настройки устройства
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* GetProperties () {return "";}
-    void        SetProperty   (const char* name, float value) {}
-    float       GetProperty   (const char* name) {return 0.f;}
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсчёт ссылок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddRef () { addref (this); }  
-    void Release () { release (this); }
-
-  private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение данных
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void PollDevice ();
-
-  private:
-    GameControlDevice (const GameControlDevice& source);             //no impl
-    GameControlDevice& operator = (const GameControlDevice& source); //no impl
-    GameControlDevice ();                                            //no impl
-
-  private:
-    typedef xtl::com_ptr<IDirectInputDevice8> DirectInputDeviceInterfacePtr;
-
-  private:
-    stl::string                             name;
-    DirectInputDeviceInterfacePtr           device_interface;
-    input::low_level::IDevice::EventHandler event_handler;
-    syslib::Timer                           poll_timer;
-    DIJOYSTATE                              current_joy_state;
-};*/
-
 class OtherDevice: virtual public input::low_level::IDevice, public xtl::reference_counter
 {
   public:
+    typedef input::low_level::IDriver::LogHandler DebugLogHandler;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OtherDevice (syslib::Window* window, const char* name, IDirectInputDevice8* direct_input_device_interface);
+    OtherDevice (syslib::Window* window, const char* name, IDirectInputDevice8* direct_input_device_interface, const DebugLogHandler& debug_log_handler);
     ~OtherDevice ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,6 +154,11 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetDwordProperty (REFGUID property, DWORD value, DWORD object_offset);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Попытка переполучения устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool ReAcquireDevice ();
+
   private:
     OtherDevice (const OtherDevice& source);             //no impl
     OtherDevice& operator = (const OtherDevice& source); //no impl
@@ -228,6 +175,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     bool                                    device_lost;
     ObjectPropertyMap                       objects_properties_map;
     stl::string                             properties;
+    DebugLogHandler                         debug_log_handler;
 };
 
 const char* get_direct_input_error_name (HRESULT error);

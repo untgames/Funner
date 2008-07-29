@@ -1,5 +1,7 @@
 #include "shared.h"
 
+using namespace common;
+
 namespace
 {
 
@@ -9,6 +11,21 @@ void default_log_handler (const char*)
 
 BOOL FAR PASCAL enum_devices_callback (LPCDIDEVICEINSTANCE device_instance, LPVOID direct_input_driver);
 
+const char* get_com_error_name (HRESULT error)
+{
+  switch (error)
+  {
+    case CLASS_E_NOAGGREGATION: return "CLASS_E_NOAGGREGATION";
+    case E_INVALIDARG:          return "E_INVALIDARG";
+    case E_NOINTERFACE:         return "E_NOINTERFACE";
+    case E_OUTOFMEMORY:         return "E_OUTOFMEMORY";
+    case E_UNEXPECTED:          return "E_UNEXPECTED";
+    case REGDB_E_CLASSNOTREG:   return "REGDB_E_CLASSNOTREG";
+    case RPC_E_CHANGED_MODE:    return "RPC_E_CHANGED_MODE";
+    default:                    return "Unknown";
+  }
+}
+
 enum DirectInputDeviceType
 {
   DirectInputDeviceType_GameControl,
@@ -16,6 +33,32 @@ enum DirectInputDeviceType
   DirectInputDeviceType_Pointer,
   DirectInputDeviceType_Other
 };
+
+struct ComInitializer
+{
+  ComInitializer ()
+  {
+    HRESULT create_result;
+
+    create_result = CoInitialize (0);
+
+    switch (create_result)
+    {
+      case S_OK:
+      case S_FALSE:
+        break;
+      default:
+        throw xtl::format_operation_exception ("ComInitializer::ComInitializer", "Can't initialize COM, error '%s'.", get_com_error_name (create_result));
+    }
+  }
+
+  ~ComInitializer ()
+  {
+    CoUninitialize ();
+  }
+};
+
+typedef common::Singleton<ComInitializer> ComInitializerSingleton;
 
 }
 
@@ -37,12 +80,28 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     Driver () 
       : log_fn (&default_log_handler)
     {
+      static const char* METHOD_NAME = "input::low_level::direct_input_driver::Driver::Driver";
+
+      try
+      {
+        ComInitializerSingleton::Instance ();
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch (METHOD_NAME);
+      }
+
       HRESULT create_result;
 
-      create_result = DirectInput8Create (GetModuleHandle (NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID *)&direct_input_interface, NULL);
+      create_result = CoCreateInstance (CLSID_DirectInput8, 0, CLSCTX_INPROC_SERVER, IID_IDirectInput8A, (LPVOID *)&direct_input_interface);
+
+      if (create_result != S_OK)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't create direct input 8 interface, error '%s'", get_com_error_name (create_result));
+
+      create_result = direct_input_interface->Initialize (GetModuleHandle (0), DIRECTINPUT_VERSION);
 
       if (create_result != DI_OK)
-        throw xtl::format_operation_exception ("input::low_level::direct_input_driver::Driver::Driver", "Can't create direct input interface, error '%s'", get_direct_input_error_name (create_result));
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't initialize direct input interface, error '%s'", get_direct_input_error_name (create_result));
     }
 
     ~Driver () 
@@ -84,9 +143,6 @@ class Driver: virtual public IDriver, public xtl::reference_counter
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
         if (!strcmp ((*iter)->device_name.c_str (), name))
         {
-//          if ((*iter)->device_type != DirectInputDeviceType_GameControl)
-//            throw xtl::make_not_implemented_exception (METHOD_NAME);
-
           HRESULT create_result;
 
           IDirectInputDevice8 *device_interface;
@@ -96,8 +152,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
           if (create_result != DI_OK)
             throw xtl::format_operation_exception (METHOD_NAME, "Can't create direct input device, error '%s'", get_direct_input_error_name (create_result));
 
-          return new OtherDevice ((*iter)->window, name, device_interface);
-//          return new GameControlDevice ((*iter)->window, name, device_interface);
+          return new OtherDevice ((*iter)->window, name, device_interface, log_fn);
         }
 
       throw xtl::make_argument_exception (METHOD_NAME, "name", name);
@@ -266,7 +321,10 @@ using input::low_level::direct_input_driver::Driver;
 
 BOOL FAR PASCAL enum_devices_callback (LPCDIDEVICEINSTANCE device_instance, LPVOID direct_input_driver)
 {
-  ((Driver*)direct_input_driver)->RegisterDevice (device_instance->tszInstanceName, device_instance->guidInstance);
+#ifdef DIRECT_INPUT_KEYBOARD_DISABLED
+  if (device_instance->guidInstance != GUID_SysKeyboard)
+#endif
+    ((Driver*)direct_input_driver)->RegisterDevice (device_instance->tszInstanceName, device_instance->guidInstance);
   
   return DIENUM_CONTINUE;
 }

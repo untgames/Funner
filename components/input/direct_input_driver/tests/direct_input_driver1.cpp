@@ -29,6 +29,11 @@ void input_event_handler (const char* event)
   printf ("New event: '%s'\n", event);
 }
 
+void debug_log_handler (const char* message)
+{
+  printf ("Debug log message: '%s'\n", message);
+}
+
 typedef xtl::com_ptr<IDevice> DevicePtr;
 
 int main ()
@@ -45,6 +50,8 @@ int main ()
 
     DirectInputDriver::RegisterDevice (window);
 
+    DirectInputDriver::Driver ()->SetDebugLog (&debug_log_handler);
+
     printf ("Available devices:\n");
 
     stl::vector<DevicePtr> devices;
@@ -52,9 +59,6 @@ int main ()
     for (size_t i = 0; i < DirectInputDriver::Driver ()->GetDevicesCount (); i++)
     {
       printf ("  %u: '%s'\n", i + 1, DirectInputDriver::Driver ()->GetDeviceName (i));
-
-      if (common::wcmatch (DirectInputDriver::Driver ()->GetDeviceName (i), "*Wireless*"))
-        continue;
 
       devices.push_back (DevicePtr (DriverManager::CreateDevice ("*", DirectInputDriver::Driver ()->GetDeviceName (i)), false));
 
@@ -67,8 +71,8 @@ int main ()
 
       if (common::wcmatch (DirectInputDriver::Driver ()->GetDeviceName (i), "*USB*xis*"))
       {
-        devices.back ()->SetProperty ("X axis.dead_zone", 0.4);
-        devices.back ()->SetProperty ("X axis.saturation", 0.6);
+        devices.back ()->SetProperty ("X axis.dead_zone", 0.4f);
+        devices.back ()->SetProperty ("X axis.saturation", 0.6f);
       }
     }
     
