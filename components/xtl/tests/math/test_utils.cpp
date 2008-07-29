@@ -11,9 +11,10 @@ using namespace math;
 int main()
 {
   printf("180deg= %.2f rad\n",deg_to_rad<float> (float (180) ) );
-  printf("PI rad= %.2f deg\n",rad_to_deg<float> (3.14159265358979323846));
+  printf("PI rad= %.2f deg\n",rad_to_deg<float> (PI_));
 
   quat_print("quat from axis/angle",quat<float> (axis_angle_to_quat(float (180), vec<float,3>(0,1,0,0) ) ) );
+  quat_print("=",quat<float> (axis_angle_to_quat(float (180),float (0),float (1),float (0)) ) );
   quat_print("quat from euler angle",quat<float> (euler_angle_to_quat(float (90),float(90),float(90) ) ) );
 
   matrix_print("Matrix translate (from vector (0,1,0) )", matrix_translate (vec<float,3>(0,1,0,0) ) );

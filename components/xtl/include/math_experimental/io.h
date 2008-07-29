@@ -6,6 +6,7 @@
 
 #include <xtl/lexical_cast.h>
 #include <xtl/token_iterator.h>
+#include <math_experimental/forward.h>
 
 namespace common
 {
@@ -17,9 +18,9 @@ class OutputTextStream;
 namespace math
 {
 
-template <class T, size_t size> class vec;
+/*template <class T, size_t size> class vec;
 template <class T, size_t size> class matrix;
-template <class T>              class quat;
+template <class T>              class quat;*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение математических типов

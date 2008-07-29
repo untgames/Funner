@@ -39,7 +39,8 @@ inline const quat<T> axis_angle_to_quat (const T& angle,const T& axis_x,const T&
 {
   quat<T> q;
 
-  T len(sqrt(axis_x_*axis_x_+axis_y_*axis_y_+axis_z_*axis_z_));
+  T len(sqrt(axis_x*axis_x+axis_y*axis_y+axis_z*axis_z));
+
   T axis_x_(axis_x/len);
   T axis_y_(axis_y/len);
   T axis_z_(axis_z/len);
@@ -47,9 +48,9 @@ inline const quat<T> axis_angle_to_quat (const T& angle,const T& axis_x,const T&
   T half_angle = angle*T(0.5);
   T sin_a      = sin (half_angle);
 
-  q.x = v.x * sin_a;
-  q.y = v.y * sin_a;
-  q.z = v.z * sin_a;
+  q.x = axis_x_ * sin_a;
+  q.y = axis_y_ * sin_a;
+  q.z = axis_z_ * sin_a;
   q.w = cos (half_angle);
   return q;
 }
@@ -74,7 +75,8 @@ void axis_angle_to_quat (const T& angle,const T& axis_x,const T& axis_y,const T&
 {
   quat<T> q;
 
-  T len(sqrt(axis_x_*axis_x_+axis_y_*axis_y_+axis_z_*axis_z_));
+  T len(sqrt(axis_x*axis_x+axis_y*axis_y+axis_z*axis_z));
+
   T axis_x_(axis_x/len);
   T axis_y_(axis_y/len);
   T axis_z_(axis_z/len);
@@ -82,10 +84,10 @@ void axis_angle_to_quat (const T& angle,const T& axis_x,const T& axis_y,const T&
   T half_angle = angle*T(0.5);
   T sin_a      = sin (half_angle);
 
-  q.x = v.x * sin_a;
-  q.y = v.y * sin_a;
-  q.z = v.z * sin_a;
-  q.w = cos (half_angle);
+  res.x = axis_x_ * sin_a;
+  res.y = axis_y_ * sin_a;
+  res.z = axis_z_ * sin_a;
+  res.w = cos (half_angle);
 }
 
 
