@@ -18,9 +18,10 @@ const char* TOOL_FORM_LIBRARY = "ToolForm"; //имя библиотеки шлюзов
     Конструктор / деструктор
 */
 
-ToolForm::ToolForm (IApplicationServer* server, const FormPtr& in_form)
+ToolForm::ToolForm (IApplicationServer* server, const WfFormPtr& in_form)
   : application_server (server),
-    form (in_form)
+    form (in_form),
+    menu_strip (0)
 {
 }
 
@@ -63,6 +64,21 @@ bool ToolForm::IsVisible ()
 }
 
 /*
+    Установка меню
+*/
+
+void ToolForm::SetMenuStrip (ToolMenuStrip* in_menu_strip)
+{
+  if (menu_strip)
+    form->Controls->Remove (menu_strip->Handle ());
+
+  menu_strip = in_menu_strip;
+
+  if (menu_strip)
+    form->Controls->Add (menu_strip->Handle ());
+}
+
+/*
     Регистрация шлюзов
 */
 
@@ -72,12 +88,14 @@ void ToolForm::RegisterInvokers (script::Environment& environment)
 
   InvokerRegistry& lib = environment.CreateLibrary (TOOL_FORM_LIBRARY);
 
-    //регистрация методов
+    //регистрация свойств
 
   lib.Register ("set_Text", make_invoker (&ToolForm::SetText));
   lib.Register ("get_Text", make_invoker (&ToolForm::Text));
   lib.Register ("set_Visible", make_invoker (&ToolForm::SetVisible));
   lib.Register ("get_Visible", make_invoker (&ToolForm::IsVisible));
+  lib.Register ("set_MenuStrip", make_invoker (&ToolForm::SetMenuStrip));
+  lib.Register ("get_MenuStrip", make_invoker (&ToolForm::MenuStrip));
 
     //регистрация типов данных
 

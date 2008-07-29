@@ -10,7 +10,9 @@ using namespace tools::ui::windows_forms;
 namespace
 {
 
-const char* INTERPERTER_NAME = "lua"; //имя интерпретатора
+const char* INTERPERTER_NAME                   = "lua";                 //имя интерпретатора
+const char* MENU_STRIP_COLLECTION_LIBRARY_NAME = "MenuStripCollection"; //имя библиотеки коллекции цепочек меню
+const char* MENU_ITEM_COLLECTION_LIBRARY_NAME  = "MenuItemCollection";  //имя библиотеки коллекции элементов меню
 
 }
 
@@ -84,7 +86,7 @@ void WindowSystem::ExecuteCommand (const char* command)
   {
     exception.touch ("tools::ui::WindowSystem::ExecuteCommand");
     throw;
-  }  
+  }
 }
 
 /*
@@ -93,46 +95,14 @@ void WindowSystem::ExecuteCommand (const char* command)
 
 void WindowSystem::LoadConfiguration (const char* file_name_mask)
 {
+  using namespace common;
+
   if (!file_name_mask)
     throw xtl::make_null_argument_exception ("tools::ui::WindowSystem::LoadConfiguration", "file_name_mask");
 
-  using namespace common;
-  
-  ParseLog parse_log;
-
   for (FileListIterator i=FileSystem::Search (file_name_mask, FileSearch_Files | FileSearch_Sort); i; ++i)
-    LoadConfigurationFile (i->name, parse_log);
+    ConfigurationParser (i->name, *this);
 }
-
-void WindowSystem::LoadConfigurationFile (const char* file_name, common::ParseLog& log)
-{
-  try
-  {
-    using namespace common;
-    
-    Parser parser (log, file_name, "xml");
-    
-    Parser::Iterator iter = parser.Root ()->First ("UIConfig");
-    
-    if (!iter)
-    {
-      log.Error (iter, "'UIConfig' tag missing");
-      return;
-    }
-    
-//    ParseConfiguration (iter);
-  }
-  catch (xtl::exception& exception)
-  {
-      //!!!вставить протоколирование!!!
-    throw;
-  }
-}
-
-//void WindowSystem::ParseConfiguration (Parser::Iterator iter, ParseLog& log)
-//{
-//  
-//}
 
 /*
     Регистрация шлюзов
@@ -143,12 +113,27 @@ void WindowSystem::RegisterInvokers ()
   try
   {
     using namespace script;    
-    
-    ToolForm::RegisterInvokers (*shell_environment);    
+
+      //регистрация шлюзов контролов
+
+    ToolForm::RegisterInvokers          (*shell_environment);    
+    ToolMenuItem::RegisterInvokers      (*shell_environment);
+    ToolMenuStrip::RegisterInvokers     (*shell_environment);
+    MenuItemRegistry::RegisterInvokers  (*shell_environment, MENU_ITEM_COLLECTION_LIBRARY_NAME);
+    MenuStripRegistry::RegisterInvokers (*shell_environment, MENU_STRIP_COLLECTION_LIBRARY_NAME);
+
+      //создание глобальной точки входа
 
     InvokerRegistry& lib = shell_environment->Library ("static.Application");
 
-    lib.Register ("get_MainForm", make_const (main_form));
+      //регистрация свойств
+
+    lib.Register ("get_MainForm",   make_const (main_form));
+    lib.Register ("get_MenuItems",  make_const (xtl::ref (menu_items)));
+    lib.Register ("get_MenuStrips", make_const (xtl::ref (menu_strips)));
+
+      //регистрация методов
+
     lib.Register ("LoadConfiguration", make_invoker<void (const char*)> (xtl::bind (&WindowSystem::LoadConfiguration, this, _1)));
   }
   catch (xtl::exception& exception)

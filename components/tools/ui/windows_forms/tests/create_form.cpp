@@ -8,8 +8,9 @@ int main ()
   {    
     Test test;
     
+    test.main_window.ExecuteCommand ("Application.LoadConfiguration ('data/conf/*.xform')");    
     test.main_window.ExecuteCommand ("Application.MainForm.Text = 'Hello world'");
-    test.main_window.ExecuteCommand ("Application.LoadConfiguration ('data/conf/*.xform')");
+    test.main_window.ExecuteCommand ("Application.MainForm.MenuStrip = Application.MenuStrips:Item('MenuStrip1')");
     
     syslib::Application::Run ();
     

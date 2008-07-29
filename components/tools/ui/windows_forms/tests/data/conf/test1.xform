@@ -1,3 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UIConfig>
+  <MenuItem Id="MenuItem1" Text="Ещё один пункт" Tip="Странное название"/>
+  <MenuItem Id="MenuItem2" Text="Справка" Tip="Справка о приложении">
+    <MenuItem Text="О программе..." Tip="Описание программы" OnClick="ShowAbout"/>
+    <MenuItem Source="MenuItem1"/>
+  </MenuItem>
+  <MenuStrip Id="MenuStrip1">
+    <MenuItem Text="Файл">
+      <MenuItem Text="Выход" Tip="Выход из приложения" OnClick="close"/>
+    </MenuItem>
+    <MenuItem Source="MenuItem2"/>
+  </MenuStrip>
 </UIConfig>
