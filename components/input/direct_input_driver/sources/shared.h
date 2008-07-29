@@ -153,17 +153,6 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     void RegisterObject (const char* name, size_t offset, ObjectType type);
 
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение данных
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void PollDevice ();
-
-  private:
-    OtherDevice (const OtherDevice& source);             //no impl
-    OtherDevice& operator = (const OtherDevice& source); //no impl
-    OtherDevice ();                                      //no impl
-
-  private:
     enum ObjectPropertyType
     {
       ObjectPropertyType_Sensitivity,
@@ -173,7 +162,19 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
       ObjectPropertyType_Num
     };
 
-    typedef stl::hash_map<stl::hash_key<const char*>, float> ObjectPropertyMap;
+    struct ObjectPropertyMapElement
+    {
+      float              value;
+      size_t             object_offset;
+      ObjectPropertyType property_type;
+
+      ObjectPropertyMapElement ();
+      ObjectPropertyMapElement (float in_value, size_t in_object_offset, ObjectPropertyType in_property_type) 
+        : value (in_value), object_offset (in_object_offset), property_type (in_property_type)
+        {}
+    };
+
+    typedef stl::hash_map<stl::hash_key<const char*>, ObjectPropertyMapElement> ObjectPropertyMap;
 
     struct ObjectData
     {
@@ -191,10 +192,30 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
         {}
     };
 
-  private:
     typedef xtl::com_ptr<IDirectInputDevice8> DirectInputDeviceInterfacePtr;
     typedef stl::vector<ObjectData>           ObjectsArray;
     typedef xtl::uninitialized_storage<char>  DeviceDataBuffer;
+
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void PollDevice ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление свойства объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AddProperty (const char* property_name, ObjectsArray::iterator object_iter, ObjectPropertyType property_type, float default_value);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка свойства объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetDwordProperty (REFGUID property, DWORD value, DWORD object_offset);
+
+  private:
+    OtherDevice (const OtherDevice& source);             //no impl
+    OtherDevice& operator = (const OtherDevice& source); //no impl
+    OtherDevice ();                                      //no impl
 
   private:
     stl::string                             name;

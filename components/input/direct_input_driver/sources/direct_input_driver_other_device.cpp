@@ -18,7 +18,7 @@ void default_event_handler (const char*)
 {
 }
 
-const char* object_type_name (GUID type)
+/*const char* object_type_name (GUID type)
 {
   if (type == GUID_XAxis)   return "GUID_XAxis";
   if (type == GUID_YAxis)   return "GUID_YAxis";
@@ -66,7 +66,7 @@ void print_flags (DWORD flags)
   if (flags & DIDOI_FFACTUATOR)      printf ("can have force-feedback effects; ");
   if (flags & DIDOI_FFEFFECTTRIGGER) printf ("can trigger playback of force-feedback effects; ");
   if (flags & DIDOI_POLLED)          printf ("require polling; ");
-}
+}*/
 
 ObjectType get_object_type (DWORD type)
 {
@@ -206,23 +206,12 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
 
       iter->min_value = range_property.lMin;
       iter->max_value = range_property.lMax;
+        
+      AddProperty (".dead_zone", iter, ObjectPropertyType_DeadZone, 0.f);
+      AddProperty (".saturation", iter, ObjectPropertyType_Saturation, 1.f);
     }
     if (iter->type == ObjectType_RelativeAxis)
-    {
-      stl::string sensitivity_name = iter->name;
-
-      sensitivity_name.append (".sensitivity");
-
-      ObjectPropertyMap::iterator property_iter = objects_properties_map.insert_pair (sensitivity_name.c_str (), 1.f).first;
-      iter->properties[ObjectPropertyType_Sensitivity] = property_iter;
-
-      if (!properties.empty ())
-        properties += ' ';
-
-      properties += '\'';
-      properties.append (sensitivity_name);
-      properties += '\'';
-    }
+      AddProperty (".sensitivity", iter, ObjectPropertyType_Sensitivity, 1.f);
   }
 
   device_interface->Poll ();
@@ -247,7 +236,42 @@ void OtherDevice::SetProperty (const char* name, float value)
   if (property_iter == objects_properties_map.end ())
     throw xtl::make_argument_exception ("input::low_level::direct_input_driver::OtherDevice::SetProperty", "name", name);
 
-  property_iter->second = value;
+  switch (property_iter->second.property_type)
+  {
+    case ObjectPropertyType_DeadZone:
+    {
+      if (value > 1.f) value = 1.f;
+      if (value < 0.f) value = 0.f;
+
+      SetDwordProperty (DIPROP_DEADZONE, (DWORD)(value * 10000), property_iter->second.object_offset);
+
+      break;
+    }
+    case ObjectPropertyType_Saturation: 
+    {
+      if (value > 1.f) value = 1.f;
+      if (value < 0.f) value = 0.f;
+
+      SetDwordProperty (DIPROP_SATURATION, (DWORD)(value * 10000), property_iter->second.object_offset);
+
+      break;
+    }
+  }
+
+  property_iter->second.value = value;
+}
+
+void OtherDevice::SetDwordProperty (REFGUID property, DWORD value, DWORD object_offset)
+{
+  DIPROPDWORD property_value;
+
+  property_value.diph.dwSize       = sizeof(DIPROPDWORD);
+  property_value.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+  property_value.diph.dwObj        = object_offset;
+  property_value.diph.dwHow        = DIPH_BYOFFSET;
+  property_value.dwData            = value;
+
+  device_interface->SetProperty (property, &property_value.diph);
 }
 
 float OtherDevice::GetProperty (const char* name)
@@ -257,7 +281,7 @@ float OtherDevice::GetProperty (const char* name)
   if (property_iter == objects_properties_map.end ())
     throw xtl::make_argument_exception ("input::low_level::direct_input_driver::OtherDevice::GetProperty", "name", name);
 
-  return property_iter->second;
+  return property_iter->second.value;
 }
 
 /*
@@ -336,7 +360,7 @@ void OtherDevice::PollDevice ()
           
           break;
         case ObjectType_RelativeAxis:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %f", iter->name.c_str (), (float)(*((LONG*)current_value) - *((LONG*)(&last_device_data.data ()[iter->offset]))) * iter->properties[ObjectPropertyType_Sensitivity]->second);
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %f", iter->name.c_str (), (float)(*((LONG*)current_value) - *((LONG*)(&last_device_data.data ()[iter->offset]))) * iter->properties[ObjectPropertyType_Sensitivity]->second.value);
           event_handler (message);
           
           break;
@@ -364,9 +388,30 @@ void OtherDevice::PollDevice ()
           }
           break;
       }
-
     }
   }
 
   current_device_data.swap (last_device_data);
+}
+
+/*
+   Добавление свойства объекта
+*/
+
+void OtherDevice::AddProperty (const char* property_name, ObjectsArray::iterator object_iter, ObjectPropertyType property_type, float default_value)
+{
+  stl::string full_property_name = object_iter->name;
+
+  full_property_name.append (property_name);
+
+  ObjectPropertyMap::iterator property_iter = objects_properties_map.insert_pair (full_property_name.c_str (), ObjectPropertyMapElement (default_value, object_iter->offset, property_type)).first;
+
+  object_iter->properties[property_type] = property_iter;
+
+  if (!properties.empty ())
+    properties += ' ';
+
+  properties += '\'';
+  properties.append (full_property_name);
+  properties += '\'';
 }

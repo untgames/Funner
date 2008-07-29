@@ -64,6 +64,12 @@ int main ()
 
       for (size_t j = 0; !word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").empty (); j++)
         printf ("  '%s' = %f\n", word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").c_str (), devices.back ()->GetProperty (word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").c_str ()));
+
+      if (common::wcmatch (DirectInputDriver::Driver ()->GetDeviceName (i), "*USB*xis*"))
+      {
+        devices.back ()->SetProperty ("X axis.dead_zone", 0.4);
+        devices.back ()->SetProperty ("X axis.saturation", 0.6);
+      }
     }
     
     window.Show ();

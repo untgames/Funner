@@ -42,13 +42,13 @@ int main ()
     printf ("Device has properties: '%s'\n", device->GetProperties ());
 
 //    device->SetProperty ("AUTOCENTER_CURSOR", 1.f);
-    device->SetProperty ("HORISONTAL_WHEEL_SENSITIVITY", -2.4f);
-    device->SetProperty ("CURSOR_SENSITIVITY", -1.1f);
+    device->SetProperty ("WheelX.sensitivity", -2.4f);
+    device->SetProperty ("Cursor.sensitivity", -1.1f);
 
-    printf ("Property 'AUTOCENTER_CURSOR'  = %f\n", device->GetProperty ("AUTOCENTER_CURSOR"));
-    printf ("Property 'VERTICAL_WHEEL_SENSITIVITY'  = %f\n", device->GetProperty ("VERTICAL_WHEEL_SENSITIVITY"));
-    printf ("Property 'HORISONTAL_WHEEL_SENSITIVITY'  = %f\n", device->GetProperty ("HORISONTAL_WHEEL_SENSITIVITY"));
-    printf ("Property 'CURSOR_SENSITIVITY' = %f\n", device->GetProperty ("CURSOR_SENSITIVITY"));
+    printf ("Property 'Cursor.auto_center'  = %f\n", device->GetProperty ("Cursor.auto_center"));
+    printf ("Property 'WheelY.sensitivity'  = %f\n", device->GetProperty ("WheelY.sensitivity"));
+    printf ("Property 'WheelX.sensitivity'  = %f\n", device->GetProperty ("WheelX.sensitivity"));
+    printf ("Property 'Cursor.sensitivity' = %f\n", device->GetProperty ("Cursor.sensitivity"));
 
     window.Show ();
 

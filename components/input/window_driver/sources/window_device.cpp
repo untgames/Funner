@@ -14,10 +14,10 @@ const char*  CURSOR_AXIS_NAME    = "Cursor";
 const char*  WHEEL_AXIS_NAME     = "Wheel";
 const char*  CHAR_INPUT_CHANNEL  = "Window";
 
-const char* AUTOCENTER_CURSOR            = "AUTOCENTER_CURSOR";
-const char* CURSOR_SENSITIVITY           = "CURSOR_SENSITIVITY";
-const char* VERTICAL_WHEEL_SENSITIVITY   = "VERTICAL_WHEEL_SENSITIVITY";
-const char* HORISONTAL_WHEEL_SENSITIVITY = "HORISONTAL_WHEEL_SENSITIVITY";
+const char* AUTOCENTER_CURSOR            = "Cursor.auto_center";
+const char* CURSOR_SENSITIVITY           = "Cursor.sensitivity";
+const char* VERTICAL_WHEEL_SENSITIVITY   = "WheelY.sensitivity";
+const char* HORISONTAL_WHEEL_SENSITIVITY = "WheelX.sensitivity";
 
 const char* PROPERTIES [] = {
   AUTOCENTER_CURSOR,
