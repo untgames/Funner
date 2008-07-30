@@ -105,7 +105,7 @@ class TestDriver: virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создаение устройства ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IDevice* CreateDevice (const char* name) 
+    IDevice* CreateDevice (const char* name, const char* init_string = "") 
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateDevice");
       return 0;

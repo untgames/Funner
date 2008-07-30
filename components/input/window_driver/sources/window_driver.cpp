@@ -60,7 +60,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создаение устройства ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IDevice* CreateDevice (const char* name) 
+    IDevice* CreateDevice (const char* name, const char*) 
     {
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
         if (!strcmp ((*iter)->device_name.c_str (), name))

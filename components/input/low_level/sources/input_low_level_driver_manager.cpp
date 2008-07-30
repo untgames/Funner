@@ -12,7 +12,7 @@
 using namespace input::low_level;
 using namespace common;
 
-const size_t DRIVER_ARRAY_RESERVE = 5; //резервируемый размер массива драйверов 
+const size_t DRIVER_ARRAY_RESERVE = 4; //резервируемый размер массива драйверов 
 
 namespace input
 {
@@ -51,7 +51,7 @@ class DriverManagerImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IDevice* CreateDevice (const char* driver_mask, const char* device_mask);
+    IDevice* CreateDevice (const char* driver_mask, const char* device_mask, const char* init_string = "");
 
   private:
     typedef xtl::com_ptr<IDriver>  DriverPtr;
@@ -151,13 +151,16 @@ const char* DriverManagerImpl::DriverName (size_t index)
    Создание устройства ввода
 */
 
-IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* device_mask)
+IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* device_mask, const char* init_string)
 {
   if (!driver_mask)
     driver_mask = "*";
     
   if (!device_mask)
     device_mask = "*";
+
+  if (!init_string)
+    init_string = "";
 
     //поиск драйвера
 
@@ -167,7 +170,7 @@ IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* d
       for (size_t i = 0; i < iter->driver->GetDevicesCount (); i++)
       {
         if (wcimatch (iter->driver->GetDeviceName (i), device_mask))
-          return iter->driver->CreateDevice (iter->driver->GetDeviceName (i));
+          return iter->driver->CreateDevice (iter->driver->GetDeviceName (i), init_string);
       }
     }
     
@@ -216,7 +219,7 @@ const char* DriverManager::DriverName (size_t index)
   return DriverManagerSingleton::Instance ().DriverName (index);
 }
 
-IDevice* DriverManager::CreateDevice (const char* driver_mask, const char* device_mask)
+IDevice* DriverManager::CreateDevice (const char* driver_mask, const char* device_mask, const char* init_string)
 {
-  return DriverManagerSingleton::Instance ().CreateDevice (driver_mask, device_mask);
+  return DriverManagerSingleton::Instance ().CreateDevice (driver_mask, device_mask, init_string);
 }

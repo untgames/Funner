@@ -136,9 +136,15 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создаение устройства ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IDevice* CreateDevice (const char* name) 
+    IDevice* CreateDevice (const char* name, const char* init_string = "") 
     {
       static const char* METHOD_NAME = "input::low_level::direct_input_driver::Driver::CreateDevice";
+
+      if (!name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+      if (!init_string)
+        init_string = "";
 
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
         if (!strcmp ((*iter)->device_name.c_str (), name))
@@ -152,7 +158,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
           if (create_result != DI_OK)
             throw xtl::format_operation_exception (METHOD_NAME, "Can't create direct input device, error '%s'", get_direct_input_error_name (create_result));
 
-          return new OtherDevice ((*iter)->window, name, device_interface, log_fn);
+          return new OtherDevice ((*iter)->window, name, device_interface, log_fn, init_string);
         }
 
       throw xtl::make_argument_exception (METHOD_NAME, "name", name);
@@ -192,6 +198,9 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     {
       static const char* METHOD_NAME = "input::low_level::direct_input_driver::Driver::RegisterDevice";
 
+      if (!device_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "device_name");
+
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
         if (!strcmp ((*iter)->device_name.c_str (), device_name))
           throw xtl::make_argument_exception (METHOD_NAME, "device_name", device_name, "Name already registered");
@@ -228,6 +237,9 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 
     void UnregisterDevice (const char* device_name)
     {
+      if (!device_name)
+        return;
+
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
         if (!strcmp ((*iter)->device_name.c_str (), device_name))
         {
@@ -372,9 +384,6 @@ IDriver* DirectInputDriver::Driver ()
 
 void DirectInputDriver::RegisterDevice (const char* device_name, syslib::Window& window)
 {
-  if (!device_name)
-    throw xtl::make_null_argument_exception ("input::low_level::direct_input_driver::RegisterDevice", "device_name");
-
   DirectInputDriverSingleton::Instance ().RegisterDevice (device_name, window);
 }
 
@@ -385,9 +394,6 @@ void DirectInputDriver::RegisterDevice (syslib::Window& window)
 
 void DirectInputDriver::UnregisterDevice (const char* device_name)
 {
-  if (!device_name)
-    throw xtl::make_null_argument_exception ("input::low_level::direct_input_driver::UnregisterDevice", "device_name");
-
   DirectInputDriverSingleton::Instance ().UnregisterDevice (device_name);
 }
 

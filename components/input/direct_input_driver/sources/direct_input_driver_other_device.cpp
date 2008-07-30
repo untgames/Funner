@@ -13,7 +13,6 @@ namespace
 {
 
 const size_t MESSAGE_BUFFER_SIZE  = 32;
-const size_t BUFFER_SIZE = 16;
 
 void default_event_handler (const char*)
 {
@@ -134,11 +133,17 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
    Конструктор/деструктор
 */
 
-OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevice8* in_direct_input_device_interface, const DebugLogHandler& in_debug_log_handler)
+OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevice8* in_direct_input_device_interface, const DebugLogHandler& in_debug_log_handler, const char* init_string)
   : event_handler (&default_event_handler), name (in_name), device_interface (in_direct_input_device_interface, false), 
-    poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10), device_lost (false), debug_log_handler (in_debug_log_handler)
+    poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10), device_lost (false), debug_log_handler (in_debug_log_handler),
+    events_buffer_size (16)
 {
   static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::OtherDevice";
+
+  if (!init_string)
+    init_string = "";
+
+  parse_init_string (init_string, xtl::bind (&OtherDevice::ProcessInitStringProperty, this, _1, _2));
 
   HRESULT operation_result;
 
@@ -179,18 +184,25 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
   if (operation_result != DI_OK)
       throw xtl::format_operation_exception (METHOD_NAME, "Can't set device cooperative level, error '%s'", get_direct_input_error_name (operation_result));
 
-  DIPROPDWORD buffer_size_property;
+  if (events_buffer_size)
+  {
+    DIPROPDWORD buffer_size_property;
 
-  buffer_size_property.diph.dwSize       = sizeof(DIPROPDWORD);
-  buffer_size_property.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-  buffer_size_property.diph.dwObj        = 0;
-  buffer_size_property.diph.dwHow        = DIPH_DEVICE;
-  buffer_size_property.dwData            = BUFFER_SIZE;
+    buffer_size_property.diph.dwSize       = sizeof(DIPROPDWORD);
+    buffer_size_property.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+    buffer_size_property.diph.dwObj        = 0;
+    buffer_size_property.diph.dwHow        = DIPH_DEVICE;
+    buffer_size_property.dwData            = events_buffer_size;
 
-  operation_result = device_interface->SetProperty (DIPROP_BUFFERSIZE, &buffer_size_property.diph);
+    operation_result = device_interface->SetProperty (DIPROP_BUFFERSIZE, &buffer_size_property.diph);
 
-  if (operation_result != DI_OK)
-    throw xtl::format_operation_exception (METHOD_NAME, "Can't set device buffer size, error '%s'", get_direct_input_error_name (operation_result));
+    if (operation_result != DI_OK)
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't set device buffer size, error '%s'", get_direct_input_error_name (operation_result));
+
+    events_buffer.resize (events_buffer_size);
+  }
+  else
+    current_device_data.resize (device_data_size);
 
   operation_result = device_interface->Acquire ();
 
@@ -236,24 +248,29 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
   device_interface->Poll ();
   device_interface->GetDeviceState (initial_device_data.size (), initial_device_data.data ());
 
-  for (ObjectsMap::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
+  if (events_buffer_size)
   {
-    switch (iter->second.type)
+    for (ObjectsMap::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
     {
-      case ObjectType_AbsoluteAxis:
-        iter->second.last_value = *(DWORD*)&(initial_device_data.data ()[iter->second.offset]);
-        break;
-      case ObjectType_RelativeAxis:
-        iter->second.last_value = *(DWORD*)&(initial_device_data.data ()[iter->second.offset]);
-        break;
-      case ObjectType_Button:
-        iter->second.last_value = initial_device_data.data ()[iter->second.offset];
-        break;
-      case ObjectType_POV:
-        iter->second.last_value = *(DWORD*)&(initial_device_data.data ()[iter->second.offset]);
-        break;
+      switch (iter->second.type)
+      {
+        case ObjectType_AbsoluteAxis:
+          iter->second.last_value = *(DWORD*)&(initial_device_data.data ()[iter->second.offset]);
+          break;
+        case ObjectType_RelativeAxis:
+          iter->second.last_value = *(DWORD*)&(initial_device_data.data ()[iter->second.offset]);
+          break;
+        case ObjectType_Button:
+          iter->second.last_value = initial_device_data.data ()[iter->second.offset];
+          break;
+        case ObjectType_POV:
+          iter->second.last_value = *(DWORD*)&(initial_device_data.data ()[iter->second.offset]);
+          break;
+      }
     }
   }
+  else
+    last_device_data.swap (initial_device_data);
 }
 
 OtherDevice::~OtherDevice ()
@@ -381,10 +398,12 @@ void OtherDevice::PollDevice ()
       return;
   }
 
-  DIDEVICEOBJECTDATA events[BUFFER_SIZE];
-  DWORD              events_count = BUFFER_SIZE;
+  DWORD events_count = events_buffer_size;
 
-  operation_result = device_interface->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), events, &events_count, 0);
+  if (events_buffer_size)
+    operation_result = device_interface->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), events_buffer.data (), &events_count, 0);
+  else
+    operation_result = device_interface->GetDeviceState (current_device_data.size (), current_device_data.data ());
 
   if (operation_result == DI_BUFFEROVERFLOW)
   {
@@ -412,15 +431,21 @@ void OtherDevice::PollDevice ()
     
       if (reacquire_result)
       {
-        operation_result = device_interface->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), events, &events_count, 0);
-
-        if (operation_result == DI_BUFFEROVERFLOW)
+        if (events_buffer_size)
         {
-          log_message = common::format ("Device %s buffer was overflowed", name.c_str ());
+          operation_result = device_interface->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), events_buffer.data (), &events_count, 0);
 
-          debug_log_handler (log_message.c_str ());
+          if (operation_result == DI_BUFFEROVERFLOW)
+          {
+            log_message = common::format ("Device %s buffer was overflowed", name.c_str ());
+
+            debug_log_handler (log_message.c_str ());
+          }
         }
-        else if (operation_result != DI_OK)
+        else
+          operation_result = device_interface->GetDeviceState (current_device_data.size (), current_device_data.data ());
+
+        if (operation_result != DI_OK)
         { 
           log_message = common::format ("Can't get device %s state, error '%s'", name.c_str (), get_direct_input_error_name (operation_result));
 
@@ -450,54 +475,109 @@ void OtherDevice::PollDevice ()
 
   static char message[MESSAGE_BUFFER_SIZE];
 
-  for (size_t i = 0; i < events_count; i++)
+  if (events_buffer_size)
   {
-    ObjectsMap::iterator iter = objects.find (events[i].dwOfs);
-
-    if (iter == objects.end ())
-      continue;
-
-    if (iter->second.bad_object)
-      continue;
-
-    switch (iter->second.type)
+    for (size_t i = 0; i < events_count; i++)
     {
-      case ObjectType_AbsoluteAxis:
-        xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %.4f", iter->second.name.c_str (), (((float)(events[i].dwData - iter->second.min_value)) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
-        event_handler (message);
-        
-        break;
-      case ObjectType_RelativeAxis:
-        xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %f", iter->second.name.c_str (), ((float)(LONG)(events[i].dwData - iter->second.last_value)) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
-        event_handler (message);
-        
-        break;
-      case ObjectType_Button:
-        xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' %s", iter->second.name.c_str (), (events[i].dwData & 0x80) ? "down" : "up");
-        event_handler (message);
-        
-        break;
-      case ObjectType_POV:
-        if (!is_pov_pressed (events[i].dwData))
-        {
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", iter->second.name.c_str ());
-          event_handler (message);
-        }
-        else
-        {
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' pov %d", iter->second.name.c_str (), events[i].dwData);
+      ObjectsMap::iterator iter = objects.find (events_buffer.data ()[i].dwOfs);
+
+      if (iter == objects.end ())
+        continue;
+
+      if (iter->second.bad_object)
+        continue;
+
+      switch (iter->second.type)
+      {
+        case ObjectType_AbsoluteAxis:
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %.4f", iter->second.name.c_str (), (((float)(events_buffer.data ()[i].dwData - iter->second.min_value)) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
           event_handler (message);
           
-          if (!is_pov_pressed (iter->second.last_value))
+          break;
+        case ObjectType_RelativeAxis:
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %f", iter->second.name.c_str (), ((float)(LONG)(events_buffer.data ()[i].dwData - iter->second.last_value)) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
+          event_handler (message);
+          
+          break;
+        case ObjectType_Button:
+          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' %s", iter->second.name.c_str (), (events_buffer.data ()[i].dwData & 0x80) ? "down" : "up");
+          event_handler (message);
+          
+          break;
+        case ObjectType_POV:
+          if (!is_pov_pressed (events_buffer.data ()[i].dwData))
           {
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", iter->second.name.c_str ());
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", iter->second.name.c_str ());
             event_handler (message);
           }
+          else
+          {
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' pov %d", iter->second.name.c_str (), events_buffer.data ()[i].dwData);
+            event_handler (message);
+            
+            if (!is_pov_pressed (iter->second.last_value))
+            {
+              xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", iter->second.name.c_str ());
+              event_handler (message);
+            }
+          }
+          break;
+      }
+
+      iter->second.last_value = events_buffer.data ()[i].dwData;
+    }
+  }
+  else
+  {
+    for (ObjectsMap::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
+    {
+      if (iter->second.bad_object)
+        continue;
+
+      char* current_value = &(current_device_data.data ()[iter->second.offset]);
+
+      if (memcmp (&(last_device_data.data ()[iter->second.offset]), current_value, get_object_data_size (iter->second.type)))
+      {
+        switch (iter->second.type)
+        {
+          case ObjectType_AbsoluteAxis:
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %.4f", iter->second.name.c_str (), (((float)(*((LONG*)current_value) - iter->second.min_value)) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
+            event_handler (message);
+
+            break;
+          case ObjectType_RelativeAxis:
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %f", iter->second.name.c_str (), (float)(*((LONG*)current_value) - *((LONG*)(&last_device_data.data ()[iter->second.offset]))) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
+            event_handler (message);
+
+            break;
+          case ObjectType_Button:
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' %s", iter->second.name.c_str (), (*current_value & 0x80) ? "down" : "up");
+            event_handler (message);
+
+            break;
+          case ObjectType_POV:
+            if (!is_pov_pressed (*(DWORD*)current_value))
+            {
+              xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", iter->second.name.c_str ());
+              event_handler (message);
+            }
+            else
+            {
+              xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' pov %d", iter->second.name.c_str (), *((DWORD*)current_value));
+              event_handler (message);
+
+              if (!is_pov_pressed (*(DWORD*)&last_device_data.data ()[iter->second.offset]))
+              {
+                xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", iter->second.name.c_str ());
+                event_handler (message);
+              }
+            }
+            break;
         }
-        break;
+      }
     }
 
-    iter->second.last_value = events[i].dwData;
+    current_device_data.swap (last_device_data);
   }
 }
 
@@ -538,4 +618,17 @@ bool OtherDevice::ReAcquireDevice ()
     return true;
 
   return false;
+}
+
+/*
+   Обработка поля init_string
+*/
+
+void OtherDevice::ProcessInitStringProperty (const char* property, const char* value)
+{
+  if (!property || !value)
+    return;
+
+  if (!xstrcmp (property, "buffer_size"))
+    events_buffer_size = atoi (value);
 }

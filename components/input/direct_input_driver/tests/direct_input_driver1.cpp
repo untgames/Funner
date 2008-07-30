@@ -60,7 +60,7 @@ int main ()
     {
       printf ("  %u: '%s'\n", i + 1, DirectInputDriver::Driver ()->GetDeviceName (i));
 
-      devices.push_back (DevicePtr (DriverManager::CreateDevice ("*", DirectInputDriver::Driver ()->GetDeviceName (i)), false));
+      devices.push_back (DevicePtr (DriverManager::CreateDevice ("*", DirectInputDriver::Driver ()->GetDeviceName (i), "buffer_size=0"), false));
 
       devices.back ()->SetEventHandler (&input_event_handler);
 

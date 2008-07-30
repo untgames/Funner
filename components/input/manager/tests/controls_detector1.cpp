@@ -29,17 +29,17 @@ class TestInput;
 
 TestInput* current_input = 0;
 
-//вҐбв®ў®Ґ гбва®©бвў® ўў®¤ 
+//тестовое устройство ввода
 class TestInput: virtual public IDevice, public xtl::reference_counter
 {
   public:
     TestInput  () {current_input = this;}
     ~TestInput () {current_input = 0;}
 
-///Џ®«гзҐ­ЁҐ Ё¬Ґ­Ё гбва®©бвў 
+///Получение имени устройства
     const char* GetName () { return TEST_DEVICE_NAME; }
 
-///Џ®¤ЇЁбЄ  ­  б®ЎлвЁп гбва®©бвў 
+///Подписка на события устройства
     void SetEventHandler (const EventHandler& handler)
     {
       event_handler = handler;
@@ -49,7 +49,7 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
       return event_handler;
     }
 
-///Ќ бва®©ЄЁ гбва®©бвў 
+///Настройки устройства
     const char* GetProperties () {return "";}
     void        SetProperty   (const char* name, float value) 
     {
@@ -61,14 +61,14 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
       return 0;
     }    
 
-///Ќ бва®©ЄЁ гбва®©бвў 
+///Настройки устройства
     void GenerateTestEvents ()
     {
       for (size_t i = 0; i < sizeof (EVENTS) / sizeof (EVENTS[0]); i++)
         event_handler (EVENTS[i]);
     }
     
-///Џ®¤бзсв ббл«®Є
+///Подсчёт ссылок
     void AddRef () { addref (this); }  
     void Release () { release (this); }
 
@@ -78,16 +78,16 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     EventHandler event_handler;
 };
 
-//вҐбв®ўл© ¤а ©ўҐа
+//тестовый драйвер
 class TestDriver: virtual public IDriver, public xtl::reference_counter
 {
   public:
     TestDriver () {}
 
-///ЋЇЁб ­ЁҐ ¤а ©ўҐа 
+///Описание драйвера
     const char* GetDescription () { return "TestDriver"; }
 
-///ЏҐаҐзЁб«Ґ­ЁҐ ¤®бвгЇ­ле гбва®©бвў ўў®¤ 
+///Перечисление доступных устройств ввода
     size_t      GetDevicesCount ()
     {
       return 1;
@@ -97,13 +97,13 @@ class TestDriver: virtual public IDriver, public xtl::reference_counter
       return TEST_DEVICE_NAME;
     }
 
-///‘®§¤ Ґ­ЁҐ гбва®©бвў  ўў®¤ 
-    IDevice* CreateDevice (const char* name) 
+///Создаение устройства ввода
+    IDevice* CreateDevice (const char* name, const char* init_string = "")
     {
       return new TestInput;
     }
 
-///“бв ­®ўЄ  дг­ЄжЁЁ ®в« ¤®з­®Ј® Їа®в®Є®«Ёа®ў ­Ёп ¤а ©ўҐа 
+///Установка функции отладочного протоколирования драйвера
     void SetDebugLog (const LogHandler& in_log)
     {
       log_fn = in_log;
@@ -114,7 +114,7 @@ class TestDriver: virtual public IDriver, public xtl::reference_counter
       return log_fn;
     }
     
-///Џ®¤бзсв ббл«®Є
+///Подсчёт ссылок
     void AddRef () { addref (this); }  
     void Release () { release (this); }
 

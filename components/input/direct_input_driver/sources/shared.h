@@ -55,7 +55,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OtherDevice (syslib::Window* window, const char* name, IDirectInputDevice8* direct_input_device_interface, const DebugLogHandler& debug_log_handler);
+    OtherDevice (syslib::Window* window, const char* name, IDirectInputDevice8* direct_input_device_interface, const DebugLogHandler& debug_log_handler, const char* init_string = "");
     ~OtherDevice ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,8 +135,10 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
         {}
     };
 
-    typedef xtl::com_ptr<IDirectInputDevice8> DirectInputDeviceInterfacePtr;
-    typedef stl::hash_map<size_t, ObjectData> ObjectsMap;
+    typedef xtl::com_ptr<IDirectInputDevice8>              DirectInputDeviceInterfacePtr;
+    typedef stl::hash_map<size_t, ObjectData>              ObjectsMap;
+    typedef xtl::uninitialized_storage<char>               DeviceDataBuffer;
+    typedef xtl::uninitialized_storage<DIDEVICEOBJECTDATA> EventsBuffer;
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,6 +161,11 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool ReAcquireDevice ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка поля init_string
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ProcessInitStringProperty (const char* property, const char* value);
+
   private:
     OtherDevice (const OtherDevice& source);             //no impl
     OtherDevice& operator = (const OtherDevice& source); //no impl
@@ -174,6 +181,10 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     ObjectPropertyMap                       objects_properties_map;
     stl::string                             properties;
     DebugLogHandler                         debug_log_handler;
+    size_t                                  events_buffer_size;     //размер буфера событий (если 0 - используется опрос мгновенного состояния)
+    EventsBuffer                            events_buffer;
+    DeviceDataBuffer                        last_device_data;
+    DeviceDataBuffer                        current_device_data;
 };
 
 const char* get_direct_input_error_name (HRESULT error);
