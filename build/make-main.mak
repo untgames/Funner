@@ -257,6 +257,7 @@ define process_target.dynamic-lib
   endif
 
   $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME).$(DLL_SUFFIX)
+  $1.LIB_FILE  := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE))).$(LIB_SUFFIX)
   TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE))).$(LIB_SUFFIX)
 
   build: $$($1.DLL_FILE)  
@@ -267,7 +268,7 @@ define process_target.dynamic-lib
 		@echo Create dynamic library $$(notdir $$@)...
 		@$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 		@$(RM) $$(basename $$@).exp
-		@mv -f $$(dir $$@)$(LIB_PREFIX)$$(notdir $$(basename $$@)).$(LIB_SUFFIX) $(DIST_LIB_DIR)
+		@if [ -x $$($1.LIB_FILE) ]; then mv -f $$($1.LIB_FILE) $(DIST_LIB_DIR); fi
 endef
 
 #Обработка цели application (имя цели)

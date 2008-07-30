@@ -47,6 +47,7 @@ endif
 MSVC_PATH        := $(call convert_path,$(MSVC_PATH))
 MSVC_BIN_PATH    := $(MSVC_PATH)/bin
 MSVS_COMMON_PATH := $(call convert_path,$(MSVS_COMMON_PATH))
+COMMON_CFLAGS    += -W3 -Ox -wd4996 $(if $(analyze),-analyze) -nologo -FC
 
 ###################################################################################################
 #Константы
@@ -79,7 +80,7 @@ export LIB
 #список дефайнов, флаги компиляции, pch файл)
 ###################################################################################################
 define tools.c++compile
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -nologo -c -EHsc -W3 -Ox -wd4996 $(if $(analyze),-analyze) -FC -Fo"$3\\" $(patsubst %,-I"%",$2) $(COMMON_CFLAGS) $5 $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -c -Fo"$3\\" $(patsubst %,-I"%",$2) $(COMMON_CFLAGS) $5 $(if $(filter -clr,$5),,-EHsc)  $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
 endef
 
 ###################################################################################################
