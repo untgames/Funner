@@ -13,7 +13,18 @@ class WindowSystem: public ICustomWindowSystem, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выполнение команды на стороне оконной системы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ExecuteCommand (const char* command);
+    void Execute (const char* name, const void* buffer, size_t buffer_size);
+    void Execute (const char* command);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Протоколирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void               SetLogHandler (const LogFunction& log);
+    const LogFunction& GetLogHandler () { return log_handler; }
+    
+    void LogMessage (const char* message);    
+    void LogPrintf  (const char* format, ...);
+    void LogVPrintf (const char* format, va_list list);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -29,11 +40,15 @@ class WindowSystem: public ICustomWindowSystem, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реестры контролов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef ControlRegistry<ToolMenuItem>  MenuItemRegistry;
-    typedef ControlRegistry<ToolMenuStrip> MenuStripRegistry;
+    typedef ControlRegistry<MenuStripItem>   MenuStripItemRegistry;
+    typedef ControlRegistry<MenuStrip>       MenuStripRegistry;
+    typedef ControlRegistry<ToolStripButton> ToolStripButtonRegistry;
+    typedef ControlRegistry<ToolStrip>       ToolStripRegistry;    
 
-    MenuItemRegistry&  MenuItems  () { return menu_items; }
-    MenuStripRegistry& MenuStrips () { return menu_strips; }
+    MenuStripItemRegistry&   MenuStripItems   () { return menu_strip_items; }
+    MenuStripRegistry&       MenuStrips       () { return menu_strips; }
+    ToolStripButtonRegistry& ToolStripButtons () { return tool_strip_buttons; }
+    ToolStripRegistry&       ToolStrips       () { return tool_strips; }
 
   private:
     void RegisterInvokers  ();
@@ -43,10 +58,13 @@ class WindowSystem: public ICustomWindowSystem, public xtl::reference_counter
     typedef xtl::shared_ptr<script::Environment> ShellEnvironmentPtr;
 
   private:
-    ApplicationServerPtr application_server; //сервер приложения
-    ToolForm::Pointer    main_form;          //главная форма приложения
-    ShellEnvironmentPtr  shell_environment;  //окружение скриптовой среды
-    script::Shell        shell;              //скриптовый интерпретатор
-    MenuItemRegistry     menu_items;         //реестр элементов меню
-    MenuStripRegistry    menu_strips;        //реестр цепочек меню
+    ApplicationServerPtr    application_server; //сервер приложения
+    Form::Pointer           main_form;          //главная форма приложения
+    ShellEnvironmentPtr     shell_environment;  //окружение скриптовой среды
+    script::Shell           shell;              //скриптовый интерпретатор
+    MenuStripItemRegistry   menu_strip_items;   //реестр элементов меню
+    MenuStripRegistry       menu_strips;        //реестр цепочек меню
+    ToolStripButtonRegistry tool_strip_buttons; //реестр кнопок
+    ToolStripRegistry       tool_strips;        //реестр цепочек кнопок
+    LogFunction             log_handler;        //функция протоколирования
 };

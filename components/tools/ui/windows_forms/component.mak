@@ -13,7 +13,7 @@ TOOLS.UI.WINDOWS_FORMS.SOURCES.LIBS             :=
 TOOLS.UI.WINDOWS_FORMS.SOURCES.COMPILER_CFLAGS  := 
 TOOLS.UI.WINDOWS_FORMS.SOURCES.COMPILER_DEFINES := 
 TOOLS.UI.WINDOWS_FORMS.SOURCES.IMPORTS			    := ../core/compile.static.mak ../../../script/core/compile.static.mak ../../../common/compile.static.mak
-TOOLS.UI.WINDOWS_FORMS.SOURCES.msvc.COMPILER_CFLAGS := -clr -wd4793
+TOOLS.UI.WINDOWS_FORMS.SOURCES.msvc.COMPILER_CFLAGS := -clr -wd4793 -wd4503
 
 #Öåëü ¹2 - Tool UI core tests
 TOOLS.UI.WINDOWS_FORMS.TESTS.TYPE             := test-suite

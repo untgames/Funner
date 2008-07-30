@@ -10,9 +10,15 @@ using namespace tools::ui::windows_forms;
 namespace
 {
 
-const char* INTERPERTER_NAME                   = "lua";                 //имя интерпретатора
-const char* MENU_STRIP_COLLECTION_LIBRARY_NAME = "MenuStripCollection"; //имя библиотеки коллекции цепочек меню
-const char* MENU_ITEM_COLLECTION_LIBRARY_NAME  = "MenuItemCollection";  //имя библиотеки коллекции элементов меню
+const char* INTERPERTER_NAME                          = "lua";                  //имя интерпретатора
+const char* MENU_STRIP_ITEM_LIBRARY_NAME              = "MenuItem";             //имя библиотеки элементов меню
+const char* MENU_STRIP_LIBRARY_NAME                   = "MenuStrip";            //имя библиотеки цепочек меню
+const char* TOOL_STRIP_BUTTON_LIBRARY_NAME            = "ToolButton";           //имя библиотеки кнопок
+const char* TOOL_STRIP_LIBRARY_NAME                   = "ToolStrip";            //имя библиотеки цепочек кнопок
+const char* MENU_STRIP_ITEM_COLLECTION_LIBRARY_NAME   = "MenuItemCollection";   //имя библиотеки коллекции элементов меню
+const char* MENU_STRIP_COLLECTION_LIBRARY_NAME        = "MenuStripCollection";  //имя библиотеки коллекции цепочек меню
+const char* TOOL_STRIP_BUTTON_COLLECTION_LIBRARY_NAME = "ToolButtonCollection"; //имя библиотеки коллекции кнопок
+const char* TOOL_STRIP_COLLECTION_LIBRARY_NAME        = "ToolStripCollection";  //имя библиотеки коллекции цепочек меню
 
 }
 
@@ -29,7 +35,7 @@ WindowSystem::WindowSystem (IApplicationServer* server)
   {
       //создание главной формы
 
-    main_form = create_main_form (server);
+    main_form = create_main_form (*this);
 
     main_form->Show ();    
     
@@ -66,27 +72,78 @@ void WindowSystem::Release ()
     Выполнение команды на стороне оконной системы
 */
 
-namespace
-{
-
-void print_errors (const char* message)
-{
-  printf ("%s\n", message);
-}
-
-}
-
-void WindowSystem::ExecuteCommand (const char* command)
+void WindowSystem::Execute (const char* name, const void* buffer, size_t buffer_size)
 {
   try
-  {
-    shell.Execute (command, &print_errors);
+  {        
+    shell.Execute (name, buffer, buffer_size, log_handler);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("tools::ui::WindowSystem::ExecuteCommand");
+    exception.touch ("tools::ui::WindowSystem::Execute(const char*, const void*, size_t)");
     throw;
   }
+}
+
+void WindowSystem::Execute (const char* command)
+{
+  try
+  {
+    shell.Execute (command, log_handler);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("tools::ui::WindowSystem::Execute(const char*)");
+    throw;
+  }  
+}
+
+/*
+    Протоколирование
+*/
+
+void WindowSystem::SetLogHandler (const LogFunction& log)
+{
+  log_handler = log;
+}
+
+void WindowSystem::LogMessage (const char* message)
+{
+  try
+  {
+    if (!message)
+      return;
+
+    log_handler (message);
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
+}
+
+void WindowSystem::LogVPrintf (const char* format, va_list list)
+{
+  if (!format)
+    return;
+    
+  try
+  {
+    log_handler (common::vformat (format, list).c_str ());
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
+}
+
+void WindowSystem::LogPrintf (const char* format, ...)
+{
+  va_list list;
+
+  va_start (list, format);
+
+  LogVPrintf (format, list);
 }
 
 /*
@@ -116,11 +173,15 @@ void WindowSystem::RegisterInvokers ()
 
       //регистрация шлюзов контролов
 
-    ToolForm::RegisterInvokers          (*shell_environment);    
-    ToolMenuItem::RegisterInvokers      (*shell_environment);
-    ToolMenuStrip::RegisterInvokers     (*shell_environment);
-    MenuItemRegistry::RegisterInvokers  (*shell_environment, MENU_ITEM_COLLECTION_LIBRARY_NAME);
-    MenuStripRegistry::RegisterInvokers (*shell_environment, MENU_STRIP_COLLECTION_LIBRARY_NAME);
+    Form::RegisterInvokers                    (*shell_environment);
+    MenuStripItem::RegisterInvokers           (*shell_environment, MENU_STRIP_ITEM_LIBRARY_NAME);
+    MenuStrip::RegisterInvokers               (*shell_environment, MENU_STRIP_LIBRARY_NAME);
+    MenuStripItemRegistry::RegisterInvokers   (*shell_environment, MENU_STRIP_ITEM_COLLECTION_LIBRARY_NAME);
+    MenuStripRegistry::RegisterInvokers       (*shell_environment, MENU_STRIP_COLLECTION_LIBRARY_NAME);
+    ToolStripButton::RegisterInvokers         (*shell_environment, TOOL_STRIP_BUTTON_LIBRARY_NAME);
+    ToolStrip::RegisterInvokers               (*shell_environment, TOOL_STRIP_LIBRARY_NAME);
+    ToolStripButtonRegistry::RegisterInvokers (*shell_environment, TOOL_STRIP_BUTTON_COLLECTION_LIBRARY_NAME);
+    ToolStripRegistry::RegisterInvokers       (*shell_environment, TOOL_STRIP_COLLECTION_LIBRARY_NAME);
 
       //создание глобальной точки входа
 
@@ -128,13 +189,16 @@ void WindowSystem::RegisterInvokers ()
 
       //регистрация свойств
 
-    lib.Register ("get_MainForm",   make_const (main_form));
-    lib.Register ("get_MenuItems",  make_const (xtl::ref (menu_items)));
-    lib.Register ("get_MenuStrips", make_const (xtl::ref (menu_strips)));
+    lib.Register ("get_MainForm",    make_const (main_form));
+    lib.Register ("get_MenuItems",   make_const (xtl::ref (menu_strip_items)));
+    lib.Register ("get_MenuStrips",  make_const (xtl::ref (menu_strips)));
+    lib.Register ("get_ToolButtons", make_const (xtl::ref (tool_strip_buttons)));
+    lib.Register ("get_ToolStrips",  make_const (xtl::ref (tool_strips)));
 
       //регистрация методов
 
     lib.Register ("LoadConfiguration", make_invoker<void (const char*)> (xtl::bind (&WindowSystem::LoadConfiguration, this, _1)));
+    lib.Register ("Execute", make_invoker<void (const char*)> (xtl::bind (&IApplicationServer::ExecuteCommand, &*application_server, _1)));
   }
   catch (xtl::exception& exception)
   {

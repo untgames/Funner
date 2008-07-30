@@ -5,6 +5,7 @@
 #define TOOLS_UI_WINDOWS_FORMS_SHARED_HEADER
 
 #include <stl/string>
+#include <stl/algorithm>
 #include <stl/hash_map>
 
 #include <xtl/bind.h>
@@ -33,8 +34,9 @@
 #include <msclr/gcroot.h>
 #include <msclr/event.h>
 
+#pragma comment(linker,"-nodefaultlib:libcmt.lib")
+
 using namespace System;
-using namespace System::Windows::Forms;
 
 namespace tools
 {
@@ -47,6 +49,9 @@ namespace windows_forms
 
 typedef xtl::com_ptr<IApplicationServer> ApplicationServerPtr;
 
+class WindowSystem;
+
+#include "auto_string.h"
 #include "event_handler.h"
 #include "menu.h"
 #include "form.h"

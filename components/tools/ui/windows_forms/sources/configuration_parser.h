@@ -11,11 +11,12 @@ class ConfigurationParser
     ~ConfigurationParser ();
 
   private:
-    void                   ParseConfiguration (const common::Parser::Iterator&);
-    ToolMenuItem::Pointer  ParseMenuItem      (const common::Parser::Iterator&);
-    ToolMenuItem::Pointer  ParseSubMenuItem   (const common::Parser::Iterator&);
-    ToolMenuStrip::Pointer ParseMenuStrip     (const common::Parser::Iterator&);
-    stl::string            GenerateUid        ();
+    void                     ParseConfiguration   (const common::Parser::Iterator&);
+    MenuStripItem::Pointer   ParseMenuStripItem   (const common::Parser::Iterator&);
+    MenuStrip::Pointer       ParseMenuStrip       (const common::Parser::Iterator&);
+    ToolStripButton::Pointer ParseToolStripButton (const common::Parser::Iterator&);
+    ToolStrip::Pointer       ParseToolStrip       (const common::Parser::Iterator&);    
+    stl::string              GenerateUid          ();
 
   private:
     WindowSystem&    window_system; //оконная система

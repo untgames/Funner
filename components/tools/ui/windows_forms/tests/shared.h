@@ -5,6 +5,7 @@
 #include <exception>
 
 #include <xtl/common_exceptions.h>
+#include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/string.h>

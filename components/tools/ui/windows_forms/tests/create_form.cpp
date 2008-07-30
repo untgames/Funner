@@ -1,5 +1,10 @@
 #include "shared.h"
 
+void print (const char* message)
+{
+  printf ("%s\n", message);
+}
+
 int main ()
 {
   printf ("Results of create_form_test:\n");
@@ -8,9 +13,8 @@ int main ()
   {    
     Test test;
     
-    test.main_window.ExecuteCommand ("Application.LoadConfiguration ('data/conf/*.xform')");    
-    test.main_window.ExecuteCommand ("Application.MainForm.Text = 'Hello world'");
-    test.main_window.ExecuteCommand ("Application.MainForm.MenuStrip = Application.MenuStrips:Item('MenuStrip1')");
+    test.main_window.SetLogHandler (&print);
+    test.main_window.ExecuteFile ("data/ui.lua");    
     
     syslib::Application::Run ();
     

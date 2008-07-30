@@ -28,7 +28,7 @@ ConfigurationParser::ConfigurationParser (const char* file_name, WindowSystem& i
     //печать ошибок
 
   for (size_t i=0; i<parse_log.MessagesCount (); i++)
-    printf ("%s\n", parse_log.Message (i));
+    window_system.LogPrintf ("%s\n", parse_log.Message (i));
 }
 
 ConfigurationParser::~ConfigurationParser ()
@@ -56,21 +56,23 @@ stl::string ConfigurationParser::GenerateUid ()
 
 void ConfigurationParser::ParseConfiguration (const Parser::Iterator& iter)
 {
-  for_each_child (iter, "MenuItem", xtl::bind (&ConfigurationParser::ParseMenuItem, this, _1));
+  for_each_child (iter, "MenuItem", xtl::bind (&ConfigurationParser::ParseMenuStripItem, this, _1));
   for_each_child (iter, "MenuStrip", xtl::bind (&ConfigurationParser::ParseMenuStrip, this, _1));
+  for_each_child (iter, "ToolButton", xtl::bind (&ConfigurationParser::ParseToolStripButton, this, _1));
+  for_each_child (iter, "ToolStrip", xtl::bind (&ConfigurationParser::ParseToolStrip, this, _1));  
 }
 
 /*
     –азбор меню    
 */
 
-ToolMenuItem::Pointer ConfigurationParser::ParseMenuItem (const Parser::Iterator& menu_iter)
+MenuStripItem::Pointer ConfigurationParser::ParseMenuStripItem (const Parser::Iterator& menu_iter)
 {
   const char* source = get<const char*> (menu_iter, "Source");
 
   if (source) //обработка инстанцированных элементов меню
   {
-    ToolMenuItem* instance = window_system.MenuItems ().Find (source);
+    MenuStripItem* instance = window_system.MenuStripItems ().Find (source);
 
     if (!instance)
       parse_log.Error (menu_iter, "MenuItem '%s' not found", source);
@@ -81,6 +83,7 @@ ToolMenuItem::Pointer ConfigurationParser::ParseMenuItem (const Parser::Iterator
   const char *id       = get<const char*> (menu_iter, "Id"),
              *text     = get<const char*> (menu_iter, "Text"),
              *tip      = get<const char*> (menu_iter, "Tip"),
+             *image    = get<const char*> (menu_iter, "Image"),
              *on_click = get<const char*> (menu_iter, "OnClick");
   
   if (!text)
@@ -92,7 +95,7 @@ ToolMenuItem::Pointer ConfigurationParser::ParseMenuItem (const Parser::Iterator
 
     //создание элемента меню
 
-  ToolMenuItem::Pointer menu_item (new ToolMenuItem (window_system.ApplicationServer ()), false);
+  MenuStripItem::Pointer menu_item (new MenuStripItem (window_system), false);
   
     //установка свойств меню
     
@@ -100,47 +103,50 @@ ToolMenuItem::Pointer ConfigurationParser::ParseMenuItem (const Parser::Iterator
 
   if (tip)
     menu_item->SetTip (tip);
+    
+  if (image)
+    menu_item->SetImage (image);
 
   if (on_click)
-    menu_item->SetOnClickCommand (on_click);
+    menu_item->SetOnClickCommand (on_click);        
 
     //добавление вложенных элементов
     
   for (Parser::NamesakeIterator iter=menu_iter->First ("MenuItem"); iter; ++iter)
   {
-    ToolMenuItem::Pointer sub_menu_item = ParseMenuItem (iter);
+    MenuStripItem::Pointer sub_menu_item = ParseMenuStripItem (iter);
 
     if (!sub_menu_item)
       continue;
 
-    menu_item->Insert (sub_menu_item);
+    insert (*menu_item, *sub_menu_item);
   }
 
     //регистраци€ элемента в реестре
 
-  window_system.MenuItems ().Register (id ? id : GenerateUid ().c_str (), menu_item);
+  window_system.MenuStripItems ().Register (id ? id : GenerateUid ().c_str (), menu_item);
 
   return menu_item;
 }
 
-ToolMenuStrip::Pointer ConfigurationParser::ParseMenuStrip (const Parser::Iterator& menu_iter)
+MenuStrip::Pointer ConfigurationParser::ParseMenuStrip (const Parser::Iterator& menu_iter)
 {
   const char* id = get<const char*> (menu_iter, "Id");
 
     //создание цепочки меню
 
-  ToolMenuStrip::Pointer menu_strip (new ToolMenuStrip, false);  
+  MenuStrip::Pointer menu_strip (new MenuStrip, false);  
 
     //добавление пунктов меню
     
   for (Parser::NamesakeIterator iter=menu_iter->First ("MenuItem"); iter; ++iter)
   {
-    ToolMenuItem::Pointer sub_menu_item = ParseMenuItem (iter);
+    MenuStripItem::Pointer sub_menu_item = ParseMenuStripItem (iter);
 
     if (!sub_menu_item)
       continue;
 
-    menu_strip->Insert (sub_menu_item);
+    menu_strip->Insert (*sub_menu_item);
   }    
 
     //регистраци€ элемента в реестре  
@@ -148,4 +154,86 @@ ToolMenuStrip::Pointer ConfigurationParser::ParseMenuStrip (const Parser::Iterat
   window_system.MenuStrips ().Register (id ? id : GenerateUid ().c_str (), menu_strip);
   
   return menu_strip;
+}
+
+/*
+    –азбор панелей кнопок
+*/
+
+ToolStripButton::Pointer ConfigurationParser::ParseToolStripButton (const Parser::Iterator& button_iter)
+{
+  const char* source = get<const char*> (button_iter, "Source");
+
+  if (source) //обработка инстанцированных элементов меню
+  {
+    ToolStripButton* instance = window_system.ToolStripButtons ().Find (source);
+
+    if (!instance)
+      parse_log.Error (button_iter, "ToolButton '%s' not found", source);
+
+    return instance;
+  }
+  
+  const char *id       = get<const char*> (button_iter, "Id"),
+             *text     = get<const char*> (button_iter, "Text"),
+             *tip      = get<const char*> (button_iter, "Tip"),
+             *image    = get<const char*> (button_iter, "Image"),
+             *on_click = get<const char*> (button_iter, "OnClick");  
+
+    //создание элемента меню
+
+  ToolStripButton::Pointer button (new ToolStripButton (window_system), false);
+  
+  if (!text && !image)
+  {
+    parse_log.Error (button_iter, "'Text' and 'Image' tags missing");
+    return 0;
+  }
+  
+    //установка свойств меню
+    
+  if (text)
+    button->SetText (text);
+
+  if (tip)
+    button->SetTip (tip);
+    
+  if (image)
+    button->SetImage (image);
+
+  if (on_click)
+    button->SetOnClickCommand (on_click);        
+
+    //регистраци€ элемента в реестре
+
+  window_system.ToolStripButtons ().Register (id ? id : GenerateUid ().c_str (), button);
+
+  return button;
+}
+
+ToolStrip::Pointer ConfigurationParser::ParseToolStrip (const Parser::Iterator& tool_strip_iter)
+{
+  const char* id = get<const char*> (tool_strip_iter, "Id");
+
+    //создание цепочки меню
+
+  ToolStrip::Pointer tool_strip (new ToolStrip, false);  
+
+    //добавление кнопок
+
+  for (Parser::NamesakeIterator iter=tool_strip_iter->First ("ToolButton"); iter; ++iter)
+  {
+    ToolStripButton::Pointer button = ParseToolStripButton (iter);
+
+    if (!button)
+      continue;
+
+    tool_strip->Insert (*button);
+  }    
+
+    //регистраци€ элемента в реестре  
+
+  window_system.ToolStrips ().Register (id ? id : GenerateUid ().c_str (), tool_strip);
+  
+  return tool_strip;
 }

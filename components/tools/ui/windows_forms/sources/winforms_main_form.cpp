@@ -7,7 +7,7 @@ namespace
     Главная форма
 */
 
-private ref class MainForm: public Form
+private ref class MainForm: public System::Windows::Forms::Form
 {
   public:
 ///Конструктор
@@ -34,9 +34,9 @@ namespace windows_forms
 {
 
 ///Создание главной формы
-ToolForm::Pointer create_main_form (IApplicationServer* server)
+Form::Pointer create_main_form (WindowSystem& window_system)
 {
-  return ToolForm::Pointer (new ToolForm (server, gcnew MainForm), false);
+  return Form::Pointer (new Form (window_system, gcnew MainForm), false);
 }
 
 }
