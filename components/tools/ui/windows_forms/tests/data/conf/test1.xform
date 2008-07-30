@@ -17,7 +17,7 @@
     <MenuItem Source="MenuItem2"/>
   </MenuStrip>
   <ToolStrip Id="ToolStrip1">
-    <ToolButton Image="data/app.ico" OnClick="Application.Execute ('Button1Click')"/>
+    <ToolButton Image="data/app.ico" OnClick="Application.Execute ('Button1Click')" Tip="Картинка"/>
     <ToolButton Text="Hello world" OnClick="Application.Execute ('Hello world')"/>
   </ToolStrip>
 </UIConfig>

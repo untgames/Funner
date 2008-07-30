@@ -79,6 +79,8 @@ void Form::SetMenuStrip (tools::ui::windows_forms::MenuStrip* in_menu_strip)
 
   if (menu_strip)
     form->Controls->Add (menu_strip->Handle ());
+
+//  form->MainMenuStrip = menu_strip ? menu_strip->Handle () : 0;
 }
 
 /*
