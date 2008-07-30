@@ -66,9 +66,7 @@ int main ()
       //инициализация рендера
       
     SceneRender& render = test.Render ();
-    
-    render.SetBackgroundColor (math::vec4f (1, 1, 1, 1));
-    
+
       //создание сцены
       
     Scene scene;  
@@ -80,17 +78,23 @@ int main ()
       //создание областей вывода
       
     Viewport vp;
+    Desktop  desktop;    
     
     vp.SetName       ("Viewport1");
     vp.SetRenderPath ("Render2d");
     vp.SetCamera     (camera.get ());
     
     vp.SetArea (0, 0, 100, 100);
-    
-    render.Attach (vp);
+
+    desktop.SetBackgroundColor (math::vec4f (1, 1, 1, 1));    
+    desktop.Attach (vp);
+
+    RenderTarget& render_target = test.RenderTarget ();
+
+    render_target.SetDesktop (&desktop);        
 
     xtl::shared_ptr<Environment> env (new Environment);
-    
+
     Shell shell ("lua", env);
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                

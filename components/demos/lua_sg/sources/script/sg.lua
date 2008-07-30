@@ -8,7 +8,7 @@ root_node = Scene.Node.Create ()
 sprite    = Scene.Sprite.Create ()
 
 sprite.Material = "sprite_material"
-sprite.Color = vec3 (1, 1, 1)
+sprite.Color = vec4 (1, 1, 1, 1)
 
 camera = Scene.OrthoCamera.Create ()
 

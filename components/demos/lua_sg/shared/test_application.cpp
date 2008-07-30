@@ -101,6 +101,7 @@ struct TestApplication::Impl
   DevicePtr                     device;              //устройство рендеринга главного окна приложения
   xtl::auto_connection          app_idle_connection; //соединение сигнала обработчика холостого хода приложения
   SceneRender                   render;              //рендер сцены
+  render::RenderTarget          render_target;       //цель рендеринга  
   InputDevicePtr                input_device;        //устройство ввода
   
   void OnClose ()
@@ -123,7 +124,7 @@ struct TestApplication::Impl
         frames_count = 0;
       }
 
-      render.Draw ();
+      render_target.Update ();
       
       frames_count++;
     }
@@ -141,17 +142,12 @@ struct TestApplication::Impl
   {
     try
     {
-      syslib::Rect            client_rect = window->ClientRect ();
-      render::low_level::Rect viewport;
+      syslib::Rect client_rect = window->ClientRect ();
 
-      viewport.x      = client_rect.left;
-      viewport.y      = client_rect.top;
-      viewport.width  = client_rect.right - client_rect.left;
-      viewport.height = client_rect.bottom - client_rect.top;
+      render_target.SetRenderableArea (client_rect.left, client_rect.top, client_rect.right - client_rect.left,
+                                       client_rect.bottom - client_rect.top);
 
-      mid_level::LowLevelDriver::SetViewport (MID_LEVEL_RENDERER_NAME, viewport);
-
-      window->Invalidate ();
+      window->Invalidate ();            
     }
     catch (std::exception& exception)
     {
@@ -226,6 +222,8 @@ TestApplication::TestApplication ()
     impl->render.SetRenderer (render::mid_level::LowLevelDriver::Name (), MID_LEVEL_RENDERER_NAME);
 //    impl->render.SetRenderer ("Debug", "Renderer2d");
 
+    impl->render_target = impl->render.CreateRenderTarget ("default", "default");
+
       //загрузка ресурсов
 
     impl->render.LoadResource (MATERIAL_LIB_FILE_NAME);
@@ -274,6 +272,15 @@ int TestApplication::Run ()
   syslib::Application::Run ();
 
   return syslib::Application::GetExitCode ();
+}
+
+/*
+    Получение цели рендеринга
+*/
+
+RenderTarget& TestApplication::RenderTarget ()
+{
+  return impl->render_target;
 }
 
 /*
