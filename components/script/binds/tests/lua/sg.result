@@ -13,6 +13,15 @@ ScaleInherit = 1
 LocalTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
 WorldTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
 ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+LocalOrtX = 1 0 0
+LocalOrtY = 0 1 0
+LocalOrtZ = 0 0 1
+WorldOrtX = 1 0 0
+WorldOrtY = 0 1 0
+WorldOrtZ = 0 0 1
+ParentOrtX = 1 0 0
+ParentOrtY = 0 1 0
+ParentOrtZ = 0 0 1
 Name = node1
 Position = 10 10 10
 WorldPosition = 10 10 10
@@ -36,6 +45,9 @@ Scale = 15 16.3999996185 17
 Rescale = 150 16.3999996185 17
 ObjectTM = 1 -1.19388721131e-009 -3.61509489011e-010 1.86264514923e-009 5.6940820059e-008 1 -1.12445022182e-008 -2.98023223877e-008 3.96146248249e-007 -2.25949925436e-010 1.00000011921 1.49011611938e-008 0 0 0 1
 Scale = 1 1 1
+LocalOrtX = 0 0 1
+LocalOrtY = 0 1 0
+LocalOrtZ = -1 0 0
 Node bind test
 node3 child name = node2
 Child name - node1

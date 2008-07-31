@@ -143,7 +143,7 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("get_LocalTM",               make_invoker (&Node::LocalTM));
   lib.Register ("get_WorldTM",               make_invoker (&Node::WorldTM));
   lib.Register ("get_ParentTM",              make_invoker (&Node::ParentTM));
-  lib.Register ("get_IsInUpdateTransaction", make_invoker (&Node::IsInUpdateTransaction));
+  lib.Register ("get_IsInUpdateTransaction", make_invoker (&Node::IsInUpdateTransaction));    
 
   lib.Register ("Parent",     make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::Parent)));
   lib.Register ("FirstChild", make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::FirstChild)));
@@ -170,6 +170,15 @@ InvokerRegistry& bind_node_library (Environment& environment)
                                            make_invoker (implicit_cast<Node::Pointer (Node::*) (const char*, NodeSearchMode)> (&Node::FindChild))));
 
   lib.Register ("ObjectTM", make_invoker (&Node::ObjectTM));
+  lib.Register ("get_LocalOrtX", make_invoker (&Node::LocalOrtX));
+  lib.Register ("get_LocalOrtY", make_invoker (&Node::LocalOrtY));
+  lib.Register ("get_LocalOrtZ", make_invoker (&Node::LocalOrtZ));
+  lib.Register ("get_WorldOrtX", make_invoker (&Node::WorldOrtX));
+  lib.Register ("get_WorldOrtY", make_invoker (&Node::WorldOrtY));
+  lib.Register ("get_WorldOrtZ", make_invoker (&Node::WorldOrtZ));
+  lib.Register ("get_ParentOrtX", make_invoker (&Node::ParentOrtX));
+  lib.Register ("get_ParentOrtY", make_invoker (&Node::ParentOrtY));
+  lib.Register ("get_ParentOrtZ", make_invoker (&Node::ParentOrtZ));  
 
   lib.Register ("Translate", make_invoker (make_invoker (implicit_cast<void (Node::*) (const vec3f&, NodeTransformSpace)> (&Node::Translate)),
                  make_invoker (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Translate)),
@@ -183,6 +192,18 @@ InvokerRegistry& bind_node_library (Environment& environment)
                  make_invoker<void (Node&, float, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, _5, NodeTransformSpace_Parent))));
   lib.Register ("Rescale", make_invoker (make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::Scale)),
                                          make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::Scale))));
+
+  lib.Register ("LookTo", make_invoker (
+    make_invoker (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookTo)),
+    make_invoker (implicit_cast<void (Node::*)(float, float, float, float, float, float, NodeTransformSpace)> (&Node::LookTo)),
+    make_invoker<void (Node&, const vec3f&, const vec3f&)> (bind (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookTo), _1, _2, _3, NodeTransformSpace_Local)),
+    make_invoker<void (Node&, float, float, float, float, float, float)> (bind (implicit_cast<void (Node::*)(float, float, float, float, float, float, NodeTransformSpace)> (&Node::LookTo), _1, _2, _3, _4, _5, _6, _7, NodeTransformSpace_Local))
+  ));
+
+  lib.Register ("LookAt", make_invoker (
+    make_invoker (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookAt)),
+    make_invoker<void (Node&, const vec3f&, const vec3f&, const vec3f&)> (bind (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookAt), _1, _2, _3, _4, NodeTransformSpace_Local))
+  ));
 
   lib.Register ("BeginUpdate", make_invoker (&Node::BeginUpdate));
   lib.Register ("EndUpdate",   make_invoker (&Node::EndUpdate));

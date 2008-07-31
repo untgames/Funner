@@ -87,6 +87,15 @@ function test_node ()
   print ("LocalTM = " .. tostring (node1.LocalTM))
   print ("WorldTM = " .. tostring (node1.WorldTM))
   print ("ParentTM = " .. tostring (node1.ParentTM))
+  print ("LocalOrtX = " .. tostring (node1.LocalOrtX))
+  print ("LocalOrtY = " .. tostring (node1.LocalOrtY))
+  print ("LocalOrtZ = " .. tostring (node1.LocalOrtZ))
+  print ("WorldOrtX = " .. tostring (node1.WorldOrtX))
+  print ("WorldOrtY = " .. tostring (node1.WorldOrtY))
+  print ("WorldOrtZ = " .. tostring (node1.WorldOrtZ))
+  print ("ParentOrtX = " .. tostring (node1.ParentOrtX))
+  print ("ParentOrtY = " .. tostring (node1.ParentOrtY))
+  print ("ParentOrtZ = " .. tostring (node1.ParentOrtZ))
 
   node1.Name = "node1"
   node1.Position = vec3 (10, 10, 10)
@@ -139,6 +148,18 @@ function test_node ()
 
   node1:ResetScale ()
   print ("Scale = " .. tostring (node1.Scale))
+
+  local parent = Scene.Node.Create ()  
+  local node2 = Scene.Node.Create ()
+
+  parent.Scale = vec3 (-1, 1, 1)
+
+  node2:BindToParent (parent)
+  node2:LookAt (vec3 (0, 1, 0), vec3 (1, 1, 0), vec3 (0, 1, 0), Scene_NodeTransformSpace.World)
+
+  print ("LocalOrtX = " .. tostring (node2.LocalOrtX))
+  print ("LocalOrtY = " .. tostring (node2.LocalOrtY))
+  print ("LocalOrtZ = " .. tostring (node2.LocalOrtZ))
 
   test_node_bind ()
 
