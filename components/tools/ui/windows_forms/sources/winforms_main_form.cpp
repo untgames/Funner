@@ -14,11 +14,27 @@ private ref class TestForm: public WeifenLuo::WinFormsUI::DockContent
     {
       InitializeComponent ();
     }
+
+    ~TestForm ()
+    {
+      if (components)
+      {
+        delete components;
+      }
+    }
     
   private:
+    System::ComponentModel::Container^ components;
+
     void InitializeComponent ()
     {
-      ShowHint = WeifenLuo::WinFormsUI::DockState::DockLeftAutoHide;      
+      components = gcnew System::ComponentModel::Container;
+
+      Text = "Fucking dock!";
+      ShowHint = WeifenLuo::WinFormsUI::DockState::DockRight/*AutoHide*/;
+      HideOnClose = true;
+
+      ResumeLayout (false);
     }    
 };
 
@@ -28,31 +44,44 @@ private ref class MainForm: public System::Windows::Forms::Form
 ///Конструктор
     MainForm ()
     {
-      IsMdiContainer = true;      
-      dock_panel     = gcnew WeifenLuo::WinFormsUI::DockPanel;
-      
+      components = gcnew System::ComponentModel::Container;
+      dock_panel = gcnew WeifenLuo::WinFormsUI::DockPanel;
+      form       = gcnew TestForm;
+
       SuspendLayout ();
 
       dock_panel->ActiveAutoHideContent = nullptr;
-      dock_panel->Dock                  = System::Windows::Forms::DockStyle::Fill;
-
-      Controls->Add (dock_panel);
-
-      TestForm^ form = gcnew TestForm;      
+      dock_panel->Dock = System::Windows::Forms::DockStyle::Fill;
 
       form->Show (dock_panel);
 
+      IsMdiContainer = true;
+      MinimumSize = System::Drawing::Size (640, 480);
+      StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
+      Controls->Add (dock_panel);
+
       ResumeLayout (false);
-      PerformLayout ();      
+      PerformLayout ();
     }
 
 ///Деструктор
     ~MainForm ()
     {
+      if (components)
+      {
+        delete components;
+      }
+    }
+
+    void ShowDock ()
+    {
+      form->Show (dock_panel);
     }
     
   private:
     WeifenLuo::WinFormsUI::DockPanel^ dock_panel; //стыковочная панель
+    System::ComponentModel::Container^ components;
+    TestForm^ form;
 };
 
 }
