@@ -96,8 +96,8 @@ float PerspectiveCamera::ZFar () const
 
 void PerspectiveCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
 {
-  float width  = tan (deg2rad (impl->fov_x)) * impl->z_near, 
-        height = tan (deg2rad (impl->fov_y)) * impl->z_near,
+  float width  = tan (deg2rad (impl->fov_x * 0.5f)) * impl->z_near, 
+        height = tan (deg2rad (impl->fov_y * 0.5f)) * impl->z_near,
         depth  = impl->z_far - impl->z_near;
 
   if (fabs (width)  < EPS) throw xtl::format_operation_exception ("scene_graph::PerspectiveCamera::ComputeProjectionMatrix", "Zero camera width");
@@ -106,8 +106,8 @@ void PerspectiveCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
 
   proj_matrix [0] = vec4f (2.0f * impl->z_near / width, 0, 0, 0);
   proj_matrix [1] = vec4f (0, 2.0f * impl->z_near / height, 0, 0);
-  proj_matrix [2] = vec4f (0, 0, -(impl->z_far + impl->z_near) / depth, -2.0f * impl->z_near * impl->z_far / depth);
-  proj_matrix [3] = vec4f (0, 0, -1, 0);
+  proj_matrix [2] = vec4f (0, 0, (impl->z_far + impl->z_near) / depth, -2.0f * impl->z_near * impl->z_far / depth); //не нужен, поскольку при рендериинге используется инвертированная матрица вида  
+  proj_matrix [3] = vec4f (0, 0, 1, 0);
 }
 
 /*
