@@ -871,6 +871,68 @@ const quatf& Node::WorldOrientation () const
 }
 
 /*
+    Позиционирование узла
+*/
+
+void Node::LookTo (const vec3f& target_point, NodeTransformSpace space)
+{
+  vec3f local_target_point;
+
+  switch (space)
+  {
+    case NodeTransformSpace_Local:
+      local_target_point = target_point;
+      break;
+    case NodeTransformSpace_Parent:
+      local_target_point = invert (ParentTM ()) * target_point;
+      break;
+    case NodeTransformSpace_World:
+      local_target_point = invert (WorldTM ()) * target_point;
+      break;
+    default:
+      throw xtl::make_argument_exception ("scene_graph::Node::LookTo", "space", space);
+  }
+
+
+}
+
+void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpace space)
+{
+  SetOrientation ();
+}
+
+void Node::LookAt (const vec3f& position, const vec3f& target, const vec3f& up, NodeTransformSpace space)
+{
+  LookTo      (target, up, space);
+  SetPosition (position); //????
+}
+
+void Node::LookTo (float target_x, float target_y, float target_z, NodeTransformSpace space)
+{
+  LookTo (vec3f (target_x, target_y, target_z));
+}
+
+void Node::LookTo (float target_x, float target_y, float target_z, float up_x, float up_y, float up_z, NodeTransformSpace space)
+{
+  LookTo (vec3f (target_x, target_y, target_z), vec3f (up_x, up_y, up_z), space);
+}
+
+void Node::LookAt
+ (float              position_x,
+  float              position_y,
+  float              position_z,
+  float              target_x,
+  float              target_y,
+  float              target_z,
+  float              up_x,
+  float              up_y,
+  float              up_z,
+  NodeTransformSpace space)
+{
+  LookAt (vec3f (position_x, position_y, position_z), vec3f (target_x, target_y, target_z), vec3f (up_x, up_y, up_z), space);
+}
+
+/*
     Масштаб узла
 */
 
