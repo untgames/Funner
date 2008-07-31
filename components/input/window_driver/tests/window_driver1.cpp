@@ -41,7 +41,7 @@ int main ()
 
     printf ("Device has properties: '%s'\n", device->GetProperties ());
 
-//    device->SetProperty ("AUTOCENTER_CURSOR", 1.f);
+    device->SetProperty ("Cursor.auto_center", 1.f);
     device->SetProperty ("WheelX.sensitivity", -2.4f);
     device->SetProperty ("Cursor.sensitivity", -1.1f);
 
