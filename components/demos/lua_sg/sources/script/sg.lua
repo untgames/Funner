@@ -4,34 +4,29 @@ velocity_x = 3
 velocity_y = 3
 mouse_sens = 5	
 
-root_node = Scene.Node.Create ()
-sprite    = Scene.Sprite.Create ()
+scene = Scene.Scene.Create ()
+
+sprite = Scene.Sprite.Create ()
 
 sprite.Material = "sprite_material"
-sprite.Color = vec4 (1, 1, 1, 1)
+sprite.Color = vec4 (1, 1, 1, 0.5)
+
+sprite:BindToScene (scene)
 
 camera = Scene.OrthoCamera.Create ()
 
-function set_root_node (new_root_node)
-  root_node = new_root_node
+camera.Name = "Camera1"
+camera.Position = vec3 (0, 0, -3)
+camera.Left = -10
+camera.Right = 10
+camera.Top = 10
+camera.Bottom = -10
+camera.ZNear = -10
+camera.ZFar = 10
 
-  sprite:BindToParent (root_node)
-end
+camera:BindToScene (scene)
 
-function set_camera (new_camera)
-  camera = new_camera
-
-  camera:BindToParent (root_node)
-
-  camera.Name = "Camera1"
-  camera.Position = vec3 (0, 0, -3)
-  camera.Left = -10
-  camera.Right = 10
-  camera.Top = 10
-  camera.Bottom = -10
-  camera.ZNear = -10
-  camera.ZFar = 10
-end
+set_camera (camera)
 
 function onBeginMove(ort)
   velocity [ort] = velocity [ort] + 1
@@ -59,3 +54,4 @@ function idle(dt)
   sprite:Translate (sign (velocity ['+x'] - velocity ['-x']) * dt * velocity_x,
                     sign (velocity ['+y'] - velocity ['-y']) * dt * velocity_y, 0)
 end
+

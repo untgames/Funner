@@ -39,20 +39,14 @@ inline void log_print (const char* message)
     Выполнение скрипта    
 */
 
-void load_script (IInterpreter& interpreter, const char* file_name)
+void input_event_handler (const char* event, Shell& shell)
 {
-  common::InputFile file (file_name);
-
-  stl::string buffer (file.Size (), ' ');
-
-  file.Read (&buffer [0], buffer.size ());        
-
-  interpreter.DoCommands (file_name, buffer.c_str (), buffer.size (), &log_print);    
+  shell.Execute (event, &log_print);
 }
 
-void input_event_handler (const char* event, IInterpreter* interpreter)
+void set_camera (Camera* camera, Viewport& vp)
 {
-  interpreter->DoCommands ("input_event", event, strlen (event), &log_print);
+  vp.SetCamera (camera);
 }
 
 int main ()
@@ -67,14 +61,6 @@ int main ()
       
     SceneRender& render = test.Render ();
 
-      //создание сцены
-      
-    Scene scene;  
-      
-    OrthoCamera::Pointer camera;
-
-    camera = OrthoCamera::Create ();    
-    
       //создание областей вывода
       
     Viewport vp;
@@ -82,7 +68,6 @@ int main ()
     
     vp.SetName       ("Viewport1");
     vp.SetRenderPath ("Render2d");
-    vp.SetCamera     (camera.get ());
     
     vp.SetArea (0, 0, 100, 100);
 
@@ -93,23 +78,26 @@ int main ()
 
     render_target.SetDesktop (&desktop);        
 
+      //инициализация LUA
+
     xtl::shared_ptr<Environment> env (new Environment);
 
     Shell shell ("lua", env);
 
-    xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
-  
     bind_math_library (*env);
     bind_scene_graph_library (*env);
 
-    load_script (*script, SCRIPT_FILE_NAME);
+    InvokerRegistry& lib = env->Library ("global");
 
-    invoke<void> (*script, "set_root_node", xtl::ref (scene.Root ()));
-    invoke<void> (*script, "set_camera", camera);
+    lib.Register ("set_camera", make_invoker<void (Camera*)> (xtl::bind (&set_camera, _1, xtl::ref (vp))));
+
+    shell.ExecuteFile (SCRIPT_FILE_NAME, &log_print);    
+
+      //инициализация системы ввода
 
     input::TranslationMap translation_map (TRANSLATION_MAP_FILE_NAME);
 
-    input::TranslationMap::EventHandler event_handler = xtl::bind (&input_event_handler, _1, script.get ());
+    input::TranslationMap::EventHandler event_handler = xtl::bind (&input_event_handler, _1, xtl::ref (shell));
 
     test.InputDevice ().SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &translation_map, _1, event_handler));
     
