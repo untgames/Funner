@@ -145,7 +145,7 @@ define batch-compile
   
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
 			@echo build-start > $$@.incomplete-build
-			@$$(call $(COMPILE_TOOL),$$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
+			@$$(call $(COMPILE_TOOL),$$(sort $$(filter-out force,$$?) $$($2.NEW_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -154,7 +154,7 @@ define batch-compile
     $$($2.FLAG_FILE): $2.UPDATED_SOURCE_FILES := $$(shell $$(call test_source_and_object_files,$$($2.SOURCE_FILES),$$($2.TMP_DIR)))
   
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
-			@$$(call $(COMPILE_TOOL),$$(sort $$($2.UPDATED_SOURCE_FILES) $$($2.NEW_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH))
+			@$$(call $(COMPILE_TOOL),$$(sort $$($2.UPDATED_SOURCE_FILES) $$($2.NEW_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -206,6 +206,8 @@ endef
 
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
 define process_target_with_sources
+  $1.TMP_DIR        := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+  $1.TMP_DIRS       := $$($1.TMP_DIR)
   $1.INCLUDE_DIRS   := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
   $1.SOURCE_DIRS    := $$(call specialize_paths,$$($1.SOURCE_DIRS))
   $1.LIB_DIRS       := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
@@ -213,10 +215,8 @@ define process_target_with_sources
   $1.EXECUTION_DIR  := $$(strip $$($1.EXECUTION_DIR))
   $1.EXECUTION_DIR  := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
   $1.LIBS           := $$($1.LIBS:%=$(LIB_PREFIX)%.$(LIB_SUFFIX))
-  $1.TARGET_DLLS    := $$($1.DLLS:%=$(DIST_BIN_DIR)/%.$(DLL_SUFFIX))  
+  $1.TARGET_DLLS    := $$($1.DLLS:%=$(DIST_BIN_DIR)/%.$(DLL_SUFFIX))
   $1.LIB_DEPS       := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))
-  $1.TMP_DIR        := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
-  $1.TMP_DIRS       := $$($1.TMP_DIR)
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
@@ -305,6 +305,7 @@ define process_tests_source_dir
   $2.TEST_EXE_FILES    := $$(filter $$(files:%=$$($2.TMP_DIR)/%.$(EXE_SUFFIX)),$$($2.OBJECT_FILES:%.$(OBJ_SUFFIX)=%.$(EXE_SUFFIX)))
   $2.TEST_RESULT_FILES := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
   $2.EXECUTION_DIR     := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
+  $1.TARGET_DLLS       := $$($1.TARGET_DLLS) $$($1.DLLS:%=$$($2.TMP_DIR)/%.$(DLL_SUFFIX))
 
   build: $$($2.TEST_EXE_FILES)
   test: TEST_MODULE.$2
@@ -401,6 +402,7 @@ define import_settings
   $2.INCLUDE_DIRS     := $$($2.INCLUDE_DIRS) $$($$(EXPORT_VAR_PREFIX).INCLUDE_DIRS:%=$$(DEPENDENCY_COMPONENT_DIR)%)
   $2.LIB_DIRS         := $$($2.LIB_DIRS) $$($$(EXPORT_VAR_PREFIX).LIB_DIRS:%=$$(DEPENDENCY_COMPONENT_DIR)%)
   $2.DLL_DIRS         := $$($2.DLL_DIRS) $$($$(EXPORT_VAR_PREFIX).DLL_DIRS:%=$$(DEPENDENCY_COMPONENT_DIR)%)
+  $2.DLLS             := $$($2.DLLS) $$($$(EXPORT_VAR_PREFIX).DLLS)
   $2.LIBS             := $$($2.LIBS) $$($$(EXPORT_VAR_PREFIX).LIBS)
   $2.COMPILER_CFLAGS  := $$($2.COMPILER_CFLAGS) $$($$(EXPORT_VAR_PREFIX).COMPILER_CFLAGS)
   $2.COMPILER_DEFINES := $$($2.COMPILER_DEFINES) $$($$(EXPORT_VAR_PREFIX).COMPILER_DEFINES)
