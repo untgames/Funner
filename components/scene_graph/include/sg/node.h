@@ -84,6 +84,18 @@ enum NodeSubTreeEvent
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Оси узла
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum NodeOrt
+{
+  NodeOrt_X,   //ось Ox
+  NodeOrt_Y,   //ось Oy
+  NodeOrt_Z,   //ось Oz
+  
+  NodeOrt_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Узел сцены
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   //добавить NodeIterator / NodeConstIterator
@@ -206,7 +218,18 @@ class Node: public xtl::dynamic_cast_root
     void               ResetScale ();
     const math::vec3f& Scale      () const;
     const math::vec3f& WorldScale () const;
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Позиционирование узла
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LookTo (const math::vec3f& target_point, const math::vec3f& up, NodeTransformSpace = NodeTransformSpace_Local);    
+    void LookTo (float target_x, float target_y, float target_z, float up_x, float up_y, float up_z, NodeTransformSpace = NodeTransformSpace_Local);
+    void LookAt (const math::vec3f& position, const math::vec3f& target, const math::vec3f& up, NodeTransformSpace = NodeTransformSpace_Local);
+    void LookAt (float position_x, float position_y, float position_z,
+                 float target_x, float target_y, float target_z,
+                 float up_x, float up_y, float up_z,
+                 NodeTransformSpace = NodeTransformSpace_Local);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление наследованием преобразований
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,6 +258,22 @@ class Node: public xtl::dynamic_cast_root
     const math::mat4f& LocalTM  () const { return TransformationMatrix (NodeTransformSpace_Local); }
     const math::mat4f& WorldTM  () const { return TransformationMatrix (NodeTransformSpace_World); }
     const math::mat4f& ParentTM () const { return TransformationMatrix (NodeTransformSpace_Parent); }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение осей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    math::vec3f Ort (NodeOrt ort, NodeTransformSpace space) const;
+
+      //сокращённые версии
+    math::vec3f LocalOrtX  () const { return Ort (NodeOrt_X, NodeTransformSpace_Local); }
+    math::vec3f LocalOrtY  () const { return Ort (NodeOrt_Y, NodeTransformSpace_Local); }
+    math::vec3f LocalOrtZ  () const { return Ort (NodeOrt_Z, NodeTransformSpace_Local); }
+    math::vec3f WorldOrtX  () const { return Ort (NodeOrt_X, NodeTransformSpace_World); }
+    math::vec3f WorldOrtY  () const { return Ort (NodeOrt_Y, NodeTransformSpace_World); }
+    math::vec3f WorldOrtZ  () const { return Ort (NodeOrt_Z, NodeTransformSpace_World); }
+    math::vec3f ParentOrtX () const { return Ort (NodeOrt_X, NodeTransformSpace_Parent); }
+    math::vec3f ParentOrtY () const { return Ort (NodeOrt_Y, NodeTransformSpace_Parent); }
+    math::vec3f ParentOrtZ () const { return Ort (NodeOrt_Z, NodeTransformSpace_Parent); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение матрицы преобразования узла object в системе координат данного узла

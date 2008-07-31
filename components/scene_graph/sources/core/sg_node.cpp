@@ -874,47 +874,53 @@ const quatf& Node::WorldOrientation () const
     Позиционирование узла
 */
 
-void Node::LookTo (const vec3f& target_point, NodeTransformSpace space)
+void Node::LookAt (const vec3f& position, const vec3f& target, const vec3f& up, NodeTransformSpace space)
 {
-  vec3f local_target_point;
+  static const char* METHOD_NAME = "scene_graph::Node::LookAt(const vec3f&, const vec3f&, const vec3f&, NodeTransformSpace)";
+
+    //приведение целевой точки в локальную систему координат
+
+  vec3f local_position, local_target, local_up;
 
   switch (space)
   {
     case NodeTransformSpace_Local:
-      local_target_point = target_point;
+      local_position = position;
+      local_target   = target;
+      local_up       = up;
+
       break;
     case NodeTransformSpace_Parent:
-      local_target_point = invert (ParentTM ()) * target_point;
+    {
+      const mat4f inv_tm = invert (ParentTM ());
+
+      local_position = inv_tm * position;
+      local_target   = inv_tm * target;
+      local_up       = inv_tm * up;
+
       break;
+    }
     case NodeTransformSpace_World:
-      local_target_point = invert (WorldTM ()) * target_point;
+    {
+      const mat4f inv_tm = invert (WorldTM ());
+
+      local_position = inv_tm * position;
+      local_target   = inv_tm * target;
+      local_up       = inv_tm * up;
+
       break;
+    }
     default:
-      throw xtl::make_argument_exception ("scene_graph::Node::LookTo", "space", space);
+      throw xtl::make_argument_exception (METHOD_NAME, "space", space);
   }
+  
+    //получение матрицы поворота
+    
+  mat4f orientation_tm   = lookatf (vec3f (0.0f), local_target - local_position, local_up);
+  quatf orientation_quat = orientation_tm;
 
-
-}
-
-void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpace space)
-{
-  SetOrientation ();
-}
-
-void Node::LookAt (const vec3f& position, const vec3f& target, const vec3f& up, NodeTransformSpace space)
-{
-  LookTo      (target, up, space);
-  SetPosition (position); //????
-}
-
-void Node::LookTo (float target_x, float target_y, float target_z, NodeTransformSpace space)
-{
-  LookTo (vec3f (target_x, target_y, target_z));
-}
-
-void Node::LookTo (float target_x, float target_y, float target_z, float up_x, float up_y, float up_z, NodeTransformSpace space)
-{
-  LookTo (vec3f (target_x, target_y, target_z), vec3f (up_x, up_y, up_z), space);
+  SetOrientation (orientation_tm);
+  SetPosition    (local_position);
 }
 
 void Node::LookAt
@@ -926,10 +932,20 @@ void Node::LookAt
   float              target_z,
   float              up_x,
   float              up_y,
-  float              up_z,
+  float              up_z,  
   NodeTransformSpace space)
 {
   LookAt (vec3f (position_x, position_y, position_z), vec3f (target_x, target_y, target_z), vec3f (up_x, up_y, up_z), space);
+}
+
+void Node::LookTo (const vec3f& target, const vec3f& up, NodeTransformSpace space)
+{
+  LookAt (impl->local_position, target, up, space);
+}
+
+void Node::LookTo (float target_x, float target_y, float target_z, float up_x, float up_y, float up_z, NodeTransformSpace space)
+{
+  LookTo (vec3f (target_x, target_y, target_z), vec3f (up_x, up_y, up_z), space);
 }
 
 /*
@@ -1128,6 +1144,49 @@ const mat4f& Node::TransformationMatrix (NodeTransformSpace space) const
       throw xtl::make_argument_exception ("scene_graph::Node::TransformationMatrix", "space", space);
       return idNode;
   } 
+}
+
+/*
+    Получение осей
+*/
+
+vec3f Node::Ort (NodeOrt ort, NodeTransformSpace space) const
+{
+  static const char* METHOD_NAME = "scene_graph::Node::Ort";
+
+    //получение матрицы преобразований
+
+  const mat4f* tm;
+  
+  switch (space)
+  {
+    case NodeTransformSpace_Local:
+      tm = &LocalTM ();
+      break;
+    case NodeTransformSpace_World:
+      tm = &WorldTM ();
+      break;
+    case NodeTransformSpace_Parent:
+      tm = &ParentTM ();
+      break;
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "space", space);
+  }
+  
+    //получение оси
+    
+  vec4f local_ort;
+
+  switch (ort)
+  {
+    case NodeOrt_X: local_ort = vec4f (1, 0, 0, 0); break;
+    case NodeOrt_Y: local_ort = vec4f (0, 1, 0, 0); break;
+    case NodeOrt_Z: local_ort = vec4f (0, 0, 1, 0); break;
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "ort", ort);
+  }
+  
+  return *tm * local_ort;
 }
 
 /*
