@@ -1186,7 +1186,7 @@ vec3f Node::Ort (NodeOrt ort, NodeTransformSpace space) const
       throw xtl::make_argument_exception (METHOD_NAME, "ort", ort);
   }
   
-  return *tm * local_ort;
+  return normalize (vec3f (*tm * local_ort));
 }
 
 /*
