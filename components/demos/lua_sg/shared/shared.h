@@ -21,6 +21,8 @@
 
 #include <render/scene_render.h>
 
+#include <syslib/application.h>
+
 #include <script/bind_libraries.h>
 #include <script/environment.h>
 #include <script/bind.h>

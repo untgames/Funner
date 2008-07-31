@@ -49,6 +49,11 @@ void set_camera (Camera* camera, Viewport& vp)
   vp.SetCamera (camera);
 }
 
+void app_exit ()
+{
+  syslib::Application::Exit (0);
+}
+
 int main ()
 {
   try
@@ -90,6 +95,7 @@ int main ()
     InvokerRegistry& lib = env->Library ("global");
 
     lib.Register ("set_camera", make_invoker<void (Camera*)> (xtl::bind (&set_camera, _1, xtl::ref (vp))));
+    lib.Register ("exit", make_invoker (&app_exit));
 
     shell.ExecuteFile (SCRIPT_FILE_NAME, &log_print);    
 
