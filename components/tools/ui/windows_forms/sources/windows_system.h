@@ -33,9 +33,10 @@ class WindowSystem: public ICustomWindowSystem, public xtl::reference_counter
     void Release ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение сервера приложения
+///Получение сервера приложения и скриптового окружения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IApplicationServer& ApplicationServer () { return *application_server; }
+    IApplicationServer&  ApplicationServer () { return *application_server; }
+    script::Environment& ShellEnvironment  () { return *shell_environment; }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реестры контролов

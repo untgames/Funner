@@ -75,9 +75,10 @@ private ref class MainForm: public System::Windows::Forms::Form
 
     void ShowDock ()
     {
+      printf ("MainForm::ShowDock\n");
       form->Show (dock_panel);
-    }
-    
+    }    
+
   private:
     WeifenLuo::WinFormsUI::DockPanel^ dock_panel; //стыковочная панель
     System::ComponentModel::Container^ components;
@@ -95,10 +96,35 @@ namespace ui
 namespace windows_forms
 {
 
+//временно
+MainForm^ get_main_form (Form& form)
+{
+  return (MainForm^)((System::Windows::Forms::Form^)form.Handle ());
+}
+
+void show_dock (Form& form)
+{
+  get_main_form (form)->ShowDock ();
+}
+
+void register_main_form_invokers (script::Environment& env, Form& form)
+{
+  using namespace script;
+
+  InvokerRegistry& lib = env.Library ("global");
+  
+  lib.Register ("dbgShowDock", make_invoker<void ()> (xtl::bind (&show_dock, xtl::ref (form))));
+}
+
 ///Создание главной формы
 Form::Pointer create_main_form (WindowSystem& window_system)
-{
-  return Form::Pointer (new Form (window_system, gcnew MainForm), false);
+{  
+  Form::Pointer form (new Form (window_system, gcnew MainForm), false);
+  
+    //временно
+  register_main_form_invokers (window_system.ShellEnvironment (), *form);
+  
+  return form;
 }
 
 }
