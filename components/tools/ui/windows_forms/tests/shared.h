@@ -9,6 +9,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/string.h>
+#include <xtl/connection.h> //out!!!
 
 #include <syslib/application.h>
 

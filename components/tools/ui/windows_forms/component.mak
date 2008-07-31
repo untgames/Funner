@@ -26,3 +26,4 @@ TOOLS.UI.WINDOWS_FORMS.TESTS.COMPILER_CFLAGS  :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.COMPILER_DEFINES :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.IMPORTS          := ../core/compile.static.mak link.static.mak ../../../system/compile.static.mak \
                                                  ../../../system/link.static.mak ../../../script/core/lua.link.static.mak
+TOOLS.UI.WINDOWS_FORMS.TESTS.msvc.COMPILER_CFLAGS := -clr -wd4793

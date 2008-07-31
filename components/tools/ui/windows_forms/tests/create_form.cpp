@@ -1,8 +1,15 @@
 #include "shared.h"
 
+#using <System.Windows.Forms.dll>
+
 void print (const char* message)
 {
   printf ("%s\n", message);
+}
+
+void idle ()  
+{
+  System::Windows::Forms::Application::DoEvents ();
 }
 
 int main ()
@@ -15,6 +22,8 @@ int main ()
     
     test.main_window.SetLogHandler (&print);
     test.main_window.ExecuteFile ("data/ui.lua");    
+    
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, &idle);
     
     syslib::Application::Run ();
     
