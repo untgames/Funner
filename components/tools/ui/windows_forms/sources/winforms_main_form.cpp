@@ -7,6 +7,10 @@ namespace
     Главная форма
 */
 
+private ref class TestForm: public WeifenLuo::WinFormsUI::DockContent
+{
+};
+
 private ref class MainForm: public System::Windows::Forms::Form
 {
   public:
@@ -20,18 +24,18 @@ private ref class MainForm: public System::Windows::Forms::Form
 
       dock_panel->ActiveAutoHideContent = nullptr;
       dock_panel->Dock                  = System::Windows::Forms::DockStyle::Fill;
-           
 
       Controls->Add (dock_panel);
-      
-      System::Windows::Forms::Form^ form = gcnew Form;
-      
-//      form->Dock = System::Windows::Forms::DockStyle::Fill;      
+
+      TestForm^ form = gcnew TestForm;      
+
+      form->Dock = System::Windows::Forms::DockStyle::Fill;      
+      form->HideOnClose = true;
 //      form->MdiParent = dock_panel;
-      
+
 //      form->Show ();      
-      form->Show (dock_panel);           
-      
+      form->Show (dock_panel);
+
       ResumeLayout (false);
     }
 
