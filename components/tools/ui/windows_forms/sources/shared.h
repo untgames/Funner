@@ -1,6 +1,3 @@
-/////////////!!!сделать обёртку над IApplicationServer (протоколирование и ExecuteCommand)
-
-
 #ifndef TOOLS_UI_WINDOWS_FORMS_SHARED_HEADER
 #define TOOLS_UI_WINDOWS_FORMS_SHARED_HEADER
 
@@ -30,6 +27,7 @@
 #using <System.dll>
 #using <System.Windows.Forms.dll>
 #using <System.Drawing.dll>
+#using <WeifenLuo.WinFormsUI.Docking.dll>
 
 #include <msclr/gcroot.h>
 #include <msclr/event.h>

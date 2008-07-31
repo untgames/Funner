@@ -13,13 +13,35 @@ private ref class MainForm: public System::Windows::Forms::Form
 ///Конструктор
     MainForm ()
     {
-      IsMdiContainer = true;
+      IsMdiContainer = true;      
+      dock_panel     = gcnew WeifenLuo::WinFormsUI::DockPanel;
+      
+      SuspendLayout ();
+
+      dock_panel->ActiveAutoHideContent = nullptr;
+      dock_panel->Dock                  = System::Windows::Forms::DockStyle::Fill;
+           
+
+      Controls->Add (dock_panel);
+      
+      System::Windows::Forms::Form^ form = gcnew Form;
+      
+//      form->Dock = System::Windows::Forms::DockStyle::Fill;      
+//      form->MdiParent = dock_panel;
+      
+//      form->Show ();      
+      form->Show (dock_panel);           
+      
+      ResumeLayout (false);
     }
 
 ///Деструктор
     ~MainForm ()
     {
     }
+    
+  private:
+    WeifenLuo::WinFormsUI::DockPanel^ dock_panel; //стыковочная панель
 };
 
 }
