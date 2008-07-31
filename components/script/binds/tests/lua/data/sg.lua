@@ -1,3 +1,25 @@
+function test_scene ()
+  print ("Scene test")
+
+  local scene = Scene.Scene.Create ()
+
+  print ("Name = " .. scene.Name)
+  print ("Entities count = " .. scene.EntitiesCount)
+
+  scene.Name = "scene1"
+
+  local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
+
+  sound_emitter1:BindToScene (scene)
+
+  print ("Name = " .. scene.Name)
+  print ("Entities count = " .. scene.EntitiesCount)
+
+  sound_emitter1:BindToParent (scene.Root)
+
+  print ("Entities count = " .. scene.EntitiesCount)
+end
+
 function print_childs (parent_node)
   local child_node = parent_node:FirstChild ()
   while (child_node) do
@@ -119,6 +141,16 @@ function test_node ()
   print ("Scale = " .. tostring (node1.Scale))
 
   test_node_bind ()
+
+  print ("IsInUpdateTransaction = " .. tostring (node1.IsInUpdateTransaction))
+
+  node1:BeginUpdate ()
+
+  print ("IsInUpdateTransaction = " .. tostring (node1.IsInUpdateTransaction))
+
+  node1:EndUpdate ()
+
+  print ("IsInUpdateTransaction = " .. tostring (node1.IsInUpdateTransaction))
 end
 
 function test_entity ()
@@ -359,4 +391,6 @@ function test ()
   test_visual_model ()
 
   test_sprite ()
+
+  test_scene ()
 end

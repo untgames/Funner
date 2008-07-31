@@ -45,6 +45,9 @@ Child name - node2
 Unbind all test
 Unbind node2 by name test
 Child name - node1
+IsInUpdateTransaction = 0
+IsInUpdateTransaction = 1
+IsInUpdateTransaction = 0
 Entity test
 IsInfiniteBounds = 1
 WireColor = 0 0 0
@@ -121,3 +124,9 @@ Frame number = 9
 Color = 1 0 0 0.699999988079
 Color = 0 0 1 0.300000011921
 Color = 0 1 0 0.300000011921
+Scene test
+Name = 
+Entities count = 0
+Name = scene1
+Entities count = 1
+Entities count = 1

@@ -131,18 +131,19 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("set_OrientationInherit", make_invoker (&Node::SetOrientationInherit));
   lib.Register ("set_ScaleInherit",       make_invoker (&Node::SetScaleInherit));
 
-  lib.Register ("get_Name",               make_invoker (&Node::Name));
-  lib.Register ("get_Position",           make_invoker (&Node::Position));
-  lib.Register ("get_WorldPosition",      make_invoker (&Node::WorldPosition));
-  lib.Register ("get_Orientation",        make_invoker (&Node::Orientation));
-  lib.Register ("get_WorldOrientation",   make_invoker (&Node::WorldOrientation));
-  lib.Register ("get_Scale",              make_invoker (implicit_cast<const vec3f& (Node::*) () const> (&Node::Scale)));
-  lib.Register ("get_WorldScale",         make_invoker (&Node::WorldScale));
-  lib.Register ("get_OrientationInherit", make_invoker (&Node::IsOrientationInherited));
-  lib.Register ("get_ScaleInherit",       make_invoker (&Node::IsScaleInherited));
-  lib.Register ("get_LocalTM",            make_invoker (&Node::LocalTM));
-  lib.Register ("get_WorldTM",            make_invoker (&Node::WorldTM));
-  lib.Register ("get_ParentTM",           make_invoker (&Node::ParentTM));
+  lib.Register ("get_Name",                  make_invoker (&Node::Name));
+  lib.Register ("get_Position",              make_invoker (&Node::Position));
+  lib.Register ("get_WorldPosition",         make_invoker (&Node::WorldPosition));
+  lib.Register ("get_Orientation",           make_invoker (&Node::Orientation));
+  lib.Register ("get_WorldOrientation",      make_invoker (&Node::WorldOrientation));
+  lib.Register ("get_Scale",                 make_invoker (implicit_cast<const vec3f& (Node::*) () const> (&Node::Scale)));
+  lib.Register ("get_WorldScale",            make_invoker (&Node::WorldScale));
+  lib.Register ("get_OrientationInherit",    make_invoker (&Node::IsOrientationInherited));
+  lib.Register ("get_ScaleInherit",          make_invoker (&Node::IsScaleInherited));
+  lib.Register ("get_LocalTM",               make_invoker (&Node::LocalTM));
+  lib.Register ("get_WorldTM",               make_invoker (&Node::WorldTM));
+  lib.Register ("get_ParentTM",              make_invoker (&Node::ParentTM));
+  lib.Register ("get_IsInUpdateTransaction", make_invoker (&Node::IsInUpdateTransaction));
 
   lib.Register ("Parent",     make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::Parent)));
   lib.Register ("FirstChild", make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::FirstChild)));
@@ -182,6 +183,9 @@ InvokerRegistry& bind_node_library (Environment& environment)
                  make_invoker<void (Node&, float, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, _5, NodeTransformSpace_Parent))));
   lib.Register ("Rescale", make_invoker (make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::Scale)),
                                          make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::Scale))));
+
+  lib.Register ("BeginUpdate", make_invoker (&Node::BeginUpdate));
+  lib.Register ("EndUpdate",   make_invoker (&Node::EndUpdate));
 
     //регистрация типов данных
 
