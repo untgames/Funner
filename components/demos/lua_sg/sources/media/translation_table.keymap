@@ -17,6 +17,7 @@
   <Translation Event="D up" Replacement="onEndMove('+x')" Tag=""/>
   <Translation Event="A down" Replacement="onBeginMove('-x')" Tag=""/>
   <Translation Event="A up" Replacement="onEndMove('-x')" Tag=""/>
+  <Translation Event="Esc down" Replacement="exit()" Tag=""/>
 
   <Translation Event="CursorY delta *" Replacement="onMove(0, {2})" Tag=""/>
   <Translation Event="CursorX delta *" Replacement="onMove({2}, 0)" Tag=""/>
