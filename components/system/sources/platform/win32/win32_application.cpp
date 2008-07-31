@@ -30,7 +30,7 @@ void Platform::DoNextEvent ()
     if (is_quit)
       syslib::Application::Exit (msg.wParam);
 
-    check_errors ("::GetMessage");
+//    check_errors ("::GetMessage");
 
     TranslateMessage (&msg);
     DispatchMessage  (&msg);
