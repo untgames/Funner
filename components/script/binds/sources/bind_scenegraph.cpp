@@ -16,6 +16,7 @@ const char* SCENE_STATIC_NODE_BIND_MODE_LIBRARY       = "static.Scene_NodeBindMo
 const char* SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY = "static.Scene_NodeTransformSpace";
 const char* SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY   = "static.Scene_NodeTraverseMode";
 const char* SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY     = "static.Scene_NodeSearchMode";
+const char* SCENE_SCENE_LIBRARY                       = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
 const char* SCENE_ENTITY_LIBRARY                      = "Scene.Entity";
 const char* SCENE_PERSPECTIVE_CAMERA_LIBRARY          = "Scene.PerspectiveCamera";
@@ -29,6 +30,44 @@ const char* SCENE_LISTENER_LIBRARY                    = "Scene.Listener";
 const char* SCENE_SOUND_EMITTER_LIBRARY               = "Scene.SoundEmitter";
 const char* SCENE_SPRITE_LIBRARY                      = "Scene.Sprite";
 const char* SCENE_VISUAL_MODEL_LIBRARY                = "Scene.VisualModel";
+
+/*
+    Создание сцены
+*/
+
+shared_ptr<Scene> create_scene ()
+{
+  return shared_ptr<Scene> (new Scene ());
+}
+
+Node::Pointer get_scene_root (Scene& scene)
+{
+  return &scene.Root ();
+}
+
+/*
+   Регистрация библиотеки работы со сценой
+*/
+
+void bind_scene_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_SCENE_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&create_scene));
+
+    //регистрация операций
+
+  lib.Register ("set_Name", make_invoker (&Scene::SetName));
+  lib.Register ("get_Name", make_invoker (&Scene::Name));
+
+  lib.Register ("get_Root", make_invoker (&get_scene_root));
+
+  lib.Register ("get_EntitiesCount", make_invoker (&Scene::EntitiesCount));
+
+  environment.RegisterType<Scene> (SCENE_SCENE_LIBRARY);
+}
 
 /*
     Создание узлов сцены
@@ -114,6 +153,10 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("BindToParent", make_invoker (make_invoker (&Node::BindToParent),
     make_invoker<void (Node&, Node&, NodeBindMode)> (xtl::bind (&Node::BindToParent, _1, _2, _3, NodeTransformSpace_Local)),
     make_invoker<void (Node&, Node&)> (xtl::bind (&Node::BindToParent, _1, _2, NodeBindMode_Default, NodeTransformSpace_Local))));
+
+  lib.Register ("BindToScene", make_invoker (make_invoker (&Node::BindToScene),
+    make_invoker<void (Node&, Scene&, NodeBindMode)> (xtl::bind (&Node::BindToScene, _1, _2, _3, NodeTransformSpace_Local)),
+    make_invoker<void (Node&, Scene&)> (xtl::bind (&Node::BindToScene, _1, _2, NodeBindMode_Default, NodeTransformSpace_Local))));
 
   lib.Register ("Unbind",      make_invoker (&Node::Unbind));
   lib.Register ("UnbindChild", make_invoker (make_invoker (implicit_cast<void (Node::*) (const char*, NodeTransformSpace)> (&Node::UnbindChild)), 
@@ -573,6 +616,8 @@ void bind_scene_graph_library (Environment& environment)
 {
     //регистрация библиотек
   
+  bind_scene_library (environment);
+
   InvokerRegistry& node_class_lib   = bind_node_library (environment);
   InvokerRegistry& entity_class_lib = bind_entity_library (environment, node_class_lib);
 
