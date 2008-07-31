@@ -60,9 +60,24 @@ class MyWindowSystem: public ICustomWindowSystem, public xtl::reference_counter
     }
     
 ///Выполнение команды на стороне оконной системы
-    void ExecuteCommand (const char* command)
+    void Execute (const char* name, const void* buffer, size_t buffer_size)
     {
-      printf ("MyWindowSystem::ExecuteCommand(%s)\n", command);
+      printf ("MyWindowSystem::ExecuteCommand(%s, %s, %u)\n", name, buffer ? "buffer" : "null", buffer_size);
+    }
+    
+///Установка функции протоколирования
+    void SetLogHandler (const LogFunction&)
+    {
+      printf ("MyWindowSystem::SetLogHandler\n");
+    }
+    
+    const LogFunction& GetLogHandler ()    
+    {
+      static LogFunction log_fn;
+      
+      printf ("MyWindowSystem::GetLogHandler\n");
+
+      return log_fn;
     }
 
 ///Подсчёт ссылок

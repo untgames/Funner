@@ -5,6 +5,6 @@ Profile:            'mywndsys'
 Application server: 'myapp'
 MyWindowSystem::~MyWindowSystem
 MyWindowSystem::MyWindowSystem
-MyWindowSystem::ExecuteCommand(test_command)
+MyWindowSystem::ExecuteCommand(test_command, buffer, 12)
 MyWindowSystem::~MyWindowSystem
 MyApplicationServer::~MyApplicationServer
