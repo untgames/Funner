@@ -52,6 +52,23 @@ template <class T> void quat_print(const char* Message,const quat<T>& V)
 	printf("\n");
 }
 
+template <class T> void point_print(const char* Message,const point<T>& p)
+{
+	printf("%s",Message);
+	for (int i=0;i<3;i++)
+	{
+		_printf(p[i]);
+	}
+	printf("\n");
+}
+
+template <class T> void plane_print(const char* Message,const plane<T>& pl)
+{
+	printf("%s\n",Message);
+	vec_print("Normal vector",pl.get_vector());
+	point_print("Control point",pl.get_point());
+}
+
 
 void _printf(int x)
 {

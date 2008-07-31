@@ -12,6 +12,9 @@ namespace math
   template <class Type, size_t Size> class vec;
   template <class Type, size_t SizeX, size_t SizeY=SizeX> class matrix;
   template <class T> class quat;
+  template <class T> class point;
+  template <class T> class plane;
+ 
 
 #ifdef _MSC_VER
   #pragma pack (pop)

@@ -25,6 +25,7 @@ struct scalar
 namespace detail
 {
 template <class T> const T& get_component (const T& v, size_t);
+template <class T> const T& get_component (const point<T>& p,size_t i);
 }
 
 
