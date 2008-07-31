@@ -9,6 +9,17 @@ namespace
 
 private ref class TestForm: public WeifenLuo::WinFormsUI::DockContent
 {
+  public:
+    TestForm ()
+    {
+      InitializeComponent ();
+    }
+    
+  private:
+    void InitializeComponent ()
+    {
+      ShowHint = WeifenLuo::WinFormsUI::DockState::DockLeftAutoHide;      
+    }    
 };
 
 private ref class MainForm: public System::Windows::Forms::Form
@@ -29,14 +40,10 @@ private ref class MainForm: public System::Windows::Forms::Form
 
       TestForm^ form = gcnew TestForm;      
 
-      form->Dock = System::Windows::Forms::DockStyle::Fill;      
-      form->HideOnClose = true;
-//      form->MdiParent = dock_panel;
-
-//      form->Show ();      
       form->Show (dock_panel);
 
       ResumeLayout (false);
+      PerformLayout ();      
     }
 
 ///Деструктор
