@@ -30,7 +30,7 @@ class IStack
     virtual int         GetInteger (size_t index) = 0;
     virtual void*       GetPointer (size_t index) = 0;
     virtual const char* GetString  (size_t index) = 0;
-    virtual xtl::any    GetVariant (size_t index) = 0;
+    virtual xtl::any&   GetVariant (size_t index) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Помещение аргументов в стек

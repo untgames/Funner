@@ -31,22 +31,22 @@ inline typename make_invoker_argument_helper<T>::result_type make_invoker_argume
   return make_invoker_argument_helper<T>::get (value);
 }
 
-inline xtl::any           make_invoker_argument (const xtl::any& value)    { return value; }
-inline bool               make_invoker_argument (bool value)               { return value; }
-inline char               make_invoker_argument (char value)               { return value; }
-inline signed char        make_invoker_argument (signed char value)        { return value; }
-inline unsigned char      make_invoker_argument (unsigned char value)      { return value; }
-inline short              make_invoker_argument (short value)              { return value; }
-inline unsigned short     make_invoker_argument (unsigned short value)     { return value; }
-inline int                make_invoker_argument (int value)                { return value; }
-inline unsigned int       make_invoker_argument (unsigned int value)       { return value; }
-inline long               make_invoker_argument (long value)               { return value; }
-inline unsigned long      make_invoker_argument (unsigned long value)      { return value; }
-inline float              make_invoker_argument (float value)              { return value; }
-inline const double&      make_invoker_argument (const double& value)      { return value; }
-inline const long double& make_invoker_argument (const long double& value) { return value; }
-inline const char*        make_invoker_argument (const char* string)       { return string; }
-inline const char*        make_invoker_argument (char* string)             { return string; }
+inline xtl::any    make_invoker_argument (const xtl::any& value)    { return value; }
+inline int         make_invoker_argument (bool value)               { return static_cast<int> (value); }
+inline int         make_invoker_argument (char value)               { return value; }
+inline int         make_invoker_argument (signed char value)        { return value; }
+inline int         make_invoker_argument (unsigned char value)      { return value; }
+inline int         make_invoker_argument (short value)              { return value; }
+inline int         make_invoker_argument (unsigned short value)     { return value; }
+inline int         make_invoker_argument (int value)                { return value; }
+inline int         make_invoker_argument (unsigned int value)       { return value; }
+inline int         make_invoker_argument (long value)               { return value; }
+inline int         make_invoker_argument (unsigned long value)      { return value; }
+inline float       make_invoker_argument (float value)              { return value; }
+inline float       make_invoker_argument (const double& value)      { return static_cast<float> (value); }
+inline float       make_invoker_argument (const long double& value) { return static_cast<float> (value); }
+inline const char* make_invoker_argument (const char* string)       { return string; }
+inline const char* make_invoker_argument (char* string)             { return string; }
 
 /*
     Извлечение аргументов из стека
@@ -91,7 +91,7 @@ struct string_argument_selector
 //извлечение вариантных типов данных
 struct any_argument_selector
 {
-  static xtl::any get (IStack& stack, size_t index) { return stack.GetVariant (index); }
+  static xtl::any& get (IStack& stack, size_t index) { return stack.GetVariant (index); }
 };
 
 //диспетчеризация взятия аргумента для различных типов данных
@@ -101,10 +101,10 @@ template <> struct argument_selector<xtl::any>:                 public any_argum
 template <> struct argument_selector<const xtl::any>:           public any_argument_selector {};
 template <> struct argument_selector<volatile xtl::any>:        public any_argument_selector {};
 template <> struct argument_selector<const volatile xtl::any>:  public any_argument_selector {};
-//template <> struct argument_selector<xtl::any&>:                public any_argument_selector {};
-//template <> struct argument_selector<const xtl::any&>:          public any_argument_selector {};
-//template <> struct argument_selector<volatile xtl::any&>:       public any_argument_selector {};
-//template <> struct argument_selector<const volatile xtl::any&>: public any_argument_selector {};
+template <> struct argument_selector<xtl::any&>:                public any_argument_selector {};
+template <> struct argument_selector<const xtl::any&>:          public any_argument_selector {};
+template <> struct argument_selector<volatile xtl::any&>:       public any_argument_selector {};
+template <> struct argument_selector<const volatile xtl::any&>: public any_argument_selector {};
 template <> struct argument_selector<char>:                     public int_argument_selector<char> {};
 template <> struct argument_selector<signed char>:              public int_argument_selector<signed char> {};
 template <> struct argument_selector<unsigned char>:            public int_argument_selector<unsigned char> {};
@@ -127,9 +127,6 @@ template <> struct argument_selector<bool>
 {
   static bool get (IStack& stack, size_t index) { return stack.GetInteger (index) != 0; }
 };
-
-template <class Traits, class Allocator>
-struct argument_selector<stl::basic_string<char, Traits, Allocator> >: public string_argument_selector {};
 
 //взятие аргумента из стека
 template <class T>
