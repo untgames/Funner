@@ -11,8 +11,9 @@ namespace syslib
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum ApplicationEvent
 {
-  ApplicationEvent_OnExit, //получен сигнал завершения приложения
-  ApplicationEvent_OnIdle, //очередь сообщений пуста
+  ApplicationEvent_OnExit,     //получен сигнал завершения приложения
+  ApplicationEvent_OnIdle,     //очередь сообщений пуста
+  ApplicationEvent_OnDoEvents, //обработка пользовательских очередей сообщений
   
   ApplicationEvent_Num
 };
@@ -26,14 +27,14 @@ class Application
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка сообщений в очереди сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void DoNextEvent ();
-    static void DoEvents    ();
+    static void DoEvents ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск обработки очереди сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void Run ();
     static bool IsMessageLoop (); //находится ли сейчас приложение в состоянии обработки сообщений
+    static bool HasUnprocessedMessages ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Прекращение обработки очереди сообщений
@@ -50,8 +51,10 @@ class Application
 ///Подписка на события приложения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void ()> EventHandler;
+    typedef xtl::function<bool ()> SuspendHandler; //функция, вызываемая перед приостановкой нити приложения
 
-    static xtl::connection RegisterEventHandler (ApplicationEvent event, const EventHandler& handler);
+    static xtl::connection RegisterEventHandler   (ApplicationEvent event, const EventHandler& handler);
+    static xtl::connection RegisterSuspendHandler (const SuspendHandler& handler);
 };
 
 }

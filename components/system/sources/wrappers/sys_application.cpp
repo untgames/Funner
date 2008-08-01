@@ -4,6 +4,43 @@ using namespace syslib;
 using namespace xtl;
 using namespace common;
 
+namespace
+{
+
+/*
+    Враппер для упрощения подсчёта вхождений в обработчик очереди сообщений
+*/
+
+class MessageLoopScope
+{
+  public:
+    MessageLoopScope  (size_t& in_counter) : counter (in_counter) { counter++; }
+    ~MessageLoopScope () { counter--; }
+    
+  private:
+    size_t& counter;
+};
+
+/*
+    Аккумулятор сигнала с операцией OR
+*/
+
+struct or_signal_accumulator
+{
+  typedef bool result_type;
+  
+  template <class InIter> bool operator () (InIter first, InIter last) const
+  {
+    for (; first!=last; ++first)
+      if (*first)
+        return true;
+
+    return false;
+  }
+};
+
+}
+
 /*
     Описание реализации приложения
 */
@@ -16,8 +53,7 @@ class ApplicationImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка сообщений в очереди сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void DoNextEvent ();
-    void DoEvents    ();
+    void DoEvents ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск обработки очереди сообщений
@@ -34,43 +70,32 @@ class ApplicationImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события приложения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    connection RegisterEventHandler (ApplicationEvent event, const Application::EventHandler& handler);
+    connection RegisterEventHandler   (ApplicationEvent event, const Application::EventHandler& handler);
+    connection RegisterSuspendHandler (const Application::SuspendHandler& handler);
     
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение о возникновении события
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Notify (ApplicationEvent);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Засыпание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Suspend ();
   
   private:
-    typedef xtl::signal<void ()> ApplicationSignal;
+    typedef xtl::signal<void ()>                        ApplicationSignal;
+    typedef xtl::signal<bool (), or_signal_accumulator> SuspendSignal;
 
-    ApplicationSignal signals [ApplicationEvent_Num]; //сигналы приложения
-    int               exit_code;                      //код завершения приложения
-    bool              is_exit_detected;               //получен сигнал завершения приложения
-    size_t            message_loop_count;             //количество вхождений в обработчик очереди сообщений
+    ApplicationSignal  signals [ApplicationEvent_Num]; //сигналы приложения
+    SuspendSignal      suspend_handler;                //сигнал проверки наличия необработанных сообщений
+    int                exit_code;                      //код завершения приложения
+    bool               is_exit_detected;               //получен сигнал завершения приложения
+    size_t             message_loop_count;             //количество вхождений в обработчик очереди сообщений
 };
 
 typedef Singleton<ApplicationImpl> ApplicationSingleton;
-
-/*
-    Враппер для упрощения подсчёта вхождений в обработчик очереди сообщений
-*/
-
-namespace
-{
-
-class MessageLoopScope
-{
-  public:
-    MessageLoopScope  (size_t& in_counter) : counter (in_counter) { counter++; }
-    ~MessageLoopScope () { counter--; }
-    
-  private:
-    size_t& counter;
-};
-
-}
 
 /*
     Конструктор
@@ -99,18 +124,28 @@ void ApplicationImpl::Exit (int code)
 }
 
 /*
-    Обработка сообщений в очереди сообщений
+    Засыпание
 */
 
-void ApplicationImpl::DoNextEvent ()
+void ApplicationImpl::Suspend ()
 {
-  if (is_exit_detected)
-    return;
+  try
+  {
+    if (!suspend_handler ())
+      return;
 
-  MessageLoopScope scope (message_loop_count);
-  
-  Platform::DoNextEvent ();
+    if (!is_exit_detected)
+      Platform::WaitMessage ();
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
+
+/*
+    Обработка сообщений в очереди сообщений
+*/
 
 void ApplicationImpl::DoEvents ()
 {
@@ -118,6 +153,18 @@ void ApplicationImpl::DoEvents ()
 
   while (!Platform::IsMessageQueueEmpty () && !is_exit_detected)
     Platform::DoNextEvent ();
+
+  if (is_exit_detected)
+    return;
+
+  try
+  {
+    signals [ApplicationEvent_OnDoEvents] ();
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
 void ApplicationImpl::Run ()
@@ -132,8 +179,8 @@ void ApplicationImpl::Run ()
 
     if (signals [ApplicationEvent_OnIdle].empty ())
     {
-      if (!is_exit_detected)
-        Platform::WaitMessage ();
+      if (!is_exit_detected && Platform::IsMessageQueueEmpty ())
+        Suspend ();
     }
     else
     {
@@ -154,6 +201,11 @@ connection ApplicationImpl::RegisterEventHandler (ApplicationEvent event, const 
   return signals [event].connect (handler);
 }
 
+connection ApplicationImpl::RegisterSuspendHandler (const Application::SuspendHandler& handler)
+{
+  return suspend_handler.connect (handler);
+}
+
 /*
     Оповещение о событиях приложения
 */
@@ -166,11 +218,6 @@ void ApplicationImpl::Notify (ApplicationEvent event)
 /*
     Обёртки над вызовами
 */
-
-void Application::DoNextEvent ()
-{
-  ApplicationSingleton::Instance ().DoNextEvent ();
-}
 
 void Application::DoEvents ()
 {
@@ -200,6 +247,11 @@ int Application::GetExitCode ()
 connection Application::RegisterEventHandler (ApplicationEvent event, const EventHandler& handler)
 {
   return ApplicationSingleton::Instance ().RegisterEventHandler (event, handler);
+}
+
+connection Application::RegisterSuspendHandler (const SuspendHandler& handler)
+{
+  return ApplicationSingleton::Instance ().RegisterSuspendHandler (handler);
 }
 
 void Application::Sleep (size_t milliseconds)
