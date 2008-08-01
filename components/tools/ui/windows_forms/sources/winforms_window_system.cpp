@@ -13,14 +13,15 @@ namespace
 const char* INTERPERTER_NAME                          = "lua";                  //имя интерпретатора
 const char* FORM_LIBRARY_NAME                         = "Form";                 //имя библиотеки шлюзов формы
 const char* MAIN_FORM_LIBRARY_NAME                    = "MainForm";             //имя библиотеки шлюзов главной формы
-const char* MENU_STRIP_ITEM_LIBRARY_NAME              = "MenuItem";             //имя библиотеки элементов меню
-const char* MENU_STRIP_LIBRARY_NAME                   = "MenuStrip";            //имя библиотеки цепочек меню
-const char* TOOL_STRIP_BUTTON_LIBRARY_NAME            = "ToolButton";           //имя библиотеки кнопок
-const char* TOOL_STRIP_LIBRARY_NAME                   = "ToolStrip";            //имя библиотеки цепочек кнопок
-const char* MENU_STRIP_ITEM_COLLECTION_LIBRARY_NAME   = "MenuItemCollection";   //имя библиотеки коллекции элементов меню
-const char* MENU_STRIP_COLLECTION_LIBRARY_NAME        = "MenuStripCollection";  //имя библиотеки коллекции цепочек меню
-const char* TOOL_STRIP_BUTTON_COLLECTION_LIBRARY_NAME = "ToolButtonCollection"; //имя библиотеки коллекции кнопок
-const char* TOOL_STRIP_COLLECTION_LIBRARY_NAME        = "ToolStripCollection";  //имя библиотеки коллекции цепочек меню
+const char* CHILD_FORM_LIBRARY_NAME                   = "ChildForm";            //имя библиотеки шлюзов дочерних форм
+const char* MENU_STRIP_ITEM_LIBRARY_NAME              = "MenuItem";             //имя библиотеки шлюзов элементов меню
+const char* MENU_STRIP_LIBRARY_NAME                   = "MenuStrip";            //имя библиотеки шлюзов цепочек меню
+const char* TOOL_STRIP_BUTTON_LIBRARY_NAME            = "ToolButton";           //имя библиотеки шлюзов кнопок
+const char* TOOL_STRIP_LIBRARY_NAME                   = "ToolStrip";            //имя библиотеки шлюзов цепочек кнопок
+const char* MENU_STRIP_ITEM_COLLECTION_LIBRARY_NAME   = "MenuItemCollection";   //имя библиотеки шлюзов коллекции элементов меню
+const char* MENU_STRIP_COLLECTION_LIBRARY_NAME        = "MenuStripCollection";  //имя библиотеки шлюзов коллекции цепочек меню
+const char* TOOL_STRIP_BUTTON_COLLECTION_LIBRARY_NAME = "ToolButtonCollection"; //имя библиотеки шлюзов коллекции кнопок
+const char* TOOL_STRIP_COLLECTION_LIBRARY_NAME        = "ToolStripCollection";  //имя библиотеки шлюзов коллекции цепочек меню
 
 /*
     Враппер над очередью обработки сообщений Windows Forms
@@ -74,7 +75,8 @@ class MessageQueueWrapper
 WindowSystem::WindowSystem (IApplicationServer* server)
   : application_server (server),
     shell_environment (new script::Environment),
-    shell (INTERPERTER_NAME, shell_environment)
+    shell (INTERPERTER_NAME, shell_environment),
+    next_child_form_uid (0)
 {
   try
   {
@@ -84,7 +86,7 @@ WindowSystem::WindowSystem (IApplicationServer* server)
     
       //создание главной формы
       
-    main_form = MainForm::Create (*this);
+    main_form = tools::ui::windows_forms::MainForm::Create (*this);
 
     main_form->Show ();        
     
@@ -148,6 +150,46 @@ void WindowSystem::Execute (const char* command)
     exception.touch ("tools::ui::WindowSystem::Execute(const char*)");
     throw;
   }  
+}
+
+/*
+    Создание дочерней формы
+*/
+
+ChildForm::Pointer WindowSystem::CreateChildForm (const char* id, const char* init_string)
+{
+  try
+  {
+    if (!id)
+      throw xtl::make_null_argument_exception ("", "id");
+    
+    ChildForm::Pointer form = ChildForm::Create (*this, init_string);
+
+    child_forms.Register (id, form);
+
+    return form;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("tools::ui::windows_forms::WindowSystem::CreateChildForm");
+    throw;
+  }
+}
+
+ChildForm::Pointer WindowSystem::CreateChildForm (const char* init_string)
+{
+  try
+  {
+    if (++next_child_form_uid == 0)
+      throw xtl::format_operation_exception ("tools::ui::WindowSystem::CreateChildForm", "No free UID's");
+
+    return CreateChildForm (common::format ("Form%u", next_child_form_uid).c_str (), init_string);
+  }
+  catch (...)
+  {
+    --next_child_form_uid;    
+    throw;
+  }
 }
 
 /*
@@ -225,16 +267,17 @@ void WindowSystem::RegisterInvokers ()
 
       //регистрация шлюзов контролов
 
-    Form::RegisterInvokers                    (*shell_environment, FORM_LIBRARY_NAME);
-    MainForm::RegisterInvokers                (*shell_environment, MAIN_FORM_LIBRARY_NAME, FORM_LIBRARY_NAME);
-    MenuStripItem::RegisterInvokers           (*shell_environment, MENU_STRIP_ITEM_LIBRARY_NAME);
-    MenuStrip::RegisterInvokers               (*shell_environment, MENU_STRIP_LIBRARY_NAME);
-    MenuStripItemRegistry::RegisterInvokers   (*shell_environment, MENU_STRIP_ITEM_COLLECTION_LIBRARY_NAME);
-    MenuStripRegistry::RegisterInvokers       (*shell_environment, MENU_STRIP_COLLECTION_LIBRARY_NAME);
-    ToolStripButton::RegisterInvokers         (*shell_environment, TOOL_STRIP_BUTTON_LIBRARY_NAME);
-    ToolStrip::RegisterInvokers               (*shell_environment, TOOL_STRIP_LIBRARY_NAME);
-    ToolStripButtonRegistry::RegisterInvokers (*shell_environment, TOOL_STRIP_BUTTON_COLLECTION_LIBRARY_NAME);
-    ToolStripRegistry::RegisterInvokers       (*shell_environment, TOOL_STRIP_COLLECTION_LIBRARY_NAME);
+    Form::RegisterInvokers                               (*shell_environment, FORM_LIBRARY_NAME);
+    tools::ui::windows_forms::MainForm::RegisterInvokers (*shell_environment, MAIN_FORM_LIBRARY_NAME, FORM_LIBRARY_NAME);
+    ChildForm::RegisterInvokers                          (*shell_environment, CHILD_FORM_LIBRARY_NAME, FORM_LIBRARY_NAME);
+    MenuStripItem::RegisterInvokers                      (*shell_environment, MENU_STRIP_ITEM_LIBRARY_NAME);
+    MenuStrip::RegisterInvokers                          (*shell_environment, MENU_STRIP_LIBRARY_NAME);
+    MenuStripItemRegistry::RegisterInvokers              (*shell_environment, MENU_STRIP_ITEM_COLLECTION_LIBRARY_NAME);
+    MenuStripRegistry::RegisterInvokers                  (*shell_environment, MENU_STRIP_COLLECTION_LIBRARY_NAME);
+    ToolStripButton::RegisterInvokers                    (*shell_environment, TOOL_STRIP_BUTTON_LIBRARY_NAME);
+    ToolStrip::RegisterInvokers                          (*shell_environment, TOOL_STRIP_LIBRARY_NAME);
+    ToolStripButtonRegistry::RegisterInvokers            (*shell_environment, TOOL_STRIP_BUTTON_COLLECTION_LIBRARY_NAME);
+    ToolStripRegistry::RegisterInvokers                  (*shell_environment, TOOL_STRIP_COLLECTION_LIBRARY_NAME);
 
       //создание глобальной точки входа
 
@@ -247,11 +290,16 @@ void WindowSystem::RegisterInvokers ()
     lib.Register ("get_MenuStrips",  make_const (xtl::ref (menu_strips)));
     lib.Register ("get_ToolButtons", make_const (xtl::ref (tool_strip_buttons)));
     lib.Register ("get_ToolStrips",  make_const (xtl::ref (tool_strips)));
+    lib.Register ("get_Forms",       make_const (xtl::ref (child_forms)));
 
       //регистрация методов
 
     lib.Register ("LoadConfiguration", make_invoker<void (const char*)> (xtl::bind (&WindowSystem::LoadConfiguration, this, _1)));
     lib.Register ("Execute", make_invoker<void (const char*)> (xtl::bind (&IApplicationServer::ExecuteCommand, &*application_server, _1)));
+    lib.Register ("CreateForm", make_invoker (
+      make_invoker<void (const char*, const char*)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*)> (&WindowSystem::CreateChildForm), this, _1, _2)),
+      make_invoker<void (const char*)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*)> (&WindowSystem::CreateChildForm), this, _1))
+    ));
   }
   catch (xtl::exception& exception)
   {

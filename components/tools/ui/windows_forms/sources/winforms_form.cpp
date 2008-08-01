@@ -26,12 +26,12 @@ void Form::SetText (const char* text)
   if (!text)
     throw xtl::make_null_argument_exception ("tools::ui::windows_forms::Form::SetText", "text");
 
-  Handle ()->Text = gcnew String (text);
+  FormHandle ()->Text = gcnew String (text);
 }
 
 const char* Form::Text ()
 {
-  return get_string (Handle ()->Text, text);
+  return get_string (FormHandle ()->Text, text);
 }
 
 /*
@@ -40,22 +40,22 @@ const char* Form::Text ()
 
 void Form::Show ()
 {
-  Handle ()->Show ();
+  FormHandle ()->Show ();
 }
 
 void Form::Hide ()
 {
-  Handle ()->Hide ();
+  FormHandle ()->Hide ();
 }
 
 void Form::SetVisible (bool state)
 {
-  Handle ()->Visible = state;
+  FormHandle ()->Visible = state;
 }
 
 bool Form::IsVisible ()
 {
-  return Handle ()->Visible;
+  return FormHandle ()->Visible;
 }
 
 /*
@@ -65,12 +65,12 @@ bool Form::IsVisible ()
 void Form::SetMenuStrip (tools::ui::windows_forms::MenuStrip* in_menu_strip)
 {
   if (menu_strip)
-    Handle ()->Controls->Remove (menu_strip->Handle ());
+    FormHandle ()->Controls->Remove (menu_strip->Handle ());
 
   menu_strip = in_menu_strip;
 
   if (menu_strip)
-    Handle ()->Controls->Add (menu_strip->Handle ());
+    FormHandle ()->Controls->Add (menu_strip->Handle ());
 }
 
 /*
@@ -82,7 +82,7 @@ void Form::Insert (windows_forms::ToolStrip* tool_strip)
   if (!tool_strip)
     throw xtl::make_null_argument_exception ("tools::ui::Form::Insert(tools::ui::windows_forms::ToolStrip*)", "tool_strip");
     
-  Handle ()->Controls->Add (tool_strip->Handle ());
+  FormHandle ()->Controls->Add (tool_strip->Handle ());
 }
 
 void Form::Remove (windows_forms::ToolStrip* tool_strip)
@@ -90,7 +90,16 @@ void Form::Remove (windows_forms::ToolStrip* tool_strip)
   if (!tool_strip)
     return;
     
-  Handle ()->Controls->Add (tool_strip->Handle ());
+  FormHandle ()->Controls->Add (tool_strip->Handle ());
+}
+
+/*
+    Низкоуровневый дескриптор окна
+*/
+
+const void* Form::WindowHandle ()
+{
+  return (const void*)FormHandle ()->Handle;
 }
 
 /*

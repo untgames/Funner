@@ -16,59 +16,29 @@ namespace ui
 namespace windows_forms
 {
 
-private ref class TestForm: public WeifenLuo::WinFormsUI::DockContent
-{
-  public:
-    TestForm ()
-    {
-      InitializeComponent ();
-    }
-    
-  private:
-    void InitializeComponent ()
-    {
-      Text        = "Fucking dock!";
-      ShowHint    = WeifenLuo::WinFormsUI::DockState::DockRight/*AutoHide*/;
-      HideOnClose = true;
-    }    
-};
-
 private ref class MainFormImpl: public System::Windows::Forms::Form
 {
   public:
 ///Конструктор
     MainFormImpl ()
     {
-      InitializeComponent ();
-      IsMdiContainer = true;      
-    }
-
-///Деструктор
-    ~MainFormImpl ()
-    {
-    }
-    
-    void InitializeComponent ()
-    {
       dock_panel = gcnew WeifenLuo::WinFormsUI::DockPanel;
-      
+
       SuspendLayout ();
 
       dock_panel->ActiveAutoHideContent = nullptr;
       dock_panel->Dock                  = System::Windows::Forms::DockStyle::Fill;
 
       Controls->Add (dock_panel);
-      
-      form = gcnew TestForm;      
 
-      form->Show (dock_panel);
-
-      ResumeLayout ();
+      ResumeLayout ();      
     }
+    
+///Стыковочная панель
+    WeifenLuo::WinFormsUI::DockPanel^ DockPanel () { return dock_panel; }
 
   private:
     WeifenLuo::WinFormsUI::DockPanel^ dock_panel; //стыковочная панель
-    TestForm^                         form;
 };
 
 }
@@ -101,10 +71,21 @@ MainForm::Pointer MainForm::Create (tools::ui::windows_forms::WindowSystem& wind
 }
 
 /*
+    Добавление дочерней формы
+*/
+
+void MainForm::Insert (WeifenLuo::WinFormsUI::DockContent^ sub_form)
+{
+  sub_form->Show (form->DockPanel ());
+  
+  form->Controls->Add (sub_form);
+}
+
+/*
     Получение ref-указателя формы
 */
 
-System::Windows::Forms::Form^ MainForm::Handle ()
+System::Windows::Forms::Form^ MainForm::FormHandle ()
 {
   return form;
 }

@@ -9,6 +9,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
+#include <xtl/implicit_cast.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/shared_ptr.h>
@@ -57,6 +58,7 @@ class WindowSystem;
 #include "menu.h"
 #include "form.h"
 #include "main_form.h"
+#include "child_form.h"
 #include "control_registry.h"
 #include "windows_system.h"
 #include "configuration_parser.h"

@@ -40,6 +40,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     void UnregisterPropertyListener     (const char* name_wc_mask, IPropertyListener* listener) {}
     void UnregisterAllPropertyListeners (const char* name_wc_mask) {}
     void UnregisterAllPropertyListeners () {}
+    ICustomChildWindow* CreateChildWindow (const char* init_string) { return 0; }
 
     void AddRef  () { addref (this); }
     void Release () { release (this); }

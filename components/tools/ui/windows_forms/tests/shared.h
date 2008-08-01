@@ -23,32 +23,76 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
 {
   public:
 ///Конструктор
-    MyChildWindow (const void* parent_window_handle) : window (syslib::WindowStyle_PopUp)
-    {
-    }
-
-///Получение низкоуровневого дескриптора окна
-    const void* GetHandle ()
-    {
-      return window.Handle ();
-    }
+    MyChildWindow () : window (syslib::WindowStyle_PopUp) {}    
 
 ///Изменение положения окна
     void SetPosition (size_t x, size_t y)
     {
-      window.SetPosition (x, y);
+      try
+      {
+        window.SetPosition (x, y);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("MyChildWindow::SetPosition");
+        throw;
+      }
     }
 
 ///Изменение размеров окна
     void SetSize (size_t width, size_t height)
     {
-      window.SetSize (width, height);
+      try
+      {
+        window.SetSize (width, height);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("MyChildWindow::SetSize");
+        throw;
+      }
+    }
+    
+///Установка родительского окна
+    void SetParent (const void* parent_window_handle)
+    {
+      try
+      {
+        window.SetParentHandle (parent_window_handle);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("MyChildWindow::SetParent");
+        throw;
+      }
+    }    
+    
+///Управление видимостью окна
+    void Show (bool state)
+    {
+      try
+      {
+        window.SetVisible (state);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("MyChildWindow::Show");
+        throw;
+      }
     }
 
 ///Обновить содержимое окна
     void Update ()
     {
-      window.Invalidate ();
+      try
+      {
+        window.Invalidate ();
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("MyChildWindow::Update");
+        throw;
+      }
     }
 
 ///Подсчёт ссылок
@@ -121,9 +165,9 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterAllPropertyListeners");    
     }
     
-    ICustomChildWindow* CreateChildWindow (const char* init_string, const void* parent_window_handle)
+    ICustomChildWindow* CreateChildWindow (const char* init_string)
     {
-      return new MyChildWindow (parent_window_handle);
+      return new MyChildWindow;
     }
 
     void AddRef  () { addref (this); }
