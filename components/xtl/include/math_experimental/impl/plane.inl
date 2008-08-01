@@ -1,42 +1,67 @@
-template<class T>
-plane<T>::plane()
+/*
+	Конструкторы
+*/
+template<class T,size_t Size>
+inline plane<T,Size>::plane()
 {
-  control_point=point<T>(0,0,0);
-  normal_vector=vec<T,3>(0,0,0);
+  control_point=vec<T,Size>(0);
+  normal_vector=vec<T,Size>(0);
 
 }
 
-template<class T>
-plane<T>::plane(const vec<T,3>& normal, const point<T>& control)
+template<class T,size_t Size>
+inline plane<T,Size>::plane(const vec<T,Size>& normal_vec, const vec<T,Size>& control_pnt)
 {
-  normal_vector=normal;
-  control_point=control;
+  normal_vector=normal_vec;
+  control_point=control_pnt;
 }
 
-template<class T>
-plane<T>::plane(const point<T>& p1, const point<T>& p2, const point<T>& p3)
+template<class T,size_t Size>
+inline plane<T,Size>::plane(const vec<T,Size>& point1, const vec<T,Size>& point2, const vec<T,Size>& point3)
 {
-  normal_vector=create_vector(p1,p2)^create_vector(p2,p3);
+  normal_vector=(point1-point2)^(point2-point3);
   control_point=p1;
 }
 
-template<class T>
-plane<T>::plane(const vec<T,3>& v1, const vec<T,3>& v2, const point<T> p)
+template<class T,size_t Size>
+inline plane<T,Size>::plane(const vec<T,Size>& vec1, const vec<T,Size>& vec2, const vec<T,Size>& point)
 {
-  normal_vector=v1^v2;
-  control_point=p;
+  normal_vector=vec1^vec2;
+  control_point=point;
 }
 
-template<class T>
-plane<T>::plane(const point<T>& p1, const point<T>& p2,const vec<T,3> v)
+template<class T,size_t Size>
+inline plane<T,Size>::plane(const vec<T,Size>& point1, const vec<T,Size>& point2,const vec<T,Size>& vec)
 {
-  normal_vector=create_vector(p1,p2)^v;
-  control_point=p1;
+  normal_vector=(point1-point2)^vec;
+  control_point=point1;
 }
 
-template<class T>
-plane<T>::plane(const plane<T>& p)
+template<class T,size_t Size>
+inline plane<T,Size>::plane(const plane<T,Size>& p)
 {
-  normal_vector=p.get_vector();
-  control_point=p.get_point();
+  normal_vector=p.get_normal_vector();
+  control_point=p.get_control_point();
 }
+
+/*
+	Утилиты
+*/
+template<class T,size_t Size>
+inline T& distance(const plane<T,Size>& pl, const vec<T,Size>& point, plane<T,Size>::Side& s)
+{
+  T dist((pl.get_normal_vector()&point)/point.length());
+  if (dist>T(0))  s=plane<T,Size>::Side::positive;
+  if (dist<T(0))  s=plane<T,Size>::Side::negative;
+  if (dist==T(0)) s=plane<T,Size>::Side::zero;
+  return abs(dist);
+}
+
+template<class T,size_t Size>
+inline T& distance(const plane<T,Size>& pl, const vec<T,Size>& point)
+{
+  T dist(pl.get_normal_vector()*point/point.length());
+  return abs(dist);
+}
+
+

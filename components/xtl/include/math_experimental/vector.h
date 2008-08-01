@@ -204,7 +204,7 @@ const vec<T,Size> max (const vec<T,Size>& a,const vec<T,Size>& b);
 ///”гол между векторами
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T,size_t Size>
-const T angle (const vec<T, Size>& a, const vec<T, Size>& b);
+const T angle     (const vec<T, Size>& a, const vec<T, Size>& b);
 
 /*
 	ќсновные типы

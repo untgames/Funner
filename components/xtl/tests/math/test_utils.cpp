@@ -2,6 +2,7 @@
 #include <math_experimental/quat.h>
 #include <math_experimental/vector.h>
 #include <math_experimental/matrix.h>
+#include <math_experimental/plane.h>
 #include <math_experimental/utils.h>
 #include <stdio.h>
 
@@ -23,7 +24,12 @@ int main()
                 (mat3f) (matrix3_rotate (float(90.0),V ) ) );
   matrix_print("Matrix scale (from vector (0,1,0) )",
                 (mat3f) (matrix3_scale  (V) )  );
-
+  
+  plane3f p1(vec3f(0,0,1));
+  plane_print("Plane p1",p1);
+  vec3f(1,0,1);
+  vec_print("Vector v1= ",v1);
+  vec_print("Projection v1 on p1:",vec3f(vec_project(p1,v1)));
   return 0;
 
 }

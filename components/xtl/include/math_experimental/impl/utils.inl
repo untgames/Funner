@@ -90,7 +90,6 @@ void axis_angle_to_quat (const T& angle,const T& axis_x,const T& axis_y,const T&
   res.w = cos (half_angle);
 }
 
-
 template <class T> 
 inline const quat<T> euler_angle_to_quat (const T& pitch,const T& yaw,const T& roll)
 {
@@ -359,4 +358,12 @@ inline void matrix3_rotate (const T& angle,const vec<T,3>& axis,matrix<T,4>& res
   res [1][3] = 0;
   res [2][3] = 0;
   res [3][3] = 1;
+}
+
+template<class T,size_t Size>
+const vec<T,Size> vec_project(const plane<T,Size>& pl, const vec<T,Size>& v)
+{
+  if (!angle(pl.get_normal_vector(),v)) return vec<T,Size> (0);
+  return matrix_to_quat(matrix3_rotate(angle(pl.get_normal_vector(),v),pl.get_normal_vector()^v))*v;
+  
 }

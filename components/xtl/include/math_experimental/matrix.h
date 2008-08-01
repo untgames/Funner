@@ -151,10 +151,10 @@ matrix<T, Size>&       operator /= (matrix<T, Size>& left, const matrix<T, Size>
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 template <class T>
-const quat<T> matrix_to_quat (const matrix<T, 3>& m);
+const quat<T> matrix_to_quat (const matrix<T,3>& m);
 
 template <class T>
-const quat<T> matrix_to_quat (const matrix<T, 4>& m);
+const quat<T> matrix_to_quat (const matrix<T,4>& m);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////

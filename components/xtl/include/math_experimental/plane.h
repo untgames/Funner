@@ -1,10 +1,11 @@
 #ifndef MATHLIB_PLANE_HEADER
 #define MATHLIB_PLANE_HEADER
 
-#include <math_experimental/forward.h>
+#include "forward.h"
 #include "vector.h"
 #include "functional.h"
 #include <stddef.h>
+#include <math.h>
 #ifdef _MSC_VER
   #pragma pack (push,1)
 #endif
@@ -12,79 +13,77 @@
 namespace math
 {
 
-//Точка
-template <class Type>
-class point
+//Плоскость
+template<class Type,size_t Size>
+class plane
 {
  public:
+
   typedef Type type;
-  
-  enum {size=3};
+  enum {size=Size};
+  typedef vec<type,size> value_vec;
+
+  enum Side {
+   positive=1,
+   negative=-1,
+   zero=0
+  };
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   //Конструкторы
   ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-  point();
-  point(const type& x_, const type& y_, const type& z_=T(0));
-  point(const point<type>& p);
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-  //Индексация (для совместимости с функционалами)
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-        type& operator [](size_t index)       {return (&x) [index]; }
-  const	type& operator [](size_t index) const {return (&x) [index]; }
+  plane();//по умолчанию
+  plane(const value_vec& normal_vec, const value_vec& control_pnt=value_vec(0));//через точку и нормальный вектор
+  plane(const value_vec& point1, const value_vec& point2, const value_vec& point3);//через три точки
+  plane(const value_vec& vec1, const value_vec& vec2, const value_vec& point);//через две пересекающиеся прямые
+  plane(const value_vec& point1, const value_vec& point2, const value_vec& vec);//через две параллельные прямые
+  plane(const plane<type>& pl);//копирование
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////
-  //Бинарные операторы
+  //Возврат значений
   ///////////////////////////////////////////////////////////////////////////////////////////////////
+  const value_vec& get_normal_vector () const {return normal_vector; }
+  const value_vec& get_control_point () const {return control_point; }
 
-  point<type>& move (const type& x_, const type& y_, const type& z_);
-  point<type>& operator= (const point<type>& p);
+
 
  private:
-  type x, y, z;
+  value_vec control_point;
+  value_vec normal_vector;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //Утилиты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//Создание вектора
-template<class T>
-const vec<T,3> create_vector(const point<T>& p1,const point<T>& p2);
+//Расстояние до точки
+template<class T,size_t Size>
+T& distance(const plane<T,Size>& pl, const vec<T,Size>& point, plane<T,Size>::Side& s);
 
-//Плоскость
-template<class Type>
-class plane
-{
-  public:
+template<class T,size_t Size>
+T& distance(const plane<T,Size>& pl, const vec<T,Size>& point);
 
-  typedef Type type;
+/*
+	Основные типы
+*/
+typedef plane<float,3>              plane3f;
+typedef plane<double,3>             plane3d;
+typedef plane<int,3>                plane3i;
+typedef plane<unsigned int,3>       plane3ui;
+typedef plane<short,3>              plane3s;
+typedef plane<unsigned short,3>     plane3us;
+typedef plane<char,3>               plane3b;
+typedef plane<unsigned char,3>      plane3ub;
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-  //Конструкторы
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-  plane();//по умолчанию
-  plane(const vec<type,3>& normal, const point<type>& control=point<type>(0,0,0));//через точку и нормальный вектор
-  plane(const point<type>& p1, const point<type>& p2, const point<type>& p3);//через три точки
-  plane(const vec<type,3>& v1, const vec<type,3>& v2, const point<type> p);//через две пересекающиеся прямые
-  plane(const point<type>& p1, const point<type>& p2,const vec<type,3> v);//через две параллельные прямые
-  plane(const plane<type>& p);//копирование
+typedef plane<float,4>              plane4f;
+typedef plane<double,4>             plane4d;
+typedef plane<int,4>                plane4i;
+typedef plane<unsigned int,4>       plane4ui;
+typedef plane<short,4>              plane4s;
+typedef plane<unsigned short,4>     plane4us;
+typedef plane<char,4>               plane4b;
+typedef plane<unsigned char,4>      plane4ub;
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-  //Возврат значений
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-  const vec<type,3>& get_vector() const {return normal_vector; }
-  const point<type>& get_point () const {return control_point; }
-
-  private:
-  point<type> control_point;
-  vec<type,3> normal_vector;
-};
-
-#include "impl/point.inl"
 #include "impl/plane.inl"
 
 #ifdef _MSC_VER

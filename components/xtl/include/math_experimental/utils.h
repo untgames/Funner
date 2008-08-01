@@ -55,6 +55,12 @@ template <class T> const matrix<T,3> matrix3_rotate   (const T& angle,const vec<
 template <class T> void              matrix4_rotate   (const T& angle,const vec<T,3>& axis,matrix<T,4>& res);
 template <class T> void              matrix3_rotate   (const T& angle,const vec<T,3>& axis,matrix<T,3>& res);
 
+////////////////////////////////////////////////////////////////////////////////////////////
+///Проектирование вектора на плоскость
+////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class T,size_t Size> const vec<T,Size> vec_project(const plane<T,Size>& pl, const vec<T,Size>& v);
+
 #include <math_experimental/impl/utils.inl>
 
 #ifdef _MSC_VER
