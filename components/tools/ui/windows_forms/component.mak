@@ -13,7 +13,8 @@ TOOLS.UI.WINDOWS_FORMS.SOURCES.LIBS             :=
 TOOLS.UI.WINDOWS_FORMS.SOURCES.DLL_DIRS         := ../../../../extern/windows_controls/bin
 TOOLS.UI.WINDOWS_FORMS.SOURCES.COMPILER_CFLAGS  := 
 TOOLS.UI.WINDOWS_FORMS.SOURCES.COMPILER_DEFINES := 
-TOOLS.UI.WINDOWS_FORMS.SOURCES.IMPORTS			    := ../core/compile.static.mak ../../../script/core/compile.static.mak ../../../common/compile.static.mak
+TOOLS.UI.WINDOWS_FORMS.SOURCES.IMPORTS			    := ../core/compile.static.mak ../../../script/core/compile.static.mak\
+                                                   ../../../common/compile.static.mak ../../../system/compile.static.mak
 TOOLS.UI.WINDOWS_FORMS.SOURCES.msvc.COMPILER_CFLAGS := -clr -wd4793 -wd4503
 
 #Öåëü ¹2 - Tool UI core tests
@@ -26,4 +27,3 @@ TOOLS.UI.WINDOWS_FORMS.TESTS.COMPILER_CFLAGS  :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.COMPILER_DEFINES :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.IMPORTS          := ../core/compile.static.mak link.static.mak ../../../system/compile.static.mak \
                                                  ../../../system/link.static.mak ../../../script/core/lua.link.static.mak
-TOOLS.UI.WINDOWS_FORMS.TESTS.msvc.COMPILER_CFLAGS := -clr -wd4793

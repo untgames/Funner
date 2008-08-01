@@ -3,14 +3,15 @@
 using namespace tools::ui;
 using namespace tools::ui::windows_forms;
 
+namespace
+{
+
 /*
      онстанты
 */
 
-namespace
-{
-
 const char* INTERPERTER_NAME                          = "lua";                  //им€ интерпретатора
+const char* MAIN_FORM_LIBRARY_NAME                    = "MainForm";             //им€ библиотеки шлюзов главной формы
 const char* MENU_STRIP_ITEM_LIBRARY_NAME              = "MenuItem";             //им€ библиотеки элементов меню
 const char* MENU_STRIP_LIBRARY_NAME                   = "MenuStrip";            //им€ библиотеки цепочек меню
 const char* TOOL_STRIP_BUTTON_LIBRARY_NAME            = "ToolButton";           //им€ библиотеки кнопок
@@ -19,6 +20,49 @@ const char* MENU_STRIP_ITEM_COLLECTION_LIBRARY_NAME   = "MenuItemCollection";   
 const char* MENU_STRIP_COLLECTION_LIBRARY_NAME        = "MenuStripCollection";  //им€ библиотеки коллекции цепочек меню
 const char* TOOL_STRIP_BUTTON_COLLECTION_LIBRARY_NAME = "ToolButtonCollection"; //им€ библиотеки коллекции кнопок
 const char* TOOL_STRIP_COLLECTION_LIBRARY_NAME        = "ToolStripCollection";  //им€ библиотеки коллекции цепочек меню
+
+/*
+    ¬раппер над очередью обработки сообщений Windows Forms
+*/
+
+class MessageQueueWrapper
+{
+  public:
+    static void RegisterWrapper   () { RegisterWrapper (true); }    
+    static void UnregisterWrapper () { RegisterWrapper (false); }
+
+  private:
+    MessageQueueWrapper ()
+      : on_do_events_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnDoEvents, &MessageQueueWrapper::DoEvents)) {}  
+  
+    static void DoEvents ()
+    {
+      System::Windows::Forms::Application::DoEvents ();
+    }
+
+    static void RegisterWrapper (bool state)
+    {
+      static stl::auto_ptr<MessageQueueWrapper> current_wrapper        = 0; //указатель на текущий враппер
+      static size_t                             current_register_count = 0; //количество регистраций
+
+      if (state)
+      {
+        if (!current_register_count++)
+          current_wrapper = new MessageQueueWrapper;
+      }
+      else
+      {
+        if (!current_register_count)
+          return;
+
+        if (!--current_register_count)
+          current_wrapper = 0;
+      }
+    }
+
+  private:
+    xtl::connection on_do_events_connection; //соединение с сигналом обработки событий нити
+};
 
 }
 
@@ -33,11 +77,15 @@ WindowSystem::WindowSystem (IApplicationServer* server)
 {
   try
   {
+      //регистраци€ очереди обработки сообщений Window Forms
+      
+    MessageQueueWrapper::RegisterWrapper ();
+    
       //создание главной формы
+      
+    main_form = MainForm::Create (*this);
 
-    main_form = create_main_form (*this);
-
-    main_form->Show ();    
+    main_form->Show ();        
     
       //регистраци€ шлюзов
       
@@ -52,6 +100,9 @@ WindowSystem::WindowSystem (IApplicationServer* server)
 
 WindowSystem::~WindowSystem ()
 {
+    //отмена регистрации очереди обработки сообщений Windows Forms
+
+  MessageQueueWrapper::UnregisterWrapper ();
 }
 
 /*
@@ -173,7 +224,7 @@ void WindowSystem::RegisterInvokers ()
 
       //регистраци€ шлюзов контролов
 
-    Form::RegisterInvokers                    (*shell_environment);
+    MainForm::RegisterInvokers                (*shell_environment, MAIN_FORM_LIBRARY_NAME);
     MenuStripItem::RegisterInvokers           (*shell_environment, MENU_STRIP_ITEM_LIBRARY_NAME);
     MenuStrip::RegisterInvokers               (*shell_environment, MENU_STRIP_LIBRARY_NAME);
     MenuStripItemRegistry::RegisterInvokers   (*shell_environment, MENU_STRIP_ITEM_COLLECTION_LIBRARY_NAME);

@@ -7,6 +7,7 @@
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
@@ -16,6 +17,8 @@
 #include <common/file.h>
 #include <common/parser.h>
 #include <common/strlib.h>
+
+#include <syslib/application.h>
 
 #include <script/shell.h>
 #include <script/environment.h>
@@ -52,7 +55,7 @@ class WindowSystem;
 #include "auto_string.h"
 #include "event_handler.h"
 #include "menu.h"
-#include "form.h"
+#include "main_form.h"
 #include "control_registry.h"
 #include "windows_system.h"
 #include "configuration_parser.h"

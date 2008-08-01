@@ -60,7 +60,7 @@ class WindowSystem: public ICustomWindowSystem, public xtl::reference_counter
 
   private:
     ApplicationServerPtr    application_server; //сервер приложения
-    Form::Pointer           main_form;          //главная форма приложения
+    MainForm::Pointer       main_form;          //главная форма приложения
     ShellEnvironmentPtr     shell_environment;  //окружение скриптовой среды
     script::Shell           shell;              //скриптовый интерпретатор
     MenuStripItemRegistry   menu_strip_items;   //реестр элементов меню
