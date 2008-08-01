@@ -22,11 +22,11 @@ struct WindowImpl
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data) : 
       user_data (in_user_data), message_handler (handler) {}
   
-  void Notify (WindowEvent event, const WindowEventContext& context)
+  void Notify (Platform::window_t window, WindowEvent event, const WindowEventContext& context)
   {
     try
     {
-      message_handler (event, context, user_data);
+      message_handler (window, event, context, user_data);
     }
     catch (...)
     {
@@ -132,7 +132,8 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 {
     //получение указател€ на пользовательские данные
     
-  WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+  WindowImpl*        impl          = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+  Platform::window_t window_handle = (Platform::window_t)wnd;
 
     //если указатель на пользовательские данные не установлен - делаем попытку его установить
     
@@ -159,7 +160,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       
       context.handle = wnd;
 
-      impl->Notify (WindowEvent_OnChangeHandle, context);      
+      impl->Notify (window_handle, WindowEvent_OnChangeHandle, context);      
 
       return 0;
     }
@@ -177,8 +178,8 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     
   switch (message)
   {
-    case WM_DESTROY: //уничтожение окна
-      impl->Notify (WindowEvent_OnDestroy, context);
+    case WM_DESTROY: //уничтожение окна    
+      impl->Notify (window_handle, WindowEvent_OnDestroy, context);      
 
       delete impl;
      
@@ -186,29 +187,29 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       return 0;
     case WM_CLOSE: //попытка закрыти€ окна
-      impl->Notify (WindowEvent_OnClose, context);
+      impl->Notify (window_handle, WindowEvent_OnClose, context);
       return 0;
     case WM_ACTIVATE: //активаци€/деактиваци€ окна
       switch (wparam)
       {
         case WA_ACTIVE:
         case WA_CLICKACTIVE:
-          impl->Notify (WindowEvent_OnActivate, context);
+          impl->Notify (window_handle, WindowEvent_OnActivate, context);
           break;
         case WA_INACTIVE:
-          impl->Notify (WindowEvent_OnDeactivate, context);
+          impl->Notify (window_handle, WindowEvent_OnDeactivate, context);
           break;
       }
 
       return 0;
     case WM_SHOWWINDOW: //изменение видимости
-      impl->Notify (wparam ? WindowEvent_OnShow : WindowEvent_OnHide, context);
+      impl->Notify (window_handle, wparam ? WindowEvent_OnShow : WindowEvent_OnHide, context);
       return 0;
     case WM_SETFOCUS: //получение фокуса ввода
-      impl->Notify (WindowEvent_OnSetFocus, context);
+      impl->Notify (window_handle, WindowEvent_OnSetFocus, context);
       return 0;
     case WM_KILLFOCUS: //потер€ фокуса ввода
-      impl->Notify (WindowEvent_OnLostFocus, context);
+      impl->Notify (window_handle, WindowEvent_OnLostFocus, context);
       return 0;
     case WM_PAINT: //необходима перерисовка
     {
@@ -216,68 +217,68 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       BeginPaint (wnd, &ps);
 
-      impl->Notify (WindowEvent_OnPaint, context);
+      impl->Notify (window_handle, WindowEvent_OnPaint, context);
 
       EndPaint (wnd, &ps);
 
       return 0;
     }
     case WM_SIZE: //изменение размеров окна
-      impl->Notify (WindowEvent_OnSize, context);
+      impl->Notify (window_handle, WindowEvent_OnSize, context);
       return 0;
     case WM_MOVE: //изменение положени€ окна
-      impl->Notify (WindowEvent_OnMove, context);
+      impl->Notify (window_handle, WindowEvent_OnMove, context);
       return 0;
     case WM_MOUSEMOVE: //изменение положени€ курсора над областью окна
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (WindowEvent_OnMouseMove, context);      
+      impl->Notify (window_handle, WindowEvent_OnMouseMove, context);      
       return 0;
     case WM_MOUSEWHEEL: //изменилось положение вертикального колеса мыши
       context.mouse_vertical_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
       
-      impl->Notify (WindowEvent_OnMouseVerticalWheel, context);
+      impl->Notify (window_handle, WindowEvent_OnMouseVerticalWheel, context);
       return 0;
     case WM_MOUSEHWHEEL: //изменилось положение горизонтального колеса мыши
       context.mouse_horisontal_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
-      impl->Notify (WindowEvent_OnMouseHorisontalWheel, context);
+      impl->Notify (window_handle, WindowEvent_OnMouseHorisontalWheel, context);
       return 0;
     case WM_LBUTTONDOWN: //нажата лева€ кнопка мыши
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (WindowEvent_OnLeftButtonDown, context);
+      impl->Notify (window_handle, WindowEvent_OnLeftButtonDown, context);
       return 0;
     case WM_LBUTTONUP: //отпущена лева€ кнопка мыши
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (WindowEvent_OnLeftButtonUp, context);
+      impl->Notify (window_handle, WindowEvent_OnLeftButtonUp, context);
       return 0;
     case WM_LBUTTONDBLCLK: //двойной щелчок левой кнопкой мыши
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (WindowEvent_OnLeftButtonDoubleClick, context);
+      impl->Notify (window_handle, WindowEvent_OnLeftButtonDoubleClick, context);
       return 0;
     case WM_RBUTTONDOWN: //нажата права€ кнопка мыши
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (WindowEvent_OnRightButtonDown, context);
+      impl->Notify (window_handle, WindowEvent_OnRightButtonDown, context);
       return 0;
     case WM_RBUTTONUP: //отпущена права€ кнопка мыши
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (WindowEvent_OnRightButtonUp, context);
+      impl->Notify (window_handle, WindowEvent_OnRightButtonUp, context);
       return 0;
     case WM_RBUTTONDBLCLK: //двойной щелчок правой кнопкой мыши
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (WindowEvent_OnRightButtonDoubleClick, context);
+      impl->Notify (window_handle, WindowEvent_OnRightButtonDoubleClick, context);
       return 0;
     case WM_XBUTTONDOWN: //нажата X кнопка мыши
     {
@@ -293,7 +294,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (event, context);      
+      impl->Notify (window_handle, event, context);      
 
       return 1;
     }
@@ -311,7 +312,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (event, context);      
+      impl->Notify (window_handle, event, context);      
 
       return 1;
     }    
@@ -329,7 +330,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (event, context);      
+      impl->Notify (window_handle, event, context);      
 
       return 1;
     }    
@@ -337,35 +338,35 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (WindowEvent_OnMiddleButtonDown, context);
+      impl->Notify (window_handle, WindowEvent_OnMiddleButtonDown, context);
       return 0;
     case WM_MBUTTONUP: //отпущена средн€€ кнопка мыши
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (WindowEvent_OnMiddleButtonUp, context);            
+      impl->Notify (window_handle, WindowEvent_OnMiddleButtonUp, context);            
       return 0;
     case WM_MBUTTONDBLCLK: //двойной щелчок средней кнопкой мыши
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
     
-      impl->Notify (WindowEvent_OnMiddleButtonDoubleClick, context);
+      impl->Notify (window_handle, WindowEvent_OnMiddleButtonDoubleClick, context);
       return 0;
     case WM_KEYDOWN: //нажата клавиша клавиатуры
       context.key           = VirtualKey2SystemKey (wparam);
       context.key_scan_code = GetScanCode (lparam);
       
-      impl->Notify (WindowEvent_OnKeyDown, context);
+      impl->Notify (window_handle, WindowEvent_OnKeyDown, context);
       return 0;
     case WM_KEYUP: //отпущена клавиша клавиатуры
       context.key           = VirtualKey2SystemKey (wparam);
       context.key_scan_code = GetScanCode (lparam);
 
-      impl->Notify (WindowEvent_OnKeyUp, context);
+      impl->Notify (window_handle, WindowEvent_OnKeyUp, context);
       return 0;
     case WM_CHAR: //в буфере окна по€вилс€ символ
       mbtowc (&context.char_code, (char*)&wparam, 1);
-      impl->Notify (WindowEvent_OnChar, context);
+      impl->Notify (window_handle, WindowEvent_OnChar, context);
       return 0;
   }
 
@@ -413,7 +414,7 @@ void RegisterWindowClass ()
 
 #undef CreateWindow
 
-Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, void* user_data)
 {
     //определене стил€ окна
     
@@ -423,9 +424,13 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
   {
     case WindowStyle_Overlapped:
       win_style = WS_OVERLAPPEDWINDOW;
+
+      if (parent)
+        win_style |= WS_CHILD;        
+
       break;
     case WindowStyle_PopUp:
-      win_style = WS_POPUP;
+      win_style = parent ? WS_CHILD : WS_POPUP;
       break;
     default:
       throw xtl::make_argument_exception ("syslib::Win32Platform::CreateWindow", "style", style);
@@ -455,13 +460,10 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
     try
     {    
       HWND wnd = CreateWindowA (WINDOW_CLASS_NAME, "", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                                0, 0, GetApplicationInstance (), window_impl);
-                                  
+                                (HWND)parent, 0, GetApplicationInstance (), window_impl);
+
       if (!wnd)
         raise_error ("::CreateWindow");
-
-//      ShowWindow   (wnd, SW_SHOW);
-//      check_errors ("::ShowWindow");
 
       if (!UpdateWindow (wnd))
         raise_error ("::UpdateWindow");
@@ -502,10 +504,10 @@ void Platform::DestroyWindow (window_t handle)
 {
   try
   {
-    HWND wnd = (HWND)handle;
+    HWND wnd = (HWND)handle;        
 
-   if (!::DestroyWindow (wnd))
-      raise_error ("::DestroyWindow");
+    if (!::DestroyWindow (wnd))
+      raise_error ("::DestroyWindow");                  
   }
   catch (xtl::exception& exception)
   {
@@ -696,7 +698,7 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
       {
         bool result = (GetWindowLong (wnd, GWL_STYLE) & WS_VISIBLE) != 0;
         
-        check_errors ("::GetWindowLong");
+//        check_errors ("::GetWindowLong");        
 
         return result;
       }
@@ -728,6 +730,41 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
   }  
 
   return false;
+}
+
+/*
+    ”становка родительского окна
+*/
+
+void Platform::SetParentWindow (window_t child, window_t parent)
+{
+  try
+  {
+    if (!SetParent ((HWND)child, (HWND)parent))
+      raise_error ("::SetParent");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::SetParentWindow");
+    throw;
+  }
+}
+
+Platform::window_t Platform::GetParentWindow (window_t child)
+{
+  try
+  {
+    HWND parent = GetParent ((HWND)child);
+    
+    check_errors ("::GetParent");
+
+    return (window_t)parent;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::GetParentWindow");
+    throw;
+  }
 }
 
 /*

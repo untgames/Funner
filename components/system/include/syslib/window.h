@@ -1,7 +1,7 @@
 #ifndef SYSLIB_WINDOW_HEADER
 #define SYSLIB_WINDOW_HEADER
 
-#include <cstddef>
+#include <stl/auto_ptr.h>
 
 #include <xtl/functional_fwd>
 #include <xtl/exception.h>
@@ -218,6 +218,12 @@ class Window
     const void* Handle () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дескриптор родительского окна
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetParentHandle (const void* handle);
+    const void* ParentHandle    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (Window&, WindowEvent, const WindowEventContext&)> EventHandler;
@@ -233,19 +239,12 @@ class Window
     const LogHandler& DebugLog    () const;
 
   private:
-    const void* CheckedHandle  () const;
-    void        SetHandle      (const void* handle);
-    void        Notify         (WindowEvent, const WindowEventContext&);
-    void        Notify         (WindowEvent);
-    static void MessageHandler (WindowEvent, const WindowEventContext&, void*);
-
-  private:
     Window (const Window&); //no impl
     Window& operator = (const Window&); //no impl
 
   private:
     struct Impl;
-    Impl* impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 #include <syslib/detail/window.inl>

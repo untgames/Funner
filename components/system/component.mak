@@ -15,6 +15,7 @@ SYSTEMLIB_SOURCES.COMPILER_CFLAGS  :=
 SYSTEMLIB_SOURCES.COMPILER_DEFINES :=
 SYSTEMLIB_SOURCES.IMPORTS          := compile.static.mak
 SYSTEMLIB_SOURCES.win32.SOURCE_DIRS := sources/platform/win32
+SYSTEMLIB_SOURCES.win32.COMPILER_CFLAGS := -wd4355
 SYSTEMLIB_SOURCES.unistd.SOURCE_DIRS := sources/platform/unistd
 
 #Цель №2 - System library tests

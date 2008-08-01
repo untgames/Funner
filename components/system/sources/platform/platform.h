@@ -29,9 +29,9 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание/закрытие/уничтожение окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef void (*WindowMessageHandler)(WindowEvent, const WindowEventContext&, void* user_data);
+    typedef void (*WindowMessageHandler)(window_t, WindowEvent, const WindowEventContext&, void* user_data);
 
-    static window_t CreateWindow  (WindowStyle, WindowMessageHandler, void* user_data);
+    static window_t CreateWindow  (WindowStyle, WindowMessageHandler, window_t parent, void* user_data);
     static void     CloseWindow   (window_t);
     static void     DestroyWindow (window_t);
     
@@ -53,6 +53,12 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void SetWindowFlag (window_t, WindowFlag flag, bool state);
     static bool GetWindowFlag (window_t, WindowFlag flag);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка родительского окна
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void     SetParentWindow (window_t child, window_t parent);
+    static window_t GetParentWindow (window_t child);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление окна

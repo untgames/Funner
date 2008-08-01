@@ -12,7 +12,7 @@ stl::string get_error_message (DWORD error_code)
   void* buffer = 0;
 
   FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, 0);
+                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, 0);                 
 
   if (!buffer)
   {
@@ -45,7 +45,7 @@ stl::string get_error_message (DWORD error_code)
         }
       }
 
-    stl::string message = common::format ("Win32 error %u. %s", error_code, buffer);    
+    stl::string message = common::format ("Win32 error %u. %s", error_code, buffer);        
 
     LocalFree (buffer);
 
@@ -61,7 +61,7 @@ void check_errors (const char* source)
   DWORD error_code = GetLastError ();
   
   if (error_code)
-    throw xtl::format_operation_exception ("syslib::check_errors", get_error_message (GetLastError ()).c_str ());
+    throw xtl::format_operation_exception ("syslib::check_errors", get_error_message (error_code).c_str ());
 }
 
 void raise_error (const char* source)

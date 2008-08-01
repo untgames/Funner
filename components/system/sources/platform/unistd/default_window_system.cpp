@@ -20,7 +20,7 @@ void raise (const char* method_name)
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler, void*)
+Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler, window_t, void*)
 {
   raise ("syslib::DefaultPlatform::CreateWindow");
   
@@ -84,6 +84,22 @@ bool Platform::GetWindowFlag (window_t, WindowFlag)
   raise ("syslib::DefaultPlatform::GetWindowFlag");
   
   return false;
+}
+
+/*
+    Установка родительского окна
+*/
+
+void Platform::SetParentWindow (window_t child, window_t parent)
+{
+  raise ("syslib::DefaultPlatform::SetParentWindow");
+}
+
+Platform::window_t Platform::GetParentWindow (window_t child)
+{
+  raise ("syslib::DefaultPlatform::GetParentWindow");
+  
+  return 0;
 }
 
 /*
