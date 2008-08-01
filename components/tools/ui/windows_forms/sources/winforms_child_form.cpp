@@ -16,7 +16,7 @@ namespace ui
 namespace windows_forms
 {
 
-private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::DockContent
+private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockContent
 {
   public:
 ///Конструктор
@@ -24,9 +24,12 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::DockContent
     {
         //инициализация свойств формы
       
-      Text        = "Fucking dock!";
-      ShowHint    = WeifenLuo::WinFormsUI::DockState::DockRightAutoHide;
-      HideOnClose = true;
+      Text           = "Fucking dock!";
+//      ShowHint     = DockState::DockRightAutoHide;
+      HideOnClose    = true;
+//      DockAreas      = (WeifenLuo::WinFormsUI::Docking::DockAreas)((WeifenLuo::WinFormsUI::Docking::DockAreas::Float | WeifenLuo::WinFormsUI::Docking::DockAreas::Document));
+      ShowHint       = WeifenLuo::WinFormsUI::Docking::DockState::Float;
+      DoubleBuffered = true;      
 
         //подписка на события формы
 

@@ -22,12 +22,17 @@ private ref class MainFormImpl: public System::Windows::Forms::Form
 ///Конструктор
     MainFormImpl ()
     {
-      dock_panel = gcnew WeifenLuo::WinFormsUI::DockPanel;
+      dock_panel = gcnew WeifenLuo::WinFormsUI::Docking::DockPanel;
 
       SuspendLayout ();
 
       dock_panel->ActiveAutoHideContent = nullptr;
       dock_panel->Dock                  = System::Windows::Forms::DockStyle::Fill;
+      
+      dock_panel->DockBottomPortion = 150;
+      dock_panel->DockLeftPortion = 200;
+      dock_panel->DockRightPortion = 200;
+      dock_panel->DockTopPortion = 150;      
 
       Controls->Add (dock_panel);
 
@@ -35,10 +40,10 @@ private ref class MainFormImpl: public System::Windows::Forms::Form
     }
     
 ///Стыковочная панель
-    WeifenLuo::WinFormsUI::DockPanel^ DockPanel () { return dock_panel; }
+    WeifenLuo::WinFormsUI::Docking::DockPanel^ DockPanel () { return dock_panel; }
 
   private:
-    WeifenLuo::WinFormsUI::DockPanel^ dock_panel; //стыковочная панель
+    WeifenLuo::WinFormsUI::Docking::DockPanel^ dock_panel; //стыковочная панель
 };
 
 }
@@ -74,7 +79,7 @@ MainForm::Pointer MainForm::Create (tools::ui::windows_forms::WindowSystem& wind
     Добавление дочерней формы
 */
 
-void MainForm::Insert (WeifenLuo::WinFormsUI::DockContent^ sub_form)
+void MainForm::Insert (WeifenLuo::WinFormsUI::Docking::DockContent^ sub_form)
 {
   sub_form->Show (form->DockPanel ());
   
