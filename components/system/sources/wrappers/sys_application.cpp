@@ -54,6 +54,7 @@ class ApplicationImpl
 ///Обработка сообщений в очереди сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void DoEvents ();
+    void CancelSystemEventsProcess () { cancel_system_events_process = true; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск обработки очереди сообщений
@@ -92,6 +93,7 @@ class ApplicationImpl
     SuspendSignal      suspend_handler;                //сигнал проверки наличия необработанных сообщений
     int                exit_code;                      //код завершения приложения
     bool               is_exit_detected;               //получен сигнал завершения приложения
+    bool               cancel_system_events_process;   //отмена обработки системных событий
     size_t             message_loop_count;             //количество вхождений в обработчик очереди сообщений
 };
 
@@ -103,9 +105,10 @@ typedef Singleton<ApplicationImpl> ApplicationSingleton;
 
 ApplicationImpl::ApplicationImpl ()
 {
-  exit_code          = 0;
-  message_loop_count = false;
-  is_exit_detected   = false;
+  exit_code                    = 0;
+  message_loop_count           = false;
+  is_exit_detected             = false;
+  cancel_system_events_process = false;
 }
 
 /*
@@ -150,12 +153,8 @@ void ApplicationImpl::Suspend ()
 void ApplicationImpl::DoEvents ()
 {
   MessageLoopScope scope (message_loop_count);
-
-  while (!Platform::IsMessageQueueEmpty () && !is_exit_detected)
-    Platform::DoNextEvent ();
-
-  if (is_exit_detected)
-    return;
+  
+  cancel_system_events_process = false;
 
   try
   {
@@ -164,6 +163,12 @@ void ApplicationImpl::DoEvents ()
   catch (...)
   {
     //подавление всех исключений
+  }  
+
+  if (!cancel_system_events_process && !is_exit_detected)
+  {
+    while (!Platform::IsMessageQueueEmpty () && !is_exit_detected)
+      Platform::DoNextEvent ();
   }
 }
 
@@ -222,6 +227,11 @@ void ApplicationImpl::Notify (ApplicationEvent event)
 void Application::DoEvents ()
 {
   ApplicationSingleton::Instance ().DoEvents ();
+}
+
+void Application::CancelSystemEventsProcess ()
+{
+  ApplicationSingleton::Instance ().CancelSystemEventsProcess ();
 }
 
 void Application::Run ()
