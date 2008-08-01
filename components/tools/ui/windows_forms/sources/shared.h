@@ -55,6 +55,7 @@ class WindowSystem;
 #include "auto_string.h"
 #include "event_handler.h"
 #include "menu.h"
+#include "form.h"
 #include "main_form.h"
 #include "control_registry.h"
 #include "windows_system.h"

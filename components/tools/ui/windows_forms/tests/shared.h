@@ -9,14 +9,55 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/string.h>
-#include <xtl/connection.h> //out!!!
 
 #include <syslib/application.h>
+#include <syslib/window.h>
 
 #include <tools/ui/main_window.h>
 #include <tools/ui/custom_window_system.h>
 
 using namespace tools::ui;
+
+//тестовое пользовательское дочернее окно
+class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
+{
+  public:
+///Конструктор
+    MyChildWindow (const void* parent_window_handle) : window (syslib::WindowStyle_PopUp)
+    {
+    }
+
+///Получение низкоуровневого дескриптора окна
+    const void* GetHandle ()
+    {
+      return window.Handle ();
+    }
+
+///Изменение положения окна
+    void SetPosition (size_t x, size_t y)
+    {
+      window.SetPosition (x, y);
+    }
+
+///Изменение размеров окна
+    void SetSize (size_t width, size_t height)
+    {
+      window.SetSize (width, height);
+    }
+
+///Обновить содержимое окна
+    void Update ()
+    {
+      window.Invalidate ();
+    }
+
+///Подсчёт ссылок
+    void AddRef  () { addref (this); }
+    void Release () { release (this); }
+
+  private:
+    syslib::Window window;
+};
 
 //тестовый сервер приложения
 class MyApplicationServer: public IApplicationServer, public xtl::reference_counter
@@ -78,6 +119,11 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     void UnregisterAllPropertyListeners ()
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterAllPropertyListeners");    
+    }
+    
+    ICustomChildWindow* CreateChildWindow (const char* init_string, const void* parent_window_handle)
+    {
+      return new MyChildWindow (parent_window_handle);
     }
 
     void AddRef  () { addref (this); }

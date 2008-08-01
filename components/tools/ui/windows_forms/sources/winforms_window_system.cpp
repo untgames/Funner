@@ -11,6 +11,7 @@ namespace
 */
 
 const char* INTERPERTER_NAME                          = "lua";                  //имя интерпретатора
+const char* FORM_LIBRARY_NAME                         = "Form";                 //имя библиотеки шлюзов формы
 const char* MAIN_FORM_LIBRARY_NAME                    = "MainForm";             //имя библиотеки шлюзов главной формы
 const char* MENU_STRIP_ITEM_LIBRARY_NAME              = "MenuItem";             //имя библиотеки элементов меню
 const char* MENU_STRIP_LIBRARY_NAME                   = "MenuStrip";            //имя библиотеки цепочек меню
@@ -224,7 +225,8 @@ void WindowSystem::RegisterInvokers ()
 
       //регистрация шлюзов контролов
 
-    MainForm::RegisterInvokers                (*shell_environment, MAIN_FORM_LIBRARY_NAME);
+    Form::RegisterInvokers                    (*shell_environment, FORM_LIBRARY_NAME);
+    MainForm::RegisterInvokers                (*shell_environment, MAIN_FORM_LIBRARY_NAME, FORM_LIBRARY_NAME);
     MenuStripItem::RegisterInvokers           (*shell_environment, MENU_STRIP_ITEM_LIBRARY_NAME);
     MenuStrip::RegisterInvokers               (*shell_environment, MENU_STRIP_LIBRARY_NAME);
     MenuStripItemRegistry::RegisterInvokers   (*shell_environment, MENU_STRIP_ITEM_COLLECTION_LIBRARY_NAME);

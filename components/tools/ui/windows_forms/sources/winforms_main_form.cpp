@@ -81,9 +81,8 @@ private ref class MainFormImpl: public System::Windows::Forms::Form
     Конструктор / деструктор
 */
 
-MainForm::MainForm (WindowSystem& in_window_system)
-  : window_system (in_window_system),
-    menu_strip (0)
+MainForm::MainForm (tools::ui::windows_forms::WindowSystem& window_system)
+  : Form (window_system)
 {
   form = gcnew MainFormImpl;
 }
@@ -96,110 +95,33 @@ MainForm::~MainForm ()
     Создание формы
 */
 
-MainForm::Pointer MainForm::Create (WindowSystem& window_system)
+MainForm::Pointer MainForm::Create (tools::ui::windows_forms::WindowSystem& window_system)
 {
   return Pointer (new MainForm (window_system), false);
 }
 
 /*
-    Изменение текста формы
+    Получение ref-указателя формы
 */
 
-void MainForm::SetText (const char* text)
+System::Windows::Forms::Form^ MainForm::Handle ()
 {
-  if (!text)
-    throw xtl::make_null_argument_exception ("tools::ui::windows_MainForms::MainForm::SetText", "text");
-
-  form->Text = gcnew String (text);
-}
-
-const char* MainForm::Text ()
-{
-  return get_string (form->Text, text);
-}
-
-/*
-    Управление видимостью формы
-*/
-
-void MainForm::Show ()
-{
-  form->Show ();
-}
-
-void MainForm::Hide ()
-{
-  form->Hide ();
-}
-
-void MainForm::SetVisible (bool state)
-{
-  form->Visible = state;
-}
-
-bool MainForm::IsVisible ()
-{
-  return form->Visible;
-}
-
-/*
-    Установка меню
-*/
-
-void MainForm::SetMenuStrip (tools::ui::windows_forms::MenuStrip* in_menu_strip)
-{
-  if (menu_strip)
-    form->Controls->Remove (menu_strip->Handle ());
-
-  menu_strip = in_menu_strip;
-
-  if (menu_strip)
-    form->Controls->Add (menu_strip->Handle ());
-}
-
-/*
-    Добавление / удаление панели кнопок
-*/
-
-void MainForm::Insert (windows_forms::ToolStrip* tool_strip)
-{
-  if (!tool_strip)
-    throw xtl::make_null_argument_exception ("tools::ui::MainForm::Insert(tools::ui::windows_MainForms::ToolStrip*)", "tool_strip");
-    
-  form->Controls->Add (tool_strip->Handle ());
-}
-
-void MainForm::Remove (windows_forms::ToolStrip* tool_strip)
-{
-  if (!tool_strip)
-    return;
-    
-  form->Controls->Add (tool_strip->Handle ());
+  return form;
 }
 
 /*
     Регистрация шлюзов
 */
 
-void MainForm::RegisterInvokers (script::Environment& environment, const char* library_name)
+void MainForm::RegisterInvokers (script::Environment& environment, const char* library_name, const char* base_library_name)
 {
-  using namespace script;
+  using namespace script;  
 
   InvokerRegistry& lib = environment.CreateLibrary (library_name);
 
-    //регистрация свойств
+    //наследование от Form
 
-  lib.Register ("set_Text", make_invoker (&MainForm::SetText));
-  lib.Register ("get_Text", make_invoker (&MainForm::Text));
-  lib.Register ("set_Visible", make_invoker (&MainForm::SetVisible));
-  lib.Register ("get_Visible", make_invoker (&MainForm::IsVisible));
-  lib.Register ("set_MenuStrip", make_invoker (&MainForm::SetMenuStrip));
-  lib.Register ("get_MenuStrip", make_invoker (&MainForm::MenuStrip));  
-
-    //регистрация методов
-
-  lib.Register ("Add", make_invoker (&MainForm::Insert));
-  lib.Register ("Remove", make_invoker (&MainForm::Remove));
+  lib.Register (environment.Library (base_library_name));  
 
     //регистрация типов данных
 
