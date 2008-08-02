@@ -33,11 +33,8 @@ class plane
   //Конструкторы
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   plane();//по умолчанию
-  plane(const value_vec& normal_vec, const value_vec& control_pnt=value_vec(0));//через точку и нормальный вектор
-  plane(const value_vec& point1, const value_vec& point2, const value_vec& point3);//через три точки
-  plane(const value_vec& vec1, const value_vec& vec2, const value_vec& point);//через две пересекающиеся прямые
-  plane(const value_vec& point1, const value_vec& point2, const value_vec& vec);//через две параллельные прямые
-  plane(const plane<type>& pl);//копирование
+  plane(const vec<type,Size>& normal_vec, const vec<type,Size>& control_pnt=vec<type,Size>(0));//через точку и нормальный вектор
+  plane(const plane<type,Size>& pl);//копирование
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   //Возврат значений
@@ -52,16 +49,32 @@ class plane
   value_vec normal_vector;
 };
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-//Утилиты
+//Объявление плоскости 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+//Через три точки
+template<class T,size_t Size>
+const plane<T,Size> plane_by_3points (const vec<T,Size>& point1, const vec<T,Size>& point2, const vec<T,Size>& point3);
+
+//Через две пересекающиеся прямые
+template<class T,size_t Size>
+const plane<T,Size> plane_by_2crosslines(const vec<T,Size>& vec1, const vec<T,Size>& vec2, const vec<T,Size>& point);
+
+//Через две параллельные прямые
+template<class T,size_t Size>
+const plane<T,Size> plane_by_2parallel_lines(const vec<T,Size>& point1, const vec<T,Size>& point2, const vec<T,Size>& vec);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //Расстояние до точки
-template<class T,size_t Size>
-T& distance(const plane<T,Size>& pl, const vec<T,Size>& point, plane<T,Size>::Side& s);
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T,size_t Size>
-T& distance(const plane<T,Size>& pl, const vec<T,Size>& point);
+const T distance(const plane<T,Size>& pl, const vec<T,Size>& point, typename plane<T,Size>::Side& s);
+
+template<class T,size_t Size>
+const T distance(const plane<T,Size>& pl, const vec<T,Size>& point);
 
 /*
 	Основные типы

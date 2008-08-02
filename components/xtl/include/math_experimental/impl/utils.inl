@@ -364,6 +364,8 @@ template<class T,size_t Size>
 const vec<T,Size> vec_project(const plane<T,Size>& pl, const vec<T,Size>& v)
 {
   if (!angle(pl.get_normal_vector(),v)) return vec<T,Size> (0);
-  return matrix_to_quat(matrix3_rotate(angle(pl.get_normal_vector(),v),pl.get_normal_vector()^v))*v;
-  
+  T ang(T(3.14159265358979323846)-angle(pl.get_normal_vector(),v));//угол между вектором и плоскостью
+  vec<T,Size> c(matrix_to_quat(matrix3_rotate(ang,pl.get_normal_vector()^v))*v);//вектор v, повернутый так, что принадлежит плоскости
+  T l(v.length()*cos(ang));//длина проекции
+  return c/c.length()*l;
 }

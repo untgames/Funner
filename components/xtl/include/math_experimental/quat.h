@@ -30,9 +30,9 @@ class quat: public quat_base<type>
     typedef type value_type;
     enum {size=4};
   
-    quat ();
-    quat (const type& x_,const type& y_,const type& z_,const type& w_);
-    quat (const type& a);
+    explicit quat ();
+    explicit quat (const type& x_,const type& y_,const type& z_,const type& w_);
+    explicit quat (const type& a);
        //для использования оптимизации возвращаемого значения
 
     template <class T,class Fn>           quat (const T&,Fn fn);

@@ -10,45 +10,47 @@ inline plane<T,Size>::plane()
 }
 
 template<class T,size_t Size>
-inline plane<T,Size>::plane(const vec<T,Size>& normal_vec, const vec<T,Size>& control_pnt)
+inline plane<T,Size>::plane(const vec<T,Size>& normal_vec, const vec<T,Size>& control_pnt=vec<T,Size>(0))
 {
   normal_vector=normal_vec;
   control_point=control_pnt;
 }
 
 template<class T,size_t Size>
-inline plane<T,Size>::plane(const vec<T,Size>& point1, const vec<T,Size>& point2, const vec<T,Size>& point3)
+inline plane<T,Size>::plane(const plane<T,Size>& pl)
 {
-  normal_vector=(point1-point2)^(point2-point3);
-  control_point=p1;
+  normal_vector=pl.get_normal_vector();
+  control_point=pl.get_control_point();
 }
 
-template<class T,size_t Size>
-inline plane<T,Size>::plane(const vec<T,Size>& vec1, const vec<T,Size>& vec2, const vec<T,Size>& point)
-{
-  normal_vector=vec1^vec2;
-  control_point=point;
-}
-
-template<class T,size_t Size>
-inline plane<T,Size>::plane(const vec<T,Size>& point1, const vec<T,Size>& point2,const vec<T,Size>& vec)
-{
-  normal_vector=(point1-point2)^vec;
-  control_point=point1;
-}
-
-template<class T,size_t Size>
-inline plane<T,Size>::plane(const plane<T,Size>& p)
-{
-  normal_vector=p.get_normal_vector();
-  control_point=p.get_control_point();
-}
 
 /*
 	”тилиты
 */
+
+///ќбъ€вление плоскости
+
 template<class T,size_t Size>
-inline T& distance(const plane<T,Size>& pl, const vec<T,Size>& point, plane<T,Size>::Side& s)
+inline const plane<T,Size> plane_by_3points(const vec<T,Size>& point1, const vec<T,Size>& point2, const vec<T,Size>& point3)
+{
+  return plane<T,Size>((point1-point2)^(point2-point3),point1);
+}
+
+template<class T,size_t Size>
+inline const plane<T,Size> plane_by_2crosslines(const vec<T,Size>& vec1, const vec<T,Size>& vec2, const vec<T,Size>& point)
+{
+  return plane<T,Size>(vec1^vec2,point);
+}
+
+template<class T,size_t Size>
+inline const plane<T,Size> plane_by_2parallel_lines(const vec<T,Size>& point1, const vec<T,Size>& point2, const vec<T,Size>& vec)
+{
+  return plane<T,Size> ((point1-point2)^vec,point1);
+}
+
+
+template<class T,size_t Size>
+inline T& distance(const plane<T,Size>& pl, const vec<T,Size>& point, typename plane<T,Size>::Side& s)
 {
   T dist((pl.get_normal_vector()&point)/point.length());
   if (dist>T(0))  s=plane<T,Size>::Side::positive;
@@ -58,10 +60,8 @@ inline T& distance(const plane<T,Size>& pl, const vec<T,Size>& point, plane<T,Si
 }
 
 template<class T,size_t Size>
-inline T& distance(const plane<T,Size>& pl, const vec<T,Size>& point)
+inline const T distance(const plane<T,Size>& pl, const vec<T,Size>& point)
 {
-  T dist(pl.get_normal_vector()*point/point.length());
-  return abs(dist);
+  T dist((pl.get_normal_vector()&point)/point.length());
+  return absol<T,T>()(dist);
 }
-
-
