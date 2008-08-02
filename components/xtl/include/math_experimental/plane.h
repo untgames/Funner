@@ -42,6 +42,16 @@ class plane
   const value_vec& get_normal_vector () const {return normal_vector; }
   const value_vec& get_control_point () const {return control_point; }
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  //Бинарные операторы
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  bool operator == (const plane<Type,Size>& p) const;
+
+  plane<Type,Size>& operator = (const plane<Type,Size>& p);
+
+  plane<Type,Size>&       operator *= (const quat<Type>& q);
+  const plane<Type,Size>  operator *   (const quat<Type>& q) const ;
+  
 
 
  private:

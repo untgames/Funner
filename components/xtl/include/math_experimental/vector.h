@@ -206,6 +206,12 @@ const vec<T,Size> max (const vec<T,Size>& a,const vec<T,Size>& b);
 template <class T,size_t Size>
 const T angle     (const vec<T, Size>& a, const vec<T, Size>& b);
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+///Параллельны ли вектора
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T,size_t Size>
+const bool is_parallel (const vec<T,Size>& v1,const vec<T,Size>& v2);
+
 /*
 	Основные типы
 */

@@ -25,6 +25,38 @@ inline plane<T,Size>::plane(const plane<T,Size>& pl)
 
 
 /*
+	Бинарные операторы
+*/
+
+template<class T,size_t Size>
+bool plane<T,Size>::operator == (const plane<T,Size>& p) const
+{
+  return (is_parallel(normal_vector,p.get_normal_vector())&&(distance(*this,p.get_control_point())<=T(0.00001)));
+}
+
+template<class T,size_t Size>
+plane<T,Size>& plane<T,Size>::operator = (const plane<T,Size>& p)
+{
+  normal_vector=p.get_normal_vector();
+  control_point=p.get_control_point();
+  return *this;
+}
+
+template<class T,size_t Size>
+plane<T,Size>& plane<T,Size>::operator *= (const quat<T>& q)
+{
+  normal_vector=q*normal_vector;
+  return *this;
+}
+
+template<class T,size_t Size>
+const plane<T,Size> plane<T,Size>::operator *(const quat<T>& q) const
+{
+  return plane(q*normal_vector,control_point);
+}
+
+
+/*
 	Утилиты
 */
 

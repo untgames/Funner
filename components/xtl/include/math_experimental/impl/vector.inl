@@ -373,3 +373,9 @@ const vec<T,3> operator ^ (const vec<T,3>& a,const vec<T,3>& b)
 
   return res;
 } 
+
+template <class T,size_t Size>
+const bool is_parallel (const vec<T,Size>& v1,const vec<T,Size>& v2)
+{
+  return (v1^v2).equal(vec<T,Size>(0),T(0,00001));
+}

@@ -1,5 +1,6 @@
 #include<math_experimental/vector.h>
 #include<math_experimental/plane.h>
+#include<math_experimental/quat.h>
 #include"shared.h"
 
 using namespace math;
@@ -15,11 +16,13 @@ int main()
   plane<float,3> p4(plane_by_2crosslines(vec3f(1,4,5),vec3f(4,4,5),vec3f(2,4,6)));
   plane_print("p4:",p4);
   plane<float,3> p5(plane_by_2parallel_lines(vec3f(2,4,6),vec3f(1,6,7),vec3f(1,1,1)));
-  plane_print("p4:",p5);
+  plane_print("p5:",p5);
   plane<float,3> p6(p5);
   plane_print("p6:",p6);
-
-
-  
+  p6=p4;
+  plane_print("p6=p4:",p6);
+  quatf q(1);
+  p6*=q;
+  plane_print("rotatted p6:",p6);
   return 0;
 }
