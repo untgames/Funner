@@ -116,7 +116,7 @@ System::Windows::Forms::Form^ MainForm::FormHandle ()
     Регистрация шлюзов
 */
 
-void MainForm::RegisterInvokers (script::Environment& environment, const char* library_name, const char* base_library_name)
+void MainForm::RegisterInvokers (script::Environment& environment, const char* base_library_name, const char* library_name)
 {
   using namespace script;  
 
