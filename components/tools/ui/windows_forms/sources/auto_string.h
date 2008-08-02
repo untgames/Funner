@@ -1,4 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Исключение, возникающее при невозможности создания строки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct BadAutoString: public xtl::message_exception_base
+{
+  BadAutoString (const char* source) : message_exception_base (source, "Can't translate string from System::String^ to const char*") {}
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Класс для приведения CLR-строк в const char*
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class AutoString
@@ -9,14 +17,28 @@ class AutoString
 
     AutoString (System::String^ from)
     {
-      str = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi (from);
+      try
+      {
+        str = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi (from);
+      }
+      catch (...)
+      {
+        throw BadAutoString ("tools::ui::windows_forms::AutoString::AutoString");
+      }
     }
 
 ///Деструктор    
     ~AutoString ()
     {
-      if (str)
-        System::Runtime::InteropServices::Marshal::FreeHGlobal ((System::IntPtr)str);
+      try
+      {
+        if (str)
+          System::Runtime::InteropServices::Marshal::FreeHGlobal ((System::IntPtr)str);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
     }
 
 ///Данные

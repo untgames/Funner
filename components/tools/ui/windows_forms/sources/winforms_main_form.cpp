@@ -24,19 +24,14 @@ private ref class MainFormImpl: public System::Windows::Forms::Form
     {
       dock_panel = gcnew WeifenLuo::WinFormsUI::Docking::DockPanel;
 
-      SuspendLayout ();
+//      SuspendLayout ();
 
       dock_panel->ActiveAutoHideContent = nullptr;
       dock_panel->Dock                  = System::Windows::Forms::DockStyle::Fill;
-      
-      dock_panel->DockBottomPortion = 150;
-      dock_panel->DockLeftPortion = 200;
-      dock_panel->DockRightPortion = 200;
-      dock_panel->DockTopPortion = 150;      
 
       Controls->Add (dock_panel);
 
-      ResumeLayout ();      
+//      ResumeLayout ();      
     }
     
 ///Стыковочная панель
@@ -59,11 +54,26 @@ private ref class MainFormImpl: public System::Windows::Forms::Form
 MainForm::MainForm (tools::ui::windows_forms::WindowSystem& window_system)
   : Form (window_system)
 {
-  form = gcnew MainFormImpl;
+  try
+  {
+    form = gcnew MainFormImpl;
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::MainForm::MainForm", exception);
+  }
 }
 
 MainForm::~MainForm ()
 {
+  try
+  {
+    form = 0;
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
 /*
@@ -81,9 +91,16 @@ MainForm::Pointer MainForm::Create (tools::ui::windows_forms::WindowSystem& wind
 
 void MainForm::Insert (WeifenLuo::WinFormsUI::Docking::DockContent^ sub_form)
 {
-  sub_form->Show (form->DockPanel ());
+  try
+  {
+    sub_form->Show (form->DockPanel ());
   
-  form->Controls->Add (sub_form);
+    form->Controls->Add (sub_form);
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::MainForm::Insert", exception);
+  }  
 }
 
 /*

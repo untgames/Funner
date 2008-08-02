@@ -1,6 +1,8 @@
 #ifndef TOOLS_UI_WINDOWS_FORMS_SHARED_HEADER
 #define TOOLS_UI_WINDOWS_FORMS_SHARED_HEADER
 
+#include <cor.h>
+
 #include <stl/string>
 #include <stl/algorithm>
 #include <stl/hash_map>
@@ -54,6 +56,7 @@ typedef xtl::com_ptr<IApplicationServer> ApplicationServerPtr;
 class WindowSystem;
 
 #include "auto_string.h"
+#include "exception.h"
 #include "event_handler.h"
 #include "menu.h"
 #include "form.h"

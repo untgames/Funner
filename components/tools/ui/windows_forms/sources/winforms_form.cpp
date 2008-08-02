@@ -23,15 +23,31 @@ Form::~Form ()
 
 void Form::SetText (const char* text)
 {
-  if (!text)
-    throw xtl::make_null_argument_exception ("tools::ui::windows_forms::Form::SetText", "text");
+  static const char* METHOD_NAME = "tools::ui::windows_forms::Form::SetText";
 
-  FormHandle ()->Text = gcnew String (text);
+  if (!text)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "text");
+    
+  try
+  {
+    FormHandle ()->Text = gcnew String (text);
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException (METHOD_NAME, exception);
+  }
 }
 
 const char* Form::Text ()
 {
-  return get_string (FormHandle ()->Text, text);
+  try
+  {
+    return get_string (FormHandle ()->Text, text);
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::Form::Text", exception);
+  }
 }
 
 /*
@@ -40,22 +56,50 @@ const char* Form::Text ()
 
 void Form::Show ()
 {
-  FormHandle ()->Show ();
+  try
+  {
+    FormHandle ()->Show ();
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::Form::Show", exception);
+  }
 }
 
 void Form::Hide ()
 {
-  FormHandle ()->Hide ();
+  try
+  {
+    FormHandle ()->Hide ();
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::Form::Hide", exception);
+  }
 }
 
 void Form::SetVisible (bool state)
 {
-  FormHandle ()->Visible = state;
+  try
+  {
+    FormHandle ()->Visible = state;
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::Form::SetVisible", exception);
+  }
 }
 
 bool Form::IsVisible ()
 {
-  return FormHandle ()->Visible;
+  try
+  {
+    return FormHandle ()->Visible;
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::Form::IsVisible", exception);
+  }
 }
 
 /*
@@ -64,13 +108,20 @@ bool Form::IsVisible ()
 
 void Form::SetMenuStrip (tools::ui::windows_forms::MenuStrip* in_menu_strip)
 {
-  if (menu_strip)
-    FormHandle ()->Controls->Remove (menu_strip->Handle ());
+  try
+  {
+    if (menu_strip)
+      FormHandle ()->Controls->Remove (menu_strip->Handle ());
 
-  menu_strip = in_menu_strip;
+    menu_strip = in_menu_strip;
 
-  if (menu_strip)
-    FormHandle ()->Controls->Add (menu_strip->Handle ());
+    if (menu_strip)
+      FormHandle ()->Controls->Add (menu_strip->Handle ());
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::Form::SetMenuStrip", exception);
+  }
 }
 
 /*
@@ -79,10 +130,19 @@ void Form::SetMenuStrip (tools::ui::windows_forms::MenuStrip* in_menu_strip)
 
 void Form::Insert (windows_forms::ToolStrip* tool_strip)
 {
+  static const char* METHOD_NAME = "tools::ui::Form::Insert(tools::ui::windows_forms::ToolStrip*)";
+
   if (!tool_strip)
-    throw xtl::make_null_argument_exception ("tools::ui::Form::Insert(tools::ui::windows_forms::ToolStrip*)", "tool_strip");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "tool_strip");
     
-  FormHandle ()->Controls->Add (tool_strip->Handle ());
+  try
+  {    
+    FormHandle ()->Controls->Add (tool_strip->Handle ());
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException (METHOD_NAME, exception);
+  }  
 }
 
 void Form::Remove (windows_forms::ToolStrip* tool_strip)
@@ -90,7 +150,14 @@ void Form::Remove (windows_forms::ToolStrip* tool_strip)
   if (!tool_strip)
     return;
     
-  FormHandle ()->Controls->Add (tool_strip->Handle ());
+  try
+  {
+    FormHandle ()->Controls->Add (tool_strip->Handle ());
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
 /*
@@ -99,7 +166,14 @@ void Form::Remove (windows_forms::ToolStrip* tool_strip)
 
 const void* Form::WindowHandle ()
 {
-  return (const void*)FormHandle ()->Handle;
+  try
+  {
+    return (const void*)FormHandle ()->Handle;
+  }
+  catch (...)
+  {
+    return 0;
+  }
 }
 
 /*

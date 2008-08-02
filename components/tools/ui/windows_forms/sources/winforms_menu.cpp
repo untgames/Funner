@@ -20,15 +20,31 @@ template ToolStrip;
 
 template <class T>
 MenuItem<T>::MenuItem (WindowSystem& in_window_system)
-  : item (gcnew T),
-    window_system (in_window_system)
+  : window_system (in_window_system)
 {
-  item->Click += make_event_handler (this, &MenuItem::OnClick);
+  try
+  {
+    item = gcnew T;
+
+    item->Click += make_event_handler (this, &MenuItem::OnClick);
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::MenuItem<T>::MenuItem", exception);
+  }
 }
 
 template <class T>
 MenuItem<T>::~MenuItem ()
 {
+  try
+  {
+    item = 0;
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
 /*
@@ -51,16 +67,32 @@ void MenuItem<T>::OnClick (System::Object^, System::EventArgs^)
 template <class T>
 void MenuItem<T>::SetText (const char* text)
 {
-  if (!text)
-    throw xtl::make_null_argument_exception ("tools::ui::windows_forms::MenuItem::SetText", "text");
+  static const char* METHOD_NAME = "tools::ui::windows_forms::MenuItem::SetText";
 
-  item->Text = gcnew String (text);
+  if (!text)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "text");
+
+  try
+  {
+    item->Text = gcnew String (text);
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException (METHOD_NAME, exception);
+  }
 }
 
 template <class T>
 const char* MenuItem<T>::Text ()
 {
-  return get_string (item->Text, text);
+  try
+  {
+    return get_string (item->Text, text);
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::MenuItem<T>::Text", exception);
+  }
 }
 
 /*
@@ -70,16 +102,32 @@ const char* MenuItem<T>::Text ()
 template <class T>
 void MenuItem<T>::SetTip (const char* tip)
 {
-  if (!tip)
-    throw xtl::make_null_argument_exception ("tools::ui::windows_forms::MenuItem::SetTip", "tip");
+  static const char* METHOD_NAME = "tools::ui::windows_forms::MenuItem::SetTip";
 
-  item->ToolTipText = gcnew String (tip);
+  if (!tip)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "tip");
+
+  try
+  {
+    item->ToolTipText = gcnew String (tip);
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException (METHOD_NAME, exception);
+  }
 }
 
 template <class T>
 const char* MenuItem<T>::Tip ()
 {
-  return get_string (item->ToolTipText, tip);
+  try
+  {
+    return get_string (item->ToolTipText, tip);
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::MenuItem<T>::Tip", exception);
+  }
 }
 
 /*
@@ -89,11 +137,20 @@ const char* MenuItem<T>::Tip ()
 template <class T>
 void MenuItem<T>::SetImage (const char* in_image)
 {
+  static const char* METHOD_NAME = "tools::ui::windows_forms::MenuItem::SetImage";
+
   if (!in_image)
-    throw xtl::make_null_argument_exception ("tools::ui::windows_forms::MenuItem::SetImage", "image");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "image");
     
-  item->Image = gcnew System::Drawing::Bitmap (gcnew String (in_image));  
-  image       = in_image;
+  try
+  {    
+    item->Image = gcnew System::Drawing::Bitmap (gcnew String (in_image));  
+    image       = in_image;
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException (METHOD_NAME, exception);
+  }
 }
 
 /*
@@ -126,7 +183,15 @@ void insert
  (MenuItem<System::Windows::Forms::ToolStripMenuItem>& parent,
   MenuItem<System::Windows::Forms::ToolStripMenuItem>& child)
 {
-  parent.Handle ()->DropDownItems->Add (child.Handle ());
+  try
+  {
+    parent.Handle ()->DropDownItems->Add (child.Handle ());
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::insert(MenuItem<System::Windows::Forms::ToolStripMenuItem>&,MenuItem<System::Windows::Forms::ToolStripMenuItem>&)",
+      exception);
+  }
 }
 
 }
@@ -176,13 +241,28 @@ void MenuItem<T>::RegisterInvokers (script::Environment& environment, const char
 
 template <class T, class Item>
 Menu<T, Item>::Menu ()
-  : menu (gcnew T)
 {
+  try
+  {
+    menu = gcnew T;
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::Menu<T,Item>::Menu", exception);
+  }  
 }
 
 template <class T, class Item>
 Menu<T, Item>::~Menu ()
 {
+  try
+  {
+    menu = 0;
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
 /*
@@ -192,7 +272,14 @@ Menu<T, Item>::~Menu ()
 template <class T, class Item>
 void Menu<T, Item>::Insert (Item& item)
 {
-  menu->Items->Add (item.Handle ());  
+  try
+  {
+    menu->Items->Add (item.Handle ());
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException ("tools::ui::windows_forms::Menu<T,Item>::Insert", exception);
+  }
 }
 
 /*

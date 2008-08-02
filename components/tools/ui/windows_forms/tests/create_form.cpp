@@ -7,7 +7,7 @@ void print (const char* message)
 
 int main ()
 {
-  printf ("Results of create_form_test:\n");
+  printf ("Results of create_form_test:\n");  
   
   try
   {    

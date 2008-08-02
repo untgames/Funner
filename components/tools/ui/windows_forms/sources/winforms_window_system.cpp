@@ -24,19 +24,25 @@ const char* TOOL_STRIP_BUTTON_COLLECTION_LIBRARY_NAME = "ToolButtonCollection"; 
 const char* TOOL_STRIP_COLLECTION_LIBRARY_NAME        = "ToolStripCollection";  //имя библиотеки шлюзов коллекции цепочек меню
 
 /*
-    Враппер над очередью обработки сообщений Windows Forms
+    Враппер над моделью приложения Windows Forms
 */
 
-class MessageQueueWrapper
+class ApplicationModelWrapper
 {
   public:
     static void RegisterWrapper   () { RegisterWrapper (true); }    
     static void UnregisterWrapper () { RegisterWrapper (false); }
 
   private:
-    MessageQueueWrapper ()
-      : on_do_events_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnDoEvents, &MessageQueueWrapper::DoEvents)) {}  
-  
+    ApplicationModelWrapper ()
+      : on_do_events_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnDoEvents, &ApplicationModelWrapper::DoEvents))
+    {
+        //реинициализация COM для работы в .NET совместимом режиме (в будущем этот код лучше перенести в SystemLib!)
+
+      CoUninitialize ();
+      CoInitializeEx (0, COINIT_APARTMENTTHREADED);
+    }  
+
     static void DoEvents ()
     {
         //обработка событий Windows Forms
@@ -50,13 +56,13 @@ class MessageQueueWrapper
 
     static void RegisterWrapper (bool state)
     {
-      static stl::auto_ptr<MessageQueueWrapper> current_wrapper        = 0; //указатель на текущий враппер
-      static size_t                             current_register_count = 0; //количество регистраций
+      static stl::auto_ptr<ApplicationModelWrapper> current_wrapper        = 0; //указатель на текущий враппер
+      static size_t                                 current_register_count = 0; //количество регистраций
 
       if (state)
-      {
+      {        
         if (!current_register_count++)
-          current_wrapper = new MessageQueueWrapper;
+          current_wrapper = new ApplicationModelWrapper;          
       }
       else
       {
@@ -88,7 +94,7 @@ WindowSystem::WindowSystem (IApplicationServer* server)
   {
       //регистрация очереди обработки сообщений Window Forms
       
-    MessageQueueWrapper::RegisterWrapper ();
+    ApplicationModelWrapper::RegisterWrapper ();
     
       //создание главной формы
       
@@ -111,7 +117,7 @@ WindowSystem::~WindowSystem ()
 {
     //отмена регистрации очереди обработки сообщений Windows Forms
 
-  MessageQueueWrapper::UnregisterWrapper ();
+  ApplicationModelWrapper::UnregisterWrapper ();
 }
 
 /*
@@ -132,6 +138,7 @@ void WindowSystem::Release ()
     Выполнение команды на стороне оконной системы
 */
 
+[STAThreadAttribute]
 void WindowSystem::Execute (const char* name, const void* buffer, size_t buffer_size)
 {
   try
@@ -145,6 +152,7 @@ void WindowSystem::Execute (const char* name, const void* buffer, size_t buffer_
   }
 }
 
+[STAThreadAttribute]
 void WindowSystem::Execute (const char* command)
 {
   try
@@ -155,7 +163,7 @@ void WindowSystem::Execute (const char* command)
   {
     exception.touch ("tools::ui::WindowSystem::Execute(const char*)");
     throw;
-  }  
+  }
 }
 
 /*

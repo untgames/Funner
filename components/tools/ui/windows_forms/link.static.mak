@@ -1,7 +1,7 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS          := tools.ui.windows_forms
+export.LIBS          := tools.ui.windows_forms ole32
 export.LINK_INCLUDES := WindowsFormsSystem
 export.IMPORTS       := ../core/link.static.mak
 export.DLLS          := WeifenLuo.WinFormsUI.Docking

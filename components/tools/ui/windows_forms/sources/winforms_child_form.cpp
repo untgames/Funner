@@ -33,7 +33,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 
         //подписка на события формы
 
-      HandleCreated   += gcnew EventHandler (this, &ChildFormImpl::OnCreateHandle);
+/*      HandleCreated   += gcnew EventHandler (this, &ChildFormImpl::OnCreateHandle);
       HandleDestroyed += gcnew EventHandler (this, &ChildFormImpl::OnDestroyHandle);
       Resize          += gcnew EventHandler (this, &ChildFormImpl::OnResize);
 
@@ -44,7 +44,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 
         //отображение окна
 
-      child_window->Show (true);
+      child_window->Show (true);*/
     }    
 
   private:
@@ -100,13 +100,15 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, const char* init_string)
   : Form (window_system)
 {
+  static const char* METHOD_NAME = "tools::ui::ChildForm::ChildForm";
+
   try
   {
       //создание пользовательского дочернего окна
 
     IApplicationServer& application_server = window_system.ApplicationServer ();
 
-    child_window = ChildWindowPtr (application_server.CreateChildWindow (init_string), false);
+//    child_window = ChildWindowPtr (application_server.CreateChildWindow (init_string), false);
 
       //создание контейнера
 
@@ -118,8 +120,12 @@ ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, con
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("tools::ui::ChildForm::ChildForm");
+    exception.touch (METHOD_NAME);
     throw;
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException (METHOD_NAME, exception);
   }
 }
 
