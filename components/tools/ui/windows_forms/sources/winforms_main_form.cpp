@@ -23,15 +23,17 @@ private ref class MainFormImpl: public System::Windows::Forms::Form
     MainFormImpl ()
     {
       dock_panel = gcnew WeifenLuo::WinFormsUI::Docking::DockPanel;
+      
+      IsMdiContainer = true;
 
-//      SuspendLayout ();
+      SuspendLayout ();
 
       dock_panel->ActiveAutoHideContent = nullptr;
       dock_panel->Dock                  = System::Windows::Forms::DockStyle::Fill;
 
-      Controls->Add (dock_panel);
+      Controls->Add (dock_panel);      
 
-//      ResumeLayout ();      
+      ResumeLayout ();
     }
     
 ///Стыковочная панель

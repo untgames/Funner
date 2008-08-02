@@ -24,16 +24,13 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
     {
         //инициализация свойств формы
       
-      Text           = "Fucking dock!";
-//      ShowHint     = DockState::DockRightAutoHide;
-      HideOnClose    = true;
-//      DockAreas      = (WeifenLuo::WinFormsUI::Docking::DockAreas)((WeifenLuo::WinFormsUI::Docking::DockAreas::Float | WeifenLuo::WinFormsUI::Docking::DockAreas::Document));
-      ShowHint       = WeifenLuo::WinFormsUI::Docking::DockState::Float;
-      DoubleBuffered = true;      
+      Text         = "Fucking dock!";
+      ShowHint     = WeifenLuo::WinFormsUI::Docking::DockState::Document;
+      HideOnClose  = true;
 
         //подписка на события формы
 
-/*      HandleCreated   += gcnew EventHandler (this, &ChildFormImpl::OnCreateHandle);
+      HandleCreated   += gcnew EventHandler (this, &ChildFormImpl::OnCreateHandle);
       HandleDestroyed += gcnew EventHandler (this, &ChildFormImpl::OnDestroyHandle);
       Resize          += gcnew EventHandler (this, &ChildFormImpl::OnResize);
 
@@ -44,7 +41,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 
         //отображение окна
 
-      child_window->Show (true);*/
+      child_window->Show (true);
     }    
 
   private:
@@ -108,7 +105,7 @@ ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, con
 
     IApplicationServer& application_server = window_system.ApplicationServer ();
 
-//    child_window = ChildWindowPtr (application_server.CreateChildWindow (init_string), false);
+    child_window = ChildWindowPtr (application_server.CreateChildWindow (init_string), false);
 
       //создание контейнера
 
