@@ -95,9 +95,7 @@ void MainForm::Insert (WeifenLuo::WinFormsUI::Docking::DockContent^ sub_form)
 {
   try
   {
-    sub_form->Show (form->DockPanel ());
-  
-    form->Controls->Add (sub_form);
+    sub_form->Show (form->DockPanel ());  
   }
   catch (System::Exception^ exception)
   {

@@ -20,7 +20,8 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 {
   public:
 /// онструктор
-    ChildFormImpl (ICustomChildWindow* in_child_window) : child_window (in_child_window)
+    ChildFormImpl (WindowSystem& in_window_system, ICustomChildWindow* in_child_window) :
+      window_system (in_window_system), child_window (in_child_window)
     {
         //инициализаци€ свойств формы
       
@@ -48,16 +49,52 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 ///ќбновление родительского окна
     void UpdateParent ()
     {
-      child_window->SetParent ((const void*)Handle);
+      try
+      {
+        try
+        {
+          child_window->SetParent ((const void*)Handle);
+        }
+        catch (System::Exception^ exception)
+        {
+          throw DotNetException ("tools::ui::windows_forms::ChildFormImpl::UpdateParent", exception);
+        }
+      }
+      catch (std::exception& exception)
+      {
+        window_system.LogPrintf ("%s", exception.what ());
+      }
+      catch (...)
+      {
+        window_system.LogPrintf ("Unknown exception at tools::ui::windows_forms::ChildFormImpl::UpdateParent");
+      }      
     }
 
 ///ќбновление размеров
     void UpdateRect ()
     {
-      System::Drawing::Rectangle^ rect = ClientRectangle;
+      try
+      {
+        try
+        {
+          System::Drawing::Rectangle^ rect = ClientRectangle;
 
-      child_window->SetPosition (rect->Left, rect->Top);
-      child_window->SetSize     (rect->Width, rect->Height);
+          child_window->SetPosition (rect->Left, rect->Top);
+          child_window->SetSize     (rect->Width, rect->Height);
+        }
+        catch (System::Exception^ exception)
+        {
+          throw DotNetException ("tools::ui::windows_forms::ChildFormImpl::UpdateRect", exception);
+        }
+      }
+      catch (std::exception& exception)
+      { 
+        window_system.LogPrintf ("%s", exception.what ());
+      }
+      catch (...)
+      {
+        window_system.LogPrintf ("Unknown exception at tools::ui::windows_forms::ChildFormImpl::UpdateRect");
+      }
     }
 
 ///ќбработка событи€ создани€ дескриптора формы
@@ -81,6 +118,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
     }        
 
   private:
+    WindowSystem&       window_system;
     ICustomChildWindow* child_window;
 };
 
@@ -109,7 +147,7 @@ ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, con
 
       //создание контейнера
 
-    form = gcnew ChildFormImpl (&*child_window);
+    form = gcnew ChildFormImpl (window_system, &*child_window);
     
       //отображение
       
