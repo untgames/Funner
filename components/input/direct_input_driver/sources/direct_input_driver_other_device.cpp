@@ -12,7 +12,7 @@ using namespace syslib;
 namespace
 {
 
-const size_t MESSAGE_BUFFER_SIZE  = 32;
+const size_t MESSAGE_BUFFER_SIZE  = 64;
 
 void default_event_handler (const char*)
 {
@@ -541,7 +541,7 @@ void OtherDevice::PollDevice ()
         switch (iter->second.type)
         {
           case ObjectType_AbsoluteAxis:
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %.4f", iter->second.name.c_str (), (((float)(*((LONG*)current_value) - iter->second.min_value)) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %.4f", iter->second.name.c_str (), ((float)(*((LONG*)current_value) - iter->second.min_value) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
             event_handler (message);
 
             break;
