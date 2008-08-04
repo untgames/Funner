@@ -13,7 +13,7 @@ End draw frame (id=5)
 Begin draw frame (id=6)
 Set render targets: render-target=3, depth-stencil-target=4
 Set viewport (left=0, top=0, width=800, height=600)
-Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 -2.00 -1.00]]
+Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
 View matrix=[[1.00 -0.00 0.00] [-0.00 -0.00 1.00] [-0.00 0.00 0.00] [-0.00 1.00 -0.00]]
 Draw primitive (id=7)
   texture_id=8

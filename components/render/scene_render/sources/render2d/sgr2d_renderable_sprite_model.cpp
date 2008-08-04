@@ -103,9 +103,12 @@ void RenderableSpriteModel::Update ()
     
       //обновление матрицы трансформаций
       
-    const math::mat4f& world_tm      = model->WorldTM ();
-    size_t             world_tm_hash = common::crc32 (&world_tm, sizeof (math::mat4f));
-      
+    math::mat4f world_tm;
+
+    model->EvalWorldTMAfterPivot (world_tm);
+
+    size_t world_tm_hash = common::crc32 (&world_tm, sizeof (math::mat4f));
+
     if (current_world_tm_hash != world_tm_hash)
     {
       primitive->SetTransform (world_tm);
