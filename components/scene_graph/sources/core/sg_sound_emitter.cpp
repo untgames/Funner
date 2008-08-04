@@ -17,7 +17,10 @@ struct SoundEmitter::Impl
   bool               signal_process [SoundEmitterEvent_Num];   //флаги обработки сигналов
   float              gain;                                     //громкость
 
-  Impl (const char* in_sound_declaration_name) : sound_declaration_name (in_sound_declaration_name), gain (1.f) {}
+  Impl (const char* in_sound_declaration_name) : sound_declaration_name (in_sound_declaration_name), gain (1.f) 
+  {
+    memset (signal_process, 0, sizeof (signal_process));
+  }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение клиентов о наступлении события
