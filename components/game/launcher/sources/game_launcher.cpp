@@ -2,8 +2,8 @@
 
 static clock_t MOVE_PERIOD = CLOCKS_PER_SEC / 100;
 
-const char* SCRIPT_FILE_NAME = "data/scripts/sg.lua";
-const char* TRANSLATION_MAP_FILE_NAME = "data/translation_table.keymap";
+const char* SCRIPT_FILE_NAME = "data/scripts/main.lua";
+const char* TRANSLATION_MAP_FILE_NAME = "data/configurations/input/translation_table.keymap";
 
 void idle (TestApplication& app, Shell& shell)
 {
@@ -47,6 +47,16 @@ void input_event_handler (const char* event, Shell& shell)
 void set_camera (Camera* camera, Viewport& vp)
 {
   vp.SetCamera (camera);
+}
+
+void set_listener (sound::ScenePlayer& scene_player, Listener* listener)
+{
+  scene_player.SetListener (listener);
+}
+
+void do_file (const char* file_name, Shell& shell)
+{
+  shell.ExecuteFile (file_name, &log_print);
 }
 
 void app_exit ()
@@ -95,7 +105,9 @@ int main ()
     InvokerRegistry& lib = env->Library ("global");
 
     lib.Register ("set_camera", make_invoker<void (Camera*)> (xtl::bind (&set_camera, _1, xtl::ref (vp))));
+    lib.Register ("set_listener", make_invoker<void (Listener*)> (xtl::bind (&set_listener, xtl::ref (test.ScenePlayer ()), _1)));
     lib.Register ("exit", make_invoker (&app_exit));
+    lib.Register ("dofile", make_invoker<void (const char*)> (xtl::bind (&do_file, _1, xtl::ref (shell))));
 
     shell.ExecuteFile (SCRIPT_FILE_NAME, &log_print);    
 

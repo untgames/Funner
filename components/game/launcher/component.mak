@@ -17,7 +17,11 @@ GAME.LAUNCHER.SOURCES.IMPORTS       := ../../system/link.static.mak ../../system
                                        ../../render/scene_render/compile.static.mak ../../render/scene_render/render2d.link.static.mak \
                                        ../../render/low_level_renderer_driver/compile.static.mak ../../render/low_level_renderer_driver/link.static.mak \
                                        ../../render/opengl_driver/link.static.mak \
-                                       ../../media/rfx/xmtl.link.static.mak \
+                                       ../../sound/manager/compile.static.mak ../../sound/manager/compile.static.mak \
+                                       ../../sound/scene_player/compile.static.mak ../../sound/scene_player/link.static.mak \
+                                       ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
+                                       ../../media/rfx/xmtl.link.static.mak ../../media/sound/snddecl.link.static.mak \
+                                       ../../media/sound/default_decoders.link.static.mak \
                                        ../../common/compile.static.mak \
                                        ../../script/binds/compile.static.mak ../../script/binds/link.static.mak \
                                        ../../script/core/compile.static.mak ../../script/core/link.static.mak ../../script/core/lua.link.static.mak \

@@ -27,14 +27,17 @@ namespace
     Константы
 */
 
-const char* CONFIGURATION_FILE_NAME   = "data/configuration.xml"; //имя файла конфигурации
+const char* CONFIGURATION_FILE_NAME   = "data/configurations/configuration.xml"; //имя файла конфигурации
 const char* CONFIGURATION_BRANCH_NAME = "Demo"; //имя ветки реестра с настройками
 const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //имя системы визуализации среднего уровня
-const char* MATERIAL_LIB_FILE_NAME    = "data/materials.xmtl"; //имя файла с материалами
+const char* MATERIAL_LIB_FILE_NAME    = "data/materials/materials.xmtl"; //имя файла с материалами
+const char* SOUND_DECL_LIB_FILE_NAME  = "data/sounds/gorilka.snddecl"; //имя файла с материалами
 
-const size_t DEFAULT_WINDOW_WIDTH  = 400;             //начальная ширина окна
-const size_t DEFAULT_WINDOW_HEIGHT = 300;             //начальная высота окна
-const char*  DEFAULT_WINDOW_TITLE  = "Render2d test"; //заголовок окна
+const char* DEFAULT_SOUND_DEVICE_MASK = "*"; //маска имени устройства воспроизведения
+
+const size_t DEFAULT_WINDOW_WIDTH  = 100;             //начальная ширина окна
+const size_t DEFAULT_WINDOW_HEIGHT = 100;             //начальная высота окна
+const char*  DEFAULT_WINDOW_TITLE  = "Default title"; //заголовок окна
 
 const size_t DEFAULT_FB_COLOR_BITS    = 24; //глубина буфера цвета
 const size_t DEFAULT_FB_ALPHA_BITS    = 8;  //глубина альфа-буфера
@@ -91,6 +94,8 @@ typedef xtl::com_ptr<render::low_level::ISwapChain> SwapChainPtr;
 typedef xtl::com_ptr<render::low_level::IDevice>    DevicePtr;
 typedef VarRegistryContainer<stl::string>           StringRegistry;
 typedef xtl::com_ptr<input::low_level::IDevice>     InputDevicePtr;
+typedef xtl::shared_ptr<sound::SoundManager>        SoundManagerPtr;
+typedef xtl::shared_ptr<sound::ScenePlayer>         ScenePlayerPtr;
 
 struct TestApplication::Impl
 {
@@ -103,9 +108,12 @@ struct TestApplication::Impl
   SceneRender                   render;              //рендер сцены
   render::RenderTarget          render_target;       //цель рендеринга  
   InputDevicePtr                input_device;        //устройство ввода
+  SoundManagerPtr               sound_manager;       //менеджер звука
+  ScenePlayerPtr                scene_player;        //проигрыватель звуков сцены
   
   void OnClose ()
   {
+    app_idle_connection.disconnect ();
     syslib::Application::Exit (0);
   }
 
@@ -160,11 +168,30 @@ struct TestApplication::Impl
     Конструктор / деструктор
 */
 
-TestApplication::TestApplication ()
+TestApplication::TestApplication (/*const char* start_script_name*/)
   : impl (new Impl)
 {
   try
-  {
+  {   /*
+      //инициализация LUA
+
+    xtl::shared_ptr<Environment> env (new Environment);
+
+    Shell shell ("lua", env);
+
+    bind_math_library (*env);
+    bind_scene_graph_library (*env);
+
+    InvokerRegistry& lib = env->Library ("global");
+    */
+/*    lib.Register ("set_camera", make_invoker<void (Camera*)> (xtl::bind (&set_camera, _1, xtl::ref (vp))));
+    lib.Register ("set_listener", make_invoker<void (Listener*)> (xtl::bind (&set_listener, xtl::ref (application->ScenePlayer ()), _1)));
+    lib.Register ("exit", make_invoker (&app_exit));
+    lib.Register ("dofile", make_invoker<void (const char*)> (xtl::bind (&do_file, _1, xtl::ref (shell))));*/
+
+  /*  shell.ExecuteFile (start_script_name, &log_print);    
+                                      */
+
       //монтирование реестра
       
     impl->string_registry.Mount (CONFIGURATION_BRANCH_NAME);
@@ -174,7 +201,6 @@ TestApplication::TestApplication ()
     impl->config.Open (CONFIGURATION_BRANCH_NAME);
 
     load_xml_configuration (VarRegistry (""), CONFIGURATION_FILE_NAME);
-
       //создание окна
       
     impl->window = new syslib::Window (get (impl->config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ? 
@@ -237,6 +263,15 @@ TestApplication::TestApplication ()
     input::low_level::WindowDriver::RegisterDevice (*(impl->window.get ()));
 
     impl->input_device = InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", "*"), false);
+    
+      //инициализация звука
+
+    impl->sound_manager = SoundManagerPtr (new sound::SoundManager ("OpenAL", get (impl->config, "SoundDeviceMask", DEFAULT_SOUND_DEVICE_MASK).c_str ()));
+    impl->scene_player  = ScenePlayerPtr  (new sound::ScenePlayer ());
+
+    impl->sound_manager->LoadSoundLibrary (SOUND_DECL_LIB_FILE_NAME);
+
+    impl->scene_player->SetManager (impl->sound_manager.get ());
   }
   catch (xtl::exception& exception)
   {
@@ -261,6 +296,11 @@ SceneRender& TestApplication::Render ()
 input::low_level::IDevice& TestApplication::InputDevice ()
 {
   return *(impl->input_device);
+}
+
+sound::ScenePlayer& TestApplication::ScenePlayer ()
+{
+  return *(impl->scene_player);
 }
 
 /*

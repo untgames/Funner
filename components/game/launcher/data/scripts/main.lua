@@ -26,6 +26,17 @@ camera.ZFar = 10
 
 camera:BindToScene (scene)
 
+listener1 = Scene.Listener.Create ()
+
+listener1:BindToParent (camera)
+
+set_listener (listener1)
+
+sound_emitter1 = Scene.SoundEmitter.Create ("gorilka")
+
+sound_emitter1:BindToParent (sprite)
+sound_emitter1:Play ()
+
 set_camera (camera)
 
 function onBeginMove(ort)
@@ -54,4 +65,3 @@ function idle(dt)
   sprite:Translate (sign (velocity ['+x'] - velocity ['-x']) * dt * velocity_x,
                     sign (velocity ['+y'] - velocity ['-y']) * dt * velocity_y, 0)
 end
-
