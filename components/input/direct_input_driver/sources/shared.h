@@ -138,6 +138,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     typedef xtl::com_ptr<IDirectInputDevice8>              DirectInputDeviceInterfacePtr;
     typedef stl::hash_map<size_t, ObjectData>              ObjectsMap;
     typedef xtl::uninitialized_storage<char>               DeviceDataBuffer;
+    typedef xtl::uninitialized_storage<char>               EventStringBuffer;
     typedef xtl::uninitialized_storage<DIDEVICEOBJECTDATA> EventsBuffer;
 
   private:
@@ -185,6 +186,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     EventsBuffer                            events_buffer;
     DeviceDataBuffer                        last_device_data;
     DeviceDataBuffer                        current_device_data;
+    EventStringBuffer                       event_string_buffer;
 };
 
 const char* get_direct_input_error_name (HRESULT error);

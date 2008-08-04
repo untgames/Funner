@@ -12,8 +12,6 @@ using namespace syslib;
 namespace
 {
 
-const size_t MESSAGE_BUFFER_SIZE  = 64;
-
 void default_event_handler (const char*)
 {
 }
@@ -136,7 +134,7 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
 OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevice8* in_direct_input_device_interface, const DebugLogHandler& in_debug_log_handler, const char* init_string)
   : event_handler (&default_event_handler), name (in_name), device_interface (in_direct_input_device_interface, false), 
     poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10), device_lost (false), debug_log_handler (in_debug_log_handler),
-    events_buffer_size (16)
+    events_buffer_size (16), event_string_buffer (1024)
 {
   static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::OtherDevice";
 
@@ -473,8 +471,6 @@ void OtherDevice::PollDevice ()
     }
   }
 
-  static char message[MESSAGE_BUFFER_SIZE];
-
   if (events_buffer_size)
   {
     for (size_t i = 0; i < events_count; i++)
@@ -490,35 +486,35 @@ void OtherDevice::PollDevice ()
       switch (iter->second.type)
       {
         case ObjectType_AbsoluteAxis:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %.4f", iter->second.name.c_str (), (((float)(events_buffer.data ()[i].dwData - iter->second.min_value)) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
-          event_handler (message);
+          xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' axis %.4f", iter->second.name.c_str (), (((float)(events_buffer.data ()[i].dwData - iter->second.min_value)) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
+          event_handler (event_string_buffer.data ());
           
           break;
         case ObjectType_RelativeAxis:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %f", iter->second.name.c_str (), ((float)(LONG)(events_buffer.data ()[i].dwData - iter->second.last_value)) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
-          event_handler (message);
+          xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' delta %f", iter->second.name.c_str (), ((float)(LONG)(events_buffer.data ()[i].dwData - iter->second.last_value)) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
+          event_handler (event_string_buffer.data ());
           
           break;
         case ObjectType_Button:
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' %s", iter->second.name.c_str (), (events_buffer.data ()[i].dwData & 0x80) ? "down" : "up");
-          event_handler (message);
+          xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' %s", iter->second.name.c_str (), (events_buffer.data ()[i].dwData & 0x80) ? "down" : "up");
+          event_handler (event_string_buffer.data ());
           
           break;
         case ObjectType_POV:
           if (!is_pov_pressed (events_buffer.data ()[i].dwData))
           {
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", iter->second.name.c_str ());
-            event_handler (message);
+            xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' up", iter->second.name.c_str ());
+            event_handler (event_string_buffer.data ());
           }
           else
           {
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' pov %d", iter->second.name.c_str (), events_buffer.data ()[i].dwData);
-            event_handler (message);
+            xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' pov %d", iter->second.name.c_str (), events_buffer.data ()[i].dwData);
+            event_handler (event_string_buffer.data ());
             
             if (!is_pov_pressed (iter->second.last_value))
             {
-              xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", iter->second.name.c_str ());
-              event_handler (message);
+              xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' down", iter->second.name.c_str ());
+              event_handler (event_string_buffer.data ());
             }
           }
           break;
@@ -541,35 +537,35 @@ void OtherDevice::PollDevice ()
         switch (iter->second.type)
         {
           case ObjectType_AbsoluteAxis:
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' axis %.4f", iter->second.name.c_str (), ((float)(*((LONG*)current_value) - iter->second.min_value) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
-            event_handler (message);
+            xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' axis %.4f", iter->second.name.c_str (), ((float)(*((LONG*)current_value) - iter->second.min_value) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
+            event_handler (event_string_buffer.data ());
 
             break;
           case ObjectType_RelativeAxis:
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' delta %f", iter->second.name.c_str (), (float)(*((LONG*)current_value) - *((LONG*)(&last_device_data.data ()[iter->second.offset]))) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
-            event_handler (message);
+            xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' delta %f", iter->second.name.c_str (), (float)(*((LONG*)current_value) - *((LONG*)(&last_device_data.data ()[iter->second.offset]))) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
+            event_handler (event_string_buffer.data ());
 
             break;
           case ObjectType_Button:
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' %s", iter->second.name.c_str (), (*current_value & 0x80) ? "down" : "up");
-            event_handler (message);
+            xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' %s", iter->second.name.c_str (), (*current_value & 0x80) ? "down" : "up");
+            event_handler (event_string_buffer.data ());
 
             break;
           case ObjectType_POV:
             if (!is_pov_pressed (*(DWORD*)current_value))
             {
-              xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", iter->second.name.c_str ());
-              event_handler (message);
+              xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' up", iter->second.name.c_str ());
+              event_handler (event_string_buffer.data ());
             }
             else
             {
-              xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' pov %d", iter->second.name.c_str (), *((DWORD*)current_value));
-              event_handler (message);
+              xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' pov %d", iter->second.name.c_str (), *((DWORD*)current_value));
+              event_handler (event_string_buffer.data ());
 
               if (!is_pov_pressed (*(DWORD*)&last_device_data.data ()[iter->second.offset]))
               {
-                xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", iter->second.name.c_str ());
-                event_handler (message);
+                xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' down", iter->second.name.c_str ());
+                event_handler (event_string_buffer.data ());
               }
             }
             break;
