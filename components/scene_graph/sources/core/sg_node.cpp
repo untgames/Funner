@@ -914,12 +914,11 @@ void Node::LookAt (const vec3f& position, const vec3f& target, const vec3f& up, 
       throw xtl::make_argument_exception (METHOD_NAME, "space", space);
   }
   
-    //получение матрицы поворота
+    //получение матрицы поворота        
     
-  mat4f orientation_tm   = lookatf (vec3f (0.0f), local_target - local_position, local_up);
-  quatf orientation_quat = orientation_tm;
+  mat4f local_orientation_tm = lookatf (vec3f (0.0f), local_target - local_position, local_up);    
 
-  SetOrientation (orientation_tm);
+  SetOrientation (local_orientation_tm);
   SetPosition    (local_position);
 }
 
@@ -940,7 +939,23 @@ void Node::LookAt
 
 void Node::LookTo (const vec3f& target, const vec3f& up, NodeTransformSpace space)
 {
-  LookAt (impl->local_position, target, up, space);
+  switch (space)
+  {
+    case NodeTransformSpace_Local:
+      LookAt (vec3f (0.0f), target, up, space);
+
+      break;
+    case NodeTransformSpace_Parent:
+      LookAt (impl->local_position, target, up, space);
+
+      break;
+    case NodeTransformSpace_World:
+      LookAt (impl->world_position, target, up, space);
+
+      break;
+    default:
+      throw xtl::make_argument_exception ("scene_graph::Node::LookTo", "space", space);
+  }
 }
 
 void Node::LookTo (float target_x, float target_y, float target_z, float up_x, float up_y, float up_z, NodeTransformSpace space)

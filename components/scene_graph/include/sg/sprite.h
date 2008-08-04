@@ -12,8 +12,9 @@ namespace scene_graph
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum SpriteModelEvent
 {
-  SpriteModelEvent_AfterMaterialUpdate,      //срабатывает после изменения материала
-  SpriteModelEvent_AfterSpriteDescsUpdate,   //срабатывает после изменения данных спрайтов
+  SpriteModelEvent_AfterMaterialUpdate,    //срабатывает после изменения материала
+  SpriteModelEvent_AfterSpriteDescsUpdate, //срабатывает после изменения данных спрайтов
+  SpriteModelEvent_AfterPivotUpdate,       //срабатывает после изменения центра спрайтовой модели
   
   SpriteModelEvent_Num
 };
@@ -48,6 +49,24 @@ class SpriteModel: public Entity
     const char* Material    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Положение и ориентиация центра модели
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void               SetPivot         (const math::vec3f& position, float angle_in_degrees);
+    void               SetPivotPosition (const math::vec3f& position);
+    void               SetPivotPosition (float x, float y, float z);
+    void               SetPivotRotation (float angle_in_degrees); //поворот центра относительно Oz
+    const math::vec3f& PivotPosition    () const;
+    float              PivotRotation    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение матриц преобразования после применения pivot-преобразования
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void EvalTransformationAfterPivot (NodeTransformSpace space, math::mat4f& result) const;
+    void EvalLocalTMAfterPivot        (math::mat4f& result) const { EvalTransformationAfterPivot (NodeTransformSpace_Local, result); }
+    void EvalParentTMAfterPivot       (math::mat4f& result) const { EvalTransformationAfterPivot (NodeTransformSpace_Parent, result); }
+    void EvalWorldTMAfterPivot        (math::mat4f& result) const { EvalTransformationAfterPivot (NodeTransformSpace_World, result); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события модели
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (SpriteModel& sender, SpriteModelEvent event_id)> EventHandler;
@@ -72,6 +91,11 @@ class SpriteModel: public Entity
 ///Оповещение об изменении данных спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void UpdateSpriteDescsNotify ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Оповещение об изменении мировой матрицы преобразований
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    void AfterUpdateWorldTransformEvent ();
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

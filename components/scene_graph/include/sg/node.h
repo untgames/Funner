@@ -319,7 +319,7 @@ class Node: public xtl::dynamic_cast_root
 ///Метод, вызываемый при посещении данного узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void AcceptCore (Visitor&);
-    
+
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///События
@@ -327,7 +327,7 @@ class Node: public xtl::dynamic_cast_root
     virtual void AfterUpdateWorldTransformEvent () {} //после изменения положения объекта
     virtual void AfterSceneAttachEvent () {}          //после присоединения объекта к сцене
     virtual void BeforeSceneDetachEvent () {}         //перед отсоединением объекта от сцены
-    
+
   private:
     static void DestroyNode (Node*);
     void SetScene (scene_graph::Scene* in_scene);
