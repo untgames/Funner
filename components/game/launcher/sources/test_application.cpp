@@ -28,10 +28,12 @@ namespace
 */
 
 const char* CONFIGURATION_FILE_NAME   = "data/configurations/configuration.xml"; //имя файла конфигурации
-const char* CONFIGURATION_BRANCH_NAME = "Demo"; //имя ветки реестра с настройками
+const char* CONFIGURATION_BRANCH_NAME = "Configuration"; //имя ветки реестра с настройками
 const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //имя системы визуализации среднего уровня
 const char* MATERIAL_LIB_FILE_NAME    = "data/materials/materials.xmtl"; //имя файла с материалами
 const char* SOUND_DECL_LIB_FILE_NAME  = "data/sounds/gorilka.snddecl"; //имя файла с материалами
+
+const char* TRANSLATION_MAP_FILE_NAME = "data/configurations/input/translation_table.keymap";
 
 const char* DEFAULT_SOUND_DEVICE_MASK = "*"; //маска имени устройства воспроизведения
 
@@ -46,7 +48,11 @@ const size_t DEFAULT_FB_STENCIL_BITS  = 8;  //глубина буфера трафарета
 const size_t DEFAULT_FB_BUFFERS_COUNT = 2;  //количество буферов в цепочке обмена
 const size_t DEFAULT_FB_FULL_SCREEN_STATE = 0; //fullscreen по умолчанию
 
+static clock_t MOVE_PERIOD = CLOCKS_PER_SEC / 100;
+
 const char* DEFAULT_DEVICE_INIT_STRING = ""; //строка инициализации устройства рендеринга
+
+const char* APPLICATION_LIBRARY = "static.Application";
 
 /*
     Утилиты
@@ -84,6 +90,41 @@ void log_print (const char* message)
   printf ("%s\n", message);
 }
 
+void do_file (const char* file_name, Shell& shell)
+{
+  shell.ExecuteFile (file_name, &log_print);
+}
+
+void idle (TestApplication& app, Shell& shell)
+{
+  try
+  {
+    static clock_t last_time = clock ();
+    
+    if (clock () - last_time > MOVE_PERIOD)
+    {
+      invoke<void> (*shell.Interpreter (), "idle", float (clock () - last_time) / CLOCKS_PER_SEC);
+
+      last_time = clock ();
+    }        
+
+    app.PostRedraw ();
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception at idle: %s\n", exception.what ());
+  }
+}
+
+/*
+    Выполнение скрипта    
+*/
+
+void input_event_handler (const char* event, Shell& shell)
+{
+  shell.Execute (event, &log_print);
+}
+
 }
 
 /*
@@ -96,6 +137,8 @@ typedef VarRegistryContainer<stl::string>           StringRegistry;
 typedef xtl::com_ptr<input::low_level::IDevice>     InputDevicePtr;
 typedef xtl::shared_ptr<sound::SoundManager>        SoundManagerPtr;
 typedef xtl::shared_ptr<sound::ScenePlayer>         ScenePlayerPtr;
+typedef xtl::shared_ptr<Environment>                EnvironmentPtr;
+typedef xtl::shared_ptr<Shell>                      ShellPtr;
 
 struct TestApplication::Impl
 {
@@ -110,7 +153,24 @@ struct TestApplication::Impl
   InputDevicePtr                input_device;        //устройство ввода
   SoundManagerPtr               sound_manager;       //менеджер звука
   ScenePlayerPtr                scene_player;        //проигрыватель звуков сцены
-  
+  EnvironmentPtr                environment;         //скриптовое окружение
+  ShellPtr                      shell;               //скриптовая оболочка
+  render::Viewport              viewport;            //вьюпорт
+  Desktop                       desktop;    
+  input::TranslationMap         translation_map;
+
+        
+  Impl ()
+  {
+      //монтирование реестра
+      
+    string_registry.Mount (CONFIGURATION_BRANCH_NAME);
+
+      //чтение настроек
+      
+    config.Open (CONFIGURATION_BRANCH_NAME);
+  }
+
   void OnClose ()
   {
     app_idle_connection.disconnect ();
@@ -162,45 +222,63 @@ struct TestApplication::Impl
       printf ("Eexception at window resize: %s\n", exception.what ());
     }
   }
+
+  void LoadConfiguration (const char* configuration_file_name)
+  {
+    load_xml_configuration (VarRegistry (""), configuration_file_name);
+  }
+
+  void SetCamera (Camera* camera)
+  {
+    viewport.SetCamera (camera);
+  }
+
+  void SetListener (Listener* listener)
+  {
+    scene_player->SetListener (listener);
+  }
 };
 
 /*
     Конструктор / деструктор
 */
 
-TestApplication::TestApplication (/*const char* start_script_name*/)
+TestApplication::TestApplication (const char* start_script_name)
   : impl (new Impl)
 {
   try
-  {   /*
+  {
+      //инициализация звука
+
+    impl->sound_manager = SoundManagerPtr (new sound::SoundManager ("OpenAL", get (impl->config, "SoundDeviceMask", DEFAULT_SOUND_DEVICE_MASK).c_str ()));
+    impl->scene_player  = ScenePlayerPtr  (new sound::ScenePlayer ());
+
+    impl->sound_manager->LoadSoundLibrary (SOUND_DECL_LIB_FILE_NAME);
+
+    impl->scene_player->SetManager (impl->sound_manager.get ());
+
       //инициализация LUA
 
-    xtl::shared_ptr<Environment> env (new Environment);
+    impl->environment = EnvironmentPtr (new Environment);
 
-    Shell shell ("lua", env);
+    impl->shell = ShellPtr (new Shell ("lua", impl->environment));
 
-    bind_math_library (*env);
-    bind_scene_graph_library (*env);
+    bind_math_library (*impl->environment);
+    bind_scene_graph_library (*impl->environment);
 
-    InvokerRegistry& lib = env->Library ("global");
-    */
-/*    lib.Register ("set_camera", make_invoker<void (Camera*)> (xtl::bind (&set_camera, _1, xtl::ref (vp))));
-    lib.Register ("set_listener", make_invoker<void (Listener*)> (xtl::bind (&set_listener, xtl::ref (application->ScenePlayer ()), _1)));
-    lib.Register ("exit", make_invoker (&app_exit));
-    lib.Register ("dofile", make_invoker<void (const char*)> (xtl::bind (&do_file, _1, xtl::ref (shell))));*/
+    InvokerRegistry& application_library = impl->environment->CreateLibrary (APPLICATION_LIBRARY);
 
-  /*  shell.ExecuteFile (start_script_name, &log_print);    
-                                      */
+    application_library.Register ("LoadConfiguration", make_invoker<void (const char*)> (xtl::bind (&TestApplication::Impl::LoadConfiguration, impl.get (), _1)));
+    application_library.Register ("Exit", make_invoker<void ()> (xtl::bind (&TestApplication::Impl::OnClose, impl.get ())));
+    application_library.Register ("SetCamera", make_invoker<void (Camera*)> (xtl::bind (&TestApplication::Impl::SetCamera, impl.get (), _1)));
+    application_library.Register ("SetListener", make_invoker<void (Listener*)> (xtl::bind (&TestApplication::Impl::SetListener, impl.get (), _1)));
 
-      //монтирование реестра
-      
-    impl->string_registry.Mount (CONFIGURATION_BRANCH_NAME);
-    
-      //чтение настроек
-      
-    impl->config.Open (CONFIGURATION_BRANCH_NAME);
+    InvokerRegistry& lib = impl->environment->Library ("global");
 
-    load_xml_configuration (VarRegistry (""), CONFIGURATION_FILE_NAME);
+    lib.Register ("dofile", make_invoker<void (const char*)> (xtl::bind (&do_file, _1, xtl::ref (*impl->shell))));
+
+    impl->shell->ExecuteFile (start_script_name, &log_print);
+
       //создание окна
       
     impl->window = new syslib::Window (get (impl->config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ? 
@@ -246,7 +324,6 @@ TestApplication::TestApplication (/*const char* start_script_name*/)
     impl->render.SetLogHandler (&log_print);
 
     impl->render.SetRenderer (render::mid_level::LowLevelDriver::Name (), MID_LEVEL_RENDERER_NAME);
-//    impl->render.SetRenderer ("Debug", "Renderer2d");
 
     impl->render_target = impl->render.CreateRenderTarget ("default", "default");
 
@@ -264,14 +341,29 @@ TestApplication::TestApplication (/*const char* start_script_name*/)
 
     impl->input_device = InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", "*"), false);
     
-      //инициализация звука
+      //создание областей вывода
+      
+    impl->viewport.SetName       ("Viewport1");
+    impl->viewport.SetRenderPath ("Render2d");
+    
+    impl->viewport.SetArea (0, 0, 100, 100);
 
-    impl->sound_manager = SoundManagerPtr (new sound::SoundManager ("OpenAL", get (impl->config, "SoundDeviceMask", DEFAULT_SOUND_DEVICE_MASK).c_str ()));
-    impl->scene_player  = ScenePlayerPtr  (new sound::ScenePlayer ());
+    impl->desktop.SetBackgroundColor (math::vec4f (1, 1, 1, 1));    
+    impl->desktop.Attach (impl->viewport);
 
-    impl->sound_manager->LoadSoundLibrary (SOUND_DECL_LIB_FILE_NAME);
+    impl->render_target.SetDesktop (&impl->desktop);        
 
-    impl->scene_player->SetManager (impl->sound_manager.get ());
+      //инициализация системы ввода
+
+    impl->translation_map.Load (TRANSLATION_MAP_FILE_NAME);
+
+    input::TranslationMap::EventHandler event_handler = xtl::bind (&input_event_handler, _1, xtl::ref (*impl->shell));
+
+    impl->input_device->SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler));
+    
+      //установка idle-функции
+
+    impl->app_idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (*this), xtl::ref (*impl->shell)));
   }
   catch (xtl::exception& exception)
   {
@@ -282,25 +374,6 @@ TestApplication::TestApplication (/*const char* start_script_name*/)
 
 TestApplication::~TestApplication ()
 {
-}
-
-/*
-    Получение объектов приложения
-*/
-
-SceneRender& TestApplication::Render ()
-{
-  return impl->render;
-}
-
-input::low_level::IDevice& TestApplication::InputDevice ()
-{
-  return *(impl->input_device);
-}
-
-sound::ScenePlayer& TestApplication::ScenePlayer ()
-{
-  return *(impl->scene_player);
 }
 
 /*
@@ -315,28 +388,10 @@ int TestApplication::Run ()
 }
 
 /*
-    Получение цели рендеринга
-*/
-
-RenderTarget& TestApplication::RenderTarget ()
-{
-  return impl->render_target;
-}
-
-/*
     Перерисовка
 */
 
 void TestApplication::PostRedraw ()
 {
   impl->window->Invalidate ();
-}
-
-/*
-    Установка idle-функции
-*/
-
-void TestApplication::SetIdleHandler (const IdleFunction& idle)
-{
-  impl->app_idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (idle, xtl::ref (*this)));
 }

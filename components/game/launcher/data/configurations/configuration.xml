@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="windows-1251"?>
-<Demo
+<Configuration
 WindowWidth="640"
 WindowHeight="480"
 WindowTitle="Render2d"

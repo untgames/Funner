@@ -1,3 +1,5 @@
+Application.LoadConfiguration ("data/configurations/configuration.xml")
+
 velocity = {['+x']=0; ['-x']=0; ['+y']=0; ['-y']=0}
 
 velocity_x = 3
@@ -30,14 +32,14 @@ listener1 = Scene.Listener.Create ()
 
 listener1:BindToParent (camera)
 
-set_listener (listener1)
+Application.SetListener (listener1)
 
 sound_emitter1 = Scene.SoundEmitter.Create ("gorilka")
 
 sound_emitter1:BindToParent (sprite)
 sound_emitter1:Play ()
 
-set_camera (camera)
+Application.SetCamera (camera)
 
 function onBeginMove(ort)
   velocity [ort] = velocity [ort] + 1
