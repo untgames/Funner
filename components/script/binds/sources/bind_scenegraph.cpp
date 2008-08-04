@@ -28,7 +28,9 @@ const char* SCENE_POINT_LIGHT_LIBRARY                 = "Scene.PointLight";
 const char* SCENE_BOX_HELPER_LIBRARY                  = "Scene.BoxHelper";
 const char* SCENE_LISTENER_LIBRARY                    = "Scene.Listener";
 const char* SCENE_SOUND_EMITTER_LIBRARY               = "Scene.SoundEmitter";
+const char* SCENE_SPRITE_MODEL_LIBRARY                = "Scene.SpriteModel";
 const char* SCENE_SPRITE_LIBRARY                      = "Scene.Sprite";
+const char* SCENE_SPRITE_LIST_LIBRARY                 = "Scene.SpriteList";
 const char* SCENE_VISUAL_MODEL_LIBRARY                = "Scene.VisualModel";
 
 /*
@@ -219,13 +221,13 @@ InvokerRegistry& bind_node_library (Environment& environment)
    Регистрация библиотеки работы с объектами сцены
 */
 
-InvokerRegistry& bind_entity_library (Environment& environment, InvokerRegistry& node_lib)
+InvokerRegistry& bind_entity_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_ENTITY_LIBRARY);
 
     //наследование
 
-  lib.Register (node_lib);
+  lib.Register (environment, SCENE_NODE_LIBRARY);
 
     //регистрация операций
 
@@ -269,13 +271,13 @@ OrthoCamera::Pointer create_ortho_camera ()
     Регистрация библиотек работы с камерами
 */
 
-void bind_perspective_camera_library (Environment& environment, InvokerRegistry& entity_lib)
+void bind_perspective_camera_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_PERSPECTIVE_CAMERA_LIBRARY);
 
     //наследование
 
-  lib.Register (entity_lib);
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
     //регистрация функций создания
 
@@ -297,13 +299,13 @@ void bind_perspective_camera_library (Environment& environment, InvokerRegistry&
   environment.RegisterType<PerspectiveCamera> (SCENE_PERSPECTIVE_CAMERA_LIBRARY);
 }
 
-void bind_ortho_camera_library (Environment& environment, InvokerRegistry& entity_lib)
+void bind_ortho_camera_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_ORTHO_CAMERA_LIBRARY);
 
     //наследование
 
-  lib.Register (entity_lib);
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
     //регистрация функций создания
 
@@ -352,13 +354,13 @@ PointLight::Pointer create_point_light ()
     Регистрация библиотек работы с источниками света
 */
 
-void bind_direct_light_library (Environment& environment, InvokerRegistry& light_lib)
+void bind_direct_light_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_DIRECT_LIGHT_LIBRARY);
 
     //наследование
 
-  lib.Register (light_lib);
+  lib.Register (environment, SCENE_LIGHT_LIBRARY);
 
     //регистрация функций создания
 
@@ -374,13 +376,13 @@ void bind_direct_light_library (Environment& environment, InvokerRegistry& light
   environment.RegisterType<DirectLight> (SCENE_DIRECT_LIGHT_LIBRARY);
 }
 
-void bind_spot_light_library (Environment& environment, InvokerRegistry& light_lib)
+void bind_spot_light_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_SPOT_LIGHT_LIBRARY);
 
     //наследование
 
-  lib.Register (light_lib);
+  lib.Register (environment, SCENE_LIGHT_LIBRARY);
 
     //регистрация функций создания
 
@@ -398,13 +400,13 @@ void bind_spot_light_library (Environment& environment, InvokerRegistry& light_l
   environment.RegisterType<SpotLight> (SCENE_SPOT_LIGHT_LIBRARY);
 }
 
-void bind_point_light_library (Environment& environment, InvokerRegistry& light_lib)
+void bind_point_light_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_POINT_LIGHT_LIBRARY);
 
     //наследование
 
-  lib.Register (light_lib);
+  lib.Register (environment, SCENE_LIGHT_LIBRARY);
 
     //регистрация функций создания
 
@@ -415,13 +417,13 @@ void bind_point_light_library (Environment& environment, InvokerRegistry& light_
   environment.RegisterType<PointLight> (SCENE_POINT_LIGHT_LIBRARY);
 }
 
-void bind_light_library (Environment& environment, InvokerRegistry& entity_lib)
+void bind_light_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_LIGHT_LIBRARY);
 
     //наследование
 
-  lib.Register (entity_lib);
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
     //регистрация операций
 
@@ -431,12 +433,6 @@ void bind_light_library (Environment& environment, InvokerRegistry& entity_lib)
   lib.Register ("get_LightColor",  make_invoker (&Light::LightColor));
   lib.Register ("get_Attenuation", make_invoker (&Light::Attenuation));
   lib.Register ("get_Range",       make_invoker (&Light::Range));
-
-    //регистрация библиотек
-
-  bind_direct_light_library (environment, lib);
-  bind_spot_light_library   (environment, lib);
-  bind_point_light_library  (environment, lib);
 
     //регистрация типов данных
 
@@ -456,13 +452,13 @@ helpers::Box::Pointer create_box_helper ()
    Регистрация библиотеки работы с хелперами
 */
 
-void bind_box_helper_library (Environment& environment, InvokerRegistry& entity_lib)
+void bind_box_helper_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_BOX_HELPER_LIBRARY);
 
     //наследование
 
-  lib.Register (entity_lib);
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
     //регистрация функций создания
 
@@ -486,13 +482,13 @@ Listener::Pointer create_listener ()
    Регистрация библиотеки работы с слушателями
 */
 
-void bind_listener_library (Environment& environment, InvokerRegistry& entity_lib)
+void bind_listener_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_LISTENER_LIBRARY);
 
     //наследование
 
-  lib.Register (entity_lib);
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
     //регистрация функций создания
 
@@ -521,13 +517,13 @@ SoundEmitter::Pointer create_sound_emitter (const char* sound_declaration_name)
    Регистрация библиотеки работы с источниками звука
 */
 
-void bind_sound_emitter_library (Environment& environment, InvokerRegistry& entity_lib)
+void bind_sound_emitter_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_SOUND_EMITTER_LIBRARY);
 
     //наследование
 
-  lib.Register (entity_lib);
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
     //регистрация функций создания
 
@@ -557,17 +553,63 @@ Sprite::Pointer create_sprite ()
   return Sprite::Create ();
 }
 
+SpriteList::Pointer create_sprite_list ()
+{
+  return SpriteList::Create ();
+}
+
 /*
-   Регистрация библиотеки работы с спрайтами
+     Регистрация библиотеки работы с спрайтовыми моделями
 */
 
-void bind_sprite_library (Environment& environment, InvokerRegistry& entity_lib)
+template <NodeTransformSpace space>
+mat4f get_transformation_after_pivot (SpriteModel& model)
+{
+  mat4f result;
+
+  model.EvalTransformationAfterPivot (space, result);
+
+  return result;
+}
+
+void bind_sprite_model_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_SPRITE_MODEL_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+
+    //регистрация операций
+
+  lib.Register ("set_Material",           make_invoker (&SpriteModel::SetMaterial));
+  lib.Register ("get_Material",           make_invoker (&SpriteModel::Material));
+  lib.Register ("set_PivotPosition",      make_invoker (implicit_cast<void (SpriteModel::*)(const vec3f&)> (&SpriteModel::SetPivotPosition)));
+  lib.Register ("get_PivotPosition",      make_invoker (&SpriteModel::PivotPosition));
+  lib.Register ("set_PivotRotation",      make_invoker (&SpriteModel::SetPivotRotation));
+  lib.Register ("get_PivotRotation",      make_invoker (&SpriteModel::PivotRotation));
+  lib.Register ("get_LocalTMAfterPivot",  make_invoker (&get_transformation_after_pivot<NodeTransformSpace_Local>));
+  lib.Register ("get_ParentTMAfterPivot", make_invoker (&get_transformation_after_pivot<NodeTransformSpace_Parent>));
+  lib.Register ("get_WorldTMAfterPivot",  make_invoker (&get_transformation_after_pivot<NodeTransformSpace_World>));
+  lib.Register ("SetPivotPosition",       make_invoker (implicit_cast<void (SpriteModel::*)(float, float, float)> (&SpriteModel::SetPivotPosition)));
+  lib.Register ("SetPivot",               make_invoker (&SpriteModel::SetPivot));
+
+    //регистрация типов данных
+
+  environment.RegisterType<SpriteModel> (SCENE_SPRITE_MODEL_LIBRARY);
+}
+
+/*
+     Регистрация библиотеки работы с спрайтами
+*/
+
+void bind_sprite_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_SPRITE_LIBRARY);
 
     //наследование
 
-  lib.Register (entity_lib);
+  lib.Register (environment, SCENE_SPRITE_MODEL_LIBRARY);
 
     //регистрация функций создания
 
@@ -576,11 +618,9 @@ void bind_sprite_library (Environment& environment, InvokerRegistry& entity_lib)
     //регистрация операций
 
   lib.Register ("set_Color",    make_invoker (implicit_cast<void (Sprite::*) (const vec4f&)> (&Sprite::SetColor)));
-  lib.Register ("set_Material", make_invoker (&Sprite::SetMaterial));
   lib.Register ("set_Alpha",    make_invoker (&Sprite::SetAlpha));
   lib.Register ("set_Frame",    make_invoker (&Sprite::SetFrame));
   lib.Register ("get_Color",    make_invoker (&Sprite::Color));
-  lib.Register ("get_Material", make_invoker (&Sprite::Material));
   lib.Register ("get_Alpha",    make_invoker (&Sprite::Alpha));
   lib.Register ("get_Frame",    make_invoker <int (Sprite&)> (&Sprite::Frame));
 
@@ -605,13 +645,13 @@ VisualModel::Pointer create_visual_model ()
    Регистрация библиотеки работы с моделями
 */
 
-void bind_visual_model_library (Environment& environment, InvokerRegistry& entity_lib)
+void bind_visual_model_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_VISUAL_MODEL_LIBRARY);
 
     //наследование
 
-  lib.Register (entity_lib);
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
     //регистрация функций создания
 
@@ -639,21 +679,21 @@ namespace binds
 
 void bind_scene_graph_library (Environment& environment)
 {
-    //регистрация библиотек
-  
-  bind_scene_library (environment);
-
-  InvokerRegistry& node_class_lib   = bind_node_library (environment);
-  InvokerRegistry& entity_class_lib = bind_entity_library (environment, node_class_lib);
-
-  bind_perspective_camera_library (environment, entity_class_lib);
-  bind_ortho_camera_library       (environment, entity_class_lib);
-  bind_light_library              (environment, entity_class_lib);
-  bind_box_helper_library         (environment, entity_class_lib);
-  bind_listener_library           (environment, entity_class_lib);
-  bind_sound_emitter_library      (environment, entity_class_lib);
-  bind_sprite_library             (environment, entity_class_lib);
-  bind_visual_model_library       (environment, entity_class_lib);
+  bind_scene_library              (environment);
+  bind_node_library               (environment);
+  bind_entity_library             (environment);
+  bind_perspective_camera_library (environment);
+  bind_ortho_camera_library       (environment);
+  bind_light_library              (environment);
+  bind_direct_light_library       (environment);
+  bind_spot_light_library         (environment);
+  bind_point_light_library        (environment);
+  bind_box_helper_library         (environment);
+  bind_listener_library           (environment);
+  bind_sound_emitter_library      (environment);
+  bind_sprite_model_library       (environment);
+  bind_sprite_library             (environment);
+  bind_visual_model_library       (environment);
 }
 
 }

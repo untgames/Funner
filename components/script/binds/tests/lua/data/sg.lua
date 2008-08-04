@@ -379,6 +379,31 @@ function test_sprite ()
   
 end
 
+function test_sprite_pivot ()
+  print ("Sprite pivot test")
+
+  local sprite = Scene.Sprite.Create ()
+
+  sprite.PivotPosition = vec3 (1, 2, 3)
+  sprite.PivotRotation = 90
+
+  local tm = sprite.WorldTMAfterPivot
+ 
+  sprite:SetPosition (5, 6, 7)
+
+  tm = sprite.WorldTMAfterPivot
+
+  local position = tm * vec3 (0)
+  local axis_x   = tm * vec4 (1, 0, 0, 0)
+  local axis_y   = tm * vec4 (0, 1, 0, 0)
+  local axis_z   = tm * vec4 (0, 0, 1, 0)
+
+  print ("position: " .. tostring (position))
+  print ("axis_x:   " .. tostring (axis_x))
+  print ("axis_y:   " .. tostring (axis_y))
+  print ("axis_z:   " .. tostring (axis_z))
+end
+
 function test_visual_model ()
   print ("VisualModel test")
 
@@ -412,6 +437,8 @@ function test ()
   test_visual_model ()
 
   test_sprite ()
+
+  test_sprite_pivot ()
 
   test_scene ()
 end
