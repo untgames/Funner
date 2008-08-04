@@ -2,8 +2,8 @@
 
 static clock_t MOVE_PERIOD = CLOCKS_PER_SEC / 100;
 
-const char* SCRIPT_FILE_NAME = "media/scripts/sg.lua";
-const char* TRANSLATION_MAP_FILE_NAME = "media/translation_table.keymap";
+const char* SCRIPT_FILE_NAME = "data/scripts/sg.lua";
+const char* TRANSLATION_MAP_FILE_NAME = "data/translation_table.keymap";
 
 void idle (TestApplication& app, Shell& shell)
 {

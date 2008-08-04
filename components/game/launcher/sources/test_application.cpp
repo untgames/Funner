@@ -27,10 +27,10 @@ namespace
     Константы
 */
 
-const char* CONFIGURATION_FILE_NAME   = "media/configuration.xml"; //имя файла конфигурации
+const char* CONFIGURATION_FILE_NAME   = "data/configuration.xml"; //имя файла конфигурации
 const char* CONFIGURATION_BRANCH_NAME = "Demo"; //имя ветки реестра с настройками
 const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //имя системы визуализации среднего уровня
-const char* MATERIAL_LIB_FILE_NAME    = "media/materials.xmtl"; //имя файла с материалами
+const char* MATERIAL_LIB_FILE_NAME    = "data/materials.xmtl"; //имя файла с материалами
 
 const size_t DEFAULT_WINDOW_WIDTH  = 400;             //начальная ширина окна
 const size_t DEFAULT_WINDOW_HEIGHT = 300;             //начальная высота окна

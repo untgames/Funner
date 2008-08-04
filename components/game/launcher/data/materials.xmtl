@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <material_library>
   <material id="sprite_material">
-    <sprite_profile image="media/bottom.jpg" blend_mode="none"/>
+    <sprite_profile image="data/bottom.jpg" blend_mode="none"/>
   </material>
 </material_library>
