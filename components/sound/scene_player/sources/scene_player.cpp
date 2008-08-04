@@ -212,9 +212,11 @@ struct ScenePlayer::Impl
 
       sound::Listener snd_listener;
         
-      snd_listener.position  = listener->WorldPosition ();                              //!!!!!!!!добавить скорость
-      snd_listener.direction = listener->WorldOrientation () * vec3f(0.f,0.f,1.f);
-      snd_listener.up        = listener->WorldOrientation () * vec3f(0.f,1.f,0.f);
+      mat4f listener_world_tm = listener->WorldTM ();
+
+      snd_listener.position  = listener_world_tm * vec3f (0.f);                              //!!!!!!!!добавить скорость
+      snd_listener.direction = listener_world_tm * vec4f (0.f,0.f,-1.f, 0.f);
+      snd_listener.up        = listener_world_tm * vec4f (0.f,1.f,0.f, 0.f);
 
       sound_manager->SetListener (snd_listener);
     }
