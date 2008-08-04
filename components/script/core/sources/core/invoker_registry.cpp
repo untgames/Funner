@@ -165,10 +165,33 @@ void InvokerRegistry::Register (const char* name, const char* source_name)
   Register (name, *this, source_name);
 }
 
+//регистрация копий шлюзов registry
 void InvokerRegistry::Register (const InvokerRegistry& registry)
 {
   for (InvokerMap::const_iterator i=registry.impl->invokers.begin (), end=registry.impl->invokers.end (); i!=end; ++i)
     Register (i->second.name.c_str (), i->second.invoker);
+}
+
+//регистрация копий шлюзов registry
+void InvokerRegistry::Register (const Environment& environment, const char* registry_name)
+{
+  try
+  {
+    if (!registry_name)
+      throw xtl::make_null_argument_exception ("", "registry_name");
+      
+    InvokerRegistry* registry = environment.FindLibrary (registry_name);
+    
+    if (!registry)
+      throw xtl::make_argument_exception ("", "registry_name", registry_name, "No registry with this name");
+
+    Register (*registry);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("script::InvokerRegistry::Register(const Environment&, const char*)");
+    throw;
+  }
 }
 
 void InvokerRegistry::Unregister (const char* name)

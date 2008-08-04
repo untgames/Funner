@@ -45,7 +45,7 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
   luaopen_base   (state);
   luaopen_string (state);
   luaopen_table  (state);
-  luaopen_math   (state);
+//  luaopen_math   (state);
 
     //регистрация функции обработки ошибок
 

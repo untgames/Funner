@@ -16,6 +16,9 @@ template <class T> class iterator;
 namespace script
 {
 
+//forward declaration
+class Environment;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Функция-шлюз между скриптовым движком и C++ кодом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +77,7 @@ class InvokerRegistry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Register   (const char* name, const Invoker& invoker);       
     void Register   (const InvokerRegistry& registry); //регистрация копий шлюзов registry        
+    void Register   (const Environment& environment, const char* registry_name); //регистрация копий шлюзов registry
     void Register   (const char* name, const char* source_name); //регистрация копии
     void Register   (const char* name, const InvokerRegistry& source_registry, const char* source_name); //регистрация копии
     void Unregister (const char* name);
