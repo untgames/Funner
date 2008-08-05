@@ -155,7 +155,7 @@ function test_node ()
   parent.Scale = vec3 (-1, 1, 1)
 
   node2:BindToParent (parent)
-  node2:LookAt (vec3 (0, 1, 0), vec3 (1, 1, 0), vec3 (0, 1, 0), Scene_NodeTransformSpace.World)
+  node2:LookTo (vec3 (1, 1, 0), vec3 (0, 1, 0), Scene_NodeTransformSpace.World)
 
   print ("LocalOrtX = " .. tostring (node2.LocalOrtX))
   print ("LocalOrtY = " .. tostring (node2.LocalOrtY))

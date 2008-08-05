@@ -16,6 +16,7 @@ const char* SCENE_STATIC_NODE_BIND_MODE_LIBRARY       = "static.Scene_NodeBindMo
 const char* SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY = "static.Scene_NodeTransformSpace";
 const char* SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY   = "static.Scene_NodeTraverseMode";
 const char* SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY     = "static.Scene_NodeSearchMode";
+const char* SCENE_STATIC_NODE_ORT_LIBRARY             = "static.Scene_NodeOrt";
 const char* SCENE_SCENE_LIBRARY                       = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
 const char* SCENE_ENTITY_LIBRARY                      = "Scene.Entity";
@@ -90,6 +91,7 @@ void bind_static_node_library (Environment& environment)
   InvokerRegistry& node_transform_space_lib = environment.CreateLibrary (SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY);
   InvokerRegistry& node_traverse_mode_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY);
   InvokerRegistry& node_search_mode_lib     = environment.CreateLibrary (SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY);
+  InvokerRegistry& node_ort_lib             = environment.CreateLibrary (SCENE_STATIC_NODE_ORT_LIBRARY);
 
   node_bind_mode_lib.Register       ("get_AddRef",         make_const (NodeBindMode_AddRef));
   node_bind_mode_lib.Register       ("get_Capture",        make_const (NodeBindMode_Capture));
@@ -103,6 +105,9 @@ void bind_static_node_library (Environment& environment)
   node_search_mode_lib.Register     ("get_OnNextSublevel", make_const (NodeSearchMode_OnNextSublevel));
   node_search_mode_lib.Register     ("get_OnAllSublevels", make_const (NodeSearchMode_OnAllSublevels));
   node_search_mode_lib.Register     ("get_Default",        make_const (NodeSearchMode_Default));
+  node_ort_lib.Register             ("get_X",              make_const (NodeOrt_X));
+  node_ort_lib.Register             ("get_Y",              make_const (NodeOrt_Y));
+  node_ort_lib.Register             ("get_Z",              make_const (NodeOrt_Z));
 }
   
 InvokerRegistry& bind_node_library (Environment& environment)
@@ -172,6 +177,9 @@ InvokerRegistry& bind_node_library (Environment& environment)
                                            make_invoker (implicit_cast<Node::Pointer (Node::*) (const char*, NodeSearchMode)> (&Node::FindChild))));
 
   lib.Register ("ObjectTM", make_invoker (&Node::ObjectTM));
+
+  lib.Register ("Ort", make_invoker (&Node::Ort));
+
   lib.Register ("get_LocalOrtX", make_invoker (&Node::LocalOrtX));
   lib.Register ("get_LocalOrtY", make_invoker (&Node::LocalOrtY));
   lib.Register ("get_LocalOrtZ", make_invoker (&Node::LocalOrtZ));
@@ -196,15 +204,12 @@ InvokerRegistry& bind_node_library (Environment& environment)
                                          make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::Scale))));
 
   lib.Register ("LookTo", make_invoker (
+    make_invoker (implicit_cast<void (Node::*)(const vec3f&, NodeTransformSpace)> (&Node::LookTo)),
     make_invoker (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookTo)),
-    make_invoker (implicit_cast<void (Node::*)(float, float, float, float, float, float, NodeTransformSpace)> (&Node::LookTo)),
+    make_invoker (implicit_cast<void (Node::*)(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)> (&Node::LookTo)),
+    make_invoker<void (Node&, const vec3f&)> (bind (implicit_cast<void (Node::*)(const vec3f&, NodeTransformSpace)> (&Node::LookTo), _1, _2, NodeTransformSpace_Local)),
     make_invoker<void (Node&, const vec3f&, const vec3f&)> (bind (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookTo), _1, _2, _3, NodeTransformSpace_Local)),
-    make_invoker<void (Node&, float, float, float, float, float, float)> (bind (implicit_cast<void (Node::*)(float, float, float, float, float, float, NodeTransformSpace)> (&Node::LookTo), _1, _2, _3, _4, _5, _6, _7, NodeTransformSpace_Local))
-  ));
-
-  lib.Register ("LookAt", make_invoker (
-    make_invoker (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookAt)),
-    make_invoker<void (Node&, const vec3f&, const vec3f&, const vec3f&)> (bind (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookAt), _1, _2, _3, _4, NodeTransformSpace_Local))
+    make_invoker<void (Node&, const vec3f&, NodeOrt, NodeOrt)> (bind (implicit_cast<void (Node::*)(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)> (&Node::LookTo), _1, _2, _3, _4, NodeTransformSpace_Local))
   ));
 
   lib.Register ("BeginUpdate", make_invoker (&Node::BeginUpdate));

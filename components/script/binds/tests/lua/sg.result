@@ -137,7 +137,7 @@ Color = 1 0 0 0.699999988079
 Color = 0 0 1 0.300000011921
 Color = 0 1 0 0.300000011921
 Sprite pivot test
-position: 7 5 4
+position: 4 4 4
 axis_x:   0 1 0 0
 axis_y:   -1 0 0 0
 axis_z:   0 0 1 0
