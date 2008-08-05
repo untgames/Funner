@@ -206,10 +206,6 @@ class Node: public xtl::dynamic_cast_root
     void SetOrientation   (const math::quatf&);
     void SetOrientation   (float angle_in_degrees, float axis_x, float axis_y, float axis_z);
     void SetOrientation   (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees); //углы Эйлера
-    void SetOrientation   (const math::vec3f& local_axis,   //направление локальной оси
-                           const math::vec3f& local_up,     //направление оси "вверх"
-                           const math::vec3f& target_point, //целевая точка
-                           NodeTransformSpace space = NodeTransformSpace_Local); //пространство, в котором находится целевая точка
     void ResetOrientation ();
 
     const math::quatf& Orientation      () const;

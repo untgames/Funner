@@ -923,14 +923,111 @@ void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpac
   SetOrientation (rotation * impl->local_orientation);
 }
 
-void Node::LookTo (const math::vec3f& target_point, NodeTransformSpace space)
-{
-  LookTo (target_point, vec3f (0, 1, 0), space);
-}
-
 void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt invariant, NodeTransformSpace space)
 {
+  static const char* METHOD_NAME = "scene_graph::Node::LookTo(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)";
+  
+    //приведение целевой точки в локальную систему координат
 
+  vec3f local_dir;
+
+  switch (space)
+  {
+    case NodeTransformSpace_Local:
+      local_dir = normalize (target_point);
+
+      break;
+    case NodeTransformSpace_Parent:
+    {
+      const math::mat4f& tm = LocalTM ();
+
+      local_dir = normalize (invert (tm) * vec4f (target_point - Position ()));
+
+      break;
+    }
+    case NodeTransformSpace_World:
+    {            
+      const math::mat4f& tm = WorldTM ();
+
+      local_dir = normalize (invert (tm) * vec4f (target_point - WorldPosition ()));
+
+      break;
+    }
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "space", space);
+  }
+  
+    //проверка корректности осей
+  
+  switch (direction)
+  {
+    case NodeOrt_X:
+    case NodeOrt_Y:
+    case NodeOrt_Z:
+      break;    
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "direction", direction);
+  }
+  
+  switch (invariant)
+  {
+    case NodeOrt_X:
+    case NodeOrt_Y:
+    case NodeOrt_Z:
+      break;
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "invariant", invariant);
+  }
+  
+  if (invariant == direction)
+    throw xtl::format_operation_exception (METHOD_NAME, "Bad configuration invariant = direction");
+    
+    //диспетчеризация
+    
+  switch (direction)
+  {
+    case NodeOrt_X:
+      switch (invariant)
+      {
+        case NodeOrt_Y:
+          LookTo (cross (local_dir, vec3f (0, 1, 0)), vec3f (0, 1, 0), NodeTransformSpace_Local);
+          break;
+        case NodeOrt_Z:
+          LookTo (vec3f (0, 0, 1), cross (vec3f (0, 0, 1), local_dir), NodeTransformSpace_Local);
+          break;
+      }
+
+      break;
+    case NodeOrt_Y:
+      switch (invariant)
+      {
+        case NodeOrt_X:
+          LookTo (cross (vec3f (1, 0, 0), local_dir), local_dir, NodeTransformSpace_Local);
+          break;
+        case NodeOrt_Z:
+          LookTo (vec3f (0, 0, 1), local_dir, NodeTransformSpace_Local);
+          break;
+      }
+      
+      break;
+    case NodeOrt_Z:
+      switch (invariant)
+      {
+        case NodeOrt_X:
+          LookTo (local_dir, cross (local_dir, vec3f (1, 0, 0)), NodeTransformSpace_Local);
+          break;
+        case NodeOrt_Y:
+          LookTo (local_dir, vec3f (0, 1, 0), NodeTransformSpace_Local);
+          break;
+      }
+      
+      break;
+  }
+}
+
+void Node::LookTo (const math::vec3f& target_point, NodeTransformSpace space)
+{
+  LookTo (target_point, NodeOrt_Z, NodeOrt_Y, space);
 }
 
 /*
