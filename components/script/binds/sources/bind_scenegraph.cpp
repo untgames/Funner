@@ -204,12 +204,12 @@ InvokerRegistry& bind_node_library (Environment& environment)
                                          make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::Scale))));
 
   lib.Register ("LookTo", make_invoker (
-    make_invoker (implicit_cast<void (Node::*)(const vec3f&, NodeTransformSpace)> (&Node::LookTo)),
+    make_invoker (implicit_cast<void (Node::*)(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)> (&Node::LookTo)),  
+    make_invoker<void (Node&, const vec3f&, NodeOrt, NodeOrt)> (bind (implicit_cast<void (Node::*)(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)> (&Node::LookTo), _1, _2, _3, _4, NodeTransformSpace_Local)),    
     make_invoker (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookTo)),
-    make_invoker (implicit_cast<void (Node::*)(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)> (&Node::LookTo)),
-    make_invoker<void (Node&, const vec3f&)> (bind (implicit_cast<void (Node::*)(const vec3f&, NodeTransformSpace)> (&Node::LookTo), _1, _2, NodeTransformSpace_Local)),
-    make_invoker<void (Node&, const vec3f&, const vec3f&)> (bind (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookTo), _1, _2, _3, NodeTransformSpace_Local)),
-    make_invoker<void (Node&, const vec3f&, NodeOrt, NodeOrt)> (bind (implicit_cast<void (Node::*)(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)> (&Node::LookTo), _1, _2, _3, _4, NodeTransformSpace_Local))
+    make_invoker<void (Node&, const vec3f&, const vec3f&)> (bind (implicit_cast<void (Node::*)(const vec3f&, const vec3f&, NodeTransformSpace)> (&Node::LookTo), _1, _2, _3, NodeTransformSpace_Local)),    
+    make_invoker (implicit_cast<void (Node::*)(const vec3f&, NodeTransformSpace)> (&Node::LookTo)),
+    make_invoker<void (Node&, const vec3f&)> (bind (implicit_cast<void (Node::*)(const vec3f&, NodeTransformSpace)> (&Node::LookTo), _1, _2, NodeTransformSpace_Local))
   ));
 
   lib.Register ("BeginUpdate", make_invoker (&Node::BeginUpdate));
