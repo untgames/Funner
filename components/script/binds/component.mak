@@ -12,7 +12,8 @@ SCRIPT.BINDS.SOURCES.LIB_DIRS         :=
 SCRIPT.BINDS.SOURCES.LIBS             := 
 SCRIPT.BINDS.SOURCES.COMPILER_CFLAGS  := 
 SCRIPT.BINDS.SOURCES.COMPILER_DEFINES := 
-SCRIPT.BINDS.SOURCES.IMPORTS				  := compile.static.mak ../core/compile.static.mak ../../scene_graph/compile.static.mak ../../common/compile.static.mak
+SCRIPT.BINDS.SOURCES.IMPORTS				  := compile.static.mak ../core/compile.static.mak ../../scene_graph/compile.static.mak ../../common/compile.static.mak \
+                                         ../../render/scene_render/compile.static.mak
 
 #Öåëü ¹2 - SCRIPT_BINDS tests
 SCRIPT.BINDS.TESTS.TYPE             := test-suite

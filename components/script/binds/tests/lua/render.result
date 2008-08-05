@@ -1,0 +1,29 @@
+Results of render_test:
+Test library:
+Viewport test
+Name = 
+RenderPath = 
+ZOrder = 2147483647
+Camera = nil
+IsActive = 1
+BackgroundColor = 0 0 0 0
+HasBackground = 0
+HasProperty 'property1' = 0
+Name = viewport1
+RenderPath = Render2D
+ZOrder = 1
+Camera = camera1
+IsActive = 1
+BackgroundColor = 0.10000000149 0.20000000298 0.300000011921 0.40000000596
+HasBackground = 0
+HasProperty 'property1' = 1
+Property 'property1' = value_of_property1
+IsActive = 0
+IsActive = 1
+BackgroundColor = 0.40000000596 0.300000011921 0.20000000298 0.10000000149
+BackgroundColor = 0.40000000596 0.300000011921 0.20000000298 0
+HasBackground = 1
+HasBackground = 0
+HasProperty 'property1' = 0
+HasProperty 'property1' = 1
+HasProperty 'property1' = 0
