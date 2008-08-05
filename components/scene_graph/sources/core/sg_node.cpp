@@ -906,6 +906,11 @@ void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpac
     default:
       throw xtl::make_argument_exception ("scene_graph::Node::LookTo(const vec3f&, const vec3f&, NodeTransformSpace)", "space", space);
   }
+  
+  static const float EPS = 0.001f;
+
+  if (qlen (y) < EPS || qlen (z) < EPS || equal (y, z, EPS))
+    return; //игнорирование позиционирования на начало локальной системы координат
 
   mat4f view;
 
@@ -956,7 +961,7 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "space", space);
   }
-  
+
     //проверка корректности осей
   
   switch (direction)
@@ -993,8 +998,10 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
           LookTo (cross (local_dir, vec3f (0, 1, 0)), vec3f (0, 1, 0), NodeTransformSpace_Local);
           break;
         case NodeOrt_Z:
+        {
           LookTo (vec3f (0, 0, 1), cross (vec3f (0, 0, 1), local_dir), NodeTransformSpace_Local);
           break;
+        }
       }
 
       break;
