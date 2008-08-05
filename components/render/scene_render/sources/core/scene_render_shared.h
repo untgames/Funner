@@ -166,8 +166,8 @@ class RenderView: private IViewportListener, public xtl::reference_counter
     {
       public:
         virtual render::mid_level::IRenderer& GetRenderer          () = 0; //получение системы визуализации
-        virtual const Rect&                   GetRenderableArea    () = 0; //получение логических границ области рендеринга
-        virtual const Rect&                   GetDesktopArea       () = 0; //получение физических границ области рендеринга
+        virtual const Rect&                   GetRenderableArea    () = 0; //получение физических границ области рендеринга
+        virtual const Rect&                   GetScreenArea        () = 0; //получение логических границ области рендеринга
         virtual RenderPathManager*            GetRenderPathManager () = 0; //получение менеджера путей рендеринга
         virtual void                          UpdateOrderNotify    () = 0; //оповещение об обновлении порядка следования областей вывода
         

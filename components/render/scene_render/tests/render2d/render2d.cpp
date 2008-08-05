@@ -51,15 +51,15 @@ int main ()
     vp1.SetCamera     (&*camera);
     vp1.SetRenderPath ("Render2d");
 
-    Desktop desktop;
+    Screen screen;
 
-    desktop.Attach (vp1);
+    screen.Attach (vp1);
     
     RenderTarget render_target;
 
     render_target = render.CreateRenderTarget ("default", "default");    
 
-    render_target.SetDesktop (&desktop);    
+    render_target.SetScreen (&screen);
     
       //загрузка ресурсов
       

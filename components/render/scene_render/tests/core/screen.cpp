@@ -1,11 +1,11 @@
 #include "shared.h"
 
 //слушатель событий рабочего стола
-class MyDesktopListener: public IDesktopListener, public xtl::reference_counter
+class MyScreenListener: public IScreenListener, public xtl::reference_counter
 {
   public:
-    MyDesktopListener ()  { printf ("MyDesktopListener::MyDesktopListener\n"); }
-    ~MyDesktopListener () { printf ("MyDesktopListener::~MyDesktopListener\n"); }
+    MyScreenListener ()  { printf ("MyScreenListener::MyScreenListener\n"); }
+    ~MyScreenListener () { printf ("MyScreenListener::~MyScreenListener\n"); }
 
     void OnChangeName (const char* new_name)
     {
@@ -36,35 +36,35 @@ class MyDesktopListener: public IDesktopListener, public xtl::reference_counter
     void Release () { release (this); }
 };
 
-void print_viewports (const Desktop& desktop)
+void print_viewports (const Screen& Screen)
 {
-  printf ("Desktop '%s' viewports (count=%u):", desktop.Name (), desktop.ViewportsCount ());
+  printf ("Screen '%s' viewports (count=%u):", Screen.Name (), Screen.ViewportsCount ());
 
-  for (size_t i=0; i<desktop.ViewportsCount (); i++)
-    printf (" '%s'", desktop.Viewport (i).Name ());
+  for (size_t i=0; i<Screen.ViewportsCount (); i++)
+    printf (" '%s'", Screen.Viewport (i).Name ());
 
   printf ("\n");          
 }
 
 int main ()
 {
-  printf ("Results of desktop_test:\n");
+  printf ("Results of Screen_test:\n");
 
   try
   {
       //создание рабочего стола
       
-    Desktop desktop1;
+    Screen screen1;
     
       //регистрация слушателя
       
-    desktop1.AttachListener (xtl::com_ptr<MyDesktopListener> (new MyDesktopListener, false).get ());    
+    screen1.AttachListener (xtl::com_ptr<MyScreenListener> (new MyScreenListener, false).get ());    
     
       //изменение базовых параметров
       
-    desktop1.SetBackgroundColor (0.5f, 0.25f, 1.0f, 0.3f);
-    desktop1.DisableBackground  ();
-    desktop1.SetName            ("Desktop1");
+    screen1.SetBackgroundColor (0.5f, 0.25f, 1.0f, 0.3f);
+    screen1.DisableBackground  ();
+    screen1.SetName            ("Screen1");
 
       //присоединение областей вывода
       
@@ -73,28 +73,28 @@ int main ()
     viewport1.SetName ("Viewport1");
     viewport2.SetName ("Viewport2");
     
-    desktop1.Attach (viewport1);
-    desktop1.Attach (viewport2);
+    screen1.Attach (viewport1);
+    screen1.Attach (viewport2);
 
       //перебор областей вывода
 
-    print_viewports (desktop1);
+    print_viewports (screen1);
 
       //копирование рабочего стола
 
-    Desktop desktop2 = desktop1;
+    Screen screen2 = screen1;
 
       //удаление областей вывода
 
-    desktop2.Detach (viewport1);
+    screen2.Detach (viewport1);
 
       //перебор областей вывода
 
-    print_viewports (desktop1);
+    print_viewports (screen1);
 
       //очистка оставшихся областей вывода с оповещением об удалении
 
-    desktop1.DetachAllViewports ();        
+    screen1.DetachAllViewports ();        
   }
   catch (std::exception& exception)
   {

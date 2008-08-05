@@ -6,7 +6,7 @@
 
 #include <mathlib.h>
 
-#include <render/desktop.h>
+#include <render/screen.h>
 
 namespace media
 {
@@ -63,9 +63,9 @@ class RenderTarget
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///√раницы логически отображаемой области рабочего стола
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetDesktopArea (const Rect& rect);
-    void        SetDesktopArea (int left, int top, size_t width, size_t height);
-    const Rect& DesktopArea    () const;
+    void        SetScreenArea (const Rect& rect);
+    void        SetScreenArea (int left, int top, size_t width, size_t height);
+    const Rect& ScreenArea    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///‘изические границы визуализируемой области (например, в оконных координатах)
@@ -77,9 +77,9 @@ class RenderTarget
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абочий стол (политика владени€ - weak-ref)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                   SetDesktop (render::Desktop* desktop);
-    render::Desktop*       Desktop    ();
-    const render::Desktop* Desktop    () const;
+    void                  SetScreen (render::Screen* screen);
+    render::Screen*       Screen    ();
+    const render::Screen* Screen    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќбновление

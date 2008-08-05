@@ -10,7 +10,6 @@
 #include <sg/camera.h>
 #include <sg/scene.h>
 
-#include <render/desktop.h>
 #include <render/scene_render.h>
 #include <render/custom_render.h>
 #include <render/mid_level/renderer.h>

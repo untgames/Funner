@@ -19,10 +19,10 @@ const size_t LISTENER_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива с
 */
 
 typedef stl::vector<Viewport>           ViewportArray;
-typedef xtl::com_ptr<IDesktopListener>  ListenerPtr;
+typedef xtl::com_ptr<IScreenListener>  ListenerPtr;
 typedef stl::vector<ListenerPtr>        ListenerArray;
 
-struct Desktop::Impl: public xtl::reference_counter
+struct Screen::Impl: public xtl::reference_counter
 {
   stl::string   name;             //имя рабочего стола
   math::vec4f   background_color; //цвет фона
@@ -59,27 +59,27 @@ struct Desktop::Impl: public xtl::reference_counter
   
   void ChangeNameNotify ()
   {
-    Notify (xtl::bind (&IDesktopListener::OnChangeName, _1, name.c_str ()));
+    Notify (xtl::bind (&IScreenListener::OnChangeName, _1, name.c_str ()));
   }
   
   void ChangeBackgroundNotify ()
   {
-    Notify (xtl::bind (&IDesktopListener::OnChangeBackground, _1, has_background, xtl::cref (background_color)));
+    Notify (xtl::bind (&IScreenListener::OnChangeBackground, _1, has_background, xtl::cref (background_color)));
   }
   
   void AttachViewportNotify (render::Viewport& viewport)
   {
-    Notify (xtl::bind (&IDesktopListener::OnAttachViewport, _1, xtl::ref (viewport)));
+    Notify (xtl::bind (&IScreenListener::OnAttachViewport, _1, xtl::ref (viewport)));
   }
   
   void DetachViewportNotify (render::Viewport& viewport)
   {
-    Notify (xtl::bind (&IDesktopListener::OnDetachViewport, _1, xtl::ref (viewport)));
+    Notify (xtl::bind (&IScreenListener::OnDetachViewport, _1, xtl::ref (viewport)));
   }  
 
   void DestroyNotify ()
   {
-    Notify (xtl::bind (&IDesktopListener::OnDestroy, _1));    
+    Notify (xtl::bind (&IScreenListener::OnDestroy, _1));    
   }  
 };
 
@@ -87,25 +87,25 @@ struct Desktop::Impl: public xtl::reference_counter
     Конструкторы / деструктор / присваивание
 */
 
-Desktop::Desktop ()
+Screen::Screen ()
   : impl (new Impl)
 {
 }
 
-Desktop::Desktop (const Desktop& desktop)
-  : impl (desktop.impl)
+Screen::Screen (const Screen& Screen)
+  : impl (Screen.impl)
 {
   addref (impl);
 }
 
-Desktop::~Desktop ()
+Screen::~Screen ()
 {
   release (impl);
 }
 
-Desktop& Desktop::operator = (const Desktop& desktop)
+Screen& Screen::operator = (const Screen& screen)
 {
-  Desktop (desktop).Swap (*this);
+  Screen (screen).Swap (*this);
 
   return *this;
 }
@@ -114,7 +114,7 @@ Desktop& Desktop::operator = (const Desktop& desktop)
     Идентификатор рабочего стола
 */
 
-size_t Desktop::Id () const
+size_t Screen::Id () const
 {
   return reinterpret_cast<size_t> (get_pointer (impl));
 }
@@ -123,10 +123,10 @@ size_t Desktop::Id () const
     Имя
 */
 
-void Desktop::SetName (const char* name)
+void Screen::SetName (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("render::Desktop::SetName", "name");
+    throw xtl::make_null_argument_exception ("render::Screen::SetName", "name");
     
   if (name == impl->name)
     return;
@@ -136,7 +136,7 @@ void Desktop::SetName (const char* name)
   impl->ChangeNameNotify ();
 }
 
-const char* Desktop::Name () const
+const char* Screen::Name () const
 {
   return impl->name.c_str ();
 }
@@ -145,7 +145,7 @@ const char* Desktop::Name () const
     Управление фона
 */
 
-void Desktop::SetBackgroundColor (const math::vec4f& color)
+void Screen::SetBackgroundColor (const math::vec4f& color)
 {
   if (color == impl->background_color)
     return;
@@ -155,17 +155,17 @@ void Desktop::SetBackgroundColor (const math::vec4f& color)
   impl->ChangeBackgroundNotify ();
 }
 
-void Desktop::SetBackgroundColor (float red, float green, float blue, float alpha)
+void Screen::SetBackgroundColor (float red, float green, float blue, float alpha)
 {
   SetBackgroundColor (math::vec4f (red, green, blue, alpha));
 }
 
-const math::vec4f& Desktop::BackgroundColor () const
+const math::vec4f& Screen::BackgroundColor () const
 {
   return impl->background_color;
 }
 
-void Desktop::SetBackgroundState (bool state)
+void Screen::SetBackgroundState (bool state)
 {
   if (state == impl->has_background)
     return;
@@ -175,7 +175,7 @@ void Desktop::SetBackgroundState (bool state)
   impl->ChangeBackgroundNotify ();
 }
 
-bool Desktop::HasBackground () const
+bool Screen::HasBackground () const
 {
   return impl->has_background;
 }
@@ -184,7 +184,7 @@ bool Desktop::HasBackground () const
     Добавление / удаление областей вывода
 */
 
-void Desktop::Attach (const render::Viewport& viewport)
+void Screen::Attach (const render::Viewport& viewport)
 {
   size_t viewport_id = viewport.Id ();
 
@@ -197,7 +197,7 @@ void Desktop::Attach (const render::Viewport& viewport)
   impl->AttachViewportNotify (impl->viewports.back ());
 }
 
-void Desktop::Detach (const render::Viewport& viewport)
+void Screen::Detach (const render::Viewport& viewport)
 {
   size_t viewport_id = viewport.Id ();
 
@@ -217,7 +217,7 @@ void Desktop::Detach (const render::Viewport& viewport)
     else ++iter;
 }
 
-void Desktop::DetachAllViewports ()
+void Screen::DetachAllViewports ()
 {
   for (ViewportArray::iterator iter=impl->viewports.begin (), end=impl->viewports.end (); iter!=end; ++iter)
     impl->DetachViewportNotify (*iter);
@@ -229,7 +229,7 @@ void Desktop::DetachAllViewports ()
     Количество областей вывода
 */
 
-size_t Desktop::ViewportsCount () const
+size_t Screen::ViewportsCount () const
 {
   return impl->viewports.size ();
 }
@@ -238,32 +238,32 @@ size_t Desktop::ViewportsCount () const
     Получение области вывода
 */
 
-render::Viewport& Desktop::Viewport (size_t index)
+render::Viewport& Screen::Viewport (size_t index)
 {
   if (index >= impl->viewports.size ())
-    throw xtl::make_range_exception ("render::Desktop::Viewport", "index", index, impl->viewports.size ());
+    throw xtl::make_range_exception ("render::Screen::Viewport", "index", index, impl->viewports.size ());
 
   return impl->viewports [index];
 }
 
-const render::Viewport& Desktop::Viewport (size_t index) const
+const render::Viewport& Screen::Viewport (size_t index) const
 {
-  return const_cast<Desktop&> (*this).Viewport (index);
+  return const_cast<Screen&> (*this).Viewport (index);
 }
 
 /*
     Работа со слушателями
 */
 
-void Desktop::AttachListener (IDesktopListener* listener)
+void Screen::AttachListener (IScreenListener* listener)
 {
   if (!listener)
-    throw xtl::make_null_argument_exception ("render::Desktop::AttachListener", "listener");
+    throw xtl::make_null_argument_exception ("render::Screen::AttachListener", "listener");
 
   impl->listeners.push_back (listener);
 }
 
-void Desktop::DetachListener (IDesktopListener* listener)
+void Screen::DetachListener (IScreenListener* listener)
 {
   if (!listener)
     return;
@@ -271,7 +271,7 @@ void Desktop::DetachListener (IDesktopListener* listener)
   impl->listeners.erase (stl::remove (impl->listeners.begin (), impl->listeners.end (), listener), impl->listeners.end ());
 }
 
-void Desktop::DetachAllListeners ()
+void Screen::DetachAllListeners ()
 {
   impl->listeners.clear ();
 }
@@ -280,17 +280,17 @@ void Desktop::DetachAllListeners ()
     Обмен
 */
 
-void Desktop::Swap (Desktop& desktop)
+void Screen::Swap (Screen& screen)
 {
-  stl::swap (impl, desktop.impl);
+  stl::swap (impl, screen.impl);
 }
 
 namespace render
 {
 
-void swap (Desktop& desktop1, Desktop& desktop2)
+void swap (Screen& screen1, Screen& screen2)
 {
-  desktop1.Swap (desktop2);
+  screen1.Swap (screen2);
 }
 
 }

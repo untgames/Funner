@@ -159,17 +159,17 @@ int main ()
     render.SetLogHandler (&log_print);
     
     Viewport vp1;
-    Desktop desktop;
+    Screen screen;
 
     vp1.SetArea       (0, 0, 100, 100);
     vp1.SetCamera     (&*camera1);
     vp1.SetRenderPath ("MySceneRender");
     
-    desktop.Attach (vp1);
+    screen.Attach (vp1);
     
     RenderTarget render_target = render.CreateRenderTarget ("default", "default");
     
-    render_target.SetDesktop (&desktop);
+    render_target.SetScreen (&screen);
     
       //загрузка ресурсов
 
