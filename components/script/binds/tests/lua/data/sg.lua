@@ -152,14 +152,11 @@ function test_node ()
   local parent = Scene.Node.Create ()  
   local node2 = Scene.Node.Create ()
 
-  parent.Scale = vec3 (-1, 1, 1)
+  node2:LookTo (vec3 (0, 2, 0), Scene_NodeOrt.Z, Scene_NodeOrt.X, Scene_NodeTransformSpace.World)
 
-  node2:BindToParent (parent)
-  node2:LookTo (vec3 (1, 1, 0), vec3 (0, 1, 0), Scene_NodeTransformSpace.World)
-
-  print ("LocalOrtX = " .. tostring (node2.LocalOrtX))
-  print ("LocalOrtY = " .. tostring (node2.LocalOrtY))
-  print ("LocalOrtZ = " .. tostring (node2.LocalOrtZ))
+  print ("WorldOrtX = " .. tostring (node2.WorldOrtX))
+  print ("WorldOrtY = " .. tostring (node2.WorldOrtY))
+  print ("WorldOrtZ = " .. tostring (node2.WorldOrtZ))
 
   test_node_bind ()
 
