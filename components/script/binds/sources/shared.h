@@ -12,8 +12,8 @@
 #include <common/strlib.h>
 
 #include <script/bind.h>
-#include <script/environment.h>
 #include <script/bind_libraries.h>
+#include <script/environment.h>
 
 #include <mathlib.h>
 #include <math/io.h>
@@ -29,6 +29,7 @@
 #include <sg/sprite.h>
 #include <sg/visual_model.h>
 
+#include <render/screen.h>
 #include <render/viewport.h>
 
 #endif

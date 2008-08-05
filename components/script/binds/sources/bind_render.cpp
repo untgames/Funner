@@ -12,6 +12,7 @@ namespace
 */
 
 const char* RENDER_VIEWPORT_LIBRARY = "Render.Viewport";
+const char* RENDER_SCREEN_LIBRARY   = "Render.Screen";
 
 /*
     Создание вьюпорта
@@ -70,6 +71,49 @@ void bind_viewport_library (Environment& environment)
   environment.RegisterType<Viewport> (RENDER_VIEWPORT_LIBRARY);
 }
 
+/*
+    Создание рабочего стола
+*/
+
+Screen create_screen ()
+{
+  return Screen ();
+}
+
+/*
+   Регистрация библиотеки работы с рабочими столами
+*/
+
+void bind_screen_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (RENDER_SCREEN_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&create_screen));
+
+    //регистрация операций
+
+  lib.Register ("set_Name",            make_invoker (&Screen::SetName));
+  lib.Register ("get_Name",            make_invoker (&Screen::Name));
+  lib.Register ("set_BackgroundColor", make_invoker (implicit_cast<void (Screen::*) (const math::vec4f&)> (&Screen::SetBackgroundColor)));
+  lib.Register ("get_BackgroundColor", make_invoker (&Screen::BackgroundColor));
+  lib.Register ("set_BackgroundState", make_invoker (&Screen::SetBackgroundState));
+  lib.Register ("get_HasBackground",   make_invoker (&Screen::HasBackground));
+  lib.Register ("get_Id",              make_invoker (&Screen::Id));
+  lib.Register ("get_ViewportsCount",  make_invoker (&Screen::ViewportsCount));
+
+  lib.Register ("SetBackgroundColor",  make_invoker (make_invoker (implicit_cast<void (Screen::*) (float, float, float, float)> (&Screen::SetBackgroundColor)),
+                 make_invoker<void (Screen&, float, float, float)> (bind (implicit_cast<void (Screen::*) (float, float, float, float)> (&Screen::SetBackgroundColor), _1, _2, _3, _4, 0.f))));
+  lib.Register ("EnableBackground",    make_invoker (&Screen::EnableBackground));
+  lib.Register ("DisableBackground",   make_invoker (&Screen::DisableBackground));
+  lib.Register ("Attach",              make_invoker (&Screen::Attach));
+  lib.Register ("Detach",              make_invoker (&Screen::Detach));
+  lib.Register ("DetachAllViewports",  make_invoker (&Screen::DetachAllViewports));
+  lib.Register ("Viewport",            make_invoker (implicit_cast<Viewport& (Screen::*) (size_t)> (&Screen::Viewport)));
+
+  environment.RegisterType<Screen> (RENDER_SCREEN_LIBRARY);
+}
 
 }
 
@@ -88,6 +132,7 @@ void bind_render_library (Environment& environment)
     //регистрация библиотек
   
   bind_viewport_library (environment);
+  bind_screen_library   (environment);
 }
 
 }
