@@ -7,6 +7,11 @@ const char* TRANSLATION_MAP_FILE_NAME = "media/translation_table.keymap";
 
 void idle (TestApplication& app, Shell& shell)
 {
+  static bool bad_script = false;
+  
+  if (bad_script)
+    return;
+
   try
   {
     static clock_t last_time = clock ();
@@ -23,6 +28,7 @@ void idle (TestApplication& app, Shell& shell)
   catch (std::exception& exception)
   {
     printf ("exception at idle: %s\n", exception.what ());
+    bad_script = true;
   }
 }
 
@@ -69,19 +75,19 @@ int main ()
       //создание областей вывода
       
     Viewport vp;
-    Desktop  desktop;    
+    Screen screen;
     
     vp.SetName       ("Viewport1");
     vp.SetRenderPath ("Render2d");
     
     vp.SetArea (0, 0, 100, 100);
 
-    desktop.SetBackgroundColor (math::vec4f (1, 1, 1, 1));    
-    desktop.Attach (vp);
+    screen.SetBackgroundColor (math::vec4f (1, 1, 1, 1));    
+    screen.Attach (vp);
 
     RenderTarget& render_target = test.RenderTarget ();
 
-    render_target.SetDesktop (&desktop);        
+    render_target.SetScreen (&screen);
 
       //инициализация LUA
 
