@@ -1,0 +1,13 @@
+Results of node_look_to_test:
+test direction=X invariant=X: Bad configuration invariant = direction
+    at scene_graph::Node::LookTo(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)
+test direction=X invariant=Y: Ox=[0.71 0.00 0.71] Oy=[0.00 1.00 0.00] Oz=[-0.71 0.00 0.71]
+test direction=X invariant=Z: Ox=[0.71 0.71 0.00] Oy=[-0.71 0.71 0.00] Oz=[0.00 0.00 1.00]
+test direction=Y invariant=X: Ox=[1.00 0.00 0.00] Oy=[0.00 0.71 0.71] Oz=[0.00 -0.71 0.71]
+test direction=Y invariant=Y: Bad configuration invariant = direction
+    at scene_graph::Node::LookTo(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)
+test direction=Y invariant=Z: Ox=[0.76 -0.65 0.00] Oy=[0.65 0.76 0.00] Oz=[0.00 0.00 1.00]
+test direction=Z invariant=X: Ox=[1.00 0.00 0.00] Oy=[0.00 0.71 -0.71] Oz=[0.00 0.71 0.71]
+test direction=Z invariant=Y: Ox=[0.71 0.00 -0.71] Oy=[0.00 1.00 0.00] Oz=[0.71 0.00 0.71]
+test direction=Z invariant=Z: Bad configuration invariant = direction
+    at scene_graph::Node::LookTo(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)

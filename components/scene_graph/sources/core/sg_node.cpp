@@ -914,14 +914,14 @@ void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpac
 
   mat4f view;
 
-  x = cross (y, z); 
+  x = cross (y, z);
   y = z ^ x;
 
   view [0] = vec4f (x, 0.0f);
   view [1] = vec4f (y, 0.0f);
   view [2] = vec4f (z, 0.0f);
   view [3] = vec4f (0.0f, 0.0f, 0.0f, 1.0f);
-  view     = transpose (view);  
+  view     = transpose (view);
 
   quatf rotation = normalize (quatf (view));
 
@@ -1009,23 +1009,41 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
       switch (invariant)
       {
         case NodeOrt_X:
-          LookTo (cross (vec3f (1, 0, 0), local_dir), local_dir, NodeTransformSpace_Local);
+        {
+          vec3f x (1, 0, 0),
+                z = cross (x, local_dir),
+                y = cross (z, x);
+          
+          LookTo (z, y, NodeTransformSpace_Local);
           break;
+        }
         case NodeOrt_Z:
           LookTo (vec3f (0, 0, 1), local_dir, NodeTransformSpace_Local);
           break;
       }
-      
+
       break;
     case NodeOrt_Z:
       switch (invariant)
       {
         case NodeOrt_X:
-          LookTo (local_dir, cross (local_dir, vec3f (1, 0, 0)), NodeTransformSpace_Local);
+        {
+          vec3f x (1, 0, 0),
+                y = cross (local_dir, x),
+                z = cross (x, y);
+
+          LookTo (z, y, NodeTransformSpace_Local);
           break;
+        }
         case NodeOrt_Y:
-          LookTo (local_dir, vec3f (0, 1, 0), NodeTransformSpace_Local);
+        {
+          vec3f y (0, 1, 0),
+                x = cross (y, local_dir),
+                z = cross (x, y);
+          
+          LookTo (z, y, NodeTransformSpace_Local);
           break;
+        }
       }
       
       break;
