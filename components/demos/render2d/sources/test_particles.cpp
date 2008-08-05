@@ -1,6 +1,7 @@
 #include "shared.h"
 
-    const size_t PARTICLES_COUNT = 100;
+const size_t PARTICLES_COUNT = 100;
+char* PARTICLES_FILE_NAME = "media/explode.wxf";
 
 typedef stl::vector<math::vec3f> ParticleArray;
 
@@ -60,7 +61,7 @@ struct TestScene
 
   TestScene () : current_particle_frame (0)
   {
-    particle_system.Load ("media/2.wxf");
+    particle_system.Load (PARTICLES_FILE_NAME);
     
     sprite_list = SpriteList::Create ();    
     
@@ -151,9 +152,14 @@ void idle (TestApplication& app, TestScene& scene)
   }
 }
 
-int main ()
+int main (int argc, char* argv [])
 {
-  printf ("Results of test_sprites:\n");
+  if (argc >= 2)
+  {
+    PARTICLES_FILE_NAME = argv [1];
+  }
+
+  printf ("Results of test_particles:\n");
 
   try
   {    
@@ -168,9 +174,9 @@ int main ()
       //создание областей вывода
       
     Viewport vp;
-    Desktop  desktop;
+    Screen screen;
     
-    desktop.SetBackgroundColor (1, 0, 0, 0);
+    screen.SetBackgroundColor (1, 0, 0, 0);
 
     vp.SetName       ("Viewport1");
     vp.SetRenderPath ("Render2d");
@@ -180,11 +186,11 @@ int main ()
 
     vp.SetArea (10, 10, 80, 80);
 
-    desktop.Attach (vp);
+    screen.Attach (vp);
 
     RenderTarget& render_target = test.RenderTarget ();
     
-    render_target.SetDesktop (&desktop);
+    render_target.SetScreen (&screen);
 
       //установка idle-функции
 

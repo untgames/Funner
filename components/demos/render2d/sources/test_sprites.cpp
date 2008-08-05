@@ -94,9 +94,9 @@ int main ()
       //создание областей вывода
       
     Viewport vp;
-    Desktop  desktop;
+    Screen screen;
     
-    desktop.SetBackgroundColor (1, 0, 0, 0);
+    screen.SetBackgroundColor (1, 0, 0, 0);
 
     vp.SetName       ("Viewport1");
     vp.SetRenderPath ("Render2d");
@@ -106,11 +106,11 @@ int main ()
 
     vp.SetArea (10, 10, 80, 80);
 
-    desktop.Attach (vp);
+    screen.Attach (vp);
 
     RenderTarget& render_target = test.RenderTarget ();
     
-    render_target.SetDesktop (&desktop);
+    render_target.SetScreen (&screen);
 
       //установка idle-функции
 
