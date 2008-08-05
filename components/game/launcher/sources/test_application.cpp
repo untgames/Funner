@@ -250,12 +250,7 @@ TestApplication::TestApplication (const char* start_script_name)
   {
       //инициализация звука
 
-    impl->sound_manager = SoundManagerPtr (new sound::SoundManager ("OpenAL", get (impl->config, "SoundDeviceMask", DEFAULT_SOUND_DEVICE_MASK).c_str ()));
     impl->scene_player  = ScenePlayerPtr  (new sound::ScenePlayer ());
-
-    impl->sound_manager->LoadSoundLibrary (SOUND_DECL_LIB_FILE_NAME);
-
-    impl->scene_player->SetManager (impl->sound_manager.get ());
 
       //инициализация LUA
 
@@ -278,6 +273,14 @@ TestApplication::TestApplication (const char* start_script_name)
     lib.Register ("dofile", make_invoker<void (const char*)> (xtl::bind (&do_file, _1, xtl::ref (*impl->shell))));
 
     impl->shell->ExecuteFile (start_script_name, &log_print);
+
+      //инициализация звука
+
+    impl->sound_manager = SoundManagerPtr (new sound::SoundManager ("OpenAL", get (impl->config, "SoundDeviceMask", DEFAULT_SOUND_DEVICE_MASK).c_str ()));
+
+    impl->sound_manager->LoadSoundLibrary (SOUND_DECL_LIB_FILE_NAME);
+
+    impl->scene_player->SetManager (impl->sound_manager.get ());
 
       //создание окна
       

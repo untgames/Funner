@@ -28,6 +28,8 @@ camera.ZFar = 10
 
 camera:BindToScene (scene)
 
+Application.SetCamera (camera)
+
 listener1 = Scene.Listener.Create ()
 
 listener1:BindToParent (camera)
@@ -38,8 +40,6 @@ sound_emitter1 = Scene.SoundEmitter.Create ("gorilka")
 
 sound_emitter1:BindToParent (sprite)
 sound_emitter1:Play ()
-
-Application.SetCamera (camera)
 
 function onBeginMove(ort)
   velocity [ort] = velocity [ort] + 1

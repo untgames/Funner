@@ -10,5 +10,4 @@ StencilBits="8"
 FullScreen="0"
 BuffersCount="2"
 SoundDeviceMask="*"
-StartScript="data/scripts/main.lua"
 />
