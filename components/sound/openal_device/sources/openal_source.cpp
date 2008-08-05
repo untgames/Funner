@@ -213,6 +213,7 @@ void OpenALSource::Play (bool looping)
   is_playing      = true;
   play_time_start = clock ();
 
+  UpdateSourceNotify ();
   UpdateSampleNotify ();
 }
 
@@ -448,35 +449,31 @@ void OpenALSource::BufferUpdate ()
   }
 }
 
+//обновление параметров источника
 void OpenALSource::PropertiesUpdate ()
 {
-  if (!is_active && !sample_need_update)
-    return;    
+  if (!is_playing || !source_need_update)
+    return;
 
   try
   {
-    OpenALContext& context = device.Context ();
-    
-      //обновление параметров источника
-    
-    if (source_need_update)
-    {
-      source_need_update = false;
+    OpenALContext& context = device.Context ();        
 
-      context.MakeCurrent ();
+    context.MakeCurrent ();
 
-      context.alSourcefv (al_source, AL_POSITION, &source.position [0]);
-      context.alSourcefv (al_source, AL_DIRECTION, &source.direction [0]);
-      context.alSourcefv (al_source, AL_VELOCITY, &source.velocity [0]);
-      context.alSourcef  (al_source, AL_GAIN, source.gain);
-      context.alSourcef  (al_source, AL_MIN_GAIN, source.minimum_gain);
-      context.alSourcef  (al_source, AL_MAX_GAIN, source.maximum_gain);
-      context.alSourcef  (al_source, AL_CONE_INNER_ANGLE, source.inner_angle);
-      context.alSourcef  (al_source, AL_CONE_OUTER_ANGLE, source.outer_angle);
-      context.alSourcef  (al_source, AL_CONE_OUTER_GAIN, source.outer_gain);
-      context.alSourcef  (al_source, AL_REFERENCE_DISTANCE, source.reference_distance);
-      context.alSourcef  (al_source, AL_MAX_DISTANCE, source.maximum_distance);
-    }
+    context.alSourcefv (al_source, AL_POSITION, &source.position [0]);
+    context.alSourcefv (al_source, AL_DIRECTION, &source.direction [0]);
+    context.alSourcefv (al_source, AL_VELOCITY, &source.velocity [0]);
+    context.alSourcef  (al_source, AL_GAIN, source.gain);
+    context.alSourcef  (al_source, AL_MIN_GAIN, source.minimum_gain);
+    context.alSourcef  (al_source, AL_MAX_GAIN, source.maximum_gain);
+    context.alSourcef  (al_source, AL_CONE_INNER_ANGLE, source.inner_angle);
+    context.alSourcef  (al_source, AL_CONE_OUTER_ANGLE, source.outer_angle);
+    context.alSourcef  (al_source, AL_CONE_OUTER_GAIN, source.outer_gain);
+    context.alSourcef  (al_source, AL_REFERENCE_DISTANCE, source.reference_distance);
+    context.alSourcef  (al_source, AL_MAX_DISTANCE, source.maximum_distance);
+
+    source_need_update = false;
   }
   catch (std::exception& exception)
   {
