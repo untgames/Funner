@@ -156,7 +156,7 @@ struct TestApplication::Impl
   EnvironmentPtr                environment;         //скриптовое окружение
   ShellPtr                      shell;               //скриптовая оболочка
   render::Viewport              viewport;            //вьюпорт
-  Desktop                       desktop;    
+  Screen                        screen;     
   input::TranslationMap         translation_map;
 
         
@@ -351,10 +351,10 @@ TestApplication::TestApplication (const char* start_script_name)
     
     impl->viewport.SetArea (0, 0, 100, 100);
 
-    impl->desktop.SetBackgroundColor (math::vec4f (1, 1, 1, 1));    
-    impl->desktop.Attach (impl->viewport);
+    impl->screen.SetBackgroundColor (math::vec4f (1, 1, 1, 1));    
+    impl->screen.Attach (impl->viewport);
 
-    impl->render_target.SetDesktop (&impl->desktop);        
+    impl->render_target.SetScreen (&impl->screen);
 
       //инициализация системы ввода
 

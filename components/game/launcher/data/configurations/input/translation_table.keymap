@@ -20,7 +20,4 @@
   <Translation Event="Esc down" Replacement="Application.Exit()" Tag=""/>
 
   <Translation Event="Enter down" Replacement="dofile('data/scripts/main.lua')" Tag=""/>
-
-  <Translation Event="CursorY delta *" Replacement="onMove(0, {2})" Tag=""/>
-  <Translation Event="CursorX delta *" Replacement="onMove({2}, 0)" Tag=""/>
 </TranslationTable>
