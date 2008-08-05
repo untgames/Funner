@@ -39,6 +39,12 @@ void trick_quat2matrix (const quat<T>& q,matrix<T,4>& m)
   quat2matrix (q,m);
 }
 
+template <class T>
+void trick_quat2matrix (const quat<T>& q,matrix<T,3>& m)
+{
+  quat2matrix (q,m);
+}
+
 template <class T,size_t size> 
 matrix<T,size>::matrix (const quat<T>& q)
 {

@@ -40,20 +40,20 @@ void quat2matrix (const quat<T>& q,matrix<T,4>& m)
   wx = q.w * x2;   wy = q.w * y2;   wz = q.w * z2;
 
   m [0][0] = T(1) - (yy + zz);
-  m [1][0] = xy - wz;
-  m [2][0] = xz + wy;
+  m [0][1] = xy - wz;
+  m [0][2] = xz + wy;
 
-  m [0][1] = xy + wz;
+  m [1][0] = xy + wz;
   m [1][1] = T(1) - (xx + zz);
-  m [2][1] = yz - wx;
+  m [1][2] = yz - wx;
 
-  m [0][2] = xz - wy;
-  m [1][2] = yz + wx;
+  m [2][0] = xz - wy;
+  m [2][1] = yz + wx;
   m [2][2] = T(1) - (xx + yy);
 
   m [0][3] = m [1][3] = m [2][3] = 0;
   m [3][0] = m [3][1] = m [3][2] = 0;
-  m [3][3] = 1;  
+  m [3][3] = 1;
 }
 
 template <class T> 
