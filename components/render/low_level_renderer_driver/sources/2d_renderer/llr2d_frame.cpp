@@ -44,7 +44,7 @@ Frame::Frame (CommonResources* in_common_resources, render::low_level::IDevice* 
 
 void Frame::SetView (const math::mat4f& tm)
 {
-  view_tm = tm;  
+  view_tm = math::translate (tm * math::vec3f (0.f));  
 }
 
 void Frame::SetProjection (const math::mat4f& tm)
