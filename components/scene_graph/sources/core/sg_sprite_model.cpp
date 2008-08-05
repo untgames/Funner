@@ -124,7 +124,7 @@ namespace
 //расчёт матрицы центра
 void eval_pivot_tm (const math::vec3f& position, float angle, math::mat4f& pivot_tm)
 {
-  pivot_tm = invert (translate (position) * fromAxisAngle (deg2rad (angle), vec3f (0, 0, 1)));
+  pivot_tm = translate (-position) * fromAxisAngle (deg2rad (angle), vec3f (0, 0, 1));
 }
 
 }

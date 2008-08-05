@@ -874,93 +874,63 @@ const quatf& Node::WorldOrientation () const
     Позиционирование узла
 */
 
-void Node::LookAt (const vec3f& position, const vec3f& target, const vec3f& up, NodeTransformSpace space)
+void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpace space)
 {
-  static const char* METHOD_NAME = "scene_graph::Node::LookAt(const vec3f&, const vec3f&, const vec3f&, NodeTransformSpace)";
-
-    //приведение целевой точки в локальную систему координат
-
-  vec3f local_position, local_target, local_up;
+  math::vec3f x, y, z;
 
   switch (space)
   {
     case NodeTransformSpace_Local:
-      local_position = position;
-      local_target   = target;
-      local_up       = up;
+      z = normalize (target_point);
+      y = normalize (up);
 
       break;
     case NodeTransformSpace_Parent:
     {
-      const mat4f inv_tm = invert (ParentTM ());
+      const math::mat4f& tm = LocalTM ();
 
-      local_position = inv_tm * position;
-      local_target   = inv_tm * target;
-      local_up       = inv_tm * up;
+      z = normalize (invert (tm) * vec4f (target_point - Position ()));
+      y = normalize (invert (tm) * vec4f (up, 0));
 
       break;
     }
     case NodeTransformSpace_World:
-    {
-      const mat4f inv_tm = invert (WorldTM ());
+    {            
+      const math::mat4f& tm = WorldTM ();
 
-      local_position = inv_tm * position;
-      local_target   = inv_tm * target;
-      local_up       = inv_tm * up;
+      z = normalize (invert (tm) * vec4f (target_point - WorldPosition ()));
+      y = normalize (invert (tm) * vec4f (up, 0));
 
       break;
     }
     default:
-      throw xtl::make_argument_exception (METHOD_NAME, "space", space);
+      throw xtl::make_argument_exception ("scene_graph::Node::LookTo(const vec3f&, const vec3f&, NodeTransformSpace)", "space", space);
   }
-  
-    //получение матрицы поворота        
-    
-  mat4f local_orientation_tm = lookatf (vec3f (0.0f), local_target - local_position, local_up);    
 
-  SetOrientation (local_orientation_tm);
-  SetPosition    (local_position);
+  mat4f view;
+
+  x = cross (y, z); 
+  y = z ^ x;
+
+  view [0] = vec4f (x, 0.0f);
+  view [1] = vec4f (y, 0.0f);
+  view [2] = vec4f (z, 0.0f);
+  view [3] = vec4f (0.0f, 0.0f, 0.0f, 1.0f);
+  view     = transpose (view);  
+
+  quatf rotation = normalize (quatf (view));
+
+  SetOrientation (rotation * impl->local_orientation);
 }
 
-void Node::LookAt
- (float              position_x,
-  float              position_y,
-  float              position_z,
-  float              target_x,
-  float              target_y,
-  float              target_z,
-  float              up_x,
-  float              up_y,
-  float              up_z,  
-  NodeTransformSpace space)
+void Node::LookTo (const math::vec3f& target_point, NodeTransformSpace space)
 {
-  LookAt (vec3f (position_x, position_y, position_z), vec3f (target_x, target_y, target_z), vec3f (up_x, up_y, up_z), space);
+  LookTo (target_point, vec3f (0, 1, 0), space);
 }
 
-void Node::LookTo (const vec3f& target, const vec3f& up, NodeTransformSpace space)
+void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt invariant, NodeTransformSpace space)
 {
-  switch (space)
-  {
-    case NodeTransformSpace_Local:
-      LookAt (vec3f (0.0f), target, up, space);
 
-      break;
-    case NodeTransformSpace_Parent:
-      LookAt (impl->local_position, target, up, space);
-
-      break;
-    case NodeTransformSpace_World:
-      LookAt (impl->world_position, target, up, space);
-
-      break;
-    default:
-      throw xtl::make_argument_exception ("scene_graph::Node::LookTo", "space", space);
-  }
-}
-
-void Node::LookTo (float target_x, float target_y, float target_z, float up_x, float up_y, float up_z, NodeTransformSpace space)
-{
-  LookTo (vec3f (target_x, target_y, target_z), vec3f (up_x, up_y, up_z), space);
 }
 
 /*

@@ -203,10 +203,15 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќриентаци€ узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetOrientation   (const math::quatf&);
-    void               SetOrientation   (float angle_in_degrees, float axis_x, float axis_y, float axis_z);
-    void               SetOrientation   (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees); //углы Ёйлера
-    void               ResetOrientation ();
+    void SetOrientation   (const math::quatf&);
+    void SetOrientation   (float angle_in_degrees, float axis_x, float axis_y, float axis_z);
+    void SetOrientation   (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees); //углы Ёйлера
+    void SetOrientation   (const math::vec3f& local_axis,   //направление локальной оси
+                           const math::vec3f& local_up,     //направление оси "вверх"
+                           const math::vec3f& target_point, //целева€ точка
+                           NodeTransformSpace space = NodeTransformSpace_Local); //пространство, в котором находитс€ целева€ точка
+    void ResetOrientation ();
+
     const math::quatf& Orientation      () const;
     const math::quatf& WorldOrientation () const;
 
@@ -222,13 +227,9 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕозиционирование узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LookTo (const math::vec3f& target_point, const math::vec3f& up, NodeTransformSpace = NodeTransformSpace_Local);    
-    void LookTo (float target_x, float target_y, float target_z, float up_x, float up_y, float up_z, NodeTransformSpace = NodeTransformSpace_Local);
-    void LookAt (const math::vec3f& position, const math::vec3f& target, const math::vec3f& up, NodeTransformSpace = NodeTransformSpace_Local);
-    void LookAt (float position_x, float position_y, float position_z,
-                 float target_x, float target_y, float target_z,
-                 float up_x, float up_y, float up_z,
-                 NodeTransformSpace = NodeTransformSpace_Local);
+    void LookTo (const math::vec3f& target_point, NodeTransformSpace = NodeTransformSpace_Local);
+    void LookTo (const math::vec3f& target_point, const math::vec3f& up_vector, NodeTransformSpace = NodeTransformSpace_Local);
+    void LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt invariant, NodeTransformSpace = NodeTransformSpace_Local);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление наследованием преобразований
