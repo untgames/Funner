@@ -887,19 +887,19 @@ void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpac
       break;
     case NodeTransformSpace_Parent:
     {
-      const math::mat4f& tm = LocalTM ();
+      quatf q = invert (normalize (Orientation ()));
 
-      z = normalize (invert (tm) * vec4f (target_point - Position ()));
-      y = normalize (invert (tm) * vec4f (up, 0));
+      z = normalize (q * vec4f (target_point - Position ()));
+      y = normalize (q * vec4f (up, 0));
 
       break;
     }
     case NodeTransformSpace_World:
     {            
-      const math::mat4f& tm = WorldTM ();
+      quatf q = invert (normalize (WorldOrientation ()));
 
-      z = normalize (invert (tm) * vec4f (target_point - WorldPosition ()));
-      y = normalize (invert (tm) * vec4f (up, 0));
+      z = normalize (q * vec4f (target_point - WorldPosition ()));
+      y = normalize (q * vec4f (up, 0));
 
       break;
     }
@@ -944,17 +944,17 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
       break;
     case NodeTransformSpace_Parent:
     {
-      const math::mat4f& tm = LocalTM ();
+      quatf q = invert (normalize (Orientation ()));
 
-      local_dir = normalize (invert (tm) * vec4f (target_point - Position ()));
+      local_dir = normalize (q * vec4f (target_point - Position ()));
 
       break;
     }
     case NodeTransformSpace_World:
     {            
-      const math::mat4f& tm = WorldTM ();
+      quatf q = invert (normalize (WorldOrientation ()));      
 
-      local_dir = normalize (invert (tm) * vec4f (target_point - WorldPosition ()));
+      local_dir = normalize (q * vec4f (target_point - WorldPosition ()));
 
       break;
     }
