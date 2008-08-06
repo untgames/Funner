@@ -34,6 +34,7 @@
 #include <input/low_level/device.h>
 #include <input/low_level/driver.h>
 #include <input/low_level/window_driver.h>
+#include <input/low_level/direct_input_driver.h>
 
 #include <input/translation_map.h>
 

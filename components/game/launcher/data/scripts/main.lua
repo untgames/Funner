@@ -2,6 +2,9 @@ Application.LoadConfiguration ("data/configurations/configuration.xml")
 
 velocity = {['+x']=0; ['-x']=0; ['+y']=0; ['-y']=0}
 
+x_axis_value = 0
+y_axis_value = 0
+
 velocity_x = 3
 velocity_y = 3
 mouse_sens = 5	
@@ -60,6 +63,18 @@ function onBeginMove(ort)
   velocity [ort] = velocity [ort] + 1
 end
 
+function onXAxis(axis_value)
+  velocity ['+x'] = velocity ['+x'] - x_axis_value + axis_value
+
+  x_axis_value = axis_value
+end
+
+function onYAxis(axis_value)
+  velocity ['-y'] = velocity ['-y'] - y_axis_value + axis_value
+
+  y_axis_value = axis_value
+end
+
 function onEndMove(ort)
   velocity [ort] = velocity [ort] - 1
 end
@@ -79,6 +94,6 @@ function sign (x)
 end
 
 function idle(dt)
-  sprite:Translate (sign (velocity ['+x'] - velocity ['-x']) * dt * velocity_x,
-                    sign (velocity ['+y'] - velocity ['-y']) * dt * velocity_y, 0)
+  sprite:Translate ((velocity ['+x'] - velocity ['-x']) * dt * velocity_x,
+                    (velocity ['+y'] - velocity ['-y']) * dt * velocity_y, 0)
 end

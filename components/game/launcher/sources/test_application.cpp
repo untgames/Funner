@@ -135,6 +135,7 @@ typedef xtl::com_ptr<render::low_level::ISwapChain> SwapChainPtr;
 typedef xtl::com_ptr<render::low_level::IDevice>    DevicePtr;
 typedef VarRegistryContainer<stl::string>           StringRegistry;
 typedef xtl::com_ptr<input::low_level::IDevice>     InputDevicePtr;
+typedef stl::vector<InputDevicePtr>                 InputDevicesArray;
 typedef xtl::shared_ptr<sound::SoundManager>        SoundManagerPtr;
 typedef xtl::shared_ptr<sound::ScenePlayer>         ScenePlayerPtr;
 typedef xtl::shared_ptr<Environment>                EnvironmentPtr;
@@ -150,7 +151,7 @@ struct TestApplication::Impl
   xtl::auto_connection          app_idle_connection; //соединение сигнала обработчика холостого хода приложения
   SceneRender                   render;              //рендер сцены
   render::RenderTarget          render_target;       //цель рендеринга  
-  InputDevicePtr                input_device;        //устройство ввода
+  InputDevicesArray             input_devices;       //устройства ввода
   SoundManagerPtr               sound_manager;       //менеджер звука
   ScenePlayerPtr                scene_player;        //проигрыватель звуков сцены
   EnvironmentPtr                environment;         //скриптовое окружение
@@ -317,10 +318,12 @@ TestApplication::TestApplication (const char* start_script_name)
   {
       //инициализация звука
 
+    printf ("Init scene player...\n");
     impl->scene_player  = ScenePlayerPtr  (new sound::ScenePlayer ());
 
       //инициализация LUA
 
+    printf ("Init LUA...\n");
     impl->environment = EnvironmentPtr (new Environment);
 
     impl->shell = ShellPtr (new Shell ("lua", impl->environment));
@@ -341,10 +344,12 @@ TestApplication::TestApplication (const char* start_script_name)
 
     lib.Register ("dofile", make_invoker<void (const char*)> (xtl::bind (&do_file, _1, xtl::ref (*impl->shell))));
 
+    printf ("Loading start script...\n");
     impl->shell->ExecuteFile (start_script_name, &log_print);
 
       //инициализация звука
 
+    printf ("Init sound...\n");
     impl->sound_manager = SoundManagerPtr (new sound::SoundManager ("OpenAL", get (impl->config, "SoundDeviceMask", DEFAULT_SOUND_DEVICE_MASK).c_str ()));
 
     impl->sound_manager->LoadSoundLibrary (SOUND_DECL_LIB_FILE_NAME);
@@ -353,17 +358,31 @@ TestApplication::TestApplication (const char* start_script_name)
 
       //инициализация системы ввода
 
-    input::low_level::WindowDriver::RegisterDevice (*(impl->window.get ()));
-
-    impl->input_device = InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", "*"), false);
-    
-      //инициализация системы ввода
-
     impl->translation_map.Load (TRANSLATION_MAP_FILE_NAME);
 
     input::TranslationMap::EventHandler event_handler = xtl::bind (&input_event_handler, _1, xtl::ref (*impl->shell));
 
-    impl->input_device->SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler));
+    printf ("Init window driver input...\n");
+    input::low_level::WindowDriver::RegisterDevice (*(impl->window.get ()));
+
+    impl->input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", "*"), false));
+
+    impl->input_devices.back ()->SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler));
+
+      //инициализация direct input
+
+    printf ("Init direct input driver input...\n");
+    input::low_level::DirectInputDriver::RegisterDevice (*(impl->window.get ()));
+
+    input::low_level::DirectInputDriver::Driver ()->SetDebugLog (&log_print);
+
+    for (size_t i = 0; i < input::low_level::DirectInputDriver::Driver ()->GetDevicesCount (); i++)
+    {
+      impl->input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", input::low_level::DirectInputDriver::Driver ()->GetDeviceName (i), "buffer_size=16"), false));
+
+      impl->input_devices.back ()->SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler));
+    }
+    printf ("Started\n");
     
       //установка idle-функции
 
