@@ -46,6 +46,8 @@ void TextLine::SetText (const char* text)
     throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetText", "text");
 
   impl->text = text;
+
+  UpdateNotify ();
 }
 
 const char* TextLine::Text () const
@@ -63,6 +65,8 @@ void TextLine::SetFont (const char* font_name)
     throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetFont", "font_name");
 
   impl->font_name = font_name;
+
+  UpdateNotify ();
 }
 
 const char* TextLine::Font () const
