@@ -4,6 +4,7 @@ using namespace render::mid_level;
 using namespace render::mid_level::renderer2d;
 using namespace render::mid_level::low_level_driver;
 using namespace render::mid_level::low_level_driver::renderer2d;
+using namespace render::low_level;
 
 /*
      онстанты
@@ -12,8 +13,7 @@ using namespace render::mid_level::low_level_driver::renderer2d;
 namespace
 {
 
-const size_t PRIMITIVE_ARRAY_RESERVE_SIZE = 2048;                             //резервируемое количество примитивов
-const size_t DEFAULT_VERTEX_BUFFER_SIZE   = PRIMITIVE_ARRAY_RESERVE_SIZE * 4; //размер вершинного буффера по умолчанию (количество вершин)
+const size_t PRIMITIVE_ARRAY_RESERVE_SIZE = 2048; //резервируемое количество примитивов
 
 }
 
@@ -22,44 +22,49 @@ const size_t DEFAULT_VERTEX_BUFFER_SIZE   = PRIMITIVE_ARRAY_RESERVE_SIZE * 4; //
 */
 
 Frame::Frame (CommonResources* in_common_resources, render::low_level::IDevice* device)
-  : common_resources (in_common_resources), current_not_blended_sprites_vertex_buffer_size (DEFAULT_VERTEX_BUFFER_SIZE), current_blended_sprites_vertex_buffer_size (DEFAULT_VERTEX_BUFFER_SIZE)
+  : common_resources (in_common_resources)
 {
-  using namespace render::low_level;
+  program_parameters.alpha_reference = 0.0f;
 
-  memset (&vertex_buffer_desc, 0, sizeof (vertex_buffer_desc));
-
-//  vertex_buffer_desc.usage_mode   = UsageMode_Default;
-  vertex_buffer_desc.usage_mode   = UsageMode_Stream;
-  vertex_buffer_desc.bind_flags   = BindFlag_VertexBuffer;
-  vertex_buffer_desc.access_flags = AccessFlag_ReadWrite;
-
-  ReserveNotBlendedSpritesVertexBuffer (device, current_not_blended_sprites_vertex_buffer_size);
-  ReserveBlendedSpritesVertexBuffer    (device, current_blended_sprites_vertex_buffer_size);
-  primitives.reserve                   (PRIMITIVE_ARRAY_RESERVE_SIZE);
+  primitives.reserve (PRIMITIVE_ARRAY_RESERVE_SIZE);
 }
 
 /*
     ћатрица вида / матрица преобразовани€
 */
 
-void Frame::SetView (const math::mat4f& tm)
+void Frame::SetViewPoint (const math::vec3f& point)
 {
-  view_tm = math::translate (tm * math::vec3f (0.f));  
+  program_parameters.view_matrix = math::translate (-point);
 }
 
 void Frame::SetProjection (const math::mat4f& tm)
 {
-  proj_tm = tm;
+  program_parameters.projection_matrix = tm;
 }
 
-void Frame::GetView (math::mat4f& tm)
+void Frame::GetViewPoint (math::vec3f& point)
 {
-  tm = view_tm;
+  point = -program_parameters.view_matrix.column (3);
 }
 
 void Frame::GetProjection (math::mat4f& tm)
 {
-  tm = proj_tm;
+  tm = program_parameters.projection_matrix;
+}
+
+/*
+    ”становка параметра дл€ работы альфа-теста
+*/
+
+void Frame::SetAlphaReference (float ref)
+{
+  program_parameters.alpha_reference = ref;
+}
+
+float Frame::GetAlphaReference ()
+{
+  return program_parameters.alpha_reference;
 }
 
 /*
@@ -99,52 +104,64 @@ void Frame::Clear ()
 }
 
 /*
-   –езервирование места под вершинные буферы
+    ќбновление вершинных буферов
 */
 
-void Frame::ReserveNotBlendedSpritesVertexBuffer (render::low_level::IDevice* device, size_t sprites_count)
+namespace
 {
-  vertex_buffer_desc.size = sizeof (RenderedSpriteVertex) * sprites_count * 6;
 
-  not_blended_sprites_vertex_buffer = BufferPtr (device->CreateBuffer (vertex_buffer_desc), false);
+bool not_blended_sprite_sort_predicate (const SpriteVertexData* data1, const SpriteVertexData* data2)
+{
+  if (data1->blend_mode == data2->blend_mode)
+    return data1->texture < data2->texture;
 
-  not_blended_sprites_vertex_data_buffer.reserve (sprites_count);
+  return data1->blend_mode > data2->blend_mode;
 }
 
-void Frame::ReserveBlendedSpritesVertexBuffer (render::low_level::IDevice* device, size_t sprites_count)
+bool blended_sprite_sort_predicate (const SpriteVertexData* data1, const SpriteVertexData* data2)
 {
-  vertex_buffer_desc.size = sizeof (RenderedSpriteVertex) * sprites_count * 6;
-
-  blended_sprites_vertex_buffer = BufferPtr (device->CreateBuffer (vertex_buffer_desc), false);
-
-  blended_sprites_vertex_data_buffer.reserve (sprites_count);
+  return data1->vertices[0].position.z > data2->vertices[0].position.z; //возможно добавить сортировку по блендингу и текстурам
 }
 
-/*
-   ‘ормирование вершинного буффера
-*/
+}
 
-void Frame::MakeVertexBuffer (SpriteVertexArray& vertex_data_array, BufferPtr& buffer)
+void Frame::UpdateVertexBuffers (render::low_level::IDevice& device)
 {
-  vertex_buffer_cache.resize (vertex_data_array.size () * 6, false);
+    //очистка буферов спрайтов
 
-  RenderedSpriteVertex* new_vertex = vertex_buffer_cache.data ();
+  not_blended_sprites.Clear ();
+  blended_sprites.Clear ();
+  
+    //заполнение буферов спрайтов  
 
-  for (SpriteVertexArray::iterator iter = vertex_data_array.begin (), end = vertex_data_array.end (); iter != end; ++iter)
+  for (PrimitiveArray::iterator iter=primitives.begin (), end=primitives.end (); iter!=end; ++iter)
   {
-    const SpriteVertexData& sprite_vertex_data = **iter;
+    Primitive&    primitive = **iter;
+    SpriteBuffer* buffer;
     
-    for (size_t j=0; j<6; j++, new_vertex++)
+    switch (primitive.GetBlendMode ())
     {
-      static size_t order [6] = {0, 1, 2, 3, 2, 1};
-      
-      new_vertex->color    = sprite_vertex_data.color;
-      new_vertex->position = sprite_vertex_data.vertices [order [j]].position;
-      new_vertex->texcoord = sprite_vertex_data.vertices [order [j]].texcoord;
+      case BlendMode_None:
+      case BlendMode_AlphaClamp:
+        buffer = &not_blended_sprites;
+        break;
+      default:
+        buffer = &blended_sprites;
+        break;
     }
+
+    buffer->Add (primitive.GetSpritesCount (), primitive.GetSpriteVertexBuffer ());
   }
 
-  buffer->SetData (0, vertex_buffer_cache.size () * sizeof (RenderedSpriteVertex), vertex_buffer_cache.data ());
+    //сортировка геометрии дл€ ускорени€ вывода
+
+  not_blended_sprites.Sort (not_blended_sprite_sort_predicate);
+  blended_sprites.Sort     (blended_sprite_sort_predicate);  
+
+    //обновление вершинных буферов
+
+  not_blended_sprites.UpdateVertexBuffer (device);
+  blended_sprites.UpdateVertexBuffer     (device);
 }
 
 /*
@@ -154,118 +171,121 @@ void Frame::MakeVertexBuffer (SpriteVertexArray& vertex_data_array, BufferPtr& b
 namespace
 {
 
-bool not_blended_sprite_sort_predicate (SpriteVertexData* data1, SpriteVertexData* data2)
+//рисование спрайтов без блендинга
+void draw_sprites (IDevice& device, const SpriteVertexData** first_sprite, const SpriteVertexData** last_sprite)
 {
-  return data1->texture < data2->texture;  //возможно добавить сортировку по глубине
+  for (const SpriteVertexData** sprite=first_sprite; sprite != last_sprite;)
+  {
+    size_t base_sprite_index = sprite - first_sprite;
+
+    render::low_level::ITexture* texture = (*sprite)->texture;
+
+    for (; sprite != last_sprite && (*sprite)->texture == texture; sprite++);
+
+    size_t sprites_count = sprite - first_sprite - base_sprite_index + 1;
+
+    device.SSSetTexture (0, texture);    
+    device.Draw         (render::low_level::PrimitiveType_TriangleList, base_sprite_index * 6, sprites_count * 6);
+  }  
 }
 
-bool blended_sprite_sort_predicate (SpriteVertexData* data1, SpriteVertexData* data2)
+//рисование спрайтов с прозрачностью
+void draw_sprites (IDevice& device, const SpriteVertexData** first_sprite, const SpriteVertexData** last_sprite, CommonResources& resources)
 {
-  return data1->vertices[0].position.z > data2->vertices[0].position.z; //возможно добавить сортировку по блендингу и текстурам
+  render::low_level::ITexture*     current_texture     = device.SSGetTexture (0);
+  render::low_level::IBlendState*  current_blend_state = device.OSGetBlendState ();
+
+  for (const SpriteVertexData** sprite=first_sprite; sprite != last_sprite;)
+  {
+    size_t base_sprite_index = sprite - first_sprite;
+
+    render::low_level::ITexture*             texture    = (*sprite)->texture;
+    render::mid_level::renderer2d::BlendMode blend_mode = (*sprite)->blend_mode;
+
+    for (; sprite != last_sprite && (*sprite)->texture == texture && (*sprite)->blend_mode == blend_mode; sprite++);
+
+    size_t sprites_count = sprite - first_sprite - base_sprite_index + 1;
+
+    device.SSSetTexture (0, texture);
+
+    if (current_texture != texture)
+    {
+      device.SSSetTexture (0, texture);
+
+      current_texture = texture;
+    }
+
+    render::low_level::IBlendState* blend_state = resources.GetBlendState (blend_mode);
+
+    if (current_blend_state != blend_state)
+    {
+      device.OSSetBlendState (blend_state);
+
+      current_blend_state = blend_state;
+    }
+
+    device.Draw (render::low_level::PrimitiveType_TriangleList, base_sprite_index * 6, sprites_count * 6);
+  }
 }
 
 }
 
-void Frame::DrawCore (render::low_level::IDevice* device)
+void Frame::DrawCore (IDevice* device)
 {
     //установка области вывода
 
   BasicFrame::BindViewport (device);
+  
+    //обновление парметров шейдинга    
 
-  common_resources->GetConstantBuffer ()->SetData (offsetof (ProgramParameters, view_matrix), sizeof (view_tm), &view_tm);
-  common_resources->GetConstantBuffer ()->SetData (offsetof (ProgramParameters, projection_matrix), sizeof (proj_tm), &proj_tm);
+  IBuffer* constant_buffer = common_resources->GetConstantBuffer ();
 
-  //ѕодготовка вершинных буфферов
+  constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
 
-  not_blended_sprites_vertex_data_buffer.clear ();
-  blended_sprites_vertex_data_buffer.clear ();  
+    //обновление вершинных буферов
+    
+  UpdateVertexBuffers (*device);
 
-  for (PrimitiveArray::iterator iter=primitives.begin (), end=primitives.end (); iter!=end; ++iter)
-  {
-    if ((*iter)->GetBlendMode () == BlendMode_None)
-      for (size_t i = 0; i < (*iter)->GetSpritesCount (); i++)
-        not_blended_sprites_vertex_data_buffer.push_back (&((*iter)->GetSpriteVertexBuffer ()[i]));
-    else
-      for (size_t i = 0; i < (*iter)->GetSpritesCount (); i++)
-        blended_sprites_vertex_data_buffer.push_back (&((*iter)->GetSpriteVertexBuffer ()[i]));
-  }
+    //установка общих ресурсов
 
-  stl::sort (not_blended_sprites_vertex_data_buffer.begin (), not_blended_sprites_vertex_data_buffer.end (), not_blended_sprite_sort_predicate);
-  stl::sort (blended_sprites_vertex_data_buffer.begin (), blended_sprites_vertex_data_buffer.end (), blended_sprite_sort_predicate);
+  device->ISSetInputLayout             (common_resources->GetInputLayout ());
+  device->SSSetConstantBuffer          (0, constant_buffer);
+  device->SSSetProgramParametersLayout (common_resources->GetProgramParametersLayout ());
+  device->SSSetSampler                 (0, common_resources->GetSamplerState ());
 
-  if (not_blended_sprites_vertex_data_buffer.size () > current_not_blended_sprites_vertex_buffer_size)
-  {
-    current_not_blended_sprites_vertex_buffer_size = not_blended_sprites_vertex_data_buffer.size () + DEFAULT_VERTEX_BUFFER_SIZE;
-    ReserveNotBlendedSpritesVertexBuffer (device, current_not_blended_sprites_vertex_buffer_size);
-  }
+    //отрисовка спрайтов без блендинга
 
-  if (blended_sprites_vertex_data_buffer.size () > current_blended_sprites_vertex_buffer_size)
-  {
-    current_blended_sprites_vertex_buffer_size = blended_sprites_vertex_data_buffer.size () + DEFAULT_VERTEX_BUFFER_SIZE;
-    ReserveBlendedSpritesVertexBuffer (device, current_blended_sprites_vertex_buffer_size);
-  }
-
-  MakeVertexBuffer (not_blended_sprites_vertex_data_buffer, not_blended_sprites_vertex_buffer);
-  MakeVertexBuffer (blended_sprites_vertex_data_buffer,     blended_sprites_vertex_buffer);
-
-  //ќтрисовка спрайтов без блендинга
-
-  device->ISSetVertexBuffer      (0, not_blended_sprites_vertex_buffer.get ());
+  device->ISSetVertexBuffer      (0, not_blended_sprites.GetVertexBuffer ());
   device->OSSetDepthStencilState (common_resources->GetDepthStencilState (true));
   device->OSSetBlendState        (common_resources->GetBlendState (BlendMode_None));
 
-  for (size_t i = 0; i < not_blended_sprites_vertex_data_buffer.size ();)
-  {
-    size_t j = i + 1;
-    render::low_level::ITexture* texture = not_blended_sprites_vertex_data_buffer[i]->texture;
+  const SpriteVertexData **first_sprite = not_blended_sprites.GetSprites (),
+                         **last_sprite  = first_sprite + not_blended_sprites.GetSpritesCount (),
+                         **first_solid_sprite;
 
-    for (; (j < not_blended_sprites_vertex_data_buffer.size ()) && (not_blended_sprites_vertex_data_buffer[j]->texture == texture); j++);
-
-    device->SSSetTexture (0, texture);
+    //поиск первого спрайта без альфа-отсечени€
     
-    device->Draw (render::low_level::PrimitiveType_TriangleList, i * 6, (j - i) * 6);
+  device->SSSetProgram (common_resources->GetAlphaClampProgram ());
 
-    i = j;
-  }
+  for (first_solid_sprite=first_sprite; first_solid_sprite != last_sprite && (*first_solid_sprite)->blend_mode == BlendMode_AlphaClamp; ++first_solid_sprite);
 
-  //ќтрисовка спрайтов с блендингом
+    //отрисовка спрайтов с альфа-отсечением
 
-  device->ISSetVertexBuffer      (0, blended_sprites_vertex_buffer.get ());
+  draw_sprites (*device, first_sprite, first_solid_sprite);
+
+    //отрисовка спрайтов без альфа-отсечени€
+
+  device->SSSetProgram (common_resources->GetDefaultProgram ());
+
+  draw_sprites (*device, first_solid_sprite, last_sprite);
+
+    //отрисовка спрайтов с блендингом
+
+  device->ISSetVertexBuffer      (0, blended_sprites.GetVertexBuffer ());
   device->OSSetDepthStencilState (common_resources->GetDepthStencilState (false));
 
-  render::low_level::ITexture*     current_texture     = device->SSGetTexture (0);
-  render::low_level::IBlendState*  current_blend_state = device->OSGetBlendState ();
-  
-  for (size_t i = 0; i < blended_sprites_vertex_data_buffer.size ();)
-  {
-    size_t j = i + 1;
+  first_sprite = blended_sprites.GetSprites ();
+  last_sprite  = first_sprite + blended_sprites.GetSpritesCount ();
 
-    render::low_level::ITexture*     texture    = blended_sprites_vertex_data_buffer [i]->texture;
-    mid_level::renderer2d::BlendMode blend_mode = blended_sprites_vertex_data_buffer [i]->blend_mode;
-
-    for (; j < blended_sprites_vertex_data_buffer.size () && blended_sprites_vertex_data_buffer [j]->texture == texture &&
-           blended_sprites_vertex_data_buffer [j]->blend_mode == blend_mode; j++);
-
-    device->SSSetTexture (0, texture);
-
-    if (current_texture != texture)
-    {
-      device->SSSetTexture (0, texture);
-      
-      current_texture = texture;
-    }
-
-    render::low_level::IBlendState* blend_state = common_resources->GetBlendState (blend_mode);
-
-    if (current_blend_state != blend_state)
-    {
-      device->OSSetBlendState (blend_state);
-
-      current_blend_state = blend_state;
-    }    
-
-    device->Draw (render::low_level::PrimitiveType_TriangleList, i * 6,  (j - i) * 6);
-    
-    i = j;
-  }
+  draw_sprites (*device, first_sprite, last_sprite, *common_resources);
 }

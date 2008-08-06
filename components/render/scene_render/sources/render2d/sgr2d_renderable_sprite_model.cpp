@@ -16,6 +16,7 @@ RenderableSpriteModel::RenderableSpriteModel (scene_graph::SpriteModel* in_model
     need_update_sprites (true),
     current_world_tm_hash (0)
 {
+  //добавить реакцию на пивоты!!!
   connect_tracker (model->RegisterEventHandler (SpriteModelEvent_AfterSpriteDescsUpdate, xtl::bind (&RenderableSpriteModel::UpdateSpritesNotify, this)));
   connect_tracker (model->RegisterEventHandler (SpriteModelEvent_AfterMaterialUpdate, xtl::bind (&RenderableSpriteModel::UpdateMaterialNotify, this)));
 }
@@ -93,6 +94,7 @@ void RenderableSpriteModel::Update ()
         case media::rfx::SpriteBlendMode_Translucent: blend_mode = render::mid_level::renderer2d::BlendMode_Translucent; break;
         case media::rfx::SpriteBlendMode_Mask:        blend_mode = render::mid_level::renderer2d::BlendMode_Mask; break;
         case media::rfx::SpriteBlendMode_Additive:    blend_mode = render::mid_level::renderer2d::BlendMode_Additive; break;
+        case media::rfx::SpriteBlendMode_AlphaClamp:  blend_mode = render::mid_level::renderer2d::BlendMode_AlphaClamp; break;
       }
 
       primitive->SetBlendMode (blend_mode);

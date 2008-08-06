@@ -54,7 +54,8 @@ RenderView::RenderView (Scene* in_scene, Render* in_render)
     
     frame = FramePtr (renderer.CreateFrame (), false);
 
-    frame->SetRenderTargets (renderer.GetColorBuffer (), renderer.GetDepthStencilBuffer ());    
+    frame->SetRenderTargets  (renderer.GetColorBuffer (), renderer.GetDepthStencilBuffer ());    
+    frame->SetAlphaReference (0.5f);
   }
   catch (xtl::exception& exception)
   {
@@ -153,9 +154,9 @@ void RenderView::Draw ()
   frame->Clear ();
 
     //установка матриц вида и проекции
-    
+
   frame->SetProjection (camera->ProjectionMatrix ());
-  frame->SetView       (invert (camera->WorldTM ()));
+  frame->SetViewPoint  (camera->WorldPosition ());
 
     //обход сцены
 

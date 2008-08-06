@@ -92,6 +92,7 @@ void Primitive::SetBlendMode (BlendMode in_blend_mode)
     case BlendMode_Translucent:
     case BlendMode_Mask:
     case BlendMode_Additive:
+    case BlendMode_AlphaClamp:
       break;
     default:
       throw xtl::make_argument_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::SetBlendMode", "blend_mode", in_blend_mode);

@@ -154,7 +154,7 @@ int main ()
     frame->SetRenderTargets (renderer->GetColorBuffer (), renderer->GetDepthStencilBuffer ());    
     frame->SetViewport      (viewport);
     frame->SetProjection    (get_ortho_proj (-100, 100, -100, 100, -1000, 1000));
-    frame->SetView          (math::lookatf (vec3f (0, 0, 3), vec3f (0.0f), vec3f (0, 1, 0)));
+    frame->SetViewPoint     (vec3f (0, 0, 3));
     frame->AddPrimitive     (primitive.get ());
 
     syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (window), renderer.get (), frame.get (), clear_frame.get (), primitive.get ()));

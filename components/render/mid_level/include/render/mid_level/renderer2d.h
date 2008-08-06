@@ -35,6 +35,7 @@ enum BlendMode
   BlendMode_Translucent, //полупрозрачность
   BlendMode_Mask,        //наложение по маске - спрайт €вл€етс€ маской при наложении
   BlendMode_Additive,    //аддитивное наложение
+  BlendMode_AlphaClamp,  //отсечение по альфа
 
   BlendMode_Num 
 };
@@ -95,10 +96,16 @@ class IFrame: virtual public mid_level::IFrame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ћатрица вида / матрица преобразовани€
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetView       (const math::mat4f&) = 0;
+    virtual void SetViewPoint  (const math::vec3f&) = 0;
     virtual void SetProjection (const math::mat4f&) = 0;
-    virtual void GetView       (math::mat4f&) = 0;
+    virtual void GetViewPoint  (math::vec3f&) = 0;
     virtual void GetProjection (math::mat4f&) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///”становка параметра дл€ работы альфа-теста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void  SetAlphaReference (float ref) = 0;
+    virtual float GetAlphaReference () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕримитивы

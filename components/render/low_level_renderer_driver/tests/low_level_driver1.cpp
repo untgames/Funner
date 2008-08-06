@@ -12,7 +12,8 @@ typedef xtl::com_ptr<IDevice>                    DevicePtr;
 const size_t WINDOW_WIDTH   = 1024;
 const size_t WINDOW_HEIGHT  = 768;
 const char* screenshot_name = "screenshots/screenshot1.tga";
-const char* texture_name    = "data/texture_hut.tga";
+//const char* texture_name    = "data/texture_hut.tga";
+const char* texture_name    = "data/radial_alpha.tif";
 
 
 float sprite_angle = 0;
@@ -40,6 +41,8 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
 
   primitive1->SetTransform (tm1);
   primitive2->SetTransform (tm2);
+  
+  frame->SetAlphaReference (0.5f * (1.0f + cos(sprite_angle)));
   
   renderer->AddFrame (clear_frame);
   renderer->AddFrame (frame);
@@ -154,8 +157,8 @@ int main ()
     primitive1->SetTexture (texture1.get ());
     primitive2->SetTexture (texture2.get ());
 
-    primitive1->SetBlendMode (BlendMode_Additive);
-    primitive2->SetBlendMode (BlendMode_Mask);
+    primitive1->SetBlendMode (BlendMode_Translucent);
+    primitive2->SetBlendMode (BlendMode_AlphaClamp);
 
     printf ("Primitive1 sprites count is %u\n", primitive1->GetSpritesCount ());
     primitive1->AddSprites (1, &sprite1);

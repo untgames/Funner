@@ -28,6 +28,48 @@ namespace low_level_driver
 namespace renderer2d
 {
 
+typedef xtl::com_ptr<render::low_level::IBlendState>              BlendStatePtr;
+typedef xtl::com_ptr<render::low_level::IBuffer>                  BufferPtr;
+typedef xtl::com_ptr<render::low_level::IDepthStencilState>       DepthStencilStatePtr;
+typedef xtl::com_ptr<render::low_level::IProgram>                 ProgramPtr;
+typedef xtl::com_ptr<render::low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
+typedef xtl::com_ptr<render::low_level::ISamplerState>            SamplerStatePtr;
+typedef xtl::com_ptr<render::low_level::IInputLayout>             InputLayoutPtr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Общие ресурсы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class CommonResources : public Object
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    CommonResources (render::low_level::IDevice* device);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение низкоуровневых данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    render::low_level::IBlendState*              GetBlendState        (render::mid_level::renderer2d::BlendMode blend_mode) { return blend_states[blend_mode].get (); }
+    render::low_level::IBuffer*                  GetConstantBuffer    () { return constant_buffer.get (); }
+    render::low_level::IDepthStencilState*       GetDepthStencilState (bool depth_write_enabled);
+    render::low_level::IProgram*                 GetDefaultProgram    () { return default_program.get (); }
+    render::low_level::IProgram*                 GetAlphaClampProgram () { return alpha_clamp_program.get (); }
+    render::low_level::IProgramParametersLayout* GetProgramParametersLayout () { return program_parameters_layout.get (); }
+    render::low_level::ISamplerState*            GetSamplerState      () { return sampler.get (); }
+    render::low_level::IInputLayout*             GetInputLayout       () { return input_layout.get (); }
+
+  private:
+    BlendStatePtr              blend_states [render::mid_level::renderer2d::BlendMode_Num];
+    BufferPtr                  constant_buffer;
+    DepthStencilStatePtr       depth_stencil_states [2];
+    ProgramPtr                 default_program;
+    ProgramPtr                 alpha_clamp_program;
+    ProgramParametersLayoutPtr program_parameters_layout;
+    SamplerStatePtr            sampler;
+    InputLayoutPtr             input_layout;
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Двумерная текстура
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +132,7 @@ struct SpriteVertexData
     math::vec2f texcoord;
   };
 
-  SpriteVertex                     vertices[4];
+  SpriteVertex                     vertices [4];
   math::vec4f                      color;
   render::low_level::ITexture*     texture;
   mid_level::renderer2d::BlendMode blend_mode;
@@ -174,6 +216,7 @@ struct ProgramParameters
 {
   math::mat4f view_matrix;
   math::mat4f projection_matrix;
+  float       alpha_reference;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,6 +227,69 @@ struct RenderedSpriteVertex
   math::vec3f position;
   math::vec2f texcoord;
   math::vec4f color;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Буфер спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class SpriteBuffer
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    SpriteBuffer  ();
+    ~SpriteBuffer ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение количества спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t GetSpritesCount () { return data_buffer.size (); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение вершинного буфера / буфера спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    render::low_level::IBuffer* GetVertexBuffer () { return vertex_buffer.get (); }    
+    const SpriteVertexData**    GetSprites      () { return data_buffer.data (); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление спрайтов примитива
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Add (size_t sprites_count, const SpriteVertexData* sprites);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Резервирование места для размещения указанного числа спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Reserve (size_t sprites_count);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сортировка геометрии
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class Predicate> void Sort (Predicate pred)
+    {
+      stl::sort (data_buffer.data (), data_buffer.data () + data_buffer.size (), pred);
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Очистка буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Clear ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление вершинного буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    void UpdateVertexBuffer (render::low_level::IDevice&);    
+
+  private:
+    void SetVertexBufferSize (render::low_level::IDevice&, size_t new_vertices);
+    
+  private:
+    typedef xtl::uninitialized_storage<const SpriteVertexData*> SpriteVertexArray;
+
+  private:
+    size_t            vertex_buffer_vertices_count; //текущее количество вершин в вершинном буфере
+    BufferPtr         vertex_buffer;                //вершинный буфер
+    SpriteVertexArray data_buffer;                  //временный буфер с данными геометрии
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,10 +306,16 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица вида / матрица преобразования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetView       (const math::mat4f&);
+    void SetViewPoint  (const math::vec3f&);
     void SetProjection (const math::mat4f&);
-    void GetView       (math::mat4f&);
+    void GetViewPoint  (math::vec3f&);
     void GetProjection (math::mat4f&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка параметра для работы альфа-теста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void  SetAlphaReference (float ref);
+    float GetAlphaReference ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Примитивы
@@ -213,23 +325,15 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     void   Clear           ();
 
   private:
-    typedef xtl::com_ptr<Primitive>                  PrimitivePtr;
-    typedef stl::vector<PrimitivePtr>                PrimitiveArray;
-    typedef stl::vector<SpriteVertexData*>           SpriteVertexArray;
-    typedef xtl::com_ptr<render::low_level::IBuffer> BufferPtr;
-    typedef xtl::com_ptr<CommonResources>            CommonResourcesPtr;
+    typedef xtl::com_ptr<Primitive>        PrimitivePtr;
+    typedef stl::vector<PrimitivePtr>      PrimitiveArray;
+    typedef xtl::com_ptr<CommonResources>  CommonResourcesPtr;
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Резервирование места под вершинные буферы
+///Обновление вершинных буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ReserveNotBlendedSpritesVertexBuffer (render::low_level::IDevice* device, size_t sprites_count);
-    void ReserveBlendedSpritesVertexBuffer    (render::low_level::IDevice* device, size_t sprites_count);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Формирование вершинного буффера
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void MakeVertexBuffer (SpriteVertexArray& vertex_data_array, BufferPtr& buffer);
+    void UpdateVertexBuffers (render::low_level::IDevice&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация визуализации
@@ -237,20 +341,11 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     void DrawCore (render::low_level::IDevice* device);
 
   private:
-    math::mat4f                   view_tm, proj_tm;
-    PrimitiveArray                primitives;
-    CommonResourcesPtr            common_resources;
-    BufferPtr                     not_blended_sprites_vertex_buffer;              //вершинный буффер спрайтов без блендинга
-    BufferPtr                     blended_sprites_vertex_buffer;                  //вершинный буффер спрайтов с блендингом
-    SpriteVertexArray             not_blended_sprites_vertex_data_buffer;         //сортируемый буффер, из которого формируется буффер для отрисовки
-    SpriteVertexArray             blended_sprites_vertex_data_buffer;             //сортируемый буффер, из которого формируется буффер для отрисовки
-    size_t                        current_not_blended_sprites_vertex_buffer_size; //текущий размер вершинного буффера спрайтов без блендинга
-    size_t                        current_blended_sprites_vertex_buffer_size;     //текущий размер вершинного буффера спрайтов с блендингом
-    render::low_level::BufferDesc vertex_buffer_desc;
-    
-    typedef xtl::uninitialized_storage<RenderedSpriteVertex> RenderedSpriteVertexArray;
-    
-    RenderedSpriteVertexArray vertex_buffer_cache;
+    ProgramParameters  program_parameters;  //параметры программы рендеринга
+    PrimitiveArray     primitives;          //массив примитивов
+    CommonResourcesPtr common_resources;    //общие ресурсы
+    SpriteBuffer       not_blended_sprites; //спрайты без блендинга
+    SpriteBuffer       blended_sprites;     //спрайты с блендингом
 };
 
 }
