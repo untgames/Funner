@@ -73,6 +73,7 @@ void SpriteMaterial::SetBlendMode (SpriteBlendMode mode)
     case SpriteBlendMode_Translucent:
     case SpriteBlendMode_Mask:
     case SpriteBlendMode_Additive:
+    case SpriteBlendMode_AlphaClamp:
       break;
     default:
       throw xtl::make_argument_exception ("media::rfx::SetBlendMode", "mode", mode);
@@ -153,6 +154,7 @@ const char* get_name (SpriteBlendMode mode)
     case SpriteBlendMode_Translucent: return "translucent";
     case SpriteBlendMode_Mask:        return "mask";
     case SpriteBlendMode_Additive:    return "additive";
+    case SpriteBlendMode_AlphaClamp:  return "alpha_clamp";
     default:
       throw xtl::make_argument_exception ("media::rfx::get_name(SpriteBlendMode)", "mode", mode);
   }

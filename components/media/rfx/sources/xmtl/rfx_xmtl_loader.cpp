@@ -304,7 +304,8 @@ class XmlMaterialLibraryLoader
         {"none",        SpriteBlendMode_None},
         {"translucent", SpriteBlendMode_Translucent},
         {"mask",        SpriteBlendMode_Mask},
-        {"additive",    SpriteBlendMode_Additive}
+        {"additive",    SpriteBlendMode_Additive},
+        {"alpha_clamp", SpriteBlendMode_AlphaClamp}
       };
       
       static const size_t blend_mode_map_size = sizeof (blend_mode_map) / sizeof (*blend_mode_map);

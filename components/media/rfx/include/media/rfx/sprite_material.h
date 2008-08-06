@@ -18,6 +18,7 @@ enum SpriteBlendMode
   SpriteBlendMode_Translucent, //полупрозрачность
   SpriteBlendMode_Mask,        //наложение по маске - спрайт является маской при наложении
   SpriteBlendMode_Additive,    //аддитивное наложение
+  SpriteBlendMode_AlphaClamp,  //альфа-отсечение
 
   SpriteBlendMode_Num   
 };
