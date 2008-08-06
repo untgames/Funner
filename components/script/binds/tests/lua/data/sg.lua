@@ -413,6 +413,21 @@ function test_visual_model ()
   print ("Mesh name = " .. visual_model1.MeshName)
 end
 
+function test_text_line ()
+  print ("TextLine test")
+
+  local text_line1 = Scene.TextLine.Create ()
+
+  print ("Text = " .. text_line1.Text)
+  print ("Font = " .. text_line1.Font)
+
+  text_line1.Text = "text"
+  text_line1.Font = "font"
+
+  print ("Text = " .. text_line1.Text)
+  print ("Font = " .. text_line1.Font)
+end
+
 function test ()
   test_node ()
 
@@ -438,4 +453,6 @@ function test ()
   test_sprite_pivot ()
 
   test_scene ()
+
+  test_text_line ()
 end

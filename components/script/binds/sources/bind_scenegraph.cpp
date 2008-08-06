@@ -32,6 +32,7 @@ const char* SCENE_SOUND_EMITTER_LIBRARY               = "Scene.SoundEmitter";
 const char* SCENE_SPRITE_MODEL_LIBRARY                = "Scene.SpriteModel";
 const char* SCENE_SPRITE_LIBRARY                      = "Scene.Sprite";
 const char* SCENE_SPRITE_LIST_LIBRARY                 = "Scene.SpriteList";
+const char* SCENE_TEXT_LINE_LIBRARY                   = "Scene.TextLine";
 const char* SCENE_VISUAL_MODEL_LIBRARY                = "Scene.VisualModel";
 
 /*
@@ -638,6 +639,41 @@ void bind_sprite_library (Environment& environment)
 }
 
 /*
+    Создание линии текста
+*/
+
+TextLine::Pointer create_text_line ()
+{
+  return TextLine::Create ();
+}
+
+/*
+   Регистрация библиотеки работы с моделями
+*/
+
+void bind_text_line_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_TEXT_LINE_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&create_text_line));
+
+    //регистрация операций
+
+  lib.Register ("set_Text", make_invoker (&TextLine::SetText));
+  lib.Register ("get_Text", make_invoker (&TextLine::Text));
+  lib.Register ("set_Font", make_invoker (&TextLine::SetFont));
+  lib.Register ("get_Font", make_invoker (&TextLine::Font));
+
+  environment.RegisterType<TextLine> (SCENE_TEXT_LINE_LIBRARY);
+}
+
+/*
     Создание модели
 */
 
@@ -698,6 +734,7 @@ void bind_scene_graph_library (Environment& environment)
   bind_sound_emitter_library      (environment);
   bind_sprite_model_library       (environment);
   bind_sprite_library             (environment);
+  bind_text_line_library          (environment);
   bind_visual_model_library       (environment);
 }
 
