@@ -1,5 +1,7 @@
 Results of text_line_test:
+TextLine color = [1.00 1.00 1.00 1.00]
 TextLine text = ''
 TextLine font name = ''
+TextLine color = [0.10 0.20 0.30 0.40]
 TextLine text = 'text'
 TextLine font name = 'font'

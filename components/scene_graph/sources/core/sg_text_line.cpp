@@ -1,7 +1,7 @@
 #include "shared.h"
 
 using namespace scene_graph;
-using namespace common;
+using namespace math;
 
 /*
     Описание реализации TextLine
@@ -11,7 +11,9 @@ struct TextLine::Impl
 {
   stl::string text;
   stl::string font_name;
+  vec4f       color;
 
+  Impl () : color (1.f, 1.f, 1.f, 1.f) {}
 };
 
 /*
@@ -34,6 +36,50 @@ TextLine::~TextLine ()
 TextLine::Pointer TextLine::Create ()
 {
   return Pointer (new TextLine, false);
+}
+
+/*
+    Цвет текста
+*/
+
+namespace
+{
+
+float clamp (float x)
+{
+  if (x < 0.0f) return 0.0f;
+  if (x > 1.0f) return 1.0f;
+  
+  return x;
+}
+
+vec4f clamp (const vec4f& color)
+{
+  return vec4f (clamp (color.x), clamp (color.y), clamp (color.z), clamp (color.w));
+}
+
+}
+
+void TextLine::SetColor (const vec4f& color)
+{
+  impl->color = clamp (color);
+
+  UpdateNotify ();
+}
+
+void TextLine::SetColor (float red, float green, float blue, float alpha)
+{
+  SetColor (vec4f (red, green, blue, alpha));
+}
+
+void TextLine::SetColor (float red, float green, float blue)
+{
+  SetColor (vec4f (red, green, blue, impl->color.w));
+}
+
+const vec4f& TextLine::Color () const
+{
+  return impl->color;
 }
 
 /*
