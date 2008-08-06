@@ -155,12 +155,13 @@ struct TestApplication::Impl
   ScenePlayerPtr                scene_player;        //проигрыватель звуков сцены
   EnvironmentPtr                environment;         //скриптовое окружение
   ShellPtr                      shell;               //скриптовая оболочка
-  render::Viewport              viewport;            //вьюпорт
-  Screen                        screen;     
+  Screen                        screen;              //область вывода
   input::TranslationMap         translation_map;
+  bool                          render_initialized;
 
         
   Impl ()
+    : render_initialized (false)
   {
       //монтирование реестра
       
@@ -169,6 +170,70 @@ struct TestApplication::Impl
       //чтение настроек
       
     config.Open (CONFIGURATION_BRANCH_NAME);
+  }
+
+  void InitRender ()
+  {
+    if (render_initialized)
+      return;
+
+      //создание окна
+      
+    window = new syslib::Window (get (config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ? 
+        syslib::WindowStyle_PopUp : syslib::WindowStyle_Overlapped, get (config, "WindowWidth", DEFAULT_WINDOW_WIDTH),
+        get (config, "WindowHeight", DEFAULT_WINDOW_HEIGHT));
+        
+    window->SetDebugLog (&log_print);
+
+    window->SetTitle (get (config, "WindowTitle", DEFAULT_WINDOW_TITLE).c_str ());    
+
+    window->Show ();
+    
+      //регистрация обработчиков событий окна
+
+    window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, &*this));
+    window->RegisterEventHandler (syslib::WindowEvent_OnSize,  xtl::bind (&Impl::OnResize, &*this));
+    window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*this));    
+
+      //создание цепочки обмена и устройства рендеринга
+
+    SwapChainDesc desc;
+
+    memset (&desc, 0, sizeof (desc));
+
+    desc.frame_buffer.color_bits   = get (config, "ColorBits", DEFAULT_FB_COLOR_BITS);
+    desc.frame_buffer.alpha_bits   = get (config, "AlphaBits", DEFAULT_FB_ALPHA_BITS);
+    desc.frame_buffer.depth_bits   = get (config, "DepthBits", DEFAULT_FB_DEPTH_BITS);
+    desc.frame_buffer.stencil_bits = get (config, "StencilBits", DEFAULT_FB_STENCIL_BITS);
+    desc.buffers_count             = get (config, "BuffersCount", DEFAULT_FB_BUFFERS_COUNT);
+    desc.swap_method               = SwapMethod_Discard;
+    desc.fullscreen                = get (config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) != 0;
+    desc.window_handle             = window->Handle ();
+    
+    render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, get (config, "DeviceInitString", DEFAULT_DEVICE_INIT_STRING).c_str (),
+      swap_chain, device);
+      
+      //создание системы визуализации среднего уровня
+      
+    render::mid_level::LowLevelDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, device.get (), swap_chain.get ());
+    
+      //инициализация рендера
+
+    render.SetLogHandler (&log_print);
+
+    render.SetRenderer (render::mid_level::LowLevelDriver::Name (), MID_LEVEL_RENDERER_NAME);
+
+    render_target = render.CreateRenderTarget ("default", "default");
+
+      //загрузка ресурсов
+
+    render.LoadResource (MATERIAL_LIB_FILE_NAME);
+    
+      //установка начальной области вывода
+    
+    OnResize ();    
+
+    render_initialized = true;
   }
 
   void OnClose ()
@@ -228,9 +293,11 @@ struct TestApplication::Impl
     load_xml_configuration (VarRegistry (""), configuration_file_name);
   }
 
-  void SetCamera (Camera* camera)
+  void SetScreen (Screen in_screen)
   {
-    viewport.SetCamera (camera);
+    screen = in_screen;
+
+    render_target.SetScreen (&screen);
   }
 
   void SetListener (Listener* listener)
@@ -258,14 +325,16 @@ TestApplication::TestApplication (const char* start_script_name)
 
     impl->shell = ShellPtr (new Shell ("lua", impl->environment));
 
-    bind_math_library (*impl->environment);
+    bind_math_library        (*impl->environment);
     bind_scene_graph_library (*impl->environment);
+    bind_render_library      (*impl->environment);
 
     InvokerRegistry& application_library = impl->environment->CreateLibrary (APPLICATION_LIBRARY);
 
     application_library.Register ("LoadConfiguration", make_invoker<void (const char*)> (xtl::bind (&TestApplication::Impl::LoadConfiguration, impl.get (), _1)));
     application_library.Register ("Exit", make_invoker<void ()> (xtl::bind (&TestApplication::Impl::OnClose, impl.get ())));
-    application_library.Register ("SetCamera", make_invoker<void (Camera*)> (xtl::bind (&TestApplication::Impl::SetCamera, impl.get (), _1)));
+    application_library.Register ("SetScreen", make_invoker<void (Screen)> (xtl::bind (&TestApplication::Impl::SetScreen, impl.get (), _1)));
+    application_library.Register ("InitRender", make_invoker<void ()> (xtl::bind (&TestApplication::Impl::InitRender, impl.get ())));
     application_library.Register ("SetListener", make_invoker<void (Listener*)> (xtl::bind (&TestApplication::Impl::SetListener, impl.get (), _1)));
 
     InvokerRegistry& lib = impl->environment->Library ("global");
@@ -282,80 +351,12 @@ TestApplication::TestApplication (const char* start_script_name)
 
     impl->scene_player->SetManager (impl->sound_manager.get ());
 
-      //создание окна
-      
-    impl->window = new syslib::Window (get (impl->config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ? 
-        syslib::WindowStyle_PopUp : syslib::WindowStyle_Overlapped, get (impl->config, "WindowWidth", DEFAULT_WINDOW_WIDTH),
-        get (impl->config, "WindowHeight", DEFAULT_WINDOW_HEIGHT));
-        
-    impl->window->SetDebugLog (&log_print);
-
-    impl->window->SetTitle (get (impl->config, "WindowTitle", DEFAULT_WINDOW_TITLE).c_str ());    
-
-    impl->window->Show ();
-    
-      //регистрация обработчиков событий окна
-
-    impl->window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, &*impl));
-    impl->window->RegisterEventHandler (syslib::WindowEvent_OnSize,  xtl::bind (&Impl::OnResize, &*impl));
-    impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*impl));    
-
-      //создание цепочки обмена и устройства рендеринга
-
-    SwapChainDesc desc;
-
-    memset (&desc, 0, sizeof (desc));
-
-    desc.frame_buffer.color_bits   = get (impl->config, "ColorBits", DEFAULT_FB_COLOR_BITS);
-    desc.frame_buffer.alpha_bits   = get (impl->config, "AlphaBits", DEFAULT_FB_ALPHA_BITS);
-    desc.frame_buffer.depth_bits   = get (impl->config, "DepthBits", DEFAULT_FB_DEPTH_BITS);
-    desc.frame_buffer.stencil_bits = get (impl->config, "StencilBits", DEFAULT_FB_STENCIL_BITS);
-    desc.buffers_count             = get (impl->config, "BuffersCount", DEFAULT_FB_BUFFERS_COUNT);
-    desc.swap_method               = SwapMethod_Discard;
-    desc.fullscreen                = get (impl->config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) != 0;
-    desc.window_handle             = impl->window->Handle ();
-    
-    render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, get (impl->config, "DeviceInitString", DEFAULT_DEVICE_INIT_STRING).c_str (),
-      impl->swap_chain, impl->device);
-      
-      //создание системы визуализации среднего уровня
-      
-    render::mid_level::LowLevelDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, impl->device.get (), impl->swap_chain.get ());
-    
-      //инициализация рендера
-
-    impl->render.SetLogHandler (&log_print);
-
-    impl->render.SetRenderer (render::mid_level::LowLevelDriver::Name (), MID_LEVEL_RENDERER_NAME);
-
-    impl->render_target = impl->render.CreateRenderTarget ("default", "default");
-
-      //загрузка ресурсов
-
-    impl->render.LoadResource (MATERIAL_LIB_FILE_NAME);
-    
-      //установка начальной области вывода
-    
-    impl->OnResize ();    
-
       //инициализация системы ввода
 
     input::low_level::WindowDriver::RegisterDevice (*(impl->window.get ()));
 
     impl->input_device = InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", "*"), false);
     
-      //создание областей вывода
-      
-    impl->viewport.SetName       ("Viewport1");
-    impl->viewport.SetRenderPath ("Render2d");
-    
-    impl->viewport.SetArea (0, 0, 100, 100);
-
-    impl->screen.SetBackgroundColor (math::vec4f (1, 1, 1, 1));    
-    impl->screen.Attach (impl->viewport);
-
-    impl->render_target.SetScreen (&impl->screen);
-
       //инициализация системы ввода
 
     impl->translation_map.Load (TRANSLATION_MAP_FILE_NAME);

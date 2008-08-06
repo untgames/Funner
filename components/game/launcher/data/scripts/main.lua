@@ -28,7 +28,22 @@ camera.ZFar = 10
 
 camera:BindToScene (scene)
 
-Application.SetCamera (camera)
+Application.InitRender () --необходимо вызывать до Application.SetScreen (screen)
+
+viewport = Render.Viewport.Create ()
+
+viewport.Name = "Viewport1"
+viewport.RenderPath = "Render2d"
+
+viewport:SetArea (0, 0, 100, 100);
+viewport.Camera = camera
+
+screen = Render.Screen.Create ()
+
+screen.BackgroundColor = vec4 (1, 1, 1, 1)
+screen:Attach (viewport)
+
+Application.SetScreen (screen)
 
 listener1 = Scene.Listener.Create ()
 
