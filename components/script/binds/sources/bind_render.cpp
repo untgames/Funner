@@ -50,7 +50,7 @@ void bind_viewport_library (Environment& environment)
   lib.Register ("set_BackgroundColor", make_invoker (implicit_cast<void (Viewport::*) (const math::vec4f&)> (&Viewport::SetBackgroundColor)));
   lib.Register ("get_BackgroundColor", make_invoker (&Viewport::BackgroundColor));
   lib.Register ("set_BackgroundState", make_invoker (&Viewport::SetBackgroundState));
-  lib.Register ("get_HasBackground",   make_invoker (&Viewport::HasBackground));
+  lib.Register ("get_BackgroundState", make_invoker (&Viewport::BackgroundState));
   lib.Register ("get_Id",              make_invoker (&Viewport::Id));
 
   lib.Register ("SetArea",             make_invoker (implicit_cast<void (Viewport::*) (int, int, size_t, size_t)> (&Viewport::SetArea)));
@@ -99,7 +99,7 @@ void bind_screen_library (Environment& environment)
   lib.Register ("set_BackgroundColor", make_invoker (implicit_cast<void (Screen::*) (const math::vec4f&)> (&Screen::SetBackgroundColor)));
   lib.Register ("get_BackgroundColor", make_invoker (&Screen::BackgroundColor));
   lib.Register ("set_BackgroundState", make_invoker (&Screen::SetBackgroundState));
-  lib.Register ("get_HasBackground",   make_invoker (&Screen::HasBackground));
+  lib.Register ("get_BackgroundState", make_invoker (&Screen::BackgroundState));
   lib.Register ("get_Id",              make_invoker (&Screen::Id));
   lib.Register ("get_ViewportsCount",  make_invoker (&Screen::ViewportsCount));
 
