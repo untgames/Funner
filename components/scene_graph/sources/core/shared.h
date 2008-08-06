@@ -13,13 +13,14 @@
 
 #include <bv/axis_aligned_box.h>
 
-#include <sg/light.h>
-#include <sg/scene.h>
-#include <sg/listener.h>
 #include <sg/camera.h>
-#include <sg/visual_model.h>
+#include <sg/light.h>
+#include <sg/listener.h>
+#include <sg/scene.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
+#include <sg/text_line.h>
+#include <sg/visual_model.h>
 
 #include "scene_object.h"
 

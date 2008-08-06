@@ -5,17 +5,18 @@
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
-#include <xtl/visitor.h>
 #include <xtl/string.h>
+#include <xtl/visitor.h>
 
-#include <sg/node.h>
+#include <sg/camera.h>
 #include <sg/light.h>
 #include <sg/listener.h>
-#include <sg/camera.h>
-#include <sg/sound_emitter.h>
-#include <sg/visual_model.h>
-#include <sg/sprite.h>
+#include <sg/node.h>
 #include <sg/scene.h>
+#include <sg/sound_emitter.h>
+#include <sg/sprite.h>
+#include <sg/text_line.h>
+#include <sg/visual_model.h>
 
 using namespace scene_graph;
 using namespace math;
