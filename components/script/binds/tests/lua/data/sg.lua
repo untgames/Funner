@@ -420,12 +420,23 @@ function test_text_line ()
 
   print ("Text = " .. text_line1.Text)
   print ("Font = " .. text_line1.Font)
+  print ("Color = " .. tostring (text_line1.Color))
 
-  text_line1.Text = "text"
-  text_line1.Font = "font"
+  text_line1.Text  = "text"
+  text_line1.Font  = "font"
+  text_line1.Color = vec4 (0.1, 0.2, 0.3, 0.4)
 
   print ("Text = " .. text_line1.Text)
   print ("Font = " .. text_line1.Font)
+  print ("Color = " .. tostring (text_line1.Color))
+
+  text_line1:SetColor (0.4, 0.3, 0.2, 0.1)
+
+  print ("Color = " .. tostring (text_line1.Color))
+
+  text_line1:SetColor (0.1, 0.2, 0.3)
+
+  print ("Color = " .. tostring (text_line1.Color))
 end
 
 function test ()
