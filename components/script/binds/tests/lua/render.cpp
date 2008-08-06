@@ -14,7 +14,6 @@ int main ()
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
   
-    bind_bv_library          (*env);
     bind_math_library        (*env);
     bind_scene_graph_library (*env);
     bind_render_library      (*env);
