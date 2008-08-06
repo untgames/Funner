@@ -22,6 +22,8 @@ const size_t PRIMITIVE_ARRAY_RESERVE_SIZE = 4096; //резервируемое количество при
 
 Frame::Frame ()
 {
+  alpha_reference = 0;
+
   primitives.reserve (PRIMITIVE_ARRAY_RESERVE_SIZE);
   
   log.Printf ("Create frame2d (id=%u)", Id ());
@@ -43,9 +45,9 @@ Frame::~Frame ()
     ћатрица вида / матрица преобразовани€
 */
 
-void Frame::SetView (const math::mat4f& tm)
+void Frame::SetViewPoint (const math::vec3f& point)
 {
-  view_tm = tm;  
+  view_point = point;
 }
 
 void Frame::SetProjection (const math::mat4f& tm)
@@ -53,14 +55,28 @@ void Frame::SetProjection (const math::mat4f& tm)
   proj_tm = tm;
 }
 
-void Frame::GetView (math::mat4f& tm)
+void Frame::GetViewPoint (math::vec3f& point)
 {
-  tm = view_tm;
+  point = view_point;
 }
 
 void Frame::GetProjection (math::mat4f& tm)
 {
   tm = proj_tm;
+}
+
+/*
+    ”становка параметра дл€ работы альфа-теста
+*/
+
+void Frame::SetAlphaReference (float ref)
+{
+  alpha_reference = ref;
+}
+
+float Frame::GetAlphaReference ()
+{
+  return alpha_reference;
 }
 
 /*
@@ -116,11 +132,7 @@ void Frame::DrawCore ()
     proj_tm [2][0], proj_tm [2][1], proj_tm [2][2], proj_tm [2][3],
     proj_tm [3][0], proj_tm [3][1], proj_tm [3][2], proj_tm [3][3]);
 
-  log.Printf ("View matrix=[[%.2f %.2f %.2f] [%.2f %.2f %.2f] [%.2f %.2f %.2f] [%.2f %.2f %.2f]]",
-    view_tm [0][0], view_tm [0][1], view_tm [0][2], view_tm [0][3],
-    view_tm [1][0], view_tm [1][1], view_tm [1][2], view_tm [1][3],
-    view_tm [2][0], view_tm [2][1], view_tm [2][2], view_tm [2][3],
-    view_tm [3][0], view_tm [3][1], view_tm [3][2], view_tm [3][3]);
+  log.Printf ("View point=[%.2f %.2f %.2f]", view_point.x, view_point.y, view_point.z);
   
   for (PrimitiveArray::iterator iter=primitives.begin (), end=primitives.end (); iter!=end; ++iter)
   {
@@ -144,6 +156,9 @@ void Frame::DrawCore ()
         break;
       case BlendMode_Additive:
         log.Printf ("  blend=additive");
+        break;
+      case BlendMode_AlphaClamp:
+        log.Printf ("  blend=alpha_clamp");
         break;
       default:
         break;

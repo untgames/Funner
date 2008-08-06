@@ -10,7 +10,7 @@ Begin draw frame (id=8)
 Set render targets: render-target=3, depth-stencil-target=4
 Set viewport (left=0, top=0, width=100, height=100)
 Projection matrix=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
-View matrix=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
+View point=[0.00 0.00 0.00]
 Draw primitive (id=6)
   texture_id=none
   blend=additive

@@ -385,10 +385,16 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица вида / матрица преобразования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetView       (const math::mat4f&);
+    void SetViewPoint  (const math::vec3f&);
     void SetProjection (const math::mat4f&);
-    void GetView       (math::mat4f&);
+    void GetViewPoint  (math::vec3f&);
     void GetProjection (math::mat4f&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка параметра для работы альфа-теста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void  SetAlphaReference (float ref);
+    float GetAlphaReference (); 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Примитивы
@@ -408,7 +414,9 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     typedef stl::vector<PrimitivePtr> PrimitiveArray;
 
   private:
-    math::mat4f    view_tm, proj_tm;
+    math::vec3f    view_point;
+    math::mat4f    proj_tm;
+    float          alpha_reference;
     PrimitiveArray primitives;
 };
 
