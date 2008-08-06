@@ -141,7 +141,7 @@ class Viewport
     void SetBackgroundState (bool state);
     void EnableBackground   () { SetBackgroundState (true); }
     void DisableBackground  () { SetBackgroundState (false); }
-    bool HasBackground      () const;
+    bool BackgroundState    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка переменных рендеринга

@@ -48,7 +48,7 @@ void RenderView::Draw ()
 
     //очистка кадра
 
-  if (viewport.HasBackground ())
+  if (viewport.BackgroundState ())
   {
     render_target_api.GetRenderer ().AddFrame (clear_frame.get ());
   }
@@ -169,7 +169,7 @@ void RenderView::UpdateClearFrame ()
 {  
     //сброс очищающего кадра
 
-  if (!viewport.HasBackground () || !render_view)
+  if (!viewport.BackgroundState () || !render_view)
   {
     if (clear_frame)
       clear_frame = 0;

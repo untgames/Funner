@@ -70,7 +70,7 @@ class Screen
     void SetBackgroundState (bool state);
     void EnableBackground   () { SetBackgroundState (true); }
     void DisableBackground  () { SetBackgroundState (false); }
-    bool HasBackground      () const;
+    bool BackgroundState    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление областей вывода

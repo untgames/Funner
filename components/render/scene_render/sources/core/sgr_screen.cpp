@@ -175,7 +175,7 @@ void Screen::SetBackgroundState (bool state)
   impl->ChangeBackgroundNotify ();
 }
 
-bool Screen::HasBackground () const
+bool Screen::BackgroundState () const
 {
   return impl->has_background;
 }

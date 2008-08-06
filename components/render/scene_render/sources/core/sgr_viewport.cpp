@@ -355,7 +355,7 @@ void Viewport::SetBackgroundState (bool state)
   impl->ChangeBackgroundNotify ();
 }
 
-bool Viewport::HasBackground () const
+bool Viewport::BackgroundState () const
 {
   return impl->has_background;
 }
