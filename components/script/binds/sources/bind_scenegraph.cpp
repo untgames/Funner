@@ -17,6 +17,7 @@ const char* SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY = "static.Scene_NodeTransf
 const char* SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY   = "static.Scene_NodeTraverseMode";
 const char* SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY     = "static.Scene_NodeSearchMode";
 const char* SCENE_STATIC_NODE_ORT_LIBRARY             = "static.Scene_NodeOrt";
+const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY  = "static.Scene_TextLineAlignment";
 const char* SCENE_SCENE_LIBRARY                       = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
 const char* SCENE_ENTITY_LIBRARY                      = "Scene.Entity";
@@ -650,8 +651,20 @@ TextLine::Pointer create_text_line ()
 }
 
 /*
-   –егистраци€ библиотеки работы с модел€ми
+   –егистраци€ библиотеки работы с текстом
 */
+
+void bind_static_text_line_library (Environment& environment)
+{
+  InvokerRegistry& text_line_alignment_lib = environment.CreateLibrary (SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY);
+
+  text_line_alignment_lib.Register ("get_Center", make_const (TextLineAlignment_Center));
+  text_line_alignment_lib.Register ("get_Left",   make_const (TextLineAlignment_Left));
+  text_line_alignment_lib.Register ("get_Right",  make_const (TextLineAlignment_Right));
+  text_line_alignment_lib.Register ("get_Top",    make_const (TextLineAlignment_Top));
+  text_line_alignment_lib.Register ("get_Bottom", make_const (TextLineAlignment_Bottom));
+}
+  
 
 void bind_text_line_library (Environment& environment)
 {
@@ -661,21 +674,31 @@ void bind_text_line_library (Environment& environment)
 
   lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
+    //регистраци€ статических переменных
+
+  bind_static_text_line_library (environment);
+
     //регистраци€ функций создани€
 
   lib.Register ("Create", make_invoker (&create_text_line));
 
     //регистраци€ операций
 
-  lib.Register ("set_Text",  make_invoker (&TextLine::SetText));
-  lib.Register ("get_Text",  make_invoker (&TextLine::Text));
-  lib.Register ("set_Font",  make_invoker (&TextLine::SetFont));
-  lib.Register ("get_Font",  make_invoker (&TextLine::Font));
-  lib.Register ("set_Color", make_invoker (implicit_cast<void (TextLine::*) (const vec4f&)> (&TextLine::SetColor)));
-  lib.Register ("get_Color", make_invoker (&TextLine::Color));
+  lib.Register ("set_Text",                make_invoker (&TextLine::SetText));
+  lib.Register ("get_Text",                make_invoker (&TextLine::Text));
+  lib.Register ("set_Font",                make_invoker (&TextLine::SetFont));
+  lib.Register ("get_Font",                make_invoker (&TextLine::Font));
+  lib.Register ("set_Color",               make_invoker (implicit_cast<void (TextLine::*) (const vec4f&)> (&TextLine::SetColor)));
+  lib.Register ("get_Color",               make_invoker (&TextLine::Color));
+  lib.Register ("set_HorizontalAlignment", make_invoker (&TextLine::SetHorizontalAlignment));
+  lib.Register ("get_HorizontalAlignment", make_invoker (&TextLine::HorizontalAlignment));
+  lib.Register ("set_VerticalAlignment",   make_invoker (&TextLine::SetVerticalAlignment));
+  lib.Register ("get_VerticalAlignment",   make_invoker (&TextLine::VerticalAlignment));
 
   lib.Register ("SetColor", make_invoker (make_invoker (implicit_cast<void (TextLine::*) (float, float, float, float)> (&TextLine::SetColor)),
                                           make_invoker (implicit_cast<void (TextLine::*) (float, float, float)>        (&TextLine::SetColor))));
+
+  lib.Register ("SetAlignment", make_invoker (&TextLine::SetAlignment));
 
   environment.RegisterType<TextLine> (SCENE_TEXT_LINE_LIBRARY);
 }

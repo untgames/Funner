@@ -413,6 +413,13 @@ function test_visual_model ()
   print ("Mesh name = " .. visual_model1.MeshName)
 end
 
+function get_name (alignment)
+  if (alignment == Scene_TextLineAlignment.Center) then return "Center" end
+  if (alignment == Scene_TextLineAlignment.Left)   then return "Left/Top" end
+  if (alignment == Scene_TextLineAlignment.Right) then return "Right/Bottom" end
+  return "Invalid"
+end
+
 function test_text_line ()
   print ("TextLine test")
 
@@ -421,14 +428,18 @@ function test_text_line ()
   print ("Text = " .. text_line1.Text)
   print ("Font = " .. text_line1.Font)
   print ("Color = " .. tostring (text_line1.Color))
+  print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
 
-  text_line1.Text  = "text"
-  text_line1.Font  = "font"
-  text_line1.Color = vec4 (0.1, 0.2, 0.3, 0.4)
+  text_line1.Text                = "text"
+  text_line1.Font                = "font"
+  text_line1.Color               = vec4 (0.1, 0.2, 0.3, 0.4)
+  text_line1.HorizontalAlignment = Scene_TextLineAlignment.Center
+  text_line1.VerticalAlignment   = Scene_TextLineAlignment.Bottom
 
   print ("Text = " .. text_line1.Text)
   print ("Font = " .. text_line1.Font)
   print ("Color = " .. tostring (text_line1.Color))
+  print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
 
   text_line1:SetColor (0.4, 0.3, 0.2, 0.1)
 
@@ -437,6 +448,10 @@ function test_text_line ()
   text_line1:SetColor (0.1, 0.2, 0.3)
 
   print ("Color = " .. tostring (text_line1.Color))
+
+  text_line1:SetAlignment (Scene_TextLineAlignment.Right, Scene_TextLineAlignment.Center)
+
+  print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
 end
 
 function test ()
