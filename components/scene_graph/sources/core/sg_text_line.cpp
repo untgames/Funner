@@ -9,11 +9,13 @@ using namespace math;
 
 struct TextLine::Impl
 {
-  stl::string text;
-  stl::string font_name;
-  vec4f       color;
+  stl::string       text;
+  stl::string       font_name;
+  vec4f             color;
+  TextLineAlignment horizontal_alignment;
+  TextLineAlignment vertical_alignment;
 
-  Impl () : color (1.f, 1.f, 1.f, 1.f) {}
+  Impl () : color (1.f, 1.f, 1.f, 1.f), horizontal_alignment (TextLineAlignment_Left), vertical_alignment (TextLineAlignment_Top) {}
 };
 
 /*
@@ -118,6 +120,49 @@ void TextLine::SetFont (const char* font_name)
 const char* TextLine::Font () const
 {
   return impl->font_name.c_str ();
+}
+
+/*
+   Выравнивание
+*/
+
+void TextLine::SetAlignment (TextLineAlignment horizontal, TextLineAlignment vertical)
+{
+  static const char* METHOD_NAME = "scene_graph::TextLine::SetAlignment";
+
+  if (horizontal >= TextLineAlignment_Num)
+    throw xtl::make_argument_exception (METHOD_NAME, "horizontal", horizontal, "Unknown TextLineAlignment");
+  if (vertical >= TextLineAlignment_Num)
+    throw xtl::make_argument_exception (METHOD_NAME, "vertical", vertical, "Unknown TextLineAlignment");
+
+  impl->horizontal_alignment = horizontal;
+  impl->vertical_alignment = vertical;
+}
+
+void TextLine::SetHorizontalAlignment (TextLineAlignment alignment)
+{
+  if (alignment >= TextLineAlignment_Num)
+    throw xtl::make_argument_exception ("scene_graph::TextLine::SetHorizontalAlignment", "alignment", alignment, "Unknown TextLineAlignment");
+
+  impl->horizontal_alignment = alignment;
+}
+
+void TextLine::SetVerticalAlignment (TextLineAlignment alignment)
+{
+  if (alignment >= TextLineAlignment_Num)
+    throw xtl::make_argument_exception ("scene_graph::TextLine::SetVerticalAlignment", "alignment", alignment, "Unknown TextLineAlignment");
+
+  impl->vertical_alignment = alignment;
+}
+
+TextLineAlignment TextLine::VerticalAlignment () const
+{
+  return impl->vertical_alignment;
+}
+
+TextLineAlignment TextLine::HorizontalAlignment () const
+{
+  return impl->horizontal_alignment;
 }
 
 /*
