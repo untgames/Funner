@@ -166,8 +166,10 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("BindToScene", make_invoker (make_invoker (&Node::BindToScene),
     make_invoker<void (Node&, Scene&, NodeBindMode)> (xtl::bind (&Node::BindToScene, _1, _2, _3, NodeTransformSpace_Local)),
     make_invoker<void (Node&, Scene&)> (xtl::bind (&Node::BindToScene, _1, _2, NodeBindMode_Default, NodeTransformSpace_Local))));
+    
+  lib.Register ("Unbind", make_invoker (make_invoker (&Node::Unbind),
+                          make_invoker<void (Node&)> (bind (&Node::Unbind, _1, NodeTransformSpace_Local))));    
 
-  lib.Register ("Unbind",      make_invoker (&Node::Unbind));
   lib.Register ("UnbindChild", make_invoker (make_invoker (implicit_cast<void (Node::*) (const char*, NodeTransformSpace)> (&Node::UnbindChild)), 
                                              make_invoker (implicit_cast<void (Node::*) (const char*, NodeSearchMode, NodeTransformSpace)> (&Node::UnbindChild)),
                                              make_invoker<void (Node&, const char*)> (xtl::bind (implicit_cast<void (Node::*) (const char*, NodeTransformSpace)> (&Node::UnbindChild), _1, _2, NodeTransformSpace_Local)),
