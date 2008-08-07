@@ -47,10 +47,10 @@ void RenderableSpriteModel::Update ()
     
     if (need_update_material)
     {
-        //получение ресурсов из кэша
+        //получение ресурсов из кэша        
 
       SpriteMaterial* material = render.GetMaterial (model->Material ());
-      ITexture*       texture  = render.GetTexture (material->Image ());
+      ITexture*       texture  = render.GetTexture (material->Image ());            
       
         //проверка корректности данных - получение размеров текстуры и тайла
 

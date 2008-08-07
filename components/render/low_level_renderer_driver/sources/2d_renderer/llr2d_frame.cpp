@@ -172,17 +172,21 @@ namespace
 {
 
 //рисование спрайтов без блендинга
-void draw_sprites (IDevice& device, const SpriteVertexData** first_sprite, const SpriteVertexData** last_sprite)
+void draw_sprites
+ (IDevice&                 device,
+  const SpriteVertexData** base_sprite,
+  const SpriteVertexData** first_sprite,
+  const SpriteVertexData** last_sprite)
 {
   for (const SpriteVertexData** sprite=first_sprite; sprite != last_sprite;)
   {
-    size_t base_sprite_index = sprite - first_sprite;
-
-    render::low_level::ITexture* texture = (*sprite)->texture;
+    render::low_level::ITexture* texture = (*sprite)->texture;    
+    
+    size_t base_sprite_index = sprite++ - base_sprite;
 
     for (; sprite != last_sprite && (*sprite)->texture == texture; sprite++);
 
-    size_t sprites_count = sprite - first_sprite - base_sprite_index + 1;
+    size_t sprites_count = sprite - base_sprite - base_sprite_index;
 
     device.SSSetTexture (0, texture);    
     device.Draw         (render::low_level::PrimitiveType_TriangleList, base_sprite_index * 6, sprites_count * 6);
@@ -190,23 +194,26 @@ void draw_sprites (IDevice& device, const SpriteVertexData** first_sprite, const
 }
 
 //рисование спрайтов с прозрачностью
-void draw_sprites (IDevice& device, const SpriteVertexData** first_sprite, const SpriteVertexData** last_sprite, CommonResources& resources)
+void draw_sprites
+ (IDevice&                 device,
+  const SpriteVertexData** base_sprite,
+  const SpriteVertexData** first_sprite,
+  const SpriteVertexData** last_sprite,
+  CommonResources&         resources)
 {
   render::low_level::ITexture*     current_texture     = device.SSGetTexture (0);
   render::low_level::IBlendState*  current_blend_state = device.OSGetBlendState ();
 
   for (const SpriteVertexData** sprite=first_sprite; sprite != last_sprite;)
   {
-    size_t base_sprite_index = sprite - first_sprite;
-
     render::low_level::ITexture*             texture    = (*sprite)->texture;
-    render::mid_level::renderer2d::BlendMode blend_mode = (*sprite)->blend_mode;
+    render::mid_level::renderer2d::BlendMode blend_mode = (*sprite)->blend_mode;    
+    
+    size_t base_sprite_index = sprite++ - base_sprite;
 
     for (; sprite != last_sprite && (*sprite)->texture == texture && (*sprite)->blend_mode == blend_mode; sprite++);
 
-    size_t sprites_count = sprite - first_sprite - base_sprite_index + 1;
-
-    device.SSSetTexture (0, texture);
+    size_t sprites_count = sprite - base_sprite - base_sprite_index;
 
     if (current_texture != texture)
     {
@@ -222,7 +229,7 @@ void draw_sprites (IDevice& device, const SpriteVertexData** first_sprite, const
       device.OSSetBlendState (blend_state);
 
       current_blend_state = blend_state;
-    }    
+    }
 
     device.Draw (render::low_level::PrimitiveType_TriangleList, base_sprite_index * 6, sprites_count * 6);
   }
@@ -271,15 +278,15 @@ void Frame::DrawCore (IDevice* device)
 
     //отрисовка спрайтов с альфа-отсечением
 
-  draw_sprites (*device, first_sprite, first_solid_sprite);
+  draw_sprites (*device, first_sprite, first_sprite, first_solid_sprite);
 
     //отрисовка спрайтов без альфа-отсечения
 
   device->SSSetProgram (common_resources->GetDefaultProgram ());
 
-  draw_sprites (*device, first_solid_sprite, last_sprite);
+  draw_sprites (*device, first_sprite, first_solid_sprite, last_sprite);
 
-    //отрисовка спрайтов с блендингом
+    //отрисовка спрайтов с блендингом    
 
   device->ISSetVertexBuffer      (0, blended_sprites.GetVertexBuffer ());
   device->OSSetDepthStencilState (common_resources->GetDepthStencilState (false));
@@ -287,5 +294,5 @@ void Frame::DrawCore (IDevice* device)
   first_sprite = blended_sprites.GetSprites ();
   last_sprite  = first_sprite + blended_sprites.GetSpritesCount ();
 
-  draw_sprites (*device, first_sprite, last_sprite, *common_resources);
+  draw_sprites (*device, first_sprite, first_sprite, last_sprite, *common_resources);
 }
