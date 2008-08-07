@@ -15,6 +15,7 @@ namespace binds
 */
 
 void bind_bv_library (Environment&);
+void bind_common_library (Environment&);
 void bind_math_library (Environment&);
 void bind_render_library (Environment&);
 void bind_scene_graph_library (Environment&);

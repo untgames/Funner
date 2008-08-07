@@ -48,6 +48,12 @@ inline float       make_invoker_argument (const long double& value) { return sta
 inline const char* make_invoker_argument (const char* string)       { return string; }
 inline const char* make_invoker_argument (char* string)             { return string; }
 
+template <class Traits, class Allocator>
+inline const char* make_invoker_argument (const stl::basic_string<char, Traits, Allocator>& s)
+{
+  return s.c_str ();
+}
+
 /*
     Извлечение аргументов из стека
 */

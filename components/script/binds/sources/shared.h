@@ -10,6 +10,7 @@
 #include <xtl/shared_ptr.h>
 
 #include <common/strlib.h>
+#include <common/file.h>
 
 #include <script/bind.h>
 #include <script/bind_libraries.h>
