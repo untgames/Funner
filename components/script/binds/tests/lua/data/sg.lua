@@ -357,8 +357,10 @@ function test_sprite ()
   sprite1.Material = "SettedMaterial"
   sprite1.Alpha    = 0.8
   sprite1.Frame    = 9
+  sprite1.AlphaReference = 0.4
 
   print ("Alpha value = " .. sprite1.Alpha)
+  print ("Alpha reference = " .. sprite1.AlphaReference)
   print ("Material name = " .. sprite1.Material)
   print ("Frame number = " .. sprite1.Frame)
    

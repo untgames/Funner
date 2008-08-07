@@ -6,9 +6,10 @@ class MyVisitor: public visitor<void, Sprite>
     void visit (Sprite& sprite)
     {
       printf ("Sprite '%s': \n", sprite.Name ());
-      printf ("  material: '%s'\n", sprite.Material ());
-      printf ("  frame:    %u\n", sprite.Frame ());
-      printf ("  color:    [%.2f %.2f %.2f %.2f]\n", sprite.Color ().x, sprite.Color ().y, sprite.Color ().z, sprite.Color ().w);
+      printf ("  material:        '%s'\n", sprite.Material ());
+      printf ("  frame:           %u\n", sprite.Frame ());
+      printf ("  color:           [%.2f %.2f %.2f %.2f]\n", sprite.Color ().x, sprite.Color ().y, sprite.Color ().z, sprite.Color ().w);
+      printf ("  alpha_reference: %.2f\n", sprite.AlphaReference ());
       printf ("  descs (count=%u):\n", sprite.SpriteDescsCount ());
       
       for (size_t i=0; i<sprite.SpriteDescsCount (); i++)
@@ -32,9 +33,10 @@ int main ()
   sprite->SetMaterial ("material1");
   sprite->SetFrame (12);
   sprite->SetAlpha (0.5f);
-  
+  sprite->SetAlphaReference (0.2f);
+
   MyVisitor visitor;
-  
+
   sprite->VisitEach (visitor, NodeTraverseMode_TopToBottom);  
 
   return 0;

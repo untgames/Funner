@@ -15,11 +15,12 @@ struct SpriteModel::Impl
   SpriteModelSignal signals [SpriteModelEvent_Num]; //сигналы модели 
   vec3f             pivot_position;                 //положение центра в локальной системе координат
   float             pivot_rotation;                 //поворот центра в локальной системе координат
+  float             alpha_reference;                //параметр, используемый для альфа-теста
   bool              need_recalc_world_tm;           //необходим пересчёт мировой матрицы преобразований
   mat4f             world_tm;                       //мировая матрица преобразований
 
   Impl () : need_recalc_world_tm (true), pivot_rotation (0.0f) {}
-  
+
     //оповещение о событии
   void Notify (SpriteModel& sender, SpriteModelEvent event_id)
   {
@@ -59,9 +60,7 @@ void SpriteModel::SetMaterial (const char* in_material)
   if (!in_material)
     throw xtl::make_null_argument_exception ("scene_graph::SpriteModel::SetMaterial", "material");
 
-  impl->material = in_material;
-  
-  impl->Notify (*this, SpriteModelEvent_AfterMaterialUpdate);
+  impl->material = in_material;  
 
   UpdateNotify ();
 }
@@ -69,6 +68,22 @@ void SpriteModel::SetMaterial (const char* in_material)
 const char* SpriteModel::Material () const
 {
   return impl->material.c_str ();
+}
+
+/*
+    Параметр, используемый для альфа-теста
+*/
+
+void SpriteModel::SetAlphaReference (float value)
+{
+  impl->alpha_reference = value;
+  
+  UpdateNotify ();
+}
+
+float SpriteModel::AlphaReference () const
+{
+  return impl->alpha_reference;
 }
 
 /*
@@ -98,8 +113,6 @@ void SpriteModel::SetPivot (const vec3f& position, float angle_in_degrees)
   impl->need_recalc_world_tm = true;    
 
     //оповещение об обновлении
-
-  impl->Notify (*this, SpriteModelEvent_AfterPivotUpdate);    
 
   UpdateNotify ();
 }
@@ -200,7 +213,6 @@ xtl::connection SpriteModel::RegisterEventHandler (SpriteModelEvent event, const
 {
   switch (event)
   {
-    case SpriteModelEvent_AfterMaterialUpdate:
     case SpriteModelEvent_AfterSpriteDescsUpdate:
       break;
     default:

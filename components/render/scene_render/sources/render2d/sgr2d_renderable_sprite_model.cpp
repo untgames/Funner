@@ -12,13 +12,13 @@ RenderableSpriteModel::RenderableSpriteModel (scene_graph::SpriteModel* in_model
     render (in_render),
     model (in_model),
     primitive (render.Renderer ()->CreatePrimitive (), false),
-    need_update_material (true),
     need_update_sprites (true),
-    current_world_tm_hash (0)
+    current_world_tm_hash (0),
+    current_material_name_hash (0)
 {
-  //добавить реакцию на пивоты!!!
   connect_tracker (model->RegisterEventHandler (SpriteModelEvent_AfterSpriteDescsUpdate, xtl::bind (&RenderableSpriteModel::UpdateSpritesNotify, this)));
-  connect_tracker (model->RegisterEventHandler (SpriteModelEvent_AfterMaterialUpdate, xtl::bind (&RenderableSpriteModel::UpdateMaterialNotify, this)));
+  
+  current_alpha_reference = primitive->GetAlphaReference ();
 }
 
 RenderableSpriteModel::~RenderableSpriteModel ()
@@ -28,11 +28,6 @@ RenderableSpriteModel::~RenderableSpriteModel ()
 /*
     Оповещения об обновлении модели
 */
-
-void RenderableSpriteModel::UpdateMaterialNotify ()
-{
-  need_update_material = true;
-}
 
 void RenderableSpriteModel::UpdateSpritesNotify ()
 {
@@ -44,10 +39,12 @@ void RenderableSpriteModel::Update ()
   try
   {
       //обновление материала
-    
-    if (need_update_material)
+
+    size_t material_name_hash = common::strhash (model->Material ());
+
+    if (material_name_hash != current_material_name_hash)
     {
-        //получение ресурсов из кэша        
+        //получение ресурсов из кэша
 
       SpriteMaterial* material = render.GetMaterial (model->Material ());
       ITexture*       texture  = render.GetTexture (material->Image ());            
@@ -98,9 +95,16 @@ void RenderableSpriteModel::Update ()
       }
 
       primitive->SetBlendMode (blend_mode);
-      primitive->SetTexture   (texture);
+      primitive->SetTexture   (texture);      
 
-      need_update_material = false;
+      current_material_name_hash = material_name_hash;
+    }
+
+    if (current_alpha_reference)
+    {
+      primitive->SetAlphaReference (model->AlphaReference ());
+
+      current_alpha_reference = model->AlphaReference ();
     }
     
       //обновление матрицы трансформаций
@@ -116,7 +120,7 @@ void RenderableSpriteModel::Update ()
       primitive->SetTransform (world_tm);
 
       current_world_tm_hash = world_tm_hash;
-    }
+    }    
 
       //обновление массива спрайтов
     

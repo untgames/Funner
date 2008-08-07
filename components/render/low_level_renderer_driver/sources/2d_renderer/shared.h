@@ -28,6 +28,14 @@ namespace low_level_driver
 namespace renderer2d
 {
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Константы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+const size_t SPRITE_VERTICES_COUNT = 6; //количество вершин в одном спрайте
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Переопределения типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef xtl::com_ptr<render::low_level::IBlendState>              BlendStatePtr;
 typedef xtl::com_ptr<render::low_level::IBuffer>                  BufferPtr;
 typedef xtl::com_ptr<render::low_level::IDepthStencilState>       DepthStencilStatePtr;
@@ -35,6 +43,49 @@ typedef xtl::com_ptr<render::low_level::IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<render::low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<render::low_level::ISamplerState>            SamplerStatePtr;
 typedef xtl::com_ptr<render::low_level::IInputLayout>             InputLayoutPtr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметры шейдера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct CommonProgramParameters
+{
+  math::mat4f view_matrix;       //матрица вида
+  math::mat4f projection_matrix; //матрица проекции
+};
+
+struct DynamicProgramParameters
+{
+  float alpha_reference; //параметр для работы альфа-теста
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметры вершины необходимые для визуализации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct RenderableVertex
+{
+  math::vec3f position; //положение вершины в пространстве
+  math::vec2f texcoord; //текстурные координаты
+  math::vec4f color;    //цвет вершины
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметры примитива необходимые для визуализации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct RenderablePrimitive
+{
+  float                            alpha_reference; //параметр для альфа-теста
+  render::low_level::ITexture*     texture;         //текстура
+  mid_level::renderer2d::BlendMode blend_mode;      //режим смешивания цветов
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметры спрайта необходимые для визуализации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct RenderableSprite
+{
+  RenderablePrimitive* primitive;                        //ссылка на примитив, которому принадлежит спрайт
+  RenderableVertex     vertices [SPRITE_VERTICES_COUNT]; //вершины, описывающие спрайт
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Общие ресурсы
@@ -51,7 +102,6 @@ class CommonResources : public Object
 ///Получение низкоуровневых данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     render::low_level::IBlendState*              GetBlendState        (render::mid_level::renderer2d::BlendMode blend_mode) { return blend_states[blend_mode].get (); }
-    render::low_level::IBuffer*                  GetConstantBuffer    () { return constant_buffer.get (); }
     render::low_level::IDepthStencilState*       GetDepthStencilState (bool depth_write_enabled);
     render::low_level::IProgram*                 GetDefaultProgram    () { return default_program.get (); }
     render::low_level::IProgram*                 GetAlphaClampProgram () { return alpha_clamp_program.get (); }
@@ -61,7 +111,6 @@ class CommonResources : public Object
 
   private:
     BlendStatePtr              blend_states [render::mid_level::renderer2d::BlendMode_Num];
-    BufferPtr                  constant_buffer;
     DepthStencilStatePtr       depth_stencil_states [2];
     ProgramPtr                 default_program;
     ProgramPtr                 alpha_clamp_program;
@@ -122,21 +171,66 @@ class RenderTargetTexture: virtual public mid_level::renderer2d::ITexture, publi
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Данные о вершине, необходимые для сортировки
+///Буфер визуализируемых спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct SpriteVertexData
+class RenderableSpriteList
 {
-  struct SpriteVertex
-  {
-    math::vec3f position;
-    math::vec2f texcoord;
-  };
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    RenderableSpriteList  ();
+    ~RenderableSpriteList ();
 
-  SpriteVertex                     vertices [4];
-  math::vec4f                      color;
-  float                            alpha_reference;
-  render::low_level::ITexture*     texture;
-  mid_level::renderer2d::BlendMode blend_mode;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение количества спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t Size () { return data_buffer.size (); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение вершинного буфера / буфера спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    render::low_level::IBuffer* GetVertexBuffer () { return vertex_buffer.get (); }
+    const RenderableSprite**    GetSprites      () { return data_buffer.data (); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление спрайтов примитива
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Add (size_t sprites_count, const RenderableSprite* sprites);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Резервирование места для размещения указанного числа спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Reserve (size_t sprites_count);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сортировка геометрии
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class Predicate> void Sort (Predicate pred)
+    {
+      stl::sort (data_buffer.data (), data_buffer.data () + data_buffer.size (), pred);
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Очистка буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Clear ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление вершинного буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    void UpdateVertexBuffer (render::low_level::IDevice&);
+
+  private:
+    void SetVertexBufferSize (render::low_level::IDevice&, size_t new_vertices);
+    
+  private:
+    typedef xtl::uninitialized_storage<const RenderableSprite*> SpriteArray;
+
+  private:
+    size_t      vertex_buffer_vertices_count; //текущее количество вершин в вершинном буфере
+    BufferPtr   vertex_buffer;                //вершинный буфер
+    SpriteArray data_buffer;                  //временный буфер с данными геометрии
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,13 +259,19 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение низкоуровневой текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    render::low_level::ITexture* GetLowLevelTexture () { return low_level_texture; }
+    render::low_level::ITexture* GetLowLevelTexture () { return renderable_primitive.texture; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим смешивания цветов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                             SetBlendMode (mid_level::renderer2d::BlendMode blend_mode);
     mid_level::renderer2d::BlendMode GetBlendMode ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка параметра для работы альфа-теста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void  SetAlphaReference (float ref);
+    float GetAlphaReference ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Спрайты
@@ -184,113 +284,29 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     void   ReserveSprites   (size_t sprites_count);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение данных для отрисовки
+///Добавление спрайтов в буфер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SpriteVertexData* GetSpriteVertexBuffer ();
+    void AddSprites (RenderableSpriteList& dst_buffer);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Построение вершинных данных для спрайта
+///Обновление визуализируемых спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void BuildSpriteVertexData (size_t sprite_index);
-    void ComputeSpriteTransorm (size_t sprite_index);
+    void UpdateRenderableSprites ();
 
   private:
     typedef stl::vector<mid_level::renderer2d::Sprite>    SpriteArray;
-    typedef xtl::uninitialized_storage<SpriteVertexData>  SpriteVertexArray;
+    typedef xtl::uninitialized_storage<RenderableSprite>  RenderableSpriteArray;
     typedef xtl::com_ptr<mid_level::renderer2d::ITexture> TexturePtr;
 
   private:
-    math::mat4f                      transform;
-    TexturePtr                       texture;
-    render::low_level::ITexture      *low_level_texture;
-    mid_level::renderer2d::BlendMode blend_mode;
-    SpriteArray                      sprites;
-    SpriteVertexArray                sprite_vertex_buffer;
-    bool                             dirty_transform;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Параметры шейдера
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct ProgramParameters
-{
-  math::mat4f view_matrix;
-  math::mat4f projection_matrix;
-  float       alpha_reference;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Данные о вершине, необходимые для вывода
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct RenderedSpriteVertex
-{
-  math::vec3f position;
-  math::vec2f texcoord;
-  math::vec4f color;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Буфер спрайтов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class SpriteBuffer
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    SpriteBuffer  ();
-    ~SpriteBuffer ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение количества спрайтов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetSpritesCount () { return data_buffer.size (); }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение вершинного буфера / буфера спрайтов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    render::low_level::IBuffer* GetVertexBuffer () { return vertex_buffer.get (); }    
-    const SpriteVertexData**    GetSprites      () { return data_buffer.data (); }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление спрайтов примитива
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Add (size_t sprites_count, const SpriteVertexData* sprites);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Резервирование места для размещения указанного числа спрайтов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Reserve (size_t sprites_count);
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сортировка геометрии
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class Predicate> void Sort (Predicate pred)
-    {
-      stl::sort (data_buffer.data (), data_buffer.data () + data_buffer.size (), pred);
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очистка буфера
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Clear ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обновление вершинного буфера
-///////////////////////////////////////////////////////////////////////////////////////////////////    
-    void UpdateVertexBuffer (render::low_level::IDevice&);    
-
-  private:
-    void SetVertexBufferSize (render::low_level::IDevice&, size_t new_vertices);
-    
-  private:
-    typedef xtl::uninitialized_storage<const SpriteVertexData*> SpriteVertexArray;
-
-  private:
-    size_t            vertex_buffer_vertices_count; //текущее количество вершин в вершинном буфере
-    BufferPtr         vertex_buffer;                //вершинный буфер
-    SpriteVertexArray data_buffer;                  //временный буфер с данными геометрии
+    math::mat4f           transform;                      //матрица преобразований примитива
+    TexturePtr            texture;                        //текстура
+    SpriteArray           sprites;                        //массив спрайтов
+    RenderablePrimitive   renderable_primitive;           //параметры, необходимые для визуализации примитива
+    RenderableSpriteArray renderable_sprites;             //массив визуализируемых спрайтов
+    bool                  need_update_transform;          //необходимо обновить положение вершин
+    bool                  need_update_renderable_sprites; //необходимо обновить параметры визуализации спрайтов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -311,12 +327,6 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     void SetProjection (const math::mat4f&);
     void GetViewPoint  (math::vec3f&);
     void GetProjection (math::mat4f&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка параметра для работы альфа-теста
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  SetAlphaReference (float ref);
-    float GetAlphaReference ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Примитивы
@@ -342,11 +352,13 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     void DrawCore (render::low_level::IDevice* device);
 
   private:
-    ProgramParameters  program_parameters;  //параметры программы рендеринга
-    PrimitiveArray     primitives;          //массив примитивов
-    CommonResourcesPtr common_resources;    //общие ресурсы
-    SpriteBuffer       not_blended_sprites; //спрайты без блендинга
-    SpriteBuffer       blended_sprites;     //спрайты с блендингом
+    CommonProgramParameters  common_program_parameters;  //общие параметры программы рендеринга
+    BufferPtr                common_constant_buffer;     //константный буфер для хранения общих параметров программы рендеринга
+    BufferPtr                dynamic_constant_buffer;    //константный буфер для хранения динамических параметров программы рендеринга
+    PrimitiveArray           primitives;                 //массив примитивов
+    CommonResourcesPtr       common_resources;           //общие ресурсы
+    RenderableSpriteList     not_blended_sprites;        //спрайты без блендинга
+    RenderableSpriteList     blended_sprites;            //спрайты с блендингом
 };
 
 }

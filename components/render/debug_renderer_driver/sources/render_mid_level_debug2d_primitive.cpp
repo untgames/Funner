@@ -10,7 +10,8 @@ using namespace render::mid_level::debug::renderer2d;
 */
 
 Primitive::Primitive ()
-  : blend_mode (BlendMode_None)
+  : blend_mode (BlendMode_None),
+    alpha_reference (0.0f)
 {
   log.Printf ("Create primitive (id=%u)", Id ());
 }
@@ -93,7 +94,22 @@ BlendMode Primitive::GetBlendMode ()
 }
 
 /*
-   Спрайты
+    Установка параметра для работы альфа-теста
+*/
+
+void Primitive::SetAlphaReference (float ref)
+{
+  alpha_reference = ref;
+}
+
+float Primitive::GetAlphaReference ()
+{
+  return alpha_reference;
+}
+
+
+/*
+    Спрайты
 */
 
 //количество спрайтов

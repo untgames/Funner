@@ -9,9 +9,6 @@ void update_notifier (SpriteModel& model, SpriteModelEvent event)
 {
   switch (event)
   {
-    case SpriteModelEvent_AfterMaterialUpdate:
-      printf ("update sprite '%s' material to '%s'\n", model.Name (), model.Material ());
-      break;
     case SpriteModelEvent_AfterSpriteDescsUpdate:
     {
       printf ("update sprite '%s' descs (count=%u):\n", model.Name (), model.SpriteDescsCount ());
@@ -40,9 +37,8 @@ int main ()
   
   Sprite::Pointer sprite (Sprite::Create ());
   
-  xtl::auto_connection c1 = sprite->RegisterEventHandler (SpriteModelEvent_AfterMaterialUpdate, &update_notifier),
-                       c2 = sprite->RegisterEventHandler (SpriteModelEvent_AfterSpriteDescsUpdate, &update_notifier),
-                       c3 = sprite->RegisterEventHandler (NodeEvent_AfterUpdate, &default_update_notifier); 
+  xtl::auto_connection c1 = sprite->RegisterEventHandler (SpriteModelEvent_AfterSpriteDescsUpdate, &update_notifier),
+                       c2 = sprite->RegisterEventHandler (NodeEvent_AfterUpdate, &default_update_notifier); 
 
   sprite->SetName     ("Sprite1");
   sprite->SetMaterial ("material1");

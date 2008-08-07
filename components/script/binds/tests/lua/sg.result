@@ -131,6 +131,7 @@ Sprite test
 Color = 0 0 0 0
 Material name = 
 Alpha value = 0.80000001192093
+Alpha reference = 0.40000000596046
 Material name = SettedMaterial
 Frame number = 9
 Color = 1 0 0 0.699999988079

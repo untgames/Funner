@@ -12,8 +12,7 @@ typedef xtl::com_ptr<IDevice>                    DevicePtr;
 const size_t WINDOW_WIDTH   = 1024;
 const size_t WINDOW_HEIGHT  = 768;
 const char* screenshot_name = "screenshots/screenshot1.tga";
-//const char* texture_name    = "data/texture_hut.tga";
-const char* texture_name    = "data/radial_alpha.tif";
+const char* texture_name    = "data/house.tif";
 
 
 float sprite_angle = 0;
@@ -40,9 +39,9 @@ void idle (syslib::Window& window, render::mid_level::renderer2d::IRenderer* ren
   mat4f tm2 = translatef (cos (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, sin (sprite_angle + 3.1415926535897932384626433832795f) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (40, 40, 1) * rotatef (-sprite_rotation, 0, 0, 1);
 
   primitive1->SetTransform (tm1);
-  primitive2->SetTransform (tm2);
+  primitive2->SetTransform (tm2);  
   
-  frame->SetAlphaReference (0.5f * (1.0f + cos(sprite_angle)));
+  primitive2->SetAlphaReference (0.5f * (1.0f + cos(sprite_angle)));
   
   renderer->AddFrame (clear_frame);
   renderer->AddFrame (frame);
@@ -151,8 +150,8 @@ int main ()
     xtl::com_ptr<render::mid_level::renderer2d::ITexture>   /*texture1  (renderer->CreateTexture (64, 64, media::PixelFormat_RGBA8), false),*/ texture2 (renderer->CreateTexture (texture_image), false), texture1 (texture2);
     xtl::com_ptr<render::mid_level::renderer2d::IPrimitive> primitive1 (renderer->CreatePrimitive (), false), primitive2 (renderer->CreatePrimitive (), false);
 
-    Sprite sprite1 = {vec3f (0.f, 0.f, 0.1f), vec2f (1.f, 1.f), vec4f (1.f, 1.f, 1.f, 0.6f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
-    Sprite sprite2 = {vec3f (0.f, 0.f, 0.2f), vec2f (1.f, 1.f), vec4f (1.f, 1.f, 1.f, 0.4f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
+    Sprite sprite1 = {vec3f (0.f, 0.f, 0.1f), vec2f (1.f, 1.f), vec4f (1.f, 1.f, 1.f, 1.0f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
+    Sprite sprite2 = {vec3f (0.f, 0.f, 0.2f), vec2f (1.f, 1.f), vec4f (1.f, 1.f, 1.f, 1.0f), vec2f (0.f, 0.f), vec2f (1.f, 1.f)};
 
     primitive1->SetTexture (texture1.get ());
     primitive2->SetTexture (texture2.get ());

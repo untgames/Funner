@@ -102,21 +102,6 @@ DepthStencilStatePtr create_depth_stencil_state (IDevice& device, bool depth_wri
   return DepthStencilStatePtr (device.CreateDepthStencilState (depth_stencil_desc), false);
 }
 
-//создание константного буфера
-BufferPtr create_constant_buffer (IDevice& device)
-{
-  BufferDesc constant_buffer_desc;
-
-  memset (&constant_buffer_desc, 0, sizeof (constant_buffer_desc));
-
-  constant_buffer_desc.size         = sizeof (ProgramParameters);
-  constant_buffer_desc.usage_mode   = UsageMode_Default;
-  constant_buffer_desc.bind_flags   = BindFlag_ConstantBuffer;
-  constant_buffer_desc.access_flags = AccessFlag_ReadWrite;
-
-  return BufferPtr (device.CreateBuffer (constant_buffer_desc), false);
-}
-
 //протоколирование компилятора шейдеров
 void shader_error_log (const char* message)
 {
@@ -150,19 +135,19 @@ ProgramParametersLayoutPtr create_program_parameters (IDevice& device)
   program_parameters [0].type   = ProgramParameterType_Float4x4;
   program_parameters [0].slot   = 0;
   program_parameters [0].count  = 1;
-  program_parameters [0].offset = offsetof (ProgramParameters, view_matrix);
+  program_parameters [0].offset = offsetof (CommonProgramParameters, view_matrix);
 
   program_parameters [1].name   = "currentProjMatrix";
   program_parameters [1].type   = ProgramParameterType_Float4x4;
   program_parameters [1].slot   = 0;
   program_parameters [1].count  = 1;
-  program_parameters [1].offset = offsetof (ProgramParameters, projection_matrix);
+  program_parameters [1].offset = offsetof (CommonProgramParameters, projection_matrix);
   
   program_parameters [2].name   = "currentAlphaReference";
   program_parameters [2].type   = ProgramParameterType_Float;
-  program_parameters [2].slot   = 0;
+  program_parameters [2].slot   = 1;
   program_parameters [2].count  = 1;
-  program_parameters [2].offset = offsetof (ProgramParameters, alpha_reference);
+  program_parameters [2].offset = offsetof (DynamicProgramParameters, alpha_reference);
 
   ProgramParametersLayoutDesc program_parameters_layout_desc;
 
@@ -204,22 +189,22 @@ InputLayoutPtr create_input_layout (IDevice& device)
   attributes [0].format   = InputDataFormat_Vector3;
   attributes [0].type     = InputDataType_Float;
   attributes [0].slot     = 0;
-  attributes [0].offset   = offsetof (RenderedSpriteVertex, position);
-  attributes [0].stride   = sizeof (RenderedSpriteVertex);
+  attributes [0].offset   = offsetof (RenderableVertex, position);
+  attributes [0].stride   = sizeof (RenderableVertex);
 
   attributes [1].semantic = VertexAttributeSemantic_TexCoord0;
   attributes [1].format   = InputDataFormat_Vector2;
   attributes [1].type     = InputDataType_Float;
   attributes [1].slot     = 0;
-  attributes [1].offset   = offsetof (RenderedSpriteVertex, texcoord);
-  attributes [1].stride   = sizeof (RenderedSpriteVertex);
+  attributes [1].offset   = offsetof (RenderableVertex, texcoord);
+  attributes [1].stride   = sizeof (RenderableVertex);
 
   attributes [2].semantic = VertexAttributeSemantic_Color;
   attributes [2].format   = InputDataFormat_Vector4;
   attributes [2].type     = InputDataType_Float;
   attributes [2].slot     = 0;
-  attributes [2].offset   = offsetof (RenderedSpriteVertex, color);
-  attributes [2].stride   = sizeof (RenderedSpriteVertex);
+  attributes [2].offset   = offsetof (RenderableVertex, color);
+  attributes [2].stride   = sizeof (RenderableVertex);
 
   InputLayoutDesc layout_desc;
 
@@ -242,8 +227,6 @@ CommonResources::CommonResources (IDevice* device)
   input_layout = create_input_layout (*device);
  
     //создание состояний уровня шейдинга
-
-  constant_buffer = create_constant_buffer (*device);
 
   default_program = create_program (*device, "render.mid_level.low_level_driver.renderer2d.Renderer.default_program",
                                     DEFAULT_SHADER_SOURCE_CODE);

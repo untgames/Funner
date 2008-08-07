@@ -92,7 +92,7 @@ render::mid_level::renderer2d::ITexture* Renderer::CreateTexture (size_t width, 
     tex_desc.format               = get_pixel_format (pixel_format);
     tex_desc.generate_mips_enable = true;
     tex_desc.bind_flags           = BindFlag_Texture | BindFlag_RenderTarget;
-    tex_desc.access_flags         = AccessFlag_ReadWrite;
+    tex_desc.access_flags         = AccessFlag_ReadWrite;    
 
     ViewDesc view_desc;
     

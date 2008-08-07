@@ -115,12 +115,12 @@ class RenderableSpriteModel: public Renderable, public xtl::trackable
     Render&                   render;                          //ссылка на рендер
     scene_graph::SpriteModel* model;                           //исходная модель
     PrimitivePtr              primitive;                       //визуализируемый примитив
-    bool                      need_update_tm;                  //флаг необходимости обновления матрицы преобразований
-    bool                      need_update_material;            //флаг необходимости обновления материала
     bool                      need_update_sprites;             //флаг необходимости обновления массива спрайтов
     size_t                    tile_columns;                    //количество столбцов тайлов
     float                     tile_tex_width, tile_tex_height; //размеры тайла в текстурных координатах
     size_t                    current_world_tm_hash;           //хэш текущей матрицы трансформации
+    size_t                    current_material_name_hash;      //хэш текущего имени материала
+    float                     current_alpha_reference;         //текущее значение параметра альфа-отсечения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

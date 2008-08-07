@@ -14,13 +14,12 @@ namespace
 */
 
 const size_t DEFAULT_VERTEX_BUFFER_SIZE = 8192; //размер вершинного буффера по умолчанию (количество вершин)
-const size_t SPRITE_VERTICES_COUNT      = 6;    //количество вершин в одном спрайте
 
 /*
     Временный буфер хранения вершинных данных
 */
 
-typedef xtl::uninitialized_storage<RenderedSpriteVertex> VertexArrayCache;
+typedef xtl::uninitialized_storage<RenderableVertex> VertexArrayCache;
 
 class VertexArrayCacheHolder
 {
@@ -80,14 +79,14 @@ VertexArrayCacheHolder* VertexArrayCacheHolder::instance = 0;
     Конструктор
 */
 
-SpriteBuffer::SpriteBuffer ()
+RenderableSpriteList::RenderableSpriteList ()
 {
   VertexArrayCacheHolder::Lock ();
 
   vertex_buffer_vertices_count = 0;
 }
 
-SpriteBuffer::~SpriteBuffer ()
+RenderableSpriteList::~RenderableSpriteList ()
 {
   VertexArrayCacheHolder::Unlock ();
 }
@@ -96,7 +95,7 @@ SpriteBuffer::~SpriteBuffer ()
     Резервирование места для размещения указанного числа спрайтов
 */
 
-void SpriteBuffer::Reserve (size_t sprites_count)
+void RenderableSpriteList::Reserve (size_t sprites_count)
 {
   data_buffer.reserve (sprites_count);
 }
@@ -105,15 +104,15 @@ void SpriteBuffer::Reserve (size_t sprites_count)
     Добавление спрайтов примитива
 */
 
-void SpriteBuffer::Add (size_t sprites_count, const SpriteVertexData* sprites)
+void RenderableSpriteList::Add (size_t sprites_count, const RenderableSprite* sprites)
 {
-  const SpriteVertexData* src = sprites;   
+  const RenderableSprite* src = sprites;   
 
   size_t current_buffer_size = data_buffer.size ();  
 
   data_buffer.resize (data_buffer.size () + sprites_count);  
 
-  const SpriteVertexData** dst = data_buffer.data () + current_buffer_size;
+  const RenderableSprite** dst = data_buffer.data () + current_buffer_size;
 
   while (sprites_count--)
     *dst++ = &*src++;    
@@ -123,7 +122,7 @@ void SpriteBuffer::Add (size_t sprites_count, const SpriteVertexData* sprites)
     Очистка буфера
 */
 
-void SpriteBuffer::Clear ()
+void RenderableSpriteList::Clear ()
 {
   data_buffer.resize (0);
 }
@@ -132,7 +131,7 @@ void SpriteBuffer::Clear ()
     Создание вершинного буфера
 */
 
-void SpriteBuffer::SetVertexBufferSize (IDevice& device, size_t new_vertices_count)
+void RenderableSpriteList::SetVertexBufferSize (IDevice& device, size_t new_vertices_count)
 {
   BufferDesc buffer_desc;
 
@@ -141,7 +140,7 @@ void SpriteBuffer::SetVertexBufferSize (IDevice& device, size_t new_vertices_cou
   buffer_desc.usage_mode   = UsageMode_Stream;
   buffer_desc.bind_flags   = BindFlag_VertexBuffer;
   buffer_desc.access_flags = AccessFlag_ReadWrite;
-  buffer_desc.size         = sizeof (RenderedSpriteVertex) * new_vertices_count;
+  buffer_desc.size         = sizeof (RenderableVertex) * new_vertices_count;
 
   vertex_buffer                = BufferPtr (device.CreateBuffer (buffer_desc), false);
   vertex_buffer_vertices_count = new_vertices_count;
@@ -151,7 +150,7 @@ void SpriteBuffer::SetVertexBufferSize (IDevice& device, size_t new_vertices_cou
     Обновление вершинного буфера
 */
 
-void SpriteBuffer::UpdateVertexBuffer (IDevice& device)
+void RenderableSpriteList::UpdateVertexBuffer (IDevice& device)
 {
   if (!data_buffer.size ())
     return;
@@ -169,24 +168,13 @@ void SpriteBuffer::UpdateVertexBuffer (IDevice& device)
 
   cache.resize (data_buffer.size () * SPRITE_VERTICES_COUNT, false);
 
-  RenderedSpriteVertex*    new_vertex = cache.data ();
-  const SpriteVertexData** src_vertex = data_buffer.data ();
+  RenderableVertex*        dst_vertex = cache.data ();
+  const RenderableSprite** src_sprite = data_buffer.data ();
 
-  for (size_t i=0, count=data_buffer.size (); i<count; i++, src_vertex++)
-  {
-    const SpriteVertexData& sprite_vertex_data = **src_vertex;
+  for (size_t count=data_buffer.size (); count--; src_sprite++, dst_vertex += SPRITE_VERTICES_COUNT)
+    memcpy (dst_vertex, (*src_sprite)->vertices, sizeof (RenderableVertex) * SPRITE_VERTICES_COUNT);
 
-    for (size_t j=0; j<SPRITE_VERTICES_COUNT; j++, new_vertex++)
-    {
-      static size_t order [SPRITE_VERTICES_COUNT] = {0, 1, 2, 3, 2, 1};
-      
-      new_vertex->color    = sprite_vertex_data.color;
-      new_vertex->position = sprite_vertex_data.vertices [order [j]].position;
-      new_vertex->texcoord = sprite_vertex_data.vertices [order [j]].texcoord;
-    }
-  }  
+    //обновление вершинного буфера
 
-    //обновление вершинного буфера    
-
-  vertex_buffer->SetData (0, cache.size () * sizeof (RenderedSpriteVertex), cache.data ());
+  vertex_buffer->SetData (0, cache.size () * sizeof (RenderableVertex), cache.data ());
 }

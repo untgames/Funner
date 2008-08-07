@@ -5,23 +5,17 @@ using namespace render::mid_level::renderer2d;
 using namespace render::mid_level::low_level_driver;
 using namespace render::mid_level::low_level_driver::renderer2d;
 
-namespace
-{
-
-const size_t DEFAULT_SPRITE_VERTEX_BUFFER_SIZE = 4; //размер вершинного буффера по умолчанию
-
-}
-
 /*
      онструктор / деструктор
 */
 
 Primitive::Primitive ()
-  : blend_mode (BlendMode_None),
-    low_level_texture (0),
-    sprite_vertex_buffer (DEFAULT_SPRITE_VERTEX_BUFFER_SIZE * sizeof (SpriteVertexData)),
-    dirty_transform (false)
+  : need_update_transform (true),
+    need_update_renderable_sprites (true)
 {
+  renderable_primitive.blend_mode      = BlendMode_None;
+  renderable_primitive.texture         = 0;
+  renderable_primitive.alpha_reference = 0.0f;
 }
 
 /*
@@ -32,7 +26,7 @@ void Primitive::SetTransform (const math::mat4f& in_transform)
 {
   transform = in_transform;
 
-  dirty_transform = true;
+  need_update_transform = true;
 }
 
 void Primitive::GetTransform (math::mat4f& out_transform)
@@ -48,31 +42,25 @@ void Primitive::SetTexture (render::mid_level::renderer2d::ITexture* in_texture)
 {
   if (!in_texture)
   {
-    texture = 0;
+    renderable_primitive.texture = 0;
     return;
   }
 
-  render::mid_level::low_level_driver::renderer2d::ImageTexture* image_texture = dynamic_cast<ImageTexture*> (in_texture);
-
-  if (image_texture)
+  if (ImageTexture* image_texture = dynamic_cast<ImageTexture*> (in_texture))
   {
-    low_level_texture = image_texture->GetTexture ();      
-    texture = image_texture;
+    renderable_primitive.texture = image_texture->GetTexture ();      
+    texture                      = image_texture;
+  }
+  else if (RenderTargetTexture* render_target_texture = dynamic_cast<RenderTargetTexture*> (in_texture))
+  {
+    renderable_primitive.texture = render_target_texture->GetView ()->GetTexture ();
+    texture                      = render_target_texture;
   }
   else
   {
-    render::mid_level::low_level_driver::renderer2d::RenderTargetTexture* render_target_texture = dynamic_cast<RenderTargetTexture*> (in_texture);
-
-    if (!render_target_texture)
-      throw xtl::make_argument_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::SetTexture", "texture", typeid (in_texture).name (),
-        "Texture type must be render::mid_level::low_level_driver::renderer2d::ImageTexture or render::mid_level::low_level_driver::renderer2d::RenderTargetTexture");
-
-    low_level_texture = render_target_texture->GetView ()->GetTexture ();
-    texture = render_target_texture;
+    throw xtl::make_argument_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::SetTexture", "texture", typeid (in_texture).name (),
+      "Texture type must be render::mid_level::low_level_driver::renderer2d::ImageTexture or render::mid_level::low_level_driver::renderer2d::RenderTargetTexture");    
   }
-
-  for (SpriteVertexData* iter = sprite_vertex_buffer.data (), *end = sprite_vertex_buffer.data () + sprite_vertex_buffer.size (); iter < end; iter++)
-    iter->texture = low_level_texture;
 }
 
 ITexture* Primitive::GetTexture ()
@@ -97,20 +85,31 @@ void Primitive::SetBlendMode (BlendMode in_blend_mode)
     default:
       throw xtl::make_argument_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::SetBlendMode", "blend_mode", in_blend_mode);
   }
-  
-  blend_mode = in_blend_mode;
 
-  for (SpriteVertexData* iter = sprite_vertex_buffer.data (), *end = sprite_vertex_buffer.data () + sprite_vertex_buffer.size (); iter < end; iter++)
-    iter->blend_mode = blend_mode;
+  renderable_primitive.blend_mode = in_blend_mode;
 }
 
 BlendMode Primitive::GetBlendMode ()
 {
-  return blend_mode;
+  return renderable_primitive.blend_mode;
 }
 
 /*
-   —прайты
+    ”становка параметра дл€ работы альфа-теста
+*/
+
+void Primitive::SetAlphaReference (float ref)
+{
+  renderable_primitive.alpha_reference = ref;
+}
+
+float Primitive::GetAlphaReference ()
+{
+  return renderable_primitive.alpha_reference;
+}
+
+/*
+    —прайты
 */
 
 //количество спрайтов
@@ -133,25 +132,16 @@ size_t Primitive::AddSprites (size_t sprites_count, const Sprite* sprites_array)
 {
   size_t first = sprites.size ();
 
+  if (!sprites_count)
+    return first;
+
+  if (!sprites_array)
+    throw xtl::make_null_argument_exception ("render::mid_level::low_level_driver::Primitive::AddSprites", "sprites_array");
+
   sprites.insert (sprites.end (), sprites_array, sprites_array + sprites_count);
-
-  try
-  {
-    if (sprite_vertex_buffer.capacity () < (sprites.size ()  * sizeof (SpriteVertexData)))
-      sprite_vertex_buffer.reserve ((sprites.size () + DEFAULT_SPRITE_VERTEX_BUFFER_SIZE) * sizeof (SpriteVertexData));
-
-    sprite_vertex_buffer.resize (sprites.size () * sizeof (SpriteVertexData));
-  }
-  catch (xtl::exception& e)
-  {
-    sprites.resize (first);
-    e.touch ("render::mid_level::low_level_driver::Primitive::AddSprites");
-    throw;
-  }
-
-  for (size_t i = first; i < sprites.size (); i++)
-    BuildSpriteVertexData (i);
   
+  need_update_renderable_sprites = true;
+
   return first;
 }
 
@@ -166,67 +156,104 @@ void Primitive::RemoveSprites (size_t first_sprite, size_t sprites_count)
 
   sprites.erase (sprites.begin () + first_sprite, sprites.begin () + first_sprite + sprites_count);  
 
-  sprite_vertex_buffer.resize (sprites.size () * sizeof (SpriteVertexData));
-
-  for (size_t i = 0; i < sprites.size (); i++)
-    BuildSpriteVertexData (i);
+  need_update_renderable_sprites = true;
 }
 
 //удаление всех спрайтов
 void Primitive::RemoveAllSprites ()
 {
   sprites.clear ();
-  sprite_vertex_buffer.resize (0);
+  
+  need_update_renderable_sprites = true;
 }
 
 //резервирование места дл€ спрайтов
 void Primitive::ReserveSprites (size_t sprites_count)
 {
   sprites.reserve (sprites_count);
-
-  if (sprite_vertex_buffer.capacity () < (sprites_count * sizeof (SpriteVertexData)))
-    sprite_vertex_buffer.reserve (sprites_count * sizeof (SpriteVertexData));
 }
 
 /*
-   ѕолучение данных дл€ отрисовки
+    ќбновление визуализируемых спрайтов
 */
 
-SpriteVertexData* Primitive::GetSpriteVertexBuffer () 
-{ 
-  if (dirty_transform)
-  {
-    for (size_t i = 0; i < sprites.size (); i++)
-      ComputeSpriteTransorm (i);
+void Primitive::UpdateRenderableSprites ()
+{
+    //обновление содержимого массива спрайтов
 
-    dirty_transform = false;
+  if (need_update_renderable_sprites)
+  {
+      //изменение размера массива спрайтов
+
+    renderable_sprites.resize (sprites.size (), false);
+    
+      //добавление спрайтов      
+      
+    const Sprite*     src_sprite = &sprites [0];
+    RenderableSprite* dst_sprite = renderable_sprites.data ();
+
+    for (size_t count=sprites.size (); count--; src_sprite++, dst_sprite++)
+    {
+      const math::vec2f &offset = src_sprite->tex_offset,
+                        &size   = src_sprite->tex_size;
+      RenderableVertex* verts   = dst_sprite->vertices;
+
+      dst_sprite->primitive = &renderable_primitive;
+
+      verts [0].texcoord = offset;
+      verts [1].texcoord = math::vec2f (offset.x + size.x, offset.y);
+      verts [2].texcoord = math::vec2f (offset.x, offset.y + size.y);
+      verts [3].texcoord = offset + size;
+      verts [4].texcoord = verts [2].texcoord;
+      verts [5].texcoord = verts [1].texcoord;
+
+      const math::vec4f &color = src_sprite->color;      
+
+      for (size_t i=0; i<SPRITE_VERTICES_COUNT; i++)
+        verts [i].color = color;
+    }    
+    
+    need_update_renderable_sprites = false;
+    need_update_transform          = true;    
   }
 
-  return sprite_vertex_buffer.data (); 
+    //обновление трансформаций
+  
+  if (need_update_transform)
+  {
+    const Sprite*     src_sprite = &sprites [0];
+    RenderableSprite* dst_sprite = renderable_sprites.data ();
+
+    for (size_t count=sprites.size (); count--; src_sprite++, dst_sprite++)
+    {
+      const math::vec3f& pos   = src_sprite->position;
+      math::vec2f        size  = src_sprite->size * 0.5f;
+      RenderableVertex*  verts = dst_sprite->vertices;
+
+      verts [0].position = transform * math::vec3f (pos.x - size.x, pos.y - size.y, pos.z);
+      verts [1].position = transform * math::vec3f (pos.x + size.x, pos.y - size.y, pos.z);
+      verts [2].position = transform * math::vec3f (pos.x - size.x, pos.y + size.y, pos.z);
+      verts [3].position = transform * math::vec3f (pos.x + size.x, pos.y + size.y, pos.z);
+      verts [4].position = verts [2].position;
+      verts [5].position = verts [1].position;
+    }    
+
+    need_update_transform = false;
+  }  
 }
 
 /*
-   ѕостроение вершинных данных дл€ спрайта
+    ƒобавление спрайтов в буфер
 */
 
-void Primitive::BuildSpriteVertexData (size_t i)
+void Primitive::AddSprites (RenderableSpriteList& list)
 {
-  ComputeSpriteTransorm (i);
+    //обновление визуализируемых спрайтов
 
-  sprite_vertex_buffer.data ()[i].color      = sprites[i].color;
-  sprite_vertex_buffer.data ()[i].texture    = low_level_texture;
-  sprite_vertex_buffer.data ()[i].blend_mode = blend_mode;
+  if (need_update_renderable_sprites || need_update_transform)
+    UpdateRenderableSprites ();
 
-  sprite_vertex_buffer.data ()[i].vertices[0].texcoord = math::vec2f (sprites[i].tex_offset.x,                         sprites[i].tex_offset.y);
-  sprite_vertex_buffer.data ()[i].vertices[1].texcoord = math::vec2f (sprites[i].tex_offset.x + sprites[i].tex_size.x, sprites[i].tex_offset.y);
-  sprite_vertex_buffer.data ()[i].vertices[2].texcoord = math::vec2f (sprites[i].tex_offset.x,                         sprites[i].tex_offset.y + sprites[i].tex_size.y);
-  sprite_vertex_buffer.data ()[i].vertices[3].texcoord = math::vec2f (sprites[i].tex_offset.x + sprites[i].tex_size.x, sprites[i].tex_offset.y + sprites[i].tex_size.y);
-}
+    //добавление спрайтов в список визуализации
 
-void Primitive::ComputeSpriteTransorm (size_t i)
-{
-  sprite_vertex_buffer.data ()[i].vertices[0].position = transform * math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y - sprites[i].size.y, sprites[i].position.z);
-  sprite_vertex_buffer.data ()[i].vertices[1].position = transform * math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y - sprites[i].size.y, sprites[i].position.z);
-  sprite_vertex_buffer.data ()[i].vertices[2].position = transform * math::vec3f (sprites[i].position.x - sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
-  sprite_vertex_buffer.data ()[i].vertices[3].position = transform * math::vec3f (sprites[i].position.x + sprites[i].size.x, sprites[i].position.y + sprites[i].size.y, sprites[i].position.z);
+  list.Add (renderable_sprites.size (), renderable_sprites.data ());
 }

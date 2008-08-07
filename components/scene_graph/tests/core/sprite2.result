@@ -1,6 +1,5 @@
 Results of sprite2_test:
 update node 'Sprite1'
-update sprite 'Sprite1' material to 'material1'
 update node 'Sprite1'
 update sprite 'Sprite1' descs (count=1):
     position: [0.00 0.00 0.00]

@@ -348,6 +348,12 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                             SetBlendMode (mid_level::renderer2d::BlendMode blend_mode);
     mid_level::renderer2d::BlendMode GetBlendMode ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка параметра для работы альфа-теста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void  SetAlphaReference (float ref);
+    float GetAlphaReference (); 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Спрайты
@@ -367,6 +373,7 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     math::mat4f                      transform;
     TexturePtr                       texture;
     mid_level::renderer2d::BlendMode blend_mode;
+    float                            alpha_reference;
     SpriteArray                      sprites;
 };
 
@@ -391,12 +398,6 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     void GetProjection (math::mat4f&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка параметра для работы альфа-теста
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  SetAlphaReference (float ref);
-    float GetAlphaReference (); 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Примитивы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t PrimitivesCount ();
@@ -416,7 +417,6 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
   private:
     math::vec3f    view_point;
     math::mat4f    proj_tm;
-    float          alpha_reference;
     PrimitiveArray primitives;
 };
 

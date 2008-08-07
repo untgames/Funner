@@ -22,8 +22,6 @@ const size_t PRIMITIVE_ARRAY_RESERVE_SIZE = 4096; //резервируемое количество при
 
 Frame::Frame ()
 {
-  alpha_reference = 0;
-
   primitives.reserve (PRIMITIVE_ARRAY_RESERVE_SIZE);
   
   log.Printf ("Create frame2d (id=%u)", Id ());
@@ -63,20 +61,6 @@ void Frame::GetViewPoint (math::vec3f& point)
 void Frame::GetProjection (math::mat4f& tm)
 {
   tm = proj_tm;
-}
-
-/*
-    Установка параметра для работы альфа-теста
-*/
-
-void Frame::SetAlphaReference (float ref)
-{
-  alpha_reference = ref;
-}
-
-float Frame::GetAlphaReference ()
-{
-  return alpha_reference;
 }
 
 /*
@@ -159,10 +143,11 @@ void Frame::DrawCore ()
         break;
       case BlendMode_AlphaClamp:
         log.Printf ("  blend=alpha_clamp");
+        log.Printf ("  alpha_reference=%.2f", primitive.GetAlphaReference ());
         break;
       default:
         break;
-    }
+    }    
     
     math::mat4f object_tm;
     

@@ -11,7 +11,7 @@ typedef xtl::com_ptr<IDevice>                    DevicePtr;
 
 const size_t WINDOW_WIDTH   = 1024;
 const size_t WINDOW_HEIGHT  = 768;
-const char* TEXTURE_NAME    = "data/texture_hut.tga";
+const char* TEXTURE_NAME    = "data/house.tif";
 const size_t SPRITES_COUNT  = 500;
 
 float rotation_angle = 0;

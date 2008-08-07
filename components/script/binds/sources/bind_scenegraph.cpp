@@ -593,6 +593,8 @@ void bind_sprite_model_library (Environment& environment)
 
   lib.Register ("set_Material",           make_invoker (&SpriteModel::SetMaterial));
   lib.Register ("get_Material",           make_invoker (&SpriteModel::Material));
+  lib.Register ("set_AlphaReference",     make_invoker (&SpriteModel::SetAlphaReference));
+  lib.Register ("get_AlphaReference",     make_invoker (&SpriteModel::AlphaReference));  
   lib.Register ("set_PivotPosition",      make_invoker (implicit_cast<void (SpriteModel::*)(const vec3f&)> (&SpriteModel::SetPivotPosition)));
   lib.Register ("get_PivotPosition",      make_invoker (&SpriteModel::PivotPosition));
   lib.Register ("set_PivotRotation",      make_invoker (&SpriteModel::SetPivotRotation));
