@@ -44,10 +44,43 @@ void RenderableSpriteModel::Update ()
 
     if (material_name_hash != current_material_name_hash)
     {
-        //получение ресурсов из кэша
+        //получение материала из кэша
 
       SpriteMaterial* material = render.GetMaterial (model->Material ());
-      ITexture*       texture  = render.GetTexture (material->Image ());            
+      
+        //преобразование режима смешивания цветов
+
+      BlendMode blend_mode;
+      bool      need_alpha;
+
+      switch (material->BlendMode ())
+      {
+        default:
+        case media::rfx::SpriteBlendMode_None:
+          blend_mode = render::mid_level::renderer2d::BlendMode_None;
+          need_alpha = false;
+          break;
+        case media::rfx::SpriteBlendMode_Translucent:
+          blend_mode = render::mid_level::renderer2d::BlendMode_Translucent;
+          need_alpha = false;
+          break;
+        case media::rfx::SpriteBlendMode_Mask:
+          blend_mode = render::mid_level::renderer2d::BlendMode_Mask;
+          need_alpha = false;
+          break;
+        case media::rfx::SpriteBlendMode_Additive:
+          blend_mode = render::mid_level::renderer2d::BlendMode_Additive;
+          need_alpha = false;
+          break;
+        case media::rfx::SpriteBlendMode_AlphaClamp:
+          blend_mode = render::mid_level::renderer2d::BlendMode_AlphaClamp;
+          need_alpha = true;
+          break;
+      }
+
+        //получение текстуры из кэша
+
+      ITexture* texture  = render.GetTexture (material->Image (), need_alpha);
       
         //проверка корректности данных - получение размеров текстуры и тайла
 
@@ -79,20 +112,8 @@ void RenderableSpriteModel::Update ()
       {
         tile_columns = 0; //маркер отсутствия тайлинга
       }
-
-        //преобразование режима смешивания цветов
-
-      BlendMode blend_mode;    
-
-      switch (material->BlendMode ())
-      {
-        default:
-        case media::rfx::SpriteBlendMode_None:        blend_mode = render::mid_level::renderer2d::BlendMode_None; break;
-        case media::rfx::SpriteBlendMode_Translucent: blend_mode = render::mid_level::renderer2d::BlendMode_Translucent; break;
-        case media::rfx::SpriteBlendMode_Mask:        blend_mode = render::mid_level::renderer2d::BlendMode_Mask; break;
-        case media::rfx::SpriteBlendMode_Additive:    blend_mode = render::mid_level::renderer2d::BlendMode_Additive; break;
-        case media::rfx::SpriteBlendMode_AlphaClamp:  blend_mode = render::mid_level::renderer2d::BlendMode_AlphaClamp; break;
-      }
+      
+        //установка параметров примитива
 
       primitive->SetBlendMode (blend_mode);
       primitive->SetTexture   (texture);      

@@ -218,9 +218,9 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 ///Работа с кэшем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Renderable*     GetRenderable (scene_graph::SpriteModel*);
-    ITexture*       GetTexture    (const char* file_name);    
+    ITexture*       GetTexture    (const char* file_name, bool need_alpha=false);
     SpriteMaterial* GetMaterial   (const char* name);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление кадра на отрисовку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -241,6 +241,11 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     void LoadMaterialLibrary (const char* file_name);
     void InsertMaterial      (const char* id, const SpriteMaterialPtr&);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание текстур
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    TexturePtr CreateTexture (const char* file_name, bool need_alpha, bool& has_alpha);
+
   private:
     struct RenderableHolder
     {
@@ -249,11 +254,20 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 
       RenderableHolder (const RenderablePtr& in_renderable, const xtl::connection& in_on_destroy) :
         renderable (in_renderable), on_destroy (in_on_destroy) {}
-    };  
+    };
+    
+    struct TextureHolder
+    {
+      TexturePtr base_texture;  //базовая текстура
+      TexturePtr alpha_texture; //альфа-текстура
+
+      TextureHolder (const TexturePtr& in_base_texture, const TexturePtr& in_alpha_texture) :
+        base_texture (in_base_texture), alpha_texture (in_alpha_texture) {}
+    };
 
     typedef stl::hash_map<scene_graph::Entity*, RenderableHolder>        RenderableMap;
     typedef stl::hash_map<stl::hash_key<const char*>, SpriteMaterialPtr> MaterialMap;
-    typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr>        TextureMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, TextureHolder>     TextureMap;
 
   private:
     LogFunction   log_handler;       //функция протоколирования

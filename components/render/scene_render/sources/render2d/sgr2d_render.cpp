@@ -189,15 +189,62 @@ void Render::RemoveRenderable (scene_graph::Entity* entity)
   renderables_cache.erase (entity);
 }
 
-ITexture* Render::GetTexture (const char* file_name)
+ITexture* Render::GetTexture (const char* file_name, bool need_alpha)
 {
     //попытка найти текстуру в кеше
 
   TextureMap::iterator iter = textures.find (file_name);
   
   if (iter != textures.end ())
-    return &*iter->second;
+  {
+    TextureHolder& holder = iter->second;
     
+      //если альфа-канал не требуется - возвращаем базовую текстуру
+
+    if (!need_alpha) 
+      return holder.base_texture.get ();
+
+      //если требуется альфа канал и соответствующая текстура присутствует - возвращаем её
+
+    if (holder.alpha_texture)
+      return holder.alpha_texture.get ();
+
+      //если альфа-текстура отсутствует - создаём её и возвращаем
+
+    bool has_alpha = false;
+
+    holder.alpha_texture = CreateTexture (file_name, true, has_alpha);
+
+    return holder.alpha_texture.get ();
+  }
+
+  try
+  {        
+      //создание новой текстуры
+      
+    bool has_alpha = false;
+      
+    TexturePtr texture = CreateTexture (file_name, need_alpha, has_alpha);
+    
+      //добавление текстуры в кэш
+
+    textures.insert_pair (file_name, TextureHolder (texture, has_alpha ? texture : TexturePtr ()));
+    
+    return texture.get ();
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::render2d::Render::GetTexture(file_name='%s', renderer='%s')", file_name, renderer->GetDescription ());
+    throw;
+  }
+}
+
+/*
+    Создание текстур
+*/
+
+TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& has_alpha)
+{
   try
   {
     if (!file_name)
@@ -205,39 +252,72 @@ ITexture* Render::GetTexture (const char* file_name)
     
       //загрузка картинки
       
+    bool need_alpha_generation = false;
+
     media::Image image (file_name);
-    
+
     switch (image.Format ())
     {
       case media::PixelFormat_BGR8:
-        image.Convert (media::PixelFormat_RGB8);
+        image.Convert (need_alpha ? media::PixelFormat_RGBA8 : media::PixelFormat_RGB8);
+        need_alpha_generation = need_alpha;
         break;
       case media::PixelFormat_BGRA8:
         image.Convert (media::PixelFormat_RGBA8);
+        has_alpha = true;
         break;
-      case media::PixelFormat_RGBA8:        
-      case media::PixelFormat_RGB8:        
+      case media::PixelFormat_RGBA8:
+      case media::PixelFormat_A8:      
       case media::PixelFormat_L8:
-      case media::PixelFormat_A8:
       case media::PixelFormat_LA8:
+        has_alpha = true;
+        break;
+      case media::PixelFormat_RGB8:
+        if (need_alpha)
+          image.Convert (media::PixelFormat_RGBA8);
+
+        need_alpha_generation = need_alpha;
+
         break;
       default:
         throw xtl::format_operation_exception ("", "Unknown texture format=%d", image.Format ());
     }
-
-      //создание новой текстуры
-
-    TexturePtr texture (renderer->CreateTexture (image), false);
     
-      //добавление текстуры в кэш
+    /*
+      Если нужна генерация альфа-канала - генерируем канал таким образом, что все пикселы с цветом нижнего левого
+      имеют alpha = 0, а остальные - alpha = 255
+    */
+          
+    if (need_alpha_generation)
+    {           
+      #pragma pack(1)      
 
-    textures.insert_pair (file_name, texture);
+      struct RGBA
+      {
+        unsigned char red, green, blue, alpha;
+      };
 
-    return texture.get ();
+      RGBA* pixel       = reinterpret_cast<RGBA*> (image.Bitmap ());
+      RGBA  alpha_color = *pixel;
+      
+      for (size_t count=image.Width () * image.Height (); count--; pixel++)
+      {
+        if (pixel->red == alpha_color.red && pixel->green == alpha_color.green && pixel->blue == alpha_color.blue)
+          pixel->alpha = 0;
+        else
+          pixel->alpha = 255;
+      }
+      
+      has_alpha = true;
+    }
+    
+      //создание текстуры
+      
+    return TexturePtr (renderer->CreateTexture (image), false);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::render2d::Render::GetTexture(file_name='%s', renderer='%s')", file_name, renderer->GetDescription ());
+    exception.touch ("render::render2d::Render::CreateTexture(file_name='%s', renderer='%s')", file_name, renderer->GetDescription ());
     throw;
   }
 }
