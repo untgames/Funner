@@ -17,11 +17,9 @@ float -> const char*: fail (Bad item #1 type (string expected, got number)
     at script::lua::Stack::GetString)
 const char* -> const char*: ok
 stl::string -> const char*: ok
-int -> stl::string: fail (Bad item #1 type (userdata expected, got number)
-    at script::lua::Stack::GetVariant)
-float -> stl::string: fail (Bad item #1 type (userdata expected, got number)
-    at script::lua::Stack::GetVariant)
-const char* -> stl::string: fail (Bad item #1 type (userdata expected, got string)
-    at script::lua::Stack::GetVariant)
-stl::string -> stl::string: fail (Bad item #1 type (userdata expected, got string)
-    at script::lua::Stack::GetVariant)
+int -> stl::string: fail (Bad item #1 type (string expected, got number)
+    at script::lua::Stack::GetString)
+float -> stl::string: fail (Bad item #1 type (string expected, got number)
+    at script::lua::Stack::GetString)
+const char* -> stl::string: ok
+stl::string -> stl::string: ok

@@ -134,6 +134,9 @@ template <> struct argument_selector<bool>
   static bool get (IStack& stack, size_t index) { return stack.GetInteger (index) != 0; }
 };
 
+template <class Traits, class Allocator>
+struct argument_selector<stl::basic_string<char, Traits, Allocator> > : public string_argument_selector {};
+
 //взятие аргумента из стека
 template <class T>
 T get_argument (IStack& stack, size_t index)
