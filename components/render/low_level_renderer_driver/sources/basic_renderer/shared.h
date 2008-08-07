@@ -15,7 +15,7 @@
 #include <render/mid_level/low_level_driver.h>
 
 #include <shared/basic_renderer.h>
-#include <shared/2d_renderer.h>
+#include <shared/renderer2d.h>
 
 namespace render
 {

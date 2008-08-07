@@ -1,5 +1,5 @@
-#ifndef RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_2D_RENDERER_SHARED_HEADER
-#define RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_2D_RENDERER_SHARED_HEADER
+#ifndef RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_RENDERER2D_SHARED_HEADER
+#define RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_RENDERER2D_SHARED_HEADER
 
 #include <stl/algorithm>
 
@@ -14,7 +14,7 @@
 #include <render/low_level/utils.h>
 
 #include <shared/basic_renderer.h>
-#include <shared/2d_renderer.h>
+#include <shared/renderer2d.h>
 
 namespace render
 {
