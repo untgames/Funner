@@ -222,7 +222,7 @@ void draw_sprites (IDevice& device, const SpriteVertexData** first_sprite, const
       device.OSSetBlendState (blend_state);
 
       current_blend_state = blend_state;
-    }
+    }    
 
     device.Draw (render::low_level::PrimitiveType_TriangleList, base_sprite_index * 6, sprites_count * 6);
   }

@@ -134,6 +134,7 @@ struct SpriteVertexData
 
   SpriteVertex                     vertices [4];
   math::vec4f                      color;
+  float                            alpha_reference;
   render::low_level::ITexture*     texture;
   mid_level::renderer2d::BlendMode blend_mode;
 };
