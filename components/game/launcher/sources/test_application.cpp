@@ -328,6 +328,7 @@ TestApplication::TestApplication (const char* start_script_name)
 
     impl->shell = ShellPtr (new Shell ("lua", impl->environment));
 
+    bind_common_library      (*impl->environment);
     bind_math_library        (*impl->environment);
     bind_scene_graph_library (*impl->environment);
     bind_render_library      (*impl->environment);

@@ -3,4 +3,7 @@
   <material id="sprite_material">
     <sprite_profile image="data/textures/bottom.jpg" blend_mode="none"/>
   </material>
+  <material id="gun_material">
+    <sprite_profile image="data/textures/gun.bmp" blend_mode="alpha_clamp"/>
+  </material>
 </material_library>

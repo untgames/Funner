@@ -13,8 +13,9 @@ scene = Scene.Scene.Create ()
 
 sprite = Scene.Sprite.Create ()
 
-sprite.Material = "sprite_material"
+sprite.Material = "gun_material"
 sprite.Color = vec4 (1, 1, 1, 0.5)
+--sprite.AlphaReference = 0.5
 
 sprite:BindToScene (scene)
 
@@ -43,7 +44,7 @@ viewport.Camera = camera
 
 screen = Render.Screen.Create ()
 
-screen.BackgroundColor = vec4 (1, 1, 1, 1)
+screen.BackgroundColor = vec4 (0.3, 0.3, 0.3, 1)
 screen:Attach (viewport)
 
 Application.SetScreen (screen)
