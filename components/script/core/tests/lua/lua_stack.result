@@ -3,25 +3,25 @@ int -> int: ok
 float -> int: ok
 const char* -> int: fail (Bad item #1 type (number expected, got string)
     at script::lua::Stack::GetInteger)
-stl::string -> int: fail (Bad item #1 type (number expected, got userdata)
+stl::string -> int: fail (Bad item #1 type (number expected, got string)
     at script::lua::Stack::GetInteger)
 int -> float: ok
 float -> float: ok
 const char* -> float: fail (Bad item #1 type (number expected, got string)
     at script::lua::Stack::GetFloat)
-stl::string -> float: fail (Bad item #1 type (number expected, got userdata)
+stl::string -> float: fail (Bad item #1 type (number expected, got string)
     at script::lua::Stack::GetFloat)
 int -> const char*: fail (Bad item #1 type (string expected, got number)
     at script::lua::Stack::GetString)
 float -> const char*: fail (Bad item #1 type (string expected, got number)
     at script::lua::Stack::GetString)
 const char* -> const char*: ok
-stl::string -> const char*: fail (Bad item #1 type (string expected, got userdata)
-    at script::lua::Stack::GetString)
+stl::string -> const char*: ok
 int -> stl::string: fail (Bad item #1 type (userdata expected, got number)
     at script::lua::Stack::GetVariant)
 float -> stl::string: fail (Bad item #1 type (userdata expected, got number)
     at script::lua::Stack::GetVariant)
 const char* -> stl::string: fail (Bad item #1 type (userdata expected, got string)
     at script::lua::Stack::GetVariant)
-stl::string -> stl::string: ok
+stl::string -> stl::string: fail (Bad item #1 type (userdata expected, got string)
+    at script::lua::Stack::GetVariant)
