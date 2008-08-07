@@ -81,10 +81,10 @@ class RenderTarget: virtual public IRenderTarget, public Object
     render::low_level::IView* GetView () { return render_target_view.get (); } 
   
   private:
-    typedef xtl::com_ptr<render::low_level::IView> IViewPtr;
+    typedef xtl::com_ptr<render::low_level::IView> ViewPtr;
 
   private:
-    IViewPtr         render_target_view;
+    ViewPtr          render_target_view;
     RenderTargetType type;
 };
 

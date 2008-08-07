@@ -1,10 +1,37 @@
 #include "shared.h"
 
 using namespace render::mid_level;
+using namespace render::low_level;
 using namespace render::mid_level::renderer2d;
 using namespace render::mid_level::low_level_driver;
 using namespace render::mid_level::low_level_driver::renderer2d;
 using namespace media;
+
+/*
+===================================================================================================
+    Утилиты
+===================================================================================================
+*/
+
+namespace
+{
+
+render::low_level::PixelFormat get_pixel_format (media::PixelFormat format)
+{
+  switch (format)
+  {
+    case media::PixelFormat_RGB8:  return render::low_level::PixelFormat_RGB8;
+    case media::PixelFormat_RGBA8: return render::low_level::PixelFormat_RGBA8;
+    case media::PixelFormat_A8:
+    case media::PixelFormat_L8:    return render::low_level::PixelFormat_A8;
+    case media::PixelFormat_LA8:   return render::low_level::PixelFormat_LA8;
+    default:
+      throw xtl::format_not_supported_exception ("render::mid_level::low_level_driver::renderer2d::get_pixel_format",
+        "Unsupported image format %s", media::get_format_name (format));
+  }
+}
+
+}
 
 /*
 ===================================================================================================
@@ -16,11 +43,32 @@ using namespace media;
     Конструктор / деструктор
 */
 
-ImageTexture::ImageTexture (render::low_level::ITexture* in_texture)
-  : texture (in_texture)
+ImageTexture::ImageTexture (render::low_level::IDevice& device, const media::Image& image)
 {
-  if (!in_texture)
-    throw xtl::make_null_argument_exception ("render::mid_level::low_level_driver::ImageTexture::ImageTexture", "texture");
+  try
+  {
+    TextureDesc tex_desc;
+
+    memset (&tex_desc, 0, sizeof (tex_desc));
+
+    tex_desc.dimension            = TextureDimension_2D;
+    tex_desc.width                = image.Width ();
+    tex_desc.height               = image.Height ();
+    tex_desc.layers               = 1;
+    tex_desc.format               = get_pixel_format (image.Format ());
+    tex_desc.generate_mips_enable = true;
+    tex_desc.bind_flags           = BindFlag_Texture;
+    tex_desc.access_flags         = AccessFlag_ReadWrite;
+
+    texture = TexturePtr (device.CreateTexture (tex_desc), false);
+
+    texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, tex_desc.format, image.Bitmap ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::mid_level::low_level_driver::ImageTexture::ImageTexture");
+    throw;
+  }
 }
 
 /*
@@ -100,7 +148,53 @@ render::low_level::ITexture* ImageTexture::GetTexture ()
    Конструктор / деструктор
 */
 
-RenderTargetTexture::RenderTargetTexture (render::low_level::IView* render_target_view)
-  : RenderTarget (render_target_view, RenderTargetType_Color)
+RenderTargetTexture::RenderTargetTexture (render::low_level::IDevice& device, size_t width, size_t height, media::PixelFormat format)
+  : RenderTarget (CreateView (device, width, height, format).get (), RenderTargetType_Color)
 {
+}
+
+/*
+    Создание отображения
+*/
+
+RenderTargetTexture::ViewPtr RenderTargetTexture::CreateView
+ (render::low_level::IDevice& device,
+  size_t                      width,
+  size_t                      height,
+  media::PixelFormat          format)
+{
+  try
+  {
+      //срздание текстуры
+    
+    TextureDesc tex_desc;
+
+    memset (&tex_desc, 0, sizeof (tex_desc));
+    
+    tex_desc.dimension            = TextureDimension_2D;
+    tex_desc.width                = width;
+    tex_desc.height               = height;
+    tex_desc.layers               = 1;
+    tex_desc.format               = get_pixel_format (format);
+    tex_desc.generate_mips_enable = true;
+    tex_desc.bind_flags           = BindFlag_Texture | BindFlag_RenderTarget;
+    tex_desc.access_flags         = AccessFlag_ReadWrite;    
+    
+    typedef xtl::com_ptr<render::low_level::ITexture> TexturePtr;
+    
+    TexturePtr texture (device.CreateTexture (tex_desc), false);
+    
+      //создание отображения
+
+    ViewDesc view_desc;
+
+    memset (&view_desc, 0, sizeof (view_desc));
+
+    return ViewPtr (device.CreateView (texture.get (), view_desc), false);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::mid_level::low_level_driver::renderer2d::RenderTargetTexture::CreateView");
+    throw;
+  }  
 }

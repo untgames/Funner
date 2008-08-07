@@ -6,25 +6,6 @@ using namespace render::mid_level::renderer2d;
 using namespace render::mid_level::low_level_driver;
 using namespace render::mid_level::low_level_driver::renderer2d;
 
-namespace
-{
-
-render::low_level::PixelFormat get_pixel_format (media::PixelFormat format)
-{
-  switch (format)
-  {
-    case media::PixelFormat_RGB8:  return render::low_level::PixelFormat_RGB8;
-    case media::PixelFormat_RGBA8: return render::low_level::PixelFormat_RGBA8;
-    case media::PixelFormat_A8:
-    case media::PixelFormat_L8:    return render::low_level::PixelFormat_A8;
-    case media::PixelFormat_LA8:   return render::low_level::PixelFormat_LA8;
-    default:
-      throw xtl::format_operation_exception ("get_pixel_format", "Can't convert media format %s to render format.", media::get_format_name (format));
-  }
-}
-
-}
-
 /*
     Конструктор
 */
@@ -51,24 +32,7 @@ render::mid_level::renderer2d::ITexture* Renderer::CreateTexture (const media::I
 {
   try
   {
-    TextureDesc tex_desc;
-
-    memset (&tex_desc, 0, sizeof (tex_desc));
-
-    tex_desc.dimension            = TextureDimension_2D;
-    tex_desc.width                = image.Width ();
-    tex_desc.height               = image.Height ();
-    tex_desc.layers               = 1;
-    tex_desc.format               = get_pixel_format (image.Format ());
-    tex_desc.generate_mips_enable = true;
-    tex_desc.bind_flags           = BindFlag_Texture;
-    tex_desc.access_flags         = AccessFlag_ReadWrite;
-
-    xtl::com_ptr<render::low_level::ITexture> texture (device->CreateTexture (tex_desc), false);
-
-    texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, tex_desc.format, image.Bitmap ());
-
-    return new ImageTexture (texture.get ());
+    return new ImageTexture (*device, image);
   }
   catch (xtl::exception& exception)
   {
@@ -81,24 +45,7 @@ render::mid_level::renderer2d::ITexture* Renderer::CreateTexture (size_t width, 
 {
   try
   {
-    TextureDesc tex_desc;
-
-    memset (&tex_desc, 0, sizeof (tex_desc));
-    
-    tex_desc.dimension            = TextureDimension_2D;
-    tex_desc.width                = width;
-    tex_desc.height               = height;
-    tex_desc.layers               = 1;
-    tex_desc.format               = get_pixel_format (pixel_format);
-    tex_desc.generate_mips_enable = true;
-    tex_desc.bind_flags           = BindFlag_Texture | BindFlag_RenderTarget;
-    tex_desc.access_flags         = AccessFlag_ReadWrite;    
-
-    ViewDesc view_desc;
-    
-    memset (&view_desc, 0, sizeof (view_desc));
-    
-    return new RenderTargetTexture (device->CreateView (device->CreateTexture (tex_desc), view_desc));
+    return new RenderTargetTexture (*device, width, height, pixel_format);
   }
   catch (xtl::exception& exception)
   {
