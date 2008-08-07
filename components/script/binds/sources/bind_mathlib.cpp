@@ -515,6 +515,24 @@ void bind_quat_library (InvokerRegistry& quat_lib)
   quat_lib.Register ("inner",       make_invoker<T (quat_type, quat_type)> (&math::inner<T>));
 }
 
+/*
+    Регистрация общих функций
+*/
+
+//получение знака
+float get_sign (float x)
+{
+  if (x < 0.0f) return -1.0f;
+  if (x > 0.0f) return 1.0f;
+  
+  return 0.0f;
+}
+
+void bind_math_common_library (InvokerRegistry& lib)
+{
+  lib.Register ("sign", make_invoker (&get_sign));
+}
+
 }
 
 namespace script
@@ -541,6 +559,7 @@ void bind_math_library (Environment& environment)
   
     //регистрация библиотек
   
+  bind_math_common_library   (math_lib);
   bind_vec_library<float, 2> (vec2_lib);
   bind_vec_library<float, 3> (vec3_lib);
   bind_vec_library<float, 4> (vec4_lib);     

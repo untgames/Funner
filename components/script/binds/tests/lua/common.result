@@ -1,3 +1,4 @@
 Results of common_test:
 Test library:
 File data: 'Hello world!'
+Filtered file data: 'Hello world!Hello world!Hello world!'
