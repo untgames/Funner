@@ -43,6 +43,7 @@ class DriverManagerImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     void RegisterDriver   (const char* name, IDriver* driver);
     void UnregisterDriver (const char* name);
+    void UnregisterAllDrivers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск драйвера по имени
@@ -72,7 +73,7 @@ class DriverManagerImpl
   private:
     typedef xtl::com_ptr<IDriver>      DriverPtr;
     typedef stl::hash_map<stl::string, DriverPtr> DriverMap;
-    
+
   private:
     DriverMap drivers; //карта драйверов
 };
@@ -123,6 +124,11 @@ void DriverManagerImpl::UnregisterDriver (const char* name)
     return;
     
   drivers.erase (name);
+}
+
+void DriverManagerImpl::UnregisterAllDrivers ()
+{
+  drivers.clear ();
 }
 
 /*
@@ -216,6 +222,11 @@ void DriverManager::RegisterDriver (const char* name, IDriver* driver)
 void DriverManager::UnregisterDriver (const char* name)
 {
   DriverManagerSingleton::Instance ().UnregisterDriver (name);
+}
+
+void DriverManager::UnregisterAllDrivers ()
+{
+  DriverManagerSingleton::Instance ().UnregisterAllDrivers ();
 }
 
 IDriver* DriverManager::FindDriver (const char* name)

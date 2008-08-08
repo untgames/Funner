@@ -39,7 +39,14 @@ class LowLevelDriver
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация систем рендернинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterRenderer       (const char* name, low_level::IDevice* device, low_level::ISwapChain* swap_chain);
+    static void RegisterRenderer (const char*             name,              //имя системы рендеринга
+                                  low_level::IDevice*     device,            //устройство рендеринга
+                                  size_t                  swap_chains_count, //количество цепочек обмена
+                                  low_level::ISwapChain** swap_chains);      //указатель на массив цепочек обмена
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Отмена регистрации
+///////////////////////////////////////////////////////////////////////////////////////////////////
     static void UnregisterRenderer     (const char* name);
     static void UnregisterAllRenderers ();
 };

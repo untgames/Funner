@@ -13,7 +13,7 @@ scene = Scene.Scene.Create ()
 
 sprite = Scene.Sprite.Create ()
 
-sprite.Material = "sprite_material"
+sprite.Material = "gun_material"
 sprite.Color = vec4 (1, 1, 1, 0.5)
 --sprite.AlphaReference = 0.5
 

@@ -150,7 +150,7 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
 
       RenderPathManager*                render_path_manager = manager.RenderPathManager ();
       mid_level::IRenderer*             renderer            = render_path_manager ? render_path_manager->Renderer () : 0;
-      render::mid_level::IRenderTarget* render_target       = renderer->GetColorBuffer (); //заменить в будущем на attachment!!!
+      render::mid_level::IRenderTarget* render_target       = renderer->GetColorBuffer (0); //заменить в будущем на attachment!!!
       
       if (render_target)
       {
@@ -306,8 +306,8 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
 
           clear_frame = ClearFramePtr (renderer.CreateClearFrame (), false);
 
-          render::mid_level::IRenderTarget *render_target        = renderer.GetColorBuffer (),
-                                           *depth_stencil_target = renderer.GetDepthStencilBuffer ();
+          render::mid_level::IRenderTarget *render_target        = renderer.GetColorBuffer (0),
+                                           *depth_stencil_target = renderer.GetDepthStencilBuffer (0);
 
           clear_frame->SetRenderTargets (render_target, depth_stencil_target);
           clear_frame->SetFlags         (render::mid_level::ClearFlag_All);

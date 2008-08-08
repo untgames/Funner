@@ -216,8 +216,11 @@ struct TestApplication::Impl
       
       //создание системы визуализации среднего уровня
       
-    render::mid_level::LowLevelDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, device.get (), swap_chain.get ());
-    
+    render::low_level::ISwapChain* swap_chains []    = {swap_chain.get ()};
+    size_t                         swap_chains_count = sizeof (swap_chains) / sizeof (*swap_chains);
+
+    render::mid_level::LowLevelDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, device.get (), swap_chains_count, swap_chains);          
+
       //инициализация рендера
 
     render.SetLogHandler (&log_print);

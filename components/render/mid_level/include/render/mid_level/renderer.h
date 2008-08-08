@@ -135,22 +135,21 @@ class IRenderer: virtual public IObject
     virtual const char* GetDescription () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Внутренний идентификатор пула ресурсов
-///  (необходим для совместного использования ресурсов, созданных на разных IRenderer)
+///Количество буферов кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t GetResourcePoolId () = 0;
+    virtual size_t GetFrameBuffersCount () = 0;    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение буфера цвета и буфера попиксельного отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IRenderTarget* GetColorBuffer () = 0;
-    virtual IRenderTarget* GetDepthStencilBuffer () = 0;
+    virtual IRenderTarget* GetColorBuffer        (size_t frame_buffer_index) = 0;
+    virtual IRenderTarget* GetDepthStencilBuffer (size_t frame_buffer_index) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IRenderTarget* CreateDepthStencilBuffer () = 0;
-    virtual IRenderTarget* CreateRenderBuffer       () = 0;
+    virtual IRenderTarget* CreateDepthStencilBuffer (size_t width, size_t height) = 0;
+    virtual IRenderTarget* CreateRenderBuffer       (size_t width, size_t height) = 0;
     virtual IClearFrame*   CreateClearFrame         () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

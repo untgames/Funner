@@ -171,7 +171,7 @@ class DriverManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void RegisterDriver       (const char* name, IDriver* driver);
     static void UnregisterDriver     (const char* name);
-    static void UnregisterAllDrivers (); //FIXME: need implement
+    static void UnregisterAllDrivers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск драйвера по имени

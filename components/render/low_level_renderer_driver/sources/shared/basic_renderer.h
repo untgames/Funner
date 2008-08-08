@@ -145,9 +145,10 @@ class BasicRenderer: virtual public IRenderer, public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    BasicRenderer (render::low_level::IDevice* device, render::low_level::ISwapChain* swap_chain);
+    BasicRenderer  (low_level::IDevice* device, size_t swap_chains_count, low_level::ISwapChain** swap_chains);
+    ~BasicRenderer ();
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание
@@ -155,22 +156,21 @@ class BasicRenderer: virtual public IRenderer, public Object
     const char* GetDescription ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Внутренний идентификатор пула ресурсов
-///  (необходим для совместного использования ресурсов, созданных на разных IRenderer)
+///Количество буферов кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetResourcePoolId ();
+    size_t GetFrameBuffersCount ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение буфера цвета и буфера попиксельного отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IRenderTarget* GetColorBuffer ();
-    IRenderTarget* GetDepthStencilBuffer ();
+    IRenderTarget* GetColorBuffer        (size_t frame_buffer_index);
+    IRenderTarget* GetDepthStencilBuffer (size_t frame_buffer_index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IRenderTarget* CreateDepthStencilBuffer ();
-    IRenderTarget* CreateRenderBuffer       ();
+    IRenderTarget* CreateDepthStencilBuffer (size_t width, size_t height);
+    IRenderTarget* CreateRenderBuffer       (size_t width, size_t height);
     IClearFrame*   CreateClearFrame         ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,25 +182,29 @@ class BasicRenderer: virtual public IRenderer, public Object
 ///Конец отрисовки / сброс отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void DrawFrames   ();
-    void CancelFrames ();    
-    
-  private:
-    typedef xtl::com_ptr<IRenderTarget>                 RenderTargetPtr;
-    typedef xtl::com_ptr<render::low_level::IDevice>    DevicePtr;
-    typedef xtl::com_ptr<render::low_level::ISwapChain> SwapChainPtr;
-    typedef xtl::com_ptr<BasicFrame>                    FramePtr;
-    typedef stl::vector<FramePtr>                       FrameArray;
+    void CancelFrames ();
 
   protected:
+    typedef xtl::com_ptr<render::low_level::IDevice> DevicePtr;  
+
     DevicePtr device;
 
   private:
-    RenderTargetPtr color_buffer;
-    RenderTargetPtr depth_stencil_buffer;
-    SwapChainPtr    swap_chain;
-    FrameArray      frames;
-    size_t          resource_pool_id;
+    struct FrameBuffer;
+
+    typedef xtl::intrusive_ptr<BasicFrame> FramePtr;
+    typedef stl::vector<FramePtr>          FrameArray;
+    typedef stl::vector<FrameBuffer>       FrameBufferArray;
+
+  private:
+    FrameBufferArray frame_buffers; //массив буферов кадра
+    FrameArray       frames;        //массив кадров
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание системы рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+IRenderer* create_renderer2d (low_level::IDevice* device, size_t swap_chains_count, low_level::ISwapChain** swap_chains);
 
 }
 

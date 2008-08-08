@@ -21,8 +21,8 @@ const size_t FRAME_ARRAY_RESERVE_SIZE = 128; //резервируемое число кадров
 BasicRenderer::BasicRenderer ()  
   : frame_id (0)
 {
-  color_buffer         = RenderTargetPtr (CreateRenderBuffer (), false);
-  depth_stencil_buffer = RenderTargetPtr (CreateDepthStencilBuffer (), false);  
+  color_buffer         = RenderTargetPtr (CreateRenderBuffer (SCREEN_WIDTH, SCREEN_HEIGHT), false);
+  depth_stencil_buffer = RenderTargetPtr (CreateDepthStencilBuffer (SCREEN_WIDTH, SCREEN_HEIGHT), false);  
   
   frames.reserve (FRAME_ARRAY_RESERVE_SIZE);
 }
@@ -37,26 +37,31 @@ const char* BasicRenderer::GetDescription ()
 }
 
 /*
-    Внутренний идентификатор пула ресурсов
-      (необходим для совместного использования ресурсов, созданных на разных IBasicRenderer)    
+    Количество буферов кадра
 */
 
-size_t BasicRenderer::GetResourcePoolId ()
+size_t BasicRenderer::GetFrameBuffersCount ()
 {
-  return 0;
+  return 1;
 }
 
 /*
     Получение буфера цвета и буфера попиксельного отсечения
 */
 
-IRenderTarget* BasicRenderer::GetColorBuffer ()
+IRenderTarget* BasicRenderer::GetColorBuffer (size_t frame_buffer_index)
 {
+  if (frame_buffer_index)
+    throw xtl::make_range_exception ("render::mid_level::debug::BasicRenderer::GetColorBuffer", "frame_buffer_index", frame_buffer_index, 1u);
+
   return color_buffer.get ();
 }
 
-IRenderTarget* BasicRenderer::GetDepthStencilBuffer ()
+IRenderTarget* BasicRenderer::GetDepthStencilBuffer (size_t frame_buffer_index)
 {
+  if (frame_buffer_index)
+    throw xtl::make_range_exception ("render::mid_level::debug::BasicRenderer::GetDepthStencilBuffer", "frame_buffer_index", frame_buffer_index, 1u);
+
   return depth_stencil_buffer.get ();
 }
 
@@ -64,14 +69,14 @@ IRenderTarget* BasicRenderer::GetDepthStencilBuffer ()
     Создание ресурсов
 */
 
-IRenderTarget* BasicRenderer::CreateDepthStencilBuffer ()
+IRenderTarget* BasicRenderer::CreateDepthStencilBuffer (size_t width, size_t height)
 {
-  return new RenderTarget (SCREEN_WIDTH, SCREEN_HEIGHT, RenderTargetType_DepthStencil);
+  return new RenderTarget (width, height, RenderTargetType_DepthStencil);
 }
 
-IRenderTarget* BasicRenderer::CreateRenderBuffer ()
+IRenderTarget* BasicRenderer::CreateRenderBuffer (size_t width, size_t height)
 {
-  return new RenderTarget (SCREEN_WIDTH, SCREEN_HEIGHT, RenderTargetType_Color);
+  return new RenderTarget (width, height, RenderTargetType_Color);
 }
 
 IClearFrame* BasicRenderer::CreateClearFrame ()

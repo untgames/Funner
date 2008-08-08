@@ -212,9 +212,12 @@ TestApplication::TestApplication ()
       impl->swap_chain, impl->device);
       
       //создание системы визуализации среднего уровня
-      
-    render::mid_level::LowLevelDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, impl->device.get (), impl->swap_chain.get ());
-    
+
+    render::low_level::ISwapChain* swap_chains []    = {impl->swap_chain.get ()};
+    size_t                         swap_chains_count = sizeof (swap_chains) / sizeof (*swap_chains);
+
+    render::mid_level::LowLevelDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, impl->device.get (), swap_chains_count, swap_chains);
+
       //инициализация рендера
 
     impl->render.SetLogHandler (&log_print);

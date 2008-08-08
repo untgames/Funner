@@ -185,7 +185,7 @@ void RenderView::UpdateClearFrame ()
     
     clear_frame = ClearFramePtr (renderer.CreateClearFrame (), false);
 
-    clear_frame->SetRenderTargets (renderer.GetColorBuffer (), renderer.GetDepthStencilBuffer ()); ////изменить!!!
+    clear_frame->SetRenderTargets (renderer.GetColorBuffer (0), renderer.GetDepthStencilBuffer (0)); ////изменить!!!
     clear_frame->SetFlags         (render::mid_level::ClearFlag_All | render::mid_level::ClearFlag_ViewportOnly);    
   }
   

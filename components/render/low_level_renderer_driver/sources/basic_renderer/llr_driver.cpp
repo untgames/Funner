@@ -20,16 +20,15 @@ const char* DRIVER_NAME = "LowLevel"; //имя драйвера
 
 struct Driver::RendererEntry
 {
-  stl::string                                 renderer_name;
-  xtl::com_ptr<render::low_level::IDevice>    device;
-  xtl::com_ptr<render::low_level::ISwapChain> swap_chain;
-  xtl::com_ptr<BasicRenderer>                 renderer;
+  stl::string             renderer_name;
+  xtl::com_ptr<IRenderer> renderer;
 
-  RendererEntry (const char* in_renderer_name, render::low_level::IDevice* in_device, render::low_level::ISwapChain* in_swap_chain)
+  RendererEntry (const char*                     in_renderer_name,
+                 render::low_level::IDevice*     device,
+                 size_t                          swap_chains_count,
+                 render::low_level::ISwapChain** swap_chains)
     : renderer_name (in_renderer_name),
-      device (in_device),
-      swap_chain (in_swap_chain),
-      renderer (new renderer2d::Renderer (in_device, in_swap_chain))
+      renderer (create_renderer2d (device, swap_chains_count, swap_chains), false)
     {}
 };
 
@@ -73,7 +72,7 @@ const char* Driver::GetRendererName (size_t index)
 }
 
 /*
-    Создание устройства визуализации
+    Создание системы визуализации
 */
 
 IRenderer* Driver::CreateRenderer (const char* name)
@@ -85,7 +84,11 @@ IRenderer* Driver::CreateRenderer (const char* name)
     
   for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
     if (!xtl::xstrcmp ((*iter)->renderer_name.c_str (), name))
+    {
+      (*iter)->renderer->AddRef ();
+
       return (*iter)->renderer.get ();
+    }
 
   throw xtl::make_argument_exception (METHOD_NAME, "name", name);
 }
@@ -94,24 +97,22 @@ IRenderer* Driver::CreateRenderer (const char* name)
    Регистрация систем рендернинга
 */
 
-void Driver::RegisterRenderer (const char* name, render::low_level::IDevice* device, render::low_level::ISwapChain* swap_chain)
+void Driver::RegisterRenderer
+ (const char*                     name,
+  render::low_level::IDevice*     device,
+  size_t                          swap_chains_count,
+  render::low_level::ISwapChain** swap_chains)
 {
   static const char* METHOD_NAME = "render::mid_level::low_level_driver::Driver::RegisterRenderer";
 
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
-  if (!device)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "device");
-
-  if (!swap_chain)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");
-
   for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
     if (!xtl::xstrcmp ((*iter)->renderer_name.c_str (), name))
       throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Name already registered");
 
-  renderer_entries.push_back (RendererEntryPtr (new RendererEntry (name, device, swap_chain)));
+  renderer_entries.push_back (RendererEntryPtr (new RendererEntry (name, device, swap_chains_count, swap_chains)));
 
   if (renderer_entries.size () == 1)
     DriverManager::RegisterDriver (DRIVER_NAME, this);
@@ -182,9 +183,13 @@ IDriver* LowLevelDriver::Driver ()
    Регистрация систем рендернинга
 */
 
-void LowLevelDriver::RegisterRenderer (const char* name, render::low_level::IDevice* device, render::low_level::ISwapChain* swap_chain)
+void LowLevelDriver::RegisterRenderer
+ (const char*                     name,
+  render::low_level::IDevice*     device,
+  size_t                          swap_chains_count,
+  render::low_level::ISwapChain** swap_chains)
 {
-  LowLevelDriverSingleton::Instance ().RegisterRenderer (name, device, swap_chain);
+  LowLevelDriverSingleton::Instance ().RegisterRenderer (name, device, swap_chains_count, swap_chains);
 }
 
 void LowLevelDriver::UnregisterRenderer (const char* name)

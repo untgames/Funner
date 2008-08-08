@@ -15,7 +15,6 @@
 #include <render/mid_level/low_level_driver.h>
 
 #include <shared/basic_renderer.h>
-#include <shared/renderer2d.h>
 
 namespace render
 {
@@ -94,14 +93,18 @@ class Driver: virtual public IDriver
     const char* GetRendererName   (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание устройства визуализации
+///Создание системы визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IRenderer* CreateRenderer (const char* name);    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация систем рендернинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterRenderer       (const char* name, render::low_level::IDevice* device, render::low_level::ISwapChain* swap_chain);
+    void RegisterRenderer (const char*             name,
+                           low_level::IDevice*     device,
+                           size_t                  swap_chains_count,
+                           low_level::ISwapChain** swap_chains);
+
     void UnregisterRenderer     (const char* name);
     void UnregisterAllRenderers ();
 

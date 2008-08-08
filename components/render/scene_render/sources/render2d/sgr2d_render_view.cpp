@@ -62,7 +62,7 @@ RenderView::RenderView (Scene* in_scene, Render* in_render)
     
     frame = FramePtr (renderer.CreateFrame (), false);
 
-    frame->SetRenderTargets  (renderer.GetColorBuffer (), renderer.GetDepthStencilBuffer ());    
+    frame->SetRenderTargets  (renderer.GetColorBuffer (0), renderer.GetDepthStencilBuffer (0));
   }
   catch (xtl::exception& exception)
   {

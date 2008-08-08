@@ -2,47 +2,121 @@
 
 using namespace render::mid_level;
 using namespace render::mid_level::low_level_driver;
+using namespace render::low_level;
+
+namespace
+{
 
 /*
     Константы
 */
 
-namespace
-{
-
 const size_t FRAME_ARRAY_RESERVE_SIZE = 128; //резервируемое число кадров
+
+/*
+    Переопределения типов
+*/
+
+typedef xtl::intrusive_ptr<RenderTarget> RenderTargetPtr;
+typedef xtl::com_ptr<ISwapChain>         SwapChainPtr;
+typedef xtl::com_ptr<ITexture>           TexturePtr;
+typedef xtl::com_ptr<IView>              ViewPtr;
 
 }
 
 /*
-    Конструктор
+    Буфер кадра
 */
 
-BasicRenderer::BasicRenderer (render::low_level::IDevice* in_device, render::low_level::ISwapChain* in_swap_chain)
-  : device (in_device), swap_chain (in_swap_chain)
+struct BasicRenderer::FrameBuffer
 {
-  static const char* METHOD_NAME = "render::mid_level::low_level_driver::BasicRenderer::BasicRenderer";
+  SwapChainPtr    swap_chain;           //цепочка обмена
+  RenderTargetPtr color_buffer;         //буфер цвета
+  RenderTargetPtr depth_stencil_buffer; //буфер попиксельного отсечения
 
-  if (!in_device)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "device");
-
-  if (!in_swap_chain)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");
-
-  static size_t free_pool_id = 1;
-
-  resource_pool_id = free_pool_id++;
-
-  if (!free_pool_id)
+  BasicRenderer::FrameBuffer::FrameBuffer (IDevice& device, ISwapChain& in_swap_chain) : swap_chain (&in_swap_chain)
   {
-    --free_pool_id;
-    throw xtl::format_operation_exception (METHOD_NAME, "No free resource pool");
-  }
-  
-  color_buffer         = RenderTargetPtr (CreateRenderBuffer (), false);
-  depth_stencil_buffer = RenderTargetPtr (CreateDepthStencilBuffer (), false);  
+    try
+    {
+        //получение дескриптора цепочки обмена
 
-  frames.reserve (FRAME_ARRAY_RESERVE_SIZE);
+      SwapChainDesc swap_chain_desc;
+
+      swap_chain->GetDesc (swap_chain_desc);
+      
+      TexturePtr texture;
+      ViewPtr    view;
+      ViewDesc   view_desc;
+
+      memset (&view_desc, 0, sizeof view_desc);
+      
+        //создание буфера цвета
+
+      texture      = TexturePtr (device.CreateRenderTargetTexture (swap_chain.get (), swap_chain_desc.buffers_count ? 1 : 0), false);
+      view         = ViewPtr (device.CreateView (texture.get (), view_desc), false);
+      color_buffer = RenderTargetPtr (new RenderTarget (view.get (), RenderTargetType_Color), false);
+      
+        //создание буфера попиксельного отсечения
+
+      texture              = TexturePtr (device.CreateDepthStencilTexture (swap_chain.get ()), false);
+      view                 = ViewPtr (device.CreateView (texture.get (), view_desc), false);
+      depth_stencil_buffer = RenderTargetPtr (new RenderTarget (view.get (), RenderTargetType_DepthStencil), false);
+    }
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("render::mid_level::low_level_driver::BasicRenderer::BasicRenderer::FrameBuffer");
+      throw;
+    }
+  }
+};
+
+/*
+    Конструктор / деструктор
+*/
+
+BasicRenderer::BasicRenderer (IDevice* in_device, size_t swap_chains_count, ISwapChain** swap_chains)
+  : device (in_device)
+{
+  try
+  {
+      //проверка аргументов
+
+    if (!in_device)
+      throw xtl::make_null_argument_exception ("", "device");
+
+    if (!swap_chains_count)
+      throw xtl::make_null_argument_exception ("", "swap_chains_count");
+
+    if (!swap_chains)
+      throw xtl::make_null_argument_exception ("", "swap_chains");
+
+      //создание буферов кадра
+
+    frame_buffers.reserve (swap_chains_count);
+
+    for (size_t i=0; i<swap_chains_count; i++)
+    {
+      ISwapChain* swap_chain = swap_chains [i];
+
+      if (!swap_chain)
+        throw xtl::format_exception<xtl::null_argument_exception> ("", "Null argument 'swap_chains[%u]'", i);
+
+      frame_buffers.push_back (FrameBuffer (*device, *swap_chain));
+    }
+
+      //резервирование памяти для хранения визуализируемых кадров
+
+    frames.reserve (FRAME_ARRAY_RESERVE_SIZE);    
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::mid_level::low_level_driver::BasicRenderer::BasicRenderer");
+    throw;
+  }
+}
+
+BasicRenderer::~BasicRenderer ()
+{
 }
 
 /*
@@ -55,67 +129,97 @@ const char* BasicRenderer::GetDescription ()
 }
 
 /*
-    Внутренний идентификатор пула ресурсов
-      (необходим для совместного использования ресурсов, созданных на разных IBasicRenderer)    
+    Количество буферов кадра
 */
 
-size_t BasicRenderer::GetResourcePoolId ()
+size_t BasicRenderer::GetFrameBuffersCount ()
 {
-  return resource_pool_id;
+  return frame_buffers.size ();
 }
 
 /*
     Получение буфера цвета и буфера попиксельного отсечения
 */
 
-IRenderTarget* BasicRenderer::GetColorBuffer ()
+IRenderTarget* BasicRenderer::GetColorBuffer (size_t index)
 {
-  return color_buffer.get ();
+  if (index)
+    throw xtl::make_range_exception ("render::mid_level::low_level_driver::BasicRenderer::GetColorBuffer", "index", index, frame_buffers.size ());
+
+  return frame_buffers [index].color_buffer.get ();
 }
 
-IRenderTarget* BasicRenderer::GetDepthStencilBuffer ()
+IRenderTarget* BasicRenderer::GetDepthStencilBuffer (size_t index)
 {
-  return depth_stencil_buffer.get ();
+  if (index)
+    throw xtl::make_range_exception ("render::mid_level::low_level_driver::BasicRenderer::GetDepthStencilBuffer", "index", index, frame_buffers.size ());
+
+  return frame_buffers [index].depth_stencil_buffer.get ();
 }
 
 /*
     Создание ресурсов
 */
 
-IRenderTarget* BasicRenderer::CreateDepthStencilBuffer ()
+namespace
 {
-  using namespace render::low_level;
 
-  xtl::com_ptr<ITexture> depth_stencil_texture (device->CreateDepthStencilTexture (swap_chain.get ()), false);
+//создание целевого буфера рендеринга
+RenderTarget* create_render_target (IDevice& device, size_t width, size_t height, RenderTargetType type)
+{
+    //создание текстуры
 
-  ViewDesc depth_stencil_view_desc;
-
-  memset (&depth_stencil_view_desc, 0, sizeof (depth_stencil_view_desc));
-
-  depth_stencil_view_desc.layer     = 0;
-  depth_stencil_view_desc.mip_level = 0;
-
-  xtl::com_ptr<IView> depth_stencil_view (device->CreateView (depth_stencil_texture.get (), depth_stencil_view_desc), false);
+  TextureDesc texture_desc;
   
-  return new RenderTarget (depth_stencil_view.get (), RenderTargetType_DepthStencil);
+  memset (&texture_desc, 0, sizeof texture_desc);
+  
+  texture_desc.dimension            = TextureDimension_2D;
+  texture_desc.width                = width;
+  texture_desc.height               = height;
+  texture_desc.layers               = 1;
+  texture_desc.generate_mips_enable = true;
+  texture_desc.usage_mode           = UsageMode_Default;
+
+  switch (type)
+  {
+    default:
+    case RenderTargetType_Color:
+      texture_desc.format     = PixelFormat_RGBA8;
+      texture_desc.bind_flags = BindFlag_RenderTarget;
+
+      break;
+    case RenderTargetType_DepthStencil:
+      texture_desc.format     = PixelFormat_D24S8;
+      texture_desc.bind_flags = BindFlag_DepthStencil;
+
+      break;
+  }
+
+  TexturePtr texture (device.CreateTexture (texture_desc), false);
+
+    //создание отображения
+
+  ViewDesc view_desc;
+
+  memset (&view_desc, 0, sizeof view_desc);
+
+  ViewPtr view (device.CreateView (texture.get (), view_desc), false);
+
+    //создание целевого буфера рендеринга
+
+  return new RenderTarget (view.get (), type);
 }
 
-IRenderTarget* BasicRenderer::CreateRenderBuffer ()
+}
+
+IRenderTarget* BasicRenderer::CreateDepthStencilBuffer (size_t width, size_t height)
 {
-  using namespace render::low_level;
+  return create_render_target (*device, width, height, RenderTargetType_DepthStencil);
+}
 
-  xtl::com_ptr<ITexture> render_target_texture (device->CreateRenderTargetTexture (swap_chain.get (), 1), false);
-
-  ViewDesc render_target_view_desc;
-
-  memset (&render_target_view_desc, 0, sizeof (render_target_view_desc));
-
-  render_target_view_desc.layer     = 0;
-  render_target_view_desc.mip_level = 0;
-
-  xtl::com_ptr<IView> render_target_view (device->CreateView (render_target_texture.get (), render_target_view_desc), false);
-  
-  return new RenderTarget (render_target_view.get (), RenderTargetType_Color);
+IRenderTarget* BasicRenderer::CreateRenderBuffer (size_t width, size_t height)
+{
+  return create_render_target (*device, width, height, RenderTargetType_Color);
 }
 
 IClearFrame* BasicRenderer::CreateClearFrame ()
@@ -163,9 +267,10 @@ void BasicRenderer::DrawFrames ()
 
   frames.clear ();
 
-    //вывод сформированной картинки    
-
-  swap_chain->Present ();
+    //вывод сформированной картинки
+    
+  for (FrameBufferArray::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)
+    iter->swap_chain->Present ();
 }
 
 void BasicRenderer::CancelFrames ()

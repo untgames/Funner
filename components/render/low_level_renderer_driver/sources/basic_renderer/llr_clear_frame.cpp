@@ -1,7 +1,6 @@
 #include "shared.h"
 
 using namespace render::mid_level;
-using namespace render::mid_level::renderer2d;
 using namespace render::mid_level::low_level_driver;
 
 /*

@@ -10,8 +10,8 @@ using namespace render::mid_level::low_level_driver::renderer2d;
     Конструктор
 */
 
-Renderer::Renderer (render::low_level::IDevice* device, render::low_level::ISwapChain* swap_chain)
-  : BasicRenderer (device, swap_chain)
+Renderer::Renderer (IDevice* device, size_t swap_chains_count, ISwapChain** swap_chains)
+  : BasicRenderer (device, swap_chains_count, swap_chains)
 {
   try
   {
@@ -62,4 +62,28 @@ render::mid_level::renderer2d::IPrimitive* Renderer::CreatePrimitive ()
 render::mid_level::renderer2d::IFrame* Renderer::CreateFrame ()
 {
   return new Frame (common_resources.get (), device.get ());
+}
+
+/*
+    Создание системы рендеринга
+*/
+
+namespace render
+{
+
+namespace mid_level
+{
+
+namespace low_level_driver
+{
+
+IRenderer* create_renderer2d (IDevice* device, size_t swap_chains_count, ISwapChain** swap_chains)
+{
+  return new Renderer (device, swap_chains_count, swap_chains);
+}
+
+}
+
+}
+
 }
