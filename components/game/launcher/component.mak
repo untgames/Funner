@@ -22,6 +22,7 @@ GAME.LAUNCHER.SOURCES.IMPORTS       := ../../system/link.static.mak ../../system
                                        ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
                                        ../../media/rfx/xmtl.link.static.mak ../../media/sound/snddecl.link.static.mak \
                                        ../../media/sound/default_decoders.link.static.mak \
+                                       ../../media/font/link.static.mak ../../media/font/xfont.link.static.mak \
                                        ../../common/compile.static.mak \
                                        ../../script/binds/compile.static.mak ../../script/binds/link.static.mak \
                                        ../../script/core/compile.static.mak ../../script/core/link.static.mak ../../script/core/lua.link.static.mak \

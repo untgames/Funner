@@ -13,7 +13,7 @@ scene = Scene.Scene.Create ()
 
 sprite = Scene.Sprite.Create ()
 
-sprite.Material = "gun_material"
+sprite.Material = "sprite_material"
 sprite.Color = vec4 (1, 1, 1, 0.5)
 --sprite.AlphaReference = 0.5
 
@@ -32,7 +32,7 @@ camera.ZFar = 10
 
 camera:BindToScene (scene)
 
-Application.InitRender () --необходимо вызывать до Application.SetScreen (screen)
+Application.InitRender () --эхюсїюфшью т√ч√трЄ№ фю Application.SetScreen (screen)
 
 viewport = Render.Viewport.Create ()
 
@@ -58,7 +58,17 @@ Application.SetListener (listener1)
 sound_emitter1 = Scene.SoundEmitter.Create ("gorilka")
 
 sound_emitter1:BindToParent (sprite)
-sound_emitter1:Play ()
+--sound_emitter1:Play ()
+
+text_line = Scene.TextLine.Create ()
+
+text_line.Text = "\"UNT - ЄрЁрЁрь!\" AV"
+text_line.Font = "data/fonts/font.xfont"
+text_line.Color = vec4 (0, 0, 1, 1)
+text_line:SetAlignment (Scene_TextLineAlignment.Center, Scene_TextLineAlignment.Center)
+--text_line:SetPosition (-5, 1, 0)
+
+text_line:BindToScene (scene)
 
 function onBeginMove(ort)
   velocity [ort] = velocity [ort] + 1
