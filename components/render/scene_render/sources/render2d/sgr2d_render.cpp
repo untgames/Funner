@@ -156,6 +156,27 @@ SpriteMaterial* Render::GetMaterial (const char* name)
   throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Material not found");
 }
 
+RenderableFont* Render::GetFont (const char* name)
+{
+  static const char* METHOD_NAME = "render::render2d::Render::GetFont";
+
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+    //попытка найти объект в кэше
+
+  RenderableFontMap::iterator iter = fonts.find (name);
+
+  if (iter != fonts.end ())
+    return iter->second.get ();
+
+  RenderableFontPtr new_font = RenderableFontPtr (new RenderableFont (name, *this));
+
+  fonts[name] = new_font;
+
+  return fonts[name].get ();
+}
+
 /*
     Работа с кэшем
 */
@@ -172,6 +193,24 @@ Renderable* Render::GetRenderable (scene_graph::SpriteModel* entity)
     //создание нового спрайта
 
   RenderablePtr renderable (new RenderableSpriteModel (entity, *this), false);
+
+  InsertRenderable (entity, renderable);
+
+  return &*renderable;
+}
+
+Renderable* Render::GetRenderable (scene_graph::TextLine* entity)
+{
+    //попытка найти объект в кэше
+
+  RenderableMap::iterator iter = renderables_cache.find (entity);
+  
+  if (iter != renderables_cache.end ())
+    return iter->second.renderable.get ();
+
+    //создание нового спрайта
+
+  RenderablePtr renderable (new RenderableTextLine (entity, *this), false);
 
   InsertRenderable (entity, renderable);
 
@@ -287,7 +326,7 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
       Если нужна генерация альфа-канала - генерируем канал таким образом, что все пикселы с цветом нижнего левого
       имеют alpha = 0, а остальные - alpha = 255
     */
-          
+
     if (need_alpha_generation)
     {           
       #pragma pack(1)      
@@ -311,6 +350,7 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
       has_alpha = true;
     }
     
+
       //создание текстуры
       
     return TexturePtr (renderer->CreateTexture (image), false);

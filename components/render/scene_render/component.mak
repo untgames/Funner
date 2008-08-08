@@ -25,7 +25,8 @@ RENDER.SCENE_RENDER.RENDER2D.SOURCES.LIBS             :=
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.COMPILER_CFLAGS  :=
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.COMPILER_DEFINES :=
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak ../../scene_graph/compile.static.mak \
-                                                         ../mid_level/compile.static.mak ../../media/rfx/compile.static.mak ../../media/image/compile.static.mak
+                                                         ../mid_level/compile.static.mak ../../media/rfx/compile.static.mak \
+                                                         ../../media/image/compile.static.mak ../../media/font/compile.static.mak
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.msvc.COMPILER_CFLAGS  := -wd4355
 
 #Öåëü ¹3 - Scene render tests

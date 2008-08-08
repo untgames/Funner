@@ -17,12 +17,14 @@
 #include <common/strlib.h>
 
 #include <media/image.h>
+#include <media/font.h>
 #include <media/rfx/material_library.h>
 #include <media/rfx/sprite_material.h>
 
-#include <sg/scene.h>
 #include <sg/camera.h>
+#include <sg/scene.h>
 #include <sg/sprite.h>
+#include <sg/text_line.h>
 
 #include <render/mid_level/renderer2d.h>
 
@@ -124,6 +126,97 @@ class RenderableSpriteModel: public Renderable, public xtl::trackable
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Подготовленные к рендерингу шрифт
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class RenderableFont
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    RenderableFont (const char* font_name, Render& in_render);
+    ~RenderableFont ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение шрифта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const media::Font& GetFont () const { return font; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ITexture* GetTexture () const { return texture.get (); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение размера самой большой стороны глифа
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t GetMaxGlyphSide () const { return max_glyph_side; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение спрайта по индексу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const render::mid_level::renderer2d::Sprite& GetSprite (size_t index) const;
+
+  private:
+    typedef xtl::uninitialized_storage<render::mid_level::renderer2d::Sprite> SpritesBuffer;
+    typedef xtl::com_ptr<ITexture>                                            TextuerPtr;
+
+  private:
+    Render&       render;                       //ссылка на рендер
+    media::Font   font;                         //шрифт
+    SpritesBuffer sprites_buffer;               //буффер спрайтов (по спрайту для каждого глифа)
+    TexturePtr    texture;                      //текстура
+    size_t        max_glyph_side;               //размер самой большой стороны среди всех глифов (в пикселях)
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Линия текста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class RenderableTextLine: public Renderable, public xtl::trackable
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    RenderableTextLine (scene_graph::TextLine* text_line, Render& render);
+    ~RenderableTextLine ();
+
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление линии текста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Update ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Загрузка нового шрифта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void PreprocessFont ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Рисование линии текста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void DrawCore (IFrame&);
+
+  private:
+    typedef xtl::uninitialized_storage<render::mid_level::renderer2d::Sprite> SpritesBuffer;
+
+  private:
+    Render&                        render;                       //ссылка на рендер
+    scene_graph::TextLine*         text_line;                    //исходная линия текста
+    PrimitivePtr                   primitive;                    //визуализируемый примитив
+    math::mat4f                    translate_tm;                 //матрица сдвига для выравнивания
+    math::mat4f                    current_world_tm;             //текущая матрица трансформации
+    size_t                         current_world_tm_hash;        //хэш текущей матрицы трансформации
+    stl::string                    current_font_name;            //текущий шрифт
+    stl::string                    current_text;                 //текущий текст
+    math::vec4f                    current_color;                //текущий цвет
+    scene_graph::TextLineAlignment current_horizontal_alignment; //текущее горизонтальное выравнивание
+    scene_graph::TextLineAlignment current_vertical_alignment;   //текущее вертикальное выравнивание
+    SpritesBuffer                  sprites_buffer;               //буффер спрайтов
+    stl::vector<size_t>            glyph_indices;                //индексы глифов в буффере спрайтов
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Область вывода рендера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class RenderView: public IRenderView, public xtl::reference_counter
@@ -217,10 +310,12 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с кэшем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Renderable*     GetRenderable (scene_graph::SpriteModel*);
+    Renderable*     GetRenderable (scene_graph::SpriteModel*);  // дублирование!!!
+    Renderable*     GetRenderable (scene_graph::TextLine*);     // дублирование!!!
     ITexture*       GetTexture    (const char* file_name, bool need_alpha=false);
     SpriteMaterial* GetMaterial   (const char* name);
-
+    RenderableFont* GetFont       (const char* name);
+    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление кадра на отрисовку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -269,12 +364,16 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     typedef stl::hash_map<stl::hash_key<const char*>, SpriteMaterialPtr> MaterialMap;
     typedef stl::hash_map<stl::hash_key<const char*>, TextureHolder>     TextureMap;
 
+    typedef xtl::shared_ptr<RenderableFont>                              RenderableFontPtr;
+    typedef stl::hash_map<stl::hash_key<const char*>, RenderableFontPtr> RenderableFontMap;
+
   private:
-    LogFunction   log_handler;       //функция протоколирования
-    RendererPtr   renderer;          //система рендеринга
-    RenderableMap renderables_cache; //кэш визуализируемых объектов
-    MaterialMap   materials;         //материалы
-    TextureMap    textures;          //текстуры
+    LogFunction       log_handler;       //функция протоколирования
+    RendererPtr       renderer;          //система рендеринга
+    RenderableMap     renderables_cache; //кэш визуализируемых объектов
+    MaterialMap       materials;         //материалы
+    TextureMap        textures;          //текстуры
+    RenderableFontMap fonts;             //шрифты
 };
 
 }

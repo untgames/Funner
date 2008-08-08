@@ -11,7 +11,7 @@ namespace
     Посетитель объектов сцены
 */
 
-struct RenderViewVisitor: public xtl::visitor<void, SpriteModel>
+struct RenderViewVisitor: public xtl::visitor<void, SpriteModel, TextLine>
 {
   typedef xtl::intrusive_ptr<Render> RenderPtr;
 
@@ -23,6 +23,14 @@ struct RenderViewVisitor: public xtl::visitor<void, SpriteModel>
   void visit (SpriteModel& model)
   {
     Renderable* renderable = render->GetRenderable (&model);
+    
+    if (renderable)
+      renderable->Draw (*frame);
+  }
+
+  void visit (TextLine& text_line)
+  {
+    Renderable* renderable = render->GetRenderable (&text_line);
     
     if (renderable)
       renderable->Draw (*frame);
