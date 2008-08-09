@@ -150,7 +150,8 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
       need_update_attachments (true),
       need_update_background (true),
       need_update_areas (true),
-      need_reorder (true)
+      need_reorder (true),
+      dirty_renderable_area (false)
     {
         //резервирование памяти для хранения областей вывода
 
@@ -213,9 +214,9 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
 ///Текущее физическое окно вывода
     const Rect& RenderableArea ()
     {
-      if (need_update_attachments)
+      if (!dirty_renderable_area && need_update_attachments)
         UpdateAttachments ();
-      
+
       return renderable_area;
     }
     
@@ -227,7 +228,8 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
 
       renderable_area = rect;
 
-      need_update_areas = true;
+      need_update_areas     = true;
+      dirty_renderable_area = true;
     }    
     
 ///Перерисовка
@@ -378,15 +380,20 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
           //инициализация физически визуализируемой области рендеринга
           
         mid_level::IRenderTarget* render_target = new_color_attachment ? new_color_attachment.get () : depth_stencil_attachment.get ();
-
-        if (render_target)
+        
+        if (!dirty_renderable_area)
         {
-          renderable_area.width  = render_target->GetWidth ();
-          renderable_area.height = render_target->GetHeight ();
-        }                      
-        else
-        {
-          renderable_area = Rect ();
+          if (render_target)
+          {
+            renderable_area.left   = 0;
+            renderable_area.top    = 0;
+            renderable_area.width  = render_target->GetWidth ();
+            renderable_area.height = render_target->GetHeight ();
+          }                      
+          else
+          {
+            renderable_area = Rect ();
+          }
         }
 
         color_attachment         = new_color_attachment;
@@ -505,6 +512,7 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     bool             need_update_background;        //необходимо обновить параметры фона
     bool             need_update_areas;             //необходимо обновить границы областей вывода
     bool             need_reorder;                  //необходимо пересортировать области вывода
+    bool             dirty_renderable_area;         //флаг, показывающий отсутствие необходимости автоматического обновления области рендеринга
 };
 
 }
