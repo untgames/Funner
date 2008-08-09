@@ -29,7 +29,7 @@ Texture::Texture (size_t width, size_t height, media::PixelFormat in_format)
       throw xtl::make_argument_exception ("render::mid_level::debug::renderer2d::Texture::Texture", "format", format);
   }
   
-  log.Printf ("Create texture %ux%u (format=%d)", width, height, format);
+  log.Printf ("Create texture %ux%u format=%d (id=%u)", width, height, format, Id ());
 }
 
 Texture::~Texture ()

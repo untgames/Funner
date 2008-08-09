@@ -1,10 +1,14 @@
 Results of renderer2d_texture_test:
 Create debug driver
+Create color-buffer 800x600 (id=3)
+Create depth-stencil-buffer 800x600 (id=4)
 Create 2D renderer (id=2)
-Create texture 400x300 (format=4)
+Create texture 400x300 format=4 (id=5)
 check texture size: 400x300
 Capture image from texture (id=5)
 check image after capture: 400x300x1 (format=4)
 Destroy texture2d (id=5)
 Destroy 2D renderer (id=2)
+Destroy depth-stencil-buffer (id=4)
+Destroy color-buffer (id=3)
 Destroy debug driver

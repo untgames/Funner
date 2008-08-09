@@ -27,6 +27,10 @@ BasicRenderer::BasicRenderer ()
   frames.reserve (FRAME_ARRAY_RESERVE_SIZE);
 }
 
+BasicRenderer::~BasicRenderer ()
+{
+}
+
 /*
    Описание
 */
@@ -69,14 +73,41 @@ IRenderTarget* BasicRenderer::GetDepthStencilBuffer (size_t frame_buffer_index)
     Создание ресурсов
 */
 
+namespace
+{
+
+//буфер рендеринга
+class RenderBuffer: public RenderTarget
+{
+  public:
+    RenderBuffer (size_t width, size_t height, RenderTargetType type) : RenderTarget (width, height, type)
+    {
+      log.Printf ("Create %s %ux%u (id=%u)", type == RenderTargetType_Color ? "color-buffer" : "depth-stencil-buffer", width, height, Id ());
+    }
+    
+    ~RenderBuffer ()
+    {
+      try
+      {
+        log.Printf ("Destroy %s (id=%u)", GetType () == RenderTargetType_Color ? "color-buffer" : "depth-stencil-buffer", Id ());
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }      
+    }
+};
+
+}
+
 IRenderTarget* BasicRenderer::CreateDepthStencilBuffer (size_t width, size_t height)
 {
-  return new RenderTarget (width, height, RenderTargetType_DepthStencil);
+  return new RenderBuffer (width, height, RenderTargetType_DepthStencil);
 }
 
 IRenderTarget* BasicRenderer::CreateRenderBuffer (size_t width, size_t height)
 {
-  return new RenderTarget (width, height, RenderTargetType_Color);
+  return new RenderBuffer (width, height, RenderTargetType_Color);
 }
 
 IClearFrame* BasicRenderer::CreateClearFrame ()

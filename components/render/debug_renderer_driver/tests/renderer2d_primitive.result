@@ -1,5 +1,7 @@
 Results of renderer2d_primitive_test:
 Create debug driver
+Create color-buffer 800x600 (id=3)
+Create depth-stencil-buffer 800x600 (id=4)
 Create 2D renderer (id=2)
 Create primitive (id=5)
 Primitive (size=4):
@@ -9,4 +11,6 @@ sprite #2: position=[2 2 2] size=[1 4] color=[0 1 0 2] tex_offset=[0 0] tex_size
 sprite #3: position=[3 3 3] size=[1 9] color=[0 1 0 3] tex_offset=[0 0] tex_size=[1 1]
 Destroy primitive (id=5)
 Destroy 2D renderer (id=2)
+Destroy depth-stencil-buffer (id=4)
+Destroy color-buffer (id=3)
 Destroy debug driver
