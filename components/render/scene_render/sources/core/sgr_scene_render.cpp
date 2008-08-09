@@ -15,8 +15,9 @@ struct SceneRender::Impl
   SceneRender::LogFunction log_handler;           //функция отладочного протоколирования
 
     //конструктор
-  Impl () : render_target_manager (new RenderTargetManager, false)
+  Impl ()
   {
+    render_target_manager = RenderTargetManagerPtr (new RenderTargetManager (xtl::bind (&Impl::LogMessage, this, _1)), false);
   }
   
   ~Impl ()

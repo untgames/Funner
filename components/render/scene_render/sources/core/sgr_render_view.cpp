@@ -92,25 +92,28 @@ void RenderView::UpdateRenderView ()
 
     if (!render_view)
     {
-        //получение менеджера путей рендеринга
-        
-      RenderPathManager* render_path_manager = render_target_api.GetRenderPathManager ();
+        //при отсутствии камеры или сцены невозможно создать область рендеринга
 
-        //при отсутствии камеры, сцены или менеджера путей рендеринга невозможно создать область рендеринга
-
-      if (!camera || !scene || !render_path_manager)
+      if (!camera || !scene)
         return;            
 
         //создание области рендеринга
 
-      ICustomSceneRender& render = render_path_manager->GetRenderPath (viewport.RenderPath ());
+      ICustomSceneRender& render_path = render_target_api.GetRenderPath (viewport.RenderPath ());
 
-      RenderViewPtr new_render_view (render.CreateRenderView (scene), false);
+      RenderViewPtr new_render_view (render_path.CreateRenderView (scene), false);
+      
+        //установка целевых буферов рендеринга
+        
+      mid_level::IRenderTarget *render_target = 0, *depth_stencil_target = 0;
+
+      render_target_api.GetRenderTargets (render_target, depth_stencil_target);      
+      new_render_view->SetRenderTargets  (render_target, depth_stencil_target);
 
         //установка свойств области вывода в область рендеринга
 
       for (Viewport::PropertyIterator prop_iter=viewport.CreatePropertyIterator (); prop_iter; ++prop_iter)
-        new_render_view->SetProperty (prop_iter->Name (), prop_iter->Value ());
+        new_render_view->SetProperty (prop_iter->Name (), prop_iter->Value ());        
 
         //явное разрешение обновления всех параметров вывода
 
@@ -176,17 +179,20 @@ void RenderView::UpdateClearFrame ()
 
     return;
   }
-  
+
     //создание очищающего кадра (при необходимости)
-    
+
   if (!clear_frame)
   {
-    render::mid_level::IRenderer& renderer = render_target_api.GetRenderer ();        
-    
+    mid_level::IRenderer& renderer = render_target_api.GetRenderer ();
+
     clear_frame = ClearFramePtr (renderer.CreateClearFrame (), false);
 
-    clear_frame->SetRenderTargets (renderer.GetColorBuffer (0), renderer.GetDepthStencilBuffer (0)); ////изменить!!!
-    clear_frame->SetFlags         (render::mid_level::ClearFlag_All | render::mid_level::ClearFlag_ViewportOnly);    
+    mid_level::IRenderTarget *render_target = 0, *depth_stencil_target = 0;        
+
+    render_target_api.GetRenderTargets (render_target, depth_stencil_target);
+    clear_frame->SetRenderTargets      (render_target, depth_stencil_target);
+    clear_frame->SetFlags              (render::mid_level::ClearFlag_All | render::mid_level::ClearFlag_ViewportOnly);
   }
   
       //установка начальной области вывода

@@ -11,7 +11,7 @@ int main ()
     printf ("renderer: %s\n", render.RendererDescription ());
     printf ("paths:    %s\n", render.RenderPaths ());
     
-    RenderTarget render_target = render.CreateRenderTarget ("default", "default");    
+    RenderTarget render_target = render.CreateRenderTarget ("FrameBuffer0", "FrameBuffer0");
 
     const Rect& screen_window     = render_target.ScreenArea ();
     const Rect& renderable_window = render_target.RenderableArea ();    

@@ -32,6 +32,7 @@ namespace mid_level
 
 //forward declaration
 class IRenderer;
+class IRenderTarget;
 
 }
 
@@ -42,7 +43,15 @@ class IRenderView
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка области вывода
+///Целевые буферы рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void SetRenderTargets (render::mid_level::IRenderTarget* render_target,
+                                   render::mid_level::IRenderTarget* depth_stencil_target) = 0;
+    virtual render::mid_level::IRenderTarget* GetRenderTarget       () = 0;
+    virtual render::mid_level::IRenderTarget* GetDepthStencilTarget () = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Область вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void SetViewport (const Rect&) = 0;
     virtual void GetViewport (Rect&) = 0;

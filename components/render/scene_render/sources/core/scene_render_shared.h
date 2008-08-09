@@ -48,7 +48,7 @@ class RenderPathManager
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (RenderPathManager&);
-    
+
   private:
     RenderPathManager (const RenderPathManager&); //no impl
     RenderPathManager& operator = (const RenderPathManager&); //no impl
@@ -94,6 +94,12 @@ class RenderTargetBase
     RenderTargetBase  (RenderTargetManager&);
     ~RenderTargetBase ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Протоколирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LogPrintf  (const char* format, ...);
+    void LogVPrintf (const char* format, va_list list);
+
   private:
     RenderTargetBase (const RenderTargetBase&); //no impl
     RenderTargetBase& operator = (const RenderTargetBase&); //no impl
@@ -114,7 +120,7 @@ class RenderTargetManager: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderTargetManager ();
+    RenderTargetManager (const SceneRender::LogFunction& log_handler);
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация целей рендеринга
@@ -125,8 +131,17 @@ class RenderTargetManager: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего менеджера путей рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                       SetRenderPathManager (render::RenderPathManager*);
-    render::RenderPathManager* RenderPathManager    () { return render_path_manager; }
+    void SetRenderPathManager (render::RenderPathManager*);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение системы рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    mid_level::IRenderer& Renderer ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение пути рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ICustomSceneRender& GetRenderPath (const char* render_path_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сброс ресурсов
@@ -134,23 +149,45 @@ class RenderTargetManager: public xtl::reference_counter
     void FlushResources ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация ассоциированных целей ренедринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                      RegisterAttachment   (const char* name, mid_level::IRenderTarget* render_target);
+    void                      UnregisterAttachment (const char* name);
+    mid_level::IRenderTarget* GetAttachment        (const char* name);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Начало / конец транзакции отрисовки 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool BeginDraw (); //результат показывает допустимость отрисовки (введено для будущего контроля глубины вложенности рендеринга)
     void EndDraw   ();
     bool IsInDraw  () const { return draw_depth != 0; }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Протоколирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LogMessage (const char* message);
+
+  private:    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление карты ассоциированных целей рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void UpdateAttachmentsMap ();
+
   private:
     RenderTargetManager (const RenderTargetManager&); //no impl
     RenderTargetManager& operator = (const RenderTargetManager&); //no impl
 
   private:
-    typedef stl::hash_set<RenderTargetBase*> RenderTargetSet;
+    typedef stl::hash_set<RenderTargetBase*>                         RenderTargetSet;
+    typedef xtl::com_ptr<mid_level::IRenderTarget>                   AttachmentPtr;
+    typedef stl::hash_map<stl::hash_key<const char*>, AttachmentPtr> AttachmentMap;
 
   private:
     render::RenderPathManager* render_path_manager; //менеджер путей рендеринга
     RenderTargetSet            render_targets;      //цели рендеринга
+    AttachmentMap              attachments;         //ассоциированные цели рендеринга
     size_t                     draw_depth;          //глубина вложенности рендеринга
+    SceneRender::LogFunction   log_handler;         //обработчик протоколирования
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,11 +202,12 @@ class RenderView: private IViewportListener, public xtl::reference_counter
     class IRenderTargetAPI
     {
       public:
-        virtual render::mid_level::IRenderer& GetRenderer          () = 0; //получение системы визуализации
-        virtual const Rect&                   GetRenderableArea    () = 0; //получение физических границ области рендеринга
-        virtual const Rect&                   GetScreenArea        () = 0; //получение логических границ области рендеринга
-        virtual RenderPathManager*            GetRenderPathManager () = 0; //получение менеджера путей рендеринга
-        virtual void                          UpdateOrderNotify    () = 0; //оповещение об обновлении порядка следования областей вывода
+        virtual mid_level::IRenderer& GetRenderer       () = 0; //получение системы визуализации
+        virtual const Rect&           GetRenderableArea () = 0; //получение физических границ области рендеринга
+        virtual const Rect&           GetScreenArea     () = 0; //получение логических границ области рендеринга
+        virtual ICustomSceneRender&   GetRenderPath     (const char* name) = 0; //получение пути рендеринга
+        virtual void                  UpdateOrderNotify () = 0; //оповещение об обновлении порядка следования областей вывода
+        virtual void                  GetRenderTargets  (mid_level::IRenderTarget*& render_target, mid_level::IRenderTarget*& depth_stencil_target) = 0; //получение ассоциированных буферов рендеринга
         
       protected:
         virtual ~IRenderTargetAPI () {}

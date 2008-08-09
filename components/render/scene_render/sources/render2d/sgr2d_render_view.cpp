@@ -61,8 +61,6 @@ RenderView::RenderView (Scene* in_scene, Render* in_render)
     IRenderer& renderer = *render->Renderer ();
     
     frame = FramePtr (renderer.CreateFrame (), false);
-
-    frame->SetRenderTargets  (renderer.GetColorBuffer (0), renderer.GetDepthStencilBuffer (0));
   }
   catch (xtl::exception& exception)
   {
@@ -73,6 +71,25 @@ RenderView::RenderView (Scene* in_scene, Render* in_render)
 
 RenderView::~RenderView ()
 {
+}
+
+/*
+    Целевые буферы рендеринга
+*/
+
+void RenderView::SetRenderTargets (mid_level::IRenderTarget* render_target, mid_level::IRenderTarget* depth_stencil_target)
+{
+  frame->SetRenderTargets (render_target, depth_stencil_target);
+}
+
+mid_level::IRenderTarget* RenderView::GetRenderTarget ()
+{
+  return frame->GetRenderTarget ();  
+}
+
+mid_level::IRenderTarget* RenderView::GetDepthStencilTarget ()
+{
+  return frame->GetDepthStencilTarget ();
 }
 
 /*
@@ -157,7 +174,7 @@ void RenderView::Draw ()
     return;
 
     //очистка кадра
-    
+
   frame->Clear ();
 
     //установка матриц вида и проекции
@@ -170,9 +187,9 @@ void RenderView::Draw ()
   RenderViewVisitor visitor (frame, render);
 
   scene->VisitEach (visitor);
-  
+
     //добавление кадра на отрисовку
-    
+
   render->Renderer ()->AddFrame (frame.get ());
 }
 

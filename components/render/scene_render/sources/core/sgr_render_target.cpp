@@ -138,25 +138,14 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
       depth_stencil_attachment_name (in_depth_stencil_attachment_name),
       screen (0),
       screen_area (0, 0, DEFAULT_AREA_WIDTH, DEFAULT_AREA_HEIGHT),
-      need_update_background_color (true),
+      need_update_attachments (true),
+      need_update_background (true),
       need_update_areas (true),
       need_reorder (true)
     {
         //резервирование памяти для хранения областей вывода
 
-      views.reserve (VIEW_ARRAY_RESERVE);
-      
-        //инициализация физически визуализируемой области рендеринга
-
-      RenderPathManager*                render_path_manager = manager.RenderPathManager ();
-      mid_level::IRenderer*             renderer            = render_path_manager ? render_path_manager->Renderer () : 0;
-      render::mid_level::IRenderTarget* render_target       = renderer->GetColorBuffer (0); //заменить в будущем на attachment!!!
-      
-      if (render_target)
-      {
-        renderable_area.width  = render_target->GetWidth ();
-        renderable_area.height = render_target->GetHeight ();
-      }
+      views.reserve (VIEW_ARRAY_RESERVE);      
     }
 
 ///Деструктор
@@ -213,7 +202,13 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     }
     
 ///Текущее физическое окно вывода
-    const Rect& RenderableArea () { return renderable_area; }
+    const Rect& RenderableArea ()
+    {
+      if (need_update_attachments)
+        UpdateAttachments ();
+      
+      return renderable_area;
+    }
     
 ///Изменение физическое окна вывода
     void SetRenderableArea (const Rect& rect)
@@ -231,14 +226,10 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     {
       static const char* METHOD_NAME = "render::RenderTarget::Impl::Draw";
       
-      RenderTargetManager&  manager             = Manager ();
-      RenderPathManager*    render_path_manager = manager.RenderPathManager ();
-      mid_level::IRenderer* renderer            = render_path_manager ? render_path_manager->Renderer () : 0;
+      if (!screen)
+        return;
 
-      if (!renderer)
-        throw xtl::format_operation_exception (METHOD_NAME, "Null renderer");
-
-      if (!manager.BeginDraw ())
+      if (!Manager ().BeginDraw ())
         return;
 
       try
@@ -254,72 +245,84 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
           UpdateAreas ();
          
           //очистка цели рендеринга
-          
-        ClearRenderTarget (*renderer);
-
+        
+        ClearRenderTarget ();
+        
           //рисование областей вывода
 
         for (ViewArray::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
         {
+          Viewport& viewport = (*iter)->Viewport ();        
+          
           try
           {
             (*iter)->Draw ();
           }
-          catch (xtl::exception& exception)
+          catch (std::exception& exception)
           {
-            manager.EndDraw ();
-
-            Viewport& viewport = (*iter)->Viewport ();
-
-            exception.touch ("draw viewport='%s', render_path='%s'", viewport.Name (), viewport.RenderPath ());          
-
-            throw;
+            LogPrintf ("%s\n    at draw viewport='%s', render_path='%s'", exception.what (), viewport.Name (), viewport.RenderPath ());
           }
-        }        
+          catch (...)
+          {
+            LogPrintf ("Unknown exception\n    at draw viewport='%s', render_path='%s'", viewport.Name (), viewport.RenderPath ());
+          }
+        }
       }
-      catch (xtl::exception& exception)
+      catch (std::exception& exception)
       {
-        manager.EndDraw ();
-        
-        exception.touch (METHOD_NAME);
-        
-        throw;
+        LogPrintf ("%s\n    at RenderTargetImpl::Draw", exception.what ());
       }
       catch (...)
-      {              
-        manager.EndDraw ();
-        throw;
-      }
+      {
+        LogPrintf ("Unknown exception\n    at RenderTargetImpl::Draw");
+      }        
 
-      manager.EndDraw ();
+        //завершение транзакции отрисовки
+
+      Manager ().EndDraw ();
     }    
     
   private:
 ///Очистка цели рендеринга
-    void ClearRenderTarget (mid_level::IRenderer& renderer)
+    void ClearRenderTarget ()
     {
       try
-      {      
-        if (!clear_frame)
-        {
-            //создание очищающего кадра
+      {
+        if (!need_update_background && !clear_frame)
+          return;
 
-          clear_frame = ClearFramePtr (renderer.CreateClearFrame (), false);
-
-          render::mid_level::IRenderTarget *render_target        = renderer.GetColorBuffer (0),
-                                           *depth_stencil_target = renderer.GetDepthStencilBuffer (0);
-
-          clear_frame->SetRenderTargets (render_target, depth_stencil_target);
-          clear_frame->SetFlags         (render::mid_level::ClearFlag_All);
-        }
+        mid_level::IRenderer& renderer = Manager ().Renderer ();
         
-          //обновление цвета очистки
-          
-        if (need_update_background_color && screen)
+        if (need_update_background)
         {
+          if (!screen->BackgroundState ())
+          {
+              //удаление очищающего кадра
+
+            clear_frame            = 0;
+            need_update_background = false;
+
+            return;
+          }
+          
+          if (!clear_frame)
+          {
+              //создание очищающего кадра
+
+            clear_frame = ClearFramePtr (renderer.CreateClearFrame (), false);
+            
+            mid_level::IRenderTarget *render_target = 0, *depth_stencil_target = 0;
+
+            RenderTargetImpl::GetRenderTargets (render_target, depth_stencil_target);
+            clear_frame->SetRenderTargets      (render_target, depth_stencil_target);
+            clear_frame->SetFlags              (render::mid_level::ClearFlag_All);
+          }
+
+            //обновление цвета очистки
+
           clear_frame->SetColor (screen->BackgroundColor ());
 
-          need_update_background_color = false;
+          need_update_background = false;
         }
 
           //очистка
@@ -341,6 +344,40 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
 
       need_update_areas = false;
     }
+    
+///Обновление целевых буферов
+    void UpdateAttachments ()
+    {
+      try
+      {
+        AttachmentPtr new_color_attachment (Manager ().GetAttachment (("Color." + color_attachment_name).c_str ())),
+                      new_depth_stencil_attachment (Manager ().GetAttachment (("DepthStencil." + depth_stencil_attachment_name).c_str ()));
+                      
+          //инициализация физически визуализируемой области рендеринга
+          
+        mid_level::IRenderTarget* render_target = new_color_attachment ? new_color_attachment.get () : depth_stencil_attachment.get ();
+
+        if (render_target)
+        {
+          renderable_area.width  = render_target->GetWidth ();
+          renderable_area.height = render_target->GetHeight ();
+        }                      
+        else
+        {
+          renderable_area = Rect ();
+        }
+
+        color_attachment         = new_color_attachment;
+        depth_stencil_attachment = new_depth_stencil_attachment;                
+
+        need_update_attachments = false;
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("render::RenderTargetImpl::UpdateAttachments");
+        throw;
+      }
+    }
 
 ///Сортировка областей вывода
     void SortViews ()
@@ -356,29 +393,24 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     }  
     
 ///Получение системы рендеринга
-    render::mid_level::IRenderer& GetRenderer ()
-    {
-      static const char* METHOD_NAME = "render::RenderView::GetRenderer";
-
-      RenderPathManager* render_path_manager = Manager ().RenderPathManager ();
-
-      if (!render_path_manager)
-        throw xtl::format_operation_exception (METHOD_NAME, "Null render path manager");
-
-      render::mid_level::IRenderer* renderer = render_path_manager->Renderer ();
-
-      if (!renderer)
-        throw xtl::format_operation_exception (METHOD_NAME, "Null renderer");
-
-      return *renderer;
-    }
+    render::mid_level::IRenderer& GetRenderer () { return Manager ().Renderer (); }
     
 ///Получение границ области рендеринга
     const Rect& GetRenderableArea  () { return renderable_area; }
     const Rect& GetScreenArea () { return screen_area; }
     
-///Получение менеджера путей рендеринга
-    RenderPathManager* GetRenderPathManager () { return Manager ().RenderPathManager (); }
+///Получение пути рендеринга
+    ICustomSceneRender& GetRenderPath (const char* name) { return Manager ().GetRenderPath (name); }
+    
+///Получение ассоциированных буферов рендеринга
+    void GetRenderTargets (mid_level::IRenderTarget*& render_target, mid_level::IRenderTarget*& depth_stencil_target)
+    {
+      if (need_update_attachments)
+        UpdateAttachments ();      
+
+      render_target        = color_attachment.get ();
+      depth_stencil_target = depth_stencil_attachment.get ();
+    }
 
 ///Оповещение об обновлении порядка следования областей вывода    
     void UpdateOrderNotify ()
@@ -386,10 +418,10 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
       need_reorder = true;
     }
   
-///Оповещение об изменении цвета фона
-    void OnChangeBackgroundColor (const math::vec4f&)
+///Оповещение об изменении фона
+    void OnChangeBackground (bool, const math::vec4f&)
     {
-      need_update_background_color = true;
+      need_update_background = true;
     }
 
 ///Оповещение о добавлении области вывода
@@ -420,7 +452,11 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
       for (ViewArray::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
         (*iter)->FlushResources ();
         
-      clear_frame = 0;
+      clear_frame              = 0;
+      color_attachment         = 0;
+      depth_stencil_attachment = 0;
+      need_update_attachments  = true;
+      need_update_background   = true;
     }
 
 ///Подсчёт числа ссылок (не требуется, регистрация слушателя будет отменена при удалении Impl или текущего экрана)
@@ -431,16 +467,20 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     typedef xtl::com_ptr<render::mid_level::IClearFrame> ClearFramePtr;
     typedef xtl::intrusive_ptr<RenderView>               ViewPtr;
     typedef stl::vector<ViewPtr>                         ViewArray;
+    typedef xtl::com_ptr<mid_level::IRenderTarget>       AttachmentPtr;
 
   private:
     stl::string      color_attachment_name;         //имя ассоциированного буфера цвета
     stl::string      depth_stencil_attachment_name; //имя ассоциированного буфера попиксельного отсечения
+    AttachmentPtr    color_attachment;              //ассоциированный буфер цвета
+    AttachmentPtr    depth_stencil_attachment;      //ассоциированный буфер попиксельного отсечения
     render::Screen*  screen;                        //экран
     Rect             screen_area;                   //логическое окно вывода
     Rect             renderable_area;               //физическое окно вывода
     ViewArray        views;                         //массив областей рендеринга
     ClearFramePtr    clear_frame;                   //очищающий кадр
-    bool             need_update_background_color;  //необходимо обновить цвет фона    
+    bool             need_update_attachments;       //необходимо обновить ассоциированные буферы
+    bool             need_update_background;        //необходимо обновить параметры фона
     bool             need_update_areas;             //необходимо обновить границы областей вывода
     bool             need_reorder;                  //необходимо пересортировать области вывода
 };

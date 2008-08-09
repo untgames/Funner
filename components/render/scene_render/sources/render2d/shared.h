@@ -227,6 +227,14 @@ class RenderView: public IRenderView, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     RenderView  (scene_graph::Scene*, Render*);
     ~RenderView ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Целевые буферы рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                      SetRenderTargets      (mid_level::IRenderTarget* render_target,
+                                                     mid_level::IRenderTarget* depth_stencil_target);
+    mid_level::IRenderTarget* GetRenderTarget       ();
+    mid_level::IRenderTarget* GetDepthStencilTarget ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка области вывода
@@ -259,7 +267,8 @@ class RenderView: public IRenderView, public xtl::reference_counter
 
   private:
     typedef xtl::intrusive_ptr<Render> RenderPtr;
-
+    
+  private:
     RenderPtr            render; //рендер
     FramePtr             frame;  //кадр
     scene_graph::Scene*  scene;  //сцена

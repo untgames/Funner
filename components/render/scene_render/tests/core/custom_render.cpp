@@ -17,6 +17,23 @@ class MyRenderView: public IRenderView, public xtl::reference_counter
     {
       printf ("MyRenderView #%u: Destroy view\n", id);
     }
+
+///Целевые буферы рендеринга
+    void SetRenderTargets (mid_level::IRenderTarget* render_target, mid_level::IRenderTarget* depth_stencil_target)
+    {
+      printf ("MyRenderView #%u: SetRenderTargets(%s, %s)\n", id, render_target ? "render-target" : "null",
+        depth_stencil_target ? "depth-stencil-target" : "null");
+    }
+    
+    mid_level::IRenderTarget* GetRenderTarget ()
+    {
+      throw xtl::make_not_implemented_exception ("MyRenderView::GetRenderTarget");
+    }
+    
+    mid_level::IRenderTarget* GetDepthStencilTarget ()
+    {
+      throw xtl::make_not_implemented_exception ("MyRenderView::GetDepthStencilTarget");
+    }
   
 ///Установка области вывода
     void SetViewport (const Rect& rect)
@@ -167,7 +184,7 @@ int main ()
     
     screen.Attach (vp1);
     
-    RenderTarget render_target = render.CreateRenderTarget ("default", "default");
+    RenderTarget render_target = render.CreateRenderTarget ("FrameBuffer0", "");
     
     render_target.SetScreen (&screen);
     

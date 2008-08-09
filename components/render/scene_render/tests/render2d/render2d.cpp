@@ -35,8 +35,6 @@ int main ()
     sprite->SetMaterial ("sprite_material");
 //    sprite->SetFrame (20);
 
-      //!!!отсутствует настройка положения камеры и спрайта!!!
-
       //создание рендера
 
     SceneRender render ("Debug", "Renderer2d", "Render2d");            
@@ -57,7 +55,7 @@ int main ()
     
     RenderTarget render_target;
 
-    render_target = render.CreateRenderTarget ("default", "default");    
+    render_target = render.CreateRenderTarget ("FrameBuffer0", "FrameBuffer0");    
 
     render_target.SetScreen (&screen);
     
