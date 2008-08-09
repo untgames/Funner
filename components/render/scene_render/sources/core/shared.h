@@ -23,6 +23,8 @@
 #include <common/strlib.h>
 #include <common/component.h>
 
+#include <media/image.h>
+
 #include <sg/camera.h>
 
 #include <render/mid_level/driver.h>

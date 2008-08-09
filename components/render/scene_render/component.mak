@@ -13,7 +13,7 @@ RENDER.SCENE_RENDER.CORE.SOURCES.LIBS             :=
 RENDER.SCENE_RENDER.CORE.SOURCES.COMPILER_CFLAGS  :=
 RENDER.SCENE_RENDER.CORE.SOURCES.COMPILER_DEFINES :=
 RENDER.SCENE_RENDER.CORE.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak ../../scene_graph/compile.static.mak \
-                                             ../mid_level/compile.static.mak
+                                             ../mid_level/compile.static.mak ../../media/image/compile.static.mak
                                              
 #Öåëü ¹2 - Scene render2d sources
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.TYPE             := static-lib

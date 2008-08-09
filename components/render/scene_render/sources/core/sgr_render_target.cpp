@@ -51,6 +51,9 @@ class IRenderTargetImpl: public xtl::reference_counter
     
 ///Перерисовка
     virtual void Draw () = 0;
+    
+///Захват изображения
+    virtual void CaptureImage (media::Image&) = 0;
 };
 
 }
@@ -100,6 +103,12 @@ class NullRenderTarget: public IRenderTargetImpl
     void Draw ()
     {
       Raise ("render::NullRenderTarget::Draw");
+    }
+    
+///Захват изображения
+    void CaptureImage (media::Image&)
+    {
+      Raise ("render::NullRenderTarget::CaptureImage");
     }
 
 ///Получение экземпляра
@@ -281,7 +290,20 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
 
       Manager ().EndDraw ();
     }    
-    
+
+///Захват изображения
+    void CaptureImage (media::Image& image)
+    {      
+      mid_level::IRenderTarget *render_target = 0, *depth_stencil_target = 0;
+      
+      RenderTargetImpl::GetRenderTargets (render_target, depth_stencil_target);
+      
+      if (!render_target)
+        throw xtl::format_operation_exception ("render::RenderTargetImpl::CaptureImage", "Null render-target buffer");
+        
+      render_target->CaptureImage (image);
+    }
+
   private:
 ///Очистка цели рендеринга
     void ClearRenderTarget ()
@@ -654,14 +676,34 @@ void RenderTarget::Update ()
     Захват изображения (screen-shot)
 */
 
-void RenderTarget::CaptureImage (media::Image&)
+void RenderTarget::CaptureImage (media::Image& image)
 {
-  throw xtl::make_not_implemented_exception ("render::SceneRender::CaptureImage(media::Image&)");
+  try
+  {
+    impl->CaptureImage (image);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::SceneRender::CaptureImage(media::Image&)");
+    throw;
+  }
 }
 
 void RenderTarget::CaptureImage (const char* image_name)
 {
-  throw xtl::make_not_implemented_exception ("render::SceneRender::CaptureImage(const char*)");
+  try
+  {
+    media::Image image;
+    
+    CaptureImage (image);
+    
+    image.Save (image_name);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::SceneRender::CaptureImage(const char*)");
+    throw;
+  }
 }
 
 /*

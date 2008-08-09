@@ -1,0 +1,9 @@
+Results of screenshot2d_test:
+Create debug driver
+Create color-buffer 800x600 (id=3)
+Create depth-stencil-buffer 800x600 (id=4)
+Create 2D renderer (id=2)
+Capture image from render-target #3
+Destroy 2D renderer (id=2)
+Destroy depth-stencil-buffer (id=4)
+Destroy color-buffer (id=3)

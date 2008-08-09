@@ -1,15 +1,5 @@
 #include "shared.h"
 
-void print (const char*, const char* message)
-{
-  printf ("%s\n", message);
-}
-
-void log_print (const char* message)
-{
-  printf ("%s\n", message);
-}
-
 int main ()
 {
   printf ("Results of render2d_test:\n");

@@ -1,9 +1,11 @@
 Results of render2d_test:
 Create debug driver
+Create color-buffer 800x600 (id=3)
+Create depth-stencil-buffer 800x600 (id=4)
 Create 2D renderer (id=2)
 Create frame2d (id=6)
 Create primitive (id=7)
-Create texture 171x128 (format=1)
+Create texture 171x128 format=1 (id=8)
 Begin draw frames (id=2, frame_id=0)
 Begin draw frame (id=5)
 Set render targets: render-target=3, depth-stencil-target=4
@@ -27,3 +29,5 @@ Destroy frame2d (id=6)
 Destroy primitive (id=7)
 Destroy texture2d (id=8)
 Destroy 2D renderer (id=2)
+Destroy depth-stencil-buffer (id=4)
+Destroy color-buffer (id=3)

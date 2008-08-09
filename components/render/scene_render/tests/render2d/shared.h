@@ -19,4 +19,14 @@
 using namespace render;
 using namespace scene_graph;
 
+void print (const char*, const char* message)
+{
+  printf ("%s\n", message);
+}
+
+void log_print (const char* message)
+{
+  printf ("%s\n", message);
+}
+
 #endif
