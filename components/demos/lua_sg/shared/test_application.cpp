@@ -225,7 +225,7 @@ TestApplication::TestApplication ()
     impl->render.SetRenderer (render::mid_level::LowLevelDriver::Name (), MID_LEVEL_RENDERER_NAME);
 //    impl->render.SetRenderer ("Debug", "Renderer2d");
 
-    impl->render_target = impl->render.CreateRenderTarget ("default", "default");
+    impl->render_target = impl->render.CreateRenderTarget ("FrameBuffer0", "FrameBuffer0");
 
       //загрузка ресурсов
 

@@ -227,7 +227,7 @@ struct TestApplication::Impl
 
     render.SetRenderer (render::mid_level::LowLevelDriver::Name (), MID_LEVEL_RENDERER_NAME);
 
-    render_target = render.CreateRenderTarget ("default", "default");
+    render_target = render.CreateRenderTarget ("FrameBuffer0", "FrameBuffer0");    
 
       //загрузка ресурсов
 
