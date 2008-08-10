@@ -6,22 +6,24 @@
 namespace render
 {
 
-//forward declaration
-class RenderTargetManager;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер путей рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class RenderPathManager
 {
   public:
-    typedef SceneRender::LogFunction LogFunction;
+    typedef SceneRender::LogFunction          LogFunction;
+    typedef ICustomSceneRender::QueryFunction QueryFunction;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     RenderPathManager () {}
-    RenderPathManager (const char* driver_name_mask, const char* renderer_name_mask, const char* render_path_masks, const LogFunction& log_handler);
+    RenderPathManager (const char*          driver_name_mask,
+                       const char*          renderer_name_mask,
+                       const char*          render_path_masks,
+                       const LogFunction&   log_handler,
+                       const QueryFunction& query_handler);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Система рендеринга
@@ -123,7 +125,7 @@ class IRenderTargetImpl: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение о необходимости сброса ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void FlushResources () = 0;    
+    virtual void FlushResources () = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,8 +148,8 @@ class RenderTargetManager: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор доступных целей рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t             RenderTargetsCount () { return render_targets.size (); }
-    IRenderTargetImpl* RenderTarget       (size_t index);
+    size_t               RenderTargetsCount () { return render_targets.size (); }
+    render::RenderTarget RenderTarget       (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего менеджера путей рендеринга
@@ -176,6 +178,16 @@ class RenderTargetManager: public xtl::reference_counter
     void                      UnregisterAttachment     (const char* name);
     void                      UnregisterAllAttachments ();
     mid_level::IRenderTarget* GetAttachment            (const char* name);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание цели рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    render::RenderTarget CreateRenderTarget (const char* color_attachment_name, const char* depth_stencil_attachment_name);
+    render::RenderTarget CreateRenderTarget (const char*               prefix,
+                                             mid_level::IRenderTarget* color_attachment,
+                                             mid_level::IRenderTarget* depth_stencil_attachment);
+    render::RenderTarget CreateRenderTarget (mid_level::IRenderTarget* color_attachment,
+                                             mid_level::IRenderTarget* depth_stencil_attachment);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Начало / конец транзакции отрисовки 
@@ -199,11 +211,12 @@ class RenderTargetManager: public xtl::reference_counter
     typedef stl::hash_map<stl::hash_key<const char*>, AttachmentPtr> AttachmentMap;
 
   private:
-    render::RenderPathManager* render_path_manager; //менеджер путей рендеринга
-    RenderTargetList           render_targets;      //цели рендеринга
-    AttachmentMap              attachments;         //ассоциированные цели рендеринга
-    size_t                     draw_depth;          //глубина вложенности рендеринга
-    SceneRender::LogFunction   log_handler;         //обработчик протоколирования
+    render::RenderPathManager* render_path_manager;          //менеджер путей рендеринга
+    RenderTargetList           render_targets;               //цели рендеринга
+    AttachmentMap              attachments;                  //ассоциированные цели рендеринга
+    size_t                     draw_depth;                   //глубина вложенности рендеринга
+    SceneRender::LogFunction   log_handler;                  //обработчик протоколирования
+    size_t                     anonymous_attachment_counter; //текущий номер в имени анонимной ассоциации буферов рендеринга
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,6 +298,45 @@ class RenderView: private IViewportListener, public xtl::reference_counter
     bool                  need_update_path;        //необходимо обновить путь рендеринга
     bool                  need_update_clear_frame; //необходимо обновить очищающий кадр
     xtl::auto_connection  on_camera_scene_change;  //соединение с сигналом оповещения об изменении сцены в камере  
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер запросов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class QueryManager
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    QueryManager  ();
+    ~QueryManager ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация функций обработки запросов рендеринга (дочерний рендеринг)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef SceneRender::QueryFunction QueryFunction;
+
+    void RegisterQueryHandler       (const char* query_string_mask, const QueryFunction& handler);
+    void UnregisterQueryHandler     (const char* query_string_mask);
+    void UnregisterAllQueryHandlers ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание запроса
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IRenderQuery* CreateQuery (mid_level::IRenderTarget* color_attachment,
+                               mid_level::IRenderTarget* depth_stencil_attachment,
+                               const char*               query_string,
+                               RenderTargetManager&      render_target_manager);
+
+  private:
+    class QueryHandlerEntry;
+
+    typedef xtl::intrusive_ptr<QueryHandlerEntry> EntryPtr;
+    typedef stl::list<EntryPtr>                   QueryHandlerList;
+
+  private:
+    QueryHandlerList handlers; //обработчики запросов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

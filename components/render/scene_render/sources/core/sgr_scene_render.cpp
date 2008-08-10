@@ -14,6 +14,7 @@ struct SceneRender::Impl
   RenderPathManager        render_path_manager;    //менеджер путей рендеринга
   RenderTargetManagerPtr   render_target_manager;  //менеджер целей рендеринга
   RenderTargetList         default_render_targets; //цели рендеринга по умолчанию
+  QueryManager             query_manager;          //менеджер запросов рендеринга
   SceneRender::LogFunction log_handler;            //функция отладочного протоколирования
 
     //конструктор
@@ -21,7 +22,7 @@ struct SceneRender::Impl
   {
     render_target_manager = RenderTargetManagerPtr (new RenderTargetManager (xtl::bind (&Impl::LogMessage, this, _1)), false);
   }
-  
+
   ~Impl ()
   {
     render_target_manager->SetRenderPathManager (0);
@@ -46,28 +47,28 @@ struct SceneRender::Impl
         
       for (size_t i=0, count=renderer->GetFrameBuffersCount (); i<count; i++)
       {
-        mid_level::IRenderTarget *color_buffer         = renderer->GetColorBuffer (i),
-                                 *depth_stencil_buffer = renderer->GetDepthStencilBuffer (i); 
-                                 
-        stl::string color_attachment_name         = common::format ("FrameBuffer%u.Color", i),
-                    depth_stencil_attachment_name = common::format ("FrameBuffer%u.DepthStencil", i);
-
-        render_target_manager->RegisterAttachment (color_attachment_name.c_str (), color_buffer);
-        render_target_manager->RegisterAttachment (depth_stencil_attachment_name.c_str (), depth_stencil_buffer);
-
-        default_render_targets.push_back (render.CreateRenderTarget (color_attachment_name.c_str (), depth_stencil_attachment_name.c_str ()));
+        default_render_targets.push_back (render_target_manager->CreateRenderTarget (common::format ("FrameBuffer%u", i).c_str (),
+          renderer->GetColorBuffer (i), renderer->GetDepthStencilBuffer (i)));
       }
 
         //добавление пустого буфера кадра
 
-      render_target_manager->RegisterAttachment ("Null.Color", 0);
-      render_target_manager->RegisterAttachment ("Null.DepthStencil", 0);
+      render_target_manager->RegisterAttachment ("Null", 0);
     }
     catch (xtl::exception& exception)
     {
       exception.touch ("render::SceneRender::Impl::UpdateRenderTargets");
       throw;
     }
+  }
+  
+    //создание запроса рендеринга
+  IRenderQuery* CreateRenderQuery
+    (mid_level::IRenderTarget* render_target,
+     mid_level::IRenderTarget* depth_stencil_target,
+     const char*               query_string)
+  {
+    return query_manager.CreateQuery (render_target, depth_stencil_target, query_string, *render_target_manager);
   }
 
     //отладочное протоколирование
@@ -145,11 +146,13 @@ void SceneRender::SetRenderer
   try
   {
     RenderPathManager new_manager (driver_name_mask, renderer_name_mask, render_path_masks,
-      xtl::bind (&Impl::LogMessage, &*impl, _1));      
+      xtl::bind (&Impl::LogMessage, &*impl, _1), xtl::bind (&Impl::CreateRenderQuery, &*impl, _1, _2, _3));
 
     new_manager.Swap (impl->render_path_manager);
 
     impl->render_target_manager->SetRenderPathManager (&impl->render_path_manager);
+    
+      //данный вызов может выбросить исключения и переводит SceneRender::SetRenderer на базовую гарантию исключений!!!
     
     impl->UpdateRenderTargets (*this);
   }
@@ -205,7 +208,7 @@ RenderTarget SceneRender::CreateRenderTarget (const char* color_attachment_name,
 {
   try
   {
-    return render::RenderTarget (*impl->render_target_manager, color_attachment_name, depth_stencil_attachment_name);
+    return impl->render_target_manager->CreateRenderTarget (color_attachment_name, depth_stencil_attachment_name);
   }
   catch (xtl::exception& exception)
   {
@@ -226,6 +229,33 @@ size_t SceneRender::RenderTargetsCount () const
 RenderTarget SceneRender::RenderTarget (size_t index) const
 {
   return impl->render_target_manager->RenderTarget (index);
+}
+
+/*
+    Регистрация функций обработки запросов рендеринга (дочерний рендеринг)
+*/
+
+void SceneRender::RegisterQueryHandler (const char* query_string_mask, const QueryFunction& handler)
+{
+  try
+  {
+    impl->query_manager.RegisterQueryHandler (query_string_mask, handler);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::SceneRender::RegisterQueryHandler");
+    throw;
+  }
+}
+
+void SceneRender::UnregisterQueryHandler (const char* query_string_mask)
+{
+  impl->query_manager.UnregisterQueryHandler (query_string_mask);
+}
+
+void SceneRender::UnregisterAllQueryHandlers ()
+{
+  impl->query_manager.UnregisterAllQueryHandlers ();
 }
 
 /*

@@ -81,6 +81,20 @@ void Render::LogPrintf (const char* format, ...)
 }
 
 /*
+    Создание дочерних запросов
+*/
+
+void Render::SetQueryHandler (const QueryFunction& in_query_handler)
+{
+  query_handler = in_query_handler;
+}
+
+const ICustomSceneRender::QueryFunction& Render::GetQueryHandler ()
+{
+  return query_handler;
+}
+
+/*
     Работа с ресурсами
 */
 

@@ -298,12 +298,18 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     void LoadResource (const char* tag, const char* file_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка функции отладочного протоколирования
+///Протоколирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetLogHandler (const LogFunction&);
     const LogFunction& GetLogHandler ();
 
     void LogPrintf (const char* format, ...);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание дочерних запросов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                 SetQueryHandler (const QueryFunction&);
+    const QueryFunction& GetQueryHandler ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -378,6 +384,7 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 
   private:
     LogFunction       log_handler;       //функция протоколирования
+    QueryFunction     query_handler;     //функция создания дочерних запросов
     RendererPtr       renderer;          //система рендеринга
     RenderableMap     renderables_cache; //кэш визуализируемых объектов
     MaterialMap       materials;         //материалы

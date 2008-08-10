@@ -18,10 +18,11 @@ const size_t RENDER_PATHS_STRING_RESERVE = 256; //резервируемый размер строки с 
 */
 
 RenderPathManager::RenderPathManager
- (const char*        driver_name_mask,
-  const char*        renderer_name_mask,
-  const char*        render_path_masks,
-  const LogFunction& log_handler)
+ (const char*          driver_name_mask,
+  const char*          renderer_name_mask,
+  const char*          render_path_masks,
+  const LogFunction&   log_handler,
+  const QueryFunction& query_handler)
 {
   try  
   {
@@ -77,9 +78,10 @@ RenderPathManager::RenderPathManager
         
       CustomSceneRenderPtr render_path = SceneRenderManagerImpl::Instance ().CreateRender (renderer.get (), path_name);
       
-        //установка функции отладочного протоколирования
+        //установка функций обратного вызова
 
-      render_path->SetLogHandler (log_handler);
+      render_path->SetLogHandler   (log_handler);
+      render_path->SetQueryHandler (query_handler);
 
         //регистрация пути рендеринга
         

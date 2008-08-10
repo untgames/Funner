@@ -39,7 +39,7 @@ enum RenderTargetAttachment
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class RenderTarget
 {
-  friend class SceneRender;
+  friend class RenderTargetManager;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
@@ -156,6 +156,15 @@ class SceneRender
 
     void               SetLogHandler (const LogFunction&);
     const LogFunction& LogHandler    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация функций обработки запросов рендеринга (дочерний рендеринг)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (render::RenderTarget& render_target, const char* query_string)> QueryFunction;
+
+    void RegisterQueryHandler       (const char* query_string_mask, const QueryFunction& handler);
+    void UnregisterQueryHandler     (const char* query_string_mask);
+    void UnregisterAllQueryHandlers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с ресурсами

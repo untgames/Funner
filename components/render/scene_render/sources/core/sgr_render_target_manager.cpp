@@ -15,7 +15,8 @@ using namespace render;
 RenderTargetManager::RenderTargetManager (const SceneRender::LogFunction& in_log_handler)
   : render_path_manager (0),
     draw_depth (0),
-    log_handler (in_log_handler)
+    log_handler (in_log_handler),
+    anonymous_attachment_counter (0)
 {
 }
 
@@ -37,7 +38,7 @@ void RenderTargetManager::Unregister (IRenderTargetImpl* target)
     Перебор доступных целей рендеринга
 */
 
-IRenderTargetImpl* RenderTargetManager::RenderTarget (size_t index)
+RenderTarget RenderTargetManager::RenderTarget (size_t index)
 {
   if (index >= render_targets.size ())
     throw xtl::make_range_exception ("render::RenderTargetManager::RenderTarget", "index", index, render_targets.size ());
@@ -137,6 +138,8 @@ void RenderTargetManager::UnregisterAttachment (const char* name)
 void RenderTargetManager::UnregisterAllAttachments ()
 {
   attachments.clear ();
+  
+  anonymous_attachment_counter = 0;
 }
 
 mid_level::IRenderTarget* RenderTargetManager::GetAttachment (const char* name)
@@ -152,6 +155,95 @@ mid_level::IRenderTarget* RenderTargetManager::GetAttachment (const char* name)
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Attachment not found");
 
   return iter->second.get ();
+}
+
+/*
+    Создание цели рендеринга
+*/
+
+RenderTarget RenderTargetManager::CreateRenderTarget
+ (const char* color_attachment_name,
+  const char* depth_stencil_attachment_name)
+{
+  try
+  {
+    return render::RenderTarget (*this, color_attachment_name, depth_stencil_attachment_name);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::RenderTargetManager::CreateRenderTarget(const char*, const char*)");
+    throw;
+  }
+}
+
+RenderTarget RenderTargetManager::CreateRenderTarget
+ (const char*               prefix,
+  mid_level::IRenderTarget* color_attachment,
+  mid_level::IRenderTarget* depth_stencil_attachment)
+{
+  try
+  {
+    if (!prefix)
+      throw xtl::make_null_argument_exception ("", "prefix");
+
+    stl::string color_attachment_name         = common::format ("%s.Color", prefix),
+                depth_stencil_attachment_name = common::format ("%s.DepthStencil", prefix);
+
+    RegisterAttachment (color_attachment_name.c_str (), color_attachment);
+    
+    try
+    {
+      RegisterAttachment (depth_stencil_attachment_name.c_str (), depth_stencil_attachment);
+      
+      try
+      {
+        return CreateRenderTarget (color_attachment_name.c_str (), depth_stencil_attachment_name.c_str ());
+      }
+      catch (...)
+      {
+        UnregisterAttachment (depth_stencil_attachment_name.c_str ());
+        throw;
+      }
+    }
+    catch (...)
+    {
+      UnregisterAttachment (color_attachment_name.c_str ());
+      throw;
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::RenderTargetManager::CreateRenderTarget(const char*, mid_level::IRenderTarget*, mid_level::IRenderTarget*)");
+    throw;
+  }
+}
+
+RenderTarget RenderTargetManager::CreateRenderTarget
+ (mid_level::IRenderTarget* color_attachment,
+  mid_level::IRenderTarget* depth_stencil_attachment)
+{
+  try
+  {
+    size_t id = anonymous_attachment_counter++;
+    
+    try
+    {
+      if (!anonymous_attachment_counter)
+        throw xtl::format_operation_exception ("", "Too many anonymous attachments");
+
+      return CreateRenderTarget (common::format ("RenderTarget%u", id).c_str (), color_attachment, depth_stencil_attachment);
+    }
+    catch (...)
+    {
+      --anonymous_attachment_counter;
+      throw;
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::RenderTargetManager::CreateRenderTarget(mid_level::IRenderTarget*, mid_level::IRenderTarget*)");
+    throw;
+  }
 }
 
 /*
