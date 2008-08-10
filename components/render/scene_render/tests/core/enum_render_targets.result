@@ -1,0 +1,6 @@
+Results of enum_render_targets_test:
+1 render targets found
+ RT#1: color-attachment='FrameBuffer0.Color', depth-stencil-attachment='FrameBuffer0.DepthStencil'
+2 render targets found
+ RT#1: color-attachment='FrameBuffer0.Color', depth-stencil-attachment='FrameBuffer0.DepthStencil'
+ RT#2: color-attachment='FrameBuffer0.Color', depth-stencil-attachment='Null.DepthStencil'
