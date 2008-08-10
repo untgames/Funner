@@ -7,12 +7,14 @@ using namespace render;
 */
 
 typedef xtl::intrusive_ptr<RenderTargetManager> RenderTargetManagerPtr;
+typedef stl::vector<RenderTarget>               RenderTargetList;
 
 struct SceneRender::Impl
 {  
-  RenderPathManager        render_path_manager;   //менеджер путей рендеринга
-  RenderTargetManagerPtr   render_target_manager; //менеджер целей рендеринга
-  SceneRender::LogFunction log_handler;           //функция отладочного протоколирования
+  RenderPathManager        render_path_manager;    //менеджер путей рендеринга
+  RenderTargetManagerPtr   render_target_manager;  //менеджер целей рендеринга
+  RenderTargetList         default_render_targets; //цели рендеринга по умолчанию
+  SceneRender::LogFunction log_handler;            //функция отладочного протоколирования
 
     //конструктор
   Impl ()
@@ -23,6 +25,49 @@ struct SceneRender::Impl
   ~Impl ()
   {
     render_target_manager->SetRenderPathManager (0);
+  }
+  
+    //обновление массива целей рендеринга по умолчанию
+  void UpdateRenderTargets (SceneRender& render)
+  {
+    try
+    {   
+      default_render_targets.clear ();
+      render_target_manager->UnregisterAllAttachments ();
+      
+        //получение системы визуализации
+      
+      mid_level::IRenderer* renderer = render_path_manager.Renderer ();
+      
+      if (!renderer)
+        throw xtl::format_operation_exception ("", "Null renderer");
+      
+        //добавление буферов кадра
+        
+      for (size_t i=0, count=renderer->GetFrameBuffersCount (); i<count; i++)
+      {
+        mid_level::IRenderTarget *color_buffer         = renderer->GetColorBuffer (i),
+                                 *depth_stencil_buffer = renderer->GetDepthStencilBuffer (i); 
+                                 
+        stl::string color_attachment_name         = common::format ("FrameBuffer%u.Color", i),
+                    depth_stencil_attachment_name = common::format ("FrameBuffer%u.DepthStencil", i);
+
+        render_target_manager->RegisterAttachment (color_attachment_name.c_str (), color_buffer);
+        render_target_manager->RegisterAttachment (depth_stencil_attachment_name.c_str (), depth_stencil_buffer);
+
+        default_render_targets.push_back (render.CreateRenderTarget (color_attachment_name.c_str (), depth_stencil_attachment_name.c_str ()));
+      }
+
+        //добавление пустого буфера кадра
+
+      render_target_manager->RegisterAttachment ("Null.Color", 0);
+      render_target_manager->RegisterAttachment ("Null.DepthStencil", 0);
+    }
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("render::SceneRender::Impl::UpdateRenderTargets");
+      throw;
+    }
   }
 
     //отладочное протоколирование
@@ -105,6 +150,8 @@ void SceneRender::SetRenderer
     new_manager.Swap (impl->render_path_manager);
 
     impl->render_target_manager->SetRenderPathManager (&impl->render_path_manager);
+    
+    impl->UpdateRenderTargets (*this);
   }
   catch (xtl::exception& exception)
   {
@@ -120,6 +167,8 @@ void SceneRender::ResetRenderer ()
   new_manager.Swap (impl->render_path_manager);
 
   impl->render_target_manager->SetRenderPathManager (0);
+
+  impl->default_render_targets.clear ();
 }
 
 const char* SceneRender::RendererDescription () const
@@ -156,13 +205,27 @@ RenderTarget SceneRender::CreateRenderTarget (const char* color_attachment_name,
 {
   try
   {
-    return RenderTarget (*impl->render_target_manager, color_attachment_name, depth_stencil_attachment_name);
+    return render::RenderTarget (*impl->render_target_manager, color_attachment_name, depth_stencil_attachment_name);
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("render::SceneRender::CreateRenderTarget");
     throw;
   }
+}
+
+/*
+    Перебор доступных целей рендеринга
+*/
+
+size_t SceneRender::RenderTargetsCount () const
+{
+  return impl->render_target_manager->RenderTargetsCount ();
+}
+
+RenderTarget SceneRender::RenderTarget (size_t index) const
+{
+  return impl->render_target_manager->RenderTarget (index);
 }
 
 /*

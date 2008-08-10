@@ -3,8 +3,8 @@
 
 #include <cstdarg>
 
-#include <stl/hash_map>
 #include <stl/hash_set>
+#include <stl/hash_map>
 #include <stl/vector>
 #include <stl/string>
 #include <stl/algorithm>

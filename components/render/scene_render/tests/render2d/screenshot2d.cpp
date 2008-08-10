@@ -12,7 +12,7 @@ int main ()
     
     SceneRender render ("Debug", "Renderer2d", "Render2d");    
     
-    RenderTarget render_target = render.CreateRenderTarget ("FrameBuffer0", "FrameBuffer0");
+    RenderTarget render_target = render.RenderTarget (0);
 
     render_target.CaptureImage ("data/screenshot.tga");       
   }

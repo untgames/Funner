@@ -5,7 +5,7 @@ LoadResource(auto, data/materials.xmtl)
 Bind camera to scene
 CreateRenderView('Scene1')
 MyRenderView #1: Create view
-MyRenderView #1: SetRenderTargets(render-target, null)
+MyRenderView #1: SetRenderTargets(render-target, depth-stencil-target)
 MyRenderView #1: SetCamera(Camera1)
 MyRenderView #1: SetViewport(0, 0, 800, 600)
 MyRenderView #1: Draw view
@@ -13,7 +13,7 @@ Change camera scene
 MyRenderView #1: Destroy view
 CreateRenderView('Scene2')
 MyRenderView #2: Create view
-MyRenderView #2: SetRenderTargets(render-target, null)
+MyRenderView #2: SetRenderTargets(render-target, depth-stencil-target)
 MyRenderView #2: SetCamera(Camera1)
 MyRenderView #2: SetViewport(0, 0, 800, 600)
 MyRenderView #2: Draw view

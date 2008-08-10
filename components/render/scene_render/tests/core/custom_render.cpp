@@ -184,7 +184,7 @@ int main ()
     
     screen.Attach (vp1);
     
-    RenderTarget render_target = render.CreateRenderTarget ("FrameBuffer0", "");
+    RenderTarget render_target = render.RenderTarget (0);
     
     render_target.SetScreen (&screen);
     

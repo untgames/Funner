@@ -45,7 +45,7 @@ int main ()
     
     RenderTarget render_target;
 
-    render_target = render.CreateRenderTarget ("FrameBuffer0", "FrameBuffer0");    
+    render_target = render.RenderTarget (0);
 
     render_target.SetScreen (&screen);
     

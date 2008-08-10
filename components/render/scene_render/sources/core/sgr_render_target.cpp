@@ -15,49 +15,6 @@ const size_t DEFAULT_AREA_HEIGHT = 100; //высота рабочего пространства по умолча
 
 }
 
-namespace render
-{
-
-/*
-    Базовый класс реализации цели рендеринга
-*/
-
-class IRenderTargetImpl: public xtl::reference_counter
-{
-  public:  
-    virtual ~IRenderTargetImpl () {}
-
-///Имена ассоциированных буферов
-    virtual const char* ColorAttachment () = 0;
-    virtual const char* DepthStencilAttachment () = 0;
-
-///Текущий экран
-    virtual render::Screen* Screen () = 0;
-
-///Смена текущего экрана
-    virtual void SetScreen (render::Screen* in_screen) = 0;
-    
-///Текущее логическое окно вывода
-    virtual const Rect& ScreenArea () = 0;
-    
-///Изменение логического окна вывода
-    virtual void SetScreenArea (const Rect& rect) = 0;
-    
-///Текущее физическое окно вывода
-    virtual const Rect& RenderableArea () = 0;
-    
-///Изменение физическое окна вывода
-    virtual void SetRenderableArea (const Rect& rect) = 0;
-    
-///Перерисовка
-    virtual void Draw () = 0;
-    
-///Захват изображения
-    virtual void CaptureImage (media::Image&) = 0;
-};
-
-}
-
 /*
     Пустая цель рендеринга    
 */
@@ -119,6 +76,9 @@ class NullRenderTarget: public IRenderTargetImpl
 
       return target;
     }
+    
+///Сброс ресурсов
+    void FlushResources () {}
 
   private:
     NullRenderTarget () {}
@@ -137,12 +97,12 @@ class NullRenderTarget: public IRenderTargetImpl
     Описание реализации цели рендеринга
 */
 
-class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTargetAPI, public IRenderTargetImpl, public RenderTargetBase
+class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTargetAPI, public IRenderTargetImpl
 {
   public:
 ///Конструктор
-    RenderTargetImpl (RenderTargetManager& manager, const char* in_color_attachment_name, const char* in_depth_stencil_attachment_name) :  
-      RenderTargetBase (manager),
+    RenderTargetImpl (RenderTargetManager& in_manager, const char* in_color_attachment_name, const char* in_depth_stencil_attachment_name) :
+      manager (&in_manager),
       color_attachment_name (in_color_attachment_name),
       depth_stencil_attachment_name (in_depth_stencil_attachment_name),
       screen (0),
@@ -156,11 +116,21 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
         //резервирование памяти для хранения областей вывода
 
       views.reserve (VIEW_ARRAY_RESERVE);      
+      
+        //регистрация цели в менеджере
+
+      manager->Register (this);
     }
 
 ///Деструктор
     ~RenderTargetImpl ()
     {
+        //отмена регистрации в менеджере
+
+      manager->Unregister (this);
+
+        //сброс текущего экрана
+
       SetScreen (0);
     }
 
@@ -240,7 +210,7 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
       if (!screen)
         return;
 
-      if (!Manager ().BeginDraw ())
+      if (!manager->BeginDraw ())
         return;
 
       try
@@ -290,7 +260,7 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
 
         //завершение транзакции отрисовки
 
-      Manager ().EndDraw ();
+      manager->EndDraw ();
     }    
 
 ///Захват изображения
@@ -307,6 +277,30 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     }
 
   private:
+///Протоколирование
+    void LogVPrintf (const char* format, va_list list)
+    {
+      if (!format)
+        return;
+        
+      try
+      {
+        manager->LogMessage (common::vformat (format, list).c_str ());
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }
+
+    void LogPrintf (const char* format, ...)
+    {
+      va_list list;
+      
+      va_start   (list, format);  
+      LogVPrintf (format, list);
+    }
+
 ///Очистка цели рендеринга
     void ClearRenderTarget ()
     {
@@ -315,7 +309,7 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
         if (!need_update_background && !clear_frame)
           return;
 
-        mid_level::IRenderer& renderer = Manager ().Renderer ();
+        mid_level::IRenderer& renderer = manager->Renderer ();
         
         if (need_update_background)
         {
@@ -374,8 +368,8 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     {
       try
       {
-        AttachmentPtr new_color_attachment (Manager ().GetAttachment (("Color." + color_attachment_name).c_str ())),
-                      new_depth_stencil_attachment (Manager ().GetAttachment (("DepthStencil." + depth_stencil_attachment_name).c_str ()));
+        AttachmentPtr new_color_attachment (manager->GetAttachment (color_attachment_name.c_str ())),
+                      new_depth_stencil_attachment (manager->GetAttachment (depth_stencil_attachment_name.c_str ()));
                       
           //инициализация физически визуализируемой области рендеринга
           
@@ -422,14 +416,14 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     }  
     
 ///Получение системы рендеринга
-    render::mid_level::IRenderer& GetRenderer () { return Manager ().Renderer (); }
+    render::mid_level::IRenderer& GetRenderer () { return manager->Renderer (); }
     
 ///Получение границ области рендеринга
     const Rect& GetRenderableArea  () { return renderable_area; }
     const Rect& GetScreenArea () { return screen_area; }
     
 ///Получение пути рендеринга
-    ICustomSceneRender& GetRenderPath (const char* name) { return Manager ().GetRenderPath (name); }
+    ICustomSceneRender& GetRenderPath (const char* name) { return manager->GetRenderPath (name); }
     
 ///Получение ассоциированных буферов рендеринга
     void GetRenderTargets (mid_level::IRenderTarget*& render_target, mid_level::IRenderTarget*& depth_stencil_target)
@@ -493,12 +487,14 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     void Release () {}
     
   private:
+    typedef xtl::intrusive_ptr<RenderTargetManager>      ManagerPtr;
     typedef xtl::com_ptr<render::mid_level::IClearFrame> ClearFramePtr;
     typedef xtl::intrusive_ptr<RenderView>               ViewPtr;
     typedef stl::vector<ViewPtr>                         ViewArray;
     typedef xtl::com_ptr<mid_level::IRenderTarget>       AttachmentPtr;
 
   private:
+    ManagerPtr       manager;                       //менеджер целей рендеринга
     stl::string      color_attachment_name;         //имя ассоциированного буфера цвета
     stl::string      depth_stencil_attachment_name; //имя ассоциированного буфера попиксельного отсечения
     AttachmentPtr    color_attachment;              //ассоциированный буфер цвета
@@ -523,6 +519,12 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
 
 RenderTarget::RenderTarget ()
   : impl (NullRenderTarget::Instance ())
+{
+  addref (impl);
+}
+
+RenderTarget::RenderTarget (IRenderTargetImpl* in_impl)
+  : impl (in_impl)
 {
   addref (impl);
 }

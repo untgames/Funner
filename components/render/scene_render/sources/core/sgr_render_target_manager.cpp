@@ -23,14 +23,26 @@ RenderTargetManager::RenderTargetManager (const SceneRender::LogFunction& in_log
     Регистрация целей рендеринга
 */
 
-void RenderTargetManager::Register (RenderTargetBase& target)
+void RenderTargetManager::Register (IRenderTargetImpl* target)
 {
-  render_targets.insert (&target);
+  render_targets.push_back (target);
 }
 
-void RenderTargetManager::Unregister (RenderTargetBase& target)
+void RenderTargetManager::Unregister (IRenderTargetImpl* target)
 {
-  render_targets.erase (&target);
+  render_targets.erase (stl::remove (render_targets.begin (), render_targets.end (), target), render_targets.end ());
+}
+
+/*
+    Перебор доступных целей рендеринга
+*/
+
+IRenderTargetImpl* RenderTargetManager::RenderTarget (size_t index)
+{
+  if (index >= render_targets.size ())
+    throw xtl::make_range_exception ("render::RenderTargetManager::RenderTarget", "index", index, render_targets.size ());
+
+  return render_targets [index];
 }
 
 /*
@@ -39,10 +51,10 @@ void RenderTargetManager::Unregister (RenderTargetBase& target)
 
 void RenderTargetManager::FlushResources ()
 {
-  for (RenderTargetSet::iterator iter=render_targets.begin (), end=render_targets.end (); iter!=end; ++iter)
+  for (RenderTargetList::iterator iter=render_targets.begin (), end=render_targets.end (); iter!=end; ++iter)
     (*iter)->FlushResources ();
-    
-  attachments.clear ();
+
+  UnregisterAllAttachments ();
 }
 
 /*
@@ -54,9 +66,6 @@ void RenderTargetManager::SetRenderPathManager (render::RenderPathManager* in_re
   FlushResources ();
 
   render_path_manager = in_render_path_manager;
-  
-  if (render_path_manager)
-    UpdateAttachmentsMap ();
 }
 
 /*
@@ -125,6 +134,11 @@ void RenderTargetManager::UnregisterAttachment (const char* name)
   attachments.erase (name);
 }
 
+void RenderTargetManager::UnregisterAllAttachments ()
+{
+  attachments.clear ();
+}
+
 mid_level::IRenderTarget* RenderTargetManager::GetAttachment (const char* name)
 {
   static const char* METHOD_NAME = "render::RenderTargetManager::GetAttachment";
@@ -138,45 +152,6 @@ mid_level::IRenderTarget* RenderTargetManager::GetAttachment (const char* name)
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Attachment not found");
 
   return iter->second.get ();
-}
-
-/*
-    Обновление карты ассоциированных целей рендеринга
-*/
-
-void RenderTargetManager::UpdateAttachmentsMap ()
-{
-  try
-  {
-      //очистка карты ассоциированных целей рендеринга
-
-    attachments.clear ();
-    
-      //получение системы визуализации
-    
-    mid_level::IRenderer& renderer = Renderer ();
-    
-      //добавление буферов кадра
-      
-    for (size_t i=0, count=renderer.GetFrameBuffersCount (); i<count; i++)
-    {
-      mid_level::IRenderTarget *color_buffer         = renderer.GetColorBuffer (i),
-                               *depth_stencil_buffer = renderer.GetDepthStencilBuffer (i); 
-
-      RegisterAttachment (common::format ("Color.FrameBuffer%u", i).c_str (), color_buffer);
-      RegisterAttachment (common::format ("DepthStencil.FrameBuffer%u", i).c_str (), depth_stencil_buffer);
-    }
-    
-      //добавление пустых буферов кадра
-      
-    RegisterAttachment ("Color.", 0);
-    RegisterAttachment ("DepthStencil.", 0);    
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::RenderTargetManager::UpdateAttachmentsMap");
-    throw;
-  }
 }
 
 /*
@@ -233,52 +208,4 @@ void RenderTargetManager::LogMessage (const char* message)
     return;
     
   log_handler (message);
-}
-
-/*
-===================================================================================================
-    RenderTargetBase
-===================================================================================================
-*/
-
-/*
-    Конструктор / деструктор
-*/
-
-RenderTargetBase::RenderTargetBase (RenderTargetManager& in_manager)
-  : manager (&in_manager)
-{
-  manager->Register (*this);
-}
-
-RenderTargetBase::~RenderTargetBase ()
-{
-  manager->Unregister (*this);
-}
-
-/*
-    Протоколирование
-*/
-
-void RenderTargetBase::LogVPrintf (const char* format, va_list list)
-{
-  if (!format)
-    return;
-    
-  try
-  {
-    manager->LogMessage (common::vformat (format, list).c_str ());
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
-}
-
-void RenderTargetBase::LogPrintf (const char* format, ...)
-{
-  va_list list;
-  
-  va_start   (list, format);  
-  LogVPrintf (format, list);
 }
