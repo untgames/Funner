@@ -389,14 +389,14 @@ class XmlMaterialLibraryLoader
 
         //чтение имени материала
 
-      const char* name = get<const char*> (log, mtl_iter, "name");
+      const char* name = get<const char*> (mtl_iter, "name");
 
       if (name)
         material->Rename (name);
 
         //чтение группы сортировки
 
-      int sort_group = get<int> (log, mtl_iter, "sort_group", material->SortGroup ());
+      int sort_group = get<int> (mtl_iter, "sort_group", material->SortGroup ());
 
       material->SetSortGroup (sort_group);
 
