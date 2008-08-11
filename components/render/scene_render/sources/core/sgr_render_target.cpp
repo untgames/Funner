@@ -107,6 +107,7 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
       depth_stencil_attachment_name (in_depth_stencil_attachment_name),
       screen (0),
       screen_area (0, 0, DEFAULT_AREA_WIDTH, DEFAULT_AREA_HEIGHT),
+      last_update_transaction_number (0),
       need_update_attachments (true),
       need_update_background (true),
       need_update_areas (true),
@@ -209,9 +210,23 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
       
       if (!screen)
         return;
+        
+      size_t draw_transaction_number = manager->BeginDraw ();
+      
+        //блокировка рекурсивного обновления буфера рендеринга
 
-      if (!manager->BeginDraw ())
+      if (!draw_transaction_number) 
         return;
+        
+        //блокировка повторного обновления буфера рендеринга        
+
+      if (draw_transaction_number == last_update_transaction_number)
+      {
+        manager->EndDraw ();
+        return;
+      }
+        
+      last_update_transaction_number = draw_transaction_number;
 
       try
       {      
@@ -504,6 +519,7 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     Rect             renderable_area;               //физическое окно вывода
     ViewArray        views;                         //массив областей рендеринга
     ClearFramePtr    clear_frame;                   //очищающий кадр
+    size_t           last_update_transaction_number; //номер последней транзакции обновления
     bool             need_update_attachments;       //необходимо обновить ассоциированные буферы
     bool             need_update_background;        //необходимо обновить параметры фона
     bool             need_update_areas;             //необходимо обновить границы областей вывода

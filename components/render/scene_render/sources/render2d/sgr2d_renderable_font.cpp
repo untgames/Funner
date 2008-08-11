@@ -11,8 +11,10 @@ RenderableFont::RenderableFont (const char* font_name, Render& in_render)
 {
   if (font.ImageName () == '\0')
     throw xtl::format_operation_exception ("render::render2d::RenderableFont::RenderableFont", "Font '%s' doesn't contain texture name", font_name);
+    
+  RenderQueryPtr query;
 
-  texture = render.GetTexture (font.ImageName ());
+  texture = render.GetTexture (font.ImageName (), true, query);
 
   sprites_buffer.resize (font.GlyphsTableSize ());
 

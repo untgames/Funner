@@ -259,6 +259,20 @@ void SceneRender::UnregisterAllQueryHandlers ()
 }
 
 /*
+    Максимальный уровень вложенности рендеринга
+*/
+
+void SceneRender::SetMaxDrawDepth (size_t level)
+{
+  impl->render_target_manager->SetMaxDrawDepth (level);
+}
+
+size_t SceneRender::MaxDrawDepth () const
+{
+  return impl->render_target_manager->MaxDrawDepth ();
+}
+
+/*
     Установка функции отладочного протоколирования
 */
 

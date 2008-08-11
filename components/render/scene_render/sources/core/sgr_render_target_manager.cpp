@@ -2,11 +2,16 @@
 
 using namespace render;
 
+namespace
+{
+
 /*
-===================================================================================================
-    RenderTargetManager
-===================================================================================================
+    Константы
 */
+
+const size_t DEFAULT_MAX_DRAW_DEPTH = 16; //максимальный уровень вложенности рендеринга по умолчанию
+
+}
 
 /*
     Конструктор
@@ -15,6 +20,8 @@ using namespace render;
 RenderTargetManager::RenderTargetManager (const SceneRender::LogFunction& in_log_handler)
   : render_path_manager (0),
     draw_depth (0),
+    draw_transaction_number (0),
+    max_draw_depth (DEFAULT_MAX_DRAW_DEPTH),
     log_handler (in_log_handler),
     anonymous_attachment_counter (0)
 {
@@ -250,15 +257,21 @@ RenderTarget RenderTargetManager::CreateRenderTarget
     Начало / конец транзакции отрисовки 
 */
 
-//результат показывает допустимость отрисовки (введено для будущего контроля глубины вложенности рендеринга)
-bool RenderTargetManager::BeginDraw ()
+//результат показывает номер транзакции отрисовки или 0 в случае запрета
+size_t RenderTargetManager::BeginDraw ()
 {
-  if (draw_depth == ~0)
-    return false;
+  if (draw_depth == max_draw_depth)
+    return 0;
     
+  if (!draw_depth)
+  {
+    if (!++draw_transaction_number) //пропуск транзакции отрисовки с номером 0
+      ++draw_transaction_number;    
+  }
+
   draw_depth++;
   
-  return true;
+  return draw_transaction_number;
 }
 
 void RenderTargetManager::EndDraw ()
@@ -288,6 +301,15 @@ void RenderTargetManager::EndDraw ()
       }
     }
   }
+}
+
+/*
+    Максимальный уровень вложенности рендеринга
+*/
+
+void RenderTargetManager::SetMaxDrawDepth (size_t level)
+{
+  max_draw_depth = level;
 }
 
 /*

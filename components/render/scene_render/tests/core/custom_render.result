@@ -1,14 +1,28 @@
 Results of custom_render_test:
+render.mid_level.Debug: Create debug driver
+render.mid_level.Debug: Create color-buffer 800x600 (id=3)
+render.mid_level.Debug: Create depth-stencil-buffer 800x600 (id=4)
+render.mid_level.Debug: Create 2D renderer (id=2)
 MySceneRender::Create(render::mid_level::debug::renderer2d::Renderer, MySceneRender)
 MySceneRender::MySceneRender
 LoadResource(auto, data/materials.xmtl)
 Bind camera to scene
 CreateRenderView('Scene1')
+render.mid_level.Debug: Create color-buffer 400x400 (id=5)
+render.mid_level.Debug: Create depth-stencil-buffer 400x400 (id=6)
+Create dynamic render target. Query='test_query'
 MyRenderView #1: Create view
 MyRenderView #1: SetRenderTargets(render-target, depth-stencil-target)
 MyRenderView #1: SetCamera(Camera1)
 MyRenderView #1: SetViewport(0, 0, 800, 600)
 MyRenderView #1: Draw view
+render.mid_level.Debug: Begin draw frames (id=2, frame_id=0)
+render.mid_level.Debug: Begin draw frame (id=7)
+render.mid_level.Debug: Set render targets: render-target=5, depth-stencil-target=6
+render.mid_level.Debug: Clear render target [0.00 0.00 0.00 0.00]
+render.mid_level.Debug: Clear depth-stencil target [1.000 0]
+render.mid_level.Debug: End draw frame (id=7)
+render.mid_level.Debug: End draw frames (id=2, frame_id=0)
 Change camera scene
 MyRenderView #1: Destroy view
 CreateRenderView('Scene2')
@@ -22,4 +36,9 @@ MyRenderView #2: SetCamera(Camera2)
 MyRenderView #2: Draw view
 Unbind camera from scene
 MyRenderView #2: Destroy view
+render.mid_level.Debug: Destroy color-buffer (id=5)
+render.mid_level.Debug: Destroy depth-stencil-buffer (id=6)
 MySceneRender::~MySceneRender
+render.mid_level.Debug: Destroy 2D renderer (id=2)
+render.mid_level.Debug: Destroy depth-stencil-buffer (id=4)
+render.mid_level.Debug: Destroy color-buffer (id=3)

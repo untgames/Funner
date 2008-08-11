@@ -79,8 +79,8 @@ void RenderableSpriteModel::Update ()
       }
 
         //получение текстуры из кэша
-
-      ITexture* texture  = render.GetTexture (material->Image (), need_alpha);
+        
+      ITexture* texture = render.GetTexture (material->Image (), need_alpha, query);
       
         //проверка корректности данных - получение размеров текстуры и тайла
 
@@ -206,6 +206,9 @@ void RenderableSpriteModel::DrawCore (IFrame& frame)
 {
   if (primitive->GetSpritesCount ())
   {
+    if (query)
+      query->Update ();    
+    
     frame.AddPrimitive (primitive.get ());
   }
 }

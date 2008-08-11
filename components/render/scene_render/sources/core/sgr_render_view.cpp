@@ -146,8 +146,8 @@ void RenderView::UpdateRenderView ()
             
       Rect result (int (renderable_area.left + (viewport_area.left - screen_area.left) * x_scale),
                    int (renderable_area.top + (viewport_area.top - screen_area.top) * y_scale),
-                   size_t (viewport_area.width * x_scale),
-                   size_t (viewport_area.height * y_scale));
+                   size_t (ceil (viewport_area.width * x_scale)),
+                   size_t (ceil (viewport_area.height * y_scale)));
 
       render_view->SetViewport (result);
       

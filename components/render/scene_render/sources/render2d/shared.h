@@ -11,6 +11,7 @@
 #include <xtl/bind.h>
 #include <xtl/visitor.h>
 #include <xtl/iterator.h>
+#include <xtl/token_parser.h>
 #include <xtl/trackable.h>
 
 #include <common/component.h>
@@ -43,14 +44,16 @@ typedef mid_level::renderer2d::IPrimitive  IPrimitive;
 typedef mid_level::renderer2d::IRenderer   IRenderer;
 typedef mid_level::renderer2d::IFrame      IFrame;
 typedef mid_level::renderer2d::ITexture    ITexture;
+typedef mid_level::IRenderTarget           IRenderTarget;
 typedef mid_level::renderer2d::BlendMode   BlendMode;
 typedef media::rfx::SpriteMaterial         SpriteMaterial;
-
-typedef xtl::com_ptr<IPrimitive>  PrimitivePtr;
-typedef xtl::com_ptr<IRenderer>   RendererPtr;
-typedef xtl::com_ptr<IFrame>      FramePtr;
-typedef xtl::com_ptr<ITexture>    TexturePtr;
-typedef SpriteMaterial::Pointer   SpriteMaterialPtr;
+typedef xtl::com_ptr<IPrimitive>           PrimitivePtr;
+typedef xtl::com_ptr<IRenderer>            RendererPtr;
+typedef xtl::com_ptr<IFrame>               FramePtr;
+typedef xtl::com_ptr<ITexture>             TexturePtr;
+typedef xtl::com_ptr<IRenderTarget>        RenderTargetPtr;
+typedef xtl::com_ptr<IRenderQuery>         RenderQueryPtr;
+typedef SpriteMaterial::Pointer            SpriteMaterialPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовый визуализируемый объект
@@ -117,6 +120,7 @@ class RenderableSpriteModel: public Renderable, public xtl::trackable
     Render&                   render;                          //ссылка на рендер
     scene_graph::SpriteModel* model;                           //исходная модель
     PrimitivePtr              primitive;                       //визуализируемый примитив
+    RenderQueryPtr            query;                           //запрос дочернего рендеринга
     bool                      need_update_sprites;             //флаг необходимости обновления массива спрайтов
     size_t                    tile_columns;                    //количество столбцов тайлов
     float                     tile_tex_width, tile_tex_height; //размеры тайла в текстурных координатах
@@ -231,10 +235,9 @@ class RenderView: public IRenderView, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Целевые буферы рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                      SetRenderTargets      (mid_level::IRenderTarget* render_target,
-                                                     mid_level::IRenderTarget* depth_stencil_target);
-    mid_level::IRenderTarget* GetRenderTarget       ();
-    mid_level::IRenderTarget* GetDepthStencilTarget ();
+    void           SetRenderTargets      (IRenderTarget* render_target, IRenderTarget* depth_stencil_target);
+    IRenderTarget* GetRenderTarget       ();
+    IRenderTarget* GetDepthStencilTarget ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка области вывода
@@ -327,7 +330,7 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Renderable*     GetRenderable (scene_graph::SpriteModel*);  // дублирование!!!
     Renderable*     GetRenderable (scene_graph::TextLine*);     // дублирование!!!
-    ITexture*       GetTexture    (const char* file_name, bool need_alpha=false);
+    ITexture*       GetTexture    (const char* file_name, bool need_alpha, RenderQueryPtr& out_query);
     SpriteMaterial* GetMaterial   (const char* name);
     RenderableFont* GetFont       (const char* name);
     
@@ -354,7 +357,8 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание текстур
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TexturePtr CreateTexture (const char* file_name, bool need_alpha, bool& has_alpha);
+    TexturePtr CreateTexture        (const char* file_name, bool need_alpha, bool& has_alpha, RenderQueryPtr& out_query);
+    TexturePtr CreateDynamicTexture (const char* name, RenderQueryPtr& out_query);
 
   private:
     struct RenderableHolder
@@ -368,11 +372,12 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     
     struct TextureHolder
     {
-      TexturePtr base_texture;  //базовая текстура
-      TexturePtr alpha_texture; //альфа-текстура
+      TexturePtr     base_texture;  //базовая текстура
+      TexturePtr     alpha_texture; //альфа-текстура
+      RenderQueryPtr query;         //запрос дочернего рендеринга
 
-      TextureHolder (const TexturePtr& in_base_texture, const TexturePtr& in_alpha_texture) :
-        base_texture (in_base_texture), alpha_texture (in_alpha_texture) {}
+      TextureHolder (const TexturePtr& in_base_texture, const TexturePtr& in_alpha_texture, const RenderQueryPtr& in_query) :
+        base_texture (in_base_texture), alpha_texture (in_alpha_texture), query (in_query) {}
     };
 
     typedef stl::hash_map<scene_graph::Entity*, RenderableHolder>        RenderableMap;

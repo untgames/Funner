@@ -77,7 +77,7 @@ RenderView::~RenderView ()
     Целевые буферы рендеринга
 */
 
-void RenderView::SetRenderTargets (mid_level::IRenderTarget* render_target, mid_level::IRenderTarget* depth_stencil_target)
+void RenderView::SetRenderTargets (IRenderTarget* render_target, IRenderTarget* depth_stencil_target)
 {
   frame->SetRenderTargets (render_target, depth_stencil_target);
 }
@@ -172,7 +172,7 @@ void RenderView::Draw ()
 {
   if (!camera)
     return;
-
+    
     //очистка кадра
 
   frame->Clear ();

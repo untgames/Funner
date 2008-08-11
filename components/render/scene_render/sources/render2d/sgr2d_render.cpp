@@ -5,6 +5,17 @@ using namespace render::render2d;
 using namespace scene_graph;
 
 /*
+    Константы
+*/
+
+namespace
+{
+
+const char* DYNAMIC_STRING_MARKER = "dynamic"; //маркер динамической текстуры
+
+}
+
+/*
     Конструктор / деструктор
 */
 
@@ -242,7 +253,7 @@ void Render::RemoveRenderable (scene_graph::Entity* entity)
   renderables_cache.erase (entity);
 }
 
-ITexture* Render::GetTexture (const char* file_name, bool need_alpha)
+ITexture* Render::GetTexture (const char* file_name, bool need_alpha, RenderQueryPtr& out_query)
 {
     //попытка найти текстуру в кеше
 
@@ -252,9 +263,11 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha)
   {
     TextureHolder& holder = iter->second;
     
+    out_query = holder.query;
+    
       //если альфа-канал не требуется - возвращаем базовую текстуру
 
-    if (!need_alpha) 
+    if (!need_alpha)
       return holder.base_texture.get ();
 
       //если требуется альфа канал и соответствующая текстура присутствует - возвращаем её
@@ -263,10 +276,12 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha)
       return holder.alpha_texture.get ();
 
       //если альфа-текстура отсутствует - создаём её и возвращаем
-
+      
     bool has_alpha = false;
+    
+    RenderQueryPtr tmp_query;
 
-    holder.alpha_texture = CreateTexture (file_name, true, has_alpha);
+    holder.alpha_texture = CreateTexture (file_name, true, has_alpha, tmp_query);
 
     return holder.alpha_texture.get ();
   }
@@ -277,12 +292,12 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha)
       
     bool has_alpha = false;
       
-    TexturePtr texture = CreateTexture (file_name, need_alpha, has_alpha);
+    TexturePtr texture = CreateTexture (file_name, need_alpha, has_alpha, out_query);
     
       //добавление текстуры в кэш
 
-    textures.insert_pair (file_name, TextureHolder (texture, has_alpha ? texture : TexturePtr ()));
-    
+    textures.insert_pair (file_name, TextureHolder (texture, has_alpha ? texture : TexturePtr (), out_query));
+
     return texture.get ();
   }
   catch (xtl::exception& exception)
@@ -296,12 +311,25 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha)
     Создание текстур
 */
 
-TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& has_alpha)
+TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& has_alpha, RenderQueryPtr& out_query)
 {
   try
   {
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
+      
+      //проверка маски динамической текстуры      
+      
+    if (!xtl::xstrncmp (file_name, DYNAMIC_STRING_MARKER, strlen (DYNAMIC_STRING_MARKER)))
+    {
+      has_alpha = true;
+
+      return CreateDynamicTexture (file_name, out_query);
+    }
+    
+      //отсутствие динамической текстуры - отсутствие запроса дочернего рендеринга
+    
+    out_query = 0;
     
       //загрузка картинки
       
@@ -374,6 +402,35 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
     exception.touch ("render::render2d::Render::CreateTexture(file_name='%s', renderer='%s')", file_name, renderer->GetDescription ());
     throw;
   }
+}
+
+TexturePtr Render::CreateDynamicTexture (const char* name, RenderQueryPtr& out_query)
+{
+    //разбор запроса динамического рендеринга
+    
+  typedef stl::vector<stl::string> StringArray;
+    
+  StringArray tokens = common::parse (name , "dynamic *\\( *([[:digit:]]*) *, *([[:digit:]]*) *, *'(.*)' *\\).*");
+  
+  if (tokens.size () != 4)
+    throw xtl::make_argument_exception ("render::render2d::Render::CreateDynamicTexture", "name", name,
+      "Wrong format. Expected: dynamic(<width>,<height>,'<query_string>')");
+
+  size_t texture_width  = xtl::io::get<size_t> (tokens [1].c_str ()),
+         texture_height = xtl::io::get<size_t> (tokens [2].c_str ());
+
+  const char* query_string = tokens [3].c_str ();
+  
+    //создание динамической текстуры и вспомогательного буфера глубины
+    
+  TexturePtr       texture (renderer->CreateTexture (texture_width, texture_height, media::PixelFormat_RGBA8), false);    
+  RenderTargetPtr  depth_stencil_buffer (renderer->CreateDepthStencilBuffer (texture_width, texture_height), false);
+                  
+    //создание запроса
+
+  out_query = RenderQueryPtr (query_handler (texture.get (), depth_stencil_buffer.get (), query_string), false);
+  
+  return texture;
 }
 
 /*
