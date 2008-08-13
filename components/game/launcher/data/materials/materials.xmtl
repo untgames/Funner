@@ -4,6 +4,6 @@
     <sprite_profile image="data/textures/bottom.jpg" blend_mode="translucent"/>
   </material>
   <material id="gun_material">
-    <sprite_profile image="data/textures/gun.bmp" blend_mode="translucent"/>
+    <sprite_profile image="data/textures/gun.bmp" blend_mode="alpha_clamp"/>
   </material>
 </material_library>
