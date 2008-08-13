@@ -7,20 +7,31 @@ float frand (float min_value=0.0f, float max_value=1.0f)
   return min_value + float (rand ()) / RAND_MAX * (max_value - min_value);
 }
 
-struct TestScene
+struct Test
 {
+  TestApplication      application;
   SpriteList::Pointer  sprite_list;
+  Sprite::Pointer      sprite;
   OrthoCamera::Pointer camera;
   Scene                scene;
-
-  TestScene ()
+  Screen               screen;
+ 
+  Test ()
   {
-    sprite_list = SpriteList::Create ();    
+      //создание сцены
     
-    sprite_list->SetName     ("SpriteList");
+    sprite_list = SpriteList::Create ();    
+    sprite      = Sprite::Create ();
+    
     sprite_list->SetMaterial ("burst_material");
     sprite_list->Reserve     (SPRITES_COUNT);
     sprite_list->BindToScene (scene);
+    
+    sprite->SetMaterial ("dynamic_material");
+    sprite->SetColor    (1, 1, 1, 0.95);
+    sprite->SetPosition (0, 0, -15);
+    sprite->SetScale    (15, 15, 1);
+    sprite->BindToScene (scene);
 
     for (size_t i=0; i<SPRITES_COUNT; i++)
     {
@@ -45,37 +56,80 @@ struct TestScene
     camera->SetRight    (10);
     camera->SetTop      (10);
     camera->SetBottom   (-10);
-    camera->SetZNear    (-10);
-    camera->SetZFar     (10);    
+    camera->SetZNear    (-20);
+    camera->SetZFar     (20);    
+    
+      //создание областей вывода
+      
+    Viewport vp;
+    
+    screen.SetBackgroundColor (1, 0, 0, 0);
+//    screen.SetBackgroundState (false);
+
+    vp.SetName            ("Viewport1");
+    vp.SetRenderPath      ("Render2d");
+    vp.SetCamera          (camera.get ());
+    vp.SetBackgroundColor (0, 0, 0, 0);
+    vp.EnableBackground   ();
+
+    vp.SetArea (5, 5, 90, 90);
+//    vp.SetArea (0, 0, 100, 100);
+
+    screen.Attach (vp);    
+
+      //настройка целевых буферов вывода
+
+    RenderTarget& render_target = application.RenderTarget ();
+    
+    render_target.SetScreen (&screen);    
+    
+      //настройка запросов рендеринга
+      
+    application.Render ().SetMaxDrawDepth (3);
+      
+    application.Render ().RegisterQueryHandler ("test_query", xtl::bind (&Test::SetupDynamicRenderTarget, this, _1, _2));
+    
+      //установка idle-функции
+
+    application.SetIdleHandler (xtl::bind (&Test::Idle, this));    
+  }
+  
+    //настройка динамического целевого буфера рендеринга
+  void SetupDynamicRenderTarget (RenderTarget& render_target, const char*)
+  {
+    render_target.SetScreen (&screen);
+  }
+  
+    //обработчик главного цикла приложения
+  void Idle ()
+  {
+    try
+    {
+      static clock_t last_update = 0;
+
+      if (clock () - last_update >= CLK_TCK / 25)
+      {    
+        SpriteModel::SpriteDesc* sprite        = sprite_list->Sprites ();
+        size_t                   sprites_count = sprite_list->SpritesCount ();
+
+        for (size_t i=0; i<sprites_count; i++, sprite++)
+          sprite->frame++;
+
+        sprite_list->Invalidate ();
+        
+        this->sprite->Rotate (1, 0, 0, 1);
+
+        last_update = clock ();
+      }    
+
+      application.PostRedraw ();
+    }
+    catch (std::exception& exception)
+    {
+      printf ("exception at idle: %s\n", exception.what ());
+    }    
   }
 };
-
-void idle (TestApplication& app, TestScene& scene)
-{
-  try
-  {
-    static clock_t last_update = 0;
-
-    if (clock () - last_update >= CLK_TCK / 25)
-    {    
-      SpriteModel::SpriteDesc* sprite        = scene.sprite_list->Sprites ();
-      size_t                   sprites_count = scene.sprite_list->SpritesCount ();
-
-      for (size_t i=0; i<sprites_count; i++, sprite++)
-        sprite->frame++;
-
-      scene.sprite_list->Invalidate ();
-
-      last_update = clock ();
-    }    
-
-    app.PostRedraw ();
-  }
-  catch (std::exception& exception)
-  {
-    printf ("exception at idle: %s\n", exception.what ());
-  }
-}
 
 int main ()
 {
@@ -83,42 +137,9 @@ int main ()
 
   try
   {    
-      //инициализация приложения
+    Test test;    
 
-    TestApplication test;
-    
-      //создание сцены
-      
-    TestScene scene;
-      
-      //создание областей вывода
-      
-    Viewport vp;
-    Screen screen;
-    
-    screen.SetBackgroundColor (1, 0, 0, 0);
-
-    vp.SetName       ("Viewport1");
-    vp.SetRenderPath ("Render2d");
-    vp.SetCamera     (scene.camera.get ());
-    vp.SetBackgroundColor (0, 0, 0, 0);
-    vp.EnableBackground ();
-
-    vp.SetArea (10, 10, 80, 80);
-
-    screen.Attach (vp);
-
-    RenderTarget& render_target = test.RenderTarget ();
-    
-    render_target.SetScreen (&screen);
-
-      //установка idle-функции
-
-    test.SetIdleHandler (xtl::bind (&idle, _1, xtl::ref (scene)));
-
-      //запуск приложения
-
-    return test.Run ();
+    return test.application.Run ();
   }
   catch (std::exception& e)
   {
