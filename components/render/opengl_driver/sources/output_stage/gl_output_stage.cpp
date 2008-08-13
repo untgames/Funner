@@ -542,7 +542,13 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
             StageRebindNotify (Stage_Output);
           }
         }
-        
+        else
+        {
+            //оповещение об обновлении буферов рендеринга          
+
+          GetCurrentFrameBuffer ().InvalidateRenderTargets ();
+        }
+
           //очистка выбранных буферов
 
         glClear (mask);

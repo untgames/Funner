@@ -19,8 +19,7 @@ const size_t DEFAULT_MAX_DRAW_DEPTH = 16; //максимальный уровень вложенности рен
 
 RenderTargetManager::RenderTargetManager (const SceneRender::LogFunction& in_log_handler)
   : render_path_manager (0),
-    draw_depth (0),
-    draw_transaction_number (0),
+    draw_context (0),
     max_draw_depth (DEFAULT_MAX_DRAW_DEPTH),
     log_handler (in_log_handler),
     anonymous_attachment_counter (0)
@@ -254,53 +253,12 @@ RenderTarget RenderTargetManager::CreateRenderTarget
 }
 
 /*
-    Начало / конец транзакции отрисовки 
+    Текущий контекст рендеринга
 */
 
-//результат показывает номер транзакции отрисовки или 0 в случае запрета
-size_t RenderTargetManager::BeginDraw ()
+void RenderTargetManager::SetDrawContext (render::DrawContext* in_draw_context)
 {
-  if (draw_depth == max_draw_depth)
-    return 0;
-    
-  if (!draw_depth)
-  {
-    if (!++draw_transaction_number) //пропуск транзакции отрисовки с номером 0
-      ++draw_transaction_number;    
-  }
-
-  draw_depth++;
-  
-  return draw_transaction_number;
-}
-
-void RenderTargetManager::EndDraw ()
-{
-  if (!draw_depth)
-    return;
-    
-  if (!--draw_depth && render_path_manager)
-  {
-      //визуализация кадра
-          
-    mid_level::IRenderer* renderer = render_path_manager->Renderer ();
-    
-    if (renderer)
-    {
-      try
-      {
-        renderer->DrawFrames ();
-      }
-      catch (std::exception& exception)
-      {
-        LogMessage (exception.what ());
-      }
-      catch (...)
-      {
-        LogMessage ("Unknown exception\n    at render::mid_level::IRenderer::DrawFrames");
-      }
-    }
-  }
+  draw_context = in_draw_context;
 }
 
 /*
@@ -310,6 +268,36 @@ void RenderTargetManager::EndDraw ()
 void RenderTargetManager::SetMaxDrawDepth (size_t level)
 {
   max_draw_depth = level;
+}
+
+/*
+    Рисование кадров
+*/
+
+void RenderTargetManager::DrawFrames ()
+{
+  if (!render_path_manager)
+    return;
+        
+  mid_level::IRenderer* renderer = render_path_manager->Renderer ();
+  
+  if (!renderer)
+    return;
+    
+    //визуализация кадров    
+    
+  try
+  {
+    renderer->DrawFrames ();
+  }
+  catch (std::exception& exception)
+  {
+    LogMessage (exception.what ());
+  }
+  catch (...)
+  {
+    LogMessage ("Unknown exception\n    at render::mid_level::IRenderer::DrawFrames");
+  }
 }
 
 /*

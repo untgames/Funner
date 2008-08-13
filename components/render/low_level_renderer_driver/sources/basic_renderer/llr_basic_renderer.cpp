@@ -8,12 +8,6 @@ namespace
 {
 
 /*
-    Константы
-*/
-
-const size_t FRAME_ARRAY_RESERVE_SIZE = 128; //резервируемое число кадров
-
-/*
     Переопределения типов
 */
 
@@ -75,7 +69,9 @@ struct BasicRenderer::FrameBuffer
 */
 
 BasicRenderer::BasicRenderer (IDevice* in_device, size_t swap_chains_count, ISwapChain** swap_chains)
-  : device (in_device)
+  : device (in_device),
+    frame_position (frames.end ()),
+    frames_count (0)
 {
   try
   {
@@ -103,10 +99,6 @@ BasicRenderer::BasicRenderer (IDevice* in_device, size_t swap_chains_count, ISwa
 
       frame_buffers.push_back (FrameBuffer (*device, *swap_chain));
     }
-
-      //резервирование памяти для хранения визуализируемых кадров
-
-    frames.reserve (FRAME_ARRAY_RESERVE_SIZE);    
   }
   catch (xtl::exception& exception)
   {
@@ -165,7 +157,7 @@ namespace
 {
 
 //создание целевого буфера рендеринга
-RenderTarget* create_render_target (IDevice& device, size_t width, size_t height, RenderTargetType type)
+RenderTarget* create_render_buffer (IDevice& device, size_t width, size_t height, RenderTargetType type)
 {
     //создание текстуры
 
@@ -173,12 +165,11 @@ RenderTarget* create_render_target (IDevice& device, size_t width, size_t height
   
   memset (&texture_desc, 0, sizeof texture_desc);
   
-  texture_desc.dimension            = TextureDimension_2D;
-  texture_desc.width                = width;
-  texture_desc.height               = height;
-  texture_desc.layers               = 1;
-  texture_desc.generate_mips_enable = true;
-  texture_desc.usage_mode           = UsageMode_Default;
+  texture_desc.dimension  = TextureDimension_2D;
+  texture_desc.width      = width;
+  texture_desc.height     = height;
+  texture_desc.layers     = 1;
+  texture_desc.usage_mode = UsageMode_Default;
 
   switch (type)
   {
@@ -214,12 +205,12 @@ RenderTarget* create_render_target (IDevice& device, size_t width, size_t height
 
 IRenderTarget* BasicRenderer::CreateDepthStencilBuffer (size_t width, size_t height)
 {
-  return create_render_target (*device, width, height, RenderTargetType_DepthStencil);
+  return create_render_buffer (*device, width, height, RenderTargetType_DepthStencil);
 }
 
 IRenderTarget* BasicRenderer::CreateRenderBuffer (size_t width, size_t height)
 {
-  return create_render_target (*device, width, height, RenderTargetType_Color);
+  return create_render_buffer (*device, width, height, RenderTargetType_Color);
 }
 
 IClearFrame* BasicRenderer::CreateClearFrame ()
@@ -228,7 +219,31 @@ IClearFrame* BasicRenderer::CreateClearFrame ()
 }
 
 /*
-   Добавление кадра в список отрисовки
+    Количество кадров / позиция вставки следующего кадра
+*/
+
+size_t BasicRenderer::FramesCount ()
+{
+  return frames_count;
+}
+
+void BasicRenderer::SetFramePosition (size_t position)
+{
+  if (position > frames_count)
+    position = frames_count;
+
+  frame_position = frames.begin ();
+  
+  advance (frame_position, position);
+}
+
+size_t BasicRenderer::GetFramePosition ()
+{
+  return size_t (distance (frames.begin (), frame_position));
+}
+
+/*
+    Добавление кадра в список отрисовки
 */
 
 void BasicRenderer::AddFrame (IFrame* in_frame)
@@ -244,7 +259,9 @@ void BasicRenderer::AddFrame (IFrame* in_frame)
     throw xtl::make_argument_exception (METHOD_NAME, "frame", typeid (in_frame).name (),
       "Frame type incompatible with render::mid_level::low_level_driver::BasicFrame");
       
-  frames.push_back (frame);
+  frames.insert (frame_position, frame);  
+
+  frames_count++;  
 }
 
 /*
@@ -256,16 +273,16 @@ void BasicRenderer::DrawFrames ()
   if (frames.empty ())
     return;
     
-    //отрисовка кадров
+    //отрисовка кадров    
 
-  for (FrameArray::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
+  for (FrameList::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
   {
     (*iter)->Draw (device.get ());
   }
 
     //очистка списка кадров
 
-  frames.clear ();
+  CancelFrames ();
 
     //вывод сформированной картинки
     
@@ -276,4 +293,7 @@ void BasicRenderer::DrawFrames ()
 void BasicRenderer::CancelFrames ()
 {
   frames.clear ();
+  
+  frame_position = frames.end ();
+  frames_count   = 0;
 }

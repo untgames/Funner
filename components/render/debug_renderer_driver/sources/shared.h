@@ -2,6 +2,7 @@
 #define RENDER_MID_LEVEL_DEBUG_DRIVER_SHARED_HEADER
 
 #include <stl/vector>
+#include <stl/list>
 
 #include <xtl/reference_counter.h>
 #include <xtl/function.h>
@@ -243,6 +244,13 @@ class BasicRenderer: virtual public IRenderer, public Object
     void AddFrame (IFrame*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Количество кадров / позиция вставки следующего кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t FramesCount      ();
+    void   SetFramePosition (size_t position);
+    size_t GetFramePosition ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конец отрисовки / сброс отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void DrawFrames   ();
@@ -251,13 +259,15 @@ class BasicRenderer: virtual public IRenderer, public Object
   private:
     typedef xtl::com_ptr<IRenderTarget> RenderTargetPtr;
     typedef xtl::com_ptr<BasicFrame>    FramePtr;
-    typedef stl::vector<FramePtr>       FrameArray;
+    typedef stl::list<FramePtr>         FrameList;
 
   private:
-    RenderTargetPtr color_buffer;
-    RenderTargetPtr depth_stencil_buffer;
-    FrameArray      frames;
-    size_t          frame_id;
+    RenderTargetPtr     color_buffer;
+    RenderTargetPtr     depth_stencil_buffer;
+    FrameList           frames;
+    FrameList::iterator frame_position;
+    size_t              frames_count;
+    size_t              frame_id;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

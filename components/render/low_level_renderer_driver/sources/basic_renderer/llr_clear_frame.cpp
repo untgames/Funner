@@ -85,5 +85,5 @@ void ClearFrame::DrawCore (render::low_level::IDevice* device)
     if (clear_flags & render::mid_level::ClearFlag_Stencil) device_clear_flags |= render::low_level::ClearFlag_Stencil;
   }
 
-  device->ClearViews (device_clear_flags, clear_color, clear_depth_value, clear_stencil_index);
+  device->ClearViews (device_clear_flags, clear_color, clear_depth_value, clear_stencil_index);  
 }

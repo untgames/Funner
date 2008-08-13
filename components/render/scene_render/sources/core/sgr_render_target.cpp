@@ -13,14 +13,9 @@ const size_t VIEW_ARRAY_RESERVE  = 8;   //резервируемое количество областей види
 const size_t DEFAULT_AREA_WIDTH  = 100; //ширина рабочего пространства по умолчанию
 const size_t DEFAULT_AREA_HEIGHT = 100; //высота рабочего пространства по умолчанию
 
-}
-
 /*
     Пустая цель рендеринга    
 */
-
-namespace
-{
 
 class NullRenderTarget: public IRenderTargetImpl
 {
@@ -93,6 +88,88 @@ class NullRenderTarget: public IRenderTargetImpl
     Rect renderable_area;
 };
 
+}
+
+/*
+    Контекст рендеринга
+*/
+
+namespace render
+{
+
+struct DrawContext
+{
+  RenderTargetManager&  render_target_manager;      //менеджер целей рендеринга
+  mid_level::IRenderer& renderer;                   //система визуализации
+  DrawContext*          parent;                     //родительский контекст
+  size_t                child_start_frame_position; //положение начала кадров для дочернего рендеринга  
+  size_t                parent_frame_offset;        //сохранённое положение кадров родительского контекста
+  size_t                depth_available;            //количество доступных уровней вложенности рендеринга  
+  size_t                transaction_id;             //идентификатор транзакции рендеринга
+
+  DrawContext (RenderTargetManager& manager) :
+    render_target_manager (manager),
+    renderer (manager.Renderer ()),
+    parent (manager.DrawContext ()),
+    child_start_frame_position (parent ? parent->child_start_frame_position : 0),
+    parent_frame_offset (renderer.GetFramePosition () - child_start_frame_position),
+    depth_available (parent ? parent->depth_available - 1 : manager.MaxDrawDepth ())    
+  {
+      //получение номера транзакции рендеринга
+      
+    static size_t next_transaction_id = 0;
+
+    transaction_id = next_transaction_id++;
+    
+    if (!transaction_id)
+      transaction_id = next_transaction_id++; //отсечение нуля
+
+      //установка нового начала кадров
+
+    renderer.SetFramePosition (child_start_frame_position);
+    
+      //установка нового текущего контекста рендеринга
+      
+    manager.SetDrawContext (this);
+  }
+
+  ~DrawContext ()
+  {
+    try
+    {
+        //установка родительского контекста рендеринга
+
+      render_target_manager.SetDrawContext (parent);
+
+      if (parent)
+      {
+          //изменение родительского начала кадров дочернего рендеринга                    
+
+        parent->child_start_frame_position = renderer.GetFramePosition ();
+
+          //установка родительского счётчика кадров        
+
+        renderer.SetFramePosition (parent->child_start_frame_position + parent_frame_offset);
+      }
+      else
+      {
+          //если контекст является корневым - рисуем все добавленные кадры
+
+        render_target_manager.DrawFrames ();
+      }
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
+  }
+};
+
+}
+
+namespace
+{
+
 /*
     Описание реализации цели рендеринга
 */
@@ -107,7 +184,7 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
       depth_stencil_attachment_name (in_depth_stencil_attachment_name),
       screen (0),
       screen_area (0, 0, DEFAULT_AREA_WIDTH, DEFAULT_AREA_HEIGHT),
-      last_update_transaction_number (0),
+      last_update_transaction_id (0),
       need_update_attachments (true),
       need_update_background (true),
       need_update_areas (true),
@@ -211,25 +288,21 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
       if (!screen)
         return;
         
-      size_t draw_transaction_number = manager->BeginDraw ();
-      
-        //блокировка рекурсивного обновления буфера рендеринга
-
-      if (!draw_transaction_number) 
-        return;
+      DrawContext* parent_draw_context = manager->DrawContext ();
         
-        //блокировка повторного обновления буфера рендеринга        
-
-      if (draw_transaction_number == last_update_transaction_number)
+      if (parent_draw_context)
       {
-        manager->EndDraw ();
-        return;
+        if (last_update_transaction_id == parent_draw_context->transaction_id)
+          return; //ограничение повторного рендеринга дочерних целей
+
+        if (!parent_draw_context->depth_available)
+          return; //ограничение на глубину вложенности рендеринга
       }
-        
-      last_update_transaction_number = draw_transaction_number;
 
       try
       {      
+        DrawContext draw_context (*manager);
+        
           //упорядочение областей вывода
         
         if (need_reorder)
@@ -271,11 +344,11 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
       catch (...)
       {
         LogPrintf ("Unknown exception\n    at RenderTargetImpl::Draw");
-      }        
+      }
 
-        //завершение транзакции отрисовки
+        //сохранение номера транзакции рендеринга для ограничения повторного рендеринга
 
-      manager->EndDraw ();
+      last_update_transaction_id = parent_draw_context ? parent_draw_context->transaction_id : 0;
     }    
 
 ///Захват изображения
@@ -358,7 +431,7 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
           need_update_background = false;
         }
 
-          //очистка
+          //очистка          
 
         renderer.AddFrame (clear_frame.get ());
       }
@@ -519,7 +592,7 @@ class RenderTargetImpl: private IScreenListener, private RenderView::IRenderTarg
     Rect             renderable_area;               //физическое окно вывода
     ViewArray        views;                         //массив областей рендеринга
     ClearFramePtr    clear_frame;                   //очищающий кадр
-    size_t           last_update_transaction_number; //номер последней транзакции обновления
+    size_t           last_update_transaction_id;    //идентификатор последней транзакции обновления
     bool             need_update_attachments;       //необходимо обновить ассоциированные буферы
     bool             need_update_background;        //необходимо обновить параметры фона
     bool             need_update_areas;             //необходимо обновить границы областей вывода

@@ -2,6 +2,7 @@
 #define RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_BASIC_RENDERER_HEADER
 
 #include <stl/vector>
+#include <stl/list>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
@@ -179,6 +180,13 @@ class BasicRenderer: virtual public IRenderer, public Object
     void AddFrame (IFrame*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+/// оличество кадров / позици€ вставки следующего кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t FramesCount      ();
+    void   SetFramePosition (size_t position);
+    size_t GetFramePosition ();    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онец отрисовки / сброс отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void DrawFrames   ();
@@ -193,12 +201,14 @@ class BasicRenderer: virtual public IRenderer, public Object
     struct FrameBuffer;
 
     typedef xtl::intrusive_ptr<BasicFrame> FramePtr;
-    typedef stl::vector<FramePtr>          FrameArray;
+    typedef stl::list<FramePtr>            FrameList;
     typedef stl::vector<FrameBuffer>       FrameBufferArray;
 
   private:
-    FrameBufferArray frame_buffers; //массив буферов кадра
-    FrameArray       frames;        //массив кадров
+    FrameBufferArray    frame_buffers;  //массив буферов кадра
+    FrameList           frames;         //массив кадров
+    FrameList::iterator frame_position; //текуща€ позици€ вставки кадров
+    size_t              frames_count;   //количество кадров
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

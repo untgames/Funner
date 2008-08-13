@@ -302,7 +302,7 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha, RenderQuer
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::render2d::Render::GetTexture(file_name='%s', renderer='%s')", file_name, renderer->GetDescription ());
+    exception.touch ("render::render2d::Render::GetTexture");
     throw;
   }
 }

@@ -33,7 +33,7 @@ Primitive2dPtr create_primitive (const Renderer2dPtr& renderer)
 
 int main ()
 {
-  printf ("Results of renderer2d_primitive_test:\n");
+  printf ("Results of renderer2d_frame1_test:\n");
 
   try
   {

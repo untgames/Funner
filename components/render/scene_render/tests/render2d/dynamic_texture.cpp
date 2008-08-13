@@ -51,12 +51,13 @@ int main ()
     vp1.SetCamera     (&*camera);
     vp1.SetRenderPath ("Render2d");
 
-    Screen screen, dynamic_screen;
+    Screen screen;
     
-//    dynamic_screen_ptr = &dynamic_screen;
-    dynamic_screen_ptr = &screen; //!!!!
+    dynamic_screen_ptr = &screen;        
+    
+    render.SetMaxDrawDepth (3);
 
-    screen.Attach (vp1);
+    screen.Attach (vp1);        
     
     RenderTarget render_target;
 

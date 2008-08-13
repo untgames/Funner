@@ -21,6 +21,8 @@ struct TextDimensions
 
 TextDimensions calculate_text_dimensions (render::mid_level::renderer2d::Sprite* glyphs, size_t glyphs_count)
 {
+    //неверно!!!!, инициализация return_value
+
   TextDimensions return_value = {0.f, 0.f, 0.f, 0.f};
 
   for (size_t i = 0; i < glyphs_count; i++, glyphs++)

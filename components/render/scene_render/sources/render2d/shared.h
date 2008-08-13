@@ -94,7 +94,7 @@ class Renderable: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Модель, состоящая из спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class RenderableSpriteModel: public Renderable, public xtl::trackable
+class RenderableSpriteModel: public Renderable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,29 +104,12 @@ class RenderableSpriteModel: public Renderable, public xtl::trackable
     ~RenderableSpriteModel ();
 
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обновление модели
-///////////////////////////////////////////////////////////////////////////////////////////////////
     void Update ();
-    void UpdateMaterialNotify ();
-    void UpdateSpritesNotify ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Рисование модели
-///////////////////////////////////////////////////////////////////////////////////////////////////
     void DrawCore (IFrame&);
 
   private:
-    Render&                   render;                          //ссылка на рендер
-    scene_graph::SpriteModel* model;                           //исходная модель
-    PrimitivePtr              primitive;                       //визуализируемый примитив
-    RenderQueryPtr            query;                           //запрос дочернего рендеринга
-    bool                      need_update_sprites;             //флаг необходимости обновления массива спрайтов
-    size_t                    tile_columns;                    //количество столбцов тайлов
-    float                     tile_tex_width, tile_tex_height; //размеры тайла в текстурных координатах
-    size_t                    current_world_tm_hash;           //хэш текущей матрицы трансформации
-    size_t                    current_material_name_hash;      //хэш текущего имени материала
-    float                     current_alpha_reference;         //текущее значение параметра альфа-отсечения
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,11 +149,11 @@ class RenderableFont
     typedef xtl::com_ptr<ITexture>                                            TextuerPtr;
 
   private:
-    Render&       render;                       //ссылка на рендер
-    media::Font   font;                         //шрифт
-    SpritesBuffer sprites_buffer;               //буффер спрайтов (по спрайту для каждого глифа)
-    TexturePtr    texture;                      //текстура
-    size_t        max_glyph_side;               //размер самой большой стороны среди всех глифов (в пикселях)
+    Render&       render;         //ссылка на рендер
+    media::Font   font;           //шрифт
+    SpritesBuffer sprites_buffer; //буффер спрайтов (по спрайту для каждого глифа)
+    TexturePtr    texture;        //текстура
+    size_t        max_glyph_side; //размер самой большой стороны среди всех глифов (в пикселях)
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,7 +358,7 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
       TexturePtr     base_texture;  //базовая текстура
       TexturePtr     alpha_texture; //альфа-текстура
       RenderQueryPtr query;         //запрос дочернего рендеринга
-
+      
       TextureHolder (const TexturePtr& in_base_texture, const TexturePtr& in_alpha_texture, const RenderQueryPtr& in_query) :
         base_texture (in_base_texture), alpha_texture (in_alpha_texture), query (in_query) {}
     };

@@ -4,27 +4,16 @@ using namespace render::mid_level;
 using namespace render::mid_level::debug;
 
 /*
-     онстанты
-*/
-
-namespace
-{
-
-const size_t FRAME_ARRAY_RESERVE_SIZE = 128; //резервируемое число кадров
-
-}
-
-/*
      онструктор
 */
 
 BasicRenderer::BasicRenderer ()  
-  : frame_id (0)
+  : frame_position (frames.end ()),
+    frames_count (0),
+    frame_id (0)
 {
   color_buffer         = RenderTargetPtr (CreateRenderBuffer (SCREEN_WIDTH, SCREEN_HEIGHT), false);
   depth_stencil_buffer = RenderTargetPtr (CreateDepthStencilBuffer (SCREEN_WIDTH, SCREEN_HEIGHT), false);  
-  
-  frames.reserve (FRAME_ARRAY_RESERVE_SIZE);
 }
 
 BasicRenderer::~BasicRenderer ()
@@ -116,6 +105,30 @@ IClearFrame* BasicRenderer::CreateClearFrame ()
 }
 
 /*
+     оличество кадров / позици€ вставки следующего кадра
+*/
+
+size_t BasicRenderer::FramesCount ()
+{
+  return frames_count;
+}
+
+void BasicRenderer::SetFramePosition (size_t position)
+{
+  if (position > frames_count)
+    position = frames_count;
+
+  frame_position = frames.begin ();
+  
+  advance (frame_position, position);
+}
+
+size_t BasicRenderer::GetFramePosition ()
+{
+  return size_t (distance (frames.begin (), frame_position));
+}
+
+/*
    ƒобавление кадра в список отрисовки
 */
 
@@ -126,13 +139,15 @@ void BasicRenderer::AddFrame (IFrame* in_frame)
   if (!in_frame)
     throw xtl::make_null_argument_exception (METHOD_NAME, "frame");
     
-  BasicFrame* frame = dynamic_cast<BasicFrame*> (in_frame);
+  BasicFrame* frame = dynamic_cast<BasicFrame*> (in_frame);      
   
   if (!frame)  
     throw xtl::make_argument_exception (METHOD_NAME, "frame", typeid (in_frame).name (),
-      "Frame type incompatible with render::mid_level::debug::BasicFrame");
-      
-  frames.push_back (frame);
+      "Frame type incompatible with render::mid_level::debug::BasicFrame");            
+
+  frames.insert (frame_position, frame);  
+
+  frames_count++;
 }
 
 /*
@@ -150,7 +165,7 @@ void BasicRenderer::DrawFrames ()
 
     //отрисовка кадров
 
-  for (FrameArray::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
+  for (FrameList::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
   {
     BasicFrame& frame = **iter;
     
@@ -160,7 +175,10 @@ void BasicRenderer::DrawFrames ()
     //очистка списка кадров
     
   frames.clear ();
-  
+
+  frame_position = frames.end ();
+  frames_count   = 0;
+
     //конец отрисовки
     
   log.Printf ("End draw frames (id=%u, frame_id=%u)", Id (), frame_id);
@@ -173,6 +191,9 @@ void BasicRenderer::DrawFrames ()
 void BasicRenderer::CancelFrames ()
 {
   frames.clear ();
+  
+  frame_position = frames.end ();
+  frames_count   = 0;
   
   log.Printf ("Renderer cancel frames (id=%u)", Id ());
 }

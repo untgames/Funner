@@ -270,6 +270,19 @@ void SwapChainFrameBuffer::InvalidateRenderTargets (const Rect& update_rect)
     dirty_rect.height = bottom - dirty_rect.y;
 }
 
+void SwapChainFrameBuffer::InvalidateRenderTargets ()
+{
+  size_t color_width  = render_targets [RenderTargetType_Color].mip_level_desc.width,
+         color_height = render_targets [RenderTargetType_Color].mip_level_desc.height,
+         ds_width     = render_targets [RenderTargetType_DepthStencil].mip_level_desc.width,
+         ds_height    = render_targets [RenderTargetType_DepthStencil].mip_level_desc.height;
+
+  dirty_rect.x      = 0;
+  dirty_rect.y      = 0;
+  dirty_rect.width  = color_width < ds_width ? ds_width : color_width;
+  dirty_rect.height = color_height < ds_height ? ds_height : color_height;
+}
+
 /*
     Обновление целевых текстур
 */
