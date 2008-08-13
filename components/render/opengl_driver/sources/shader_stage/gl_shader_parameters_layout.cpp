@@ -98,15 +98,10 @@ void ProgramParametersLayout::SetDesc (const ProgramParametersLayoutDesc& in_des
    Получение данных
 */
 
-size_t ProgramParametersLayout::GroupsCount ()
-{
-  return parameter_groups.size ();
-}
-
-ProgramParameterGroup& ProgramParametersLayout::ParametersGroup (size_t index)
+ProgramParameterGroup& ProgramParametersLayout::GetGroup (size_t index)
 {
   if (index >= parameter_groups.size ())
-    throw xtl::make_range_exception ("render::low_level::opengl::ProgramParametersLayout::ParametersGroup", "index", index, 0u, parameter_groups.size ());
+    throw xtl::make_range_exception ("render::low_level::opengl::ProgramParametersLayout::GetGroup", "index", index, 0u, parameter_groups.size ());
 
-  return parameter_groups[index];
+  return parameter_groups [index];
 }

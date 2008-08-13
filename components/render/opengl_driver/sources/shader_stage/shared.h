@@ -65,14 +65,10 @@ class ProgramParametersLayout : virtual public IProgramParametersLayout, public 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕолучение данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          ///добавить приставку Get!!!
-    size_t                 ParametersCount () {return parameters.size ();}
-    size_t                 GroupsCount ();
-    ProgramParameterGroup& ParametersGroup (size_t index);
-
     size_t                 GetGroupsCount     () const { return parameter_groups.size (); }
-    size_t                 GetParametersCount () const { return parameter_groups.size (); }    
+    size_t                 GetParametersCount () const { return parameters.size (); }    
     ProgramParameterGroup* GetGroups          ()       { return &parameter_groups [0]; }
+    ProgramParameterGroup& GetGroup           (size_t index);
     ProgramParameter*      GetParameters      ()       { return &parameters [0]; }
 
   private:

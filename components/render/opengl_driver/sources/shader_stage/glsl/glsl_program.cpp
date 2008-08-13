@@ -214,16 +214,16 @@ void GlslProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLa
     oldest_entry->source_layout = NULL;
 
     oldest_entry->parameters.clear ();
-    oldest_entry->parameters.reserve (parameters_layout->ParametersCount ());
+    oldest_entry->parameters.reserve (parameters_layout->GetParametersCount ());
 
     GlslProgramParameter temp_parameter;
 
     oldest_entry->parameter_groups.clear ();
-    oldest_entry->parameter_groups.reserve (parameters_layout->GroupsCount ());
+    oldest_entry->parameter_groups.reserve (parameters_layout->GetGroupsCount ());
 
-    for (size_t i = 0, group_count = parameters_layout->GroupsCount (); i < group_count; i++)
+    for (size_t i = 0, group_count = parameters_layout->GetGroupsCount (); i < group_count; i++)
     {
-      ProgramParameterGroup &current_group = parameters_layout->ParametersGroup (i);
+      ProgramParameterGroup &current_group = parameters_layout->GetGroup (i);
 
       GlslProgramParameterGroup new_group = {current_group.slot, 0, current_group.count, NULL};
 

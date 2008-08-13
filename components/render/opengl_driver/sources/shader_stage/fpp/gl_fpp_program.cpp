@@ -132,7 +132,6 @@ FppProgram::LayoutCacheEntry& FppProgram::GetLayout (ProgramParametersLayout* pa
   
   new_entry->source_layout_id = 0;
   
-  
     //резервирование памяти для хранения параметров и групп
   
   new_entry->parameters.reserve (parameters_layout->GetParametersCount ());
@@ -164,7 +163,7 @@ FppProgram::LayoutCacheEntry& FppProgram::GetLayout (ProgramParametersLayout* pa
       
       dst_param.location = shader->FindDynamicParameter (src_param.name);
       dst_param.offset   = src_param.offset;
-      
+
       if (!dst_param.location)
       {
           //если параметр отсутствует - игнорируем его
@@ -371,6 +370,7 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
   for (ProgramParameterGroupArray::iterator iter=groups.begin (), end=groups.end (); iter!=end; ++iter)
   {
     FppProgramParameterGroup& group  = *iter;
+
     IBindableBuffer*          buffer = constant_buffers [group.slot].get ();
 
       //проверка наличия требуемого константного буфера
@@ -411,7 +411,7 @@ void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLay
       //обновление хэша данных группы параметров
 
     group.data_hash = buffer->GetDataHash ();    
-  }  
+  }
   
     //обновление хэшей FppState
     
