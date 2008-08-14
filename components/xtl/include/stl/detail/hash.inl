@@ -87,3 +87,17 @@ inline size_t hash (const wchar_t* s)
 }
 
 #endif
+
+//получение последовательного хэша
+template <class T>
+inline size_t hash (const T& object, size_t previous_hash)
+{
+  return hash (object) ^ previous_hash;
+}
+
+//получение хэша пары
+template <class T1, class T2>
+inline size_t hash (const pair<T1, T2>& p)
+{
+  return hash (p.second, hash (p.first));
+}

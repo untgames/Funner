@@ -12,6 +12,9 @@
 namespace stl
 {
 
+//forward declaration
+template <class T1, class T2> struct pair;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Функтор хэширования
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,6 +62,12 @@ size_t hash (unsigned int x);
 size_t hash (const char*);
 size_t hash (const unsigned char*);
 size_t hash (const wchar_t*);
+
+//получение последовательного хэша
+template <class T> size_t hash (const T&, size_t previous_hash);
+
+//получение хэша пары
+template <class T1, class T2> size_t hash (const pair<T1, T2>&);
 
 #include <stl/detail/hash.inl>
 
