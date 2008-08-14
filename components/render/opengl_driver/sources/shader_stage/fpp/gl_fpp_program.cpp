@@ -147,6 +147,8 @@ FppProgram::LayoutCacheEntry& FppProgram::GetLayout (ProgramParametersLayout* pa
     
   const ProgramParameter*      src_params = parameters_layout->GetParameters ();
   const ProgramParameterGroup* src_groups = parameters_layout->GetGroups ();
+  
+  printf ("parameters_count=%u groups_count=%u\n", parameters_layout->GetParametersCount (), parameters_layout->GetGroupsCount ());
     
   for (size_t i=0, count=parameters_layout->GetGroupsCount (); i<count; i++)
   {
@@ -160,6 +162,8 @@ FppProgram::LayoutCacheEntry& FppProgram::GetLayout (ProgramParametersLayout* pa
       FppProgramParameter     dst_param;
       
         //поиск параметра в шейдере
+        
+        printf ("name='%s'\n", src_param.name);
       
       dst_param.location = shader->FindDynamicParameter (src_param.name);
       dst_param.offset   = src_param.offset;
@@ -167,6 +171,8 @@ FppProgram::LayoutCacheEntry& FppProgram::GetLayout (ProgramParametersLayout* pa
       if (!dst_param.location)
       {
           //если параметр отсутствует - игнорируем его
+          
+          printf ("FUCKOFF\n");
 
         LogPrintf ("Unreferenced parameter '%s'", src_param.name);
         continue;
@@ -268,6 +274,8 @@ FppProgram::LayoutCacheEntry& FppProgram::GetLayout (ProgramParametersLayout* pa
     dst_group.parameters = &new_entry->parameters [start_parameters_count];
 
     new_entry->parameter_groups.push_back (dst_group);
+    
+    printf ("test: %p %p\n", &new_entry->parameters [0], &new_entry->parameter_groups [0]);
   }
 
     //установка времени доступа и исходного layout

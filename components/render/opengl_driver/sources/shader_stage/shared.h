@@ -3,6 +3,7 @@
 
 #include <stl/vector>
 #include <stl/algorithm>
+#include <stl/string>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/trackable_ptr.h>
@@ -23,8 +24,6 @@ namespace low_level
 namespace opengl
 {
 
-typedef xtl::trackable_ptr<IBindableBuffer> ConstantBufferPtr;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Элементы таблицы локальных данных контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,17 +38,22 @@ enum ShaderStageCache
   ShaderStageCache_FppModesStateHash,    //хэш режимов визуализации
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Описание расположения параметров в группе (группировка произодится по индексам константных буферов)
+///////////////////////////////////////////////////////////////////////////////////////////////////
 struct ProgramParameterGroup
 {
-  size_t            slot;       //номер слота с константым буфером
-  size_t            count;      //количество элементов группы
-  ProgramParameter* parameters; //указатель на начало области с элементами
+  size_t            slot;       //индекс константного буфера
+  size_t            count;      //количество параметров в группе
+  ProgramParameter* parameters; //указатель на начало области с параметрами группы
 };
 
+typedef xtl::trackable_ptr<IBindableBuffer> ConstantBufferPtr;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание расположения параметров
+///Описание расположения параметров программы шейдинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ProgramParametersLayout : virtual public IProgramParametersLayout, public ContextObject
+class ProgramParametersLayout: virtual public IProgramParametersLayout, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,36 +67,43 @@ class ProgramParametersLayout : virtual public IProgramParametersLayout, public 
     void SetDesc (const ProgramParametersLayoutDesc& in_desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение данных
+///Получение параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                 GetGroupsCount     () const { return parameter_groups.size (); }
-    size_t                 GetParametersCount () const { return parameters.size (); }    
-    ProgramParameterGroup* GetGroups          ()       { return &parameter_groups [0]; }
-    ProgramParameterGroup& GetGroup           (size_t index);
-    ProgramParameter*      GetParameters      ()       { return &parameters [0]; }
+    size_t            GetParametersCount () const { return parameters.size (); }    
+    ProgramParameter* GetParameters      ()       { return &parameters [0]; }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение групп
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    size_t                 GetGroupsCount () const { return groups.size (); }
+    ProgramParameterGroup* GetGroups      ()       { return &groups [0]; }
+    ProgramParameterGroup& GetGroup       (size_t index);
 
   private:
-    stl::vector<ProgramParameterGroup> parameter_groups;
-    stl::vector<ProgramParameter>      parameters;
+    typedef stl::vector<ProgramParameter>      ParameterArray;
+    typedef stl::vector<ProgramParameterGroup> GroupArray;
+
+  private:  
+    ParameterArray parameters; //параметры программы шейдинга
+    GroupArray     groups;     //группы параметров программы шейдинга
+    stl::string    names;      //имена параметров
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Шейдер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Shader : virtual public IObject
-{
-};
+class Shader: virtual public IObject {};
 
 typedef xtl::com_ptr<Shader> ShaderPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Программа
+///Программа шейдинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Program : virtual public IProgram, public ContextObject
+class Program: virtual public IProgram, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Биндинг
+///Установка программы шейдинга в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLayout* parameters_layout) = 0;
     
@@ -101,7 +112,7 @@ class Program : virtual public IProgram, public ContextObject
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Шейдер менеджер
+///Менеджер шейдеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class ShaderManager : virtual public IObject
 {
