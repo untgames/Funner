@@ -192,16 +192,16 @@ struct FppDynamicParameter
 typedef stl::hash_map<stl::hash_key<const char*>, FppDynamicParameter> FppDynamicParameterMap;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Fixed-pipeline-program шейдер
+///Fixed-pipeline-program
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FppShader: virtual public Shader, public Object
+class FppProgram: virtual public ICompiledProgram, virtual public IShader, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FppShader  (const ShaderDesc& shader_desc, const LogFunction& error_log);
-    ~FppShader ();
+    FppProgram  (const ContextManager&, const ShaderDesc& shader_desc, const LogFunction& error_log);
+    ~FppProgram ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовое состояние фиксированной программы шейдинга
@@ -213,58 +213,64 @@ class FppShader: virtual public Shader, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const FppDynamicParameter* FindDynamicParameter (const char* name) const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание программы, устанавливаемой в контекст OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IBindableProgram* CreateBindableProgram (ProgramParametersLayout* layout);
+
   private:
     FppState               base_state;         //базовое состояние фиксированной программы шейдинга
     FppDynamicParameterMap dynamic_parameters; //массив динамических параметров
 };
 
-typedef xtl::com_ptr<FppShader> FppShaderPtr;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Fixed-pipeline-program
+///Fixed-pipeline-program устанавливаемая в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FppProgram : public Program
+class FppBindableProgram: virtual public IBindableProgram, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор/деструктор
+///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FppProgram (const ContextManager& manager, size_t shaders_count, ShaderPtr* shaders);
-    ~FppProgram ();
+    FppBindableProgram (const ContextManager& manager, FppProgram& compiled_program, ProgramParametersLayout* layout);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Биндинг
+///Установка программы в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLayout* parameters_layout);
+    void Bind (ConstantBufferPtr* constant_buffers);  
     
   private:
-    struct LayoutCacheEntry;  
+    void UpdateHashes ();
+    
+  private:
+    struct Parameter;
+    struct Group;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение расположения параметров
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    LayoutCacheEntry& GetLayout (ProgramParametersLayout*);
+    typedef stl::vector<Parameter>  ParameterArray;
+    typedef stl::vector<Group>      GroupArray;
 
   private:
-    typedef stl::vector<LayoutCacheEntry> LayoutsCache;
-    typedef xtl::com_ptr<FppShader>       FppShaderPtr;
-
-    FppShaderPtr  shader;         //используемый шейдер
-    LayoutsCache  layouts_cache;  //кэш параметров программы
-    size_t        current_time;   //текущее время
+    ParameterArray  parameters;     //параметры программы
+    GroupArray      groups;         //группы параметров
+    FppState        fpp_state;      //состояние фиксированной программы шейдинга
+    size_t          viewer_hash;    //хэш параметров наблюдателя
+    size_t          object_hash;    //хэш параметров объекта
+    size_t          material_hash;  //хэш параметров материала
+    size_t          lighting_hash;  //хэш параметров освещения
+    size_t          texmaps_hash;   //хэш параметров текстурирования
+    size_t          modes_hash;     //хэш режимов визуализации
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер fixed-pipeline-program шейдеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FppShaderManager : virtual public ShaderManager, public ContextObject
+class FppShaderManager : virtual public IShaderManager, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     FppShaderManager (const ContextManager& manager);
-    ~FppShaderManager ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество поддерживаемых профилей
@@ -279,8 +285,8 @@ class FppShaderManager : virtual public ShaderManager, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Shader*  CreateShader  (const ShaderDesc& shader_desc, const LogFunction& error_log);
-    Program* CreateProgram (size_t shaders_count, ShaderPtr* shaders, const LogFunction& error_log);
+    IShader*          CreateShader  (const ShaderDesc& shader_desc, const LogFunction& error_log);
+    ICompiledProgram* CreateProgram (size_t shaders_count, IShader** shaders, const LogFunction& error_log);
 };
 
 }

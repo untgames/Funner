@@ -10,7 +10,7 @@ RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS     := sources ../../../extern/glew/in
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS      := sources/common sources/platform/win32 sources/driver sources/input_stage \
                                          sources/output_stage sources/output_stage/swap_chain_manager sources/output_stage/fbo_manager \
                                          sources/texture_manager sources/texture_manager/nv_dxt sources/shader_stage \
-                                         sources/shader_stage/glsl sources/shader_stage/fpp sources/query_manager
+                                         sources/shader_stage/fpp sources/shader_stage/glsl sources/query_manager
 RENDER.OPENGL_DRIVER.SOURCES.LIB_DIRS         :=  
 RENDER.OPENGL_DRIVER.SOURCES.LIBS             := 
 RENDER.OPENGL_DRIVER.SOURCES.COMPILER_DEFINES := GLEW_STATIC GLEW_MX

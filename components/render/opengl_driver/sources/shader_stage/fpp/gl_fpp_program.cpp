@@ -11,83 +11,430 @@ namespace
     Константы
 */
 
-const size_t CACHED_LAYOUT_ARRAY_SIZE = 4; //размер кэша параметров fpp-программы
+const size_t FPP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE = 8; //резервируемое количество смещений динамических параметров
 
 /*
-   Параметр шейдера
+    Пара: тэг - значение
 */
 
-struct FppProgramParameter
+struct Tag2Value
 {
-  const FppDynamicParameter* location; //указатель на динамический параметр шейдера
-  size_t                     offset;   //смещение относительно начала константного буфера
-  size_t                     size;     //размер параметра в байтах
+  const char* tag;
+  int         value;
 };
 
-struct FppProgramParameterGroup
-{
-  size_t               slot;        //номер слота с константым буфером
-  size_t               data_hash;   //хеш данных константного буфера
-  size_t               count;       //количество элементов группы
-  FppProgramParameter* parameters;  //указатель на начало области с элементами
-};
+/*
+    Парсер FPP-шейдеров
+*/
 
-typedef stl::vector<FppProgramParameter>            ParametersArray;
-typedef stl::vector<FppProgramParameterGroup>       ProgramParameterGroupArray;
-typedef xtl::trackable_ptr<ProgramParametersLayout> ProgramParametersLayoutPtr;
+class FppProgramParser
+{
+  public:
+    FppProgramParser (FppState& in_base_state, FppDynamicParameterMap& in_dynamic_parameters, const ShaderDesc& shader_desc, const LogFunction& error_log)
+     : base_state (in_base_state),
+       dynamic_parameters (in_dynamic_parameters),
+       parser (parse_log, shader_desc.name, shader_desc.source_code, shader_desc.source_code_size, "wxf")
+    {
+        //разбор шейдера
+
+      ParseShader ();
+
+        //проверка ошибок разбора
+
+      for (size_t i=0, count=parse_log.MessagesCount (); i<count; i++)
+        error_log (parse_log.Message (i));
+        
+      if (parse_log.HasErrors ())
+        throw xtl::format_exception<xtl::bad_argument> ("render::low_level::opengl::FppProgramParser::FppProgramParser", "Errors in shader '%s'", shader_desc.name);
+    }
+    
+  private:
+      //добавление динамического параметра
+    void AddDynamicParameter (Parser::Iterator line_iter, const char* name, FppDynamicParameterType type, size_t count)
+    {
+      FppDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
+
+      if (iter != dynamic_parameters.end ())
+      {
+        parse_log.Error (line_iter, "Parameter '%s' has been already defined", name);
+        return;
+      }            
+
+      FppDynamicParameter& param = dynamic_parameters.insert_pair (name, FppDynamicParameter ()).first->second;
+
+      param.type   = type;
+      param.count  = count;      
+
+      param.field_offsets.reserve (FPP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE);
+    }
+    
+      //добавление смещения на динамический параметр
+    void AddDynamicParameterField (Parser::Iterator line_iter, const char* name, size_t offset, FppDynamicParameterType type, size_t count)
+    {
+      FppDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
+
+      if (iter == dynamic_parameters.end ())      
+      {
+        parse_log.Error (line_iter, "Undefined parameter '%s'", name);
+        return;
+      }
+      
+      FppDynamicParameter& param = iter->second;
+      
+      if (param.type != type)
+      {
+        parse_log.Error (line_iter, "Type of parameter '%s' mismatch", name);
+        return;
+      }
+      
+      if (param.count < count)      
+      {
+        parse_log.Error (line_iter, "Parameter '%s' attributes count %u is less than expected attributes count %u",
+                         name, param.count, count);
+        return;
+      }
+      
+      param.field_offsets.push_back (offset);
+    }  
+    
+      //разбор значений
+    template <class T, FppDynamicParameterType Type>
+    void ParseValues (Parser::Iterator iter, const char* node_name, size_t offset, size_t count)
+    {
+      iter = iter->First (node_name);
+      
+      if (!iter)
+        return;        
+
+      size_t       attributes_count = iter->AttributesCount ();
+      const char** attributes       = iter->Attributes ();      
+
+      if (attributes_count == 1 && isalpha (*attributes [0]))
+      {
+          //добавление динамического параметра
+
+        AddDynamicParameterField (iter, attributes [0], offset, Type, count);
+
+        return;
+      }
+
+        //проверка корректности числа атрибутов
+
+      if (attributes_count < count)
+      {
+        parse_log.Error (iter, "Too few attributes (%u attributes expected)", count);
+
+        return;
+      }
+
+        //разбор атрибутов
+
+      size_t parsed_attributes_count = read_range (xtl::io::make_token_iterator (attributes, attributes + count),
+                                                   (T*)((char*)&base_state + offset));
+
+      if (parsed_attributes_count != count)
+        parse_log.Error (iter, "Error at read attribute #%u", parsed_attributes_count);
+    }
+
+      //разбор целочисленных значений
+    void ParseIntegerValues (Parser::Iterator iter, const char* node_name, size_t offset, size_t count)
+    {
+      ParseValues<int, FppDynamicParameterType_Int> (iter, node_name, offset, count);
+    }
+
+      //разбор вещественных значений
+    void ParseFloatValues (Parser::Iterator iter, const char* node_name, size_t offset, size_t count)
+    {
+      ParseValues<float, FppDynamicParameterType_Float> (iter, node_name, offset, count);
+    }
+    
+      //разбор векторов
+    void ParseVector4f (Parser::Iterator iter, const char* node_name, size_t offset)
+    {
+      ParseFloatValues (iter, node_name, offset, 4);
+    }
+
+    void ParseVector3f (Parser::Iterator iter, const char* node_name, size_t offset)
+    {
+      ParseFloatValues (iter, node_name, offset, 3);
+    }
+
+      //разбор матрицы
+    void ParseMatrix4f (Parser::Iterator iter, const char* node_name, size_t offset)
+    {
+      ParseFloatValues (iter, node_name, offset, 16);
+    }
+    
+      //разбор объявления параметров
+    void ParseParameterDeclarations (Parser::Iterator params_iter, const char* name, FppDynamicParameterType type, size_t count)
+    {
+      for (Parser::NamesakeIterator iter=params_iter->First (name); iter; ++iter)
+      {
+        if (!iter->AttributesCount ())
+        {
+          parse_log.Error (iter, "Parameter names expected");
+          continue;
+        }
+
+        for (size_t i=0; i<iter->AttributesCount (); i++)
+          AddDynamicParameter (iter, iter->Attribute (i), type, count);
+      }
+    }
+    
+      //разбор строкового свойства
+    void ParseEnum (Parser::Iterator iter, const char* node_name, size_t offset, const Tag2Value* pairs)
+    {
+      iter = iter->First (node_name);
+
+      if (!iter)
+        return;
+        
+      if (!iter->AttributesCount ())
+      {
+        parse_log.Error (iter, "Too few attributes (1 attribute expected)");
+        return;
+      }
+
+        //поиск значения, соответствующего прочитанной строке
+
+      const char* value = iter->Attribute (0);
+
+      for (const Tag2Value* i=pairs; i->tag; i++)
+        if (!xtl::xstricmp (i->tag, value))
+        {
+          *(int*)((char*)&base_state + offset) = i->value;
+
+          return;
+        }
+
+        //если соответствие не найдено - сообщаем об ошибке
+
+      parse_log.Error (iter, "Unknown value '%s'", value);
+    }
+    
+      //разбор параметров источника освещения
+    void ParseLight (Parser::Iterator light_iter, size_t base_offset)
+    {
+      static const Tag2Value light_types [] = {
+        {"Point",  LightType_Point},
+        {"Remote", LightType_Remote},
+        {"Spot",   LightType_Spot},
+        {0, 0}
+      };
+      
+      ParseEnum          (light_iter, "Type",                 base_offset + offsetof (LightDesc, type), light_types);
+      ParseIntegerValues (light_iter, "Enable",               base_offset + offsetof (LightDesc, enable), 1);
+      ParseVector3f      (light_iter, "Position",             base_offset + offsetof (LightDesc, position));
+      ParseVector3f      (light_iter, "Direction",            base_offset + offsetof (LightDesc, direction));
+      ParseVector4f      (light_iter, "AmbientColor",         base_offset + offsetof (LightDesc, ambient_color));
+      ParseVector4f      (light_iter, "DiffuseColor",         base_offset + offsetof (LightDesc, diffuse_color));
+      ParseVector4f      (light_iter, "SpecularColor",        base_offset + offsetof (LightDesc, specular_color));
+      ParseFloatValues   (light_iter, "Angle",                base_offset + offsetof (LightDesc, angle), 1);
+      ParseFloatValues   (light_iter, "Exponent",             base_offset + offsetof (LightDesc, exponent), 1);
+      ParseFloatValues   (light_iter, "ContantAttenuation",   base_offset + offsetof (LightDesc, constant_attenuation), 1);
+      ParseFloatValues   (light_iter, "LinearAttenuation",    base_offset + offsetof (LightDesc, linear_attenuation), 1);
+      ParseFloatValues   (light_iter, "QuadraticAttenuation", base_offset + offsetof (LightDesc, quadratic_attenuation), 1);
+    }    
+  
+      //разбор параметров текстрирования
+    void ParseTexmap (Parser::Iterator texmap_iter, size_t base_offset)
+    {
+      ParseMatrix4f (texmap_iter, "Transform", base_offset + offsetof (TexmapDesc, transform));
+      ParseMatrix4f (texmap_iter, "Texgen",    base_offset + offsetof (TexmapDesc, transform));
+      ParseVector4f (texmap_iter, "TexgenU",   base_offset + offsetof (TexmapDesc, transform [0]));
+      ParseVector4f (texmap_iter, "TexgenV",   base_offset + offsetof (TexmapDesc, transform [1]));
+      ParseVector4f (texmap_iter, "TexgenW",   base_offset + offsetof (TexmapDesc, transform [2]));
+      
+      static const Tag2Value texcoord_sources [] = {
+        {"Explicit",      TexcoordSource_Explicit},
+        {"SphereMap",     TexcoordSource_SphereMap},
+        {"ReflectionMap", TexcoordSource_ReflectionMap},
+        {"ObjectSpace",   TexcoordSource_ObjectSpace},
+        {"ViewerSpace",   TexcoordSource_ViewerSpace},
+        {0, 0}
+      };
+
+      ParseEnum (texmap_iter, "TexcoordU", base_offset + offsetof (TexmapDesc, source_u), texcoord_sources);
+      ParseEnum (texmap_iter, "TexcoordV", base_offset + offsetof (TexmapDesc, source_v), texcoord_sources);
+      ParseEnum (texmap_iter, "TexcoordW", base_offset + offsetof (TexmapDesc, source_w), texcoord_sources);
+      
+      static const Tag2Value texture_blend_modes [] = {
+        {"Replace",  TextureBlend_Replace},
+        {"Modulate", TextureBlend_Modulate},
+        {"Blend",    TextureBlend_Blend},
+        {0, 0}
+      };
+      
+      ParseEnum (texmap_iter, "Blend", base_offset + offsetof (TexmapDesc, blend), texture_blend_modes);
+    }
+  
+      //разбор шейдера
+    void ParseShader ()
+    {
+      Parser::Iterator program_iter = parser.Root ();
+
+      if (!program_iter)
+        return;
+        
+        //разбор объявлений параметров
+        
+      Parser::Iterator params_iter = program_iter->First ("Parameters");
+        
+      if (params_iter)
+      {        
+        ParseParameterDeclarations (params_iter, "float",    FppDynamicParameterType_Float, 1);
+        ParseParameterDeclarations (params_iter, "int",      FppDynamicParameterType_Int, 1);
+        ParseParameterDeclarations (params_iter, "float3",   FppDynamicParameterType_Float, 3);
+        ParseParameterDeclarations (params_iter, "int3",     FppDynamicParameterType_Int, 3);
+        ParseParameterDeclarations (params_iter, "float4",   FppDynamicParameterType_Float, 4);
+        ParseParameterDeclarations (params_iter, "int4",     FppDynamicParameterType_Int, 4);
+        ParseParameterDeclarations (params_iter, "float4x4", FppDynamicParameterType_Float, 16);
+        ParseParameterDeclarations (params_iter, "int4x4",   FppDynamicParameterType_Int, 16);
+
+        if (params_iter->NextNamesake ())
+          parse_log.Warning (params_iter->NextNamesake (), "Second (and others) 'Parameters' block(s) ignored");
+      }
+
+        //разбор параметров трансформации
+
+      ParseMatrix4f (program_iter, "ProjectionMatrix", offsetof (FppState, viewer.projection_matrix));
+      ParseMatrix4f (program_iter, "ViewMatrix", offsetof (FppState, viewer.view_matrix));
+      ParseMatrix4f (program_iter, "ObjectMatrix", offsetof (FppState, object.matrix));
+      
+        //разбор параметров материала
+      
+      ParseVector4f    (program_iter, "EmissionColor", offsetof (FppState, material.emission_color));
+      ParseVector4f    (program_iter, "AmbientColor",  offsetof (FppState, material.ambient_color));
+      ParseVector4f    (program_iter, "DiffuseColor",  offsetof (FppState, material.diffuse_color));
+      ParseVector4f    (program_iter, "SpecularColor", offsetof (FppState, material.specular_color));
+      ParseFloatValues (program_iter, "Shininess",     offsetof (FppState, material.shininess), 1);
+      
+      static const Tag2Value color_material_modes [] = {
+        {"Explicit",          ColorMaterial_Explicit},
+        {"Emission",          ColorMaterial_Emission},
+        {"Ambient",           ColorMaterial_Ambient},
+        {"Diffuse",           ColorMaterial_Diffuse},
+        {"Specular",          ColorMaterial_Specular},
+        {"AmbientAndDiffuse", ColorMaterial_AmbientAndDiffuse},
+        {0, 0}
+      };
+
+      ParseEnum (program_iter, "ColorMaterial", offsetof (FppState, material.color_material), color_material_modes);
+
+      static const Tag2Value compare_modes [] = {
+        {"AlwaysFail",   CompareMode_AlwaysFail},
+        {"AlwaysPass",   CompareMode_AlwaysPass},
+        {"Equal",        CompareMode_Equal},
+        {"NotEqual",     CompareMode_NotEqual},
+        {"Less",         CompareMode_Less},
+        {"LessEqual",    CompareMode_LessEqual},
+        {"Greater",      CompareMode_Greater},
+        {"GreaterEqual", CompareMode_GreaterEqual},
+        {0, 0}
+      };
+
+      ParseEnum          (program_iter, "AlphaCompareMode", offsetof (FppState, material.alpha_compare_mode), compare_modes);
+      ParseFloatValues   (program_iter, "AlphaReference",   offsetof (FppState, material.alpha_reference), 1);
+      ParseIntegerValues (program_iter, "Normalize",        offsetof (FppState, modes.normalize), 1);
+
+        //разбор параметров освещения
+      
+      for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
+      {
+        char light_name [32];
+        
+        xtl::xsnprintf (light_name, sizeof light_name, "Light%u", i);
+        
+        Parser::Iterator light_iter = program_iter->First (light_name);
+
+        if (light_iter)
+          ParseLight (light_iter, offsetof (FppState, lights [i]));
+      }
+      
+        //разбор параметров текстурирования
+        
+      for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+      {
+        char texmap_name [32];
+        
+        xtl::xsnprintf (texmap_name, sizeof texmap_name, "Texmap%u", i);
+        
+        Parser::Iterator texmap_iter = program_iter->First (texmap_name);
+        
+        if (texmap_iter)
+          ParseTexmap (texmap_iter, offsetof (FppState, maps [i]));
+      }
+    }    
+
+  private:
+    FppState&               base_state;         //базовое состояние fpp-шейдера
+    FppDynamicParameterMap& dynamic_parameters; //динамические параметры
+    ParseLog                parse_log;          //протокол парсера
+    Parser                  parser;             //парсер исходного текста fpp-шейдера
+};
 
 }
 
 /*
-    Элемент кэша параметров
+    Конструктор / деструктор
 */
 
-struct FppProgram::LayoutCacheEntry
+namespace
 {
-  size_t                     source_layout_id; //идентификатор исходных параметров программы
-  ParametersArray            parameters;       //параметры программы
-  ProgramParameterGroupArray parameter_groups; //группы параметров
-  size_t                     hit_time;         //время последней выборки элемента из кэша
-  FppState                   fpp_state;        //состояние фиксированной программы шейдинга
-  size_t                     viewer_hash;      //хэш параметров наблюдателя
-  size_t                     object_hash;      //хэш параметров объекта
-  size_t                     material_hash;    //хэш параметров материала
-  size_t                     lighting_hash;    //хэш параметров освещения
-  size_t                     texmaps_hash;     //хэш параметров текстурирования
-  size_t                     modes_hash;       //хэш режимов визуализации
-  
-  void UpdateHashes ()
-  {
-    viewer_hash   = crc32 (&fpp_state.viewer, sizeof (fpp_state.viewer));
-    object_hash   = crc32 (&fpp_state.object, sizeof (fpp_state.object));
-    material_hash = crc32 (&fpp_state.material, sizeof (fpp_state.material));
-    lighting_hash = crc32 (fpp_state.lights, sizeof (fpp_state.lights));
-    texmaps_hash  = crc32 (fpp_state.maps, sizeof (fpp_state.maps));
-    modes_hash    = crc32 (&fpp_state.modes, sizeof (fpp_state.modes));
-  }
-};
 
-/*
-    Конструктор/деструктор
-*/
+void identity_matrix (Matrix4f& m)
+{
+  for (size_t i=0; i<4; i++)
+    for (size_t j=0; j<4; j++)
+      m [i][j] = i == j ? 1.0f : 0.0f;
+}
 
-FppProgram::FppProgram (const ContextManager& context_manager, size_t shaders_count, ShaderPtr* shaders)
-  : Program (context_manager), layouts_cache (CACHED_LAYOUT_ARRAY_SIZE), current_time (0)
+}
+
+FppProgram::FppProgram (const ContextManager& manager, const ShaderDesc& shader_desc, const LogFunction& error_log)
+  : ContextObject (manager)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FppProgram::FppProgram";
+
+    //инициализация состояния fpp-шейдера
+    
+  memset (&base_state, 0, sizeof base_state);
   
-    //проверка корректности шейдеров
+  identity_matrix (base_state.viewer.projection_matrix);
+  identity_matrix (base_state.viewer.view_matrix);
+  identity_matrix (base_state.object.matrix);
 
-  if (!shaders)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "shaders");
+  base_state.material.alpha_compare_mode = CompareMode_AlwaysPass;
 
-  if (shaders_count > 1)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Multiple shaders not supported (shaders_count=%u)", shaders_count);
+  for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
+  {
+    LightDesc& light = base_state.lights [i];
+    
+    light.constant_attenuation = 1.0f;
+  }
+  
+  for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+  {
+    TexmapDesc& texmap = base_state.maps [i];
 
-  shader = cast_object<FppShader> (shaders [0].get (), METHOD_NAME, "shaders[0]");
+    identity_matrix (texmap.transform);
+    identity_matrix (texmap.texgen);
+  }
 
-  if (!shader)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "shaders[0]");
+    //разбор fpp-шейдера
+
+  if (!shader_desc.profile)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "shader_desc.profile");
+
+  if (!shader_desc.source_code)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "shader_desc.source_code");
+
+  if (!shader_desc.name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "shader_desc.name");    
+
+  error_log (format ("Compiling %s...", shader_desc.name).c_str ());
+
+  FppProgramParser (base_state, dynamic_parameters, shader_desc, error_log);
 }
 
 FppProgram::~FppProgram ()
@@ -95,599 +442,35 @@ FppProgram::~FppProgram ()
 }
 
 /*
-    Получение расположения параметров
+    Работа с динамическими параметрами
 */
 
-FppProgram::LayoutCacheEntry& FppProgram::GetLayout (ProgramParametersLayout* parameters_layout)
+const FppDynamicParameter* FppProgram::FindDynamicParameter (const char* name) const
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FppProgram::GetLayout";
-
-  if (!parameters_layout)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "parameters_layout");
+  if (!name)
+    return 0;
     
-    //поиск layout в кэше
-
-  for (size_t i=0; i<CACHED_LAYOUT_ARRAY_SIZE; i++)
-    if (layouts_cache [i].source_layout_id == parameters_layout->GetId ())
-    {
-      layouts_cache [i].hit_time = current_time++;
-
-      return layouts_cache [i];
-    }
-
-    //поиск элемента кэша на выброс по стратегии LRU
-
-  LayoutCacheEntry* new_entry = &layouts_cache [0];
-
-  for (size_t i=1; i<CACHED_LAYOUT_ARRAY_SIZE; i++)
-  {
-    if (current_time - layouts_cache [i].hit_time > current_time - new_entry->hit_time)
-      new_entry = &layouts_cache [i];
-  }
+  FppDynamicParameterMap::const_iterator iter = dynamic_parameters.find (name);
   
-    //очистка данных элемента кэша
-
-  new_entry->parameters.clear ();
-  new_entry->parameter_groups.clear ();  
-  
-  new_entry->source_layout_id = 0;
-  
-    //резервирование памяти для хранения параметров и групп
-  
-  new_entry->parameters.reserve (parameters_layout->GetParametersCount ());
-  new_entry->parameter_groups.reserve (parameters_layout->GetGroupsCount ());
-  
-    //получение базового состояния фиксированной программы шейдинга
-  
-  new_entry->fpp_state = shader->GetBaseState ();
-
-  new_entry->UpdateHashes ();
-  
-    //преобразование параметров
+  if (iter == dynamic_parameters.end ())
+    return 0;
     
-  const ProgramParameter*      src_params = parameters_layout->GetParameters ();
-  const ProgramParameterGroup* src_groups = parameters_layout->GetGroups ();
-  
-  printf ("parameters_count=%u groups_count=%u\n", parameters_layout->GetParametersCount (), parameters_layout->GetGroupsCount ());
-    
-  for (size_t i=0, count=parameters_layout->GetGroupsCount (); i<count; i++)
-  {
-    const ProgramParameterGroup& src_group = src_groups [i];
-    
-    size_t start_parameters_count = new_entry->parameters.size ();
-    
-    for (size_t j=0; j<src_group.count; j++)
-    {
-      const ProgramParameter& src_param = src_group.parameters [j];
-      FppProgramParameter     dst_param;
-      
-        //поиск параметра в шейдере
-        
-        printf ("name='%s'\n", src_param.name);
-      
-      dst_param.location = shader->FindDynamicParameter (src_param.name);
-      dst_param.offset   = src_param.offset;
-
-      if (!dst_param.location)
-      {
-          //если параметр отсутствует - игнорируем его
-          
-          printf ("FUCKOFF\n");
-
-        LogPrintf ("Unreferenced parameter '%s'", src_param.name);
-        continue;
-      }
-      
-        //проверка соответствия типов
-        
-      const FppDynamicParameter& dyn_param = *dst_param.location;
-
-      bool check_status = false;
-
-      switch (src_param.type)
-      {
-        case ProgramParameterType_Int:
-          check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 1;
-          break;
-        case ProgramParameterType_Float:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 1;
-          break;
-        case ProgramParameterType_Int2:
-          check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 2;
-          break;
-        case ProgramParameterType_Float2:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 2;
-          break;
-        case ProgramParameterType_Int3:
-          check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 3;
-          break;
-        case ProgramParameterType_Float3:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 3;
-          break;
-        case ProgramParameterType_Int4:
-          check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 4;
-          break;
-        case ProgramParameterType_Float4:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 4;
-          break;
-        case ProgramParameterType_Float2x2:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 4;
-          break;
-        case ProgramParameterType_Float3x3:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 9;
-          break;
-        case ProgramParameterType_Float4x4:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 16;
-          break;
-        default:
-          LogPrintf ("Internal error: undefined program parameter type %d", src_param.type);
-          continue;
-      }
-      
-      switch (dyn_param.type)
-      {
-        case FppDynamicParameterType_Int:
-          dst_param.size = dyn_param.count * sizeof (int);
-          break;
-        case FppDynamicParameterType_Float:
-          dst_param.size = dyn_param.count * sizeof (float);
-          break;         
-        default:
-          dst_param.size = 0;
-          break;
-      }
-      
-      if (!check_status)
-      {
-        const char* dyn_param_type_name;
-
-        switch (dyn_param.type)
-        {
-          case FppDynamicParameterType_Int:    dyn_param_type_name = "int"; break;
-          case FppDynamicParameterType_Float:  dyn_param_type_name = "float"; break;         
-          default:                             dyn_param_type_name = "__unknown__"; break;
-        }
-
-        LogPrintf ("Shader parameter '%s' declaration %sx%u mismatch with layout definition %s",
-                   src_param.name, dyn_param_type_name, dyn_param.count, get_name (src_param.type));
-
-        continue;
-      }
-
-        //добавляем созданный параметр
-
-      new_entry->parameters.push_back (dst_param);
-    }
-    
-      //добавление новой группы
-      
-    size_t group_parameters_count = new_entry->parameters.size () - start_parameters_count;
-
-    if (!group_parameters_count)
-      continue; //игнорируем пустые группы
-      
-    FppProgramParameterGroup dst_group;
-    
-    dst_group.slot       = src_group.slot;
-    dst_group.data_hash  = 0;
-    dst_group.count      = group_parameters_count;
-    dst_group.parameters = &new_entry->parameters [start_parameters_count];
-
-    new_entry->parameter_groups.push_back (dst_group);
-    
-    printf ("test: %p %p\n", &new_entry->parameters [0], &new_entry->parameter_groups [0]);
-  }
-
-    //установка времени доступа и исходного layout
-
-  new_entry->hit_time         = current_time++;
-  new_entry->source_layout_id = parameters_layout->GetId ();
-  
-  return *new_entry;
+  return &iter->second;
 }
 
 /*
-    Биндинг
+    Создание программы, устанавливаемой в контекст OpenGL
 */
 
-namespace
+IBindableProgram* FppProgram::CreateBindableProgram (ProgramParametersLayout* layout)
 {
-
-//транспонирование матрицы
-void transpose_matrix (const Matrix4f source, Matrix4f destination)
-{
-  for (size_t i=0; i<4; i++)
-    for (size_t j=0; j<4; j++)
-      destination [i][j] = source [j][i];
-}
-
-//эмуляция загрузки транспонированной матрицы в контекст OpenGL
-void load_transpose_matrix (Matrix4f matrix, PFNGLLOADTRANSPOSEMATRIXFPROC fn)
-{
-  if (fn)
+  try
   {
-    fn (&matrix [0][0]);
-    
-    return;
+    return new FppBindableProgram (GetContextManager (), *this, layout);
   }
-  
-  Matrix4f transposed_matrix;
-
-  transpose_matrix (matrix, transposed_matrix);
-
-  glLoadMatrixf (&transposed_matrix [0][0]);
-}
-
-//эмуляция умножения транспонированной матрицы
-void mult_transpose_matrix (Matrix4f matrix, PFNGLMULTTRANSPOSEMATRIXFPROC fn)
-{
-  if (fn)
+  catch (xtl::exception& exception)
   {
-    fn (&matrix [0][0]);
-    
-    return;
+    exception.touch ("render::low_level::opengl::FppProgram::CreateBindableProgram");
+    throw;
   }
-  
-  Matrix4f transposed_matrix;
-
-  transpose_matrix (matrix, transposed_matrix);
-
-  glMultMatrixf (&transposed_matrix [0][0]);
-}
-
-}
-
-void FppProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLayout* parameters_layout)
-{
-  static const char* METHOD_NAME = "render::low_level::opengl::FppProgram::Bind";
-  
-    //получение кэш переменных
-
-  const ContextCaps& caps          = GetCaps ();
-  size_t*            context_cache = &GetContextDataTable (Stage_Shading)[0];
-                   
-  size_t &current_program       = context_cache [ShaderStageCache_UsedProgram],
-         &current_viewer_hash   = context_cache [ShaderStageCache_FppViewerStateHash],
-         &current_object_hash   = context_cache [ShaderStageCache_FppObjectStateHash],
-         &current_material_hash = context_cache [ShaderStageCache_FppMaterialStateHash],
-         &current_lighting_hash = context_cache [ShaderStageCache_FppLightingStateHash],
-         &current_texmaps_hash  = context_cache [ShaderStageCache_FppTexmapsStateHash],
-         &current_modes_hash    = context_cache [ShaderStageCache_FppModesStateHash];
-
-    //отключение glsl-шейдеров  
-
-  if (current_program != GetId ())
-  {    
-    if (caps.has_arb_shading_language_100)
-      caps.glUseProgram_fn (0);
-
-    current_program = GetId ();
-  }
-
-    //извлечение параметров из кэша расположения параметров
-    
-  LayoutCacheEntry*           hit_layout = &GetLayout (parameters_layout);
-  ProgramParameterGroupArray& groups     = hit_layout->parameter_groups;
-  FppState&                   fpp_state  = hit_layout->fpp_state;
-  char*                       dst_data   = (char*)&fpp_state;
-
-    //обновление динамических параметров
-    
-  bool need_update_hashes = false;
-
-  for (ProgramParameterGroupArray::iterator iter=groups.begin (), end=groups.end (); iter!=end; ++iter)
-  {
-    FppProgramParameterGroup& group  = *iter;
-
-    IBindableBuffer*          buffer = constant_buffers [group.slot].get ();
-
-      //проверка наличия требуемого константного буфера
-
-    if (!buffer)
-      throw xtl::format_operation_exception (METHOD_NAME, "Null constant buffer #%u", group.slot);
-
-      //проверка необходимости обновления параметров
-
-    if (group.data_hash == buffer->GetDataHash ())
-      continue;
-      
-    need_update_hashes = true;
-
-      //получение базового адреса константного буфера
-      
-    char* buffer_base = (char*)buffer->GetDataPointer ();
-    
-    if (!buffer_base)
-      throw xtl::format_operation_exception (METHOD_NAME, "Null constant buffer #%u data pointer", group.slot);
-      
-      //обновление динамических параметров
-
-    for (size_t j=0; j<group.count; j++)
-    {
-      const FppProgramParameter& param      = group.parameters [j];
-      const char*                src_data   = buffer_base + param.offset;
-
-        //обновление всех полей FppState, ассоциированных с динамическим параметром
-
-      const size_t* offset      = &param.location->field_offsets [0],
-                    update_size = param.size;
-
-      for (size_t k=0, count=param.location->field_offsets.size (); k<count; k++, offset++)
-        memcpy (dst_data + *offset, src_data, update_size);
-    }
-
-      //обновление хэша данных группы параметров
-
-    group.data_hash = buffer->GetDataHash ();    
-  }
-  
-    //обновление хэшей FppState
-    
-  if (need_update_hashes)
-  {
-    hit_layout->UpdateHashes ();
-  }
-
-    //установка состояния в контекст OpenGL
-    
-  bool need_update_modelview_matrix = current_viewer_hash != hit_layout->viewer_hash ||
-                                       current_object_hash != hit_layout->object_hash;
-   
-    //установка параметров наблюдателя
-    
-  if (current_viewer_hash != hit_layout->viewer_hash)
-  {    
-    glMatrixMode          (GL_PROJECTION);
-    load_transpose_matrix (fpp_state.viewer.projection_matrix, caps.glLoadTransposeMatrixf_fn);
-    
-    current_viewer_hash = hit_layout->viewer_hash;
-  }
-  
-  if (need_update_modelview_matrix)
-  {  
-    glMatrixMode          (GL_MODELVIEW);
-    load_transpose_matrix (fpp_state.viewer.view_matrix, caps.glLoadTransposeMatrixf_fn);
-  }
-
-    //установка параметров источников освещения
-    
-  if (current_lighting_hash != hit_layout->lighting_hash)
-  {    
-    bool lighting = false;
-    
-    for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
-      if (fpp_state.lights [i].enable)
-      {
-        lighting = true;
-        break;
-      }
-      
-    if (lighting)
-    {
-      glEnable (GL_LIGHTING);
-
-      for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
-      {
-        const LightDesc& light    = fpp_state.lights [i];
-        GLenum           light_id = GL_LIGHT0 + i;
-        
-        if (!light.enable)
-        {
-          glDisable (light_id);
-          continue;
-        }
-
-        float position [4] = {light.position [0], light.position [1], light.position [2], light.type != LightType_Remote};
-
-        glEnable  (light_id);
-        glLightfv (light_id, GL_POSITION,              position);
-        glLightfv (light_id, GL_SPOT_DIRECTION,        light.direction);
-        glLightfv (light_id, GL_AMBIENT,               (GLfloat*)&light.ambient_color);
-        glLightfv (light_id, GL_DIFFUSE,               (GLfloat*)&light.diffuse_color);
-        glLightfv (light_id, GL_SPECULAR,              (GLfloat*)&light.specular_color);
-        glLightf  (light_id, GL_SPOT_CUTOFF,           light.type != LightType_Point ? light.angle : 180.0f);
-        glLightf  (light_id, GL_SPOT_EXPONENT,         light.exponent);
-        glLightf  (light_id, GL_CONSTANT_ATTENUATION,  light.constant_attenuation);
-        glLightf  (light_id, GL_LINEAR_ATTENUATION,    light.linear_attenuation);
-        glLightf  (light_id, GL_QUADRATIC_ATTENUATION, light.quadratic_attenuation);
-      }
-      
-      glLightModeli (GL_LIGHT_MODEL_TWO_SIDE,     GL_TRUE);
-      glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-    }
-    else
-    {
-      glDisable (GL_LIGHTING);    
-    }
-
-    current_lighting_hash = hit_layout->lighting_hash;
-  }
-  
-    //установка параметров объекта
-    
-  if (current_object_hash != hit_layout->object_hash)
-  {  
-    current_object_hash = hit_layout->object_hash; 
-  }
-
-  if (need_update_modelview_matrix)
-  {  
-    mult_transpose_matrix (fpp_state.object.matrix, caps.glMultTransposeMatrixf_fn);
-  }
-
-    //установка параметров материала      
-    
-  if (current_material_hash != hit_layout->material_hash)
-  {
-    glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION,  (GLfloat*)&fpp_state.material.emission_color);
-    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT,   (GLfloat*)&fpp_state.material.ambient_color);
-    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE,   (GLfloat*)&fpp_state.material.diffuse_color);
-    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR,  (GLfloat*)&fpp_state.material.specular_color);
-    glMaterialf  (GL_FRONT_AND_BACK, GL_SHININESS, fpp_state.material.shininess);
-
-      //настройка передачи цвета материала
-
-    if (fpp_state.material.color_material == ColorMaterial_Explicit)
-    {
-      glDisable (GL_COLOR_MATERIAL);
-    }
-    else
-    {
-      GLenum mode;
-      
-      switch (fpp_state.material.color_material)
-      {
-        case ColorMaterial_Emission:           mode = GL_EMISSION; break;
-        case ColorMaterial_Ambient:            mode = GL_AMBIENT; break;
-        default:
-        case ColorMaterial_Diffuse:            mode = GL_DIFFUSE; break;
-        case ColorMaterial_Specular:           mode = GL_SPECULAR; break;
-        case ColorMaterial_AmbientAndDiffuse:  mode = GL_AMBIENT_AND_DIFFUSE; break;
-      }
-      
-      glEnable        (GL_COLOR_MATERIAL);
-      glColorMaterial (GL_FRONT_AND_BACK, mode);
-    }  
-
-      //включение параметров альфа-теста
-
-    if (fpp_state.material.alpha_compare_mode != CompareMode_AlwaysPass)
-    {
-      glEnable (GL_ALPHA_TEST);
-      
-      GLenum gl_mode;
-      
-      switch (fpp_state.material.alpha_compare_mode)
-      {      
-        case CompareMode_AlwaysFail:   gl_mode = GL_NEVER;    break;
-        default:
-        case CompareMode_AlwaysPass:   gl_mode = GL_ALWAYS;   break;
-        case CompareMode_Equal:        gl_mode = GL_EQUAL;    break;
-        case CompareMode_NotEqual:     gl_mode = GL_NOTEQUAL; break;
-        case CompareMode_Less:         gl_mode = GL_LESS;     break;
-        case CompareMode_LessEqual:    gl_mode = GL_LEQUAL;   break;
-        case CompareMode_Greater:      gl_mode = GL_GREATER;  break;
-        case CompareMode_GreaterEqual: gl_mode = GL_GEQUAL;   break;
-      }
-
-      glAlphaFunc (gl_mode, fpp_state.material.alpha_reference);
-    }
-    else
-    {
-      glDisable (GL_ALPHA_TEST);
-    }
-
-    current_material_hash = hit_layout->material_hash;    
-  }  
-
-    //установка параметров текстурирования
-    
-  if (current_texmaps_hash != hit_layout->texmaps_hash)
-  {    
-    size_t *common_cache             = &GetContextManager ().GetContextDataTable (Stage_Common)[0],
-           texture_units_count       = caps.has_arb_multitexture ? caps.texture_units_count : 1,
-           &active_texture_slot      = common_cache [CommonCache_ActiveTextureSlot],
-           &current_enabled_textures = common_cache [CommonCache_EnabledTextures];
-
-    if (texture_units_count > DEVICE_SAMPLER_SLOTS_COUNT)
-      texture_units_count = DEVICE_SAMPLER_SLOTS_COUNT;
-
-    glMatrixMode (GL_TEXTURE);
-
-    for (size_t i=0; i<texture_units_count; i++)
-    {
-        //установка активного слота текстурирования
-
-      if (active_texture_slot != i)
-      {
-        caps.glActiveTexture_fn (GL_TEXTURE0 + i);
-
-        active_texture_slot = i;
-      }
-
-        //если текстура не установлена - отключение текстурирования канала
-
-      if (!(current_enabled_textures & (1 << i)))
-      {
-        glDisable (GL_TEXTURE_2D);
-
-        continue;
-      }
-      
-        //включение текстурирования на канале
-        
-      glEnable (GL_TEXTURE_2D);        
-      
-      TexmapDesc& texmap = fpp_state.maps [i];
-      
-        //установка параметров смешивания цветов
-        
-      GLenum blend_mode;
-        
-      switch (texmap.blend)
-      {
-        default:
-        case TextureBlend_Replace:
-          blend_mode = GL_REPLACE;
-          break;
-        case TextureBlend_Modulate:
-          blend_mode = GL_MODULATE;
-          break;
-        case TextureBlend_Blend:
-          blend_mode = GL_BLEND;
-          break;
-      }    
-
-      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, blend_mode);
-
-        //установка параметров генерации текстурных координат
-
-      load_transpose_matrix (texmap.transform, caps.glLoadTransposeMatrixf_fn);
-      
-      TexcoordSource source [] = {texmap.source_u, texmap.source_v, texmap.source_w};
-      
-      for (size_t i=0; i<3; i++)
-      {
-        GLenum coord = GL_S + i, coord_gen_mode = GL_TEXTURE_GEN_S + i;
-
-        switch (source [i])
-        {
-          case TexcoordSource_Explicit:
-            glDisable (coord_gen_mode);
-            break;
-          case TexcoordSource_SphereMap:
-          case TexcoordSource_ReflectionMap:
-            glEnable  (coord_gen_mode);
-            glTexGeni (coord, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
-            break;
-          case TexcoordSource_ObjectSpace:
-            glEnable   (coord_gen_mode);
-            glTexGeni  (coord, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-            glTexGenfv (coord, GL_OBJECT_PLANE, &texmap.texgen [i][0]);
-            break;
-          case TexcoordSource_ViewerSpace:
-            glEnable   (coord_gen_mode);
-            glTexGeni  (coord, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
-            glTexGenfv (coord, GL_EYE_PLANE, &texmap.texgen [i][0]);
-            break;
-        }
-      }
-    }
-    
-    current_texmaps_hash = hit_layout->texmaps_hash;
-  }
-  
-    //установка режимов отрисовки
-    
-  if (current_modes_hash != hit_layout->modes_hash)
-  {
-    if (fpp_state.modes.normalize) glEnable  (GL_NORMALIZE);
-    else                           glDisable (GL_NORMALIZE);
-
-    current_modes_hash = hit_layout->modes_hash;
-  }  
-  
-    //проверка ошибок
-    
-  CheckErrors (METHOD_NAME);
 }

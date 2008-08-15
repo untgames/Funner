@@ -11,7 +11,7 @@ inline DstT* cast_object (const ContextManager& owner, SrcT* ptr, const char* so
   DstT* object = cast_object<DstT> (ptr, source, argument_name);
   
   if (!object->GetContextManager ().IsCompatible (owner))
-    throw xtl::format_exception<xtl::bad_argument> (source, "Argument %s is incompatible with target IDevice", argument_name);
+    throw xtl::format_exception<xtl::bad_argument> (source, "Argument '%s' is incompatible with target IDevice", argument_name);
     
   return object;
 }

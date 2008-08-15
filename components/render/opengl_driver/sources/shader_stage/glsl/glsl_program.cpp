@@ -1,112 +1,85 @@
 #include "shared.h"
 
-#include <stl/algorithm>
-
 using namespace common;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
-namespace
-{
-
-const size_t CACHED_LAYOUT_ARRAY_SIZE = 4;
-
 /*
-   Параметр шейдера
-*/
-struct GlslProgramParameter
-{
-  int                  location;  //имя константы
-  ProgramParameterType type;      //тип константы
-  size_t               count;     //количество элементов массива
-  size_t               offset;    //смещение относительно начала константного буфера
-};
-
-struct GlslProgramParameterGroup
-{
-  size_t                slot;       //номер слота с константым буфером
-  size_t                data_hash;  //хеш данных константного буфера
-  size_t                count;      //количество элементов группы
-  GlslProgramParameter* parameters; //указатель на начало области с элементами
-};
-
-
-typedef stl::vector<GlslProgramParameter>           ParametersArray;
-typedef xtl::trackable_ptr<ProgramParametersLayout> ProgramParametersLayoutPtr;
-typedef stl::vector<GlslProgramParameterGroup>      ProgramParameterGroupArray;
-
-}
-
-struct GlslProgram::LayoutCacheEntry
-{
-  ParametersArray            parameters;       //параметры программы
-  ProgramParametersLayoutPtr source_layout;    //исходные параметры программы
-  ProgramParameterGroupArray parameter_groups; //группы параметров
-  size_t                     bind_time;        //время последнего биндинга
-};
-
-/*
-   Конструктор
+    Конструктор
 */
 
-GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, ShaderPtr* in_shaders, const LogFunction& error_log)
-  : Program (manager), program (0), layouts_cache (CACHED_LAYOUT_ARRAY_SIZE)
+GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, IShader** in_shaders, const LogFunction& error_log)
+  : ContextObject (manager),
+    handle (0)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::GlslProgram::GlslProgram";
 
   try
   {
+      //установка текущего контекста
+
     MakeContextCurrent ();
+    
+      //создание программы
 
-    if (glCreateProgram) program = glCreateProgram ();
-    else                 program = glCreateProgramObjectARB ();
+    if (glCreateProgram) handle = glCreateProgram ();
+    else                 handle = glCreateProgramObjectARB ();
 
-    if (!program)
+    if (!handle)
       RaiseError (METHOD_NAME);
+
+      //присоединение шейдеров к программе
 
     shaders.reserve (shaders_count);
 
-    for (size_t i = 0; i < shaders_count; i++)
+    for (size_t i=0; i<shaders_count; i++)
     {
-      GlslShaderPtr shader = cast_object<GlslShader> (*this, in_shaders [i].get (), METHOD_NAME, "shaders"); 
+      ShaderPtr shader = cast_object<GlslShader> (*this, in_shaders [i], METHOD_NAME, "shaders");
+      
+      if (!shader)
+        throw xtl::format_exception<xtl::null_argument_exception> (METHOD_NAME, "shaders[%u]", i);
 
-      if (glAttachShader) glAttachShader    (program, shader->GetShaderObject ());
-      else                glAttachObjectARB (program, shader->GetShaderObject ());
+      if (glAttachShader) glAttachShader    (handle, shader->GetHandle ());
+      else                glAttachObjectARB (handle, shader->GetHandle ());
 
       shaders.push_back (shader);
     }
+    
+      //линковка программы
 
     int link_status = 0;
 
-    if (glLinkProgram) glLinkProgram    (program);
-    else               glLinkProgramARB (program);
+    if (glLinkProgram) glLinkProgram    (handle);
+    else               glLinkProgramARB (handle);
+    
+      //протоколирование ошибок
 
-    if (glGetProgramiv) glGetProgramiv            (program, GL_LINK_STATUS, &link_status);
-    else                glGetObjectParameterivARB (program, GL_LINK_STATUS, &link_status);
+    if (glGetProgramiv) glGetProgramiv            (handle, GL_LINK_STATUS, &link_status);
+    else                glGetObjectParameterivARB (handle, GL_LINK_STATUS, &link_status);
 
     stl::string log_buffer;   
 
     GetProgramLog (log_buffer);
+    error_log     (log_buffer.c_str ());
 
-    error_log (log_buffer.c_str ());
-
-      //Возможно нет необходимости делать валидацию
+      //проверка состояния программы
 
     if (link_status)
     {
-      if (glValidateProgram) glValidateProgram    (program);
-      else                   glValidateProgramARB (program);
+      if (glValidateProgram) glValidateProgram    (handle);
+      else                   glValidateProgramARB (handle);
 
-      if (glGetProgramiv) glGetProgramiv            (program, GL_OBJECT_VALIDATE_STATUS_ARB, &link_status);
-      else                glGetObjectParameterivARB (program, GL_OBJECT_VALIDATE_STATUS_ARB, &link_status);
+      if (glGetProgramiv) glGetProgramiv            (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &link_status);
+      else                glGetObjectParameterivARB (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &link_status);
 
       GetProgramLog (log_buffer);
-
-      error_log (log_buffer.c_str ());
+      error_log     (log_buffer.c_str ());
     }
 
+      //проверка ошибок
+
     if (!link_status)
-      RaiseError (METHOD_NAME);
+      RaiseError (METHOD_NAME);        
 
     CheckErrors (METHOD_NAME);
   }
@@ -140,193 +113,90 @@ GlslProgram::~GlslProgram ()
 }
 
 /*
-   Удаление шейдеров
+    Удаление программы
 */
 
 void GlslProgram::DeleteProgram ()
 {
-  if (!program)
+  if (!handle)
     return;
+    
+    //установка текущего контекста
 
   MakeContextCurrent ();
+  
+    //отсоединение шейдеров от программы
 
   for (ShaderArray::iterator iter=shaders.begin (), end=shaders.end (); iter!=end; ++iter)
   {
-    if (glDetachShader) glDetachShader    (program, (*iter)->GetShaderObject ());
-    else                glDetachObjectARB (program, (*iter)->GetShaderObject ());
+    if (glDetachShader) glDetachShader    (handle, (*iter)->GetHandle ());
+    else                glDetachObjectARB (handle, (*iter)->GetHandle ());
   }
+  
+    //удаление программы
 
-  if (glDeleteProgram) glDeleteProgram   (program);
-  else                 glDeleteObjectARB (program);
+  if (glDeleteProgram) glDeleteProgram   (handle);
+  else                 glDeleteObjectARB (handle);
 
-  CheckErrors ("render::low_level::opengl::GlslProgram::DeletePrograms");
+    //проверка ошибок
+
+  CheckErrors ("render::low_level::opengl::GlslProgram::DeleteProgram");
 }
 
 /*
-   Биндинг
-*/
-
-void GlslProgram::Bind (ConstantBufferPtr* constant_buffers, ProgramParametersLayout* parameters_layout)
-{
-  static const char* METHOD_NAME = "render::low_level::opengl::GlslProgram::Bind";
-
-  if (!constant_buffers)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "constant_buffers");
-
-  if (!parameters_layout)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "parameters_layout");
-
-  MakeContextCurrent ();
-
-  const ContextCaps& caps = GetCaps ();
-
-  size_t& current_program = GetContextDataTable (Stage_Shading)[ShaderStageCache_UsedProgram];
-  
-  if (current_program != GetId ())
-  {
-    caps.glUseProgram_fn (program);
-  
-    //установка кэш-переменной
-
-    current_program = GetId ();
-  }
-  
-  //Поиск в кэше
-
-  LayoutCacheEntry *hit_layout = NULL;
-
-  for (size_t i = 0; i < CACHED_LAYOUT_ARRAY_SIZE; i++)
-  {
-    if (layouts_cache[i].source_layout == parameters_layout)
-      hit_layout = &layouts_cache[i];
-  }
-
-  if (!hit_layout)
-  {
-    LayoutCacheEntry *oldest_entry = &layouts_cache[0];
-
-    for (size_t i = 1; i < CACHED_LAYOUT_ARRAY_SIZE; i++)
-    {
-      if ((current_time - layouts_cache[i].bind_time) > (current_time - oldest_entry->bind_time))
-        oldest_entry = &layouts_cache[i];
-    }
-
-    oldest_entry->source_layout = NULL;
-
-    oldest_entry->parameters.clear ();
-    oldest_entry->parameters.reserve (parameters_layout->GetParametersCount ());
-
-    GlslProgramParameter temp_parameter;
-
-    oldest_entry->parameter_groups.clear ();
-    oldest_entry->parameter_groups.reserve (parameters_layout->GetGroupsCount ());
-
-    for (size_t i = 0, group_count = parameters_layout->GetGroupsCount (); i < group_count; i++)
-    {
-      ProgramParameterGroup &current_group = parameters_layout->GetGroup (i);
-
-      GlslProgramParameterGroup new_group = {current_group.slot, 0, current_group.count, NULL};
-
-      for (size_t j = 0; j < current_group.count; j++)
-      {
-        ProgramParameter &current_parameter = current_group.parameters [j];
-        
-        int parameter_location = caps.glGetUniformLocation_fn (program, current_parameter.name);
-
-        if (parameter_location == -1)
-        {
-          LogPrintf ("Unreferenced uniform parameter '%s'", current_parameter.name);
-          continue;
-        }
-
-        temp_parameter.location = parameter_location;
-        temp_parameter.type     = current_parameter.type;
-        temp_parameter.count    = current_parameter.count;
-        temp_parameter.offset   = current_parameter.offset;
-
-        oldest_entry->parameters.push_back (temp_parameter);
-      }
-
-      new_group.parameters = oldest_entry->parameters.end () - new_group.count;
-
-      oldest_entry->parameter_groups.push_back (new_group);
-    }
-
-    oldest_entry->source_layout = parameters_layout;
-
-    hit_layout = oldest_entry;
-  }
-
-  //Установка юниформов
-
-  for (size_t i = 0; i < hit_layout->parameter_groups.size (); i++)
-  {
-    GlslProgramParameterGroup& group = hit_layout->parameter_groups [i];
-
-    if (!constant_buffers[group.slot])
-      throw xtl::format_operation_exception (METHOD_NAME, "No needed constant buffer %u", group.slot);
-
-    if ((current_time - hit_layout->bind_time == 1) && (group.data_hash == constant_buffers[group.slot]->GetDataHash ()))
-      continue;
-
-    group.data_hash = constant_buffers[group.slot]->GetDataHash ();
-
-    char* buffer_base = (char*)constant_buffers[group.slot]->GetDataPointer ();
-
-    for (size_t j = 0; j < group.count; j++)
-    {
-      const GlslProgramParameter& parameter       = group.parameters [j];
-      void*                       uniform_pointer = buffer_base + parameter.offset;
-
-      switch (parameter.type)
-      {
-        case ProgramParameterType_Int:      caps.glUniform1iv_fn       (parameter.location, parameter.count, (int*)uniform_pointer);      break;
-        case ProgramParameterType_Float:    caps.glUniform1fv_fn       (parameter.location, parameter.count, (float*)uniform_pointer);    break;
-        case ProgramParameterType_Int2:     caps.glUniform2iv_fn       (parameter.location, parameter.count, (int*)uniform_pointer);      break;
-        case ProgramParameterType_Float2:   caps.glUniform2fv_fn       (parameter.location, parameter.count, (float*)uniform_pointer);    break;
-        case ProgramParameterType_Int3:     caps.glUniform3iv_fn       (parameter.location, parameter.count, (int*)uniform_pointer);      break;
-        case ProgramParameterType_Float3:   caps.glUniform3fv_fn       (parameter.location, parameter.count, (float*)uniform_pointer);    break;
-        case ProgramParameterType_Int4:     caps.glUniform4iv_fn       (parameter.location, parameter.count, (int*)uniform_pointer);      break;
-        case ProgramParameterType_Float4:   caps.glUniform4fv_fn       (parameter.location, parameter.count, (float*)uniform_pointer);    break;
-        case ProgramParameterType_Float2x2: caps.glUniformMatrix2fv_fn (parameter.location, parameter.count, 0, (float*)uniform_pointer); break;
-        case ProgramParameterType_Float3x3: caps.glUniformMatrix3fv_fn (parameter.location, parameter.count, 0, (float*)uniform_pointer); break;
-        case ProgramParameterType_Float4x4: caps.glUniformMatrix4fv_fn (parameter.location, parameter.count, 0, (float*)uniform_pointer); break;
-      }
-    }
-  }
-
-  hit_layout->bind_time = current_time++;
-
-  CheckErrors (METHOD_NAME);
-}
-
-/*
-   Получение лога OpenGL
+    Получение протокола ошибок OpenGL
 */
 
 void GlslProgram::GetProgramLog (stl::string& log_buffer)
 {
-  int log_length = 0;
+    //очистка буфера
 
   log_buffer.clear ();
+  
+    //установка текущего контекста
 
   MakeContextCurrent ();
+  
+    //получение размера строки состояния программы
+  
+  int log_length = 0;  
 
-  if (glGetProgramiv) glGetProgramiv            (program, GL_INFO_LOG_LENGTH, &log_length);
-  else                glGetObjectParameterivARB (program, GL_INFO_LOG_LENGTH, &log_length);
+  if (glGetProgramiv) glGetProgramiv            (handle, GL_INFO_LOG_LENGTH, &log_length);
+  else                glGetObjectParameterivARB (handle, GL_INFO_LOG_LENGTH, &log_length);
 
-  if (log_length)
-  {
-    int getted_log_size = 0;
-
-    log_buffer.resize (log_length - 1);
-
-    if (glGetProgramInfoLog) glGetProgramInfoLog (program, log_length, &getted_log_size, &log_buffer [0]);
-    else                     glGetInfoLogARB     (program, log_length, &getted_log_size, &log_buffer [0]);
+  if (!log_length)
+    return;
     
-    if (getted_log_size)
-      log_buffer.resize (getted_log_size - 1);
-  }
+    //чтение строки состояния
+
+  int getted_log_size = 0;
+
+  log_buffer.resize (log_length - 1);
+
+  if (glGetProgramInfoLog) glGetProgramInfoLog (handle, log_length, &getted_log_size, &log_buffer [0]);
+  else                     glGetInfoLogARB     (handle, log_length, &getted_log_size, &log_buffer [0]);
+
+  if (getted_log_size)
+    log_buffer.resize (getted_log_size - 1);
+
+    //проверка ошибок
 
   CheckErrors ("render::low_level::opengl::GlslProgram::GetProgramLog");
+}
+
+/*
+    Создание программы, устанавливаемой в контекст OpenGL
+*/
+
+IBindableProgram* GlslProgram::CreateBindableProgram (ProgramParametersLayout* layout)
+{
+  try
+  {
+    return new GlslBindableProgram (GetContextManager (), *this, layout);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::GlslProgram::CreateBindableProgram");
+    throw;
+  }
 }
