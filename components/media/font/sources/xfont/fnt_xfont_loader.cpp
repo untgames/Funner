@@ -72,7 +72,6 @@ void xfont_load (const char* file_name, Font& font)
 
   glyph_info = new_font.Glyphs ();
 
-  printf ("2\n");
   glyph_count = 0;
   for (Parser::NamesakeIterator i = iter->First ("Glyphs.Glyph"); i; ++i, glyph_count++)
   {
