@@ -23,26 +23,29 @@ void xfont_load (const char* file_name, Font& font)
 
   static const char* METHOD_NAME = "media::xfont_load";
 
-  for (Parser::NamesakeIterator i = iter->First ("Glyphs.Glyph"); i; ++i, glyph_count++)
-    if (!test (i, "XPos") || !test (i, "YPos") || !test (i, "Width") || !test (i, "Heigth"))
-    {
-      log.Error (i, "Incorrect file format, one of tag property missing");
-      break;
-    }
+  if (iter)
+  {
+    for (Parser::NamesakeIterator i = iter->First ("Glyphs.Glyph"); i; ++i, glyph_count++)
+      if (!test (i, "XPos") || !test (i, "YPos") || !test (i, "Width") || !test (i, "Heigth"))
+      {
+        log.Error (i, "Incorrect file format, one of tag property missing");
+        break;
+      }
 
-  if (!glyph_count)
-    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no glyphs");
-
-  for (Parser::NamesakeIterator i = iter->First ("Kernings.Kerning"); i; ++i)
-    if (!test (i, "LeftGlyph") || !test (i, "RightGlyph") || !test (i, "XKerning") || !test (i, "YKerning"))
-    {
-      log.Error (i, "Incorrect file format, one of tag property missing");
-      break;
-    }
+    for (Parser::NamesakeIterator i = iter->First ("Kernings.Kerning"); i; ++i)
+      if (!test (i, "LeftGlyph") || !test (i, "RightGlyph") || !test (i, "XKerning") || !test (i, "YKerning"))
+      {
+        log.Error (i, "Incorrect file format, one of tag property missing");
+        break;
+      }
+  }
 
   for (size_t i = 0; i < log.MessagesCount (); i++)
     if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
       throw xtl::format_operation_exception (METHOD_NAME, log.Message(i));
+
+  if (!glyph_count)
+    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no glyphs");
 
   if (!iter)
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'Font' root tag");
@@ -69,6 +72,7 @@ void xfont_load (const char* file_name, Font& font)
 
   glyph_info = new_font.Glyphs ();
 
+  printf ("2\n");
   glyph_count = 0;
   for (Parser::NamesakeIterator i = iter->First ("Glyphs.Glyph"); i; ++i, glyph_count++)
   {
