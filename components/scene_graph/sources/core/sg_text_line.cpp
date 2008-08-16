@@ -137,6 +137,8 @@ void TextLine::SetAlignment (TextLineAlignment horizontal, TextLineAlignment ver
 
   impl->horizontal_alignment = horizontal;
   impl->vertical_alignment = vertical;
+
+  UpdateNotify ();
 }
 
 void TextLine::SetHorizontalAlignment (TextLineAlignment alignment)
@@ -145,6 +147,8 @@ void TextLine::SetHorizontalAlignment (TextLineAlignment alignment)
     throw xtl::make_argument_exception ("scene_graph::TextLine::SetHorizontalAlignment", "alignment", alignment, "Unknown TextLineAlignment");
 
   impl->horizontal_alignment = alignment;
+
+  UpdateNotify ();
 }
 
 void TextLine::SetVerticalAlignment (TextLineAlignment alignment)
@@ -153,6 +157,8 @@ void TextLine::SetVerticalAlignment (TextLineAlignment alignment)
     throw xtl::make_argument_exception ("scene_graph::TextLine::SetVerticalAlignment", "alignment", alignment, "Unknown TextLineAlignment");
 
   impl->vertical_alignment = alignment;
+
+  UpdateNotify ();
 }
 
 TextLineAlignment TextLine::VerticalAlignment () const
