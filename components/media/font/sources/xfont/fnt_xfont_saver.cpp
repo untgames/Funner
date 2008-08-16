@@ -60,7 +60,7 @@ class XmlFontSaver
       writer.WriteAttribute ("XPos", glyph_info.x_pos);
       writer.WriteAttribute ("YPos", glyph_info.y_pos);
       writer.WriteAttribute ("Width", glyph_info.width);
-      writer.WriteAttribute ("Heigth", glyph_info.height);
+      writer.WriteAttribute ("Height", glyph_info.height);
       writer.WriteAttribute ("BearingX", glyph_info.bearing_x);
       writer.WriteAttribute ("BearingY", glyph_info.bearing_y);
       writer.WriteAttribute ("AdvanceX", glyph_info.advance_x);

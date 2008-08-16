@@ -6,6 +6,6 @@ Results of font_test:
     <Glyph XPos="15" YPos="18" Width="10" Height="16" BearingX="1" BearingY="10" AdvanceX="12" AdvanceY="0"/>
   </Glyphs>
   <Kernings>
-    <Kerning LeftGlyph="1" RightGlyph="0" XKerning="10" YKerning="0"/>
+    <Kerning LeftGlyph="1" RightGlyph="0" XKerning="10.2" YKerning="0"/>
   </Kernings>
 </Font>

@@ -229,10 +229,7 @@ KerningInfo Font::Kerning (size_t left_glyph_index, size_t right_glyph_index) co
 
   if (iter == impl->kernings.end ())
   {
-    KerningInfo return_value;
-
-    return_value.x_kerning = impl->glyphs.data()[left_glyph_index].advance_x;
-    return_value.y_kerning = impl->glyphs.data()[left_glyph_index].advance_y;
+    KerningInfo return_value = {0.f, 0.f};
 
     return return_value;
   }
