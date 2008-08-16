@@ -26,7 +26,7 @@ void xfont_load (const char* file_name, Font& font)
   if (iter)
   {
     for (Parser::NamesakeIterator i = iter->First ("Glyphs.Glyph"); i; ++i, glyph_count++)
-      if (!test (i, "XPos") || !test (i, "YPos") || !test (i, "Width") || !test (i, "Heigth"))
+      if (!test (i, "XPos") || !test (i, "YPos") || !test (i, "Width") || !test (i, "Height"))
       {
         log.Error (i, "Incorrect file format, one of tag property missing");
         break;
@@ -78,7 +78,7 @@ void xfont_load (const char* file_name, Font& font)
     read (i, "XPos",     glyph_info[glyph_count].x_pos);
     read (i, "YPos",     glyph_info[glyph_count].y_pos);
     read (i, "Width",    glyph_info[glyph_count].width);
-    read (i, "Heigth",   glyph_info[glyph_count].height);
+    read (i, "Height",   glyph_info[glyph_count].height);
     read (i, "BearingX", glyph_info[glyph_count].bearing_x, 0);
     read (i, "BearingY", glyph_info[glyph_count].bearing_y, (int)glyph_info[glyph_count].height);
     read (i, "AdvanceX", glyph_info[glyph_count].advance_x, (int)glyph_info[glyph_count].width);
