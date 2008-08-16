@@ -154,8 +154,8 @@ struct RenderableTextLine::Impl
           {
             media::KerningInfo kerning_info = current_font.Kerning (glyph_indices [i], glyph_indices [i + 1]);
 
-            current_pen_x_position += (float)kerning_info.x_kerning / max_glyph_side;
-            current_pen_y_position += (float)kerning_info.y_kerning / max_glyph_side;
+            current_pen_x_position += (float)glyphs [glyph_indices [i]].advance_x / max_glyph_side + (float)kerning_info.x_kerning / max_glyph_side;
+            current_pen_y_position += (float)glyphs [glyph_indices [i]].advance_y / max_glyph_side + (float)kerning_info.y_kerning / max_glyph_side;
           }
           else
           {
