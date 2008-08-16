@@ -47,9 +47,9 @@ class TextLine: public Entity
 ///Установка/получение текста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void           SetText     (const char* text);
-//    void           SetText     (const wchar_t* text);
+    void           SetText     (const wchar_t* text);
     const char*    Text        () const;
-//    const wchar_t* TextUnicode () const;
+    const wchar_t* TextUnicode () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка/получение имени шрифта

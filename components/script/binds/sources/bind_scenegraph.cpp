@@ -686,8 +686,10 @@ void bind_text_line_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Text",                make_invoker (&TextLine::SetText));
+  lib.Register ("set_Text",                make_invoker (implicit_cast<void (TextLine::*) (const char*)> (&TextLine::SetText)));
   lib.Register ("get_Text",                make_invoker (&TextLine::Text));
+  lib.Register ("set_TextUnicode",         make_invoker (implicit_cast<void (TextLine::*) (const wchar_t*)> (&TextLine::SetText)));
+  lib.Register ("get_TextUnicode",         make_invoker (&TextLine::TextUnicode));
   lib.Register ("set_Font",                make_invoker (&TextLine::SetFont));
   lib.Register ("get_Font",                make_invoker (&TextLine::Font));
   lib.Register ("set_Color",               make_invoker (implicit_cast<void (TextLine::*) (const vec4f&)> (&TextLine::SetColor)));

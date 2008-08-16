@@ -11,6 +11,8 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/uninitialized_storage.h>
 
+#include <common/utf_converter.h>
+
 #include <bv/axis_aligned_box.h>
 
 #include <sg/camera.h>

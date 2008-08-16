@@ -150,13 +150,17 @@ Entities count = 1
 Entities count = 1
 TextLine test
 Text = 
+TextUnicode = 
 Font = 
 Color = 1 1 1 1
 Horizontal aligment = Left/Top vertical aligment = Left/Top
 Text = text
+TextUnicode = text
 Font = font
 Color = 0.10000000149 0.20000000298 0.300000011921 0.40000000596
 Horizontal aligment = Center vertical aligment = Right/Bottom
+Text = Не юникод текст
+TextUnicode = Не юникод текст
 Color = 0.40000000596 0.300000011921 0.20000000298 0.10000000149
 Color = 0.10000000149 0.20000000298 0.300000011921 0.10000000149
 Horizontal aligment = Right/Bottom vertical aligment = Center

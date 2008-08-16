@@ -10,12 +10,16 @@ using namespace math;
 struct TextLine::Impl
 {
   stl::string       text;
+  bool              text_need_update;
+  stl::wstring      text_unicode;
+  bool              text_unicode_need_update;
   stl::string       font_name;
   vec4f             color;
   TextLineAlignment horizontal_alignment;
   TextLineAlignment vertical_alignment;
 
-  Impl () : color (1.f, 1.f, 1.f, 1.f), horizontal_alignment (TextLineAlignment_Left), vertical_alignment (TextLineAlignment_Top) {}
+  Impl () : text_need_update (false), text_unicode_need_update (false), color (1.f, 1.f, 1.f, 1.f), 
+            horizontal_alignment (TextLineAlignment_Left), vertical_alignment (TextLineAlignment_Top) {}
 };
 
 /*
@@ -95,12 +99,45 @@ void TextLine::SetText (const char* text)
 
   impl->text = text;
 
+  impl->text_need_update = false;
+  impl->text_unicode_need_update = true;
+
+  UpdateNotify ();
+}
+
+void TextLine::SetText (const wchar_t* text)
+{
+  if (!text)
+    throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetText", "text");
+
+  impl->text_unicode = text;
+
+  impl->text_unicode_need_update = false;
+  impl->text_need_update = true;
+
   UpdateNotify ();
 }
 
 const char* TextLine::Text () const
 {
+  if (impl->text_need_update)
+  {
+    impl->text = common::tostring (impl->text_unicode);
+    impl->text_need_update = false;
+  }
+
   return impl->text.c_str ();
+}
+
+const wchar_t* TextLine::TextUnicode () const
+{
+  if (impl->text_unicode_need_update)
+  {
+    impl->text_unicode = common::towstring (impl->text);
+    impl->text_unicode_need_update = false;
+  }
+
+  return impl->text_unicode.c_str ();
 }
 
 /*

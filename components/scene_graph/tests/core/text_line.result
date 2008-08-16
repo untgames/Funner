@@ -1,10 +1,14 @@
 Results of text_line_test:
-TextLine color = [1.00 1.00 1.00 1.00]
+TextLine color = [1,00 1,00 1,00 1,00]
 TextLine text = ''
+TextLine unicode text = ''
 TextLine font name = ''
 TextLine horizontal alignment = 'TextLineAlignment_Left/TextLineAlignment_Top', vertical_alignment = 'TextLineAlignment_Left/TextLineAlignment_Top'
-TextLine color = [0.10 0.20 0.30 0.40]
-TextLine text = 'text'
+TextLine color = [0,10 0,20 0,30 0,40]
+TextLine text = 'Не юникод текст'
+TextLine unicode text = 'Не юникод текст'
 TextLine font name = 'font'
 TextLine horizontal alignment = 'TextLineAlignment_Center', vertical_alignment = 'TextLineAlignment_Right/TextLineAlignment_Bottom'
+TextLine text = 'Юникод текст'
+TextLine unicode text = 'Юникод текст'
 TextLine horizontal alignment = 'TextLineAlignment_Right/TextLineAlignment_Bottom', vertical_alignment = 'TextLineAlignment_Center'

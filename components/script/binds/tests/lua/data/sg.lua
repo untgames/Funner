@@ -428,6 +428,7 @@ function test_text_line ()
   local text_line1 = Scene.TextLine.Create ()
 
   print ("Text = " .. text_line1.Text)
+  print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
   print ("Font = " .. text_line1.Font)
   print ("Color = " .. tostring (text_line1.Color))
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
@@ -439,9 +440,15 @@ function test_text_line ()
   text_line1.VerticalAlignment   = Scene_TextLineAlignment.Bottom
 
   print ("Text = " .. text_line1.Text)
+  print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
   print ("Font = " .. text_line1.Font)
   print ("Color = " .. tostring (text_line1.Color))
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+
+  text_line1.Text = "Не юникод текст"
+
+  print ("Text = " .. text_line1.Text)
+  print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
 
   text_line1:SetColor (0.4, 0.3, 0.2, 0.1)
 
