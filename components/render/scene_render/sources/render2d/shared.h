@@ -127,17 +127,17 @@ class RenderableFont
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение шрифта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const media::Font& GetFont () const { return font; }
+    const media::Font& GetFont () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ITexture* GetTexture () const { return texture.get (); }
+    ITexture* GetTexture () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение размера самой большой стороны глифа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetMaxGlyphSide () const { return max_glyph_side; }
+    size_t GetMaxGlyphSide () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение спрайта по индексу
@@ -149,11 +149,8 @@ class RenderableFont
     typedef xtl::com_ptr<ITexture>                                            TextuerPtr;
 
   private:
-    Render&       render;         //ссылка на рендер
-    media::Font   font;           //шрифт
-    SpritesBuffer sprites_buffer; //буффер спрайтов (по спрайту для каждого глифа)
-    TexturePtr    texture;        //текстура
-    size_t        max_glyph_side; //размер самой большой стороны среди всех глифов (в пикселях)
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,19 +185,8 @@ class RenderableTextLine: public Renderable, public xtl::trackable
     typedef xtl::uninitialized_storage<render::mid_level::renderer2d::Sprite> SpritesBuffer;
 
   private:
-    Render&                        render;                       //ссылка на рендер
-    scene_graph::TextLine*         text_line;                    //исходная линия текста
-    PrimitivePtr                   primitive;                    //визуализируемый примитив
-    math::mat4f                    translate_tm;                 //матрица сдвига для выравнивания
-    math::mat4f                    current_world_tm;             //текущая матрица трансформации
-    size_t                         current_world_tm_hash;        //хэш текущей матрицы трансформации
-    stl::string                    current_font_name;            //текущий шрифт
-    stl::string                    current_text;                 //текущий текст
-    math::vec4f                    current_color;                //текущий цвет
-    scene_graph::TextLineAlignment current_horizontal_alignment; //текущее горизонтальное выравнивание
-    scene_graph::TextLineAlignment current_vertical_alignment;   //текущее вертикальное выравнивание
-    SpritesBuffer                  sprites_buffer;               //буффер спрайтов
-    stl::vector<size_t>            glyph_indices;                //индексы глифов в буффере спрайтов
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

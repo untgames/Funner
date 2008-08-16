@@ -10,9 +10,10 @@
 #include <common/component.h>
 #include <common/log.h>
 
+#include <sg/camera.h>
 #include <sg/scene.h>
 #include <sg/sprite.h>
-#include <sg/camera.h>
+#include <sg/text_line.h>
 
 #include <render/scene_render.h>
 

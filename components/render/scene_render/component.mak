@@ -53,4 +53,4 @@ RENDER.SCENE_RENDER.RENDER2D.TESTS.DLL_DIRS         :=
 RENDER.SCENE_RENDER.RENDER2D.TESTS.COMPILER_CFLAGS  :=
 RENDER.SCENE_RENDER.RENDER2D.TESTS.IMPORTS          := compile.static.mak render2d.link.static.mak ../debug_renderer_driver/link.static.mak \
                                                        ../../scene_graph/compile.static.mak ../../common/compile.static.mak \
-                                                       ../../media/rfx/xmtl.link.static.mak
+                                                       ../../media/rfx/xmtl.link.static.mak ../../media/font/xfont.link.static.mak

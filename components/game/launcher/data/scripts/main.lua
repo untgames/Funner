@@ -62,11 +62,12 @@ sound_emitter1:BindToParent (sprite)
 
 text_line = Scene.TextLine.Create ()
 
-text_line.Text = "\"UNT - тарарам!\" AV"
-text_line.Font = "data/fonts/font.xfont"
+text_line.Text = "\"UNT - табарарам!\" AV"
+text_line.Font = "data/fonts/times_new_roman.xfont"
 text_line.Color = vec4 (0, 0, 1, 1)
 text_line:SetAlignment (Scene_TextLineAlignment.Center, Scene_TextLineAlignment.Center)
---text_line:SetPosition (-5, 1, 0)
+text_line:SetScale (2, 2, 1)
+text_line:SetPosition (0, 0, -1)
 
 text_line:BindToScene (scene)
 

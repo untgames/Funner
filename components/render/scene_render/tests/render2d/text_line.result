@@ -1,0 +1,58 @@
+Results of text_line_test:
+Create debug driver
+Create color-buffer 800x600 (id=3)
+Create depth-stencil-buffer 800x600 (id=4)
+Create 2D renderer (id=2)
+Create frame2d (id=6)
+Create primitive (id=7)
+Create texture 2048x1024 format=4 (id=8)
+Begin draw frames (id=2, frame_id=0)
+Begin draw frame (id=5)
+Set render targets: render-target=3, depth-stencil-target=4
+Clear render target [0.00 0.00 0.00 0.00]
+Clear depth-stencil target [1.000 0]
+End draw frame (id=5)
+Begin draw frame (id=6)
+Set render targets: render-target=3, depth-stencil-target=4
+Set viewport (left=0, top=0, width=800, height=600)
+Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
+View point=[0.00 0.00 0.00]
+Draw primitive (id=7)
+  texture_id=8
+  blend=translucent
+  transform=[[1.00 0.00 0.00] [-0.89 0.00 1.00] [0.00 -0.32 0.00] [0.00 1.00 0.00]]
+  sprites (count=4):
+    sprite #0: position=[0.30 0.32 0.00] size=[0.53 0.67] color=[0.10 0.20 0.30 0.40] tex_offset=[0.02 0.09] tex_size=[0.02 0.04]
+    sprite #1: position=[0.80 0.22 0.00] size=[0.36 0.47] color=[0.10 0.20 0.30 0.40] tex_offset=[0.36 0.10] tex_size=[0.01 0.03]
+    sprite #2: position=[1.26 0.21 0.00] size=[0.45 0.45] color=[0.10 0.20 0.30 0.40] tex_offset=[0.68 0.10] tex_size=[0.01 0.03]
+    sprite #3: position=[1.65 0.30 0.00] size=[0.27 0.59] color=[0.10 0.20 0.30 0.40] tex_offset=[0.60 0.09] tex_size=[0.01 0.04]
+End draw frame (id=6)
+End draw frames (id=2, frame_id=0)
+Begin draw frames (id=2, frame_id=1)
+Begin draw frame (id=5)
+Set render targets: render-target=3, depth-stencil-target=4
+Clear render target [0.00 0.00 0.00 0.00]
+Clear depth-stencil target [1.000 0]
+End draw frame (id=5)
+Begin draw frame (id=6)
+Set render targets: render-target=3, depth-stencil-target=4
+Set viewport (left=0, top=0, width=800, height=600)
+Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
+View point=[0.00 0.00 0.00]
+Draw primitive (id=7)
+  texture_id=8
+  blend=translucent
+  transform=[[1.00 0.00 0.00] [-1.78 0.00 1.00] [0.00 -0.66 0.00] [0.00 1.00 0.00]]
+  sprites (count=4):
+    sprite #0: position=[0.30 0.32 0.00] size=[0.53 0.67] color=[0.10 0.20 0.30 0.40] tex_offset=[0.02 0.09] tex_size=[0.02 0.04]
+    sprite #1: position=[0.80 0.22 0.00] size=[0.36 0.47] color=[0.10 0.20 0.30 0.40] tex_offset=[0.36 0.10] tex_size=[0.01 0.03]
+    sprite #2: position=[1.26 0.21 0.00] size=[0.45 0.45] color=[0.10 0.20 0.30 0.40] tex_offset=[0.68 0.10] tex_size=[0.01 0.03]
+    sprite #3: position=[1.65 0.30 0.00] size=[0.27 0.59] color=[0.10 0.20 0.30 0.40] tex_offset=[0.60 0.09] tex_size=[0.01 0.04]
+End draw frame (id=6)
+End draw frames (id=2, frame_id=1)
+Destroy frame2d (id=6)
+Destroy primitive (id=7)
+Destroy texture2d (id=8)
+Destroy 2D renderer (id=2)
+Destroy depth-stencil-buffer (id=4)
+Destroy color-buffer (id=3)
