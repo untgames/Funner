@@ -51,6 +51,7 @@ struct RenderableTextLine::Impl
   stl::string                    current_text;                 //текущий текст
   SpritesBuffer                  sprites_buffer;               //буффер спрайтов
   stl::vector<size_t>            glyph_indices;                //индексы глифов в буффере спрайтов
+  TextDimensions                 text_dimensions;              //границы текста
 
   Impl (scene_graph::TextLine* in_text_line, Render& in_render)
     : render (in_render),
@@ -130,12 +131,9 @@ struct RenderableTextLine::Impl
         }
 
         sprites_buffer.resize (result_text_length);
-      }
 
-        //формирование позиций спрайтов
-      if (need_rebuild_text)
-      {
-        render::mid_level::renderer2d::Sprite* current_sprite = sprites_buffer.data ();
+          //формирование позиций спрайтов
+        current_sprite = sprites_buffer.data ();
 
         float current_pen_x_position = 0.f;
         float current_pen_y_position = 0.f;
@@ -163,6 +161,8 @@ struct RenderableTextLine::Impl
             current_pen_y_position += (float)glyphs [glyph_indices [i]].advance_y / max_glyph_side;
           }
         }
+
+        text_dimensions = calculate_text_dimensions (sprites_buffer.data (), sprites_buffer.size ());
       }
 
       if ((current_horizontal_alignment != text_line->HorizontalAlignment ()) || (current_vertical_alignment != text_line->VerticalAlignment ()))
@@ -175,8 +175,6 @@ struct RenderableTextLine::Impl
 
       if (need_update_position)
       {
-        TextDimensions text_dimensions = calculate_text_dimensions (sprites_buffer.data (), sprites_buffer.size ());
-
         math::vec3f translate_vector (0);
 
         if ((text_dimensions.left < -0.501f) || (text_dimensions.right > 0.501f))  //проверка вертикального шрифта
@@ -264,7 +262,7 @@ struct RenderableTextLine::Impl
           current_sprite->color = current_color;     
       }
 
-      if (need_update_position || need_rebuild_text || color_changed)
+      if (need_rebuild_text || color_changed)
       {
         primitive->RemoveAllSprites ();
 
