@@ -2,6 +2,7 @@
 #include <stl/hash_map>
 
 #include <xtl/common_exceptions.h>
+#include <xtl/reference_counter.h>
 #include <xtl/uninitialized_storage.h>
 
 #include <common/component.h>
@@ -45,37 +46,35 @@ namespace media
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация гарнитуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FontImpl
+struct Font::Impl : public xtl::reference_counter
 {
-  public:
-    FontImpl () : first_char_index (0) {}
+  Impl () : first_char_index (0) {}
 
-  public:
-    typedef xtl::uninitialized_storage<GlyphInfo>      GlyphsArray;
-    typedef stl::hash_map<KerningsMapKey, KerningInfo> KerningsMap;
+  typedef xtl::uninitialized_storage<GlyphInfo>      GlyphsArray;
+  typedef stl::hash_map<KerningsMapKey, KerningInfo> KerningsMap;
 
-  public:
-    size_t      first_char_index;  //char-код первого глифа
-    GlyphsArray glyphs;            //глифы
-    stl::string file_name;         //имя файла с содержимым гарнитуры
-    stl::string str_name;          //имя гарнитуры
-    KerningsMap kernings;          //кернинги
+  size_t      first_char_index;  //char-код первого глифа
+  GlyphsArray glyphs;            //глифы
+  stl::string file_name;         //имя файла с содержимым гарнитуры
+  stl::string str_name;          //имя гарнитуры
+  KerningsMap kernings;          //кернинги
 };
 
 }
 
 Font::Font ()
-  : impl (new FontImpl)
+  : impl (new Impl)
 {
 }
 
 Font::Font (const Font& source)
   : impl (source.impl)
 {                  
+  addref (impl);
 }
 
 Font::Font (const char* file_name)
-  : impl (new FontImpl)
+  : impl (new Impl)
 {
   static const char* METHOD_NAME = "media::Font::Font";
 
@@ -95,13 +94,9 @@ Font::Font (const char* file_name)
   }
 }
 
-Font::Font (FontImpl* source)
-  : impl (source)
-{
-}
-
 Font::~Font ()
 {
+  release (impl);
 }
 
 Font& Font::operator = (const Font& source)
@@ -142,6 +137,9 @@ const char* Font::Name () const
 
 void Font::Rename (const char* new_name)
 {
+  if (!new_name)
+    throw xtl::make_null_argument_exception ("media::Font::Rename", "new_name");
+
   impl->str_name = new_name;
 }
 
@@ -225,7 +223,7 @@ void Font::RemoveAllKernings ()
 
 KerningInfo Font::Kerning (size_t left_glyph_index, size_t right_glyph_index) const
 {
-  FontImpl::KerningsMap::iterator iter = impl->kernings.find (KerningsMapKey (left_glyph_index, right_glyph_index));
+  Impl::KerningsMap::iterator iter = impl->kernings.find (KerningsMapKey (left_glyph_index, right_glyph_index));
 
   if (iter == impl->kernings.end ())
   {
@@ -239,7 +237,7 @@ KerningInfo Font::Kerning (size_t left_glyph_index, size_t right_glyph_index) co
 
 bool Font::HasKerning (size_t left_glyph_index, size_t right_glyph_index) const
 {
-  FontImpl::KerningsMap::iterator iter = impl->kernings.find (KerningsMapKey (left_glyph_index, right_glyph_index));
+  Impl::KerningsMap::iterator iter = impl->kernings.find (KerningsMapKey (left_glyph_index, right_glyph_index));
 
   if (iter == impl->kernings.end ())
     return false;
@@ -273,7 +271,7 @@ void Font::Save (const char* file_name) const
 
 void Font::Swap (Font& font)
 {
-  swap (impl, font.impl);
+  stl::swap (impl, font.impl);
 }
 
 namespace media
