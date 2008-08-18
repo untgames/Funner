@@ -44,12 +44,12 @@ void xfont_load (const char* file_name, Font& font)
     if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
       throw xtl::format_operation_exception (METHOD_NAME, log.Message(i));
 
-  if (!glyph_count)
-    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no glyphs");
-
   if (!iter)
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'Font' root tag");
     
+  if (!glyph_count)
+    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no glyphs");
+
   if (!test (iter, "FontFile"))
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'FontFile' property");
     
