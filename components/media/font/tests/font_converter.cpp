@@ -59,6 +59,7 @@ int main ()
     font_desc.char_codes_line = utf16_string.c_str ();
     font_desc.glyph_size = 64;
     font_desc.first_glyph_code = FIRST_GLYPH_CODE;
+    font_desc.glyph_interval = 5;
 
     setlocale (LC_ALL, "C");
 

@@ -130,11 +130,6 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
   FT_Face& face = font_face.Face ();
 
-    // Add a gap between letters vert and horz
-    // prevents nasty artefacts when letters are too close together
-
-  unsigned int char_spacer = 5;  //Поэкспериментировать с этим значением!!!!
-
   size_t freetype_char_size = font_desc.glyph_size * 64;
 
   if (FT_Set_Char_Size (face, freetype_char_size, freetype_char_size, RESOLUTION, RESOLUTION))
@@ -168,7 +163,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
     // Now work out how big our texture needs to be
 
-  size_t raw_size = (max_width + char_spacer) * ((max_height >> 6) + char_spacer) * glyphs_count;
+  size_t raw_size = (max_width + font_desc.glyph_interval) * ((max_height >> 6) + font_desc.glyph_interval) * glyphs_count;
 
   size_t texture_side = (size_t)sqrt ((float)raw_size);
 
@@ -265,12 +260,12 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
     current_glyph->advance_y = 0;
 
       // Advance a column
-    column += (advance + char_spacer);
+    column += (advance + font_desc.glyph_interval);
 
       // If at end of row
     if ((final_width - 1) < (column + advance))
     {
-      current_row += (max_height >> 6) + char_spacer;
+      current_row += (max_height >> 6) + font_desc.glyph_interval;
       column = 0;
     }
   }
