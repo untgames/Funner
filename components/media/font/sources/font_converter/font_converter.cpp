@@ -1,11 +1,17 @@
 #include <cmath>
 
+#include <stl/hash_map>
+#include <stl/vector>
+
 #include <xtl/common_exceptions.h>
+#include <xtl/string.h>
 #include <xtl/uninitialized_storage.h>
 
 #include <common/file.h>
+#include <common/hash.h>
 #include <common/log.h>
 
+#include <media/atlas_builder.h>
 #include <media/font_converter.h>
 #include <media/image.h>
 
@@ -15,7 +21,9 @@
 namespace
 {
 
-size_t RESOLUTION = 72;
+const size_t RESOLUTION = 72;
+
+const media::PixelFormat RESULT_IMAGE_FORMAT = media::PixelFormat_L8;
 
 const char* LOG_NAME = "media.font.font_converter"; //имя потока протоколирования
 
@@ -97,6 +105,14 @@ void set_null_glyph_data (media::GlyphInfo* glyph)
   glyph->advance_y = 0;
 }
 
+size_t get_glyph_bitmap_size (FT_Bitmap_& bitmap)
+{
+  return abs (bitmap.pitch) * bitmap.rows;
+}
+
+typedef stl::hash_map<size_t, size_t>           BitmapHashMap;
+typedef stl::vector<stl::pair<size_t, size_t> > DuplicateGlyphs;
+
 }
 
 namespace media
@@ -116,7 +132,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
   if (!font_desc.char_codes_line)
     throw xtl::make_null_argument_exception (METHOD_NAME, "font_desc.char_codes_line");
   
-  size_t char_codes_count = wcslen (font_desc.char_codes_line);
+  size_t char_codes_count = xtl::xstrlen (font_desc.char_codes_line);
 
   if (!char_codes_count)
     throw xtl::format_operation_exception (METHOD_NAME, "Empty char codes string");
@@ -135,61 +151,9 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
   if (FT_Set_Char_Size (face, freetype_char_size, freetype_char_size, RESOLUTION, RESOLUTION))
     throw xtl::format_operation_exception (METHOD_NAME, "Can't set char size");
 
-    // Calculate maximum width, height and bearing
+  const AtlasBuilder::PackHandler& pack_handler = AtlasBuilderManager::GetPacker ("default");
 
-  int    max_height = 0, max_width = 0, max_bearing = 0;
-  size_t glyphs_count = 0;
-
-  for (size_t i = 0; i < char_codes_count; i++)
-  {
-    if (FT_Load_Char (face, font_desc.char_codes_line [i], FT_LOAD_RENDER))
-    {
-      common::LogSystem::Printf (LOG_NAME, "Can't load char %u.", i);
-    
-      continue;
-    }
-
-    if ((2 * (face->glyph->bitmap.rows << 6) - face->glyph->metrics.horiBearingY) > max_height)
-      max_height = (2 * (face->glyph->bitmap.rows << 6) - face->glyph->metrics.horiBearingY);
-    
-    if (face->glyph->metrics.horiBearingY > max_bearing)
-      max_bearing = face->glyph->metrics.horiBearingY;
-
-    if ((face->glyph->advance.x >> 6) + (face->glyph->metrics.horiBearingX >> 6) > max_width)
-      max_width = (face->glyph->advance.x >> 6) + (face->glyph->metrics.horiBearingX >> 6);
-
-    glyphs_count++;
-  }
-
-    // Now work out how big our texture needs to be
-
-  size_t raw_size = (max_width + font_desc.glyph_interval) * ((max_height >> 6) + font_desc.glyph_interval) * glyphs_count;
-
-  size_t texture_side = (size_t)sqrt ((float)raw_size);
-
-    // just in case the size might chop a glyph in half, add another glyph width/height
-  
-  texture_side += stl::max (max_width, (max_height >> 6));
-
-    // Now round up to nearest power of two
-  
-  texture_side = get_next_higher_power_of_two (texture_side);
-
-    // Would we benefit from using a non-square texture (2X width)
-  
-  size_t final_width, final_height;
-
-  if (texture_side * texture_side * 0.5 >= raw_size)
-    final_height = (size_t)((float)texture_side * 0.5f);
-  else
-    final_height = texture_side;
-
-  final_width = texture_side;
-
-  const size_t pixel_bytes = get_bytes_per_pixel (result_image.Format ());
-  
-  size_t data_width = final_width * pixel_bytes;
-  size_t data_size  = final_width * final_height * pixel_bytes;
+    //Установка данных шрифта
 
   media::Font font;
 
@@ -198,37 +162,32 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
   font.ResizeGlyphsTable (char_codes_count);
   font.SetFirstGlyphCode (font_desc.first_glyph_code);
 
-  media::Image image (final_width, final_height, 1, result_image.Format ());
+    //Подготовка массива с размерами каждого глифа
 
-  image.Rename (result_image.Name ());
+  size_t glyphs_count = 0;
 
-  unsigned char* image_data = (unsigned char*)image.Bitmap ();
-
-    // Reset content (Black, transparent)
-  
-  memset (image_data, 0, data_size);
-
-  size_t column = 0, current_row = 0;
+  xtl::uninitialized_storage<math::vec2ui> glyph_sizes (char_codes_count), glyph_origins (char_codes_count);
+  xtl::uninitialized_storage<size_t> glyph_indices (char_codes_count);
 
   media::GlyphInfo *current_glyph = font.Glyphs ();
 
+  BitmapHashMap   bitmap_map;
+  DuplicateGlyphs duplicate_glyphs;
+
+  duplicate_glyphs.reserve (char_codes_count);
+  
   for (size_t i = 0; i < char_codes_count; i++, current_glyph++)
   {
-      // Load & render glyph
-      
     if (FT_Load_Char (face, font_desc.char_codes_line [i], FT_LOAD_RENDER))
     {
-        // problem loading this glyph, continue
       set_null_glyph_data (current_glyph);
 
+      common::LogSystem::Printf (LOG_NAME, "Can't load char %u.", i);
+    
       continue;
     }
 
-    FT_Int advance = (face->glyph->advance.x >> 6) + (face->glyph->metrics.horiBearingX >> 6);
-
-    unsigned char* buffer = face->glyph->bitmap.buffer;
-
-    if (!buffer)
+    if (!face->glyph->bitmap.buffer)
     {
       common::LogSystem::Printf (LOG_NAME, "Freetype returned null for character %u.", i);
       
@@ -238,37 +197,106 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
       continue;
     }
 
-    int y_bearing = (max_bearing >> 6) - (face->glyph->metrics.horiBearingY >> 6);
+    if (face->glyph->bitmap.pixel_mode != FT_PIXEL_MODE_GRAY)
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Can't save image, pixel format differs from FT_PIXEL_MODE_GRAY.");
 
-    for (int j = 0; j < face->glyph->bitmap.rows; j++)
-    {
-      size_t row = current_row + y_bearing + face->glyph->bitmap.rows - j - 1;
-
-      unsigned char* destination_pixel = &image_data[(row * data_width) + column * pixel_bytes];
-
-      for (int k = 0; k < face->glyph->bitmap.width; k++, destination_pixel += pixel_bytes, buffer++)
-        memset (destination_pixel, *buffer, pixel_bytes);
-    }
-
-    current_glyph->x_pos     = column;
-    current_glyph->y_pos     = current_row + y_bearing;
-    current_glyph->width     = face->glyph->metrics.width >> 6;
-    current_glyph->height    = face->glyph->metrics.height >> 6;
+    current_glyph->width     = face->glyph->bitmap.width;
+    current_glyph->height    = face->glyph->bitmap.rows;
     current_glyph->bearing_x = face->glyph->metrics.horiBearingX >> 6;
     current_glyph->bearing_y = face->glyph->metrics.horiBearingY >> 6;
     current_glyph->advance_x = face->glyph->metrics.horiAdvance >> 6;
     current_glyph->advance_y = 0;
 
-      // Advance a column
-    column += (advance + font_desc.glyph_interval);
+    size_t bitmap_hash = common::crc32 (face->glyph->bitmap.buffer, get_glyph_bitmap_size (face->glyph->bitmap));
 
-      // If at end of row
-    if ((final_width - 1) < (column + advance))
+    BitmapHashMap::iterator iter = bitmap_map.find (bitmap_hash);
+
+    if (iter != bitmap_map.end ())
     {
-      current_row += (max_height >> 6) + font_desc.glyph_interval;
-      column = 0;
+      duplicate_glyphs.push_back (stl::pair<size_t, size_t> (i, iter->second));
+
+      continue;
+    }
+
+    bitmap_map [bitmap_hash] = i;
+    
+    glyph_sizes.data () [glyphs_count].x = face->glyph->bitmap.width + font_desc.glyph_interval;
+    glyph_sizes.data () [glyphs_count].y = face->glyph->bitmap.rows + font_desc.glyph_interval;
+    glyph_indices.data () [glyphs_count] = i;
+
+    glyphs_count++;
+  }
+
+    //Формирование позиций глифов
+
+  pack_handler (glyphs_count, glyph_sizes.data (), glyph_origins.data (), AtlasPackFlag_PowerOfTwoEdges);
+
+  size_t result_image_width = 0, result_image_height = 0;
+
+  for (size_t i = 0; i < glyphs_count; i++)
+  {
+    if (result_image_width < (glyph_origins.data ()[i].x + glyph_sizes.data ()[i].x))
+      result_image_width = glyph_origins.data ()[i].x + glyph_sizes.data ()[i].x;
+    if (result_image_height < (glyph_origins.data ()[i].y + glyph_sizes.data ()[i].y))
+      result_image_height = glyph_origins.data ()[i].y + glyph_sizes.data ()[i].y;
+  }
+
+  result_image_width  = get_next_higher_power_of_two (result_image_width);
+  result_image_height = get_next_higher_power_of_two (result_image_height);
+
+  media::Image image (result_image_width, result_image_height, 1, RESULT_IMAGE_FORMAT);
+
+  image.Rename (result_image.Name ());
+
+  unsigned char* image_data = (unsigned char*)image.Bitmap ();
+
+    //Сброс цвета (чёрный, прозрачный)
+  
+  size_t bytes_per_pixel = get_bytes_per_pixel (RESULT_IMAGE_FORMAT);
+  size_t row_size = bytes_per_pixel * result_image_width;
+
+  memset (image_data, 0, result_image_width * result_image_height * bytes_per_pixel);
+
+    //Формирование конечного изображения
+
+  for (size_t i = 0; i < glyphs_count; i++)
+  {
+    if (FT_Load_Char (face, font_desc.char_codes_line [glyph_indices.data () [i]], FT_LOAD_RENDER))
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't render glyph %u second time", glyph_indices.data () [i]);
+
+    if (!face->glyph->bitmap.buffer)
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't get glyph %u buffer while rendering second time", glyph_indices.data () [i]);
+
+    current_glyph = font.Glyphs () + glyph_indices.data () [i];
+
+    size_t origin_x = glyph_origins.data () [i].x;
+    size_t origin_y = glyph_origins.data () [i].y;
+
+    current_glyph->x_pos = origin_x;
+    current_glyph->y_pos = origin_y;
+
+    for (int j = 0; j < face->glyph->bitmap.rows; j++)
+    {
+      unsigned char* buffer = face->glyph->bitmap.buffer + face->glyph->bitmap.pitch * j;
+      unsigned char* destination_pixel = &image_data[((origin_y + (face->glyph->bitmap.rows - j - 1)) * row_size) + origin_x * bytes_per_pixel];
+
+      for (int k = 0; k < face->glyph->bitmap.width; k++, destination_pixel += bytes_per_pixel, buffer++)
+        memset (destination_pixel, *buffer, bytes_per_pixel);
     }
   }
+
+    //Формирование данных повторяющихся глифов
+
+  for (DuplicateGlyphs::iterator iter = duplicate_glyphs.begin (), end = duplicate_glyphs.end (); iter != end; ++iter)
+  {
+    GlyphInfo *first_glyph_occurence = font.Glyphs () + iter->second;
+    GlyphInfo *same_glyph            = font.Glyphs () + iter->first;
+
+    same_glyph->x_pos = first_glyph_occurence->x_pos;
+    same_glyph->y_pos = first_glyph_occurence->y_pos;
+  }
+
+    //Формирование кёрнингов
 
   for (size_t i = 0; i < char_codes_count; i++)
     for (size_t j = 0; j < char_codes_count; j++)

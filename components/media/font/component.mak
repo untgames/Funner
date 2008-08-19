@@ -45,7 +45,7 @@ MEDIA.FONT.TESTS.LIBS             :=
 MEDIA.FONT.TESTS.COMPILER_CFLAGS  :=
 MEDIA.FONT.TESTS.COMPILER_DEFINES :=
 MEDIA.FONT.TESTS.IMPORTS          := compile.static.mak link.static.mak xfont.link.static.mak font_converter.link.static.mak \
-                                     ../../media/image/compile.static.mak ../../media/image/link.static.mak
+                                     ../../media/image/compile.static.mak ../../media/image/link.static.mak ../../media/image/left_bottom_packer.link.static.mak
 
 #Цель - MediaLib utils
 MEDIA.FONT.UTILS.TYPE             := application
