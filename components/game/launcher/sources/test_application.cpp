@@ -95,27 +95,6 @@ void do_file (const char* file_name, Shell& shell)
   shell.ExecuteFile (file_name, &log_print);
 }
 
-void idle (TestApplication& app, Shell& shell)
-{
-  try
-  {
-    static clock_t last_time = clock ();
-    
-    if (clock () - last_time > MOVE_PERIOD)
-    {
-      invoke<void> (*shell.Interpreter (), "idle", float (clock () - last_time) / CLOCKS_PER_SEC);
-
-      last_time = clock ();
-    }        
-
-    app.PostRedraw ();
-  }
-  catch (std::exception& exception)
-  {
-    printf ("exception at idle: %s\n", exception.what ());
-  }
-}
-
 /*
     Выполнение скрипта    
 */
@@ -159,7 +138,6 @@ struct TestApplication::Impl
   Screen                        screen;              //область вывода
   input::TranslationMap         translation_map;
   bool                          render_initialized;
-
         
   Impl ()
     : render_initialized (false)
@@ -171,6 +149,35 @@ struct TestApplication::Impl
       //чтение настроек
       
     config.Open (CONFIGURATION_BRANCH_NAME);
+  }
+
+  ~Impl ()
+  {
+    try
+    {
+      printf ("Destructing test application\n");
+      string_registry.UnmountAll ();
+      config.Close ();
+      swap_chain = 0;
+      device = 0;
+      app_idle_connection.disconnect ();
+      render.ResetRenderer ();
+      RenderTarget ().Swap (render_target);
+      input_devices.clear ();
+      render::mid_level::LowLevelDriver::UnregisterRenderer (MID_LEVEL_RENDERER_NAME);
+      sound_manager.reset ();
+      scene_player.reset ();
+      environment.reset ();
+      shell.reset ();
+      Screen ().Swap (screen);
+      translation_map.Clear ();
+      window = 0;
+      printf ("All nulled\n");
+    }
+    catch (...)
+    {
+      printf ("Exception at destructing");
+    }
   }
 
   void InitRender ()
@@ -188,8 +195,6 @@ struct TestApplication::Impl
 
     window->SetTitle (get (config, "WindowTitle", DEFAULT_WINDOW_TITLE).c_str ());    
 
-    window->Show ();
-    
       //регистрация обработчиков событий окна
 
     window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, &*this));
@@ -246,6 +251,28 @@ struct TestApplication::Impl
     syslib::Application::Exit (0);
   }
 
+  void OnIdle ()
+  {
+    try
+    {
+      static clock_t last_time = clock ();
+      
+      if (clock () - last_time > MOVE_PERIOD)
+      {
+        invoke<void> (*shell->Interpreter (), "idle", float (clock () - last_time) / CLOCKS_PER_SEC);
+
+        last_time = clock ();
+      }        
+
+      if (window.get () && !window->IsClosed ())
+        window->Invalidate ();
+    }
+    catch (std::exception& exception)
+    {
+      printf ("exception at idle: %s\n", exception.what ());
+    }
+  }
+
   void OnRedraw ()
   {
     try
@@ -288,7 +315,7 @@ struct TestApplication::Impl
     }
     catch (std::exception& exception)
     {
-      printf ("Eexception at window resize: %s\n", exception.what ());
+      printf ("Exception at window resize: %s\n", exception.what ());
     }
   }
 
@@ -354,17 +381,35 @@ TestApplication::TestApplication (const char* start_script_name)
       //инициализация звука
 
     printf ("Init sound...\n");
-    impl->sound_manager = SoundManagerPtr (new sound::SoundManager ("OpenAL", get (impl->config, "SoundDeviceMask", DEFAULT_SOUND_DEVICE_MASK).c_str ()));
 
-    impl->sound_manager->LoadSoundLibrary (SOUND_DECL_LIB_FILE_NAME);
+    try
+    {
+      impl->sound_manager = SoundManagerPtr (new sound::SoundManager ("OpenAL", get (impl->config, "SoundDeviceMask", DEFAULT_SOUND_DEVICE_MASK).c_str ()));
+    }
+    catch (xtl::exception& e)
+    {
+      printf ("Can't create sound manager. Exception: '%s'\n", e.what ());
+    }
+    catch (...)
+    {
+      printf ("Can't create sound manager. Unknown exception\n");
+    }
 
-    impl->scene_player->SetManager (impl->sound_manager.get ());
+    if (impl->sound_manager)
+    {
+      impl->sound_manager->LoadSoundLibrary (SOUND_DECL_LIB_FILE_NAME);
+
+      impl->scene_player->SetManager (impl->sound_manager.get ());
+    }
 
       //инициализация системы ввода
 
     impl->translation_map.Load (TRANSLATION_MAP_FILE_NAME);
 
     input::TranslationMap::EventHandler event_handler = xtl::bind (&input_event_handler, _1, xtl::ref (*impl->shell));
+
+    if (!impl->window.get ())
+      throw xtl::format_operation_exception ("TestApplication::TestApplication", "Window wasn't created");
 
     printf ("Init window driver input...\n");
     input::low_level::WindowDriver::RegisterDevice (*(impl->window.get ()));
@@ -386,11 +431,14 @@ TestApplication::TestApplication (const char* start_script_name)
 
       impl->input_devices.back ()->SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler));
     }
+
     printf ("Started\n");
-    
+
       //установка idle-функции
 
-    impl->app_idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (*this), xtl::ref (*impl->shell)));
+    impl->app_idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&Impl::OnIdle, &*impl));
+
+    impl->window->Show ();    
   }
   catch (xtl::exception& exception)
   {

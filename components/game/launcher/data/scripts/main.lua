@@ -62,8 +62,12 @@ sound_emitter1:BindToParent (sprite)
 
 text_line = Scene.TextLine.Create ()
 
-text_line.Text = "\"UNT - табарарам!\" AV"
-text_line.Font = "data/fonts/times_new_roman.xfont"
+text_string = "\"UNTGS - the best!\" AV"
+
+text_line.Text = text_string
+--text_line.Font = "data/fonts/times_new_roman.xfont"
+text_line.Font = "data/fonts/a_damn_mess.xfont"
+text_line.Name = "TextLine"
 text_line.Color = vec4 (0, 0, 1, 1)
 text_line:SetAlignment (Scene_TextLineAlignment.Center, Scene_TextLineAlignment.Center)
 text_line:SetScale (2, 2, 1)
@@ -105,7 +109,15 @@ function sign (x)
   end
 end
 
-function idle(dt)
+current_text_length = 1
+
+function idle (dt)
   sprite:Translate ((velocity ['+x'] - velocity ['-x']) * dt * velocity_x,
                     (velocity ['+y'] - velocity ['-y']) * dt * velocity_y, 0)
+
+  if (current_text_length > string.len (text_string)) then current_text_length = 1 end
+
+--  text_line.Text = string.char (string.byte (text_string, 1, current_text_length))
+
+  current_text_length = current_text_length + 1
 end
