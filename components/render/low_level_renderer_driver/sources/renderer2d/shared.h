@@ -12,8 +12,6 @@
 
 #include <render/low_level/utils.h>
 
-#include <render/mid_level/renderer2d.h>
-
 #include <shared/basic_renderer.h>
 
 namespace render
@@ -368,32 +366,6 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     CommonResourcesPtr       common_resources;           //общие ресурсы
     RenderableSpriteList     not_blended_sprites;        //спрайты без блендинга
     RenderableSpriteList     blended_sprites;            //спрайты с блендингом
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///—истема рендеринга 2D-примитивов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class Renderer: virtual public mid_level::renderer2d::IRenderer, public BasicRenderer
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// онструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Renderer (low_level::IDevice* device, size_t swap_chains_count, low_level::ISwapChain** swap_chains);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///—оздание ресурсов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    mid_level::renderer2d::ITexture*   CreateTexture   (const media::Image& image);
-    mid_level::renderer2d::ITexture*   CreateTexture   (size_t width, size_t height, media::PixelFormat pixel_format);
-    mid_level::renderer2d::IPrimitive* CreatePrimitive ();
-    mid_level::renderer2d::IFrame*     CreateFrame     ();
-
-  private:
-    typedef xtl::com_ptr<CommonResources> CommonResourcesPtr;
-
-  private:
-    CommonResourcesPtr common_resources; //общие ресурсы
 };
 
 }

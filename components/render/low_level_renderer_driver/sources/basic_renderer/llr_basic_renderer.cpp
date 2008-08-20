@@ -22,13 +22,13 @@ typedef xtl::com_ptr<IView>              ViewPtr;
     Буфер кадра
 */
 
-struct BasicRenderer::FrameBuffer
+struct RendererDispatch::FrameBuffer
 {
   SwapChainPtr    swap_chain;           //цепочка обмена
   RenderTargetPtr color_buffer;         //буфер цвета
   RenderTargetPtr depth_stencil_buffer; //буфер попиксельного отсечения
 
-  BasicRenderer::FrameBuffer::FrameBuffer (IDevice& device, ISwapChain& in_swap_chain) : swap_chain (&in_swap_chain)
+  RendererDispatch::FrameBuffer::FrameBuffer (IDevice& device, ISwapChain& in_swap_chain) : swap_chain (&in_swap_chain)
   {
     try
     {
@@ -58,7 +58,7 @@ struct BasicRenderer::FrameBuffer
     }
     catch (xtl::exception& exception)
     {
-      exception.touch ("render::mid_level::low_level_driver::BasicRenderer::BasicRenderer::FrameBuffer");
+      exception.touch ("render::mid_level::low_level_driver::RendererDispatch::RendererDispatch::FrameBuffer");
       throw;
     }
   }
@@ -68,10 +68,11 @@ struct BasicRenderer::FrameBuffer
     Конструктор / деструктор
 */
 
-BasicRenderer::BasicRenderer (IDevice* in_device, size_t swap_chains_count, ISwapChain** swap_chains)
+RendererDispatch::RendererDispatch (IDevice* in_device, size_t swap_chains_count, ISwapChain** swap_chains)
   : device (in_device),
     frame_position (frames.end ()),
-    frames_count (0)
+    frames_count (0),
+    renderer2d (in_device)
 {
   try
   {
@@ -102,12 +103,12 @@ BasicRenderer::BasicRenderer (IDevice* in_device, size_t swap_chains_count, ISwa
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::mid_level::low_level_driver::BasicRenderer::BasicRenderer");
+    exception.touch ("render::mid_level::low_level_driver::RendererDispatch::RendererDispatch");
     throw;
   }
 }
 
-BasicRenderer::~BasicRenderer ()
+RendererDispatch::~RendererDispatch ()
 {
 }
 
@@ -115,16 +116,16 @@ BasicRenderer::~BasicRenderer ()
    Описание
 */
 
-const char* BasicRenderer::GetDescription ()
+const char* RendererDispatch::GetDescription ()
 {
-  return "render::mid_level::low_level_driver::BasicRenderer";
+  return "render::mid_level::low_level_driver::RendererDispatch";
 }
 
 /*
     Количество буферов кадра
 */
 
-size_t BasicRenderer::GetFrameBuffersCount ()
+size_t RendererDispatch::GetFrameBuffersCount ()
 {
   return frame_buffers.size ();
 }
@@ -133,18 +134,18 @@ size_t BasicRenderer::GetFrameBuffersCount ()
     Получение буфера цвета и буфера попиксельного отсечения
 */
 
-IRenderTarget* BasicRenderer::GetColorBuffer (size_t index)
+IRenderTarget* RendererDispatch::GetColorBuffer (size_t index)
 {
   if (index)
-    throw xtl::make_range_exception ("render::mid_level::low_level_driver::BasicRenderer::GetColorBuffer", "index", index, frame_buffers.size ());
+    throw xtl::make_range_exception ("render::mid_level::low_level_driver::RendererDispatch::GetColorBuffer", "index", index, frame_buffers.size ());
 
   return frame_buffers [index].color_buffer.get ();
 }
 
-IRenderTarget* BasicRenderer::GetDepthStencilBuffer (size_t index)
+IRenderTarget* RendererDispatch::GetDepthStencilBuffer (size_t index)
 {
   if (index)
-    throw xtl::make_range_exception ("render::mid_level::low_level_driver::BasicRenderer::GetDepthStencilBuffer", "index", index, frame_buffers.size ());
+    throw xtl::make_range_exception ("render::mid_level::low_level_driver::RendererDispatch::GetDepthStencilBuffer", "index", index, frame_buffers.size ());
 
   return frame_buffers [index].depth_stencil_buffer.get ();
 }
@@ -203,17 +204,17 @@ RenderTarget* create_render_buffer (IDevice& device, size_t width, size_t height
 
 }
 
-IRenderTarget* BasicRenderer::CreateDepthStencilBuffer (size_t width, size_t height)
+IRenderTarget* RendererDispatch::CreateDepthStencilBuffer (size_t width, size_t height)
 {
   return create_render_buffer (*device, width, height, RenderTargetType_DepthStencil);
 }
 
-IRenderTarget* BasicRenderer::CreateRenderBuffer (size_t width, size_t height)
+IRenderTarget* RendererDispatch::CreateRenderBuffer (size_t width, size_t height)
 {
   return create_render_buffer (*device, width, height, RenderTargetType_Color);
 }
 
-IClearFrame* BasicRenderer::CreateClearFrame ()
+IClearFrame* RendererDispatch::CreateClearFrame ()
 {
   return new ClearFrame;
 }
@@ -222,12 +223,12 @@ IClearFrame* BasicRenderer::CreateClearFrame ()
     Количество кадров / позиция вставки следующего кадра
 */
 
-size_t BasicRenderer::FramesCount ()
+size_t RendererDispatch::FramesCount ()
 {
   return frames_count;
 }
 
-void BasicRenderer::SetFramePosition (size_t position)
+void RendererDispatch::SetFramePosition (size_t position)
 {
   if (position > frames_count)
     position = frames_count;
@@ -237,7 +238,7 @@ void BasicRenderer::SetFramePosition (size_t position)
   advance (frame_position, position);
 }
 
-size_t BasicRenderer::GetFramePosition ()
+size_t RendererDispatch::GetFramePosition ()
 {
   return size_t (distance (frames.begin (), frame_position));
 }
@@ -246,9 +247,9 @@ size_t BasicRenderer::GetFramePosition ()
     Добавление кадра в список отрисовки
 */
 
-void BasicRenderer::AddFrame (IFrame* in_frame)
+void RendererDispatch::AddFrame (IFrame* in_frame)
 {
-  static const char* METHOD_NAME = "render::mid_level::low_level_driver::BasicRenderer::AddFrame";
+  static const char* METHOD_NAME = "render::mid_level::low_level_driver::RendererDispatch::AddFrame";
 
   if (!in_frame)
     throw xtl::make_null_argument_exception (METHOD_NAME, "frame");
@@ -268,7 +269,7 @@ void BasicRenderer::AddFrame (IFrame* in_frame)
     Конец отрисовки / сброс отрисовки
 */
 
-void BasicRenderer::DrawFrames ()
+void RendererDispatch::DrawFrames ()
 {
   if (frames.empty ())
     return;
@@ -290,10 +291,34 @@ void BasicRenderer::DrawFrames ()
     iter->swap_chain->Present ();
 }
 
-void BasicRenderer::CancelFrames ()
+void RendererDispatch::CancelFrames ()
 {
   frames.clear ();
   
   frame_position = frames.end ();
   frames_count   = 0;
+}
+
+/*
+   Создание ресурсов
+*/
+
+render::mid_level::renderer2d::ITexture* RendererDispatch::CreateTexture (const media::Image& image)
+{
+  return renderer2d.CreateTexture (image);
+}
+
+render::mid_level::renderer2d::ITexture* RendererDispatch::CreateTexture (size_t width, size_t height, media::PixelFormat pixel_format)
+{
+  return renderer2d.CreateTexture (width, height, pixel_format);
+}
+
+render::mid_level::renderer2d::IPrimitive* RendererDispatch::CreatePrimitive ()
+{
+  return renderer2d.CreatePrimitive ();
+}
+
+render::mid_level::renderer2d::IFrame* RendererDispatch::CreateFrame ()
+{
+  return renderer2d.CreateFrame ();
 }

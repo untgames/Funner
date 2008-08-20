@@ -20,15 +20,15 @@ const char* DRIVER_NAME = "LowLevel"; //טלÿ הנאיגונא
 
 struct Driver::RendererEntry
 {
-  stl::string             renderer_name;
-  xtl::com_ptr<IRenderer> renderer;
+  stl::string                    renderer_name;
+  xtl::com_ptr<RendererDispatch> renderer;
 
   RendererEntry (const char*                     in_renderer_name,
                  render::low_level::IDevice*     device,
                  size_t                          swap_chains_count,
                  render::low_level::ISwapChain** swap_chains)
     : renderer_name (in_renderer_name),
-      renderer (create_renderer2d (device, swap_chains_count, swap_chains), false)
+      renderer (new RendererDispatch (device, swap_chains_count, swap_chains))
     {}
 };
 

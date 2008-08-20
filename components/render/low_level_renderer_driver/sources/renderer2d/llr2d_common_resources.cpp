@@ -222,6 +222,9 @@ InputLayoutPtr create_input_layout (IDevice& device)
 
 CommonResources::CommonResources (IDevice* device)
 {
+  if (!device)
+    throw xtl::make_null_argument_exception ("render::mid_level::low_level_driver::renderer2d::CommonResources::CommonResources", "device");
+
     //создание состояний входного уровня
 
   input_layout = create_input_layout (*device);

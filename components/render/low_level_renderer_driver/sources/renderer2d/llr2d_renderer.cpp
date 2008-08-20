@@ -6,84 +6,70 @@ using namespace render::mid_level::renderer2d;
 using namespace render::mid_level::low_level_driver;
 using namespace render::mid_level::low_level_driver::renderer2d;
 
+namespace
+{
+
+typedef xtl::com_ptr<render::low_level::IDevice> DevicePtr;
+typedef xtl::com_ptr<CommonResources>  CommonResourcesPtr;
+
+}
+
+struct Renderer2D::Impl
+{
+  CommonResourcesPtr common_resources;
+  DevicePtr          device;
+
+  Impl (IDevice* in_device) : common_resources (CommonResourcesPtr (new CommonResources (in_device), false)), device (in_device) {}
+};
+
 /*
     Конструктор
 */
 
-Renderer::Renderer (IDevice* device, size_t swap_chains_count, ISwapChain** swap_chains)
-  : BasicRenderer (device, swap_chains_count, swap_chains)
+Renderer2D::Renderer2D (IDevice* device)
+  : impl (new Impl (device))
+  {}
+
+Renderer2D::~Renderer2D ()
 {
-  try
-  {
-    common_resources = CommonResourcesPtr (new CommonResources (device), false);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::mid_level:low_level_driver::renderer2d::Renderer::Renderer");
-    throw;
-  }
 }
 
 /*
     Создание ресурсов
 */
 
-render::mid_level::renderer2d::ITexture* Renderer::CreateTexture (const media::Image& image)
+render::mid_level::renderer2d::ITexture* Renderer2D::CreateTexture (const media::Image& image)
 {
   try
   {
-    return new ImageTexture (*device, image);
+    return new ImageTexture (*impl->device, image);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::mid_level::low_level_driver::renderer2d::Renderer::CreateTexture(const media::Image&)");
+    exception.touch ("render::mid_level::low_level_driver::renderer2d::Renderer2D::CreateTexture(const media::Image&)");
     throw;
   }
 }
 
-render::mid_level::renderer2d::ITexture* Renderer::CreateTexture (size_t width, size_t height, media::PixelFormat pixel_format)
+render::mid_level::renderer2d::ITexture* Renderer2D::CreateTexture (size_t width, size_t height, media::PixelFormat pixel_format)
 {
   try
   {
-    return new RenderTargetTexture (*device, width, height, pixel_format);
+    return new RenderTargetTexture (*impl->device, width, height, pixel_format);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::mid_level::low_level_driver::renderer2d::Renderer::CreateTexture(size_t, size_t, media::PixelFormat)");
+    exception.touch ("render::mid_level::low_level_driver::renderer2d::Renderer2D::CreateTexture(size_t, size_t, media::PixelFormat)");
     throw;
   }
 }
 
-render::mid_level::renderer2d::IPrimitive* Renderer::CreatePrimitive ()
+render::mid_level::renderer2d::IPrimitive* Renderer2D::CreatePrimitive ()
 {
   return new Primitive;
 }
 
-render::mid_level::renderer2d::IFrame* Renderer::CreateFrame ()
+render::mid_level::renderer2d::IFrame* Renderer2D::CreateFrame ()
 {
-  return new Frame (common_resources.get (), device.get ());
-}
-
-/*
-    Создание системы рендеринга
-*/
-
-namespace render
-{
-
-namespace mid_level
-{
-
-namespace low_level_driver
-{
-
-IRenderer* create_renderer2d (IDevice* device, size_t swap_chains_count, ISwapChain** swap_chains)
-{
-  return new Renderer (device, swap_chains_count, swap_chains);
-}
-
-}
-
-}
-
+  return new Frame (impl->common_resources.get (), impl->device.get ());
 }
