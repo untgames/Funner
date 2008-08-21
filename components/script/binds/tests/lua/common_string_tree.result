@@ -1,0 +1,97 @@
+Results of common_string_tree_test:
+Test library:
+Name: ''
+Attributes áount: 0
+Children count: 0
+Added attribute 0
+Added attribute 1
+Second attribute value is Second attribute value
+Second attribute value is New second attribute value
+Name: 'Node'
+Attributes áount: 2
+Children count: 1
+First child name is Child Node
+Attributes áount: 3
+First attribute value is New first attribute value
+Second attribute value is First attribute value
+Attributes áount: 2
+Attributes áount: 0
+First child name is Child2 Node
+Children count: 2
+Node 'Child2 Node' found
+Node 'Child22 Node' not found
+Node.Child2 Node = child2 attribute0
+Node.Child2 Node = default value
+Child2 attribute0 = new child2 attribute0
+Children count: 1
+Children count: 0
+Node 1 attributes áount: 1
+Node 2 attributes áount: 1
+Node 1 children count: 1
+Node 2 children count: 1
+Node 1 attributes áount: 0
+Node 2 attributes áount: 1
+Node 1 children count: 0
+Node 2 children count: 1
+Node 'RootNode'
+Attributes:
+End of attributes
+Children
+    Node 'Name'
+    Attributes:
+    0 = Root Node Name
+    End of attributes
+    Children
+    End of children
+    Node 'Property1'
+    Attributes:
+    0 = Property1
+    End of attributes
+    Children
+    End of children
+    Node 'ChildLevelOne'
+    Attributes:
+    End of attributes
+    Children
+        Node 'Array'
+        Attributes:
+        End of attributes
+        Children
+            Node '#text'
+            Attributes:
+            0 = 0
+            1 = 1
+            2 = 2
+            3 = 3
+            4 = 4
+            5 = 5
+            End of attributes
+            Children
+            End of children
+        End of children
+        Node 'ChildLevelTwo'
+        Attributes:
+        End of attributes
+        Children
+            Node '#text'
+            Attributes:
+            0 = Attribute1
+            1 = Attribute2
+            2 = Attribute3
+            End of attributes
+            Children
+            End of children
+        End of children
+    End of children
+End of children
+<?xml version="1.0" encoding="utf-8"?>
+<RootNode Name="Root Node Name" Property1="Property1">
+  <ChildLevelOne>
+    <Array>
+      0 1 2 3 4 5
+    </Array>
+    <ChildLevelTwo>
+      Attribute1 Attribute2 Attribute3
+    </ChildLevelTwo>
+  </ChildLevelOne>
+</RootNode>

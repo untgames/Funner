@@ -5,8 +5,9 @@
 #include <string.h>
 #include <time.h>
 
-#include <xtl/shared_ptr.h>
 #include <xtl/bind.h>
+#include <xtl/connection.h>
+#include <xtl/shared_ptr.h>
 
 #include <script/bind_libraries.h>
 #include <script/environment.h>
@@ -14,6 +15,7 @@
 #include <script/shell.h>
 
 #include <common/file.h>
+#include <common/log.h>
 #include <common/strlib.h>
 
 #include <mathlib.h>

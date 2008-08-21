@@ -7,10 +7,15 @@
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/implicit_cast.h>
+#include <xtl/iterator_range.h>
+#include <xtl/reference_counter.h>
 #include <xtl/shared_ptr.h>
 
-#include <common/strlib.h>
 #include <common/file.h>
+#include <common/log.h>
+#include <common/parser.h>
+#include <common/strlib.h>
+#include <common/xml_writer.h>
 
 #include <script/bind.h>
 #include <script/bind_libraries.h>

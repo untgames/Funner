@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<RootNode Name="Root Node Name" Property1="Property1">
+  <ChildLevelOne>
+    <Array>0 1 2 3 4 5</Array>   
+    <ChildLevelTwo>
+      Attribute1
+      Attribute2
+      Attribute3
+    </ChildLevelTwo>
+  </ChildLevelOne>
+</RootNode>
