@@ -1,9 +1,9 @@
 function clone_test ()
-  local node1 = StringTree.Create ()
+  local node1 = StringNode.Create ()
 
   node1:AddAttribute ("First attribute value")
 
-  local child = StringTree.Create ()
+  local child = StringNode.Create ()
 
   child.Name = "Child Node"
 
@@ -50,13 +50,13 @@ function print_node (node, indent)
 end
 
 function xml_test ()
-  local node = StringTree.LoadXml ("data/string_tree.xml")
+  local node = StringNode.LoadXml ("data/string_tree.xml")
   print_node (node, 0)
   node:SaveXml ("/io/stdout")
 end
 
 function test ()
-  local node = StringTree.Create ()
+  local node = StringNode.Create ()
 
   print ("Name: '" .. node.Name .. "'")
   print ("Attributes áount: " .. tostring (node.AttributesCount))
@@ -71,7 +71,7 @@ function test ()
 
   print ("Second attribute value is " .. node:Attribute (1))
 
-  local child = StringTree.Create ()
+  local child = StringNode.Create ()
 
   child.Name = "Child Node"
 
@@ -97,7 +97,7 @@ function test ()
 
   print ("Attributes áount: " .. tostring (node.AttributesCount))
 
-  local child2 = StringTree.Create ()
+  local child2 = StringNode.Create ()
 
   child2.Name = "Child2 Node"
 
@@ -109,7 +109,7 @@ function test ()
   print ("First child name is " .. node:Child (0).Name)
   print ("Children count: " .. tostring (node.ChildrenCount))
 
-  local find_node = StringTree.Find (node, "Child2 Node")
+  local find_node = StringNode.Find (node, "Child2 Node")
 
   if (not (find_node)) then
     print ("Node 'Child2 Node' not found")
@@ -117,7 +117,7 @@ function test ()
     print ("Node 'Child2 Node' found")
   end
 
-  find_node = StringTree.Find (node, "Child22 Node")
+  find_node = StringNode.Find (node, "Child22 Node")
 
   if (not (find_node)) then
     print ("Node 'Child22 Node' not found")
@@ -125,10 +125,10 @@ function test ()
     print ("Node 'Child22 Node' found")
   end
 
-  print ("Node.Child2 Node = " .. StringTree.Get (node, "Child Node.Child2 Node"))
-  print ("Node.Child2 Node = " .. StringTree.Get (node, "Child Node.Child22 Node", "default value"))
+  print ("Node.Child2 Node = " .. StringNode.Get (node, "Child Node.Child2 Node"))
+  print ("Node.Child2 Node = " .. StringNode.Get (node, "Child Node.Child22 Node", "default value"))
 
-  StringTree.Set (node, "Child Node.Child2 Node", "new child2 attribute0")
+  StringNode.Set (node, "Child Node.Child2 Node", "new child2 attribute0")
 
   print ("Child2 attribute0 = " .. child2:Attribute (0))
 

@@ -6,9 +6,9 @@ using namespace xtl;
 namespace
 {
 
-const char* LOG_NAME = "script.binds.common_string_tree"; //имя потока протоколирования
+const char* LOG_NAME = "script.binds.common_string_node"; //имя потока протоколирования
 
-const char* COMMON_STRING_TREE_LIBRARY = "StringTree";
+const char* COMMON_STRING_TREE_LIBRARY = "StringNode";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Узел дерева строк
