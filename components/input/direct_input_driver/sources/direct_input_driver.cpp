@@ -158,7 +158,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
           if (create_result != DI_OK)
             throw xtl::format_operation_exception (METHOD_NAME, "Can't create direct input device, error '%s'", get_direct_input_error_name (create_result));
 
-          return new OtherDevice ((*iter)->window, name, device_interface, log_fn, init_string);
+          return new OtherDevice ((*iter)->window, name, device_interface, (*iter)->device_guid, log_fn, init_string);
         }
 
       throw xtl::make_argument_exception (METHOD_NAME, "name", name);

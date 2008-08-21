@@ -131,7 +131,7 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
    Конструктор/деструктор
 */
 
-OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevice8* in_direct_input_device_interface, const DebugLogHandler& in_debug_log_handler, const char* init_string)
+OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevice8* in_direct_input_device_interface, REFGUID rguid, const DebugLogHandler& in_debug_log_handler, const char* init_string)
   : event_handler (&default_event_handler), name (in_name), device_interface (in_direct_input_device_interface, false), 
     poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10), device_lost (false), debug_log_handler (in_debug_log_handler),
     events_buffer_size (16), event_string_buffer (1024)
@@ -239,6 +239,16 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
     }
     if (iter->second.type == ObjectType_RelativeAxis)
       AddProperty (".sensitivity", iter, ObjectPropertyType_Sensitivity, 1.f);
+  }
+
+  if (rguid == GUID_SysMouse)
+  {
+    RenameObject (offsetof (DIMOUSESTATE, lX), "Mouse X Axis");
+    RenameObject (offsetof (DIMOUSESTATE, lY), "Mouse Y Axis");
+    RenameObject (offsetof (DIMOUSESTATE, lZ), "Mouse Z Axis");
+    RenameObject (offsetof (DIMOUSESTATE, rgbButtons[0]), "Mouse Button 0");
+    RenameObject (offsetof (DIMOUSESTATE, rgbButtons[1]), "Mouse Button 1");
+    RenameObject (offsetof (DIMOUSESTATE, rgbButtons[2]), "Mouse Button 2");
   }
 
   xtl::uninitialized_storage<char> initial_device_data (device_data_size);
@@ -627,4 +637,18 @@ void OtherDevice::ProcessInitStringProperty (const char* property, const char* v
 
   if (!xstrcmp (property, "buffer_size"))
     events_buffer_size = atoi (value);
+}
+
+/*
+   Переименование объекта
+*/
+
+void OtherDevice::RenameObject (size_t object_offset, const char* new_name)
+{
+  ObjectsMap::iterator iter = objects.find (object_offset);
+
+  if (iter == objects.end ())
+    return;
+
+  iter->second.name = new_name;
 }

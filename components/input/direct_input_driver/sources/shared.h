@@ -55,7 +55,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OtherDevice (syslib::Window* window, const char* name, IDirectInputDevice8* direct_input_device_interface, const DebugLogHandler& debug_log_handler, const char* init_string = "");
+    OtherDevice (syslib::Window* window, const char* name, IDirectInputDevice8* direct_input_device_interface, REFGUID rguid, const DebugLogHandler& debug_log_handler, const char* init_string = "");
     ~OtherDevice ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,6 +93,12 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///Регистрация объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterObject (const char* name, size_t offset, ObjectType type);
+
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Переименование объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RenameObject (size_t object_offset, const char* new_name);
 
   private:
     enum ObjectPropertyType
