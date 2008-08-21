@@ -149,6 +149,10 @@ T get_argument (IStack& stack, size_t index)
   {
     throw;
   }
+  catch (xtl::bad_any_cast& exception)
+  {
+    throw xtl::format_exception<script::ArgumentException> ("script::detail::get_argument", "Exception on argument #%u: %s, %s -> %s\n", index, exception.what (), exception.source_type ().name (), exception.target_type ().name ());
+  }
   catch (std::exception& exception)
   {
     throw xtl::format_exception<script::ArgumentException> ("script::detail::get_argument", "Exception on argument #%u: %s", index, exception.what ());
