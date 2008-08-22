@@ -424,7 +424,9 @@ void vector<T,Allocator>::_insert (iterator position,const value_type& value)
 
   if (finish != end_of_storage) 
   {
-    construct (finish,finish++ [-1]);
+    construct (finish,finish [-1]);
+
+    ++finish;
     
     T tmp = value;
     
