@@ -59,32 +59,22 @@ Children
     Children
         Node 'Array'
         Attributes:
+        0 = 0
+        1 = 1
+        2 = 2
+        3 = 3
+        4 = 4
+        5 = 5
         End of attributes
         Children
-            Node '#text'
-            Attributes:
-            0 = 0
-            1 = 1
-            2 = 2
-            3 = 3
-            4 = 4
-            5 = 5
-            End of attributes
-            Children
-            End of children
         End of children
         Node 'ChildLevelTwo'
         Attributes:
+        0 = Attribute1
+        1 = Attribute2
+        2 = Attribute3
         End of attributes
         Children
-            Node '#text'
-            Attributes:
-            0 = Attribute1
-            1 = Attribute2
-            2 = Attribute3
-            End of attributes
-            Children
-            End of children
         End of children
     End of children
 End of children

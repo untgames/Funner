@@ -311,6 +311,14 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 
       for (ParseNode* iter = node->First (); iter; iter = iter->Next ())
       {
+        if (!xstrcmp ("#text", iter->Tag ()))
+        {
+          for (size_t i = 0; i < iter->AttributesCount (); i++)
+            string_node->AddAttribute (iter->Attribute (i));
+        
+          continue;
+        }
+
         StringNode::Pointer child = StringNode::Create ();
 
         ProcessNode (child, iter);
@@ -333,7 +341,8 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
         return;
       }
 
-
+      XmlWriter::Scope scope (writer, name.c_str ());
+      
       if (attribute_offsets.size () > 1)
       {
         struct AttributeIterator: public stl::iterator<stl::forward_iterator_tag, const char*>
@@ -373,8 +382,6 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
         return;
       }
 
-      XmlWriter::Scope scope (writer, name.c_str ());
-      
       for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
         (*iter)->SaveNode (writer);
     }
