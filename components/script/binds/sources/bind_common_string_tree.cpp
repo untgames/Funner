@@ -56,9 +56,20 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с атрибутами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t AttributesCapacity () const
+    {
+      return attribute_offsets.capacity ();
+    }
+
     size_t AttributesCount () const
     {
       return attribute_offsets.size ();
+    }
+
+    void ReserveAttributes (size_t new_size)
+    {
+      attribute_offsets.reserve (new_size);
+      attributes.reserve (new_size * 8);
     }
 
     const char* Attribute (size_t index) const
@@ -144,9 +155,19 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с детьмя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t ChildrenCapacity () const
+    {
+      return childs.capacity ();
+    }
+
     size_t ChildrenCount () const
     {
       return childs.size ();
+    }
+
+    void ReserveChildren (size_t new_size)
+    {
+      childs.reserve (new_size);
     }
 
     StringNode& Child (size_t index) const
@@ -177,7 +198,7 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
       if (new_child->HasNode (this))
         throw xtl::format_operation_exception (METHOD_NAME, "Can't add child because it contains this node");
 
-      childs.insert (childs.begin () + index, new_child);
+      childs.insert (childs.begin () + index, Pointer (new_child));
     }
 
     void RemoveChild (size_t index)
@@ -276,8 +297,17 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
     {
       string_node->SetName (node->Tag ());
 
+      string_node->ReserveAttributes (node->AttributesCount ());
+
       for (size_t i = 0; i < node->AttributesCount (); i++)
         string_node->AddAttribute (node->Attribute (i));
+
+      size_t children_count = 0;
+
+      for (ParseNode* iter = node->First (); iter; iter = iter->Next ())
+        children_count++;
+
+      string_node->ReserveChildren (children_count);
 
       for (ParseNode* iter = node->First (); iter; iter = iter->Next ())
       {
@@ -467,19 +497,23 @@ void bind_common_string_tree (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Name",            make_invoker (&StringNode::SetName));
-  lib.Register ("get_Name",            make_invoker (&StringNode::Name));
-  lib.Register ("get_AttributesCount", make_invoker (&StringNode::AttributesCount));
-  lib.Register ("get_ChildrenCount",   make_invoker (&StringNode::ChildrenCount));
+  lib.Register ("set_Name",               make_invoker (&StringNode::SetName));
+  lib.Register ("get_Name",               make_invoker (&StringNode::Name));
+  lib.Register ("get_AttributesCount",    make_invoker (&StringNode::AttributesCount));
+  lib.Register ("get_AttributesCapacity", make_invoker (&StringNode::AttributesCapacity));
+  lib.Register ("get_ChildrenCount",      make_invoker (&StringNode::ChildrenCount));
+  lib.Register ("get_ChildrenCapacity",   make_invoker (&StringNode::ChildrenCapacity));
 
 
   lib.Register ("Clone",               make_invoker (&StringNode::Clone));
+  lib.Register ("ReserveAttributes",   make_invoker (&StringNode::ReserveAttributes));
   lib.Register ("Attribute",           make_invoker (&StringNode::Attribute));
   lib.Register ("SetAttribute",        make_invoker (&StringNode::SetAttribute));
   lib.Register ("AddAttribute",        make_invoker (make_invoker (implicit_cast<void (StringNode::*) (size_t, const char*)> (&StringNode::AddAttribute)),
                                                      make_invoker (implicit_cast<size_t (StringNode::*) (const char*)> (&StringNode::AddAttribute))));
   lib.Register ("RemoveAttribute",     make_invoker (&StringNode::RemoveAttribute));
   lib.Register ("RemoveAllAttributes", make_invoker (&StringNode::RemoveAllAttributes));
+  lib.Register ("ReserveChildren",     make_invoker (&StringNode::ReserveChildren));
   lib.Register ("Child",               make_invoker (&StringNode::Child));
   lib.Register ("AddChild",            make_invoker (make_invoker (implicit_cast<void (StringNode::*) (size_t, StringNode*)> (&StringNode::AddChild)),
                                                      make_invoker (implicit_cast<size_t (StringNode::*) (StringNode*)> (&StringNode::AddChild))));

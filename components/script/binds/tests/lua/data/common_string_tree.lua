@@ -59,13 +59,20 @@ function test ()
   local node = StringNode.Create ()
 
   print ("Name: '" .. node.Name .. "'")
-  print ("Attributes áount: " .. tostring (node.AttributesCount))
-  print ("Children count: " .. tostring (node.ChildrenCount))
+  print ("Attributes áount: " .. node.AttributesCount)
+  print ("Children count: " .. node.ChildrenCount)
+  print ("Attributes capacity: " .. node.AttributesCapacity)
+  print ("Children capacity: " .. node.ChildrenCapacity)
 
   node.Name = "Node"
+  node:ReserveAttributes (4)
+  node:ReserveChildren (4)
+  
   print ("Added attribute " .. node:AddAttribute ("First attribute value"))
   print ("Added attribute " .. node:AddAttribute ("Second attribute value"))
   print ("Second attribute value is " .. node:Attribute (1))
+  print ("Attributes capacity: " .. node.AttributesCapacity)
+  print ("Children capacity: " .. node.ChildrenCapacity)
 
   node:SetAttribute (1, "New second attribute value")
 
@@ -78,24 +85,24 @@ function test ()
   node:AddChild (child)
 
   print ("Name: '" .. node.Name .. "'")
-  print ("Attributes áount: " .. tostring (node.AttributesCount))
-  print ("Children count: " .. tostring (node.ChildrenCount))
+  print ("Attributes áount: " .. node.AttributesCount)
+  print ("Children count: " .. node.ChildrenCount)
 
   print ("First child name is " .. node:Child (0).Name)
 
   node:AddAttribute (0, "New first attribute value")
 
-  print ("Attributes áount: " .. tostring (node.AttributesCount))
+  print ("Attributes áount: " .. node.AttributesCount)
   print ("First attribute value is " .. node:Attribute (0))
   print ("Second attribute value is " .. node:Attribute (1))
 
   node:RemoveAttribute (1)
 
-  print ("Attributes áount: " .. tostring (node.AttributesCount))
+  print ("Attributes áount: " .. node.AttributesCount)
 
   node:RemoveAllAttributes ()
 
-  print ("Attributes áount: " .. tostring (node.AttributesCount))
+  print ("Attributes áount: " .. node.AttributesCount)
 
   local child2 = StringNode.Create ()
 
@@ -107,9 +114,9 @@ function test ()
   child:AddChild (0, child2)
 
   print ("First child name is " .. node:Child (0).Name)
-  print ("Children count: " .. tostring (node.ChildrenCount))
+  print ("Children count: " .. node.ChildrenCount)
 
-  local find_node = StringNode.Find (node, "Child2 Node")
+  local find_node = node:Find ("Child2 Node")
 
   if (not (find_node)) then
     print ("Node 'Child2 Node' not found")
@@ -117,7 +124,7 @@ function test ()
     print ("Node 'Child2 Node' found")
   end
 
-  find_node = StringNode.Find (node, "Child22 Node")
+  find_node = node:Find ("Child22 Node")
 
   if (not (find_node)) then
     print ("Node 'Child22 Node' not found")
@@ -125,20 +132,20 @@ function test ()
     print ("Node 'Child22 Node' found")
   end
 
-  print ("Node.Child2 Node = " .. StringNode.Get (node, "Child Node.Child2 Node"))
-  print ("Node.Child2 Node = " .. StringNode.Get (node, "Child Node.Child22 Node", "default value"))
+  print ("Node.Child2 Node = " .. node:Get ("Child Node.Child2 Node"))
+  print ("Node.Child2 Node = " .. node:Get ("Child Node.Child22 Node", "default value"))
 
-  StringNode.Set (node, "Child Node.Child2 Node", "new child2 attribute0")
+  node:Set ("Child Node.Child2 Node", "new child2 attribute0")
 
   print ("Child2 attribute0 = " .. child2:Attribute (0))
 
   node:RemoveChild (1)
 
-  print ("Children count: " .. tostring (node.ChildrenCount))
+  print ("Children count: " .. node.ChildrenCount)
 
   node:RemoveAllChildren ()
 
-  print ("Children count: " .. tostring (node.ChildrenCount))
+  print ("Children count: " .. node.ChildrenCount)
 
   clone_test ()
 

@@ -3,9 +3,13 @@ Test library:
 Name: ''
 Attributes áount: 0
 Children count: 0
+Attributes capacity: 0
+Children capacity: 0
 Added attribute 0
 Added attribute 1
 Second attribute value is Second attribute value
+Attributes capacity: 4
+Children capacity: 4
 Second attribute value is New second attribute value
 Name: 'Node'
 Attributes áount: 2
