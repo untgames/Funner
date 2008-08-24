@@ -16,7 +16,7 @@ class VarRegistryContainerImpl : public ICustomVarRegistry, public xtl::referenc
 /*
    Получение/установка данных
 */
-    xtl::any GetValue (const char* var_name)
+    xtl::any& GetValueCore (const char* var_name)
     {
       static const char* METHOD_NAME = "VarRegistryContainer::GetValue";
 
@@ -29,6 +29,28 @@ class VarRegistryContainerImpl : public ICustomVarRegistry, public xtl::referenc
         throw xtl::make_argument_exception (METHOD_NAME, "var_name", var_name, "Variable not found");              
 
       return iter->second;
+    }
+
+    xtl::any GetValue (const char* var_name)
+    {
+      return GetValueCore (var_name);
+    }
+
+    xtl::any& SetValue (const char* var_name)
+    {
+      static const char* METHOD_NAME = "VarRegistryContainer::SetValue";
+
+      if (!var_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "var_name");
+
+      VarMap::iterator iter = vars.find (var_name);
+      
+      if (iter == vars.end ())
+        Notify (var_name, VarRegistryEvent_OnCreateVar);
+      else
+        Notify (var_name, VarRegistryEvent_OnChangeVar);
+
+      return vars[var_name];
     }
 
     void SetValue (const char* var_name, const xtl::any& value)
@@ -192,13 +214,13 @@ VarRegistryContainer<T>& VarRegistryContainer<T>::operator = (const VarRegistryC
 template <class T>
 const T& VarRegistryContainer<T>::GetValue (const char* var_name) const
 {
-  return impl->GetValue (var_name).cast ();
+  return any_cast<T&> (impl->GetValueCore (var_name));
 }
 
 template <class T>
 void VarRegistryContainer<T>::SetValue (const char* var_name, const T& value)
 {
-  impl->SetValue (var_name, xtl::any (value, true));
+  any_cast<T&> (impl->SetValue (var_name)) = value;
 }
 
 /*
