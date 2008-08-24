@@ -17,7 +17,7 @@ typedef common::VarRegistryContainer<stl::string> StringRegistry;
 
 int main ()
 {
-  printf ("Results of common_string_tree_test:\n");
+  printf ("Results of common_var_registry_test:\n");
   
   try
   {
