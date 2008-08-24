@@ -30,7 +30,7 @@ TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex
     //проверка возможности создания текстуры
 
   glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_ARB, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
-                gl_format, gl_type, NULL);
+                gl_format, gl_type, 0);
   
   GLint width = 0;
 
@@ -44,7 +44,7 @@ TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex
 
   glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
                 gl_format, gl_type, 0);
-                
+
     //проверка ошибок
 
   CheckErrors (METHOD_NAME);

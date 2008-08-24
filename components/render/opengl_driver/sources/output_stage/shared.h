@@ -16,8 +16,9 @@
 
 #include <render/low_level/utils.h>
 
-#include <shared/output_stage.h>
+#include <shared/command_list.h>
 #include <shared/context_object.h>
+#include <shared/output_stage.h>
 #include <shared/texture_manager.h>
 
 namespace render
@@ -272,11 +273,14 @@ class BlendState: virtual public IBlendState, public ContextObject
 ///Установка состояния в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Bind ();
+    
+  private:
+    typedef CommandListBuilder::ExecuterPtr ExecuterPtr;
 
   private:
-    BlendDesc desc;         //дескриптор состояния
-    size_t    desc_hash;    //хэш дескриптора состояния
-    int       display_list; //номер списка команд конфигурации OpenGL
+    BlendDesc   desc;      //дескриптор состояния
+    size_t      desc_hash; //хэш дескриптора состояния
+    ExecuterPtr executer;  //исполнитель списка команд
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -303,11 +307,14 @@ class DepthStencilState: virtual public IDepthStencilState, public ContextObject
     void Bind (size_t stencil_reference);
 
   private:
+    typedef CommandListBuilder::ExecuterPtr ExecuterPtr;
+
+  private:
     DepthStencilDesc desc;                           //дескриптор состояния
     size_t           desc_hash;                      //хэш дескриптора состояния
-    int              display_list;                   //номер списка команд конфигурации OpenGL
     GLenum           gl_stencil_func [FaceMode_Num]; //функции отсечения трафарета
     bool             need_two_side_stencil;          //состояние требует двустороннего трафарета
+    ExecuterPtr      executer;                       //исполнитель списка команд
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -334,9 +341,12 @@ class RasterizerState : virtual public IRasterizerState, public ContextObject
     void GetDesc (RasterizerDesc&);
 
   private:
-    RasterizerDesc desc;         //дескриптор состояния
-    size_t         desc_hash;    //хэш дескриптора состояния
-    int            display_list; //номер списка команд конфигурации состояния в OpenGL
+    typedef CommandListBuilder::ExecuterPtr ExecuterPtr;
+
+  private:
+    RasterizerDesc desc;      //дескриптор состояния
+    size_t         desc_hash; //хэш дескриптора состояния
+    ExecuterPtr    executer;  //исполнитель списка команд
 };
 
 }

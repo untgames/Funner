@@ -13,39 +13,13 @@ using namespace common;
 
 BlendState::BlendState (const ContextManager& context_manager, const BlendDesc& in_desc)
   : ContextObject (context_manager),
-    desc_hash (0),
-    display_list (0)
+    desc_hash (0)
 {
   SetDesc (in_desc);
 }
 
 BlendState::~BlendState ()
 {
-  try
-  {
-    if (display_list)
-    {
-      MakeContextCurrent ();
-
-      glDeleteLists (display_list, 1);
-      
-      CheckErrors ("");      
-    }
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::BlendState::~BlendState");
-    
-    LogPrintf ("%s", exception.what ());
-  }  
-  catch (std::exception& exception)
-  {
-    LogPrintf ("%s", exception.what ());
-  }
-  catch (...)
-  {
-    //подавляем все исключения
-  }
 }
 
 /*
@@ -237,59 +211,54 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   }
 
     //запись команд в контексте OpenGL
-
-  if (!display_list)
-  {
-    display_list = glGenLists (1);      
     
-    if (!display_list)
-      RaiseError (METHOD_NAME);
-  }
-
-  glNewList (display_list, GL_COMPILE);
+  CommandListBuilder cmd_list;    
   
   size_t mask = in_desc.color_write_mask;
 
-  glColorMask ((mask & ColorWriteFlag_Red) != 0, (mask & ColorWriteFlag_Green) != 0,
-               (mask & ColorWriteFlag_Blue) != 0, (mask & ColorWriteFlag_Alpha) != 0);
-               
+  cmd_list.Add (glColorMask, (mask & ColorWriteFlag_Red) != 0, (mask & ColorWriteFlag_Green) != 0, (mask & ColorWriteFlag_Blue) != 0,
+                (mask & ColorWriteFlag_Alpha) != 0);
+
   if (in_desc.blend_enable && (mask & ColorWriteFlag_All))
   {
-    glEnable (GL_BLEND);    
+    cmd_list.Add (glEnable, GL_BLEND);
 
-    if      (glBlendEquationSeparate)    glBlendEquationSeparate    (color_blend_equation, alpha_blend_equation);
-    else if (glBlendEquationSeparateEXT) glBlendEquationSeparateEXT (color_blend_equation, alpha_blend_equation);      
-    else if (glBlendEquation)            glBlendEquation            (color_blend_equation);
-    else if (glBlendEquationEXT)         glBlendEquationEXT         (color_blend_equation);
+    if      (glBlendEquationSeparate)    cmd_list.Add (glBlendEquationSeparate, color_blend_equation, alpha_blend_equation);
+    else if (glBlendEquationSeparateEXT) cmd_list.Add (glBlendEquationSeparateEXT, color_blend_equation, alpha_blend_equation);
+    else if (glBlendEquation)            cmd_list.Add (glBlendEquation, color_blend_equation);
+    else if (glBlendEquationEXT)         cmd_list.Add (glBlendEquationEXT, color_blend_equation);
 
-    if      (glBlendFuncSeparate)    glBlendFuncSeparate    (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
-    else if (glBlendFuncSeparateEXT) glBlendFuncSeparateEXT (src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
-    else                             glBlendFunc            (src_color_arg, dst_color_arg);      
+    if      (glBlendFuncSeparate)    cmd_list.Add (glBlendFuncSeparate, src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
+    else if (glBlendFuncSeparateEXT) cmd_list.Add (glBlendFuncSeparateEXT, src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
+    else                             cmd_list.Add (glBlendFunc, src_color_arg, dst_color_arg);      
   }
   else
   {
-    glDisable (GL_BLEND);
+    cmd_list.Add (glDisable, GL_BLEND);
   }
   
   if (caps.has_arb_multisample)
   {
-    if (in_desc.sample_alpha_to_coverage) glEnable  (GL_SAMPLE_ALPHA_TO_COVERAGE);
-    else                                  glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);
-  }
+    if (in_desc.sample_alpha_to_coverage) cmd_list.Add (glEnable, GL_SAMPLE_ALPHA_TO_COVERAGE);
+    else                                  cmd_list.Add (glDisable, GL_SAMPLE_ALPHA_TO_COVERAGE);
+  }  
+  
+    //создание исполнителя команд    
 
-  glEndList ();  
-  
+  ExecuterPtr new_executer = cmd_list.Finish ();  
+
     //проверка ошибок
-  
+
   CheckErrors (METHOD_NAME);
   
-    //сохранение дескриптора
+    //сохранение параметров
 
   desc      = in_desc;
   desc_hash = crc32 (&desc, sizeof desc);
-  
+  executer  = new_executer;
+
     //оповещение о необходимости ребиндинга уровня
-    
+
   StageRebindNotify (Stage_Output);
 }
 
@@ -315,16 +284,13 @@ void BlendState::Bind ()
   if (current_desc_hash == desc_hash)
     return;
 
-    //проверка корректности состояния
-
-  if (!display_list)
-    throw xtl::format_operation_exception (METHOD_NAME, "Empty state (null display list)");
-    
     //установка состояния в контекст OpenGL
 
   MakeContextCurrent ();  
+  
+    //выполнение команд 
 
-  glCallList (display_list);
+  executer->ExecuteCommands ();
 
     //проверка ошибок
 

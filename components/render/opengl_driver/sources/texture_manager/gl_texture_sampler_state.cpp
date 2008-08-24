@@ -59,42 +59,34 @@ TexTargetId get_target_id (GLenum tex_target)
 }
 
 /*
+    Описание реализации текстурного сэмплера
+*/
+
+typedef CommandListBuilder::ExecuterPtr          ExecuterPtr;
+typedef xtl::array<ExecuterPtr, TexTargetId_Num> ExecuterArray;    
+
+struct SamplerState::Impl
+{
+  SamplerDesc   desc;      //дескриптор сэмплера
+  size_t        desc_hash; //хэш дескриптора
+  ExecuterArray executers; //исполнители списков команд
+
+  Impl () : desc_hash (0) {}
+};
+
+/*
     Конструктор
 */
 
 SamplerState::SamplerState (const ContextManager& manager, const SamplerDesc& in_desc) 
-  : ContextObject (manager), desc_hash (0)
+  : ContextObject (manager),
+    impl (new Impl)
 {
   SetDesc (in_desc);
 }
 
 SamplerState::~SamplerState ()
 {
-  if (!display_list)
-    return;
-
-  try
-  {
-    MakeContextCurrent ();
-
-    glDeleteLists (display_list, TexTargetId_Num);
-
-    CheckErrors ("");
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::SamplerState::~SamplerState");
-
-    LogPrintf ("%s", exception.what ());
-  }
-  catch (std::exception& exception)
-  {
-    LogPrintf ("%s", exception.what ());
-  }
-  catch (...)
-  {
-    //подавляем все исключения
-  }
 }
 
 /*
@@ -111,7 +103,7 @@ void SamplerState::Bind (GLenum texture_target)
   
     //применение параметров сэмплирования
 
-  glCallList (display_list + target_id);
+  impl->executers [target_id]->ExecuteCommands ();
 
     //проверка ошибок
 
@@ -119,12 +111,17 @@ void SamplerState::Bind (GLenum texture_target)
 }
 
 /*
-    Получение дескриптора сэмплера
+    Получение дескриптора сэмплера и его хэша
 */
 
 void SamplerState::GetDesc (SamplerDesc& out_desc)
 {
-  out_desc = desc;
+  out_desc = impl->desc;
+}
+
+size_t SamplerState::GetDescHash ()
+{
+  return impl->desc_hash;
 }
 
 /*
@@ -278,32 +275,23 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
   MakeContextCurrent ();
   
-    //запись команд в контексте OpenGL
-    
-  if (!display_list)
-  {    
-    display_list = glGenLists (TexTargetId_Num);
-  
-    if (!display_list)
-      RaiseError (METHOD_NAME);
-  }
-
     //создание списков инициализации сэмплеров для различных типов текстур
+    
+  CommandListBuilder cmd_list;
+  ExecuterArray      new_executers;
 
   for (size_t i=0; i<TexTargetId_Num; i++)
   {
-    GLenum tex_target = get_gl_texture_target ((TexTargetId)i);
+    GLenum tex_target = get_gl_texture_target ((TexTargetId)i);    
 
-    glNewList (display_list + i, GL_COMPILE);
-
-    glTexParameteri (tex_target, GL_TEXTURE_MIN_FILTER, gl_min_filter);
-    glTexParameteri (tex_target, GL_TEXTURE_MAG_FILTER, gl_mag_filter);
+    cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_MIN_FILTER, gl_min_filter);
+    cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_MAG_FILTER, gl_mag_filter);
 
     if (caps.has_ext_texture_filter_anisotropic)
-      glTexParameteri (tex_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, in_desc.max_anisotropy);
+      cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, in_desc.max_anisotropy);
 
-    glTexParameteri (tex_target, GL_TEXTURE_WRAP_S, gl_wrap [Texcoord_U]);
-    glTexParameteri (tex_target, GL_TEXTURE_WRAP_T, gl_wrap [Texcoord_V]);
+    cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_WRAP_S, gl_wrap [Texcoord_U]);
+    cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_WRAP_T, gl_wrap [Texcoord_V]);
 
     if (caps.has_ext_texture3d)
     {
@@ -311,7 +299,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
       {
         case GL_TEXTURE_3D:
         case GL_TEXTURE_CUBE_MAP:
-          glTexParameteri (tex_target, GL_TEXTURE_WRAP_R, gl_wrap [Texcoord_W]);
+          cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_WRAP_R, gl_wrap [Texcoord_W]);
           break;
         default:
           break;        
@@ -320,31 +308,34 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
     if (caps.has_sgis_texture_lod)
     {
-      glTexParameterf (tex_target, GL_TEXTURE_MIN_LOD, in_desc.min_lod);
-      glTexParameterf (tex_target, GL_TEXTURE_MAX_LOD, in_desc.max_lod);
+      cmd_list.Add (glTexParameterf, tex_target, GL_TEXTURE_MIN_LOD, in_desc.min_lod);
+      cmd_list.Add (glTexParameterf, tex_target, GL_TEXTURE_MAX_LOD, in_desc.max_lod);
     }
 
     if (caps.has_ext_shadow_funcs || caps.has_arb_shadow)
     {
-      glTexParameteri (tex_target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-      glTexParameteri (tex_target, GL_TEXTURE_COMPARE_FUNC, gl_comparision_function);
+      cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+      cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_COMPARE_FUNC, gl_comparision_function);
     }
 
-    glTexParameterfv (tex_target, GL_TEXTURE_BORDER_COLOR, in_desc.border_color);
-
-    glEndList ();
-  }
-  
-    //проверка ошибок
-
-  CheckErrors (METHOD_NAME);
-
-    //сохранение дескриптора
-
-  desc      = in_desc;
-  desc_hash = crc32 (&desc, sizeof desc);
-  
-    //оповещение о необходимости ребиндинга уровня
+    cmd_list.Add (glTexParameterfv, tex_target, GL_TEXTURE_BORDER_COLOR, (const float*)in_desc.border_color);
     
+      //создание исполнителя команд
+
+    new_executers [i] = cmd_list.Finish ();
+
+      //проверка ошибок
+
+    CheckErrors (METHOD_NAME);
+  }  
+
+    //сохранение параметров
+
+  impl->desc      = in_desc;
+  impl->desc_hash = crc32 (&impl->desc, sizeof impl->desc);
+  impl->executers = new_executers;
+
+    //оповещение о необходимости ребиндинга уровня
+
   StageRebindNotify (Stage_TextureManager);
 }

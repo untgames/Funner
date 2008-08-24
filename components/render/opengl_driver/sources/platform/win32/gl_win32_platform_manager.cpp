@@ -47,7 +47,7 @@ class PlatformManagerImpl
 
       acxtrnal_path += "/AppPatch/AcXtrnal.dll";
 
-//      LoadDefaultAdapter ("Direct3D wrapper", acxtrnal_path.c_str ());
+      LoadDefaultAdapter ("Direct3D wrapper", acxtrnal_path.c_str ());
     }
   
 ///Создание адаптера

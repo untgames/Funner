@@ -4,19 +4,22 @@
 #include <cmath>
 #include <cfloat>
 
-#include <common/hash.h>
+#include <stl/auto_ptr.h>
 
-#include <xtl/trackable_ptr.h>
-#include <xtl/uninitialized_storage.h>
-#include <xtl/intrusive_ptr.h>
-#include <xtl/shared_ptr.h>
 #include <xtl/array>
 #include <xtl/common_exceptions.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/shared_ptr.h>
+#include <xtl/trackable_ptr.h>
+#include <xtl/uninitialized_storage.h>
+
+#include <common/hash.h>
 
 #include <render/low_level/utils.h>
 
-#include <shared/texture_manager.h>
+#include <shared/command_list.h>
 #include <shared/context_object.h>
+#include <shared/texture_manager.h>
 
 #include "nv_dxt/blockdxt.h"
 
@@ -355,12 +358,14 @@ class SamplerState : virtual public ISamplerState, public ContextObject
     void SetDesc (const SamplerDesc&);
     void GetDesc (SamplerDesc&);    
 
-    size_t GetDescHash () const { return desc_hash; }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение хэша дескриптора
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    size_t GetDescHash ();
+    
   private:
-    SamplerDesc   desc;         //дескриптор сэмплера
-    size_t        desc_hash;    //хэш дескриптора
-    int           display_list; //номер первого списка команд конфигурации OpenGL (всего списков OpenGLTextureTarget_Num)
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -37,6 +37,7 @@ using namespace render::low_level;
 
 typedef xtl::com_ptr<IDriver>                  DriverPtr;
 typedef xtl::com_ptr<ISwapChain>               SwapChainPtr;
+typedef xtl::com_ptr<IAdapter>                 AdapterPtr;
 typedef xtl::com_ptr<IDevice>                  DevicePtr;
 typedef xtl::com_ptr<ITexture>                 TexturePtr;
 typedef xtl::com_ptr<ISamplerState>            SamplerStatePtr;
@@ -71,12 +72,20 @@ struct Test
   syslib::Window window;
   SwapChainPtr   swap_chain;
   DevicePtr      device;
-  size_t         log_mode;
+//  AdapterPtr     adapter;  
+  size_t         log_mode;  
   
   Test (const wchar_t* title, const char* init_string="") :
     window (syslib::WindowStyle_Overlapped, 640, 480)
   {
     window.SetTitle (title);
+    
+/*    IDriver* driver = DriverManager::FindDriver ("OpenGL");
+    
+    if (driver)
+    {
+      adapter = AdapterPtr (driver->CreateAdapter ("Mesa", "mesagl.dll"), false);
+    }*/    
 
     SwapChainDesc desc;
 
@@ -93,7 +102,7 @@ struct Test
     desc.fullscreen                = false;
     desc.window_handle             = window.Handle ();
 
-    DriverManager::CreateSwapChainAndDevice ("OpenGL", "*", desc, init_string, swap_chain, device);
+    DriverManager::CreateSwapChainAndDevice ("OpenGL", "*", desc, init_string, swap_chain, device);    
 
     log_mode = OutputMode_Default;
 

@@ -7,9 +7,10 @@
 #include <render/low_level/device.h>
 #include <render/low_level/debug.h>
 
-#include <shared/property_list.h>
+#include <shared/command_list.h>
 #include <shared/context_object.h>
 #include <shared/platform.h>
+#include <shared/property_list.h>
 
 #include <stl/string>
 #include <stl/vector>
@@ -17,6 +18,7 @@
 #include <stl/bitset>
 
 #include <xtl/bind.h>
+#include <xtl/function.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>

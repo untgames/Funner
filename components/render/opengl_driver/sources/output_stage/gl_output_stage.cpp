@@ -324,7 +324,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
         register_fbo_manager (frame_buffer_manager);
 
         //инициализация BlendState
-          
+         
       BlendDesc blend_desc;
       
       memset (&blend_desc, 0, sizeof (blend_desc));
@@ -332,11 +332,11 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
       blend_desc.blend_enable     = false;
       blend_desc.color_write_mask = ColorWriteFlag_All;
 
-      default_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);
+      default_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);      
       
       blend_desc.color_write_mask = 0;
       
-      null_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);
+      null_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);      
       
         //инициализация DepthStencilState
         

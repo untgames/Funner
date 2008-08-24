@@ -10,39 +10,13 @@ using namespace common;
 
 DepthStencilState::DepthStencilState (const ContextManager& manager, const DepthStencilDesc& in_desc)
   : ContextObject (manager),
-    desc_hash (0),
-    display_list (0)
+    desc_hash (0)
 {
   SetDesc (in_desc);
 }
 
 DepthStencilState::~DepthStencilState ()
 {
-  try
-  {
-    if (display_list)
-    {
-      MakeContextCurrent ();
-
-      glDeleteLists (display_list, 1);
-
-      CheckErrors ("");
-    }
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::DepthStencilState::~DepthStencilState");
-    
-    LogPrintf ("%s", exception.what ());
-  }
-  catch (std::exception& exception)
-  {
-    LogPrintf ("%s", exception.what ());
-  }
-  catch (...)
-  {
-    //подавляем все исключения
-  }
 }
 
 /*
@@ -161,31 +135,23 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
          
     //запись команд в контексте OpenGL
 
-  if (!display_list)
-  {
-    display_list = glGenLists (1);      
-    
-    if (!display_list)
-      RaiseError (METHOD_NAME);
-  }
-  
-  glNewList (display_list, GL_COMPILE);
+  CommandListBuilder cmd_list;
   
   if (in_desc.depth_test_enable)
   {
-    glEnable    (GL_DEPTH_TEST);
-    glDepthFunc (gl_depth_compare_mode);
+    cmd_list.Add (glEnable, GL_DEPTH_TEST);
+    cmd_list.Add (glDepthFunc, gl_depth_compare_mode);
   }
   else
   {
-    glDisable (GL_DEPTH_TEST);
+    cmd_list.Add (glDisable, GL_DEPTH_TEST);
   }
 
-  glDepthMask (in_desc.depth_write_enable);
+  cmd_list.Add (glDepthMask, in_desc.depth_write_enable);
 
   if (in_desc.stencil_test_enable)
   {
-    glEnable (GL_STENCIL_TEST);
+    cmd_list.Add (glEnable, GL_STENCIL_TEST);
     
     if (need_two_side_stencil)
     {
@@ -193,53 +159,56 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
       {
         if (glStencilOpSeparate)
         {
-          glStencilOpSeparate (GL_FRONT, gl_stencil_operation [FaceMode_Front][0], gl_stencil_operation [FaceMode_Front][1],
-                               gl_stencil_operation [FaceMode_Front][2]);
-          glStencilOpSeparate (GL_BACK, gl_stencil_operation [FaceMode_Back][0], gl_stencil_operation [FaceMode_Back][1],
-                               gl_stencil_operation [FaceMode_Back][2]);
+          cmd_list.Add (glStencilOpSeparate, GL_FRONT, gl_stencil_operation [FaceMode_Front][0], gl_stencil_operation [FaceMode_Front][1],
+                        gl_stencil_operation [FaceMode_Front][2]);
+          cmd_list.Add (glStencilOpSeparate, GL_BACK, gl_stencil_operation [FaceMode_Back][0], gl_stencil_operation [FaceMode_Back][1],
+                        gl_stencil_operation [FaceMode_Back][2]);
         }
         else if (glStencilOpSeparateATI)
         {
-          glStencilOpSeparateATI (GL_FRONT, gl_stencil_operation [FaceMode_Front][0], gl_stencil_operation [FaceMode_Front][1],
-                                  gl_stencil_operation [FaceMode_Front][2]);
-          glStencilOpSeparateATI (GL_BACK, gl_stencil_operation [FaceMode_Back][0], gl_stencil_operation [FaceMode_Back][1],
-                                  gl_stencil_operation [FaceMode_Back][2]);
+          cmd_list.Add (glStencilOpSeparateATI, GL_FRONT, gl_stencil_operation [FaceMode_Front][0], gl_stencil_operation [FaceMode_Front][1],
+                        gl_stencil_operation [FaceMode_Front][2]);
+          cmd_list.Add (glStencilOpSeparateATI, GL_BACK, gl_stencil_operation [FaceMode_Back][0], gl_stencil_operation [FaceMode_Back][1],
+                        gl_stencil_operation [FaceMode_Back][2]);
         }
       }
       else if (caps.has_ext_stencil_two_side)
       {
-        glEnable               (GL_STENCIL_TEST_TWO_SIDE_EXT);        
-        glActiveStencilFaceEXT (GL_FRONT);
-        glStencilOp            (gl_stencil_operation [0][0], gl_stencil_operation [0][1], gl_stencil_operation [0][2]);
-        glActiveStencilFaceEXT (GL_BACK);
-        glStencilOp            (gl_stencil_operation [1][0], gl_stencil_operation [1][1], gl_stencil_operation [1][2]);
+        cmd_list.Add (glEnable, GL_STENCIL_TEST_TWO_SIDE_EXT);        
+        cmd_list.Add (glActiveStencilFaceEXT, GL_FRONT);
+        cmd_list.Add (glStencilOp, gl_stencil_operation [0][0], gl_stencil_operation [0][1], gl_stencil_operation [0][2]);
+        cmd_list.Add (glActiveStencilFaceEXT, GL_BACK);
+        cmd_list.Add (glStencilOp, gl_stencil_operation [1][0], gl_stencil_operation [1][1], gl_stencil_operation [1][2]);
       }
     }
     else
     {
       if (caps.has_ext_stencil_two_side)
-        glDisable (GL_STENCIL_TEST_TWO_SIDE_EXT);
+        cmd_list.Add (glDisable, GL_STENCIL_TEST_TWO_SIDE_EXT);
 
-      glStencilOp (gl_stencil_operation [0][0], gl_stencil_operation [0][1], gl_stencil_operation [0][2]);
+      cmd_list.Add (glStencilOp, gl_stencil_operation [0][0], gl_stencil_operation [0][1], gl_stencil_operation [0][2]);
     }
   }
   else
   {
-    glDisable (GL_STENCIL_TEST);
+    cmd_list.Add (glDisable, GL_STENCIL_TEST);
   }
 
-  glStencilMask (in_desc.stencil_write_mask);
+  cmd_list.Add (glStencilMask, in_desc.stencil_write_mask);
+  
+    //создание нового исполнителя команд
 
-  glEndList ();
+  ExecuterPtr new_executer = cmd_list.Finish ();
 
     //проверка ошибок
 
   CheckErrors (METHOD_NAME);
   
-    //сохранение дескриптора
+    //сохранение параметров
 
   desc      = in_desc;
   desc_hash = crc32 (&desc, sizeof desc);
+  executer  = new_executer;
 
   for (int i=0; i<FaceMode_Num; i++)
     this->gl_stencil_func [i] = gl_stencil_func [i];
@@ -271,11 +240,6 @@ void DepthStencilState::Bind (size_t reference)
   if (desc_hash == current_desc_hash && reference == current_reference)
     return;  
 
-    //проверка корректности состояния
-
-  if (!display_list)
-    throw xtl::format_operation_exception (METHOD_NAME, "Empty state (null display list)");
-
     //установка текущего контекста
 
   MakeContextCurrent ();
@@ -283,7 +247,7 @@ void DepthStencilState::Bind (size_t reference)
     //установка состояния в контекст OpenGL
 
   if (desc_hash != current_desc_hash)
-    glCallList (display_list);
+    executer->ExecuteCommands ();
 
   if (desc.stencil_test_enable)
   {
