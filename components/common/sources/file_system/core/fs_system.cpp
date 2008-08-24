@@ -653,7 +653,16 @@ bool FileSystemImpl::IsFileExist (const char* src_file_name)
   try
   {
     string file_name;
-    return src_file_name && FindFileSystem (src_file_name,file_name);    
+    
+    if (!src_file_name)
+      return false;
+      
+    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
+    
+    if (!file_system)
+      return false;
+
+    return file_system->IsFileExist (file_name.c_str ());
   }
   catch (...)
   {

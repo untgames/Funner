@@ -247,7 +247,7 @@ bool StdioFileSystem::IsFileExist (const char* file_name)
 {
   struct stat s;
 
-  return !stat (file_name,&s);  
+  return stat (file_name,&s) == 0; 
 }
 
 bool StdioFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
