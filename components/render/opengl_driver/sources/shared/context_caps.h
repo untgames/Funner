@@ -3,8 +3,6 @@
 
 #include <shared/extensions.h>
 
-#include <gl/glew.h>
-
 namespace render
 {
 
@@ -33,6 +31,7 @@ struct ContextCaps
   bool has_arb_texture_cube_map;           //GL_ARB_texture_cube_map
   bool has_arb_texture_mirrored_repeat;    //GL_ARB_texture_mirrored_repeat
   bool has_arb_texture_non_power_of_two;   //GL_ARB_texture_non_power_of_two
+  bool has_arb_texture_rectangle;          //GL_ARB_texture_rectangle
   bool has_arb_transpose_matrix;           //GL_ARB_transpose_matrix
   bool has_arb_vertex_buffer_object;       //GL_ARB_vertex_buffer_object
   bool has_arb_vertex_shader;              //GL_ARB_vertex_shader
@@ -49,7 +48,6 @@ struct ContextCaps
   bool has_ext_texture_compression_s3tc;   //GL_EXT_texture_compression_s3tc
   bool has_ext_texture_filter_anisotropic; //GL_EXT_texture_filter_anisotropic
   bool has_ext_texture_lod_bias;           //GL_EXT_texture_lod_bias
-  bool has_ext_texture_rectangle;          //GL_EXT_texture_rectangle
   bool has_ext_texture3d;                  //GL_EXT_texture3D
   bool has_sgis_generate_mipmap;           //GL_SGIS_generate_mipmap
   bool has_sgis_texture_lod;               //GL_SGIS_texture_lod
@@ -105,8 +103,6 @@ struct ContextCaps
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void Init (const ExtensionSet& available_extension_set, const ExtensionSet& enabled_extension_set);
 };
-
-
 
 }
 

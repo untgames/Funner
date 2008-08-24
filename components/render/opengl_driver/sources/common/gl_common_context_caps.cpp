@@ -96,8 +96,9 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    ARB_texture_border_clamp       = "GL_ARB_texture_border_clamp",
                    ARB_texture_compression        = "GL_ARB_texture_compression",
                    ARB_texture_cube_map           = "GL_ARB_texture_cube_map",
-                   ARB_texture_mirrored_repeat    = "GL_ARB_texture_mirrored_repeat",
+                   ARB_texture_mirrored_repeat    = "GL_ARB_texture_mirrored_repeat",                   
                    ARB_texture_non_power_of_two   = "GL_ARB_texture_non_power_of_two",
+                   ARB_texture_rectangle          = "GL_ARB_texture_rectangle",                   
                    ARB_transpose_matrix           = "GL_ARB_transpose_matrix",
                    ARB_vertex_buffer_object       = "GL_ARB_vertex_buffer_object",
                    ARB_vertex_shader              = "GL_ARB_vertex_shader",
@@ -115,7 +116,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    EXT_texture_cube_map           = "GL_EXT_texture_cube_map",
                    EXT_texture_filter_anisotropic = "GL_EXT_texture_filter_anisotropic",
                    EXT_texture_lod_bias           = "GL_EXT_texture_lod_bias",
-                   EXT_texture_rectangle          = "GL_EXT_texture_rectangle",
                    EXT_texture3D                  = "GL_EXT_texture3D",
                    NV_texture_rectangle           = "GL_NV_texture_rectangle",
                    SGIS_generate_mipmap           = "GL_SGIS_generate_mipmap",
@@ -149,6 +149,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_arb_texture_cube_map           = ext.Get (ARB_texture_cube_map) || ext.Get (EXT_texture_cube_map);
   has_arb_texture_mirrored_repeat    = ext.Get (ARB_texture_mirrored_repeat);
   has_arb_texture_non_power_of_two   = ext.Get (ARB_texture_non_power_of_two);
+  has_arb_texture_rectangle          = ext.Get (ARB_texture_rectangle) || ext.Get (NV_texture_rectangle);    
   has_arb_transpose_matrix           = ext.Get (ARB_transpose_matrix);
   has_arb_vertex_buffer_object       = ext.Get (ARB_vertex_buffer_object);
   has_arb_vertex_shader              = ext.Get (ARB_vertex_shader);
@@ -165,14 +166,13 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_texture_compression_s3tc   = ext.Get (ARB_texture_compression) && ext.Get (EXT_texture_compression_s3tc);
   has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
   has_ext_texture_lod_bias           = ext.Get (EXT_texture_lod_bias);
-  has_ext_texture_rectangle          = ext.Get (EXT_texture_rectangle) || ext.Get (NV_texture_rectangle);
   has_ext_texture3d                  = ext.Get (EXT_texture3D);
   has_sgis_generate_mipmap           = ext.Get (SGIS_generate_mipmap);  
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
 
-  if (has_ext_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT, (GLint*)&max_rectangle_texture_size);
+  if (has_arb_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
   if (has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
   if (has_ext_texture3d)         glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
 

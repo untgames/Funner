@@ -21,65 +21,31 @@ struct OpenGLException: virtual public xtl::exception {};
 ===================================================================================================
 */
 
-class ContextImpl: public xtl::reference_counter
+class ContextImpl: public xtl::reference_counter, private IContextListener
 {
   public:
-    ContextImpl (ISwapChain* swap_chain) : context (swap_chain), master_swap_chain (swap_chain)
-    {
-      Init ();
-    }
-
-    ContextImpl (ISwapChain* swap_chain, const Context& shared_context) : context (swap_chain, shared_context), master_swap_chain (swap_chain)
-    {
-      Init ();
-    }
-    
-      //получение контекста и главной цепочки обмена
-       Context&  GetContext () { return context; }
-    ISwapChain*  GetMasterSwapChain () const { return master_swap_chain.get (); }
-    
-      //получение флагов поддержки исключений
-    ExtensionSet& GetExtensions () { return extensions; } 
- 
-      ///Получение аппаратно поддерживаемых возможностей контекста
-    const ContextCaps& GetCaps () const
-    {
-      return context_caps;
-    }
-    
-      //получение информации о реализации OpenGL
-    const char* GetExtensionsString () const { return extensions_string.c_str (); }
-    const char* GetVersionString    () const { return version_string.c_str (); }
-    const char* GetVendorString     () const { return vendor_string.c_str (); }
-    const char* GetRendererString   () const { return renderer_string.c_str (); }
-
-      //получение таблицы локальных данных контекста
-    ContextDataTable& GetContextDataTable (Stage table_id)
-    {
-      if (table_id < 0 || table_id >= Stage_Num)
-        throw xtl::make_range_exception ("render::low_level::opengl::ContextImpl::GetContextDataTable", "table_id", table_id, 0, Stage_Num);
-
-      return context_data_table [table_id];
-    }
-    
-      //инициализация таблицы возможностей контекста
-    void InitContextCaps (const ExtensionSet& enabled_extensions)
-    {
-      context_caps.Init (extensions, enabled_extensions);
-    }    
-    
-  private:
-
-      //инициализация
-    void Init ()        
+///Конструктор
+    ContextImpl (ISwapChain* swap_chain, IContext* shared_context) : master_swap_chain (swap_chain)
     {
       try
       {
-          //выбор активного контекста
+          //создание контекста
+
+        context = ContextPtr (PlatformManager::CreateContext (swap_chain, shared_context), false);        
         
-        context.MakeCurrent (master_swap_chain.get ());
+          //подписка на события контекста
+
+        context->AttachListener (this);
+
+          //выбор активного контекста          
         
-          //отключение буферов отрисовки
+        context->MakeCurrent (master_swap_chain.get ());        
+        
+          //инициализация таблицы точек входа OpenGL 1.1
+          
+        gl_entries.Init (context->GetLibrary ());
+        
+          //отключение буферов отрисовки          
 
         glDrawBuffer (GL_NONE);
         glReadBuffer (GL_NONE);
@@ -89,27 +55,42 @@ class ContextImpl: public xtl::reference_counter
         extensions_string = reinterpret_cast<const char*> (glGetString (GL_EXTENSIONS));
         version_string    = reinterpret_cast<const char*> (glGetString (GL_VERSION));
         vendor_string     = reinterpret_cast<const char*> (glGetString (GL_VENDOR));
-        renderer_string   = reinterpret_cast<const char*> (glGetString (GL_RENDERER));        
-
-        const char* swap_chain_extension_string = Context::GetSwapChainExtensionString ();
-
-        if (*swap_chain_extension_string)
-        {
-          extensions_string += ' ';
-          extensions_string += swap_chain_extension_string;
-        }
+        renderer_string   = reinterpret_cast<const char*> (glGetString (GL_RENDERER));
         
-          //определение багов работы OpenGL
+          //добавление не переносимых расширений 
           
-        detect_opengl_bugs (extensions_string);
+        IPropertyList* swap_chain_properties = swap_chain->GetProperties ();
         
+        if (swap_chain_properties)
+        {
+          for (size_t i=0, count=swap_chain_properties->GetSize (); i<count; i++)
+            if (!xtl::xstricmp (swap_chain_properties->GetKey (i), "gl_extensions"))
+            {
+              const char* extensions = swap_chain_properties->GetValue (i);
+
+              if (*extensions)
+              {
+                extensions_string += ' ';
+                extensions_string += extensions;
+              }
+              
+              break;
+            }
+        }
+
+          //определение багов работы OpenGL
+
+        detect_opengl_bugs (extensions_string);
+
           //установка флагов поддержки расширений
 
         extensions.SetGroup (extensions_string.c_str (), true);
 
           //определение поддержки версий
+
+          //!!!добавить определение поддержки версий!!!                    
           
-        static Extension Version_1_1 ("GL_VERSION_1_1"), Version_1_2 ("GL_VERSION_1_2"), Version_1_3 ("GL_VERSION_1_3"),
+/*        static Extension Version_1_1 ("GL_VERSION_1_1"), Version_1_2 ("GL_VERSION_1_2"), Version_1_3 ("GL_VERSION_1_3"),
                          Version_1_4 ("GL_VERSION_1_4"), Version_1_5 ("GL_VERSION_1_5"), Version_2_0 ("GL_VERSION_2_0"),
                          Version_2_1 ("GL_VERSION_2_1");
 
@@ -119,21 +100,78 @@ class ContextImpl: public xtl::reference_counter
         extensions.Set (Version_1_4, GLEW_VERSION_1_4 != 0);
         extensions.Set (Version_1_5, GLEW_VERSION_1_5 != 0);
         extensions.Set (Version_2_0, GLEW_VERSION_2_0 != 0);
-        extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);
+        extensions.Set (Version_2_1, GLEW_VERSION_2_1 != 0);*/
       }
       catch (xtl::exception& exception)
       {
-        exception.touch ("render::low_level::opengl::ContextImpl::Init");
-        
-        throw;        
+        exception.touch ("render::low_level::opengl::ContextImpl::ContextImpl");        
+        throw;
       }
     }
 
-  private:
-    typedef xtl::com_ptr<ISwapChain> SwapChainPtr;   //указатель на цепочку обмена  
+///Получение контекста и главной цепочки обмена
+    IContext&   GetContext         () const { return *context; }
+    ISwapChain& GetMasterSwapChain () const { return *master_swap_chain; }
+    
+///Получение точек входа OpenGL 1.1
+    const GlEntries& GetGlEntries () const { return gl_entries; }
+    
+///Получение флагов поддержки исключений
+    ExtensionSet& GetExtensions () { return extensions; } 
+ 
+///Получение аппаратно-поддерживаемых возможностей контекста
+    const ContextCaps& GetCaps () const
+    {
+      return context_caps;
+    }
+
+///Получение информации о реализации OpenGL
+    const char* GetExtensionsString () const { return extensions_string.c_str (); }
+    const char* GetVersionString    () const { return version_string.c_str (); }
+    const char* GetVendorString     () const { return vendor_string.c_str (); }
+    const char* GetRendererString   () const { return renderer_string.c_str (); }
+
+///Получение таблицы локальных данных контекста
+    ContextDataTable& GetContextDataTable (Stage table_id)
+    {
+      if (table_id < 0 || table_id >= Stage_Num)
+        throw xtl::make_range_exception ("render::low_level::opengl::ContextImpl::GetContextDataTable", "table_id", table_id, 0, Stage_Num);
+
+      return context_data_table [table_id];
+    }
+
+///Инициализация таблицы возможностей контекста
+    void InitContextCaps (const ExtensionSet& enabled_extensions)
+    {
+      context_caps.Init (extensions, enabled_extensions);
+    }
+    
+///Получение текущего контекста
+    static ContextImpl* GetCurrentContext ()
+    {
+      return current_context;
+    }
     
   private:
-    Context          context;                        //контекст OpenGL
+///Контекст стал текущим
+    void OnSetCurrent ()
+    {
+      current_context = this;
+    } 
+
+///Контекст перестал быть текущим
+    virtual void OnLostCurrent ()
+    {
+      current_context = 0;
+    }
+
+  private:
+    typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
+    typedef xtl::com_ptr<IContext>   ContextPtr;
+    
+  private:
+    ContextPtr       context;                        //контекст OpenGL
+    GlEntries        gl_entries;                     //таблица точек входа OpenGL 1.1
     SwapChainPtr     master_swap_chain;              //главная цепочка обмена, связанная с контекстом
     ExtensionSet     extensions;                     //флаги поддерживаемых исключений
     stl::string      extensions_string;              //строка поддерживаемых расширений
@@ -142,7 +180,12 @@ class ContextImpl: public xtl::reference_counter
     stl::string      renderer_string;                //имя устройства отрисовки OpenGL
     ContextDataTable context_data_table [Stage_Num]; //таблицы локальных данных контекста
     ContextCaps      context_caps;                   //аппаратно поддерживаемые возможности контекста
+
+  private:
+    static ContextImpl* current_context; //указатель на текущий контекст        
 };
+
+ContextImpl* ContextImpl::current_context = 0;
 
 }
 
@@ -155,16 +198,15 @@ class ContextImpl: public xtl::reference_counter
 struct ContextManager::Impl: public xtl::reference_counter
 {
   public:  
+///Конструктор
     Impl (const LogHandler& in_log_handler, const char* init_string) :
       log_handler (in_log_handler),
       current_context (0),
-      current_draw_swap_chain (0),
-      current_read_swap_chain (0),
+      current_swap_chain (0),
       current_context_id (0),
       next_context_id (1),
       check_gl_errors (true),
-      on_destroy_draw_swap_chain (xtl::bind (&Impl::RestoreContext, this)),
-      on_destroy_read_swap_chain (xtl::bind (&Impl::RestoreContext, this))
+      on_destroy_swap_chain (xtl::bind (&Impl::RestoreContext, this))
     {
         //разбор строки инициализации устройства
 
@@ -181,19 +223,21 @@ struct ContextManager::Impl: public xtl::reference_counter
         need_stage_rebind [stage] = true;
     }    
     
-      //создание контекста
+///Создание контекста
     size_t CreateContext (ISwapChain* swap_chain)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::CreateContext";         
-      
+
+        //проверка корректности аргументов
+
       if (!swap_chain)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");        
+        throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");
 
-      ContextImplPtr new_context;      
+        //создание контекста
 
-      if (context_map.empty ()) new_context = ContextImplPtr (new ContextImpl (swap_chain), false);
-      else                      new_context = ContextImplPtr (new ContextImpl (swap_chain, context_map.begin ()->second->GetContext ()), false);
-      
+      IContext*      shared_context = context_map.empty () ? (IContext*)0 : &context_map.begin ()->second->GetContext (); 
+      ContextImplPtr new_context (new ContextImpl (swap_chain, shared_context), false);
+
         //проверка поддержки требуемых расширений и версий
       
       ExtensionSet& context_extensions = new_context->GetExtensions ();
@@ -250,7 +294,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       return new_context_id;
     }
     
-      //удаление контекста
+///Удаление контекста
     void DeleteContext (size_t context_id)
     {
       context_map.erase (context_id);
@@ -259,22 +303,22 @@ struct ContextManager::Impl: public xtl::reference_counter
         RestoreContext ();
     }
     
-      //установка текущего контекста
-    void SetContext (size_t context_id, ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain)
+///Установка текущего контекста
+    void SetContext (size_t context_id, ISwapChain* swap_chain)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::SetContext";
       
-      if (context_id == current_context_id && draw_swap_chain == current_draw_swap_chain && read_swap_chain == current_read_swap_chain)
+      if (context_id == current_context_id && swap_chain == current_swap_chain)
         return;
         
-      if (!context_id && !draw_swap_chain)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "draw_swap_chain && context_id");
-        
+      if (!context_id && !swap_chain)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain && context_id");
+
       if (!context_id) //поиск совместимого контекста
       {
         try
         {
-          context_id = GetCompatibleContextId (draw_swap_chain);
+          context_id = GetCompatibleContextId (swap_chain);
         }
         catch (xtl::exception& exception)
         {
@@ -293,51 +337,45 @@ struct ContextManager::Impl: public xtl::reference_counter
 
       ContextImplPtr context = iter->second;
       
-      if (!draw_swap_chain) //использование первичной цепочки обмена
-        draw_swap_chain = context->GetMasterSwapChain ();
-        
-        //если цепочка чтения не указана
-        
-      if (!read_swap_chain)
-        read_swap_chain = draw_swap_chain;        
+      if (!swap_chain) //использование первичной цепочки обмена
+        swap_chain = &context->GetMasterSwapChain ();        
 
         //проверка совместимости контекста с цепочками обмена
 
-      if (!context->GetContext ().IsCompatible (draw_swap_chain))
-        throw xtl::make_argument_exception (METHOD_NAME, "draw_swap_chain", "ISwapChain instance", "Swap chain incompatible with context");
-
-      if (draw_swap_chain != read_swap_chain && !context->GetContext ().IsCompatible (read_swap_chain))
-        throw xtl::make_argument_exception (METHOD_NAME, "read_swap_chain", "ISwapChain instance", "Swap chain incompatible with context");
+      if (!context->GetContext ().IsCompatible (swap_chain))
+        throw xtl::make_argument_exception (METHOD_NAME, "swap_chain", "ISwapChain instance", "Swap chain incompatible with context");
 
         //регистрация обработчиков удаления цепочек обмена
 
-      draw_swap_chain->RegisterDestroyHandler (on_destroy_draw_swap_chain);
-      read_swap_chain->RegisterDestroyHandler (on_destroy_read_swap_chain);
+      swap_chain->RegisterDestroyHandler (on_destroy_swap_chain);
 
         //обновление данных
 
-      current_context         = &*iter->second;
-      current_draw_swap_chain = draw_swap_chain;
-      current_read_swap_chain = read_swap_chain;
-      current_context_id      = context_id;
+      current_context    = &*iter->second;
+      current_swap_chain = swap_chain;
+      current_context_id = context_id;
 
         //оповещение о необходимости ребиндинга выходного уровня
 
       StageRebindNotify (Stage_Output);
     }
     
-      //активация текущего контекста
+///Активация текущего контекста
     void MakeContextCurrent (bool clear_errors)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::MakeContextCurrent";
+      
+        //если текущий контекст не изменился - нет необходимости переключения      
 
       if (!current_context)
         throw xtl::format_operation_exception (METHOD_NAME, "Null active context");
 
       try
       {
-        current_context->GetContext ().MakeCurrent (current_draw_swap_chain, current_read_swap_chain);
+          //сделать кэширование установки!!!
         
+        current_context->GetContext ().MakeCurrent (current_swap_chain);
+
           //очистка текущей ошибки
           
         if (clear_errors)
@@ -351,13 +389,12 @@ struct ContextManager::Impl: public xtl::reference_counter
       }
     }    
     
-      //получение текущего контекста и цепочек обмена
-    ISwapChain*  GetDrawSwapChain () const { return current_draw_swap_chain; }
-    ISwapChain*  GetReadSwapChain () const { return current_read_swap_chain; }
-    size_t       GetContextId     () const { return current_context_id; }
-    ContextImpl* GetContext       () const { return current_context; }
+///Получение текущего контекста и цепочек обмена
+    ISwapChain*  GetSwapChain () const { return current_swap_chain; }
+    size_t       GetContextId () const { return current_context_id; }
+    ContextImpl* GetContext   () const { return current_context; }
     
-      //создание цепочки обмена совместимой с контекстом
+///Создание цепочки обмена совместимой с контекстом
     ISwapChain* CreateCompatibleSwapChain (size_t context_id)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(size_t)";
@@ -373,28 +410,28 @@ struct ContextManager::Impl: public xtl::reference_counter
       
         //создание цепочки обмена
         
-      return SwapChainManager::CreatePBuffer (context->GetMasterSwapChain ());
+      return PlatformManager::CreatePBuffer (&context->GetMasterSwapChain ());
     }
     
-      //создание совместимой цепочки обмена
+///Создание совместимой цепочки обмена
     ISwapChain* CreateCompatibleSwapChain (ISwapChain* swap_chain)
     {
       if (!swap_chain)
         throw xtl::make_null_argument_exception ("render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(ISwapChain*)", "swap_chain");
       
-      return SwapChainManager::CreatePBuffer (swap_chain);
+      return PlatformManager::CreatePBuffer (swap_chain);
     }
     
-      //создание совместимой цепочки обмена
+///Создание совместимой цепочки обмена
     ISwapChain* CreateCompatibleSwapChain (ISwapChain* swap_chain, const SwapChainDesc& desc)
     {
       if (!swap_chain)
         throw xtl::make_null_argument_exception ("render::low_level::opengl::ContextManager::CreateCompatibleSwapChain(ISwapChain*,const SwapChainDesc&)", "swap_chain");
       
-      return SwapChainManager::CreatePBuffer (swap_chain, desc);
+      return PlatformManager::CreatePBuffer (swap_chain, &desc);
     }    
     
-      //проверка совместимости контекста и цепочки обмена
+///Проверка совместимости контекста и цепочки обмена
     bool IsCompatible (size_t context_id, ISwapChain* swap_chain)
     {
         //поиск контекста
@@ -407,7 +444,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       return iter->second->GetContext ().IsCompatible (swap_chain);
     }
     
-      //определение поддержки расширения контекстом
+///Определение поддержки расширения контекстом
     bool IsSupported (size_t context_id, const Extension& extension) const
     {
         //поиск контекста
@@ -428,7 +465,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       return current_context->GetExtensions ().Get (extension);
     }
     
-      //протоколирование
+///Протоколирование
     void LogPrint (const char* message)
     {
       try
@@ -441,7 +478,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       }
     }
     
-      //включение / отключение проверки ошибок
+///Включение / отключение проверки ошибок
     void SetValidationState (bool state)
     {
       check_gl_errors = state;
@@ -449,7 +486,7 @@ struct ContextManager::Impl: public xtl::reference_counter
     
     bool GetValidationState () const { return check_gl_errors; }
     
-      //проверка ошибок OpenGL
+//Проверка ошибок OpenGL
     void CheckErrors (const char* source)
     {
       if (!check_gl_errors)
@@ -485,6 +522,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       }      
     }
     
+///Очистка текущей ошибки OpenGL
     void ClearErrors ()
     {
       if (!check_gl_errors)
@@ -493,7 +531,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       while (glGetError () != GL_NO_ERROR);
     }
     
-      //оповещение о необходимости ребинда уровня
+///Оповещение о необходимости ребинда уровня
     void StageRebindNotify (Stage stage)
     {
       if (stage < 0 || stage >= Stage_Num)
@@ -502,14 +540,14 @@ struct ContextManager::Impl: public xtl::reference_counter
       need_stage_rebind [stage] = true;
     }
     
-      //очистка флагов ребиндинга
+///Очистка флагов ребиндинга
     void ResetRebindNotifications ()
     {
       for (size_t stage=0; stage<Stage_Num; stage++)
         need_stage_rebind [stage] = false;
     }
     
-      //проверка необходимости ребинда уровня
+///Проверка необходимости ребинда уровня
     bool NeedStageRebind (Stage stage)
     {
       if (stage < 0 || stage >= Stage_Num)
@@ -519,7 +557,7 @@ struct ContextManager::Impl: public xtl::reference_counter
     }  
     
   private:
-      //добавление свойства
+///Добавление свойства
     void AddInitProperty (const char* name, const char* value)
     {
       if (!xtl::xstricmp (name, "require"))
@@ -568,7 +606,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       }
     }
     
-      //поиск контекста, совместимого с указанной цепочкой обмена
+//Поиск контекста, совместимого с указанной цепочкой обмена
     size_t GetCompatibleContextId (ISwapChain* swap_chain)
     {
         //наиболее выгодным является выбор текущего контекста, если это возможно
@@ -590,7 +628,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       return 0;
     }
     
-      //восставление контекста (после удаления контекста или цепочки обмена)
+///Восставление контекста (после удаления контекста или цепочки обмена)
     void RestoreContext ()
     {
         //оповещение о необходимости ребиндинга выходного уровня
@@ -603,7 +641,7 @@ struct ContextManager::Impl: public xtl::reference_counter
 
       if (iter != context_map.end ())
       {
-        current_draw_swap_chain = current_read_swap_chain = current_context->GetMasterSwapChain ();
+        current_swap_chain = &current_context->GetMasterSwapChain ();
 
         return;
       }
@@ -614,10 +652,9 @@ struct ContextManager::Impl: public xtl::reference_counter
       {
           //если удалены все контексты - восставление не возможно
 
-        current_draw_swap_chain = 0;
-        current_read_swap_chain = 0;
-        current_context         = 0;
-        current_context_id      = 0;
+        current_swap_chain = 0;
+        current_context    = 0;
+        current_context_id = 0;
 
         return;
       }
@@ -626,10 +663,9 @@ struct ContextManager::Impl: public xtl::reference_counter
 
       ContextImplPtr context = context_map.begin ()->second;
 
-      current_context         = &*context;
-      current_read_swap_chain = context->GetMasterSwapChain ();
-      current_draw_swap_chain = current_read_swap_chain;
-      current_context_id      = context_map.begin ()->first;
+      current_context    = &*context;
+      current_swap_chain = &context->GetMasterSwapChain ();
+      current_context_id = context_map.begin ()->first;
     }
 
   private:
@@ -645,12 +681,10 @@ struct ContextManager::Impl: public xtl::reference_counter
     bool                      check_gl_errors;               //нужно ли проверять ошибки OpenGL
     ContextMap                context_map;                   //карта отображения цепочки обмена на контекст
     ContextImpl*              current_context;               //текущий контекст
-    ISwapChain*               current_draw_swap_chain;       //цепочка обмена для рисования
-    ISwapChain*               current_read_swap_chain;       //цепочка обмена для чтения
+    ISwapChain*               current_swap_chain;            //текущая цепочка обмена
     size_t                    current_context_id;            //идентификатор текущего контекста (0 - отсутствует)
     size_t                    next_context_id;               //номер следующего создаваемого контекста
-    xtl::trackable::slot_type on_destroy_draw_swap_chain;    //обработчик удаления цепочки обмена для рисования
-    xtl::trackable::slot_type on_destroy_read_swap_chain;    //обработчик удаления цепочки обмена для чтения
+    xtl::trackable::slot_type on_destroy_swap_chain;         //обработчик удаления цепочки обмена
     bool                      need_stage_rebind [Stage_Num]; //флаги, определяющие необходимость ребиндинга уровня
 };
 
@@ -721,19 +755,14 @@ ISwapChain* ContextManager::CreateCompatibleSwapChain (ISwapChain* swap_chain, c
     Выбор текущего контекста
 */
 
-void ContextManager::SetContext (size_t context_id, ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain)
+void ContextManager::SetContext (size_t context_id, ISwapChain* swap_chain)
 {
-  impl->SetContext (context_id, draw_swap_chain, read_swap_chain);
+  impl->SetContext (context_id, swap_chain);
 }
 
-ISwapChain* ContextManager::GetDrawSwapChain () const
+ISwapChain* ContextManager::GetSwapChain () const
 {
-  return impl->GetDrawSwapChain ();
-}
-
-ISwapChain* ContextManager::GetReadSwapChain () const
-{
-  return impl->GetReadSwapChain ();
+  return impl->GetSwapChain ();
 }
 
 size_t ContextManager::GetContextId () const
@@ -893,7 +922,7 @@ void ContextManager::RaiseError (const char* source) const
     
   CheckErrors (source);
   
-  throw xtl::format_operation_exception (source, "Invalid operation");
+  throw xtl::format_operation_exception (source, "Invalid operation (internal error)");
 }
 
 void ContextManager::ClearErrors () const
@@ -918,4 +947,28 @@ void ContextManager::ResetRebindNotifications ()
 bool ContextManager::NeedStageRebind (Stage stage) const
 {
   return impl->NeedStageRebind (stage);
+}
+
+namespace render
+{
+
+namespace low_level
+{
+
+namespace opengl
+{
+
+/*
+    Получение таблицы точек входа для текущего контекста
+*/
+
+const GlEntries* get_gl_entries ()
+{
+  return &ContextImpl::GetCurrentContext ()->GetGlEntries ();
+}
+
+}
+
+}
+
 }

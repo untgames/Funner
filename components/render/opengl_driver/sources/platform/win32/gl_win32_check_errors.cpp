@@ -3,53 +3,54 @@
 namespace
 {
 
-//буфер сообщения о Win32 ошибке
-class Win32ErrorMessage
+//получение строки с сообщением об ошибке
+stl::string get_error_message (DWORD error_code)
 {
-  public:
-    Win32ErrorMessage (DWORD error_code) : buffer (0)
-    {
-      FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                     0, error_code, 0, (LPTSTR)&buffer, 0, 0);
-//MAKELANGID (LANG_NEUTRAL,SUBLANG_DEFAULT)                     
+  void* buffer = 0;
 
-      if (!buffer)
-        throw xtl::format_operation_exception ("render::low_level::opengl::Win32ErrorMessage::Win32ErrorMessage", "Internal error at FormatMessage");
-        
-        //отсечение завершающих \n и пробелов
-        
-      char* iter = (char*)buffer;
+  size_t buffer_len = FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                     0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, 0);                 
+
+  if (!buffer)
+  {
+    return common::format ("Win32 error %u", error_code);
+  }
+  else
+  {    
+      //отсечение завершающих \n и пробелов      
+
+    char* iter = (char*)buffer;    
+    
+    iter [buffer_len] = '\0';    
+
+    iter += buffer_len;
+
+    if (iter == buffer)
+      return "";      
       
-      iter += strlen (iter);
-      
-      if (iter == buffer)
-        return;
-      
-      for (;;)
-        switch (*--iter)
+    for (bool loop=true; loop;)
+      switch (*--iter)
+      {
+        case '\n':
+        case '\r':
+        case ' ':
+        case '\t':
+          break;
+        default:
         {
-          case '\n':
-          case '\r':
-          case ' ':
-          case '\t':
-            break;
-          default:
-            iter [1] = '\0';
-            return;
+          iter [1] = '\0';
+          loop     = false;
+          break;
         }
-    }
+      }
 
-    ~Win32ErrorMessage ()
-    {
-      if (buffer)
-        LocalFree (buffer);
-    }
+    stl::string message = common::format ("Win32 error %u. %s", error_code, buffer);        
 
-    const char* Message () const { return reinterpret_cast<const char*> (buffer); }
+    LocalFree (buffer);
 
-  private:
-    void* buffer;
-};
+    return message;
+  }
+}
 
 }
 
@@ -62,15 +63,20 @@ namespace low_level
 namespace opengl
 {
 
+namespace windows
+{
+
 //генерация исключения
 void raise_error (const char* source)
 {
   DWORD error_code = GetLastError ();
-  
+
   if (error_code)
-    throw xtl::format_operation_exception (source, Win32ErrorMessage (GetLastError ()).Message ());
-  
+    throw xtl::format_operation_exception (source, "%s", get_error_message (error_code).c_str ());
+
   throw xtl::format_operation_exception (source, "Operation failed");
+}
+
 }
 
 }

@@ -27,8 +27,17 @@ int main ()
       test.swap_chain->GetDesc (swap_chain_desc);
       
       swap_chain_desc.window_handle = window.Handle ();
+      
+      IAdapter* adapter = test.swap_chain->GetAdapter ();
+      IDriver*  driver  = DriverManager::FindDriver ("OpenGL");
+      
+      if (!driver || !adapter)
+      {
+        printf ("Wrong OpenGL driver configuration\n");
+        return 0;
+      }      
 
-      SwapChainPtr swap_chain (test.driver->CreateSwapChain (swap_chain_desc), false);    
+      SwapChainPtr swap_chain (driver->CreateSwapChain (1, &adapter, swap_chain_desc), false);    
       
       TexturePtr texture [4] = {
         TexturePtr (test.device->CreateRenderTargetTexture (test.swap_chain.get (), 1), false),

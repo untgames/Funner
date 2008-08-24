@@ -1,13 +1,16 @@
 #include "shared.h"
 
 using namespace render::low_level;
-using namespace render::low_level::opengl;
-using namespace common;
-
-const size_t MODE_ARRAY_RESERVE = 32; //резервируемое количество видео-режимов
+using namespace render::low_level::opengl::windows;
 
 namespace
 {
+
+/*
+    Константы
+*/
+
+const size_t MODE_ARRAY_RESERVE = 32; //резервируемое количество видео-режимов
 
 /*
     Получение информации об видео-режиме
@@ -43,24 +46,64 @@ bool get_mode_desc (const char* device_name, int mode_index, OutputModeDesc& mod
 }
 
 /*
+    Описание реализации устройства вывода
+*/
+
+typedef stl::vector<OutputModeDesc> OutputModeArray;
+
+struct Output::Impl
+{
+  stl::string     name;                      //имя устройства
+  stl::string     win_name;                  //имя устройства в Windows
+  PropertyList    properties;                //свойства устройства
+  OutputModeArray modes;                     //режимы работы устройства
+  HDC             hDC;                       //хэндл контекста устройства
+  bool            need_restore_default_mode; //необходимо ли восстанавливать настройки при удалении устройства вывода
+  
+///Конструктор
+  Impl () : hDC (0), need_restore_default_mode (false) {}
+  
+///Деструктор
+  ~Impl ()
+  {
+    if (hDC)
+      DeleteDC (hDC);
+  }
+
+///Получение дескприптора контекста устройства
+  HDC GetDC ()
+  {
+    if (hDC)
+      return hDC;
+
+    hDC = CreateDC (win_name.c_str (), 0, 0, 0);
+
+    if (!hDC)
+      raise_error (common::format ("render::low_level::opengl::windows::Output::GetDC(device-name='%s')", name.c_str ()).c_str ());
+
+    return hDC;    
+  }
+};
+
+/*
     Конструктор / деструктор
 */
 
 Output::Output (const DISPLAY_DEVICE& device_info)
-  : hDC (NULL)
+  : impl (new Impl)
 {
     //получение имени устройства
 
-  name     = device_info.DeviceString;
-  win_name = device_info.DeviceName;
-  
+  impl->name     = device_info.DeviceString;
+  impl->win_name = device_info.DeviceName;
+
     //отсечение завершающих пробелов в имени устройства
 
   stl::string::reverse_iterator iter;
 
-  for (iter=name.rbegin (); iter!=name.rend () && *iter == ' '; ++iter);
+  for (iter=impl->name.rbegin (); iter!=impl->name.rend () && *iter == ' '; ++iter);
 
-  name.erase (iter.base (), name.end ());
+  impl->name.erase (iter.base (), impl->name.end ());
   
     //формирование строки флагов устройства
     
@@ -93,36 +136,33 @@ Output::Output (const DISPLAY_DEVICE& device_info)
 
     //регистрация свойств
 
-  properties.AddProperty ("win-name",     device_info.DeviceName);
-  properties.AddProperty ("flags",        flags_string.c_str ());
-  properties.AddProperty ("pci-id",       device_info.DeviceID);
-  properties.AddProperty ("registry-key", device_info.DeviceKey);
+  impl->properties.AddProperty ("win-name",     device_info.DeviceName);
+  impl->properties.AddProperty ("flags",        flags_string.c_str ());
+  impl->properties.AddProperty ("pci-id",       device_info.DeviceID);
+  impl->properties.AddProperty ("registry-key", device_info.DeviceKey);
   
     //построение списка видео-режимов
     
-  modes.reserve (MODE_ARRAY_RESERVE);
+  impl->modes.reserve (MODE_ARRAY_RESERVE);
 
   OutputModeDesc mode_desc;
 
-  for (int mode_index=0; get_mode_desc (win_name.c_str (), mode_index, mode_desc); mode_index++)
-    modes.push_back (mode_desc);
+  for (int mode_index=0; get_mode_desc (impl->win_name.c_str (), mode_index, mode_desc); mode_index++)
+    impl->modes.push_back (mode_desc);
 }
 
 Output::~Output ()
 {
-    //восстанавливаем искходный видеорежим
-
   try
   {
+      //восстанавливаем исходный видеорежим    
+    
     RestoreDefaultMode ();
   }
   catch (...)
   {
     //подавляем все исключения
   }
-
-  if (hDC)
-    DeleteDC (hDC);
 }
 
 /*
@@ -131,7 +171,12 @@ Output::~Output ()
 
 const char* Output::GetName ()
 {
-  return name.c_str ();
+  return impl->name.c_str ();
+}
+
+const char* Output::GetWinName ()
+{
+  return impl->win_name.c_str ();
 }
 
 /*
@@ -140,15 +185,15 @@ const char* Output::GetName ()
 
 size_t Output::GetModesCount ()
 {
-  return modes.size ();
+  return impl->modes.size ();
 }
 
 void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 {
-  if (mode_index >= modes.size ())
-    throw xtl::make_range_exception ("render::low_level::opengl::Output::GetModeDesc", "mode_index", mode_index, modes.size ());
+  if (mode_index >= impl->modes.size ())
+    throw xtl::make_range_exception ("render::low_level::opengl::windows::Output::GetModeDesc", "mode_index", mode_index, impl->modes.size ());
     
-  mode_desc = modes [mode_index];
+  mode_desc = impl->modes [mode_index];
 }
 
 /*
@@ -201,32 +246,39 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
 
   try
   {
-    set_mode_desc (win_name.c_str (), &dev_mode_desc);
+    set_mode_desc (impl->win_name.c_str (), &dev_mode_desc);
+
+    impl->need_restore_default_mode = true;
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::Output::SetCurrentMode(device-name='%s', mode='%ux%ux%u @ %uHz')",
-      name.c_str (), mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);
+    exception.touch ("render::low_level::opengl::windows::Output::SetCurrentMode(device-name='%s', mode='%ux%ux%u @ %uHz')",
+      impl->name.c_str (), mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);
     throw;
   }
 }
 
 void Output::RestoreDefaultMode ()
 {
+  if (!impl->need_restore_default_mode)
+    return;
+
   try
   {
-    set_mode_desc (win_name.c_str (), 0);
+    set_mode_desc (impl->win_name.c_str (), 0);
+    
+    impl->need_restore_default_mode = false;
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::Output::RestoreDefaultMode(device-name='%s')", name.c_str ());
+    exception.touch ("render::low_level::opengl::windows::Output::RestoreDefaultMode(device-name='%s')", impl->name.c_str ());
     throw;
   }
 }
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 {
-  get_mode_desc (win_name.c_str (), ENUM_CURRENT_SETTINGS, mode_desc);
+  get_mode_desc (impl->win_name.c_str (), ENUM_CURRENT_SETTINGS, mode_desc);
 }
 
 /*
@@ -237,47 +289,30 @@ void Output::SetGammaRamp (const Color3f table [256])
 {
   WORD gamma_ramp_table[3][256];
 
-  for (size_t i = 0; i < 256; i++)
+  for (size_t i=0; i<256; i++)
   {
-    gamma_ramp_table[0][i] = (WORD)(table[i].red * 65535.f);
-    gamma_ramp_table[1][i] = (WORD)(table[i].green * 65535.f);
-    gamma_ramp_table[2][i] = (WORD)(table[i].blue * 65535.f);
+    gamma_ramp_table [0][i] = (WORD)(table [i].red * 65535.f);
+    gamma_ramp_table [1][i] = (WORD)(table [i].green * 65535.f);
+    gamma_ramp_table [2][i] = (WORD)(table [i].blue * 65535.f);
   }
 
-  if (!SetDeviceGammaRamp (GetDC (), gamma_ramp_table))
-    raise_error (format ("render::low_level::opengl::Output::SetGammaRamp(device-name='%s')", name.c_str ()).c_str ());
+  if (!SetDeviceGammaRamp (impl->GetDC (), gamma_ramp_table))
+    raise_error (common::format ("render::low_level::opengl::windows::Output::SetGammaRamp(device-name='%s')", impl->name.c_str ()).c_str ());
 }
 
 void Output::GetGammaRamp (Color3f table [256])
 {
-  WORD gamma_ramp_table[3][256];
+  WORD gamma_ramp_table [3][256];
 
-  if (!GetDeviceGammaRamp (GetDC (), gamma_ramp_table))
-    raise_error (format ("render::low_level::opengl::Output::GetGammaRamp(device-name='%s')", name.c_str ()).c_str ());
+  if (!GetDeviceGammaRamp (impl->GetDC (), gamma_ramp_table))
+    raise_error (common::format ("render::low_level::opengl::windows::Output::GetGammaRamp(device-name='%s')", impl->name.c_str ()).c_str ());
 
-  for (size_t i = 0; i < 256; i++)
+  for (size_t i=0; i<256; i++)
   {
-    table[i].red   = (float)gamma_ramp_table[0][i] / 65535.f;
-    table[i].green = (float)gamma_ramp_table[1][i] / 65535.f;
-    table[i].blue  = (float)gamma_ramp_table[2][i] / 65535.f;
+    table [i].red   = (float)gamma_ramp_table[0][i] / 65535.f;
+    table [i].green = (float)gamma_ramp_table[1][i] / 65535.f;
+    table [i].blue  = (float)gamma_ramp_table[2][i] / 65535.f;
   }
-}
-
-/*
-   Получение хэндла контекста устройства
-*/
-
-HDC Output::GetDC ()
-{
-  if (hDC)
-    return hDC;
-    
-  hDC = CreateDC (win_name.c_str (), NULL, NULL, NULL);
-
-  if (!hDC)
-    raise_error (common::format ("render::low_level::opengl::Output::GetDC(device-name='%s')", name.c_str ()).c_str ());
-
-  return hDC;
 }
 
 /*
@@ -288,7 +323,7 @@ void Output::GetScreenRect (Rect& rect)
 {
   OutputModeDesc mode_desc;
 
-  get_mode_desc (win_name.c_str (), ENUM_CURRENT_SETTINGS, mode_desc, &rect);
+  get_mode_desc (impl->win_name.c_str (), ENUM_CURRENT_SETTINGS, mode_desc, &rect);
 }
 
 /*
@@ -297,5 +332,5 @@ void Output::GetScreenRect (Rect& rect)
 
 IPropertyList* Output::GetProperties ()
 {
-  return &properties;
+  return &impl->properties;
 }

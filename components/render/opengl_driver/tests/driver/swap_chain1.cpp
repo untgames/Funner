@@ -6,9 +6,15 @@ typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
 
 const bool FAIL_TEST = false;
 
-void dump (const SwapChainDesc& desc)
+void dump (ISwapChain& swap_chain)
 {
+  SwapChainDesc desc;
+  
+  swap_chain.GetDesc (desc);  
+
   printf ("Swap chain description:\n");
+  printf ("    Adapter name:  '%s'\n", swap_chain.GetAdapter ()->GetName ());
+  printf ("    Adapter path:  '%s'\n", swap_chain.GetAdapter ()->GetPath ());
   printf ("    Color bits:    %u\n", desc.frame_buffer.color_bits);
   printf ("    Alpha bits:    %u\n", desc.frame_buffer.alpha_bits);
   printf ("    Depth bits:    %u\n", desc.frame_buffer.depth_bits);
@@ -42,7 +48,7 @@ int main ()
     
     xtl::com_ptr<IDriver> driver = DriverManager::FindDriver ("OpenGL");
     
-    if (!driver)
+    if (!driver || !driver->GetAdaptersCount ())
     {
       printf ("OpenGL driver not found");
       return 0;
@@ -52,7 +58,7 @@ int main ()
     
     memset (&desc, 0, sizeof (desc));
 
-    desc.frame_buffer.color_bits   = 32;
+    desc.frame_buffer.color_bits   = 16;
     desc.frame_buffer.alpha_bits   = 8;
     desc.frame_buffer.depth_bits   = 16;
     desc.frame_buffer.stencil_bits = 8;
@@ -63,24 +69,27 @@ int main ()
     desc.fullscreen                = false;
     desc.window_handle             = window.Handle ();
 
-    SwapChainPtr swap_chain (driver->CreateSwapChain (desc), false);
-    
+    typedef stl::vector<IAdapter*> AdapterArray;
+
+    AdapterArray adapters (driver->GetAdaptersCount ());
+
+    for (size_t i=0; i<adapters.size (); i++)
+      adapters [i] = driver->GetAdapter (i);
+
+    SwapChainPtr swap_chain (driver->CreateSwapChain (adapters.size (), &adapters [0], desc), false);
+
 //    printf ("Swap chain containing output: '%s'\n", swap_chain->GetContainingOutput ()->GetName ());
-    
-    swap_chain->GetDesc (desc);
-    
-    dump (desc);
+
+    dump (*swap_chain);
 
     if (FAIL_TEST)
     {
       desc.samples_count = 0;
       desc.buffers_count = 1;
 
-      SwapChainPtr (driver->CreateSwapChain (desc), false).swap (swap_chain);
-    
-      swap_chain->GetDesc (desc);
+      SwapChainPtr (driver->CreateSwapChain (adapters.size (), &adapters [0], desc), false).swap (swap_chain);
 
-      dump (desc);
+      dump (*swap_chain);
     }
   }
   catch (std::exception& exception)

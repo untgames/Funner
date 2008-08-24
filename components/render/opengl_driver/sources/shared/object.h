@@ -3,8 +3,9 @@
 
 #include <typeinfo>
 
-#include <xtl/reference_counter.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/reference_counter.h>
+#include <xtl/trackable.h>
 
 #include <render/low_level/object.h>
 

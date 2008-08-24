@@ -1,0 +1,11 @@
+Results of output_stage_state_block_test:
+after reset
+OSGetBlendState:        0
+OSGetDepthStencilState: 0
+OSGetRenderTargetView:  0
+OSGetDepthStencilView:  0
+after apply
+OSGetBlendState:        1
+OSGetDepthStencilState: 1
+OSGetRenderTargetView:  1
+OSGetDepthStencilView:  0

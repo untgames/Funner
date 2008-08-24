@@ -40,7 +40,7 @@ int main ()
     
     xtl::com_ptr<IDriver> driver = DriverManager::FindDriver ("OpenGL");
 
-    if (!driver)
+    if (!driver || !driver->GetAdaptersCount ())
     {
       printf ("OpenGL driver not found\n");
       return 0;
@@ -60,8 +60,15 @@ int main ()
     desc.vsync                     = true;
     desc.fullscreen                = true;
     desc.window_handle             = window.Handle ();
+    
+    typedef stl::vector<IAdapter*> AdapterArray;
 
-    SwapChainPtr swap_chain (driver->CreateSwapChain (desc), false);
+    AdapterArray adapters (driver->GetAdaptersCount ());
+
+    for (size_t i=0; i<adapters.size (); i++)
+      adapters [i] = driver->GetAdapter (i);    
+
+    SwapChainPtr swap_chain (driver->CreateSwapChain (adapters.size (), &adapters [0], desc), false);
     
     printf ("Swap chain containing output: '%s'\n", swap_chain->GetContainingOutput ()->GetName ());
     

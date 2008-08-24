@@ -19,7 +19,6 @@
 #include <shared/output_stage.h>
 #include <shared/context_object.h>
 #include <shared/texture_manager.h>
-#include <shared/platform/swap_chain_manager.h>
 
 namespace render
 {
@@ -36,8 +35,7 @@ namespace opengl
 enum OutputStageCache
 {
   OutputStageCache_FrameBufferId,         //идентификатор текущего буфера кадра
-  OutputStageCache_ReadBufferAttachment,  //тип буфера чтения
-  OutputStageCache_DrawBufferAttachment,  //тип буфера отрисовки
+  OutputStageCache_BufferAttachment,      //тип буфера
   OutputStageCache_ClearColorHash,        //хэш цвета очистки буфера цвета
   OutputStageCache_ClearDepthHash,        //хэш значения очистки буфера глубины
   OutputStageCache_ClearStencilValue,     //значение очистки буфера трафарета
@@ -182,8 +180,6 @@ class FrameBufferManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка активного буфера кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetFrameBuffer (size_t context_id, ISwapChain* draw_swap_chain, GLenum draw_buffer_type, ISwapChain* read_swap_chain,
-                         GLenum read_buffer_type);
     void SetFrameBuffer (size_t context_id, ISwapChain* swap_chain, GLenum buffer_type);
     void SetFrameBuffer (size_t fbo_id, size_t cache_id);
 

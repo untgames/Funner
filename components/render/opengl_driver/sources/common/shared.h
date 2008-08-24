@@ -9,20 +9,19 @@
 
 #include <shared/property_list.h>
 #include <shared/context_object.h>
-#include <shared/platform/context.h>
-#include <shared/platform/swap_chain_manager.h>
+#include <shared/platform.h>
 
 #include <stl/string>
 #include <stl/vector>
 #include <stl/hash_map>
 #include <stl/bitset>
 
-#include <xtl/reference_counter.h>
 #include <xtl/bind.h>
-#include <xtl/uninitialized_storage.h>
-#include <xtl/intrusive_ptr.h>
-#include <xtl/string.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/reference_counter.h>
+#include <xtl/string.h>
+#include <xtl/uninitialized_storage.h>
 
 #include <common/singleton.h>
 #include <common/strlib.h>

@@ -32,7 +32,7 @@ GLenum get_gl_texture_target (TexTargetId tex_target)
   {
     case TexTargetId_Texture1D:        return GL_TEXTURE_1D;
     case TexTargetId_Texture2D:        return GL_TEXTURE_2D;
-    case TexTargetId_TextureRectangle: return GL_TEXTURE_RECTANGLE_EXT;
+    case TexTargetId_TextureRectangle: return GL_TEXTURE_RECTANGLE_ARB;
     case TexTargetId_Texture3D:        return GL_TEXTURE_3D;
     case TexTargetId_TextureCubemap:   return GL_TEXTURE_CUBE_MAP_ARB;
     default:
@@ -47,7 +47,7 @@ TexTargetId get_target_id (GLenum tex_target)
   {
     case GL_TEXTURE_1D:            return TexTargetId_Texture1D;
     case GL_TEXTURE_2D:            return TexTargetId_Texture2D;
-    case GL_TEXTURE_RECTANGLE_EXT: return TexTargetId_TextureRectangle;
+    case GL_TEXTURE_RECTANGLE_ARB: return TexTargetId_TextureRectangle;
     case GL_TEXTURE_3D:            return TexTargetId_Texture3D;
     case GL_TEXTURE_CUBE_MAP_ARB:  return TexTargetId_TextureCubemap;
     default:

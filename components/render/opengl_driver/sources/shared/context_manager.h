@@ -1,14 +1,12 @@
 #ifndef RENDER_GL_DRIVER_CONTEXT_MANAGER_HEADER
 #define RENDER_GL_DRIVER_CONTEXT_MANAGER_HEADER
 
+#include <xtl/array>
 #include <render/low_level/driver.h>
 
+#include <shared/gl_entries.h>
 #include <shared/extensions.h>
 #include <shared/context_caps.h>
-
-#include <xtl/array>
-
-#include <gl/glew.h>
 
 namespace render
 {
@@ -18,11 +16,6 @@ namespace low_level
 
 namespace opengl
 {
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение контекста GLEW (имя функции выбрано исходя из требований GLEW)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-const GLEWContext* glewGetContext ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Идентификаторы уровней устройства отрисовки
@@ -76,7 +69,7 @@ typedef xtl::array<size_t, CONTEXT_DATA_TABLE_SIZE> ContextDataTable;
 class ContextManager
 {
   public:
-    typedef xtl::function<void (const char*)> LogHandler;
+    typedef xtl::function<void (const char*)> LogHandler;    
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
@@ -103,10 +96,9 @@ class ContextManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выбор текущего контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetContext       (size_t context_id, ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain);
-    ISwapChain* GetDrawSwapChain () const;
-    ISwapChain* GetReadSwapChain () const;
-    size_t      GetContextId     () const;
+    void        SetContext   (size_t context_id, ISwapChain* swap_chain);
+    ISwapChain* GetSwapChain () const;
+    size_t      GetContextId () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Активация текущего контекста

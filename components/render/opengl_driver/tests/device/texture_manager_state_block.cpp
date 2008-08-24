@@ -48,15 +48,15 @@ int main ()
     texture_desc.access_flags         = AccessFlag_ReadWrite;    
     
     sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
-    sampler_desc.max_anisotropy       = 0;
+    sampler_desc.max_anisotropy       = 1;
     sampler_desc.mag_filter           = TexMagFilter_Linear;
     sampler_desc.wrap_u               = TexcoordWrap_Clamp;
     sampler_desc.wrap_v               = TexcoordWrap_Clamp;
     sampler_desc.wrap_w               = TexcoordWrap_Clamp;
     sampler_desc.comparision_function = CompareMode_Less;
-    sampler_desc.mip_lod_bias         = 0.2f;
-    sampler_desc.min_lod              = 1.f;
-    sampler_desc.max_lod              = 2.f;    
+    sampler_desc.mip_lod_bias         = 0.0f;
+    sampler_desc.min_lod              = 0.0f;
+    sampler_desc.max_lod              = FLT_MAX;    
 
     TexturePtr texture (test.device->CreateTexture (texture_desc), false);
     SamplerStatePtr sampler (test.device->CreateSamplerState (sampler_desc), false);        

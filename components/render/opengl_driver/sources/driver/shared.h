@@ -2,6 +2,7 @@
 #define RENDER_GL_DRIVER_DRIVER_SHARED_HEADER
 
 #include <stl/string>
+#include <stl/vector>
 
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
@@ -14,8 +15,6 @@
 #include <render/low_level/utils.h>
 #include <render/low_level/driver.h>
 
-#include <shared/platform/output_manager.h>
-#include <shared/platform/swap_chain_manager.h>
 #include <shared/object.h>
 #include <shared/context_manager.h>
 #include <shared/property_list.h>
@@ -24,6 +23,7 @@
 #include <shared/output_stage.h>
 #include <shared/shader_stage.h>
 #include <shared/query_manager.h>
+#include <shared/platform.h>
 
 namespace render
 {
@@ -52,15 +52,20 @@ class Driver: virtual public IDriver, public Object
     const char* GetDescription ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перечисление доступных устройств вывода
+///Перечисление доступных адаптеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t   GetOutputsCount ();
-    IOutput* GetOutput       (size_t index);
+    size_t    GetAdaptersCount ();
+    IAdapter* GetAdapter       (size_t index);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание адаптера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IAdapter* CreateAdapter (const char* name, const char* path);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISwapChain* CreateSwapChain (const SwapChainDesc& desc);
+    ISwapChain* CreateSwapChain (size_t prefered_adapters_count, IAdapter** prefered_adapters, const SwapChainDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства отрисовки
@@ -77,10 +82,17 @@ class Driver: virtual public IDriver, public Object
 ///Протоколирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void LogMessage (const char* message) const;
+    
+  private:
+    void RegisterAdapter   (IAdapter*);
+    void UnregisterAdapter (IAdapter*);
 
   private:
-    OutputManager output_manager; //менеджер устройств вывода
-    LogFunction   log_fn;         //функция отладочного протоколирования
+    typedef stl::vector<IAdapter*> AdapterArray;
+
+  private:
+    AdapterArray adapters; //адаптеры отрисовки
+    LogFunction  log_fn;   //функция отладочного протоколирования
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -2,337 +2,252 @@
 
 using namespace render::low_level;
 using namespace render::low_level::opengl;
-using namespace common;
+using namespace render::low_level::opengl::windows;
 
 /*
-    Описание реализации контекста
+    Описание реализации контекста OpenGL
 */
 
-#ifdef _MSC_VER
-  #pragma warning (disable : 4355) //'this' : used in base member initializer list
-#endif
+typedef xtl::com_ptr<Adapter>          AdapterPtr;
+typedef stl::vector<IContextListener*> ListenerArray;
 
-struct Context::Impl
+struct Context::Impl: public IContextListener
 {
-  HGLRC                     gl_context;                 //контекст OpenGL
-  int                       pixel_format;               //формат пикселей, требуемый контекстом
-  ISwapChain*               draw_swap_chain;            //текущая цепочка обмена (для рисования)
-  ISwapChain*               read_swap_chain;            //текущая цепочка обмена (для чтения)
-  HDC                       draw_swap_chain_dc;         //контекст устройства текущей цепочки обмена (для рисования)
-  HDC                       read_swap_chain_dc;         //контекст устройства текущей цепочки обмена (для чтения)
-  GLEWContext               glew_context;               //контекст GLEW
-  const WGLEWContext*       wglew_context;              //контекст WGLEW
-  xtl::trackable::slot_type on_destroy_draw_swap_chain; //обработчик удаления цепочки обмена (для рисования)
-  xtl::trackable::slot_type on_destroy_read_swap_chain; //обработчик удаления цепочки обмена (для чтения)
-  bool                      vsync;                      //необходимо ли делать вертикальную синхронизацию
+  AdapterPtr                  adapter;               //адаптер
+  HGLRC                       context;               //контекст OpenGL
+  int                         pixel_format;          //формат пикселей
+  ISwapChain*                 swap_chain;            //текущая цепочка обмена
+  HDC                         device_context;        //контекст устройства текущей цепочки обмена
+  bool                        vsync;                 //включена ли вертикальная синхронизация
+  const WglExtensionEntries*  wgl_extension_entries; //таблица WGL-расширений
+  xtl::trackable::slot_type   on_destroy_swap_chain; //обработчик удаления цепочки обмена
+  ListenerArray               listeners;             //слушатели событий контекста
 
-  Impl (ISwapChain* in_swap_chain, Impl* shared_context=0) : draw_swap_chain (0), read_swap_chain (0),
-    on_destroy_draw_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this)),
-    on_destroy_read_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this)),
-    vsync (false)
+  Impl () : context (0), pixel_format (0), swap_chain (0), device_context (0), vsync (false), wgl_extension_entries (0),
+    on_destroy_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this)) {}
+
+///Установка вертикальной синхронизации
+  void SetVSync ()
   {
-    if (!in_swap_chain)
-      throw xtl::make_null_argument_exception ("render::low_level::opengl::Context::Context", "swap_chain");      
-      
-    SwapChain* swap_chain = cast_object<SwapChain> (in_swap_chain, "render::low_level::opengl::Context::Context", "swap_chain");    
-    
-    HDC swap_chain_dc = swap_chain->GetDC ();    
-    
-    pixel_format = GetPixelFormat (swap_chain_dc);
+    if (wgl_extension_entries->SwapIntervalEXT)
+      wgl_extension_entries->SwapIntervalEXT (vsync);
+  }
 
-    gl_context = wglCreateContext (swap_chain_dc);    
+///Обработчик удаления цепочки обмена
+  void OnDestroySwapChain ()
+  {
+    swap_chain            = 0;
+    device_context        = 0;
+    vsync                 = false;
+    wgl_extension_entries = 0;
+  }
 
-    if (!gl_context)
-      raise_error ("wglCreateContext");      
-      
+///Оповещение о потере контекста
+  void LostCurrentNotify ()
+  {
     try
     {
-      if (shared_context && !wglShareLists (shared_context->gl_context, gl_context))      
-        raise_error ("wglShareLists");        
-
-      make_current_context (gl_context, swap_chain_dc, swap_chain_dc);
-
-      GLenum status = glewContextInit (&glew_context);
-
-      if (status != GLEW_OK)
-        throw xtl::format_operation_exception ("glewContextInit", "%s", glewGetString (status));        
-
-      SetSwapChains (swap_chain, swap_chain);
-
-        //установка вертикальной синхронизации
-
-      wglewSetContext (wglew_context);
-      SetVSync ();
+      for (ListenerArray::iterator iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
+        (*iter)->OnLostCurrent ();
     }
     catch (...)
     {
-      make_current_context (0, 0, 0);
-      wglDeleteContext (gl_context);
-      throw;
+      //подавление всех исключений
     }
   }
 
-  ~Impl ()
+///Оповещение об установке текущего контекста
+  void SetCurrentNotify ()
   {
-    if (wglGetCurrentContext () == gl_context)
-    {
-      wglewSetContext (wglew_context);
-      
-      make_current_context (0, 0, 0);
-
-      wglewSetContext (0);
-      glewSetContext (0);
-    }
-
-    wglDeleteContext (gl_context);
-  }
-  
-    //обработчик удаления цепочек обмена
-  void OnDestroySwapChain ()
-  {
-    read_swap_chain    = draw_swap_chain = 0;
-    read_swap_chain_dc = draw_swap_chain_dc = 0;
-    wglew_context      = 0;
-  }
-  
-    //установка активных цепочек обмена
-  void SetSwapChains (ISwapChain* in_draw_swap_chain, ISwapChain* in_read_swap_chain)
-  {
-    SwapChain *casted_draw_swap_chain, *casted_read_swap_chain;
-
-    casted_draw_swap_chain = cast_object<SwapChain> (in_draw_swap_chain, "render::low_level::opengl::Context::Impl::SetSwapChains", "draw_swap_chain");
-
-    if (in_read_swap_chain != in_draw_swap_chain)
-      casted_read_swap_chain = cast_object<SwapChain> (in_read_swap_chain, "render::low_level::opengl::Context::Impl::SetSwapChains", "read_swap_chain");
-    else
-      casted_read_swap_chain = casted_draw_swap_chain;
-
-    draw_swap_chain_dc = casted_draw_swap_chain->GetDC ();
-    read_swap_chain_dc = casted_read_swap_chain->GetDC ();
-    draw_swap_chain    = in_draw_swap_chain;
-    read_swap_chain    = in_read_swap_chain;
-    wglew_context      = casted_draw_swap_chain->GetWGLEWContext ();
-    vsync              = casted_draw_swap_chain->HasVSync ();
-
-    casted_draw_swap_chain->RegisterDestroyHandler (on_destroy_draw_swap_chain);
-    casted_read_swap_chain->RegisterDestroyHandler (on_destroy_read_swap_chain);
-  }
-
-    //установка текущего контекста
-  void MakeCurrent (ISwapChain* in_draw_swap_chain, ISwapChain* in_read_swap_chain)
-  {
-    if (!in_draw_swap_chain)
-      throw xtl::make_null_argument_exception ("render::low_level::opengl::Context::MakeCurrent", "draw_swap_chain");
-
-    if (!in_read_swap_chain)
-      throw xtl::make_null_argument_exception ("render::low_level::opengl::Context::MakeCurrent", "read_swap_chain");
-      
-    const GLEWContext*  old_glew_context  = glewGetContext ();
-    const WGLEWContext* old_wglew_context = wglewGetContext ();
-
     try
     {
-      if (in_draw_swap_chain != draw_swap_chain || in_read_swap_chain != read_swap_chain)
-        SetSwapChains (in_draw_swap_chain, in_read_swap_chain);
-
-      wglewSetContext (wglew_context);
-      glewSetContext  (&glew_context);
-      
-      make_current_context (gl_context, draw_swap_chain_dc, read_swap_chain_dc);
-      
-      SetVSync (); 
+      for (ListenerArray::iterator iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
+        (*iter)->OnSetCurrent ();
     }
-    catch (xtl::exception& exception)
+    catch (...)
     {
-      glewSetContext (old_glew_context);
-      wglewSetContext (old_wglew_context);
-      
-      exception.touch ("render::low_level::opengl::Context::MakeCurrent");
-      
-      throw;
-    }
+      //подавление всех исключений
+    }    
   }
-  
-    //проверка является ли контекст текущим
-  bool IsCurrent (ISwapChain* in_draw_swap_chain, ISwapChain* in_read_swap_chain)
+
+///Обработчик события потери текущего контекста
+  void OnLostCurrent ()
   {
-    if (!in_draw_swap_chain || !in_read_swap_chain)
-      return false;
-      
-    if (wglGetCurrentContext () != gl_context)
-      return false;
-      
-    SwapChain *draw_swap_chain = dynamic_cast<SwapChain*> (in_draw_swap_chain),
-              *read_swap_chain = dynamic_cast<SwapChain*> (in_read_swap_chain);
-              
-    if (draw_swap_chain->GetDC () != wglGetCurrentDC ())
-      return false;
+    adapter->SetContextListener (0);
 
-    WGLEWScope wglew_scope (read_swap_chain->GetWGLEWContext ());
-
-    if   (wglewGetContext () && WGLEW_ARB_make_current_read) return wglGetCurrentReadDCARB () == read_swap_chain->GetDC ();
-    else                                                     return draw_swap_chain == read_swap_chain;
-  }
-  
-    //проверка совместимости цепочки обмена с контекстом
-  bool IsCompatible (ISwapChain* in_swap_chain)
-  {
-    if (!in_swap_chain)
-      return false;
-
-    SwapChain* swap_chain = dynamic_cast<SwapChain*> (in_swap_chain);
-
-    if (!swap_chain)
-      return false;
-
-    return GetPixelFormat (swap_chain->GetDC ()) == pixel_format;
-  }
-  
-    //установка вертикальной синхронизации
-  void SetVSync ()
-  {
-    if (!WGLEW_EXT_swap_control)
-      return;
-    
-    static int current_vsync = wglGetSwapIntervalEXT ();
-    
-    if ((int)vsync == current_vsync)
-      return;
-    
-    if (wglGetSwapIntervalEXT () != (int)vsync)
-    {
-      wglSwapIntervalEXT (vsync);
-      
-      current_vsync = vsync;
-    }
-  }
+    LostCurrentNotify ();
+  }  
 };
 
 /*
     Конструктор / деструктор
 */
 
-Context::Context (ISwapChain* in_swap_chain)
+Context::Context (ISwapChain* in_swap_chain, IContext* in_shared_context)
+  : impl (new Impl)
 {
   try
   {
-    impl = new Impl (in_swap_chain);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::Context::Context");
-    throw;
-  }
-}
+      //проверка корректности аргументов
+      
+    if (!in_swap_chain)
+      throw xtl::make_null_argument_exception ("", "swap_chain");      
 
-Context::Context (ISwapChain* in_swap_chain, const Context& shared_context)
-{
-  try
-  {
-    impl = new Impl (in_swap_chain, get_pointer (shared_context.impl));
+    ISwapChainImpl* swap_chain     = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");
+    Context*        shared_context = cast_object<Context> (in_shared_context, "", "shared_context");
+    
+      //инициализация адаптера
+      
+    impl->adapter = swap_chain->GetAdapterImpl ();
+    
+      //получение контекста устройства отрисовки
+
+    HDC dc = swap_chain->GetDC ();    
+
+      //получение формата пикселей
+
+    impl->pixel_format = impl->adapter->GetPixelFormat (dc);
+
+    if (!impl->pixel_format)
+      raise_error ("wglGetPixelFormat");
+      
+      //создание контекста
+
+    impl->context = impl->adapter->CreateContext (dc);
+
+    if (!impl->context)
+      raise_error ("wglCreateContext");
+      
+      //объединение таблиц ресурсов контекстов
+
+    if (shared_context)
+    {
+      try
+      {
+        impl->adapter->ShareLists (shared_context->impl->context, impl->context);
+      }
+      catch (...)
+      {
+        impl->adapter->DeleteContext (impl->context);
+        throw;
+      }
+    }
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::Context::Context");
+    exception.touch ("render::low_level::opengl::windows::Context::Context");
     throw;
   }
 }
 
 Context::~Context ()
 {
+  try
+  {
+      //отмена текущего контекста
+    
+    if (impl->adapter->GetCurrentContext () == impl->context)
+      impl->adapter->MakeCurrent (0, 0);
+
+      //удаление контекста
+
+    impl->adapter->DeleteContext (impl->context);
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
 /*
-    Установка текущего контекста
+    Установка текущего контектса
 */
 
 void Context::MakeCurrent (ISwapChain* swap_chain)
 {
-  impl->MakeCurrent (swap_chain, swap_chain);
-}
-
-void Context::MakeCurrent (ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain)
-{
-  impl->MakeCurrent (draw_swap_chain, read_swap_chain);
-}
-
-bool Context::IsCurrent (ISwapChain* draw_swap_chain, ISwapChain* read_swap_chain) const
-{
-  return impl->IsCurrent (draw_swap_chain, read_swap_chain);
-}
-
-bool Context::IsCurrent (ISwapChain* swap_chain) const
-{
-  return impl->IsCurrent (swap_chain, swap_chain);
-}
-
-/*
-    Проверка совместимости цепочки обмена с контекстом
-*/
-
-bool Context::IsCompatible (ISwapChain* swap_chain) const
-{
-  return impl->IsCompatible (swap_chain);
-}
-
-/*
-    Получение списка расширений, зависящих от текущей цепочки обмена
-*/
-
-const char* Context::GetSwapChainExtensionString ()
-{
-  return WGLEW_ARB_extensions_string ? wglGetExtensionsStringARB (wglGetCurrentDC ()) : "";
-}
-
-/*
-    Установка текущего контекста  
-*/
-
-namespace render
-{
-
-namespace low_level
-{
-
-namespace opengl
-{
-
-void make_current_context (HGLRC context, HDC draw_dc, HDC read_dc)
-{
-  static HGLRC current_context = 0;
-  static HDC   current_draw_dc = 0,
-               current_read_dc = 0;
-               
-  if (current_context == context && current_draw_dc == draw_dc && current_read_dc == read_dc)
-    return;
-
-  if (wglewGetContext () && WGLEW_ARB_make_current_read)
+  try
   {
-    if (wglGetCurrentContext () == context && wglGetCurrentDC () == draw_dc && wglGetCurrentReadDCARB () == read_dc)
-      return;      
-
-    if (!wglMakeContextCurrentARB (draw_dc, read_dc, context))
-      raise_error ("wglMakeContextCurrentARB");
-  }
-  else
-  {
-    if (read_dc != draw_dc)
-      throw xtl::format_not_supported_exception ("render::low_level::opengl::make_current_context", "WGL_ARB_make_current_read extenstion not supported (could not set different read/write swap chains)");
+    if (!swap_chain)
+      throw xtl::make_null_argument_exception ("", "swap_chain");
       
-    if (wglGetCurrentContext () == context && wglGetCurrentDC () == draw_dc)
-      return;
+    if (swap_chain != impl->swap_chain)
+    {
+        //изменение текущей цепочки обмена
 
-    if (!wglMakeCurrent (draw_dc, context))
-      raise_error ("wglMakeCurrent");
+      ISwapChainImpl* casted_swap_chain = cast_object<ISwapChainImpl> (swap_chain, "", "swap_chain");
+
+      impl->swap_chain            = swap_chain;
+      impl->device_context        = casted_swap_chain->GetDC ();
+      impl->vsync                 = casted_swap_chain->HasVSync ();
+      impl->wgl_extension_entries = &casted_swap_chain->GetWglExtensionEntries ();
+
+        //подписка на событие удаления цепочки обмена
+
+      casted_swap_chain->RegisterDestroyHandler (impl->on_destroy_swap_chain);
+    }
+
+      //установка текущего контекста
+
+    impl->adapter->MakeCurrent (impl->device_context, impl->context);
+
+      //установка вертикальной синхронизации
+
+    impl->SetVSync ();
+
+      //подписка на событие потери контекста
+
+    impl->adapter->SetContextListener (&*impl);
+
+      //оповещение об установке текущего контекста
+
+    impl->SetCurrentNotify ();
   }
-  
-  current_context = context;
-  current_draw_dc = draw_dc;
-  current_read_dc = read_dc;
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::windows::Context::MakeCurrent");
+    throw;
+  }
 }
 
+/*
+   Проверка совместимости цепочки обмена с контекстом
+*/
+
+bool Context::IsCompatible (ISwapChain* in_swap_chain)
+{
+  if (!in_swap_chain)
+    return false;
+
+  ISwapChainImpl* swap_chain = dynamic_cast<ISwapChainImpl*> (in_swap_chain);
+
+  if (!swap_chain)
+    return false;
+
+  return impl->adapter->GetPixelFormat (swap_chain->GetDC ()) == impl->pixel_format;
 }
 
+/*
+    Получение интерфейса библиотеки OpenGL
+*/
+
+ILibrary& Context::GetLibrary ()
+{
+  return impl->adapter->GetLibrary ();
 }
 
+/*
+    Подписка на события контекста
+*/
+
+void Context::AttachListener (IContextListener* listener)
+{
+  if (!listener)
+    return;
+    
+  impl->listeners.push_back (listener);
+}
+
+void Context::DetachListener (IContextListener* listener)
+{
+  impl->listeners.erase (stl::remove (impl->listeners.begin (), impl->listeners.end (), listener), impl->listeners.end ());
 }

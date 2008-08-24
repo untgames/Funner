@@ -22,8 +22,14 @@ int main ()
     
     printf ("Driver:\n");
     printf ("  description: '%s'\n", driver->GetDescription ());
+    
+    if (!driver->GetAdaptersCount () || !driver->GetAdapter (0)->GetOutputsCount ())
+    {
+      printf ("No outputs found\n");
+      return 0;
+    }
 
-    IOutput *output = driver->GetOutput (0);
+    IOutput *output = driver->GetAdapter (0)->GetOutput (0);
     Color3f table [256] = {0}, table2[256] = {0};
 
     output->GetGammaRamp (table);

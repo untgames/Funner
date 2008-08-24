@@ -36,7 +36,7 @@ class ContextObject: public Object
 ///Менеджер контекстов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
           ContextManager& GetContextManager ()       { return context_manager; }
-    const ContextManager& GetContextManager () const { return context_manager; }
+    const ContextManager& GetContextManager () const { return context_manager; }    
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

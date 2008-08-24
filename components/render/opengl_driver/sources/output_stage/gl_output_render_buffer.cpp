@@ -12,7 +12,7 @@ namespace
 */
 
 const GLenum MODE_NAMES [] = {GL_BLEND, GL_DEPTH_TEST, GL_STENCIL_TEST, GL_SCISSOR_TEST, GL_FOG, GL_TEXTURE_1D, GL_TEXTURE_2D,
-                              GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP, GL_TEXTURE_RECTANGLE_EXT};
+                              GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP, GL_TEXTURE_RECTANGLE_ARB};
 const size_t MODE_NAMES_COUNT = sizeof (MODE_NAMES) / sizeof (*MODE_NAMES);
 
 struct RenderBufferTempState

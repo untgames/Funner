@@ -1,8 +1,5 @@
-#ifndef RENDER_GL_DRIVER_SWAP_CHAIN_MANAGER_HEADER
-#define RENDER_GL_DRIVER_SWAP_CHAIN_MANAGER_HEADER
-
-#include <render/low_level/driver.h>
-#include <shared/platform/output_manager.h>
+#ifndef RENDER_GL_DRIVER_LIBRARY_HEADER
+#define RENDER_GL_DRIVER_LIBRARY_HEADER
 
 namespace render
 {
@@ -14,21 +11,28 @@ namespace opengl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Менеджер цепочек обмена
+///Флаги поиска точки входа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SwapChainManager
+enum EntrySearch
+{
+  EntrySearch_Library = 1, //искать в библиотеке
+  EntrySearch_Context = 2, //искать в контексте
+  EntrySearch_NoThrow = 4, //без исключений, возвращать 0 в случае ошибки    
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Интерфейс запроса точек входа OpenGL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class ILibrary
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание цепочки обмена
+///Получение адреса точки входа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static ISwapChain* CreateSwapChain (OutputManager& output_manager, const SwapChainDesc& swap_chain_desc);
+    virtual const void* GetProcAddress (const char* name, size_t search_flags) = 0;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание PBuffer'а
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static ISwapChain* CreatePBuffer (ISwapChain* source_chain, const SwapChainDesc& pbuffer_desc);
-    static ISwapChain* CreatePBuffer (ISwapChain* source_chain);
+  protected:
+    virtual ~ILibrary () {}
 };
 
 }
@@ -38,3 +42,4 @@ class SwapChainManager
 }
 
 #endif
+

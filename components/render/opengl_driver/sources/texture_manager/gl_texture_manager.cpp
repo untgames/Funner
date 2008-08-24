@@ -347,7 +347,7 @@ struct TextureManager::Impl: public ContextObject
       if (is_pot || caps.has_arb_texture_non_power_of_two)
         return new Texture1D (GetContextManager (), desc);
 
-      if (caps.has_ext_texture_rectangle)
+      if (caps.has_arb_texture_rectangle)
       {
         if (desc.width > caps.max_rectangle_texture_size)
           throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, caps.max_rectangle_texture_size);
@@ -383,7 +383,7 @@ struct TextureManager::Impl: public ContextObject
       if (is_pot || caps.has_arb_texture_non_power_of_two)
         return new Texture2D (GetContextManager (), desc);
 
-      if (caps.has_ext_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
+      if (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
       {
         if (desc.width > caps.max_rectangle_texture_size || desc.height > caps.max_rectangle_texture_size)
           throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 2D texture %ux%u (maximum texture size is %u)", desc.width, desc.height, caps.max_rectangle_texture_size);

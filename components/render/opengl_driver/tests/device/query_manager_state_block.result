@@ -1,0 +1,7 @@
+Results of query_manager_state_block_test:
+after reset
+GetPredicate: 0
+GetPredicateValue: 0
+after apply
+GetPredicate: 1
+GetPredicateValue: 1

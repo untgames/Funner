@@ -59,17 +59,13 @@ struct Test
   typedef xtl::function<void (Test&)> CallbackFn;
 
   syslib::Window window;
-  DriverPtr      driver;
   SwapChainPtr   swap_chain;
   DevicePtr      device;
   CallbackFn     redraw;
 
   Test (const wchar_t* title, const CallbackFn& in_redraw, const char* init_string="") :
-    window (syslib::WindowStyle_Overlapped, 1024, 768), driver (DriverManager::FindDriver ("OpenGL")), redraw (in_redraw)
+    window (syslib::WindowStyle_Overlapped, 1024, 768), redraw (in_redraw)
   {
-    if (!driver)
-      throw xtl::format_operation_exception ("Test::Test", "OpenGL driver not found");
-  
     window.SetTitle (title);
 
     SwapChainDesc desc;
@@ -87,8 +83,7 @@ struct Test
     desc.fullscreen                = true;
     desc.window_handle             = window.Handle ();
 
-    swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);
-    device     = DevicePtr (driver->CreateDevice (&*swap_chain, init_string), false);    
+    DriverManager::CreateSwapChainAndDevice ("OpenGL", "*", desc, init_string, swap_chain, device);
 
     OnResize ();
     

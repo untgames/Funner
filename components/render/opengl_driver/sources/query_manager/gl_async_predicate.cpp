@@ -133,7 +133,7 @@ void AsyncPredicate::MakeCurrentContextParent ()
   ContextManager& manager = GetContextManager ();
 
   if (manager.GetContextId () != parent_context)
-    manager.SetContext (parent_context, 0, 0); 
+    manager.SetContext (parent_context, 0); 
 
   MakeContextCurrent ();
 }

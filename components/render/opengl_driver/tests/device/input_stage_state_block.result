@@ -1,0 +1,23 @@
+Results of input_stage_state_block_test:
+after reset
+ISGetInputLayout: 0
+ISGetIndexBuffer: 0
+ISGetVertexBuffer(0): 0
+ISGetVertexBuffer(1): 0
+ISGetVertexBuffer(2): 0
+ISGetVertexBuffer(3): 0
+ISGetVertexBuffer(4): 0
+ISGetVertexBuffer(5): 0
+ISGetVertexBuffer(6): 0
+ISGetVertexBuffer(7): 0
+after apply
+ISGetInputLayout: 1
+ISGetIndexBuffer: 1
+ISGetVertexBuffer(0): 1
+ISGetVertexBuffer(1): 1
+ISGetVertexBuffer(2): 1
+ISGetVertexBuffer(3): 0
+ISGetVertexBuffer(4): 1
+ISGetVertexBuffer(5): 1
+ISGetVertexBuffer(6): 1
+ISGetVertexBuffer(7): 1

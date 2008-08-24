@@ -11,6 +11,8 @@
 #include <render/low_level/driver.h>
 #include <render/low_level/debug.h>
 
+#include <stl/vector>
+
 #include <xtl/intrusive_ptr.h>
 
 using namespace render::low_level;

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-OutputMode Mode = OutputMode_Default;
+size_t output_mode = OutputMode_Default;
 
 void print_input_layout_desc(const InputLayoutDesc& desc)
 {
@@ -15,7 +15,8 @@ void print_input_layout_desc(const InputLayoutDesc& desc)
   printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
   printf(" %-10s  | %-24s | %-24s | %-36s | %-4s | %-8d | %-6s\n",
     buffer_names[0], get_name(desc.index_type), filler, filler, filler, desc.index_buffer_offset, filler);
-  for (int i = 0; i < desc.vertex_attributes_count; i++)
+
+  for (size_t i = 0; i < desc.vertex_attributes_count; i++)
   {
     printf(" %-10s  | %-24s | %-24s | %-36s | %-4d | %-8d | %-6d\n",
       buffer_names[i + 1],
@@ -37,17 +38,20 @@ void test_input_layout_desc(const InputLayoutDesc& desc, IDevice* device)
   {
     device->ISSetInputLayout(device->CreateInputLayout(desc));
     device->Draw(PrimitiveType_PointList, 0, 0);
-    if (Mode != OutputMode_FailOnly)
+    
+    if (output_mode & OutputMode_Success)
     {
-      print_input_layout_desc(desc);
-      printf("Testing... OK\n");
+      print_input_layout_desc (desc);
+
+      printf ("Testing... OK\n");
     }
   }
   catch (std::exception& exception)
   {
-    if (Mode != OutputMode_SuccessOnly)
+    if (output_mode & OutputMode_Fail)
     {
-      print_input_layout_desc(desc);
+      print_input_layout_desc (desc);
+      
       printf ("Testing... FAIL! exception: %s\n", exception.what ());
     }
   }
@@ -61,7 +65,7 @@ int main ()
   {
     Test test (L"OpenGL device test window (all_input_states_test)");
     
-    Mode = test.log_mode;
+    output_mode = test.log_mode;
     
     InputLayoutDesc desc;
     BufferDesc index, vertex;
@@ -80,7 +84,7 @@ int main ()
     desc.vertex_attributes = attribs;
     desc.vertex_attributes_count = 2;
     
-    for (int i = 0; i < desc.vertex_attributes_count; i++)
+    for (size_t i = 0; i < desc.vertex_attributes_count; i++)
     {
       attribs[i].slot = 0;
       attribs[i].offset = 0;

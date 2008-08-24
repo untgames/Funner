@@ -192,53 +192,44 @@ ITexture* FrameBufferManager::CreateDepthStencilBuffer (ISwapChain* swap_chain)
     Установка активного буфера кадра
 */
 
-void FrameBufferManager::SetFrameBuffer
- (size_t      context_id,
-  ISwapChain* draw_swap_chain,
-  GLenum      draw_buffer_type,
-  ISwapChain* read_swap_chain,
-  GLenum      read_buffer_type)
+void FrameBufferManager::SetFrameBuffer (size_t context_id, ISwapChain* swap_chain, GLenum buffer_type)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::SetFrameBuffer(size_t,ISwapChain*,...)";
+  static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::SetFrameBuffer(size_t,ISwapChain*,GLenum)";
   
-  if (!draw_swap_chain)
-    draw_buffer_type = GL_NONE;
-    
-  if (!read_swap_chain)
-    read_buffer_type = GL_NONE;
-    
+  if (!swap_chain)
+    buffer_type = GL_NONE;
+
     //установка активного контекста
 
   ContextManager& context_manager = impl->GetContextManager ();        
 
-  context_manager.SetContext (context_id, draw_swap_chain, read_swap_chain);    
+  context_manager.SetContext (context_id, swap_chain);
 
     //проверка необходимости переустановки буфера
 
-  ContextDataTable &state_cache              = context_manager.GetContextDataTable (Stage_Output);
-  size_t           &current_draw_buffer_type = state_cache [OutputStageCache_DrawBufferAttachment],
-                   &current_read_buffer_type = state_cache [OutputStageCache_ReadBufferAttachment],
-                   &current_fbo              = state_cache [OutputStageCache_FrameBufferId];
+  ContextDataTable &state_cache         = context_manager.GetContextDataTable (Stage_Output);
+  size_t           &current_buffer_type = state_cache [OutputStageCache_BufferAttachment],
+                   &current_fbo         = state_cache [OutputStageCache_FrameBufferId];
 
-  if (current_draw_buffer_type == draw_buffer_type && current_read_buffer_type == read_buffer_type && !current_fbo)
+  if (current_buffer_type == buffer_type && !current_fbo)
     return;
 
     //установка текущего контекста OpenGL
 
   context_manager.MakeContextCurrent ();
-  
+
     //установка буфера кадра по умолчанию
-    
+
   if (context_manager.GetCaps().has_ext_framebuffer_object && current_fbo)
     glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
 
     //установка текущего буфера чтения и отрисовки
     
-  if (current_draw_buffer_type != draw_buffer_type)
-    glDrawBuffer (draw_buffer_type);
-    
-  if (current_read_buffer_type != read_buffer_type)
-    glReadBuffer (read_buffer_type);    
+  if (current_buffer_type != buffer_type)
+  {
+    glDrawBuffer (buffer_type);
+    glReadBuffer (buffer_type);
+  }
 
     //проверка ошибок
 
@@ -246,14 +237,8 @@ void FrameBufferManager::SetFrameBuffer
 
     //установка значений кэш-переменных  
     
-  current_fbo              = 0;
-  current_draw_buffer_type = draw_buffer_type;
-  current_read_buffer_type = read_buffer_type;
-}
-
-void FrameBufferManager::SetFrameBuffer (size_t context_id, ISwapChain* swap_chain, GLenum buffer_type)
-{
-  SetFrameBuffer (context_id, swap_chain, buffer_type, swap_chain, buffer_type);
+  current_fbo         = 0;
+  current_buffer_type = buffer_type;
 }
 
 void FrameBufferManager::SetFrameBuffer (size_t fbo_id, size_t cache_id)

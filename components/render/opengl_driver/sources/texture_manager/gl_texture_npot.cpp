@@ -9,7 +9,7 @@ using namespace render::low_level::opengl;
 */
 
 TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex_desc)
-  : Texture (manager, tex_desc, GL_TEXTURE_RECTANGLE_EXT, 1)
+  : Texture (manager, tex_desc, GL_TEXTURE_RECTANGLE_ARB, 1)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureNpot::TextureNpot";
 
@@ -29,12 +29,12 @@ TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex
          
     //проверка возможности создания текстуры
 
-  glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
+  glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_ARB, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
                 gl_format, gl_type, NULL);
   
   GLint width = 0;
 
-  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_EXT, 0, GL_TEXTURE_WIDTH, &width);
+  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_RECTANGLE_ARB, 0, GL_TEXTURE_WIDTH, &width);
 
   if (!width)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create rectangle texture %ux%ux%u@%s (proxy texture fail)", 
@@ -42,7 +42,7 @@ TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex
 
     //создание текстуры
 
-  glTexImage2D (GL_TEXTURE_RECTANGLE_EXT, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
+  glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
                 gl_format, gl_type, 0);
                 
     //проверка ошибок
@@ -69,7 +69,7 @@ void TextureNpot::SetUncompressedData
     throw xtl::format_not_supported_exception ("render::low_level::opengl::TextureNpot::SetUncompressedData",
       "Mip-mapping not supported for rectangle-textures (mip_level=%u)", mip_level);
 
-  glTexSubImage2D (GL_TEXTURE_RECTANGLE_EXT, 0, x, y, width, height, format, type, buffer);
+  glTexSubImage2D (GL_TEXTURE_RECTANGLE_ARB, 0, x, y, width, height, format, type, buffer);
 }
 
 void TextureNpot::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, size_t, const void*)

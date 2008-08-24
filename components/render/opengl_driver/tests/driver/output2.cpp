@@ -12,28 +12,36 @@ int main ()
     {
       printf ("OpenGL driver not found");
       return 0;
-    }
+    }    
     
     printf ("Driver:\n");
-    printf ("  description: '%s'\n", driver->GetDescription ());
-    printf ("  outputs count: %u\n", driver->GetOutputsCount ());
+    printf ("  description:   '%s'\n", driver->GetDescription ());
+    printf ("  adapters count: %u\n", driver->GetAdaptersCount ());
 
-    for (size_t i=0; i<driver->GetOutputsCount (); i++)
+    for (size_t i=0; i<driver->GetAdaptersCount (); i++)
     {
-      IOutput*       output     = driver->GetOutput (i);
-      IPropertyList* properties = output->GetProperties ();
-      
-      printf ("  output #%u: '%s'\n", i, output->GetName ());
+      IAdapter* adapter = driver->GetAdapter (i);
+
+      printf ("  adapter #%u:\n", i);
+      printf ("    outputs count: %u\n", adapter->GetOutputsCount ());
+
+      for (size_t j=0; j<adapter->GetOutputsCount (); j++)
+      {
+        IOutput* output = adapter->GetOutput (j);
+
+        printf ("    output #%u:\n", j);
+        printf ("      name: '%s'\n", output->GetName ());
+      }
     }
-    
-    if (!driver->GetOutputsCount ())
+
+    if (!driver->GetAdaptersCount () || !driver->GetAdapter (0)->GetOutputsCount ())
     {
       printf ("No output devices found\n");
       return 0;
     }
     
-    IOutput* output = driver->GetOutput (0);
-    
+    IOutput* output = driver->GetAdapter (0)->GetOutput (0);
+
     OutputModeDesc mode_desc;
     
     output->GetCurrentMode (mode_desc);

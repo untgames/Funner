@@ -19,7 +19,7 @@ namespace
 //определние бага функции glGetTexImage при работе с 3D-текстурой
 bool detect_texture3d_bug ()
 {
-  if (!GLEW_VERSION_1_2 && !GLEW_EXT_texture3D)
+  if (!glTexImage3D && !glTexImage3DEXT)
     return false;
 
   static const size_t TEX_SIZE = 2, MAX_TEXEL_SIZE = 8, RGB_TEXEL_SIZE = 3;  
@@ -50,8 +50,10 @@ bool detect_texture3d_bug ()
   glPixelStorei (GL_UNPACK_SKIP_IMAGES,  0);
   glPixelStorei (GL_UNPACK_IMAGE_HEIGHT, 0);  
     
-  glTexImage3D  (GL_TEXTURE_3D, 0, GL_RGB, TEX_SIZE, TEX_SIZE, TEX_SIZE, 0, GL_RGB, GL_UNSIGNED_BYTE, src_buffer);
-  glGetTexImage (GL_TEXTURE_3D, 0, GL_RGB, GL_UNSIGNED_BYTE, dst_buffer);
+  PFNGLTEXIMAGE3DPROC glTexImage3D_fn = glTexImage3D ? glTexImage3D : (PFNGLTEXIMAGE3DPROC)glTexImage3DEXT;
+  
+  glTexImage3D_fn (GL_TEXTURE_3D, 0, GL_RGB, TEX_SIZE, TEX_SIZE, TEX_SIZE, 0, GL_RGB, GL_UNSIGNED_BYTE, src_buffer);
+  glGetTexImage   (GL_TEXTURE_3D, 0, GL_RGB, GL_UNSIGNED_BYTE, dst_buffer);
 
   glDeleteTextures (1, &texture_id);  
 

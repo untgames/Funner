@@ -54,12 +54,14 @@ typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 // режим вывода логов
 enum OutputMode
 {
-  OutputMode_All,
-  OutputMode_SuccessOnly,
-  OutputMode_FailOnly,
-  
-  OutputMode_Default = OutputMode_All,
-  
+  OutputMode_Success     = 1,
+  OutputMode_Fail        = 2,
+  OutputMode_SuccessOnly = OutputMode_Success,
+  OutputMode_FailOnly    = OutputMode_Fail,
+  OutputMode_All         = OutputMode_Success | OutputMode_Fail,  
+
+  OutputMode_Default = 0,
+
   OutputMode_Num
 };
 
@@ -67,19 +69,14 @@ enum OutputMode
 struct Test
 {
   syslib::Window window;
-  DriverPtr      driver;
   SwapChainPtr   swap_chain;
   DevicePtr      device;
-  OutputMode     log_mode;
+  size_t         log_mode;
   
   Test (const wchar_t* title, const char* init_string="") :
-    window (syslib::WindowStyle_Overlapped, 400, 400), driver (DriverManager::FindDriver ("OpenGL"))
+    window (syslib::WindowStyle_Overlapped, 640, 480)
   {
-    if (!driver)
-      throw xtl::format_operation_exception ("Test::Test", "OpenGL driver not found");
-
     window.SetTitle (title);
-//    window.Hide ();
 
     SwapChainDesc desc;
 
@@ -93,25 +90,21 @@ struct Test
     desc.samples_count             = 0;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = false;
-    desc.fullscreen                = true;
+    desc.fullscreen                = false;
     desc.window_handle             = window.Handle ();
 
-    swap_chain = SwapChainPtr (driver->CreateSwapChain (desc), false);
-    device     = DevicePtr (driver->CreateDevice (&*swap_chain, init_string), false);    
-    
-    char* modestr = getenv("TestResultOutputMode");
-  
+    DriverManager::CreateSwapChainAndDevice ("OpenGL", "*", desc, init_string, swap_chain, device);
+
+    log_mode = OutputMode_Default;
+
+    char* modestr = getenv ("TestResultOutputMode");
+
     if (modestr)
     {
-      if (!stricmp(modestr, "All"))
-        log_mode =  OutputMode_All;
-      if (!stricmp(modestr, "Success"))
-        log_mode = OutputMode_SuccessOnly;
-      if (!stricmp(modestr, "Failure"))
-        log_mode = OutputMode_FailOnly;
+      if (!xtl::xstricmp (modestr, "All"))     log_mode = OutputMode_All;
+      if (!xtl::xstricmp (modestr, "Success")) log_mode = OutputMode_SuccessOnly;
+      if (!xtl::xstricmp (modestr, "Failure")) log_mode = OutputMode_FailOnly;
     }
-    else
-      log_mode = OutputMode_Default;
   }
 };
 
