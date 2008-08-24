@@ -9,17 +9,18 @@
 #include <xtl/connection.h>
 #include <xtl/shared_ptr.h>
 
+#include <common/file.h>
+#include <common/log.h>
+#include <common/strlib.h>
+#include <common/var_registry_container.h>
+
+#include <mathlib.h>
+#include <math/io.h>
+
 #include <script/bind_libraries.h>
 #include <script/environment.h>
 #include <script/bind.h>
 #include <script/shell.h>
-
-#include <common/file.h>
-#include <common/log.h>
-#include <common/strlib.h>
-
-#include <mathlib.h>
-#include <math/io.h>
 
 using namespace script;
 using namespace script::binds;

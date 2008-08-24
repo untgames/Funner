@@ -1,0 +1,11 @@
+Results of common_string_tree_test:
+Test library:
+Branch name = 
+IsOpened = 0
+Has a = 0
+Branch name = branch
+IsOpened = 1
+Has a = 1
+a = 1
+Has a = 1
+Has a = 0
