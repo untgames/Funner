@@ -28,7 +28,7 @@ struct Driver::RendererEntry
                  size_t                          swap_chains_count,
                  render::low_level::ISwapChain** swap_chains)
     : renderer_name (in_renderer_name),
-      renderer (new RendererDispatch (device, swap_chains_count, swap_chains))
+      renderer (new RendererDispatch (device, swap_chains_count, swap_chains), false)
     {}
 };
 
