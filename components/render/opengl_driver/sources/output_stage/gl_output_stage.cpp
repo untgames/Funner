@@ -501,7 +501,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
         
           //настройка параметров очистки буфера трафарета
 
-        if (clear_flags & ClearFlag_Stencil)
+/*        if (clear_flags & ClearFlag_Stencil)
         {
           if (context_cache [OutputStageCache_ClearStencilValue] != stencil)
           {
@@ -518,7 +518,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
           }                    
 
           mask |= GL_STENCIL_BUFFER_BIT;
-        }
+        }*/
         
           //настройка области отсечения
           

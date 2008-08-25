@@ -1,14 +1,16 @@
 #ifndef RENDER_MID_LEVEL_DEBUG_DRIVER_SHARED_HEADER
 #define RENDER_MID_LEVEL_DEBUG_DRIVER_SHARED_HEADER
 
-#include <stl/vector>
+#include <stl/algorithm>
 #include <stl/list>
+#include <stl/vector>
 
 #include <xtl/reference_counter.h>
 #include <xtl/function.h>
 #include <xtl/string.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/iterator.h>
 
 #include <common/log.h>
 #include <common/component.h>
@@ -107,6 +109,45 @@ class RenderTarget: virtual public IRenderTarget, public Object
   private:
     size_t           width, height;
     RenderTargetType type;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Буфер рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class RenderBuffer: public RenderTarget
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    RenderBuffer  (size_t width, size_t height, RenderTargetType type);
+    ~RenderBuffer ();
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Буфер кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class FrameBuffer: virtual public IFrameBuffer, public Object
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FrameBuffer  ();
+    ~FrameBuffer ();
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение буфера цвета и буфера попиксельного отсечения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IRenderTarget* GetColorBuffer        ();
+    IRenderTarget* GetDepthStencilBuffer ();
+    
+  private:
+    typedef xtl::com_ptr<IRenderTarget> RenderTargetPtr;
+
+  private:
+    RenderTargetPtr color_buffer;
+    RenderTargetPtr depth_stencil_buffer;    
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,15 +262,10 @@ class BasicRenderer: virtual public IRenderer, public Object
     const char* GetDescription ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество буферов кадра
+///Перебор буферов кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetFrameBuffersCount ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение буфера цвета и буфера попиксельного отсечения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    IRenderTarget* GetColorBuffer        (size_t frame_buffer_index);
-    IRenderTarget* GetDepthStencilBuffer (size_t frame_buffer_index);
+    size_t        GetFrameBuffersCount ();
+    IFrameBuffer* GetFrameBuffer       (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
@@ -255,15 +291,23 @@ class BasicRenderer: virtual public IRenderer, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void DrawFrames   ();
     void CancelFrames ();
-    
-  private:
-    typedef xtl::com_ptr<IRenderTarget> RenderTargetPtr;
-    typedef xtl::com_ptr<BasicFrame>    FramePtr;
-    typedef stl::list<FramePtr>         FrameList;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Подписка на события системы рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AttachListener (IRendererListener*);
+    void DetachListener (IRendererListener*);
 
   private:
-    RenderTargetPtr     color_buffer;
-    RenderTargetPtr     depth_stencil_buffer;
+    typedef xtl::com_ptr<BasicFrame>        FramePtr;
+    typedef stl::list<FramePtr>             FrameList;
+    typedef xtl::com_ptr<FrameBuffer>       FrameBufferPtr;
+    typedef stl::vector<FrameBufferPtr>     FrameBufferArray;
+    typedef stl::vector<IRendererListener*> ListenerArray;
+
+  private:
+    FrameBufferPtr      frame_buffer;
+    ListenerArray       listeners;
     FrameList           frames;
     FrameList::iterator frame_position;
     size_t              frames_count;

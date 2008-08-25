@@ -7,17 +7,27 @@ using namespace render::mid_level::debug;
     Конструктор
 */
 
-BasicRenderer::BasicRenderer ()  
+BasicRenderer::BasicRenderer ()
   : frame_position (frames.end ()),
     frames_count (0),
     frame_id (0)
 {
-  color_buffer         = RenderTargetPtr (CreateRenderBuffer (SCREEN_WIDTH, SCREEN_HEIGHT), false);
-  depth_stencil_buffer = RenderTargetPtr (CreateDepthStencilBuffer (SCREEN_WIDTH, SCREEN_HEIGHT), false);  
+  frame_buffer = FrameBufferPtr (new FrameBuffer, false);
 }
 
 BasicRenderer::~BasicRenderer ()
 {
+    //оповещение об удалении буфера кадра
+    
+  try
+  {
+    for (ListenerArray::iterator iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
+      (*iter)->OnFrameBufferDestroy (frame_buffer.get ());
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
 /*
@@ -30,7 +40,7 @@ const char* BasicRenderer::GetDescription ()
 }
 
 /*
-    Количество буферов кадра
+    Перебор буферов кадра
 */
 
 size_t BasicRenderer::GetFrameBuffersCount ()
@@ -38,56 +48,14 @@ size_t BasicRenderer::GetFrameBuffersCount ()
   return 1;
 }
 
-/*
-    Получение буфера цвета и буфера попиксельного отсечения
-*/
-
-IRenderTarget* BasicRenderer::GetColorBuffer (size_t frame_buffer_index)
+IFrameBuffer* BasicRenderer::GetFrameBuffer (size_t index)
 {
-  if (frame_buffer_index)
-    throw xtl::make_range_exception ("render::mid_level::debug::BasicRenderer::GetColorBuffer", "frame_buffer_index", frame_buffer_index, 1u);
-
-  return color_buffer.get ();
-}
-
-IRenderTarget* BasicRenderer::GetDepthStencilBuffer (size_t frame_buffer_index)
-{
-  if (frame_buffer_index)
-    throw xtl::make_range_exception ("render::mid_level::debug::BasicRenderer::GetDepthStencilBuffer", "frame_buffer_index", frame_buffer_index, 1u);
-
-  return depth_stencil_buffer.get ();
+  return frame_buffer.get ();
 }
 
 /*
     Создание ресурсов
 */
-
-namespace
-{
-
-//буфер рендеринга
-class RenderBuffer: public RenderTarget
-{
-  public:
-    RenderBuffer (size_t width, size_t height, RenderTargetType type) : RenderTarget (width, height, type)
-    {
-      log.Printf ("Create %s %ux%u (id=%u)", type == RenderTargetType_Color ? "color-buffer" : "depth-stencil-buffer", width, height, Id ());
-    }
-    
-    ~RenderBuffer ()
-    {
-      try
-      {
-        log.Printf ("Destroy %s (id=%u)", GetType () == RenderTargetType_Color ? "color-buffer" : "depth-stencil-buffer", Id ());
-      }
-      catch (...)
-      {
-        //подавление всех исключений
-      }      
-    }
-};
-
-}
 
 IRenderTarget* BasicRenderer::CreateDepthStencilBuffer (size_t width, size_t height)
 {
@@ -196,4 +164,18 @@ void BasicRenderer::CancelFrames ()
   frames_count   = 0;
   
   log.Printf ("Renderer cancel frames (id=%u)", Id ());
+}
+
+/*
+    Подписка на события системы рендеринга
+*/
+
+void BasicRenderer::AttachListener (IRendererListener* listener)
+{
+  listeners.push_back (listener);
+}
+
+void BasicRenderer::DetachListener (IRendererListener* listener)
+{
+  listeners.erase (stl::remove (listeners.begin (), listeners.end (), listener), listeners.end ());
 }

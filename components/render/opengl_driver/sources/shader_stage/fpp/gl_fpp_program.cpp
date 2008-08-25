@@ -341,11 +341,7 @@ class FppProgramParser
       
       for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
       {
-        char light_name [32];
-        
-        xtl::xsnprintf (light_name, sizeof light_name, "Light%u", i);
-        
-        Parser::Iterator light_iter = program_iter->First (light_name);
+        Parser::Iterator light_iter = program_iter->First ("Light");
 
         if (light_iter)
           ParseLight (light_iter, offsetof (FppState, lights [i]));

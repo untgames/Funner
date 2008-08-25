@@ -235,7 +235,16 @@ struct ContextManager::Impl: public xtl::reference_counter
 
         //создание контекста
 
-      IContext*      shared_context = context_map.empty () ? (IContext*)0 : &context_map.begin ()->second->GetContext (); 
+      IContext* shared_context = 0;
+
+      if (!context_map.empty ())
+      {
+        IContext* context = &context_map.begin ()->second->GetContext ();
+        
+        if (!context->IsCompatible (swap_chain))
+          shared_context = context;
+      }
+      
       ContextImplPtr new_context (new ContextImpl (swap_chain, shared_context), false);
 
         //проверка поддержки требуемых расширений и версий

@@ -365,6 +365,7 @@ struct MyShaderParameters
   math::mat4f object_tm; 
   math::mat4f view_tm;
   math::mat4f proj_tm;
+  math::vec3f light_pos;
 };
 
 ModelPtr load_model (const DevicePtr& device, const char* file_name)
@@ -433,10 +434,12 @@ void idle (Test& test)
   
   cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
   
-  angle+=50.0f*dt;
+  angle += 0.5f*dt;
 
-  my_shader_parameters.object_tm = math::rotatef (math::deg2rad (angle), 0, 0, 1) * 
-                                   math::rotatef (math::deg2rad (angle*0.2f), 1, 0, 0);                                   
+//  my_shader_parameters.object_tm = math::rotatef (angle, 0, 0, 1) * 
+//                                   math::rotatef (angle*0.2f, 1, 0, 0);
+
+  my_shader_parameters.light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
 
   cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
  
@@ -488,6 +491,7 @@ int main ()
       {"myProjMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, proj_tm)},
       {"myViewMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, view_tm)},
       {"myObjectMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, object_tm)},
+      {"lightPos", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_pos)},      
     };
     
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};

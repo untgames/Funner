@@ -31,7 +31,7 @@ int main ()
     viewport.width  = 100;
     viewport.height = 100;
     
-    frame1->SetRenderTargets (renderer->GetColorBuffer (0), renderer->GetDepthStencilBuffer (0));
+    frame1->SetRenderTargets (renderer->GetFrameBuffer (0)->GetColorBuffer (), renderer->GetFrameBuffer (0)->GetDepthStencilBuffer ());
     frame1->SetViewport      (viewport);
     
       //рисование

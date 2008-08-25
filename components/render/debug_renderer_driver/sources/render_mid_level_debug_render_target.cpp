@@ -53,3 +53,25 @@ void RenderTarget::CaptureImage (media::Image& image)
       break;
   }
 }
+
+/*
+    Буфер рендеринга
+*/
+
+RenderBuffer::RenderBuffer (size_t width, size_t height, RenderTargetType type)
+  : RenderTarget (width, height, type)
+{
+  log.Printf ("Create %s %ux%u (id=%u)", type == RenderTargetType_Color ? "color-buffer" : "depth-stencil-buffer", width, height, Id ());
+}
+    
+RenderBuffer::~RenderBuffer ()
+{
+  try
+  {
+    log.Printf ("Destroy %s (id=%u)", GetType () == RenderTargetType_Color ? "color-buffer" : "depth-stencil-buffer", Id ());
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }      
+}

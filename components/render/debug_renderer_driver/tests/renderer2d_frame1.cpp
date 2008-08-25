@@ -70,7 +70,7 @@ int main ()
     viewport.width  = 100;
     viewport.height = 100;
     
-    frame->SetRenderTargets (renderer->GetColorBuffer (0), renderer->GetDepthStencilBuffer (0));
+    frame->SetRenderTargets (renderer->GetFrameBuffer (0)->GetColorBuffer (), renderer->GetFrameBuffer (0)->GetDepthStencilBuffer ());
     frame->SetViewport      (viewport);
             
     frame->AddPrimitive (primitive1.get ());
