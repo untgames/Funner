@@ -243,12 +243,17 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
 
   if (rguid == GUID_SysMouse)
   {
-    RenameObject (offsetof (DIMOUSESTATE, lX), "Mouse X Axis");
-    RenameObject (offsetof (DIMOUSESTATE, lY), "Mouse Y Axis");
-    RenameObject (offsetof (DIMOUSESTATE, lZ), "Mouse Z Axis");
-    RenameObject (offsetof (DIMOUSESTATE, rgbButtons[0]), "Mouse Button 0");
-    RenameObject (offsetof (DIMOUSESTATE, rgbButtons[1]), "Mouse Button 1");
-    RenameObject (offsetof (DIMOUSESTATE, rgbButtons[2]), "Mouse Button 2");
+    RenameObject (offsetof (DIMOUSESTATE2, lX), "Mouse X Axis");
+    RenameObject (offsetof (DIMOUSESTATE2, lY), "Mouse Y Axis");
+    RenameObject (offsetof (DIMOUSESTATE2, lZ), "Mouse Z Axis");
+    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[0]), "Mouse Button 1");
+    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[1]), "Mouse Button 2");
+    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[2]), "Mouse Button 3");
+    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[3]), "Mouse Button 4");
+    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[4]), "Mouse Button 5");
+    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[5]), "Mouse Button 6");
+    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[6]), "Mouse Button 7");
+    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[7]), "Mouse Button 8");
   }
 
   xtl::uninitialized_storage<char> initial_device_data (device_data_size);
