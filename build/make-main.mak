@@ -451,8 +451,8 @@ all: build check
 run: build
 build: create-dirs
 rebuild: clean build
-test: build
-check: build
+#test: build
+#check: build
 export-dirs: create-dirs
 #dist: check
 dist : export-dirs
