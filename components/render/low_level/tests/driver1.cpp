@@ -15,7 +15,7 @@ int main ()
     IDevice*    device     = 0;
     ISwapChain* swap_chain = 0;
     
-    DriverManager::CreateSwapChainAndDevice ("*_drv", swap_chain_desc, "", swap_chain, device);
+    DriverManager::CreateSwapChainAndDevice ("*_drv", "*", swap_chain_desc, "", swap_chain, device);
   }
   catch (std::exception& exception)
   {

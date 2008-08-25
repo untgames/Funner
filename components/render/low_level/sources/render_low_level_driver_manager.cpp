@@ -38,37 +38,157 @@ namespace low_level
 class DriverManagerImpl
 {
   public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация драйверов
-///////////////////////////////////////////////////////////////////////////////////////////////////    
-    void RegisterDriver   (const char* name, IDriver* driver);
-    void UnregisterDriver (const char* name);
-    void UnregisterAllDrivers ();
+///Регистрация драйвера
+    void RegisterDriver (const char* name, IDriver* driver)
+    {
+      static const char* METHOD_NAME = "render::low_level::DriverManager::RegisterDriver";
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+      if (!name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+      if (!driver)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "driver");
+
+      DriverMap::iterator iter = drivers.find (name);
+
+      if (iter != drivers.end ())
+        throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Driver with this name has been already registered");
+
+      drivers.insert_pair (name, driver);
+    }
+
+///Отмена регистрации драйвера
+    void UnregisterDriver (const char* name)
+    {
+      if (!name)
+        return;
+        
+      drivers.erase (name);
+    }
+
+///Отмена регистрации всех драйверов
+    void UnregisterAllDrivers ()
+    {
+      drivers.clear ();
+    }
+
 ///Поиск драйвера по имени
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    IDriver* FindDriver (const char* name);
+    IDriver* FindDriver (const char* name)
+    {
+      if (!name)
+        return 0;
+        
+      LoadDefaultDrivers ();
+        
+      DriverMap::iterator iter = drivers.find (name);
+      
+      return iter != drivers.end () ? get_pointer (iter->second) : 0;
+    }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание цепочки обмена
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISwapChain* CreateSwapChain (const char* driver_mask, const SwapChainDesc& swap_chain_desc);
+///Создание адаптера
+    IAdapter* CreateAdapter (const char* driver_name, const char* adapter_name, const char* path)
+    {
+      static const char* METHOD_NAME = "render::low_level::DriverManagerImpl::CreateAdapter";
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+        //проверка корректности аргументов
+
+      if (!driver_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "driver_name");
+
+        //загрузка драйверов "по умолчанию"
+        
+      LoadDefaultDrivers ();
+      
+        //поиск драйвера
+        
+      DriverMap::iterator iter = drivers.find (driver_name);
+      
+      if (iter == drivers.end ())
+        throw xtl::make_argument_exception (METHOD_NAME, "driver_name", driver_name, "Driver not registered");
+        
+        //создание адаптера
+
+      return iter->second->CreateAdapter (adapter_name, path);
+    }
+
 ///Создание устройства отрисовки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void CreateSwapChainAndDevice (const char*               driver_mask,     //маска имени драйвера
-                                   const SwapChainDesc&      swap_chain_desc, //дескриптор цепочки обмена
-                                   const char*               init_string,     //строка инициализации
-                                   xtl::com_ptr<ISwapChain>& out_swap_chain,  //результирующая цепочка обмена
-                                   xtl::com_ptr<IDevice>&    out_device);     //результирующее устройство отрисовки
+    void CreateSwapChainAndDevice
+     (const char*               driver_mask,     //маска имени драйвера
+      const char*               adapter_mask,    //маска имени адаптера
+      const SwapChainDesc&      swap_chain_desc, //дескриптор цепочки обмена
+      const char*               init_string,     //строка инициализации
+      xtl::com_ptr<ISwapChain>& out_swap_chain,  //результирующая цепочка обмена
+      xtl::com_ptr<IDevice>&    out_device)      //результирующее устройство отрисовки
+    {
+        //проверка корректности аргументов
+
+      if (!driver_mask)
+        driver_mask = "*";
+        
+      if (!adapter_mask)
+        adapter_mask = "*";
+
+      if (!init_string)
+        init_string = "";
+        
+        //загрузка драйверов "по умолчанию"
+        
+      LoadDefaultDrivers ();
+        
+        //поиск драйвера
+        
+      typedef stl::vector<IAdapter*> AdapterArray;
+
+      AdapterArray adapters;        
+
+      for (DriverMap::iterator iter=drivers.begin (), end=drivers.end (); iter != end; ++iter)
+        if (wcimatch (iter->first.c_str (), driver_mask))
+        {
+          DriverPtr driver = iter->second;
+          
+            //поиск предпочтительных адаптеров            
+
+          adapters.clear   ();
+          adapters.reserve (driver->GetAdaptersCount ());
+
+          for (size_t i=0, count=driver->GetAdaptersCount (); i<count; i++)
+          {
+            IAdapter*   adapter      = driver->GetAdapter (i);
+            const char* adapter_name = "";
+
+            if (!adapter || !(adapter_name = adapter->GetName ()))
+              continue; //проверка корректности параметров адаптера
+              
+            if (!wcimatch (adapter_name, adapter_mask))
+              continue;
+              
+            adapters.push_back (adapter);              
+          }          
+          
+          if (!adapters.empty ())
+          {
+              //создание SwapChain и устройства отрисовки
+
+            xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc), false);
+            xtl::com_ptr<IDevice>    device (driver->CreateDevice (get_pointer (swap_chain), init_string), false);
+
+            out_swap_chain = swap_chain;
+            out_device     = device;
+
+            return;
+          }
+        }
+
+      throw xtl::format_operation_exception ("render::low_level::DriverManagerImpl::CreateSwapChainAndDevice",
+        "No match driver found (driver_mask='%s', adapter_mask='%s')", driver_mask, adapter_mask);      
+    }
 
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка драйверов по умолчанию
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadDefaultDrivers ();
+    void LoadDefaultDrivers ()
+    {
+      static ComponentLoader loader (DRIVER_COMPONENTS_MASK);
+    }
 
   private:
     typedef xtl::com_ptr<IDriver>      DriverPtr;
@@ -80,132 +200,6 @@ class DriverManagerImpl
 
 }
 
-}
-
-/*
-    Загрузка драйверов по умолчанию
-*/
-
-void DriverManagerImpl::LoadDefaultDrivers ()
-{
-  try
-  {
-    static ComponentLoader loader (DRIVER_COMPONENTS_MASK);
-  }
-  catch (...)
-  {
-  }
-}
-
-/*
-    Регистрация драйверов
-*/
-
-void DriverManagerImpl::RegisterDriver (const char* name, IDriver* driver)
-{
-  if (!name)
-    throw xtl::make_null_argument_exception ("render::low_level::DriverManager::RegisterDriver", "name");
-
-  if (!driver)
-    throw xtl::make_null_argument_exception ("render::low_level::DriverManager::RegisterDriver", "driver");
-
-  DriverMap::iterator iter = drivers.find (name);
-
-  if (iter != drivers.end ())
-    throw xtl::make_argument_exception ("render::low_level::DriverManager::RegisterDriver", "name", name,
-                          "Driver with this name has been already registered");
-
-  drivers.insert_pair (name, driver);
-}
-
-void DriverManagerImpl::UnregisterDriver (const char* name)
-{
-  if (!name)
-    return;
-    
-  drivers.erase (name);
-}
-
-void DriverManagerImpl::UnregisterAllDrivers ()
-{
-  drivers.clear ();
-}
-
-/*
-    Поиск драйвера по имени
-*/
-
-IDriver* DriverManagerImpl::FindDriver (const char* name)
-{
-  if (!name)
-    return 0;
-    
-  LoadDefaultDrivers ();
-    
-  DriverMap::iterator iter = drivers.find (name);
-  
-  return iter != drivers.end () ? get_pointer (iter->second) : 0;
-}
-
-/*
-    Создание цепочки обмена
-*/
-
-ISwapChain* DriverManagerImpl::CreateSwapChain (const char* driver_mask, const SwapChainDesc& swap_chain_desc)
-{
-  if (!driver_mask)
-    driver_mask = "*";
-    
-  LoadDefaultDrivers ();
-    
-    //поиск драйвера
-
-  for (DriverMap::iterator iter=drivers.begin (), end=drivers.end (); iter != end; ++iter)
-    if (wcimatch (iter->first.c_str (), driver_mask))
-      return iter->second->CreateSwapChain (swap_chain_desc); 
-
-  return 0;
-}
-
-/*
-    Создание устройства отрисовки
-*/
-
-void DriverManagerImpl::CreateSwapChainAndDevice
- (const char*               driver_mask,      //маска имени драйвера
-  const SwapChainDesc&      swap_chain_desc,  //дескриптор цепочки обмена
-  const char*               init_string,      //строка инициализации
-  xtl::com_ptr<ISwapChain>& out_swap_chain,   //результирующая цепочка обмена
-  xtl::com_ptr<IDevice>&    out_device)       //результирующее устройство отрисовки
-{
-  if (!driver_mask)
-    driver_mask = "*";
-    
-  if (!init_string)
-    init_string = "";
-    
-  LoadDefaultDrivers ();
-    
-    //поиск драйвера
-    
-  for (DriverMap::iterator iter=drivers.begin (), end=drivers.end (); iter != end; ++iter)
-    if (wcimatch (iter->first.c_str (), driver_mask))
-    {
-      DriverPtr driver = iter->second;
-
-        //создание SwapChain и устройства отрисовки
-
-      xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (swap_chain_desc), false);
-      xtl::com_ptr<IDevice>    device (driver->CreateDevice (get_pointer (swap_chain), init_string), false);      
-
-      out_swap_chain = swap_chain;
-      out_device     = device;
-
-      return;
-    }
-
-  throw xtl::format_operation_exception ("render::low_level::DriverManagerImpl::CreateSwapChainAndDevice",
-    "No match driver found (driver_mask='%s')", driver_mask);
 }
 
 /*
@@ -234,23 +228,25 @@ IDriver* DriverManager::FindDriver (const char* name)
   return DriverManagerSingleton::Instance ().FindDriver (name);
 }
 
-ISwapChain* DriverManager::CreateSwapChain (const char* driver_mask, const SwapChainDesc& swap_chain_desc)
+IAdapter* DriverManager::CreateAdapter (const char* driver_name, const char* adapter_name, const char* path)
 {
-  return DriverManagerSingleton::Instance ().CreateSwapChain (driver_mask, swap_chain_desc);
+  return DriverManagerSingleton::Instance ().CreateAdapter (driver_name, adapter_name, path);
 }
 
 void DriverManager::CreateSwapChainAndDevice
  (const char*               driver_mask,
+  const char*               adapter_mask,
   const SwapChainDesc&      swap_chain_desc,
   const char*               init_string,
   xtl::com_ptr<ISwapChain>& out_swap_chain,
   xtl::com_ptr<IDevice>&    out_device)
 {
-  DriverManagerSingleton::Instance ().CreateSwapChainAndDevice (driver_mask, swap_chain_desc, init_string, out_swap_chain, out_device);
+  DriverManagerSingleton::Instance ().CreateSwapChainAndDevice (driver_mask, adapter_mask, swap_chain_desc, init_string, out_swap_chain, out_device);
 }
 
 void DriverManager::CreateSwapChainAndDevice
  (const char*          driver_mask,
+  const char*          adapter_mask,
   const SwapChainDesc& swap_chain_desc,
   const char*          init_string,
   ISwapChain*&         out_swap_chain,
@@ -259,11 +255,11 @@ void DriverManager::CreateSwapChainAndDevice
   xtl::com_ptr<ISwapChain> swap_chain;
   xtl::com_ptr<IDevice>    device;
 
-  CreateSwapChainAndDevice (driver_mask, swap_chain_desc, init_string, swap_chain, device);
-  
+  CreateSwapChainAndDevice (driver_mask, adapter_mask, swap_chain_desc, init_string, swap_chain, device);
+
   swap_chain->AddRef ();
   device->AddRef ();
-  
+
   out_swap_chain = &*swap_chain;
   out_device     = &*device;
 }

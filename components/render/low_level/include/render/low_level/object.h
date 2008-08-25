@@ -2,7 +2,6 @@
 #define RENDER_LOW_LEVEL_OBJECT_HEADER
 
 #include <xtl/functional_fwd>
-#include <xtl/trackable.h> //убрать зависимость!!!
 
 namespace render
 {
@@ -20,6 +19,9 @@ class IPropertyList;
 class IObject
 {
   public:
+    typedef xtl::slot<void ()>     DestroyHandlerSlot;
+    typedef xtl::function<void ()> DestroyHandler;
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение списка свойств объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,9 +41,9 @@ class IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация обработчиков события удаления объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual xtl::connection RegisterDestroyHandler (xtl::trackable::slot_type& handler) = 0;
-    virtual xtl::connection RegisterDestroyHandler (const xtl::trackable::function_type& handler) = 0;
-    virtual xtl::connection RegisterDestroyHandler (const xtl::trackable::function_type& handler, xtl::trackable& trackable) = 0;
+    virtual xtl::connection RegisterDestroyHandler (DestroyHandlerSlot& handler) = 0;
+    virtual xtl::connection RegisterDestroyHandler (const DestroyHandler& handler) = 0;
+    virtual xtl::connection RegisterDestroyHandler (const DestroyHandler& handler, xtl::trackable& trackable) = 0;
 
   protected:
     virtual ~IObject () {}

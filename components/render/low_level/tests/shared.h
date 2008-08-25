@@ -3,10 +3,11 @@
 
 #include <stdio.h>
 
-#include <xtl/intrusive_ptr.h>
-#include <xtl/function.h>
-#include <xtl/reference_counter.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/reference_counter.h>
+#include <xtl/trackable.h>
 
 #include <render/low_level/driver.h>
 #include <render/low_level/device.h>
@@ -95,6 +96,29 @@ class TestOutput: public IOutput, public ObjectImpl
     OutputModeDesc test_mode;
 };
 
+//тестовый адаптер
+class TestAdapter: public IAdapter, public ObjectImpl
+{
+  public:
+///Получение имени
+    const char* GetName () { return "TestAdapter"; }
+    
+///Получение пути
+    const char* GetPath () { return ""; }
+    
+///Получение описания
+    const char* GetDescription () { return "render::low_level::TestAdapter"; }
+    
+///Количество устройств вывода
+    size_t GetOutputsCount () { return 1; }
+    
+///Получение устройства вывода
+    IOutput* GetOutput (size_t) { return &output; }
+  
+  private:
+    TestOutput output;
+};
+
 //тестовый драйвер
 class TestDriver: public IDriver, public ObjectImpl
 {
@@ -105,25 +129,26 @@ class TestDriver: public IDriver, public ObjectImpl
     const char* GetDescription () { return "TestDriver"; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перечисление доступных устройств вывода
+///Перечисление доступных адаптеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t   GetOutputsCount () { return 1; }
-    IOutput* GetOutput       (size_t index) { return &output; }
+    size_t    GetAdaptersCount () { return 1; }
+    IAdapter* GetAdapter       (size_t) { return &adapter; }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание адаптера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IAdapter* CreateAdapter (const char*, const char*)
+    {
+      throw xtl::make_not_implemented_exception ("TestDriver::CreateAdapter");
+    }    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISwapChain* CreateSwapChain (const SwapChainDesc&)
+    ISwapChain* CreateSwapChain (size_t adapters_count, IAdapter**, const SwapChainDesc&)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateSwapChain");
-      return 0;
     }
-
-    ISwapChain* CreateSwapChain (IOutput*, const SwapChainDesc&)
-    {
-      throw xtl::make_not_implemented_exception ("TestDriver::CreateSwapChain");
-      return 0;
-    }    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание устройства отрисовки
@@ -149,7 +174,7 @@ class TestDriver: public IDriver, public ObjectImpl
     
   private:
     LogFunction log_fn;
-    TestOutput  output;
+    TestAdapter adapter;
 };
 
 #endif
