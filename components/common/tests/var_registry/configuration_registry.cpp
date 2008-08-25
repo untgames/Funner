@@ -12,10 +12,10 @@ void log_handler (const char* log_name, const char* event)
 
 int main ()
 {
+  printf ("Results of configuration_registry_test:\n");
+
   LogSystem::RegisterLogHandler ("*", &log_handler);
 
-  printf ("Results of configuration_registry_test:\n");
-  
   try
   {   
     VarRegistry registry (ConfigurationRegistry::BranchName ());
