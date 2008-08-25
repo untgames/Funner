@@ -76,6 +76,8 @@ bool rematch  (const char* string,const char* re_pattern, const char* flags="");
 bool wcmatch  (const char* string,const char* wildcard);
 bool wcimatch (const char* string,const char* wildcard);
 
+bool is_wildcard (const char* string);
+
 #include <common/detail/strlib.inl>
 
 }

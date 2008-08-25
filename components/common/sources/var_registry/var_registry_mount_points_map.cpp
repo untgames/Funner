@@ -6,6 +6,12 @@ using namespace xtl;
 namespace
 {
 
+/*
+   Константы
+*/
+
+const char* REGISTRY_COMPONENTS_MASK = "common.var_registries.*";
+
 //отсечение суффикса
 void remove_suffix (stl::string& s)
 {
@@ -314,6 +320,8 @@ void MountPointsMap::UnmountAll ()
 
 MountPoint* MountPointsMap::FindMountPoint (const char* full_var_name, stl::string& var_sub_name)
 {
+  static ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
+
   for (stl::string mount_point_name = full_var_name; !mount_point_name.empty (); )
   {
     MountMap::iterator iter = mount_points_map.find (mount_point_name.c_str ());

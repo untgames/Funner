@@ -35,3 +35,9 @@ case-insensetive:
 '' match ''
 '' not match 'hello world'
 'hello world' not match ''
+is_wildcard test:
+String 'not wildcard' is not wildcard
+String 'wildcard*' is wildcard
+String 'wildc?rd' is wildcard
+String 'w*ld?ard' is wildcard
+String '' is not wildcard

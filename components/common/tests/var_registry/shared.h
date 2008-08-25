@@ -15,6 +15,7 @@
 #include <xtl/reference_counter.h>
 #include <xtl/lexical_cast.h>
 
+#include <common/log.h>
 #include <common/var_registry.h>
 #include <common/var_registry_container.h>
 

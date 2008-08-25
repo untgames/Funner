@@ -14,11 +14,13 @@
 #include <xtl/string.h>
 #include <xtl/trackable.h>
 
+#include <common/component.h>
 #include <common/file.h>
 #include <common/parser.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 #include <common/var_registry.h>
+#include <common/var_registry_container.h>
 
 namespace common
 {

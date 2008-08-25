@@ -2,18 +2,22 @@ Results of component_manager_test:
 Before load
 Components:
   component 'common.file_systems.ZipFileSystem' unloaded
+  component 'common.var_registries.configuration_registry' unloaded
   component 'common.tests.MyComponent' unloaded
 Load MyComponent
 After load
 Components:
   component 'common.file_systems.ZipFileSystem' loaded
+  component 'common.var_registries.configuration_registry' loaded
   component 'common.tests.MyComponent' loaded
 Unload MyComponent
 Components:
   component 'common.file_systems.ZipFileSystem' unloaded
+  component 'common.var_registries.configuration_registry' unloaded
   component 'common.tests.MyComponent' unloaded
 After unregister
 Components:
   component 'common.file_systems.ZipFileSystem' unloaded
+  component 'common.var_registries.configuration_registry' unloaded
 After unregister all
 Components:

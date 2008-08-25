@@ -46,6 +46,12 @@ void load_xml_configurations (VarRegistry& registry, const char* file_mask)
   if (!file_mask)
     throw make_null_argument_exception (METHOD_NAME, "file_mask");
 
+  if (!is_wildcard (file_mask))
+  {
+    load_xml_configuration (registry, file_mask);
+    return;
+  }
+
   FileList config_files (FileSystem::Search (file_mask, FileSearch_Files));
 
   for (size_t i = 0; i < config_files.Size (); i++)

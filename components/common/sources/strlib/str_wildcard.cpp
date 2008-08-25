@@ -72,3 +72,11 @@ bool common::wcimatch (const char* s,const char* pattern)
 
   return true;
 }
+
+bool common::is_wildcard (const char* string)
+{
+  if (strstr (string, "*") || strstr (string, "?"))
+    return true;
+
+  return false;
+}

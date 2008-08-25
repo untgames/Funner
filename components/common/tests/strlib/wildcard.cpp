@@ -13,6 +13,11 @@ void itest (const char* s,const char* pattern)
   printf ("'%s' %s '%s'\n",s,wcimatch (s,pattern)?"match":"not match",pattern);
 }
 
+void is_wildcard_test (const char* s)
+{
+  printf ("String '%s' is %swildcard\n", s, is_wildcard (s) ? "" : "not ");
+}
+
 int main ()
 {
   printf ("Results of wildcard_test:\n");
@@ -46,6 +51,13 @@ int main ()
   itest ("","");
   itest ("",s);
   itest (s,"");    
+
+  const char* test_strings [] = {"not wildcard", "wildcard*", "wildc?rd", "w*ld?ard", "", 0};
+
+  printf ("is_wildcard test:\n");
+
+  for (const char** p = test_strings; *p ; p++)
+    is_wildcard_test (*p);
 
   return 0;
 }
