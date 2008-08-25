@@ -274,20 +274,20 @@ void RendererDispatch::DrawFrames ()
   if (frames.empty ())
     return;
     
-    //отрисовка кадров    
-
+    //отрисовка кадров
+    
   for (FrameList::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
   {
     (*iter)->Draw (device.get ());
-  }
+  }  
 
     //очистка списка кадров
 
   CancelFrames ();
 
-    //вывод сформированной картинки
+    //вывод сформированной картинки        
     
-  for (FrameBufferArray::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)
+  for (FrameBufferArray::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)  
     iter->swap_chain->Present ();
 }
 

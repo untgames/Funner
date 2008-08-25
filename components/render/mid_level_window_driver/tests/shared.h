@@ -6,6 +6,7 @@
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
 #include <xtl/exception.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/ref.h>
@@ -81,7 +82,7 @@ class BasicTest
       desc.swap_method             = render::low_level::SwapMethod_Discard;
       desc.window_handle           = window.Handle ();
 
-      render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, DEVICE_INIT_STRING, swap_chain, device);
+      render::low_level::DriverManager::CreateSwapChainAndDevice ("*", "*", desc, DEVICE_INIT_STRING, swap_chain, device);
       
         //регистрация системы визуализации
         
@@ -123,7 +124,7 @@ class BasicTest
         //установка размеров области вывода
 
       OnResize ();      
-    }
+    }    
     
 ///Получение объектов визуализации
     renderer2d::IRenderer* Renderer () { return renderer.get (); }
@@ -199,7 +200,7 @@ class BasicTest
       catch (std::exception& e)
       {
         printf ("redraw exception: %s\n", e.what ());
-      }    
+      }          
     }    
   
   private:
