@@ -111,6 +111,23 @@ class DriverManagerImpl
       return iter->second->CreateAdapter (adapter_name, path);
     }
 
+///Создание цепочки обмена
+    ISwapChain* CreateSwapChain
+     (const char*          driver_mask,     //маска имени драйвера
+      const char*          adapter_mask,    //маска имени адаптера
+      const SwapChainDesc& swap_chain_desc) //дескриптор цепочки обмена
+    {
+        //поиск драйвера
+        
+      AdapterArray adapters;        
+
+      DriverPtr driver = GetDriver (driver_mask, adapter_mask, adapters);
+
+        //создание SwapChain и устройства отрисовки
+
+      return driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc);
+    }
+
 ///Создание устройства отрисовки
     void CreateSwapChainAndDevice
      (const char*               driver_mask,     //маска имени драйвера
@@ -122,29 +139,48 @@ class DriverManagerImpl
     {
         //проверка корректности аргументов
 
+      if (!init_string)
+        init_string = "";
+        
+        //поиск драйвера
+        
+      AdapterArray adapters;        
+
+      DriverPtr driver = GetDriver (driver_mask, adapter_mask, adapters);
+
+        //создание SwapChain и устройства отрисовки
+
+      xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc), false);
+      xtl::com_ptr<IDevice>    device (driver->CreateDevice (get_pointer (swap_chain), init_string), false);
+
+      out_swap_chain = swap_chain;
+      out_device     = device;
+    }
+
+  private:
+    typedef stl::vector<IAdapter*> AdapterArray;
+
+///Получение драйвера
+    IDriver* GetDriver (const char* driver_mask, const char* adapter_mask, AdapterArray& adapters)
+    {
+        //проверка корректности аргументов
+
       if (!driver_mask)
         driver_mask = "*";
         
       if (!adapter_mask)
         adapter_mask = "*";
 
-      if (!init_string)
-        init_string = "";
-        
         //загрузка драйверов "по умолчанию"
         
       LoadDefaultDrivers ();
         
         //поиск драйвера
         
-      typedef stl::vector<IAdapter*> AdapterArray;
-
-      AdapterArray adapters;        
-
       for (DriverMap::iterator iter=drivers.begin (), end=drivers.end (); iter != end; ++iter)
         if (wcimatch (iter->first.c_str (), driver_mask))
         {
-          DriverPtr driver = iter->second;
+          IDriver* driver = iter->second.get ();
           
             //поиск предпочтительных адаптеров            
 
@@ -162,28 +198,17 @@ class DriverManagerImpl
             if (!wcimatch (adapter_name, adapter_mask))
               continue;
               
-            adapters.push_back (adapter);              
+            adapters.push_back (adapter);
           }          
           
           if (!adapters.empty ())
-          {
-              //создание SwapChain и устройства отрисовки
-
-            xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc), false);
-            xtl::com_ptr<IDevice>    device (driver->CreateDevice (get_pointer (swap_chain), init_string), false);
-
-            out_swap_chain = swap_chain;
-            out_device     = device;
-
-            return;
-          }
+            return driver;
         }
 
-      throw xtl::format_operation_exception ("render::low_level::DriverManagerImpl::CreateSwapChainAndDevice",
+      throw xtl::format_operation_exception ("render::low_level::DriverManagerImpl::GetDriver",
         "No match driver found (driver_mask='%s', adapter_mask='%s')", driver_mask, adapter_mask);      
     }
 
-  private:
 ///Загрузка драйверов по умолчанию
     void LoadDefaultDrivers ()
     {
@@ -231,6 +256,14 @@ IDriver* DriverManager::FindDriver (const char* name)
 IAdapter* DriverManager::CreateAdapter (const char* driver_name, const char* adapter_name, const char* path)
 {
   return DriverManagerSingleton::Instance ().CreateAdapter (driver_name, adapter_name, path);
+}
+
+ISwapChain* DriverManager::CreateSwapChain
+ (const char*          driver_mask,
+  const char*          adapter_mask,
+  const SwapChainDesc& swap_chain_desc)
+{
+  return DriverManagerSingleton::Instance ().CreateSwapChain (driver_mask, adapter_mask, swap_chain_desc);
 }
 
 void DriverManager::CreateSwapChainAndDevice
