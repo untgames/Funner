@@ -175,6 +175,10 @@ struct Node::Impl
       return;
 
       //определяем инвариантное пространство преобразований
+      
+    bool  need_transform_in_world_space = false;
+    vec3f old_world_position, old_world_scale;
+    quatf old_world_orientation;
 
     switch (invariant_space)
     {
@@ -182,7 +186,10 @@ struct Node::Impl
       case NodeTransformSpace_Local:
         break;
       case NodeTransformSpace_World:
-        throw xtl::make_not_implemented_exception ("scene_graph::Node::BindToParent (invariant_space=NodeTransformSpace_World)");
+        need_transform_in_world_space = true;
+        old_world_position            = this_node->WorldPosition ();
+        old_world_scale               = this_node->WorldScale ();
+        old_world_orientation         = this_node->WorldOrientation ();
         break;
       default:
         throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "invariant_space", invariant_space);
@@ -282,6 +289,28 @@ struct Node::Impl
         //установка текущей сцены
 
       SetScene (0);
+    }
+
+      //преобразование системы координат
+      
+    if (need_transform_in_world_space)
+    {           
+      this_node->BeginUpdate ();
+      
+      if (parent)
+      {
+        this_node->Translate (old_world_position - this_node->WorldPosition (), NodeTransformSpace_World);
+        this_node->Rotate    (old_world_orientation * invert (this_node->WorldOrientation ()), NodeTransformSpace_World);
+        this_node->Scale     (old_world_scale / this_node->WorldScale ());
+      }
+      else
+      {
+        this_node->SetPosition    (old_world_position);
+        this_node->SetOrientation (old_world_orientation);
+        this_node->SetScale       (old_world_scale);
+      }
+      
+      this_node->EndUpdate ();
     }
 
       //снятие блокировки на вызов BindToParent
