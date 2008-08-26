@@ -405,19 +405,19 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     {
       glEnable (GL_LIGHTING);
       
-      static bool start [FPP_MAX_LIGHTS_COUNT];
+//      static bool start [FPP_MAX_LIGHTS_COUNT];
 
       for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
       {
         const LightDesc& light    = fpp_state.lights [i];
         GLenum           light_id = GL_LIGHT0 + i;        
         
-        if (!start [i])
-        {
-          dump (light_id);
-
-          start [i] = true;
-        }
+//        if (!start [i])
+//        {
+//          dump (light_id);
+//
+//          start [i] = true;
+//        }
         
         if (!light.enable)
         {
@@ -429,22 +429,22 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
         glEnable  (light_id);
         glLightfv (light_id, GL_POSITION,              position);
-//        glLightfv (light_id, GL_SPOT_DIRECTION,        light.direction);
+        glLightfv (light_id, GL_SPOT_DIRECTION,        light.direction);
         glLightfv (light_id, GL_AMBIENT,               (GLfloat*)&light.ambient_color);
         glLightfv (light_id, GL_DIFFUSE,               (GLfloat*)&light.diffuse_color);
         glLightfv (light_id, GL_SPECULAR,              (GLfloat*)&light.specular_color);
-//        glLightf  (light_id, GL_SPOT_CUTOFF,           light.type != LightType_Point ? light.angle : 180.0f);
-//        glLightf  (light_id, GL_SPOT_EXPONENT,         light.exponent);
-//        glLightf  (light_id, GL_CONSTANT_ATTENUATION,  light.constant_attenuation);
-//        glLightf  (light_id, GL_LINEAR_ATTENUATION,    light.linear_attenuation);
-//        glLightf  (light_id, GL_QUADRATIC_ATTENUATION, light.quadratic_attenuation);
+        glLightf  (light_id, GL_SPOT_CUTOFF,           light.type != LightType_Point ? light.angle : 180.0f);
+        glLightf  (light_id, GL_SPOT_EXPONENT,         light.exponent);
+        glLightf  (light_id, GL_CONSTANT_ATTENUATION,  light.constant_attenuation);
+        glLightf  (light_id, GL_LINEAR_ATTENUATION,    light.linear_attenuation);
+        glLightf  (light_id, GL_QUADRATIC_ATTENUATION, light.quadratic_attenuation);
 
-    dump (light_id);
+//    dump (light_id);
 
       }
       
-//      glLightModeli (GL_LIGHT_MODEL_TWO_SIDE,     GL_TRUE);
-//      glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+      glLightModeli (GL_LIGHT_MODEL_TWO_SIDE,     GL_TRUE);
+      glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     }
     else
     {
@@ -478,7 +478,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
       //настройка передачи цвета материала
 
-/*    if (fpp_state.material.color_material == ColorMaterial_Explicit)
+    if (fpp_state.material.color_material == ColorMaterial_Explicit)
     {
       glDisable (GL_COLOR_MATERIAL);
     }
@@ -498,7 +498,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       
       glEnable        (GL_COLOR_MATERIAL);
       glColorMaterial (GL_FRONT_AND_BACK, mode);
-    }*/
+    }
 
       //включение параметров альфа-теста
 
@@ -533,7 +533,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
     //установка параметров текстурирования
     
-/*  if (current_texmaps_hash != texmaps_hash)
+  if (current_texmaps_hash != texmaps_hash)
   {    
     size_t *common_cache             = &GetContextManager ().GetContextDataTable (Stage_Common)[0],
            texture_units_count       = caps.has_arb_multitexture ? caps.texture_units_count : 1,
@@ -636,7 +636,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     else                           glDisable (GL_NORMALIZE);
 
     current_modes_hash = modes_hash;
-  }*/  
+  }
 
     //проверка ошибок
 
