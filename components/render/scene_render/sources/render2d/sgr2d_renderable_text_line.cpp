@@ -71,6 +71,7 @@ struct RenderableTextLine::Impl
     {    
       bool need_rebuild_text    = false;
       bool need_update_position = false;
+      bool need_color_update    = current_color != text_line->Color ();
 
       RenderableFont*    font         = render.GetFont (text_line->Font ());
       const media::Font& current_font = font->GetFont ();
@@ -83,6 +84,7 @@ struct RenderableTextLine::Impl
         
         need_rebuild_text    = true;
         need_update_position = true;
+        need_color_update    = true;
 
         current_font_name = text_line->Font ();
       }
@@ -94,6 +96,7 @@ struct RenderableTextLine::Impl
 
         need_rebuild_text    = true;
         need_update_position = true;
+        need_color_update    = true;
       }
 
         //формирование буфера спрайтов
@@ -250,9 +253,7 @@ struct RenderableTextLine::Impl
         current_world_tm      = world_tm;
       }
 
-      bool color_changed = current_color != text_line->Color ();
-
-      if (color_changed)
+      if (need_color_update)
       {
         current_color = text_line->Color ();
 
@@ -262,7 +263,7 @@ struct RenderableTextLine::Impl
           current_sprite->color = current_color;     
       }
 
-      if (need_rebuild_text || color_changed)
+      if (need_rebuild_text || need_color_update)
       {
         primitive->RemoveAllSprites ();
 
