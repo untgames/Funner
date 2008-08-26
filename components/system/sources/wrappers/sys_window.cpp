@@ -21,7 +21,7 @@ struct Window::Impl
     }
     
 ///Инциализация окна
-    void Init (WindowStyle in_style, Platform::window_t parent, bool is_visible)
+    void Init (WindowStyle in_style, Platform::window_t parent, bool is_visible, const Rect* window_rect = 0)
     {
       try
       {
@@ -47,8 +47,14 @@ struct Window::Impl
 
         SetHandle (new_handle);
 
+        if (window_rect)
+        {
+          window->SetPosition (window_rect->left, window_rect->top);
+          window->SetSize     (window_rect->right - window_rect->left, window_rect->bottom - window_rect->top);
+        }
+
         if (is_visible)
-          window->SetVisible (true);
+          window->SetVisible (true);      
       }
       catch (xtl::exception& exception)
       {
@@ -69,7 +75,7 @@ struct Window::Impl
       if (!handle)
         return;
         
-      Notify (WindowEvent_OnClose);      
+//      Notify (WindowEvent_OnClose);      
 
       Platform::DestroyWindow (handle);
     }
@@ -109,7 +115,9 @@ struct Window::Impl
 
       if (need_window_recreate)
       {
-        Init (style, new_parent_handle, window->IsVisible ());
+        Rect window_rect = window->WindowRect ();
+
+        Init (style, new_parent_handle, window->IsVisible (), &window_rect);
       }      
       else
       {
@@ -435,7 +443,9 @@ void Window::SetStyle (WindowStyle style)
     if (style == impl->Style ())
       return;
       
-    impl->Init (style, impl->ParentHandle (), IsVisible ());    
+    Rect window_rect = WindowRect ();
+
+    impl->Init (style, impl->ParentHandle (), IsVisible (), &window_rect);
   }
   catch (xtl::exception& exception)
   {

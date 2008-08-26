@@ -1,0 +1,13 @@
+Results of window3_test:
+is_active: 1
+is_visible: 1
+position: x=10 y=10
+width: 400
+height: 300
+window style: WindowStyle_Overlapped
+is_active: 1
+is_visible: 1
+position: x=10 y=10
+width: 400
+height: 300
+window style: WindowStyle_PopUp
