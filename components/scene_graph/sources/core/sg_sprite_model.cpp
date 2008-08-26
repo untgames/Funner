@@ -19,7 +19,7 @@ struct SpriteModel::Impl
   bool              need_recalc_world_tm;           //необходим пересчёт мировой матрицы преобразований
   mat4f             world_tm;                       //мировая матрица преобразований
 
-  Impl () : need_recalc_world_tm (true), pivot_rotation (0.0f) {}
+  Impl () : need_recalc_world_tm (true), pivot_rotation (0.0f), alpha_reference (0.f) {}
 
     //оповещение о событии
   void Notify (SpriteModel& sender, SpriteModelEvent event_id)
