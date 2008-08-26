@@ -126,19 +126,26 @@ InvokerRegistry& bind_node_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Name",               make_invoker (&Node::SetName));  
-  lib.Register ("set_Position",           make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetPosition)));
-  lib.Register ("SetPosition",            make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetPosition)));
-  lib.Register ("ResetPosition",          make_invoker (&Node::ResetPosition));
-  lib.Register ("set_Orientation",        make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetOrientation)));
-  lib.Register ("SetOrientation",         make_invoker (implicit_cast<void (Node::*) (float, float, float, float)> (&Node::SetOrientation)));
-  lib.Register ("SetEulerOrientation",    make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetOrientation)));
-  lib.Register ("ResetOrientation",       make_invoker (&Node::ResetOrientation));
-  lib.Register ("set_Scale",              make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetScale)));
-  lib.Register ("SetScale",               make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetScale)));
-  lib.Register ("ResetScale",             make_invoker (&Node::ResetScale));
-  lib.Register ("set_OrientationInherit", make_invoker (&Node::SetOrientationInherit));
-  lib.Register ("set_ScaleInherit",       make_invoker (&Node::SetScaleInherit));
+  lib.Register ("set_Name",                 make_invoker (&Node::SetName));  
+  lib.Register ("set_Position",             make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetPosition)));
+  lib.Register ("set_WorldPosition",        make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetWorldPosition)));  
+  lib.Register ("SetPosition",              make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetPosition)));
+  lib.Register ("SetWorldPosition",         make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetWorldPosition)));
+  lib.Register ("ResetPosition",            make_invoker (&Node::ResetPosition));
+  lib.Register ("set_Orientation",          make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetOrientation)));
+  lib.Register ("set_WorldOrientation",     make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetWorldOrientation)));
+  lib.Register ("SetOrientation",           make_invoker (implicit_cast<void (Node::*) (float, float, float, float)> (&Node::SetOrientation)));
+  lib.Register ("SetWorldOrientation",      make_invoker (implicit_cast<void (Node::*) (float, float, float, float)> (&Node::SetWorldOrientation)));
+  lib.Register ("SetEulerOrientation",      make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetOrientation)));
+  lib.Register ("SetWorldEulerOrientation", make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetWorldOrientation)));
+  lib.Register ("ResetOrientation",         make_invoker (&Node::ResetOrientation));
+  lib.Register ("set_Scale",                make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetScale)));
+  lib.Register ("set_WorldScale",           make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetWorldScale)));
+  lib.Register ("SetScale",                 make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetScale)));
+  lib.Register ("SetWorldScale",            make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetWorldScale)));
+  lib.Register ("ResetScale",               make_invoker (&Node::ResetScale));
+  lib.Register ("set_OrientationInherit",   make_invoker (&Node::SetOrientationInherit));
+  lib.Register ("set_ScaleInherit",         make_invoker (&Node::SetScaleInherit));
 
   lib.Register ("get_Name",                  make_invoker (&Node::Name));
   lib.Register ("get_Position",              make_invoker (&Node::Position));
