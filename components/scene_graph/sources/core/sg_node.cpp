@@ -299,9 +299,9 @@ struct Node::Impl
       
       if (parent)
       {
-        this_node->Translate (old_world_position - this_node->WorldPosition (), NodeTransformSpace_World);
-        this_node->Rotate    (old_world_orientation * invert (this_node->WorldOrientation ()), NodeTransformSpace_World);
-        this_node->Scale     (old_world_scale / this_node->WorldScale ());
+        this_node->SetWorldPosition    (old_world_position);
+        this_node->SetWorldOrientation (old_world_orientation);
+        this_node->SetWorldScale       (old_world_scale);
       }
       else
       {
@@ -847,6 +847,16 @@ void Node::ResetPosition ()
   SetPosition (vec3f (0.0f));
 }
 
+void Node::SetWorldPosition (const vec3f& position)
+{
+  Translate (position - WorldPosition (), NodeTransformSpace_World);
+}
+
+void Node::SetWorldPosition  (float x, float y, float z)
+{
+  SetWorldPosition (vec3f (x, y, z));
+}
+
 const vec3f& Node::Position () const
 {
   return impl->local_position;
@@ -879,6 +889,21 @@ void Node::SetOrientation (float angle_in_degrees, float axis_x, float axis_y, f
 void Node::SetOrientation (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees)
 {
   SetOrientation (fromEulerAnglef (deg2rad (pitch_in_degrees), deg2rad (yaw_in_degrees), deg2rad (roll_in_degrees)));
+}
+
+void Node::SetWorldOrientation (const quatf& orientation)
+{
+  Rotate (orientation * invert (WorldOrientation ()), NodeTransformSpace_World);
+}
+
+void Node::SetWorldOrientation (float angle_in_degrees, float axis_x, float axis_y, float axis_z)
+{
+  SetWorldOrientation (fromAxisAnglef (deg2rad (angle_in_degrees), axis_x, axis_y, axis_z));
+}
+
+void Node::SetWorldOrientation (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees)
+{
+  SetWorldOrientation (fromEulerAnglef (deg2rad (pitch_in_degrees), deg2rad (yaw_in_degrees), deg2rad (roll_in_degrees)));
 }
 
 void Node::ResetOrientation ()
@@ -1098,6 +1123,16 @@ void Node::SetScale (const vec3f& scale)
 void Node::SetScale (float sx, float sy, float sz)
 {
   SetScale (vec3f (sx, sy, sz));
+}
+
+void Node::SetWorldScale (const vec3f& scale)
+{
+  Scale (scale / WorldScale ());
+}
+
+void Node::SetWorldScale (float sx, float sy, float sz)
+{
+  SetWorldScale (vec3f (sx, sy, sz));
 }
 
 void Node::ResetScale ()

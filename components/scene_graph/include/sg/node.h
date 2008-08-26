@@ -194,19 +194,24 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Положение узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetPosition   (const math::vec3f&);
-    void               SetPosition   (float x, float y, float z);
-    void               ResetPosition ();
-    const math::vec3f& Position      () const;
-    const math::vec3f& WorldPosition () const;
+    void               SetPosition      (const math::vec3f&);
+    void               SetPosition      (float x, float y, float z);
+    void               ResetPosition    ();
+    void               SetWorldPosition (const math::vec3f&);
+    void               SetWorldPosition (float x, float y, float z);
+    const math::vec3f& Position         () const;
+    const math::vec3f& WorldPosition    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ориентация узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetOrientation   (const math::quatf&);
-    void SetOrientation   (float angle_in_degrees, float axis_x, float axis_y, float axis_z);
-    void SetOrientation   (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees); //углы Эйлера
-    void ResetOrientation ();
+    void SetOrientation      (const math::quatf&);
+    void SetOrientation      (float angle_in_degrees, float axis_x, float axis_y, float axis_z);
+    void SetOrientation      (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees); //углы Эйлера
+    void ResetOrientation    ();
+    void SetWorldOrientation (const math::quatf&);
+    void SetWorldOrientation (float angle_in_degrees, float axis_x, float axis_y, float axis_z);
+    void SetWorldOrientation (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees); //углы Эйлера
 
     const math::quatf& Orientation      () const;
     const math::quatf& WorldOrientation () const;
@@ -214,11 +219,13 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Масштаб узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetScale   (const math::vec3f&);
-    void               SetScale   (float sx, float sy, float sz);
-    void               ResetScale ();
-    const math::vec3f& Scale      () const;
-    const math::vec3f& WorldScale () const;
+    void               SetScale      (const math::vec3f&);
+    void               SetScale      (float sx, float sy, float sz);
+    void               SetWorldScale (const math::vec3f&);
+    void               SetWorldScale (float sx, float sy, float sz);    
+    void               ResetScale    ();
+    const math::vec3f& Scale         () const;
+    const math::vec3f& WorldScale    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Позиционирование узла
