@@ -83,6 +83,12 @@ inline T* get_pointer (const auto_ptr<T>& p)
 }
 
 template <class T>
+inline bool auto_ptr<T>::operator ! () const throw ()
+{
+  return ptr == 0;
+}
+
+template <class T>
 inline T* auto_ptr<T>::release () throw ()
 {
   T* tmp = ptr;
