@@ -28,7 +28,7 @@ struct Test
     sprite_list->BindToScene (scene);
     
     sprite->SetMaterial ("dynamic_material");
-    sprite->SetColor    (1, 1, 1, 0.95);
+    sprite->SetColor    (1, 1, 1, 0.95f);
     sprite->SetPosition (0, 0, -15);
     sprite->SetScale    (15, 15, 1);
     sprite->BindToScene (scene);
@@ -64,7 +64,7 @@ struct Test
     Viewport vp;
     
     screen.SetBackgroundColor (1, 0, 0, 0);
-//    screen.SetBackgroundState (false);
+    screen.SetBackgroundState (false);
 
     vp.SetName            ("Viewport1");
     vp.SetRenderPath      ("Render2d");
@@ -131,12 +131,23 @@ struct Test
   }
 };
 
+void log_print (const char* log, const char* message)
+{
+  printf ("%s: %s\n", log, message);
+}
+
 int main ()
 {
   printf ("Results of test_sprites:\n");
 
   try
   {    
+      //настройка протоколирования
+
+    xtl::auto_connection log_connection = common::LogSystem::RegisterLogHandler ("*", &log_print);
+    
+      //запуск теста
+    
     Test test;    
 
     return test.application.Run ();

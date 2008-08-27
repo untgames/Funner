@@ -8,6 +8,7 @@
 #include <stl/vector>
 #include <stl/iterator>
 
+#include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/ref.h>
@@ -15,6 +16,7 @@
 
 #include <math/io.h>
 
+#include <common/log.h>
 #include <common/strlib.h>
 #include <common/parser.h>
 

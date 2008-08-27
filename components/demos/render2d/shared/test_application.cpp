@@ -5,20 +5,16 @@
 #include <xtl/ref.h>
 
 #include <common/var_registry.h>
-#include <common/var_registry_container.h>
 #include <common/strlib.h>
 
 #include <syslib/window.h>
 #include <syslib/application.h>
 
-#include <render/low_level/driver.h>
-#include <render/low_level/device.h>
-#include <render/mid_level/low_level_driver.h>
+#include <render/mid_level/window_driver.h>
 
 #include "shared.h"
 
 using namespace common;
-using namespace render::low_level;
 
 namespace
 {
@@ -27,8 +23,7 @@ namespace
     Константы
 */
 
-const char* CONFIGURATION_FILE_NAME   = "media/configuration.xml"; //имя файла конфигурации
-const char* CONFIGURATION_BRANCH_NAME = "Demo"; //имя ветки реестра с настройками
+const char* CONFIGURATION_BRANCH_NAME = "Configuration.WindowSettings"; //имя ветки реестра с настройками
 const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //имя системы визуализации среднего уровня
 const char* MATERIAL_LIB_FILE_NAME    = "media/materials.xmtl"; //имя файла с материалами
 
@@ -87,21 +82,14 @@ void log_print (const char* message)
     Описание реализации TestApplication
 */
 
-typedef xtl::com_ptr<render::low_level::ISwapChain> SwapChainPtr;
-typedef xtl::com_ptr<render::low_level::IDevice>    DevicePtr;
-typedef VarRegistryContainer<stl::string>           StringRegistry;
-
 struct TestApplication::Impl
 {
-  StringRegistry                 string_registry;     //монтируемый реестр строк
   VarRegistry                    config;              //реестр конфигурационных настроек
   stl::auto_ptr<syslib::Window>  window;              //главное окно приложения
-  SwapChainPtr                   swap_chain;          //цепочка обмена главного окна приложения
-  DevicePtr                      device;              //устройство рендеринга главного окна приложения
   xtl::auto_connection           app_idle_connection; //соединение сигнала обработчика холостого хода приложения
   SceneRender                    render;              //рендер сцены
   render::RenderTarget           render_target;       //цель рендеринга
-  
+
   void OnClose ()
   {
     syslib::Application::Exit (0);
@@ -134,23 +122,6 @@ struct TestApplication::Impl
     {
       printf ("Exception at window redraw\n");
     }
-  }  
-  
-  void OnResize ()
-  {
-    try
-    {
-      syslib::Rect client_rect = window->ClientRect ();
-
-      render_target.SetRenderableArea (client_rect.left, client_rect.top, client_rect.right - client_rect.left,
-                                       client_rect.bottom - client_rect.top);
-
-      window->Invalidate ();
-    }
-    catch (std::exception& exception)
-    {
-      printf ("Exception at window resize: %s\n", exception.what ());
-    }
   }
 };
 
@@ -163,15 +134,9 @@ TestApplication::TestApplication ()
 {
   try
   {
-      //монтирование реестра
-      
-    impl->string_registry.Mount (CONFIGURATION_BRANCH_NAME);
-    
       //чтение настроек
-      
-    impl->config.Open (CONFIGURATION_BRANCH_NAME);
 
-    load_xml_configuration (VarRegistry (""), CONFIGURATION_FILE_NAME);
+    impl->config.Open (CONFIGURATION_BRANCH_NAME);
 
       //создание окна
       
@@ -188,39 +153,16 @@ TestApplication::TestApplication ()
       //регистрация обработчиков событий окна
 
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, &*impl));
-    impl->window->RegisterEventHandler (syslib::WindowEvent_OnSize,  xtl::bind (&Impl::OnResize, &*impl));
-    impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*impl));    
+    impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*impl)); 
 
-      //создание цепочки обмена и устройства рендеринга
+      //инициализация системы рендеринга
 
-    SwapChainDesc desc;
-
-    memset (&desc, 0, sizeof (desc));
-
-    desc.frame_buffer.color_bits   = get (impl->config, "ColorBits", DEFAULT_FB_COLOR_BITS);
-    desc.frame_buffer.alpha_bits   = get (impl->config, "AlphaBits", DEFAULT_FB_ALPHA_BITS);
-    desc.frame_buffer.depth_bits   = get (impl->config, "DepthBits", DEFAULT_FB_DEPTH_BITS);
-    desc.frame_buffer.stencil_bits = get (impl->config, "StencilBits", DEFAULT_FB_STENCIL_BITS);
-    desc.buffers_count             = get (impl->config, "BuffersCount", DEFAULT_FB_BUFFERS_COUNT);
-    desc.swap_method               = SwapMethod_Discard;
-    desc.fullscreen                = get (impl->config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) != 0;
-    desc.window_handle             = impl->window->Handle ();
-
-    render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, get (impl->config, "DeviceInitString", DEFAULT_DEVICE_INIT_STRING).c_str (),
-      impl->swap_chain, impl->device);
-
-      //создание системы визуализации среднего уровня
-      
-    render::low_level::ISwapChain* swap_chains []    = {impl->swap_chain.get ()};
-    size_t                         swap_chains_count = sizeof (swap_chains) / sizeof (*swap_chains);
-
-    render::mid_level::LowLevelDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, impl->device.get (), swap_chains_count, swap_chains);
+    render::mid_level::WindowDriver::RegisterWindow (MID_LEVEL_RENDERER_NAME, *impl->window, CONFIGURATION_BRANCH_NAME);        
 
       //инициализация рендера
 
     impl->render.SetLogHandler (&log_print);
-
-    impl->render.SetRenderer (render::mid_level::LowLevelDriver::Name (), MID_LEVEL_RENDERER_NAME);
+    impl->render.SetRenderer   (render::mid_level::WindowDriver::Name (), MID_LEVEL_RENDERER_NAME);
 //    impl->render.SetRenderer ("Debug", "Renderer2d");
 
     impl->render_target = impl->render.RenderTarget (0);
@@ -228,10 +170,6 @@ TestApplication::TestApplication ()
       //загрузка ресурсов
 
     impl->render.LoadResource (MATERIAL_LIB_FILE_NAME);    
-    
-      //установка начальной области вывода
-    
-    impl->OnResize ();    
   }
   catch (xtl::exception& exception)
   {

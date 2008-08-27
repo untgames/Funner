@@ -67,7 +67,7 @@ struct TestScene
     
     sprite_list->SetName     ("SpriteList");
 //    sprite_list->SetMaterial ("font_material");
-    sprite_list->SetMaterial ("burst_material");
+    sprite_list->SetMaterial ("pistol_material");
     sprite_list->Reserve     (PARTICLES_COUNT);
     sprite_list->BindToScene (scene);
 
