@@ -18,28 +18,13 @@ RenderTarget::RenderTarget (render::low_level::IView* in_render_target_view, Ren
     default:
       throw xtl::make_argument_exception ("render::mid_level::window_driver::RenderTarget::RenderTarget", "type", type);
   }
-}
 
-/*
-    Размеры буфера
-*/
-
-size_t RenderTarget::GetWidth ()
-{
   render::low_level::TextureDesc render_texture_desc;
 
   render_target_view->GetTexture ()->GetDesc (render_texture_desc);
 
-  return render_texture_desc.width;
-}
-
-size_t RenderTarget::GetHeight ()
-{
-  render::low_level::TextureDesc render_texture_desc;
-
-  render_target_view->GetTexture ()->GetDesc (render_texture_desc);
-
-  return render_texture_desc.height;
+  width  = render_texture_desc.width;
+  height = render_texture_desc.height;
 }
 
 /*
@@ -81,4 +66,14 @@ void RenderTarget::CaptureImage (media::Image& image)
     default:
       break;
   }
+}
+
+/*
+   Установка размера
+*/
+
+void RenderTarget::SetSize (size_t in_width, size_t in_height)
+{
+  width  = in_width;
+  height = in_height;
 }

@@ -232,6 +232,10 @@ void WindowFrameBuffer::ChangeWindowHandleHandler ()
 
 void WindowFrameBuffer::ResizeWindowHandler ()
 {
+  syslib::Rect client_rect = window->ClientRect ();
+
+  frame_buffer->SetSize (client_rect.right - client_rect.left, client_rect.bottom - client_rect.top);
+
   renderer_entry->renderer->FrameBufferResizeNotify (frame_buffer.get (), window->Width (), window->Height ());
 }
 
