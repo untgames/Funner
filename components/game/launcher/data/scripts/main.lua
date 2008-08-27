@@ -1,4 +1,4 @@
-Application.LoadConfiguration ("data/configurations/configuration.xml")
+--Application.LoadConfiguration ("data/configurations/configuration.xml")
 
 velocity = {['+x']=0; ['-x']=0; ['+y']=0; ['-y']=0}
 
@@ -22,7 +22,7 @@ sprite:BindToScene (scene)
 camera = Scene.OrthoCamera.Create ()
 
 camera.Name = "Camera1"
-camera.Position = vec3 (0, 0, -3)
+camera.Position = vec3 (0, 0, 0)
 camera.Left = -10
 camera.Right = 10
 camera.Top = 10
@@ -70,7 +70,7 @@ text_line.Font = "data/fonts/a_damn_mess.xfont"
 text_line.Name = "TextLine"
 text_line.Color = vec4 (0, 0, 1, 1)
 text_line:SetAlignment (Scene_TextLineAlignment.Center, Scene_TextLineAlignment.Center)
-text_line:SetScale (2, 2, 1)
+--text_line:SetScale (2, 2, 1)
 text_line:SetPosition (0, 0, -1)
 
 text_line:BindToScene (scene)

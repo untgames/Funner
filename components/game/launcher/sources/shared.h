@@ -8,12 +8,17 @@
 #include <stl/vector>
 
 #include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
+#include <xtl/intrusive_ptr.h>
 #include <xtl/function.h>
 #include <xtl/ref.h>
 #include <xtl/shared_ptr.h>
 
 #include <common/file.h>
+#include <common/log.h>
 #include <common/strlib.h>
+#include <common/var_registry.h>
 
 #include <sg/scene.h>
 #include <sg/camera.h>
@@ -21,7 +26,10 @@
 
 #include <render/scene_render.h>
 
+#include <render/mid_level/window_driver.h>
+
 #include <syslib/application.h>
+#include <syslib/window.h>
 
 #include <sound/manager.h>
 #include <sound/scene_player.h>

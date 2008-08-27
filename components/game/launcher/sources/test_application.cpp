@@ -85,6 +85,11 @@ void log_print (const char* message)
   printf ("%s\n", message);
 }
 
+void log_handler (const char* log_name, const char* event)
+{
+  printf ("log %s event: '%s'\n", log_name, event);
+}
+
 void do_file (const char* file_name, Shell& shell)
 {
   shell.ExecuteFile (file_name, &log_print);
@@ -131,6 +136,8 @@ struct TestApplication::Impl
   Impl ()
     : render_initialized (false)
   {
+    LogSystem::RegisterLogHandler ("*", &log_handler);
+
       //чтение настроек
       
     config.Open (CONFIGURATION_BRANCH_NAME);
@@ -300,6 +307,8 @@ TestApplication::TestApplication (const char* start_script_name)
     impl->shell = ShellPtr (new Shell ("lua", impl->environment));
 
     bind_common_library      (*impl->environment);
+    bind_common_string_tree  (*impl->environment);
+    bind_common_var_registry (*impl->environment);
     bind_math_library        (*impl->environment);
     bind_scene_graph_library (*impl->environment);
     bind_render_library      (*impl->environment);
