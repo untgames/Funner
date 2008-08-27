@@ -15,7 +15,7 @@ GAME.LAUNCHER.SOURCES.IMPORTS       := ../../system/link.static.mak ../../system
                                        ../../scene_graph/compile.static.mak \
                                        ../../render/low_level/compile.static.mak ../../render/low_level/link.static.mak \
                                        ../../render/scene_render/compile.static.mak ../../render/scene_render/render2d.link.static.mak \
-                                       ../../render/low_level_renderer_driver/compile.static.mak ../../render/low_level_renderer_driver/link.static.mak \
+                                       ../../render/mid_level_window_driver/compile.static.mak ../../render/mid_level_window_driver/link.static.mak \
                                        ../../render/opengl_driver/link.static.mak \
                                        ../../sound/manager/compile.static.mak ../../sound/manager/compile.static.mak \
                                        ../../sound/scene_player/compile.static.mak ../../sound/scene_player/link.static.mak \
@@ -29,4 +29,5 @@ GAME.LAUNCHER.SOURCES.IMPORTS       := ../../system/link.static.mak ../../system
                                        ../../input/low_level/compile.static.mak ../../input/low_level/link.static.mak \
                                        ../../input/window_driver/compile.static.mak ../../input/window_driver/link.static.mak \
                                        ../../input/direct_input_driver/compile.static.mak ../../input/direct_input_driver/link.static.mak \
-                                       ../../input/manager/compile.static.mak ../../input/manager/link.static.mak ../../input/manager/keymap.link.static.mak
+                                       ../../input/manager/compile.static.mak ../../input/manager/link.static.mak ../../input/manager/keymap.link.static.mak \
+                                       ../../common/configurator.link.static.mak

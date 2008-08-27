@@ -5,20 +5,16 @@
 #include <xtl/ref.h>
 
 #include <common/var_registry.h>
-#include <common/var_registry_container.h>
 #include <common/strlib.h>
 
 #include <syslib/window.h>
 #include <syslib/application.h>
 
-#include <render/low_level/driver.h>
-#include <render/low_level/device.h>
-#include <render/mid_level/low_level_driver.h>
+#include <render/mid_level/window_driver.h>
 
 #include "shared.h"
 
 using namespace common;
-using namespace render::low_level;
 
 namespace
 {
@@ -27,8 +23,7 @@ namespace
      онстанты
 */
 
-const char* CONFIGURATION_FILE_NAME   = "data/configurations/configuration.xml"; //им€ файла конфигурации
-const char* CONFIGURATION_BRANCH_NAME = "Configuration"; //им€ ветки реестра с настройками
+const char* CONFIGURATION_BRANCH_NAME = "Configuration.Configuration"; //им€ ветки реестра с настройками
 const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //им€ системы визуализации среднего уровн€
 const char* MATERIAL_LIB_FILE_NAME    = "data/materials/materials.xmtl"; //им€ файла с материалами
 const char* SOUND_DECL_LIB_FILE_NAME  = "data/sounds/gorilka.snddecl"; //им€ файла с материалами
@@ -110,9 +105,6 @@ void input_event_handler (const char* event, Shell& shell)
     ќписание реализации TestApplication
 */
 
-typedef xtl::com_ptr<render::low_level::ISwapChain> SwapChainPtr;
-typedef xtl::com_ptr<render::low_level::IDevice>    DevicePtr;
-typedef VarRegistryContainer<stl::string>           StringRegistry;
 typedef xtl::com_ptr<input::low_level::IDevice>     InputDevicePtr;
 typedef stl::vector<InputDevicePtr>                 InputDevicesArray;
 typedef xtl::shared_ptr<sound::SoundManager>        SoundManagerPtr;
@@ -122,11 +114,8 @@ typedef xtl::shared_ptr<Shell>                      ShellPtr;
 
 struct TestApplication::Impl
 {
-  StringRegistry                string_registry;     //монтируемый реестр строк  
   VarRegistry                   config;              //реестр конфигурационных настроек
   stl::auto_ptr<syslib::Window> window;              //главное окно приложени€
-  SwapChainPtr                  swap_chain;          //цепочка обмена главного окна приложени€
-  DevicePtr                     device;              //устройство рендеринга главного окна приложени€
   xtl::auto_connection          app_idle_connection; //соединение сигнала обработчика холостого хода приложени€
   SceneRender                   render;              //рендер сцены
   render::RenderTarget          render_target;       //цель рендеринга  
@@ -142,10 +131,6 @@ struct TestApplication::Impl
   Impl ()
     : render_initialized (false)
   {
-      //монтирование реестра
-      
-    string_registry.Mount (CONFIGURATION_BRANCH_NAME);
-
       //чтение настроек
       
     config.Open (CONFIGURATION_BRANCH_NAME);
@@ -156,15 +141,12 @@ struct TestApplication::Impl
     try
     {
       printf ("Destructing test application\n");
-      string_registry.UnmountAll ();
       config.Close ();
-      swap_chain = 0;
-      device = 0;
       app_idle_connection.disconnect ();
       render.ResetRenderer ();
       RenderTarget ().Swap (render_target);
       input_devices.clear ();
-      render::mid_level::LowLevelDriver::UnregisterRenderer (MID_LEVEL_RENDERER_NAME);
+      render::mid_level::WindowDriver::UnregisterAllWindows (MID_LEVEL_RENDERER_NAME);
       sound_manager.reset ();
       scene_player.reset ();
       environment.reset ();
@@ -197,40 +179,18 @@ struct TestApplication::Impl
 
       //регистраци€ обработчиков событий окна
 
-    window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, &*this));
-    window->RegisterEventHandler (syslib::WindowEvent_OnSize,  xtl::bind (&Impl::OnResize, &*this));
+//    window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, &*this));
     window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*this));    
-
-      //создание цепочки обмена и устройства рендеринга
-
-    SwapChainDesc desc;
-
-    memset (&desc, 0, sizeof (desc));
-
-    desc.frame_buffer.color_bits   = get (config, "ColorBits", DEFAULT_FB_COLOR_BITS);
-    desc.frame_buffer.alpha_bits   = get (config, "AlphaBits", DEFAULT_FB_ALPHA_BITS);
-    desc.frame_buffer.depth_bits   = get (config, "DepthBits", DEFAULT_FB_DEPTH_BITS);
-    desc.frame_buffer.stencil_bits = get (config, "StencilBits", DEFAULT_FB_STENCIL_BITS);
-    desc.buffers_count             = get (config, "BuffersCount", DEFAULT_FB_BUFFERS_COUNT);
-    desc.swap_method               = SwapMethod_Discard;
-    desc.fullscreen                = get (config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) != 0;
-    desc.window_handle             = window->Handle ();
-    
-    render::low_level::DriverManager::CreateSwapChainAndDevice ("*", desc, get (config, "DeviceInitString", DEFAULT_DEVICE_INIT_STRING).c_str (),
-      swap_chain, device);
       
       //создание системы визуализации среднего уровн€
-      
-    render::low_level::ISwapChain* swap_chains []    = {swap_chain.get ()};
-    size_t                         swap_chains_count = sizeof (swap_chains) / sizeof (*swap_chains);
 
-    render::mid_level::LowLevelDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, device.get (), swap_chains_count, swap_chains);          
+    render::mid_level::WindowDriver::RegisterWindow (MID_LEVEL_RENDERER_NAME, *window, CONFIGURATION_BRANCH_NAME);
 
       //инициализаци€ рендера
 
     render.SetLogHandler (&log_print);
 
-    render.SetRenderer (render::mid_level::LowLevelDriver::Name (), MID_LEVEL_RENDERER_NAME);
+    render.SetRenderer (render::mid_level::WindowDriver::Name (), MID_LEVEL_RENDERER_NAME);
 
     render_target = render.RenderTarget (0);
 
@@ -239,8 +199,6 @@ struct TestApplication::Impl
     render.LoadResource (MATERIAL_LIB_FILE_NAME);
     
       //установка начальной области вывода
-    
-    OnResize ();    
 
     render_initialized = true;
   }
@@ -300,24 +258,7 @@ struct TestApplication::Impl
     {
       printf ("Exception at window redraw\n");
     }
-  }  
-  
-  void OnResize ()
-  {
-    try
-    {
-      syslib::Rect client_rect = window->ClientRect ();
-
-      render_target.SetRenderableArea (client_rect.left, client_rect.top, client_rect.right - client_rect.left,
-                                       client_rect.bottom - client_rect.top);
-
-      window->Invalidate ();            
-    }
-    catch (std::exception& exception)
-    {
-      printf ("Exception at window resize: %s\n", exception.what ());
-    }
-  }
+  }    
 
   void LoadConfiguration (const char* configuration_file_name)
   {
