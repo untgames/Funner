@@ -132,7 +132,7 @@ CommandListBuilder::ExecuterPtr CommandListBuilder::Finish ()
 
     //проверка возможности построения дисплейного списка средствами OpenGL
 
-  int display_list = glGenLists (1);
+/*  int display_list = glGenLists (1);
   
   if (display_list)
   {
@@ -161,7 +161,7 @@ CommandListBuilder::ExecuterPtr CommandListBuilder::Finish ()
       glDeleteLists (display_list, 1);
       throw;
     }
-  }
+  }*/
 
     //возвращение класса, выполнящего команды вручную
 
