@@ -2,8 +2,8 @@
 
 using namespace render::mid_level;
 using namespace render::mid_level::renderer2d;
-using namespace render::mid_level::low_level_driver;
-using namespace render::mid_level::low_level_driver::renderer2d;
+using namespace render::mid_level::window_driver;
+using namespace render::mid_level::window_driver::renderer2d;
 using namespace render::low_level;
 
 namespace
@@ -28,7 +28,7 @@ class VertexArrayCacheHolder
     static VertexArrayCache& GetCache ()
     {
       if (!instance)
-        throw xtl::format_operation_exception ("render::mid_level::low_level_driver::renderer2d::VertexArrayCache::GetCache",
+        throw xtl::format_operation_exception ("render::mid_level::window_driver::renderer2d::VertexArrayCache::GetCache",
           "Null instance (lock cache before use)");
 
       return instance->cache;

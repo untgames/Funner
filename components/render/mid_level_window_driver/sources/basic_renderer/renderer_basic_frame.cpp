@@ -1,7 +1,7 @@
 #include "shared.h"
 
 using namespace render::mid_level;
-using namespace render::mid_level::low_level_driver;
+using namespace render::mid_level::window_driver;
 
 /*
     Конструктор
@@ -21,7 +21,7 @@ BasicFrame::BasicFrame ()
 
 void BasicFrame::SetRenderTargets (IRenderTarget* in_render_target, IRenderTarget* in_depth_stencil_target)
 {
-  static const char* METHOD_NAME = "render::mid_level::low_level_driver::BasicFrame::SetRenderTargets";
+  static const char* METHOD_NAME = "render::mid_level::window_driver::BasicFrame::SetRenderTargets";
 
   if (in_render_target)
   {
@@ -29,7 +29,7 @@ void BasicFrame::SetRenderTargets (IRenderTarget* in_render_target, IRenderTarge
     
     if (!casted_render_target)
       throw xtl::make_argument_exception (METHOD_NAME, "render_target", typeid (in_render_target).name (),
-        "Render target type incompatible with render::mid_level::low_level_driver::RenderTarget");
+        "Render target type incompatible with render::mid_level::window_driver::RenderTarget");
         
     render_target = casted_render_target;
   }
@@ -41,7 +41,7 @@ void BasicFrame::SetRenderTargets (IRenderTarget* in_render_target, IRenderTarge
     
     if (!casted_depth_stencil_target)
       throw xtl::make_argument_exception (METHOD_NAME, "depth_stencil_target", typeid (in_depth_stencil_target).name (),
-        "Depth-stencil target type incompatible with render::mid_level::low_level_driver::RenderTarget");
+        "Depth-stencil target type incompatible with render::mid_level::window_driver::RenderTarget");
         
     depth_stencil_target = casted_depth_stencil_target;
   }

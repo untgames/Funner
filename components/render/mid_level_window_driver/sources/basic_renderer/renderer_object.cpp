@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render::mid_level::low_level_driver;
+using namespace render::mid_level::window_driver;
 
 /*
     Подсчёт ссылок

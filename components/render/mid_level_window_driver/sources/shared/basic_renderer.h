@@ -1,5 +1,5 @@
-#ifndef RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_BASIC_RENDERER_HEADER
-#define RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_BASIC_RENDERER_HEADER
+#ifndef RENDER_MID_WINDOW_DRIVER_BASIC_RENDERER_HEADER
+#define RENDER_MID_WINDOW_DRIVER_BASIC_RENDERER_HEADER
 
 #include <stl/vector>
 #include <stl/list>
@@ -23,7 +23,7 @@ namespace render
 namespace mid_level
 {
 
-namespace low_level_driver
+namespace window_driver
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

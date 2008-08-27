@@ -1,6 +1,8 @@
 #ifndef RENDER_MID_LEVEL_WINDOW_DRIVER_HEADER
 #define RENDER_MID_LEVEL_WINDOW_DRIVER_HEADER
 
+#include <syslib/window.h>
+
 namespace render
 {
 

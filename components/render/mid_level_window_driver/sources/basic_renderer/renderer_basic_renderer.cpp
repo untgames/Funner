@@ -1,7 +1,8 @@
 #include "shared.h"
 
+using namespace common;
 using namespace render::mid_level;
-using namespace render::mid_level::low_level_driver;
+using namespace render::mid_level::window_driver;
 using namespace render::low_level;
 
 namespace
@@ -11,99 +12,27 @@ namespace
     Переопределения типов
 */
 
-typedef xtl::intrusive_ptr<RenderTarget> RenderTargetPtr;
-typedef xtl::com_ptr<ISwapChain>         SwapChainPtr;
-typedef xtl::com_ptr<ITexture>           TexturePtr;
-typedef xtl::com_ptr<IView>              ViewPtr;
+typedef xtl::com_ptr<ITexture> TexturePtr;
+typedef xtl::com_ptr<IView>    ViewPtr;
 
 }
-
-/*
-    Буфер кадра
-*/
-
-struct RendererDispatch::FrameBuffer
-{
-  SwapChainPtr    swap_chain;           //цепочка обмена
-  RenderTargetPtr color_buffer;         //буфер цвета
-  RenderTargetPtr depth_stencil_buffer; //буфер попиксельного отсечения
-
-  RendererDispatch::FrameBuffer::FrameBuffer (IDevice& device, ISwapChain& in_swap_chain) : swap_chain (&in_swap_chain)
-  {
-    try
-    {
-        //получение дескриптора цепочки обмена
-
-      SwapChainDesc swap_chain_desc;
-
-      swap_chain->GetDesc (swap_chain_desc);
-      
-      TexturePtr texture;
-      ViewPtr    view;
-      ViewDesc   view_desc;
-
-      memset (&view_desc, 0, sizeof view_desc);
-      
-        //создание буфера цвета
-
-      texture      = TexturePtr (device.CreateRenderTargetTexture (swap_chain.get (), swap_chain_desc.buffers_count ? 1 : 0), false);
-      view         = ViewPtr (device.CreateView (texture.get (), view_desc), false);
-      color_buffer = RenderTargetPtr (new RenderTarget (view.get (), RenderTargetType_Color), false);
-      
-        //создание буфера попиксельного отсечения
-
-      texture              = TexturePtr (device.CreateDepthStencilTexture (swap_chain.get ()), false);
-      view                 = ViewPtr (device.CreateView (texture.get (), view_desc), false);
-      depth_stencil_buffer = RenderTargetPtr (new RenderTarget (view.get (), RenderTargetType_DepthStencil), false);
-    }
-    catch (xtl::exception& exception)
-    {
-      exception.touch ("render::mid_level::low_level_driver::RendererDispatch::RendererDispatch::FrameBuffer");
-      throw;
-    }
-  }
-};
 
 /*
     Конструктор / деструктор
 */
 
-RendererDispatch::RendererDispatch (IDevice* in_device, size_t swap_chains_count, ISwapChain** swap_chains)
-  : device (in_device),
+RendererDispatch::RendererDispatch (render::low_level::IDevice& in_device)
+  : device (&in_device),
     frame_position (frames.end ()),
-    frames_count (0),
-    renderer2d (in_device)
+    frames_count (0)
 {
   try
   {
-      //проверка аргументов
-
-    if (!in_device)
-      throw xtl::make_null_argument_exception ("", "device");
-
-    if (!swap_chains_count)
-      throw xtl::make_null_argument_exception ("", "swap_chains_count");
-
-    if (!swap_chains)
-      throw xtl::make_null_argument_exception ("", "swap_chains");
-
-      //создание буферов кадра
-
-    frame_buffers.reserve (swap_chains_count);
-
-    for (size_t i=0; i<swap_chains_count; i++)
-    {
-      ISwapChain* swap_chain = swap_chains [i];
-
-      if (!swap_chain)
-        throw xtl::format_exception<xtl::null_argument_exception> ("", "Null argument 'swap_chains[%u]'", i);
-
-      frame_buffers.push_back (FrameBuffer (*device, *swap_chain));
-    }
+    renderer2d = Renderer2DPtr (new Renderer2D (device.get ()));
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::mid_level::low_level_driver::RendererDispatch::RendererDispatch");
+    exception.touch ("render::mid_level::window_driver::RendererDispatch::RendererDispatch");
     throw;
   }
 }
@@ -113,12 +42,51 @@ RendererDispatch::~RendererDispatch ()
 }
 
 /*
+   Регистрация/удаление окна
+*/
+
+void RendererDispatch::AddFrameBuffer (FrameBuffer* frame_buffer)
+{
+  try
+  {
+    if (!frame_buffer)
+      throw xtl::make_null_argument_exception ("", "frame_buffer");
+
+    frame_buffers.push_back (frame_buffer);
+
+    frame_buffer->connect_tracker (xtl::bind (&RendererDispatch::RemoveFrameBuffer, this, frame_buffer));
+
+    FrameBufferCreateNotify (frame_buffers.back ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::mid_level::window_driver::RendererDispatch::AddFrameBuffer");
+    throw;
+  }
+}
+
+void RendererDispatch::RemoveFrameBuffer (FrameBuffer* frame_buffer)
+{
+  for (FrameBufferArray::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)
+  {
+    if (*iter == frame_buffer)
+    {
+      frame_buffers.erase (iter);
+
+      FrameBufferDestroyNotify (frame_buffer);
+
+      break;
+    }
+  }
+}
+
+/*
    Описание
 */
 
 const char* RendererDispatch::GetDescription ()
 {
-  return "render::mid_level::low_level_driver::RendererDispatch";
+  return "render::mid_level::window_driver::RendererDispatch";
 }
 
 /*
@@ -130,24 +98,12 @@ size_t RendererDispatch::GetFrameBuffersCount ()
   return frame_buffers.size ();
 }
 
-/*
-    Получение буфера цвета и буфера попиксельного отсечения
-*/
-
-IRenderTarget* RendererDispatch::GetColorBuffer (size_t index)
+IFrameBuffer* RendererDispatch::GetFrameBuffer (size_t index)
 {
-  if (index)
-    throw xtl::make_range_exception ("render::mid_level::low_level_driver::RendererDispatch::GetColorBuffer", "index", index, frame_buffers.size ());
+  if (index >= GetFrameBuffersCount ())
+    throw xtl::make_range_exception ("render::mid_level::window_driver::RendererDispatch::GetFrameBuffer", "index", index, frame_buffers.size ());
 
-  return frame_buffers [index].color_buffer.get ();
-}
-
-IRenderTarget* RendererDispatch::GetDepthStencilBuffer (size_t index)
-{
-  if (index)
-    throw xtl::make_range_exception ("render::mid_level::low_level_driver::RendererDispatch::GetDepthStencilBuffer", "index", index, frame_buffers.size ());
-
-  return frame_buffers [index].depth_stencil_buffer.get ();
+  return frame_buffers[index];
 }
 
 /*
@@ -249,7 +205,7 @@ size_t RendererDispatch::GetFramePosition ()
 
 void RendererDispatch::AddFrame (IFrame* in_frame)
 {
-  static const char* METHOD_NAME = "render::mid_level::low_level_driver::RendererDispatch::AddFrame";
+  static const char* METHOD_NAME = "render::mid_level::window_driver::RendererDispatch::AddFrame";
 
   if (!in_frame)
     throw xtl::make_null_argument_exception (METHOD_NAME, "frame");
@@ -258,7 +214,7 @@ void RendererDispatch::AddFrame (IFrame* in_frame)
   
   if (!frame)  
     throw xtl::make_argument_exception (METHOD_NAME, "frame", typeid (in_frame).name (),
-      "Frame type incompatible with render::mid_level::low_level_driver::BasicFrame");
+      "Frame type incompatible with render::mid_level::window_driver::BasicFrame");
       
   frames.insert (frame_position, frame);  
 
@@ -288,7 +244,7 @@ void RendererDispatch::DrawFrames ()
     //вывод сформированной картинки        
     
   for (FrameBufferArray::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)  
-    iter->swap_chain->Present ();
+    (*iter)->Present ();
 }
 
 void RendererDispatch::CancelFrames ()
@@ -300,25 +256,80 @@ void RendererDispatch::CancelFrames ()
 }
 
 /*
+   Подписка на события системы рендеринга
+*/
+
+void RendererDispatch::AttachListener (IRendererListener* listener)
+{
+  static const char* METHOD_NAME = "render::mid_level::window_driver::RendererDispatch::AttachListener";
+
+  if (!listener)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "listener");
+
+  ListenerSet::iterator iter = listeners.find (listener);
+
+  if (iter != listeners.end ())
+    throw xtl::format_operation_exception (METHOD_NAME, "Listener already attached");
+
+  listeners.insert (listener);
+}
+
+void RendererDispatch::DetachListener (IRendererListener* listener)
+{
+  if (!listener)
+    throw xtl::make_null_argument_exception ("render::mid_level::window_driver::RendererDispatch::DetachListener", "listener");
+
+  listeners.erase (listener);
+}
+
+/*
    Создание ресурсов
 */
 
 render::mid_level::renderer2d::ITexture* RendererDispatch::CreateTexture (const media::Image& image)
 {
-  return renderer2d.CreateTexture (image);
+  return renderer2d->CreateTexture (image);
 }
 
 render::mid_level::renderer2d::ITexture* RendererDispatch::CreateTexture (size_t width, size_t height, media::PixelFormat pixel_format)
 {
-  return renderer2d.CreateTexture (width, height, pixel_format);
+  return renderer2d->CreateTexture (width, height, pixel_format);
 }
 
 render::mid_level::renderer2d::IPrimitive* RendererDispatch::CreatePrimitive ()
 {
-  return renderer2d.CreatePrimitive ();
+  return renderer2d->CreatePrimitive ();
 }
 
 render::mid_level::renderer2d::IFrame* RendererDispatch::CreateFrame ()
 {
-  return renderer2d.CreateFrame ();
+  return renderer2d->CreateFrame ();
+}
+
+/*
+   Оповещения
+*/
+
+void RendererDispatch::FrameBufferCreateNotify (IFrameBuffer* frame_buffer)
+{
+  for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+    (*iter)->OnFrameBufferCreate (frame_buffer);
+}
+
+void RendererDispatch::FrameBufferDestroyNotify (IFrameBuffer* frame_buffer)
+{
+  for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+    (*iter)->OnFrameBufferDestroy (frame_buffer);
+}
+
+void RendererDispatch::FrameBufferUpdateNotify (IFrameBuffer* frame_buffer)
+{
+  for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+    (*iter)->OnFrameBufferUpdate (frame_buffer);
+}
+
+void RendererDispatch::FrameBufferResizeNotify (IFrameBuffer* frame_buffer, size_t width, size_t height)
+{
+  for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+    (*iter)->OnFrameBufferResize (frame_buffer, width, height);
 }

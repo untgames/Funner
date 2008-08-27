@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<Configuration1
+DriverMask="*"
+AdapterMask="*"
+ColorBits="24"
+AlphaBits="0"
+DepthBits="24"
+StencilBits="8"
+SamplesCount="2"
+FullScreen="0"
+BuffersCount="2"
+VSync="0"
+SwapMethod="Flip"
+InitString=""
+/>

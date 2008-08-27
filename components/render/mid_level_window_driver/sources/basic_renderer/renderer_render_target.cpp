@@ -1,7 +1,7 @@
 #include "shared.h"
 
 using namespace render::mid_level;
-using namespace render::mid_level::low_level_driver;
+using namespace render::mid_level::window_driver;
 
 /*
     Конструктор
@@ -16,7 +16,7 @@ RenderTarget::RenderTarget (render::low_level::IView* in_render_target_view, Ren
     case RenderTargetType_DepthStencil:
       break;
     default:
-      throw xtl::make_argument_exception ("render::mid_level::low_level_driver::RenderTarget::RenderTarget", "type", type);
+      throw xtl::make_argument_exception ("render::mid_level::window_driver::RenderTarget::RenderTarget", "type", type);
   }
 }
 
@@ -48,7 +48,7 @@ size_t RenderTarget::GetHeight ()
 
 void RenderTarget::CaptureImage (media::Image& image)
 {
-  static const char* METHOD_NAME = "render::mid_level::low_level_driver::RenderTarget::CaptureImage";
+  static const char* METHOD_NAME = "render::mid_level::window_driver::RenderTarget::CaptureImage";
   
   switch (type)
   {
@@ -76,7 +76,7 @@ void RenderTarget::CaptureImage (media::Image& image)
       break;
     }
     case RenderTargetType_DepthStencil:
-      throw xtl::format_not_supported_exception ("render::mid_level::low_level_driver::RenderTarget::CaptureImage",
+      throw xtl::format_not_supported_exception ("render::mid_level::window_driver::RenderTarget::CaptureImage",
         "Can't capture depth-stencil render-targets");
     default:
       break;

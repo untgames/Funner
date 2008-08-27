@@ -2,7 +2,7 @@
 
 using namespace render::low_level;
 using namespace render::mid_level::renderer2d;
-using namespace render::mid_level::low_level_driver::renderer2d;
+using namespace render::mid_level::window_driver::renderer2d;
 
 namespace
 {
@@ -105,7 +105,7 @@ DepthStencilStatePtr create_depth_stencil_state (IDevice& device, bool depth_wri
 //протоколирование компил€тора шейдеров
 void shader_error_log (const char* message)
 {
-  common::LogSystem::Print ("render.mid_level.low_level_driver.renderer2d.Renderer", message);
+  common::LogSystem::Print ("render.mid_level.window_driver.renderer2d.Renderer", message);
 }
 
 //создание программы
@@ -223,7 +223,7 @@ InputLayoutPtr create_input_layout (IDevice& device)
 CommonResources::CommonResources (IDevice* device)
 {
   if (!device)
-    throw xtl::make_null_argument_exception ("render::mid_level::low_level_driver::renderer2d::CommonResources::CommonResources", "device");
+    throw xtl::make_null_argument_exception ("render::mid_level::window_driver::renderer2d::CommonResources::CommonResources", "device");
 
     //создание состо€ний входного уровн€
 
@@ -231,10 +231,10 @@ CommonResources::CommonResources (IDevice* device)
  
     //создание состо€ний уровн€ шейдинга
 
-  default_program = create_program (*device, "render.mid_level.low_level_driver.renderer2d.Renderer.default_program",
+  default_program = create_program (*device, "render.mid_level.window_driver.renderer2d.Renderer.default_program",
                                     DEFAULT_SHADER_SOURCE_CODE);
 
-  alpha_clamp_program = create_program (*device, "render.mid_level.low_level_driver.renderer2d.Renderer.alpha_clamp_program",
+  alpha_clamp_program = create_program (*device, "render.mid_level.window_driver.renderer2d.Renderer.alpha_clamp_program",
                                         ALPHA_CLAMP_SHADER_SOURCE_CODE);
 
   program_parameters_layout = create_program_parameters (*device);

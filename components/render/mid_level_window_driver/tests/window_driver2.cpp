@@ -15,7 +15,7 @@ class Test: public BasicTest
 {
   public:
 /// онструктор
-    Test () : BasicTest (L"Low-level driver test #2")
+    Test () : BasicTest (L"Window driver test #2")
     {
         //инициализаци€ параметров теста
 

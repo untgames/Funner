@@ -3,8 +3,8 @@
 using namespace render::mid_level;
 using namespace render::low_level;
 using namespace render::mid_level::renderer2d;
-using namespace render::mid_level::low_level_driver;
-using namespace render::mid_level::low_level_driver::renderer2d;
+using namespace render::mid_level::window_driver;
+using namespace render::mid_level::window_driver::renderer2d;
 using namespace media;
 
 /*
@@ -26,7 +26,7 @@ render::low_level::PixelFormat get_pixel_format (media::PixelFormat format)
     case media::PixelFormat_L8:    return render::low_level::PixelFormat_A8;
     case media::PixelFormat_LA8:   return render::low_level::PixelFormat_LA8;
     default:
-      throw xtl::format_not_supported_exception ("render::mid_level::low_level_driver::renderer2d::get_pixel_format",
+      throw xtl::format_not_supported_exception ("render::mid_level::window_driver::renderer2d::get_pixel_format",
         "Unsupported image format %s", media::get_format_name (format));
   }
 }
@@ -66,7 +66,7 @@ ImageTexture::ImageTexture (render::low_level::IDevice& device, const media::Ima
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::mid_level::low_level_driver::ImageTexture::ImageTexture");
+    exception.touch ("render::mid_level::window_driver::ImageTexture::ImageTexture");
     throw;
   }
 }
@@ -108,7 +108,7 @@ media::PixelFormat ImageTexture::GetFormat ()
     case render::low_level::PixelFormat_RGB8:  return media::PixelFormat_RGB8;
     case render::low_level::PixelFormat_RGBA8: return media::PixelFormat_RGBA8;
     default:
-      throw xtl::format_not_supported_exception ("render::mid_level::low_level_driver::ImageTexture::GetFormat", "Texture uses incompatible format %s", render::low_level::get_name (texture_desc.format));
+      throw xtl::format_not_supported_exception ("render::mid_level::window_driver::ImageTexture::GetFormat", "Texture uses incompatible format %s", render::low_level::get_name (texture_desc.format));
   }
 }
 
@@ -118,7 +118,7 @@ media::PixelFormat ImageTexture::GetFormat ()
 
 void ImageTexture::CaptureImage (media::Image& image)
 {
-  static const char* METHOD_NAME = "render::mid_level::low_level_driver::ImageTexture::CaptureImage";
+  static const char* METHOD_NAME = "render::mid_level::window_driver::ImageTexture::CaptureImage";
   
   render::low_level::TextureDesc texture_desc;
 
@@ -194,7 +194,7 @@ RenderTargetTexture::ViewPtr RenderTargetTexture::CreateView
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::mid_level::low_level_driver::renderer2d::RenderTargetTexture::CreateView");
+    exception.touch ("render::mid_level::window_driver::renderer2d::RenderTargetTexture::CreateView");
     throw;
   }  
 }

@@ -10,8 +10,12 @@
 #include <xtl/exception.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/ref.h>
+#include <xtl/shared_ptr.h>
+#include <xtl/trackable.h>
 
 #include <common/log.h>
+#include <common/var_registry.h>
+#include <common/var_registry_container.h>
 
 #include <syslib/application.h>
 #include <syslib/window.h>
@@ -20,7 +24,7 @@
 #include <render/low_level/driver.h>
 
 #include <render/mid_level/driver.h>
-#include <render/mid_level/low_level_driver.h>
+#include <render/mid_level/window_driver.h>
 #include <render/mid_level/renderer2d.h>
 
 #include <media/image.h>
@@ -33,169 +37,177 @@ using namespace math;
     Константы
 */
 
-const size_t WINDOW_WIDTH       = 1024;                        //ширина окна
-const size_t WINDOW_HEIGHT      = 768;                         //высота окна
-const char*  DEVICE_INIT_STRING = "max_version=1.1 disable=*"; //строка инициализация низкоуровневого устройства отрисовки
+const size_t WINDOW_WIDTH              = 1024;                        //ширина окна
+const size_t WINDOW_HEIGHT             = 768;                         //высота окна
+const char*  CONFIGURATION_MOUNT_POINT = "Configuration";
+const char*  CONFIGURATION_BRANCH_NAME = "Configuration.Configuration1";
+const char*  CONFIGURATION_FILE_NAME   = "data/configuration.xml";
+
+const math::vec4f CLEAR_COLOR (0.7f, 0.f, 0.f, 0.f);
 
 /*
     Переопределения типов
 */
 
-typedef xtl::com_ptr<render::low_level::ISwapChain> SwapChainPtr;
-typedef xtl::com_ptr<render::low_level::IDevice>    DevicePtr;
-typedef xtl::com_ptr<render::mid_level::IRenderer>  RendererPtr;
-typedef xtl::com_ptr<renderer2d::IRenderer>         Renderer2dPtr;
-typedef xtl::com_ptr<IClearFrame>                   ClearFramePtr;
-typedef xtl::com_ptr<renderer2d::IFrame>            FramePtr;
-typedef xtl::com_ptr<ITexture>                      TexturePtr;
-typedef xtl::com_ptr<IPrimitive>                    PrimitivePtr;
+typedef xtl::com_ptr<render::low_level::ISwapChain>   SwapChainPtr;
+typedef xtl::com_ptr<render::low_level::IDevice>      DevicePtr;
+typedef xtl::com_ptr<render::mid_level::IFrameBuffer> FrameBufferPtr;
+typedef xtl::com_ptr<render::mid_level::IRenderer>    RendererPtr;
+typedef xtl::com_ptr<renderer2d::IRenderer>           Renderer2dPtr;
+typedef xtl::com_ptr<IClearFrame>                     ClearFramePtr;
+typedef xtl::com_ptr<renderer2d::IFrame>              FramePtr;
+typedef xtl::com_ptr<ITexture>                        TexturePtr;
+typedef xtl::com_ptr<IPrimitive>                      PrimitivePtr;
 
 /*
-    Тестовое приложение
+   Слушатель событий системы рендеринга
 */
 
-class BasicTest
+class RendererListener : public IRendererListener
 {
   public:
-///Конструктор  
-    BasicTest (const wchar_t* title) : window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT)
+    void OnFrameBufferCreate (IFrameBuffer* frame_buffer) 
     {
-        //подписка на события протоколирования
+      printf ("Created frame buffer %p\n", frame_buffer);
+    }
 
-      common::LogSystem::RegisterLogHandler ("*", &LogMessage);
+    void OnFrameBufferDestroy (IFrameBuffer* frame_buffer) 
+    {
+      printf ("Destroyed frame buffer %p\n", frame_buffer);
+    }
 
+    void OnFrameBufferUpdate (IFrameBuffer* frame_buffer) 
+    {
+      printf ("Updated frame buffer %p\n", frame_buffer);
+    }
+
+    void OnFrameBufferResize (IFrameBuffer* frame_buffer, size_t width, size_t height) 
+    {
+      printf ("Changed size of frame buffer %p to %ux%u\n", frame_buffer, width, height);
+    }
+};
+
+/*
+   Окно рендеринга
+*/
+
+class RenderWindow : public IRendererListener, public xtl::trackable
+{
+  public:
+    RenderWindow (const wchar_t* title) 
+      : window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT)
+    {
         //инициализация окна
     
       window.SetTitle (title);
       window.Show ();
 
-        //создание устройства отрисовки
+      WindowDriver::RegisterWindow ("MyRenderer", window, CONFIGURATION_BRANCH_NAME);
 
-      render::low_level::SwapChainDesc desc;
-
-      memset (&desc, 0, sizeof (desc));
-
-      desc.frame_buffer.color_bits = 16;
-      desc.frame_buffer.alpha_bits = 0;
-      desc.frame_buffer.depth_bits = 16;
-      desc.buffers_count           = 2;
-      desc.swap_method             = render::low_level::SwapMethod_Discard;
-      desc.window_handle           = window.Handle ();
-
-      render::low_level::DriverManager::CreateSwapChainAndDevice ("*", "*", desc, DEVICE_INIT_STRING, swap_chain, device);
-      
-        //регистрация системы визуализации
-        
-      render::low_level::ISwapChain* swap_chains []    = {swap_chain.get ()};
-      size_t                         swap_chains_count = sizeof (swap_chains) / sizeof (*swap_chains);
-
-      LowLevelDriver::RegisterRenderer ("MyRenderer", device.get (), swap_chains_count, swap_chains);
-      
-        //создание системы визуализации
-        
-      RendererPtr basic_renderer (DriverManager::CreateRenderer (LowLevelDriver::Name (), "MyRenderer"), false);
+      RendererPtr basic_renderer (DriverManager::CreateRenderer (WindowDriver::Name (), "MyRenderer"), false);
 
       renderer = Renderer2dPtr (dynamic_cast<renderer2d::IRenderer*> (basic_renderer.get ()));
 
       if (!renderer)
-        throw xtl::format_operation_exception ("BasicTest::Test", "No renderer2d");
-        
+        throw xtl::format_operation_exception ("RenderWindow::RenderWindow", "No renderer2d");
+
+      renderer->AttachListener (this);
+      
+      OnFrameBufferCreate (renderer->GetFrameBuffer (renderer->GetFrameBuffersCount () - 1));
+      
+        //регистрация обработчиков событий окна
+
+      window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&RenderWindow::OnRedraw, this));
+      window.RegisterEventHandler (syslib::WindowEvent_OnSize,  xtl::bind (&RenderWindow::OnResize, this));
+      window.RegisterEventHandler (syslib::WindowEvent_OnDestroy, xtl::bind (&RenderWindow::OnDestroy, this));
+
+        //установка размеров области вывода
+
+      OnResize ();      
+    }
+
+    ~RenderWindow ()
+    {
+      renderer->DetachListener (this);
+    }
+
+    void OnFrameBufferCreate (IFrameBuffer* new_frame_buffer) 
+    {
+      if (frame_buffer)
+        return;
+
+      frame_buffer = new_frame_buffer;
+
         //создание очищающего кадра
         
       clear_frame = ClearFramePtr (renderer->CreateClearFrame (), false);
 
-      clear_frame->SetRenderTargets (renderer->GetColorBuffer (0), renderer->GetDepthStencilBuffer (0));
+      clear_frame->SetRenderTargets (frame_buffer->GetColorBuffer (), renderer->GetFrameBuffer (0)->GetDepthStencilBuffer ());
       clear_frame->SetFlags         (render::mid_level::ClearFlag_All);
-      clear_frame->SetColor         (math::vec4f (0.7f, 0.f, 0.f, 0.f));
+      clear_frame->SetColor         (CLEAR_COLOR);
       
         //создание базового кадра
 
       frame = FramePtr (renderer->CreateFrame (), false);
 
-      frame->SetRenderTargets (renderer->GetColorBuffer (0), renderer->GetDepthStencilBuffer (0));
+      frame->SetRenderTargets (frame_buffer->GetColorBuffer (), renderer->GetFrameBuffer (0)->GetDepthStencilBuffer ());
       frame->SetProjection    (GetOrthoProjectionMatrix (-100, 100, -100, 100, -1000, 1000));
-
-        //регистрация обработчиков событий окна
-
-      window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&BasicTest::OnRedraw, this));
-      window.RegisterEventHandler (syslib::WindowEvent_OnSize,  xtl::bind (&BasicTest::OnResize, this));
-      window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&BasicTest::OnClose, this));
-
-        //установка размеров области вывода
-
-      OnResize ();      
-    }    
-    
-///Получение объектов визуализации
-    renderer2d::IRenderer* Renderer () { return renderer.get (); }
-    renderer2d::IFrame*    Frame    () { return frame.get (); }
-    
-///Загрузка ресурсов
-    TexturePtr LoadTexture (const char* file_name)
-    {
-      if (!file_name)
-        throw xtl::make_null_argument_exception ("BasicTest::LoadTexture", "file_name");
-    
-      media::Image image (file_name, media::PixelFormat_RGBA8);
-
-      return TexturePtr (renderer->CreateTexture (image), false);
     }
-    
-///Выполнение теста
-    int Run ()
-    {
-      syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&BasicTest::OnIdleWrapper, this));
 
-      syslib::Application::Run ();    
-      
-      return syslib::Application::GetExitCode ();
+    void OnFrameBufferDestroy (IFrameBuffer* destroyed_frame_buffer) 
+    {
+      if (frame_buffer.get () == destroyed_frame_buffer)
+        frame_buffer = 0;
     }
-    
+
+    void OnFrameBufferUpdate (IFrameBuffer* updated_frame_buffer) 
+    {
+      if (frame_buffer.get () == updated_frame_buffer)
+        OnRedraw ();
+    }
+
+    void OnFrameBufferResize (IFrameBuffer* resized_frame_buffer, size_t width, size_t height) 
+    {
+      if (frame_buffer.get () == resized_frame_buffer)
+        OnResize ();
+    }
+
+    renderer2d::IRenderer* Renderer ()
+    {
+      return renderer.get ();
+    }
+
+    renderer2d::IFrame* Frame () 
+    {
+      return frame.get ();
+    }
+
+    void AddPrimitive (IPrimitive* primitive)
+    {
+      frame->AddPrimitive (primitive);
+    }
+
+///Обработчик события перерисовки окна
+    void OnRedraw ()
+    {
+      Redraw ();
+    }
+
+    syslib::Window& Window ()
+    {
+      return window;
+    }
+
   private:
-///Обработчик событий главного цикла приложения
-    virtual void OnIdle () {}
-    
-///Обёртка над обработчиком событий главного цикла приложения
-    void OnIdleWrapper ()
-    {
-      try
-      {
-        OnIdle ();
-        
-        Redraw ();
-      }
-      catch (std::exception& exception)
-      {
-        printf ("exception at idle: %s\n", exception.what ());
-      }
-    }
-
 ///Перерисовка
     void Redraw ()
     {
       try
       {      
-        static size_t last_fps = 0, frames_count = 0;
-        
-          //замер количества кадров в секунду
-
-        if (clock () - last_fps > CLK_TCK)
-        {
-          printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
-
-          last_fps     = clock ();
-          frames_count = 0;
-        }                  
-        
-          //рисование кадров
-          
         renderer->AddFrame   (clear_frame.get ());        
         renderer->AddFrame   (frame.get ());
+
         renderer->DrawFrames ();        
-        
-          //увеличение числа кадров
-        
-        frames_count++;        
       }
       catch (std::exception& e)
       {
@@ -203,13 +215,6 @@ class BasicTest
       }          
     }    
   
-  private:
-///Протоколирование
-    static void LogMessage (const char* name, const char* message)
-    {
-      printf ("Log message from log '%s': '%s'\n", name, message);
-    }
-
 ///Обработчик события изменения размеров окна
     void OnResize ()
     {
@@ -234,16 +239,10 @@ class BasicTest
       }
     }
 
-///Обработчик события перерисовки окна
-    void OnRedraw ()
+///Обработчик события удаления окна
+    void OnDestroy ()
     {
-      Redraw ();
-    }
-
-///Обработчик события закрытия окна
-    void OnClose ()
-    {
-      syslib::Application::Exit (0);
+      frame_buffer = 0;
     }
     
 ///Получение ортографической матрицы проекции
@@ -267,11 +266,173 @@ class BasicTest
 
   private:
     syslib::Window window;
-    SwapChainPtr   swap_chain;
-    DevicePtr      device;
     Renderer2dPtr  renderer;
+    FrameBufferPtr frame_buffer;
     ClearFramePtr  clear_frame;
     FramePtr       frame;
+};
+
+/*
+    Тестовое приложение
+*/
+
+class BasicTest
+{
+  public:
+///Конструктор  
+    BasicTest (const wchar_t* title)
+    {
+        //монтирование реестра
+        
+      string_registry.Mount (CONFIGURATION_MOUNT_POINT);
+
+        //чтение настроек
+        
+      var_registry.Open (CONFIGURATION_MOUNT_POINT);
+
+        //чтение конфигурации
+
+      load_xml_configuration (var_registry, CONFIGURATION_FILE_NAME);
+
+        //подписка на события протоколирования
+
+      common::LogSystem::RegisterLogHandler ("*", &LogMessage);
+
+      AddWindow ();
+
+      render_windows[0]->Renderer ()->AttachListener (&renderer_listener);
+    }    
+    
+///Получение объектов визуализации
+    renderer2d::IRenderer* Renderer () 
+    { 
+      if (render_windows.empty ())
+        return 0;
+
+      return render_windows[0]->Renderer (); 
+    }
+
+    renderer2d::IFrame* Frame () 
+    { 
+      if (render_windows.empty ())
+        return 0;
+
+      return render_windows[0]->Frame (); 
+    }
+    
+///Загрузка ресурсов
+    TexturePtr LoadTexture (const char* file_name)
+    {
+      if (!file_name)
+        throw xtl::make_null_argument_exception ("BasicTest::LoadTexture", "file_name");
+    
+      if (render_windows.empty ())
+        throw xtl::format_operation_exception ("BasicTest::LoadTexture", "No windows");
+
+      media::Image image (file_name, media::PixelFormat_RGBA8);
+
+      return TexturePtr (render_windows[0]->Renderer ()->CreateTexture (image), false);
+    }
+    
+///Выполнение теста
+    int Run ()
+    {
+      idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&BasicTest::OnIdleWrapper, this));
+
+      syslib::Application::Run ();    
+      
+      return syslib::Application::GetExitCode ();
+    }
+
+    void AddWindow ()
+    {
+      render_windows.push_back (new RenderWindow (L"Additional window"));
+
+      render_windows.back ()->Window ().RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&BasicTest::OnClose, this, _1));
+    }
+
+    void AddPrimitive (IPrimitive* primitive)
+    {
+      for (size_t i = 0; i < render_windows.size (); i++)
+        render_windows[i]->AddPrimitive (primitive);
+    }
+    
+    void ChangeWindowStyle (syslib::WindowStyle new_style)
+    {
+      render_windows[0]->Window ().SetStyle (new_style);
+    }
+    
+  private:
+///Обработчик событий главного цикла приложения
+    virtual void OnIdle () {}
+
+///Обработчик события закрытия главного окна
+    void OnClose (syslib::Window& closed_window)
+    {
+      for (size_t i = 0; i < render_windows.size (); i++)
+        if (&(render_windows[i]->Window ()) == &closed_window)
+        {
+          render_windows.erase (render_windows.begin () + i);
+          break;
+        }
+
+      if (render_windows.empty ())
+      {
+        idle_connection.disconnect ();
+        syslib::Application::Exit (0);
+      }
+    }
+    
+///Обёртка над обработчиком событий главного цикла приложения
+    void OnIdleWrapper ()
+    {
+      try
+      {        
+        static size_t last_fps = 0, frames_count = 0;
+        
+          //замер количества кадров в секунду
+
+        if (clock () - last_fps > CLK_TCK)
+        {
+          printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
+
+          last_fps     = clock ();
+          frames_count = 0;
+        }                  
+        
+          //рисование кадров
+          
+        for (size_t i = 0; i < render_windows.size (); i++)
+          render_windows[i]->OnRedraw ();
+
+          //увеличение числа кадров
+        
+        frames_count++;        
+
+        OnIdle ();
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception at idle: %s\n", exception.what ());
+      }
+    }
+
+  private:
+///Протоколирование
+    static void LogMessage (const char* name, const char* message)
+    {
+      printf ("Log message from log '%s': '%s'\n", name, message);
+    }
+
+  private:
+    typedef xtl::shared_ptr<RenderWindow> RenderWindowPtr;
+
+  private:
+    stl::vector<RenderWindow*>              render_windows;
+    common::VarRegistry                       var_registry;
+    common::VarRegistryContainer<stl::string> string_registry;
+    RendererListener                          renderer_listener;
+    xtl::connection                           idle_connection;
 };
 
 //получение случайного числа в диапазоне [min_value;max_value]
@@ -281,3 +442,4 @@ float frand (float min_value=0.0f, float max_value=1.0f)
 }
 
 #endif
+

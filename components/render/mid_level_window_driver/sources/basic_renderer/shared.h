@@ -1,18 +1,24 @@
-#ifndef RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_BASIC_RENDERER_SHARED_HEADER
-#define RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_BASIC_RENDERER_SHARED_HEADER
+#ifndef RENDER_MID_WINDOW_DRIVER_BASIC_RENDERER_SHARED_HEADER
+#define RENDER_MID_WINDOW_DRIVER_BASIC_RENDERER_SHARED_HEADER
 
+#include <stl/set>
 #include <stl/string>
 
+#include <xtl/bind.h>
+#include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/string.h>
+#include <xtl/trackable.h>
 
 #include <common/singleton.h>
+#include <common/var_registry.h>
 
 #include <media/image.h>
 
 #include <render/low_level/utils.h>
 
-#include <render/mid_level/low_level_driver.h>
+#include <render/mid_level/window_driver.h>
 
 #include <shared/basic_renderer.h>
 
@@ -22,7 +28,7 @@ namespace render
 namespace mid_level
 {
 
-namespace low_level_driver
+namespace window_driver
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,15 +104,12 @@ class Driver: virtual public IDriver
     IRenderer* CreateRenderer (const char* name);    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация систем рендернинга
+///Регистрация окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterRenderer (const char*             name,
-                           low_level::IDevice*     device,
-                           size_t                  swap_chains_count,
-                           low_level::ISwapChain** swap_chains);
-
-    void UnregisterRenderer     (const char* name);
-    void UnregisterAllRenderers ();
+    void RegisterWindow       (const char* renderer_name, syslib::Window& window, const char* configuration_branch);
+    void UnregisterWindow     (const char* renderer_name, syslib::Window& window);
+    void UnregisterAllWindows (const char* renderer_name);
+    void UnregisterAllWindows ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -114,17 +117,51 @@ class Driver: virtual public IDriver
     void AddRef  () {}
     void Release () {}
 
+  public:
+    struct RendererEntry;
+
   private:
     void UnregisterDriver ();
 
   private:
-    struct RendererEntry;
-
     typedef xtl::shared_ptr<RendererEntry> RendererEntryPtr;
     typedef stl::vector<RendererEntryPtr>  RendererEntries;
 
   private:
     RendererEntries renderer_entries;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Буфер кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class FrameBuffer: virtual public IFrameBuffer, public Object, public xtl::trackable
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FrameBuffer  (low_level::IDevice& device, low_level::ISwapChain& in_swap_chain);
+    ~FrameBuffer ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение буфера цвета и буфера попиксельного отсечения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IRenderTarget* GetColorBuffer        ();
+    IRenderTarget* GetDepthStencilBuffer ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вызов показа цепи обмена
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Present () { swap_chain->Present (); }
+
+  private:
+    typedef xtl::intrusive_ptr<RenderTarget>    RenderTargetPtr;
+    typedef xtl::com_ptr<low_level::ISwapChain> SwapChainPtr;
+
+  private:
+    RenderTargetPtr color_buffer;         //буфер цвета
+    RenderTargetPtr depth_stencil_buffer; //буфер попиксельного отсечения
+    SwapChainPtr    swap_chain;           //цепь обмена
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,9 +173,15 @@ class RendererDispatch: virtual public renderer2d::IRenderer, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RendererDispatch  (low_level::IDevice* device, size_t swap_chains_count, low_level::ISwapChain** swap_chains);
+    RendererDispatch  (low_level::IDevice& device);
     ~RendererDispatch ();
-  
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация/удаление окна
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AddFrameBuffer    (FrameBuffer*);
+    void RemoveFrameBuffer (FrameBuffer*);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,13 +190,8 @@ class RendererDispatch: virtual public renderer2d::IRenderer, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество буферов кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetFrameBuffersCount ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение буфера цвета и буфера попиксельного отсечения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    IRenderTarget* GetColorBuffer        (size_t frame_buffer_index);
-    IRenderTarget* GetDepthStencilBuffer (size_t frame_buffer_index);
+    size_t        GetFrameBuffersCount ();
+    IFrameBuffer* GetFrameBuffer       (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
@@ -181,6 +219,12 @@ class RendererDispatch: virtual public renderer2d::IRenderer, public Object
     void CancelFrames ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Подписка на события системы рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AttachListener (IRendererListener*);
+    void DetachListener (IRendererListener*);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     render::mid_level::renderer2d::ITexture*   CreateTexture   (const media::Image& image);
@@ -188,21 +232,30 @@ class RendererDispatch: virtual public renderer2d::IRenderer, public Object
     render::mid_level::renderer2d::IPrimitive* CreatePrimitive ();
     render::mid_level::renderer2d::IFrame*     CreateFrame     ();
 
-  private:
-    struct FrameBuffer;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Оповещения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void FrameBufferCreateNotify  (IFrameBuffer* frame_buffer);
+    void FrameBufferDestroyNotify (IFrameBuffer* frame_buffer);
+    void FrameBufferUpdateNotify  (IFrameBuffer* frame_buffer);
+    void FrameBufferResizeNotify  (IFrameBuffer* frame_buffer, size_t width, size_t height);
 
-    typedef xtl::intrusive_ptr<BasicFrame> FramePtr;
-    typedef stl::list<FramePtr>            FrameList;
-    typedef stl::vector<FrameBuffer>       FrameBufferArray;
+  private:
+    typedef xtl::intrusive_ptr<BasicFrame>           FramePtr;
+    typedef stl::list<FramePtr>                      FrameList;
+    typedef stl::vector<FrameBuffer*>                FrameBufferArray;
     typedef xtl::com_ptr<render::low_level::IDevice> DevicePtr;  
+    typedef stl::auto_ptr<Renderer2D>                Renderer2DPtr;  
+    typedef stl::set<IRendererListener*>             ListenerSet;
 
   private:
-    DevicePtr           device;
-    FrameBufferArray    frame_buffers;  //массив буферов кадра
-    FrameList           frames;         //массив кадров
-    FrameList::iterator frame_position; //текущая позиция вставки кадров
-    size_t              frames_count;   //количество кадров
-    Renderer2D          renderer2d;     //2д рендерер
+    DevicePtr           device;                           //устройство вывода
+    FrameBufferArray    frame_buffers;                    //массив буферов кадра
+    FrameList           frames;                           //массив кадров
+    FrameList::iterator frame_position;                   //текущая позиция вставки кадров
+    size_t              frames_count;                     //количество кадров
+    Renderer2DPtr       renderer2d;                       //2д рендерер
+    ListenerSet         listeners;                        //слушатели событий
 };
 
 }

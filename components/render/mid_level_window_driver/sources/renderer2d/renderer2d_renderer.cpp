@@ -3,8 +3,8 @@
 using namespace render::low_level;
 using namespace render::mid_level;
 using namespace render::mid_level::renderer2d;
-using namespace render::mid_level::low_level_driver;
-using namespace render::mid_level::low_level_driver::renderer2d;
+using namespace render::mid_level::window_driver;
+using namespace render::mid_level::window_driver::renderer2d;
 
 namespace
 {
@@ -46,7 +46,7 @@ render::mid_level::renderer2d::ITexture* Renderer2D::CreateTexture (const media:
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::mid_level::low_level_driver::renderer2d::Renderer2D::CreateTexture(const media::Image&)");
+    exception.touch ("render::mid_level::window_driver::renderer2d::Renderer2D::CreateTexture(const media::Image&)");
     throw;
   }
 }
@@ -59,7 +59,7 @@ render::mid_level::renderer2d::ITexture* Renderer2D::CreateTexture (size_t width
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::mid_level::low_level_driver::renderer2d::Renderer2D::CreateTexture(size_t, size_t, media::PixelFormat)");
+    exception.touch ("render::mid_level::window_driver::renderer2d::Renderer2D::CreateTexture(size_t, size_t, media::PixelFormat)");
     throw;
   }
 }

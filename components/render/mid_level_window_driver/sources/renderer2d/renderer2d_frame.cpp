@@ -2,8 +2,8 @@
 
 using namespace render::mid_level;
 using namespace render::mid_level::renderer2d;
-using namespace render::mid_level::low_level_driver;
-using namespace render::mid_level::low_level_driver::renderer2d;
+using namespace render::mid_level::window_driver;
+using namespace render::mid_level::window_driver::renderer2d;
 using namespace render::low_level;
 
 namespace
@@ -101,7 +101,7 @@ size_t Frame::PrimitivesCount ()
 //добавление примитива
 void Frame::AddPrimitive (IPrimitive* in_primitive)
 {
-  static const char* METHOD_NAME = "render::mid_level::low_level_driver::renderer2d::Frame::AddPrimitive";  
+  static const char* METHOD_NAME = "render::mid_level::window_driver::renderer2d::Frame::AddPrimitive";  
 
   if (!in_primitive)
     throw xtl::make_null_argument_exception (METHOD_NAME, "primitive");
@@ -112,7 +112,7 @@ void Frame::AddPrimitive (IPrimitive* in_primitive)
 
   if (!casted_primitive)
     throw xtl::make_argument_exception (METHOD_NAME, "primitive", typeid (in_primitive).name (),
-      "Primitive type incompatible with render::mid_level::low_level_driver::renderer2d::Primitive");
+      "Primitive type incompatible with render::mid_level::window_driver::renderer2d::Primitive");
       
     //добавление примитива в список примитивов кадра (для захвата ресурсов примитива)
 

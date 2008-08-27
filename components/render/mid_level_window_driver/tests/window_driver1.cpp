@@ -15,7 +15,7 @@ class Test: public BasicTest
 {
   public:
 ///Конструктор
-    Test () : BasicTest (L"Low-level driver test #1")
+    Test () : BasicTest (L"Window driver test #1")
     {
         //инициализация параметров теста
 
@@ -55,7 +55,7 @@ class Test: public BasicTest
 
       printf ("Frame primitives count is %u\n", Frame ()->PrimitivesCount ());
     }
-    
+
   private:
 ///Обработчик главного цикла приложения
     void OnIdle ()
@@ -77,7 +77,7 @@ class Test: public BasicTest
       {
         media::Image screenshot;
 
-        Renderer ()->GetColorBuffer (0)->CaptureImage (screenshot);
+        Renderer ()->GetFrameBuffer (0)->GetColorBuffer ()->CaptureImage (screenshot);
 
         screenshot.Save (SCREENSHOT_NAME);
 

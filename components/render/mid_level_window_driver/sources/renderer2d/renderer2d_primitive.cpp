@@ -2,8 +2,8 @@
 
 using namespace render::mid_level;
 using namespace render::mid_level::renderer2d;
-using namespace render::mid_level::low_level_driver;
-using namespace render::mid_level::low_level_driver::renderer2d;
+using namespace render::mid_level::window_driver;
+using namespace render::mid_level::window_driver::renderer2d;
 
 /*
     Конструктор / деструктор
@@ -58,8 +58,8 @@ void Primitive::SetTexture (render::mid_level::renderer2d::ITexture* in_texture)
   }
   else
   {
-    throw xtl::make_argument_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::SetTexture", "texture", typeid (in_texture).name (),
-      "Texture type must be render::mid_level::low_level_driver::renderer2d::ImageTexture or render::mid_level::low_level_driver::renderer2d::RenderTargetTexture");    
+    throw xtl::make_argument_exception ("render::mid_level::window_driver::renderer2d::Primitive::SetTexture", "texture", typeid (in_texture).name (),
+      "Texture type must be render::mid_level::window_driver::renderer2d::ImageTexture or render::mid_level::window_driver::renderer2d::RenderTargetTexture");    
   }
 }
 
@@ -83,7 +83,7 @@ void Primitive::SetBlendMode (BlendMode in_blend_mode)
     case BlendMode_AlphaClamp:
       break;
     default:
-      throw xtl::make_argument_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::SetBlendMode", "blend_mode", in_blend_mode);
+      throw xtl::make_argument_exception ("render::mid_level::window_driver::renderer2d::Primitive::SetBlendMode", "blend_mode", in_blend_mode);
   }
 
   renderable_primitive.blend_mode = in_blend_mode;
@@ -122,7 +122,7 @@ size_t Primitive::GetSpritesCount ()
 void Primitive::GetSprite (size_t index, Sprite& sprite)
 {
   if (index >= sprites.size ())
-    throw xtl::make_range_exception ("render::mid_level::low_level_driver::renderer2d::Primitive::GetSprite", "index", index, sprites.size ());
+    throw xtl::make_range_exception ("render::mid_level::window_driver::renderer2d::Primitive::GetSprite", "index", index, sprites.size ());
 
   sprite = sprites [index];
 }
@@ -136,7 +136,7 @@ size_t Primitive::AddSprites (size_t sprites_count, const Sprite* sprites_array)
     return first;
 
   if (!sprites_array)
-    throw xtl::make_null_argument_exception ("render::mid_level::low_level_driver::Primitive::AddSprites", "sprites_array");
+    throw xtl::make_null_argument_exception ("render::mid_level::window_driver::Primitive::AddSprites", "sprites_array");
 
   sprites.insert (sprites.end (), sprites_array, sprites_array + sprites_count);
   

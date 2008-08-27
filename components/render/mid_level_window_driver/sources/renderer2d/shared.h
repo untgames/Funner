@@ -1,5 +1,5 @@
-#ifndef RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_RENDERER2D_SHARED_HEADER
-#define RENDER_MID_LEVEL_LOW_LEVEL_DRIVER_RENDERER2D_SHARED_HEADER
+#ifndef RENDER_MID_WINDOW_DRIVER_RENDERER2D_SHARED_HEADER
+#define RENDER_MID_WINDOW_DRIVER_RENDERER2D_SHARED_HEADER
 
 #include <stl/algorithm>
 
@@ -20,7 +20,7 @@ namespace render
 namespace mid_level
 {
 
-namespace low_level_driver
+namespace window_driver
 {
 
 namespace renderer2d
