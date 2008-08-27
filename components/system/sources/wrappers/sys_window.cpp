@@ -440,12 +440,19 @@ void Window::SetStyle (WindowStyle style)
 {
   try
   {
-    if (style == impl->Style ())
-      return;
-      
-    Rect window_rect = WindowRect ();
+    if (impl->Handle ())
+    {
+      if (style == impl->Style ())
+        return;
+        
+      Rect window_rect = WindowRect ();
 
-    impl->Init (style, impl->ParentHandle (), IsVisible (), &window_rect);
+      impl->Init (style, impl->ParentHandle (), IsVisible (), &window_rect);
+    }
+    else
+    {
+      impl->Init (style, impl->ParentHandle (), false);
+    }
   }
   catch (xtl::exception& exception)
   {
