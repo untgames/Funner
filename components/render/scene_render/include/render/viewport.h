@@ -3,6 +3,8 @@
 
 #include <stl/string_fwd>
 
+#include <mathlib.h>
+
 #include <render/common.h>
 
 namespace xtl
@@ -43,12 +45,6 @@ class IViewportListener
     virtual void OnChangeProperty   (const char* name, const char* new_value) {}
     virtual void OnDestroy          () {}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсчёт ссылок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void AddRef  () {}
-    virtual void Release () {}
-    
   protected:
     virtual ~IViewportListener () {}
 };

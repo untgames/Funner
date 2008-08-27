@@ -189,7 +189,7 @@ void RenderView::Draw ()
   scene->VisitEach (visitor);
 
     //добавление кадра на отрисовку
-
+    
   render->Renderer ()->AddFrame (frame.get ());
 }
 

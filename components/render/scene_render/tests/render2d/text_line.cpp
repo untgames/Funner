@@ -45,9 +45,7 @@ int main ()
 
     screen.Attach (vp1);
     
-    RenderTarget render_target;
-
-    render_target = render.RenderTarget (0);
+    RenderTarget render_target = render.RenderTarget (0);
 
     render_target.SetScreen (&screen);
     

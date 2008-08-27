@@ -15,142 +15,130 @@ const char* RENDER_PATH_COMPONENTS_MASK = "render.scene_render.*"; //маска имён 
 
 /*
 ===================================================================================================
-    SceneRenderManagerImpl::RenderPath
+    Реализация менеджера путей рендеринга
 ===================================================================================================
 */
 
-class SceneRenderManagerImpl::RenderPath: public SceneRenderManager::IRenderPath, public xtl::reference_counter
+class SceneRenderManagerImpl
 {
   public:
-///Конструктор
-    RenderPath (const char* in_name, const RenderCreater& in_creater) : name (in_name), creater (in_creater) { }
+    typedef SceneRenderManager::RenderCreater RenderCreater;
+    typedef SceneRenderManager::Iterator      Iterator;
+  
+///Регистрация путей рендеринга
+    void RegisterRender (const char* path_name, const RenderCreater& creater)
+    {
+      static const char* METHOD_NAME = "render::SceneRenderManagerImpl::RegisterRender";
 
-///Имя пути
-    const char* Name () { return name.c_str (); }
+      if (!path_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "path_name");
+        
+      RenderPathMap::iterator iter = paths.find (path_name);
+      
+      if (iter != paths.end ())
+        throw xtl::make_argument_exception (METHOD_NAME, "path_name", path_name, "Render path has already registered");
+        
+      paths.insert_pair (path_name, RenderPathPtr (new RenderPath (path_name, creater), false));      
+    }
+
+///Отмена регистрации пути рендеринга
+    void UnregisterRender (const char* path_name)
+    {
+      if (!path_name)
+        return;
+        
+      paths.erase (path_name);
+    }
+
+///Отмена регистрации всех путей рендеринга
+    void UnregisterAllRenders ()
+    {
+      paths.clear ();
+    }
+
+///Перебор путей рендеринга
+    Iterator CreateIterator ()
+    {
+      struct RenderPathSelector
+      {
+        SceneRenderManager::IRenderPath& operator () (RenderPathMap::value_type& v) const { return *v.second; }
+      };
+      
+      LoadDefaultComponents ();
+
+      return Iterator (paths.begin (), paths.begin (), paths.end (), RenderPathSelector ());        
+    }
 
 ///Создание рендера
-    ICustomSceneRender* CreateRender (mid_level::IRenderer* renderer)
+    CustomSceneRenderPtr CreateRender (mid_level::IRenderer* renderer, const char* path_name)
     {
       try
       {
-        return creater (renderer, name.c_str ());
+        if (!renderer)
+          throw xtl::make_null_argument_exception ("", "renderer");
+          
+        if (!path_name)
+          throw xtl::make_null_argument_exception ("", "path_name");
+          
+        LoadDefaultComponents ();
+
+        RenderPathMap::iterator iter = paths.find (path_name);
+
+        if (iter == paths.end ())
+          throw xtl::make_argument_exception ("", "path_name", path_name, "Render path has not registered");
+          
+        try
+        {          
+          return CustomSceneRenderPtr (iter->second->CreateRender (renderer), false);
+        }
+        catch (xtl::exception& exception)
+        {
+          exception.touch ("create render path '%s'", path_name);
+          throw;
+        }
       }
       catch (xtl::exception& exception)
       {
-        exception.touch ("render::SceneRenderManagerImpl::RenderPath::CreateRender(path_name='%s')", name.c_str ());
+        exception.touch ("render::SceneRenderManagerImpl::CreateRender");
         throw;
       }
     }
+        
+  private:
+///Загрузка компонентов по умолчанию
+    void LoadDefaultComponents ()
+    {
+      static common::ComponentLoader loader (RENDER_PATH_COMPONENTS_MASK);
+    }
 
   private:
-    stl::string   name;    //имя пути рендеринга
-    RenderCreater creater; //функтор создания рендера
+///Реализация пути рендеринга
+    struct RenderPath: public SceneRenderManager::IRenderPath, public xtl::reference_counter
+    {
+      RenderPath (const char* in_name, const RenderCreater& in_creater) : name (in_name), creater (in_creater) { }
+      
+///Получение имени пути
+      const char* Name () { return name.c_str (); }
+      
+///Создание пути рендеринга
+      ICustomSceneRender* CreateRender (mid_level::IRenderer* renderer)
+      {
+        return creater (renderer, name.c_str ());
+      }
+
+      stl::string   name;    //имя пути рендеринга
+      RenderCreater creater; //функтор создания рендера
+    };
+
+    typedef xtl::intrusive_ptr<RenderPath>                           RenderPathPtr;
+    typedef stl::hash_map<stl::hash_key<const char*>, RenderPathPtr> RenderPathMap;
+
+  private:
+    RenderPathMap paths; //карта путей рендеринга
 };
 
-/*
-===================================================================================================
-    SceneRenderManagerImpl
-===================================================================================================
-*/
-
-/*
-   Загрузка компонентов по умолчанию
-*/
-
-void SceneRenderManagerImpl::LoadDefaultComponents ()
-{
-  static common::ComponentLoader loader (RENDER_PATH_COMPONENTS_MASK);  
-}
-
-/*
-    Регистрация путей рендеринга
-*/
-
-void SceneRenderManagerImpl::RegisterRender (const char* path_name, const RenderCreater& creater)
-{
-  static const char* METHOD_NAME = "render::SceneRenderManagerImpl::RegisterRender";
-
-  if (!path_name)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "path_name");
-    
-  RenderPathMap::iterator iter = paths.find (path_name);
-  
-  if (iter != paths.end ())
-    throw xtl::make_argument_exception (METHOD_NAME, "path_name", path_name, "Render path has already registered");
-    
-  paths.insert_pair (path_name, RenderPathPtr (new RenderPath (path_name, creater), false));
-}
-
-void SceneRenderManagerImpl::UnregisterRender (const char* path_name)
-{
-  if (!path_name)
-    return;
-    
-  paths.erase (path_name);
-}
-
-void SceneRenderManagerImpl::UnregisterAllRenders ()
-{
-  paths.clear ();
-}
-
-/*
-    Перебор путей рендеринга
-*/
-
-SceneRenderManagerImpl::Iterator SceneRenderManagerImpl::CreateIterator ()
-{
-  struct RenderPathSelector
-  {
-    SceneRenderManager::IRenderPath& operator () (RenderPathMap::value_type& v) const { return *v.second; }
-  };
-  
-  LoadDefaultComponents ();
-
-  return Iterator (paths.begin (), paths.begin (), paths.end (), RenderPathSelector ());  
-}
-
-/*
-    Создание рендера
-*/
-
-CustomSceneRenderPtr SceneRenderManagerImpl::CreateRender (mid_level::IRenderer* renderer, const char* path_name)
-{
-  try
-  {
-    if (!renderer)
-      throw xtl::make_null_argument_exception ("", "renderer");
-      
-    if (!path_name)
-      throw xtl::make_null_argument_exception ("", "path_name");
-      
-    LoadDefaultComponents ();
-
-    RenderPathMap::iterator iter = paths.find (path_name);
-
-    if (iter == paths.end ())
-      throw xtl::make_argument_exception ("", "path_name", path_name, "Render path has not registered");
-
-    return CustomSceneRenderPtr (iter->second->CreateRender (renderer), false);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::SceneRenderManagerImpl::CreateRender");
-    throw;
-  }
-}
-
-/*
-    Получение экземпляра менеджера
-*/
-
-SceneRenderManagerImpl& SceneRenderManagerImpl::Instance ()
-{
-    //синглтон для менеджера путей рендеринга
-  typedef common::Singleton<SceneRenderManagerImpl> SceneRenderManagerSingleton;
-  
-  return SceneRenderManagerSingleton::Instance ();
-}
+//синглтон для менеджера путей рендеринга
+typedef common::Singleton<SceneRenderManagerImpl> SceneRenderManagerSingleton;
 
 /*
 ===================================================================================================
@@ -166,7 +154,7 @@ void SceneRenderManager::RegisterRender (const char* path_name, const RenderCrea
 {
   try
   {
-    SceneRenderManagerImpl::Instance ().RegisterRender (path_name, creater);
+    SceneRenderManagerSingleton::Instance ().RegisterRender (path_name, creater);
   }
   catch (xtl::exception& exception)
   {
@@ -177,12 +165,12 @@ void SceneRenderManager::RegisterRender (const char* path_name, const RenderCrea
 
 void SceneRenderManager::UnregisterRender (const char* path_name)
 {
-  SceneRenderManagerImpl::Instance ().UnregisterRender (path_name);
+  SceneRenderManagerSingleton::Instance ().UnregisterRender (path_name);
 }
 
 void SceneRenderManager::UnregisterAllRenders ()
 {
-  SceneRenderManagerImpl::Instance ().UnregisterAllRenders ();
+  SceneRenderManagerSingleton::Instance ().UnregisterAllRenders ();
 }
 
 /*
@@ -193,11 +181,25 @@ SceneRenderManager::Iterator SceneRenderManager::CreateIterator ()
 {
   try
   {
-    return SceneRenderManagerImpl::Instance ().CreateIterator ();
+    return SceneRenderManagerSingleton::Instance ().CreateIterator ();
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("render::SceneRenderManager::CreateIterator");
     throw;
   }
+}
+
+/*
+    Создание пути рендеринга
+*/
+
+namespace render
+{
+
+CustomSceneRenderPtr create_render_path (mid_level::IRenderer* renderer, const char* path_name)
+{
+  return SceneRenderManagerSingleton::Instance ().CreateRender (renderer, path_name);
+}
+
 }

@@ -1,5 +1,5 @@
-#ifndef RENDER_Screen_HEADER
-#define RENDER_Screen_HEADER
+#ifndef RENDER_SCREEN_HEADER
+#define RENDER_SCREEN_HEADER
 
 #include <render/viewport.h>
 
@@ -16,17 +16,12 @@ class IScreenListener
 ///События
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnChangeName       (const char* new_name) {}
+    virtual void OnChangeArea       (const Rect&) {}
     virtual void OnChangeBackground (bool state, const math::vec4f& new_color) {}
     virtual void OnAttachViewport   (Viewport&) {}
     virtual void OnDetachViewport   (Viewport&) {}
     virtual void OnDestroy          () {}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсчёт ссылок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void AddRef  () {}
-    virtual void Release () {}
-    
   protected:
     virtual ~IScreenListener () {}
 };
@@ -56,6 +51,15 @@ class Screen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void        SetName (const char* name);
     const char* Name    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Рабочее пространство
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetArea   (const Rect& rect);
+    void        SetArea   (int left, int top, size_t width, size_t height);
+    void        SetOrigin (int left, int top);
+    void        SetSize   (size_t width, size_t height);
+    const Rect& Area      () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Цвет фона

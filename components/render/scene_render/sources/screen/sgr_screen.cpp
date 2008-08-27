@@ -11,6 +11,8 @@ namespace
 
 const size_t VIEWPORT_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива областей вывода
 const size_t LISTENER_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива слушателей
+const size_t DEFAULT_SCREEN_WIDTH        = 100; //ширина экрана по умолчанию
+const size_t DEFAULT_SCREEN_HEIGHT       = 100; //высота экрана по умолчанию
 
 }
 
@@ -18,19 +20,19 @@ const size_t LISTENER_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива с
     ќписание реализации рабочего стола
 */
 
-typedef stl::vector<Viewport>           ViewportArray;
-typedef xtl::com_ptr<IScreenListener>  ListenerPtr;
-typedef stl::vector<ListenerPtr>        ListenerArray;
+typedef stl::vector<Viewport>         ViewportArray;
+typedef stl::vector<IScreenListener*> ListenerArray;
 
 struct Screen::Impl: public xtl::reference_counter
 {
   stl::string   name;             //им€ рабочего стола
+  Rect          area;             //рабоча€ область
   math::vec4f   background_color; //цвет фона
   bool          has_background;   //есть ли фон
   ViewportArray viewports;        //области вывода
   ListenerArray listeners;        //слушатели
 
-  Impl () : has_background (true)
+  Impl () : area (0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), has_background (true)
   {
     viewports.reserve (VIEWPORT_ARRAY_RESERVE_SIZE);
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
@@ -60,6 +62,11 @@ struct Screen::Impl: public xtl::reference_counter
   void ChangeNameNotify ()
   {
     Notify (xtl::bind (&IScreenListener::OnChangeName, _1, name.c_str ()));
+  }
+  
+  void ChangeAreaNotify ()
+  {
+    Notify (xtl::bind (&IScreenListener::OnChangeArea, _1, area));
   }
   
   void ChangeBackgroundNotify ()
@@ -116,7 +123,7 @@ Screen& Screen::operator = (const Screen& screen)
 
 size_t Screen::Id () const
 {
-  return reinterpret_cast<size_t> (get_pointer (impl));
+  return reinterpret_cast<size_t> (impl);
 }
 
 /*
@@ -142,7 +149,51 @@ const char* Screen::Name () const
 }
 
 /*
-    ”правление фона
+    –абоча€ область
+*/
+
+void Screen::SetArea (const Rect& rect)
+{
+  if (impl->area.left == rect.left && impl->area.top == rect.top && impl->area.width == rect.width && impl->area.height == rect.height)
+    return;
+
+  impl->area = rect;
+
+  impl->ChangeAreaNotify ();
+}
+
+void Screen::SetArea (int left, int top, size_t width, size_t height)
+{
+  SetArea (Rect (left, top, width, height));
+}
+
+void Screen::SetOrigin (int left, int top)
+{
+  Rect new_rect = impl->area;
+  
+  new_rect.left = left;
+  new_rect.top  = top;
+  
+  SetArea (new_rect);
+}
+
+void Screen::SetSize (size_t width, size_t height)
+{
+  Rect new_rect = impl->area;
+  
+  new_rect.width  = width;
+  new_rect.height = height;
+
+  SetArea (new_rect);
+}
+
+const Rect& Screen::Area () const
+{
+  return impl->area;
+}
+
+/*
+    ”правление фоном
 */
 
 void Screen::SetBackgroundColor (const math::vec4f& color)

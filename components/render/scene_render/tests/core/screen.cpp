@@ -1,15 +1,17 @@
 #include "shared.h"
 
 //слушатель событий рабочего стола
-class MyScreenListener: public IScreenListener, public xtl::reference_counter
+class MyScreenListener: public IScreenListener
 {
   public:
-    MyScreenListener ()  { printf ("MyScreenListener::MyScreenListener\n"); }
-    ~MyScreenListener () { printf ("MyScreenListener::~MyScreenListener\n"); }
-
     void OnChangeName (const char* new_name)
     {
       printf ("OnChangeName(%s)\n", new_name);
+    }
+    
+    void OnChangeArea (const Rect& rect)
+    {
+      printf ("OnChangeArea(%d, %d, %u, %u)\n", rect.left, rect.top, rect.width, rect.height);
     }
     
     void OnChangeBackground (bool new_state, const math::vec4f& new_color)
@@ -31,9 +33,6 @@ class MyScreenListener: public IScreenListener, public xtl::reference_counter
     {
       printf ("OnDestroy()\n");
     }
-
-    void AddRef  () { addref (this); }
-    void Release () { release (this); }
 };
 
 void print_viewports (const Screen& Screen)
@@ -52,27 +51,30 @@ int main ()
 
   try
   {
+    MyScreenListener listener;
+    
       //создание рабочего стола
       
     Screen screen1;
     
       //регистрация слушателя
       
-    screen1.AttachListener (xtl::com_ptr<MyScreenListener> (new MyScreenListener, false).get ());    
+    screen1.AttachListener (&listener);
     
       //изменение базовых параметров
       
+    screen1.SetArea            (10, 20, 300, 40);
     screen1.SetBackgroundColor (0.5f, 0.25f, 1.0f, 0.3f);
     screen1.DisableBackground  ();
     screen1.SetName            ("Screen1");
 
       //присоединение областей вывода
-      
+
     Viewport viewport1, viewport2;
-    
+
     viewport1.SetName ("Viewport1");
     viewport2.SetName ("Viewport2");
-    
+
     screen1.Attach (viewport1);
     screen1.Attach (viewport2);
 

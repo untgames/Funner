@@ -60,9 +60,9 @@ int main ()
     vp1.SetRenderPath ("MySceneRender");
     
     screen.Attach (vp1);
-    
+
     RenderTarget render_target = render.RenderTarget (0);
-    
+
     render_target.SetScreen (&screen);
     
       //настройка запросов рендеринга
@@ -76,7 +76,7 @@ int main ()
       //отрисовка
 
     render_target.Update ();
-    
+
       //присоединение камеры к сцене
       
     printf ("Bind camera to scene\n");

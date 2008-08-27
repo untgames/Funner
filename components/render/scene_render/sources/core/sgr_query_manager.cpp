@@ -1,9 +1,11 @@
-#include "scene_render_shared.h"
+#include "shared.h"
 
 using namespace render;
 
 namespace
 {
+
+typedef RenderTargetImpl::Pointer RenderTargetPtr;
 
 /*
     Реализация запроса рендеринга
@@ -13,28 +15,28 @@ class RenderQueryImpl: public IRenderQuery, public xtl::reference_counter
 {
   public:
 ///Конструктор
-    RenderQueryImpl (RenderTarget& in_render_target) : render_target (in_render_target) {}
+    RenderQueryImpl (const RenderTargetPtr& in_render_target) : render_target (in_render_target) {}
 
 ///Обновление
-    void Update () { render_target.Update (); }
+    void Update () { render_target->Update (); }
 
 ///Подсчёт ссылок
     void AddRef  () { addref (this); }
     void Release () { release (this); }
 
   private:
-    RenderTarget render_target; //цель рендеринга
+    RenderTargetPtr render_target; //цель рендеринга
 };
 
-}
-
 /*
-    Описание реализации обработчика запроса
+    Обработчик запроса
 */
 
-class QueryManager::QueryHandlerEntry: public xtl::reference_counter
+class QueryHandlerEntry: public xtl::reference_counter
 {
   public:
+    typedef QueryManager::QueryFunction QueryFunction;
+  
 ///Конструктор
     QueryHandlerEntry (const char* in_query_string_mask, const QueryFunction& in_handler)
       : query_string_mask (in_query_string_mask),
@@ -49,9 +51,11 @@ class QueryManager::QueryHandlerEntry: public xtl::reference_counter
     bool IsMatch (const char* query_string) { return common::wcmatch (query_string, query_string_mask.c_str ()); }
     
 ///Создание объекта запроса
-    IRenderQuery* CreateQuery (RenderTarget& render_target, const char* query_string)
+    IRenderQuery* CreateQuery (const RenderTargetPtr& render_target, const char* query_string)
     {
-      handler (render_target, query_string);
+      ConstructableRenderTarget render_target_wrapper (*render_target);
+
+      handler (render_target_wrapper, query_string);
 
       return new RenderQueryImpl (render_target);
     }
@@ -61,11 +65,26 @@ class QueryManager::QueryHandlerEntry: public xtl::reference_counter
     QueryFunction handler;           //обработчик запроса
 };
 
+}
+
+/*
+    Описание реализации менеджера запросов
+*/
+
+typedef xtl::intrusive_ptr<QueryHandlerEntry> EntryPtr;
+typedef stl::list<EntryPtr>                   QueryHandlerList;
+
+struct QueryManager::Impl
+{
+  QueryHandlerList handlers; //обработчики запросов
+};
+
 /*
     Конструктор / деструктор
 */
 
 QueryManager::QueryManager ()
+  : impl (new Impl)
 {
 }
 
@@ -84,7 +103,7 @@ void QueryManager::RegisterQueryHandler (const char* query_string_mask, const Qu
   if (!query_string_mask)
     throw xtl::make_null_argument_exception (METHOD_NAME, "query_string_mask");
 
-  handlers.push_front (EntryPtr (new QueryHandlerEntry (query_string_mask, handler), false));
+  impl->handlers.push_front (EntryPtr (new QueryHandlerEntry (query_string_mask, handler), false));
 }
 
 void QueryManager::UnregisterQueryHandler (const char* query_string_mask)
@@ -92,14 +111,14 @@ void QueryManager::UnregisterQueryHandler (const char* query_string_mask)
   if (!query_string_mask)
     return;
     
-  for (QueryHandlerList::iterator iter=handlers.begin (), end=handlers.end (); iter!=end;)
+  for (QueryHandlerList::iterator iter=impl->handlers.begin (), end=impl->handlers.end (); iter!=end;)
     if (xtl::xstrcmp (query_string_mask, (*iter)->QueryStringMask ()))
     {
       QueryHandlerList::iterator next = iter;
 
       ++next;
 
-      handlers.erase (iter);
+      impl->handlers.erase (iter);
 
       iter = next;
     }
@@ -108,7 +127,7 @@ void QueryManager::UnregisterQueryHandler (const char* query_string_mask)
 
 void QueryManager::UnregisterAllQueryHandlers ()
 {
-  handlers.clear ();
+  impl->handlers.clear ();
 }
 
 /*
@@ -119,7 +138,7 @@ IRenderQuery* QueryManager::CreateQuery
  (mid_level::IRenderTarget* color_attachment,
   mid_level::IRenderTarget* depth_stencil_attachment,
   const char*               query_string,
-  RenderTargetManager&      render_target_manager)
+  RenderManager&            render_manager)
 {
   try
   {
@@ -128,25 +147,19 @@ IRenderQuery* QueryManager::CreateQuery
       
       //поиск подходящего обработчика
       
-    for (QueryHandlerList::iterator iter=handlers.begin (), end=handlers.end (); iter!=end; ++iter)
+    for (QueryHandlerList::iterator iter=impl->handlers.begin (), end=impl->handlers.end (); iter!=end; ++iter)
     {
       if (!(*iter)->IsMatch (query_string))
         continue;
 
-        //создание цели рендеринга
-
-      RenderTarget render_target = render_target_manager.CreateRenderTarget (color_attachment, depth_stencil_attachment);
-
         //создание запроса
 
-      return (*iter)->CreateQuery (render_target, query_string);
+      return (*iter)->CreateQuery (RenderTargetImpl::Create (render_manager, color_attachment, depth_stencil_attachment), query_string);
     }
 
       //создание пустого запроса
 
-    RenderTarget default_render_target = render_target_manager.CreateRenderTarget (color_attachment, depth_stencil_attachment);
-
-    return new RenderQueryImpl (default_render_target);
+    return new RenderQueryImpl (RenderTargetImpl::Create (render_manager, color_attachment, depth_stencil_attachment));
   }
   catch (xtl::exception& exception)
   {

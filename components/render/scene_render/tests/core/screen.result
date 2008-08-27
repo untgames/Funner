@@ -1,5 +1,5 @@
 Results of Screen_test:
-MyScreenListener::MyScreenListener
+OnChangeArea(10, 20, 300, 40)
 OnChangeBackground(true, 0.50, 0.25, 1.00, 0.30)
 OnChangeBackground(false, 0.50, 0.25, 1.00, 0.30)
 OnChangeName(Screen1)
@@ -10,4 +10,3 @@ OnDetachViewport(Viewport1)
 Screen 'Screen1' viewports (count=1): 'Viewport2'
 OnDetachViewport(Viewport2)
 OnDestroy()
-MyScreenListener::~MyScreenListener

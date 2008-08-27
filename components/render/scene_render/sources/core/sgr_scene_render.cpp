@@ -1,74 +1,44 @@
-#include "scene_render_shared.h"
+#include "shared.h"
 
 using namespace render;
+
+namespace
+{
+
+/*
+    Константы
+*/
+
+const size_t DEFAULT_MAX_DRAW_DEPTH = 16; //максимальный уровень вложенности рендеринга по умолчанию
+
+}
 
 /*
     Описание реализации SceneRender
 */
 
-typedef xtl::intrusive_ptr<RenderTargetManager> RenderTargetManagerPtr;
-typedef stl::vector<RenderTarget>               RenderTargetList;
+typedef stl::auto_ptr<RenderManager> RenderManagerPtr;
 
 struct SceneRender::Impl
 {  
-  RenderPathManager        render_path_manager;    //менеджер путей рендеринга
-  RenderTargetManagerPtr   render_target_manager;  //менеджер целей рендеринга
-  RenderTargetList         default_render_targets; //цели рендеринга по умолчанию
-  QueryManager             query_manager;          //менеджер запросов рендеринга
-  SceneRender::LogFunction log_handler;            //функция отладочного протоколирования
-
-    //конструктор
-  Impl ()
-  {
-    render_target_manager = RenderTargetManagerPtr (new RenderTargetManager (xtl::bind (&Impl::LogMessage, this, _1)), false);
-  }
-
-  ~Impl ()
-  {
-    render_target_manager->SetRenderPathManager (0);
-  }
+  RenderManagerPtr         render_manager; //менеджер рендеринга
+  QueryManager             query_manager;  //менеджер запросов рендеринга
+  SceneRender::LogFunction log_handler;    //функция отладочного протоколирования
+  size_t                   max_draw_depth; //максимальный уровень вложенности рендеринга
   
-    //обновление массива целей рендеринга по умолчанию
-  void UpdateRenderTargets (SceneRender& render)
-  {
-    try
-    {   
-      default_render_targets.clear ();
-      render_target_manager->UnregisterAllAttachments ();
-      
-        //получение системы визуализации
-      
-      mid_level::IRenderer* renderer = render_path_manager.Renderer ();
-      
-      if (!renderer)
-        throw xtl::format_operation_exception ("", "Null renderer");
-      
-        //добавление буферов кадра
-        
-      for (size_t i=0, count=renderer->GetFrameBuffersCount (); i<count; i++)
-      {
-        default_render_targets.push_back (render_target_manager->CreateRenderTarget (common::format ("FrameBuffer%u", i).c_str (),
-          renderer->GetColorBuffer (i), renderer->GetDepthStencilBuffer (i)));
-      }
+///Конструктор
+  Impl () : max_draw_depth (DEFAULT_MAX_DRAW_DEPTH) {}
 
-        //добавление пустого буфера кадра
-
-      render_target_manager->RegisterAttachment ("Null", 0);
-    }
-    catch (xtl::exception& exception)
-    {
-      exception.touch ("render::SceneRender::Impl::UpdateRenderTargets");
-      throw;
-    }
-  }
-  
-    //создание запроса рендеринга
+///Создание запроса рендеринга
   IRenderQuery* CreateRenderQuery
     (mid_level::IRenderTarget* render_target,
      mid_level::IRenderTarget* depth_stencil_target,
      const char*               query_string)
   {
-    return query_manager.CreateQuery (render_target, depth_stencil_target, query_string, *render_target_manager);
+    if (!render_manager)
+      throw xtl::format_operation_exception ("render::SceneRender::Impl::CreateRenderQuery", "Null render manager");
+
+    return query_manager.CreateQuery (render_target, depth_stencil_target, query_string, *render_manager);
   }
 
     //отладочное протоколирование
@@ -145,16 +115,12 @@ void SceneRender::SetRenderer
 {
   try
   {
-    RenderPathManager new_manager (driver_name_mask, renderer_name_mask, render_path_masks,
-      xtl::bind (&Impl::LogMessage, &*impl, _1), xtl::bind (&Impl::CreateRenderQuery, &*impl, _1, _2, _3));
+    RenderManagerPtr new_manager = new RenderManager (driver_name_mask, renderer_name_mask, render_path_masks,
+      xtl::bind (&Impl::LogMessage, &*impl, _1), xtl::bind (&Impl::CreateRenderQuery, &*impl, _1, _2, _3));      
 
-    new_manager.Swap (impl->render_path_manager);
+    new_manager->DrawTransactionManager ().SetMaxDrawDepth (impl->max_draw_depth);
 
-    impl->render_target_manager->SetRenderPathManager (&impl->render_path_manager);
-    
-      //данный вызов может выбросить исключения и переводит SceneRender::SetRenderer на базовую гарантию исключений!!!
-    
-    impl->UpdateRenderTargets (*this);
+    impl->render_manager = new_manager;    
   }
   catch (xtl::exception& exception)
   {
@@ -165,30 +131,22 @@ void SceneRender::SetRenderer
 
 void SceneRender::ResetRenderer ()
 {
-  RenderPathManager new_manager;
-
-  new_manager.Swap (impl->render_path_manager);
-
-  impl->render_target_manager->SetRenderPathManager (0);
-
-  impl->default_render_targets.clear ();
+  impl->render_manager = 0;
 }
 
 const char* SceneRender::RendererDescription () const
 {
-  mid_level::IRenderer* renderer = impl->render_path_manager.Renderer ();
-  
-  return renderer ? renderer->GetDescription () : "";
+  return impl->render_manager ? impl->render_manager->Renderer ().GetDescription () : "";
 }
 
 const char* SceneRender::RenderPaths () const
 {
-  return impl->render_path_manager.RenderPaths ();
+  return impl->render_manager ? impl->render_manager->RenderPaths () : "";
 }
 
 bool SceneRender::HasRenderPath (const char* path_name) const
 {
-  return impl->render_path_manager.HasRenderPath (path_name);
+  return impl->render_manager ? impl->render_manager->HasRenderPath (path_name) : false;
 }
 
 /*
@@ -197,24 +155,10 @@ bool SceneRender::HasRenderPath (const char* path_name) const
 
 void SceneRender::LoadResource (const char* tag, const char* file_name)
 {
-  impl->render_path_manager.LoadResource (tag, file_name, impl->log_handler);
-}
+  if (!impl->render_manager)
+    throw xtl::format_operation_exception ("render::SceneRender::LoadResource", "Null render manager");
 
-/*
-    Создание цели рендеринга
-*/
-
-RenderTarget SceneRender::CreateRenderTarget (const char* color_attachment_name, const char* depth_stencil_attachment_name)
-{
-  try
-  {
-    return impl->render_target_manager->CreateRenderTarget (color_attachment_name, depth_stencil_attachment_name);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::SceneRender::CreateRenderTarget");
-    throw;
-  }
+  impl->render_manager->LoadResource (tag, file_name);
 }
 
 /*
@@ -223,12 +167,15 @@ RenderTarget SceneRender::CreateRenderTarget (const char* color_attachment_name,
 
 size_t SceneRender::RenderTargetsCount () const
 {
-  return impl->render_target_manager->RenderTargetsCount ();
+  return impl->render_manager ? impl->render_manager->RenderTargetsCount () : 0;
 }
 
 RenderTarget SceneRender::RenderTarget (size_t index) const
 {
-  return impl->render_target_manager->RenderTarget (index);
+  if (!impl->render_manager)
+    throw xtl::make_range_exception ("render::SceneRender::RenderTarget", "index", index, 0u);    
+
+  return ConstructableRenderTarget (impl->render_manager->RenderTarget (index));
 }
 
 /*
@@ -264,12 +211,15 @@ void SceneRender::UnregisterAllQueryHandlers ()
 
 void SceneRender::SetMaxDrawDepth (size_t level)
 {
-  impl->render_target_manager->SetMaxDrawDepth (level);
+  impl->max_draw_depth = level;
+
+  if (impl->render_manager)
+    impl->render_manager->DrawTransactionManager ().SetMaxDrawDepth (level);
 }
 
 size_t SceneRender::MaxDrawDepth () const
 {
-  return impl->render_target_manager->MaxDrawDepth ();
+  return impl->max_draw_depth;
 }
 
 /*

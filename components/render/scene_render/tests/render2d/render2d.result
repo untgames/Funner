@@ -1,33 +1,35 @@
 Results of render2d_test:
 Create debug driver
-Create color-buffer 800x600 (id=3)
-Create depth-stencil-buffer 800x600 (id=4)
+Create color-buffer 800x600 (id=4)
+Create depth-stencil-buffer 800x600 (id=5)
+Create frame-buffer (id=3)
 Create 2D renderer (id=2)
-Create frame2d (id=6)
-Create primitive (id=7)
-Create texture 171x128 format=1 (id=8)
+Create frame2d (id=7)
+Create primitive (id=8)
+Create texture 171x128 format=1 (id=9)
 Begin draw frames (id=2, frame_id=0)
-Begin draw frame (id=5)
-Set render targets: render-target=3, depth-stencil-target=4
+Begin draw frame (id=6)
+Set render targets: render-target=4, depth-stencil-target=5
 Clear render target [0.00 0.00 0.00 0.00]
 Clear depth-stencil target [1.000 0]
-End draw frame (id=5)
-Begin draw frame (id=6)
-Set render targets: render-target=3, depth-stencil-target=4
+End draw frame (id=6)
+Begin draw frame (id=7)
+Set render targets: render-target=4, depth-stencil-target=5
 Set viewport (left=0, top=0, width=800, height=600)
 Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
 View point=[0.00 0.00 0.00]
-Draw primitive (id=7)
-  texture_id=8
+Draw primitive (id=8)
+  texture_id=9
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[0.00 0.00 0.00 0.00] tex_offset=[0.00 0.00] tex_size=[0.06 0.16]
-End draw frame (id=6)
+End draw frame (id=7)
 End draw frames (id=2, frame_id=0)
-Destroy frame2d (id=6)
-Destroy primitive (id=7)
-Destroy texture2d (id=8)
+Destroy frame2d (id=7)
+Destroy primitive (id=8)
+Destroy texture2d (id=9)
 Destroy 2D renderer (id=2)
-Destroy depth-stencil-buffer (id=4)
-Destroy color-buffer (id=3)
+Destroy frame-buffer (id=3)
+Destroy depth-stencil-buffer (id=5)
+Destroy color-buffer (id=4)

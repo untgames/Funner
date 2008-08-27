@@ -57,10 +57,10 @@ int main ()
     
     render.SetMaxDrawDepth (3);
 
-    screen.Attach (vp1);        
-    
-    RenderTarget render_target;
+    screen.Attach (vp1);
 
+    RenderTarget render_target;
+    
     render_target = render.RenderTarget (0);
 
     render_target.SetScreen (&screen);

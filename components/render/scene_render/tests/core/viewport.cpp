@@ -1,19 +1,9 @@
 #include "shared.h"
 
 ///Слушатель событий области вывода
-class MyViewportListener: public IViewportListener, public xtl::reference_counter
+class MyViewportListener: public IViewportListener
 {
   public:
-    MyViewportListener ()
-    {
-      printf ("MyViewportListener::MyViewportListener\n");
-    }
-
-    ~MyViewportListener ()
-    {
-      printf ("MyViewportListener::~MyViewportListener\n");
-    }
-
     void OnChangeName (const char* new_name)
     {
       printf ("OnChangeName(%s)\n", new_name);
@@ -58,10 +48,6 @@ class MyViewportListener: public IViewportListener, public xtl::reference_counte
     {
       printf ("OnDestroy()\n");
     }
-
-///Подсчёт ссылок
-    void AddRef  () { addref (this); }
-    void Release () { release (this); }
 };
 
 int main ()
@@ -70,14 +56,16 @@ int main ()
   
   try
   {
-      //создание камеры и области вывода
+    MyViewportListener listener;
     
+      //создание камеры и области вывода
+
     Viewport viewport;
     Camera::Pointer camera = OrthoCamera::Create ();
 
-      //присоединение слушателя к области вывода
+      //присоединение слушателя к области вывода      
 
-    viewport.AttachListener (xtl::com_ptr<MyViewportListener> (new MyViewportListener, false).get ());
+    viewport.AttachListener (&listener);
 
       //изменение параметров области вывода
 

@@ -31,8 +31,7 @@ struct RenderProperty: public IViewportProperty, public xtl::reference_counter
     Описание реализации Viewport
 */
 
-typedef xtl::com_ptr<IViewportListener>                        ListenerPtr;
-typedef stl::vector<ListenerPtr>                               ListenerArray;
+typedef stl::vector<IViewportListener*>                        ListenerArray;
 typedef xtl::intrusive_ptr<RenderProperty>                     PropertyPtr;
 typedef stl::hash_map<stl::hash_key<const char*>, PropertyPtr> PropertyMap;
 
@@ -195,7 +194,7 @@ const char* Viewport::Name () const
 
 size_t Viewport::Id () const
 {
-  return reinterpret_cast<size_t> (get_pointer (impl));
+  return reinterpret_cast<size_t> (impl);
 }
 
 /*
