@@ -8,6 +8,8 @@
 #include <xtl/string.h>
 #include <xtl/visitor.h>
 
+#include <common/hash.h>
+
 #include <sg/camera.h>
 #include <sg/light.h>
 #include <sg/listener.h>

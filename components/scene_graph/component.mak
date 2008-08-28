@@ -22,4 +22,4 @@ SG_TESTS.LIB_DIRS         :=
 SG_TESTS.LIBS             :=
 SG_TESTS.COMPILER_CFLAGS  :=
 SG_TESTS.COMPILER_DEFINES := 
-SG_TESTS.IMPORTS          := link.static.mak compile.static.mak
+SG_TESTS.IMPORTS          := link.static.mak compile.static.mak ../common/compile.static.mak

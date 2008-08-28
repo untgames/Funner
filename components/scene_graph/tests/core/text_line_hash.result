@@ -1,0 +1,9 @@
+Results of text_line_hash_test:
+computed: text_hash=ffffffff text_unicode_hash=ffffffff
+real:     text_hash=ffffffff text_unicode_hash=ffffffff
+Set text
+computed: text_hash=742961ad text_unicode_hash=aca902cc
+real:     text_hash=742961ad text_unicode_hash=aca902cc
+Set unicode text
+computed: text_hash=742961ad text_unicode_hash=aca902cc
+real:     text_hash=742961ad text_unicode_hash=aca902cc
