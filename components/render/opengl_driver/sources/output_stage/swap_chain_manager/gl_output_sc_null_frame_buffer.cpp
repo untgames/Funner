@@ -21,7 +21,7 @@ void SwapChainNullFrameBuffer::Bind ()
 {
   try
   {
-    frame_buffer_manager.SetFrameBuffer         (GetContextManager ().GetContextId (), 0, GL_NONE);
+    frame_buffer_manager.SetFrameBuffer         ((ISwapChain*)0, GL_NONE);
     frame_buffer_manager.SetFrameBufferActivity (false, false);
   }
   catch (xtl::exception& exception)

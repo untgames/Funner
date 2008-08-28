@@ -52,11 +52,6 @@ ContextDataTable& ContextObject::GetContextDataTable (Stage table_id)
     Определение поддержки расширения контекстом
 */
 
-bool ContextObject::IsSupported (size_t context_id, const Extension& extension) const
-{
-  return context_manager.IsSupported (context_id, extension);
-}
-
 bool ContextObject::IsSupported (const Extension& extension) const
 {
   return context_manager.IsSupported (extension);

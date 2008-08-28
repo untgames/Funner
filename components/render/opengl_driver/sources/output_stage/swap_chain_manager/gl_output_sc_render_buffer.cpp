@@ -30,10 +30,10 @@ SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManager& manager,
     Установка активного буфера кадра
 */
 
-void SwapChainRenderBuffer::SetFrameBuffer (size_t context_id, ISwapChain* swap_chain, GLenum buffer_type)
+void SwapChainRenderBuffer::SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type, bool has_depth_stencil)
 {
-  frame_buffer_manager.SetFrameBuffer (context_id, swap_chain, buffer_type);
-  frame_buffer_manager.SetFrameBufferActivity (buffer_type != GL_NONE, context_id != 0);
+  frame_buffer_manager.SetFrameBuffer (swap_chain, buffer_type);
+  frame_buffer_manager.SetFrameBufferActivity (buffer_type != GL_NONE, has_depth_stencil);
 }
 
 /*
@@ -52,7 +52,8 @@ SwapChainColorBuffer::SwapChainColorBuffer
   size_t                    in_buffer_index)
   : SwapChainRenderBuffer (manager, RenderTargetType_Color),
     swap_chain (in_swap_chain),
-    buffer_index (in_buffer_index)
+    buffer_index (in_buffer_index),
+    is_shadow (false)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainColorBuffer::SwapChainColorBuffer";
   
@@ -85,7 +86,8 @@ SwapChainColorBuffer::SwapChainColorBuffer (const FrameBufferManager& manager, I
   : SwapChainRenderBuffer (manager, desc),
     swap_chain (in_swap_chain),
     buffer_index (1),
-    buffer_type (GL_BACK)
+    buffer_type (GL_BACK),
+    is_shadow (true)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainColorBuffer::SwapChainColorBuffer";
 
@@ -103,7 +105,7 @@ void SwapChainColorBuffer::Bind ()
 {
   try    
   {
-    SetFrameBuffer (0, swap_chain.get (), buffer_type);
+    SetFrameBuffer (swap_chain.get (), buffer_type, false);
   }
   catch (xtl::exception& exception)
   {
@@ -115,7 +117,7 @@ void SwapChainColorBuffer::Bind ()
 
 /*
 ===================================================================================================
-    SwapDepthStencilBuffer
+    SwapChainDepthStencilBuffer
 ===================================================================================================
 */
 
@@ -123,8 +125,9 @@ void SwapChainColorBuffer::Bind ()
     Конструктор / деструктор
 */
 
-SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManager& manager, ISwapChain* swap_chain)
-  : SwapChainRenderBuffer (manager, RenderTargetType_DepthStencil)
+SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManager& manager, ISwapChain* in_swap_chain)
+  : SwapChainRenderBuffer (manager, RenderTargetType_DepthStencil),
+    swap_chain (in_swap_chain)
 {
   try
   {
@@ -136,14 +139,10 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
       //установка размеров буфера
 
     SwapChainDesc swap_chain_desc;    
-    
-    swap_chain->GetDesc (swap_chain_desc);        
-    
-    SetSize (swap_chain_desc.frame_buffer.width, swap_chain_desc.frame_buffer.height);        
 
-      //создание контекста      
+    swap_chain->GetDesc (swap_chain_desc);
 
-    context_id = GetContextManager ().CreateContext (swap_chain);
+    SetSize (swap_chain_desc.frame_buffer.width, swap_chain_desc.frame_buffer.height);
   }
   catch (xtl::exception& exception)
   {
@@ -152,8 +151,9 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
   }
 }
 
-SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManager& manager, ISwapChain* swap_chain, const TextureDesc& desc)
-  : SwapChainRenderBuffer (manager, desc)
+SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManager& manager, ISwapChain* in_swap_chain, const TextureDesc& desc)
+  : SwapChainRenderBuffer (manager, desc),
+    swap_chain (in_swap_chain)
 {
   try
   {
@@ -173,10 +173,6 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
     if (desc.height > swap_chain_desc.frame_buffer.height)
       throw xtl::format_not_supported_exception ("", "Depth-stencil buffer height=%u is greater than swap-chain desc.height=%u", desc.height,
         swap_chain_desc.frame_buffer.height);
-
-      //создание контекста  
-
-    context_id = GetContextManager ().CreateContext (swap_chain);    
   }
   catch (xtl::exception& exception)
   {
@@ -187,9 +183,7 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
 
 SwapChainDepthStencilBuffer::~SwapChainDepthStencilBuffer ()
 {
-  GetContextManager ().DeleteContext (context_id);
 }
-
    
 /*
     Установка в контекст OpenGL
@@ -199,7 +193,7 @@ void SwapChainDepthStencilBuffer::Bind ()
 {
   try
   {
-    SetFrameBuffer (context_id, 0, 0);
+    SetFrameBuffer (swap_chain.get (), 0, true);
   }
   catch (xtl::exception& exception)
   {
@@ -207,4 +201,113 @@ void SwapChainDepthStencilBuffer::Bind ()
     
     throw;
   }  
+}
+
+/*
+===================================================================================================
+    SwapChainFakeDepthStencilBuffer
+===================================================================================================
+*/
+
+/*
+    Конструктор / деструктор
+*/
+
+SwapChainFakeDepthStencilBuffer::SwapChainFakeDepthStencilBuffer (const ContextManager& manager, const TextureDesc& in_desc)
+  : ContextObject (manager),
+    desc (in_desc)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFakeDepthStencilBuffer::SwapChainFakeDepthStencilBuffer";
+
+    //проверка корректности дескриптора
+
+  switch (desc.format)
+  {
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D24S8:
+    case PixelFormat_S8:
+      break;
+    case PixelFormat_RGB8:
+    case PixelFormat_RGBA8:   
+    case PixelFormat_L8:
+    case PixelFormat_A8:
+    case PixelFormat_LA8:
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported desc.format=%s", get_name (desc.format));
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);
+  }    
+  
+  if (desc.bind_flags & ~BindFlag_DepthStencil)
+    throw xtl::make_argument_exception (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
+
+  switch (desc.access_flags)
+  {
+    case 0:
+      break;
+    case AccessFlag_Read:
+    case AccessFlag_Write:
+    case AccessFlag_ReadWrite:
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported desc.access_flags=%s (incompatible with pbuffer emulation mode)", get_name ((AccessFlag)desc.access_flags));
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", desc.access_flags);
+  }
+  
+  switch (desc.usage_mode)  
+  {
+    case UsageMode_Default:
+    case UsageMode_Static:
+    case UsageMode_Dynamic:
+    case UsageMode_Stream:
+      break;
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.usage_mode", desc.usage_mode);
+  }
+  
+  switch (desc.dimension)
+  {
+    case TextureDimension_2D:
+      break;
+    case TextureDimension_1D:
+    case TextureDimension_3D:
+    case TextureDimension_Cubemap:
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported render-buffer dimension desc.dimension=%s", get_name (desc.dimension));
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.dimension", desc.dimension);
+  }
+
+  if (desc.generate_mips_enable)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Automatic mip-map generation for render-buffers not supported");
+}
+
+SwapChainFakeDepthStencilBuffer::~SwapChainFakeDepthStencilBuffer ()
+{
+}
+
+/*
+    Получение дескриптора
+*/
+
+void SwapChainFakeDepthStencilBuffer::GetDesc (TextureDesc& out_desc)
+{
+  out_desc = desc;
+}
+
+/*
+    Работа с данными
+*/
+
+void SwapChainFakeDepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+{
+  throw xtl::format_operation_exception ("render::low_level::opengl::SwapChainFakeDepthStencilBuffer::SetData",
+    "Can't set render buffer data (no AccessFlag_Write in desc.access_flags)");
+}
+
+void SwapChainFakeDepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+{
+  throw xtl::format_operation_exception ("render::low_level::opengl::SwapChainFakeDepthStencilBuffer::GetData",
+    "Can't get render buffer data (no AccessFlag_Read in desc.access_flags)");
 }

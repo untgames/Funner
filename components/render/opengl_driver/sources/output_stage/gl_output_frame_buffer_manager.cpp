@@ -94,7 +94,7 @@ ISwapChain* FrameBufferManager::GetDefaultSwapChain () const
     Регистрация обработчиков создания буферов кадра / буферов отрисовки
 */
 
-void FrameBufferManager::RegisterCreater  (const FrameBufferChecker& checker, const FrameBufferCreater& creater)
+void FrameBufferManager::RegisterCreater (const FrameBufferChecker& checker, const FrameBufferCreater& creater)
 {
   impl->frame_buffer_factories.push_front (FrameBufferFactory (checker, creater));
 }
@@ -192,18 +192,21 @@ ITexture* FrameBufferManager::CreateDepthStencilBuffer (ISwapChain* swap_chain)
     Установка активного буфера кадра
 */
 
-void FrameBufferManager::SetFrameBuffer (size_t context_id, ISwapChain* swap_chain, GLenum buffer_type)
+void FrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FrameBufferManager::SetFrameBuffer(size_t,ISwapChain*,GLenum)";
   
   if (!swap_chain)
+  {
     buffer_type = GL_NONE;
+    swap_chain  = impl->default_swap_chain.get ();
+  }
 
-    //установка активного контекста
+    //установка активной цепочки обмена
 
   ContextManager& context_manager = impl->GetContextManager ();        
 
-  context_manager.SetContext (context_id, swap_chain);
+  context_manager.SetSwapChain (swap_chain);
 
     //проверка необходимости переустановки буфера
 

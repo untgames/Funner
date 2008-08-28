@@ -32,7 +32,7 @@ class SwapChainRenderBuffer: public RenderBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка активного буфера кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetFrameBuffer (size_t context_id, ISwapChain* swap_chain, GLenum buffer_type);
+    void SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type, bool has_depth_stencil);
 
   private:
     FrameBufferManager frame_buffer_manager; //менеджер буферов кадра
@@ -61,6 +61,11 @@ class SwapChainColorBuffer: public SwapChainRenderBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     GLenum GetBufferType () const { return buffer_type; }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Является ли буфер теневым
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool IsShadow () const { return is_shadow; }
+
   private:
     void Bind ();
 
@@ -71,10 +76,11 @@ class SwapChainColorBuffer: public SwapChainRenderBuffer
     SwapChainPtr swap_chain;   //цепочка обмена
     size_t       buffer_index; //индекс буфера обмена в цепочке обмена
     GLenum       buffer_type;  //тип буфера
+    bool         is_shadow;    //является ли буфер теневым
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Буфер глубины-трафарета цепочки обмена
+///Буфер попиксельного отсечения цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class SwapChainDepthStencilBuffer: public SwapChainRenderBuffer
 {
@@ -87,15 +93,45 @@ class SwapChainDepthStencilBuffer: public SwapChainRenderBuffer
     ~SwapChainDepthStencilBuffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Идентификатор контекста
+///Цепочка обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetContextId () const { return context_id; }
+    ISwapChain* GetSwapChain   () const { return swap_chain.get (); }
 
   private:
     void Bind ();
 
   private:
-    size_t context_id; //идентификатор контекста
+    typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
+
+  private:
+    SwapChainPtr swap_chain; //цепочка обмена
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Буфер попиксельного отсечения, необходимый для сочетания с буферами цвета
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class SwapChainFakeDepthStencilBuffer: virtual public ITexture, public ContextObject
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    SwapChainFakeDepthStencilBuffer  (const ContextManager&, const TextureDesc&);
+    ~SwapChainFakeDepthStencilBuffer ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение дескриптора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void GetDesc (TextureDesc&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с данными
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
+    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+
+  private:
+    TextureDesc desc; //дескриптор текстуры
 };
 
 typedef xtl::com_ptr<SwapChainColorBuffer>        ColorBufferPtr;
@@ -132,7 +168,7 @@ class SwapChainFrameBufferManager: public Object
     ColorBufferPtr        GetShadowBuffer  (SwapChainDepthStencilBuffer*);
     DepthStencilBufferPtr GetShadowBuffer  (SwapChainColorBuffer*);
     void                  GetShadowBuffers (ColorBufferPtr&, DepthStencilBufferPtr&);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение менеджера буферов кадров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -153,13 +189,13 @@ class SwapChainFrameBufferManager: public Object
     ISwapChain* GetDefaultSwapChain () const;
 
   private:
-    typedef stl::list<SwapChainColorBuffer*>        ColorBufferList;
-    typedef stl::list<SwapChainDepthStencilBuffer*> DepthStencilBufferList;
+    typedef xtl::trackable_ptr<SwapChainColorBuffer>        ColorBufferTrackablePtr;
+    typedef xtl::trackable_ptr<SwapChainDepthStencilBuffer> DepthStencilBufferTrackablePtr;
 
   private:
-    FrameBufferManager     frame_buffer_manager;          //менеджер буферов кадра
-    ColorBufferList        shadow_color_buffers;          //список теневых буферов цвета
-    DepthStencilBufferList shadow_depth_stencil_buffers;  //список теневых буферов попиксельного отсечения
+    FrameBufferManager             frame_buffer_manager;        //менеджер буферов кадра
+    ColorBufferTrackablePtr        shadow_color_buffer;         //теневой буфер цвета
+    DepthStencilBufferTrackablePtr shadow_depth_stencil_buffer; //теневой буфер попиксельного отсечения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,7 +234,8 @@ class SwapChainFrameBuffer: public IFrameBuffer, public ContextObject
     void FinishInitialization (SwapChainFrameBufferManager&);
 
   private:
-    typedef xtl::com_ptr<IRenderTargetTexture> TexturePtr;
+    typedef xtl::com_ptr<IRenderTargetTexture>            TexturePtr;
+    typedef xtl::com_ptr<SwapChainFakeDepthStencilBuffer> FakeDepthStencilBufferPtr;
 
     struct RenderTarget
     {
@@ -211,13 +248,14 @@ class SwapChainFrameBuffer: public IFrameBuffer, public ContextObject
     };
 
   private:
-    FrameBufferManager    frame_buffer_manager;                    //менеджер буферов кадра
-    ColorBufferPtr        color_buffer;                            //буфер цвета
-    DepthStencilBufferPtr depth_stencil_buffer;                    //буфер попиксельного отсечения
-    RenderTarget          render_targets [RenderTargetType_Num];   //цели отрисовки
-    bool                  is_buffer_active [RenderTargetType_Num]; //активность буферов цвета и попиксельного отсечения
-    bool                  has_texture_targets;                     //флаг, определяющий присутствие целевых текстур
-    Rect                  dirty_rect;                              //область обновления целевых текстур
+    FrameBufferManager        frame_buffer_manager;                    //менеджер буферов кадра
+    ColorBufferPtr            color_buffer;                            //буфер цвета
+    DepthStencilBufferPtr     depth_stencil_buffer;                    //буфер попиксельного отсечения
+    FakeDepthStencilBufferPtr fake_depth_stencil_buffer;               //вспомогательный буфер попиксельного отсечения
+    RenderTarget              render_targets [RenderTargetType_Num];   //цели отрисовки
+    bool                      is_buffer_active [RenderTargetType_Num]; //активность буферов цвета и попиксельного отсечения
+    bool                      has_texture_targets;                     //флаг, определяющий присутствие целевых текстур
+    Rect                      dirty_rect;                              //область обновления целевых текстур
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

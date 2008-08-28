@@ -17,58 +17,6 @@ HWND check_output_window (const SwapChainDesc& desc)
   return window;
 }
 
-/*
-    Свойства цепочки обмена
-*/
-
-class SwapChainProperyList: virtual public IPropertyList
-{
-  public:
-///Конструктор
-    SwapChainProperyList (HDC dc, const WglExtensionEntries* in_wgl_extension_entries)
-      : device_context (dc),
-        wgl_extension_entries (in_wgl_extension_entries) {}  
-
-///Количество свойств
-    size_t GetSize () { return 1; }
-
-///Получение ключа
-    const char* GetKey (size_t index)
-    {
-      if (index)
-        throw xtl::make_range_exception ("render::low_level::opengl::windows::SwapChainProperyList::GetKey", "index", index, 1u);
-
-      return "gl_extensions";
-    }
-    
-///Получение значения
-    const char* GetValue (size_t index)
-    {
-      if (index)
-        throw xtl::make_range_exception ("render::low_level::opengl::windows::SwapChainProperyList::GetValue", "index", index, 1u);
-        
-      if (wgl_extension_entries->GetExtensionsStringARB)
-      {
-        const char* result = wgl_extension_entries->GetExtensionsStringARB (device_context);
-        
-        return result ? result : "";
-      }
-
-      if (wgl_extension_entries->GetExtensionsStringEXT)
-      {
-        const char* result = wgl_extension_entries->GetExtensionsStringEXT ();
-
-        return result ? result : "";
-      }
-
-      return "";
-    }
-    
-  private:
-    HDC                        device_context;
-    const WglExtensionEntries* wgl_extension_entries;
-};
-
 }
 
 /*
@@ -87,15 +35,14 @@ struct PrimarySwapChain::Impl: private IWindowListener
   DummyWindow             listener_window;        //следящее окно
   SwapChainDesc           desc;                   //дескриптор цепочки обмена
   ChangeDisplayModeSignal cdm_signal;             //сигнал, оповещающий об изменении видео-режима
-  SwapChainProperyList    properties;             //свойства цепочки обмена
+  PropertyList            properties;             //свойства цепочки обмена
 
 ///Конструктор
   Impl (const SwapChainDesc& in_desc, const PixelFormatDesc& pixel_format)
     : adapter (pixel_format.adapter),
       output_window (check_output_window (in_desc)),
       output_context (::GetDC (output_window)),
-      listener_window (output_window, this),
-      properties (output_context, &wgl_extension_entries)
+      listener_window (output_window, this)
   {
       //проверка корректности операции
 
@@ -111,12 +58,16 @@ struct PrimarySwapChain::Impl: private IWindowListener
     else
     {
       memset (&wgl_extension_entries, 0, sizeof wgl_extension_entries);
-    }
+    }    
 
       //установка состояния FullScreen
 
     if (in_desc.fullscreen)
       SetFullscreenState (true, in_desc.frame_buffer.color_bits);
+
+      //установка свойств цепочки обмена
+
+    properties.AddProperty ("gl_extensions", get_wgl_extensions_string (wgl_extension_entries, output_context).c_str ());
 
       //установка текущего формата пикселей для контекста отрисовки
 
@@ -135,7 +86,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
     desc.swap_method               = pixel_format.swap_method;    
     desc.fullscreen                = GetFullscreenState ();
     desc.vsync                     = in_desc.vsync;
-    desc.window_handle             = in_desc.window_handle;
+    desc.window_handle             = in_desc.window_handle;    
   }    
   
 ///Деструктор

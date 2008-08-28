@@ -183,7 +183,16 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
     depth_stencil_buffer = buffer;
 
     return;
-  }  
+  }
+  
+    //обработка случая рендеринга во вспомогательный буфер
+    
+  if (SwapChainFakeDepthStencilBuffer* buffer = dynamic_cast<SwapChainFakeDepthStencilBuffer*> (base_texture))
+  {
+    fake_depth_stencil_buffer = buffer;
+
+    return;
+  }
 
     //если целевая текстура имеет неизвестный тип - создание буфера кадра невозможно
 
@@ -192,13 +201,37 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
 
 void SwapChainFrameBuffer::FinishInitialization (SwapChainFrameBufferManager& manager)
 {
-    //если оба буфера проинициализированы - дополнительная инициализация не требуется    
+  static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBuffer::FinishInitialization";
+
+    //если оба буфера проинициализированы - проверка совместимости
 
   if (color_buffer && depth_stencil_buffer)
-    return;
+  {
+    if (color_buffer->GetSwapChain () != depth_stencil_buffer->GetSwapChain ())
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported render targets configuration. Render-target-view and depth-stencil view have different swap chains");
 
-    //проверка случаев отсутствия одного из буферов
-    
+    return;
+  }
+  
+    //проверка взаимодействия со вспомогательным буфером попиксельного отсечения
+
+  if (fake_depth_stencil_buffer && color_buffer)
+  {
+    if (!color_buffer->IsShadow ())
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported render targets configuration. Render-target-view is not pbuffer");
+
+    return;
+  }
+
+  if (fake_depth_stencil_buffer && !color_buffer)
+  {
+    manager.GetShadowBuffers (color_buffer, depth_stencil_buffer);
+
+    return;
+  }
+
+    //проверка случаев отсутствия одного из буферов  
+
   if (color_buffer && !depth_stencil_buffer)
   {
       //отсутствует буфер попиксельного отсечения, но присутствует буфер цвета
@@ -216,10 +249,10 @@ void SwapChainFrameBuffer::FinishInitialization (SwapChainFrameBufferManager& ma
     
     return;
   }
-  
+
     //отсутствуют оба буфера (рендеринг в обе целевые текстуры)    
 
-  manager.GetShadowBuffers (color_buffer, depth_stencil_buffer);
+  manager.GetShadowBuffers (color_buffer, depth_stencil_buffer);    
 }
 
 /*
@@ -230,8 +263,7 @@ void SwapChainFrameBuffer::Bind ()
 {
   try
   {
-    frame_buffer_manager.SetFrameBuffer (depth_stencil_buffer->GetContextId (), color_buffer->GetSwapChain (),
-                                         color_buffer->GetBufferType ());
+    frame_buffer_manager.SetFrameBuffer (color_buffer->GetSwapChain (), color_buffer->GetBufferType ());
     frame_buffer_manager.SetFrameBufferActivity (is_buffer_active [RenderTargetType_Color],
                                                  is_buffer_active [RenderTargetType_DepthStencil]);
   }

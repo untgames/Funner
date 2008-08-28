@@ -96,14 +96,7 @@ class AsyncPredicate : virtual public IAsyncPredicate, public ContextObject
     bool IsResultAvailable ();
 
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка текущим первоначального контекста, если активен другой
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void MakeCurrentContextParent ();
-
-  private:
-    GLuint query;          //OpenGL id запроса
-    size_t parent_context; //первоначальный контекст
+    GLuint query; //OpenGL id запроса
 };
 
 }

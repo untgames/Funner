@@ -2,7 +2,6 @@
 
 using namespace render::low_level;
 using namespace render::low_level::opengl;
-using namespace common;
 
 typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
 
@@ -28,7 +27,7 @@ ColorBufferPtr SwapChainFrameBufferManager::CreateShadowColorBuffer (SwapChainDe
 {
   ContextManager& context_manager = frame_buffer_manager.GetContextManager ();
 
-  xtl::com_ptr<ISwapChain> swap_chain (context_manager.CreateCompatibleSwapChain (depth_stencil_buffer->GetContextId ()), false);
+  xtl::com_ptr<ISwapChain> swap_chain (context_manager.CreateCompatibleSwapChain (depth_stencil_buffer->GetSwapChain ()), false);
 
   return ColorBufferPtr (new SwapChainColorBuffer (frame_buffer_manager, swap_chain.get (), 1), false);
 }
@@ -40,157 +39,91 @@ DepthStencilBufferPtr SwapChainFrameBufferManager::CreateShadowDepthStencilBuffe
   return DepthStencilBufferPtr (new SwapChainDepthStencilBuffer (frame_buffer_manager, color_buffer->GetSwapChain ()), false);
 }
 
-namespace
-{
-
-template <class List> class list_remover
-{
-  public:
-    typedef typename List::iterator Iter;  
-
-    list_remover (List& in_list, Iter in_iter) : list (in_list), iter (in_iter) {}
-
-    void operator () () const { list.erase (iter); }
-
-  private:
-    List& list;
-    Iter  iter;
-};
-
-}
-
 ColorBufferPtr SwapChainFrameBufferManager::GetShadowBuffer (SwapChainDepthStencilBuffer* depth_stencil_buffer)
 {
-  ContextManager& manager    = frame_buffer_manager.GetContextManager ();
-  size_t          context_id = depth_stencil_buffer->GetContextId ();
-  
-    //попытка найти совместимый по формату буфер цвета
-  
-  for (ColorBufferList::iterator iter=shadow_color_buffers.begin (), end=shadow_color_buffers.end (); iter!=end; ++iter)
-    if (manager.IsCompatible (context_id, (*iter)->GetSwapChain ()))
-    {
-        //оптимизация: перемещение найденного узла в начало списка для ускорения повторного поиска
-
-      shadow_color_buffers.splice (shadow_color_buffers.begin (), shadow_color_buffers, iter);
-
-      return *iter;
-    }
+    //попытка вернуть существующий теневой буфер цвета
+    
+  if (shadow_color_buffer)
+    return shadow_color_buffer.get ();
 
     //создание нового буфера цвета
 
   ColorBufferPtr color_buffer = CreateShadowColorBuffer (depth_stencil_buffer);
+
+  shadow_color_buffer = color_buffer.get ();
   
-  shadow_color_buffers.push_front (color_buffer.get ());
-
-  try
-  {
-    color_buffer->RegisterDestroyHandler (list_remover<ColorBufferList> (shadow_color_buffers, shadow_color_buffers.begin ()), GetTrackable ());
-  }
-  catch (...)
-  {
-    shadow_color_buffers.pop_front ();
-    throw;
-  }
-
   return color_buffer;
 }
 
 DepthStencilBufferPtr SwapChainFrameBufferManager::GetShadowBuffer (SwapChainColorBuffer* color_buffer)
 {
-  ContextManager& manager    = frame_buffer_manager.GetContextManager ();
-  ISwapChain*     swap_chain = color_buffer->GetSwapChain ();
-
-    //попытка найти совместимый по формату буфер глубина-трафарет        
+    //попытка вернуть существующий теневой буфер попиксельного отсечения
     
-  for (DepthStencilBufferList::iterator iter=shadow_depth_stencil_buffers.begin (), end=shadow_depth_stencil_buffers.end (); iter!=end; ++iter)
-    if (manager.IsCompatible ((*iter)->GetContextId (), swap_chain))
-    {
-        //оптимизация: перемещение найденного узла в начало списка для ускорения повторного поиска
+  if (shadow_depth_stencil_buffer)
+    return shadow_depth_stencil_buffer.get ();
 
-      shadow_depth_stencil_buffers.splice (shadow_depth_stencil_buffers.begin (), shadow_depth_stencil_buffers, iter);
+    //создание нового буфера попиксельного отсечения
 
-      return *iter;
-    }    
-
-    //создание нового буфера глубина-трафарет
-    
-  DepthStencilBufferPtr depth_stencil_buffer = CreateShadowDepthStencilBuffer (color_buffer);  
-
-  shadow_depth_stencil_buffers.push_front (depth_stencil_buffer.get ());  
-
-  try
-  {
-    depth_stencil_buffer->RegisterDestroyHandler (list_remover<DepthStencilBufferList> (shadow_depth_stencil_buffers,
-      shadow_depth_stencil_buffers.begin ()), GetTrackable ());
-  }
-  catch (...)
-  {
-    shadow_depth_stencil_buffers.pop_front ();
-    throw;
-  }
-
+  DepthStencilBufferPtr depth_stencil_buffer = CreateShadowDepthStencilBuffer (color_buffer);
+  
+  shadow_depth_stencil_buffer = depth_stencil_buffer.get ();
+  
   return depth_stencil_buffer;
 }
 
 void SwapChainFrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer, DepthStencilBufferPtr& depth_stencil_buffer)
 {
-  ContextManager& manager = frame_buffer_manager.GetContextManager ();    
+    //попытка вернуть существующие буферы
+    
+  if (shadow_depth_stencil_buffer && shadow_color_buffer)
+  {
+    color_buffer         = shadow_color_buffer.get ();
+    depth_stencil_buffer = shadow_depth_stencil_buffer.get ();
 
-  if (!shadow_color_buffers.empty () && !shadow_depth_stencil_buffers.empty ())
-  { 
-    for (ColorBufferList::iterator i=shadow_color_buffers.begin (), end=shadow_color_buffers.end (); i!=end; ++i)
-    {
-      ISwapChain* swap_chain = (*i)->GetSwapChain ();
+    return;
+  }
       
-      for (DepthStencilBufferList::iterator j=shadow_depth_stencil_buffers.begin (), end=shadow_depth_stencil_buffers.end (); j!=end; ++j)
-        if (manager.IsCompatible ((*j)->GetContextId (), swap_chain))
-        {
-          color_buffer         = *i;
-          depth_stencil_buffer = *j;
+    //создание буфера цвета
 
-            //оптимизация: перемещение найденных узлов в начало списка для ускорения повторного поиска
-
-          shadow_color_buffers.splice (shadow_color_buffers.begin (), shadow_color_buffers, i);
-          shadow_depth_stencil_buffers.splice (shadow_depth_stencil_buffers.begin (), shadow_depth_stencil_buffers, j);          
-          
-          return;
-        }
-    }
-  }
-
-  if (!shadow_color_buffers.empty ())
+  if (!shadow_color_buffer && shadow_depth_stencil_buffer)
   {
-    color_buffer         = shadow_color_buffers.front ();
-    depth_stencil_buffer = GetShadowBuffer (color_buffer.get ());    
+    DepthStencilBufferPtr new_depth_stencil_buffer = shadow_depth_stencil_buffer.get ();
+    ColorBufferPtr        new_color_buffer         = GetShadowBuffer (new_depth_stencil_buffer.get ());
+
+    color_buffer         = new_color_buffer;
+    depth_stencil_buffer = new_depth_stencil_buffer;
     
     return;
   }
 
-  if (!shadow_depth_stencil_buffers.empty ())
+    //создание буфера попиксельного отсечения
+
+  if (shadow_color_buffer && !shadow_depth_stencil_buffer)
   {
-    depth_stencil_buffer = shadow_depth_stencil_buffers.front ();
-    color_buffer         = GetShadowBuffer (depth_stencil_buffer.get ());
+    ColorBufferPtr        new_color_buffer         = shadow_color_buffer.get ();
+    DepthStencilBufferPtr new_depth_stencil_buffer = GetShadowBuffer (new_color_buffer.get ());
+    
+    color_buffer         = new_color_buffer;
+    depth_stencil_buffer = new_depth_stencil_buffer;    
     
     return;
   }
 
-    //создание новой пары буферов
+    //если оба буфера отсутствуют - создание PBuffer-а
 
-  SwapChainPtr          swap_chain (manager.CreateCompatibleSwapChain (GetDefaultSwapChain ()), false);
-  ColorBufferPtr        new_color_buffer (new SwapChainColorBuffer (frame_buffer_manager, swap_chain.get (), 1), false);  
+  SwapChainPtr swap_chain (frame_buffer_manager.GetContextManager ().CreateCompatibleSwapChain (GetDefaultSwapChain ()), false);
+
+    //создание теневого буфера цвета
+
+  ColorBufferPtr new_color_buffer (new SwapChainColorBuffer (frame_buffer_manager, swap_chain.get (), 1), false);  
+
+  shadow_color_buffer = new_color_buffer.get ();    
+
+    //создание теневого буфера попиксельного отсечения
+
   DepthStencilBufferPtr new_depth_stencil_buffer = GetShadowBuffer (new_color_buffer.get ());
 
-  shadow_color_buffers.push_front (new_color_buffer.get ());
-
-  try
-  {
-    new_color_buffer->RegisterDestroyHandler (list_remover<ColorBufferList> (shadow_color_buffers, shadow_color_buffers.begin ()), GetTrackable ());
-  }
-  catch (...)
-  {
-    shadow_color_buffers.pop_front ();
-    throw;
-  }
+    //возврат значений
 
   color_buffer         = new_color_buffer;
   depth_stencil_buffer = new_depth_stencil_buffer;
@@ -215,9 +148,9 @@ ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& de
       {
         SwapChainDesc swap_chain_desc;
         ISwapChain*   default_swap_chain = GetDefaultSwapChain ();
-        
+
         default_swap_chain->GetDesc (swap_chain_desc);
-        
+
         swap_chain_desc.frame_buffer.width  = desc.width;
         swap_chain_desc.frame_buffer.height = desc.height;
 
@@ -238,14 +171,12 @@ ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& de
     {
       try
       {
-        ISwapChain* default_swap_chain = GetDefaultSwapChain ();
-
-        return new SwapChainDepthStencilBuffer (frame_buffer_manager, default_swap_chain, desc);
+        return new SwapChainFakeDepthStencilBuffer (frame_buffer_manager.GetContextManager (), desc);
       }
       catch (xtl::exception& exception)
       {
         exception.touch (METHOD_NAME);
-        
+
         throw;
       }
     }
@@ -257,10 +188,8 @@ ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& de
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create output-stage texture with format=%s", get_name (desc.format));
-      return 0;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);
-      return 0;
   }
 }
 
@@ -315,7 +244,8 @@ bool SwapChainFrameBufferManager::IsSupported (View* color_view, View* depth_ste
   {
     ITexture* base_texture = depth_stencil_view->GetTexture ();
     
-    if (!dynamic_cast<IRenderTargetTexture*> (base_texture) && !dynamic_cast<SwapChainDepthStencilBuffer*> (base_texture))
+    if (!dynamic_cast<IRenderTargetTexture*> (base_texture) && !dynamic_cast<SwapChainDepthStencilBuffer*> (base_texture) &&
+        !dynamic_cast<SwapChainFakeDepthStencilBuffer*> (base_texture))
       return false;
   }
 

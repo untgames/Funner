@@ -10,7 +10,7 @@ using namespace common;
 
 Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char* init_string)
   : driver (in_driver),
-    context_manager (xtl::bind (&Driver::LogMessage, in_driver, _1), init_string),
+    context_manager (swap_chain, init_string, xtl::bind (&Driver::LogMessage, in_driver, _1)),
     output_stage (context_manager, swap_chain),
     input_stage (context_manager),
     texture_manager (context_manager),
@@ -592,11 +592,13 @@ void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t ver
 
       //рисование      
 
+      printf (",,,in mode=%04x fv=%u vcount=%u\n", mode, first_vertex, vertices_count);
     glDrawArrays (mode, first_vertex, vertices_count);
+      printf (",,,out\n");            
 
-      //проверка ошибок
+      //проверка ошибок      
 
-    context_manager.CheckErrors ("glDrawArrays");
+    context_manager.CheckErrors ("glDrawArrays");    
   }
   catch (xtl::exception& exception)
   {
