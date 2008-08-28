@@ -592,9 +592,7 @@ void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t ver
 
       //рисование      
 
-      printf (",,,in mode=%04x fv=%u vcount=%u\n", mode, first_vertex, vertices_count);
     glDrawArrays (mode, first_vertex, vertices_count);
-      printf (",,,out\n");            
 
       //проверка ошибок      
 

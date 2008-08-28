@@ -279,11 +279,16 @@ struct ContextManager::Impl: public xtl::reference_counter
     void MakeContextCurrent (bool clear_errors)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::MakeContextCurrent";      
+      
+        //проверка необходимости смены контекста
+      
+      if (ContextImpl::GetCurrentContext () == &context)
+        return;
 
       try
       {
-          //сделать кэширование установки!!!          
-
+          //установка контекста
+        
         context.GetContext ().MakeCurrent (current_swap_chain);
 
           //очистка текущей ошибки
