@@ -109,6 +109,13 @@ struct WindowFrameBuffer : public xtl::trackable
     connect_tracker (window->RegisterEventHandler (WindowEvent_OnChangeHandle, xtl::bind (&WindowFrameBuffer::ChangeWindowHandleHandler, this)));
     connect_tracker (window->RegisterEventHandler (WindowEvent_OnSize, xtl::bind (&WindowFrameBuffer::ResizeWindowHandler, this)));
     connect_tracker (window->RegisterEventHandler (WindowEvent_OnPaint, xtl::bind (&WindowFrameBuffer::UpdateWindowHandler, this)));
+
+    syslib::Rect client_rect = window->ClientRect ();
+
+    size_t width = client_rect.right - client_rect.left;
+    size_t height = client_rect.bottom - client_rect.top;
+
+    frame_buffer->SetSize (width, height);
   }
 
   void DestroyWindowHandler ();
@@ -234,9 +241,12 @@ void WindowFrameBuffer::ResizeWindowHandler ()
 {
   syslib::Rect client_rect = window->ClientRect ();
 
-  frame_buffer->SetSize (client_rect.right - client_rect.left, client_rect.bottom - client_rect.top);
+  size_t width = client_rect.right - client_rect.left;
+  size_t height = client_rect.bottom - client_rect.top;
 
-  renderer_entry->renderer->FrameBufferResizeNotify (frame_buffer.get (), window->Width (), window->Height ());
+  frame_buffer->SetSize (width, height);
+
+  renderer_entry->renderer->FrameBufferResizeNotify (frame_buffer.get (), width, height);
 }
 
 void WindowFrameBuffer::UpdateWindowHandler ()
