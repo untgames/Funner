@@ -54,8 +54,6 @@ class Test: public BasicTest
     {
       primitive->SetTransform (rotatef (rotation_angle, 0, 0, 1));
 
-//      ChangeWindowStyle ((syslib::WindowStyle)(current_style++ % 2));
-
       rotation_angle += 0.05f;      
     }
 

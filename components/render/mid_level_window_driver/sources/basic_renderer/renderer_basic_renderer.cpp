@@ -54,8 +54,6 @@ void RendererDispatch::AddFrameBuffer (FrameBuffer* frame_buffer)
 
     frame_buffers.push_back (frame_buffer);
 
-    frame_buffer->connect_tracker (xtl::bind (&RendererDispatch::RemoveFrameBuffer, this, frame_buffer));
-
     FrameBufferCreateNotify (frame_buffers.back ());
   }
   catch (xtl::exception& exception)

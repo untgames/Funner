@@ -92,10 +92,12 @@ void fill_swap_chain_desc (SwapChainDesc& swap_chain_desc, const void* window_ha
     ¬хождение системы рендеринга в список драйвера
 */
 
+typedef xtl::com_ptr<FrameBuffer> FrameBufferPtr;
+
 struct WindowFrameBuffer : public xtl::trackable
 {
   syslib::Window*           window;
-  xtl::com_ptr<FrameBuffer> frame_buffer;
+  FrameBufferPtr            frame_buffer;
   Driver*                   driver;
   Driver::RendererEntry*    renderer_entry;
   stl::string               configuration_branch;
@@ -217,22 +219,19 @@ namespace
 
 void WindowFrameBuffer::DestroyWindowHandler ()
 {
-  printf ("Destroy\n");
-
   driver->UnregisterWindow (renderer_entry->renderer_name.c_str (), *window);
 }
 
 void WindowFrameBuffer::ChangeWindowHandleHandler ()
 {
-  printf ("Change handle\n");
-
   if (!window->Handle ())
   {
+    renderer_entry->renderer->RemoveFrameBuffer (frame_buffer.get ());
     frame_buffer = 0;
     return;
   }
 
-  frame_buffer = renderer_entry->CreateFrameBuffer (window->Handle (), configuration_branch.c_str ());
+  frame_buffer = FrameBufferPtr (renderer_entry->CreateFrameBuffer (window->Handle (), configuration_branch.c_str ()), false);
 
   renderer_entry->renderer->AddFrameBuffer (frame_buffer.get ());
 }

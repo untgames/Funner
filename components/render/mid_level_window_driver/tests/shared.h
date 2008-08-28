@@ -95,7 +95,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
 {
   public:
     RenderWindow (const wchar_t* title) 
-      : window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT)
+      : window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT), style (0)
     {
         //инициализация окна
     
@@ -119,7 +119,9 @@ class RenderWindow : public IRendererListener, public xtl::trackable
 
       window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&RenderWindow::OnRedraw, this));
       window.RegisterEventHandler (syslib::WindowEvent_OnSize,  xtl::bind (&RenderWindow::OnResize, this));
+//      window.RegisterEventHandler (syslib::WindowEvent_OnChangeHandle, xtl::bind (&RenderWindow::OnChangeHandle, this));
       window.RegisterEventHandler (syslib::WindowEvent_OnDestroy, xtl::bind (&RenderWindow::OnDestroy, this));
+      window.RegisterEventHandler (syslib::WindowEvent_OnLeftButtonDown, xtl::bind (&RenderWindow::ChangeWindowStyle, this));
 
         //установка размеров области вывода
 
@@ -142,7 +144,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
         
       clear_frame = ClearFramePtr (renderer->CreateClearFrame (), false);
 
-      clear_frame->SetRenderTargets (frame_buffer->GetColorBuffer (), renderer->GetFrameBuffer (0)->GetDepthStencilBuffer ());
+      clear_frame->SetRenderTargets (frame_buffer->GetColorBuffer (), frame_buffer->GetDepthStencilBuffer ());
       clear_frame->SetFlags         (render::mid_level::ClearFlag_All);
       clear_frame->SetColor         (CLEAR_COLOR);
       
@@ -150,7 +152,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
 
       frame = FramePtr (renderer->CreateFrame (), false);
 
-      frame->SetRenderTargets (frame_buffer->GetColorBuffer (), renderer->GetFrameBuffer (0)->GetDepthStencilBuffer ());
+      frame->SetRenderTargets (frame_buffer->GetColorBuffer (), frame_buffer->GetDepthStencilBuffer ());
       frame->SetProjection    (GetOrthoProjectionMatrix (-100, 100, -100, 100, -1000, 1000));
     }
 
@@ -199,6 +201,11 @@ class RenderWindow : public IRendererListener, public xtl::trackable
     }
 
   private:
+    void ChangeWindowStyle ()
+    {
+      window.SetStyle ((syslib::WindowStyle)(style++ % 2));
+    }
+    
 ///Перерисовка
     void Redraw ()
     {
@@ -265,11 +272,12 @@ class RenderWindow : public IRendererListener, public xtl::trackable
     }    
 
   private:
-    syslib::Window window;
-    Renderer2dPtr  renderer;
-    FrameBufferPtr frame_buffer;
-    ClearFramePtr  clear_frame;
-    FramePtr       frame;
+    syslib::Window      window;
+    Renderer2dPtr       renderer;
+    FrameBufferPtr      frame_buffer;
+    ClearFramePtr       clear_frame;
+    FramePtr            frame;
+    size_t              style;
 };
 
 /*
@@ -355,11 +363,6 @@ class BasicTest
     {
       for (size_t i = 0; i < render_windows.size (); i++)
         render_windows[i]->AddPrimitive (primitive);
-    }
-    
-    void ChangeWindowStyle (syslib::WindowStyle new_style)
-    {
-      render_windows[0]->Window ().SetStyle (new_style);
     }
     
   private:

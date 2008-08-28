@@ -6,6 +6,8 @@
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/trackable.h>
+#include <xtl/trackable_ptr.h>
 
 #include <render/low_level/device.h>
 #include <render/low_level/driver.h>
@@ -53,7 +55,7 @@ enum RenderTargetType
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Целевой буфер отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class RenderTarget: virtual public IRenderTarget, public Object
+class RenderTarget: virtual public IRenderTarget, public Object, public xtl::trackable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +141,7 @@ class BasicFrame: virtual public IFrame, public Object
     virtual void DrawCore (render::low_level::IDevice* device) = 0;
 
   private:
-    typedef xtl::com_ptr<RenderTarget> RenderTargetPtr;
+    typedef xtl::trackable_ptr<RenderTarget> RenderTargetPtr;
 
   private:
     RenderTargetPtr             render_target;
