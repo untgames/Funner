@@ -1,287 +1,335 @@
 #include "shared.h"
 
+#undef min
+#undef max
+
 using namespace render::render2d;
 using namespace scene_graph;
 
 namespace
 {
 
-bool is_symbol_valid (size_t symbol_code, const media::Font& font)
-{
-  return ((symbol_code >= font.FirstGlyphCode ()) && (symbol_code < (font.FirstGlyphCode () + font.GlyphsTableSize ())));
-}
-
+//границы текста
 struct TextDimensions
 {
-  float right;
-  float left;
-  float top;
-  float bottom;
+  math::vec2f min;
+  math::vec2f max;
 };
 
-TextDimensions calculate_text_dimensions (render::mid_level::renderer2d::Sprite* glyphs, size_t glyphs_count)
+//определение корректности кода символа
+inline bool is_symbol_valid (size_t symbol_code, size_t first_code, size_t last_code)
 {
-  TextDimensions return_value = {0.f, 0.f, 0.f, 0.f};
-
-  for (size_t i = 0; i < glyphs_count; i++, glyphs++)
-  {
-    if ((glyphs->position.x - (glyphs->size.x / 2.f)) < return_value.left)   return_value.left   = glyphs->position.x - (glyphs->size.x / 2.f);
-    if ((glyphs->position.x + (glyphs->size.x / 2.f)) > return_value.right)  return_value.right  = glyphs->position.x + (glyphs->size.x / 2.f);
-    if ((glyphs->position.y - (glyphs->size.y / 2.f)) < return_value.bottom) return_value.bottom = glyphs->position.y - (glyphs->size.y / 2.f);
-    if ((glyphs->position.y + (glyphs->size.y / 2.f)) > return_value.top)    return_value.top    = glyphs->position.y + (glyphs->size.y / 2.f);
-  }
-
-  return return_value;
+  return symbol_code >= first_code && symbol_code < last_code;
 }
 
 }
+
+/*
+    Описание реализации строки текста
+*/
 
 struct RenderableTextLine::Impl
 {
   Render&                        render;                       //ссылка на рендер
   scene_graph::TextLine*         text_line;                    //исходная линия текста
   PrimitivePtr                   primitive;                    //визуализируемый примитив
+  SpritesBuffer                  sprites_buffer;               //буфер спрайтов
   math::vec4f                    current_color;                //текущий цвет
+  RenderableFont*                current_renderable_font;      //текущий шрифт
+  size_t                         current_text_hash;            //текущий хэш текста
+  TextDimensions                 current_text_dimensions;      //текущие границы текста 
   scene_graph::TextLineAlignment current_horizontal_alignment; //текущее горизонтальное выравнивание
   scene_graph::TextLineAlignment current_vertical_alignment;   //текущее вертикальное выравнивание
-  math::mat4f                    translate_tm;                 //матрица сдвига для выравнивания
-  math::mat4f                    current_world_tm;             //текущая матрица трансформации
-  size_t                         current_world_tm_hash;        //хэш текущей матрицы трансформации
-  stl::string                    current_font_name;            //текущий шрифт
-  stl::string                    current_text;                 //текущий текст
-  SpritesBuffer                  sprites_buffer;               //буффер спрайтов
-  stl::vector<size_t>            glyph_indices;                //индексы глифов в буффере спрайтов
-  TextDimensions                 text_dimensions;              //границы текста
+  math::vec3f                    current_offset;               //текущее смещение текста, определяемое выраваниванием  
+  size_t                         current_world_tm_hash;        //хэш текущей матрицы преобразований  
+  bool                           need_full_update;             //необходимо полностью обновить все параметры
+  bool                           wrong_state;                  //надпись находится в некорректном состоянии
 
+///Конструктор
   Impl (scene_graph::TextLine* in_text_line, Render& in_render)
     : render (in_render),
       text_line (in_text_line),
       primitive (render.Renderer ()->CreatePrimitive (), false),
-      current_color (math::vec4f (-1.f)),
-      current_horizontal_alignment (TextLineAlignment_Num),
-      current_vertical_alignment (TextLineAlignment_Num),
-      translate_tm (1)
+      need_full_update (true),
+      wrong_state (true)
   {
     primitive->SetBlendMode (render::mid_level::renderer2d::BlendMode_Translucent);
   }
-
+  
+///Обновление параметров строки текста
   void Update ()
   {
     try
-    {    
-      bool need_rebuild_text    = false;
-      bool need_update_position = false;
-      bool need_color_update    = current_color != text_line->Color ();
+    {
+      if (wrong_state)
+        need_full_update = true;
 
-      RenderableFont*    font         = render.GetFont (text_line->Font ());
-      const media::Font& current_font = font->GetFont ();
-
-        //проверка обновления шрифта
-      if (xtl::xstrcmp (current_font_name.c_str (), text_line->Font ()))
-      {
-        //получение нового шрифта
-        primitive->SetTexture (font->GetTexture ());
+      wrong_state = true;
+      
+        //получение шрифта
         
-        need_rebuild_text    = true;
-        need_update_position = true;
-        need_color_update    = true;
+      RenderableFont* renderable_font = render.GetFont (text_line->Font ());
+      
+        //инициализация флагов обновления
+        
+      bool need_update_sprites = false;
 
-        current_font_name = text_line->Font ();
+        //определение необходимости обновления текста
+
+      bool need_update_text = renderable_font != current_renderable_font || text_line->TextUnicodeHash () != current_text_hash;
+
+        //определение необходимости обновления смещения текста
+
+      bool need_update_offset = current_horizontal_alignment != text_line->HorizontalAlignment () ||
+                                current_vertical_alignment != text_line->VerticalAlignment ();
+
+        //проверка необходимости обновления матрицы преобразований текста
+
+      const math::mat4f& world_tm      = text_line->WorldTM ();
+      size_t             world_tm_hash = common::crc32 (&world_tm, sizeof (math::mat4f));
+
+      bool need_update_tm = world_tm_hash != current_world_tm_hash;
+
+        //определение необходимости обновления цвета текста
+
+      bool need_update_color = current_color != text_line->Color ();
+      
+        //определение необходимости обновления всех полей
+        
+      if (need_full_update)
+      {
+        need_update_text    = true;
+        need_update_offset  = true;
+        need_update_color   = true;
+        need_update_tm      = true;
+        need_update_sprites = true;
       }
 
-        //проверка обновления текста
-      if (xtl::xstrcmp (current_text.c_str (), text_line->Text ()))
+        //обновление текста
+
+      if (need_update_text)
       {
-        current_text = text_line->Text ();
+          //инициализация параметров рендеринга текста
 
-        need_rebuild_text    = true;
-        need_update_position = true;
-        need_color_update    = true;
-      }
+        const wchar_t*          text_unicode      = text_line->TextUnicode ();
+        size_t                  text_length       = xtl::xstrlen (text_unicode);
+        const media::Font&      font              = renderable_font->GetFont ();
+        const media::GlyphInfo* glyphs            = font.Glyphs ();
+        size_t                  glyphs_count      = font.GlyphsTableSize (),
+                                first_glyph_code  = font.FirstGlyphCode (),
+                                last_glyph_code   = first_glyph_code + glyphs_count;
+        float                   current_pen_x     = 0.0f,
+                                current_pen_y     = 0.0f,
+                                max_glyph_side    = (float)renderable_font->GetMaxGlyphSide ();
+        math::vec4f             color             = text_line->Color ();
+        TextDimensions          text_dimensions;
 
-        //формирование буфера спрайтов
-      if (need_rebuild_text)
-      {
-        size_t text_length = strlen (text_line->Text ());
+          //резервирование места для буфера спрайтов
 
-        sprites_buffer.resize (text_length, false);
-        glyph_indices.resize (text_length);
+        sprites_buffer.resize (text_length, false);      
 
-        render::mid_level::renderer2d::Sprite* current_sprite = sprites_buffer.data ();
+          //формирование массива спрайтов
 
-        size_t result_text_length = 0;
+        const wchar_t*                 pos              = text_unicode;
+        size_t                         prev_glyph_index = 0;      
+        mid_level::renderer2d::Sprite* dst_sprite       = sprites_buffer.data ();
 
-        for (size_t i = 0; i < text_length; i++, current_sprite++, result_text_length++)
+        for (size_t i=0; i<text_length; i++, pos++)
         {
-          size_t current_symbol_code = *(unsigned char*)&text_line->Text ()[i];
+            //проверка наличия кода символа в шрифте
 
-          if (!is_symbol_valid (current_symbol_code, current_font))
+          size_t current_symbol_code = *pos;
+
+          if (!is_symbol_valid (current_symbol_code, first_glyph_code, last_glyph_code))
           {
-            if (!is_symbol_valid ('?', current_font))
-            {
-              result_text_length--;
-              
+            if (!is_symbol_valid ('?', first_glyph_code, last_glyph_code))
               continue;
+
+            current_symbol_code = '?';
+          }
+          
+            //получение глифа
+
+          size_t                  glyph_index = current_symbol_code - first_glyph_code;
+          const media::GlyphInfo& glyph       = glyphs [glyph_index];
+          
+            //перенос пера
+            
+          if (dst_sprite != sprites_buffer.data ()) //производится только если есть предыдущий символ
+          {
+            if (font.HasKerning (prev_glyph_index, glyph_index))
+            {
+              media::KerningInfo kerning_info = font.Kerning (prev_glyph_index, glyph_index);
+
+              current_pen_x += kerning_info.x_kerning / max_glyph_side;
+              current_pen_y += kerning_info.y_kerning / max_glyph_side;
             }
-            else
-              current_symbol_code = '?';
           }
 
-          size_t glyph_index = current_symbol_code - current_font.FirstGlyphCode ();
+            //инициализация спрайта
 
-          *current_sprite                   = font->GetSprite (glyph_index);
-          glyph_indices[result_text_length] = glyph_index;
+              //bearing внести в инициализацию спрайтов в RenderableFont!!!!
+
+          float bearing_x = glyph.bearing_x / max_glyph_side, bearing_y = glyph.bearing_y / max_glyph_side;
+
+          const mid_level::renderer2d::Sprite& src_sprite = renderable_font->GetSprite (glyph_index);
+
+          dst_sprite->position   = math::vec3f (current_pen_x + bearing_x + src_sprite.size.x / 2.f,
+                                                current_pen_y + bearing_y - src_sprite.size.y / 2.f, 0.f);
+          dst_sprite->color      = color;
+          dst_sprite->size       = src_sprite.size;
+          dst_sprite->tex_offset = src_sprite.tex_offset;
+          dst_sprite->tex_size   = src_sprite.tex_size;        
+          
+            //перенос пера
+
+          current_pen_x += glyph.advance_x / max_glyph_side;
+          current_pen_y += glyph.advance_y / max_glyph_side;
+
+            //корректировка границ текста
+
+          TextDimensions glyph_dimensions;
+          
+          glyph_dimensions.min.x = dst_sprite->position.x - dst_sprite->size.x * 0.5f;
+          glyph_dimensions.min.y = dst_sprite->position.y - dst_sprite->size.y * 0.5f;
+          glyph_dimensions.max.x = glyph_dimensions.min.x + dst_sprite->size.x;
+          glyph_dimensions.max.y = glyph_dimensions.min.y + dst_sprite->size.y;
+
+          if (glyph_dimensions.min.x < text_dimensions.min.x) text_dimensions.min.x = glyph_dimensions.min.x;
+          if (glyph_dimensions.min.y < text_dimensions.min.y) text_dimensions.min.y = glyph_dimensions.min.y;
+          if (glyph_dimensions.max.x > text_dimensions.max.x) text_dimensions.max.x = glyph_dimensions.max.x;
+          if (glyph_dimensions.max.y > text_dimensions.max.y) text_dimensions.max.y = glyph_dimensions.max.y;
+          
+            //переход к следующему спрайту
+
+          dst_sprite++;
+          prev_glyph_index = glyph_index;
         }
-
-        sprites_buffer.resize (result_text_length);
-
-          //формирование позиций спрайтов
-        current_sprite = sprites_buffer.data ();
-
-        float current_pen_x_position = 0.f;
-        float current_pen_y_position = 0.f;
-        float max_glyph_side         = (float)font->GetMaxGlyphSide ();
-
-        const media::GlyphInfo* glyphs = current_font.Glyphs ();
-
-        for (size_t i = 0; i < sprites_buffer.size (); i++, current_sprite++)
-        {
-          float bearing_x = (float)glyphs [glyph_indices [i]].bearing_x / max_glyph_side;
-          float bearing_y = (float)glyphs [glyph_indices [i]].bearing_y / max_glyph_side;
-
-          current_sprite->position = math::vec3f (current_pen_x_position + bearing_x + current_sprite->size.x / 2.f, current_pen_y_position + bearing_y - current_sprite->size.y / 2.f, 0.f);
-
-          if (((i + 1) < sprites_buffer.size ()) && (current_font.HasKerning (glyph_indices [i], glyph_indices [i + 1])))
-          {
-            media::KerningInfo kerning_info = current_font.Kerning (glyph_indices [i], glyph_indices [i + 1]);
-
-            current_pen_x_position += (float)glyphs [glyph_indices [i]].advance_x / max_glyph_side + (float)kerning_info.x_kerning / max_glyph_side;
-            current_pen_y_position += (float)glyphs [glyph_indices [i]].advance_y / max_glyph_side + (float)kerning_info.y_kerning / max_glyph_side;
-          }
-          else
-          {
-            current_pen_x_position += (float)glyphs [glyph_indices [i]].advance_x / max_glyph_side;
-            current_pen_y_position += (float)glyphs [glyph_indices [i]].advance_y / max_glyph_side;
-          }
-        }
-
-        text_dimensions = calculate_text_dimensions (sprites_buffer.data (), sprites_buffer.size ());
-      }
-
-      if ((current_horizontal_alignment != text_line->HorizontalAlignment ()) || (current_vertical_alignment != text_line->VerticalAlignment ()))
-      {
-        current_horizontal_alignment = text_line->HorizontalAlignment ();
-        current_vertical_alignment   = text_line->VerticalAlignment ();
-
-        need_update_position = true;
-      }
-
-      if (need_update_position)
-      {
-        math::vec3f translate_vector (0);
-
-        if ((text_dimensions.left < -0.501f) || (text_dimensions.right > 0.501f))  //проверка вертикального шрифта
-        {
-          switch (current_horizontal_alignment)
-          {
-            case TextLineAlignment_Center:
-              translate_vector.x = -(text_dimensions.right + text_dimensions.left) / 2.f;
-              break;
-            case TextLineAlignment_Right:
-              translate_vector.x = -text_dimensions.right;
-              break;
-            case TextLineAlignment_Left:
-              translate_vector.x = -text_dimensions.left;
-              break;
-          }
-        }
-        else
-        {
-          switch (current_horizontal_alignment)
-          {
-            case TextLineAlignment_Right:
-              translate_vector.x = -0.5;
-              break;
-            case TextLineAlignment_Left:
-              translate_vector.x = 0.5;
-              break;
-          }
-        }
-
-        if ((text_dimensions.bottom < -0.501f) || (text_dimensions.top > 0.501f))  //проверка горизонтального шрифта
-        {
-          switch (current_vertical_alignment)
-          {
-            case TextLineAlignment_Center:
-              translate_vector.y = -(text_dimensions.top + text_dimensions.bottom) / 2.f;
-              break;
-            case TextLineAlignment_Top:
-              translate_vector.y = -text_dimensions.top;
-              break;
-            case TextLineAlignment_Bottom:
-              translate_vector.y = -text_dimensions.bottom;
-              break;
-          }
-        }
-        else
-        {
-          switch (current_vertical_alignment)
-          {
-            case TextLineAlignment_Top:
-              translate_vector.y = -0.5;
-              break;
-            case TextLineAlignment_Bottom:
-              translate_vector.y = 0.5;
-              break;
-          }
-        }
-
-        translate_tm = translate (translate_vector);
-      }
-
-        //обновление матрицы трансформаций
         
-      math::mat4f world_tm = text_line->WorldTM ();
+          //корректировка количества спрайтов
 
-      size_t world_tm_hash = common::crc32 (&world_tm, sizeof (math::mat4f));
+        sprites_buffer.resize (dst_sprite - sprites_buffer.data ());
 
-      if (need_update_position || (current_world_tm_hash != world_tm_hash))
+          //обновление текстуры
+
+        primitive->SetTexture (renderable_font->GetTexture ());      
+
+          //обновление параметров
+
+        current_text_dimensions = text_dimensions;      
+        current_renderable_font = renderable_font;      
+        current_text_hash       = text_line->TextUnicodeHash ();
+
+          //обновление флагов
+
+        need_update_offset  = true;
+        need_update_sprites = true;
+        need_update_color   = false;
+      }
+      
+        //обновление положения текста
+        
+      if (need_update_offset)
       {
-        primitive->SetTransform (world_tm * translate_tm);
+          //расчёт вектора смещения надписи
+        
+        scene_graph::TextLineAlignment halign = text_line->HorizontalAlignment (),
+                                       valign = text_line->VerticalAlignment ();
+        math::vec2f                    size   = current_text_dimensions.max - current_text_dimensions.min,
+                                       offset = -current_text_dimensions.min;
+
+        switch (halign)
+        {
+          default:
+          case TextLineAlignment_Center:
+            offset.x -= 0.5f * size.x;
+            break;
+          case TextLineAlignment_Right:
+            offset.x -= size.x;
+            break;
+          case TextLineAlignment_Left:
+            break;
+        }
+        
+        switch (valign)
+        {
+          default:
+          case TextLineAlignment_Center:
+            offset.y -= 0.5f * size.y;
+            break;
+          case TextLineAlignment_Top:
+            offset.y -= size.y;
+            break;
+          case TextLineAlignment_Bottom:
+            break;
+        }
+
+          //обновление параметров
+
+        current_horizontal_alignment = halign;
+        current_vertical_alignment   = valign;
+        current_offset               = math::vec3f (offset, 0.0f);
+
+          //обновление флагов
+
+        need_update_tm = true;
+      }
+
+        //обновление матрицы преобразований
+
+      if (need_update_tm)
+      {
+        primitive->SetTransform (world_tm * math::translate (current_offset));
+
+          //обновление параметров
 
         current_world_tm_hash = world_tm_hash;
-        current_world_tm      = world_tm;
       }
 
-      if (need_color_update)
+        //обновление цвета текста
+
+      if (need_update_color)
       {
+          //получение цвета
+         
+        math::vec4f color = text_line->Color ();
+        
+          //обновление цвета в спрайтах
+
+        mid_level::renderer2d::Sprite* sprite = sprites_buffer.data ();
+
+        for (size_t i=0, count=sprites_buffer.size (); i<count; i++, sprite++)
+          sprite->color = color;
+
+          //обновление параметров
+
         current_color = text_line->Color ();
-
-        render::mid_level::renderer2d::Sprite* current_sprite = sprites_buffer.data ();
-
-        for (size_t i = 0; i < sprites_buffer.size (); i++, current_sprite++)
-          current_sprite->color = current_color;     
+        
+          //обновление флагов
+          
+        need_update_sprites = true;
       }
-
-      if (need_rebuild_text || need_color_update)
+      
+        //обновление спрайтов
+        
+      if (need_update_sprites)
       {
         primitive->RemoveAllSprites ();
-
-        primitive->AddSprites (sprites_buffer.size (), sprites_buffer.data ());
+        primitive->AddSprites       (sprites_buffer.size (), sprites_buffer.data ());
       }
+
+        //обновление корректности состояния надписи
+
+      wrong_state = false;
     }
     catch (std::exception& exception)
     {
       render.LogPrintf ("%s\n    at render::render2d::RenderableTextLine::Update(text_line='%s')", exception.what (), text_line->Name ());
-
-      primitive->RemoveAllSprites ();
     }
     catch (...)
     {    
-      render.LogPrintf ("Unknown exception\n    at render::render2d::RenderableTextLine::Update(text_line='%s')", text_line->Name ());    
-
-      primitive->RemoveAllSprites ();
-    }  
+      render.LogPrintf ("Unknown exception\n    at render::render2d::RenderableTextLine::Update(text_line='%s')", text_line->Name ());
+    }
   }
 };
 
@@ -290,7 +338,8 @@ struct RenderableTextLine::Impl
 */
 
 RenderableTextLine::RenderableTextLine (scene_graph::TextLine* text_line, Render& render)
-  : Renderable (text_line), impl (new Impl (text_line, render))
+  : Renderable (text_line),
+    impl (new Impl (text_line, render))
 {
 }
 
@@ -313,8 +362,6 @@ void RenderableTextLine::Update ()
 
 void RenderableTextLine::DrawCore (IFrame& frame)
 {
-  if (impl->primitive->GetSpritesCount ())
-  {
+  if (!impl->wrong_state && impl->primitive->GetSpritesCount ())
     frame.AddPrimitive (impl->primitive.get ());
-  }
 }

@@ -331,7 +331,7 @@ class RenderManager::Impl: private mid_level::IRendererListener
     }
 
 ///Буфер кадра удалён
-    void OnFrameBufferRemove (mid_level::IFrameBuffer* frame_buffer)
+    void OnFrameBufferDestroy (mid_level::IFrameBuffer* frame_buffer)
     {
       for (FrameBufferArray::iterator iter=frame_buffers.begin (); iter!=frame_buffers.end ();)
         if ((*iter)->frame_buffer == frame_buffer) frame_buffers.erase (iter);

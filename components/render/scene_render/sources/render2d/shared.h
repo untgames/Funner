@@ -46,13 +46,13 @@ typedef mid_level::renderer2d::IFrame      IFrame;
 typedef mid_level::renderer2d::ITexture    ITexture;
 typedef mid_level::IRenderTarget           IRenderTarget;
 typedef mid_level::renderer2d::BlendMode   BlendMode;
-typedef media::rfx::SpriteMaterial         SpriteMaterial;
 typedef xtl::com_ptr<IPrimitive>           PrimitivePtr;
 typedef xtl::com_ptr<IRenderer>            RendererPtr;
 typedef xtl::com_ptr<IFrame>               FramePtr;
 typedef xtl::com_ptr<ITexture>             TexturePtr;
 typedef xtl::com_ptr<IRenderTarget>        RenderTargetPtr;
 typedef xtl::com_ptr<IRenderQuery>         RenderQueryPtr;
+typedef media::rfx::SpriteMaterial         SpriteMaterial;
 typedef SpriteMaterial::Pointer            SpriteMaterialPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,6 +143,7 @@ class RenderableFont
 ///Получение спрайта по индексу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const render::mid_level::renderer2d::Sprite& GetSprite (size_t index) const;
+      //ввести другую структуру!!!!
 
   private:
     typedef xtl::uninitialized_storage<render::mid_level::renderer2d::Sprite> SpritesBuffer;
