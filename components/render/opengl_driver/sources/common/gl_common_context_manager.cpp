@@ -190,7 +190,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
     {
       return current_context;
     }
-    
+
   private:
 ///Контекст стал текущим
     void OnSetCurrent ()
@@ -243,6 +243,7 @@ struct ContextManager::Impl: public xtl::reference_counter
         log_handler (in_log_handler),
         current_swap_chain (0),
         check_gl_errors (true),
+        need_change_context (true),
         on_destroy_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this))
     {
         //инициализация флагов ребиндинга уровней
@@ -268,7 +269,8 @@ struct ContextManager::Impl: public xtl::reference_counter
 
         //обновление данных
 
-      current_swap_chain = swap_chain;
+      current_swap_chain  = swap_chain;
+      need_change_context = true;
 
         //оповещение о необходимости ребиндинга выходного уровня
 
@@ -278,18 +280,18 @@ struct ContextManager::Impl: public xtl::reference_counter
 ///Активация текущего контекста
     void MakeContextCurrent (bool clear_errors)
     {
-      static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::MakeContextCurrent";      
+        //проверка необходимости смены контекстов
       
-        //проверка необходимости смены контекста
-      
-      if (ContextImpl::GetCurrentContext () == &context)
+      if (ContextImpl::GetCurrentContext () == &context && !need_change_context)
         return;
-
+      
       try
       {
           //установка контекста
-        
+
         context.GetContext ().MakeCurrent (current_swap_chain);
+        
+        need_change_context = false;
 
           //очистка текущей ошибки
 
@@ -298,7 +300,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       }
       catch (xtl::exception& exception)
       {
-        exception.touch (METHOD_NAME);
+        exception.touch ("render::low_level::opengl::ContextManager::MakeContextCurrent");
 
         throw;
       }
@@ -427,7 +429,8 @@ struct ContextManager::Impl: public xtl::reference_counter
 ///Обработчик удаления цепочки обмена
     void OnDestroySwapChain ()
     {
-      current_swap_chain = 0;
+      current_swap_chain  = 0;
+      need_change_context = true;
     }
 
   private:
@@ -435,6 +438,7 @@ struct ContextManager::Impl: public xtl::reference_counter
     LogHandler                log_handler;                   //обработчик протоколирования
     ISwapChain*               current_swap_chain;            //текущая цепочка обмена
     bool                      check_gl_errors;               //нужно ли проверять ошибки OpenGL
+    bool                      need_change_context;           //необходимо сменить контекст
     xtl::trackable::slot_type on_destroy_swap_chain;         //обработчик удаления цепочки обмена
     bool                      need_stage_rebind [Stage_Num]; //флаги, определяющие необходимость ребиндинга уровня
 };
