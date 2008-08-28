@@ -19,16 +19,16 @@ struct MyVertex
 
 void redraw (Test& test)
 {
-  test.device->Draw (PrimitiveType_TriangleList, 0, 3);
+  test.device->DrawIndexed (PrimitiveType_TriangleList, 0, 3, 0);
 }
 
 int main ()
 {
-  printf ("Results of draw1_test:\n");
+  printf ("Results of draw_indexed_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (draw1)", &redraw);
+    Test test (L"OpenGL device test window (draw_indexed)", &redraw);
     
     test.window.Show ();
    
@@ -55,12 +55,29 @@ int main ()
     
     vb->SetData (0, vb_desc.size, verts);
     
+    printf ("Create index buffer\n");    
+
+    static size_t indices [] = {0, 1, 2};
+
+    BufferDesc ib_desc;
+
+    memset (&ib_desc, 0, sizeof ib_desc);
+
+    ib_desc.size         = sizeof indices;
+    ib_desc.usage_mode   = UsageMode_Default;
+    ib_desc.bind_flags   = BindFlag_IndexBuffer;
+    ib_desc.access_flags = AccessFlag_ReadWrite;
+
+    BufferPtr ib (test.device->CreateBuffer (ib_desc), false);
+
+    ib->SetData (0, ib_desc.size, indices);  
+
     printf ("Set input-stage\n");
     
     VertexAttribute attributes [] = {
       {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
       {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
+      {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_UByte, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
     };
     
     InputLayoutDesc layout_desc;
@@ -76,6 +93,7 @@ int main ()
 
     test.device->ISSetInputLayout (layout.get ());
     test.device->ISSetVertexBuffer (0, vb.get ());
+    test.device->ISSetIndexBuffer (ib.get ());
 
     printf ("Main loop\n");
 
