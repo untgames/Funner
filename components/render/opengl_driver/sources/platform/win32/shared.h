@@ -286,7 +286,7 @@ class PBuffer: virtual public ISwapChainImpl, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    PBuffer  (PrimarySwapChain* primary_swap_chain, const SwapChainDesc& desc);
+    PBuffer  (PrimarySwapChain* primary_swap_chain, size_t width, size_t height);
     PBuffer  (PrimarySwapChain* swap_chain);
     ~PBuffer ();
 
@@ -321,10 +321,13 @@ class PBuffer: virtual public ISwapChainImpl, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     HDC GetDC ();
 
-  private:
-    void Create ();
-    void Destroy ();
-    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Реалиация интерфейса ISwapChainImpl
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IAdapter*                  GetAdapter             ();
+    Adapter*                   GetAdapterImpl         ();
+    const WglExtensionEntries& GetWglExtensionEntries ();
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
@@ -444,6 +447,12 @@ class Adapter: virtual public IAdapter, public Object
 ///Генерация исключения с передачей контекста ошибки GetLastError ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void raise_error (const char* source);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка поддержки расширений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+stl::string get_wgl_extensions_string (const WglExtensionEntries& wgl_extension_entries, HDC device_context);
+bool        has_extension             (const char* extensions_string, const char* extension);
 
 }
 

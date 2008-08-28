@@ -457,7 +457,9 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
       switch (target_format)
       {
         case PixelFormat_D16:
+      printf ("2\n");
           glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, buffer);
+      printf ("3\n");
           break;
         case PixelFormat_D24X8:
         {

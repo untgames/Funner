@@ -9,7 +9,7 @@ namespace
 template <class Fn>
 inline void init_extension_entry (ILibrary& library, const char* name, Fn& fn)
 {
-  fn = reinterpret_cast<Fn> (library.GetProcAddress (name, EntrySearch_Library | EntrySearch_NoThrow));
+  fn = reinterpret_cast<Fn> (library.GetProcAddress (name, EntrySearch_Context | EntrySearch_NoThrow));
 }
 
 }

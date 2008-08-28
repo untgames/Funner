@@ -179,7 +179,7 @@ int main ()
   {
     printf ("Results of render_buffers_test:\n");
     
-    Test test (L"OpenGL device test window (render_buffers)");
+    Test test (L"OpenGL device test window (render_buffers)", "");
     
     Color4f clear_color;
     
@@ -214,13 +214,14 @@ int main ()
     
     memset (&desc, 0, sizeof (desc));
     
-    desc.dimension  = TextureDimension_2D;
-    desc.width      = 512;
-    desc.height     = 512;
-    desc.layers     = 1;
-    desc.format     = PixelFormat_RGBA8;
-    desc.bind_flags = BindFlag_RenderTarget;
-    
+    desc.dimension    = TextureDimension_2D;
+    desc.width        = 512;
+    desc.height       = 512;
+    desc.layers       = 1;
+    desc.format       = PixelFormat_RGBA8;
+    desc.bind_flags   = BindFlag_RenderTarget;
+    desc.access_flags = AccessFlag_ReadWrite;
+
     TexturePtr color_render_buffer = test.device->CreateTexture (desc);
 
     test_buffer (*color_render_buffer);

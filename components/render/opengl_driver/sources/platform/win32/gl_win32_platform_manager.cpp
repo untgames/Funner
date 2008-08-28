@@ -148,7 +148,23 @@ class PlatformManagerImpl
 ///Создание PBuffer'а
     ISwapChain* CreatePBuffer (ISwapChain* source_chain, const SwapChainDesc* pbuffer_desc)
     {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::windows::PlatformManagerImpl::CreatePBuffer");
+      try
+      {
+        PrimarySwapChain* primary_swap_chain = dynamic_cast<PrimarySwapChain*> (source_chain);
+
+        if (!primary_swap_chain)
+          throw xtl::format_operation_exception ("", "Incompatible source chain, render::low_level::opengl::windows::PrimarySwapChain needed.");
+
+        if (pbuffer_desc)
+          return new PBuffer (primary_swap_chain, pbuffer_desc->frame_buffer.width, pbuffer_desc->frame_buffer.height);
+        else
+          return new PBuffer (primary_swap_chain);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("render::low_level::opengl::windows::PlatformManagerImpl::CreatePBuffer");
+        throw;
+      }
     }
 
 ///Создание контекста
@@ -288,7 +304,7 @@ class PlatformManagerImpl
         
       if (fmt0.support_draw_to_pbuffer != fmt1.support_draw_to_pbuffer)
         return fmt1.support_draw_to_pbuffer;
-        
+
         //упорядочивание по наличию стерео-режима
         
       if (fmt0.support_stereo != fmt1.support_stereo)

@@ -211,19 +211,10 @@ struct PixelFormatEnumContext
         
           //проверка наличия расширений WGL_ARB_pbuffer и WGL_ARB_multisample
           
-        const char* extensions = 0;
+        stl::string extensions = get_wgl_extensions_string (*wgl_extension_entries, device_context);
           
-        if (wgl_extension_entries->GetExtensionsStringARB)
-          extensions = wgl_extension_entries->GetExtensionsStringARB (device_context);
-          
-        if (!extensions && wgl_extension_entries->GetExtensionsStringEXT)
-          extensions = wgl_extension_entries->GetExtensionsStringEXT ();
-
-        if (extensions)
-        {
-          has_pbuffer     = strstr (extensions, "WGL_ARB_pbuffer") != 0;
-          has_multisample = strstr (extensions, "WGL_ARB_multisample") != 0;
-        }
+        has_pbuffer     = has_extension (extensions.c_str (), "WGL_ARB_pbuffer");
+        has_multisample = has_extension (extensions.c_str (), "WGL_ARB_multisample");
       }
       catch (...)
       {
