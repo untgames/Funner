@@ -394,7 +394,7 @@ void RegisterWindowClass ()
   
   memset (&wc, 0, sizeof (wc));
 
-  wc.style         = CS_DBLCLKS; // | CS_HREDRAW | CS_VREDRAW
+  wc.style         = CS_OWNDC | CS_DBLCLKS; // | CS_HREDRAW | CS_VREDRAW
   wc.lpfnWndProc   = &WindowMessageHandler;
   wc.hInstance     = GetApplicationInstance ();
   wc.hIcon         = LoadIcon (GetApplicationInstance (), IDI_APPLICATION);  

@@ -161,7 +161,6 @@ struct Window::Impl
       return signals [event].connect (handler);
     }    
 
-  private:  
 ///Оповещение о возникновении события
     void Notify (WindowEvent event, const WindowEventContext& context)
     {
@@ -199,6 +198,7 @@ struct Window::Impl
       Notify (event, context);    
     }
 
+  private:
 ///Обработчик событий окна
     static void MessageHandler (Platform::window_t wnd, WindowEvent event, const WindowEventContext& context, void* user_data)
     {
@@ -228,7 +228,6 @@ struct Window::Impl
             impl->SetHandle ((Platform::window_t)context.handle);
             break;
           case WindowEvent_OnDestroy: //окно уничтожено
-            impl->Notify (WindowEvent_OnDestroy);
             impl->SetHandle (0);
             break;
           case WindowEvent_OnActivate:                //окно стало активным   
@@ -328,6 +327,12 @@ Window::~Window ()
 {
   try
   {
+      //оповещение об удалении
+
+    impl->Notify (WindowEvent_OnDestroy);
+
+      //принудительное закрытие окна
+
     ForceClose ();
   }
   catch (...)

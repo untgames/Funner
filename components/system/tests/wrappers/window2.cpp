@@ -17,7 +17,7 @@ int main ()
     
     window.SetPosition (0, 0);    
 
-    auto_connection connection4 = window.RegisterEventHandler (WindowEvent_OnDestroy, &destroy);
+    auto_connection connection4 = window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
     
     printf ("title: '%s'\n", window.Title ());
     printf ("is_active: %d\n", window.IsActive ());
