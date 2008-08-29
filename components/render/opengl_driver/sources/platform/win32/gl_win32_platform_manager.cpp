@@ -168,11 +168,11 @@ class PlatformManagerImpl
     }
 
 ///Создание контекста
-    IContext* CreateContext (ISwapChain* swap_chain, IContext* shared_context)
+    IContext* CreateContext (ISwapChain* swap_chain)
     {
       try
       {
-        return new Context (swap_chain, shared_context);
+        return new Context (swap_chain);
       }
       catch (xtl::exception& exception)
       {
@@ -370,7 +370,7 @@ ISwapChain* PlatformManager::CreatePBuffer (ISwapChain* source_chain, const Swap
   return PlatformManagerSingleton::Instance ().CreatePBuffer (source_chain, pbuffer_desc);
 }
 
-render::low_level::opengl::IContext* PlatformManager::CreateContext (ISwapChain* swap_chain, render::low_level::opengl::IContext* shared_context)
+render::low_level::opengl::IContext* PlatformManager::CreateContext (ISwapChain* swap_chain)
 {
-  return PlatformManagerSingleton::Instance ().CreateContext (swap_chain, shared_context);
+  return PlatformManagerSingleton::Instance ().CreateContext (swap_chain);
 }

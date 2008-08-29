@@ -16,6 +16,7 @@ struct PBuffer::Impl
   SwapChainDesc              desc;                //дескриптор буфера
   HPBUFFERARB                pbuffer;             //дескриптор PBuffer'а
   HDC                        output_context;      //контекст устройства вывода
+  int                        pixel_format_index;  //индекс формата пикселей
   bool                       create_largest_flag; //флаг, сигнализирующий о необходимости создания максимально возможного pbuffer'а
   xtl::auto_connection       cds_connection;      //соединение с сигналом, оповещающим об изменении видео-режима
   const WglExtensionEntries* wgl_extension_entries; //таблица WGL-расширений  
@@ -33,6 +34,8 @@ struct PBuffer::Impl
 
     cds_connection = swap_chain->RegisterDisplayModeChangeHandler (xtl::bind (&PBuffer::Impl::OnDisplayModeChange, this));
     wgl_extension_entries = &swap_chain->GetWglExtensionEntries ();
+    
+    pixel_format_index = swap_chain->GetPixelFormat ();
 
     if (!has_extension (get_wgl_extensions_string (*wgl_extension_entries, swap_chain->GetDC ()).c_str (), "WGL_ARB_pbuffer"))
       throw xtl::format_not_supported_exception (METHOD_NAME, "PBuffer does not supported");        
@@ -77,7 +80,7 @@ struct PBuffer::Impl
         
         //поиск подходящего формата пикселей
         
-      int pixel_format = primary_swap_chain->GetAdapterImpl ()->GetPixelFormat (primary_device_context);
+      int pixel_format = primary_swap_chain->GetPixelFormat ();
       
         //создание PBuffer
 
@@ -210,16 +213,7 @@ bool PBuffer::GetFullscreenState ()
 }
 
 /*
-    Контекст устройства вывода / WGLEW контекст
-*/
-
-HDC PBuffer::GetDC ()
-{
-  return impl->output_context;
-}
-
-/*
-   Реалиация интерфейса ISwapChainImpl
+    Получение драйвера
 */
 
 IAdapter* PBuffer::GetAdapter ()
@@ -227,11 +221,35 @@ IAdapter* PBuffer::GetAdapter ()
   return impl->primary_swap_chain->GetAdapter ();
 }
 
+/*
+   Реалиация интерфейса ISwapChainImpl
+*/
+
+//получение реализации адаптера
 Adapter* PBuffer::GetAdapterImpl ()
 {
   return impl->primary_swap_chain->GetAdapterImpl ();
 }
 
+//получение контекста устройства вывода
+HDC PBuffer::GetDC ()
+{
+  return impl->output_context;
+}
+
+//получение формата пикселей цепочки обмена
+int PBuffer::GetPixelFormat ()
+{
+  return impl->pixel_format_index;
+}
+
+//есть ли вертикальная синхронизация
+bool PBuffer::HasVSync ()
+{
+  return false;
+}
+
+//получение точек входа
 const WglExtensionEntries& PBuffer::GetWglExtensionEntries ()
 {
   return *impl->wgl_extension_entries;

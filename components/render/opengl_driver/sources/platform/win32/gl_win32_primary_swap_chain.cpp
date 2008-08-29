@@ -32,6 +32,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
   WglExtensionEntries     wgl_extension_entries;  //таблица WGL-расширений
   HWND                    output_window;          //окно вывода
   HDC                     output_context;         //контекст вывода
+  int                     pixel_format_index;     //индекс формата пикселей устройства вывода
   DummyWindow             listener_window;        //следящее окно
   SwapChainDesc           desc;                   //дескриптор цепочки обмена
   ChangeDisplayModeSignal cdm_signal;             //сигнал, оповещающий об изменении видео-режима
@@ -42,6 +43,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
     : adapter (pixel_format.adapter),
       output_window (check_output_window (in_desc)),
       output_context (::GetDC (output_window)),
+      pixel_format_index (0),
       listener_window (output_window, this)
   {
       //проверка корректности операции
@@ -58,7 +60,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
     else
     {
       memset (&wgl_extension_entries, 0, sizeof wgl_extension_entries);
-    }    
+    }
 
       //установка состояния FullScreen
 
@@ -69,9 +71,11 @@ struct PrimarySwapChain::Impl: private IWindowListener
 
     properties.AddProperty ("gl_extensions", get_wgl_extensions_string (wgl_extension_entries, output_context).c_str ());
 
-      //установка текущего формата пикселей для контекста отрисовки
+      //установка текущего формата пикселей для контекста отрисовки      
 
     adapter->SetPixelFormat (output_context, pixel_format.pixel_format_index);
+
+    pixel_format_index = pixel_format.pixel_format_index;
 
       //инициализация дескриптора цепочки обмена      
 
@@ -83,11 +87,11 @@ struct PrimarySwapChain::Impl: private IWindowListener
     desc.frame_buffer.stencil_bits = pixel_format.stencil_bits;
     desc.samples_count             = pixel_format.samples_count;
     desc.buffers_count             = pixel_format.buffers_count;
-    desc.swap_method               = pixel_format.swap_method;    
+    desc.swap_method               = pixel_format.swap_method;
     desc.fullscreen                = GetFullscreenState ();
     desc.vsync                     = in_desc.vsync;
-    desc.window_handle             = in_desc.window_handle;    
-  }    
+    desc.window_handle             = in_desc.window_handle;
+  }
   
 ///Деструктор
   ~Impl ()
@@ -203,11 +207,6 @@ PrimarySwapChain::~PrimarySwapChain ()
     Получение адаптера
 */
 
-Adapter* PrimarySwapChain::GetAdapterImpl ()
-{
-  return impl->adapter.get ();
-}
-
 IAdapter* PrimarySwapChain::GetAdapter ()
 {
   return impl->adapter.get ();
@@ -217,10 +216,22 @@ IAdapter* PrimarySwapChain::GetAdapter ()
     Реалиация интерфейса IDeviceContext
 */
 
+//получение реализации адаптера
+Adapter* PrimarySwapChain::GetAdapterImpl ()
+{
+  return impl->adapter.get ();
+}
+
 //контекст устройства вывода
 HDC PrimarySwapChain::GetDC ()
 {
   return impl->output_context;
+}
+
+//получение формата пикселей цепочки обмена
+int PrimarySwapChain::GetPixelFormat ()
+{
+  return impl->pixel_format_index;
 }
 
 //есть ли вертикальная синхронизация

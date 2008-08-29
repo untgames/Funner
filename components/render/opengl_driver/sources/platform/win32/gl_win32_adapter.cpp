@@ -14,77 +14,183 @@ namespace
 typedef WINGDIAPI HGLRC (WINAPI *CreateContextFn)       (HDC dc);
 typedef WINGDIAPI BOOL  (WINAPI *DeleteContextFn)       (HGLRC context);
 typedef WINGDIAPI int   (WINAPI *DescribePixelFormatFn) (HDC dc, int pixel_format, UINT size, LPPIXELFORMATDESCRIPTOR pfd);
-typedef WINGDIAPI HGLRC (WINAPI *GetCurrentContextFn)   ();
-typedef WINGDIAPI HDC   (WINAPI *GetCurrentDCFn)        ();
-typedef WINGDIAPI int   (WINAPI *GetPixelFormatFn)      (HDC dc);
 typedef WINGDIAPI PROC  (WINAPI *GetProcAddressFn)      (LPCSTR name);
-typedef WINGDIAPI BOOL  (WINAPI *MakeCurrentFn)         (HDC device_context, HGLRC context);
+typedef WINGDIAPI BOOL  (WINAPI *MakeCurrentFn)         (HDC dc, HGLRC context);
+typedef WINGDIAPI void  (WINAPI *SetCallbackProcsFn)    (void*); //???????????
 typedef WINGDIAPI BOOL  (WINAPI *SetPixelFormatFn)      (HDC dc, int pixel_format, const PIXELFORMATDESCRIPTOR* pfd);
-typedef WINGDIAPI BOOL  (WINAPI *ShareListsFn)          (HGLRC src, HGLRC dst);
+typedef WINGDIAPI BOOL  (WINAPI *SetPixelFormat1Fn)     (HDC hdc, int iPixelFormat);
 typedef WINGDIAPI BOOL  (WINAPI *SwapBuffersFn)         (HDC dc);
-typedef WINGDIAPI void  (APIENTRY *glFlushFn)           (void);
+typedef WINGDIAPI void* (WINAPI *SetContextFn)          (HDC dc, HGLRC context, void* callback);
+typedef WINGDIAPI void  (WINAPI *ReleaseContextFn)      (HGLRC context);
 
 /*
     Таблица функций, используемых для работы OpenGL
 */
 
-struct WglEntries
+class WglEntries
 {
-  CreateContextFn       CreateContext;
-  DeleteContextFn       DeleteContext;
-  DescribePixelFormatFn DescribePixelFormat;
-  GetCurrentContextFn   GetCurrentContext;
-  GetCurrentDCFn        GetCurrentDC;
-  GetPixelFormatFn      GetPixelFormat;
-  GetProcAddressFn      GetProcAddress;
-  MakeCurrentFn         MakeCurrent;
-  SetPixelFormatFn      SetPixelFormat;
-  ShareListsFn          ShareLists;
-  SwapBuffersFn         SwapBuffers;
-  glFlushFn             Flush;
-
+  public:
 ///Конструктор
-  WglEntries (syslib::DynamicLibrary& dll)
-  {
-      //инициализация базовых точек входа
+    WglEntries (syslib::DynamicLibrary& dll) : current_context (0), current_dc (0)
+    {   
+      if (dll.GetSymbol ("wglCreateContext"))
+      {
+        InitMcd (dll);
+        return;
+      }
 
-    get (dll, "wglCreateContext",       CreateContext);
-    get (dll, "wglDeleteContext",       DeleteContext);
-    get (dll, "wglDescribePixelFormat", DescribePixelFormat);
-    get (dll, "wglGetCurrentContext",   GetCurrentContext);
-    get (dll, "wglGetCurrentDC",        GetCurrentDC);
-    get (dll, "wglGetPixelFormat",      GetPixelFormat);
-    get (dll, "wglGetProcAddress",      GetProcAddress);
-    get (dll, "wglMakeCurrent",         MakeCurrent);
-    get (dll, "wglSetPixelFormat",      SetPixelFormat);
-    get (dll, "wglShareLists",          ShareLists);
-    get (dll, "wglSwapBuffers",         SwapBuffers);
-    get (dll, "glFlush",                Flush);        
-
-    if (!xtl::xstricmp (dll.Name (), "opengl32.dll"))
-    {
-        //подмена функций диспетчеризации
-
-      SetPixelFormat = &::SetPixelFormat;
-      GetPixelFormat = &::GetPixelFormat;
+      if (dll.GetSymbol ("DrvCreateContext"))
+      {
+        InitIcd (dll);
+        return;
+      }
+    
+      throw xtl::format_operation_exception ("render::low_level::opengl::windows::WglEntries::WglEntries",
+        "Invalid library '%s'. Could not initialize MCD/ICD driver (neither wglCreateContext nor DrvCreateContext found)",
+        dll.Name ());        
     }
-  }
+    
+///Получение текущего контекста и текущего устройства вывода
+    HGLRC GetCurrentContext () { return current_context; }
+    HDC   GetCurrentDC      () { return current_dc; }
+    
+///Диспетчеры WGL
+    HGLRC CreateContext  (HDC dc) { 
+      
+/*      if (fSetCallbackProcs)
+      {
+        fSetCallbackProcs (0);
+      }*/
+      
+      HGLRC context = fCreateContext (dc);            
+      
+      return context; 
+    }
+
+    BOOL DeleteContext  (HGLRC context) { return fDeleteContext (context); }
+    PROC GetProcAddress (LPCSTR name)   { return fGetProcAddress (name); }
+    BOOL SwapBuffers    (HDC dc)        { return fSwapBuffers (dc); }
+
+    BOOL SetPixelFormat (HDC dc, int pixel_format, const PIXELFORMATDESCRIPTOR* pfd)
+    {
+      if (fSetPixelFormat)
+        return fSetPixelFormat (dc, pixel_format, pfd);
+
+      return fSetPixelFormat1 (dc, pixel_format);
+    }
+
+    int DescribePixelFormat (HDC dc, int pixel_format, UINT size, LPPIXELFORMATDESCRIPTOR pfd)
+    {
+      return fDescribePixelFormat (dc, pixel_format, size, pfd);
+    }
+
+    BOOL MakeCurrent (HDC dc, HGLRC context)
+    {
+      if (fMakeCurrent)
+      {
+          //установка через MCD
+        
+        if (!fMakeCurrent (dc, context))
+          return FALSE;
+        
+        current_context = context;
+        current_dc      = dc;
+
+        return TRUE;
+      }
+      
+        //установка через ICD                
+
+      if (current_context)
+      {
+        fReleaseContext (current_context);
+
+        current_dc      = 0;
+        current_context = 0;
+      }
+      
+      if (dc || context)
+      {
+        if (!fSetContext (dc, context, 0))
+          return FALSE;
+
+        current_context = context;
+        current_dc      = dc;
+      }      
+
+      return TRUE;
+    }
+    
+  private:  
+///Инициализация MCD
+    void InitMcd (syslib::DynamicLibrary& dll)
+    {
+        //инициализация базовых точек входа
+
+      get (dll, "wglCreateContext",       fCreateContext);
+      get (dll, "wglDeleteContext",       fDeleteContext);
+      get (dll, "wglDescribePixelFormat", fDescribePixelFormat);
+      get (dll, "wglGetProcAddress",      fGetProcAddress);
+      get (dll, "wglMakeCurrent",         fMakeCurrent);
+      get (dll, "wglSetPixelFormat",      fSetPixelFormat);
+      get (dll, "wglSwapBuffers",         fSwapBuffers);
+
+      if (!xtl::xstricmp (dll.Name (), "opengl32.dll"))
+      {
+          //подмена функций диспетчеризации
+
+        fSetPixelFormat = &::SetPixelFormat;
+      }
+      
+      fSetContext       = 0;
+      fReleaseContext   = 0;
+      fSetPixelFormat1  = 0;
+      fSetCallbackProcs = 0;
+    }
+    
+///Инициализация ICD
+    void InitIcd (syslib::DynamicLibrary& dll)
+    {
+        //инициализация ICD-драйвера
+
+      get (dll, "DrvCreateContext",       fCreateContext);
+      get (dll, "DrvDeleteContext",       fDeleteContext);
+      get (dll, "DrvDescribePixelFormat", fDescribePixelFormat);
+      get (dll, "DrvGetProcAddress",      fGetProcAddress);
+      get (dll, "DrvReleaseContext",      fReleaseContext);
+      get (dll, "DrvSetCallbackProcs",    fSetCallbackProcs);
+      get (dll, "DrvSetContext",          fSetContext);
+      get (dll, "DrvSetPixelFormat",      fSetPixelFormat1);
+      get (dll, "DrvSwapBuffers",         fSwapBuffers);
+
+      fMakeCurrent    = 0;
+      fSetPixelFormat = 0;
+    }
 
 ///Приведение типа с проверкой корректности возврата
-  template <class Fn> static void get (syslib::DynamicLibrary& dll, const char* symbol, Fn& fn)
-  {
-    fn = reinterpret_cast<Fn> (dll.GetSymbol (symbol));
+    template <class Fn> static void get (syslib::DynamicLibrary& dll, const char* symbol, Fn& fn)
+    {
+      fn = reinterpret_cast<Fn> (dll.GetSymbol (symbol));
 
-    if (!fn)
-      throw xtl::format_operation_exception ("render::low_level::opengl::windows::WglEntries::WglEntries",
-        "Symbol '%s' not found in library '%s'", symbol, dll.Name ());
-  }
-  
-///Инициализация функции расширения
-  template <class Fn> void getext (const char* symbol, Fn& fn)
-  {
-    fn = reinterpret_cast<Fn> (GetProcAddress (symbol));    
-  }
+      if (!fn)
+        throw xtl::format_operation_exception ("render::low_level::opengl::windows::WglEntries::WglEntries",
+          "Symbol '%s' not found in library '%s'", symbol, dll.Name ());
+    }    
+
+  private:
+    CreateContextFn       fCreateContext;
+    DeleteContextFn       fDeleteContext;
+    DescribePixelFormatFn fDescribePixelFormat;
+    GetProcAddressFn      fGetProcAddress;
+    MakeCurrentFn         fMakeCurrent;
+    SetCallbackProcsFn    fSetCallbackProcs;
+    SetPixelFormatFn      fSetPixelFormat;
+    SetPixelFormat1Fn     fSetPixelFormat1;
+    SwapBuffersFn         fSwapBuffers;
+    SetContextFn          fSetContext;
+    ReleaseContextFn      fReleaseContext;
+    HGLRC                 current_context;
+    HDC                   current_dc;
 };
 
 /*
@@ -95,7 +201,7 @@ class DummyContext
 {
   public:
 ///Конструктор
-    DummyContext (HWND parent_window, const WglEntries& in_entries)
+    DummyContext (HWND parent_window, WglEntries& in_entries)
       : entries (in_entries),
         window (parent_window),
         dc (GetDC (window.GetHandle ())),
@@ -119,10 +225,7 @@ class DummyContext
             context = entries.CreateContext (dc);
 
             if (!context)
-              raise_error ("wglCreateContext");
-
-            prev_dc      = entries.GetCurrentDC ();
-            prev_context = entries.GetCurrentContext ();
+              raise_error ("wglCreateContext");                            
 
             if (!entries.MakeCurrent (dc, context))
               raise_error ("wglMakeCurrent");                            
@@ -135,7 +238,8 @@ class DummyContext
       catch (...)      
       {
         if (context) entries.DeleteContext (context);
-        if (dc)      ReleaseDC (window.GetHandle (), dc);
+        if (dc)      ReleaseDC (window.GetHandle (), dc);        
+
         throw;
       }              
     }
@@ -143,20 +247,16 @@ class DummyContext
 ///Деструктор
     ~DummyContext ()
     {      
-      if (!entries.MakeCurrent (prev_dc, prev_context))
-        entries.MakeCurrent (0, 0);
-
+      entries.MakeCurrent   (0, 0);
       entries.DeleteContext (context);
       ReleaseDC             (window.GetHandle (), dc);
     }
 
   private:
-    const WglEntries& entries;      //точки входа в wgl-функции
-    DummyWindow       window;       //макетное окно
-    HDC               dc;           //контекст устройства отрисовки
-    HGLRC             context;      //контекст OpenGL
-    HDC               prev_dc;      //предыдущий контекст устройства отрисовки
-    HGLRC             prev_context; //предыдущий контекст OpenGL
+    WglEntries& entries; //точки входа в wgl-функции
+    DummyWindow window;  //макетное окно
+    HDC         dc;      //контекст устройства отрисовки
+    HGLRC       context; //контекст OpenGL
 };
 
 /*
@@ -167,7 +267,7 @@ struct PixelFormatEnumContext
 {  
   Adapter::PixelFormatArray& pixel_formats;         //массив форматов пикселей
   HDC                        device_context;        //контекст устройства отрисовки
-  const WglEntries&          wgl_entries;           //точки входа wgl-функций
+  WglEntries&                wgl_entries;           //точки входа wgl-функций
   WglExtensionEntries*       wgl_extension_entries; //таблица WGL-расширений  
   Adapter*                   adapter;               //адаптер
   int                        current_pixel_format;  //текущий номер формата пикселей
@@ -179,7 +279,7 @@ struct PixelFormatEnumContext
    (HWND                               window,
     HDC                                in_device_context,
     Adapter*                           in_adapter,
-    const WglEntries&                  in_entries,
+    WglEntries&                        in_entries,
     Adapter::PixelFormatArray&         in_pixel_formats,
     Adapter::WglExtensionEntriesArray& wgl_extension_entries_array)
       : pixel_formats (in_pixel_formats),
@@ -195,9 +295,9 @@ struct PixelFormatEnumContext
 
     try
     {
-        //создание макетного контекста
+        //создание макетного контекста        
 
-      DummyContext context (window, wgl_entries);
+      DummyContext context (window, wgl_entries);                  
 
         //инициализация расширений
 
@@ -242,7 +342,7 @@ struct PixelFormatEnumContext
     
       //попытка перечисления с использованием расширеня WGL_ARB_pixel_format
       
-    if (wgl_extension_entries->GetPixelFormatAttribivARB)
+    if (wgl_extension_entries && wgl_extension_entries->GetPixelFormatAttribivARB)
     {
         //определение максимального формата пикселей      
 
@@ -419,8 +519,9 @@ struct Adapter::Impl: public ILibrary
       entries (dll),
       name (in_name),
       path (in_dll_path),
-      context_listener (0) {}
-      
+      context_listener (0)
+  {}
+
 ///Получение адреса точки входа OpenGL
   const void* GetProcAddress (const char* name, size_t search_flags)
   {
@@ -570,7 +671,7 @@ void Adapter::EnumPixelFormats
 {
   try
   {
-      //оповещение о возможной потере контекста в процессе перечисления форматов
+      //оповещение о возможной потере контекста
 
     if (impl->context_listener)
       impl->context_listener->OnLostCurrent ();
@@ -615,11 +716,6 @@ HDC Adapter::GetCurrentDC ()
   return impl->entries.GetCurrentDC ();
 }
 
-int Adapter::GetPixelFormat (HDC dc)
-{
-  return impl->entries.GetPixelFormat (dc);
-}
-
 PROC Adapter::GetProcAddress (LPCSTR name)
 {
   return impl->entries.GetProcAddress (name);
@@ -648,19 +744,8 @@ void Adapter::SetPixelFormat (HDC dc, int pixel_format)
     raise_error ("wglSetPixelFormat");
 }
 
-void Adapter::ShareLists (HGLRC src, HGLRC dst)
-{
-  if (!impl->entries.ShareLists (src, dst))
-    raise_error ("wglShareLists");
-}
-
 void Adapter::SwapBuffers (HDC dc)
 {
-    //сброс буфера команд OpenGL
-
-  if (impl->entries.GetCurrentDC () == dc)
-    impl->entries.Flush ();
-
     //обмен буферов
 
   if (!impl->entries.SwapBuffers (dc))

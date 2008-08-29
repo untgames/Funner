@@ -83,7 +83,7 @@ struct Context::Impl: public IContextListener
      онструктор / деструктор
 */
 
-Context::Context (ISwapChain* in_swap_chain, IContext* in_shared_context)
+Context::Context (ISwapChain* in_swap_chain)
   : impl (new Impl)
 {
   try
@@ -93,8 +93,7 @@ Context::Context (ISwapChain* in_swap_chain, IContext* in_shared_context)
     if (!in_swap_chain)
       throw xtl::make_null_argument_exception ("", "swap_chain");      
 
-    ISwapChainImpl* swap_chain     = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");
-    Context*        shared_context = cast_object<Context> (in_shared_context, "", "shared_context");
+    ISwapChainImpl* swap_chain = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");
     
       //инициализаци€ адаптера
       
@@ -106,32 +105,17 @@ Context::Context (ISwapChain* in_swap_chain, IContext* in_shared_context)
 
       //получение формата пикселей
 
-    impl->pixel_format = impl->adapter->GetPixelFormat (dc);
+    impl->pixel_format = swap_chain->GetPixelFormat ();
 
     if (!impl->pixel_format)
-      raise_error ("wglGetPixelFormat");
-      
+      throw xtl::format_operation_exception ("", "Null pixel format");
+
       //создание контекста
 
     impl->context = impl->adapter->CreateContext (dc);
 
     if (!impl->context)
       raise_error ("wglCreateContext");
-      
-      //объединение таблиц ресурсов контекстов
-
-    if (shared_context)
-    {
-      try
-      {
-        impl->adapter->ShareLists (shared_context->impl->context, impl->context);
-      }
-      catch (...)
-      {
-        impl->adapter->DeleteContext (impl->context);
-        throw;
-      }
-    }
   }
   catch (xtl::exception& exception)
   {
@@ -223,7 +207,7 @@ bool Context::IsCompatible (ISwapChain* in_swap_chain)
   if (!swap_chain)
     return false;
 
-  return impl->adapter->GetPixelFormat (swap_chain->GetDC ()) == impl->pixel_format;
+  return swap_chain->GetPixelFormat () == impl->pixel_format;
 }
 
 /*

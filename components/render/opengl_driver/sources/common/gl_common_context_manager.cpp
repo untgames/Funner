@@ -32,7 +32,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
       {
           //создание контекста
 
-        context = ContextPtr (PlatformManager::CreateContext (swap_chain, 0), false);                
+        context = ContextPtr (PlatformManager::CreateContext (swap_chain), false);
 
           //подписка на события контекста
 
@@ -77,15 +77,11 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
               
               break;
             }
-        }
-        
-          //определение багов работы OpenGL
-
-        detect_opengl_bugs (extensions_string);
+        }        
 
           //установка флагов поддержки расширений
 
-        extensions.SetGroup (extensions_string.c_str (), true);        
+        extensions.SetGroup (extensions_string.c_str (), true);
 
           //определение поддержки расширений и версий           
 
@@ -143,6 +139,16 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
               extensions.Set (version_entries [i].extension, false);
           }        
         }
+        
+          //определение багов работы OpenGL
+          
+        stl::string bug_string;
+
+        detect_opengl_bugs (bug_string);
+
+        extensions.SetGroup (bug_string.c_str (), true);
+        
+        extensions_string += bug_string;
 
           //инициализация таблицы возможностей контекста
 

@@ -625,9 +625,9 @@ void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size
 
     Bind (base_vertex, first_index, &indices_layout);
 
-      //рисование
+      //рисование      
 
-    glDrawElements (mode, indices_count, indices_layout.type, indices_layout.data);
+    glDrawElements (mode, indices_count, indices_layout.type, indices_layout.data);    
 
       //проверка ошибок
 

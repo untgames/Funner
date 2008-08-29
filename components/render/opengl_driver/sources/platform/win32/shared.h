@@ -94,6 +94,7 @@ class ISwapChainImpl: virtual public ISwapChain
   public:
     virtual Adapter*                   GetAdapterImpl         () = 0; //получение реализации адаптера
     virtual HDC                        GetDC                  () = 0; //контекст устройства вывода
+    virtual int                        GetPixelFormat         () = 0; //формат пикселей устройства вывода
     virtual bool                       HasVSync               () = 0; //есть ли вертикальная синхронизация
     virtual const WglExtensionEntries& GetWglExtensionEntries () = 0; //получение таблицы WGL-расширений
 
@@ -262,6 +263,7 @@ class PrimarySwapChain: virtual public ISwapChainImpl, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Adapter*                   GetAdapterImpl         (); //получение реализации адаптера
     HDC                        GetDC                  (); //контекст устройства вывода
+    int                        GetPixelFormat         (); //формат пикселей устройства вывода
     bool                       HasVSync               (); //есть ли вертикальная синхронизация
     const WglExtensionEntries& GetWglExtensionEntries (); //получение таблицы WGL-расширений
 
@@ -289,16 +291,16 @@ class PBuffer: virtual public ISwapChainImpl, public Object
     PBuffer  (PrimarySwapChain* primary_swap_chain, size_t width, size_t height);
     PBuffer  (PrimarySwapChain* swap_chain);
     ~PBuffer ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение адаптера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IAdapter* GetAdapter ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void GetDesc (SwapChainDesc&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Есть ли вертикальная синхронизация
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool HasVSync () { return false; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение устройства вывода с максимальным размером области перекрытия
@@ -315,18 +317,15 @@ class PBuffer: virtual public ISwapChainImpl, public Object
 ///Обмен текущего заднего буфера и переднего буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Present ();
-
+    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Контекст устройства вывода
+///Реалиация интерфейса IDeviceContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    HDC GetDC ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реалиация интерфейса ISwapChainImpl
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    IAdapter*                  GetAdapter             ();
-    Adapter*                   GetAdapterImpl         ();
-    const WglExtensionEntries& GetWglExtensionEntries ();
+    Adapter*                   GetAdapterImpl         (); //получение реализации адаптера
+    HDC                        GetDC                  (); //контекст устройства вывода
+    int                        GetPixelFormat         (); //формат пикселей устройства вывода
+    bool                       HasVSync               (); //есть ли вертикальная синхронизация
+    const WglExtensionEntries& GetWglExtensionEntries (); //получение таблицы WGL-расширений
 
   private:
     struct Impl;
@@ -342,7 +341,7 @@ class Context: virtual public IContext, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Context  (ISwapChain* swap_chain, IContext* shared_context);
+    Context  (ISwapChain* swap_chain);
     ~Context ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -427,11 +426,9 @@ class Adapter: virtual public IAdapter, public Object
     void  DeleteContext     (HGLRC context);
     HGLRC GetCurrentContext ();
     HDC   GetCurrentDC      ();
-    int   GetPixelFormat    (HDC dc);
     PROC  GetProcAddress    (const char* name);
     void  MakeCurrent       (HDC device_context, HGLRC context);
     void  SetPixelFormat    (HDC dc, int pixel_format);
-    void  ShareLists        (HGLRC src, HGLRC dst);
     void  SwapBuffers       (HDC dc);
 
   private:
