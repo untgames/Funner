@@ -104,8 +104,12 @@ void BasicFrame::Draw (render::low_level::IDevice* device)
     
   render::low_level::IView *render_target_view = render_target ? render_target->GetView () : 0,
                            *depth_stencil_view = depth_stencil_target ? depth_stencil_target->GetView () : 0;
-                           
-  device->OSSetRenderTargets (render_target_view, depth_stencil_view);  
+
+  if (render_target_view != device->OSGetRenderTargetView () || depth_stencil_view != device->OSGetDepthStencilView ())
+  {                           
+    device->Flush ();
+    device->OSSetRenderTargets (render_target_view, depth_stencil_view);
+  }
 
     //собственно отрисовка
 
