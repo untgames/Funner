@@ -1,5 +1,3 @@
---Application.LoadConfiguration ("data/configurations/configuration.xml")
-
 velocity = {['+x']=0; ['-x']=0; ['+y']=0; ['-y']=0}
 
 x_axis_value = 0

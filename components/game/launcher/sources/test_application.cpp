@@ -1,3 +1,5 @@
+#include <conio.h>
+
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/intrusive_ptr.h>
@@ -222,6 +224,19 @@ struct TestApplication::Impl
     {
       static clock_t last_time = clock ();
       
+      static clock_t last     = 0;  
+      static size_t  last_fps = 0, frames_count = 0;
+    
+      if (clock () - last_fps > CLK_TCK)
+      {
+        printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
+
+        last_fps     = clock ();
+        frames_count = 0;
+      }
+
+      frames_count++;
+
       if (clock () - last_time > MOVE_PERIOD)
       {
         invoke<void> (*shell->Interpreter (), "idle", float (clock () - last_time) / CLOCKS_PER_SEC);
@@ -235,6 +250,8 @@ struct TestApplication::Impl
     catch (std::exception& exception)
     {
       printf ("exception at idle: %s\n", exception.what ());
+      printf ("Critical error, to exit press any button\n");
+      getch ();
     }
   }
 
@@ -266,11 +283,6 @@ struct TestApplication::Impl
       printf ("Exception at window redraw\n");
     }
   }    
-
-  void LoadConfiguration (const char* configuration_file_name)
-  {
-    load_xml_configuration (VarRegistry (""), configuration_file_name);
-  }
 
   void SetScreen (Screen in_screen)
   {
@@ -315,7 +327,6 @@ TestApplication::TestApplication (const char* start_script_name)
 
     InvokerRegistry& application_library = impl->environment->CreateLibrary (APPLICATION_LIBRARY);
 
-    application_library.Register ("LoadConfiguration", make_invoker<void (const char*)> (xtl::bind (&TestApplication::Impl::LoadConfiguration, impl.get (), _1)));
     application_library.Register ("Exit", make_invoker<void ()> (xtl::bind (&TestApplication::Impl::OnClose, impl.get ())));
     application_library.Register ("SetScreen", make_invoker<void (Screen)> (xtl::bind (&TestApplication::Impl::SetScreen, impl.get (), _1)));
     application_library.Register ("InitRender", make_invoker<void ()> (xtl::bind (&TestApplication::Impl::InitRender, impl.get ())));
@@ -393,6 +404,8 @@ TestApplication::TestApplication (const char* start_script_name)
   catch (xtl::exception& exception)
   {
     exception.touch ("TestApplication::TestApplication");
+    printf ("Critical error, to exit press any button\n");
+    getch ();
     throw;
   }
 }
