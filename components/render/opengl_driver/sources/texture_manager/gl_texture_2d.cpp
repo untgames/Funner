@@ -37,7 +37,7 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     tex_desc.height, get_name (tex_desc.format));
 
       //создание mip-уровней
-
+      
   for (size_t i=0; i<GetMipsCount (); i++)
   {
     MipLevelDesc level_desc;
@@ -47,7 +47,7 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_format, gl_type, 0);
 
     glGetTexLevelParameteriv (GL_TEXTURE_2D, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
-  }
+  }  
   
    //установка реального внутреннего формата хранения пикселей (связано с установкой сжатого формата)
    

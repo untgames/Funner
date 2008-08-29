@@ -381,7 +381,14 @@ struct TextureManager::Impl: public ContextObject
       bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
+      {
+        static Extension BUG_Texture2D_NoProxy = "GLBUG_Texture2D_NoProxy";
+
+        if (IsSupported (BUG_Texture2D_NoProxy))
+          return new Texture2DNoProxy (GetContextManager (), desc); //создание текстуры в режиме эмул€ции
+
         return new Texture2D (GetContextManager (), desc);
+      }
 
       if (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
       {

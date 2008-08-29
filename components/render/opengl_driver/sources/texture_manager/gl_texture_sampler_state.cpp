@@ -283,7 +283,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   for (size_t i=0; i<TexTargetId_Num; i++)
   {
     GLenum tex_target = get_gl_texture_target ((TexTargetId)i);    
-
+    
     cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_MIN_FILTER, gl_min_filter);
     cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_MAG_FILTER, gl_mag_filter);
 

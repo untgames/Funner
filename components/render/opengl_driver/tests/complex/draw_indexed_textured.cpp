@@ -27,7 +27,7 @@ struct MyVertex
 
 void redraw (Test& test)
 {
-  test.device->DrawIndexed (PrimitiveType_TriangleList, 0, 3, 0);
+  test.device->DrawIndexed (PrimitiveType_TriangleList, 0, 6, 0);
 }
 
 int main ()
@@ -42,7 +42,14 @@ int main ()
    
     printf ("Create vertex buffer\n");
     
-    static const size_t VERTICES_COUNT = 3;
+    static const MyVertex verts [] = {
+      {{-1, -1, 0}, {0, 0, 1}, {0, 0}, {255, 255, 255, 255}},
+      {{ 1, -1, 0}, {0, 0, 1}, {1, 0}, {255, 255, 255, 255}},
+      {{ 1, 1, 0},  {0, 0, 1}, {1, 1}, {255, 255, 255, 255}},
+      {{-1, 1, 0},  {0, 0, 1}, {0, 1}, {255, 255, 255, 255}},
+    };    
+    
+    static const size_t VERTICES_COUNT = sizeof verts / sizeof *verts;
     
     BufferDesc vb_desc;
     
@@ -53,19 +60,13 @@ int main ()
     vb_desc.bind_flags   = BindFlag_VertexBuffer;
     vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
     
-    BufferPtr vb (test.device->CreateBuffer (vb_desc), false);
-    
-    static const MyVertex verts [] = {
-      {{-1, -1, 0}, {0, 0, 1}, {0, 0}, {255, 255, 255, 255}},
-      {{ 1, -1, 0}, {0, 0, 1}, {1, 0}, {255, 255, 255, 255}},
-      {{ 0, 1, 0}, {0, 0, 1}, {0.5f, 1}, {255, 255, 255, 255}},
-    };
+    BufferPtr vb (test.device->CreateBuffer (vb_desc), false);    
     
     vb->SetData (0, vb_desc.size, verts);
     
     printf ("Create index buffer\n");    
 
-    static size_t indices [] = {0, 1, 2};
+    static size_t indices [] = {0, 1, 2, 3, 0, 2};
 
     BufferDesc ib_desc;
 

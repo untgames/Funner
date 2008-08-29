@@ -313,7 +313,7 @@ void Texture::BuildMipmaps
     if (target != GL_TEXTURE_CUBE_MAP)
       z /= 2;
 
-    glPixelStorei (GL_UNPACK_ROW_LENGTH,  unclamped_width); //длина строки в пикселях (для данного mip-уровня)
+    glPixelStorei (GL_UNPACK_ROW_LENGTH, unclamped_width); //длина строки в пикселях (для данного mip-уровня)
 
     SetUncompressedData (z, mip_level, x, y, width, height, gl_format, gl_type, dst);
 

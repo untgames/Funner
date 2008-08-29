@@ -64,7 +64,7 @@ struct Test
   CallbackFn     redraw;
 
   Test (const wchar_t* title, const CallbackFn& in_redraw, const char* init_string="") :
-    window (syslib::WindowStyle_Overlapped, 1024, 768), redraw (in_redraw)
+    window (syslib::WindowStyle_Overlapped, 400, 300), redraw (in_redraw)
   {
     window.SetTitle (title);
 

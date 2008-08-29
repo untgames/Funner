@@ -322,7 +322,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
         
       if (GetCaps ().has_ext_framebuffer_object)
         register_fbo_manager (frame_buffer_manager);
-
+        
         //инициализация BlendState
          
       BlendDesc blend_desc;
@@ -391,6 +391,19 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
 
       default_scissor.width  = swap_chain_desc.frame_buffer.width;
       default_scissor.height = swap_chain_desc.frame_buffer.height;
+      
+        //инициализация маски буферов, которые можно очищать
+        
+      clear_views_mask = ~0;
+
+      if (!swap_chain_desc.frame_buffer.color_bits && !swap_chain_desc.frame_buffer.alpha_bits)
+        clear_views_mask &= ~ClearFlag_RenderTarget;
+
+      if (!swap_chain_desc.frame_buffer.depth_bits)
+        clear_views_mask &= ~ClearFlag_Depth;
+
+      if (!swap_chain_desc.frame_buffer.stencil_bits)
+        clear_views_mask &= ~ClearFlag_Stencil;
 
         //установка состояния по умолчанию
 
@@ -438,6 +451,10 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
     {
       try
       {
+          //маскировка буферов, которые можно очищать
+
+        clear_flags &= clear_views_mask;
+
           //установка целей рендеринга и активного контекста
 
         BindRenderTargets ();
@@ -866,6 +883,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
     DepthStencilStatePtr          default_depth_stencil_state;   //состояние подуровня попиксельного отсечения по умолчанию
     DepthStencilStatePtr          null_depth_stencil_state;      //состояние подуровня попиксельного отсечения соотв. отключению подуровня
     RasterizerStatePtr            default_rasterizer_state;      //состояние растеризатора по умолчанию
+    size_t                        clear_views_mask;              //маска буферов, которые можно очищать (необходима для работы с Direct3D wrapper)
 };
 
 /*

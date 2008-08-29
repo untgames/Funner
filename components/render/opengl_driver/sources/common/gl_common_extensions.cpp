@@ -310,8 +310,9 @@ const char* extensions [] = {
   "GL_WIN_phong_shading",
   "GL_WIN_specular_fog",
   "GL_WIN_swap_hint",
-  
-  "GLBUG_Texture3D_GetTexImage"
+
+  "GLBUG_Texture3D_GetTexImage",
+  "GLBUG_Texture2D_NoProxy"
 };
 
 const size_t EXTENSIONS_COUNT = sizeof (extensions) / sizeof (*extensions);      
