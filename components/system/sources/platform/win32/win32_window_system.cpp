@@ -223,6 +223,8 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       return 0;
     }
+    case WM_ERASEBKGND: //нужно ли очищать фон
+      return 1; //очищать фон не нужно
     case WM_SIZE: //изменение размеров окна
       impl->Notify (window_handle, WindowEvent_OnSize, context);
       return 0;
@@ -394,7 +396,7 @@ void RegisterWindowClass ()
   
   memset (&wc, 0, sizeof (wc));
 
-  wc.style         = CS_OWNDC | CS_DBLCLKS; // | CS_HREDRAW | CS_VREDRAW
+  wc.style         = CS_OWNDC | CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
   wc.lpfnWndProc   = &WindowMessageHandler;
   wc.hInstance     = GetApplicationInstance ();
   wc.hIcon         = LoadIcon (GetApplicationInstance (), IDI_APPLICATION);  
@@ -426,11 +428,11 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       win_style = WS_OVERLAPPEDWINDOW;
 
       if (parent)
-        win_style |= WS_CHILD;        
+        win_style |= WS_CHILD | WS_CLIPSIBLINGS; 
 
       break;
     case WindowStyle_PopUp:
-      win_style = parent ? WS_CHILD : WS_POPUP;
+      win_style = parent ? WS_CHILD  | WS_CLIPSIBLINGS : WS_POPUP;
       break;
     default:
       throw xtl::make_argument_exception ("syslib::Win32Platform::CreateWindow", "style", style);
