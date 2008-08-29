@@ -205,7 +205,7 @@ void draw_solid_sprites
   for (const RenderableSprite** sprite=first_sprite; sprite != last_sprite;)
   {
     render::low_level::ITexture* texture = (*sprite)->primitive->texture;    
-    
+
     size_t base_sprite_index = sprite++ - base_sprite;
 
     for (; sprite != last_sprite && (*sprite)->primitive->texture == texture; sprite++);
@@ -213,8 +213,9 @@ void draw_solid_sprites
     size_t sprites_count = sprite - base_sprite - base_sprite_index;
 
     device.SSSetTexture (0, texture);
-    device.Draw         (render::low_level::PrimitiveType_TriangleList, base_sprite_index * 6, sprites_count * 6);
-  }  
+    device.DrawIndexed  (render::low_level::PrimitiveType_TriangleList, base_sprite_index * SPRITE_INDICES_COUNT,
+                         sprites_count * SPRITE_INDICES_COUNT, 0);
+  }
 }
 
 //рисование спрайтов с альфа-отсечением
@@ -255,7 +256,8 @@ void draw_alpha_clamped_sprites
       current_texture = texture;
     }
 
-    device.Draw (render::low_level::PrimitiveType_TriangleList, base_sprite_index * 6, sprites_count * 6);
+    device.DrawIndexed (render::low_level::PrimitiveType_TriangleList, base_sprite_index * SPRITE_INDICES_COUNT,
+      sprites_count * SPRITE_INDICES_COUNT, 0);
   }  
 }
 
@@ -297,7 +299,8 @@ void draw_blend_sprites
       current_blend_state = blend_state;
     }
 
-    device.Draw (render::low_level::PrimitiveType_TriangleList, base_sprite_index * 6, sprites_count * 6);
+    device.DrawIndexed (render::low_level::PrimitiveType_TriangleList, base_sprite_index * SPRITE_INDICES_COUNT,
+      sprites_count * SPRITE_INDICES_COUNT, 0);
   }
 }
 
@@ -328,6 +331,7 @@ void Frame::DrawCore (IDevice* device)
     //отрисовка спрайтов без блендинга
 
   device->ISSetVertexBuffer      (0, not_blended_sprites.GetVertexBuffer ());
+  device->ISSetIndexBuffer       (not_blended_sprites.GetIndexBuffer ());
   device->OSSetDepthStencilState (common_resources->GetDepthStencilState (true));
   device->OSSetBlendState        (common_resources->GetBlendState (BlendMode_None));
 
@@ -343,7 +347,7 @@ void Frame::DrawCore (IDevice* device)
 
     //отрисовка спрайтов с альфа-отсечением
 
-  draw_alpha_clamped_sprites (*device, first_sprite, first_sprite, first_solid_sprite, *dynamic_constant_buffer);
+  draw_alpha_clamped_sprites (*device, first_sprite, first_sprite, first_solid_sprite, *dynamic_constant_buffer);  
 
     //отрисовка спрайтов без альфа-отсечения
 
@@ -354,6 +358,7 @@ void Frame::DrawCore (IDevice* device)
     //отрисовка спрайтов с блендингом    
 
   device->ISSetVertexBuffer      (0, blended_sprites.GetVertexBuffer ());
+  device->ISSetIndexBuffer       (blended_sprites.GetIndexBuffer ());
   device->OSSetDepthStencilState (common_resources->GetDepthStencilState (false));
 
   first_sprite = blended_sprites.GetSprites ();

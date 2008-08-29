@@ -13,22 +13,22 @@ namespace
     Константы
 */
 
-const size_t DEFAULT_VERTEX_BUFFER_SIZE = 8192; //размер вершинного буффера по умолчанию (количество вершин)
+const size_t DEFAULT_SPRITES_RESERVE_SIZE = 512; //резервируемое число спрайтов в буферах
 
 /*
     Временный буфер хранения вершинных данных
 */
 
-typedef xtl::uninitialized_storage<RenderableVertex> VertexArrayCache;
+typedef xtl::uninitialized_storage<char> TempBuffer;
 
-class VertexArrayCacheHolder
+class TempBufferHolder
 {
   public:
       //получение кэша
-    static VertexArrayCache& GetCache ()
+    static TempBuffer& GetCache ()
     {
       if (!instance)
-        throw xtl::format_operation_exception ("render::mid_level::window_driver::renderer2d::VertexArrayCache::GetCache",
+        throw xtl::format_operation_exception ("render::mid_level::window_driver::renderer2d::TempBuffer::GetCache",
           "Null instance (lock cache before use)");
 
       return instance->cache;
@@ -39,7 +39,7 @@ class VertexArrayCacheHolder
     {
       if (!instance)
       {
-        instance = new VertexArrayCacheHolder;
+        instance = new TempBufferHolder;
       }
       else
       {
@@ -58,20 +58,20 @@ class VertexArrayCacheHolder
     }
 
   private:
-    VertexArrayCacheHolder () : ref_count (1) {}
+    TempBufferHolder () : ref_count (1) {}
 
-    ~VertexArrayCacheHolder ()
+    ~TempBufferHolder ()
     {
       instance = 0;
     }
   
   private:
-    size_t                         ref_count;
-    VertexArrayCache               cache;
-    static VertexArrayCacheHolder* instance;
+    size_t                   ref_count;
+    TempBuffer               cache;
+    static TempBufferHolder* instance;
 };
 
-VertexArrayCacheHolder* VertexArrayCacheHolder::instance = 0;
+TempBufferHolder* TempBufferHolder::instance = 0;
 
 }
 
@@ -81,14 +81,14 @@ VertexArrayCacheHolder* VertexArrayCacheHolder::instance = 0;
 
 RenderableSpriteList::RenderableSpriteList ()
 {
-  VertexArrayCacheHolder::Lock ();
+  TempBufferHolder::Lock ();
 
-  vertex_buffer_vertices_count = 0;
+  buffers_sprites_count = 0;
 }
 
 RenderableSpriteList::~RenderableSpriteList ()
 {
-  VertexArrayCacheHolder::Unlock ();
+  TempBufferHolder::Unlock ();
 }
 
 /*
@@ -128,22 +128,40 @@ void RenderableSpriteList::Clear ()
 }
 
 /*
-    Создание вершинного буфера
+    Изменение размеров буферов
 */
 
-void RenderableSpriteList::SetVertexBufferSize (IDevice& device, size_t new_vertices_count)
+void RenderableSpriteList::ResizeBuffers (IDevice& device, size_t new_sprites_count)
 {
+    //создание вершинного буфера
+
   BufferDesc buffer_desc;
 
   memset (&buffer_desc, 0, sizeof buffer_desc);
 
   buffer_desc.usage_mode   = UsageMode_Stream;
   buffer_desc.bind_flags   = BindFlag_VertexBuffer;
-  buffer_desc.access_flags = AccessFlag_ReadWrite;
-  buffer_desc.size         = sizeof (RenderableVertex) * new_vertices_count;
+  buffer_desc.access_flags = AccessFlag_Write;
+  buffer_desc.size         = sizeof (RenderableVertex) * new_sprites_count * SPRITE_VERTICES_COUNT;  
 
-  vertex_buffer                = BufferPtr (device.CreateBuffer (buffer_desc), false);
-  vertex_buffer_vertices_count = new_vertices_count;
+  BufferPtr new_vertex_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
+  
+    //создание индексного буфера
+    
+  memset (&buffer_desc, 0, sizeof buffer_desc);
+
+  buffer_desc.usage_mode   = UsageMode_Stream;
+  buffer_desc.bind_flags   = BindFlag_IndexBuffer;
+  buffer_desc.access_flags = AccessFlag_Write;
+  buffer_desc.size         = sizeof (size_t) * new_sprites_count * SPRITE_INDICES_COUNT;  
+
+  BufferPtr new_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
+
+    //обновление параметров
+
+  vertex_buffer         = new_vertex_buffer;
+  index_buffer          = new_index_buffer;
+  buffers_sprites_count = new_sprites_count;
 }
 
 /*
@@ -155,26 +173,44 @@ void RenderableSpriteList::UpdateVertexBuffer (IDevice& device)
   if (!data_buffer.size ())
     return;
 
-    //если размер вершинного буфера меньше необходимого - пересоздаём его
-       
-  size_t vertices_count = data_buffer.size () * SPRITE_VERTICES_COUNT;  
+    //подготовка вершинного и индексного буферов       
 
-  if (data_buffer.size () > vertex_buffer_vertices_count)
-    SetVertexBufferSize (device, (data_buffer.size () + DEFAULT_VERTEX_BUFFER_SIZE) * SPRITE_VERTICES_COUNT);
+  if (data_buffer.size () > buffers_sprites_count)
+    ResizeBuffers (device, data_buffer.size () + DEFAULT_SPRITES_RESERVE_SIZE);
 
     //формирование буфера вершин    
 
-  VertexArrayCache& cache = VertexArrayCacheHolder::GetCache ();
+  TempBuffer& cache = TempBufferHolder::GetCache ();
 
-  cache.resize (data_buffer.size () * SPRITE_VERTICES_COUNT, false);
+  cache.resize (data_buffer.size () * SPRITE_VERTICES_COUNT * sizeof (RenderableVertex), false);
 
-  RenderableVertex*        dst_vertex = cache.data ();
+  RenderableVertex*        dst_vertex = reinterpret_cast<RenderableVertex*> (cache.data ());
   const RenderableSprite** src_sprite = data_buffer.data ();
 
   for (size_t count=data_buffer.size (); count--; src_sprite++, dst_vertex += SPRITE_VERTICES_COUNT)
     memcpy (dst_vertex, (*src_sprite)->vertices, sizeof (RenderableVertex) * SPRITE_VERTICES_COUNT);
 
-    //обновление вершинного буфера
+    //обновление вершинного буфера    
 
-  vertex_buffer->SetData (0, cache.size () * sizeof (RenderableVertex), cache.data ());
+  vertex_buffer->SetData (0, cache.size (), cache.data ());
+  
+    //формирование буфера индексов
+    
+  cache.resize (data_buffer.size () * SPRITE_INDICES_COUNT * sizeof (size_t), false);
+
+  size_t *dst_index = reinterpret_cast<size_t*> (cache.data ()), src_index = 0;
+
+  static const size_t index_offsets [] = {0, 1, 2, 3, 0, 2};
+
+  for (size_t count=data_buffer.size (); count--; src_index += SPRITE_VERTICES_COUNT)
+  {
+    const size_t* offset = index_offsets;
+    
+    for (size_t count=SPRITE_INDICES_COUNT; count--; dst_index++, offset++)
+      *dst_index = *offset + src_index;
+  }
+
+    //обновление индексного буфера
+
+  index_buffer->SetData (0, cache.size (), cache.data ());    
 }

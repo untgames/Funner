@@ -29,7 +29,8 @@ namespace renderer2d
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онстанты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t SPRITE_VERTICES_COUNT = 6; //количество вершин в одном спрайте
+const size_t SPRITE_VERTICES_COUNT = 4; //количество вершин в одном спрайте
+const size_t SPRITE_INDICES_COUNT  = 6; //количество индексов в одном спрайте
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕереопределени€ типов
@@ -61,9 +62,9 @@ struct DynamicProgramParameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RenderableVertex
 {
-  math::vec3f position; //положение вершины в пространстве
-  math::vec2f texcoord; //текстурные координаты
-  math::vec4f color;    //цвет вершины
+  math::vec3f  position; //положение вершины в пространстве
+  math::vec2f  texcoord; //текстурные координаты
+  math::vec4ub color;    //цвет вершины
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,6 +199,7 @@ class RenderableSpriteList
 ///ѕолучение вершинного буфера / буфера спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     render::low_level::IBuffer* GetVertexBuffer () { return vertex_buffer.get (); }
+    render::low_level::IBuffer* GetIndexBuffer  () { return index_buffer.get (); }
     const RenderableSprite**    GetSprites      () { return data_buffer.data (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -229,15 +231,16 @@ class RenderableSpriteList
     void UpdateVertexBuffer (render::low_level::IDevice&);
 
   private:
-    void SetVertexBufferSize (render::low_level::IDevice&, size_t new_vertices);
+    void ResizeBuffers (render::low_level::IDevice&, size_t new_sprites_count);
     
   private:
     typedef xtl::uninitialized_storage<const RenderableSprite*> SpriteArray;
 
   private:
-    size_t      vertex_buffer_vertices_count; //текущее количество вершин в вершинном буфере
-    BufferPtr   vertex_buffer;                //вершинный буфер
-    SpriteArray data_buffer;                  //временный буфер с данными геометрии
+    size_t      buffers_sprites_count; //текущий резерв количества спрайтов в вершинном и индексном буферах
+    BufferPtr   vertex_buffer;         //вершинный буфер
+    BufferPtr   index_buffer;          //индексный буфер
+    SpriteArray data_buffer;           //временный буфер с данными геометрии
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,6 +367,8 @@ class Frame: virtual public mid_level::renderer2d::IFrame, public BasicFrame
     BufferPtr                dynamic_constant_buffer;    //константный буфер дл€ хранени€ динамических параметров программы рендеринга
     PrimitiveArray           primitives;                 //массив примитивов
     CommonResourcesPtr       common_resources;           //общие ресурсы
+
+       //сделать одним буфером!!!
     RenderableSpriteList     not_blended_sprites;        //спрайты без блендинга
     RenderableSpriteList     blended_sprites;            //спрайты с блендингом
 };

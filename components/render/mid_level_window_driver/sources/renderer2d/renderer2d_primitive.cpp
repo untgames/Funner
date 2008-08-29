@@ -202,16 +202,15 @@ void Primitive::UpdateRenderableSprites ()
 
       verts [0].texcoord = offset;
       verts [1].texcoord = math::vec2f (offset.x + size.x, offset.y);
-      verts [2].texcoord = math::vec2f (offset.x, offset.y + size.y);
-      verts [3].texcoord = offset + size;
-      verts [4].texcoord = verts [2].texcoord;
-      verts [5].texcoord = verts [1].texcoord;
+      verts [2].texcoord = offset + size;
+      verts [3].texcoord = math::vec2f (offset.x, offset.y + size.y);
 
-      const math::vec4f &color = src_sprite->color;      
-
+      const math::vec4ub color (unsigned char (src_sprite->color.x * 255.0f), unsigned char (src_sprite->color.y * 255.0f),
+                                unsigned char (src_sprite->color.z * 255.0f), unsigned char (src_sprite->color.w * 255.0f));
+      
       for (size_t i=0; i<SPRITE_VERTICES_COUNT; i++)
         verts [i].color = color;
-    }    
+    }
     
     need_update_renderable_sprites = false;
     need_update_transform          = true;    
@@ -232,10 +231,8 @@ void Primitive::UpdateRenderableSprites ()
 
       verts [0].position = transform * math::vec3f (pos.x - size.x, pos.y - size.y, pos.z);
       verts [1].position = transform * math::vec3f (pos.x + size.x, pos.y - size.y, pos.z);
-      verts [2].position = transform * math::vec3f (pos.x - size.x, pos.y + size.y, pos.z);
-      verts [3].position = transform * math::vec3f (pos.x + size.x, pos.y + size.y, pos.z);
-      verts [4].position = verts [2].position;
-      verts [5].position = verts [1].position;
+      verts [2].position = transform * math::vec3f (pos.x + size.x, pos.y + size.y, pos.z);      
+      verts [3].position = transform * math::vec3f (pos.x - size.x, pos.y + size.y, pos.z);
     }    
 
     need_update_transform = false;

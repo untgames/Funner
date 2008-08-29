@@ -201,7 +201,7 @@ InputLayoutPtr create_input_layout (IDevice& device)
 
   attributes [2].semantic = VertexAttributeSemantic_Color;
   attributes [2].format   = InputDataFormat_Vector4;
-  attributes [2].type     = InputDataType_Float;
+  attributes [2].type     = InputDataType_UByte;
   attributes [2].slot     = 0;
   attributes [2].offset   = offsetof (RenderableVertex, color);
   attributes [2].stride   = sizeof (RenderableVertex);
