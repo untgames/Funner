@@ -436,8 +436,8 @@ void idle (Test& test)
   
   angle += 0.5f*dt;
 
-//  my_shader_parameters.object_tm = math::rotatef (angle, 0, 0, 1) * 
-//                                   math::rotatef (angle*0.2f, 1, 0, 0);
+  my_shader_parameters.object_tm = math::rotatef (angle, 0, 0, 1) * 
+                                   math::rotatef (angle*0.2f, 1, 0, 0);
 
   my_shader_parameters.light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
 

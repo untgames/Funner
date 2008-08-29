@@ -79,13 +79,6 @@ struct Test
     window (syslib::WindowStyle_Overlapped, 640, 480)
   {
     window.SetTitle (title);
-    
-/*    IDriver* driver = DriverManager::FindDriver ("OpenGL");
-    
-    if (driver)
-    {
-      adapter = AdapterPtr (driver->CreateAdapter ("Mesa", "mesagl.dll"), false);
-    }*/    
 
     SwapChainDesc desc;
 

@@ -96,12 +96,14 @@ struct Test
   {
     try
     {
+      syslib::Rect rect = window.ClientRect ();
+    
       Viewport vp;
 
-      vp.x         = 0;
-      vp.y         = 0;
-      vp.width     = window.Width ();
-      vp.height    = window.Height ();
+      vp.x         = rect.left;
+      vp.y         = rect.top;
+      vp.width     = rect.right - rect.left;
+      vp.height    = rect.bottom - rect.top;
       vp.min_depth = 0;
       vp.max_depth = 1;
 

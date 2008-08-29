@@ -667,7 +667,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
         if (current_viewport_hash != GetViewportHash ())
         {
           const Viewport& viewport = GetViewport ();
-
+          
           glViewport   (viewport.x, viewport.y, viewport.width, viewport.height);
           glDepthRange (viewport.min_depth, viewport.max_depth);
           
