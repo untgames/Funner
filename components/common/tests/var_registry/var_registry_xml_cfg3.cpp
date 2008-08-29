@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const char* configuration_file_name_mask = "data/configuration*";
+const char* configuration_file_name = "data/auto_cfg.xml";
 
 void enumerator (const char* var_name, const VarRegistry& registry)
 {
@@ -9,7 +9,7 @@ void enumerator (const char* var_name, const VarRegistry& registry)
 
 int main ()
 {
-  printf ("Results of var_registry_xml_cfg2_test:\n");
+  printf ("Results of var_registry_xml_cfg3_test:\n");
   
   try
   {
@@ -17,7 +17,7 @@ int main ()
     
     VarRegistry registry ("etc");
     
-    load_xml_configuration (registry, configuration_file_name_mask);
+    load_xml_configuration (registry, configuration_file_name, "*");
 
     printf ("enumerate all vars:\n");
     registry.EnumerateVars (xtl::bind (&enumerator, _1, xtl::cref (registry)));

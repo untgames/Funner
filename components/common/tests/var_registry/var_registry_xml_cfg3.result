@@ -1,0 +1,14 @@
+Results of var_registry_xml_cfg3_test:
+TestVarRegistry::TestVarRegistry()
+enumerate all vars:
+Setting1.value=setting_value1
+Setting2.value=setting_value2
+AutoId0.value=auto_value1
+LevelTwo.AutoId0.value=level_two_auto_value1
+LevelTwo.AutoId1.value=level_two_auto_value2
+LevelTwo.MyId4.value=level_two_auto_value1
+LevelTwo.MyId3.value=level_two_auto_value2
+LevelTwo.SuperMyId2.value=level_two_auto_value1
+LevelTwo.SuperMyId9.value=level_two_auto_value2
+AutoId1.value=auto_value2
+TestVarRegistry::~TestVarRegistry

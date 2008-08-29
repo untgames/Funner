@@ -162,8 +162,8 @@ class VarRegistrySystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка конфигураций из XML файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void load_xml_configurations (VarRegistry& registry, const char* file_mask);
-void load_xml_configuration  (VarRegistry& registry, const char* file_name);
+void load_xml_configuration (VarRegistry& registry, const char* file_mask);
+void load_xml_configuration (VarRegistry& registry, const char* file_mask, const char* root_name_mask);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конфигурационный реестр

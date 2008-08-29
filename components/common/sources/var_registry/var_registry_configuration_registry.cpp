@@ -20,7 +20,7 @@ class ConfigurationRegistryImpl
     {
       try
       {
-        load_xml_configurations (var_registry, file_name_mask);
+        load_xml_configuration (var_registry, file_name_mask, BRANCH_NAME);
       }
       catch (xtl::exception& e)
       {
