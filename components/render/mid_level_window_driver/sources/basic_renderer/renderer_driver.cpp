@@ -18,7 +18,8 @@ const char* DRIVER_NAME = "WindowDriver"; //טלÿ הנאיגונא
 void test_registry_variable (VarRegistry& var_registry, const char* variable_name)
 {
   if (!var_registry.HasVariable (variable_name))
-    throw xtl::format_operation_exception ("", "There is no '%s' variable in the configuration registry branch", variable_name);
+    throw xtl::format_operation_exception ("", "There is no '%s' variable in the configuration registry branch '%s'",
+      variable_name, var_registry.BranchName ());
 }
 
 void test_registry_variables (VarRegistry& var_registry)
