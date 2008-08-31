@@ -25,7 +25,7 @@ namespace
     Константы
 */
 
-const char* CONFIGURATION_BRANCH_NAME = "Configuration.Configuration"; //имя ветки реестра с настройками
+const char* CONFIGURATION_BRANCH_NAME = "Configuration"; //имя ветки реестра с настройками
 const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //имя системы визуализации среднего уровня
 const char* MATERIAL_LIB_FILE_NAME    = "data/materials/materials.xmtl"; //имя файла с материалами
 const char* SOUND_DECL_LIB_FILE_NAME  = "data/sounds/gorilka.snddecl"; //имя файла с материалами
@@ -252,6 +252,7 @@ struct TestApplication::Impl
       printf ("exception at idle: %s\n", exception.what ());
       printf ("Critical error, to exit press any button\n");
       getch ();
+      throw;
     }
   }
 
