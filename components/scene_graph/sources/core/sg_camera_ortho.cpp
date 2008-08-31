@@ -58,6 +58,7 @@ void OrthoCamera::SetLeft (float left)
 {
   impl->left = left;
   UpdateBoundsNotify ();
+  UpdateNotify ();  
 }
 
 float OrthoCamera::Left () const
@@ -69,6 +70,7 @@ void OrthoCamera::SetRight (float right)
 {
   impl->right = right;
   UpdateBoundsNotify ();
+  UpdateNotify ();
 }
 
 float OrthoCamera::Right () const
@@ -80,6 +82,7 @@ void OrthoCamera::SetTop (float top)
 {
   impl->top = top;
   UpdateBoundsNotify ();
+  UpdateNotify ();
 }
 
 float OrthoCamera::Top () const
@@ -91,6 +94,7 @@ void OrthoCamera::SetBottom (float bottom)
 {
   impl->bottom = bottom;
   UpdateBoundsNotify ();
+  UpdateNotify ();
 }
 
 float OrthoCamera::Bottom () const
@@ -102,6 +106,7 @@ void OrthoCamera::SetZNear (float z_near)
 {
   impl->z_near = z_near;
   UpdateBoundsNotify ();
+  UpdateNotify ();
 }
 
 float OrthoCamera::ZNear () const
@@ -113,6 +118,7 @@ void OrthoCamera::SetZFar  (float z_far)
 {
   impl->z_far = z_far;
   UpdateBoundsNotify ();
+  UpdateNotify ();
 }
 
 float OrthoCamera::ZFar () const
@@ -144,7 +150,7 @@ void OrthoCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
 void OrthoCamera::UpdateBoundsCore ()
 {
   SetBoundBox (axis_aligned_box <float> (stl::min (impl->left, impl->right), stl::min (impl->bottom, impl->top), -impl->z_far,
-                                         stl::max (impl->left, impl->right), stl::max (impl->bottom, impl->top), -impl->z_near));
+                                         stl::max (impl->left, impl->right), stl::max (impl->bottom, impl->top), impl->z_near));
 }
 
 /*
