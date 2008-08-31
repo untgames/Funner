@@ -136,10 +136,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
   const ContextCaps& caps = GetCaps ();      
 
-  if (in_desc.max_anisotropy > caps.max_anisotropy) // && caps.has_ext_texture_filter_anisotropic)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set desc.max_anisotropy=%u (max anisotropy level %u)", in_desc.max_anisotropy, caps.max_anisotropy);
-    
-  if (in_desc.max_anisotropy < 1.0f)
+  if (in_desc.max_anisotropy < 1)
     throw xtl::make_argument_exception (METHOD_NAME, "desc.max_anisotropy", in_desc.max_anisotropy, "Maximum anisotropy must be >= 1.0");
 
   if (!caps.has_ext_texture3d && in_desc.wrap_w != TexcoordWrap_Default)
@@ -270,6 +267,11 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
       throw xtl::make_argument_exception (METHOD_NAME, "desc.comparision_function", in_desc.comparision_function);
       break;
   }
+  
+  size_t max_anisotropy = in_desc.max_anisotropy;
+
+  if (max_anisotropy > caps.max_anisotropy)
+    max_anisotropy = caps.max_anisotropy;
 
     //выбор текущего контекста
 
@@ -288,7 +290,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_MAG_FILTER, gl_mag_filter);
 
     if (caps.has_ext_texture_filter_anisotropic)
-      cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, in_desc.max_anisotropy);
+      cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_anisotropy);            
 
     cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_WRAP_S, gl_wrap [Texcoord_U]);
     cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_WRAP_T, gl_wrap [Texcoord_V]);
@@ -331,9 +333,10 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
     //сохранение параметров
 
-  impl->desc      = in_desc;
-  impl->desc_hash = crc32 (&impl->desc, sizeof impl->desc);
-  impl->executers = new_executers;
+  impl->desc                = in_desc;
+  impl->desc.max_anisotropy = max_anisotropy;
+  impl->desc_hash           = crc32 (&impl->desc, sizeof impl->desc);
+  impl->executers           = new_executers;
 
     //оповещение о необходимости ребиндинга уровня
 
