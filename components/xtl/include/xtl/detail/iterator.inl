@@ -47,7 +47,7 @@ template <class Iter> void iterator_prev (Iter& iter, stl::bidirectional_iterato
 }
 
 /*
-    Хранителище для итератора
+    Хранилище для итератора
 */
 
 template <class T, class Iter, class Fn> class iterator_base: public iterator_interface<T>
