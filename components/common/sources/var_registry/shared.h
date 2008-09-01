@@ -1,3 +1,4 @@
+#include <stl/auto_ptr.h>
 #include <stl/hash_map>
 #include <stl/list>
 #include <stl/string>
@@ -7,6 +8,7 @@
 #include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/iterator.h>
 #include <xtl/reference_counter.h>
 #include <xtl/ref.h>
 #include <xtl/shared_ptr.h>
@@ -129,6 +131,34 @@ class MountPointsMap
   private:
     MountMap      mount_points_map;
     ListenersList listeners;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Набор переменных одного уровня вложения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class BranchLevelVarSet
+{
+  public:
+    typedef VarRegistry::Iterator Iterator;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор/деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    BranchLevelVarSet (const VarRegistry& registry);
+    ~BranchLevelVarSet ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание итератора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Iterator CreateIterator ();
+
+  private:
+    BranchLevelVarSet (const BranchLevelVarSet&);             //no impl
+    BranchLevelVarSet& operator = (const BranchLevelVarSet&); //no impl
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 }

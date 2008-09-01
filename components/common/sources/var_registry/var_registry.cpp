@@ -105,7 +105,12 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
       {
         public:
           EnumerationWrapper (MountPointsList& list, const EnumHandler& in_handler, size_t in_branch_name_size, const char* in_var_name_mask)
-            : iter (list.begin ()), last (list.end ()), handler (in_handler), var_name_mask (in_var_name_mask), branch_name_size (in_branch_name_size)
+            : iter (list.begin ()), 
+              last (list.end ()), 
+              handler (in_handler), 
+              var_name_mask (in_var_name_mask), 
+              branch_name_size (in_branch_name_size),
+              var_name_offset (0)
           {
             EnumHandler wrapper = ref (*this);
 
@@ -113,27 +118,52 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
             {
               MountPoint& mount_point = *(*iter)->mount_point;
               
-              const char* sub_name = mount_point.Name ().c_str () + branch_name_size;
-              
-              if (*sub_name && branch_name_size)
-                sub_name++;
+              if (mount_point.Name ().size () > branch_name_size)
+              {
+                var_name_offset = 0;
 
-              current_prefix = sub_name;
-              
-              if (!current_prefix.empty ())
-                current_prefix += '.';
-    
+                const char* sub_name = mount_point.Name ().c_str () + branch_name_size;
+
+                if (*sub_name && branch_name_size)
+                  sub_name++;
+
+                current_prefix = sub_name;
+                
+                if (!current_prefix.empty ())
+                  current_prefix += '.';
+              }
+              else
+              {
+                current_prefix.clear ();
+                var_name_offset = branch_name_size - mount_point.Name ().size ();
+              }
+                
               mount_point.Registry ()->EnumerateVars (wrapper);
             }
           
           }
 
+          void ProcessVar (const char* var_name)
+          {
+            if (wcmatch (var_name, var_name_mask))
+              handler (var_name);
+          }
+
           void operator () (const char* var_name)
           {
-            stl::string relative_var_name = current_prefix + var_name;
+            if (var_name_offset)
+            {
+              if (strlen (var_name) < var_name_offset)
+                return;
 
-            if (wcmatch (relative_var_name.c_str (), var_name_mask))
-              handler (relative_var_name.c_str ());
+              ProcessVar (var_name + var_name_offset);
+            }
+            else
+            {
+              stl::string relative_var_name = current_prefix + var_name;
+
+              ProcessVar (relative_var_name.c_str ());
+            }
           }
 
         private:
@@ -142,9 +172,19 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
           const char*               var_name_mask;
           size_t                    branch_name_size;
           stl::string               current_prefix;
+          size_t                    var_name_offset;
       };
 
       EnumerationWrapper (assigned_mount_points, handler, branch_name.size (), var_name_mask);
+    }
+
+///Перебор переменных дочернего подуровня
+    VarRegistry::Iterator CreateIterator (const VarRegistry& registry)
+    {
+      if (!iteration_set)
+        iteration_set = new BranchLevelVarSet (registry);
+
+      return iteration_set->CreateIterator ();
     }
 
 ///Подписка на добавление/изменение/удаление переменных  
@@ -303,12 +343,14 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
     typedef xtl::signal<void (const char*)>     VarRegistrySignal;    
     typedef xtl::shared_ptr<AssignedMountPoint> AssignedMountPointPtr;
     typedef stl::list<AssignedMountPointPtr>    MountPointsList;
+    typedef stl::auto_ptr<BranchLevelVarSet>    IterationSetPtr;
 
   private:
     stl::string             branch_name;
     MountPointsMap::Pointer mount_points_map;
     MountPointsList         assigned_mount_points;
     VarRegistrySignal       signals [VarRegistryEvent_Num];
+    IterationSetPtr         iteration_set;
 };
 
 /*
@@ -416,14 +458,23 @@ void VarRegistry::Close ()
    Обход всех переменных / переменных по маске
 */
 
-void VarRegistry::EnumerateVars (const char* var_name_mask, const EnumHandler& handler)
+void VarRegistry::EnumerateVars (const char* var_name_mask, const EnumHandler& handler) const
 {
   impl->EnumerateVars (var_name_mask, handler);
 }
 
-void VarRegistry::EnumerateVars (const EnumHandler& handler)
+void VarRegistry::EnumerateVars (const EnumHandler& handler) const
 {
   EnumerateVars ("*", handler);
+}
+
+/*
+   Перебор переменных дочернего подуровня
+*/
+
+VarRegistry::Iterator VarRegistry::CreateIterator () const
+{
+  return impl->CreateIterator (*this);
 }
 
 /*

@@ -112,8 +112,25 @@ class VarRegistry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef ICustomVarRegistry::EnumHandler EnumHandler;
 
-    void EnumerateVars (const EnumHandler& handler);
-    void EnumerateVars (const char* var_name_mask, const EnumHandler& handler);
+    void EnumerateVars (const EnumHandler& handler) const;
+    void EnumerateVars (const char* var_name_mask, const EnumHandler& handler) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перебор переменных дочернего подуровня
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    class ISubLevel
+    {
+      public:
+        virtual const char* Name      () = 0; //имя подуровня
+        virtual size_t      VarsCount () = 0; //общее количество переменных подуровня
+
+      protected:
+        virtual ~ISubLevel () {}
+    };
+
+    typedef xtl::iterator<ISubLevel> Iterator;
+
+    Iterator CreateIterator () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на добавление/изменение/удаление переменных

@@ -12,6 +12,7 @@
 #include <xtl/signal.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/iterator.h>
 #include <xtl/reference_counter.h>
 #include <xtl/lexical_cast.h>
 
@@ -103,7 +104,9 @@ class TestVarRegistry: public ICustomVarRegistry, public xtl::reference_counter
     void EnumerateVars (const EnumHandler& handler)
     {
       for (VarMap::iterator iter=vars.begin (); iter!=vars.end (); ++iter)
+      {
         handler (iter->first.c_str ());
+      }
     }
 
 ///Добавление/удаление ссылки
