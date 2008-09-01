@@ -1,0 +1,29 @@
+Client screens count is 0
+Client listeners count is 0
+OnSetScreen: attachment_name is 'ScreenAttachment1', screen name is 'Screen1'
+OnSetScreen: attachment_name is 'ScreenAttachment1', screen name is 'Screen2'
+OnSetListener: attachment_name is 'ListenerAttachment1', listener name is 'Listener1'
+OnSetListener: attachment_name is 'ListenerAttachment1', listener name is 'Listener2'
+Client screens count is 1
+Client listeners count is 1
+OnRemoveScreen: attachment_name is 'ScreenAttachment1'
+OnRemoveListener: attachment_name is 'ListenerAttachment1'
+Client screens count is 0
+Client listeners count is 0
+OnSetScreen: attachment_name is 'ScreenAttachment2', screen name is 'Screen2'
+OnSetScreen: attachment_name is 'ScreenAttachment1', screen name is 'Screen1'
+OnSetListener: attachment_name is 'ListenerAttachment2', listener name is 'Listener2'
+OnSetListener: attachment_name is 'ListenerAttachment1', listener name is 'Listener1'
+Listener 1 name is 'Listener1'
+Screen 0 name is 'Screen2'
+Listener 'ListenerAttachment2' name is 'Listener2'
+Screen 'ScreenAttachment1' name is 'Screen1'
+Listener 'asd' is 00000000
+Screen 'asd' is 00000000
+Client screens count is 2
+Client listeners count is 2
+OnRemoveScreen: attachment_name is 'ScreenAttachment2'
+OnRemoveScreen: attachment_name is 'ScreenAttachment1'
+Client screens count is 0
+Client listeners count is 0
+OnDestroy
