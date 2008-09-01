@@ -42,31 +42,31 @@ Device::Device (Window* window, const char* in_name)
   : event_handler (&default_event_handler), name (in_name), x_cursor_pos (window->CursorPosition ().x), y_cursor_pos (window->CursorPosition ().y),
     autocenter_cursor (0), cursor_sensitivity (1.f), vertical_wheel_sensitivity (1.f), horisontal_wheel_sensitivity (1.f)
 {
-  connections.reserve (CONNECTIONS_COUNT);
-
   try
   {
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnMouseMove,               xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnMouseVerticalWheel,      xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnMouseHorisontalWheel,    xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnLeftButtonDown,          xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnLeftButtonUp,            xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnLeftButtonDoubleClick,   xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnRightButtonDown,         xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnRightButtonUp,           xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnRightButtonDoubleClick,  xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnMiddleButtonDown,        xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnMiddleButtonUp,          xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnMiddleButtonDoubleClick, xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnXButton1Down,            xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnXButton1Up,              xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnXButton1DoubleClick,     xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnXButton2Down,            xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnXButton2Up,              xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnXButton2DoubleClick,     xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnKeyDown,                 xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnKeyUp,                   xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
-    connections.push_back (window->RegisterEventHandler (WindowEvent_OnChar,                    xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3)));
+    Window::EventHandler handler (xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3));
+
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMouseMove,               handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMouseVerticalWheel,      handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMouseHorisontalWheel,    handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnLeftButtonDown,          handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnLeftButtonUp,            handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnLeftButtonDoubleClick,   handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnRightButtonDown,         handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnRightButtonUp,           handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnRightButtonDoubleClick,  handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMiddleButtonDown,        handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMiddleButtonUp,          handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMiddleButtonDoubleClick, handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton1Down,            handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton1Up,              handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton1DoubleClick,     handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton2Down,            handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton2Up,              handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton2DoubleClick,     handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnKeyDown,                 handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnKeyUp,                   handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnChar,                    handler));
 
     for (size_t i = 0; i < PROPERTIES_COUNT; i++)
     {
@@ -79,20 +79,13 @@ Device::Device (Window* window, const char* in_name)
   }
   catch (xtl::exception& exception)
   {
-    connections.clear ();
     exception.touch ("input::low_level::window::Device::Device");
-    throw;
-  }
-  catch (...)
-  {
-    connections.clear ();
     throw;
   }
 }
 
 Device::~Device ()
 {
-  Release ();
 }
 
 /*
@@ -152,7 +145,6 @@ float Device::GetProperty (const char* name)
     return horisontal_wheel_sensitivity;
 
   throw xtl::make_argument_exception ("input::low_level::window::Device::GetProperty", "name", name);
-  return 0.f;
 }
 
 /*

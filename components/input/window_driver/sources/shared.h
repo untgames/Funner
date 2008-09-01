@@ -14,6 +14,7 @@
 #include <xtl/function.h>
 #include <xtl/reference_counter.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/trackable.h>
 #include <xtl/common_exceptions.h>
 
 #include <common/singleton.h>
@@ -34,7 +35,7 @@ namespace low_level
 namespace window
 {
 
-class Device: virtual public input::low_level::IDevice, public xtl::reference_counter
+class Device: virtual public input::low_level::IDevice, public xtl::reference_counter, private xtl::trackable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,10 +83,8 @@ class Device: virtual public input::low_level::IDevice, public xtl::reference_co
   private:
     Device (const Device& source);             //no impl
     Device& operator = (const Device& source); //no impl
-    Device ();                                 //no impl
 
   private:
-    stl::vector<xtl::connection>            connections;                  //подключения на события окна
     stl::string                             name;                         //имя устройства
     stl::string                             properties;                   //настройки
     input::low_level::IDevice::EventHandler event_handler;                //обработчик событий

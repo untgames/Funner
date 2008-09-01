@@ -13,7 +13,7 @@
 using namespace syslib;
 using namespace input::low_level;
 
-void on_window_destroy (Window&, WindowEvent, const WindowEventContext&)
+void on_window_close (Window&, WindowEvent, const WindowEventContext&)
 {
   Application::Exit (0);
 }
@@ -52,7 +52,7 @@ int main ()
 
     window.Show ();
 
-    window.RegisterEventHandler (WindowEvent_OnDestroy, &on_window_destroy);
+    window.RegisterEventHandler (WindowEvent_OnClose, &on_window_close);
 
     Application::Run ();        
 
