@@ -314,10 +314,15 @@ class XmlMaterialLibraryLoader
       
         //чтение параметров тайлинга
         
-      material->SetTiling   (get<size_t> (log, profile_iter, "tiling", material->IsTiled ()) != 0);
-      material->SetTileSize (get<size_t> (log, profile_iter, "tile_width", material->TileWidth ()),
-                             get<size_t> (log, profile_iter, "tile_height", material->TileHeight ()));
-                                
+      bool tiling = get<bool> (profile_iter, "tiling", material->IsTiled ());
+
+      if (tiling)
+      {
+        material->SetTiling   (true);
+        material->SetTileSize (get<size_t> (log, profile_iter, "tile_width", material->TileWidth ()),
+                               get<size_t> (log, profile_iter, "tile_height", material->TileHeight ()));
+      }
+                        
       return material;
     }
     
