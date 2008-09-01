@@ -180,7 +180,7 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
   operation_result = device_interface->SetCooperativeLevel ((HWND)window->Handle (), DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
 
   if (operation_result != DI_OK)
-      throw xtl::format_operation_exception (METHOD_NAME, "Can't set device cooperative level, error '%s'", get_direct_input_error_name (operation_result));
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't set device cooperative level, error '%s'", get_direct_input_error_name (operation_result));
 
   if (events_buffer_size)
   {
@@ -284,13 +284,13 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
   }
   else
     last_device_data.swap (initial_device_data);
+
+  window->RegisterEventHandler (WindowEvent_OnChangeHandle, xtl::bind (&Timer::Pause, &poll_timer));
 }
 
 OtherDevice::~OtherDevice ()
 {
   device_interface->Unacquire ();
-
-  Release ();
 }
 
 /*
