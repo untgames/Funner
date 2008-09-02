@@ -21,7 +21,7 @@ int main ()
   
   try
   {
-    xtl::auto_connection log_connection = common::LogSystem::RegisterLogHandler ("*", &log_handler);
+    common::LogFilter filter ("*", &log_handler);
 
     StringRegistry string_registry;
 

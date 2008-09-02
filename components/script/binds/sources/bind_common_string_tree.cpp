@@ -10,6 +10,14 @@ const char* LOG_NAME = "script.binds.common_string_node"; //имя потока протоколи
 
 const char* COMMON_STRING_TREE_LIBRARY = "StringNode";
 
+//получение протокола
+Log& get_log ()
+{
+  static Log log (LOG_NAME);
+  
+  return log;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Узел дерева строк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,12 +234,12 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 
       Pointer return_value = Pointer (new StringNode, false);
 
-      ParseLog log;
-      Parser   parser (log, file_name);
-      
-      for (size_t i = 0; i < log.MessagesCount (); i++)
-        if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
-          LogSystem::Printf (LOG_NAME, "Parser error: '%s'", log.Message(i));
+      ParseLog parse_log;
+      Parser   parser (parse_log, file_name);      
+
+      for (size_t i = 0; i < parse_log.MessagesCount (); i++)
+        if (parse_log.MessageType (i) == PARSE_LOG_ERROR || parse_log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
+          get_log ().Printf ("Parser error: '%s'", parse_log.Message (i));
 
       ParseNode* iter = parser.Root ()->First ();
 
@@ -331,7 +339,7 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
     {
       if (name.empty ())
       {
-        LogSystem::Print (LOG_NAME, "Can't save node, empty name");
+        get_log ().Print ("Can't save node, empty name");
         return;
       }
 
