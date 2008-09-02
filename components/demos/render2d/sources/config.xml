@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="windows-1251"?>
+<Configuration>
 <WindowSettings
 WindowWidth="640"
 WindowHeight="480"
@@ -10,10 +11,11 @@ StencilBits="8"
 FullScreen="0"
 BuffersCount="2"
 SwapMethod="flip"
-InitString=""
+InitString="disable=*"
 DriverMask="*"
-AdapterMask="*"
+AdapterMask="*Direct3D*"
 SamplesCount="0"
 VSync="1"
 FullScreen="0"
 />
+</Configuration>

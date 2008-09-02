@@ -144,7 +144,7 @@ int main ()
   {    
       //настройка протоколирования
 
-    xtl::auto_connection log_connection = common::LogSystem::RegisterLogHandler ("*", &log_print);
+    common::LogFilter filter ("*", &log_print);
     
       //запуск теста
     
