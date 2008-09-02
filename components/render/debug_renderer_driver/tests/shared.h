@@ -3,7 +3,6 @@
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/function.h>
-#include <xtl/connection.h>
 
 #include <common/log.h>
 
@@ -26,9 +25,8 @@ typedef xtl::com_ptr<renderer2d::IFrame>           Frame2dPtr;
 class Test
 {
   public:
-    Test ()
+    Test () : log_filter ("render.mid_level.Debug", &Print)
     {
-      log_connection = common::LogSystem::RegisterLogHandler ("render.mid_level.Debug", &Print);
     }
     
     ~Test ()
@@ -43,5 +41,5 @@ class Test
     }
   
   private:
-    xtl::auto_connection log_connection;  
+    common::LogFilter log_filter;
 };
