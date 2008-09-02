@@ -37,9 +37,14 @@ void test_registry_variables (VarRegistry& var_registry)
   test_registry_variable (var_registry, "FullScreen");
 }
 
+stl::string get_string (VarRegistry& registry, const char* name)
+{
+  return registry.GetValue (name).cast<stl::string> ();
+}
+
 SwapMethod get_swap_method (VarRegistry& registry, const char* name)
 {
-  stl::string swap_method (to_string (registry.GetValue (name)));
+  stl::string swap_method (get_string (registry, name));
 
   if (!xtl::xstricmp ("Discard", swap_method.c_str ()))
     return SwapMethod_Discard;
@@ -53,18 +58,18 @@ SwapMethod get_swap_method (VarRegistry& registry, const char* name)
 
 size_t get_size_t (VarRegistry& registry, const char* name)
 {
-  return atoi (to_string (registry.GetValue (name)).c_str ());
+  return atoi (get_string (registry, name).c_str ());
 }
 
 stl::string get (VarRegistry& registry, const char* name)
 {
-  return to_string (registry.GetValue (name));
+  return get_string (registry, name);
 }
 
 stl::string get (VarRegistry& registry, const char* name, const char* default_value)
 {
   if (registry.HasVariable (name))
-    return to_string (registry.GetValue (name));
+    return get_string (registry, name);
 
   return stl::string ();
 }

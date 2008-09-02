@@ -4,6 +4,7 @@
 #include <stl/set>
 #include <stl/string>
 
+#include <xtl/any.h>
 #include <xtl/bind.h>
 #include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
