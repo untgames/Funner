@@ -1,0 +1,13 @@
+Results of log_system3_test:
+Message
+  [print1]#log_critical: Test
+  [print2]#log_critical: Test
+Message
+  [print1]#log_critical: Test
+  [print2]#log_critical: Test
+  [print3]#log_critical: Test
+Message
+  [print1]#log_critical: Test
+  [print2]#log_critical: Test
+Message
+  [print4]#log_ok: Test

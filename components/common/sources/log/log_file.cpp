@@ -1,19 +1,4 @@
-#include <time.h>
-
-#include <stl/algorithm>
-#include <stl/set>
-#include <stl/string>
-#include <stl/vector>
-#include <stl/functional>
-
-#include <xtl/bind.h>
-#include <xtl/function.h>
-#include <xtl/lexical_cast.h>
-#include <xtl/string.h>
-#include <xtl/common_exceptions.h>
-
-#include <common/log.h>
-#include <common/strlib.h>
+#include "shared.h"
 
 using namespace common;
 

@@ -14,10 +14,10 @@ int main ()
 {
   printf ("Results of configuration_registry_test:\n");
 
-  LogSystem::RegisterLogHandler ("*", &log_handler);
-
   try
   {   
+    LogFilter filter ("*", &log_handler);    
+    
     VarRegistry registry (ConfigurationRegistry::BranchName ());
 
     registry.SetValue ("my_configuration_variable", xtl::any (stl::string ("my_configuration_variable_value"), true));

@@ -26,8 +26,20 @@ class ConfiguratorComponent
       }
       catch (xtl::exception& e)
       {
-        common::LogSystem::Print (LOG_NAME, e.what ());
+        GetLog ().Print (e.what ());
       }
+      catch (...)
+      {
+        GetLog ().Print ("Unknown exception at ConfiguratorComponent::ConfiguratorComponent");
+      }
+    }
+    
+  private:
+    common::Log& GetLog ()
+    {
+      static common::Log log (LOG_NAME);
+      
+      return log;
     }
 };
 

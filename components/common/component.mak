@@ -7,7 +7,9 @@ TARGETS := COMMON.SOURCES COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR COMMON.TEST
 COMMON.SOURCES.TYPE             := static-lib
 COMMON.SOURCES.NAME             := common
 COMMON.SOURCES.INCLUDE_DIRS     := include ../xtl/include ../../extern/pcre/include sources
-COMMON.SOURCES.SOURCE_DIRS      := sources/file_system/core sources/streams sources/hash sources/memory sources/parser sources/strlib sources/utils sources/var_registry sources/platform/default
+COMMON.SOURCES.SOURCE_DIRS      := sources/file_system/core sources/streams sources/hash sources/memory \
+                                   sources/parser sources/strlib sources/utils sources/log sources/var_registry \
+                                   sources/platform/default
 COMMON.SOURCES.LIB_DIRS         :=  
 COMMON.SOURCES.LIBS             := 
 COMMON.SOURCES.COMPILER_CFLAGS  :=
@@ -38,7 +40,8 @@ COMMON.CONFIGURATOR.IMPORTS          := compile.static.mak
 #Цель - CommonLib tests
 COMMON.TESTS.TYPE             := test-suite
 COMMON.TESTS.INCLUDE_DIRS     :=
-COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils tests/parser tests/memory tests/var_registry
+COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
+                                 tests/parser tests/memory tests/var_registry tests/log
 COMMON.TESTS.EXECUTION_DIR    :=
 COMMON.TESTS.LIB_DIRS         :=  
 COMMON.TESTS.LIBS             :=

@@ -4,8 +4,7 @@
 
 using namespace common;
 
-//const char* DST_FILE_NAME = "/io/stdout/test.keydet";
-const char* DST_FILE_NAME = "c:/result.htm";
+const char* DST_FILE_NAME = "/io/stdout/test.html";
 
 int main ()
 {
