@@ -8,7 +8,7 @@ int main ()
   {
       //настройка протоколирования
     
-    xtl::auto_connection log_connection = common::LogSystem::RegisterLogHandler ("render.mid_level.Debug", &print);
+    common::LogFilter log_filter ("render.mid_level.Debug", &print);
     
       //создание сцены
 

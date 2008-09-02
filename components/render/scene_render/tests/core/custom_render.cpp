@@ -27,10 +27,10 @@ int main ()
   {
       //настройка протоколирования
 
-    xtl::auto_connection log_connection = common::LogSystem::RegisterLogHandler ("render.mid_level.Debug", &debug_print);
+    common::LogFilter log_filter ("render.mid_level.Debug", &debug_print);
 
       //регистраци€ пользовательского рендера
-    
+
     SceneRenderManager::RegisterRender ("MySceneRender", &MySceneRender::Create);
 
       //создание рендера сцены
