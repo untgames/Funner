@@ -121,6 +121,7 @@ typedef xtl::shared_ptr<Shell>                      ShellPtr;
 
 struct TestApplication::Impl
 {
+  LogFilter                     log_filter;          //фильтр протоколирования
   VarRegistry                   config;              //реестр конфигурационных настроек
   stl::auto_ptr<syslib::Window> window;              //главное окно приложения
   xtl::auto_connection          app_idle_connection; //соединение сигнала обработчика холостого хода приложения
@@ -136,10 +137,9 @@ struct TestApplication::Impl
   bool                          render_initialized;
         
   Impl ()
-    : render_initialized (false)
+    : log_filter ("*", &log_handler),
+      render_initialized (false)
   {
-    LogSystem::RegisterLogHandler ("*", &log_handler);
-
       //чтение настроек
       
     config.Open (CONFIGURATION_BRANCH_NAME);
