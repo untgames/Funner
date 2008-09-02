@@ -7,6 +7,12 @@ using namespace render::mid_level::window_driver::renderer2d;
 namespace
 {
 
+/*
+     онстанты
+*/
+
+const char* LOG_NAME = "render.mid_level.window_driver.renderer2d.Renderer"; //им€ потока протоколировани€
+
 /*const char* PIXEL_SHADER =
 "uniform sampler2D texture; varying vec4 color; void main (void) {gl_FragColor = vec4 (vec3 (texture2D (texture, vec2 (gl_TexCoord[0]))), color.w);}";
 const char* VERTEX_SHADER = 
@@ -105,7 +111,9 @@ DepthStencilStatePtr create_depth_stencil_state (IDevice& device, bool depth_wri
 //протоколирование компил€тора шейдеров
 void shader_error_log (const char* message)
 {
-  common::LogSystem::Print ("render.mid_level.window_driver.renderer2d.Renderer", message);
+  static common::Log log (LOG_NAME);
+  
+  log.Print (message);
 }
 
 //создание программы

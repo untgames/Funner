@@ -288,7 +288,7 @@ class BasicTest
 {
   public:
 ///Конструктор  
-    BasicTest (const wchar_t* title)
+    BasicTest (const wchar_t* title) : log_filter ("*", &LogMessage)
     {
         //монтирование реестра
         
@@ -301,10 +301,6 @@ class BasicTest
         //чтение конфигурации
 
       load_xml_configuration (var_registry, CONFIGURATION_FILE_NAME);
-
-        //подписка на события протоколирования
-
-      common::LogSystem::RegisterLogHandler ("*", &LogMessage);
 
       AddWindow ();
 
@@ -431,7 +427,8 @@ class BasicTest
     typedef xtl::shared_ptr<RenderWindow> RenderWindowPtr;
 
   private:
-    stl::vector<RenderWindow*>              render_windows;
+    common::LogFilter                         log_filter;
+    stl::vector<RenderWindow*>                render_windows;
     common::VarRegistry                       var_registry;
     common::VarRegistryContainer<stl::string> string_registry;
     RendererListener                          renderer_listener;
