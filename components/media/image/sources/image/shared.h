@@ -17,6 +17,7 @@
 #include <common/file.h>
 #include <common/component.h>
 #include <common/log.h>
+#include <common/singleton.h>
 #include <common/strlib.h>
 
 #include <media/image.h>

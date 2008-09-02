@@ -13,6 +13,7 @@
 #include <common/file.h>
 #include <common/component.h>
 #include <common/log.h>
+#include <common/singleton.h>
 
 #include <media/sound.h>
 

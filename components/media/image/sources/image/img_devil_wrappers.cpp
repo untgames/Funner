@@ -18,9 +18,16 @@ const char* LOG_NAME = "media.image.devil"; //имя потока протоколирования
 
 Log& get_log ()
 {
-  static Log log (LOG_NAME);
+  struct LogHolder
+  {
+    LogHolder () : log (LOG_NAME) {}
+    
+    Log log;
+  };
+
+  typedef common::Singleton<LogHolder> LogHolderSingleton;
   
-  return log;
+  return LogHolderSingleton::Instance ().log;
 }
 
 void log_exception (const char* source, std::exception& exception)
