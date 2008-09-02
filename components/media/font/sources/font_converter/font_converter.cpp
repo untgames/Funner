@@ -113,6 +113,13 @@ size_t get_glyph_bitmap_size (FT_Bitmap_& bitmap)
 typedef stl::hash_map<size_t, size_t>           BitmapHashMap;
 typedef stl::vector<stl::pair<size_t, size_t> > DuplicateGlyphs;
 
+common::Log& get_log ()
+{
+  static common::Log log (LOG_NAME);
+  
+  return log;
+}
+
 }
 
 namespace media
@@ -182,14 +189,14 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
     {
       set_null_glyph_data (current_glyph);
 
-      common::LogSystem::Printf (LOG_NAME, "Can't load char %u.", i);
+      get_log ().Printf ("Can't load char %u.", i);
     
       continue;
     }
 
     if (!face->glyph->bitmap.buffer)
     {
-      common::LogSystem::Printf (LOG_NAME, "Freetype returned null for character %u.", i);
+      get_log ().Printf ("Freetype returned null for character %u.", i);
       
       set_null_glyph_data (current_glyph);
       current_glyph->advance_x = face->glyph->metrics.horiAdvance >> 6;
@@ -305,7 +312,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
       if (FT_Get_Kerning (face, FT_Get_Char_Index (face, font_desc.char_codes_line [i]), FT_Get_Char_Index (face, font_desc.char_codes_line [j]), FT_KERNING_UNFITTED, &kerning))
       {
-        common::LogSystem::Printf (LOG_NAME, "Can't get kerning for pair %u-%u.", i, j);
+        get_log ().Printf ("Can't get kerning for pair %u-%u.", i, j);
         continue;
       }
 

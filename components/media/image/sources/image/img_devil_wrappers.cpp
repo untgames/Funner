@@ -16,14 +16,21 @@ const char* LOG_NAME = "media.image.devil"; //имя потока протоколирования
     Протоколирование исключения
 */
 
+Log& get_log ()
+{
+  static Log log (LOG_NAME);
+  
+  return log;
+}
+
 void log_exception (const char* source, std::exception& exception)
 {
-  common::LogSystem::Printf (LOG_NAME, "Exception at %s: %s", source, exception.what ());
+  get_log ().Printf ("Exception at %s: %s", source, exception.what ());
 }
 
 void log_exception (const char* source)
 {
-  common::LogSystem::Printf (LOG_NAME, "Unknown exception at %s", source);
+  get_log ().Printf ("Unknown exception at %s", source); 
 }
 
 /*
