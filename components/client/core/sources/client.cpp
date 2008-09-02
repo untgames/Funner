@@ -1,11 +1,15 @@
+#include <stl/hash_map>
 #include <stl/set>
 #include <stl/string>
 #include <stl/vector>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
+
+#include <input/translation_map.h>
 
 #include <client/client.h>
 
@@ -43,7 +47,7 @@ typedef stl::vector<ListenerAttachmentPtr> ListenerAttachments;
 }
 
 /*
-   Реализация клиента
+   ╨хрышчрЎш  ъышхэЄр
 */
 
 struct Client::Impl
@@ -54,7 +58,7 @@ struct Client::Impl
       OnDestroyNotify ();
     }
 
-///Работа с экранами
+///╨рсюЄр ё ¤ъЁрэрьш
     void SetScreen (const char* attachment_name, render::Screen* screen)
     {
       static const char* METHOD_NAME = "client::Client::SetScreen";
@@ -84,9 +88,9 @@ struct Client::Impl
 
       if (erase_position != screen_attachments.end ())
       {
-        screen_attachments.erase (erase_position);      
-
         OnRemoveScreenNotify (attachment_name);
+
+        screen_attachments.erase (erase_position);      
       }
     }
 
@@ -124,7 +128,7 @@ struct Client::Impl
       return &screen_attachments[index]->screen;
     }
 
-///Работа со слушателями
+///╨рсюЄр ёю ёыє°рЄхы ьш
     void SetListener (const char* attachment_name, scene_graph::Listener* listener)
     {
       static const char* METHOD_NAME = "client::Client::SetListener";
@@ -154,9 +158,9 @@ struct Client::Impl
 
       if (erase_position != listener_attachments.end ())
       {
-        listener_attachments.erase (erase_position);
-
         OnRemoveListenerNotify (attachment_name);
+
+        listener_attachments.erase (erase_position);
       }
     }
 
@@ -194,7 +198,7 @@ struct Client::Impl
       return listener_attachments[index]->listener.get ();
     }
 
-///Работа с устройствами ввода
+///╨рсюЄр ё єёЄЁющёЄтрьш ттюфр
     xtl::connection RegisterInputHandler (const InputEventHandler& input_handler)
     {
       return input_signal.connect (input_handler);
@@ -210,7 +214,7 @@ struct Client::Impl
       if (!translation_table)
         throw xtl::make_null_argument_exception (METHOD_NAME, "translation_table");
 
-      //???????????
+      input_translator_attachments[attachment_name] = input::TranslationMap (translation_table);
     }
 
     void RemoveInputTranslator (const char* attachment_name)
@@ -218,15 +222,15 @@ struct Client::Impl
       if (!attachment_name)
         throw xtl::make_null_argument_exception ("client::Client::RemoveInputTranslator", "attachment_name");
 
-      //???????????
+      input_translator_attachments.erase (attachment_name);
     }
 
     void RemoveAllInputTranslators ()
     {
-      //???????????
+      input_translator_attachments.clear ();
     }
 
-    void ProcessInputEvent (const char* attachment_name, const char* event) const
+    void ProcessInputEvent (const char* attachment_name, const char* event)
     {
       static const char* METHOD_NAME = "client::Client::ProcessInputEvent";
 
@@ -236,10 +240,13 @@ struct Client::Impl
       if (!event)
         throw xtl::make_null_argument_exception (METHOD_NAME, "event");
 
-      //???????????
+      InputTraslatorMap::iterator translation_map = input_translator_attachments.find (attachment_name);
+
+      if (translation_map != input_translator_attachments.end ())
+        translation_map->second.ProcessEvent (event, xtl::bind (&Client::Impl::InputEventHandler, this, attachment_name, _1));
     }
 
-///Работа со слушателями событий
+///╨рсюЄр ёю ёыє°рЄхы ьш ёюс√Єшщ
     void AttachEventListener (IClientEventListener* listener)
     {
       static const char* METHOD_NAME = "client::Client::AttachEventListener";
@@ -264,7 +271,7 @@ struct Client::Impl
     }
 
   private:
-///Поиск экрана
+///╧юшёъ ¤ъЁрэр
     ScreenAttachments::iterator FindScreenAttachment (const char* attachment_name)
     {     
       for (ScreenAttachments::iterator iter = screen_attachments.begin (), end = screen_attachments.end (); iter != end; ++iter)
@@ -274,7 +281,7 @@ struct Client::Impl
       return screen_attachments.end ();
     }
 
-///Поиск слушателя
+///╧юшёъ ёыє°рЄхы 
     ListenerAttachments::iterator FindListenerAttachment (const char* attachment_name)
     {     
       for (ListenerAttachments::iterator iter = listener_attachments.begin (), end = listener_attachments.end (); iter != end; ++iter)
@@ -284,7 +291,7 @@ struct Client::Impl
       return listener_attachments.end ();
     }
 
-//Оповещение слушателей
+//╬яютх∙хэшх ёыє°рЄхыхщ
     void OnSetScreenNotify (const char* attachment_name, render::Screen* screen)
     {
       for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
@@ -315,23 +322,30 @@ struct Client::Impl
         (*iter)->OnDestroy ();
     }
 
+    void InputEventHandler (const char* attachment_name, const char* event)
+    {
+      input_signal (attachment_name, event);
+    }
+
   private:
-    typedef xtl::signal<void (const char*, const char*)> InputSignal;
-    typedef stl::set<IClientEventListener*>              ListenerSet;
+    typedef xtl::signal<void (const char*, const char*)>              InputSignal;
+    typedef stl::set<IClientEventListener*>                           ListenerSet;
+    typedef stl::hash_map<stl::hash_key<const char*>, input::TranslationMap> InputTraslatorMap;
 
   private:
     ScreenAttachments   screen_attachments;
     ListenerAttachments listener_attachments;
     InputSignal         input_signal;
     ListenerSet         listeners;
+    InputTraslatorMap   input_translator_attachments;
 };
 
 /*
-   Клиент
+   ╩ышхэЄ
 */
 
 /*
-   Конструктор/деструктор
+   ╩юэёЄЁєъЄюЁ/фхёЄЁєъЄюЁ
 */
 
 Client::Client ()
@@ -344,7 +358,7 @@ Client::~Client ()
 }
 
 /*
-   Работа с экранами
+   ╨рсюЄр ё ¤ъЁрэрьш
 */
 
 void Client::SetScreen (const char* attachment_name, render::Screen* screen)
@@ -378,7 +392,7 @@ render::Screen* Client::Screen (size_t index) const
 }
 
 /*
-   Работа со слушателями
+   ╨рсюЄр ёю ёыє°рЄхы ьш
 */
 
 void Client::SetListener (const char* attachment_name, scene_graph::Listener* listener)
@@ -412,7 +426,7 @@ scene_graph::Listener* Client::Listener (size_t index) const
 }
 
 /*
-   Работа с устройствами ввода
+   ╨рсюЄр ё єёЄЁющёЄтрьш ттюфр
 */
 
 xtl::connection Client::RegisterInputHandler (const InputEventHandler& input_handler)
@@ -441,7 +455,7 @@ void Client::ProcessInputEvent (const char* attachment_name, const char* event) 
 }
 
 /*
-   Работа со слушателями событий
+   ╨рсюЄр ёю ёыє°рЄхы ьш ёюс√Єшщ
 */
 
 void Client::AttachEventListener (IClientEventListener* listener)

@@ -1,10 +1,17 @@
 #include <cstdio>
 
+#include <xtl/connection.h>
+#include <xtl/exception.h>
+#include <xtl/function.h>
+
 #include <sg/listener.h>
 
 #include <render/screen.h>
 
 #include <client/client.h>
+
+const char* TRANSLATION_TABLE1_FILE_NAME = "data/translation_table1.keymap";
+const char* TRANSLATION_TABLE2_FILE_NAME = "data/translation_table2.keymap";
 
 using namespace client;
 
@@ -42,6 +49,11 @@ class ClientEventListener : public IClientEventListener
       printf ("OnDestroy\n");
     }
 };
+
+void input_event_handler (const char* attachment_name, const char* event)
+{
+  printf ("New input event from attachment '%s': '%s'\n", attachment_name, event);
+}
 
 int main ()
 {
@@ -106,6 +118,33 @@ int main ()
 
   printf ("Client screens count is %u\n", client.ScreensCount ());
   printf ("Client listeners count is %u\n", client.ListenersCount ());
+
+  try
+  {
+    client.SetInputTranslator ("InputTranslatorAttachment1", TRANSLATION_TABLE1_FILE_NAME);
+    client.SetInputTranslator ("InputTranslatorAttachment2", TRANSLATION_TABLE2_FILE_NAME);
+  }
+  catch (xtl::exception& e)
+  {
+    printf ("Exception: %s\n", e.what ());
+    return 1;
+  }
+
+  client.RegisterInputHandler (&input_event_handler);
+
+  client.ProcessInputEvent ("InputTranslatorAttachment1", "event1");
+  client.ProcessInputEvent ("InputTranslatorAttachment2", "event1");
+  client.ProcessInputEvent ("InputTranslatorAttachment2", "event2 param1");
+
+  client.RemoveInputTranslator ("InputTranslatorAttachment2");
+
+  client.ProcessInputEvent ("InputTranslatorAttachment1", "event1");
+  client.ProcessInputEvent ("InputTranslatorAttachment2", "event2");
+
+  client.RemoveAllInputTranslators ();
+
+  client.ProcessInputEvent ("InputTranslatorAttachment1", "event1");
+  client.ProcessInputEvent ("InputTranslatorAttachment2", "event2");
 
   return 0;
 }

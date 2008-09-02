@@ -26,4 +26,7 @@ OnRemoveScreen: attachment_name is 'ScreenAttachment2'
 OnRemoveScreen: attachment_name is 'ScreenAttachment1'
 Client screens count is 0
 Client listeners count is 0
+New input event from attachment 'InputTranslatorAttachment1': 'Replaced event1: event_name=event1, event_param1= end'
+New input event from attachment 'InputTranslatorAttachment2': 'Replaced event2: event_name=event2, event_param1=param1 end'
+New input event from attachment 'InputTranslatorAttachment1': 'Replaced event1: event_name=event1, event_param1= end'
 OnDestroy
