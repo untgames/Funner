@@ -1,6 +1,12 @@
 #ifndef CLIENT_ENGINE_HEADER
 #define CLIENT_ENGINE_HEADER
 
+#include <stl/auto_ptr.h>
+
+#include <common/var_registry.h>
+
+#include <client/client.h>
+
 namespace client
 {
 
@@ -39,8 +45,13 @@ class Engine
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Engine (Client& client, const char* configuration_branch_name, IEngineStartupParams* engine_startup_params = 0);
+    Engine (const char* configuration_branch_name, IEngineStartupParams* engine_startup_params = 0);
     ~Engine ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка клиента
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetClient (client::Client* client);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных
@@ -51,7 +62,7 @@ class Engine
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadResource (const char* resource_name);
+//    void LoadResource (const char* resource_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение тракейбла
@@ -73,6 +84,10 @@ class Engine
   private:
     Engine (const Engine&);
     Engine& operator = (const Engine&);
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 xtl::trackable& get_trackable (const Engine& engine);
@@ -83,7 +98,7 @@ xtl::trackable& get_trackable (const Engine& engine);
 class StartupManager
 {
   public:
-    typedef xtl::function<void (VarRegistry&, IEngineStartupParams*, Engine&)> StartupHandler;
+    typedef xtl::function<void (common::VarRegistry&, IEngineStartupParams*, Engine&)> StartupHandler;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление обработчиков

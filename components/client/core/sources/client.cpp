@@ -1,17 +1,4 @@
-#include <stl/hash_map>
-#include <stl/set>
-#include <stl/string>
-#include <stl/vector>
-
-#include <xtl/bind.h>
-#include <xtl/common_exceptions.h>
-#include <xtl/connection.h>
-#include <xtl/shared_ptr.h>
-#include <xtl/signal.h>
-
-#include <input/translation_map.h>
-
-#include <client/client.h>
+#include "shared.h"
 
 using namespace client;
 
@@ -50,12 +37,14 @@ typedef stl::vector<ListenerAttachmentPtr> ListenerAttachments;
    Реализация клиента
 */
 
-struct Client::Impl
+struct Client::Impl : public xtl::reference_counter
 {
   public:
     ~Impl ()
     {
-      OnDestroyNotify ();
+      RemoveAllScreens   ();
+      RemoveAllListeners ();
+      OnDestroyNotify    ();
     }
 
 ///Работа с экранами
@@ -328,8 +317,8 @@ struct Client::Impl
     }
 
   private:
-    typedef xtl::signal<void (const char*, const char*)>              InputSignal;
-    typedef stl::set<IClientEventListener*>                           ListenerSet;
+    typedef xtl::signal<void (const char*, const char*)>                     InputSignal;
+    typedef stl::set<IClientEventListener*>                                  ListenerSet;
     typedef stl::hash_map<stl::hash_key<const char*>, input::TranslationMap> InputTraslatorMap;
 
   private:
@@ -353,8 +342,26 @@ Client::Client ()
 {
 }
 
+Client::Client (const Client& source)
+  : impl (source.impl)
+{
+  addref (impl);
+}
+
 Client::~Client ()
 {
+  release (impl);
+}
+
+/*
+   Копирование
+*/
+
+Client& Client::operator = (const Client& source)
+{
+  Client (source).Swap (*this);
+
+  return *this;
 }
 
 /*
@@ -466,4 +473,27 @@ void Client::AttachEventListener (IClientEventListener* listener)
 void Client::DetachEventListener (IClientEventListener* listener)
 {
   impl->DetachEventListener (listener);
+}
+
+/*
+   Обмен
+*/
+
+void Client::Swap (Client& client)
+{
+  stl::swap (impl, client.impl);
+}
+
+namespace client
+{
+
+/*
+   Обмен
+*/
+
+void swap (Client& client1, Client& client2)
+{
+  client1.Swap (client2);
+}
+
 }
