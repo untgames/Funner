@@ -71,7 +71,7 @@ stl::string get (VarRegistry& registry, const char* name, const char* default_va
   if (registry.HasVariable (name))
     return get_string (registry, name);
 
-  return stl::string ();
+  return stl::string (default_value);
 }
 
 void fill_swap_chain_desc (SwapChainDesc& swap_chain_desc, const void* window_handle, VarRegistry& var_registry)
