@@ -5,11 +5,9 @@
 
 #include <stl/algorithm>
 #include <stl/functional>
-//#include <stl/hash_map> //????
 #include <stl/list>
 #include <stl/set>
 #include <stl/string>
-//#include <stl/vector>
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
@@ -22,6 +20,7 @@
 #include <xtl/string.h>
 #include <xtl/uninitialized_storage.h>
 
+#include <common/file.h>
 #include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>

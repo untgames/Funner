@@ -3,14 +3,13 @@
 
 #include <xtl/functional_fwd>
 
-#include <common/file.h>
-
 namespace common
 {
 
 //forward declarations
 class LogImpl;
 class LogFilterImpl;
+class File;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Именованный протокол
