@@ -1,9 +1,5 @@
 ###################################################################################################
-#ќпределени€ и константы
+#Ёкспортируемые настройки компонента
 ###################################################################################################
-TARGETS := CLIENT_COMPONENTS
-
-CLIENT_COMPONENTS.TYPE       := package
-CLIENT_COMPONENTS.COMPONENTS := core window_manager
-
-
+export.LIBS    := client.window_manager
+export.IMPORTS := ../../common/link.static.mak ../../system/link.static.mak ../core/link.static.mak

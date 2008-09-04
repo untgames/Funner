@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <Window1>
+    <WindowStartup StartupParam="Window1 start"/>
+  </Window1>
+  <Windows>
+    <auto_template prefix="Window" index="2" step = "1"/>
+    <auto Style="Overlapped" Width="300" Height="400" Title="auto1" Show="1" XPosition="0" YPosition="0">
+      <WindowStartup StartupParam="AutoWindow2 start"/>
+    </auto>
+    <auto Style="Overlapped" Width="640" Height="480" Title="auto2" Show="1">
+      <WindowStartup StartupParam="AutoWindow3 start"/>
+    </auto>
+    <auto Style="PopUp" Width="10" Height="10" Title="auto3" Show="0">
+      <WindowStartup StartupParam="AutoWindow4 start"/>
+    </auto>
+  </Windows>
+</Configuration>

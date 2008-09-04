@@ -1,9 +1,5 @@
 ###################################################################################################
-#ќпределени€ и константы
+#Ёкспортируемые настройки компонента
 ###################################################################################################
-TARGETS := CLIENT_COMPONENTS
-
-CLIENT_COMPONENTS.TYPE       := package
-CLIENT_COMPONENTS.COMPONENTS := core window_manager
-
-
+export.INCLUDE_DIRS := include
+export.IMPORTS      := ../../common/compile.static.mak ../../system/compile.static.mak ../core/compile.static.mak
