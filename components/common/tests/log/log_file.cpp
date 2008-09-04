@@ -1,6 +1,4 @@
-#include <stdio.h>
-
-#include <common/log.h>
+#include "shared.h"
 
 using namespace common;
 

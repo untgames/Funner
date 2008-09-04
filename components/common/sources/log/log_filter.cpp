@@ -33,8 +33,16 @@ LogFilterImpl::LogFilterImpl (const char* in_mask, const LogHandler& handler)
 
 LogFilterImpl::~LogFilterImpl ()
 {
-  for (LogList::iterator iter=sources.begin (), end=sources.end (); iter!=end; ++iter)
+  for (LogList::iterator iter=sources.begin (), end=sources.end (); iter!=end;)
+  {
+    LogList::iterator next = iter;
+
+    ++next;
+
     (*iter)->RemoveFilter (this);
+
+    iter = next;
+  }
 
   LogSystemImpl::Instance ().Unregister (this);
   LogSystemImpl::Unlock ();

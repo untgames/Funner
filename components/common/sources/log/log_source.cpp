@@ -32,8 +32,16 @@ LogImpl::LogImpl (const char* log_name)
 
 LogImpl::~LogImpl ()
 {
-  for (FilterList::iterator iter=filters.begin (), end=filters.end (); iter!=end; ++iter)
+  for (FilterList::iterator iter=filters.begin (), end=filters.end (); iter!=end;)
+  {
+    FilterList::iterator next = iter;
+
+    ++next;
+
     (*iter)->RemoveSource (this);
+
+    iter = next;
+  }
 
   LogSystemImpl::Instance ().Unregister (this);
   LogSystemImpl::Unlock ();
