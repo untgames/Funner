@@ -1,3 +1,5 @@
+#include <cstdio>
+
 #include <xtl/exception.h>
 
 #include <common/component.h>

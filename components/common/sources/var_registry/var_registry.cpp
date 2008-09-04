@@ -3,6 +3,17 @@
 using namespace common;
 using namespace xtl;
 
+namespace
+{
+
+/*
+   Константы
+*/
+
+const char* REGISTRY_COMPONENTS_MASK = "common.var_registries.*";
+
+}
+
 /*
     Описание реализации реестра переменных
 */
@@ -178,6 +189,8 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
           size_t                    var_name_offset;
       };
 
+      LoadDefaultComponents ();
+
       EnumerationWrapper (assigned_mount_points, handler, branch_name.c_str (), branch_name.size (), var_name_mask);
     }
 
@@ -258,11 +271,18 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
     }
     
   private:
+    void LoadDefaultComponents ()
+    {
+      static ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
+    }
+
 ///Поиск точки монтирования по имени
     MountPoint* FindMountPoint (const char* var_name, stl::string& var_sub_name)
     {
       if (!mount_points_map)
         return 0;        
+
+      LoadDefaultComponents ();
 
       return mount_points_map->FindMountPoint (branch_name.c_str (), var_name, var_sub_name);
     }
