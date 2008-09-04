@@ -529,16 +529,9 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::count (const key_type& key) 
   if (!num_elements)
     return 0;
 
-  const Bucket& bucket = table [bkt_num_key (key)];
-  iterator  i          = bucket.first;
-  size_type count      = bucket.count, pos = count;
+  stl::pair<const_iterator, const_iterator> range = equal_range (key);
 
-  for (;count && !equals (keyof (*i),key);++i,--count);
-
-  if (count)
-    for (pos=count--,++i;count && equals (keyof (*i),key);++i,--count);
-  
-  return pos-count;
+  return distance (range.first, range.second);
 }
     
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
