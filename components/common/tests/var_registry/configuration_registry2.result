@@ -1,0 +1,10 @@
+Results of configuration_registry2_test:
+Log 'common.Configurator' message: 'config.xml(0): error: File 'config.xml' not found
+    at common::StdioFileSystem::FileOpen
+    at common::load_xml_configuration
+    at common::ConfigurationRegistry::LoadConfiguration'
+Variable 'Window2.Style' value is 'Overlapped'
+Variable 'Window2.Width' value is '300'
+Variable 'Window2.Height' value is '400'
+Variable 'Window3.Style' value is 'PopUp'
+Variable 'Window4.Style' value is 'Overlapped'

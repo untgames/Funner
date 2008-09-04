@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <Window1>
+    <window_startup startup_param="Window1 start"/>
+  </Window1>
+  <Windows>
+    <auto_template prefix="Window" index="2" step = "1"/>
+    <auto Style="Overlapped" Width="300" Height="400"/>
+    <auto Style="PopUp"/>
+    <auto Style="Overlapped"/>
+  </Windows>
+</Configuration>

@@ -104,7 +104,8 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
       struct EnumerationWrapper
       {
         public:
-          EnumerationWrapper (MountPointsList& list, const EnumHandler& in_handler, size_t in_branch_name_size, const char* in_var_name_mask)
+          EnumerationWrapper (MountPointsList& list, const EnumHandler& in_handler, const char* branch_name, size_t in_branch_name_size, 
+                              const char* in_var_name_mask)
             : iter (list.begin ()), 
               last (list.end ()), 
               handler (in_handler), 
@@ -135,18 +136,17 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
               else
               {
                 current_prefix.clear ();
+                
                 var_name_offset = branch_name_size - mount_point.Name ().size ();
+
+                if (mount_point.Name ().size ())
+                  current_var_name_mask = format ("%s.%s", branch_name + mount_point.Name ().size () + 1, in_var_name_mask);
+                else
+                  current_var_name_mask = in_var_name_mask;
               }
                 
               mount_point.Registry ()->EnumerateVars (wrapper);
-            }
-          
-          }
-
-          void ProcessVar (const char* var_name)
-          {
-            if (wcmatch (var_name, var_name_mask))
-              handler (var_name);
+            }          
           }
 
           void operator () (const char* var_name)
@@ -156,13 +156,15 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
               if (strlen (var_name) < var_name_offset)
                 return;
 
-              ProcessVar (var_name + var_name_offset);
+              if (wcmatch (var_name, current_var_name_mask.c_str ()))
+                handler (var_name + var_name_offset);
             }
             else
             {
               stl::string relative_var_name = current_prefix + var_name;
 
-              ProcessVar (relative_var_name.c_str ());
+              if (wcmatch (relative_var_name.c_str (), var_name_mask))
+                handler (relative_var_name.c_str ());
             }
           }
 
@@ -172,10 +174,11 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
           const char*               var_name_mask;
           size_t                    branch_name_size;
           stl::string               current_prefix;
+          stl::string               current_var_name_mask;
           size_t                    var_name_offset;
       };
 
-      EnumerationWrapper (assigned_mount_points, handler, branch_name.size (), var_name_mask);
+      EnumerationWrapper (assigned_mount_points, handler, branch_name.c_str (), branch_name.size (), var_name_mask);
     }
 
 ///Перебор переменных дочернего подуровня
