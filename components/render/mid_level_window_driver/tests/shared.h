@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <ctime>
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
