@@ -22,7 +22,6 @@ const char* get_name (CompareMode param)
     case CompareMode_GreaterEqual: return "CompareMode_GreaterEqual";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(CompareMode)", "param", param);
-      return "";
   }
 }
 
@@ -36,7 +35,6 @@ const char* get_name (UsageMode param)
     case UsageMode_Stream:  return "UsageMode_Stream";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(UsageMode)", "param", param);
-      return "";
   }
 }
 
@@ -111,7 +109,6 @@ const char* get_name (BindFlag param)
     case BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil: return "BindFlag_VertexBuffer | BindFlag_IndexBuffer | BindFlag_ConstantBuffer | BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(BindFlag)", "param", param);
-      return "";
   }
 }
 
@@ -125,7 +122,6 @@ const char* get_name (AccessFlag param)
     case AccessFlag_Read | AccessFlag_Write: return "read | write";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(AccessFlag)", "param", param);
-      return "";
   }
 }
 
@@ -147,7 +143,6 @@ const char* get_name (PixelFormat param)
     case PixelFormat_S8:    return "PixelFormat_S8";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(PixelFormat)", "param", param);
-      return "";
   }
 }
 
@@ -161,7 +156,6 @@ const char* get_name (TextureDimension param)
     case TextureDimension_Cubemap: return "TextureDimension_Cubemap";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(TextureDimension)", "param", param);
-      return "";
   }
 }
 
@@ -177,7 +171,6 @@ const char* get_name (StencilOperation param)
     case StencilOperation_Invert:     return "StencilOperation_Invert";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(StencilOperation)", "param", param);
-      return "";
   }
 }
 
@@ -192,7 +185,6 @@ const char* get_name (BlendOperation param)
     case BlendOperation_Max:                return "BlendOperation_Max";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(BlendOperation)", "param", param);
-      return "";
   }
 }
 
@@ -212,7 +204,6 @@ const char* get_name (BlendArgument param)
     case BlendArgument_InverseDestinationAlpha: return "BlendArgument_InverseDestinationAlpha";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(BlendArgument)", "param", param);
-      return "";
   }  
 }
 
@@ -238,7 +229,18 @@ const char* get_name (ColorWriteFlag param)
     case ColorWriteFlag_Red | ColorWriteFlag_Green | ColorWriteFlag_Blue | ColorWriteFlag_Alpha:  return "red | green | blue | alpha";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(ColorWriteFlag)", "param", param);
-      return "";    
+  }
+}
+
+const char* get_name (SwapMethod param)
+{
+  switch (param)
+  {
+    case SwapMethod_Discard: return "discard";
+    case SwapMethod_Flip:    return "flip";
+    case SwapMethod_Copy:    return "copy";
+    default:
+      throw xtl::make_argument_exception ("render::low_level::get_name(SwapMethod)", "param", param);
   }
 }
 
@@ -255,7 +257,6 @@ const char* get_name (InputDataType param)
     case InputDataType_Float:   return "InputDataType_Float";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(InputDataType)", "param", param);
-      return "";    
   }
 }
 
@@ -269,7 +270,6 @@ const char* get_name (InputDataFormat param)
     case InputDataFormat_Vector4: return "InputDataFormat_Vector4";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(InputDataFormat)", "param", param);
-      return "";    
   }
 }
 
@@ -290,7 +290,6 @@ const char* get_name (VertexAttributeSemantic param)
     case VertexAttributeSemantic_TexCoord7: return "VertexAttributeSemantic_TexCoord7";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(VertexAttributeSemantic)", "param", param);
-      return "";    
   }
 }
 
@@ -307,7 +306,6 @@ const char* get_name (TexMinFilter param)
     case TexMinFilter_LinearMipLinear: return "TexMinFilter_LinearMipLinear";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(TexMinFilter)", "param", param);
-      return "";    
   }
 }
 
@@ -320,7 +318,6 @@ const char* get_name (TexMagFilter param)
     case TexMagFilter_Linear:  return "TexMagFilter_Linear";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(TexMagFilter)", "param", param);
-      return "";    
   }
 }
 
@@ -334,7 +331,6 @@ const char* get_name (TexcoordWrap param)
     case TexcoordWrap_ClampToBorder: return "TexcoordWrap_ClampToBorder";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(TexcoordWrap)", "param", param);
-      return "";    
   }
 }
 
@@ -355,7 +351,6 @@ const char* get_name (ProgramParameterType param)
     case ProgramParameterType_Float4x4:   return "ProgramParameterType_Float4x4";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(ProgramParameterType)", "param", param);
-      return "";
   }
 }
 
@@ -367,7 +362,6 @@ const char* get_name (FillMode param)
     case FillMode_Solid:     return "FillMode_Solid";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(FillMode)", "param", param);
-      return "";    
   }
 }
 
@@ -380,7 +374,6 @@ const char* get_name (CullMode param)
     case CullMode_Back:  return "CullMode_Back";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(CullMode)", "param", param);
-      return "";    
   }
 }
 
@@ -396,7 +389,6 @@ const char* get_name (PrimitiveType param)
     case PrimitiveType_TriangleFan:    return "PrimitiveType_TriangleFan";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(PrimitiveType)", "param", param);
-      return "";
   }
 }
 

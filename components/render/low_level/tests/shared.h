@@ -137,7 +137,7 @@ class TestDriver: public IDriver, public ObjectImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание адаптера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IAdapter* CreateAdapter (const char*, const char*)
+    IAdapter* CreateAdapter (const char*, const char*, const char*)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateAdapter");
     }    

@@ -86,7 +86,7 @@ class DriverManagerImpl
     }
 
 ///Создание адаптера
-    IAdapter* CreateAdapter (const char* driver_name, const char* adapter_name, const char* path)
+    IAdapter* CreateAdapter (const char* driver_name, const char* adapter_name, const char* path, const char* init_string)
     {
       static const char* METHOD_NAME = "render::low_level::DriverManagerImpl::CreateAdapter";
 
@@ -108,7 +108,7 @@ class DriverManagerImpl
         
         //создание адаптера
 
-      return iter->second->CreateAdapter (adapter_name, path);
+      return iter->second->CreateAdapter (adapter_name, path, init_string);
     }
 
 ///Создание цепочки обмена
@@ -253,9 +253,9 @@ IDriver* DriverManager::FindDriver (const char* name)
   return DriverManagerSingleton::Instance ().FindDriver (name);
 }
 
-IAdapter* DriverManager::CreateAdapter (const char* driver_name, const char* adapter_name, const char* path)
+IAdapter* DriverManager::CreateAdapter (const char* driver_name, const char* adapter_name, const char* path, const char* init_string)
 {
-  return DriverManagerSingleton::Instance ().CreateAdapter (driver_name, adapter_name, path);
+  return DriverManagerSingleton::Instance ().CreateAdapter (driver_name, adapter_name, path, init_string);
 }
 
 ISwapChain* DriverManager::CreateSwapChain
