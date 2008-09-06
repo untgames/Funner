@@ -12,8 +12,8 @@ FUNNER_EXTERN_LIBS.win32      := extern/glew
 #Цель №2 - пакет
 FUNNER_COMPONENTS.TYPE       := package
 FUNNER_COMPONENTS.COMPONENTS := components/xtl components/common components/system components/media \
-                                components/bound_volumes components/scene_graph components/script components/sound \
-                                components/render components/input components/client components/tools components/demos
+                                components/bound_volumes components/scene_graph components/sound \
+                                components/render components/input components/script components/client components/tools components/demos
 
 #Цель №3 - сборка SDK
 FUNNER_SDK.TYPE        := sdk
