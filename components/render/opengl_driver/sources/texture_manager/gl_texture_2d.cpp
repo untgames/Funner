@@ -48,9 +48,9 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
 
     glGetTexLevelParameteriv (GL_TEXTURE_2D, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
   }  
-  
+
    //установка реального внутреннего формата хранения пикселей (связано с установкой сжатого формата)
-   
+
   try
   {
     SetFormat (get_pixel_format (gl_internal_format));

@@ -9,6 +9,7 @@
 
 #include <shared/command_list.h>
 #include <shared/context_object.h>
+#include <shared/log.h>
 #include <shared/platform.h>
 #include <shared/property_list.h>
 
@@ -25,9 +26,9 @@
 #include <xtl/string.h>
 #include <xtl/uninitialized_storage.h>
 
+#include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
-#include <common/singleton.h>
 
 namespace render
 {

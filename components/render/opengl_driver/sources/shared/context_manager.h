@@ -74,7 +74,7 @@ class ContextManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ContextManager  (ISwapChain* swap_chain, const char* init_string, const LogHandler& log_handler);
+    ContextManager  (ISwapChain* swap_chain, const char* init_string);
     ContextManager  (const ContextManager&);
     ~ContextManager ();
 

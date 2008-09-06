@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace render::low_level;
+using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::windows;
 
 namespace
@@ -25,6 +26,7 @@ typedef stl::vector<OutputPtr> OutputArray;
 
 struct OutputArrayBuilder
 {
+  Log          log;     //протокол
   OutputArray& outputs; //массив устройств вывода
 
   OutputArrayBuilder (OutputArray& in_outputs) : outputs (in_outputs)
@@ -50,16 +52,31 @@ struct OutputArrayBuilder
     info.cbSize = sizeof (info);
 
     if (!GetMonitorInfo (monitor, &info))
-      return FALSE;
+      return TRUE;
 
     DISPLAY_DEVICE device_info;
 
     memset (&device_info, 0, sizeof device_info);
 
     device_info.cb = sizeof device_info;
+
+    if (!EnumDisplayDevices (info.szDevice, 0, &device_info, 0))
+      return TRUE;
       
-    for (size_t i=0; EnumDisplayDevices (info.szDevice, i, &device_info, 0); i++)
-      builder->outputs.push_back (OutputPtr (new Output (device_info), false));
+    try
+    {
+      OutputPtr output (new Output (device_info.DeviceString, info.szDevice), false);
+    
+      builder->outputs.push_back (output);
+    }
+    catch (std::exception& exception)
+    {
+      builder->log.Printf ("%s\n    at render::low_level::opengl::windows::OutputArrayBuilder::MonitorEnumProc", exception.what ());
+    }
+    catch (...)
+    {
+      builder->log.Printf ("Unknown exception\n    at render::low_level::opengl::windows::OutputArrayBuilder::MonitorEnumProc");
+    }    
 
     return TRUE;
   }
@@ -145,7 +162,7 @@ struct OutputSearcher
   {
     EnumDisplayMonitors (dc, 0, &OutputSearcher::MonitorEnumProc, reinterpret_cast<DWORD> (this));
   }
-  
+
   static BOOL CALLBACK MonitorEnumProc (HMONITOR monitor, HDC dc, LPRECT intersection_region, LPARAM data)
   {
     OutputSearcher* search_data = reinterpret_cast<OutputSearcher*> (data);
@@ -163,7 +180,7 @@ struct OutputSearcher
       return FALSE;
 
     size_t intersection_region_size = (intersection_region->right - intersection_region->left) *
-                                      (intersection_region->bottom - intersection_region->top);
+                                      (intersection_region->bottom - intersection_region->top);                                      
                                       
     if (intersection_region_size > search_data->intersection_region_size)
     {
@@ -192,7 +209,7 @@ Output* OutputManager::FindContainingOutput (HWND window) const
   if (!window)
     return 0;
 
-  HDC dc = GetWindowDC (window);
+  HDC dc = GetWindowDC (window);  
 
   if (!dc)
     return 0;

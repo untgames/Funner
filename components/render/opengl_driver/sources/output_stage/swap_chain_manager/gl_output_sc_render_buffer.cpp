@@ -85,8 +85,8 @@ SwapChainColorBuffer::SwapChainColorBuffer
 SwapChainColorBuffer::SwapChainColorBuffer (const FrameBufferManager& manager, ISwapChain* in_swap_chain, const TextureDesc& desc)
   : SwapChainRenderBuffer (manager, desc),
     swap_chain (in_swap_chain),
-    buffer_index (1),
-    buffer_type (GL_BACK),
+    buffer_index (0),
+    buffer_type (GL_FRONT),
     is_shadow (true)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainColorBuffer::SwapChainColorBuffer";
@@ -94,7 +94,21 @@ SwapChainColorBuffer::SwapChainColorBuffer (const FrameBufferManager& manager, I
     //проверка корректности переданных параметров
 
   if (!swap_chain)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");   
+    throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");
+    
+    //установка индекса буфера
+    
+  SwapChainDesc swap_chain_desc;
+
+  memset (&swap_chain_desc, 0, sizeof swap_chain_desc);
+
+  swap_chain->GetDesc (swap_chain_desc);
+
+  if (swap_chain_desc.buffers_count > 1)
+  {    
+    buffer_index = 1;
+    buffer_type  = GL_BACK;
+  }
 }
 
 /*

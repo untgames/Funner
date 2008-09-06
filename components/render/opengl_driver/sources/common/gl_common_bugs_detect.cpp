@@ -84,10 +84,10 @@ bool detect_proxy_texture2d_bug ()
 void detect_opengl_bugs (stl::string& extensions)
 {
   if (detect_texture3d_bug ())
-    extensions += " GLBUG_Texture3D_GetTexImage";
-    
+    extensions += " GLBUG_texture3D_get_tex_image";
+
   if (detect_proxy_texture2d_bug ())
-    extensions += " GLBUG_Texture2D_NoProxy";
+    extensions += " GLBUG_texture2D_no_proxy";
 }
 
 }

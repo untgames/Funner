@@ -19,9 +19,9 @@ namespace
 
 struct FrameBufferHolder: public xtl::trackable, public xtl::reference_counter
 {
-  View*         render_target_view; //целевое отображение буфера цвета
-  View*         depth_stencil_view; //целевое отображение буфера глубина-трафарет
-  IFrameBuffer* frame_buffer;       //буфер кадра
+  View*                       render_target_view; //целевое отображение буфера цвета
+  View*                       depth_stencil_view; //целевое отображение буфера глубина-трафарет
+  stl::auto_ptr<IFrameBuffer> frame_buffer;       //буфер кадра
 
   FrameBufferHolder (View* in_render_target_view, View* in_depth_stencil_view, FrameBufferManager& manager) :
     render_target_view (in_render_target_view),
@@ -301,8 +301,12 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
       register_swap_chain_manager (frame_buffer_manager);
 
         //инициализация отображений
-        
-      xtl::com_ptr<ITexture> color_texture (frame_buffer_manager.CreateColorBuffer (swap_chain, 1), false),
+
+      SwapChainDesc swap_chain_desc;
+
+      swap_chain->GetDesc (swap_chain_desc);        
+
+      xtl::com_ptr<ITexture> color_texture (frame_buffer_manager.CreateColorBuffer (swap_chain, swap_chain_desc.buffers_count > 1 ? 1 : 0), false),
                              depth_stencil_texture (frame_buffer_manager.CreateDepthStencilBuffer (swap_chain), false);
                              
       ViewDesc view_desc;
@@ -316,12 +320,12 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
       
         //установка текущего буфера кадров
 
-      BindRenderTargets ();
+      BindRenderTargets ();      
       
         //регистрация дополнительного менеджера буферов кадра
         
       if (GetCaps ().has_ext_framebuffer_object)
-        register_fbo_manager (frame_buffer_manager);
+        register_fbo_manager (frame_buffer_manager);        
         
         //инициализация BlendState
          
@@ -370,13 +374,9 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
       rasterizer_desc.multisample_enable      = false;
       rasterizer_desc.antialiased_line_enable = false;
 
-      default_rasterizer_state = RasterizerStatePtr (new RasterizerState (GetContextManager (), rasterizer_desc), false);
+      default_rasterizer_state = RasterizerStatePtr (new RasterizerState (GetContextManager (), rasterizer_desc), false);      
       
-        //инициализация областей отсечения и вывода
-        
-      SwapChainDesc swap_chain_desc;
-
-      swap_chain->GetDesc (swap_chain_desc);
+        //инициализация областей отсечения и вывода        
 
       Viewport default_viewport;
       Rect     default_scissor;
@@ -412,7 +412,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
       SetRasterizerState   (&*default_rasterizer_state);
       SetViewport          (default_viewport);
       SetScissor           (default_scissor);
-    }    
+    }
     
       //создание отображения
     View* CreateView (ITexture* texture, const ViewDesc& desc)
@@ -567,7 +567,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
         }
 
           //очистка выбранных буферов
-
+          
         glClear (mask);
         
           //восстановление состояния OpenGL
@@ -821,7 +821,7 @@ struct OutputStage::Impl: public ContextObject, public FrameBufferManagerHolder,
       frame_buffers.push_front (frame_buffer_holder);
 
       return &*frame_buffers.front ();
-    }    
+    }
     
       //добавление отображения
     void AddView (const xtl::com_ptr<View>& view)

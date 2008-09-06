@@ -338,21 +338,16 @@ class FppProgramParser
       ParseIntegerValues (program_iter, "Normalize",        offsetof (FppState, modes.normalize), 1);
 
         //разбор параметров освещения
-      
-      for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
+        
+      size_t light_index = 0;
+        
+      for (Parser::Iterator light_iter = program_iter->First ("Light"); light_iter && light_index < FPP_MAX_LIGHTS_COUNT; ++light_iter, ++light_index)
       {
-        char light_name [32];
-        
-        xtl::xsnprintf (light_name, sizeof light_name, "Light%u", i);
-        
-        Parser::Iterator light_iter = program_iter->First (light_name);
-
-        if (light_iter)
-          ParseLight (light_iter, offsetof (FppState, lights [i]));
+        ParseLight (light_iter, offsetof (FppState, lights [light_index]));
       }
-      
+
         //разбор параметров текстурирования
-        
+
       for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
       {
         char texmap_name [32];
@@ -432,7 +427,7 @@ FppProgram::FppProgram (const ContextManager& manager, const ShaderDesc& shader_
   if (!shader_desc.name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "shader_desc.name");    
 
-  error_log (format ("Compiling %s...", shader_desc.name).c_str ());
+  error_log (format ("Compiling '%s'...", shader_desc.name).c_str ());
 
   FppProgramParser (base_state, dynamic_parameters, shader_desc, error_log);
 }

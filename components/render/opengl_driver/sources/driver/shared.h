@@ -60,7 +60,7 @@ class Driver: virtual public IDriver, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание адаптера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IAdapter* CreateAdapter (const char* name, const char* path);
+    IAdapter* CreateAdapter (const char* name, const char* path, const char* init_string);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание цепочки обмена
@@ -77,12 +77,7 @@ class Driver: virtual public IDriver, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetDebugLog (const LogFunction&);
     const LogFunction& GetDebugLog ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Протоколирование
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LogMessage (const char* message) const;
-    
+
   private:
     void RegisterAdapter   (IAdapter*);
     void UnregisterAdapter (IAdapter*);
@@ -105,7 +100,7 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Device  (Driver* driver, ISwapChain* swap_chain, const char* init_string);
+    Device  (ISwapChain* swap_chain, const char* init_string);
     ~Device ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,10 +216,6 @@ class Device: virtual public IDevice, public Object
     void Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout = 0);
 
   private:
-    typedef xtl::com_ptr<Driver> DriverPtr;
-
-  private:
-    DriverPtr       driver;                 //драйвер OpenGL
     ContextManager  context_manager;        //менеджер контекстов OpenGL
     PropertyList    properties;             //свойства устройства
     OutputStage     output_stage;           //выходной уровень

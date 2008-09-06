@@ -21,16 +21,16 @@ bool get_mode_desc (const char* device_name, int mode_index, OutputModeDesc& mod
   DEVMODE dev_mode_desc;
   
   memset (&dev_mode_desc, 0, sizeof (dev_mode_desc));
-  
-  dev_mode_desc.dmSize = sizeof (dev_mode_desc);
-  
+
+  dev_mode_desc.dmSize  = sizeof (dev_mode_desc);
+
   if (!EnumDisplaySettings (device_name, mode_index, &dev_mode_desc))
     return false;
 
   mode_desc.width        = dev_mode_desc.dmPelsWidth;
   mode_desc.height       = dev_mode_desc.dmPelsHeight;
   mode_desc.color_bits   = dev_mode_desc.dmBitsPerPel;
-  mode_desc.refresh_rate = dev_mode_desc.dmDisplayFrequency;
+  mode_desc.refresh_rate = dev_mode_desc.dmDisplayFrequency;  
   
   if (screen_rect)  
   {
@@ -89,14 +89,24 @@ struct Output::Impl
     Конструктор / деструктор
 */
 
-Output::Output (const DISPLAY_DEVICE& device_info)
+Output::Output (const char* device_name, const char* win_name)
   : impl (new Impl)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::windows::Output::Output";
+
+    //проверка корректности аргументов
+
+  if (!device_name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "device_name");
+
+  if (!win_name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "win_name");
+
     //получение имени устройства
 
-  impl->name     = device_info.DeviceString;
-  impl->win_name = device_info.DeviceName;
-
+  impl->name     = device_name;
+  impl->win_name = win_name;
+  
     //отсечение завершающих пробелов в имени устройства
 
   stl::string::reverse_iterator iter;
@@ -104,42 +114,10 @@ Output::Output (const DISPLAY_DEVICE& device_info)
   for (iter=impl->name.rbegin (); iter!=impl->name.rend () && *iter == ' '; ++iter);
 
   impl->name.erase (iter.base (), impl->name.end ());
-  
-    //формирование строки флагов устройства
-    
-  stl::string flags_string;
-  
-  struct Tag2Flag
-  {
-    const char* tag;
-    size_t      flag;
-  };
-  
-  static const Tag2Flag flags [] = {
-    {"ATTACHED_TO_DESKTOP", DISPLAY_DEVICE_ATTACHED_TO_DESKTOP},
-    {"MIRRORING_DRIVER",    DISPLAY_DEVICE_MIRRORING_DRIVER},
-    {"MODESPRUNED",         DISPLAY_DEVICE_MODESPRUNED},
-    {"PRIMARY_DEVICE",      DISPLAY_DEVICE_PRIMARY_DEVICE},
-    {"REMOVABLE",           DISPLAY_DEVICE_REMOVABLE},
-    {"VGA_COMPATIBLE",      DISPLAY_DEVICE_VGA_COMPATIBLE},
-    {0, 0}
-  };
-  
-  for (const Tag2Flag* i=flags; i->tag; ++i)
-    if (i->flag & device_info.StateFlags)
-    {
-      if (!flags_string.empty ())
-        flags_string += " | ";
-        
-      flags_string += i->tag;
-    }
 
     //регистрация свойств
 
-  impl->properties.AddProperty ("win-name",     device_info.DeviceName);
-  impl->properties.AddProperty ("flags",        flags_string.c_str ());
-  impl->properties.AddProperty ("pci-id",       device_info.DeviceID);
-  impl->properties.AddProperty ("registry-key", device_info.DeviceKey);
+  impl->properties.AddProperty ("win-name", impl->win_name.c_str ());
   
     //построение списка видео-режимов
     
@@ -236,7 +214,7 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   DEVMODE dev_mode_desc;
 
   memset (&dev_mode_desc, 0, sizeof (dev_mode_desc));
-
+  
   dev_mode_desc.dmSize             = sizeof (DEVMODE);
   dev_mode_desc.dmPelsWidth        = mode_desc.width;
   dev_mode_desc.dmPelsHeight       = mode_desc.height;

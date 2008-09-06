@@ -16,7 +16,7 @@ RENDER.OPENGL_DRIVER.UTILS.IMPORTS          :=  ../../common/compile.static.mak 
 #OpenGL render system sources
 RENDER.OPENGL_DRIVER.SOURCES.TYPE             := static-lib
 RENDER.OPENGL_DRIVER.SOURCES.NAME             := render.low_level.opengl_driver
-RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS     := sources ../../../extern/glew/include
+RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS     := sources sources/platform/win32/ddk
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS      := sources/common sources/driver sources/input_stage \
                                                  sources/output_stage sources/output_stage/swap_chain_manager sources/output_stage/fbo_manager \
                                                  sources/texture_manager sources/texture_manager/nv_dxt sources/shader_stage \

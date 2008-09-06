@@ -382,7 +382,7 @@ struct TextureManager::Impl: public ContextObject
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
       {
-        static Extension BUG_Texture2D_NoProxy = "GLBUG_Texture2D_NoProxy";
+        static Extension BUG_Texture2D_NoProxy = "GLBUG_texture2D_no_proxy";
 
         if (IsSupported (BUG_Texture2D_NoProxy))
           return new Texture2DNoProxy (GetContextManager (), desc); //создание текстуры в режиме эмул€ции

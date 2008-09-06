@@ -16,7 +16,6 @@
 #include <render/low_level/debug.h>
 #include <render/low_level/utils.h>
 
-//#include <stl/list>
 #include <stl/string>
 #include <stl/hash_map>
 
@@ -32,6 +31,8 @@
 
 #include <common/file.h>
 #include <common/hash.h>
+#include <common/log.h>
+#include <common/singleton.h>
 
 #include <media/image.h>
 #include <media/mesh.h>
@@ -53,20 +54,40 @@ typedef xtl::com_ptr<IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 
+//протокол теста
+struct TestLogFilter
+{
+  common::LogFilter log_filter;
+  
+  TestLogFilter () : log_filter ("*", &LogPrint) {}
+  
+  static void LogPrint (const char* log_name, const char* message)
+  {
+    printf ("%s: %s\n", log_name, message);
+    fflush (stdout);
+  }  
+};
+
+typedef common::Singleton<TestLogFilter> TestLogFilterSingleton;
+
 //тестовое приложение
 struct Test
 {
   typedef xtl::function<void (Test&)> CallbackFn;
 
-  syslib::Window window;
-  SwapChainPtr   swap_chain;
-  DevicePtr      device;
-  CallbackFn     redraw;
+  syslib::Window     window;
+  SwapChainPtr       swap_chain;
+  DevicePtr          device;
+  CallbackFn         redraw;
 
-  Test (const wchar_t* title, const CallbackFn& in_redraw, const char* init_string="") :
-    window (syslib::WindowStyle_Overlapped, 400, 300), redraw (in_redraw)
+  Test (const wchar_t* title, const CallbackFn& in_redraw, const char* adapter_mask="*", const char* init_string="") :
+    window (syslib::WindowStyle_Overlapped, 800, 600),
+    redraw (in_redraw)
   {
+    TestLogFilterSingleton::Instance (); //инициализация фильтра протокольных сообщений
+  
     window.SetTitle (title);
+    window.Show ();
 
     SwapChainDesc desc;
 
@@ -80,17 +101,18 @@ struct Test
     desc.samples_count             = 0;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = false;
-    desc.fullscreen                = true;
-    desc.window_handle             = window.Handle ();
+    desc.window_handle             = window.Handle ();    
 
-    DriverManager::CreateSwapChainAndDevice ("OpenGL", "*", desc, init_string, swap_chain, device);
+    DriverManager::CreateSwapChainAndDevice ("OpenGL", adapter_mask, desc, init_string, swap_chain, device);        
+    
+//    swap_chain->SetFullscreenState (true);
 
     OnResize ();
     
     window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Test::OnRedraw, this));
     window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Test::OnResize, this));
     window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Test::OnClose, this));
-  }   
+  }
  
   void OnResize ()
   {
@@ -105,11 +127,9 @@ struct Test
       vp.width     = rect.right - rect.left;
       vp.height    = rect.bottom - rect.top;
       vp.min_depth = 0;
-      vp.max_depth = 1;
+      vp.max_depth = 1;            
 
       device->RSSetViewport (vp);
-
-      window.Invalidate ();
     }
     catch (std::exception& e)
     {
@@ -129,11 +149,13 @@ struct Test
       clear_color.alpha = 0;      
 
       device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);
-      
+
       if (redraw)
         redraw (*this);      
-     
-      swap_chain->Present ();    
+
+      device->Flush ();
+
+      swap_chain->Present ();
     }
     catch (std::exception& e)
     {
@@ -144,7 +166,7 @@ struct Test
   void OnClose ()
   {
     syslib::Application::Exit (0);
-  }
+  }  
 };
 
 //чтение ихсодного текста шейдера в строку

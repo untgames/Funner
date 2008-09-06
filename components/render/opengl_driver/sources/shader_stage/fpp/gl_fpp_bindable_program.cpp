@@ -366,7 +366,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         {
           glDisable (light_id);
           continue;
-        }
+        }        
 
         float position [4] = {light.position [0], light.position [1], light.position [2], light.type != LightType_Remote};
 

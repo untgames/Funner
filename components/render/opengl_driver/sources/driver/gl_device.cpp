@@ -8,9 +8,8 @@ using namespace common;
     Конструктор / деструктор
 */
 
-Device::Device (Driver* in_driver, ISwapChain* swap_chain, const char* init_string)
-  : driver (in_driver),
-    context_manager (swap_chain, init_string, xtl::bind (&Driver::LogMessage, in_driver, _1)),
+Device::Device (ISwapChain* swap_chain, const char* init_string)
+  : context_manager (swap_chain, init_string),
     output_stage (context_manager, swap_chain),
     input_stage (context_manager),
     texture_manager (context_manager),

@@ -89,7 +89,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (draw3)", &redraw, "check_gl_errors=0");
+    Test test (L"OpenGL device test window (draw3)", &redraw);
     
     test.window.Show ();
    

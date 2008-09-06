@@ -29,33 +29,48 @@ class PlatformManagerImpl
         //резервирование места для хранения адаптеров "по умолчанию"
 
       default_adapters.reserve (ADAPTERS_ARRAY_RESERVE_SIZE);
+      
+        //получение пути к директории Windows
+        
+      stl::string win_dir;      
 
+      win_dir.fast_resize (GetWindowsDirectory (&win_dir [0], 0));      
+
+      if (GetWindowsDirectory (&win_dir [0], win_dir.size ()))
+      {      
+        win_dir.pop_back ();
+
+          //загрузка MSOGL
+
+        LoadDefaultAdapter ("MSOGL", (win_dir + "\\system32\\ogldrv.dll").c_str (), "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture2D_no_proxy'");
+
+          //загрузка Direct3D эмулятора AcXtrnal
+
+        LoadDefaultAdapter ("Direct3D wrapper", (win_dir + "\\AppPatch\\AcXtrnal.dll").c_str ());
+      }      
+      
         //загрузка адаптера "по умолчанию"
 
-      LoadDefaultAdapter ("Default", "opengl32.dll");
-      
-        //загрузка Direct3D эмулятора (если он есть)
-
-      stl::string acxtrnal_path;
-
-      acxtrnal_path.fast_resize (GetWindowsDirectory (&acxtrnal_path [0], 0));      
-
-      if (!GetWindowsDirectory (&acxtrnal_path [0], acxtrnal_path.size ()))
-        raise_error ("GetWindowsDirectory");
-
-      acxtrnal_path.pop_back ();
-
-      acxtrnal_path += "/AppPatch/AcXtrnal.dll";
-
-      LoadDefaultAdapter ("Direct3D wrapper", acxtrnal_path.c_str ());
+      LoadDefaultAdapter ("Default", "opengl32.dll");      
     }
-  
+
 ///Создание адаптера
-    IAdapter* CreateAdapter (const char* name, const char* path)
+    Adapter* CreateAdapter (const char* name, const char* path, const char* init_string)
     {
       try
       {
-        return new Adapter (name, path);
+        if (!name)
+          throw xtl::make_null_argument_exception ("", "name");
+
+        if (!path)
+          throw xtl::make_null_argument_exception ("", "path");
+          
+        if (!init_string)
+          init_string = "";
+
+        log.Printf ("Create adapter '%s' (path='%s', init_string='%s')...", name, path, init_string);
+
+        return new Adapter (name, path, init_string);
       }
       catch (xtl::exception& exception)
       {
@@ -80,6 +95,8 @@ class PlatformManagerImpl
 
         if (adapters_count && !adapters)
           throw xtl::make_null_argument_exception ("", "adapters");
+          
+        log.Printf ("Create swap chain...");
 
         struct DCHolder
         {
@@ -89,7 +106,7 @@ class PlatformManagerImpl
           DCHolder (const void* window_handle)
           {
             if (!window_handle)
-              throw xtl::make_null_argument_exception ("", "swap_chain_desc.window_handle");            
+              throw xtl::make_null_argument_exception ("", "swap_chain_desc.window_handle");                          
               
             window = (HWND)window_handle;
             dc     = GetDC (window);
@@ -127,12 +144,72 @@ class PlatformManagerImpl
             throw xtl::format_exception<xtl::argument_exception> ("", "Invalid argument 'adapters[%u]'. Wrong type '%s'",
               i, typeid (*in_adapter).name ());
 
-          adapter->EnumPixelFormats (dc_holder.window, dc_holder.dc, pixel_formats, wgl_extension_entries);
+          try
+          {
+            log.Printf ("...enumerate pixel formats on adapter '%s'", adapter->GetName ());
+
+            adapter->EnumPixelFormats (dc_holder.window, dc_holder.dc, pixel_formats, wgl_extension_entries);
+          }
+          catch (std::exception& exception)
+          {
+            log.Printf ("%s\n    at enumerate pixel formats on adapter '%s'", exception.what (), adapter->GetName ());
+          }
+          catch (...)
+          {
+            log.Printf ("Unknown exception\n    at enumerate pixel formats on adapter '%s'", adapter->GetName ());
+          }
         }
 
-          //выбор наиболее подходящего формата
+          //выбор наиболее подходящего формата          
 
-        const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc);        
+        const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc);
+
+          //протоколирование выбранного формата
+
+        const char* acceleration_string = "";
+        
+        switch (pixel_format.acceleration)
+        {
+          default:
+          case Acceleration_No:
+            acceleration_string = "SW";
+            break;
+          case Acceleration_MCD:
+            acceleration_string = "MCD";
+            break;
+          case Acceleration_ICD:
+            acceleration_string = "ICD";
+            break;
+        }
+
+        stl::string flags;
+        
+        if (pixel_format.buffers_count > 1)
+        {
+          flags += ", SwapMethod=";
+          flags += get_name (pixel_format.swap_method);
+          flags += ", DOUBLE_BUFFER";
+        }
+
+        if (pixel_format.support_draw_to_pbuffer)
+        {
+          if (flags.empty ()) flags += ", ";
+          else                flags += " | ";          
+          
+          flags += "PBUFFER";
+        }
+
+        if (pixel_format.support_stereo)
+        {
+          if (flags.empty ()) flags += ", ";
+          else                flags += " | ";          
+          
+          flags += " | STEREO";          
+        }
+
+        log.Printf ("...choose %s pixel format #%u on adapter '%s' (RGB/A: %u/%u, D/S: %u/%u, Samples: %u%s)",
+          acceleration_string, pixel_format.pixel_format_index, pixel_format.adapter->GetName (), pixel_format.color_bits,
+          pixel_format.alpha_bits, pixel_format.depth_bits, pixel_format.stencil_bits, pixel_format.samples_count, flags.c_str ());
 
           //создание цепочки обмена
 
@@ -183,28 +260,25 @@ class PlatformManagerImpl
     
   private:
 ///Попытка загрузки адаптера "по умолчанию"
-    void LoadDefaultAdapter (const char* name, const char* path)
+    void LoadDefaultAdapter (const char* name, const char* path, const char* init_string = "")
     {
       try
       {
           //создание адаптера
 
-        AdapterPtr adapter (new Adapter (name, path), false);
+        AdapterPtr adapter (CreateAdapter (name, path, init_string), false);
 
           //регистрация адаптера
 
         default_adapters.push_back (adapter);
       }
       catch (std::exception& exception)
-      {
-          //сделать протоколирование!!!
-        printf ("Error at load default OpenGL adapter (name='%s', path='%s'): %s\n", name, path, exception.what ());
-
-          //подавление исключения
+      {        
+        log.Printf ("%s\n    at render::low_level::opengl::PlatformManager::LoadDefaultAdapter('%s', '%s')", exception.what (), name, path);
       }
       catch (...)
       {
-        //подавление всех исключений
+        log.Printf ("Unknown exception\n    at render::low_level::opengl::PlatformManager::LoadDefaultAdapter('%s', '%s')", name, path);
       }
     }
     
@@ -339,6 +413,7 @@ class PlatformManagerImpl
     typedef stl::vector<AdapterPtr> AdapterArray;
 
   private:
+    Log          log;              //протокол
     AdapterArray default_adapters; //адаптеры "по умолчанию"
 };
 
@@ -350,9 +425,9 @@ typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;
     Обёртки над менеджером платформы
 */
 
-IAdapter* PlatformManager::CreateAdapter (const char* name, const char* path)
+IAdapter* PlatformManager::CreateAdapter (const char* name, const char* path, const char* init_string)
 {
-  return PlatformManagerSingleton::Instance ().CreateAdapter (name, path);
+  return PlatformManagerSingleton::Instance ().CreateAdapter (name, path, init_string);
 }
 
 void PlatformManager::EnumDefaultAdapters (const xtl::function<void (IAdapter*)>& handler)

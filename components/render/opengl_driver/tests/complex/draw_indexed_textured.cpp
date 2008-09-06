@@ -27,7 +27,7 @@ struct MyVertex
 
 void redraw (Test& test)
 {
-  test.device->DrawIndexed (PrimitiveType_TriangleList, 0, 6, 0);
+  test.device->DrawIndexed (PrimitiveType_TriangleList, 0, 6, 0);  
 }
 
 int main ()
@@ -37,7 +37,7 @@ int main ()
   try
   {
     Test test (L"OpenGL device test window (draw_indexed_textured)", &redraw);
-    
+
     test.window.Show ();
    
     printf ("Create vertex buffer\n");
@@ -140,7 +140,6 @@ int main ()
     SamplerStatePtr sampler (test.device->CreateSamplerState (sampler_desc), false);
 
     texture->SetData (0, 0, 0, 0, image.Width (), image.Height (), PixelFormat_RGB8, image.Bitmap ());
-    printf ("in\n");    
 
     test.device->SSSetTexture (0, texture.get ());
     test.device->SSSetSampler (0, sampler.get ());

@@ -311,8 +311,9 @@ const char* extensions [] = {
   "GL_WIN_specular_fog",
   "GL_WIN_swap_hint",
 
-  "GLBUG_Texture3D_GetTexImage",
-  "GLBUG_Texture2D_NoProxy"
+  "GLBUG_texture3D_get_tex_image",
+  "GLBUG_texture2D_no_proxy",
+  "GLBUG_swap_buffers_twice_call"
 };
 
 const size_t EXTENSIONS_COUNT = sizeof (extensions) / sizeof (*extensions);      

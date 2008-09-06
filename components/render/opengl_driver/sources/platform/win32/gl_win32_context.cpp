@@ -11,8 +11,9 @@ using namespace render::low_level::opengl::windows;
 typedef xtl::com_ptr<Adapter>          AdapterPtr;
 typedef stl::vector<IContextListener*> ListenerArray;
 
-struct Context::Impl: public IContextListener
+struct Context::Impl: public IContextLostListener
 {
+  Log                         log;                   //протокол
   AdapterPtr                  adapter;               //адаптер
   HGLRC                       context;               //контекст OpenGL
   int                         pixel_format;          //формат пикселей
@@ -73,8 +74,6 @@ struct Context::Impl: public IContextListener
 ///Обработчик события потери текущего контекста
   void OnLostCurrent ()
   {
-    adapter->SetContextListener (0);
-
     LostCurrentNotify ();
   }  
 };
@@ -91,9 +90,9 @@ Context::Context (ISwapChain* in_swap_chain)
       //проверка корректности аргументов
       
     if (!in_swap_chain)
-      throw xtl::make_null_argument_exception ("", "swap_chain");      
+      throw xtl::make_null_argument_exception ("", "swap_chain");
 
-    ISwapChainImpl* swap_chain = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");
+    ISwapChainImpl* swap_chain = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");    
     
       //инициализация адаптера
       
@@ -112,10 +111,14 @@ Context::Context (ISwapChain* in_swap_chain)
 
       //создание контекста
 
-    impl->context = impl->adapter->CreateContext (dc);
+    impl->context = impl->adapter->GetLibrary ().CreateContext (dc);    
+    
+    impl->log.Printf ("Create context (id=%u)...", GetId ());
 
     if (!impl->context)
       raise_error ("wglCreateContext");
+      
+    impl->log.Printf ("...context created successfull (handle=%08u)", impl->context);
   }
   catch (xtl::exception& exception)
   {
@@ -128,14 +131,26 @@ Context::~Context ()
 {
   try
   {
-      //отмена текущего контекста
+    impl->log.Printf ("Destroy context (id=%u)...", GetId ());
     
-    if (impl->adapter->GetCurrentContext () == impl->context)
-      impl->adapter->MakeCurrent (0, 0);
+    IAdapterLibrary& library = impl->adapter->GetLibrary ();
+
+      //отмена текущего контекста
+
+    if (library.GetCurrentContext () == impl->context)
+    {
+      impl->log.Printf ("...release current context");
+      
+      library.MakeCurrent (0, 0);
+    }
 
       //удаление контекста
+      
+    impl->log.Printf ("...delete context (handle=%08u)", impl->context);
 
-    impl->adapter->DeleteContext (impl->context);
+    library.DeleteContext (impl->context);
+
+    impl->log.Printf ("...context successfully destroyed");
   }
   catch (...)
   {
@@ -172,15 +187,11 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
       //установка текущего контекста
 
-    impl->adapter->MakeCurrent (impl->device_context, impl->context);
+    impl->adapter->GetLibrary ().MakeCurrent (impl->device_context, impl->context, &*impl);
 
       //установка вертикальной синхронизации
 
     impl->SetVSync ();
-
-      //подписка на событие потери контекста
-
-    impl->adapter->SetContextListener (&*impl);
 
       //оповещение об установке текущего контекста
 

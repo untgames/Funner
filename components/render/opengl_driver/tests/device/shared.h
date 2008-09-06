@@ -76,7 +76,8 @@ struct Test
   size_t         log_mode;  
   
   Test (const wchar_t* title, const char* init_string="") :
-    window (syslib::WindowStyle_Overlapped, 640, 480)
+//    window (syslib::WindowStyle_Overlapped, 640, 480)
+    window (syslib::WindowStyle_PopUp, 1024, 768)
   {
     window.SetTitle (title);
 

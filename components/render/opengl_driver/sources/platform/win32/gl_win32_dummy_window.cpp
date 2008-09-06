@@ -86,10 +86,10 @@ void RegisterWindowClass ()
   wc.lpfnWndProc   = &WindowMessageHandler;
   wc.hInstance     = GetModuleHandle (0);
   wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-  wc.lpszClassName = WINDOW_CLASS_NAME;
+  wc.lpszClassName = WINDOW_CLASS_NAME;  
 
   if (!RegisterClass (&wc))
-    raise_error ("::RegisterClass");
+    raise_error ("::RegisterClass");    
 }
 
 void UnregisterWindowClass ()
@@ -120,7 +120,7 @@ DummyWindow::DummyWindow (HWND parent, IWindowListener* listener)
       
     try
     {
-        //создание окна
+        //создание окна        
       
       window = CreateWindowA (WINDOW_CLASS_NAME, "", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                               parent, 0, GetModuleHandle (0), listener);

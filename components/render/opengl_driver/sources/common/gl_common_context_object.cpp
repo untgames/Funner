@@ -73,7 +73,7 @@ const ContextCaps& ContextObject::GetCaps () const
 void ContextObject::LogPrintf  (const char* format, ...) const
 {
   va_list args;
-  
+
   va_start (args, format);
 
   context_manager.LogVPrintf (format, args);

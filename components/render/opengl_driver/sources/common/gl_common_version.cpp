@@ -42,17 +42,20 @@ Version::Version (const char* string)
   dot    = strchr (string, '.');
 
   if (!dot)
-    return;    
-    
+    dot = string + strlen (string);
+
   buffer.assign (string, dot);  
   
   minor_version = atoi (buffer.c_str ());
   
     //получение номера билда
     
-  string = dot + 1;
+  if (*dot)
+  {    
+    string = dot + 1;
 
-  build_number = atoi (string);
+    build_number = atoi (string);
+  }
 }
 
 /*

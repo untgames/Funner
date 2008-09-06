@@ -206,7 +206,6 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     case TexMinFilter_LinearMipLinear: gl_min_filter = GL_LINEAR_MIPMAP_LINEAR; break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.min_filter", in_desc.min_filter);
-      break;
   }
   
   switch (in_desc.mag_filter)
@@ -216,7 +215,6 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
     case TexMagFilter_Linear: gl_mag_filter = GL_LINEAR; break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.mag_filter", in_desc.mag_filter);
-      break;
   }
 
   TexcoordWrap wrap [Texcoord_Num] = {in_desc.wrap_u, in_desc.wrap_v, in_desc.wrap_w};
@@ -249,23 +247,21 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
         break;
       default:
         throw xtl::make_argument_exception (METHOD_NAME, wrap_name [i], wrap [i]);
-        break;
     }
   }
 
   switch (in_desc.comparision_function)
   {
-    case CompareMode_AlwaysFail:   gl_comparision_function = GL_NEVER; break;
-    case CompareMode_AlwaysPass:   gl_comparision_function = GL_ALWAYS; break;
-    case CompareMode_Equal:        gl_comparision_function = GL_EQUAL; break;
+    case CompareMode_AlwaysFail:   gl_comparision_function = GL_NEVER;    break;
+    case CompareMode_AlwaysPass:   gl_comparision_function = GL_ALWAYS;   break;
+    case CompareMode_Equal:        gl_comparision_function = GL_EQUAL;    break;
     case CompareMode_NotEqual:     gl_comparision_function = GL_NOTEQUAL; break;
-    case CompareMode_Less:         gl_comparision_function = GL_LESS; break;
-    case CompareMode_LessEqual:    gl_comparision_function = GL_LEQUAL; break;
-    case CompareMode_Greater:      gl_comparision_function = GL_GREATER; break;
-    case CompareMode_GreaterEqual: gl_comparision_function = GL_GEQUAL; break;
+    case CompareMode_Less:         gl_comparision_function = GL_LESS;     break;
+    case CompareMode_LessEqual:    gl_comparision_function = GL_LEQUAL;   break;
+    case CompareMode_Greater:      gl_comparision_function = GL_GREATER;  break;
+    case CompareMode_GreaterEqual: gl_comparision_function = GL_GEQUAL;   break;
     default:
-      throw xtl::make_argument_exception (METHOD_NAME, "desc.comparision_function", in_desc.comparision_function);
-      break;
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.comparision_function", in_desc.comparision_function);  
   }
   
   size_t max_anisotropy = in_desc.max_anisotropy;
@@ -316,8 +312,9 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
     if (caps.has_ext_shadow_funcs || caps.has_arb_shadow)
     {
-      cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-      cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_COMPARE_FUNC, gl_comparision_function);
+         ////!!!!!не работает для RGBA текстур в OpenGL-D3D Translator
+//      cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+//      cmd_list.Add (glTexParameteri, tex_target, GL_TEXTURE_COMPARE_FUNC, gl_comparision_function);
     }
 
     cmd_list.Add (glTexParameterfv, tex_target, GL_TEXTURE_BORDER_COLOR, (const float*)in_desc.border_color);

@@ -133,7 +133,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   for (size_t version_id = GlVersion_1_2; version_id != GlVersion_Num; version_id++)
   {
     if (ext.Get (versions [version_id]))
-      ext |= ExtensionSet (std_extension_set.versions [version_id]) &= enabled_extension_set;
+      (ext |= std_extension_set.versions [version_id]) &= enabled_extension_set;
   }
 
      //инициализация таблицы возможностей контекста

@@ -114,7 +114,7 @@ void Texture3D::GetData
 
     //если баг работы функции glGetTexImage не обнаружен - копирование производится как и в общем случае
 
-  static Extension BUG_Texture3D_GetTexImage = "GLBUG_Texture3D_GetTexImage";
+  static Extension BUG_Texture3D_GetTexImage = "GLBUG_texture3D_get_tex_image";
 
   if (!IsSupported (BUG_Texture3D_GetTexImage))
   {

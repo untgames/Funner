@@ -12,13 +12,14 @@ typedef xtl::com_ptr<PrimarySwapChain> SwapChainPtr;
 
 struct PBuffer::Impl
 {
-  SwapChainPtr               primary_swap_chain;  //основна€ цепочка обмена
-  SwapChainDesc              desc;                //дескриптор буфера
-  HPBUFFERARB                pbuffer;             //дескриптор PBuffer'а
-  HDC                        output_context;      //контекст устройства вывода
-  int                        pixel_format_index;  //индекс формата пикселей
-  bool                       create_largest_flag; //флаг, сигнализирующий о необходимости создани€ максимально возможного pbuffer'а
-  xtl::auto_connection       cds_connection;      //соединение с сигналом, оповещающим об изменении видео-режима
+  Log                        log;                   //протокол
+  SwapChainPtr               primary_swap_chain;    //основна€ цепочка обмена
+  SwapChainDesc              desc;                  //дескриптор буфера
+  HPBUFFERARB                pbuffer;               //дескриптор PBuffer'а
+  HDC                        output_context;        //контекст устройства вывода
+  int                        pixel_format_index;    //индекс формата пикселей
+  bool                       create_largest_flag;   //флаг, сигнализирующий о необходимости создани€ максимально возможного pbuffer'а
+  xtl::auto_connection       cds_connection;        //соединение с сигналом, оповещающим об изменении видео-режима
   const WglExtensionEntries* wgl_extension_entries; //таблица WGL-расширений  
 
 /// онструктор / деструктор
@@ -33,6 +34,7 @@ struct PBuffer::Impl
       throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");
 
     cds_connection = swap_chain->RegisterDisplayModeChangeHandler (xtl::bind (&PBuffer::Impl::OnDisplayModeChange, this));
+
     wgl_extension_entries = &swap_chain->GetWglExtensionEntries ();
     
     pixel_format_index = swap_chain->GetPixelFormat ();
@@ -76,6 +78,8 @@ struct PBuffer::Impl
   {
     try
     {
+      log.Printf ("Create PBuffer...");
+      
       HDC primary_device_context = primary_swap_chain->GetDC ();
         
         //поиск подход€щего формата пикселей
@@ -86,6 +90,8 @@ struct PBuffer::Impl
 
       int  pbuffer_attributes []  = {0, 0, WGL_PBUFFER_LARGEST_ARB, 1, 0, 0};
       int* pbuffer_attributes_ptr = create_largest_flag ? pbuffer_attributes + 2 : pbuffer_attributes;
+      
+      log.Printf ("...call wglCreatePbufferARB");
 
       pbuffer = wgl_extension_entries->CreatePbufferARB (primary_device_context, pixel_format, desc.frame_buffer.width, desc.frame_buffer.height,
                                                          pbuffer_attributes_ptr);
@@ -95,12 +101,16 @@ struct PBuffer::Impl
         
         //получение контекста вывода
         
+      log.Printf ("...call wglGetPbufferDCARB");
+        
       output_context = wgl_extension_entries->GetPbufferDCARB (pbuffer);
-      
+
       if (!output_context)
         raise_error ("wglGetPbufferDCARB");            
         
         //получение размеров созданного PBuffer'а
+        
+      log.Printf ("...call wglQueryPBufferARB");
         
       int width, height;
 
@@ -108,13 +118,28 @@ struct PBuffer::Impl
           !wgl_extension_entries->QueryPbufferARB (pbuffer, WGL_PBUFFER_HEIGHT_ARB, &height))
         raise_error ("wglQueryPBufferARB");
 
+      log.Printf ("...PBuffer %ux%u successfully created", width, height);
+
       desc.frame_buffer.width  = (size_t)width;
       desc.frame_buffer.height = (size_t)height;
     }
     catch (...)
     {
-      if (output_context) wgl_extension_entries->ReleasePbufferDCARB (pbuffer, output_context);
-      if (pbuffer)        wgl_extension_entries->DestroyPbufferARB (pbuffer);
+      log.Printf ("...PBuffer creation failed");
+
+      if (output_context)
+      {
+        log.Printf ("...call wglReleasePbufferDCARB");
+
+        wgl_extension_entries->ReleasePbufferDCARB (pbuffer, output_context);
+      }
+
+      if (pbuffer)
+      {
+        log.Printf ("...call wglDestroyPbufferARB");
+        
+        wgl_extension_entries->DestroyPbufferARB (pbuffer);
+      }
       
       output_context = 0;
       pbuffer = 0;
@@ -127,16 +152,25 @@ struct PBuffer::Impl
   {
     try
     {
+      log.Printf ("Destroy PBuffer...");
+
+      log.Printf ("...call wglReleasePbufferDCARB");
+
       wgl_extension_entries->ReleasePbufferDCARB (pbuffer, output_context);
-      wgl_extension_entries->DestroyPbufferARB   (pbuffer);
+
+      log.Printf ("...call wglDestroyPbufferARB");
+
+      wgl_extension_entries->DestroyPbufferARB (pbuffer);
     }
     catch (...)
     {
       //подавл€ем все исключени€
     }
-    
-    output_context = 0;  
+
+    output_context = 0;
     pbuffer = 0;
+    
+    log.Printf ("...PBuffer successfully destroyed");
   }
 };
 

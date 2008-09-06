@@ -98,7 +98,7 @@ void Driver::UnregisterAdapter (IAdapter* adapter)
     Создание адаптера
 */
 
-IAdapter* Driver::CreateAdapter (const char* name, const char* path)
+IAdapter* Driver::CreateAdapter (const char* name, const char* path, const char* init_string)
 {
   try
   {
@@ -114,7 +114,7 @@ IAdapter* Driver::CreateAdapter (const char* name, const char* path)
 
     typedef xtl::com_ptr<IAdapter> AdapterPtr;
     
-    AdapterPtr adapter (PlatformManager::CreateAdapter (name, path), false);
+    AdapterPtr adapter (PlatformManager::CreateAdapter (name, path, init_string), false);
     
       //регистрация адаптера в драйвере
 
@@ -164,7 +164,7 @@ IDevice* Driver::CreateDevice (ISwapChain* swap_chain, const char* init_string)
   
   try
   {
-    return new Device (this, swap_chain, init_string);
+    return new Device (swap_chain, init_string);
   }
   catch (xtl::exception& exception)
   {
@@ -185,25 +185,6 @@ void Driver::SetDebugLog (const LogFunction& in_log_fn)
 const LogFunction& Driver::GetDebugLog ()
 {
   return log_fn;
-}
-
-/*
-    Протоколирование
-*/
-
-void Driver::LogMessage (const char* message) const
-{
-  if (!message)
-    return;
-    
-  try
-  {
-    log_fn (message);
-  }
-  catch (...)
-  {
-    //подавляем все исключения
-  }
 }
 
 /*

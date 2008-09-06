@@ -50,27 +50,27 @@ struct Model
     
   Model (const DevicePtr& in_device, const char* name) : device (in_device), library (name)
   {
-    printf ("Begin convert\n");
+//    printf ("Begin convert\n");
     
     LoadVertexBuffers ();
     LoadMeshes ();
     
-    printf ("Model has loaded successful!\n");    
+//    printf ("Model has loaded successful!\n");    
   }
   
   void LoadMeshes ()
   {
-    printf ("Load meshes\n");    
+//    printf ("Load meshes\n");    
     
     for (media::geometry::MeshLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)    
     {
       media::geometry::Mesh& mesh = *iter;      
       
-      printf ("Load mesh '%s'\n", mesh.Name ());
+//      printf ("Load mesh '%s'\n", mesh.Name ());
       
       ModelMeshPtr model_mesh (new ModelMesh);
       
-      printf ("Add vertex buffers\n");
+//      printf ("Add vertex buffers\n");
       
       for (size_t i=0, vb_count=mesh.VertexBuffersCount (); i<vb_count; i++)
       {
@@ -89,7 +89,7 @@ struct Model
         model_mesh->vertex_buffers.push_back (model_vb);
       }
       
-      printf ("Add index buffer\n");      
+//      printf ("Add index buffer\n");      
       
       const media::geometry::IndexBuffer& ib = mesh.IndexBuffer ();
       
@@ -100,7 +100,7 @@ struct Model
       {
         if (ib.Size ())
         {        
-          printf ("Create new hw index-buffer (%u indices)\n", ib.Size ());
+//          printf ("Create new hw index-buffer (%u indices)\n", ib.Size ());
           
           BufferDesc desc;
           
@@ -122,7 +122,7 @@ struct Model
       
       model_mesh->index_buffer = ib_buffer;
       
-      printf ("Add primitives\n");
+//      printf ("Add primitives\n");
       
       for (size_t i=0, primitives_count=mesh.PrimitivesCount (); i<primitives_count; i++)
       {
@@ -163,8 +163,8 @@ struct Model
         dst_primitive.vertex_buffer = model_mesh->vertex_buffers [src_primitive.vertex_buffer];
         dst_primitive.first         = src_primitive.first;
 
-        printf ("primitive#%u: type=%s vb-slot=%u vb-id=VB#%u vb-ptr=%p first=%u count=%u (vb-slots=%u)\n", i, get_name (dst_primitive.type), src_primitive.vertex_buffer,
-                dst_primitive.vertex_buffer->id, dst_primitive.vertex_buffer.get (), dst_primitive.first, dst_primitive.count, model_mesh->vertex_buffers.size ());
+//        printf ("primitive#%u: type=%s vb-slot=%u vb-id=VB#%u vb-ptr=%p first=%u count=%u (vb-slots=%u)\n", i, get_name (dst_primitive.type), src_primitive.vertex_buffer,
+//                dst_primitive.vertex_buffer->id, dst_primitive.vertex_buffer.get (), dst_primitive.first, dst_primitive.count, model_mesh->vertex_buffers.size ());
 
         model_mesh->primitives.push_back (dst_primitive);
       }
@@ -175,7 +175,7 @@ struct Model
 
   void LoadVertexBuffers ()
   {    
-    printf ("Load vertex buffers:\n");
+//    printf ("Load vertex buffers:\n");
     
     for (media::geometry::MeshLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)
     {
@@ -185,7 +185,7 @@ struct Model
       {
         media::geometry::VertexBuffer& vb = mesh.VertexBuffer (i);
         
-        printf ("Load VB#%u\n", vb.Id ());
+//        printf ("Load VB#%u\n", vb.Id ());
         
         VertexBufferPtr model_vb (new ModelVertexBuffer);
         
@@ -197,14 +197,14 @@ struct Model
         {
           media::geometry::VertexStream& vs = vb.Stream (j);
           
-          printf ("Load VS#%u\n", vs.Id ());          
+//          printf ("Load VS#%u\n", vs.Id ());          
           
           BufferMap::iterator iter = vertex_streams.find (vs.Id ());
           BufferPtr vs_buffer;
           
           if (iter == vertex_streams.end ())
           {            
-            printf ("Create new hw vertex-buffer\n");
+//            printf ("Create new hw vertex-buffer\n");
             
             BufferDesc desc;
             
@@ -295,9 +295,9 @@ struct Model
             dst_va.slot   = model_vb->vertex_streams.size ();
             dst_va.offset = src_va.offset;
             
-            printf ("va #%u: semantic=%s type=%s format=%s stride=%u slot=%u offset=%u\n",
-                    vertex_attributes.size (), get_name (dst_va.semantic), get_name (dst_va.type), get_name (dst_va.format),
-                    dst_va.stride, dst_va.slot, dst_va.offset);
+//            printf ("va #%u: semantic=%s type=%s format=%s stride=%u slot=%u offset=%u\n",
+//                    vertex_attributes.size (), get_name (dst_va.semantic), get_name (dst_va.type), get_name (dst_va.format),
+//                    dst_va.stride, dst_va.slot, dst_va.offset);
             
             vertex_attributes.push_back (dst_va);
           }
@@ -366,6 +366,7 @@ struct MyShaderParameters
   math::mat4f view_tm;
   math::mat4f proj_tm;
   math::vec3f light_pos;
+  math::vec3f light_dir; 
 };
 
 ModelPtr load_model (const DevicePtr& device, const char* file_name)
@@ -440,6 +441,7 @@ void idle (Test& test)
                                    math::rotatef (angle*0.2f, 1, 0, 0);
 
   my_shader_parameters.light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
+  my_shader_parameters.light_dir = -normalize (my_shader_parameters.light_pos);
 
   cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
  
@@ -471,7 +473,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (model_load)", &redraw, "check_gl_errors=0");
+    Test test (L"OpenGL device test window (model_load)", &redraw);
     
     test.window.Show ();    
     
@@ -491,7 +493,8 @@ int main ()
       {"myProjMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, proj_tm)},
       {"myViewMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, view_tm)},
       {"myObjectMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, object_tm)},
-      {"lightPos", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_pos)},      
+      {"lightPos", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_pos)},
+      {"lightDir", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_dir)},
     };
     
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};

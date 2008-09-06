@@ -2,7 +2,6 @@
 
 using namespace render::low_level;
 using namespace render::low_level::opengl;
-using namespace common;
 
 namespace
 {
@@ -58,14 +57,14 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         vendor_string     = reinterpret_cast<const char*> (glGetString (GL_VENDOR));
         renderer_string   = reinterpret_cast<const char*> (glGetString (GL_RENDERER));        
         
-          //добавление не переносимых расширений 
-          
+          //добавление непереносимых расширений 
+
         IPropertyList* swap_chain_properties = swap_chain->GetProperties ();        
-        
+
         if (swap_chain_properties)
         {
           for (size_t i=0, count=swap_chain_properties->GetSize (); i<count; i++)
-            if (!xtl::xstricmp (swap_chain_properties->GetKey (i), "gl_extensions"))
+            if (!xtl::xstrcmp (swap_chain_properties->GetKey (i), "gl_extensions"))
             {
               const char* extensions = swap_chain_properties->GetValue (i);              
 
@@ -77,7 +76,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
               
               break;
             }
-        }        
+        }
 
           //установка флагов поддержки расширений
 
@@ -144,7 +143,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
           
         stl::string bug_string;
 
-        detect_opengl_bugs (bug_string);
+        detect_opengl_bugs (bug_string);        
 
         extensions.SetGroup (bug_string.c_str (), true);
         
@@ -160,7 +159,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         throw;
       }
     }
-
+    
 ///Получение контекста
     IContext& GetContext () const { return *context; }
 
@@ -244,9 +243,8 @@ struct ContextManager::Impl: public xtl::reference_counter
 {
   public:  
 ///Конструктор
-    Impl (ISwapChain* swap_chain, const char* init_string, const LogHandler& in_log_handler)
+    Impl (ISwapChain* swap_chain, const char* init_string)
       : context (swap_chain, init_string),
-        log_handler (in_log_handler),
         current_swap_chain (0),
         check_gl_errors (true),
         need_change_context (true),
@@ -343,16 +341,14 @@ struct ContextManager::Impl: public xtl::reference_counter
 ///Протоколирование
     void LogPrint (const char* message)
     {
-      try
-      {
-        log_handler (message);
-      }
-      catch (...)
-      {
-        //подавляем все исключения
-      }
+      log.Print (message);
     }
-    
+
+    void LogVPrintf (const char* message, va_list args)
+    {
+      log.VPrintf (message, args);
+    }
+
 ///Включение / отключение проверки ошибок
     void SetValidationState (bool state)
     {
@@ -440,21 +436,22 @@ struct ContextManager::Impl: public xtl::reference_counter
     }
 
   private:
+    Log                       log;                           //протокол
     ContextImpl               context;                       //контекст
     LogHandler                log_handler;                   //обработчик протоколирования
     ISwapChain*               current_swap_chain;            //текущая цепочка обмена
     bool                      check_gl_errors;               //нужно ли проверять ошибки OpenGL
     bool                      need_change_context;           //необходимо сменить контекст
     xtl::trackable::slot_type on_destroy_swap_chain;         //обработчик удаления цепочки обмена
-    bool                      need_stage_rebind [Stage_Num]; //флаги, определяющие необходимость ребиндинга уровня
+    bool                      need_stage_rebind [Stage_Num]; //флаги, определяющие необходимость ребиндинга уровня    
 };
 
 /*
     Конструкторы / деструктор / присваивание
 */
 
-ContextManager::ContextManager (ISwapChain* swap_chain, const char* init_string, const LogHandler& log_handler)
-  : impl (new Impl (swap_chain, init_string, log_handler))
+ContextManager::ContextManager (ISwapChain* swap_chain, const char* init_string)
+  : impl (new Impl (swap_chain, init_string))
 {
 }
 
@@ -604,10 +601,7 @@ void ContextManager::LogPrintf (const char* format, ...) const
 
 void ContextManager::LogVPrintf (const char* format, va_list args) const
 {
-  if (!format)
-    return;
-
-  impl->LogPrint (common::vformat (format, args).c_str ());
+  impl->LogVPrintf (format, args);
 }
 
 /*
