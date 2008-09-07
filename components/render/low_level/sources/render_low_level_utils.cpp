@@ -174,6 +174,17 @@ const char* get_name (StencilOperation param)
   }
 }
 
+const char* get_name (FaceMode param)
+{
+  switch (param)
+  {    
+    case FaceMode_Front: return "FaceMode_Front";
+    case FaceMode_Back:  return "FaceMode_Back";
+    default:
+      throw xtl::make_argument_exception ("render::low_level::get_name(FaceMode)", "param", param);
+  }
+}
+
 const char* get_name (BlendOperation param)
 {
   switch (param)
