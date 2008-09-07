@@ -18,9 +18,10 @@ RENDER.OPENGL_DRIVER.SOURCES.TYPE             := static-lib
 RENDER.OPENGL_DRIVER.SOURCES.NAME             := render.low_level.opengl_driver
 RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS     := sources sources/platform/win32/ddk
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS      := sources/common sources/driver sources/input_stage \
-                                                 sources/output_stage sources/output_stage/swap_chain_manager sources/output_stage/fbo_manager \
+                                                 sources/frame_buffer_manager sources/frame_buffer_manager/swap_chain_manager \
+                                                 sources/frame_buffer_manager/fbo_manager \
                                                  sources/texture_manager sources/texture_manager/nv_dxt sources/shader_stage \
-                                                 sources/shader_stage/fpp sources/shader_stage/glsl sources/query_manager
+                                                 sources/shader_stage/fpp sources/shader_stage/glsl sources/query_manager sources/output_stage
 RENDER.OPENGL_DRIVER.SOURCES.LIB_DIRS         :=  
 RENDER.OPENGL_DRIVER.SOURCES.LIBS             := 
 RENDER.OPENGL_DRIVER.SOURCES.COMPILER_DEFINES := GLEW_STATIC GLEW_MX

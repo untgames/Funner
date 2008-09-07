@@ -10,7 +10,8 @@ using namespace common;
 
 Device::Device (ISwapChain* swap_chain, const char* init_string)
   : context_manager (swap_chain, init_string),
-    output_stage (context_manager, swap_chain),
+    frame_buffer_manager (context_manager, swap_chain),
+    output_stage (context_manager),
     input_stage (context_manager),
     texture_manager (context_manager),
     shader_stage (context_manager),
@@ -325,32 +326,6 @@ const Rect& Device::RSGetScissor ()
     Управление выходным уровнем (output-stage)
 */
 
-ITexture* Device::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
-{
-  try
-  {
-    return output_stage.CreateRenderTargetTexture (swap_chain, buffer_index);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::Device::CreateRenderTargetTexture");
-    throw;
-  }
-}
-
-ITexture* Device::CreateDepthStencilTexture (ISwapChain* swap_chain)
-{
-  try
-  {
-    return output_stage.CreateDepthStencilTexture (swap_chain);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::Device::CreateDepthStencilTexture");
-    throw;
-  }
-}
-
 IBlendState* Device::CreateBlendState (const BlendDesc& desc)
 {
   try
@@ -377,19 +352,6 @@ IDepthStencilState* Device::CreateDepthStencilState (const DepthStencilDesc& des
   }
 }
 
-IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
-{
-  try
-  {
-    return output_stage.CreateView (texture, desc);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::Device::CreateView");
-    throw;
-  }
-}
-
 void Device::OSSetBlendState (IBlendState* state)
 {
   output_stage.SetBlendState (state);
@@ -403,11 +365,6 @@ void Device::OSSetDepthStencilState (IDepthStencilState* state)
 void Device::OSSetStencilReference (size_t reference)
 {
   output_stage.SetStencilReference (reference);
-}
-
-void Device::OSSetRenderTargets (IView* render_target_view, IView* depth_stencil_view)
-{
-  output_stage.SetRenderTargets (render_target_view, depth_stencil_view);
 }
 
 IBlendState* Device::OSGetBlendState ()
@@ -425,33 +382,77 @@ size_t Device::OSGetStencilReference ()
   return output_stage.GetStencilReference ();
 }
 
+/*
+    Управление менеджером буферов кадра
+*/
+
+ITexture* Device::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
+{
+  try
+  {
+    return frame_buffer_manager.CreateRenderTargetTexture (swap_chain, buffer_index);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::Device::CreateRenderTargetTexture");
+    throw;
+  }
+}
+
+ITexture* Device::CreateDepthStencilTexture (ISwapChain* swap_chain)
+{
+  try
+  {
+    return frame_buffer_manager.CreateDepthStencilTexture (swap_chain);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::Device::CreateDepthStencilTexture");
+    throw;
+  }
+}
+
+IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
+{
+  try
+  {
+    return frame_buffer_manager.CreateView (texture, desc);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::Device::CreateView");
+    throw;
+  }
+}
+
+void Device::OSSetRenderTargets (IView* render_target_view, IView* depth_stencil_view)
+{
+  frame_buffer_manager.SetRenderTargets (render_target_view, depth_stencil_view);
+}
+
 IView* Device::OSGetRenderTargetView ()
 {
-  return output_stage.GetRenderTargetView ();
+  return frame_buffer_manager.GetRenderTargetView ();
 }
 
 IView* Device::OSGetDepthStencilView ()
 {
-  return output_stage.GetDepthStencilView ();
+  return frame_buffer_manager.GetDepthStencilView ();
 }
-
-/*
-    Очистка
-*/
 
 void Device::ClearRenderTargetView (const Color4f& color)
 {
-  output_stage.ClearRenderTargetView (color);
+  frame_buffer_manager.ClearRenderTargetView (color);
 }
 
 void Device::ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil)
 {
-  output_stage.ClearDepthStencilView (clear_flags, depth, stencil);
+  frame_buffer_manager.ClearDepthStencilView (clear_flags, depth, stencil);
 }
 
 void Device::ClearViews (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)
 {
-  output_stage.ClearViews (clear_flags, color, depth, stencil);
+  frame_buffer_manager.ClearViews (clear_flags, color, depth, stencil);
 }
 
 /*
@@ -494,10 +495,15 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
 {
   try
   {
+      //установка состояния менеджера буферов кадра
+    
       //установка состояния выходного уровня
     
     if (context_manager.NeedStageRebind (Stage_Output))
+    {
+      frame_buffer_manager.Bind (); //вынести отдельно!!!!
       output_stage.Bind ();
+    }
     
       //установка состояния входного уровня
 

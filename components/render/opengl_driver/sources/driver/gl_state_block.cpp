@@ -9,6 +9,7 @@ using namespace render::low_level::opengl;
 
 StateBlock::StateBlock (Device& device, const StateBlockMask& in_mask)
   : mask (in_mask),
+    frame_buffer_manager_state (device.frame_buffer_manager.CreateStageState ()),
     output_stage_state (device.output_stage.CreateStageState ()),
     input_stage_state (device.input_stage.CreateStageState ()),
     texture_manager_state (device.texture_manager.CreateStageState ()),
@@ -34,11 +35,12 @@ void StateBlock::Capture ()
 {
   try
   {
-    output_stage_state->Capture (mask);
-    input_stage_state->Capture (mask);
+    frame_buffer_manager->Capture  (mask);
+    output_stage_state->Capture    (mask);
+    input_stage_state->Capture     (mask);
     texture_manager_state->Capture (mask);
-    shader_stage_state->Capture (mask);
-    query_manager_state->Capture (mask);
+    shader_stage_state->Capture    (mask);
+    query_manager_state->Capture   (mask);
   }
   catch (xtl::exception& exception)
   {
@@ -55,11 +57,12 @@ void StateBlock::Apply ()
 {
   try
   {
-    output_stage_state->Apply (mask);
-    input_stage_state->Apply (mask);
+    frame_buffer_manager->Apply  (mask);
+    output_stage_state->Apply    (mask);
+    input_stage_state->Apply     (mask);
     texture_manager_state->Apply (mask);
-    shader_stage_state->Apply (mask);
-    query_manager_state->Apply (mask);
+    shader_stage_state->Apply    (mask);
+    query_manager_state->Apply   (mask);
   }
   catch (xtl::exception& exception)
   {

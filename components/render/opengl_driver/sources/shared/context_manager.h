@@ -28,6 +28,7 @@ enum Stage
   Stage_Output,
   Stage_TextureManager,
   Stage_QueryManager,
+  Stage_FrameBufferManager,
 
   Stage_Num
 };
