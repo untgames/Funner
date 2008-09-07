@@ -1,6 +1,10 @@
 #include "shared.h"
 
 size_t output_mode = OutputMode_Default;
+size_t total_tests   = 0;
+size_t success_tests = 0;
+size_t wrong_tests   = 0;
+size_t fail_tests    = 0;
 
 void print_input_layout_desc(const InputLayoutDesc& desc)
 {
@@ -34,6 +38,7 @@ void print_input_layout_desc(const InputLayoutDesc& desc)
 
 void test_input_layout_desc(const InputLayoutDesc& desc, IDevice* device)
 {
+	total_tests++;
   try
   {
     device->ISSetInputLayout(device->CreateInputLayout(desc));
@@ -45,15 +50,20 @@ void test_input_layout_desc(const InputLayoutDesc& desc, IDevice* device)
 
       printf ("Testing... OK\n");
     }
+    success_tests++;
+  }
+  catch (xtl::argument_exception&)
+  {
+  	wrong_tests++;
   }
   catch (std::exception& exception)
   {
     if (output_mode & OutputMode_Fail)
     {
       print_input_layout_desc (desc);
-      
       printf ("Testing... FAIL! exception: %s\n", exception.what ());
     }
+    fail_tests++;
   }
 }
 
@@ -134,6 +144,10 @@ int main ()
         }
       }
     }
+    printf ("Total tests count:   %u\n", total_tests);
+    printf ("Success tests count: %u\n", success_tests);
+    printf ("Wrong tests count:   %u\n", wrong_tests);
+    printf ("Fail tests count:    %u\n", fail_tests);
   }
   catch (std::exception& exception)
   {
