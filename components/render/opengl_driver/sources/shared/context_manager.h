@@ -28,7 +28,7 @@ enum Stage
   Stage_Output,
   Stage_TextureManager,
   Stage_QueryManager,
-  Stage_FrameBufferManager,
+  Stage_RenderTargetManager,
 
   Stage_Num
 };
@@ -40,6 +40,10 @@ enum CommonCache
 {
   CommonCache_ActiveTextureSlot,   //номер текущего активного слота текстурироания
   CommonCache_EnabledTextures,     //маска: установлена ли текстура в определенном слоте
+  CommonCache_ColorWriteMask,      //маска записи в буфер цвета
+  CommonCache_DepthWriteEnable,    //включена ли запись в буфер глубины
+  CommonCache_StencilWriteMask,    //маска записи в буфер трафарета  
+  CommonCache_ScissorEnable,       //включен ли тест отсечения  
 
   CommonCache_Num
 };

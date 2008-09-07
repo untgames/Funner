@@ -154,7 +154,7 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
 {
   public:
 /// онструктор
-    Impl (ContextManager& context_manager) :
+    Impl (const ContextManager& context_manager) :
       ContextObject (context_manager),
       OutputStageState (static_cast<ContextObject*> (this))
     {
@@ -215,7 +215,7 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
     }
     
 ///”становка состо€ни€ уровн€ в контекст OpenGL
-    void Bind ()
+    void Bind (bool has_render_target, bool has_depth_stencil)
     {
       try
       {      
@@ -223,27 +223,19 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
 
         BlendState* blend_state = GetBlendState ();        
 
-        if (blend_state && frame_buffer_manager.IsActiveColorBuffer ())
-        {
-          blend_state->Bind ();      
-        }
-        else
-        {
-          null_blend_state->Bind ();
-        }
-        
+        if (!blend_state || !has_render_target)
+          blend_state = null_blend_state.get ();
+
+        blend_state->Bind ();
+
           //установка состо€ни€ подуровн€ попиксельного отсечени€
 
         DepthStencilState* depth_stencil_state = GetDepthStencilState ();        
 
-        if (depth_stencil_state && frame_buffer_manager.IsActiveDepthStencilBuffer ())
-        {
-          depth_stencil_state->Bind (GetStencilReference ());
-        }
-        else
-        {
-          null_depth_stencil_state->Bind (GetStencilReference ());
-        }
+        if (!depth_stencil_state || !has_depth_stencil)
+          depth_stencil_state = null_depth_stencil_state.get ();
+
+        depth_stencil_state->Bind (GetStencilReference ());
 
           //установка состо€ни€ растеризатора
 
@@ -282,7 +274,7 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
      онструктор / деструктор
 */
 
-OutputStage::OutputStage (ContextManager& context_manager)
+OutputStage::OutputStage (const ContextManager& context_manager)
   : impl (new Impl (context_manager))
 {
 }
@@ -407,7 +399,7 @@ IRasterizerState* OutputStage::GetRasterizerState () const
     ”становка состо€ни€ уровн€ в контекст OpenGL
 */
 
-void OutputStage::Bind ()
+void OutputStage::Bind (bool has_render_target, bool has_depth_stencil_target)
 {
-  impl->Bind ();
+  impl->Bind (has_render_target, has_depth_stencil_target);
 }

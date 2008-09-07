@@ -278,8 +278,9 @@ void BlendState::Bind ()
     //проверка необходимости биндинга (кэширование состояния)
     
   size_t *state_cache              = &GetContextDataTable (Stage_Output)[0],
+         *state_common_cache       = &GetContextDataTable (Stage_Common)[0],
          &current_desc_hash        = state_cache [OutputStageCache_BlendStateHash],
-         &current_color_write_mask = state_cache [OutputStageCache_ColorWriteMask];
+         &current_color_write_mask = state_common_cache [CommonCache_ColorWriteMask];
 
   if (current_desc_hash == desc_hash)
     return;

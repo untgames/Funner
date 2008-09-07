@@ -8,17 +8,14 @@ using namespace common;
     Конструктор / деструктор
 */
 
-FboFrameBuffer::FboFrameBuffer (const FrameBufferManager& manager, View* color_view, View* depth_stencil_view)
-  : ContextObject (manager.GetContextManager ()),
+FboFrameBuffer::FboFrameBuffer (const FrameBufferManagerPtr& manager, View* color_view, View* depth_stencil_view)
+  : ContextObject (manager->GetContextManager ()),
     frame_buffer_manager (manager),
-    id (0)
+    id (0),
+    is_color_buffer_active (false)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FboFrameBuffer::FboFrameBuffer";
   
-    //сброс флагов активности целевых буферов
-    
-  memset (is_active, 0, sizeof is_active);
-
     //выбор текущего контекста
 
   MakeContextCurrent ();
@@ -39,7 +36,7 @@ FboFrameBuffer::FboFrameBuffer (const FrameBufferManager& manager, View* color_v
   {    
       //установка текущего буфера кадра в контекст OpenGL
     
-    frame_buffer_manager.SetFrameBuffer (id, GetId ());
+    frame_buffer_manager->SetFrameBuffer (id, GetId ());
     
       //установка активного буфера вывода и чтения
 
@@ -103,13 +100,14 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, View* view)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FboFrameBuffer::SetAttachment";
 
-    //установка флага активности целевого буфера
-
-  is_active [target_type] = view != 0;  
-
   if (!view)
     return;
     
+    //установка флага активности целевого буфера
+
+  if (target_type == RenderTargetType_Color)
+    is_color_buffer_active = view != 0;
+ 
     //проверка совместимости хранимой в отображении текстуры и буфера кадра    
     
   ITexture* base_texture = view->GetTexture ();
@@ -270,7 +268,6 @@ void FboFrameBuffer::FinishInitialization ()
   CheckErrors (METHOD_NAME);
 }
 
-
 /*
     Выбор буфера в контекст OpenGL
 */
@@ -279,8 +276,7 @@ void FboFrameBuffer::Bind ()
 {
   try
   {
-    frame_buffer_manager.SetFrameBuffer (id, GetId ());
-    frame_buffer_manager.SetFrameBufferActivity (is_active [RenderTargetType_Color], is_active [RenderTargetType_DepthStencil]);
+    frame_buffer_manager->SetFrameBuffer (id, GetId ());
   }
   catch (xtl::exception& exception)
   {

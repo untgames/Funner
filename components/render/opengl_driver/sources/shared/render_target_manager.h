@@ -1,5 +1,5 @@
-#ifndef RENDER_GL_DRIVER_FRAME_BUFFER_MANAGER_HEADER
-#define RENDER_GL_DRIVER_FRAME_BUFFER_MANAGER_HEADER
+#ifndef RENDER_GL_DRIVER_RENDER_TARGET_MANAGER_HEADER
+#define RENDER_GL_DRIVER_RENDER_TARGET_MANAGER_HEADER
 
 #include <stl/auto_ptr.h>
 #include <render/low_level/device.h>
@@ -15,16 +15,16 @@ namespace opengl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Менеджер буферов кадра
+///Менеджер целевых буферов рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FrameBufferManager
+class RenderTargetManager
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FrameBufferManager  (const ContextManager&, ISwapChain* swap_chain);
-    ~FrameBufferManager ();
+    RenderTargetManager  (const ContextManager&, ISwapChain* swap_chain);
+    ~RenderTargetManager ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание объекта состояния уровня
@@ -49,7 +49,7 @@ class FrameBufferManager
     void    SetRenderTargets    (IView* render_target_view, IView* depth_stencil_view);
     IView*  GetRenderTargetView () const;
     IView*  GetDepthStencilView () const;
-
+    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка подуровня растеризации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,8 +76,8 @@ class FrameBufferManager
     void Bind ();
 
   private:
-    FrameBufferManager (const FrameBufferManager&); //no impl
-    FrameBufferManager& operator = (const FrameBufferManager&); //no impl
+    RenderTargetManager (const RenderTargetManager&); //no impl
+    RenderTargetManager& operator = (const RenderTargetManager&); //no impl
   
   private:
     struct Impl;

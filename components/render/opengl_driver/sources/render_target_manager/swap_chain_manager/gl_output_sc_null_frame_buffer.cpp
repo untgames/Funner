@@ -8,8 +8,8 @@ using namespace common;
     Конструктор
 */
 
-SwapChainNullFrameBuffer::SwapChainNullFrameBuffer (const FrameBufferManager& in_frame_buffer_manager)
-  : ContextObject (in_frame_buffer_manager.GetContextManager ()),
+SwapChainNullFrameBuffer::SwapChainNullFrameBuffer (const FrameBufferManagerPtr& in_frame_buffer_manager)
+  : ContextObject (in_frame_buffer_manager->GetContextManager ()),
     frame_buffer_manager (in_frame_buffer_manager)
   {}
 
@@ -21,8 +21,7 @@ void SwapChainNullFrameBuffer::Bind ()
 {
   try
   {
-    frame_buffer_manager.SetFrameBuffer         ((ISwapChain*)0, GL_NONE);
-    frame_buffer_manager.SetFrameBufferActivity (false, false);
+    frame_buffer_manager->SetFrameBuffer ((ISwapChain*)0, GL_NONE);
   }
   catch (xtl::exception& exception)
   {

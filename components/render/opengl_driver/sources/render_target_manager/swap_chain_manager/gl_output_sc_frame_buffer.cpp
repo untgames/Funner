@@ -19,19 +19,19 @@ inline SwapChainFrameBuffer::RenderTarget::RenderTarget ()
     Конструктор / деструктор
 */
 
-SwapChainFrameBuffer::SwapChainFrameBuffer (SwapChainFrameBufferManager& manager, View* color_view, View* depth_stencil_view)
-  : ContextObject (manager.GetFrameBufferManager ().GetContextManager ()),
-    frame_buffer_manager (manager.GetFrameBufferManager ()),
-    has_texture_targets (false)
+SwapChainFrameBuffer::SwapChainFrameBuffer (const FrameBufferManagerPtr& manager, View* color_view, View* depth_stencil_view)
+  : ContextObject (manager->GetContextManager ()),
+    frame_buffer_manager (manager),
+    has_texture_targets (false),
+    is_color_buffer_active (false)
 {
   try
   {
-    memset (is_buffer_active, 0, sizeof is_buffer_active);
     memset (&dirty_rect, 0, sizeof dirty_rect);
    
     SetColorView         (color_view);
     SetDepthStencilView  (depth_stencil_view);
-    FinishInitialization (manager);
+    FinishInitialization ();
   }
   catch (xtl::exception& exception)
   {
@@ -62,7 +62,7 @@ void SwapChainFrameBuffer::SetColorView (View* view)
   
     //установка флага активности буфера цвета
 
-  is_buffer_active [RenderTargetType_Color] = true;
+  is_color_buffer_active = true;
 
     //обработка случая рендеринга в текстуру
     
@@ -92,10 +92,8 @@ void SwapChainFrameBuffer::SetColorView (View* view)
       case PixelFormat_D24S8:
       case PixelFormat_S8:
         throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported color render-target texture format=%s", get_name (render_target.texture_desc.format));
-        break;
       default:
         throw xtl::make_argument_exception (METHOD_NAME, "texture_desc.format", render_target.texture_desc.format);
-        break;
     }    
     
     has_texture_targets = true;    
@@ -132,10 +130,6 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
   
   if (!base_texture)
     throw xtl::format_operation_exception (METHOD_NAME, "Internal error: view with null texture");
-  
-    //установка флага активности буфера попиксельного отсечения
-
-  is_buffer_active [RenderTargetType_DepthStencil] = true;
 
     //обработка случая рендеринга в текстуру
 
@@ -199,7 +193,7 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
   throw xtl::format_operation_exception (METHOD_NAME, "Depth-stencil-view texture has unknown type %s", view->GetTextureTypeName ());
 }
 
-void SwapChainFrameBuffer::FinishInitialization (SwapChainFrameBufferManager& manager)
+void SwapChainFrameBuffer::FinishInitialization ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBuffer::FinishInitialization";
 
@@ -225,7 +219,7 @@ void SwapChainFrameBuffer::FinishInitialization (SwapChainFrameBufferManager& ma
 
   if (fake_depth_stencil_buffer && !color_buffer)
   {
-    manager.GetShadowBuffers (color_buffer, depth_stencil_buffer);
+    frame_buffer_manager->GetShadowBuffers (color_buffer, depth_stencil_buffer);
 
     return;
   }
@@ -236,7 +230,7 @@ void SwapChainFrameBuffer::FinishInitialization (SwapChainFrameBufferManager& ma
   {
       //отсутствует буфер попиксельного отсечения, но присутствует буфер цвета
 
-    depth_stencil_buffer = manager.GetShadowBuffer (color_buffer.get ());
+    depth_stencil_buffer = frame_buffer_manager->GetShadowBuffer (color_buffer.get ());
 
     return;
   }
@@ -245,14 +239,14 @@ void SwapChainFrameBuffer::FinishInitialization (SwapChainFrameBufferManager& ma
   {
       //отсутствует буфер цвета, но присутствует буфер попиксельного отсечения
 
-    color_buffer = manager.GetShadowBuffer (depth_stencil_buffer.get ());    
+    color_buffer = frame_buffer_manager->GetShadowBuffer (depth_stencil_buffer.get ());    
     
     return;
   }
 
     //отсутствуют оба буфера (рендеринг в обе целевые текстуры)    
 
-  manager.GetShadowBuffers (color_buffer, depth_stencil_buffer);    
+  frame_buffer_manager->GetShadowBuffers (color_buffer, depth_stencil_buffer);    
 }
 
 /*
@@ -263,9 +257,8 @@ void SwapChainFrameBuffer::Bind ()
 {
   try
   {
-    frame_buffer_manager.SetFrameBuffer (color_buffer->GetSwapChain (), color_buffer->GetBufferType ());
-    frame_buffer_manager.SetFrameBufferActivity (is_buffer_active [RenderTargetType_Color],
-                                                 is_buffer_active [RenderTargetType_DepthStencil]);
+    frame_buffer_manager->SetFrameBuffer (color_buffer->GetSwapChain (),
+      is_color_buffer_active ? color_buffer->GetBufferType () : GL_NONE);
   }
   catch (xtl::exception& exception)
   {

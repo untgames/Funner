@@ -42,8 +42,8 @@ GLenum get_render_buffer_format (PixelFormat format, const char* source, const c
     Конструктор / деструктор
 */
 
-FboRenderBuffer::FboRenderBuffer (const FrameBufferManager& manager, const TextureDesc& desc)
-  : RenderBuffer (manager.GetContextManager (), desc),
+FboRenderBuffer::FboRenderBuffer (const FrameBufferManagerPtr& manager, const TextureDesc& desc)
+  : RenderBuffer (manager->GetContextManager (), desc),
     frame_buffer_manager (manager),
     render_buffer_id (0),
     frame_buffer_id (0)
@@ -210,20 +210,7 @@ void FboRenderBuffer::Bind ()
 {
   try
   {
-    frame_buffer_manager.SetFrameBuffer (GetFrameBufferId (), GetId ());
-    
-    switch (GetTargetType ())
-    {
-      case RenderTargetType_Color:
-        frame_buffer_manager.SetFrameBufferActivity (true, false);
-        break;
-      case RenderTargetType_DepthStencil:
-        frame_buffer_manager.SetFrameBufferActivity (false, true);
-        break;
-      default:
-        frame_buffer_manager.SetFrameBufferActivity (false, false);
-        break;
-    }
+    frame_buffer_manager->SetFrameBuffer (GetFrameBufferId (), GetId ());
   }
   catch (xtl::exception& exception)
   {

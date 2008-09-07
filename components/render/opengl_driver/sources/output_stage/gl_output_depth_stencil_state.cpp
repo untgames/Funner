@@ -232,10 +232,11 @@ void DepthStencilState::Bind (size_t reference)
     //проверка необходимости биндинга (кэширование состояния)
 
   ContextDataTable& state_cache                 = GetContextDataTable (Stage_Output);
+  ContextDataTable& state_common_cache          = GetContextDataTable (Stage_Common);  
   size_t            &current_desc_hash          = state_cache [OutputStageCache_DepthStencilStateHash],
                     &current_reference          = state_cache [OutputStageCache_StencilReference],
-                    &current_depth_write_enable = state_cache [OutputStageCache_DepthWriteEnable],
-                    &current_stencil_write_mask = state_cache [OutputStageCache_StencilWriteMask];
+                    &current_depth_write_enable = state_common_cache [CommonCache_DepthWriteEnable],
+                    &current_stencil_write_mask = state_common_cache [CommonCache_StencilWriteMask];
 
   if (desc_hash == current_desc_hash && reference == current_reference)
     return;  

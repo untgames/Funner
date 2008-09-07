@@ -12,18 +12,19 @@
 #include <common/component.h>
 
 #include <render/low_level/device.h>
-#include <render/low_level/utils.h>
 #include <render/low_level/driver.h>
+#include <render/low_level/utils.h>
 
-#include <shared/object.h>
 #include <shared/context_manager.h>
-#include <shared/property_list.h>
 #include <shared/input_stage.h>
-#include <shared/texture_manager.h>
+#include <shared/object.h>
 #include <shared/output_stage.h>
-#include <shared/shader_stage.h>
-#include <shared/query_manager.h>
 #include <shared/platform.h>
+#include <shared/property_list.h>
+#include <shared/query_manager.h>
+#include <shared/render_target_manager.h>
+#include <shared/shader_stage.h>
+#include <shared/texture_manager.h>
 
 namespace render
 {
@@ -216,17 +217,17 @@ class Device: virtual public IDevice, public Object
     void Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout = 0);
 
   private:
-    ContextManager     context_manager;        //менеджер контекстов OpenGL
-    PropertyList       properties;             //свойства устройства
-    FrameBufferManager frame_buffer_manager;   //менеджер буферов кадра
-    OutputStage        output_stage;           //выходной уровень
-    InputStage         input_stage;            //входной уровень
-    TextureManager     texture_manager;        //менеджер текстур
-    ShaderStage        shader_stage;           //уровень шейдинга
-    QueryManager       query_manager;          //менеджер запросов
-    size_t             cached_base_vertex;     //кэшированный индекс базовой вершины
-    size_t             cached_base_index;      //кэшированный индекс базового индекса
-    IndicesLayout      cached_indices_layout;  //кэшированное расположение индексов
+    ContextManager      context_manager;        //менеджер контекстов OpenGL
+    PropertyList        properties;             //свойства устройства
+    RenderTargetManager render_target_manager;  //менеджер целевых буферов рендеринга
+    OutputStage         output_stage;           //выходной уровень
+    InputStage          input_stage;            //входной уровень
+    TextureManager      texture_manager;        //менеджер текстур
+    ShaderStage         shader_stage;           //уровень шейдинга
+    QueryManager        query_manager;          //менеджер запросов
+    size_t              cached_base_vertex;     //кэшированный индекс базовой вершины
+    size_t              cached_base_index;      //кэшированный индекс базового индекса
+    IndicesLayout       cached_indices_layout;  //кэшированное расположение индексов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,13 +260,13 @@ class StateBlock: virtual public IStateBlock, public Object
     typedef stl::auto_ptr<IStageState> StageStatePtr;
 
   private:
-    StateBlockMask mask;                       //маска состояний
-    StageStatePtr  frame_buffer_manager_state; //состояние менеджера буферов кадра
-    StageStatePtr  output_stage_state;         //состояние выходного уровня
-    StageStatePtr  input_stage_state;          //состояние входного уровня
-    StageStatePtr  texture_manager_state;      //состояние менеджера текстур
-    StageStatePtr  shader_stage_state;         //состояние шейдерного уровня
-    StageStatePtr  query_manager_state;        //состояние менеджера запросов
+    StateBlockMask mask;                        //маска состояний
+    StageStatePtr  render_target_manager_state; //состояние менеджера целевых буферов рендеринга
+    StageStatePtr  output_stage_state;          //состояние выходного уровня
+    StageStatePtr  input_stage_state;           //состояние входного уровня
+    StageStatePtr  texture_manager_state;       //состояние менеджера текстур
+    StageStatePtr  shader_stage_state;          //состояние шейдерного уровня
+    StageStatePtr  query_manager_state;         //состояние менеджера запросов
 };
 
 }

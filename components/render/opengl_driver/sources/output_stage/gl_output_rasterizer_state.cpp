@@ -30,8 +30,9 @@ void RasterizerState::Bind ()
     //проверка необходимости биндинга (кэширование состояния)
 
   size_t *state_cache            = &GetContextDataTable (Stage_Output)[0],
+         *state_common_cache     = &GetContextDataTable (Stage_Common)[0],
          &current_desc_hash      = state_cache [OutputStageCache_RasterizerStateHash],
-         &current_scissor_enable = state_cache [OutputStageCache_ScissorEnable];
+         &current_scissor_enable = state_cache [CommonCache_ScissorEnable];
 
   if (current_desc_hash == desc_hash)
     return;

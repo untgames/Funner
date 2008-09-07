@@ -276,9 +276,9 @@ struct ContextManager::Impl: public xtl::reference_counter
       current_swap_chain  = swap_chain;
       need_change_context = true;
 
-        //оповещение о необходимости ребиндинга выходного уровня
+        //оповещение о необходимости ребиндинга менеджера целевых буферов отрисовки
 
-      StageRebindNotify (Stage_Output);
+      StageRebindNotify (Stage_RenderTargetManager);
     }
     
 ///Активация текущего контекста

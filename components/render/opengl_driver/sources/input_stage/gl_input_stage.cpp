@@ -301,7 +301,7 @@ struct InputStage::Impl: public ContextObject
     Конструктор / деструктор
 */
 
-InputStage::InputStage (ContextManager& context_manager)
+InputStage::InputStage (const ContextManager& context_manager)
   : impl (new Impl (context_manager))
 {
 }
