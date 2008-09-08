@@ -170,7 +170,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_sgis_generate_mipmap           = ext.Get (SGIS_generate_mipmap);  
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
 
-  glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
+  glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);  
 
   if (has_arb_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
   if (has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
