@@ -235,11 +235,11 @@ struct TextureManager::Impl: public ContextObject
                                  "Reason: different sampler states for same texture", j, i);
             }
 
-          sampler_state->Bind (texture_target);
+          sampler_state->Bind (texture_target, is_depth_stencil (texture->GetFormat ()));
 
           texture->SetSamplerHash (sampler_state->GetDescHash ());
         }
-        
+
           //изменение режима текстурирования для текущего слота
 
         if (need_change_mode)
@@ -271,7 +271,6 @@ struct TextureManager::Impl: public ContextObject
         case TextureDimension_Cubemap: return CreateTextureCubemap (desc);
         default:
           throw xtl::make_argument_exception ("", "desc.dimension", desc.dimension);
-          return 0;
       }
     }
     

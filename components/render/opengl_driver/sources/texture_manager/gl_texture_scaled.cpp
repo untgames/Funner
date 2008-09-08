@@ -65,6 +65,11 @@ void ScaledTexture::GetMipLevelDesc (size_t level, MipLevelDesc& out_desc)
   shadow_texture->GetMipLevelDesc (level, out_desc);
 }
 
+PixelFormat ScaledTexture::GetFormat ()
+{
+  return shadow_texture->GetFormat ();
+}
+
 /*
     Установка / получение хэша дескриптора прикрепленного сэмплера
 */

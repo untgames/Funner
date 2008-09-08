@@ -17,7 +17,6 @@
 
 #include <render/low_level/utils.h>
 
-#include <shared/command_list.h>
 #include <shared/context_object.h>
 #include <shared/texture_manager.h>
 
@@ -83,6 +82,11 @@ class BindableTexture: virtual public ITexture, virtual public IRenderTargetText
     virtual void Bind () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение формата пикселей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual PixelFormat GetFormat () = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / получение хэша дескриптора прикрепленного сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void   SetSamplerHash (size_t hash) = 0;
@@ -112,10 +116,10 @@ class Texture: public BindableTexture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение информации о текстуре
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    GLenum      GetTarget    () const { return target; }      //получение типа текстуры
-    GLuint      GetTextureId () const { return texture_id; }  //получение идентификатора текстуры
-    size_t      GetMipsCount () const { return mips_count; }  //получение количества mip-уровней
-    PixelFormat GetFormat    () const { return desc.format; } //получение формата текстуры
+    GLenum      GetTarget    () { return target; }      //получение типа текстуры
+    GLuint      GetTextureId () { return texture_id; }  //получение идентификатора текстуры
+    size_t      GetMipsCount () { return mips_count; }  //получение количества mip-уровней
+    PixelFormat GetFormat    () { return desc.format; } //получение формата текстуры
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / получение хэша дескриптора прикрепленного сэмплера
@@ -126,7 +130,7 @@ class Texture: public BindableTexture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текстуры в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind ();
+    void Bind ();    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
@@ -326,10 +330,11 @@ class ScaledTexture: public BindableTexture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void GetDesc         (TextureDesc&);
-    void GetDesc         (RenderTargetTextureDesc&);
-    void GetDesc         (BindableTextureDesc&);
-    void GetMipLevelDesc (size_t level, MipLevelDesc& desc);
+    void        GetDesc         (TextureDesc&);
+    void        GetDesc         (RenderTargetTextureDesc&);
+    void        GetDesc         (BindableTextureDesc&);
+    void        GetMipLevelDesc (size_t level, MipLevelDesc& desc);
+    PixelFormat GetFormat       ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / получение хэша дескриптора прикрепленного сэмплера
@@ -374,7 +379,7 @@ class SamplerState : virtual public ISamplerState, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выбор сэмплера в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (GLenum texture_target);
+    void Bind (GLenum texture_target, bool is_depth);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение/получение дескриптора
