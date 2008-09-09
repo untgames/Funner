@@ -104,13 +104,9 @@ int main ()
     ClientEventListener client_event_listener;
     Client client;
 
-    client.AttachEventListener (&client_event_listener);
-
     render::Screen screen;
 
     screen.SetName ("Screen");
-
-    client.SetScreen ("ScreenAttachment", &screen);
 
     xtl::com_ptr<EngineSubsystem> subsystem1 (new EngineSubsystem (SUBSYSTEM1_CONFIGURATION), false), subsystem2 (new EngineSubsystem (SUBSYSTEM2_CONFIGURATION), false),
                                   subsystem3 (new EngineSubsystem (SUBSYSTEM3_CONFIGURATION), false), subsystem4 (new EngineSubsystem (SUBSYSTEM4_CONFIGURATION), false);
@@ -122,23 +118,23 @@ int main ()
 
     Engine engine (CONFIGURATION_BRANCH_NAME);
 
+    engine.AttachEventListener (&client_event_listener);
+
     printf ("Engine configuration branch name is '%s'\n", engine.ConfigurationBranch ());
     printf ("Engine subsystems count is %u\n", engine.SubsystemsCount ());
-    printf ("Engine's client screens count is %u\n", engine.Client ().ScreensCount ());
 
     engine.GetTrackable ().connect_tracker (&engine_tracker);
 
-    engine.SetClient (&client);
+    engine.AttachClient (client);
+
+    client.SetScreen ("ScreenAttachment", &screen);
 
     printf ("Engine subsystems count is %u\n", engine.SubsystemsCount ());
-    printf ("Engine's client screens count is %u\n", engine.Client ().ScreensCount ());
     printf ("engine subsystem 1 name is '%s'\n", engine.Subsystem (1).Name ());
 
-    printf ("Engine's client screens count is %u\n", engine.Client ().ScreensCount ());
+    engine.DetachClient ();
 
-    engine.SetClient (0);
-
-    printf ("Engine's client screens count is %u\n", engine.Client ().ScreensCount ());
+    client.SetScreen ("ScreenAttachment", &screen);
 
     engine.RemoveSubsystem (subsystem1);
 

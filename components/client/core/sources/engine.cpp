@@ -15,23 +15,27 @@ struct Engine::Impl : public xtl::trackable
       {}
 
 ///Установка клиента
-    void SetClient (client::Client* new_client)
+    void AttachClient (const Client& new_client)
     {
-      if (!new_client)
-        client::Client ().Swap (client);
-      else
-        client = *new_client;
+      DisableAllListeners ();
+
+      client = new_client;
+
+      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+        client.AttachEventListener (*iter);
+    }
+
+    void DetachClient ()
+    {
+      DisableAllListeners ();
+      
+      client::Client ().Swap (client);
     }
 
 ///Получение данных
     const char* ConfigurationBranch () const
     {
       return configuration_branch_name.c_str ();
-    }
-
-    client::Client& Client ()
-    {
-      return client;
     }
 
 ///Перебор подсистем
@@ -75,15 +79,64 @@ struct Engine::Impl : public xtl::trackable
         subsystems.erase (iter);
     }
 
+///Обработка событий ввода
+    void ProcessInputEvent (const char* attachment_name, const char* event) const
+    {
+      try
+      {
+        client.ProcessInputEvent (attachment_name, event);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("client::Engine::ProcessInputEvent");
+        throw;
+      }
+    }
+
+///Работа со слушателями событий
+    void AttachEventListener (IClientEventListener* listener)
+    {
+      static const char* METHOD_NAME = "client::Engine::AttachEventListener";
+
+      if (!listener)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "listener");
+
+      ListenerSet::iterator iter = listeners.find (listener);
+
+      if (iter != listeners.end ())
+        throw xtl::format_operation_exception (METHOD_NAME, "Listener already attached");
+
+      listeners.insert (listener);
+      client.AttachEventListener (listener);
+    }
+
+    void DetachEventListener (IClientEventListener* listener)
+    {
+      if (!listener)
+        throw xtl::make_null_argument_exception ("client::Engine::DetachEventListener", "listener");
+
+      listeners.erase (listener);
+      client.DetachEventListener (listener);
+    }
+
+  private:
+    void DisableAllListeners ()
+    {
+      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+        client.DetachEventListener (*iter);
+    }
+
   private:
     typedef Engine::SubsystemPointer SubsystemPointer;
 
-    typedef stl::vector<SubsystemPointer> Subsystems;
+    typedef stl::vector<SubsystemPointer>   Subsystems;
+    typedef stl::set<IClientEventListener*> ListenerSet;
 
   private:
     client::Client client;
     stl::string    configuration_branch_name;
     Subsystems     subsystems;
+    ListenerSet    listeners;
 };
 
 /*
@@ -112,9 +165,14 @@ Engine::~Engine ()
    Установка клиента
 */
 
-void Engine::SetClient (client::Client* client)
+void Engine::AttachClient (const Client& client)
 {
-  impl->SetClient (client);
+  impl->AttachClient (client);
+}
+
+void Engine::DetachClient ()
+{
+  impl->DetachClient ();
 }
 
 /*
@@ -124,11 +182,6 @@ void Engine::SetClient (client::Client* client)
 const char* Engine::ConfigurationBranch () const
 {
   return impl->ConfigurationBranch ();
-}
-
-client::Client& Engine::Client () const
-{
-  return impl->Client ();
 }
 
 /*
@@ -166,6 +219,29 @@ void Engine::AddSubsystem (const SubsystemPointer subsystem)
 void Engine::RemoveSubsystem (const SubsystemPointer subsystem)
 {
   impl->RemoveSubsystem (subsystem);
+}
+
+/*
+   Обработка событий ввода
+*/
+
+void Engine::ProcessInputEvent (const char* attachment_name, const char* event) const
+{
+  impl->ProcessInputEvent (attachment_name, event);
+}
+
+/*
+   Работа со слушателями событий
+*/
+
+void Engine::AttachEventListener (IClientEventListener* listener)
+{
+  impl->AttachEventListener (listener);
+}
+
+void Engine::DetachEventListener (IClientEventListener* listener)
+{
+  impl->DetachEventListener (listener);
 }
 
 namespace client

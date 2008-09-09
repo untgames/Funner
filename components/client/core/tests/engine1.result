@@ -1,17 +1,11 @@
-OnSetScreen: attachment_name is 'ScreenAttachment', screen name is 'Screen'
 Starting subsystem 'Subsystem3'. Engine startup params = 00000000
 Starting subsystem 'Subsystem2'. Engine startup params = 00000000
 Starting subsystem 'Subsystem4'. Engine startup params = 00000000
 Starting subsystem 'Subsystem1'. Engine startup params = 00000000
 Engine configuration branch name is 'Configuration'
 Engine subsystems count is 4
-Engine's client screens count is 0
+OnSetScreen: attachment_name is 'ScreenAttachment', screen name is 'Screen'
 Engine subsystems count is 4
-Engine's client screens count is 1
 engine subsystem 1 name is 'Subsystem2'
-Engine's client screens count is 1
-Engine's client screens count is 0
 Engine subsystems count is 3
 Engine tracked
-OnRemoveScreen: attachment_name is 'ScreenAttachment'
-OnDestroy
