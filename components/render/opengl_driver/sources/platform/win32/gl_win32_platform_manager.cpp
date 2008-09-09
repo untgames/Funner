@@ -42,7 +42,7 @@ class PlatformManagerImpl
 
           //загрузка MSOGL
 
-        LoadDefaultAdapter ("MSOGL", (win_dir + "\\system32\\ogldrv.dll").c_str (), "bugs='GLBUG_swap_buffers_twice_call'");
+        LoadDefaultAdapter ("MSOGL", (win_dir + "\\system32\\ogldrv.dll").c_str (), "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture2d_no_proxy'");
 
           //загрузка Direct3D эмулятора AcXtrnal
 

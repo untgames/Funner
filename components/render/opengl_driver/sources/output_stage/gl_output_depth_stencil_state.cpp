@@ -230,15 +230,14 @@ void DepthStencilState::Bind (size_t reference)
   static const char* METHOD_NAME = "render::low_level::opengl::DepthStencilState::Bind";
   
     //проверка необходимости биндинга (кэширование состояния)
+    
+  const size_t current_desc_hash          = GetContextCacheValue (CacheEntry_DepthStencilStateHash),
+               current_reference          = GetContextCacheValue (CacheEntry_StencilReference),
+               current_depth_write_enable = GetContextCacheValue (CacheEntry_DepthWriteEnable),
+               current_stencil_write_mask = GetContextCacheValue (CacheEntry_StencilWriteMask);
 
-  ContextDataTable& state_cache                 = GetContextDataTable (Stage_Output);
-  ContextDataTable& state_common_cache          = GetContextDataTable (Stage_Common);  
-  size_t            &current_desc_hash          = state_cache [OutputStageCache_DepthStencilStateHash],
-                    &current_reference          = state_cache [OutputStageCache_StencilReference],
-                    &current_depth_write_enable = state_common_cache [CommonCache_DepthWriteEnable],
-                    &current_stencil_write_mask = state_common_cache [CommonCache_StencilWriteMask];
-
-  if (desc_hash == current_desc_hash && reference == current_reference)
+  if (desc_hash == current_desc_hash && reference == current_reference && current_depth_write_enable == size_t (desc.depth_write_enable) &&
+      current_stencil_write_mask == size_t (desc.stencil_write_mask))
     return;  
 
     //установка текущего контекста
@@ -293,10 +292,10 @@ void DepthStencilState::Bind (size_t reference)
 
     //установка кэш-переменных
 
-  current_desc_hash          = desc_hash;
-  current_reference          = reference;
-  current_depth_write_enable = desc.depth_write_enable;
-  current_stencil_write_mask = desc.stencil_write_mask;
+  SetContextCacheValue (CacheEntry_DepthStencilStateHash, desc_hash);
+  SetContextCacheValue (CacheEntry_StencilReference,      reference);
+  SetContextCacheValue (CacheEntry_DepthWriteEnable,      desc.depth_write_enable);
+  SetContextCacheValue (CacheEntry_StencilWriteMask,      desc.stencil_write_mask);
 
     //оповещение о необходимости ребиндинга уровня
 

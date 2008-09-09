@@ -34,14 +34,12 @@ namespace opengl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Идентификаторы элементов кэша контекстной таблицы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum TextureManagerCache
+enum TextureManagerCacheEntry
 {
-  TextureManagerCache_TextureId0,
-  TextureManagerCache_TextureIdLast = TextureManagerCache_TextureId0 + DEVICE_SAMPLER_SLOTS_COUNT - 1,
-  TextureManagerCache_TextureTarget0,
-  TextureManagerCache_TextureTargetLast = TextureManagerCache_TextureTarget0 + DEVICE_SAMPLER_SLOTS_COUNT - 1,
-
-  TextureManagerCache_Num
+  CacheEntry_TextureId0 = CacheEntry_TextureManagerPrivateFirst,
+  CacheEntry_TextureIdLast = CacheEntry_TextureId0 + DEVICE_SAMPLER_SLOTS_COUNT - 1,
+  CacheEntry_TextureTarget0,
+  CacheEntry_TextureTargetLast = CacheEntry_TextureTarget0 + DEVICE_SAMPLER_SLOTS_COUNT - 1,
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

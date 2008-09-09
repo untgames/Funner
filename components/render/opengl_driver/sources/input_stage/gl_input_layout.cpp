@@ -492,7 +492,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
       
     //отключение неиспользуемых и включение используемых вершинных массивов
     
-  size_t& current_enabled_semantics_mask = GetContextDataTable (Stage_Input)[InputStageCache_EnabledSemantics];
+  const size_t current_enabled_semantics_mask = GetContextCacheValue (CacheEntry_EnabledSemantics);
 
   if (current_enabled_semantics_mask != used_semantics_mask)
   {
@@ -526,7 +526,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
       set_client_capability (GL_TEXTURE_COORD_ARRAY,  current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_TexCoord0);
     }    
 
-    current_enabled_semantics_mask = used_semantics_mask;
+    SetContextCacheValue (CacheEntry_EnabledSemantics, used_semantics_mask);
   }
 
     //настройка вершинных буферов    
@@ -600,12 +600,10 @@ void InputLayout::Bind
   
     //проверка необходимости переустановки layout
     
-  ContextDataTable& cache = GetContextDataTable (Stage_Input);
+  const size_t current_base_vertex  = GetContextCacheValue (CacheEntry_CurrentBaseVertex),  
+               current_layout_hash  = GetContextCacheValue (CacheEntry_CurrentLayoutHash),
+               current_buffers_hash = GetContextCacheValue (CacheEntry_CurrentBuffersHash);
 
-  size_t &current_base_vertex  = cache [InputStageCache_CurrentBaseVertex],  
-         &current_layout_hash  = cache [InputStageCache_CurrentLayoutHash],
-         &current_buffers_hash = cache [InputStageCache_CurrentBuffersHash];
-  
   size_t vertex_buffers_id [DEVICE_VERTEX_BUFFER_SLOTS_COUNT];
 
   for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
@@ -619,9 +617,9 @@ void InputLayout::Bind
   {
     BindVertexAttributes (base_vertex, vertex_buffers);
 
-    current_base_vertex  = base_vertex;
-    current_layout_hash  = attributes_hash;
-    current_buffers_hash = buffers_hash;
+    SetContextCacheValue (CacheEntry_CurrentBaseVertex,  base_vertex);
+    SetContextCacheValue (CacheEntry_CurrentLayoutHash,  attributes_hash);
+    SetContextCacheValue (CacheEntry_CurrentBuffersHash, buffers_hash);
   }
 
     //установка индексного буфера

@@ -282,9 +282,8 @@ void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum
 
     //проверка необходимости переустановки буфера
 
-  ContextDataTable &state_cache         = GetContextDataTable (Stage_RenderTargetManager);
-  size_t           &current_buffer_type = state_cache [RenderTargetManagerCache_BufferAttachment],
-                   &current_fbo         = state_cache [RenderTargetManagerCache_FrameBufferId];
+  const size_t current_buffer_type = GetContextCacheValue (CacheEntry_BufferAttachment),
+               current_fbo         = GetContextCacheValue (CacheEntry_FrameBufferId);
 
   if (current_buffer_type == buffer_type && !current_fbo)
     return;
@@ -311,9 +310,9 @@ void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum
   CheckErrors (METHOD_NAME);
 
     //установка значений кэш-переменных  
-
-  current_fbo         = 0;
-  current_buffer_type = buffer_type;
+    
+  SetContextCacheValue (CacheEntry_BufferAttachment, buffer_type);
+  SetContextCacheValue (CacheEntry_FrameBufferId,    0);
 }
 
 /*

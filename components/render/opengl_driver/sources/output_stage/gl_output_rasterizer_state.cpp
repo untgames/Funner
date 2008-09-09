@@ -28,13 +28,11 @@ void RasterizerState::Bind ()
   static const char* METHOD_NAME = "render::low_level::opengl::RasterizerState::Bind";
   
     //проверка необходимости биндинга (кэширование состояния)
+    
+  const size_t current_desc_hash      = GetContextCacheValue (CacheEntry_RasterizerStateHash),
+               current_scissor_enable = GetContextCacheValue (CacheEntry_ScissorEnable);
 
-  size_t *state_cache            = &GetContextDataTable (Stage_Output)[0],
-         *state_common_cache     = &GetContextDataTable (Stage_Common)[0],
-         &current_desc_hash      = state_cache [OutputStageCache_RasterizerStateHash],
-         &current_scissor_enable = state_cache [CommonCache_ScissorEnable];
-
-  if (current_desc_hash == desc_hash)
+  if (current_desc_hash == desc_hash && current_scissor_enable == size_t (desc.scissor_enable))
     return;
 
     //установка состояния в контекст OpenGL
@@ -50,9 +48,9 @@ void RasterizerState::Bind ()
   CheckErrors (METHOD_NAME);
 
     //установка кэш-переменных
-
-  current_desc_hash      = desc_hash;
-  current_scissor_enable = desc.scissor_enable;
+    
+  SetContextCacheValue (CacheEntry_RasterizerStateHash, desc_hash);
+  SetContextCacheValue (CacheEntry_ScissorEnable,       desc.scissor_enable);
 }
 
 /*

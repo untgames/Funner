@@ -27,15 +27,15 @@ namespace opengl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Элементы таблицы локальных данных контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ShaderStageCache
+enum ShadingStageCacheEntry
 {
-  ShaderStageCache_UsedProgram,          //ID текущей используемой программы
-  ShaderStageCache_FppViewerStateHash,   //хэш параметров наблюдателя
-  ShaderStageCache_FppObjectStateHash,   //хэш параметров объекта
-  ShaderStageCache_FppMaterialStateHash, //хэш параметров материала
-  ShaderStageCache_FppLightingStateHash, //хэш параметров освещения
-  ShaderStageCache_FppTexmapsStateHash,  //хэш параметров текстурирования
-  ShaderStageCache_FppModesStateHash,    //хэш режимов визуализации
+  CacheEntry_UsedProgram = CacheEntry_ShadingStagePrivateFirst, //ID текущей используемой программы
+  CacheEntry_FppViewerStateHash,   //хэш параметров наблюдателя
+  CacheEntry_FppObjectStateHash,   //хэш параметров объекта
+  CacheEntry_FppMaterialStateHash, //хэш параметров материала
+  CacheEntry_FppLightingStateHash, //хэш параметров освещения
+  CacheEntry_FppTexmapsStateHash,  //хэш параметров текстурирования
+  CacheEntry_FppModesStateHash,    //хэш режимов визуализации
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

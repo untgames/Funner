@@ -19,13 +19,13 @@ SystemMemoryInputBuffer::SystemMemoryInputBuffer (const ContextManager& context_
 
 void SystemMemoryInputBuffer::Bind ()
 {
-  size_t& current_id = GetContextDataTable (Stage_Input)[InputStageCache_BindedVboBuffer];
+  const size_t current_id = GetContextCacheValue (CacheEntry_BindedVboBuffer);
 
   if (current_id == GetId ())
     return;
 
   MakeContextCurrent ();
-  
+
   const ContextCaps& caps = GetCaps ();
 
   if (caps.has_arb_vertex_buffer_object)
@@ -37,7 +37,7 @@ void SystemMemoryInputBuffer::Bind ()
 
     //установка кэш-переменной
 
-  current_id = GetId ();  
+  SetContextCacheValue (CacheEntry_BindedVboBuffer, 0);
 }
 
 /*

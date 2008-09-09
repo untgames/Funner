@@ -170,13 +170,11 @@ struct TextureManager::Impl: public ContextObject
 
         //получение кэш-переменных
 
-      size_t *common_cache             = &GetContextDataTable (Stage_Common)[0],
-             *cache                    = &GetContextDataTable (Stage_TextureManager)[0],
-             *current_texture_id       = cache + TextureManagerCache_TextureId0,
-             *current_texture_target   = cache + TextureManagerCache_TextureTarget0,
-             &current_enabled_textures = common_cache [CommonCache_EnabledTextures],
-             &current_active_slot      = common_cache [CommonCache_ActiveTextureSlot],
-             enabled_textures          = 0;
+      size_t *current_texture_id       = GetContextCache () + CacheEntry_TextureId0,
+             *current_texture_target   = GetContextCache () + CacheEntry_TextureTarget0,
+             enabled_textures          = 0,
+             &current_enabled_textures = GetContextCache () [CacheEntry_EnabledTextures],
+             &current_active_slot      = GetContextCache () [CacheEntry_ActiveTextureSlot];
 
         //выбор текущего контекста
 
@@ -187,7 +185,7 @@ struct TextureManager::Impl: public ContextObject
       BindableTextureDesc texture_desc;
 
       const ContextCaps& caps     = GetCaps ();
-      SamplerSlot*       samplers = state.GetSlots ();      
+      SamplerSlot*       samplers = state.GetSlots ();
 
       for (size_t i = 0; i < caps.texture_units_count; i++)
       {

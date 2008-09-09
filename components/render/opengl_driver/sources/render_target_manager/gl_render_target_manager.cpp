@@ -312,10 +312,9 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         BindRenderTargets ();
 
           //установка областей вывода и отсечения
-
-        size_t *context_cache         = &GetContextDataTable (Stage_RenderTargetManager)[0],
-               &current_viewport_hash = context_cache [RenderTargetManagerCache_ViewportHash],
-               &current_scissor_hash  = context_cache [RenderTargetManagerCache_ScissorHash];
+          
+        const size_t current_viewport_hash = GetContextCacheValue (CacheEntry_ViewportHash),
+                     current_scissor_hash  = GetContextCacheValue (CacheEntry_ScissorHash);
 
         if (current_viewport_hash != GetViewportHash ())
         {
@@ -323,8 +322,8 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
 
           glViewport   (viewport.x, viewport.y, viewport.width, viewport.height);
           glDepthRange (viewport.min_depth, viewport.max_depth);
-
-          current_viewport_hash = GetViewportHash ();
+          
+          SetContextCacheValue (CacheEntry_ViewportHash, GetViewportHash ());
         }
         
         if (current_scissor_hash != GetScissorHash ())
@@ -333,7 +332,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
 
           glScissor (scissor.x, scissor.y, scissor.width, scissor.height);
 
-          current_scissor_hash = GetScissorHash ();
+          SetContextCacheValue (CacheEntry_ScissorHash, GetScissorHash ());
         }
 
           //оповещение об изменении целевых буферов отрисовки
@@ -366,9 +365,6 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
 
           //получение значений кэш переменных
 
-        size_t *context_cache        = &GetContextDataTable (Stage_RenderTargetManager)[0],
-               *context_common_cache = &GetContextDataTable (Stage_Common)[0];
-
         GLbitfield mask = 0;
         
         bool need_restore_color_write_mask   = false,
@@ -382,20 +378,20 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         {
           size_t clear_color_hash = crc32 (&color, sizeof color);
           
-          if (context_cache [RenderTargetManagerCache_ClearColorHash] != clear_color_hash)
+          if (GetContextCacheValue (CacheEntry_ClearColorHash) != clear_color_hash)
           {
             glClearColor (color.red, color.green, color.blue, color.alpha);
             
-            context_cache [RenderTargetManagerCache_ClearColorHash] = clear_color_hash;
+            SetContextCacheValue (CacheEntry_ClearColorHash, clear_color_hash);
           }
-          
-          if (context_common_cache [CommonCache_ColorWriteMask] != ColorWriteFlag_All)
+
+          if (GetContextCacheValue (CacheEntry_ColorWriteMask) != ColorWriteFlag_All)
           {
             glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-            
+
             need_restore_color_write_mask = true;
           }
-          
+
           mask |= GL_COLOR_BUFFER_BIT;
         }
         
@@ -405,17 +401,17 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         {
           size_t clear_depth_hash = crc32 (&depth, sizeof depth);
           
-          if (context_cache [RenderTargetManagerCache_ClearDepthHash] != clear_depth_hash)
+          if (GetContextCacheValue (CacheEntry_ClearDepthHash) != clear_depth_hash)
           {
             glClearDepth (depth);
             
-            context_cache [RenderTargetManagerCache_ClearDepthHash] = clear_depth_hash;
+            SetContextCacheValue (CacheEntry_ClearDepthHash, clear_depth_hash);
           }
           
-          if (!context_common_cache [CommonCache_DepthWriteEnable])
+          if (!GetContextCacheValue (CacheEntry_DepthWriteEnable))
           {
             glDepthMask (GL_TRUE);
-            
+
             need_restore_depth_write_mask = true;
           }          
 
@@ -426,19 +422,19 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
 
         if (clear_flags & ClearFlag_Stencil)
         {
-          if (context_cache [RenderTargetManagerCache_ClearStencilValue] != stencil)
+          if (GetContextCacheValue (CacheEntry_ClearStencilValue) != stencil)
           {
             glClearStencil (stencil);
-            
-            context_cache [RenderTargetManagerCache_ClearStencilValue] = stencil;
+
+            SetContextCacheValue (CacheEntry_ClearStencilValue, stencil);
           }
 
-          if (context_common_cache [CommonCache_StencilWriteMask] != unsigned char (~0))
+          if (GetContextCacheValue (CacheEntry_StencilWriteMask) != unsigned char (~0))
           {
             glStencilMask (~0);
-            
+
             need_restore_stencil_write_mask = true;
-          }                    
+          }
 
           mask |= GL_STENCIL_BUFFER_BIT;
         }
@@ -447,20 +443,20 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           
         if (clear_flags & ClearFlag_ViewportOnly)
         {          
-          if (!context_common_cache [CommonCache_ScissorEnable])
+          if (!GetContextCacheValue (CacheEntry_ScissorEnable))
           {
             glEnable (GL_SCISSOR_TEST);
 
             need_restore_scissor_test = true;
           }
 
-          if (context_cache [RenderTargetManagerCache_ScissorHash] != GetViewportHash ())
+          if (GetContextCacheValue (CacheEntry_ScissorHash) != GetViewportHash ())
           {
             const Viewport& viewport = GetViewport ();
 
             glScissor (viewport.x, viewport.y, viewport.width, viewport.height);          
 
-            context_cache [RenderTargetManagerCache_ScissorHash] = GetViewportHash ();
+            SetContextCacheValue (CacheEntry_ScissorHash, GetViewportHash ());
 
             StageRebindNotify (Stage_RenderTargetManager);
           }
@@ -480,7 +476,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         
         if (need_restore_color_write_mask)
         {
-          size_t mask = context_common_cache [CommonCache_ColorWriteMask];
+          size_t mask = GetContextCacheValue (CacheEntry_ColorWriteMask);
 
           glColorMask ((mask & ColorWriteFlag_Red) != 0, (mask & ColorWriteFlag_Green) != 0,
                       (mask & ColorWriteFlag_Blue) != 0, (mask & ColorWriteFlag_Alpha) != 0);
@@ -490,12 +486,12 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         {
           glDepthMask (GL_FALSE);
         }
-        
+
         if (need_restore_stencil_write_mask)
         {
-          glStencilMask (context_common_cache [CommonCache_StencilWriteMask]);
+          glStencilMask (GetContextCacheValue (CacheEntry_StencilWriteMask));
         }
-        
+
         if (need_restore_scissor_test)
         {
           glDisable (GL_SCISSOR_TEST);

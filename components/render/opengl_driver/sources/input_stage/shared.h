@@ -33,13 +33,13 @@ namespace opengl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ёлементы таблицы локальных данных контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum InputStageCache
+enum InputStageCacheEntry
 {
-  InputStageCache_BindedVboBuffer,    //ID текущего забинденного буфера
-  InputStageCache_EnabledSemantics,   //маска используемых семантик вершинных атрибутов
-  InputStageCache_CurrentBaseVertex,  //текуща€ базова€ вершина
-  InputStageCache_CurrentLayoutHash,  //хэш атрибутов layout'а
-  InputStageCache_CurrentBuffersHash, //хэш установленных вершинных буферов
+  CacheEntry_BindedVboBuffer = CacheEntry_InputStagePrivateFirst, //ID текущего забинденного буфера
+  CacheEntry_EnabledSemantics,   //маска используемых семантик вершинных атрибутов
+  CacheEntry_CurrentBaseVertex,  //текуща€ базова€ вершина
+  CacheEntry_CurrentLayoutHash,  //хэш атрибутов layout'а
+  CacheEntry_CurrentBuffersHash, //хэш установленных вершинных буферов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

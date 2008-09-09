@@ -116,15 +116,15 @@ void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     //получение данных из кэша контекста
 
   const ContextCaps& caps            = GetCaps ();
-  size_t&            current_program = GetContextDataTable (Stage_Shading)[ShaderStageCache_UsedProgram];
-  
+  const size_t       current_program = GetContextCacheValue (CacheEntry_UsedProgram);
+
   if (current_program != program.GetId ())
   {
       //установка программы шейдинга в контекст OpenGL
-    
+
     caps.glUseProgram_fn (program.GetHandle ());
 
-    current_program = program.GetId ();
+    SetContextCacheValue (CacheEntry_UsedProgram, program.GetId ());
   }
 
     //установка параметров программы в контекст OpenGL

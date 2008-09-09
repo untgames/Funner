@@ -1,7 +1,6 @@
 #ifndef RENDER_GL_DRIVER_CONTEXT_MANAGER_HEADER
 #define RENDER_GL_DRIVER_CONTEXT_MANAGER_HEADER
 
-#include <xtl/array>
 #include <render/low_level/driver.h>
 
 #include <shared/gl_entries.h>
@@ -34,39 +33,46 @@ enum Stage
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Идентификаторы элементов кэша контекстной таблицы общего уровня
+///Количество элементов, резервируемых в кэше состояния контекста для каждого из уровней
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum CommonCache
+const size_t CONTEXT_CACHE_STAGE_ENTRIES_NUM = 64;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Идентификаторы кэшируемых состояний контекста
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum CacheEntry
 {
-  CommonCache_ActiveTextureSlot,   //номер текущего активного слота текстурироания
-  CommonCache_EnabledTextures,     //маска: установлена ли текстура в определенном слоте
-  CommonCache_ColorWriteMask,      //маска записи в буфер цвета
-  CommonCache_DepthWriteEnable,    //включена ли запись в буфер глубины
-  CommonCache_StencilWriteMask,    //маска записи в буфер трафарета  
-  CommonCache_ScissorEnable,       //включен ли тест отсечения  
+  CacheEntry_SharedFirst = 0,
 
-  CommonCache_Num
+  CacheEntry_ActiveTextureSlot, //номер текущего активного слота текстурироания
+  CacheEntry_EnabledTextures,   //маска: установлена ли текстура в определенном слоте
+  CacheEntry_ColorWriteMask,    //маска записи в буфер цвета
+  CacheEntry_DepthWriteEnable,  //включена ли запись в буфер глубины
+  CacheEntry_StencilWriteMask,  //маска записи в буфер трафарета  
+  CacheEntry_ScissorEnable,     //включен ли тест отсечения    
+
+  CacheEntry_SharedLast = CacheEntry_SharedFirst + CONTEXT_CACHE_STAGE_ENTRIES_NUM,
+
+  CacheEntry_InputStagePrivateFirst = CacheEntry_SharedLast,
+  CacheEntry_InputStagePrivateLast  = CacheEntry_InputStagePrivateFirst + CONTEXT_CACHE_STAGE_ENTRIES_NUM,
+
+  CacheEntry_ShadingStagePrivateFirst = CacheEntry_InputStagePrivateLast,
+  CacheEntry_ShadingStagePrivateLast  = CacheEntry_ShadingStagePrivateFirst + CONTEXT_CACHE_STAGE_ENTRIES_NUM,
+
+  CacheEntry_OutputStagePrivateFirst = CacheEntry_ShadingStagePrivateLast,
+  CacheEntry_OutputStagePrivateLast  = CacheEntry_OutputStagePrivateFirst + CONTEXT_CACHE_STAGE_ENTRIES_NUM,
+
+  CacheEntry_TextureManagerPrivateFirst = CacheEntry_OutputStagePrivateLast,
+  CacheEntry_TextureManagerPrivateLast  = CacheEntry_TextureManagerPrivateFirst + CONTEXT_CACHE_STAGE_ENTRIES_NUM,
+
+  CacheEntry_QueryManagerPrivateFirst = CacheEntry_TextureManagerPrivateLast,
+  CacheEntry_QueryManagerPrivateLast  = CacheEntry_QueryManagerPrivateFirst + CONTEXT_CACHE_STAGE_ENTRIES_NUM,
+
+  CacheEntry_RenderTargetManagerPrivateFirst = CacheEntry_QueryManagerPrivateLast,
+  CacheEntry_RenderTargetManagerPrivateLast  = CacheEntry_RenderTargetManagerPrivateFirst + CONTEXT_CACHE_STAGE_ENTRIES_NUM,
+
+  CacheEntry_Num = CacheEntry_RenderTargetManagerPrivateLast
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Маски уровней
-///////////////////////////////////////////////////////////////////////////////////////////////////
-enum StageFlag
-{
-  StageFlag_Input          = 1 << Stage_Input,
-  StageFlag_Shading        = 1 << Stage_Shading,
-  StageFlag_Output         = 1 << Stage_Output,
-  StageFlag_TextureManager = 1 << Stage_TextureManager,
-  StageFlag_QueryManager   = 1 << Stage_QueryManager,
-  StageFlag_All            = ~0
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество элементов в каждой из таблиц локальных данных контекста
-///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t CONTEXT_DATA_TABLE_SIZE = 64;
-
-typedef xtl::array<size_t, CONTEXT_DATA_TABLE_SIZE> ContextDataTable;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер контекстов OpenGL (политика копирования - подсчёт ссылок)
@@ -103,10 +109,12 @@ class ContextManager
     void MakeContextCurrent () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с таблицами локальных данных текущего контекста
+///Работа кэшем текущего контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const ContextDataTable& GetContextDataTable (Stage table_id) const;
-          ContextDataTable& GetContextDataTable (Stage table_id);
+    const size_t* GetContextCache      () const;
+          size_t* GetContextCache      ();
+          void    SetContextCacheValue (size_t entry_id, size_t value);
+          size_t  GetContextCacheValue (size_t entry_id) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение информации о текущей реализации OpenGL

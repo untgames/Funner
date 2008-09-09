@@ -503,11 +503,6 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
 
       context_manager.StageRebindNotify (Stage_Output); //сделать внутреннее кэширование состояния has_render_target/has_depth_stencil!!!
     }
-
-      //установка состояния выходного уровня
-
-    if (context_manager.NeedStageRebind (Stage_Output))
-      output_stage.Bind (render_target_manager.GetRenderTargetView () != 0, render_target_manager.GetDepthStencilView () != 0);
     
       //установка состояния входного уровня
 
@@ -545,8 +540,13 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
     if (context_manager.NeedStageRebind (Stage_Shading))
       shader_stage.Bind ();
 
+      //установка состояния выходного уровня
+
+    if (context_manager.NeedStageRebind (Stage_Output))
+      output_stage.Bind (render_target_manager.GetRenderTargetView () != 0, render_target_manager.GetDepthStencilView () != 0);      
+
       //очистка флагов ребиндинга
-      
+
     context_manager.ResetRebindNotifications ();
   }
   catch (xtl::exception& exception)

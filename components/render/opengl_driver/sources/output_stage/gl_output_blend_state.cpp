@@ -276,13 +276,11 @@ void BlendState::Bind ()
   static const char* METHOD_NAME = "render::low_level::opengl::BlendState::Bind";
 
     //проверка необходимости биндинга (кэширование состояния)
-    
-  size_t *state_cache              = &GetContextDataTable (Stage_Output)[0],
-         *state_common_cache       = &GetContextDataTable (Stage_Common)[0],
-         &current_desc_hash        = state_cache [OutputStageCache_BlendStateHash],
-         &current_color_write_mask = state_common_cache [CommonCache_ColorWriteMask];
 
-  if (current_desc_hash == desc_hash)
+  const size_t current_desc_hash        = GetContextCacheValue (CacheEntry_BlendStateHash),
+               current_color_write_mask = GetContextCacheValue (CacheEntry_ColorWriteMask);
+
+  if (current_desc_hash == desc_hash && current_color_write_mask == desc.color_write_mask)
     return;
 
     //установка состояния в контекст OpenGL
@@ -297,8 +295,8 @@ void BlendState::Bind ()
 
   CheckErrors (METHOD_NAME);
 
-    //установка кэш-переменной
+    //установка кэш-переменных
 
-  current_desc_hash        = desc_hash;
-  current_color_write_mask = desc.color_write_mask;
+  SetContextCacheValue (CacheEntry_BlendStateHash, desc_hash);
+  SetContextCacheValue (CacheEntry_ColorWriteMask, desc.color_write_mask);
 }

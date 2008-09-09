@@ -11,7 +11,7 @@ using namespace render::low_level::opengl;
 Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_desc)
   : Texture (manager, tex_desc, GL_TEXTURE_2D, get_mips_count (tex_desc.width, tex_desc.height))
 {
-  const char* METHOD_NAME = "render::low_level::opengl::Texture2D::Texture2D";
+  const char* METHOD_NAME = "render::low_level::opengl::Texture2D::Texture2D";  
   
     //установка текстуры в контекст OpenGL
 
@@ -36,7 +36,7 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 2D texture %ux%u@%s. Reason: proxy texure fail", tex_desc.width,
     tex_desc.height, get_name (tex_desc.format));
 
-      //создание mip-уровней
+      //создание mip-уровней      
       
   for (size_t i=0; i<GetMipsCount (); i++)
   {
@@ -47,7 +47,7 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_format, gl_type, 0);
 
     glGetTexLevelParameteriv (GL_TEXTURE_2D, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
-  }  
+  }    
 
    //установка реального внутреннего формата хранения пикселей (связано с установкой сжатого формата)
 
@@ -60,7 +60,7 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     e.touch (METHOD_NAME);
     
     throw;
-  }
+  }  
 
     //проверка ошибок
 

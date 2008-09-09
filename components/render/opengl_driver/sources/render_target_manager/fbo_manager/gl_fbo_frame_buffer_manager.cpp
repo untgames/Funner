@@ -75,8 +75,7 @@ void FboFrameBufferManager::SetFrameBuffer (size_t fbo_id, size_t cache_id)
 
     //проверка необходимости переустановки буфера
 
-  ContextDataTable &state_cache = GetContextDataTable (Stage_RenderTargetManager);
-  size_t           &current_id  = state_cache [RenderTargetManagerCache_FrameBufferId];
+  const size_t current_id = GetContextCacheValue (CacheEntry_FrameBufferId);
   
   if (current_id == cache_id)
     return;
@@ -100,7 +99,7 @@ void FboFrameBufferManager::SetFrameBuffer (size_t fbo_id, size_t cache_id)
 
     //установка значений кэш-переменных
 
-  current_id = cache_id;
+  SetContextCacheValue (CacheEntry_FrameBufferId, cache_id);
 }
 
 /*

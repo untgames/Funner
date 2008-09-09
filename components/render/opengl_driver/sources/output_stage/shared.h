@@ -28,12 +28,12 @@ namespace opengl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Элементы таблицы локальных данных контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum OutputStageCache
+enum OutputStageCacheEntry
 {
-  OutputStageCache_BlendStateHash,        //хэш состояния подуровня смешивания цветов
-  OutputStageCache_DepthStencilStateHash, //хэш состояния подуровня попиксельного отсечения
-  OutputStageCache_StencilReference,      //ссылочное значение теста трафарета
-  OutputStageCache_RasterizerStateHash,   //хэш состояния подуровня растеризации
+  CacheEntry_BlendStateHash = CacheEntry_OutputStagePrivateFirst, //хэш состояния подуровня смешивания цветов
+  CacheEntry_DepthStencilStateHash, //хэш состояния подуровня попиксельного отсечения
+  CacheEntry_StencilReference,      //ссылочное значение теста трафарета
+  CacheEntry_RasterizerStateHash,   //хэш состояния подуровня растеризации
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

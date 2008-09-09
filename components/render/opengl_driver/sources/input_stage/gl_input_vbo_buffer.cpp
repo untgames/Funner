@@ -122,7 +122,7 @@ void VboBuffer::GetDataCore (size_t offset, size_t size, void* data)
 
 void VboBuffer::Bind ()
 {
-  size_t& current_id = GetContextDataTable (Stage_Input)[InputStageCache_BindedVboBuffer];
+  const size_t current_id = GetContextCacheValue (CacheEntry_BindedVboBuffer);
 
   if (current_id == GetId ())
     return;
@@ -137,7 +137,7 @@ void VboBuffer::Bind ()
 
     //установка кэш-переменной
 
-  current_id = GetId ();
+  SetContextCacheValue (CacheEntry_BindedVboBuffer, GetId ());
 }
 
 /*

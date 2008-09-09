@@ -38,14 +38,24 @@ void ContextObject::MakeContextCurrent () const
     Работа с таблицами локальных данных текущего контекста
 */
 
-const ContextDataTable& ContextObject::GetContextDataTable (Stage table_id) const
+const size_t* ContextObject::GetContextCache () const
 {
-  return context_manager.GetContextDataTable (table_id);
+  return context_manager.GetContextCache ();
 }
 
-ContextDataTable& ContextObject::GetContextDataTable (Stage table_id)
+size_t* ContextObject::GetContextCache ()
 {
-  return context_manager.GetContextDataTable (table_id);
+  return context_manager.GetContextCache ();
+}
+
+void ContextObject::SetContextCacheValue (size_t entry_id, size_t value)
+{
+  context_manager.SetContextCacheValue (entry_id, value);
+}
+
+size_t ContextObject::GetContextCacheValue (size_t entry_id) const
+{
+  return context_manager.GetContextCacheValue (entry_id);
 }
 
 /*

@@ -45,10 +45,12 @@ class ContextObject: public Object
     void MakeContextCurrent () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с таблицами локальных данных текущего контекста
+///Работа с кэшем текущего контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const ContextDataTable& GetContextDataTable (Stage table_id) const;
-          ContextDataTable& GetContextDataTable (Stage table_id);
+    const size_t* GetContextCache      () const;
+          size_t* GetContextCache      ();
+          void    SetContextCacheValue (size_t entry_id, size_t value);
+          size_t  GetContextCacheValue (size_t entry_id) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Определение поддержки расширения контекстом

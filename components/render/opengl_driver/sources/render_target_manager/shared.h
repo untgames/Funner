@@ -29,15 +29,15 @@ namespace opengl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Элементы таблицы локальных данных контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum RenderTargetManagerCache
+enum RenderTargetManagerCacheEntry
 {
-  RenderTargetManagerCache_FrameBufferId,         //идентификатор текущего буфера кадра
-  RenderTargetManagerCache_BufferAttachment,      //тип буфера
-  RenderTargetManagerCache_ClearColorHash,        //хэш цвета очистки буфера цвета
-  RenderTargetManagerCache_ClearDepthHash,        //хэш значения очистки буфера глубины
-  RenderTargetManagerCache_ClearStencilValue,     //значение очистки буфера трафарета
-  RenderTargetManagerCache_ViewportHash,          //хэш состояния области вывода
-  RenderTargetManagerCache_ScissorHash,           //хэш состояния области отсечения
+  CacheEntry_FrameBufferId = CacheEntry_RenderTargetManagerPrivateFirst, //идентификатор текущего буфера кадра
+  CacheEntry_BufferAttachment,  //тип буфера
+  CacheEntry_ClearColorHash,    //хэш цвета очистки буфера цвета
+  CacheEntry_ClearDepthHash,    //хэш значения очистки буфера глубины
+  CacheEntry_ClearStencilValue, //значение очистки буфера трафарета
+  CacheEntry_ViewportHash,      //хэш состояния области вывода
+  CacheEntry_ScissorHash,       //хэш состояния области отсечения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

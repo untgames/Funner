@@ -159,9 +159,9 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         throw;
       }
     }
-    
+       
 ///Получение контекста
-    IContext& GetContext () const { return *context; }
+    IContext& GetContext () { return *context; }
 
 ///Получение точек входа OpenGL 1.1
     const GlEntries& GetGlEntries () { return gl_entries; }
@@ -181,14 +181,8 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
     const char* GetVendorString     () { return vendor_string.c_str (); }
     const char* GetRendererString   () { return renderer_string.c_str (); }
 
-///Получение таблицы локальных данных контекста
-    ContextDataTable& GetContextDataTable (Stage table_id)
-    {
-      if (table_id < 0 || table_id >= Stage_Num)
-        throw xtl::make_range_exception ("render::low_level::opengl::ContextImpl::GetContextDataTable", "table_id", table_id, 0, Stage_Num);
-
-      return context_data_table [table_id];
-    }
+///Получение кэша контекста
+    size_t* GetContextCache () { return &context_cache [0]; }
 
 ///Получение текущего контекста
     static ContextImpl* GetCurrentContext ()
@@ -210,20 +204,21 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
     }
 
   private:
-    typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
-    typedef xtl::com_ptr<IContext>   ContextPtr;
+    typedef xtl::com_ptr<ISwapChain>           SwapChainPtr;
+    typedef xtl::com_ptr<IContext>             ContextPtr;
+    typedef xtl::array<size_t, CacheEntry_Num> ContextCache;
     
   private:
-    ContextPtr       context;                        //контекст OpenGL
-    GlEntries        gl_entries;                     //таблица точек входа OpenGL 1.1
-    ExtensionSet     extensions;                     //флаги поддерживаемых исключений
-    stl::string      extensions_string;              //строка поддерживаемых расширений
-    stl::string      version_string;                 //версия OpenGL
-    stl::string      vendor_string;                  //производитель реализации OpenGL
-    stl::string      renderer_string;                //имя устройства отрисовки OpenGL
-    ContextDataTable context_data_table [Stage_Num]; //таблицы локальных данных контекста
-    ContextCaps      context_caps;                   //аппаратно поддерживаемые возможности контекста
-    bool             need_check_errors;              //нужно ли проверять ошибки
+    ContextPtr   context;            //контекст OpenGL
+    GlEntries    gl_entries;         //таблица точек входа OpenGL 1.1
+    ExtensionSet extensions;         //флаги поддерживаемых исключений
+    stl::string  extensions_string;  //строка поддерживаемых расширений
+    stl::string  version_string;     //версия OpenGL
+    stl::string  vendor_string;      //производитель реализации OpenGL
+    stl::string  renderer_string;    //имя устройства отрисовки OpenGL
+    ContextCache context_cache;      //кэш состояния контекста
+    ContextCaps  context_caps;       //аппаратно поддерживаемые возможности контекста
+    bool         need_check_errors;  //нужно ли проверять ошибки
 
   private:
     static ContextImpl* current_context; //указатель на текущий контекст        
@@ -514,17 +509,33 @@ void ContextManager::MakeContextCurrent () const
 }
 
 /*
-    Работа с таблицами локальных данных контекста
+    Работа с кэшем текущего контекста
 */
 
-const ContextDataTable& ContextManager::GetContextDataTable (Stage table_id) const
+const size_t* ContextManager::GetContextCache () const
 {
-  return impl->GetContext ().GetContextDataTable (table_id);
+  return impl->GetContext ().GetContextCache ();
 }
 
-ContextDataTable& ContextManager::GetContextDataTable (Stage table_id)
+size_t* ContextManager::GetContextCache ()
 {
-  return const_cast<ContextDataTable&> (const_cast<const ContextManager&> (*this).GetContextDataTable (table_id));
+  return impl->GetContext ().GetContextCache ();
+}
+
+void ContextManager::SetContextCacheValue (size_t entry_id, size_t value)
+{
+  if (entry_id >= CacheEntry_Num)
+    throw xtl::make_range_exception ("render::low_level::opengl::SetContextCacheValue", "entry_id", entry_id, size_t (CacheEntry_Num));
+    
+  GetContextCache ()[entry_id] = value;
+}
+
+size_t ContextManager::GetContextCacheValue (size_t entry_id) const
+{
+  if (entry_id >= CacheEntry_Num)
+    throw xtl::make_range_exception ("render::low_level::opengl::GetContextCacheValue", "entry_id", entry_id, size_t (CacheEntry_Num));
+    
+  return GetContextCache ()[entry_id];
 }
 
 /*

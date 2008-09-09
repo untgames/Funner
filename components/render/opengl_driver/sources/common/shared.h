@@ -18,6 +18,7 @@
 #include <stl/hash_map>
 #include <stl/bitset>
 
+#include <xtl/array>
 #include <xtl/bind.h>
 #include <xtl/function.h>
 #include <xtl/common_exceptions.h>

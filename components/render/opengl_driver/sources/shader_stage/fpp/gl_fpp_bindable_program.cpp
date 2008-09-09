@@ -238,16 +238,15 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
   
     //получение кэш переменных
 
-  const ContextCaps& caps          = GetCaps ();
-  size_t*            context_cache = &GetContextDataTable (Stage_Shading)[0];
+  const ContextCaps& caps = GetCaps ();
                    
-  size_t &current_program       = context_cache [ShaderStageCache_UsedProgram],
-         &current_viewer_hash   = context_cache [ShaderStageCache_FppViewerStateHash],
-         &current_object_hash   = context_cache [ShaderStageCache_FppObjectStateHash],
-         &current_material_hash = context_cache [ShaderStageCache_FppMaterialStateHash],
-         &current_lighting_hash = context_cache [ShaderStageCache_FppLightingStateHash],
-         &current_texmaps_hash  = context_cache [ShaderStageCache_FppTexmapsStateHash],
-         &current_modes_hash    = context_cache [ShaderStageCache_FppModesStateHash];
+  const size_t current_program       = GetContextCacheValue (CacheEntry_UsedProgram),
+               current_viewer_hash   = GetContextCacheValue (CacheEntry_FppViewerStateHash),
+               current_object_hash   = GetContextCacheValue (CacheEntry_FppObjectStateHash),
+               current_material_hash = GetContextCacheValue (CacheEntry_FppMaterialStateHash),
+               current_lighting_hash = GetContextCacheValue (CacheEntry_FppLightingStateHash),
+               current_texmaps_hash  = GetContextCacheValue (CacheEntry_FppTexmapsStateHash),
+               current_modes_hash    = GetContextCacheValue (CacheEntry_FppModesStateHash);
 
     //отключение glsl-шейдеров  
 
@@ -256,7 +255,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     if (caps.has_arb_shading_language_100)
       caps.glUseProgram_fn (0);
 
-    current_program = GetId ();
+    SetContextCacheValue (CacheEntry_UsedProgram, 0);
   }
 
     //извлечение параметров из кэша расположения параметров
@@ -331,7 +330,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     glMatrixMode          (GL_PROJECTION);
     load_transpose_matrix (fpp_state.viewer.projection_matrix, caps.glLoadTransposeMatrixf_fn);
     
-    current_viewer_hash = viewer_hash;
+    SetContextCacheValue (CacheEntry_FppViewerStateHash, viewer_hash);
   }
   
   if (need_update_modelview_matrix)
@@ -391,14 +390,14 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       glDisable (GL_LIGHTING);    
     }
 
-    current_lighting_hash = lighting_hash;
+    SetContextCacheValue (CacheEntry_FppLightingStateHash, lighting_hash);
   }
   
     //установка параметров объекта
     
   if (current_object_hash != object_hash)
   {  
-    current_object_hash = object_hash; 
+    SetContextCacheValue (CacheEntry_FppObjectStateHash, object_hash);
   }
 
   if (need_update_modelview_matrix)
@@ -468,17 +467,16 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       glDisable (GL_ALPHA_TEST);
     }
 
-    current_material_hash = material_hash;    
+    SetContextCacheValue (CacheEntry_FppMaterialStateHash, material_hash);
   }  
 
     //установка параметров текстурирования
     
   if (current_texmaps_hash != texmaps_hash)
   {    
-    size_t *common_cache             = &GetContextManager ().GetContextDataTable (Stage_Common)[0],
-           texture_units_count       = caps.has_arb_multitexture ? caps.texture_units_count : 1,
-           &active_texture_slot      = common_cache [CommonCache_ActiveTextureSlot],
-           &current_enabled_textures = common_cache [CommonCache_EnabledTextures];
+    size_t       texture_units_count      = caps.has_arb_multitexture ? caps.texture_units_count : 1;
+    const size_t active_texture_slot      = GetContextCacheValue (CacheEntry_ActiveTextureSlot),
+                 current_enabled_textures = GetContextCacheValue (CacheEntry_EnabledTextures);
 
     if (texture_units_count > DEVICE_SAMPLER_SLOTS_COUNT)
       texture_units_count = DEVICE_SAMPLER_SLOTS_COUNT;
@@ -493,7 +491,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       {
         caps.glActiveTexture_fn (GL_TEXTURE0 + i);
 
-        active_texture_slot = i;
+        SetContextCacheValue (CacheEntry_ActiveTextureSlot, i);
       }
 
         //если текстура не установлена - отключение текстурирования канала
@@ -565,7 +563,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       }
     }
     
-    current_texmaps_hash = texmaps_hash;
+    SetContextCacheValue (CacheEntry_FppTexmapsStateHash, texmaps_hash);
   }
   
     //установка режимов отрисовки
@@ -575,7 +573,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     if (fpp_state.modes.normalize) glEnable  (GL_NORMALIZE);
     else                           glDisable (GL_NORMALIZE);
 
-    current_modes_hash = modes_hash;
+    SetContextCacheValue (CacheEntry_FppModesStateHash, modes_hash);
   }  
   
     //проверка ошибок
