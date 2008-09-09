@@ -3,9 +3,10 @@
 
 #define _WIN32_WINNT 0x0501 //for ChangeDisplaySettingsEx
 
-#include <stl/vector>
-#include <stl/string>
 #include <stl/hash_map>
+#include <stl/list>
+#include <stl/string>
+#include <stl/vector>
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
@@ -27,8 +28,6 @@
 #include "wgl_entries.h"
 
 #include <windows.h>
-//#include <winternl.h>
-//#include <d3dkmthk.h>
 
 namespace render
 {

@@ -11,7 +11,6 @@ namespace
     Константы
 */
 
-const size_t ADAPTERS_ARRAY_RESERVE_SIZE     = 4;   //резервируемое количество адаптеров "по умолчанию"
 const size_t PIXEL_FORMAT_ARRAY_RESERVE_SIZE = 256; //резервируемое количество форматов пикселей
 
 /*
@@ -26,10 +25,6 @@ class PlatformManagerImpl
 ///Конструктор
     PlatformManagerImpl ()
     {
-        //резервирование места для хранения адаптеров "по умолчанию"
-
-      default_adapters.reserve (ADAPTERS_ARRAY_RESERVE_SIZE);
-      
         //получение пути к директории Windows
         
       stl::string win_dir;      
@@ -51,7 +46,7 @@ class PlatformManagerImpl
       
         //загрузка адаптера "по умолчанию"
 
-      LoadDefaultAdapter ("Default", "opengl32.dll");      
+      LoadDefaultAdapter ("Default", "opengl32.dll");
     }
 
 ///Создание адаптера
@@ -82,7 +77,7 @@ class PlatformManagerImpl
 ///Перечисление адаптеров "по умолчанию"
     void EnumDefaultAdapters (const xtl::function<void (IAdapter*)>& handler)
     {
-      for (AdapterArray::iterator iter=default_adapters.begin (), end=default_adapters.end (); iter!=end; ++iter)
+      for (AdapterList::iterator iter=default_adapters.begin (), end=default_adapters.end (); iter!=end; ++iter)
         handler (get_pointer (*iter));
     }
 
@@ -270,7 +265,7 @@ class PlatformManagerImpl
 
           //регистрация адаптера
 
-        default_adapters.push_back (adapter);
+        default_adapters.push_front (adapter);
       }
       catch (std::exception& exception)
       {        
@@ -409,12 +404,12 @@ class PlatformManagerImpl
     }
 
   private:
-    typedef xtl::com_ptr<Adapter>   AdapterPtr;
-    typedef stl::vector<AdapterPtr> AdapterArray;
+    typedef xtl::com_ptr<Adapter>  AdapterPtr;
+    typedef stl::list<AdapterPtr> AdapterList;
 
   private:
-    Log          log;              //протокол
-    AdapterArray default_adapters; //адаптеры "по умолчанию"
+    Log         log;              //протокол
+    AdapterList default_adapters; //адаптеры "по умолчанию"
 };
 
 typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;
