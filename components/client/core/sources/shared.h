@@ -18,6 +18,7 @@
 #include <xtl/signal.h>
 #include <xtl/trackable.h>
 
+#include <common/component.h>
 #include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>

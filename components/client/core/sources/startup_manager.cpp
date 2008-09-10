@@ -6,6 +6,7 @@ namespace
 {
 
 const char* LOG_NAME = "client.StartupManager";
+const char* REGISTRY_COMPONENTS_MASK = "client.subsystems.*";
 
 }
 
@@ -49,13 +50,15 @@ struct StartupManagerImpl::Impl
 
     void Startup (Engine& engine, IEngineStartupParams* engine_startup_params)
     {
+      static common::ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
+
       if (need_sort)
       {
         stl::sort (startup_handlers.begin (), startup_handlers.end (), xtl::bind (&Impl::StartupHandlerEntryLessPredicate, this, _1, _2));
         need_sort = false;
       }
 
-      stl::hash_set<stl::hash_key<const char*>> registry_branches;
+      stl::hash_set<stl::hash_key<const char*> > registry_branches;
 
       common::VarRegistry configuration_registry (engine.ConfigurationBranch ());
 

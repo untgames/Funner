@@ -10,6 +10,7 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/reference_counter.h>
 
+#include <common/component.h>
 #include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
@@ -24,8 +25,9 @@ using namespace client;
 namespace
 {
 
-const char* WINDOWS_SUBSYSTEM_NAME = "WindowsSubsytem";
-const char* LOG_NAME               = "client.WindowManager";
+const char* WINDOWS_SUBSYSTEM_NAME   = "WindowsSubsytem";
+const char* LOG_NAME                 = "client.WindowManager";
+const char* REGISTRY_COMPONENTS_MASK = "client.subsystems.*";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсистема движка               
@@ -136,13 +138,15 @@ struct WindowManagerImpl
 
     void InitWindow (syslib::Window& window, VarRegistry& var_registry, Engine& engine)
     {
+      static common::ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
+
       if (need_sort)
       {
         stl::sort (startup_handlers.begin (), startup_handlers.end (), xtl::bind (&WindowManagerImpl::StartupHandlerEntryLessPredicate, this, _1, _2));
         need_sort = false;
       }
 
-      stl::hash_set<stl::hash_key<const char*>> registry_branches;
+      stl::hash_set<stl::hash_key<const char*> > registry_branches;
 
       for (VarRegistry::Iterator configuration_branch_iter = var_registry.CreateIterator (); configuration_branch_iter; ++configuration_branch_iter)
         registry_branches.insert (configuration_branch_iter->Name ());
@@ -168,6 +172,8 @@ struct WindowManagerImpl
 
     void InitWindows (VarRegistry& var_registry, Engine& engine)
     {
+      static common::ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
+
       xtl::com_ptr<WindowsSubsytem> windows_subsystem (new WindowsSubsytem (), false); 
 
       VarRegistry window_registry;
