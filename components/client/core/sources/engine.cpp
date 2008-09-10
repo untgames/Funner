@@ -6,7 +6,7 @@ using namespace client;
    Реализация движка
 */
 
-struct Engine::Impl : public xtl::trackable
+struct Engine::Impl : public IClientEventListener, public xtl::trackable
 {
   public:
 ///Конструктор/деструктор
@@ -14,20 +14,26 @@ struct Engine::Impl : public xtl::trackable
       : configuration_branch_name (in_configuration_branch_name)
       {}
 
+    ~Impl ()
+    {
+      DetachClient ();
+      OnDestroyNotify ();
+    }
+
 ///Установка клиента
     void AttachClient (const Client& new_client)
     {
-      DisableAllListeners ();
-
       client = new_client;
 
-      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
-        client.AttachEventListener (*iter);
+      client.AttachEventListener (this);
     }
 
     void DetachClient ()
     {
-      DisableAllListeners ();
+      RemoveAllScreens ();
+      RemoveAllListeners ();
+
+      client.DetachEventListener (this);
       
       client::Client ().Swap (client);
     }
@@ -107,7 +113,6 @@ struct Engine::Impl : public xtl::trackable
         throw xtl::format_operation_exception (METHOD_NAME, "Listener already attached");
 
       listeners.insert (listener);
-      client.AttachEventListener (listener);
     }
 
     void DetachEventListener (IClientEventListener* listener)
@@ -116,14 +121,86 @@ struct Engine::Impl : public xtl::trackable
         throw xtl::make_null_argument_exception ("client::Engine::DetachEventListener", "listener");
 
       listeners.erase (listener);
-      client.DetachEventListener (listener);
+    }
+
+///События установки/удаления экрана
+    void OnSetScreen (const char* attachment_name, render::Screen* screen) 
+    {
+      screen_attachments.insert (attachment_name);
+      OnSetScreenNotify (attachment_name, screen);
+    }
+
+    void OnRemoveScreen (const char* attachment_name) 
+    {
+      screen_attachments.erase (attachment_name);
+      OnRemoveScreenNotify (attachment_name);
+    }
+
+///События установки/удаления слушателя
+    void OnSetListener (const char* attachment_name, scene_graph::Listener* listener) 
+    {
+      listener_attachments.insert (attachment_name);
+      OnSetListenerNotify (attachment_name, listener);
+    }
+
+    void OnRemoveListener (const char* attachment_name) 
+    {
+      listener_attachments.erase (attachment_name);
+      OnRemoveListenerNotify (attachment_name);
+    }
+
+///Событие удаления клиента
+    void OnDestroy () 
+    {
+      OnDestroyNotify ();
     }
 
   private:
-    void DisableAllListeners ()
+    void RemoveAllScreens ()
+    {
+      for (AttachmentsSet::iterator iter = screen_attachments.begin (), end = screen_attachments.end (); iter != end; ++iter)
+        OnRemoveScreenNotify (iter->c_str ());
+
+      screen_attachments.clear ();
+    }
+
+    void RemoveAllListeners ()
+    {
+      for (AttachmentsSet::iterator iter = listener_attachments.begin (), end = listener_attachments.end (); iter != end; ++iter)
+        OnRemoveListenerNotify (iter->c_str ());
+
+      listener_attachments.clear ();
+    }
+
+//Оповещение слушателей
+    void OnSetScreenNotify (const char* attachment_name, render::Screen* screen)
     {
       for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
-        client.DetachEventListener (*iter);
+        (*iter)->OnSetScreen (attachment_name, screen);
+    }
+    
+    void OnRemoveScreenNotify (const char* attachment_name)
+    {
+      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+        (*iter)->OnRemoveScreen (attachment_name);
+    }
+    
+    void OnSetListenerNotify (const char* attachment_name, scene_graph::Listener* listener)
+    {
+      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+        (*iter)->OnSetListener (attachment_name, listener);
+    }
+    
+    void OnRemoveListenerNotify (const char* attachment_name)
+    {
+      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+        (*iter)->OnRemoveListener (attachment_name);
+    }
+
+    void OnDestroyNotify ()
+    {
+      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+        (*iter)->OnDestroy ();
     }
 
   private:
@@ -131,11 +208,14 @@ struct Engine::Impl : public xtl::trackable
 
     typedef stl::vector<SubsystemPointer>   Subsystems;
     typedef stl::set<IClientEventListener*> ListenerSet;
+    typedef stl::hash_set<stl::string>      AttachmentsSet;
 
   private:
     client::Client client;
     stl::string    configuration_branch_name;
     Subsystems     subsystems;
+    AttachmentsSet screen_attachments;
+    AttachmentsSet listener_attachments;
     ListenerSet    listeners;
 };
 
