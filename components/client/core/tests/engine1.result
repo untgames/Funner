@@ -7,5 +7,7 @@ Engine subsystems count is 4
 OnSetScreen: attachment_name is 'ScreenAttachment', screen name is 'Screen'
 Engine subsystems count is 4
 engine subsystem 1 name is 'Subsystem2'
+OnRemoveScreen: attachment_name is 'ScreenAttachment'
 Engine subsystems count is 3
+OnDestroy
 Engine tracked
