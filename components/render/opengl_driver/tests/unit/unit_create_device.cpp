@@ -6,7 +6,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window");
+    Test test;
 
     printf ("Device: '%s'\n", test.device->GetName ());
   }

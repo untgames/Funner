@@ -37,11 +37,11 @@ class PlatformManagerImpl
 
           //загрузка MSOGL
 
-        LoadDefaultAdapter ("MSOGL", "ogldrv", "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture2d_no_proxy'");
+        LoadDefaultAdapter ("MSOGL", "ogldrv", "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture_no_subimage'");
 
           //загрузка Direct3D эмулятора AcXtrnal
 
-        LoadDefaultAdapter ("Direct3D wrapper", (win_dir + "\\AppPatch\\AcXtrnal").c_str ());
+        LoadDefaultAdapter ("Direct3D wrapper", (win_dir + "\\AppPatch\\AcXtrnal").c_str (), "bugs='GLBUG_texture_no_subimage'");
       }      
       
         //загрузка адаптера "по умолчанию"

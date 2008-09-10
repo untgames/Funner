@@ -1,7 +1,6 @@
 #include "shared.h"
 
-const char* PIXEL_SHADER_FILE_NAME   = "data/glsl/bumpslc.frag";
-const char* VERTEX_SHADER_FILE_NAME  = "data/glsl/bumpslc.vert";
+const char* SHADER_FILE_NAME = "data/fpp_shader.wxf";
 
 #pragma pack (1)
 
@@ -44,11 +43,11 @@ void print (const char* message)
 
 int main ()
 {
-  printf ("Results of shader_stage_state_block_test:\n");
+  printf ("Results of unit_shader_stage_state_block_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (shader_stage_state_block)");
+    Test test;
     
     static ProgramParameter shader_parameters[] = {
       {"LightPosition", ProgramParameterType_Float3, 3, 1, offsetof (MyShaderParameters, light_position)},
@@ -57,14 +56,14 @@ int main ()
       {"Transform", ProgramParameterType_Float4x4, 3, 1, offsetof (MyShaderParameters, transform)}
     };
 
-    stl::string pixel_shader_source  = read_shader (PIXEL_SHADER_FILE_NAME),
-                vertex_shader_source = read_shader (VERTEX_SHADER_FILE_NAME);
+    stl::string shader_source;
+    
+    common::FileSystem::LoadTextFile (SHADER_FILE_NAME, shader_source);
 
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
     
     ShaderDesc shader_descs [] = {
-      {"p_shader", size_t (-1), pixel_shader_source.c_str (), "glsl.ps", ""},
-      {"v_shader", size_t (-1), vertex_shader_source.c_str (), "glsl.vs", ""}
+      {"fpp_shader", ~0, shader_source.c_str (), "fpp", ""},
     }; 
 
     ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));

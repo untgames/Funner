@@ -312,7 +312,7 @@ const char* extensions [] = {
   "GL_WIN_swap_hint",
 
   "GLBUG_texture3D_get_tex_image",
-  "GLBUG_texture2D_no_proxy",
+  "GLBUG_texture_no_subimage",
   "GLBUG_swap_buffers_twice_call"
 };
 

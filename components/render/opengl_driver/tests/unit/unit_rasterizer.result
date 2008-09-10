@@ -1,4 +1,4 @@
-Results of rasterizer_test:
+Results of unit_rasterizer_test:
 Rasterizer state:
   fill_mode:               FillMode_Solid
   cull_mode:               CullMode_None
@@ -13,5 +13,5 @@ Rasterizer state:
   front_counter_clockwise: false
   depth_bias:              1
   scissor_enable:          true
-  multisample_enable:      true
+  multisample_enable:      false
   antialiased_line_enable: false

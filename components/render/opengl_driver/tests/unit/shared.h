@@ -28,6 +28,8 @@
 #include <xtl/ref.h>
 #include <xtl/common_exceptions.h>
 
+#include <common/file.h>
+
 #include <media/image.h>
 
 using namespace render::low_level;
@@ -71,10 +73,10 @@ struct Test
   DevicePtr      device;
   size_t         log_mode;
   
-  Test (const wchar_t* title, const char* init_string="") :
+  Test (const char* init_string="") :
     window (syslib::WindowStyle_Overlapped, 640, 480)
   {
-    window.SetTitle (title);
+    window.SetTitle (L"OpenGL test window");
 
     SwapChainDesc desc;
 

@@ -1,4 +1,4 @@
-Results of query_manager_state_block_test:
+Results of unit_query_manager_state_block_test:
 after reset
 GetPredicate: 0
 GetPredicateValue: 0

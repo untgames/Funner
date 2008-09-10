@@ -1,4 +1,4 @@
-Results of shader_stage_state_block_test:
+Results of unit_shader_stage_state_block_test:
 after reset
 SSGetProgramParametersLayout: 0
 SSGetProgram: 0

@@ -6,7 +6,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (init_string)", "GL_3DFX_tbuffer=! disable='GL_EXT_blend_*'");
+    Test test ("GL_3DFX_tbuffer=! disable='GL_EXT_blend_*'");
 
     printf ("Device: '%s'\n", test.device->GetName ());
 

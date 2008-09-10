@@ -298,12 +298,12 @@ struct TextureManager::Impl: public ContextObject
 
     ITexture* GetTexture (size_t sampler_slot)
     {
-      return state.GetTexture (CheckSamplerSlot (sampler_slot));
+      return state.GetTexture (sampler_slot);
     }
 
     ISamplerState* GetSampler (size_t sampler_slot)
     {
-      return state.GetSampler (CheckSamplerSlot (sampler_slot));
+      return state.GetSampler (sampler_slot);
     }
 
   private:
@@ -342,7 +342,14 @@ struct TextureManager::Impl: public ContextObject
       bool is_pot = is_power_of_two (desc.width);    
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
+      {
+        static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
+
+        if (IsSupported (BUG_texture_no_subimage))
+          return new Texture1DNoSubimage (GetContextManager (), desc); //создание текстуры в режиме эмул€ции
+
         return new Texture1D (GetContextManager (), desc);
+      }
 
       if (caps.has_arb_texture_rectangle)
       {
@@ -379,10 +386,10 @@ struct TextureManager::Impl: public ContextObject
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
       {
-        static Extension BUG_Texture2D_NoProxy = "GLBUG_texture2D_no_proxy";
+        static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
 
-        if (IsSupported (BUG_Texture2D_NoProxy))
-          return new Texture2DNoProxy (GetContextManager (), desc); //создание текстуры в режиме эмул€ции
+        if (IsSupported (BUG_texture_no_subimage))
+          return new Texture2DNoSubimage (GetContextManager (), desc); //создание текстуры в режиме эмул€ции
 
         return new Texture2D (GetContextManager (), desc);
       }

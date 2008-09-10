@@ -17,14 +17,14 @@ class QueryManagerState: public IStageState
     QueryManagerState (QueryManagerState* in_main_state = 0) : main_state (in_main_state) {}
 
 ///Установка предиката отрисовки
-    void SetPredication (AsyncPredicate* in_predicate, bool in_predicate_value)
+    void SetPredication (IAsyncPredicate* in_predicate, bool in_predicate_value)
     {
       predicate       = in_predicate;
       predicate_value = in_predicate_value;
     }
 
 ///Получение предиката отрисовки
-    AsyncPredicate* GetPredicate () { return predicate.get (); }
+    IAsyncPredicate* GetPredicate () { return predicate.get (); }
 
 ///Получение сравниваемого значения предиката отрисовки
     bool GetPredicateValue () { return predicate_value; }
@@ -65,7 +65,7 @@ class QueryManagerState: public IStageState
 
   private:
     typedef xtl::trackable_ptr<QueryManagerState> QueryManagerStatePtr;
-    typedef xtl::trackable_ptr<AsyncPredicate>    AsyncPredicatePtr;
+    typedef xtl::trackable_ptr<IAsyncPredicate>   AsyncPredicatePtr;
 
   private:
     QueryManagerStatePtr main_state;       //основное состояние уровня
@@ -96,7 +96,7 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
         //проверка наличия необходимых расширений
 
       if (!GetCaps ().has_arb_occlusion_query)
-        return new NullPredicate (GetContextManager ());
+        return new NullPredicate;
         
         //установка текущего контекста
 
@@ -113,7 +113,7 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
         //в случае невозможности получения корректного результата - создаём эмуляцию
 
       if (!query_counter_bits)
-        return new NullPredicate (GetContextManager ());
+        return new NullPredicate;
         
         //создание предиката
 
@@ -157,7 +157,13 @@ IPredicate* QueryManager::CreatePredicate ()
 
 void QueryManager::SetPredication (IPredicate* predicate, bool predicate_value)
 {
-  AsyncPredicate* casted_predicate = cast_object<AsyncPredicate> (impl->GetContextManager (), predicate, "render::low_level::opengl::QueryManager::SetPredication", "predicate");
+  static const char* METHOD_NAME = "render::low_level::opengl::QueryManager::SetPredication";
+
+  IAsyncPredicate* casted_predicate = cast_object<IAsyncPredicate> (predicate, METHOD_NAME, "predicate");
+  ContextObject*   casted_object    = dynamic_cast<ContextObject*> (predicate);
+
+  if (casted_object && !casted_object->IsCompatible (impl->GetContextManager ()))
+    throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Argument 'predicate' is incompatible with target IDevice");
 
   impl->SetPredication (casted_predicate, predicate_value);
 }

@@ -139,32 +139,6 @@ inline void dump_desc (IBlendState& state)
   printf ("  color_write_mask:                 %s\n", get_name ((ColorWriteFlag)desc.color_write_mask));
 }
 
-//печать дескриптора rasterizer-state
-inline void dump_desc (IRasterizerState& state)
-{
-  if (!&state)
-  {
-    printf ("Null rasterizer state\n");
-    
-    return;
-  }
-
-  using render::low_level::get_name;
-
-  RasterizerDesc desc;
-  
-  state.GetDesc (desc);
-  
-  printf ("Rasterizer state:\n");
-  printf ("  fill_mode:               %s\n", get_name (desc.fill_mode));
-  printf ("  cull_mode:               %s\n", get_name (desc.cull_mode));
-  printf ("  front_counter_clockwise: %s\n", desc.front_counter_clockwise ? "true" : "false");
-  printf ("  depth_bias:              %d\n", desc.depth_bias);
-  printf ("  scissor_enable:          %s\n", desc.scissor_enable ? "true" : "false");
-  printf ("  multisample_enable:      %s\n", desc.multisample_enable ? "true" : "false");  
-  printf ("  antialiased_line_enable: %s\n", desc.antialiased_line_enable ? "true" : "false");
-}
-
 //печать дескриптора stencil
 inline void dump_desc (const StencilDesc& desc)
 {

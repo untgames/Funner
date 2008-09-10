@@ -1,0 +1,4 @@
+Results of init_string_test:
+Could not create new context. Reason: required extension 'GL_3DFX_tbuffer' not supported
+    at render::low_level::opengl::ContextImpl::ContextImpl
+    at render::low_level::opengl::Driver::CreateDevice

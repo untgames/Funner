@@ -60,21 +60,6 @@ bool detect_texture3d_bug ()
   return glGetError () != GL_NO_ERROR || dst_buffer [TEX_SIZE * TEX_SIZE * TEX_SIZE * RGB_TEXEL_SIZE] != DST_BUFFER_MARKER;
 }
 
-//определение отсутствия двумерных прокси-текстур
-bool detect_proxy_texture2d_bug ()
-{
-  size_t texture_id  = 0;
-  GLint  proxy_width = 0;  
-
-  glGenTextures            (1, &texture_id);
-  glBindTexture            (GL_TEXTURE_2D, texture_id);  
-  glTexImage2D             (GL_PROXY_TEXTURE_2D, 1, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 1, GL_TEXTURE_WIDTH, &proxy_width);
-  glDeleteTextures         (1, &texture_id);
-
-  return glGetError () != GL_NO_ERROR || !proxy_width;
-}
-
 }
 
 /*
@@ -85,9 +70,6 @@ void detect_opengl_bugs (stl::string& extensions)
 {
   if (detect_texture3d_bug ())
     extensions += " GLBUG_texture3D_get_tex_image";
-
-  if (detect_proxy_texture2d_bug ())
-    extensions += " GLBUG_texture2D_no_proxy";
 }
 
 }

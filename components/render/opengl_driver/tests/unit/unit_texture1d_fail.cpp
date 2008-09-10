@@ -4,11 +4,11 @@ using namespace common;
 
 int main ()
 {
-  printf ("Results of texture1d_test:\n");
+  printf ("Results of unit_texture1d_fail_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (texture1d_test)");
+    Test test;
 
     TextureDesc desc;
 

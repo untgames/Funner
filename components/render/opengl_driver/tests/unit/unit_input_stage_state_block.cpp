@@ -27,11 +27,11 @@ struct State
 
 int main ()
 {
-  printf ("Results of input_stage_state_block_test:\n");
+  printf ("Results of unit_input_stage_state_block_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (input_stage_state_block)");
+    Test test;
     
     BufferDesc buffer_desc;
     

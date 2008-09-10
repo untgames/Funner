@@ -1,6 +1,0 @@
-Results of init_string_test:
-Could not create new context. Reason: required extension 'GL_3DFX_tbuffer' not supported
-    at render::low_level::opengl::ContextManager::CreateContext
-    at render::low_level::opengl::SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer
-    at render::low_level::opengl::SwapChainFrameBufferManager::CreateDepthStencilBuffer
-    at render::low_level::opengl::Driver::CreateDevice

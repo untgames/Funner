@@ -2,11 +2,11 @@
 
 int main ()
 {
-  printf ("Results of output_stage_state_block_test:\n");
+  printf ("Results of unit_output_stage_state_block_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (output_stage_state_block)");
+    Test test;
     
     IBlendState*        src_blend_state         = test.device->OSGetBlendState ();
     IDepthStencilState* src_depth_stencil_state = test.device->OSGetDepthStencilState ();

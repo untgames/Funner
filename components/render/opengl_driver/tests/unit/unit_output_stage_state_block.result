@@ -1,4 +1,4 @@
-Results of output_stage_state_block_test:
+Results of unit_output_stage_state_block_test:
 after reset
 OSGetBlendState:        0
 OSGetDepthStencilState: 0

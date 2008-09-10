@@ -33,11 +33,11 @@ struct State
 
 int main ()
 {
-  printf ("Results of rasterizer_stage_state_block_test:\n");
+  printf ("Results of unit_rasterizer_stage_state_block_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (rasterizer_stage_state_block)");    
+    Test test;
 
     State src_state;
 

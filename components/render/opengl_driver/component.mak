@@ -32,7 +32,7 @@ RENDER.OPENGL_DRIVER.SOURCES.win32.SOURCE_DIRS := sources/platform/win32
 #OpenGL render system tests
 RENDER.OPENGL_DRIVER.TESTS.TYPE             := test-suite
 RENDER.OPENGL_DRIVER.TESTS.INCLUDE_DIRS     :=
-RENDER.OPENGL_DRIVER.TESTS.SOURCE_DIRS      := tests/driver tests/device tests/complex
+RENDER.OPENGL_DRIVER.TESTS.SOURCE_DIRS      := tests/driver tests/device tests/complex tests/unit
 RENDER.OPENGL_DRIVER.TESTS.LIB_DIRS         :=
 RENDER.OPENGL_DRIVER.TESTS.LIBS             :=
 RENDER.OPENGL_DRIVER.TESTS.COMPILER_CFLAGS  :=

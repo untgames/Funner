@@ -1,21 +1,21 @@
-Results of texture_manager_state_block_test:
+Results of unit_texture_manager_state_block_test:
 after reset
 SSGetTexture(0): 0
-SSGetTexture(1): 0
-SSGetTexture(2): 0
-SSGetTexture(3): 0
-SSGetTexture(4): 0
-SSGetTexture(5): 0
-SSGetTexture(6): 0
-SSGetTexture(7): 0
+SSGetTexture(1): 1
+SSGetTexture(2): 1
+SSGetTexture(3): 1
+SSGetTexture(4): 1
+SSGetTexture(5): 1
+SSGetTexture(6): 1
+SSGetTexture(7): 1
 SSGetSamplerState(0): 0
-SSGetSamplerState(1): 0
-SSGetSamplerState(2): 0
-SSGetSamplerState(3): 0
-SSGetSamplerState(4): 0
-SSGetSamplerState(5): 0
-SSGetSamplerState(6): 0
-SSGetSamplerState(7): 0
+SSGetSamplerState(1): 1
+SSGetSamplerState(2): 1
+SSGetSamplerState(3): 1
+SSGetSamplerState(4): 1
+SSGetSamplerState(5): 1
+SSGetSamplerState(6): 1
+SSGetSamplerState(7): 1
 after apply
 SSGetTexture(0): 1
 SSGetTexture(1): 1

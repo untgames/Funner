@@ -24,11 +24,11 @@ void print (const char* message)
 
 int main ()
 {
-  printf ("Results of query_manager_state_block_test:\n");
+  printf ("Results of unit_query_manager_state_block_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (query_manager_state_block)");
+    Test test;
     
     PredicatePtr predicate (test.device->CreatePredicate ());
     bool         predicate_value = true;

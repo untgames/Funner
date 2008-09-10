@@ -103,7 +103,7 @@ int main ()
 
   try
   {
-    Test test (L"OpenGL device test window");
+    Test test;
     
     output_mode = test.log_mode;
     

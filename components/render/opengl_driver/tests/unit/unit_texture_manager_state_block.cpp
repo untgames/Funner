@@ -26,11 +26,11 @@ struct State
 
 int main ()
 {
-  printf ("Results of texture_manager_state_block_test:\n");
+  printf ("Results of unit_texture_manager_state_block_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (texture_manager_state_block)");
+    Test test;
     
     TextureDesc texture_desc;
     SamplerDesc sampler_desc;
@@ -52,8 +52,8 @@ int main ()
     sampler_desc.mag_filter           = TexMagFilter_Linear;
     sampler_desc.wrap_u               = TexcoordWrap_Clamp;
     sampler_desc.wrap_v               = TexcoordWrap_Clamp;
-    sampler_desc.wrap_w               = TexcoordWrap_Clamp;
-    sampler_desc.comparision_function = CompareMode_Less;
+    sampler_desc.wrap_w               = TexcoordWrap_Repeat;
+    sampler_desc.comparision_function = CompareMode_AlwaysPass;
     sampler_desc.mip_lod_bias         = 0.0f;
     sampler_desc.min_lod              = 0.0f;
     sampler_desc.max_lod              = FLT_MAX;    
@@ -61,11 +61,8 @@ int main ()
     TexturePtr texture (test.device->CreateTexture (texture_desc), false);
     SamplerStatePtr sampler (test.device->CreateSamplerState (sampler_desc), false);        
     
-    for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
-    {
-      test.device->SSSetSampler (i, sampler.get ());
-      test.device->SSSetTexture (i, texture.get ());
-    }    
+    test.device->SSSetSampler (0, sampler.get ());
+    test.device->SSSetTexture (0, texture.get ());
 
     State src_state;
 
@@ -85,11 +82,8 @@ int main ()
 
     state_block->Capture ();
         
-    for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
-    {
-      test.device->SSSetSampler (i, 0);
-      test.device->SSSetTexture (i, 0);
-    }
+    test.device->SSSetSampler (0, 0);
+    test.device->SSSetTexture (0, 0);
 
     printf ("after reset\n");
     

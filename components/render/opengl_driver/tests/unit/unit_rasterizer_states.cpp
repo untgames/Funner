@@ -51,16 +51,18 @@ void test_state(const RasterizerDesc& desc, IDevice* device)
 
 int main ()
 {
-  printf ("Results of all_blend_states test:\n");
+  printf ("Results of unit_rasterizer_states test:\n");
 
   try
   {
-    Test test (L"OpenGL device test window (all_rasterizer_states test)");
+    Test test;
     
     output_mode = test.log_mode;
     
     RasterizerDesc desc;
-    desc.depth_bias = 0;
+    
+    desc.depth_bias         = 0;
+    desc.multisample_enable = false; 
     
     for (int fm = 0; fm < FillMode_Num; fm++)
     {
@@ -71,17 +73,15 @@ int main ()
         for (int front = 0; front < 2; front++)
         {
           desc.front_counter_clockwise = front != 0;
+          
           for (int scissor = 0; scissor < 2; scissor++)
           {
             desc.scissor_enable = scissor != 0;
-            for (int mult = 0; mult < 2; mult++)
+
+            for (int anti = 0; anti < 2; anti++)
             {
-              desc.multisample_enable = mult != 0;
-              for (int anti = 0; anti < 2; anti++)
-              {
-                desc.antialiased_line_enable = anti != 0;
-                test_state(desc, test.device.get());
-              }
+              desc.antialiased_line_enable = anti != 0;
+              test_state(desc, test.device.get());
             }
           }
         }
