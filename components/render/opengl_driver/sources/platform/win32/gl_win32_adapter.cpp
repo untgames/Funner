@@ -281,121 +281,138 @@ void Adapter::EnumPixelFormats
 
   PixelFormatDesc out_desc;
 
-    //попытка перечисления с использованием расширеня WGL_ARB_pixel_format
+    //попытка перечисления с использованием расширеня WGL_ARB_pixel_format/WGL_EXT_pixel_format
 
-  if (wgl_extension_entries && wgl_extension_entries->GetPixelFormatAttribivARB)
+  PFNWGLGETPIXELFORMATATTRIBIVARBPROC fGetPixelFormatAttribiv = 0;
+  
+  if (wgl_extension_entries)
+  {
+    fGetPixelFormatAttribiv = wgl_extension_entries->GetPixelFormatAttribivARB;
+    
+    if (fGetPixelFormatAttribiv)
+    {
+      impl->log.Printf (".....enumerate using WGL_ARB_pixel_format");
+    }
+    else
+    {
+      fGetPixelFormatAttribiv = reinterpret_cast<PFNWGLGETPIXELFORMATATTRIBIVARBPROC> (wgl_extension_entries->GetPixelFormatAttribivEXT);
+      
+      if (fGetPixelFormatAttribiv)
+        impl->log.Printf (".....enumerate using WGL_EXT_pixel_format");
+    }
+  }    
+
+  if (fGetPixelFormatAttribiv)
   {
       //определение максимального формата пикселей      
 
     int name = WGL_NUMBER_PIXEL_FORMATS_ARB, max_pixel_format = 0;
+    
+    if (!fGetPixelFormatAttribiv (device_context, 1, 0, 1, &name, &max_pixel_format))
+      max_pixel_format = 0;
 
-    impl->log.Printf (".....enumerate using WGL_ARB_pixel_format");
+      //перечисление форматов
 
-    if (wgl_extension_entries->GetPixelFormatAttribivARB (device_context, 1, 0, 1, &name, &max_pixel_format))
+    impl->log.Printf (".....%u formats found", max_pixel_format);
+
+    for (int current_pixel_format=1; current_pixel_format<=max_pixel_format; ++current_pixel_format)
     {
-        //перечисление форматов
+      static int basic_names [] = {
+        WGL_SUPPORT_OPENGL_ARB,
+        WGL_DRAW_TO_WINDOW_ARB,
+        WGL_PIXEL_TYPE_ARB,
+        WGL_COLOR_BITS_ARB,
+        WGL_ALPHA_BITS_ARB,
+        WGL_DEPTH_BITS_ARB,
+        WGL_STENCIL_BITS_ARB,
+        WGL_DOUBLE_BUFFER_ARB,
+        WGL_AUX_BUFFERS_ARB,
+        WGL_STEREO_ARB,
+        WGL_SWAP_METHOD_ARB,
+        WGL_ACCELERATION_ARB,
+      };
 
-      impl->log.Printf (".....%u formats found", max_pixel_format);
+      static const int BASIC_NAMES_COUNT = sizeof (basic_names) / sizeof (GLenum);
 
-      for (int current_pixel_format=1; current_pixel_format<=max_pixel_format; ++current_pixel_format)
+      int value_buffer [BASIC_NAMES_COUNT], *iter = value_buffer;
+
+      if (!fGetPixelFormatAttribiv (device_context, current_pixel_format, 0, BASIC_NAMES_COUNT, basic_names, value_buffer))
+        continue;
+
+      if (!*iter++) //форматы без поддержки OpenGL игнорируются
+        continue;
+
+      if (!*iter++) //форматы без поддержки рисования в окно игнорируются
+        continue;
+
+      if (*iter++ == PFD_TYPE_COLORINDEX) //палитровые форматы игнорируются
+        continue;
+
+      out_desc.adapter                 = this;
+      out_desc.wgl_extension_entries   = wgl_extension_entries;
+      out_desc.pixel_format_index      = current_pixel_format;
+      out_desc.color_bits              = *iter++;
+      out_desc.alpha_bits              = *iter++;
+      out_desc.depth_bits              = *iter++;
+      out_desc.stencil_bits            = *iter++;
+      out_desc.samples_count           = 0;      
+      out_desc.buffers_count           = *iter++ ? 2 : 1;
+      out_desc.aux_buffers             = *iter++;
+      out_desc.support_draw_to_pbuffer = false;
+      out_desc.support_stereo          = *iter++ != 0;
+      
+      switch (*iter++)
       {
-        static int basic_names [] = {
-          WGL_SUPPORT_OPENGL_ARB,
-          WGL_DRAW_TO_WINDOW_ARB,
-          WGL_PIXEL_TYPE_ARB,
-          WGL_COLOR_BITS_ARB,
-          WGL_ALPHA_BITS_ARB,
-          WGL_DEPTH_BITS_ARB,
-          WGL_STENCIL_BITS_ARB,
-          WGL_DOUBLE_BUFFER_ARB,
-          WGL_AUX_BUFFERS_ARB,
-          WGL_STEREO_ARB,
-          WGL_SWAP_METHOD_ARB,
-          WGL_ACCELERATION_ARB,
-        };
-
-        static const int BASIC_NAMES_COUNT = sizeof (basic_names) / sizeof (GLenum);
-
-        int value_buffer [BASIC_NAMES_COUNT], *iter = value_buffer;
-
-        if (!wgl_extension_entries->GetPixelFormatAttribivARB (device_context, current_pixel_format, 0, BASIC_NAMES_COUNT, basic_names, value_buffer))
-          continue;
-
-        if (!*iter++) //форматы без поддержки OpenGL игнорируются
-          continue;
-
-        if (!*iter++) //форматы без поддержки рисования в окно игнорируются
-          continue;
-
-        if (*iter++ == PFD_TYPE_COLORINDEX) //палитровые форматы игнорируются
-          continue;
-
-        out_desc.adapter                 = this;
-        out_desc.wgl_extension_entries   = wgl_extension_entries;
-        out_desc.pixel_format_index      = current_pixel_format;
-        out_desc.color_bits              = *iter++;
-        out_desc.alpha_bits              = *iter++;
-        out_desc.depth_bits              = *iter++;
-        out_desc.stencil_bits            = *iter++;
-        out_desc.samples_count           = 0;      
-        out_desc.buffers_count           = *iter++ ? 2 : 1;
-        out_desc.aux_buffers             = *iter++;
-        out_desc.support_draw_to_pbuffer = false;
-        out_desc.support_stereo          = *iter++ != 0;
-        
-        switch (*iter++)
-        {
-          case WGL_SWAP_EXCHANGE_ARB:
-            out_desc.swap_method = SwapMethod_Flip;
-            break;
-          case WGL_SWAP_COPY_ARB:
-            out_desc.swap_method = SwapMethod_Copy;
-            break;
-          default:            
-          case WGL_SWAP_UNDEFINED_ARB:
-            out_desc.swap_method = SwapMethod_Discard;
-            break;
-        }
-
-        switch (*iter++)
-        {
-          default:
-          case WGL_NO_ACCELERATION_ARB:
-            out_desc.acceleration = Acceleration_No;
-            break;
-          case WGL_GENERIC_ACCELERATION_ARB:
-            out_desc.acceleration = Acceleration_MCD;
-            break;
-          case WGL_FULL_ACCELERATION_ARB:
-            out_desc.acceleration = Acceleration_ICD;
-            break;
-        }
-
-        int name, value;
-
-        if (has_pbuffer)
-        {
-          name = WGL_DRAW_TO_PBUFFER_ARB;
-          
-           if (wgl_extension_entries->GetPixelFormatAttribivARB (device_context, current_pixel_format, 0, 1, &name, &value))
-             out_desc.support_draw_to_pbuffer = value != 0;
-        }
-
-        if (has_multisample)
-        {
-          name = WGL_SAMPLES_ARB;
-          
-          if (wgl_extension_entries->GetPixelFormatAttribivARB (device_context, current_pixel_format, 0, 1, &name, &value))
-            out_desc.samples_count = size_t (value);
-        }
-
-          //добавление дескриптора в массив
-
-        pixel_formats.push_back (out_desc);          
+        case WGL_SWAP_EXCHANGE_ARB:
+          out_desc.swap_method = SwapMethod_Flip;
+          break;
+        case WGL_SWAP_COPY_ARB:
+          out_desc.swap_method = SwapMethod_Copy;
+          break;
+        default:            
+        case WGL_SWAP_UNDEFINED_ARB:
+          out_desc.swap_method = SwapMethod_Discard;
+          break;
       }
 
-      return;
+      switch (*iter++)
+      {
+        default:
+        case WGL_NO_ACCELERATION_ARB:
+          out_desc.acceleration = Acceleration_No;
+          break;
+        case WGL_GENERIC_ACCELERATION_ARB:
+          out_desc.acceleration = Acceleration_MCD;
+          break;
+        case WGL_FULL_ACCELERATION_ARB:
+          out_desc.acceleration = Acceleration_ICD;
+          break;
+      }
+
+      int name, value;
+
+      if (has_pbuffer)
+      {
+        name = WGL_DRAW_TO_PBUFFER_ARB;
+        
+         if (fGetPixelFormatAttribiv (device_context, current_pixel_format, 0, 1, &name, &value))
+           out_desc.support_draw_to_pbuffer = value != 0;
+      }
+
+      if (has_multisample)
+      {
+        name = WGL_SAMPLES_ARB;
+        
+        if (fGetPixelFormatAttribiv (device_context, current_pixel_format, 0, 1, &name, &value))
+          out_desc.samples_count = size_t (value);
+      }
+
+        //добавление дескриптора в массив
+
+      pixel_formats.push_back (out_desc);          
     }
+
+    return;
   }
 
     //перечисление без использования расширений
@@ -406,7 +423,7 @@ void Adapter::EnumPixelFormats
     
   impl->log.Printf (".....enumerate using DescribePixelFormat");
 
-  int max_pixel_format = impl->library->DescribePixelFormat (device_context, 1, sizeof pfd, &pfd);  
+  int max_pixel_format = impl->library->DescribePixelFormat (device_context, 1, sizeof pfd, &pfd);
 
   impl->log.Printf (".....%u formats found", max_pixel_format);
 

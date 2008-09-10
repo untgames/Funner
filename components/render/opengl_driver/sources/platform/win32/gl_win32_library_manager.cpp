@@ -34,7 +34,7 @@ typedef wglGetProcAddressFn      DrvGetProcAddressFn;
 typedef wglSwapBuffersFn         DrvSwapBuffersFn;
 
 typedef HGLRC (WINAPI *DrvCreateLayerContextFn) (HDC dc, int layer);
-typedef BOOL  (WINAPI *DrvSwapLayerBuffersFn)       (HDC hdc, UINT fuPlanes);
+typedef BOOL  (WINAPI *DrvSwapLayerBuffersFn)   (HDC hdc, UINT fuPlanes);
 
 typedef BOOL  (WINAPI *DrvSetPixelFormatFn)  (HDC hdc, int pixel_format);
 typedef void* (WINAPI *DrvSetContextFn)      (HDC dc, HGLRC context, void* callback);
@@ -246,14 +246,14 @@ class WglAdapterLibrary: public AdapterLibrary
         GetSymbol ("wglSetPixelFormat",      fwglSetPixelFormat);
         GetSymbol ("wglSwapBuffers",         fwglSwapBuffers);
         
-        if (!xtl::xstricmp (GetName (), "opengl32.dll"))
+        static const char* OPENGL32_DLL = "opengl32";
+        
+        if (!xtl::xstrnicmp (GetName (), OPENGL32_DLL, strlen (OPENGL32_DLL)))
           fwglSetPixelFormat = &::SetPixelFormat;
+          
+          //перенаправление вызовов GDI
 
-            //перенаправление вызовов GDI API
-            
-        log.Printf ("...redirect GDI calls");
-
-        PixelFormatManager::RedirectApiCalls (GetModule (), fwglDescribePixelFormat);
+        PixelFormatManager::RedirectApiCalls (GetModule ());
 
         log.Printf ("...WGL library successfully loaded");
       }
@@ -280,8 +280,8 @@ class WglAdapterLibrary: public AdapterLibrary
 
         memset (&pfd, 0, sizeof pfd);
 
-        if (!PixelFormatManager::SetPixelFormat (dc, pixel_format, &pfd))
-          raise_error ("SetPixelFormat");
+        if (!PixelFormatManager::SetPixelFormat (dc, pixel_format, fwglDescribePixelFormat))
+          raise_error ("render::low_level::opengl::windows::PixelFormatManager::SetPixelFormat");
 
         if (!fwglSetPixelFormat (dc, pixel_format, &pfd))
           raise_error ("wglSetPixelFormat");
@@ -455,13 +455,11 @@ class IcdAdapterLibrary: public AdapterLibrary
 
         if (set_callback_procs_fn)
           throw xtl::format_not_supported_exception ("", "Adapter library '%s' has unsupported function 'DrvSetCallbackProcs'", GetName ());
-
-          //перенаправление вызовов GDI API
           
-        log.Printf ("...redirect GDI calls");
-
-        PixelFormatManager::RedirectApiCalls (GetModule (), fDrvDescribePixelFormat);
-        
+          //перенаправление вызовов GDI
+          
+        PixelFormatManager::RedirectApiCalls (GetModule ());
+       
         log.Printf ("...ICD library successfully loaded");
       }
       catch (xtl::exception& exception)
@@ -487,8 +485,8 @@ class IcdAdapterLibrary: public AdapterLibrary
 
         memset (&pfd, 0, sizeof pfd);
 
-        if (!PixelFormatManager::SetPixelFormat (dc, pixel_format, &pfd))
-          raise_error ("SetPixelFormat");
+        if (!PixelFormatManager::SetPixelFormat (dc, pixel_format, fDrvDescribePixelFormat))
+          raise_error ("render::low_level::opengl::windows::PixelFormatManager::SetPixelFormat");
 
         if (!fDrvSetPixelFormat (dc, pixel_format))
           raise_error ("DrvSetPixelFormat");

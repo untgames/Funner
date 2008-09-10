@@ -103,10 +103,10 @@ void redirect_dll_call (HMODULE module, const char* import_module_name, void* sr
   {
     if (!module)
       throw xtl::make_null_argument_exception ("", "module");
-      
+
     if (!import_module_name)
       throw xtl::make_null_argument_exception ("", "import_module_name");
-      
+
     if (!src_thunk)
       throw xtl::make_null_argument_exception ("", "src_thunk");
       
@@ -130,16 +130,16 @@ void redirect_dll_call (HMODULE module, const char* import_module_name, void* sr
 
     for (;import_descriptor->Name; ++import_descriptor) //перебор импортируемых модулей
     {
-      const char* module_name = reinterpret_cast<const char*> (image_base + import_descriptor->Name);
+      const char* module_name = reinterpret_cast<const char*> (image_base + import_descriptor->Name);      
 
       if (xtl::xstricmp (module_name, import_module_name))
         continue;
 
+        //перебор точек входа
+
       void**            thunk      = reinterpret_cast<void**> (image_base + import_descriptor->FirstThunk);
       char*             hint       = import_descriptor->OriginalFirstThunk ? image_base + import_descriptor->OriginalFirstThunk : (char*)thunk;
-      PIMAGE_THUNK_DATA thunk_data = PIMAGE_THUNK_DATA (hint);
-      
-        //перебор точек входа
+      PIMAGE_THUNK_DATA thunk_data = PIMAGE_THUNK_DATA (hint);        
 
       for (;thunk_data->u1.AddressOfData; thunk_data++, thunk++)
       {

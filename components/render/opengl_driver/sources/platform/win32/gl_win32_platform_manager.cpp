@@ -37,16 +37,16 @@ class PlatformManagerImpl
 
           //загрузка MSOGL
 
-        LoadDefaultAdapter ("MSOGL", (win_dir + "\\system32\\ogldrv.dll").c_str (), "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture2d_no_proxy'");
+        LoadDefaultAdapter ("MSOGL", "ogldrv", "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture2d_no_proxy'");
 
           //загрузка Direct3D эмулятора AcXtrnal
 
-        LoadDefaultAdapter ("Direct3D wrapper", (win_dir + "\\AppPatch\\AcXtrnal.dll").c_str ());
+        LoadDefaultAdapter ("Direct3D wrapper", (win_dir + "\\AppPatch\\AcXtrnal").c_str ());
       }      
       
         //загрузка адаптера "по умолчанию"
 
-      LoadDefaultAdapter ("Default", "opengl32.dll");
+      LoadDefaultAdapter ("OpenGL32", "opengl32");
     }
 
 ///Создание адаптера
@@ -143,6 +143,8 @@ class PlatformManagerImpl
           {
             log.Printf ("...enumerate pixel formats on adapter '%s'", adapter->GetName ());
 
+            PixelFormatManager::SetDefaultLibrary (&adapter->GetLibrary ());
+
             adapter->EnumPixelFormats (dc_holder.window, dc_holder.dc, pixel_formats, wgl_extension_entries);
           }
           catch (std::exception& exception)
@@ -153,6 +155,8 @@ class PlatformManagerImpl
           {
             log.Printf ("Unknown exception\n    at enumerate pixel formats on adapter '%s'", adapter->GetName ());
           }
+
+          PixelFormatManager::SetDefaultLibrary (0);
         }
 
           //выбор наиболее подходящего формата          
