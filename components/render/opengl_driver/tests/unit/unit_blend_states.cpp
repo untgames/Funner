@@ -99,7 +99,7 @@ void test_blend_state (const BlendDesc& desc, IDevice* device)
 
 int main ()
 {
-  printf ("Results of all_blend_states test:\n");
+  printf ("Results of unit_blend_states test:\n");
 
   try
   {

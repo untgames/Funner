@@ -2,7 +2,7 @@
 
 int main ()
 {
-  printf ("Results of create_device_test:\n");
+  printf ("Results of unit_create_device_test:\n");
   
   try
   {
