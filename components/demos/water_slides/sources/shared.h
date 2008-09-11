@@ -16,6 +16,7 @@
 #include <common/file.h>
 #include <common/streams.h>
 #include <common/strlib.h>
+#include <common/log.h>
 
 #include <mathlib.h>
 

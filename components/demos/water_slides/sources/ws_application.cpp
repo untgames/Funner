@@ -110,7 +110,7 @@ struct MyApplication::Impl
       desc.fullscreen                = configuration.GetInteger ("FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) != 0;
       desc.window_handle             = window.Handle ();
       
-      render::low_level::DriverManager::CreateSwapChainAndDevice ("*", "Default", desc, configuration.GetString ("DeviceInitString", DEFAULT_DEVICE_INIT_STRING),
+      render::low_level::DriverManager::CreateSwapChainAndDevice ("*", "*", desc, configuration.GetString ("DeviceInitString", DEFAULT_DEVICE_INIT_STRING),
         swap_chain, device);
       
         //оповещение об изменении размеров

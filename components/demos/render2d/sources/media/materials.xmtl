@@ -13,6 +13,6 @@
     <sprite_profile image="media/burst_strip.tga" blend_mode="additive" tiling="1" tile_width="64" tile_height="64"/>
   </material>
   <material id="pistol_material">
-    <sprite_profile image="media/pistol_mflash_strip.tga" blend_mode="additive" tiling="1" tile_width="86" tile_height="128"/>
+    <sprite_profile image="media/pistol_mflash_strip.tga" blend_mode="additive" tiling="1" tile_width="43" tile_height="64"/>
   </material>
 </material_library>

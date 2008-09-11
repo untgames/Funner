@@ -126,7 +126,7 @@ class TestView: public IGameView
     void OnDraw ()
     {
       if (!current_device)
-        return;
+        return;        
 
       UpdateShaderParameters ();        
       
@@ -143,7 +143,8 @@ class TestView: public IGameView
       current_device->SSSetProgram      (ground_shader.get ());
       current_device->SSSetTexture      (0, ground_texture.get ());
       current_device->ISSetVertexBuffer (0, rect_vertex_buffer.get ());
-      current_device->Draw              (PrimitiveType_TriangleStrip, 0, 4);
+      current_device->ISSetIndexBuffer  (rect_index_buffer.get ());
+      current_device->DrawIndexed       (PrimitiveType_TriangleList, 0, 6, 0);
 
       current_device->SSSetProgram      (water_shader.get ());
       current_device->OSSetBlendState   (blend_state.get ());
@@ -154,21 +155,21 @@ class TestView: public IGameView
       for (size_t i=0; i<GRID_SIZE-2; i++)
         current_device->DrawIndexed (PrimitiveType_TriangleStrip, i * indices_block_size, indices_block_size, 0);
 
-      current_device->SSSetProgram        (ground_shader.get ());
-      current_device->ISSetVertexBuffer   (0, rect_vertex_buffer.get ());      
+      current_device->ISSetVertexBuffer   (0, rect_vertex_buffer.get ());
+      current_device->ISSetIndexBuffer    (rect_index_buffer.get ());
       current_device->SSSetProgram        (ground_shader.get ());
       current_device->SSSetConstantBuffer (0, boat_constant_buffer.get ());
       current_device->SSSetTexture        (0, boat_texture.get ());
-      current_device->Draw                (PrimitiveType_TriangleStrip, 0, 4);
+      current_device->DrawIndexed         (PrimitiveType_TriangleList, 0, 6, 0);
 
       current_device->OSSetBlendState (default_blend_state.get ());
-      current_device->OSSetDepthStencilState (default_depth_stencil_state.get ());
+      current_device->OSSetDepthStencilState (default_depth_stencil_state.get ());      
     }
 
     void LoadResources (sound::ScenePlayer* player, IDevice& device)
     {
       if (player)
-        player->SetListener (&*(listener.get ()));
+        player->SetListener (&*(listener.get ()));        
 
       current_device = &device;
       
@@ -195,6 +196,14 @@ class TestView: public IGameView
       index_buffer = BufferPtr (current_device->CreateBuffer (ib_desc), false);
 
       index_buffer->SetData (0, indices.size () * sizeof size_t, &indices [0]);
+      
+      static size_t rect_indices [] = {0, 1, 2, 3, 0, 2};
+      
+      ib_desc.size = sizeof rect_indices;
+      
+      rect_index_buffer = BufferPtr (current_device->CreateBuffer (ib_desc), false);
+
+      rect_index_buffer->SetData (0, sizeof rect_indices, rect_indices);
 
       static VertexAttribute attributes [] = {
         {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, normal), sizeof (Vertex)},
@@ -212,7 +221,7 @@ class TestView: public IGameView
       layout_desc.index_type              = InputDataType_UInt;
       layout_desc.index_buffer_offset     = 0;            
 
-      input_layout = InputLayoutPtr (current_device->CreateInputLayout (layout_desc), false);      
+      input_layout = InputLayoutPtr (current_device->CreateInputLayout (layout_desc), false);            
      
       static ProgramParameter shader_parameters[] = {
         {"myProjMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (ShaderParameters, projection_matrix)},
@@ -244,15 +253,14 @@ class TestView: public IGameView
       memset (&rs_desc, 0, sizeof (rs_desc));
 
       rs_desc.fill_mode  = FillMode_Solid;
-//      rs_desc.fill_mode  = FillMode_Wireframe;
-      rs_desc.cull_mode  = CullMode_None;
+      rs_desc.cull_mode  = CullMode_None;      
 
-      rasterizer = RasterizerStatePtr (current_device->CreateRasterizerState (rs_desc), false);      
+      rasterizer = RasterizerStatePtr (current_device->CreateRasterizerState (rs_desc), false);            
 
       water_texture  = LoadTexture (WATER_TEXTURE_NAME);
       ground_texture = LoadTexture (GROUND_TEXTURE_NAME);
       boat_texture   = LoadTexture (BOAT_TEXTURE_NAME);
-
+      
       SamplerDesc sampler_desc;
       
       memset (&sampler_desc, 0, sizeof (sampler_desc));
@@ -271,8 +279,8 @@ class TestView: public IGameView
       static Vertex rect_vertices [] = {
         {{-1, -1, 0}, {0, 0, -1}, {0, 0}, {255, 255, 255, 255}},
         {{ 1, -1, 0}, {0, 0, -1}, {1, 0}, {255, 255, 255, 255}},
-        {{-1,  1, 0}, {0, 0, -1}, {0, 1}, {255, 255, 255, 255}},
         {{ 1,  1, 0}, {0, 0, -1}, {1, 1}, {255, 255, 255, 255}},
+        {{-1,  1, 0}, {0, 0, -1}, {0, 1}, {255, 255, 255, 255}},
       };
 
       vb_desc.size = sizeof (rect_vertices);
@@ -294,7 +302,7 @@ class TestView: public IGameView
       blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
       blend_desc.color_write_mask                 = ColorWriteFlag_All;
 
-      blend_state = BlendStatePtr (current_device->CreateBlendState (blend_desc), false);            
+      blend_state = BlendStatePtr (current_device->CreateBlendState (blend_desc), false);                  
 
       UpdateWater ();
     }
@@ -449,11 +457,11 @@ class TestView: public IGameView
       tex_desc.layers       = 1;
       tex_desc.format       = format;
       tex_desc.bind_flags   = BindFlag_Texture;
-      tex_desc.access_flags = AccessFlag_ReadWrite;
+      tex_desc.access_flags = AccessFlag_ReadWrite;      
 
-      TexturePtr texture (current_device->CreateTexture (tex_desc), false);
+      TexturePtr texture (current_device->CreateTexture (tex_desc), false);            
 
-      texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, format, image.Bitmap ());      
+      texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, format, image.Bitmap ());            
 
       return texture;
     }
@@ -534,6 +542,7 @@ class TestView: public IGameView
     BufferPtr                  constant_buffer;
     BufferPtr                  boat_constant_buffer;
     BufferPtr                  index_buffer;
+    BufferPtr                  rect_index_buffer;
     InputLayoutPtr             input_layout;
     ProgramPtr                 water_shader;
     ProgramPtr                 ground_shader;    
