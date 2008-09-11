@@ -14,10 +14,23 @@
 #include <syslib/application.h>
 #include <syslib/window.h>
 
+#include <sg/scene.h>
+#include <sg/visual_model.h>
+#include <sg/camera.h>
+
+#include <render/screen.h>
+#include <render/scene_render.h>
+
 #include <tools/ui/main_window.h>
 #include <tools/ui/custom_window_system.h>
 
+#include <client/engine.h>
+#include <client/window_manager.h>
+
 using namespace tools::ui;
+using namespace scene_graph;
+using namespace client;
+using namespace render;
 
 extern "C"
 {
@@ -26,14 +39,47 @@ extern double _HUGE = DBL_MAX;
 
 }
 
-//вҐбв®ў®Ґ Ї®«м§®ў вҐ«мбЄ®Ґ ¤®зҐа­ҐҐ ®Є­®
+namespace
+{
+
+/*
+    Константы
+*/
+
+const char* MODEL_MESH_NAME             = "media/mesh/spy.xmesh";
+const char* ENGINE_CONFIGURATION_BRANCH = "Configuration";
+const char* WINDOW_CONFIGURATION_BRANCH = "Configuration.Window";
+const char* SCREEN_ATTACHMENT_NAME      = "MainScreen";
+
+//тестовое пользовательское дочернее окно
 class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
 {
   public:
-///Љ®­бвагЄв®а
-    MyChildWindow () : window (syslib::WindowStyle_PopUp) {}    
+///Конструктор
+    MyChildWindow (const EngineAttachments& attachments)
+      : window (syslib::WindowStyle_PopUp),
+        engine (ENGINE_CONFIGURATION_BRANCH, StartupGroup_Level2)
+    {
+        //установка точек привязки
 
-///€§¬Ґ­Ґ­ЁҐ Ї®«®¦Ґ­Ёп ®Є­ 
+      engine.Attach (attachments);            
+      
+        //регистрация окна
+
+      common::VarRegistry window_config (WINDOW_CONFIGURATION_BRANCH);
+
+      WindowManager::InitWindow (window, window_config, engine);            
+
+        //запуск систем движка
+
+      engine.Start (StartupGroup_LevelMax);
+      
+        //показ окна
+        
+      window.Show ();
+    }
+
+///Изменение положения окна
     void SetPosition (size_t x, size_t y)
     {
       try
@@ -47,7 +93,7 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
       }
     }
 
-///€§¬Ґ­Ґ­ЁҐ а §¬Ґа®ў ®Є­ 
+///Изменение размеров окна
     void SetSize (size_t width, size_t height)
     {
       try
@@ -61,7 +107,7 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
       }
     }
     
-///“бв ­®ўЄ  а®¤ЁвҐ«мбЄ®Ј® ®Є­ 
+///Установка родительского окна
     void SetParent (const void* parent_window_handle)
     {
       try
@@ -74,8 +120,8 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
         throw;
       }
     }    
-    
-///“Їа ў«Ґ­ЁҐ ўЁ¤Ё¬®бвмо ®Є­ 
+
+///Управление видимостью окна
     void Show (bool state)
     {
       try
@@ -89,7 +135,7 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
       }
     }
 
-///ЋЎ­®ўЁвм б®¤Ґа¦Ё¬®Ґ ®Є­ 
+///Обновить содержимое окна
     void Update ()
     {
       try
@@ -103,26 +149,47 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
       }
     }
 
-///Џ®¤бзсв ббл«®Є
+///Подсчёт ссылок
     void AddRef  () { addref (this); }
     void Release () { release (this); }
 
   private:
-    syslib::Window window;
+    OrthoCamera::Pointer camera;
+    syslib::Window       window;
+    Engine               engine;
 };
 
-//вҐбв®ўл© бҐаўҐа ЇаЁ«®¦Ґ­Ёп
+//тестовый сервер приложения
 class MyApplicationServer: public IApplicationServer, public xtl::reference_counter
 {
   public:
     MyApplicationServer ()
     {
-      printf ("MyApplicationServer::MyApplicationServer\n");
-    }
-    
-    ~MyApplicationServer ()
-    {
-      printf ("MyApplicationServer::~MyApplicationServer\n");
+      VisualModel::Pointer model = VisualModel::Create ();
+
+      model->SetMeshName (MODEL_MESH_NAME);
+      model->BindToScene (scene);
+
+      camera = OrthoCamera::Create ();
+
+      camera->SetLeft   (-10);
+      camera->SetRight  (10);
+      camera->SetBottom (-10);
+      camera->SetTop    (10);
+      camera->SetZNear  (0);
+      camera->SetZFar   (10);
+
+      camera->BindToScene (scene);
+      
+      Viewport viewport;
+      
+      viewport.SetArea       (0, 0, 100, 100);
+      viewport.SetCamera     (&*camera);
+      viewport.SetRenderPath ("ModelerRender");
+
+      screen.Attach (viewport);
+
+      attachments.SetScreen (SCREEN_ATTACHMENT_NAME, &screen);
     }
 
     void ExecuteCommand (const char* command)
@@ -175,28 +242,34 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     
     ICustomChildWindow* CreateChildWindow (const char* init_string)
     {
-      return new MyChildWindow;
+      return new MyChildWindow (attachments);
     }
 
     void AddRef  () { addref (this); }
     void Release () { release (this); }
+    
+  private:
+    Scene                scene;
+    OrthoCamera::Pointer camera;
+    Screen               screen;
+    EngineAttachments    attachments;
 };
 
-//Є« бб вҐбв®ў®Ј® ЇаЁ«®¦Ґ­Ёп
+//класс тестового приложения
 struct Test
 {
   Test () : log ("modeler.test")
   {
-      //аҐЈЁбва жЁп бҐаўҐа  ЇаЁ«®¦Ґ­Ёп
+      //регистрация сервера приложения
 
     tools::ui::WindowSystemManager::RegisterApplicationServer ("MyApplicationServer",
       xtl::com_ptr<MyApplicationServer> (new MyApplicationServer, false).get ());
 
-      //б®§¤ ­ЁҐ Ј« ў­®Ј® ®Є­ 
+      //создание главного окна
 
     MainWindow ("MyApplicationServer", "WindowsForms").Swap (main_window);
 
-      //Ї®¤ЇЁбЄ  ­  б®ЎлвЁп Їа®в®Є®«Ёа®ў ­Ёп
+      //подписка на события протоколирования
 
     main_window.SetLogHandler (xtl::bind (&Test::LogPrint, this, _1));
   }
@@ -213,6 +286,8 @@ struct Test
 void log_print (const char* log, const char* message)
 {
   printf ("%s: %s\n", log, message);
+}
+
 }
 
 int main ()
