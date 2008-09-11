@@ -115,8 +115,6 @@ int main ()
 
     Engine engine (CONFIGURATION_BRANCH_NAME, StartupGroup_Level2);
 
-    engine.Attach (&client_event_listener);
-
     printf ("Engine configuration branch name is '%s'\n", engine.ConfigurationBranch ());
     printf ("Engine subsystems count is %u\n", engine.SubsystemsCount ());
 
@@ -125,6 +123,8 @@ int main ()
     engine.Attach (client);
 
     client.SetScreen ("ScreenAttachment", &screen);
+
+    engine.Attach (&client_event_listener);
 
     engine.Start (StartupGroup_LevelMax);
 

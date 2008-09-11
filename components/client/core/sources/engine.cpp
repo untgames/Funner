@@ -137,6 +137,12 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
         throw xtl::format_operation_exception (METHOD_NAME, "Listener already attached");
 
       listeners.insert (listener);
+
+      for (size_t i = 0; i < attachments.ScreensCount (); i++)
+        listener->OnSetScreen (attachments.ScreenName (i), attachments.Screen (i));
+
+      for (size_t i = 0; i < attachments.ListenersCount (); i++)
+        listener->OnSetListener (attachments.ListenerName (i), attachments.Listener (i));
     }
 
     void Detach (IEngineEventListener* listener)
