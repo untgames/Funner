@@ -172,9 +172,29 @@ class FrameBuffer: virtual public IFrameBuffer, public Object, public xtl::track
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Диспетчеризация вызовов системы двумерного рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class IRenderer2dDispatch: virtual public renderer2d::IRenderer
+{
+  public:
+    virtual render::mid_level::renderer2d::IFrame* CreateFrame   () { return CreateFrame2d (); }
+    virtual render::mid_level::renderer2d::IFrame* CreateFrame2d () = 0;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Диспетчеризация вызовов системы низкоуровневого рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class ILowLevelRendererDispatch: virtual public ILowLevelRenderer
+{
+  public:
+    virtual render::mid_level::ILowLevelFrame* CreateFrame () { return CreateLowLevelFrame (); }
+    virtual render::mid_level::ILowLevelFrame* CreateLowLevelFrame () = 0;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовая система рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class RendererDispatch: virtual public renderer2d::IRenderer, virtual public ILowLevelRenderer, public Object
+class RendererDispatch: virtual public IRenderer2dDispatch, virtual public ILowLevelRendererDispatch, public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,11 +202,6 @@ class RendererDispatch: virtual public renderer2d::IRenderer, virtual public ILo
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     RendererDispatch  (low_level::IDevice& device);
     ~RendererDispatch ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение устройства
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    low_level::IDevice& GetDevice ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация/удаление окна
@@ -241,8 +256,9 @@ class RendererDispatch: virtual public renderer2d::IRenderer, virtual public ILo
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     render::mid_level::renderer2d::ITexture*   CreateTexture   (const media::Image& image);
     render::mid_level::renderer2d::ITexture*   CreateTexture   (size_t width, size_t height, media::PixelFormat pixel_format);
-    render::mid_level::renderer2d::IPrimitive* CreatePrimitive ();
-    render::mid_level::renderer2d::IFrame*     CreateFrame     ();
+    render::mid_level::renderer2d::IPrimitive* CreatePrimitive ();    
+    render::mid_level::renderer2d::IFrame*     CreateFrame2d   ();        
+    render::mid_level::ILowLevelFrame*         CreateLowLevelFrame ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещения
@@ -257,17 +273,19 @@ class RendererDispatch: virtual public renderer2d::IRenderer, virtual public ILo
     typedef stl::list<FramePtr>                      FrameList;
     typedef stl::vector<FrameBuffer*>                FrameBufferArray;
     typedef xtl::com_ptr<render::low_level::IDevice> DevicePtr;  
-    typedef stl::auto_ptr<Renderer2D>                Renderer2DPtr;  
+    typedef stl::auto_ptr<Renderer2D>                Renderer2DPtr;
+    typedef stl::auto_ptr<LowLevelRenderer>          LowLevelRendererPtr;
     typedef stl::set<IRendererListener*>             ListenerSet;
 
   private:
-    DevicePtr           device;                           //устройство вывода
-    FrameBufferArray    frame_buffers;                    //массив буферов кадра
-    FrameList           frames;                           //массив кадров
-    FrameList::iterator frame_position;                   //текущая позиция вставки кадров
-    size_t              frames_count;                     //количество кадров
-    Renderer2DPtr       renderer2d;                       //2д рендерер
-    ListenerSet         listeners;                        //слушатели событий
+    DevicePtr           device;             //устройство вывода
+    FrameBufferArray    frame_buffers;      //массив буферов кадра
+    FrameList           frames;             //массив кадров
+    FrameList::iterator frame_position;     //текущая позиция вставки кадров
+    size_t              frames_count;       //количество кадров
+    Renderer2DPtr       renderer2d;         //2д рендерер
+    LowLevelRendererPtr low_level_renderer; //низкоуровневая система визуализации
+    ListenerSet         listeners;          //слушатели событий
 };
 
 }

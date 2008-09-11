@@ -1,6 +1,7 @@
 #ifndef RENDER_MID_WINDOW_DRIVER_BASIC_RENDERER_HEADER
 #define RENDER_MID_WINDOW_DRIVER_BASIC_RENDERER_HEADER
 
+#include <stl/auto_ptr.h>
 #include <stl/vector>
 #include <stl/list>
 
@@ -14,6 +15,7 @@
 
 #include <render/mid_level/driver.h>
 #include <render/mid_level/renderer2d.h>
+#include <render/mid_level/low_level_renderer.h>
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4250) //'class1' : inherits 'class2::member' via dominance
@@ -156,7 +158,7 @@ class Renderer2D
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Renderer2D (low_level::IDevice* device);
     ~Renderer2D ();
@@ -172,6 +174,32 @@ class Renderer2D
   private:
     Renderer2D (const Renderer2D&);             //no impl
     Renderer2D& operator = (const Renderer2D&); //no impl
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Система низкоуровневого рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class LowLevelRenderer
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    LowLevelRenderer  (low_level::IDevice* device);
+    ~LowLevelRenderer ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание ресурсов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    mid_level::ILowLevelFrame* CreateFrame ();
+
+  private:
+    LowLevelRenderer (const LowLevelRenderer&);             //no impl
+    LowLevelRenderer& operator = (const LowLevelRenderer&); //no impl
 
   private:
     struct Impl;

@@ -28,7 +28,8 @@ RendererDispatch::RendererDispatch (render::low_level::IDevice& in_device)
 {
   try
   {
-    renderer2d = Renderer2DPtr (new Renderer2D (device.get ()));
+    renderer2d         = new Renderer2D (device.get ());
+    low_level_renderer = new LowLevelRenderer (device.get ());
   }
   catch (xtl::exception& exception)
   {
@@ -39,15 +40,6 @@ RendererDispatch::RendererDispatch (render::low_level::IDevice& in_device)
 
 RendererDispatch::~RendererDispatch ()
 {
-}
-
-/*
-    Получение устройства
-*/
-
-IDevice& RendererDispatch::GetDevice ()
-{
-  return *device;
 }
 
 /*
@@ -312,9 +304,14 @@ render::mid_level::renderer2d::IPrimitive* RendererDispatch::CreatePrimitive ()
   return renderer2d->CreatePrimitive ();
 }
 
-render::mid_level::renderer2d::IFrame* RendererDispatch::CreateFrame ()
+render::mid_level::renderer2d::IFrame* RendererDispatch::CreateFrame2d ()
 {
   return renderer2d->CreateFrame ();
+}
+
+render::mid_level::ILowLevelFrame* RendererDispatch::CreateLowLevelFrame ()
+{
+  return low_level_renderer->CreateFrame ();
 }
 
 /*
