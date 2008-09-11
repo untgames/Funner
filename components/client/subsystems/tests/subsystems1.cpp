@@ -11,8 +11,6 @@
 
 #include <render/scene_render.h>
 
-#include <render/mid_level/window_driver.h>
-
 #include <client/engine.h>
 #include <client/window_manager.h>
 
@@ -47,10 +45,10 @@ int main ()
     screen1.SetBackgroundColor (0.8f, 0.f, 0.f, 0.f);
     screen2.SetBackgroundColor (0.f, 0.8f, 0.f, 0.f);
 
-    engine.Attach (client);
-
     client.SetScreen ("Screen1", &screen1);
     client.SetScreen ("Screen2", &screen2);
+
+    engine.Attach (client);
 
     syslib::Application::Run ();
   }

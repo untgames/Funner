@@ -29,6 +29,8 @@ const char* WINDOWS_SUBSYSTEM_NAME   = "WindowsSubsytem";
 const char* LOG_NAME                 = "client.WindowManager";
 const char* REGISTRY_COMPONENTS_MASK = "client.subsystems.*";
 
+const size_t SHOWN_WINDOWS_ARRAY_RESERVE_SIZE = 8;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсистема движка               
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,6 +180,12 @@ struct WindowManagerImpl
 
       VarRegistry window_registry;
 
+      typedef stl::vector<syslib::Window*> WindowArray;
+
+      WindowArray shown_windows;
+
+      shown_windows.reserve (SHOWN_WINDOWS_ARRAY_RESERVE_SIZE);
+
       for (VarRegistry::Iterator window_iter=var_registry.CreateIterator (); window_iter; ++window_iter)
       {
         if (*var_registry.BranchName ())
@@ -206,13 +214,13 @@ struct WindowManagerImpl
           
           new_window->SetPosition (window_position);
         
-          if (window_registry.HasVariable ("Show"))
-            if (get_size_t (window_registry, "Show"))
-              new_window->Show ();
-
           InitWindow (*new_window, window_registry, engine);
 
           windows_subsystem->AddWindow (new_window);
+
+          if (window_registry.HasVariable ("Show"))
+            if (get_size_t (window_registry, "Show"))
+              shown_windows.push_back (new_window.get ());
         }
         catch (xtl::exception& e)
         {
@@ -223,6 +231,9 @@ struct WindowManagerImpl
           log.Printf ("Can't add window from registry '%s', unknown exception", window_registry.BranchName ());
         }
       }
+
+      for (WindowArray::iterator iter = shown_windows.begin (), end = shown_windows.end (); iter != end; ++iter)
+        (*iter)->Show ();
 
       engine.AddSubsystem (windows_subsystem);
     }

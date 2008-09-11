@@ -33,8 +33,7 @@ CLIENT.SUBSYSTEMS.TESTS.LIB_DIRS         :=
 CLIENT.SUBSYSTEMS.TESTS.LIBS             :=
 CLIENT.SUBSYSTEMS.TESTS.COMPILER_CFLAGS  :=
 CLIENT.SUBSYSTEMS.TESTS.COMPILER_DEFINES :=
-CLIENT.SUBSYSTEMS.TESTS.IMPORTS          := ../../common/compile.static.mak ../../common/link.static.mak ../../system/compile.static.mak \
-                                            ../../render/mid_level_window_driver/compile.static.mak ../../render/mid_level_window_driver/link.static.mak \
+CLIENT.SUBSYSTEMS.TESTS.IMPORTS          := ../../common/compile.static.mak ../../system/compile.static.mak \
                                             ../window_manager/compile.static.mak ../window_manager/link.static.mak ../core/compile.static.mak \
                                             ../../render/opengl_driver/link.static.mak ../../common/configurator.link.static.mak \
                                             window_renderer.link.static.mak scene_render.link.static.mak

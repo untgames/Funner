@@ -3,3 +3,4 @@
 ###################################################################################################
 export.LIBS          := client.scene_render
 export.LINK_INCLUDES := SceneRender
+export.IMPORTS       := ../window_manager/link.static.mak
