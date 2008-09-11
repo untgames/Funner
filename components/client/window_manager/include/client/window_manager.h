@@ -21,7 +21,7 @@ class WindowManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абота с обработчиками
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterStartupHandler       (const char* name, const StartupHandler&, int order = 0); //чем ниже order, тем раньше запускаетс€
+    static void RegisterStartupHandler       (const char* name, const StartupHandler&, size_t order = 1); //чем ниже order, тем раньше запускаетс€
     static void UnregisterStartupHandler     (const char* name);
     static void UnregisterAllStartupHandlers ();
 

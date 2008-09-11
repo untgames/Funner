@@ -15,7 +15,7 @@ struct StartupManagerImpl::Impl
   public:
     Impl () : need_sort (false), log (LOG_NAME) {}
 
-    void RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, int order)
+    void RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, size_t order)
     {
       static const char* METHOD_NAME = "client::StartupManager::RegisterStartupHandler";
 
@@ -48,7 +48,7 @@ struct StartupManagerImpl::Impl
       startup_handlers.clear ();
     }
 
-    void Startup (Engine& engine, IEngineStartupParams* engine_startup_params)
+    void Startup (Engine& engine, size_t low_level, size_t high_level, IEngineStartupParams* engine_startup_params)
     {
       static common::ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
 
@@ -67,6 +67,9 @@ struct StartupManagerImpl::Impl
 
       for (StartupHandlers::iterator iter = startup_handlers.begin (), end = startup_handlers.end (); iter != end; ++iter)
       {
+        if (((*iter)->order < low_level) || ((*iter)->order > high_level))
+          continue;
+
         if (!registry_branches.count ((*iter)->node_name.c_str ()))
         {
           log.Printf ("Startup handler with node name '%s' was not called, no such branch in registry '%s'", (*iter)->node_name.c_str (), engine.ConfigurationBranch ());
@@ -87,9 +90,9 @@ struct StartupManagerImpl::Impl
     {
       stl::string    node_name;
       StartupHandler handler;
-      int            order;
+      size_t         order;
 
-      StartupHandlerEntry (const char* in_node_name, const StartupHandler& in_handler, int in_order)
+      StartupHandlerEntry (const char* in_node_name, const StartupHandler& in_handler, size_t in_order)
         : node_name (in_node_name), handler (in_handler), order (in_order)
         {}
     };
@@ -138,7 +141,7 @@ StartupManagerImpl::~StartupManagerImpl ()
    Добавление/удаление обработчиков
 */
 
-void StartupManagerImpl::RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, int order)
+void StartupManagerImpl::RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, size_t order)
 {
   impl->RegisterStartupHandler (node_name, startup_handler, order);
 }
@@ -157,9 +160,9 @@ void StartupManagerImpl::UnregisterAllStartupHandlers ()
    Запуск обработчиков
 */
 
-void StartupManagerImpl::Startup (Engine& engine, IEngineStartupParams* engine_startup_params)
+void StartupManagerImpl::Startup (Engine& engine, size_t low_level, size_t high_level, IEngineStartupParams* engine_startup_params)
 {
-  impl->Startup (engine, engine_startup_params);
+  impl->Startup (engine, low_level, high_level, engine_startup_params);
 }
 
 /*
@@ -170,7 +173,7 @@ void StartupManagerImpl::Startup (Engine& engine, IEngineStartupParams* engine_s
    Добавление/удаление обработчиков
 */
 
-void StartupManager::RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, int order)
+void StartupManager::RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, size_t order)
 {
   StartupManagerSingleton::Instance ().RegisterStartupHandler (node_name, startup_handler, order);
 }

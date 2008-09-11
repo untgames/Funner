@@ -108,12 +108,12 @@ int main ()
     xtl::com_ptr<EngineSubsystem> subsystem1 (new EngineSubsystem (SUBSYSTEM1_CONFIGURATION), false), subsystem2 (new EngineSubsystem (SUBSYSTEM2_CONFIGURATION), false),
                                   subsystem3 (new EngineSubsystem (SUBSYSTEM3_CONFIGURATION), false), subsystem4 (new EngineSubsystem (SUBSYSTEM4_CONFIGURATION), false);
 
-    StartupManager::RegisterStartupHandler (SUBSYSTEM1_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem1.get (), _1, _2, _3), 2);
+    StartupManager::RegisterStartupHandler (SUBSYSTEM1_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem1.get (), _1, _2, _3), StartupGroup_Level5);
     StartupManager::RegisterStartupHandler (SUBSYSTEM2_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem2.get (), _1, _2, _3));
-    StartupManager::RegisterStartupHandler (SUBSYSTEM3_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem3.get (), _1, _2, _3), -5);
+    StartupManager::RegisterStartupHandler (SUBSYSTEM3_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem3.get (), _1, _2, _3), StartupGroup_Level2);
     StartupManager::RegisterStartupHandler (SUBSYSTEM4_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem4.get (), _1, _2, _3), 0);
 
-    Engine engine (CONFIGURATION_BRANCH_NAME);
+    Engine engine (CONFIGURATION_BRANCH_NAME, StartupGroup_Level2);
 
     engine.Attach (&client_event_listener);
 
@@ -126,10 +126,14 @@ int main ()
 
     client.SetScreen ("ScreenAttachment", &screen);
 
+    engine.Start (StartupGroup_LevelMax);
+
     printf ("Engine subsystems count is %u\n", engine.SubsystemsCount ());
     printf ("engine subsystem 1 name is '%s'\n", engine.Subsystem (1).Name ());
 
     client2.SetScreen ("ScreenAttachment2", &screen);
+
+    engine.Start (StartupGroup_LevelMax);
 
     engine.Attach (client2);
 

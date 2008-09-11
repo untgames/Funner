@@ -208,7 +208,7 @@ class SceneRenderComponent
     //загрузка компонента
     SceneRenderComponent () 
     {
-      StartupManager::RegisterStartupHandler ("SceneRender", &scene_render_startup, StartupGroup_Level5);
+      StartupManager::RegisterStartupHandler ("SceneRender", &scene_render_startup, StartupGroup_Level3);
     }
 };
 

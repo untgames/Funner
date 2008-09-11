@@ -11,13 +11,29 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
   public:
 ///Конструктор/деструктор
     Impl (const char* in_configuration_branch_name, IEngineStartupParams* engine_startup_params)
-      : configuration_branch_name (in_configuration_branch_name)
+      : configuration_branch_name (in_configuration_branch_name), start_level (0)
       {}
 
     ~Impl ()
     {
       Detach ();
       OnDestroyNotify ();
+    }
+
+///Запуск систем
+    void Start (Engine& engine, size_t new_start_level, IEngineStartupParams* engine_startup_params)
+    {
+      if (new_start_level <= start_level)
+        return;
+
+      StartupManagerSingleton::Instance ().Startup (engine, start_level + 1, new_start_level, engine_startup_params);  
+
+      start_level = new_start_level;
+    }
+
+    size_t StartLevel () const
+    {
+      return start_level;
     }
 
 ///Установка точек привязки
@@ -225,6 +241,7 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
     AttachmentsSet    screen_attachments;
     AttachmentsSet    listener_attachments;
     ListenerSet       listeners;
+    size_t            start_level;
 };
 
 /*
@@ -235,18 +252,32 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
    Конструктор/деструктор
 */
 
-Engine::Engine (const char* configuration_branch_name, IEngineStartupParams* engine_startup_params)
+Engine::Engine (const char* configuration_branch_name, size_t start_level, IEngineStartupParams* engine_startup_params)
 {
   if (!configuration_branch_name)
     throw xtl::make_null_argument_exception ("client::Engine::Engine", "configuration_branch_name");
 
   impl = new Impl (configuration_branch_name, engine_startup_params);
 
-  StartupManagerSingleton::Instance ().Startup (*this, engine_startup_params);
+  Start (start_level, engine_startup_params);
 }
 
 Engine::~Engine ()
 {
+}
+
+/*
+   Запуск систем
+*/
+
+void Engine::Start (size_t start_level, IEngineStartupParams* engine_startup_params)
+{
+  impl->Start (*this, start_level, engine_startup_params);
+}
+
+size_t Engine::StartLevel () const
+{
+  return impl->StartLevel ();
 }
 
 /*

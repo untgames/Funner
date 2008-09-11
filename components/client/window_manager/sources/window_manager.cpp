@@ -105,7 +105,7 @@ struct WindowManagerImpl
   public:
     WindowManagerImpl () : need_sort (false), log (LOG_NAME) {}
 
-    void RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, int order)
+    void RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, size_t order)
     {
       static const char* METHOD_NAME = "client::WindowManager::RegisterStartupHandler";
 
@@ -243,9 +243,9 @@ struct WindowManagerImpl
     {
       stl::string    node_name;
       StartupHandler handler;
-      int            order;
+      size_t         order;
 
-      StartupHandlerEntry (const char* in_node_name, const StartupHandler& in_handler, int in_order)
+      StartupHandlerEntry (const char* in_node_name, const StartupHandler& in_handler, size_t in_order)
         : node_name (in_node_name), handler (in_handler), order (in_order)
         {}
     };
@@ -300,7 +300,7 @@ typedef common::Singleton<WindowManagerImpl> WindowManagerSingleton;
    Работа с обработчиками
 */
 
-void WindowManager::RegisterStartupHandler (const char* name, const StartupHandler& startup_handler, int order)
+void WindowManager::RegisterStartupHandler (const char* name, const StartupHandler& startup_handler, size_t order)
 {
   WindowManagerSingleton::Instance ().RegisterStartupHandler (name, startup_handler, order);
 }

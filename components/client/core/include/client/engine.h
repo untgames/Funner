@@ -13,15 +13,13 @@ namespace client
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Группы, указывающие порядок запуска подсистем движка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum StartupGroup
-{
-  StartupGroup_Level0 = 0,
-  StartupGroup_Level1 = 10,
-  StartupGroup_Level2 = 20,
-  StartupGroup_Level3 = 30,
-  StartupGroup_Level4 = 40,
-  StartupGroup_Level5 = 50
-};
+const size_t StartupGroup_Level0 = 0;
+const size_t StartupGroup_Level1 = 10;
+const size_t StartupGroup_Level2 = 20;
+const size_t StartupGroup_Level3 = 30;
+const size_t StartupGroup_Level4 = 40;
+const size_t StartupGroup_Level5 = 50;
+const size_t StartupGroup_LevelMax = ~0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсистема движка               
@@ -58,8 +56,14 @@ class Engine
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Engine  (const char* configuration_branch_name, IEngineStartupParams* engine_startup_params = 0);
+    Engine  (const char* configuration_branch_name, size_t start_level = StartupGroup_LevelMax, IEngineStartupParams* engine_startup_params = 0);  //включая start_level
     ~Engine ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Запуск систем
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void   Start      (size_t start_level, IEngineStartupParams* engine_startup_params = 0); //включая start_level
+    size_t StartLevel () const; //текущий уровень запуска
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка точек привязки
@@ -127,7 +131,7 @@ class StartupManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление обработчиков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterStartupHandler       (const char* node_name, const StartupHandler& startup_handler, int order = 0); //чем ниже order, тем раньше запускается
+    static void RegisterStartupHandler       (const char* node_name, const StartupHandler& startup_handler, size_t order = 1); //чем ниже order, тем раньше запускается
     static void UnregisterStartupHandler     (const char* node_name);
     static void UnregisterAllStartupHandlers ();
 };

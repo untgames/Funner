@@ -47,14 +47,14 @@ class StartupManagerImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление обработчиков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterStartupHandler       (const char* node_name, const StartupHandler& startup_handler, int order);
+    void RegisterStartupHandler       (const char* node_name, const StartupHandler& startup_handler, size_t order);
     void UnregisterStartupHandler     (const char* node_name);
     void UnregisterAllStartupHandlers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск обработчиков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Startup (Engine& engine, IEngineStartupParams* engine_startup_params);
+    void Startup (Engine& engine, size_t low_level, size_t high_level, IEngineStartupParams* engine_startup_params);
 
   private:
     struct Impl;
