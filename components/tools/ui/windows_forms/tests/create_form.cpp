@@ -1,5 +1,12 @@
 #include "shared.h"
 
+extern "C"
+{
+
+extern double _HUGE = DBL_MAX;
+
+}
+
 void print (const char* message)
 {
   printf ("%s\n", message);

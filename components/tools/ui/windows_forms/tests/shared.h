@@ -2,6 +2,7 @@
 #define TOOLS_UI_WINDOWS_FORMS_TESTS_SHARED_HEADER
 
 #include <cstdio>
+#include <cfloat>
 #include <exception>
 
 #include <xtl/common_exceptions.h>
