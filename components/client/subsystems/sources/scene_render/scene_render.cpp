@@ -52,7 +52,7 @@ stl::string get (VarRegistry& registry, const char* name, const char* default_va
    Подсистема рендера сцены               
 */
 
-class SceneRenderSubsystem : public IEngineSubsystem, public IClientEventListener, public xtl::reference_counter
+class SceneRenderSubsystem : public IEngineSubsystem, public IEngineEventListener, public xtl::reference_counter
 {
   public:
 /// Конструктор/деструктор
@@ -110,12 +110,12 @@ class SceneRenderSubsystem : public IEngineSubsystem, public IClientEventListene
         screen_map.insert_pair (attachment_name.c_str (), render_target_index);
       }
 
-      engine->AttachEventListener (this);
+      engine->Attach (this);
     }
 
     ~SceneRenderSubsystem ()
     {
-      engine->DetachEventListener (this);
+      engine->Detach (this);
     }
     
 /// Получение имени

@@ -13,7 +13,6 @@
 
 #include <render/screen.h>
 
-#include <client/client.h>
 #include <client/engine.h>
 
 const char* CONFIGURATION_FILE_NAME   = "data/configuration.xml";
@@ -25,12 +24,9 @@ const char* SUBSYSTEM4_CONFIGURATION  = "Subsystem4";
 
 using namespace client;
 
-class ClientEventListener : public IClientEventListener
+class ClientEventListener : public IEngineEventListener
 {
   public:
-    ClientEventListener () {}
-    ~ClientEventListener () {}
-
 ///События установки/удаления экрана
     void OnSetScreen (const char* attachment_name, render::Screen* screen) 
     {
@@ -102,7 +98,7 @@ int main ()
     common::ConfigurationRegistry::LoadConfiguration (CONFIGURATION_FILE_NAME);
 
     ClientEventListener client_event_listener;
-    Client client;
+    EngineAttachments client;
 
     render::Screen screen;
 
@@ -118,21 +114,21 @@ int main ()
 
     Engine engine (CONFIGURATION_BRANCH_NAME);
 
-    engine.AttachEventListener (&client_event_listener);
+    engine.Attach (&client_event_listener);
 
     printf ("Engine configuration branch name is '%s'\n", engine.ConfigurationBranch ());
     printf ("Engine subsystems count is %u\n", engine.SubsystemsCount ());
 
     engine.GetTrackable ().connect_tracker (&engine_tracker);
 
-    engine.AttachClient (client);
+    engine.Attach (client);
 
     client.SetScreen ("ScreenAttachment", &screen);
 
     printf ("Engine subsystems count is %u\n", engine.SubsystemsCount ());
     printf ("engine subsystem 1 name is '%s'\n", engine.Subsystem (1).Name ());
 
-    engine.DetachClient ();
+    engine.Detach ();
 
     client.SetScreen ("ScreenAttachment", &screen);
 

@@ -37,7 +37,7 @@ typedef stl::vector<ListenerAttachmentPtr> ListenerAttachments;
    Реализация клиента
 */
 
-struct Client::Impl : public xtl::reference_counter
+struct EngineAttachments::Impl : public xtl::reference_counter
 {
   public:
     ~Impl ()
@@ -50,7 +50,7 @@ struct Client::Impl : public xtl::reference_counter
 ///Работа с экранами
     void SetScreen (const char* attachment_name, render::Screen* screen)
     {
-      static const char* METHOD_NAME = "client::Client::SetScreen";
+      static const char* METHOD_NAME = "EngineAttachments::EngineAttachments::SetScreen";
 
       if (!attachment_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
@@ -71,7 +71,7 @@ struct Client::Impl : public xtl::reference_counter
     void RemoveScreen (const char* attachment_name)
     {
       if (!attachment_name)
-        throw xtl::make_null_argument_exception ("client::Client::RemoveScreen", "attachment_name");
+        throw xtl::make_null_argument_exception ("client::EngineAttachments::RemoveScreen", "attachment_name");
 
       ScreenAttachments::iterator erase_position = FindScreenAttachment (attachment_name);
 
@@ -94,7 +94,7 @@ struct Client::Impl : public xtl::reference_counter
     render::Screen* FindScreen (const char* attachment_name)
     {
       if (!attachment_name)
-        throw xtl::make_null_argument_exception ("client::Client::FindScreen", "attachment_name");
+        throw xtl::make_null_argument_exception ("client::EngineAttachments::FindScreen", "attachment_name");
 
       ScreenAttachments::iterator find_position = FindScreenAttachment (attachment_name);
 
@@ -112,7 +112,7 @@ struct Client::Impl : public xtl::reference_counter
     render::Screen* Screen (size_t index) const
     {
       if (index >= screen_attachments.size ())
-        throw xtl::make_range_exception ("client::Client::Screen", "index", index, 0u, screen_attachments.size ());
+        throw xtl::make_range_exception ("client::EngineAttachments::Screen", "index", index, 0u, screen_attachments.size ());
 
       return &screen_attachments[index]->screen;
     }
@@ -120,7 +120,7 @@ struct Client::Impl : public xtl::reference_counter
 ///Работа со слушателями
     void SetListener (const char* attachment_name, scene_graph::Listener* listener)
     {
-      static const char* METHOD_NAME = "client::Client::SetListener";
+      static const char* METHOD_NAME = "client::EngineAttachments::SetListener";
 
       if (!attachment_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
@@ -141,7 +141,7 @@ struct Client::Impl : public xtl::reference_counter
     void RemoveListener (const char* attachment_name)
     {
       if (!attachment_name)
-        throw xtl::make_null_argument_exception ("client::Client::RemoveListener", "attachment_name");
+        throw xtl::make_null_argument_exception ("client::EngineAttachments::RemoveListener", "attachment_name");
 
       ListenerAttachments::iterator erase_position = FindListenerAttachment (attachment_name);
 
@@ -164,7 +164,7 @@ struct Client::Impl : public xtl::reference_counter
     scene_graph::Listener* FindListener (const char* attachment_name)
     {
       if (!attachment_name)
-        throw xtl::make_null_argument_exception ("client::Client::FindListener", "attachment_name");
+        throw xtl::make_null_argument_exception ("client::EngineAttachments::FindListener", "attachment_name");
 
       ListenerAttachments::iterator find_position = FindListenerAttachment (attachment_name);
 
@@ -182,7 +182,7 @@ struct Client::Impl : public xtl::reference_counter
     scene_graph::Listener* Listener (size_t index) const
     {
       if (index >= listener_attachments.size ())
-        throw xtl::make_range_exception ("client::Client::Listener", "index", index, 0u, listener_attachments.size ());
+        throw xtl::make_range_exception ("client::EngineAttachments::Listener", "index", index, 0u, listener_attachments.size ());
 
       return listener_attachments[index]->listener.get ();
     }
@@ -195,7 +195,7 @@ struct Client::Impl : public xtl::reference_counter
 
     void SetInputTranslator (const char* attachment_name, const char* translation_table)
     {
-      static const char* METHOD_NAME = "client::Client::SetInputTranslator";
+      static const char* METHOD_NAME = "client::EngineAttachments::SetInputTranslator";
 
       if (!attachment_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
@@ -209,7 +209,7 @@ struct Client::Impl : public xtl::reference_counter
     void RemoveInputTranslator (const char* attachment_name)
     {
       if (!attachment_name)
-        throw xtl::make_null_argument_exception ("client::Client::RemoveInputTranslator", "attachment_name");
+        throw xtl::make_null_argument_exception ("client::EngineAttachments::RemoveInputTranslator", "attachment_name");
 
       input_translator_attachments.erase (attachment_name);
     }
@@ -221,7 +221,7 @@ struct Client::Impl : public xtl::reference_counter
 
     void ProcessInputEvent (const char* attachment_name, const char* event)
     {
-      static const char* METHOD_NAME = "client::Client::ProcessInputEvent";
+      static const char* METHOD_NAME = "client::EngineAttachments::ProcessInputEvent";
 
       if (!attachment_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
@@ -232,13 +232,13 @@ struct Client::Impl : public xtl::reference_counter
       InputTraslatorMap::iterator translation_map = input_translator_attachments.find (attachment_name);
 
       if (translation_map != input_translator_attachments.end ())
-        translation_map->second.ProcessEvent (event, xtl::bind (&Client::Impl::InputEventHandler, this, attachment_name, _1));
+        translation_map->second.ProcessEvent (event, xtl::bind (&EngineAttachments::Impl::InputEventHandler, this, attachment_name, _1));
     }
 
 ///Работа со слушателями событий
-    void AttachEventListener (IClientEventListener* listener)
+    void Attach (IEngineEventListener* listener)
     {
-      static const char* METHOD_NAME = "client::Client::AttachEventListener";
+      static const char* METHOD_NAME = "client::EngineAttachments::Attach";
 
       if (!listener)
         throw xtl::make_null_argument_exception (METHOD_NAME, "listener");
@@ -251,10 +251,10 @@ struct Client::Impl : public xtl::reference_counter
       listeners.insert (listener);
     }
 
-    void DetachEventListener (IClientEventListener* listener)
+    void Detach (IEngineEventListener* listener)
     {
       if (!listener)
-        throw xtl::make_null_argument_exception ("client::Client::DetachEventListener", "listener");
+        throw xtl::make_null_argument_exception ("client::EngineAttachments::Detach", "listener");
 
       listeners.erase (listener);
     }
@@ -318,7 +318,7 @@ struct Client::Impl : public xtl::reference_counter
 
   private:
     typedef xtl::signal<void (const char*, const char*)>                     InputSignal;
-    typedef stl::set<IClientEventListener*>                                  ListenerSet;
+    typedef stl::set<IEngineEventListener*>                                  ListenerSet;
     typedef stl::hash_map<stl::hash_key<const char*>, input::TranslationMap> InputTraslatorMap;
 
   private:
@@ -337,18 +337,18 @@ struct Client::Impl : public xtl::reference_counter
    Конструктор/деструктор
 */
 
-Client::Client ()
+EngineAttachments::EngineAttachments ()
   : impl (new Impl)
 {
 }
 
-Client::Client (const Client& source)
+EngineAttachments::EngineAttachments (const EngineAttachments& source)
   : impl (source.impl)
 {
   addref (impl);
 }
 
-Client::~Client ()
+EngineAttachments::~EngineAttachments ()
 {
   release (impl);
 }
@@ -357,9 +357,9 @@ Client::~Client ()
    Копирование
 */
 
-Client& Client::operator = (const Client& source)
+EngineAttachments& EngineAttachments::operator = (const EngineAttachments& source)
 {
-  Client (source).Swap (*this);
+  EngineAttachments (source).Swap (*this);
 
   return *this;
 }
@@ -368,32 +368,32 @@ Client& Client::operator = (const Client& source)
    Работа с экранами
 */
 
-void Client::SetScreen (const char* attachment_name, render::Screen* screen)
+void EngineAttachments::SetScreen (const char* attachment_name, render::Screen* screen)
 {
   impl->SetScreen (attachment_name, screen);
 }
 
-void Client::RemoveScreen (const char* attachment_name)
+void EngineAttachments::RemoveScreen (const char* attachment_name)
 {
   impl->RemoveScreen (attachment_name);
 }
 
-void Client::RemoveAllScreens ()
+void EngineAttachments::RemoveAllScreens ()
 {
   impl->RemoveAllScreens ();
 }
 
-render::Screen* Client::FindScreen (const char* attachment_name) const
+render::Screen* EngineAttachments::FindScreen (const char* attachment_name) const
 {
   return impl->FindScreen (attachment_name);
 }
 
-size_t Client::ScreensCount () const
+size_t EngineAttachments::ScreensCount () const
 {
   return impl->ScreensCount ();
 }
 
-render::Screen* Client::Screen (size_t index) const
+render::Screen* EngineAttachments::Screen (size_t index) const
 {
   return impl->Screen (index);
 }
@@ -402,32 +402,32 @@ render::Screen* Client::Screen (size_t index) const
    Работа со слушателями
 */
 
-void Client::SetListener (const char* attachment_name, scene_graph::Listener* listener)
+void EngineAttachments::SetListener (const char* attachment_name, scene_graph::Listener* listener)
 {
   impl->SetListener (attachment_name, listener);
 }
 
-void Client::RemoveListener (const char* attachment_name)
+void EngineAttachments::RemoveListener (const char* attachment_name)
 {
   impl->RemoveListener (attachment_name);
 }
 
-void Client::RemoveAllListeners ()
+void EngineAttachments::RemoveAllListeners ()
 {
   impl->RemoveAllListeners ();
 }
 
-scene_graph::Listener* Client::FindListener (const char* attachment_name) const
+scene_graph::Listener* EngineAttachments::FindListener (const char* attachment_name) const
 {
   return impl->FindListener (attachment_name);
 }
 
-size_t Client::ListenersCount () const
+size_t EngineAttachments::ListenersCount () const
 {
   return impl->ListenersCount ();
 }
 
-scene_graph::Listener* Client::Listener (size_t index) const
+scene_graph::Listener* EngineAttachments::Listener (size_t index) const
 {
   return impl->Listener (index);
 }
@@ -436,27 +436,27 @@ scene_graph::Listener* Client::Listener (size_t index) const
    Работа с устройствами ввода
 */
 
-xtl::connection Client::RegisterInputHandler (const InputEventHandler& input_handler)
+xtl::connection EngineAttachments::RegisterInputHandler (const InputEventHandler& input_handler)
 {
   return impl->RegisterInputHandler (input_handler);
 }
 
-void Client::SetInputTranslator (const char* attachment_name, const char* translation_table)
+void EngineAttachments::SetInputTranslator (const char* attachment_name, const char* translation_table)
 {
   impl->SetInputTranslator (attachment_name, translation_table);
 }
 
-void Client::RemoveInputTranslator (const char* attachment_name)
+void EngineAttachments::RemoveInputTranslator (const char* attachment_name)
 {
   impl->RemoveInputTranslator (attachment_name);
 }
 
-void Client::RemoveAllInputTranslators ()
+void EngineAttachments::RemoveAllInputTranslators ()
 {
   impl->RemoveAllInputTranslators ();
 }
 
-void Client::ProcessInputEvent (const char* attachment_name, const char* event) const
+void EngineAttachments::ProcessInputEvent (const char* attachment_name, const char* event) const
 {
   impl->ProcessInputEvent (attachment_name, event);
 }
@@ -465,21 +465,21 @@ void Client::ProcessInputEvent (const char* attachment_name, const char* event) 
    Работа со слушателями событий
 */
 
-void Client::AttachEventListener (IClientEventListener* listener)
+void EngineAttachments::Attach (IEngineEventListener* listener)
 {
-  impl->AttachEventListener (listener);
+  impl->Attach (listener);
 }
 
-void Client::DetachEventListener (IClientEventListener* listener)
+void EngineAttachments::Detach (IEngineEventListener* listener)
 {
-  impl->DetachEventListener (listener);
+  impl->Detach (listener);
 }
 
 /*
    Обмен
 */
 
-void Client::Swap (Client& client)
+void EngineAttachments::Swap (EngineAttachments& client)
 {
   stl::swap (impl, client.impl);
 }
@@ -491,7 +491,7 @@ namespace client
    Обмен
 */
 
-void swap (Client& client1, Client& client2)
+void swap (EngineAttachments& client1, EngineAttachments& client2)
 {
   client1.Swap (client2);
 }

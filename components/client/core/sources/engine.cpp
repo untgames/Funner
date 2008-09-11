@@ -6,7 +6,7 @@ using namespace client;
    Реализация движка
 */
 
-struct Engine::Impl : public IClientEventListener, public xtl::trackable
+struct Engine::Impl : public IEngineEventListener, public xtl::trackable
 {
   public:
 ///Конструктор/деструктор
@@ -16,26 +16,28 @@ struct Engine::Impl : public IClientEventListener, public xtl::trackable
 
     ~Impl ()
     {
-      DetachClient ();
+      Detach ();
       OnDestroyNotify ();
     }
 
-///Установка клиента
-    void AttachClient (const Client& new_client)
+///Установка точек привязки
+    void Attach (const EngineAttachments& new_attachments)
     {
-      client = new_client;
+      Detach ();
+      
+      const_cast<EngineAttachments&> (new_attachments).Attach (this);
 
-      client.AttachEventListener (this);
+      attachments = new_attachments;
     }
 
-    void DetachClient ()
+    void Detach ()
     {
       RemoveAllScreens ();
       RemoveAllListeners ();
 
-      client.DetachEventListener (this);
+      attachments.Detach (this);
       
-      client::Client ().Swap (client);
+      EngineAttachments ().Swap (attachments);
     }
 
 ///Получение данных
@@ -90,7 +92,7 @@ struct Engine::Impl : public IClientEventListener, public xtl::trackable
     {
       try
       {
-        client.ProcessInputEvent (attachment_name, event);
+        attachments.ProcessInputEvent (attachment_name, event);
       }
       catch (xtl::exception& e)
       {
@@ -100,9 +102,9 @@ struct Engine::Impl : public IClientEventListener, public xtl::trackable
     }
 
 ///Работа со слушателями событий
-    void AttachEventListener (IClientEventListener* listener)
+    void Attach (IEngineEventListener* listener)
     {
-      static const char* METHOD_NAME = "client::Engine::AttachEventListener";
+      static const char* METHOD_NAME = "client::Engine::Attach(IEngineEventListener*)";
 
       if (!listener)
         throw xtl::make_null_argument_exception (METHOD_NAME, "listener");
@@ -115,10 +117,10 @@ struct Engine::Impl : public IClientEventListener, public xtl::trackable
       listeners.insert (listener);
     }
 
-    void DetachEventListener (IClientEventListener* listener)
+    void Detach (IEngineEventListener* listener)
     {
-      if (!listener)
-        throw xtl::make_null_argument_exception ("client::Engine::DetachEventListener", "listener");
+      if (!listener)      
+        return;
 
       listeners.erase (listener);
     }
@@ -207,16 +209,16 @@ struct Engine::Impl : public IClientEventListener, public xtl::trackable
     typedef Engine::SubsystemPointer SubsystemPointer;
 
     typedef stl::vector<SubsystemPointer>   Subsystems;
-    typedef stl::set<IClientEventListener*> ListenerSet;
+    typedef stl::set<IEngineEventListener*> ListenerSet;
     typedef stl::hash_set<stl::string>      AttachmentsSet;
 
   private:
-    client::Client client;
-    stl::string    configuration_branch_name;
-    Subsystems     subsystems;
-    AttachmentsSet screen_attachments;
-    AttachmentsSet listener_attachments;
-    ListenerSet    listeners;
+    EngineAttachments attachments;
+    stl::string       configuration_branch_name;
+    Subsystems        subsystems;
+    AttachmentsSet    screen_attachments;
+    AttachmentsSet    listener_attachments;
+    ListenerSet       listeners;
 };
 
 /*
@@ -242,17 +244,17 @@ Engine::~Engine ()
 }
 
 /*
-   Установка клиента
+   Установка точек привязки
 */
 
-void Engine::AttachClient (const Client& client)
+void Engine::Attach (const EngineAttachments& attachments)
 {
-  impl->AttachClient (client);
+  impl->Attach (attachments);
 }
 
-void Engine::DetachClient ()
+void Engine::Detach ()
 {
-  impl->DetachClient ();
+  impl->Detach ();
 }
 
 /*
@@ -314,14 +316,14 @@ void Engine::ProcessInputEvent (const char* attachment_name, const char* event) 
    Работа со слушателями событий
 */
 
-void Engine::AttachEventListener (IClientEventListener* listener)
+void Engine::Attach (IEngineEventListener* listener)
 {
-  impl->AttachEventListener (listener);
+  impl->Attach (listener);
 }
 
-void Engine::DetachEventListener (IClientEventListener* listener)
+void Engine::Detach (IEngineEventListener* listener)
 {
-  impl->DetachEventListener (listener);
+  impl->Detach (listener);
 }
 
 namespace client

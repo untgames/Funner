@@ -40,14 +40,14 @@ int main ()
 
     Engine engine (CONFIGURATION_BRANCH_NAME);
 
-    Client client;
+    EngineAttachments client;
 
     render::Screen screen1, screen2;
     
     screen1.SetBackgroundColor (0.8f, 0.f, 0.f, 0.f);
     screen2.SetBackgroundColor (0.f, 0.8f, 0.f, 0.f);
 
-    engine.AttachClient (client);
+    engine.Attach (client);
 
     client.SetScreen ("Screen1", &screen1);
     client.SetScreen ("Screen2", &screen2);

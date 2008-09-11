@@ -8,19 +8,16 @@
 
 #include <render/screen.h>
 
-#include <client/client.h>
+#include <client/engine_attachments.h>
 
 const char* TRANSLATION_TABLE1_FILE_NAME = "data/translation_table1.keymap";
 const char* TRANSLATION_TABLE2_FILE_NAME = "data/translation_table2.keymap";
 
 using namespace client;
 
-class ClientEventListener : public IClientEventListener
+class ClientEventListener : public IEngineEventListener
 {
   public:
-    ClientEventListener () {}
-    ~ClientEventListener () {}
-
 ///События установки/удаления экрана
     void OnSetScreen (const char* attachment_name, render::Screen* screen) 
     {
@@ -58,9 +55,9 @@ void input_event_handler (const char* attachment_name, const char* event)
 int main ()
 {
   ClientEventListener client_event_listener;
-  Client client;
+  EngineAttachments client;
 
-  client.AttachEventListener (&client_event_listener);
+  client.Attach (&client_event_listener);
 
   printf ("Client screens count is %u\n", client.ScreensCount ());
   printf ("Client listeners count is %u\n", client.ListenersCount ());
@@ -108,11 +105,11 @@ int main ()
   printf ("Client screens count is %u\n", client.ScreensCount ());
   printf ("Client listeners count is %u\n", client.ListenersCount ());
 
-  client.DetachEventListener (&client_event_listener);
+  client.Detach (&client_event_listener);
   
   client.RemoveAllListeners ();
   
-  client.AttachEventListener (&client_event_listener);
+  client.Attach (&client_event_listener);
   
   client.RemoveAllScreens ();
 

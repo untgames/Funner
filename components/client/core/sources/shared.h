@@ -25,7 +25,6 @@
 
 #include <input/translation_map.h>
 
-#include <client/client.h>
 #include <client/engine.h>
 
 namespace client
