@@ -111,7 +111,8 @@ struct Window::Impl
 ///Установка низкоуровневого дескриптора родительского окна
     void SetParentHandle (Platform::window_t new_parent_handle)
     {
-      bool need_window_recreate = !new_parent_handle && parent_handle || new_parent_handle && !parent_handle; //нужно пересоздавать окно      
+//      bool need_window_recreate = !new_parent_handle && parent_handle || new_parent_handle && !parent_handle; //нужно пересоздавать окно      
+      bool need_window_recreate = false;
 
       if (need_window_recreate)
       {
