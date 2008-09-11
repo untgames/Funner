@@ -146,8 +146,13 @@ bool not_blended_sprite_sort_predicate (const RenderableSprite* sprite1, const R
 bool blended_sprite_sort_predicate (const RenderableSprite* sprite1, const RenderableSprite* sprite2)
 {  
     //возможно добавить сортировку по блендингу и текстурам??
+    
+//  if (sprite1->vertices [0].position.z != sprite2->vertices [0].position.z)    
+    return sprite1->vertices [0].position.z > sprite2->vertices [0].position.z;
 
-  return sprite1->vertices [0].position.z > sprite2->vertices [0].position.z;
+     //сортировка нужна для визуализации изометрии, в будущем убрать в настройки
+
+//  return sprite1->vertices [0].position.y > sprite2->vertices [0].position.y;
 }
 
 }

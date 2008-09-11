@@ -42,6 +42,15 @@ RendererDispatch::~RendererDispatch ()
 }
 
 /*
+    Получение устройства
+*/
+
+IDevice& RendererDispatch::GetDevice ()
+{
+  return *device;
+}
+
+/*
    Регистрация/удаление окна
 */
 
