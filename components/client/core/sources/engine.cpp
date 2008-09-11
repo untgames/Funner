@@ -28,6 +28,12 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
       const_cast<EngineAttachments&> (new_attachments).Attach (this);
 
       attachments = new_attachments;
+
+      for (size_t i = 0; i < attachments.ScreensCount (); i++)
+        OnSetScreen (attachments.ScreenName (i), attachments.Screen (i));
+
+      for (size_t i = 0; i < attachments.ListenersCount (); i++)
+        OnSetListener (attachments.ListenerName (i), attachments.Listener (i));
     }
 
     void Detach ()

@@ -65,6 +65,7 @@ class EngineAttachments
 
     size_t          ScreensCount () const;
     render::Screen* Screen       (size_t index) const;
+    const char*     ScreenName   (size_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со слушателями
@@ -76,6 +77,7 @@ class EngineAttachments
 
     size_t                 ListenersCount () const;
     scene_graph::Listener* Listener       (size_t index) const;
+    const char*            ListenerName   (size_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с устройствами ввода

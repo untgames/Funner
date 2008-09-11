@@ -99,6 +99,7 @@ int main ()
 
     ClientEventListener client_event_listener;
     EngineAttachments client;
+    EngineAttachments client2;
 
     render::Screen screen;
 
@@ -127,6 +128,10 @@ int main ()
 
     printf ("Engine subsystems count is %u\n", engine.SubsystemsCount ());
     printf ("engine subsystem 1 name is '%s'\n", engine.Subsystem (1).Name ());
+
+    client2.SetScreen ("ScreenAttachment2", &screen);
+
+    engine.Attach (client2);
 
     engine.Detach ();
 

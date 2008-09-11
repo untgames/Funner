@@ -93,8 +93,8 @@ int main ()
   client.SetListener ("ListenerAttachment2", listener2.get ());
   client.SetListener ("ListenerAttachment1", listener1.get ());
 
-  printf ("Listener 1 name is '%s'\n", client.Listener (1)->Name ());
-  printf ("Screen 0 name is '%s'\n", client.Screen (0)->Name ());
+  printf ("Listener 1 name is '%s', attachment name is '%s'\n", client.Listener (1)->Name (), client.ListenerName (1));
+  printf ("Screen 0 name is '%s', attachment name is '%s'\n", client.Screen (0)->Name (), client.ScreenName (0));
 
   printf ("Listener 'ListenerAttachment2' name is '%s'\n", client.FindListener ("ListenerAttachment2")->Name ());
   printf ("Screen 'ScreenAttachment1' name is '%s'\n", client.FindScreen ("ScreenAttachment1")->Name ());

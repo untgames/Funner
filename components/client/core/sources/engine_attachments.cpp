@@ -117,6 +117,14 @@ struct EngineAttachments::Impl : public xtl::reference_counter
       return &screen_attachments[index]->screen;
     }
 
+    const char* ScreenName (size_t index) const
+    {
+      if (index >= screen_attachments.size ())
+        throw xtl::make_range_exception ("client::EngineAttachments::ScreenName", "index", index, 0u, screen_attachments.size ());
+
+      return screen_attachments[index]->attachment_name.c_str ();
+    }
+
 ///Работа со слушателями
     void SetListener (const char* attachment_name, scene_graph::Listener* listener)
     {
@@ -185,6 +193,14 @@ struct EngineAttachments::Impl : public xtl::reference_counter
         throw xtl::make_range_exception ("client::EngineAttachments::Listener", "index", index, 0u, listener_attachments.size ());
 
       return listener_attachments[index]->listener.get ();
+    }
+
+    const char* ListenerName (size_t index) const
+    {
+      if (index >= listener_attachments.size ())
+        throw xtl::make_range_exception ("client::EngineAttachments::ListenerName", "index", index, 0u, listener_attachments.size ());
+
+      return listener_attachments[index]->attachment_name.c_str ();
     }
 
 ///Работа с устройствами ввода
@@ -398,6 +414,11 @@ render::Screen* EngineAttachments::Screen (size_t index) const
   return impl->Screen (index);
 }
 
+const char* EngineAttachments::ScreenName (size_t index) const
+{
+  return impl->ScreenName (index);
+}
+
 /*
    Работа со слушателями
 */
@@ -430,6 +451,11 @@ size_t EngineAttachments::ListenersCount () const
 scene_graph::Listener* EngineAttachments::Listener (size_t index) const
 {
   return impl->Listener (index);
+}
+
+const char* EngineAttachments::ListenerName (size_t index) const
+{
+  return impl->ListenerName (index);
 }
 
 /*
