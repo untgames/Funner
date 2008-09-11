@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UIConfig>
+  <MenuItem Id="MenuItem1" Text="Ещё один пункт" Tip="Странное название"/>
+  <MenuItem Id="MenuItem2" Text="Справка" Tip="Справка о приложении">
+    <MenuItem Text="О программе..." Tip="Описание программы" OnClick="Application.Execute ('ShowAbout')"/>
+    <MenuItem Source="MenuItem1"/>
+    <MenuItem Text="Подменю">
+       <MenuItem Text="Подподменю">
+         <MenuItem Text="Пункт" Image="media/app.ico"/>
+       </MenuItem>
+    </MenuItem>
+  </MenuItem>
+  <MenuStrip Id="MenuStrip1">
+    <MenuItem Text="Файл">
+      <MenuItem Text="Новая форма" OnClick="Application.CreateForm ('my_init_string')"/>
+      <MenuItem Text="Новая форма снизу" OnClick="Application.CreateForm ('my_init_string', DockState.BottomAutoHide)"/>
+      <MenuItem Text="Выход" Tip="Выход из приложения" OnClick="Application.Execute ('close')"/>
+    </MenuItem>
+    <MenuItem Source="MenuItem2"/>
+  </MenuStrip>
+  <ToolStrip Id="ToolStrip1">
+    <ToolButton Image="media/app.ico" OnClick="Application.Execute ('Button1Click')" Tip="Картинка"/>
+    <ToolButton Text="Hello world" OnClick="Application.Execute ('Hello world')"/>
+  </ToolStrip>
+</UIConfig>
