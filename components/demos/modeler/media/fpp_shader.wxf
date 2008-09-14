@@ -14,7 +14,7 @@ EmissionColor 0 0 0 0
 
 Light
 {
-  Enable        0
+  Enable        1
   Type          Point
   DiffuseColor  1 1 1 1
   SpecularColor 1 1 1 1

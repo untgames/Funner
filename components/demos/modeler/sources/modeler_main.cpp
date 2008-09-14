@@ -161,20 +161,22 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     MyApplicationServer ()
     {
       VisualModel::Pointer model = VisualModel::Create ();
-//      VisualModel::Pointer envelope = VisualModel::Create ();
+      VisualModel::Pointer envelope = VisualModel::Create ();
 
       model->SetMeshName (MODEL_MESH_NAME);
       model->BindToScene (scene);
 
-//      envelope->SetMeshName (MODEL2_MESH_NAME);
-//      envelope->BindToScene (scene);
+      model->Scale (-2.f, 2.f, 2.f);
+
+      envelope->SetMeshName (MODEL2_MESH_NAME);
+      envelope->BindToScene (scene);
 
       camera = OrthoCamera::Create ();
 
-      camera->SetLeft   (-2);
-      camera->SetRight  (2);
-      camera->SetBottom (-2);
-      camera->SetTop    (2);
+      camera->SetLeft   (-3);
+      camera->SetRight  (3);
+      camera->SetBottom (-3);
+      camera->SetTop    (3);
       camera->SetZNear  (-100);
       camera->SetZFar   (100);
 

@@ -123,6 +123,19 @@ class RenderManager
     RenderableModelMap  renderable_models;
 };
 
+#pragma pack (1)
+
+struct MyShaderParameters
+{
+  math::mat4f object_tm; 
+  math::mat4f view_tm;
+  math::mat4f proj_tm;
+  math::vec3f light_pos;
+  math::vec3f light_dir; 
+};
+
+typedef xtl::com_ptr<low_level::IBuffer> BufferPtr;
+
 /*
     Посетитель объектов сцены
 */
@@ -131,12 +144,21 @@ struct RenderViewVisitor: public xtl::visitor<void, VisualModel>
 {
   RenderManager*      render_manager;
   low_level::IDevice* device;
+  BufferPtr           cb;
+  MyShaderParameters  *shader_parameters;
+  float               angle;
 
-  RenderViewVisitor (RenderManager* in_render_manager, low_level::IDevice* in_device) : render_manager (in_render_manager), device (in_device) {}
+  RenderViewVisitor (RenderManager* in_render_manager, low_level::IDevice* in_device, BufferPtr in_cb, MyShaderParameters& in_shader_parameters, float in_angle) 
+    : render_manager (in_render_manager), device (in_device), cb (in_cb), shader_parameters (&in_shader_parameters), angle (in_angle) {}
 
   void visit (VisualModel& model)
   {
     RenderableModel& renderable_model = render_manager->GetRenderableModel (device, model.MeshName ());
+
+    shader_parameters->object_tm = math::rotatef (angle, 0, 0, 1) * 
+                                   math::rotatef (angle * 0.2f, 1, 0, 0) * model.WorldTM ();
+
+    cb->SetData (0, sizeof *shader_parameters, shader_parameters);
 
     renderable_model.Draw (*device);
   }
@@ -152,20 +174,8 @@ struct RenderViewVisitor: public xtl::visitor<void, VisualModel>
 const char* COMPONENT_NAME   = "render.scene_render.ModelerRender"; //имя компонента
 const char* RENDER_PATH_NAME = "ModelerRender";                     //имя пути рендеринга
 
-#pragma pack (1)
-
-struct MyShaderParameters
-{
-  math::mat4f object_tm; 
-  math::mat4f view_tm;
-  math::mat4f proj_tm;
-  math::vec3f light_pos;
-  math::vec3f light_dir; 
-};
-
 typedef xtl::com_ptr<low_level::IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
-typedef xtl::com_ptr<low_level::IBuffer>                  BufferPtr;
 
 /*
 ===================================================================================================
@@ -182,9 +192,10 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
         camera (0),
         render_manager (in_render_manager),
         frame (in_renderer->CreateFrame (), false),
-        current_angle (0.f)
+        current_angle (0.f),
+        shader_source (read_shader (SHADER_FILE_NAME))
     {
-      frame->SetCallback (this);
+      frame->SetCallback (this);      
     }
     
 ///Целевые буферы рендеринга
@@ -251,59 +262,60 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
 
     void Draw (render::low_level::IDevice& device)
     {
-      BlendStatePtr blend_state = create_blend_state (device, low_level::BlendArgument_One, low_level::BlendArgument_One);
+/*      if (!blend_state)
+        blend_state = create_blend_state (device, low_level::BlendArgument_One, low_level::BlendArgument_One);
 
-      device.OSSetBlendState (blend_state.get ());
-
-      stl::string shader_source  = read_shader (SHADER_FILE_NAME);
+      device.OSSetBlendState (blend_state.get ());*/
       
-      low_level::ShaderDesc shader_descs [] = {
-        {"fpp_shader", size_t (-1), shader_source.c_str (), "fpp", ""},
-      };
+      if (!shader)
+      {
+        low_level::ShaderDesc shader_descs [] = {
+          {"fpp_shader", size_t (-1), shader_source.c_str (), "fpp", ""},
+        };
 
-      static low_level::ProgramParameter shader_parameters[] = {
-        {"myProjMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, proj_tm)},
-        {"myViewMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, view_tm)},
-        {"myObjectMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, object_tm)},
-        {"lightPos", low_level::ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_pos)},
-        {"lightDir", low_level::ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_dir)},
-      };
-      
-      low_level::ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
+        static low_level::ProgramParameter shader_parameters[] = {
+          {"myProjMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, proj_tm)},
+          {"myViewMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, view_tm)},
+          {"myObjectMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, object_tm)},
+          {"lightPos", low_level::ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_pos)},
+          {"lightDir", low_level::ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_dir)},
+        };
+        
+        low_level::ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
 
-      ProgramPtr shader (device.CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));
-      ProgramParametersLayoutPtr program_parameters_layout (device.CreateProgramParametersLayout (program_parameters_layout_desc));
+        shader = ProgramPtr (device.CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print), false);
 
-      low_level::BufferDesc cb_desc;
-      
-      memset (&cb_desc, 0, sizeof cb_desc);
-      
-      cb_desc.size         = sizeof MyShaderParameters;
-      cb_desc.usage_mode   = low_level::UsageMode_Default;
-      cb_desc.bind_flags   = low_level::BindFlag_ConstantBuffer;
-      cb_desc.access_flags = low_level::AccessFlag_ReadWrite;
+        program_parameters_layout = ProgramParametersLayoutPtr (device.CreateProgramParametersLayout (program_parameters_layout_desc), false);
+      }
 
-      BufferPtr cb (device.CreateBuffer (cb_desc), false);
+      if (!cb)
+      {
+        low_level::BufferDesc cb_desc;
+        
+        memset (&cb_desc, 0, sizeof cb_desc);
+        
+        cb_desc.size         = sizeof MyShaderParameters;
+        cb_desc.usage_mode   = low_level::UsageMode_Default;
+        cb_desc.bind_flags   = low_level::BindFlag_ConstantBuffer;
+        cb_desc.access_flags = low_level::AccessFlag_ReadWrite;
+
+        cb = BufferPtr (device.CreateBuffer (cb_desc), false);
+      }
 
       MyShaderParameters my_shader_parameters;
       
-      my_shader_parameters.object_tm = math::rotatef (current_angle, 0, 0, 1) * 
-                                       math::rotatef (current_angle * 0.2f, 1, 0, 0);
-
-      current_angle += 0.01f;
-
       my_shader_parameters.proj_tm   = camera->ProjectionMatrix ();
       my_shader_parameters.view_tm   = invert (camera->WorldTM ());
-
-      cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
       device.SSSetProgram (shader.get ());
       device.SSSetProgramParametersLayout (program_parameters_layout.get ());
       device.SSSetConstantBuffer (0, cb.get ());    
       
-      RenderViewVisitor visitor (render_manager, &device);            
+      RenderViewVisitor visitor (render_manager, &device, cb, my_shader_parameters, current_angle);            
 
       scene->VisitEach (visitor);
+
+      current_angle += 0.01f;
     }
 
 ///Подсчёт ссылок
@@ -327,6 +339,11 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     RenderManager*                        render_manager;
     FramePtr                              frame;
     float                                 current_angle;
+    BlendStatePtr                         blend_state;
+    stl::string                           shader_source;
+    ProgramPtr                            shader;
+    ProgramParametersLayoutPtr            program_parameters_layout;
+    BufferPtr                             cb;
 };
 
 /*

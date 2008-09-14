@@ -394,3 +394,4 @@ void RenderableModel::Draw (IDevice& device)
 {
   impl->Draw (device);
 }
+
