@@ -19,7 +19,7 @@ const float EPS = 0.001f;
 struct Vertex
 {
   Vec3d   position;
-  Color4d color;
+  Vec3d   dummy;
   Vec3d   normal;  
   int     attr;
 };
@@ -29,14 +29,6 @@ template <class T1, class T2> void copy (const Vec3<T1>& src, Vec3<T2>& dst)
   dst.x = static_cast<T2> (src.x);
   dst.y = static_cast<T2> (src.y);
   dst.z = static_cast<T2> (src.z);
-}
-
-template <class T1, class T2> void copy (const Color4<T1>& src, Color4<T2>& dst)
-{
-  dst.r = static_cast<T2> (src.r);
-  dst.g = static_cast<T2> (src.g);
-  dst.b = static_cast<T2> (src.b);
-  dst.a = static_cast<T2> (src.a);
 }
 
 inline double cos2 (double angle)
@@ -248,7 +240,6 @@ class SurfaceBuilder
 
         copy (vertex.position, out_vertex.position);
         copy (vertex.normal, out_vertex.normal);
-        copy (vertex.color, out_vertex.color);
         
         out_vertices.push_back (out_vertex);
       }
@@ -289,7 +280,7 @@ class SurfaceBuilder
     const ModelData&  model_data;
     VertexArray       vertices;   
     Last              last;    
-        //á¤¥« âì «®ª «ì­ë¬¨!!!!
+        //ñäåëàòü ëîêàëüíûìè!!!!
     double            e1, e3, e, ei [3];
     short             ok;
     double            f0, f1, f2, f3, dm, p1, p2, ymax;
@@ -393,7 +384,7 @@ class SurfaceBuilder
       return 0.0;
     }    
     
-    void env (double y, double x, double sixpack[])
+    void env (double y, double x, Vertex& vertex)
     {
       double z, z1, z2, z3;
       double pp, qq, rr;
@@ -405,42 +396,42 @@ class SurfaceBuilder
       
       if(def_ok(x, y, old))
       {
-        sixpack [0] = old.p * dm;
-        sixpack [1] = old.q * dm;
-        sixpack [2] = old.r * dm;
-        pp          = old.p * old.p;
-        qq          = old.q * old.q;
-        rr          = old.r * old.r;
-        z1          = -((model_data.A * pp + model_data.B * qq + model_data.C * rr)/2. - model_data.h) / model_data.mx;
-        z2          = model_data.A * model_data.A * pp + model_data.B * model_data.B * qq + model_data.C * model_data.C * rr;
-        z3          = -(z2 * z1-model_data.A * model_data.g * old.p) * model_data.mx;
-        sixpack [6] = model_data.A * (model_data.g * z1 * model_data.mx * model_data.mx-old.p * (model_data.A * model_data.mx * model_data.mx * z1 * z1 + z3));
-        sixpack [7] = model_data.B * old.q * (model_data.B * model_data.mx * model_data.mx * (1.-z1 * z1)-z3);
-        sixpack [8] = model_data.C * old.r * (model_data.C * model_data.mx * model_data.mx * (1.-z1 * z1)-z3);
-        z           = sqrt (sixpack [6] * sixpack [6] + sixpack [7] * sixpack [7] + sixpack [8] * sixpack [8]);
-        sixpack [6] = sixpack [6]/z;
-        sixpack [7] = sixpack [7]/z;
-        sixpack [8] = sixpack [8]/z;
+        vertex.position.x = old.p * dm;
+        vertex.position.y = old.q * dm;
+        vertex.position.z = old.r * dm;
+        pp                = old.p * old.p;
+        qq                = old.q * old.q;
+        rr                = old.r * old.r;
+        z1                = -((model_data.A * pp + model_data.B * qq + model_data.C * rr)/2. - model_data.h) / model_data.mx;
+        z2                = model_data.A * model_data.A * pp + model_data.B * model_data.B * qq + model_data.C * model_data.C * rr;
+        z3                = -(z2 * z1-model_data.A * model_data.g * old.p) * model_data.mx;
+        vertex.normal.x   = model_data.A * (model_data.g * z1 * model_data.mx * model_data.mx-old.p * (model_data.A * model_data.mx * model_data.mx * z1 * z1 + z3));
+        vertex.normal.y   = model_data.B * old.q * (model_data.B * model_data.mx * model_data.mx * (1.-z1 * z1)-z3);
+        vertex.normal.z   = model_data.C * old.r * (model_data.C * model_data.mx * model_data.mx * (1.-z1 * z1)-z3);
+        z                 = sqrt (vertex.normal.x * vertex.normal.x + vertex.normal.y * vertex.normal.y + vertex.normal.z * vertex.normal.z);
+        vertex.normal.x   = vertex.normal.x/z;
+        vertex.normal.y   = vertex.normal.y/z;
+        vertex.normal.z   = vertex.normal.z/z;
 
-        hls2rgb3f ((-z1 + 8.0) * 30, 0.2, 0.9, &sixpack [3], 1);
+        hls2rgb3f ((-z1 + 8.0) * 30, 0.2, 0.9, &vertex.dummy.x, 1);
 
-        sixpack [3] = .4;
-        sixpack [4] = .4;
-        sixpack [5] = .4;
-        sixpack [9] = 1.;
+        vertex.dummy.x = .4;
+        vertex.dummy.y = .4;
+        vertex.dummy.z = .4;
+        vertex.attr    = 1;
       }
       else
       {
-        sixpack [0] = 0.;
-        sixpack [1] = 0.;
-        sixpack [2] = 0.;
-        sixpack [6] = 0.1;
-        sixpack [7] = 0.1;
-        sixpack [8] = 0.1;
-        sixpack [3] = 1.0;
-        sixpack [4] = 1.0; 
-        sixpack [5] = 1.0;
-        sixpack [9] = 0.;
+        vertex.position.x = 0.;
+        vertex.position.y = 0.;
+        vertex.position.z = 0.;
+        vertex.normal.x   = 0.1;
+        vertex.normal.y   = 0.1;
+        vertex.normal.z   = 0.1;
+        vertex.dummy.x    = 1.0;
+        vertex.dummy.y    = 1.0; 
+        vertex.dummy.z    = 1.0;
+        vertex.attr       = 0;
       }
     }
     
@@ -475,10 +466,8 @@ class SurfaceBuilder
 
       int  in, i, mn=50;
       double uu,vv;
-      double sixpack [10], copy_six [10], copy_copy [10];
+      Vertex sixpack, copy_six, copy_copy;      
 
-      Vertex tmp;
-        
       for (int u=0; u<uanz; u++)
       {
         in = 0;
@@ -497,13 +486,11 @@ class SurfaceBuilder
               {
                 env(uu,vv, sixpack);
                 
-                if (sixpack[9] != 0.)
-                {
-                   memcpy (&tmp, sixpack, sizeof(tmp));
-                   
-                   tmp.attr = in;
+                if (sixpack.attr != 0.)
+                {                  
+                   sixpack.attr = in;
 
-                   vertices.push_back(tmp);
+                   vertices.push_back(sixpack);
                 }
                 else
                 {
@@ -515,13 +502,11 @@ class SurfaceBuilder
                   
                     env (uu, vv, sixpack);
                     
-                    if (sixpack[9]!=0.)
+                    if (sixpack.attr)
                     { 
-                      memcpy (&tmp, sixpack, sizeof(tmp));
-                       
-                      tmp.attr = in;
+                      sixpack.attr = in;
                       
-                      vertices.push_back (tmp);
+                      vertices.push_back (sixpack);
 
                       break;
                     }
@@ -536,7 +521,7 @@ class SurfaceBuilder
                 {
                   env(uu,vv, copy_copy);
                   
-                  if (copy_copy[9]!=0.)
+                  if (copy_copy.attr)
                     in=11;
                 }
                 break;
@@ -545,7 +530,7 @@ class SurfaceBuilder
               {
                 env (uu, vv, copy_six);
                 
-                if (copy_six[9]!=0.)
+                if (copy_six.attr)
                 {
                   in = 0;
                   vv = vv - (mn+1)/mn/vanz;
@@ -557,13 +542,11 @@ class SurfaceBuilder
                     
                     env (uu,vv, sixpack);
 
-                    if(sixpack [9] != 0.)
+                    if(sixpack.attr)
                     {
-                      memcpy (&tmp, sixpack, sizeof(tmp));
+                      sixpack.attr = in;
 
-                      tmp.attr = in;
-
-                      vertices.push_back (tmp);
+                      vertices.push_back (sixpack);
 
                       break;
                     }
@@ -578,29 +561,27 @@ class SurfaceBuilder
 
                     env (uu,vv, sixpack);
                     
-                    if (sixpack [9] != 0.)
+                    if (sixpack.attr)
                     { 
-                      memcpy (&tmp, sixpack, sizeof(tmp));
-
-                      tmp.attr = in;
+                      sixpack.attr = in;
                       
-                      vertices.push_back(tmp);
+                      vertices.push_back(sixpack);
 
                       break;
                     }
                   }
-
-                  memcpy (&tmp, copy_copy, sizeof(tmp));
                   
-                  tmp.attr = in;
+                  sixpack = copy_copy;
                   
-                  vertices.push_back (tmp);
+                  sixpack.attr = in;
                   
-                  memcpy (&tmp, copy_six, sizeof(tmp));
+                  vertices.push_back (sixpack);
                   
-                  tmp.attr = in;
+                  sixpack = copy_six;
                   
-                  vertices.push_back(tmp);
+                  sixpack.attr = in;
+                  
+                  vertices.push_back(sixpack);
                 }
                 else 
                 {
@@ -622,7 +603,7 @@ class SurfaceBuilder
 }
 
 /*
-    ‡ £àã§ª  ¬®¤¥«¨ ¨§ ä ©« 
+    Çàãðóçêà ìîäåëè èç ôàéëà
 */
 
 void LoadModelData (const char* file_name, ModelData& model_data)
@@ -647,7 +628,7 @@ void LoadModelData (const char* file_name, ModelData& model_data)
 }
 
 /*
-    ®áâà®¥­¨¥ ¬¥£ -¯®¢¥àå­®áâ¨
+    Ïîñòðîåíèå ìåãà-ïîâåðõíîñòè
 */
 
 void BuildMegaSurface (const ModelData& model_data, int uanz, int vanz, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)

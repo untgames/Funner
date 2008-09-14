@@ -304,7 +304,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
       
       my_shader_parameters.proj_tm      = camera->ProjectionMatrix ();
       my_shader_parameters.view_tm      = invert (camera->WorldTM ());
-      my_shader_parameters.light_enable = 0;
+      my_shader_parameters.light_enable = 1;
 
       device.SSSetProgram (shader.get ());
       device.SSSetProgramParametersLayout (program_parameters_layout.get ());

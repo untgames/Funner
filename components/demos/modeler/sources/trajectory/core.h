@@ -47,7 +47,6 @@ typedef Color4<float>  Color4f;
 struct DrawVertex
 {
   Vec3f   position; //положение точки в пространстве
-  Vec3f   normal;   //нормаль к поверхности в точке
   Color4f color;    //цвет точки
 };
 

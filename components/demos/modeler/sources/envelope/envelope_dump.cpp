@@ -6,7 +6,7 @@
 
 using namespace modeler;
 
-const char* INPUT_FILE_NAME_PREFIX = "input.";
+const char* INPUT_FILE_NAME_PREFIX = "media/models/input.";
 const char* INPUT_FILE_NAME_SUFFIX = ".dat";
 
 void dump (const DrawVertexArray& vertices, const DrawPrimitiveArray& primitives)
@@ -14,7 +14,7 @@ void dump (const DrawVertexArray& vertices, const DrawPrimitiveArray& primitives
   printf ("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
   printf ("<mesh_library>\n");
   printf ("  <vertex_streams>\n");
-  printf ("    <vertex_stream id=\"vs#1\" vertices_count=\"%u\" vertex_size=\"36\">\n", vertices.size ());
+  printf ("    <vertex_stream id=\"vs#1\" vertices_count=\"%u\" vertex_size=\"24\">\n", vertices.size ());
   printf ("      <channel semantic=\"position\" type=\"float3\" offset=\"0\">\n");
   
   for (size_t i=0; i<vertices.size (); i++)
@@ -36,17 +36,6 @@ void dump (const DrawVertexArray& vertices, const DrawPrimitiveArray& primitives
   }
   
   printf ("\n");
-  printf ("      </channel>\n");
-  printf ("      <channel semantic=\"color\" type=\"float3\" offset=\"24\">\n");
-  
-  for (size_t i=0; i<vertices.size (); i++)
-  {
-    const Color4f& c = vertices [i].color;
-
-    printf ("%g %g %g %g ", c.r, c.g, c.b, c.a);
-  }
-
-  printf ("\n");  
   printf ("      </channel>\n");
   printf ("    </vertex_stream>\n");
   printf ("  </vertex_streams>\n");

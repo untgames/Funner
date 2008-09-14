@@ -20,5 +20,5 @@ Light
   DiffuseColor  1 1 1 1
   SpecularColor 1 1 1 1
   AmbientColor  1 1 1 1
-  Position      0 0 0
+  Position      0 0 40
 }

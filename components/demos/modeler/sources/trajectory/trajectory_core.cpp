@@ -137,9 +137,9 @@ class TrajectoryBuilder
 
       Array_y_z ();
 
-      float angle = 0;
+/*      float angle = 0;
 
-/*      for (size_t i = 0; i < 1000; i++, angle += 0.001)
+      for (size_t i = 0; i < 1000; i++, angle += 0.001)
       {
         model_data.nu1 = sin (angle);
         model_data.nu3 = sin (angle);
@@ -157,7 +157,7 @@ class TrajectoryBuilder
         DoIterEx ();
       }*/
 
-      for (size_t i = 0; i < 10000; i++)
+      for (size_t i = 0; i < 20000; i++)
       {
         DoIterEx ();
       }
@@ -195,23 +195,14 @@ class TrajectoryBuilder
         line_start.position.x = point.pnts2 [0];
         line_start.position.y = point.pnts2 [1];
         line_start.position.z = point.pnts2 [2];
-        line_start.normal.x   = normal [0];
-        line_start.normal.y   = normal [1];
-        line_start.normal.z   = normal [2];
         line_start.color.r    = (float)point3d[i].rgb[0];
         line_start.color.g    = (float)point3d[i].rgb[1];
         line_start.color.b    = (float)point3d[i].rgb[2];
         line_start.color.a    = 1.f;
 
-//        line_end.position.x = line_start.position.x + (point3d[i].pnts[0] * 0.1f);
-//        line_end.position.y = line_start.position.y + (point3d[i].pnts[1] * 0.1f);
-//        line_end.position.z = line_start.position.z + (point3d[i].pnts[2] * 0.1f);
         line_end.position.x = line_start.position.x + normal [0] * 0.1f;
         line_end.position.y = line_start.position.y + normal [1] * 0.1f;
         line_end.position.z = line_start.position.z + normal [2] * 0.1f;
-        line_end.normal.x   = normal [0];
-        line_end.normal.y   = normal [1];
-        line_end.normal.z   = normal [2];
         line_end.color.r    = (float)point3d[i].rgb[0];
         line_end.color.g    = (float)point3d[i].rgb[1];
         line_end.color.b    = (float)point3d[i].rgb[2];
@@ -248,6 +239,37 @@ class TrajectoryBuilder
       return 2.0 * maximum_moment_of_inertia * (model_data.h + sqrt (sqr (model_data.mx) + sqr (model_data.my) + sqr (model_data.mz))) - sqr (model_data.g);
     }
 
+    void Section3D (int nst, double koef)
+    {
+      int    i, ii = 1;
+      float  fa = 0, fb = 0;
+      double maximum_moment_of_inertia;
+
+      maximum_moment_of_inertia = std::max (model_data.A, std::max (model_data.B, model_data.C));
+
+      if (ii_change_condition ())
+      {
+        ii = -1;
+      }
+
+      for (i = 1; i <= nst; i++) 
+      {
+        BuildPoint (i, fb, fa, ii, maximum_moment_of_inertia, koef, true);
+      }
+
+      ii = -1;
+
+      if (ii_change_condition ())
+      {
+        ii = 1;
+      }
+    
+      for (i = 1; i <= nst; i++) 
+      {
+        BuildPoint (i, fb, fa, ii, maximum_moment_of_inertia, koef, false);
+      }
+    }
+    
     void BuildPoint (size_t i, float& fb, float& fa, int& ii, double maximum_moment_of_inertia, double koef, bool sign)
     {
       elmnts %= MaxSize; //??????
@@ -258,12 +280,12 @@ class TrajectoryBuilder
 
       if (sign)
       {
-        if (ii * fa > 0)
+        if (ii * fa <= 0)
           return;
       }
       else
       {
-        if (ii * fa < 0)
+        if (ii * fa >= 0)
           return;
       }
 
@@ -272,16 +294,15 @@ class TrajectoryBuilder
       if (fa == fb)
         return;
 
-      bool build_point_condition;
-
+      bool   build_point_condition;
+      double condition_value = y[0][i] * (y[4][i] * (y[3][i] * model_data.my - y[4][i] * model_data.mx) - y[5][i] * (y[5][i] * model_data.mx - y[3][i] * model_data.mz)) +
+                               y[1][i] * (y[5][i] * (y[4][i] * model_data.mz - y[5][i] * model_data.my) - y[3][i] * (y[3][i] * model_data.my - y[4][i] * model_data.mx)) +
+                               y[2][i] * (y[3][i] * (y[5][i] * model_data.mx - y[3][i] * model_data.mz) - y[4][i] * (y[4][i] * model_data.mz - y[5][i] * model_data.my));
+                               
       if (sign)
-        build_point_condition = y[0][i] * (y[4][i] * (y[3][i] * model_data.my - y[4][i] * model_data.mx) - y[5][i] * (y[5][i] * model_data.mx - y[3][i] * model_data.mz)) +
-                                y[1][i] * (y[5][i] * (y[4][i] * model_data.mz - y[5][i] * model_data.my) - y[3][i] * (y[3][i] * model_data.my - y[4][i] * model_data.mx)) +
-                                y[2][i] * (y[3][i] * (y[5][i] * model_data.mx - y[3][i] * model_data.mz) - y[4][i] * (y[4][i] * model_data.mz - y[5][i] * model_data.my)) < 0;
+        build_point_condition = condition_value > 0;
       else
-        build_point_condition = y[0][i] * (y[4][i] * (y[3][i] * model_data.my - y[4][i] * model_data.mx) - y[5][i] * (y[5][i] * model_data.mx - y[3][i] * model_data.mz)) +
-                                y[1][i] * (y[5][i] * (y[4][i] * model_data.mz - y[5][i] * model_data.my) - y[3][i] * (y[3][i] * model_data.my - y[4][i] * model_data.mx)) +
-                                y[2][i] * (y[3][i] * (y[5][i] * model_data.mx - y[3][i] * model_data.mz) - y[4][i] * (y[4][i] * model_data.mz - y[5][i] * model_data.my)) > 0;
+        build_point_condition = condition_value < 0;
 
       if (build_point_condition && (y[4][i] > 0))
       {
@@ -328,9 +349,9 @@ class TrajectoryBuilder
         point3d[elmnts].pnts2[1] *= -1;
 
         if (sign)
-          point3d[elmnts].side = koef > 1;
-        else
           point3d[elmnts].side = koef < 1;
+        else
+          point3d[elmnts].side = koef > 1;
 
         point3d[elmnts].nu1  = model_data.nu1;
         point3d[elmnts].nu3  = model_data.nu3;
@@ -343,193 +364,7 @@ class TrajectoryBuilder
         elmnts++; 
       }         
     }
-
-/*    void Section3D (int nst, double koef)
-    {
-      int    i, ii = 1;
-      float  fa = 0, fb = 0;
-      double maximum_moment_of_inertia;
-
-      maximum_moment_of_inertia = std::max (model_data.A, std::max (model_data.B, model_data.C));
-
-      if (ii_change_condition ())
-      {
-        ii = -1;
-      }
-
-      for (i = 1; i <= nst; i++) 
-      {
-        BuildPoint (i, fb, fa, ii, maximum_moment_of_inertia, koef, true);
-      }
-
-      ii = -1;
-
-      if (ii_change_condition ())
-      {
-        ii = 1;
-      }
     
-      for (i = 1; i <= nst; i++) 
-      {
-        BuildPoint (i, fb, fa, ii, maximum_moment_of_inertia, koef, false);
-      }
-    }*/
-    
-void Section3D(int nst,double koef)
-{
-int i,ii=1;
-float dd[3],dd2[3],fa=0,fb;
-double dc [3];
-double m,ama;
-
-  ama=std::max(model_data.A,std::max(model_data.B,model_data.C));
-
-  if(model_data.mx*(model_data.B*y[1][1]*y[5][1]-model_data.C*y[2][1]*y[4][1])+
-     model_data.my*(model_data.C*y[2][1]*y[3][1]-model_data.A*y[0][1]*y[5][1])+
-     model_data.mz*(model_data.A*y[0][1]*y[4][1]-model_data.B*y[1][1]*y[3][1])>0)ii=-1;
-
-  for (i = 1; i <=nst; i++) 
-  {
-    elmnts%=MaxSize;
-    fb=fa;
-    fa= model_data.mx*(model_data.B*y[1][i]*y[5][i]-model_data.C*y[2][i]*y[4][i])+
-      model_data.my*(model_data.C*y[2][i]*y[3][i]-model_data.A*y[0][i]*y[5][i])+
-      model_data.mz*(model_data.A*y[0][i]*y[4][i]-model_data.B*y[1][i]*y[3][i]);
-    if (ii*fa>0)
-    { ii=-ii;
-
-       if((y[0][i]*(y[4][i]*(y[3][i]*model_data.my-y[4][i]*model_data.mx)-
-      y[5][i]*(y[5][i]*model_data.mx-y[3][i]*model_data.mz))+
-      y[1][i]*(y[5][i]*(y[4][i]*model_data.mz-y[5][i]*model_data.my)-
-      y[3][i]*(y[3][i]*model_data.my-y[4][i]*model_data.mx))+
-      y[2][i]*(y[3][i]*(y[5][i]*model_data.mx-y[3][i]*model_data.mz)-
-      y[4][i]*(y[4][i]*model_data.mz-y[5][i]*model_data.my))<0)&&(y[4][i]>0))
-      {
-        if(fa-fb==0)continue;
-    m=(model_data.A*model_data.A*(y[0][i-1]*fa-y[0][i]*fb)*(y[0][i-1]*fa-y[0][i]*fb)+
-      model_data.B*model_data.B*(y[1][i-1]*fa-y[1][i]*fb)*(y[1][i-1]*fa-y[1][i]*fb)+
-      model_data.C*model_data.C*(y[2][i-1]*fa-y[2][i]*fb)*(y[2][i-1]*fa-y[2][i]*fb))/(fa-fb)/(fa-fb);
-    if((2.0*ama*(model_data.h+sqrt(model_data.mx*model_data.mx+model_data.my*model_data.my+model_data.mz*model_data.mz))-model_data.g*model_data.g)!=0)
-    hls2rgb3f(sqrt((m-model_data.g*model_data.g)/
-    (2.0*ama*(model_data.h+sqrt(model_data.mx*model_data.mx+model_data.my*model_data.my+model_data.mz*model_data.mz))-model_data.g*model_data.g))*360.,
-      .5,1.0,dc,1);   
-
-        dd[2]=(y[5][i-1]*fa-y[5][i]*fb)/(fa-fb);
-        dd[1]=(y[4][i-1]*fa-y[4][i]*fb)/(fa-fb);
-        dd[0]=(y[3][i-1]*fa-y[3][i]*fb)/(fa-fb);
-        
-        dd2[2]=dm*(y[2][i-1]*fa-y[2][i]*fb)/(fa-fb);
-        dd2[1]=dm*(y[1][i-1]*fa-y[1][i]*fb)/(fa-fb);
-        dd2[0]=dm*(y[0][i-1]*fa-y[0][i]*fb)/(fa-fb);
-
-        
-        memcpy(&point3d[elmnts].pnts,dd,sizeof(dd));
-        memcpy(&point3d[elmnts].pnts2,dd2,sizeof(dd2));
-
-        memcpy(&point3d[elmnts].rgb,dc,sizeof(dc));
-        point3d[elmnts].side=koef>1;
-        point3d[elmnts].nu1=model_data.nu1;
-        point3d[elmnts].nu3=model_data.nu3;
-        if(MaxSize>CurSize)
-        {
-          CurSize++;
-        }
-        elmnts++;    
-        memcpy(&point3d[elmnts].pnts,dd,sizeof(dd));
-        memcpy(&point3d[elmnts].pnts2,dd2,sizeof(dd2));
-
-        memcpy(&point3d[elmnts].rgb,dc,sizeof(dc));
-        point3d[elmnts].pnts[1]*=-1;
-        point3d[elmnts].pnts2[1]*=-1;
-        point3d[elmnts].side=koef>1;
-        point3d[elmnts].nu1=model_data.nu1;
-        point3d[elmnts].nu3=model_data.nu3;
-        if(MaxSize>CurSize)
-        {
-          CurSize++;
-        }
-        elmnts++; 
-     }
-     
-    }
-  
-    }
-  ii=-1;
-  if(model_data.mx*(model_data.B*y[1][1]*y[5][1]-model_data.C*y[2][1]*y[4][1])+
-     model_data.my*(model_data.C*y[2][1]*y[3][1]-model_data.A*y[0][1]*y[5][1])+
-     model_data.mz*(model_data.A*y[0][1]*y[4][1]-model_data.B*y[1][1]*y[3][1])>0)
-     {
-    ii=1;
-     }
-for (i = 1; i <=nst; i++) 
-  {
-    elmnts%=MaxSize;
-    fb=fa;
-    fa= model_data.mx*(model_data.B*y[1][i]*y[5][i]-model_data.C*y[2][i]*y[4][i])+
-      model_data.my*(model_data.C*y[2][i]*y[3][i]-model_data.A*y[0][i]*y[5][i])+
-      model_data.mz*(model_data.A*y[0][i]*y[4][i]-model_data.B*y[1][i]*y[3][i]);
-    if (ii*fa<0)
-    { ii=-ii;
-
-       if((y[0][i]*(y[4][i]*(y[3][i]*model_data.my-y[4][i]*model_data.mx)-
-      y[5][i]*(y[5][i]*model_data.mx-y[3][i]*model_data.mz))+
-      y[1][i]*(y[5][i]*(y[4][i]*model_data.mz-y[5][i]*model_data.my)-
-      y[3][i]*(y[3][i]*model_data.my-y[4][i]*model_data.mx))+
-      y[2][i]*(y[3][i]*(y[5][i]*model_data.mx-y[3][i]*model_data.mz)-
-      y[4][i]*(y[4][i]*model_data.mz-y[5][i]*model_data.my))>0)&&(y[4][i]>0))
-      {
-        if(fa-fb==0)continue;
-    m=(model_data.A*model_data.A*(y[0][i-1]*fa-y[0][i]*fb)*(y[0][i-1]*fa-y[0][i]*fb)+
-      model_data.B*model_data.B*(y[1][i-1]*fa-y[1][i]*fb)*(y[1][i-1]*fa-y[1][i]*fb)+
-      model_data.C*model_data.C*(y[2][i-1]*fa-y[2][i]*fb)*(y[2][i-1]*fa-y[2][i]*fb))/(fa-fb)/(fa-fb);
-    if((2.0*ama*(model_data.h+sqrt(model_data.mx*model_data.mx+model_data.my*model_data.my+model_data.mz*model_data.mz))-model_data.g*model_data.g)!=0)
-    hls2rgb3f(sqrt((m-model_data.g*model_data.g)/
-    (2.0*ama*(model_data.h+sqrt(model_data.mx*model_data.mx+model_data.my*model_data.my+model_data.mz*model_data.mz))-model_data.g*model_data.g))*360.,
-      .5,1.0,dc,1);   
-
-        dd[2]=(y[5][i-1]*fa-y[5][i]*fb)/(fa-fb);
-        dd[1]=(y[4][i-1]*fa-y[4][i]*fb)/(fa-fb);
-        dd[0]=(y[3][i-1]*fa-y[3][i]*fb)/(fa-fb);
-    
-        dd2[2]=dm*(y[2][i-1]*fa-y[2][i]*fb)/(fa-fb);
-        dd2[1]=dm*(y[1][i-1]*fa-y[1][i]*fb)/(fa-fb);
-        dd2[0]=dm*(y[0][i-1]*fa-y[0][i]*fb)/(fa-fb);
-
-
-        memcpy(&point3d[elmnts].pnts,dd,sizeof(dd));
-        memcpy(&point3d[elmnts].pnts2,dd2,sizeof(dd2));
-
-        memcpy(&point3d[elmnts].rgb,dc,sizeof(dc));
-        point3d[elmnts].side=koef<1;
-        point3d[elmnts].nu1=model_data.nu1;
-        point3d[elmnts].nu3=model_data.nu3;
-        if(MaxSize>CurSize)
-        {
-          CurSize++;
-        }
-        elmnts++;    
-        memcpy(&point3d[elmnts].pnts,dd,sizeof(dd));
-        memcpy(&point3d[elmnts].pnts2,dd2,sizeof(dd2));
-
-        memcpy(&point3d[elmnts].rgb,dc,sizeof(dc));
-        point3d[elmnts].pnts[1]*=-1;
-        point3d[elmnts].pnts2[1]*=-1;
-        point3d[elmnts].side=koef<1;
-        point3d[elmnts].nu1=model_data.nu1;
-        point3d[elmnts].nu3=model_data.nu3;
-        if(MaxSize>CurSize)
-        {
-          CurSize++;
-        }
-        elmnts++; 
-     }
-     
-    }
-  
-    }
-
-}    
-
     void q_starting (double *vst, int nd, int nst, int pr)
     {
       int    i;

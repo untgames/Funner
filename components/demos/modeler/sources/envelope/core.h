@@ -29,15 +29,8 @@ template <class T> struct Vec3
   T x, y, z;
 };
 
-template <class T> struct Color4
-{
-  T r, g, b, a;
-};
-
-typedef Vec3<double>   Vec3d;
-typedef Vec3<float>    Vec3f;
-typedef Color4<double> Color4d;
-typedef Color4<float>  Color4f;
+typedef Vec3<double> Vec3d;
+typedef Vec3<float>  Vec3f;
 
 /*
     Визуализируемая точка поверхности
@@ -45,9 +38,8 @@ typedef Color4<float>  Color4f;
 
 struct DrawVertex
 {
-  Vec3f   position; //положение точки в пространстве
-  Vec3f   normal;   //нормаль к поверхности в точке
-  Color4f color;    //цвет точки
+  Vec3f position; //положение точки в пространстве
+  Vec3f normal;   //нормаль к поверхности в точке
 };
 
 /*
