@@ -1,6 +1,7 @@
 #include <stl/hash_map>
 #include <stl/vector>
 
+#include <xtl/bind.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
 #include <xtl/shared_ptr.h>
@@ -74,6 +75,9 @@ struct RenderableModel::Impl: public xtl::trackable
     for (media::geometry::MeshLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)    
     {
       media::geometry::Mesh& mesh = *iter;      
+      
+      if (!check (mesh, xtl::bind (&Impl::LogMessage, this, _1)))
+        continue;
       
 //      printf ("Load mesh '%s'\n", mesh.Name ());
       
@@ -356,10 +360,11 @@ struct RenderableModel::Impl: public xtl::trackable
           BufferPtr vs = vb.vertex_streams [i];          
           
           device->ISSetVertexBuffer (i, vs.get ());
-        }        
+        }
         
         if (mesh.index_buffer)
         {
+          printf ("draw %u vertices from vertex %u\n", primitive.count, primitive.first);
           device->DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
         }
         else
@@ -369,6 +374,12 @@ struct RenderableModel::Impl: public xtl::trackable
       }
     }
   }
+  
+  private:
+    void LogMessage (const char* message)
+    {
+      printf ("%s\n", message);
+    }
 };
 
 RenderableModel::RenderableModel (IDevice& device, const char* file_name)
