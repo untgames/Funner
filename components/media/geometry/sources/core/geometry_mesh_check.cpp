@@ -329,7 +329,7 @@ bool check (const Mesh& mesh, size_t joints_count, const xtl::function<void (con
     return false;
   }
   
-  return log.HasErrors ();
+  return !log.HasErrors ();
 }
 
 bool check (const Mesh& mesh, const xtl::function<void (const char*)>& log_handler)

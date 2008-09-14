@@ -7,3 +7,4 @@ mesh 'mesh1': infinite value vertex_buffer[0].stream[0].vertex[1].texcoord0.x (a
 mesh 'mesh1': vertex_buffer[0].stream[0].vertex[0] not normalized (weights_sum=0.100)
 mesh 'mesh1': vertex_buffer[0].stream[0].vertex[1].last_weight=5 > weights_count=4 (last_weight=first_weight+weights_count)
 mesh 'mesh1': vertex_buffer[0].weight[2].joint_index=6 >= joints_count=5
+check=0

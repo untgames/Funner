@@ -70,7 +70,7 @@ int main ()
     mesh.AddPrimitive (PrimitiveType_TriangleStrip, 0, 0, 3, "");
     mesh.AddPrimitive (PrimitiveType_TriangleList, 1, 0, 2, "");
 
-    check (mesh, 5, &print);
+    printf ("check=%d\n", check (mesh, 5, &print));
   }
   catch (std::exception& exception)
   {
