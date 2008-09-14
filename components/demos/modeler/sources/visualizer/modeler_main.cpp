@@ -28,6 +28,10 @@
 #include <client/engine.h>
 #include <client/window_manager.h>
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 using namespace tools::ui;
 using namespace scene_graph;
 using namespace client;
