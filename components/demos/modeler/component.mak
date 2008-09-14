@@ -6,7 +6,7 @@ TARGETS := DEMOS.MODELER.MATH DEMOS.MODELER.VISUALIZER
 #Утилита расчёта траекторий и огибающей
 DEMOS.MODELER.MATH.TYPE          := application
 DEMOS.MODELER.MATH.NAME          := modeler-envelope
-DEMOS.MODELER.MATH.SOURCE_DIRS   := sources/math
+DEMOS.MODELER.MATH.SOURCE_DIRS   := sources/envelope
 DEMOS.MODELER.MATH.EXECUTION_DIR := .
 DEMOS.MODELER.MATH.IMPORTS       :=
 
