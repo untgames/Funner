@@ -24,7 +24,7 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
 {
   public:
 ///Конструктор
-    MyChildWindow () : window (syslib::WindowStyle_PopUp) {}    
+    MyChildWindow () : window (syslib::WindowStyle_PopUp) {}
 
 ///Изменение положения окна
     void SetPosition (size_t x, size_t y)
@@ -78,20 +78,6 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
       catch (xtl::exception& exception)
       {
         exception.touch ("MyChildWindow::Show");
-        throw;
-      }
-    }
-
-///Обновить содержимое окна
-    void Update ()
-    {
-      try
-      {
-        window.Invalidate ();
-      }
-      catch (xtl::exception& exception)
-      {
-        exception.touch ("MyChildWindow::Update");
         throw;
       }
     }

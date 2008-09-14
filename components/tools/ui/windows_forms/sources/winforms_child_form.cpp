@@ -24,7 +24,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
       window_system (in_window_system), child_window (in_child_window)
     {
         //инициализация свойств формы
-      
+
       Text         = "Form";
       ShowHint     = WeifenLuo::WinFormsUI::Docking::DockState::Hidden;
       HideOnClose  = true;
@@ -34,15 +34,6 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
       HandleCreated   += gcnew EventHandler (this, &ChildFormImpl::OnCreateHandle);
       HandleDestroyed += gcnew EventHandler (this, &ChildFormImpl::OnDestroyHandle);
       Resize          += gcnew EventHandler (this, &ChildFormImpl::OnResize);
-
-        //начальное обновление параметров
-
-      UpdateParent ();
-      UpdateRect ();
-
-        //отображение окна
-
-      child_window.Show (true);
     }    
 
   private:
@@ -100,14 +91,24 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 ///Обработка события создания дескриптора формы
     void OnCreateHandle (System::Object^, EventArgs^)
     {
-//      printf ("ChildFormImpl::OnCreateHandle (%p)\n", (const void*)Handle);
-      child_window.SetParent ((const void*)Handle);      
+      printf ("ChildFormImpl::OnCreateHandle (%p)\n", (const void*)Handle);
+      
+        //обновление параметров
+
+      UpdateParent ();
+      UpdateRect ();
+
+        //отображение окна
+
+      child_window.Show (true);
     }
 
 ///Обработка события уничтожения дескриптора формы
     void OnDestroyHandle (System::Object^, EventArgs^)
     {
-//      printf ("ChildFormImpl::OnDestroyHandle (%p)\n", (const void*)Handle);      
+      printf ("ChildFormImpl::OnDestroyHandle (%p)\n", (const void*)Handle);
+
+      child_window.Show (false);
       child_window.SetParent (0);
     }
 
