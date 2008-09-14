@@ -21,7 +21,7 @@
       BuffersCount = "2"
       SwapMethod   = "Discard"
       DriverMask   = "*"
-      AdapterMask  = "OpenGL32"
+      AdapterMask  = "*"
       SamplesCount = "1024"
       VSync        = "0"
       FullScreen   = "0"

@@ -61,7 +61,7 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
     MyChildWindow (const EngineAttachments& attachments)
       : window (syslib::WindowStyle_PopUp),
         engine (ENGINE_CONFIGURATION_BRANCH, StartupGroup_Level2),
-        invalidate_timer (xtl::bind (&MyChildWindow::OnTime, this), 1)
+        invalidate_timer (xtl::bind (&MyChildWindow::OnTime, this), 10)
     {
         //установка точек привязки
 
@@ -75,11 +75,7 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
 
         //запуск систем движка
 
-      engine.Start (StartupGroup_LevelMax);
-      
-        //показ окна
-        
-      window.Show ();
+      engine.Start (StartupGroup_LevelMax);      
     }
 
 ///Изменение положения окна
@@ -130,24 +126,13 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
       try
       {
         window.SetVisible (state);
+
+//        if (state)
+//          window.Invalidate ();
       }
       catch (xtl::exception& exception)
       {
         exception.touch ("MyChildWindow::Show");
-        throw;
-      }
-    }
-
-///Обновить содержимое окна
-    void Update ()
-    {
-      try
-      {
-        window.Invalidate ();
-      }
-      catch (xtl::exception& exception)
-      {
-        exception.touch ("MyChildWindow::Update");
         throw;
       }
     }
@@ -194,6 +179,8 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       camera->SetZFar   (100);
 
       camera->BindToScene (scene);
+      
+      screen.SetBackgroundColor (1, 0, 0, 0);
       
       Viewport viewport;
       

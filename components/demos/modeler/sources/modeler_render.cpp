@@ -136,7 +136,9 @@ struct RenderViewVisitor: public xtl::visitor<void, VisualModel>
 
   void visit (VisualModel& model)
   {
-    render_manager->GetRenderableModel (device, model.MeshName ()).Draw (*device);
+    RenderableModel& renderable_model = render_manager->GetRenderableModel (device, model.MeshName ());
+
+    renderable_model.Draw (*device);
   }
 };
 
@@ -298,8 +300,8 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
       device.SSSetProgram (shader.get ());
       device.SSSetProgramParametersLayout (program_parameters_layout.get ());
       device.SSSetConstantBuffer (0, cb.get ());    
-
-      RenderViewVisitor visitor (render_manager, &device);
+      
+      RenderViewVisitor visitor (render_manager, &device);            
 
       scene->VisitEach (visitor);
     }

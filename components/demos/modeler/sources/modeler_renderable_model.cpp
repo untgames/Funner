@@ -356,7 +356,7 @@ struct RenderableModel::Impl: public xtl::trackable
           BufferPtr vs = vb.vertex_streams [i];          
           
           device->ISSetVertexBuffer (i, vs.get ());
-        }
+        }        
         
         if (mesh.index_buffer)
         {
@@ -365,7 +365,7 @@ struct RenderableModel::Impl: public xtl::trackable
         else
         {
           device->Draw (primitive.type, primitive.first, primitive.count);
-        }
+        }        
       }
     }
   }
