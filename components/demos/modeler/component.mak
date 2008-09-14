@@ -1,14 +1,21 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := DEMOS.MODELER.MATH DEMOS.MODELER.VISUALIZER
+TARGETS := DEMOS.MODELER.ENVELOPE DEMOS.MODELER.TRAJECTORY DEMOS.MODELER.VISUALIZER
 
-#Утилита расчёта траекторий и огибающей
-DEMOS.MODELER.MATH.TYPE          := application
-DEMOS.MODELER.MATH.NAME          := modeler-envelope
-DEMOS.MODELER.MATH.SOURCE_DIRS   := sources/envelope
-DEMOS.MODELER.MATH.EXECUTION_DIR := .
-DEMOS.MODELER.MATH.IMPORTS       :=
+#Утилита расчёта огибающей
+DEMOS.MODELER.ENVELOPE.TYPE          := application
+DEMOS.MODELER.ENVELOPE.NAME          := modeler-envelope
+DEMOS.MODELER.ENVELOPE.SOURCE_DIRS   := sources/envelope
+DEMOS.MODELER.ENVELOPE.EXECUTION_DIR := .
+DEMOS.MODELER.ENVELOPE.IMPORTS       :=
+
+#Утилита расчёта траектории
+DEMOS.MODELER.TRAJECTORY.TYPE          := application
+DEMOS.MODELER.TRAJECTORY.NAME          := modeler-trajectory
+DEMOS.MODELER.TRAJECTORY.SOURCE_DIRS   := sources/trajectory
+DEMOS.MODELER.TRAJECTORY.EXECUTION_DIR := .
+DEMOS.MODELER.TRAJECTORY.IMPORTS       :=
 
 #Приложение Modeler
 DEMOS.MODELER.VISUALIZER.TYPE          := application
