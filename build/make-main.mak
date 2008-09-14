@@ -223,7 +223,7 @@ define process_target_with_sources
   TMP_DIRS := $$($1.TMP_DIRS) $$(TMP_DIRS)
   TMP_CLEAN_DIRS := $(TMP_CLEAN_DIRS) $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
 
-  build: $$($1.TARGET_DLLS)
+  build: $$($1.TARGET_DLLS)  
 
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))  
 endef
@@ -283,7 +283,6 @@ define process_target.application
   TARGET_FILES := $$(TARGET_FILES) $$($1.EXE_FILE)
 
   build: $$($1.EXE_FILE)
-  run: RUN.$1
 
   $$(eval $$(call process_target_with_sources,$1))
   
@@ -298,6 +297,10 @@ define process_target.application
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
 		@export PATH="$$(call build_execution_path,$$($1.DLL_DIRS))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<)
+
+  ifneq (,$$(filter $$($1.EXE_FILE),$$(files:%=$(DIST_BIN_DIR)/%.$(EXE_SUFFIX))))
+    run: RUN.$1
+  endif
 endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
