@@ -85,33 +85,14 @@ void hls2rgb3f (double h, double l, double s, double* rgb, int hls)
   }
 }
 
-void nrerror (char error_text[])
-{
-  FILE *stream;
-  
-  stream = fopen ("err_data.txt", "w");
-
-  fprintf (stream, "Numerical Recipes run-time error...\n");
-  fprintf (stream, "%s\n", error_text);
-  fprintf (stream, "...now exiting to system...\n");
-  
-  fclose (stream);
-
-  return;
-}
-
 double* vector (int nl, int nh)
 {
-  double *v;
-  char   tmp[80];
-
-  v = (double*)malloc ((unsigned)(nh - nl + 1) * sizeof (double));
+  double* v = (double*)malloc ((unsigned)(nh - nl + 1) * sizeof (double));
 
   if (!v) 
   {
-    sprintf (tmp, "allocation failure in vector(%d,%d)", nl, nh);
-    nrerror (tmp);
-    exit (1);
+    printf ("allocation failure in vector(%d,%d)", nl, nh);
+    abort  ();
   }
   
   return v - nl;
@@ -127,14 +108,13 @@ class TrajectoryBuilder
   public:
     TrajectoryBuilder (const ModelData& in_model_data) : model_data (in_model_data) 
     {
-      MaxSize = 900000;
+      MaxSize = 900000; //?????
 
       CurSize = elmnts = 0;
 
-
       mlen = model_data.len;
 
-      nit0 = nit = 1;
+      nit = 1;
 
       if (sqr (model_data.nu1) + sqr (model_data.nu3) > 1)
       {
@@ -196,24 +176,42 @@ class TrajectoryBuilder
 
 //        if ((sqr (point3d[i].pnts2[0]) + sqr (point3d[i].pnts2[1]) + sqr (point3d[i].pnts2[2])) > 2.f)
 //          continue;
+         
+        Point3D& point = point3d [i];
+        float    normal [3], normal_length = 0.0f;
+        
+        for (size_t j=0; j<3; j++)
+        {
+//          normal [j]     = point.pnts [j] - point.pnts2 [j];
+          normal [j]     = point.pnts2 [j];
+          normal_length += sqr (normal [j]);
+        }
 
-        line_start.position.x = point3d[i].pnts2[0];
-        line_start.position.y = point3d[i].pnts2[1];
-        line_start.position.z = point3d[i].pnts2[2];
-        line_start.normal.x   = 0;
-        line_start.normal.y   = 0;
-        line_start.normal.z   = -1;
+        normal_length = sqrt (normal_length);
+        
+        for (size_t j=0; j<3; j++)
+          normal [j] /= normal_length;
+
+        line_start.position.x = point.pnts2 [0];
+        line_start.position.y = point.pnts2 [1];
+        line_start.position.z = point.pnts2 [2];
+        line_start.normal.x   = normal [0];
+        line_start.normal.y   = normal [1];
+        line_start.normal.z   = normal [2];
         line_start.color.r    = (float)point3d[i].rgb[0];
         line_start.color.g    = (float)point3d[i].rgb[1];
         line_start.color.b    = (float)point3d[i].rgb[2];
         line_start.color.a    = 1.f;
 
-        line_end.position.x = line_start.position.x + (point3d[i].pnts[0] * 0.1f);
-        line_end.position.y = line_start.position.y + (point3d[i].pnts[1] * 0.1f);
-        line_end.position.z = line_start.position.z + (point3d[i].pnts[2] * 0.1f);
-        line_end.normal.x   = 0;
-        line_end.normal.y   = 0;
-        line_end.normal.z   = -1;
+//        line_end.position.x = line_start.position.x + (point3d[i].pnts[0] * 0.1f);
+//        line_end.position.y = line_start.position.y + (point3d[i].pnts[1] * 0.1f);
+//        line_end.position.z = line_start.position.z + (point3d[i].pnts[2] * 0.1f);
+        line_end.position.x = line_start.position.x + normal [0] * 0.1f;
+        line_end.position.y = line_start.position.y + normal [1] * 0.1f;
+        line_end.position.z = line_start.position.z + normal [2] * 0.1f;
+        line_end.normal.x   = normal [0];
+        line_end.normal.y   = normal [1];
+        line_end.normal.z   = normal [2];
         line_end.color.r    = (float)point3d[i].rgb[0];
         line_end.color.g    = (float)point3d[i].rgb[1];
         line_end.color.b    = (float)point3d[i].rgb[2];
@@ -346,7 +344,7 @@ class TrajectoryBuilder
       }         
     }
 
-    void Section3D (int nst, double koef)
+/*    void Section3D (int nst, double koef)
     {
       int    i, ii = 1;
       float  fa = 0, fb = 0;
@@ -375,7 +373,162 @@ class TrajectoryBuilder
       {
         BuildPoint (i, fb, fa, ii, maximum_moment_of_inertia, koef, false);
       }
+    }*/
+    
+void Section3D(int nst,double koef)
+{
+int i,ii=1;
+float dd[3],dd2[3],fa=0,fb;
+double dc [3];
+double m,ama;
+
+  ama=std::max(model_data.A,std::max(model_data.B,model_data.C));
+
+  if(model_data.mx*(model_data.B*y[1][1]*y[5][1]-model_data.C*y[2][1]*y[4][1])+
+     model_data.my*(model_data.C*y[2][1]*y[3][1]-model_data.A*y[0][1]*y[5][1])+
+     model_data.mz*(model_data.A*y[0][1]*y[4][1]-model_data.B*y[1][1]*y[3][1])>0)ii=-1;
+
+  for (i = 1; i <=nst; i++) 
+  {
+    elmnts%=MaxSize;
+    fb=fa;
+    fa= model_data.mx*(model_data.B*y[1][i]*y[5][i]-model_data.C*y[2][i]*y[4][i])+
+      model_data.my*(model_data.C*y[2][i]*y[3][i]-model_data.A*y[0][i]*y[5][i])+
+      model_data.mz*(model_data.A*y[0][i]*y[4][i]-model_data.B*y[1][i]*y[3][i]);
+    if (ii*fa>0)
+    { ii=-ii;
+
+       if((y[0][i]*(y[4][i]*(y[3][i]*model_data.my-y[4][i]*model_data.mx)-
+      y[5][i]*(y[5][i]*model_data.mx-y[3][i]*model_data.mz))+
+      y[1][i]*(y[5][i]*(y[4][i]*model_data.mz-y[5][i]*model_data.my)-
+      y[3][i]*(y[3][i]*model_data.my-y[4][i]*model_data.mx))+
+      y[2][i]*(y[3][i]*(y[5][i]*model_data.mx-y[3][i]*model_data.mz)-
+      y[4][i]*(y[4][i]*model_data.mz-y[5][i]*model_data.my))<0)&&(y[4][i]>0))
+      {
+        if(fa-fb==0)continue;
+    m=(model_data.A*model_data.A*(y[0][i-1]*fa-y[0][i]*fb)*(y[0][i-1]*fa-y[0][i]*fb)+
+      model_data.B*model_data.B*(y[1][i-1]*fa-y[1][i]*fb)*(y[1][i-1]*fa-y[1][i]*fb)+
+      model_data.C*model_data.C*(y[2][i-1]*fa-y[2][i]*fb)*(y[2][i-1]*fa-y[2][i]*fb))/(fa-fb)/(fa-fb);
+    if((2.0*ama*(model_data.h+sqrt(model_data.mx*model_data.mx+model_data.my*model_data.my+model_data.mz*model_data.mz))-model_data.g*model_data.g)!=0)
+    hls2rgb3f(sqrt((m-model_data.g*model_data.g)/
+    (2.0*ama*(model_data.h+sqrt(model_data.mx*model_data.mx+model_data.my*model_data.my+model_data.mz*model_data.mz))-model_data.g*model_data.g))*360.,
+      .5,1.0,dc,1);   
+
+        dd[2]=(y[5][i-1]*fa-y[5][i]*fb)/(fa-fb);
+        dd[1]=(y[4][i-1]*fa-y[4][i]*fb)/(fa-fb);
+        dd[0]=(y[3][i-1]*fa-y[3][i]*fb)/(fa-fb);
+        
+        dd2[2]=dm*(y[2][i-1]*fa-y[2][i]*fb)/(fa-fb);
+        dd2[1]=dm*(y[1][i-1]*fa-y[1][i]*fb)/(fa-fb);
+        dd2[0]=dm*(y[0][i-1]*fa-y[0][i]*fb)/(fa-fb);
+
+        
+        memcpy(&point3d[elmnts].pnts,dd,sizeof(dd));
+        memcpy(&point3d[elmnts].pnts2,dd2,sizeof(dd2));
+
+        memcpy(&point3d[elmnts].rgb,dc,sizeof(dc));
+        point3d[elmnts].side=koef>1;
+        point3d[elmnts].nu1=model_data.nu1;
+        point3d[elmnts].nu3=model_data.nu3;
+        if(MaxSize>CurSize)
+        {
+          CurSize++;
+        }
+        elmnts++;    
+        memcpy(&point3d[elmnts].pnts,dd,sizeof(dd));
+        memcpy(&point3d[elmnts].pnts2,dd2,sizeof(dd2));
+
+        memcpy(&point3d[elmnts].rgb,dc,sizeof(dc));
+        point3d[elmnts].pnts[1]*=-1;
+        point3d[elmnts].pnts2[1]*=-1;
+        point3d[elmnts].side=koef>1;
+        point3d[elmnts].nu1=model_data.nu1;
+        point3d[elmnts].nu3=model_data.nu3;
+        if(MaxSize>CurSize)
+        {
+          CurSize++;
+        }
+        elmnts++; 
+     }
+     
     }
+  
+    }
+  ii=-1;
+  if(model_data.mx*(model_data.B*y[1][1]*y[5][1]-model_data.C*y[2][1]*y[4][1])+
+     model_data.my*(model_data.C*y[2][1]*y[3][1]-model_data.A*y[0][1]*y[5][1])+
+     model_data.mz*(model_data.A*y[0][1]*y[4][1]-model_data.B*y[1][1]*y[3][1])>0)
+     {
+    ii=1;
+     }
+for (i = 1; i <=nst; i++) 
+  {
+    elmnts%=MaxSize;
+    fb=fa;
+    fa= model_data.mx*(model_data.B*y[1][i]*y[5][i]-model_data.C*y[2][i]*y[4][i])+
+      model_data.my*(model_data.C*y[2][i]*y[3][i]-model_data.A*y[0][i]*y[5][i])+
+      model_data.mz*(model_data.A*y[0][i]*y[4][i]-model_data.B*y[1][i]*y[3][i]);
+    if (ii*fa<0)
+    { ii=-ii;
+
+       if((y[0][i]*(y[4][i]*(y[3][i]*model_data.my-y[4][i]*model_data.mx)-
+      y[5][i]*(y[5][i]*model_data.mx-y[3][i]*model_data.mz))+
+      y[1][i]*(y[5][i]*(y[4][i]*model_data.mz-y[5][i]*model_data.my)-
+      y[3][i]*(y[3][i]*model_data.my-y[4][i]*model_data.mx))+
+      y[2][i]*(y[3][i]*(y[5][i]*model_data.mx-y[3][i]*model_data.mz)-
+      y[4][i]*(y[4][i]*model_data.mz-y[5][i]*model_data.my))>0)&&(y[4][i]>0))
+      {
+        if(fa-fb==0)continue;
+    m=(model_data.A*model_data.A*(y[0][i-1]*fa-y[0][i]*fb)*(y[0][i-1]*fa-y[0][i]*fb)+
+      model_data.B*model_data.B*(y[1][i-1]*fa-y[1][i]*fb)*(y[1][i-1]*fa-y[1][i]*fb)+
+      model_data.C*model_data.C*(y[2][i-1]*fa-y[2][i]*fb)*(y[2][i-1]*fa-y[2][i]*fb))/(fa-fb)/(fa-fb);
+    if((2.0*ama*(model_data.h+sqrt(model_data.mx*model_data.mx+model_data.my*model_data.my+model_data.mz*model_data.mz))-model_data.g*model_data.g)!=0)
+    hls2rgb3f(sqrt((m-model_data.g*model_data.g)/
+    (2.0*ama*(model_data.h+sqrt(model_data.mx*model_data.mx+model_data.my*model_data.my+model_data.mz*model_data.mz))-model_data.g*model_data.g))*360.,
+      .5,1.0,dc,1);   
+
+        dd[2]=(y[5][i-1]*fa-y[5][i]*fb)/(fa-fb);
+        dd[1]=(y[4][i-1]*fa-y[4][i]*fb)/(fa-fb);
+        dd[0]=(y[3][i-1]*fa-y[3][i]*fb)/(fa-fb);
+    
+        dd2[2]=dm*(y[2][i-1]*fa-y[2][i]*fb)/(fa-fb);
+        dd2[1]=dm*(y[1][i-1]*fa-y[1][i]*fb)/(fa-fb);
+        dd2[0]=dm*(y[0][i-1]*fa-y[0][i]*fb)/(fa-fb);
+
+
+        memcpy(&point3d[elmnts].pnts,dd,sizeof(dd));
+        memcpy(&point3d[elmnts].pnts2,dd2,sizeof(dd2));
+
+        memcpy(&point3d[elmnts].rgb,dc,sizeof(dc));
+        point3d[elmnts].side=koef<1;
+        point3d[elmnts].nu1=model_data.nu1;
+        point3d[elmnts].nu3=model_data.nu3;
+        if(MaxSize>CurSize)
+        {
+          CurSize++;
+        }
+        elmnts++;    
+        memcpy(&point3d[elmnts].pnts,dd,sizeof(dd));
+        memcpy(&point3d[elmnts].pnts2,dd2,sizeof(dd2));
+
+        memcpy(&point3d[elmnts].rgb,dc,sizeof(dc));
+        point3d[elmnts].pnts[1]*=-1;
+        point3d[elmnts].pnts2[1]*=-1;
+        point3d[elmnts].side=koef<1;
+        point3d[elmnts].nu1=model_data.nu1;
+        point3d[elmnts].nu3=model_data.nu3;
+        if(MaxSize>CurSize)
+        {
+          CurSize++;
+        }
+        elmnts++; 
+     }
+     
+    }
+  
+    }
+
+}    
 
     void q_starting (double *vst, int nd, int nst, int pr)
     {
@@ -388,7 +541,7 @@ class TrajectoryBuilder
 
         q1 = qq1;
         q3 = qq3; 
-        q2 = sqrt (1.0 + 1.0e-20 - sqr (q1) - sqr (q3));
+        q2 = sqrt (1.0 + 1.0e-20 - sqr (q1) - sqr (q3)); //???
            
         u1 = q2 * model_data.mz - q3 * model_data.my;
         u2 = q3 * model_data.mx - q1 * model_data.mz;
@@ -400,7 +553,7 @@ class TrajectoryBuilder
 
         vv = sqr (v1) / model_data.A + sqr (v2) / model_data.B + sqr (v3) / model_data.C;
 
-        det = 2 * (model_data.h + q1 * model_data.mx + q2 * model_data.my + q3 * model_data.mz) * vv - 
+        det = 2.0 * (model_data.h + q1 * model_data.mx + q2 * model_data.my + q3 * model_data.mz) * vv - 
               sqr (model_data.g) * (model_data.A * sqr (u1) + model_data.B * sqr (u2) + model_data.C * sqr (u3)) / model_data.A / model_data.B / model_data.C;
 
                                   //here put +-sqrt
@@ -539,19 +692,16 @@ class TrajectoryBuilder
     {
       double x1 = 0.0, x2, dx = mlen, *vstart;
       
-      int nstep = 200, ndim = 10, ii;
+      int nstep = 200, ndim = 10;
 
       vstart = vector (1, ndim);
       
-      for (ii = nit0; ii <= nit; ii++)
-      {
-        x2 = x1 + dx;
+      x2 = x1 + dx;
 
-        q_starting (vstart, ndim, nstep, ii - 1);
-        rkd        (vstart, ndim, x1, x2, nstep);
-        
-        x1 += dx;
-      }
+      q_starting (vstart, ndim, nstep, nit - 1);
+      rkd        (vstart, ndim, x1, x2, nstep);
+      
+      x1 += dx;
 
       free_vector (vstart, 1, ndim);
     }
@@ -569,7 +719,6 @@ class TrajectoryBuilder
         if (nit < 1000)
         {
           nit++;
-          nit0++;
         }
       }
     }
@@ -585,7 +734,6 @@ class TrajectoryBuilder
         if (nit < 1000)
         {
           nit++;
-          nit0++;
         }
       }
 
@@ -609,7 +757,7 @@ class TrajectoryBuilder
     size_t               elmnts;
     int                  MaxSize, CurSize;
     int                  ind;
-    int                  nit0, nit;
+    int                  nit;
     double               dm;
     double               mlen;
     double               qq1, qq3;

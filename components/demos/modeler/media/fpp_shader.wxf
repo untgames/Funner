@@ -1,6 +1,7 @@
 Parameters
 {
   float4x4 myViewMatrix myObjectMatrix myProjMatrix
+  int myLightEnable
 }
 
 ProjectionMatrix myProjMatrix
@@ -14,7 +15,7 @@ EmissionColor 0 0 0 0
 
 Light
 {
-  Enable        1
+  Enable        myLightEnable
   Type          Point
   DiffuseColor  1 1 1 1
   SpecularColor 1 1 1 1

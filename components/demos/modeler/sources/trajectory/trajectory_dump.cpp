@@ -4,7 +4,7 @@
 
 #include "core.h"
 
-const char* INPUT_FILE_NAME_PREFIX = "input.";
+const char* INPUT_FILE_NAME_PREFIX = "media/models/input.";
 const char* INPUT_FILE_NAME_SUFFIX = ".dat";
 
 void dump (const DrawVertexArray& vertices, const DrawPrimitiveArray& primitives)

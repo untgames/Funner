@@ -130,8 +130,7 @@ struct MyShaderParameters
   math::mat4f object_tm; 
   math::mat4f view_tm;
   math::mat4f proj_tm;
-  math::vec3f light_pos;
-  math::vec3f light_dir; 
+  int         light_enable;
 };
 
 typedef xtl::com_ptr<low_level::IBuffer> BufferPtr;
@@ -277,8 +276,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
           {"myProjMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, proj_tm)},
           {"myViewMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, view_tm)},
           {"myObjectMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, object_tm)},
-          {"lightPos", low_level::ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_pos)},
-          {"lightDir", low_level::ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_dir)},
+          {"myLightEnable", low_level::ProgramParameterType_Int, 0, 1, offsetof (MyShaderParameters, light_enable)},
         };
         
         low_level::ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
@@ -304,14 +302,15 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
 
       MyShaderParameters my_shader_parameters;
       
-      my_shader_parameters.proj_tm   = camera->ProjectionMatrix ();
-      my_shader_parameters.view_tm   = invert (camera->WorldTM ());
+      my_shader_parameters.proj_tm      = camera->ProjectionMatrix ();
+      my_shader_parameters.view_tm      = invert (camera->WorldTM ());
+      my_shader_parameters.light_enable = 0;
 
       device.SSSetProgram (shader.get ());
       device.SSSetProgramParametersLayout (program_parameters_layout.get ());
       device.SSSetConstantBuffer (0, cb.get ());    
-      
-      RenderViewVisitor visitor (render_manager, &device, cb, my_shader_parameters, current_angle);            
+
+      RenderViewVisitor visitor (render_manager, &device, cb, my_shader_parameters, current_angle);
 
       scene->VisitEach (visitor);
 
