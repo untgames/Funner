@@ -16,4 +16,5 @@ DEMOS.MODELER.IMPORTS       := ../../system/compile.static.mak ../../system/link
                                ../../tools/ui/core/compile.static.mak ../../script/core/lua.link.static.mak \
                                ../../client/core/compile.static.mak ../../client/window_manager/compile.static.mak \
                                ../../client/subsystems/scene_render.link.static.mak ../../client/subsystems/window_renderer.link.static.mak \
-                               ../../common/configurator.link.static.mak ../../render/opengl_driver/link.static.mak
+                               ../../common/configurator.link.static.mak ../../render/opengl_driver/link.static.mak \
+                               ../../media/geometry/compile.static.mak ../../media/geometry/xmesh.link.static.mak

@@ -12,6 +12,7 @@
 #include <common/log.h>
 
 #include <syslib/application.h>
+#include <syslib/timer.h>
 #include <syslib/window.h>
 
 #include <sg/scene.h>
@@ -46,7 +47,8 @@ namespace
      онстанты
 */
 
-const char* MODEL_MESH_NAME             = "media/mesh/spy.xmesh";
+const char* MODEL_MESH_NAME             = "media/mesh/trajectory.xmesh";
+const char* MODEL2_MESH_NAME            = "media/mesh/envelope.xmesh";
 const char* ENGINE_CONFIGURATION_BRANCH = "Configuration";
 const char* WINDOW_CONFIGURATION_BRANCH = "Configuration.Window";
 const char* SCREEN_ATTACHMENT_NAME      = "MainScreen";
@@ -58,7 +60,8 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
 /// онструктор
     MyChildWindow (const EngineAttachments& attachments)
       : window (syslib::WindowStyle_PopUp),
-        engine (ENGINE_CONFIGURATION_BRANCH, StartupGroup_Level2)
+        engine (ENGINE_CONFIGURATION_BRANCH, StartupGroup_Level2),
+        invalidate_timer (xtl::bind (&MyChildWindow::OnTime, this), 1)
     {
         //установка точек прив€зки
 
@@ -154,9 +157,16 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
     void Release () { release (this); }
 
   private:
+    void OnTime ()
+    {
+      window.Invalidate ();
+    }
+
+  private:
     OrthoCamera::Pointer camera;
     syslib::Window       window;
     Engine               engine;
+    syslib::Timer        invalidate_timer;
 };
 
 //тестовый сервер приложени€
@@ -166,18 +176,22 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     MyApplicationServer ()
     {
       VisualModel::Pointer model = VisualModel::Create ();
+//      VisualModel::Pointer envelope = VisualModel::Create ();
 
       model->SetMeshName (MODEL_MESH_NAME);
       model->BindToScene (scene);
 
+//      envelope->SetMeshName (MODEL2_MESH_NAME);
+//      envelope->BindToScene (scene);
+
       camera = OrthoCamera::Create ();
 
-      camera->SetLeft   (-10);
-      camera->SetRight  (10);
-      camera->SetBottom (-10);
-      camera->SetTop    (10);
-      camera->SetZNear  (0);
-      camera->SetZFar   (10);
+      camera->SetLeft   (-2);
+      camera->SetRight  (2);
+      camera->SetBottom (-2);
+      camera->SetTop    (2);
+      camera->SetZNear  (-100);
+      camera->SetZFar   (100);
 
       camera->BindToScene (scene);
       

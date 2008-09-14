@@ -1,17 +1,26 @@
 #include <cstdio>
 #include <exception>
 
+#include <stl/hash_map>
+#include <stl/string>
+
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/iterator.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/shared_ptr.h>
+#include <xtl/visitor.h>
+
+#include <mathlib.h>
 
 #include <common/component.h>
+#include <common/file.h>
 
 #include <sg/camera.h>
 #include <sg/scene.h>
+#include <sg/visual_model.h>
 
 #include <render/low_level/device.h>
 
@@ -21,10 +30,116 @@
 #include <render/custom_render.h>
 #include <render/mid_level/renderer.h>
 
+#include "shared.h"
+
 using namespace render;
+using namespace scene_graph;
 
 namespace
 {
+
+const char* SHADER_FILE_NAME  = "media/fpp_shader.wxf";
+
+typedef xtl::com_ptr<low_level::IBlendState> BlendStatePtr;
+
+//чтение ихсодного текста шейдера в строку
+stl::string read_shader (const char* file_name)
+{
+  common::InputFile file (file_name);
+  
+  stl::string buffer (file.Size (), ' ');
+  
+  file.Read (&buffer [0], file.Size ());
+  
+  return buffer;
+} 
+
+void print (const char* message)
+{
+  printf ("Shader message: '%s'\n", message);
+}
+
+//создание состояния смешивания цветов
+BlendStatePtr create_blend_state
+ (low_level::IDevice&      device,
+  bool          blend_enable,
+  low_level::BlendArgument src_arg,
+  low_level::BlendArgument dst_color_arg,
+  low_level::BlendArgument dst_alpha_arg)
+{
+  low_level::BlendDesc blend_desc;
+
+  memset (&blend_desc, 0, sizeof (blend_desc));
+
+  blend_desc.blend_enable                     = blend_enable;
+  blend_desc.blend_color_operation            = low_level::BlendOperation_Add;
+  blend_desc.blend_alpha_operation            = low_level::BlendOperation_Add;
+  blend_desc.blend_color_source_argument      = src_arg;
+  blend_desc.blend_color_destination_argument = dst_color_arg;
+  blend_desc.blend_alpha_source_argument      = src_arg;
+  blend_desc.blend_alpha_destination_argument = dst_alpha_arg;
+  blend_desc.color_write_mask                 = low_level::ColorWriteFlag_All;
+
+  return BlendStatePtr (device.CreateBlendState (blend_desc), false);
+}
+
+BlendStatePtr create_blend_state (low_level::IDevice& device, low_level::BlendArgument src_arg, low_level::BlendArgument dst_arg)
+{
+  return create_blend_state (device, true, src_arg, dst_arg, dst_arg);
+}
+
+class RenderManager
+{
+  public:
+///Получение модели по имени
+    RenderableModel& GetRenderableModel (low_level::IDevice* device, const char* model_name)
+    {
+      RenderableModelMap::iterator iter = renderable_models.find (model_name);
+
+      if (iter == renderable_models.end ())
+      {
+        try
+        {
+          RenderableModelPtr new_model (new RenderableModel (*device, model_name));
+
+          renderable_models.insert_pair (model_name, new_model);
+        }
+        catch (std::exception& exception)
+        {
+          printf ("exception: %s\n    at RenderManager::GetRenderableModel\n", exception.what ());
+          throw;
+        }
+      }
+
+      return *renderable_models[model_name];
+    }
+
+  private:
+    typedef xtl::shared_ptr<RenderableModel> RenderableModelPtr;
+
+    typedef stl::hash_map<stl::hash_key<const char*>, RenderableModelPtr> RenderableModelMap;
+
+  private:
+    RenderableModelMap  renderable_models;
+};
+
+/*
+    Посетитель объектов сцены
+*/
+
+struct RenderViewVisitor: public xtl::visitor<void, VisualModel>
+{
+  RenderManager*      render_manager;
+  low_level::IDevice* device;
+
+  RenderViewVisitor (RenderManager* in_render_manager, low_level::IDevice* in_device) : render_manager (in_render_manager), device (in_device) {}
+
+  void visit (VisualModel& model)
+  {
+    render_manager->GetRenderableModel (device, model.MeshName ()).Draw (*device);
+  }
+};
+
 
 /*
 ===================================================================================================
@@ -35,30 +150,45 @@ namespace
 const char* COMPONENT_NAME   = "render.scene_render.ModelerRender"; //имя компонента
 const char* RENDER_PATH_NAME = "ModelerRender";                     //имя пути рендеринга
 
+#pragma pack (1)
+
+struct MyShaderParameters
+{
+  math::mat4f object_tm; 
+  math::mat4f view_tm;
+  math::mat4f proj_tm;
+  math::vec3f light_pos;
+  math::vec3f light_dir; 
+};
+
+typedef xtl::com_ptr<low_level::IProgram>                 ProgramPtr;
+typedef xtl::com_ptr<low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
+typedef xtl::com_ptr<low_level::IBuffer>                  BufferPtr;
+
 /*
 ===================================================================================================
     Область вывода рендера
 ===================================================================================================
 */
 
-class ModelerView: public IRenderView, public xtl::reference_counter
+class ModelerView: public IRenderView, public xtl::reference_counter, public render::mid_level::ILowLevelFrame::IDrawCallback
 {
   public:
-    ModelerView ()
+    ModelerView (render::mid_level::ILowLevelRenderer* in_renderer, scene_graph::Scene* in_scene, RenderManager* in_render_manager)
+      : renderer (in_renderer),
+        scene (in_scene),
+        camera (0),
+        render_manager (in_render_manager),
+        frame (in_renderer->CreateFrame (), false),
+        current_angle (0.f)
     {
-      printf ("Create view\n");
+      frame->SetCallback (this);
     }
     
-    ~ModelerView ()
-    {
-      printf ("Destroy view\n");
-    }
-
 ///Целевые буферы рендеринга
     void SetRenderTargets (mid_level::IRenderTarget* render_target, mid_level::IRenderTarget* depth_stencil_target)
     {
-      printf ("SetRenderTargets(%s, %s)\n", render_target ? "render-target" : "null",
-        depth_stencil_target ? "depth-stencil-target" : "null");
+      frame->SetRenderTargets (render_target, depth_stencil_target);
     }
     
     mid_level::IRenderTarget* GetRenderTarget ()
@@ -74,7 +204,14 @@ class ModelerView: public IRenderView, public xtl::reference_counter
 ///Установка области вывода
     void SetViewport (const Rect& rect)
     {
-      printf ("SetViewport(%d, %d, %u, %u)\n", rect.left, rect.top, rect.width, rect.height);
+      render::mid_level::Viewport viewport;
+      
+      viewport.x      = rect.left;
+      viewport.y      = rect.top;
+      viewport.width  = rect.width;
+      viewport.height = rect.height;
+      
+      frame->SetViewport (viewport);
     }
     
     void GetViewport (Rect&)
@@ -83,9 +220,9 @@ class ModelerView: public IRenderView, public xtl::reference_counter
     }
     
 ///Установка камеры
-    void SetCamera (scene_graph::Camera* camera)
+    void SetCamera (scene_graph::Camera* new_camera)
     {
-      printf ("SetCamera(%s)\n", camera ? camera->Name () : "null");
+      camera = new_camera;
     }
 
     scene_graph::Camera* GetCamera ()
@@ -94,10 +231,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter
     }
 
 ///Установка / чтение свойств
-    void SetProperty (const char* name, const char* value)
-    {
-      printf ("SetProperty(%s, %s)\n", name, value);
-    }
+    void SetProperty (const char* name, const char* value) {}
 
     void GetProperty (const char*, size_t, char*)
     {
@@ -107,7 +241,67 @@ class ModelerView: public IRenderView, public xtl::reference_counter
 ///Рисование
     void Draw ()
     {
-      printf ("!!!!!!!!!!!!!!Draw view\n");
+      if (!camera)
+        return;
+
+      renderer->AddFrame (frame.get ());
+    }
+
+    void Draw (render::low_level::IDevice& device)
+    {
+      BlendStatePtr blend_state = create_blend_state (device, low_level::BlendArgument_One, low_level::BlendArgument_One);
+
+      device.OSSetBlendState (blend_state.get ());
+
+      stl::string shader_source  = read_shader (SHADER_FILE_NAME);
+      
+      low_level::ShaderDesc shader_descs [] = {
+        {"fpp_shader", size_t (-1), shader_source.c_str (), "fpp", ""},
+      };
+
+      static low_level::ProgramParameter shader_parameters[] = {
+        {"myProjMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, proj_tm)},
+        {"myViewMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, view_tm)},
+        {"myObjectMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, object_tm)},
+        {"lightPos", low_level::ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_pos)},
+        {"lightDir", low_level::ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_dir)},
+      };
+      
+      low_level::ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
+
+      ProgramPtr shader (device.CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));
+      ProgramParametersLayoutPtr program_parameters_layout (device.CreateProgramParametersLayout (program_parameters_layout_desc));
+
+      low_level::BufferDesc cb_desc;
+      
+      memset (&cb_desc, 0, sizeof cb_desc);
+      
+      cb_desc.size         = sizeof MyShaderParameters;
+      cb_desc.usage_mode   = low_level::UsageMode_Default;
+      cb_desc.bind_flags   = low_level::BindFlag_ConstantBuffer;
+      cb_desc.access_flags = low_level::AccessFlag_ReadWrite;
+
+      BufferPtr cb (device.CreateBuffer (cb_desc), false);
+
+      MyShaderParameters my_shader_parameters;
+      
+      my_shader_parameters.object_tm = math::rotatef (current_angle, 0, 0, 1) * 
+                                       math::rotatef (current_angle * 0.2f, 1, 0, 0);
+
+      current_angle += 0.01f;
+
+      my_shader_parameters.proj_tm   = camera->ProjectionMatrix ();
+      my_shader_parameters.view_tm   = invert (camera->WorldTM ());
+
+      cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+
+      device.SSSetProgram (shader.get ());
+      device.SSSetProgramParametersLayout (program_parameters_layout.get ());
+      device.SSSetConstantBuffer (0, cb.get ());    
+
+      RenderViewVisitor visitor (render_manager, &device);
+
+      scene->VisitEach (visitor);
     }
 
 ///Подсчёт ссылок
@@ -120,6 +314,17 @@ class ModelerView: public IRenderView, public xtl::reference_counter
     {
       release (this);
     }
+
+  private:
+    typedef xtl::com_ptr<render::mid_level::ILowLevelFrame> FramePtr;
+
+  private:
+    render::mid_level::ILowLevelRenderer* renderer;
+    scene_graph::Scene*                   scene;
+    scene_graph::Camera*                  camera;
+    RenderManager*                        render_manager;
+    FramePtr                              frame;
+    float                                 current_angle;
 };
 
 /*
@@ -131,29 +336,18 @@ class ModelerView: public IRenderView, public xtl::reference_counter
 class ModelerRender: public ICustomSceneRender, public xtl::reference_counter
 {
   public:
-    ModelerRender (mid_level::IRenderer* in_renderer)
+    ModelerRender (mid_level::IRenderer* in_renderer) : renderer (0)
     {
-      mid_level::ILowLevelRenderer* renderer = dynamic_cast<mid_level::ILowLevelRenderer*> (in_renderer);
+      renderer = dynamic_cast<mid_level::ILowLevelRenderer*> (in_renderer);
 
       if (!renderer)
         throw xtl::format_exception<xtl::bad_argument> ("ModelerRender::ModelerRender", "Renderer is not castable to render::mid_level::ILowLevelRenderer");
-
-      device = &renderer->GetDevice ();
-
-      printf ("MySceneRender::MySceneRender\n");
     }
-    
-    ~ModelerRender ()
-    {
-      printf ("MySceneRender::~MySceneRender\n");
-    }    
   
 ///Создание областей вывода
     IRenderView* CreateRenderView (scene_graph::Scene* scene)
     {
-      printf ("CreateRenderView('%s')\n", scene ? scene->Name () : "null");
-      
-      return new ModelerView;
+      return new ModelerView (renderer, scene, &render_manager);
     }
 
 ///Работа с ресурсами
@@ -197,8 +391,9 @@ class ModelerRender: public ICustomSceneRender, public xtl::reference_counter
     }
 
   private:
-    low_level::IDevice* device;
-    QueryFunction       query_handler;
+    render::mid_level::ILowLevelRenderer* renderer;
+    QueryFunction                         query_handler;
+    RenderManager                         render_manager;
 };
 
 /*
