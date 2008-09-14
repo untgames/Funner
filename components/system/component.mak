@@ -1,30 +1,30 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := SYSTEMLIB_SOURCES SYSTEMLIB_TESTS
+TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
 
 #Цель №1 - System library sources
-SYSTEMLIB_SOURCES.TYPE             := static-lib
-SYSTEMLIB_SOURCES.NAME             := system
-SYSTEMLIB_SOURCES.INCLUDE_DIRS     := sources
-SYSTEMLIB_SOURCES.SOURCE_DIRS      := sources/wrappers
-SYSTEMLIB_SOURCES.LIB_DIRS         :=
-SYSTEMLIB_SOURCES.EXECTUTION_DIR   :=
-SYSTEMLIB_SOURCES.LIBS             :=
-SYSTEMLIB_SOURCES.COMPILER_CFLAGS  :=
-SYSTEMLIB_SOURCES.COMPILER_DEFINES :=
-SYSTEMLIB_SOURCES.IMPORTS          := compile.static.mak
-SYSTEMLIB_SOURCES.win32.SOURCE_DIRS := sources/platform/win32
-SYSTEMLIB_SOURCES.win32.COMPILER_CFLAGS := -wd4355
-SYSTEMLIB_SOURCES.unistd.SOURCE_DIRS := sources/platform/unistd
+SYSTEMLIB.SOURCES.TYPE             := static-lib
+SYSTEMLIB.SOURCES.NAME             := system
+SYSTEMLIB.SOURCES.INCLUDE_DIRS     := sources
+SYSTEMLIB.SOURCES.SOURCE_DIRS      := sources/wrappers
+SYSTEMLIB.SOURCES.LIB_DIRS         :=
+SYSTEMLIB.SOURCES.EXECTUTION_DIR   :=
+SYSTEMLIB.SOURCES.LIBS             :=
+SYSTEMLIB.SOURCES.COMPILER_CFLAGS  :=
+SYSTEMLIB.SOURCES.COMPILER_DEFINES :=
+SYSTEMLIB.SOURCES.IMPORTS          := compile.static.mak
+SYSTEMLIB.SOURCES.win32.SOURCE_DIRS := sources/platform/win32
+SYSTEMLIB.SOURCES.win32.COMPILER_CFLAGS := -wd4355
+SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS := sources/platform/unistd
 
 #Цель №2 - System library tests
-SYSTEMLIB_TESTS.TYPE             := test-suite
-SYSTEMLIB_TESTS.INCLUDE_DIRS     :=
-SYSTEMLIB_TESTS.SOURCE_DIRS      := tests/wrappers
-SYSTEMLIB_TESTS.LIB_DIRS         :=
-SYSTEMLIB_TESTS.EXECTUTION_DIR   :=
-SYSTEMLIB_TESTS.LIBS             :=
-SYSTEMLIB_TESTS.COMPILER_CFLAGS  :=
-SYSTEMLIB_TESTS.COMPILER_DEFINES :=
-SYSTEMLIB_TESTS.IMPORTS          := compile.static.mak link.static.mak
+SYSTEMLIB.TESTS.TYPE             := test-suite
+SYSTEMLIB.TESTS.INCLUDE_DIRS     :=
+SYSTEMLIB.TESTS.SOURCE_DIRS      := tests/wrappers
+SYSTEMLIB.TESTS.LIB_DIRS         :=
+SYSTEMLIB.TESTS.EXECTUTION_DIR   :=
+SYSTEMLIB.TESTS.LIBS             :=
+SYSTEMLIB.TESTS.COMPILER_CFLAGS  :=
+SYSTEMLIB.TESTS.COMPILER_DEFINES :=
+SYSTEMLIB.TESTS.IMPORTS          := compile.static.mak link.static.mak
