@@ -29,5 +29,5 @@ GAME.LAUNCHER.SOURCES.IMPORTS       := ../../system/link.static.mak ../../system
                                        ../../input/low_level/compile.static.mak ../../input/low_level/link.static.mak \
                                        ../../input/window_driver/compile.static.mak ../../input/window_driver/link.static.mak \
                                        ../../input/direct_input_driver/compile.static.mak ../../input/direct_input_driver/link.static.mak \
-                                       ../../input/manager/compile.static.mak ../../input/manager/link.static.mak ../../input/manager/keymap.link.static.mak \
+                                       ../../input/manager/compile.static.mak ../../input/manager/link.static.mak ../../input/manager/xkeymap.link.static.mak \
                                        ../../common/configurator.link.static.mak

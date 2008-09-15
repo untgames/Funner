@@ -6,8 +6,8 @@
 
 using namespace input;
 
-const char* TRANSLATION_MAP_FILE_NAME = "data/translation_table.keymap";
-const char* DST_FILE_NAME = "/io/stdout/test.keymap";
+const char* TRANSLATION_MAP_FILE_NAME = "data/translation_table.xkeymap";
+const char* DST_FILE_NAME = "/io/stdout/test.xkeymap";
 
 int main ()
 {

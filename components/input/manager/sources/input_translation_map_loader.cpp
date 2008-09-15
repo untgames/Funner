@@ -35,23 +35,23 @@ void translation_map_loader (const char* file_name, TranslationMap& target_map)
 }
 
 /*
-   Љ®¬Ї®­Ґ­в § Јаг§ЄЁ Є ав ва ­б«пжЁЁ
+   Компонент загрузки карт трансляции
 */
 
 class KeymapLoaderComponent
 {
   public:
-    //§ Јаг§Є  Є®¬Ї®­Ґ­в 
+    //загрузка компонента
     KeymapLoaderComponent () 
     {
-      TranslationMapManager::RegisterLoader ("keymap", &translation_map_loader);
+      TranslationMapManager::RegisterLoader ("xkeymap", &translation_map_loader);
     }
 };
 
 extern "C"
 {
 
-ComponentRegistrator<KeymapLoaderComponent> KeymapLoader ("input.loaders.keymap");
+ComponentRegistrator<KeymapLoaderComponent> XKeymapLoader ("input.loaders.xkeymap");
 
 }
 

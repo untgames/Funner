@@ -6,8 +6,8 @@
 
 using namespace input;
 
-const char* CONTROLS_DETECTOR_FILE_NAME = "data/controls_detector.keydet";
-const char* DST_FILE_NAME = "/io/stdout/test.keydet";
+const char* CONTROLS_DETECTOR_FILE_NAME = "data/controls_detector.xkeydet";
+const char* DST_FILE_NAME = "/io/stdout/test.xkeydet";
 
 int main ()
 {

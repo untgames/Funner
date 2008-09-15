@@ -30,7 +30,7 @@ const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //имя системы визуализации
 const char* MATERIAL_LIB_FILE_NAME    = "data/materials/materials.xmtl"; //имя файла с материалами
 const char* SOUND_DECL_LIB_FILE_NAME  = "data/sounds/gorilka.snddecl"; //имя файла с материалами
 
-const char* TRANSLATION_MAP_FILE_NAME = "data/configurations/input/translation_table.keymap";
+const char* TRANSLATION_MAP_FILE_NAME = "data/configurations/input/translation_table.xkeymap";
 
 const char* DEFAULT_SOUND_DEVICE_MASK = "*"; //маска имени устройства воспроизведения
 

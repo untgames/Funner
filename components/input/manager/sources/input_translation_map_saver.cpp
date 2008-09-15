@@ -28,23 +28,23 @@ void translation_map_saver (const char* file_name, const TranslationMap& source_
 }
 
 /*
-   Љ®¬Ї®­Ґ­в б®еа ­Ґ­Ёп Є ав ва ­б«пжЁЁ
+   Компонент сохранения карт трансляции
 */
 
 class KeymapSaverComponent
 {
   public:
-    //§ Јаг§Є  Є®¬Ї®­Ґ­в 
+    //загрузка компонента
     KeymapSaverComponent () 
     {
-      TranslationMapManager::RegisterSaver ("keymap", &translation_map_saver);
+      TranslationMapManager::RegisterSaver ("xkeymap", &translation_map_saver);
     }
 };
 
 extern "C"
 {
 
-ComponentRegistrator<KeymapSaverComponent> KeymapSaver ("input.savers.keymap");
+ComponentRegistrator<KeymapSaverComponent> XKeymapSaver ("input.savers.xkeymap");
 
 }
 

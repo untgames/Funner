@@ -24,5 +24,5 @@ INPUT.MANAGER.TESTS.DLLS             :=
 INPUT.MANAGER.TESTS.DLL_DIRS         :=
 INPUT.MANAGER.TESTS.COMPILER_CFLAGS  :=
 INPUT.MANAGER.TESTS.COMPILER_DEFINES :=
-INPUT.MANAGER.TESTS.IMPORTS          := compile.static.mak link.static.mak keymap.link.static.mak keydet.link.static.mak \
+INPUT.MANAGER.TESTS.IMPORTS          := compile.static.mak link.static.mak xkeymap.link.static.mak xkeydet.link.static.mak \
                                         ../low_level/compile.static.mak ../../common/compile.static.mak ../../common/link.static.mak

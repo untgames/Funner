@@ -35,23 +35,23 @@ void controls_detector_loader (const char* file_name, ControlsDetector& target_d
 }
 
 /*
-   Компонент загрузки определителей контролов
+   ╩юьяюэхэЄ чруЁєчъш юяЁхфхышЄхыхщ ъюэЄЁюыют
 */
 
 class KeydetLoaderComponent
 {
   public:
-    //загрузка компонента
+    //чруЁєчър ъюьяюэхэЄр
     KeydetLoaderComponent () 
     {
-      ControlsDetectorManager::RegisterLoader ("keydet", &controls_detector_loader);
+      ControlsDetectorManager::RegisterLoader ("xkeydet", &controls_detector_loader);
     }
 };
 
 extern "C"
 {
 
-ComponentRegistrator<KeydetLoaderComponent> KeydetLoader ("input.loaders.keydet");
+ComponentRegistrator<KeydetLoaderComponent> XKeydetLoader ("input.loaders.xkeydet");
 
 }
 
