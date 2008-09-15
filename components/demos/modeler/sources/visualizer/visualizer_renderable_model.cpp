@@ -70,7 +70,7 @@ struct RenderableModel::Impl: public xtl::trackable
 
   void LoadMeshes ()
   {
-//    printf ("Load meshes\n");    
+    printf ("Load %u meshes\n", library.Size ());
     
     for (media::geometry::MeshLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)    
     {

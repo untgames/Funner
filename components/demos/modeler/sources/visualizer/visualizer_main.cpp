@@ -131,8 +131,8 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
       {
         window.SetVisible (state);
 
-//        if (state)
-//          window.Invalidate ();
+        if (state)
+          window.Invalidate ();
       }
       catch (xtl::exception& exception)
       {
@@ -168,12 +168,14 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       VisualModel::Pointer envelope = VisualModel::Create ();
 
       model->SetMeshName (MODEL_MESH_NAME);
+      model->SetName     ("Trajectory");
       model->BindToScene (scene);
 
-      model->Scale (-2.f, 2.f, 2.f);
+      model->Scale (-2.01f, 2.01f, 2.01f);
 
       envelope->SetMeshName (MODEL2_MESH_NAME);
       envelope->BindToScene (scene);
+      envelope->SetName     ("Envelope");
 
       camera = OrthoCamera::Create ();
 
@@ -181,12 +183,25 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       camera->SetRight  (3);
       camera->SetBottom (-3);
       camera->SetTop    (3);
-      camera->SetZNear  (-100);
+      camera->SetZNear  (0);
       camera->SetZFar   (100);
+      
+      camera->SetPosition (0, 0, 4);
+      camera->LookTo      (math::vec3f (0.0f), NodeOrt_Z, NodeOrt_Y, NodeTransformSpace_World);
+      
+      math::vec3f dir = camera->WorldOrtZ (),
+                  p   = invert (camera->WorldTM ()) * math::vec3f (0, 0, 4),
+                  p1  = invert (camera->WorldTM ()) * math::vec4f (0, 0, 1, 0),
+                  p3  = invert (camera->WorldTM ()) * math::vec3f (0, 0, 0);
+      
+      printf ("Camera dir: %g %g %g\n", dir.x, dir.y, dir.z);
+      printf ("Light:      %g %g %g\n", p.x, p.y, p.z);
+      printf ("Point:      %g %g %g\n", p3.x, p3.y, p3.z);
+      printf ("Normal:     %g %g %g\n", p1.x, p1.y, p1.z);
 
       camera->BindToScene (scene);
       
-      screen.SetBackgroundColor (1, 0, 0, 0);
+      screen.SetBackgroundColor (0.f, 0.05f, 0.2f, 0);
       
       Viewport viewport;
       

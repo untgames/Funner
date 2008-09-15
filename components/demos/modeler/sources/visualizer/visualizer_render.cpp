@@ -11,6 +11,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/string.h>
 #include <xtl/visitor.h>
 
 #include <mathlib.h>
@@ -62,7 +63,7 @@ void print (const char* message)
 //создание состояния смешивания цветов
 BlendStatePtr create_blend_state
  (low_level::IDevice&      device,
-  bool          blend_enable,
+  bool                     blend_enable,
   low_level::BlendArgument src_arg,
   low_level::BlendArgument dst_color_arg,
   low_level::BlendArgument dst_alpha_arg)
@@ -81,11 +82,6 @@ BlendStatePtr create_blend_state
   blend_desc.color_write_mask                 = low_level::ColorWriteFlag_All;
 
   return BlendStatePtr (device.CreateBlendState (blend_desc), false);
-}
-
-BlendStatePtr create_blend_state (low_level::IDevice& device, low_level::BlendArgument src_arg, low_level::BlendArgument dst_arg)
-{
-  return create_blend_state (device, true, src_arg, dst_arg, dst_arg);
 }
 
 class RenderManager
@@ -141,18 +137,47 @@ typedef xtl::com_ptr<low_level::IBuffer> BufferPtr;
 
 struct RenderViewVisitor: public xtl::visitor<void, VisualModel>
 {
-  RenderManager*      render_manager;
-  low_level::IDevice* device;
-  BufferPtr           cb;
-  MyShaderParameters  *shader_parameters;
-  float               angle;
+  RenderManager*          render_manager;
+  low_level::IDevice*     device;
+  low_level::IBlendState* envelope_blend_state;
+  low_level::IBlendState* trajectory_blend_state;
+  BufferPtr               cb;
+  MyShaderParameters      *shader_parameters;
+  float                   angle;
 
-  RenderViewVisitor (RenderManager* in_render_manager, low_level::IDevice* in_device, BufferPtr in_cb, MyShaderParameters& in_shader_parameters, float in_angle) 
-    : render_manager (in_render_manager), device (in_device), cb (in_cb), shader_parameters (&in_shader_parameters), angle (in_angle) {}
+  RenderViewVisitor (RenderManager*          in_render_manager,
+                     low_level::IDevice*     in_device,
+                     BufferPtr               in_cb,
+                     MyShaderParameters&     in_shader_parameters,
+                     float                   in_angle,
+                     low_level::IBlendState& in_envelope_blend_state,
+                     low_level::IBlendState& in_trajectory_blend_state)
+    : render_manager (in_render_manager),
+      device (in_device),
+      cb (in_cb),
+      shader_parameters (&in_shader_parameters),
+      angle (in_angle),
+      envelope_blend_state (&in_envelope_blend_state),
+      trajectory_blend_state (&in_trajectory_blend_state)
+  {
+  }
 
   void visit (VisualModel& model)
   {
     RenderableModel& renderable_model = render_manager->GetRenderableModel (device, model.MeshName ());
+    
+    if (!xtl::xstrcmp (model.Name (), "Envelope"))
+    {
+      shader_parameters->light_enable = true;
+
+//      device->OSSetBlendState (envelope_blend_state);            
+    }
+    else
+    {
+      shader_parameters->light_enable = false;
+      
+//      device->OSSetBlendState (trajectory_blend_state);      
+    }
 
     shader_parameters->object_tm = math::rotatef (angle, 0, 0, 1) * 
                                    math::rotatef (angle * 0.2f, 1, 0, 0) * model.WorldTM ();
@@ -205,12 +230,12 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     
     mid_level::IRenderTarget* GetRenderTarget ()
     {
-      throw xtl::make_not_implemented_exception ("MyRenderView::GetRenderTarget");
+      throw xtl::make_not_implemented_exception ("ModelerView::GetRenderTarget");
     }
     
     mid_level::IRenderTarget* GetDepthStencilTarget ()
     {
-      throw xtl::make_not_implemented_exception ("MyRenderView::GetDepthStencilTarget");
+      throw xtl::make_not_implemented_exception ("ModelerView::GetDepthStencilTarget");
     }
   
 ///Установка области вывода
@@ -228,7 +253,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     
     void GetViewport (Rect&)
     {
-      throw xtl::make_not_implemented_exception ("MyRenderView::GetViewport");
+      throw xtl::make_not_implemented_exception ("ModelerView::GetViewport");
     }
     
 ///Установка камеры
@@ -239,7 +264,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
 
     scene_graph::Camera* GetCamera ()
     {
-      throw xtl::make_not_implemented_exception ("MyRenderView::GetCamera");
+      throw xtl::make_not_implemented_exception ("ModelerView::GetCamera");
     }
 
 ///Установка / чтение свойств
@@ -247,7 +272,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
 
     void GetProperty (const char*, size_t, char*)
     {
-      throw xtl::make_not_implemented_exception ("MyRenderView::GetProperty");      
+      throw xtl::make_not_implemented_exception ("ModelerView::GetProperty");      
     }
 
 ///Рисование
@@ -260,11 +285,12 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     }
 
     void Draw (render::low_level::IDevice& device)
-    {
-/*      if (!blend_state)
-        blend_state = create_blend_state (device, low_level::BlendArgument_One, low_level::BlendArgument_One);
-
-      device.OSSetBlendState (blend_state.get ());*/
+    {      
+      if (!trajectory_blend_state)
+        trajectory_blend_state = create_blend_state (device, true, low_level::BlendArgument_One, low_level::BlendArgument_One, low_level::BlendArgument_One);
+        
+      if (!envelope_blend_state)
+        envelope_blend_state = create_blend_state (device, false, low_level::BlendArgument_One, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero);
       
       if (!shader)
       {
@@ -308,9 +334,9 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
 
       device.SSSetProgram (shader.get ());
       device.SSSetProgramParametersLayout (program_parameters_layout.get ());
-      device.SSSetConstantBuffer (0, cb.get ());    
+      device.SSSetConstantBuffer (0, cb.get ());
 
-      RenderViewVisitor visitor (render_manager, &device, cb, my_shader_parameters, current_angle);
+      RenderViewVisitor visitor (render_manager, &device, cb, my_shader_parameters, current_angle, *envelope_blend_state, *trajectory_blend_state);
 
       scene->VisitEach (visitor);
 
@@ -338,7 +364,8 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     RenderManager*                        render_manager;
     FramePtr                              frame;
     float                                 current_angle;
-    BlendStatePtr                         blend_state;
+    BlendStatePtr                         envelope_blend_state;
+    BlendStatePtr                         trajectory_blend_state;    
     stl::string                           shader_source;
     ProgramPtr                            shader;
     ProgramParametersLayoutPtr            program_parameters_layout;
@@ -379,7 +406,7 @@ class ModelerRender: public ICustomSceneRender, public xtl::reference_counter
 
     const ICustomSceneRender::LogFunction& GetLogHandler ()
     {
-      throw xtl::make_not_implemented_exception ("MyRenderView::GetLogHandler");
+      throw xtl::make_not_implemented_exception ("ModelerView::GetLogHandler");
     }
     
     void SetQueryHandler (const QueryFunction& in_handler)
@@ -403,7 +430,7 @@ class ModelerRender: public ICustomSceneRender, public xtl::reference_counter
 ///Создание рендера
     static ICustomSceneRender* Create (mid_level::IRenderer* renderer, const char* path_name)
     {
-      printf ("MySceneRender::Create(%s, %s)\n", renderer ? renderer->GetDescription () : "null", path_name);
+      printf ("ModelerRender::Create(%s, %s)\n", renderer ? renderer->GetDescription () : "null", path_name);
       
       return new ModelerRender (renderer);
     }

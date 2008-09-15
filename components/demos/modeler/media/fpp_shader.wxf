@@ -9,9 +9,10 @@ ViewMatrix       myViewMatrix
 ObjectMatrix     myObjectMatrix
 
 DiffuseColor 1 1 1 1
-SpecularColor 0.4 0 0 0
+SpecularColor 1 1 1 1
 AmbientColor 0 0 0 0
 EmissionColor 0 0 0 0
+Shininess 80
 
 Light
 {
@@ -20,5 +21,6 @@ Light
   DiffuseColor  1 1 1 1
   SpecularColor 1 1 1 1
   AmbientColor  1 1 1 1
-  Position      0 0 40
+  Position      0 0 20
+  
 }

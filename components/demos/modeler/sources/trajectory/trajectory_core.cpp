@@ -195,9 +195,9 @@ class TrajectoryBuilder
         line_start.position.x = point.pnts2 [0];
         line_start.position.y = point.pnts2 [1];
         line_start.position.z = point.pnts2 [2];
-        line_start.color.r    = (float)point3d[i].rgb[0];
-        line_start.color.g    = (float)point3d[i].rgb[1];
-        line_start.color.b    = (float)point3d[i].rgb[2];
+        line_start.color.r    = 0.2f;
+        line_start.color.g    = 0.2f;
+        line_start.color.b    = 0.2f;
         line_start.color.a    = 1.f;
 
         line_end.position.x = line_start.position.x + normal [0] * 0.1f;

@@ -8,7 +8,7 @@ class RenderableModel
   public:
     RenderableModel (render::low_level::IDevice& device, const char* file_name);
     ~RenderableModel ();
-
+    
     void Draw (render::low_level::IDevice& device);
 
   private:
