@@ -374,18 +374,6 @@ class FppProgramParser
     Конструктор / деструктор
 */
 
-namespace
-{
-
-void identity_matrix (Matrix4f& m)
-{
-  for (size_t i=0; i<4; i++)
-    for (size_t j=0; j<4; j++)
-      m [i][j] = i == j ? 1.0f : 0.0f;
-}
-
-}
-
 FppProgram::FppProgram (const ContextManager& manager, const ShaderDesc& shader_desc, const LogFunction& error_log)
   : ContextObject (manager)
 {

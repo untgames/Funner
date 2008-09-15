@@ -38,6 +38,8 @@ FppBindableProgram::FppBindableProgram
     //получение базового состояния фиксированной программы шейдинга
   
   fpp_state = program.GetBaseState ();  
+  
+  identity_matrix (view_object_matrix);
 
     //обновление хэшей
 
@@ -183,14 +185,6 @@ FppBindableProgram::FppBindableProgram
 namespace
 {
 
-//транспонирование матрицы
-void transpose_matrix (const Matrix4f source, Matrix4f destination)
-{
-  for (size_t i=0; i<4; i++)
-    for (size_t j=0; j<4; j++)
-      destination [i][j] = source [j][i];
-}
-
 //эмуляция загрузки транспонированной матрицы в контекст OpenGL
 void load_transpose_matrix (Matrix4f matrix, PFNGLLOADTRANSPOSEMATRIXFPROC fn)
 {
@@ -206,23 +200,6 @@ void load_transpose_matrix (Matrix4f matrix, PFNGLLOADTRANSPOSEMATRIXFPROC fn)
   transpose_matrix (matrix, transposed_matrix);
 
   glLoadMatrixf (&transposed_matrix [0][0]);
-}
-
-//эмуляция умножения транспонированной матрицы
-void mult_transpose_matrix (Matrix4f matrix, PFNGLMULTTRANSPOSEMATRIXFPROC fn)
-{
-  if (fn)
-  {
-    fn (&matrix [0][0]);
-    
-    return;
-  }
-  
-  Matrix4f transposed_matrix;
-
-  transpose_matrix (matrix, transposed_matrix);
-
-  glMultMatrixf (&transposed_matrix [0][0]);
 }
 
 }
@@ -321,23 +298,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
     //установка состояния в контекст OpenGL
     
-  bool need_update_modelview_matrix = current_viewer_hash != viewer_hash || current_object_hash != object_hash;
-   
-    //установка параметров наблюдателя
-    
-  if (current_viewer_hash != viewer_hash)
-  {    
-    glMatrixMode          (GL_PROJECTION);
-    load_transpose_matrix (fpp_state.viewer.projection_matrix, caps.glLoadTransposeMatrixf_fn);
-    
-    SetContextCacheValue (CacheEntry_FppViewerStateHash, viewer_hash);
-  }
-  
-  if (need_update_modelview_matrix)
-  {  
-    glMatrixMode          (GL_MODELVIEW);
-    load_transpose_matrix (fpp_state.viewer.view_matrix, caps.glLoadTransposeMatrixf_fn);
-  }
+  bool need_update_modelview_matrix = false;
 
     //установка параметров источников освещения
     
@@ -354,18 +315,30 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       
     if (lighting)
     {
-      glEnable (GL_LIGHTING);
+      glEnable      (GL_LIGHTING);
+      glLightModeli (GL_LIGHT_MODEL_TWO_SIDE,     GL_TRUE);
+      glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+      
+        //установка преобразований наблюдателя
+
+      glMatrixMode  (GL_MODELVIEW);
+
+      load_transpose_matrix (fpp_state.viewer.view_matrix, caps.glLoadTransposeMatrixf_fn);
+
+      need_update_modelview_matrix = true;
+      
+        //установка параметров источника
 
       for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
       {
         const LightDesc& light    = fpp_state.lights [i];
         GLenum           light_id = GL_LIGHT0 + i;
-        
+
         if (!light.enable)
         {
           glDisable (light_id);
           continue;
-        }        
+        }
 
         float position [4] = {light.position [0], light.position [1], light.position [2], light.type != LightType_Remote};
 
@@ -380,10 +353,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         glLightf  (light_id, GL_CONSTANT_ATTENUATION,  light.constant_attenuation);
         glLightf  (light_id, GL_LINEAR_ATTENUATION,    light.linear_attenuation);
         glLightf  (light_id, GL_QUADRATIC_ATTENUATION, light.quadratic_attenuation);
-      }
-      
-      glLightModeli (GL_LIGHT_MODEL_TWO_SIDE,     GL_TRUE);
-      glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+      }      
     }
     else
     {
@@ -391,18 +361,42 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     }
 
     SetContextCacheValue (CacheEntry_FppLightingStateHash, lighting_hash);
-  }
+  }  
   
-    //установка параметров объекта
+    //установка параметров наблюдателя    
     
+  bool need_compute_view_object_matrix = false;
+
+  if (current_viewer_hash != viewer_hash)
+  {    
+    glMatrixMode          (GL_PROJECTION);
+    load_transpose_matrix (fpp_state.viewer.projection_matrix, caps.glLoadTransposeMatrixf_fn);
+
+    SetContextCacheValue (CacheEntry_FppViewerStateHash, viewer_hash);
+
+    need_compute_view_object_matrix = true;
+  }
+
+    //установка параметров объекта
+
   if (current_object_hash != object_hash)
-  {  
+  {
     SetContextCacheValue (CacheEntry_FppObjectStateHash, object_hash);
+
+    need_compute_view_object_matrix = true;
+  }
+
+  if (need_compute_view_object_matrix)
+  {
+    mult_matrix (fpp_state.viewer.view_matrix, fpp_state.object.matrix, view_object_matrix);
+
+    need_update_modelview_matrix = true;
   }
 
   if (need_update_modelview_matrix)
-  {  
-    mult_transpose_matrix (fpp_state.object.matrix, caps.glMultTransposeMatrixf_fn);
+  {
+    glMatrixMode          (GL_MODELVIEW);
+    load_transpose_matrix (view_object_matrix, caps.glLoadTransposeMatrixf_fn);
   }
 
     //установка параметров материала      

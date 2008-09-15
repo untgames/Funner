@@ -594,12 +594,12 @@ void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t ver
       //преобразование типа примитивов
 
     GLenum mode = get_mode (primitive_type, "");
-    
+
       //установка состояния устройства в контекст OpenGL
 
-    Bind (0, 0);
+    Bind (0, 0); 
 
-      //рисование      
+      //рисование
 
     glDrawArrays (mode, first_vertex, vertices_count);
 

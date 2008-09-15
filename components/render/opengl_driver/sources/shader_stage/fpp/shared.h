@@ -250,15 +250,16 @@ class FppBindableProgram: virtual public IBindableProgram, public ContextObject
     typedef stl::vector<Group>      GroupArray;
 
   private:
-    ParameterArray  parameters;     //параметры программы
-    GroupArray      groups;         //группы параметров
-    FppState        fpp_state;      //состояние фиксированной программы шейдинга
-    size_t          viewer_hash;    //хэш параметров наблюдателя
-    size_t          object_hash;    //хэш параметров объекта
-    size_t          material_hash;  //хэш параметров материала
-    size_t          lighting_hash;  //хэш параметров освещения
-    size_t          texmaps_hash;   //хэш параметров текстурирования
-    size_t          modes_hash;     //хэш режимов визуализации
+    ParameterArray  parameters;         //параметры программы
+    GroupArray      groups;             //группы параметров
+    FppState        fpp_state;          //состояние фиксированной программы шейдинга
+    Matrix4f        view_object_matrix; //композиция преобразований вида и объекта
+    size_t          viewer_hash;        //хэш параметров наблюдателя
+    size_t          object_hash;        //хэш параметров объекта
+    size_t          material_hash;      //хэш параметров материала
+    size_t          lighting_hash;      //хэш параметров освещения
+    size_t          texmaps_hash;       //хэш параметров текстурирования
+    size_t          modes_hash;         //хэш режимов визуализации
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,6 +289,13 @@ class FppShaderManager : virtual public IShaderManager, public ContextObject
     IShader*          CreateShader  (const ShaderDesc& shader_desc, const LogFunction& error_log);
     ICompiledProgram* CreateProgram (size_t shaders_count, IShader** shaders, const LogFunction& error_log);
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Матричные утилиты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void identity_matrix  (Matrix4f); //инициализация единичной матрицы
+void mult_matrix      (const Matrix4f a, const Matrix4f b, Matrix4f result); //result = a * b
+void transpose_matrix (const Matrix4f source, Matrix4f result); //транспонирование матрицы
 
 }
 

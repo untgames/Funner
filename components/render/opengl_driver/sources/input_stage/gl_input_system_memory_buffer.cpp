@@ -10,7 +10,8 @@ using namespace common;
 
 SystemMemoryBuffer::SystemMemoryBuffer (const ContextManager& context_manager, const BufferDesc& in_desc)
   : Buffer (context_manager, in_desc), buffer (in_desc.size)
-  {}
+{
+}
 
 SystemMemoryBuffer::~SystemMemoryBuffer ()
 {

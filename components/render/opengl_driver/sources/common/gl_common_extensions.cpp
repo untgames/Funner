@@ -313,7 +313,7 @@ const char* extensions [] = {
 
   "GLBUG_texture3D_get_tex_image",
   "GLBUG_texture_no_subimage",
-  "GLBUG_swap_buffers_twice_call"
+  "GLBUG_swap_buffers_twice_call",
 };
 
 const size_t EXTENSIONS_COUNT = sizeof (extensions) / sizeof (*extensions);      

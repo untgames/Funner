@@ -3,6 +3,7 @@
 
 #include <cstring>
 #include <cstdarg>
+#include <cmath>
 
 #include <render/low_level/device.h>
 #include <render/low_level/debug.h>

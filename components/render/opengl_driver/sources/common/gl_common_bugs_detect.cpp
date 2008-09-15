@@ -22,6 +22,8 @@ bool detect_texture3d_bug ()
   if (!glTexImage3D && !glTexImage3DEXT)
     return false;
 
+  while (glGetError () != GL_NO_ERROR);            
+
   static const size_t TEX_SIZE = 2, MAX_TEXEL_SIZE = 8, RGB_TEXEL_SIZE = 3;  
   static const unsigned char SRC_BUFFER_MARKER = 0, DST_BUFFER_MARKER = 1;
 
