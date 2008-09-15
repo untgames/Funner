@@ -3,33 +3,34 @@
 
 #include <stdio.h>
 
-#include <stl/vector>
 #include <stl/hash_map>
 #include <stl/string>
+#include <stl/vector>
 
-#include <xtl/reference_counter.h>
-#include <xtl/function.h>
-#include <xtl/shared_ptr.h>
-#include <xtl/iterator.h>
-#include <xtl/connection.h>
-#include <xtl/signal.h>
 #include <xtl/bind.h>
-#include <xtl/intrusive_ptr.h>
-#include <xtl/token_parser.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
+#include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/iterator.h>
+#include <xtl/reference_counter.h>
+#include <xtl/shared_ptr.h>
+#include <xtl/signal.h>
+#include <xtl/token_parser.h>
 
+#include <common/component.h>
+#include <common/parser.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
-#include <common/parser.h>
 #include <common/xml_writer.h>
-#include <common/component.h>
 
 #include <input/low_level/device.h>
 #include <input/low_level/driver.h>
-#include <input/translation_map.h>
 #include <input/action_map.h>
 #include <input/controls_detector.h>
 #include <input/events_source.h>
+#include <input/translation_map.h>
+#include <input/translation_map_registry.h>
 
 namespace input
 {
