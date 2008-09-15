@@ -538,12 +538,12 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
       //установка состояния шейдерного уровня
 
     if (context_manager.NeedStageRebind (Stage_Shading))
-      shader_stage.Bind ();
+      shader_stage.Bind ();            
 
       //установка состояния выходного уровня
 
     if (context_manager.NeedStageRebind (Stage_Output))
-      output_stage.Bind (render_target_manager.GetRenderTargetView () != 0, render_target_manager.GetDepthStencilView () != 0);      
+      output_stage.Bind (render_target_manager.GetRenderTargetView () != 0, render_target_manager.GetDepthStencilView () != 0);
 
       //очистка флагов ребиндинга
 

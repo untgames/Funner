@@ -296,14 +296,30 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     UpdateHashes ();
   }
 
-    //установка состояния в контекст OpenGL
+    //установка состояния в контекст OpenGL    
     
-  bool need_update_modelview_matrix = false;
+  bool need_update_modelview_matrix = false,
+       need_update_modes            = current_modes_hash != modes_hash,
+       need_update_viewer           = current_viewer_hash != viewer_hash,
+       need_update_object           = current_object_hash != object_hash,       
+       need_update_material         = current_material_hash != material_hash,
+       need_update_lighting         = current_lighting_hash != lighting_hash || need_update_viewer,
+       need_update_texmaps          = current_texmaps_hash != texmaps_hash;    
+    
+    //установка режимов отрисовки
+    
+  if (need_update_modes)
+  {
+    if (fpp_state.modes.normalize) glEnable  (GL_NORMALIZE);
+    else                           glDisable (GL_NORMALIZE);
+
+    SetContextCacheValue (CacheEntry_FppModesStateHash, modes_hash);
+  }    
 
     //установка параметров источников освещения
-    
-  if (current_lighting_hash != lighting_hash)
-  {    
+
+  if (need_update_lighting)
+  {
     bool lighting = false;
     
     for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
@@ -315,13 +331,15 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       
     if (lighting)
     {
+        //включение освещения
+      
       glEnable      (GL_LIGHTING);
       glLightModeli (GL_LIGHT_MODEL_TWO_SIDE,     GL_TRUE);
       glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
       
-        //установка преобразований наблюдателя
+        //установка преобразования наблюдателя
 
-      glMatrixMode  (GL_MODELVIEW);
+      glMatrixMode (GL_MODELVIEW);
 
       load_transpose_matrix (fpp_state.viewer.view_matrix, caps.glLoadTransposeMatrixf_fn);
 
@@ -361,47 +379,11 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     }
 
     SetContextCacheValue (CacheEntry_FppLightingStateHash, lighting_hash);
-  }  
+  }    
   
-    //установка параметров наблюдателя    
-    
-  bool need_compute_view_object_matrix = false;
+    //установка параметров материала
 
-  if (current_viewer_hash != viewer_hash)
-  {    
-    glMatrixMode          (GL_PROJECTION);
-    load_transpose_matrix (fpp_state.viewer.projection_matrix, caps.glLoadTransposeMatrixf_fn);
-
-    SetContextCacheValue (CacheEntry_FppViewerStateHash, viewer_hash);
-
-    need_compute_view_object_matrix = true;
-  }
-
-    //установка параметров объекта
-
-  if (current_object_hash != object_hash)
-  {
-    SetContextCacheValue (CacheEntry_FppObjectStateHash, object_hash);
-
-    need_compute_view_object_matrix = true;
-  }
-
-  if (need_compute_view_object_matrix)
-  {
-    mult_matrix (fpp_state.viewer.view_matrix, fpp_state.object.matrix, view_object_matrix);
-
-    need_update_modelview_matrix = true;
-  }
-
-  if (need_update_modelview_matrix)
-  {
-    glMatrixMode          (GL_MODELVIEW);
-    load_transpose_matrix (view_object_matrix, caps.glLoadTransposeMatrixf_fn);
-  }
-
-    //установка параметров материала      
-    
-  if (current_material_hash != material_hash)
+  if (need_update_material)
   {
     glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION,  (GLfloat*)&fpp_state.material.emission_color);
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT,   (GLfloat*)&fpp_state.material.ambient_color);
@@ -421,17 +403,17 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       
       switch (fpp_state.material.color_material)
       {
-        case ColorMaterial_Emission:           mode = GL_EMISSION; break;
-        case ColorMaterial_Ambient:            mode = GL_AMBIENT; break;
+        case ColorMaterial_Emission:          mode = GL_EMISSION; break;
+        case ColorMaterial_Ambient:           mode = GL_AMBIENT; break;
         default:
-        case ColorMaterial_Diffuse:            mode = GL_DIFFUSE; break;
-        case ColorMaterial_Specular:           mode = GL_SPECULAR; break;
-        case ColorMaterial_AmbientAndDiffuse:  mode = GL_AMBIENT_AND_DIFFUSE; break;
+        case ColorMaterial_Diffuse:           mode = GL_DIFFUSE; break;
+        case ColorMaterial_Specular:          mode = GL_SPECULAR; break;
+        case ColorMaterial_AmbientAndDiffuse: mode = GL_AMBIENT_AND_DIFFUSE; break;
       }
       
       glEnable        (GL_COLOR_MATERIAL);
       glColorMaterial (GL_FRONT_AND_BACK, mode);
-    }  
+    }
 
       //включение параметров альфа-теста
 
@@ -466,7 +448,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
     //установка параметров текстурирования
     
-  if (current_texmaps_hash != texmaps_hash)
+  if (need_update_texmaps)
   {    
     size_t       texture_units_count      = caps.has_arb_multitexture ? caps.texture_units_count : 1;
     const size_t active_texture_slot      = GetContextCacheValue (CacheEntry_ActiveTextureSlot),
@@ -560,14 +542,40 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     SetContextCacheValue (CacheEntry_FppTexmapsStateHash, texmaps_hash);
   }
   
-    //установка режимов отрисовки
+    //установка параметров наблюдателя    
     
-  if (current_modes_hash != modes_hash)
-  {
-    if (fpp_state.modes.normalize) glEnable  (GL_NORMALIZE);
-    else                           glDisable (GL_NORMALIZE);
+  bool need_compute_view_object_matrix = false;
 
-    SetContextCacheValue (CacheEntry_FppModesStateHash, modes_hash);
+  if (need_update_viewer)
+  {    
+    glMatrixMode          (GL_PROJECTION);
+    load_transpose_matrix (fpp_state.viewer.projection_matrix, caps.glLoadTransposeMatrixf_fn);
+
+    SetContextCacheValue (CacheEntry_FppViewerStateHash, viewer_hash);
+
+    need_compute_view_object_matrix = true;
+  }
+
+    //установка параметров объекта
+
+  if (need_update_object)
+  {
+    SetContextCacheValue (CacheEntry_FppObjectStateHash, object_hash);
+
+    need_compute_view_object_matrix = true;
+  }
+
+  if (need_compute_view_object_matrix)
+  {
+    mult_matrix (fpp_state.viewer.view_matrix, fpp_state.object.matrix, view_object_matrix);
+
+    need_update_modelview_matrix = true;
+  }
+
+  if (need_update_modelview_matrix)
+  {
+    glMatrixMode          (GL_MODELVIEW);
+    load_transpose_matrix (view_object_matrix, caps.glLoadTransposeMatrixf_fn);
   }  
   
     //проверка ошибок
