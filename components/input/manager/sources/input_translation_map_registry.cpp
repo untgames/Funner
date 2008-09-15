@@ -11,11 +11,13 @@ struct RegistryNode
 {
   public:
 ///Регистрация / удаление трансляторов
-    void Register (StringArray::iterator current_node, StringArray::iterator last_node, const char* in_translation_map)
+    void Register (StringArray::iterator current_node, StringArray::iterator last_node, const char* in_translation_map, const char* in_profile)
     {
       if (current_node == last_node)
       {
         translation_map = in_translation_map;
+        profile         = in_profile;
+
         return;
       }
 
@@ -24,7 +26,7 @@ struct RegistryNode
       if (iter == children.end ())
           iter = children.insert_pair (current_node->c_str (), RegistryNodePtr (new RegistryNode ())).first;
 
-      iter->second->Register (current_node + 1, last_node, in_translation_map);
+      iter->second->Register (current_node + 1, last_node, in_translation_map, in_profile);
     }
    
     void Unregister (StringArray::iterator current_node, StringArray::iterator last_node)
@@ -86,6 +88,16 @@ struct RegistryNode
       children.clear ();
     }
 
+///Перечисление
+    void Enumerate (TranslationMapRegistry::IEnumerator& enumerator)
+    {
+      if (!translation_map.empty ())
+        enumerator.Process (profile.c_str (), translation_map.c_str ());
+
+      for (NodeMap::iterator iter = children.begin (), end = children.end (); iter != end; ++iter)
+        iter->second->Enumerate (enumerator);
+    }
+
   private:
     const char* GetTranslationMap ()
     {
@@ -102,6 +114,7 @@ struct RegistryNode
   private:
     NodeMap     children;
     stl::string translation_map;
+    stl::string profile;
 };
 
 }
@@ -129,7 +142,7 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
       {
         ParseProfile (profile, profile_nodes);
 
-        root.Register (profile_nodes.begin (), profile_nodes.end (), translation_map);
+        root.Register (profile_nodes.begin (), profile_nodes.end (), translation_map, profile);
       }
       catch (xtl::exception& exception)
       {
@@ -195,6 +208,12 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
       root.Clear ();
     }
 
+///Перечисление записей
+    void Enumerate (TranslationMapRegistry::IEnumerator& enumerator)
+    {
+      root.Enumerate (enumerator);
+    }
+
   private:
     void ParseProfile (const char* profile, StringArray& profile_nodes) const
     {
@@ -214,6 +233,7 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
 
   private:
     RegistryNode root;
+    size_t       size;
 };
 
 /*
@@ -292,6 +312,15 @@ const char* TranslationMapRegistry::FindNearest (const char* profile) const
 void TranslationMapRegistry::Clear ()
 {
   impl->Clear ();
+}
+
+/*
+   Перечисление записей
+*/
+
+void TranslationMapRegistry::Enumerate (IEnumerator& enumerator) const
+{
+  impl->Enumerate (enumerator);
 }
 
 /*

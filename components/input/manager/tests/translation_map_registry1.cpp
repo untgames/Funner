@@ -13,6 +13,14 @@ const char* TRANSLATION_MAP2_NAME    = "microsoft_wireless_mouse2.keymap";
 const char* TRANSLATION_MAP3_NAME    = "logitech_wired_mouse.keymap";
 const char* TRANSLATION_MAP4_NAME    = "game_type_1.keymap";
 
+class MyEnumerator : public TranslationMapRegistry::IEnumerator
+{
+  void Process (const char* profile, const char* translation_map)
+  {
+    printf ("  Profile '%s' map is '%s'\n", profile, translation_map);
+  }
+};
+
 int main ()
 {
   printf ("Results of translation_map_registry1_test:\n");
@@ -27,6 +35,12 @@ int main ()
     translation_map_registry.Register (TRANSLATION_MAP2_PROFILE, TRANSLATION_MAP2_NAME);
     translation_map_registry.Register (TRANSLATION_MAP3_PROFILE, TRANSLATION_MAP3_NAME);
     translation_map_registry.Register (TRANSLATION_MAP4_PROFILE, TRANSLATION_MAP4_NAME);
+
+    MyEnumerator enumerator;
+
+    printf ("Enumerating profiles:\n");
+
+    translation_map_registry.Enumerate (enumerator);
 
     printf ("Has '%s' - '%c'\n", TRANSLATION_MAP1_PROFILE, translation_map_registry.Find (TRANSLATION_MAP1_PROFILE) ? 'y' : 'n');
 
@@ -51,11 +65,19 @@ int main ()
 
     translation_map_registry.Unregister (TRANSLATION_MAP1_PROFILE);
 
+    printf ("Enumerating profiles:\n");
+
+    translation_map_registry.Enumerate (enumerator);
+
     printf ("Has '%s' - '%c'\n", TRANSLATION_MAP1_PROFILE, translation_map_registry.Find (TRANSLATION_MAP1_PROFILE) ? 'y' : 'n');
     printf ("Has nearest '%s' - '%c'\n", TRANSLATION_MAP1_PROFILE, translation_map_registry.FindNearest (TRANSLATION_MAP1_PROFILE) ? 'y' : 'n');
 
     translation_map_registry.Clear ();
     
+    printf ("Enumerating profiles:\n");
+
+    translation_map_registry.Enumerate (enumerator);
+
     printf ("Has '%s' - '%c'\n", TRANSLATION_MAP1_PROFILE, translation_map_registry.Find (TRANSLATION_MAP1_PROFILE) ? 'y' : 'n');
     printf ("Has nearest '%s' - '%c'\n", TRANSLATION_MAP1_PROFILE, translation_map_registry.FindNearest (TRANSLATION_MAP1_PROFILE) ? 'y' : 'n');
   }

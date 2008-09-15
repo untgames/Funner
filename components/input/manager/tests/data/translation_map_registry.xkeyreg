@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<TranslationMapRegistry>
+  <Translation Profile="game1.mouse" TranslationMap="mouse.xkeymap"/>
+  <Translation Profile="game2.gamepad.USB 4 axis 12 buttons with POV.1c4a1-9f2-21-aa0c" TranslationMap="gamepad 1c4a1-9f2-21-aa0c.xkeymap"/>
+</TranslationMapRegistry>

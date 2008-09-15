@@ -1,6 +1,10 @@
 Results of translation_map_registry1_test:
 Has 'game_type_1.mouse.microsoft_wireless_mouse' - 'n'
 Has nearest 'game_type_1.mouse.microsoft_wireless_mouse' - 'n'
+Enumerating profiles:
+  Profile 'game_type_2.mouse.microsoft_wireless_mouse' map is 'microsoft_wireless_mouse2.keymap'
+  Profile 'game_type_1' map is 'game_type_1.keymap'
+  Profile 'game_type_1.mouse.logitech_wired_mouse' map is 'logitech_wired_mouse.keymap'
 Has 'game_type_1.mouse.microsoft_wireless_mouse' - 'n'
 Has nearest 'game_type_1.mouse.microsoft_wireless_mouse' - 'y'
 Nearest name is 'game_type_1.keymap'
@@ -8,7 +12,12 @@ Has 'game_type_1.mouse.microsoft_wireless_mouse' - 'y'
 Name is 'microsoft_wireless_mouse.keymap'
 Has nearest 'game_type_1.mouse.microsoft_wireless_mouse' - 'y'
 Nearest name is 'microsoft_wireless_mouse.keymap'
+Enumerating profiles:
+  Profile 'game_type_2.mouse.microsoft_wireless_mouse' map is 'microsoft_wireless_mouse2.keymap'
+  Profile 'game_type_1' map is 'game_type_1.keymap'
+  Profile 'game_type_1.mouse.logitech_wired_mouse' map is 'logitech_wired_mouse.keymap'
 Has 'game_type_1.mouse.microsoft_wireless_mouse' - 'n'
 Has nearest 'game_type_1.mouse.microsoft_wireless_mouse' - 'y'
+Enumerating profiles:
 Has 'game_type_1.mouse.microsoft_wireless_mouse' - 'n'
 Has nearest 'game_type_1.mouse.microsoft_wireless_mouse' - 'n'
