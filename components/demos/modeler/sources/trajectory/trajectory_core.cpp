@@ -157,10 +157,16 @@ class TrajectoryBuilder
         DoIterEx ();
       }*/
 
+      size_t print_step = iterations_count / 10000;
+
       for (size_t i = 0; i < iterations_count; i++)
       {
+        if (!(i % print_step))
+          printf ("\rProgress: %.2f%%", (float)i / iterations_count * 100.f);
+
         DoIterEx ();
       }
+      printf ("\rProgress: 100.00%%\n");
 //      Section3D (200, 1.02);
     }  
 
@@ -200,7 +206,7 @@ class TrajectoryBuilder
         line_start.color.b    = 0.2f;
         line_start.color.a    = 1.f;
         
-        float direction = point.side ? 1.0f : -1.0f;
+        float direction = point.envelope_side ? 1.0f : -1.0f;
 
         line_end.position.x = line_start.position.x + direction * normal [0] * 0.1f;
         line_end.position.y = line_start.position.y + direction * normal [1] * 0.1f;
@@ -335,6 +341,8 @@ class TrajectoryBuilder
         point3d[elmnts].side = koef > 1;
         point3d[elmnts].nu1  = model_data.nu1;
         point3d[elmnts].nu3  = model_data.nu3;
+
+        point3d[elmnts].envelope_side = ii > 0;
         
         if (MaxSize > CurSize)
         {
@@ -357,6 +365,8 @@ class TrajectoryBuilder
 
         point3d[elmnts].nu1  = model_data.nu1;
         point3d[elmnts].nu3  = model_data.nu3;
+        
+        point3d[elmnts].envelope_side = ii > 0;
         
         if (MaxSize > CurSize)
         {
@@ -586,6 +596,7 @@ class TrajectoryBuilder
       float   nrmls[3];
       double  rgb[3],nu1,nu3;
       bool    side;
+      bool    envelope_side;
     };
 
   private:    
