@@ -91,7 +91,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 ///Обработка события создания дескриптора формы
     void OnCreateHandle (System::Object^, EventArgs^)
     {
-      printf ("ChildFormImpl::OnCreateHandle (%p)\n", (const void*)Handle);
+//      printf ("ChildFormImpl::OnCreateHandle (%p)\n", (const void*)Handle);
       
         //обновление параметров
 
@@ -106,7 +106,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 ///Обработка события уничтожения дескриптора формы
     void OnDestroyHandle (System::Object^, EventArgs^)
     {
-      printf ("ChildFormImpl::OnDestroyHandle (%p)\n", (const void*)Handle);
+//      printf ("ChildFormImpl::OnDestroyHandle (%p)\n", (const void*)Handle);
 
       child_window.Show (false);
       child_window.SetParent (0);
