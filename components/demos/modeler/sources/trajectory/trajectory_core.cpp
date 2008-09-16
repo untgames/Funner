@@ -159,6 +159,9 @@ class TrajectoryBuilder
 
       size_t print_step = iterations_count / 10000;
 
+      if (!print_step)
+        print_step++;
+
       for (size_t i = 0; i < iterations_count; i++)
       {
         if (!(i % print_step))
