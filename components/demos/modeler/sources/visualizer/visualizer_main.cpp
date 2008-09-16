@@ -51,8 +51,9 @@ namespace
     Константы
 */
 
-const char* MODEL_MESH_NAME             = "media/mesh/trajectory.xmesh";
-const char* MODEL2_MESH_NAME            = "media/mesh/envelope.xmesh";
+const char* TRAJECTORY_MESH_NAMES[]     = {"media/mesh/trajectory1.xmesh", "media/mesh/trajectory2.xmesh", "media/mesh/trajectory3.xmesh", 
+                                           "media/mesh/trajectory4.xmesh", "media/mesh/trajectory5.xmesh"};
+const char* ENVELOPE_MESH_NAME          = "media/mesh/envelope.xmesh";
 const char* ENGINE_CONFIGURATION_BRANCH = "Configuration";
 const char* WINDOW_CONFIGURATION_BRANCH = "Configuration.Window";
 const char* SCREEN_ATTACHMENT_NAME      = "MainScreen";
@@ -164,17 +165,20 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
   public:
     MyApplicationServer ()
     {
-      VisualModel::Pointer model = VisualModel::Create ();
+      for (size_t i = 0; i < sizeof (TRAJECTORY_MESH_NAMES) / sizeof (TRAJECTORY_MESH_NAMES[0]); i++)
+      {
+        VisualModel::Pointer trajectory = VisualModel::Create ();
+
+        trajectory->SetMeshName (TRAJECTORY_MESH_NAMES[i]);
+        trajectory->SetName     ("Trajectory");
+        trajectory->BindToScene (scene);
+
+        trajectory->Scale (-2.f, 2.f, 2.f);
+      }
+      
       VisualModel::Pointer envelope = VisualModel::Create ();
 
-      model->SetMeshName (MODEL_MESH_NAME);
-      model->SetName     ("Trajectory");
-      model->BindToScene (scene);
-
-//      model->Scale (-2.01f, 2.01f, 2.01f);
-      model->Scale (-2.f, 2.f, 2.f);
-
-      envelope->SetMeshName (MODEL2_MESH_NAME);
+      envelope->SetMeshName (ENVELOPE_MESH_NAME);
       envelope->BindToScene (scene);
       envelope->SetName     ("Envelope");
 

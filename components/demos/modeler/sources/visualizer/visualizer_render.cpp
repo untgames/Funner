@@ -179,8 +179,8 @@ struct RenderViewVisitor: public xtl::visitor<void, VisualModel>
 //      device->OSSetBlendState (trajectory_blend_state);      
     }
 
-    shader_parameters->object_tm = math::rotatef (angle, 0, 0, 1) * 
-                                   math::rotatef (angle * 0.2f, 1, 0, 0) * model.WorldTM ();
+    shader_parameters->object_tm = math::rotatef (angle, 0, 0, 1) * math::rotatef (angle, 0, 1, 0) * 
+                                   math::rotatef (angle, 1, 0, 0) * model.WorldTM ();
 
     cb->SetData (0, sizeof *shader_parameters, shader_parameters);
 
