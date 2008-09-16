@@ -283,17 +283,25 @@ class FppProgramParser
       if (params_iter)
       {        
         ParseParameterDeclarations (params_iter, "float",    FppDynamicParameterType_Float, 1);
-        ParseParameterDeclarations (params_iter, "int",      FppDynamicParameterType_Int, 1);
         ParseParameterDeclarations (params_iter, "float3",   FppDynamicParameterType_Float, 3);
-        ParseParameterDeclarations (params_iter, "int3",     FppDynamicParameterType_Int, 3);
         ParseParameterDeclarations (params_iter, "float4",   FppDynamicParameterType_Float, 4);
-        ParseParameterDeclarations (params_iter, "int4",     FppDynamicParameterType_Int, 4);
         ParseParameterDeclarations (params_iter, "float4x4", FppDynamicParameterType_Float, 16);
+        ParseParameterDeclarations (params_iter, "int",      FppDynamicParameterType_Int, 1);
+        ParseParameterDeclarations (params_iter, "int3",     FppDynamicParameterType_Int, 3);
+        ParseParameterDeclarations (params_iter, "int4",     FppDynamicParameterType_Int, 4);
         ParseParameterDeclarations (params_iter, "int4x4",   FppDynamicParameterType_Int, 16);
 
         if (params_iter->NextNamesake ())
           parse_log.Warning (params_iter->NextNamesake (), "Second (and others) 'Parameters' block(s) ignored");
       }
+      
+        //разбор параметров растеризации
+
+      ParseFloatValues   (program_iter, "PointSize",          offsetof (FppState, rasterization.point_size), 1);
+      ParseFloatValues   (program_iter, "LineWidth",          offsetof (FppState, rasterization.line_width), 1);
+      ParseIntegerValues (program_iter, "LineStippleFactor",  offsetof (FppState, rasterization.line_stipple_factor), 1);
+      ParseIntegerValues (program_iter, "LineStipplePattern", offsetof (FppState, rasterization.line_stipple_pattern), 1);
+
 
         //разбор параметров трансформации
 
@@ -403,6 +411,11 @@ FppProgram::FppProgram (const ContextManager& manager, const ShaderDesc& shader_
     identity_matrix (texmap.transform);
     identity_matrix (texmap.texgen);
   }
+
+  base_state.rasterization.point_size           = 1.0f;  
+  base_state.rasterization.line_width           = 1.0f;
+  base_state.rasterization.line_stipple_pattern = ~0;
+  base_state.rasterization.line_stipple_factor  = 1;
 
     //разбор fpp-шейдера
 

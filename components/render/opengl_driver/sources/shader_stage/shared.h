@@ -30,12 +30,13 @@ namespace opengl
 enum ShadingStageCacheEntry
 {
   CacheEntry_UsedProgram = CacheEntry_ShadingStagePrivateFirst, //ID текущей используемой программы
-  CacheEntry_FppViewerStateHash,   //хэш параметров наблюдателя
-  CacheEntry_FppObjectStateHash,   //хэш параметров объекта
-  CacheEntry_FppMaterialStateHash, //хэш параметров материала
-  CacheEntry_FppLightingStateHash, //хэш параметров освещения
-  CacheEntry_FppTexmapsStateHash,  //хэш параметров текстурирования
-  CacheEntry_FppModesStateHash,    //хэш режимов визуализации
+  CacheEntry_FppViewerStateHash,             //хэш параметров наблюдателя
+  CacheEntry_FppObjectStateHash,             //хэш параметров объекта
+  CacheEntry_FppRasterizationStateHash,      //хэш параметров растеризации
+  CacheEntry_FppMaterialStateHash,           //хэш параметров материала
+  CacheEntry_FppLightingStateHash,           //хэш параметров освещения
+  CacheEntry_FppTexmapsStateHash,            //хэш параметров текстурирования
+  CacheEntry_FppModesStateHash,              //хэш режимов визуализации
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -217,13 +217,14 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
   const ContextCaps& caps = GetCaps ();
                    
-  const size_t current_program       = GetContextCacheValue (CacheEntry_UsedProgram),
-               current_viewer_hash   = GetContextCacheValue (CacheEntry_FppViewerStateHash),
-               current_object_hash   = GetContextCacheValue (CacheEntry_FppObjectStateHash),
-               current_material_hash = GetContextCacheValue (CacheEntry_FppMaterialStateHash),
-               current_lighting_hash = GetContextCacheValue (CacheEntry_FppLightingStateHash),
-               current_texmaps_hash  = GetContextCacheValue (CacheEntry_FppTexmapsStateHash),
-               current_modes_hash    = GetContextCacheValue (CacheEntry_FppModesStateHash);
+  const size_t current_program            = GetContextCacheValue (CacheEntry_UsedProgram),
+               current_viewer_hash        = GetContextCacheValue (CacheEntry_FppViewerStateHash),
+               current_object_hash        = GetContextCacheValue (CacheEntry_FppObjectStateHash),
+               current_rasterization_hash = GetContextCacheValue (CacheEntry_FppRasterizationStateHash),
+               current_material_hash      = GetContextCacheValue (CacheEntry_FppMaterialStateHash),
+               current_lighting_hash      = GetContextCacheValue (CacheEntry_FppLightingStateHash),
+               current_texmaps_hash       = GetContextCacheValue (CacheEntry_FppTexmapsStateHash),
+               current_modes_hash         = GetContextCacheValue (CacheEntry_FppModesStateHash);
 
     //отключение glsl-шейдеров  
 
@@ -302,6 +303,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
        need_update_modes            = current_modes_hash != modes_hash,
        need_update_viewer           = current_viewer_hash != viewer_hash,
        need_update_object           = current_object_hash != object_hash,       
+       need_update_rasterization    = current_rasterization_hash != rasterization_hash,
        need_update_material         = current_material_hash != material_hash,
        need_update_lighting         = current_lighting_hash != lighting_hash || need_update_viewer,
        need_update_texmaps          = current_texmaps_hash != texmaps_hash;    
@@ -315,6 +317,29 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
     SetContextCacheValue (CacheEntry_FppModesStateHash, modes_hash);
   }    
+  
+    //установка параметров растеризации
+    
+  if (need_update_rasterization)
+  {
+    float point_size = fpp_state.rasterization.point_size,
+          line_width = fpp_state.rasterization.line_width;
+          
+    unsigned short line_stipple_factor = fpp_state.rasterization.line_stipple_factor;        
+
+    if (point_size <= 0.0f)        point_size = 1.0f;
+    if (line_width <= 0.0f)        line_width = 1.0f;    
+    if (line_stipple_factor < 1)   line_stipple_factor = 1;
+    if (line_stipple_factor > 255) line_stipple_factor = 255;
+
+    glPointSize (point_size);
+    glLineWidth (line_width);
+    
+      //проблемы с поддержкой на MSOGL
+//    glLineStipple (line_stipple_factor, static_cast<unsigned short> (fpp_state.rasterization.line_stipple_pattern));
+
+    SetContextCacheValue (CacheEntry_FppRasterizationStateHash, rasterization_hash);
+  }
 
     //установка параметров источников освещения
 
@@ -589,10 +614,11 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
 void FppBindableProgram::UpdateHashes ()
 {
-  viewer_hash   = crc32 (&fpp_state.viewer, sizeof (fpp_state.viewer));
-  object_hash   = crc32 (&fpp_state.object, sizeof (fpp_state.object));
-  material_hash = crc32 (&fpp_state.material, sizeof (fpp_state.material));
-  lighting_hash = crc32 (fpp_state.lights, sizeof (fpp_state.lights));
-  texmaps_hash  = crc32 (fpp_state.maps, sizeof (fpp_state.maps));
-  modes_hash    = crc32 (&fpp_state.modes, sizeof (fpp_state.modes));
+  viewer_hash        = crc32 (&fpp_state.viewer, sizeof (fpp_state.viewer));
+  object_hash        = crc32 (&fpp_state.object, sizeof (fpp_state.object));
+  rasterization_hash = crc32 (&fpp_state.rasterization, sizeof (fpp_state.rasterization));
+  material_hash      = crc32 (&fpp_state.material, sizeof (fpp_state.material));
+  lighting_hash      = crc32 (fpp_state.lights, sizeof (fpp_state.lights));
+  texmaps_hash       = crc32 (fpp_state.maps, sizeof (fpp_state.maps));
+  modes_hash         = crc32 (&fpp_state.modes, sizeof (fpp_state.modes));
 }

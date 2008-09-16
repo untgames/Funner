@@ -151,16 +151,28 @@ struct ModesDesc
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметры растеризации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct RasterizationDesc
+{
+  float point_size;           //размер точки
+  float line_width;           //ширина линии
+  int   line_stipple_factor;  //количество повторений пикселя в маске линии
+  int   line_stipple_pattern; //маска линии
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Состояние фиксированной программы шейдинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct FppState
 {
-  ModesDesc    modes;                              //режимы визуализации
-  ViewerDesc   viewer;                             //параметры наблюдателя
-  ObjectDesc   object;                             //параметры объекта
-  LightDesc    lights [FPP_MAX_LIGHTS_COUNT];      //параметры источников освещения
-  MaterialDesc material;                           //праметры материала
-  TexmapDesc   maps [DEVICE_SAMPLER_SLOTS_COUNT];  //параметры текстурирования
+  ModesDesc         modes;                              //режимы визуализации
+  ViewerDesc        viewer;                             //параметры наблюдателя
+  ObjectDesc        object;                             //параметры объекта
+  RasterizationDesc rasterization;                      //параметры растеризации
+  LightDesc         lights [FPP_MAX_LIGHTS_COUNT];      //параметры источников освещения
+  MaterialDesc      material;                           //праметры материала
+  TexmapDesc        maps [DEVICE_SAMPLER_SLOTS_COUNT];  //параметры текстурирования
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,6 +268,7 @@ class FppBindableProgram: virtual public IBindableProgram, public ContextObject
     Matrix4f        view_object_matrix; //композиция преобразований вида и объекта
     size_t          viewer_hash;        //хэш параметров наблюдателя
     size_t          object_hash;        //хэш параметров объекта
+    size_t          rasterization_hash; //хэш параметров растеризации
     size_t          material_hash;      //хэш параметров материала
     size_t          lighting_hash;      //хэш параметров освещения
     size_t          texmaps_hash;       //хэш параметров текстурирования
