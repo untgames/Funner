@@ -4,6 +4,8 @@ Parameters
   int myLightEnable
 }
 
+LineWidth 12
+
 ProjectionMatrix myProjMatrix
 ViewMatrix       myViewMatrix
 ObjectMatrix     myObjectMatrix
