@@ -74,6 +74,6 @@ struct DrawPrimitive
 typedef std::vector<DrawVertex>    DrawVertexArray;
 typedef std::vector<DrawPrimitive> DrawPrimitiveArray;
 
-void BuildTrajectory (const ModelData& model_data, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives);
+void BuildTrajectory (const ModelData& model_data, size_t iterations_count, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives);
 
 #endif

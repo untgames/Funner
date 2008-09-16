@@ -106,7 +106,7 @@ void free_vector(double *v,int nl,int)
 class TrajectoryBuilder
 {
   public:
-    TrajectoryBuilder (const ModelData& in_model_data) : model_data (in_model_data) 
+    TrajectoryBuilder (const ModelData& in_model_data, size_t iterations_count) : model_data (in_model_data) 
     {
       MaxSize = 900000; //?????
 
@@ -157,7 +157,7 @@ class TrajectoryBuilder
         DoIterEx ();
       }*/
 
-      for (size_t i = 0; i < 20000; i++)
+      for (size_t i = 0; i < iterations_count; i++)
       {
         DoIterEx ();
       }
@@ -632,9 +632,9 @@ void LoadModelData (const char* file_name, ModelData& model_data)
     Построение мега-поверхности
 */
 
-void BuildTrajectory (const ModelData& model_data, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
+void BuildTrajectory (const ModelData& model_data, size_t iterations_count, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
 {
-  TrajectoryBuilder builder (model_data);
+  TrajectoryBuilder builder (model_data, iterations_count);
   
   builder.Convert (out_vertices, out_primitives);
 }
