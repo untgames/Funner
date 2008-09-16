@@ -171,7 +171,8 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       model->SetName     ("Trajectory");
       model->BindToScene (scene);
 
-      model->Scale (-2.01f, 2.01f, 2.01f);
+//      model->Scale (-2.01f, 2.01f, 2.01f);
+      model->Scale (-2.f, 2.f, 2.f);
 
       envelope->SetMeshName (MODEL2_MESH_NAME);
       envelope->BindToScene (scene);

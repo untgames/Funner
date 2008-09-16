@@ -199,10 +199,12 @@ class TrajectoryBuilder
         line_start.color.g    = 0.2f;
         line_start.color.b    = 0.2f;
         line_start.color.a    = 1.f;
+        
+        float direction = point.side ? 1.0f : -1.0f;
 
-        line_end.position.x = line_start.position.x + normal [0] * 0.1f;
-        line_end.position.y = line_start.position.y + normal [1] * 0.1f;
-        line_end.position.z = line_start.position.z + normal [2] * 0.1f;
+        line_end.position.x = line_start.position.x + direction * normal [0] * 0.1f;
+        line_end.position.y = line_start.position.y + direction * normal [1] * 0.1f;
+        line_end.position.z = line_start.position.z + direction * normal [2] * 0.1f;
         line_end.color.r    = (float)point3d[i].rgb[0];
         line_end.color.g    = (float)point3d[i].rgb[1];
         line_end.color.b    = (float)point3d[i].rgb[2];
