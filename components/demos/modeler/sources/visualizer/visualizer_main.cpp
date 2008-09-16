@@ -2,14 +2,17 @@
 #include <cfloat>
 #include <exception>
 
+#include <xtl/any.h>
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/iterator.h>
 #include <xtl/reference_counter.h>
 #include <xtl/string.h>
 
 #include <common/log.h>
+#include <common/strlib.h>
 
 #include <syslib/application.h>
 #include <syslib/timer.h>
@@ -51,8 +54,7 @@ namespace
     Константы
 */
 
-const char* TRAJECTORY_MESH_NAMES[]     = {"media/mesh/trajectory1.xmesh", "media/mesh/trajectory2.xmesh", "media/mesh/trajectory3.xmesh", 
-                                           "media/mesh/trajectory4.xmesh", "media/mesh/trajectory5.xmesh"};
+const char* TRAJECTORIES_REGISTRY_NAME  = "Configuration.Trajectories";
 const char* ENVELOPE_MESH_NAME          = "media/mesh/envelope.xmesh";
 const char* ENGINE_CONFIGURATION_BRANCH = "Configuration";
 const char* WINDOW_CONFIGURATION_BRANCH = "Configuration.Window";
@@ -165,11 +167,22 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
   public:
     MyApplicationServer ()
     {
-      for (size_t i = 0; i < sizeof (TRAJECTORY_MESH_NAMES) / sizeof (TRAJECTORY_MESH_NAMES[0]); i++)
+      common::VarRegistry trajectories_registry (TRAJECTORIES_REGISTRY_NAME);
+      common::VarRegistry current_trajectory;
+
+      for (common::VarRegistry::Iterator iter = trajectories_registry.CreateIterator (); iter; ++iter)
       {
+        current_trajectory.Open (common::format ("%s.%s", trajectories_registry.BranchName (), iter->Name ()).c_str ());
+
+        if (!current_trajectory.HasVariable ("Filename"))
+        {
+          printf ("Can't load trajectory from branch '%s': no 'Filename' property\n", current_trajectory.BranchName ());
+          continue;
+        }
+
         VisualModel::Pointer trajectory = VisualModel::Create ();
 
-        trajectory->SetMeshName (TRAJECTORY_MESH_NAMES[i]);
+        trajectory->SetMeshName (current_trajectory.GetValue ("Filename").cast<stl::string> ().c_str ());
         trajectory->SetName     ("Trajectory");
         trajectory->BindToScene (scene);
 

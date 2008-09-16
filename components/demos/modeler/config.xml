@@ -27,4 +27,11 @@
       FullScreen   = "0"
     />  
   </Window>
+  <Trajectories>
+    <auto Filename="media/mesh/trajectory1.xmesh"/>
+    <auto Filename="media/mesh/trajectory2.xmesh"/>
+    <auto Filename="media/mesh/trajectory3.xmesh"/>
+    <auto Filename="media/mesh/trajectory4.xmesh"/>
+    <auto Filename="media/mesh/trajectory5.xmesh"/>
+  </Trajectories>
 </Configuration>

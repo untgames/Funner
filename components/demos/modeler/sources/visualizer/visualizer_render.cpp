@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <ctime>
 #include <exception>
 
 #include <stl/hash_map>
@@ -326,6 +327,17 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
         cb = BufferPtr (device.CreateBuffer (cb_desc), false);
       }
 
+      render::low_level::RasterizerDesc rs_desc;
+
+      memset (&rs_desc, 0, sizeof (rs_desc));
+
+      rs_desc.fill_mode  = render::low_level::FillMode_Wireframe;
+      rs_desc.cull_mode  = render::low_level::CullMode_Back;      
+
+      xtl::com_ptr<render::low_level::IRasterizerState> rasterizer (device.CreateRasterizerState (rs_desc), false);
+
+      device.RSSetState (rasterizer.get ());
+
       MyShaderParameters my_shader_parameters;
       
       my_shader_parameters.proj_tm      = camera->ProjectionMatrix ();
@@ -340,7 +352,14 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
 
       scene->VisitEach (visitor);
 
-      current_angle += 0.01f;
+      static clock_t last = 0;
+
+      if (clock () - last > CLK_TCK / 50)
+      {
+        current_angle += 0.1f * float (clock () - last) / CLK_TCK;
+      
+        last = clock ();
+      }
     }
 
 ///Подсчёт ссылок
