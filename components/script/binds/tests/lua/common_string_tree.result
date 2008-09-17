@@ -71,10 +71,22 @@ Children
         Node 'ChildLevelTwo'
         Attributes:
         0 = Attribute1
-        1 = Attribute2
-        2 = Attribute3
+        1 = Mega Attribute
+        2 = Attribute2
+        3 = Attribute3
         End of attributes
         Children
+            Node 'ChildInAttributes'
+            Attributes:
+            End of attributes
+            Children
+                Node 'Name'
+                Attributes:
+                0 = ChildInAttributes
+                End of attributes
+                Children
+                End of children
+            End of children
         End of children
     End of children
 End of children
@@ -85,7 +97,8 @@ End of children
       0 1 2 3 4 5
     </Array>
     <ChildLevelTwo>
-      Attribute1 Attribute2 Attribute3
+      Attribute1 Mega Attribute Attribute2 Attribute3
+      <ChildInAttributes Name="ChildInAttributes"/>
     </ChildLevelTwo>
   </ChildLevelOne>
 </RootNode>

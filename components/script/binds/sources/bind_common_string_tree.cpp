@@ -6,11 +6,11 @@ using namespace xtl;
 namespace
 {
 
-const char* LOG_NAME = "script.binds.common_string_node"; //имя потока протоколирования
+const char* LOG_NAME = "script.binds.common_string_node"; //шь  яюЄюър яЁюЄюъюышЁютрэш 
 
 const char* COMMON_STRING_TREE_LIBRARY = "StringNode";
 
-//получение протокола
+//яюыєўхэшх яЁюЄюъюыр
 Log& get_log ()
 {
   static Log log (LOG_NAME);
@@ -19,7 +19,7 @@ Log& get_log ()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Узел дерева строк
+///╙чхы фхЁхтр ёЄЁюъ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 {
@@ -28,7 +28,7 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание копии
+///╤ючфрэшх ъюяшш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Pointer Clone ()
     {
@@ -46,7 +46,7 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение имени/переименование
+///╧юыєўхэшх шьхэш/яхЁхшьхэютрэшх
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* Name () const
     {
@@ -62,7 +62,7 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с атрибутами
+///╨рсюЄр ё рЄЁшсєЄрьш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t AttributesCapacity () const
     {
@@ -161,7 +161,7 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с детьмя
+///╨рсюЄр ё фхЄ№ь 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t ChildrenCapacity () const
     {
@@ -223,7 +223,7 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Загрузка/сохранение
+///╟руЁєчър/ёюїЁрэхэшх
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static Pointer LoadXml (const char* file_name)
     {
@@ -262,7 +262,7 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание нового узла
+///╤ючфрэшх эютюую єчыр
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static Pointer Create ()
     {
@@ -270,7 +270,7 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск узла
+///╧юшёъ єчыр
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Pointer FindNode (const char* name_to_find, bool create_if_not_exist)
     {
@@ -386,8 +386,6 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
                           finish (&*attribute_offsets.end (), attributes.c_str ());
 
         writer.WriteData (xtl::make_iterator_range (start, finish));
-
-        return;
       }
 
       for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
@@ -437,14 +435,14 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
     typedef stl::vector<Pointer> ChildArray;
 
   private:
-    stl::string          name;                 //имя узла
-    stl::string          attributes;           //значения атрибутов
-    AttributeOffsetArray attribute_offsets;    //массив смещений атрибутов
-    ChildArray           childs;               //дети
+    stl::string          name;                 //шь  єчыр
+    stl::string          attributes;           //чэрўхэш  рЄЁшсєЄют
+    AttributeOffsetArray attribute_offsets;    //ьрёёшт ёьх∙хэшщ рЄЁшсєЄют
+    ChildArray           childs;               //фхЄш
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск дочернего узла по имени
+///╧юшёъ фюўхЁэхую єчыр яю шьхэш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 StringNode::Pointer find (StringNode* node, const char* name)
 {
@@ -452,7 +450,7 @@ StringNode::Pointer find (StringNode* node, const char* name)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение значения нулевого атрибута дочернего узла с именем name
+///╧юыєўхэшх чэрўхэш  эєыхтюую рЄЁшсєЄр фюўхЁэхую єчыр ё шьхэхь name
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const char* get (StringNode* node, const char* name)
 {
@@ -499,18 +497,18 @@ namespace binds
 {
 
 /*
-    Регистрация библиотеки работы с деревьями строк
+    ╨хушёЄЁрЎш  сшсышюЄхъш ЁрсюЄ√ ё фхЁхт№ ьш ёЄЁюъ
 */
 
 void bind_common_string_tree (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (COMMON_STRING_TREE_LIBRARY);
 
-    //регистрация функций создания
+    //ЁхушёЄЁрЎш  ЇєэъЎшщ ёючфрэш 
 
   lib.Register ("Create", make_invoker (&StringNode::Create));
 
-    //регистрация операций
+    //ЁхушёЄЁрЎш  юяхЁрЎшщ
 
   lib.Register ("set_Name",               make_invoker (&StringNode::SetName));
   lib.Register ("get_Name",               make_invoker (&StringNode::Name));
@@ -542,7 +540,7 @@ void bind_common_string_tree (Environment& environment)
                                                      make_invoker(implicit_cast<const char* (*) (StringNode*, const char*)> (&get))));
   lib.Register ("Set",                 make_invoker (&set));
 
-    //регистрация типов данных
+    //ЁхушёЄЁрЎш  Єшяют фрээ√ї
 
   environment.RegisterType<StringNode> (COMMON_STRING_TREE_LIBRARY);
 }

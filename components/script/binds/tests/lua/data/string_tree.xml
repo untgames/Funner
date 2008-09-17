@@ -2,9 +2,11 @@
 <RootNode Name="Root Node Name" Property1="Property1">
   <ChildLevelOne>
     <Array>0 1 2 3 4 5</Array>   
-    <ChildLevelTwo>
+    <ChildLevelTwo>      
       Attribute1
+      'Mega Attribute'
       Attribute2
+      <ChildInAttributes Name="ChildInAttributes"/>
       Attribute3
     </ChildLevelTwo>
   </ChildLevelOne>
