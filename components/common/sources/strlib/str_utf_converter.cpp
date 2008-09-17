@@ -1,7 +1,11 @@
 #include <wchar.h>
 #include <string.h>
+
 #include <stl/string>
+
 #include <xtl/common_exceptions.h>
+#include <xtl/string.h>
+
 #include <common/utf_converter.h>
 
 namespace common
@@ -586,6 +590,164 @@ stl::string tostring (const stl::wstring& string)
     return "";
 
   return tostring (&string [0], string.size ());
+}
+
+/*
+   —жатие UTF16 строк
+*/
+
+size_t utf16_decompress (const wchar_t* source, size_t source_length, char* destination, size_t max_destination_length)
+{
+  if (!source)
+  {
+    if (source_length)
+      throw xtl::make_null_argument_exception ("common::utf16_decompress", "source");
+
+    return 0;
+  }
+
+  if (!destination)
+  {
+    if (max_destination_length)
+      throw xtl::make_null_argument_exception ("common::utf16_decompress", "destination");
+
+    return 0; 
+  }
+
+  size_t count = source_length * 6 + 1;
+  
+  if (count > max_destination_length)
+    count = max_destination_length;
+
+  if (!count)
+    return 0;
+
+  char* dst = destination;
+
+  count = (count - 1) / 6;
+
+  for (const char* src = reinterpret_cast<const char*> (source); count; src += 2, dst += 6, count--)
+    xtl::xsnprintf (dst, 7, "%%%02X%%%02X", src[0], src[1]);
+
+  *dst = 0;
+
+  return (dst - destination) / 6;
+}
+
+size_t utf16_decompress (const wchar_t* source, char* destination, size_t max_destination_length)
+{
+  if (!source)
+    throw xtl::make_null_argument_exception ("common::utf16_decompress (const wchar_t*, char*, size_t)", "source");
+
+  return utf16_decompress (source, xtl::xstrlen (source), destination, max_destination_length);
+}
+
+size_t utf16_compress (const char* source, size_t source_length, wchar_t* destination, size_t max_destination_length)
+{
+  if (!source)
+  {
+    if (source_length)
+      throw xtl::make_null_argument_exception ("common::utf16_compress", "source");
+
+    return 0;
+  }
+
+  if (!destination)
+  {
+    if (max_destination_length)
+      throw xtl::make_null_argument_exception ("common::utf16_compress", "destination");
+
+    return 0; 
+  }
+
+  size_t count = source_length / 6 + 1;
+  
+  if (count > max_destination_length)
+    count = max_destination_length;
+
+  if (!count)
+    return 0;
+
+  count--;
+
+  wchar_t* dst = destination;
+
+  char* dummy_ptr;
+
+  char decompressed_buffer[5] = {0, 0, 0, 0, 0};
+
+  for (; count; source += 6, dst++, count--)
+  {
+    if ((source[0] != '%') || (source[3] != '%'))
+      break;
+
+    decompressed_buffer[0] = source[1];
+    decompressed_buffer[1] = source[2];
+    decompressed_buffer[2] = source[4];
+    decompressed_buffer[3] = source[5];
+
+    *dst = (wchar_t)strtoul (decompressed_buffer, &dummy_ptr, 16);
+  }
+
+  *dst = 0;
+
+  return (dst - destination) * 6;
+}
+
+size_t utf16_compress (const char* source, wchar_t* destination, size_t max_destination_length)
+{
+  if (!source)
+    throw xtl::make_null_argument_exception ("common::utf16_compress (const char*, wchar_t*, size_t)", "source");
+
+  return utf16_compress (source, xtl::xstrlen (source), destination, max_destination_length);
+}
+
+stl::string utf16_decompress (const wchar_t* source, size_t source_length)
+{
+  stl::string result;
+
+  result.fast_resize (source_length * 6);
+
+  result.resize (utf16_decompress (source, source_length, &result[0], result.length () + 1) * 6);
+
+  return result;
+}
+
+stl::string utf16_decompress (const wchar_t* source)
+{
+  if (!source)
+    throw xtl::make_null_argument_exception ("common::utf16_decompress (const wchar_t*)", "source");
+
+  return utf16_decompress (source, xtl::xstrlen (source));
+}
+
+stl::string utf16_decompress (const stl::wstring& source)
+{
+  return utf16_decompress (source.c_str (), source.length ());
+}
+
+stl::wstring utf16_compress (const char* source, size_t source_length)
+{
+  stl::wstring result;
+
+  result.fast_resize (source_length / 6);
+
+  result.resize (utf16_compress (source, source_length, &result[0], result.length () + 1) / 6);
+
+  return result;
+}
+
+stl::wstring utf16_compress (const char* source)
+{
+  if (!source)
+    throw xtl::make_null_argument_exception ("common::utf16_compress (const char*)", "source");
+
+  return utf16_compress (source, xtl::xstrlen (source));
+}
+
+stl::wstring utf16_compress (const stl::string& source)
+{
+  return utf16_compress (source.c_str (), source.length ());
 }
 
 } //namespace common

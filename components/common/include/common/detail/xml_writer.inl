@@ -14,6 +14,42 @@ inline void xml_write (OutputTextStream& stream, const T& value, const char* for
   write (stream, value, format);
 }
 
+template <class T>
+inline void xml_write_data (OutputTextStream& stream, const T& value)
+{
+  write (stream, value);
+}
+
+template <class T>
+inline void xml_write_data (OutputTextStream& stream, const T& value, const char* format)
+{
+  write (stream, value, format);
+}
+
+inline void xml_write_data (OutputTextStream& stream, const char* value)
+{
+  write (stream, '\'');
+  write (stream, value);
+  write (stream, '\'');
+}
+
+inline void xml_write_data (OutputTextStream& stream, const char* value, const char* format)
+{
+  xml_write_data (stream, value);
+}
+
+template <class Char, class Traits, class Allocator>
+inline void xml_write_data (OutputTextStream& stream, const stl::basic_string<Char, Traits, Allocator>& value)
+{
+  xml_write_data (stream, value.c_str ());
+}
+
+template <class Char, class Traits, class Allocator>
+inline void xml_write_data (OutputTextStream& stream, const stl::basic_string<Char, Traits, Allocator>& value, const char* format)
+{
+  xml_write_data (stream, value);
+}
+
 /*
     Сериализация атрибутов
 */
@@ -63,7 +99,7 @@ inline void XmlWriter::WriteData (const T& value)
   
   try
   {
-    xml_write (Stream (), value);
+    xml_write_data (Stream (), value);
     EndData   ();
   }
   catch (...)
@@ -80,7 +116,7 @@ inline void XmlWriter::WriteData (const T& value, const char* format)
   
   try
   {
-    xml_write (Stream (), value, format);
+    xml_write_data (Stream (), value, format);
     EndData   ();
   }
   catch (...)
