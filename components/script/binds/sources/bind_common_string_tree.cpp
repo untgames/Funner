@@ -351,6 +351,10 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 
       XmlWriter::Scope scope (writer, name.c_str ());
       
+      for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
+        if ((*iter)->attribute_offsets.size () == 1)
+          (*iter)->SaveNode (writer);
+
       if (attribute_offsets.size () > 1)
       {
         struct AttributeIterator: public stl::iterator<stl::forward_iterator_tag, const char*>
@@ -389,7 +393,8 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
       }
 
       for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
-        (*iter)->SaveNode (writer);
+        if ((*iter)->attribute_offsets.size () != 1)
+          (*iter)->SaveNode (writer);
     }
 
     bool HasNode (StringNode* node)
@@ -457,10 +462,10 @@ const char* get (StringNode* node, const char* name)
   StringNode::Pointer find_node = node->FindNode (name, false);
 
   if (!find_node)
-    throw xtl::format_operation_exception ("script::binds::get (StringNode, const char*)", "No such node");
+    throw xtl::format_operation_exception ("script::binds::get (StringNode, const char*)", "There is no node '%s'", name);
 
   if (!find_node->AttributesCount ())
-    throw xtl::format_operation_exception ("script::binds::get (StringNode, const char*)", "Node hasn't attributes");
+    throw xtl::format_operation_exception ("script::binds::get (StringNode, const char*)", "Node '%s' hasn't attributes", name);
 
   return find_node->Attribute (0);
 }
