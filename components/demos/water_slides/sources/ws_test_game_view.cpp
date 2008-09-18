@@ -499,7 +499,7 @@ class TestView: public IGameView
         {
           Vertex& v = vertices [i][j];
 
-          v.position.z = next_field->U [i][j];
+          v.position.z = next_field->U [i][j] - 1;
           v.normal.x   = next_field->U [i-1][j] - next_field->U [i+1][j];
           v.normal.y   = next_field->U [i][j-1] - next_field->U [i][j+1];
 
