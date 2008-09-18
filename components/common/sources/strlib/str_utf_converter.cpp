@@ -681,10 +681,10 @@ size_t utf16_compress (const char* source, size_t source_length, wchar_t* destin
     if ((source[0] != '%') || (source[3] != '%'))
       break;
 
-    decompressed_buffer[0] = source[1];
-    decompressed_buffer[1] = source[2];
-    decompressed_buffer[2] = source[4];
-    decompressed_buffer[3] = source[5];
+    decompressed_buffer[0] = source[4];
+    decompressed_buffer[1] = source[5];
+    decompressed_buffer[2] = source[1];
+    decompressed_buffer[3] = source[2];
 
     *dst = (wchar_t)strtoul (decompressed_buffer, &dummy_ptr, 16);
   }
