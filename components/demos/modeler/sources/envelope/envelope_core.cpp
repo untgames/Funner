@@ -468,8 +468,16 @@ class SurfaceBuilder
       double uu,vv;
       Vertex sixpack, copy_six, copy_copy;      
 
+      size_t print_step = uanz / 10000;
+
+      if (!print_step)
+        print_step++;
+
       for (int u=0; u<uanz; u++)
       {
+        if (!(u % print_step))
+          printf ("\rProgress: %.2f%%", (float)u / uanz * 100.f);
+
         in = 0;
         
         for (int v=0;v<(vanz);v++)
@@ -596,7 +604,9 @@ class SurfaceBuilder
             in = 10;
           }        
         }
-      }            
+      }
+      
+      printf ("\rProgress: 100.00%%\n");
     }    
 };
 
