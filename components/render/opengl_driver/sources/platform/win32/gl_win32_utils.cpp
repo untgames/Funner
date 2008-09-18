@@ -80,15 +80,13 @@ void raise_error (const char* source)
 ///Проверка поддержки расширений
 stl::string get_wgl_extensions_string (const WglExtensionEntries& wgl_extension_entries, HDC device_context)
 {
-  stl::string extensions;
-    
   if (wgl_extension_entries.GetExtensionsStringARB)
-    extensions += wgl_extension_entries.GetExtensionsStringARB (device_context);
+    return wgl_extension_entries.GetExtensionsStringARB (device_context);
     
   if (wgl_extension_entries.GetExtensionsStringEXT)
-    extensions += wgl_extension_entries.GetExtensionsStringEXT ();
+    return wgl_extension_entries.GetExtensionsStringEXT ();
 
-  return extensions;
+  return "";
 }
 
 bool has_extension (const char* extensions_string, const char* extension)

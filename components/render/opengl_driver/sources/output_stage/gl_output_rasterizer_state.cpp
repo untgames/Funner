@@ -140,7 +140,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     cmd_list.Add (glDisable, GL_POLYGON_OFFSET_FILL);
     cmd_list.Add (glDisable, GL_POLYGON_OFFSET_LINE);
     cmd_list.Add (glDisable, GL_POLYGON_OFFSET_POINT);
-  }  
+  }
 
   if (in_desc.scissor_enable) cmd_list.Add (glEnable, GL_SCISSOR_TEST);
   else                        cmd_list.Add (glDisable, GL_SCISSOR_TEST);
