@@ -296,9 +296,9 @@ define process_target.application
 
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@export PATH="$$(call build_execution_path,$$($1.DLL_DIRS))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<)
+		@export PATH="$$(call build_execution_path,$$($1.DLL_DIRS))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
 
-  ifneq (,$$(filter $$($1.EXE_FILE),$$(files:%=$(DIST_BIN_DIR)/%.$(EXE_SUFFIX))))
+  ifneq (,$$(filter $$(files:%=$(DIST_BIN_DIR)/%.$(EXE_SUFFIX)),$$($1.EXE_FILE)))
     run: RUN.$1
   endif
 endef
