@@ -1,10 +1,10 @@
 Results of lua_properties_test:
 invoke result: 8
 after invoke: A(2)
-exception: Invalid argument <id>=0
+exception: Invalid argument <id>=12
     at set_id(A)
-    at script::lua::invoke_dispatch("my_library.set_id")
-    at lua-call [string "lua_f"](5)
-    at lua-call [string "lua_f"](5)
+    at script::lua::invoke_dispatch("my_library.set_id", [A(2)], 12.0000)
+    at [string "lua_f"](5)
+    at [string "lua_f"](5)
     at script::lua::Interpreter::Invoke
     at script::invoke("Lua 5.1.3","test2",...)

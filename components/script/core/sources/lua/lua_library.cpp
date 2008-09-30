@@ -45,17 +45,30 @@ int unsafe_invoke_dispatch (lua_State* state)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("script::lua::invoke_dispatch(\"%s\")", invoker_name);
+    stl::string stack;
+    
+    dump_stack (state, stack);
+    
+    exception.touch ("script::lua::invoke_dispatch(\"%s\", %s)", invoker_name, stack.c_str ());
     throw;
   }
   catch (xtl::bad_any_cast& exception)
   {
-    throw xtl::format_exception<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\")", invoker_name).c_str (),
-                             "%s: %s->%s", exception.what (), exception.source_type ().name (), exception.target_type ().name ());
+    stl::string stack;
+    
+    dump_stack (state, stack);    
+    
+    throw xtl::format_exception<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\", %s)", invoker_name).c_str (),
+      "%s: %s->%s", exception.what (), exception.source_type ().name (), exception.target_type ().name (), stack.c_str ());
   }
   catch (std::exception& exception)
   {
-    throw xtl::format_exception<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\")", invoker_name).c_str (), "%s", exception.what ());
+    stl::string stack;
+    
+    dump_stack (state, stack);
+
+    throw xtl::format_exception<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\", %s)", invoker_name).c_str (),
+      "%s", exception.what (), stack.c_str ());
   }
 
   return 0;

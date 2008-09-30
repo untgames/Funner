@@ -214,9 +214,10 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-int variant_destroy  (lua_State*); //удаление объекта вариантного типа данных
-int variant_tostring (lua_State*); //печать в строку состояния объекта пользовательского типа данных
-int safe_call        (lua_State*, int (*f)(lua_State*)); //безопасный вызов шлюза
+int  variant_destroy  (lua_State*); //удаление объекта вариантного типа данных
+int  variant_tostring (lua_State*); //печать в строку состояния объекта пользовательского типа данных
+int  safe_call        (lua_State*, int (*f)(lua_State*)); //безопасный вызов шлюза
+void dump_stack       (lua_State*, stl::string& buffer); //печать состояния стека
 
 }
 
