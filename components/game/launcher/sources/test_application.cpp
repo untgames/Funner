@@ -45,11 +45,11 @@ const size_t DEFAULT_FB_STENCIL_BITS  = 8;  //глубина буфера трафарета
 const size_t DEFAULT_FB_BUFFERS_COUNT = 2;  //количество буферов в цепочке обмена
 const size_t DEFAULT_FB_FULL_SCREEN_STATE = 0; //fullscreen по умолчанию
 
-static clock_t MOVE_PERIOD = CLOCKS_PER_SEC / 100;
+static clock_t MOVE_PERIOD = CLOCKS_PER_SEC / 500;
 
 const char* DEFAULT_DEVICE_INIT_STRING = ""; //строка инициализации устройства рендеринга
 
-const char* APPLICATION_LIBRARY = "static.Application";
+const char* APPLICATION_LIBRARY = "Application";
 
 /*
     Утилиты
@@ -223,19 +223,6 @@ struct TestApplication::Impl
     try
     {
       static clock_t last_time = clock ();
-      
-      static clock_t last     = 0;  
-      static size_t  last_fps = 0, frames_count = 0;
-    
-      if (clock () - last_fps > CLK_TCK)
-      {
-        printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
-
-        last_fps     = clock ();
-        frames_count = 0;
-      }
-
-      frames_count++;
 
       if (clock () - last_time > MOVE_PERIOD)
       {
