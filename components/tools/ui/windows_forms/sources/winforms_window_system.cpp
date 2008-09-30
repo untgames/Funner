@@ -14,7 +14,7 @@ const char* INTERPERTER_NAME                          = "lua";                  
 const char* FORM_LIBRARY_NAME                         = "Form";                 //им€ библиотеки шлюзов формы
 const char* MAIN_FORM_LIBRARY_NAME                    = "MainForm";             //им€ библиотеки шлюзов главной формы
 const char* CHILD_FORM_LIBRARY_NAME                   = "ChildForm";            //им€ библиотеки шлюзов дочерних форм
-const char* DOCK_STATE_LIBRARY_NAME                   = "static.DockState";     //им€ библиотеки перечислени€ допустимых состо€ний дока
+const char* DOCK_STATE_LIBRARY_NAME                   = "DockState";            //им€ библиотеки перечислени€ допустимых состо€ний дока
 const char* MENU_STRIP_ITEM_LIBRARY_NAME              = "MenuItem";             //им€ библиотеки шлюзов элементов меню
 const char* MENU_STRIP_LIBRARY_NAME                   = "MenuStrip";            //им€ библиотеки шлюзов цепочек меню
 const char* TOOL_STRIP_BUTTON_LIBRARY_NAME            = "ToolButton";           //им€ библиотеки шлюзов кнопок
@@ -296,7 +296,7 @@ void WindowSystem::RegisterInvokers ()
 
       //создание глобальной точки входа
 
-    InvokerRegistry& lib = shell_environment->Library ("static.Application");
+    InvokerRegistry& lib = shell_environment->Library ("Application");
 
       //регистраци€ свойств
 
