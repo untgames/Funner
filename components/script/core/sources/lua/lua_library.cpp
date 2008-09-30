@@ -97,7 +97,7 @@ int unsafe_variant_get_field (lua_State* state)
     throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found", lua_tostring (state, 2));
   }
 
-  bool is_static_call = lua_isuserdata (state, 1) == 0;  
+  bool is_static_call = lua_isuserdata (state, 1) == 0;
 
     //помещение аргумента вызова шлюза в стек
 
@@ -125,28 +125,30 @@ int unsafe_variant_set_field (lua_State* state)
   static const char* METHOD_NAME = "script::lua::variant_set_field";  
 
   if (!lua_getmetatable (state, 1))
-    throw xtl::format_exception<RuntimeException> (METHOD_NAME, "Bad '__newindex' call. Object isn't variant");        
-
-  lua_pushvalue (state, 2);
-  lua_rawget    (state, -2);
-
-  if (!lua_isnil (state, -1)) //если существует поле с указанным именем
-  {
-    lua_pop       (state, 1);  //удаляем результат предыдущего поиска
-    lua_pushvalue (state, 3);
-    lua_rawset    (state, -3);
-
-    return 1;
-  }
+    throw xtl::format_exception<RuntimeException> (METHOD_NAME, "Bad '__newindex' call. Object isn't variant");            
 
     //пытаемся найти поле с префиксом set_
 
-  lua_pop         (state, 1); //удаляем результат предыдущего поиска
   lua_pushfstring (state, "set_%s", lua_tostring (state, 2));
   lua_rawget      (state, -2);
 
   if (lua_isnil (state, -1)) //свойство с указанным именем не найдено
-    throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found (or read-only)", lua_tostring (state, 2));
+  {
+    lua_pop (state, 2); //удаление результата и метатаблицы
+    
+    if (!lua_istable (state, 3))
+      throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found (or read-only)", lua_tostring (state, 2));
+      
+      //добавление вложенной таблицы
+
+    lua_rawset (state, 1);
+
+    return 0;
+  }
+  
+    //удаление метатаблицы
+    
+  lua_remove (state, -2);
     
   bool is_static_call = lua_isuserdata (state, 1) == 0; //является ли вызов статическим    
   int  args_count     = is_static_call ? 1 : 2;
@@ -194,10 +196,11 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
     {"__newindex", &variant_set_field},
     {0, 0}
   };  
-
+  
   luaL_register    (state, name, common_meta_table);
-  lua_pushvalue    (state, -1);
-  lua_setfield     (state, LUA_REGISTRYINDEX, name); //регистрация метатаблицы
+  lua_pushstring   (state, name);
+  lua_pushvalue    (state, -2);
+  lua_rawset       (state, LUA_REGISTRYINDEX); //регистрация метатаблицы
   lua_pushvalue    (state, -1);
   lua_setmetatable (state, -1);
 
@@ -206,6 +209,7 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
   lua_pushstring (state, "__library_name");
   lua_pushstring (state, name);
   lua_rawset     (state, -3);
+  lua_pop        (state, 1); //удаление таблицы из стека  
   
   try
   {    
@@ -242,7 +246,7 @@ void Library::Destroy ()
   lua_pushnil   (state);
   lua_pushvalue (state, -1);
   lua_setfield  (state, LUA_REGISTRYINDEX, table_name.c_str ());
-  lua_setfield  (state, LUA_GLOBALSINDEX, table_name.c_str ());  
+  lua_setfield  (state, LUA_GLOBALSINDEX, table_name.c_str ());
 }
 
 /*
@@ -266,7 +270,7 @@ void Library::RegisterInvoker (const char* invoker_name, Invoker& invoker)
     lua_pushvalue (state, -2);
     lua_pushvalue (state, -1);
     lua_rawset    (state, -5);
-    lua_setglobal (state, invoker_name);
+    lua_rawset    (state, LUA_GLOBALSINDEX);
   }
   else
   {

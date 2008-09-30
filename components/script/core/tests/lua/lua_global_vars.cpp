@@ -3,8 +3,8 @@
 using namespace script;
 
 const char* lua_f = 
-"function test ()\nMyVar.Value = MyEnum.One\nprint (\"Test MyVar.Value: \" .. MyVar.Value)\n"
-"MyVar.HardValue = MyVar.HardValue\nend\n"
+"function test ()\nA.B.C.MyVar.Value = A.B.C.MyEnum.One\nprint (\"Test A.B.C.MyVar.Value: \" .. A.B.C.MyVar.Value)\n"
+"A.B.C.MyVar.HardValue = A.B.C.MyVar.HardValue\nend\n"
 ;
 
 struct A
@@ -55,9 +55,9 @@ int main ()
     
     xtl::shared_ptr<Environment> env (new Environment);
 
-    InvokerRegistry& enum_registry   = env->CreateLibrary ("MyEnum");
-    InvokerRegistry& var_registry    = env->CreateLibrary ("MyVar");
     InvokerRegistry& object_registry = env->CreateLibrary ("A");
+    InvokerRegistry& enum_registry   = env->CreateLibrary ("A.B.C.MyEnum");
+    InvokerRegistry& var_registry    = env->CreateLibrary ("A.B.C.MyVar");
 
     env->RegisterType<A> ("A");    
 

@@ -2,7 +2,7 @@
 
 using namespace script;
 
-const char* lua_f = "function test1 (object) return object:f(2) + object:f(3) end\n"
+const char* lua_f = "function test1 (object) return object:f(2) + A.B.my_library.f (object, 3) end\n"
 "function test2 (object) return print (object:f(2)) end";
 
 struct A
@@ -42,9 +42,9 @@ int main ()
     
     xtl::shared_ptr<Environment> env (new Environment);
     
-    InvokerRegistry& registry = env->CreateLibrary ("my_library");
+    InvokerRegistry& registry = env->CreateLibrary ("A.B.my_library");
 
-    env->RegisterType<A> ("my_library");
+    env->RegisterType<A> ("A.B.my_library");
 
     Shell shell ("lua", env);
     
