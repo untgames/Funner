@@ -52,38 +52,38 @@ Save XMesh library '/io/stdout/test.xmesh'
   <vertex_buffers>
     <vertex_buffer id="vb#1" weights="vws#1">
       <streams>
-        vs#1
-        vs#2
+        'vs#1'
+        'vs#2'
       </streams>
     </vertex_buffer>
     <vertex_buffer id="vb#2">
       <streams>
-        vs#3
+        'vs#3'
       </streams>
     </vertex_buffer>
     <vertex_buffer id="vb#3">
       <streams>
-        vs#4
+        'vs#4'
       </streams>
     </vertex_buffer>
     <vertex_buffer id="vb#4">
       <streams>
-        vs#5
+        'vs#5'
       </streams>
     </vertex_buffer>
     <vertex_buffer id="vb#5">
       <streams>
-        vs#4
+        'vs#4'
       </streams>
     </vertex_buffer>
     <vertex_buffer id="vb#6">
       <streams>
-        vs#5
+        'vs#5'
       </streams>
     </vertex_buffer>
     <vertex_buffer id="vb#7">
       <streams>
-        vs#3
+        'vs#3'
       </streams>
     </vertex_buffer>
   </vertex_buffers>
@@ -101,7 +101,7 @@ Save XMesh library '/io/stdout/test.xmesh'
   <meshes>
     <mesh name="body-node.controller#0" index_buffer="ib#1">
       <vertex_buffers>
-        vb#1
+        'vb#1'
       </vertex_buffers>
       <primitives>
         <primitive type="triangle_list" material="skin" vertex_buffer="0" first="0" count="1470"/>
@@ -109,7 +109,7 @@ Save XMesh library '/io/stdout/test.xmesh'
     </mesh>
     <mesh name="Mesh01-node_PIVOT.mesh#0" index_buffer="ib#2">
       <vertex_buffers>
-        vb#2
+        'vb#2'
       </vertex_buffers>
       <primitives>
         <primitive type="triangle_list" material="iris" vertex_buffer="0" first="0" count="160"/>
@@ -117,8 +117,8 @@ Save XMesh library '/io/stdout/test.xmesh'
     </mesh>
     <mesh name="REye-node_PIVOT.mesh#0" index_buffer="ib#3">
       <vertex_buffers>
-        vb#3
-        vb#4
+        'vb#3'
+        'vb#4'
       </vertex_buffers>
       <primitives>
         <primitive type="triangle_list" material="Material__3" vertex_buffer="0" first="0" count="160"/>
@@ -127,8 +127,8 @@ Save XMesh library '/io/stdout/test.xmesh'
     </mesh>
     <mesh name="LEye-node_PIVOT.mesh#0" index_buffer="ib#3">
       <vertex_buffers>
-        vb#5
-        vb#6
+        'vb#5'
+        'vb#6'
       </vertex_buffers>
       <primitives>
         <primitive type="triangle_list" material="Material__3" vertex_buffer="0" first="0" count="160"/>
@@ -137,7 +137,7 @@ Save XMesh library '/io/stdout/test.xmesh'
     </mesh>
     <mesh name="Mesh02-node_PIVOT.mesh#0" index_buffer="ib#2">
       <vertex_buffers>
-        vb#7
+        'vb#7'
       </vertex_buffers>
       <primitives>
         <primitive type="triangle_list" material="iris" vertex_buffer="0" first="0" count="160"/>
