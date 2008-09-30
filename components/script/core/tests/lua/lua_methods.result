@@ -1,0 +1,6 @@
+Results of lua_methods_test:
+f(A(4),2)
+f(A(4),3)
+invoke result: 13
+f(A(4),2)
+to_string: A(6)

@@ -3,7 +3,8 @@
 using namespace script;
 
 const char* lua_f = 
-"function test ()\nMyVar.Value = MyEnum.One\nprint (\"Test MyVar.Value: \" .. MyVar.Value)\nend\n"
+"function test ()\nMyVar.Value = MyEnum.One\nprint (\"Test MyVar.Value: \" .. MyVar.Value)\n"
+"MyVar.Value = MyVar.ReadOnlyValue\nprint (\"Test MyVar.Value: \" .. MyVar.Value)\nend\n"
 ;
 
 enum MyEnum
@@ -33,12 +34,12 @@ int main ()
 {
   try
   {
-    printf ("Results of lua_interpreter6_test:\n");
+    printf ("Results of lua_global_vars_test:\n");
     
     xtl::shared_ptr<Environment> env (new Environment);
 
-    InvokerRegistry& enum_registry = env->CreateLibrary ("static.MyEnum");
-    InvokerRegistry& var_registry  = env->CreateLibrary ("static.MyVar");
+    InvokerRegistry& enum_registry = env->CreateLibrary ("MyEnum");
+    InvokerRegistry& var_registry  = env->CreateLibrary ("MyVar");
 
     Shell shell ("lua", env);
     
@@ -48,6 +49,7 @@ int main ()
     enum_registry.Register ("get_One",   make_const (MyEnum_One));
     var_registry.Register  ("get_Value", make_invoker (&get_value));
     var_registry.Register  ("set_Value", make_invoker (&set_value));
+    var_registry.Register  ("get_ReadOnlyValue", make_const (12));
 
     interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
 
@@ -58,7 +60,7 @@ int main ()
   catch (std::exception& exception)
   {      
     printf ("exception: %s\n",exception.what ());
-  }                                               
+  }
   catch (...)
   {
     printf ("unknown exception\n");

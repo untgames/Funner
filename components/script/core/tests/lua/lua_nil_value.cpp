@@ -3,19 +3,26 @@
 using namespace script;
 
 const char* lua_f = 
-"function test ()\nMyLibrary.Id = MyLibrary.Id1\nprint (\"Test MyLibrary.Id: \" .. MyLibrary.Id)\nend\n"
+"function test ()\nif (f ()) then\n print(\"not null\")\nelse print (\"null\")\nend\nend\n"
 ;
 
-int my_id = 3;
-
-int get_id ()
+struct A
 {
-  return my_id;
-}
+  public:
+    virtual ~A () {}
+};
 
-void set_id (int id)
+struct B: A
 {
-  my_id = id;
+  public:
+    virtual ~B () {}
+};
+
+typedef xtl::shared_ptr<A> Ptr;
+
+Ptr f ()
+{
+  return Ptr ();
 }
 
 void log_function (const char* s)
@@ -27,19 +34,17 @@ int main ()
 {
   try
   {
-    printf ("Results of lua_interpreter5_test:\n");
+    printf ("Results of lua_nil_value_test:\n");
     
     xtl::shared_ptr<Environment> env (new Environment);
 
-    InvokerRegistry& registry = env->CreateLibrary ("static.MyLibrary");
+    InvokerRegistry& registry = env->CreateLibrary ("global");
 
     Shell shell ("lua", env);
     
     xtl::com_ptr<IInterpreter> interpreter (shell.Interpreter ());
 
-    registry.Register ("get_Id", make_invoker (&get_id));
-    registry.Register ("set_Id", make_invoker (&set_id));
-    registry.Register ("get_Id1", make_const (12));
+    registry.Register ("f", make_invoker (&f));
 
     interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
 

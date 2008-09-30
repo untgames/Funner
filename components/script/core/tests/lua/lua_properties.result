@@ -1,4 +1,4 @@
-Results of lua_interpreter4_test:
+Results of lua_properties_test:
 invoke result: 8
 after invoke: A(2)
 exception: Invalid argument <id>=0

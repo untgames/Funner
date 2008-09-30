@@ -18,7 +18,7 @@ int main ()
 {
   try
   {
-    printf ("Results of lua_interpreter1_test:\n");
+    printf ("Results of lua_interpreter_info_test:\n");
     
     xtl::shared_ptr<Environment> env (new Environment);
     
