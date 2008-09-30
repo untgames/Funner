@@ -14,7 +14,7 @@ function test ()
   aabox1.minimum = vec3 (-10, -24, 7.45)
   aabox1.maximum = vec3 (17, 32, 14.59)
 
-  print ("pxnynz corner = " .. tostring (aabox1:get_corner (BV_Corner.pxnynz)))
+  print ("pxnynz corner = " .. tostring (aabox1:get_corner (BV.Corner.pxnynz)))
 
   print ("minimum = " .. tostring (aabox1.minimum))
   print ("maximum = " .. tostring (aabox1.maximum))

@@ -41,7 +41,7 @@ function test_node_bind ()
 
   local node4 = node2:Parent ()
   
-  node1:BindToParent (node3, Scene_NodeBindMode.AddRef, Scene_NodeTransformSpace.Parent)
+  node1:BindToParent (node3, Scene.NodeBindMode.AddRef, Scene.NodeTransformSpace.Parent)
   node2:BindToParent (node3)
 
   node4 = node3:FindChild ("node2")
@@ -50,7 +50,7 @@ function test_node_bind ()
 
   print_childs (node3)
     
-  node1:Unbind (Scene_NodeTransformSpace.Parent)
+  node1:Unbind (Scene.NodeTransformSpace.Parent)
 
   print ("Unbind node1 test")
   print_childs (node3)
@@ -152,7 +152,7 @@ function test_node ()
   local parent = Scene.Node.Create ()  
   local node2 = Scene.Node.Create ()
 
-  node2:LookTo (vec3 (0, 2, 0), Scene_NodeOrt.Z, Scene_NodeOrt.X, Scene_NodeTransformSpace.World)
+  node2:LookTo (vec3 (0, 2, 0), Scene.NodeOrt.Z, Scene.NodeOrt.X, Scene.NodeTransformSpace.World)
 
   print ("WorldOrtX = " .. tostring (node2.WorldOrtX))
   print ("WorldOrtY = " .. tostring (node2.WorldOrtY))
@@ -416,9 +416,9 @@ function test_visual_model ()
 end
 
 function get_name (alignment)
-  if (alignment == Scene_TextLineAlignment.Center) then return "Center" end
-  if (alignment == Scene_TextLineAlignment.Left)   then return "Left/Top" end
-  if (alignment == Scene_TextLineAlignment.Right) then return "Right/Bottom" end
+  if (alignment == Scene.TextLineAlignment.Center) then return "Center" end
+  if (alignment == Scene.TextLineAlignment.Left)   then return "Left/Top" end
+  if (alignment == Scene.TextLineAlignment.Right) then return "Right/Bottom" end
   return "Invalid"
 end
 
@@ -436,8 +436,8 @@ function test_text_line ()
   text_line1.Text                = "text"
   text_line1.Font                = "font"
   text_line1.Color               = vec4 (0.1, 0.2, 0.3, 0.4)
-  text_line1.HorizontalAlignment = Scene_TextLineAlignment.Center
-  text_line1.VerticalAlignment   = Scene_TextLineAlignment.Bottom
+  text_line1.HorizontalAlignment = Scene.TextLineAlignment.Center
+  text_line1.VerticalAlignment   = Scene.TextLineAlignment.Bottom
 
   print ("Text = " .. text_line1.Text)
   print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
@@ -458,7 +458,7 @@ function test_text_line ()
 
   print ("Color = " .. tostring (text_line1.Color))
 
-  text_line1:SetAlignment (Scene_TextLineAlignment.Right, Scene_TextLineAlignment.Center)
+  text_line1:SetAlignment (Scene.TextLineAlignment.Right, Scene.TextLineAlignment.Center)
 
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
 end

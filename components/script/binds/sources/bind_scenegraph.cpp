@@ -12,12 +12,12 @@ namespace
     Константы (имена библиотек)
 */
 
-const char* SCENE_STATIC_NODE_BIND_MODE_LIBRARY       = "static.Scene_NodeBindMode";
-const char* SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY = "static.Scene_NodeTransformSpace";
-const char* SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY   = "static.Scene_NodeTraverseMode";
-const char* SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY     = "static.Scene_NodeSearchMode";
-const char* SCENE_STATIC_NODE_ORT_LIBRARY             = "static.Scene_NodeOrt";
-const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY  = "static.Scene_TextLineAlignment";
+const char* SCENE_STATIC_NODE_BIND_MODE_LIBRARY       = "Scene.NodeBindMode";
+const char* SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY = "Scene.NodeTransformSpace";
+const char* SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY   = "Scene.NodeTraverseMode";
+const char* SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY     = "Scene.NodeSearchMode";
+const char* SCENE_STATIC_NODE_ORT_LIBRARY             = "Scene.NodeOrt";
+const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY  = "Scene.TextLineAlignment";
 const char* SCENE_SCENE_LIBRARY                       = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
 const char* SCENE_ENTITY_LIBRARY                      = "Scene.Entity";

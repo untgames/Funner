@@ -12,7 +12,7 @@ namespace
     Константы (имена библиотек)
 */
 
-const char* BV_STATIC_AXIS_ALIGNED_BOX_CORNER_LIBRARY = "static.BV_Corner";
+const char* BV_STATIC_AXIS_ALIGNED_BOX_CORNER_LIBRARY = "BV.Corner";
 const char* BV_AXIS_ALIGNED_BOX_LIBRARY               = "BV.AxisAlignedBox";
 
 /*
