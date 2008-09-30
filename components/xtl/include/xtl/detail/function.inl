@@ -34,6 +34,11 @@ struct function_invoker_base
     virtual const std::type_info& target_type () = 0;
     virtual void*                 target      () = 0;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дамп
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void dump (stl::string&) = 0;
+
   private:
     size_t ref_count;
 };
@@ -95,6 +100,25 @@ template <class Signature>
 inline bool function_not_equals (null_ptr_type, const function<Signature>& f)
 {
   return !f.empty ();
+}
+
+namespace function_adl_defaults
+{
+
+struct bad_function_dump {};
+
+/*
+    Свободные функции по умолчанию, для игнорирования отсутствия соответствующих псевдонимов при ADL
+*/
+
+using xtl::to_string;
+
+//по умолчанию типы не преобразуются к строкам
+inline void to_string (stl::string&, default_cast_type)
+{
+  throw bad_function_dump ();
+}
+
 }
 
 }
@@ -163,6 +187,11 @@ template <class Signature> class function<Signature>::empty_invoker_impl: public
     {
       throw bad_function_call ();
     }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дамп
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void dump (stl::string&) { throw detail::function_adl_defaults::bad_function_dump (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение экземпляра обработчика пустого делегата
@@ -193,6 +222,16 @@ template <class Signature> template <class Fn> class function<Signature>::invoke
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const std::type_info& target_type () { return typeid (Fn); }
     void*                 target      () { return (void*)&base::function (); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дамп
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void dump (stl::string& buffer)
+    {
+      using detail::function_adl_defaults::to_string;
+
+      to_string (buffer, base::function ());
+    }
 };
 
 /*
@@ -511,4 +550,27 @@ template <class Signature, class Fn>
 inline bool operator != (Fn a, const function<Signature>& b)
 {
   return detail::function_not_equals (unwrap (a), b);
+}
+
+/*
+    Дамп
+*/
+
+template <class Signature>
+void function<Signature>::to_string (stl::string& buffer) const
+{
+  try
+  {  
+    invoker->dump (buffer);
+  }
+  catch (detail::function_adl_defaults::bad_function_dump&)
+  {
+    buffer = target_type ().name ();
+  }
+}
+
+template <class Signature>
+inline void to_string (stl::string& buffer, const function<Signature>& fn)
+{
+  fn.to_string (buffer);
 }
