@@ -19,4 +19,7 @@ stack (size=4):
   item[2]: '2'
   item[3]: 'f (float, int)'
 exception: Bad overloaded invoker call (2 arguments in stack)
+    could be (float, string, int)
+          or (float, string)
+          or (float, int)
     at script::OverloadedInvoker::operator ()

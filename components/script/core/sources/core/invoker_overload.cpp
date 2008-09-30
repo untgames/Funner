@@ -10,7 +10,8 @@ namespace
     Константы
 */
 
-const size_t OVERLOADED_INVOKERS_RESERVE_SIZE = 8; //количество резервируемых перегруженных шлюзов
+const size_t OVERLOADED_INVOKERS_RESERVE_SIZE = 8;   //количество резервируемых перегруженных шлюзов
+const size_t OVERLOADS_ERROR_BUFFER_RESERVE   = 256; //резервируемое количество символов в строке об ошибке перегрузки
 
 /*
     Диспетчер вызова перегруженных шлюзов
@@ -55,11 +56,27 @@ class OverloadedInvoker
       size_t arguments_count = stack.Size ();
 
       if (arguments_count)
-        arguments_count--; //удаление имени функции из стека
+        arguments_count--; //удаление имени функции из стека        
+        
+      stl::string overloads, buffer;
+      
+      overloads.reserve (OVERLOADS_ERROR_BUFFER_RESERVE);
+      buffer.reserve    (OVERLOADS_ERROR_BUFFER_RESERVE);
+      
+      for (InvokerArray::iterator iter=invokers->begin (), end=invokers->end (); iter!=end; ++iter)
+      {
+        Invoker& invoker = *iter;      
+        
+        if (overloads.empty ()) overloads += "    could be ";
+        else                    overloads += "\n          or ";
 
-      throw xtl::format_exception<RuntimeException> ("script::OverloadedInvoker::operator ()", "Bad overloaded invoker call (%u arguments in stack)", arguments_count);
+        to_string (buffer, invoker);
 
-      return 0;
+        overloads += buffer;
+      }
+
+      throw xtl::format_exception<RuntimeException> ("script::OverloadedInvoker::operator ()",
+        "Bad overloaded invoker call (%u arguments in stack)\n%s", arguments_count, overloads.c_str ());
     }
 
   private:

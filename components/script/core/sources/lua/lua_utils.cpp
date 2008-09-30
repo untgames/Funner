@@ -181,13 +181,13 @@ void dump_stack (lua_State* state, stl::string& buffer)
         try
         {
           variant->to_string (value);
+          
+          buffer += format ("[%s]", value.c_str ());          
         }
         catch (...)
         {
-          value = "???";
+          buffer += format ("<%s>", variant->castable_type ().name ());
         }
-
-        buffer += format ("[%s]", value.c_str ());
 
         break;
       }

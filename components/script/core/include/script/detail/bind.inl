@@ -61,42 +61,56 @@ inline const char* make_invoker_argument (const stl::basic_string<char, Traits, 
 //общая версия
 template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value> struct common_argument_selector
 {
+  typedef T dump_type;
+
   static T get (IStack& stack, size_t index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }
 };
 
 //извлечение enum-типов
 template <class T> struct common_argument_selector<T, true>
 {
+  typedef int dump_type;
+
   static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetInteger (index)); }  
 };
 
 //извлечение целочисленного аргумента
 template <class T> struct int_argument_selector
 {
+  typedef int dump_type;
+
   static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetInteger (index)); }
 };
 
 //извлечение вещественного аргумента
 template <class T> struct float_argument_selector
 {
+  typedef float dump_type;
+
   static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetFloat (index)); }
 };
 
 //извлечение void-указателей
 struct raw_pointer_argument_selector
 {
+  typedef void* dump_type;
+
   static void* get (IStack& stack, size_t index) { return stack.GetPointer (index); }
 };
 
 //извлечение строк
 struct string_argument_selector
 {
+  typedef const char* dump_type;
+
   static const char* get (IStack& stack, size_t index) { return stack.GetString (index); }
 };
 
 //извлечение вариантных типов данных
 struct any_argument_selector
 {
+  typedef xtl::any& dump_type;
+
   static xtl::any& get (IStack& stack, size_t index) { return stack.GetVariant (index); }
 };
 
@@ -131,6 +145,8 @@ template <> struct argument_selector<const volatile char*>:     public string_ar
 
 template <> struct argument_selector<bool>
 {
+  typedef int dump_type;
+
   static bool get (IStack& stack, size_t index) { return stack.GetInteger (index) != 0; }
 };
 
@@ -274,6 +290,67 @@ struct invoker_impl<FnTraits, Fn, void>
 
   Fn fn;
 };
+
+/*
+    Дамп функции
+*/
+
+template <class T>
+inline void dump_type (stl::string& buffer)
+{
+  buffer += typeid (T).name ();  
+}
+
+template <> inline void dump_type<int> (stl::string& buffer)
+{
+  buffer += "int";  
+}
+
+template <> inline void dump_type<float> (stl::string& buffer)
+{
+  buffer += "float";
+}
+
+template <> inline void dump_type<const char*> (stl::string& buffer)
+{
+  buffer += "string";
+}
+
+template <> inline void dump_type<void*> (stl::string& buffer)
+{
+  buffer += "float";
+}
+
+template <class FunctionalTraits, size_t I, size_t Last> struct stack_argument_dumper
+{
+  static void dump (stl::string& buffer)
+  {
+    if (I) buffer += ", ";
+    else   buffer += "(";
+  
+    typedef typename functional_argument_traits<FunctionalTraits, I>::argument_type argument_type;
+
+    dump_type<typename argument_selector<argument_type>::dump_type> (buffer);
+    
+    stack_argument_dumper<FunctionalTraits, I+1, Last>::dump (buffer);
+  }
+};
+
+template <class FunctionalTraits, size_t I> struct stack_argument_dumper<FunctionalTraits, I, I>
+{
+  static void dump (stl::string& buffer) { buffer += ")"; }
+};
+
+//дамп функтора
+template <class FnTraits, class Fn, class Ret>
+inline void to_string (stl::string& buffer, const invoker_impl<FnTraits, Fn, Ret>& invoker)
+{
+  enum { arguments_count = FnTraits::arguments_count + FnTraits::is_memfun };
+  
+  buffer.clear ();
+  
+  stack_argument_dumper<FnTraits, 0, arguments_count>::dump (buffer);
+}
 
 /*
     Функция-диспетчер вызова шлюза
