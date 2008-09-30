@@ -3,6 +3,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/bind.h>
 #include <xtl/ref.h>
+#include <xtl/any.h>
 
 #include <common/var_registry.h>
 #include <common/strlib.h>

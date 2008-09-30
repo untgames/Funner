@@ -16,7 +16,7 @@ const char*  GROUND_SHADER_FILE_NAME = "media/ground_shader.wxf"; //имя файла с 
 const char*  WATER_TEXTURE_NAME      = "media/sky.jpg";           //имя файла с текстурой воды
 const char*  GROUND_TEXTURE_NAME     = "media/bottom.jpg";        //имя файла с текстурой земли
 const char*  BOAT_TEXTURE_NAME       = "media/boat.tif";          //имя файла с лодкой
-const size_t GRID_SIZE               = 128;                       //количество разбиений сетки с водой
+const size_t GRID_SIZE               = 64;                        //количество разбиений сетки с водой
 const float  WATER_UPDATE_TIME       = 0.01f;                     //период обновления воды
 const float  SCALE_FACTOR            = 1.1f;                      //коэффициент растяжения сетки
 
@@ -160,7 +160,7 @@ class TestView: public IGameView
       current_device->SSSetProgram        (ground_shader.get ());
       current_device->SSSetConstantBuffer (0, boat_constant_buffer.get ());
       current_device->SSSetTexture        (0, boat_texture.get ());
-      current_device->DrawIndexed         (PrimitiveType_TriangleList, 0, 6, 0);
+//      current_device->DrawIndexed         (PrimitiveType_TriangleList, 0, 6, 0);
 
       current_device->OSSetBlendState (default_blend_state.get ());
       current_device->OSSetDepthStencilState (default_depth_stencil_state.get ());      

@@ -331,8 +331,9 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
 
       memset (&rs_desc, 0, sizeof (rs_desc));
 
-      rs_desc.fill_mode  = render::low_level::FillMode_Wireframe;
-      rs_desc.cull_mode  = render::low_level::CullMode_Back;      
+      rs_desc.fill_mode  = render::low_level::FillMode_Solid;
+      rs_desc.cull_mode  = render::low_level::CullMode_Front;
+      rs_desc.front_counter_clockwise = true;
 
       xtl::com_ptr<render::low_level::IRasterizerState> rasterizer (device.CreateRasterizerState (rs_desc), false);
 
