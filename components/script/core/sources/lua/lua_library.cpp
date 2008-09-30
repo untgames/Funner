@@ -70,7 +70,7 @@ int invoke_dispatch (lua_State* state)
 int unsafe_variant_get_field (lua_State* state)
 {
   static const char* METHOD_NAME = "script::lua::variant_get_field";
-  
+
   if (!lua_getmetatable (state, 1))
     throw xtl::format_exception<RuntimeException> (METHOD_NAME, "Bad '__index' call. Object isn't variant");
 
@@ -78,19 +78,27 @@ int unsafe_variant_get_field (lua_State* state)
   lua_rawget    (state, -2);
 
   if (!lua_isnil (state, -1)) //поле с заданным именем найдено
+  {
+    lua_remove (state, -2); //удаление метатаблицы
     return 1;
+  }
 
     //пытаемся найти поле с префиксом get_
 
-  lua_pop (state, 1); //удаляем результат предыдущего поиска
+  lua_pop         (state, 1); //удаляем результат предыдущего поиска
   lua_pushfstring (state, "get_%s", lua_tostring (state, 2));
   lua_rawget      (state, -2);
+  lua_remove      (state, -2); //удаление метатаблицы
 
-  if (lua_isnil (state, -1)) //свойство с указанным именем не найдено
+  if (lua_isnil (state, -1)) //свойство с указанным именем не найдено  
+  {
+    lua_pop (state, 1); //удаление результата поиска
+
     throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found", lua_tostring (state, 2));
+  }
 
-  bool is_static_call = lua_isuserdata (state, 1) == 0;
-    
+  bool is_static_call = lua_isuserdata (state, 1) == 0;  
+
     //помещение аргумента вызова шлюза в стек
 
   if (is_static_call)

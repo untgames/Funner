@@ -1,4 +1,4 @@
 Results of lua_global_vars_test:
 invoke
 Test MyVar.Value: 1
-Test MyVar.Value: 12
+set hard value: 12

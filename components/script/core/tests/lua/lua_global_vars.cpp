@@ -4,8 +4,15 @@ using namespace script;
 
 const char* lua_f = 
 "function test ()\nMyVar.Value = MyEnum.One\nprint (\"Test MyVar.Value: \" .. MyVar.Value)\n"
-"MyVar.Value = MyVar.ReadOnlyValue\nprint (\"Test MyVar.Value: \" .. MyVar.Value)\nend\n"
+"MyVar.HardValue = MyVar.HardValue\nend\n"
 ;
+
+struct A
+{
+  A (int in_id) : id (in_id) {}
+
+  int id;
+};
 
 enum MyEnum
 {
@@ -25,6 +32,16 @@ void set_value (MyEnum value)
   my_value = value;
 }
 
+A get_hard_value ()
+{
+  return A (12);
+}
+
+void set_hard_value (const A& a)
+{
+  printf ("set hard value: %d\n", a.id);
+}
+
 void log_function (const char* s)
 {
   printf ("%s\n", s);
@@ -38,8 +55,11 @@ int main ()
     
     xtl::shared_ptr<Environment> env (new Environment);
 
-    InvokerRegistry& enum_registry = env->CreateLibrary ("MyEnum");
-    InvokerRegistry& var_registry  = env->CreateLibrary ("MyVar");
+    InvokerRegistry& enum_registry   = env->CreateLibrary ("MyEnum");
+    InvokerRegistry& var_registry    = env->CreateLibrary ("MyVar");
+    InvokerRegistry& object_registry = env->CreateLibrary ("A");
+
+    env->RegisterType<A> ("A");    
 
     Shell shell ("lua", env);
     
@@ -49,7 +69,8 @@ int main ()
     enum_registry.Register ("get_One",   make_const (MyEnum_One));
     var_registry.Register  ("get_Value", make_invoker (&get_value));
     var_registry.Register  ("set_Value", make_invoker (&set_value));
-    var_registry.Register  ("get_ReadOnlyValue", make_const (12));
+    var_registry.Register  ("set_HardValue", make_invoker (&set_hard_value));    
+    var_registry.Register  ("get_HardValue", make_invoker (&get_hard_value));
 
     interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
 
