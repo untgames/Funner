@@ -34,9 +34,10 @@ const char* TRANSLATION_MAP_FILE_NAME = "data/configurations/input/translation_t
 
 const char* DEFAULT_SOUND_DEVICE_MASK = "*"; //маска имени устройства воспроизведения
 
-const size_t DEFAULT_WINDOW_WIDTH  = 100;             //начальная ширина окна
-const size_t DEFAULT_WINDOW_HEIGHT = 100;             //начальная высота окна
-const char*  DEFAULT_WINDOW_TITLE  = "Default title"; //заголовок окна
+const size_t DEFAULT_WINDOW_WIDTH   = 100;             //начальная ширина окна
+const size_t DEFAULT_WINDOW_HEIGHT  = 100;             //начальная высота окна
+const char*  DEFAULT_WINDOW_TITLE   = "Default title"; //заголовок окна
+const size_t DEFAULT_CURSOR_VISIBLE = 1;               //состояние курсора по умолчанию
 
 const size_t DEFAULT_FB_COLOR_BITS    = 24; //глубина буфера цвета
 const size_t DEFAULT_FB_ALPHA_BITS    = 8;  //глубина альфа-буфера
@@ -185,6 +186,10 @@ struct TestApplication::Impl
     window->SetDebugLog (&log_print);
 
     window->SetTitle (get (config, "WindowTitle", DEFAULT_WINDOW_TITLE).c_str ());    
+    
+      //установка видимости курсора
+
+    window->SetCursorVisible (get (config, "CursorVisible", DEFAULT_CURSOR_VISIBLE) != 0);
 
       //регистрация обработчиков событий окна
 
