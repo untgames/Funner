@@ -126,3 +126,19 @@ Point Platform::GetCursorPosition ()
   
   return Point ();
 }
+
+/*
+    Видимость курсора
+*/
+
+void Platform::SetCursorVisible (window_t, bool state)
+{
+  raise ("syslib::DefaultPlatform::SetCursorVisible");
+}
+
+bool Platform::GetCursorVisible (window_t)
+{
+  raise ("syslib::DefaultPlatform::GetCursorVisible");
+  
+  return false;
+}

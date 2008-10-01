@@ -722,6 +722,36 @@ void Window::SetCursorPosition (size_t x, size_t y)
 }
 
 /*
+    Видимость курсора
+*/
+
+bool Window::IsCursorVisible () const
+{
+  try
+  {
+    return Platform::GetCursorVisible (impl->CheckedHandle ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::IsCursorVisible");
+    throw;
+  }
+}
+
+void Window::SetCursorVisible (bool state)
+{
+  try
+  {
+    Platform::SetCursorVisible (impl->CheckedHandle (), state);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::SetCursorVisible");
+    throw;
+  }
+}
+
+/*
     Активность окна
 */
 

@@ -72,6 +72,12 @@ class Platform
     static Point GetCursorPosition ();
     static void  SetCursorPosition (window_t, const Point& client_position); //в клиентских координатах окна
     static Point GetCursorPosition (window_t);                               //в клиентских координатах окна
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Видимость курсора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void SetCursorVisible (window_t, bool state);
+    static bool GetCursorVisible (window_t);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени клавиши

@@ -16,11 +16,13 @@ const char* WINDOW_CLASS_NAME = "Default window class";
 
 struct WindowImpl
 {
-  void*                          user_data;       //указатель на пользовательские данные
-  Platform::WindowMessageHandler message_handler; //функция обработки сообщений окна
+  void*                          user_data;         //указатель на пользовательские данные
+  Platform::WindowMessageHandler message_handler;   //функция обработки сообщений окна
+  bool                           is_cursor_visible; //видим ли курсор
+  HCURSOR                        cursor;            //изображение курсора
   
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data) : 
-      user_data (in_user_data), message_handler (handler) {}
+      user_data (in_user_data), message_handler (handler), is_cursor_visible (true), cursor (0) {}
   
   void Notify (Platform::window_t window, WindowEvent event, const WindowEventContext& context)
   {
@@ -151,7 +153,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
         //устанавливаем указатель на пользовательские данные
 
       SetWindowLong (wnd, GWL_USERDATA, (LONG)impl);
-
+      
         //оповещаем окно об изменении низкоуровневого дескриптора
         
       WindowEventContext context;
@@ -211,6 +213,30 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     case WM_KILLFOCUS: //потеря фокуса ввода
       impl->Notify (window_handle, WindowEvent_OnLostFocus, context);
       return 0;
+    case WM_SETCURSOR: //изменение положения курсора
+      if (LOWORD(lparam) == HTCLIENT) //наша клиентная область
+      {
+        if (impl->is_cursor_visible && impl->cursor)
+        {
+          SetCursor (impl->cursor);
+          
+          impl->cursor = 0;
+        }        
+        else if (!impl->is_cursor_visible && !impl->cursor)
+        {
+            //сохранение текущего курсора
+
+          impl->cursor = (HCURSOR)GetClassLong (wnd, GCL_HCURSOR);
+
+          SetCursor (0); //отключение курсора для окна
+        }
+
+        return 1;
+      }
+
+        //не клиентная область - обработчик по умолчанию
+
+      return DefWindowProc (wnd, message, wparam, lparam);
     case WM_PAINT: //необходима перерисовка
     {
       PAINTSTRUCT ps;      
@@ -224,7 +250,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       return 0;
     }
     case WM_ERASEBKGND: //нужно ли очищать фон
-      return 1; //очищать фон не нужно
+      return 1; //очищать фон не нужно    
     case WM_SIZE: //изменение размеров окна
       impl->Notify (window_handle, WindowEvent_OnSize, context);
       return 0;
@@ -870,3 +896,56 @@ Point Platform::GetCursorPosition (window_t handle)
     throw;
   }
 }
+
+/*
+    Видимость курсора
+*/
+
+void Platform::SetCursorVisible (window_t handle, bool state)
+{
+  try
+  {
+    HWND        wnd  = (HWND)handle;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+      
+    impl->is_cursor_visible = state;
+    
+      //послыка WM_SETCURSOR
+    
+    POINT position;
+    
+    if (!GetCursorPos (&position))
+      raise_error ("::GetCursorPos");
+      
+    if (!SetCursorPos (position.x, position.y))
+      raise_error ("::SetCursorPos");    
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::SetCursorVisible");
+    throw;
+  }
+}
+
+bool Platform::GetCursorVisible (window_t handle)
+{
+  try
+  {
+    HWND        wnd  = (HWND)handle;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+      
+    return impl->is_cursor_visible;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::GetCursorVisible");
+    throw;
+  }  
+}
+
