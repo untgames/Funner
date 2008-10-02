@@ -10,8 +10,8 @@
 
 #include <client/engine_attachments.h>
 
-const char* TRANSLATION_TABLE1_FILE_NAME = "data/translation_table1.keymap";
-const char* TRANSLATION_TABLE2_FILE_NAME = "data/translation_table2.keymap";
+const char* TRANSLATION_TABLE1_FILE_NAME = "data/translation_table1.xkeymap";
+const char* TRANSLATION_TABLE2_FILE_NAME = "data/translation_table2.xkeymap";
 
 using namespace client;
 

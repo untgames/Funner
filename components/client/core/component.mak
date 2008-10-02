@@ -5,7 +5,7 @@ TARGETS := CLIENT.SOURCES CLIENT.TESTS
 
 #Цель - CLIENTLib sources
 CLIENT.SOURCES.TYPE             := static-lib
-CLIENT.SOURCES.NAME             := client.client
+CLIENT.SOURCES.NAME             := client.core
 CLIENT.SOURCES.INCLUDE_DIRS     := 
 CLIENT.SOURCES.SOURCE_DIRS      := sources
 CLIENT.SOURCES.LIB_DIRS         :=  
@@ -22,4 +22,4 @@ CLIENT.TESTS.LIBS             :=
 CLIENT.TESTS.LINK_INCLUDES    :=
 CLIENT.TESTS.COMPILER_CFLAGS  :=
 CLIENT.TESTS.COMPILER_DEFINES :=
-CLIENT.TESTS.IMPORTS          := compile.static.mak link.static.mak ../../input/manager/keymap.link.static.mak
+CLIENT.TESTS.IMPORTS          := compile.static.mak link.static.mak ../../input/manager/xkeymap.link.static.mak
