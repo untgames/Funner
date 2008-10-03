@@ -1,6 +1,7 @@
 #ifndef COMMONLIB_LOG_HEADER
 #define COMMONLIB_LOG_HEADER
 
+#include <cstdarg>
 #include <xtl/functional_fwd>
 
 namespace common

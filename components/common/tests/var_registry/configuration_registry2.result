@@ -1,8 +1,14 @@
 Results of configuration_registry2_test:
+Log 'common.ComponentManager' message: 'Load components 'common.file_systems.*''
+Log 'common.ComponentManager' message: '...load component 'common.file_systems.ZipFileSystem''
+Log 'common.ComponentManager' message: '...components loaded successull'
+Log 'common.ComponentManager' message: 'Load components 'common.var_registries.*''
+Log 'common.ComponentManager' message: '...load component 'common.var_registries.configuration_registry''
 Log 'common.Configurator' message: 'config.xml(0): error: File 'config.xml' not found
     at common::StdioFileSystem::FileOpen
     at common::load_xml_configuration
     at common::ConfigurationRegistry::LoadConfiguration'
+Log 'common.ComponentManager' message: '...components loaded successull'
 Variable 'Window2.Style' value is 'Overlapped'
 Variable 'Window2.Width' value is '300'
 Variable 'Window2.Height' value is '400'

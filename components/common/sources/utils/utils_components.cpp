@@ -1,13 +1,26 @@
 #include <common/component.h>
+#include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
 #include <xtl/function.h>
 #include <xtl/iterator.h>
+#include <xtl/string.h>
 
+#include <stl/auto_ptr.h>
 #include <stl/list>
 
 using namespace common;
+
+namespace
+{
+
+/*
+    Константы
+*/
+
+const char*  COMPONENT_MANAGER_DEFAULT_LOG = "common.ComponentManager"; //имя потока протоколирования
+const size_t COMPONENT_NAME_BUFFER_SIZE    = 128;                       //буфер для хранения имени компонента
 
 /*
     Реализация менеджера компонентов
@@ -20,7 +33,7 @@ class ComponentManagerImpl
     typedef ComponentManager::Iterator   Iterator;
   
       //конструктор
-    ComponentManagerImpl () : components (MallocAllocator (&malloc, &free)) {}
+    ComponentManagerImpl () : components (MallocAllocator (&malloc, &free)), load_indent (0) {}
 
       //деструктор
     ~ComponentManagerImpl ()
@@ -68,8 +81,8 @@ class ComponentManagerImpl
       {
         ComponentNode& node = *iter;
         
-        if (wcimatch (node.name.c_str (), wc_component_mask) && !node.is_locked) components.erase (iter++);
-        else                                                                     ++iter;
+        if (wcimatch (node.name, wc_component_mask) && !node.is_locked) components.erase (iter++);
+        else                                                            ++iter;
       }
     }
 
@@ -78,6 +91,19 @@ class ComponentManagerImpl
     {
       if (!wc_component_mask)
         return;
+        
+      Log log (COMPONENT_MANAGER_DEFAULT_LOG);      
+      
+      if (load_indent)
+      {
+        log.Printf ("...load components '%s'", wc_component_mask);
+      }
+      else
+      {
+        log.Printf ("Load components '%s'", wc_component_mask);
+      }
+
+      load_indent++;
 
       for (ComponentList::iterator iter=components.begin (), end=components.end (); iter != end; ++iter)
       {
@@ -88,26 +114,30 @@ class ComponentManagerImpl
           
         try
         {
-          if (!wcimatch (node.name.c_str (), wc_component_mask))
+          if (!wcimatch (node.name, wc_component_mask))
             continue;
 
           node.is_locked = true;
 
           try
-          {        
+          {
+            log.Printf ("...load component '%s'", node.name);
+
             node.component->Load ();
 
-            LogPrintf (log_handler, "Component '%s' loaded successull", node.name.c_str ());
+            LogPrintf (log_handler, "Component '%s' loaded successull", node.name);
             
             node.is_loaded = true;
           }
           catch (std::exception& e)
           {
-            LogPrintf (log_handler, "Exception at load component '%s': %s", node.name.c_str (), e.what ());
+            log.Printf (".....%s", e.what ());
+            LogPrintf (log_handler, "Exception at load component '%s': %s", node.name, e.what ());
           }
           catch (...)
           {
-            LogPrintf (log_handler, "Unknown exception at load component '%s'", node.name.c_str ());
+            log.Print (".....unknown exception");
+            LogPrintf (log_handler, "Unknown exception at load component '%s'", node.name);
           }
         }
         catch (...)
@@ -117,6 +147,11 @@ class ComponentManagerImpl
 
         node.is_locked = false;  
       }
+
+      load_indent--;
+
+      if (!load_indent)
+        log.Printf ("...components loaded successull");
     }
     
       //выгрузка компонента
@@ -124,6 +159,19 @@ class ComponentManagerImpl
     {
       if (!wc_component_mask)
         return;
+        
+      Log log (COMPONENT_MANAGER_DEFAULT_LOG);
+
+      if (load_indent)
+      {
+        log.Printf ("...unload components '%s'", wc_component_mask);        
+      }
+      else
+      {
+        log.Printf ("Unload components '%s'", wc_component_mask);        
+      }
+      
+      load_indent++;
 
       for (ComponentList::iterator iter=components.begin (), end=components.end (); iter != end; ++iter)
       {
@@ -134,10 +182,12 @@ class ComponentManagerImpl
 
         try
         {
-          if (!wcimatch (node.name.c_str (), wc_component_mask))
+          if (!wcimatch (node.name, wc_component_mask))
             continue;
 
           node.is_locked = true;
+
+          log.Printf ("...unload component '%s'", node.name);
 
           node.component->Unload ();          
         }
@@ -149,6 +199,11 @@ class ComponentManagerImpl
         node.is_loaded = false;
         node.is_locked = false;  
       }
+      
+      load_indent--;
+      
+      if (!load_indent)      
+        log.Printf ("...components unloaded successull");
     }
     
       //создание итератора
@@ -180,15 +235,21 @@ class ComponentManagerImpl
   private:
     struct ComponentNode: public IComponentState
     {
-      IComponent* component; //указатель на компонент
-      stl::string name;      //имя компонента
-      size_t      name_hash; //хэш имени компонента
-      bool        is_loaded; //флаг: загружен ли компонент
-      bool        is_locked; //флаг: компонент заблокирован для отмены регистрации
+      IComponent* component;                         //указатель на компонент
+      char        name [COMPONENT_NAME_BUFFER_SIZE]; //имя компонента
+      size_t      name_hash;                         //хэш имени компонента
+      bool        is_loaded;                         //флаг: загружен ли компонент
+      bool        is_locked;                         //флаг: компонент заблокирован для отмены регистрации
 
-      ComponentNode (const char* in_name, IComponent* in_component) : component (in_component), name (in_name, MallocAllocator (&malloc, &free)),
-        is_loaded (false), is_locked (false)
+      ComponentNode (const char* in_name, IComponent* in_component) :
+        component (in_component),
+        is_loaded (false),
+        is_locked (false)
       {
+        xtl::xstrncpy (name, in_name, COMPONENT_NAME_BUFFER_SIZE - 1);
+
+        name [COMPONENT_NAME_BUFFER_SIZE - 1] = '\0';
+
         name_hash = strhash (in_name);
       }
 
@@ -209,17 +270,17 @@ class ComponentManagerImpl
         }
       }
 
-      const char* Name () { return name.c_str (); }
+      const char* Name () { return name; }
 
       bool IsLoaded () { return is_loaded; }
     };
-    
-  private:
+
     typedef stl::simple_allocator<char>               MallocAllocator;
     typedef stl::list<ComponentNode, MallocAllocator> ComponentList;
 
   private:
     ComponentList components;
+    size_t        load_indent;
 };
 
 /*
@@ -227,6 +288,8 @@ class ComponentManagerImpl
 */
 
 typedef Singleton<ComponentManagerImpl, SingletonStatic> ComponentManagerSingleton;
+
+}
 
 /*
     Регистрация компонента
