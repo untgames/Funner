@@ -4,6 +4,7 @@ using namespace media;
 using namespace common;
 
 const char* SOURCE_IMAGE_NAME                  = "data/pic1.jpg";
+const char* RESULTS_DIR                        = "results";
 const char* RESULT_POWER_OF_TWO_ATLAS_NAME     = "results/power_of_two_atlas.xatlas";
 const char* RESULT_NON_POWER_OF_TWO_ATLAS_NAME = "results/non_power_of_two_atlas.xatlas";
 const char* RESULT_EMPTY_ATLAS_NAME            = "results/empty_atlas.xatlas";
@@ -38,6 +39,9 @@ int main ()
   try
   {
     printf ("Results of atlas_builder1 test:\n");
+    
+    if (!FileSystem::IsDir (RESULTS_DIR))
+      FileSystem::Mkdir (RESULTS_DIR);    
 
     AtlasBuilder atlas_builder;
 
