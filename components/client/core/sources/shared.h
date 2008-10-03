@@ -14,7 +14,6 @@
 #include <xtl/connection.h>
 #include <xtl/iterator.h>
 #include <xtl/reference_counter.h>
-#include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/trackable.h>
 

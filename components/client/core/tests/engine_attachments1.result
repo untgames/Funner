@@ -1,32 +1,33 @@
-Client screens count is 0
-Client listeners count is 0
+Results of engine_attachments1_test:
+screens={} listeners={} input_handlers={}
 OnSetScreen: attachment_name is 'ScreenAttachment1', screen name is 'Screen1'
 OnSetScreen: attachment_name is 'ScreenAttachment1', screen name is 'Screen2'
 OnSetListener: attachment_name is 'ListenerAttachment1', listener name is 'Listener1'
 OnSetListener: attachment_name is 'ListenerAttachment1', listener name is 'Listener2'
-Client screens count is 1
-Client listeners count is 1
+screens={ScreenAttachment1::Screen2} listeners={ListenerAttachment1::Listener2} input_handlers={}
 OnRemoveScreen: attachment_name is 'ScreenAttachment1'
 OnRemoveListener: attachment_name is 'ListenerAttachment1'
-Client screens count is 0
-Client listeners count is 0
+screens={} listeners={} input_handlers={}
 OnSetScreen: attachment_name is 'ScreenAttachment2', screen name is 'Screen2'
 OnSetScreen: attachment_name is 'ScreenAttachment1', screen name is 'Screen1'
 OnSetListener: attachment_name is 'ListenerAttachment2', listener name is 'Listener2'
 OnSetListener: attachment_name is 'ListenerAttachment1', listener name is 'Listener1'
-Listener 1 name is 'Listener1', attachment name is 'ListenerAttachment1'
-Screen 0 name is 'Screen2', attachment name is 'ScreenAttachment2'
+screens={ScreenAttachment2::Screen2, ScreenAttachment1::Screen1} listeners={ListenerAttachment2::Listener2, ListenerAttachment1::Listener1} input_handlers={}
 Listener 'ListenerAttachment2' name is 'Listener2'
 Screen 'ScreenAttachment1' name is 'Screen1'
 Listener 'asd' is 00000000
 Screen 'asd' is 00000000
-Client screens count is 2
-Client listeners count is 2
+screens={ScreenAttachment2::Screen2, ScreenAttachment1::Screen1} listeners={ListenerAttachment2::Listener2, ListenerAttachment1::Listener1} input_handlers={}
 OnRemoveScreen: attachment_name is 'ScreenAttachment2'
 OnRemoveScreen: attachment_name is 'ScreenAttachment1'
-Client screens count is 0
-Client listeners count is 0
-New input event from attachment 'InputTranslatorAttachment1': 'Replaced event1: event_name=event1, event_param1= end'
-New input event from attachment 'InputTranslatorAttachment2': 'Replaced event2: event_name=event2, event_param1=param1 end'
-New input event from attachment 'InputTranslatorAttachment1': 'Replaced event1: event_name=event1, event_param1= end'
+screens={} listeners={} input_handlers={}
+OnSetInputHandler: attachment_name is 'InputTranslatorAttachment1'
+OnSetInputHandler: attachment_name is 'InputTranslatorAttachment2'
+OnSetInputHandler: attachment_name is 'InputTranslatorAttachment3'
+screens={} listeners={} input_handlers={InputTranslatorAttachment1, InputTranslatorAttachment3, InputTranslatorAttachment2}
+OnRemoveInputHandler: attachment_name is 'InputTranslatorAttachment2'
+screens={} listeners={} input_handlers={InputTranslatorAttachment1, InputTranslatorAttachment3}
+OnRemoveInputHandler: attachment_name is 'InputTranslatorAttachment1'
+OnRemoveInputHandler: attachment_name is 'InputTranslatorAttachment3'
+screens={} listeners={} input_handlers={}
 OnDestroy

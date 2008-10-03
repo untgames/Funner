@@ -20,7 +20,7 @@ const char* CONFIGURATION_BRANCH_NAME = "Configuration";
 
 void log_handler (const char* log_name, const char* message)
 {
-  printf ("Log '%s' message: '%s'\n", log_name, message);
+  printf ("%s: %s\n", log_name, message);
 }
 
 void render_log_print (const char* message)
@@ -45,8 +45,8 @@ int main ()
     screen1.SetBackgroundColor (0.8f, 0.f, 0.f, 0.f);
     screen2.SetBackgroundColor (0.f, 0.8f, 0.f, 0.f);
 
-    client.SetScreen ("Screen1", &screen1);
-    client.SetScreen ("Screen2", &screen2);
+    client.SetScreen ("Screen1", screen1);
+    client.SetScreen ("Screen2", screen2);
 
     engine.Attach (client);
 
@@ -54,7 +54,7 @@ int main ()
   }
   catch (xtl::exception& e)
   {
-    printf ("Exception: '%s'\n", e.what ());
+    printf ("exception: %s\n", e.what ());
 
     return 1;
   }

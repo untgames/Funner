@@ -1,35 +1,49 @@
 #ifndef CLIENT_ENGINE_ATTACHMENTS_HEADER
 #define CLIENT_ENGINE_ATTACHMENTS_HEADER
 
-#include <stl/auto_ptr.h>
-
 #include <sg/listener.h>
 
 #include <render/screen.h>
+
+namespace xtl
+{
+
+//forward declarations
+template <class T> class iterator;
+
+}
 
 namespace client
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///‘«ги вҐ«м б®ЎлвЁ© ¤ўЁ¦Є 
+///Слушатель событий движка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class IEngineEventListener
 {
   public:
+    typedef xtl::function<void (const char* command)> InputHandler;
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///‘®ЎлвЁп гбв ­®ўЄЁ/г¤ «Ґ­Ёп нЄа ­ 
+///События установки / удаления экрана
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnSetScreen    (const char* attachment_name, render::Screen* screen) {}
+    virtual void OnSetScreen    (const char* attachment_name, render::Screen& screen) {}
     virtual void OnRemoveScreen (const char* attachment_name) {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///‘®ЎлвЁп гбв ­®ўЄЁ/г¤ «Ґ­Ёп б«ги вҐ«п
+///События установки / удаления слушателя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnSetListener    (const char* attachment_name, scene_graph::Listener* listener) {}
+    virtual void OnSetListener    (const char* attachment_name, scene_graph::Listener& listener) {}
     virtual void OnRemoveListener (const char* attachment_name) {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///‘®ЎлвЁҐ г¤ «Ґ­Ёп Є«ЁҐ­в 
+///События добавления / удаления точек привязки событий ввода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void OnSetInputHandler    (const char* attachment_name, const InputHandler& handler) {}
+    virtual void OnRemoveInputHandler (const char* attachment_name) {}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Событие удаления клиента
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnDestroy () {}
 
@@ -38,68 +52,74 @@ class IEngineEventListener
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///’®зЄЁ ЇаЁўп§ЄЁ ¤ўЁ¦Є 
+///Точки привязки движка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class EngineAttachments
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Љ®­бвагЄв®а / ¤ҐбвагЄв®а
+///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     EngineAttachments  ();
     EngineAttachments  (const EngineAttachments&);
     ~EngineAttachments ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Љ®ЇЁа®ў ­ЁҐ
+///Копирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     EngineAttachments& operator = (const EngineAttachments&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ђ Ў®в  б нЄа ­ ¬Ё
+///Работа с экранами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void            SetScreen        (const char* attachment_name, render::Screen* screen);
+    void            SetScreen        (const char* attachment_name, render::Screen& screen);
     void            RemoveScreen     (const char* attachment_name);
     void            RemoveAllScreens ();
     render::Screen* FindScreen       (const char* attachment_name) const;
 
-    size_t          ScreensCount () const;
-    render::Screen* Screen       (size_t index) const;
-    const char*     ScreenName   (size_t index) const;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ђ Ў®в  б® б«ги вҐ«п¬Ё
+///Работа со слушателями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                   SetListener        (const char* attachment_name, scene_graph::Listener* listener);
+    void                   SetListener        (const char* attachment_name, scene_graph::Listener& listener);
     void                   RemoveListener     (const char* attachment_name);
     void                   RemoveAllListeners ();
     scene_graph::Listener* FindListener       (const char* attachment_name) const;
 
-    size_t                 ListenersCount () const;
-    scene_graph::Listener* Listener       (size_t index) const;
-    const char*            ListenerName   (size_t index) const;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с устройствами ввода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef IEngineEventListener::InputHandler InputHandler;
+
+    void                SetInputHandler        (const char* attachment_name, const InputHandler& input_handler);
+    void                RemoveInputHandler     (const char* attachment_name);
+    void                RemoveAllInputHandlers ();
+    const InputHandler* FindInputHandler       (const char* attachment_name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ђ Ў®в  б гбва®©бвў ¬Ё ўў®¤ 
+///Перебор объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const char* attachment_name, const char* command)> InputEventHandler;
+    template <class T> struct IAttachment
+    {
+      virtual T&          Value () = 0;
+      virtual const char* Name  () = 0;
+    };
 
-    xtl::connection RegisterInputHandler (const InputEventHandler& input_handler);
+    typedef xtl::iterator<IAttachment<render::Screen> >        ScreenIterator;
+    typedef xtl::iterator<IAttachment<scene_graph::Listener> > ListenerIterator;
+    typedef xtl::iterator<IAttachment<const InputHandler> >    InputHandlerIterator;
 
-    void SetInputTranslator        (const char* attachment_name, const char* translation_table);
-    void RemoveInputTranslator     (const char* attachment_name);
-    void RemoveAllInputTranslators ();
-
-    void ProcessInputEvent (const char* attachment_name, const char* event) const;
+    ScreenIterator       CreateScreenIterator       () const;
+    ListenerIterator     CreateListenerIterator     () const;
+    InputHandlerIterator CreateInputHandlerIterator () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ђ Ў®в  б® б«ги вҐ«п¬Ё б®ЎлвЁ©
+///Работа со слушателями событий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Attach (IEngineEventListener* listener);
     void Detach (IEngineEventListener* listener);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ЋЎ¬Ґ­
+///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (EngineAttachments&);
 
@@ -109,7 +129,7 @@ class EngineAttachments
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ЋЎ¬Ґ­
+///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (EngineAttachments&, EngineAttachments&);
 

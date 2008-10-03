@@ -3,6 +3,7 @@
 #include <xtl/connection.h>
 #include <xtl/exception.h>
 #include <xtl/function.h>
+#include <xtl/iterator.h>
 
 #include <sg/listener.h>
 
@@ -10,18 +11,15 @@
 
 #include <client/engine_attachments.h>
 
-const char* TRANSLATION_TABLE1_FILE_NAME = "data/translation_table1.xkeymap";
-const char* TRANSLATION_TABLE2_FILE_NAME = "data/translation_table2.xkeymap";
-
 using namespace client;
 
 class ClientEventListener : public IEngineEventListener
 {
   public:
 ///События установки/удаления экрана
-    void OnSetScreen (const char* attachment_name, render::Screen* screen) 
+    void OnSetScreen (const char* attachment_name, render::Screen& screen) 
     {
-      printf ("OnSetScreen: attachment_name is '%s', screen name is '%s'\n", attachment_name, screen->Name ());
+      printf ("OnSetScreen: attachment_name is '%s', screen name is '%s'\n", attachment_name, screen.Name ());
     }
 
     void OnRemoveScreen (const char* attachment_name) 
@@ -30,15 +28,26 @@ class ClientEventListener : public IEngineEventListener
     }
 
 ///События установки/удаления слушателя
-    void OnSetListener (const char* attachment_name, scene_graph::Listener* listener) 
+    void OnSetListener (const char* attachment_name, scene_graph::Listener& listener) 
     {
-      printf ("OnSetListener: attachment_name is '%s', listener name is '%s'\n", attachment_name, listener->Name ());
+      printf ("OnSetListener: attachment_name is '%s', listener name is '%s'\n", attachment_name, listener.Name ());
     }
 
     void OnRemoveListener (const char* attachment_name) 
     {
       printf ("OnRemoveListener: attachment_name is '%s'\n", attachment_name);
     }
+
+///События установки/удаления обработчика событий ввода
+    void OnSetInputHandler (const char* attachment_name, const InputHandler&)
+    {
+      printf ("OnSetInputHandler: attachment_name is '%s'\n", attachment_name);
+    }
+    
+    void OnRemoveInputHandler (const char* attachment_name)
+    {
+      printf ("OnRemoveInputHandler: attachment_name is '%s'\n", attachment_name);
+    }    
 
 ///Событие удаления клиента
     void OnDestroy () 
@@ -47,20 +56,46 @@ class ClientEventListener : public IEngineEventListener
     }
 };
 
-void input_event_handler (const char* attachment_name, const char* event)
+void input_event_handler (const char*)
 {
-  printf ("New input event from attachment '%s': '%s'\n", attachment_name, event);
+}
+
+void dump (const EngineAttachments& client)
+{
+  printf ("screens={");
+  
+  bool need_separator = false;
+  
+  for (EngineAttachments::ScreenIterator iter=client.CreateScreenIterator (); iter; ++iter, need_separator=true)
+    printf ("%s%s::%s", need_separator ? ", " : "", iter->Name (), iter->Value ().Name ());
+    
+  printf ("} listeners={");
+  
+  need_separator = false;
+  
+  for (EngineAttachments::ListenerIterator iter=client.CreateListenerIterator (); iter; ++iter, need_separator=true)
+    printf ("%s%s::%s", need_separator ? ", " : "", iter->Name (), iter->Value ().Name ());
+    
+  printf ("} input_handlers={");
+  
+  need_separator = false;
+  
+  for (EngineAttachments::InputHandlerIterator iter=client.CreateInputHandlerIterator (); iter; ++iter, need_separator=true)
+    printf ("%s%s", need_separator ? ", " : "", iter->Name ());
+    
+  printf ("}\n");
 }
 
 int main ()
 {
+  printf ("Results of engine_attachments1_test:\n");
+
   ClientEventListener client_event_listener;
   EngineAttachments client;
 
   client.Attach (&client_event_listener);
 
-  printf ("Client screens count is %u\n", client.ScreensCount ());
-  printf ("Client listeners count is %u\n", client.ListenersCount ());
+  dump (client);
 
   scene_graph::Listener::Pointer listener1 = scene_graph::Listener::Create (), listener2 = scene_graph::Listener::Create ();
 
@@ -72,29 +107,26 @@ int main ()
   screen1.SetName ("Screen1");
   screen2.SetName ("Screen2");
 
-  client.SetScreen ("ScreenAttachment1", &screen1);
-  client.SetScreen ("ScreenAttachment1", &screen2);
+  client.SetScreen ("ScreenAttachment1", screen1);
+  client.SetScreen ("ScreenAttachment1", screen2);
 
-  client.SetListener ("ListenerAttachment1", listener1.get ());
-  client.SetListener ("ListenerAttachment1", listener2.get ());
+  client.SetListener ("ListenerAttachment1", *listener1);
+  client.SetListener ("ListenerAttachment1", *listener2);
 
-  printf ("Client screens count is %u\n", client.ScreensCount ());
-  printf ("Client listeners count is %u\n", client.ListenersCount ());
+  dump (client);
 
   client.RemoveScreen ("ScreenAttachment1");
   client.RemoveListener ("ListenerAttachment1");
 
-  printf ("Client screens count is %u\n", client.ScreensCount ());
-  printf ("Client listeners count is %u\n", client.ListenersCount ());
+  dump (client);
 
-  client.SetScreen ("ScreenAttachment2", &screen2);
-  client.SetScreen ("ScreenAttachment1", &screen1);
+  client.SetScreen ("ScreenAttachment2", screen2);
+  client.SetScreen ("ScreenAttachment1", screen1);
 
-  client.SetListener ("ListenerAttachment2", listener2.get ());
-  client.SetListener ("ListenerAttachment1", listener1.get ());
-
-  printf ("Listener 1 name is '%s', attachment name is '%s'\n", client.Listener (1)->Name (), client.ListenerName (1));
-  printf ("Screen 0 name is '%s', attachment name is '%s'\n", client.Screen (0)->Name (), client.ScreenName (0));
+  client.SetListener ("ListenerAttachment2", *listener2);
+  client.SetListener ("ListenerAttachment1", *listener1);
+  
+  dump (client);  
 
   printf ("Listener 'ListenerAttachment2' name is '%s'\n", client.FindListener ("ListenerAttachment2")->Name ());
   printf ("Screen 'ScreenAttachment1' name is '%s'\n", client.FindScreen ("ScreenAttachment1")->Name ());
@@ -102,8 +134,7 @@ int main ()
   printf ("Listener 'asd' is %p\n", client.FindListener ("asd"));
   printf ("Screen 'asd' is %p\n", client.FindScreen ("asd"));
 
-  printf ("Client screens count is %u\n", client.ScreensCount ());
-  printf ("Client listeners count is %u\n", client.ListenersCount ());
+  dump (client);  
 
   client.Detach (&client_event_listener);
   
@@ -113,35 +144,21 @@ int main ()
   
   client.RemoveAllScreens ();
 
-  printf ("Client screens count is %u\n", client.ScreensCount ());
-  printf ("Client listeners count is %u\n", client.ListenersCount ());
+  dump (client);
 
-  try
-  {
-    client.SetInputTranslator ("InputTranslatorAttachment1", TRANSLATION_TABLE1_FILE_NAME);
-    client.SetInputTranslator ("InputTranslatorAttachment2", TRANSLATION_TABLE2_FILE_NAME);
-  }
-  catch (xtl::exception& e)
-  {
-    printf ("Exception: %s\n", e.what ());
-    return 1;
-  }
+  client.SetInputHandler ("InputTranslatorAttachment1", &input_event_handler);
+  client.SetInputHandler ("InputTranslatorAttachment2", &input_event_handler);
+  client.SetInputHandler ("InputTranslatorAttachment3", &input_event_handler);
 
-  client.RegisterInputHandler (&input_event_handler);
+  dump (client);
 
-  client.ProcessInputEvent ("InputTranslatorAttachment1", "event1");
-  client.ProcessInputEvent ("InputTranslatorAttachment2", "event1");
-  client.ProcessInputEvent ("InputTranslatorAttachment2", "event2 param1");
+  client.RemoveInputHandler ("InputTranslatorAttachment2");
 
-  client.RemoveInputTranslator ("InputTranslatorAttachment2");
+  dump (client);
 
-  client.ProcessInputEvent ("InputTranslatorAttachment1", "event1");
-  client.ProcessInputEvent ("InputTranslatorAttachment2", "event2");
+  client.RemoveAllInputHandlers ();
 
-  client.RemoveAllInputTranslators ();
-
-  client.ProcessInputEvent ("InputTranslatorAttachment1", "event1");
-  client.ProcessInputEvent ("InputTranslatorAttachment2", "event2");
+  dump (client);
 
   return 0;
 }

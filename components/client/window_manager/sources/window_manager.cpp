@@ -25,7 +25,7 @@ using namespace client;
 namespace
 {
 
-const char* WINDOWS_SUBSYSTEM_NAME   = "WindowsSubsytem";
+const char* WINDOWS_SUBSYSTEM_NAME   = "WindowsSubsystem";
 const char* LOG_NAME                 = "client.WindowManager";
 const char* REGISTRY_COMPONENTS_MASK = "client.subsystems.*";
 
@@ -235,7 +235,7 @@ struct WindowManagerImpl
       for (WindowArray::iterator iter = shown_windows.begin (), end = shown_windows.end (); iter != end; ++iter)
         (*iter)->Show ();
 
-      engine.AddSubsystem (windows_subsystem);
+      engine.AddSubsystem (windows_subsystem.get ());
     }
 
   private:

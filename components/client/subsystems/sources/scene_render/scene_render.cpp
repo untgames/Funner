@@ -122,14 +122,14 @@ class SceneRenderSubsystem : public IEngineSubsystem, public IEngineEventListene
     const char* Name () { return "SceneRender"; }
 
 /// События установки/удаления экрана
-    void OnSetScreen (const char* attachment_name, render::Screen* screen) 
+    void OnSetScreen (const char* attachment_name, render::Screen& screen) 
     {
       ScreenMap::iterator iter = screen_map.find (attachment_name);
 
       if (iter == screen_map.end ())
         return;
 
-      render.RenderTarget (iter->second).SetScreen (screen);
+      render.RenderTarget (iter->second).SetScreen (&screen);
     }
 
     void OnRemoveScreen (const char* attachment_name) 
@@ -187,9 +187,9 @@ void scene_render_startup (common::VarRegistry& var_registry, IEngineStartupPara
     test_registry_variable (var_registry, "DriverMask");
     test_registry_variable (var_registry, "RendererMask");
 
-    Engine::SubsystemPointer new_subsystem (new SceneRenderSubsystem (var_registry, engine), false);
+    xtl::com_ptr<SceneRenderSubsystem> new_subsystem (new SceneRenderSubsystem (var_registry, engine), false);
 
-    engine.AddSubsystem (new_subsystem);
+    engine.AddSubsystem (new_subsystem.get ());
   }
   catch (xtl::exception& e)
   {

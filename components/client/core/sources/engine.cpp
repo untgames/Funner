@@ -2,23 +2,60 @@
 
 using namespace client;
 
+namespace
+{
+
 /*
-   Реализация движка
+    Константы
+*/
+
+const size_t DEFAULT_ENGINE_SUBSYSTEMS_RESERVE_SIZE = 128; //резервируемое количество подсистем
+
+}
+
+/*
+    Реализация движка
 */
 
 struct Engine::Impl : public IEngineEventListener, public xtl::trackable
 {
   public:
-///Конструктор/деструктор
-    Impl (const char* in_configuration_branch_name, IEngineStartupParams* engine_startup_params)
-      : configuration_branch_name (in_configuration_branch_name), start_level (0)
-      {}
+///Конструктор
+    Impl (const char* in_name, const char* in_configuration_branch_name, IEngineStartupParams* engine_startup_params)
+      : name (in_name),
+        configuration_branch_name (in_configuration_branch_name),
+        start_level (0),
+        log (common::format ("client.engines.%s", in_name).c_str ())
+    {
 
+      subsystems.reserve (DEFAULT_ENGINE_SUBSYSTEMS_RESERVE_SIZE);
+    }
+
+///Деструктор
     ~Impl ()
     {
+      while (!subsystems.empty ())
+        RemoveSubsystem (&*subsystems.front ());
+      
       Detach ();
       OnDestroyNotify ();
     }
+    
+///Установка имени
+    void SetName (const char* in_name)
+    {
+      if (!in_name)
+        throw xtl::make_null_argument_exception ("client::Engine::SetName", "name");
+        
+      log.Printf ("Engine change name to '%s'", in_name);
+
+      name = in_name;      
+
+      common::Log (common::format ("client.engines.%s", in_name).c_str ()).Swap (log);
+    }
+    
+///Получение имени
+    const char* Name () { return name.c_str (); }
 
 ///Запуск систем
     void Start (Engine& engine, size_t new_start_level, IEngineStartupParams* engine_startup_params)
@@ -31,6 +68,7 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
       start_level = new_start_level;
     }
 
+///Возвращение текущего уровня запуска
     size_t StartLevel () const
     {
       return start_level;
@@ -44,36 +82,47 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
       const_cast<EngineAttachments&> (new_attachments).Attach (this);
 
       attachments = new_attachments;
+      
+      for (EngineAttachments::ScreenIterator iter=attachments.CreateScreenIterator (); iter; ++iter)
+        OnSetScreen (iter->Name (), iter->Value ());
 
-      for (size_t i = 0; i < attachments.ScreensCount (); i++)
-        OnSetScreen (attachments.ScreenName (i), attachments.Screen (i));
-
-      for (size_t i = 0; i < attachments.ListenersCount (); i++)
-        OnSetListener (attachments.ListenerName (i), attachments.Listener (i));
+      for (EngineAttachments::ListenerIterator iter=attachments.CreateListenerIterator (); iter; ++iter)
+        OnSetListener (iter->Name (), iter->Value ());
+        
+      for (EngineAttachments::InputHandlerIterator iter=attachments.CreateInputHandlerIterator (); iter; ++iter)
+        OnSetInputHandler (iter->Name (), iter->Value ());
     }
 
+///Сброс точек привзяки
     void Detach ()
     {
-      RemoveAllScreens ();
-      RemoveAllListeners ();
+      for (EngineAttachments::ScreenIterator iter=attachments.CreateScreenIterator (); iter; ++iter)
+        OnRemoveScreen (iter->Name ());
+
+      for (EngineAttachments::ListenerIterator iter=attachments.CreateListenerIterator (); iter; ++iter)
+        OnRemoveListener (iter->Name ());
+        
+      for (EngineAttachments::InputHandlerIterator iter=attachments.CreateInputHandlerIterator (); iter; ++iter)
+        OnRemoveInputHandler (iter->Name ());
 
       attachments.Detach (this);
-      
+
       EngineAttachments ().Swap (attachments);
     }
 
-///Получение данных
+///Получение имени ветки реестра с конфигурацией движка
     const char* ConfigurationBranch () const
     {
       return configuration_branch_name.c_str ();
     }
 
-///Перебор подсистем
+///Количество запущенных подсистем
     size_t SubsystemsCount () const
     {
       return subsystems.size ();
     }
 
+///Получение подсистемы
     IEngineSubsystem& Subsystem (size_t index) const
     {
       if (index >= subsystems.size ())
@@ -82,8 +131,8 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
       return *subsystems[index];
     }
 
-///Добавление/удаление подсистем
-    void AddSubsystem (const SubsystemPointer subsystem)
+///Добавление подсистем
+    void AddSubsystem (IEngineSubsystem* subsystem)
     {
       static const char* METHOD_NAME = "client::Engine::AddSubsystem";
 
@@ -96,30 +145,22 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
         throw xtl::format_operation_exception (METHOD_NAME, "Can't add subsystem '%s', already added", subsystem->Name ());
 
       subsystems.push_back (subsystem);
+      
+      log.Printf ("Add subsystem '%s'", subsystem->Name ());
     }
 
-    void RemoveSubsystem (const SubsystemPointer subsystem)
+///Удаление подсистемы
+    void RemoveSubsystem (IEngineSubsystem* subsystem)
     {
       if (!subsystem)
-        throw xtl::make_null_argument_exception ("client::Engine::RemoveSubsystem", "subsystem");
+        return;
 
       Subsystems::iterator iter = stl::find (subsystems.begin (), subsystems.end (), subsystem);
 
       if (iter != subsystems.end ())
+      {
+        log.Printf ("Remove susbsystem '%s'", subsystem->Name ());
         subsystems.erase (iter);
-    }
-
-///Обработка событий ввода
-    void ProcessInputEvent (const char* attachment_name, const char* event) const
-    {
-      try
-      {
-        attachments.ProcessInputEvent (attachment_name, event);
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("client::Engine::ProcessInputEvent");
-        throw;
       }
     }
 
@@ -137,12 +178,15 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
         throw xtl::format_operation_exception (METHOD_NAME, "Listener already attached");
 
       listeners.insert (listener);
+      
+      for (EngineAttachments::ScreenIterator iter=attachments.CreateScreenIterator (); iter; ++iter)
+        listener->OnSetScreen (iter->Name (), iter->Value ());
 
-      for (size_t i = 0; i < attachments.ScreensCount (); i++)
-        listener->OnSetScreen (attachments.ScreenName (i), attachments.Screen (i));
-
-      for (size_t i = 0; i < attachments.ListenersCount (); i++)
-        listener->OnSetListener (attachments.ListenerName (i), attachments.Listener (i));
+      for (EngineAttachments::ListenerIterator iter=attachments.CreateListenerIterator (); iter; ++iter)
+        listener->OnSetListener (iter->Name (), iter->Value ());
+        
+      for (EngineAttachments::InputHandlerIterator iter=attachments.CreateInputHandlerIterator (); iter; ++iter)
+        listener->OnSetInputHandler (iter->Name (), iter->Value ());
     }
 
     void Detach (IEngineEventListener* listener)
@@ -153,31 +197,39 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
       listeners.erase (listener);
     }
 
+  private:
 ///События установки/удаления экрана
-    void OnSetScreen (const char* attachment_name, render::Screen* screen) 
+    void OnSetScreen (const char* attachment_name, render::Screen& screen) 
     {
-      screen_attachments.insert (attachment_name);
       OnSetScreenNotify (attachment_name, screen);
     }
 
     void OnRemoveScreen (const char* attachment_name) 
     {
-      screen_attachments.erase (attachment_name);
       OnRemoveScreenNotify (attachment_name);
     }
 
 ///События установки/удаления слушателя
-    void OnSetListener (const char* attachment_name, scene_graph::Listener* listener) 
+    void OnSetListener (const char* attachment_name, scene_graph::Listener& listener) 
     {
-      listener_attachments.insert (attachment_name);
       OnSetListenerNotify (attachment_name, listener);
     }
 
     void OnRemoveListener (const char* attachment_name) 
     {
-      listener_attachments.erase (attachment_name);
       OnRemoveListenerNotify (attachment_name);
     }
+    
+///События установки/удаления обработчика событий ввода
+    void OnSetInputHandler (const char* attachment_name, const InputHandler& handler) 
+    {
+      OnSetInputHandlerNotify (attachment_name, handler);
+    }
+
+    void OnRemoveInputHandler (const char* attachment_name) 
+    {
+      OnRemoveInputHandlerNotify (attachment_name);
+    }    
 
 ///Событие удаления клиента
     void OnDestroy () 
@@ -185,25 +237,8 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
       OnDestroyNotify ();
     }
 
-  private:
-    void RemoveAllScreens ()
-    {
-      for (AttachmentsSet::iterator iter = screen_attachments.begin (), end = screen_attachments.end (); iter != end; ++iter)
-        OnRemoveScreenNotify (iter->c_str ());
-
-      screen_attachments.clear ();
-    }
-
-    void RemoveAllListeners ()
-    {
-      for (AttachmentsSet::iterator iter = listener_attachments.begin (), end = listener_attachments.end (); iter != end; ++iter)
-        OnRemoveListenerNotify (iter->c_str ());
-
-      listener_attachments.clear ();
-    }
-
 //Оповещение слушателей
-    void OnSetScreenNotify (const char* attachment_name, render::Screen* screen)
+    void OnSetScreenNotify (const char* attachment_name, render::Screen& screen)
     {
       for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
         (*iter)->OnSetScreen (attachment_name, screen);
@@ -215,7 +250,7 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
         (*iter)->OnRemoveScreen (attachment_name);
     }
     
-    void OnSetListenerNotify (const char* attachment_name, scene_graph::Listener* listener)
+    void OnSetListenerNotify (const char* attachment_name, scene_graph::Listener& listener)
     {
       for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
         (*iter)->OnSetListener (attachment_name, listener);
@@ -226,6 +261,18 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
       for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
         (*iter)->OnRemoveListener (attachment_name);
     }
+    
+    void OnSetInputHandlerNotify (const char* attachment_name, const EngineAttachments::InputHandler& handler)
+    {
+      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+        (*iter)->OnSetInputHandler (attachment_name, handler);
+    }
+    
+    void OnRemoveInputHandlerNotify (const char* attachment_name)
+    {
+      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+        (*iter)->OnRemoveInputHandler (attachment_name);
+    }    
 
     void OnDestroyNotify ()
     {
@@ -234,36 +281,32 @@ struct Engine::Impl : public IEngineEventListener, public xtl::trackable
     }
 
   private:
-    typedef Engine::SubsystemPointer SubsystemPointer;
-
-    typedef stl::vector<SubsystemPointer>   Subsystems;
+    typedef xtl::com_ptr<IEngineSubsystem>  SubsystemPtr; 
+    typedef stl::vector<SubsystemPtr>       Subsystems;
     typedef stl::set<IEngineEventListener*> ListenerSet;
-    typedef stl::hash_set<stl::string>      AttachmentsSet;
 
   private:
     EngineAttachments attachments;
+    stl::string       name;
     stl::string       configuration_branch_name;
     Subsystems        subsystems;
-    AttachmentsSet    screen_attachments;
-    AttachmentsSet    listener_attachments;
     ListenerSet       listeners;
     size_t            start_level;
+    common::Log       log;
 };
 
 /*
-   Движок
-*/
-
-/*
-   Конструктор/деструктор
+    Конструктор / деструктор
 */
 
 Engine::Engine (const char* configuration_branch_name, size_t start_level, IEngineStartupParams* engine_startup_params)
 {
   if (!configuration_branch_name)
     throw xtl::make_null_argument_exception ("client::Engine::Engine", "configuration_branch_name");
+    
+  static size_t default_name_id = 1;
 
-  impl = new Impl (configuration_branch_name, engine_startup_params);
+  impl = new Impl (common::format ("Engine%u", default_name_id++).c_str (), configuration_branch_name, engine_startup_params);
 
   Start (start_level, engine_startup_params);
 }
@@ -273,7 +316,7 @@ Engine::~Engine ()
 }
 
 /*
-   Запуск систем
+    Запуск систем
 */
 
 void Engine::Start (size_t start_level, IEngineStartupParams* engine_startup_params)
@@ -287,7 +330,7 @@ size_t Engine::StartLevel () const
 }
 
 /*
-   Установка точек привязки
+    Установка точек привязки
 */
 
 void Engine::Attach (const EngineAttachments& attachments)
@@ -301,7 +344,7 @@ void Engine::Detach ()
 }
 
 /*
-   Получение данных
+    Получение данных
 */
 
 const char* Engine::ConfigurationBranch () const
@@ -310,7 +353,7 @@ const char* Engine::ConfigurationBranch () const
 }
 
 /*
-   Получение тракейбла
+    Получение сигнала оповещения об удалении Engine
 */
 
 xtl::trackable& Engine::GetTrackable () const
@@ -318,8 +361,19 @@ xtl::trackable& Engine::GetTrackable () const
   return *impl;
 }
 
+
+namespace client
+{
+
+xtl::trackable& get_trackable (const Engine& engine)
+{
+  return engine.GetTrackable ();
+}
+
+}
+
 /*
-   Перебор подсистем
+    Перебор подсистем
 */
 
 size_t Engine::SubsystemsCount () const
@@ -333,30 +387,21 @@ IEngineSubsystem& Engine::Subsystem (size_t index) const
 }
 
 /*
-   Добавление/удаление подсистем
+    Добавление / удаление подсистем
 */
 
-void Engine::AddSubsystem (const SubsystemPointer subsystem)
+void Engine::AddSubsystem (IEngineSubsystem* subsystem)
 {
   impl->AddSubsystem (subsystem);
 }
 
-void Engine::RemoveSubsystem (const SubsystemPointer subsystem)
+void Engine::RemoveSubsystem (IEngineSubsystem* subsystem)
 {
   impl->RemoveSubsystem (subsystem);
 }
 
 /*
-   Обработка событий ввода
-*/
-
-void Engine::ProcessInputEvent (const char* attachment_name, const char* event) const
-{
-  impl->ProcessInputEvent (attachment_name, event);
-}
-
-/*
-   Работа со слушателями событий
+    Работа со слушателями событий
 */
 
 void Engine::Attach (IEngineEventListener* listener)
@@ -367,14 +412,4 @@ void Engine::Attach (IEngineEventListener* listener)
 void Engine::Detach (IEngineEventListener* listener)
 {
   impl->Detach (listener);
-}
-
-namespace client
-{
-
-xtl::trackable& get_trackable (const Engine& engine)
-{
-  return engine.GetTrackable ();
-}
-
 }

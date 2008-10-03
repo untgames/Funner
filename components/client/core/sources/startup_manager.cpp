@@ -5,16 +5,30 @@ using namespace client;
 namespace
 {
 
-const char* LOG_NAME = "client.StartupManager";
-const char* REGISTRY_COMPONENTS_MASK = "client.subsystems.*";
+/*
+    Константы
+*/
+
+const char*  LOG_NAME                              = "client.StartupManager"; //имя потока протоколирования
+const char*  REGISTRY_COMPONENTS_MASK              = "client.subsystems.*";   //маска имени автоматически загружаемых компонентов
+const size_t DEFAULT_STARTUP_HANDLERS_RESERVE_SIZE = 32;                      //резервируемое количество обработчиков запуска подсистем
 
 }
+
+/*
+    Описание реализации менеджера запуска подсистем
+*/
 
 struct StartupManagerImpl::Impl
 {
   public:
-    Impl () : need_sort (false), log (LOG_NAME) {}
+///Конструктор
+    Impl () : need_sort (false), log (LOG_NAME)
+    {
+      startup_handlers.reserve (DEFAULT_STARTUP_HANDLERS_RESERVE_SIZE);
+    }
 
+///Регистрация обработчика запуска подсистемы
     void RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, size_t order)
     {
       static const char* METHOD_NAME = "client::StartupManager::RegisterStartupHandler";
@@ -27,11 +41,12 @@ struct StartupManagerImpl::Impl
       if (iter != startup_handlers.end ())
         throw xtl::format_operation_exception (METHOD_NAME, "Can't register startup handler with node name '%s', already registered", node_name);
 
-      startup_handlers.push_back (StartupHandlerEntryPtr (new StartupHandlerEntry (node_name, startup_handler, order)));
+      startup_handlers.push_back (StartupHandlerEntryPtr (new StartupHandlerEntry (node_name, startup_handler, order), false));
 
       need_sort = true;
     }
     
+///Удаление обработчика запуска подсистемы
     void UnregisterStartupHandler (const char* node_name)
     {
       if (!node_name)
@@ -43,18 +58,20 @@ struct StartupManagerImpl::Impl
         startup_handlers.erase (iter);
     }
 
+///Удаление всех обработчиков запуска подсистем
     void UnregisterAllStartupHandlers ()
     {
       startup_handlers.clear ();
     }
 
+///Запуск подсистем
     void Startup (Engine& engine, size_t low_level, size_t high_level, IEngineStartupParams* engine_startup_params)
     {
       static common::ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
 
       if (need_sort)
       {
-        stl::sort (startup_handlers.begin (), startup_handlers.end (), xtl::bind (&Impl::StartupHandlerEntryLessPredicate, this, _1, _2));
+        stl::sort (startup_handlers.begin (), startup_handlers.end (), &Impl::StartupHandlerEntryLessPredicate);
         need_sort = false;
       }
 
@@ -67,7 +84,7 @@ struct StartupManagerImpl::Impl
 
       for (StartupHandlers::iterator iter = startup_handlers.begin (), end = startup_handlers.end (); iter != end; ++iter)
       {
-        if (((*iter)->order < low_level) || ((*iter)->order > high_level))
+        if (((*iter)->order <= low_level) || ((*iter)->order > high_level))
           continue;
 
         if (!registry_branches.count ((*iter)->node_name.c_str ()))
@@ -86,7 +103,7 @@ struct StartupManagerImpl::Impl
     }
 
   private:
-    struct StartupHandlerEntry
+    struct StartupHandlerEntry: public xtl::reference_counter
     {
       stl::string    node_name;
       StartupHandler handler;
@@ -97,11 +114,11 @@ struct StartupManagerImpl::Impl
         {}
     };
 
-    typedef xtl::shared_ptr<StartupHandlerEntry> StartupHandlerEntryPtr;
-    typedef stl::vector<StartupHandlerEntryPtr>  StartupHandlers;
+    typedef xtl::intrusive_ptr<StartupHandlerEntry> StartupHandlerEntryPtr;
+    typedef stl::vector<StartupHandlerEntryPtr>     StartupHandlers;
 
   private:
-    bool StartupHandlerEntryLessPredicate (const StartupHandlerEntryPtr& left, const StartupHandlerEntryPtr& right)
+    static bool StartupHandlerEntryLessPredicate (const StartupHandlerEntryPtr& left, const StartupHandlerEntryPtr& right)
     {
       return left->order < right->order;
     }
@@ -122,11 +139,7 @@ struct StartupManagerImpl::Impl
 };
 
 /*
-   Реализация менеджера запуска
-*/
-
-/*
-   Конструктор/деструктор
+    Конструктор / деструктор
 */
 
 StartupManagerImpl::StartupManagerImpl ()
@@ -138,7 +151,7 @@ StartupManagerImpl::~StartupManagerImpl ()
 }
 
 /*
-   Добавление/удаление обработчиков
+    Добавление / удаление обработчиков
 */
 
 void StartupManagerImpl::RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, size_t order)
@@ -157,7 +170,7 @@ void StartupManagerImpl::UnregisterAllStartupHandlers ()
 }
 
 /*
-   Запуск обработчиков
+    Запуск обработчиков
 */
 
 void StartupManagerImpl::Startup (Engine& engine, size_t low_level, size_t high_level, IEngineStartupParams* engine_startup_params)
@@ -166,11 +179,7 @@ void StartupManagerImpl::Startup (Engine& engine, size_t low_level, size_t high_
 }
 
 /*
-   Менеджер запуска
-*/
-
-/*
-   Добавление/удаление обработчиков
+    Добавление / удаление обработчиков
 */
 
 void StartupManager::RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler, size_t order)

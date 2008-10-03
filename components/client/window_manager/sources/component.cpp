@@ -39,7 +39,7 @@ class WindowManagerComponent
     //загрузка компонента
     WindowManagerComponent () 
     {
-      StartupManager::RegisterStartupHandler ("WindowManager", &window_manager_startup, StartupGroup_Level0);
+      StartupManager::RegisterStartupHandler ("WindowManager", &window_manager_startup, StartupGroup_Level1);
     }
 };
 

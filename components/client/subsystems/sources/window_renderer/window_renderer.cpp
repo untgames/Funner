@@ -11,6 +11,8 @@
 using namespace client;
 using namespace common;
 
+//сделать подсистему, и при удалении подсистемы отменять регистрацию окна!!!
+
 namespace
 {
 

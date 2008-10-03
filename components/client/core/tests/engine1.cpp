@@ -28,9 +28,9 @@ class ClientEventListener : public IEngineEventListener
 {
   public:
 ///События установки/удаления экрана
-    void OnSetScreen (const char* attachment_name, render::Screen* screen) 
+    void OnSetScreen (const char* attachment_name, render::Screen& screen) 
     {
-      printf ("OnSetScreen: attachment_name is '%s', screen name is '%s'\n", attachment_name, screen->Name ());
+      printf ("OnSetScreen: attachment_name is '%s', screen name is '%s'\n", attachment_name, screen.Name ());
     }
 
     void OnRemoveScreen (const char* attachment_name) 
@@ -39,14 +39,25 @@ class ClientEventListener : public IEngineEventListener
     }
 
 ///События установки/удаления слушателя
-    void OnSetListener (const char* attachment_name, scene_graph::Listener* listener) 
+    void OnSetListener (const char* attachment_name, scene_graph::Listener& listener) 
     {
-      printf ("OnSetListener: attachment_name is '%s', listener name is '%s'\n", attachment_name, listener->Name ());
+      printf ("OnSetListener: attachment_name is '%s', listener name is '%s'\n", attachment_name, listener.Name ());
     }
 
     void OnRemoveListener (const char* attachment_name) 
     {
       printf ("OnRemoveListener: attachment_name is '%s'\n", attachment_name);
+    }
+    
+///События установки/удаления обработчика событий ввода
+    void OnSetInputHandler (const char* attachment_name, const InputHandler&)
+    {
+      printf ("OnSetInputHandler: attachment_name is '%s'\n", attachment_name);
+    }
+    
+    void OnRemoveInputHandler (const char* attachment_name)
+    {
+      printf ("OnRemoveInputHandler: attachment_name is '%s'\n", attachment_name);
     }
 
 ///Событие удаления клиента
@@ -73,7 +84,7 @@ class EngineSubsystem : public IEngineSubsystem, public xtl::reference_counter
     {
       printf ("Starting subsystem '%s'. Engine startup params = %p\n", Name (), engine_startup_params);
 
-      engine.AddSubsystem (Engine::SubsystemPointer (this));
+      engine.AddSubsystem (this);
     }
 
   private:
@@ -92,9 +103,11 @@ void log_handler (const char* log_name, const char* message)
 
 int main ()
 {
+  printf ("Results of engine1_test:\n");
+
   try
   {
-    common::LogFilter log_filter ("*", &log_handler);
+    common::LogFilter log_filter ("client.engines.*", &log_handler);
     common::ConfigurationRegistry::LoadConfiguration (CONFIGURATION_FILE_NAME);
 
     ClientEventListener client_event_listener;
@@ -109,9 +122,9 @@ int main ()
                                   subsystem3 (new EngineSubsystem (SUBSYSTEM3_CONFIGURATION), false), subsystem4 (new EngineSubsystem (SUBSYSTEM4_CONFIGURATION), false);
 
     StartupManager::RegisterStartupHandler (SUBSYSTEM1_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem1.get (), _1, _2, _3), StartupGroup_Level5);
-    StartupManager::RegisterStartupHandler (SUBSYSTEM2_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem2.get (), _1, _2, _3));
+    StartupManager::RegisterStartupHandler (SUBSYSTEM2_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem2.get (), _1, _2, _3), 2);
     StartupManager::RegisterStartupHandler (SUBSYSTEM3_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem3.get (), _1, _2, _3), StartupGroup_Level2);
-    StartupManager::RegisterStartupHandler (SUBSYSTEM4_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem4.get (), _1, _2, _3), 0);
+    StartupManager::RegisterStartupHandler (SUBSYSTEM4_CONFIGURATION, xtl::bind (&EngineSubsystem::SubsystemStarter, subsystem4.get (), _1, _2, _3));
 
     Engine engine (CONFIGURATION_BRANCH_NAME, StartupGroup_Level2);
 
@@ -122,16 +135,16 @@ int main ()
 
     engine.Attach (client);
 
-    client.SetScreen ("ScreenAttachment", &screen);
+    client.SetScreen ("ScreenAttachment", screen);
 
     engine.Attach (&client_event_listener);
 
     engine.Start (StartupGroup_LevelMax);
 
     printf ("Engine subsystems count is %u\n", engine.SubsystemsCount ());
-    printf ("engine subsystem 1 name is '%s'\n", engine.Subsystem (1).Name ());
+    printf ("Engine subsystem 1 name is '%s'\n", engine.Subsystem (1).Name ());
 
-    client2.SetScreen ("ScreenAttachment2", &screen);
+    client2.SetScreen ("ScreenAttachment2", screen);
 
     engine.Start (StartupGroup_LevelMax);
 
@@ -139,9 +152,9 @@ int main ()
 
     engine.Detach ();
 
-    client.SetScreen ("ScreenAttachment", &screen);
+    client.SetScreen ("ScreenAttachment", screen);
 
-    engine.RemoveSubsystem (subsystem1);
+    engine.RemoveSubsystem (subsystem1.get ());
 
     printf ("Engine subsystems count is %u\n", engine.SubsystemsCount ());
   }

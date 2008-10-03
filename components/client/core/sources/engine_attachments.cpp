@@ -2,253 +2,233 @@
 
 using namespace client;
 
-namespace
-{
-
-struct ScreenAttachment
-{
-  stl::string    attachment_name;
-  render::Screen screen;
-
-  ScreenAttachment (const char* in_attachment_name, render::Screen* in_screen)
-    : attachment_name (in_attachment_name), screen (*in_screen)
-    {}
-};
-
-struct ListenerAttachment
-{
-  stl::string                    attachment_name;
-  scene_graph::Listener::Pointer listener;
-
-  ListenerAttachment (const char* in_attachment_name, scene_graph::Listener* in_listener)
-    : attachment_name (in_attachment_name), listener (in_listener)
-    {}
-};
-
-typedef xtl::shared_ptr<ScreenAttachment>   ScreenAttachmentPtr;
-typedef xtl::shared_ptr<ListenerAttachment> ListenerAttachmentPtr;
-
-typedef stl::vector<ScreenAttachmentPtr>   ScreenAttachments;
-typedef stl::vector<ListenerAttachmentPtr> ListenerAttachments;
-
-}
-
 /*
-   Реализация клиента
+    Реализация клиента
 */
 
-struct EngineAttachments::Impl : public xtl::reference_counter
+struct EngineAttachments::Impl: public xtl::reference_counter
 {
   public:
+///Деструктор
     ~Impl ()
     {
-      RemoveAllScreens   ();
-      RemoveAllListeners ();
-      OnDestroyNotify    ();
+      RemoveAllScreens       ();
+      RemoveAllListeners     ();
+      RemoveAllInputHandlers ();
+      OnDestroyNotify        ();
     }
 
-///Работа с экранами
-    void SetScreen (const char* attachment_name, render::Screen* screen)
+///Установка экрана
+    void SetScreen (const char* attachment_name, render::Screen& screen)
     {
       static const char* METHOD_NAME = "EngineAttachments::EngineAttachments::SetScreen";
 
       if (!attachment_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
 
-      if (!screen)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "screen");
+      ScreenAttachments::iterator iter = screen_attachments.find (attachment_name);
 
-      ScreenAttachments::iterator insert_position = FindScreenAttachment (attachment_name);
-
-      if (insert_position != screen_attachments.end ())
-        (*insert_position)->screen = *screen;
+      if (iter != screen_attachments.end ())
+      {
+        iter->second->screen = screen;
+      }
       else
-        screen_attachments.push_back (ScreenAttachmentPtr (new ScreenAttachment (attachment_name, screen)));
+      {
+        screen_attachments.insert_pair (attachment_name, ScreenAttachmentPtr (new ScreenAttachment (attachment_name, screen), false));
+      }
 
       OnSetScreenNotify (attachment_name, screen);
     }
 
+///Удаление экрана
     void RemoveScreen (const char* attachment_name)
     {
       if (!attachment_name)
-        throw xtl::make_null_argument_exception ("client::EngineAttachments::RemoveScreen", "attachment_name");
+        return;
 
-      ScreenAttachments::iterator erase_position = FindScreenAttachment (attachment_name);
+      ScreenAttachments::iterator iter = screen_attachments.find (attachment_name);
 
-      if (erase_position != screen_attachments.end ())
-      {
-        OnRemoveScreenNotify (attachment_name);
+      if (iter == screen_attachments.end ())
+        return;
 
-        screen_attachments.erase (erase_position);      
-      }
+      OnRemoveScreenNotify     (attachment_name);
+      screen_attachments.erase (iter);
     }
 
+///Удаление всех экранов
     void RemoveAllScreens ()
     {
-      for (ScreenAttachments::iterator iter = screen_attachments.begin (), end = screen_attachments.end (); iter != end; ++iter)
-        OnRemoveScreenNotify ((*iter)->attachment_name.c_str ());
+      for (ScreenAttachments::iterator iter=screen_attachments.begin (), end=screen_attachments.end (); iter!=end; ++iter)
+        OnRemoveScreenNotify (iter->second->name.c_str ());
 
       screen_attachments.clear ();
     }
 
+///Поиск экрана
     render::Screen* FindScreen (const char* attachment_name)
     {
       if (!attachment_name)
-        throw xtl::make_null_argument_exception ("client::EngineAttachments::FindScreen", "attachment_name");
+        return 0;
 
-      ScreenAttachments::iterator find_position = FindScreenAttachment (attachment_name);
+      ScreenAttachments::iterator iter = screen_attachments.find (attachment_name);
 
-      if (find_position != screen_attachments.end ())
-        return &(*find_position)->screen;
+      if (iter != screen_attachments.end ())
+        return &iter->second->screen;
 
       return 0;
     }
-
-    size_t ScreensCount () const
+    
+///Перебор экранов
+    ScreenIterator CreateScreenIterator ()
     {
-      return screen_attachments.size ();
+      struct Selector
+      {
+        IAttachment<render::Screen>& operator () (ScreenAttachments::value_type& value) const { return *value.second; }
+      };
+      
+      return ScreenIterator (screen_attachments.begin (), screen_attachments.begin (), screen_attachments.end (), Selector ());
     }
 
-    render::Screen* Screen (size_t index) const
-    {
-      if (index >= screen_attachments.size ())
-        throw xtl::make_range_exception ("client::EngineAttachments::Screen", "index", index, 0u, screen_attachments.size ());
-
-      return &screen_attachments[index]->screen;
-    }
-
-    const char* ScreenName (size_t index) const
-    {
-      if (index >= screen_attachments.size ())
-        throw xtl::make_range_exception ("client::EngineAttachments::ScreenName", "index", index, 0u, screen_attachments.size ());
-
-      return screen_attachments[index]->attachment_name.c_str ();
-    }
-
-///Работа со слушателями
-    void SetListener (const char* attachment_name, scene_graph::Listener* listener)
+///Установка слушателя
+    void SetListener (const char* attachment_name, scene_graph::Listener& listener)
     {
       static const char* METHOD_NAME = "client::EngineAttachments::SetListener";
 
       if (!attachment_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
 
-      if (!listener)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "listener");
+      ListenerAttachments::iterator iter = listener_attachments.find (attachment_name);
 
-      ListenerAttachments::iterator insert_position = FindListenerAttachment (attachment_name);
-
-      if (insert_position != listener_attachments.end ())
-        (*insert_position)->listener = listener;
+      if (iter != listener_attachments.end ())
+      {
+        iter->second->listener = &listener;
+      }
       else
-        listener_attachments.push_back (ListenerAttachmentPtr (new ListenerAttachment (attachment_name, listener)));
+      {        
+        listener_attachments.insert_pair (attachment_name, ListenerAttachmentPtr (new ListenerAttachment (attachment_name, listener), false));
+      }
 
       OnSetListenerNotify (attachment_name, listener);
     }
 
+///Удаление слушателя
     void RemoveListener (const char* attachment_name)
     {
       if (!attachment_name)
-        throw xtl::make_null_argument_exception ("client::EngineAttachments::RemoveListener", "attachment_name");
+        return;
 
-      ListenerAttachments::iterator erase_position = FindListenerAttachment (attachment_name);
+      ListenerAttachments::iterator iter = listener_attachments.find (attachment_name);
 
-      if (erase_position != listener_attachments.end ())
-      {
-        OnRemoveListenerNotify (attachment_name);
+      if (iter == listener_attachments.end ())
+        return;
 
-        listener_attachments.erase (erase_position);
-      }
+      OnRemoveListenerNotify     (attachment_name);
+      listener_attachments.erase (iter);
     }
 
+///Удаление всех слушателей
     void RemoveAllListeners ()
     {
-      for (ListenerAttachments::iterator iter = listener_attachments.begin (), end = listener_attachments.end (); iter != end; ++iter)
-        OnRemoveListenerNotify ((*iter)->attachment_name.c_str ());
+      for (ListenerAttachments::iterator iter=listener_attachments.begin (), end=listener_attachments.end (); iter!=end; ++iter)
+        OnRemoveListenerNotify (iter->second->name.c_str ());
 
       listener_attachments.clear ();
     }
 
+///Поиск слушателя по имени
     scene_graph::Listener* FindListener (const char* attachment_name)
     {
       if (!attachment_name)
-        throw xtl::make_null_argument_exception ("client::EngineAttachments::FindListener", "attachment_name");
+        return 0;
 
-      ListenerAttachments::iterator find_position = FindListenerAttachment (attachment_name);
+      ListenerAttachments::iterator iter = listener_attachments.find (attachment_name);
 
-      if (find_position != listener_attachments.end ())
-        return (*find_position)->listener.get ();
+      if (iter != listener_attachments.end ())
+        return iter->second->listener.get ();
 
       return 0;
     }
-
-    size_t ListenersCount () const
+    
+///Перебор слушателей
+    ListenerIterator CreateListenerIterator ()
     {
-      return listener_attachments.size ();
+      struct Selector
+      {
+        IAttachment<scene_graph::Listener>& operator () (ListenerAttachments::value_type& value) const { return *value.second; }
+      };
+      
+      return ListenerIterator (listener_attachments.begin (), listener_attachments.begin (), listener_attachments.end (), Selector ());
     }
-
-    scene_graph::Listener* Listener (size_t index) const
+    
+///Регистрация обработчика событий ввода
+    void SetInputHandler (const char* attachment_name, const InputHandler& handler)
     {
-      if (index >= listener_attachments.size ())
-        throw xtl::make_range_exception ("client::EngineAttachments::Listener", "index", index, 0u, listener_attachments.size ());
-
-      return listener_attachments[index]->listener.get ();
-    }
-
-    const char* ListenerName (size_t index) const
-    {
-      if (index >= listener_attachments.size ())
-        throw xtl::make_range_exception ("client::EngineAttachments::ListenerName", "index", index, 0u, listener_attachments.size ());
-
-      return listener_attachments[index]->attachment_name.c_str ();
-    }
-
-///Работа с устройствами ввода
-    xtl::connection RegisterInputHandler (const InputEventHandler& input_handler)
-    {
-      return input_signal.connect (input_handler);
-    }
-
-    void SetInputTranslator (const char* attachment_name, const char* translation_table)
-    {
-      static const char* METHOD_NAME = "client::EngineAttachments::SetInputTranslator";
+      static const char* METHOD_NAME = "EngineAttachments::EngineAttachments::SetScreen";
 
       if (!attachment_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
 
-      if (!translation_table)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "translation_table");
+      InputHandlerAttachments::iterator iter = input_attachments.find (attachment_name);
 
-      input_translator_attachments[attachment_name] = input::TranslationMap (translation_table);
+      if (iter != input_attachments.end ())
+      {
+        iter->second->handler = handler;
+      }
+      else
+      {
+        input_attachments.insert_pair (attachment_name, InputHandlerAttachmentPtr (new InputHandlerAttachment (attachment_name, handler), false));
+      }
+
+      OnSetInputHandlerNotify (attachment_name, handler);
     }
-
-    void RemoveInputTranslator (const char* attachment_name)
+    
+///Удаление обработчика событий ввода
+    void RemoveInputHandler (const char* attachment_name)
     {
       if (!attachment_name)
-        throw xtl::make_null_argument_exception ("client::EngineAttachments::RemoveInputTranslator", "attachment_name");
-
-      input_translator_attachments.erase (attachment_name);
+        return;
+        
+      InputHandlerAttachments::iterator iter = input_attachments.find (attachment_name);
+      
+      if (iter == input_attachments.end ())
+        return;
+        
+      OnRemoveInputHandlerNotify (attachment_name);
+      input_attachments.erase    (iter);
     }
-
-    void RemoveAllInputTranslators ()
+    
+///Удаление всех обработчиков событий ввода
+    void RemoveAllInputHandlers ()
     {
-      input_translator_attachments.clear ();
+      for (InputHandlerAttachments::iterator iter=input_attachments.begin (), end=input_attachments.end (); iter!=end; ++iter)
+        OnRemoveInputHandlerNotify (iter->second->name.c_str ());
+
+      input_attachments.clear ();
     }
-
-    void ProcessInputEvent (const char* attachment_name, const char* event)
+    
+///Поиск обработчика событий ввода
+    const InputHandler* FindInputHandler (const char* attachment_name)
     {
-      static const char* METHOD_NAME = "client::EngineAttachments::ProcessInputEvent";
-
       if (!attachment_name)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
-
-      if (!event)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "event");
-
-      InputTraslatorMap::iterator translation_map = input_translator_attachments.find (attachment_name);
-
-      if (translation_map != input_translator_attachments.end ())
-        translation_map->second.ProcessEvent (event, xtl::bind (&EngineAttachments::Impl::InputEventHandler, this, attachment_name, _1));
+        return 0;
+      
+      InputHandlerAttachments::iterator iter = input_attachments.find (attachment_name);
+      
+      if (iter != input_attachments.end ())
+        return &iter->second->handler;
+        
+      return 0;
+    }
+    
+///Перебор обработчиков событий ввода
+    InputHandlerIterator CreateInputHandlerIterator ()
+    {
+      struct Selector
+      {
+        IAttachment<const InputHandler>& operator () (InputHandlerAttachments::value_type& value) const { return *value.second; }
+      };
+      
+      return InputHandlerIterator (input_attachments.begin (), input_attachments.begin (), input_attachments.end (), Selector ());
     }
 
 ///Работа со слушателями событий
@@ -259,12 +239,12 @@ struct EngineAttachments::Impl : public xtl::reference_counter
       if (!listener)
         throw xtl::make_null_argument_exception (METHOD_NAME, "listener");
 
-      ListenerSet::iterator iter = listeners.find (listener);
+      EventListenerSet::iterator iter = event_listeners.find (listener);
 
-      if (iter != listeners.end ())
+      if (iter != event_listeners.end ())
         throw xtl::format_operation_exception (METHOD_NAME, "Listener already attached");
 
-      listeners.insert (listener);
+      event_listeners.insert (listener);
     }
 
     void Detach (IEngineEventListener* listener)
@@ -272,85 +252,111 @@ struct EngineAttachments::Impl : public xtl::reference_counter
       if (!listener)
         throw xtl::make_null_argument_exception ("client::EngineAttachments::Detach", "listener");
 
-      listeners.erase (listener);
+      event_listeners.erase (listener);
     }
 
   private:
-///Поиск экрана
-    ScreenAttachments::iterator FindScreenAttachment (const char* attachment_name)
-    {     
-      for (ScreenAttachments::iterator iter = screen_attachments.begin (), end = screen_attachments.end (); iter != end; ++iter)
-        if (!xtl::xstrcmp ((*iter)->attachment_name.c_str (), attachment_name))
-          return iter;
-
-      return screen_attachments.end ();
-    }
-
-///Поиск слушателя
-    ListenerAttachments::iterator FindListenerAttachment (const char* attachment_name)
-    {     
-      for (ListenerAttachments::iterator iter = listener_attachments.begin (), end = listener_attachments.end (); iter != end; ++iter)
-        if (!xtl::xstrcmp ((*iter)->attachment_name.c_str (), attachment_name))
-          return iter;
-
-      return listener_attachments.end ();
-    }
-
 //Оповещение слушателей
-    void OnSetScreenNotify (const char* attachment_name, render::Screen* screen)
+    void OnSetScreenNotify (const char* attachment_name, render::Screen& screen)
     {
-      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
         (*iter)->OnSetScreen (attachment_name, screen);
     }
     
     void OnRemoveScreenNotify (const char* attachment_name)
     {
-      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
         (*iter)->OnRemoveScreen (attachment_name);
     }
     
-    void OnSetListenerNotify (const char* attachment_name, scene_graph::Listener* listener)
+    void OnSetListenerNotify (const char* attachment_name, scene_graph::Listener& listener)
     {
-      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
         (*iter)->OnSetListener (attachment_name, listener);
     }
     
     void OnRemoveListenerNotify (const char* attachment_name)
     {
-      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
         (*iter)->OnRemoveListener (attachment_name);
     }
+    
+    void OnSetInputHandlerNotify (const char* attachment_name, const InputHandler& handler)
+    {
+      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
+        (*iter)->OnSetInputHandler (attachment_name, handler);
+    }
+    
+    void OnRemoveInputHandlerNotify (const char* attachment_name)
+    {
+      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
+        (*iter)->OnRemoveInputHandler (attachment_name);
+    }    
 
     void OnDestroyNotify ()
     {
-      for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
+      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
         (*iter)->OnDestroy ();
     }
-
-    void InputEventHandler (const char* attachment_name, const char* event)
+   
+  private:
+    struct ScreenAttachment: public IAttachment<render::Screen>, public xtl::reference_counter
     {
-      input_signal (attachment_name, event);
-    }
+      stl::string    name;
+      render::Screen screen;
+      
+      ScreenAttachment (const char* in_name, render::Screen& in_screen) : name (in_name), screen (in_screen) {}      
+
+      const char*     Name  () { return name.c_str (); }
+      render::Screen& Value () { return screen; }
+    };
+    
+    struct ListenerAttachment: public IAttachment<scene_graph::Listener>, public xtl::reference_counter
+    {
+      stl::string                    name;
+      scene_graph::Listener::Pointer listener;
+      
+      ListenerAttachment (const char* in_name, scene_graph::Listener& in_listener) : name (in_name), listener (&in_listener) {}
+
+      const char*            Name  () { return name.c_str (); }
+      scene_graph::Listener& Value () { return *listener; }
+    };
+    
+    struct InputHandlerAttachment: public IAttachment<const InputHandler>, public xtl::reference_counter
+    {
+      stl::string  name;
+      InputHandler handler;
+      
+      InputHandlerAttachment (const char* in_name, const InputHandler& in_handler) : name (in_name), handler (in_handler) {} 
+
+      const char*         Name  () { return name.c_str (); }
+      const InputHandler& Value () { return handler; }
+    };    
 
   private:
-    typedef xtl::signal<void (const char*, const char*)>                     InputSignal;
-    typedef stl::set<IEngineEventListener*>                                  ListenerSet;
-    typedef stl::hash_map<stl::hash_key<const char*>, input::TranslationMap> InputTraslatorMap;
+    typedef xtl::intrusive_ptr<ScreenAttachment>                                 ScreenAttachmentPtr;
+    typedef stl::hash_map<stl::hash_key<const char*>, ScreenAttachmentPtr>       ScreenAttachments;
+    typedef xtl::intrusive_ptr<ListenerAttachment>                               ListenerAttachmentPtr;
+    typedef stl::hash_map<stl::hash_key<const char*>, ListenerAttachmentPtr>     ListenerAttachments;
+    typedef xtl::intrusive_ptr<InputHandlerAttachment>                           InputHandlerAttachmentPtr;
+    typedef stl::hash_map<stl::hash_key<const char*>, InputHandlerAttachmentPtr> InputHandlerAttachments;
+    typedef stl::hash_set<IEngineEventListener*>                                 EventListenerSet;    
 
   private:
-    ScreenAttachments   screen_attachments;
-    ListenerAttachments listener_attachments;
-    InputSignal         input_signal;
-    ListenerSet         listeners;
-    InputTraslatorMap   input_translator_attachments;
+    ScreenAttachments       screen_attachments;
+    ListenerAttachments     listener_attachments;
+    InputHandlerAttachments input_attachments;
+    EventListenerSet        event_listeners;
 };
 
 /*
-   Клиент
+===================================================================================================
+    EngineAttachments
+===================================================================================================
 */
 
 /*
-   Конструктор/деструктор
+    Конструктор / деструктор / присваивание
 */
 
 EngineAttachments::EngineAttachments ()
@@ -369,10 +375,6 @@ EngineAttachments::~EngineAttachments ()
   release (impl);
 }
 
-/*
-   Копирование
-*/
-
 EngineAttachments& EngineAttachments::operator = (const EngineAttachments& source)
 {
   EngineAttachments (source).Swap (*this);
@@ -381,10 +383,10 @@ EngineAttachments& EngineAttachments::operator = (const EngineAttachments& sourc
 }
 
 /*
-   Работа с экранами
+    Работа с экранами
 */
 
-void EngineAttachments::SetScreen (const char* attachment_name, render::Screen* screen)
+void EngineAttachments::SetScreen (const char* attachment_name, render::Screen& screen)
 {
   impl->SetScreen (attachment_name, screen);
 }
@@ -404,26 +406,16 @@ render::Screen* EngineAttachments::FindScreen (const char* attachment_name) cons
   return impl->FindScreen (attachment_name);
 }
 
-size_t EngineAttachments::ScreensCount () const
+EngineAttachments::ScreenIterator EngineAttachments::CreateScreenIterator () const
 {
-  return impl->ScreensCount ();
-}
-
-render::Screen* EngineAttachments::Screen (size_t index) const
-{
-  return impl->Screen (index);
-}
-
-const char* EngineAttachments::ScreenName (size_t index) const
-{
-  return impl->ScreenName (index);
+  return impl->CreateScreenIterator ();
 }
 
 /*
-   Работа со слушателями
+    Работа со слушателями
 */
 
-void EngineAttachments::SetListener (const char* attachment_name, scene_graph::Listener* listener)
+void EngineAttachments::SetListener (const char* attachment_name, scene_graph::Listener& listener)
 {
   impl->SetListener (attachment_name, listener);
 }
@@ -443,52 +435,42 @@ scene_graph::Listener* EngineAttachments::FindListener (const char* attachment_n
   return impl->FindListener (attachment_name);
 }
 
-size_t EngineAttachments::ListenersCount () const
+EngineAttachments::ListenerIterator EngineAttachments::CreateListenerIterator () const
 {
-  return impl->ListenersCount ();
-}
-
-scene_graph::Listener* EngineAttachments::Listener (size_t index) const
-{
-  return impl->Listener (index);
-}
-
-const char* EngineAttachments::ListenerName (size_t index) const
-{
-  return impl->ListenerName (index);
+  return impl->CreateListenerIterator ();
 }
 
 /*
-   Работа с устройствами ввода
+    Работа с устройствами ввода
 */
 
-xtl::connection EngineAttachments::RegisterInputHandler (const InputEventHandler& input_handler)
+void EngineAttachments::SetInputHandler (const char* attachment_name, const InputHandler& input_handler)
 {
-  return impl->RegisterInputHandler (input_handler);
+  impl->SetInputHandler (attachment_name, input_handler);
 }
 
-void EngineAttachments::SetInputTranslator (const char* attachment_name, const char* translation_table)
+void EngineAttachments::RemoveInputHandler (const char* attachment_name)
 {
-  impl->SetInputTranslator (attachment_name, translation_table);
+  impl->RemoveInputHandler (attachment_name);
 }
 
-void EngineAttachments::RemoveInputTranslator (const char* attachment_name)
+void EngineAttachments::RemoveAllInputHandlers ()
 {
-  impl->RemoveInputTranslator (attachment_name);
+  impl->RemoveAllInputHandlers ();
 }
 
-void EngineAttachments::RemoveAllInputTranslators ()
+const EngineAttachments::InputHandler* EngineAttachments::FindInputHandler (const char* attachment_name) const
 {
-  impl->RemoveAllInputTranslators ();
+  return impl->FindInputHandler (attachment_name);
 }
 
-void EngineAttachments::ProcessInputEvent (const char* attachment_name, const char* event) const
+EngineAttachments::InputHandlerIterator EngineAttachments::CreateInputHandlerIterator () const
 {
-  impl->ProcessInputEvent (attachment_name, event);
+  return impl->CreateInputHandlerIterator ();
 }
 
 /*
-   Работа со слушателями событий
+    Работа со слушателями событий
 */
 
 void EngineAttachments::Attach (IEngineEventListener* listener)
@@ -502,24 +484,24 @@ void EngineAttachments::Detach (IEngineEventListener* listener)
 }
 
 /*
-   Обмен
+    Обмен
 */
 
-void EngineAttachments::Swap (EngineAttachments& client)
+void EngineAttachments::Swap (EngineAttachments& attachments)
 {
-  stl::swap (impl, client.impl);
+  stl::swap (impl, attachments.impl);
 }
 
 namespace client
 {
 
 /*
-   Обмен
+    Обмен
 */
 
-void swap (EngineAttachments& client1, EngineAttachments& client2)
+void swap (EngineAttachments& attachments1, EngineAttachments& attachments2)
 {
-  client1.Swap (client2);
+  attachments1.Swap (attachments2);
 }
 
 }
