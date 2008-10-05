@@ -4,6 +4,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/common_exceptions.h>
 
+#include <common/component.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
@@ -52,6 +53,12 @@ class DriverManagerImpl
 ///Создание устройства ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDevice* CreateDevice (const char* driver_mask, const char* device_mask, const char* init_string = "");
+
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Загрузка драйверов по умолчанию
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LoadDefaultDrivers ();
 
   private:
     typedef xtl::com_ptr<IDriver>  DriverPtr;
@@ -115,6 +122,8 @@ IDriver* DriverManagerImpl::FindDriver (const char* name)
   if (!name)
     return 0;
     
+  LoadDefaultDrivers ();
+
   for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
     if (i->name == name)
       return get_pointer (i->driver);
@@ -128,11 +137,15 @@ IDriver* DriverManagerImpl::FindDriver (const char* name)
 
 size_t DriverManagerImpl::DriversCount ()
 {
+  LoadDefaultDrivers ();
+
   return drivers.size ();
 }
 
 IDriver* DriverManagerImpl::Driver (size_t index)
 {
+  LoadDefaultDrivers ();
+
   if (index >= drivers.size ())
     throw xtl::make_range_exception ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
 
@@ -141,6 +154,8 @@ IDriver* DriverManagerImpl::Driver (size_t index)
 
 const char* DriverManagerImpl::DriverName (size_t index)
 {
+  LoadDefaultDrivers ();
+
   if (index >= drivers.size ())
     throw xtl::make_range_exception ("input::low_level::DriverManager::Driver", "index", index, 0u, drivers.size ());
 
@@ -153,6 +168,8 @@ const char* DriverManagerImpl::DriverName (size_t index)
 
 IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* device_mask, const char* init_string)
 {
+  LoadDefaultDrivers ();
+
   if (!driver_mask)
     driver_mask = "*";
     
@@ -176,6 +193,15 @@ IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* d
     
   throw xtl::format_operation_exception ("input::low_level::DriverManagerImpl::CreateDevice",
     "No configuration with driver_mask='%s' and device_mask='%s'", driver_mask, device_mask);
+}
+
+/*
+   Загрузка драйверов по умолчанию
+*/
+
+void DriverManagerImpl::LoadDefaultDrivers ()
+{
+  static ComponentLoader loader ("input.low_level.*");
 }
 
 /*

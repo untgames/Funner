@@ -5,6 +5,9 @@ using namespace common;
 namespace
 {
 
+const char* COMPONENT_NAME = "input.low_level.direct_input8"; //имя компонента
+const char* DRIVER_NAME    = "DirectInput8";                  //имя драйвера
+
 void default_log_handler (const char*)
 {
 }
@@ -102,12 +105,13 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 
       if (create_result != DI_OK)
         throw xtl::format_operation_exception (METHOD_NAME, "Can't initialize direct input interface, error '%s'", get_direct_input_error_name (create_result));
+
+      RegisterDevices ();
     }
 
     ~Driver () 
     { 
       UnregisterDriver ();
-      UnregisterAllDevices ();
 
       direct_input_interface->Release ();
     }
@@ -158,7 +162,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
           if (create_result != DI_OK)
             throw xtl::format_operation_exception (METHOD_NAME, "Can't create direct input device, error '%s'", get_direct_input_error_name (create_result));
 
-          return new OtherDevice ((*iter)->window, name, device_interface, (*iter)->device_guid, log_fn, init_string);
+          return new OtherDevice (&dummy_window, name, device_interface, (*iter)->device_guid, log_fn, init_string);
         }
 
       throw xtl::make_argument_exception (METHOD_NAME, "name", name);
@@ -194,16 +198,9 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация окна как устройства ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterDevice (const char* device_name, syslib::Window& window)
+    void RegisterDevices ()
     {
-      static const char* METHOD_NAME = "input::low_level::direct_input_driver::Driver::RegisterDevice";
-
-      if (!device_name)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "device_name");
-
-      for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
-        if (!strcmp ((*iter)->device_name.c_str (), device_name))
-          throw xtl::make_argument_exception (METHOD_NAME, "device_name", device_name, "Name already registered");
+      static const char* METHOD_NAME = "input::low_level::direct_input_driver::Driver::RegisterDevices";
 
       current_device_type = DirectInputDeviceType_GameControl;
       direct_input_interface->EnumDevices (DI8DEVCLASS_GAMECTRL, &enum_devices_callback, this, DIEDFL_ATTACHEDONLY);
@@ -221,51 +218,9 @@ class Driver: virtual public IDriver, public xtl::reference_counter
         DriverManager::RegisterDriver (GetDescription (), this);
 
       for (DirectInputDeviceEntries::iterator iter = direct_input_device_entries.begin (), end = direct_input_device_entries.end (); iter != end; ++iter)
-      {
-        stl::string current_device_name = device_name;
-
-        current_device_name += '.';
-        current_device_name += iter->device_name;
-
-        device_entries.push_back (DeviceEntryPtr (new DeviceEntry (current_device_name.c_str (), iter->device_guid, iter->device_type, &window, 
-                                                                   window.RegisterEventHandler (syslib::WindowEvent_OnDestroy, 
-                                                                                                xtl::bind (&Driver::DestroyWindowHandler, this, _1, _2, _3)))));
-      }
+        device_entries.push_back (DeviceEntryPtr (new DeviceEntry (iter->device_name.c_str (), iter->device_guid, iter->device_type)));
 
       direct_input_device_entries.clear ();
-    }
-
-    void UnregisterDevice (const char* device_name)
-    {
-      if (!device_name)
-        return;
-
-      for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
-        if (!strcmp ((*iter)->device_name.c_str (), device_name))
-        {
-          device_entries.erase (iter);
-
-          if (device_entries.empty ())
-            UnregisterDriver ();
-
-          return;
-        }
-    }
-
-    void UnregisterAllDevices (syslib::Window& window)
-    {
-      for (DeviceEntries::iterator iter = device_entries.begin (); iter != device_entries.end (); ++iter)
-        if ((*iter)->window == &window)
-          device_entries.erase (iter--);
-
-      if (device_entries.empty ())
-        UnregisterDriver ();
-    }
-
-    void UnregisterAllDevices ()
-    {
-      device_entries.clear ();
-      UnregisterDriver ();
     }
 
   private:
@@ -276,11 +231,6 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     void UnregisterDriver ()
     {
       DriverManager::UnregisterDriver (GetDescription ());
-    }
-
-    void DestroyWindowHandler (syslib::Window& window, syslib::WindowEvent, const syslib::WindowEventContext&)
-    {
-      UnregisterAllDevices (window);
     }
 
   private:
@@ -295,20 +245,18 @@ class Driver: virtual public IDriver, public xtl::reference_counter
         {}
     };
 
-    struct DeviceEntry
+    struct DeviceEntry : public xtl::reference_counter
     {
       stl::string           device_name;
       GUID                  device_guid;
       DirectInputDeviceType device_type;
-      syslib::Window*       window;
-      xtl::auto_connection  on_window_destroy_connection;
 
-      DeviceEntry (const char* in_device_name, const GUID& in_device_guid, DirectInputDeviceType in_device_type, syslib::Window* in_window, xtl::connection& in_connection) 
-        : device_name (in_device_name), device_guid (in_device_guid), device_type (in_device_type), window (in_window), on_window_destroy_connection (in_connection)
+      DeviceEntry (const char* in_device_name, const GUID& in_device_guid, DirectInputDeviceType in_device_type)
+        : device_name (in_device_name), device_guid (in_device_guid), device_type (in_device_type)
         {}
     };
 
-    typedef xtl::shared_ptr<DeviceEntry>        DeviceEntryPtr;
+    typedef xtl::intrusive_ptr<DeviceEntry>     DeviceEntryPtr;
     typedef stl::vector<DeviceEntryPtr>         DeviceEntries;
     typedef stl::vector<DirectInputDeviceEntry> DirectInputDeviceEntries;
 
@@ -318,6 +266,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     LogHandler               log_fn;
     IDirectInput8            *direct_input_interface;  
     DirectInputDeviceType    current_device_type;
+    syslib::Window           dummy_window;
 };
 
 }
@@ -343,70 +292,27 @@ BOOL FAR PASCAL enum_devices_callback (LPCDIDEVICEINSTANCE device_instance, LPVO
 
 }
 
+/*
+    Компонент драйвера
+*/
+
 namespace
 {
 
-typedef common::Singleton<input::low_level::direct_input_driver::Driver> DirectInputDriverSingleton;
+class DirectInputDriverComponent
+{
+  public:
+    DirectInputDriverComponent ()
+    {
+      input::low_level::DriverManager::RegisterDriver (DRIVER_NAME, xtl::com_ptr<Driver> (new Driver, false).get ());
+    }
+};
 
 }
 
-namespace input
+extern "C"
 {
 
-namespace low_level
-{
-
-/*
-   Window-драйвер ввода
-*/
-
-/*
-   Имя драйвера
-*/
-
-const char* DirectInputDriver::Name ()
-{
-  return DirectInputDriverSingleton::Instance ().GetDescription ();
-}
-
-/*
-   Получение драйвера
-*/
-
-IDriver* DirectInputDriver::Driver ()
-{
-  return DirectInputDriverSingleton::InstancePtr ();
-}
-
-/*
-   Регистрация окна как устройства ввода
-*/
-
-void DirectInputDriver::RegisterDevice (const char* device_name, syslib::Window& window)
-{
-  DirectInputDriverSingleton::Instance ().RegisterDevice (device_name, window);
-}
-
-void DirectInputDriver::RegisterDevice (syslib::Window& window)
-{
-  RegisterDevice (window.Title (), window);
-}
-
-void DirectInputDriver::UnregisterDevice (const char* device_name)
-{
-  DirectInputDriverSingleton::Instance ().UnregisterDevice (device_name);
-}
-
-void DirectInputDriver::UnregisterAllDevices (syslib::Window& window)
-{
-  DirectInputDriverSingleton::Instance ().UnregisterAllDevices (window);
-}
-
-void DirectInputDriver::UnregisterAllDevices ()
-{
-  DirectInputDriverSingleton::Instance ().UnregisterAllDevices ();
-}
-
-}
+common::ComponentRegistrator<DirectInputDriverComponent> DirectInput8Driver (COMPONENT_NAME);
 
 }

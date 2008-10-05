@@ -3,35 +3,39 @@
 
 #include <stl/vector>
 
-#include <xtl/signal.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/common_exceptions.h>
+#include <xtl/signal.h>
+#include <xtl/string.h>
 
+#include <common/log.h>
 #include <common/strlib.h>
 
 #include <input/low_level/device.h>
 #include <input/low_level/driver.h>
-#include <input/low_level/direct_input_driver.h>
 
-#include <syslib/window.h>
 #include <syslib/application.h>
 
 using namespace common;
 using namespace syslib;
 using namespace input::low_level;
 
-void on_window_close (Window&, WindowEvent, const WindowEventContext&)
-{
-  Application::Exit (0);
-}
-
 void input_event_handler (const char* event)
 {
+  if (!xtl::xstrcmp ("'Mouse Button 2' down", event))
+    Application::Exit (0);
+
   printf ("New event: '%s'\n", event);
 }
 
 void debug_log_handler (const char* message)
 {
-  printf ("Debug log message: '%s'\n", message);
+  printf ("Debug log message: %s\n", message);
+}
+
+void print_log (const char* log_name, const char* message)
+{
+  printf ("%s: %s\n", log_name, message);
 }
 
 typedef xtl::com_ptr<IDevice> DevicePtr;
@@ -41,26 +45,27 @@ int main ()
   setlocale (LC_ALL, "Russian");
 
   printf ("Results of direct_input_driver1_test:\n");
+
+  LogFilter filter ("*", &print_log);
   
   try
   {
-    Window window (WindowStyle_Overlapped, 400, 300);
-    
-    window.SetTitle ("Test window");
+    IDriver* direct_input_driver = DriverManager::FindDriver ("DirectInput8");
 
-    DirectInputDriver::RegisterDevice (window);
+    if (!direct_input_driver)
+      throw xtl::format_operation_exception ("", "Can't find direct input 8 driver");
 
-    DirectInputDriver::Driver ()->SetDebugLog (&debug_log_handler);
+    direct_input_driver->SetDebugLog (&debug_log_handler);
 
     printf ("Available devices:\n");
 
     stl::vector<DevicePtr> devices;
 
-    for (size_t i = 0; i < DirectInputDriver::Driver ()->GetDevicesCount (); i++)
+    for (size_t i = 0; i < direct_input_driver->GetDevicesCount (); i++)
     {
-      printf ("  %u: '%s'\n", i + 1, DirectInputDriver::Driver ()->GetDeviceName (i));
+      printf ("  %u: '%s'\n", i + 1, direct_input_driver->GetDeviceName (i));
 
-      devices.push_back (DevicePtr (DriverManager::CreateDevice ("*", DirectInputDriver::Driver ()->GetDeviceName (i), "buffer_size=0"), false));
+      devices.push_back (DevicePtr (DriverManager::CreateDevice ("*", direct_input_driver->GetDeviceName (i), "buffer_size=0"), false));
 
       devices.back ()->SetEventHandler (&input_event_handler);
 
@@ -69,17 +74,13 @@ int main ()
       for (size_t j = 0; !word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").empty (); j++)
         printf ("  '%s' = %f\n", word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").c_str (), devices.back ()->GetProperty (word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").c_str ()));
 
-      if (common::wcmatch (DirectInputDriver::Driver ()->GetDeviceName (i), "*USB*xis*"))
+      if (common::wcmatch (direct_input_driver->GetDeviceName (i), "*USB*xis*"))
       {
         devices.back ()->SetProperty ("X axis.dead_zone", 0.4f);
         devices.back ()->SetProperty ("X axis.saturation", 0.6f);
       }
     }
     
-    window.Show ();
-
-    window.RegisterEventHandler (WindowEvent_OnClose, &on_window_close);
-
     Application::Run ();        
 
     return Application::GetExitCode ();    

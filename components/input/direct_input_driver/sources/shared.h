@@ -11,8 +11,8 @@
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
-#include <xtl/shared_ptr.h>
 
+#include <common/component.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
@@ -21,7 +21,6 @@
 
 #include <input/low_level/device.h>
 #include <input/low_level/driver.h>
-#include <input/low_level/direct_input_driver.h>
 
 #define DIRECTINPUT_VERSION 0x0800
 
