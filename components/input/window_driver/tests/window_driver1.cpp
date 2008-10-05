@@ -39,15 +39,16 @@ int main ()
 
     device->SetEventHandler (&input_event_handler);
 
+    printf ("Device name is '%s', full name is '%s'\n", device->GetName (), device->GetFullName ());
     printf ("Device has properties: '%s'\n", device->GetProperties ());
 
     device->SetProperty ("Cursor.auto_center", 1.f);
     device->SetProperty ("WheelX.sensitivity", -2.4f);
     device->SetProperty ("Cursor.sensitivity", -1.1f);
 
-    printf ("Property 'Cursor.auto_center'  = %f\n", device->GetProperty ("Cursor.auto_center"));
-    printf ("Property 'WheelY.sensitivity'  = %f\n", device->GetProperty ("WheelY.sensitivity"));
-    printf ("Property 'WheelX.sensitivity'  = %f\n", device->GetProperty ("WheelX.sensitivity"));
+    printf ("Property 'Cursor.auto_center' = %f\n", device->GetProperty ("Cursor.auto_center"));
+    printf ("Property 'WheelY.sensitivity' = %f\n", device->GetProperty ("WheelY.sensitivity"));
+    printf ("Property 'WheelX.sensitivity' = %f\n", device->GetProperty ("WheelX.sensitivity"));
     printf ("Property 'Cursor.sensitivity' = %f\n", device->GetProperty ("Cursor.sensitivity"));
 
     window.Show ();

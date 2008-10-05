@@ -37,6 +37,18 @@ enum DirectInputDeviceType
   DirectInputDeviceType_Other
 };
 
+const char* get_device_type_name (DirectInputDeviceType type)
+{
+  switch (type)
+  {
+    case DirectInputDeviceType_GameControl: return "Joystick";
+    case DirectInputDeviceType_Keyboard:    return "Keyboard";
+    case DirectInputDeviceType_Pointer:     return "Pointer";
+    case DirectInputDeviceType_Other:
+    default:                                return "Unknown";
+  }
+}
+
 struct ComInitializer
 {
   ComInitializer ()
@@ -162,7 +174,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
           if (create_result != DI_OK)
             throw xtl::format_operation_exception (METHOD_NAME, "Can't create direct input device, error '%s'", get_direct_input_error_name (create_result));
 
-          return new OtherDevice (&dummy_window, name, device_interface, (*iter)->device_guid, log_fn, init_string);
+          return new OtherDevice (&dummy_window, name, device_interface, (*iter)->device_guid, log_fn, get_device_type_name ((*iter)->device_type), init_string);
         }
 
       throw xtl::make_argument_exception (METHOD_NAME, "name", name);

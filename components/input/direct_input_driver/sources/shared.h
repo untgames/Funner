@@ -54,13 +54,19 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OtherDevice (syslib::Window* window, const char* name, IDirectInputDevice8* direct_input_device_interface, REFGUID rguid, const DebugLogHandler& debug_log_handler, const char* init_string = "");
+    OtherDevice (syslib::Window* window, const char* name, IDirectInputDevice8* direct_input_device_interface, REFGUID rguid, 
+                 const DebugLogHandler& debug_log_handler, const char* device_type, const char* init_string = "");
     ~OtherDevice ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* GetName () { return name.c_str (); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Полное имя устройства (тип.имя.идентификатор)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* GetFullName () { return full_name.c_str (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события устройства
@@ -179,6 +185,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 
   private:
     stl::string                             name;
+    stl::string                             full_name;
     DirectInputDeviceInterfacePtr           device_interface;
     input::low_level::IDevice::EventHandler event_handler;
     syslib::Timer                           poll_timer;

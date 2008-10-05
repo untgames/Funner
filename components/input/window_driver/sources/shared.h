@@ -50,6 +50,11 @@ class Device: virtual public input::low_level::IDevice, public xtl::reference_co
     const char* GetName () { return name.c_str (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Полное имя устройства (тип.имя.идентификатор)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* GetFullName () { return full_name.c_str (); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetEventHandler (const input::low_level::IDevice::EventHandler& handler)
@@ -86,6 +91,7 @@ class Device: virtual public input::low_level::IDevice, public xtl::reference_co
 
   private:
     stl::string                             name;                         //имя устройства
+    stl::string                             full_name;                    //полное имя устройства
     stl::string                             properties;                   //настройки
     input::low_level::IDevice::EventHandler event_handler;                //обработчик событий
     size_t                                  x_cursor_pos;                 //последние координаты курсора

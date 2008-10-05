@@ -63,12 +63,13 @@ int main ()
 
     for (size_t i = 0; i < direct_input_driver->GetDevicesCount (); i++)
     {
-      printf ("  %u: '%s'\n", i + 1, direct_input_driver->GetDeviceName (i));
+      printf ("  %u: name is '%s'", i + 1, direct_input_driver->GetDeviceName (i));
 
       devices.push_back (DevicePtr (DriverManager::CreateDevice ("*", direct_input_driver->GetDeviceName (i), "buffer_size=0"), false));
 
       devices.back ()->SetEventHandler (&input_event_handler);
 
+      printf (" full name is '%s'\n", devices.back ()->GetFullName ());
       printf ("Device has properties: '%s'\n", devices.back ()->GetProperties ());
 
       for (size_t j = 0; !word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").empty (); j++)

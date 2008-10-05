@@ -39,7 +39,7 @@ void default_event_handler (const char*)
 */
 
 Device::Device (Window* window, const char* in_name)
-  : event_handler (&default_event_handler), name (in_name), x_cursor_pos (window->CursorPosition ().x), y_cursor_pos (window->CursorPosition ().y),
+  : name (in_name), full_name ("window"), event_handler (&default_event_handler), x_cursor_pos (window->CursorPosition ().x), y_cursor_pos (window->CursorPosition ().y),
     autocenter_cursor (0), cursor_sensitivity (1.f), vertical_wheel_sensitivity (1.f), horisontal_wheel_sensitivity (1.f)
 {
   try
@@ -81,6 +81,12 @@ Device::Device (Window* window, const char* in_name)
   {
     exception.touch ("input::low_level::window::Device::Device");
     throw;
+  }
+
+  if (!name.empty ())
+  {
+    full_name += '.';
+    full_name += name;
   }
 }
 
