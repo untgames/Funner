@@ -375,15 +375,19 @@ TestApplication::TestApplication (const char* start_script_name)
       //инициализация direct input
 
     printf ("Init direct input driver input...\n");
-    input::low_level::DirectInputDriver::RegisterDevice (*(impl->window.get ()));
 
-    input::low_level::DirectInputDriver::Driver ()->SetDebugLog (&log_print);
+    input::low_level::IDriver* direct_input_driver = input::low_level::DriverManager::FindDriver ("DirectInput8");
 
-    for (size_t i = 0; i < input::low_level::DirectInputDriver::Driver ()->GetDevicesCount (); i++)
+    if (direct_input_driver)
     {
-      impl->input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", input::low_level::DirectInputDriver::Driver ()->GetDeviceName (i), "buffer_size=16"), false));
+      direct_input_driver->SetDebugLog (&log_print);
 
-      impl->input_devices.back ()->SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler));
+      for (size_t i = 0; i < direct_input_driver->GetDevicesCount (); i++)
+      {
+        impl->input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", direct_input_driver->GetDeviceName (i), "buffer_size=16"), false));
+
+        impl->input_devices.back ()->SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler));
+      }
     }
 
     printf ("Started\n");
