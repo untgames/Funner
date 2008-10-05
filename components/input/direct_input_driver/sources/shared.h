@@ -15,6 +15,7 @@
 #include <common/component.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+#include <common/utf_converter.h>
 
 #include <syslib/timer.h>
 #include <syslib/window.h>
@@ -69,6 +70,11 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     const char* GetFullName () { return full_name.c_str (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение имени контрола
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const wchar_t* GetControlName (const char* control_id);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetEventHandler (const input::low_level::IDevice::EventHandler& handler)
@@ -98,6 +104,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///Регистрация объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterObject (const char* name, size_t offset, ObjectType type);
+    void RegisterObject (const wchar_t* name, size_t offset, ObjectType type);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,6 +139,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     struct ObjectData
     {
       stl::string                 name;
+      stl::wstring                unicode_name;
       size_t                      offset;
       ObjectType                  type;
       DWORD                       min_value;                          //минимальное значение (для объектов типа ось)
@@ -141,16 +149,17 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
       DWORD                       last_value;                         //последнее значение
 
       ObjectData () {}
-      ObjectData (const char* in_name, size_t in_offset, ObjectType in_type) 
-        : name (in_name), offset (in_offset), type (in_type), min_value (-65536), max_value (65535), bad_object (0)
+      ObjectData (const char* in_name, const wchar_t* in_unicode_name, size_t in_offset, ObjectType in_type) 
+        : name (in_name), unicode_name (in_unicode_name), offset (in_offset), type (in_type), min_value (-65536), max_value (65535), bad_object (0)
         {}
     };
 
-    typedef xtl::com_ptr<IDirectInputDevice8>              DirectInputDeviceInterfacePtr;
-    typedef stl::hash_map<size_t, ObjectData>              ObjectsMap;
-    typedef xtl::uninitialized_storage<char>               DeviceDataBuffer;
-    typedef xtl::uninitialized_storage<char>               EventStringBuffer;
-    typedef xtl::uninitialized_storage<DIDEVICEOBJECTDATA> EventsBuffer;
+    typedef xtl::com_ptr<IDirectInputDevice8>                               DirectInputDeviceInterfacePtr;
+    typedef stl::hash_map<size_t, ObjectData>                               ObjectsMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, ObjectsMap::iterator> ObjectsNamesMap;
+    typedef xtl::uninitialized_storage<char>                                DeviceDataBuffer;
+    typedef xtl::uninitialized_storage<char>                                EventStringBuffer;
+    typedef xtl::uninitialized_storage<DIDEVICEOBJECTDATA>                  EventsBuffer;
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,6 +187,11 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ProcessInitStringProperty (const char* property, const char* value);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка событий
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ProcessEvent (const char* event);
+
   private:
     OtherDevice (const OtherDevice& source);             //no impl
     OtherDevice& operator = (const OtherDevice& source); //no impl
@@ -190,6 +204,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     input::low_level::IDevice::EventHandler event_handler;
     syslib::Timer                           poll_timer;
     ObjectsMap                              objects;
+    ObjectsNamesMap                         objects_names;
     bool                                    device_lost;
     ObjectPropertyMap                       objects_properties_map;
     stl::string                             properties;
@@ -199,6 +214,10 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     DeviceDataBuffer                        last_device_data;
     DeviceDataBuffer                        current_device_data;
     EventStringBuffer                       event_string_buffer;
+    size_t                                  current_axis;
+    size_t                                  current_button;
+    size_t                                  current_pov;
+    size_t                                  current_unknown;
 };
 
 const char* get_direct_input_error_name (HRESULT error);

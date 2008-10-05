@@ -3,8 +3,9 @@
 
 #include <stl/vector>
 
-#include <xtl/intrusive_ptr.h>
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/string.h>
 
@@ -20,12 +21,14 @@ using namespace common;
 using namespace syslib;
 using namespace input::low_level;
 
-void input_event_handler (const char* event)
+void input_event_handler (IDevice* device, const char* event)
 {
-  if (!xtl::xstrcmp ("'Mouse Button 2' down", event))
+  if (!xtl::xstrcmp ("'Button1' down", event))
     Application::Exit (0);
 
   printf ("New event: '%s'\n", event);
+
+  printf ("Control name is '%S'\n", device->GetControlName (word (event, 0, " ", " \t", "''").c_str ()));
 }
 
 void debug_log_handler (const char* message)
@@ -67,7 +70,7 @@ int main ()
 
       devices.push_back (DevicePtr (DriverManager::CreateDevice ("*", direct_input_driver->GetDeviceName (i), "buffer_size=0"), false));
 
-      devices.back ()->SetEventHandler (&input_event_handler);
+      devices.back ()->SetEventHandler (xtl::bind (&input_event_handler, devices.back ().get (), _1));
 
       printf (" full name is '%s'\n", devices.back ()->GetFullName ());
       printf ("Device has properties: '%s'\n", devices.back ()->GetProperties ());
@@ -77,8 +80,8 @@ int main ()
 
       if (common::wcmatch (direct_input_driver->GetDeviceName (i), "*USB*xis*"))
       {
-        devices.back ()->SetProperty ("X axis.dead_zone", 0.4f);
-        devices.back ()->SetProperty ("X axis.saturation", 0.6f);
+        devices.back ()->SetProperty ("Axis1.dead_zone", 0.4f);
+        devices.back ()->SetProperty ("Axis1.saturation", 0.6f);
       }
     }
     

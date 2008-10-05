@@ -135,7 +135,7 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
                           const DebugLogHandler& in_debug_log_handler, const char* device_type, const char* init_string)
   : name (in_name), device_interface (in_direct_input_device_interface, false), event_handler (&default_event_handler),
     poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10), device_lost (false), debug_log_handler (in_debug_log_handler),
-    events_buffer_size (16), event_string_buffer (1024)
+    events_buffer_size (16), event_string_buffer (1024), current_axis (0), current_button (0), current_pov (0), current_unknown (0)
 {
   static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::OtherDevice";
 
@@ -242,21 +242,6 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
       AddProperty (".sensitivity", iter, ObjectPropertyType_Sensitivity, 1.f);
   }
 
-  if (rguid == GUID_SysMouse)
-  {
-    RenameObject (offsetof (DIMOUSESTATE2, lX), "Mouse X Axis");
-    RenameObject (offsetof (DIMOUSESTATE2, lY), "Mouse Y Axis");
-    RenameObject (offsetof (DIMOUSESTATE2, lZ), "Mouse Z Axis");
-    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[0]), "Mouse Button 1");
-    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[1]), "Mouse Button 2");
-    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[2]), "Mouse Button 3");
-    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[3]), "Mouse Button 4");
-    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[4]), "Mouse Button 5");
-    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[5]), "Mouse Button 6");
-    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[6]), "Mouse Button 7");
-    RenameObject (offsetof (DIMOUSESTATE2, rgbButtons[7]), "Mouse Button 8");
-  }
-
   full_name = common::format ("%s.%s.%x-%x-%x-%x", device_type, in_name, ((size_t*)&rguid)[0], ((size_t*)&rguid)[1], ((size_t*)&rguid)[2], ((size_t*)&rguid)[3]);
 
   xtl::uninitialized_storage<char> initial_device_data (device_data_size);
@@ -294,6 +279,27 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
 OtherDevice::~OtherDevice ()
 {
   device_interface->Unacquire ();
+}
+
+/*
+   Получение имени контрола
+*/
+
+const wchar_t* OtherDevice::GetControlName (const char* control_id)
+{
+  static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::GetControlName";
+
+  printf ("Getting control name for id '%s'\n", control_id);
+
+  if (!control_id)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "control_id");
+
+  ObjectsNamesMap::iterator iter = objects_names.find (control_id);
+
+  if (iter == objects_names.end ())
+    throw xtl::make_argument_exception (METHOD_NAME, "control_id", control_id, "No such control");
+
+  return iter->second->second.unicode_name.c_str ();
 }
 
 /*
@@ -361,7 +367,27 @@ float OtherDevice::GetProperty (const char* name)
 
 void OtherDevice::RegisterObject (const char* name, size_t offset, ObjectType type)
 {
-  objects.insert_pair (offset, ObjectData (name, offset, type));
+  stl::wstring unicode_name = common::towstring (name);
+
+  RegisterObject (unicode_name.c_str (), offset, type);
+}
+
+void OtherDevice::RegisterObject (const wchar_t* unicode_name, size_t offset, ObjectType type)
+{
+  stl::string object_name;
+
+  if ((type == ObjectType_AbsoluteAxis) || (type == ObjectType_RelativeAxis))
+    object_name = common::format ("Axis%u", current_axis++);
+  else if (type == ObjectType_Button)
+    object_name = common::format ("Button%u", current_button++);
+  else if (type == ObjectType_POV)
+    object_name = common::format ("POV%u", current_pov++);
+  else
+    object_name = common::format ("Unknown%u", current_unknown++);
+
+  ObjectsMap::iterator iter = objects.insert_pair (offset, ObjectData (object_name.c_str (), unicode_name, offset, type)).first;
+
+  objects_names.insert_pair (object_name.c_str (), iter);
 }
 
 /*
@@ -385,7 +411,7 @@ void OtherDevice::PollDevice ()
       log_message = common::format ("Device %s reacquired", name.c_str ());
 
       debug_log_handler (log_message.c_str ());
-      event_handler ("device reacquired");
+      ProcessEvent ("device reacquired");
       
       device_lost       = false;
       device_reacquired = true;
@@ -397,7 +423,7 @@ void OtherDevice::PollDevice ()
         log_message = common::format ("Device %s lost", name.c_str ());
 
         debug_log_handler (log_message.c_str ());
-        event_handler ("device lost");
+        ProcessEvent ("device lost");
         
         device_lost = true;
       }
@@ -436,7 +462,7 @@ void OtherDevice::PollDevice ()
         log_message = common::format ("Bad device %s (loosing at get state)", name.c_str ());
 
         debug_log_handler (log_message.c_str ());
-        event_handler ("device bad");
+        ProcessEvent ("device bad");
         
         poll_timer.Pause ();
 
@@ -474,7 +500,7 @@ void OtherDevice::PollDevice ()
         log_message = common::format ("Device %s lost", name.c_str ());
 
         debug_log_handler (log_message.c_str ());
-        event_handler ("device lost");
+        ProcessEvent ("device lost");
         device_lost = true;
 
         return;
@@ -505,34 +531,34 @@ void OtherDevice::PollDevice ()
       {
         case ObjectType_AbsoluteAxis:
           xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' axis %.4f", iter->second.name.c_str (), (((float)(events_buffer.data ()[i].dwData - iter->second.min_value)) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
-          event_handler (event_string_buffer.data ());
+          ProcessEvent (event_string_buffer.data ());
           
           break;
         case ObjectType_RelativeAxis:
           xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' delta %f", iter->second.name.c_str (), ((float)(LONG)(events_buffer.data ()[i].dwData - iter->second.last_value)) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
-          event_handler (event_string_buffer.data ());
+          ProcessEvent (event_string_buffer.data ());
           
           break;
         case ObjectType_Button:
           xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' %s", iter->second.name.c_str (), (events_buffer.data ()[i].dwData & 0x80) ? "down" : "up");
-          event_handler (event_string_buffer.data ());
+          ProcessEvent (event_string_buffer.data ());
           
           break;
         case ObjectType_POV:
           if (!is_pov_pressed (events_buffer.data ()[i].dwData))
           {
             xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' up", iter->second.name.c_str ());
-            event_handler (event_string_buffer.data ());
+            ProcessEvent (event_string_buffer.data ());
           }
           else
           {
             xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' pov %d", iter->second.name.c_str (), events_buffer.data ()[i].dwData);
-            event_handler (event_string_buffer.data ());
+            ProcessEvent (event_string_buffer.data ());
             
             if (!is_pov_pressed (iter->second.last_value))
             {
               xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' down", iter->second.name.c_str ());
-              event_handler (event_string_buffer.data ());
+              ProcessEvent (event_string_buffer.data ());
             }
           }
           break;
@@ -556,34 +582,34 @@ void OtherDevice::PollDevice ()
         {
           case ObjectType_AbsoluteAxis:
             xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' axis %.4f", iter->second.name.c_str (), ((float)(*((LONG*)current_value) - iter->second.min_value) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
-            event_handler (event_string_buffer.data ());
+            ProcessEvent (event_string_buffer.data ());
 
             break;
           case ObjectType_RelativeAxis:
             xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' delta %f", iter->second.name.c_str (), (float)(*((LONG*)current_value) - *((LONG*)(&last_device_data.data ()[iter->second.offset]))) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
-            event_handler (event_string_buffer.data ());
+            ProcessEvent (event_string_buffer.data ());
 
             break;
           case ObjectType_Button:
             xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' %s", iter->second.name.c_str (), (*current_value & 0x80) ? "down" : "up");
-            event_handler (event_string_buffer.data ());
+            ProcessEvent (event_string_buffer.data ());
 
             break;
           case ObjectType_POV:
             if (!is_pov_pressed (*(DWORD*)current_value))
             {
               xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' up", iter->second.name.c_str ());
-              event_handler (event_string_buffer.data ());
+              ProcessEvent (event_string_buffer.data ());
             }
             else
             {
               xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' pov %d", iter->second.name.c_str (), *((DWORD*)current_value));
-              event_handler (event_string_buffer.data ());
+              ProcessEvent (event_string_buffer.data ());
 
               if (!is_pov_pressed (*(DWORD*)&last_device_data.data ()[iter->second.offset]))
               {
                 xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' down", iter->second.name.c_str ());
-                event_handler (event_string_buffer.data ());
+                ProcessEvent (event_string_buffer.data ());
               }
             }
             break;
@@ -659,4 +685,19 @@ void OtherDevice::RenameObject (size_t object_offset, const char* new_name)
     return;
 
   iter->second.name = new_name;
+}
+
+/*
+   Обработка событий
+*/
+
+void OtherDevice::ProcessEvent (const char* event)
+{
+  try
+  {
+    event_handler (event);
+  }
+  catch (...)
+  {
+  }
 }

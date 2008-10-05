@@ -95,6 +95,17 @@ Device::~Device ()
 }
 
 /*
+   Получение имени контрола
+*/
+
+const wchar_t* Device::GetControlName (const char* control_id)
+{
+  control_name = common::towstring (control_id);
+
+  return control_name.c_str ();
+}
+
+/*
    Настройки устройства
 */
 

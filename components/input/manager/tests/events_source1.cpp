@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <stl/string>
+
 #include <xtl/bind.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/function.h>
 #include <xtl/reference_counter.h>
 #include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
+
+#include <common/utf_converter.h>
 
 #include <input/low_level/driver.h>
 #include <input/low_level/device.h>
@@ -31,6 +35,17 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
 
 ///Получение имени устройства
     const char* GetName () { return TEST_DEVICE_NAME; }
+
+///Полное имя устройства (тип.имя.идентификатор)
+    const char* GetFullName () { return "type.TestInput.1c4a1-9f2-21-aa0c"; };
+
+///Получение имени контрола
+    const wchar_t* GetControlName (const char* control_id)
+    { 
+      control_name = common::towstring (control_id);
+      return control_name.c_str ();
+    }
+
 
 ///Подписка на события устройства
     void SetEventHandler (const EventHandler& handler)
@@ -69,6 +84,7 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     float        dead_zone;
     float        saturation_zone;
     EventHandler event_handler;
+    stl::wstring control_name;
 };
 
 //тестовый драйвер

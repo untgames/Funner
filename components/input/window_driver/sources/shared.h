@@ -18,6 +18,7 @@
 #include <xtl/common_exceptions.h>
 
 #include <common/singleton.h>
+#include <common/utf_converter.h>
 
 #include <syslib/window.h>
 #include <syslib/keydefs.h>
@@ -53,6 +54,11 @@ class Device: virtual public input::low_level::IDevice, public xtl::reference_co
 ///ѕолное им€ устройства (тип.им€.идентификатор)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* GetFullName () { return full_name.c_str (); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕолучение имени контрола
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const wchar_t* GetControlName (const char* control_id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕодписка на событи€ устройства
@@ -101,6 +107,7 @@ class Device: virtual public input::low_level::IDevice, public xtl::reference_co
     float                                   vertical_wheel_sensitivity;   //множитель delt'ы вертикального колеса мыши
     float                                   horisontal_wheel_sensitivity; //множитель delt'ы горизонтального колеса мыши
     stl::bitset<syslib::ScanCode_Num>       pressed_keys;                 //какие кнопки €вл€ютс€ нажатыми
+    stl::wstring                            control_name;                 //им€ контрола
 };
 
 }
