@@ -226,9 +226,6 @@ class Driver: virtual public IDriver, public xtl::reference_counter
       current_device_type = DirectInputDeviceType_Other;
       direct_input_interface->EnumDevices (DI8DEVCLASS_DEVICE, &enum_devices_callback, this, DIEDFL_ATTACHEDONLY);
 
-      if (device_entries.empty () && !direct_input_device_entries.empty ())
-        DriverManager::RegisterDriver (GetDescription (), this);
-
       for (DirectInputDeviceEntries::iterator iter = direct_input_device_entries.begin (), end = direct_input_device_entries.end (); iter != end; ++iter)
         device_entries.push_back (DeviceEntryPtr (new DeviceEntry (iter->device_name.c_str (), iter->device_guid, iter->device_type)));
 
