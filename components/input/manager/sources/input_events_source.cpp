@@ -44,9 +44,10 @@ struct EventsSource::Impl : public xtl::reference_counter
     typedef signal<void (const char*)> DeviceSignal;
     typedef com_ptr<IDevice>           DevicePtr;
 
-    DeviceSignal signals;           //сигналы устройства
-    DevicePtr    connected_device;  //подключённое устройство
-    stl::string  driver_name;       //имя драйвера
+    DeviceSignal         signals;           //сигналы устройства
+    DevicePtr            connected_device;  //подключённое устройство
+    xtl::auto_connection device_connection; //подключение к устройству
+    stl::string          driver_name;       //имя драйвера
 };
 
 /*
@@ -96,7 +97,7 @@ void EventsSource::Impl::Connect (const char* driver_name_mask, const char* devi
           {
             DevicePtr new_connected_device (driver->CreateDevice (driver->GetDeviceName (j)), false);
 
-            new_connected_device->SetEventHandler (xtl::bind (&EventsSource::Impl::DeviceEventHandler, this, _1));
+            device_connection = new_connected_device->RegisterEventHandler (xtl::bind (&EventsSource::Impl::DeviceEventHandler, this, _1));
 
             driver_name      = DriverManager::DriverName (i);
             connected_device = new_connected_device;
@@ -120,6 +121,7 @@ void EventsSource::Impl::Connect (const char* driver_name_mask, const char* devi
 void EventsSource::Impl::Disconnect ()
 {
   connected_device = 0;
+  device_connection.disconnect ();
   driver_name.clear ();
 }
 

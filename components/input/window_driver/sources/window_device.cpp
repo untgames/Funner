@@ -28,10 +28,6 @@ const char* PROPERTIES [] = {
 
 const size_t PROPERTIES_COUNT = sizeof (PROPERTIES) / sizeof (*PROPERTIES);
 
-void default_event_handler (const char*)
-{
-}
-
 }
 
 /*
@@ -39,7 +35,7 @@ void default_event_handler (const char*)
 */
 
 Device::Device (Window* window, const char* in_name)
-  : name (in_name), full_name ("window"), event_handler (&default_event_handler), x_cursor_pos (window->CursorPosition ().x), y_cursor_pos (window->CursorPosition ().y),
+  : name (in_name), full_name ("window"), x_cursor_pos (window->CursorPosition ().x), y_cursor_pos (window->CursorPosition ().y),
     autocenter_cursor (0), cursor_sensitivity (1.f), vertical_wheel_sensitivity (1.f), horisontal_wheel_sensitivity (1.f)
 {
   try
@@ -103,6 +99,15 @@ const wchar_t* Device::GetControlName (const char* control_id)
   control_name = common::towstring (control_id);
 
   return control_name.c_str ();
+}
+
+/*
+   Подписка на события устройства
+*/
+
+xtl::connection Device::RegisterEventHandler (const input::low_level::IDevice::EventHandler& handler)
+{
+  return signals.connect (handler);
 }
 
 /*
@@ -201,7 +206,7 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
         break;
 
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s at %u %u", CURSOR_AXIS_NAME, window_event_context.cursor_position.x, window_event_context.cursor_position.y);
-      event_handler (message);
+      signals (message);
       
       Rect client_rect = window.ClientRect ();
 
@@ -217,11 +222,11 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
             axis_pos = (float)window_event_context.cursor_position.x * 2.f / client_rect_width - 1.f;
 
             xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX axis %f", CURSOR_AXIS_NAME, axis_pos);
-            event_handler (message);
+            signals (message);
           }
 
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX delta %f", CURSOR_AXIS_NAME, ((float)((float)window_event_context.cursor_position.x - (float)x_cursor_pos)) * cursor_sensitivity);
-          event_handler (message);
+          signals (message);
         }
 
         x_cursor_pos = window_event_context.cursor_position.x;
@@ -236,11 +241,11 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
             axis_pos = -(float)window_event_context.cursor_position.y * 2.f / client_rect_height + 1.f;
 
             xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY axis %f", CURSOR_AXIS_NAME, axis_pos);
-            event_handler (message);
+            signals (message);
           }
 
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", CURSOR_AXIS_NAME, ((float)((float)window_event_context.cursor_position.y - (float)y_cursor_pos)) * cursor_sensitivity);
-          event_handler (message);
+          signals (message);
         }
 
         y_cursor_pos = window_event_context.cursor_position.y;
@@ -257,115 +262,115 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
     }
     case WindowEvent_OnMouseVerticalWheel:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", WHEEL_AXIS_NAME, window_event_context.mouse_vertical_wheel_delta * vertical_wheel_sensitivity);
-      event_handler (message);
+      signals (message);
        
       if (window_event_context.mouse_vertical_wheel_delta > 0)
       {
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sYUp down", WHEEL_AXIS_NAME);
-        event_handler (message);
+        signals (message);
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sYUp up", WHEEL_AXIS_NAME);
-        event_handler (message);
+        signals (message);
       }
 
       if (window_event_context.mouse_vertical_wheel_delta < 0)
       {
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sYDown down", WHEEL_AXIS_NAME);
-        event_handler (message);
+        signals (message);
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sYDown up", WHEEL_AXIS_NAME);
-        event_handler (message);
+        signals (message);
       }
 
       break;
     case WindowEvent_OnMouseHorisontalWheel:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX delta %f", WHEEL_AXIS_NAME, window_event_context.mouse_horisontal_wheel_delta * horisontal_wheel_sensitivity);
-      event_handler (message);
+      signals (message);
        
       if (window_event_context.mouse_horisontal_wheel_delta > 0)
       {
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sXRight down", WHEEL_AXIS_NAME);
-        event_handler (message);
+        signals (message);
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sXRight up", WHEEL_AXIS_NAME);
-        event_handler (message);
+        signals (message);
       }
 
       if (window_event_context.mouse_horisontal_wheel_delta < 0)
       {
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sXLeft down", WHEEL_AXIS_NAME);
-        event_handler (message);
+        signals (message);
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sXLeft up", WHEEL_AXIS_NAME);
-        event_handler (message);
+        signals (message);
       }
 
       break;
     case WindowEvent_OnLeftButtonDoubleClick:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 dblclk");
-      event_handler (message);
+      signals (message);
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 down");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnLeftButtonDown:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 down");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnLeftButtonUp:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 up");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnRightButtonDoubleClick:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse1 dblclk");
-      event_handler (message);
+      signals (message);
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse1 down");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnRightButtonDown:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse1 down");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnRightButtonUp:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse1 up");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnMiddleButtonDoubleClick:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 dblclk");
-      event_handler (message);
+      signals (message);
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 down");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnMiddleButtonDown:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 down");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnMiddleButtonUp:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 up");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnXButton1DoubleClick:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 dblclk");
-      event_handler (message);
+      signals (message);
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 down");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnXButton1Down:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 down");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnXButton1Up:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 up");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnXButton2DoubleClick:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX2 dblclk");
-      event_handler (message);
+      signals (message);
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX2 down");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnXButton2Down:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX2 down");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnXButton2Up:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX2 up");
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnKeyDown:
       if (pressed_keys[window_event_context.key_scan_code])
@@ -375,16 +380,16 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", get_key_scan_name (window_event_context.key_scan_code));
         pressed_keys.set (window_event_context.key_scan_code);
       }
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnKeyUp:
       pressed_keys.reset (window_event_context.key_scan_code);
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", get_key_scan_name (window_event_context.key_scan_code));
-      event_handler (message);
+      signals (message);
       break;
     case WindowEvent_OnChar:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s char %C", CHAR_INPUT_CHANNEL, window_event_context.char_code);
-      event_handler (message);
+      signals (message);
       break;
   }
 }

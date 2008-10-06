@@ -37,7 +37,7 @@ int main ()
 
     xtl::com_ptr<IDevice> device (DriverManager::CreateDevice ("*", "*"), false);
 
-    device->SetEventHandler (&input_event_handler);
+    device->RegisterEventHandler (&input_event_handler);
 
     printf ("Device name is '%s', full name is '%s'\n", device->GetName (), device->GetFullName ());
     printf ("Device has properties: '%s'\n", device->GetProperties ());

@@ -21,7 +21,7 @@ using namespace input::low_level;
 const char* DEVICE_PROPERTY1 = "Axis_X_dead_zone";
 const char* DEVICE_PROPERTY2 = "Axis_X_saturation_zone";
 
-//עוסעמגמו ףסענמיסעגמ גגמהא
+/*//עוסעמגמו ףסענמיסעגמ גגמהא
 class TestInput: virtual public IDevice, public xtl::reference_counter
 {
   public:
@@ -94,7 +94,7 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     float        saturation_zone;
     EventHandler event_handler;
     stl::wstring control_name;
-};
+};*/
 
 //עוסעמגûי הנאיגונ
 class TestDriver: virtual public IDriver, public xtl::reference_counter

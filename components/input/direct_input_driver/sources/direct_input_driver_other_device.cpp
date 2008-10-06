@@ -12,11 +12,8 @@ using namespace syslib;
 namespace
 {
 
-void default_event_handler (const char*)
-{
-}
-
-/*const char* object_type_name (GUID type)
+//Неиспользуемые функции на будущее
+const char* object_type_name (GUID type)
 {
   if (type == GUID_XAxis)   return "GUID_XAxis";
   if (type == GUID_YAxis)   return "GUID_YAxis";
@@ -64,7 +61,8 @@ void print_flags (DWORD flags)
   if (flags & DIDOI_FFACTUATOR)      printf ("can have force-feedback effects; ");
   if (flags & DIDOI_FFEFFECTTRIGGER) printf ("can trigger playback of force-feedback effects; ");
   if (flags & DIDOI_POLLED)          printf ("require polling; ");
-}*/
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ObjectType get_object_type (DWORD type)
 {
@@ -74,7 +72,7 @@ ObjectType get_object_type (DWORD type)
   if (type & DIDFT_RELAXIS)         return ObjectType_RelativeAxis;
   if (type & DIDFT_ABSAXIS)         return ObjectType_AbsoluteAxis;
 
-  if (type & DIDFT_AXIS)            return ObjectType_RelativeAxis;  //Ґб«Ё ­Ґв в®з­®© Ё­д®а¬ жЁЁ ® вЁЇҐ ®бЁ
+  if (type & DIDFT_AXIS)            return ObjectType_RelativeAxis;  //если нет точной информации о типе оси
 
   if (type & DIDFT_PSHBUTTON)       return ObjectType_Button;
   if (type & DIDFT_TGLBUTTON)       return ObjectType_Button;
@@ -133,7 +131,7 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
 
 OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevice8* in_direct_input_device_interface, REFGUID rguid, 
                           const DebugLogHandler& in_debug_log_handler, const char* device_type, const char* init_string)
-  : name (in_name), device_interface (in_direct_input_device_interface, false), event_handler (&default_event_handler),
+  : name (in_name), device_interface (in_direct_input_device_interface, false),
     poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10), device_lost (false), debug_log_handler (in_debug_log_handler),
     events_buffer_size (16), event_string_buffer (1024), current_axis (0), current_button (0), current_pov (0), current_unknown (0)
 {
@@ -300,6 +298,15 @@ const wchar_t* OtherDevice::GetControlName (const char* control_id)
     throw xtl::make_argument_exception (METHOD_NAME, "control_id", control_id, "No such control");
 
   return iter->second->second.unicode_name.c_str ();
+}
+
+/*
+   Подписка на события устройства
+*/
+
+xtl::connection OtherDevice::RegisterEventHandler (const input::low_level::IDevice::EventHandler& handler)
+{
+  return signals.connect (handler);
 }
 
 /*
@@ -695,7 +702,7 @@ void OtherDevice::ProcessEvent (const char* event)
 {
   try
   {
-    event_handler (event);
+    signals (event);
   }
   catch (...)
   {

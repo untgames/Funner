@@ -70,7 +70,7 @@ int main ()
 
       devices.push_back (DevicePtr (DriverManager::CreateDevice ("*", direct_input_driver->GetDeviceName (i), "buffer_size=0"), false));
 
-      devices.back ()->SetEventHandler (xtl::bind (&input_event_handler, devices.back ().get (), _1));
+      devices.back ()->RegisterEventHandler (xtl::bind (&input_event_handler, devices.back ().get (), _1));
 
       printf (" full name is '%s'\n", devices.back ()->GetFullName ());
       printf ("Device has properties: '%s'\n", devices.back ()->GetProperties ());

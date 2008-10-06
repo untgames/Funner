@@ -6,11 +6,12 @@
 #include <stl/vector>
 
 #include <xtl/bind.h>
-#include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/signal.h>
 
 #include <common/component.h>
 #include <common/singleton.h>
@@ -77,14 +78,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetEventHandler (const input::low_level::IDevice::EventHandler& handler)
-    {
-      event_handler = handler;
-    }
-    const input::low_level::IDevice::EventHandler& GetEventHandler ()
-    {
-      return event_handler;
-    }
+    xtl::connection RegisterEventHandler (const input::low_level::IDevice::EventHandler& handler);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройки устройства
@@ -198,26 +192,29 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     OtherDevice ();                                      //no impl
 
   private:
-    stl::string                             name;
-    stl::string                             full_name;
-    DirectInputDeviceInterfacePtr           device_interface;
-    input::low_level::IDevice::EventHandler event_handler;
-    syslib::Timer                           poll_timer;
-    ObjectsMap                              objects;
-    ObjectsNamesMap                         objects_names;
-    bool                                    device_lost;
-    ObjectPropertyMap                       objects_properties_map;
-    stl::string                             properties;
-    DebugLogHandler                         debug_log_handler;
-    size_t                                  events_buffer_size;     //размер буфера событий (если 0 - используется опрос мгновенного состояния)
-    EventsBuffer                            events_buffer;
-    DeviceDataBuffer                        last_device_data;
-    DeviceDataBuffer                        current_device_data;
-    EventStringBuffer                       event_string_buffer;
-    size_t                                  current_axis;
-    size_t                                  current_button;
-    size_t                                  current_pov;
-    size_t                                  current_unknown;
+    typedef xtl::signal<void (const char*)> DeviceSignal;
+
+  private:
+    stl::string                   name;
+    stl::string                   full_name;
+    DirectInputDeviceInterfacePtr device_interface;
+    DeviceSignal                  signals;
+    syslib::Timer                 poll_timer;
+    ObjectsMap                    objects;
+    ObjectsNamesMap               objects_names;
+    bool                          device_lost;
+    ObjectPropertyMap             objects_properties_map;
+    stl::string                   properties;
+    DebugLogHandler               debug_log_handler;
+    size_t                        events_buffer_size;     //размер буфера событий (если 0 - используется опрос мгновенного состояния)
+    EventsBuffer                  events_buffer;
+    DeviceDataBuffer              last_device_data;
+    DeviceDataBuffer              current_device_data;
+    EventStringBuffer             event_string_buffer;
+    size_t                        current_axis;
+    size_t                        current_button;
+    size_t                        current_pov;
+    size_t                        current_unknown;
 };
 
 const char* get_direct_input_error_name (HRESULT error);

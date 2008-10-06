@@ -4,11 +4,12 @@
 #include <stl/string>
 
 #include <xtl/bind.h>
-#include <xtl/intrusive_ptr.h>
-#include <xtl/function.h>
-#include <xtl/reference_counter.h>
-#include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
+#include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/reference_counter.h>
+#include <xtl/signal.h>
 
 #include <common/utf_converter.h>
 
@@ -48,13 +49,9 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
 
 
 ///Подписка на события устройства
-    void SetEventHandler (const EventHandler& handler)
+    xtl::connection RegisterEventHandler (const EventHandler& handler)
     {
-      event_handler = handler;
-    }
-    const EventHandler& GetEventHandler ()
-    {
-      return event_handler;
+      return signals.connect (handler);
     }
 
 ///Настройки устройства
@@ -73,7 +70,7 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     void GenerateTestEvents ()
     {
       for (size_t i = 0; i < sizeof (EVENTS) / sizeof (EVENTS[0]); i++)
-        event_handler (EVENTS[i]);
+        signals (EVENTS[i]);
     }
     
 ///Подсчёт ссылок
@@ -81,9 +78,12 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     void Release () { release (this); }
 
   private:
+    typedef xtl::signal<void (const char*)> DeviceSignal;
+
+  private:
     float        dead_zone;
     float        saturation_zone;
-    EventHandler event_handler;
+    DeviceSignal signals;
     stl::wstring control_name;
 };
 

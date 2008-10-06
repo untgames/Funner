@@ -1,7 +1,6 @@
 #ifndef INPUT_SYSTEM_LOW_LEVEL_DEVICE_HEADER
 #define INPUT_SYSTEM_LOW_LEVEL_DEVICE_HEADER
 
-#include <stddef.h>
 #include <xtl/functional_fwd>
 
 namespace input
@@ -36,8 +35,7 @@ class IDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (const char* event)> EventHandler;
 
-    virtual void                SetEventHandler (const EventHandler& handler) = 0;
-    virtual const EventHandler& GetEventHandler () = 0;
+    virtual xtl::connection RegisterEventHandler (const EventHandler& handler) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройки устройства
