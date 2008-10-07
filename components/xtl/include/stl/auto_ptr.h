@@ -29,7 +29,7 @@ struct auto_ptr_ref
 template <class T>
 class auto_ptr
 {
-  typedef T* (auto_ptr::*unspecified_bool_type)() const throw ();
+  typedef T* auto_ptr::* unspecified_bool_type;
   public:
     typedef T element_type;
 
@@ -67,7 +67,7 @@ class auto_ptr
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка на 0
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    operator unspecified_bool_type () const throw () { return ptr ? &auto_ptr::get : 0; } //неявное приведение типа для проверки if (p)
+    operator unspecified_bool_type () const throw () { return ptr ? &auto_ptr::ptr : 0; } //неявное приведение типа для проверки if (p)
     bool     operator !            () const throw ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
