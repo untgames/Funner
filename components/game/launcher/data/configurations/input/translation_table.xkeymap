@@ -9,8 +9,8 @@
   <Translation Event="Left down" Replacement="onBeginMove('-x')" Tag=""/>
   <Translation Event="Left up" Replacement="onEndMove('-x')" Tag=""/>
 
-  <Translation Event="'X axis' axis *" Replacement="onXAxis({2})" Tag=""/>
-  <Translation Event="'Y axis' axis *" Replacement="onYAxis({2})" Tag=""/>
+  <Translation Event="'Axis2' axis *" Replacement="onXAxis({2})" Tag=""/>
+  <Translation Event="'Axis1' axis *" Replacement="onYAxis({2})" Tag=""/>
 
   <Translation Event="W down" Replacement="onBeginMove('+y')" Tag=""/>
   <Translation Event="W up" Replacement="onEndMove('+y')" Tag=""/>

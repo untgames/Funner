@@ -119,6 +119,7 @@ typedef xtl::shared_ptr<sound::SoundManager>        SoundManagerPtr;
 typedef xtl::shared_ptr<sound::ScenePlayer>         ScenePlayerPtr;
 typedef xtl::shared_ptr<Environment>                EnvironmentPtr;
 typedef xtl::shared_ptr<Shell>                      ShellPtr;
+typedef stl::vector<xtl::connection>                ConnectionArray;
 
 struct TestApplication::Impl
 {
@@ -134,7 +135,8 @@ struct TestApplication::Impl
   EnvironmentPtr                environment;         //скриптовое окружение
   ShellPtr                      shell;               //скриптова€ оболочка
   Screen                        screen;              //область вывода
-  input::TranslationMap         translation_map;
+  input::TranslationMap         translation_map;     //карта трансл€ций
+  ConnectionArray               device_connections;  //соединени€ устройств ввода
   bool                          render_initialized;
         
   Impl ()
@@ -148,6 +150,9 @@ struct TestApplication::Impl
 
   ~Impl ()
   {
+    for (ConnectionArray::iterator iter = device_connections.begin (), end = device_connections.end (); iter != end; ++iter)
+      iter->disconnect ();
+
     try
     {
       printf ("Destructing test application\n");
@@ -370,7 +375,7 @@ TestApplication::TestApplication (const char* start_script_name)
 
     impl->input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", "*"), false));
 
-    impl->input_devices.back ()->SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler));
+    impl->device_connections.push_back (impl->input_devices.back ()->RegisterEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler)));
 
       //инициализаци€ direct input
 
@@ -386,7 +391,7 @@ TestApplication::TestApplication (const char* start_script_name)
       {
         impl->input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", direct_input_driver->GetDeviceName (i), "buffer_size=16"), false));
 
-        impl->input_devices.back ()->SetEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler));
+        impl->device_connections.push_back (impl->input_devices.back ()->RegisterEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler)));
       }
     }
 
