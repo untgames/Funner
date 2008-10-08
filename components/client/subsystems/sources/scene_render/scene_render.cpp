@@ -110,7 +110,14 @@ class SceneRenderSubsystem : public IEngineSubsystem, public IEngineEventListene
         screen_map.insert_pair (attachment_name.c_str (), render_target_index);
       }
 
-      engine->Attach (this);
+      try
+      {
+        engine->Attach (this);
+      }
+      catch (...)
+      {
+        engine->Detach (this);
+      }
     }
 
     ~SceneRenderSubsystem ()
