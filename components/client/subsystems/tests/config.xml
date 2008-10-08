@@ -14,6 +14,12 @@
       RenderTarget = "1"
     />
   </SceneRender>
+  <InputManager
+    TranslationMapRegistry = "data/translation_map_registry.xkeyreg"
+  />
+  <DirectInputDriver
+    Load = "1"
+  />
   <WindowManager>
     <Window1
       Style  = "Overlapped"
@@ -37,6 +43,9 @@
         VSync        = "0"
         FullScreen   = "0"
       />
+      <WindowInputDriver
+        Load = "1"
+      />
     </Window1>
     <Window2
       Style  = "Overlapped"
@@ -59,6 +68,9 @@
         SamplesCount = "1024"
         VSync        = "0"
         FullScreen   = "0"
+      />
+      <WindowInputDriver
+        Load = "1"
       />
     </Window2>
   </WindowManager>

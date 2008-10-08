@@ -1,7 +1,9 @@
 #include <cstdio>
 
+#include <xtl/connection.h>
 #include <xtl/exception.h>
 #include <xtl/function.h>
+#include <xtl/string.h>
 
 #include <common/log.h>
 #include <common/strlib.h>
@@ -17,6 +19,7 @@
 using namespace client;
 
 const char* CONFIGURATION_BRANCH_NAME = "Configuration";
+const char* TRANSLATION_TABLE1_FILE_NAME = "data/translation_table1.keymap";
 
 void log_handler (const char* log_name, const char* message)
 {
@@ -26,6 +29,14 @@ void log_handler (const char* log_name, const char* message)
 void render_log_print (const char* message)
 {
   printf ("%s\n", message);
+}
+
+void input_event_handler (const char* event)
+{
+  if (!xtl::xstrcmp ("exit", event))
+    syslib::Application::Exit (0);
+
+  printf ("New input event: '%s'\n", event);
 }
 
 int main ()
@@ -47,6 +58,8 @@ int main ()
 
     client.SetScreen ("Screen1", screen1);
     client.SetScreen ("Screen2", screen2);
+
+    client.SetInputHandler ("game1", &input_event_handler);
 
     engine.Attach (client);
 
