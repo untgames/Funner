@@ -14,6 +14,12 @@
       RenderTarget = "1"
     />
   </SceneRender>
+  <ScenePlayer
+    Attachment = "ScenePlayer1"
+    DriverMask = "*"
+    DeviceMask = "*"
+    InitString = ""
+  />
   <InputManager
     TranslationMapRegistry = "data/translation_map_registry.xkeyreg"
   />
