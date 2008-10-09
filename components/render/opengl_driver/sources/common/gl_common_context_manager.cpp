@@ -29,6 +29,10 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
     {
       try
       {
+          //очистка контекстного кеша
+
+        memset (context_cache.data (), 0, context_cache.size () * sizeof (ContextCache::value_type));
+
           //создание контекста
 
         context = ContextPtr (PlatformManager::CreateContext (swap_chain), false);
