@@ -371,11 +371,19 @@ TestApplication::TestApplication (const char* start_script_name)
       throw xtl::format_operation_exception ("TestApplication::TestApplication", "Window wasn't created");
 
     printf ("Init window driver input...\n");
+
     input::low_level::WindowDriver::RegisterDevice (*(impl->window.get ()));
 
-    impl->input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", "*"), false));
+    input::low_level::IDevice *window_input_device = input::low_level::WindowDriver::Driver ()->CreateDevice (impl->window->Title ());
 
-    impl->device_connections.push_back (impl->input_devices.back ()->RegisterEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler)));
+    if (window_input_device)
+    {
+      impl->input_devices.push_back (InputDevicePtr (window_input_device, false));
+
+      impl->device_connections.push_back (window_input_device->RegisterEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler)));
+    }
+    else
+      printf ("Can't create window input device\n");
 
       //инициализация direct input
 
