@@ -72,17 +72,17 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
     {
         //установка точек привязки
 
-      engine.Attach (attachments);            
-      
+      engine.Attach (attachments);
+
         //регистрация окна
 
       common::VarRegistry window_config (WINDOW_CONFIGURATION_BRANCH);
 
-      WindowManager::InitWindow (window, window_config, engine);            
+      WindowManager::InitWindow (window, window_config, engine);
 
         //запуск систем движка
 
-      engine.Start (StartupGroup_LevelMax);      
+      engine.Start (StartupGroup_LevelMax);
     }
 
 ///Изменение положения окна
@@ -112,7 +112,7 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
         throw;
       }
     }
-    
+
 ///Установка родительского окна
     void SetParent (const void* parent_window_handle)
     {
@@ -125,7 +125,7 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
         exception.touch ("MyChildWindow::SetParent");
         throw;
       }
-    }    
+    }
 
 ///Управление видимостью окна
     void Show (bool state)
@@ -188,7 +188,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
         trajectory->Scale (-2.f, 2.f, 2.f);
       }
-      
+
       VisualModel::Pointer envelope = VisualModel::Create ();
 
       envelope->SetMeshName (ENVELOPE_MESH_NAME);
@@ -203,53 +203,53 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       camera->SetTop    (3);
       camera->SetZNear  (0);
       camera->SetZFar   (100);
-      
+
       camera->SetPosition (0, 0, 4);
       camera->LookTo      (math::vec3f (0.0f), NodeOrt_Z, NodeOrt_Y, NodeTransformSpace_World);
-      
+
       math::vec3f dir = camera->WorldOrtZ (),
                   p   = invert (camera->WorldTM ()) * math::vec3f (0, 0, 4),
                   p1  = invert (camera->WorldTM ()) * math::vec4f (0, 0, 1, 0),
                   p3  = invert (camera->WorldTM ()) * math::vec3f (0, 0, 0);
-      
+
       printf ("Camera dir: %g %g %g\n", dir.x, dir.y, dir.z);
       printf ("Light:      %g %g %g\n", p.x, p.y, p.z);
       printf ("Point:      %g %g %g\n", p3.x, p3.y, p3.z);
       printf ("Normal:     %g %g %g\n", p1.x, p1.y, p1.z);
 
       camera->BindToScene (scene);
-      
+
       screen.SetBackgroundColor (0.f, 0.05f, 0.2f, 0);
-      
+
       Viewport viewport;
-      
+
       viewport.SetArea       (0, 0, 100, 100);
       viewport.SetCamera     (&*camera);
       viewport.SetRenderPath ("ModelerRender");
 
       screen.Attach (viewport);
 
-      attachments.SetScreen (SCREEN_ATTACHMENT_NAME, &screen);
+      attachments.SetScreen (SCREEN_ATTACHMENT_NAME, screen);
     }
 
     void ExecuteCommand (const char* command)
     {
       if (!xtl::xstrcmp (command, "close"))
         syslib::Application::Exit (0);
-      
+
       printf ("MyApplicationServer::ExecuteCommand(%s)\n", command);
     }
 
     void SetProperty (const char* name, const stl::string& value)
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::SetProperty");
-    } 
-    
+    }
+
     void GetProperty (const char* name, stl::string& value)
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::GetProperty");
     }
-    
+
     bool IsPropertyPresent (const char* name)
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::IsPropertyPresent");
@@ -258,7 +258,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     bool IsPropertyReadOnly (const char* name)
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::IsPropertyPresent");
-    }    
+    }
 
     void RegisterPropertyListener (const char* name_wc_mask, IPropertyListener* listener)
     {
@@ -269,17 +269,17 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterPropertyListener");
     }
-    
+
     void UnregisterAllPropertyListeners (const char* name_wc_mask)
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterAllPropertyListeners");
     }
-    
+
     void UnregisterAllPropertyListeners ()
     {
-      throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterAllPropertyListeners");    
+      throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterAllPropertyListeners");
     }
-    
+
     ICustomChildWindow* CreateChildWindow (const char* init_string)
     {
       return new MyChildWindow (attachments);
@@ -287,7 +287,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
     void AddRef  () { addref (this); }
     void Release () { release (this); }
-    
+
   private:
     Scene                scene;
     OrthoCamera::Pointer camera;
@@ -313,7 +313,7 @@ struct Test
 
     main_window.SetLogHandler (xtl::bind (&Test::LogPrint, this, _1));
   }
-  
+
   void LogPrint (const char* message)
   {
     log.Print (message);
@@ -335,14 +335,14 @@ int main ()
   try
   {
     common::LogFilter log_filter ("*", &log_print);
-    
+
     Test test;
 
     test.main_window.ExecuteFile ("media/ui.lua");
 
     syslib::Application::Run ();
-    
-    return syslib::Application::GetExitCode ();    
+
+    return syslib::Application::GetExitCode ();
   }
   catch (xtl::exception& exception)
   {
