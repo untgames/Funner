@@ -78,12 +78,16 @@ function onBeginMove(ort)
 end
 
 function onXAxis(axis_value)
+  if (math.abs (axis_value) < 0.02) then axis_value = 0 end
+
   velocity ['+x'] = velocity ['+x'] - x_axis_value + axis_value
 
   x_axis_value = axis_value
 end
 
 function onYAxis(axis_value)
+  if (math.abs (axis_value) < 0.02) then axis_value = 0 end
+
   velocity ['-y'] = velocity ['-y'] - y_axis_value + axis_value
 
   y_axis_value = axis_value

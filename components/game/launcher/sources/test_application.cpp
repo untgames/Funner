@@ -28,7 +28,7 @@ namespace
 const char* CONFIGURATION_BRANCH_NAME = "Configuration"; //имя ветки реестра с настройками
 const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //имя системы визуализации среднего уровня
 const char* MATERIAL_LIB_FILE_NAME    = "data/materials/materials.xmtl"; //имя файла с материалами
-const char* SOUND_DECL_LIB_FILE_NAME  = "data/sounds/gorilka.snddecl"; //имя файла с материалами
+const char* SOUND_DECL_LIB_FILE_NAME  = "data/sounds/sounds.snddecl"; //имя файла с описанием звуков
 
 const char* TRANSLATION_MAP_FILE_NAME = "data/configurations/input/translation_table.xkeymap";
 
