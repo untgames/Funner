@@ -14,7 +14,7 @@ struct RenderableSpriteModel::Impl: public xtl::trackable
   PrimitivePtr              primitive;                       //визуализируемый примитив
   RenderQueryPtr            query;                           //запрос дочернего рендеринга
   bool                      need_update_sprites;             //флаг необходимости обновления массива спрайтов
-  size_t                    tile_columns;                    //количество столбцов тайлов
+  size_t                    tile_columns, tile_rows;         //количество столбцов / строк тайлов
   float                     tile_tex_width, tile_tex_height; //размеры тайла в текстурных координатах
   size_t                    current_world_tm_hash;           //хэш текущей матрицы трансформации
   size_t                    current_material_name_hash;      //хэш текущего имени материала
@@ -128,18 +128,25 @@ void RenderableSpriteModel::Update ()
         if (!tile_width || !tile_height)
           throw xtl::format_operation_exception ("", "Bad material '%s' (tile_width=%u, tile_height=%u)", model->Material (),
             tile_width, tile_height);
-            
+
         impl->tile_columns = texture_width / tile_width;
-        
+        impl->tile_rows    = texture_height / tile_height;
+
         if (!impl->tile_columns)
           impl->tile_columns = 1;
+          
+        if (!impl->tile_rows)
+          impl->tile_rows = 1;
           
         impl->tile_tex_width  = tile_width / float (texture_width);
         impl->tile_tex_height = tile_height / float (texture_height);
       }
       else
       {
-        impl->tile_columns = 0; //маркер отсутствия тайлинга
+          //маркер отсутствия тайлинга        
+        
+        impl->tile_columns = 0; 
+        impl->tile_rows    = 0;
       }
       
         //установка параметров примитива
@@ -192,10 +199,10 @@ void RenderableSpriteModel::Update ()
         dst_sprite.size     = src_sprite->size;
         dst_sprite.color    = src_sprite->color;
 
-        if (impl->tile_columns)
+        if (impl->tile_columns || impl->tile_rows)
         {
           size_t frame       = src_sprite->frame,
-                 tile_row    = frame / impl->tile_columns,
+                 tile_row    = frame / impl->tile_columns % impl->tile_rows,
                  tile_column = frame % impl->tile_columns;
 
           dst_sprite.tex_offset = math::vec2f (tile_column * impl->tile_tex_width, tile_row * impl->tile_tex_height);
