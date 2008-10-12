@@ -7,7 +7,7 @@
 ###################################################################################################
 EXE_SUFFIX   :=
 DLL_SUFFIX   := .dylib
-PROFILES     += macosx
+PROFILES     += macosx unistd
 
 include $(TOOLSETS_DIR)/g++.mak
 
