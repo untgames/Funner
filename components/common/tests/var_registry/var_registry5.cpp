@@ -29,10 +29,10 @@ void register_handler (const char* mask, const VarRegistry& registry)
 {
   VarRegistryEvent events [] = {VarRegistryEvent_OnCreateVar, VarRegistryEvent_OnChangeVar, VarRegistryEvent_OnDeleteVar};
 
-  for (int i=0; i<sizeof (events)/sizeof (*events); i++)
+  for (size_t i = 0; i < sizeof (events) / sizeof (*events); i++)
   {
     VarRegistryEvent event = (VarRegistryEvent)i;
-    
+
     registry.RegisterEventHandler (mask, event, xtl::bind (&notify, _1, event, mask, xtl::cref (registry)));
   }
 }
@@ -40,7 +40,7 @@ void register_handler (const char* mask, const VarRegistry& registry)
 int main ()
 {
   printf ("Results of var_registry5_test:\n");
-  
+
   try
   {
     VarRegistrySystem::Mount ("a.b", TestVarRegistry::Create ().get ());
@@ -48,7 +48,7 @@ int main ()
     VarRegistry registry ("a");
 
     register_handler ("*", registry);
-    
+
     registry.SetValue ("b.y", xtl::any (stl::string ("y"), true));
     registry.SetValue ("b.x.y", xtl::any (stl::string ("x.y"), true));
 

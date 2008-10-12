@@ -14,14 +14,14 @@ const size_t INTERNAL_BUFFER_SIZE = 128;     //размер внутреннего буфера протоко
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct ParseLogMessage
 {
-  ParseLogMessageType type;           //тип сообщения  
+  ParseLogMessageType type;           //тип сообщения
   size_t              message_offset; //смещение до строки с сообщением
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание реализации протокола парсера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct ParseLog::Impl 
+struct ParseLog::Impl
 {
   size_t           buffer_size;     //размер буфера
   size_t           available;       //доступный размер буфера
@@ -38,7 +38,7 @@ struct ParseLog::Impl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   Impl  ();
   ~Impl ();
-  
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Резервирование места под сообщение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,10 +94,10 @@ char* ParseLog::Impl::AllocMessage (size_t message_size,ParseLogMessageType type
 
     if (!new_buf)
       return NULL;
-      
+
     size_t messages_buf_size = buffer + buffer_size - (char*)message_pos,
            string_buf_size   = string_pos - buffer;
-    
+
     if (buffer)
     {
       memcpy (new_buf,buffer,string_buf_size);
@@ -116,15 +116,15 @@ char* ParseLog::Impl::AllocMessage (size_t message_size,ParseLogMessageType type
 
   ParseLogMessage* message_header = --message_pos;
   message_header->type            = type;
-  message_header->message_offset  = string_pos - buffer;  
+  message_header->message_offset  = string_pos - buffer;
   available                      -= size;
 
-  messages_count++;  
-  
+  messages_count++;
+
   char* message_string = string_pos;
-  
+
   string_pos += message_size + sizeof (char);
-  
+
   return message_string;
 }
 
@@ -144,32 +144,32 @@ void ParseLog::Impl::InsertMessage
     case PARSE_LOG_WARNING:     message_type_string = "warning"; break;
     case PARSE_LOG_FATAL_ERROR: message_type_string = "fatal error"; break;
   }
-    
+
   if (type != PARSE_LOG_FATAL_ERROR)
   {
     size_t size = xtl::xvsnprintf (NULL,0,format,list) + xtl::xsnprintf (NULL,0,"%s(%u): %s: ",file_name,line,message_type_string);
-    
+
     if (size == (size_t)-1)
       return;
 
     char* pos = AllocMessage (size,type);
-    
+
     if (!pos)
       return;
 
-    pos    += sprintf  (pos,"%s(%u): %s: ",file_name,line,message_type_string);
+    pos    += sprintf  (pos,"%s(%lu): %s: ",file_name,line,message_type_string);
     pos    += vsprintf (pos,format,list);
     *pos++  = '\0';
   }
   else
-  {    
+  {
     size_t size = xtl::xvsnprintf (NULL,0,format,list) + xtl::xsnprintf (NULL,0,"%s: ",message_type_string);
-    
+
     if (size == (size_t)-1)
       return;
 
     char* pos = AllocMessage (size,type);
-    
+
     if (!pos)
       return;
 
@@ -259,38 +259,38 @@ void ParseLog::FatalError (const char* format,...)
 {
   va_list list;
 
-  va_start    (list,format);  
+  va_start    (list,format);
   VFatalError (format,list);
 }
 
 void ParseLog::Error (const char* file_name,size_t line,const char* format,...)
 {
   va_list list;
-  
-  va_start (list,format);  
+
+  va_start (list,format);
   VError   (file_name,line,format,list);
 }
 
 void ParseLog::Warning (const char* file_name,size_t line,const char* format,...)
 {
   va_list list;
-  
-  va_start (list,format);  
+
+  va_start (list,format);
   VWarning (file_name,line,format,list);
 }
 
 void ParseLog::Error (ParseNode* node,const char* format,...)
 {
   va_list list;
-  
-  va_start (list,format);  
-  VError   (node,format,list);  
+
+  va_start (list,format);
+  VError   (node,format,list);
 }
 
 void ParseLog::Warning (ParseNode* node,const char* format,...)
 {
   va_list list;
-  
-  va_start (list,format);  
+
+  va_start (list,format);
   VWarning (node,format,list);
 }

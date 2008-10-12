@@ -51,7 +51,7 @@ class MountPoint : public xtl::trackable, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события реестра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const char* mount_point_name, const char* var_name, VarRegistryEvent event)> EventHandler;    
+    typedef xtl::function<void (const char* mount_point_name, const char* var_name, VarRegistryEvent event)> EventHandler;
 
     xtl::connection RegisterEventHandler (const EventHandler& handler);
 
@@ -110,6 +110,9 @@ class MountPointsMap
       public:
         virtual void OnMount   (MountPoint*) = 0;
         virtual void OnUnmount (MountPoint*) = 0;
+
+      protected:
+        virtual ~IListener () {}
     };
 
     void RegisterListener   (IListener*);
@@ -119,7 +122,7 @@ class MountPointsMap
 ///Получение глобальной карты точек монтирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static Pointer GetGlobalMap ();
-    
+
   private:
     void OnUnmount (MountPoint*);
 
@@ -140,7 +143,7 @@ class BranchLevelVarSet
 {
   public:
     typedef VarRegistry::Iterator Iterator;
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////

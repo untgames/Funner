@@ -32,7 +32,7 @@ class UnistdFileSystem: public StdioFileSystem
     void FileResize (file_t file,filesize_t new_size)
     {
       static const char* METHOD_NAME = "UnistdFileSystem::FileResize";
-      
+
       if (ftruncate (fileno ((FILE*)file),new_size) == -1)
       {
         switch (errno)
@@ -41,15 +41,15 @@ class UnistdFileSystem: public StdioFileSystem
           case EINVAL: throw xtl::make_null_argument_exception    (METHOD_NAME,"buffer"); break;
           case ENOSPC: throw xtl::format_exception<FileNoSpaceException> (METHOD_NAME,"No enough space for resize file up to %u bytes",new_size); break;
           default:     throw xtl::format_exception<FileException> (METHOD_NAME,"Unknown error"); break;
-        }    
-      }      
+        }
+      }
     }
 #endif
 
     void Mkdir (const char* dir_name)
     {
       static const char* METHOD_NAME = "UnistdFileSystem::Mkdir";
-      
+
       if (mkdir (dir_name,S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH))
       {
         switch (errno)
@@ -69,15 +69,15 @@ class UnistdFileSystem: public StdioFileSystem
       DIR* dir = opendir (dir_name.c_str ());
 
       if (!dir)
-        return;    
+        return;
 
       FileInfo info;
 
-      for (struct dirent* entry;entry=readdir (dir);)
-      {   
+      for (struct dirent* entry; (entry = readdir (dir)) != 0;)
+      {
         if (*entry->d_name != '.' && wcmatch (entry->d_name,mask.c_str ()))
-        {            
-          file_name = dir_name + entry->d_name;      
+        {
+          file_name = dir_name + entry->d_name;
 
           StdioFileSystem::GetFileInfo (file_name.c_str (),info);
 
@@ -86,8 +86,8 @@ class UnistdFileSystem: public StdioFileSystem
       }
 
       closedir (dir);
-    }    
-#endif    
+    }
+#endif
 };
 
 }
@@ -99,4 +99,4 @@ class UnistdFileSystem: public StdioFileSystem
 ICustomFileSystem* UnistdPlatform::GetFileSystem ()
 {
   return Singleton<UnistdFileSystem>::InstancePtr ();
-}    
+}

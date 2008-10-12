@@ -34,9 +34,19 @@ inline size_t hash (int x)
   return x;
 }
 
+inline size_t hash (long x)
+{
+  return static_cast<size_t> (x);
+}
+
 inline size_t hash (unsigned int x)
 {
   return x;
+}
+
+inline size_t hash (unsigned long x)
+{
+  return static_cast<size_t> (x);
 }
 
 template <class T> inline size_t hash (const T* p)
@@ -70,19 +80,19 @@ inline size_t hash (const wchar_t* s)
 
 inline size_t hash (const char* s)
 {
-  size_t h = 0; 
-  
+  size_t h = 0;
+
   while (*s) h = 5 * h + *s++;
-  
+
   return h;
 }
 
 inline size_t hash (const wchar_t* s)
 {
-  size_t h = 0; 
-  
+  size_t h = 0;
+
   while (*s) h = 5 * h + *s++;
-  
+
   return h;
 }
 

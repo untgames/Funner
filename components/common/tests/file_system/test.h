@@ -6,6 +6,8 @@
 
 #include <stl/string>
 
+#include <xtl/function.h>
+
 #include <common/file.h>
 #include <common/streams.h>
 
@@ -22,8 +24,8 @@ inline void PrintFileInfo (const char* file_name)
   FileSystem::GetFileHash (file_name,file_hash);
 
   printf ("File '%s' info:\n",file_name);
-  printf ("Size:             %u\n",FileSystem::GetFileSize (file_name));
-  printf ("CRC32 hash value: %08x\n",file_hash.crc32);
+  printf ("Size:             %lu\n",FileSystem::GetFileSize (file_name));
+  printf ("CRC32 hash value: %08lx\n",file_hash.crc32);
   printf ("MD5 hash value:   {");
 
   for (size_t i=0;i<15;i++)

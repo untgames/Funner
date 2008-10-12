@@ -12,17 +12,17 @@ void PrintLog (const char* message)
 int main ()
 {
   printf ("Results of search_path_test:\n");
-  
+
   printf ("Add search path '%s':\n",SEARCH_PATH);
-  
+
   try
   {
     FileSystem::AddSearchPath (SEARCH_PATH, &PrintLog);
-  
+
     InputFile file (FILE_NAME);
-    
+
     printf ("File name: '%s'\n",FILE_NAME);
-    printf ("File size: %u bytes\n",file.Size ());    
+    printf ("File size: %lu bytes\n",file.Size ());
   }
   catch (std::exception& exception)
   {

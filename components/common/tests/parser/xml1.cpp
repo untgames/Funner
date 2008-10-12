@@ -21,15 +21,15 @@ size_t EnumNodes (ParseNode* p,size_t level=0)
 
     for (size_t i=0;i<p->AttributesCount ();i++)
       printf (" '%s'",p->Attribute (i));
-      
+
     printf (" )");
-  }    
+  }
 
   printf ("\n");
 
   for (ParseNode* i=p->First();i;i=i->Next())
     nodes += EnumNodes (i,level+1);
-    
+
   return nodes;
 }
 
@@ -42,17 +42,17 @@ int main ()
     printf ("Results of xml1_test:\n");
 
     Parser p (log, file_name[i]);
-      
+
     printf ("Parse successfull\n");
 
     size_t nodes_count = EnumNodes (p.Root ());
-    
-    printf ("Total nodes count: %u\n",nodes_count);
-    
+
+    printf ("Total nodes count: %lu\n",nodes_count);
+
     for (size_t i = 0; i < log.MessagesCount (); i++)
     {
       printf ("%s\n", log.Message(i));
     }
   }
-  return 0;  
+  return 0;
 }

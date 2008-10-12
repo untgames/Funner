@@ -15,7 +15,7 @@ struct Test
 int main ()
 {
   printf ("Results of split_test:\n");
-  
+
   static Test test [] = {
       {"hello world"," "," \t",""},
       {"hello, world",","," \t",""},
@@ -30,20 +30,20 @@ int main ()
       {"hello (my world}111,world"," ,"," \t","(}"},
       {"hello (my world}world"," }"," \t","(}"},
   };
-  
+
   static const size_t tests_count = sizeof (test) / sizeof (*test);
-  
+
   for (size_t i=0;i<tests_count;i++)
   {
     vector<string> tokens = split (test [i].str,test [i].delimiters,test [i].spaces, test [i].brackets);
-    
-    printf ("split '%s' (delimiters='%s', spaces='%s', brackets='%s') on %u tokens:\n",
+
+    printf ("split '%s' (delimiters='%s', spaces='%s', brackets='%s') on %lu tokens:\n",
             test [i].str,decompress (test [i].delimiters).c_str (),decompress (test [i].spaces).c_str (),
             decompress (test [i].brackets).c_str (),tokens.size ());
-    
+
     for (size_t i=0;i<tokens.size ();i++)
-      printf ("    '%s'\n",tokens [i].c_str ());    
+      printf ("    '%s'\n",tokens [i].c_str ());
   }
- 
+
   return 0;
 }

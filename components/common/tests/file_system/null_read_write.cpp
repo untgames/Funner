@@ -11,9 +11,9 @@ int main ()
   {
     InputFile  file1 (SRC_FILE_NAME);
     OutputFile file2 (DST_FILE_NAME);
-    
-    printf ("File::Read(0,0): %d\n", file1.Read (0,0));
-    printf ("File::Write(0,0): %d\n", file2.Write (0,0));
+
+    printf ("File::Read(0,0): %lu\n", file1.Read (0,0));
+    printf ("File::Write(0,0): %lu\n", file2.Write (0,0));
 
     file2.Close ();
 

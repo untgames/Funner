@@ -53,9 +53,9 @@ void OutputTextStream::Write (const char* string, size_t size)
 {
   if (!string && size)
     throw xtl::make_null_argument_exception ("common::OutputTextStream::Write(const char*,size_t)", "string");
-    
+
   size_t write_size = impl->buffer.Write (string, size);
-    
+
   if (write_size != size)
     throw xtl::format_exception<StreamWriteException> ("common::OutputTextStream::Write", "Could not write block with size %u to the buffer (write_size=%u)",
                                  size, write_size);
@@ -65,7 +65,7 @@ void OutputTextStream::Write (const char* string)
 {
   if (!string)
     throw xtl::make_null_argument_exception ("common::OutputTextStream::Write(const char*)", "string");
-    
+
   Write (string, strlen (string));
 }
 
@@ -120,7 +120,7 @@ void write (OutputTextStream& stream, size_t count, char symbol)
 
   char buf [128];
   const size_t BUF_SIZE = sizeof (buf);
-  
+
   memset (buf, symbol, BUF_SIZE < count ? BUF_SIZE : count);
 
   for (size_t i=0, passes_count=count/BUF_SIZE; i<passes_count; i++)
@@ -136,7 +136,7 @@ void write (OutputTextStream& stream, size_t count, wchar_t symbol)
 
   const size_t BUF_SIZE = 128;
   wchar_t buf [BUF_SIZE];
-  
+
   for (size_t i=0, fill_size=count<BUF_SIZE?count:BUF_SIZE; i<fill_size; i++)
     buf [i] = symbol;
 
@@ -183,7 +183,7 @@ void get_int_printf_format (const char*& format, bool sign, char buffer [FORMAT_
     base_format  = 'u';
     format      += 4;
   }
-  
+
   switch (*format)
   {
     case '+':
@@ -219,9 +219,19 @@ void write (OutputTextStream& stream, int value, const char* format)
   write_int (stream, static_cast<unsigned int> (value), format, true);
 }
 
+void write (OutputTextStream& stream, long value, const char* format)
+{
+  write_int (stream, static_cast<int> (value), format, true);
+}
+
 void write (OutputTextStream& stream, unsigned int value, const char* format)
 {
   write_int (stream, value, format, false);
+}
+
+void write (OutputTextStream& stream, unsigned long value, const char* format)
+{
+  write_int (stream, static_cast<unsigned int> (value), format, false);
 }
 
 /*
@@ -250,14 +260,14 @@ void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SI
       format++;
       break;
   }
-  
+
   const char *dot = strchr (format, '.');
-  
+
   if (dot)
   {
     const char* frac_format = dot + 1;
     size_t      frac_size   = strlen (frac_format);
-    
+
     xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%u.%uf",
                              *format == '0' ? "0" : "", dot - format + frac_size + 1, frac_size);
   }
@@ -281,7 +291,7 @@ void write (OutputTextStream& stream, double value, const char* format)
 
   xtl::xsnprintf (value_buffer, sizeof (value_buffer), format_buffer, value);
 
-  stream.Write (value_buffer);  
+  stream.Write (value_buffer);
 }
 
 void write (OutputTextStream& stream, float value, const char* format)
@@ -305,7 +315,7 @@ void write (OutputTextStream& stream, bool value, const char* format)
 {
   if (!format)
     throw xtl::make_null_argument_exception ("common::write", "format");
-    
+
   if (!strcmp (format, "alpha")) stream.Write (value ? "true" : "false");
   else if (!*format)             stream.Write (value ? "1" : "0");
   else

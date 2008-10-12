@@ -7,7 +7,7 @@ void string_enumerator (const char* var_name, const VarRegistry& registry)
 
 void size_t_enumerator (const char* var_name, const VarRegistry& registry)
 {
-  printf ("%s=%u; ", var_name, registry.GetValue (var_name).cast<size_t> ());
+  printf ("%s=%lu; ", var_name, registry.GetValue (var_name).cast<size_t> ());
 }
 
 void notify (const char* var_name, VarRegistryEvent event_id, const char* var_mask, const VarRegistry& registry)
@@ -34,10 +34,10 @@ void register_handler (const char* mask, const VarRegistry& registry)
 {
   VarRegistryEvent events [] = {VarRegistryEvent_OnCreateVar, VarRegistryEvent_OnChangeVar, VarRegistryEvent_OnDeleteVar};
 
-  for (int i=0; i<sizeof (events)/sizeof (*events); i++)
+  for (size_t i = 0; i < sizeof (events) / sizeof (*events); i++)
   {
     VarRegistryEvent event = (VarRegistryEvent)i;
-    
+
     registry.RegisterEventHandler (mask, event, xtl::bind (&notify, _1, event, mask, xtl::cref (registry)));
   }
 }
@@ -45,7 +45,7 @@ void register_handler (const char* mask, const VarRegistry& registry)
 int main ()
 {
   printf ("Results of var_registry_container1_test:\n");
-  
+
   try
   {
     VarRegistryContainer<stl::string> string_container;
@@ -57,7 +57,7 @@ int main ()
 
     VarRegistry string_registry ("string_branch");
     VarRegistry size_t_registry ("size_t_branch");
-    
+
     register_handler ("*", string_registry);
     register_handler ("*", size_t_registry);
 

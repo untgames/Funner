@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <sys/stat.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #ifdef _MSC_VER
   #include <io.h>
@@ -18,8 +18,9 @@
   #error Unknown compiler
 #endif
 
-#include <xtl/function.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/function.h>
+#include <xtl/string.h>
 
 #include <common/heap.h>
 #include <common/file.h>

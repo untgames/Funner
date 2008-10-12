@@ -2,6 +2,8 @@
 #define COMMONLIB_LOG_HEADER
 
 #include <cstdarg>
+#include <cstddef>
+
 #include <xtl/functional_fwd>
 
 namespace common
@@ -63,7 +65,7 @@ class LogFilter
 {
   public:
     typedef xtl::function<void (const char* log_name, const char* message)> LogHandler;
-  
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////

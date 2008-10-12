@@ -41,16 +41,16 @@ namespace
 //проверка существования файла в домене
 bool is_file_exist (const char* file_name,StdioFile& file)
 {
-  return !stricmp (file.name,file_name) || !strnicmp (file.dir_name,file_name,strlen (file.dir_name));
+  return !xtl::xstricmp (file.name,file_name) || !xtl::xstrnicmp (file.dir_name,file_name,strlen (file.dir_name));
 }
 
 }
-  
+
 
 StdioIOSystem::file_t StdioIOSystem::FileOpen (const char* file_name,filemode_t mode,size_t)
 {
   StdioFile* stdio_file = stdio_files;
-  
+
   for (size_t i=0;i<STDIO_FILES_NUM;i++,stdio_file++)
     if (is_file_exist (file_name,*stdio_file))
     {
@@ -62,14 +62,14 @@ StdioIOSystem::file_t StdioIOSystem::FileOpen (const char* file_name,filemode_t 
 
       return (file_t)stdio_file->stream;
     }
-  
+
   throw xtl::format_exception<FileNotFoundException> ("common::StdioIOSystem::FileOpen","File '%s' not found",file_name);
 }
 
 bool StdioIOSystem::IsFileExist (const char* file_name)
 {
   StdioFile* stdio_file = stdio_files;
-  
+
   for (size_t i=0;i<STDIO_FILES_NUM;i++,stdio_file++)
     if (is_file_exist (file_name,*stdio_file))
       return true;
@@ -80,14 +80,14 @@ bool StdioIOSystem::IsFileExist (const char* file_name)
 void StdioIOSystem::Search (const char* wc_mask,const FileSearchHandler& handler)
 {
   FileInfo info;
-  
+
   memset (&info,0,sizeof (info));
 
   StdioFile* stdio_file = stdio_files;
-  
+
   for (size_t i=0;i<STDIO_FILES_NUM;i++,stdio_file++)
     if (!(wcimatch (wc_mask,stdio_file->name)))
-      handler (stdio_file->name,info);  
+      handler (stdio_file->name,info);
 }
 
 bool StdioIOSystem::GetFileInfo (const char* file_name,FileInfo& info)

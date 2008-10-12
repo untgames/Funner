@@ -10,7 +10,7 @@ namespace
 void remove_suffix (stl::string& s)
 {
   size_t pos = s.rfind ('.');
-  
+
   s.erase (pos != stl::string::npos ? pos : 0);
 }
 
@@ -136,11 +136,11 @@ void MountPointsMap::Unlink (const char* link_name)
 
     //поиск точки монтирования с указанным именем
 
-  MountMap::iterator iter = mount_points_map.find (link_name);      
+  MountMap::iterator iter = mount_points_map.find (link_name);
 
   if (iter == mount_points_map.end ())
     return;
-    
+
   if (dynamic_cast<VarRegistryLink*> (iter->second->Registry ()))
     Unmount (link_name);
 }
@@ -169,24 +169,24 @@ void MountPointsMap::Mount (const char* branch_name, ICustomVarRegistry* registr
       throw format_operation_exception ("common::MountPointsMap::Mount",
         "Can't mount branch '%s', because it conflicts with already mounted branch '%s'",
         branch_name, parent_branch.c_str ());
-        
+
       //отсечение суффикса
 
     remove_suffix (parent_branch);
   }
-  
+
     //добавление новой точки монтирования
 
   MountPointPtr new_mount_point (new MountPoint (branch_name, registry), false);
 
   mount_points_map.insert_pair (branch_name, new_mount_point);
-  
+
     //оповещение о появлении новой точки монтирования
 
   for (ListenersList::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
   {
     IListener& listener = **iter;
-    
+
     try
     {
       listener.OnMount (new_mount_point.get ());
@@ -203,7 +203,7 @@ void MountPointsMap::OnUnmount (MountPoint* mount_point)
   for (ListenersList::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
   {
     IListener& listener = **iter;
-    
+
     try
     {
       listener.OnUnmount (mount_point);
@@ -222,18 +222,18 @@ void MountPointsMap::Unmount (const char* branch_name, ICustomVarRegistry* regis
 
     //поиск точки монтирования с указанным именем
 
-  MountMap::iterator iter = mount_points_map.find (branch_name);      
+  MountMap::iterator iter = mount_points_map.find (branch_name);
 
   if (iter == mount_points_map.end ())
     return;
-    
+
   MountPoint* mount_point = iter->second.get ();
-    
+
   if (mount_point->Registry () != registry)
     return;
 
     //оповещение об удалении точки монтирования
-  
+
   OnUnmount (mount_point);
 
    //удаление точки монтирования
@@ -248,15 +248,15 @@ void MountPointsMap::Unmount (const char* branch_name)
 
     //поиск точки монтирования с указанным именем
 
-  MountMap::iterator iter = mount_points_map.find (branch_name);      
+  MountMap::iterator iter = mount_points_map.find (branch_name);
 
   if (iter == mount_points_map.end ())
     return;
-    
+
   MountPoint* mount_point = iter->second.get ();
-    
+
     //оповещение об удалении точки монтирования
-  
+
   OnUnmount (mount_point);
 
    //удаление точки монтирования
@@ -269,11 +269,11 @@ void MountPointsMap::UnmountAll (ICustomVarRegistry* registry)
   for (MountMap::iterator map_iter = mount_points_map.begin (), map_end = mount_points_map.end (); map_iter != map_end;)
   {
     MountPoint* mount_point = map_iter->second.get ();
-      
+
     if (mount_point->Registry () == registry)
     {
         //оповещение об удалении точки монтирования
-      
+
       OnUnmount (mount_point);
 
        //удаление точки монтирования
@@ -296,14 +296,14 @@ void MountPointsMap::UnmountAll ()
 
   for (MountMap::iterator map_iter = mount_points_map.begin (), map_end = mount_points_map.end (); map_iter != map_end; ++map_iter)
     OnUnmount (map_iter->second.get ());
-    
+
     //удаление всех точек монтирования
 
   mount_points_map.clear ();
 }
 
 /*
-   Поиск точки монтирования  
+   Поиск точки монтирования
      жадный поиск точки монтирования с последовательным отсечением суффиксов (пример для a.b.c.d)
        1) search: a.b.c.d var_sub_name = ''
        2) search: a.b.c   var_sub_name = 'd'
@@ -324,9 +324,9 @@ MountPoint* MountPointsMap::FindMountPoint (const char* full_var_name, stl::stri
 
       return iter->second.get ();
     }
-    
+
       //отсечение суффикса
-      
+
     remove_suffix (mount_point_name);
   }
 
@@ -336,12 +336,12 @@ MountPoint* MountPointsMap::FindMountPoint (const char* full_var_name, stl::stri
 MountPoint* MountPointsMap::FindMountPoint (const char* branch_name, const char* var_name, stl::string& var_sub_name)
 {
   stl::string full_name (branch_name);
-  
+
   if (*branch_name)
     full_name += '.';
-  
+
   full_name += var_name;
-  
+
   return FindMountPoint (full_name.c_str (), var_sub_name);
 }
 
@@ -369,20 +369,25 @@ void MountPointsMap::UnregisterListener (IListener* listener)
    Получение глобальной карты точек монтирования
 */
 
+namespace
+{
+
+struct MountPointsMapWrapper
+{
+  MountPointsMapWrapper () : instance (new MountPointsMap) {}
+
+  ~MountPointsMapWrapper ()
+  {
+    instance->UnmountAll (); //???????????
+  }
+
+  MountPointsMap::Pointer instance;
+};
+
+}
+
 MountPointsMap::Pointer MountPointsMap::GetGlobalMap ()
 {
-  struct MountPointsMapWrapper
-  {
-    MountPointsMapWrapper () : instance (new MountPointsMap) {}
-
-    ~MountPointsMapWrapper ()
-    {
-      instance->UnmountAll (); //???????????
-    }
-
-    MountPointsMap::Pointer instance;
-  };
-
   typedef Singleton<MountPointsMapWrapper> MountPointsMapSingleton;
 
   return MountPointsMapSingleton::Instance ().instance;

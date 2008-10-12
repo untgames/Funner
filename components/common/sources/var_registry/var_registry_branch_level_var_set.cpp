@@ -14,7 +14,7 @@ size_t get_first_word_length (const char* string)
     switch (*end)
     {
       case '\0':
-      case '.':  
+      case '.':
         return end - string;
       default:
         break;
@@ -29,7 +29,7 @@ struct Var : public VarRegistry::ISubLevel
   stl::string name;
 
   Var (const char* in_name, size_t length) : ref_count (1), name (in_name, length) {}
-  
+
   const char* Name ()
   {
     return name.c_str ();
@@ -43,6 +43,11 @@ struct Var : public VarRegistry::ISubLevel
 
 typedef stl::hash_map<size_t, Var> VarMap;
 
+struct Selector
+{
+  Var& operator () (VarMap::value_type& value) const { return value.second; }
+};
+
 }
 
 struct BranchLevelVarSet::Impl
@@ -52,7 +57,7 @@ struct BranchLevelVarSet::Impl
   VarMap               vars;
 
 //Конструктор
-  Impl (const VarRegistry& registry)  
+  Impl (const VarRegistry& registry)
   {
     create_var_connection = registry.RegisterEventHandler ("*", VarRegistryEvent_OnCreateVar, xtl::bind (&BranchLevelVarSet::Impl::OnCreateVar, this, _1));
     delete_var_connection = registry.RegisterEventHandler ("*", VarRegistryEvent_OnDeleteVar, xtl::bind (&BranchLevelVarSet::Impl::OnDeleteVar, this, _1));
@@ -94,7 +99,7 @@ struct BranchLevelVarSet::Impl
 /*
    Набор переменных одного уровня вложения
 */
-    
+
 /*
    Конструктор/деструктор
 */
@@ -114,10 +119,5 @@ BranchLevelVarSet::~BranchLevelVarSet ()
 
 BranchLevelVarSet::Iterator BranchLevelVarSet::CreateIterator ()
 {
-  struct Selector
-  {
-    Var& operator () (VarMap::value_type& value) const { return value.second; }
-  };
-
   return Iterator (impl->vars.begin (), impl->vars.begin (), impl->vars.end (), Selector ());
 }

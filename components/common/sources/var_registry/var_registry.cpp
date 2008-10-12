@@ -23,26 +23,26 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
   public:
 ///Конструкторы
     Impl () {}
-    
-    Impl (const MountPointsMap::Pointer& in_mount_points_map, const char* in_branch_name) : 
+
+    Impl (const MountPointsMap::Pointer& in_mount_points_map, const char* in_branch_name) :
       branch_name (in_branch_name), mount_points_map (in_mount_points_map)
     {
-        //регистрация слушателя на добавление/удаление точек монтирования      
-      
+        //регистрация слушателя на добавление/удаление точек монтирования
+
       if (mount_points_map)
         mount_points_map->RegisterListener (this);
     }
-    
+
 ///Деструктор
     ~Impl ()
     {
         //оповещение об удалении всех веток реестра
-        
+
       for (MountPointsList::iterator iter=assigned_mount_points.begin (), end=assigned_mount_points.end (); iter!=end; ++iter)
         UnmountRegistryNotify ((*iter)->mount_point);
 
         //отмена регистрации слушателя на добавление/удаление точек монтирования
-      
+
       if (mount_points_map)
         mount_points_map->UnregisterListener (this);
     }
@@ -69,7 +69,7 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
     void SetValue (const char* var_name, const xtl::any& value)
     {
       static const char* METHOD_NAME = "common::VarRegistry::Impl::SetValue";
-      
+
       if (!var_name)
         throw make_null_argument_exception (METHOD_NAME, "var_name");
 
@@ -88,7 +88,7 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
     {
       if (!var_name)
         return false;
-        
+
       try
       {
         stl::string var_sub_name;
@@ -111,83 +111,6 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
     {
       if (!var_name_mask)
         throw make_null_argument_exception ("common::VarRegistry::Impl::EnumerateVars", "var_name_mask");
-      
-      struct EnumerationWrapper
-      {
-        public:
-          EnumerationWrapper (MountPointsList& list, const EnumHandler& in_handler, const char* branch_name, size_t in_branch_name_size, 
-                              const char* in_var_name_mask)
-            : iter (list.begin ()), 
-              last (list.end ()), 
-              handler (in_handler), 
-              var_name_mask (in_var_name_mask), 
-              branch_name_size (in_branch_name_size),
-              var_name_offset (0)
-          {
-            EnumHandler wrapper = ref (*this);
-
-            for (; iter != last; ++iter)
-            {
-              MountPoint& mount_point = *(*iter)->mount_point;
-              
-              if (mount_point.Name ().size () > branch_name_size)
-              {
-                var_name_offset = 0;
-
-                const char* sub_name = mount_point.Name ().c_str () + branch_name_size;
-
-                if (*sub_name && branch_name_size)
-                  sub_name++;
-
-                current_prefix = sub_name;
-                
-                if (!current_prefix.empty ())
-                  current_prefix += '.';
-              }
-              else
-              {
-                current_prefix.clear ();
-                
-                var_name_offset = branch_name_size - mount_point.Name ().size ();
-
-                if (mount_point.Name ().size ())
-                  current_var_name_mask = format ("%s.%s", branch_name + mount_point.Name ().size () + 1, in_var_name_mask);
-                else
-                  current_var_name_mask = in_var_name_mask;
-              }
-                
-              mount_point.Registry ()->EnumerateVars (wrapper);
-            }          
-          }
-
-          void operator () (const char* var_name)
-          {
-            if (var_name_offset)
-            {
-              if (strlen (var_name) < var_name_offset)
-                return;
-
-              if (wcmatch (var_name, current_var_name_mask.c_str ()))
-                handler (var_name + var_name_offset);
-            }
-            else
-            {
-              stl::string relative_var_name = current_prefix + var_name;
-
-              if (wcmatch (relative_var_name.c_str (), var_name_mask))
-                handler (relative_var_name.c_str ());
-            }
-          }
-
-        private:
-          MountPointsList::iterator iter, last;
-          EnumHandler               handler;
-          const char*               var_name_mask;
-          size_t                    branch_name_size;
-          stl::string               current_prefix;
-          stl::string               current_var_name_mask;
-          size_t                    var_name_offset;
-      };
 
       LoadDefaultComponents ();
 
@@ -203,11 +126,11 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
       return iteration_set->CreateIterator ();
     }
 
-///Подписка на добавление/изменение/удаление переменных  
+///Подписка на добавление/изменение/удаление переменных
     xtl::connection RegisterEventHandler (const char* var_name_mask, VarRegistryEvent event, const EventHandler& handler)
     {
       static const char* METHOD_NAME = "common::VarRegistry::Impl::RegisterEventHandler";
-      
+
       if (!var_name_mask)
         throw make_null_argument_exception (METHOD_NAME, "var_name_mask");
 
@@ -220,34 +143,6 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
         default:
           throw make_argument_exception (METHOD_NAME, "event", event);
       }
-      
-      //класс-адаптер, предназначенный для фильтрации сообщений при распространении сигналов (OnCreateVar/OnDeleteVar/OnChangeVar)
-      struct EventFilter
-      {
-        public:
-          typedef VarRegistry::EventHandler EventHandler;
-        
-          EventFilter (const char* in_var_mask, const EventHandler& in_handler) : var_mask (in_var_mask), handler (in_handler) {}
-
-          void operator () (const char* var_name) const
-          {
-            if (!wcmatch (var_name, var_mask.c_str ()))
-              return;
-
-            try
-            {
-              handler (var_name);
-            }
-            catch (...)
-            {
-              //подавление всех исключений
-            }
-          }
-
-        private:
-          EventHandler handler;
-          stl::string  var_mask;
-      };      
 
       return signals [event].connect (EventFilter (var_name_mask, handler));
     }
@@ -255,21 +150,14 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
 ///Создание ветвей реестра
     static Impl* GetNullBranch ()
     {
-      struct ImplWrapper
-      {
-        ImplWrapper () : instance (new Impl, false) {}
-
-        xtl::intrusive_ptr<Impl> instance;
-      };
-
       return common::Singleton<ImplWrapper>::Instance ().instance.get ();
     }
-    
+
     static Impl* CreateBranch  (const char* branch_name)
     {
       return new Impl (MountPointsMap::GetGlobalMap (), branch_name);
     }
-    
+
   private:
     void LoadDefaultComponents ()
     {
@@ -280,7 +168,7 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
     MountPoint* FindMountPoint (const char* var_name, stl::string& var_sub_name)
     {
       if (!mount_points_map)
-        return 0;        
+        return 0;
 
       LoadDefaultComponents ();
 
@@ -302,12 +190,12 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
       {
         //подавление всех исключений
       }
-    }  
+    }
 
       //присоединённая точка монтирования
     struct AssignedMountPoint
     {
-      AssignedMountPoint (MountPoint* in_mount_point, xtl::connection& in_event_connection)
+      AssignedMountPoint (MountPoint* in_mount_point, const xtl::connection& in_event_connection)
         : mount_point (in_mount_point), event_connection (in_event_connection) {}
 
       MountPoint           *mount_point;
@@ -318,16 +206,16 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
     void OnMount (MountPoint* new_mount_point)
     {
       size_t match_size = stl::min (new_mount_point->Name ().size (), branch_name.size ());
-      
+
       if (!xtl::xstrncmp (branch_name.c_str (), new_mount_point->Name ().c_str (), match_size))
       {
           //добавление новой точки монтирования
-        
+
         assigned_mount_points.push_back (AssignedMountPointPtr (new AssignedMountPoint (new_mount_point,
           new_mount_point->RegisterEventHandler (xtl::bind (&VarRegistry::Impl::Notify, this, _1, _2, _3)))));
-          
+
           //оповещение о добавлении ветки реестра
-          
+
         MountRegistryNotify (new_mount_point);
       }
     }
@@ -339,34 +227,148 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
         if ((*iter)->mount_point == deleted_mount_point)
         {
             //оповещение об удалении ветки реестра
-            
+
           UnmountRegistryNotify (deleted_mount_point);
-          
+
             //удаление ветки реестра
-          
+
           assigned_mount_points.erase (iter);
 
           return;
         }
     }
-    
+
 ///Оповещение о добавлении ветки реестра
     void MountRegistryNotify (MountPoint* mount_point)
     {
       mount_point->Registry ()->EnumerateVars (xtl::bind (&Impl::Notify, this, mount_point->Name ().c_str (), _1, VarRegistryEvent_OnCreateVar));
     }
-    
+
 ///Оповещение об удалении ветки реестра
     void UnmountRegistryNotify (MountPoint* mount_point)
     {
       mount_point->Registry ()->EnumerateVars (xtl::bind (&Impl::Notify, this, mount_point->Name ().c_str (), _1, VarRegistryEvent_OnDeleteVar));
-    }    
-    
+    }
+
   private:
-    typedef xtl::signal<void (const char*)>     VarRegistrySignal;    
+    typedef xtl::signal<void (const char*)>     VarRegistrySignal;
     typedef xtl::shared_ptr<AssignedMountPoint> AssignedMountPointPtr;
     typedef stl::list<AssignedMountPointPtr>    MountPointsList;
     typedef stl::auto_ptr<BranchLevelVarSet>    IterationSetPtr;
+
+    //класс-адаптер, предназначенный для перебора переменных
+    struct EnumerationWrapper
+    {
+      public:
+        EnumerationWrapper (MountPointsList& list, const EnumHandler& in_handler, const char* branch_name, size_t in_branch_name_size,
+                            const char* in_var_name_mask)
+          : iter (list.begin ()),
+            last (list.end ()),
+            handler (in_handler),
+            var_name_mask (in_var_name_mask),
+            branch_name_size (in_branch_name_size),
+            var_name_offset (0)
+        {
+          EnumHandler wrapper = xtl::ref (*this);
+
+          for (; iter != last; ++iter)
+          {
+            MountPoint& mount_point = *(*iter)->mount_point;
+
+            if (mount_point.Name ().size () > branch_name_size)
+            {
+              var_name_offset = 0;
+
+              const char* sub_name = mount_point.Name ().c_str () + branch_name_size;
+
+              if (*sub_name && branch_name_size)
+                sub_name++;
+
+              current_prefix = sub_name;
+
+              if (!current_prefix.empty ())
+                current_prefix += '.';
+            }
+            else
+            {
+              current_prefix.clear ();
+
+              var_name_offset = branch_name_size - mount_point.Name ().size ();
+
+              if (mount_point.Name ().size ())
+                current_var_name_mask = format ("%s.%s", branch_name + mount_point.Name ().size () + 1, in_var_name_mask);
+              else
+                current_var_name_mask = in_var_name_mask;
+            }
+
+            mount_point.Registry ()->EnumerateVars (wrapper);
+          }
+        }
+
+        void operator () (const char* var_name)
+        {
+          if (var_name_offset)
+          {
+            if (strlen (var_name) < var_name_offset)
+              return;
+
+            if (wcmatch (var_name, current_var_name_mask.c_str ()))
+              handler (var_name + var_name_offset);
+          }
+          else
+          {
+            stl::string relative_var_name = current_prefix + var_name;
+
+            if (wcmatch (relative_var_name.c_str (), var_name_mask))
+              handler (relative_var_name.c_str ());
+          }
+        }
+
+      private:
+        MountPointsList::iterator iter, last;
+        EnumHandler               handler;
+        const char*               var_name_mask;
+        size_t                    branch_name_size;
+        stl::string               current_prefix;
+        stl::string               current_var_name_mask;
+        size_t                    var_name_offset;
+    };
+
+    //класс-адаптер, предназначенный для фильтрации сообщений при распространении сигналов (OnCreateVar/OnDeleteVar/OnChangeVar)
+    struct EventFilter
+    {
+      public:
+        typedef VarRegistry::EventHandler EventHandler;
+
+        EventFilter (const char* in_var_mask, const EventHandler& in_handler) : handler (in_handler), var_mask (in_var_mask) {}
+
+        void operator () (const char* var_name) const
+        {
+          if (!wcmatch (var_name, var_mask.c_str ()))
+            return;
+
+          try
+          {
+            handler (var_name);
+          }
+          catch (...)
+          {
+            //подавление всех исключений
+          }
+        }
+
+      private:
+        EventHandler handler;
+        stl::string  var_mask;
+    };
+
+    //обертка используемая для возврата реализации (GetNullBranch)
+    struct ImplWrapper
+    {
+      ImplWrapper () : instance (new Impl, false) {}
+
+      xtl::intrusive_ptr<Impl> instance;
+    };
 
   private:
     stl::string             branch_name;
@@ -410,7 +412,7 @@ VarRegistry::~VarRegistry ()
 {
   release (impl);
 }
-    
+
 /*
    Копирование
 */
@@ -418,7 +420,7 @@ VarRegistry::~VarRegistry ()
 VarRegistry& VarRegistry::operator = (const VarRegistry& source)
 {
   VarRegistry (source).Swap (*this);
-  
+
   return *this;
 }
 
@@ -452,7 +454,7 @@ bool VarRegistry::HasVariable (const char* var_name) const
 const char* VarRegistry::BranchName () const
 {
   return impl->BranchName ();
-}           
+}
 
 /*
    Проверка установлен ли реестр

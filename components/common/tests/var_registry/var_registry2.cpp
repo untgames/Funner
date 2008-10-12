@@ -24,10 +24,10 @@ void register_handler (const char* mask, const VarRegistry& registry)
 {
   VarRegistryEvent events [] = {VarRegistryEvent_OnCreateVar, VarRegistryEvent_OnChangeVar, VarRegistryEvent_OnDeleteVar};
 
-  for (int i=0; i<sizeof (events)/sizeof (*events); i++)
+  for (size_t i=0; i < sizeof (events) / sizeof (*events); i++)
   {
     VarRegistryEvent event = (VarRegistryEvent)i;
-    
+
     registry.RegisterEventHandler (mask, event, xtl::bind (&notify, _1, event, mask, xtl::cref (registry)));
   }
 }
@@ -35,11 +35,11 @@ void register_handler (const char* mask, const VarRegistry& registry)
 int main ()
 {
   printf ("Results of var_registry2_test:\n");
-  
+
   try
   {
     TestVarRegistry::Pointer test_registry = TestVarRegistry::Create ();
-    
+
     VarRegistrySystem::Mount ("test", test_registry.get ());
 
     VarRegistry registry ("test");
@@ -51,11 +51,11 @@ int main ()
     registry.SetValue ("x", xtl::any (stl::string ("x"), true));
     registry.SetValue ("y", xtl::any (stl::string ("y"), true));
     registry.SetValue ("x.y", xtl::any (stl::string ("x.y"), true));
-    registry.SetValue ("xxxx.y", xtl::any (stl::string ("xxxx.y"), true));    
-    
+    registry.SetValue ("xxxx.y", xtl::any (stl::string ("xxxx.y"), true));
+
     test_registry->RemoveVariable ("x");
     test_registry->RemoveVariable ("xxxx.y");
-    
+
     printf ("end scope\n");
   }
   catch (std::exception& e)

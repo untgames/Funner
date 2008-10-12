@@ -26,7 +26,7 @@ class VarRegistryContainerImpl : public ICustomVarRegistry, public xtl::referenc
       VarMap::iterator iter = vars.find (var_name);
 
       if (iter == vars.end ())
-        throw xtl::make_argument_exception (METHOD_NAME, "var_name", var_name, "Variable not found");              
+        throw xtl::make_argument_exception (METHOD_NAME, "var_name", var_name, "Variable not found");
 
       return iter->second;
     }
@@ -44,7 +44,7 @@ class VarRegistryContainerImpl : public ICustomVarRegistry, public xtl::referenc
         throw xtl::make_null_argument_exception (METHOD_NAME, "var_name");
 
       VarMap::iterator iter = vars.find (var_name);
-      
+
       if (iter == vars.end ())
         Notify (var_name, VarRegistryEvent_OnCreateVar);
       else
@@ -61,7 +61,7 @@ class VarRegistryContainerImpl : public ICustomVarRegistry, public xtl::referenc
         throw xtl::make_null_argument_exception (METHOD_NAME, "var_name");
 
       VarMap::iterator iter = vars.find (var_name);
-      
+
       if (iter == vars.end ())
       {
         vars.insert_pair (var_name, value);
@@ -69,7 +69,7 @@ class VarRegistryContainerImpl : public ICustomVarRegistry, public xtl::referenc
         Notify (var_name, VarRegistryEvent_OnCreateVar);
 
         return;
-      }            
+      }
 
       vars [var_name] = value;
 
@@ -163,9 +163,9 @@ class VarRegistryContainerImpl : public ICustomVarRegistry, public xtl::referenc
   private:
     typedef stl::hash_map<stl::string, xtl::any> VarMap;
 
-  private:  
+  private:
     VarMap       vars;
-    EventHandler event_handler;   
+    EventHandler event_handler;
 };
 
 }
@@ -214,13 +214,13 @@ VarRegistryContainer<T>& VarRegistryContainer<T>::operator = (const VarRegistryC
 template <class T>
 const T& VarRegistryContainer<T>::GetValue (const char* var_name) const
 {
-  return any_cast<T&> (impl->GetValueCore (var_name));
+  return xtl::any_cast<T&> (impl->GetValueCore (var_name));
 }
 
 template <class T>
 void VarRegistryContainer<T>::SetValue (const char* var_name, const T& value)
 {
-  any_cast<T&> (impl->SetValue (var_name)) = value;
+  xtl::any_cast<T&> (impl->SetValue (var_name)) = value;
 }
 
 /*

@@ -22,27 +22,27 @@ TestSample test_samples [] = {
 int main ()
 {
   printf ("Results of align_test:\n");
-  
-  Heap heap;  
-  
+
+  Heap heap;
+
   for (size_t i=0;i<sizeof (test_samples)/sizeof (TestSample);i++)
   {
     TestSample& sample = test_samples [i];
-    
+
     void* p = heap.Allocate (sample.size,sample.align,sample.offset);
-    
+
     if (!p)
     {
-      printf ("allocate failed at size=%u align=%u offset=%u\n",sample.size,sample.align,sample.offset);
+      printf ("allocate failed at size=%lu align=%lu offset=%lu\n",sample.size,sample.align,sample.offset);
       continue;
     }
-    
+
     if (!check_align (p,sample.align,sample.offset))
-      printf ("align failed at size=%u align=%u offset=%u\n",sample.size,sample.align,sample.offset);
-    
+      printf ("align failed at size=%lu align=%lu offset=%lu\n",sample.size,sample.align,sample.offset);
+
     heap.Deallocate (p);
   }
-  
+
   printf ("successfull\n");
 
   return 0;

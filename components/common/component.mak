@@ -17,14 +17,15 @@ COMMON.SOURCES.COMPILER_DEFINES := PCRE_STATIC
 COMMON.SOURCES.unistd.SOURCE_DIRS  := sources/platform/unistd
 
 #Цель - CommonLib zip file system sources
-COMMON.ZIP_FILE_SYSTEM.TYPE             := static-lib
-COMMON.ZIP_FILE_SYSTEM.NAME             := common.zip_file_system
-COMMON.ZIP_FILE_SYSTEM.INCLUDE_DIRS     := include ../xtl/include ../../extern/zzip/include
-COMMON.ZIP_FILE_SYSTEM.SOURCE_DIRS      := sources/file_system/zip
-COMMON.ZIP_FILE_SYSTEM.LIB_DIRS         :=
-COMMON.ZIP_FILE_SYSTEM.LIBS             :=
-COMMON.ZIP_FILE_SYSTEM.COMPILER_CFLAGS  :=
-COMMON.ZIP_FILE_SYSTEM.COMPILER_DEFINES :=
+COMMON.ZIP_FILE_SYSTEM.TYPE                    := static-lib
+COMMON.ZIP_FILE_SYSTEM.NAME                    := common.zip_file_system
+COMMON.ZIP_FILE_SYSTEM.INCLUDE_DIRS            := include ../xtl/include ../../extern/zzip/include
+COMMON.ZIP_FILE_SYSTEM.SOURCE_DIRS             := sources/file_system/zip
+COMMON.ZIP_FILE_SYSTEM.LIB_DIRS                :=
+COMMON.ZIP_FILE_SYSTEM.LIBS                    :=
+COMMON.ZIP_FILE_SYSTEM.COMPILER_CFLAGS         :=
+COMMON.ZIP_FILE_SYSTEM.COMPILER_DEFINES        :=
+COMMON.ZIP_FILE_SYSTEM.macosx.COMPILER_DEFINES := ZZIP_1_H
 
 #Цель - CommonLib zip file system sources
 COMMON.CONFIGURATOR.TYPE             := static-lib
