@@ -6,17 +6,25 @@
 */
 
 //проверка имеет ли T квалификатор const/volatile
-template <class T>           struct is_const:                   public false_type {};
-template <class T>           struct is_const<const T>:          public true_type {};
-template <class T>           struct is_const<const volatile T>: public true_type {};
-template <class T, size_t N> struct is_const<T [N]>:            public is_const<T> {};
-template <class T>           struct is_const<T []>:             public is_const<T> {};
+template <class T>           struct is_const:                       public false_type {};
+template <class T>           struct is_const<const T>:              public true_type {};
+template <class T>           struct is_const<const volatile T>:     public true_type {};
+template <class T, size_t N> struct is_const<T [N]>:                public is_const<T> {};
+template <class T, size_t N> struct is_const<const T [N]>:          public true_type {};
+template <class T, size_t N> struct is_const<const volatile T [N]>: public true_type {};
+template <class T>           struct is_const<T []>:                 public is_const<T> {};
+template <class T>           struct is_const<const T []>:           public true_type {};
+template <class T>           struct is_const<const volatile T []>:  public true_type {};
 
-template <class T>           struct is_volatile:                   public false_type {};
-template <class T>           struct is_volatile<volatile T>:       public true_type {};
-template <class T>           struct is_volatile<const volatile T>: public true_type {};
-template <class T, size_t N> struct is_volatile<T [N]>:            public is_volatile<T> {};
-template <class T>           struct is_volatile<T []>:             public is_volatile<T> {};
+template <class T>           struct is_volatile:                       public false_type {};
+template <class T>           struct is_volatile<volatile T>:           public true_type {};
+template <class T>           struct is_volatile<const volatile T>:     public true_type {};
+template <class T, size_t N> struct is_volatile<T [N]>:                public is_volatile<T> {};
+template <class T, size_t N> struct is_volatile<volatile T [N]>:       public true_type {};
+template <class T, size_t N> struct is_volatile<const volatile T [N]>: public true_type {};
+template <class T>           struct is_volatile<T []>:                 public is_volatile<T> {};
+template <class T>           struct is_volatile<volatile T []>:        public true_type {};
+template <class T>           struct is_volatile<const volatile T []>:  public true_type {};
 
 //удаление квалификатора const
 template <class T>           struct remove_const                       { typedef T          type; };
