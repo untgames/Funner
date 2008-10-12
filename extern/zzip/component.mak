@@ -14,3 +14,4 @@ EXTERN.ZZIP.COMPILER_CFLAGS  :=                          #Флаги сборки (зависят 
 EXTERN.ZZIP.msvc.COMPILER_DEFINES := _CRT_SECURE_NO_DEPRECATE #Определения сборки
 EXTERN.ZZIP.g++.COMPILER_CFLAGS := --no-warn                #Флаги сборки (зависят от конфигурации)
 EXTERN.ZZIP.nds.g++.COMPILER_DEFINES := ZZIP_1_H
+EXTERN.ZZIP.macosx.COMPILER_DEFINES := ZZIP_1_H
