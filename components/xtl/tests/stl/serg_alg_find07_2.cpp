@@ -12,7 +12,7 @@ bool eq_nosign (int x, int y)
 
 void lookup (int* first, int* last, size_t count, int val, bool (*pred) (int x, int y))
 {
-  printf ("Searching for a sequence of %d '%d'%s", count, val, (count != 1 ? "s: " : ":  "));
+  printf ("Searching for a sequence of %lu '%d'%s", count, val, (count != 1 ? "s: " : ":  "));
   int* result = search_n (first, last, count, val, pred);
   if (result == last)
     printf ("Not found\n");
@@ -20,7 +20,7 @@ void lookup (int* first, int* last, size_t count, int val, bool (*pred) (int x, 
     printf ("Index = %d\n", result - first);
 }
 
-int main () 
+int main ()
 {
   printf ("Results of serg_alg_find07_2:\n");
 

@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_deque03_test:\n");
 
@@ -31,7 +31,7 @@ int main ()
     c1.pop_front ();
   }
 
-  printf ("\nc1.size () = %u\n", c1.size ());
+  printf ("\nc1.size () = %lu\n", c1.size ());
 
   return 0;
 }

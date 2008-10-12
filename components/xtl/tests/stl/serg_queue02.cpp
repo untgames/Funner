@@ -4,7 +4,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_queue02_test:\n");
 
@@ -22,8 +22,8 @@ int main ()
   else
      printf ("The queue q2 is not empty.\n");
 
-  printf ("q1.size () = %u\n", q1.size ());
-  printf ("q2.size () = %u\n", q2.size ());
+  printf ("q1.size () = %lu\n", q1.size ());
+  printf ("q2.size () = %lu\n", q2.size ());
 
   return 0;
 }

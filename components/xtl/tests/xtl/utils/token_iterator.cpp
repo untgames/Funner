@@ -31,19 +31,19 @@ void test (xtl::io::token_iterator<Token, BaseIter>& iter)
 int main ()
 {
   printf ("Results of token_iterator_test:\n");
-  
+
   const char* tokens [] = {"1", "hello", "3.14"};
-  xtl::io::token_iterator<const char*> iter = xtl::io::make_token_iterator (tokens, tokens + sizeof (tokens)/sizeof(*tokens));  
-  
+  xtl::io::token_iterator<const char*> iter = xtl::io::make_token_iterator (tokens, tokens + sizeof (tokens)/sizeof(*tokens));
+
   test<int> (iter);
   test<int> (iter);
   test<const char*> (iter);
   test<float> (iter);
   test<float> (iter);
-  
+
   printf ("empty: %d\n", iter.empty ());
   printf ("iter == 0: %d\n", iter == 0);
-  printf ("available: %d\n", iter.available ());
+  printf ("available: %lu\n", iter.available ());
 
   return 0;
 }

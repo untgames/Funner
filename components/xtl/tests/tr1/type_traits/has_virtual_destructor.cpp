@@ -2,8 +2,10 @@
 
 class polymorphic_no_virtual_destructor
 {
-public:
-   virtual void method() = 0;
+  public:
+    virtual ~polymorphic_no_virtual_destructor () {}
+
+    virtual void method() = 0;
 };
 
 int main ()

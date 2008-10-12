@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   typedef hash_map <const char*, int> MyHash;
 
@@ -19,8 +19,8 @@ int main ()
   hm1.insert_pair ("igor",40);
 
   print ("hm1 =", hm1.begin (), hm1.end ());
-  printf ("size: %u\n", hm1.size ());
-  printf ("max_size: %u\n", hm1.max_size ());
+  printf ("size: %lu\n", hm1.size ());
+  printf ("max_size: %lu\n", hm1.max_size ());
   printf ("empty: %s\n", hm1.empty ()?"true":"false");
 
   MyHash::key_equal ke = hm1.key_eq ();
@@ -29,7 +29,7 @@ int main ()
 
   MyHash::hasher hr = hm1.hash_func ();
 
-  printf ("hash_func ('serg') return %d\n", hr ("serg"));
+  printf ("hash_func ('serg') return %lu\n", hr ("serg"));
 
   print ("hm1 =", hm1.begin (), hm1.end ());
 

@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_set5_test:\n");
 
@@ -19,10 +19,10 @@ int main ()
 
   // Keys must be unique in set, so duplicates are ignored
   i = s1.count (1);
-  printf ("count (1) => %d\n", i);
+  printf ("count (1) => %lu\n", i);
 
   i = s1.count (2);
-  printf ("count (2) => %d\n", i);
+  printf ("count (2) => %lu\n", i);
 
   return 0;
 }

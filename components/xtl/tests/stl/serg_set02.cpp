@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_set2_test:\n");
 
@@ -19,8 +19,8 @@ int main ()
 
   print ("s1 =", s1.begin (), s1.end ());
   print ("s2 =", s2.begin (), s2.end ());
-  printf ("max_size: %u\n", s1.max_size ());
-  printf ("size: %u\n", s1.size ());
+  printf ("max_size: %lu\n", s1.max_size ());
+  printf ("size: %lu\n", s1.size ());
   printf ("empty: %s\n", s1.empty ()?"true":"false");
 
   set <int, less <int> >::key_compare lkc = s1.key_comp ();

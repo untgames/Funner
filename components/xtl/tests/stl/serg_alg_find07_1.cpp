@@ -7,7 +7,7 @@ using namespace stl;
 
 void lookup (int* first, int* last, size_t count, int val)
 {
-  printf ("Searching for a sequence of %d '%d'%s", count, val, (count != 1 ? "s: " : ":  "));
+  printf ("Searching for a sequence of %lu '%d'%s", count, val, (count != 1 ? "s: " : ":  "));
   int* result = search_n (first, last, count, val);
   if (result == last)
     printf ("Not found\n");
@@ -15,7 +15,7 @@ void lookup (int* first, int* last, size_t count, int val)
     printf ("Index = %d\n", result - first);
 }
 
-int main () 
+int main ()
 {
   printf ("Results of serg_alg_find07_1:\n");
 

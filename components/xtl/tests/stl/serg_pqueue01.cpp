@@ -20,7 +20,7 @@ template <class T> void unque (const char* title, T& q)
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_pqueue01_test:\n");
 
@@ -51,7 +51,7 @@ int main ()
   unque ("q4", q4);
   unque ("q5", q5);
   unque ("q6", q6);
-  printf ("After printing, q6 has %u elements.\n", q6.size ());
+  printf ("After printing, q6 has %lu elements.\n", q6.size ());
 
   return 0;
 }

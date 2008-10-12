@@ -4,7 +4,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_pqueue04_test:\n");
 
@@ -14,7 +14,7 @@ int main ()
   q1.push (20);
   q1.push (30);
 
-  printf ("The queue length is %u\n", q1.size ());
+  printf ("The queue length is %lu\n", q1.size ());
 
   printf ("Unqueue q1: ");
   while (!q1.empty ())
@@ -23,7 +23,7 @@ int main ()
     q1.pop ();
   }
 
-  printf ("\nThe queue length is %u\n", q1.size ());
+  printf ("\nThe queue length is %lu\n", q1.size ());
 
   return 0;
 }

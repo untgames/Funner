@@ -17,13 +17,13 @@ int main()
 
   index = str1.find_last_not_of (c1, 7);
   if ( index != npos )
-    printf ("found str1[%d] = '%c'\n", index, str1 [index]);
+    printf ("found str1[%lu] = '%c'\n", index, str1 [index]);
   else
     printf ("The character '%c' was not found in str1.\n", c1);
 
   index = str1.find_last_not_of (c1);
   if (index != npos )
-    printf ("found str1[%d] = '%c'\n", index, str1 [index]); 
+    printf ("found str1[%lu] = '%c'\n", index, str1 [index]);
   else
     printf ("The character non '%c' was not found in str1.\n", c1);
 
@@ -34,14 +34,14 @@ int main()
   const char *cstr2 = "B1";
   index = str2.find_last_not_of (cstr2, 6);
   if (index != npos)
-    printf ("found str2[%d] = '%c'\n", index, str2 [index]);
+    printf ("found str2[%lu] = '%c'\n", index, str2 [index]);
   else
     printf ("Elements of the substring 'B1' were not found in str2 before the 6th position.\n");
 
   cstr2 = "B-1";
   index = str2.find_last_not_of (cstr2);
   if ( index != npos )
-    printf ("found str2[%d] = '%c'\n", index, str2 [index]);
+    printf ("found str2[%lu] = '%c'\n", index, str2 [index]);
   else
     printf ("The elements of the substring 'B-1' were not found in str2.\n");
 
@@ -51,13 +51,13 @@ int main()
   const char *cstr3 = "45G";
   string::size_type index2 = str3.find_last_not_of (cstr3);
   if ( index2 != npos )
-    printf ("found str3[%d] = '%c'\n", index2, str3 [index2]);
+    printf ("found str3[%lu] = '%c'\n", index2, str3 [index2]);
   else
     printf ("Elements in str3 contain only characters in the string '45G'.\n");
 
   index = str3.find_last_not_of (cstr3, 6, index2 - 1);
   if (index != npos)
-    printf ("found str3[%d] = '%c'\n", index, str3 [index]);
+    printf ("found str3[%lu] = '%c'\n", index, str3 [index]);
   else
     printf ("Elements in str3 contain only characters in the string '45G'.\n");
 
@@ -68,16 +68,16 @@ int main()
   string str4a ( "b-a" );
   index = str4.find_last_not_of (str4a, 5);
   if (index != npos)
-    printf ("found str4[%d] = '%c'\n", index, str4 [index]);
+    printf ("found str4[%lu] = '%c'\n", index, str4 [index]);
   else
    printf ("Elements other than those in the substring 'ba3' were not found in the string str4.\n");
 
   string str4b ( "12" );
   index = str4.find_last_not_of (str4b);
   if (index != npos )
-    printf ("found str4[%d] = '%c'\n", index, str4 [index]);
+    printf ("found str4[%lu] = '%c'\n", index, str4 [index]);
   else
     printf ("Elements other than those in the substring '12' were not found in the string str4.\n");
-  
+
   return 0;
 }

@@ -4,7 +4,12 @@
 #include <new>
 #include <stdexcept>
 
-struct poly_bug { virtual int foo() = 0; };
+struct poly_bug
+{
+  virtual ~poly_bug () {}
+
+  virtual int foo() = 0;
+};
 
 int main ()
 {
@@ -40,6 +45,6 @@ int main ()
   CHECK_INTEGRAL_CONSTANT (is_polymorphic<std::out_of_range>::value, true);
   CHECK_INTEGRAL_CONSTANT (is_polymorphic<std::range_error>::value, true);
   CHECK_INTEGRAL_CONSTANT (is_polymorphic<poly_bug>::value, true);
-  
+
   return 0;
 }

@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_list12_test:\n");
 
@@ -19,13 +19,13 @@ int main ()
   c1.push_back (300);
 
   print ("c1 =", c1.begin (), c1.end ());
-  printf ("Size before remove: %u\n", c1.size ());
+  printf ("Size before remove: %lu\n", c1.size ());
 
   c1.remove (5);
 
   printf ("After removing elements with value 5, the list becomes:\n");
   print ("c1 =", c1.begin (), c1.end ());
-  printf ("Size after remove: %u\n", c1.size ());
+  printf ("Size after remove: %lu\n", c1.size ());
 
   return 0;
 }

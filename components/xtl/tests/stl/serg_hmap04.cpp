@@ -6,7 +6,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_hmap4_test:\n");
 
@@ -39,15 +39,15 @@ int main ()
   printf ("Delete elements with key of 2 from hm3:\n");
   print ("hm3 =", hm3.begin (), hm3.end ());
 
-  printf ("Count of deleted elements: %d.\n", n);
+  printf ("Count of deleted elements: %lu.\n", n);
 
   hm3.erase (++hm3.begin ());
   printf ("Delete 2nd element: \n");
   print ("hm3 =", hm3.begin (), hm3.end ());
 
-  printf ("Size of hm3 before: %d\n", hm3.size ());
+  printf ("Size of hm3 before: %lu\n", hm3.size ());
   hm3.clear ();
-  printf ("Size of hm3 after: %d\n", hm3.size ());
+  printf ("Size of hm3 after: %lu\n", hm3.size ());
 
   return 0;
 }

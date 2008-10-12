@@ -16,13 +16,13 @@ int main()
 
   pos = s1.find (c2);
   if ( pos != string::npos )
-    printf ("'%c' found at position: %u\n", c2, pos);
+    printf ("'%c' found at position: %lu\n", c2, pos);
   else
     printf ("'%c' not found\n", c2);
 
   pos = s1.find (c2, 8);
   if ( pos != string::npos )
-    printf ("'%c' found at position: %u\n", c2, pos);
+    printf ("'%c' found at position: %lu\n", c2, pos);
   else
     printf ("'%c' not found\n", c2);
 

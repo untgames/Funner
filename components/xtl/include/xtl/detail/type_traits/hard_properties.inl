@@ -9,7 +9,7 @@ template <class T> struct is_class_helper
 {
   template <class U> static yes_type is_class_tester (void (U::*)());
   template <class U> static no_type  is_class_tester (...);
-  
+
   enum { value = (sizeof (is_class_tester<T> (0)) == sizeof (yes_type)) && !is_union<T>::value };
 };
 
@@ -52,19 +52,19 @@ namespace detail
 template <class T, bool is_a_class=is_class<T>::value> struct is_polymorphic_helper
 {
   typedef typename remove_cv<T>::type base;
-  
+
   struct A: public base
   {
       A  ();
-      ~A () throw();
+//      ~A () throw();  //деструктор закомментировани для обхода предупреждений об отсутствии виртуального деструктора (при компиляции gcc)
 
       char padding [256];
-      
+
    private:
       A (const A&);
-      A& operator = (const A&);  
+      A& operator = (const A&);
   };
-  
+
   struct B: public base
   {
       B  ();
@@ -74,9 +74,9 @@ template <class T, bool is_a_class=is_class<T>::value> struct is_polymorphic_hel
 
    private:
       B (const B&);
-      B& operator = (const B&);  
-  };  
-  
+      B& operator = (const B&);
+  };
+
   enum { value = sizeof (A) == sizeof (B) };
 };
 
@@ -85,7 +85,7 @@ template <class T> struct is_polymorphic_helper<T, false>: public false_type {};
 }
 
 template <class T> struct is_polymorphic: public bool_constant<detail::is_polymorphic_helper<T>::value> {};
-                                    
+
 /*
     Проверка является ли класс абстрактным
 */
@@ -97,7 +97,7 @@ template <class T, bool is_a_complete_class=is_class<T>::value && sizeof (T)> st
 {
   template <class U> static no_type  check_sig (U (*)[1]);
   template <class U> static yes_type check_sig (...);
-   
+
   enum {
     sig_size = sizeof (check_sig<T> (0)),
     value    = sig_size == sizeof (yes_type)

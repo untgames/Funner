@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   typedef hash_set<int> mySet;
 
@@ -19,11 +19,11 @@ int main ()
 
   print ("hs1 =", hs1.begin (), hs1.end ());
 
-  i = hs1.count (1); 
-  printf ("count (1) => %d\n", i);
+  i = hs1.count (1);
+  printf ("count (1) => %lu\n", i);
 
   i = hs1.count (2);
-  printf ("count (2) => %d\n", i);
+  printf ("count (2) => %lu\n", i);
 
   return 0;
 }

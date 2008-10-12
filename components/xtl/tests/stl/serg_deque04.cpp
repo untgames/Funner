@@ -5,13 +5,13 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_deque04_test:\n");
 
   deque <int> c1, c2;
   deque <int>::iterator iter;
-  
+
   c1.push_back (10);
   c1.push_back (20);
   c1.push_back (30);
@@ -31,7 +31,7 @@ int main ()
   c1.insert (++c1.begin(), c2.begin(), --c2.end());
   print ("c1 = ", c1.begin(), c1.end());
 
-  printf ("c1.size () = %u\n", c1.size ());
+  printf ("c1.size () = %lu\n", c1.size ());
 
   return 0;
 }

@@ -28,7 +28,7 @@ void print (const math::vec<T, size>& v)
     printf (" ");
     print  (v [i]);
   }
-    
+
   printf (" ]\n");
 }
 
@@ -49,7 +49,7 @@ void print (const math::matrix<T, size>& v)
 
     printf (" ]");
   }
-    
+
   printf (" ]\n");
 }
 
@@ -63,7 +63,7 @@ void print (const math::quat<T>& v)
     printf (" ");
     print  (v [i]);
   }
-    
+
   printf (" ]\n");
 }
 
@@ -82,18 +82,18 @@ void test (xtl::io::token_iterator<Token, BaseIter>& iter)
 int main ()
 {
   printf ("Results of token_iterator_math_test:\n");
-  
+
   const char* tokens [] = {"1", "2", "3.14", "4", "5", "6.2", "7", "9.2", "10", "11", "12", "13"};
-  xtl::io::token_iterator<const char*> iter = xtl::io::make_token_iterator (tokens, tokens + sizeof (tokens)/sizeof(*tokens));  
+  xtl::io::token_iterator<const char*> iter = xtl::io::make_token_iterator (tokens, tokens + sizeof (tokens)/sizeof(*tokens));
 
   test<math::vec3f> (iter);
   test<math::mat2i> (iter);
   test<math::quatd> (iter);
-  test<math::vec3f> (iter);  
+  test<math::vec3f> (iter);
 
   printf ("empty: %d\n", iter.empty ());
   printf ("iter == 0: %d\n", iter == 0);
-  printf ("available: %d\n", iter.available ());
+  printf ("available: %lu\n", iter.available ());
 
   return 0;
 }

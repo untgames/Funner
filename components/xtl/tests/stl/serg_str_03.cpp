@@ -32,16 +32,16 @@ int main()
 
   string::size_type nArray1;
   nArray1 = s1.copy (arr1_ptr, 12);  // C4996
-  printf ("The number of copied characters in array1 is: %d\n", nArray1);
+  printf ("The number of copied characters in array1 is: %lu\n", nArray1);
   printf ("The copied characters array1 is: '%s'\n", array1);
 
   string::size_type nArray2;
   nArray2 = s1.copy (arr2_ptr, 5, 6);  // C4996
-  printf ("The number of copied characters in array2 is: %d\n", nArray2);
+  printf ("The number of copied characters in array2 is: %lu\n", nArray2);
   printf ("The copied characters array2 is: '%s'\n", arr2_ptr);
 
   test ();
   printf ("obj count=%d\n",Char::obj_count);
-  
+
   return 0;
 }

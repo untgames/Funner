@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_set3_test:\n");
 
@@ -39,11 +39,11 @@ int main ()
   printf ("After the element with a key of 2 is deleted, the set s3 is:\n");
   print ("s3 =", s3.begin (), s3.end ());
 
-  printf ("The number of elements removed from s3 is: %d\n", n);
+  printf ("The number of elements removed from s3 is: %lu\n", n);
 
-  printf ("The size of the s3 is %u\n", s3.size ());
+  printf ("The size of the s3 is %lu\n", s3.size ());
   s3.clear ();
-  printf ("The size of s3 after clearing is %u\n", s3.size ());
+  printf ("The size of s3 after clearing is %lu\n", s3.size ());
 
   return 0;
 }

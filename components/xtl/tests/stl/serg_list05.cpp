@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_list5_test:\n");
 
@@ -24,9 +24,9 @@ int main ()
   printf ("After erasing all elements but the first, the list becomes:\n");
   print ("c1 =", c1.begin (), c1.end ());
 
-  printf ("The size of the list is %u\n", c1.size ());
+  printf ("The size of the list is %lu\n", c1.size ());
   c1.clear ();
-  printf ("The size of list after clearing is %u\n", c1.size ());
+  printf ("The size of list after clearing is %lu\n", c1.size ());
 
   return 0;
 }

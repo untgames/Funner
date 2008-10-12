@@ -3,15 +3,15 @@
 template <size_t size, size_t align> void check_helper ()
 {
   typedef typename aligned_storage<size, align>::type type;
-  
+
   enum {
     check_align  = alignment_of<type>::value == align,
     check_size   = sizeof (type) == size,
     check_pod    = is_pod<type>::value,
     check_result = check_align && check_size && check_pod
   };
-  
-  printf ("%saligned_storage<%u, %u>: align=%u size=%u is_pod=%s\n", check_result?"":"error: ",
+
+  printf ("%saligned_storage<%lu, %lu>: align=%lu size=%lu is_pod=%s\n", check_result?"":"error: ",
           size, align, alignment_of<type>::value, sizeof (type), is_pod<type>::value?"true":"false");
 }
 

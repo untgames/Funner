@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_hmap6_test:\n");
 
@@ -19,13 +19,13 @@ int main ()
 
   // Keys must be unique in hash_map, so duplicates are ignored
   i = hm1.count (1);
-  printf ("Elemets with key of 1: %d\n", i);
+  printf ("Elemets with key of 1: %lu\n", i);
 
   i = hm1.count (2);
-  printf ("Elemets with key of 2: %d\n", i);
+  printf ("Elemets with key of 2: %lu\n", i);
 
   i = hm1.count (3);
-  printf ("Elemets with key of 3: %d\n", i);
+  printf ("Elemets with key of 3: %lu\n", i);
 
   return 0;
 }

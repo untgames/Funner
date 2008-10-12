@@ -24,11 +24,11 @@ int main ()
     const Array a = { { 42.42f } };
 
     // use some common STL container operations
-    printf ("static_size: %d\n", a.size ());
-    printf ("size:        %d\n", a.size ());
+    printf ("static_size: %lu\n", a.size ());
+    printf ("size:        %lu\n", a.size ());
     // Can't use std::boolalpha because it isn't portable
     printf ("empty:       %s\n", (a.empty()? "true" : "false"));
-    printf ("max_size:    %d\n", a.max_size ());
+    printf ("max_size:    %lu\n", a.max_size ());
     printf ("front:       %f\n", a.front ());
     printf ("back:        %f\n", a.back ());
     printf ("[0]:         %f\n", a[0]);

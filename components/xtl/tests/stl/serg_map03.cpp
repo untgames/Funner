@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_map3_test:\n");
 
@@ -38,16 +38,16 @@ int main ()
   print ("m3 =", m3.begin (), m3.end ());
 
   // The 3rd member function returns the number of elements removed
-  printf ("The number of elements removed from m3 is: %d.\n", n);
+  printf ("The number of elements removed from m3 is: %lu.\n", n);
 
   // The dereferenced iterator can also be used to specify a key
   m3.erase (++m3.begin ());
   printf ("After the 2nd element is deleted, the map m1 is: \n");
   print ("m3 =", m3.begin (), m3.end ());
 
-  printf ("The size of the m3 is %d\n", m3.size ());
+  printf ("The size of the m3 is %lu\n", m3.size ());
   m3.clear ();
-  printf ("The size of the m3 after clear() is %d\n", m3.size ());
+  printf ("The size of the m3 after clear() is %lu\n", m3.size ());
 
   return 0;
 }

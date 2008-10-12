@@ -2,7 +2,11 @@
 
 class A
 {
-  virtual void test () = 0;
+  public:
+    virtual ~A () {}
+
+  private:
+    virtual void test () = 0;
 };
 
 class B: public A
@@ -22,13 +26,13 @@ int main ()
     any a (b);
 
     any_multicast<B&> (a).test ();
-    
+
     any_multicast<A&> (a);
   }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());
-  }  
+  }
 
   return 0;
 }

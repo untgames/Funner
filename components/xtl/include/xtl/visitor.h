@@ -32,12 +32,12 @@ class basic_visitor
 {
   public:
     typedef ResultType result_type;
-  
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Данный деструктор нужен для обеспечения работы механизма RTTI
-///////////////////////////////////////////////////////////////////////////////////////////////////    
-    virtual ~basic_visitor () {}    
-    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual ~basic_visitor () {}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка посещений объектов разных типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,6 +51,8 @@ class basic_visitor
 template <class T, class Ret> class visitor_node
 {
   public:
+    virtual ~visitor_node () {}
+
     virtual Ret visit (T& object) = 0;
 };
 
@@ -66,7 +68,7 @@ template <class Ret> class visitor_node<mpl::null_type, Ret> {};
 template <class ResultType, class T1=mpl::null_type, class T2=mpl::null_type, class T3=mpl::null_type, class T4=mpl::null_type,
           class T5=mpl::null_type, class T6=mpl::null_type, class T7=mpl::null_type, class T8=mpl::null_type, class T9=mpl::null_type, class T10=mpl::null_type>
 class visitor: public visitor<ResultType, T2, T3, T4, T5, T6, T7, T8, T9>, public visitor_node<T1, ResultType> {};
-               
+
 template <class ResultType> class visitor<ResultType>: public basic_visitor<ResultType> {};
 
 #include <xtl/detail/visitor.inl>

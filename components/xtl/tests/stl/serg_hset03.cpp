@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_hset3_test:\n");
 
@@ -39,9 +39,9 @@ int main ()
   printf ("After the element with a key of 2 is deleted, the set hs3 is:\n");
   print ("hs3 =", hs3.begin (), hs3.end ());
 
-  printf ("The size of the hs3 is %u\n", hs3.size ());
+  printf ("The size of the hs3 is %lu\n", hs3.size ());
   hs3.clear ();
-  printf ("The size of hs3 after clearing is %u\n", hs3.size ());
+  printf ("The size of hs3 after clearing is %lu\n", hs3.size ());
 
   return 0;
 }

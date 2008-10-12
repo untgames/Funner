@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   typedef map <int, int> myMap;
 
@@ -19,8 +19,8 @@ int main ()
   m1.insert_pair (4,40);
 
   print ("m1 =", m1.begin (), m1.end ());
-  printf ("max_size: %u\n", m1.max_size ());
-  printf ("size: %u\n", m1.size ());
+  printf ("max_size: %lu\n", m1.max_size ());
+  printf ("size: %lu\n", m1.size ());
   printf ("empty: %s\n", m1.empty ()?"true":"false");
 
   myMap::key_compare kc = m1.key_comp ();

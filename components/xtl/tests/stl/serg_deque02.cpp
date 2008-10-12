@@ -5,7 +5,7 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   printf ("Results of serg_deque02_test:\n");
 
@@ -23,9 +23,9 @@ int main ()
   else
      printf ("The queue c2 is not empty.\n");
 
-  printf ("c1.size () = %u\n", c1.size ());
-  printf ("c2.size () = %u\n", c2.size ());
-  printf ("c1.max_size () = %u\n", c1.max_size ());
+  printf ("c1.size () = %lu\n", c1.size ());
+  printf ("c2.size () = %lu\n", c2.size ());
+  printf ("c1.max_size () = %lu\n", c1.max_size ());
 
   return 0;
 }

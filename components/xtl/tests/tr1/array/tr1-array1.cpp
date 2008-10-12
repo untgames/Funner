@@ -16,9 +16,9 @@ int main()
     }
 
     // use some common STL container operations
-    printf ("size:     %u\n", a.size());
+    printf ("size:     %lu\n", a.size());
     printf ("empty:    %s\n", a.empty() ? "true" : "false");
-    printf ("max_size: %u\n", a.max_size());
+    printf ("max_size: %lu\n", a.max_size());
     printf ("front:    %g\n", a.front());
     printf ("back:     %g\n", a.back());
     printf ("elems:    ");

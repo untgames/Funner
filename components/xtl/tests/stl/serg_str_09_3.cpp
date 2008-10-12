@@ -17,13 +17,13 @@ int main()
 
   pos = s1.find_last_of (s2, s1.size (), 4);
   if ( pos != string::npos )
-    printf ("Found at position: %u\n", pos);
+    printf ("Found at position: %lu\n", pos);
   else
     printf ("Not found\n");
 
   pos = s1.find_last_of (s2, s1.size (), 2);
   if ( pos != string::npos )
-    printf ("Found at position: %u\n", pos);
+    printf ("Found at position: %lu\n", pos);
   else
     printf ("Not found\n");
 

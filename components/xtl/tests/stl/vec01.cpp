@@ -9,13 +9,13 @@ int main ()
 
   printf ("Results of vec01_test:\n");
   printf ("empty = %d\n",v.empty ());
-  printf ("size = %d\n",v.size ());
-  printf ("max_size = %d\n",v.max_size ());
-  
+  printf ("size = %lu\n",v.size ());
+  printf ("max_size = %lu\n",v.max_size ());
+
   v.push_back (42);
-  
-  printf ("size = %d\n",v.size ());  
+
+  printf ("size = %lu\n",v.size ());
   printf ("v1[0] = %d\n",v [0]);
-  
+
   return 0;
 }

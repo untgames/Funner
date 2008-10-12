@@ -6,14 +6,14 @@
 
 using namespace stl;
 
-int main () 
+int main ()
 {
   typedef hash_multiset<int> mySet;
 
   printf ("Results of serg_hset6m_test:\n");
 
   mySet hs1;
-  
+
   hs1.insert (10);
   hs1.insert (20);
   hs1.insert (10);
@@ -27,7 +27,7 @@ int main ()
   diff = distance (p1.first, p1.second);
 
   printf ("Num of elements '10': %d\n", diff);
-  printf ("Direct call to hs1.count (10): %d\n", hs1.count (10));
+  printf ("Direct call to hs1.count (10): %lu\n", hs1.count (10));
 
   return 0;
 }
