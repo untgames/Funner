@@ -22,7 +22,7 @@ PROFILES          += nds
 COMPILER_GCC      := $(DEVKITARM)/bin/arm-eabi-gcc.exe
 LINKER_GCC        := $(DEVKITARM)/bin/arm-eabi-g++.exe
 LIB_GCC           := $(DEVKITARM)/bin/arm-eabi-ar.exe
-EXE_SUFFIX        := nds
+EXE_SUFFIX        := .nds
 PROFILES          += unistd
 
 include $(TOOLSETS_DIR)/g++.mak

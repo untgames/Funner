@@ -52,10 +52,10 @@ COMMON_CFLAGS    += -W3 -Ox -wd4996 $(if $(analyze),-analyze) -nologo -FC
 ###################################################################################################
 #Константы
 ###################################################################################################
-LIB_SUFFIX := lib
-OBJ_SUFFIX := obj
-EXE_SUFFIX := exe
-DLL_SUFFIX := dll
+LIB_SUFFIX := .lib
+OBJ_SUFFIX := .obj
+EXE_SUFFIX := .exe
+DLL_SUFFIX := .dll
 PROFILES   += msvc win32
 COMMON_LINK_FLAGS += -stack:128000
 
