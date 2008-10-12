@@ -1,8 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := FUNNER_ALL
+TARGETS := FUNNER_EXTERN_LIBS
 
-#Цель - all
-FUNNER_ALL.TYPE       := package
-FUNNER_ALL.COMPONENTS := extern components
+#Цель - external libraries
+FUNNER_EXTERN_LIBS.TYPE       := package
+FUNNER_EXTERN_LIBS.COMPONENTS := zlib zzip pcre devil ogg vorbis vorbisfile lua freetype
