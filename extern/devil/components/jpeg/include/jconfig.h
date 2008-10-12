@@ -45,7 +45,7 @@ typedef unsigned char boolean;
 
 #define TWO_FILE_COMMANDLINE  /* optional */
 
-#ifndef ARM9
+#ifdef MSC_VER
 #define USE_SETMODE   /* Microsoft has setmode() */
 #endif
 

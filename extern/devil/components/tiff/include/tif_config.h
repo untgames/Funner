@@ -15,7 +15,7 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <io.h> header file. */
-#ifndef ARM9
+#if defined (MSC_VER) || defined (__CYGWIN__)
   #define HAVE_IO_H 1
 #endif
 
