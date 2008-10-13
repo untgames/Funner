@@ -9,5 +9,7 @@ EXE_SUFFIX   :=
 DLL_SUFFIX   := .dylib
 PROFILES     += macosx unistd carbon
 
+COMMON_CFLAGS += -I/System/Library/Frameworks/Carbon.framework/Versions/A/Frameworks/HIToolbox.framework/Versions/A/Headers
+
 include $(TOOLSETS_DIR)/g++.mak
 
