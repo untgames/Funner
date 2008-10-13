@@ -7,17 +7,17 @@ const char* get_event_name (WindowEvent event)
     case WindowEvent_OnLeftButtonDown:          return "left button down";
     case WindowEvent_OnLeftButtonUp:            return "left button up";
     case WindowEvent_OnLeftButtonDoubleClick:   return "left button double click";
-    case WindowEvent_OnRightButtonDown:         return "right button down";       
-    case WindowEvent_OnRightButtonUp:           return "right button up";         
+    case WindowEvent_OnRightButtonDown:         return "right button down";
+    case WindowEvent_OnRightButtonUp:           return "right button up";
     case WindowEvent_OnRightButtonDoubleClick:  return "right button double click";
-    case WindowEvent_OnMiddleButtonDown:        return "middle button down";       
-    case WindowEvent_OnMiddleButtonUp:          return "middle button up";         
+    case WindowEvent_OnMiddleButtonDown:        return "middle button down";
+    case WindowEvent_OnMiddleButtonUp:          return "middle button up";
     case WindowEvent_OnMiddleButtonDoubleClick: return "middle button double click";
     case WindowEvent_OnXButton1Down:            return "XButton1 down";
     case WindowEvent_OnXButton1Up:              return "XButton1 up";
     case WindowEvent_OnXButton1DoubleClick:     return "XButton1 double click";
-    case WindowEvent_OnXButton2Down:            return "XButton2 down";        
-    case WindowEvent_OnXButton2Up:              return "XButton2 up";          
+    case WindowEvent_OnXButton2Down:            return "XButton2 down";
+    case WindowEvent_OnXButton2Up:              return "XButton2 up";
     case WindowEvent_OnXButton2DoubleClick:     return "XButton2 double click";
     default:                                    return "Unknown";
   }
@@ -50,7 +50,7 @@ void keys (Window& window, WindowEvent event, const WindowEventContext& context)
     case WindowEvent_OnXButton2Down:
     case WindowEvent_OnXButton2Up:
     case WindowEvent_OnXButton2DoubleClick:
-      printf ("%s x=%d y=%d\n", get_event_name (event), context.cursor_position.x, context.cursor_position.y);
+      printf ("%s x=%lu y=%lu\n", get_event_name (event), context.cursor_position.x, context.cursor_position.y);
       break;
     case WindowEvent_OnChar:
       printf ("char '%C'\n", context.char_code);
@@ -61,17 +61,19 @@ void keys (Window& window, WindowEvent event, const WindowEventContext& context)
     case WindowEvent_OnMouseHorisontalWheel:
       printf ("horizontal wheel %.2f\n", context.mouse_horisontal_wheel_delta);
       break;
+    default:
+      break;
   }
 }
 
 void mousemove (Window& window, WindowEvent, const WindowEventContext& context)
 {
-  printf ("window '%s': mouse move x=%u y=%u\n", window.Title (), context.cursor_position.x, context.cursor_position.y);
+  printf ("window '%s': mouse move x=%lu y=%lu\n", window.Title (), context.cursor_position.x, context.cursor_position.y);
 }
 
 void destroy (Window& window, WindowEvent, const WindowEventContext&)
 {
-  printf ("window '%s': destroyed\n", window.Title ());  
+  printf ("window '%s': destroyed\n", window.Title ());
 
   Application::Exit (0);
 
@@ -91,11 +93,11 @@ void print (const char* message)
 int main ()
 {
   printf ("Results of window1_test:\n");
-  
+
   try
   {
     Window window (WindowStyle_Overlapped, 400, 300);
-    
+
     window.SetTitle ("Test window");
     window.Show ();
 
@@ -122,13 +124,13 @@ int main ()
                     connection21 = window.RegisterEventHandler (WindowEvent_OnXButton2Down, &keys),
                     connection22 = window.RegisterEventHandler (WindowEvent_OnXButton2Up, &keys),
                     connection23 = window.RegisterEventHandler (WindowEvent_OnXButton2DoubleClick, &keys);
-                    
-    window.SetDebugLog (&print);        
 
-    Application::Run ();        
+    window.SetDebugLog (&print);
 
-    return Application::GetExitCode ();    
-  }  
+    Application::Run ();
+
+    return Application::GetExitCode ();
+  }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());

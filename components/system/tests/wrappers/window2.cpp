@@ -8,31 +8,31 @@ void destroy (Window&, WindowEvent, const WindowEventContext&)
 int main ()
 {
   printf ("Results of window1_test:\n");
-  
+
   try
   {
     Window window (WindowStyle_Overlapped, 400, 300);
 
     window.SetTitle ("Test window");
-    
-    window.SetPosition (0, 0);    
+
+    window.SetPosition (0, 0);
 
     auto_connection connection4 = window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
-    
+
     printf ("title: '%s'\n", window.Title ());
     printf ("is_active: %d\n", window.IsActive ());
-    printf ("position: x=%d y=%d\n", window.Position ().x, window.Position ().y);
-    printf ("width: %d\n", window.Width ());
-    printf ("height: %d\n", window.Height ());
-    
+    printf ("position: x=%lu y=%lu\n", window.Position ().x, window.Position ().y);
+    printf ("width: %lu\n", window.Width ());
+    printf ("height: %lu\n", window.Height ());
+
     window.Show ();
-    
-    printf ("after show\n");    
-    
+
+    printf ("after show\n");
+
     printf ("is_active: %d\n", window.IsActive ());
-    
+
     window.Deactivate ();
-    
+
     printf ("after deactivate\n");
     printf ("is_active: %d\n", window.IsActive ());
 
@@ -40,10 +40,10 @@ int main ()
 
     Timer timer (xtl::bind (&Window::Close, &window), 1000);
 
-    Application::Run ();        
+    Application::Run ();
 
-    return Application::GetExitCode ();    
-  }  
+    return Application::GetExitCode ();
+  }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());

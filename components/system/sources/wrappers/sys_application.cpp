@@ -16,7 +16,7 @@ class MessageLoopScope
   public:
     MessageLoopScope  (size_t& in_counter) : counter (in_counter) { counter++; }
     ~MessageLoopScope () { counter--; }
-    
+
   private:
     size_t& counter;
 };
@@ -28,7 +28,7 @@ class MessageLoopScope
 struct or_signal_accumulator
 {
   typedef bool result_type;
-  
+
   template <class InIter> bool operator () (InIter first, InIter last) const
   {
     for (; first!=last; ++first)
@@ -48,8 +48,8 @@ struct or_signal_accumulator
 class ApplicationImpl
 {
   public:
-    ApplicationImpl ();    
-    
+    ApplicationImpl ();
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка сообщений в очереди сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ class ApplicationImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     connection RegisterEventHandler   (ApplicationEvent event, const Application::EventHandler& handler);
     connection RegisterSuspendHandler (const Application::SuspendHandler& handler);
-    
+
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение о возникновении события
@@ -84,7 +84,7 @@ class ApplicationImpl
 ///Засыпание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Suspend ();
-  
+
   private:
     typedef xtl::signal<void ()>                        ApplicationSignal;
     typedef xtl::signal<bool (), or_signal_accumulator> SuspendSignal;
@@ -122,7 +122,7 @@ void ApplicationImpl::Exit (int code)
 
   is_exit_detected = true;
   exit_code        = code;
-  
+
   Notify (ApplicationEvent_OnExit);
 }
 
@@ -153,7 +153,7 @@ void ApplicationImpl::Suspend ()
 void ApplicationImpl::DoEvents ()
 {
   MessageLoopScope scope (message_loop_count);
-  
+
   cancel_system_events_process = false;
 
   try
@@ -163,7 +163,7 @@ void ApplicationImpl::DoEvents ()
   catch (...)
   {
     //подавление всех исключений
-  }  
+  }
 
   if (!cancel_system_events_process && !is_exit_detected)
   {

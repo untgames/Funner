@@ -14,16 +14,16 @@ void print_window_info (syslib::Window& window)
 {
   printf ("is_active: %d\n", window.IsActive ());
   printf ("is_visible: %d\n", window.IsVisible ());
-  printf ("position: x=%d y=%d\n", window.Position ().x, window.Position ().y);
-  printf ("width: %d\n", window.Width ());
-  printf ("height: %d\n", window.Height ());
+  printf ("position: x=%lu y=%lu\n", window.Position ().x, window.Position ().y);
+  printf ("width: %lu\n", window.Width ());
+  printf ("height: %lu\n", window.Height ());
   printf ("window style: %s\n", get_name (window.Style ()));
 }
 
 int main ()
 {
   printf ("Results of window4_test:\n");
-  
+
   try
   {
     Window window;
@@ -40,8 +40,8 @@ int main ()
 
     print_window_info (window);
 
-    return Application::GetExitCode ();    
-  }  
+    return Application::GetExitCode ();
+  }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());

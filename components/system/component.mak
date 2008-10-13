@@ -4,19 +4,20 @@
 TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
 
 #Öåëü ¹1 - System library sources
-SYSTEMLIB.SOURCES.TYPE             := static-lib
-SYSTEMLIB.SOURCES.NAME             := system
-SYSTEMLIB.SOURCES.INCLUDE_DIRS     := sources
-SYSTEMLIB.SOURCES.SOURCE_DIRS      := sources/wrappers
-SYSTEMLIB.SOURCES.LIB_DIRS         :=
-SYSTEMLIB.SOURCES.EXECTUTION_DIR   :=
-SYSTEMLIB.SOURCES.LIBS             :=
-SYSTEMLIB.SOURCES.COMPILER_CFLAGS  :=
-SYSTEMLIB.SOURCES.COMPILER_DEFINES :=
-SYSTEMLIB.SOURCES.IMPORTS          := compile.static.mak
-SYSTEMLIB.SOURCES.win32.SOURCE_DIRS := sources/platform/win32
-SYSTEMLIB.SOURCES.win32.COMPILER_CFLAGS := -wd4355
-SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS := sources/platform/unistd
+SYSTEMLIB.SOURCES.TYPE                   := static-lib
+SYSTEMLIB.SOURCES.NAME                   := system
+SYSTEMLIB.SOURCES.INCLUDE_DIRS           := sources
+SYSTEMLIB.SOURCES.SOURCE_DIRS            := sources/wrappers
+SYSTEMLIB.SOURCES.LIB_DIRS               :=
+SYSTEMLIB.SOURCES.EXECTUTION_DIR         :=
+SYSTEMLIB.SOURCES.LIBS                   :=
+SYSTEMLIB.SOURCES.COMPILER_CFLAGS        :=
+SYSTEMLIB.SOURCES.COMPILER_DEFINES       :=
+SYSTEMLIB.SOURCES.IMPORTS                := compile.static.mak
+SYSTEMLIB.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32
+SYSTEMLIB.SOURCES.win32.COMPILER_CFLAGS  := -wd4355
+SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS := sources/platform/no_windows
+SYSTEMLIB.SOURCES.carbon.SOURCE_DIRS     := sources/platform/carbon
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite

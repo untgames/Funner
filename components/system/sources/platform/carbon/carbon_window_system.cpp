@@ -23,7 +23,7 @@ void raise (const char* method_name)
 Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler, window_t, void*)
 {
   raise ("syslib::DefaultPlatform::CreateWindow");
-  
+
   return 0;
 }
 
@@ -36,7 +36,7 @@ void Platform::DestroyWindow (window_t)
 {
   raise ("syslib::DefaultPlatform::DestroyWindow");
 }
-    
+
 /*
     Заголовок окна
 */
@@ -62,7 +62,7 @@ void Platform::SetWindowRect (window_t, const Rect&)
 
 void Platform::GetWindowRect (window_t, Rect&)
 {
-  raise ("syslib::DefaultPlatform::GetWindowRect");  
+  raise ("syslib::DefaultPlatform::GetWindowRect");
 }
 
 void Platform::GetClientRect (window_t, Rect&)
@@ -82,7 +82,7 @@ void Platform::SetWindowFlag (window_t, WindowFlag, bool)
 bool Platform::GetWindowFlag (window_t, WindowFlag)
 {
   raise ("syslib::DefaultPlatform::GetWindowFlag");
-  
+
   return false;
 }
 
@@ -98,7 +98,7 @@ void Platform::SetParentWindow (window_t child, window_t parent)
 Platform::window_t Platform::GetParentWindow (window_t child)
 {
   raise ("syslib::DefaultPlatform::GetParentWindow");
-  
+
   return 0;
 }
 
@@ -108,7 +108,7 @@ Platform::window_t Platform::GetParentWindow (window_t child)
 
 void Platform::InvalidateWindow (window_t)
 {
-  raise ("syslib::DefaultPlatform::InvalidateWindow");    
+  raise ("syslib::DefaultPlatform::InvalidateWindow");
 }
 
 /*
@@ -123,8 +123,18 @@ void Platform::SetCursorPosition (const Point&)
 Point Platform::GetCursorPosition ()
 {
   raise ("syslib::DefaultPlatform::GetCursorPosition");
-  
+
   return Point ();
+}
+
+void Platform::SetCursorPosition (window_t, const Point& client_position)
+{
+  throw xtl::make_not_implemented_exception ("syslib::Platform::SetCursorPosition (window_t, const Point&)");
+}
+
+Point Platform::GetCursorPosition (window_t)
+{
+  throw xtl::make_not_implemented_exception ("syslib::Platform::GetCursorPosition (window_t)");
 }
 
 /*
@@ -139,6 +149,6 @@ void Platform::SetCursorVisible (window_t, bool state)
 bool Platform::GetCursorVisible (window_t)
 {
   raise ("syslib::DefaultPlatform::GetCursorVisible");
-  
+
   return false;
 }

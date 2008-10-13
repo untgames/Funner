@@ -5,11 +5,11 @@ void test (Timer& timer)
   try
   {
     static size_t count = 0;
-    
+
     count++;
-    
-    printf ("#%u: elapsed=%u\n", count, timer.ElapsedMilliseconds () / 100 * 100); //точность до 1/10 секунды    
-    
+
+    printf ("#%lu: elapsed=%lu\n", count, timer.ElapsedMilliseconds () / 100 * 100); //точность до 1/10 секунды
+
     switch (count)
     {
       case 10: timer.SetPeriod (200); break;
@@ -24,20 +24,20 @@ void test (Timer& timer)
 
 int main ()
 {
-  printf ("Results of timer_test:\n");  
-  
+  printf ("Results of timer_test:\n");
+
   try
   {
     Timer timer (&test, 100);
 
-    Application::Run ();        
+    Application::Run ();
 
-    return Application::GetExitCode ();    
-  }  
+    return Application::GetExitCode ();
+  }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());
-  }  
+  }
 
   return 0;
 }
