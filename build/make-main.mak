@@ -17,7 +17,6 @@ LINK_TOOL                               := tools.link       #Имя макроса утилиты
 LIB_TOOL                                := tools.lib        #Имя макроса утилиты архивирования объектных файлов
 EXPORT_EXCLUDE_PATTERN                  := .svn            #Шаблон файлов, исключаемых из копирования при выполнении цели export-dirs
 EXPORT_TAR_TMP_FILE_SHORT_NAME          := export-file.tar #Базовое имя файла архива, используемого при выполнении цели export-dirs
-LIB_COMMON_PREFIX                       := funner.         #Префикс имен библиотек
 
 ###################################################################################################
 #Производные пути и переменные
@@ -30,7 +29,6 @@ DIST_DIR_SHORT_NAME                     := $(strip $(DIST_DIR_SHORT_NAME))
 EXPORT_VAR_PREFIX                       := $(strip $(EXPORT_VAR_PREFIX))
 EXPORT_TAR_TMP_FILE_SHORT_NAME          := $(strip $(EXPORT_TAR_TMP_FILE_SHORT_NAME))
 EXPORT_EXCLUDE_PATTERN                  := $(strip $(EXPORT_EXCLUDE_PATTERN))
-LIB_COMMON_PREFIX                       := $(strip $(LIB_COMMON_PREFIX))
 CURRENT_TOOLSET                         := $(TOOLSET)
 BUILD_DIR                               := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 TOOLSETS_DIR                            := $(BUILD_DIR)$(strip $(TOOLSETS_DIR_SHORT_NAME))
@@ -102,11 +100,6 @@ $(call check_toolset_constant,LIB_SUFFIX)
 $(call check_toolset_constant,OBJ_SUFFIX)
 $(call check_toolset_constant,DLL_SUFFIX)
 $(call check_toolset_constant,EXE_SUFFIX)
-
-###################################################################################################
-#Корректировка констант утилит сборки
-###################################################################################################
-LIB_PREFIX := $(LIB_PREFIX)$(LIB_COMMON_PREFIX)
 
 ###################################################################################################
 #Подключение файла конфигурации компонента
@@ -389,6 +382,21 @@ endif
 
 endef
 
+#Импортирование переменных (префикс источника, префикс приёмника, относительный путь к используемому компоненту)
+define import_variables
+#  $$(warning src='$1' dst='$2' path='$3')  
+
+  $2.INCLUDE_DIRS     := $$($2.INCLUDE_DIRS) $$($1.INCLUDE_DIRS:%=$3%)
+  $2.LIB_DIRS         := $$($2.LIB_DIRS) $$($1.LIB_DIRS:%=$3%)
+  $2.DLL_DIRS         := $$($2.DLL_DIRS) $$($1.DLL_DIRS:%=$3%)
+  $2.DLLS             := $$($2.DLLS) $$($1.DLLS)
+  $2.LIBS             := $$($2.LIBS) $$($1.LIBS)
+  $2.COMPILER_CFLAGS  := $$($2.COMPILER_CFLAGS) $$($1.COMPILER_CFLAGS)
+  $2.COMPILER_DEFINES := $$($2.COMPILER_DEFINES) $$($1.COMPILER_DEFINES)
+  $2.LINK_INCLUDES    := $$($2.LINK_INCLUDES) $$($1.LINK_INCLUDES)
+  $2.LINK_FLAGS       := $$($2.LINK_FLAGS) $$($1.LINK_FLAGS)
+endef
+
 #Импортирование настроек
 define import_settings
 #Получение относительного пути к используемому компоненту
@@ -407,18 +415,12 @@ define import_settings
   include $$(DEPENDENCY_EXPORT_FILE)
 
 #Изменение настроек
-  $2.INCLUDE_DIRS     := $$($2.INCLUDE_DIRS) $$($$(EXPORT_VAR_PREFIX).INCLUDE_DIRS:%=$$(DEPENDENCY_COMPONENT_DIR)%)
-  $2.LIB_DIRS         := $$($2.LIB_DIRS) $$($$(EXPORT_VAR_PREFIX).LIB_DIRS:%=$$(DEPENDENCY_COMPONENT_DIR)%)
-  $2.DLL_DIRS         := $$($2.DLL_DIRS) $$($$(EXPORT_VAR_PREFIX).DLL_DIRS:%=$$(DEPENDENCY_COMPONENT_DIR)%)
-  $2.DLLS             := $$($2.DLLS) $$($$(EXPORT_VAR_PREFIX).DLLS)
-  $2.LIBS             := $$($2.LIBS) $$($$(EXPORT_VAR_PREFIX).LIBS)
-  $2.COMPILER_CFLAGS  := $$($2.COMPILER_CFLAGS) $$($$(EXPORT_VAR_PREFIX).COMPILER_CFLAGS)
-  $2.COMPILER_DEFINES := $$($2.COMPILER_DEFINES) $$($$(EXPORT_VAR_PREFIX).COMPILER_DEFINES)
-  $2.LINK_INCLUDES    := $$($2.LINK_INCLUDES) $$($$(EXPORT_VAR_PREFIX).LINK_INCLUDES)
-  $2.LINK_FLAGS       := $$($2.LINK_FLAGS) $$($$(EXPORT_VAR_PREFIX).LINK_FLAGS)
-  DEPENDENCY_IMPORTS  := $$($$(EXPORT_VAR_PREFIX).IMPORTS:%=$(dir $1)%)  
+  $$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX),$2,$$(DEPENDENCY_COMPONENT_DIR)))
+  $$(foreach profile,$(PROFILES),$$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$$(profile),$2,$$(DEPENDENCY_COMPONENT_DIR))))
 
 #Импортирование вложенных зависимостей
+  DEPENDENCY_IMPORTS  := $$($$(EXPORT_VAR_PREFIX).IMPORTS:%=$(dir $1)%)
+
   $$(foreach imp,$$(DEPENDENCY_IMPORTS),$$(eval $$(call import_settings,$$(imp),$2)))
 endef
 
