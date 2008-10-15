@@ -5,7 +5,7 @@ TARGETS := CLIENT.SOURCES CLIENT.TESTS
 
 #Цель - CLIENTLib sources
 CLIENT.SOURCES.TYPE             := static-lib
-CLIENT.SOURCES.NAME             := client.core
+CLIENT.SOURCES.NAME             := funner.client.core
 CLIENT.SOURCES.INCLUDE_DIRS     := 
 CLIENT.SOURCES.SOURCE_DIRS      := sources
 CLIENT.SOURCES.LIB_DIRS         :=  

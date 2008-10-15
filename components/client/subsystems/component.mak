@@ -6,7 +6,7 @@ TARGETS := CLIENT.SUBSYSTEMS.WINDOW_RENDERER CLIENT.SUBSYSTEMS.SCENE_RENDER CLIE
 
 #Цель - sources
 CLIENT.SUBSYSTEMS.WINDOW_RENDERER.TYPE             := static-lib
-CLIENT.SUBSYSTEMS.WINDOW_RENDERER.NAME             := client.window_renderer
+CLIENT.SUBSYSTEMS.WINDOW_RENDERER.NAME             := funner.client.window_renderer
 CLIENT.SUBSYSTEMS.WINDOW_RENDERER.INCLUDE_DIRS     :=
 CLIENT.SUBSYSTEMS.WINDOW_RENDERER.SOURCE_DIRS      := sources/window_renderer
 CLIENT.SUBSYSTEMS.WINDOW_RENDERER.LIB_DIRS         :=  
@@ -17,7 +17,7 @@ CLIENT.SUBSYSTEMS.WINDOW_RENDERER.IMPORTS          := ../window_manager/compile.
 
 #Цель - sources
 CLIENT.SUBSYSTEMS.SCENE_RENDER.TYPE             := static-lib
-CLIENT.SUBSYSTEMS.SCENE_RENDER.NAME             := client.scene_render
+CLIENT.SUBSYSTEMS.SCENE_RENDER.NAME             := funner.client.scene_render
 CLIENT.SUBSYSTEMS.SCENE_RENDER.INCLUDE_DIRS     :=
 CLIENT.SUBSYSTEMS.SCENE_RENDER.SOURCE_DIRS      := sources/scene_render
 CLIENT.SUBSYSTEMS.SCENE_RENDER.LIB_DIRS         :=  
@@ -28,7 +28,7 @@ CLIENT.SUBSYSTEMS.SCENE_RENDER.IMPORTS          := ../../common/compile.static.m
 
 #Цель - sources
 CLIENT.SUBSYSTEMS.SCENE_PLAYER.TYPE             := static-lib
-CLIENT.SUBSYSTEMS.SCENE_PLAYER.NAME             := client.scene_player
+CLIENT.SUBSYSTEMS.SCENE_PLAYER.NAME             := funner.client.scene_player
 CLIENT.SUBSYSTEMS.SCENE_PLAYER.INCLUDE_DIRS     :=
 CLIENT.SUBSYSTEMS.SCENE_PLAYER.SOURCE_DIRS      := sources/scene_player
 CLIENT.SUBSYSTEMS.SCENE_PLAYER.LIB_DIRS         :=  
@@ -39,7 +39,7 @@ CLIENT.SUBSYSTEMS.SCENE_PLAYER.IMPORTS          := ../../common/compile.static.m
 
 #Цель - sources
 CLIENT.SUBSYSTEMS.INPUT.TYPE             := static-lib
-CLIENT.SUBSYSTEMS.INPUT.NAME             := client.input_manager
+CLIENT.SUBSYSTEMS.INPUT.NAME             := funner.client.input_manager
 CLIENT.SUBSYSTEMS.INPUT.INCLUDE_DIRS     :=
 CLIENT.SUBSYSTEMS.INPUT.SOURCE_DIRS      := sources/input_manager
 CLIENT.SUBSYSTEMS.INPUT.LIB_DIRS         :=  
@@ -51,7 +51,7 @@ CLIENT.SUBSYSTEMS.INPUT.IMPORTS          := ../../common/compile.static.mak ../c
 
 #Цель - sources
 CLIENT.SUBSYSTEMS.DIRECT_INPUT_DRIVER.TYPE             := static-lib
-CLIENT.SUBSYSTEMS.DIRECT_INPUT_DRIVER.NAME             := client.direct_input_driver
+CLIENT.SUBSYSTEMS.DIRECT_INPUT_DRIVER.NAME             := funner.client.direct_input_driver
 CLIENT.SUBSYSTEMS.DIRECT_INPUT_DRIVER.INCLUDE_DIRS     :=
 CLIENT.SUBSYSTEMS.DIRECT_INPUT_DRIVER.SOURCE_DIRS      := sources/direct_input_driver
 CLIENT.SUBSYSTEMS.DIRECT_INPUT_DRIVER.LIB_DIRS         :=  
@@ -62,7 +62,7 @@ CLIENT.SUBSYSTEMS.DIRECT_INPUT_DRIVER.IMPORTS          := ../core/compile.static
 
 #Цель - sources
 CLIENT.SUBSYSTEMS.WINDOW_INPUT_DRIVER.TYPE             := static-lib
-CLIENT.SUBSYSTEMS.WINDOW_INPUT_DRIVER.NAME             := client.window_input_driver
+CLIENT.SUBSYSTEMS.WINDOW_INPUT_DRIVER.NAME             := funner.client.window_input_driver
 CLIENT.SUBSYSTEMS.WINDOW_INPUT_DRIVER.INCLUDE_DIRS     :=
 CLIENT.SUBSYSTEMS.WINDOW_INPUT_DRIVER.SOURCE_DIRS      := sources/window_input_driver
 CLIENT.SUBSYSTEMS.WINDOW_INPUT_DRIVER.LIB_DIRS         :=  
