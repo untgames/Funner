@@ -30,7 +30,7 @@ void dump ()
   printf ("Components:\n");
 
   for (ComponentManager::Iterator iter=ComponentManager::CreateIterator (); iter; ++iter)
-    printf ("  component '%s' %s\n", iter->Name (), iter->IsLoaded () ? "loaded" : "unloaded");
+    printf ("  component '%s' %s\n", iter->Name (), iter->IsLoaded () ? "loaded" : "not loaded");
 }
 
 int main ()

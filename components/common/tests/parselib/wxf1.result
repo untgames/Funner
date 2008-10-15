@@ -1,0 +1,32 @@
+Results of wxf1_test:
+Parse successfull
+root (source='', line=0): {}
+ test2_node (source='data/test2.wxf', line=1): {1}
+ test2_node (source='data/test2.wxf', line=2): {2}
+ frame (source='data/test1.wxf', line=9): {frame #1}
+  node_tag (source='data/test1.wxf', line=11): {1}
+  another_node_tag (source='data/test1.wxf', line=12): {1, 2, hello world}
+  yet_another_node_tag (source='data/test1.wxf', line=13): {100, 200, 300, 400}
+  node (source='data/test1.wxf', line=19): {identifier, 1, 2, 3, 4, 5, 6}
+  bonus (source='data/test1.wxf', line=25): {A, B, C}
+  some_frame (source='data/test1.wxf', line=34): {frame #2}
+   title (source='data/test1.wxf', line=35): {Hello world}
+   empty_node (source='data/test1.wxf', line=37): {}
+  yet_one_frame (source='data/test1.wxf', line=40): {frame #3}
+   some_node (source='data/test1.wxf', line=42): {1}
+   frame (source='data/test1.wxf', line=44): {frame #4}
+    node (source='data/test1.wxf', line=44): {Test}
+ frame (source='data/test1.wxf', line=48): {frame #1}
+  float (source='data/test1.wxf', line=50): {1.22}
+  float (source='data/test1.wxf', line=51): {.22}
+  int (source='data/test1.wxf', line=52): {-123}
+  string (source='data/test1.wxf', line=53): {hello}
+  level2 (source='data/test1.wxf', line=56): {}
+   level3 (source='data/test1.wxf', line=57): {}
+    level4 (source='data/test1.wxf', line=58): {}
+     test (source='data/test1.wxf', line=59): {!!!}
+data/test1.wxf(3): error: unexpected characters on line
+data/test1.wxf(5): error: User error
+data/test1.wxf(6): warning: User defined warning
+data/test1.wxf(32): error: syntax error. Unexpected value '1'. Line must start from identifier
+data/test1.wxf(54): error: syntax error. Unexpected value '112'. Line must start from identifier

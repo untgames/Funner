@@ -6,7 +6,7 @@ using namespace xtl;
 namespace
 {
 
-void parse_node (VarRegistry& registry, ParseNode* node)
+void parse_node (VarRegistry& registry, const ParseNode& node)
 {
   if (!node)
     return;
@@ -14,18 +14,18 @@ void parse_node (VarRegistry& registry, ParseNode* node)
   int         children_auto_index = 0, children_auto_step  = 1;
   stl::string prefix              = "AutoId", tmp_buffer;
 
-  for (ParseNode* iter = node->First (); iter; iter = iter->Next ())
+  for (ParseNode iter = node.First (); iter; iter=iter.Next ())
   {
-    const char* tag = iter->Tag ();
+    const char* name = iter.Name ();
 
-    if (!xstrcmp ("auto", tag))
+    if (!xstrcmp ("auto", name))
     {
       tmp_buffer = format ("%s%d", prefix.c_str (), children_auto_index);
-      tag        = tmp_buffer.c_str ();
+      name       = tmp_buffer.c_str ();
 
       children_auto_index += children_auto_step;
     }
-    else if (!xstrcmp ("auto_template", iter->Tag ()))
+    else if (!xstrcmp ("auto_template", iter.Name ()))
     {
       const char* new_prefix = get<const char*> (iter, "prefix", 0);
       
@@ -38,12 +38,12 @@ void parse_node (VarRegistry& registry, ParseNode* node)
       continue;
     }
 
-    if (iter->AttributesCount ())
-      registry.SetValue (tag, stl::string (iter->Attribute (0)));
+    if (iter.AttributesCount ())
+      registry.SetValue (name, stl::string (iter.Attribute (0)));
 
-    if (iter->First ())
+    if (iter.First ())
     {
-      VarRegistry sub_registry (format ("%s.%s", registry.BranchName (), tag).c_str ());
+      VarRegistry sub_registry (format ("%s.%s", registry.BranchName (), name).c_str ());
 
       parse_node (sub_registry, iter);
     }
@@ -57,12 +57,20 @@ void load_xml (VarRegistry& registry, const char* file_name, const char* root_na
   if (!file_name)
     throw make_null_argument_exception (METHOD_NAME, "file_name");
 
-  ParseLog log;
-  Parser   p (log, file_name);
+  Parser p (file_name);
+  
+  ParseLog log = p.Log ();
 
   for (size_t i = 0; i < log.MessagesCount (); i++)
-    if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
-      throw format_operation_exception (METHOD_NAME, log.Message(i));
+    switch (log.MessageType (i))
+    {
+      case ParseLogMessageType_Error:
+      case ParseLogMessageType_FatalError:
+        throw format_operation_exception (METHOD_NAME, log.Message (i));
+      default:
+        break;
+    }
+  
 
   if (!root_name_mask)
   {
@@ -70,11 +78,11 @@ void load_xml (VarRegistry& registry, const char* file_name, const char* root_na
     return;
   }
 
-  if (!p.Root ()->First ())
+  if (!p.Root ().First ())
     return;
 
-  if (wcmatch (p.Root ()->First ()->Tag (), root_name_mask))
-    parse_node (registry, p.Root ()->First ());
+  if (wcmatch (p.Root ().First ().Name (), root_name_mask))
+    parse_node (registry, p.Root ().First ());
 }
 
 }

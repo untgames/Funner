@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <WindowManager
+    <Window1>
+      <WindowRenderer 
+        RendererName = "MyRenderer"
+      />
+    </Window1>
+  />
+</Configuration>

@@ -1,6 +1,6 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS          := funner.common.configurator
-export.LINK_INCLUDES := Configurator
-export.IMPORTS       := link.static.mak xml.link.static.mak
+export.LIBS          := funner.common.parsers.xml
+export.LINK_INCLUDES := XmlParser
+export.IMPORTS       := link.static.mak

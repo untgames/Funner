@@ -1,0 +1,20 @@
+Results of parse_tree_builder:
+empty tree test:
+ (source='', line=0): {}
+current node: 'B' (depth=2)
+current node: 'D' (depth=4)
+builder-copy results (nodes=5, attributes=6, buffer_size=4096):
+root (source='', line=0): {}
+ A (source='source1', line=12): {1, 2, 3}
+  B (source='source1', line=12): {x, y, zzz}
+   C (source='source1', line=189): {}
+    D (source='source2', line=0): {}
+Found 1 nodes with name 'A' (NextNamesake test)
+Found 1 nodes with name 'A' (Next(const char*) test)
+builder results (nodes=4, attributes=6, builder_size=16384):
+root (source='', line=0): {}
+ A (source='source1', line=12): {1, 2, 3}
+  B (source='source1', line=12): {x, y, w}
+ A (source='source3', line=14): {}
+Found 2 nodes with name 'A' (NextNamesake test)
+Found 2 nodes with name 'A' (Next(const char*) test)
