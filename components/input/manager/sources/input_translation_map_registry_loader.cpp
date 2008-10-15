@@ -9,25 +9,31 @@ namespace
 void translation_map_registry_loader (const char* file_name, TranslationMapRegistry& target_registry)
 {
   static const char* METHOD_NAME = "input::translation_map_registry_loader";
-  ParseLog           log;
-  Parser             p (log, file_name);
-  Parser::Iterator   iter = p.Root ()->First ("TranslationMapRegistry");
+  Parser             p (file_name);
+  ParseLog           log = p.Log ();
+  Parser::Iterator   iter = p.Root ().First ("TranslationMapRegistry");
 
   for (size_t i = 0; i < log.MessagesCount (); i++)
-    if (log.MessageType (i) == PARSE_LOG_ERROR || log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
-      throw xtl::format_operation_exception (METHOD_NAME, log.Message(0));
+    switch (log.MessageType (i))
+    {
+      case ParseLogMessageType_Error:
+      case ParseLogMessageType_FatalError:
+        throw xtl::format_operation_exception (METHOD_NAME, log.Message (i));
+      default:
+        break;
+    }
 
   if (!iter)
     throw xtl::format_operation_exception (METHOD_NAME, "Invalid file format, no root 'TranslationMapRegistry' tag");
 
   for (Parser::NamesakeIterator i = iter->First ("Translation"); i; i++)
-    if (!test (i, "Profile") || !test (i, "TranslationMap"))
+    if (!i->First ("Profile") || !i->First ("TranslationMap"))
       throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, one of tag property missing at line %u", i->LineNumber ());
 
   for (Parser::NamesakeIterator i = iter->First ("Translation"); i; i++)
   {
-    const char *profile         = get<const char*> (i, "Profile", ""),
-               *translation_map = get<const char*> (i, "TranslationMap", "");
+    const char *profile         = get<const char*> (*i, "Profile", ""),
+               *translation_map = get<const char*> (*i, "TranslationMap", "");
 
     target_registry.Register (profile, translation_map);
   }

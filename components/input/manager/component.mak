@@ -5,7 +5,7 @@ TARGETS := INPUT.MANAGER.SOURCES INPUT.MANAGER.TESTS
 
 #Öåëü ¹1 - INPUT manager sources
 INPUT.MANAGER.SOURCES.TYPE             := static-lib
-INPUT.MANAGER.SOURCES.NAME             := input.manager
+INPUT.MANAGER.SOURCES.NAME             := funner.input.manager
 INPUT.MANAGER.SOURCES.INCLUDE_DIRS     := 
 INPUT.MANAGER.SOURCES.SOURCE_DIRS      := sources
 INPUT.MANAGER.SOURCES.LIB_DIRS         :=  

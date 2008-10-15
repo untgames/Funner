@@ -2,3 +2,4 @@
 #Экспортируемые настройки компонента
 ###################################################################################################
 export.LINK_INCLUDES := XKeyregLoader XKeyregSaver
+export.IMPORTS       := link.static.mak ../../common/xml.link.static.mak

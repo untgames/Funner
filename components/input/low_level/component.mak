@@ -5,7 +5,7 @@ TARGETS := INPUT.LOW_LEVEL.SOURCES INPUT.LOW_LEVEL.TESTS
 
 #Öåëü ¹1 - INPUT system sources
 INPUT.LOW_LEVEL.SOURCES.TYPE             := static-lib
-INPUT.LOW_LEVEL.SOURCES.NAME             := input.low_level
+INPUT.LOW_LEVEL.SOURCES.NAME             := funner.input.low_level
 INPUT.LOW_LEVEL.SOURCES.INCLUDE_DIRS     := 
 INPUT.LOW_LEVEL.SOURCES.SOURCE_DIRS      := sources
 INPUT.LOW_LEVEL.SOURCES.LIB_DIRS         :=  

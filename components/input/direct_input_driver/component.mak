@@ -5,7 +5,7 @@ TARGETS := INPUT.DIRECT_INPUT_DRIVER.SOURCES INPUT.DIRECT_INPUT_DRIVER.TESTS
 
 #Öåëü ¹1 - Window driver sources
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.TYPE                 := static-lib
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.NAME                 := input.direct_input_driver
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.NAME                 := funner.input.direct_input_driver
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.INCLUDE_DIRS         := ../../../extern/dinputsdk/include
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.SOURCE_DIRS          := sources
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.LIB_DIRS             :=  
