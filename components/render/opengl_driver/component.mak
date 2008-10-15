@@ -15,8 +15,8 @@ RENDER.OPENGL_DRIVER.UTILS.IMPORTS          :=  ../../common/compile.static.mak 
 
 #OpenGL render system sources
 RENDER.OPENGL_DRIVER.SOURCES.TYPE             := static-lib
-RENDER.OPENGL_DRIVER.SOURCES.NAME             := render.low_level.opengl_driver
-RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS     := sources sources/platform/win32/ddk
+RENDER.OPENGL_DRIVER.SOURCES.NAME             := funner.render.low_level.opengl_driver
+RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS     := sources
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS      := sources/common sources/driver sources/input_stage \
                                                  sources/render_target_manager sources/render_target_manager/swap_chain_manager \
                                                  sources/render_target_manager/fbo_manager \
@@ -24,7 +24,7 @@ RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS      := sources/common sources/driver s
                                                  sources/shader_stage/fpp sources/shader_stage/glsl sources/query_manager sources/output_stage
 RENDER.OPENGL_DRIVER.SOURCES.LIB_DIRS         :=  
 RENDER.OPENGL_DRIVER.SOURCES.LIBS             := 
-RENDER.OPENGL_DRIVER.SOURCES.COMPILER_DEFINES := GLEW_STATIC GLEW_MX
+RENDER.OPENGL_DRIVER.SOURCES.COMPILER_DEFINES :=
 RENDER.OPENGL_DRIVER.SOURCES.IMPORTS          := ../low_level/compile.static.mak ../../common/compile.static.mak ../../system/compile.static.mak
 RENDER.OPENGL_DRIVER.SOURCES.msvc.COMPILER_CFLAGS  := -wd4355
 RENDER.OPENGL_DRIVER.SOURCES.win32.SOURCE_DIRS := sources/platform/win32

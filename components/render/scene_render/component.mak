@@ -5,7 +5,7 @@ TARGETS := RENDER.SCENE_RENDER.CORE.SOURCES RENDER.SCENE_RENDER.CORE.TESTS RENDE
 
 #Öåëü ¹1 - Scene render sources
 RENDER.SCENE_RENDER.CORE.SOURCES.TYPE             := static-lib
-RENDER.SCENE_RENDER.CORE.SOURCES.NAME             := render.scene_render
+RENDER.SCENE_RENDER.CORE.SOURCES.NAME             := funner.render.scene_render
 RENDER.SCENE_RENDER.CORE.SOURCES.INCLUDE_DIRS     :=
 RENDER.SCENE_RENDER.CORE.SOURCES.SOURCE_DIRS      := sources/screen sources/core
 RENDER.SCENE_RENDER.CORE.SOURCES.LIB_DIRS         :=  
@@ -17,7 +17,7 @@ RENDER.SCENE_RENDER.CORE.SOURCES.IMPORTS          := compile.static.mak ../../co
                                              
 #Öåëü ¹2 - Scene render2d sources
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.TYPE             := static-lib
-RENDER.SCENE_RENDER.RENDER2D.SOURCES.NAME             := render.scene_render.render2d
+RENDER.SCENE_RENDER.RENDER2D.SOURCES.NAME             := funner.render.scene_render.render2d
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.INCLUDE_DIRS     :=
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.SOURCE_DIRS      := sources/render2d
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.LIB_DIRS         :=  

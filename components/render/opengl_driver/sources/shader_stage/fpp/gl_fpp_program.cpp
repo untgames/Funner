@@ -33,18 +33,20 @@ class FppProgramParser
     FppProgramParser (FppState& in_base_state, FppDynamicParameterMap& in_dynamic_parameters, const ShaderDesc& shader_desc, const LogFunction& error_log)
      : base_state (in_base_state),
        dynamic_parameters (in_dynamic_parameters),
-       parser (parse_log, shader_desc.name, shader_desc.source_code, shader_desc.source_code_size, "wxf")
+       parser (shader_desc.name, shader_desc.source_code_size, shader_desc.source_code, "wxf")
     {
         //разбор шейдера
 
       ParseShader ();
 
         //проверка ошибок разбора
-
-      for (size_t i=0, count=parse_log.MessagesCount (); i<count; i++)
-        error_log (parse_log.Message (i));
         
-      if (parse_log.HasErrors ())
+      ParseLog log = parser.Log ();
+
+      for (size_t i=0, count=log.MessagesCount (); i<count; i++)
+        error_log (log.Message (i));
+
+      if (log.HasErrors ())
         throw xtl::format_exception<xtl::bad_argument> ("render::low_level::opengl::FppProgramParser::FppProgramParser", "Errors in shader '%s'", shader_desc.name);
     }
     
@@ -56,9 +58,9 @@ class FppProgramParser
 
       if (iter != dynamic_parameters.end ())
       {
-        parse_log.Error (line_iter, "Parameter '%s' has been already defined", name);
+        parser.Log ().Error (*line_iter, "Parameter '%s' has been already defined", name);
         return;
-      }            
+      }
 
       FppDynamicParameter& param = dynamic_parameters.insert_pair (name, FppDynamicParameter ()).first->second;
 
@@ -73,9 +75,9 @@ class FppProgramParser
     {
       FppDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
 
-      if (iter == dynamic_parameters.end ())      
+      if (iter == dynamic_parameters.end ())
       {
-        parse_log.Error (line_iter, "Undefined parameter '%s'", name);
+        parser.Log ().Error (*line_iter, "Undefined parameter '%s'", name);
         return;
       }
       
@@ -83,14 +85,14 @@ class FppProgramParser
       
       if (param.type != type)
       {
-        parse_log.Error (line_iter, "Type of parameter '%s' mismatch", name);
+        parser.Log ().Error (*line_iter, "Type of parameter '%s' mismatch", name);
         return;
       }
       
       if (param.count < count)      
       {
-        parse_log.Error (line_iter, "Parameter '%s' attributes count %u is less than expected attributes count %u",
-                         name, param.count, count);
+        parser.Log ().Error (*line_iter, "Parameter '%s' attributes count %u is less than expected attributes count %u",
+          name, param.count, count);
         return;
       }
       
@@ -122,7 +124,7 @@ class FppProgramParser
 
       if (attributes_count < count)
       {
-        parse_log.Error (iter, "Too few attributes (%u attributes expected)", count);
+        parser.Log ().Error (*iter, "Too few attributes (%u attributes expected)", count);
 
         return;
       }
@@ -133,7 +135,7 @@ class FppProgramParser
                                                    (T*)((char*)&base_state + offset));
 
       if (parsed_attributes_count != count)
-        parse_log.Error (iter, "Error at read attribute #%u", parsed_attributes_count);
+        parser.Log ().Error (*iter, "Error at read attribute #%u", parsed_attributes_count);
     }
 
       //разбор целочисленных значений
@@ -172,7 +174,7 @@ class FppProgramParser
       {
         if (!iter->AttributesCount ())
         {
-          parse_log.Error (iter, "Parameter names expected");
+          parser.Log ().Error (*iter, "Parameter names expected");
           continue;
         }
 
@@ -191,7 +193,7 @@ class FppProgramParser
         
       if (!iter->AttributesCount ())
       {
-        parse_log.Error (iter, "Too few attributes (1 attribute expected)");
+        parser.Log ().Error (*iter, "Too few attributes (1 attribute expected)");
         return;
       }
 
@@ -209,7 +211,7 @@ class FppProgramParser
 
         //если соответствие не найдено - сообщаем об ошибке
 
-      parse_log.Error (iter, "Unknown value '%s'", value);
+      parser.Log ().Error (*iter, "Unknown value '%s'", value);
     }
     
       //разбор параметров источника освещения
@@ -292,7 +294,7 @@ class FppProgramParser
         ParseParameterDeclarations (params_iter, "int4x4",   FppDynamicParameterType_Int, 16);
 
         if (params_iter->NextNamesake ())
-          parse_log.Warning (params_iter->NextNamesake (), "Second (and others) 'Parameters' block(s) ignored");
+          parser.Log ().Warning (params_iter->NextNamesake (), "Second (and others) 'Parameters' block(s) ignored");
       }
       
         //разбор параметров растеризации
@@ -372,7 +374,6 @@ class FppProgramParser
   private:
     FppState&               base_state;         //базовое состояние fpp-шейдера
     FppDynamicParameterMap& dynamic_parameters; //динамические параметры
-    ParseLog                parse_log;          //протокол парсера
     Parser                  parser;             //парсер исходного текста fpp-шейдера
 };
 

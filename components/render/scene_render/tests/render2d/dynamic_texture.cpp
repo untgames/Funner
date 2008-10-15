@@ -28,7 +28,7 @@ int main ()
 
     sprite->BindToScene (scene, NodeBindMode_Capture);
     camera->BindToScene (scene, NodeBindMode_Capture);
-    
+
     sprite->SetName ("Sprite1");
     camera->SetName ("Camera1");
     sprite->SetMaterial ("dynamic_material");

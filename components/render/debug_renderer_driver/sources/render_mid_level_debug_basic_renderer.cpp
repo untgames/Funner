@@ -111,9 +111,9 @@ void BasicRenderer::AddFrame (IFrame* in_frame)
   
   if (!frame)  
     throw xtl::make_argument_exception (METHOD_NAME, "frame", typeid (in_frame).name (),
-      "Frame type incompatible with render::mid_level::debug::BasicFrame");            
-
-  frames.insert (frame_position, frame);  
+      "Frame type incompatible with render::mid_level::debug::BasicFrame");
+      
+  frames.insert (frame_position, frame);
 
   frames_count++;
 }
@@ -136,12 +136,12 @@ void BasicRenderer::DrawFrames ()
   for (FrameList::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
   {
     BasicFrame& frame = **iter;
-    
+
     frame.Draw ();
   }
   
     //очистка списка кадров
-    
+
   frames.clear ();
 
   frame_position = frames.end ();

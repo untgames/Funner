@@ -5,7 +5,7 @@ TARGETS := RENDER.MID_LEVEL.SOURCES RENDER.MID_LEVEL.TESTS
 
 #Öåëü ¹1 - RENDER system sources
 RENDER.MID_LEVEL.SOURCES.TYPE             := static-lib
-RENDER.MID_LEVEL.SOURCES.NAME             := render.mid_level
+RENDER.MID_LEVEL.SOURCES.NAME             := funner.render.mid_level
 RENDER.MID_LEVEL.SOURCES.INCLUDE_DIRS     :=
 RENDER.MID_LEVEL.SOURCES.SOURCE_DIRS      := sources
 RENDER.MID_LEVEL.SOURCES.LIB_DIRS         :=  

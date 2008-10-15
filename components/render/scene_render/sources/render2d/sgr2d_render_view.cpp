@@ -180,7 +180,7 @@ void RenderView::Draw ()
     //установка матриц вида и проекции
 
   frame->SetProjection (camera->ProjectionMatrix ());
-  frame->SetViewPoint  (camera->WorldPosition ());
+  frame->SetViewPoint  (camera->WorldPosition ());  
 
     //обход сцены
 
