@@ -5,7 +5,7 @@ TARGETS := EXTERN.FREETYPE
 
 #Öåëü ¹1 - Freetype
 EXTERN.FREETYPE.TYPE                  := static-lib
-EXTERN.FREETYPE.NAME                  := extern.freetype
+EXTERN.FREETYPE.NAME                  := funner.extern.freetype
 EXTERN.FREETYPE.INCLUDE_DIRS          := include
 EXTERN.FREETYPE.SOURCE_DIRS           := sources/autofit sources/base sources/bdf sources/cache sources/cff sources/cid sources/gzip \
                                          sources/lzw sources/pcf sources/pfr sources/psaux sources/pshinter sources/psnames sources/raster \

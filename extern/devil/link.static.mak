@@ -1,4 +1,4 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS    := extern.devil extern.ilu extern.jpeglib extern.tifflib extern.zlib
+export.LIBS    := funner.extern.devil funner.extern.ilu funner.extern.jpeglib funner.extern.tifflib funner.extern.zlib

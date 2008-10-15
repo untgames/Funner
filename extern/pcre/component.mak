@@ -5,7 +5,7 @@ TARGETS := EXTERN.PCRE
 
 #Цель №1 - PCRE
 EXTERN.PCRE.TYPE                  := static-lib               #Тип цели
-EXTERN.PCRE.NAME                  := extern.pcre              #Имя выходного файла
+EXTERN.PCRE.NAME                  := funner.extern.pcre              #Имя выходного файла
 EXTERN.PCRE.INCLUDE_DIRS          := include                  #Относительные пути к каталогам c заголовочными файлами
 EXTERN.PCRE.SOURCE_DIRS           := sources                  #Относительные пути к каталогам c исходными файлами
 EXTERN.PCRE.LIB_DIRS              :=                          #Относительные пути к каталогам с библиотеками

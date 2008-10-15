@@ -5,7 +5,7 @@ TARGETS := EXTERN.ZZIP
 
 #Цель №1 - ZZIP
 EXTERN.ZZIP.TYPE             := static-lib               #Тип цели
-EXTERN.ZZIP.NAME             := extern.zzip              #Имя выходного файла
+EXTERN.ZZIP.NAME             := funner.extern.zzip              #Имя выходного файла
 EXTERN.ZZIP.INCLUDE_DIRS     := include ../zlib/include  #Относительные пути к каталогам c заголовочными файлами
 EXTERN.ZZIP.SOURCE_DIRS      := sources                  #Относительные пути к каталогам c исходными файлами
 EXTERN.ZZIP.LIB_DIRS         :=                          #Относительные пути к каталогам с библиотеками

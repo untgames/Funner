@@ -5,7 +5,7 @@ TARGETS := EXTERN.VORBIS_STATIC
 
 #Öåëü ¹1 - VORBIS_STATIC
 EXTERN.VORBIS_STATIC.TYPE                 := static-lib
-EXTERN.VORBIS_STATIC.NAME                 := extern.vorbis_static
+EXTERN.VORBIS_STATIC.NAME                 := funner.extern.vorbis_static
 EXTERN.VORBIS_STATIC.INCLUDE_DIRS         := include ../ogg/include
 EXTERN.VORBIS_STATIC.SOURCE_DIRS          := sources
 EXTERN.VORBIS_STATIC.LIB_DIRS             :=
