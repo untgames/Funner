@@ -1,0 +1,17 @@
+Results of uninitialized_storage_test:
+s1: size=10, capacity=10, empty=false, content={0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+Reserve 100 elements
+s1: size=10, capacity=100, empty=false, content={0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+Copy to s2
+s1: size=10, capacity=100, empty=false, content={0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+s2: size=10, capacity=10, empty=false, content={0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+Remove elements
+s1: size=5, capacity=100, empty=false, content={0, 1, 2, 3, 4}
+Swap s1 and s2
+s1: size=10, capacity=10, empty=false, content={0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+s2: size=5, capacity=100, empty=false, content={0, 1, 2, 3, 4}
+Assign s1 to s2
+s1: size=10, capacity=10, empty=false, content={0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+s2: size=10, capacity=10, empty=false, content={0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+Clear
+s2: size=0, capacity=10, empty=true, content={}

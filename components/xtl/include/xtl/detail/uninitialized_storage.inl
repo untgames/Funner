@@ -19,7 +19,7 @@ inline uninitialized_storage<T, Allocator>::uninitialized_storage (const uniniti
   : allocator_type (storage), start (0), finish (0), end_of_storage (0)
 {
   resize (storage.size ());  
-  memcpy (start, storage.start, finish - start);
+  memcpy (start, storage.start, sizeof (T) * (finish - start));
 }
     
 template <class T, class Allocator>    
