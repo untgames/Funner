@@ -23,7 +23,7 @@ struct NodeStackItem
 {
   size_t node_offset;       //смещение узла
   size_t last_child_offset; //смещение последнего ребёнка
-  
+
   NodeStackItem (size_t in_node_offset) : node_offset (in_node_offset), last_child_offset (0) {}
 };
 
@@ -57,7 +57,7 @@ struct ParseTreeBuilder::Impl
     current_source_offset         = 0;
     current_line_number           = 0;
     current_node_attributes_count = 0;
-    
+
     nodes_stack.reserve (NODES_STACK_RESERVE_SIZE);
   }
 
@@ -66,22 +66,22 @@ struct ParseTreeBuilder::Impl
     : nodes_stack (impl.nodes_stack)
   {
     nodes_stack.reserve (NODES_STACK_RESERVE_SIZE);
-    
+
     impl.CopyBufferTo (*this, impl.buffer.size ());
 
     total_nodes_count      = impl.total_nodes_count;
     total_attributes_count = impl.total_attributes_count;
     current_source_offset  = impl.current_source_offset;
-    current_line_number    = impl.current_line_number;    
+    current_line_number    = impl.current_line_number;
   }
-  
+
 ///Копирование буфера
   void CopyBufferTo (Impl& impl, size_t buffer_size) const
   {
     size_t old_front_offset                 = front_offset - buffer.data (),
            old_back_offset                  = buffer.data () + buffer.size () - back_offset,
            old_node_attributes_count_offset = current_node_attributes_count ? reinterpret_cast<char*> (current_node_attributes_count) - buffer.data () : 0;
-           
+
     if (buffer_size < old_front_offset + old_back_offset)
       buffer_size = old_front_offset + old_back_offset;
 
@@ -94,7 +94,7 @@ struct ParseTreeBuilder::Impl
     memcpy (new_buffer.data (), buffer.data (), old_front_offset);
     memcpy (impl.back_offset, buffer.data () + buffer.size () - old_back_offset, old_back_offset);
 
-    impl.buffer.swap (new_buffer);    
+    impl.buffer.swap (new_buffer);
   }
 
 ///Заказ памяти в буфере
@@ -132,8 +132,8 @@ struct ParseTreeBuilder::Impl
     }
 
     CopyBufferTo (*this, new_size);
-  }    
-  
+  }
+
 ///Резервирование места в передней части буфера
   char* AllocFront (size_t size)
   {
@@ -145,7 +145,7 @@ struct ParseTreeBuilder::Impl
 
     return res;
   }
-  
+
 ///Резервирование места в задней части буфера
   char* AllocBack (size_t size)
   {
@@ -154,7 +154,7 @@ struct ParseTreeBuilder::Impl
     back_offset -= size;
 
     return back_offset;
-  }  
+  }
 };
 
 /*
@@ -165,10 +165,10 @@ ParseTreeBuilder::ParseTreeBuilder ()
   : impl (new Impl)
 {
     //создание пустого узла
-   
+
   BeginNode (DUMMY_NODE_NAME);
   EndNode   ();
-  
+
     //создание корневого узла
 
   impl->nodes_stack.clear ();
@@ -189,7 +189,7 @@ ParseTreeBuilder::~ParseTreeBuilder ()
 ParseTreeBuilder& ParseTreeBuilder::operator = (const ParseTreeBuilder& builder)
 {
   ParseTreeBuilder (builder).Swap (*this);
-  
+
   return *this;
 }
 
@@ -203,7 +203,7 @@ const char* ParseTreeBuilder::NodeName () const
   if (!impl->buffer.data () || impl->nodes_stack.empty ())
     return "";
 
-  return impl->buffer.data () + impl->nodes_stack.back ().node_offset + sizeof ParseNodeImpl;
+  return impl->buffer.data () + impl->nodes_stack.back ().node_offset + sizeof (ParseNodeImpl);
 }
 
 //уровень вложенности узлов (корень на нулевом уровне)
@@ -269,15 +269,15 @@ void ParseTreeBuilder::BeginNode (const char* name, size_t line_number)
 
   if (!name)
     throw xtl::make_null_argument_exception ("common::ParseTreeBuilder::BeginNode(const char*, size_t)", "name");
-    
+
     //резервирование памяти для расположения узла
 
   size_t name_size   = strlen (name) + 1,
          node_offset = impl->front_offset - impl->buffer.data (),
-         node_size   = sizeof ParseNodeImpl + name_size;
+         node_size   = sizeof (ParseNodeImpl) + name_size;
 
   ParseNodeImpl* node = reinterpret_cast<ParseNodeImpl*> (impl->AllocFront (node_size));
-  
+
     //инициализация узла
 
   node->attributes_count              = 0;
@@ -290,11 +290,11 @@ void ParseTreeBuilder::BeginNode (const char* name, size_t line_number)
   node->line_number                   = line_number;
   impl->current_line_number           = line_number;
   impl->current_node_attributes_count = &node->attributes_count;
-  
-  strcpy (reinterpret_cast<char*> (node) + sizeof ParseNodeImpl, name);  
-  
+
+  strcpy (reinterpret_cast<char*> (node) + sizeof (ParseNodeImpl), name);
+
     //обновление ссылок на узел
-    
+
   impl->nodes_stack.push_back (NodeStackItem (node_offset));
 
   if (impl->nodes_stack.size () > 1)
@@ -308,7 +308,7 @@ void ParseTreeBuilder::BeginNode (const char* name, size_t line_number)
       prev_node->next_offset = node_offset - parent.last_child_offset;
     }
     else
-    {      
+    {
       ParseNodeImpl* parent_node = reinterpret_cast<ParseNodeImpl*> (impl->buffer.data () + parent.node_offset);
 
       parent_node->first_offset = node_offset - parent.node_offset;
@@ -316,9 +316,9 @@ void ParseTreeBuilder::BeginNode (const char* name, size_t line_number)
 
     parent.last_child_offset = node_offset;
   }
-  
+
     //увеличение числа узлов
-    
+
   impl->total_nodes_count++;
 }
 
@@ -344,21 +344,21 @@ void ParseTreeBuilder::AddAttribute (const char* value)
 void ParseTreeBuilder::AddAttributes (size_t count, const char** values)
 {
   static const char* METHOD_NAME = "common::ParseTreeBuilder::AddAttributes";
-  
+
     //проверка корректности аргументов и подсчёт количества памяти, необходимого для хранения значений атрибутов
-    
+
   if (!impl->current_node_attributes_count)
     throw xtl::format_operation_exception (METHOD_NAME, "Attributes section closed");
 
   if (!values)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "values");      
+    throw xtl::make_null_argument_exception (METHOD_NAME, "values");
 
-  size_t attribute_values_size = 0;  
-  
+  size_t attribute_values_size = 0;
+
   for (size_t i=0; i<count; i++)
   {
     const char* value = values [i];
-    
+
     if (!value)
       throw xtl::format_exception<xtl::null_argument_exception> (METHOD_NAME, "Null argument 'values[%u]'", i);
 
@@ -370,11 +370,11 @@ void ParseTreeBuilder::AddAttributes (size_t count, const char** values)
   impl->Alloc (attribute_values_size + count * sizeof (size_t));
 
   char*   dst_value  = impl->AllocBack (attribute_values_size);
-  size_t* dst_offset = reinterpret_cast<size_t*> (impl->AllocFront (count * sizeof (size_t)));  
-  
+  size_t* dst_offset = reinterpret_cast<size_t*> (impl->AllocFront (count * sizeof (size_t)));
+
   dst_value += attribute_values_size;
 
-    //копирование атрибутов в буфер    
+    //копирование атрибутов в буфер
 
   for (size_t i=0; i<count; i++, dst_offset++)
   {
@@ -385,7 +385,7 @@ void ParseTreeBuilder::AddAttributes (size_t count, const char** values)
     strcpy (dst_value, value);
 
     *dst_offset = impl->buffer.data () + impl->buffer.size () - dst_value;
-  }  
+  }
 
     //увеличение числа атрибутов
 

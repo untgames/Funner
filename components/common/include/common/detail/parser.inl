@@ -11,7 +11,7 @@ void for_each_child_impl (Iter iter, Fn& fn)
   for (; iter; ++iter)
   {
     try
-    {    
+    {
       fn (*iter);
     }
     catch (ParserException&)
@@ -36,7 +36,7 @@ void for_each_child_impl (Iter iter, Fn& fn)
       }
       catch (...)
       {
-      }  
+      }
     }
   }
 }
@@ -75,7 +75,7 @@ inline Parser::AttributeIterator make_attribute_iterator (const ParseNode& node,
 }
 
 /*
-    Чтение атрибутов    
+    Чтение атрибутов
 */
 
 template <class T>
@@ -84,9 +84,11 @@ inline bool try_read (const ParseNode& node, const char* name, T& value)
   ParseNode child = node.First (name);
 
   if (!child)
-    return false;    
+    return false;
 
-  return read (make_attribute_iterator (child), value);
+  Parser::AttributeIterator attr_iter = make_attribute_iterator (child);
+
+  return read (attr_iter, value);
 }
 
 template <class T>
@@ -105,7 +107,9 @@ inline void read (const ParseNode& node, const char* name, T& value)
 {
   ParseNode child = get_first_child (node, name);
 
-  if (!read (make_attribute_iterator (child), value))
+  Parser::AttributeIterator attr_iter = make_attribute_iterator (child);
+
+  if (!read (attr_iter, value))
     raise_parser_exception (child, "Bad value");
 }
 
@@ -113,8 +117,10 @@ template <class OutIter>
 inline void read (const ParseNode& node, const char* name, OutIter first, size_t count)
 {
   ParseNode child = get_first_child (node, name);
-  
-  size_t read_count = read_range (make_attribute_iterator (child), first, count);
+
+  Parser::AttributeIterator attr_iter = make_attribute_iterator (child);
+
+  size_t read_count = read_range (attr_iter, first, count);
 
   if (read_count != count)
     raise_parser_exception (child, "Error at read node item #%u (requested_items_count=%u)", read_count, count);
@@ -126,7 +132,7 @@ inline T get (const ParseNode& node, const char* name)
   T value;
 
   read (node, name, value);
-  
+
   return value;
 }
 
@@ -134,7 +140,7 @@ template <class T>
 inline T get (const ParseNode& node, const char* name, const T& default_value)
 {
   T value;
-  
+
   if (try_read (node, name, value))
     return value;
 

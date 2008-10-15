@@ -27,8 +27,8 @@ void print_indent (size_t indent)
 void print (const ParseNode& node, size_t indent)
 {
   print_indent (indent);
-  printf       ("%s (source='%s', line=%u): {", node.Name (), node.Source (), node.LineNumber ());
-  
+  printf       ("%s (source='%s', line=%lu): {", node.Name (), node.Source (), node.LineNumber ());
+
   for (size_t i=0, count=node.AttributesCount (); i<count; i++)
   {
     if (i)
@@ -36,7 +36,7 @@ void print (const ParseNode& node, size_t indent)
 
     printf ("%s", node.Attribute (i));
   }
-  
+
   printf ("}\n");
 
   for (ParseIterator iter=node.First (); iter; ++iter)

@@ -24,7 +24,7 @@ size_t get_node_offset (ParseTree* tree, ParseNodeImpl* node)
 //имя узла
 const char* get_node_name (ParseNodeImpl* node)
 {
-  return reinterpret_cast<const char*> (node) + sizeof ParseNodeImpl;
+  return reinterpret_cast<const char*> (node) + sizeof (ParseNodeImpl);
 }
 
 //первый потомок
@@ -64,7 +64,7 @@ ParseNodeImpl* get_next_node (ParseNodeImpl* iter, const char* name)
       if (name_hash == iter->name_hash && !strcmp (name, get_node_name (iter)))
         return iter;
   }
-  
+
   return 0;
 }
 
@@ -72,7 +72,7 @@ ParseNodeImpl* get_next_node (ParseNodeImpl* iter, const char* name)
 const char** get_attributes (ParseNodeImpl* node, ParseTree* tree)
 {
   const char** attributes = reinterpret_cast<const char**> (reinterpret_cast<char*> (node) + node->attributes_offset);
-  
+
   if (node->flags & ParseNodeFlag_AttributesAsPointers)
     return attributes;
 
@@ -87,6 +87,37 @@ const char** get_attributes (ParseNodeImpl* node, ParseTree* tree)
   return attributes;
 }
 
+//Дерево для работы ParseNode::ParseNode ()
+struct NullTreeHolder
+{
+  xtl::intrusive_ptr<ParseTree> tree;
+
+  NullTreeHolder ()
+  {
+    static const char* NODE_NAME      = "";
+    static size_t      NODE_NAME_SIZE = strlen (NODE_NAME) + 1;
+
+    ParseTreeBuffer buffer (sizeof (ParseNodeImpl) + NODE_NAME_SIZE);
+
+    ParseNodeImpl* node = reinterpret_cast<ParseNodeImpl*> (buffer.data ());
+
+    node->attributes_count   = 0;
+    node->name_hash          = strhash (NODE_NAME);
+    node->attributes_offset  = 0;
+    node->flags              = 0;
+    node->next_offset        = 0;
+    node->first_offset       = 0;
+    node->source_back_offset = 0;
+    node->line_number        = 0;
+
+    char* name = buffer.data () + sizeof (ParseNodeImpl);
+
+    strcpy (name, NODE_NAME);
+
+    tree = xtl::intrusive_ptr<ParseTree> (new ParseTree (buffer), false);
+  }
+};
+
 }
 
 /*
@@ -95,36 +126,6 @@ const char** get_attributes (ParseNodeImpl* node, ParseTree* tree)
 
 ParseNode::ParseNode ()
 {
-  struct NullTreeHolder
-  {
-    xtl::intrusive_ptr<ParseTree> tree;
-    
-    NullTreeHolder ()
-    {
-      static const char* NODE_NAME      = "";
-      static size_t      NODE_NAME_SIZE = strlen (NODE_NAME) + 1;
-      
-      ParseTreeBuffer buffer (sizeof ParseNodeImpl + NODE_NAME_SIZE);
-
-      ParseNodeImpl* node = reinterpret_cast<ParseNodeImpl*> (buffer.data ());
-
-      node->attributes_count   = 0;
-      node->name_hash          = strhash (NODE_NAME);
-      node->attributes_offset  = 0;
-      node->flags              = 0;
-      node->next_offset        = 0;
-      node->first_offset       = 0;
-      node->source_back_offset = 0;
-      node->line_number        = 0;
-
-      char* name = buffer.data () + sizeof ParseNodeImpl;
-
-      strcpy (name, NODE_NAME);
-
-      tree = xtl::intrusive_ptr<ParseTree> (new ParseTree (buffer), false);
-    }
-  };
-
   typedef common::Singleton<NullTreeHolder> NullTreeHolderSingleton;
 
   tree   = NullTreeHolderSingleton::Instance ().tree.get ();
@@ -137,7 +138,7 @@ ParseNode::ParseNode (ParseTree* in_tree, size_t in_offset)
   : tree (in_tree),
     offset (in_offset)
 {
-  addref (tree);  
+  addref (tree);
 }
 
 ParseNode::ParseNode (const ParseNode& node)
@@ -155,7 +156,7 @@ ParseNode::~ParseNode ()
 ParseNode& ParseNode::operator = (const ParseNode& node)
 {
   ParseNode (node).Swap (*this);
-  
+
   return *this;
 }
 
@@ -172,7 +173,7 @@ bool ParseNode::operator ! () const
 {
   return IsEmpty ();
 }
-    
+
 ParseNode::operator UnspecifiendBoolType () const
 {
   return IsEmpty () ? 0 : &ParseNode::IsEmpty;
@@ -199,9 +200,9 @@ size_t ParseNode::AttributesCount () const
 }
 
 const char* ParseNode::Attribute (size_t index) const
-{  
+{
   ParseNodeImpl* node = get_node_impl (tree, offset);
-  
+
   if (index >= node->attributes_count)
     throw xtl::make_range_exception ("common::ParseNode::Attribute", "index", index, node->attributes_count);
 
@@ -211,7 +212,7 @@ const char* ParseNode::Attribute (size_t index) const
 const char** ParseNode::Attributes () const
 {
   ParseNodeImpl* node = get_node_impl (tree, offset);
-  
+
   return get_attributes (node, tree);
 }
 
@@ -222,7 +223,7 @@ const char** ParseNode::Attributes () const
 //первый потомок
 ParseNode ParseNode::First () const
 {
-  ParseNodeImpl* node = get_node_impl (tree, offset);    
+  ParseNodeImpl* node = get_node_impl (tree, offset);
 
   return ParseNode (tree, node->first_offset ? offset + node->first_offset : 0);
 }
@@ -244,7 +245,7 @@ ParseNode ParseNode::First (const char* name) const
 {
   if (!name)
     throw xtl::make_null_argument_exception ("common::ParseNode::First(const char*)", "name");
-    
+
   if (!*name)
     return *this;
 
@@ -261,7 +262,7 @@ ParseNode ParseNode::Next (const char* name) const
 {
   if (!name)
     throw xtl::make_null_argument_exception ("common::ParseNode::Next(const char*)", "name");
-    
+
   if (!*name)
     return *this;
 
@@ -303,7 +304,7 @@ const char* ParseNode::Source () const
 size_t ParseNode::LineNumber () const
 {
   ParseNodeImpl* node = get_node_impl (tree, offset);
-  
+
   return node->line_number;
 }
 

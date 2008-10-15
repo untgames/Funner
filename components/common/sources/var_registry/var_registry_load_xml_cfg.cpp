@@ -27,8 +27,8 @@ void parse_node (VarRegistry& registry, const ParseNode& node)
     }
     else if (!xstrcmp ("auto_template", iter.Name ()))
     {
-      const char* new_prefix = get<const char*> (iter, "prefix", 0);
-      
+      const char* new_prefix = get<const char*> (iter, "prefix", (const char*)0);
+
       if (new_prefix)
         prefix = new_prefix;
 
@@ -58,7 +58,7 @@ void load_xml (VarRegistry& registry, const char* file_name, const char* root_na
     throw make_null_argument_exception (METHOD_NAME, "file_name");
 
   Parser p (file_name);
-  
+
   ParseLog log = p.Log ();
 
   for (size_t i = 0; i < log.MessagesCount (); i++)
@@ -70,7 +70,7 @@ void load_xml (VarRegistry& registry, const char* file_name, const char* root_na
       default:
         break;
     }
-  
+
 
   if (!root_name_mask)
   {

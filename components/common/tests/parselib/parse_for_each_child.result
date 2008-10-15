@@ -2,6 +2,6 @@ Results of parse_for_each_child_test:
 node 'A': source='source1' line=1
 node 'A': source='source1' line=2
 node 'A': source='source1' line=3
-source1(1): error: node 'A': bad allocation
-source1(2): error: node 'A': bad allocation
-source1(3): error: node 'A': bad allocation
+source1(1): error: node 'A': Test exception
+source1(2): error: node 'A': Test exception
+source1(3): error: node 'A': Test exception
