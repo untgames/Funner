@@ -5,7 +5,7 @@ TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
 
 #Öåëü ¹1 - System library sources
 SYSTEMLIB.SOURCES.TYPE                   := static-lib
-SYSTEMLIB.SOURCES.NAME                   := system
+SYSTEMLIB.SOURCES.NAME                   := funner.system
 SYSTEMLIB.SOURCES.INCLUDE_DIRS           := sources
 SYSTEMLIB.SOURCES.SOURCE_DIRS            := sources/wrappers
 SYSTEMLIB.SOURCES.LIB_DIRS               :=
