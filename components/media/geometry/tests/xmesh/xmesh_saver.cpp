@@ -65,8 +65,8 @@ int main ()
     mesh1.Attach (vb1);
     mesh1.Attach (ib);
     
-    mesh1.AddPrimitive (PrimitiveType_TriangleList, 0, 0, 12, "material1");
-    mesh1.AddPrimitive (PrimitiveType_TriangleStrip, 0, 1, 14, "material2");
+    mesh1.AddPrimitive (PrimitiveType_TriangleList, 0, 0, 1, "material1");
+    mesh1.AddPrimitive (PrimitiveType_TriangleStrip, 0, 1, 1, "material2");
 
     Mesh mesh2;
     
@@ -80,8 +80,8 @@ int main ()
     
     mesh2.Attach (vb2);
     
-    mesh2.AddPrimitive (PrimitiveType_LineList, 0, 0, 12, "material1");
-    mesh2.AddPrimitive (PrimitiveType_LineStrip, 0, 1, 14, "material2");    
+    mesh2.AddPrimitive (PrimitiveType_LineList, 0, 0, 1, "material1");
+    mesh2.AddPrimitive (PrimitiveType_LineStrip, 0, 1, 2, "material2");    
 
     MeshLibrary mesh_library;
 

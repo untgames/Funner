@@ -5,7 +5,7 @@ TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOU
 
 #Öåëü ¹1 - Image sources
 MEDIA.IMAGE.SOURCES.TYPE             := static-lib
-MEDIA.IMAGE.SOURCES.NAME             := media.image
+MEDIA.IMAGE.SOURCES.NAME             := funner.media.image
 MEDIA.IMAGE.SOURCES.INCLUDE_DIRS     := ../../../extern/devil/include
 MEDIA.IMAGE.SOURCES.SOURCE_DIRS      := sources/image sources/atlas
 MEDIA.IMAGE.SOURCES.LIB_DIRS         :=  
@@ -16,7 +16,7 @@ MEDIA.IMAGE.SOURCES.IMPORTS          := compile.static.mak
 
 #Öåëü ¹2 - XAtlas sources
 MEDIA.XATLAS.SOURCES.TYPE             := static-lib
-MEDIA.XATLAS.SOURCES.NAME             := media.image.xatlas
+MEDIA.XATLAS.SOURCES.NAME             := funner.media.image.xatlas
 MEDIA.XATLAS.SOURCES.INCLUDE_DIRS     := 
 MEDIA.XATLAS.SOURCES.SOURCE_DIRS      := sources/xatlas
 MEDIA.XATLAS.SOURCES.LIB_DIRS         :=  
@@ -27,7 +27,7 @@ MEDIA.XATLAS.SOURCES.IMPORTS          := compile.static.mak
 
 #Öåëü ¹3 - XAtlas sources
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.TYPE             := static-lib
-MEDIA.LEFT_BOTTOM_PACKER.SOURCES.NAME             := media.image.left_bottom_packer
+MEDIA.LEFT_BOTTOM_PACKER.SOURCES.NAME             := funner.media.image.left_bottom_packer
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.INCLUDE_DIRS     := ../../bound_volumes/include
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.SOURCE_DIRS      := sources/packers/left_bottom
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.LIB_DIRS         :=  

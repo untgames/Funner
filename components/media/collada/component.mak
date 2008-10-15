@@ -5,7 +5,7 @@ TARGETS := MEDIA.COLLADA.SOURCES MEDIA.COLLADA.DAE.SOURCES MEDIA.COLLADA.CONVERT
 
 #Öåëü ¹1 - sources
 MEDIA.COLLADA.SOURCES.TYPE             := static-lib
-MEDIA.COLLADA.SOURCES.NAME             := media.collada
+MEDIA.COLLADA.SOURCES.NAME             := funner.media.collada
 MEDIA.COLLADA.SOURCES.INCLUDE_DIRS     :=
 MEDIA.COLLADA.SOURCES.SOURCE_DIRS      := sources/model
 MEDIA.COLLADA.SOURCES.LIB_DIRS         :=  
@@ -16,7 +16,7 @@ MEDIA.COLLADA.SOURCES.IMPORTS          := compile.static.mak ../shared/compile.s
 
 #Öåëü ¹2 - DAE loader sources
 MEDIA.COLLADA.DAE.SOURCES.TYPE             := static-lib
-MEDIA.COLLADA.DAE.SOURCES.NAME             := media.collada.dae
+MEDIA.COLLADA.DAE.SOURCES.NAME             := funner.media.collada.dae
 MEDIA.COLLADA.DAE.SOURCES.INCLUDE_DIRS     :=
 MEDIA.COLLADA.DAE.SOURCES.SOURCE_DIRS      := sources/dae_loader
 MEDIA.COLLADA.DAE.SOURCES.LIB_DIRS         :=  
@@ -27,7 +27,7 @@ MEDIA.COLLADA.DAE.SOURCES.IMPORTS          := compile.static.mak link.static.mak
 
 #Öåëü ¹3 - collada convert sources
 MEDIA.COLLADA.CONVERT.SOURCES.TYPE             := static-lib
-MEDIA.COLLADA.CONVERT.SOURCES.NAME             := media.collada.convert
+MEDIA.COLLADA.CONVERT.SOURCES.NAME             := funner.media.collada.convert
 MEDIA.COLLADA.CONVERT.SOURCES.INCLUDE_DIRS     :=
 MEDIA.COLLADA.CONVERT.SOURCES.SOURCE_DIRS      := sources/convert
 MEDIA.COLLADA.CONVERT.SOURCES.LIB_DIRS         :=

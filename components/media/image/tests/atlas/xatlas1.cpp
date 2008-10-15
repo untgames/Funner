@@ -16,12 +16,10 @@ int main ()
   catch (std::exception& exception)
   {                                               
     printf ("exception: %s\n",exception.what ());
-    return 1;
   }                                               
   catch (...)
   {
     printf ("unknown exception\n");
-    return 1;
   }
 
   return 0;

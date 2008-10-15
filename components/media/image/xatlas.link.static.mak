@@ -1,6 +1,6 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS             := media.image.xatlas
-export.LINK_INCLUDES    := XAtlasLoader XAtlasSaver
-export.IMPORTS          := link.static.mak
+export.LIBS          := funner.media.image.xatlas
+export.LINK_INCLUDES := XAtlasLoader XAtlasSaver
+export.IMPORTS       := link.static.mak ../../common/xml.link.static.mak

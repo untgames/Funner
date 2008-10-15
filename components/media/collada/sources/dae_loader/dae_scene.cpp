@@ -8,15 +8,13 @@ using namespace math;
 
 void DaeParser::ParseLibraryVisualScenes (Parser::Iterator iter)
 {
-  if (!test (iter, "visual_scene"))
+  if (!iter->First ("visual_scene"))
   {
-    parse_log.Warning (iter, "Incorrect 'library_visual_scenes' node. Must be at least one 'visual_scene' sub-tag");
+    iter->Log ().Warning (*iter, "Empty 'library_visual_scenes' node. Must be at least one 'visual_scene' sub-tag");
     return;
   }
-  
-  LogScope scope (iter, *this);
 
-  for_each_child (iter, "visual_scene", bind (&DaeParser::ParseVisualScene, this, _1));
+  for_each_child (*iter, "visual_scene", bind (&DaeParser::ParseVisualScene, this, _1));
 }
 
 /*
@@ -25,27 +23,19 @@ void DaeParser::ParseLibraryVisualScenes (Parser::Iterator iter)
 
 void DaeParser::ParseVisualScene (Parser::Iterator iter)
 {
-  const char *id   = get<const char*> (iter, "id"),
-             *name = get<const char*> (iter, "name");
-  
-  LogScope scope (iter, *this);
-  
-  if (!id)
-  {
-    LogError (iter, "No id");
-    return;
-  }
-  
-    //создане сцены
+  const char *id   = get<const char*> (*iter, "id"),
+             *name = get<const char*> (*iter, "name", "");
+
+    //создание сцены
 
   Node scene;
   
   scene.SetId (id);  
   
-  if (name)
+  if (*name)
     scene.SetName (name);
   
-  for_each_child (iter, "node", bind (&DaeParser::ParseNode, this, _1, ref (scene)));
+  for_each_child (*iter, "node", bind (&DaeParser::ParseNode, this, _1, ref (scene)));
   
     //добавление сцены в библиотеку
     
@@ -58,27 +48,15 @@ void DaeParser::ParseVisualScene (Parser::Iterator iter)
 
 void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
 {
-  const char *id   = get<const char*> (iter, "id"),
-             *sid  = get<const char*> (iter, "sid"),
-             *name = get<const char*> (iter, "name");
-  
-  LogScope scope (iter, *this);
-  
-  if (!id)
-  {
-    LogError (iter, "No id");
-    return;
-  }
-  
+  const char *id   = get<const char*> (*iter, "id"),
+             *sid  = get<const char*> (*iter, "sid", ""),
+             *name = get<const char*> (*iter, "name", "");
+
     //разбор преобразований узла
-    
+
   mat4f tm;
    
-  if (!ParseTransform (iter, tm))
-  {
-    LogError (iter, "Error at parse node transformation sub-tags");
-    return;
-  }
+  ParseTransform (iter, tm);
   
     //создание узла
   
@@ -92,12 +70,12 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
   
     //установка дополнительного идентификатора
 
-  if (sid)
+  if (*sid)
     node.SetSubId (sid);
     
     //установка имени узла
     
-  if (name)
+  if (*name)
     node.SetName (name);
     
     //установка преобразований узла
@@ -110,82 +88,70 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
   
     //разбор инстанцированной геометрии
     
-  for_each_child (iter, "instance_geometry", bind (&DaeParser::ParseInstanceGeometry, this, _1, ref (node.Meshes ())));
+  for_each_child (*iter, "instance_geometry", bind (&DaeParser::ParseInstanceGeometry, this, _1, ref (node.Meshes ())));
   
     //разбор инстанцированных контроллеров
     
-  for_each_child (iter, "instance_controller", bind (&DaeParser::ParseInstanceController, this, _1, ref (node.Controllers ())));
+  for_each_child (*iter, "instance_controller", bind (&DaeParser::ParseInstanceController, this, _1, ref (node.Controllers ())));
   
     //разбор инстанцированных источников света
     
-  for_each_child (iter, "instance_light", bind (&DaeParser::ParseInstanceLight, this, _1, ref (node.Lights ())));
+  for_each_child (*iter, "instance_light", bind (&DaeParser::ParseInstanceLight, this, _1, ref (node.Lights ())));
   
     //разбор инстанцированных камер
     
-  for_each_child (iter, "instance_camera", bind (&DaeParser::ParseInstanceCamera, this, _1, ref (node.Cameras ())));
+  for_each_child (*iter, "instance_camera", bind (&DaeParser::ParseInstanceCamera, this, _1, ref (node.Cameras ())));
 
     //разбор вложенных узлов
 
-  for_each_child (iter, "node", bind (&DaeParser::ParseNode, this, _1, ref (node)));  
+  for_each_child (*iter, "node", bind (&DaeParser::ParseNode, this, _1, ref (node)));  
 }
 
 /*
     Разбор преобразований узла
 */
 
-bool DaeParser::ParseTransform (Parser::Iterator iter, mat4f& tm)
-{
+void DaeParser::ParseTransform (Parser::Iterator iter, mat4f& tm)
+{  
   for (Parser::Iterator i=iter->First (); i; ++i)
   {
-    if (test_tag (i, "matrix"))
+    const char* name = i->Name ();
+    
+    if (!strcmp (name, "matrix"))
     {
       mat4f sub_tm;
       
-      if (!CheckedRead (i, "#text", sub_tm))
-        return false;
+      read (*i, "#text", sub_tm);
         
       tm = sub_tm * tm;
     }
-    else if (test_tag (i, "translate"))
+    else if (!strcmp (name, "translate"))
     {
-      vec3f offset;            
-      
-      if (!CheckedRead (i, "#text", offset))
-        return false;        
-        
+      vec3f offset = get<vec3f> (*i, "#text");
+
       tm = translate (offset) * tm;
     }
-    else if (test_tag (i, "rotate"))
+    else if (!strcmp (name, "rotate"))
     {
-      vec4f r;
-      
-      if (!CheckedRead (i, "#text", r))
-        return false;
-        
+      vec4f r = get<vec4f> (*i, "#text");
+
       tm = rotatef (deg2rad (r.w), r.x, r.y, r.z) * tm;
     }
-    else if (test_tag (i, "scale"))
+    else if (!strcmp (name, "scale"))
     {
-      vec3f s;      
-      
-      if (!CheckedRead (i, "#text", s))
-        return false;        
-        
+      vec3f s = get<vec3f> (*i, "#text");
+
       tm = scale (s) * tm;
     }
-    else if (test_tag (i, "lookat"))
+    else if (!strcmp (name, "lookat"))
     {
-      LogError (i, "Lookat transform doesn't supported");
-      return false;
+      raise_parser_exception (*i, "Lookat transform doesn't supported");
     }
-    else if (test_tag (i, "skew"))
+    else if (!strcmp (name, "skew"))
     {
-      LogError (i, "Skew transform doesn't supported");
-      return false;
+      raise_parser_exception (*i, "Skew transform doesn't supported");
     }
   }
-
-  return true;
 }
 
 /*
@@ -194,24 +160,15 @@ bool DaeParser::ParseTransform (Parser::Iterator iter, mat4f& tm)
 
 void DaeParser::ParseInstanceLight (Parser::Iterator iter, Node::LightList& lights)
 {
-  const char* url = get<const char*> (iter, "url");
-  
-  if (!url)
-  {
-    LogError (iter, "No url. Error at parser 'instance_light'");
-    return;
-  }
-  
+  const char* url = get<const char*> (*iter, "url");  
+
   url++; //избавляемся от префисного '#'
-  
+
   Light* light = model.Lights ().Find (url);
-  
+
   if (!light)
-  {
-    LogError (iter, "No light with id='%s' detected", url);
-    return;
-  }
-  
+    raise_parser_exception (*iter, "No light with id='%s' detected", url);
+
     //добавление источнкиа света в коллекцию узла
 
   lights.Insert (*light);
@@ -223,24 +180,15 @@ void DaeParser::ParseInstanceLight (Parser::Iterator iter, Node::LightList& ligh
 
 void DaeParser::ParseInstanceCamera (Parser::Iterator iter, Node::CameraList& cameras)
 {
-  const char* url = get<const char*> (iter, "url");
-  
-  if (!url)
-  {
-    LogError (iter, "No url. Error at parser 'instance_camera'");
-    return;
-  }
-  
+  const char* url = get<const char*> (*iter, "url");
+
   url++; //избавляемся от префисного '#'
-  
+
   Camera* camera = model.Cameras ().Find (url);
   
   if (!camera)
-  {
-    LogError (iter, "No camera with id='%s' detected", url);
-    return;
-  }
-  
+    raise_parser_exception (*iter, "No camera with id='%s' detected", url);
+
     //добавление камеры в коллекцию узла
 
   cameras.Insert (*camera);
@@ -252,24 +200,14 @@ void DaeParser::ParseInstanceCamera (Parser::Iterator iter, Node::CameraList& ca
 
 void DaeParser::ParseInstanceGeometry (Parser::Iterator iter, Node::MeshList& meshes)
 {
-  const char* url = get<const char*> (iter, "url");
-  
-  if (!url)
-  {
-    LogError (iter, "No url. Error at parse 'instance_geometry'");
-    return;
-  }
-  
+  const char* url = get<const char*> (*iter, "url");  
+
   url++; //избавляемся от префисного '#'
-  
+
   Mesh* mesh = model.Meshes ().Find (url);
-  
+
   if (!mesh)
-  {
-      //это может быть не меш
-//    LogError (iter, "No mesh with id='%s' detected", url);
     return;
-  }
 
   InstanceMesh imesh;
 
@@ -277,7 +215,7 @@ void DaeParser::ParseInstanceGeometry (Parser::Iterator iter, Node::MeshList& me
 
     //разбор прикреплённых материалов
   
-  for_each_child (iter, "bind_material", bind (&DaeParser::ParseBindMaterial, this, _1, ref (imesh.MaterialBinds ())));
+  for_each_child (*iter, "bind_material", bind (&DaeParser::ParseBindMaterial, this, _1, ref (imesh.MaterialBinds ())));
   
     //добавление меша в коллекцию узла
     
@@ -290,44 +228,29 @@ void DaeParser::ParseInstanceGeometry (Parser::Iterator iter, Node::MeshList& me
 
 void DaeParser::ParseInstanceController (Parser::Iterator iter, Node::ControllerList& controllers)
 {
-  const char* url = get<const char*> (iter, "url");
-  
-  if (!url)
-  {
-    LogError (iter, "No url. Error at parse 'instance_controller'");
-    return;
-  }
-  
+  const char* url = get<const char*> (*iter, "url");
+
   url++; //избавляемся от префисного '#'
 
   Skin*  skin  = model.Skins ().Find (url);
   Morph* morph = model.Morphs ().Find (url);
 
   if (!skin && !morph)
-  {
-    LogError (iter, "No controller with id='%s' detected", url);
-    return;
-  }
-  
+    raise_parser_exception (*iter, "No controller with id='%s' detected", url);
+
   InstanceController icontroller;
   
   icontroller.SetController (url);
   
     //разбор прикреплённых материалов
     
-  for_each_child (iter, "bind_material", bind (&DaeParser::ParseBindMaterial, this, _1, ref (icontroller.MaterialBinds ())));
+  for_each_child (*iter, "bind_material", bind (&DaeParser::ParseBindMaterial, this, _1, ref (icontroller.MaterialBinds ())));
   
     //разбор корней поиска соединений
     
   for (Parser::NamesakeIterator skeleton_iter=iter->First ("skeleton"); skeleton_iter; ++skeleton_iter)
   {
-    const char* root_id = get<const char*> (skeleton_iter, "#text");
-
-    if (!root_id)
-    {
-      LogError (skeleton_iter, "Error at read 'skeleton' data");
-      return;
-    }
+    const char* root_id = get<const char*> (*skeleton_iter, "#text");
 
     icontroller.InsertJointSearchRoot (root_id);
   }  
@@ -343,39 +266,20 @@ void DaeParser::ParseInstanceController (Parser::Iterator iter, Node::Controller
 
 void DaeParser::ParseBindMaterial (Parser::Iterator iter, MaterialBinds& binds)
 {
-  if (!test (iter, "technique_common"))
-  {
-    LogError (iter, "No 'technique_common' sub-tag");
-    return;
-  }
+  common::ParseNode technique_common_node = get_first_child (*iter, "technique_common");
   
-  for (Parser::NamesakeIterator i=iter->First ("technique_common.instance_material"); i; ++i)
+  for (Parser::NamesakeIterator i=technique_common_node.First ("instance_material"); i; ++i)
   {
-    const char *target = get<const char*> (i, "target"),
-               *symbol = get<const char*> (i, "symbol");
-    
-    if (!target)
-    {
-      LogError (i, "No 'target' attribute");
-      continue;
-    }
-    
-    if (!symbol)
-    {
-      LogError (i, "No 'symbol' attribute");
-      continue;
-    }    
-    
+    const char *target = get<const char*> (*i, "target"),
+               *symbol = get<const char*> (*i, "symbol");
+
     target++; //избавляемся от префисного '#'
-    
+
     Material* material = model.Materials ().Find (target);
     
     if (!material)
-    {
-      LogError (i, "No material with id='%s' detected", target);
-      continue;
-    }
-    
+      raise_parser_exception (*i, "No material with id='%s' detected", target);
+
       //добавляем материал в список присоединённых материалов
 
     binds.SetMaterial (symbol, target);
@@ -383,24 +287,16 @@ void DaeParser::ParseBindMaterial (Parser::Iterator iter, MaterialBinds& binds)
       //разбор текстурных каналов
 
     for (Parser::NamesakeIterator j=i->First ("bind_vertex_input"); j; ++j)
-      if (test (j, "input_semantic", "TEXCOORD"))
+    {
+      const char* input_semantic = get<const char*> (*j, "input_semantic", "");
+      
+      if (*input_semantic && !strcmp (input_semantic, "TEXCOORD"))
       {
-        const char *semantic = get<const char*> (j, "semantic"),
-                   *set      = get<const char*> (j, "input_set");
-                        
-        if (!semantic)
-        {
-          LogError (j, "No 'semantic' attribute");
-          continue;
-        }
-        
-        if (!set)
-        {
-          LogError (j, "No 'input_set' attribute");
-          continue;
-        }
+        const char *semantic = get<const char*> (*j, "semantic"),
+                   *set      = get<const char*> (*j, "input_set");
 
         binds.SetTexcoordChannelName (symbol, semantic, set);
       }
+    }
   }
 }

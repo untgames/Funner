@@ -1,8 +1,8 @@
 Results of collada_import_test:
 Load collada model 'data/ape.dae'
-data/ape.dae(1): warning: not yet implement. Encoding="utf-8"
-data/ape.dae(16376): warning: No targets
-data/ape.dae(16376): warning: No weights
+data/ape.dae(1): warning: not yet implement. Encoding='utf-8'
+data/ape.dae(16376): warning: node 'morph': No targets
+data/ape.dae(16376): warning: node 'morph': No weights
 Converting...
 Save XMesh library '/io/stdout/test.xmesh'
 <?xml version="1.0" encoding="utf-8"?>

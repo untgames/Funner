@@ -1,4 +1,6 @@
 Results of xmesh_loader_test:
+data/test.xmesh(1): warning: not yet implement. Encoding='utf-8'
+data/test.xmesh(65): warning: node 'primitive': Empty primitive
 <?xml version="1.0" encoding="utf-8"?>
 <mesh_library>
   <vertex_streams>
@@ -52,8 +54,8 @@ Results of xmesh_loader_test:
         'vb#1'
       </vertex_buffers>
       <primitives>
-        <primitive type="triangle_list" material="material1" vertex_buffer="0" first="0" count="12"/>
-        <primitive type="triangle_strip" material="material2" vertex_buffer="0" first="1" count="14"/>
+        <primitive type="triangle_list" material="material1" vertex_buffer="0" first="0" count="1"/>
+        <primitive type="triangle_strip" material="material2" vertex_buffer="0" first="1" count="1"/>
       </primitives>
     </mesh>
     <mesh name="mesh2">
@@ -61,8 +63,8 @@ Results of xmesh_loader_test:
         'vb#2'
       </vertex_buffers>
       <primitives>
-        <primitive type="line_list" material="material1" vertex_buffer="0" first="0" count="12"/>
-        <primitive type="line_strip" material="material2" vertex_buffer="0" first="1" count="14"/>
+        <primitive type="line_list" material="material1" vertex_buffer="0" first="0" count="1"/>
+        <primitive type="line_strip" material="material2" vertex_buffer="0" first="1" count="2"/>
       </primitives>
     </mesh>
   </meshes>

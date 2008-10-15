@@ -7,61 +7,32 @@ using namespace media::collada;
     Разбор источника
 */
 
-void DaeParser::ParseFloatArray (Parser::Iterator iter, vector <float> *source)
+void DaeParser::ParseFloatArray (Parser::Iterator iter, vector<float>& source)
 {
-  LogScope scope (iter, *this);
-  
-  size_t data_count = 0, count = 0, stride = 0;
-  
-  if (!CheckedRead (iter, "float_array.count", data_count))
-  {
-    LogError (iter, "Error at read 'float_array.count'");
-    return;
-  }
-  
-  Parser::Iterator accessor_iter = iter->First ("technique_common.accessor");
-  
-  if (!accessor_iter || !CheckedRead (accessor_iter, "count", count) || !CheckedRead (accessor_iter, "stride", stride))
-  {
-    LogError (iter, "Error at read 'technique_common.accessor'");
-    return;    
-  }
-  
+  Parser::Iterator accessor_iter = get_first_child (*iter, "technique_common.accessor");    
+
+  size_t data_count = get<size_t> (*iter, "float_array.count"),
+         count      = get<size_t> (*accessor_iter, "count"),
+         stride     = get<size_t> (*accessor_iter, "stride");   
+
   if (data_count < count * stride)
-  {
-    LogError (accessor_iter, "Wrong count/stride attribute. count * stride > float_array.count. count=%u, stride=%u, "
-              "float_array.count=%u", count, stride, data_count);
-    return;
-  }
+    raise_parser_exception (*accessor_iter, "Wrong count/stride attribute. count * stride > float_array.count. count=%u, stride=%u, "
+    "float_array.count=%u", count, stride, data_count);
 
-  source->resize (data_count);
+  source.resize (data_count);
 
-  if (read_range (iter, "float_array.#text", source->begin (), data_count) != data_count)
-  {
-    LogError (iter, "Error at read 'float_array' items");
-    return;
-  }
+  if (data_count)
+    read (*iter, "float_array.#text", source.begin (), data_count);
 }
 
-void DaeParser::ParseIdrefArray (Parser::Iterator iter, vector <string> *source)
+void DaeParser::ParseIdrefArray (Parser::Iterator iter, vector<string>& source)
 {
-  LogScope scope (iter, *this);
-  
-  size_t data_count = 0;
-  
-  if (!CheckedRead (iter, "IDREF_array.count", data_count))
-  {
-    LogError (iter, "Error at read 'IDREF_array.count'");
-    return;
-  }
-  
-  source->resize (data_count);
+  size_t data_count = get<size_t> (*iter, "IDREF_array.count");  
 
-  if (read_range (iter, "IDREF_array.#text", source->begin (), data_count) != data_count)
-  {
-    LogError (iter, "Error at read 'IDREF_array' items");
-    return;
-  }
+  source.resize (data_count);
+
+  if (data_count)
+    read (*iter, "IDREF_array.#text", source.begin (), data_count);
 }
 
 /*
@@ -70,33 +41,23 @@ void DaeParser::ParseIdrefArray (Parser::Iterator iter, vector <string> *source)
 
 void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
 {
-  const char* base_mesh = get<const char*> (iter, "source");
-  vector <string> targets;
-  vector <float>  weights;
-  int target_source_count = 0, weight_source_count = 0;
+  const char* base_mesh = get<const char*> (*iter, "source");
 
-  if (!base_mesh)
-  {
-    LogError (iter, "No base mesh ('source' property)");
-    return;
-  }
+  vector<string> targets;
+  vector<float>  weights;
 
-  if (!test (iter, "targets"))
-  {
-    LogError (iter, "No 'targets' sub-tag");
-    return;
-  }
+  size_t target_source_count = 0, weight_source_count = 0;
+
+  if (!iter->First ("targets"))
+    raise_parser_exception (*iter, "No 'targets' sub-tag");
 
   base_mesh++; //убираем префиксный '#'
 
   Mesh* mesh = model.Meshes ().Find (base_mesh);
-  
+
   if (!mesh)
-  {
-    LogError (iter, "Incorrect url '%s'. No mesh in library", base_mesh);
-    return;
-  }
-  
+    raise_parser_exception (*iter, "Incorrect url '%s'. No mesh in library", base_mesh);
+
     //создание морфера
 
   Morph morph;
@@ -106,90 +67,78 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
   
     //разбор параметров морфера
    
-  LogScope scope (iter, *this);
+  const char* method = get<const char*> (*iter, "method");
 
-  if (test (iter, "method", "RELATIVE"))
-    morph.SetMethod (MorphMethod_Relative);
-  else
-    morph.SetMethod (MorphMethod_Normalized);
-
-  for (Parser::NamesakeIterator targets_iter=iter->First ("targets")->First ("input"); targets_iter; ++targets_iter)
+  if (!strcmp (method, "RELATIVE"))
   {
-    const char *semantic    = get<const char*> (targets_iter, "semantic"),
-               *source_name = get<const char*> (targets_iter, "source");
+    morph.SetMethod (MorphMethod_Relative);
+  }
+  else
+  {
+    morph.SetMethod (MorphMethod_Normalized);
+  }
 
-    if (!semantic)
-    {
-      LogError (iter, "No 'semantic' in targets input node");
-      return;
-    }
-             
-    if (!source_name)
-    {
-      LogError (iter, "No 'source' in targets input node");
-      return;
-    }
-  
-    source_name++;
+  for (Parser::NamesakeIterator targets_iter=iter->First ("targets.input"); targets_iter; ++targets_iter)
+  {
+    const char *semantic    = get<const char*> (*targets_iter, "semantic"),
+               *source_name = get<const char*> (*targets_iter, "source");
+
+    source_name++; //избавляемся от префиксого '#'
 
     if (!::strcmp (semantic, "MORPH_TARGET"))
     {
       if (target_source_count++)
-      {
-        LogError (iter, "Only one input for 'MORPH_TARGET' allowed");
-        return;
-      }
+        raise_parser_exception (*iter, "Only one input for 'MORPH_TARGET' allowed");
 
-      for (Parser::NamesakeIterator i = iter->First("source"); i; ++i)
-        if (test (i, "id", source_name))
+      for (Parser::NamesakeIterator i = iter->First ("source"); i; ++i)
+      {
+        const char* source_id = get<const char*> (*i, "id", "");
+        
+        if (*source_id && !strcmp (source_id, source_name))
         {
-          ParseIdrefArray (i, &targets);
+          ParseIdrefArray (i, targets);
           break;
         }
+      }
 
       if (targets.empty ())
-        LogWarning (iter, "No targets");
+        iter->Log ().Warning (*iter, "No targets");
     }
     else if (!::strcmp (semantic, "MORPH_WEIGHT"))
     {
       if (weight_source_count++)
-      {
-        LogError (iter, "Only one input for 'MORPH_WEIGHT' allowed");
-        return;
-      }
+        raise_parser_exception (*iter, "Only one input for 'MORPH_WEIGHT' allowed");
 
-      for (Parser::NamesakeIterator i = iter->First("source"); i; ++i)
-        if (test (i, "id", source_name))
+      for (Parser::NamesakeIterator i = iter->First ("source"); i; ++i)
+      {
+        const char* source_id = get<const char*> (*i, "id", "");
+
+        if (*id && !strcmp (source_id, source_name))
         {
-          ParseFloatArray (i, &weights);
+          ParseFloatArray (i, weights);
           break;
         }
+      }
 
       if (weights.empty ())
-        LogWarning (iter, "No weights");
+        iter->Log ().Warning (*iter, "No weights");
     }
   }
 
   if (targets.size () != weights.size ())
-  {
-    LogError (iter, "Different count of targets and weights");
-    return;
-  }
+    raise_parser_exception (*iter, "Different count of targets and weights");
 
   for (size_t i = 0; i < targets.size (); i++)
   {
     Mesh* mesh = model.Meshes ().Find (targets [i].c_str ());
-    
+
     if (!mesh)
-    {
-      LogError (iter, "Incorrect url '%s'. No mesh in library", targets [i].c_str ());
-      return;
-    }
-     
+      raise_parser_exception (*iter, "Incorrect url '%s'. No mesh in library", targets [i].c_str ());
+
       //создание цели
-    
+
     MorphTarget target;
-    
+
     target.SetMesh   (targets [i].c_str ());
     target.SetWeight (weights [i]);
 

@@ -10,6 +10,7 @@
 #include <xtl/function.h>
 #include <xtl/iterator.h>
 
+#include <common/log.h>
 #include <common/xml_writer.h>
 #include <common/parser.h>
 #include <common/component.h>

@@ -5,7 +5,7 @@ TARGETS := MEDIA.RFX.SOURCES MEDIA.RFX.XMTL.SOURCES MEDIA.RFX.TESTS MEDIA.RFX.XM
 
 #Öåëü ¹1 - sources
 MEDIA.RFX.SOURCES.TYPE             := static-lib
-MEDIA.RFX.SOURCES.NAME             := media.rfx
+MEDIA.RFX.SOURCES.NAME             := funner.media.rfx
 MEDIA.RFX.SOURCES.INCLUDE_DIRS     :=
 MEDIA.RFX.SOURCES.SOURCE_DIRS      := sources/core
 MEDIA.RFX.SOURCES.LIB_DIRS         :=  
@@ -16,7 +16,7 @@ MEDIA.RFX.SOURCES.IMPORTS          := compile.static.mak ../shared/compile.stati
 
 #Öåëü ¹2 - XMTL serializer sources
 MEDIA.RFX.XMTL.SOURCES.TYPE             := static-lib
-MEDIA.RFX.XMTL.SOURCES.NAME             := media.rfx.xmtl
+MEDIA.RFX.XMTL.SOURCES.NAME             := funner.media.rfx.xmtl
 MEDIA.RFX.XMTL.SOURCES.INCLUDE_DIRS     :=
 MEDIA.RFX.XMTL.SOURCES.SOURCE_DIRS      := sources/xmtl
 MEDIA.RFX.XMTL.SOURCES.LIB_DIRS         :=  

@@ -6,15 +6,13 @@
 
 void DaeParser::ParseLibraryControllers (Parser::Iterator iter)
 {
-  if (!test (iter, "controller"))
+  if (!iter->First ("controller"))
   {
-    parse_log.Warning (iter, "Incorrect 'library_controllers' node. Must be at least one 'controller' sub-tag");
+    iter->Log ().Warning (*iter, "Empty 'library_controllers' node. Must be at least one 'controller' sub-tag");
     return;
   }
   
-  LogScope scope (iter, *this);
-
-  for_each_child (iter, "controller", bind (&DaeParser::ParseController, this, _1));
+  for_each_child (*iter, "controller", bind (&DaeParser::ParseController, this, _1));
 }
 
 /*
@@ -23,28 +21,25 @@ void DaeParser::ParseLibraryControllers (Parser::Iterator iter)
 
 void DaeParser::ParseController (Parser::Iterator iter)
 {
-  const char* id = get<const char*> (iter, "id");
-  
-  LogScope scope (iter, *this);
-  
-  if (!id)
-  {
-    LogError (iter, "No id");
-    return;
-  }  
+  const char* id = get<const char*> (*iter, "id");
 
   Parser::Iterator skin_iter  = iter->First ("skin"),
                    morph_iter = iter->First ("morph");
   
   if (skin_iter && morph_iter)
-    LogError (skin_iter->NextNamesake (), "Only one 'skin' or 'morph' sub-tag allowed");          
+  {
+    raise_parser_exception (skin_iter->NextNamesake (), "Only one 'skin' or 'morph' sub-tag allowed");          
+  }
+
   if (!skin_iter && !morph_iter)
-    LogError (skin_iter->NextNamesake (), "Must be at least one 'skin' or 'morph' sub-tag");          
+  {
+    raise_parser_exception (skin_iter->NextNamesake (), "Must be at least one 'skin' or 'morph' sub-tag");          
+  }
 
   if (skin_iter)
   { 
     if (skin_iter->NextNamesake ())
-      LogError (skin_iter->NextNamesake (), "Only one 'skin' sub-tag allowed");          
+      raise_parser_exception (skin_iter->NextNamesake (), "Only one 'skin' sub-tag allowed");          
 
     ParseSkin (skin_iter, id);
   }
@@ -52,7 +47,7 @@ void DaeParser::ParseController (Parser::Iterator iter)
   if (morph_iter)
   {
     if (morph_iter->NextNamesake ())
-      LogError (morph_iter->NextNamesake (), "Only one 'morph' sub-tag allowed");          
+      raise_parser_exception (morph_iter->NextNamesake (), "Only one 'morph' sub-tag allowed");
 
     ParseMorph (morph_iter, id);
   }

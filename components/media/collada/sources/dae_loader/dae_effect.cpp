@@ -6,67 +6,50 @@
 
 void DaeParser::ParseLibraryEffects (Parser::Iterator iter)
 {
-  if (!test (iter, "effect"))
+  if (!iter->First ("effect"))
   {
-    LogError (iter, "Incorrect 'library_effects' node. Must be at least one 'effect' sub-tag");
+    iter->Log ().Warning (*iter, "Empty 'library_effects' node. Must be at least one 'effect' sub-tag");
     return;
   }
   
-  LogScope scope (iter, *this);
-
-  for_each_child (iter, "effect", xtl::bind (&DaeParser::ParseEffect, this, _1));
+  for_each_child (*iter, "effect", xtl::bind (&DaeParser::ParseEffect, this, _1));
 }
 
 void DaeParser::ParseEffect (Parser::Iterator iter)
 {
-  LogScope scope (iter, *this);
+  const char* id = get<const char*> (*iter, "id");
 
-  const char* id = get<const char*> (iter, "id");
-
-  if (!id)
-  {
-    LogError (iter, "Incorrect 'id' attribute");
-    return;
-  }
-  
     //создание эффекта
-    
+
   Effect effect;
-  
+
   effect.SetId (id);
 
     //разбор профилей эффекта
 
-  parse_if (iter, "profile_COMMON", xtl::bind (&DaeParser::ParseEffectProfileCommon, this, _1, ref (effect)));
-  
+  common::ParseNode profile_common = iter->First ("profile_COMMON");
+
+  if (profile_common)
+    ParseEffectProfileCommon (profile_common, effect);
+
     //добавление эффекта в библиотеку
-    
+
   model.Effects ().Insert (id, effect);
 }
 
 void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect& effect)
 {
-  if (!test (profile_iter, "technique"))
-  {
-    LogError (profile_iter, "Incorrect 'profile_COMMON' tag. Node must have 'technique' sub-tag");
-    return;
-  }
+  if (!profile_iter->First ("technique"))
+    raise_parser_exception (*profile_iter, "Incorrect 'profile_COMMON' tag. Node must have 'technique' sub-tag");
 
     //чтение техники
 
-  Parser::Iterator technique_iter = profile_iter->First ("technique");    
-  
-  LogScope technique_scope (technique_iter, *this, "profile_COMMON");
-  
-    //чтение экстра параметров
-    
-  if (Parser::Iterator bump_texture_iter = technique_iter->First ("extra.technique.bump.texture"))
-  {
-    Texture texture;
+  Parser::Iterator technique_iter = profile_iter->First ("technique");
 
-    if (ParseTexture (bump_texture_iter, profile_iter, texture))
-      effect.SetTexture (TextureMap_Bump, texture);
-  }
+    //чтение экстра параметров
+
+  if (Parser::Iterator bump_texture_iter = technique_iter->First ("extra.technique.bump.texture"))
+    ParseTexture (bump_texture_iter, profile_iter, effect, TextureMap_Bump);
 
     //чтение типа шейдера
 
@@ -82,18 +65,15 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
   size_t type_index = 0;
 
   for (; type_index<shader_types_count; type_index++)
-    if (test (technique_iter, shader_types [type_index].string))
+    if (technique_iter->First (shader_types [type_index].string))
     {
       effect.SetShaderType (shader_types [type_index].value);
       technique_iter = technique_iter->First (shader_types [type_index].string);
       break;
     }
-    
+
   if (type_index == shader_types_count)
-  {
-    LogError (technique_iter, "Uncorrect 'technique' tag, no expected sub-tag (one of 'constant', 'lambert', 'phong' or 'blinn')");
-    return;
-  }
+    raise_parser_exception (*technique_iter, "Uncorrect 'technique' tag, no expected sub-tag (one of 'constant', 'lambert', 'phong' or 'blinn')");
   
     //чтение базовых параметров техники
     
@@ -108,10 +88,8 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
 
   for (size_t i=0; i<shader_params_count; i++)
   {
-    float value = 0.0f;
-    
-    if (CheckedRead (technique_iter, shader_params [i].string, value))
-      effect.SetParam (shader_params [i].value, value);    
+    if (common::ParseNode param_node = technique_iter->First (shader_params [i].string))
+      effect.SetParam (shader_params [i].value, get<float> (param_node, ""));
   }
 
     //чтение текстурных карт
@@ -134,12 +112,11 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
     if (!texmap_iter)
       continue;
 
-    bool  has_color = false;
-    vec4f color;
+    bool has_color = false;
 
-    if (CheckedRead (texmap_iter, "color.#text", color))
+    if (common::ParseNode param_node = texmap_iter->First ("color.#text"))
     {
-      effect.SetMapColor (texmaps [i].value, color);
+      effect.SetMapColor (texmaps [i].value, get<vec4f> (param_node, ""));
       has_color = true;
     }
     
@@ -148,91 +125,61 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
     if (texture_iter)
     {
       if (has_color)
-      {
-        LogError (texture_iter, "Texture map must have color or texture. Texture will be ignored");
-        continue;
-      }
-      
-      Texture texture;
-      
-      if (ParseTexture (texture_iter, profile_iter, texture))
-        effect.SetTexture (texmaps [i].value, texture);      
+        raise_parser_exception (*texture_iter, "Texture map must have color or texture");
+
+      ParseTexture (texture_iter, profile_iter, effect, texmaps [i].value);
     }      
   }
 }
 
-bool DaeParser::ParseTexture (Parser::Iterator iter, Parser::Iterator profile_iter, Texture& texture)
+void DaeParser::ParseTexture (Parser::Iterator iter, Parser::Iterator profile_iter, Effect& effect, TextureMap map)
 {
-  const char *sampler_name  = get<const char*> (iter, "texture"),
-             *texcoord_name = get<const char*> (iter, "texcoord");
+  Texture texture;
+
+  const char *sampler_name  = get<const char*> (*iter, "texture", ""),
+             *texcoord_name = get<const char*> (*iter, "texcoord", "");
              
-  LogScope scope (iter, *this, sampler_name);
-             
-  if (!sampler_name)
-  {
-    LogError (iter, "Incorrect 'texture' sub-tag");
-    return false;    
-  }
-  
+  if (!*sampler_name)
+    raise_parser_exception (*iter, "Node 'texture' not found");
+
   Parser::NamesakeIterator param_iter = profile_iter->First ("newparam");
-  
+
   const char* surface_name = 0;
-  
+
   for (; param_iter; ++param_iter)
-    if (test (param_iter, "sid", sampler_name))
+    if (!strcmp (get<const char*> (*param_iter, "sid", ""), sampler_name))
     {
-      surface_name = get<const char*> (param_iter, "sampler2D.source.#text");
-      
-      if (!surface_name)
-      {
-        LogError (param_iter, "Incorrect 'sampler2D.source' sub-tag");
-        return false;
-      }
+      surface_name = get<const char*> (*param_iter, "sampler2D.source.#text");
 
       break;
     }
-    
+
   if (!param_iter)
-  {
-    LogError (profile_iter, "There is no sampler2D with sid '%s'", sampler_name);
-    return false;
-  }
-    
+    raise_parser_exception (*profile_iter, "There is no sampler2D with sid '%s'", sampler_name);
+
   param_iter = profile_iter->First ("newparam");    
   
   const char* image_name = 0;
   
   for (; param_iter; ++param_iter)
-    if (test (param_iter, "sid", surface_name))
+    if (!strcmp (get<const char*> (*param_iter, "sid", ""), surface_name))
     {
-      image_name = get<const char*> (param_iter, "surface.init_from.#text");
-      
-      if (!image_name)
-      {
-        LogError (param_iter, "Incorrect 'surface.init_from' sub-tag");
-        return false;
-      }
-
+      image_name = get<const char*> (*param_iter, "surface.init_from.#text", (const char*)0);
       break;
     }  
-      
+
   if (!image_name)
-  {
-    LogError (profile_iter, "There is no surface with sid '%s'", surface_name);
-    return false;
-  }
-  
+    raise_parser_exception (*profile_iter, "There is no surface with sid '%s'", surface_name);
+
   texture.SetImage (image_name);
              
-  if (texcoord_name)
+  if (*texcoord_name)
     texture.SetTexcoordChannel (texcoord_name);             
-             
-  float amount = 1.0f;
-             
-  if (CheckedRead (iter, "extra.technique.amount.#text", amount))
-    texture.SetAmount (amount);
-    
+
+  if (common::ParseNode param_node = iter->First ("extra.technique.amount.#text"))
+    texture.SetAmount (get<float> (param_node, ""));
+
     //добавить чтение экстра-полей
     
-  return true;
+  effect.SetTexture (map, texture);
 }

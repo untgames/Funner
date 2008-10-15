@@ -1,6 +1,6 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS          := media.collada.dae
+export.LIBS          := funner.media.collada.dae
 export.LINK_INCLUDES := DaeLoader
-export.IMPORTS       := link.static.mak
+export.IMPORTS       := link.static.mak ../../common/xml.link.static.mak

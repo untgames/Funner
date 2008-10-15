@@ -1,6 +1,6 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS             := media.sound.default_decoders extern.vorbisfile_static extern.vorbis_static extern.ogg
-export.LINK_INCLUDES    := WavLoader OggLoader
-export.IMPORTS          := link.static.mak
+export.LIBS          := funner.media.sound.default_decoders funner.extern.vorbisfile_static funner.extern.vorbis_static funner.extern.ogg
+export.LINK_INCLUDES := WavLoader OggLoader
+export.IMPORTS       := link.static.mak

@@ -7,8 +7,12 @@
 #include <stl/vector>
 #include <stl/string>
 
-#include <xtl/functional>
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/ref.h>
+#include <xtl/reference_counter.h>
 
 #include <common/parser.h>
 #include <common/hash.h>
@@ -46,29 +50,9 @@ template <class T> struct String2Value
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Утилита, позволяющая отслеживать стек вызовов парсера
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class LogScope
-{
-  public:
-    LogScope  (Parser::Node* node, DaeParser& parser, const char* id = 0);
-    ~LogScope ();
-
-    Parser::Node* Node () const { return node; }
-    LogScope*     Prev () const { return prev; }
-    const char*   Id   () const { return id; }
-  
-  private:
-    DaeParser&    parser;
-    Parser::Node* node;
-    LogScope*     prev;
-    const char*   id;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Массив дублированния индексов вершин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class VertexIndexMap
+class VertexIndexMap: public xtl::reference_counter
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,6 +73,8 @@ class VertexIndexMap
     IndexArray indices;
 };
 
+typedef xtl::intrusive_ptr<VertexIndexMap> VertexIndexMapPtr;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузчик коллады
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,13 +85,7 @@ class DaeParser
   public:    
     DaeParser  (const char* file_name, Model& model, const LogHandler& log);
     ~DaeParser ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Протоколирование
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LogError   (Parser::Node* node, const char* format, ...);
-    void LogWarning (Parser::Node* node, const char* format, ...);    
-    
+
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Печать ошибок в протокол
@@ -115,7 +95,7 @@ class DaeParser
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание или поиск карт вершинных индексов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    VertexIndexMap* GetVertexIndicesMap  (const char* mesh_id, size_t surface_index);
+    VertexIndexMapPtr GetVertexIndicesMap  (const char* mesh_id, size_t surface_index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Разбор отдельных элементов
@@ -132,12 +112,13 @@ class DaeParser
     void ParseImage               (Parser::Iterator);
     void ParseEffect              (Parser::Iterator);
     void ParseEffectProfileCommon (Parser::Iterator, Effect& effect);
-    bool ParseTexture             (Parser::Iterator, Parser::Iterator profile_iter, Texture& texture);
+    void ParseTexture             (Parser::Iterator, Parser::Iterator profile_iter, Effect& effect, TextureMap map);
     void ParseMaterial            (Parser::Iterator);
     void ParseGeometry            (Parser::Iterator);
     void ParseMesh                (Parser::Iterator, Mesh& mesh);
     void ParseMeshSource          (Parser::Iterator, MeshSourceMap& sources);
     void ParseSurfaceInput        (Parser::Iterator, Parser::Iterator mesh_iter, MeshSourceMap& sources, MeshInputBuilder& inputs);
+    void ParsePolygonSurface      (Parser::Iterator);
     void ParseSurface             (Parser::Iterator, Parser::Iterator mesh_iter, Mesh& mesh, PrimitiveType type, MeshSourceMap& sources);
     void ParseSurfaceBuffers      (Parser::Iterator, Parser::Iterator surface_iter, SurfaceInfo& info);
     void ParseController          (Parser::Iterator);
@@ -147,47 +128,23 @@ class DaeParser
     void ParseCamera              (Parser::Iterator);
     void ParseVisualScene         (Parser::Iterator);
     void ParseNode                (Parser::Iterator, Node& parent);
-    bool ParseTransform           (Parser::Iterator, math::mat4f& tm);
+    void ParseTransform           (Parser::Iterator, math::mat4f& tm);
     void ParseInstanceLight       (Parser::Iterator, Node::LightList& lights);
     void ParseInstanceCamera      (Parser::Iterator, Node::CameraList& cameras);
     void ParseInstanceGeometry    (Parser::Iterator, Node::MeshList& meshes);
     void ParseInstanceController  (Parser::Iterator, Node::ControllerList& controllers);
     void ParseBindMaterial        (Parser::Iterator iter, MaterialBinds& binds);
-    void ParseIdrefArray          (Parser::Iterator iter, stl::vector <stl::string> *source);
-    void ParseNameArray           (Parser::Iterator iter, stl::vector <stl::string> *source);
-    void ParseFloatArray          (Parser::Iterator iter, stl::vector <float> *source);
-    void ParseFloatArray          (Parser::Iterator iter, stl::vector <math::mat4f> *source);
+    void ParseIdrefArray          (Parser::Iterator iter, stl::vector<stl::string>& source);
+    void ParseNameArray           (Parser::Iterator iter, stl::vector<stl::string>& source);
+    void ParseFloatArray          (Parser::Iterator iter, stl::vector<float>& source);
+    void ParseFloatArray          (Parser::Iterator iter, stl::vector<math::mat4f>& source);
 
   private:
-    template <class T> bool CheckedRead (Parser::Node* node, const char* tag, T& value)
-    {
-      if (node && tag)
-        node = node->First (tag);        
-
-      if (!node)
-        return false;
-                    
-      if (!read (node, 0, value))
-      {
-        const char* str_value = get<const char*> (node, 0);
-        
-        LogScope scope (node, *this);
-        
-        LogError (node, "Incorrect value '%s'", str_value ? str_value : "UNREADABLE");
-        return false;
-      }
-      
-      return true;
-    }
-    
-  private:
-    typedef stl::hash_map<stl::hash_key<const char*>, VertexIndexMap*> VertexIndexMaps;
+    typedef stl::hash_map<stl::hash_key<const char*>, VertexIndexMapPtr> VertexIndexMaps;
 
   private:
     Model&          model;             //загружаемая модель
-    ParseLog        parse_log;         //протокол парсера
     Parser          parser;            //парсер
-    LogScope*       current_scope;     //текущий блок разбора
     VertexIndexMaps vertex_index_maps; //карты вершинных индексов
 };
 

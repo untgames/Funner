@@ -14,8 +14,8 @@ class XmlMaterialLibraryLoader
 {
   private:
     MaterialLibrary& material_library; //библиотека материалов
-    ParseLog         log;              //протокол ошибок загрузки
     Parser           parser;           //парсер
+    ParseLog         log;              //протокол ошибок загрузки    
 
   private:
     /*
@@ -32,23 +32,23 @@ class XmlMaterialLibraryLoader
     T GetEnumValue (Parser::Iterator node_iter, const char* attribute, size_t count, const Name2Value<T>* map, const T& default_value)
     {
       Parser::Iterator attr_iter = node_iter->First (attribute);
-      
+
       if (!attr_iter)
       {
-        log.Error (node_iter, "No attribute '%s' found");
+        log.Error (*node_iter, "Attribute '%s' not found");
         return default_value;
       }
-      
-      const char* value = get<const char*> (log, attr_iter, 0);
-      
-      if (!value)
+
+      const char* value = get<const char*> (*attr_iter, "", "");
+
+      if (!*value)
         return default_value;
 
       for (size_t i=0; i<count; i++)
         if (!::strcmp (map [i].string, value))
           return map [i].value;
           
-      log.Error (attr_iter, "Wrong value '%s'", value);
+      log.Error (*attr_iter, "Wrong value '%s'", value);
 
       return default_value;
     }
@@ -78,19 +78,19 @@ class XmlMaterialLibraryLoader
       Texmap& texmap = material.Map (map_type);
       
         //чтение веса и состояния карты
-        
-      material.SetMapState  (map_type, get<int> (log, map_iter, "enable", material.MapState (map_type) != 0) ? MapState_Enabled : MapState_Disabled);
-      material.SetMapWeight (map_type, get<float> (log, map_iter, "weight", material.MapWeight (map_type)));
-      
+
+      material.SetMapState  (map_type, get<int> (*map_iter, "enable", material.MapState (map_type) != 0) ? MapState_Enabled : MapState_Disabled);
+      material.SetMapWeight (map_type, get<float> (*map_iter, "weight", material.MapWeight (map_type)));
+
         //чтение имени картинки
         
-      const char* image_name = get<const char*> (log, map_iter, "image");
-      
-      if (image_name)
+      const char* image_name = get<const char*> (*map_iter, "image", "");
+
+      if (*image_name)
         texmap.SetImage (image_name);
-      
+
         //чтение фильтров
-        
+
       static const Name2Value<TexmapFilter> filter_map [] = {
         {"min_filter", TexmapFilter_Min},
         {"mag_filter", TexmapFilter_Mag},
@@ -144,11 +144,11 @@ class XmlMaterialLibraryLoader
         
           //чтение источника текстурных координат
           
-        const char* source = get<const char*> (log, iter, "source");
+        const char* source = get<const char*> (*iter, "source", "");
         
-        if (!source)
+        if (!*source)
         {
-          log.Error (iter, "No attribute 'source' found");
+          log.Error (*iter, "No attribute 'source' found");
           continue;
         }
         
@@ -157,16 +157,16 @@ class XmlMaterialLibraryLoader
         else
         {
           int source_channel = -1;
-          
+
           xtl::io::token_iterator<const char*> token_iter (&source, &source + 1);
-          
+
           if (read (token_iter, source_channel))
           {
             texmap.SetSource (texcoord, source_channel);
           }
           else
           {
-            log.Error (iter, "Error at read 'source' value='%s'", source);
+            log.Error (*iter, "Error at read 'source' value='%s'", source);
           }
         }
       }
@@ -205,13 +205,13 @@ class XmlMaterialLibraryLoader
       static const size_t pin_name_map_size = sizeof (pin_name_map) / sizeof (*pin_name_map);
       
       for (size_t i=0; i<pin_name_map_size; i++)
-        material->SetPin (pin_name_map [i].value, get<size_t> (log, profile_iter, pin_name_map [i].string,
+        material->SetPin (pin_name_map [i].value, get<size_t> (*profile_iter, pin_name_map [i].string,
                           material->IsEnabled (pin_name_map [i].value)) ? true : false);                                             
       
         //чтение вещественных параметров
         
-      material->SetShininess    (get<float> (log, profile_iter, "shininess", material->Shininess ()));
-      material->SetTransparency (get<float> (log, profile_iter, "transparency", material->Transparency ()));
+      material->SetShininess    (get<float> (*profile_iter, "shininess", material->Shininess ()));
+      material->SetTransparency (get<float> (*profile_iter, "transparency", material->Transparency ()));
       
         //чтение параметров смешивания
         
@@ -262,7 +262,7 @@ class XmlMaterialLibraryLoader
       
       material->SetAlphaTestMode      (GetEnumValue (profile_iter, "alpha_test_mode", compare_mode_map_size, compare_mode_map,
                                        material->AlphaTestMode ()));
-      material->SetAlphaTestReference (get<float> (log, profile_iter, "alpha_test_ref", material->AlphaTestReference ()));
+      material->SetAlphaTestReference (get<float> (*profile_iter, "alpha_test_ref", material->AlphaTestReference ()));
       
         //чтение цветов
         
@@ -274,12 +274,12 @@ class XmlMaterialLibraryLoader
       };
       
       for (size_t i=0; i<CommonMaterialColor_Num; i++)
-        material->SetColor (color_map [i].value, get<math::vec3f> (log, profile_iter, color_map [i].string,
+        material->SetColor (color_map [i].value, get<math::vec3f> (*profile_iter, color_map [i].string,
                             material->Color (color_map [i].value)));
                             
         //чтение карт
       
-      for_each_child (profile_iter, "map", xtl::bind (&XmlMaterialLibraryLoader::ParseCommonMap, this, _1, xtl::ref (*material)));
+      for_each_child (*profile_iter, "map", xtl::bind (&XmlMaterialLibraryLoader::ParseCommonMap, this, _1, xtl::ref (*material)));
       
       return material;
     }
@@ -296,7 +296,7 @@ class XmlMaterialLibraryLoader
       
         //чтение имени базового изображения
       
-      material->SetImage (get<const char*> (log, profile_iter, "image", material->Image ()));
+      material->SetImage (get<const char*> (*profile_iter, "image", material->Image ()));
 
         //чтение режима смешивания цветов
 
@@ -314,13 +314,15 @@ class XmlMaterialLibraryLoader
       
         //чтение параметров тайлинга
         
-      bool tiling = get<bool> (profile_iter, "tiling", material->IsTiled ());
+      bool tiling = false;
+
+      try_read (*profile_iter, "tiling", tiling);
 
       if (tiling)
       {
         material->SetTiling   (true);
-        material->SetTileSize (get<size_t> (log, profile_iter, "tile_width", material->TileWidth ()),
-                               get<size_t> (log, profile_iter, "tile_height", material->TileHeight ()));
+        material->SetTileSize (get<size_t> (*profile_iter, "tile_width", material->TileWidth ()),
+                               get<size_t> (*profile_iter, "tile_height", material->TileHeight ()));
       }
                         
       return material;
@@ -340,7 +342,7 @@ class XmlMaterialLibraryLoader
         
       for (Parser::NamesakeIterator pass_iter=profile_iter->First ("pass"); pass_iter; ++pass_iter)
       {
-        const char* material_id = get<const char*> (log, pass_iter, "material");
+        const char* material_id = get<const char*> (*pass_iter, "material");
         
         if (!material_id)
           continue;
@@ -349,13 +351,13 @@ class XmlMaterialLibraryLoader
         
         if (!sub_material)
         {
-          log.Error (pass_iter, "Material '%s' not found", material_id);
+          log.Error (*pass_iter, "Material '%s' not found", material_id);
           continue;
         }
         
         size_t pass_index = material->AddPass (sub_material);
         
-        material->SetPassState (pass_index, get<int> (log, pass_iter, "enable", 1) ? PassState_Enabled : PassState_Disabled);
+        material->SetPassState (pass_index, get<int> (*pass_iter, "enable", 1) ? PassState_Enabled : PassState_Disabled);
       }
       
       return material;
@@ -367,25 +369,19 @@ class XmlMaterialLibraryLoader
 
     void ParseMaterial (Parser::Iterator mtl_iter)
     {
-      const char* id = get<const char*> (mtl_iter, "id");
-      
-      if (!id)
-      {
-        log.Error (mtl_iter, "No 'id' attribute found");
-        return;
-      }
-       
+      const char* id = get<const char*> (*mtl_iter, "id");
+
         //создание материала
-        
+
       Material::Pointer material;
       Parser::Iterator  profile_iter;
-      
+
       if      (profile_iter = mtl_iter->First ("common_profile"))    material = ParseCommonMaterial (profile_iter);
       else if (profile_iter = mtl_iter->First ("multipass_profile")) material = ParseMultiPassMaterial (profile_iter);
       else if (profile_iter = mtl_iter->First ("sprite_profile"))    material = ParseSpriteMaterial (profile_iter);
       else
       {
-        log.Error (mtl_iter, "Unknown profile at load material '%s'", id);
+        log.Error (*mtl_iter, "Unknown profile at load material '%s'", id);
         return;
       }
       
@@ -394,14 +390,16 @@ class XmlMaterialLibraryLoader
 
         //чтение имени материала
 
-      const char* name = get<const char*> (mtl_iter, "name");
+      const char* name = get<const char*> (*mtl_iter, "name", "");
 
-      if (name)
+      if (*name)
         material->Rename (name);
 
         //чтение группы сортировки
 
-      int sort_group = get<int> (mtl_iter, "sort_group", material->SortGroup ());
+      int sort_group = material->SortGroup ();
+
+      try_read (*mtl_iter, "sort_group", sort_group);
 
       material->SetSortGroup (sort_group);
 
@@ -416,28 +414,16 @@ class XmlMaterialLibraryLoader
     
     void ParseInstanceMaterial (Parser::Iterator mtl_iter)
     {
-      const char *id     = get<const char*> (mtl_iter, "id"),
-                 *source = get<const char*> (mtl_iter, "source");
-      
-      if (!id)
-      {
-        log.Error (mtl_iter, "No 'id' attribute");
-        return;
-      }
-      
-      if (!source)
-      {
-        log.Error (mtl_iter, "No 'source' attribute");
-        return;
-      }
-      
+      const char *id     = get<const char*> (*mtl_iter, "id"),
+                 *source = get<const char*> (*mtl_iter, "source");
+
       Material::Pointer material_ptr = material_library.Find (source);
       
       if (!material_ptr)
       {
-        log.Error (mtl_iter, "No material with name '%s' found", source);
+        log.Error (*mtl_iter, "No material with name '%s' found", source);
       }
-      
+
       material_library.Attach (id, material_ptr);
     }
   
@@ -447,26 +433,20 @@ class XmlMaterialLibraryLoader
     
     void LoadLibrary (Parser::Iterator library_iter)
     {        
-      for_each_child (library_iter, "material", xtl::bind (&XmlMaterialLibraryLoader::ParseMaterial, this, _1));
-      for_each_child (library_iter, "instance_material", xtl::bind (&XmlMaterialLibraryLoader::ParseInstanceMaterial, this, _1));
+      for_each_child (*library_iter, "material", xtl::bind (&XmlMaterialLibraryLoader::ParseMaterial, this, _1));
+      for_each_child (*library_iter, "instance_material", xtl::bind (&XmlMaterialLibraryLoader::ParseInstanceMaterial, this, _1));
     }
 
   public:
     XmlMaterialLibraryLoader (const char* file_name, MaterialLibrary& in_library, const MaterialLibrary::LogHandler& log_handler)
-      : material_library (in_library), parser (file_name, "xml")
+      : material_library (in_library),
+        parser (file_name, "xml"),
+        log (parser.Log ())
     {
-        //загрузка библиотеки
-      
-      Parser::Iterator library_iter = parser.Root ()->First ("material_library");
-      
-      if (!library_iter)
-      {
-        log.Error (parser.Root (), "No 'material_library' tag found");
-        return;
-      }
+        //загрузка библиотек
+        
+      for_each_child (parser.Root (), "material_library", xtl::bind (&XmlMaterialLibraryLoader::LoadLibrary, this, _1));
 
-      LoadLibrary (library_iter);
-      
         //вывод протокола загрузки
 
       for (size_t i=0, count=log.MessagesCount (); i<count; i++)

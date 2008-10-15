@@ -1,6 +1,6 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS             := media.image
+export.LIBS             := funner.media.image
 export.LINK_INCLUDES    := DevIL
 export.IMPORTS          := ../../common/link.static.mak ../../../extern/devil/link.static.mak

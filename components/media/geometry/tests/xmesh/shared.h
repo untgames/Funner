@@ -1,9 +1,14 @@
 #ifndef MEDIALIB_GEOMETRY_XMESH_TESTS_HEADER
 #define MEDIALIB_GEOMETRY_XMESH_TESTS_HEADER
 
-#include <stdio.h>
+#include <cstdio>
 #include <exception>
+
+#include <xtl/function.h>
+
 #include <media/mesh.h>
+
+#include <common/log.h>
 
 using namespace media::geometry;
 using namespace media;

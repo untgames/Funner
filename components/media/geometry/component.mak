@@ -5,7 +5,7 @@ TARGETS := MEDIA.GEOMETRY.SOURCES MEDIA.GEOMETRY.XMESH MEDIA.GEOMETRY.TESTS MEDI
 
 #Öåëü ¹1 - sources
 MEDIA.GEOMETRY.SOURCES.TYPE             := static-lib
-MEDIA.GEOMETRY.SOURCES.NAME             := media.geometry
+MEDIA.GEOMETRY.SOURCES.NAME             := funner.media.geometry
 MEDIA.GEOMETRY.SOURCES.INCLUDE_DIRS     :=
 MEDIA.GEOMETRY.SOURCES.SOURCE_DIRS      := sources/core
 MEDIA.GEOMETRY.SOURCES.LIB_DIRS         :=
@@ -16,7 +16,7 @@ MEDIA.GEOMETRY.SOURCES.IMPORTS          := compile.static.mak ../shared/compile.
 
 #Öåëü ¹2 - xmesh serializer sources
 MEDIA.GEOMETRY.XMESH.TYPE             := static-lib
-MEDIA.GEOMETRY.XMESH.NAME             := media.geometry.xmesh
+MEDIA.GEOMETRY.XMESH.NAME             := funner.media.geometry.xmesh
 MEDIA.GEOMETRY.XMESH.INCLUDE_DIRS     :=
 MEDIA.GEOMETRY.XMESH.SOURCE_DIRS      := sources/xmesh
 MEDIA.GEOMETRY.XMESH.LIB_DIRS         :=
