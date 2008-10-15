@@ -5,7 +5,7 @@ TARGETS := TOOLS.UI.CORE.SOURCES TOOLS.UI.CORE.TESTS
 
 #Öåëü ¹1 - Tools UI core sources
 TOOLS.UI.CORE.SOURCES.TYPE             := static-lib
-TOOLS.UI.CORE.SOURCES.NAME             := tools.ui.core
+TOOLS.UI.CORE.SOURCES.NAME             := funner.tools.ui.core
 TOOLS.UI.CORE.SOURCES.INCLUDE_DIRS     := 
 TOOLS.UI.CORE.SOURCES.SOURCE_DIRS      := sources
 TOOLS.UI.CORE.SOURCES.LIB_DIRS         :=  

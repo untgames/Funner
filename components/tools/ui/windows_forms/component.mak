@@ -5,7 +5,7 @@ TARGETS := TOOLS.UI.WINDOWS_FORMS.SOURCES TOOLS.UI.WINDOWS_FORMS.TESTS
 
 #Öåëü ¹1 - Windows forms window system unmanaged sources
 TOOLS.UI.WINDOWS_FORMS.SOURCES.TYPE             := static-lib
-TOOLS.UI.WINDOWS_FORMS.SOURCES.NAME             := tools.ui.windows_forms
+TOOLS.UI.WINDOWS_FORMS.SOURCES.NAME             := funner.tools.ui.windows_forms
 TOOLS.UI.WINDOWS_FORMS.SOURCES.INCLUDE_DIRS     := 
 TOOLS.UI.WINDOWS_FORMS.SOURCES.SOURCE_DIRS      := sources
 TOOLS.UI.WINDOWS_FORMS.SOURCES.LIB_DIRS         :=

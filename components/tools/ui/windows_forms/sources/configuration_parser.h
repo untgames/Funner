@@ -20,7 +20,6 @@ class ConfigurationParser
 
   private:
     WindowSystem&    window_system; //оконная система
-    common::ParseLog parse_log;     //протокол разбора
     common::Parser   parser;        //парсер
     size_t           next_uid;      //следующий номер уникального идентификатора
 };
