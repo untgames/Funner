@@ -242,7 +242,10 @@ struct TestApplication::Impl
       }        
 
       if (window.get () && !window->IsClosed ())
-        window->Invalidate ();
+      {
+        OnRedraw ();
+//        window->Invalidate ();
+      }
     }
     catch (std::exception& exception)
     {
@@ -262,7 +265,7 @@ struct TestApplication::Impl
     
       if (clock () - last_fps > CLK_TCK)
       {
-        printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
+//        printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
 
         last_fps     = clock ();
         frames_count = 0;

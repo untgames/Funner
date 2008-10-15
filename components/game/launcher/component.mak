@@ -9,7 +9,7 @@ GAME.LAUNCHER.SOURCES.NAME          := game-launcher
 GAME.LAUNCHER.SOURCES.INCLUDE_DIRS  :=
 GAME.LAUNCHER.SOURCES.SOURCE_DIRS   := sources
 GAME.LAUNCHER.SOURCES.EXECUTION_DIR := . 
-GAME.LAUNCHER.SOURCES.LIBS          := demos.luasg.shared
+GAME.LAUNCHER.SOURCES.LIBS          :=
 GAME.LAUNCHER.SOURCES.LINK_INCLUDES :=
 GAME.LAUNCHER.SOURCES.IMPORTS       := ../../system/link.static.mak ../../system/compile.static.mak \
                                        ../../scene_graph/compile.static.mak \
