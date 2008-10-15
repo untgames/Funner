@@ -19,7 +19,7 @@ int main ()
   
   try
   {
-    common::LogFilter filter ("*", &log_handler);
+    common::LogFilter filter ("script.binds.*", &log_handler);
 
     xtl::shared_ptr<Environment> env (new Environment);
     

@@ -1,6 +1,6 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS          := script.core script.lua extern.lua
+export.LIBS          := funner.script.core funner.script.lua funner.extern.lua
 export.LINK_INCLUDES := LuaInterpreter
 export.IMPORTS       := ../../common/link.static.mak link.static.mak

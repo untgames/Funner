@@ -234,14 +234,21 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 
       Pointer return_value = Pointer (new StringNode, false);
 
-      ParseLog parse_log;
-      Parser   parser (parse_log, file_name);      
+      Parser parser (file_name);      
+      ParseLog parse_log = parser.Log ();
 
       for (size_t i = 0; i < parse_log.MessagesCount (); i++)
-        if (parse_log.MessageType (i) == PARSE_LOG_ERROR || parse_log.MessageType (i) == PARSE_LOG_FATAL_ERROR)
-          get_log ().Printf ("Parser error: '%s'", parse_log.Message (i));
+        switch (parse_log.MessageType (i))
+        {
+          case ParseLogMessageType_Error:
+          case ParseLogMessageType_FatalError:
+            get_log ().Printf ("Parser error: '%s'", parse_log.Message (i));
+            break;
+          default:
+            break;
+        }
 
-      ParseNode* iter = parser.Root ()->First ();
+      ParseNode iter = parser.Root ().First ();
 
       if (!iter)
         throw xtl::format_operation_exception (METHOD_NAME, "There is no root node in file '%s'", file_name);
@@ -301,28 +308,28 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
     }
 
   private:
-    static void ProcessNode (StringNode::Pointer string_node, ParseNode* node)
+    static void ProcessNode (StringNode::Pointer string_node, const ParseNode& node)
     {
-      string_node->SetName (node->Tag ());
+      string_node->SetName (node.Name ());
 
-      string_node->ReserveAttributes (node->AttributesCount ());
+      string_node->ReserveAttributes (node.AttributesCount ());
 
-      for (size_t i = 0; i < node->AttributesCount (); i++)
-        string_node->AddAttribute (node->Attribute (i));
+      for (size_t i = 0; i < node.AttributesCount (); i++)
+        string_node->AddAttribute (node.Attribute (i));
 
       size_t children_count = 0;
 
-      for (ParseNode* iter = node->First (); iter; iter = iter->Next ())
+      for (ParseNode iter = node.First (); iter; iter = iter.Next ())
         children_count++;
 
       string_node->ReserveChildren (children_count);
 
-      for (ParseNode* iter = node->First (); iter; iter = iter->Next ())
+      for (ParseNode iter = node.First (); iter; iter = iter.Next ())
       {
-        if (!xstrcmp ("#text", iter->Tag ()))
+        if (!xstrcmp ("#text", iter.Name ()))
         {
-          for (size_t i = 0; i < iter->AttributesCount (); i++)
-            string_node->AddAttribute (iter->Attribute (i));
+          for (size_t i = 0; i < iter.AttributesCount (); i++)
+            string_node->AddAttribute (iter.Attribute (i));
         
           continue;
         }

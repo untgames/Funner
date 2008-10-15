@@ -5,7 +5,7 @@ TARGETS := SCRIPT.BINDS.SOURCES SCRIPT.BINDS.TESTS
 
 #Öåëü ¹1 - SCRIPT_BINDS sources
 SCRIPT.BINDS.SOURCES.TYPE             := static-lib
-SCRIPT.BINDS.SOURCES.NAME             := script.binds
+SCRIPT.BINDS.SOURCES.NAME             := funner.script.binds
 SCRIPT.BINDS.SOURCES.INCLUDE_DIRS     := include
 SCRIPT.BINDS.SOURCES.SOURCE_DIRS      := sources
 SCRIPT.BINDS.SOURCES.LIB_DIRS         :=  

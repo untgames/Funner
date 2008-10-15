@@ -21,8 +21,6 @@ int main ()
   
   try
   {
-    common::LogFilter filter ("*", &log_handler);
-
     StringRegistry string_registry;
 
     string_registry.Mount ("branch");

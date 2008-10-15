@@ -5,7 +5,7 @@ TARGETS := SCRIPT.CORE.SOURCES SCRIPT.CORE.TESTS SCRIPT.LUA.SOURCES SCRIPT.LUA.T
 
 #Öåëü ¹1 - SCRIPT_CORE sources
 SCRIPT.CORE.SOURCES.TYPE             := static-lib
-SCRIPT.CORE.SOURCES.NAME             := script.core
+SCRIPT.CORE.SOURCES.NAME             := funner.script.core
 SCRIPT.CORE.SOURCES.INCLUDE_DIRS     := 
 SCRIPT.CORE.SOURCES.SOURCE_DIRS      := sources/core
 SCRIPT.CORE.SOURCES.LIB_DIRS         :=  
@@ -26,7 +26,7 @@ SCRIPT.CORE.TESTS.IMPORTS				   := compile.static.mak link.static.mak ../../comm
 
 #Öåëü ¹3 - SCRIPT_LUA sources
 SCRIPT.LUA.SOURCES.TYPE             := static-lib
-SCRIPT.LUA.SOURCES.NAME             := script.lua
+SCRIPT.LUA.SOURCES.NAME             := funner.script.lua
 SCRIPT.LUA.SOURCES.INCLUDE_DIRS     := ../../../extern/lua/include
 SCRIPT.LUA.SOURCES.SOURCE_DIRS      := sources/lua
 SCRIPT.LUA.SOURCES.LIB_DIRS         :=  
