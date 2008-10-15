@@ -5,7 +5,7 @@ TARGETS := SOUND.LOW_LEVEL.SOURCES SOUND.LOW_LEVEL.TESTS
 
 #Öåëü ¹1 - Sound system sources
 SOUND.LOW_LEVEL.SOURCES.TYPE             := static-lib
-SOUND.LOW_LEVEL.SOURCES.NAME             := sound.low_level
+SOUND.LOW_LEVEL.SOURCES.NAME             := funner.sound.low_level
 SOUND.LOW_LEVEL.SOURCES.INCLUDE_DIRS     := 
 SOUND.LOW_LEVEL.SOURCES.SOURCE_DIRS      := sources/device
 SOUND.LOW_LEVEL.SOURCES.LIB_DIRS         :=  

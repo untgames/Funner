@@ -5,7 +5,7 @@ TARGETS := SOUND.OPENAL_DRIVER.SOURCES SOUND.OPENAL_DRIVER.TESTS
 
 #Öåëü ¹1 - OPENALDEVICE sources
 SOUND.OPENAL_DRIVER.SOURCES.TYPE             := static-lib
-SOUND.OPENAL_DRIVER.SOURCES.NAME             := sound.low_level.openal_driver
+SOUND.OPENAL_DRIVER.SOURCES.NAME             := funner.sound.low_level.openal_driver
 SOUND.OPENAL_DRIVER.SOURCES.INCLUDE_DIRS     := ../../../extern/openalsdk/include
 SOUND.OPENAL_DRIVER.SOURCES.SOURCE_DIRS      := sources
 SOUND.OPENAL_DRIVER.SOURCES.LIB_DIRS         :=  

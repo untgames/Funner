@@ -5,7 +5,7 @@ TARGETS := SOUND.MANAGER.SOURCES SOUND.MANAGER.TESTS
 
 #Öåëü ¹1 - Sound system sources
 SOUND.MANAGER.SOURCES.TYPE             := static-lib
-SOUND.MANAGER.SOURCES.NAME             := sound.manager
+SOUND.MANAGER.SOURCES.NAME             := funner.sound.manager
 SOUND.MANAGER.SOURCES.INCLUDE_DIRS     := 
 SOUND.MANAGER.SOURCES.SOURCE_DIRS      := sources/manager
 SOUND.MANAGER.SOURCES.LIB_DIRS         :=  

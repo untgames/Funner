@@ -1,5 +1,5 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS    := sound.scene_player
+export.LIBS    := funner.sound.scene_player
 export.IMPORTS := ../manager/link.static.mak ../../system/link.static.mak ../../scene_graph/link.static.mak
