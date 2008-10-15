@@ -14,7 +14,8 @@ COMMON.SOURCES.LIB_DIRS         :=
 COMMON.SOURCES.LIBS             := 
 COMMON.SOURCES.COMPILER_CFLAGS  :=
 COMMON.SOURCES.COMPILER_DEFINES := PCRE_STATIC
-COMMON.SOURCES.unistd.SOURCE_DIRS  := sources/platform/unistd
+COMMON.SOURCES.unistd.SOURCE_DIRS := sources/platform/unistd
+COMMON.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib

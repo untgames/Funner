@@ -1,6 +1,8 @@
 #ifndef COMMONLIB_PLATFORM_HEADER
 #define COMMONLIB_PLATFORM_HEADER
 
+#include <cstddef>
+
 namespace common
 {
 
@@ -21,6 +23,7 @@ class DefaultPlatform
     static ICustomAllocator*  GetSystemAllocator ();
     static ICustomFileSystem* GetFileSystem ();
     static ICustomFileSystem* GetIOSystem ();
+    static size_t             GetMilliseconds ();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,6 +35,7 @@ class Win32Platform
     static ICustomAllocator*  GetSystemAllocator ();
     static ICustomFileSystem* GetFileSystem ();
     static ICustomFileSystem* GetIOSystem ();
+    static size_t             GetMilliseconds ();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,10 +48,21 @@ class UnistdPlatform: public DefaultPlatform
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Darwin
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class MacOsXPlatform : public UnistdPlatform
+{
+  public:
+    static size_t GetMilliseconds ();
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указание текущей платформы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef _MSC_VER
   typedef DefaultPlatform Platform;
+#elif defined (__APPLE__)
+  typedef MacOsXPlatform Platform;
 #elif defined __GNUC__
   typedef UnistdPlatform Platform;
 #else

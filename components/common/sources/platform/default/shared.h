@@ -2,6 +2,7 @@
 #define COMMLIB_DEFAULT_PLATFORM_HEADER
 
 #include <stdio.h>
+#include <ctime>
 #include <errno.h>
 #include <sys/stat.h>
 #include <stdlib.h>
