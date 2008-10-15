@@ -5,7 +5,7 @@ TARGETS := SG_COMPONENTS SG_TESTS
 
 #Цель №1 - SG components sources
 SG_COMPONENTS.TYPE             := static-lib
-SG_COMPONENTS.NAME             := scene_graph
+SG_COMPONENTS.NAME             := funner.scene_graph
 SG_COMPONENTS.INCLUDE_DIRS     := ../bound_volumes/include
 SG_COMPONENTS.SOURCE_DIRS      := sources/core sources/helpers
 SG_COMPONENTS.LIB_DIRS         :=  
