@@ -7,11 +7,11 @@ using namespace common;
 struct Configuration::Impl
 {
   public:
-    Impl (const char* file_name) : parser (parse_log, file_name) {}
+    Impl (const char* file_name) : parser (file_name) {}
 
     int GetInteger (const char* property_name, int default_value = 0)
     {
-      ParseNode *node = parser.Root ()->First ("Configuration");
+      ParseNode node = parser.Root ().First ("Configuration");
 
       if (!node)
         return default_value;
@@ -21,7 +21,7 @@ struct Configuration::Impl
 
     const char* GetString (const char* property_name, const char* default_value = "")
     {
-      ParseNode *node = parser.Root ()->First ("Configuration");
+      ParseNode node = parser.Root ().First ("Configuration");
 
       if (!node)
         return default_value;
@@ -31,7 +31,7 @@ struct Configuration::Impl
 
     size_t LogMessagesCount ()
     {
-      return parse_log.MessagesCount ();
+      return parser.Log ().MessagesCount ();
     }
   
     const char* LogMessage (size_t index)
@@ -39,12 +39,11 @@ struct Configuration::Impl
       if (index >= LogMessagesCount ())
         throw xtl::make_range_exception ("Configuration::LogMessage", "index", index, (size_t)0, LogMessagesCount ());
 
-      return parse_log.Message (index);
+      return parser.Log ().Message (index);
     }
 
   private:
-    ParseLog parse_log;
-    Parser   parser;
+    Parser parser;
 };
 
 Configuration::Configuration (const char* file_name)

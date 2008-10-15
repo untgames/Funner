@@ -11,9 +11,9 @@ struct ParticleFrame
   
   void Load (common::Parser::Iterator iter)
   {
-    particles.reserve (PARTICLES_COUNT);
+    particles.reserve (PARTICLES_COUNT);    
     
-    read_range (iter, 0, stl::back_inserter (particles));    
+    read (*iter, "", stl::back_inserter (particles), iter->AttributesCount ()/3);
     
     for (ParticleArray::iterator pos_iter=particles.begin (); pos_iter!=particles.end (); ++pos_iter)
       stl::swap (pos_iter->y, pos_iter->z);
@@ -29,10 +29,10 @@ struct ParticleSystem
   
   void Load (const char* file_name)
   {
-    common::ParseLog log;
-    common::Parser parser (log, file_name, "wxf");    
+    common::Parser parser (file_name, "wxf");
+    common::ParseLog log = parser.Log ();
     
-    for (common::Parser::NamesakeIterator iter=parser.Root ()->First ("positions"); iter; ++iter)
+    for (common::Parser::NamesakeIterator iter=parser.Root ().First ("positions"); iter; ++iter)
     {
       ParticleFramePtr frame (new ParticleFrame);
       
@@ -203,6 +203,6 @@ int main (int argc, char* argv [])
   catch (std::exception& e)
   {
     printf ("exception: %s\n", e.what ());
-    return 1;
+    return 0;
   }
 }
