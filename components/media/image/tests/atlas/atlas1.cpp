@@ -21,7 +21,7 @@ int main ()
     printf ("Atlas image is '%s'\n", atlas.Image ());
 
     atlas.SetImage ("atlas_image.tga");
-    
+
     printf ("Atlas image is '%s'\n", atlas.Image ());
 
     printf ("Tiles count is %u\n", atlas.TilesCount ());
@@ -58,7 +58,7 @@ int main ()
     printf ("Tiles count is %u\n", atlas.TilesCount ());
 
     printf ("Tile 0 is:\n");
-    print (atlas.Tile (0u));
+    print (atlas.Tile ((size_t)0));
     printf ("Tile 1 is:\n");
     print (atlas.Tile (1));
 
@@ -66,7 +66,7 @@ int main ()
 
     printf ("Tiles count is %u\n", atlas.TilesCount ());
 
-    atlas.Remove (0u);
+    atlas.Remove ((size_t)0);
 
     printf ("Tiles count is %u\n", atlas.TilesCount ());
 
@@ -79,9 +79,9 @@ int main ()
     printf ("Tiles count is %u\n", atlas.TilesCount ());
   }
   catch (std::exception& exception)
-  {                                               
-    printf ("exception: %s\n",exception.what ()); 
+  {
+    printf ("exception: %s\n",exception.what ());
   }
-                                    
+
   return 0;
-} 
+}

@@ -3,7 +3,7 @@ sphere created by default constructor
 center=[0 0 0] radius=-1
 sphere created by vector and radius constructor
 center=[10 20 30] radius=40
-volume: 268082.56
+volume: 268082.5
 set_radius
 center=[10 20 30] radius=5
 set_center

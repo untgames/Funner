@@ -21,7 +21,7 @@ namespace
 {
 
 //получение ближайшей сверху степени двойки
-size_t get_next_higher_power_of_two (size_t k) 
+size_t get_next_higher_power_of_two (size_t k)
 {
   if (!k)
     return 1;
@@ -41,7 +41,7 @@ inline bool my_intersects (const axis_aligned_box<T>& box1, const axis_aligned_b
     if (box1.maximum ()[i] < box2.minimum ()[i] || box1.minimum ()[i] > box2.maximum ()[i])
       return false;
 
-  return true;  
+  return true;
 }
 
 class TileImageBuilder
@@ -77,7 +77,7 @@ class TileImageBuilder
         result_image_horisontal_side = result_image_vertical_side = get_next_higher_power_of_two ((size_t)sqrt ((float)minimum_area)) / 2;
       else
         result_image_horisontal_side = result_image_vertical_side = (size_t)sqrt ((float)minimum_area) + 1;
-        
+
       //Building map
 
       bool pack_result = false;
@@ -149,12 +149,12 @@ class TileImageBuilder
           out_origins[i].x = iter->x_pos;
           out_origins[i].y = iter->y_pos;
 
-          bound_volumes::axis_aligned_box<size_t> image_bb (vec3ui (out_origins[i].x, out_origins[i].y, 0), 
+          bound_volumes::axis_aligned_box<unsigned int> image_bb (vec3ui (out_origins[i].x, out_origins[i].y, 0),
                                                             vec3ui (out_origins[i].x + images[indices[i]].x - 1, out_origins[i].y + images[indices[i]].y - 1, 1));
 
           for (FreeSpacesSet::iterator erase_iter = free_spaces.begin (), erase_end = free_spaces.end (); erase_iter != erase_end;)
           {
-            bound_volumes::axis_aligned_box<size_t> free_space_bb (vec3ui (erase_iter->x_pos, erase_iter->y_pos, 0), 
+            bound_volumes::axis_aligned_box<unsigned int> free_space_bb (vec3ui (erase_iter->x_pos, erase_iter->y_pos, 0),
                                                                    vec3ui (erase_iter->x_pos + erase_iter->width - 1, erase_iter->y_pos + erase_iter->height - 1, 1));
 
             if (my_intersects (free_space_bb, image_bb))
@@ -198,7 +198,7 @@ class TileImageBuilder
                 else if (erase_iter->y_pos < (out_origins[i].y + images[indices[i]].y))
                 {
                   FreeSpace narrow_free_space (erase_iter->x_pos, erase_iter->y_pos, out_origins[i].x - erase_iter->x_pos, erase_iter->height);
-                  
+
                   free_spaces.insert (narrow_free_space);
                 }
 
@@ -259,7 +259,7 @@ class LeftBottomPackerComponent
 {
   public:
     //загрузка компонента
-    LeftBottomPackerComponent () 
+    LeftBottomPackerComponent ()
     {
       AtlasBuilderManager::RegisterPacker ("default", &left_bottom_pack);
       AtlasBuilderManager::RegisterPacker ("left_bottom", &left_bottom_pack);

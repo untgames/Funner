@@ -10,54 +10,54 @@ class Test
 {
   public:
     Test (const char* in_file_name);
-    
+
     template <class T> void Translate      (const char* type_name, const char* tag, const T& default_value = T ());
     template <class T> void TranslateArray (const char* type_name, const char* tag, size_t count);
-    
+
   private:
-    template <class T> void Print (const char* type_name, const char* tag, size_t count, const T* array);    
-        
+    template <class T> void Print (const char* type_name, const char* tag, size_t count, const T* array);
+
     void Write (int value)            { printf ("%d", value); }
     void Write (short value)          { printf ("%d", value); }
-    void Write (const char* s)        { printf ("%s", s); }    
+    void Write (const char* s)        { printf ("%s", s); }
     void Write (float value)          { printf ("%g", value); }
     void Write (const stl::string& s) { Write (s.c_str ()); }
     void Write (char value)           { printf ("%c", value); }
     void Write (const math::vec3f& v) { printf ("%g, %g, %g",  v [0],  v [1],  v [2]); }
     void Write (const math::mat3f& m) { Write (m [0]); printf (", "); Write (m [1]); printf (", "); Write (m [2]); }
-  
+
   private:
-    Parser parser;    
+    Parser parser;
 };
 
 Test::Test (const char* in_file_name)
   : parser (in_file_name)
-{ 
+{
   ParseLog log = parser.Log ();
 
   if (log.HasErrors () || log.HasWarnings ())
   {
     printf ("Parse log:\n");
-    
+
     for (size_t i=0;i<log.MessagesCount ();i++)
       printf ("%s\n", log.Message (i));
   }
 }
 
-template <class T> 
+template <class T>
 void Test::Print (const char* type_name, const char* tag, size_t count, const T* array)
 {
   printf ("%12s %28s = {", type_name, format ("<%s>[%u]", tag, count).c_str ());
 
   if (count)
-  {    
+  {
     for (size_t i=0;i<count-1;i++)
     {
       printf ("\"");
       Write  (array [i]);
       printf ("\", ");
     }
-    
+
     printf ("\"");
     Write  (array [count-1]);
     printf ("\"");
@@ -70,7 +70,7 @@ template <class T>
 void Test::Translate (const char* type_name, const char* tag, const T& default_value)
 {
   T object = get<T> (parser.Root (), tag, default_value);
-  
+
   printf ("%12s %28s = \"", type_name, format ("<%s>", tag).c_str ());
   Write  (object);
   printf ("\"\n");
@@ -81,7 +81,7 @@ void Test::TranslateArray (const char* type_name, const char* tag, size_t count)
 {
   vector<T> v;
 
-  read (parser.Root (), tag, back_inserter (v), count);  
+  read (parser.Root (), tag, back_inserter (v), count);
   Print (type_name, tag, v.size (), &v [0]);
 }
 
@@ -92,7 +92,7 @@ int main ()
   try
   {
     Test test (SRC_FILE_NAME);
-    
+
     printf ("Dump:\n");
 
     test.Translate<int>         ("int", "int_value");
@@ -111,6 +111,6 @@ int main ()
   {
     printf ("exception: %s\n", exception.what ());
   }
-  
-  return 0;  
+
+  return 0;
 }

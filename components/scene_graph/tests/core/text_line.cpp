@@ -1,7 +1,5 @@
 #include "shared.h"
 
-#include <clocale>
-
 const char* get_name (TextLineAlignment alignment)
 {
   switch (alignment)
@@ -16,8 +14,6 @@ const char* get_name (TextLineAlignment alignment)
 int main ()
 {
   printf ("Results of text_line_test:\n");
-
-  setlocale (LC_ALL, "Russian");
 
   TextLine::Pointer text_line (TextLine::Create ());
 
@@ -47,6 +43,6 @@ int main ()
   text_line->SetVerticalAlignment   (TextLineAlignment_Center);
 
   printf ("TextLine horizontal alignment = '%s', vertical_alignment = '%s'\n", get_name (text_line->HorizontalAlignment ()), get_name (text_line->VerticalAlignment ()));
-  
+
   return 0;
 }
