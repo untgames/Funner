@@ -7,17 +7,6 @@ using namespace common;
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
 
-namespace
-{
-
-//возвращение количества миллисекунд, прошедших с начала выполнения программы
-size_t milliseconds ()
-{
-  return size_t (clock () * 1000.0f / CLOCKS_PER_SEC);
-}
-
-}
-
 /*
     Описание реализации таймера
 */
@@ -29,13 +18,13 @@ struct Timer::Impl
   size_t            period;     //период срабатываний (в милисекундах)
   Platform::timer_t sys_timer;  //дескриптор системного таймера
   size_t            start_time; //время старта таймера
-  
+
   Impl  (Timer& in_timer, const TickHandler& in_handler);
   ~Impl ();
-  
+
   void SetTimer  (size_t period);
   void KillTimer ();
-  
+
   static void TimerHandler (void*);
 };
 
@@ -56,22 +45,22 @@ void Timer::Impl::SetTimer (size_t in_period)
 {
   if (sys_timer && period == in_period)
     return;
-    
-  KillTimer ();  
-  
+
+  KillTimer ();
+
   period = in_period;
-  
+
   sys_timer  = Platform::CreateTimer (period, &TimerHandler, this);
-  start_time = milliseconds ();  
+  start_time = milliseconds ();
 }
 
 void Timer::Impl::KillTimer ()
 {
   if (!sys_timer)
     return;
-    
+
   Platform::KillTimer (sys_timer);
-  
+
   sys_timer = 0;
 }
 
@@ -117,7 +106,7 @@ size_t Timer::Period () const
 }
 
 void Timer::SetPeriod (size_t period_in_milliseconds)
-{  
+{
   impl->SetTimer (period_in_milliseconds);
 }
 

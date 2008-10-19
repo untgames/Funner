@@ -2,38 +2,77 @@
 
 using namespace syslib;
 
-/*
-    Генерация исключения: работа с динамическими библиотеками невозможна для платформы по умолчанию
-*/
-
 namespace
 {
 
-void raise (const char* method_name)
+void raise_error (const char* source)
 {
-  throw xtl::format_not_supported_exception (method_name, "No dynamic libraries support for default platform");
+  const char* error = dlerror ();
+
+  if (error)
+    throw xtl::format_operation_exception (source, error);
+
+  throw xtl::format_operation_exception (source, "Unknown error");
 }
 
 }
-
 /*
     Загрузка динамических библиотек
 */
 
 Platform::dll_t Platform::LoadLibrary (const wchar_t* name)
 {
-  raise ("syslib::DefaultPlatform::LoadLibrary");
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+
+    size_t dlopen_flags = RTLD_NOW | RTLD_GLOBAL;
+
+    void* library = dlopen (common::tostring (name).c_str (), dlopen_flags);
+
+    if (!library)
+      raise_error (common::format ("::dlopen('%S', %lu)", name, dlopen_flags).c_str ());
+
+    return (dll_t)library;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::CarbonPlatform::LoadLibrary");
+    throw;
+  }
 
   return 0;
 }
 
-void Platform::UnloadLibrary (dll_t)
+void Platform::UnloadLibrary (dll_t library)
 {
-  raise ("syslib::DefaultPlatform::UnloadLibrary");
+  try
+  {
+    if (!library)
+      throw xtl::make_null_argument_exception ("", "library");
+
+    if (dlclose (library))
+      raise_error ("::dlclose");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::CarbonPlatform::UnloadLibrary");
+    throw;
+  }
 }
 
-void* Platform::GetSymbol (dll_t, const char*)
+void* Platform::GetSymbol (dll_t library, const char* symbol_name)
 {
-  raise ("syslib::DefaultPlatform::GetSymbol");
-  return 0;
+  static const char* METHOD_NAME = "syslib::CarbonPlatform::GetSymbol";
+
+  if (!library)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "library");
+
+  if (!symbol_name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "symbol_name");
+
+  void* address = dlsym (library, symbol_name);
+
+  return address;
 }

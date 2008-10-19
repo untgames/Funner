@@ -7,7 +7,7 @@ void destroy (Window&, WindowEvent, const WindowEventContext&)
 
 int main ()
 {
-  printf ("Results of window1_test:\n");
+  printf ("Results of window2_test:\n");
 
   try
   {

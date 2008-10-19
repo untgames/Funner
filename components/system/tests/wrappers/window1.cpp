@@ -25,7 +25,10 @@ const char* get_event_name (WindowEvent event)
 
 void keys (Window& window, WindowEvent event, const WindowEventContext& context)
 {
-  printf ("window '%s': ", window.Title ());
+  printf ("window '%s' pressed keys: alt-%c control-%c shift-%c; pressed mouse keys: 1-%c 2-%c 3-%c; event: ",
+          window.Title (), context.keyboard_alt_pressed ? 'y' : 'n', context.keyboard_control_pressed ? 'y' : 'n',
+          context.keyboard_shift_pressed ? 'y' : 'n', context.mouse_left_button_pressed ? 'y' : 'n',
+          context.mouse_right_button_pressed ? 'y' : 'n', context.mouse_middle_button_pressed ? 'y' : 'n');
 
   switch (event)
   {
@@ -82,6 +85,25 @@ void destroy (Window& window, WindowEvent, const WindowEventContext&)
   throw std::bad_alloc (); //тестирование распространения исключений в обработчиках событий
 }
 
+void print_event (Window& window, WindowEvent event, const WindowEventContext& context)
+{
+  switch (event)
+  {
+    case WindowEvent_OnClose:        printf ("Window close event\n");          break;
+    case WindowEvent_OnChangeHandle: printf ("Window changed handle to %p event\n", context.handle); break;
+    case WindowEvent_OnActivate:     printf ("Window activate event\n");       break;
+    case WindowEvent_OnDeactivate:   printf ("Window deactivate event\n");     break;
+    case WindowEvent_OnShow:         printf ("Window show event\n");           break;
+    case WindowEvent_OnHide:         printf ("Window hide event\n");           break;
+    case WindowEvent_OnSetFocus:     printf ("Window set focus event\n");      break;
+    case WindowEvent_OnLostFocus:    printf ("Window lost focus event\n");     break;
+    case WindowEvent_OnPaint:        printf ("Window paint event\n");          break;
+    case WindowEvent_OnMove:         printf ("Window move event\n");           break;
+    case WindowEvent_OnSize:         printf ("Window size event\n");           break;
+    default: return;
+  }
+}
+
 void app_exit ()
 {
   printf ("application exit\n");
@@ -125,7 +147,18 @@ int main ()
                     connection20 = window.RegisterEventHandler (WindowEvent_OnXButton1DoubleClick, &keys),
                     connection21 = window.RegisterEventHandler (WindowEvent_OnXButton2Down, &keys),
                     connection22 = window.RegisterEventHandler (WindowEvent_OnXButton2Up, &keys),
-                    connection23 = window.RegisterEventHandler (WindowEvent_OnXButton2DoubleClick, &keys);
+                    connection23 = window.RegisterEventHandler (WindowEvent_OnXButton2DoubleClick, &keys),
+                    connection24 = window.RegisterEventHandler (WindowEvent_OnClose, &print_event),
+                    connection25 = window.RegisterEventHandler (WindowEvent_OnActivate, &print_event),
+                    connection26 = window.RegisterEventHandler (WindowEvent_OnDeactivate, &print_event),
+                    connection27 = window.RegisterEventHandler (WindowEvent_OnShow, &print_event),
+                    connection28 = window.RegisterEventHandler (WindowEvent_OnHide, &print_event),
+                    connection29 = window.RegisterEventHandler (WindowEvent_OnSetFocus, &print_event),
+                    connection30 = window.RegisterEventHandler (WindowEvent_OnLostFocus, &print_event),
+                    connection31 = window.RegisterEventHandler (WindowEvent_OnPaint, &print_event),
+                    connection32 = window.RegisterEventHandler (WindowEvent_OnMove, &print_event),
+                    connection33 = window.RegisterEventHandler (WindowEvent_OnSize, &print_event),
+                    connection34 = window.RegisterEventHandler (WindowEvent_OnChangeHandle, &print_event);
 
     window.SetDebugLog (&print);
 

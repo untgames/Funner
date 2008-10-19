@@ -65,7 +65,7 @@ const char* get_key_name (Key key)
     case Key_Home:            return "Home";
     case Key_End:             return "End";
 
-    case Key_Enter:           return "Enter"; 
+    case Key_Enter:           return "Enter";
     case Key_Escape:          return "Escape";
     case Key_Pause:           return "Pause";
     case Key_Tab:             return "Tab";
@@ -79,13 +79,13 @@ const char* get_key_name (Key key)
     case Key_NumLock:         return "Num Lock";
     case Key_ScrollLock:      return "Scroll Lock";
     case Key_CapsLock:        return "Caps Lock";
-    
+
     case Key_Tilda:           return "~";
     case Key_Comma:           return ",";
     case Key_Dot:             return ".";
     case Key_Slash:           return "/";
     case Key_BackSlash:       return "\\";
-    case Key_Semicolon:       return "\"";
+    case Key_Semicolon:       return ";";
     case Key_Apostrophe:      return "'";
     case Key_LeftBracket:     return "[";
     case Key_RightBracket:    return "]";

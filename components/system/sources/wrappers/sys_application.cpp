@@ -134,7 +134,7 @@ void ApplicationImpl::Suspend ()
 {
   try
   {
-    if (!suspend_handler ())
+    if (suspend_handler && !suspend_handler ())
       return;
 
     if (!is_exit_detected)
