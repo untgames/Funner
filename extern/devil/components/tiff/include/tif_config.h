@@ -55,6 +55,8 @@ static int _wopen (const void* name, int mode, ...)
 
 #endif
 
-#else
+#endif
+
+#ifdef _WIN32
   #define lfind _lfind
 #endif
